@@ -1,0 +1,8 @@
+/** 
+ * @namespace btk
+ * @brief The "btk" namespace contains all Biomechanical ToolKit (BTK)
+ * classes. There are several nested namespaces within the btk:: namespace.
+ */
+
+
+

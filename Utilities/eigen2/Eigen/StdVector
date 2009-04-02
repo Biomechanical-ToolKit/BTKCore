@@ -1,0 +1,15 @@
+#ifndef EIGEN_STDVECTOR_MODULE_H
+#define EIGEN_STDVECTOR_MODULE_H
+
+#include "Core"
+#include <vector>
+
+namespace Eigen {
+#include "src/StdVector/UnalignedType.h"
+} // namespace Eigen
+
+namespace std {
+#include "src/StdVector/StdVector.h"
+} // namespace std
+
+#endif // EIGEN_STDVECTOR_MODULE_H
