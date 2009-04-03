@@ -46,27 +46,6 @@ namespace btk
    * Collection of markers
    */ 
   typedef Collection<Marker> MarkerCollection;
-  /*
-  class MarkerCollection : public Collection<Marker>
-  {
-  public:
-    typedef SharedPtr<MarkerCollection> Pointer;
-    typedef SharedPtr<const MarkerCollection> ConstPointer;
-    
-    static Pointer New() {return Pointer(new MarkerCollection());};
-    
-    // ~MarkerCollection(); // Implicit.
-    
-  protected:
-    MarkerCollection()
-    : Collection<Marker>()
-    {};
-    
-  private:
-    MarkerCollection(const MarkerCollection& ); // Not implemented.
-    MarkerCollection& operator=(const MarkerCollection& ); // Not implemented.
-  };
-   */
 };
 
 #endif // __btkMarkerCollection_h

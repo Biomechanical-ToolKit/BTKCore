@@ -41,25 +41,11 @@
 
 namespace btk
 {
-  class AnalogCollection : public Collection<Analog>
-  {
-  public:
-    typedef SharedPtr<AnalogCollection> Pointer;
-    typedef SharedPtr<const AnalogCollection> ConstPointer;
-    
-    static Pointer New() {return Pointer(new AnalogCollection());};
-    
-    // ~AnalogCollection(); // Implicit.
-    
-  protected:
-    AnalogCollection()
-    : Collection<Analog>()
-    {};
-    
-  private:
-    AnalogCollection(const AnalogCollection& ); // Not implemented.
-    AnalogCollection& operator=(const AnalogCollection& ); // Not implemented.
-  };
+  /**
+   * @typedef AnalogCollection 
+   * Collection of analog channels
+   */ 
+  typedef Collection<Analog> AnalogCollection;
 };
 
 #endif // __btkAnalogCollection_h
