@@ -40,6 +40,8 @@ namespace btk
   /**
    * @class AcquisitionFileIO
    * @brief Interface to read/write acquisition's files.
+	 *
+	 * @ingroup BTKIO
    */
   /**
    * @var AcquisitionFileIO::m_FileType
@@ -57,7 +59,7 @@ namespace btk
   
   /**
    * @typedef AcquisitionFileIO::ConstPointer
-   * Smart const pointer associated with an AcquisitionFileIO object.
+   * Smart pointer associated with a const AcquisitionFileIO object.
    */
   
   /**

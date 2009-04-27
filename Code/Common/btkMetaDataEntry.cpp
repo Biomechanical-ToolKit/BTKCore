@@ -34,8 +34,8 @@
  */
 
 #include "btkMetaDataEntry.h"
-#include "btkMacro.h"
 #include "btkException.h"
+#include "btkConvert.h"
 
 #include <iostream>
 
@@ -56,7 +56,7 @@ namespace btk
   
   /**
    * @typedef MetaDataEntry::ConstPointer
-   * Smart const pointer associated with a MetaDataEntry object.
+   * Smart  pointer associated with a const MetaDataEntry object.
    */
   
   /**
@@ -68,93 +68,102 @@ namespace btk
    * @typedef MetaDataEntry::ConstIterator
    * Const Iterator related to the children of the entry.
    */
+
+	/**
+	 * Collapse the @a parent children entries' values starting with the string @a basename
+	 * and incrementing (for example: LABELS, LABELS2, LABELS3). The entries'
+	 * values are stored in @a target.
+	 *
+	 * The input @a targetFinalSize can be used to fox the number of values 
+	 * to collpase (by default: -1). The input @a blankReplacement can be used
+	 * to fill the @a target' values which have no corresponding in the @a parent (by default: ""). 
+	 */
+	void MetaDataEntry::CollapseChildrenValues(std::vector<std::string>& target,
+																			 			 MetaDataEntry::ConstPointer parent,
+                           						 			 const std::string& basename,
+																			 			 int targetFinalSize,
+                           						 			 const std::string& blankReplacement)
+  {
+		target.clear();
+    int collapsedNumber = 0; int inc = 2;
+    std::string name = basename;
+		if (parent.get() != 0)
+		{
+      while (1)
+      {
+        MetaDataEntry::ConstIterator it = parent->Find(name);
+        if (it == parent->End())
+          break;
+        std::vector<std::string> temp = (*it)->GetMetaDataEntryValue()->GetValues();
+        for (std::vector<std::string>::const_iterator it = temp.begin() ; it != temp.end() ; ++it)
+        {
+          if (target.size() == targetFinalSize)
+            break;
+          std::string str = *it;
+          str = str.erase(str.find_last_not_of(' ') + 1);
+          str = str.erase(0, str.find_first_not_of(' '));
+          target.push_back(str);
+        }
+        collapsedNumber = target.size();
+        if (collapsedNumber == targetFinalSize)
+          break;
+        name = basename + ToString(inc);
+      }
+		}
+    if ((collapsedNumber < targetFinalSize) && (!blankReplacement.empty()))
+    {
+      target.resize(targetFinalSize);
+      for (int inc = collapsedNumber ; inc < targetFinalSize ; ++inc)
+        target[inc] = blankReplacement + ToString(inc + 1);
+    }
+  };
   
   /**
+	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::string&, bool) constructor.
    */
-  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::string& desc,
-                                            bool isUnlocked)
-  {
-    return Pointer(new MetaDataEntry(name, desc, isUnlocked));
-  };
-  
-  /**
+	
+	/**
+	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, int8_t val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, int8_t, const std::string&, bool) constructor.
    */
-  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, int8_t val,
-                                            const std::string& desc, bool isUnlocked)
-  {
-    return Pointer(new MetaDataEntry(name, val, desc, isUnlocked));
-  };
-  
-  /**
+
+	/**
+	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, int16_t val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, int16_t, const std::string&, bool) constructor.
    */
-  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, int16_t val, 
-                                            const std::string& desc, bool isUnlocked)
-  {
-    return Pointer(new MetaDataEntry(name, val, desc, isUnlocked));
-  };
-  
-  /**
+
+	/**
+	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, float val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, float, const std::string&, bool) constructor.
    */
-  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, float val, 
-                                            const std::string& desc, bool isUnlocked)
-  {
-    return Pointer(new MetaDataEntry(name, val, desc, isUnlocked));
-  };
-  
-  /**
+
+	/**
+	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, std::string val,const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::string&, const std::string&, bool) constructor.
    */
-  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, std::string val, 
-                                            const std::string& desc, bool isUnlocked)
-  {
-    return Pointer(new MetaDataEntry(name, val, desc, isUnlocked));
-  };
-  
-  /**
+
+	/**
+	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, const std::vector<int8_t>& val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<uint8_t>&, const std::vector<int8_t>&, const std::string&, bool) constructor.
    */
-  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, 
-                                            const std::vector<int8_t>& val, const std::string& desc,
-                                            bool isUnlocked)
-  {
-    return Pointer(new MetaDataEntry(name, dim, val, desc, isUnlocked));
-  };
-  
-  /**
+
+	/**
+	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, const std::vector<int16_t>& val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<uint8_t>&, const std::vector<int16_t>&, const std::string&, bool) constructor.
    */
-  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, 
-                                            const std::vector<int16_t>& val, const std::string& desc,
-                                            bool isUnlocked)
-  {
-    return Pointer(new MetaDataEntry(name, dim, val, desc, isUnlocked));
-  };
-  
-  /**
-   * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<uint8_t>&, const std::vector<float>&, const std::string&, bool) constructor.
+
+	/**
+   * @fn  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, const std::vector<float>& val, const std::string& desc, bool isUnlocked)
+	 * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<uint8_t>&, const std::vector<float>&, const std::string&, bool) constructor.
    */
-  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, 
-                                            const std::vector<float>& val, const std::string& desc,
-                                            bool isUnlocked)
-  {
-    return Pointer(new MetaDataEntry(name, dim, val, desc, isUnlocked));
-  };
-  
-  /**
+
+	/**
+	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, const std::vector<std::string>& val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<uint8_t>&, const std::vector<std::string>&, const std::string&, bool) constructor.
    */
-  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, 
-                                            const std::vector<std::string>& val, const std::string& desc,
-                                            bool isUnlocked)
-  {
-    return Pointer(new MetaDataEntry(name, dim, val, desc, isUnlocked));
-  };
-  
-  /**
+
+	/**
    * @fn const std::string& MetaDataEntry::GetLabel() const
    * Returns the label of the entry.
    */

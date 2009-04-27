@@ -47,7 +47,7 @@ namespace btk
     typedef SharedPtr<const Object> ConstPointer;
     
     long GetTimestamp() const {return this->m_Timestamp;};
-    virtual void Modified();
+    BTK_COMMON_EXPORT virtual void Modified();
     
   protected:
     Object()

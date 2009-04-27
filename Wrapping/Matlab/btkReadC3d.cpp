@@ -33,7 +33,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkObjectHandle.h"
+#include "btkMEXObjectHandle.h"
+#include "btkMEXStreambufToPrintf.h"
+#include "btkMEXStreambufToWarnMsgTxt.h"
 
 #include <btkAcquisitionFileReader.h>
 #include <btkC3dFileIO.h>
@@ -44,6 +46,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mexErrMsgTxt("One input required.");
 	if (nlhs > 1)
 	 mexErrMsgTxt("Too many output arguments.");
+
+	// std::cout redirection to the mexPrintf function.
+	btk::MEXStreambufToPrintf matlabStandardOutput;
+	std::streambuf* stdStandardOutput = std::cout.rdbuf(&matlabStandardOutput);
+	// std::cerr redirection to the mexWarnMsgTxt function.
+	btk::MEXStreambufToWarnMsgTxt matlabErrorOutput;
+	std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput);
 
   int strlen = (mxGetM(prhs[0]) * mxGetN(prhs[0]) * sizeof(mxChar)) + 1;
   char* filename = (char*)mxMalloc(strlen);
@@ -66,7 +75,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 		mexErrMsgTxt("An unexpected error occured.");
 	}
-	plhs[0] = btkOH_create_handle(reader->GetOutput());
+	plhs[0] = btk_MOH_create_handle(reader->GetOutput());
 
 	mxFree(filename);
-}
+
+	// Back to the previous output buffer.
+	std::cout.rdbuf(stdStandardOutput);
+	std::cerr.rdbuf(stdErrorOutput);
+};

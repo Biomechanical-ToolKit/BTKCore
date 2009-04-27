@@ -56,7 +56,7 @@ namespace btk
   
   /**
    * @typedef DataObject::ConstPointer
-   * Smart const pointer associated with a DataObject object.
+   * Smart pointer associated with a const DataObject object.
    */
   
   /**

@@ -1,0 +1,27 @@
+// This file contains only regular modules. Optional modules are described
+// in their respective directory. For example, the BTKWrappingMatlab module 
+// is described in the file Wrapping/Matlab/BTKWrappingMatlab.dox 
+
+/** 
+ * @defgroup BTKCommon Common
+ * @brief Common is the base of BTK. It contains required classes by others modules. 
+ * 
+ * This modules corresponds to the library BTKCommon
+ */
+
+/**
+ * @defgroup BTKIO IO
+ * @brief Reader/Writer classes for acquistions files, models, ...
+ *
+ * This modules corresponds to the library BTKIO
+ */
+
+/**
+ * @defgroup BTKBasicFilters BasicFilters
+ * @brief Simple filters (e.g. Extract a frame of markers frome an acquisition).
+ *
+ * This modules corresponds to the library BTKBasicFilters
+ */
+
+
+

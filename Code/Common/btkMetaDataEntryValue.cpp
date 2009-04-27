@@ -34,7 +34,6 @@
  */
 
 #include "btkMetaDataEntryValue.h"
-#include "btkMacro.h"
 #include "btkConvert.h"
 
 namespace btk
@@ -69,79 +68,57 @@ namespace btk
   
   /**
    * @typedef MetaDataEntryValue::Pointer
-   * Smart pointer of a MetaDataEntryValue.
+   * Smart pointer associated with a MetaDataEntryValue object.
    */
   
   /**
    * @typedef MetaDataEntryValue::ConstPointer
-   * Smart const pointer of a MetaDataEntryValue.
+   * Smart pointer associated with a const MetaDataEntryValue object.
    */
   
   /**
+	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(int8_t val)
+
    * Creates a smart pointer from the MetaDataEntryValue(int8_t) constructor.
-   */
-  MetaDataEntryValue::Pointer MetaDataEntryValue::New(int8_t val)
-  {
-    return Pointer(new MetaDataEntryValue(val));
-  };
+	 */
   
-  /**
+	/**
+	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(int16_t val)
    * Creates a smart pointer from the MetaDataEntryValue(int16_t) constructor.
    */
-  MetaDataEntryValue::Pointer MetaDataEntryValue::New(int16_t val)
-  {
-    return Pointer(new MetaDataEntryValue(val));
-  };
-  
-  /**
+
+	/**
+	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(float val)
    * Creates a smart pointer from the MetaDataEntryValue(float) constructor.
    */
-  MetaDataEntryValue::Pointer MetaDataEntryValue::New(float val)
-  {
-    return Pointer(new MetaDataEntryValue(val));
-  };
-  
-  /**
+
+	/**
+	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(std::string val)
    * Creates a smart pointer from the MetaDataEntryValue(std::string) constructor.
    */
-  MetaDataEntryValue::Pointer MetaDataEntryValue::New(std::string val)
-  {
-    return Pointer(new MetaDataEntryValue(val));
-  };
-  
-  /**
+
+	/**
+	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val)
    * Creates a smart pointer from the MetaDataEntryValue(const std::vector<uint8_t>&, const std::vector<int8_t>&) constructor.
    */
-  MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val)
-  {
-    return Pointer(new MetaDataEntryValue(dim, val));
-  };
-  
-  /**
+
+	/**
+	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val)
    * Creates a smart pointer from the MetaDataEntryValue(const std::vector<uint8_t>&, const std::vector<int16_t>&) constructor.
    */
-  MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val)
-  {
-    return Pointer(new MetaDataEntryValue(dim, val));
-  };
-  
-  /**
+	
+	/**
+	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<float>& val)
    * Creates a smart pointer from the MetaDataEntryValue(const std::vector<uint8_t>&, const std::vector<float>&) constructor.
    */
-  MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<float>& val)
-  {
-    return Pointer(new MetaDataEntryValue(dim, val));
-  };
-  
-  /**
+	
+	/**
+	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<std::string>& val)
+
    * Creates a smart pointer from the MetaDataEntryValue(const std::vector<uint8_t>&, const std::vector<std::string>&) constructor.
    */
-  MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<std::string>& val)
-  {
-    return Pointer(new MetaDataEntryValue(dim, val));
-  };
 
-  /**
+	/**
    * @fn Format MetaDataEntryValue::GetFormat() const
    * Returns the format of the values.
    */

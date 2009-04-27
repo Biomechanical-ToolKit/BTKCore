@@ -63,6 +63,8 @@ namespace btk
    * @endcode
    *
    * @sa VAXLittleEndianBinaryFileStream, IEEELittleEndianBinaryFileStream, IEEEBigEndianBinaryFileStream
+	 *
+	 * @ingroup BTKIO
    */
   /**
    * @var BinaryFileStream::mr_Fstream

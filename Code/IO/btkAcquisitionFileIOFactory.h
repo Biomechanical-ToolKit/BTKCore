@@ -46,10 +46,10 @@ namespace btk
   {
   public:
     typedef enum {ReadMode, WriteMode} OpenMode;
-    static AcquisitionFileIO::Pointer CreateAcquisitionIO(const std::string& Filename, OpenMode mode);
+    BTK_IO_EXPORT static AcquisitionFileIO::Pointer CreateAcquisitionIO(const std::string& Filename, OpenMode mode);
     
   protected:
-    AcquisitionFileIOFactory();
+    BTK_IO_EXPORT AcquisitionFileIOFactory();
     virtual ~AcquisitionFileIOFactory() {};
     
   private:

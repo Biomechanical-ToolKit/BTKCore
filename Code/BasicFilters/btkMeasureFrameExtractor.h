@@ -87,6 +87,8 @@ namespace btk
    * @class MeasureFrameExtractor
    * @brief Extracts a frame from a collection of btk::Measure objects
    * @tparam T Must be a class which inherit of btk::Measure
+	 *
+	 * @ingroup BTKBasicFilters
    */
   
   /**
@@ -96,7 +98,7 @@ namespace btk
   
   /**
    * @typedef MeasureFrameExtractor<T>::ConstPointer
-   * Smart const pointer associated with a MeasureFrameExtractor object.
+   * Smart pointer associated with a const MeasureFrameExtractor object.
    */
   
   /**
@@ -106,7 +108,7 @@ namespace btk
   
   /**
    * @typedef MeasureFrameExtractor<T>::CollectionConstPointer
-   * Smart const pointer associated with a Collection<T> object.
+   * Smart pointer associated with a const Collection<T> object.
    */
   
   /**

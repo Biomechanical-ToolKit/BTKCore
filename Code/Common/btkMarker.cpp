@@ -37,23 +37,99 @@
 
 namespace btk
 {
-  Marker::Marker(const std::string& label, int frameNumber)
-  : Measure<3>(label, frameNumber),
-    m_Residual(Residual(frameNumber,1)), m_Mask(Mask(frameNumber,1))
-  {};
-  
+  /**
+	 * @class Marker
+	 * @brief Coordinates of a point in a 3D space along the time.
+	 *
+	 * Coordinates of the point are generaly measured by an acquisition sytem.
+	 * Each Marker object has a residual value for each frame. A mask is also added to know the parts of the system which measured the coordinates.
+	 *
+	 * @ingroup BTKCommon
+	 */
+
+ 	/**
+   * @typedef Marker::Residual
+   * Vector of double representing the residual associated with each coordinates (if applicable).
+   */
+
+  /**
+   * @typedef Marker::Mask
+   * Vector of double representing the parts of the system which measured the coordinates (if applicable).
+   */
+
+	/**
+   * @typedef Marker::Pointer
+   * Smart pointer associated with a Marker object.
+   */
+
+	/**
+   * @typedef Marker::ConstPointer
+   * Smart pointer associated with a const Marker object.
+   */
+
+  /**
+	 * @fn static Pointer Marker::New(int frameNumber = 1)
+	 * @brief Creates a smart pointer associated with a Marker object.
+	 *
+	 * The marker created has an empty label and a number of frame equals to @a framenumber.
+	 * @warning The number of frames must be greater than 0.
+	 */
+
+	/**
+	 * @fn static Pointer Marker::New(const std::string& label, int frameNumber)
+	 * @brief Creates a smart pointer associated with a Marker object.
+	 *
+	 * The marker created has a label and a number of frame equals to @a label and @a framenumber respectively.
+	 * @warning The number of frames must be greater than 0.
+	 */
+
+	/**
+	 * @fn virtual Marker::~Marker()
+	 * Empty destructor.
+	 */
+
+	/**
+	 * @fn Residual& Marker::GetResidual()
+	 * Gets the residuals.
+	 */
+
+	/**
+	 * @fn const Residual& Marker::GetResidual() const
+	 * Gets the residuals.
+	 */
+
+	/**
+	 * Sets the residuals.
+	 */  
   void Marker::SetResidual(const Residual& r)
   {
     this->m_Residual = r;
     this->Modified();
   };
   
+  /**
+	 * @fn Mask& Marker::GetMask()
+	 * Gets the masks.
+	 */
+
+	/**
+	 * @fn const Mask& Marker::GetMask() const
+	 * Gets the masks.
+	 */
+
+	/**
+	 * Sets the masks.
+	 */
   void Marker::SetMask(const Mask& m)
   {
     this->m_Residual = m;
     this->Modified();
   };
   
+	/**
+	 * Resizes the number of frames of the measures, the residuals and the masks.
+	 * @warning The number of frames must be greater than 0.
+	 */
   void Marker::SetFrameNumber(int frameNumber)
   {
     int actualFrameNumber = this->GetFrameNumber();
@@ -81,4 +157,14 @@ namespace btk
     }
     this->Modified();
   };
+
+	/**
+	 * Constructor.
+	 * @warning The number of frames must be greater than 0.
+	 */
+	Marker::Marker(const std::string& label, int frameNumber)
+  : Measure<3>(label, frameNumber),
+    m_Residual(Residual(frameNumber,1)), m_Mask(Mask(frameNumber,1))
+  {};
+
 }

@@ -44,6 +44,8 @@ namespace btk
   /**
    * @typedef AnalogCollection 
    * Collection of analog channels
+	 * 
+	 * @ingroup BTKCommon
    */ 
   typedef Collection<Analog> AnalogCollection;
 };

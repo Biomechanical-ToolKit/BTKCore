@@ -38,6 +38,7 @@
 
 #include "btkDataObject.h"
 #include "btkMetaDataEntry.h"
+#include "btkEventCollection.h"
 #include "btkMarkerCollection.h"
 #include "btkAnalogCollection.h"
 
@@ -51,6 +52,8 @@ namespace btk
 	  typedef SharedPtr<Acquisition> Pointer;
     typedef SharedPtr<const Acquisition> ConstPointer;
     
+		typedef EventCollection::Iterator EventIterator;
+    typedef EventCollection::ConstIterator EventConstIterator;
     typedef MarkerCollection::Iterator MarkerIterator;
     typedef MarkerCollection::ConstIterator MarkerConstIterator;
     typedef AnalogCollection::Iterator AnalogIterator;
@@ -61,7 +64,11 @@ namespace btk
     static Pointer New() {return Pointer(new Acquisition());};
     
     // ~Acquisition(); // Implicit.
-    
+    EventIterator BeginEvent() {return this->m_Events->Begin();};
+    EventConstIterator BeginEvent() const {return this->m_Events->Begin();};
+    EventIterator EndEvent() {return this->m_Events->End();};
+    EventConstIterator EndEvent() const {return this->m_Events->End();};
+
     MarkerIterator BeginMarker() {return this->m_Markers->Begin();};
     MarkerConstIterator BeginMarker() const {return this->m_Markers->Begin();};
     MarkerIterator EndMarker() {return this->m_Markers->End();};
@@ -75,52 +82,63 @@ namespace btk
     MetaDataIterator EndMetaData() {return this->mp_MetaData->End();};
     MetaDataConstIterator EndMetaData() const {return this->mp_MetaData->End();};
     
-    void Init(int markerNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerMarkerFrame = 1);
+    BTK_COMMON_EXPORT void Init(int markerNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerMarkerFrame = 1);
     
     double GetDuration() {return this->m_MarkerFrequency * this->m_MarkerFrameNumber;};
     int GetFirstFrame() const {return this->m_FirstFrame;};
-    void SetFirstFrame(int num);
+    BTK_COMMON_EXPORT void SetFirstFrame(int num);
     int GetLastFrame() const {return (this->m_FirstFrame + this->GetMarkerFrameNumber() - 1);};
     double GetMarkerFrequency() {return this->m_MarkerFrequency;};
-    void SetMarkerFrequency(double frequency);
+    BTK_COMMON_EXPORT void SetMarkerFrequency(double frequency);
     double GetAnalogFrequency() {return this->m_MarkerFrequency * this->m_AnalogSampleNumberPerMarkerFrame;};
     int GetMarkerFrameNumber() const {return this->m_MarkerFrameNumber;};
     int GetAnalogFrameNumber() const {return this->m_MarkerFrameNumber * this->m_AnalogSampleNumberPerMarkerFrame;};
     
+		int GetEventNumber() const {return this->m_Events->GetItemNumber();};
+    BTK_COMMON_EXPORT void SetEventNumber(int num);
     int GetMarkerNumber() const {return this->m_Markers->GetItemNumber();};
-    void SetMarkerNumber(int num);
+    BTK_COMMON_EXPORT void SetMarkerNumber(int num);
     int GetAnalogNumber() const {return this->m_Analogs->GetItemNumber();};
-    void SetAnalogNumber(int num);
+    BTK_COMMON_EXPORT void SetAnalogNumber(int num);
     
-    Marker::Pointer GetMarker(int idx);
-    Marker::ConstPointer GetMarker(int idx) const;
-    void SetMarker(int idx, Marker::Pointer marker);
+		BTK_COMMON_EXPORT Event::Pointer GetEvent(int idx);
+    BTK_COMMON_EXPORT Event::ConstPointer GetEvent(int idx) const;
+    BTK_COMMON_EXPORT void SetEvent(int idx, Event::Pointer marker);
+    EventCollection::Pointer GetEvents() {return this->m_Events;};
+    EventCollection::ConstPointer GetEvents() const {return this->m_Events;};
+
+    BTK_COMMON_EXPORT Marker::Pointer GetMarker(int idx);
+    BTK_COMMON_EXPORT Marker::ConstPointer GetMarker(int idx) const;
+    BTK_COMMON_EXPORT void SetMarker(int idx, Marker::Pointer marker);
     MarkerCollection::Pointer GetMarkers() {return this->m_Markers;};
     MarkerCollection::ConstPointer GetMarkers() const {return this->m_Markers;};
-    Analog::Pointer GetAnalog(int idx);
-    Analog::ConstPointer GetAnalog(int idx) const;
-    void SetAnalog(int idx, Analog::Pointer analog);
+    BTK_COMMON_EXPORT Analog::Pointer GetAnalog(int idx);
+    BTK_COMMON_EXPORT Analog::ConstPointer GetAnalog(int idx) const;
+    BTK_COMMON_EXPORT void SetAnalog(int idx, Analog::Pointer analog);
     AnalogCollection::Pointer GetAnalogs() {return this->m_Analogs;};
     AnalogCollection::ConstPointer GetAnalogs() const {return this->m_Analogs;};
     MetaDataEntry::Pointer GetMetaData() {return this->mp_MetaData;};
     MetaDataEntry::ConstPointer GetMetaData() const {return this->mp_MetaData;};
-    void SetMetaData(MetaDataEntry::Pointer metaData);
+    BTK_COMMON_EXPORT void SetMetaData(MetaDataEntry::Pointer metaData);
     
-    MarkerIterator FindMarker(const std::string& label);
-    MarkerConstIterator FindMarker(const std::string& label) const;
-    AnalogIterator FindAnalog(const std::string& label);
-    AnalogConstIterator FindAnalog(const std::string& label) const;
+		BTK_COMMON_EXPORT EventIterator FindEvent(const std::string& label);
+    BTK_COMMON_EXPORT EventConstIterator FindEvent(const std::string& label) const;
+    BTK_COMMON_EXPORT MarkerIterator FindMarker(const std::string& label);
+    BTK_COMMON_EXPORT MarkerConstIterator FindMarker(const std::string& label) const;
+    BTK_COMMON_EXPORT AnalogIterator FindAnalog(const std::string& label);
+    BTK_COMMON_EXPORT AnalogConstIterator FindAnalog(const std::string& label) const;
     
-    void Reset();
+    BTK_COMMON_EXPORT void Reset();
     
   protected:
-    Acquisition();
+    BTK_COMMON_EXPORT Acquisition();
     
-    void SetMarkerFrameNumber(int frameNumber);
-    void SetAnalogFrameNumber(int frameNumber);
+    BTK_COMMON_EXPORT void SetMarkerFrameNumber(int frameNumber);
+    BTK_COMMON_EXPORT void SetAnalogFrameNumber(int frameNumber);
     
   private:
     MetaDataEntry::Pointer mp_MetaData;
+		EventCollection::Pointer m_Events;
     MarkerCollection::Pointer m_Markers;
     AnalogCollection::Pointer m_Analogs;
     int m_FirstFrame;    

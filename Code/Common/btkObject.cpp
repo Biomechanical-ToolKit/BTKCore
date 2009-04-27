@@ -61,7 +61,7 @@ namespace btk
   
   /**
    * @typedef Object::ConstPointer
-   * Smart const pointer associated with a Object object.
+   * Smart pointer associated with a const Object object.
    */
   
   /**

@@ -51,34 +51,52 @@ namespace btk
     
     typedef std::list<MetaDataEntry::Pointer>::iterator Iterator;
     typedef std::list<MetaDataEntry::Pointer>::const_iterator ConstIterator;
-    
-    static Pointer New(const std::string& name, const std::string& desc = "",
-                       bool isUnlocked = true);
+    BTK_COMMON_EXPORT static void CollapseChildrenValues(
+				std::vector<std::string>& target,
+				MetaDataEntry::ConstPointer parent,
+        const std::string& basename,
+				int targetFinalSize = -1 ,
+        const std::string& blankReplacement = "");
+    static Pointer New(const std::string& name, 
+											 const std::string& desc = "",bool isUnlocked = true)
+		{return Pointer(new MetaDataEntry(name, desc, isUnlocked));};
     static Pointer New(const std::string& name, int8_t val,
-                       const std::string& desc = "", bool isUnlocked = true);
+                       const std::string& desc = "", bool isUnlocked = true)		{return Pointer(new MetaDataEntry(name, val, desc, isUnlocked));};
     static Pointer New(const std::string& name, int16_t val, 
-                       const std::string& desc = "", bool isUnlocked = true);
+                       const std::string& desc = "", bool isUnlocked = true)    {return Pointer(new MetaDataEntry(name, val, desc, isUnlocked));};
     static Pointer New(const std::string& name, float val, 
-                       const std::string& desc = "", bool isUnlocked = true);
-    static Pointer New(const std::string& name, std::string val, const std::string& desc = "",
-                       bool isUnlocked = true);
-    static Pointer New(const std::string& name, const std::vector<uint8_t>& dim, 
-                       const std::vector<int8_t>& val, const std::string& desc = "",
-                       bool isUnlocked = true);
-    static Pointer New(const std::string& name, const std::vector<uint8_t>& dim, 
-                       const std::vector<int16_t>& val, const std::string& desc = "",
-                       bool isUnlocked = true);
-    static Pointer New(const std::string& name, const std::vector<uint8_t>& dim, 
-                       const std::vector<float>& val, const std::string& desc = "",
-                       bool isUnlocked = true);
-    static Pointer New(const std::string& name, const std::vector<uint8_t>& dim, 
-                       const std::vector<std::string>& val, const std::string& desc = "",
-                       bool isUnlocked = true);
+                       const std::string& desc = "", bool isUnlocked = true)    {return Pointer(new MetaDataEntry(name, val, desc, isUnlocked));};
+    static Pointer New(const std::string& name, std::string val,
+			 								 const std::string& desc = "", bool isUnlocked = true)		{return Pointer(new MetaDataEntry(name, val, desc, isUnlocked));};
+    static Pointer New(const std::string& name, 
+											 const std::vector<uint8_t>& dim, 
+                       const std::vector<int8_t>& val, 
+											 const std::string& desc = "",
+                       bool isUnlocked = true)
+		{return Pointer(new MetaDataEntry(name, dim, val, desc, isUnlocked));};
+    static Pointer New(const std::string& name,
+											 const std::vector<uint8_t>& dim, 
+                       const std::vector<int16_t>& val, 
+											 const std::string& desc = "",
+                       bool isUnlocked = true)
+		{return Pointer(new MetaDataEntry(name, dim, val, desc, isUnlocked));};
+    static Pointer New(const std::string& name, 
+											 const std::vector<uint8_t>& dim, 
+                       const std::vector<float>& val, 
+											 const std::string& desc = "",
+                       bool isUnlocked = true)
+		{return Pointer(new MetaDataEntry(name, dim, val, desc, isUnlocked));};
+    static Pointer New(const std::string& name, 
+											 const std::vector<uint8_t>& dim, 
+                       const std::vector<std::string>& val, 
+											 const std::string& desc = "",
+                       bool isUnlocked = true)
+		{return Pointer(new MetaDataEntry(name, dim, val, desc, isUnlocked));};
     
     // ~MetaDataEntry(); // Implicit.
     
     const std::string& GetLabel() const {return this->m_Label;};
-    void SetLabel(const std::string& label);
+    BTK_COMMON_EXPORT void SetLabel(const std::string& label);
     const std::string& GetDescription() const {return this->m_Description;};
     void SetDescription(const std::string& desc) {this->m_Description = desc;};
     bool GetUnlockState(void) const {return this->m_Unlocked;};
@@ -87,56 +105,67 @@ namespace btk
     MetaDataEntryValue::ConstPointer GetMetaDataEntryValue() const {return this->m_Value;};
     void SetMetaDataEntryValue(MetaDataEntryValue::Pointer val) {this->m_Value = val;};
     bool HasMetaDataEntryValue() const {return (this->m_Value.get() != 0);};
-    //MetaDataEntry* GetParent() {return static_cast<MetaDataEntry*>(this->DataObject::GetParent());};
-    //const MetaDataEntry* GetParent() const {return static_cast<MetaDataEntry*>(this->DataObject::GetParent());};
     bool HasMetaParent() const {return this->m_HasMetaParent;}; 
     void SetParent(DataObject* parent = 0) {this->m_HasMetaParent = false; this->DataObject::SetParent(parent);};
     void SetParent(MetaDataEntry* parent = 0) {this->m_HasMetaParent = true; this->DataObject::SetParent(parent);};
-    //bool HasParent() const {return (this->mp_Parent != 0);};
     MetaDataEntry::Iterator Begin() {return this->m_Children.begin();};
     MetaDataEntry::ConstIterator Begin() const {return this->m_Children.begin();};
     MetaDataEntry::Iterator End() {return this->m_Children.end();};
     MetaDataEntry::ConstIterator End() const {return this->m_Children.end();};
-    MetaDataEntry::Pointer GetChild(int idx);
-    MetaDataEntry::ConstPointer GetChild(int idx) const;
-    MetaDataEntry::Pointer GetChild(const std::string& label);
-    MetaDataEntry::ConstPointer GetChild(const std::string& label) const;
-    bool AppendChild(MetaDataEntry::Pointer entry);
-    bool InsertChild(Iterator loc, MetaDataEntry::Pointer entry);
-    bool InsertChild(int idx, MetaDataEntry::Pointer entry);
-    void SetChild(int idx, MetaDataEntry::Pointer entry);
-    MetaDataEntry::Pointer TakeChild(Iterator loc);
-    MetaDataEntry::Pointer TakeChild(int idx);
-    MetaDataEntry::Pointer TakeChild(const std::string& label);
+    BTK_COMMON_EXPORT MetaDataEntry::Pointer GetChild(int idx);
+    BTK_COMMON_EXPORT MetaDataEntry::ConstPointer GetChild(int idx) const;
+    BTK_COMMON_EXPORT MetaDataEntry::Pointer GetChild(const std::string& label);
+    BTK_COMMON_EXPORT MetaDataEntry::ConstPointer GetChild(const std::string& label) const;
+    BTK_COMMON_EXPORT bool AppendChild(MetaDataEntry::Pointer entry);
+    BTK_COMMON_EXPORT bool InsertChild(Iterator loc, MetaDataEntry::Pointer entry);
+    BTK_COMMON_EXPORT bool InsertChild(int idx, MetaDataEntry::Pointer entry);
+    BTK_COMMON_EXPORT void SetChild(int idx, MetaDataEntry::Pointer entry);
+    BTK_COMMON_EXPORT MetaDataEntry::Pointer TakeChild(Iterator loc);
+    BTK_COMMON_EXPORT MetaDataEntry::Pointer TakeChild(int idx);
+    BTK_COMMON_EXPORT MetaDataEntry::Pointer TakeChild(const std::string& label);
     bool HasChildren() const {return (this->m_Children.size() != 0);};
     int GetChildNumber() const {return this->m_Children.size();};
-    Iterator Find(const std::string& label);
-    ConstIterator Find(const std::string& label) const;
-    Pointer Clone() const;
+    BTK_COMMON_EXPORT Iterator Find(const std::string& label);
+    BTK_COMMON_EXPORT ConstIterator Find(const std::string& label) const;
+    BTK_COMMON_EXPORT Pointer Clone() const;
     
   protected:
-    MetaDataEntry(const std::string& name, const std::string& desc = "",
-                  bool isUnlocked = true);
-    MetaDataEntry(const std::string& name, int8_t val,
-                  const std::string& desc = "", bool isUnlocked = true);
-    MetaDataEntry(const std::string& name, int16_t val, 
-                  const std::string& desc = "", bool isUnlocked = true);
-    MetaDataEntry(const std::string& name, float val, 
-                  const std::string& desc = "", bool isUnlocked = true);
-    MetaDataEntry(const std::string& name, std::string val, const std::string& desc = "",
-                  bool isUnlocked = true);
-    MetaDataEntry(const std::string& name, const std::vector<uint8_t>& dim, 
-                  const std::vector<int8_t>& val, const std::string& desc = "",
-                  bool isUnlocked = true);
-    MetaDataEntry(const std::string& name, const std::vector<uint8_t>& dim, 
-                  const std::vector<int16_t>& val, const std::string& desc = "",
-                  bool isUnlocked = true);
-    MetaDataEntry(const std::string& name, const std::vector<uint8_t>& dim, 
-                  const std::vector<float>& val, const std::string& desc = "",
-                  bool isUnlocked = true);
-    MetaDataEntry(const std::string& name, const std::vector<uint8_t>& dim, 
-                  const std::vector<std::string>& val, const std::string& desc = "",
-                  bool isUnlocked = true);
+    BTK_COMMON_EXPORT MetaDataEntry(const std::string& name, 
+																		const std::string& desc = "",
+									                  bool isUnlocked = true);
+    BTK_COMMON_EXPORT MetaDataEntry(const std::string& name, int8_t val,
+									                  const std::string& desc = "",
+																		bool isUnlocked = true);
+    BTK_COMMON_EXPORT MetaDataEntry(const std::string& name, int16_t val, 
+                  									const std::string& desc = "", 
+																		bool isUnlocked = true);
+    BTK_COMMON_EXPORT MetaDataEntry(const std::string& name, float val,
+																		const std::string& desc = "",
+																		bool isUnlocked = true);
+    BTK_COMMON_EXPORT MetaDataEntry(const std::string& name, 
+																		std::string val, 
+																		const std::string& desc = "",
+																		bool isUnlocked = true);
+    BTK_COMMON_EXPORT MetaDataEntry(const std::string& name, 
+																	  const std::vector<uint8_t>& dim, 
+                  									const std::vector<int8_t>& val,
+																		const std::string& desc = "",
+									                  bool isUnlocked = true);
+    BTK_COMMON_EXPORT MetaDataEntry(const std::string& name, 
+																		const std::vector<uint8_t>& dim, 
+									                  const std::vector<int16_t>& val, 
+																		const std::string& desc = "",
+									                  bool isUnlocked = true);
+    BTK_COMMON_EXPORT MetaDataEntry(const std::string& name, 
+																		const std::vector<uint8_t>& dim, 
+                 										const std::vector<float>& val, 
+																		const std::string& desc = "",
+                 										bool isUnlocked = true);
+    BTK_COMMON_EXPORT MetaDataEntry(const std::string& name, 
+																		const std::vector<uint8_t>& dim, 
+                  									const std::vector<std::string>& val, 
+																		const std::string& desc = "",
+                  									bool isUnlocked = true);
     
     using DataObject::SetParent;
     
@@ -146,7 +175,6 @@ namespace btk
     bool m_Unlocked;
     MetaDataEntryValue::Pointer m_Value;
     bool m_HasMetaParent;
-    //MetaDataEntry* mp_Parent;
     std::list<MetaDataEntry::Pointer> m_Children;
     
     MetaDataEntry(const MetaDataEntry& ); // Not implemented.

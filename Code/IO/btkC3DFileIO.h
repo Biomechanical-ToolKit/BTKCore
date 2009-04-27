@@ -61,23 +61,19 @@ namespace btk
     static Pointer New() {return Pointer(new C3DFileIO());};
     using AcquisitionFileIO::SetByteOrder;
     
-    ~C3DFileIO() {};
+    // ~C3DFileIO(); // Implicit.
     
-    virtual bool CanReadFile(const std::string& filename);
-    virtual bool CanWriteFile(const std::string& filename);
-    virtual void Read(const std::string& filename, Acquisition::Pointer output);
-    virtual void Write(const std::string& filename, Acquisition::Pointer input);
+    BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
+    BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename);
+    BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output);
+    BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input);
     
   protected:
-    C3DFileIO();
+    BTK_IO_EXPORT C3DFileIO();
     
   private:
     C3DFileIO(const C3DFileIO& ); // Not implemented.
     C3DFileIO& operator=(const C3DFileIO& ); // Not implemented.
-    
-    void collapse(MetaDataEntry::ConstPointer group, int numberToCollapse,
-                  const std::string& base, std::vector<std::string>& collapsed,
-                  bool needToFillBlank);
     
     class Format
     {

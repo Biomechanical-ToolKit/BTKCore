@@ -54,7 +54,7 @@ namespace btk
     typedef SharedPtr<Measure> Pointer;
     typedef SharedPtr<const Measure> ConstPointer;
     
-    static Pointer New(int frameNumber = 10) {return Pointer(new Measure("", frameNumber));};
+    static Pointer New(int frameNumber = 1) {return Pointer(new Measure("", frameNumber));};
     static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Measure(label, frameNumber));};
     
     virtual ~Measure() {};
@@ -80,13 +80,71 @@ namespace btk
     Measure(const Measure& ); // Not implemented.
     Measure& operator=(const Measure& ); // Not implemented.
   };
+ 
+	/**
+	 * @class Measure
+	 * @brief Measure with @a d dimensions along the time.
+	 *
+	 * The measures are stored in a matrix. The measures' dimensions correspond to the columns of the matrix. The frames correspond to the line.
+	 *
+	 * @tparam d Number of dimensions.
+	 *
+	 * @warning The number of dimensions @a d must be greater than 0.
+	 *
+	 * @ingroup BTKCommon
+	 */
+	/**
+	 * @var Measure::m_Label
+	 * Label of the measure.
+	 */
+	/**
+	 * @var Measure::m_Description
+	 * Description of the measure.
+	 */
+  /**
+	 * @var Measure::m_Values
+	 * Values of the measure.
+	 */
+
+	/**
+	 * @typedef Measure<d>::Values
+	 * Measures' values along the time.
+	 */
+
+	/**
+   * @typedef Measure<d>::Pointer
+   * Smart pointer associated with a Measure object.
+   */
   
-  template <int d>
-  Measure<d>::Measure(const std::string& label, int frameNumber)
-  : m_Label(label), m_Description(),
-    m_Values(Values(frameNumber, d))
-  {};
+  /**
+   * @typedef Measure<d>::ConstPointer
+   * Smart pointer associated with a const Measure object.
+   */
   
+ /**
+	 * @fn template <int d> static Pointer Measure<d>::New(int frameNumber = 1)
+	 * @brief Creates a smart pointer associated with a Measure object.
+	 *
+	 * The measure created has an empty label and a number of frame equals to @a framenumber.
+	 * @warning The number of frames must be greater than 0.
+	 */ 
+
+  /**
+	 * @fn template <int d> static Pointer Measure::New(const std::string& label, int frameNumber)
+	 * @brief Creates a smart pointer associated with a Measure object.
+	 *
+	 * The measure created has a label and a number of frame equals to @a label and @a framenumber respectively.
+	 * @warning The number of frames must be greater than 0.
+	 */
+
+	/**
+	 * @fn template <int d> const std::string Measure<d>::GetLabel() const
+	 * Returns the measure's label.
+	 */
+  
+	/**
+	 * Set the label of the measure.
+	 */
   template <int d>
   void Measure<d>::SetLabel(const std::string& label)
   {
@@ -94,6 +152,14 @@ namespace btk
     this->Modified();
   };
   
+  /**
+	 * @fn template <int d> const std::string Measure<d>::GetDescription() const
+	 * Returns the description.
+	 */
+
+	/**
+	 * Sets the description.
+	 */
   template <int d>
   void Measure<d>::SetDescription(const std::string& description)
   {
@@ -101,6 +167,20 @@ namespace btk
     this->Modified();
   };
   
+	/**
+	 * @fn template <int d> Values& Measure<d>::GetValues()
+	 * Returns the measure's values.
+	 */
+
+  /**
+	 * @fn template <int d> const Values& Measure<d>::GetValues() const
+	 * Returns the measure's values.
+	 */
+	
+	/**
+	 * Set the values of the measure.
+	 * @warning The values' dimensions must be equal than the dimensions of the object.
+	 */
   template <int d>
   void Measure<d>::SetValues(const Values& v)
   {
@@ -108,6 +188,15 @@ namespace btk
     this->Modified();
   };
   
+  /**
+	 * @fn template <int d> int Measure<d>::GetFrameNumber() const 
+	 * Returns the number of frames.
+	 */
+
+	/**
+	 * Sets the number of frames.
+	 * The input @a frameNumber must be greater than 0.
+	 */
   template <int d>
   void Measure<d>::SetFrameNumber(int frameNumber)
   {
@@ -125,6 +214,16 @@ namespace btk
     }
     this->Modified();
   };
+
+	/**
+	 * Constructor.
+	 */
+	template <int d>
+  Measure<d>::Measure(const std::string& label, int frameNumber)
+  : m_Label(label), m_Description(),
+    m_Values(Values(frameNumber, d))
+  {};
+
 };
 
 #endif // __btkMeasure_h

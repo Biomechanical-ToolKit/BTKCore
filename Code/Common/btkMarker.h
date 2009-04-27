@@ -49,21 +49,21 @@ namespace btk
     typedef SharedPtr<Marker> Pointer;
     typedef SharedPtr<const Marker> ConstPointer;
     
-    static Pointer New(int frameNumber = 10) {return Pointer(new Marker("", frameNumber));};
+    static Pointer New(int frameNumber = 1) {return Pointer(new Marker("", frameNumber));};
     static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Marker(label, frameNumber));};
     
     virtual ~Marker() {};
     
     Residual& GetResidual() {return this->m_Residual;};
     const Residual& GetResidual() const {return this->m_Residual;};
-    void SetResidual(const Residual& r);
+    BTK_COMMON_EXPORT void SetResidual(const Residual& r);
     Mask& GetMask() {return this->m_Mask;};
     const Mask& GetMask() const {return this->m_Mask;};
-    void SetMask(const Mask& m);
-    void SetFrameNumber(int frameNumber);
+    BTK_COMMON_EXPORT void SetMask(const Mask& m);
+    BTK_COMMON_EXPORT void SetFrameNumber(int frameNumber);
     
   protected:
-    Marker(const std::string& label, int frameNumber);
+    BTK_COMMON_EXPORT Marker(const std::string& label, int frameNumber);
     
   private:
     Marker(const Marker& ); // Not implemented.

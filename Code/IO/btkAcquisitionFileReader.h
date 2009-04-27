@@ -66,17 +66,17 @@ namespace btk
     Acquisition::Pointer GetOutput() {return this->GetOutput(0);};
     
     const std::string& GetFilename() const {return this->m_Filename;};
-    void SetFilename(const std::string& filename);
+    BTK_IO_EXPORT void SetFilename(const std::string& filename);
     AcquisitionFileIO::Pointer GetAcquisitionIO() {return this->m_AcquisitionIO;};
     AcquisitionFileIO::ConstPointer GetAcquisitionIO() const {return this->m_AcquisitionIO;};
-    void SetAcquisitionIO(AcquisitionFileIO::Pointer io);
+    BTK_IO_EXPORT void SetAcquisitionIO(AcquisitionFileIO::Pointer io);
   
   protected:
-    AcquisitionFileReader();
+    BTK_IO_EXPORT AcquisitionFileReader();
     
     Acquisition::Pointer GetOutput(int idx) {return std::tr1::static_pointer_cast<Acquisition>(this->GetNthOutput(idx));};
-    virtual DataObject::Pointer MakeOutput(int idx);
-    virtual void GenerateData();
+    BTK_IO_EXPORT virtual DataObject::Pointer MakeOutput(int idx);
+    BTK_IO_EXPORT virtual void GenerateData();
     
     AcquisitionFileIO::Pointer m_AcquisitionIO;
     std::string m_Filename;

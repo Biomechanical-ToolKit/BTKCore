@@ -44,6 +44,8 @@ namespace btk
   /**
    * @typedef MarkerCollection 
    * Collection of markers
+	 *
+	 * @ingroup BTKCommon
    */ 
   typedef Collection<Marker> MarkerCollection;
 };

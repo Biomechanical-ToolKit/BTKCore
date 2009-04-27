@@ -36,6 +36,7 @@
 #ifndef __btkProcessObject_h
 #define __btkProcessObject_h
 
+#include "btkMacro.h"
 #include "btkObject.h"
 #include "btkDataObject.h"
 
@@ -50,32 +51,32 @@ namespace btk
     typedef SharedPtr<const ProcessObject> ConstPointer;
     
     int GetInputNumber() const {return this->m_Inputs.size();};
-    int GetValidInputNumber() const;
+    BTK_COMMON_EXPORT int GetValidInputNumber() const;
     
     int GetOutputNumber() const {return m_Outputs.size();};
     
-    void Update();
+    BTK_COMMON_EXPORT void Update();
     
   protected:
-    ProcessObject();
-    virtual ~ProcessObject();
+    BTK_COMMON_EXPORT ProcessObject();
+    BTK_COMMON_EXPORT virtual ~ProcessObject();
     
-    DataObject::Pointer GetNthInput(int idx);
-    DataObject::ConstPointer GetNthInput(int idx) const;
-    int GetInputIndex(DataObject::Pointer input);
-    virtual void SetNthInput(int idx, DataObject::Pointer input);
-    void SetInputNumber(int num);
+    BTK_COMMON_EXPORT DataObject::Pointer GetNthInput(int idx);
+    BTK_COMMON_EXPORT DataObject::ConstPointer GetNthInput(int idx) const;
+    BTK_COMMON_EXPORT int GetInputIndex(DataObject::Pointer input);
+    BTK_COMMON_EXPORT virtual void SetNthInput(int idx, DataObject::Pointer input);
+    BTK_COMMON_EXPORT void SetInputNumber(int num);
     
-    DataObject::Pointer GetNthOutput(int idx);
-    DataObject::ConstPointer GetNthOutput(int idx) const;
-    int GetOutputIndex(DataObject::Pointer output);
-    virtual void SetNthOutput(int idx, DataObject::Pointer output);
-    void SetOutputNumber(int num);
+    BTK_COMMON_EXPORT DataObject::Pointer GetNthOutput(int idx);
+    BTK_COMMON_EXPORT DataObject::ConstPointer GetNthOutput(int idx) const;
+    BTK_COMMON_EXPORT int GetOutputIndex(DataObject::Pointer output);
+    BTK_COMMON_EXPORT virtual void SetNthOutput(int idx, DataObject::Pointer output);
+    BTK_COMMON_EXPORT void SetOutputNumber(int num);
     
-    void Modified();
+    BTK_COMMON_EXPORT void Modified();
     bool IsModified() const {return this->m_Modified;};
-    virtual void GenerateData() = 0;
-    virtual DataObject::Pointer MakeOutput(int idx) = 0;
+    BTK_COMMON_EXPORT virtual void GenerateData() = 0;
+    BTK_COMMON_EXPORT virtual DataObject::Pointer MakeOutput(int idx) = 0;
     
   private:
     ProcessObject(const ProcessObject& ); // Not implemented.

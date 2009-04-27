@@ -37,6 +37,7 @@
 #define __btkMetaDataEntryValue_h
 
 #include "btkSharedPtr.h"
+#include "btkMacro.h"
 
 #include <string>
 #include <vector>
@@ -56,67 +57,66 @@ namespace btk
     typedef SharedPtr<MetaDataEntryValue> Pointer;
     typedef SharedPtr<const MetaDataEntryValue> ConstPointer;
 
-    static Pointer New(int8_t val);
-    static Pointer New(int16_t val);
-    static Pointer New(float val);
-    static Pointer New(std::string val);
-    static Pointer New(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val);
-    static Pointer New(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val);
-    static Pointer New(const std::vector<uint8_t>& dim, const std::vector<float>& val);
-    static Pointer New(const std::vector<uint8_t>& dim, const std::vector<std::string>& val);
-    
+    static Pointer New(int8_t val) {return Pointer(new MetaDataEntryValue(val));};
+    static Pointer New(int16_t val) {return Pointer(new MetaDataEntryValue(val));};
+    static Pointer New(float val) {return Pointer(new MetaDataEntryValue(val));};
+    static Pointer New(std::string val) {return Pointer(new MetaDataEntryValue(val));};
+    static Pointer New(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val)	{return Pointer(new MetaDataEntryValue(dim, val));};
+    static Pointer New(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val) {return Pointer(new MetaDataEntryValue(dim, val));};
+    static Pointer New(const std::vector<uint8_t>& dim, const std::vector<float>& val) {return Pointer(new MetaDataEntryValue(dim, val));};
+    static Pointer New(const std::vector<uint8_t>& dim, const std::vector<std::string>& val) {return Pointer(new MetaDataEntryValue(dim, val));};
+
     // ~MetaDataEntryValue(); // Implicit.
     
     Format GetFormat() const {return this->m_Format;};
-    void SetFormat(Format format);
-    uint8_t GetDimension(int idx) const;
-    void SetDimension(int idx, uint8_t val);
+    BTK_COMMON_EXPORT void SetFormat(Format format);
+    BTK_COMMON_EXPORT uint8_t GetDimension(int idx) const;
+    BTK_COMMON_EXPORT void SetDimension(int idx, uint8_t val);
     const std::vector<uint8_t>& GetDimensions() const {return this->m_Dims;};
-    void SetDimensions(const std::vector<uint8_t>& dims);
-    void ResizeDimensions(int nb);
-    const std::string GetValue(int idx) const;
-    void SetValue(int idx, int8_t val);
-    void SetValue(int idx, int16_t val);
-    void SetValue(int idx, float val);
-    void SetValue(int idx, const std::string& val);
+    BTK_COMMON_EXPORT void SetDimensions(const std::vector<uint8_t>& dims);
+    BTK_COMMON_EXPORT void ResizeDimensions(int nb);
+    BTK_COMMON_EXPORT const std::string GetValue(int idx) const;
+    BTK_COMMON_EXPORT void SetValue(int idx, int8_t val);
+    BTK_COMMON_EXPORT void SetValue(int idx, int16_t val);
+    BTK_COMMON_EXPORT void SetValue(int idx, float val);
+    BTK_COMMON_EXPORT void SetValue(int idx, const std::string& val);
     const std::vector<std::string>& GetValues() const {return this->m_Values;};
-    void SetValues(int8_t val);
-    void SetValues(int16_t val);
-    void SetValues(float val);
-    void SetValues(const std::string& val);
-    void SetValues(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val);
-    void SetValues(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val);
-    void SetValues(const std::vector<uint8_t>& dim, const std::vector<float>& val);
-    void SetValues(const std::vector<uint8_t>& dim, const std::vector<std::string>& val);
+    BTK_COMMON_EXPORT void SetValues(int8_t val);
+    BTK_COMMON_EXPORT void SetValues(int16_t val);
+    BTK_COMMON_EXPORT void SetValues(float val);
+    BTK_COMMON_EXPORT void SetValues(const std::string& val);
+    BTK_COMMON_EXPORT void SetValues(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val);
+    BTK_COMMON_EXPORT void SetValues(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val);
+    BTK_COMMON_EXPORT void SetValues(const std::vector<uint8_t>& dim, const std::vector<float>& val);
+    BTK_COMMON_EXPORT void SetValues(const std::vector<uint8_t>& dim, const std::vector<std::string>& val);
     Pointer Clone() const {return Pointer(new MetaDataEntryValue(*this));};
     //ConstPointer Clone() const {return ConstPointer(new MetaDataEntryValue(*this));};
 
-    friend bool operator==(const MetaDataEntryValue& rLHS, const MetaDataEntryValue& rRHS);
+    BTK_COMMON_EXPORT friend bool operator==(const MetaDataEntryValue& rLHS, const MetaDataEntryValue& rRHS);
     friend bool operator!=(const MetaDataEntryValue& rLHS, const MetaDataEntryValue& rRHS)
     {
       return !(rLHS == rRHS);
     };
   
   protected:
-    MetaDataEntryValue(int8_t val);
-    MetaDataEntryValue(int16_t val);
-    MetaDataEntryValue(float val);
-    MetaDataEntryValue(std::string val);
-    MetaDataEntryValue(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val);
-    MetaDataEntryValue(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val);
-    MetaDataEntryValue(const std::vector<uint8_t>& dim, const std::vector<float>& val);
-    MetaDataEntryValue(const std::vector<uint8_t>& dim, const std::vector<std::string>& val);
+    BTK_COMMON_EXPORT MetaDataEntryValue(int8_t val);
+    BTK_COMMON_EXPORT MetaDataEntryValue(int16_t val);
+    BTK_COMMON_EXPORT MetaDataEntryValue(float val);
+    BTK_COMMON_EXPORT MetaDataEntryValue(std::string val);
+    BTK_COMMON_EXPORT MetaDataEntryValue(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val);
+    BTK_COMMON_EXPORT MetaDataEntryValue(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val);
+    BTK_COMMON_EXPORT MetaDataEntryValue(const std::vector<uint8_t>& dim, const std::vector<float>& val);
+    BTK_COMMON_EXPORT MetaDataEntryValue(const std::vector<uint8_t>& dim, const std::vector<std::string>& val);
     
   private:
+		BTK_COMMON_EXPORT MetaDataEntryValue(const MetaDataEntryValue& toCopy);
+    MetaDataEntryValue& operator=(const MetaDataEntryValue& ); // Not implemented.
+
     int prod(int start = 0) const;
     
     Format m_Format;
     std::vector<uint8_t> m_Dims;
     std::vector<std::string> m_Values;
-    
-    MetaDataEntryValue(const MetaDataEntryValue& toCopy);
-    MetaDataEntryValue& operator=(const MetaDataEntryValue& ); // Not implemented.
-    
   };
 };
 

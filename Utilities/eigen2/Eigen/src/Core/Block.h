@@ -61,27 +61,28 @@
   *
   * \sa MatrixBase::block(int,int,int,int), MatrixBase::block(int,int), class VectorBlock
   */
+
 template<typename MatrixType, int BlockRows, int BlockCols, int _PacketAccess, int _DirectAccessStatus>
 struct ei_traits<Block<MatrixType, BlockRows, BlockCols, _PacketAccess, _DirectAccessStatus> >
 {
-  typedef typename MatrixType::Scalar Scalar;
-  typedef typename MatrixType::Nested MatrixTypeNested;
+  typedef typename ei_traits<MatrixType>::Scalar Scalar;
+  typedef typename ei_nested<MatrixType>::type MatrixTypeNested;
   typedef typename ei_unref<MatrixTypeNested>::type _MatrixTypeNested;
   enum{
-    RowsAtCompileTime = MatrixType::RowsAtCompileTime == 1 ? 1 : BlockRows,
-    ColsAtCompileTime = MatrixType::ColsAtCompileTime == 1 ? 1 : BlockCols,
+    RowsAtCompileTime = ei_traits<MatrixType>::RowsAtCompileTime == 1 ? 1 : BlockRows,
+    ColsAtCompileTime = ei_traits<MatrixType>::ColsAtCompileTime == 1 ? 1 : BlockCols,
     MaxRowsAtCompileTime = RowsAtCompileTime == 1 ? 1
-      : (BlockRows==Dynamic ? MatrixType::MaxRowsAtCompileTime : BlockRows),
+      : (BlockRows==Dynamic ? ei_traits<MatrixType>::MaxRowsAtCompileTime : BlockRows),
     MaxColsAtCompileTime = ColsAtCompileTime == 1 ? 1
-      : (BlockCols==Dynamic ? MatrixType::MaxColsAtCompileTime : BlockCols),
-    RowMajor = int(MatrixType::Flags)&RowMajorBit,
+      : (BlockCols==Dynamic ? ei_traits<MatrixType>::MaxColsAtCompileTime : BlockCols),
+    RowMajor = int(ei_traits<MatrixType>::Flags)&RowMajorBit,
     InnerSize = RowMajor ? ColsAtCompileTime : RowsAtCompileTime,
     InnerMaxSize = RowMajor ? MaxColsAtCompileTime : MaxRowsAtCompileTime,
     MaskPacketAccessBit = (InnerMaxSize == Dynamic || (InnerSize >= ei_packet_traits<Scalar>::size))
                         ? PacketAccessBit : 0,
     FlagsLinearAccessBit = (RowsAtCompileTime == 1 || ColsAtCompileTime == 1) ? LinearAccessBit : 0,
-    Flags = (MatrixType::Flags & (HereditaryBits | MaskPacketAccessBit | DirectAccessBit)) | FlagsLinearAccessBit,
-    CoeffReadCost = MatrixType::CoeffReadCost,
+    Flags = (ei_traits<MatrixType>::Flags & (HereditaryBits | MaskPacketAccessBit | DirectAccessBit)) | FlagsLinearAccessBit,
+    CoeffReadCost = ei_traits<MatrixType>::CoeffReadCost,
     PacketAccess = _PacketAccess
   };
   typedef typename ei_meta_if<int(PacketAccess)==ForceAligned,
@@ -122,7 +123,7 @@ template<typename MatrixType, int BlockRows, int BlockCols, int PacketAccess, in
       : m_matrix(matrix), m_startRow(startRow), m_startCol(startCol),
         m_blockRows(matrix.rows()), m_blockCols(matrix.cols())
     {
-      EIGEN_STATIC_ASSERT(RowsAtCompileTime!=Dynamic && RowsAtCompileTime!=Dynamic,THIS_METHOD_IS_ONLY_FOR_FIXED_SIZE)
+      EIGEN_STATIC_ASSERT(RowsAtCompileTime!=Dynamic && ColsAtCompileTime!=Dynamic,THIS_METHOD_IS_ONLY_FOR_FIXED_SIZE)
       ei_assert(startRow >= 0 && BlockRows >= 1 && startRow + BlockRows <= matrix.rows()
           && startCol >= 0 && BlockCols >= 1 && startCol + BlockCols <= matrix.cols());
     }
@@ -221,15 +222,13 @@ class Block<MatrixType,BlockRows,BlockCols,PacketAccess,HasDirectAccess>
 
     class InnerIterator;
     typedef typename ei_traits<Block>::AlignedDerivedType AlignedDerivedType;
+    friend class Block<MatrixType,BlockRows,BlockCols,AsRequested,HasDirectAccess>;
 
     EIGEN_INHERIT_ASSIGNMENT_OPERATORS(Block)
 
-    AlignedDerivedType forceAligned()
+    AlignedDerivedType _convertToForceAligned()
     {
-      if (PacketAccess==ForceAligned)
-        return *this;
-      else
-        return Block<MatrixType,BlockRows,BlockCols,ForceAligned,HasDirectAccess>
+      return Block<MatrixType,BlockRows,BlockCols,ForceAligned,HasDirectAccess>
                     (m_matrix, Base::m_data, Base::m_rows.value(), Base::m_cols.value());
     }
 
@@ -454,7 +453,7 @@ MatrixBase<Derived>::end(int size) const
   * \only_for_vectors
   *
   * The template parameter \a Size is the number of coefficients in the block
-  * 
+  *
   * \param start the index of the first element of the sub-vector
   *
   * Example: \include MatrixBase_template_int_segment.cpp

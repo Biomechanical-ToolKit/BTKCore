@@ -1,0 +1,9 @@
+// Wrapping module documentation.
+
+/** 
+ * @defgroup BTKWrapping Wrapping
+ * @brief Wraps BTK functions. 
+ * 
+ * See each sub-modules for more informations on their wrapping.
+ */
+

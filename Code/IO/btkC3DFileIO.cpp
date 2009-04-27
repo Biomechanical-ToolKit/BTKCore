@@ -46,6 +46,8 @@ namespace btk
   /**
    * @class C3DFileIOException
    * @brief Exception class for the C3DFileIO class.
+	 *
+	 * @ingroup BTKIO
    */
   
   /**
@@ -67,22 +69,17 @@ namespace btk
   
   /**
    * @typedef C3DFileIO::Pointer
-   * Smart pointer associated with an C3DFileIO object.
+   * Smart pointer associated with a C3DFileIO object.
    */
   
   /**
    * @typedef C3DFileIO::ConstPointer
-   * Smart const pointer associated with an C3DFileIO object.
+   * Smart pointer associated with a const C3DFileIO object.
    */
   
   /**
    * @fn static C3DFileIO::Pointer C3DFileIO::New()
    * Create a C3DFileIO object an return it as a smart pointer.
-   */
-  
-  /**
-   * @fn C3DFileIO::~C3DFileIO()
-   * Empty destructor.
    */
   
   /**
@@ -123,8 +120,8 @@ namespace btk
     output->Reset();
     // Open the stream
     std::fstream ifs;
-    BinaryFileStream* pFstream = 0;
-    Format* pFormat = 0;
+    BinaryFileStream* ibfs = 0;
+    Format* fdf = 0; // C3D file data format
     ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
     try
     {
@@ -138,28 +135,29 @@ namespace btk
       {
         case IEEE_LittleEndian : // IEEE LE (Intel)
           this->SetByteOrder(IEEE_LittleEndian);
-          pFstream = new IEEELittleEndianBinaryFileStream(ifs);
+          ibfs = new IEEELittleEndianBinaryFileStream(ifs);
           break;
         case VAX_LittleEndian : // VAX LE (DEC)
           this->SetByteOrder(VAX_LittleEndian);
-          pFstream = new VAXLittleEndianBinaryFileStream(ifs);
+          ibfs = new VAXLittleEndianBinaryFileStream(ifs);
           break;
         case IEEE_BigEndian : // IEEE BE (MIPS)
           this->SetByteOrder(IEEE_BigEndian);
-          pFstream = new IEEEBigEndianBinaryFileStream(ifs);
+          ibfs = new IEEEBigEndianBinaryFileStream(ifs);
           break;
         default :
           ifs.close();
           throw(C3DFileIOException("Invalid processor type"));
           break;
       };
-      pFstream->SeekRead(0, std::ios_base::beg);
-      int8_t parameterFirstBlock = pFstream->ReadI8();
+      ibfs->SeekRead(0, std::ios_base::beg);
+      int8_t parameterFirstBlock = ibfs->ReadI8();
       if (parameterFirstBlock <= 0)
         throw(C3DFileIOException("Bad parameter first block number"));
-      if (pFstream->ReadI8() != 80)
+      if (ibfs->ReadI8() != 80)
         throw(C3DFileIOException("Bad header key"));
       uint16_t markerNumber = 0,
+							 totalAnalogSamplesPer3dFrame = 0,
                lastFrame = 0,
                markerMaximumFillGap = 0, 
                dataFirstBlock = 0, 
@@ -168,32 +166,85 @@ namespace btk
       if (parameterFirstBlock != 1)
       {
     // Header
-        markerNumber = pFstream->ReadU16(); // (word 02)
-        pFstream->ReadU16(); // uint16_t totalAnalogSamplesPer3dFrame = pFstream->ReadU16(); // (word 03)
-        output->SetFirstFrame(pFstream->ReadU16()); // (word 04)
-        lastFrame = pFstream->ReadU16(); // (word 05)
-        markerMaximumFillGap = pFstream->ReadU16(); // (word 06)
-        markerScaleFactor = pFstream->ReadFloat(); // (word 07-08)
+        markerNumber = ibfs->ReadU16(); // (word 02)
+        totalAnalogSamplesPer3dFrame = ibfs->ReadU16(); // (word 03)
+        output->SetFirstFrame(ibfs->ReadU16()); // (word 04)
+        lastFrame = ibfs->ReadU16(); // (word 05)
+        markerMaximumFillGap = ibfs->ReadU16(); // (word 06)
+        markerScaleFactor = ibfs->ReadFloat(); // (word 07-08)
         if (markerScaleFactor == 0)
           throw(C3DFileIOException("Incorrect 3D scale factor"));
-        dataFirstBlock = pFstream->ReadU16(); // (word 09)
-        numberSamplesPerAnalogChannel = pFstream->ReadU16(); // (word 10)
-        markerFrameRate = pFstream->ReadFloat(); // (word 11-12)
-        pFstream->SeekRead(270, std::ios_base::cur); // word 13-147 => 135 word
-    // Event
+        dataFirstBlock = ibfs->ReadU16(); // (word 09)
+        numberSamplesPerAnalogChannel = ibfs->ReadU16(); // (word 10)
+        markerFrameRate = ibfs->ReadFloat(); // (word 11-12)
+        ibfs->SeekRead(270, std::ios_base::cur); // word 13-147 => 135 word 
+    // Event in Header section
+	      const int maxEvents = 18;
+        uint16_t labelRangeSection = ibfs->ReadU16(); // (word 148)
+        uint16_t labelRangeFirstBlock = ibfs->ReadU16(); // (word 149)
+        if (labelRangeSection == 12345)
+				{
+					btkIOErrorMacro(filename, "This C3D file has a 'Label and Range Section' but BTK doesn't support it again.");
+					if (labelRangeFirstBlock < 2)
+						btkIOErrorMacro(filename, "The 'Label and Range Section' address is incorrect.");
+				}
+				uint16_t labelEventFormat = ibfs->ReadU16(); // (word 150)
+				EventCollection::Pointer events = output->GetEvents();
+				uint16_t eventNumber = ibfs->ReadU16();
+				output->SetEventNumber(eventNumber); // (word 151)
+				if (eventNumber != 0)
+        {
+          ibfs->SeekRead(2, std::ios_base::cur); // (word 152)
+				  EventCollection::Iterator it = events->Begin();
+          while(it != events->End())
+          {
+            (*it)->SetTime(ibfs->ReadFloat());
+            ++it;
+          }
+          ibfs->SeekRead((maxEvents * 4) - (eventNumber * 4), std::ios_base::cur);
+					// No need to read event's activation status.
+					ibfs->SeekRead(maxEvents, std::ios_base::cur);
+          ibfs->SeekRead(2, std::ios_base::cur); // (word 198)
+          it = events->Begin();
+          if (labelEventFormat == 12345)
+          {
+            while(it != events->End())
+            {
+							std::string str = ibfs->ReadString(4);
+							str = str.erase(str.find_last_not_of(' ') + 1);
+	        		str = str.erase(0, str.find_first_not_of(' '));
+              (*it)->SetLabel(str);
+              ++it;
+            }
+          }
+          else
+          {
+            while(it != events->End())
+            {
+              std::string str = ibfs->ReadString(2);
+							str = str.erase(str.find_last_not_of(' ') + 1);
+	        		str = str.erase(0, str.find_first_not_of(' '));
+              (*it)->SetLabel(str);
+              ++it;
+            }
+          }
+        }
     // Parameter
-        pFstream->SeekRead((512 * (parameterFirstBlock - 1)), std::ios_base::beg);
+				ibfs->SeekRead((512 * (parameterFirstBlock - 1)), std::ios_base::beg);
       }
-      uint8_t firstBlock = pFstream->ReadU8();
+      uint8_t firstBlock = ibfs->ReadU8();
       // Some file doesn't respect the parameter key (equal to 80) 
-      // if (pFstream->ReadI8() != 80) throw(C3DFileIOException("Bad parameter Key"));
-      pFstream->ReadI8();
-      uint8_t blockNumber = pFstream->ReadU8();
-      pFstream->ReadU8(); // Processor type
+      // if (ibfs->ReadI8() != 80) throw(C3DFileIOException("Bad parameter Key"));
+      ibfs->ReadI8();
+      uint8_t blockNumber = ibfs->ReadU8();
+      ibfs->ReadU8(); // Processor type
+			unsigned int totalBytesRead = 4; // the four bytes read previously.
       if (firstBlock > 1)
-        pFstream->SeekRead((512 * (firstBlock - 1) - 4), std::ios_base::cur);
-
-      int8_t nbCharName = 0;
+			{
+        ibfs->SeekRead((512 * (firstBlock - 1) - 4), std::ios_base::cur);
+				totalBytesRead += (512 * (firstBlock - 1) - 4);
+			}
+      int8_t nbCharLabel = 0;
       int8_t id = 0;
       int offset = 0;
       int8_t type = 0;
@@ -204,146 +255,250 @@ namespace btk
       MetaDataEntry::Pointer root = output->GetMetaData();
       while (1)
       {
-        nbCharName = pFstream->ReadI8();
-        if (nbCharName == 0) break; // Parameter section end
-        id = pFstream->ReadI8();
+        nbCharLabel = ibfs->ReadI8(); totalBytesRead += nbCharLabel + 1;
+        if (nbCharLabel == 0)
+					break; // Parameter section end
+        id = ibfs->ReadI8(); totalBytesRead += 1;
         if (id == 0)
           throw(C3DFileIOException("Error during the ID extraction in the parameter section - ID equal to 0"));
+				bool lastEntry = false; // Used too to determine the end of the Parameter section
+				std::string label = ibfs->ReadString(abs(nbCharLabel));
+				offset = ibfs->ReadU16(); totalBytesRead += offset; 
+				if (offset == 0)
+					lastEntry = true;
+				offset -= 2;
         if (id < 0)
         {
           groupIds.push_back(id);
-          MetaDataEntry::Pointer entry = MetaDataEntry::New(pFstream->ReadString(abs(nbCharName)));
-          entry->SetUnlockState((nbCharName > 0 ? true : false));
-          offset = pFstream->ReadU16(); offset -= 2;
-          uint8_t nbCharDesc = pFstream->ReadU8(); offset -= 1;
-          entry->SetDescription(pFstream->ReadString(nbCharDesc)); offset -= nbCharDesc;
+          MetaDataEntry::Pointer entry = MetaDataEntry::New(label);
+          entry->SetUnlockState((nbCharLabel > 0 ? true : false));
+          uint8_t nbCharDesc = ibfs->ReadU8(); offset -= 1;
+          entry->SetDescription(ibfs->ReadString(nbCharDesc)); offset -= nbCharDesc;
           root->AppendChild(entry);
         }
         else
         {
           parameterIds.push_back(id);
-          std::string name = pFstream->ReadString(abs(nbCharName));
-          offset = pFstream->ReadU16(); offset -= 2;
-          type = pFstream->ReadI8();  offset -= 1;
-          int8_t nbDim = pFstream->ReadI8(); offset -= 1;
-          dataDim = pFstream->ReadU8(nbDim); offset -= nbDim;
+          type = ibfs->ReadI8(); offset -= 1;
+          int8_t nbDim = ibfs->ReadI8(); offset -= 1;
+          dataDim = ibfs->ReadU8(nbDim); offset -= nbDim;
           size_t prod = 1;
           int8_t inc = 0 ; while (inc < nbDim) prod *= dataDim[inc++];
-          if (static_cast<int>(prod * abs(type)) >= offset) 
+          if ((static_cast<int>(prod * abs(type)) >= offset) && (!lastEntry))
             throw(C3DFileIOException("Error in the number of elements in the parameter's data. The number is superior to the offset"));
           MetaDataEntry::Pointer entry;
           switch (type)
           {
             case -1:
               if (dataDim.size() == 2)
-                entry = MetaDataEntry::New(name, dataDim, pFstream->ReadString(dataDim[1],dataDim[0]), "", (nbCharName > 0 ? true : false));
+                entry = MetaDataEntry::New(label, dataDim, ibfs->ReadString(dataDim[1],dataDim[0]), "", (nbCharLabel > 0 ? true : false));
               else
-                entry = MetaDataEntry::New(name, dataDim, pFstream->ReadString(1,prod), "", (nbCharName > 0 ? true : false));
+                entry = MetaDataEntry::New(label, dataDim, ibfs->ReadString(1,prod), "", (nbCharLabel > 0 ? true : false));
               break;
             case 1:
-              entry = MetaDataEntry::New(name, dataDim, pFstream->ReadI8(prod), "", (nbCharName > 0 ? true : false));
+              entry = MetaDataEntry::New(label, dataDim, ibfs->ReadI8(prod), "", (nbCharLabel > 0 ? true : false));
               break;
             case 2:
-              entry = MetaDataEntry::New(name, dataDim, pFstream->ReadI16(prod), "", (nbCharName > 0 ? true : false));
+              entry = MetaDataEntry::New(label, dataDim, ibfs->ReadI16(prod), "", (nbCharLabel > 0 ? true : false));
               break;
             case 4:
-              entry = MetaDataEntry::New(name, dataDim, pFstream->ReadFloat(prod), "", (nbCharName > 0 ? true : false));
+              entry = MetaDataEntry::New(label, dataDim, ibfs->ReadFloat(prod), "", (nbCharLabel > 0 ? true : false));
               break;
             default :
               throw(C3DFileIOException("Data parameter type unknown"));
               break;
           }
           offset -= (prod * abs(type));
-          uint8_t nbCharDesc = pFstream->ReadU8(); offset -= 1;
-          entry->SetDescription(pFstream->ReadString(nbCharDesc)); 
+          uint8_t nbCharDesc = ibfs->ReadU8(); offset -= 1;
+          entry->SetDescription(ibfs->ReadString(nbCharDesc)); 
           offset -= nbCharDesc;
           parameters.push_back(entry);
         }
+				if (lastEntry)
+					offset = 0;
         if (offset < 0)
-          throw(C3DFileIOException(" Error during the pointing of another parameter|group"));
-        pFstream->SeekRead(offset, std::ios_base::cur);
+          throw(C3DFileIOException("Error during the pointing of another parameter|group"));
+				// Checks if the next parameter is not pointing in the Data section.
+				if ((totalBytesRead + offset) > static_cast<unsigned int>((blockNumber * 512)))
+				{
+					btkIOErrorMacro(filename, "The next parameter is pointing in the Data section. Parameters' extraction is stopped.");
+					totalBytesRead -= offset;
+					break;
+				}
+				if (lastEntry)
+					break; // Parameter section end
+        ibfs->SeekRead(offset, std::ios_base::cur);
       }
       std::list<MetaDataEntry::Pointer>::iterator itParameter = parameters.begin();
       MetaDataEntry::Iterator itGroup = root->Begin();
       std::list<int8_t>::iterator itG = groupIds.begin();
       std::list<int8_t>::iterator itP = parameterIds.begin();
-      while(1)
-      {
-        if (itP == parameterIds.end())
-        {
-          ++itG; ++itGroup;
-          if (itG == groupIds.end())
-            break;
-          itP = parameterIds.begin(); itParameter = parameters.begin();
-          
-        }
-        if (*itG == -*itP)
-        {
-          (*itGroup)->AppendChild(*itParameter);
-          itP = parameterIds.erase(itP); 
-          itParameter = parameters.erase(itParameter);
-        }
-        else
-        {
-          ++itP; ++itParameter;
-        }
-      }
+			if (!parameterIds.empty())
+			{
+	      while(1)
+	      {
+	        if (itP == parameterIds.end())
+	        {
+	          ++itG; ++itGroup;
+	          if (itG == groupIds.end() || (itGroup == root->End()))
+	            break;
+	          itP = parameterIds.begin(); itParameter = parameters.begin();
+	        }
+        	if (*itG == -*itP)
+	        {
+	          (*itGroup)->AppendChild(*itParameter);
+	          itP = parameterIds.erase(itP); 
+	          itParameter = parameters.erase(itParameter);
+	        }
+	        else
+	        {
+	          ++itP; ++itParameter;
+	        }
+	      }
+			}
       if (parameters.size() != 0)
-        throw(C3DFileIOException("Some parameters are orphans - No group has the same id"));
+        btkIOErrorMacro(filename, "Some parameters are orphans. No group has the same id. These parameters are lost");
+			int totalBlocksRead = static_cast<int>(ceil((double)totalBytesRead / 512));
+			if (totalBlocksRead != blockNumber)
+			{
+				btkIOErrorMacro(filename, "The number of blocks to be read in the parameter section is different than the number of blocks read. The value kept is the number of blocks read.");
+				blockNumber = totalBlocksRead;
+			}
+		// Events in Parameter section
+			MetaDataEntry::ConstIterator itEvent = root->Find("EVENT");
+			// Took a chance to find the events in EVENTS group insteat of EVENT
+			if (itEvent == root->End())
+			{
+				itEvent = root->Find("EVENTS");
+				if (itEvent != root->End())
+					btkIOErrorMacro(filename, "EVENTS group found instead of EVENT. The EVENTS group is used to extract events.");
+			}
+			if (itEvent != root->End())
+			{
+				MetaDataEntry::ConstIterator itUsed = (*itEvent)->Find("USED");
+				if (itUsed != (*itEvent)->End())
+				{
+					int eventsNumber = btk::FromString<int>((*itUsed)->GetMetaDataEntryValue()->GetValue(0));
+					std::vector<std::string> eventsLabel = std::vector<std::string>(eventsNumber);
+					std::vector<std::string> eventsTime = std::vector<std::string>(eventsNumber);
+					std::vector<std::string> eventsContext = std::vector<std::string>(eventsNumber);
+
+					std::vector<std::string> eventsSubject = std::vector<std::string>(eventsNumber);
+					std::vector<std::string> eventsDescription = std::vector<std::string>(eventsNumber);
+ 					MetaDataEntry::CollapseChildrenValues(eventsLabel, *itEvent, "LABELS", eventsNumber, "uname*");
+					MetaDataEntry::CollapseChildrenValues(eventsTime, *itEvent, "TIMES");
+					if (static_cast<int>(eventsTime.size()) < 2 * eventsNumber)
+						btkIOErrorMacro(filename, "The EVENT:TIME doesn't contains the appropriate number of values. The extracted times could be corrupted.")
+					eventsTime.resize(2 * eventsNumber,"0");
+					MetaDataEntry::CollapseChildrenValues(eventsContext, *itEvent, "CONTEXTS");
+					eventsContext.resize(eventsNumber,"");
+
+					MetaDataEntry::CollapseChildrenValues(eventsSubject, *itEvent, "SUBJECTS");
+					eventsSubject.resize(eventsNumber,"");
+
+					MetaDataEntry::CollapseChildrenValues(eventsDescription, *itEvent, "DESCRIPTIONS");
+					eventsDescription.resize(eventsNumber,"");
+					EventCollection::Pointer events = output->GetEvents();
+					for (int incEvt = 0 ; incEvt < eventsNumber ; ++incEvt)
+					{
+						Event::Pointer evt = Event::New(
+								eventsLabel[incEvt],
+								FromString<float>(eventsTime[2 * incEvt]) * 60 + FromString<float>(eventsTime[2 * incEvt + 1]),
+								eventsContext[incEvt],
+								eventsSubject[incEvt],
+								eventsDescription[incEvt]);
+						events->InsertItem(evt);
+					}
+				}
+			}
     // Data
       if (dataFirstBlock != 0)
       {
         if (dataFirstBlock < (parameterFirstBlock + (firstBlock != 0 ? (firstBlock - 1) : 0) + blockNumber))
-          throw(C3DFileIOException("Bad data first block"));
-        pFstream->SeekRead((512 * (dataFirstBlock - 1)), std::ios_base::beg);
-        std::vector<float> analogChannelScale = std::vector<float>(0);
-        std::vector<int> analogOffset = std::vector<int>(0);
-        float analogGenScale = 0;
-        MetaDataEntry::ConstPointer analogGr =  root->GetChild("ANALOG");
-        uint16_t analogNumber; int16_t analogUsed;
-        FromString(analogGr->GetChild("USED")->GetMetaDataEntryValue()->GetValues().front(), analogUsed); analogNumber = analogUsed;
-        if (analogNumber != 0)
+					throw(C3DFileIOException("Bad data first block"));
+        ibfs->SeekRead((512 * (dataFirstBlock - 1)), std::ios_base::beg);
+				if (numberSamplesPerAnalogChannel == 0)
+					numberSamplesPerAnalogChannel = 1;
+				uint16_t analogNumber = totalAnalogSamplesPer3dFrame / numberSamplesPerAnalogChannel;
+
+				MetaDataEntry::ConstIterator itAnalog = root->Find("ANALOG");
+				if (itAnalog != root->End())
+				{
+					MetaDataEntry::ConstIterator itAnalogUsed = (*itAnalog)->Find("USED");
+					if (itAnalogUsed != (*itAnalog)->End())
+					{
+						int16_t analogUsed;
+						FromString((*itAnalogUsed)->GetMetaDataEntryValue()->GetValues().front(), analogUsed);
+						if (analogNumber != static_cast<uint16_t>(analogUsed))
+						{
+							btkIOErrorMacro(filename, "The number of analog channels wrote in the header section and in the parameter section are not the same. The value kept is from the parameter section.");
+							analogNumber = static_cast<uint16_t>(analogUsed);
+						}
+					}
+				}
+        std::vector<float> analogChannelScale = std::vector<float>(analogNumber, 1.0);
+        std::vector<int> analogOffset = std::vector<int>(analogNumber, 0);
+        float analogGenScale = 1.0;
+
+        if ((analogNumber != 0) && (itAnalog != root->End()))
         {
-          //  - ANALOG:OFFSET
-          MetaDataEntry::ConstPointer analogGrOffsetPr =  analogGr->GetChild("OFFSET");
-          if (analogGrOffsetPr->GetMetaDataEntryValue()-> GetDimensions().front() < analogNumber)
-            throw(C3DFileIOException("Insuffisant number of analog offsets"));
-          //  - ANALOG:SCALE
-          MetaDataEntry::ConstPointer analogGrScalePr =  analogGr->GetChild("SCALE");
-          if (analogGrScalePr->GetMetaDataEntryValue()-> GetDimensions().front() < analogNumber)
-            throw(C3DFileIOException("Insuffisant number of analog scales"));
-          // - ANALOG:GEN_SCALE
-          MetaDataEntry::ConstPointer analogGrGenScalePr =  analogGr->GetChild("GEN_SCALE");
-          // - ANALOG:FORMAT
+					// - ANALOG:FORMAT
           bool unsignedAnalogFormat = false;
-          if (analogGr->Find("FORMAT") != analogGr->End())
+					MetaDataEntry::ConstIterator itAnalogFormat = (*itAnalog)->Find("FORMAT");
+          if (itAnalogFormat != (*itAnalog)->End())
           {
             const std::string analogFormat = "UNSIGNED";
-            if (analogGr->GetChild("FORMAT")->GetMetaDataEntryValue()->GetValues().front().compare(analogFormat) == 0)
+            if ((*itAnalogFormat)->GetMetaDataEntryValue()->GetValues().front().compare(analogFormat) == 0)
               unsignedAnalogFormat = true;
           }
-          const std::vector<std::string> dataOffset = analogGrOffsetPr->GetMetaDataEntryValue()->GetValues();
-          FromString(analogGrScalePr->GetMetaDataEntryValue()->GetValues(), analogChannelScale);
-          FromString(analogGrGenScalePr->GetMetaDataEntryValue()->GetValues().front(), analogGenScale);
-          analogOffset.resize(dataOffset.size());
-          std::vector<int16_t> analogOffset_t;
-          FromString(dataOffset, analogOffset_t);
-          if (unsignedAnalogFormat) // unsigned
-          { 
-            for (unsigned inc = 0 ; inc < analogOffset_t.size() ; ++inc)
-              analogOffset[inc] = static_cast<uint16_t>(analogOffset_t[inc]);
-          }
-          else // signed
-          {
-            for (unsigned inc = 0 ; inc < analogOffset_t.size() ; ++inc)
-              analogOffset[inc] = analogOffset_t[inc];
-          }
+          // - ANALOG:OFFSET
+					MetaDataEntry::ConstIterator itAnalogOffset = (*itAnalog)->Find("OFFSET");
+					if (itAnalogOffset != (*itAnalog)->End())
+					{
+					  const std::vector<std::string> dataOffset = (*itAnalogOffset)->GetMetaDataEntryValue()->GetValues();
+            std::vector<int16_t> analogOffset_t;
+            FromString(dataOffset, analogOffset_t);
+					  unsigned mini = ((analogOffset_t.size() > analogOffset.size()) ? analogOffset.size() : analogOffset_t.size());
+            if (unsignedAnalogFormat) // unsigned
+            { 
+              for (unsigned inc = 0 ; inc < mini ; ++inc)
+                analogOffset[inc] = static_cast<uint16_t>(analogOffset_t[inc]);
+            }
+            else // signed
+            {
+              for (unsigned inc = 0 ; inc < mini ; ++inc)
+                analogOffset[inc] = analogOffset_t[inc];
+            }
+					}
+					// - ANALOG:SCALE
+					MetaDataEntry::ConstIterator itAnalogScale = (*itAnalog)->Find("SCALE");
+					if (itAnalogScale != (*itAnalog)->End())
+						FromString((*itAnalogScale)->GetMetaDataEntryValue()->GetValues(), analogChannelScale);
+					// - ANALOG:GEN_SCALE
+					MetaDataEntry::ConstIterator itAnalogGenScale = (*itAnalog)->Find("GEN_SCALE");
+					if (itAnalogGenScale != (*itAnalog)->End())
+						FromString((*itAnalogGenScale)->GetMetaDataEntryValue()->GetValues().front(), analogGenScale);
         }
         if (markerScaleFactor > 0) // integer
-          pFormat = new IntegerFormat(pFstream);
+          fdf = new IntegerFormat(ibfs);
         else // float;
-          pFormat = new FloatFormat(pFstream);
-        int frameNumber = lastFrame - output->GetFirstFrame() + 1;
+          fdf = new FloatFormat(ibfs);
+				MetaDataEntry::ConstIterator itPoint = root->Find("POINT");
+				if (itPoint != root->End())
+				{
+					MetaDataEntry::ConstIterator itPointUsed = (*itPoint)->Find("USED");
+					if (itPointUsed != (*itPoint)->End())
+					{
+						int16_t pointUsed;
+						FromString((*itPointUsed)->GetMetaDataEntryValue()->GetValues().front(), pointUsed);
+						if (markerNumber != static_cast<uint16_t>(pointUsed))
+						{
+							btkIOErrorMacro(filename, "The number of markers wrote in the header section and in the parameter section are not the same. The value kept is from the parameter section.");
+							markerNumber = static_cast<uint16_t>(pointUsed);
+						}
+					}
+				}
+				int frameNumber = lastFrame - output->GetFirstFrame() + 1;
         output->Init(markerNumber, frameNumber, analogNumber, numberSamplesPerAnalogChannel);
         output->SetMarkerFrequency(markerFrameRate);
         for (int frame = 0 ; frame < frameNumber ; ++frame)
@@ -352,7 +507,7 @@ namespace btk
           while (itM != output->EndMarker())
           {
             Marker* marker = itM->get();
-            pFormat->ReadPoint(&(marker->GetValues().data()[frame]),
+            fdf->ReadPoint(&(marker->GetValues().data()[frame]),
                                &(marker->GetValues().data()[frame + frameNumber]),
                                &(marker->GetValues().data()[frame + 2*frameNumber]),
                                &(marker->GetResidual().data()[frame]), 
@@ -365,7 +520,7 @@ namespace btk
           Acquisition::AnalogIterator itA = output->BeginAnalog();
           while (itA != output->EndAnalog())
           {
-            (*itA)->GetValues().data()[analogFrame] = (pFormat->ReadAnalog() - analogOffset[incChannel]) * analogChannelScale[incChannel] * analogGenScale;
+            (*itA)->GetValues().data()[analogFrame] = (fdf->ReadAnalog() - analogOffset[incChannel]) * analogChannelScale[incChannel] * analogGenScale;
             ++itA; ++incChannel;
             if ((itA == output->EndAnalog()) && (inc < static_cast<unsigned>(numberSamplesPerAnalogChannel - 1)))
             {
@@ -375,31 +530,39 @@ namespace btk
             }
           }
         }
-    // Label & description
+		// Label & description
         int inc = 0; 
         std::vector<std::string> collapsed;
-        MetaDataEntry::ConstPointer pointGr =  root->GetChild("POINT");
-        this->collapse(pointGr, markerNumber, "LABELS", collapsed, true);
+				// POINT
+        MetaDataEntry::ConstPointer groupPtr;
+				if (itPoint != root->End())
+					groupPtr = *itPoint;
+        MetaDataEntry::CollapseChildrenValues(collapsed, groupPtr, "LABELS", markerNumber, "uname*");
         inc = 0; for (Acquisition::MarkerIterator it = output->BeginMarker() ; it != output->EndMarker() ; ++it)
           (*it)->SetLabel(collapsed[inc++]);
-        collapsed.clear(); this->collapse(pointGr, markerNumber, "DESCRIPTIONS", collapsed, false);
+				MetaDataEntry::CollapseChildrenValues(collapsed, groupPtr, "DESCRIPTIONS", markerNumber);
         inc = 0; for (Acquisition::MarkerIterator it = output->BeginMarker() ; it != output->EndMarker() ; ++it)
         {
           if (inc >= static_cast<int>(collapsed.size()))
             break;
           (*it)->SetDescription(collapsed[inc++]);
         }
-        collapsed.clear(); this->collapse(analogGr, analogNumber, "LABELS", collapsed, true);
+				// ANALOG
+				if (itAnalog != root->End())
+					groupPtr = *itAnalog;
+				else
+					groupPtr = MetaDataEntry::ConstPointer();
+				MetaDataEntry::CollapseChildrenValues(collapsed, groupPtr, "LABELS", analogNumber, "uname*");
         inc = 0; for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
           (*it)->SetLabel(collapsed[inc++]);
-        collapsed.clear(); this->collapse(analogGr, analogNumber, "DESCRIPTIONS", collapsed, false);
+        MetaDataEntry::CollapseChildrenValues(collapsed, groupPtr, "DESCRIPTIONS", analogNumber);
         inc = 0; for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
         {
           if (inc >= static_cast<int>(collapsed.size()))
             break;
           (*it)->SetDescription(collapsed[inc++]);
         }
-      }
+			}
     }
     catch (std::fstream::failure& )
     {
@@ -416,30 +579,30 @@ namespace btk
         excmsg = "Unknown error associated with the filestream";
       
       if (ifs.is_open()) ifs.close();     
-      if (pFstream) delete pFstream;
-      if (pFormat) delete pFormat;
+      if (ibfs) delete ibfs;
+      if (fdf) delete fdf;
       throw(C3DFileIOException(excmsg));
     }
     catch (C3DFileIOException& )
     {
-      if (pFstream) delete pFstream;
-      if (pFormat) delete pFormat;
+      if (ibfs) delete ibfs;
+      if (fdf) delete fdf;
       throw;
     }
     catch (std::exception& e)
     {
-      if (pFstream) delete pFstream;
-      if (pFormat) delete pFormat;
+      if (ibfs) delete ibfs;
+      if (fdf) delete fdf;
       throw(C3DFileIOException("Unexcepted exception occured: " + std::string(e.what())));
     }
     catch(...)
     {
-      if (pFstream) delete pFstream;
-      if (pFormat) delete pFormat;
+      if (ibfs) delete ibfs;
+      if (fdf) delete fdf;
       throw(C3DFileIOException("Unknown exception"));
     }
-    if (pFstream) delete pFstream;
-    if (pFormat) delete pFormat;
+    if (ibfs) delete ibfs;
+    if (fdf) delete fdf;
   };
   
   /**
@@ -455,39 +618,5 @@ namespace btk
   : AcquisitionFileIO()
   {
     this->SetFileType(AcquisitionFileIO::Binary);
-  };
-  
-  void C3DFileIO::collapse(MetaDataEntry::ConstPointer group, int numberToCollapse, 
-                           const std::string& base, std::vector<std::string>& collapsed,
-                           bool needToFillBlank)
-  {
-    int collapsedNumber = 0; int inc = 2;
-    std::string name = base;
-    while (1)
-    {
-      MetaDataEntry::ConstIterator it = group->Find(name);
-      if (it == group->End())
-        break;
-      std::vector<std::string> temp = (*it)->GetMetaDataEntryValue()->GetValues();
-      for (std::vector<std::string>::const_iterator it = temp.begin() ; it != temp.end() ; ++it)
-      {
-        if (collapsed.size() == numberToCollapse)
-          break;
-        std::string str = *it;
-        str = str.erase(str.find_last_not_of(' ') + 1);
-        str = str.erase(0, str.find_first_not_of(' '));
-        collapsed.push_back(str);
-      }
-      collapsedNumber = collapsed.size();
-      if (collapsedNumber >= numberToCollapse)
-        break;
-      name = base + ToString(inc);
-    }
-    if ((collapsedNumber < numberToCollapse) && (needToFillBlank))
-    {
-      collapsed.resize(numberToCollapse);
-      for (int inc = collapsedNumber ; inc < numberToCollapse ; ++inc)
-        collapsed[inc] = "uname*" + ToString(inc + 1);
-    }
   };
 };

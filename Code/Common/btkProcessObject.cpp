@@ -34,7 +34,6 @@
  */
 
 #include "btkProcessObject.h"
-#include "btkMacro.h"
 #include "btkConvert.h"
 
 namespace btk
@@ -126,7 +125,7 @@ namespace btk
   
   /**
    * @typedef ProcessObject::ConstPointer
-   * Smart const pointer associated with a ProcessObject object.
+   * Smart pointer associated with a const ProcessObject object.
    */
   
   /**
@@ -272,7 +271,7 @@ namespace btk
       return;
     if (num < 0)
     {
-      btkErrorMacro("Attempt to set the number of inputs to " << ToString(num));
+      btkErrorMacro("Attempt to set the number of inputs to " + ToString(num));
       num = 0;
     }
     this->m_Inputs.resize(num);
@@ -349,7 +348,7 @@ namespace btk
       return;
     if (num < 0)
     {
-      btkErrorMacro("Attempt to set the number of outputs to " << ToString(num));
+      btkErrorMacro("Attempt to set the number of outputs to " + ToString(num));
       num = 0;
     }
     this->m_Outputs.resize(num);

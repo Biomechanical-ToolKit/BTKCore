@@ -1,7 +1,0 @@
-#cmakedefine BTK_USE_GCC_EXPERIMENTAL
-#cmakedefine HAVE_TR1_MEMORY_H
-#cmakedefine HAVE_MEMORY_H
-#cmakedefine HAVE_BOOST_TR1_MEMORY_HPP
-#cmakedefine HAVE_BOOST_MEMORY_HPP
-
-#define TDD_C3DFilePath "${BTK_SOURCE_DIR}/Test/Resources/C3D/"

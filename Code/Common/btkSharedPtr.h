@@ -36,13 +36,15 @@
 #ifndef __btkSharedPtr_h
 #define __btkSharedPtr_h
 
-#include <config.h>
+#include <btkConfigure.h>
 
 namespace btk // For documentation purpose
 {
 /**
  * @define SharedPtr 
  * Macro which determine the shared_ptr class to use in BTK.
+ *
+ * @ingroup BTKCommon
  */ 
 };
 // TODO: Need to add the experimental case with  GCC 4.3 (–std=c++0x) 

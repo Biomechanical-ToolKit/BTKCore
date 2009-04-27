@@ -53,13 +53,13 @@ namespace btk
     
     FileType GetFileType() const {return this->m_FileType;};
     ByteOrder GetByteOrder() const {return this->m_ByteOrder;};
-    virtual bool CanReadFile(const std::string& filename) = 0;
-    virtual bool CanWriteFile(const std::string& filename) = 0;
-    virtual void Read(const std::string& filename, Acquisition::Pointer output) = 0;
-    virtual void Write(const std::string& filename, Acquisition::Pointer input) = 0;
+    BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename) = 0;
+    BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename) = 0;
+    BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output) = 0;
+    BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input) = 0;
     
   protected:
-    AcquisitionFileIO();
+    BTK_IO_EXPORT AcquisitionFileIO();
     virtual ~AcquisitionFileIO() {};
     
     void SetFileType(FileType f) {this->m_FileType = f;};

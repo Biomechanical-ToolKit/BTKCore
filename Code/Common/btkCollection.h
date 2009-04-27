@@ -94,6 +94,8 @@ namespace btk
   /**
    * @class Collection
    * @brief List of objects.
+	 *  
+	 * @ingroup BTKCommon
    */
   
   /**
@@ -103,7 +105,7 @@ namespace btk
   
   /**
    * @typedef Collection<T>::ConstPointer
-   * Smart const pointer associated with a Collection object.
+   * Smart pointer associated with a const Collection object.
    */
   
   /**
@@ -113,7 +115,7 @@ namespace btk
   
   /**
    * @typedef Collection<T>::ItemConstPointer
-   * Smart const pointer associated with a T object.
+   * Smart pointer associated with a const T object.
    */
   
   /**

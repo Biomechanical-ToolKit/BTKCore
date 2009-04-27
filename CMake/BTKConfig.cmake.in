@@ -1,0 +1,59 @@
+#---------------------------------------------------------------------------
+#
+# BTKConfig.cmake - BTK CMake configuration file for external projects.
+#
+# This file is configured by BTK and used by the UseBTK.cmake module
+# to load BTK's settings for an external project.
+@BTK_CONFIG_CODE@
+
+# The BTK include file directories.
+SET(BTK_INCLUDE_DIRS "@BTK_INCLUDE_DIRS_CONFIG@")
+
+# The BTK library directories.
+SET(BTK_LIBRARY_DIRS "@BTK_LIBRARY_DIRS_CONFIG@")
+
+# The C and C++ flags added by BTK to the cmake-configured flags.
+SET(BTK_REQUIRED_C_FLAGS "@BTK_REQUIRED_C_FLAGS@")
+SET(BTK_REQUIRED_CXX_FLAGS "@BTK_REQUIRED_CXX_FLAGS@")
+SET(BTK_REQUIRED_LINK_FLAGS "@BTK_REQUIRED_LINK_FLAGS@")
+
+# The BTK version number
+SET(BTK_VERSION_MAJOR "@BTK_VERSION_MAJOR@")
+SET(BTK_VERSION_MINOR "@BTK_VERSION_MINOR@")
+SET(BTK_VERSION_PATCH "@BTK_VERSION_PATCH@")
+
+# The location of the UseBTK.cmake file.
+SET(BTK_USE_FILE "@BTK_USE_FILE@")
+
+# The build settings file.
+SET(BTK_BUILD_SETTINGS_FILE "@BTK_BUILD_SETTINGS_FILE@")
+
+# The library dependencies file.
+SET(BTK_LIBRARY_DEPENDS_FILE "@BTK_LIBRARY_DEPENDS_FILE@")
+
+# The list of available kits.
+SET(BTK_KITS "@BTK_KITS@")
+
+# The list of available languages.
+SET(BTK_LANGUAGES "@BTK_LANGUAGES@")
+
+# Whether BTK was built with shared libraries.
+SET(BTK_BUILD_SHARED "@BUILD_SHARED_LIBS@")
+
+# Whether BTK was built with Wrapping support.
+SET(BTK_WRAPPING_MATLAB "@BTK_WRAPPING_MATLAB@")
+
+# A list of all libraries for BTK.  Those listed here should
+# automatically pull in their dependencies.
+SET(BTK_LIBRARIES BTKIO)
+
+# The BTK library dependencies.
+IF(NOT BTK_NO_LIBRARY_DEPENDS AND EXISTS "${BTK_LIBRARY_DEPENDS_FILE}")
+  INCLUDE("${BTK_LIBRARY_DEPENDS_FILE}")
+ENDIF(NOT BTK_NO_LIBRARY_DEPENDS AND EXISTS "${BTK_LIBRARY_DEPENDS_FILE}")
+
+# Whether BTK was built using a system eigen2
+SET(BTK_USE_SYSTEM_EIGEN2 "@BTK_USE_SYSTEM_EIGEN2/@")
+
+# The EIGEN2_DIR setting used to build BTK.  Set if BTK_USE_SYSTEM_EIGEN2 is true.
+SET(BTK_EIGEN2_INCLUDE_DIR "@BTK_EIGEN2_INCLUDE_DIR@")

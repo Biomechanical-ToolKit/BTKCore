@@ -43,44 +43,10 @@ namespace btk
   /**
    * @typedef Analog 
    * Analog channel measure, 1D signal.
+	 *
+   * @ingroup BTKCommon
    */ 
   typedef Measure<1> Analog;
-  /*
-  class Analog : public DataObject
-  {
-  public:
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Measure;
-    
-    typedef SharedPtr<Analog> Pointer;
-    typedef SharedPtr<const Analog> ConstPointer;
-    
-    static Pointer New(int frameNumber = 10) {return Pointer(new Analog("", frameNumber));};
-    static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Analog(label, frameNumber));};
-    
-    virtual ~Analog() {};
-    
-    const std::string GetLabel() const {return this->m_Label;};
-    void SetLabel(const std::string& label);
-    const std::string GetDescription() const {return this->m_Description;};
-    void SetDescription(const std::string& description);
-    Measure& GetMeasure() {return this->m_Measure;};
-    const Measure& GetMeasure() const {return this->m_Measure;};
-    void SetMeasure(const Measure& c);
-    int GetFrameNumber() const {return this->m_Measure.rows();};
-    void SetFrameNumber(int frameNumber);
-    
-  protected:
-    Analog(const std::string& label, int frameNumber);
-    
-  private:
-    Analog(const Analog& ); // Not implemented.
-    Analog& operator=(const Analog& ); // Not implemented.
-    
-    std::string m_Label;
-    std::string m_Description;
-    Measure m_Measure;
-  };
-  */
 };
 
 #endif // __btkAnalog_h

@@ -33,14 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(_MSC_VER)
-  // Disable unsafe warning (use of the function 'strcpy' instead of 
-	// 'strcpy_s' for portability reasons;
-  #pragma warning( disable : 4996 ) 
-#endif
-
-#include "btkObjectHandle.h"
-#include "btkASCIIConverter.h"
+#include "btkMEXObjectHandle.h"
+#include "btkMEXAdaptMeasures.h"
 
 #include <btkAcquisition.h>
 
@@ -48,72 +42,99 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	if(nrhs!=1)
 		mexErrMsgTxt("One input required.");
-	if (nlhs > 1)
+	if (nlhs > 2)
 	 mexErrMsgTxt("Too many output arguments.");
 
-	btk::Acquisition::Pointer acq = btkOH_get_object<btk::Acquisition>(prhs[0]);
-	btk::MarkerCollection::Pointer markers = acq->GetMarkers();
-
-	char** fieldnames = new char*[markers->GetItemNumber()];
-	int inc = 0;
-	for(btk::MarkerCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
+	// First output
+	btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+	btk::MarkerCollection::Pointer markers;
+	btk::MetaDataEntry::Iterator itPoint = acq->GetMetaData()->Find("POINT");
+	if (itPoint != acq->GetMetaData()->End())
 	{
-		std::string originalLabel = (*it)->GetLabel();
-    std::string convertedLabel = std::string(originalLabel.length(), '_');
-		for(int i = 0 ; i < static_cast<int>(originalLabel.length()) ; ++i)
+	  btk::MarkerCollection::Pointer allMarkers = acq->GetMarkers();
+		const char* names[] = {"ANGLES", "FORCES", "MOMENTS", "POWERS", "SCALARS", "REACTIONS"};
+		int numberOfNames =  sizeof(names) / (sizeof(char) * 4);
+  	std::vector<std::string> generalBlackList, blackList;
+		for(int i = 0 ; i < numberOfNames ; ++i)
 		{
-			convertedLabel[i] = btk::ASCIIConverter[originalLabel[i]];
+			btk::MetaDataEntry::CollapseChildrenValues(blackList, *itPoint, names[i]);
+		  generalBlackList.insert(generalBlackList.end(), blackList.begin(), blackList.end());
 		}
-		char c = convertedLabel[0];
-		// Matlab only accept characters [a-zA-Z] for the first character of 
-		// a variable's name. If the first character is included in [_0-9],
-		// then the character 'C' is inserted at the beginning.
-		if ((c == btk::ASCIIConverter[0x00]) // _
-				|| (c == btk::ASCIIConverter[0x30]) // 0
-				|| (c == btk::ASCIIConverter[0x31]) // 1
-  			|| (c == btk::ASCIIConverter[0x32]) // 2
-				|| (c == btk::ASCIIConverter[0x33]) // 3
-				|| (c == btk::ASCIIConverter[0x34]) // 4
-        || (c == btk::ASCIIConverter[0x35]) // 5
-				|| (c == btk::ASCIIConverter[0x36]) // 6
-				|| (c == btk::ASCIIConverter[0x37]) // 7
-				|| (c == btk::ASCIIConverter[0x38]) // 8
-				|| (c == btk::ASCIIConverter[0x39])) // 9
-			convertedLabel.insert(convertedLabel.begin(), 'C');
 
-		fieldnames[inc] = new char[convertedLabel.length() + 1];
-    //strncpy(fieldnames[inc], convertedLabel.c_str(), convertedLabel.length() + 1);
-		strcpy(fieldnames[inc], convertedLabel.c_str());
-
-		//mexPrintf("Marker's label '%s' vs conversion: '%s'\n", (const char*)fieldnames[inc], convertedLabel.c_str());
-		inc++;
+		if (generalBlackList.empty())
+			markers = allMarkers;
+		else
+		{
+			markers = btk::MarkerCollection::New();
+			for(btk::MarkerCollection::Iterator it3DPoint = allMarkers->Begin() ; it3DPoint != allMarkers->End() ; ++it3DPoint)
+			{
+			  std::vector<std::string>::iterator itLabel = generalBlackList.begin();
+				bool labelFound = false;
+				while(itLabel != generalBlackList.end())
+				{
+					if ((*it3DPoint)->GetLabel().compare(*itLabel) == 0)
+					{
+						itLabel = generalBlackList.erase(itLabel);
+						labelFound = true;
+						break;
+					}
+					++itLabel;
+				}
+				if (!labelFound)
+					markers->InsertItem(*it3DPoint);
+				if (generalBlackList.empty())
+					break;
+			}
+		}
 	}
+	else
+		markers = acq->GetMarkers();
 
-	plhs[0] = mxCreateStructMatrix(1, 1, acq->GetMarkerNumber(), (const char**)fieldnames);
+	char** fieldnames = 0;
+	plhs[0] = btkMEXAdaptMeasures<btk::Marker>(markers, &fieldnames);
+	int numberOfMarkers = acq->GetMarkerNumber();
+	for (int i = 0 ; i < markers->GetItemNumber() ; ++i)
+		delete[] fieldnames[i];
+	delete[] fieldnames;
 
-//  int nfields = mxGetNumberOfFields(plhs[0]);
-//  int nstructelems = mxGetNumberOfElements(plhs[0]);
-
-//	mexPrintf("mxGetNumberOfFields: %i\n", nfields);
-//	mexPrintf("mxGetNumberOfElements: %i\n", nstructelems);
-//	for(int i = 0 ; i < 5 ; ++i)
-//		mexPrintf("Marker's label: '%s' vs '%s'\n", (const char*)fieldnames[i], mxGetFieldNameByNumber(plhs[0], i));
-  
-	inc = 0;
-	mxArray* marker = mxCreateDoubleMatrix(acq->GetMarkerFrameNumber(), 3, mxREAL);
-  double* initialValues = mxGetPr(marker);
-  for(btk::MarkerCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
+  // Second output (optionnal)
+	if (nlhs == 2)
 	{
-	  mxSetPr(marker, (*it)->GetValues().data());
-		mxArray* deepMarker = mxDuplicateArray(marker);
-		mxSetFieldByNumber(plhs[0], 0, inc, deepMarker);
+    const char* info[] = {"frequency", "units"};
+		int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
+		char* units = 0;
+    btk::MetaDataEntry::Pointer metadata = acq->GetMetaData();
+    btk::MetaDataEntry::ConstIterator itPoint = metadata->Find("POINT");
+		if ((itPoint != metadata->End()) && (numberOfMarkers != 0))
+		{
+			btk::MetaDataEntry::ConstIterator itUnit = (*itPoint)->Find("UNITS");
+			if (itUnit != (*itPoint)->End())
+			{
+				btk::MetaDataEntryValue::ConstPointer pointUnit = (*itUnit)->GetMetaDataEntryValue();
+				// Erase blank spaces at the beginning and the end of the string.
+				std::string str = pointUnit->GetValue(0);
+        str = str.erase(str.find_last_not_of(' ') + 1);
+        str = str.erase(0, str.find_first_not_of(' '));
+				units = new char[str.length() + 1];
+        strcpy(units, str.c_str());
+			}
+		}
+		if (units == 0)
+		{
+			//mexWarnMsgTxt("No POINT:UNITS parameter. The makers' unit is empty.");
+			units = new char[1];
+			units[0] = '\0';
+		}
+		plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
+		mxArray* firstFrame  = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
+    mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
+    *mxGetPr(frequency) = acq->GetMarkerFrequency();
+		const char* ALL[] = {"ALLMARKERS"};
+		mxArray* unitsStruct = mxCreateStructMatrix(1, 1, 1, ALL);
+		mxSetFieldByNumber(unitsStruct, 0, 0, mxCreateString((const char*)units));
+		mxSetFieldByNumber(plhs[1], 0, 0, frequency);
+		mxSetFieldByNumber(plhs[1], 0, 1, unitsStruct);
 
-		delete[] fieldnames[inc];
-		inc++;
+		delete[] units;
 	}
-  delete[] fieldnames;
-  mxSetPr(marker, initialValues);
-  mxDestroyArray(marker);
-
-	//mxFree((void*)fieldnames);
 };

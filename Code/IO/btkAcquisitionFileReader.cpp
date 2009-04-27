@@ -43,6 +43,7 @@ namespace btk
   /**
    * @class AcquisitionFileReaderException
    * @brief Exception class for the AcquisitionFileReader class.
+	 * @ingroup BTKIO
    */
   
   /**
@@ -70,12 +71,12 @@ namespace btk
   
   /**
    * @typedef AcquisitionFileReader::Pointer
-   * Smart pointer associated with a AcquisitionFileReader object.
+   * Smart pointer associated with an AcquisitionFileReader object.
    */
   
   /**
    * @typedef AcquisitionFileReader::ConstPointer
-   * Smart const pointer associated with a AcquisitionFileReader object.
+   * Smart pointer associated with a const AcquisitionFileReader object.
    */
   
   /**

@@ -42,6 +42,8 @@ namespace btk
   /**
    * @class AcquisitionFileIOFactory
    * @brief This class only implements the CreateAcquisitionIO method.
+	 *
+	 * @ingroup BTKIO
    */
   
   /**

@@ -34,7 +34,6 @@
  */
 
 #include "btkAcquisition.h"
-#include "btkMacro.h"
 #include "btkException.h"
 
 namespace btk
@@ -60,9 +59,19 @@ namespace btk
   
   /**
    * @typedef Acquisition::ConstPointer
-   * Smart const pointer associated with an Acquisition object.
+   * Smart pointer associated with a const Acquisition object.
    */
   
+	/**
+   * @typedef Acquisition::EventIterator
+   * Iterator for events contained in the acquisition object.
+   */
+  
+  /**
+   * @typedef Acquisition::EventConstIterator
+   * Const iterator for events contained in the acquisition object.
+   */
+
   /**
    * @typedef Acquisition::MarkerIterator
    * Iterator for markers contained in the acquisition object.
@@ -98,7 +107,26 @@ namespace btk
    * Creates an Acquisition object and return it as smart pointer.
    */
   
+ 	/**
+   * @fn Acquisition::EventIterator Acquisition::BeginEvent()
+   * Returns an iterator to the beginning of the list of events.
+   */
   
+  /**
+   * @fn Acquisition::EventConstIterator Acquisition::BeginEvent() const
+   * Returns a const iterator to the beginning of the list of events.
+   */
+  
+  /**
+   * @fn Acquisition::EventIterator Acquisition::EndEvent()
+   * Returns an iterator just past the last event.
+   */
+  
+  /**
+   * @fn Acquisition::EventConstIterator Acquisition::EndEvent() const
+   * Returns a const iterator just past the last event.
+   */
+
   /**
    * @fn Acquisition::MarkerIterator Acquisition::BeginMarker()
    * Returns an iterator to the beginning of the list of markers.
@@ -170,52 +198,55 @@ namespace btk
     // Marker
     if (frameNumber <= 0)
     {
-      btkErrorMacro("Impossible to set the frame number to 0 or lower.");
-      return;
+      btkErrorMacro("Impossible to set the frame number to 0 or lower. The number of frames is now equals to 1.");
+			frameNumber = 1;
     }
-    if ((analogSampleNumberPerMarkerFrame <= 0) && (analogNumber != 0))
+    if (analogSampleNumberPerMarkerFrame <= 0)
     {
-      btkErrorMacro("Impossible to set the analog sample number to 0 when the number of analog channels is not equal to 0.");
-      return;
+      btkErrorMacro("Impossible to set the analog sample number to 0. The numbers of analog samples per marker frame is now equals to 1.");
+      analogSampleNumberPerMarkerFrame = 1;
     }
     if (markerNumber == 0)
     {
       this->m_Markers->SetItemNumber(0);
       this->m_MarkerFrameNumber = frameNumber;
-      this->Modified();
-      return;
     }
-    if (markerNumber < this->GetMarkerNumber())
-      this->m_Markers->SetItemNumber(markerNumber);
-    else
-    {
-      for (int inc = this->GetMarkerNumber() ; inc < markerNumber ; ++inc)
-      {
-        Marker::Pointer pt = Marker::New(frameNumber);
-        pt->SetParent(this);
-        this->m_Markers->InsertItem(pt);
-      }
-    }
-    this->SetMarkerFrameNumber(frameNumber);
+		else
+		{
+    	if (markerNumber < this->GetMarkerNumber())
+	      this->m_Markers->SetItemNumber(markerNumber);
+	    else
+	    {
+	      for (int inc = this->GetMarkerNumber() ; inc < markerNumber ; ++inc)
+	      {
+        	Marker::Pointer pt = Marker::New(frameNumber);
+        	pt->SetParent(this);
+        	this->m_Markers->InsertItem(pt);
+	      }
+    	}
+    	this->SetMarkerFrameNumber(frameNumber);
+		}
     // Analog
     if (analogNumber == 0)
     {
       this->m_Analogs->SetItemNumber(0);
       this->m_AnalogSampleNumberPerMarkerFrame = analogSampleNumberPerMarkerFrame;
-      return;
     }
-    if (analogNumber < this->GetAnalogNumber())
-      this->m_Analogs->SetItemNumber(analogNumber);
-    else
-    {
-      for (int inc = this->GetAnalogNumber() ; inc < analogNumber ; ++inc)
-      {
-        Analog::Pointer pt = Analog::New(this->m_MarkerFrameNumber * analogSampleNumberPerMarkerFrame);
-        pt->SetParent(this);
-        this->m_Analogs->InsertItem(pt);
-      }
-    }
-    this->SetAnalogFrameNumber(analogSampleNumberPerMarkerFrame);
+		else
+		{
+    	if (analogNumber < this->GetAnalogNumber())
+	      this->m_Analogs->SetItemNumber(analogNumber);
+	    else
+	    {
+	      for (int inc = this->GetAnalogNumber() ; inc < analogNumber ; ++inc)
+	      {
+	        Analog::Pointer pt = Analog::New(this->m_MarkerFrameNumber * analogSampleNumberPerMarkerFrame);
+	        pt->SetParent(this);
+	        this->m_Analogs->InsertItem(pt);
+	      }
+    	}
+    	this->SetAnalogFrameNumber(analogSampleNumberPerMarkerFrame);
+		}
     // Modification update
     this->Modified();  
   };
@@ -284,6 +315,28 @@ namespace btk
    * @fn int Acquisition::GetAnalogFrameNumber() const
    * Returns the number of frames for the analog channels.
    */
+
+	/**
+   * @fn int Acquisition::GetEventNumber() const
+   * Returns the number of events.
+   */
+  
+  /**
+   * Sets the number of markers.
+   */
+  void Acquisition::SetEventNumber(int num)
+  {
+    if (num == this->GetEventNumber())
+      return;
+		if (num < this->GetEventNumber())
+      this->m_Events->SetItemNumber(num);
+    else
+    {
+      for (int inc = this->GetEventNumber() ; inc < num ; ++inc)
+        this->m_Events->InsertItem(Event::New());
+    }
+    this->Modified();
+  };
   
   /**
    * @fn int Acquisition::GetMarkerNumber() const
@@ -338,6 +391,55 @@ namespace btk
     }
     this->Modified();
   };
+
+	/**
+   * Gets the event at the index @a idx as a smart pointer.
+   */
+  Event::Pointer Acquisition::GetEvent(int idx)
+  {
+    if (idx >= this->GetEventNumber())
+      throw(OutOfRangeException("Acquisition::GetEvent"));
+    EventIterator it = this->BeginEvent();
+    std::advance(it, idx);
+    return *it;
+  };
+  
+  /**
+   * Gets the event at the index @a idx as a const smart pointer.
+   */
+  Event::ConstPointer Acquisition::GetEvent(int idx) const
+  {
+    if (idx >= this->GetEventNumber())
+      throw(OutOfRangeException("Acquisition::GetEvent"));
+    EventConstIterator it = this->BeginEvent();
+    std::advance(it, idx);
+    return *it;
+  };
+  
+  /**
+   * Sets the content of @a event at the index @a idx.
+   */
+  void Acquisition::SetEvent(int idx, Event::Pointer marker)
+  {
+    if (idx >= this->GetEventNumber())
+    {
+      btkErrorMacro("Out of range");
+      return;
+    }
+    EventIterator it = this->BeginEvent();
+    std::advance(it, idx);
+    *it = marker;
+  };
+  
+  /**
+   * @fn EventCollection::Pointer Acquisition::GetEvents()
+   * Returns the collection of events.
+   */
+  
+  /**
+   * @fn EventCollection::ConstPointer Acquisition::GetEvents() const
+   * Returns the collection of events.
+   */
   
   /**
    * Gets the marker at the index @a idx as a smart pointer.
@@ -461,8 +563,43 @@ namespace btk
     this->Modified();
   };
   
+	/**
+   * Finds the event with the proposed @a label and returns the iterator associed
+   * with it. If no event has @a label as label, an iterator pointing to the 
+   * end of the collection is returned.
+   */
+  Acquisition::EventIterator Acquisition::FindEvent(const std::string& label)
+  {
+    EventIterator it = this->BeginEvent();
+    while (it != this->EndEvent())
+    {
+      if ((*it)->GetLabel().compare(label) == 0)
+        break;
+      ++it;
+    }
+    return it;
+  };
+  
   /**
-   * Finds the marker with the propose @a label and returns the iterator associed
+   * Finds the event with the proposed @a label and returns the const iterator associed
+   * with it. If no event has @a label as label, a const iterator pointing to the 
+   * end of the collection is returned.
+   */
+  Acquisition::EventConstIterator Acquisition::FindEvent(const std::string& label) const
+  {
+    EventConstIterator it = this->BeginEvent();
+    while (it != this->EndEvent())
+    {
+      if ((*it)->GetLabel().compare(label) == 0)
+        break;
+      ++it;
+    }
+    return it;
+  };
+
+
+  /**
+   * Finds the marker with the proposed @a label and returns the iterator associed
    * with it. If no marker has @a label as label, an iterator pointing to the 
    * end of the collection is returned.
    */
@@ -479,7 +616,7 @@ namespace btk
   };
   
   /**
-   * Finds the marker with the propose @a label and returns the const iterator associed
+   * Finds the marker with the proposed @a label and returns the const iterator associed
    * with it. If no marker has @a label as label, a const iterator pointing to the 
    * end of the collection is returned.
    */
@@ -496,7 +633,7 @@ namespace btk
   };
   
   /**
-   * Finds the analog channel with the propose @a label and returns the iterator 
+   * Finds the analog channel with the proposed @a label and returns the iterator 
    * associated with it. If no marker has @a label as label, an iterator pointing to the 
    * end of the collection is returned.
    */
@@ -513,7 +650,7 @@ namespace btk
   };
   
   /**
-   * Finds the analog channel with the propose @a label and returns the const iterator 
+   * Finds the analog channel with the proposed @a label and returns the const iterator 
    * associated with it. If no marker has @a label as label, a const iterator pointing to the 
    * end of the collection is returned.
    */
@@ -537,11 +674,12 @@ namespace btk
    * - Marker frequency sets to 0.
    * - Marker frame number sets to 0.
    * - Empty metadata.
-   * To re-populate this acquisition, you need to re-use the init() method to
+   * To re-populate this acquisition, you need to re-use the Init() method to
    * set the marker and analog number and their frame number.
    */
   void Acquisition::Reset()
   {
+		this->m_Events->SetItemNumber(0);
     this->m_Markers->SetItemNumber(0);
     this->m_Analogs->SetItemNumber(0);
     this->m_FirstFrame = 1;
@@ -559,6 +697,7 @@ namespace btk
   Acquisition::Acquisition()
   : DataObject()
   {
+		this->m_Events = EventCollection::New();
     this->m_Markers = MarkerCollection::New();
     this->m_Analogs = AnalogCollection::New();
     this->mp_MetaData = MetaDataEntry::New("ROOT");

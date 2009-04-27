@@ -101,8 +101,8 @@ namespace btk
     
     virtual size_t Fill(size_t nb);
     virtual void SeekWrite(size_t nb, std::ios_base::seekdir dir);
-    // Note: MSVC doesn't like the 2 next commented methods.
-    //       It thinks the type char is the same than the type int8_t...
+    // Note: MSVC doesn't like the following commented methods.
+    //       char and int8_t are the same for it...
     //virtual size_t Write(char c);
     //virtual size_t Write(const std::vector<char>& rVectorChar);
     virtual size_t Write(int8_t i8);
@@ -131,9 +131,12 @@ namespace btk
   public:
     explicit VAXLittleEndianBinaryFileStream(std::fstream& rFsteam) : BinaryFileStream(rFsteam) {};
     // ~VAXLittleEndianBinaryFileStream(); // Implicit.  
-    virtual int16_t ReadI16(); using BinaryFileStream::ReadI16;
-    virtual uint16_t ReadU16(); using BinaryFileStream::ReadU16;
-    virtual float ReadFloat(); using BinaryFileStream::ReadFloat;
+    virtual int16_t ReadI16();
+		using BinaryFileStream::ReadI16;
+    virtual uint16_t ReadU16();
+		using BinaryFileStream::ReadU16;
+    virtual float ReadFloat();
+		using BinaryFileStream::ReadFloat;
   
   private:
     VAXLittleEndianBinaryFileStream(const VAXLittleEndianBinaryFileStream& ); // Not implemented.
@@ -145,9 +148,12 @@ namespace btk
   public:
     explicit IEEELittleEndianBinaryFileStream(std::fstream& rFsteam) : BinaryFileStream(rFsteam) {};
     // ~IEEELittleEndianBinaryFileStream(); // Implicit.  
-    virtual int16_t ReadI16(); using BinaryFileStream::ReadI16;
-    virtual uint16_t ReadU16(); using BinaryFileStream::ReadU16;
-    virtual float ReadFloat(); using BinaryFileStream::ReadFloat;
+    virtual int16_t ReadI16(); 
+		using BinaryFileStream::ReadI16;
+    virtual uint16_t ReadU16();
+		using BinaryFileStream::ReadU16;
+    virtual float ReadFloat();
+		using BinaryFileStream::ReadFloat;
   
   private:
     IEEELittleEndianBinaryFileStream(const IEEELittleEndianBinaryFileStream& ); // Not implemented.
@@ -159,9 +165,12 @@ namespace btk
   public:
     explicit IEEEBigEndianBinaryFileStream(std::fstream& rFsteam) : BinaryFileStream(rFsteam) {};
     // ~IEEEBigEndianBinaryFileStream(); // Implicit.  
-    virtual int16_t ReadI16(); using BinaryFileStream::ReadI16;
-    virtual uint16_t ReadU16(); using BinaryFileStream::ReadU16;
-    virtual float ReadFloat(); using BinaryFileStream::ReadFloat;
+    virtual int16_t ReadI16();
+		using BinaryFileStream::ReadI16;
+    virtual uint16_t ReadU16();
+		using BinaryFileStream::ReadU16;
+    virtual float ReadFloat();
+		using BinaryFileStream::ReadFloat;
   
   private:
     IEEEBigEndianBinaryFileStream(const IEEEBigEndianBinaryFileStream& ); // Not implemented.

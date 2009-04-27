@@ -50,9 +50,9 @@ namespace btk
     
     bool HasParent() const {return this->mp_Parent != 0;};
     DataObject* GetParent() const {return this->mp_Parent;};
-    void SetParent(DataObject* parent);
+    BTK_COMMON_EXPORT void SetParent(DataObject* parent);
     
-    void Update();
+    BTK_COMMON_EXPORT void Update();
     
   protected:
     DataObject()
@@ -63,7 +63,7 @@ namespace btk
     };
     virtual ~DataObject() {};
 
-    void Modified();
+    BTK_COMMON_EXPORT void Modified();
     
   private:
     DataObject(const DataObject& ); // Not implemented.

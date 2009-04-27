@@ -43,21 +43,29 @@
 
 #include <iostream>
 
-#if defined(__BORLANDC__)
-  #define BTK_FUNCTION __FUNC__
-#elif defined(_WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
-  #define BTK_FUNCTION __FUNCSIG__
-#elif defined(__GNUC__)
-  #define BTK_FUNCTION __PRETTY_FUNCTION__
+#if defined(_WIN32)
+  #define btkStripPathMacro(f) \
+	  (strrchr(f, '\\') ? strrchr(f, '\\') + 1 : f)
 #else
-  #define BTK_FUNCTION __FUNCTION__
+  #define btkStripPathMacro(f) \
+    (strrchr(f, '/') ? strrchr(f, '/') + 1 : f)
 #endif
+
+#define STR(x) #x
+#define XSTR(x) STR(x)
 
 /**
  * This macro is used to print error message with the following format:
- * <filename>: <line> (<function_name>): <message>
+ * <source> (<line>): <message>
  */
 #define btkErrorMacro(m) \
-  std::cerr << "\n" << __FILE__ << ": " << __LINE__ << " (" << BTK_FUNCTION << "): " << m << std::endl;
+	std::cerr << btkStripPathMacro(__FILE__) << "(" << XSTR(__LINE__) << "): " << m << std::endl;
+
+/**
+ * This macro is used to print error message with the following format:
+ * <source> (<line>): '<file>' <message>
+ */
+#define btkIOErrorMacro(f, m) \
+	std::cerr << btkStripPathMacro(__FILE__) << "(" << XSTR(__LINE__) << "): '" << btkStripPathMacro(f.c_str()) << "' - " << m << std::endl;
 
 #endif // __btkMacro_h
