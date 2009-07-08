@@ -49,8 +49,5 @@ int main()
 #include "TRCFileIOTest.h"
 #include "TRCFileReaderTest.h"
 #include "TRCFileWriterTest.h"
-#ifdef HAVE_BTKVTKADAPTER
-  #include "VTKPointSourceTest.h"
-#endif
 
 #include <cxxtest/Root.cpp>
