@@ -51,6 +51,11 @@ namespace btk
    * @var AcquisitionFileIO::m_ByteOrder
    * Byte order.
    */
+  /**
+   * @var AcquisitionFileIO::m_StorageFormat
+   * Storage format.
+   */
+
   
   /**
    * @typedef AcquisitionFileIO::Pointer
@@ -99,6 +104,19 @@ namespace btk
    * @var AcquisitionFileIO::ByteOrder AcquisitionFileIO::IEEE_BigEndian
    * Enum value for a byte order in big endian with a IEEE float representation.
    */
+
+  /**
+   * @enum AcquisitionFileIO::StorageFormat
+   * Enums used to specify the format of the stored data.
+   */
+  /**
+   * @var AcquisitionFileIO::StorageFormat AcquisitionFileIO::Float
+   * Acquisition's data are stored as float values.
+   */
+  /**
+   * @var AcquisitionFileIO::StorageFormat AcquisitionFileIO::Integer
+   * Acquisition's data are stored as integer values.
+   */
   
   /**
    * @fn FileType AcquisitionFileIO::GetFileType() const
@@ -108,6 +126,21 @@ namespace btk
   /**
    * @fn ByteOrder AcquisitionFileIO::GetByteOrder() const
    * Gets the byte order of the file.
+   */
+
+  /**
+   * @fn void AcquisitionFileIO::SetByteOrder(ByteOrder b)
+   * Sets the byte order of the file.
+   */
+
+  /**
+   * @fn double AcquisitionFileIO::GetStorageFormat() const
+   * Return the format used to store points and analog channels.
+   */
+
+  /**
+   * @fn void AcquisitionFileIO::SetStorageFormat(StorageFormat df)
+   * Set the format used to store points and analog channels.
    */
   
   /**
@@ -140,6 +173,7 @@ namespace btk
   {
     this->m_FileType = TypeNotApplicable;
     this->m_ByteOrder = OrderNotApplicable;
+    this->m_StorageFormat = StorageNotApplicable;
   };
   
   /**
@@ -152,12 +186,5 @@ namespace btk
    * Sets the type of the file. This method is protected because some file can
    * be only ASCII file or binary file. An inherited class can use this method as
    * public with @c using @c AcquisitionFileIO::SetFileType; in its public part.
-   */
-  
-  /**
-   * @fn void AcquisitionFileIO::SetByteOrder(ByteOrder b)
-   * Sets the byte order of the file. This method is protected because some file can
-   * be only ASCII file or binary file. An inherited class can use this method as
-   * public with @c using @c AcquisitionFileIO::SetByteOrder; in its public part.
    */
 };

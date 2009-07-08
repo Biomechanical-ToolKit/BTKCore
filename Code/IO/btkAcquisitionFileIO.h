@@ -50,9 +50,14 @@ namespace btk
     
     typedef enum {TypeNotApplicable, ASCII, Binary} FileType;
     typedef enum {OrderNotApplicable = 0, IEEE_LittleEndian, VAX_LittleEndian, IEEE_BigEndian} ByteOrder;
-    
+    typedef enum {StorageNotApplicable = 0, Float = -1, Integer = 1} StorageFormat;
+
     FileType GetFileType() const {return this->m_FileType;};
     ByteOrder GetByteOrder() const {return this->m_ByteOrder;};
+    void SetByteOrder(ByteOrder b) {this->m_ByteOrder = b;};
+    StorageFormat GetStorageFormat() const {return this->m_StorageFormat;};
+    void SetStorageFormat(StorageFormat s) {this->m_StorageFormat = s;};
+
     BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename) = 0;
     BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename) = 0;
     BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output) = 0;
@@ -63,10 +68,10 @@ namespace btk
     virtual ~AcquisitionFileIO() {};
     
     void SetFileType(FileType f) {this->m_FileType = f;};
-    void SetByteOrder(ByteOrder b) {this->m_ByteOrder = b;};
-    
+        
     FileType m_FileType;
     ByteOrder m_ByteOrder;
+    StorageFormat m_StorageFormat;
     
   private:
     AcquisitionFileIO(const AcquisitionFileIO& ); // Not implemented.

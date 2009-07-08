@@ -171,7 +171,7 @@ namespace btk
   AcquisitionFileWriter::AcquisitionFileWriter()
   : m_AcquisitionIO(), m_Filename()
   {
-    this->SetOutputNumber(1);
+    this->SetInputNumber(1);
   };
   
   /**
@@ -184,7 +184,7 @@ namespace btk
    */
   DataObject::Pointer AcquisitionFileWriter::MakeOutput(int idx)
   {
-    return Acquisition::New();
+    throw(RuntimeError("btk::AcquisitionFileWriter has not ouput."));
   };
   
   /**

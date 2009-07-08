@@ -383,9 +383,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::VAX_LittleEndian);
-    io->SetDataFormat(btk::C3DFileIO::Integer);
+    io->SetStorageFormat(btk::C3DFileIO::Integer);
     io->SetByteOrder(btk::AcquisitionFileIO::IEEE_BigEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -396,7 +396,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Integer);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Integer);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_BigEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -428,9 +428,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::VAX_LittleEndian);
-    io->SetDataFormat(btk::C3DFileIO::Integer);
+    io->SetStorageFormat(btk::C3DFileIO::Integer);
     io->SetByteOrder(btk::AcquisitionFileIO::IEEE_LittleEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -441,7 +441,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Integer);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Integer);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_LittleEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -473,9 +473,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::VAX_LittleEndian);
-    io->SetDataFormat(btk::C3DFileIO::Integer);
+    io->SetStorageFormat(btk::C3DFileIO::Integer);
     io->SetByteOrder(btk::AcquisitionFileIO::VAX_LittleEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -486,7 +486,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Integer);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Integer);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::VAX_LittleEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -518,9 +518,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_LittleEndian);
-    io->SetDataFormat(btk::C3DFileIO::Integer);
+    io->SetStorageFormat(btk::C3DFileIO::Integer);
     io->SetByteOrder(btk::AcquisitionFileIO::IEEE_BigEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -531,7 +531,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Integer);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Integer);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_BigEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -563,9 +563,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_LittleEndian);
-    io->SetDataFormat(btk::C3DFileIO::Integer);
+    io->SetStorageFormat(btk::C3DFileIO::Integer);
     io->SetByteOrder(btk::AcquisitionFileIO::IEEE_LittleEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -576,7 +576,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Integer);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Integer);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_LittleEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -608,9 +608,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_LittleEndian);
-    io->SetDataFormat(btk::C3DFileIO::Integer);
+    io->SetStorageFormat(btk::C3DFileIO::Integer);
     io->SetByteOrder(btk::AcquisitionFileIO::VAX_LittleEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -621,7 +621,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Integer);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Integer);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::VAX_LittleEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -653,9 +653,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Integer);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Integer);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_LittleEndian);
-    io->SetDataFormat(btk::C3DFileIO::Float);
+    io->SetStorageFormat(btk::C3DFileIO::Float);
     io->SetByteOrder(btk::AcquisitionFileIO::IEEE_BigEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -666,7 +666,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_BigEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -698,9 +698,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Integer);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Integer);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_LittleEndian);
-    io->SetDataFormat(btk::C3DFileIO::Float);
+    io->SetStorageFormat(btk::C3DFileIO::Float);
     io->SetByteOrder(btk::AcquisitionFileIO::VAX_LittleEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -711,7 +711,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::VAX_LittleEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -743,9 +743,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_BigEndian);
-    io->SetDataFormat(btk::C3DFileIO::Float);
+    io->SetStorageFormat(btk::C3DFileIO::Float);
     io->SetByteOrder(btk::AcquisitionFileIO::VAX_LittleEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -756,7 +756,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::VAX_LittleEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -788,9 +788,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_LittleEndian);
-    io->SetDataFormat(btk::C3DFileIO::Float);
+    io->SetStorageFormat(btk::C3DFileIO::Float);
     io->SetByteOrder(btk::AcquisitionFileIO::IEEE_BigEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -801,7 +801,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_BigEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -833,9 +833,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq->RemovePoint(23);
     acq->RemovePoint(22);
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::VAX_LittleEndian);
-    io->SetDataFormat(btk::C3DFileIO::Float);
+    io->SetStorageFormat(btk::C3DFileIO::Float);
     io->SetByteOrder(btk::AcquisitionFileIO::IEEE_LittleEndian);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
@@ -846,7 +846,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->Update();
     acq = reader->GetOutput();
     io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_EQUALS(io->GetDataFormat(), btk::C3DFileIO::Float);
+    TS_ASSERT_EQUALS(io->GetStorageFormat(), btk::C3DFileIO::Float);
     TS_ASSERT_EQUALS(io->GetByteOrder(), btk::AcquisitionFileIO::IEEE_LittleEndian);
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
@@ -862,6 +862,104 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_DELTA(acq->GetPoint(17)->GetValues()(16,2), 564.4166, 0.0001);
     TS_ASSERT_DELTA(acq->GetPoint(0)->GetResiduals()(0,0), 1.3333, 0.0001);
     TS_ASSERT_DELTA(acq->GetPoint(14)->GetResiduals()(20), 1.91667, 0.0001);
+  };
+
+  CXXTEST_TEST(sample09_PluginC3D_rewrited)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "sample09/PluginC3D.c3d");
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    reader->Update();
+    writer->SetAcquisitionIO(reader->GetAcquisitionIO());
+    writer->SetInput(reader->GetOutput());
+    writer->SetFilename(C3DFilePathOUT + "sample09_PluginC3D.c3d");
+    writer->Update();
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "sample09_PluginC3D.c3d");
+    reader2->Update();
+
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      TS_ASSERT_DELTA(acq->GetPoint(1)->GetValues()(i,0), acq2->GetPoint(1)->GetValues()(i,0), 0.00001);
+      TS_ASSERT_DELTA(acq->GetPoint(2)->GetValues()(i,1), acq2->GetPoint(2)->GetValues()(i,1), 0.00001);
+      TS_ASSERT_DELTA(acq->GetPoint(3)->GetValues()(i,2), acq2->GetPoint(3)->GetValues()(i,2), 0.00001);
+      TS_ASSERT_DELTA(acq->GetPoint(4)->GetResiduals()(i), acq2->GetPoint(4)->GetResiduals()(i), 0.00001);
+    }
+  }
+
+  CXXTEST_TEST(sample19_sample19_rewrited)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "sample19/sample19.c3d");
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    reader->Update();
+    writer->SetInput(reader->GetOutput());
+    writer->SetFilename(C3DFilePathOUT + "sample19_sample19.c3d");
+    writer->SetAcquisitionIO(reader->GetAcquisitionIO());
+    writer->Update();
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "sample19_sample19.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::Acquisition::Pointer acq2 = reader->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), acq2->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+    for (int i = 1 ; i < 50 ; i+=10)
+    {
+      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acq2->GetAnalog(0)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acq2->GetAnalog(1)->GetValues()(i), 0.00001);
+    }
+  };
+
+  CXXTEST_TEST(convertTRC2C3D)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(TRCFilePathIN + "Knee.trc");
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(reader->GetOutput());
+    writer->SetFilename(C3DFilePathOUT + "Knee_rewritedInC3D.c3d");
+    writer->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "Knee_rewritedInC3D.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+
+    TS_ASSERT_DELTA(acq->GetPoint(70)->GetResiduals()(82), -1.0, 0.000001);
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      TS_ASSERT_DELTA(acq->GetPoint(1)->GetValues()(i,0), acq2->GetPoint(1)->GetValues()(i,0), 0.00005);
+      TS_ASSERT_DELTA(acq->GetPoint(2)->GetValues()(i,1), acq2->GetPoint(2)->GetValues()(i,1), 0.00001);
+      TS_ASSERT_DELTA(acq->GetPoint(3)->GetValues()(i,2), acq2->GetPoint(3)->GetValues()(i,2), 0.00001);
+      TS_ASSERT_DELTA(acq->GetPoint(4)->GetResiduals()(i), acq2->GetPoint(4)->GetResiduals()(i), 0.00001);
+    }
+
+    TS_ASSERT_DELTA(acq->GetPoint(70)->GetResiduals()(82), acq2->GetPoint(70)->GetResiduals()(82), 0.000001);
   };
 };
 
@@ -889,4 +987,7 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015vr_from_Eb015pi)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015vr_from_Eb015sr)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015sr_from_Eb015pr)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015pr_from_Eb015vr)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample09_PluginC3D_rewrited)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample19_sample19_rewrited)  
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertTRC2C3D)
 #endif

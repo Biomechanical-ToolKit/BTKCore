@@ -66,20 +66,7 @@ namespace btk
    *
    * @ingroup BTKIO
    */
- 
-  /**
-   * @enum C3DFileIO::DataFormat
-   * Enums used to specify the format of the stored data in the C3D file.
-   */
-  /**
-   * @var C3DFileIO::DataFormat C3DFileIO::Float
-   * Acquisition's data are stored as float values (by default).
-   */
-  /**
-   * @var C3DFileIO::DataFormat C3DFileIO::Integer
-   * Acquisition's data are stored as integer values.
-   */
-
+  
   /**
    * @enum C3DFileIO::AnalogIntegerFormat
    * Enums used to specify the format used to store analog's data.
@@ -127,16 +114,6 @@ namespace btk
   /**
    * @fn static C3DFileIO::Pointer C3DFileIO::New()
    * Create a C3DFileIO object an return it as a smart pointer.
-   */
-
-  /**
-   * @fn double C3DFileIO::GetDataFormat() const
-   * Return the format used to store points and analog channels.
-   */
-
-  /**
-   * @fn void C3DFileIO::SetDataFormat(DataFormat df)
-   * Set the format used to store points and analog channels in the C3D file.
    */
 
   /**
@@ -653,12 +630,12 @@ namespace btk
         if (pointScaleFactor > 0) // integer
         {
           fdf = new IntegerFormat(ibfs);
-          this->m_DataFormat = Integer; 
+          this->m_StorageFormat = Integer; 
         }
         else // float;
         {
           fdf = new FloatFormat(ibfs);
-          this->m_DataFormat = Float;
+          this->m_StorageFormat = Float;
         }
         int frameNumber = lastFrame - input->GetFirstFrame() + 1;
         input->Init(pointNumber, frameNumber, analogNumber, numberSamplesPerAnalogChannel);
@@ -889,7 +866,7 @@ namespace btk
         // Maximum interpolation gap in 3D frames
         writtenBytes += obfs->Write(static_cast<uint16_t>(10));
         // The 3D scale factor
-        writtenBytes += obfs->Write(static_cast<float>(this->m_PointScale * static_cast<double>(this->m_DataFormat)));
+        writtenBytes += obfs->Write(static_cast<float>(this->m_PointScale * static_cast<double>(this->m_StorageFormat)));
         // The (false) number of the first block of the Data section
         writtenBytes += obfs->Write(static_cast<uint16_t>(0));
         // The number of analog samples per analog channel
@@ -939,6 +916,8 @@ namespace btk
         MetaDataEntry::Iterator itPoint = input->GetMetaData()->FindChild("POINT");
         pointID = std::distance(input->GetMetaData()->Begin(), itPoint) + 1;
         dataStart = (*itPoint)->TakeChild("DATA_START");
+        if (dataStart.get() == 0)
+          dataStart = MetaDataEntry::New("DATA_START", static_cast<int16_t>(0));
       }
       // MetaDataEntry
       int id = 1;
@@ -957,6 +936,8 @@ namespace btk
         dataStart->GetMetaDataEntryValue()->SetValues(static_cast<int16_t>(dS));
         writtenBytes += this->WriteMetaDataEntry(obfs, dataStart, pointID);
         writtenBytes += obfs->Fill(512 - (writtenBytes % 512));
+        // DATA_START is reinserted.
+        input->GetMetaData()->GetChild(pointID - 1)->AppendChild(dataStart);
         // Back to the parameter: number of blocks
         obfs->SeekWrite(512 * (2 - 1) + 2, std::ios_base::beg);
         obfs->Write(pNB);
@@ -978,14 +959,14 @@ namespace btk
       if (!templateFile)
       {
         obfs->SeekWrite(512 * (dS - 1), std::ios_base::beg);
-        if (this->m_DataFormat == Float) // Float format
+        if (this->m_StorageFormat == Float) // Float format
           fdf = new FloatFormat(obfs);
         else // Integer format
           fdf = new IntegerFormat(obfs);
         int frameNumber = input->GetPointFrameNumber();
         for (int frame = 0 ; frame < frameNumber ; ++frame)
         {
-          Acquisition::PointConstIterator itM = input->BeginPoint(); 
+          Acquisition::PointConstIterator itM = input->BeginPoint();
           while (itM != input->EndPoint())
           {
             Point* point = itM->get();
@@ -1002,11 +983,11 @@ namespace btk
           Acquisition::AnalogConstIterator itA = input->BeginAnalog();
           while (itA != input->EndAnalog())
           {
-            fdf->WriteAnalog(
+            fdf->WriteAnalog(static_cast<float>(
                 (*itA)->GetValues().data()[analogFrame] 
                 / this->m_AnalogChannelScale[incChannel]
     						/ this->m_AnalogUniversalScale
-		    				+ this->m_AnalogZeroOffset[incChannel]);
+		    				+ this->m_AnalogZeroOffset[incChannel]));
             ++itA; ++incChannel;
             if ((itA == input->EndAnalog()) && (inc < static_cast<unsigned>(numberSamplesPerAnalogChannel - 1)))
             {
@@ -1051,7 +1032,7 @@ namespace btk
   {
     this->m_PointScale = 0.0;
     this->m_AnalogUniversalScale = 0.0;
-    this->m_DataFormat = Float;
+    this->m_StorageFormat = Float;
     this->m_AnalogIntegerFormat = Signed;
     this->SetFileType(AcquisitionFileIO::Binary);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
@@ -1153,17 +1134,10 @@ namespace btk
       if (val > max)
         max = val;
     }
-    double pointScale = max / 32000;
-    /*
-    std::cout << std::endl << "Max:" << max << std::endl;
-    std::cout << std::endl << "Point scaling factor:" << pointScale << std::endl;    
-    if (max < 2667)
-      std::cout << std::endl << "Final point scaling factor:" << 2667.0/32000.0 << std::endl;   
-    else if (max < 3200)
-      std::cout << std::endl << "Final point scaling factor:" << 3200.0/32000.0 << pointScale << std::endl;
-    else
-      std::cout << std::endl << "Final point scaling factor:" << max/32000.0 << pointScale << std::endl;
-      */
+    const int currentMax = static_cast<int>(this->m_PointScale * 32000);
+    // Guess to compute a new point scaling factor.
+    if (((max > currentMax) || (max <= (currentMax / 2))) && (max != 0))
+      this->m_PointScale = max / 32000.0;
   };
   
   void C3DFileIO::UpdateScalingFactorsFromMetaData(Acquisition::Pointer input)
@@ -1208,7 +1182,7 @@ namespace btk
         if (itAnalogOffset != (*itAnalog)->End())
         {
           const std::vector<std::string> dataOffset = (*itAnalogOffset)->GetMetaDataEntryValue()->GetValues();
-          if (dataOffset.size() < analogNumber)
+          if (static_cast<int>(dataOffset.size()) < analogNumber)
           {
             btkErrorMacro("No enough analog offsets. Impossible to update analog offsets.");
           }
@@ -1237,7 +1211,7 @@ namespace btk
         MetaDataEntry::ConstIterator itAnalogScale = (*itAnalog)->FindChild("SCALE");
         if (itAnalogScale != (*itAnalog)->End())
         {
-          if ((*itAnalogScale)->GetMetaDataEntryValue()->GetValues().size() < analogNumber)
+          if (static_cast<int>((*itAnalogScale)->GetMetaDataEntryValue()->GetValues().size()) < analogNumber)
           {
             btkErrorMacro("No enough analog scaling factors. Impossible to update analog offsets.");
           }
@@ -1276,9 +1250,9 @@ namespace btk
           FromString((*itPointScale)->GetMetaDataEntryValue()->GetValue(0), pointScale);
           this->m_PointScale = fabs(pointScale);
           if (pointScale > 0)
-            this->m_DataFormat = Integer;
+            this->m_StorageFormat = Integer;
           else
-            this->m_DataFormat = Float;
+            this->m_StorageFormat = Float;
         }
         else
         {
@@ -1297,7 +1271,7 @@ namespace btk
     // POINT:USED
     point->CreateChild("USED", static_cast<int16_t>(pointNumber));
     // POINT:SCALE
-    point->CreateChild("SCALE", static_cast<float>(this->m_PointScale * static_cast<double>(this->m_DataFormat)));
+    point->CreateChild("SCALE", static_cast<float>(this->m_PointScale * static_cast<double>(this->m_StorageFormat)));
     // POINT:RATE
     point->CreateChild("RATE", static_cast<float>(input->GetPointFrequency()));
     // POINT:DATA_START (Updated dynamicaly during the file writing)
@@ -1315,8 +1289,8 @@ namespace btk
     }
     point->CreateChild("LABELS", labels);
     point->CreateChild("DESCRIPTIONS", descs);
-    // POINT:UNIT
-    point->CreateChild("UNIT", input->GetPointUnit(Point::Marker));
+    // POINT:UNITS
+    point->CreateChild("UNITS", input->GetPointUnit(Point::Marker));
     // POINT:TYPE_GROUPS (init)
     std::vector<std::string> typeGroups; 
     // POINT:ANGLES & POINT:ANGLE_UNITS
@@ -1338,11 +1312,13 @@ namespace btk
     int analogNumber = input->GetAnalogNumber();
     // ANALOG:USED
     analog->CreateChild("USED", static_cast<int16_t>(analogNumber));
-    // ANALOG:LABELS & ANALOG:DESCRIPTIONS & ANALOG:UNITS & ANALOG:GAIN (LABELS2, ...)
+    // ANALOG:LABELS & ANALOG:DESCRIPTIONS & ANALOG:UNITS & ANALOG:GAIN & ANALOG:SCALE & ANALOG:OFFSET (LABELS2, ...)
     labels.resize(analogNumber);
     descs.resize(analogNumber);
     std::vector<std::string> units = std::vector<std::string>(analogNumber);
-    std::vector<int16_t> gain = std::vector<int16_t>(analogNumber);
+    std::vector<int16_t> gain = std::vector<int16_t>(analogNumber, 0);
+    std::vector<int16_t> analogZeroOffset = std::vector<int16_t>(analogNumber, 0);
+    std::vector<float> analogChannelScale = std::vector<float>(analogNumber, 1.0);
     inc = 0;
     for (Acquisition::AnalogConstIterator itAnalog = input->BeginAnalog() ; itAnalog != input->EndAnalog() ; ++itAnalog)
     {
@@ -1350,26 +1326,18 @@ namespace btk
       descs[inc] = (*itAnalog)->GetDescription();
       units[inc] = (*itAnalog)->GetUnit();
       gain[inc] = (*itAnalog)->GetGain();
+      analogChannelScale[inc] = static_cast<float>(this->m_AnalogChannelScale[inc]);
+      analogZeroOffset[inc] = this->m_AnalogZeroOffset[inc];
       ++inc;
     }
     analog->CreateChild("LABELS", labels);
     analog->CreateChild("DESCRIPTIONS", descs);
     analog->CreateChild("UNITS", units);
     analog->CreateChild("GAIN", gain);
-    // ANALOG:GEN_SCALE
-    analog->CreateChild("GEN_SCALE", static_cast<float>(this->m_AnalogUniversalScale));
-    // ANALOG:SCALE & ANALOG:OFFSET
-    std::vector<float> analogChannelScale = std::vector<float>(this->m_AnalogChannelScale.size());
-		std::vector<int16_t> analogZeroOffset = std::vector<int16_t>(this->m_AnalogZeroOffset.size());
-    analogChannelScale.resize(analogNumber, 1.0);
-    analogZeroOffset.resize(analogNumber, 0);
-    for (int i = 0 ; i < analogNumber ; ++i)
-    {
-      analogChannelScale[i] = this->m_AnalogChannelScale[i];
-      analogZeroOffset[i] = this->m_AnalogZeroOffset[i];
-    }
     analog->CreateChild("SCALE", analogChannelScale);
     analog->CreateChild("OFFSET", analogZeroOffset);
+    // ANALOG:GEN_SCALE
+    analog->CreateChild("GEN_SCALE", static_cast<float>(this->m_AnalogUniversalScale)); 
     // ANALOG:RATE
     analog->CreateChild("RATE", static_cast<float>(input->GetAnalogFrequency()));
     // ANALOG:FORMAT
@@ -1406,7 +1374,7 @@ namespace btk
         if (s.compare("general") == 0)
           genericFlags[inc] = 1;
         bool newUniqueEventFound = false;
-        for (int i = 0 ; i < uniqueEvents.size() ; ++i)
+        for (int i = 0 ; i < static_cast<int>(uniqueEvents.size()) ; ++i)
         {
           if (contexts[inc].length() == 0)
             continue;
@@ -1424,8 +1392,8 @@ namespace btk
           uniqueEvents.push_back(contexts[inc]);
         labels[inc] = (*itEvent)->GetLabel();
         descs[inc] = (*itEvent)->GetDescription();
-        times[2 * inc] = static_cast<int>((*itEvent)->GetTime() / 60);
-        times[2 * inc + 1] = (*itEvent)->GetTime() - (times[2 * inc] * 60);
+        times[2 * inc] = static_cast<float>(static_cast<int>((*itEvent)->GetTime() / 60));
+        times[2 * inc + 1] = static_cast<float>((*itEvent)->GetTime() - (times[2 * inc] * 60));
         subjects[inc] = (*itEvent)->GetSubject();
         ++inc;
       }
@@ -1460,7 +1428,7 @@ namespace btk
           for (std::vector<std::string>::iterator it1 = uniqueEventsLabel.begin() ; it1 != uniqueEventsLabel.end() ; ++it1)
           {
             bool toCollapse = true;
-            std::string s2;
+            std::string s2 = "";;
             for (std::vector<std::string>::iterator it2 = uniqueEvents.begin() ; it2 != uniqueEvents.end() ; ++it2)
             {
               std::string s1 = *it1;
@@ -1473,7 +1441,7 @@ namespace btk
                 break;
               }
             }
-            if (toCollapse)
+            if (toCollapse && !s2.empty())
             {
               uniqueEventsLabel.push_back(s2);
               ++uniqueEventAppended;

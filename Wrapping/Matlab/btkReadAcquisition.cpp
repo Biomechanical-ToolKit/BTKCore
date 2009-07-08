@@ -61,8 +61,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   mxGetString(prhs[0], filename, strlen); 
   
   btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-  //btk::C3DFileIO::Pointer c3dIO = btk::C3DFileIO::New();
-  //reader->SetAcquisitionIO(c3dIO);
   reader->SetFilename(std::string(filename));
   
   try

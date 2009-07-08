@@ -56,66 +56,17 @@ void btkMEXGetPoints(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
   }
   else
   {
-    char** units = new char*[numberOfPoints];
-
+    std::vector<std::string> units = std::vector<std::string>(numberOfPoints, "");
     const char* info[] = {"firstFrame", "frequency", "units"};
     int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
-    
-    const char* names[] = {"ANGLE", "FORCE", "MOMENT", "POWER", "SCALAR"};
-    int numberOfNames =  sizeof(names) / (sizeof(char) * 4);
-
-    std::vector<std::string> xUnit = std::vector<std::string>(numberOfNames + 1, "");
-    btk::MetaDataEntry::Pointer metadata = acq->GetMetaData();
-    btk::MetaDataEntry::ConstIterator itPoint = metadata->Find("POINT");
-    if (itPoint != metadata->End())
+       
+    int inc = 0;
+    for(btk::PointCollection::ConstIterator itPt = points->Begin() ; itPt != points->End() ; ++itPt)
     {
-      for(int i = 1 ; i <= numberOfNames ; ++i)
-      {
-        btk::MetaDataEntry::ConstIterator itUnits = (*itPoint)->Find(std::string(names[i-1]) + "_UNITS");
-        if (itUnits != (*itPoint)->End())
-        {
-          xUnit[i] = (*itUnits)->GetMetaDataEntryValue()->GetValue(0);
-          xUnit[i] = xUnit[i].erase(xUnit[i].find_last_not_of(' ') + 1);
-          xUnit[i] = xUnit[i].erase(0, xUnit[i].find_first_not_of(' '));
-        }
-      }
-      // POINT:ANGLES special case.
-      if (xUnit[1].empty())
-        xUnit[1] = "deg";
-      // POINT:UNITS
-      btk::MetaDataEntry::ConstIterator itPointUnits = (*itPoint)->Find("UNITS");
-      if (itPointUnits != (*itPoint)->End())
-      {
-        std::string& pointUnit = xUnit[0];
-        pointUnit = (*itPointUnits)->GetMetaDataEntryValue()->GetValue(0);
-        pointUnit = pointUnit.erase(pointUnit.find_last_not_of(' ') + 1);
-        pointUnit = pointUnit.erase(0, pointUnit.find_first_not_of(' '));
-      }
-      int inc = 0;
-      for(btk::PointCollection::ConstIterator itPt = points->Begin() ; itPt != points->End() ; ++itPt)
-      {
-        if ((*itPt)->GetType() <= 5) // 5: number of known units.
-        {
-          units[inc] = new char[xUnit[(*itPt)->GetType()].length() + 1];
-          strcpy(units[inc], xUnit[(*itPt)->GetType()].c_str());
-        }
-        else
-        {
-          units[inc] = new char[1];
-          units[inc] = '\0';
-        }
-        ++inc;
-      }
+      if ((*itPt)->GetType() <= 5) // 0-5: known units.
+        units[inc] = acq->GetPointUnit((*itPt)->GetType());
+      ++inc;
     }
-    else
-    {
-      for (int i = 0 ; i < numberOfPoints ; ++i)
-      {
-        units[i] = new char[1];
-        units[i] = '\0';
-      }
-    }
-    
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     mxArray* firstFrame  = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
     *reinterpret_cast<int*>(mxGetPr(firstFrame)) = acq->GetFirstFrame();
@@ -124,14 +75,12 @@ void btkMEXGetPoints(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
     mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
     for (int i = 0 ; i < numberOfPoints ;++i)
     {
-      mxSetFieldByNumber(unitsStruct, 0, i, mxCreateString((const char*)units[i]));
+      mxSetFieldByNumber(unitsStruct, 0, i, mxCreateString(units[i].c_str()));
       delete[] fieldnames[i];
-      delete[] units[i];
     }
     mxSetFieldByNumber(plhs[1], 0, 0, firstFrame);
     mxSetFieldByNumber(plhs[1], 0, 1, frequency);
     mxSetFieldByNumber(plhs[1], 0, 2, unitsStruct);
     delete[] fieldnames;
-    delete[] units;
   }
 };

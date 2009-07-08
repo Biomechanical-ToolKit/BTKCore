@@ -55,7 +55,7 @@ namespace btk
   class C3DFileIO : public AcquisitionFileIO
   {
   public:
-    typedef enum {Float = -1, Integer = 1} DataFormat;
+    
     typedef enum {Signed, Unsigned}  AnalogIntegerFormat;
     typedef enum {None = 1, ScalesFromDataUpdate = 2, ScalesFromMetaDataUpdate = 4, MetaDataFromDataUpdate = 8} WritingFlag;
 
@@ -66,9 +66,6 @@ namespace btk
         
     // ~C3DFileIO(); // Implicit.
     
-    using AcquisitionFileIO::SetByteOrder;
-    double GetDataFormat() const {return this->m_DataFormat;};
-    void SetDataFormat(DataFormat df) {this->m_DataFormat = df;};
     double GetPointScale() const {return this->m_PointScale;};
     void SetPointScale(double s) {this->m_PointScale = s;};
     AnalogIntegerFormat GetAnalogIntegerFormat() const {return this->m_AnalogIntegerFormat;};
@@ -109,8 +106,8 @@ namespace btk
       Format(BinaryFileStream* bfs) {this->m_Bfs = bfs;};
       virtual void ReadPoint(double* x, double* y, double* z, double* residual, double* cam, double pointScaleFactor) = 0;
       virtual double ReadAnalog() = 0;
-      virtual void WritePoint(float x, float y, float z, float residual, double cam, float pointScaleFactor) = 0;
-      virtual void WriteAnalog(float v) = 0;
+      virtual void WritePoint(double x, double y, double z, double residual, double cam, double pointScaleFactor) = 0;
+      virtual void WriteAnalog(double v) = 0;
     protected:
       BinaryFileStream* m_Bfs;
     };
@@ -136,25 +133,31 @@ namespace btk
 #endif
       };
       virtual double ReadAnalog() {return static_cast<float>(this->m_Bfs->ReadI16());};
-      virtual void WritePoint(float x, float y, float z, float residual, double cam, float pointScaleFactor)
+      virtual void WritePoint(double x, double y, double z, double residual, double cam, double pointScaleFactor)
       {
         int8_t byteptr[2];
-        int16_t residualAndMask;
-        this->m_Bfs->Write(static_cast<int16_t>(x / pointScaleFactor));
-				this->m_Bfs->Write(static_cast<int16_t>(y / pointScaleFactor));
-				this->m_Bfs->Write(static_cast<int16_t>(z / pointScaleFactor));
-#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-        byteptr[0] = cam;
-        byteptr[1] = (byteptr[0] >= 0 ? residual / pointScaleFactor : -1);
+        int16_t residualAndMask; 
+#if defined(_MSC_VER)
+        this->m_Bfs->Write(static_cast<int16_t>(floor(x / pointScaleFactor + 0.5)));
+				this->m_Bfs->Write(static_cast<int16_t>(floor(y / pointScaleFactor + 0.5)));
+				this->m_Bfs->Write(static_cast<int16_t>(floor(z / pointScaleFactor + 0.5)));
 #else
-        byteptr[1] = cam;
-        byteptr[0] = (byteptr[1] >= 0 ? residual / pointScaleFactor : -1);
+        this->m_Bfs->Write(static_cast<int16_t>(static_cast<float>(x / pointScaleFactor)));
+				this->m_Bfs->Write(static_cast<int16_t>(static_cast<float>(y / pointScaleFactor)));
+				this->m_Bfs->Write(static_cast<int16_t>(static_cast<float>(z / pointScaleFactor)));
+#endif
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+        byteptr[0] = static_cast<int8_t>(cam);
+        byteptr[1] = (byteptr[0] >= 0 ? static_cast<int8_t>(residual / pointScaleFactor) : -1);
+#else
+        byteptr[1] = static_cast<int8_t>(cam);
+        byteptr[0] = (byteptr[1] >= 0 ? static_cast<int8_t>(residual / pointScaleFactor) : -1);
 #endif
         memcpy(&residualAndMask, &byteptr, sizeof(residualAndMask));
         this->m_Bfs->Write(residualAndMask);
 
       };
-      virtual void WriteAnalog(float v) {this->m_Bfs->Write(static_cast<int16_t>(v));};
+      virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<int16_t>(static_cast<float>(v)));};
 
     };
     class FloatFormat : public Format
@@ -181,31 +184,30 @@ namespace btk
 #endif
       };
       virtual double ReadAnalog() {return this->m_Bfs->ReadFloat();};
-      virtual void WritePoint(float x, float y, float z, float residual, double cam, float pointScaleFactor)
+      virtual void WritePoint(double x, double y, double z, double residual, double cam, double pointScaleFactor)
       {
         int8_t byteptr[2];
         int16_t residualAndMask;
-        this->m_Bfs->Write(x);
-				this->m_Bfs->Write(y);
-				this->m_Bfs->Write(z);
+        this->m_Bfs->Write(static_cast<float>(x));
+				this->m_Bfs->Write(static_cast<float>(y));
+				this->m_Bfs->Write(static_cast<float>(z));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-        byteptr[0] = cam;
-        byteptr[1] = (byteptr[0] >= 0 ? fabs(residual / pointScaleFactor) : -1);
+        byteptr[0] = static_cast<int8_t>(cam);
+        byteptr[1] = (byteptr[0] >= 0 ? static_cast<int8_t>(fabs(residual / pointScaleFactor)) : -1);
 #else
-        byteptr[1] = cam;
-        byteptr[0] = (byteptr[1] >= 0 ? fabs(residual / pointScaleFactor) : -1);
+        byteptr[1] = static_cast<int8_t>(cam);
+        byteptr[0] = (byteptr[1] >= 0 ? static_cast<int8_t>(fabs(residual / pointScaleFactor)) : -1);
 #endif
         memcpy(&residualAndMask, &byteptr, sizeof(residualAndMask));
         this->m_Bfs->Write(static_cast<float>(residualAndMask));
       };
-      virtual void WriteAnalog(float v) {this->m_Bfs->Write(static_cast<float>(v));};
+      virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<float>(v));};
     };
 
     double m_PointScale;
     std::vector<double> m_AnalogChannelScale;
 		std::vector<int> m_AnalogZeroOffset;
     double m_AnalogUniversalScale;
-    DataFormat m_DataFormat;
     AnalogIntegerFormat m_AnalogIntegerFormat;
     int m_WritingFlags;
   };

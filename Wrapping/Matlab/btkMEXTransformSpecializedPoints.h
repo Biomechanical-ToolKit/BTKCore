@@ -98,10 +98,10 @@ void btkMEXTransformSpecializedPoints(
     int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
     char* units = 0;
     btk::MetaDataEntry::Pointer metadata = acq->GetMetaData();
-    btk::MetaDataEntry::ConstIterator itPoint = metadata->Find("POINT");
+    btk::MetaDataEntry::ConstIterator itPoint = metadata->FindChild("POINT");
     if (itPoint != metadata->End())
     {
-      btk::MetaDataEntry::ConstIterator itUnit = (*itPoint)->Find(label + "_UNITS");
+      btk::MetaDataEntry::ConstIterator itUnit = (*itPoint)->FindChild(label + "_UNITS");
       if (itUnit != (*itPoint)->End())
       {
         btk::MetaDataEntryValue::ConstPointer pointUnit = (*itUnit)->GetMetaDataEntryValue();

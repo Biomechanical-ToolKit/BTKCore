@@ -38,18 +38,93 @@
 #include "btkMEXStreambufToWarnMsgTxt.h"
 
 #include <btkAcquisitionFileWriter.h>
+#include <btkAcquisitionFileIOFactory.h>
+
+const std::string extractByteOrderOption(const mxArray* opt, btk::AcquisitionFileIO::ByteOrder* b)
+{
+  std::string errMsg;
+  int strlen = (mxGetM(opt) * mxGetN(opt) * sizeof(mxChar)) + 1;
+  char* option = (char*)mxMalloc(strlen);
+  mxGetString(opt, option, strlen);
+  if (strcmpi(option, "IEEE_BigEndian") == 0)
+    *b = btk::AcquisitionFileIO::IEEE_BigEndian;
+  else if (strcmpi(option, "IEEE_LittleEndian") == 0)
+    *b = btk::AcquisitionFileIO::IEEE_LittleEndian;
+  else if (strcmpi(option, "VAX_LittleEndian") == 0)
+    *b = btk::AcquisitionFileIO::VAX_LittleEndian;
+  else
+    errMsg = "Unknown ByteOrder option: '" + std::string(option) + "'";
+  mxFree(option);
+  return errMsg;
+};
+
+const std::string extractStorageFormatOption(const mxArray* opt, btk::AcquisitionFileIO::StorageFormat* s)
+{
+  std::string errMsg;
+  int strlen = (mxGetM(opt) * mxGetN(opt) * sizeof(mxChar)) + 1;
+  char* option = (char*)mxMalloc(strlen);
+  mxGetString(opt, option, strlen);
+  if (strcmpi(option, "Float") == 0)
+    *s = btk::AcquisitionFileIO::Float;
+  else if (strcmpi(option, "Integer") == 0)
+    *s = btk::AcquisitionFileIO::Integer;
+  else
+    errMsg = "Unknown StorageFormat option: '" + std::string(option) + "'";
+  mxFree(option);
+  return errMsg;
+};
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs != 2)
+  if(nrhs < 2)
     mexErrMsgTxt("Two inputs required.");
+  if ((nrhs % 2) != 0)
+    mexErrMsgTxt("Incorrect number of inputs.");
   if (nlhs > 0)
    mexErrMsgTxt("Too many output arguments.");
 
-  
-
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
+  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+  char* filename = (char*)mxMalloc(strlen);
+  mxGetString(prhs[1], filename, strlen);
+
+  char* option = 0;
+  btk::AcquisitionFileIO::ByteOrder byteOrderOption = btk::AcquisitionFileIO::OrderNotApplicable;
+  btk::AcquisitionFileIO::StorageFormat storageFormatOption = btk::AcquisitionFileIO::StorageNotApplicable;
+  std::string errMsg;
+  
+  const char* options[] = {"ByteOrder", "StorageFormat"};
+  int numberOfOptions =  sizeof(options) / (sizeof(char) * 4);
+  for (int i = 2 ; i < nrhs ; i += 2)
+  {
+    strlen = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
+    option = (char*)mxMalloc(strlen);
+    mxGetString(prhs[i], option, strlen);
+    int j = 0;
+    for (j = 0 ; j < numberOfOptions ; ++j)
+    {
+      if (strcmpi(option, options[j]) == 0)
+      {
+        switch(j)
+        {
+        case 0:
+          errMsg = extractByteOrderOption(prhs[i+1], &byteOrderOption);
+          break;
+        case 1:
+          errMsg = extractStorageFormatOption(prhs[i+1], &storageFormatOption);
+          break;
+        }
+        break;
+      }
+    }
+    if (j == numberOfOptions)
+      errMsg = "Unknown option: '" + std::string(option) + "'";
+    mxFree(option);
+    if (!errMsg.empty())
+      mexErrMsgTxt(errMsg.c_str());
+  }
+  
   // std::cout redirection to the mexPrintf function.
   btk::MEXStreambufToPrintf matlabStandardOutput;
   std::streambuf* stdStandardOutput = std::cout.rdbuf(&matlabStandardOutput);
@@ -57,12 +132,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::MEXStreambufToWarnMsgTxt matlabErrorOutput;
   std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput); 
 
-  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-  char* filename = (char*)mxMalloc(strlen);
-  mxGetString(prhs[1], filename, strlen); 
-  
+  // The IO detection is done here to be able to set options.
+  btk::AcquisitionFileIO::Pointer io = btk::AcquisitionFileIOFactory::CreateAcquisitionIO(filename, btk::AcquisitionFileIOFactory::WriteMode);
+  if (io.get() != 0)
+  {
+    if (byteOrderOption != btk::AcquisitionFileIO::OrderNotApplicable)
+      io->SetByteOrder(byteOrderOption);      
+    if (storageFormatOption != btk::AcquisitionFileIO::StorageNotApplicable)
+      io->SetStorageFormat(storageFormatOption);      
+  }
+
   btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
-  writer->SetFilename(std::string(filename));
+  writer->SetAcquisitionIO(io);
+  writer->SetFilename(filename);
   writer->SetInput(acq);
   
   try
@@ -71,13 +153,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   catch(std::exception& e)
   {
-    mexErrMsgTxt(e.what());
     std::remove(filename);
+    errMsg = e.what();   
   }
   catch(...)
   {
-    mexErrMsgTxt("An unexpected error occured.");
     std::remove(filename);
+    errMsg = "An unexpected error occured.";
   }
 
   mxFree(filename);
@@ -86,5 +168,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   matlabErrorOutput.requestNewLine();
   std::cout.rdbuf(stdStandardOutput);
   std::cerr.rdbuf(stdErrorOutput);
+
+  if (!errMsg.empty())
+    mexErrMsgTxt(errMsg.c_str());
 };
 

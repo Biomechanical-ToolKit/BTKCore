@@ -477,7 +477,7 @@ namespace btk
   void MetaDataEntryValue::SetValues(const std::string& val)
   {
     this->m_Format = CHAR;
-    this->m_Dims = std::vector<uint8_t>(0);
+    this->m_Dims = std::vector<uint8_t>(1,val.length());
     this->m_Values = std::vector<std::string>(1, val);
   };
 

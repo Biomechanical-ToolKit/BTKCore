@@ -152,19 +152,10 @@ namespace btk
           throw(TRCFileIOException("Error between TRC header keywords and values."));
         if ((kf2 == std::string::npos) && (vf2 == std::string::npos))
           break;
-        //std::string ksub = k.substr(kf1, kf2 - kf1);
-        //ksub = ksub.erase(ksub.find_last_not_of(' ') + 1);
-        //ksub = ksub.erase(0, ksub.find_first_not_of(' '));
-        //std::string vsub = v.substr(vf1, vf2 - vf1);
-        //vsub = vsub.erase(vsub.find_last_not_of(' ') + 1);
-        //vsub = vsub.erase(0, vsub.find_first_not_of(' '));
-        //keywords.insert(std::make_pair(ksub, vsub));
         keywords.insert(std::make_pair(k.substr(kf1, kf2 - kf1), v.substr(vf1, vf2 - vf1)));
         kf1 = kf2 + 1;
         vf1 = vf2 + 1;
       }
-      //for (std::map<std::string, std::string>::const_iterator it = keywords.begin() ; it != keywords.end() ; ++it)
-      //  std::cout << it->first << ": " << it->second << std::endl;
       std::string num;
       int numberOfPoints = 0;
       if (!(num = keywords["NumMarkers"]).empty())
@@ -177,8 +168,6 @@ namespace btk
         output->SetPointFrequency(FromString<double>(num));
       if (!(num = keywords["OrigDataStartFrame"]).empty())
         output->SetFirstFrame(FromString<int>(num));
-      //MetaDataEntry::Pointer pointGr = MetaDataEntry::New("POINT");
-      //output->GetMetaData()->AppendChild(pointGr);
       if (!(num = keywords["Units"]).empty())
         output->SetPointUnit(num);
       else
@@ -186,14 +175,6 @@ namespace btk
         btkIOErrorMacro(filename, "No 'Units' keyword. Default unit is millimeter (mm)");
         output->SetPointUnit("mm");
       }
-      /*
-        pointGr->AppendChild(MetaDataEntry::New("UNITS", num, static_cast<std::string>("Units of distance measurement used by the 3D data")));
-      else
-      {
-        btkIOErrorMacro(filename, "No 'Units' keyword. Default unit is millimeter (mm)");
-        pointGr->AppendChild(MetaDataEntry::New("UNITS", "mm", static_cast<std::string>("Units of distance measurement used by the 3D data")));
-      }
-      */
       if (numberOfPoints != 0)
       {
         std::getline(ifs, line);
@@ -248,18 +229,19 @@ namespace btk
               (*it)->GetValues().coeffRef(i, 1) = 0.0;
               (*it)->GetValues().coeffRef(i, 2) = 0.0;
               (*it)->GetResiduals().coeffRef(i) = -1;
+              (*it)->GetMasks().coeffRef(i) = -1;
             }
             else
             {
               FromString(x, (*it)->GetValues().coeffRef(i, 0));
               FromString(y, (*it)->GetValues().coeffRef(i, 1));
               FromString(z, (*it)->GetValues().coeffRef(i, 2));
+              (*it)->GetResiduals().coeffRef(i) = 0;
+              (*it)->GetMasks().coeffRef(i) = 0;
             }
           }
-          //std::cout << output->GetPoint(0)->GetValues()(i,0) << std::endl; 
         }
       }
-      //std::cout << std::endl << std::endl << std::endl << std::endl;
     }
     catch (std::fstream::failure& )
     {
