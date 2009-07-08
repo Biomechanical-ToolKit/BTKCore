@@ -38,7 +38,7 @@
 
 #if defined(_MSC_VER)
   // Disable unsafe warning (use of the function 'strcpy' instead of 
-	// 'strcpy_s' for portability reasons;
+  // 'strcpy_s' for portability reasons;
   #pragma warning( disable : 4996 ) 
 #endif
 
@@ -67,62 +67,58 @@ mxArray* btkMEXAdaptMeasures(typename btk::Collection<T>::Pointer m, char*** fie
 {
   typedef typename btk::Collection<T> itemCollection;
   int numberOfMeasures = m->GetItemNumber();
-	(*fieldnamesPtr) = new char*[numberOfMeasures];
-	char** fieldnames = *fieldnamesPtr;
-	int inc = 0;
-	for(itemCollection::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
-	{
-		std::string originalLabel = (*it)->GetLabel();
+  (*fieldnamesPtr) = new char*[numberOfMeasures];
+  char** fieldnames = *fieldnamesPtr;
+  int inc = 0;
+  for(itemCollection::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
+  {
+    std::string originalLabel = (*it)->GetLabel();
     std::string convertedLabel = std::string(originalLabel.length(), '_');
-		// Check bad characters
-		for(int i = 0 ; i < static_cast<int>(originalLabel.length()) ; ++i)
-			convertedLabel[i] = btk::ASCIIConverter[originalLabel[i]];
-		char c = convertedLabel[0];
-		// Check first character
-		if ((c == btk::ASCIIConverter[0x00]) // _
-				|| (c == btk::ASCIIConverter[0x30]) // 0
-				|| (c == btk::ASCIIConverter[0x31]) // 1
-  			|| (c == btk::ASCIIConverter[0x32]) // 2
-				|| (c == btk::ASCIIConverter[0x33]) // 3
-				|| (c == btk::ASCIIConverter[0x34]) // 4
+    // Check bad characters
+    for(int i = 0 ; i < static_cast<int>(originalLabel.length()) ; ++i)
+      convertedLabel[i] = btk::ASCIIConverter[originalLabel[i]];
+    char c = convertedLabel[0];
+    // Check first character
+    if ((c == btk::ASCIIConverter[0x00]) // _
+        || (c == btk::ASCIIConverter[0x30]) // 0
+        || (c == btk::ASCIIConverter[0x31]) // 1
+        || (c == btk::ASCIIConverter[0x32]) // 2
+        || (c == btk::ASCIIConverter[0x33]) // 3
+        || (c == btk::ASCIIConverter[0x34]) // 4
         || (c == btk::ASCIIConverter[0x35]) // 5
-				|| (c == btk::ASCIIConverter[0x36]) // 6
-				|| (c == btk::ASCIIConverter[0x37]) // 7
-				|| (c == btk::ASCIIConverter[0x38]) // 8
-				|| (c == btk::ASCIIConverter[0x39])) // 9
-			convertedLabel.insert(convertedLabel.begin(), 'C');
-		// Check label's redundancy
-		int id = 0;
-		std::string doubleLabel = convertedLabel;
-		for (int i = 0 ; i < inc ; ++i)
-		{
-			if (doubleLabel.compare(fieldnames[i]) == 0)
-				doubleLabel = convertedLabel + btk::ToString(++id);
-		}
-		if (id != 0)
-	    convertedLabel = doubleLabel;
-		fieldnames[inc] = new char[convertedLabel.length() + 1];
-		strcpy(fieldnames[inc], convertedLabel.c_str());
-		inc++;
-	}
-	mxArray* out = mxCreateStructMatrix(1, 1, numberOfMeasures, (const char**)fieldnames);
-	if (numberOfMeasures > 0)
-	{
-		inc = 0;
-		typename T::ConstPointer firstItem = m->GetItem(0);
-		mxArray* measure = mxCreateDoubleMatrix(firstItem->GetFrameNumber(), firstItem->GetValues().cols(), mxREAL);
-	  double* initialValues = mxGetPr(measure);
-	  for(itemCollection::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
-		{
-		  mxSetPr(measure, (*it)->GetValues().data());
-			mxArray* deepMarker = mxDuplicateArray(measure);
-			mxSetFieldByNumber(out, 0, inc, deepMarker);
-			inc++;
-		}
-	  mxSetPr(measure, initialValues);
- 	  mxDestroyArray(measure);
-	}
-	return out;
+        || (c == btk::ASCIIConverter[0x36]) // 6
+        || (c == btk::ASCIIConverter[0x37]) // 7
+        || (c == btk::ASCIIConverter[0x38]) // 8
+        || (c == btk::ASCIIConverter[0x39])) // 9
+      convertedLabel.insert(convertedLabel.begin(), 'C');
+    // Check label's redundancy
+    int id = 0;
+    std::string doubleLabel = convertedLabel;
+    for (int i = 0 ; i < inc ; ++i)
+    {
+      if (doubleLabel.compare(fieldnames[i]) == 0)
+        doubleLabel = convertedLabel + btk::ToString(++id);
+    }
+    if (id != 0)
+      convertedLabel = doubleLabel;
+    fieldnames[inc] = new char[convertedLabel.length() + 1];
+    strcpy(fieldnames[inc], convertedLabel.c_str());
+    inc++;
+  }
+  mxArray* out = mxCreateStructMatrix(1, 1, numberOfMeasures, (const char**)fieldnames);
+  if (numberOfMeasures > 0)
+  {
+    inc = 0;
+    typename T::ConstPointer firstItem = m->GetItem(0);
+    for(itemCollection::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
+    {
+      mxArray* measure = mxCreateDoubleMatrix(firstItem->GetFrameNumber(), firstItem->GetValues().cols(), mxREAL);
+      memcpy(mxGetPr(measure), (*it)->GetValues().data(), mxGetNumberOfElements(measure) * sizeof(double));
+      mxSetFieldByNumber(out, 0, inc, measure);
+      ++inc;
+    }
+  }
+  return out;
 };
 
 #endif

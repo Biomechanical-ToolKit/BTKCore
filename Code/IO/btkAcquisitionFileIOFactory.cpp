@@ -36,14 +36,15 @@
 #include "btkAcquisitionFileIOFactory.h"
 
 #include "btkC3DFileIO.h"
+#include "btkTRCFileIO.h"
 
 namespace btk
 {
   /**
    * @class AcquisitionFileIOFactory
    * @brief This class only implements the CreateAcquisitionIO method.
-	 *
-	 * @ingroup BTKIO
+   *
+   * @ingroup BTKIO
    */
   
   /**
@@ -65,19 +66,22 @@ namespace btk
    * of the IO is important as the first AcquisitionFileIO which can read/write the file
    * is returned.
    */
-  AcquisitionFileIO::Pointer AcquisitionFileIOFactory::CreateAcquisitionIO(const std::string& Filename, OpenMode mode)
+  AcquisitionFileIO::Pointer AcquisitionFileIOFactory::CreateAcquisitionIO(const std::string& filename, OpenMode mode)
   {
     AcquisitionFileIO::Pointer io;
     if (mode == ReadMode)
     {
       io = C3DFileIO::New();
-      if (io->CanReadFile(Filename)) return io;
-      
+      if (io->CanReadFile(filename)) return io;
+      io = TRCFileIO::New();
+      if (io->CanReadFile(filename)) return io; 
     }
     else
     {
       io = C3DFileIO::New();
-      if (io->CanWriteFile(Filename)) return io;
+      if (io->CanWriteFile(filename)) return io;
+      io = TRCFileIO::New();
+      if (io->CanWriteFile(filename)) return io;
     }
     return AcquisitionFileIO::Pointer();
   };

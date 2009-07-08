@@ -43,7 +43,6 @@ namespace btk
   /**
    * @class AcquisitionFileReaderException
    * @brief Exception class for the AcquisitionFileReader class.
-	 * @ingroup BTKIO
    */
   
   /**
@@ -59,6 +58,8 @@ namespace btk
   /**
    * @class AcquisitionFileReader
    * @brief Reader for files which contain acquisition data (C3D, TRC, ...).
+   *
+   * @ingroup BTKIO 
    */
   /**
    * @var AcquisitionFileReader::m_Filename
@@ -181,7 +182,7 @@ namespace btk
     {
       this->m_AcquisitionIO = AcquisitionFileIOFactory::CreateAcquisitionIO(this->m_Filename.c_str(), AcquisitionFileIOFactory::ReadMode);
       if (this->m_AcquisitionIO.get() == 0)
-        throw AcquisitionFileReaderException("No IO founded, the file is not supported or the file suffix is misspelled (Some IO use it to verify they can read file)\nFilename: " + this->m_Filename);
+        throw AcquisitionFileReaderException("No IO found, the file is not supported or valid or the file suffix is misspelled (Some IO use it to verify they can read the file)\nFilename: " + this->m_Filename);
     }
     
     this->m_AcquisitionIO->Read(this->m_Filename, this->GetOutput());

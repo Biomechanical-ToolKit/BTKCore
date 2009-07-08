@@ -40,73 +40,45 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-	if(nrhs!=1)
-		mexErrMsgTxt("One input required.");
-	if (nlhs > 2)
-	 mexErrMsgTxt("Too many output arguments.");
+  if(nrhs!=1)
+    mexErrMsgTxt("One input required.");
+  if (nlhs > 2)
+   mexErrMsgTxt("Too many output arguments.");
 
-	// First output
-	btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-	btk::AnalogCollection::Pointer analogs = acq->GetAnalogs();
-	char** fieldnames = 0;
-	plhs[0] = btkMEXAdaptMeasures<btk::Analog>(analogs, &fieldnames);
-	int numberOfAnalogs = acq->GetAnalogNumber();
+  // First output
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  btk::AnalogCollection::Pointer analogs = acq->GetAnalogs();
+  char** fieldnames = 0;
+  plhs[0] = btkMEXAdaptMeasures<btk::Analog>(analogs, &fieldnames);
+  int numberOfAnalogs = acq->GetAnalogNumber();
 
   // Second output (optionnal)
-	if (nlhs != 2)
-	{
-		for (int i = 0 ; i < numberOfAnalogs ; ++i)
-			delete[] fieldnames[i];
-		delete[] fieldnames;
-	}
-	else
-	{
+  if (nlhs != 2)
+  {
+    for (int i = 0 ; i < numberOfAnalogs ; ++i)
+      delete[] fieldnames[i];
+    delete[] fieldnames;
+  }
+  else
+  {
     const char* info[] = {"frequency", "units"};
-		int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
-		int inc = 0;
-		char** units = new char*[numberOfAnalogs];
-    btk::MetaDataEntry::Pointer metadata = acq->GetMetaData();
-    btk::MetaDataEntry::ConstIterator itAnalog = metadata->Find("ANALOG");
-		if ((itAnalog != metadata->End()) && (numberOfAnalogs != 0))
-		{
-			btk::MetaDataEntry::ConstIterator itUnit = (*itAnalog)->Find("UNITS");
-			if (itUnit != (*itAnalog)->End())
-			{
-				btk::MetaDataEntryValue::ConstPointer analogUnit = (*itUnit)->GetMetaDataEntryValue();
-				int num = ( (static_cast<int>(analogUnit->GetValues().size()) > numberOfAnalogs) ? numberOfAnalogs : analogUnit->GetValues().size() );
-				for (inc = 0 ; inc < num ; ++inc)
-				{
-					std::string str = analogUnit->GetValue(inc);
-					str = str.erase(str.find_last_not_of(' ') + 1);
-          str = str.erase(0, str.find_first_not_of(' '));
-					units[inc] = new char[str.length() + 1];
-					strcpy(units[inc], str.c_str());
-				}
-			}
-		}
-		//else
-		//	mexWarnMsgTxt("No ANALOG:UNITS parameter. The unit of each analog channel is empty.");
-		for (int i = inc ; i < numberOfAnalogs ; ++i)
-		{
-			units[i] = new char[1];
-			units[i] = '\0';
-		}
-		
-		plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
+    int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
+    plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
+    // frequency field
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
     *mxGetPr(frequency) = acq->GetAnalogFrequency();
-		mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
-		for (int i = 0 ; i < numberOfAnalogs ;++i)
-		{
-			mxSetFieldByNumber(unitsStruct, 0, i, mxCreateString((const char*)units[i]));
-			delete[] fieldnames[i];
-			delete[] units[i];
-		}
-		mxSetFieldByNumber(plhs[1], 0, 0, frequency);
-		mxSetFieldByNumber(plhs[1], 0, 1, unitsStruct);
-
-		delete[] fieldnames;
-		delete[] units;
-	}
+    mxSetFieldByNumber(plhs[1], 0, 0, frequency);
+    // units field
+    btk::AnalogCollection::ConstIterator itAnalog = analogs->Begin();
+    mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
+    for (int i = 0 ; i < numberOfAnalogs ;++i)
+    {
+      mxSetFieldByNumber(unitsStruct, 0, i, mxCreateString((*itAnalog)->GetUnit().c_str()));
+      ++itAnalog;
+      delete[] fieldnames[i];
+    }
+    delete[] fieldnames;
+    mxSetFieldByNumber(plhs[1], 0, 1, unitsStruct);
+  }
 };
 

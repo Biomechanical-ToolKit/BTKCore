@@ -93,6 +93,11 @@ namespace btk
    * @fn DataObject::DataObject()
    * Default constructor.
    */
+
+  /**
+   * @fn DataObject::DataObject(const DataObject& toCopy)
+   * Copy constructor.
+   */
   
   /**
    * @fn DataObject::~DataObject()

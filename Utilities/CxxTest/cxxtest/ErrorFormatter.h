@@ -45,7 +45,7 @@ namespace CxxTest
         int run()
         {
             TestRunner::runAllTests( *this );
-            return tracker().failedTests();
+            return (tracker().failedTests() + tracker().unexpectedTests());
         }
 
         void enterWorld( const WorldDescription & /*desc*/ )
@@ -83,13 +83,18 @@ namespace CxxTest
 
         void leaveWorld( const WorldDescription &desc )
         {
-            if ( !tracker().failedTests() ) {
+            if ( !tracker().failedTests() && !tracker().unexpectedTests() )
+            {
                 (*_o) << "OK!" << endl;
                 return;
             }
             newLine();
-            (*_o) << "Failed " << tracker().failedTests() << " of " << totalTests << endl;
-            unsigned numPassed = desc.numTotalTests() - tracker().failedTests();
+            (*_o) << "Warnings: " << tracker().warnedTests() << " of " << totalTests << endl;
+
+            (*_o) << "Failures: " << tracker().failedTests() << " of " << totalTests << endl;
+            (*_o) << "Errors: " << tracker().unexpectedTests() << " of " << totalTests << endl;
+            unsigned numPassed = desc.numTotalTests() - tracker().failedTests() - tracker().unexpectedTests();
+            
             (*_o) << "Success rate: " << (numPassed * 100 / desc.numTotalTests()) << "%" << endl;
         }
 

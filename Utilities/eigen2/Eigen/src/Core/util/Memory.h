@@ -33,7 +33,7 @@
   #define EIGEN_MALLOC_ALREADY_ALIGNED 0
 #endif
 
-#if (defined _GNU_SOURCE) || ((defined _XOPEN_SOURCE) && (_XOPEN_SOURCE >= 600))
+#if ((defined _GNU_SOURCE) || ((defined _XOPEN_SOURCE) && (_XOPEN_SOURCE >= 600))) && (defined _POSIX_ADVISORY_INFO) && (_POSIX_ADVISORY_INFO > 0)
   #define EIGEN_HAS_POSIX_MEMALIGN 1
 #else
   #define EIGEN_HAS_POSIX_MEMALIGN 0
@@ -341,6 +341,12 @@ public:
     {
         ei_aligned_free( p );
     }
+    
+    bool operator!=(const aligned_allocator<T>& other) const
+    { return false; }
+    
+    bool operator==(const aligned_allocator<T>& other) const
+    { return true; }
 };
 
 #endif // EIGEN_MEMORY_H

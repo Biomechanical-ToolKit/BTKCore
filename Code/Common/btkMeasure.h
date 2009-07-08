@@ -68,50 +68,51 @@ namespace btk
     void SetValues(const Values& v);
     int GetFrameNumber() const {return this->m_Values.rows();};
     void SetFrameNumber(int frameNumber);
+    Pointer Clone() const {return Pointer(new Measure<d>(*this));};
     
   protected:
     Measure(const std::string& label, int frameNumber);
+    Measure(const Measure& toCopy);
     
     std::string m_Label;
     std::string m_Description;
     Values m_Values;
     
-  private:
-    Measure(const Measure& ); // Not implemented.
+  private: 
     Measure& operator=(const Measure& ); // Not implemented.
   };
  
-	/**
-	 * @class Measure
-	 * @brief Measure with @a d dimensions along the time.
-	 *
-	 * The measures are stored in a matrix. The measures' dimensions correspond to the columns of the matrix. The frames correspond to the line.
-	 *
-	 * @tparam d Number of dimensions.
-	 *
-	 * @warning The number of dimensions @a d must be greater than 0.
-	 *
-	 * @ingroup BTKCommon
-	 */
-	/**
-	 * @var Measure::m_Label
-	 * Label of the measure.
-	 */
-	/**
-	 * @var Measure::m_Description
-	 * Description of the measure.
-	 */
   /**
-	 * @var Measure::m_Values
-	 * Values of the measure.
-	 */
+   * @class Measure
+   * @brief Measure with @a d dimensions along the time.
+   *
+   * The measures are stored in a matrix. The measures' dimensions correspond to the columns of the matrix. The frames correspond to the line.
+   *
+   * @tparam d Number of dimensions.
+   *
+   * @warning The number of dimensions @a d must be greater than 0.
+   *
+   * @ingroup BTKCommon
+   */
+  /**
+   * @var Measure::m_Label
+   * Label of the measure.
+   */
+  /**
+   * @var Measure::m_Description
+   * Description of the measure.
+   */
+  /**
+   * @var Measure::m_Values
+   * Values of the measure.
+   */
 
-	/**
-	 * @typedef Measure<d>::Values
-	 * Measures' values along the time.
-	 */
+  /**
+   * @typedef Measure<d>::Values
+   * Measures' values along the time.
+   */
 
-	/**
+  /**
    * @typedef Measure<d>::Pointer
    * Smart pointer associated with a Measure object.
    */
@@ -122,65 +123,71 @@ namespace btk
    */
   
  /**
-	 * @fn template <int d> static Pointer Measure<d>::New(int frameNumber = 1)
-	 * @brief Creates a smart pointer associated with a Measure object.
-	 *
-	 * The measure created has an empty label and a number of frame equals to @a framenumber.
-	 * @warning The number of frames must be greater than 0.
-	 */ 
+   * @fn template <int d> static Pointer Measure<d>::New(int frameNumber = 1)
+   * @brief Creates a smart pointer associated with a Measure object.
+   *
+   * The measure created has an empty label and a number of frame equals to @a framenumber.
+   * @warning The number of frames must be greater than 0.
+   */ 
 
   /**
-	 * @fn template <int d> static Pointer Measure::New(const std::string& label, int frameNumber)
-	 * @brief Creates a smart pointer associated with a Measure object.
-	 *
-	 * The measure created has a label and a number of frame equals to @a label and @a framenumber respectively.
-	 * @warning The number of frames must be greater than 0.
-	 */
+   * @fn template <int d> static Pointer Measure::New(const std::string& label, int frameNumber)
+   * @brief Creates a smart pointer associated with a Measure object.
+   *
+   * The measure created has a label and a number of frame equals to @a label and @a framenumber respectively.
+   * @warning The number of frames must be greater than 0.
+   */
 
-	/**
-	 * @fn template <int d> const std::string Measure<d>::GetLabel() const
-	 * Returns the measure's label.
-	 */
+  /**
+   * @fn template <int d> const std::string Measure<d>::GetLabel() const
+   * Returns the measure's label.
+   */
   
-	/**
-	 * Set the label of the measure.
-	 */
+  /**
+   * Set the label of the measure.
+   */
   template <int d>
   void Measure<d>::SetLabel(const std::string& label)
   {
+    if (this->m_Label.compare(label) == 0)
+      return;
     this->m_Label = label;
     this->Modified();
   };
   
   /**
-	 * @fn template <int d> const std::string Measure<d>::GetDescription() const
-	 * Returns the description.
-	 */
+   * @fn template <int d> const std::string Measure<d>::GetDescription() const
+   * Returns the description.
+   */
 
-	/**
-	 * Sets the description.
-	 */
+  /**
+   * Sets the description.
+   */
   template <int d>
   void Measure<d>::SetDescription(const std::string& description)
   {
+    if (this->m_Description.compare(description) == 0)
+      return;
     this->m_Description = description;
     this->Modified();
   };
   
-	/**
-	 * @fn template <int d> Values& Measure<d>::GetValues()
-	 * Returns the measure's values.
-	 */
+  /**
+   * @fn template <int d> Values& Measure<d>::GetValues()
+   * Returns the measure's values.
+   *
+   * @warning If you modify the object's content with this function, don't forget to call the Modified() method.
+   */
 
   /**
-	 * @fn template <int d> const Values& Measure<d>::GetValues() const
-	 * Returns the measure's values.
-	 */
-	
-	/**
-	 * Set the values of the measure.
-	 * @warning The values' dimensions must be equal than the dimensions of the object.
-	 */
+   * @fn template <int d> const Values& Measure<d>::GetValues() const
+   * Returns the measure's values.
+   */
+  
+  /**
+   * Set the values of the measure.
+   * @warning The values' dimensions must be equal than the dimensions of the object.
+   */
   template <int d>
   void Measure<d>::SetValues(const Values& v)
   {
@@ -189,39 +196,54 @@ namespace btk
   };
   
   /**
-	 * @fn template <int d> int Measure<d>::GetFrameNumber() const 
-	 * Returns the number of frames.
-	 */
+   * @fn template <int d> int Measure<d>::GetFrameNumber() const 
+   * Returns the number of frames.
+   */
 
-	/**
-	 * Sets the number of frames.
-	 * The input @a frameNumber must be greater than 0.
-	 */
+  /**
+   * @fn template <int d> Pointer Measure<d>::Clone() const
+   * Clones the object.
+   */
+
+  /**
+   * Sets the number of frames.
+   * The input @a frameNumber must be greater than 0.
+   */
   template <int d>
   void Measure<d>::SetFrameNumber(int frameNumber)
   {
     if (frameNumber == this->GetFrameNumber())
       return;
-    else if (frameNumber >= this->GetFrameNumber())
+    else if (frameNumber > this->GetFrameNumber())
     {
-      Values tmp(frameNumber, d);
-      tmp.block(0,0,this->GetFrameNumber(),d) = this->m_Values;
-      this->m_Values = tmp;
+      Values v(frameNumber, d);
+      v.block(0,0,this->GetFrameNumber(),d) = this->m_Values;
+      this->m_Values = v;
     }
     else
     {
-      this->m_Values = this->m_Values.block(0,0,frameNumber,3);
+      Values v = this->m_Values.block(0,0,frameNumber,3);
+      this->m_Values = v;
     }
     this->Modified();
   };
 
-	/**
-	 * Constructor.
-	 */
-	template <int d>
+  /**
+   * Constructor.
+   */
+  template <int d>
   Measure<d>::Measure(const std::string& label, int frameNumber)
-  : m_Label(label), m_Description(),
+  : DataObject(), m_Label(label), m_Description(),
     m_Values(Values(frameNumber, d))
+  {};
+
+  /**
+   * Copy constructor.
+   */
+  template <int d>
+  Measure<d>::Measure(const Measure& toCopy)
+  : DataObject(toCopy), m_Label(toCopy.m_Label), 
+    m_Description(toCopy.m_Description), m_Values(toCopy.m_Values)
   {};
 
 };

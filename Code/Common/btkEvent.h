@@ -42,38 +42,38 @@
 
 namespace btk
 {
-	class Event: public DataObject
-	{
-	public:
-		typedef SharedPtr<Event> Pointer;
+  class Event: public DataObject
+  {
+  public:
+    typedef SharedPtr<Event> Pointer;
     typedef SharedPtr<const Event> ConstPointer;
     
     static Pointer New(const std::string& label = "", double t = 0.0, const std::string& context = "", const std::string& subject = "", const std::string& desc = "") {return Pointer(new Event(label, t, context, subject, desc));};
 
-		// ~Event(); // Implicit.
-		const std::string& GetLabel() const {return this->m_Label;};
-		BTK_COMMON_EXPORT void SetLabel(const std::string& label);
-		const std::string& GetDescription() const {return this->m_Description;};
-		BTK_COMMON_EXPORT void SetDescription(const std::string& desc);
-		const std::string& GetContext() const {return this->m_Context;};
-		BTK_COMMON_EXPORT void SetContext(const std::string& context);
-		const std::string& GetSubject() const {return this->m_Subject;};
-		BTK_COMMON_EXPORT void SetSubject(const std::string& subject);
-		double GetTime() const {return this->m_Time;};
-		BTK_COMMON_EXPORT void SetTime(double t);
-		Pointer Clone() const {return Pointer(new Event(*this));};
+    // ~Event(); // Implicit.
+    const std::string& GetLabel() const {return this->m_Label;};
+    BTK_COMMON_EXPORT void SetLabel(const std::string& label);
+    const std::string& GetDescription() const {return this->m_Description;};
+    BTK_COMMON_EXPORT void SetDescription(const std::string& desc);
+    const std::string& GetContext() const {return this->m_Context;};
+    BTK_COMMON_EXPORT void SetContext(const std::string& context);
+    const std::string& GetSubject() const {return this->m_Subject;};
+    BTK_COMMON_EXPORT void SetSubject(const std::string& subject);
+    double GetTime() const {return this->m_Time;};
+    BTK_COMMON_EXPORT void SetTime(double t);
+    Pointer Clone() const {return Pointer(new Event(*this));};
 
-	private:
-		BTK_COMMON_EXPORT Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc);
-		BTK_COMMON_EXPORT Event(const Event& toCopy);
+  private:
+    BTK_COMMON_EXPORT Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc);
+    BTK_COMMON_EXPORT Event(const Event& toCopy);
     Event& operator=(const Event& ); // Not implemented.
 
-		std::string m_Label;
-		std::string m_Description;
-		std::string m_Context;
-		std::string m_Subject;
-		double m_Time;
-	};
+    std::string m_Label;
+    std::string m_Description;
+    std::string m_Context;
+    std::string m_Subject;
+    double m_Time;
+  };
 };
 
 #endif // __btkEvent_h

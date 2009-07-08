@@ -42,7 +42,12 @@ namespace btk // For documentation purpose
 {
 /**
  * @define SharedPtr 
- * Macro which determine the shared_ptr class to use in BTK.
+ * Macro which uses the right shared_ptr class in BTK.
+ *
+ * @define static_pointer_cast 
+ * Macro which uses the right static_pointer_cast function in BTK. This
+ * function is a template function which returns a shared_ptr of the 
+ * specified template.
  *
  * @ingroup BTKCommon
  */ 
@@ -52,42 +57,48 @@ namespace btk // For documentation purpose
 /* Native header */
 #if defined(__GNUC__)
   #if defined(HAVE_TR1_MEMORY_H) && !defined(BTK_USE_GCC_EXPERIMENTAL)
- 		#include <tr1/memory>
-	  namespace btk { 
-	    #define SharedPtr std::tr1::shared_ptr
-		};
+     #include <tr1/memory>
+    namespace btk { 
+      #define SharedPtr std::tr1::shared_ptr
+      #define static_pointer_cast std::tr1::static_pointer_cast
+    };
   /* Experimental with GCC 4.3 */
-	#elif defined(HAVE_MEMORY_H)
-	  #include <memory>
-	  namespace btk { 
-	    #define SharedPtr std::shared_ptr
-		};
-	#endif
+  #elif defined(HAVE_MEMORY_H)
+    #include <memory>
+    namespace btk { 
+      #define SharedPtr std::shared_ptr
+      #define static_pointer_cast std::static_pointer_cast
+    };
+  #endif
 #elif defined(_MSC_VER)
   /* included with MSVC 2008 SP1 */
-	#if defined(HAVE_MEMORY_H)
-  	#include <memory>
-	  namespace btk { 
-	    #define SharedPtr std::tr1::shared_ptr
-		};
+  #if defined(HAVE_MEMORY_H)
+    #include <memory>
+    namespace btk { 
+      #define SharedPtr std::tr1::shared_ptr
+      #define static_pointer_cast std::tr1::static_pointer_cast
+    };
   #endif
 #endif
 /* Boost header */
 #if !defined(HAVE_TR1_MEMORY_H) && !defined(HAVE_MEMORY_H)
   /* From Boost 1.34 */
   #if defined(HAVE_BOOST_TR1_MEMORY_HPP)
-	  #include <boost/tr1/memory.hpp>
-  	namespace btk { 
-	    #define SharedPtr boost::tr1::shared_ptr
-		};
-	#elif defined(HAVE_BOOST_MEMORY_HPP)
-	  #include <boost/memory.hpp>
-	  namespace btk { 
-	    #define SharedPtr boost::shared_ptr
-		};
-	#else
-	  #error "No recognized library which embeds a shared_ptr class."
-	#endif
+    #include <boost/tr1/memory.hpp>
+    namespace btk { 
+      #define SharedPtr boost::tr1::shared_ptr
+      #define static_pointer_cast boost::tr1::static_pointer_cast
+    };
+  #elif defined(HAVE_BOOST_MEMORY_HPP)
+    #include <boost/memory.hpp>
+    namespace btk { 
+      #define SharedPtr boost::shared_ptr
+      #define static_pointer_cast boost::static_pointer_cast
+    };
+  #else
+    #error "No recognized library which embeds a shared_ptr class."
+  #endif
 #endif
 
 #endif
+

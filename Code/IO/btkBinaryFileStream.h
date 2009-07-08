@@ -109,11 +109,11 @@ namespace btk
     virtual size_t Write(const std::vector<int8_t>& rVectorI8);
     virtual size_t Write(uint8_t u8);
     virtual size_t Write(const std::vector<uint8_t>& rVectorU8);
-    virtual size_t Write(int16_t i16);
+    virtual size_t Write(int16_t i16) = 0;
     virtual size_t Write(const std::vector<int16_t>& rVectorI16);
-    virtual size_t Write(uint16_t u16);
+    virtual size_t Write(uint16_t u16) = 0;
     virtual size_t Write(const std::vector<uint16_t>& rVectorU16);
-    virtual size_t Write(float f);
+    virtual size_t Write(float f) = 0;
     virtual size_t Write(const std::vector<float>& rVectorFloat);
     virtual size_t Write(const std::string& rString);
     virtual size_t Write(const std::vector<std::string>& rVectorString);
@@ -132,11 +132,14 @@ namespace btk
     explicit VAXLittleEndianBinaryFileStream(std::fstream& rFsteam) : BinaryFileStream(rFsteam) {};
     // ~VAXLittleEndianBinaryFileStream(); // Implicit.  
     virtual int16_t ReadI16();
-		using BinaryFileStream::ReadI16;
+    using BinaryFileStream::ReadI16;
     virtual uint16_t ReadU16();
-		using BinaryFileStream::ReadU16;
+    using BinaryFileStream::ReadU16;
     virtual float ReadFloat();
-		using BinaryFileStream::ReadFloat;
+    using BinaryFileStream::ReadFloat;
+    virtual size_t Write(int16_t i16);
+    virtual size_t Write(uint16_t u16);
+    virtual size_t Write(float f);
   
   private:
     VAXLittleEndianBinaryFileStream(const VAXLittleEndianBinaryFileStream& ); // Not implemented.
@@ -149,11 +152,14 @@ namespace btk
     explicit IEEELittleEndianBinaryFileStream(std::fstream& rFsteam) : BinaryFileStream(rFsteam) {};
     // ~IEEELittleEndianBinaryFileStream(); // Implicit.  
     virtual int16_t ReadI16(); 
-		using BinaryFileStream::ReadI16;
+    using BinaryFileStream::ReadI16;
     virtual uint16_t ReadU16();
-		using BinaryFileStream::ReadU16;
+    using BinaryFileStream::ReadU16;
     virtual float ReadFloat();
-		using BinaryFileStream::ReadFloat;
+    using BinaryFileStream::ReadFloat;
+    virtual size_t Write(int16_t i16);
+    virtual size_t Write(uint16_t u16);
+    virtual size_t Write(float f);
   
   private:
     IEEELittleEndianBinaryFileStream(const IEEELittleEndianBinaryFileStream& ); // Not implemented.
@@ -166,11 +172,14 @@ namespace btk
     explicit IEEEBigEndianBinaryFileStream(std::fstream& rFsteam) : BinaryFileStream(rFsteam) {};
     // ~IEEEBigEndianBinaryFileStream(); // Implicit.  
     virtual int16_t ReadI16();
-		using BinaryFileStream::ReadI16;
+    using BinaryFileStream::ReadI16;
     virtual uint16_t ReadU16();
-		using BinaryFileStream::ReadU16;
+    using BinaryFileStream::ReadU16;
     virtual float ReadFloat();
-		using BinaryFileStream::ReadFloat;
+    using BinaryFileStream::ReadFloat;
+    virtual size_t Write(int16_t i16);
+    virtual size_t Write(uint16_t u16);
+    virtual size_t Write(float f);
   
   private:
     IEEEBigEndianBinaryFileStream(const IEEEBigEndianBinaryFileStream& ); // Not implemented.

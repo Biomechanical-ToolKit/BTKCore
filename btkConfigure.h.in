@@ -48,27 +48,27 @@
 #if (defined(_MSC_VER) && defined(BTK_BUILD_SHARED_LIBS)) 
   // BTKCommon
   #if defined(BTKCommon_EXPORTS)
-  	#define BTK_COMMON_EXPORT __declspec( dllexport )
+    #define BTK_COMMON_EXPORT __declspec( dllexport )
   #else
     #define BTK_COMMON_EXPORT __declspec( dllimport )
   #endif
   // BTKIO
-	#if defined(BTKIO_EXPORTS)
-  	#define BTK_IO_EXPORT __declspec( dllexport )
+  #if defined(BTKIO_EXPORTS)
+    #define BTK_IO_EXPORT __declspec( dllexport )
   #else
     #define BTK_IO_EXPORT __declspec( dllimport )
   #endif
   // BTKBasicFilters
-	#if defined(BTKBasicFilters_EXPORTS)
-  	#define BTK_BASICFILTERS_EXPORT __declspec( dllexport )
+  #if defined(BTKBasicFilters_EXPORTS)
+    #define BTK_BASICFILTERS_EXPORT __declspec( dllexport )
   #else
     #define BTK_BASICFILTERS_EXPORT __declspec( dllimport )
   #endif
 #else
   // Un*x doesn't need this
   #define BTK_COMMON_EXPORT
-	#define BTK_IO_EXPORT
-	#define BTK_BASICFILTERS_EXPORT
+  #define BTK_IO_EXPORT
+  #define BTK_BASICFILTERS_EXPORT
 
 #endif
 

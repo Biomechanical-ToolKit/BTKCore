@@ -179,6 +179,58 @@ CXXTEST_SUITE(MetaDataEntryValueTest)
     TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
     TS_ASSERT_EQUALS(test->GetValues().size(), 0);
   };
+
+  CXXTEST_TEST(SetValuesFromVectorString)
+  {
+    std::vector<std::string> val = std::vector<std::string>(0);
+    val.push_back("NAME");
+    val.push_back("CALIBRATION");
+    val.push_back("FULL_DESCRIPTION");
+    val.push_back("SETUP");
+    val.push_back("DATE");
+    btk::MetaDataEntryValue::Pointer test = btk::MetaDataEntryValue::New(val);
+    TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataEntryValue::CHAR);
+    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS(test->GetDimension(0), 16);
+    TS_ASSERT_EQUALS(test->GetDimension(1), 5);
+    TS_ASSERT_EQUALS(test->GetValues().size(), 5);
+    TS_ASSERT_EQUALS(test->GetValue(0), "NAME            ");
+    TS_ASSERT_EQUALS(test->GetValue(1), "CALIBRATION     ");
+    TS_ASSERT_EQUALS(test->GetValue(2), "FULL_DESCRIPTION");
+    TS_ASSERT_EQUALS(test->GetValue(3), "SETUP           ");
+    TS_ASSERT_EQUALS(test->GetValue(4), "DATE            ");
+  };
+
+  CXXTEST_TEST(SetValueFromString)
+  {
+    std::vector<std::string> val = std::vector<std::string>(0);
+    val.push_back("NAME");
+    val.push_back("CALIBRATION");
+    val.push_back("FULL_DESCRIPTION");
+    val.push_back("SETUP");
+    val.push_back("DATE");
+    btk::MetaDataEntryValue::Pointer test = btk::MetaDataEntryValue::New(val);
+    test->SetValue(2,"SHORTER");
+    TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataEntryValue::CHAR);
+    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS(test->GetDimension(0), 16);
+    TS_ASSERT_EQUALS(test->GetDimension(1), 5);
+    TS_ASSERT_EQUALS(test->GetValues().size(), 5);
+    TS_ASSERT_EQUALS(test->GetValue(0), "NAME            ");
+    TS_ASSERT_EQUALS(test->GetValue(1), "CALIBRATION     ");
+    TS_ASSERT_EQUALS(test->GetValue(2), "SHORTER         ");
+    TS_ASSERT_EQUALS(test->GetValue(3), "SETUP           ");
+    TS_ASSERT_EQUALS(test->GetValue(4), "DATE            ");
+    test->SetValue(2,"BIGGERANDBIGGERANDBIGGER");
+    TS_ASSERT_EQUALS(test->GetDimension(0), 24);
+    TS_ASSERT_EQUALS(test->GetDimension(1), 5);
+    TS_ASSERT_EQUALS(test->GetValues().size(), 5);
+    TS_ASSERT_EQUALS(test->GetValue(0), "NAME                    ");
+    TS_ASSERT_EQUALS(test->GetValue(1), "CALIBRATION             ");
+    TS_ASSERT_EQUALS(test->GetValue(2), "BIGGERANDBIGGERANDBIGGER");
+    TS_ASSERT_EQUALS(test->GetValue(3), "SETUP                   ");
+    TS_ASSERT_EQUALS(test->GetValue(4), "DATE                    ");
+  };
   
   CXXTEST_TEST(SetFormatChar2Integer)
   {
@@ -330,6 +382,8 @@ CXXTEST_TEST_REGISTRATION(MetaDataEntryValueTest, ConstructorVectorCharResizeEmp
 CXXTEST_TEST_REGISTRATION(MetaDataEntryValueTest, ConstructorVectorCharResizeLowerDim2)
 CXXTEST_TEST_REGISTRATION(MetaDataEntryValueTest, ConstructorVectorCharResizeUpperDim2)
 CXXTEST_TEST_REGISTRATION(MetaDataEntryValueTest, ConstructorVectorCharPointLabels)
+CXXTEST_TEST_REGISTRATION(MetaDataEntryValueTest, SetValuesFromVectorString)
+CXXTEST_TEST_REGISTRATION(MetaDataEntryValueTest, SetValueFromString)
 CXXTEST_TEST_REGISTRATION(MetaDataEntryValueTest, SetFormatChar2Integer)
 CXXTEST_TEST_REGISTRATION(MetaDataEntryValueTest, SetFormatFloat2Integer)
 CXXTEST_TEST_REGISTRATION(MetaDataEntryValueTest, SetFormatFloat2CharDim1)

@@ -8,9 +8,9 @@ CXXTEST_SUITE(AcquisitionTest)
   CXXTEST_TEST(Constructor)
   {
     btk::Acquisition::Pointer test = btk::Acquisition::New();
-    TS_ASSERT_EQUALS(test->GetMarkerFrameNumber(), 0);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 0);
     TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 0);
-    TS_ASSERT_EQUALS(test->GetMarkerNumber(), 0);
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 0);
     TS_ASSERT_EQUALS(test->GetAnalogNumber(), 0);
     TS_ASSERT_EQUALS(test->GetMetaData()->GetLabel(), "ROOT");
   };
@@ -19,10 +19,10 @@ CXXTEST_SUITE(AcquisitionTest)
   {
     btk::Acquisition::Pointer test = btk::Acquisition::New();
     test->Init(1, 150, 1, 1);
-    test->SetMarkerFrequency(100);
-    TS_ASSERT_EQUALS(test->GetMarkerFrequency(), 100);
+    test->SetPointFrequency(100);
+    TS_ASSERT_EQUALS(test->GetPointFrequency(), 100);
     TS_ASSERT_EQUALS(test->GetAnalogFrequency(), 100);
-    TS_ASSERT_EQUALS(test->GetMarkerFrameNumber(), 150);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 150);
     TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 150);
   };
   
@@ -30,13 +30,13 @@ CXXTEST_SUITE(AcquisitionTest)
   {
     btk::Acquisition::Pointer test = btk::Acquisition::New();
     test->Init(12, 150, 7, 1);
-    test->SetMarkerFrequency(100);
-    TS_ASSERT_EQUALS(test->GetMarkerNumber(), 12);
+    test->SetPointFrequency(100);
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 12);
     TS_ASSERT_EQUALS(test->GetAnalogNumber(), 7);
-    TS_ASSERT_EQUALS(test->GetMarkerFrameNumber(), 150);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 150);
     TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 150);
-    btk::Marker::Pointer ptMarker = test->GetMarker(0);
-    TS_ASSERT_EQUALS(ptMarker->GetFrameNumber(), 150);
+    btk::Point::Pointer ptPoint = test->GetPoint(0);
+    TS_ASSERT_EQUALS(ptPoint->GetFrameNumber(), 150);
     btk::Analog::Pointer ptAnalog = test->GetAnalog(0);
     TS_ASSERT_EQUALS(ptAnalog->GetFrameNumber(), 150);
   };
@@ -45,41 +45,39 @@ CXXTEST_SUITE(AcquisitionTest)
   {
     btk::Acquisition::Pointer test = btk::Acquisition::New();
     test->Init(0, 200, 1, 1);
-    TS_ASSERT_EQUALS(test->GetMarkerFrameNumber(), 200);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 200);
     TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 200);
   }
 
-	CXXTEST_TEST(InitMarkerAndAnalog)
+  CXXTEST_TEST(InitPointAndAnalog)
   {
     btk::Acquisition::Pointer test = btk::Acquisition::New();
     test->Init(5, 200, 10, 1);
-		TS_ASSERT_EQUALS(test->GetMarkerNumber(), 5);
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 5);
     TS_ASSERT_EQUALS(test->GetAnalogNumber(), 10);
-    TS_ASSERT_EQUALS(test->GetMarkerFrameNumber(), 200);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 200);
     TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 200);
   }
 
-  CXXTEST_TEST(InitMarkerOnly)
+  CXXTEST_TEST(InitPointOnly)
   {
     btk::Acquisition::Pointer test = btk::Acquisition::New();
     test->Init(5, 200);
-		TS_ASSERT_EQUALS(test->GetMarkerNumber(), 5);
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 5);
     TS_ASSERT_EQUALS(test->GetAnalogNumber(), 0);
-    TS_ASSERT_EQUALS(test->GetMarkerFrameNumber(), 200);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 200);
     TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 200);
   }
 
-	CXXTEST_TEST(InitAnalogOnly)
+  CXXTEST_TEST(InitAnalogOnly)
   {
     btk::Acquisition::Pointer test = btk::Acquisition::New();
     test->Init(0, 200, 10);
-		TS_ASSERT_EQUALS(test->GetMarkerNumber(), 0);
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 0);
     TS_ASSERT_EQUALS(test->GetAnalogNumber(), 10);
-    TS_ASSERT_EQUALS(test->GetMarkerFrameNumber(), 200);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 200);
     TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 200);
   }
-
-
 };
 
 CXXTEST_SUITE_REGISTRATION(AcquisitionTest)
@@ -87,7 +85,7 @@ CXXTEST_TEST_REGISTRATION(AcquisitionTest, Constructor)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, SetDurationAndFrequency)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, SetNumber)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, SetAnalogFrequencyOnly)
-CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitMarkerAndAnalog)
-CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitMarkerOnly)
-CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitAnalogOnly)
+CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitPointAndAnalog)
+CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitPointOnly)
+CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitAnalogOnly) 
 #endif

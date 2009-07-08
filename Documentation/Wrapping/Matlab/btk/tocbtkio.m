@@ -3,7 +3,8 @@ function tocbtkio
 % ----------------
 %
 % Acquisition
-%   <a href="matlab:help btkReadC3D">btkReadC3D</a>  - Load C3D file
+%   <a href="matlab:help btkReadAcquisition">btkReadAcquisition</a>   - Load acquisition's file (C3D and TRC files format supported)
+%   <a href="matlab:help btkWriteAcquisition">btkWriteAcquisition</a>  - Save acquisition data (ONLY TRC file format supported)
 %
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>
 

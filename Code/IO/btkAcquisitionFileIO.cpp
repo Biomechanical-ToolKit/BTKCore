@@ -40,8 +40,8 @@ namespace btk
   /**
    * @class AcquisitionFileIO
    * @brief Interface to read/write acquisition's files.
-	 *
-	 * @ingroup BTKIO
+   *
+   * @ingroup BTKIO
    */
   /**
    * @var AcquisitionFileIO::m_FileType
@@ -72,11 +72,11 @@ namespace btk
    */
   /**
    * @var AcquisitionFileIO::FileType AcquisitionFileIO::ASCII
-   * Enum value for ASCII file
+   * Enum value for ASCII file.
    */
   /**
    * @var AcquisitionFileIO::FileType AcquisitionFileIO::Binary
-   * Enum value for binary file
+   * Enum value for binary file.
    */
   
   /**

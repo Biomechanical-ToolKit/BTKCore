@@ -74,7 +74,7 @@ namespace btk
   protected:
     BTK_IO_EXPORT AcquisitionFileReader();
     
-    Acquisition::Pointer GetOutput(int idx) {return std::tr1::static_pointer_cast<Acquisition>(this->GetNthOutput(idx));};
+    Acquisition::Pointer GetOutput(int idx) {return static_pointer_cast<Acquisition>(this->GetNthOutput(idx));};
     BTK_IO_EXPORT virtual DataObject::Pointer MakeOutput(int idx);
     BTK_IO_EXPORT virtual void GenerateData();
     

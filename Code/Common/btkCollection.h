@@ -65,7 +65,8 @@ namespace btk
     ConstIterator Begin() const {return this->m_Items.begin();};
     Iterator End() {return this->m_Items.end();};
     ConstIterator End() const {return this->m_Items.end();};
-    
+   
+    bool IsEmpty() const {return this->m_Items.empty();}; 
     int GetItemNumber() const {return this->m_Items.size();};
     void SetItemNumber(int num);
 
@@ -94,8 +95,8 @@ namespace btk
   /**
    * @class Collection
    * @brief List of objects.
-	 *  
-	 * @ingroup BTKCommon
+   *  
+   * @ingroup BTKCommon
    */
   
   /**
@@ -156,6 +157,11 @@ namespace btk
   /**
    * @fn template <class T> Collection<T>::ConstIterator Collection<T>::End() const
    * Returns a const iterator just past the last item.
+   */
+
+  /**
+   * @fn template <class T> bool Collection<T>::IsEmpty() const
+   * Returns true if the collection is empty.
    */
   
   /**
@@ -254,7 +260,7 @@ namespace btk
       btkErrorMacro("Impossible to set an empty entry");
       return;
     }
-    if (idx >= this->m_Items.size())
+    if (idx >= static_cast<int>(this->m_Items.size()))
     {
       btkErrorMacro("Out of range");
       return;
@@ -286,7 +292,7 @@ namespace btk
   template <class T>
   void Collection<T>::RemoveItem(int idx)
   {
-    if (idx >= this->m_Items.size())
+    if (idx >= static_cast<int>(this->m_Items.size()))
     {
       btkErrorMacro("Out of range");
       return;

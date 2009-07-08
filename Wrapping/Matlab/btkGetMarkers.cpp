@@ -34,107 +34,97 @@
  */
 
 #include "btkMEXObjectHandle.h"
+#include "btkSpecializedPointsExtractor.h"
 #include "btkMEXAdaptMeasures.h"
 
 #include <btkAcquisition.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-	if(nrhs!=1)
-		mexErrMsgTxt("One input required.");
-	if (nlhs > 2)
-	 mexErrMsgTxt("Too many output arguments.");
+  if(nrhs!=1)
+    mexErrMsgTxt("One input required.");
+  if (nlhs > 3)
+   mexErrMsgTxt("Too many output arguments.");
 
-	// First output
-	btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-	btk::MarkerCollection::Pointer markers;
-	btk::MetaDataEntry::Iterator itPoint = acq->GetMetaData()->Find("POINT");
-	if (itPoint != acq->GetMetaData()->End())
-	{
-	  btk::MarkerCollection::Pointer allMarkers = acq->GetMarkers();
-		const char* names[] = {"ANGLES", "FORCES", "MOMENTS", "POWERS", "SCALARS", "REACTIONS"};
-		int numberOfNames =  sizeof(names) / (sizeof(char) * 4);
-  	std::vector<std::string> generalBlackList, blackList;
-		for(int i = 0 ; i < numberOfNames ; ++i)
-		{
-			btk::MetaDataEntry::CollapseChildrenValues(blackList, *itPoint, names[i]);
-		  generalBlackList.insert(generalBlackList.end(), blackList.begin(), blackList.end());
-		}
+  // First output
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
-		if (generalBlackList.empty())
-			markers = allMarkers;
-		else
-		{
-			markers = btk::MarkerCollection::New();
-			for(btk::MarkerCollection::Iterator it3DPoint = allMarkers->Begin() ; it3DPoint != allMarkers->End() ; ++it3DPoint)
-			{
-			  std::vector<std::string>::iterator itLabel = generalBlackList.begin();
-				bool labelFound = false;
-				while(itLabel != generalBlackList.end())
-				{
-					if ((*it3DPoint)->GetLabel().compare(*itLabel) == 0)
-					{
-						itLabel = generalBlackList.erase(itLabel);
-						labelFound = true;
-						break;
-					}
-					++itLabel;
-				}
-				if (!labelFound)
-					markers->InsertItem(*it3DPoint);
-				if (generalBlackList.empty())
-					break;
-			}
-		}
-	}
-	else
-		markers = acq->GetMarkers();
+  btk::SpecializedPointsExtractor::Pointer specialPointExtractor = btk::SpecializedPointsExtractor::New();
+  specialPointExtractor->SetInput(acq);
+  btk::PointCollection::Pointer markers = specialPointExtractor->GetOutput();
+  specialPointExtractor->Update();
 
-	char** fieldnames = 0;
-	plhs[0] = btkMEXAdaptMeasures<btk::Marker>(markers, &fieldnames);
-	int numberOfMarkers = acq->GetMarkerNumber();
-	for (int i = 0 ; i < markers->GetItemNumber() ; ++i)
-		delete[] fieldnames[i];
-	delete[] fieldnames;
+  char** fieldnames = 0;
+  plhs[0] = btkMEXAdaptMeasures<btk::Point>(markers, &fieldnames);
+  int numberOfPoints = markers->GetItemNumber();
+  if (nlhs != 3)
+  {
+    for (int i = 0 ; i < numberOfPoints ; ++i)
+      delete[] fieldnames[i];
+    delete[] fieldnames;
+  }
 
   // Second output (optionnal)
-	if (nlhs == 2)
-	{
+  if (nlhs >= 2)
+  {
     const char* info[] = {"frequency", "units"};
-		int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
-		char* units = 0;
+    int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
+    char* units = 0;
     btk::MetaDataEntry::Pointer metadata = acq->GetMetaData();
     btk::MetaDataEntry::ConstIterator itPoint = metadata->Find("POINT");
-		if ((itPoint != metadata->End()) && (numberOfMarkers != 0))
-		{
-			btk::MetaDataEntry::ConstIterator itUnit = (*itPoint)->Find("UNITS");
-			if (itUnit != (*itPoint)->End())
-			{
-				btk::MetaDataEntryValue::ConstPointer pointUnit = (*itUnit)->GetMetaDataEntryValue();
-				// Erase blank spaces at the beginning and the end of the string.
-				std::string str = pointUnit->GetValue(0);
+    if ((itPoint != metadata->End()) && (numberOfPoints != 0))
+    {
+      btk::MetaDataEntry::ConstIterator itUnit = (*itPoint)->Find("UNITS");
+      if (itUnit != (*itPoint)->End())
+      {
+        btk::MetaDataEntryValue::ConstPointer pointUnit = (*itUnit)->GetMetaDataEntryValue();
+        // Erase blank spaces at the beginning and the end of the string.
+        std::string str = pointUnit->GetValue(0);
         str = str.erase(str.find_last_not_of(' ') + 1);
         str = str.erase(0, str.find_first_not_of(' '));
-				units = new char[str.length() + 1];
+        units = new char[str.length() + 1];
         strcpy(units, str.c_str());
-			}
-		}
-		if (units == 0)
-		{
-			//mexWarnMsgTxt("No POINT:UNITS parameter. The makers' unit is empty.");
-			units = new char[1];
-			units[0] = '\0';
-		}
-		plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
-		mxArray* firstFrame  = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
+      }
+    }
+    if (units == 0)
+    {
+      //mexWarnMsgTxt("No POINT:UNITS parameter. The makers' unit is empty.");
+      units = new char[1];
+      units[0] = '\0';
+    }
+    plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
-    *mxGetPr(frequency) = acq->GetMarkerFrequency();
-		const char* ALL[] = {"ALLMARKERS"};
-		mxArray* unitsStruct = mxCreateStructMatrix(1, 1, 1, ALL);
-		mxSetFieldByNumber(unitsStruct, 0, 0, mxCreateString((const char*)units));
-		mxSetFieldByNumber(plhs[1], 0, 0, frequency);
-		mxSetFieldByNumber(plhs[1], 0, 1, unitsStruct);
+    *mxGetPr(frequency) = acq->GetPointFrequency();
+    const char* ALL[] = {"ALLMARKERS"};
+    mxArray* unitsStruct = mxCreateStructMatrix(1, 1, 1, ALL);
+    mxSetFieldByNumber(unitsStruct, 0, 0, mxCreateString((const char*)units));
+    mxSetFieldByNumber(plhs[1], 0, 0, frequency);
+    mxSetFieldByNumber(plhs[1], 0, 1, unitsStruct);
 
-		delete[] units;
-	}
+    delete[] units;
+  }
+
+  // Third output (optionnal)
+  if (nlhs >= 3)
+  {
+    plhs[2] = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
+    if (numberOfPoints > 0)
+    {
+      int inc = 0;
+      mxArray* residual = mxCreateDoubleMatrix(acq->GetPointFrameNumber(), 1, mxREAL);
+      double* initialValues = mxGetPr(residual);
+      for(btk::PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
+      {
+        mxSetPr(residual, (*it)->GetResiduals().data());
+        mxArray* deepCopy = mxDuplicateArray(residual);
+        mxSetFieldByNumber(plhs[2], 0, inc, deepCopy);
+
+        delete[] fieldnames[inc];
+        inc++;
+      }
+      delete[] fieldnames;
+      mxSetPr(residual, initialValues);
+      mxDestroyArray(residual);
+    }
+  }
 };

@@ -2,8 +2,10 @@ SET(BTKIO_SRCS
   btkAcquisitionFileIO.cpp
   btkAcquisitionFileIOFactory.cpp
   btkAcquisitionFileReader.cpp
+  btkAcquisitionFileWriter.cpp
   btkBinaryFileStream.cpp
   btkC3DFileIO.cpp
+  btkTRCFileIO.cpp
 )
 
 ADD_LIBRARY(BTKIO ${BTK_LIBS_BUILD_TYPE} ${BTKIO_SRCS})

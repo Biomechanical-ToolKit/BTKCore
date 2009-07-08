@@ -1,7 +1,7 @@
 #ifndef C3DFileIOTest_h
 #define C3DFileIOTest_h
 
-#include <btkC3dFileIO.h>
+#include <btkC3DFileIO.h>
 
 CXXTEST_SUITE(C3DFileIOTest)
 {
@@ -14,19 +14,19 @@ CXXTEST_SUITE(C3DFileIOTest)
   CXXTEST_TEST(CanReadFileEmptyFile)
   {
     btk::C3DFileIO::Pointer pt = btk::C3DFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanReadFile(C3DFilePath + "others/Empty.c3d"), false);
+    TS_ASSERT_EQUALS(pt->CanReadFile(C3DFilePathIN + "others/Empty.c3d"), false);
   };
   
   CXXTEST_TEST(CanReadFileFail)
   {
     btk::C3DFileIO::Pointer pt = btk::C3DFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanReadFile(C3DFilePath + "others/Fail.c3d"), false);
+    TS_ASSERT_EQUALS(pt->CanReadFile(C3DFilePathIN + "others/Fail.c3d"), false);
   };
   
   CXXTEST_TEST(CanReadFileOk)
   {
     btk::C3DFileIO::Pointer pt = btk::C3DFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanReadFile(C3DFilePath + "sample01/Eb015pi.C3D"), true);
+    TS_ASSERT_EQUALS(pt->CanReadFile(C3DFilePathIN + "sample01/Eb015pi.C3D"), true);
   };
   
   CXXTEST_TEST(CanWriteFileEmpty)

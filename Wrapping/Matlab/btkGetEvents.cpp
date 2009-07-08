@@ -35,7 +35,7 @@
 
 #if defined(_MSC_VER)
   // Disable unsafe warning (use of the function 'strcpy' instead of 
-	// 'strcpy_s' for portability reasons;
+  // 'strcpy_s' for portability reasons;
   #pragma warning( disable : 4996 ) 
 #endif
 
@@ -47,100 +47,138 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-	if(nrhs!=1)
-		mexErrMsgTxt("One input required.");
-	if (nlhs > 2)
-	 mexErrMsgTxt("Too many output arguments.");
+  if(nrhs!=1)
+    mexErrMsgTxt("One input required.");
+  if (nlhs > 2)
+   mexErrMsgTxt("Too many output arguments.");
 
-	// First output
-	btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-	btk::EventCollection::Pointer events = acq->GetEvents();
-  int numberOfEvents = acq->GetEventNumber();
-	char** fieldnames = new char*[numberOfEvents];
-  double* times = new double[numberOfEvents];
-	int inc = 0;
-  for(btk::EventCollection::ConstIterator it = events->Begin() ; it != events->End() ; ++it)
-	{
-		std::string originalLabel;
-		if ((*it)->GetContext().length() != 0)
-			originalLabel = (*it)->GetContext() + "_" + (*it)->GetLabel();
-		else
-			originalLabel = (*it)->GetLabel();
-		times[inc] = (*it)->GetTime();
-    std::string convertedLabel = std::string(originalLabel.length(), '_');
-		// Check bad characters
-		for(int i = 0 ; i < static_cast<int>(originalLabel.length()) ; ++i)
-			convertedLabel[i] = btk::ASCIIConverter[originalLabel[i]];
-		char c = convertedLabel[0];
-		// Check first character
-		if ((c == btk::ASCIIConverter[0x00]) // _
-				|| (c == btk::ASCIIConverter[0x30]) // 0
-				|| (c == btk::ASCIIConverter[0x31]) // 1
-  			|| (c == btk::ASCIIConverter[0x32]) // 2
-				|| (c == btk::ASCIIConverter[0x33]) // 3
-				|| (c == btk::ASCIIConverter[0x34]) // 4
-        || (c == btk::ASCIIConverter[0x35]) // 5
-				|| (c == btk::ASCIIConverter[0x36]) // 6
-				|| (c == btk::ASCIIConverter[0x37]) // 7
-				|| (c == btk::ASCIIConverter[0x38]) // 8
-				|| (c == btk::ASCIIConverter[0x39])) // 9
-			convertedLabel.insert(convertedLabel.begin(), 'C');
-		// Check label's redundancy
-		int id = 0;
-		std::string doubleLabel = convertedLabel;
-		for (int i = 0 ; i < inc ; ++i)
-		{
-			if (doubleLabel.compare(fieldnames[i]) == 0)
-				doubleLabel = convertedLabel + btk::ToString(++id);
-		}
-		if (id != 0)
-	    convertedLabel = doubleLabel;
-		fieldnames[inc] = new char[convertedLabel.length() + 1];
-		strcpy(fieldnames[inc], convertedLabel.c_str());
-		inc++;
-	}
-	plhs[0] = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames);
-  if (numberOfEvents != 0)
-	{
-		for(int inc = 0 ; inc < numberOfEvents ; ++inc)
-		{
-			mxArray* value = mxCreateDoubleMatrix(1, 1, mxREAL);
-      *mxGetPr(value) = times[inc];
-			mxSetFieldByNumber(plhs[0], 0, inc, value);
-		}
-		delete[] times;
-	}	
-	
-	// Second output (optionnal)
-	if (nlhs != 2)
-	{
-		for (int i = 0 ; i < numberOfEvents ; ++i)
-			delete[] fieldnames[i];
-		delete[] fieldnames;
-  }
-	else
-	{
-		const char* info[] = {"subjects", "units"};
-		int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
-		
-		plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
-		mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames);
+  // First output
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  btk::EventCollection::Pointer events = acq->GetEvents();
+  int inc = 0;
+  bool onlyOneSubject = true;
+  char** fieldnames;
+  int numberOfEvents = 0;
+  std::vector<std::string> labels;
+  std::vector< std::vector<double> > times;
+  std::vector<std::string> subjects;
+
+  if (!events->IsEmpty())
+  {
+    btk::EventCollection::ConstIterator it = events->Begin();
+    std::string subject = (*it)->GetSubject();
+    ++it;
+    while (it != events->End())
+    {
+      if (subject.compare((*it)->GetSubject()) != 0)
+      {
+        onlyOneSubject = false;
+        break;
+      }
+      ++it;
+    }
     
-		int inc = 0;
-		for (btk::EventCollection::ConstIterator it = events->Begin() ; it != events->End() ; ++it)
-		{
-			mxSetFieldByNumber(subjectsStruct, 0, inc, mxCreateString((*it)->GetSubject().c_str()));
-			delete[] fieldnames[inc];
-			++inc;
-		}
+    for(btk::EventCollection::ConstIterator it = events->Begin() ; it != events->End() ; ++it)
+    {
+      std::string label = "";
+      if (!onlyOneSubject)
+      {
+        if (!((*it)->GetSubject().empty()))
+          label = (*it)->GetSubject() + "_";
+      }
+      if (!((*it)->GetContext().empty()))
+        label += (*it)->GetContext() + "_" + (*it)->GetLabel();
+      else
+        label += (*it)->GetLabel();
+      bool labelAddition = true;
 
-		const char* ALL[] = {"ALLEVENTS"};
-		mxArray* unitsStruct = mxCreateStructMatrix(1, 1, 1, ALL);
-		mxSetFieldByNumber(unitsStruct, 0, 0, mxCreateString("s"));
+      for(int i = 0 ; i < static_cast<int>(labels.size()) ; ++i)
+      {
+        if (labels[i].compare(label) == 0)
+        {
+          times[i].push_back((*it)->GetTime());
+          labelAddition = false;
+          break;
+        }
+      }
+      if (labelAddition)
+      {
+        labels.push_back(label);
+        times.resize(times.size() + 1);
+        times.back().push_back((*it)->GetTime());
+        subjects.push_back((*it)->GetSubject());
+      }
+    }
+    
+    numberOfEvents = labels.size();
+    fieldnames = new char*[numberOfEvents];
+    for (int i = 0 ; i < static_cast<int>(labels.size()) ; ++i)
+    {
+      std::string convertedLabel = std::string(labels[i].length(), '_');
+      // Check bad characters
+      for(int j = 0 ; j < static_cast<int>(convertedLabel.length()) ; ++j)
+        convertedLabel[j] = btk::ASCIIConverter[labels[i][j]];
+      char c = convertedLabel[0];
+      // Check first character
+      if ((c == btk::ASCIIConverter[0x00]) // _
+          || (c == btk::ASCIIConverter[0x30]) // 0
+          || (c == btk::ASCIIConverter[0x31]) // 1
+          || (c == btk::ASCIIConverter[0x32]) // 2
+          || (c == btk::ASCIIConverter[0x33]) // 3
+          || (c == btk::ASCIIConverter[0x34]) // 4
+          || (c == btk::ASCIIConverter[0x35]) // 5
+          || (c == btk::ASCIIConverter[0x36]) // 6
+          || (c == btk::ASCIIConverter[0x37]) // 7
+          || (c == btk::ASCIIConverter[0x38]) // 8
+          || (c == btk::ASCIIConverter[0x39])) // 9
+        convertedLabel.insert(convertedLabel.begin(), 'C');
+      fieldnames[i] = new char[convertedLabel.length() + 1];
+      strcpy(fieldnames[i], convertedLabel.c_str());
+    }
+ 
+  }
 
-		mxSetFieldByNumber(plhs[1], 0, 0, subjectsStruct);
-		mxSetFieldByNumber(plhs[1], 0, 1, unitsStruct);
+  plhs[0] = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames);
+  
+  for(int i = 0 ; i < numberOfEvents ; ++i)
+  {
+    mxArray* value = mxCreateDoubleMatrix(1, times[i].size(), mxREAL);
+    double* v = mxGetPr(value);
+    for(int j = 0 ; j < static_cast<int>(times[i].size()) ; ++j)
+      v[j] = times[i][j]; 
+    mxSetFieldByNumber(plhs[0], 0, i, value);
+  }
+  
+  // Second output (optionnal)
+  if (nlhs != 2)
+  {
+    for (int i = 0 ; i < numberOfEvents ; ++i)
+      delete[] fieldnames[i];
+    delete[] fieldnames;
+  }
+  else
+  {
+    const char* info[] = {"subjects", "units"};
+    int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
+    
+    plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
+    mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames);
+    
+    int inc = 0;
+    for (int i = 0 ; i < numberOfEvents ; ++i)
+    {
+      mxSetFieldByNumber(subjectsStruct, 0, i, mxCreateString(subjects[i].c_str()));
+      delete[] fieldnames[inc];
+      ++inc;
+    }
 
-		delete[] fieldnames;
-	}
+    const char* ALL[] = {"ALLEVENTS"};
+    mxArray* unitsStruct = mxCreateStructMatrix(1, 1, 1, ALL);
+    mxSetFieldByNumber(unitsStruct, 0, 0, mxCreateString("s"));
+
+    mxSetFieldByNumber(plhs[1], 0, 0, subjectsStruct);
+    mxSetFieldByNumber(plhs[1], 0, 1, unitsStruct);
+
+    delete[] fieldnames;
+  }
 };

@@ -1,1 +1,4 @@
-#define TDD_C3DFilePath "${BTK_SOURCE_DIR}/Testing/Data/Input/C3DSamples/"
+#define TDD_C3DFilePathIN "${BTK_SOURCE_DIR}/Testing/Data/Input/C3DSamples/"
+#define TDD_C3DFilePathOUT "${BTK_SOURCE_DIR}/Testing/Data/Output/C3DSamples/"
+#define TDD_TRCFilePathIN "${BTK_SOURCE_DIR}/Testing/Data/Input/TRCSamples/"
+#define TDD_TRCFilePathOUT "${BTK_SOURCE_DIR}/Testing/Data/Output/TRCSamples/"

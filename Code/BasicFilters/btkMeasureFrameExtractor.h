@@ -71,8 +71,8 @@ namespace btk
   protected:
     MeasureFrameExtractor();
     
-    CollectionPointer GetInput(int idx) {return std::tr1::static_pointer_cast< Collection<T> >(this->GetNthInput(idx));};  
-    ItemPointer GetOutput(int idx) {return std::tr1::static_pointer_cast<T>(this->GetNthOutput(idx));};
+    CollectionPointer GetInput(int idx) {return static_pointer_cast< Collection<T> >(this->GetNthInput(idx));};  
+    ItemPointer GetOutput(int idx) {return static_pointer_cast<T>(this->GetNthOutput(idx));};
     virtual DataObject::Pointer MakeOutput(int idx);
     virtual void GenerateData();
     
@@ -87,8 +87,8 @@ namespace btk
    * @class MeasureFrameExtractor
    * @brief Extracts a frame from a collection of btk::Measure objects
    * @tparam T Must be a class which inherit of btk::Measure
-	 *
-	 * @ingroup BTKBasicFilters
+   *
+   * @ingroup BTKBasicFilters
    */
   
   /**
@@ -182,7 +182,6 @@ namespace btk
    * @fn template <class T> ItemPointer MeasureFrameExtractor<T>::GetOutput(int idx)
    * Returns the output at the index @a idx.
    */
-  
   
   /**
    * Creates a T:Pointer object and return it as a DataObject::Pointer.

@@ -49,7 +49,7 @@ namespace btk
     typedef SharedPtr<const AcquisitionFileIO> ConstPointer;
     
     typedef enum {TypeNotApplicable, ASCII, Binary} FileType;
-    typedef enum {OrderNotApplicable, IEEE_LittleEndian, VAX_LittleEndian, IEEE_BigEndian} ByteOrder;
+    typedef enum {OrderNotApplicable = 0, IEEE_LittleEndian, VAX_LittleEndian, IEEE_BigEndian} ByteOrder;
     
     FileType GetFileType() const {return this->m_FileType;};
     ByteOrder GetByteOrder() const {return this->m_ByteOrder;};

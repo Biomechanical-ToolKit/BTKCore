@@ -46,7 +46,7 @@ namespace btk
   {
   public:
     typedef enum {ReadMode, WriteMode} OpenMode;
-    BTK_IO_EXPORT static AcquisitionFileIO::Pointer CreateAcquisitionIO(const std::string& Filename, OpenMode mode);
+    BTK_IO_EXPORT static AcquisitionFileIO::Pointer CreateAcquisitionIO(const std::string& filename, OpenMode mode);
     
   protected:
     BTK_IO_EXPORT AcquisitionFileIOFactory();

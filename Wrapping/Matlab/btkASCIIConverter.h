@@ -295,7 +295,7 @@ namespace btk
     '_', /* 0xfd */
     '_', /* 0xfe */
     '_'  /* 0xff */
-	};
+  };
 };
 
 #endif

@@ -12,7 +12,11 @@ function [markers markersInfo] = btkGetMarkers(h) %#ok
 %    - MARKERSINFO.UNITS
 %  MARKERSINFO.FREQUENCY contains the markers' frequency.  MARKERSINFO.UNITS
 %  contains the unit of each marker.  Each fieldname in MARKERSINFO.UNITS
-%  corresponds to marker's label. 
+%  corresponds to marker's label.
+%
+%  [MARKERS MARKERSINFO MARKERSRESIDUAL] = BTKGETMARKERS(H) returns markers'
+%  residual related to their 3D reconstruction error.  Each fieldname in 
+%  MARKERSRESIDUAL corresponds to a marker's label.
 
 %  Author: A. Barré
 %  Copyright 2009- Biomechanical ToolKit (BTK).
@@ -23,4 +27,4 @@ function [markers markersInfo] = btkGetMarkers(h) %#ok
 
 error(generatemsgid('NotSupported'),'MEX file for BTKGETMARKERS not found');
 
-% [EOF] btkReadC3D.m
+% [EOF] btkGetMarkers.m

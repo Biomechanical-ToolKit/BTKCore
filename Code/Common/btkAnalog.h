@@ -40,13 +40,35 @@
 
 namespace btk
 {
-  /**
-   * @typedef Analog 
-   * Analog channel measure, 1D signal.
-	 *
-   * @ingroup BTKCommon
-   */ 
-  typedef Measure<1> Analog;
+  class Analog : public Measure<1>
+  {
+  public:
+    typedef enum {Unknown = 0, PlusMinus10, PlusMinus5, PlusMinus2Dot5, PlusMinus1Dot25} Gain;
+
+    typedef SharedPtr<Analog> Pointer;
+    typedef SharedPtr<const Analog> ConstPointer;
+    
+    static Pointer New(int frameNumber = 1) {return Pointer(new Analog("", frameNumber));};
+    static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Analog(label, frameNumber));};
+    
+    virtual ~Analog() {};
+    
+    const std::string& GetUnit() const {return this->m_Unit;};
+    BTK_COMMON_EXPORT void SetUnit(const std::string& u);
+    Gain GetGain() const {return this->m_Gain;};
+    BTK_COMMON_EXPORT void SetGain(Gain g);
+    Pointer Clone() const {return Pointer(new Analog(*this));}
+    
+  protected:
+    BTK_COMMON_EXPORT Analog(const std::string& label, int frameNumber, Gain g = Unknown);
+    
+  private:
+    BTK_COMMON_EXPORT Analog(const Analog& toCopy);
+    Analog& operator=(const Analog& ); // Not implemented.
+    
+    std::string m_Unit;
+    Gain m_Gain;
+  };
 };
 
 #endif // __btkAnalog_h

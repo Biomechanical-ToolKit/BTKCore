@@ -1,12 +1,14 @@
 SET(BTKCommon_SRCS
   btkAcquisition.cpp
+  btkAnalog.cpp
   btkDataObject.cpp
-	btkEvent.cpp
-  btkMarker.cpp
+  btkEvent.cpp
+  btkForcePlatform.cpp
+  btkPoint.cpp
   btkMetaDataEntry.cpp
   btkMetaDataEntryValue.cpp
   btkObject.cpp
-  btkProcessObject.cpp  
+  btkProcessObject.cpp
 )
 
 ADD_LIBRARY(BTKCommon ${BTK_LIBS_BUILD_TYPE} ${BTKCommon_SRCS})

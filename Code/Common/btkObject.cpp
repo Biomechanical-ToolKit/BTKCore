@@ -85,6 +85,11 @@ namespace btk
    * @fn Object::Object()
    * Constructor.
    */
+
+  /**
+   * @fn Object::Object(const Object& toCopy)
+   * Copy constructor.
+   */
   
   /**
    * @fn Object::~Object()

@@ -43,9 +43,9 @@ namespace btk
 {
   /**
    * @typedef EventCollection 
-   * Collection of markers
-	 *
-	 * @ingroup BTKCommon
+   * Collection of events
+   *
+   * @ingroup BTKCommon
    */ 
   typedef Collection<Event> EventCollection;
 };

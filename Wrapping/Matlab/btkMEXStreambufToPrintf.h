@@ -38,7 +38,7 @@
 
 #if defined(_MSC_VER)
   // Disable unsafe warning (use of the function 'sprintf' instead of 
-	// 'sprintf_s' for portability reasons;
+  // 'sprintf_s' for portability reasons;
   #pragma warning( disable : 4996 ) 
 #endif
 
@@ -48,51 +48,51 @@
 
 namespace btk
 {
-	/**
-	 * @brief Stream buffer to display message in the Matlab command window by using the function mexPrintf.
-	 *
-	 * For example, the redirection of std::cout in the Maltab Command Window is done by the following code. 
-	 * @code
-	 * btk::MEXStreambufToPrintf matlabStandardOutput;
-	 * std::streambuf* stdStandardOutput = std::cout.rdbuf(&matlabStandardOutput)
-	 *   ... // your stuff
-	 * std::cout.rdbuf(stdStandardOutput);
-	 * @endcode
-	 * It is important to go back to the previous stream buffer.
-	 *
-	 * @ingroup BTKWrappingMatlab
-	 */
-	class MEXStreambufToPrintf : public std::streambuf
-	{
-	public:
-		// MEXStreambufToPrintf(); // Implicit.
-		// MEXStreambufToPrintf(const MEXStreambufToPrintf& toCopy); // Implicit.
-		// ~MEXStreambufToPrintf(); // Implicit.
-		// MEXStreambufToPrintf& operator=(const MEXStreambufToPrintf& toCopy); // Implicit.
+  /**
+   * @brief Stream buffer to display message in the Matlab command window by using the function mexPrintf.
+   *
+   * For example, the redirection of std::cout in the Maltab Command Window is done by the following code. 
+   * @code
+   * btk::MEXStreambufToPrintf matlabStandardOutput;
+   * std::streambuf* stdStandardOutput = std::cout.rdbuf(&matlabStandardOutput)
+   *   ... // your stuff
+   * std::cout.rdbuf(stdStandardOutput);
+   * @endcode
+   * It is important to go back to the previous stream buffer.
+   *
+   * @ingroup BTKWrappingMatlab
+   */
+  class MEXStreambufToPrintf : public std::streambuf
+  {
+  public:
+    // MEXStreambufToPrintf(); // Implicit.
+    // MEXStreambufToPrintf(const MEXStreambufToPrintf& toCopy); // Implicit.
+    // ~MEXStreambufToPrintf(); // Implicit.
+    // MEXStreambufToPrintf& operator=(const MEXStreambufToPrintf& toCopy); // Implicit.
 
-	protected:
-	  virtual std::streamsize xsputn(const char* s, std::streamsize n); 
-  	virtual int overflow(int c = EOF);
-	};
+  protected:
+    virtual std::streamsize xsputn(const char* s, std::streamsize n); 
+    virtual int overflow(int c = EOF);
+  };
 
-	/**
-	 * Overloaded method which calls the function mexPrintf
-	 */
-	std::streamsize MEXStreambufToPrintf::xsputn(const char* s, std::streamsize n) 
-	{
- 		mexPrintf("%.*s", n, s);
- 		return n;
-	};
+  /**
+   * Overloaded method which calls the function mexPrintf
+   */
+  std::streamsize MEXStreambufToPrintf::xsputn(const char* s, std::streamsize n) 
+  {
+     mexPrintf("%.*s", n, s);
+     return n;
+  };
 
-	/**
-	 * Overloaded method which calls the function mexPrintf
-	 */
-	int MEXStreambufToPrintf::overflow(int c) 
-	{
+  /**
+   * Overloaded method which calls the function mexPrintf
+   */
+  int MEXStreambufToPrintf::overflow(int c) 
+  {
     if (c != EOF)
       mexPrintf("%.1s", &c);
     return 1;
-	}
+  }
 };
 
 #endif // __btkMEXStreambufToPrintf_h

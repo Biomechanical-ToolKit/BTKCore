@@ -54,12 +54,15 @@ namespace btk
     {
       this->m_Timestamp = 0;
     };
+    Object(const Object& toCopy)
+    {
+      this->m_Timestamp = toCopy.m_Timestamp;
+    }
     virtual ~Object() {};
     
     long m_Timestamp;
     
   private:
-    Object(const Object& ); // Not implemented.
     Object& operator=(const Object& ); // Not implemented.
   };
 };

@@ -61,12 +61,17 @@ namespace btk
       this->mp_Parent = 0;
       this->mp_Source = 0;
     };
+    DataObject(const DataObject& toCopy)
+    : Object(toCopy) 
+    {
+      this->mp_Parent = toCopy.mp_Parent;
+      this->mp_Source = toCopy.mp_Source;
+    };
     virtual ~DataObject() {};
 
     BTK_COMMON_EXPORT void Modified();
     
   private:
-    DataObject(const DataObject& ); // Not implemented.
     DataObject& operator=(const DataObject& ); // Not implemented.
     
     DataObject* mp_Parent;

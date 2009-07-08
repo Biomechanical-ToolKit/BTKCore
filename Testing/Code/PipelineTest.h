@@ -36,8 +36,8 @@ public:
   Source::Pointer GetOutput() {return this->GetOutput(0);};
   
 protected:
-  Source::Pointer GetInput(int idx) {return std::tr1::static_pointer_cast<Source>(this->GetNthInput(idx));};
-  Source::Pointer GetOutput(int idx) {return std::tr1::static_pointer_cast<Source>(this->GetNthOutput(idx));};
+  Source::Pointer GetInput(int idx) {return static_pointer_cast<Source>(this->GetNthInput(idx));};
+  Source::Pointer GetOutput(int idx) {return static_pointer_cast<Source>(this->GetNthOutput(idx));};
   virtual btk::DataObject::Pointer MakeOutput(int /* idx */)
   {
     return Source::New();

@@ -40,14 +40,14 @@
 
 namespace btk
 {
-	/**
-	 * @class Event 
-	 * @brief Label a specific time during an acquisition.
-	 *
-	 * @ingroup BTKCommon
-	 */
+  /**
+   * @class Event 
+   * @brief Label a specific time during an acquisition.
+   *
+   * @ingroup BTKCommon
+   */
 
-	/**
+  /**
    * @typedef Event::Pointer
    * Smart pointer associated with an Event object.
    */
@@ -57,111 +57,111 @@ namespace btk
    * Smart pointer associated with a const Event object.
    */
 
-	/**
-	 * @fn Pointer Event::New(const std::string& label = "", double t = 0.0, const std::string& context = "", const std::string& subject = "", const std::string& desc = "")
-	 * Creates a smart pointer associated with an Event object.
-	 */
+  /**
+   * @fn Pointer Event::New(const std::string& label = "", double t = 0.0, const std::string& context = "", const std::string& subject = "", const std::string& desc = "")
+   * Creates a smart pointer associated with an Event object.
+   */
 
-	/**
-	 * @fn const std::string& Event::GetLabel()	const
-	 * Returns event's label.
-	 */
-	
-	/**
-	 * Sets event's label.
-	 */
-	void Event::SetLabel(const std::string& label)
-	{
-		if (this->m_Label.compare(label) == 0)
-			return;
-		this->m_Label = label;
-		this->Modified();
-	};
+  /**
+   * @fn const std::string& Event::GetLabel()  const
+   * Returns event's label.
+   */
+  
+  /**
+   * Sets event's label.
+   */
+  void Event::SetLabel(const std::string& label)
+  {
+    if (this->m_Label.compare(label) == 0)
+      return;
+    this->m_Label = label;
+    this->Modified();
+  };
 
-	/**
-	 * @fn const std::string& Event::GetDescription() const
-	 * Returns event's description.
-	 */
+  /**
+   * @fn const std::string& Event::GetDescription() const
+   * Returns event's description.
+   */
 
-	/**
-	 * Sets event's description.
-	 */
-	void Event::SetDescription(const std::string& desc)
-	{
-		if (this->m_Description.compare(desc) == 0)
-			return;
-		this->m_Description = desc;
-		this->Modified();
-	};
+  /**
+   * Sets event's description.
+   */
+  void Event::SetDescription(const std::string& desc)
+  {
+    if (this->m_Description.compare(desc) == 0)
+      return;
+    this->m_Description = desc;
+    this->Modified();
+  };
 
-	/**
-	 * @fn const std::string& Event::GetContext() const
-	 * Returns event's context.
-	 */
-		
-	/**
-	 * Sets event's context.
-	 */
-	void Event::SetContext(const std::string& context)
-	{
-		if (this->m_Context.compare(context) == 0)
-			return;
-		this->m_Context = context;
-		this->Modified();
-	};
+  /**
+   * @fn const std::string& Event::GetContext() const
+   * Returns event's context.
+   */
+    
+  /**
+   * Sets event's context.
+   */
+  void Event::SetContext(const std::string& context)
+  {
+    if (this->m_Context.compare(context) == 0)
+      return;
+    this->m_Context = context;
+    this->Modified();
+  };
 
-	/**
-	 * @fn const std::string& Event::GetSubject() const
-	 * Returns the subject associated with the event.
-	 */
-		
-	/**
-	 * Sets the subject associated with the event.
-	 */
-	void Event::SetSubject(const std::string& subject)
-	{
-		if (this->m_Subject.compare(subject) == 0)
-			return;
-		this->m_Subject = subject;
-		this->Modified();
-	};
+  /**
+   * @fn const std::string& Event::GetSubject() const
+   * Returns the subject associated with the event.
+   */
+    
+  /**
+   * Sets the subject associated with the event.
+   */
+  void Event::SetSubject(const std::string& subject)
+  {
+    if (this->m_Subject.compare(subject) == 0)
+      return;
+    this->m_Subject = subject;
+    this->Modified();
+  };
 
-	/**
-	 * @fn double Event::GetTime() const
-	 * Returns event's time.
-	 */
-	
-	/**
-	 * Sets event's time.
-	 */
-	void Event::SetTime(double t)
-	{
-		if (std::fabs(this->m_Time - t) < std::numeric_limits<double>::epsilon())
-			return;
-		this->m_Time = t;
-		this->Modified();
-	};
+  /**
+   * @fn double Event::GetTime() const
+   * Returns event's time.
+   */
+  
+  /**
+   * Sets event's time.
+   */
+  void Event::SetTime(double t)
+  {
+    if (std::fabs(this->m_Time - t) < std::numeric_limits<double>::epsilon())
+      return;
+    this->m_Time = t;
+    this->Modified();
+  };
 
-	/**
-	 * @fn Pointer Event::Clone() const
-	 * Clones the object and return it as new smart pointer.
-	 */
-	
-	/**
-	 * Constructor.
-	 */
-	Event::Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc)
-	: m_Label(label), m_Context(context), m_Subject(subject), m_Description(desc)
-	{
-		this->m_Time = t;
-	};
+  /**
+   * @fn Pointer Event::Clone() const
+   * Clones the object and return it as new smart pointer.
+   */
+  
+  /**
+   * Constructor.
+   */
+  Event::Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc)
+  : m_Label(label), m_Context(context), m_Subject(subject), m_Description(desc)
+  {
+    this->m_Time = t;
+  };
 
-	/**
-	 * Copy constructor.
-	 */
-	Event::Event(const Event& toCopy)
-	: m_Label(toCopy.m_Label), m_Context(toCopy.m_Context), m_Subject(toCopy.m_Subject), m_Description(toCopy.m_Description)
-	{
-		this->m_Time = toCopy.m_Time;
-	};
+  /**
+   * Copy constructor.
+   */
+  Event::Event(const Event& toCopy)
+  : m_Label(toCopy.m_Label), m_Context(toCopy.m_Context), m_Subject(toCopy.m_Subject), m_Description(toCopy.m_Description)
+  {
+    this->m_Time = toCopy.m_Time;
+  };
 };

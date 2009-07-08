@@ -77,48 +77,67 @@ namespace btk
    */
   
   /**
-	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(int8_t val)
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(int8_t val)
 
    * Creates a smart pointer from the MetaDataEntryValue(int8_t) constructor.
-	 */
+   */
   
-	/**
-	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(int16_t val)
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(int16_t val)
    * Creates a smart pointer from the MetaDataEntryValue(int16_t) constructor.
    */
 
-	/**
-	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(float val)
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(float val)
    * Creates a smart pointer from the MetaDataEntryValue(float) constructor.
    */
 
-	/**
-	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(std::string val)
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(std::string val)
    * Creates a smart pointer from the MetaDataEntryValue(std::string) constructor.
    */
 
-	/**
-	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val)
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<int8_t>& val)
+   * Creates a smart pointer from the MetaDataEntryValue(const std::vector<int8_t>&) constructor.
+   */
+
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<int16_t>& val)
+   * Creates a smart pointer from the MetaDataEntryValue(const std::vector<int16_t>&) constructor.
+   */
+  
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<float>& val)
+   * Creates a smart pointer from the MetaDataEntryValue(const std::vector<float>&) constructor.
+   */
+  
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<std::string>& val)
+   * Creates a smart pointer from the MetaDataEntryValue(const std::vector<std::string>&) constructor.
+   */
+
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val)
    * Creates a smart pointer from the MetaDataEntryValue(const std::vector<uint8_t>&, const std::vector<int8_t>&) constructor.
    */
 
-	/**
-	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val)
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val)
    * Creates a smart pointer from the MetaDataEntryValue(const std::vector<uint8_t>&, const std::vector<int16_t>&) constructor.
    */
-	
-	/**
-	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<float>& val)
+  
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<float>& val)
    * Creates a smart pointer from the MetaDataEntryValue(const std::vector<uint8_t>&, const std::vector<float>&) constructor.
    */
-	
-	/**
-	 * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<std::string>& val)
-
+  
+  /**
+   * @fn MetaDataEntryValue::Pointer MetaDataEntryValue::New(const std::vector<uint8_t>& dim, const std::vector<std::string>& val)
    * Creates a smart pointer from the MetaDataEntryValue(const std::vector<uint8_t>&, const std::vector<std::string>&) constructor.
    */
 
-	/**
+  /**
    * @fn Format MetaDataEntryValue::GetFormat() const
    * Returns the format of the values.
    */
@@ -137,13 +156,13 @@ namespace btk
       if (this->m_Dims.size() == 0)
         this->m_Values.push_back(" ");
       else
-        this->m_Values = std::vector<std::string>(this->prod(1), std::string(this->m_Dims[0], ' '));
+        this->m_Values = std::vector<std::string>(this->GetDimensionsProduct(1), std::string(this->m_Dims[0], ' '));
     }
     else
     {
       if ((this->m_Format == CHAR) || (this->m_Format == FLOAT)
           || ((this->m_Format == INTEGER) && (format == BYTE)))
-        this->m_Values = std::vector<std::string>(this->prod(0), "0");
+        this->m_Values = std::vector<std::string>(this->GetDimensionsProduct(0), "0");
     }
     this->m_Format = format;
     
@@ -176,10 +195,10 @@ namespace btk
     }
     if (this->m_Dims[idx] == val)
       return;
-    int oldProd = this->prod();
+    int oldProd = this->GetDimensionsProduct();
     uint8_t oldValue = this->m_Dims[idx];
     this->m_Dims[idx] = val;
-    int prod = this->prod();
+    int prod = this->GetDimensionsProduct();
     std::string blank;
     if (this->m_Format == CHAR)
     {
@@ -200,7 +219,7 @@ namespace btk
     if ( (this->m_Format != CHAR) || (idx != 0) )
     {
       int diffNb = val - oldValue;
-      int repeat = this->prod(idx + 1);
+      int repeat = this->GetDimensionsProduct(idx + 1);
       if (diffNb < 0)
       {
         int inc = 1;
@@ -241,6 +260,19 @@ namespace btk
    * @fn const std::vector<uint8_t>& MetaDataEntryValue::GetDimensions() const 
    * Returns the dimensions associated with the values.
    */
+
+  /**
+   * Compute the product of the dimensions from the idx @a start.
+   */
+  int MetaDataEntryValue::GetDimensionsProduct(int start) const
+  {
+    int prod = 1;
+    int inc = start;
+    while (inc < static_cast<int>(this->m_Dims.size()))
+      prod *= this->m_Dims[inc++];
+    return prod;
+  };
+
   
   /**
    * Sets @a dims as the new dimensions and adapt the values and their structure.
@@ -260,7 +292,7 @@ namespace btk
     {
       if (this->m_Format == CHAR)
       {
-        int prod = this->prod(1);
+        int prod = this->GetDimensionsProduct(1);
         this->m_Values.resize(prod, std::string(this->m_Dims[0], ' '));
         for (int i = 0 ; i < prod ; ++i)
         {
@@ -269,7 +301,7 @@ namespace btk
       }
       else
       {
-        int prod = this->prod();
+        int prod = this->GetDimensionsProduct();
         this->m_Values.resize(prod, "0");
       }
     }
@@ -290,7 +322,7 @@ namespace btk
       int inc = 0;
       if (this->m_Format == CHAR)
         inc = 1;
-      this->m_Values.resize(this->prod(inc));
+      this->m_Values.resize(this->GetDimensionsProduct(inc));
       if (this->m_Format == CHAR && nb == 0)
         this->m_Values[0] = this->m_Values[0][0];
     }
@@ -377,7 +409,8 @@ namespace btk
   };
 
   /**
-   * Sets @a val as the value at the specified @a idx if possible.
+   * Sets @a val as the value at the specified @a idx if possible. 
+   * Dimensions are updated if necessary.
    *   - This method doesn't do anything if the idx is out of range.
    *   - This method doesn't do anything if the new value doesn't have the same format.
    */
@@ -394,6 +427,12 @@ namespace btk
       return;
     }
     this->m_Values[idx] = val;
+
+    int len = this->m_Values[idx].length();
+    if (len > this->m_Dims[0])
+      this->m_Dims[0] = len;
+    for (int i = 0 ; i < this->GetDimensionsProduct(1) ; ++i)
+      this->m_Values[i].resize(this->m_Dims[0], ' ');
   };
   
   /**
@@ -443,42 +482,93 @@ namespace btk
   };
 
   /**
+   * Overwrite the data to store @a val in a BYTE format as a 1D vector.
+   * @warning The number of values must be lower than 256.
+   */
+  void MetaDataEntryValue::SetValues(const std::vector<int8_t>& val)
+  {
+    this->SetValues(std::vector<uint8_t>(1,val.size()), val);
+  };
+
+  
+  /**
+   * Overwrite the data to store @a val in a INTEGER format as a 1D vector.
+   * @warning The number of values must be lower than 256.
+   */
+  void MetaDataEntryValue::SetValues(const std::vector<int16_t>& val)
+  {
+    this->SetValues(std::vector<uint8_t>(1,val.size()), val);
+  };
+
+  /**
+   * Overwrite the data to store @a val in a FLOAT format as a 1D vector.
+   * @warning The number of values must be lower than 256.
+   */
+  void MetaDataEntryValue::SetValues(const std::vector<float>& val)
+  {
+    this->SetValues(std::vector<uint8_t>(1,val.size()), val);
+  };
+
+  /**
+   * Overwrite the data to store @a val in a CHAR format as an array with auto-generated dimensions.
+   * @warning The number of values must be lower than 256. The string can have a maximum length of 255.
+   */
+  void MetaDataEntryValue::SetValues(const std::vector<std::string>& val)
+  {
+    this->m_Format = CHAR;
+    this->m_Dims = std::vector<uint8_t>(2,0);
+    this->m_Dims[1] = val.size();
+    this->m_Values = val;
+    for (int i = 0 ; i < this->m_Dims[1] ; ++i)
+    {
+      int len = this->m_Values[i].length();
+      if (len > this->m_Dims[0])
+        this->m_Dims[0] = len;
+    }
+    for (int i = 0 ; i < this->m_Dims[1] ; ++i)
+      this->m_Values[i].resize(this->m_Dims[0], ' ');
+  };
+
+  /**
    * Overwrite the data to store @a val in an BYTE format with the dimensions @a dims.
    * If the product of the dimensions is not equal to the size of @a val,
    * then the number of values is adjusted to fit with it. The value added is "0".
+   * @warning Each dimension must be lower than 256.
    */
   void MetaDataEntryValue::SetValues(const std::vector<uint8_t>& dims, const std::vector<int8_t>& val)
   {
     this->m_Format = BYTE;
     this->m_Dims = dims;
     ToString(val, this->m_Values);
-    this->m_Values.resize(this->prod(), "0");
+    this->m_Values.resize(this->GetDimensionsProduct(), "0");
   };
 
   /**
    * Overwrite the data to store @a val in an INTEGER format with the dimensions @a dims.
    * If the product of the dimensions is not equal to the size of @a val,
    * then the number of values is adjusted to fit with it. The value added is "0".
+   * @warning Each dimension must be lower than 256.
    */
   void MetaDataEntryValue::SetValues(const std::vector<uint8_t>& dims, const std::vector<int16_t>& val)
   {
     this->m_Format = INTEGER;
     this->m_Dims = dims;
     ToString(val, this->m_Values);
-    this->m_Values.resize(this->prod(), "0");
+    this->m_Values.resize(this->GetDimensionsProduct(), "0");
   };
 
   /**
    * Overwrite the data to store @a val in an FLOAT format with the dimensions @a dims.
    * If the product of the dimensions is not equal to the size of @a val,
    * then the number of values is adjusted to fit with it. The value added is "0".
+   * @warning Each dimension must be lower than 256.
    */
   void MetaDataEntryValue::SetValues(const std::vector<uint8_t>& dims, const std::vector<float>& val)
   {
     this->m_Format = FLOAT;
     this->m_Dims = dims;
     ToString(val, this->m_Values);
-    this->m_Values.resize(this->prod(), "0");
+    this->m_Values.resize(this->GetDimensionsProduct(), "0");
   };
 
   /**
@@ -487,12 +577,12 @@ namespace btk
    * then the number of values is adjusted to fit with it. The value added is 
    * " " if the dimension is null. Otherwise, it is a string of white spaces.
    * The size of this string corresponds to the first dimension.
+   * @warning Each dimension must be lower than 256.
    */
   void MetaDataEntryValue::SetValues(const std::vector<uint8_t>& dims, const std::vector<std::string>& val)
   {
     this->m_Format = CHAR;
     this->m_Dims = dims;
-    ToString(val, this->m_Values);
     if (this->m_Dims.size() == 0)
     {
       if (this->m_Values.size() != 1)
@@ -503,7 +593,7 @@ namespace btk
     }
     else
     {
-      int prod = this->prod(1);
+      int prod = this->GetDimensionsProduct(1);
       this->m_Values.resize(prod, std::string(this->m_Dims[0], ' '));
       for (int i = 0 ; i < prod ; ++i)
       {
@@ -576,45 +666,111 @@ namespace btk
   {
     this->m_Format = CHAR;
   };
+ 
+  /**
+   * Constructor which store @a val in a BYTE format as a 1D vector.
+   * If the product of the dimensions is not equal to the size of @a val,
+   * then the number of values is adjusted to fit with it. The value added is "0".
+   * @warning The number of values must be lower than 256.
+   */
+  MetaDataEntryValue::MetaDataEntryValue(const std::vector<int8_t>& val)
+  : m_Dims(std::vector<uint8_t>(1,val.size()))
+  {
+    this->m_Format = BYTE;
+    ToString(val, this->m_Values);
+    this->m_Values.resize(this->GetDimensionsProduct(), "0");
+  };
   
+  /**
+   * Constructor which store @a val in an INTEGER format as a 1D vector.
+   * If the product of the dimensions is not equal to the size of @a val,
+   * then the number of values is adjusted to fit with it. The value added is "0".
+   * @warning The number of values must be lower than 256.
+   */
+  MetaDataEntryValue::MetaDataEntryValue(const std::vector<int16_t>& val)
+  : m_Dims(std::vector<uint8_t>(1,val.size()))
+  {
+    this->m_Format = INTEGER;
+    ToString(val, this->m_Values);
+    this->m_Values.resize(this->GetDimensionsProduct(), "0");
+  };
+  
+  /**
+   * Constructor which store @a val in a FLOAT format as a 1D vector.
+   * If the product of the dimensions is not equal to the size of @a val,
+   * then the number of values is adjusted to fit with it. The value added is "0".
+   * @warning The number of values must be lower than 256.
+   */
+  MetaDataEntryValue::MetaDataEntryValue(const std::vector<float>& val)
+  : m_Dims(std::vector<uint8_t>(1,val.size()))
+  {
+    this->m_Format = FLOAT;
+    ToString(val, this->m_Values);
+    this->m_Values.resize(this->GetDimensionsProduct(), "0");
+  };
+
+  /**
+   * Constructor which store @a val in a CHAR format as an array (array's dimensions automalicaly generated)
+   * @warning The number of values must be lower than 256 and the maximum length for the strings is equal to 255.
+   */
+  MetaDataEntryValue::MetaDataEntryValue(const std::vector<std::string>& val)
+  : m_Dims(std::vector<uint8_t>(2,0))
+  {
+    this->m_Format = CHAR;
+    this->m_Values = val;
+    this->m_Dims[1] = val.size();
+    for (int i = 0 ; i < this->m_Dims[1] ; ++i)
+    {
+      int len = this->m_Values[i].length();
+      if (len > this->m_Dims[0])
+        this->m_Dims[0] = len;
+    }
+    for (int i = 0 ; i < this->m_Dims[1] ; ++i)
+      this->m_Values[i].resize(this->m_Dims[0], ' ');
+  };
+
   /**
    * Constructor which store @a val in a BYTE format with the dimensions @a dims.
    * If the product of the dimensions is not equal to the size of @a val,
    * then the number of values is adjusted to fit with it. The value added is "0".
+   * @warning Each dimension must be lower than 256.
    */
   MetaDataEntryValue::MetaDataEntryValue(const std::vector<uint8_t>& dims, const std::vector<int8_t>& val)
   : m_Dims(dims)
   {
     this->m_Format = BYTE;
     ToString(val, this->m_Values);
-    this->m_Values.resize(this->prod(), "0");
+    this->m_Values.resize(this->GetDimensionsProduct(), "0");
   };
   
   /**
    * Constructor which store @a val in an INTEGER format with the dimensions @a dims.
    * If the product of the dimensions is not equal to the size of @a val,
    * then the number of values is adjusted to fit with it. The value added is "0".
+   * @warning Each dimension must be lower than 256.
    */
   MetaDataEntryValue::MetaDataEntryValue(const std::vector<uint8_t>& dims, const std::vector<int16_t>& val)
   : m_Dims(dims)
   {
     this->m_Format = INTEGER;
     ToString(val, this->m_Values);
-    this->m_Values.resize(this->prod(), "0");
+    this->m_Values.resize(this->GetDimensionsProduct(), "0");
   };
   
   /**
    * Constructor which store @a val in a FLOAT format with the dimensions @a dims.
    * If the product of the dimensions is not equal to the size of @a val,
    * then the number of values is adjusted to fit with it. The value added is "0".
+   * @warning Each dimension must be lower than 256.
    */
   MetaDataEntryValue::MetaDataEntryValue(const std::vector<uint8_t>& dims, const std::vector<float>& val)
   : m_Dims(dims)
   {
     this->m_Format = FLOAT;
     ToString(val, this->m_Values);
-    this->m_Values.resize(this->prod(), "0");
+    this->m_Values.resize(this->GetDimensionsProduct(), "0");
   };
+
   
   /**
    * Constructor which store @a val in a CHAR format with the dimensions @a dims.
@@ -622,6 +778,7 @@ namespace btk
    * then the number of values is adjusted to fit with it. The value added is 
    * " " if the dimension is null. Otherwise, it is a string of white spaces.
    * The size of this string corresponds to the first dimension.
+   * @warning Each dimension must be lower than 256.
    */
   MetaDataEntryValue::MetaDataEntryValue(const std::vector<uint8_t>& dims, const std::vector<std::string>& val)
   : m_Dims(dims)
@@ -638,7 +795,7 @@ namespace btk
     }
     else
     {
-      int prod = this->prod(1);
+      int prod = this->GetDimensionsProduct(1);
       this->m_Values.resize(prod, std::string(this->m_Dims[0], ' '));
       for (int i = 0 ; i < prod ; ++i)
       {
@@ -646,19 +803,7 @@ namespace btk
       }
     }
   };
-  
-  /**
-   * Compute the product of the dimensions from the idx @a start.
-   */
-  int MetaDataEntryValue::prod(int start) const
-  {
-    int prod = 1;
-    int inc = start;
-    while (inc < static_cast<int>(this->m_Dims.size()))
-      prod *= this->m_Dims[inc++];
-    return prod;
-  };
-  
+    
   MetaDataEntryValue::MetaDataEntryValue(const MetaDataEntryValue& toCopy)
   : m_Dims(toCopy.m_Dims), m_Values(toCopy.m_Values)
   {

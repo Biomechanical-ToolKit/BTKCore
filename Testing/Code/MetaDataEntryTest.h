@@ -16,9 +16,9 @@ CXXTEST_SUITE(MetaDataEntryTest)
   
   CXXTEST_TEST(CtorWithValue)
   {
-    btk::MetaDataEntry::Pointer test = btk::MetaDataEntry::New("SCALE", (float)0.145, "marker scale");
+    btk::MetaDataEntry::Pointer test = btk::MetaDataEntry::New("SCALE", (float)0.145, "point scale");
     TS_ASSERT_EQUALS(test->GetLabel(), "SCALE");
-    TS_ASSERT_EQUALS(test->GetDescription(), "marker scale");
+    TS_ASSERT_EQUALS(test->GetDescription(), "point scale");
     TS_ASSERT_EQUALS(test->GetUnlockState(), true);
     TS_ASSERT_EQUALS(test->HasMetaDataEntryValue(), true);
     btk::MetaDataEntryValue::Pointer val = test->GetMetaDataEntryValue();
@@ -59,7 +59,7 @@ CXXTEST_SUITE(MetaDataEntryTest)
     btk::MetaDataEntry::Pointer pointScale = btk::MetaDataEntry::New("SCALE", (float)-0.0833);
     point->AppendChild(pointUsed);
     point->AppendChild(pointScale);
-    TS_ASSERT_EQUALS(*(point->Find("USED")), pointUsed);
+    TS_ASSERT_EQUALS(*(point->FindChild("USED")), pointUsed);
   };
   
   CXXTEST_TEST(TakeChild)

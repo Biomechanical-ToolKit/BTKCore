@@ -69,37 +69,37 @@ namespace btk
    * Const Iterator related to the children of the entry.
    */
 
-	/**
-	 * Collapse the @a parent children entries' values starting with the string @a basename
-	 * and incrementing (for example: LABELS, LABELS2, LABELS3). The entries'
-	 * values are stored in @a target.
-	 *
-	 * The input @a targetFinalSize can be used to fox the number of values 
-	 * to collpase (by default: -1). The input @a blankReplacement can be used
-	 * to fill the @a target' values which have no corresponding in the @a parent (by default: ""). 
-	 */
-	void MetaDataEntry::CollapseChildrenValues(std::vector<std::string>& target,
-																			 			 MetaDataEntry::ConstPointer parent,
-                           						 			 const std::string& basename,
-																			 			 int targetFinalSize,
-                           						 			 const std::string& blankReplacement)
+  /**
+   * Collapse the @a parent children entries' values starting with the string @a baselabel
+   * and incrementing (for example: LABELS, LABELS2, LABELS3). The entries'
+   * values are stored in @a target.
+   *
+   * The input @a targetFinalSize can be used to fox the number of values 
+   * to collpase (by default: -1). The input @a blankReplacement can be used
+   * to fill the @a target' values which have no corresponding in the @a parent (by default: ""). 
+   */
+  void MetaDataEntry::CollapseChildrenValues(std::vector<std::string>& target,
+                                              MetaDataEntry::ConstPointer parent,
+                                               const std::string& baselabel,
+                                              int targetFinalSize,
+                                               const std::string& blankReplacement)
   {
-		target.clear();
+    target.clear();
     int collapsedNumber = 0; int inc = 2;
-    std::string name = basename;
-		if (parent.get() != 0)
-		{
+    std::string label = baselabel;
+    if (parent.get() != 0)
+    {
       while (1)
       {
-        MetaDataEntry::ConstIterator it = parent->Find(name);
+        MetaDataEntry::ConstIterator it = parent->FindChild(label);
         if (it == parent->End())
           break;
         std::vector<std::string> temp = (*it)->GetMetaDataEntryValue()->GetValues();
-        for (std::vector<std::string>::const_iterator it = temp.begin() ; it != temp.end() ; ++it)
+        for (std::vector<std::string>::const_iterator it2 = temp.begin() ; it2 != temp.end() ; ++it2)
         {
           if (target.size() == targetFinalSize)
             break;
-          std::string str = *it;
+          std::string str = *it2;
           str = str.erase(str.find_last_not_of(' ') + 1);
           str = str.erase(0, str.find_first_not_of(' '));
           target.push_back(str);
@@ -107,9 +107,9 @@ namespace btk
         collapsedNumber = target.size();
         if (collapsedNumber == targetFinalSize)
           break;
-        name = basename + ToString(inc);
+        label = baselabel + ToString(inc);
       }
-		}
+    }
     if ((collapsedNumber < targetFinalSize) && (!blankReplacement.empty()))
     {
       target.resize(targetFinalSize);
@@ -119,51 +119,71 @@ namespace btk
   };
   
   /**
-	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::string& desc, bool isUnlocked)
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::string&, bool) constructor.
    */
-	
-	/**
-	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, int8_t val, const std::string& desc, bool isUnlocked)
+  
+  /**
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, int8_t val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, int8_t, const std::string&, bool) constructor.
    */
 
-	/**
-	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, int16_t val, const std::string& desc, bool isUnlocked)
+  /**
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, int16_t val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, int16_t, const std::string&, bool) constructor.
    */
 
-	/**
-	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, float val, const std::string& desc, bool isUnlocked)
+  /**
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, float val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, float, const std::string&, bool) constructor.
    */
 
-	/**
-	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, std::string val,const std::string& desc, bool isUnlocked)
+  /**
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, const std::string& val,const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::string&, const std::string&, bool) constructor.
    */
 
-	/**
-	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, const std::vector<int8_t>& val, const std::string& desc, bool isUnlocked)
+  /**
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label,  const std::vector<int8_t>& val, const std::string& desc, bool isUnlocked)
+   * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<int8_t>&, const std::string&, bool) constructor.
+   */
+
+  /**
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, const std::vector<int16_t>& val, const std::string& desc, bool isUnlocked)
+   * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<int16_t>&, const std::string&, bool) constructor.
+   */
+
+  /**
+   * @fn  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, const std::vector<float>& val, const std::string& desc, bool isUnlocked)
+   * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<float>&, const std::string&, bool) constructor.
+   */
+
+  /**
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, const std::vector<std::string>& val, const std::string& desc, bool isUnlocked)
+   * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<std::string>&, const std::string&, bool) constructor.
+   */
+
+  /**
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, const std::vector<uint8_t>& dim, const std::vector<int8_t>& val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<uint8_t>&, const std::vector<int8_t>&, const std::string&, bool) constructor.
    */
 
-	/**
-	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, const std::vector<int16_t>& val, const std::string& desc, bool isUnlocked)
+  /**
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, const std::vector<uint8_t>& dim, const std::vector<int16_t>& val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<uint8_t>&, const std::vector<int16_t>&, const std::string&, bool) constructor.
    */
 
-	/**
-   * @fn  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, const std::vector<float>& val, const std::string& desc, bool isUnlocked)
-	 * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<uint8_t>&, const std::vector<float>&, const std::string&, bool) constructor.
+  /**
+   * @fn  MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, const std::vector<uint8_t>& dim, const std::vector<float>& val, const std::string& desc, bool isUnlocked)
+   * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<uint8_t>&, const std::vector<float>&, const std::string&, bool) constructor.
    */
 
-	/**
-	 * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& name, const std::vector<uint8_t>& dim, const std::vector<std::string>& val, const std::string& desc, bool isUnlocked)
+  /**
+   * @fn MetaDataEntry::Pointer MetaDataEntry::New(const std::string& label, const std::vector<uint8_t>& dim, const std::vector<std::string>& val, const std::string& desc, bool isUnlocked)
    * Creates a smart pointer from the MetaDataEntry(const std::string&, const std::vector<uint8_t>&, const std::vector<std::string>&, const std::string&, bool) constructor.
    */
 
-	/**
+  /**
    * @fn const std::string& MetaDataEntry::GetLabel() const
    * Returns the label of the entry.
    */
@@ -174,16 +194,19 @@ namespace btk
    */
   void MetaDataEntry::SetLabel(const std::string& label)
   {
+    if (this->m_Label.compare(label) == 0)
+      return;
     MetaDataEntry* parent = 0;
     if (this->m_HasMetaParent)
       parent = static_cast<MetaDataEntry*>(this->DataObject::GetParent());
     
     if (parent)
     {
-      if (parent->Find(label) != parent->End())
+      if (parent->FindChild(label) != parent->End())
         throw(DomainError("MetaDataEntry::SetLabel"));
     }
     this->m_Label = label;
+    this->Modified();
   };
   
   /**
@@ -192,9 +215,16 @@ namespace btk
    */
   
   /**
-   * @fn void MetaDataEntry::SetDescription(const std::string& desc)
    * Sets the description of the entry.
    */
+  void MetaDataEntry::SetDescription(const std::string& desc)
+  {
+    if (this->m_Description.compare(desc) == 0)
+      return;
+    this->m_Description = desc;
+    this->Modified();
+  };
+
   
   /**
    * @fn bool MetaDataEntry::GetUnlockState(void) const
@@ -285,7 +315,7 @@ namespace btk
    */
   MetaDataEntry::Pointer MetaDataEntry::GetChild(const std::string& label)
   {
-    Iterator it = this->Find(label);
+    Iterator it = this->FindChild(label);
     if (it == this->End())
       throw(DomainError("MetaDataEntry::GetChild"));
     return *it;
@@ -296,7 +326,7 @@ namespace btk
    */
   MetaDataEntry::ConstPointer MetaDataEntry::GetChild(const std::string& label) const
   {
-    ConstIterator it = this->Find(label);
+    ConstIterator it = this->FindChild(label);
     if (it == this->End())
       throw(DomainError("MetaDataEntry::GetChild"));
     return *it;
@@ -323,7 +353,7 @@ namespace btk
       btkErrorMacro("Impossible to insert an empty entry");
       return false;
     }
-    if (this->Find(entry->GetLabel()) != this->End())
+    if (this->FindChild(entry->GetLabel()) != this->End())
     {
       btkErrorMacro("Label '" + entry->GetLabel() + "' already exists in the entries' list");
       return false;
@@ -365,7 +395,7 @@ namespace btk
       btkErrorMacro("Out of range");
       return;
     }
-    if (this->Find(entry->GetLabel()) != this->End())
+    if (this->FindChild(entry->GetLabel()) != this->End())
     {
       btkErrorMacro("Label '" + entry->GetLabel() + "' already exists in the entries' list");
       return;
@@ -418,7 +448,7 @@ namespace btk
    */
   MetaDataEntry::Pointer MetaDataEntry::TakeChild(const std::string& label)
   {
-    Iterator it = this->Find(label);
+    Iterator it = this->FindChild(label);
     if (it == this->End())
     {
       btkErrorMacro("No Child with the label: " + label);
@@ -428,6 +458,42 @@ namespace btk
     this->m_Children.erase(it);
     this->Modified();
     return entry;
+  };
+
+  /**
+   * Removes the child entry at the iterator @a loc.
+   */
+  void MetaDataEntry::RemoveChild(Iterator loc)
+  {
+    if (loc == this->End())
+      return;
+    this->m_Children.erase(loc);
+    this->Modified();
+  };
+
+  /**
+   * Removes the child entry at the index @a idx.
+   */
+  void MetaDataEntry::RemoveChild(int idx)
+  {
+    if (idx >= static_cast<int>(this->m_Children.size()))
+      return;
+    Iterator it = this->Begin();
+    std::advance(it, idx);
+    this->m_Children.erase(it);
+    this->Modified();
+  };
+
+  /**
+   * Removes the child entry with the label @a label.
+   */
+  void MetaDataEntry::RemoveChild(const std::string& label)
+  {
+    Iterator it = this->FindChild(label);
+    if (it == this->End())
+      return;
+    this->m_Children.erase(it);
+    this->Modified();
   };
   
   /**
@@ -443,7 +509,7 @@ namespace btk
   /**
    * Finds the children which has the label @a label and return it as an Iterator
    */
-  MetaDataEntry::Iterator MetaDataEntry::Find(const std::string& label)
+  MetaDataEntry::Iterator MetaDataEntry::FindChild(const std::string& label)
   {
     Iterator it = this->Begin();
     while (it != this->End())
@@ -458,7 +524,7 @@ namespace btk
   /**
    * Finds the children which has the label @a label and return it as a ConstIterator
    */
-  MetaDataEntry::ConstIterator MetaDataEntry::Find(const std::string& label) const
+  MetaDataEntry::ConstIterator MetaDataEntry::FindChild(const std::string& label) const
   {
     ConstIterator it = this->Begin();
     while (it != this->End())
@@ -484,9 +550,256 @@ namespace btk
       pt->AppendChild((*it)->Clone());
     return pt;
   };
-  
+ 
+ /**
+  * Creates an new MetaDataEntry or replaces its data if it already exists.
+  *
+  * This method constructs a MetaDataEntry without value, with the label @a label, an empty description and is unlocked.
+  */ 
+ MetaDataEntry::Pointer MetaDataEntry::CreateChild(const std::string& label)
+ {
+   Iterator it = this->FindChild(label);
+   if (it != this->End())
+   {
+     (*it)->SetDescription("");
+     (*it)->SetMetaDataEntryValue(MetaDataEntryValue::Pointer());
+     (*it)->SetUnlockState(true);
+     return (*it);
+   }
+   else
+   {
+     Pointer entry = MetaDataEntry::New(label);
+     this->AppendChild(entry);
+     return entry;
+   }
+ };
+
+ /**
+  * Creates an new MetaDataEntry or replaces its data if it already exists.
+  *
+  * This method constructs a MetaDataEntry with a single value @a val, with the label @a label, an empty description and is unlocked.
+  */
+ void MetaDataEntry::CreateChild(const std::string& label, int8_t val)
+ {
+   Iterator it = this->FindChild(label);
+   if (it != this->End())
+   {
+     (*it)->SetDescription("");
+     if ((*it)->HasMetaDataEntryValue())
+       (*it)->GetMetaDataEntryValue()->SetValues(val);
+     else
+       (*it)->SetMetaDataEntryValue(MetaDataEntryValue::New(val));
+     (*it)->SetUnlockState(true);
+   }
+   else
+     this->AppendChild(MetaDataEntry::New(label, val));
+ };
+ 
+ /**
+  * Creates an new MetaDataEntry or replaces its data if it already exists.
+  *
+  * This method constructs a MetaDataEntry with a single value @a val, with the label @a label, an empty description and is unlocked.
+  */
+ void MetaDataEntry::CreateChild(const std::string& label, int16_t val)
+ {
+   Iterator it = this->FindChild(label);
+   if (it != this->End())
+   {
+     (*it)->SetDescription("");
+     if ((*it)->HasMetaDataEntryValue())
+       (*it)->GetMetaDataEntryValue()->SetValues(val);
+     else
+       (*it)->SetMetaDataEntryValue(MetaDataEntryValue::New(val));
+     (*it)->SetUnlockState(true);
+   }
+   else
+     this->AppendChild(MetaDataEntry::New(label, val));
+ };
+
+ /**
+  * Creates an new MetaDataEntry or replaces its data if it already exists.
+  *
+  * This method constructs a MetaDataEntry with a single value @a val, with the label @a label, an empty description and is unlocked.
+  */
+ void MetaDataEntry::CreateChild(const std::string& label, float val)
+ {
+   Iterator it = this->FindChild(label);
+   if (it != this->End())
+   {
+     (*it)->SetDescription("");
+     if ((*it)->HasMetaDataEntryValue())
+       (*it)->GetMetaDataEntryValue()->SetValues(val);
+     else
+       (*it)->SetMetaDataEntryValue(MetaDataEntryValue::New(val));
+     (*it)->SetUnlockState(true);
+   }
+   else
+     this->AppendChild(MetaDataEntry::New(label, val));
+ };
+ 
+ /**
+  * Creates an new MetaDataEntry or replaces its data if it already exists.
+  *
+  * This method constructs a MetaDataEntry with a single value @a val, with the label @a label, an empty description and is unlocked.
+  */
+ void MetaDataEntry::CreateChild(const std::string& label, const std::string& val)
+ {
+   Iterator it = this->FindChild(label);
+   if (it != this->End())
+   {
+     (*it)->SetDescription("");
+     if ((*it)->HasMetaDataEntryValue())
+       (*it)->GetMetaDataEntryValue()->SetValues(val);
+     else
+       (*it)->SetMetaDataEntryValue(MetaDataEntryValue::New(val));
+     (*it)->SetUnlockState(true);
+   }
+   else
+     this->AppendChild(MetaDataEntry::New(label, val, "", true));
+ };
+
+ /**
+  * Creates an new MetaDataEntry or replaces its data if it already exists.
+  *
+  * This method constructs a MetaDataEntry with an 1D vector @a val as values, with the label @a label, an empty description and is unlocked.
+  * This method is a recursive method which give the possibility to create more than one entry if the vector's length is greater or equal to 256. The parameter @a inc give the value added to the label to give the next label. For @a inc=1, The label is not modified.
+  */
+ void MetaDataEntry::CreateChild(const std::string& label, const std::vector<int8_t> val, int inc)
+ {
+   if (val.size() >= 256)
+   {
+     std::vector<int8_t> val1, val2;
+     std::vector<int8_t>::const_iterator it1 = val.begin(); std::advance(it1, 255);
+     std::vector<int8_t>::const_iterator it2 = val.begin(); std::advance(it2, 256);
+     val1.assign(val.begin(), it1);
+     val2.assign(it2, val.end());
+     this->CreateChild(label, val1);
+     this->CreateChild(label, val2, inc + 1);
+   }
+   std::string l = label;
+   if (inc != 1)
+     l += ToString(inc);
+   Iterator it = this->FindChild(l);
+   if (it != this->End())
+   {
+     (*it)->SetDescription("");
+     if ((*it)->HasMetaDataEntryValue())
+       (*it)->GetMetaDataEntryValue()->SetValues(val);
+     else
+       (*it)->SetMetaDataEntryValue(MetaDataEntryValue::New(val));
+     (*it)->SetUnlockState(true);
+   }
+   else
+     this->AppendChild(MetaDataEntry::New(l, val));
+ };
+
+ /**
+  * Creates an new MetaDataEntry or replaces its data if it already exists.
+  *
+  * This method constructs a MetaDataEntry with an 1D vector @a val as values, with the label @a label, an empty description and is unlocked.
+  * This method is a recursive method which give the possibility to create more than one entry if the vector's length is greater or equal to 256. The parameter @a inc give the value added to the label to give the next label. For @a inc=1, The label is not modified.
+  */
+ void MetaDataEntry::CreateChild(const std::string& label, const std::vector<int16_t> val, int inc)
+ {
+   if (val.size() >= 256)
+   {
+     std::vector<int16_t> val1, val2;
+     std::vector<int16_t>::const_iterator it1 = val.begin(); std::advance(it1, 255);
+     std::vector<int16_t>::const_iterator it2 = val.begin(); std::advance(it2, 256);
+     val1.assign(val.begin(), it1);
+     val2.assign(it2, val.end());
+     this->CreateChild(label, val1);
+     this->CreateChild(label, val2, inc + 1);
+   }
+   std::string l = label;
+   if (inc != 1)
+     l += ToString(inc);
+   Iterator it = this->FindChild(l);
+   if (it != this->End())
+   {
+     (*it)->SetDescription("");
+     if ((*it)->HasMetaDataEntryValue())
+       (*it)->GetMetaDataEntryValue()->SetValues(val);
+     else
+       (*it)->SetMetaDataEntryValue(MetaDataEntryValue::New(val));
+     (*it)->SetUnlockState(true);
+   }
+   else
+     this->AppendChild(MetaDataEntry::New(l, val));
+ };
+ 
+ /**
+  * Creates an new MetaDataEntry or replaces its data if it already exists.
+  *
+  * This method constructs a MetaDataEntry with an 1D vector @a val as values, with the label @a label, an empty description and is unlocked.
+  * This method is a recursive method which give the possibility to create more than one entry if the vector's length is greater or equal to 256. The parameter @a inc give the value added to the label to give the next label. For @a inc=1, The label is not modified.
+  */
+ void MetaDataEntry::CreateChild(const std::string& label, const std::vector<float> val, int inc)
+ {
+   if (val.size() >= 256)
+   {
+     std::vector<float> val1, val2;
+     std::vector<float>::const_iterator it1 = val.begin(); std::advance(it1, 255);
+     std::vector<float>::const_iterator it2 = val.begin(); std::advance(it2, 256);
+     val1.assign(val.begin(), it1);
+     val2.assign(it2, val.end());
+     this->CreateChild(label, val1);
+     this->CreateChild(label, val2, inc + 1);
+   }
+   std::string l = label;
+   if (inc != 1)
+     l += ToString(inc);
+   Iterator it = this->FindChild(l);
+   if (it != this->End())
+   {
+     (*it)->SetDescription("");
+     if ((*it)->HasMetaDataEntryValue())
+       (*it)->GetMetaDataEntryValue()->SetValues(val);
+     else
+       (*it)->SetMetaDataEntryValue(MetaDataEntryValue::New(val));
+     (*it)->SetUnlockState(true);
+   }
+   else
+     this->AppendChild(MetaDataEntry::New(l, val));
+ };
+
+ /**
+  * Creates an new MetaDataEntry or replaces its data if it already exists.
+  *
+  * This method constructs a MetaDataEntry with an 1D vector @a val as values, with the label @a label, an empty description and is unlocked.
+  * This method is a recursive method which give the possibility to create more than one entry if the vector's length is greater or equal to 256. The parameter @a inc give the value added to the label to give the next label. For @a inc=1, The label is not modified.
+  */
+ void MetaDataEntry::CreateChild(const std::string& label, const std::vector<std::string>& val, int inc)
+ {
+   if (val.size() >= 256)
+   {
+     std::vector<std::string> val1, val2;
+     std::vector<std::string>::const_iterator it1 = val.begin(); std::advance(it1, 255);
+     std::vector<std::string>::const_iterator it2 = val.begin(); std::advance(it2, 256);
+     val1.assign(val.begin(), it1);
+     val2.assign(it2, val.end());
+     this->CreateChild(label, val1);
+     this->CreateChild(label, val2, inc + 1);
+   }
+   std::string l = label;
+   if (inc != 1)
+     l += ToString(inc);
+   Iterator it = this->FindChild(l);
+   if (it != this->End())
+   {
+     (*it)->SetDescription("");
+     if ((*it)->HasMetaDataEntryValue())
+       (*it)->GetMetaDataEntryValue()->SetValues(val);
+     else
+       (*it)->SetMetaDataEntryValue(MetaDataEntryValue::New(val));
+     (*it)->SetUnlockState(true);
+   }
+   else
+     this->AppendChild(MetaDataEntry::New(l, val));
+ };
+
   /**
-   * Constructor for an entry without a MetaDataEntryValue;
+   * Constructor for an entry without a MetaDataEntryValue.
    */
   MetaDataEntry::MetaDataEntry(const std::string& label,
                                const std::string& desc, bool isUnlocked)
@@ -498,7 +811,7 @@ namespace btk
   };
   
   /**
-   * Constructor for an entry containing a MetaDataEntryValue with a single BYTE
+   * Constructor for an entry containing a MetaDataEntryValue with a single BYTE.
    */
   MetaDataEntry::MetaDataEntry(const std::string& label, int8_t val,
                                const std::string& desc, bool isUnlocked)
@@ -510,7 +823,7 @@ namespace btk
   };
   
   /**
-   * Constructor for an entry containing a MetaDataEntryValue with a single INTEGER
+   * Constructor for an entry containing a MetaDataEntryValue with a single INTEGER.
    */
   MetaDataEntry::MetaDataEntry(const std::string& label, int16_t val, 
                                const std::string& desc, bool isUnlocked)
@@ -522,7 +835,7 @@ namespace btk
   };
   
   /**
-   * Constructor for an entry containing a MetaDataEntryValue with a single FLOAT
+   * Constructor for an entry containing a MetaDataEntryValue with a single FLOAT.
    */
   MetaDataEntry::MetaDataEntry(const std::string& label, float val, 
                                const std::string& desc, bool isUnlocked)
@@ -534,10 +847,23 @@ namespace btk
   };
   
   /**
-   * Constructor for an entry containing a MetaDataEntryValue with a single string
+   * Constructor for an entry containing a MetaDataEntryValue with a single string.
    */
-  MetaDataEntry::MetaDataEntry(const std::string& label, std::string val, 
+  MetaDataEntry::MetaDataEntry(const std::string& label, const std::string& val, 
                                const std::string& desc, bool isUnlocked)
+  : DataObject(), m_Label(label), m_Description(desc),
+  m_Value(MetaDataEntryValue::New(val)),
+  m_Children(std::list<MetaDataEntry::Pointer>(0))
+  {
+    this->m_Unlocked = isUnlocked;
+  };
+
+  /**
+   * Constructor for an entry containing a MetaDataEntryValue of BYTE valuescorresponding to a 1D vector.
+   */
+  MetaDataEntry::MetaDataEntry(const std::string& label,
+                               const std::vector<int8_t>& val, const std::string& desc,
+                               bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Value(MetaDataEntryValue::New(val)),
   m_Children(std::list<MetaDataEntry::Pointer>(0))
@@ -546,7 +872,45 @@ namespace btk
   };
   
   /**
-   * Constructor for an entry containing a MetaDataEntryValue of BYTE values
+   * Constructor for an entry containing a MetaDataEntryValue of INTEGER values corresponding to a 1D vector.
+   */
+  MetaDataEntry::MetaDataEntry(const std::string& label, 
+                               const std::vector<int16_t>& val, const std::string& desc,
+                               bool isUnlocked)
+  : DataObject(), m_Label(label), m_Description(desc),
+  m_Value(MetaDataEntryValue::New(val)),
+  m_Children(std::list<MetaDataEntry::Pointer>(0))
+  {
+    this->m_Unlocked = isUnlocked;
+  };
+  
+  /**
+   * Constructor for an entry containing a MetaDataEntryValue of FLOAT values corresponding to a 1D vector.
+   */
+  MetaDataEntry::MetaDataEntry(const std::string& label,
+                               const std::vector<float>& val, const std::string& desc,
+                               bool isUnlocked)
+  : DataObject(), m_Label(label), m_Description(desc),
+  m_Value(MetaDataEntryValue::New(val)),
+  m_Children(std::list<MetaDataEntry::Pointer>(0))
+  {
+    this->m_Unlocked = isUnlocked;
+  };
+  
+  /**
+   * Constructor for an entry containing a MetaDataEntryValue of string values corresponding to a 1D vector.
+   */
+  MetaDataEntry::MetaDataEntry(const std::string& label,                               const std::vector<std::string>& val, const std::string& desc,
+                               bool isUnlocked)
+  : DataObject(), m_Label(label), m_Description(desc),
+  m_Value(MetaDataEntryValue::New(val)),
+  m_Children(std::list<MetaDataEntry::Pointer>(0))
+  {
+    this->m_Unlocked = isUnlocked;
+  };
+  
+  /**
+   * Constructor for an entry containing a MetaDataEntryValue of BYTE values.
    */
   MetaDataEntry::MetaDataEntry(const std::string& label, const std::vector<uint8_t>& dim, 
                                const std::vector<int8_t>& val, const std::string& desc,
@@ -559,7 +923,7 @@ namespace btk
   };
   
   /**
-   * Constructor for an entry containing a MetaDataEntryValue of INTEGER values
+   * Constructor for an entry containing a MetaDataEntryValue of INTEGER values.
    */
   MetaDataEntry::MetaDataEntry(const std::string& label, const std::vector<uint8_t>& dim, 
                                const std::vector<int16_t>& val, const std::string& desc,
@@ -572,7 +936,7 @@ namespace btk
   };
   
   /**
-   * Constructor for an entry containing a MetaDataEntryValue of FLOAT values
+   * Constructor for an entry containing a MetaDataEntryValue of FLOAT values.
    */
   MetaDataEntry::MetaDataEntry(const std::string& label, const std::vector<uint8_t>& dim, 
                                const std::vector<float>& val, const std::string& desc,
@@ -585,7 +949,7 @@ namespace btk
   };
   
   /**
-   * Constructor for an entry containing a MetaDataEntryValue of string values
+   * Constructor for an entry containing a MetaDataEntryValue of string values.
    */
   MetaDataEntry::MetaDataEntry(const std::string& label, const std::vector<uint8_t>& dim, 
                                const std::vector<std::string>& val, const std::string& desc,

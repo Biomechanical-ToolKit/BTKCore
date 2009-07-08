@@ -1,0 +1,381 @@
+/* 
+ * The Biomechanical ToolKit
+ * Copyright (c) 2009, Arnaud Barré
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 
+ *     * Redistributions of source code must retain the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer.
+ *     * Redistributions in binary form must reproduce the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ *     * Neither the name(s) of the copyright holders nor the names
+ *       of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written
+ *       permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#include "btkTRCFileIO.h"
+#include "btkConvert.h"
+
+#if defined(_MSC_VER)
+  // Disable unsafe warning (use of the function 'sprintf' instead of 
+  // 'sprintf_s' for portability reasons;
+  #pragma warning( disable : 4996 ) 
+#endif
+
+#include <fstream>
+#include <algorithm>
+#include <cctype>
+#include <iostream>
+#include <map>
+#include <sstream>
+
+namespace btk
+{
+  /**
+   * @class TRCFileIOException
+   * @brief Exception class for the TRCFileIO class.
+   */
+  
+  /**
+   * @fn TRCFileIOException::TRCFileIOException(const std::string& msg)
+   * Constructor.
+   */
+  
+  /**
+   * @fn virtual TRCFileIOException::~TRCFileIOException()
+   * Empty destructor.
+   */
+  
+  /**
+   * @class TRCFileIO
+   * @brief Interface to read/write TRC files.
+   *
+   * The TRC file format is created by Motion Analysis Corp.
+   *
+   * @ingroup BTKIO
+   */
+  
+  /**
+   * @typedef TRCFileIO::Pointer
+   * Smart pointer associated with a TRCFileIO object.
+   */
+  
+  /**
+   * @typedef TRCFileIO::ConstPointer
+   * Smart pointer associated with a const TRCFileIO object.
+   */
+  
+  /**
+   * @fn static TRCFileIO::Pointer TRCFileIO::New()
+   * Create a TRCFileIO object an return it as a smart pointer.
+   */
+  
+  /**
+   * Checks if the first word in the file corresponds to "PathFileType".
+   */
+  bool TRCFileIO::CanReadFile(const std::string& filename)
+  {
+    std::ifstream ifs(filename.c_str());
+    char c[13];
+    ifs.read(c, 12); c[12] = '\0';
+    ifs.close();
+    if (strcmp(c,"PathFileType") != 0)
+      return false;
+    return true;
+  };
+  
+  /**
+   * Checks if the suffix of @a filename is TRC.
+   */
+  bool TRCFileIO::CanWriteFile(const std::string& filename)
+  {
+    std::string lowercase = filename;
+    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
+    std::string::size_type TRCPos = lowercase.rfind(".trc");
+    if ((TRCPos != std::string::npos) && (TRCPos == lowercase.length() - 4))
+      return true;
+    else
+      return false;
+  };
+  
+  /**
+   * Read the file designated by @a filename and fill @a output.
+   */
+  void TRCFileIO::Read(const std::string& filename, Acquisition::Pointer output)
+  {
+    output->Reset();
+    // Open the stream
+    std::ifstream ifs;
+    ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
+    try
+    {
+      std::string line;
+      ifs.open(filename.c_str());
+    // Check the first header keyword: "PathFileType"
+      std::getline(ifs, line);
+      if (line.substr(0,12).compare("PathFileType") != 0)
+        throw(TRCFileIOException("Invalid TRC file."));
+    // Extract header data
+      // Required TRC keywords : DataRate, NumFrames, NumMarkers, Units, OrigDataStartFrame
+      std::map<std::string, std::string> keywords;
+      std::string k, v;
+      std::getline(ifs, k); // keywords
+      std::getline(ifs, v); // corresponding values
+      int kf2 = -1, kf1 = 0, vf2 = -1, vf1 = 0;
+      char sep = '\t';
+      while(1)
+      {
+        kf2 = k.find(sep, kf2 + 1);
+        vf2 = v.find(sep, vf2 + 1);
+        if ((kf2 == std::string::npos) && (vf2 != std::string::npos)
+            || (kf2 != std::string::npos) && (vf2 == std::string::npos))
+          throw(TRCFileIOException("Error between TRC header keywords and values."));
+        if ((kf2 == std::string::npos) && (vf2 == std::string::npos))
+          break;
+        //std::string ksub = k.substr(kf1, kf2 - kf1);
+        //ksub = ksub.erase(ksub.find_last_not_of(' ') + 1);
+        //ksub = ksub.erase(0, ksub.find_first_not_of(' '));
+        //std::string vsub = v.substr(vf1, vf2 - vf1);
+        //vsub = vsub.erase(vsub.find_last_not_of(' ') + 1);
+        //vsub = vsub.erase(0, vsub.find_first_not_of(' '));
+        //keywords.insert(std::make_pair(ksub, vsub));
+        keywords.insert(std::make_pair(k.substr(kf1, kf2 - kf1), v.substr(vf1, vf2 - vf1)));
+        kf1 = kf2 + 1;
+        vf1 = vf2 + 1;
+      }
+      //for (std::map<std::string, std::string>::const_iterator it = keywords.begin() ; it != keywords.end() ; ++it)
+      //  std::cout << it->first << ": " << it->second << std::endl;
+      std::string num;
+      int numberOfPoints = 0;
+      if (!(num = keywords["NumMarkers"]).empty())
+        numberOfPoints = FromString<int>(num);
+      int numberOfFrames = 0;
+      if (!(num = keywords["NumFrames"]).empty())
+        numberOfFrames = FromString<int>(num);
+      double framerate = 0.0;
+      if (!(num = keywords["DataRate"]).empty())
+        output->SetPointFrequency(FromString<double>(num));
+      if (!(num = keywords["OrigDataStartFrame"]).empty())
+        output->SetFirstFrame(FromString<int>(num));
+      //MetaDataEntry::Pointer pointGr = MetaDataEntry::New("POINT");
+      //output->GetMetaData()->AppendChild(pointGr);
+      if (!(num = keywords["Units"]).empty())
+        output->SetPointUnit(num);
+      else
+      {
+        btkIOErrorMacro(filename, "No 'Units' keyword. Default unit is millimeter (mm)");
+        output->SetPointUnit("mm");
+      }
+      /*
+        pointGr->AppendChild(MetaDataEntry::New("UNITS", num, static_cast<std::string>("Units of distance measurement used by the 3D data")));
+      else
+      {
+        btkIOErrorMacro(filename, "No 'Units' keyword. Default unit is millimeter (mm)");
+        pointGr->AppendChild(MetaDataEntry::New("UNITS", "mm", static_cast<std::string>("Units of distance measurement used by the 3D data")));
+      }
+      */
+      if (numberOfPoints != 0)
+      {
+        std::getline(ifs, line);
+        std::istringstream iss(line.substr(0, line.length() - 1), std::istringstream::in); // No need of the carriage return character
+        std::string buf;
+        std::list<std::string> labels;
+        iss >> buf; // Frame#
+        iss >> buf; // Time
+        while (iss)
+        {
+          std::getline(iss, buf, '\t');
+          if (!buf.empty())
+          {
+            buf = buf.erase(buf.find_last_not_of(' ') + 1);
+            buf = buf.erase(0, buf.find_first_not_of(' '));
+            labels.push_back(buf);
+          }
+        }
+        int numberOfLabels = labels.size();
+        if (numberOfPoints != numberOfLabels)
+        {
+          btkIOErrorMacro(filename, "Mismatch between the number of points and the number of labels extracted. Final number of points corresponds to the number of labels extracted.");
+          numberOfPoints = numberOfLabels;
+        }
+        std::getline(ifs, line); // Coordinate's label (X1, Y1, Z1, ...)
+        output->Init(numberOfPoints, numberOfFrames);
+        std::list<std::string>::const_iterator itLabel = labels.begin();
+        for (PointCollection::Iterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
+        {
+          (*it)->SetLabel(*itLabel);
+          ++itLabel;
+        }
+        for(int i = 0 ; i < numberOfFrames ; ++i)
+        {
+          ifs >> buf; // Frame#
+          ifs >> buf; // Time
+          std::getline(ifs, line);
+          line[0] = ' '; // was '\t'
+          line[line.length() - 1] = '\t'; // was '\n'
+          std::istringstream iss2(line, std::istringstream::in);
+          int j = 1;
+          for (PointCollection::Iterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
+          {
+            std::string x="", y="", z="";
+            std::getline(iss2, x, '\t');
+            std::getline(iss2, y, '\t');
+            std::getline(iss2, z, '\t');
+            
+            if (x.empty() || y.empty() || z.empty()) // occlusion
+            {
+              (*it)->GetValues().coeffRef(i, 0) = 0.0;
+              (*it)->GetValues().coeffRef(i, 1) = 0.0;
+              (*it)->GetValues().coeffRef(i, 2) = 0.0;
+              (*it)->GetResiduals().coeffRef(i) = -1;
+            }
+            else
+            {
+              FromString(x, (*it)->GetValues().coeffRef(i, 0));
+              FromString(y, (*it)->GetValues().coeffRef(i, 1));
+              FromString(z, (*it)->GetValues().coeffRef(i, 2));
+            }
+          }
+          //std::cout << output->GetPoint(0)->GetValues()(i,0) << std::endl; 
+        }
+      }
+      //std::cout << std::endl << std::endl << std::endl << std::endl;
+    }
+    catch (std::fstream::failure& )
+    {
+      std::string excmsg; 
+      if (!ifs.is_open())
+        excmsg = "Invalid file path.";
+      else if (ifs.eof())
+        excmsg = "Unexcepted end of file.";
+      else if(ifs.bad())
+        excmsg = "Loss of integrity of the filestream.";
+      else if(ifs.fail())
+        excmsg = "Internal logic operation error on the stream associated with the file.";
+      else
+        excmsg = "Unknown error associated with the filestream.";
+      
+      if (ifs.is_open()) ifs.close();    
+      throw(TRCFileIOException(excmsg));
+    }
+    catch (TRCFileIOException& )
+    {
+      if (ifs.is_open()) ifs.close(); 
+      throw;
+    }
+    catch (std::exception& e)
+    {
+      if (ifs.is_open()) ifs.close(); 
+      throw(TRCFileIOException("Unexcepted exception occured: " + std::string(e.what())));
+    }
+    catch(...)
+    {
+      if (ifs.is_open()) ifs.close(); 
+      throw(TRCFileIOException("Unknown exception"));
+    }
+  };
+  
+  /**
+   * Write the file designated by @a filename with the content of @a input.
+   */
+  void TRCFileIO::Write(const std::string& filename, Acquisition::Pointer input)
+  {
+    if (input.get() == 0)
+    {
+      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
+      return;
+    }
+    std::ofstream ofs(filename.c_str());
+    if (!ofs)
+      throw(TRCFileIOException("Invalid file path."));
+    int idx = 0;
+    for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+    {
+      if ((*it)->GetFrameNumber() != input->GetPointFrameNumber())
+      {
+        btkIOErrorMacro(filename, "Point #" + ToString(idx) + " frame number is resized to the general number of frames.");
+        (*it)->SetFrameNumber(input->GetPointFrameNumber());
+        ++idx;
+      }
+    }
+    double freq = 100.0;
+    if (input->GetPointFrequency() != 0)
+       freq = input->GetPointFrequency();
+    else
+      btkIOErrorMacro(filename, "Points' frequency is not set. Default frequency is set to 100Hz");
+    double stepTime = 1.0 / freq;
+    ofs << static_cast<std::string>("PathFileType\t4\t(X/Y/Z)\tBTK\t\n");
+    ofs << static_cast<std::string>("DataRate\tCameraRate\tNumFrames\tNumMarkers\tUnits\tOrigDataRate\tOrigDataStartFrame\tOrigNumFrames\t\n");
+    ofs.setf(std::ios::fixed, std::ios::floatfield);
+    ofs.precision(2);
+    ofs << input->GetPointFrequency() /* DataRate */ << "\t"
+        << input->GetPointFrequency() /* CameraRate */ << "\t"
+        << input->GetPointFrameNumber() /* NumFrames */ << "\t"
+        << input->GetPointNumber() /* NumMarkers */ << "\t"
+        << input->GetPointUnit() /* Units */ << "\t" 
+        << freq /* OrigDataRate */ << "\t"
+        << input->GetFirstFrame() /* OrigDataStartFrame */ << "\t"
+        << input->GetPointFrameNumber() /* OrigNumFrames */<< "\t\n";
+    ofs << "Frame#\tTime\t";
+    for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+      ofs << (*it)->GetLabel() << "\t\t\t";
+    ofs << "\n\t\t";
+    idx = 1;
+    for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+    {
+      ofs << "X" << idx << "\t" << "Y" << idx << "\t" << "Z" << idx << "\t";
+      ++idx;
+    }
+    ofs << "\n";
+    double time = 0.0;
+    for (int frame = 0 ; frame < input->GetPointFrameNumber() ; ++frame)
+    {
+      ofs.precision(3);
+      ofs << "\n" << frame + 1 << "\t" << time;
+      ofs.precision(5);
+
+      for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+      {
+        if ((*it)->GetValues().row(frame).isZero() && ((*it)->GetResiduals().coeffRef(frame) == -1))
+          ofs << "\t\t\t";
+        else
+           ofs << "\t" << (*it)->GetValues().coeffRef(frame, 0)
+               << "\t" << (*it)->GetValues().coeffRef(frame, 1)
+               << "\t" << (*it)->GetValues().coeffRef(frame, 2);
+      };
+      ofs << " ";
+      time += stepTime;
+    };
+    ofs << std::endl;
+    ofs.close();
+  };
+  
+  /**
+   * Constructor.
+   */
+  TRCFileIO::TRCFileIO()
+  : AcquisitionFileIO()
+  {
+    this->SetFileType(AcquisitionFileIO::Binary);
+  };
+};
