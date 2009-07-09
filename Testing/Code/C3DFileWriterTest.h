@@ -40,7 +40,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->SetFilename(C3DFilePathIN + "sample01/Eb015pi.c3d");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
-    writer->SetAcquisitionIO(reader->GetAcquisitionIO());
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
+    io->SetWritingFlags(btk::C3DFileIO::None);
+    writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015pi.c3d");
     writer->Update();
@@ -77,7 +79,6 @@ CXXTEST_SUITE(C3DFileWriterTest)
       TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acq2->GetAnalog(1)->GetValues()(i), 0.00001);
     }
 
-    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
 
     TS_ASSERT_EQUALS(acq->GetEventNumber(), 3);
@@ -95,7 +96,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->SetFilename(C3DFilePathIN + "sample01/Eb015pr.c3d");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
-    writer->SetAcquisitionIO(reader->GetAcquisitionIO());
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
+    io->SetWritingFlags(btk::C3DFileIO::None);
+    writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015pr.c3d");
     writer->Update();
@@ -133,7 +136,6 @@ CXXTEST_SUITE(C3DFileWriterTest)
       TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acq2->GetAnalog(1)->GetValues()(i), 0.00001);
     }
 
-    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
   };
 
@@ -143,7 +145,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->SetFilename(C3DFilePathIN + "sample01/Eb015si.c3d");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
-    writer->SetAcquisitionIO(reader->GetAcquisitionIO());
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
+    io->SetWritingFlags(btk::C3DFileIO::None);
+    writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015si.c3d");
     writer->Update();
@@ -171,9 +175,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetAnalog(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
 
-    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
-
   };
 
   CXXTEST_TEST(sample01_Eb015sr_rewrited)
@@ -182,7 +184,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->SetFilename(C3DFilePathIN + "sample01/Eb015sr.c3d");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
-    writer->SetAcquisitionIO(reader->GetAcquisitionIO());
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
+    io->SetWritingFlags(btk::C3DFileIO::None);
+    writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015sr.c3d");
     writer->Update();
@@ -210,7 +214,6 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetAnalog(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
 
-    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
   };
 
@@ -220,7 +223,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->SetFilename(C3DFilePathIN + "sample01/Eb015vi.c3d");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
-    writer->SetAcquisitionIO(reader->GetAcquisitionIO());
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
+    io->SetWritingFlags(btk::C3DFileIO::None);
+    writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015vi.c3d");
     writer->Update();
@@ -248,7 +253,6 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetAnalog(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
 
-    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
   };
 
@@ -258,7 +262,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->SetFilename(C3DFilePathIN + "sample01/Eb015vr.c3d");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
-    writer->SetAcquisitionIO(reader->GetAcquisitionIO());
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
+    io->SetWritingFlags(btk::C3DFileIO::None);
+    writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015vr.c3d");
     writer->Update();
@@ -286,7 +292,6 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetAnalog(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
 
-    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
   };
 
@@ -325,7 +330,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetPoint(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
 
-    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(writer->GetAcquisitionIO());
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
   };
 
@@ -338,7 +343,6 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::Acquisition::Pointer acq = reader->GetOutput();
     acq->ClearPoint();
     acq->ClearEvent();
-    writer->SetAcquisitionIO(reader->GetAcquisitionIO());
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015vr_clearPoint.c3d");
     writer->Update();
@@ -356,8 +360,8 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(0,0), -26.6599, 0.001);
     TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(1,0), -25.8, 0.0001);
 
-    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(writer->GetAcquisitionIO());
+    TS_ASSERT_DELTA(io->GetPointScale(), 0.1, 0.0001);
   };
 
   CXXTEST_TEST(sample01_Eb015vr_clearAll)

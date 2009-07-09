@@ -1033,7 +1033,6 @@ namespace btk
   : AcquisitionFileIO(), 
     m_AnalogChannelScale(),
     m_AnalogZeroOffset()
-
   {
     this->m_PointScale = 0.1;
     this->m_AnalogUniversalScale = 1.0;
@@ -1046,8 +1045,8 @@ namespace btk
     this->SetByteOrder(btk::C3DFileIO::VAX_LittleEndian);
 #else
     this->SetByteOrder(btk::C3DFileIO::IEEE_LittleEndian);
-    this->m_WritingFlags = ScalesFromDataUpdate | MetaDataFromDataUpdate;
 #endif
+    this->m_WritingFlags = ScalesFromDataUpdate | MetaDataFromDataUpdate;  
   };
 
   /*
