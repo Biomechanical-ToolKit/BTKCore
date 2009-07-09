@@ -570,32 +570,35 @@ namespace btk
               this->m_AnalogIntegerFormat = Signed;
           }
           // - ANALOG:OFFSET
-          MetaDataEntry::ConstIterator itAnalogOffset = (*itAnalog)->FindChild("OFFSET");
-          if (itAnalogOffset != (*itAnalog)->End())
+          std::vector<std::string> analogData;
+          MetaDataEntry::CollapseChildrenValues(analogData, *itAnalog, "OFFSET", analogNumber, "0");
+          std::vector<int16_t> analogZeroOffset_t;
+          FromString(analogData, analogZeroOffset_t);
+          unsigned mini = ((analogZeroOffset_t.size() > this->m_AnalogZeroOffset.size()) ? this->m_AnalogZeroOffset.size() : analogZeroOffset_t.size());
+          if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
+          { 
+            for (unsigned inc = 0 ; inc < mini ; ++inc)
+              this->m_AnalogZeroOffset[inc] = static_cast<uint16_t>(analogZeroOffset_t[inc]);
+          }
+          else // signed
           {
-            const std::vector<std::string> dataOffset = (*itAnalogOffset)->GetMetaDataEntryValue()->GetValues();
-            std::vector<int16_t> analogZeroOffset_t;
-            FromString(dataOffset, analogZeroOffset_t);
-            unsigned mini = ((analogZeroOffset_t.size() > this->m_AnalogZeroOffset.size()) ? this->m_AnalogZeroOffset.size() : analogZeroOffset_t.size());
-            if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
-            { 
-              for (unsigned inc = 0 ; inc < mini ; ++inc)
-                this->m_AnalogZeroOffset[inc] = static_cast<uint16_t>(analogZeroOffset_t[inc]);
-            }
-            else // signed
-            {
-              for (unsigned inc = 0 ; inc < mini ; ++inc)
-                this->m_AnalogZeroOffset[inc] = analogZeroOffset_t[inc];
-            }
+            for (unsigned inc = 0 ; inc < mini ; ++inc)
+              this->m_AnalogZeroOffset[inc] = analogZeroOffset_t[inc];
           }
           // - ANALOG:SCALE
-          MetaDataEntry::ConstIterator itAnalogScale = (*itAnalog)->FindChild("SCALE");
-          if (itAnalogScale != (*itAnalog)->End())
-            FromString((*itAnalogScale)->GetMetaDataEntryValue()->GetValues(), this->m_AnalogChannelScale);
+          MetaDataEntry::CollapseChildrenValues(analogData, *itAnalog, "SCALE", analogNumber, "1.0");
+          FromString(analogData, this->m_AnalogChannelScale);
           // - ANALOG:GEN_SCALE
           MetaDataEntry::ConstIterator itAnalogGenScale = (*itAnalog)->FindChild("GEN_SCALE");
           if (itAnalogGenScale != (*itAnalog)->End())
+          {
             FromString((*itAnalogGenScale)->GetMetaDataEntryValue()->GetValue(0), this->m_AnalogUniversalScale);
+            if (this->m_AnalogUniversalScale == 0.0)
+            {
+              btkIOErrorMacro(filename, "Analog universal scaling factor error. Value zero (0) replaced by one (1).");
+              this->m_AnalogUniversalScale = 1.0;
+            }
+          }
         }
         // POINT
         MetaDataEntry::ConstIterator itPoint = root->FindChild("POINT");
@@ -706,10 +709,7 @@ namespace btk
             {
               Acquisition::PointIterator itPt = input->FindPoint(collapsed[j]);
               if (itPt != input->EndPoint())
-              {
                 (*itPt)->SetType(static_cast<Point::Type>(i + 1));
-                //std::cout << std::endl << collapsed[j] << std::endl;
-              }
             }
           }
         }
@@ -718,7 +718,12 @@ namespace btk
         {
           MetaDataEntry::CollapseChildrenValues(collapsed, *itAnalog, "LABELS", analogNumber, "uname*");
           inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-            (*it)->SetLabel(collapsed[inc++]);
+          {
+            (*it)->SetLabel(collapsed[inc]);
+            (*it)->SetOffset(this->m_AnalogZeroOffset[inc]);
+            (*it)->SetScale(this->m_AnalogChannelScale[inc] * this->m_AnalogUniversalScale);
+            ++inc;
+          }
           MetaDataEntry::CollapseChildrenValues(collapsed, *itAnalog, "DESCRIPTIONS", analogNumber);
           inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
           {
@@ -983,11 +988,11 @@ namespace btk
           Acquisition::AnalogConstIterator itA = input->BeginAnalog();
           while (itA != input->EndAnalog())
           {
-            fdf->WriteAnalog(static_cast<float>(
-                (*itA)->GetValues().data()[analogFrame] 
+            fdf->WriteAnalog(
+                (*itA)->GetValues().data()[analogFrame]
                 / this->m_AnalogChannelScale[incChannel]
     						/ this->m_AnalogUniversalScale
-		    				+ this->m_AnalogZeroOffset[incChannel]));
+		    				+ this->m_AnalogZeroOffset[incChannel]);
             ++itA; ++incChannel;
             if ((itA == input->EndAnalog()) && (inc < static_cast<unsigned>(numberSamplesPerAnalogChannel - 1)))
             {
@@ -1030,8 +1035,8 @@ namespace btk
     m_AnalogZeroOffset()
 
   {
-    this->m_PointScale = 0.0;
-    this->m_AnalogUniversalScale = 0.0;
+    this->m_PointScale = 0.1;
+    this->m_AnalogUniversalScale = 1.0;
     this->m_StorageFormat = Float;
     this->m_AnalogIntegerFormat = Signed;
     this->SetFileType(AcquisitionFileIO::Binary);
@@ -1123,8 +1128,12 @@ namespace btk
     return writtenBytes;
   };
 
+  /**
+   * Update scaling factors from acquisition's data.
+   */
   void C3DFileIO::UpdateScalingFactorsFromData(Acquisition::Pointer input)
   {
+    // POINT:SCALE
     double max = 0.0;
     for (Acquisition::PointConstIterator itPoint = input->BeginPoint() ; itPoint != input->EndPoint() ; ++itPoint)
     {
@@ -1138,8 +1147,24 @@ namespace btk
     // Guess to compute a new point scaling factor.
     if (((max > currentMax) || (max <= (currentMax / 2))) && (max != 0))
       this->m_PointScale = max / 32000.0;
+    // ANALOG:SCALE & ANALOG:OFFSET
+    int analogNumber = input->GetAnalogNumber();
+    int inc = 0;
+    this->m_AnalogChannelScale.resize(analogNumber, 1.0);
+    this->m_AnalogZeroOffset.resize(analogNumber, 0);
+    for (Acquisition::AnalogConstIterator itAnalog = input->BeginAnalog() ; itAnalog != input->EndAnalog() ; ++itAnalog)
+    {
+      this->m_AnalogChannelScale[inc] = (*itAnalog)->GetScale();
+      this->m_AnalogZeroOffset[inc] = (*itAnalog)->GetOffset();
+      ++inc;
+    }
+    // ANALOG:GEN_SCALE
+    this->m_AnalogUniversalScale = 1.0;
   };
   
+  /**
+   * Update scaling factors from acquisition's metada.
+   */
   void C3DFileIO::UpdateScalingFactorsFromMetaData(Acquisition::Pointer input)
   {
     int analogNumber = input->GetAnalogNumber();
@@ -1262,6 +1287,9 @@ namespace btk
     }
   };
 
+  /**
+   * Update acquisition's metadata from its data.
+   */
   void C3DFileIO::UpdateMetaDataFromData(Acquisition::Pointer input)
   {
     // POINT group

@@ -157,7 +157,7 @@ namespace btk
         this->m_Bfs->Write(residualAndMask);
 
       };
-      virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<int16_t>(static_cast<float>(v)));};
+      virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<int16_t>(v));};
 
     };
     class FloatFormat : public Format
