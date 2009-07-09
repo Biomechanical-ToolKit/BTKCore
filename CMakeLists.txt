@@ -48,20 +48,6 @@ ELSE(BTK_USE_SYSTEM_EIGEN2)
       ${BTK_SOURCE_DIR}/Utilities/eigen2)
 ENDIF(BTK_USE_SYSTEM_EIGEN2)
 
-# Determine Visulization support
-OPTION(BTK_USE_VISSUPPORT "Build BTK with visualization support." OFF)
-CMAKE_DEPENDENT_OPTION(BTK_USE_VTK "Build VTK support." OFF "BTK_USE_VISSUPPORT" OFF)
-IF(BTK_USE_VTK)
-  FIND_PACKAGE(VTK REQUIRED)
-  IF(VTK_MAJOR_VERSION LESS 5)
-    IF(VTK_MINOR_VERSION LESS 2)
-      MESSAGE(FATAL_ERROR "VTK 5.2 or greater required")
-    ENDIF(VTK_MINOR_VERSION LESS 2)
-  ENDIF(VTK_MAJOR_VERSION LESS 5)
-
-  INCLUDE(${VTK_USE_FILE})
-ENDIF(BTK_USE_VTK)
-
 # The entire BTK tree should use the same include path
 # Create the list of include directories needed for BTK header files.
 INCLUDE(${CMAKE_MODULE_PATH}/btkIncludeDirectories.cmake)
