@@ -122,7 +122,7 @@ namespace btk
    */
 
   /**
-   * Set the analog gain.
+   * Sets the analog gain.
    */
   void Analog::SetGain(Gain g)
   {
@@ -131,6 +131,38 @@ namespace btk
     this->m_Gain = g;
     this->Modified();
   };
+
+  /**
+   * @fn int Analog::GetOffset() const
+   * Returns the analog offset value in bit which represents the 0 value.
+   */
+
+  /**
+   * Sets the analog offset.
+   */
+  void Analog::SetOffset(int o)
+  {
+    if (this->m_Offset == o)
+      return;
+    this->m_Offset = o;
+    this->Modified();
+  }
+
+  /**
+   * @fn double Analog::GetScale() const
+   * Returns the scaling factor which can bu used to transform a ADC value into real value.
+   */
+
+  /**
+   * Set the scaling factor.
+   */
+  void Analog::SetScale(double s)
+  {
+    if (fabs(this->m_Scale - s) <= std::numeric_limits<double>::epsilon())
+      return;
+    this->m_Scale = s;
+    this->Modified();
+  }
 
   /**
    * @fn Pointer Analog::Clone() const
@@ -145,6 +177,8 @@ namespace btk
   : Measure<1>(label, frameNumber), m_Unit("")
   {
     this->m_Gain = g;
+    this->m_Offset = 0;
+    this->m_Scale = 1.0;
   };
 
   /**
@@ -154,6 +188,9 @@ namespace btk
   : Measure<1>(toCopy), m_Unit(toCopy.m_Unit)
   {
     this->m_Gain = toCopy.m_Gain;
+    this->m_Offset = toCopy.m_Offset;
+    this->m_Scale = toCopy.m_Scale;
+
   };
 
 }

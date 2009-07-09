@@ -57,6 +57,10 @@ namespace btk
     BTK_COMMON_EXPORT void SetUnit(const std::string& u);
     Gain GetGain() const {return this->m_Gain;};
     BTK_COMMON_EXPORT void SetGain(Gain g);
+    int GetOffset() const {return this->m_Offset;};
+    BTK_COMMON_EXPORT void SetOffset(int o);
+    double GetScale() const {return this->m_Scale;};
+    BTK_COMMON_EXPORT void SetScale(double s);
     Pointer Clone() const {return Pointer(new Analog(*this));}
     
   protected:
@@ -68,6 +72,8 @@ namespace btk
     
     std::string m_Unit;
     Gain m_Gain;
+    int m_Offset;
+    double m_Scale;
   };
 };
 
