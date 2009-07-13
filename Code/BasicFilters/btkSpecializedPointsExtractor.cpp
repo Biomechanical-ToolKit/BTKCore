@@ -34,7 +34,6 @@
  */
 
 #include "btkSpecializedPointsExtractor.h"
-#include "btkMetaDataEntry.h"
 
 namespace btk
 {

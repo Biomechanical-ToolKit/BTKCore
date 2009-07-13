@@ -34,7 +34,7 @@
  */
 
 #include "btkForcePlatformsExtractor.h"
-#include "btkMetaDataEntry.h"
+#include "btkMetaData.h"
 #include "btkConvert.h"
 
 namespace btk
@@ -116,19 +116,19 @@ namespace btk
     Acquisition::Pointer input = this->GetInput();
     if (input.get() != 0)
     {
-      MetaDataEntry::Iterator itForcePlatformGr = input->GetMetaData()->FindChild("FORCE_PLATFORM");
+      MetaData::Iterator itForcePlatformGr = input->GetMetaData()->FindChild("FORCE_PLATFORM");
       if (itForcePlatformGr != input->GetMetaData()->End())
       {
-        MetaDataEntry::Iterator itUsed = (*itForcePlatformGr)->FindChild("USED");
+        MetaData::Iterator itUsed = (*itForcePlatformGr)->FindChild("USED");
         int numberOfForcePlatforms = 0;
         if (itUsed != (*itForcePlatformGr)->End())
-          FromString((*itUsed)->GetMetaDataEntryValue()->GetValues().front(), numberOfForcePlatforms);
+          numberOfForcePlatforms = (*itUsed)->GetInfo()->ToInt(0);
 
-        MetaDataEntry::Iterator itType = (*itForcePlatformGr)->FindChild("TYPE");
+        MetaData::Iterator itType = (*itForcePlatformGr)->FindChild("TYPE");
         std::vector<int> types = std::vector<int>(numberOfForcePlatforms, 1);
         if (itType != (*itForcePlatformGr)->End())
         {
-          FromString((*itType)->GetMetaDataEntryValue()->GetValues(), types);
+          (*itType)->GetInfo()->ToInt(types);
           if (static_cast<int>(types.size()) < numberOfForcePlatforms)
           {
             btkErrorMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE don't indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:TYPE");
@@ -140,7 +140,7 @@ namespace btk
           }
         }
 
-        MetaDataEntry::Iterator itChannels = (*itForcePlatformGr)->FindChild("CHANNEL");
+        MetaData::Iterator itChannels = (*itForcePlatformGr)->FindChild("CHANNEL");
         if (itChannels == (*itForcePlatformGr)->End())
         {
           btkErrorMacro("No FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force plateform(s). Force plateforms' data are empty.");
@@ -149,8 +149,8 @@ namespace btk
 
         output->SetItemNumber(numberOfForcePlatforms);
 
-        MetaDataEntry::Pointer pOrigin;
-        MetaDataEntry::Iterator itOrigin = (*itForcePlatformGr)->FindChild("ORIGIN");
+        MetaData::Pointer pOrigin;
+        MetaData::Iterator itOrigin = (*itForcePlatformGr)->FindChild("ORIGIN");
         if (itOrigin == (*itForcePlatformGr)->End())
         {
           btkErrorMacro("No FORCE_PLATFORM::ORIGIN entry. Default values are used.");
@@ -158,16 +158,16 @@ namespace btk
         else
           pOrigin = (*itOrigin);
         
-        MetaDataEntry::Pointer pCorners;
-        MetaDataEntry::Iterator itCorners = (*itForcePlatformGr)->FindChild("CORNERS");
+        MetaData::Pointer pCorners;
+        MetaData::Iterator itCorners = (*itForcePlatformGr)->FindChild("CORNERS");
         if (itCorners == (*itForcePlatformGr)->End())
         {
           btkErrorMacro("No FORCE_PLATFORM::CORNERS entry. Default values are used.");
         }
         else
           pCorners = (*itCorners);
-        MetaDataEntry::Pointer pCalMatrix;
-        MetaDataEntry::Iterator itCalMatrix = (*itForcePlatformGr)->FindChild("CAL_MATRIX");
+        MetaData::Pointer pCalMatrix;
+        MetaData::Iterator itCalMatrix = (*itForcePlatformGr)->FindChild("CAL_MATRIX");
         if (itCalMatrix == (*itForcePlatformGr)->End())
         {
           for(int i = 0 ; i < numberOfForcePlatforms ; ++i)
@@ -185,7 +185,7 @@ namespace btk
         ForcePlatformCollection::Iterator itFP = output->Begin();
         AnalogCollection::Pointer analogs = input->GetAnalogs();
         std::vector<int> channelsIndex;
-        FromString((*itChannels)->GetMetaDataEntryValue()->GetValues(), channelsIndex);
+        (*itChannels)->GetInfo()->ToInt(channelsIndex);
         int channelNumberAlreadyExtracted = 0;
         int calMatrixCoefficentNumberAleadyExtracted = 0;
         bool noError = true;
@@ -293,38 +293,38 @@ namespace btk
     }
   };
   
-  void ForcePlatformsExtractor::ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, int idx, int* coefficientsAlreadyExtracted, MetaDataEntry::Pointer pOrigin, MetaDataEntry::Pointer pCorners, MetaDataEntry::Pointer pCalMatrix)
+  void ForcePlatformsExtractor::ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, int idx, int* coefficientsAlreadyExtracted, MetaData::Pointer pOrigin, MetaData::Pointer pCorners, MetaData::Pointer pCalMatrix)
   {
-    MetaDataEntryValue::Pointer pValue;
+    MetaDataInfo::Pointer pValue;
     if (pOrigin.get() != 0)
     {
-      pValue = pOrigin->GetMetaDataEntryValue();
+      pValue = pOrigin->GetInfo();
       if (static_cast<int>(pValue->GetValues().size()) >= 3 * (idx + 1))
       {
-        fp->SetOrigin(FromString<double>(pValue->GetValue(3 * idx)),
-                      FromString<double>(pValue->GetValue(3 * idx + 1)),
-                      FromString<double>(pValue->GetValue(3 * idx + 2)));
+        fp->SetOrigin(pValue->ToDouble(3 * idx),
+                      pValue->ToDouble(3 * idx + 1),
+                      pValue->ToDouble(3 * idx + 2));
       }
     }
     if (pCorners.get() != 0)
     {
-      pValue = pCorners->GetMetaDataEntryValue();
+      pValue = pCorners->GetInfo();
       if (static_cast<int>(pValue->GetValues().size()) >= 12 * (idx + 1))
       {
         for (int i = 0 ; i < 4 ; ++i)
           for (int j = 0 ; j < 3 ; ++j)
-            fp->SetCorner(j, i, FromString<double>(pValue->GetValue(j + i * 3 + idx * 12)));
+            fp->SetCorner(j, i, pValue->ToDouble(j + i * 3 + idx * 12));
       }
     }
     if (pCalMatrix.get() != 0)
     {
-      pValue = pCalMatrix->GetMetaDataEntryValue();
+      pValue = pCalMatrix->GetInfo();
       ForcePlatform::CalMatrix cal = fp->GetCalMatrix();
       if (static_cast<int>(pValue->GetValues().size()) >= (*coefficientsAlreadyExtracted + cal.size()))
       {
         for (int i = 0 ; i < cal.cols() ; ++i)
           for (int j = 0 ; j < cal.rows() ; ++j)
-            cal.coeffRef(j,i) = FromString<double>(pValue->GetValue(j + i * cal.rows() + *coefficientsAlreadyExtracted));
+            cal.coeffRef(j,i) = pValue->ToDouble(j + i * cal.rows() + *coefficientsAlreadyExtracted);
         fp->SetCalMatrix(cal);
       }
       (*coefficientsAlreadyExtracted) += cal.size();
@@ -398,26 +398,26 @@ namespace btk
     return noError;
   };
 /*
-  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType5::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr)
+  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType5::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr)
   {
   };
 
-  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType6::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr)
+  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType6::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr)
   {
 
   };
   */
 /*
-  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType7::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr)
+  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType7::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr)
   {};
 
-  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType11::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr)
+  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType11::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr)
   {};
 
-  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType12::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr)
+  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType12::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr)
   {};
 
-  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType21::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr)
+  void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType21::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr)
   {};
   */
 };

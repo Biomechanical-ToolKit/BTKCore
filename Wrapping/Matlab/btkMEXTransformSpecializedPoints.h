@@ -96,29 +96,7 @@ void btkMEXTransformSpecializedPoints(
 
     const char* info[] = {"frequency", "units"};
     int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
-    char* units = 0;
-    btk::MetaDataEntry::Pointer metadata = acq->GetMetaData();
-    btk::MetaDataEntry::ConstIterator itPoint = metadata->FindChild("POINT");
-    if (itPoint != metadata->End())
-    {
-      btk::MetaDataEntry::ConstIterator itUnit = (*itPoint)->FindChild(label + "_UNITS");
-      if (itUnit != (*itPoint)->End())
-      {
-        btk::MetaDataEntryValue::ConstPointer pointUnit = (*itUnit)->GetMetaDataEntryValue();
-        // Erase blank spaces at the beginning and the end of the string.
-        std::string str = pointUnit->GetValue(0);
-        str = str.erase(str.find_last_not_of(' ') + 1);
-        str = str.erase(0, str.find_first_not_of(' '));
-        units = new char[str.length() + 1];
-        strcpy(units, str.c_str());
-      }
-    }
-    if (units == 0)
-    {
-      //mexWarnMsgTxt("No POINT:UNITS parameter. The makers' unit is empty.");
-      units = new char[1];
-      units[0] = '\0';
-    }
+
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     mxArray* firstFrame  = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
@@ -126,11 +104,9 @@ void btkMEXTransformSpecializedPoints(
     std::string allLabels = "ALL" + label + "S";
     const char* ALL[] = {allLabels.c_str()};
     mxArray* unitsStruct = mxCreateStructMatrix(1, 1, 1, ALL);
-    mxSetFieldByNumber(unitsStruct, 0, 0, mxCreateString((const char*)units));
+    mxSetFieldByNumber(unitsStruct, 0, 0, mxCreateString(acq->GetPointUnit(t).c_str()));
     mxSetFieldByNumber(plhs[1], 0, 0, frequency);
     mxSetFieldByNumber(plhs[1], 0, 1, unitsStruct);
-
-    delete[] units;
   }
 };
 

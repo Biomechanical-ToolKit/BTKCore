@@ -66,15 +66,15 @@ namespace btk
     BTK_BASICFILTERS_EXPORT virtual void GenerateData();
     
   private:
-    void ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, int idx, int* coefficientsAlreadyExtracted, MetaDataEntry::Pointer pOrigin, MetaDataEntry::Pointer pCorners, MetaDataEntry::Pointer pCalMatrix);
+    void ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, int idx, int* coefficientsAlreadyExtracted, MetaData::Pointer pOrigin, MetaData::Pointer pCorners, MetaData::Pointer pCalMatrix);
     bool ExtractForcePlatformData(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex);
     bool ExtractForcePlatformData(ForcePlatformType4::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex);
-    //void ExtractForcePlatformData(ForcePlatformType5::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr);
-    //void ExtractForcePlatformData(ForcePlatformType6::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr);
-    //void ExtractForcePlatformData(ForcePlatformType7::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr);
-    //void ExtractForcePlatformData(ForcePlatformType11::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr);
-    //void ExtractForcePlatformData(ForcePlatformType12::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr);
-    //void ExtractForcePlatformData(ForcePlatformType21::Pointer fp, AnalogCollection::Pointer channels, MetaDataEntry::Pointer fpGr);
+    //void ExtractForcePlatformData(ForcePlatformType5::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
+    //void ExtractForcePlatformData(ForcePlatformType6::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
+    //void ExtractForcePlatformData(ForcePlatformType7::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
+    //void ExtractForcePlatformData(ForcePlatformType11::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
+    //void ExtractForcePlatformData(ForcePlatformType12::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
+    //void ExtractForcePlatformData(ForcePlatformType21::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
 
     ForcePlatformsExtractor(const ForcePlatformsExtractor& ); // Not implemented.
     ForcePlatformsExtractor& operator=(const ForcePlatformsExtractor& ); // Not implemented.

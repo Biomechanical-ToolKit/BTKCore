@@ -28,7 +28,7 @@ CXXTEST_SUITE(ForcePlatformsExtractorTest)
     TS_ASSERT_EQUALS(pf1->GetChannel(4)->GetLabel(), "MY1");
     TS_ASSERT_EQUALS(pf1->GetChannel(5)->GetLabel(), "MZ1");
     btk::ForcePlatform::Origin o1; o1 << -4.4 , 1.9, -21.6;
-    TS_ASSERT_EQUALS(pf1->GetOrigin().isApprox(o1), true);
+    TS_ASSERT_EQUALS(pf1->GetOrigin().isApprox(o1, 0.00001), true);
     btk::ForcePlatform::Corner c11; c11 << 520.0451 , 1242.1694, 0.6219;
     btk::ForcePlatform::Corner c21; c21 << 57.0463 , 1243.1996, 0.6211;
     btk::ForcePlatform::Corner c31; c31 << 58.1765 , 1751.1663, 2.0812;
@@ -50,7 +50,7 @@ CXXTEST_SUITE(ForcePlatformsExtractorTest)
     TS_ASSERT_EQUALS(pf2->GetChannel(4)->GetLabel(), "MY2");
     TS_ASSERT_EQUALS(pf2->GetChannel(5)->GetLabel(), "MZ2");
     btk::ForcePlatform::Origin o2; o2 << -4.06 , 3.81, -20.06;
-    TS_ASSERT_EQUALS(pf2->GetOrigin().isApprox(o2), true);
+    TS_ASSERT_EQUALS(pf2->GetOrigin().isApprox(o2, 0.00001), true);
     btk::ForcePlatform::Corner c12; c12 << 53.6655  , 1139.9977, 1.9204;
     btk::ForcePlatform::Corner c22; c22 << 516.6432 , 1143.3159, 1.2880;
     btk::ForcePlatform::Corner c32; c32 << 520.2825 , 635.3301, 0.1814;
@@ -84,7 +84,7 @@ CXXTEST_SUITE(ForcePlatformsExtractorTest)
     TS_ASSERT_EQUALS(pf1->GetChannel(4)->GetLabel(), "MY1");
     TS_ASSERT_EQUALS(pf1->GetChannel(5)->GetLabel(), "MZ1");
     btk::ForcePlatform::Origin o1; o1 << -1.6 , 0.7, 37.5;
-    TS_ASSERT_EQUALS(pf1->GetOrigin().isApprox(o1), true);
+    TS_ASSERT_EQUALS(pf1->GetOrigin().isApprox(o1, 0.00001), true);
     TS_ASSERT_DELTA(pf1->GetChannel(0)->GetValues()(1), 0.08843, 0.00001);
     TS_ASSERT_DELTA(pf1->GetChannel(0)->GetValues()(3), -0.08843, 0.00001);
     TS_ASSERT_DELTA(pf1->GetChannel(0)->GetValues()(1020), -69.59441, 0.00001);
@@ -124,7 +124,7 @@ CXXTEST_SUITE(ForcePlatformsExtractorTest)
           -0.0020,-0.0050,-0.0020, -3.2500, -0.5940,391.8790;
     TS_ASSERT_EQUALS(pf1->GetCalMatrix().isApprox(cal.transpose(), 0.0001), true);
     btk::ForcePlatform::Origin o1; o1 << -1.6 , 0.7, 37.5;
-    TS_ASSERT_EQUALS(pf1->GetOrigin().isApprox(o1), true);
+    TS_ASSERT_EQUALS(pf1->GetOrigin().isApprox(o1, 0.00001), true);
     
   };
 

@@ -34,6 +34,7 @@
  */
 
 #include "btkC3DFileIO.h"
+#include "btkMetaDataUtils.h"
 #include "btkConvert.h"
 
 #include <fstream>
@@ -368,8 +369,8 @@ namespace btk
       std::vector<uint8_t> dataDim;
       std::list<int8_t> groupIds;
       std::list<int8_t> parameterIds;
-      std::list<MetaDataEntry::Pointer> parameters;
-      MetaDataEntry::Pointer root = input->GetMetaData();
+      std::list<MetaData::Pointer> parameters;
+      MetaData::Pointer root = input->GetMetaData();
       while (1)
       {
         nbCharLabel = ibfs->ReadI8(); totalBytesRead += nbCharLabel + 1;
@@ -387,7 +388,7 @@ namespace btk
         if (id < 0)
         {
           groupIds.push_back(id);
-          MetaDataEntry::Pointer entry = MetaDataEntry::New(label);
+          MetaData::Pointer entry = MetaData::New(label);
           entry->SetUnlockState((nbCharLabel > 0 ? true : false));
           uint8_t nbCharDesc = ibfs->ReadU8(); offset -= 1;
           entry->SetDescription(ibfs->ReadString(nbCharDesc)); offset -= nbCharDesc;
@@ -403,23 +404,23 @@ namespace btk
           int8_t inc = 0 ; while (inc < nbDim) prod *= dataDim[inc++];
           if ((static_cast<int>(prod * abs(type)) >= offset) && (!lastEntry))
             throw(C3DFileIOException("Error in the number of elements in the parameter's data. The number is superior to the offset."));
-          MetaDataEntry::Pointer entry;
+          MetaData::Pointer entry;
           switch (type)
           {
             case -1:
               if (dataDim.size() == 2)
-                entry = MetaDataEntry::New(label, dataDim, ibfs->ReadString(dataDim[1],dataDim[0]), "", (nbCharLabel > 0 ? true : false));
+                entry = MetaData::New(label, dataDim, ibfs->ReadString(dataDim[1],dataDim[0]), "", (nbCharLabel > 0 ? true : false));
               else
-                entry = MetaDataEntry::New(label, dataDim, ibfs->ReadString(1,prod), "", (nbCharLabel > 0 ? true : false));
+                entry = MetaData::New(label, dataDim, ibfs->ReadString(1,prod), "", (nbCharLabel > 0 ? true : false));
               break;
             case 1:
-              entry = MetaDataEntry::New(label, dataDim, ibfs->ReadI8(prod), "", (nbCharLabel > 0 ? true : false));
+              entry = MetaData::New(label, dataDim, ibfs->ReadI8(prod), "", (nbCharLabel > 0 ? true : false));
               break;
             case 2:
-              entry = MetaDataEntry::New(label, dataDim, ibfs->ReadI16(prod), "", (nbCharLabel > 0 ? true : false));
+              entry = MetaData::New(label, dataDim, ibfs->ReadI16(prod), "", (nbCharLabel > 0 ? true : false));
               break;
             case 4:
-              entry = MetaDataEntry::New(label, dataDim, ibfs->ReadFloat(prod), "", (nbCharLabel > 0 ? true : false));
+              entry = MetaData::New(label, dataDim, ibfs->ReadFloat(prod), "", (nbCharLabel > 0 ? true : false));
               break;
             default :
               throw(C3DFileIOException("Data parameter type unknown for the entry: '" + label + "'"));
@@ -446,8 +447,8 @@ namespace btk
           break; // Parameter section end
         ibfs->SeekRead(offset, std::ios_base::cur);
       }
-      std::list<MetaDataEntry::Pointer>::iterator itParameter = parameters.begin();
-      MetaDataEntry::Iterator itGroup = root->Begin();
+      std::list<MetaData::Pointer>::iterator itParameter = parameters.begin();
+      MetaData::Iterator itGroup = root->Begin();
       std::list<int8_t>::iterator itG = groupIds.begin();
       std::list<int8_t>::iterator itP = parameterIds.begin();
       if (!parameterIds.empty())
@@ -482,7 +483,7 @@ namespace btk
         blockNumber = totalBlocksRead;
       }
     // Events in Parameter section
-      MetaDataEntry::ConstIterator itEvent = root->FindChild("EVENT");
+      MetaData::ConstIterator itEvent = root->FindChild("EVENT");
       // Took a chance to find the events in EVENTS group insteat of EVENT
       if (itEvent == root->End())
       {
@@ -492,35 +493,35 @@ namespace btk
       }
       if (itEvent != root->End())
       {
-        MetaDataEntry::ConstIterator itUsed = (*itEvent)->FindChild("USED");
+        MetaData::ConstIterator itUsed = (*itEvent)->FindChild("USED");
         if (itUsed != (*itEvent)->End())
         {
-          int eventsNumber = btk::FromString<int>((*itUsed)->GetMetaDataEntryValue()->GetValue(0));
-          std::vector<std::string> eventsLabel = std::vector<std::string>(eventsNumber);
-          std::vector<std::string> eventsTime = std::vector<std::string>(eventsNumber);
-          std::vector<std::string> eventsContext = std::vector<std::string>(eventsNumber);
+          int eventsNumber = (*itUsed)->GetInfo()->ToInt(0);
+          std::vector<std::string> eventsLabel;
+          std::vector<double> eventsTime;
+          std::vector<std::string> eventsContext;
 
-          std::vector<std::string> eventsSubject = std::vector<std::string>(eventsNumber);
-          std::vector<std::string> eventsDescription = std::vector<std::string>(eventsNumber);
-           MetaDataEntry::CollapseChildrenValues(eventsLabel, *itEvent, "LABELS", eventsNumber, "uname*");
-          MetaDataEntry::CollapseChildrenValues(eventsTime, *itEvent, "TIMES");
+          std::vector<std::string> eventsSubject;
+          std::vector<std::string> eventsDescription;
+           MetaDataCollapseChildrenValues<std::string>(eventsLabel, *itEvent, "LABELS", eventsNumber, "uname*");
+          MetaDataCollapseChildrenValues(eventsTime, *itEvent, "TIMES");
           if (static_cast<int>(eventsTime.size()) < 2 * eventsNumber)
             btkIOErrorMacro(filename, "The EVENT:TIME doesn't contains the appropriate number of values. The extracted times could be corrupted.")
-          eventsTime.resize(2 * eventsNumber,"0");
-          MetaDataEntry::CollapseChildrenValues(eventsContext, *itEvent, "CONTEXTS");
+          eventsTime.resize(2 * eventsNumber, 0.0);
+          MetaDataCollapseChildrenValues(eventsContext, *itEvent, "CONTEXTS");
           eventsContext.resize(eventsNumber,"");
 
-          MetaDataEntry::CollapseChildrenValues(eventsSubject, *itEvent, "SUBJECTS");
+          MetaDataCollapseChildrenValues(eventsSubject, *itEvent, "SUBJECTS");
           eventsSubject.resize(eventsNumber,"");
 
-          MetaDataEntry::CollapseChildrenValues(eventsDescription, *itEvent, "DESCRIPTIONS");
+          MetaDataCollapseChildrenValues(eventsDescription, *itEvent, "DESCRIPTIONS");
           eventsDescription.resize(eventsNumber,"");
           EventCollection::Pointer events = input->GetEvents();
           for (int incEvt = 0 ; incEvt < eventsNumber ; ++incEvt)
           {
             Event::Pointer evt = Event::New(
                 eventsLabel[incEvt],
-                FromString<float>(eventsTime[2 * incEvt]) * 60 + FromString<float>(eventsTime[2 * incEvt + 1]),
+                eventsTime[2 * incEvt] * 60 + eventsTime[2 * incEvt + 1],
                 eventsContext[incEvt],
                 eventsSubject[incEvt],
                 eventsDescription[incEvt]);
@@ -538,14 +539,14 @@ namespace btk
           numberSamplesPerAnalogChannel = 1;
         uint16_t analogNumber = totalAnalogSamplesPer3dFrame / numberSamplesPerAnalogChannel;
         // ANALOG
-        MetaDataEntry::ConstIterator itAnalog = root->FindChild("ANALOG");
+        MetaData::ConstIterator itAnalog = root->FindChild("ANALOG");
         if (itAnalog != root->End())
         {
-          MetaDataEntry::ConstIterator itAnalogUsed = (*itAnalog)->FindChild("USED");
+          MetaData::ConstIterator itAnalogUsed = (*itAnalog)->FindChild("USED");
           if (itAnalogUsed != (*itAnalog)->End())
           {
             int16_t analogUsed;
-            FromString((*itAnalogUsed)->GetMetaDataEntryValue()->GetValue(0), analogUsed);
+            analogUsed = (*itAnalogUsed)->GetInfo()->ToInt(0);
             if (analogNumber != static_cast<uint16_t>(analogUsed))
             {
               btkIOErrorMacro(filename, "The number of analog channels wrote in the header section and in the parameter section are not the same. The value kept is from the parameter section.");
@@ -560,39 +561,31 @@ namespace btk
         if ((analogNumber != 0) && (itAnalog != root->End()))
         {
           // - ANALOG:FORMAT
-          MetaDataEntry::ConstIterator itAnalogFormat = (*itAnalog)->FindChild("FORMAT");
+          MetaData::ConstIterator itAnalogFormat = (*itAnalog)->FindChild("FORMAT");
           if (itAnalogFormat != (*itAnalog)->End())
           {
-            const std::string analogFormat = "UNSIGNED";
-            if ((*itAnalogFormat)->GetMetaDataEntryValue()->GetValue(0).compare(analogFormat) == 0)
+            if ((*itAnalogFormat)->GetInfo()->ToString(0).compare("UNSIGNED") == 0)
               this->m_AnalogIntegerFormat = Unsigned;
             else
               this->m_AnalogIntegerFormat = Signed;
           }
           // - ANALOG:OFFSET
-          std::vector<std::string> analogData;
-          MetaDataEntry::CollapseChildrenValues(analogData, *itAnalog, "OFFSET", analogNumber, "0");
-          std::vector<int16_t> analogZeroOffset_t;
-          FromString(analogData, analogZeroOffset_t);
-          unsigned mini = ((analogZeroOffset_t.size() > this->m_AnalogZeroOffset.size()) ? this->m_AnalogZeroOffset.size() : analogZeroOffset_t.size());
           if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
-          { 
-            for (unsigned inc = 0 ; inc < mini ; ++inc)
-              this->m_AnalogZeroOffset[inc] = static_cast<uint16_t>(analogZeroOffset_t[inc]);
+          {
+           std::vector<int16_t> analogZeroOffset_t;
+           MetaDataCollapseChildrenValues<int16_t>(analogZeroOffset_t, *itAnalog, "OFFSET", analogNumber, 0);
+           for (unsigned inc = 0 ; inc < this->m_AnalogZeroOffset.size() ; ++inc)
+             this->m_AnalogZeroOffset[inc] = static_cast<uint16_t>(analogZeroOffset_t[inc]);
           }
           else // signed
-          {
-            for (unsigned inc = 0 ; inc < mini ; ++inc)
-              this->m_AnalogZeroOffset[inc] = analogZeroOffset_t[inc];
-          }
+            MetaDataCollapseChildrenValues<int>(this->m_AnalogZeroOffset, *itAnalog, "OFFSET", analogNumber, 0);
           // - ANALOG:SCALE
-          MetaDataEntry::CollapseChildrenValues(analogData, *itAnalog, "SCALE", analogNumber, "1.0");
-          FromString(analogData, this->m_AnalogChannelScale);
+          MetaDataCollapseChildrenValues<double>(this->m_AnalogChannelScale, *itAnalog, "SCALE", analogNumber, 1.0);
           // - ANALOG:GEN_SCALE
-          MetaDataEntry::ConstIterator itAnalogGenScale = (*itAnalog)->FindChild("GEN_SCALE");
+          MetaData::ConstIterator itAnalogGenScale = (*itAnalog)->FindChild("GEN_SCALE");
           if (itAnalogGenScale != (*itAnalog)->End())
           {
-            FromString((*itAnalogGenScale)->GetMetaDataEntryValue()->GetValue(0), this->m_AnalogUniversalScale);
+            this->m_AnalogUniversalScale = (*itAnalogGenScale)->GetInfo()->ToDouble(0);
             if (this->m_AnalogUniversalScale == 0.0)
             {
               btkIOErrorMacro(filename, "Analog universal scaling factor error. Value zero (0) replaced by one (1).");
@@ -601,15 +594,15 @@ namespace btk
           }
         }
         // POINT
-        MetaDataEntry::ConstIterator itPoint = root->FindChild("POINT");
+        MetaData::ConstIterator itPoint = root->FindChild("POINT");
         if (itPoint != root->End())
         {
           // POINT:USED
-          MetaDataEntry::ConstIterator itPointUsed = (*itPoint)->FindChild("USED");
+          MetaData::ConstIterator itPointUsed = (*itPoint)->FindChild("USED");
           if (itPointUsed != (*itPoint)->End())
           {
             int16_t pointUsed;
-            FromString((*itPointUsed)->GetMetaDataEntryValue()->GetValue(0), pointUsed);
+            pointUsed = (*itPointUsed)->GetInfo()->ToInt(0);
             if (pointNumber != static_cast<uint16_t>(pointUsed))
             {
               btkIOErrorMacro(filename, "The number of points wrote in the header section and in the parameter section are not the same. The value kept is from the parameter section.");
@@ -617,11 +610,10 @@ namespace btk
             }
           }
           // POINT:SCALE
-          MetaDataEntry::ConstIterator itPointScale = (*itPoint)->FindChild("SCALE");
+          MetaData::ConstIterator itPointScale = (*itPoint)->FindChild("SCALE");
           if (itPointScale != (*itPoint)->End())
           {
-            float pointScale = 0.0;
-            FromString((*itPointScale)->GetMetaDataEntryValue()->GetValue(0), pointScale);
+            float pointScale = (*itPointScale)->GetInfo()->ToFloat(0);
             if (fabs(pointScale - pointScaleFactor) > std::numeric_limits<float>::epsilon())
             {
               btkIOErrorMacro(filename, "The point scaling factor writen in the header and in the parameter POINT:SCALE are not the same. The second value is kept.");
@@ -679,11 +671,11 @@ namespace btk
         if (itPoint != root->End())
         {
           // POINT:LABELS
-          MetaDataEntry::CollapseChildrenValues(collapsed, *itPoint, "LABELS", pointNumber, "uname*");
+          MetaDataCollapseChildrenValues<std::string>(collapsed, *itPoint, "LABELS", pointNumber, "uname*");
           inc = 0; for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
             (*it)->SetLabel(collapsed[inc++]);
           // POINT:DESCRIPTIONS
-          MetaDataEntry::CollapseChildrenValues(collapsed, *itPoint, "DESCRIPTIONS", pointNumber);
+          MetaDataCollapseChildrenValues(collapsed, *itPoint, "DESCRIPTIONS", pointNumber);
           inc = 0; for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
           {
             if (inc >= static_cast<int>(collapsed.size()))
@@ -691,20 +683,20 @@ namespace btk
             (*it)->SetDescription(collapsed[inc++]);
           }
           // POINT:UNITS
-          MetaDataEntry::ConstIterator itPointUnits = (*itPoint)->FindChild("UNITS");
+          MetaData::ConstIterator itPointUnits = (*itPoint)->FindChild("UNITS");
           if (itPointUnits != (*itPoint)->End())
-            input->SetPointUnit((*itPointUnits)->GetMetaDataEntryValue()->GetValue(0));
+            input->SetPointUnit((*itPointUnits)->GetInfo()->ToString(0));
           // POINT type and special units
           const char* names[] = {"ANGLE", "FORCE", "MOMENT", "POWER", "SCALAR", "REACTION"}; 
           int numberOfNames =  sizeof(names) / (sizeof(char) * 4);
           for(int i = 0 ; i < numberOfNames ; ++i)
           {
             // unit
-            MetaDataEntry::ConstIterator itU = (*itPoint)->FindChild(std::string(names[i]) + "_UNITS");
+            MetaData::ConstIterator itU = (*itPoint)->FindChild(std::string(names[i]) + "_UNITS");
             if (itU != (*itPoint)->End())
-              input->SetPointUnit(static_cast<Point::Type>(i + 1), (*itU)->GetMetaDataEntryValue()->GetValue(0));
+              input->SetPointUnit(static_cast<Point::Type>(i + 1), (*itU)->GetInfo()->ToString(0));
             // type
-            MetaDataEntry::CollapseChildrenValues(collapsed, *itPoint, std::string(names[i]) + "S");
+            MetaDataCollapseChildrenValues(collapsed, *itPoint, std::string(names[i]) + "S");
             for (int j = 0 ; j < static_cast<int>(collapsed.size()) ; ++j)
             {
               Acquisition::PointIterator itPt = input->FindPoint(collapsed[j]);
@@ -716,7 +708,7 @@ namespace btk
         // ANALOG Label, description, unit
         if (itAnalog != root->End())
         {
-          MetaDataEntry::CollapseChildrenValues(collapsed, *itAnalog, "LABELS", analogNumber, "uname*");
+          MetaDataCollapseChildrenValues<std::string>(collapsed, *itAnalog, "LABELS", analogNumber, "uname*");
           inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
           {
             (*it)->SetLabel(collapsed[inc]);
@@ -724,14 +716,14 @@ namespace btk
             (*it)->SetScale(this->m_AnalogChannelScale[inc] * this->m_AnalogUniversalScale);
             ++inc;
           }
-          MetaDataEntry::CollapseChildrenValues(collapsed, *itAnalog, "DESCRIPTIONS", analogNumber);
+          MetaDataCollapseChildrenValues(collapsed, *itAnalog, "DESCRIPTIONS", analogNumber);
           inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
           {
             if (inc >= static_cast<int>(collapsed.size()))
               break;
             (*it)->SetDescription(collapsed[inc++]);
           }
-          MetaDataEntry::CollapseChildrenValues(collapsed, *itAnalog, "UNITS", analogNumber);
+          MetaDataCollapseChildrenValues(collapsed, *itAnalog, "UNITS", analogNumber);
           inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
           {
             if (inc >= static_cast<int>(collapsed.size()))
@@ -739,20 +731,19 @@ namespace btk
             (*it)->SetUnit(collapsed[inc++]);
           }
           // - ANALOG:GAIN
-          MetaDataEntry::CollapseChildrenValues(collapsed, *itAnalog, "GAIN");
+          std::vector<int16_t> gains;
+          MetaDataCollapseChildrenValues(gains, *itAnalog, "GAIN");
           inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
           {
-            if (inc >= static_cast<int>(collapsed.size()))
+            if (inc >= static_cast<int>(gains.size()))
               break;
-            int gain;
-            FromString(collapsed[inc], gain);
-            if (gain < 0 || gain > 4)
+            if (gains[inc] < 0 || gains[inc] > 4)
             {
               btkIOErrorMacro(filename, "Unknown gain. If the value corresping to this unknown gain is a real value, please contact a developer to add it in the list.");
               (*it)->SetGain(Analog::Unknown);
             }
             else
-              (*it)->SetGain(static_cast<Analog::Gain>(gain));
+              (*it)->SetGain(static_cast<Analog::Gain>(gains[inc]));
             ++inc;
           }
         }
@@ -914,32 +905,32 @@ namespace btk
       writtenBytes += obfs->Write(static_cast<int8_t>(this->GetByteOrder() + 83));
       // POINT:DATA_START init
       int pointID = -1;
-      MetaDataEntry::Pointer dataStart;
+      MetaData::Pointer dataStart;
       uint16_t dS = 0;
       if (!templateFile)
       {
-        MetaDataEntry::Iterator itPoint = input->GetMetaData()->FindChild("POINT");
+        MetaData::Iterator itPoint = input->GetMetaData()->FindChild("POINT");
         pointID = std::distance(input->GetMetaData()->Begin(), itPoint) + 1;
         dataStart = (*itPoint)->TakeChild("DATA_START");
         if (dataStart.get() == 0)
-          dataStart = MetaDataEntry::New("DATA_START", static_cast<int16_t>(0));
+          dataStart = MetaData::New("DATA_START", static_cast<int16_t>(0));
       }
-      // MetaDataEntry
+      // MetaData
       int id = 1;
-      for (MetaDataEntry::ConstIterator it = input->GetMetaData()->Begin() ; it != input->GetMetaData()->End() ; ++it)
+      for (MetaData::ConstIterator it = input->GetMetaData()->Begin() ; it != input->GetMetaData()->End() ; ++it)
       {
-        writtenBytes += this->WriteMetaDataEntry(obfs, *it, id);
+        writtenBytes += this->WriteMetaData(obfs, *it, id);
         ++id;
       }
       // POINT:DATA_START final
       if (!templateFile)
       {
-        int totalWrittenBytes = writtenBytes + (1 + 1 + dataStart->GetLabel().length() + 2 + 1 + 1 + dataStart->GetMetaDataEntryValue()->GetDimensions().size() + (dataStart->GetMetaDataEntryValue()->GetValues().size() * abs(dataStart->GetMetaDataEntryValue()->GetFormat())) + 1 + dataStart->GetDescription().length());
+        int totalWrittenBytes = writtenBytes + (1 + 1 + dataStart->GetLabel().length() + 2 + 1 + 1 + dataStart->GetInfo()->GetDimensions().size() + (dataStart->GetInfo()->GetValues().size() * abs(dataStart->GetInfo()->GetFormat())) + 1 + dataStart->GetDescription().length());
         totalWrittenBytes += (512 - (totalWrittenBytes % 512));
         uint8_t pNB = static_cast<uint8_t>(totalWrittenBytes / 512);
         dS = 2 + pNB;
-        dataStart->GetMetaDataEntryValue()->SetValues(static_cast<int16_t>(dS));
-        writtenBytes += this->WriteMetaDataEntry(obfs, dataStart, pointID);
+        dataStart->GetInfo()->SetValues(static_cast<int16_t>(dS));
+        writtenBytes += this->WriteMetaData(obfs, dataStart, pointID);
         writtenBytes += obfs->Fill(512 - (writtenBytes % 512));
         // DATA_START is reinserted.
         input->GetMetaData()->GetChild(pointID - 1)->AppendChild(dataStart);
@@ -1052,19 +1043,19 @@ namespace btk
   /*
    * Recursive method to write meta data entry and its children
    */
-  size_t C3DFileIO::WriteMetaDataEntry(BinaryFileStream* obfs, MetaDataEntry::ConstPointer m, int id)
+  size_t C3DFileIO::WriteMetaData(BinaryFileStream* obfs, MetaData::ConstPointer m, int id)
   {
     size_t writtenBytes = 0;
     // Number of characters in the name
 		writtenBytes += obfs->Write(static_cast<int8_t>(m->GetLabel().length() * (m->GetUnlockState() ? 1 : -1)));
-    if (m->HasMetaDataEntryValue()) // Parameter
+    if (m->HasInfo()) // Parameter
     {
   		// ID number
 	  	writtenBytes += obfs->Write(static_cast<int8_t>(id));
 		  // Name
   		writtenBytes += obfs->Write(m->GetLabel());
       // The Offset to the next parameter/group
-      MetaDataEntryValue::ConstPointer mv = m->GetMetaDataEntryValue();
+      MetaDataInfo::ConstPointer mv = m->GetInfo();
 			writtenBytes += obfs->Write(static_cast<uint16_t>(2 + 1 + 1 + mv->GetDimensions().size() + (mv->GetDimensionsProduct() * abs(mv->GetFormat())) + 1 + m->GetDescription().length()));
       // Format
 			writtenBytes += obfs->Write(static_cast<int8_t>(mv->GetFormat()));
@@ -1077,29 +1068,17 @@ namespace btk
 			{
 				case -1:
 					// Not necessary to transform in char
-					writtenBytes += obfs->Write(mv->GetValues());
+					writtenBytes += obfs->Write(mv->ToString());
 					break;
 				case 1:
-          {
-          std::vector<int8_t> values;
-					FromString(mv->GetValues(), values);
-					writtenBytes += obfs->Write(values);
+					writtenBytes += obfs->Write(mv->ToInt8());
 					break;
-          }
 				case 2:
-          {
-					std::vector<int16_t> values;
-					FromString(mv->GetValues(), values);
-					writtenBytes += obfs->Write(values);
+					writtenBytes += obfs->Write(mv->ToInt16());
           break;
-          }
 				case 4:
-          {
-					std::vector<float> values;
-					FromString(mv->GetValues(), values);
-					writtenBytes += obfs->Write(values);
+					writtenBytes += obfs->Write(mv->ToFloat());
           break;
-          }
 				default: // Should be impossible!
 					throw(C3DFileIOException("Parameter's data format unknown."));
 					break;
@@ -1122,8 +1101,8 @@ namespace btk
       // The description
       writtenBytes += obfs->Write(m->GetDescription());
     }
-    for (MetaDataEntry::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
-      writtenBytes += this->WriteMetaDataEntry(obfs, *it, id);
+    for (MetaData::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
+      writtenBytes += this->WriteMetaData(obfs, *it, id);
     return writtenBytes;
   };
 
@@ -1170,7 +1149,7 @@ namespace btk
     if (analogNumber != 0)
     {
       // ANALOG
-      MetaDataEntry::ConstIterator itAnalog = input->GetMetaData()->FindChild("ANALOG");
+      MetaData::ConstIterator itAnalog = input->GetMetaData()->FindChild("ANALOG");
       if (itAnalog == input->GetMetaData()->End())
       {
         btkErrorMacro("No ANALOG group. Impossible to update analog scaling factors.");
@@ -1178,21 +1157,21 @@ namespace btk
       else
       {
         // - ANALOG:FORMAT
-        MetaDataEntry::ConstIterator itAnalogFormat = (*itAnalog)->FindChild("FORMAT");
+        MetaData::ConstIterator itAnalogFormat = (*itAnalog)->FindChild("FORMAT");
         if (itAnalogFormat != (*itAnalog)->End())
         {
           const std::string analogFormat = "UNSIGNED";
-          if ((*itAnalogFormat)->GetMetaDataEntryValue()->GetValue(0).compare(analogFormat) == 0)
+          if ((*itAnalogFormat)->GetInfo()->ToString(0).compare(analogFormat) == 0)
             this->m_AnalogIntegerFormat = Unsigned;
           else
             this->m_AnalogIntegerFormat = Signed;
         }
         // - ANALOG:BITS
-        MetaDataEntry::ConstIterator itAnalogResolution = (*itAnalog)->FindChild("BITS");
+        MetaData::ConstIterator itAnalogResolution = (*itAnalog)->FindChild("BITS");
         if (itAnalogResolution != (*itAnalog)->End())
         {
           int bits;
-          FromString((*itAnalogResolution)->GetMetaDataEntryValue()->GetValue(0), bits);
+          bits = (*itAnalogResolution)->GetInfo()->ToInt(0);
           if ((bits != 8) && (bits != 8) && (bits != 12) && (bits != 14) && (bits != 16))
           {
             btkErrorMacro("Unknown analog resolution. Default resolution (12 bits) added for this acquisition.");
@@ -1202,28 +1181,27 @@ namespace btk
             input->SetAnalogResolution(static_cast<Acquisition::AnalogResolution>(bits));
         }
         // - ANALOG:OFFSET
-        MetaDataEntry::ConstIterator itAnalogOffset = (*itAnalog)->FindChild("OFFSET");
+        MetaData::ConstIterator itAnalogOffset = (*itAnalog)->FindChild("OFFSET");
         if (itAnalogOffset != (*itAnalog)->End())
         {
-          const std::vector<std::string> dataOffset = (*itAnalogOffset)->GetMetaDataEntryValue()->GetValues();
-          if (static_cast<int>(dataOffset.size()) < analogNumber)
+          if (static_cast<int>((*itAnalogOffset)->GetInfo()->GetValues().size()) < analogNumber)
           {
             btkErrorMacro("No enough analog offsets. Impossible to update analog offsets.");
           }
           else
           {
-            std::vector<int16_t> analogZeroOffset_t;
-            FromString(dataOffset, analogZeroOffset_t);
-            unsigned mini = ((analogZeroOffset_t.size() > this->m_AnalogZeroOffset.size()) ? this->m_AnalogZeroOffset.size() : analogZeroOffset_t.size());
             if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
             {
+              std::vector<int16_t> analogZeroOffset_t;
+              (*itAnalogOffset)->GetInfo()->ToInt16(analogZeroOffset_t);
+              unsigned mini = ((analogZeroOffset_t.size() > this->m_AnalogZeroOffset.size()) ? this->m_AnalogZeroOffset.size() : analogZeroOffset_t.size());
               for (unsigned inc = 0 ; inc < mini ; ++inc)
                 this->m_AnalogZeroOffset[inc] = static_cast<uint16_t>(analogZeroOffset_t[inc]);
             }
             else // signed
             {
-              for (unsigned inc = 0 ; inc < mini ; ++inc)
-                this->m_AnalogZeroOffset[inc] = analogZeroOffset_t[inc];
+              (*itAnalogOffset)->GetInfo()->ToInt(this->m_AnalogZeroOffset);
+              this->m_AnalogZeroOffset.resize(analogNumber, 0);
             }
           }
         }
@@ -1232,24 +1210,24 @@ namespace btk
           btkErrorMacro("No ANALOG:OFFSET parameter. Impossible to update analog offsets.");
         }
         // - ANALOG:SCALE
-        MetaDataEntry::ConstIterator itAnalogScale = (*itAnalog)->FindChild("SCALE");
+        MetaData::ConstIterator itAnalogScale = (*itAnalog)->FindChild("SCALE");
         if (itAnalogScale != (*itAnalog)->End())
         {
-          if (static_cast<int>((*itAnalogScale)->GetMetaDataEntryValue()->GetValues().size()) < analogNumber)
+          if (static_cast<int>((*itAnalogScale)->GetInfo()->GetValues().size()) < analogNumber)
           {
             btkErrorMacro("No enough analog scaling factors. Impossible to update analog offsets.");
           }
           else
-            FromString((*itAnalogScale)->GetMetaDataEntryValue()->GetValues(), this->m_AnalogChannelScale);
+            (*itAnalogScale)->GetInfo()->ToDouble(this->m_AnalogChannelScale);
         }
         else
         {
           btkErrorMacro("No ANALOG:SCALE parameter. Impossible to update analog scaling factors.");
         }
         // - ANALOG:GEN_SCALE
-        MetaDataEntry::ConstIterator itAnalogGenScale = (*itAnalog)->FindChild("GEN_SCALE");
+        MetaData::ConstIterator itAnalogGenScale = (*itAnalog)->FindChild("GEN_SCALE");
         if (itAnalogGenScale != (*itAnalog)->End())
-          FromString((*itAnalogGenScale)->GetMetaDataEntryValue()->GetValue(0), this->m_AnalogUniversalScale);
+          this->m_AnalogUniversalScale = (*itAnalogGenScale)->GetInfo()->ToDouble(0);
         else
         {
           btkErrorMacro("No ANALOG:GEN_SCALE parameter. Impossible to update analog scaling factors.");
@@ -1259,7 +1237,7 @@ namespace btk
     if (input->GetPointNumber() != 0)
     {
       // POINT
-      MetaDataEntry::ConstIterator itPoint = input->GetMetaData()->FindChild("POINT");
+      MetaData::ConstIterator itPoint = input->GetMetaData()->FindChild("POINT");
       if (itPoint == input->GetMetaData()->End())
       {
         btkErrorMacro("No POINT group. Impossible to update point scaling factor.");
@@ -1267,11 +1245,10 @@ namespace btk
       else
       {
         // POINT:SCALE
-        MetaDataEntry::ConstIterator itPointScale = (*itPoint)->FindChild("SCALE");
+        MetaData::ConstIterator itPointScale = (*itPoint)->FindChild("SCALE");
         if (itPointScale != (*itPoint)->End())
         {
-          double pointScale = 0.0;
-          FromString((*itPointScale)->GetMetaDataEntryValue()->GetValue(0), pointScale);
+          double pointScale = (*itPointScale)->GetInfo()->ToDouble(0);
           this->m_PointScale = fabs(pointScale);
           if (pointScale > 0)
             this->m_StorageFormat = Integer;
@@ -1293,17 +1270,17 @@ namespace btk
   {
     // POINT group
     // -----------
-    MetaDataEntry::Pointer point = input->GetMetaData()->CreateChild("POINT");
+    MetaData::Pointer point = MetaDataCreateChild(input->GetMetaData(), "POINT");
     int pointNumber = input->GetPointNumber();
     // POINT:USED
-    point->CreateChild("USED", static_cast<int16_t>(pointNumber));
+    MetaDataCreateChild(point, "USED", static_cast<int16_t>(pointNumber));
     // POINT:SCALE
-    point->CreateChild("SCALE", static_cast<float>(this->m_PointScale * static_cast<double>(this->m_StorageFormat)));
+    MetaDataCreateChild(point, "SCALE", static_cast<float>(this->m_PointScale * static_cast<double>(this->m_StorageFormat)));
     // POINT:RATE
-    point->CreateChild("RATE", static_cast<float>(input->GetPointFrequency()));
+    MetaDataCreateChild(point, "RATE", static_cast<float>(input->GetPointFrequency()));
     // POINT:DATA_START (Updated dynamicaly during the file writing)
     // POINT:FRAMES
-    point->CreateChild("FRAMES", static_cast<int16_t>(input->GetPointFrameNumber()));
+    MetaDataCreateChild(point, "FRAMES", static_cast<int16_t>(input->GetPointFrameNumber()));
     // POINT:LABELS & POINT:DESCRIPTIONS (LABELS2, DESCRIPTIONS2, ...)
     std::vector<std::string> labels = std::vector<std::string>(pointNumber);
     std::vector<std::string> descs = std::vector<std::string>(pointNumber);
@@ -1314,10 +1291,10 @@ namespace btk
       descs[inc] = (*itPoint)->GetDescription();
       ++inc;
     }
-    point->CreateChild("LABELS", labels);
-    point->CreateChild("DESCRIPTIONS", descs);
+    MetaDataCreateChild(point, "LABELS", labels);
+    MetaDataCreateChild(point, "DESCRIPTIONS", descs);
     // POINT:UNITS
-    point->CreateChild("UNITS", input->GetPointUnit(Point::Marker));
+    MetaDataCreateChild(point, "UNITS", input->GetPointUnit(Point::Marker));
     // POINT:TYPE_GROUPS (init)
     std::vector<std::string> typeGroups; 
     // POINT:ANGLES & POINT:ANGLE_UNITS
@@ -1332,13 +1309,13 @@ namespace btk
     this->UpdateMetaDataFromSpecializedPoint(input, point, typeGroups, Point::Moment, "MOMENT");
     // POINT:TYPE_GROUPS (final)
     if (!typeGroups.empty())
-      point->CreateChild("TYPE_GROUPS", typeGroups);
+      MetaDataCreateChild(point, "TYPE_GROUPS", typeGroups);
     // ANALOG group
     // ------------
-    MetaDataEntry::Pointer analog = input->GetMetaData()->CreateChild("ANALOG");
+    MetaData::Pointer analog = MetaDataCreateChild(input->GetMetaData(), "ANALOG");
     int analogNumber = input->GetAnalogNumber();
     // ANALOG:USED
-    analog->CreateChild("USED", static_cast<int16_t>(analogNumber));
+    MetaDataCreateChild(analog, "USED", static_cast<int16_t>(analogNumber));
     // ANALOG:LABELS & ANALOG:DESCRIPTIONS & ANALOG:UNITS & ANALOG:GAIN & ANALOG:SCALE & ANALOG:OFFSET (LABELS2, ...)
     labels.resize(analogNumber);
     descs.resize(analogNumber);
@@ -1357,28 +1334,28 @@ namespace btk
       analogZeroOffset[inc] = this->m_AnalogZeroOffset[inc];
       ++inc;
     }
-    analog->CreateChild("LABELS", labels);
-    analog->CreateChild("DESCRIPTIONS", descs);
-    analog->CreateChild("UNITS", units);
-    analog->CreateChild("GAIN", gain);
-    analog->CreateChild("SCALE", analogChannelScale);
-    analog->CreateChild("OFFSET", analogZeroOffset);
+    MetaDataCreateChild(analog, "LABELS", labels);
+    MetaDataCreateChild(analog, "DESCRIPTIONS", descs);
+    MetaDataCreateChild(analog, "UNITS", units);
+    MetaDataCreateChild(analog, "GAIN", gain);
+    MetaDataCreateChild(analog, "SCALE", analogChannelScale);
+    MetaDataCreateChild(analog, "OFFSET", analogZeroOffset);
     // ANALOG:GEN_SCALE
-    analog->CreateChild("GEN_SCALE", static_cast<float>(this->m_AnalogUniversalScale)); 
+    MetaDataCreateChild(analog, "GEN_SCALE", static_cast<float>(this->m_AnalogUniversalScale)); 
     // ANALOG:RATE
-    analog->CreateChild("RATE", static_cast<float>(input->GetAnalogFrequency()));
+    MetaDataCreateChild(analog, "RATE", static_cast<float>(input->GetAnalogFrequency()));
     // ANALOG:FORMAT
-    analog->CreateChild("FORMAT", (this->m_AnalogIntegerFormat == Unsigned ? "UNSIGNED" : "SIGNED"));
+    MetaDataCreateChild(analog, "FORMAT", (this->m_AnalogIntegerFormat == Unsigned ? "UNSIGNED" : "SIGNED"));
     // ANALOG:BITS
-    analog->CreateChild("BITS", static_cast<int16_t>(input->GetAnalogResolution()));
+    MetaDataCreateChild(analog, "BITS", static_cast<int16_t>(input->GetAnalogResolution()));
     // EVENT group
     // -----------
     if (input->GetEventNumber() != 0)
     {
-      MetaDataEntry::Pointer event = input->GetMetaData()->CreateChild("EVENT");
+      MetaData::Pointer event = MetaDataCreateChild(input->GetMetaData(), "EVENT");
       int16_t eventNumber = input->GetEventNumber();
       // EVENT:USED
-      event->CreateChild("USED", eventNumber);
+      MetaDataCreateChild(event, "USED", eventNumber);
       // EVENT:CONTEXTS &
       // EVENT:LABELS &
       // EVENT:DESCRIPTIONS &
@@ -1424,17 +1401,17 @@ namespace btk
         subjects[inc] = (*itEvent)->GetSubject();
         ++inc;
       }
-      event->CreateChild("CONTEXTS", contexts);
-      event->CreateChild("LABELS", labels);
-      event->CreateChild("DESCRIPTIONS", descs);
-      event->CreateChild("TIMES", times);
-      event->CreateChild("SUBJECTS", subjects);
-      event->CreateChild("GENERIC_FLAGS", genericFlags);
+      MetaDataCreateChild(event, "CONTEXTS", contexts);
+      MetaDataCreateChild(event, "LABELS", labels);
+      MetaDataCreateChild(event, "DESCRIPTIONS", descs);
+      MetaDataCreateChild(event, "TIMES", times);
+      MetaDataCreateChild(event, "SUBJECTS", subjects);
+      MetaDataCreateChild(event, "GENERIC_FLAGS", genericFlags);
       // EVENT:ICON_IDS
-      event->CreateChild("ICON_IDS", std::vector<int16_t>(eventNumber,0));
+      MetaDataCreateChild(event, "ICON_IDS", std::vector<int16_t>(eventNumber,0));
       // EVENT_CONTEXT group (special case)
       // -------------------
-      MetaDataEntry::ConstIterator itEventGr = input->GetMetaData()->FindChild("EVENT_CONTEXT");
+      MetaData::ConstIterator itEventGr = input->GetMetaData()->FindChild("EVENT_CONTEXT");
       bool needToUpdate = true;
       bool needToGenerate = true;
       int16_t uniqueEventNumber = uniqueEvents.size();
@@ -1444,14 +1421,14 @@ namespace btk
       std::vector<int16_t> uniqueEventColours;
       if (itEventGr != input->GetMetaData()->End())
       {
-        MetaDataEntry::ConstIterator itEventLabelsPr = (*itEventGr)->FindChild("LABELS");
+        MetaData::ConstIterator itEventLabelsPr = (*itEventGr)->FindChild("LABELS");
         if (itEventLabelsPr != (*itEventGr)->End())
         {
-          MetaDataEntry::ConstIterator itEventIconsPr = (*itEventGr)->FindChild("ICON_IDS");
-          MetaDataEntry::ConstIterator itEventDescsPr = (*itEventGr)->FindChild("DESCRIPTIONS");
-          MetaDataEntry::ConstIterator itEventColoursPr = (*itEventGr)->FindChild("COLOURS");
+          MetaData::ConstIterator itEventIconsPr = (*itEventGr)->FindChild("ICON_IDS");
+          MetaData::ConstIterator itEventDescsPr = (*itEventGr)->FindChild("DESCRIPTIONS");
+          MetaData::ConstIterator itEventColoursPr = (*itEventGr)->FindChild("COLOURS");
           int uniqueEventAppended = 0;
-          uniqueEventsLabel = (*itEventLabelsPr)->GetMetaDataEntryValue()->GetValues();
+          (*itEventLabelsPr)->GetInfo()->ToString(uniqueEventsLabel);
           for (std::vector<std::string>::iterator it1 = uniqueEventsLabel.begin() ; it1 != uniqueEventsLabel.end() ; ++it1)
           {
             bool toCollapse = true;
@@ -1479,13 +1456,13 @@ namespace btk
             needToGenerate = false;
             int totalUniqueEvents = uniqueEventsLabel.size() + uniqueEventAppended;
             if (itEventIconsPr != (*itEventGr)->End())
-              FromString((*itEventIconsPr)->GetMetaDataEntryValue()->GetValues(), uniqueEventsIcon);
+              (*itEventIconsPr)->GetInfo()->ToInt16(uniqueEventsIcon);
             uniqueEventsIcon.resize(totalUniqueEvents, 0);
             if (itEventDescsPr != (*itEventGr)->End())
-              uniqueEventDesc = (*itEventDescsPr)->GetMetaDataEntryValue()->GetValues();
+              (*itEventDescsPr)->GetInfo()->ToString(uniqueEventDesc);
             uniqueEventDesc.resize(totalUniqueEvents, "");
             if (itEventColoursPr != (*itEventGr)->End())
-              FromString((*itEventColoursPr)->GetMetaDataEntryValue()->GetValues(), uniqueEventColours);
+              (*itEventColoursPr)->GetInfo()->ToInt16(uniqueEventColours);
             uniqueEventColours.resize(totalUniqueEvents * 3, 0);
           }
           else
@@ -1504,12 +1481,12 @@ namespace btk
       }
       if (needToUpdate && (uniqueEventNumber != 0))
       {
-        MetaDataEntry::Pointer eventContext = input->GetMetaData()->CreateChild("EVENT_CONTEXT");
-        eventContext->CreateChild("USED", uniqueEventNumber);
-        eventContext->CreateChild("ICON_IDS", uniqueEventsIcon);
-        eventContext->CreateChild("LABELS", uniqueEventsLabel);
-        eventContext->CreateChild("DESCRIPTIONS", uniqueEventDesc);
-        eventContext->CreateChild("COLOURS", uniqueEventColours);
+        MetaData::Pointer eventContext = MetaDataCreateChild(input->GetMetaData(), "EVENT_CONTEXT");
+        MetaDataCreateChild(eventContext, "USED", uniqueEventNumber);
+        MetaDataCreateChild(eventContext, "ICON_IDS", uniqueEventsIcon);
+        MetaDataCreateChild(eventContext, "LABELS", uniqueEventsLabel);
+        MetaDataCreateChild(eventContext, "DESCRIPTIONS", uniqueEventDesc);
+        MetaDataCreateChild(eventContext, "COLOURS", uniqueEventColours);
       }
     }
     else
@@ -1518,7 +1495,7 @@ namespace btk
     }
   };
 
-  void C3DFileIO::UpdateMetaDataFromSpecializedPoint(Acquisition::Pointer input, MetaDataEntry::Pointer point, std::vector<std::string>& typeGroups, Point::Type type, const std::string& label)
+  void C3DFileIO::UpdateMetaDataFromSpecializedPoint(Acquisition::Pointer input, MetaData::Pointer point, std::vector<std::string>& typeGroups, Point::Type type, const std::string& label)
   {
     std::vector<std::string> buffer;
     for (Acquisition::PointConstIterator itPoint = input->BeginPoint() ; itPoint != input->EndPoint() ; ++itPoint)
@@ -1530,8 +1507,8 @@ namespace btk
     {
       std::string labels = label + "S";
       std::string labelUnits = label + "_UNITS";
-      point->CreateChild(labels, buffer);
-      point->CreateChild(labelUnits, input->GetPointUnit(type));
+      MetaDataCreateChild(point, labels, buffer);
+      MetaDataCreateChild(point, labelUnits, input->GetPointUnit(type));
       typeGroups.push_back(labels); typeGroups.push_back(labelUnits);
     }
   };

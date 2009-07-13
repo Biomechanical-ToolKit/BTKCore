@@ -150,19 +150,19 @@ namespace btk
    */
 
   /**
-   * @fn MetaDataEntry::Pointer Acquisition::GetMetaData()
+   * @fn MetaData::Pointer Acquisition::GetMetaData()
    * Returns the metadata.
    */ 
   
   /**
-   * @fn MetaDataEntry::ConstPointer Acquisition::GetMetaData() const
+   * @fn MetaData::ConstPointer Acquisition::GetMetaData() const
    * Returns the metadata.
    */
   
   /**
    * Sets the metadata of the acquisition.
    */
-  void Acquisition::SetMetaData(MetaDataEntry::Pointer metaData)
+  void Acquisition::SetMetaData(MetaData::Pointer metaData)
   {
     if (this->mp_MetaData == metaData)
       return;
@@ -721,7 +721,7 @@ namespace btk
     this->m_PointFrequency = 0;
     this->m_PointFrameNumber = 0;
     this->m_AnalogSampleNumberPerPointFrame = 1;
-    this->mp_MetaData = MetaDataEntry::New("ROOT");
+    this->mp_MetaData = MetaData::New("ROOT");
     this->mp_MetaData->SetParent(this);
     this->m_AnalogResolution = Bit12;
     this->m_Units.resize(7,"");
@@ -861,7 +861,7 @@ namespace btk
     this->m_Events = EventCollection::New();
     this->m_Points = PointCollection::New();
     this->m_Analogs = AnalogCollection::New();
-    this->mp_MetaData = MetaDataEntry::New("ROOT");
+    this->mp_MetaData = MetaData::New("ROOT");
     this->mp_MetaData->SetParent(this);
     this->m_FirstFrame = 1;
     this->m_PointFrequency = 0;

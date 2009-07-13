@@ -91,11 +91,11 @@ namespace btk
     BTK_IO_EXPORT C3DFileIO();
     
   private:
-    BTK_IO_EXPORT size_t WriteMetaDataEntry(BinaryFileStream* obfs, MetaDataEntry::ConstPointer, int id);
+    BTK_IO_EXPORT size_t WriteMetaData(BinaryFileStream* obfs, MetaData::ConstPointer, int id);
     BTK_IO_EXPORT void UpdateScalingFactorsFromData(Acquisition::Pointer input);
     BTK_IO_EXPORT void UpdateScalingFactorsFromMetaData(Acquisition::Pointer input);
     BTK_IO_EXPORT void UpdateMetaDataFromData(Acquisition::Pointer input);
-    BTK_IO_EXPORT void UpdateMetaDataFromSpecializedPoint(Acquisition::Pointer input, MetaDataEntry::Pointer, std::vector<std::string>& typeGroups, Point::Type type, const std::string& label);
+    BTK_IO_EXPORT void UpdateMetaDataFromSpecializedPoint(Acquisition::Pointer input, MetaData::Pointer point, std::vector<std::string>& typeGroups, Point::Type type, const std::string& label);
 
     C3DFileIO(const C3DFileIO& ); // Not implemented.
     C3DFileIO& operator=(const C3DFileIO& ); // Not implemented.

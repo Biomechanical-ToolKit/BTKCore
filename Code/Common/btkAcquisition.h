@@ -37,7 +37,7 @@
 #define __btkAcquisition_h
 
 #include "btkDataObject.h"
-#include "btkMetaDataEntry.h"
+#include "btkMetaData.h"
 #include "btkEventCollection.h"
 #include "btkPointCollection.h"
 #include "btkAnalogCollection.h"
@@ -60,8 +60,8 @@ namespace btk
     typedef PointCollection::ConstIterator PointConstIterator;
     typedef AnalogCollection::Iterator AnalogIterator;
     typedef AnalogCollection::ConstIterator AnalogConstIterator;
-    typedef std::list<MetaDataEntry::Pointer>::iterator MetaDataIterator;
-    typedef std::list<MetaDataEntry::Pointer>::const_iterator MetaDataConstIterator;
+    typedef std::list<MetaData::Pointer>::iterator MetaDataIterator;
+    typedef std::list<MetaData::Pointer>::const_iterator MetaDataConstIterator;
     
     static Pointer New() {return Pointer(new Acquisition());};
     
@@ -72,9 +72,9 @@ namespace btk
     MetaDataConstIterator BeginMetaData() const {return this->mp_MetaData->Begin();};
     MetaDataIterator EndMetaData() {return this->mp_MetaData->End();};
     MetaDataConstIterator EndMetaData() const {return this->mp_MetaData->End();};
-    MetaDataEntry::Pointer GetMetaData() {return this->mp_MetaData;};
-    MetaDataEntry::ConstPointer GetMetaData() const {return this->mp_MetaData;};
-    BTK_COMMON_EXPORT void SetMetaData(MetaDataEntry::Pointer metaData);
+    MetaData::Pointer GetMetaData() {return this->mp_MetaData;};
+    MetaData::ConstPointer GetMetaData() const {return this->mp_MetaData;};
+    BTK_COMMON_EXPORT void SetMetaData(MetaData::Pointer metaData);
     
     // Event
     EventIterator BeginEvent() {return this->m_Events->Begin();};
@@ -159,7 +159,7 @@ namespace btk
     BTK_COMMON_EXPORT void SetAnalogFrameNumber(int frameNumber);
     
   private:
-    MetaDataEntry::Pointer mp_MetaData;
+    MetaData::Pointer mp_MetaData;
     EventCollection::Pointer m_Events;
     PointCollection::Pointer m_Points;
     AnalogCollection::Pointer m_Analogs;

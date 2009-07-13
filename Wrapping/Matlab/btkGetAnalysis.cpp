@@ -54,35 +54,35 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  btk::MetaDataEntry::Pointer metadata = acq->GetMetaData();
-  btk::MetaDataEntry::ConstIterator itAnalysis = metadata->FindChild("ANALYSIS");
+  btk::MetaData::Pointer metadata = acq->GetMetaData();
+  btk::MetaData::ConstIterator itAnalysis = metadata->FindChild("ANALYSIS");
 
   char** fieldnames = 0;
   int numberOfParameters = 0;
   std::vector< std::vector<std::string> > entryValues = std::vector< std::vector<std::string> >(0);
-  std::vector<float> parameterValues = std::vector<float>(0);
+  std::vector<double> parameterValues = std::vector<double>(0);
 
   const char* names[] = {"NAMES", "CONTEXTS", "SUBJECTS", "UNITS"};
   int numberOfNames =  sizeof(names) / (sizeof(char) * 4);
   
   if (itAnalysis != metadata->End())
   {
-    btk::MetaDataEntry::ConstIterator itUsed = (*itAnalysis)->FindChild("USED");
+    btk::MetaData::ConstIterator itUsed = (*itAnalysis)->FindChild("USED");
     if (itUsed != (*itAnalysis)->End())
     {
-      numberOfParameters = btk::FromString<int>((*itUsed)->GetMetaDataEntryValue()->GetValue(0));
+      numberOfParameters = (*itUsed)->GetInfo()->ToInt(0);
       entryValues = std::vector< std::vector<std::string> >(numberOfNames, std::vector<std::string>(numberOfParameters));
       for (int inc = 0 ; inc < numberOfNames ; ++inc)
       {
-        btk::MetaDataEntry::ConstIterator it = (*itAnalysis)->FindChild(names[inc]);
+        btk::MetaData::ConstIterator it = (*itAnalysis)->FindChild(names[inc]);
         int num = 0;
         if (it != (*itAnalysis)->End())
         {
-          num = ((numberOfParameters > static_cast<int>((*it)->GetMetaDataEntryValue()->GetValues().size())) ? static_cast<int>((*it)->GetMetaDataEntryValue()->GetValues().size()) : numberOfParameters);
+          num = ((numberOfParameters > static_cast<int>((*it)->GetInfo()->GetValues().size())) ? static_cast<int>((*it)->GetInfo()->GetValues().size()) : numberOfParameters);
           for (int i = 0 ; i < num ; ++i)
           {
             std::string& str = entryValues[inc][i];
-            str = (*it)->GetMetaDataEntryValue()->GetValue(i);
+            str = (*it)->GetInfo()->ToString(i);
             str = str.erase(str.find_last_not_of(' ') + 1);
             str = str.erase(0, str.find_first_not_of(' '));
           }
@@ -129,14 +129,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         //++incLabel;
       }
       // values
-      btk::MetaDataEntry::ConstIterator itValues = (*itAnalysis)->FindChild("VALUES");
-      parameterValues = std::vector<float>(numberOfParameters, 0);
+      btk::MetaData::ConstIterator itValues = (*itAnalysis)->FindChild("VALUES");
       if (itValues != (*itAnalysis)->End())
       {
-        std::vector<std::string> str = (*itValues)->GetMetaDataEntryValue()->GetValues();
-        int num = ((numberOfParameters > static_cast<int>(str.size())) ? static_cast<int>(str.size()) : numberOfParameters);
-        for (int inc = 0 ; inc < num ; ++inc)
-          parameterValues[inc] = btk::FromString<float>(str[inc]);
+        parameterValues = (*itValues)->GetInfo()->ToDouble();
+        if (static_cast<int>(parameterValues.size()) < numberOfParameters)
+        {
+          btkErrorMacro("Some parameters has no values. Data may be corrupted.");
+          parameterValues.resize(numberOfParameters, 0.0);
+        }
       }
     }
   }

@@ -53,15 +53,9 @@ CXXTEST_SUITE(C3DFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetEvent(2)->GetLabel(), "RTO");
     TS_ASSERT_DELTA(acq->GetEvent(2)->GetTime(), 7.32, 0.0001);
 
-    /*
-    for (int i = 0 ; i < 10 ; ++i)
-    {
-      for (int j = 0 ; j < 3 ; ++j)
-        std::cout << acq->GetPoint(0)->GetValues()(i,j) << " ";
-      std::cout << "| "<< acq->GetPoint(0)->GetResiduals()(i) << "\n";
-    }
-    std::cout << std::endl;
-     */
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());    
+    TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
+    
   };
   
   CXXTEST_TEST(Sample01_Eb015si)
@@ -573,4 +567,5 @@ CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample22_BKINtechnologies)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_dynamic)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_standing)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_type1)
+
 #endif
