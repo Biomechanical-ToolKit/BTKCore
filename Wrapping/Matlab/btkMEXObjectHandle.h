@@ -36,10 +36,11 @@
 #ifndef __btkMEXObjectHandle_h
 #define __btkMEXObjectHandle_h
 
-#include "btkSharedPtr.h"
+#include "btkMEXClassID.h"
+
+#include <btkSharedPtr.h>
 
 #include <mex.h>
-#include <typeinfo>
 #include <list>
 
 namespace btk
@@ -53,9 +54,10 @@ namespace btk
     static MEXObjectHandle* FromMEXHandle(const mxArray* ma);
 
     MEXObjectHandle(SharedPtr<T> ptr)
-    : mp_Type(&typeid(T)), m_Object(ptr)
+    : m_Object(ptr)
     {
       //mexPrintf("MEXObjectHandle::MEXObjectHandle\n");
+      this->m_ClassID = MEXClassID<T>();
       this->mp_Signature = this; 
       MEXHandleCollector<T>::RegisterHandle(this);
     } 
@@ -70,8 +72,8 @@ namespace btk
     SharedPtr<T> GetObject() const {return this->m_Object;};  
 
   private:
-    MEXObjectHandle* mp_Signature; 
-    const std::type_info* mp_Type;
+    MEXObjectHandle* mp_Signature;
+    int m_ClassID;
     SharedPtr<T> m_Object;
 
     friend class MEXHandleCollector<T>;
@@ -88,8 +90,8 @@ namespace btk
     };
 
     ~MEXHandleCollector()
-     {
-      for(std::list<MEXObjectHandle<T>*>::iterator it = this->m_Objects.begin() ; it != this->m_Objects.end() ; ++it)
+    {
+      for(typename std::list<MEXObjectHandle<T>*>::iterator it = this->m_Objects.begin() ; it != this->m_Objects.end() ; ++it)
        {
         if ((*it)->mp_Signature == *it) // check for valid signature
           delete *it;
@@ -159,9 +161,9 @@ namespace btk
     if (obj->mp_Signature != obj) // check memory has correct signature
       mexErrMsgTxt("Parameter does not represent an MEXObjectHandle object.");
 
-    if (*(obj->mp_Type) != typeid(T)) // check type 
+    if (obj->m_ClassID != MEXClassID<T>()) // check type 
      {
-      mexPrintf("Given: <%s>, Required: <%s>.\n", obj->mp_Type->name(), typeid(T).name());
+      mexPrintf("Given: <%i>, Required: <%i>.\n", obj->m_ClassID, MEXClassID<T>());
       mexErrMsgTxt("Given MEXObjectHandle does not represent the correct type.");
     }
 
