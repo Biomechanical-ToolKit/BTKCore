@@ -42,6 +42,7 @@
 #define __btkMacro_h
 
 #include <iostream>
+#include <cstring>
 
 #if defined(_WIN32)
   #define btkStripPathMacro(f) \

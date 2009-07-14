@@ -1,6 +1,6 @@
-# First release build with CMAKE 2.6.3.
+# First release build with CMAKE 2.6.2.
 # The prior versions of CMAKE have not been tested
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6.3)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6.2)
 # BTK: Biomechanical ToolKit
 PROJECT(BTK)
 

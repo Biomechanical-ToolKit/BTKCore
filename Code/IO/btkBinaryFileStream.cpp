@@ -35,6 +35,8 @@
 
 #include "btkBinaryFileStream.h"
 
+#include <cstring>
+
 namespace btk
 {
   /** 
