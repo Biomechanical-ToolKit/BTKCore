@@ -70,7 +70,7 @@ mxArray* btkMEXAdaptMeasures(typename btk::Collection<T>::Pointer m, char*** fie
   (*fieldnamesPtr) = new char*[numberOfMeasures];
   char** fieldnames = *fieldnamesPtr;
   int inc = 0;
-  for(itemCollection::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
+  for(typename itemCollection::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
   {
     std::string originalLabel = (*it)->GetLabel();
     std::string convertedLabel = std::string(originalLabel.length(), '_');
@@ -110,7 +110,7 @@ mxArray* btkMEXAdaptMeasures(typename btk::Collection<T>::Pointer m, char*** fie
   {
     inc = 0;
     typename T::ConstPointer firstItem = m->GetItem(0);
-    for(itemCollection::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
+    for(typename itemCollection::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
     {
       mxArray* measure = mxCreateDoubleMatrix(firstItem->GetFrameNumber(), firstItem->GetValues().cols(), mxREAL);
       memcpy(mxGetPr(measure), (*it)->GetValues().data(), mxGetNumberOfElements(measure) * sizeof(double));

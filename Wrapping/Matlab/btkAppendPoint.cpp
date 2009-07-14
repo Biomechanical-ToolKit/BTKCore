@@ -40,6 +40,9 @@
 #include <btkPoint.h>
 #include <btkConvert.h>
 
+#include <algorithm>
+#include <cctype>
+
 // btkAppendPoint(h, type, label, values, residual, mask, description)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -97,20 +100,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
   char* type = (char*)mxMalloc(strlen);
   mxGetString(prhs[1], type, strlen);
+  std::string uppercase = std::string(type);
+  std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
   btk::Point::Type t;
-  if (strcmpi(type, "MARKER") == 0)
+  if (uppercase.compare("MARKER") == 0)
     t = btk::Point::Marker;
-  else if(strcmpi(type, "ANGLE") == 0)
+  else if(uppercase.compare("ANGLE") == 0)
     t = btk::Point::Angle;
-  else if(strcmpi(type, "FORCE") == 0)
+  else if(uppercase.compare("FORCE") == 0)
     t = btk::Point::Force;
-  else if(strcmpi(type, "MOMENT") == 0)
+  else if(uppercase.compare("MOMENT") == 0)
     t = btk::Point::Moment;
-  else if(strcmpi(type, "POWER") == 0)
+  else if(uppercase.compare("POWER") == 0)
     t = btk::Point::Power;
-  else if(strcmpi(type, "SCALAR") == 0)
+  else if(uppercase.compare("SCALAR") == 0)
     t = btk::Point::Scalar;
-  else if(strcmpi(type, "REACTION") == 0)
+  else if(uppercase.compare("REACTION") == 0)
     t = btk::Point::Reaction;
   else
   {

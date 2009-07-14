@@ -1,5 +1,5 @@
 % Biomechanical Toolbox 
-% Version 0.1.0 22-Apr-2009
+% Version 0.1.0 17-Jul-2009
 %
 % Table of Contents (T0C)
 % -----------------------

@@ -40,17 +40,22 @@
 #include <btkAcquisitionFileWriter.h>
 #include <btkAcquisitionFileIOFactory.h>
 
+#include <algorithm>
+#include <cctype>
+
 const std::string extractByteOrderOption(const mxArray* opt, btk::AcquisitionFileIO::ByteOrder* b)
 {
   std::string errMsg;
   int strlen = (mxGetM(opt) * mxGetN(opt) * sizeof(mxChar)) + 1;
   char* option = (char*)mxMalloc(strlen);
   mxGetString(opt, option, strlen);
-  if (strcmpi(option, "IEEE_BigEndian") == 0)
+  std::string uppercase = std::string(option);
+  std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
+  if (uppercase.compare("IEEE_BIGENDIAN") == 0)
     *b = btk::AcquisitionFileIO::IEEE_BigEndian;
-  else if (strcmpi(option, "IEEE_LittleEndian") == 0)
+  else if (uppercase.compare("IEEE_LITTLEENDIAN") == 0)
     *b = btk::AcquisitionFileIO::IEEE_LittleEndian;
-  else if (strcmpi(option, "VAX_LittleEndian") == 0)
+  else if (uppercase.compare("VAX_LITTLEENDIAN") == 0)
     *b = btk::AcquisitionFileIO::VAX_LittleEndian;
   else
     errMsg = "Unknown ByteOrder option: '" + std::string(option) + "'";
@@ -64,9 +69,11 @@ const std::string extractStorageFormatOption(const mxArray* opt, btk::Acquisitio
   int strlen = (mxGetM(opt) * mxGetN(opt) * sizeof(mxChar)) + 1;
   char* option = (char*)mxMalloc(strlen);
   mxGetString(opt, option, strlen);
-  if (strcmpi(option, "Float") == 0)
+  std::string uppercase = std::string(option);
+  std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
+  if (uppercase.compare("FLOAT") == 0)
     *s = btk::AcquisitionFileIO::Float;
-  else if (strcmpi(option, "Integer") == 0)
+  else if (uppercase.compare("INTEGER") == 0)
     *s = btk::AcquisitionFileIO::Integer;
   else
     errMsg = "Unknown StorageFormat option: '" + std::string(option) + "'";
@@ -94,7 +101,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::AcquisitionFileIO::StorageFormat storageFormatOption = btk::AcquisitionFileIO::StorageNotApplicable;
   std::string errMsg;
   
-  const char* options[] = {"ByteOrder", "StorageFormat"};
+  const char* options[] = {"BYTEORDER", "STORAGEFORMAT"};
   int numberOfOptions =  sizeof(options) / (sizeof(char) * 4);
   for (int i = 2 ; i < nrhs ; i += 2)
   {
@@ -104,7 +111,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int j = 0;
     for (j = 0 ; j < numberOfOptions ; ++j)
     {
-      if (strcmpi(option, options[j]) == 0)
+      std::string uppercase = std::string(option);
+      std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
+      if (uppercase.compare(options[j]) == 0)
       {
         switch(j)
         {
