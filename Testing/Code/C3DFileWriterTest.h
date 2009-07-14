@@ -887,18 +887,18 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_DELTA(acq->GetPoint(14)->GetResiduals()(20), 1.91667, 0.0001);
   };
 
-  CXXTEST_TEST(sample09_PluginC3D_rewrited)
+  CXXTEST_TEST(sample09_PlugInC3D_rewrited)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "sample09/PluginC3D.c3d");
+    reader->SetFilename(C3DFilePathIN + "sample09/PlugInC3D.c3d");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
     writer->SetAcquisitionIO(reader->GetAcquisitionIO());
     writer->SetInput(reader->GetOutput());
-    writer->SetFilename(C3DFilePathOUT + "sample09_PluginC3D.c3d");
+    writer->SetFilename(C3DFilePathOUT + "sample09_PlugInC3D.c3d");
     writer->Update();
     btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
-    reader2->SetFilename(C3DFilePathOUT + "sample09_PluginC3D.c3d");
+    reader2->SetFilename(C3DFilePathOUT + "sample09_PlugInC3D.c3d");
     reader2->Update();
 
     btk::Acquisition::Pointer acq = reader->GetOutput();
@@ -1018,7 +1018,7 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015vr_from_Eb015pi)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015vr_from_Eb015sr)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015sr_from_Eb015pr)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015pr_from_Eb015vr)
-CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample09_PluginC3D_rewrited)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample09_PlugInC3D_rewrited)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample19_sample19_rewrited)  
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertTRC2C3D)
 #endif

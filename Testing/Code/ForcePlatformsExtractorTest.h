@@ -131,7 +131,7 @@ CXXTEST_SUITE(ForcePlatformsExtractorTest)
   CXXTEST_TEST(FileSample19Sample19)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "sample19/Sample19.c3d");
+    reader->SetFilename(C3DFilePathIN + "sample19/sample19.c3d");
     btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
     pfe->SetInput(reader->GetOutput());
     btk::ForcePlatformCollection::Pointer pfc = pfe->GetOutput();

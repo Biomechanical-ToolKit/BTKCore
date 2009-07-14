@@ -44,6 +44,8 @@ namespace btk
   class ForcePlatform : public DataObject
   {
   public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     typedef Eigen::Matrix<double, 3, 4> Corners;
     typedef Eigen::Matrix<double, 3, 1> Corner;
     typedef Eigen::Matrix<double, 3, 1> Origin;

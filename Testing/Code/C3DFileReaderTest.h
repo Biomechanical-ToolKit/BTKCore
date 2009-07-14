@@ -517,21 +517,21 @@ CXXTEST_SUITE(C3DFileReaderTest)
   CXXTEST_TEST(Sample28_dynamic)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "sample28/dynamic.c3d");
+    reader->SetFilename(C3DFilePathIN + "sample28/dynamic.C3D");
     reader->Update();
   };
 
   CXXTEST_TEST(Sample28_standing)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "sample28/standing.c3d");
+    reader->SetFilename(C3DFilePathIN + "sample28/standing.C3D");
     reader->Update();
   };
 
   CXXTEST_TEST(Sample28_type1)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "sample28/type1.c3d");
+    reader->SetFilename(C3DFilePathIN + "sample28/type1.C3D");
     reader->Update();
   };
 };
