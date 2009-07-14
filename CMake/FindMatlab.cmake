@@ -1,9 +1,15 @@
 # - Try to find a version of Matlab and headers/library required by the 
-#   used compiler. It determines the right MEX-File extension.
-# This module detects a Matlab's version between Matlab 7.0 (R14) and 
-# Matlab 7.9 (r2009b).
+#   used compiler. It determines the right MEX-File extension and add 
+#   a macro to help the build of MEX-functions.
+#
+# For Windows, this module detects a Matlab's version between Matlab 7.0 
+# (R14) and Matlab 7.9 (r2009b). 
+# The Unix part of this module doesn't detect the Matlab version. To use it,
+# it is necessary to set the MATLAB_ROOT with the path of the Matlab
+# installation.
 #
 # This module defines: 
+#  MATLAB_ROOT: Matlab installation path
 #  MATLAB_INCLUDE_DIR: include path for mex.h, engine.h
 #  MATLAB_MEX_LIBRARY: path to libmex.lib
 #  MATLAB_MX_LIBRARY:  path to libmx.lib
@@ -16,18 +22,15 @@
 #  - function's name which will be called in Matlab;
 #  - C/C++ source files;
 #  - third libraries required.
-#
-# This module was tested with Matlab 7.0, 7.4 and 7.7 on a win32 system 
-# with the compiler cl 9.0 (Microsoft Visual C++ Express edition 2008).
 
 # Copyright (c) 2009 Arnaud Barré <arnaud.barre@gmail.com>
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-IF(MATLAB_INCLUDE_DIR AND MATLAB_LIBRARIES)
+IF(MATLAB_ROOT AND MATLAB_INCLUDE_DIR AND MATLAB_LIBRARIES)
    # in cache already
    SET(Matlab_FIND_QUIETLY TRUE)
-ENDIF(MATLAB_INCLUDE_DIR AND MATLAB_LIBRARIES)
+ENDIF(MATLAB_ROOT AND MATLAB_INCLUDE_DIR AND MATLAB_LIBRARIES)
 
 IF(WIN32)
   SET(MATLAB_PATHS 
@@ -67,6 +70,11 @@ IF(WIN32)
   ELSE(CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$")
     MESSAGE("Matlab Mex files are only supported by MS Visual Studio")
   ENDIF(CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$")
+
+  # LIBMEX, LIBMX, LIBENG names
+  SET(LIBMEX "libmex")
+  SET(LIBMX "libmx")
+  SET(LIBENG "libeng")
 ELSE(WIN32)
   # MEX files extension
   IF(APPLE)
@@ -75,50 +83,38 @@ ELSE(WIN32)
     ELSE(CMAKE_OSX_ARCHITECTURES MATCHES i386)
       SET(MATLAB_MEXFILE_EXT mexmac)
     ENDIF(CMAKE_OSX_ARCHITECTURES MATCHES i386)
+    SET(LIBMEX "libmex.dylib")
+    SET(LIBMX "libmx.dylib")
+    SET(LIBENG "libeng.dylib")
    ELSE(APPLE)
     SET(MATLAB_MEXFILE_EXT mexglx)
+    SET(LIBMEX "libmex.so")
+    SET(LIBMX "libmx.so")
+    SET(LIBENG "libeng.so")
   ENDIF(APPLE)
 
-  MESSAGE(STATUS "FindMatlab.cmake needs a way to determine the Matlab version on Linux/Apple.\nYou should need to set MATLAB_ENG_LIBRARY, MATLAB_MX_LIBRARY, MATLAB_MEX_LIBRARY\n and MATLAB_INCLUDE_DIR manualy.")
-  SET(MATLAB_VERSION "Matlab-7.8")
+  FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS})
   IF(CMAKE_SIZEOF_VOID_P EQUAL 4)
     # Regular x86
-    SET(MATLAB_ROOT
-      /usr/local/${MATLAB_VERSION}/bin/glnx86/
-      /opt/${MATLAB_VERSION}/bin/glnx86/
-      $ENV{HOME}/${MATLAB_VERSION}/bin/glnx86/
-      $ENV{HOME}/redhat-matlab/bin/glnx86/
-      )
+    SET(MATLAB_LIBRARIES_PATHS "${MATLAB_ROOT}/bin/glnx86")
   ELSE(CMAKE_SIZEOF_VOID_P EQUAL 4)
     # AMD64:
-    SET(MATLAB_ROOT
-      /usr/local/${MATLAB_VERSION}/bin/glnxa64/
-      /opt/${MATLAB_VERSION}/bin/glnxa64/
-      $ENV{HOME}/matlab7_64/bin/glnxa64/
-      $ENV{HOME}/${MATLAB_VERSION}/bin/glnxa64/
-      $ENV{HOME}/redhat-matlab/bin/glnxa64/
-      )
+    SET(MATLAB_LIBRARIES_PATHS "${MATLAB_ROOT}/bin/glnxa64")
   ENDIF(CMAKE_SIZEOF_VOID_P EQUAL 4)
 
-  SET(MATLAB_LIBRARIES_PATHS
-    ${MATLAB_ROOT})
-  SET(MATLAB_INCLUDE_PATHS 
-    "/usr/local/${MATLAB_VERSION}/extern/include/"
-    "/opt/${MATLAB_VERSION}/extern/include/"
-    "$ENV{HOME}/${MATLAB_VERSION}/extern/include/"
-    "$ENV{HOME}/redhat-matlab/extern/include/")
+  SET(MATLAB_INCLUDE_PATHS "${MATLAB_ROOT}/extern/include/")
 ENDIF(WIN32)
 
 FIND_LIBRARY(MATLAB_MEX_LIBRARY
-    libmex
+    ${LIBMEX}
     ${MATLAB_LIBRARIES_PATHS}
     )
 FIND_LIBRARY(MATLAB_MX_LIBRARY
-    libmx
+    ${LIBMX}
     ${MATLAB_LIBRARIES_PATHS}
     )
 FIND_LIBRARY(MATLAB_ENG_LIBRARY
-    libeng
+    ${LIBENG}
     ${MATLAB_LIBRARIES_PATHS}
     )
 FIND_PATH(MATLAB_INCLUDE_DIR
@@ -134,7 +130,6 @@ SET(MATLAB_LIBRARIES
 )
 
 # Macros for building MEX-files
-
 MACRO(MATLAB_EXTRACT_SOURCES_LIBRARIES sources thirdlibraries)
   SET(${sources})
   SET(${thirdlibraries})
@@ -161,7 +156,7 @@ MACRO(MATLAB_MEX_CREATE functionname)
 ENDMACRO(MATLAB_MEX_CREATE)
 
 INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(Matlab DEFAULT_MSG MATLAB_INCLUDE_DIR MATLAB_MEX_LIBRARY MATLAB_MX_LIBRARY MATLAB_ENG_LIBRARY)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(Matlab DEFAULT_MSG MATLAB_ROOT MATLAB_INCLUDE_DIR MATLAB_MEX_LIBRARY MATLAB_MX_LIBRARY MATLAB_ENG_LIBRARY)
 
 MARK_AS_ADVANCED(
   MATLAB_ROOT
@@ -170,5 +165,5 @@ MARK_AS_ADVANCED(
   MATLAB_ENG_LIBRARY
   MATLAB_LIBRARIES
   MATLAB_INCLUDE_DIR
-  MATLAB_MEXFILE_EXT:
+  MATLAB_MEXFILE_EXT
 )
