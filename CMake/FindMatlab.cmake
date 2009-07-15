@@ -94,6 +94,9 @@ ELSE(WIN32)
   ENDIF(APPLE)
 
   FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS})
+  IF("${MATLAB_ROOT}" STREQUAL "MATLAB_ROOT-NOTFOUND")
+    MESSAGE(FATAL_ERROR "On Linux/MacOS system, it is required to set the Matlab installation path in the MATLAB_ROOT variable")
+  ENDIF("${MATLAB_ROOT}" STREQUAL "MATLAB_ROOT-NOTFOUND")
   IF(CMAKE_SIZEOF_VOID_P EQUAL 4)
     # Regular x86
     SET(MATLAB_LIBRARIES_PATHS "${MATLAB_ROOT}/bin/glnx86")
