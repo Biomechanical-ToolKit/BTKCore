@@ -667,20 +667,45 @@ namespace btk
     // Label, description, unit and type
         int inc = 0; 
         std::vector<std::string> collapsed;
+        bool c3dFromMotion = false;
         // POINT Label, description, unit
         if (itPoint != root->End())
         {
-          // POINT:LABELS
-          MetaDataCollapseChildrenValues<std::string>(collapsed, *itPoint, "LABELS", pointNumber, "uname*");
-          inc = 0; for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
-            (*it)->SetLabel(collapsed[inc++]);
-          // POINT:DESCRIPTIONS
-          MetaDataCollapseChildrenValues(collapsed, *itPoint, "DESCRIPTIONS", pointNumber);
-          inc = 0; for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+          // NOTE: C3D files exported from "Motion Analysis Corp." softwares (EvaRT, Cortex) seem to use POINT:LABELS and POINTS:DESCRIPTIONS as a short and long version of the points' label respecively. Point's Label used in EvaRT and Cortex correspond to values stored in POINTS:DESCRIPTIONS. To distinguish C3D files exported from "Motion Analysis Corp." softwares, it is possible to check the value in the parameter MANUFACTURER:Company.     
+          MetaData::Iterator itManufacturer = root->FindChild("MANUFACTURER");
+          if (itManufacturer != root->End())
           {
-            if (inc >= static_cast<int>(collapsed.size()))
-              break;
-            (*it)->SetDescription(collapsed[inc++]);
+            MetaData::Iterator itCompany = (*itManufacturer)->FindChild("Company");
+            if (itCompany != (*itManufacturer)->End())
+            {
+              if ((*itCompany)->GetInfo()->ToString(0).compare("Motion Analysis Corp.") == 0)
+              {
+                c3dFromMotion = true;
+                root->RemoveChild(itManufacturer);
+              }
+            }
+          }
+          if (!c3dFromMotion)
+          {
+            // POINT:LABELS
+            MetaDataCollapseChildrenValues<std::string>(collapsed, *itPoint, "LABELS", pointNumber, "uname*");
+            inc = 0; for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+              (*it)->SetLabel(collapsed[inc++]);
+            // POINT:DESCRIPTIONS
+            MetaDataCollapseChildrenValues(collapsed, *itPoint, "DESCRIPTIONS", pointNumber);
+            inc = 0; for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+            {
+              if (inc >= static_cast<int>(collapsed.size()))
+                break;
+              (*it)->SetDescription(collapsed[inc++]);
+            }
+          }
+          else
+          {
+            // POINT:LABELS
+            MetaDataCollapseChildrenValues<std::string>(collapsed, *itPoint, "DESCRIPTIONS", pointNumber, "uname*");
+            inc = 0; for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+              (*it)->SetLabel(collapsed[inc++]);
           }
           // POINT:UNITS
           MetaData::ConstIterator itPointUnits = (*itPoint)->FindChild("UNITS");
@@ -708,20 +733,34 @@ namespace btk
         // ANALOG Label, description, unit
         if (itAnalog != root->End())
         {
-          MetaDataCollapseChildrenValues<std::string>(collapsed, *itAnalog, "LABELS", analogNumber, "uname*");
-          inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+          if (!c3dFromMotion)
           {
-            (*it)->SetLabel(collapsed[inc]);
-            (*it)->SetOffset(this->m_AnalogZeroOffset[inc]);
-            (*it)->SetScale(this->m_AnalogChannelScale[inc] * this->m_AnalogUniversalScale);
-            ++inc;
+            MetaDataCollapseChildrenValues<std::string>(collapsed, *itAnalog, "LABELS", analogNumber, "uname*");
+            inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+            {
+              (*it)->SetLabel(collapsed[inc]);
+              (*it)->SetOffset(this->m_AnalogZeroOffset[inc]);
+              (*it)->SetScale(this->m_AnalogChannelScale[inc] * this->m_AnalogUniversalScale);
+              ++inc;
+            }
+            MetaDataCollapseChildrenValues(collapsed, *itAnalog, "DESCRIPTIONS", analogNumber);
+            inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+            {
+              if (inc >= static_cast<int>(collapsed.size()))
+                break;
+              (*it)->SetDescription(collapsed[inc++]);
+            }
           }
-          MetaDataCollapseChildrenValues(collapsed, *itAnalog, "DESCRIPTIONS", analogNumber);
-          inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+          else
           {
-            if (inc >= static_cast<int>(collapsed.size()))
-              break;
-            (*it)->SetDescription(collapsed[inc++]);
+            MetaDataCollapseChildrenValues<std::string>(collapsed, *itAnalog, "DESCRIPTIONS", analogNumber, "uname*");
+            inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+            {
+              (*it)->SetLabel(collapsed[inc]);
+              (*it)->SetOffset(this->m_AnalogZeroOffset[inc]);
+              (*it)->SetScale(this->m_AnalogChannelScale[inc] * this->m_AnalogUniversalScale);
+              ++inc;
+            }
           }
           MetaDataCollapseChildrenValues(collapsed, *itAnalog, "UNITS", analogNumber);
           inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
@@ -911,9 +950,14 @@ namespace btk
       {
         MetaData::Iterator itPoint = input->GetMetaData()->FindChild("POINT");
         pointID = std::distance(input->GetMetaData()->Begin(), itPoint) + 1;
-        dataStart = (*itPoint)->TakeChild("DATA_START");
-        if (dataStart.get() == 0)
+        MetaData::Iterator itDataStart = (*itPoint)->FindChild("DATA_START");
+        if (itDataStart == (*itPoint)->End())
           dataStart = MetaData::New("DATA_START", static_cast<int16_t>(0));
+        else
+        {
+          dataStart = (*itDataStart);
+          (*itPoint)->RemoveChild(itDataStart);
+        }
       }
       // MetaData
       int id = 1;
