@@ -792,7 +792,9 @@ namespace btk
   {
     std::string u = units;
     u = u.erase(u.find_last_not_of(' ') + 1);
-    u = u.erase(0, u.find_first_not_of(' ')); 
+    u = u.erase(0, u.find_first_not_of(' '));
+    u = u.erase(u.find_last_not_of(static_cast<char>(0x00)) + 1);
+    u = u.erase(0, u.find_first_not_of(static_cast<char>(0x00)));  
     if (this->m_Units[t].compare(u) == 0)
       return;
     this->m_Units[t] = u;
