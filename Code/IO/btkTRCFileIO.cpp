@@ -215,7 +215,6 @@ namespace btk
           line[0] = ' '; // was '\t'
           line[line.length() - 1] = '\t'; // was '\n'
           std::istringstream iss2(line, std::istringstream::in);
-          int j = 1;
           for (PointCollection::Iterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
           {
             std::string x="", y="", z="";
@@ -288,7 +287,7 @@ namespace btk
       return;
     }
     std::ofstream ofs(filename.c_str());
-    if (!ofs)
+    if (!ofs) 
       throw(TRCFileIOException("Invalid file path."));
     int idx = 0;
     for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
@@ -306,8 +305,8 @@ namespace btk
     else
       btkIOErrorMacro(filename, "Points' frequency is not set. Default frequency is set to 100Hz");
     double stepTime = 1.0 / freq;
-    ofs << static_cast<std::string>("PathFileType\t4\t(X/Y/Z)\tBTK\t\n");
-    ofs << static_cast<std::string>("DataRate\tCameraRate\tNumFrames\tNumMarkers\tUnits\tOrigDataRate\tOrigDataStartFrame\tOrigNumFrames\t\n");
+    ofs << static_cast<std::string>("PathFileType\t4\t(X/Y/Z)\t") << btkStripPathMacro(filename.c_str());
+    ofs << static_cast<std::string>("\t\nDataRate\tCameraRate\tNumFrames\tNumMarkers\tUnits\tOrigDataRate\tOrigDataStartFrame\tOrigNumFrames\t\n");
     ofs.setf(std::ios::fixed, std::ios::floatfield);
     ofs.precision(2);
     ofs << input->GetPointFrequency() /* DataRate */ << "\t"
@@ -333,7 +332,7 @@ namespace btk
     for (int frame = 0 ; frame < input->GetPointFrameNumber() ; ++frame)
     {
       ofs.precision(3);
-      ofs << "\n" << frame + 1 << "\t" << time;
+      ofs << std::endl << frame + 1 << "\t" << time;
       ofs.precision(5);
 
       for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)

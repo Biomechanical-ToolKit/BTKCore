@@ -37,7 +37,6 @@
 #define __btkTRCFileIO_h
 
 #include "btkAcquisitionFileIO.h"
-#include "btkBinaryFileStream.h"
 #include "btkException.h"
 
 namespace btk
