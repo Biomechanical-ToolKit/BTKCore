@@ -61,15 +61,15 @@ IF(WIN32)
     "${MATLAB_ROOT}/extern/include")
 
   # MEX files extension
-  IF(CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$")
+  IF((CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$") OR (CMAKE_CXX_COMPILER MATCHES "^.*cl$"))
     IF(OLD_WIN_MEXFILE_EXT)
       SET(MATLAB_MEXFILE_EXT dll)
     ELSE(OLD_WIN_MEXFILE_EXT)
       SET(MATLAB_MEXFILE_EXT mexw32)
     ENDIF (OLD_WIN_MEXFILE_EXT)
-  ELSE(CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$")
-    MESSAGE("Matlab Mex files are only supported by MS Visual Studio")
-  ENDIF(CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$")
+  ELSE((CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$") OR (CMAKE_CXX_COMPILER MATCHES "^.*cl$"))
+    MESSAGE(FATAL_ERROR "Matlab Mex files are only supported by MS Visual Studio")
+  ENDIF((CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$") OR (CMAKE_CXX_COMPILER MATCHES "^.*cl$"))
 
   # LIBMEX, LIBMX, LIBENG names
   SET(LIBMEX "libmex")

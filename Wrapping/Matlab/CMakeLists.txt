@@ -65,9 +65,17 @@ IF(NOT BTK_INSTALL_NO_DEVELOPMENT)
           PATTERN ".svn" EXCLUDE
           PATTERN ".DS_Store" EXCLUDE)
 
-  INSTALL(DIRECTORY "${BTK_LIBRARY_PATH}/"
-           DESTINATION "${BTK_INSTALL_SHARE_DIR_CM24}/Wrapping/Matlab/btk"
-          COMPONENT Development
-          FILES_MATCHING PATTERN "*.${MATLAB_MEXFILE_EXT}")
+  # Fix a problem with this installation method and the use of the MS Visual Studio generators.
+  IF(CMAKE_CXX_COMPILER MATCHES "^.*cl$")
+    INSTALL(DIRECTORY "${BTK_LIBRARY_PATH}/@BUILD_TYPE@/"
+            DESTINATION "${BTK_INSTALL_SHARE_DIR_CM24}/Wrapping/Matlab/btk"
+            COMPONENT Development
+            FILES_MATCHING PATTERN "*.${MATLAB_MEXFILE_EXT}")
+  ELSE(CMAKE_CXX_COMPILER MATCHES "^.*cl$")
+    INSTALL(DIRECTORY "${BTK_LIBRARY_PATH}/"
+            DESTINATION "${BTK_INSTALL_SHARE_DIR_CM24}/Wrapping/Matlab/btk"
+            COMPONENT Development
+            FILES_MATCHING PATTERN "*.${MATLAB_MEXFILE_EXT}")
+  ENDIF(CMAKE_CXX_COMPILER MATCHES "^.*cl$")
 ENDIF(NOT BTK_INSTALL_NO_DEVELOPMENT)
 
