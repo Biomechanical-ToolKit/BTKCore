@@ -776,7 +776,7 @@ namespace btk
           {
             if (inc >= static_cast<int>(gains.size()))
               break;
-            if (gains[inc] < 0 || gains[inc] > 4)
+            if (gains[inc] < 0 || gains[inc] > 5)
             {
               btkIOErrorMacro(filename, "Unknown gain. If the value corresping to this unknown gain is a real value, please contact a developer to add it in the list.");
               (*it)->SetGain(Analog::Unknown);

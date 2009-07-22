@@ -158,6 +158,11 @@ namespace btk
    */
   void Analog::SetScale(double s)
   {
+    if (s == 0.0)
+    {
+      btkErrorMacro("Impossible to set a scaling factor to 0.");
+      return;
+    }
     if (fabs(this->m_Scale - s) <= std::numeric_limits<double>::epsilon())
       return;
     this->m_Scale = s;

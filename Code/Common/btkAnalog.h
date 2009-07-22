@@ -37,13 +37,14 @@
 #define __btkAnalog_h
 
 #include "btkMeasure.h"
+#include "btkMacro.h"
 
 namespace btk
 {
   class Analog : public Measure<1>
   {
   public:
-    typedef enum {Unknown = 0, PlusMinus10, PlusMinus5, PlusMinus2Dot5, PlusMinus1Dot25} Gain;
+    typedef enum {Unknown = 0, PlusMinus10, PlusMinus5, PlusMinus2Dot5, PlusMinus1Dot25, PlusMinus1} Gain;
 
     typedef SharedPtr<Analog> Pointer;
     typedef SharedPtr<const Analog> ConstPointer;
