@@ -168,6 +168,7 @@ namespace btk
           pCorners = (*itCorners);
         MetaData::Pointer pCalMatrix;
         MetaData::Iterator itCalMatrix = (*itForcePlatformGr)->FindChild("CAL_MATRIX");
+        int calMatrixStep = 0;
         if (itCalMatrix == (*itForcePlatformGr)->End())
         {
           for(int i = 0 ; i < numberOfForcePlatforms ; ++i)
@@ -180,7 +181,10 @@ namespace btk
           }
         }
         else
+        {
           pCalMatrix = (*itCalMatrix);
+          calMatrixStep = pCalMatrix->GetInfo()->GetDimension(0) * pCalMatrix->GetInfo()->GetDimension(1);
+        }
 
         ForcePlatformCollection::Iterator itFP = output->Begin();
         AnalogCollection::Pointer analogs = input->GetAnalogs();
@@ -196,29 +200,29 @@ namespace btk
           {
           case 1:
             (*itFP) = ForcePlatformType1::New();
-            this->ExtractForcePlatformDataCommon((*itFP), i, &calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+            this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
             //calMatrixCoefficentNumberAleadyExtracted *= (6 * 6);
             noError = this->ExtractForcePlatformData((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 2:
             (*itFP) = ForcePlatformType2::New();
-            this->ExtractForcePlatformDataCommon((*itFP), i, &calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+            this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
             //calMatrixCoefficentNumberAleadyExtracted *= (6 * 6);
             noError = this->ExtractForcePlatformData((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 3:
             (*itFP) = ForcePlatformType3::New();
-            this->ExtractForcePlatformDataCommon((*itFP), i, &calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+            this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
             //calMatrixCoefficentNumberAleadyExtracted *= (8 * 8);
             noError = this->ExtractForcePlatformData((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 4:
             {
             ForcePlatformType4::Pointer fp4 = ForcePlatformType4::New();
-            this->ExtractForcePlatformDataCommon(fp4, i, &calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+            this->ExtractForcePlatformDataCommon(fp4, i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
             //ForcePlatformType4::CalMatrix cal = fp4->GetCalMatrix();
             //fp4->SetCalMatrix(cal);
-            //this->ExtractForcePlatformDataCalibrationMatrix(fp4, i, &calMatrixCoefficentNumberAleadyExtracted, (*itCalMatrix));
+            //this->ExtractForcePlatformDataCalibrationMatrix(fp4, i, calMatrixCoefficentNumberAleadyExtracted, (*itCalMatrix));
             noError = this->ExtractForcePlatformData(fp4, analogs, &channelNumberAlreadyExtracted, channelsIndex);
             (*itFP) = fp4;
             }
@@ -288,12 +292,13 @@ namespace btk
 
           }
           ++itFP;
+          calMatrixCoefficentNumberAleadyExtracted += calMatrixStep;
         }
       }
     }
   };
   
-  void ForcePlatformsExtractor::ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, int idx, int* coefficientsAlreadyExtracted, MetaData::Pointer pOrigin, MetaData::Pointer pCorners, MetaData::Pointer pCalMatrix)
+  void ForcePlatformsExtractor::ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, int idx, int coefficientsAlreadyExtracted, MetaData::Pointer pOrigin, MetaData::Pointer pCorners, MetaData::Pointer pCalMatrix)
   {
     MetaDataInfo::Pointer pValue;
     if (pOrigin.get() != 0)
@@ -320,14 +325,13 @@ namespace btk
     {
       pValue = pCalMatrix->GetInfo();
       ForcePlatform::CalMatrix cal = fp->GetCalMatrix();
-      if (static_cast<int>(pValue->GetValues().size()) >= (*coefficientsAlreadyExtracted + cal.size()))
+      if (static_cast<int>(pValue->GetValues().size()) >= (coefficientsAlreadyExtracted + cal.size()))
       {
         for (int i = 0 ; i < cal.cols() ; ++i)
           for (int j = 0 ; j < cal.rows() ; ++j)
-            cal.coeffRef(j,i) = pValue->ToDouble(j + i * cal.rows() + *coefficientsAlreadyExtracted);
+            cal.coeffRef(j,i) = pValue->ToDouble(j + i * cal.rows() + coefficientsAlreadyExtracted);
         fp->SetCalMatrix(cal);
       }
-      (*coefficientsAlreadyExtracted) += cal.size();
     }
     else if (fp->GetType() > 3)
       btkErrorMacro("No calibration matrix for force platform #" + ToString(idx) + ". Its data won't be scaled.");
