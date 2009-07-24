@@ -69,7 +69,7 @@ namespace btk
     BTK_IO_EXPORT void SetFilename(const std::string& filename);
     AcquisitionFileIO::Pointer GetAcquisitionIO() {return this->m_AcquisitionIO;};
     AcquisitionFileIO::ConstPointer GetAcquisitionIO() const {return this->m_AcquisitionIO;};
-    BTK_IO_EXPORT void SetAcquisitionIO(AcquisitionFileIO::Pointer io);
+    BTK_IO_EXPORT void SetAcquisitionIO(AcquisitionFileIO::Pointer io = AcquisitionFileIO::Pointer());
   
   protected:
     BTK_IO_EXPORT AcquisitionFileReader();

@@ -65,7 +65,7 @@ namespace btk
     void SetInput(CollectionPointer input) {this->SetNthInput(0, input);};
     ItemPointer GetOutput() {return this->GetOutput(0);};
     
-    int GetIndex() {return this->m_Index;};
+    int GetIndex() const {return this->m_Index;};
     void SetIndex(int idx);
     
   protected:
@@ -86,7 +86,7 @@ namespace btk
   /**
    * @class MeasureFrameExtractor
    * @brief Extracts a frame from a collection of btk::Measure objects
-   * @tparam T Must be a class which inherit of btk::Measure
+   * @tparam T Must be a class inheriting of btk::Measure
    *
    * @ingroup BTKBasicFilters
    */
@@ -147,7 +147,7 @@ namespace btk
    */
   
   /**
-   * @fn template <class T> int MeasureFrameExtractor<T>::GetIndex()
+   * @fn template <class T> int MeasureFrameExtractor<T>::GetIndex() const
    * Gets the index of the frame to extract.
    */
   
@@ -157,6 +157,8 @@ namespace btk
   template <class T>
   void MeasureFrameExtractor<T>::SetIndex(int idx)
   {
+    if (this->m_Index == idx)
+      return;
     this->m_Index = idx; 
     this->Modified();
   };

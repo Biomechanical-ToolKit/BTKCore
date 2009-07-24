@@ -33,58 +33,49 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkAcquisitionFileWriter_h
-#define __btkAcquisitionFileWriter_h
+#ifndef __btkANCFileIO_h
+#define __btkANCFileIO_h
 
-#include "btkException.h"
-#include "btkProcessObject.h"
-#include "btkAcquisition.h"
 #include "btkAcquisitionFileIO.h"
+#include "btkException.h"
 
 namespace btk
 {
-  class AcquisitionFileWriterException : public Exception
+  class ANCFileIOException : public Exception
   {
   public:
-    explicit AcquisitionFileWriterException(const std::string& msg)
+    explicit ANCFileIOException(const std::string& msg)
     : Exception(msg)
     {};
       
-    virtual ~AcquisitionFileWriterException() throw() {};
+    virtual ~ANCFileIOException() throw() {};
   };
   
-  class AcquisitionFileWriter : public ProcessObject
+  class ANCFileIO : public AcquisitionFileIO
   {
   public:
-    typedef SharedPtr<AcquisitionFileWriter> Pointer;
-    typedef SharedPtr<const AcquisitionFileWriter> ConstPointer;
+    typedef SharedPtr<ANCFileIO> Pointer;
+    typedef SharedPtr<const ANCFileIO> ConstPointer;
     
-    virtual ~AcquisitionFileWriter() {};
+    static Pointer New() {return Pointer(new ANCFileIO());};
     
-    static Pointer New() {return Pointer(new AcquisitionFileWriter());};
+    // ~ANCFileIO(); // Implicit.
     
-    Acquisition::Pointer GetInput() {return this->GetInput(0);};
-    void SetInput(Acquisition::Pointer input) {this->SetNthInput(0, input);};    
-    const std::string& GetFilename() const {return this->m_Filename;};
-    BTK_IO_EXPORT void SetFilename(const std::string& filename);
-    AcquisitionFileIO::Pointer GetAcquisitionIO() {return this->m_AcquisitionIO;};
-    AcquisitionFileIO::ConstPointer GetAcquisitionIO() const {return this->m_AcquisitionIO;};
-    BTK_IO_EXPORT void SetAcquisitionIO(AcquisitionFileIO::Pointer io = AcquisitionFileIO::Pointer());
-  
+    BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
+    BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename);
+    BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output);
+    BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input);
+    
   protected:
-    BTK_IO_EXPORT AcquisitionFileWriter();
-    
-    Acquisition::Pointer GetInput(int idx) {return static_pointer_cast<Acquisition>(this->GetNthInput(idx));}; 
-    BTK_IO_EXPORT virtual DataObject::Pointer MakeOutput(int idx);
-    BTK_IO_EXPORT virtual void GenerateData();
-    
-    AcquisitionFileIO::Pointer m_AcquisitionIO;
-    std::string m_Filename;
+    BTK_IO_EXPORT ANCFileIO();
     
   private:
-    AcquisitionFileWriter(const AcquisitionFileWriter& ); // Not implemented.
-    AcquisitionFileWriter& operator=(const AcquisitionFileWriter& ); // Not implemented.
-  };
+    std::string ExtractKeywordValue(const std::string& line, const std::string& keyword) const;
+    void ExtractDataInfo(const std::string& line, const std::string& keyword, std::list<std::string>& info) const;
+
+    ANCFileIO(const ANCFileIO& ); // Not implemented.
+    ANCFileIO& operator=(const ANCFileIO& ); // Not implemented. 
+   };
 };
 
-#endif // __btkAcquisitionFileWriter_h
+#endif // __btkANCFileIO_h

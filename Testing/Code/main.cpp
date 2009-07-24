@@ -28,12 +28,17 @@ int main()
 #endif
 };
 
-#define C3DFilePathIN std::string(TDD_C3DFilePathIN)
-#define C3DFilePathOUT std::string(TDD_C3DFilePathOUT)
-#define TRCFilePathIN std::string(TDD_TRCFilePathIN)
-#define TRCFilePathOUT std::string(TDD_TRCFilePathOUT)
+#define ANCFilePathIN std::string(TDD_FilePathIN) + "ANCSamples/"
+#define ANCFilePathOUT std::string(TDD_FilePathOUT) + "ANCSamples/"
+#define C3DFilePathIN std::string(TDD_FilePathIN) + "C3DSamples/"
+#define C3DFilePathOUT std::string(TDD_FilePathOUT) + "C3DSamples/"
+#define TRCFilePathIN std::string(TDD_FilePathIN) + "TRCSamples/"
+#define TRCFilePathOUT std::string(TDD_FilePathOUT) + "TRCSamples/"
 
 #include "AcquisitionTest.h"
+#include "ANCFileIOTest.h"
+#include "ANCFileReaderTest.h"
+#include "ANCFileWriterTest.h"
 #include "C3DFileIOTest.h"
 #include "C3DFileReaderTest.h"
 #include "C3DFileWriterTest.h"

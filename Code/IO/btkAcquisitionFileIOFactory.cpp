@@ -35,6 +35,7 @@
 
 #include "btkAcquisitionFileIOFactory.h"
 
+#include "btkANCFileIO.h"
 #include "btkC3DFileIO.h"
 #include "btkTRCFileIO.h"
 
@@ -75,12 +76,16 @@ namespace btk
       if (io->CanReadFile(filename)) return io;
       io = TRCFileIO::New();
       if (io->CanReadFile(filename)) return io; 
+      io = ANCFileIO::New();
+      if (io->CanReadFile(filename)) return io;
     }
     else
     {
       io = C3DFileIO::New();
       if (io->CanWriteFile(filename)) return io;
       io = TRCFileIO::New();
+      if (io->CanWriteFile(filename)) return io;
+      io = ANCFileIO::New();
       if (io->CanWriteFile(filename)) return io;
     }
     return AcquisitionFileIO::Pointer();
