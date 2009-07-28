@@ -1,4 +1,4 @@
-function pn = btkGetAnalogNumber(h) %#ok
+function an = btkGetAnalogNumber(h) %#ok
 %BTKGETANALOGNUMBER Returns number of channels.
 % 
 %  AN = BTKGETANALOGNUMBER(H) returns the number of analog channels in one acquisition.

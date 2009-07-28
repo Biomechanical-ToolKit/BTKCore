@@ -4,7 +4,7 @@ function h = btkReadAcquisition(filename) %#ok
 %  H = BTKREADACQUISITION(FILENAME) returns the handle H of a biomechanical 
 %  acquisition stored in file FILENAME.  This handle is returned 
 %  as a 32-bit and can be only used with the btk* function.  Supported 
-%  file formats are C3D AND TRC.
+%  file formats are ANC, C3D AND TRC.
 
 %  Author: A. Barré
 %  Copyright 2009- Biomechanical ToolKit (BTK).

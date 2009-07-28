@@ -3,7 +3,7 @@ function [forceplates forceplatesInfo] = btkGetForcePlatforms(h) %#ok
 % 
 %  FORCEPLATES = BTKGETFORCEPLATFORMS(H) returns a structure of force platform's. 
 %  The structure FORCEPLATFORMS is a row structure where each row contains 
-%  data for one force platform. Fielnames for each row are:
+%  data for one force platform. Fieldnames for each row are:
 %   - FORCEPLATES(i).CHANNELS
 %   - FORCEPLATES(i).CORNERS
 %   - FORCEPLATES(i).ORIGIN
@@ -21,7 +21,7 @@ function [forceplates forceplatesInfo] = btkGetForcePlatforms(h) %#ok
 %
 %  [FORCEPLATES FORCEPLATESINFO] = BTKGETFORCEPLATFORMS(H) returns 
 %  force platform's channel' informations in FORCEPLATESINFO.  The structure 
-%  FORCEPLATESINFO has the followig fields:
+%  FORCEPLATESINFO has the following fields:
 %    - FORCEPLATESINFO(i).FREQUENCY
 %    - FORCEPLATESINFO(i).UNITS
 %    - FORCEPLATESINFO(i).CAL_MATRIX

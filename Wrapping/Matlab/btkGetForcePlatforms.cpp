@@ -42,7 +42,7 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs!=1)
+  if (nrhs!=1)
     mexErrMsgTxt("One input required.");
   if (nlhs > 2)
    mexErrMsgTxt("Too many output arguments.");
@@ -88,7 +88,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     else
     {
-      std::string warnText = "Force platform " + btk::ToString(i) + " is empty. Send an email to delevopers to inform them.";
+      std::string warnText = "Force platform #" + btk::ToString(i) + " is empty. Send an email to BTK developers to inform them.";
       mexWarnMsgTxt(warnText.c_str());
     }
     ++itPlatform;

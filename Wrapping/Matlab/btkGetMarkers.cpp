@@ -34,9 +34,9 @@
  */
 
 #include "btkMEXObjectHandle.h"
-#include "btkSpecializedPointsExtractor.h"
 #include "btkMEXAdaptMeasures.h"
 
+#include <btkSpecializedPointsExtractor.h>
 #include <btkAcquisition.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])

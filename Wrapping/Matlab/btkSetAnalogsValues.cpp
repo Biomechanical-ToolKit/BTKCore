@@ -34,23 +34,45 @@
  */
 
 #include "btkMEXObjectHandle.h"
-#include "btkMEXGetPoints.h"
 
 #include <btkAcquisition.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if (nrhs != 2)
-    mexErrMsgTxt("Two inputs required.");
+    mexErrMsgTxt("Two input required.");
   if (nlhs > 0)
    mexErrMsgTxt("Too many output arguments.");
 
-  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
-    mexErrMsgTxt("The first frame must be set by one integer.");
+  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]))
+    mexErrMsgTxt("The second input must be a matrix of real values corresponding to markers' coordinates."); 
 
-  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]); 
-  acq->SetPointNumber(static_cast<int>(mxGetScalar(prhs[1])));
+  // First output
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
-  // Return updated points
-  btkMEXGetPoints(acq, nlhs, plhs);
+  int numberOfFrames = acq->GetAnalogFrameNumber();
+  int numberOfChannels = acq->GetAnalogNumber();
+
+  if (mxGetNumberOfElements(prhs[1]) != (numberOfFrames * numberOfChannels))
+    mexErrMsgTxt("The second input doesn't have the same size than the number of markers' coordinates.");
+    
+  double* values = mxGetPr(prhs[1]);
+
+  int i = 0;
+  int j = numberOfFrames;
+  double* v = 0;
+  btk::Acquisition::AnalogIterator it = acq->BeginAnalog();
+  while (i < (numberOfFrames * numberOfChannels))
+  {
+    if (j >= numberOfFrames)
+    {
+      v = (*it)->GetValues().data();
+      ++it;
+      j = 0;
+    }
+    v[j] = values[i];
+    ++i; ++j;
+  }
 };
+
+

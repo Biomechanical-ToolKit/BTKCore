@@ -4,11 +4,13 @@ function tocbtkcommon
 %
 % Acquisition accessor
 %   <a href="matlab:help btkGetAnalogFrameNumber">btkGetAnalogFrameNumber</a>  - Analog's frame number accessor
+%   <a href="matlab:help btkGetAnalogFrequency">btkGetAnalogFrequency</a>    - Analog's frequency accessor
 %   <a href="matlab:help btkGetAnalogNumber">btkGetAnalogNumber</a>       - Analog's number accessor
 %   <a href="matlab:help btkGetAnalysis">btkGetAnalysis</a>           - ANALYSIS group extraction
 %   <a href="matlab:help btkGetEvents">btkGetEvents</a>             - Events extraction
 %   <a href="matlab:help btkGetFirstFrame">btkGetFirstFrame</a>         - Acquisition's first frame accessor
 %   <a href="matlab:help btkGetPointFrameNumber">btkGetPointFrameNumber</a>   - Point's frame number accessor
+%   <a href="matlab:help btkGetPointFrequency">btkGetPointFrequency</a>     - Point's frequency accessor
 %   <a href="matlab:help btkGetPointNumber">btkGetPointNumber</a>        - Point's number accessor
 %
 % Acquisition modifier
@@ -20,6 +22,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkGetAngles">btkGetAngles</a>             - Angles extraction
 %   <a href="matlab:help btkGetForces">btkGetForces</a>             - Forces extraction
 %   <a href="matlab:help btkGetMarkers">btkGetMarkers</a>            - Markers extraction
+%   <a href="matlab:help btkGetMarkersValues">btkGetMarkersValues</a>      - Extracts markers as a simple matrix 
 %   <a href="matlab:help btkGetMoments">btkGetMoments</a>            - Moments extraction
 %   <a href="matlab:help btkGetPoints">btkGetPoints</a>             - Points extraction
 %   <a href="matlab:help btkGetPowers">btkGetPowers</a>             - Powers extraction
@@ -28,6 +31,7 @@ function tocbtkcommon
 % Point modifier
 %   <a href="matlab:help btkAppendPoint">btkAppendPoint</a>           - Append point to an acquisition
 %   <a href="matlab:help btkRemovePoint">btkRemovePoint</a>           - Delete point from an acquisition
+%   <a href="matlab:help btkSetMarkersValues">btkSetMarkersValues</a>      - Sets markers's value from a matrix 
 %   <a href="matlab:help btkSetPoint">btkSetPoint</a>              - Point's data modifier (values, residuals, masks)
 %   <a href="matlab:help btkSetPointDescription">btkSetPointDescription</a>   - Point's description modifier
 %   <a href="matlab:help btkSetPointLabel">btkSetPointLabel</a>         - Point's label modifier
@@ -35,7 +39,11 @@ function tocbtkcommon
 %
 % Analogs accessor
 %   <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>            - Analog channels extraction
+%   <a href="matlab:help btkGetAnalogsValues">btkGetAnalogsValues</a>      - Extracts analogs channels' values in a simple matrix 
 %   <a href="matlab:help btkGetForcePlatforms">btkGetForcePlatforms</a>     - Force platform channels and configuration extraction
+%
+% Analog mutator
+%   <a href="matlab:help btkSetAnalogsValues">btkSetAnalogsValues</a>      - Sets analog's value from a matrix 
 %
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>
 

@@ -34,23 +34,51 @@
  */
 
 #include "btkMEXObjectHandle.h"
-#include "btkMEXGetPoints.h"
 
+#include <btkSpecializedPointsExtractor.h>
 #include <btkAcquisition.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if (nrhs != 2)
-    mexErrMsgTxt("Two inputs required.");
+    mexErrMsgTxt("Two input required.");
   if (nlhs > 0)
    mexErrMsgTxt("Too many output arguments.");
 
-  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
-    mexErrMsgTxt("The first frame must be set by one integer.");
+  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]))
+    mexErrMsgTxt("The second input must be a matrix of real values corresponding to markers' coordinates."); 
 
-  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]); 
-  acq->SetPointNumber(static_cast<int>(mxGetScalar(prhs[1])));
+  // First output
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
-  // Return updated points
-  btkMEXGetPoints(acq, nlhs, plhs);
+  btk::SpecializedPointsExtractor::Pointer specialPointExtractor = btk::SpecializedPointsExtractor::New();
+  specialPointExtractor->SetInput(acq);
+  btk::PointCollection::Pointer markers = specialPointExtractor->GetOutput();
+  specialPointExtractor->Update();
+
+  int numberOfFrames = acq->GetPointFrameNumber();
+  int numberOfMarkers = markers->GetItemNumber();
+
+  if (mxGetNumberOfElements(prhs[1]) != (numberOfFrames * numberOfMarkers * 3))
+    mexErrMsgTxt("The second input doesn't have the same size than the number of markers' coordinates.");
+    
+  double* values = mxGetPr(prhs[1]);
+
+  int i = 0;
+  int j = numberOfFrames * 3;
+  double* v = 0;
+  btk::PointCollection::Iterator it = markers->Begin();
+  while (i < (numberOfFrames * numberOfMarkers * 3))
+  {
+    if (j >= (numberOfFrames * 3))
+    {
+      v = (*it)->GetValues().data();
+      ++it;
+      j = 0;
+    }
+    v[j] = values[i];
+    ++i; ++j;
+  }
 };
+
+
