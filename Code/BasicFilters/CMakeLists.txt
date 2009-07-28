@@ -1,6 +1,7 @@
 SET(BTKBasicFilters_SRCS
       btkForcePlatformsExtractor.cpp
       btkSpecializedPointsExtractor.cpp
+      btkGroundReactionWrenchFilter.cpp
   )
 
 ADD_LIBRARY(BTKBasicFilters ${BTK_LIBS_BUILD_TYPE} ${BTKBasicFilters_SRCS})

@@ -44,6 +44,7 @@ int main()
 #include "C3DFileWriterTest.h"
 #include "ForcePlatformTypesTest.h"
 #include "ForcePlatformsExtractorTest.h"
+#include "GroundReactionWrenchFilterTest.h"
 #include "PointTest.h"
 #include "PointCollectionTest.h"
 #include "MeasureFrameExtractorTest.h"
