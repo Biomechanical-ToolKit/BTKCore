@@ -10,6 +10,7 @@ SET(BTKCommon_SRCS
   btkMetaDataUtils.cpp 
   btkObject.cpp
   btkProcessObject.cpp
+  btkWrench.cpp
 )
 
 ADD_LIBRARY(BTKCommon ${BTK_LIBS_BUILD_TYPE} ${BTKCommon_SRCS})

@@ -77,6 +77,8 @@ namespace btk
     if (pos == this->m_Position)
       return;
     this->m_Position = pos;
+    // force point's type
+    this->m_Position->SetType(Point::Marker);
     this->Modified();
   };
 
@@ -93,6 +95,8 @@ namespace btk
     if (force == this->m_Force)
       return;
     this->m_Force = force;
+    // force point's type
+    this->m_Position->SetType(Point::Force);
     this->Modified();
   };
 
@@ -109,6 +113,8 @@ namespace btk
     if (moment == this->m_Moment)
       return;
     this->m_Moment = moment;
+    // force point's type
+    this->m_Position->SetType(Point::Moment);
     this->Modified();
   };
 
@@ -124,8 +130,8 @@ namespace btk
   Wrench::Wrench(const std::string& label, int frameNumber)
   {
     this->m_Position = Point::New(label, frameNumber);
-    this->m_Force = Point::New(label + ".F", frameNumber);
-    this->m_Moment = Point::New(label + ".M", frameNumber);
+    this->m_Force = Point::New(label + ".F", frameNumber, Point::Force);
+    this->m_Moment = Point::New(label + ".M", frameNumber, Point::Moment);
   };
 
 }
