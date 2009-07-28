@@ -68,8 +68,7 @@ namespace btk
   private:
     void ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, int idx, int coefficientsAlreadyExtracted, MetaData::Pointer pOrigin, MetaData::Pointer pCorners, MetaData::Pointer pCalMatrix);
     bool ExtractForcePlatformData(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex);
-    bool ExtractForcePlatformData(ForcePlatformType4::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex);
-    //void ExtractForcePlatformData(ForcePlatformType5::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
+    bool ExtractForcePlatformDataWithCalibrationMatrix(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex);
     //void ExtractForcePlatformData(ForcePlatformType6::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
     //void ExtractForcePlatformData(ForcePlatformType7::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
     //void ExtractForcePlatformData(ForcePlatformType11::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);

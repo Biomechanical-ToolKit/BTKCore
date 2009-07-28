@@ -201,38 +201,30 @@ namespace btk
           case 1:
             (*itFP) = ForcePlatformType1::New();
             this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            //calMatrixCoefficentNumberAleadyExtracted *= (6 * 6);
             noError = this->ExtractForcePlatformData((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 2:
             (*itFP) = ForcePlatformType2::New();
             this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            //calMatrixCoefficentNumberAleadyExtracted *= (6 * 6);
             noError = this->ExtractForcePlatformData((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 3:
             (*itFP) = ForcePlatformType3::New();
             this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            //calMatrixCoefficentNumberAleadyExtracted *= (8 * 8);
             noError = this->ExtractForcePlatformData((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 4:
             {
-            ForcePlatformType4::Pointer fp4 = ForcePlatformType4::New();
-            this->ExtractForcePlatformDataCommon(fp4, i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            //ForcePlatformType4::CalMatrix cal = fp4->GetCalMatrix();
-            //fp4->SetCalMatrix(cal);
-            //this->ExtractForcePlatformDataCalibrationMatrix(fp4, i, calMatrixCoefficentNumberAleadyExtracted, (*itCalMatrix));
-            noError = this->ExtractForcePlatformData(fp4, analogs, &channelNumberAlreadyExtracted, channelsIndex);
-            (*itFP) = fp4;
+            (*itFP) = ForcePlatformType4::New();
+            this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+            noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
             }
             break;
           case 5:
             {
-            btkErrorMacro("Force Platform type 5 is not yet supported. Please, report this to the developers");
-            //ForcePlatformType5::Pointer fp5 = ForcePlatformType5::New();
-            //this->ExtractForcePlatformData(fp5, analogs, (*itForcePlatformGr));
-            //(*itFP) = fp5;
+            (*itFP) = ForcePlatformType5::New();
+            this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+            noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
             }
             break;
           case 6:
@@ -373,7 +365,7 @@ namespace btk
     return noError;
   };
 
-  bool ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType4::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex)
+  bool ForcePlatformsExtractor::ExtractForcePlatformDataWithCalibrationMatrix(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex)
   {
     int numberOfChannelToExtract = fp->GetChannelNumber();
     bool noError = true;
