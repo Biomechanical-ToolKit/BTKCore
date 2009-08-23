@@ -1,7 +1,5 @@
 FIND_PACKAGE(Matlab REQUIRED)
 
-INCLUDE_DIRECTORIES(${MATLAB_INCLUDE_DIR})
-
 CMAKE_DEPENDENT_OPTION(BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES
                        "Compiler option to be able to redistribute BTK MEX files on machine without the same developper environment (builds BTK in Release mode and links libraries in static mode (if MSVC is the compiler)." OFF
                        BTK_WRAP_MATLAB OFF)
@@ -24,6 +22,9 @@ IF (BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
     SET(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG" CACHE STRING "The CXX flags are fixed due to the activation of BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES, Uncheck it to go to previous flags." FORCE)
   ENDIF(MSVC)
 ENDIF(BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
+
+IF(MATLAB_ROOT)
+INCLUDE_DIRECTORIES(${MATLAB_INCLUDE_DIR})
 
 # Common: accessor
 MATLAB_MEX_CREATE(btkGetAnalogFrameNumber btkGetAnalogFrameNumber.cpp BTKCommon)
@@ -63,6 +64,7 @@ MATLAB_MEX_CREATE(btkGetScalars btkGetScalars.cpp BTKBasicFilters)
 # IO
 MATLAB_MEX_CREATE(btkReadAcquisition btkReadAcquisition.cpp BTKIO)
 MATLAB_MEX_CREATE(btkWriteAcquisition btkWriteAcquisition.cpp BTKIO)
+ENDIF(MATLAB_ROOT)
 
 IF(NOT BTK_INSTALL_NO_DEVELOPMENT)
   INSTALL(DIRECTORY ${BTK_SOURCE_DIR}/Documentation/Wrapping/Matlab/btk
