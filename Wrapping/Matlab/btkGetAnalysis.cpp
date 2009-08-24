@@ -139,6 +139,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           parameterValues.resize(numberOfParameters, 0.0);
         }
       }
+      else
+        mexErrMsgTxt("Missing ANALYSIS:VALUES. Impossible to extract values");
     }
   }
   plhs[0] = mxCreateStructMatrix(1, 1, numberOfParameters, (const char**)fieldnames);
