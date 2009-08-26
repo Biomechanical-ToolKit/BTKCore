@@ -33,45 +33,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
-
-#include <btkSpecializedPointsExtractor.h>
-#include <btkAcquisition.h>
+#include "btkMEXSpecializedPointValues.h"
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if (nrhs != 1)
-    mexErrMsgTxt("One input required.");
-  if (nlhs > 1)
-   mexErrMsgTxt("Too many output arguments.");
-
-  // First output
-  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-
-  btk::SpecializedPointsExtractor::Pointer specialPointExtractor = btk::SpecializedPointsExtractor::New();
-  specialPointExtractor->SetInput(acq);
-  btk::PointCollection::Pointer markers = specialPointExtractor->GetOutput();
-  specialPointExtractor->Update();
-
-  int numberOfFrames = acq->GetPointFrameNumber();
-  int numberOfMarkers = markers->GetItemNumber();
-  plhs[0] = mxCreateDoubleMatrix(numberOfFrames, numberOfMarkers * 3, mxREAL);
-  double* values = mxGetPr(plhs[0]);
-
-  int i = 0;
-  int j = numberOfFrames * 3;
-  double* v = 0;
-  btk::PointCollection::ConstIterator it = markers->Begin();
-  while(i < (numberOfFrames * numberOfMarkers * 3))
-  {
-    if (j >= (numberOfFrames * 3))
-    {
-      v = (*it)->GetValues().data();
-      ++it;
-      j = 0;
-    }
-    values[i] = v[j];
-    ++i; ++j;
-  }
+  btkMEXGetSpecializedPointValues(btk::Point::Marker, nlhs, plhs, nrhs, prhs);
 };
 

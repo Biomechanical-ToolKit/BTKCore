@@ -1,7 +1,7 @@
-function av = btkSetAnalogsValues(h) %#ok
+function btkSetAnalogsValues(h, v) %#ok
 %BTKSETANALOGSVALUES Sets analog channels' values from a matrix
 % 
-%  BTKSETANALOGSVALUES(H, AV) uses data of matrix AV to set analog channels' values.
+%  BTKSETANALOGSVALUES(H, V) uses data of matrix V to set analog channels' values.
 %  The number of rows of the matrix corresponds to the number of analog's frame.
 %  Its number of columns corresponds to the number of analog channels.
 %  The biomechanical acquisition handle H is represented as a 32-bit integer

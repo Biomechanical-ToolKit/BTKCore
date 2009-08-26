@@ -1,7 +1,7 @@
-function av = btkGetAnalogsValues(h) %#ok
+function btkGetAnalogsValues(h, v) %#ok
 %BTKGETANALOGSVALUES Extract analog channels' values and store them in a matrix
 % 
-%  AV = BTKGETANALOGSVALUES(H) returns a matrix of real.  The number of rows
+%  BTKGETANALOGSVALUES(H, V) returns a matrix of real.  The number of rows
 %  of this matrix corresponds to the number of analog's frame.  The number 
 %  of columns of this matrix corresponds to the number of analog channels.
 %  The biomechanical acquisition handle H is represented as a 32-bit integer

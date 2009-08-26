@@ -37,7 +37,6 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  btkMEXSetSpecializedPointValues(btk::Point::Marker, nlhs, plhs, nrhs, prhs);
+  btkMEXSetSpecializedPointValues(btk::Point::Scalar, nlhs, plhs, nrhs, prhs);
 };
-
 

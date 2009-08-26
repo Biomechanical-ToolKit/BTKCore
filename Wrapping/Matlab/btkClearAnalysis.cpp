@@ -33,11 +33,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXSpecializedPointValues.h"
+#if defined(_MSC_VER)
+  // Disable unsafe warning (use of the function 'strcpy' instead of 
+  // 'strcpy_s' for portability reasons;
+  #pragma warning( disable : 4996 ) 
+#endif
+
+#include "btkMEXObjectHandle.h"
+
+#include <btkAcquisition.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  btkMEXSetSpecializedPointValues(btk::Point::Marker, nlhs, plhs, nrhs, prhs);
-};
+  if(nrhs!=1)
+    mexErrMsgTxt("One input required.");
+  if (nlhs > 0)
+   mexErrMsgTxt("Too many output arguments.");
+
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  btk::MetaData::Pointer metadata = acq->GetMetaData();
+  btk::MetaData::ConstIterator itAnalysis = metadata->FindChild("ANALYSIS");
+
+  if (itAnalysis == metadata->End())
+    return;
+
+  const char* names[] = {"NAMES", "CONTEXTS", "SUBJECTS", "UNITS", "VALUES", "USED"};
+  int numberOfNames =  sizeof(names) / (sizeof(char) * 4);
+
+  std::vector<uint8_t> dims = std::vector<uint8_t>(1,0);
+  for (int i = 0 ; i < numberOfNames ; ++i)
+  {
+    btk::MetaData::ConstIterator it = (*itAnalysis)->FindChild(names[i]);
+    if (it != (*itAnalysis)->End())
+    {
+      if ((*it)->HasInfo())
+        (*it)->GetInfo()->SetDimensions(dims);
+    }
+  }
+ };
 
 

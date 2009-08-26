@@ -1,7 +1,7 @@
-function mv = btkGetMarkersValues(h) %#ok
+function v = btkGetMarkersValues(h) %#ok
 %BTKGETMARKERSVALUES Extract markers' coordinates and store them in a matrix
 % 
-%  MV = BTKGETMARKERSVALUES(H) returns a matrix of real.  The number of rows
+%  V = BTKGETMARKERSVALUES(H) returns a matrix of real.  The number of rows
 %  of this matrix corresponds to the number of point's frame.  The number of
 %  columns of this matrix corresponds to the number of extracted markers 
 %  multiplied by 3 (their coordinates X,Y,Z).

@@ -39,5 +39,5 @@ function [forceplates forceplatesInfo] = btkGetForcePlatforms(h) %#ok
 
 error(generatemsgid('NotSupported'),'MEX file for BTKGETFORCEPLATFORMS not found');
 
-% [EOF] btkReadC3D.m
+% [EOF] btkGetForcePlatforms.m
 

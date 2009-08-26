@@ -14,4 +14,4 @@ function af = btkGetAnalogFrequency(h) %#ok
 
 error(generatemsgid('NotSupported'),'MEX file for BTKGETANALOGFREQUENCY not found');
 
-% [EOF] btkGetAnalogNumber.m
+% [EOF] btkGetAnalogFrequency.m

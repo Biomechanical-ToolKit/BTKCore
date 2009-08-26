@@ -22,5 +22,5 @@ function [analogs analogsInfo] = btkGetAnalogs(h) %#ok
 
 error(generatemsgid('NotSupported'),'MEX file for BTKGETANALOGS not found');
 
-% [EOF] btkReadC3D.m
+% [EOF] btkGetAnalogs.m
 

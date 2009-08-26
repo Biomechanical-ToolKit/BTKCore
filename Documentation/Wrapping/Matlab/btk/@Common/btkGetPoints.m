@@ -25,5 +25,5 @@ function [points pointsInfo] = btkGet3DPoints(h) %#ok
 
 error(generatemsgid('NotSupported'),'MEX file for BTKGETPOINTS not found');
 
-% [EOF] btkReadC3D.m
+% [EOF] btkGet3DPoints.m
 

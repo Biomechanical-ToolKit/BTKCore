@@ -23,5 +23,5 @@ function [analysis analysisInfo] = btkGetAnalysis(h) %#ok
 
 error(generatemsgid('NotSupported'),'MEX file for BTKGETANALYSIS not found');
 
-% [EOF] btkReadC3D.m
+% [EOF] btkGetAnalysis.m
 
