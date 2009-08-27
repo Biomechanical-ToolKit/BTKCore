@@ -102,10 +102,9 @@ void btkMEXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs
   if (nlhs > 0)
    mexErrMsgTxt("Too many output arguments.");
 
-  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]))
+  if (!mxIsNumeric(prhs[1]))
     mexErrMsgTxt("The second input must be a matrix of real values corresponding to the same dimensions than extracted points' coordinates.");
 
-  // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
   btk::SpecializedPointsExtractor::Pointer specialPointExtractor = btk::SpecializedPointsExtractor::New();
@@ -117,9 +116,11 @@ void btkMEXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs
   int numberOfFrames = acq->GetPointFrameNumber();
   int numberOfPoints = points->GetItemNumber();
 
-  mexPrintf("%i vs %i", mxGetNumberOfElements(prhs[1]), (numberOfFrames * numberOfPoints * 3));
   if (mxGetNumberOfElements(prhs[1]) != (numberOfFrames * numberOfPoints * 3))
     mexErrMsgTxt("The second input doesn't have the same size than the number of extracted points' coordinates.");
+    
+  if (numberOfPoints == 0)
+    return;
     
   double* values = mxGetPr(prhs[1]);
 
