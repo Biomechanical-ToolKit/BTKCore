@@ -1370,8 +1370,11 @@ namespace btk
       }
       dims[2] = typeGroups.size() / 2;
       dims[1] = 2;
-      MetaData::Pointer tg = MetaData::New("TYPE_GROUPS", dims, typeGroups);
-      point->AppendChild(tg);
+      MetaData::Iterator itGroups = point->FindChild("TYPE_GROUPS");
+      if (itGroups != point->End())
+        (*itGroups)->GetInfo()->SetValues(dims, typeGroups);
+      else
+        point->AppendChild(MetaData::New("TYPE_GROUPS", dims, typeGroups));
     }
     // ANALOG group
     // ------------
@@ -1572,7 +1575,7 @@ namespace btk
       std::string labelUnits = label + "_UNITS";
       MetaDataCreateChild(point, labels, buffer);
       MetaDataCreateChild(point, labelUnits, input->GetPointUnit(type));
-      typeGroups.push_back(labels); typeGroups.push_back(labelUnits);
+      typeGroups.push_back(labels); typeGroups.push_back(label);
     }
   };
 };
