@@ -1,7 +1,7 @@
 function btkRemovePoint(h, idx_or_label) %#ok
 %BTKREMOVEPOINT Delete the point with the given index or label. 
 % 
-%  BTKREMOVEPOINT(H, INDEX) remove the point at the indicated point.
+%  BTKREMOVEPOINT(H, INDEX) remove the point at the given index.
 %
 %  The point to remove can also be selected by its LABEL.
 %  BTKREMOVEPOINT(H, LABEL)
@@ -26,6 +26,6 @@ function btkRemovePoint(h, idx_or_label) %#ok
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.
 %# mex
 
-error(generatemsgid('NotSupported'),'MEX file for function not found');
+error(generatemsgid('NotSupported'),'MEX file for function BTKREMOVEPOINT not found');
 
 % [EOF] btkRemovePoint.m

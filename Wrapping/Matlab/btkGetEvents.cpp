@@ -137,15 +137,75 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
  
   }
+  
+  // sort event's times.
+  for (int i = 0 ; i < static_cast<int>(times.size()) ; ++i)
+  {
+    for (int j = 0 ; j < static_cast<int>(times[i].size()) - 1 ; ++j)
+    {
+      if (times[i][j] > times[i][j + 1])
+      {
+        double t = times[i][j];
+        times[i][j] = times[i][j + 1];
+        times[i][j + 1] = t;
+      }
+      for (int k = j ; k > 1 ; --k)
+      {
+        if (times[i][k] < times[i][k - 1])
+        {
+          double t = times[i][k];
+          times[i][k] = times[i][k - 1];
+          times[i][k - 1] = t;
+        }
+        else
+          break;
+      }
+    }
+  }
+  // sort event depending the first time.
+  std::vector<int> indexes = std::vector<int>(times.size(),0);
+  for (int i = 0 ; i < static_cast<int>(times.size()) ; ++i) 
+    indexes[i] = i;
+  for (int i = 0 ; i < times.size() -1 ; ++i)
+  {
+    if (times[i][0] > times[i+1][0])
+    {
+      int idx = indexes[i];
+      indexes[i] = indexes[i+1];
+      indexes[i+1] = idx;
+    }
+    for (int k = i ; k > 1 ; --k)
+    {
+      if (times[k][0] < times[k - 1][0])
+      {
+        int idx = indexes[k];
+        indexes[k] = indexes[k-1];
+        indexes[k-1] = idx;
+      }
+      else
+        break;
+    }
+  }
+  
+  // times, fieldnames and subjects sorted
+  std::vector< std::vector<double> > times_sorted = std::vector< std::vector<double> >(numberOfEvents);
+  char** fieldnames_sorted = new char*[numberOfEvents];
+  std::vector<std::string> subjects_sorted = std::vector<std::string>(numberOfEvents);
+  for (int i = 0 ; i < static_cast<int>(indexes.size()) ; ++i)
+  {
+    times_sorted[i] = times[indexes[i]];
+    fieldnames_sorted[i] = fieldnames[indexes[i]];
+    subjects_sorted[i] = subjects[indexes[i]];
+  }
 
-  plhs[0] = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames);
+  plhs[0] = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames_sorted);
   
   for(int i = 0 ; i < numberOfEvents ; ++i)
   {
-    mxArray* value = mxCreateDoubleMatrix(1, times[i].size(), mxREAL);
+    mxArray* value = mxCreateDoubleMatrix(1, times_sorted[i].size(), mxREAL);
     double* v = mxGetPr(value);
-    for(int j = 0 ; j < static_cast<int>(times[i].size()) ; ++j)
-      v[j] = times[i][j]; 
+    for(int j = 0 ; j < static_cast<int>(times_sorted[i].size()) ; ++j)
+      v[j] = times_sorted[i][j]; 
     mxSetFieldByNumber(plhs[0], 0, i, value);
   }
   
@@ -155,6 +215,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     for (int i = 0 ; i < numberOfEvents ; ++i)
       delete[] fieldnames[i];
     delete[] fieldnames;
+    delete[] fieldnames_sorted;
   }
   else
   {
@@ -162,12 +223,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
     
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
-    mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames);
+    mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames_sorted);
     
     int inc = 0;
     for (int i = 0 ; i < numberOfEvents ; ++i)
     {
-      mxSetFieldByNumber(subjectsStruct, 0, i, mxCreateString(subjects[i].c_str()));
+      mxSetFieldByNumber(subjectsStruct, 0, i, mxCreateString(subjects_sorted[i].c_str()));
       delete[] fieldnames[inc];
       ++inc;
     }
@@ -180,5 +241,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mxSetFieldByNumber(plhs[1], 0, 1, unitsStruct);
 
     delete[] fieldnames;
+    delete[] fieldnames_sorted;
   }
 };

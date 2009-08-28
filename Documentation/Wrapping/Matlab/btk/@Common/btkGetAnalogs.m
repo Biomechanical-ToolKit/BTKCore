@@ -11,7 +11,8 @@ function [analogs analogsInfo] = btkGetAnalogs(h) %#ok
 %    - ANALOGSINFO.FREQUENCY
 %    - ANALOGSINFO.UNITS
 %  ANALOGSINFO.FREQUENCY contains the analogs' frequency.  ANALOGSINFO.UNITS
-%  contains the unit of each analog channel.  Each fieldname in ANALOGSINFO.%  UNITS corresponds to analog channel's label. 
+%  contains the unit of each analog channel.  Each fieldname in ANALOGSINFO.
+%  UNITS corresponds to analog channel's label. 
 
 %  Author: A. Barré
 %  Copyright 2009- Biomechanical ToolKit (BTK).

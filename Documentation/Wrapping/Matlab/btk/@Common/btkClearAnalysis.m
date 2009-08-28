@@ -8,8 +8,8 @@ function btkClearAnalysis(h) %#ok
 %    - UNITS;
 %    - VALUES;
 %    - USED.
-%  The analysis is then empty. Use MEX functions BTKAPPENDANALYSISPAREMETER 
-%  and BTKREMOVEANALYSISPAREMETER to set analysis' parameters.
+%  The analysis is then empty. Use MEX functions <a href="matlab:help btkAppendAnalysisParameter">btkAppendAnalysisParameter</a> 
+%  and <a href="matlab:help btkRemoveAnalysisParameter">btkRemoveAnalysisParameter</a> to set analysis' parameters.
 
 %  Author: A. Barré
 %  Copyright 2009- Biomechanical ToolKit (BTK).

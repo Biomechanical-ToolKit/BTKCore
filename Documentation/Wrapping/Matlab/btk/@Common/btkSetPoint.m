@@ -8,14 +8,16 @@ function btkSetPoint(h, idx_or_label, values, residuals, masks) %#ok
 %  BTKSETPOINT(H, INDEX, VALUES, RESIDUALS) modifies also the point's 
 %  residuals. RESIDUALS is matrix (N,1) and corresponds to the residuals of
 %  the 3D reconstruction of markers. 
-%  NOTE: This parameter is an informational parameter and seems not used in %  some commercial softwares.
+%  NOTE: This parameter is an informational parameter and seems not used in 
+%  some commercial softwares.
 %
 %  BTKSETPOINT(H, INDEX, VALUES, RESIDUALS, MASKS) modifies also the 
 %  masks of the camera used to reconstruct markers' positions. MASKS is a 
 %  matrix (N,1) of integer corresponding to a conversion of a binary number.
-%  For example, the value 14 correspond to the mask 0b0001110 meaning that %
+%  For example, the value 14 correspond to the mask 0b0001110 meaning that
 %  cameras #2, #3 and #4 was used to reconstruct the point 
-%  NOTE: This parameter is an informational parameter and seems not used in %  some commercial softwares.
+%  NOTE: This parameter is an informational parameter and seems not used in 
+%  some commercial softwares.
 %
 %  The point to modify can also be selected by its LABEL.
 %  BTKSETPOINT(H, LABEL, VALUES)

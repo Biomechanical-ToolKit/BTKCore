@@ -42,6 +42,7 @@
 #include "btkMEXObjectHandle.h"
 
 #include <btkAcquisition.h>
+#include <btkMetaDataUtils.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -57,7 +58,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (itAnalysis == metadata->End())
     return;
 
-  const char* names[] = {"NAMES", "CONTEXTS", "SUBJECTS", "UNITS", "VALUES", "USED"};
+  const char* names[] = {"NAMES", "CONTEXTS", "SUBJECTS", "UNITS", "VALUES"};
   int numberOfNames =  sizeof(names) / (sizeof(char) * 4);
 
   std::vector<uint8_t> dims = std::vector<uint8_t>(1,0);
@@ -70,6 +71,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         (*it)->GetInfo()->SetDimensions(dims);
     }
   }
- };
+  btk::MetaDataCreateChild((*itAnalysis), "USED", (int16_t)0);
+};
 
 
