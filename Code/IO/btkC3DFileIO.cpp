@@ -408,8 +408,11 @@ namespace btk
           switch (type)
           {
             case -1:
-              if (dataDim.size() == 2)
-                entry = MetaData::New(label, dataDim, ibfs->ReadString(dataDim[1],dataDim[0]), "", (nbCharLabel > 0 ? true : false));
+              if (dataDim.size() >= 2)
+              {
+                int rows = 1; int8_t inc2 = 1 ; while (inc2 < nbDim) rows *= dataDim[inc2++];
+                entry = MetaData::New(label, dataDim, ibfs->ReadString(rows, dataDim[0]), "", (nbCharLabel > 0 ? true : false));
+              }
               else
                 entry = MetaData::New(label, dataDim, ibfs->ReadString(1,prod), "", (nbCharLabel > 0 ? true : false));
               break;
@@ -983,11 +986,11 @@ namespace btk
         obfs->Write(pNB);
         // Back to the header: data first block
         obfs->SeekWrite(16, std::ios_base::beg);
-			  obfs->Write(dS);
+        obfs->Write(dS);
       }
       else
       {
-  		  writtenBytes += obfs->Fill(512 - (writtenBytes % 512));
+        writtenBytes += obfs->Fill(512 - (writtenBytes % 512));
         uint8_t pNB = static_cast<uint8_t>(writtenBytes / 512);
         // Back to the parameter: number of blocks
         obfs->SeekWrite(2, std::ios_base::beg);
@@ -1026,8 +1029,8 @@ namespace btk
             fdf->WriteAnalog(
                 (*itA)->GetValues().data()[analogFrame]
                 / this->m_AnalogChannelScale[incChannel]
-    						/ this->m_AnalogUniversalScale
-		    				+ this->m_AnalogZeroOffset[incChannel]);
+                / this->m_AnalogUniversalScale
+                + this->m_AnalogZeroOffset[incChannel]);
             ++itA; ++incChannel;
             if ((itA == input->EndAnalog()) && (inc < static_cast<unsigned>(numberSamplesPerAnalogChannel - 1)))
             {
@@ -1091,53 +1094,53 @@ namespace btk
   {
     size_t writtenBytes = 0;
     // Number of characters in the name
-		writtenBytes += obfs->Write(static_cast<int8_t>(m->GetLabel().length() * (m->GetUnlockState() ? 1 : -1)));
+    writtenBytes += obfs->Write(static_cast<int8_t>(m->GetLabel().length() * (m->GetUnlockState() ? 1 : -1)));
     if (m->HasInfo()) // Parameter
     {
-  		// ID number
-	  	writtenBytes += obfs->Write(static_cast<int8_t>(id));
-		  // Name
-  		writtenBytes += obfs->Write(m->GetLabel());
+      // ID number
+      writtenBytes += obfs->Write(static_cast<int8_t>(id));
+      // Name
+      writtenBytes += obfs->Write(m->GetLabel());
       // The Offset to the next parameter/group
       MetaDataInfo::ConstPointer mv = m->GetInfo();
-			writtenBytes += obfs->Write(static_cast<uint16_t>(2 + 1 + 1 + mv->GetDimensions().size() + (mv->GetDimensionsProduct() * abs(mv->GetFormat())) + 1 + m->GetDescription().length()));
+      writtenBytes += obfs->Write(static_cast<uint16_t>(2 + 1 + 1 + mv->GetDimensions().size() + (mv->GetDimensionsProduct() * abs(mv->GetFormat())) + 1 + m->GetDescription().length()));
       // Format
-			writtenBytes += obfs->Write(static_cast<int8_t>(mv->GetFormat()));
-			// Dimension's size
-			writtenBytes += obfs->Write(static_cast<uint8_t>(mv->GetDimensions().size()));
-			// Dimension's value
-			writtenBytes += obfs->Write(mv->GetDimensions());
-			// Data
-			switch(mv->GetFormat())
-			{
-				case -1:
-					// Not necessary to transform in char
-					writtenBytes += obfs->Write(mv->ToString());
-					break;
-				case 1:
-					writtenBytes += obfs->Write(mv->ToInt8());
-					break;
-				case 2:
-					writtenBytes += obfs->Write(mv->ToInt16());
+      writtenBytes += obfs->Write(static_cast<int8_t>(mv->GetFormat()));
+      // Dimension's size
+      writtenBytes += obfs->Write(static_cast<uint8_t>(mv->GetDimensions().size()));
+      // Dimension's value
+      writtenBytes += obfs->Write(mv->GetDimensions());
+      // Data
+      switch(mv->GetFormat())
+      {
+        case -1:
+          // Not necessary to transform in char
+          writtenBytes += obfs->Write(mv->ToString());
           break;
-				case 4:
-					writtenBytes += obfs->Write(mv->ToFloat());
+        case 1:
+          writtenBytes += obfs->Write(mv->ToInt8());
           break;
-				default: // Should be impossible!
-					throw(C3DFileIOException("Parameter's data format unknown."));
-					break;
-			}
-			// Number of characters in the description
-			writtenBytes += obfs->Write(static_cast<uint8_t>(m->GetDescription().length()));
-			// The description
-			writtenBytes += obfs->Write(m->GetDescription());
+        case 2:
+          writtenBytes += obfs->Write(mv->ToInt16());
+          break;
+        case 4:
+          writtenBytes += obfs->Write(mv->ToFloat());
+          break;
+        default: // Should be impossible!
+          throw(C3DFileIOException("Parameter's data format unknown."));
+          break;
+      }
+      // Number of characters in the description
+      writtenBytes += obfs->Write(static_cast<uint8_t>(m->GetDescription().length()));
+      // The description
+      writtenBytes += obfs->Write(m->GetDescription());
     }
     else // Group
     {
       // ID number
-	  	writtenBytes += obfs->Write(static_cast<int8_t>(-1 * id));
-		  // Name
-  		writtenBytes += obfs->Write(m->GetLabel());
+      writtenBytes += obfs->Write(static_cast<int8_t>(-1 * id));
+      // Name
+      writtenBytes += obfs->Write(m->GetLabel());
       // The Offset to the next parameter/group
       writtenBytes += obfs->Write(static_cast<uint16_t>(2 + 1 + m->GetDescription().length()));
       // Number of characters in the description
@@ -1353,7 +1356,23 @@ namespace btk
     this->UpdateMetaDataFromSpecializedPoint(input, point, typeGroups, Point::Moment, "MOMENT");
     // POINT:TYPE_GROUPS (final)
     if (!typeGroups.empty())
-      MetaDataCreateChild(point, "TYPE_GROUPS", typeGroups);
+    {
+      // POINT:TYPE_GROUPS is a 3D array
+      // n x 2 x m 
+      // n: number of characters
+      // m: number of types of specialized points
+      std::vector<uint8_t> dims = std::vector<uint8_t>(3,0);
+      int num = -1;
+      for (int i = 0 ; i < static_cast<int>(typeGroups.size()) ; ++i)
+      {
+        if (typeGroups[i].size() > dims[0])
+          dims[0] = typeGroups[i].size();
+      }
+      dims[2] = typeGroups.size() / 2;
+      dims[1] = 2;
+      MetaData::Pointer tg = MetaData::New("TYPE_GROUPS", dims, typeGroups);
+      point->AppendChild(tg);
+    }
     // ANALOG group
     // ------------
     MetaData::Pointer analog = MetaDataCreateChild(input->GetMetaData(), "ANALOG");
