@@ -73,6 +73,7 @@ namespace btk
     BTK_COMMON_EXPORT ~MetaDataInfo();
     
     Format GetFormat() const {return this->m_Format;};
+    BTK_COMMON_EXPORT std::string GetFormatAsString() const;
     BTK_COMMON_EXPORT void SetFormat(Format format);
     BTK_COMMON_EXPORT uint8_t GetDimension(int idx) const;
     BTK_COMMON_EXPORT void SetDimension(int idx, uint8_t val);

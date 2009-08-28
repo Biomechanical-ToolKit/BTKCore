@@ -120,7 +120,7 @@ namespace btk
     MetaDataInfo::ConstPointer GetInfo() const {return this->m_Info;};
     void SetInfo(MetaDataInfo::Pointer val) {this->m_Info = val;};
     bool HasInfo() const {return (this->m_Info.get() != 0);};
-    bool IsMetaDataParent() const {return this->m_MetaDataParentAssigned;};
+    bool HasMetaDataAsParent() const {return this->m_MetaDataParentAssigned;};
     void SetParent(DataObject* parent = 0) {this->m_MetaDataParentAssigned = false; this->DataObject::SetParent(parent);};
     void SetParent(MetaData* parent = 0) {this->m_MetaDataParentAssigned = true; this->DataObject::SetParent(parent);};
     MetaData::Iterator Begin() {return this->m_Children.begin();};

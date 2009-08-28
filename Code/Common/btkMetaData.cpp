@@ -210,7 +210,7 @@ namespace btk
    */
   
   /**
-   * @fn bool MetaData::IsMetaDataParent() const
+   * @fn bool MetaData::HasMetaDataAsParent() const
    * Checks if this object has MetaData object as parents.
    */
   

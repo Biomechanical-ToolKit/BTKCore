@@ -150,6 +150,30 @@ namespace btk
    */
   
   /**
+   * Returns the format of the values as a string.
+   */
+  std::string MetaDataInfo::GetFormatAsString() const
+  {
+    std::string format = "";
+    switch(this->m_Format)
+    {
+      case Byte:
+        format = "Byte";
+        break;
+      case Integer:
+        format = "Integer";
+        break;
+      case Real:
+        format = "Real";
+        break;
+      case Char:
+        format = "Char";
+        break;
+    }
+    return format;
+  };
+  
+  /**
    * Sets the format of the values and adapt the values.
    * This method erases the values and set default values ("0" or a string with white spaces).
    */
@@ -964,7 +988,7 @@ namespace btk
   };
 
   /**
-   * Adapts the vector @a val based on the of the values of the member 
+   * Adapts the vector @a val based on the values of the member 
    * MetaDataInfo::m_Dims.
    */
   void MetaDataInfo::FillSource(std::vector<std::string>& val) const
