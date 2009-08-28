@@ -33,15 +33,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
-#include "btkMEXGetPoints.h"
-
 #if defined(_MSC_VER)
   // Disable unsafe warning (use of the function 'strcpy' instead of 
   // 'strcpy_s' for portability reasons;
   #pragma warning( disable : 4996 ) 
 #endif
 
+#include "btkMXTypesFix.h"
+#include "btkMEXObjectHandle.h"
+#include "btkMEXGetPoints.h"
 #include "btkASCIIConverter.h"
 
 #include <btkAcquisition.h>
