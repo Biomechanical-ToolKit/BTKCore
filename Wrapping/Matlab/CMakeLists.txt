@@ -41,6 +41,7 @@ MATLAB_MEX_CREATE(btkGetPointFrequency btkGetPointFrequency.cpp BTKCommon)
 MATLAB_MEX_CREATE(btkGetPointNumber btkGetPointNumber.cpp BTKCommon)
 MATLAB_MEX_CREATE(btkGetPoints btkGetPoints.cpp BTKCommon)
 # Common: modifier
+MATLAB_MEX_CREATE(btkAppendAnalysisParameter btkAppendAnalysisParameter.cpp BTKCommon)
 MATLAB_MEX_CREATE(btkAppendPoint btkAppendPoint.cpp BTKCommon)
 MATLAB_MEX_CREATE(btkClearAnalysis btkClearAnalysis.cpp BTKCommon)
 MATLAB_MEX_CREATE(btkRemoveAnalysisParameter btkRemoveAnalysisParameter.cpp BTKCommon)

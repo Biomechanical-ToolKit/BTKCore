@@ -15,8 +15,9 @@ function tocbtkcommon
 %   <a href="matlab:help btkGetPointNumber">btkGetPointNumber</a>           - Point's number accessor
 %
 % Acquisition modifier
+%   <a href="matlab:help btkAppendAnalysisParameter">btkAppendAnalysisParameter</a>  - Append or set a paremeter into the analysis
 %   <a href="matlab:help btkClearAnalysis">btkClearAnalysis</a>            - Clear the metadata ANALYSIS
-%   <a href="matlab:help btkRemoveAnalysisParameter">btkRemoveAnalysisParameter</a>  - Erase one paremeter from the analysis
+%   <a href="matlab:help btkRemoveAnalysisParameter">btkRemoveAnalysisParameter</a>  - Erase a paremeter from the analysis
 %   <a href="matlab:help btkSetFirstFrame">btkSetFirstFrame</a>            - Acquisition's first frame modifier
 %   <a href="matlab:help btkSetPointFrameNumber">btkSetPointFrameNumber</a>      - Point's frame number modifier
 %   <a href="matlab:help btkSetPointNumber">btkSetPointNumber</a>           - Point's number modifier

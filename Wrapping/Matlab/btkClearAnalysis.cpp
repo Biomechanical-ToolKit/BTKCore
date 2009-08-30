@@ -58,10 +58,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (itAnalysis == metadata->End())
     return;
 
-  const char* names[] = {"NAMES", "CONTEXTS", "SUBJECTS", "UNITS", "VALUES"};
+  // Char
+  const char* names[] = {"NAMES", "CONTEXTS", "SUBJECTS", "UNITS", "DESCRIPTIONS"};
   int numberOfNames =  sizeof(names) / (sizeof(char) * 4);
-
-  std::vector<uint8_t> dims = std::vector<uint8_t>(1,0);
+  std::vector<uint8_t> dims = std::vector<uint8_t>(2,0);
   for (int i = 0 ; i < numberOfNames ; ++i)
   {
     btk::MetaData::ConstIterator it = (*itAnalysis)->FindChild(names[i]);
@@ -71,6 +71,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         (*it)->GetInfo()->SetDimensions(dims);
     }
   }
+  // Real
+  btk::MetaData::ConstIterator it = (*itAnalysis)->FindChild("VALUES");
+  if (it != (*itAnalysis)->End())
+  {
+    if ((*it)->HasInfo())
+      (*it)->GetInfo()->SetDimensions(std::vector<uint8_t>(1,0));
+  }
+  // Integer
   btk::MetaDataCreateChild((*itAnalysis), "USED", (int16_t)0);
 };
 
