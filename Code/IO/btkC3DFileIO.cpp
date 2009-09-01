@@ -572,11 +572,60 @@ namespace btk
             else
               this->m_AnalogIntegerFormat = Signed;
           }
+          // - ANALOG:BITS
+          MetaData::ConstIterator itAnalogBits = (*itAnalog)->FindChild("BITS");
+          int bits = 0;
+          if (itAnalogBits != (*itAnalog)->End())
+          {
+            bits = (*itAnalogBits)->GetInfo()->ToInt(0);
+            switch(bits)
+            {
+              case 8:
+                input->SetAnalogResolution(Acquisition::Bit8);
+                break;
+              case 12:
+                input->SetAnalogResolution(Acquisition::Bit12);
+                break;
+              case 14:
+                input->SetAnalogResolution(Acquisition::Bit14);
+                break;
+              case 16:
+                input->SetAnalogResolution(Acquisition::Bit16);
+                break;
+              default:
+                btkIOErrorMacro(filename, "Unknown analog resolution. Set by default to 12.");
+                input->SetAnalogResolution(Acquisition::Bit12);
+                break;
+            }
+          }
+          else
+            input->SetAnalogResolution(Acquisition::Bit12);
+          // Check if values in ANALOG:OFFSET correspond to the informations in ANALOG:FORMAT and ANALOG:BITS
+          std::vector<int16_t> analogZeroOffset_t;
+          MetaDataCollapseChildrenValues<int16_t>(analogZeroOffset_t, *itAnalog, "OFFSET", analogNumber, 0);
+          bits = input->GetAnalogResolution();
+          for (unsigned inc = 0 ; inc < this->m_AnalogZeroOffset.size() ; ++inc)
+          {
+            if (fabs(static_cast<double>(analogZeroOffset_t[inc])) > pow(2.0, bits))
+            {
+              bits += 2;
+              --inc;
+            }
+          }
+          if (bits != input->GetAnalogResolution())
+          {
+            if (bits >= 16)
+            {
+              input->SetAnalogResolution(Acquisition::Bit16);
+              this->m_AnalogIntegerFormat = Unsigned;
+            }
+            else
+              input->SetAnalogResolution(static_cast<Acquisition::AnalogResolution>(bits));
+            btkIOErrorMacro(filename, "Analog format and/or their resolution are inconsistents with Analog offsets. They were update.");
+          }
           // - ANALOG:OFFSET
           if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
           {
-           std::vector<int16_t> analogZeroOffset_t;
-           MetaDataCollapseChildrenValues<int16_t>(analogZeroOffset_t, *itAnalog, "OFFSET", analogNumber, 0);
            for (unsigned inc = 0 ; inc < this->m_AnalogZeroOffset.size() ; ++inc)
              this->m_AnalogZeroOffset[inc] = static_cast<uint16_t>(analogZeroOffset_t[inc]);
           }
@@ -1410,10 +1459,14 @@ namespace btk
     MetaDataCreateChild(analog, "GEN_SCALE", static_cast<float>(this->m_AnalogUniversalScale)); 
     // ANALOG:RATE
     MetaDataCreateChild(analog, "RATE", static_cast<float>(input->GetAnalogFrequency()));
-    // ANALOG:FORMAT
-    MetaDataCreateChild(analog, "FORMAT", (this->m_AnalogIntegerFormat == Unsigned ? "UNSIGNED" : "SIGNED"));
     // ANALOG:BITS
-    MetaDataCreateChild(analog, "BITS", static_cast<int16_t>(input->GetAnalogResolution()));
+    int16_t bits = static_cast<int16_t>(input->GetAnalogResolution());
+    MetaDataCreateChild(analog, "BITS", bits);
+    // ANALOG:FORMAT
+    if (bits == 16)
+      MetaDataCreateChild(analog, "FORMAT", "UNSIGNED");
+    else
+      MetaDataCreateChild(analog, "FORMAT", (this->m_AnalogIntegerFormat == Unsigned ? "UNSIGNED" : "SIGNED"));
     // EVENT group
     // -----------
     if (input->GetEventNumber() != 0)

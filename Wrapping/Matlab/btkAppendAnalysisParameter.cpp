@@ -74,8 +74,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   else
   {
-    subject = (char*)mxMalloc(1);
-    subject[0] = '\0';
+    subject = (char*)mxMalloc(9);
+    strcpy(subject, "        ");
   }
   if (nrhs >= 7)
   {
@@ -87,8 +87,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   else
   {
-    description = (char*)mxMalloc(1);
-    description[0] = '\0';
+    description = (char*)mxMalloc(9);
+    strcpy(description, "        ");
   }
   int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
   name = (char*)mxMalloc(strlen);

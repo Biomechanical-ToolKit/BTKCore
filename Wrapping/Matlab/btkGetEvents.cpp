@@ -59,12 +59,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   bool onlyOneSubject = true;
   char** fieldnames;
   int numberOfEvents = 0;
-  std::vector<std::string> labels;
-  std::vector< std::vector<double> > times;
-  std::vector<std::string> subjects;
+  
+  std::vector< std::vector<double> > times_sorted;
+  char** fieldnames_sorted;
+  std::vector<std::string> subjects_sorted;
 
   if (!events->IsEmpty())
   {
+    std::vector<std::string> labels;
+    std::vector< std::vector<double> > times;
+    std::vector<std::string> subjects;
+  
     btk::EventCollection::ConstIterator it = events->Begin();
     std::string subject = (*it)->GetSubject();
     ++it;
@@ -135,69 +140,68 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       fieldnames[i] = new char[convertedLabel.length() + 1];
       strcpy(fieldnames[i], convertedLabel.c_str());
     }
- 
-  }
-  
-  // sort event's times.
-  for (int i = 0 ; i < static_cast<int>(times.size()) ; ++i)
-  {
-    for (int j = 0 ; j < static_cast<int>(times[i].size()) - 1 ; ++j)
+    
+    // sort event's times.
+    for (int i = 0 ; i < static_cast<int>(times.size()) ; ++i)
     {
-      if (times[i][j] > times[i][j + 1])
+      for (int j = 0 ; j < static_cast<int>(times[i].size()) - 1 ; ++j)
       {
-        double t = times[i][j];
-        times[i][j] = times[i][j + 1];
-        times[i][j + 1] = t;
-      }
-      for (int k = j ; k > 1 ; --k)
-      {
-        if (times[i][k] < times[i][k - 1])
+        if (times[i][j] > times[i][j + 1])
         {
-          double t = times[i][k];
-          times[i][k] = times[i][k - 1];
-          times[i][k - 1] = t;
+          double t = times[i][j];
+          times[i][j] = times[i][j + 1];
+          times[i][j + 1] = t;
+        }
+        for (int k = j ; k > 1 ; --k)
+        {
+          if (times[i][k] < times[i][k - 1])
+          {
+            double t = times[i][k];
+            times[i][k] = times[i][k - 1];
+            times[i][k - 1] = t;
+          }
+          else
+            break;
+        }
+      }
+    }
+    // sort event depending the first time.
+    std::vector<int> indexes = std::vector<int>(times.size(),0);
+    for (int i = 0 ; i < static_cast<int>(times.size()) ; ++i) 
+      indexes[i] = i;
+    for (int i = 0 ; i < static_cast<int>(times.size()) -1 ; ++i)
+    {
+      if (times[i][0] > times[i+1][0])
+      {
+        int idx = indexes[i];
+        indexes[i] = indexes[i+1];
+        indexes[i+1] = idx;
+      }
+      for (int k = i ; k > 1 ; --k)
+      {
+        if (times[k][0] < times[k - 1][0])
+        {
+          int idx = indexes[k];
+          indexes[k] = indexes[k-1];
+          indexes[k-1] = idx;
         }
         else
           break;
       }
     }
-  }
-  // sort event depending the first time.
-  std::vector<int> indexes = std::vector<int>(times.size(),0);
-  for (int i = 0 ; i < static_cast<int>(times.size()) ; ++i) 
-    indexes[i] = i;
-  for (int i = 0 ; i < times.size() -1 ; ++i)
-  {
-    if (times[i][0] > times[i+1][0])
+    
+    // times, fieldnames and subjects sorted
+    std::vector< std::vector<double> > times_sorted = std::vector< std::vector<double> >(numberOfEvents);
+  char** fieldnames_sorted = new char*[numberOfEvents];
+  std::vector<std::string> subjects_sorted = std::vector<std::string>(numberOfEvents);
+    for (int i = 0 ; i < static_cast<int>(indexes.size()) ; ++i)
     {
-      int idx = indexes[i];
-      indexes[i] = indexes[i+1];
-      indexes[i+1] = idx;
-    }
-    for (int k = i ; k > 1 ; --k)
-    {
-      if (times[k][0] < times[k - 1][0])
-      {
-        int idx = indexes[k];
-        indexes[k] = indexes[k-1];
-        indexes[k-1] = idx;
-      }
-      else
-        break;
+      times_sorted[i] = times[indexes[i]];
+      fieldnames_sorted[i] = fieldnames[indexes[i]];
+      subjects_sorted[i] = subjects[indexes[i]];
     }
   }
   
-  // times, fieldnames and subjects sorted
-  std::vector< std::vector<double> > times_sorted = std::vector< std::vector<double> >(numberOfEvents);
-  char** fieldnames_sorted = new char*[numberOfEvents];
-  std::vector<std::string> subjects_sorted = std::vector<std::string>(numberOfEvents);
-  for (int i = 0 ; i < static_cast<int>(indexes.size()) ; ++i)
-  {
-    times_sorted[i] = times[indexes[i]];
-    fieldnames_sorted[i] = fieldnames[indexes[i]];
-    subjects_sorted[i] = subjects[indexes[i]];
-  }
-
   plhs[0] = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames_sorted);
   
   for(int i = 0 ; i < numberOfEvents ; ++i)
