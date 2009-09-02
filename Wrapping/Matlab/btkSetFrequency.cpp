@@ -34,23 +34,21 @@
  */
 
 #include "btkMEXObjectHandle.h"
-#include "btkMEXGetPoints.h"
 
 #include <btkAcquisition.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if (nrhs != 2)
-    mexErrMsgTxt("Two inputs required.");
-  if (nlhs > 2)
-   mexErrMsgTxt("Too many output arguments.");
-
+  if(nrhs != 2)
+    mexErrMsgTxt("Two input arguments required.");
+  if (nlhs > 0)
+    mexErrMsgTxt("Too many output arguments.");
+   
   if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
-    mexErrMsgTxt("The first frame must be set by one integer.");
+    mexErrMsgTxt("The frequency must be set by a numerical value.");
 
-  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]); 
-  acq->SetPointNumber(static_cast<int>(mxGetScalar(prhs[1])));
-
-  // Return updated points
-  btkMEXGetPoints(acq, nlhs, plhs);
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  double freq = mxGetScalar(prhs[1]);
+  acq->SetPointFrequency(freq);
 };
+

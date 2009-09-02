@@ -23,6 +23,8 @@ function h = btkWriteAcquisition(filename) %#ok
 %  Without any option, a C3D File is written using the machine byte order
 %  and the float as storage format. Using these options on ASCII formats 
 %  (for example TRC) have no effect on the file data.
+%  The writing of an empty acquisition (no point and no analog channel) in
+%  a C3D file will create a template C3D file. Only the metadata will be saved.
 %
 %  EXAMPLES:
 %   - BTKWRITEACQUISITION(acq, 'filename.c3d', 'StorageFormat', 'Float'); 
