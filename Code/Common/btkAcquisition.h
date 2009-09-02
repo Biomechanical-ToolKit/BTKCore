@@ -133,7 +133,7 @@ namespace btk
     BTK_COMMON_EXPORT AnalogConstIterator FindAnalog(const std::string& label) const;
         
     // Others
-    void Init(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1) {this->Resize(pointNumber, frameNumber, analogNumber, analogSampleNumberPerPointFrame);};
+    BTK_COMMON_EXPORT void Init(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1);
     BTK_COMMON_EXPORT void Resize(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1);
     BTK_COMMON_EXPORT void Reset();
     double GetDuration() {return ((this->m_PointFrequency == 0) ? 0 : 1 / this->m_PointFrequency * this->m_PointFrameNumber);};

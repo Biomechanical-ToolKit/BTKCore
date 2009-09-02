@@ -634,6 +634,16 @@ namespace btk
    * frame. The analog part has @a analogNumber analog channels and their sampling rate
    * correspond the integer factor @a analogSampleNumberPerPointFrame.
    */
+  void Acquisition::Init(int pointNumber, int frameNumber, int analogNumber, int analogSampleNumberPerPointFrame)
+  {
+    this->Resize(pointNumber, frameNumber, analogNumber, analogSampleNumberPerPointFrame);
+    int inc = 1;
+    for (PointIterator itPoint = this->BeginPoint() ; itPoint != this->EndPoint() ; ++itPoint)
+      (*itPoint)->SetLabel("uname*" + ToString(inc++));
+    inc = 1;
+    for (AnalogIterator itAnalog = this->BeginAnalog() ; itAnalog != this->EndAnalog() ; ++itAnalog)
+      (*itAnalog)->SetLabel("uname*" + ToString(inc++));
+  };
 
   /**
    * Resize the acquisition with @a pointNumber which have @a frameNumber

@@ -183,7 +183,7 @@ namespace btk
    * @warning The number of frames must be greater than 0.
    */
   Analog::Analog(const std::string& label, int frameNumber, Gain g)
-  : Measure<1>(label, frameNumber), m_Unit("")
+  : Measure<1>(label, frameNumber), m_Unit("V")
   {
     this->m_Gain = g;
     this->m_Offset = 0;

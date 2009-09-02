@@ -1219,7 +1219,7 @@ namespace btk
     }
     const int currentMax = static_cast<int>(this->m_PointScale * 32000);
     // Guess to compute a new point scaling factor.
-    if (((max > currentMax) || (max <= (currentMax / 2))) && (max != 0))
+    if (((max > currentMax) || (max <= (currentMax / 2))) && (max > std::numeric_limits<double>::epsilon()))
       this->m_PointScale = max / 32000.0;
     // ANALOG:SCALE & ANALOG:OFFSET
     int analogNumber = input->GetAnalogNumber();
