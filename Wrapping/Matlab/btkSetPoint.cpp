@@ -94,7 +94,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   else
   {
     int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
-    if ((idx < 0) || (idx > acq->GetPointNumber()))
+    if ((idx < 0) || (idx >= acq->GetPointNumber()))
       mexErrMsgTxt("Point's index out of range.");
     point = acq->GetPoint(idx);
   }

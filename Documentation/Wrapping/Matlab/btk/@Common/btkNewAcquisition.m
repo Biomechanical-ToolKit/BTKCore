@@ -3,7 +3,15 @@ function h = btkNewAcquisition(pn, fn, an, r) %#ok
 % 
 %  H = BTKNEWACQUISITION(PN, FN) returns the handle H of an initialized 
 %  biomechanical acquisition with PN points and FN frames. There is no analog
-%  channels.
+%  channels. The points created are tagged with the type 'Marker'. To change the type
+%  of theses points, use <a href="matlab:help btkSetPointType">btkSetPointType</a> or <a href="matlab:help btkSetPoint">btkSetPoint</a>
+%  Other parameters of the acquisition are set to:
+%  - First frame equals to 1: use <a href="matlab:help btkSetFirstFrame">btkSetFirstFrame</a> to modify it.
+%  - Points' frequency equals to 0: use <a href="matlab:help btkSetFrequency">btkSetFrequency</a> to modify it.
+%  - Points' units set to "mm", "deg", "N", "Nmm", "W", "" for markers, angles, forces, 
+%    moments, powers and scalars respectively: use <a href="matlab:help btkSetPointUnits">btkSetPointUnits</a> to modify them.
+%  - Analogs' frequency equals to 0. Updated when the points' frequency is. 
+%  - Analog channel resolution sets to 12 bits: use <a href="matlab:help btkSetAnalogResolution">btkSetAnalogResolution</a> to modify it.
 %
 %  H = BTKNEWACQUISITION(PN, FN, AN) returns the handle H of an initialized 
 %  biomechanical acquisition with PN points and AN analog channels. The number of frames 
