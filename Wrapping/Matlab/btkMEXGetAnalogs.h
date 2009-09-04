@@ -40,51 +40,57 @@
 
 #include <btkAcquisition.h>
 
-void btkMEXGetPoints(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
-{ 
-  if (nlhs == 0)
-    return;
-
-  btk::PointCollection::Pointer points = acq->GetPoints();
+void btkMEXGetAnalogs(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
+{
+  // First output
+  btk::AnalogCollection::Pointer analogs = acq->GetAnalogs();
   char** fieldnames = 0;
-  plhs[0] = btkMEXAdaptMeasures<btk::Point>(points, &fieldnames);
-  int numberOfPoints = acq->GetPointNumber();
+  plhs[0] = btkMEXAdaptMeasures<btk::Analog>(analogs, &fieldnames);
+  int numberOfAnalogs = acq->GetAnalogNumber();
 
   // Second output (optionnal)
   if (nlhs != 2)
   {
-    for (int i = 0 ; i < numberOfPoints ; ++i)
+    for (int i = 0 ; i < numberOfAnalogs ; ++i)
       delete[] fieldnames[i];
     delete[] fieldnames;
   }
   else
   {
-    std::vector<std::string> units = std::vector<std::string>(numberOfPoints, "");
-    const char* info[] = {"firstFrame", "frequency", "units"};
+    const char* info[] = {"gain", "offset", "scale", "frequency", "units"};
     int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
-       
-    int inc = 0;
-    for(btk::PointCollection::ConstIterator itPt = points->Begin() ; itPt != points->End() ; ++itPt)
-    {
-      if ((*itPt)->GetType() <= 5) // 0-5: known units.
-        units[inc] = acq->GetPointUnit((*itPt)->GetType());
-      ++inc;
-    }
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
-    mxArray* firstFrame  = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
-    *reinterpret_cast<int*>(mxGetPr(firstFrame)) = acq->GetFirstFrame();
+    // frequency field
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
-    *mxGetPr(frequency) = acq->GetPointFrequency();
-    mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
-    for (int i = 0 ; i < numberOfPoints ;++i)
+    *mxGetPr(frequency) = acq->GetAnalogFrequency();
+    // gain, offset, scale and units field
+    btk::AnalogCollection::ConstIterator itAnalog = analogs->Begin();
+    mxArray* gainStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
+    mxArray* offsetStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
+    mxArray* scaleStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
+    mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
+    for (int i = 0 ; i < numberOfAnalogs ;++i)
     {
-      mxSetFieldByNumber(unitsStruct, 0, i, mxCreateString(units[i].c_str()));
+      mxArray* gain = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
+      mxArray* offset = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
+      mxArray* scale = mxCreateDoubleMatrix(1, 1, mxREAL);
+      *reinterpret_cast<int*>(mxGetPr(gain)) = static_cast<int>((*itAnalog)->GetGain());
+      *reinterpret_cast<int*>(mxGetPr(offset)) = (*itAnalog)->GetOffset();
+      *mxGetPr(scale) = (*itAnalog)->GetScale();
+      mxSetFieldByNumber(gainStruct, 0, i, gain);
+      mxSetFieldByNumber(offsetStruct, 0, i, offset);
+      mxSetFieldByNumber(scaleStruct, 0, i, scale);
+      mxSetFieldByNumber(unitsStruct, 0, i, mxCreateString((*itAnalog)->GetUnit().c_str()));
+      
+      ++itAnalog;
       delete[] fieldnames[i];
     }
-    mxSetFieldByNumber(plhs[1], 0, 0, firstFrame);
-    mxSetFieldByNumber(plhs[1], 0, 1, frequency);
-    mxSetFieldByNumber(plhs[1], 0, 2, unitsStruct);
     delete[] fieldnames;
+    mxSetFieldByNumber(plhs[1], 0, 0, gainStruct);
+    mxSetFieldByNumber(plhs[1], 0, 1, offsetStruct);
+    mxSetFieldByNumber(plhs[1], 0, 2, scaleStruct);
+    mxSetFieldByNumber(plhs[1], 0, 3, frequency);
+    mxSetFieldByNumber(plhs[1], 0, 4, unitsStruct);
   }
 };
 

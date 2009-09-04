@@ -54,11 +54,15 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetScalarsValues">btkSetScalarsValues</a>         - Sets scalars's value from a matrix 
 %
 % Analogs accessor
+%   <a href="matlab:help btkGetAnalogResolution">btkGetAnalogResolution</a>      - Returns ADC resolution
 %   <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>               - Analog channels extraction
 %   <a href="matlab:help btkGetAnalogsValues">btkGetAnalogsValues</a>         - Extracts analogs channels' values in a simple matrix 
 %   <a href="matlab:help btkGetForcePlatforms">btkGetForcePlatforms</a>        - Force platform channels and configuration extraction
 %
-% Analog mutator
+% Analog modifier
+%   <a href="matlab:help btkSetAnalogDescription">btkSetAnalogDescription</a>     - Sets analog's description
+%   <a href="matlab:help btkSetAnalogLabel">btkSetAnalogLabel</a>           - Sets analog's label
+%   <a href="matlab:help btkSetAnalogResolution">btkSetAnalogResolution</a>      - Sets ADC resolution (8, 12, 14 or 16 bits)
 %   <a href="matlab:help btkSetAnalogsValues">btkSetAnalogsValues</a>         - Sets analog's value from a matrix 
 %
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>

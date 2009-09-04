@@ -8,11 +8,15 @@ function [analogs analogsInfo] = btkGetAnalogs(h) %#ok
 %
 %  [ANALOGS ANALOGSINFO] = BTKGETANALOGS(H) returns analogs' informations  
 %  in ANALOGSINFO.  The structure ANALOGSINFO has the followig fields:
+%    - ANALOGSINFO.GAIN
+%    - ANALOGSINFO.OFFSET
+%    - ANALOGSINFO.SCALE
 %    - ANALOGSINFO.FREQUENCY
 %    - ANALOGSINFO.UNITS
-%  ANALOGSINFO.FREQUENCY contains the analogs' frequency.  ANALOGSINFO.UNITS
-%  contains the unit of each analog channel.  Each fieldname in ANALOGSINFO.
-%  UNITS corresponds to analog channel's label. 
+%  ANALOGSINFO.GAIN, ANALOGSINFO.OFFSET and ANALOGSINFO.SCALE contains the required parameter
+%  to convert the digital measure into it analog variant. ANALOGSINFO.FREQUENCY contains the 
+%  analogs' frequency.  ANALOGSINFO.UNITS contains the unit of each analog channel.  
+%  Each fieldname in ANALOGSINFO.UNITS corresponds to analog channel's label. 
 
 %  Author: A. Barré
 %  Copyright 2009- Biomechanical ToolKit (BTK).
