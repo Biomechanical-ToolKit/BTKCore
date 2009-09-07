@@ -1,0 +1,11 @@
+// BTKVTK module documentation.
+
+/** 
+ * @defgroup BTKVTK VTK Support
+ * @brief To display BTK data in VTK 5.2 or greater.
+ * 
+ * This modules corresponds to the library BTKVTK.
+ *
+ * @ingroup BTKVISSUPPORT
+ */
+

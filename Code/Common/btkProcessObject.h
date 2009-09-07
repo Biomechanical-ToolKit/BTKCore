@@ -56,6 +56,7 @@ namespace btk
     int GetOutputNumber() const {return m_Outputs.size();};
     
     BTK_COMMON_EXPORT void Update();
+    BTK_COMMON_EXPORT void ResetState();
     
   protected:
     BTK_COMMON_EXPORT ProcessObject();

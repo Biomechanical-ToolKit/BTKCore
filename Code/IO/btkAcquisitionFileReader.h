@@ -64,7 +64,9 @@ namespace btk
     static Pointer New() {return Pointer(new AcquisitionFileReader());};
     
     Acquisition::Pointer GetOutput() {return this->GetOutput(0);};
-    
+   
+    bool GetDisableFilenameExceptionState() const {return this->m_FilenameExtensionDisabled;};
+    void SetDisableFilenameExceptionState(bool s) {this->m_FilenameExtensionDisabled = s;};
     const std::string& GetFilename() const {return this->m_Filename;};
     BTK_IO_EXPORT void SetFilename(const std::string& filename);
     AcquisitionFileIO::Pointer GetAcquisitionIO() {return this->m_AcquisitionIO;};
@@ -84,6 +86,8 @@ namespace btk
   private:
     AcquisitionFileReader(const AcquisitionFileReader& ); // Not implemented.
     AcquisitionFileReader& operator=(const AcquisitionFileReader& ); // Not implemented.
+
+    bool m_FilenameExtensionDisabled;
   };
 };
 

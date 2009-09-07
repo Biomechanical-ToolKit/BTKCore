@@ -1,0 +1,9 @@
+// VisSupport module documentation.
+
+/** 
+ * @defgroup BTKVISSUPPORT Visualization Support
+ * @brief To display BTK data in 2D/3D environment.
+ * 
+ * See each sub-modules for more informations.
+ */
+

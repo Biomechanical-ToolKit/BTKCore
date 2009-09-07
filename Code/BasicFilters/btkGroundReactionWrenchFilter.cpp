@@ -40,7 +40,7 @@ namespace btk
 {
   /**
    * @class GroundReactionWrenchFilter
-   * Transform force platform data into ground reaction wrenches.
+   * @brief Transform force platform data into ground reaction wrenches.
    * Theses wrenches are expressed in the global frame.
    *
    * The point of application of each wrench is calculated from :

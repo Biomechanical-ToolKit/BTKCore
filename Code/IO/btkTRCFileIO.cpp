@@ -248,7 +248,7 @@ namespace btk
       if (!ifs.is_open())
         excmsg = "Invalid file path.";
       else if (ifs.eof())
-        excmsg = "Unexcepted end of file.";
+        excmsg = "Unexpected end of file.";
       else if(ifs.bad())
         excmsg = "Loss of integrity of the filestream.";
       else if(ifs.fail())
@@ -267,7 +267,7 @@ namespace btk
     catch (std::exception& e)
     {
       if (ifs.is_open()) ifs.close(); 
-      throw(TRCFileIOException("Unexcepted exception occured: " + std::string(e.what())));
+      throw(TRCFileIOException("Unexpected exception occured: " + std::string(e.what())));
     }
     catch(...)
     {

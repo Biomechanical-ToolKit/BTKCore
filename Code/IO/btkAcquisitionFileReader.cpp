@@ -96,6 +96,16 @@ namespace btk
    */
   
   /**
+   * @fn bool AcquisitionFileReader::GetDisableFilenameExceptionState() const
+   * Returns state of the disabling of the exception for missing filename.
+   */
+   
+  /**
+   * @fn void AcquisitionFileReader::SetDisableFilenameExceptionState(bool s)
+   * Enable/disable exception for the missing of the filename.
+   */
+  
+  /**
    * @fn const std::string& AcquisitionFileReader::GetFilename() const
    * Gets the filename of the file to read.
    */
@@ -144,6 +154,7 @@ namespace btk
   : m_AcquisitionIO(), m_Filename()
   {
     this->SetOutputNumber(1);
+    this->m_FilenameExtensionDisabled = false;
   };
   
   /**
@@ -166,7 +177,12 @@ namespace btk
   void AcquisitionFileReader::GenerateData()
   {
     if (this->m_Filename.empty())
-      throw AcquisitionFileReaderException("Filename must be specified");
+    {
+      if (!this->m_FilenameExtensionDisabled)
+        throw AcquisitionFileReaderException("Filename must be specified");
+      else
+        return;
+    }
     
     std::ifstream ifs;
     ifs.open(this->m_Filename.c_str());

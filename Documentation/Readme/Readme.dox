@@ -8,6 +8,10 @@
 - @ref compil_sec
   - @ref build_sec
   - @ref config_sec 
+    - @ref config_tools
+    - @ref config_vissupport
+      - @ref config_vtk
+    - @ref config_matlab
 - @ref install_sec
 - @ref pb_sec
 - @ref data_sec
@@ -31,53 +35,59 @@ BTK use the generous open-source New BSD license. Yes, you can use BTK
 in commercial products. The complete text of the copyright follows.
 
 @verbatim
-The Biomechanical ToolKit
-Copyright (c) 2009, Arnaud Barré
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-
-    * Redistributions of source code must retain the above
-      copyright notice, this list of conditions and the following
-      disclaimer.
-    * Redistributions in binary form must reproduce the above
-      copyright notice, this list of conditions and the following
-      disclaimer in the documentation and/or other materials
-      provided with the distribution.
-    * Neither the name(s) of the copyright holders nor the names
-      of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written
-      permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
+/*
+ * The Biomechanical ToolKit
+ * Copyright (c) 2009, Arnaud Barré
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 
+ *     * Redistributions of source code must retain the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer.
+ *     * Redistributions in binary form must reproduce the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ *     * Neither the name(s) of the copyright holders nor the names
+ *       of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written
+ *       permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */ 
 @endverbatim
 
 @htmlonly <hr> @endhtmlonly
 
 @section organisation_sec Organization
 
-The BTK source code repository is organized into four major sections.
+The BTK source code repository is organized into six major sections.
 
- - The toolkit source code is found in the directory @b Code. This directory has the following subdirectories.
-   - @b Common: Core classes commonly used by other kits
-   - @b IO: Classes for reading and writing data
-   - @b BasicFilers: Simple filters to adapt data 
- - The @b Utilities directory contains ressources or libraries required to build BTK.
- - The @b Wrapping directory contains code related to BTK and various programing language to bridge BTK with them.
- - The @b Testing directory contains lots of testing examples. These are undocumented tests but can be helpful in some cases.
+- The toolkit source code is found in the directory @b Code. This directory has the following subdirectories.
+  - @b Common: Core classes commonly used by other kits
+  - @b IO: Classes for reading and writing data
+  - @b BasicFilers: Simple filters to adapt data 
+  - @b VisSupport: Visualization support in 2D/3D environment
+    - @b VTK: Visualization in VTK environment
+- The @b Examples directory contains ressources to use BTK.
+- The @b Testing directory contains lots of testing examples. These are undocumented tests but can be helpful in some cases.
+- The @b Tools directory contains applications created with BTK sources.
+- The @b Utilities directory contains ressources or libraries required to build BTK.
+- The @b Wrapping directory contains code related to BTK and various programing language to bridge BTK with them.
 
 @htmlonly <hr> @endhtmlonly
 
@@ -88,7 +98,7 @@ The BTK source code is commented and permits to construct the API documentation 
 
 @section compil_sec Compilation
 
-The Biomechanical ToolKit (BTK) was tested on PC (Windows XP) with <a href="Visual C++ 2008 Express">Microsoft Visual C++ 2008 Express</a>, Mac OS X (Leopard) with <a href="http://developer.apple.com/tools/xcode/">XCode 3.1</a> and should works on Linux with GCC 4.0 or greater. The compilation process only requires the use of a terminal/command prompt. BTK use <a href="http://www.cmake.org">CMake</a> 2.6.3 or greater to generate its build system, so it is necessary to download it from <a>http://www.cmake.org/HTML/Download.html</a>. The instructions below cover the basics of running CMake for BTK under the assumption that CMake is already installed. See the CMake web page for details on <a href="http://www.cmake.org/HTML/Install.html">intalling</a> and <a href="http://www.cmake.org/HTML/RunningCMake.html">running</a> CMake. 
+The Biomechanical ToolKit (BTK) was tested on PC (Windows XP) with <a href="Visual C++ 2008 Express">Microsoft Visual C++ 2008 Express</a>, Mac OS X (Leopard) with <a href="http://developer.apple.com/tools/xcode/">XCode 3.1</a> and should works on Linux with GCC 4.0 or greater. The compilation process only requires the use of a terminal/command prompt. BTK use <a href="http://www.cmake.org">CMake</a> 2.6.2 or greater to generate its build system, so it is necessary to download it from <a>http://www.cmake.org/HTML/Download.html</a>. The instructions below cover the basics of running CMake for BTK under the assumption that CMake is already installed. See the CMake web page for details on <a href="http://www.cmake.org/HTML/Install.html">intalling</a> and <a href="http://www.cmake.org/HTML/RunningCMake.html">running</a> CMake. 
 
 Compiling BTK requires a complete BTK source tree. Running BTK regression tests (see option @ref config_test in @ref config_sec "Configuration Options in CMake") requires for the first time this option is activate an internet connection to download data files from <a>ftp://ftp.c3d.org</a>. 
 
@@ -130,6 +140,22 @@ BTK is a toolkit providing a wide variety of functionality. Several configuratio
 
 The interactive CMake interface provides brief documentation for every option. Some options have more meaning than can be described in one sentence, so additional documentation is provided here:
 
+@subsubsection config_vissupport BTK_USE_VISSUPPORT
+To display BTK data in 2D/3D enviromments. This option activates sub-options to choose the environment(s) to used.
+
+@paragraph config_vtk BTK_USE_VTK
+Builds library BTKVTK to display BTK data in the <a href="http://www.vtk.org">VTK</a> environment. VTK 5.4 or above required. This option is only shown when @ref config_vissupport is activated.
+
+@subsubsection BTK_USE_SYSTEM_EIGEN2
+Permits to use the <a href="http://eigen.tuxfamily.org/">Eigen</a> library installed on your system instead of the version embedded in BTK. Eigen 2.0 or above required.
+
+@subsubsection config_tools BUILD_TOOLS
+Active the building of tools embedded in BTK. These tools are:
+ - Mokka: Visualizer/editor of acquisition data. Requires <a href="http://www.vtk.org">VTK</a> 5.4 or above and <a href="http://www.qtsoftware.com">Qt</a> 4.5 or above. The option @ref config_vtk must be activated.
+
+@subsubsection BUILD_EXAMPLES
+Active the building of examples in the folder Examples.
+
 @subsubsection BUILD_SHARED_LIBS
 Sets whether the compiled BTK libraries will be shared libraries or static libraries. When linking executables against static libraries the needed symbols will be copied from the libraries into the executables enabling them to run without access to the original libraries. When linking executables against shared libraries references to the symbols are placed into the executables. This has the advantage that many executables can share a large library without producing many copies of its code.
 @n@n
@@ -152,6 +178,9 @@ This option updates this file (Readme.html) by using the the file /Documentation
 This option generate the API documentation and can be found in "Documentation/API" from the the build directory. This documentation is in a HTML format. The main file is the file index.html. 
 
 @subsubsection config_matlab BTK_WRAP_MATLAB
+<div class="important">
+@b Note: Matlab users using Microsoft Visual Studio 2008 can use the script @a EasyInstallWithRedistribuableMatlabToolbox_MSVC2008.bat to compile and install BTK with a single click! This script is in the root of BTK sources.
+</div>
 Enable/Disable generation of BTK bindings in the Matlab language. In order to build the Matlab-based BTK interpreter, the target computer needs to have Matlab 7.0 or newer installed. To turn on Matlab wrapping, set BTK_WRAP_MATLAB to ON during the configuration process.
 
 @paragraph config_matlab_redistribuable BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES
@@ -183,13 +212,24 @@ In Matlab, the BTK project can be seen as a toolbox. You have only to add in the
 
 @section data_sec Getting Data
 
-Regression tests in BTK required C3D files. These files are on the net to reduce the size of the BTK source package. The first time you want to build the tests (BUILD_TESTING option in CMake), CMake will download the required files from ftp://ftp.c3d.org. This download take a long time due to a check betwen EPSV and PASV mode... This problen is due to the CMake binary option build and cannot be fixed by a script.
+Regression tests in BTK required C3D files. These files are on the net
+to reduce the size of the BTK source package. The first time you want to
+build the tests (BUILD_TESTING option in CMake), CMake will download the
+required files from ftp://ftp.c3d.org. This download take a long time
+due to a check betwen EPSV and PASV mode... This problen is due to the
+CMake binary option build and cannot be fixed by a script.
 
 @htmlonly <hr> @endhtmlonly
 
 @section run_sec Running BTK
 
-Many tests/examples in Testing directory will be compiled if BUILD_TESTING are enable in CMake. To run these tests, just type CTest (or "c:\Program Files\CMake 2.6\bin\ctest.exe") or @p bin/TDD from the build directory. If you have built shared libraries, make sure the PATH environment variable (Windows) or the LD_LIBRARY_PATH (Unix) point to the shared libraries (see above documentation of the BUILD_SHARED_LIBS for details)
+Many tests/examples in Testing directory will be compiled if
+BUILD_TESTING are enable in CMake. To run these tests, just type CTest
+(or "c:\Program Files\CMake 2.6\bin\ctest.exe") or @p bin/TDD from the
+build directory. If you have built shared libraries, make sure the PATH
+environment variable (Windows) or the LD_LIBRARY_PATH (Unix) point to
+the shared libraries (see above documentation of the BUILD_SHARED_LIBS
+for details)
 
 @htmlonly <hr> @endhtmlonly
 

@@ -186,6 +186,14 @@ namespace btk
     }
     this->m_Updating = false;
   };
+
+  /**
+   * Reset the state of the process. Usefull when an exception was thrown during the generation of the data.
+   */
+  void ProcessObject::ResetState()
+  {
+    this->m_Updating = false;
+  };
   
   /**
    * Process constructor with zero input and output. The inherited class set the number

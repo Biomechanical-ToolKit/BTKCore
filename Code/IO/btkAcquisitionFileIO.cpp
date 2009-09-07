@@ -110,6 +110,10 @@ namespace btk
    * Enums used to specify the format of the stored data.
    */
   /**
+   * @var AcquisitionFileIO::StorageFormat AcquisitionFileIO::StorageNotApplicable
+   * Acquisition's data have no storage format.
+   */
+  /**
    * @var AcquisitionFileIO::StorageFormat AcquisitionFileIO::Float
    * Acquisition's data are stored as float values.
    */

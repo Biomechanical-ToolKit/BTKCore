@@ -64,12 +64,18 @@
   #else
     #define BTK_BASICFILTERS_EXPORT __declspec( dllimport )
   #endif
+  // BTKVisSupport
+  #if defined(BTKVisSupport_EXPORTS)
+    #define BTK_VISSUPPORT_EXPORT __declspec( dllexport )
+  #else
+    #define BTK_VISSUPPORT_EXPORT __declspec( dllimport )
+  #endif
 #else
   // Un*x doesn't need this
   #define BTK_COMMON_EXPORT
   #define BTK_IO_EXPORT
   #define BTK_BASICFILTERS_EXPORT
-
+  #define BTK_VISSUPPORT_EXPORT
 #endif
 
 #endif // __btkConfigure_h

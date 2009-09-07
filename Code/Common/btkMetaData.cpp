@@ -215,6 +215,11 @@ namespace btk
    */
   
   /**
+   * @fn void MetaData::SetParent(DataObject* parent = 0)
+   * Sets the parent of the entry.
+   */
+   
+  /**
    * @fn void MetaData::SetParent(MetaData* parent = 0)
    * Sets the parent of the entry.
    */
