@@ -676,13 +676,19 @@ namespace btk
         this->m_PointScale = fabs(pointScaleFactor);
         if (pointScaleFactor > 0) // integer
         {
-          fdf = new IntegerFormat(ibfs);
           this->m_StorageFormat = Integer; 
+          if (this->m_AnalogIntegerFormat == Unsigned)
+            fdf = new IntegerFormatUnsignedAnalog(ibfs);
+          else
+            fdf = new IntegerFormatSignedAnalog(ibfs);
         }
-        else // float;
+        else // float
         {
-          fdf = new FloatFormat(ibfs);
           this->m_StorageFormat = Float;
+          if (this->m_AnalogIntegerFormat == Unsigned)
+            fdf = new FloatFormatUnsignedAnalog(ibfs);
+          else
+            fdf = new FloatFormatSignedAnalog(ibfs);
         }
         int frameNumber = lastFrame - input->GetFirstFrame() + 1;
         input->Init(pointNumber, frameNumber, analogNumber, numberSamplesPerAnalogChannel);
@@ -706,7 +712,7 @@ namespace btk
           Acquisition::AnalogIterator itA = input->BeginAnalog();
           while (itA != input->EndAnalog())
           {
-            (*itA)->GetValues().data()[analogFrame] = (fdf->ReadAnalog() - this->m_AnalogZeroOffset[incChannel]) * this->m_AnalogChannelScale[incChannel] * this->m_AnalogUniversalScale;
+            (*itA)->GetValues().data()[analogFrame] = (fdf->ReadAnalog() - static_cast<double>(this->m_AnalogZeroOffset[incChannel])) * this->m_AnalogChannelScale[incChannel] * this->m_AnalogUniversalScale;
             ++itA; ++incChannel;
             if ((itA == input->EndAnalog()) && (inc < static_cast<unsigned>(numberSamplesPerAnalogChannel - 1)))
             {
@@ -1051,10 +1057,20 @@ namespace btk
       if (!templateFile)
       {
         obfs->SeekWrite(512 * (dS - 1), std::ios_base::beg);
-        if (this->m_StorageFormat == Float) // Float format
-          fdf = new FloatFormat(obfs);
-        else // Integer format
-          fdf = new IntegerFormat(obfs);
+        if (this->m_StorageFormat == Integer) // integer
+        {
+          if (this->m_AnalogIntegerFormat == Unsigned)
+            fdf = new IntegerFormatUnsignedAnalog(obfs);
+          else
+            fdf = new IntegerFormatSignedAnalog(obfs);
+        }
+        else // float
+        {
+          if (this->m_AnalogIntegerFormat == Unsigned)
+            fdf = new FloatFormatUnsignedAnalog(obfs);
+          else
+            fdf = new FloatFormatSignedAnalog(obfs);
+        }
         int frameNumber = input->GetPointFrameNumber();
         for (int frame = 0 ; frame < frameNumber ; ++frame)
         {

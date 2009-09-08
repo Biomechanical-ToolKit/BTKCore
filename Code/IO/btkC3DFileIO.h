@@ -100,6 +100,7 @@ namespace btk
     C3DFileIO(const C3DFileIO& ); // Not implemented.
     C3DFileIO& operator=(const C3DFileIO& ); // Not implemented.
     
+    // Interface
     class Format
     {
     public:
@@ -111,10 +112,11 @@ namespace btk
     protected:
       BinaryFileStream* m_Bfs;
     };
-    class IntegerFormat : public Format
+    // Integer format + signed analog data
+    class IntegerFormatSignedAnalog : public Format
     {
     public:
-      IntegerFormat(BinaryFileStream* bfs) : Format(bfs) {};
+      IntegerFormatSignedAnalog(BinaryFileStream* bfs) : Format(bfs) {};
       virtual void ReadPoint(double* x, double* y, double* z, double* residual, double* cam, double pointScaleFactor)
       {
         int8_t byteptr[2];
@@ -139,12 +141,12 @@ namespace btk
         int16_t residualAndMask; 
 #if defined(_MSC_VER)
         this->m_Bfs->Write(static_cast<int16_t>(floor(x / pointScaleFactor + 0.5)));
-				this->m_Bfs->Write(static_cast<int16_t>(floor(y / pointScaleFactor + 0.5)));
-				this->m_Bfs->Write(static_cast<int16_t>(floor(z / pointScaleFactor + 0.5)));
+        this->m_Bfs->Write(static_cast<int16_t>(floor(y / pointScaleFactor + 0.5)));
+        this->m_Bfs->Write(static_cast<int16_t>(floor(z / pointScaleFactor + 0.5)));
 #else
         this->m_Bfs->Write(static_cast<int16_t>(static_cast<float>(x / pointScaleFactor)));
-				this->m_Bfs->Write(static_cast<int16_t>(static_cast<float>(y / pointScaleFactor)));
-				this->m_Bfs->Write(static_cast<int16_t>(static_cast<float>(z / pointScaleFactor)));
+        this->m_Bfs->Write(static_cast<int16_t>(static_cast<float>(y / pointScaleFactor)));
+        this->m_Bfs->Write(static_cast<int16_t>(static_cast<float>(z / pointScaleFactor)));
 #endif
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
         byteptr[0] = static_cast<int8_t>(cam);
@@ -158,12 +160,20 @@ namespace btk
 
       };
       virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<int16_t>(v));};
-
     };
-    class FloatFormat : public Format
+    // Integer format + unsigned analog data
+    class IntegerFormatUnsignedAnalog : public IntegerFormatSignedAnalog
     {
     public:
-      FloatFormat(BinaryFileStream* bfs) : Format(bfs) {};
+      IntegerFormatUnsignedAnalog(BinaryFileStream* bfs) : IntegerFormatSignedAnalog(bfs) {};
+      virtual double ReadAnalog() {return static_cast<float>(this->m_Bfs->ReadU16());};
+      virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<uint16_t>(v));};
+    };
+    // Float format + signed analog data
+    class FloatFormatSignedAnalog : public Format
+    {
+    public:
+      FloatFormatSignedAnalog(BinaryFileStream* bfs) : Format(bfs) {};
       virtual void ReadPoint(double* x, double* y, double* z, double* residual, double* cam, double pointScaleFactor)
       {
         int8_t byteptr[2];
@@ -189,8 +199,8 @@ namespace btk
         int8_t byteptr[2];
         int16_t residualAndMask;
         this->m_Bfs->Write(static_cast<float>(x));
-				this->m_Bfs->Write(static_cast<float>(y));
-				this->m_Bfs->Write(static_cast<float>(z));
+        this->m_Bfs->Write(static_cast<float>(y));
+        this->m_Bfs->Write(static_cast<float>(z));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
         byteptr[0] = static_cast<int8_t>(cam);
         byteptr[1] = (byteptr[0] >= 0 ? static_cast<int8_t>(fabs(residual / pointScaleFactor)) : -1);
@@ -203,10 +213,18 @@ namespace btk
       };
       virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<float>(v));};
     };
+    // Float format + unsigned analog data
+    class FloatFormatUnsignedAnalog : public FloatFormatSignedAnalog
+    {
+    public:
+      FloatFormatUnsignedAnalog(BinaryFileStream* bfs) : FloatFormatSignedAnalog(bfs) {};
+      virtual double ReadAnalog() {return static_cast<uint16_t>(this->m_Bfs->ReadFloat());};
+      virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<float>(static_cast<uint16_t>(v)));};
+    };
 
     double m_PointScale;
     std::vector<double> m_AnalogChannelScale;
-		std::vector<int> m_AnalogZeroOffset;
+    std::vector<int> m_AnalogZeroOffset;
     double m_AnalogUniversalScale;
     AnalogIntegerFormat m_AnalogIntegerFormat;
     int m_WritingFlags;
