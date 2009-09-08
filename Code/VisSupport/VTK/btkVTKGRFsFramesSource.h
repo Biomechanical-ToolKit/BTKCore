@@ -46,11 +46,11 @@ namespace btk
   class VTKGRFsFramesSource : public vtkPolyDataAlgorithm
   {
   public:
-    BTK_VISSUPPORT_EXPORT static VTKGRFsFramesSource* New();
-    vtkTypeRevisionMacro(VTKGRFsFramesSource, vtkPolyDataAlgorithm);
-    BTK_VISSUPPORT_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
+    BTK_VTK_EXPORT static VTKGRFsFramesSource* New();
+    vtkExportedTypeRevisionMacro(VTKGRFsFramesSource, vtkPolyDataAlgorithm, BTK_VTK_EXPORT);
+    BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
 
-    BTK_VISSUPPORT_EXPORT void SetInput(WrenchCollection::Pointer input);
+    BTK_VTK_EXPORT void SetInput(WrenchCollection::Pointer input);
     
     double GetScaleUnit() {return this->mp_Scale;};
     void SetScaleUnit(double s) {this->mp_Scale = s;};
@@ -59,11 +59,11 @@ namespace btk
     VTKGRFsFramesSource();
     ~VTKGRFsFramesSource();
     
-    BTK_VISSUPPORT_EXPORT virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
-    BTK_VISSUPPORT_EXPORT virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
-    //BTK_VISSUPPORT_EXPORT virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+    BTK_VTK_EXPORT virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+    BTK_VTK_EXPORT virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+    //BTK_VTK_EXPORT virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
 
-    BTK_VISSUPPORT_EXPORT virtual int FillInputPortInformation(int port, vtkInformation* info);
+    BTK_VTK_EXPORT virtual int FillInputPortInformation(int port, vtkInformation* info);
     
   private:
     VTKGRFsFramesSource(const VTKGRFsFramesSource& );  // Not implemented.

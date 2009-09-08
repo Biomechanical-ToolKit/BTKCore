@@ -52,40 +52,40 @@ namespace btk
   class VTKMarkersFramesSource : public vtkPolyDataAlgorithm
   {
   public:
-    BTK_VISSUPPORT_EXPORT static VTKMarkersFramesSource* New();
-    vtkTypeRevisionMacro(VTKMarkersFramesSource, vtkPolyDataAlgorithm);
-    BTK_VISSUPPORT_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
+    BTK_VTK_EXPORT static VTKMarkersFramesSource* New();
+    vtkExportedTypeRevisionMacro(VTKMarkersFramesSource, vtkPolyDataAlgorithm, BTK_VTK_EXPORT);
+    BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
 
-    BTK_VISSUPPORT_EXPORT void SetInput(PointCollection::Pointer input);
+    BTK_VTK_EXPORT void SetInput(PointCollection::Pointer input);
 
-    BTK_VISSUPPORT_EXPORT void ClearSelectedMarkers();
-    BTK_VISSUPPORT_EXPORT void SetSelectedMarker(vtkIdType id);
+    BTK_VTK_EXPORT void ClearSelectedMarkers();
+    BTK_VTK_EXPORT void SetSelectedMarker(vtkIdType id);
 
-    BTK_VISSUPPORT_EXPORT double GetMarkerRadius(vtkIdType id);
-    BTK_VISSUPPORT_EXPORT void SetMarkerRadius(vtkIdType id, double radius);
-    BTK_VISSUPPORT_EXPORT double* GetMarkerColor(vtkIdType id);
-    BTK_VISSUPPORT_EXPORT void SetMarkersColor(vtkIdTypeArray* ids, double r, double g, double b);
-    BTK_VISSUPPORT_EXPORT vtkIdType GetMarkerColorIndex(vtkIdType id);
-    BTK_VISSUPPORT_EXPORT void SetMarkerColorIndex(vtkIdType id, vtkIdType);
-    BTK_VISSUPPORT_EXPORT vtkLookupTable* GetMarkerColorLUT();
+    BTK_VTK_EXPORT double GetMarkerRadius(vtkIdType id);
+    BTK_VTK_EXPORT void SetMarkerRadius(vtkIdType id, double radius);
+    BTK_VTK_EXPORT double* GetMarkerColor(vtkIdType id);
+    BTK_VTK_EXPORT void SetMarkersColor(vtkIdTypeArray* ids, double r, double g, double b);
+    BTK_VTK_EXPORT vtkIdType GetMarkerColorIndex(vtkIdType id);
+    BTK_VTK_EXPORT void SetMarkerColorIndex(vtkIdType id, vtkIdType);
+    BTK_VTK_EXPORT vtkLookupTable* GetMarkerColorLUT();
     
-    BTK_VISSUPPORT_EXPORT void HideMarker(vtkIdType id);
-    BTK_VISSUPPORT_EXPORT void HideMarkers();
-    BTK_VISSUPPORT_EXPORT void ShowMarker(vtkIdType id);
-    BTK_VISSUPPORT_EXPORT void ShowMarkers();
+    BTK_VTK_EXPORT void HideMarker(vtkIdType id);
+    BTK_VTK_EXPORT void HideMarkers();
+    BTK_VTK_EXPORT void ShowMarker(vtkIdType id);
+    BTK_VTK_EXPORT void ShowMarkers();
     
     double GetScaleUnit() {return this->mp_Scale;};
     void SetScaleUnit(double s) {this->mp_Scale = s;};
  
   protected:
-    BTK_VISSUPPORT_EXPORT VTKMarkersFramesSource();
-    BTK_VISSUPPORT_EXPORT ~VTKMarkersFramesSource();
+    BTK_VTK_EXPORT VTKMarkersFramesSource();
+    BTK_VTK_EXPORT ~VTKMarkersFramesSource();
     
-    BTK_VISSUPPORT_EXPORT virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
-    BTK_VISSUPPORT_EXPORT virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+    BTK_VTK_EXPORT virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+    BTK_VTK_EXPORT virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
     //virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
 
-    BTK_VISSUPPORT_EXPORT virtual int FillInputPortInformation(int port, vtkInformation* info);
+    BTK_VTK_EXPORT virtual int FillInputPortInformation(int port, vtkInformation* info);
     
   private:
     VTKMarkersFramesSource(const VTKMarkersFramesSource& );  // Not implemented.

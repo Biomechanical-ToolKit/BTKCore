@@ -54,25 +54,25 @@ namespace btk
   class VTKAxesWidget : public vtkObject
   {
   public:
-    BTK_VISSUPPORT_EXPORT static VTKAxesWidget* New();
-    vtkTypeRevisionMacro(VTKAxesWidget, vtkObject);
-    BTK_VISSUPPORT_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
+    BTK_VTK_EXPORT static VTKAxesWidget* New();
+    vtkExportedTypeRevisionMacro(VTKAxesWidget, vtkObject, BTK_VTK_EXPORT);
+    BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
-    BTK_VISSUPPORT_EXPORT void SetAxesActor(vtkAxesActor* actor);
+    BTK_VTK_EXPORT void SetAxesActor(vtkAxesActor* actor);
     vtkAxesActor* GetAxesActor() {return this->mp_AxesActor;};
-    BTK_VISSUPPORT_EXPORT void SetParentRenderer(vtkRenderer* ren);
+    BTK_VTK_EXPORT void SetParentRenderer(vtkRenderer* ren);
     vtkRenderer* GetParentRenderer() {return this->mp_ParentRenderer;};
-    BTK_VISSUPPORT_EXPORT void SetInteractor(vtkRenderWindowInteractor* iren);
+    BTK_VTK_EXPORT void SetInteractor(vtkRenderWindowInteractor* iren);
     vtkRenderWindowInteractor* GetInteractor() {return this->mp_WindowInteractor;};
-    BTK_VISSUPPORT_EXPORT void SetViewport(double minX, double minY, double maxX, double maxY);
-    BTK_VISSUPPORT_EXPORT double* GetViewport();
+    BTK_VTK_EXPORT void SetViewport(double minX, double minY, double maxX, double maxY);
+    BTK_VTK_EXPORT double* GetViewport();
     
-    BTK_VISSUPPORT_EXPORT void SetEnabled(int);
-    BTK_VISSUPPORT_EXPORT void ExecuteEvent(vtkObject *o, unsigned long event, void *calldata);
+    BTK_VTK_EXPORT void SetEnabled(int);
+    BTK_VTK_EXPORT void ExecuteEvent(vtkObject *o, unsigned long event, void *calldata);
     
   protected:
-    BTK_VISSUPPORT_EXPORT VTKAxesWidget();
-    BTK_VISSUPPORT_EXPORT ~VTKAxesWidget();
+    BTK_VTK_EXPORT VTKAxesWidget();
+    BTK_VTK_EXPORT ~VTKAxesWidget();
 
   private:
     class VTKAxesWidgetObserver : public vtkCommand

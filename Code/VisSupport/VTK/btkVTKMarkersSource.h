@@ -46,18 +46,18 @@ namespace btk
   class VTKMarkersSource : public vtkGlyph3D 
   {
   public:
-    BTK_VISSUPPORT_EXPORT static VTKMarkersSource* New();
-    vtkTypeRevisionMacro(VTKMarkersSource, vtkGlyph3D);
-    BTK_VISSUPPORT_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
+    BTK_VTK_EXPORT static VTKMarkersSource* New();
+    vtkExportedTypeRevisionMacro(VTKMarkersSource, vtkGlyph3D, BTK_VTK_EXPORT);
+    BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
 
-    BTK_VISSUPPORT_EXPORT virtual int IsPointVisible(vtkDataSet* points, vtkIdType id);
+    BTK_VTK_EXPORT virtual int IsPointVisible(vtkDataSet* points, vtkIdType id);
 
-    BTK_VISSUPPORT_EXPORT void SetExistingMarkers(vtkIntArray* m);
-    BTK_VISSUPPORT_EXPORT void SetVisibleMarkers(vtkIntArray* m);
+    BTK_VTK_EXPORT void SetExistingMarkers(vtkIntArray* m);
+    BTK_VTK_EXPORT void SetVisibleMarkers(vtkIntArray* m);
     
   protected:
-    BTK_VISSUPPORT_EXPORT VTKMarkersSource();
-    BTK_VISSUPPORT_EXPORT ~VTKMarkersSource();
+    BTK_VTK_EXPORT VTKMarkersSource();
+    BTK_VTK_EXPORT ~VTKMarkersSource();
     
   private:
     VTKMarkersSource(const VTKMarkersSource& );  // Not implemented.

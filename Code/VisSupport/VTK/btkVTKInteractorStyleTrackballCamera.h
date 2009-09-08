@@ -45,19 +45,19 @@ namespace btk
   class VTKInteractorStyleTrackballCamera : public vtkInteractorStyleTrackballCamera
   {
   public:
-    BTK_VISSUPPORT_EXPORT static VTKInteractorStyleTrackballCamera* New();
-    vtkTypeRevisionMacro(VTKInteractorStyleTrackballCamera, vtkInteractorStyleTrackballCamera);
-    BTK_VISSUPPORT_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
+    BTK_VTK_EXPORT static VTKInteractorStyleTrackballCamera* New();
+    vtkExportedTypeRevisionMacro(VTKInteractorStyleTrackballCamera, vtkInteractorStyleTrackballCamera, BTK_VTK_EXPORT);
+    BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
-    BTK_VISSUPPORT_EXPORT virtual void Rotate();
+    BTK_VTK_EXPORT virtual void Rotate();
     //virtual void EndRotate();
     
   protected:
-    BTK_VISSUPPORT_EXPORT VTKInteractorStyleTrackballCamera();
+    BTK_VTK_EXPORT VTKInteractorStyleTrackballCamera();
     ~VTKInteractorStyleTrackballCamera() {};
     
   private:
-    BTK_VISSUPPORT_EXPORT void ProjectToSphere(int* size, int* pos, double* vec);
+    BTK_VTK_EXPORT void ProjectToSphere(int* size, int* pos, double* vec);
     
     double m_Radius;
   };

@@ -45,18 +45,17 @@ namespace btk
   class VTKDataObjectAdapter : public vtkDataObject
   {
   public:
-    BTK_VISSUPPORT_EXPORT static VTKDataObjectAdapter* New();
+    BTK_VTK_EXPORT static VTKDataObjectAdapter* New();
+    vtkExportedTypeRevisionMacro(VTKDataObjectAdapter, vtkDataObject, BTK_VTK_EXPORT);
+    BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
-    vtkTypeRevisionMacro(VTKDataObjectAdapter, vtkDataObject);
-    BTK_VISSUPPORT_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
-    
-    BTK_VISSUPPORT_EXPORT virtual unsigned long int GetMTime();
+    BTK_VTK_EXPORT virtual unsigned long int GetMTime();
     
     DataObject::Pointer GetBTKDataObject() {return this->mp_Data;};
-    BTK_VISSUPPORT_EXPORT void SetBTKDataObject(DataObject::Pointer data);
+    BTK_VTK_EXPORT void SetBTKDataObject(DataObject::Pointer data);
     
   protected:
-    BTK_VISSUPPORT_EXPORT VTKDataObjectAdapter();
+    BTK_VTK_EXPORT VTKDataObjectAdapter();
     ~VTKDataObjectAdapter() {};
     
   private:    

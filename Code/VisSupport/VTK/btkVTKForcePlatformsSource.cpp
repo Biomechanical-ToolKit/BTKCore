@@ -128,9 +128,9 @@ namespace btk
     for (ForcePlatformCollection::ConstIterator it = input->Begin() ; it != input->End() ; ++it)
     {
       double* c = (*it)->GetCorners().data();
-      planeGenerator->SetOrigin(c[6] * this->mp_Scale, c[7] * this->mp_Scale, c[8] * this->mp_Scale);
       planeGenerator->SetPoint1(c[3] * this->mp_Scale, c[4] * this->mp_Scale, c[5] * this->mp_Scale);
       planeGenerator->SetPoint2(c[9] * this->mp_Scale, c[10] * this->mp_Scale, c[11] * this->mp_Scale);
+      planeGenerator->SetOrigin(c[6] * this->mp_Scale, c[7] * this->mp_Scale, c[8] * this->mp_Scale);
 
       planeGenerator->Update();
       vtkPolyData* forcePlatform = vtkPolyData::New();
