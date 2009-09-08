@@ -6,6 +6,7 @@ SET(Mokka_CPP
   MainWindow.cpp
   Metadata.cpp
   MetadataView.cpp
+  ComboBoxDelegate.cpp
   main.cpp
   )
 
@@ -13,7 +14,8 @@ SET(Mokka_H
   About.h
   MainWindow.h
   MetadataView.h
-  Metadata.h)
+  Metadata.h
+  ComboBoxDelegate.h)
 
 SET(Mokka_UI
   About.ui

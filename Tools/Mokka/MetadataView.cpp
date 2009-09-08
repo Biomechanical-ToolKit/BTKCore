@@ -34,25 +34,63 @@
  */
 
 #include "MetadataView.h"
+#include "ComboBoxDelegate.h"
 
-/*
-int MetadataView::countMetaData(btk::MetaData::Pointer m)
+MetadataView::MetadataView(QWidget* parent)
+: QTreeView(parent)
 {
-  int count = m->GetChildNumber();
-  for (btk::MetaData::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
-  {
-    if ((*it)->HasChildren())
-      count += m->countMetaData((*it))
-  }
-  return count;
+  // Model
+  this->mp_Model = new QStandardItemModel();
+  this->setModel(this->mp_Model);
+  this->mp_Model->setColumnCount(7);
+  // TreeView
+  this->mp_Model->setHorizontalHeaderLabels(QStringList() << "Labels" << "" << "Format" << "Dimensions" << "" << "Values" << "Description");
+  QStandardItem* lockHeader = new QStandardItem(QIcon(QString::fromUtf8(":/images/lock.png")), "");
+  this->mp_Model->setHorizontalHeaderItem(1, lockHeader);
+  QHeaderView* header = this->header();
+  header->setMovable(false);
+  header->resizeSection(1, 25);
+  header->setResizeMode (1, QHeaderView::Fixed);
+  header->resizeSection(4, 16);
+  header->setResizeMode (4, QHeaderView::Fixed);
+  // Delegate
+  ComboBoxDelegate* format = new ComboBoxDelegate(this);
+  format->setList(QStringList() << "" << "Char" << "Byte" << "Integer" << "Real");
+  this->setItemDelegateForColumn(2, format);
+  // Connection
+  connect(this->mp_Model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(dispatchChangement(QStandardItem*)));
+  
+  this->setEditTriggers(QAbstractItemView::NoEditTriggers);
 };
-*/
-void MetadataView::expandItem(QStandardItem* expander)
+
+void MetadataView::dispatchChangement(QStandardItem* item)
+{
+  switch (item->index().column())
+  {
+  case 0: // Label
+    break;
+  case 1: // Unlock
+    break;
+  case 2: // Format
+    break;
+  case 3: // Dimensions
+    break;
+  case 4: // Expander
+    this->expandItem(item);
+    break;
+  case 5: // Values
+    break;
+  case 6: // Description
+    break;
+  }
+};
+
+void MetadataView::expandItem(QStandardItem* item)
 {
   this->mp_Model->blockSignals(true);
-  int state = expander->data(checkState2).toInt();
-  QModelIndex index = this->mp_Model->indexFromItem(expander);
-  QStandardItem* parent = expander->parent();
+  int state = item->data(checkState2).toInt();
+  QModelIndex index = this->mp_Model->indexFromItem(item);
+  QStandardItem* parent = item->parent();
   QStandardItem* values = parent->child(index.row(), index.column() + 1);
   int count = values->data(metadataInfoValuesCount).toInt();
   QFont f = values->font();
@@ -103,28 +141,28 @@ void MetadataView::constructView(btk::MetaData::Pointer m, QStandardItem* parent
       switch(info->GetFormat())
       {
         case btk::MetaDataInfo::Char:
-          for (int i = 1 ; i < info->GetValues().size() ; ++i)
+          for (int i = 1 ; i < static_cast<int>(info->GetValues().size()) ; ++i)
           {
             parent->setChild(++idx, 5, new QStandardItem(QString::fromStdString(info->ToString(i))));
             this->setRowHidden(idx, parent->index(), true);
           }
           break;
         case btk::MetaDataInfo::Byte:
-          for (int i = 1 ; i < info->GetValues().size() ; ++i)
+          for (int i = 1 ; i < static_cast<int>(info->GetValues().size()) ; ++i)
           {
             parent->setChild(++idx, 5, new QStandardItem(QString::number(info->ToInt(i))));
             this->setRowHidden(idx, parent->index(), true);
           }
           break;
         case btk::MetaDataInfo::Integer:
-          for (int i = 1 ; i < info->GetValues().size() ; ++i)
+          for (int i = 1 ; i < static_cast<int>(info->GetValues().size()) ; ++i)
           {
             parent->setChild(++idx, 5, new QStandardItem(QString::number(info->ToInt(i))));
             this->setRowHidden(idx, parent->index(), true);
           }
           break;
         case btk::MetaDataInfo::Real:
-          for (int i = 1 ; i < info->GetValues().size() ; ++i)
+          for (int i = 1 ; i < static_cast<int>(info->GetValues().size()) ; ++i)
           {
             parent->setChild(++idx, 5, new QStandardItem(QString::number(info->ToDouble(i))));
             this->setRowHidden(idx, parent->index(), true);

@@ -146,7 +146,7 @@
      <x>0</x>
      <y>0</y>
      <width>954</width>
-     <height>22</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1067,13 +1067,13 @@ QPushButton::flat
    <property name="minimumSize">
     <size>
      <width>200</width>
-     <height>437</height>
+     <height>0</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>500</width>
-     <height>437</height>
+     <height>16777215</height>
     </size>
    </property>
    <property name="floating">

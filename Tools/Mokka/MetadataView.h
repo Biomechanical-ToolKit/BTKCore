@@ -52,45 +52,14 @@ class MetadataView : public QTreeView
   Q_OBJECT
 
 public:
-  MetadataView(QWidget* parent = 0)
-  : QTreeView(parent)
-  {
-    this->mp_Model = new QStandardItemModel();
-    this->setModel(this->mp_Model);
-    this->mp_Model->setColumnCount(7);
-    
-    QStringList headers; headers << "Labels" << "" << "Format" << "Dimensions" << "" << "Values" << "Description";
-    this->mp_Model->setHorizontalHeaderLabels(headers);
-    QStandardItem* lockHeader = new QStandardItem(QIcon(QString::fromUtf8(":/images/lock.png")), "");
-    this->mp_Model->setHorizontalHeaderItem(1, lockHeader);
-    QHeaderView* header = this->header();
-    header->setMovable(false);
-    header->resizeSection(1, 25);
-    header->setResizeMode (1, QHeaderView::Fixed);
-    header->resizeSection(4, 16);
-    header->setResizeMode (4, QHeaderView::Fixed);
-    this->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    
-    connect(this->mp_Model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(expandItem(QStandardItem*)));
-  };
+  MetadataView(QWidget* parent = 0);
+  ~MetadataView() { delete this->mp_Model; };
   
-  ~MetadataView()
-  {
-    delete this->mp_Model;
-  }
-  
-  virtual QStyleOptionViewItem viewOptions() const
-  {
-    QStyleOptionViewItem item;
-    item.init(this);
-    item.displayAlignment = Qt::AlignTop;
-    return item;
-  };
-
   void load(btk::MetaData::Pointer m);
   void reset();
 
 public Q_SLOTS:
+  void dispatchChangement(QStandardItem*);
   void expandItem(QStandardItem*);
   
 private:
@@ -98,6 +67,8 @@ private:
   
   QStandardItemModel* mp_Model;
 };
+
+// --------------- MetdataViewItem ---------------
 
 class DimensionsItem : public QStandardItem
 {
@@ -161,6 +132,8 @@ public:
     this->setText(txt);
   };
 };
+
+// --------------- Specials QCheckBox ---------------
 
 class Lock : public QCheckBox
 {

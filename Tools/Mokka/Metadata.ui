@@ -16,13 +16,7 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="MetadataView" name="treeView">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="alternatingRowColors">
+     <property name="showDropIndicator" stdset="0">
       <bool>false</bool>
      </property>
      <property name="expandsOnDoubleClick">
@@ -33,9 +27,6 @@
      </attribute>
      <attribute name="headerStretchLastSection">
       <bool>true</bool>
-     </attribute>
-     <attribute name="headerMinimumSectionSize">
-      <number>75</number>
      </attribute>
     </widget>
    </item>
