@@ -1,16 +1,16 @@
 <RCC>
   <qresource>
-    <file>images/1downarrow.png</file>
-    <file>images/1uparrow.png</file>
-    <file>images/disclosureTriangleSmallDownBlack.png</file>
-    <file>images/disclosureTriangleSmallRightBlack.png</file>
-    <file>images/edit.png</file>
-    <file>images/editdelete.png</file>
-    <file>images/filenew.png</file>
-    <file>images/lock.png</file>
-    <file>images/player_pause.png</file>
-    <file>images/player_play.png</file>
-    <file>images/resetzoom.png</file>
-    <file>images/unlock.png</file>
+    <file>Resources/Images/1downarrow.png</file>
+    <file>Resources/Images/1uparrow.png</file>
+    <file>Resources/Images/disclosureTriangleSmallDownBlack.png</file>
+    <file>Resources/Images/disclosureTriangleSmallRightBlack.png</file>
+    <file>Resources/Images/edit.png</file>
+    <file>Resources/Images/editdelete.png</file>
+    <file>Resources/Images/filenew.png</file>
+    <file>Resources/Images/lock.png</file>
+    <file>Resources/Images/player_pause.png</file>
+    <file>Resources/Images/player_play.png</file>
+    <file>Resources/Images/resetzoom.png</file>
+    <file>Resources/Images/unlock.png</file>
   </qresource>
 </RCC>

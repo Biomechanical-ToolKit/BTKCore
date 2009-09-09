@@ -99,7 +99,7 @@
          </property>
          <property name="icon">
           <iconset resource="images.qrc">
-           <normaloff>:/images/player_play.png</normaloff>:/images/player_play.png</iconset>
+           <normaloff>:/Resources/Images/player_play.png</normaloff>:/Resources/Images/player_play.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -386,7 +386,7 @@ QPushButton::flat
          </property>
          <property name="icon">
           <iconset resource="images.qrc">
-           <normaloff>:/images/disclosureTriangleSmallDownBlack.png</normaloff>:/images/disclosureTriangleSmallDownBlack.png</iconset>
+           <normaloff>:/Resources/Images/disclosureTriangleSmallDownBlack.png</normaloff>:/Resources/Images/disclosureTriangleSmallDownBlack.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -724,7 +724,7 @@ QPushButton::flat
          </property>
          <property name="icon">
           <iconset resource="images.qrc">
-           <normaloff>:/images/filenew.png</normaloff>:/images/filenew.png</iconset>
+           <normaloff>:/Resources/Images/filenew.png</normaloff>:/Resources/Images/filenew.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -762,7 +762,7 @@ QPushButton::flat
          </property>
          <property name="icon">
           <iconset resource="images.qrc">
-           <normaloff>:/images/editdelete.png</normaloff>:/images/editdelete.png</iconset>
+           <normaloff>:/Resources/Images/editdelete.png</normaloff>:/Resources/Images/editdelete.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -800,7 +800,7 @@ QPushButton::flat
          </property>
          <property name="icon">
           <iconset resource="images.qrc">
-           <normaloff>:/images/1downarrow.png</normaloff>:/images/1downarrow.png</iconset>
+           <normaloff>:/Resources/Images/1downarrow.png</normaloff>:/Resources/Images/1downarrow.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -838,7 +838,7 @@ QPushButton::flat
          </property>
          <property name="icon">
           <iconset resource="images.qrc">
-           <normaloff>:/images/1uparrow.png</normaloff>:/images/1uparrow.png</iconset>
+           <normaloff>:/Resources/Images/1uparrow.png</normaloff>:/Resources/Images/1uparrow.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -873,7 +873,7 @@ QPushButton::flat
          </property>
          <property name="icon">
           <iconset resource="images.qrc">
-           <normaloff>:/images/resetzoom.png</normaloff>:/images/resetzoom.png</iconset>
+           <normaloff>:/Resources/Images/resetzoom.png</normaloff>:/Resources/Images/resetzoom.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -927,7 +927,7 @@ QPushButton::flat
          </property>
          <property name="icon">
           <iconset resource="images.qrc">
-           <normaloff>:/images/disclosureTriangleSmallDownBlack.png</normaloff>:/images/disclosureTriangleSmallDownBlack.png</iconset>
+           <normaloff>:/Resources/Images/disclosureTriangleSmallDownBlack.png</normaloff>:/Resources/Images/disclosureTriangleSmallDownBlack.png</iconset>
          </property>
          <property name="iconSize">
           <size>

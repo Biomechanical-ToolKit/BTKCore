@@ -45,7 +45,7 @@ MetadataView::MetadataView(QWidget* parent)
   this->mp_Model->setColumnCount(7);
   // TreeView
   this->mp_Model->setHorizontalHeaderLabels(QStringList() << "Labels" << "" << "Format" << "Dimensions" << "" << "Values" << "Description");
-  QStandardItem* lockHeader = new QStandardItem(QIcon(QString::fromUtf8(":/images/lock.png")), "");
+  QStandardItem* lockHeader = new QStandardItem(QIcon(QString::fromUtf8(":/Resources/Images/lock.png")), "");
   this->mp_Model->setHorizontalHeaderItem(1, lockHeader);
   QHeaderView* header = this->header();
   header->setMovable(false);

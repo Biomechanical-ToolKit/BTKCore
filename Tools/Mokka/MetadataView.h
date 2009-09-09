@@ -144,14 +144,14 @@ public:
     this->setStyleSheet(
       "QCheckBox { spacing: 0px; margin-left:5px; }\
        QCheckBox::indicator { width: 13px; height: 13px; }\
-       QCheckBox::indicator:unchecked { image: url(:/images/unlock.png); }\
-       QCheckBox::indicator:unchecked:hover { image: url(:/images/unlock.png); }\
-       QCheckBox::indicator:unchecked:pressed { image: url(:/images/unlock.png); }\
-       QCheckBox::indicator:checked { image: url(:/images/lock.png); }\
-       QCheckBox::indicator:checked:hover { image: url(:/images/lock.png); }\
-       QCheckBox::indicator:checked:pressed { image: url(:/images/lock.png); }\
-       QCheckBox::indicator:indeterminate:hover { image: url(:/images/unlock.png); }\
-       QCheckBox::indicator:indeterminate:pressed { image: url(:/images/unlock.png); }"
+       QCheckBox::indicator:unchecked { image: url(:/Resources/Images/unlock.png); }\
+       QCheckBox::indicator:unchecked:hover { image: url(:/Resources/Images/unlock.png); }\
+       QCheckBox::indicator:unchecked:pressed { image: url(:/Resources/Images/unlock.png); }\
+       QCheckBox::indicator:checked { image: url(:/Resources/Images/lock.png); }\
+       QCheckBox::indicator:checked:hover { image: url(:/Resources/Images/lock.png); }\
+       QCheckBox::indicator:checked:pressed { image: url(:/Resources/Images/lock.png); }\
+       QCheckBox::indicator:indeterminate:hover { image: url(:/Resources/Images/unlock.png); }\
+       QCheckBox::indicator:indeterminate:pressed { image: url(:/Resources/Images/unlock.png); }"
      );
     if (unlocked)
       this->setCheckState(Qt::Unchecked);
@@ -197,14 +197,14 @@ private:
       this->setStyleSheet(
         "QCheckBox { spacing: 0px; }\
          QCheckBox::indicator { width: 16px; height: 16px; }\
-         QCheckBox::indicator:unchecked { image: url(:/images/invisible.png); }\
-         QCheckBox::indicator:unchecked:hover { image: url(:/images/invisible.png); }\
-         QCheckBox::indicator:unchecked:pressed { image: url(:/images/invisible.png); }\
-         QCheckBox::indicator:checked { image: url(:/images/invisible.png); }\
-         QCheckBox::indicator:checked:hover { image: url(:/images/invisible.png); }\
-         QCheckBox::indicator:checked:pressed { image: url(:/images/invisible.png); }\
-         QCheckBox::indicator:indeterminate:hover { image: url(:/images/invisible.png); }\
-         QCheckBox::indicator:indeterminate:pressed { image: url(:/images/invisible.png); }"
+         QCheckBox::indicator:unchecked { image: url(:/Resources/Images/invisible.png); }\
+         QCheckBox::indicator:unchecked:hover { image: url(:/Resources/Images/invisible.png); }\
+         QCheckBox::indicator:unchecked:pressed { image: url(:/Resources/Images/invisible.png); }\
+         QCheckBox::indicator:checked { image: url(:/Resources/Images/invisible.png); }\
+         QCheckBox::indicator:checked:hover { image: url(:/Resources/Images/invisible.png); }\
+         QCheckBox::indicator:checked:pressed { image: url(:/Resources/Images/invisible.png); }\
+         QCheckBox::indicator:indeterminate:hover { image: url(:/Resources/Images/invisible.png); }\
+         QCheckBox::indicator:indeterminate:pressed { image: url(:/Resources/Images/invisible.png); }"
       );
     }
     else
@@ -212,14 +212,14 @@ private:
       this->setStyleSheet(
         "QCheckBox { spacing: 0px; }\
          QCheckBox::indicator { width: 16px; height: 16px; }\
-         QCheckBox::indicator:unchecked { image: url(:/images/disclosureTriangleSmallRightBlack.png); }\
-         QCheckBox::indicator:unchecked:hover { image: url(:/images/disclosureTriangleSmallRightBlack.png); }\
-         QCheckBox::indicator:unchecked:pressed { image: url(:/images/disclosureTriangleSmallRightBlack.png); }\
-         QCheckBox::indicator:checked { image: url(:/images/disclosureTriangleSmallDownBlack.png); }\
-         QCheckBox::indicator:checked:hover { image: url(:/images/disclosureTriangleSmallDownBlack.png); }\
-         QCheckBox::indicator:checked:pressed { image: url(:/images/disclosureTriangleSmallDownBlack.png); }\
-         QCheckBox::indicator:indeterminate:hover { image: url(:/images/disclosureTriangleSmallDownBlack.png); }\
-         QCheckBox::indicator:indeterminate:pressed { image: url(:/images/disclosureTriangleSmallDownBlack.png); }"
+         QCheckBox::indicator:unchecked { image: url(:/Resources/Images/disclosureTriangleSmallRightBlack.png); }\
+         QCheckBox::indicator:unchecked:hover { image: url(:/Resources/Images/disclosureTriangleSmallRightBlack.png); }\
+         QCheckBox::indicator:unchecked:pressed { image: url(:/Resources/Images/disclosureTriangleSmallRightBlack.png); }\
+         QCheckBox::indicator:checked { image: url(:/Resources/Images/disclosureTriangleSmallDownBlack.png); }\
+         QCheckBox::indicator:checked:hover { image: url(:/Resources/Images/disclosureTriangleSmallDownBlack.png); }\
+         QCheckBox::indicator:checked:pressed { image: url(:/Resources/Images/disclosureTriangleSmallDownBlack.png); }\
+         QCheckBox::indicator:indeterminate:hover { image: url(:/Resources/Images/disclosureTriangleSmallDownBlack.png); }\
+         QCheckBox::indicator:indeterminate:pressed { image: url(:/Resources/Images/disclosureTriangleSmallDownBlack.png); }"
       );
     }
   };

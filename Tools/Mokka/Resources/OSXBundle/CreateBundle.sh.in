@@ -1,0 +1,37 @@
+#!/bin/sh
+
+InstallPrefix="@install_dir@"
+ProjectBinaryDir="@binary_dir@"
+OSX_App_Name="@target@"
+OSX_App="@EXECUTABLE_OUTPUT_PATH@/$OSX_App_Name.app"
+
+
+Qt4LibDir="@QT_LIBRARY_DIR@"
+Qt4BinDir="$(dirname @QT_MOC_EXECUTABLE@)"
+
+# Remove the previous @target@ app package so we start with a clean bundle
+echo "Removing Previous $OSX_App_Name.app bundle at $InstallPrefix/"
+rm -rf "$InstallPrefix/$OSX_App_Name.app"
+
+# copy the @target@.app bundle to the installation location
+echo "Copying $OSX_App_Name.app from the build tree to $InstallPrefix/"
+cp -Rp "$OSX_App" "$InstallPrefix/"
+
+OSX_App="@install_dir@/$OSX_App_Name.app"
+ContentsDir="$OSX_App/Contents"
+SupportDir="$OSX_App/Contents/Support"
+LibrariesDir="$OSX_App/Contents/Libraries"
+FrameworksDir="$OSX_App/Contents/Frameworks"
+PythonDir="$OSX_App/Contents/Python"
+PluginsDir="$OSX_App/Contents/Plugins"
+
+
+# create directories in the @target@.app bundle
+mkdir -p "$SupportDir"
+mkdir -p "$SupportDir"
+if [ ! -e $LibrariesDir ]
+  then
+  mkdir -p "$LibrariesDir"
+fi
+
+
