@@ -98,7 +98,6 @@ void btkMEXTransformSpecializedPoints(
     int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
 
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
-    mxArray* firstFrame  = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
     *mxGetPr(frequency) = acq->GetPointFrequency();
     std::string allLabels = "ALL" + label + "S";

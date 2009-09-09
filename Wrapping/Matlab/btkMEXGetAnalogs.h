@@ -71,11 +71,11 @@ void btkMEXGetAnalogs(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
     mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
     for (int i = 0 ; i < numberOfAnalogs ;++i)
     {
-      mxArray* gain = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
-      mxArray* offset = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
+      mxArray* gain = mxCreateDoubleMatrix(1, 1, mxREAL);
+      mxArray* offset = mxCreateDoubleMatrix(1, 1, mxREAL);
       mxArray* scale = mxCreateDoubleMatrix(1, 1, mxREAL);
-      *reinterpret_cast<int*>(mxGetPr(gain)) = static_cast<int>((*itAnalog)->GetGain());
-      *reinterpret_cast<int*>(mxGetPr(offset)) = (*itAnalog)->GetOffset();
+      *mxGetPr(gain) = static_cast<double>((*itAnalog)->GetGain());
+      *mxGetPr(offset) = static_cast<double>((*itAnalog)->GetOffset());
       *mxGetPr(scale) = (*itAnalog)->GetScale();
       mxSetFieldByNumber(gainStruct, 0, i, gain);
       mxSetFieldByNumber(offsetStruct, 0, i, offset);

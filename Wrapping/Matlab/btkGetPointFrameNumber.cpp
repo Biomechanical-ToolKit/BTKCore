@@ -45,6 +45,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    mexErrMsgTxt("Too many output arguments.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  plhs[0] = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
-  *reinterpret_cast<int*>(mxGetPr(plhs[0])) = acq->GetPointFrameNumber();
+  plhs[0] = mxCreateDoubleMatrix(1, 1, mxREAL);
+  *mxGetPr(plhs[0]) = static_cast<double>(acq->GetPointFrameNumber());
 };

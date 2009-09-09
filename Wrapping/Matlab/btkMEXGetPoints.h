@@ -71,8 +71,8 @@ void btkMEXGetPoints(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
       ++inc;
     }
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
-    mxArray* firstFrame  = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
-    *reinterpret_cast<int*>(mxGetPr(firstFrame)) = acq->GetFirstFrame();
+    mxArray* firstFrame  = mxCreateDoubleMatrix(1, 1, mxREAL);
+    *mxGetPr(firstFrame) = static_cast<double>(acq->GetFirstFrame());
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
     *mxGetPr(frequency) = acq->GetPointFrequency();
     mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
