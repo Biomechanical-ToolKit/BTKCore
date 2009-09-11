@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMEXGetAnalysis_h
-#define __btkMEXGetAnalysis_h
+#ifndef __btkMXAnalysis_h
+#define __btkMXAnalysis_h
 
 #if defined(_MSC_VER)
   // Disable unsafe warning (use of the function 'strcpy' instead of 
@@ -42,13 +42,25 @@
   #pragma warning( disable : 4996 ) 
 #endif
 
-#include "btkMEXObjectHandle.h"
+#include "btkMXObjectHandle.h"
 #include "btkASCIIConverter.h"
 
 #include <btkAcquisition.h>
+#include <btkMetaDataUtils.h>
 #include <btkConvert.h>
 
-void btkMEXGetAnalysis(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
+void btkCreateAnalysis(btk::MetaData::Pointer analysis, char* name, char* context, char* unit, double value, char* subject, char* description)
+{
+  btk::MetaDataCreateChild(analysis, "USED", static_cast<int16_t>(1));
+  btk::MetaDataCreateChild(analysis, "NAMES", std::string(name));
+  btk::MetaDataCreateChild(analysis, "CONTEXTS", std::string(context));
+  btk::MetaDataCreateChild(analysis, "UNITS", std::string(unit));
+  btk::MetaDataCreateChild(analysis, "VALUES", static_cast<float>(value));
+  btk::MetaDataCreateChild(analysis, "SUBJECTS", std::string(subject));
+  btk::MetaDataCreateChild(analysis, "DESCRIPTIONS", std::string(description));
+};
+
+void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
 {
   // First output
   btk::MetaData::Pointer metadata = acq->GetMetaData();
@@ -181,4 +193,4 @@ void btkMEXGetAnalysis(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
   }
 };
 
-#endif // __btkMEXGetAnalysis_h
+#endif // __btkMXAnalysis_h

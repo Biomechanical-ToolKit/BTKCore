@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
+#include "btkMXObjectHandle.h"
 
 #include <btkAcquisition.h>
 
@@ -44,7 +44,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 1)
    mexErrMsgTxt("Too many output arguments.");
 
-  // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
   int numberOfFrames = acq->GetAnalogFrameNumber();

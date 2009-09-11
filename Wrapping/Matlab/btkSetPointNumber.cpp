@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
-#include "btkMEXGetPoints.h"
+#include "btkMXObjectHandle.h"
+#include "btkMXPoint.h"
 
 #include <btkAcquisition.h>
 
@@ -52,5 +52,5 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   acq->SetPointNumber(static_cast<int>(mxGetScalar(prhs[1])));
 
   // Return updated points
-  btkMEXGetPoints(acq, nlhs, plhs);
+  btkMXCreatePointsStructure(acq, nlhs, plhs);
 };

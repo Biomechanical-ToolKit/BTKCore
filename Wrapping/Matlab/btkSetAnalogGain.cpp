@@ -33,21 +33,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
+#include "btkMXObjectHandle.h"
+#include "btkMXAnalog.h"
 
 #include <btkAcquisition.h>
+#include <btkAnalog.h>
+#include <btkConvert.h>
 
+// btkSetAnalogLabel(h, i, newLabel)
+// btkSetAnalogLabel(h, label, newLabel)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs < 1)
-    mexErrMsgTxt("One inputs required.");
-  if (nlhs > 1)
+  if(nrhs < 3)
+    mexErrMsgTxt("Three inputs required.");
+  if (nlhs > 2)
    mexErrMsgTxt("Too many output arguments.");
 
-  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
+    mexErrMsgTxt("Analog's offset must be a scalar integer value.");
 
-  plhs[0] = mxCreateDoubleMatrix(1, 1, mxREAL);
-  *mxGetPr(plhs[0]) = static_cast<double>(acq->GetAnalogResolution());
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);
   
+  int gain = static_cast<int>(mxGetScalar(prhs[2]));
+  if ((gain < 0) && (gain > 5))
+    mexErrMsgTxt("Unknown gain. Read the documentation of this fuction to know the possible values");
+  analog->SetGain(static_cast<btk::Analog::Gain>(gain));
+
+  // Return updated analog channels
+  btkMXCreateAnalogsStructure(acq, nlhs, plhs);
 };
 

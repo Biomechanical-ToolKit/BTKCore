@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMEXAdaptMeasures_h
-#define __btkMEXAdaptMeasures_h
+#ifndef __btkMXMeasure_h
+#define __btkMXMeasure_h
 
 #if defined(_MSC_VER)
   // Disable unsafe warning (use of the function 'strcpy' instead of 
@@ -63,7 +63,7 @@
  * @ingroup BTKWrappingMatlab
  */
 template <class T>
-mxArray* btkMEXAdaptMeasures(typename btk::Collection<T>::Pointer m, char*** fieldnamesPtr)
+mxArray* btkMXCreateMeasuresStructure(typename btk::Collection<T>::Pointer m, char*** fieldnamesPtr)
 {
   typedef typename btk::Collection<T> itemCollection;
   int numberOfMeasures = m->GetItemNumber();
@@ -121,4 +121,4 @@ mxArray* btkMEXAdaptMeasures(typename btk::Collection<T>::Pointer m, char*** fie
   return out;
 };
 
-#endif
+#endif // __btkMXMeasure_h

@@ -33,21 +33,53 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMEXGetPoints_h
-#define __btkMEXGetPoints_h
+#ifndef __btkMXPoint_h
+#define __btkMXPoint_h
 
-#include "btkMEXAdaptMeasures.h"
+#include "btkMXMeasure.h"
 
 #include <btkAcquisition.h>
+#include <btkSpecializedPointsExtractor.h>
 
-void btkMEXGetPoints(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
+btk::Point::Pointer btkMXGetPoint(btk::Acquisition::Pointer acq, int nrhs, const mxArray* prhs[])
+{
+  if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
+    mexErrMsgTxt("Point's index must be a non-empty string or an integer.");
+  
+  btk::Point::Pointer point;
+  if (mxIsChar(prhs[1]))
+  {
+    int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+    char* label = (char*)mxMalloc(strlen);
+    mxGetString(prhs[1], label, strlen);
+    btk::Acquisition::PointIterator itPoint = acq->FindPoint(label);
+    if (itPoint == acq->EndPoint())
+    {
+      std::string err = "No point with label: '" + std::string(label) + "'.";
+      mxFree(label);
+      mexErrMsgTxt(err.c_str());
+    }
+    point = *itPoint;
+    mxFree(label);
+  }
+  else
+  {
+    int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
+    if ((idx < 0) || (idx >= acq->GetPointNumber()))
+      mexErrMsgTxt("Point's index out of range.");
+    point = acq->GetPoint(idx);
+  }
+  return point;
+};
+
+void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
 { 
   if (nlhs == 0)
     return;
 
   btk::PointCollection::Pointer points = acq->GetPoints();
   char** fieldnames = 0;
-  plhs[0] = btkMEXAdaptMeasures<btk::Point>(points, &fieldnames);
+  plhs[0] = btkMXCreateMeasuresStructure<btk::Point>(points, &fieldnames);
   int numberOfPoints = acq->GetPointNumber();
 
   // Second output (optionnal)
@@ -88,4 +120,4 @@ void btkMEXGetPoints(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
   }
 };
 
-#endif // __btkMEXGetPoints_h
+#endif // __btkMXPoint_h 

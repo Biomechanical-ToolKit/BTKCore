@@ -33,12 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
-#include "btkMEXGetPoints.h"
-
-#include <btkAcquisition.h>
-#include <btkPoint.h>
-#include <btkConvert.h>
+#include "btkMXObjectHandle.h"
+#include "btkMXPoint.h"
 
 // btkRemovePoint(h, i)
 // btkRemovePoint(h, label)
@@ -63,6 +59,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (itPoint == acq->EndPoint())
     {
       std::string err = "No point with label: '" + std::string(label) + "'.";
+      mxFree(label);
       mexErrMsgTxt(err.c_str());
     }
     mxFree(label);
@@ -77,6 +74,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
 
   // Return updated points
-  btkMEXGetPoints(acq, nlhs, plhs);
+  btkMXCreatePointsStructure(acq, nlhs, plhs);
 };
 

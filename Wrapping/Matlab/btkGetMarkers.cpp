@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
-#include "btkMEXAdaptMeasures.h"
+#include "btkMXObjectHandle.h"
+#include "btkMXMeasure.h"
 
 #include <btkSpecializedPointsExtractor.h>
 #include <btkAcquisition.h>
@@ -55,7 +55,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   specialPointExtractor->Update();
 
   char** fieldnames = 0;
-  plhs[0] = btkMEXAdaptMeasures<btk::Point>(markers, &fieldnames);
+  plhs[0] = btkMXCreateMeasuresStructure<btk::Point>(markers, &fieldnames);
   int numberOfPoints = markers->GetItemNumber();
   if (nlhs != 3)
   {

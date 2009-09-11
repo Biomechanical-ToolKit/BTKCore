@@ -33,12 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXGetAnalysis.h"
-
-#include <btkMetaDataUtils.h>
-
-// Forward declaration
-void btkCreateAnalysis(btk::MetaData::Pointer analysis, char* name, char* context, char* unit, double value, char* subject, char* description);
+#include "btkMXAnalysis.h"
 
 // btkAppendAnalysisParameter(h, name, context, unit, value, subject, description)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
@@ -266,22 +261,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
   }
   // Return updated analysis
-  btkMEXGetAnalysis(acq, nlhs, plhs);
+  btkMXCreateAnalysisStructure(acq, nlhs, plhs);
   
   mxFree(name);
   mxFree(context);
   mxFree(unit);
   mxFree(subject);
   mxFree(description);
-};
-
-void btkCreateAnalysis(btk::MetaData::Pointer analysis, char* name, char* context, char* unit, double value, char* subject, char* description)
-{
-  btk::MetaDataCreateChild(analysis, "USED", static_cast<int16_t>(1));
-  btk::MetaDataCreateChild(analysis, "NAMES", std::string(name));
-  btk::MetaDataCreateChild(analysis, "CONTEXTS", std::string(context));
-  btk::MetaDataCreateChild(analysis, "UNITS", std::string(unit));
-  btk::MetaDataCreateChild(analysis, "VALUES", static_cast<float>(value));
-  btk::MetaDataCreateChild(analysis, "SUBJECTS", std::string(subject));
-  btk::MetaDataCreateChild(analysis, "DESCRIPTIONS", std::string(description));
 };

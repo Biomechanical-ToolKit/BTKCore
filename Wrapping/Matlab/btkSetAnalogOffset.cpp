@@ -33,11 +33,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMXSpecializedPoint.h"
+#include "btkMXObjectHandle.h"
+#include "btkMXAnalog.h"
 
+#include <btkAcquisition.h>
+#include <btkAnalog.h>
+#include <btkConvert.h>
+
+// btkSetAnalogLabel(h, i, newLabel)
+// btkSetAnalogLabel(h, label, newLabel)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  btkMXSetSpecializedPointValues(btk::Point::Moment, nlhs, plhs, nrhs, prhs);
-};
+  if(nrhs < 3)
+    mexErrMsgTxt("Three inputs required.");
+  if (nlhs > 2)
+   mexErrMsgTxt("Too many output arguments.");
 
+  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
+    mexErrMsgTxt("Analog's offset must be a scalar integer value.");
+
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);
+  analog->SetOffset(static_cast<int>(mxGetScalar(prhs[2])));
+
+  // Return updated analog channels
+  btkMXCreateAnalogsStructure(acq, nlhs, plhs);
+};
 

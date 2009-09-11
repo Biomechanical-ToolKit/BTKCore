@@ -33,11 +33,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXSpecializedPointValues.h"
+#include "btkMXSpecializedPoint.h"
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  btkMEXSetSpecializedPointValues(btk::Point::Angle, nlhs, plhs, nrhs, prhs);
+  btkMXSetSpecializedPointValues(btk::Point::Angle, nlhs, plhs, nrhs, prhs);
 };
 
 

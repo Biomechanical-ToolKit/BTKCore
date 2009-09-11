@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXGetAnalysis.h"
+#include "btkMXAnalysis.h"
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -155,6 +155,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
 
   // Return updated analysis
-  btkMEXGetAnalysis(acq, nlhs, plhs);
+  btkMXCreateAnalysisStructure(acq, nlhs, plhs);
 };
 

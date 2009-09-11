@@ -33,19 +33,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMEXGetPoints_h
-#define __btkMEXGetPoints_h
+#ifndef __btkMXAnalog_h
+#define __btkMXAnalog_h
 
-#include "btkMEXAdaptMeasures.h"
+#include "btkMXMeasure.h"
 
 #include <btkAcquisition.h>
 
-void btkMEXGetAnalogs(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
+btk::Analog::Pointer btkMXGetAnalog(btk::Acquisition::Pointer acq, int nrhs, const mxArray* prhs[])
+{
+  if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
+    mexErrMsgTxt("Analog's index must be a non-empty string or an integer.");
+  btk::Analog::Pointer analog;
+  if (mxIsChar(prhs[1]))
+  {
+    int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+    char* label = (char*)mxMalloc(strlen);
+    mxGetString(prhs[1], label, strlen);
+    btk::Acquisition::AnalogIterator itAnalog = acq->FindAnalog(label);
+    if (itAnalog == acq->EndAnalog())
+    {
+      std::string err = "No analog channel with label: '" + std::string(label) + "'.";
+      mexErrMsgTxt(err.c_str());
+    }
+    analog = *itAnalog;
+    mxFree(label);
+  }
+  else
+  {
+    int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
+    if ((idx < 0) || (idx > acq->GetAnalogNumber()))
+      mexErrMsgTxt("Analog's index out of range.");
+    analog = acq->GetAnalog(idx);
+  }
+  return analog;
+};
+
+void btkMXCreateAnalogsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
 {
   // First output
   btk::AnalogCollection::Pointer analogs = acq->GetAnalogs();
   char** fieldnames = 0;
-  plhs[0] = btkMEXAdaptMeasures<btk::Analog>(analogs, &fieldnames);
+  plhs[0] = btkMXCreateMeasuresStructure<btk::Analog>(analogs, &fieldnames);
   int numberOfAnalogs = acq->GetAnalogNumber();
 
   // Second output (optionnal)
@@ -94,4 +123,4 @@ void btkMEXGetAnalogs(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
   }
 };
 
-#endif // __btkMEXGetPoints_h
+#endif // __btkMXAnalog_h

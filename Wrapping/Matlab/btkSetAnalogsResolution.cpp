@@ -33,11 +33,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMXSpecializedPoint.h"
+#include "btkMXObjectHandle.h"
+#include "btkMXPoint.h"
+
+#include <btkAcquisition.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  btkMXSetSpecializedPointValues(btk::Point::Moment, nlhs, plhs, nrhs, prhs);
+  if(nrhs!=2)
+    mexErrMsgTxt("Two input required.");
+  if (nlhs > 0)
+   mexErrMsgTxt("Too many output arguments.");
+
+  if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
+    mexErrMsgTxt("Analog resolution must be set by a scalr integer value.");
+  
+  int ar = static_cast<int>(mxGetScalar(prhs[1]));
+  btk::Acquisition::AnalogResolution res = btk::Acquisition::Bit12;
+  switch (ar)
+  {
+    case 8:
+      res = btk::Acquisition::Bit8;
+      break;
+    case 12:
+      break;
+    case 14:
+      res = btk::Acquisition::Bit14;
+      break;
+    case 16:
+      res = btk::Acquisition::Bit16;
+      break;
+    default:
+      mexErrMsgTxt("Unvalid analog resolution.");
+
+  }
+  
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  acq->SetAnalogResolution(res);
 };
-
-

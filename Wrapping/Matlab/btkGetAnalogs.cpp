@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
-#include "btkMEXGetAnalogs.h"
+#include "btkMXObjectHandle.h"
+#include "btkMXAnalog.h"
 
 #include <btkAcquisition.h>
 
@@ -47,6 +47,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   
-  btkMEXGetAnalogs(acq, nlhs, plhs);
+  btkMXCreateAnalogsStructure(acq, nlhs, plhs);
 };
 

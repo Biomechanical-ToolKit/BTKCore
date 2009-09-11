@@ -33,12 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
-#include "btkMEXGetPoints.h"
-
-#include <btkAcquisition.h>
-#include <btkPoint.h>
-#include <btkConvert.h>
+#include "btkMXObjectHandle.h"
+#include "btkMXPoint.h"
 
 // btkSetPoint(h, i, values, residual, mask)
 // btkSetPoint(h, label, values, residual, mask)
@@ -51,8 +47,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   int vn = 0, mn = 0, rn = 0;
 
-  if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
-    mexErrMsgTxt("Point's index must be a non-empty string or an integer.");
   if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetN(prhs[2]) != 3))
     mexErrMsgTxt("Point's values must have a second dimension equals to 3.");
   vn = mxGetM(prhs[2]);
@@ -76,28 +70,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (vn != acq->GetPointFrameNumber())
     mexErrMsgTxt("Frame number mismatching.");
 
-  btk::Point::Pointer point;
-  if (mxIsChar(prhs[1]))
-  {
-    int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-    char* label = (char*)mxMalloc(strlen);
-    mxGetString(prhs[1], label, strlen);
-    btk::Acquisition::PointIterator itPoint = acq->FindPoint(label);
-    if (itPoint == acq->EndPoint())
-    {
-      std::string err = "No point with label: '" + std::string(label) + "'.";
-      mexErrMsgTxt(err.c_str());
-    }
-    point = *itPoint;
-    mxFree(label);
-  }
-  else
-  {
-    int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
-    if ((idx < 0) || (idx >= acq->GetPointNumber()))
-      mexErrMsgTxt("Point's index out of range.");
-    point = acq->GetPoint(idx);
-  }
+  btk::Point::Pointer point = btkMXGetPoint(acq, nrhs, prhs);
 
   memcpy(point->GetValues().data(), mxGetPr(prhs[2]) , mxGetNumberOfElements(prhs[2]) * sizeof(double));
   if (nrhs >= 4)
@@ -106,6 +79,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     memcpy(point->GetMasks().data(), mxGetPr(prhs[4]) , mxGetNumberOfElements(prhs[4]) * sizeof(double));
 
   // Return updated points
-  btkMEXGetPoints(acq, nlhs, plhs);
+  btkMXCreatePointsStructure(acq, nlhs, plhs);
 };
 

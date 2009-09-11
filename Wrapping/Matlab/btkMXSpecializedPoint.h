@@ -33,17 +33,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMEXTransformSpecializedPoints_h
-#define __btkMEXTransformSpecializedPoints_h
+#ifndef __btkMXSpecializedPoint_h
+#define __btkMXSpecializedPoint_h
 
-#include "btkMEXObjectHandle.h"
-#include "btkMEXAdaptMeasures.h"
+#include "btkMXMeasure.h"
+#include "btkMXObjectHandle.h"
 
 #include <btkAcquisition.h>
-#include <btkPointCollection.h>
 #include <btkSpecializedPointsExtractor.h>
 
-void btkMEXTransformSpecializedPoints(
+void btkMXCreateSpecializedPointsStructure(
     btk::Point::Type t,
     int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -62,7 +61,7 @@ void btkMEXTransformSpecializedPoints(
   pointsExtractor->Update();
 
   char** fieldnames = 0;
-  plhs[0] = btkMEXAdaptMeasures<btk::Point>(points, &fieldnames);
+  plhs[0] = btkMXCreateMeasuresStructure<btk::Point>(points, &fieldnames);
   int numberOfPoints = points->GetItemNumber();
   for (int i = 0 ; i < numberOfPoints ; ++i)
     delete[] fieldnames[i];
@@ -109,4 +108,94 @@ void btkMEXTransformSpecializedPoints(
   }
 };
 
-#endif // __btkMEXTransformSpecializedPoints_h
+void btkMXGetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+  if (nrhs != 1)
+    mexErrMsgTxt("One input required.");
+  if (nlhs > 1)
+   mexErrMsgTxt("Too many output arguments.");
+
+  // First output
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+
+  btk::SpecializedPointsExtractor::Pointer specialPointExtractor = btk::SpecializedPointsExtractor::New();
+  specialPointExtractor->SetInput(acq);
+  specialPointExtractor->SetPointType(t);
+  btk::PointCollection::Pointer points = specialPointExtractor->GetOutput();
+  specialPointExtractor->Update();
+
+  int numberOfFrames = acq->GetPointFrameNumber();
+  int numberOfPoints = points->GetItemNumber();
+  if (numberOfPoints == 0)
+  {
+    plhs[0] = mxCreateDoubleMatrix(0, 0, mxREAL);
+    return;
+  }
+
+  plhs[0] = mxCreateDoubleMatrix(numberOfFrames, numberOfPoints * 3, mxREAL);
+  double* values = mxGetPr(plhs[0]);
+
+  int i = 0;
+  int j = numberOfFrames * 3;
+  double* v = 0;
+  btk::PointCollection::ConstIterator it = points->Begin();
+  while(i < (numberOfFrames * numberOfPoints * 3))
+  {
+    if (j >= (numberOfFrames * 3))
+    {
+      v = (*it)->GetValues().data();
+      ++it;
+      j = 0;
+    }
+    values[i] = v[j];
+    ++i; ++j;
+  }
+};
+
+void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+  if (nrhs != 2)
+    mexErrMsgTxt("Two input required.");
+  if (nlhs > 0)
+   mexErrMsgTxt("Too many output arguments.");
+
+  if (!mxIsNumeric(prhs[1]))
+    mexErrMsgTxt("The second input must be a matrix of real values corresponding to the same dimensions than extracted points' coordinates.");
+
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+
+  btk::SpecializedPointsExtractor::Pointer specialPointExtractor = btk::SpecializedPointsExtractor::New();
+  specialPointExtractor->SetInput(acq);
+  specialPointExtractor->SetPointType(t);
+  btk::PointCollection::Pointer points = specialPointExtractor->GetOutput();
+  specialPointExtractor->Update();
+
+  int numberOfFrames = acq->GetPointFrameNumber();
+  int numberOfPoints = points->GetItemNumber();
+
+  if (mxGetNumberOfElements(prhs[1]) != (numberOfFrames * numberOfPoints * 3))
+    mexErrMsgTxt("The second input doesn't have the same size than the number of extracted points' coordinates.");
+    
+  if (numberOfPoints == 0)
+    return;
+    
+  double* values = mxGetPr(prhs[1]);
+
+  int i = 0;
+  int j = numberOfFrames * 3;
+  double* v = 0;
+  btk::PointCollection::Iterator it = points->Begin();
+  while (i < (numberOfFrames * numberOfPoints * 3))
+  {
+    if (j >= (numberOfFrames * 3))
+    {
+      v = (*it)->GetValues().data();
+      ++it;
+      j = 0;
+    }
+    v[j] = values[i];
+    ++i; ++j;
+  }
+};
+
+#endif // __btkMXSpecializedPoint_h 

@@ -33,10 +33,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMEXObjectHandle_h
-#define __btkMEXObjectHandle_h
+#ifndef __btkMXObjectHandle_h
+#define __btkMXObjectHandle_h
 
-#include "btkMEXClassID.h"
+#include "btkMXClassID.h"
 
 #include <btkSharedPtr.h>
 
@@ -240,4 +240,4 @@ void btk_MOH_destroy_handle(const mxArray *mxh)
   delete handle;
 };
 
-#endif  // __btkMEXObjectHandle_h
+#endif  // __btkMXObjectHandle_h

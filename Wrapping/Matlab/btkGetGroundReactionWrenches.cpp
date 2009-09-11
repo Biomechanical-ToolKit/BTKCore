@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
-#include "btkMEXAdaptMeasures.h"
+#include "btkMXObjectHandle.h"
+#include "btkMXMeasure.h"
 #include "btkMEXStreambufToWarnMsgTxt.h"
 
 #include <btkAcquisition.h>

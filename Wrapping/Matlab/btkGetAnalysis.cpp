@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXGetAnalysis.h"
+#include "btkMXAnalysis.h"
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -44,7 +44,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   
-  btkMEXGetAnalysis(acq, nlhs, plhs);
+  btkMXCreateAnalysisStructure(acq, nlhs, plhs);
 };
 
 

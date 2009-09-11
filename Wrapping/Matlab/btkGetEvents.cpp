@@ -39,7 +39,7 @@
   #pragma warning( disable : 4996 ) 
 #endif
 
-#include "btkMEXObjectHandle.h"
+#include "btkMXObjectHandle.h"
 #include "btkASCIIConverter.h"
 
 #include <btkAcquisition.h>

@@ -1,20 +1,26 @@
-function btkSetAnalogLabel(h, idx_or_label, new_label) %#ok
-%BTKSETANALOGLABEL Modify analog's label and return updated analogs.
+function btkSetAnalogGain(h, idx_or_label, new_gain) %#ok
+%BTKSETANALOGGAIN Modify analog's gain and return updated analogs.
 % 
-%  BTKSETANALOGLABEL(H, INDEX, NEWLABEL) modifies analog's label by NEWLABEL for 
-%  the analog at the index INDEX.  NEWLABEL must be a non-empty string.
+%  BTKSETANALOGGAIN(H, INDEX, NEWGAIN) modifies analog's gain by NEWGAIN for 
+%  the analog at the index INDEX.  NEWGAIN must be a value between 0 and 5 to represent:
+%    - 0 : unknown gain
+%    - 1 : +/- 10 volts
+%    - 2 : +/- 5 volts
+%    - 3 : +/- 2.5 volts
+%    - 4 : +/- 1.25 volts
+%    - 5 : +/- 1 volt
 %
 %  The analog to modify can also be selected by its LABEL.
-%  BTKSETANALOGLABEL(H, LABEL, NEWLABEL)
+%  BTKSETANALOGGAIN(H, LABEL, NEWGAIN)
 %
 %  This function can also returns updated list of analogs.
-%  ANALOGS = BTKSETANALOGLABEL(H, INDEX, NEWLABEL)
-%  ANALOGS = BTKSETANALOGLABEL(H, LABEL, NEWLABEL)
+%  ANALOGS = BTKSETANALOGGAIN(H, INDEX, NEWGAIN)
+%  ANALOGS = BTKSETANALOGGAIN(H, LABEL, NEWGAIN)
 %  The format of ANALOGS is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>
 %
 %  This function can also returns updated list of analogs' informations.
-%  [ANALOGS, ANALOGSINFO] = BTKSETANALOGLABEL(H, INDEX, NEWLABEL)
-%  [ANALOGS, ANALOGSINFO] = BTKSETANALOGLABEL(H, LABEL, NEWLABEL)
+%  [ANALOGS, ANALOGSINFO] = BTKSETANALOGGAIN(H, INDEX, NEWGAIN)
+%  [ANALOGS, ANALOGSINFO] = BTKSETANALOGGAIN(H, LABEL, NEWGAIN)
 %  The format of ANALOGSINFO is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>
 %
 %  The acquisition is represented by the handle H.  This handle is obtained
@@ -29,4 +35,4 @@ function btkSetAnalogLabel(h, idx_or_label, new_label) %#ok
 
 error(generatemsgid('NotSupported'),'MEX file for function not found');
 
-% [EOF] btkSetAnalogLabel.m
+% [EOF] btkSetAnalogGain.m

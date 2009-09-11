@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
-#include "btkMEXGetPoints.h"
+#include "btkMXObjectHandle.h"
+#include "btkMXPoint.h"
 
 #include <btkAcquisition.h>
 #include <btkPoint.h>
@@ -49,35 +49,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 2)
    mexErrMsgTxt("Too many output arguments.");
 
-  if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
-    mexErrMsgTxt("Point's index must be a non-empty string or an integer.");
   if (!mxIsChar(prhs[2]) || mxIsEmpty(prhs[2]))
     mexErrMsgTxt("Point's label must be a non-empty string.");    
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-
-  btk::Point::Pointer point;
-  if (mxIsChar(prhs[1]))
-  {
-    int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-    char* label = (char*)mxMalloc(strlen);
-    mxGetString(prhs[1], label, strlen);
-    btk::Acquisition::PointIterator itPoint = acq->FindPoint(label);
-    if (itPoint == acq->EndPoint())
-    {
-      std::string err = "No point with label: '" + std::string(label) + "'.";
-      mexErrMsgTxt(err.c_str());
-    }
-    point = *itPoint;
-    mxFree(label);
-  }
-  else
-  {
-    int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
-    if ((idx < 0) || (idx >= acq->GetPointNumber()))
-      mexErrMsgTxt("Point's index out of range.");
-    point = acq->GetPoint(idx);
-  }
+  btk::Point::Pointer point = btkMXGetPoint(acq, nrhs, prhs);
 
   int strlen = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
   char* newLabel = (char*)mxMalloc(strlen);
@@ -86,6 +62,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   mxFree(newLabel);
 
   // Return updated points
-  btkMEXGetPoints(acq, nlhs, plhs);
+  btkMXCreatePointsStructure(acq, nlhs, plhs);
 };
 

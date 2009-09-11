@@ -1,20 +1,21 @@
-function btkSetAnalogLabel(h, idx_or_label, new_label) %#ok
-%BTKSETANALOGLABEL Modify analog's label and return updated analogs.
+function btkSetAnalogOffset(h, idx_or_label, new_offset) %#ok
+%BTKSETANALOGOFFSET Modify analog's offset and return updated analogs.
 % 
-%  BTKSETANALOGLABEL(H, INDEX, NEWLABEL) modifies analog's label by NEWLABEL for 
-%  the analog at the index INDEX.  NEWLABEL must be a non-empty string.
+%  BTKSETANALOGOFFSET(H, INDEX, NEWOFFSET) modifies analog's offset by NEWOFFSET for 
+%  the analog at the index INDEX. This offset is used to convert numeric data into analog 
+%  data or vice versa.
 %
 %  The analog to modify can also be selected by its LABEL.
-%  BTKSETANALOGLABEL(H, LABEL, NEWLABEL)
+%  BTKSETANALOGOFFSET(H, LABEL, NEWOFFSET)
 %
 %  This function can also returns updated list of analogs.
-%  ANALOGS = BTKSETANALOGLABEL(H, INDEX, NEWLABEL)
-%  ANALOGS = BTKSETANALOGLABEL(H, LABEL, NEWLABEL)
+%  ANALOGS = BTKSETANALOGOFFSET(H, INDEX, NEWOFFSET)
+%  ANALOGS = BTKSETANALOGOFFSET(H, LABEL, NEWOFFSET)
 %  The format of ANALOGS is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>
 %
 %  This function can also returns updated list of analogs' informations.
-%  [ANALOGS, ANALOGSINFO] = BTKSETANALOGLABEL(H, INDEX, NEWLABEL)
-%  [ANALOGS, ANALOGSINFO] = BTKSETANALOGLABEL(H, LABEL, NEWLABEL)
+%  [ANALOGS, ANALOGSINFO] = BTKSETANALOGOFFSET(H, INDEX, NEWOFFSET)
+%  [ANALOGS, ANALOGSINFO] = BTKSETANALOGOFFSET(H, LABEL, NEWOFFSET)
 %  The format of ANALOGSINFO is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>
 %
 %  The acquisition is represented by the handle H.  This handle is obtained
@@ -29,4 +30,4 @@ function btkSetAnalogLabel(h, idx_or_label, new_label) %#ok
 
 error(generatemsgid('NotSupported'),'MEX file for function not found');
 
-% [EOF] btkSetAnalogLabel.m
+% [EOF] btkSetAnalogOffset.m

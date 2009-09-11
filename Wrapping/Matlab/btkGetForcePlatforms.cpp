@@ -33,9 +33,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMEXObjectHandle.h"
+#include "btkMXObjectHandle.h"
 #include "btkForcePlatformsExtractor.h"
-#include "btkMEXAdaptMeasures.h"
+#include "btkMXMeasure.h"
 #include "btkMEXStreambufToWarnMsgTxt.h"
 
 #include <btkAcquisition.h>
@@ -72,7 +72,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (fp.get() != 0)
     {
       // channels field
-      mxSetFieldByNumber(plhs[0], i, 0, btkMEXAdaptMeasures<btk::Analog>(fp->GetChannels(), &(channelFieldnames[i])));
+      mxSetFieldByNumber(plhs[0], i, 0, btkMXCreateMeasuresStructure<btk::Analog>(fp->GetChannels(), &(channelFieldnames[i])));
       // corners field
       mxArray* corners = mxCreateDoubleMatrix(3, 4, mxREAL);
       memcpy(mxGetPr(corners), fp->GetCorners().data(), mxGetNumberOfElements(corners) * sizeof(double));
