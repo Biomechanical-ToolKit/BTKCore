@@ -159,10 +159,10 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_AxesWidget = 0;
   this->m_PlaybackStep = 1;
   this->m_PlaybackDelay = 33; // 33 msec
-  this->mp_PlayIcon = new QIcon(QString::fromUtf8(":/images/player_play.png"));
-  this->mp_PauseIcon = new QIcon(QString::fromUtf8(":/images/player_pause.png"));
-  this->mp_DownArrow = new QIcon(QString::fromUtf8(":/images/disclosureTriangleSmallDownBlack.png"));
-  this->mp_RightArrow = new QIcon(QString::fromUtf8(":/images/disclosureTriangleSmallRightBlack.png"));
+  this->mp_PlayIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_play.png"));
+  this->mp_PauseIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_pause.png"));
+  this->mp_DownArrow = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallDownBlack.png"));
+  this->mp_RightArrow = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallRightBlack.png"));
 
   // Finalize UI
   // Qt UI

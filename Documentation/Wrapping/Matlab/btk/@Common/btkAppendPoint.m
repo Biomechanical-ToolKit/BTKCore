@@ -10,23 +10,28 @@ function btkAppendPoint(h, type, label, values, residuals, masks, desc) %#ok
 %  the 3D reconstruction of markers. 
 %  NOTE: This parameter is an informational parameter and seems not used in %  some commercial softwares.
 %
-%  BTKAPPENDPOINT(H, LABEL, VALUES, VALUES, RESIDUALS, MASKS) set also the 
+%  BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS) set also the 
 %  masks of the camera used to reconstruct markers' positions. MASKS is a 
 %  matrix (N,1) of integer corresponding to a conversion of a binary number.
 %  For example, the value 14 correspond to the mask 0b0001110 meaning that %
 %  cameras #2, #3 and #4 was used to reconstruct the point 
 %  NOTE: This parameter is an informational parameter and seems not used in %  some commercial softwares.
 %
+%  BTKSETPBTKAPPENDPOINTOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION) 
+%  modifies also the description of the point.
+%
 %  This function can also returns updated list of points.
 %  POINTS = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES)
 %  POINTS = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS)
 %  POINTS = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS)
+%  POINTS = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION)
 %  The format of POINTS is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>
 %
 %  This function can also returns updated list of points' informations.
 %  [POINTS, POINTSINFO] = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES)
 %  [POINTS, POINTSINFO] = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS)
 %  [POINTS, POINTSINFO] = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS)
+%  [POINTS, POINTSINFO] = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION)
 %  The format of POINTSINFO is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>
 %
 %  The acquisition is represented by the handle H.  This handle is obtained

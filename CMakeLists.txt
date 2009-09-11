@@ -93,6 +93,13 @@ IF(WIN32)
    ELSE(BUILD_SHARED_LIBS)
      SET(BTK_LIBS_BUILD_TYPE "STATIC")
    ENDIF(BUILD_SHARED_LIBS)
+   
+   IF(BTK_USE_VTK)
+     IF(BUILD_SHARED_LIBS AND NOT VTK_BUILD_SHARED_LIBS)
+       MESSAGE(FATAL_ERROR "BTK can't be build as shared libraries and used VTK static libraries. Please unckeck the option BUILD_SHARED_LIBS.")
+     ENDIF(BUILD_SHARED_LIBS AND NOT VTK_BUILD_SHARED_LIBS)
+   ENDIF(BTK_USE_VTK)
+   
    SET(BUILD_SHARED_LIBS OFF)
 ENDIF(WIN32)
 # Configure files with settings for use by the build.

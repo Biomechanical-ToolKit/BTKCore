@@ -64,6 +64,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   if (((rn != vn) && (rn != 0)) || ((mn != vn) && (mn != 0)))
     mexErrMsgTxt("Point's data have not the same number of frames.");
+  if (nrhs >= 6)
+  {
+    if (!mxIsChar(prhs[5]))
+      mexErrMsgTxt("Point's description must be a string");
+  }
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
@@ -77,7 +82,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     memcpy(point->GetResiduals().data(), mxGetPr(prhs[3]) , mxGetNumberOfElements(prhs[3]) * sizeof(double)); 
   if (nrhs >= 5)
     memcpy(point->GetMasks().data(), mxGetPr(prhs[4]) , mxGetNumberOfElements(prhs[4]) * sizeof(double));
-
+  if (nrhs >= 6)
+  {
+    int strlen = (mxGetM(prhs[5]) * mxGetN(prhs[5]) * sizeof(mxChar)) + 1;
+    char* desc = (char*)mxMalloc(strlen);
+    mxGetString(prhs[5], desc, strlen);
+    point->SetDescription(desc);
+    mxFree(desc);
+  }
   // Return updated points
   btkMXCreatePointsStructure(acq, nlhs, plhs);
 };

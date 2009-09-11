@@ -19,27 +19,35 @@ function btkSetPoint(h, idx_or_label, values, residuals, masks) %#ok
 %  NOTE: This parameter is an informational parameter and seems not used in 
 %  some commercial softwares.
 %
+%  BTKSETPOINT(H, INDEX, VALUES, RESIDUALS, MASKS, DESCRIPTION) modifies also 
+%  the description of the point.
+%
 %  The point to modify can also be selected by its LABEL.
 %  BTKSETPOINT(H, LABEL, VALUES)
 %  BTKSETPOINT(H, LABEL, VALUES, RESIDUALS)
 %  BTKSETPOINT(H, LABEL, VALUES, RESIDUALS, MASKS)
+%  BTKSETPOINT(H, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION)
 %
 %  This function can also returns updated list of points.
 %  POINTS = BTKSETPOINT(H, INDEX, VALUES)
 %  POINTS = BTKSETPOINT(H, INDEX, VALUES, RESIDUALS)
 %  POINTS = BTKSETPOINT(H, INDEX, VALUES, RESIDUALS, MASKS)
+%  POINTS = BTKSETPOINT(H, INDEX, VALUES, RESIDUALS, MASKS, DESCRIPTION)
 %  POINTS = BTKSETPOINT(H, LABEL, VALUES)
 %  POINTS = BTKSETPOINT(H, LABEL, VALUES, RESIDUALS)
 %  POINTS = BTKSETPOINT(H, LABEL, VALUES, RESIDUALS, MASKS)
+%  POINTS = BTKSETPOINT(H, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION)
 %  The format of POINTS is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>
 %
 %  This function can also returns updated list of points' informations.
 %  [POINTS, POINTSINFO] = BTKSETPOINT(H, INDEX, VALUES)
 %  [POINTS, POINTSINFO] = BTKSETPOINT(H, INDEX, VALUES, RESIDUALS)
 %  [POINTS, POINTSINFO] = BTKSETPOINT(H, INDEX, VALUES, RESIDUALS, MASKS)
+%  [POINTS, POINTSINFO] = BTKSETPOINT(H, INDEX, VALUES, RESIDUALS, MASKS, DESCRIPTION)
 %  [POINTS, POINTSINFO] = BTKSETPOINT(H, LABEL, VALUES)
 %  [POINTS, POINTSINFO] = BTKSETPOINT(H, LABEL, VALUES, RESIDUALS)
 %  [POINTS, POINTSINFO] = BTKSETPOINT(H, LABEL, VALUES, RESIDUALS, MASKS)
+%  [POINTS, POINTSINFO] = BTKSETPOINT(H, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION)
 %  The format of POINTSINFO is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>
 %
 %  The acquisition is represented by the handle H.  This handle is obtained

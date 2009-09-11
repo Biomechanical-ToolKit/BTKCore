@@ -46,7 +46,7 @@
 #include <btkAcquisition.h>
 
 // Forward declaration
-mxArray* btkMEXCreateMetaDataStructure(btk::MetaData::Pointer md);
+mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md);
 
 // btkGetMetaData(h)
 // btkGetMetaData(h, label)
@@ -100,10 +100,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt(err.c_str());
   }
   
-  plhs[0] = btkMEXCreateMetaDataStructure(md);
+  plhs[0] = btkMXCreateMetaDataStructure(md);
 };
 
-mxArray* btkMEXCreateMetaDataStructure(btk::MetaData::Pointer md)
+mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
 {
   const char* metaDataFieldnames[] = {"info", "children", "description"};
   mxArray* out = mxCreateStructMatrix(1, 1, 3, metaDataFieldnames);
@@ -225,7 +225,7 @@ mxArray* btkMEXCreateMetaDataStructure(btk::MetaData::Pointer md)
     inc = 0;
     for (btk::MetaData::ConstIterator it = md->Begin() ; it != md->End() ; ++it)
     {
-      mxSetFieldByNumber(children, 0, inc, btkMEXCreateMetaDataStructure(*it));
+      mxSetFieldByNumber(children, 0, inc, btkMXCreateMetaDataStructure(*it));
       ++inc;
     }
   }
