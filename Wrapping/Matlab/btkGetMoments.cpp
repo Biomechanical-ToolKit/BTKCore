@@ -37,7 +37,7 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  btkMXGetSpecializedPointValues(btk::Point::Moment, nlhs, plhs, nrhs, prhs);
+  btkMXCreateSpecializedPointsStructure(btk::Point::Moment, nlhs, plhs, nrhs, prhs);
 };
 
 
