@@ -49,14 +49,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 2)
    mexErrMsgTxt("Too many output arguments.");
 
-  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
+  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
     mexErrMsgTxt("Analog's offset must be a scalar integer value.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);
   
   int gain = static_cast<int>(mxGetScalar(prhs[2]));
-  if ((gain < 0) && (gain > 5))
+  if ((gain < 0) || (gain > 5))
     mexErrMsgTxt("Unknown gain. Read the documentation of this fuction to know the possible values");
   analog->SetGain(static_cast<btk::Analog::Gain>(gain));
 
