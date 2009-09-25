@@ -38,11 +38,14 @@
 
 #include "ui_MainWindow.h"
 #include "Metadata.h"
+#include "PointsEditor.h"
 
 #include <QTimer>
 #include <QUndoStack>
 
 #include <btkProcessObject.h>
+#include <btkAcquisition.h>
+#include <btkAcquisitionFileIO.h>
 #include <btkVTKAxesWidget.h>
 
 #include <map>
@@ -64,27 +67,45 @@ public:
   ~MainWindow();
 
   void initialize();
+  void setVTKMarkerRadius(int id, double r);
+  double VTKMarkerRadius(int id);
+  void setVTKMarkerColorIndex(int id, int idx);
+  int VTKMarkerColorIndex(int id);
+  void setVTKMarkerVisibility(int id, bool visible);
+  bool VTKMarkerVisibility(int id);
+  
+  PointsEditor* mp_PointsEditorDlg;
 
 protected:
     void closeEvent(QCloseEvent* event);
     bool eventFilter(QObject* obj, QEvent* event);
 
-private Q_SLOTS:
+public Q_SLOTS:
   // Qt
+  // Menu
   void about();
+  void visitBTKWebsite();
+  void setAcquisitionModifed(int modified);
   void editMetadata();
+  void editPoints();
   void openRecentFile();
   void clearRecentFiles();
   void openFile();
+  void saveFile();
+  void saveAsFile();
   void closeFile();
   void changePlaybackParameters();
   void changeGroundOrientation();
   void updateDisplay(int frame);
-  void updateActiveEvent(int frame);
+  // Markers dock
+  void editMarkerLabel();
+  void editMarkerDescription();
+  void editMarkerRadius();
+  void editMarkerColor();
   void updateMarkerRadiusSpinBox(int v);
-  void toggleTimer();
-  void displayPreviousFrame();
-  void displayNextFrame();
+  void markersDockLocationChanged(Qt::DockWidgetArea area);
+  void displayMarkerProperties();
+  void circleSelectedMarkers();
   void toggleMarkersVisibilityButtons();
   void showSelectedMarkers();
   void hideSelectedMarkers();
@@ -92,23 +113,28 @@ private Q_SLOTS:
   void hideAllMarkers();
   void updateMarkerVisibility(QTableWidgetItem* item);
   void updateMarkerRadius(double r);
-  void updateMarkerColor();
-  void displayMarkerProperties();
   void toggleMarkerProperties();
+  void focusOnMarkerLabelEdition();
+  // Events dock
+  void updateActiveEvent(int frame);
   void displayEventInformations();
   void toggleEventInformations();
   void updateEventsButtonsState();
   void showEvent();
-  void circleSelectedMarkers();
-  void markersDockLocationChanged(Qt::DockWidgetArea area);
   void eventsDockLocationChanged(Qt::DockWidgetArea area);
+  // Playback
+  void toggleTimer();
+  void displayPreviousFrame();
+  void displayNextFrame();
   // Qt / VTK
   void updateDisplayedMarkersList(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   void selectPickedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-
+  
 private:
-  void loadFile(const QString& filename);
+  void openFile(const QString& filename);
+  void saveFile(const QString& filename);
+  void fillFileInformations(const QString& filename, btk::AcquisitionFileIO::Pointer io, btk::Acquisition::Pointer acq);
   void readSettings(); 
   void writeSettings();
   void updateRecentFileActions();

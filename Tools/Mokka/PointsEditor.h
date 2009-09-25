@@ -33,50 +33,36 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkPoint_h
-#define __btkPoint_h
+#ifndef MarkerOrderer_h
+#define MarkerOrderer_h
 
-#include "btkMeasure.h"
+#include "ui_PointsEditor.h"
 
-namespace btk
+#include <QDialog>
+
+#include <btkPoint.h>
+
+class PointsEditor : public QDialog, public Ui::MarkerOrderer
 {
-  class Point : public Measure<3>
-  {
-  public:
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Residuals;
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Masks;
-    typedef enum {Marker = 0, Angle, Force, Moment, Power, Scalar, Reaction} Type;
-    
-    typedef SharedPtr<Point> Pointer;
-    typedef SharedPtr<const Point> ConstPointer;
-    
-    static Pointer New(int frameNumber = 1) {return Pointer(new Point("", frameNumber, Marker));};
-    static Pointer New(const std::string& label, int frameNumber, Type t = Marker) {return Pointer(new Point(label, frameNumber, t));};
-    
-    virtual ~Point() {};
-    
-    Residuals& GetResiduals() {return this->m_Residuals;};
-    const Residuals& GetResiduals() const {return this->m_Residuals;};
-    BTK_COMMON_EXPORT void SetResiduals(const Residuals& r);
-    Masks& GetMasks() {return this->m_Masks;};
-    const Masks& GetMasks() const {return this->m_Masks;};
-    BTK_COMMON_EXPORT void SetMasks(const Masks& m);
-    BTK_COMMON_EXPORT void SetFrameNumber(int frameNumber);
-    Type GetType() const {return this->m_Type;};
-    BTK_COMMON_EXPORT void SetType(Point::Type t);
-    Pointer Clone() const {return Pointer(new Point(*this));};
-    
-  protected:
-    BTK_COMMON_EXPORT Point(const std::string& label, int frameNumber, Type t);
-    
-  private:
-    BTK_COMMON_EXPORT Point(const Point& toCopy);
-    Point& operator=(const Point& ); // Not implemented.
-    
-    Residuals m_Residuals;
-    Masks m_Masks;
-    Type m_Type;
-  };
+  Q_OBJECT
+  
+public:
+  PointsEditor(QWidget* parent = 0);
+  // ~PointsEditor(); // Implicit.
+  
+private Q_SLOTS:
+  void modifyWindow();
+  void showPointType(int index);
+  void togglePointsVisibilityButtons();
+  void insertSelectedPoints();
+  void removeSelectedPoints();
+  void insertAllPoints();
+  void removeAllPoints();
+  
+private:
+  void keepOnlyMarkers();
+  void showAllPoints();
+  void showOnlyType(btk::Point::Type t);
 };
 
-#endif // __btkPoint_h
+#endif // MarkerOrderer_h

@@ -168,7 +168,7 @@ namespace btk
       return;
     this->mp_MetaData->SetParent(static_cast<DataObject*>(0));
     this->mp_MetaData = metaData;
-    if (this->mp_MetaData.get() == 0)
+    if (this->mp_MetaData.get() != 0)
       this->mp_MetaData->SetParent(this);
     this->Modified();
   };
@@ -244,6 +244,17 @@ namespace btk
    * @fn EventCollection::ConstPointer Acquisition::GetEvents() const
    * Returns the collection of events.
    */
+  
+  /**
+   * Sets events for this acquisition.
+   */
+  void Acquisition::SetEvents(EventCollection::Pointer evts)
+  {
+    if (this->m_Events == evts)
+      return;
+    this->m_Events = evts;
+    this->Modified();
+  };
 
   /**
    * @fn bool Acquisition::IsEmptyEvent() const
@@ -387,6 +398,17 @@ namespace btk
    * @fn PointCollection::ConstPointer Acquisition::GetPoints() const
    * Returns the collection of points.
    */
+   
+  /**
+   * Sets points for this acquisition.
+   */
+  void Acquisition::SetPoints(PointCollection::Pointer points)
+  {
+    if (this->m_Points == points)
+      return;
+    this->m_Points = points;
+    this->Modified();
+  };
 
   /**
    * @fn bool Acquisition::IsEmptyPoint() const
@@ -590,6 +612,17 @@ namespace btk
    */
 
   /**
+   * Sets analog channels for this acquisition.
+   */
+  void Acquisition::SetAnalogs(AnalogCollection::Pointer analogs)
+  {
+    if (this->m_Analogs == analogs)
+      return;
+    this->m_Analogs = analogs;
+    this->Modified();
+  };
+  
+  /**
    * @fn void Acquisition::ClearAnalog()
    * Clear analogs channels.
    */
@@ -631,8 +664,8 @@ namespace btk
   /**
    * @fn void Acquisition::Init(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1)
    * Initialize the acquisition with @a pointNumber which have @a frameNumber
-   * frame. The analog part has @a analogNumber analog channels and their sampling rate
-   * correspond the integer factor @a analogSampleNumberPerPointFrame.
+   * frame. The analog part has @a analogNumber analog channels and their number of frames
+   * corresponds to the integer factor @a analogSampleNumberPerPointFrame multiplied by @a frameNumber.
    */
   void Acquisition::Init(int pointNumber, int frameNumber, int analogNumber, int analogSampleNumberPerPointFrame)
   {
@@ -647,8 +680,8 @@ namespace btk
 
   /**
    * Resize the acquisition with @a pointNumber which have @a frameNumber
-   * frame. The analog part has @a analogNumber analog channels and their sampling rate
-   * correspond the integer factor @a analogSampleNumberPerPointFrame.
+   * frame. The analog part has @a analogNumber analog channels and their number of frames
+   * corresponds to the integer factor @a analogSampleNumberPerPointFrame multiplied by @a frameNumber.
    */
   void Acquisition::Resize(int pointNumber, int frameNumber,
                            int analogNumber, int analogSampleNumberPerPointFrame)
@@ -863,6 +896,11 @@ namespace btk
     this->m_AnalogResolution = r;
     this->Modified();
   };
+  
+  /**
+   * @fn Pointer Acquisition::Clone() const
+   * Returns a deep copy of this object.
+   */
     
   /**
    * Constructor.
@@ -922,5 +960,23 @@ namespace btk
       (*it)->SetFrameNumber(this->m_PointFrameNumber * this->m_AnalogSampleNumberPerPointFrame);
       ++it;
     }
+  };
+  
+  /**
+   * Constructor of copy. Timestamp, source and parent are reset.
+   */
+  Acquisition::Acquisition(const Acquisition& toCopy)
+  : DataObject(), m_Units(toCopy.m_Units)
+  {
+    this->m_Events = toCopy.m_Events->Clone();
+    this->m_Points = toCopy.m_Points->Clone();
+    this->m_Analogs = toCopy.m_Analogs->Clone();
+    this->mp_MetaData = toCopy.mp_MetaData->Clone();
+    this->mp_MetaData->SetParent(this);
+    this->m_FirstFrame = toCopy.m_FirstFrame;
+    this->m_PointFrequency = toCopy.m_PointFrequency;
+    this->m_PointFrameNumber = toCopy.m_PointFrameNumber;
+    this->m_AnalogSampleNumberPerPointFrame = toCopy.m_AnalogSampleNumberPerPointFrame;
+    this->m_AnalogResolution = toCopy.m_AnalogResolution;
   };
 }

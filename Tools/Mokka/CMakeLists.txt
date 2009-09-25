@@ -3,24 +3,30 @@ INCLUDE(${QT_USE_FILE})
 
 SET(Mokka_CPP
   About.cpp
+  ComboBoxDelegate.cpp
   MainWindow.cpp
   Metadata.cpp
   MetadataView.cpp
-  ComboBoxDelegate.cpp
+  PointsEditor.cpp
+  TableWidget.cpp
+  UndoCommands.cpp
   main.cpp
   )
 
 SET(Mokka_H
   About.h
+  ComboBoxDelegate.h
   MainWindow.h
   MetadataView.h
   Metadata.h
-  ComboBoxDelegate.h)
+  PointsEditor.h
+  TableWidget.h)
 
 SET(Mokka_UI
   About.ui
   MainWindow.ui
-  Metadata.ui)
+  Metadata.ui
+  PointsEditor.ui)
 
 SET(Mokka_QRC
   images.qrc)
@@ -35,7 +41,7 @@ QT4_ADD_RESOURCES(Mokka_RCC ${Mokka_QRC})
 
 IF(WIN32)
   SET(GUI WIN32)
-  LINK_LIBRARIES(${QT_QTMAIN_LIBRARY})
+	TARGET_LINK_LIBRARIES(Mokka ${QT_QTMAIN_LIBRARY})
   SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS") 
 ELSEIF(APPLE)
   SET(GUI MACOSX_BUNDLE)

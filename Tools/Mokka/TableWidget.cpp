@@ -33,50 +33,52 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkPoint_h
-#define __btkPoint_h
+#include "TableWidget.h"
+#include <iostream>
 
-#include "btkMeasure.h"
+TableWidget::TableWidget(QWidget* parent)
+: QTableWidget(parent)
+{};
 
-namespace btk
+void TableWidget::dropEvent(QDropEvent* event)
 {
-  class Point : public Measure<3>
-  {
-  public:
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Residuals;
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Masks;
-    typedef enum {Marker = 0, Angle, Force, Moment, Power, Scalar, Reaction} Type;
-    
-    typedef SharedPtr<Point> Pointer;
-    typedef SharedPtr<const Point> ConstPointer;
-    
-    static Pointer New(int frameNumber = 1) {return Pointer(new Point("", frameNumber, Marker));};
-    static Pointer New(const std::string& label, int frameNumber, Type t = Marker) {return Pointer(new Point(label, frameNumber, t));};
-    
-    virtual ~Point() {};
-    
-    Residuals& GetResiduals() {return this->m_Residuals;};
-    const Residuals& GetResiduals() const {return this->m_Residuals;};
-    BTK_COMMON_EXPORT void SetResiduals(const Residuals& r);
-    Masks& GetMasks() {return this->m_Masks;};
-    const Masks& GetMasks() const {return this->m_Masks;};
-    BTK_COMMON_EXPORT void SetMasks(const Masks& m);
-    BTK_COMMON_EXPORT void SetFrameNumber(int frameNumber);
-    Type GetType() const {return this->m_Type;};
-    BTK_COMMON_EXPORT void SetType(Point::Type t);
-    Pointer Clone() const {return Pointer(new Point(*this));};
-    
-  protected:
-    BTK_COMMON_EXPORT Point(const std::string& label, int frameNumber, Type t);
-    
-  private:
-    BTK_COMMON_EXPORT Point(const Point& toCopy);
-    Point& operator=(const Point& ); // Not implemented.
-    
-    Residuals m_Residuals;
-    Masks m_Masks;
-    Type m_Type;
-  };
-};
+  QModelIndex cur = this->currentIndex();
+  // Check to not drop label column onto description column
+  if ((event->source() != this) || 
+      (this->indexAt(event->pos()).column() != cur.column()))
 
-#endif // __btkPoint_h
+  {
+    this->viewport()->update();
+    return;
+  }
+  QDropEvent* evt;
+  // If the drop is coming from a description, need to create a new drop event.
+  if (cur.column() == 1)
+  {
+    evt = new QDropEvent(QPoint(32, event->pos().y()),
+                         event->proposedAction(),
+                         event->mimeData(),
+                         event->mouseButtons(),
+                         event->keyboardModifiers(),
+                         event->type());
+  }
+  else
+    evt = new QDropEvent(*event);
+  // Dropping
+  QTableWidget::dropEvent(evt);
+  delete evt;
+  // Delete copied row(s)
+  if (evt->isAccepted())
+  {
+    event->accept();
+    this->blockSignals(true);
+    QModelIndexList indexes = this->selectedIndexes();
+    this->clearSelection();
+    for (QModelIndexList::iterator it = indexes.begin() ; it != indexes.end() ; ++it)
+    {
+      if (it->column() == 0)
+        this->removeRow(it->row());
+    }
+    this->blockSignals(false);
+  }
+}

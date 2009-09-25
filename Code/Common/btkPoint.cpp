@@ -210,6 +210,11 @@ namespace btk
     this->m_Type = t;
     this->Modified();
   };
+  
+  /**
+   * @fn Pointer Point::Clone() const
+   * Returns a deep copy of this object.
+   */
 
   /**
    * Constructor.
@@ -217,9 +222,18 @@ namespace btk
    */
   Point::Point(const std::string& label, int frameNumber, Type t)
   : Measure<3>(label, frameNumber),
-    m_Residuals(Residuals(frameNumber,1)), m_Masks(Masks(frameNumber,1))
+    m_Residuals(Residuals(frameNumber, 1)), m_Masks(Masks(frameNumber, 1))
   {
     this->m_Type = t;
   };
 
+  /**
+   * Constructor of copy.
+   */
+  Point::Point(const Point& toCopy)
+  : Measure<3>(toCopy),
+    m_Residuals(toCopy.m_Residuals), m_Masks(toCopy.m_Masks)
+  {
+    this->m_Type = toCopy.m_Type;
+  };
 }

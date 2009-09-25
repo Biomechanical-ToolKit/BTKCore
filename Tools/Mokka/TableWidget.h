@@ -33,50 +33,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkPoint_h
-#define __btkPoint_h
+#ifndef TableWidget_h
+#define TableWidget_h
 
-#include "btkMeasure.h"
+#include <QTableWidget>
+#include <QDropEvent>
+#include <QTableWidgetItem>
 
-namespace btk
+class TableWidgetItem : public QTableWidgetItem
 {
-  class Point : public Measure<3>
+public:
+  TableWidgetItem()
+  : QTableWidgetItem()
   {
-  public:
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Residuals;
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Masks;
-    typedef enum {Marker = 0, Angle, Force, Moment, Power, Scalar, Reaction} Type;
-    
-    typedef SharedPtr<Point> Pointer;
-    typedef SharedPtr<const Point> ConstPointer;
-    
-    static Pointer New(int frameNumber = 1) {return Pointer(new Point("", frameNumber, Marker));};
-    static Pointer New(const std::string& label, int frameNumber, Type t = Marker) {return Pointer(new Point(label, frameNumber, t));};
-    
-    virtual ~Point() {};
-    
-    Residuals& GetResiduals() {return this->m_Residuals;};
-    const Residuals& GetResiduals() const {return this->m_Residuals;};
-    BTK_COMMON_EXPORT void SetResiduals(const Residuals& r);
-    Masks& GetMasks() {return this->m_Masks;};
-    const Masks& GetMasks() const {return this->m_Masks;};
-    BTK_COMMON_EXPORT void SetMasks(const Masks& m);
-    BTK_COMMON_EXPORT void SetFrameNumber(int frameNumber);
-    Type GetType() const {return this->m_Type;};
-    BTK_COMMON_EXPORT void SetType(Point::Type t);
-    Pointer Clone() const {return Pointer(new Point(*this));};
-    
-  protected:
-    BTK_COMMON_EXPORT Point(const std::string& label, int frameNumber, Type t);
-    
-  private:
-    BTK_COMMON_EXPORT Point(const Point& toCopy);
-    Point& operator=(const Point& ); // Not implemented.
-    
-    Residuals m_Residuals;
-    Masks m_Masks;
-    Type m_Type;
+    this->setFlags(this->flags() & ~(Qt::ItemIsDropEnabled));
   };
 };
 
-#endif // __btkPoint_h
+class TableWidget : public QTableWidget
+{
+  Q_OBJECT
+  
+public:
+  TableWidget(QWidget* parent = 0);
+  void dropEvent(QDropEvent* event);
+};
+
+#endif // TableWidget_h

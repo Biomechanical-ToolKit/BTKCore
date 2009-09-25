@@ -61,6 +61,8 @@ namespace btk
     BTK_VTK_EXPORT void ClearSelectedMarkers();
     BTK_VTK_EXPORT void SetSelectedMarker(vtkIdType id);
 
+    BTK_VTK_EXPORT bool GetMarkerVisibility(vtkIdType id);
+    BTK_VTK_EXPORT void SetMarkerVisibility(vtkIdType id, bool visible);
     BTK_VTK_EXPORT double GetMarkerRadius(vtkIdType id);
     BTK_VTK_EXPORT void SetMarkerRadius(vtkIdType id, double radius);
     BTK_VTK_EXPORT double* GetMarkerColor(vtkIdType id);

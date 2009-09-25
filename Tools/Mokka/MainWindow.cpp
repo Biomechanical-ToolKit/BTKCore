@@ -36,8 +36,11 @@
 #include "MainWindow.h"
 #include "Metadata.h"
 #include "About.h"
+#include "UndoCommands.h"
+#include "UserRoles.h"
 
 #include <btkAcquisitionFileReader.h>
+#include <btkAcquisitionFileWriter.h>
 #include <btkDownsampleFilter.h>
 #include <btkWrenchCollection.h>
 #include <btkSpecializedPointsExtractor.h>
@@ -59,6 +62,7 @@
 #include <QColorDialog>
 #include <QMessageBox>
 #include <QSettings>
+#include <QDesktopServices>
 
 #include <vtkInformation.h>
 #include <vtkIdList.h>
@@ -82,10 +86,6 @@
 enum {BTK_READER, BTK_MARKERS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
 enum {VTK_GROUND, VTK_FORCE_PLATFORMS, VTK_MARKERS, VTK_GRFS};
 
-static int markerId = Qt::UserRole + 1;
-static int eventFrame = Qt::UserRole + 2;
-static int validEvent = Qt::UserRole + 3;
-
 class vtkStreamingDemandDrivenPipelineCollection : public vtkstd::list<vtkStreamingDemandDrivenPipeline*>
 {};
 
@@ -105,17 +105,49 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 {
-  if ((event->type() == QEvent::KeyPress) && this->frameSlider->isEnabled())
+  QLineEdit* lineEdit = qobject_cast<QLineEdit*>(obj);
+  if (lineEdit)
+  {
+    if (event->type() == QEvent::KeyPress)
+    {
+      QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+      if (keyEvent->key() == Qt::Key_Escape)
+      {
+        while (lineEdit->isUndoAvailable())
+          lineEdit->undo();
+        if ((obj->objectName().compare("markerLabelEdit") == 0) || (obj->objectName().compare("markerDescEdit") == 0))
+          this->markersTable->setFocus();
+        //return true;
+      }
+      else if (keyEvent->matches(QKeySequence::Undo) && !lineEdit->isUndoAvailable())
+      {
+        this->mp_UndoStack->undo();
+        //return true;
+      }
+      else if (keyEvent->matches(QKeySequence::Redo) && !lineEdit->isRedoAvailable())
+      {
+        this->mp_UndoStack->redo();
+        //return true;
+      }
+    }
+    return false;
+  }
+  else if ((event->type() == QEvent::KeyPress) && this->frameSlider->isEnabled())
   {
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
     // special case for 'markerRadiusSpinBox' widget
-    if ((obj->objectName().compare("markerRadiusSpinBox") == 0) && (keyEvent->key() == Qt::Key_Escape))
+    if ((obj->objectName().compare("markerRadiusSpinBox") == 0))
     {
-      this->markersTable->clearSelection();
-      return true;
+      if (keyEvent->key() == Qt::Key_Escape)
+        this->markersTable->setFocus();
+      if (keyEvent->matches(QKeySequence::Undo))
+        this->mp_UndoStack->undo();
+      if (keyEvent->matches(QKeySequence::Redo))
+        this->mp_UndoStack->redo();
+      return false;
     }
     // general case
-    if (keyEvent->matches(QKeySequence::MoveToPreviousChar))
+    else if (keyEvent->matches(QKeySequence::MoveToPreviousChar))
     {
       this->displayPreviousFrame(1);
       return true;
@@ -138,6 +170,14 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
         this->markersTable->clearSelection();
       return true;
     }
+    else if ((keyEvent->key() == Qt::Key_Return) || (keyEvent->key() == Qt::Key_Enter))
+    {
+      if (obj->objectName().compare("eventsTable") == 0)
+        ;//this->focusOnEventLabelEdition();
+      else
+        this->focusOnMarkerLabelEdition();
+      return true;
+    }
     else
       return false;
   }
@@ -156,6 +196,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_VTKProc = new vtkProcessMap();
   this->m_FirstFrame = 1;
   this->mp_MetadataDlg = new Metadata(this);
+  this->mp_PointsEditorDlg = new PointsEditor(this);
   this->mp_AxesWidget = 0;
   this->m_PlaybackStep = 1;
   this->m_PlaybackDelay = 33; // 33 msec
@@ -181,7 +222,11 @@ MainWindow::MainWindow(QWidget* parent)
   this->hideMarkersButton->setFont(f);
 #endif
   this->markersDock->setVisible(false);
+  this->markerProperties->setVisible(false);
+  this->markerPropertiesButton->setIcon(*this->mp_RightArrow);
   this->eventsDock->setVisible(false);
+  this->eventInformations->setVisible(false);
+  this->eventInformationsButton->setIcon(*this->mp_RightArrow);
   this->informationsDock->setVisible(false);
   this->informationsDock->setFloating(true); // To not show a blinking rectangle at the startup
   this->action_FileOpen->setShortcut(QKeySequence::Open);
@@ -228,13 +273,11 @@ MainWindow::MainWindow(QWidget* parent)
 
   // Qt UI: Undo/Redo
   this->mp_UndoStack = new QUndoStack(this);
-  //connect(this->mp_UndoStack, SIGNAL(indexChanged(int)), this, SLOT(setAcquisitionModifed(int)));
+  connect(this->mp_UndoStack, SIGNAL(indexChanged(int)), this, SLOT(setAcquisitionModifed(int)));
   QAction* actionUndo = this->mp_UndoStack->createUndoAction(this);
   actionUndo->setShortcut(QKeySequence::Undo);
-  //actionUndo->setEnabled(false);
   QAction* actionRedo = this->mp_UndoStack->createRedoAction(this);
   actionRedo->setShortcut(QKeySequence::Redo);
-  //actionRedo->setEnabled(false);
   this->menuEdit->insertAction(this->actionCut, actionUndo);
   this->menuEdit->insertAction(this->actionCut, actionRedo);
   this->menuEdit->insertSeparator(this->actionCut);
@@ -262,35 +305,46 @@ MainWindow::MainWindow(QWidget* parent)
   style->Delete();
 
   // Qt Signal/Slot connection
+  // Menu
   connect(this->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+  connect(this->actionVisit_BTK_website, SIGNAL(triggered()), this, SLOT(visitBTKWebsite()));
   connect(this->actionEdit_Metadata, SIGNAL(triggered()), this, SLOT(editMetadata()));
+  connect(this->actionEdit_Points, SIGNAL(triggered()), this, SLOT(editPoints()));
   connect(this->action_FileOpen, SIGNAL(triggered()), this, SLOT(openFile()));
+  connect(this->actionSave, SIGNAL(triggered()), this, SLOT(saveFile()));
+  connect(this->actionSave_As, SIGNAL(triggered()), this, SLOT(saveAsFile()));
   connect(this->actionClose, SIGNAL(triggered()), this, SLOT(closeFile()));
   connect(this->action_Quit, SIGNAL(triggered()), this, SLOT(close()));
   connect(this->mp_PlaybackSpeedActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changePlaybackParameters()));
   connect(this->mp_GroundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
-
+  // Playback
   connect(this->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(updateActiveEvent(int)));
   connect(this->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(updateDisplay(int)));
   connect(this->playButton, SIGNAL(clicked()), this, SLOT(toggleTimer()));
   connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(displayNextFrame()));
+  // Markers dock
   connect(this->markersTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateMarkerVisibility(QTableWidgetItem*)));
   connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayMarkerProperties()));
   connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(toggleMarkersVisibilityButtons()));
   connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(circleSelectedMarkers()));
+  connect(this->markersTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(focusOnMarkerLabelEdition()));
   connect(this->markerRadiusSlider, SIGNAL(valueChanged(int)), this, SLOT(updateMarkerRadiusSpinBox(int)));
   connect(this->markerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateMarkerRadius(double)));
-  connect(this->markerColorButton, SIGNAL(clicked(bool)), this, SLOT(updateMarkerColor()));
   connect(this->showMarkersButton, SIGNAL(clicked()), this, SLOT(showAllMarkers()));
   connect(this->hideMarkersButton, SIGNAL(clicked()), this, SLOT(hideAllMarkers()));
+  connect(this->markerPropertiesButton, SIGNAL(clicked()), this, SLOT(toggleMarkerProperties()));
+  connect(this->markerLabelEdit, SIGNAL(editingFinished()), this, SLOT(editMarkerLabel()));
+  connect(this->markerDescEdit, SIGNAL(editingFinished()), this, SLOT(editMarkerDescription()));
+  connect(this->markerRadiusSpinBox, SIGNAL(editingFinished()), this, SLOT(editMarkerRadius()));
+  connect(this->markerRadiusSlider, SIGNAL(sliderReleased()), this, SLOT(editMarkerRadius()));
+  connect(this->markerColorButton, SIGNAL(clicked(bool)), this, SLOT(editMarkerColor()));
+  // Events dock
   connect(this->eventsTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayEventInformations()));
   connect(this->eventsTable, SIGNAL(itemSelectionChanged()), this, SLOT(updateEventsButtonsState()));
   connect(this->showEventButton, SIGNAL(clicked()), this, SLOT(showEvent()));
   connect(this->markersDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(markersDockLocationChanged(Qt::DockWidgetArea)));
   connect(this->eventsDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(eventsDockLocationChanged(Qt::DockWidgetArea)));
   connect(this->eventInformationsButton, SIGNAL(clicked()), this, SLOT(toggleEventInformations()));
-  connect(this->markerPropertiesButton, SIGNAL(clicked()), this, SLOT(toggleMarkerProperties()));
-  
   // Qt/VTK connections
   this->mp_EventQtSlotConnections->Connect(
       this->qvtkWidget->GetRenderWindow()->GetInteractor(), 
@@ -309,20 +363,20 @@ MainWindow::MainWindow(QWidget* parent)
   this->markersTable->installEventFilter(this);
   this->eventsTable->installEventFilter(this);
   this->markerRadiusSpinBox->installEventFilter(this);
+  this->markerLabelEdit->installEventFilter(this);
+  this->markerDescEdit->installEventFilter(this);
 
   // Settings
   QCoreApplication::setOrganizationName("BTK");
   QCoreApplication::setOrganizationDomain("btk.org");
-  QCoreApplication::setApplicationName("MainWindow");
+  QCoreApplication::setApplicationName("Mokka");
   this->readSettings();
   this->setCurrentFile("");
 };
 
 MainWindow::~MainWindow()
 {
-  //std::cout << "Deleting" << std::endl;
   delete this->mp_Syncro;
-  //this->mp_Markers->Delete();
   this->mp_AxesWidget->Delete();
   this->mp_EventQtSlotConnections->Delete();
   this->mp_Mappers->Delete();
@@ -332,7 +386,6 @@ MainWindow::~MainWindow()
   (*this->mp_VTKProc)[VTK_MARKERS]->Delete();
   (*this->mp_VTKProc)[VTK_GRFS]->Delete();
   delete this->mp_VTKProc;
-  //this->mp_Ground->Delete();
   vtkAlgorithm::SetDefaultExecutivePrototype(0);
   delete this->mp_PlayIcon;
   delete this->mp_PauseIcon;
@@ -506,9 +559,51 @@ void MainWindow::about()
   aboutDlg.exec();
 };
 
+void MainWindow::visitBTKWebsite()
+{
+  QDesktopServices::openUrl(QUrl("http://b-tk.googlecode.com", QUrl::TolerantMode));
+};
+
+void MainWindow::setAcquisitionModifed(int modified)
+{
+  //std::cout << this->mp_UndoStack->cleanIndex() << std::endl;
+  if (modified == this->mp_UndoStack->cleanIndex())
+  {
+    this->actionSave->setEnabled(false);
+    this->setWindowModified(false);
+  }
+  else
+  {
+    this->actionSave->setEnabled(true);
+    this->setWindowModified(true);
+  }
+};
+
 void MainWindow::editMetadata()
 {
   this->mp_MetadataDlg->exec();
+};
+
+void MainWindow::editPoints()
+{
+  int num = this->markersTable->rowCount();
+  for (int i = 0 ; i < num ; ++i)
+  {
+    QTableWidgetItem* source = this->markersTable->item(i,0);
+    QTableWidgetItem* target = this->mp_PointsEditorDlg->tableWidget->item(i,0);
+    target->setText(source->text());
+    target->setData(pointId, source->data(pointId));
+    target->setData(pointType, source->data(pointType));
+    target->setData(pointDisabled, source->data(pointDisabled));
+    this->mp_PointsEditorDlg->tableWidget->item(i,1)->setText(source->data(pointDescription).toString());
+    target->setCheckState(source->data(pointDisabled).toBool() ? Qt::Unchecked : Qt::Checked);
+  }
+  this->mp_PointsEditorDlg->tableWidget->resizeColumnsToContents();
+  this->mp_PointsEditorDlg->setWindowModified(false);
+  this->mp_PointsEditorDlg->tableWidget->clearSelection();
+  int ret = this->mp_PointsEditorDlg->exec();
+  if ((ret == QDialog::Accepted) && (this->mp_PointsEditorDlg->isWindowModified()))
+    this->mp_UndoStack->push(new EditPoints(this));
 };
 
 void MainWindow::setCurrentFile(const QString& filename) 
@@ -555,7 +650,7 @@ void MainWindow::openRecentFile()
   { 
     QAction* pAction = qobject_cast<QAction*>(sender()); 
     if (pAction) 
-      this->loadFile(pAction->data().toString()); 
+      this->openFile(pAction->data().toString()); 
   }
 }
 
@@ -579,7 +674,7 @@ bool MainWindow::isOkToContinue()
     switch(messageBox.exec())
     {
         case QMessageBox::Yes:
-            //this->saveFile();
+            this->saveFile();
             break;
         case QMessageBox::Cancel:
             return false;
@@ -591,6 +686,7 @@ bool MainWindow::isOkToContinue()
 
 void MainWindow::openFile()
 {
+  /*
   QFileDialog open(this,
                    trUtf8("Open Acquisition"),
                    this->m_LastDirectory,
@@ -600,11 +696,21 @@ void MainWindow::openFile()
     this->m_LastDirectory = open.directory().absolutePath();
     QStringList filenames = open.selectedFiles();
     if (!filenames.isEmpty())
-      this->loadFile(filenames.first());
+      this->openFile(filenames.first());
+  }
+  */
+  QString filename = QFileDialog::getOpenFileName(this,
+                       trUtf8("Open Acquisition"),
+                       this->m_LastDirectory,
+                       trUtf8("Acquisition Files (*.c3d *.trc)"));
+  if (!filename.isEmpty())
+  {
+    this->m_LastDirectory = QFileInfo(filename).absolutePath();
+    this->openFile(filename);
   }
 };
 
-void MainWindow::loadFile(const QString& filename)
+void MainWindow::openFile(const QString& filename)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
   this->closeFile();
@@ -624,7 +730,6 @@ void MainWindow::loadFile(const QString& filename)
     error.setInformativeText(e.what());
     error.exec();
     return;
-
   }
   catch (std::exception& e)
   {
@@ -646,73 +751,7 @@ void MainWindow::loadFile(const QString& filename)
   btk::Acquisition::Pointer acq = reader->GetOutput();
   this->m_FirstFrame = acq->GetFirstFrame();
   this->changePlaybackParameters();
-  // Informations Dock
-  QFileInfo fI = QFileInfo(filename);
-  this->fileNameValue->setText(fI.fileName());
-  this->documentTypeValue->setText(fI.suffix().toUpper() + QString(" Document"));
-  double sizeDouble = static_cast<double>(fI.size());
-  QString sizeText;
-  if (sizeDouble <= 1024.0)
-    sizeText = QString::number(sizeDouble) + " bytes";
-  else
-  {
-    sizeDouble /= 1024.0;
-    if (sizeDouble <= 1024.0)
-      sizeText = QString::number(sizeDouble) + " KB";
-    else
-    {
-      sizeDouble /= 1024.0;
-      sizeText = QString::number(sizeDouble) + " MB";
-    }
-  }
-  this->fileSizeValue->setText(sizeText);
-  this->creationDateValue->setText(fI.created().toString());
-  this->modificationDateValue->setText(fI.lastModified().toString());
-  switch(reader->GetAcquisitionIO()->GetFileType())
-  {
-    case btk::AcquisitionFileIO::TypeNotApplicable:
-      this->fileFormatValue->setText("NA");
-      break;
-    case btk::AcquisitionFileIO::ASCII:
-      this->fileFormatValue->setText("ASCII");
-      break;
-    case btk::AcquisitionFileIO::Binary:
-      this->fileFormatValue->setText("Binary");
-      break;
-  }
-  switch(reader->GetAcquisitionIO()->GetByteOrder())
-  {
-    case btk::AcquisitionFileIO::OrderNotApplicable:
-      this->byteOrderValue->setText("NA");
-      break;
-    case btk::AcquisitionFileIO::IEEE_LittleEndian:
-      this->byteOrderValue->setText("IEEE Little Endian");
-      break;
-    case btk::AcquisitionFileIO::VAX_LittleEndian:
-      this->byteOrderValue->setText("VAX Little Endian");
-      break;
-    case btk::AcquisitionFileIO::IEEE_BigEndian:
-      this->byteOrderValue->setText("IEEE Big Endian");
-      break;
-  }
-  switch(reader->GetAcquisitionIO()->GetStorageFormat())
-  {
-    case btk::AcquisitionFileIO::StorageNotApplicable:
-      this->storageFormatValue->setText("NA");
-      break;
-    case btk::AcquisitionFileIO::Float:
-      this->storageFormatValue->setText("Float");
-      break;
-    case btk::AcquisitionFileIO::Integer:
-      this->storageFormatValue->setText("Integer");
-      break;
-  }
-  this->pointNumberValue->setText(QString::number(acq->GetPointNumber()));
-  this->pointFrequencyValue->setText(QString::number(acq->GetPointFrequency()) + " Hz");
-  this->analogNumberValue->setText(QString::number(acq->GetAnalogNumber()));
-  this->analogFrequencyValue->setText(QString::number(acq->GetAnalogFrequency()) + " Hz");
-  this->eventNumberValue->setText(QString::number(acq->GetEventNumber()));
-  this->informationsDock->updateGeometry();
+  this->fillFileInformations(filename, reader->GetAcquisitionIO(), acq);
   // BTK pipeline settings
   static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProc[BTK_GRWS_DOWNSAMPLED])->SetUpDownRatio(static_cast<int>(acq->GetAnalogFrequency() / (acq->GetPointFrequency())));
   // UI settings
@@ -720,29 +759,48 @@ void MainWindow::loadFile(const QString& filename)
   this->markersTable->blockSignals(true);
   btk::PointCollection::Pointer markers = static_pointer_cast<btk::SpecializedPointsExtractor>(this->m_BTKProc[BTK_MARKERS])->GetOutput();
   markers->Update();
-  this->markersTable->setRowCount(markers->GetItemNumber());
-  //QBrush defaultLabelColor = QBrush(QColor(Qt::gray));
-  int row = 0;
-  for (btk::PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
+  btk::PointCollection::Pointer points = acq->GetPoints();
+  this->markersTable->setRowCount(points->GetItemNumber());
+  this->mp_PointsEditorDlg->tableWidget->setItemPrototype(new TableWidgetItem());
+  this->mp_PointsEditorDlg->tableWidget->setRowCount(this->markersTable->rowCount());
+  int incPointId = 0, incMarkerId = 0;
+  for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
   {
     QTableWidgetItem* labelItem = new QTableWidgetItem();
-    labelItem->setData(markerId, row);
-    labelItem->setCheckState(Qt::Checked);
+    this->markersTable->setItem(incPointId, 0, labelItem);
     labelItem->setText(QString::fromStdString((*it)->GetLabel()));
-    //labelItem->setForeground(defaultLabelColor);
-    this->markersTable->setItem(row, 0, labelItem);
-    ++row;
+    labelItem->setData(pointId, incPointId);
+    labelItem->setData(pointType, static_cast<int>((*it)->GetType()));
+    labelItem->setData(pointLabel, labelItem->text());
+    labelItem->setData(pointDescription, QString::fromStdString((*it)->GetDescription()));
+    labelItem->setData(pointDisabled, false);
+    if ((*it)->GetType() == btk::Point::Marker)
+    {
+      labelItem->setData(markerId, incMarkerId);
+      labelItem->setCheckState(Qt::Checked);
+      labelItem->setData(markerRadius, 8.0); // TODO: Use default radius from preferences.
+      labelItem->setData(markerColorIndex, (int)0); // TODO: Use default color from preferences.
+      this->markersTable->setRowHidden(incPointId, false);
+      ++incMarkerId;
+    }
+    else
+      this->markersTable->setRowHidden(incPointId, true);
+    this->mp_PointsEditorDlg->tableWidget->setItem(incPointId, 0, new TableWidgetItem());
+    //TableWidgetItem* pointDescItem = new TableWidgetItem();
+    //pointDescItem->setFlags(pointDescItem->flags() & ~(Qt::ItemIsDropEnabled) & ~(Qt::ItemIsSelectable));
+    //this->mp_PointsEditorDlg->tableWidget->setItem(incPointId, 1, pointDescItem);
+    this->mp_PointsEditorDlg->tableWidget->setItem(incPointId, 1, new TableWidgetItem());
+    ++incPointId;
   }
   this->markersTable->blockSignals(false);
   this->showMarkersButton->setEnabled(true);
   this->hideMarkersButton->setEnabled(true);
-  //this->markersDock->setEnabled(true);
   // Events
   btk::EventCollection::Pointer events = acq->GetEvents();
   this->eventsTable->setColumnCount(4);
   this->eventsTable->setRowCount(events->GetItemNumber());
   this->eventsTable->setColumnHidden(3, true);
-  row = 0;
+  int row = 0;
   std::string previousSubject = "";
   double pointFrequency = acq->GetPointFrequency();
   for (btk::EventCollection::ConstIterator it = events->Begin() ; it != events->End() ; ++it)
@@ -824,14 +882,106 @@ void MainWindow::loadFile(const QString& filename)
   
   this->actionClose->setEnabled(true);
   this->actionEdit_Metadata->setEnabled(true);
+  this->actionEdit_Points->setEnabled(true);
   //this->actionSave->setEnabled(true); 
-  //this->actionSave_As->setEnabled(true);
+  this->actionSave_As->setEnabled(true);
+};
+
+void MainWindow::saveFile()
+{
+  this->saveFile(this->m_RecentFiles.first());
+};
+
+void MainWindow::saveAsFile()
+{
+  QString filename = QFileDialog::getSaveFileName(this,
+                       trUtf8("Save As Acquisition"),
+                       this->m_LastDirectory + "/untitled.c3d",
+                       trUtf8("Acquisition Files (*.c3d *.trc)"));
+  if (!filename.isEmpty())
+  {
+    this->m_LastDirectory = QFileInfo(filename).absolutePath();
+    this->saveFile(filename);
+  }
+};
+
+void MainWindow::saveFile(const QString& filename)
+{
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  btk::Acquisition::Pointer source = static_pointer_cast<btk::AcquisitionFileReader>(this->m_BTKProc[BTK_READER])->GetOutput();
+  btk::Acquisition::Pointer target = btk::Acquisition::New();
+  // Acquisition info
+  target->SetFirstFrame(source->GetFirstFrame());
+  target->SetPointFrequency(source->GetPointFrequency());
+  target->SetAnalogResolution(source->GetAnalogResolution());
+  // Event
+  target->SetEvents(source->GetEvents()->Clone());
+  // Metadata
+  target->SetMetaData(source->GetMetaData()->Clone());
+  // Point
+  int num = this->markersTable->rowCount();
+  btk::PointCollection::Pointer sourcePoints = source->GetPoints();
+  btk::PointCollection::Pointer targetPoints = target->GetPoints();
+  int inc = 0;
+  for (int i = 0 ; i < num ; ++i)
+  {
+    QTableWidgetItem* item = this->markersTable->item(i, 0);
+    if (!item->data(pointDisabled).toBool())
+    {
+      btk::Point::Pointer p = sourcePoints->GetItem(item->data(pointId).toInt())->Clone() ;
+      p->SetLabel(item->data(pointLabel).toString().toStdString());
+      p->SetDescription(item->data(pointDescription).toString().toStdString());
+      targetPoints->InsertItem(p);
+      ++inc;
+    }
+  }
+  // Analog
+  target->SetAnalogs(source->GetAnalogs()->Clone());
+  // Final setup
+  target->Resize(inc, source->GetPointFrameNumber(), source->GetAnalogNumber(), source->GetAnalogFrameNumber() / source->GetPointFrameNumber());
+  // BTK writer
+  btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+  writer->SetFilename(filename.toStdString());
+  writer->SetInput(target);
+  QMessageBox error(QMessageBox::Critical, "File error", "Error occured during the file saving", QMessageBox::Ok , this);
+  try
+  {
+    writer->Update();
+  }
+  catch (btk::Exception& e)
+  {
+    QApplication::restoreOverrideCursor();
+    error.setInformativeText(e.what());
+    error.exec();
+    return;
+  }
+  catch (std::exception& e)
+  {
+    QApplication::restoreOverrideCursor();
+    error.setInformativeText("Unexpected error: " + QString(e.what()));
+    error.exec();
+    return;
+  }
+  catch (...)
+  {
+    QApplication::restoreOverrideCursor();
+    error.setInformativeText("Unknown error.");
+    error.exec();
+    return;
+  }
+  this->mp_UndoStack->setClean();
+  this->setCurrentFile(filename);
+  this->fillFileInformations(filename, writer->GetAcquisitionIO(), target);
+  QApplication::restoreOverrideCursor();
+  this->setWindowModified(false);
 };
 
 void MainWindow::closeFile()
 {
+  this->mp_UndoStack->clear();
   this->actionClose->setEnabled(false);
-  this->actionEdit_Metadata->setEnabled(true);
+  this->actionEdit_Metadata->setEnabled(false);
+  this->actionEdit_Points->setEnabled(false);
   this->actionSave->setEnabled(false); 
   this->actionSave_As->setEnabled(false);
   this->setCurrentFile("");
@@ -886,6 +1036,77 @@ void MainWindow::closeFile()
   this->qvtkWidget->GetRenderWindow()->Render();
 };
 
+void MainWindow::fillFileInformations(const QString& filename, btk::AcquisitionFileIO::Pointer io, btk::Acquisition::Pointer acq)
+{
+  // Informations Dock
+  QFileInfo fI = QFileInfo(filename);
+  this->fileNameValue->setText(fI.fileName());
+  this->documentTypeValue->setText(fI.suffix().toUpper() + QString(" Document"));
+  double sizeDouble = static_cast<double>(fI.size());
+  QString sizeText;
+  if (sizeDouble <= 1024.0)
+    sizeText = QString::number(sizeDouble) + " bytes";
+  else
+  {
+    sizeDouble /= 1024.0;
+    if (sizeDouble <= 1024.0)
+      sizeText = QString::number(sizeDouble) + " KB";
+    else
+    {
+      sizeDouble /= 1024.0;
+      sizeText = QString::number(sizeDouble) + " MB";
+    }
+  }
+  this->fileSizeValue->setText(sizeText);
+  this->creationDateValue->setText(fI.created().toString());
+  this->modificationDateValue->setText(fI.lastModified().toString());
+  switch(io->GetFileType())
+  {
+    case btk::AcquisitionFileIO::TypeNotApplicable:
+      this->fileFormatValue->setText("NA");
+      break;
+    case btk::AcquisitionFileIO::ASCII:
+      this->fileFormatValue->setText("ASCII");
+      break;
+    case btk::AcquisitionFileIO::Binary:
+      this->fileFormatValue->setText("Binary");
+      break;
+  }
+  switch(io->GetByteOrder())
+  {
+    case btk::AcquisitionFileIO::OrderNotApplicable:
+      this->byteOrderValue->setText("NA");
+      break;
+    case btk::AcquisitionFileIO::IEEE_LittleEndian:
+      this->byteOrderValue->setText("IEEE Little Endian");
+      break;
+    case btk::AcquisitionFileIO::VAX_LittleEndian:
+      this->byteOrderValue->setText("VAX Little Endian");
+      break;
+    case btk::AcquisitionFileIO::IEEE_BigEndian:
+      this->byteOrderValue->setText("IEEE Big Endian");
+      break;
+  }
+  switch(io->GetStorageFormat())
+  {
+    case btk::AcquisitionFileIO::StorageNotApplicable:
+      this->storageFormatValue->setText("NA");
+      break;
+    case btk::AcquisitionFileIO::Float:
+      this->storageFormatValue->setText("Float");
+      break;
+    case btk::AcquisitionFileIO::Integer:
+      this->storageFormatValue->setText("Integer");
+      break;
+  }
+  this->pointNumberValue->setText(QString::number(acq->GetPointNumber()));
+  this->pointFrequencyValue->setText(QString::number(acq->GetPointFrequency()) + " Hz");
+  this->analogNumberValue->setText(QString::number(acq->GetAnalogNumber()));
+  this->analogFrequencyValue->setText(QString::number(acq->GetAnalogFrequency()) + " Hz");
+  this->eventNumberValue->setText(QString::number(acq->GetEventNumber()));
+  this->informationsDock->updateGeometry();
+};
+
 void MainWindow::changePlaybackParameters()
 {
   btk::Acquisition::Pointer acq = static_pointer_cast<btk::AcquisitionFileReader>(this->m_BTKProc[BTK_READER])->GetOutput();
@@ -932,9 +1153,6 @@ void MainWindow::changePlaybackParameters()
       this->m_PlaybackStep = 1;
     }
   }
-
-  //std::cout << this->m_PlaybackDelay << " ms ; " << this->m_PlaybackStep << std::endl;
-
   // Relaunch playback if necessary
   if (this->mp_Timer->isActive())
   {
@@ -1011,12 +1229,6 @@ void MainWindow::displayNextFrame(int step)
     this->frameSlider->setValue(this->frameSlider->value() + step);
   else
     this->frameSlider->setValue(this->frameSlider->minimum());
-};
-
-void MainWindow::updateMarkerRadiusSpinBox(int v)
-{
-  double r = static_cast<double>(v) / 10.0;
-  this->markerRadiusSpinBox->setValue(r);
 };
 
 void MainWindow::toggleMarkersVisibilityButtons()
@@ -1104,37 +1316,24 @@ void MainWindow::updateMarkerRadius(double r)
   this->markerRadiusSlider->setValue(r * 10.0);
   this->markerRadiusSlider->blockSignals(false);
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-    btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->SetMarkerRadius((*it)->data(markerId).toInt(), r);
+    markers->SetMarkerRadius((*it)->data(markerId).toInt(), r);
   this->updateDisplay(this->frameSlider->value());
 };
 
-void MainWindow::updateMarkerColor()
+void MainWindow::updateMarkerRadiusSpinBox(int v)
 {
-  QColor color = QColorDialog::getColor(Qt::white, this);
-  if (color.isValid())
-  {
-    QString ss = "background-color: rgb( %1, %2, %3);";
-    this->markerColorButton->setStyleSheet(ss.arg(color.red()).arg(color.green()).arg(color.blue()));
-    QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
-    vtkIdTypeArray* ids = vtkIdTypeArray::New();
-    ids->SetNumberOfValues(items.count());
-    int i = 0;
-    for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-    {
-      ids->SetValue(i, (*it)->data(markerId).toInt());
-      ++i;
-    }
-    btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->SetMarkersColor(ids, color.redF(), color.greenF(), color.blueF());
-    this->updateDisplay(this->frameSlider->value());
-    ids->Delete();
-  }
+  double r = static_cast<double>(v) / 10.0;
+  this->markerRadiusSpinBox->setValue(r);
 };
 
 void MainWindow::displayMarkerProperties()
 {
   this->markerRadiusSpinBox->blockSignals(true);
   this->markerRadiusSlider->blockSignals(true);
+  this->markerLabelEdit->blockSignals(true);
+  this->markerDescEdit->blockSignals(true);
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
   if (items.isEmpty())
   {
@@ -1160,12 +1359,9 @@ void MainWindow::displayMarkerProperties()
     }
     else
     {
-      int idx = items.first()->data(markerId).toInt();
-      btk::PointCollection::Pointer markers = static_pointer_cast<btk::SpecializedPointsExtractor>(this->m_BTKProc[BTK_MARKERS])->GetOutput();
-      btk::PointCollection::ConstIterator it = markers->Begin();
-      std::advance(it, idx);
-      this->markerLabelEdit->setText(QString::fromStdString((*it)->GetLabel()));
-      this->markerDescEdit->setText(QString::fromStdString((*it)->GetDescription()));
+      QTableWidgetItem* item = items.first();
+      this->markerLabelEdit->setText(item->data(pointLabel).toString());
+      this->markerDescEdit->setText(item->data(pointDescription).toString());
       this->markerLabelEdit->setEnabled(true);
       this->markerDescEdit->setEnabled(true);
     }
@@ -1216,6 +1412,135 @@ void MainWindow::displayMarkerProperties()
   }
   this->markerRadiusSpinBox->blockSignals(false);
   this->markerRadiusSlider->blockSignals(false);
+  this->markerLabelEdit->blockSignals(false);
+  this->markerDescEdit->blockSignals(false);
+};
+
+void MainWindow::focusOnMarkerLabelEdition()
+{
+  this->markerProperties->setVisible(true);
+  this->markerPropertiesButton->setIcon(*this->mp_DownArrow);
+  this->markerLabelEdit->setFocus();
+  this->markerLabelEdit->selectAll();
+};
+
+void MainWindow::editMarkerLabel()
+{
+  QString label = this->markerLabelEdit->text();
+  QTableWidgetItem* item = this->markersTable->currentItem();
+  if (label.compare(item->text()) == 0)
+    return;
+  this->mp_UndoStack->push(new EditMarkerLabel(label, item));
+};
+
+void MainWindow::editMarkerDescription()
+{
+  QString desc = this->markerDescEdit->text();
+  QTableWidgetItem* item = this->markersTable->currentItem();
+  if (desc.compare(item->data(pointDescription).toString()) == 0)
+    return;
+  this->mp_UndoStack->push(new EditMarkerDescription(desc, item));
+};
+
+void MainWindow::editMarkerRadius()
+{
+  double r = this->markerRadiusSpinBox->value();
+  if (this->markerRadiusSpinBox->text().isEmpty())
+    return;
+  QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
+  if (items.isEmpty())
+    return;
+  bool modified = false;
+  for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    if (r != (*it)->data(markerRadius).toDouble())
+    {
+      modified = true;
+      break;
+    }
+  }
+  if (!modified)
+    return;
+  this->mp_UndoStack->push(new EditMarkersRadius(r, items, this));
+};
+
+void MainWindow::editMarkerColor()
+{
+  QColor color = QColorDialog::getColor(Qt::white, this);
+  QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
+  if (items.isEmpty())
+    return;
+  if (color.isValid())
+  {
+    bool modified = false;
+    vtkLookupTable* markersColorsLUT = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetMarkerColorLUT();
+    int num = markersColorsLUT->GetNumberOfTableValues();
+    int i = 0;
+    for (i = 0 ; i < num ; ++i)
+    {
+      double* c = markersColorsLUT->GetTableValue(i);
+      if ((color.redF() == c[0]) && (color.greenF() == c[1]) && (color.blueF() == c[2]))
+        break;
+    }
+    if (i >= num)
+    {
+      markersColorsLUT->SetNumberOfTableValues(num + 1);
+      markersColorsLUT->SetTableValue(num, color.redF(), color.greenF(), color.blueF());
+      markersColorsLUT->SetTableRange(0, num + 1);
+      i = num;
+      modified = true;
+    }
+    if (!modified)
+    {
+      QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
+      for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+      {
+        if ((*it)->data(markerColorIndex) != i)
+        {
+          modified = true;
+          break;
+        }
+      }
+    }
+    if (modified)
+      this->mp_UndoStack->push(new EditMarkersColorIndex(i, items, this));
+  }
+};
+
+void MainWindow::setVTKMarkerRadius(int id, double r)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markers->SetMarkerRadius(id, r);
+};
+
+double MainWindow::VTKMarkerRadius(int id)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  return markers->GetMarkerRadius(id);
+};
+
+void MainWindow::setVTKMarkerColorIndex(int id, int idx)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markers->SetMarkerColorIndex(id, idx);
+};
+
+int MainWindow::VTKMarkerColorIndex(int id)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  return markers->GetMarkerColorIndex(id);
+};
+
+void MainWindow::setVTKMarkerVisibility(int id, bool visible)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markers->SetMarkerVisibility(id, visible);
+};
+
+bool MainWindow::VTKMarkerVisibility(int id)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  return markers->GetMarkerVisibility(id);
 };
 
 void MainWindow::toggleMarkerProperties()
@@ -1231,7 +1556,6 @@ void MainWindow::toggleMarkerProperties()
     this->markerPropertiesButton->setIcon(*this->mp_RightArrow);
   }
 };
-
 
 void MainWindow::circleSelectedMarkers()
 {
@@ -1387,7 +1711,7 @@ void MainWindow::updateDisplayedMarkersList(vtkObject* caller, unsigned long /* 
   for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
   {
     QTableWidgetItem* item = this->markersTable->item(row, 0);
-    if (indexes->GetValue(row) && (item->checkState() == Qt::Checked))
+    if (indexes->GetValue(item->data(markerId).toInt()) && (item->checkState() == Qt::Checked))
       item->setForeground(displayLabelColor);
     else
       item->setForeground(defaultLabelColor);

@@ -196,7 +196,7 @@
      <addaction name="action1_10"/>
      <addaction name="actionFull_Frames"/>
     </widget>
-    <addaction name="actionReoder_Markers"/>
+    <addaction name="actionEdit_Points"/>
     <addaction name="actionEdit_Contexts_Events"/>
     <addaction name="actionEdit_Metadata"/>
     <addaction name="separator"/>
@@ -263,15 +263,9 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,0">
      <item>
       <widget class="QTableWidget" name="markersTable">
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
        </property>
@@ -348,13 +342,6 @@
       </layout>
      </item>
      <item>
-      <widget class="Line" name="line">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
         <number>0</number>
@@ -427,7 +414,7 @@ QPushButton::flat
              <bool>false</bool>
             </property>
             <property name="readOnly">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -560,7 +547,7 @@ QPushButton::flat
              <bool>false</bool>
             </property>
             <property name="readOnly">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -607,12 +594,9 @@ QPushButton::flat
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QVBoxLayout" name="verticalLayout_4">
+    <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,0">
      <item>
       <widget class="QTableWidget" name="eventsTable">
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>
        </property>
@@ -887,13 +871,6 @@ QPushButton::flat
         </widget>
        </item>
       </layout>
-     </item>
-     <item>
-      <widget class="Line" name="line_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1334,12 +1311,12 @@ QPushButton::flat
     <string>&amp;Quit</string>
    </property>
   </action>
-  <action name="actionReoder_Markers">
+  <action name="actionEdit_Points">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Reoder Markers</string>
+    <string>Edit Points</string>
    </property>
   </action>
   <action name="actionEdit_Contexts_Events">
@@ -1388,9 +1365,6 @@ QPushButton::flat
    </property>
   </action>
   <action name="actionVisit_BTK_website">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>Visit BTK website</string>
    </property>

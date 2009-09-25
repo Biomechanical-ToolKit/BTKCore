@@ -78,7 +78,10 @@ namespace btk
     void SetItem(int idx, ItemPointer elt);
     void RemoveItem(Iterator loc);
     void RemoveItem(int idx);
+    ItemPointer TakeItem(Iterator loc);
+    ItemPointer TakeItem(int idx);
     void Clear() {this->m_Items.clear();};
+    Pointer Clone() const;
     
   protected:
     Collection()
@@ -304,9 +307,57 @@ namespace btk
   };
   
   /**
+   * Removes the item at the location @a loc and return it.
+   */
+  template <class T>
+  typename T::Pointer Collection<T>::TakeItem(Iterator loc)
+  {
+    if (loc == this->End())
+    {
+      btkErrorMacro("Out of range");
+      return ItemPointer();
+    }
+    ItemPointer p = *loc;
+    this->m_Items.erase(loc);
+    this->Modified();
+    return p;
+  };
+  
+  /**
+   * Removes the item at the index @a idx and return it.
+   */
+  template <class T>
+  typename T::Pointer Collection<T>::TakeItem(int idx)
+  {
+    if (idx >= static_cast<int>(this->m_Items.size()))
+    {
+      btkErrorMacro("Out of range");
+      return ItemPointer();
+    }
+    Iterator it = this->Begin();
+    std::advance(it, idx);
+    ItemPointer p = *it;
+    this->m_Items.erase(it);
+    this->Modified();
+    return p;
+  };
+  
+  /**
    * @fn template <class T> void Collection<T>::Clear()
    * Clear the contents of the list.
    */
+   
+  /**
+   * Deep copy.
+   */
+  template <class T>
+  typename SharedPtr< Collection<T> > Collection<T>::Clone() const
+  {
+    Pointer p = Pointer(new Collection());
+    for (ConstIterator it = this->Begin() ; it != this->End() ; ++it)
+      p->m_Items.push_back((*it)->Clone());
+    return p;
+  };
 };
 
 #endif // __btkCollection_h

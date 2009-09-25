@@ -32,51 +32,21 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+#ifndef UserRoles_h
+#define UserRoles_h
 
-#ifndef __btkPoint_h
-#define __btkPoint_h
+#include <Qt>
 
-#include "btkMeasure.h"
+typedef enum {pointId = Qt::UserRole + 1,
+              pointLabel, 
+              pointDescription,
+              pointType,
+              pointDisabled} pointProperty;
+typedef enum {markerId = Qt::UserRole + 10,
+              markerRadius,
+              markerColorIndex} markerProperty;
+static int eventFrame = Qt::UserRole + 20;
+static int validEvent = Qt::UserRole + 30;
 
-namespace btk
-{
-  class Point : public Measure<3>
-  {
-  public:
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Residuals;
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Masks;
-    typedef enum {Marker = 0, Angle, Force, Moment, Power, Scalar, Reaction} Type;
-    
-    typedef SharedPtr<Point> Pointer;
-    typedef SharedPtr<const Point> ConstPointer;
-    
-    static Pointer New(int frameNumber = 1) {return Pointer(new Point("", frameNumber, Marker));};
-    static Pointer New(const std::string& label, int frameNumber, Type t = Marker) {return Pointer(new Point(label, frameNumber, t));};
-    
-    virtual ~Point() {};
-    
-    Residuals& GetResiduals() {return this->m_Residuals;};
-    const Residuals& GetResiduals() const {return this->m_Residuals;};
-    BTK_COMMON_EXPORT void SetResiduals(const Residuals& r);
-    Masks& GetMasks() {return this->m_Masks;};
-    const Masks& GetMasks() const {return this->m_Masks;};
-    BTK_COMMON_EXPORT void SetMasks(const Masks& m);
-    BTK_COMMON_EXPORT void SetFrameNumber(int frameNumber);
-    Type GetType() const {return this->m_Type;};
-    BTK_COMMON_EXPORT void SetType(Point::Type t);
-    Pointer Clone() const {return Pointer(new Point(*this));};
-    
-  protected:
-    BTK_COMMON_EXPORT Point(const std::string& label, int frameNumber, Type t);
-    
-  private:
-    BTK_COMMON_EXPORT Point(const Point& toCopy);
-    Point& operator=(const Point& ); // Not implemented.
-    
-    Residuals m_Residuals;
-    Masks m_Masks;
-    Type m_Type;
-  };
-};
-
-#endif // __btkPoint_h
+ #endif // UserRoles_h

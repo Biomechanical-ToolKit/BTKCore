@@ -159,6 +159,35 @@ namespace btk
     this->mp_SelectedMarkers->SetValue(id, 1);
     this->mp_MarkersRadius->SetValue(id, this->mp_MarkersRadius->GetValue(id) * 1.75);
   };
+  
+  /**
+   * Returns the visibility of the marker with index @a id.
+   */
+  bool VTKMarkersFramesSource::GetMarkerVisibility(vtkIdType id)
+  {
+    if (id >= this->mp_MarkersRadius->GetNumberOfTuples())
+    {
+      vtkErrorMacro("Out of range.");
+      return false;
+    }
+    return this->mp_VisibleMarkers->GetValue(id);
+  };
+  
+  /**
+   * Sets the visibility of the marker with index @a id.
+   */
+  void VTKMarkersFramesSource::SetMarkerVisibility(vtkIdType id, bool visible)
+  {
+    if (id >= this->mp_VisibleMarkers->GetNumberOfTuples())
+    {
+      vtkErrorMacro("Out of range.");
+      return;
+    }
+    if (visible)
+      this->mp_VisibleMarkers->SetValue(id, 1);
+    else
+      this->mp_VisibleMarkers->SetValue(id, 0);
+  };
 
   /**
    * Returns radius of the marker with index @a id.
@@ -268,12 +297,7 @@ namespace btk
    */
   void VTKMarkersFramesSource::HideMarker(vtkIdType id)
   {
-    if (id >= this->mp_VisibleMarkers->GetNumberOfTuples())
-    {
-      vtkErrorMacro("Out of range.");
-      return;
-    }
-    this->mp_VisibleMarkers->SetValue(id, 0);
+    this->SetMarkerVisibility(id, 0);
   };
 
   /**
@@ -290,12 +314,7 @@ namespace btk
    */
   void VTKMarkersFramesSource::ShowMarker(vtkIdType id)
   {
-    if (id >= this->mp_VisibleMarkers->GetNumberOfTuples())
-    {
-      vtkErrorMacro("Out of range.");
-      return;
-    }
-    this->mp_VisibleMarkers->SetValue(id, 1);
+    this->SetMarkerVisibility(id, 1);
   };
 
   /**

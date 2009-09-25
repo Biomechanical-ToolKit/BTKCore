@@ -236,11 +236,11 @@ namespace btk
   {};
 
   /**
-   * Copy constructor.
+   * Copy constructor. Timestamp, source and parent are reset.
    */
   template <int d>
   Measure<d>::Measure(const Measure& toCopy)
-  : DataObject(toCopy), m_Label(toCopy.m_Label), 
+  : DataObject(), m_Label(toCopy.m_Label), 
     m_Description(toCopy.m_Description), m_Values(toCopy.m_Values)
   {};
 

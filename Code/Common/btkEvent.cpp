@@ -151,16 +151,17 @@ namespace btk
    * Constructor.
    */
   Event::Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc)
-  : m_Label(label), m_Context(context), m_Subject(subject), m_Description(desc)
+  : DataObject(), m_Label(label), m_Context(context), m_Subject(subject), m_Description(desc)
   {
     this->m_Time = t;
   };
 
   /**
-   * Copy constructor.
+   * Copy constructor. Timestamp, source and parent are reset.
    */
   Event::Event(const Event& toCopy)
-  : m_Label(toCopy.m_Label), m_Context(toCopy.m_Context), m_Subject(toCopy.m_Subject), m_Description(toCopy.m_Description)
+  : DataObject(), 
+    m_Label(toCopy.m_Label), m_Context(toCopy.m_Context), m_Subject(toCopy.m_Subject), m_Description(toCopy.m_Description)
   {
     this->m_Time = toCopy.m_Time;
   };

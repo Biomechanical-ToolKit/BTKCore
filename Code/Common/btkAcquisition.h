@@ -86,6 +86,7 @@ namespace btk
     BTK_COMMON_EXPORT void SetEvent(int idx, Event::Pointer point);
     EventCollection::Pointer GetEvents() {return this->m_Events;};
     EventCollection::ConstPointer GetEvents() const {return this->m_Events;};
+    BTK_COMMON_EXPORT void SetEvents(EventCollection::Pointer evts);
     bool IsEmptyEvent() const {return this->m_Events->IsEmpty();};
     int GetEventNumber() const {return this->m_Events->GetItemNumber();};
     BTK_COMMON_EXPORT void SetEventNumber(int num);
@@ -103,6 +104,7 @@ namespace btk
     BTK_COMMON_EXPORT void SetPoint(int idx, Point::Pointer point);
     PointCollection::Pointer GetPoints() {return this->m_Points;};
     PointCollection::ConstPointer GetPoints() const {return this->m_Points;};
+    BTK_COMMON_EXPORT void SetPoints(PointCollection::Pointer points);
     bool IsEmptyPoint() const {return this->m_Points->IsEmpty();};
     int GetPointNumber() const {return this->m_Points->GetItemNumber();};
     BTK_COMMON_EXPORT void SetPointNumber(int num);
@@ -122,12 +124,12 @@ namespace btk
     bool IsEmptyAnalog() const {return this->m_Analogs->IsEmpty();};    
     int GetAnalogNumber() const {return this->m_Analogs->GetItemNumber();};
     BTK_COMMON_EXPORT void SetAnalogNumber(int num);
-
     BTK_COMMON_EXPORT Analog::Pointer GetAnalog(int idx);
     BTK_COMMON_EXPORT Analog::ConstPointer GetAnalog(int idx) const;
     BTK_COMMON_EXPORT void SetAnalog(int idx, Analog::Pointer analog);
     AnalogCollection::Pointer GetAnalogs() {return this->m_Analogs;};
     AnalogCollection::ConstPointer GetAnalogs() const {return this->m_Analogs;};
+    BTK_COMMON_EXPORT void SetAnalogs(AnalogCollection::Pointer analogs);
     void ClearAnalog() {this->m_Analogs->Clear();};
     BTK_COMMON_EXPORT AnalogIterator FindAnalog(const std::string& label);
     BTK_COMMON_EXPORT AnalogConstIterator FindAnalog(const std::string& label) const;
@@ -152,6 +154,8 @@ namespace btk
     AnalogResolution GetAnalogResolution() const {return this->m_AnalogResolution;};
     BTK_COMMON_EXPORT void SetAnalogResolution(AnalogResolution r);
     
+    Pointer Clone() const {return Pointer(new Acquisition(*this));};
+    
   protected:
     BTK_COMMON_EXPORT Acquisition();
     
@@ -159,6 +163,9 @@ namespace btk
     BTK_COMMON_EXPORT void SetAnalogFrameNumber(int frameNumber);
     
   private:
+    BTK_COMMON_EXPORT Acquisition(const Acquisition& toCopy);
+    Acquisition& operator=(const Acquisition& ); // Not implemented.
+    
     MetaData::Pointer mp_MetaData;
     EventCollection::Pointer m_Events;
     PointCollection::Pointer m_Points;
