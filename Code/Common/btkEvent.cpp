@@ -58,7 +58,7 @@ namespace btk
    */
 
   /**
-   * @fn Pointer Event::New(const std::string& label = "", double t = 0.0, const std::string& context = "", const std::string& subject = "", const std::string& desc = "")
+   * @fn Pointer Event::New(const std::string& label = "", double t = 0.0, const std::string& context = "", const std::string& subject = "", const std::string& desc = "", int id = 0)
    * Creates a smart pointer associated with an Event object.
    */
 
@@ -141,6 +141,24 @@ namespace btk
     this->m_Time = t;
     this->Modified();
   };
+  
+  /**
+   * @fn int Event::GetId() const
+   * Returns the event's ID. Can be used by software (as Vicon Workstation) 
+   * to indicate event (independently of the label).
+   */
+  
+  
+  /**
+   * Sets the event's ID. 
+   */
+  void Event::SetId(int id)
+  {
+    if (this->m_Id == id)
+      return;
+    this->m_Id = id;
+    this->Modified();
+  };
 
   /**
    * @fn Pointer Event::Clone() const
@@ -150,10 +168,11 @@ namespace btk
   /**
    * Constructor.
    */
-  Event::Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc)
+  Event::Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc, int id)
   : DataObject(), m_Label(label), m_Context(context), m_Subject(subject), m_Description(desc)
   {
     this->m_Time = t;
+    this->m_Id = id;
   };
 
   /**
@@ -164,5 +183,6 @@ namespace btk
     m_Label(toCopy.m_Label), m_Context(toCopy.m_Context), m_Subject(toCopy.m_Subject), m_Description(toCopy.m_Description)
   {
     this->m_Time = toCopy.m_Time;
+    this->m_Id = toCopy.m_Id;
   };
 };

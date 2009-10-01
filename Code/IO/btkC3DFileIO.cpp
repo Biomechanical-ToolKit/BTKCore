@@ -461,9 +461,9 @@ namespace btk
           if (itP == parameterIds.end())
           {
             ++itG; ++itGroup;
-            if (itG == groupIds.end() || (itGroup == root->End()))
-              break;
             itP = parameterIds.begin(); itParameter = parameters.begin();
+            if (itG == groupIds.end() || itGroup == root->End() || itP == parameterIds.end() || itParameter == parameters.end())
+              break;
           }
           if (*itG == -*itP)
           {
@@ -487,12 +487,12 @@ namespace btk
       }
     // Events in Parameter section
       MetaData::ConstIterator itEvent = root->FindChild("EVENT");
-      // Took a chance to find the events in EVENTS group insteat of EVENT
+      // Took a chance to find the events in EVENTS group instead of EVENT
       if (itEvent == root->End())
       {
         itEvent = root->FindChild("EVENTS");
         if (itEvent != root->End())
-          btkIOErrorMacro(filename, "EVENTS group found instead of EVENT. The EVENT group is used to extract events.");
+          btkIOErrorMacro(filename, "EVENTS group found instead of EVENT. The EVENTS group is used to extract events.");
       }
       if (itEvent != root->End())
       {
@@ -502,8 +502,8 @@ namespace btk
           int eventsNumber = (*itUsed)->GetInfo()->ToInt(0);
           std::vector<std::string> eventsLabel;
           std::vector<double> eventsTime;
+          std::vector<int> eventsId;
           std::vector<std::string> eventsContext;
-
           std::vector<std::string> eventsSubject;
           std::vector<std::string> eventsDescription;
            MetaDataCollapseChildrenValues<std::string>(eventsLabel, *itEvent, "LABELS", eventsNumber, "uname*");
@@ -519,6 +519,10 @@ namespace btk
 
           MetaDataCollapseChildrenValues(eventsDescription, *itEvent, "DESCRIPTIONS");
           eventsDescription.resize(eventsNumber,"");
+          
+          MetaDataCollapseChildrenValues(eventsId, *itEvent, "ICON_IDS");
+          eventsId.resize(eventsNumber, 0);
+          
           EventCollection::Pointer events = input->GetEvents();
           for (int incEvt = 0 ; incEvt < eventsNumber ; ++incEvt)
           {
@@ -527,7 +531,8 @@ namespace btk
                 eventsTime[2 * incEvt] * 60 + eventsTime[2 * incEvt + 1],
                 eventsContext[incEvt],
                 eventsSubject[incEvt],
-                eventsDescription[incEvt]);
+                eventsDescription[incEvt],
+                eventsId[incEvt]);
             events->InsertItem(evt);
           }
         }
@@ -1496,13 +1501,15 @@ namespace btk
       // EVENT:DESCRIPTIONS &
       // EVENT:TIMES &
       // EVENT:SUBJECTS &
-      // EVENT:GENERIC_FLAGS
+      // EVENT:GENERIC_FLAGS &
+      // EVENT:ICON_IDS
       std::vector<std::string> contexts =  std::vector<std::string>(eventNumber,"");
       labels.resize(eventNumber, "");
       descs.resize(eventNumber, "");
       std::vector<float> times =  std::vector<float>(eventNumber * 2, 0.0);
       std::vector<std::string> subjects =  std::vector<std::string>(eventNumber, "");
       std::vector<int8_t> genericFlags =  std::vector<int8_t>(eventNumber, 0);
+      std::vector<int16_t> iconIds =  std::vector<int16_t>(eventNumber, 0);
       std::vector<std::string> uniqueEvents;
       inc = 0;
       for (Acquisition::EventConstIterator itEvent = input->BeginEvent() ; itEvent != input->EndEvent() ; ++itEvent)
@@ -1534,6 +1541,7 @@ namespace btk
         times[2 * inc] = static_cast<float>(static_cast<int>((*itEvent)->GetTime() / 60));
         times[2 * inc + 1] = static_cast<float>((*itEvent)->GetTime() - (times[2 * inc] * 60));
         subjects[inc] = (*itEvent)->GetSubject();
+        iconIds[inc] = (*itEvent)->GetId();
         ++inc;
       }
       MetaDataCreateChild(event, "CONTEXTS", contexts);
@@ -1542,8 +1550,7 @@ namespace btk
       MetaDataCreateChild(event, "TIMES", times);
       MetaDataCreateChild(event, "SUBJECTS", subjects);
       MetaDataCreateChild(event, "GENERIC_FLAGS", genericFlags);
-      // EVENT:ICON_IDS
-      MetaDataCreateChild(event, "ICON_IDS", std::vector<int16_t>(eventNumber,0));
+      MetaDataCreateChild(event, "ICON_IDS", iconIds);
       // EVENT_CONTEXT group (special case)
       // -------------------
       MetaData::ConstIterator itEventGr = input->GetMetaData()->FindChild("EVENT_CONTEXT");

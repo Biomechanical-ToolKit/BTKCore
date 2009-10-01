@@ -170,7 +170,7 @@ namespace btk
       vtkErrorMacro("Out of range.");
       return false;
     }
-    return this->mp_VisibleMarkers->GetValue(id);
+    return this->mp_VisibleMarkers->GetValue(id) ? true : false;
   };
   
   /**
@@ -503,9 +503,6 @@ namespace btk
                                    vtkInformationVector** inputVector,
                                    vtkInformationVector* outputVector)
   {
-
-    vtkTimerLog* timer = vtkTimerLog::New();
-    timer->StartTimer();
 
     vtkInformation* outInfo = outputVector->GetInformationObject(0);    
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));

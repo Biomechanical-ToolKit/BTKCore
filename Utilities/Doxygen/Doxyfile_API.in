@@ -659,7 +659,8 @@ EXCLUDE_PATTERNS       = */.svn* \
 # wildcard * is used, a substring. Examples: ANamespace, AClass, 
 # AClass::ANamespace, ANamespace::*Test
 
-EXCLUDE_SYMBOLS        = vtkTypeRevisionMacro \
+EXCLUDE_SYMBOLS        = vtkExportedTypeRevisionMacro \
+                         vtkTypeRevisionMacro \
                          vtkCxxRevisionMacro \
                          vtkStandardNewMacro \
                          *_p

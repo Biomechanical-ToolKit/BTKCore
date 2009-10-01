@@ -11,7 +11,7 @@ CXXTEST_SUITE(PointTest)
   {
     btk::Point::Pointer test = btk::Point::New("HEEL_R", 200);
     TS_ASSERT_EQUALS(test->GetLabel(), "HEEL_R");
-    TS_ASSERT_EQUALS(test->GetDescription(), "");
+    TS_ASSERT_EQUALS(test->GetDescription(), "         ");
     TS_ASSERT_EQUALS(test->GetValues().rows(), 200);
     TS_ASSERT_EQUALS(test->GetValues().cols(), 3);
     TS_ASSERT_EQUALS(test->GetResiduals().rows(), 200);

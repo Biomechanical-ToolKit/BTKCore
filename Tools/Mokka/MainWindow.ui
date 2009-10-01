@@ -598,7 +598,7 @@ QPushButton::flat
      <item>
       <widget class="QTableWidget" name="eventsTable">
        <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
+        <enum>QFrame::Sunken</enum>
        </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>

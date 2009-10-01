@@ -48,7 +48,7 @@ namespace btk
     typedef SharedPtr<Event> Pointer;
     typedef SharedPtr<const Event> ConstPointer;
     
-    static Pointer New(const std::string& label = "", double t = 0.0, const std::string& context = "", const std::string& subject = "", const std::string& desc = "") {return Pointer(new Event(label, t, context, subject, desc));};
+    static Pointer New(const std::string& label = "", double t = 0.0, const std::string& context = "", const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, t, context, subject, desc, id));};
 
     // ~Event(); // Implicit.
     const std::string& GetLabel() const {return this->m_Label;};
@@ -61,10 +61,12 @@ namespace btk
     BTK_COMMON_EXPORT void SetSubject(const std::string& subject);
     double GetTime() const {return this->m_Time;};
     BTK_COMMON_EXPORT void SetTime(double t);
+    int GetId() const {return this->m_Id;};
+    BTK_COMMON_EXPORT void SetId(int id);
     Pointer Clone() const {return Pointer(new Event(*this));};
 
   private:
-    BTK_COMMON_EXPORT Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc);
+    BTK_COMMON_EXPORT Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc, int id);
     BTK_COMMON_EXPORT Event(const Event& toCopy);
     Event& operator=(const Event& ); // Not implemented.
 
@@ -73,6 +75,7 @@ namespace btk
     std::string m_Context;
     std::string m_Subject;
     double m_Time;
+    int m_Id;
   };
 };
 
