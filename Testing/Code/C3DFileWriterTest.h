@@ -957,6 +957,65 @@ CXXTEST_SUITE(C3DFileWriterTest)
       TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acq2->GetAnalog(1)->GetValues()(i), 0.00001);
     }
   };
+    
+  CXXTEST_TEST(emptyAcquisition)
+  {
+    btk::Acquisition::Pointer acq = btk::Acquisition::New();
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(acq);
+    writer->SetFilename(C3DFilePathOUT + "EmptyAcquisition.c3d");
+    writer->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathOUT + "EmptyAcquisition.c3d");
+    reader->Update();
+    acq = reader->GetOutput();
+    btk::MetaData::Pointer metadata = acq->GetMetaData();
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), 1);
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 0);
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), 0);
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), 0);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 0);
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 0);
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), "mm");
+    btk::MetaData::ConstIterator itPoint = metadata->FindChild("POINT");
+    btk::MetaData::ConstIterator itAnalog = metadata->FindChild("ANALOG");
+    btk::MetaData::ConstIterator itFP = metadata->FindChild("FORCE_PLATFORM");
+    TS_ASSERT(itPoint != metadata->End());
+    TS_ASSERT(itAnalog != metadata->End());
+    TS_ASSERT(itFP != metadata->End());
+    // POINT and ANALOG are suppoed to be OK
+    btk::MetaData::ConstIterator itUsed = (*itFP)->FindChild("USED");
+    btk::MetaData::ConstIterator itType = (*itFP)->FindChild("TYPE");
+    btk::MetaData::ConstIterator itZero = (*itFP)->FindChild("ZERO");
+    btk::MetaData::ConstIterator itCorners = (*itFP)->FindChild("CORNERS");
+    btk::MetaData::ConstIterator itOrigin = (*itFP)->FindChild("ORIGIN");
+    btk::MetaData::ConstIterator itChannel = (*itFP)->FindChild("CHANNEL");
+    TS_ASSERT(itUsed != (*itFP)->End());
+    TS_ASSERT(itType != (*itFP)->End());
+    TS_ASSERT(itZero != (*itFP)->End());
+    TS_ASSERT(itCorners != (*itFP)->End());
+    TS_ASSERT(itOrigin != (*itFP)->End());
+    TS_ASSERT(itChannel != (*itFP)->End());
+    TS_ASSERT((*itUsed)->HasInfo());
+    TS_ASSERT((*itType)->HasInfo());
+    TS_ASSERT((*itZero)->HasInfo());
+    TS_ASSERT((*itCorners)->HasInfo());
+    TS_ASSERT((*itOrigin)->HasInfo());
+    TS_ASSERT((*itChannel)->HasInfo());
+    TS_ASSERT_EQUALS((*itUsed)->GetInfo()->GetDimensionsProduct(), 1);
+    TS_ASSERT_EQUALS((*itType)->GetInfo()->GetDimensionsProduct(), 0);
+    TS_ASSERT_EQUALS((*itZero)->GetInfo()->GetDimensionsProduct(), 2);
+    TS_ASSERT_EQUALS((*itCorners)->GetInfo()->GetDimensionsProduct(), 0);
+    TS_ASSERT_EQUALS((*itOrigin)->GetInfo()->GetDimensionsProduct(), 0);
+    TS_ASSERT_EQUALS((*itChannel)->GetInfo()->GetDimensionsProduct(), 0);
+    TS_ASSERT_EQUALS((*itUsed)->GetInfo()->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((*itType)->GetInfo()->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((*itZero)->GetInfo()->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((*itCorners)->GetInfo()->GetDimensions().size(), 3);
+    TS_ASSERT_EQUALS((*itOrigin)->GetInfo()->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((*itChannel)->GetInfo()->GetDimensions().size(), 2);
+  };
 
   CXXTEST_TEST(convertTRC2C3D)
   {
@@ -1019,6 +1078,7 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015vr_from_Eb015sr)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015sr_from_Eb015pr)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015pr_from_Eb015vr)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample09_PlugInC3D_rewrited)
-CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample19_sample19_rewrited)  
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample19_sample19_rewrited)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, emptyAcquisition)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertTRC2C3D)
 #endif

@@ -908,6 +908,8 @@ namespace btk
       btkErrorMacro("Null acquisition.");
       return;
     }
+    if (this->HasWritingFlag(CompatibleVicon))
+      this->KeepAcquisitionCompatibleVicon(input);
     if (this->HasWritingFlag(ScalesFromDataUpdate))
       this->UpdateScalingFactorsFromData(input);
     if (this->HasWritingFlag(ScalesFromMetaDataUpdate))
@@ -1154,7 +1156,7 @@ namespace btk
 #else
     this->SetByteOrder(btk::C3DFileIO::IEEE_LittleEndian);
 #endif
-    this->m_WritingFlags = ScalesFromDataUpdate | MetaDataFromDataUpdate;  
+    this->m_WritingFlags = ScalesFromDataUpdate | MetaDataFromDataUpdate | CompatibleVicon;  
   };
 
   /*
@@ -1223,6 +1225,75 @@ namespace btk
     return writtenBytes;
   };
 
+  /**
+   * Check and adapt the acquistion to be compatible with Polygon.
+   *
+   * Due to an unknown reason (bug?) Vicon's products (Polygon, Workstation and maybe Nexus) crash
+   * if descriptions are empty. Then this method check if descriptions are empty and fill them
+   * with 4 blank spaces.
+   */
+  void C3DFileIO::KeepAcquisitionCompatibleVicon(Acquisition::Pointer input)
+  {
+    std::string blank = std::string(1, '    ');
+    // Frequency
+    if (input->GetPointFrequency() == 0.0)
+    {
+      btkErrorMacro("Acquisition frequency can't be null and is set to 50 Hz.");
+      input->SetPointFrequency(50.0);
+    }
+    // Point
+    for (Acquisition::PointConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+    {
+      if ((*it)->GetDescription().empty())
+        (*it)->SetDescription(blank);
+    }
+    // Analog channel
+    for (Acquisition::AnalogConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+    {
+      if ((*it)->GetDescription().empty())
+        (*it)->SetDescription(blank);
+    }
+    // ANALYSIS
+    MetaData::Iterator itAnalysis = input->GetMetaData()->FindChild("ANALYSIS");
+    if (itAnalysis != input->GetMetaData()->End())
+    {
+      int num = 0;
+      MetaData::Iterator it = (*itAnalysis)->FindChild("USED");
+      if (it != (*itAnalysis)->End())
+      {
+        if ((*it)->HasInfo())
+          if ((*it)->GetInfo()->GetDimensionsProduct() != 0)
+            num = (*it)->GetInfo()->ToInt(0);
+      }
+      it = (*itAnalysis)->FindChild("DESCRIPTIONS");
+      if (it != (*itAnalysis)->End())
+      {
+        if ((*it)->HasInfo())
+        {
+          if ((*it)->GetInfo()->GetDimensionsProduct() == 0)
+          {
+            std::vector<uint8_t> dims = std::vector<uint8_t>(2, 4); // 4: number of blank spaces.
+            dims[1] = num;
+            (*it)->GetInfo()->SetValues(dims, std::vector<std::string>(num, blank));
+          }
+        }
+      }
+      it = (*itAnalysis)->FindChild("SUBJECTS");
+      if (it != (*itAnalysis)->End())
+      {
+        if ((*it)->HasInfo())
+        {
+          if ((*it)->GetInfo()->GetDimensionsProduct() == 0)
+          {
+            std::vector<uint8_t> dims = std::vector<uint8_t>(2, 4); // 4: number of blank spaces.
+            dims[1] = num;
+            (*it)->GetInfo()->SetValues(dims, std::vector<std::string>(num, blank));
+          }
+        }
+      }
+    }
+  };
+  
   /**
    * Update scaling factors from acquisition's data.
    */
@@ -1488,6 +1559,29 @@ namespace btk
       MetaDataCreateChild(analog, "FORMAT", "UNSIGNED");
     else
       MetaDataCreateChild(analog, "FORMAT", (this->m_AnalogIntegerFormat == Unsigned ? "UNSIGNED" : "SIGNED"));
+    // FORCE_PLATFORM group
+    // --------------------
+    MetaData::ConstIterator itFPGr = input->GetMetaData()->FindChild("FORCE_PLATFORM");
+    if (itFPGr == input->GetMetaData()->End())
+    {
+      MetaData::Pointer fp = MetaDataCreateChild(input->GetMetaData(), "FORCE_PLATFORM");
+      // FORCE_PLATFORM:USED
+      MetaDataCreateChild(fp, "USED", (int16_t)0);
+      // FORCE_PLATFORM:ZERO
+      std::vector<int16_t> zeros = std::vector<int16_t>(2,0); zeros[0] = 1;
+      MetaDataCreateChild(fp, "ZERO", zeros);
+      // FORCE_PLATFORM:TYPE
+      MetaDataCreateChild(fp, "TYPE")->SetInfo(MetaDataInfo::New(std::vector<uint8_t>(1,0), std::vector<int16_t>(0)));
+      // FORCE_PLATFORM:CORNERS
+      std::vector<uint8_t> cornersDim = std::vector<uint8_t>(3, 0); cornersDim[0] = 3; cornersDim[1] = 4;
+      MetaDataCreateChild(fp, "CORNERS")->SetInfo(MetaDataInfo::New(cornersDim, std::vector<float>(0)));
+      // FORCE_PLATFORM:ORIGIN
+      std::vector<uint8_t> originDim = std::vector<uint8_t>(2, 0); originDim[0] = 3;
+      MetaDataCreateChild(fp, "ORIGIN")->SetInfo(MetaDataInfo::New(originDim, std::vector<float>(0)));
+      // FORCE_PLATFORM:CHANNEL
+      std::vector<uint8_t> channelDim = std::vector<uint8_t>(2, 0); channelDim[0] = 6;
+      MetaDataCreateChild(fp, "CHANNEL")->SetInfo(MetaDataInfo::New(channelDim, std::vector<int16_t>(0)));
+    }
     // EVENT group
     // -----------
     if (input->GetEventNumber() != 0)

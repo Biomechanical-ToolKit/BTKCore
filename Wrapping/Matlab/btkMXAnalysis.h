@@ -56,8 +56,8 @@ void btkCreateAnalysis(btk::MetaData::Pointer analysis, char* name, char* contex
   btk::MetaDataCreateChild(analysis, "CONTEXTS", std::string(context));
   btk::MetaDataCreateChild(analysis, "UNITS", std::string(unit));
   btk::MetaDataCreateChild(analysis, "VALUES", static_cast<float>(value));
-  btk::MetaDataCreateChild(analysis, "SUBJECTS", std::string(subject));
-  btk::MetaDataCreateChild(analysis, "DESCRIPTIONS", std::string(description));
+  btk::MetaDataCreateChild(analysis, "SUBJECTS", subject ? std::string(subject) : "");
+  btk::MetaDataCreateChild(analysis, "DESCRIPTIONS", description ? std::string(description) : "");
 };
 
 void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])

@@ -57,7 +57,7 @@ namespace btk
   public:
     
     typedef enum {Signed, Unsigned}  AnalogIntegerFormat;
-    typedef enum {None = 1, ScalesFromDataUpdate = 2, ScalesFromMetaDataUpdate = 4, MetaDataFromDataUpdate = 8} WritingFlag;
+    typedef enum {None = 1, ScalesFromDataUpdate = 2, ScalesFromMetaDataUpdate = 4, MetaDataFromDataUpdate = 8, CompatibleVicon = 16} WritingFlag;
 
     typedef SharedPtr<C3DFileIO> Pointer;
     typedef SharedPtr<const C3DFileIO> ConstPointer;
@@ -92,6 +92,7 @@ namespace btk
     
   private:
     BTK_IO_EXPORT size_t WriteMetaData(BinaryFileStream* obfs, MetaData::ConstPointer, int id);
+    BTK_IO_EXPORT void KeepAcquisitionCompatibleVicon(Acquisition::Pointer input);
     BTK_IO_EXPORT void UpdateScalingFactorsFromData(Acquisition::Pointer input);
     BTK_IO_EXPORT void UpdateScalingFactorsFromMetaData(Acquisition::Pointer input);
     BTK_IO_EXPORT void UpdateMetaDataFromData(Acquisition::Pointer input);

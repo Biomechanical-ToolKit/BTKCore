@@ -231,7 +231,7 @@ namespace btk
    */
   template <int d>
   Measure<d>::Measure(const std::string& label, int frameNumber)
-  : DataObject(), m_Label(label), m_Description("         "),
+  : DataObject(), m_Label(label), m_Description(""),
     m_Values(Values(frameNumber, d))
   {};
 

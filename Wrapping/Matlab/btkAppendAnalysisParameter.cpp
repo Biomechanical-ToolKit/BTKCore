@@ -67,11 +67,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     subject = (char*)mxMalloc(strlen);
     mxGetString(prhs[5], subject, strlen);
   }
-  else
-  {
-    subject = (char*)mxMalloc(9);
-    strcpy(subject, "        ");
-  }
   if (nrhs >= 7)
   {
     if (!mxIsChar(prhs[6]))
@@ -79,11 +74,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int strlen = (mxGetM(prhs[6]) * mxGetN(prhs[6]) * sizeof(mxChar)) + 1;
     description = (char*)mxMalloc(strlen);
     mxGetString(prhs[6], description, strlen);
-  }
-  else
-  {
-    description = (char*)mxMalloc(9);
-    strcpy(description, "        ");
   }
   int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
   name = (char*)mxMalloc(strlen);
@@ -213,13 +203,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             (*its[1])->GetInfo()->ToString(dataStr);
             it = dataStr.begin();
             std::advance(it, i);
-            dataStr.insert(it, std::string(description));
+            dataStr.insert(it, description ? std::string(description) : "");
             (*its[1])->GetInfo()->SetValues(dataStr);
             // subject
             (*its[2])->GetInfo()->ToString(dataStr);
             it = dataStr.begin();
             std::advance(it, i);
-            dataStr.insert(it, std::string(subject));
+            dataStr.insert(it, subject ? std::string(subject) : "");
             (*its[2])->GetInfo()->SetValues(dataStr);
             // context
             (*its[3])->GetInfo()->ToString(dataStr);
@@ -246,9 +236,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             // name
             (*its[0])->GetInfo()->SetValue(i, strName);
             // description
-            (*its[1])->GetInfo()->SetValue(i, std::string(description));
+            (*its[1])->GetInfo()->SetValue(i, description ? std::string(description) : "");
             // subject
-            (*its[2])->GetInfo()->SetValue(i, std::string(subject));
+            (*its[2])->GetInfo()->SetValue(i, subject ? std::string(subject) : "");
             // context
             (*its[3])->GetInfo()->SetValue(i, strContext);
             // unit
