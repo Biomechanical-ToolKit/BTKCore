@@ -64,6 +64,13 @@ namespace btk
     int GetId() const {return this->m_Id;};
     BTK_COMMON_EXPORT void SetId(int id);
     Pointer Clone() const {return Pointer(new Event(*this));};
+    //! @cond
+    BTK_COMMON_EXPORT friend bool operator==(const Event& rLHS, const Event& rRHS);
+    //! @endcond
+    friend bool operator!=(const Event& rLHS, const Event& rRHS)
+    {
+      return !(rLHS == rRHS);
+    };
 
   private:
     BTK_COMMON_EXPORT Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc, int id);

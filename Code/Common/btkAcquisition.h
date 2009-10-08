@@ -90,9 +90,12 @@ namespace btk
     bool IsEmptyEvent() const {return this->m_Events->IsEmpty();};
     int GetEventNumber() const {return this->m_Events->GetItemNumber();};
     BTK_COMMON_EXPORT void SetEventNumber(int num);
-    void ClearEvent() {this->m_Events->Clear();};
+    void ClearEvents() {this->m_Events->Clear();};
     BTK_COMMON_EXPORT EventIterator FindEvent(const std::string& label);
     BTK_COMMON_EXPORT EventConstIterator FindEvent(const std::string& label) const;
+    void AppendEvent(Event::Pointer e) {this->m_Events->InsertItem(e);};
+    void RemoveEvent(int idx) {this->m_Events->RemoveItem(idx);};
+    EventIterator RemoveEvent(EventIterator it) {return this->m_Events->RemoveItem(it);};
 
     // Point
     PointIterator BeginPoint() {return this->m_Points->Begin();};
@@ -108,13 +111,13 @@ namespace btk
     bool IsEmptyPoint() const {return this->m_Points->IsEmpty();};
     int GetPointNumber() const {return this->m_Points->GetItemNumber();};
     BTK_COMMON_EXPORT void SetPointNumber(int num);
-    void ClearPoint() {this->m_Points->Clear();};
+    void ClearPoints() {this->m_Points->Clear();};
     BTK_COMMON_EXPORT PointIterator FindPoint(const std::string& label);
     BTK_COMMON_EXPORT PointConstIterator FindPoint(const std::string& label) const;
     void AppendPoint(Point::Pointer p) {this->m_Points->InsertItem(p);};
     BTK_COMMON_EXPORT void RemovePoint(const std::string& label);
     void RemovePoint(int idx) {this->m_Points->RemoveItem(idx);};
-    void RemovePoint(PointIterator it) {this->m_Points->RemoveItem(it);};
+    PointIterator RemovePoint(PointIterator it) {return this->m_Points->RemoveItem(it);};
         
     // Analog
     AnalogIterator BeginAnalog() {return this->m_Analogs->Begin();};
@@ -130,7 +133,7 @@ namespace btk
     AnalogCollection::Pointer GetAnalogs() {return this->m_Analogs;};
     AnalogCollection::ConstPointer GetAnalogs() const {return this->m_Analogs;};
     BTK_COMMON_EXPORT void SetAnalogs(AnalogCollection::Pointer analogs);
-    void ClearAnalog() {this->m_Analogs->Clear();};
+    void ClearAnalogs() {this->m_Analogs->Clear();};
     BTK_COMMON_EXPORT AnalogIterator FindAnalog(const std::string& label);
     BTK_COMMON_EXPORT AnalogConstIterator FindAnalog(const std::string& label) const;
         

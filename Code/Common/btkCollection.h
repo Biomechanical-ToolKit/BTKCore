@@ -76,7 +76,7 @@ namespace btk
     bool InsertItem(int idx, ItemPointer elt);
     bool InsertItem(ItemPointer elt) {return this->InsertItem(this->End(), elt);};
     void SetItem(int idx, ItemPointer elt);
-    void RemoveItem(Iterator loc);
+    Iterator RemoveItem(Iterator loc);
     void RemoveItem(int idx);
     ItemPointer TakeItem(Iterator loc);
     ItemPointer TakeItem(int idx);
@@ -278,15 +278,16 @@ namespace btk
    * Removes the item at the location @a loc.
    */
   template <class T>
-  void Collection<T>::RemoveItem(Iterator loc)
+  typename std::list<typename T::Pointer>::iterator Collection<T>::RemoveItem(Iterator loc)
   {
     if (loc == this->End())
     {
       btkErrorMacro("Out of range");
-      return;
+      return loc;
     }
-    this->m_Items.erase(loc);
+    Iterator it = this->m_Items.erase(loc);
     this->Modified();
+    return it;
   };
   
   /**

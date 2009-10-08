@@ -101,6 +101,11 @@ namespace btk
    * @var C3DFileIO::WritingFlag C3DFileIO::MetaDataFromDataUpdate
    * Updates (or synchronize) the acquisition's metadata from the data (by default).
    */
+  /**
+   * @var C3DFileIO::WritingFlag C3DFileIO::CompatibleVicon
+   * Checks and updates (if necessary) acquisitions parameter which can crash Vicon's 
+   * product (Polygon, Workstation, Nexus).
+   */
   
   /**
    * @typedef C3DFileIO::Pointer
@@ -1628,7 +1633,7 @@ namespace btk
             break;
           }
         }
-        if (newUniqueEventFound)
+        if (newUniqueEventFound || (uniqueEvents.empty() && !contexts[inc].empty()))
           uniqueEvents.push_back(contexts[inc]);
         labels[inc] = (*itEvent)->GetLabel();
         descs[inc] = (*itEvent)->GetDescription();

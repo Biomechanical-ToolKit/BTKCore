@@ -284,7 +284,7 @@ namespace btk
   };
 
   /**
-   * @fn void Acquisition::ClearEvent()
+   * @fn void Acquisition::ClearEvents()
    * Clear events.
    */
 
@@ -321,6 +321,21 @@ namespace btk
     }
     return it;
   };
+  
+  /**
+   * @fn void Acquisition::AppendEvent(Event::Pointer e)
+   * Append the event @a e in the acquisition
+   */
+   
+  /**
+   * @fn void Acquisition::RemoveEvent(int idx)
+   * Remove the event associated with the index @a idx
+   */
+  
+  /**
+   * @fn EventIterator Acquisition::RemoveEvent(EventIterator it)
+   * Remove the event associated with the iterator @a it
+   */
 
   /**
    * @fn Acquisition::PointIterator Acquisition::BeginPoint()
@@ -443,7 +458,7 @@ namespace btk
   };
 
   /**
-   * @fn void Acquisition::ClearPoint()
+   * @fn void Acquisition::ClearPoints()
    * Clear points.
    */
 
@@ -503,7 +518,7 @@ namespace btk
    */
 
   /**
-   * @fn void Acquisition::RemovePoint(PointIterator it)
+   * @fn PointIterator Acquisition::RemovePoint(PointIterator it)
    * Convenient method to delete a point from the acquisition.
    */
   
@@ -623,7 +638,7 @@ namespace btk
   };
   
   /**
-   * @fn void Acquisition::ClearAnalog()
+   * @fn void Acquisition::ClearAnalogs()
    * Clear analogs channels.
    */
 

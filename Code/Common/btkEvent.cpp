@@ -164,6 +164,32 @@ namespace btk
    * @fn Pointer Event::Clone() const
    * Clones the object and return it as new smart pointer.
    */
+   
+  /**
+   * @fn friend bool Event::operator==(const Event& rLHS, const Event& rRHS)
+   * Equality operator.
+   */
+  bool operator==(const Event& rLHS, const Event& rRHS)
+  {
+    if (rLHS.m_Label != rRHS.m_Label) 
+      return false;
+    if (rLHS.m_Context != rRHS.m_Context) 
+      return false;
+    if (rLHS.m_Subject != rRHS.m_Subject) 
+      return false;
+    if (rLHS.m_Description != rRHS.m_Description) 
+      return false;
+    if (fabs(rLHS.m_Time - rRHS.m_Time) >= std::numeric_limits<double>::epsilon())
+      return false;
+    if (rLHS.m_Id != rRHS.m_Id) 
+      return false;
+    return true;
+  };
+  
+  /**
+    * @fn friend bool Event::operator!=(const Event& rLHS, const Event& rRHS)
+    * Inequality operator.
+    */
   
   /**
    * Constructor.
