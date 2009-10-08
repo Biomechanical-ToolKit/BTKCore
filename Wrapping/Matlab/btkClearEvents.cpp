@@ -33,16 +33,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMXEvent.h"
+#if defined(_MSC_VER)
+  // Disable unsafe warning (use of the function 'strcpy' instead of 
+  // 'strcpy_s' for portability reasons;
+  #pragma warning( disable : 4996 ) 
+#endif
+
+#include "btkMXObjectHandle.h"
+
+#include <btkAcquisition.h>
+#include <btkMetaDataUtils.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs!=1)
     mexErrMsgTxt("One input required.");
-  if (nlhs > 2)
+  if (nlhs > 0)
    mexErrMsgTxt("Too many output arguments.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   
-  btkMXCreateEventsStructure(acq, nlhs, plhs);
+  acq->ClearEvents();
 };
+
+

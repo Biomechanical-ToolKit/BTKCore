@@ -58,7 +58,7 @@ const std::string extractByteOrderOption(const mxArray* opt, btk::AcquisitionFil
   else if (uppercase.compare("VAX_LITTLEENDIAN") == 0)
     *b = btk::AcquisitionFileIO::VAX_LittleEndian;
   else
-    errMsg = "Unknown ByteOrder option: '" + std::string(option) + "'";
+    errMsg = "Unknown ByteOrder option: '" + std::string(option) + "'.";
   mxFree(option);
   return errMsg;
 };
@@ -76,7 +76,7 @@ const std::string extractStorageFormatOption(const mxArray* opt, btk::Acquisitio
   else if (uppercase.compare("INTEGER") == 0)
     *s = btk::AcquisitionFileIO::Integer;
   else
-    errMsg = "Unknown StorageFormat option: '" + std::string(option) + "'";
+    errMsg = "Unknown StorageFormat option: '" + std::string(option) + "'.";
   mxFree(option);
   return errMsg;
 };
@@ -96,11 +96,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   char* filename = (char*)mxMalloc(strlen);
   mxGetString(prhs[1], filename, strlen);
 
-  char* option = 0;
   btk::AcquisitionFileIO::ByteOrder byteOrderOption = btk::AcquisitionFileIO::OrderNotApplicable;
   btk::AcquisitionFileIO::StorageFormat storageFormatOption = btk::AcquisitionFileIO::StorageNotApplicable;
   std::string errMsg;
   
+  char* option = 0;
   const char* options[] = {"BYTEORDER", "STORAGEFORMAT"};
   int numberOfOptions =  sizeof(options) / (sizeof(char) * 4);
   for (int i = 2 ; i < nrhs ; i += 2)
@@ -128,7 +128,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       }
     }
     if (j == numberOfOptions)
-      errMsg = "Unknown option: '" + std::string(option) + "'";
+      errMsg = "Unknown option: '" + std::string(option) + "'.";
     mxFree(option);
     if (!errMsg.empty())
       mexErrMsgTxt(errMsg.c_str());

@@ -7,7 +7,6 @@ function tocbtkcommon
 %   <a href="matlab:help btkGetAnalogFrequency">btkGetAnalogFrequency</a>       - Analog's frequency accessor
 %   <a href="matlab:help btkGetAnalogNumber">btkGetAnalogNumber</a>          - Analog's number accessor
 %   <a href="matlab:help btkGetAnalysis">btkGetAnalysis</a>              - ANALYSIS group extraction
-%   <a href="matlab:help btkGetEvents">btkGetEvents</a>                - Events extraction
 %   <a href="matlab:help btkGetFirstFrame">btkGetFirstFrame</a>            - Acquisition's first frame accessor
 %   <a href="matlab:help btkGetMetaData">btkGetMetaData</a>              - Acquisition's metadata accessor	
 %   <a href="matlab:help btkGetPointFrameNumber">btkGetPointFrameNumber</a>      - Point's frame number accessor
@@ -24,7 +23,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetFrequency">btkSetFrequency</a>             - Set the main frequency.
 %   <a href="matlab:help btkSetPointNumber">btkSetPointNumber</a>           - Point's number modifier
 %
-% Points accessor
+% Point accessor
 %   <a href="matlab:help btkGetAngles">btkGetAngles</a>                - Angles extraction
 %   <a href="matlab:help btkGetAnglesValues">btkGetAnglesValues</a>          - Extracts angles as a simple matrix 
 %   <a href="matlab:help btkGetForces">btkGetForces</a>                - Forces extraction
@@ -40,7 +39,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkGetScalarsValues">btkGetScalarsValues</a>         - Extracts scalars as a simple matrix 
 %
 % Point modifier
-%   <a href="matlab:help btkAppendPoint">btkAppendPoint</a>              - Append point to an acquisition
+%   <a href="matlab:help btkAppendPoint">btkAppendPoint</a>              - Append point into an acquisition
 %   <a href="matlab:help btkRemovePoint">btkRemovePoint</a>              - Delete point from an acquisition
 %   <a href="matlab:help btkSetPoint">btkSetPoint</a>                 - Point's data modifier (values, residuals, masks)
 %   <a href="matlab:help btkSetPointDescription">btkSetPointDescription</a>      - Point's description modifier
@@ -53,7 +52,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetMarkersValues">btkSetMarkersValues</a>         - Sets markers's value from a matrix
 %   <a href="matlab:help btkSetScalarsValues">btkSetScalarsValues</a>         - Sets scalars's value from a matrix 
 %
-% Analogs accessor
+% Analog accessor
 %   <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>               - Analog channels extraction
 %   <a href="matlab:help btkGetAnalogsResolution">btkGetAnalogsResolution</a>     - Returns ADC resolution
 %   <a href="matlab:help btkGetAnalogsValues">btkGetAnalogsValues</a>         - Extracts analogs channels' values in a simple matrix 
@@ -67,6 +66,14 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetAnalogScale">btkSetAnalogScale</a>           - Sets analog's scale factor
 %   <a href="matlab:help btkSetAnalogsResolution">btkSetAnalogsResolution</a>     - Sets ADC resolution (8, 12, 14 or 16 bits)
 %   <a href="matlab:help btkSetAnalogsValues">btkSetAnalogsValues</a>         - Sets analog's value from a matrix 
+%
+% Event accessor
+%   <a href="matlab:help btkGetEvents">btkGetEvents</a>                - Events extraction
+%
+% Event modifier
+%   <a href="matlab:help btkAppendEvent">btkAppendEvent</a>              - Append event into an acquisition
+%   <a href="matlab:help btkClearEvents">btkClearEvents</a>              - Remove all events from an acquisition
+%   <a href="matlab:help btkRemoveEvent">btkRemoveEvent</a>              - Remove event from an acquisition
 %
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>
 

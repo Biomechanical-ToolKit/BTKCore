@@ -52,14 +52,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   vn = mxGetM(prhs[2]);
   if (nrhs >= 4)
   {
-     if (!mxIsNumeric(prhs[3]) || mxIsEmpty(prhs[3]) || mxIsComplex(prhs[3]) || (mxGetN(prhs[3]) != 1))
-    mexErrMsgTxt("Point's residual must have a second dimension equals to 1.");
+    if (!mxIsNumeric(prhs[3]) || mxIsEmpty(prhs[3]) || mxIsComplex(prhs[3]) || (mxGetN(prhs[3]) != 1))
+      mexErrMsgTxt("Point's residual must have a second dimension equals to 1.");
     rn = mxGetM(prhs[3]);
   }
   if (nrhs >= 5)
   {
-     if (!mxIsNumeric(prhs[4]) || mxIsEmpty(prhs[4]) || mxIsComplex(prhs[4]) || (mxGetN(prhs[4]) != 1))
-    mexErrMsgTxt("Point's mask must have a second dimension equals to 1.");
+    if (!mxIsNumeric(prhs[4]) || mxIsEmpty(prhs[4]) || mxIsComplex(prhs[4]) || (mxGetN(prhs[4]) != 1))
+      mexErrMsgTxt("Point's mask must have a second dimension equals to 1.");
     mn = mxGetM(prhs[4]);
   }
   if (((rn != vn) && (rn != 0)) || ((mn != vn) && (mn != 0)))
