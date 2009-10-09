@@ -25,22 +25,6 @@
     <property name="margin">
      <number>0</number>
     </property>
-    <item row="1" column="0">
-     <widget class="QVTKWidget" name="qvtkWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>400</width>
-        <height>0</height>
-       </size>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="0">
      <widget class="QFrame" name="frame">
       <property name="sizePolicy">
@@ -138,6 +122,22 @@
       </layout>
      </widget>
     </item>
+    <item row="1" column="0">
+     <widget class="QVTKWidget" name="qvtkWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>400</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -146,7 +146,7 @@
      <x>0</x>
      <y>0</y>
      <width>954</width>
-     <height>19</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -624,11 +624,11 @@ QPushButton::flat
        <attribute name="horizontalHeaderVisible">
         <bool>false</bool>
        </attribute>
-       <attribute name="horizontalHeaderMinimumSectionSize">
-        <number>45</number>
-       </attribute>
-       <attribute name="horizontalHeaderStretchLastSection">
+       <attribute name="horizontalHeaderHighlightSections">
         <bool>false</bool>
+       </attribute>
+       <attribute name="horizontalHeaderMinimumSectionSize">
+        <number>25</number>
        </attribute>
        <attribute name="verticalHeaderVisible">
         <bool>false</bool>
@@ -638,6 +638,12 @@ QPushButton::flat
        </attribute>
        <attribute name="verticalHeaderMinimumSectionSize">
         <number>16</number>
+       </attribute>
+       <attribute name="horizontalHeaderMinimumSectionSize">
+        <number>25</number>
+       </attribute>
+       <attribute name="horizontalHeaderHighlightSections">
+        <bool>false</bool>
        </attribute>
        <column>
         <property name="text">
@@ -760,80 +766,17 @@ QPushButton::flat
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="downEventButton">
-         <property name="enabled">
-          <bool>false</bool>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
+         <property name="sizeHint" stdset="0">
           <size>
-           <width>26</width>
-           <height>26</height>
+           <width>40</width>
+           <height>20</height>
           </size>
          </property>
-         <property name="toolTip">
-          <string>Down event</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="images.qrc">
-           <normaloff>:/Resources/Images/1downarrow.png</normaloff>:/Resources/Images/1downarrow.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>18</width>
-           <height>18</height>
-          </size>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="upEventButton">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>26</width>
-           <height>26</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Up event</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="images.qrc">
-           <normaloff>:/Resources/Images/1uparrow.png</normaloff>:/Resources/Images/1uparrow.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>18</width>
-           <height>18</height>
-          </size>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
+        </spacer>
        </item>
        <item>
         <widget class="QPushButton" name="showEventButton">
@@ -942,7 +885,7 @@ QPushButton::flat
              <bool>false</bool>
             </property>
             <property name="readOnly">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -969,6 +912,21 @@ QPushButton::flat
               <string/>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>General</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Right</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Left</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item row="2" column="0">
@@ -991,9 +949,6 @@ QPushButton::flat
             </property>
             <property name="frame">
              <bool>false</bool>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
             </property>
             <property name="decimals">
              <number>5</number>
@@ -1022,7 +977,7 @@ QPushButton::flat
              <bool>false</bool>
             </property>
             <property name="readOnly">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -1044,13 +999,13 @@ QPushButton::flat
    <property name="minimumSize">
     <size>
      <width>200</width>
-     <height>0</height>
+     <height>437</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>500</width>
-     <height>16777215</height>
+     <height>437</height>
     </size>
    </property>
    <property name="floating">
@@ -1403,7 +1358,7 @@ QPushButton::flat
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Edit Metadata</string>
+    <string>View Metadata</string>
    </property>
    <property name="toolTip">
     <string>Edit Metadata</string>

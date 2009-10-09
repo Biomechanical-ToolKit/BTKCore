@@ -39,9 +39,13 @@
 
 #include <btkVTKMarkersFramesSource.h>
 
+// ----------------------------------------------- //
+//               POINT/MARKER EDITION              //
+// ----------------------------------------------- //
+
 // --------------- EditMarkerLabel ---------------
 EditMarkerLabel::EditMarkerLabel(const QString& label, QTableWidgetItem* item, QUndoCommand* parent)
-: m_Label(label)
+: QUndoCommand(parent), m_Label(label)
 {
   this->mp_Item = item;
 };
@@ -60,7 +64,7 @@ void EditMarkerLabel::action()
 
 // --------------- EditMarkerDescription ---------------
 EditMarkerDescription::EditMarkerDescription(const QString& desc, QTableWidgetItem* item, QUndoCommand* parent)
-: m_Description(desc)
+: QUndoCommand(parent), m_Description(desc)
 {
   this->mp_Item = item;
 };
@@ -78,7 +82,7 @@ void EditMarkerDescription::action()
 
 // --------------- EditMarkersRadius ---------------
 EditMarkersRadius::EditMarkersRadius(double r, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent)
-: m_Items(items), m_Radius(QVector<double>(items.count(), r))
+: QUndoCommand(parent), m_Items(items), m_Radius(QVector<double>(items.count(), r))
 {
   this->mp_Main = w;
 };
@@ -104,7 +108,7 @@ void EditMarkersRadius::action()
 
 // --------------- EditMarkersColorIndex ---------------
 EditMarkersColorIndex::EditMarkersColorIndex(int idx, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent)
-: m_Items(items), m_Indexes(QVector<int>(items.count(), idx))
+: QUndoCommand(parent), m_Items(items), m_Indexes(QVector<int>(items.count(), idx))
 {
   this->mp_Main = w;
 };
@@ -130,7 +134,7 @@ void EditMarkersColorIndex::action()
 
 // --------------- EditPoints ---------------
 EditPoints::EditPoints(MainWindow* w, QUndoCommand* parent)
-: m_Items(QVector< pointProp >(w->markersTable->rowCount()))
+: QUndoCommand(parent), m_Items(QVector< pointProp >(w->markersTable->rowCount()))
 {
   this->mp_Main = w;
   int num = this->mp_Main->mp_PointsEditorDlg->tableWidget->rowCount();
@@ -195,4 +199,175 @@ void EditPoints::action()
   this->mp_Main->markersTable->blockSignals(false);
   this->mp_Main->displayMarkerProperties();
   this->mp_Main->circleSelectedMarkers();
+};
+
+// ----------------------------------------------- //
+//                   EVENT EDITION                 //
+// ----------------------------------------------- //
+
+// --------------- EditEventLabel ---------------
+EditEventLabel::EditEventLabel(const QString& label, int id, QTableWidgetItem* item, QUndoCommand* parent)
+: QUndoCommand(parent), m_Label(label)
+{
+  this->mp_Item = item;
+  this->m_Id = id;
+};
+
+void EditEventLabel::action()
+{
+  QString temp = this->mp_Item->text();
+  int id = this->mp_Item->data(eventId).toInt();
+  this->mp_Item->setData(eventLabel, this->m_Label);
+  this->mp_Item->setData(eventId, this->m_Id);
+  this->mp_Item->setText(this->m_Label);
+  this->m_Label = temp;
+  this->m_Id = id;
+  this->mp_Item->tableWidget()->blockSignals(true);
+  this->mp_Item->tableWidget()->clearSelection();
+  this->mp_Item->tableWidget()->blockSignals(false);
+  this->mp_Item->tableWidget()->setCurrentItem(this->mp_Item);
+};
+
+// --------------- EditEventContext ---------------
+EditEventContext::EditEventContext(const QString& context, QTableWidgetItem* item, QUndoCommand* parent)
+: QUndoCommand(parent), m_Context(context)
+{
+  this->mp_Item = item;
+};
+
+void EditEventContext::action()
+{
+  QString temp = this->mp_Item->text();
+  this->mp_Item->setData(eventContext, this->m_Context);
+  this->mp_Item->setText(this->m_Context);
+  this->m_Context = temp;
+  this->mp_Item->tableWidget()->blockSignals(true);
+  this->mp_Item->tableWidget()->clearSelection();
+  this->mp_Item->tableWidget()->blockSignals(false);
+  this->mp_Item->tableWidget()->setCurrentItem(this->mp_Item);
+};
+
+// --------------- EditEventTime ---------------
+EditEventTime::EditEventTime(double t, QTableWidgetItem* item, QUndoCommand* parent)
+: QUndoCommand(parent)
+{
+  this->m_Time = t;
+  this->mp_Item = item;
+};
+
+void EditEventTime::action()
+{
+  double temp = this->mp_Item->data(eventTime).toDouble();
+  this->mp_Item->setData(eventTime, this->m_Time);
+  this->mp_Item->setText(QString::number(this->m_Time, 'f', 2));
+  this->m_Time = temp;
+  this->mp_Item->tableWidget()->blockSignals(true);
+  this->mp_Item->tableWidget()->clearSelection();
+  this->mp_Item->tableWidget()->sortItems(0);
+  this->mp_Item->tableWidget()->blockSignals(false);
+  this->mp_Item->tableWidget()->setCurrentItem(this->mp_Item);
+};
+
+// --------------- EditEventSubject ---------------
+EditEventSubject::EditEventSubject(const QString& subject, QTableWidgetItem* item, QUndoCommand* parent)
+: QUndoCommand(parent), m_Subject(subject)
+{
+  this->mp_Item = item;
+};
+
+void EditEventSubject::action()
+{
+  QString temp = this->mp_Item->text();
+  this->mp_Item->setData(eventSubject, this->m_Subject);
+  this->mp_Item->setText(this->m_Subject);
+  this->m_Subject = temp;
+  this->mp_Item->tableWidget()->blockSignals(true);
+  this->mp_Item->tableWidget()->clearSelection();
+  this->mp_Item->tableWidget()->blockSignals(false);
+  this->mp_Item->tableWidget()->setCurrentItem(this->mp_Item);
+};
+
+// --------------- NewEvent ---------------
+NewEvent::NewEvent(MainWindow* w, int frame, double freq, QUndoCommand* parent)
+{
+  this->mp_Main = w;
+  this->m_Frame = frame;
+  this->m_Freq = freq;
+  this->mp_Item = 0;
+};
+
+void NewEvent::undo()
+{
+  this->mp_Main->eventsTable->removeRow(this->mp_Item->row());
+  this->mp_Item = 0;
+};
+
+void NewEvent::redo()
+{
+  this->mp_Item = new NumericalTableWidgetItem();
+  double t = static_cast<double>(this->m_Frame) / this->m_Freq;
+  this->mp_Item->setText(QString::number(t, 'f', 2));
+  this->mp_Item->setData(eventFrame, this->m_Frame);
+  this->mp_Item->setData(eventTime, t);
+  this->mp_Item->setData(eventVisible, true);
+  this->mp_Main->eventsTable->blockSignals(true);
+  this->mp_Main->eventsTable->clearSelection();
+  this->mp_Main->eventsTable->insertRow(0);
+  this->mp_Main->eventsTable->setItem(0, 0, this->mp_Item);
+  this->mp_Main->eventsTable->setItem(0, 1, new QTableWidgetItem());
+  this->mp_Main->eventsTable->setItem(0, 2, new QTableWidgetItem());
+  this->mp_Main->eventsTable->setItem(0, 3, new QTableWidgetItem());
+  this->mp_Main->eventsTable->sortItems(0);
+  this->mp_Main->eventsTable->blockSignals(false);
+  this->mp_Main->eventsTable->selectRow(this->mp_Item->row());
+  
+  this->mp_Main->updateActiveEvent(this->mp_Main->frameSlider->value());
+  this->mp_Main->focusOnEventEdition(2);
+};
+
+// --------------- DeleteEvent ---------------
+DeleteEvent::DeleteEvent(MainWindow* w, QUndoCommand* parent)
+{
+  this->mp_Main = w;
+  this->mp_Item = w->eventsTable->currentItem();
+};
+
+void DeleteEvent::action()
+{
+  int row = this->mp_Item->row();
+  if (this->mp_Main->eventsTable->isRowHidden(row))
+    this->mp_Main->eventsTable->setRowHidden(row, false);
+  else
+  {
+    this->mp_Main->eventsTable->setRowHidden(row, true);
+    int i = 0;
+    for (i = row + 1 ; i < this->mp_Main->eventsTable->rowCount() ; ++i)
+    {
+      if (!this->mp_Main->eventsTable->isRowHidden(i))
+      {
+        this->mp_Main->eventsTable->blockSignals(true);
+        this->mp_Main->eventsTable->clearSelection();
+        this->mp_Main->eventsTable->blockSignals(false);
+        this->mp_Main->eventsTable->selectRow(i);
+        break;
+      }
+    }
+    if (i == this->mp_Main->eventsTable->rowCount())
+    {
+      for (i = row - 1; i >= 0 ; --i)
+      {
+        if (!this->mp_Main->eventsTable->isRowHidden(i))
+        {
+          this->mp_Main->eventsTable->blockSignals(true);
+          this->mp_Main->eventsTable->clearSelection();
+          this->mp_Main->eventsTable->blockSignals(false);
+          this->mp_Main->eventsTable->selectRow(i);
+          break;
+        }
+      }
+      if (i == -1)
+        this->mp_Main->eventsTable->clearSelection();
+    }
+  }
+  this->mp_Main->updateActiveEvent(this->mp_Main->frameSlider->value());
 };

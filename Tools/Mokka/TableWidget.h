@@ -39,6 +39,19 @@
 #include <QTableWidget>
 #include <QDropEvent>
 #include <QTableWidgetItem>
+#include <iostream>
+
+class NumericalTableWidgetItem : public QTableWidgetItem
+{
+public:
+  virtual bool operator< (const QTableWidgetItem& other) const
+  {
+    if (this->text().toDouble() < other.text().toDouble())
+      return true;
+    else
+      return false;
+  };
+};
 
 class TableWidgetItem : public QTableWidgetItem
 {

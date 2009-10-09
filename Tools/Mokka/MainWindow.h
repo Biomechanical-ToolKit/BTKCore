@@ -116,12 +116,20 @@ public Q_SLOTS:
   void toggleMarkerProperties();
   void focusOnMarkerLabelEdition();
   // Events dock
+  void editEventLabel();
+  void editEventContext(const QString& context);
+  void editEventTime();
+  void editEventSubject();
+  void newEvent();
+  void deleteEvent();
   void updateActiveEvent(int frame);
   void displayEventInformations();
   void toggleEventInformations();
+  void updateEventInternalInformations(QTableWidgetItem* item);
   void updateEventsButtonsState();
   void showEvent();
   void eventsDockLocationChanged(Qt::DockWidgetArea area);
+  void focusOnEventEdition(int idx = -1);
   // Playback
   void toggleTimer();
   void displayPreviousFrame();

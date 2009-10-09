@@ -42,6 +42,11 @@
 #include <QUndoCommand>
 
 class MainWindow;
+class NumericalTableWidgetItem;
+
+// ----------------------------------------------- //
+//               POINT/MARKER EDITION              //
+// ----------------------------------------------- //
 
 // --------------- EditMarkerLabel ---------------
 class EditMarkerLabel : public QUndoCommand
@@ -125,5 +130,100 @@ private:
   
   void action();
 };
- 
+
+// ----------------------------------------------- //
+//                   EVENT EDITION                 //
+// ----------------------------------------------- //
+
+// --------------- EditEventLabel ---------------
+class EditEventLabel : public QUndoCommand
+{
+public:
+  EditEventLabel(const QString& label, int id, QTableWidgetItem* item, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  QString m_Label;
+  int m_Id;
+  QTableWidgetItem* mp_Item;
+  
+  void action();
+};
+
+// --------------- EditEventContext -------------
+class EditEventContext : public QUndoCommand
+{
+public:
+  EditEventContext(const QString& context, QTableWidgetItem* item, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  QString m_Context;
+  QTableWidgetItem* mp_Item;
+  
+  void action();
+};
+
+// --------------- EditEventTime ---------------
+class EditEventTime : public QUndoCommand
+{
+public:
+  EditEventTime(double t, QTableWidgetItem* item, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  double m_Time;
+  QTableWidgetItem* mp_Item;
+  
+  void action();
+};
+
+// --------------- EditEventSubject ---------------=
+class EditEventSubject : public QUndoCommand
+{
+public:
+  EditEventSubject(const QString& subject, QTableWidgetItem* item, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  QString m_Subject;
+  QTableWidgetItem* mp_Item;
+  
+  void action();
+};
+
+// --------------- NewEvent ---------------=
+class NewEvent : public QUndoCommand
+{
+public:
+  NewEvent(MainWindow* w, int frame, double freq, QUndoCommand* parent = 0);
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  MainWindow* mp_Main;
+  int m_Frame;
+  double m_Freq;
+  NumericalTableWidgetItem* mp_Item;
+};
+
+// --------------- DeleteEvent ---------------=
+class DeleteEvent : public QUndoCommand
+{
+public:
+  DeleteEvent(MainWindow* w, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  MainWindow* mp_Main;
+  QTableWidgetItem* mp_Item;
+  
+  void action();
+};
+
 #endif // UndoCommands_h
