@@ -1670,23 +1670,27 @@ namespace btk
           MetaData::ConstIterator itEventColoursPr = (*itEventGr)->FindChild("COLOURS");
           int uniqueEventAppended = 0;
           (*itEventLabelsPr)->GetInfo()->ToString(uniqueEventsLabel);
-          for (std::vector<std::string>::iterator it1 = uniqueEventsLabel.begin() ; it1 != uniqueEventsLabel.end() ; ++it1)
+          for (int i = 0 ; i < static_cast<int>(uniqueEventsLabel.size()) ; ++i)
           {
             bool toCollapse = true;
-            std::string s2 = "";;
-            for (std::vector<std::string>::iterator it2 = uniqueEvents.begin() ; it2 != uniqueEvents.end() ; ++it2)
+            
+            std::string s1 = uniqueEventsLabel[i];
+            s1 = s1.erase(s1.find_last_not_of(' ') + 1);
+            s1 = s1.erase(0, s1.find_first_not_of(' '));
+            std::string s2 = "";
+            std::vector<std::string>::iterator it2;
+            for (it2 = uniqueEvents.begin() ; it2 != uniqueEvents.end() ; ++it2)
             {
-              std::string s1 = *it1;
-              s2 = *it2;
+              std::string s2l = s2 = *it2;
               std::transform(s1.begin(), s1.end(), s1.begin(), tolower);
-              std::transform(s2.begin(), s2.end(), s2.begin(), tolower);
-              if (s1.compare(s2) == 0)
+              std::transform(s2.begin(), s2.end(), s2l.begin(), tolower);
+              if (s1.compare(s2l) == 0)
               {
                 toCollapse = false;
                 break;
               }
             }
-            if (toCollapse && !s2.empty())
+            if (toCollapse && !s2.empty() && (it2 != uniqueEvents.end()))
             {
               uniqueEventsLabel.push_back(s2);
               ++uniqueEventAppended;
