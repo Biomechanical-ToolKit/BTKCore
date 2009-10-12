@@ -49,6 +49,7 @@ namespace btk
 {
   class VTKMarkersCoordinates;
   class VTKMarkersIds;
+  class VTKTrajectoryIds;
   class VTKMarkersFramesSource : public vtkPolyDataAlgorithm
   {
   public:
@@ -75,6 +76,10 @@ namespace btk
     BTK_VTK_EXPORT void HideMarkers();
     BTK_VTK_EXPORT void ShowMarker(vtkIdType id);
     BTK_VTK_EXPORT void ShowMarkers();
+
+    BTK_VTK_EXPORT void SetTrajectoryVisibility(int idx, bool visible);
+    BTK_VTK_EXPORT void ShowTrajectory(int idx);
+    BTK_VTK_EXPORT void HideTrajectory(int idx);
     
     double GetScaleUnit() {return this->mp_Scale;};
     void SetScaleUnit(double s) {this->mp_Scale = s;};
@@ -97,6 +102,10 @@ namespace btk
     VTKMarkersIds* mp_ExistingMarkers;
     vtkIntArray* mp_VisibleMarkers;
     vtkIntArray* mp_SelectedMarkers;
+    vtkIntArray* mp_TrajectoryMarkers;
+    vtkPoints* mp_TrajectoryCoords;
+    vtkIntArray* mp_TrajectoryColors;
+    VTKTrajectoryIds* mp_TrajectoryIds;
     vtkDoubleArray* mp_MarkersRadius;
     vtkIdTypeArray* mp_MarkersColorIndex;
     vtkLookupTable* mp_MarkersColorsLUT;

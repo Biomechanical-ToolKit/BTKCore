@@ -45,6 +45,7 @@
 #include <vtkPointData.h>
 #include <vtkTimerLog.h>
 #include <vtkstd/vector>
+#include <vtkCellArray.h>
 
 namespace btk
 {
@@ -60,6 +61,20 @@ namespace btk
    * @brief Store markers' visibility for each frame.
    */
   class VTKMarkersIds : public vtkstd::vector<vtkIntArray*>
+  {};
+  
+  /**
+   * @class VTKTrajectoryIds
+   * @brief Store markers' visibility for each frame.
+   */
+  class VTKTrajectoryIds : public vtkstd::vector<vtkCellArray*>
+  {};
+  
+  /**
+   * @class VTKTrajectoryPath
+   * @brief List of ids representing markers' path.
+   */
+  class VTKTrajectoryPath : public vtkstd::vector<vtkIdList*>
   {};
   
   /** 
@@ -254,8 +269,14 @@ namespace btk
       this->mp_MarkersColorsLUT->SetTableRange(0, num + 1);
       i = num;
     }
+    int frameNumber = this->mp_ExistingMarkers->size();
     for (int j = 0 ; j < ids->GetNumberOfTuples() ; ++j)
-      this->mp_MarkersColorIndex->SetValue(ids->GetValue(j), i);
+    {
+      int markerIdx = ids->GetValue(j);
+      this->mp_MarkersColorIndex->SetValue(markerIdx, i);
+      for (int k = 0 ; k < frameNumber ; ++k)
+        this->mp_TrajectoryColors->SetValue(markerIdx * frameNumber + k, i);
+    }
   };
 
   /**
@@ -282,6 +303,9 @@ namespace btk
       return;
     }
     this->mp_MarkersColorIndex->SetValue(id, color);
+    int frameNumber = this->mp_ExistingMarkers->size();
+    for (int i = 0 ; i < frameNumber ; ++i)
+      this->mp_TrajectoryColors->SetValue(id * frameNumber + i, color);
   };
 
   /**
@@ -327,6 +351,30 @@ namespace btk
   };
   
   /**
+   * Sets visibility of marker's trajectory
+   */
+  void VTKMarkersFramesSource::SetTrajectoryVisibility(int idx, bool visible)
+  {
+    this->mp_TrajectoryMarkers->SetValue(idx, visible ? 1 : 0);
+  };
+  
+  /**
+   * Convenient method to show marker's trajectory.
+   */
+  void VTKMarkersFramesSource::ShowTrajectory(int idx)
+  {
+    this->SetTrajectoryVisibility(idx, true);
+  };
+  
+  /**
+   * Convenient method to hide marker's trajectory.
+   */
+  void VTKMarkersFramesSource::HideTrajectory(int idx)
+  {
+    this->SetTrajectoryVisibility(idx, false);
+  };
+  
+  /**
    * @fn double VTKMarkersFramesSource::GetScaleUnit()
    * Returns the scale factor used to adapt markers' positions
    *
@@ -346,10 +394,17 @@ namespace btk
   VTKMarkersFramesSource::VTKMarkersFramesSource()
   : vtkPolyDataAlgorithm()
   {
+    this->SetNumberOfOutputPorts(2);
+    
     this->mp_MarkersCoordinates = new VTKMarkersCoordinates();
     this->mp_ExistingMarkers = new VTKMarkersIds();
     this->mp_VisibleMarkers = vtkIntArray::New();
     this->mp_SelectedMarkers = vtkIntArray::New();
+    this->mp_TrajectoryMarkers = vtkIntArray::New();
+    this->mp_TrajectoryCoords = vtkPoints::New();
+    this->mp_TrajectoryIds = new VTKTrajectoryIds();
+    this->mp_TrajectoryColors = vtkIntArray::New();
+    this->mp_TrajectoryColors->SetName("Colors");
     this->mp_MarkersRadius = vtkDoubleArray::New();
     this->mp_MarkersColorIndex = vtkIdTypeArray::New();
     this->mp_MarkersColorIndex->SetName("Colors");
@@ -383,8 +438,14 @@ namespace btk
     }
     delete this->mp_MarkersCoordinates;
     delete this->mp_ExistingMarkers;
+    for (int i = 0 ; i < static_cast<int>(this->mp_TrajectoryIds->size()) ; ++i)
+      this->mp_TrajectoryIds->operator[](i)->Delete();
+    delete this->mp_TrajectoryIds;
     this->mp_VisibleMarkers->Delete();
     this->mp_SelectedMarkers->Delete();
+    this->mp_TrajectoryMarkers->Delete();
+    this->mp_TrajectoryCoords->Delete();
+    this->mp_TrajectoryColors->Delete();
     this->mp_MarkersRadius->Delete();
     this->mp_MarkersColorIndex->Delete();
     this->mp_MarkersColorsLUT->Delete();
@@ -394,7 +455,9 @@ namespace btk
   /**
    * Generate marker's position.
    */
-  int VTKMarkersFramesSource::RequestInformation(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+  int VTKMarkersFramesSource::RequestInformation(vtkInformation* request, 
+                                                 vtkInformationVector** inputVector, 
+                                                 vtkInformationVector* outputVector)
   {
     // Convert a btk::PointCollection into a vector of polydata containing centers of visible markers.
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
@@ -416,24 +479,40 @@ namespace btk
       int pointNumber = input->GetItemNumber();
       if (pointNumber != 0)
       {
+        frameNumber = input->GetItem(0)->GetFrameNumber();
+        
         // Radius, Selected & Hidden markers
         this->mp_MarkersRadius->SetNumberOfValues(pointNumber);
         this->mp_SelectedMarkers->SetNumberOfValues(pointNumber);
         this->mp_VisibleMarkers->SetNumberOfValues(pointNumber);
+        this->mp_TrajectoryMarkers->SetNumberOfValues(pointNumber);
         this->mp_MarkersColorIndex->SetNumberOfValues(pointNumber);
+        VTKTrajectoryPath trajectoryPaths = VTKTrajectoryPath();
+        trajectoryPaths.resize(pointNumber, 0);
+        this->mp_TrajectoryCoords->SetNumberOfPoints(pointNumber * frameNumber);
+        this->mp_TrajectoryColors->SetNumberOfValues(pointNumber * frameNumber);
+        for (int i = 0 ; i < static_cast<int>(this->mp_TrajectoryIds->size()) ; ++i)
+          this->mp_TrajectoryIds->operator[](i)->Delete();
+        this->mp_TrajectoryIds->resize(pointNumber);  
         for (int i = 0 ; i < pointNumber ; ++i)
         {
           this->mp_MarkersRadius->SetValue(i, 8.0); // 8mm
           this->mp_SelectedMarkers->SetValue(i, 0);
           this->mp_VisibleMarkers->SetValue(i, 1);
+          this->mp_TrajectoryMarkers->SetValue(i, 0);
           this->mp_MarkersColorIndex->SetValue(i, 0);
+          this->mp_TrajectoryIds->operator[](i) = vtkCellArray::New();
+          trajectoryPaths[i] = vtkIdList::New();
         }
-
-        frameNumber = input->GetItem(0)->GetFrameNumber();
         vtkPolyData* points = vtkPolyData::New();
         vtkPoints* centers = vtkPoints::New();
         centers->SetNumberOfPoints(pointNumber);
         points->SetPoints(centers);
+        for (int i = 0 ; i < static_cast<int>(this->mp_MarkersCoordinates->size()) ; ++i)
+        {
+          this->mp_MarkersCoordinates->operator[](i)->Delete();
+          this->mp_ExistingMarkers->operator[](i)->Delete();
+        }
         this->mp_MarkersCoordinates->resize(frameNumber);
         this->mp_ExistingMarkers->resize(frameNumber);
 
@@ -447,13 +526,24 @@ namespace btk
           {
             double* ic = (*it)->GetValues().data();
             centers->SetPoint(ptIdx, ic[i] * this->mp_Scale, 
-                                     ic[frameNumber + i] * this->mp_Scale,
-                                     ic[2 * frameNumber + i] * this->mp_Scale);
+                              ic[frameNumber + i] * this->mp_Scale,
+                              ic[2 * frameNumber + i] * this->mp_Scale);
+            this->mp_TrajectoryCoords->SetPoint(ptIdx * frameNumber + i, ic[i] * this->mp_Scale, 
+                                                ic[frameNumber + i] * this->mp_Scale,
+                                                ic[2 * frameNumber + i] * this->mp_Scale);
+            this->mp_TrajectoryColors->SetValue(ptIdx * frameNumber + i, 0);
             // Insert only valid point
             if ((*it)->GetResiduals().coeffRef(i) != -1.0)
+            {
               existingMarkersIds->SetValue(ptIdx, 1);
+              trajectoryPaths[ptIdx]->InsertNextId(ptIdx * frameNumber + i);
+            }
             else
+            {
               existingMarkersIds->SetValue(ptIdx, 0);
+              this->mp_TrajectoryIds->operator[](ptIdx)->InsertNextCell(trajectoryPaths[ptIdx]);
+              trajectoryPaths[ptIdx]->Reset();
+            }
             ++ptIdx;
             ++it;
           }
@@ -476,11 +566,17 @@ namespace btk
         }
         points->Delete();
         centers->Delete();
+        for (int i = 0 ; i < this->mp_TrajectoryIds->size() ; ++i)
+        {
+          this->mp_TrajectoryIds->operator[](i)->InsertNextCell(trajectoryPaths[i]);
+          trajectoryPaths[i]->Delete();
+        }
+        
       }
       // Update output informations
-      vtkInformation *outInfo = outputVector->GetInformationObject(0);
+      vtkInformation* outInfo = outputVector->GetInformationObject(0);
       // TIME_STEPS
-      double *outTimes = new double [frameNumber];
+      double* outTimes = new double [frameNumber];
       int i;
       for (i = 0; i < frameNumber; ++i)
         outTimes[i] = i;
@@ -500,12 +596,15 @@ namespace btk
    * Extract markers' frame required by a vtkStreamingDemandDrivenPipeline object.
    */
   int VTKMarkersFramesSource::RequestData(vtkInformation* request,
-                                   vtkInformationVector** inputVector,
-                                   vtkInformationVector* outputVector)
+                                          vtkInformationVector** inputVector,
+                                          vtkInformationVector* outputVector)
   {
-
-    vtkInformation* outInfo = outputVector->GetInformationObject(0);    
+    // positions
+    vtkInformation* outInfo = outputVector->GetInformationObject(0);
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+    // trajectories
+    vtkInformation* outInfo2 = outputVector->GetInformationObject(1);
+    vtkPolyData* output2 = vtkPolyData::SafeDownCast(outInfo2->Get(vtkDataObject::DATA_OBJECT()));
 
     if (this->mp_MarkersCoordinates->size() != 0)
     {
@@ -522,11 +621,33 @@ namespace btk
       this->mp_MarkersGenerator->SetExistingMarkers(existingMarkers);
       this->mp_MarkersGenerator->Update();
       output->ShallowCopy(this->mp_MarkersGenerator->GetOutput());
+      
+      // Trajectory generation
+      vtkCellArray* trajectoryIds = vtkCellArray::New();
+      for (int i = 0 ; i < this->mp_TrajectoryMarkers->GetNumberOfTuples() ; ++i)
+      {
+        if (this->mp_TrajectoryMarkers->GetValue(i))
+        {
+          vtkIdType npts;
+          vtkIdType* pts;
+          this->mp_TrajectoryIds->operator[](i)->InitTraversal();
+          while (this->mp_TrajectoryIds->operator[](i)->GetNextCell(npts, pts))
+            trajectoryIds->InsertNextCell(npts, pts);
+        }
+      }
+      output2->SetPoints(this->mp_TrajectoryCoords);
+      output2->SetLines(trajectoryIds);
+      output2->GetPointData()->SetScalars(this->mp_TrajectoryColors);
+      trajectoryIds->Delete();
+      
       // Invoke btk::VTKMarkersListUpdateEvent
       this->InvokeEvent(btk::VTKMarkersListUpdateEvent, static_cast<void*>(this->mp_ExistingMarkers->operator[](index)));
     }
     else
+    {
       output->Initialize();
+      output2->Initialize();
+    }
 
     return 1;
   };
