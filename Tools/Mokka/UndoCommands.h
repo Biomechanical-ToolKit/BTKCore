@@ -139,13 +139,14 @@ private:
 class EditEventLabel : public QUndoCommand
 {
 public:
-  EditEventLabel(const QString& label, int id, QTableWidgetItem* item, QUndoCommand* parent = 0);
+  EditEventLabel(const QString& label, int id, const QString& desc, QTableWidgetItem* item, QUndoCommand* parent = 0);
   virtual void undo() {this->action();};
   virtual void redo() {this->action();};
   
 private:
   QString m_Label;
   int m_Id;
+  QString m_Desc;
   QTableWidgetItem* mp_Item;
   
   void action();

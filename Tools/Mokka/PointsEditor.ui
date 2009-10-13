@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Points</string>
+   <string>Points[*]</string>
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
@@ -120,7 +120,7 @@
     </widget>
    </item>
    <item>
-    <widget class="TableWidget" name="tableWidget">
+    <widget class="PointEditorTableWidget" name="tableWidget">
      <property name="editTriggers">
       <set>QAbstractItemView::DoubleClicked</set>
      </property>
@@ -226,7 +226,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>TableWidget</class>
+   <class>PointEditorTableWidget</class>
    <extends>QTableWidget</extends>
    <header>TableWidget.h</header>
   </customwidget>

@@ -39,7 +39,13 @@
 #include <QTableWidget>
 #include <QDropEvent>
 #include <QTableWidgetItem>
-#include <iostream>
+
+class MarkerTableWidget : public QTableWidget
+{
+public:
+  MarkerTableWidget(QWidget* parent);
+  virtual void mousePressEvent (QMouseEvent* event);
+};
 
 class NumericalTableWidgetItem : public QTableWidgetItem
 {
@@ -53,23 +59,22 @@ public:
   };
 };
 
-class TableWidgetItem : public QTableWidgetItem
+class PointEditorTableWidget : public QTableWidget
+{
+  Q_OBJECT
+  
+public:
+  PointEditorTableWidget(QWidget* parent = 0);
+  void dropEvent(QDropEvent* event);
+};
+
+class PointEditorTableWidgetItem : public QTableWidgetItem
 {
 public:
-  TableWidgetItem()
+  PointEditorTableWidgetItem()
   : QTableWidgetItem()
   {
     this->setFlags(this->flags() & ~(Qt::ItemIsDropEnabled));
   };
 };
-
-class TableWidget : public QTableWidget
-{
-  Q_OBJECT
-  
-public:
-  TableWidget(QWidget* parent = 0);
-  void dropEvent(QDropEvent* event);
-};
-
 #endif // TableWidget_h

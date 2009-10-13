@@ -40,6 +40,7 @@ PointsEditor::PointsEditor(QWidget* parent)
 : QDialog(parent)
 {
    this->setupUi(this);
+   this->tableWidget->setItemPrototype(new PointEditorTableWidgetItem());
    
 #ifdef Q_OS_MAC
   QFont f = this->tableWidget->font();

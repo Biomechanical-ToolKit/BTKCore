@@ -43,9 +43,7 @@
 
 #include <btkMetaData.h>
 
-static int checkState2 = Qt::UserRole + 100;
-static int metadataInfoFirstValue = Qt::UserRole + 101;
-static int metadataInfoValuesCount = Qt::UserRole + 102;
+#include "UserRoles.h"
 
 class MetadataView : public QTreeView
 {

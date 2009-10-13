@@ -206,8 +206,8 @@ void EditPoints::action()
 // ----------------------------------------------- //
 
 // --------------- EditEventLabel ---------------
-EditEventLabel::EditEventLabel(const QString& label, int id, QTableWidgetItem* item, QUndoCommand* parent)
-: QUndoCommand(parent), m_Label(label)
+EditEventLabel::EditEventLabel(const QString& label, int id, const QString& desc, QTableWidgetItem* item, QUndoCommand* parent)
+: QUndoCommand(parent), m_Label(label), m_Desc(desc)
 {
   this->mp_Item = item;
   this->m_Id = id;
@@ -217,8 +217,10 @@ void EditEventLabel::action()
 {
   QString temp = this->mp_Item->text();
   int id = this->mp_Item->data(eventId).toInt();
+  QString desc = this->mp_Item->data(eventDescription).toString();
   this->mp_Item->setData(eventLabel, this->m_Label);
   this->mp_Item->setData(eventId, this->m_Id);
+  this->mp_Item->setData(eventDescription, this->m_Desc);
   this->mp_Item->setText(this->m_Label);
   this->m_Label = temp;
   this->m_Id = id;

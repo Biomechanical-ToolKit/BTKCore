@@ -11,6 +11,8 @@
     <file>Resources/Images/player_pause.png</file>
     <file>Resources/Images/player_play.png</file>
     <file>Resources/Images/resetzoom.png</file>
+    <file>Resources/Images/trajectory_active.png</file>
+    <file>Resources/Images/trajectory_unactive.png</file>
     <file>Resources/Images/unlock.png</file>
   </qresource>
 </RCC>

@@ -105,6 +105,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 {
+  
   QLineEdit* lineEdit = qobject_cast<QLineEdit*>(obj);
   if (lineEdit)
   {
@@ -518,7 +519,6 @@ void MainWindow::initialize()
   actor->PickableOff();
   this->mp_Renderer->AddActor(actor);
   // Cleanup for force platforms.
-  //forcePlaforms->Delete();
   mapper->Delete();
   actor->Delete();
   prop->Delete();
@@ -530,6 +530,7 @@ void MainWindow::initialize()
   // Pipeline for markers
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::New();
   markers->SetInput(markersExtractor->GetOutput());
+  // - Display marker's position
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(markers->GetOutputPort(0));
   mapper->SetLookupTable(markers->GetMarkerColorLUT());
@@ -541,7 +542,21 @@ void MainWindow::initialize()
   actor->SetMapper(mapper);
   actor->SetScale(0.005);
   this->mp_Renderer->AddActor(actor);
-  // Cleanup for markers
+  mapper->Delete();
+  actor->Delete();
+  // - Display marker's trajectory
+  mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(markers->GetOutputPort(1));
+  mapper->SetLookupTable(markers->GetMarkerColorLUT());
+  mapper->SetScalarModeToUsePointFieldData();
+  mapper->UseLookupTableScalarRangeOn();
+  mapper->SelectColorArray("Colors");
+  this->mp_Mappers->AddItem(mapper);
+  actor = vtkActor::New();
+  actor->SetMapper(mapper);
+  actor->SetScale(0.005);
+  actor->PickableOff();
+  this->mp_Renderer->AddActor(actor);
   mapper->Delete();
   actor->Delete();
   // Pipeline for GRFs
@@ -562,7 +577,6 @@ void MainWindow::initialize()
   actor->PickableOff();
   this->mp_Renderer->AddActor(actor);
   // Cleanup for GRFs.
-  //GRFs->Delete();
   mapper->Delete();
   actor->Delete();
   prop->Delete();
@@ -801,13 +815,13 @@ void MainWindow::openFile(const QString& filename)
   markers->Update();
   btk::PointCollection::Pointer points = acq->GetPoints();
   this->markersTable->setRowCount(points->GetItemNumber());
-  this->mp_PointsEditorDlg->tableWidget->setItemPrototype(new TableWidgetItem());
   this->mp_PointsEditorDlg->tableWidget->setRowCount(this->markersTable->rowCount());
   int incPointId = 0, incMarkerId = 0;
   for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
   {
     QTableWidgetItem* labelItem = new QTableWidgetItem();
     this->markersTable->setItem(incPointId, 0, labelItem);
+//this->markersTable->setIndexWidget(this->markersTable->model()->index(incPointId, 1), trajcb);
     labelItem->setText(QString::fromStdString((*it)->GetLabel()));
     labelItem->setData(pointId, incPointId);
     labelItem->setData(pointType, static_cast<int>((*it)->GetType()));
@@ -820,18 +834,21 @@ void MainWindow::openFile(const QString& filename)
       labelItem->setCheckState(Qt::Checked);
       labelItem->setData(markerRadius, 8.0); // TODO: Use default radius from preferences.
       labelItem->setData(markerColorIndex, (int)0); // TODO: Use default color from preferences.
+      labelItem->setData(markerTrajectoryActived, false);
+      labelItem->setIcon(QIcon(":/Resources/Images/trajectory_unactive.png"));
       this->markersTable->setRowHidden(incPointId, false);
       ++incMarkerId;
     }
     else
       this->markersTable->setRowHidden(incPointId, true);
-    this->mp_PointsEditorDlg->tableWidget->setItem(incPointId, 0, new TableWidgetItem());
+    this->mp_PointsEditorDlg->tableWidget->setItem(incPointId, 0, new PointEditorTableWidgetItem());
     //TableWidgetItem* pointDescItem = new TableWidgetItem();
     //pointDescItem->setFlags(pointDescItem->flags() & ~(Qt::ItemIsDropEnabled) & ~(Qt::ItemIsSelectable));
     //this->mp_PointsEditorDlg->tableWidget->setItem(incPointId, 1, pointDescItem);
-    this->mp_PointsEditorDlg->tableWidget->setItem(incPointId, 1, new TableWidgetItem());
+    this->mp_PointsEditorDlg->tableWidget->setItem(incPointId, 1, new PointEditorTableWidgetItem());
     ++incPointId;
   }
+  //this->markersTable->resizeColumnsToContents();
   this->markersTable->blockSignals(false);
   this->showMarkersButton->setEnabled(true);
   this->hideMarkersButton->setEnabled(true);
@@ -858,7 +875,8 @@ void MainWindow::openFile(const QString& filename)
     int frameIndex = static_cast<int>((*it)->GetTime() * pointFrequency);
     timeItem->setData(eventFrame, frameIndex);
     labelItem->setText(QString::fromStdString((*it)->GetLabel()));
-    labelItem->setData(eventId, (*it)->GetTime());
+    labelItem->setData(eventId, (*it)->GetId());
+    labelItem->setData(eventDescription, QString::fromStdString((*it)->GetDescription()));
     eventLabelWordList << labelItem->text();
     contextItem->setText(QString::fromStdString((*it)->GetContext()));
     contextItem->setData(eventContext, contextItem->text());
@@ -957,8 +975,8 @@ void MainWindow::saveAsFile()
 {
   QString filename = QFileDialog::getSaveFileName(this,
                        trUtf8("Save As Acquisition"),
-                       this->m_LastDirectory + "/untitled.c3d",
-                       trUtf8("C3D Files (*.c3d), TRC Files (*.trc)"));
+                       this->m_RecentFiles.first(),
+                       trUtf8("C3D Files (*.c3d);;TRC Files (*.trc)"));
   if (!filename.isEmpty())
   {
     this->m_LastDirectory = QFileInfo(filename).absolutePath();
@@ -976,15 +994,34 @@ void MainWindow::saveFile(const QString& filename)
   target->SetPointFrequency(source->GetPointFrequency());
   target->SetAnalogResolution(source->GetAnalogResolution());
   // Event
-  target->SetEvents(source->GetEvents()->Clone());
+  int eventRowNum = this->eventsTable->rowCount();
+  btk::EventCollection::Pointer targetEvents = target->GetEvents();
+  for (int i = 0 ; i < eventRowNum ; ++i)
+  {
+    if (!this->eventsTable->isRowHidden(i))
+    {
+      btk::Event::Pointer p = btk::Event::New();
+      QTableWidgetItem* item = this->eventsTable->item(i, 0);
+      p->SetTime(item->data(eventTime).toDouble());
+      item = this->eventsTable->item(i, 1);
+      p->SetContext(item->text().toStdString());
+      item = this->eventsTable->item(i, 2);
+      p->SetLabel(item->text().toStdString());
+      p->SetId(item->data(eventId).toInt());
+      p->SetDescription(item->data(eventDescription).toString().toStdString());
+      item = this->eventsTable->item(i, 3);
+      p->SetSubject(item->text().toStdString());
+      targetEvents->InsertItem(p);
+    }
+  }
   // Metadata
   target->SetMetaData(source->GetMetaData()->Clone());
   // Point
-  int num = this->markersTable->rowCount();
+  int inc = 0;
+  int pointRowNum = this->markersTable->rowCount();
   btk::PointCollection::Pointer sourcePoints = source->GetPoints();
   btk::PointCollection::Pointer targetPoints = target->GetPoints();
-  int inc = 0;
-  for (int i = 0 ; i < num ; ++i)
+  for (int i = 0 ; i < pointRowNum ; ++i)
   {
     QTableWidgetItem* item = this->markersTable->item(i, 0);
     if (!item->data(pointDisabled).toBool())
@@ -1364,10 +1401,17 @@ void MainWindow::hideAllMarkers()
 void MainWindow::updateMarkerVisibility(QTableWidgetItem* item)
 {
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  // Hide/show markers
   if (item->checkState() == Qt::Checked)
     markers->ShowMarker(item->data(markerId).toInt());
-  if (item->checkState() == Qt::Unchecked)
+  else if (item->checkState() == Qt::Unchecked)
     markers->HideMarker(item->data(markerId).toInt());
+  // Hide/show trajectories
+  if (item->data(markerTrajectoryActived).toBool())
+    markers->ShowTrajectory(item->data(markerId).toInt());
+  else
+    markers->HideTrajectory(item->data(markerId).toInt());
+  // Update current frame
   this->updateDisplay(this->frameSlider->value());
 };
 
@@ -1755,6 +1799,7 @@ void MainWindow::updateEventInternalInformations(QTableWidgetItem* item)
   switch(item->column())
   {
     case 0:
+    {
       double pointFrequency = acq->GetPointFrequency();
       int frameIndex = static_cast<int>(item->data(eventTime).toDouble() * pointFrequency);
       item->setData(eventFrame, frameIndex);
@@ -1762,6 +1807,7 @@ void MainWindow::updateEventInternalInformations(QTableWidgetItem* item)
         item->setData(eventVisible, false);
       else
         item->setData(eventVisible, true);
+    }
     default:
       break;
   }
@@ -1827,15 +1873,18 @@ void MainWindow::editEventLabel()
   if (label.compare(item->text()) == 0)
     return;
   int id = 0;
+  QString desc = "";
   for (int i = 0 ; i < this->eventsTable->rowCount() ; ++i)
   {
-    if (this->eventsTable->item(i,2)->text().compare(label) == 0)
+    QTableWidgetItem* itemLabel = this->eventsTable->item(i,2);
+    if (itemLabel->text().compare(label) == 0)
     {
-      id = this->eventsTable->item(i,2)->data(eventId).toInt();
+      id = itemLabel->data(eventId).toInt();
+      desc = itemLabel->data(eventDescription).toString();
       break;
     }
   }
-  this->mp_UndoStack->push(new EditEventLabel(label, id, item));
+  this->mp_UndoStack->push(new EditEventLabel(label, id, desc, item));
 };
 
 void MainWindow::editEventContext(const QString& context)

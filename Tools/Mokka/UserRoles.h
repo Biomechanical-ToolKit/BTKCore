@@ -46,13 +46,19 @@ typedef enum {pointId = Qt::UserRole + 1,
               
 typedef enum {markerId = Qt::UserRole + 10,
               markerRadius,
-              markerColorIndex} markerProperty;
+              markerColorIndex,
+              markerTrajectoryActived} markerProperty;
               
 typedef enum {eventFrame = Qt::UserRole + 20,
               eventId,
               eventLabel,
+              eventDescription,
               eventContext,
               eventTime,
               eventSubject,
               eventVisible} eventInformation;
+
+static int checkState2 = Qt::UserRole + 30;
+static int metadataInfoFirstValue = Qt::UserRole + 41;
+static int metadataInfoValuesCount = Qt::UserRole + 42;
  #endif // UserRoles_h

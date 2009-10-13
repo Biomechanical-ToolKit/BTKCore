@@ -25,6 +25,22 @@
     <property name="margin">
      <number>0</number>
     </property>
+    <item row="1" column="0">
+     <widget class="QVTKWidget" name="qvtkWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>400</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="0">
      <widget class="QFrame" name="frame">
       <property name="sizePolicy">
@@ -120,22 +136,6 @@
         </widget>
        </item>
       </layout>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QVTKWidget" name="qvtkWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>400</width>
-        <height>0</height>
-       </size>
-      </property>
      </widget>
     </item>
    </layout>
@@ -263,9 +263,9 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
-    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,0">
+    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0">
      <item>
-      <widget class="QTableWidget" name="markersTable">
+      <widget class="MarkerTableWidget" name="markersTable">
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
        </property>
@@ -284,8 +284,14 @@
        <property name="cornerButtonEnabled">
         <bool>false</bool>
        </property>
+       <property name="columnCount">
+        <number>1</number>
+       </property>
        <attribute name="horizontalHeaderVisible">
         <bool>false</bool>
+       </attribute>
+       <attribute name="horizontalHeaderDefaultSectionSize">
+        <number>50</number>
        </attribute>
        <attribute name="horizontalHeaderStretchLastSection">
         <bool>true</bool>
@@ -571,7 +577,7 @@ QPushButton::flat
    </property>
    <property name="minimumSize">
     <size>
-     <width>225</width>
+     <width>250</width>
      <height>357</height>
     </size>
    </property>
@@ -638,12 +644,6 @@ QPushButton::flat
        </attribute>
        <attribute name="verticalHeaderMinimumSectionSize">
         <number>16</number>
-       </attribute>
-       <attribute name="horizontalHeaderMinimumSectionSize">
-        <number>25</number>
-       </attribute>
-       <attribute name="horizontalHeaderHighlightSections">
-        <bool>false</bool>
        </attribute>
        <column>
         <property name="text">
@@ -1440,6 +1440,11 @@ QPushButton::flat
    <class>QVTKWidget</class>
    <extends>QWidget</extends>
    <header>QVTKWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MarkerTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>TableWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

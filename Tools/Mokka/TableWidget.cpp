@@ -34,13 +34,38 @@
  */
 
 #include "TableWidget.h"
-#include <iostream>
+#include "UserRoles.h"
 
-TableWidget::TableWidget(QWidget* parent)
+// ------------------- MarkerTableWidget -------------------
+MarkerTableWidget::MarkerTableWidget(QWidget* parent)
 : QTableWidget(parent)
 {};
 
-void TableWidget::dropEvent(QDropEvent* event)
+void MarkerTableWidget::mousePressEvent(QMouseEvent* event)
+{
+  QPoint pos = event->pos();
+  int x = pos.x();
+  if ((x >= 35) && (x <= 50))
+  {
+    this->blockSignals(true);
+    QTableWidgetItem* item = this->itemAt(pos);
+    bool actived = item->data(markerTrajectoryActived).toBool();
+    if (actived)
+      item->setIcon(QIcon(":/Resources/Images/trajectory_unactive.png"));
+    else
+      item->setIcon(QIcon(":/Resources/Images/trajectory_active.png"));
+    this->blockSignals(false);
+    item->setData(markerTrajectoryActived, !actived);
+  }
+  QTableWidget::mousePressEvent(event);
+};
+
+// ------------------- PointEditorTableWidget -------------------
+PointEditorTableWidget::PointEditorTableWidget(QWidget* parent)
+: QTableWidget(parent)
+{};
+
+void PointEditorTableWidget::dropEvent(QDropEvent* event)
 {
   QModelIndex cur = this->currentIndex();
   // Check to not drop label column onto description column
@@ -81,4 +106,4 @@ void TableWidget::dropEvent(QDropEvent* event)
     }
     this->blockSignals(false);
   }
-}
+};

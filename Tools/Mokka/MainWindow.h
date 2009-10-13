@@ -39,6 +39,7 @@
 #include "ui_MainWindow.h"
 #include "Metadata.h"
 #include "PointsEditor.h"
+#include "UserRoles.h"
 
 #include <QTimer>
 #include <QUndoStack>
@@ -176,5 +177,47 @@ private:
   QIcon* mp_PauseIcon;
   QIcon* mp_DownArrow;
   QIcon* mp_RightArrow;
+};
+
+class TrajectoryCheckBox : public QCheckBox
+{
+  Q_OBJECT
+  
+public:
+  TrajectoryCheckBox(QTableWidgetItem* item)
+  : QCheckBox()
+  {
+    this->setStyleSheet(
+      "QCheckBox { spacing: 0px; margin-left:5px; }\
+       QCheckBox::indicator { width: 13px; height: 13px; }\
+       QCheckBox::indicator:unchecked { image: url(:/Resources/Images/trajectory_unactive.png); }\
+       QCheckBox::indicator:unchecked:hover { image: url(:/Resources/Images/trajectory_unactive.png); }\
+       QCheckBox::indicator:unchecked:pressed { image: url(:/Resources/Images/trajectory_unactive.png); }\
+       QCheckBox::indicator:checked { image: url(:/Resources/Images/trajectory_active.png); }\
+       QCheckBox::indicator:checked:hover { image: url(:/Resources/Images/trajectory_active.png); }\
+       QCheckBox::indicator:checked:pressed { image: url(:/Resources/Images/trajectory_active.png); }\
+       QCheckBox::indicator:indeterminate:hover { image: url(:/Resources/Images/trajectory_active.png); }\
+       QCheckBox::indicator:indeterminate:pressed { image: url(:/Resources/Images/trajectory_active.png); }"
+     );
+    this->setCheckState(Qt::Unchecked);
+    //this->setDisabled(true);
+    this->mp_Item = item;
+    connect(this, SIGNAL(stateChanged(int)), this, SLOT(itemChanged(int)));
+  };
+protected:
+/*
+  virtual void mousePressEvent(QMouseEvent* event)
+  {
+    //static_cast<QWidget*>(this->parent())->setFocus();
+  }
+*/
+private Q_SLOTS:
+  void itemChanged(int s)
+  {
+    this->mp_Item->setData(checkState2, s);
+  };
+  
+private:
+  QTableWidgetItem* mp_Item;
 };
 #endif // MainWindow_h
