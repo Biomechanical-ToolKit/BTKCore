@@ -45,7 +45,13 @@ void MarkerTableWidget::mousePressEvent(QMouseEvent* event)
 {
   QPoint pos = event->pos();
   int x = pos.x();
-  if ((x >= 35) && (x <= 50))
+  QStyle* style = this->style();
+  QStyleOptionButton opt;
+  QRect checkBoxRect = style->subElementRect(QStyle::SE_ViewItemCheckIndicator, &opt);
+  const int checkMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, this) + 1;
+  const int iconPixelStart = checkBoxRect.x() + checkBoxRect.width() + checkMargin * 3;
+  const int iconPixelEnd = iconPixelStart + 16;
+  if ((x >= iconPixelStart) && (x <= iconPixelEnd))
   {
     this->blockSignals(true);
     QTableWidgetItem* item = this->itemAt(pos);

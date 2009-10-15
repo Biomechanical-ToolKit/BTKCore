@@ -244,7 +244,7 @@
    <property name="minimumSize">
     <size>
      <width>225</width>
-     <height>367</height>
+     <height>350</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -577,8 +577,8 @@ QPushButton::flat
    </property>
    <property name="minimumSize">
     <size>
-     <width>250</width>
-     <height>357</height>
+     <width>225</width>
+     <height>350</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -999,13 +999,13 @@ QPushButton::flat
    <property name="minimumSize">
     <size>
      <width>200</width>
-     <height>437</height>
+     <height>0</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>500</width>
-     <height>437</height>
+     <height>16777215</height>
     </size>
    </property>
    <property name="floating">

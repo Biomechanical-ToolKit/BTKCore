@@ -905,19 +905,17 @@ void MainWindow::openFile(const QString& filename)
   }
   eventLabelWordList.removeDuplicates();
   this->eventsTable->resizeColumnsToContents();
-  //this->eventsTable->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
-  //this->eventsTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
+  this->eventsTable->horizontalHeader()->resizeSection(0, 35);
+  this->eventsTable->horizontalHeader()->setResizeMode(0, QHeaderView::Fixed);
   this->eventsTable->horizontalHeader()->resizeSection(1, 50);
   this->eventsTable->horizontalHeader()->setResizeMode(1, QHeaderView::Fixed);
   this->eventsTable->horizontalHeader()->resizeSection(3, 50);
   this->eventsTable->horizontalHeader()->setResizeMode(3, QHeaderView::Fixed);
   this->eventsTable->horizontalHeader()->setResizeMode(2, QHeaderView::Stretch);
   this->eventsTable->sortItems(0);
-  //this->eventsTable->horizontalHeader()->setStretchLastSection(true);
   this->newEventButton->setEnabled(true);
   this->deleteEventButton->setEnabled(false);
   this->showEventButton->setEnabled(false);
-  //this->eventsDock->setEnabled(true);
   this->eventsTable->blockSignals(false);
 
   QCompleter* eventLabelCompleter = new QCompleter(eventLabelWordList, this);
