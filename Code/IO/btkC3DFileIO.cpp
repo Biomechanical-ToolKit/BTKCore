@@ -1617,24 +1617,23 @@ namespace btk
         std::string s = contexts[inc];
         std::transform(s.begin(), s.end(), s.begin(), tolower);
         if (s.compare("general") == 0)
-          genericFlags[inc] = 1;
-        bool newUniqueEventFound = false;
-        for (int i = 0 ; i < static_cast<int>(uniqueEvents.size()) ; ++i)
+          genericFlags[inc] = 1;        
+        if (!contexts[inc].empty())
         {
-          if (contexts[inc].length() == 0)
-            continue;
-          std::string s1 = uniqueEvents[i];
-          std::string s2 = contexts[inc];
-          std::transform(s1.begin(), s1.end(), s1.begin(), tolower);
-          std::transform(s2.begin(), s2.end(), s2.begin(), tolower);
-          if (s1.compare(s2) != 0)
+          bool newUniqueEventFound = true;
+          for (int i = 0 ; i < static_cast<int>(uniqueEvents.size()) ; ++i)
           {
-            newUniqueEventFound = true;
-            break;
+            std::string s1 = uniqueEvents[i];
+            std::transform(s1.begin(), s1.end(), s1.begin(), tolower);
+            if (s1.compare(s) == 0)
+            {
+              newUniqueEventFound = false;
+              break;
+            }
           }
+          if (newUniqueEventFound)
+            uniqueEvents.push_back(contexts[inc]);
         }
-        if (newUniqueEventFound || (uniqueEvents.empty() && !contexts[inc].empty()))
-          uniqueEvents.push_back(contexts[inc]);
         labels[inc] = (*itEvent)->GetLabel();
         descs[inc] = (*itEvent)->GetDescription();
         times[2 * inc] = static_cast<float>(static_cast<int>((*itEvent)->GetTime() / 60));
