@@ -32,7 +32,7 @@ function btkAppendEvent(h, label, time, context, subject, description, id) %#ok
 %  [EVENTS, EVENTSINFO] = BTKAPPENDEVENT(H, LABEL, TIME, CONTEXT, SUBJECT)
 %  [EVENTS, EVENTSINFO] = BTKAPPENDEVENT(H, LABEL, TIME, CONTEXT, SUBJECT, DESCRIPTION)
 %  [EVENTS, EVENTSINFO] = BTKAPPENDEVENT(H, LABEL, TIME, CONTEXT, SUBJECT, DESCRIPTION, ID)
-%  The format of BTKAPPENDEVENT is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
+%  The format of EVENTSINFO is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %
 %  The acquisition is represented by the handle H.  This handle is obtained
 %  by the use of a btk* function.

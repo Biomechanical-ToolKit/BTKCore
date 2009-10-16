@@ -45,27 +45,27 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetPointDescription">btkSetPointDescription</a>      - Point's description modifier
 %   <a href="matlab:help btkSetPointLabel">btkSetPointLabel</a>            - Point's label modifier
 %   <a href="matlab:help btkSetPointType">btkSetPointType</a>             - Point's type modifier
-%   <a href="matlab:help btkSetAnglesValues">btkSetAnglesValues</a>          - Sets scalars's value from a matrix
-%   <a href="matlab:help btkSetForcesValues">btkSetForcesValues</a>          - Sets forces's value from a matrix
-%   <a href="matlab:help btkSetMomentsValues">btkSetMomentsValues</a>         - Sets moments's value from a matrix
-%   <a href="matlab:help btkSetPowersValues">btkSetPowersValues</a>          - Sets power's value from a matrix
-%   <a href="matlab:help btkSetMarkersValues">btkSetMarkersValues</a>         - Sets markers's value from a matrix
-%   <a href="matlab:help btkSetScalarsValues">btkSetScalarsValues</a>         - Sets scalars's value from a matrix 
+%   <a href="matlab:help btkSetAnglesValues">btkSetAnglesValues</a>          - Set scalars's value from a matrix
+%   <a href="matlab:help btkSetForcesValues">btkSetForcesValues</a>          - Set forces's value from a matrix
+%   <a href="matlab:help btkSetMomentsValues">btkSetMomentsValues</a>         - Set moments's value from a matrix
+%   <a href="matlab:help btkSetPowersValues">btkSetPowersValues</a>          - Set power's value from a matrix
+%   <a href="matlab:help btkSetMarkersValues">btkSetMarkersValues</a>         - Set markers's value from a matrix
+%   <a href="matlab:help btkSetScalarsValues">btkSetScalarsValues</a>         - Set scalars's value from a matrix 
 %
 % Analog accessor
 %   <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>               - Analog channels extraction
-%   <a href="matlab:help btkGetAnalogsResolution">btkGetAnalogsResolution</a>     - Returns ADC resolution
-%   <a href="matlab:help btkGetAnalogsValues">btkGetAnalogsValues</a>         - Extracts analogs channels' values in a simple matrix 
+%   <a href="matlab:help btkGetAnalogsResolution">btkGetAnalogsResolution</a>     - Return ADC resolution
+%   <a href="matlab:help btkGetAnalogsValues">btkGetAnalogsValues</a>         - Extract analogs channels' values in a simple matrix 
 %   <a href="matlab:help btkGetForcePlatforms">btkGetForcePlatforms</a>        - Force platform channels and configuration extraction
 %
 % Analog modifier
-%   <a href="matlab:help btkSetAnalogDescription">btkSetAnalogDescription</a>     - Sets analog's description
-%   <a href="matlab:help btkSetAnalogGain">btkSetAnalogGain</a>            - Sets analog's gain
-%   <a href="matlab:help btkSetAnalogLabel">btkSetAnalogLabel</a>           - Sets analog's label
-%   <a href="matlab:help btkSetAnalogOffset">btkSetAnalogOffset</a>          - Sets analog's offset
-%   <a href="matlab:help btkSetAnalogScale">btkSetAnalogScale</a>           - Sets analog's scale factor
-%   <a href="matlab:help btkSetAnalogsResolution">btkSetAnalogsResolution</a>     - Sets ADC resolution (8, 12, 14 or 16 bits)
-%   <a href="matlab:help btkSetAnalogsValues">btkSetAnalogsValues</a>         - Sets analog's value from a matrix 
+%   <a href="matlab:help btkSetAnalogDescription">btkSetAnalogDescription</a>     - Set analog's description
+%   <a href="matlab:help btkSetAnalogGain">btkSetAnalogGain</a>            - Set analog's gain
+%   <a href="matlab:help btkSetAnalogLabel">btkSetAnalogLabel</a>           - Set analog's label
+%   <a href="matlab:help btkSetAnalogOffset">btkSetAnalogOffset</a>          - Set analog's offset
+%   <a href="matlab:help btkSetAnalogScale">btkSetAnalogScale</a>           - Set analog's scale factor
+%   <a href="matlab:help btkSetAnalogsResolution">btkSetAnalogsResolution</a>     - Set ADC resolution (8, 12, 14 or 16 bits)
+%   <a href="matlab:help btkSetAnalogsValues">btkSetAnalogsValues</a>         - Set analog's value from a matrix 
 %
 % Event accessor
 %   <a href="matlab:help btkGetEvents">btkGetEvents</a>                - Events extraction
@@ -74,6 +74,8 @@ function tocbtkcommon
 %   <a href="matlab:help btkAppendEvent">btkAppendEvent</a>              - Append event into an acquisition
 %   <a href="matlab:help btkClearEvents">btkClearEvents</a>              - Remove all events from an acquisition
 %   <a href="matlab:help btkRemoveEvent">btkRemoveEvent</a>              - Remove event from an acquisition
+%   <a href="matlab:help btkSetEventDescription">btkSetEventDescription</a>      - Set event's description
+%   <a href="matlab:help btkSetEventId">btkSetEventId</a>               - Set event's ID
 %
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>
 
