@@ -200,7 +200,7 @@ namespace btk
               btkErrorMacro("Vertical offset between the origin of the force platform #" + ToString(inc) + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
               origin.z() *= -1;
             }
-            this->FinishGRWComputation(grw, origin);
+            //this->FinishGRWComputation(grw, origin);
             this->TransformGRWToGlobal(grw, (*it)->GetCorners());
             break;
           case 2:
