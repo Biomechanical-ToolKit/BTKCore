@@ -61,4 +61,5 @@ typedef enum {eventFrame = Qt::UserRole + 20,
 static int checkState2 = Qt::UserRole + 30;
 static int metadataInfoFirstValue = Qt::UserRole + 41;
 static int metadataInfoValuesCount = Qt::UserRole + 42;
- #endif // UserRoles_h
+
+#endif // UserRoles_h

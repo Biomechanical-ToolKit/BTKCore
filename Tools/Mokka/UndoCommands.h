@@ -44,12 +44,39 @@
 class MainWindow;
 class NumericalTableWidgetItem;
 
+class UndoCommand : public QUndoCommand
+{
+public:
+  typedef enum {None, Acquisition, Model} CommandType;
+  
+  UndoCommand(QUndoCommand* parent = 0)
+  : QUndoCommand(parent)
+  {
+    this->m_CommandType = None;
+  };
+  
+  CommandType commandType() const {return this->m_CommandType;};
+  
+protected:
+  CommandType m_CommandType;
+};
+
+class AcquisitionUndoCommand : public UndoCommand
+{
+public:
+  AcquisitionUndoCommand(QUndoCommand* parent = 0)
+  : UndoCommand(parent)
+  {
+    this->m_CommandType = UndoCommand::Acquisition;
+  };
+};
+
 // ----------------------------------------------- //
 //               POINT/MARKER EDITION              //
 // ----------------------------------------------- //
 
 // --------------- EditMarkerLabel ---------------
-class EditMarkerLabel : public QUndoCommand
+class EditMarkerLabel : public AcquisitionUndoCommand
 {
 public:
   EditMarkerLabel(const QString& label, QTableWidgetItem* item, QUndoCommand* parent = 0);
@@ -64,7 +91,7 @@ private:
 };
 
 // --------------- EditMarkerDescription ---------------
-class EditMarkerDescription : public QUndoCommand
+class EditMarkerDescription : public AcquisitionUndoCommand
 {
 public:
   EditMarkerDescription(const QString& desc, QTableWidgetItem* item, QUndoCommand* parent = 0);
@@ -79,7 +106,7 @@ private:
 };
 
 // --------------- EditMarkersRadius ---------------
-class EditMarkersRadius : public QUndoCommand
+class EditMarkersRadius : public UndoCommand
 {
 public:
   EditMarkersRadius(double r, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent = 0);
@@ -95,7 +122,7 @@ private:
 };
 
 // --------------- EditMarkerColorIndex ---------------
-class EditMarkersColorIndex : public QUndoCommand
+class EditMarkersColorIndex : public UndoCommand
 {
 public:
   EditMarkersColorIndex(int idx, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent = 0);
@@ -111,7 +138,7 @@ private:
 };
 
 // --------------- ReorderMarkers ---------------
-class EditPoints : public QUndoCommand
+class EditPoints : public AcquisitionUndoCommand
 {
 public:
   EditPoints(MainWindow* w, QUndoCommand* parent = 0);
@@ -136,7 +163,7 @@ private:
 // ----------------------------------------------- //
 
 // --------------- EditEventLabel ---------------
-class EditEventLabel : public QUndoCommand
+class EditEventLabel : public AcquisitionUndoCommand
 {
 public:
   EditEventLabel(const QString& label, int id, const QString& desc, QTableWidgetItem* item, QUndoCommand* parent = 0);
@@ -153,7 +180,7 @@ private:
 };
 
 // --------------- EditEventContext -------------
-class EditEventContext : public QUndoCommand
+class EditEventContext : public AcquisitionUndoCommand
 {
 public:
   EditEventContext(const QString& context, QTableWidgetItem* item, QUndoCommand* parent = 0);
@@ -168,7 +195,7 @@ private:
 };
 
 // --------------- EditEventTime ---------------
-class EditEventTime : public QUndoCommand
+class EditEventTime : public AcquisitionUndoCommand
 {
 public:
   EditEventTime(double t, QTableWidgetItem* item, QUndoCommand* parent = 0);
@@ -183,7 +210,7 @@ private:
 };
 
 // --------------- EditEventSubject ---------------=
-class EditEventSubject : public QUndoCommand
+class EditEventSubject : public AcquisitionUndoCommand
 {
 public:
   EditEventSubject(const QString& subject, QTableWidgetItem* item, QUndoCommand* parent = 0);
@@ -198,7 +225,7 @@ private:
 };
 
 // --------------- NewEvent ---------------=
-class NewEvent : public QUndoCommand
+class NewEvent : public AcquisitionUndoCommand
 {
 public:
   NewEvent(MainWindow* w, int frame, double freq, QUndoCommand* parent = 0);
@@ -213,7 +240,7 @@ private:
 };
 
 // --------------- DeleteEvent ---------------=
-class DeleteEvent : public QUndoCommand
+class DeleteEvent : public AcquisitionUndoCommand
 {
 public:
   DeleteEvent(MainWindow* w, QUndoCommand* parent = 0);

@@ -302,7 +302,7 @@ MainWindow::MainWindow(QWidget* parent)
 
   // Qt UI: Undo/Redo
   this->mp_UndoStack = new QUndoStack(this);
-  connect(this->mp_UndoStack, SIGNAL(indexChanged(int)), this, SLOT(setAcquisitionModifed(int)));
+  connect(this->mp_UndoStack, SIGNAL(indexChanged(int)), this, SLOT(setAcquisitionModified(int)));
   QAction* actionUndo = this->mp_UndoStack->createUndoAction(this);
   actionUndo->setShortcut(QKeySequence::Undo);
   QAction* actionRedo = this->mp_UndoStack->createRedoAction(this);
@@ -618,9 +618,8 @@ void MainWindow::visitBTKWebsite()
   QDesktopServices::openUrl(QUrl("http://b-tk.googlecode.com", QUrl::TolerantMode));
 };
 
-void MainWindow::setAcquisitionModifed(int modified)
+void MainWindow::setAcquisitionModified(int modified)
 {
-  //std::cout << this->mp_UndoStack->cleanIndex() << std::endl;
   if (modified == this->mp_UndoStack->cleanIndex())
   {
     this->actionSave->setEnabled(false);
@@ -718,21 +717,33 @@ bool MainWindow::isOkToContinue()
 { 
   if (this->isWindowModified())
   {
-    QMessageBox messageBox(QMessageBox::Question, 
-                           trUtf8("MainWindow"),
-                           trUtf8("The document has been modified.\nDo you want to save your changes?"), 
-                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                           this, Qt::Sheet);
-    messageBox.setDefaultButton(QMessageBox::Yes);
-    messageBox.setEscapeButton(QMessageBox::Cancel);
-    switch(messageBox.exec())
+    bool acquisitionModified = false;
+    for (int i = 0 ; i < this->mp_UndoStack->index() ; ++i)
     {
-        case QMessageBox::Yes:
-            this->saveFile();
-            break;
-        case QMessageBox::Cancel:
-            return false;
-            break;
+      if (static_cast<const UndoCommand*>(this->mp_UndoStack->command(i))->commandType() == UndoCommand::Acquisition)
+      {
+        acquisitionModified = true;
+        break;
+      }
+    }
+    if (acquisitionModified)
+    {
+      QMessageBox messageBox(QMessageBox::Question, 
+                             trUtf8("Mokka"),
+                             trUtf8("The document has been modified.\nDo you want to save your changes?"), 
+                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                             this, Qt::Sheet);
+      messageBox.setDefaultButton(QMessageBox::Yes);
+      messageBox.setEscapeButton(QMessageBox::Cancel);
+      switch(messageBox.exec())
+      {
+          case QMessageBox::Yes:
+              this->saveFile();
+              break;
+          case QMessageBox::Cancel:
+              return false;
+              break;
+      }
     }
   } 
   return true; 
@@ -753,21 +764,24 @@ void MainWindow::openFile()
       this->openFile(filenames.first());
   }
   */
-  QString filename = QFileDialog::getOpenFileName(this,
-                       trUtf8("Open Acquisition"),
-                       this->m_LastDirectory,
-                       trUtf8("Acquisition Files (*.c3d *.trc)"));
-  if (!filename.isEmpty())
+  if (this->isOkToContinue())
   {
-    this->m_LastDirectory = QFileInfo(filename).absolutePath();
-    this->openFile(filename);
+    QString filename = QFileDialog::getOpenFileName(this,
+                         trUtf8("Open Acquisition"),
+                         this->m_LastDirectory,
+                         trUtf8("Acquisition Files (*.c3d *.trc)"));
+    if (!filename.isEmpty())
+    {
+      this->m_LastDirectory = QFileInfo(filename).absolutePath();
+      this->openFile(filename);
+    }
   }
 };
 
 void MainWindow::openFile(const QString& filename)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  this->closeFile();
+  this->clearUI();
   btk::AcquisitionFileReader::Pointer reader = static_pointer_cast<btk::AcquisitionFileReader>(this->m_BTKProc[BTK_READER]);
   if (reader->GetFilename().compare(filename.toStdString()))
     reader->SetAcquisitionIO();
@@ -1073,6 +1087,12 @@ void MainWindow::saveFile(const QString& filename)
 };
 
 void MainWindow::closeFile()
+{
+  if (this->isOkToContinue())
+    this->clearUI();
+}
+
+void MainWindow::clearUI()
 {
   this->mp_UndoStack->clear();
   this->actionClose->setEnabled(false);
@@ -1525,6 +1545,8 @@ void MainWindow::focusOnMarkerLabelEdition()
   this->markerPropertiesButton->setIcon(*this->mp_DownArrow);
   this->markerLabelEdit->setFocus();
   this->markerLabelEdit->selectAll();
+  
+  this->markersTable->scrollToItem(this->markersTable->currentItem());
 };
 
 void MainWindow::editMarkerLabel()

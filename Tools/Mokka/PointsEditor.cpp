@@ -189,7 +189,6 @@ void PointsEditor::showOnlyType(btk::Point::Type t)
   int num = this->tableWidget->rowCount();
   for (int i = 0 ; i < num ; ++i)
   {
-    std::cout << this->tableWidget->item(i, 0)->data(pointType).toInt() << " vs " << static_cast<int>(t) << std::endl;
     if (this->tableWidget->item(i, 0)->data(pointType).toInt() == static_cast<int>(t))
       this->tableWidget->setRowHidden(i, false);
     else

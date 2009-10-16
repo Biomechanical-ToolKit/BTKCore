@@ -45,7 +45,7 @@
 
 // --------------- EditMarkerLabel ---------------
 EditMarkerLabel::EditMarkerLabel(const QString& label, QTableWidgetItem* item, QUndoCommand* parent)
-: QUndoCommand(parent), m_Label(label)
+: AcquisitionUndoCommand(parent), m_Label(label)
 {
   this->mp_Item = item;
 };
@@ -64,7 +64,7 @@ void EditMarkerLabel::action()
 
 // --------------- EditMarkerDescription ---------------
 EditMarkerDescription::EditMarkerDescription(const QString& desc, QTableWidgetItem* item, QUndoCommand* parent)
-: QUndoCommand(parent), m_Description(desc)
+: AcquisitionUndoCommand(parent), m_Description(desc)
 {
   this->mp_Item = item;
 };
@@ -82,7 +82,7 @@ void EditMarkerDescription::action()
 
 // --------------- EditMarkersRadius ---------------
 EditMarkersRadius::EditMarkersRadius(double r, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent)
-: QUndoCommand(parent), m_Items(items), m_Radius(QVector<double>(items.count(), r))
+: UndoCommand(parent), m_Items(items), m_Radius(QVector<double>(items.count(), r))
 {
   this->mp_Main = w;
 };
@@ -108,7 +108,7 @@ void EditMarkersRadius::action()
 
 // --------------- EditMarkersColorIndex ---------------
 EditMarkersColorIndex::EditMarkersColorIndex(int idx, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent)
-: QUndoCommand(parent), m_Items(items), m_Indexes(QVector<int>(items.count(), idx))
+: UndoCommand(parent), m_Items(items), m_Indexes(QVector<int>(items.count(), idx))
 {
   this->mp_Main = w;
 };
@@ -134,7 +134,7 @@ void EditMarkersColorIndex::action()
 
 // --------------- EditPoints ---------------
 EditPoints::EditPoints(MainWindow* w, QUndoCommand* parent)
-: QUndoCommand(parent), m_Items(QVector< pointProp >(w->markersTable->rowCount()))
+: AcquisitionUndoCommand(parent), m_Items(QVector< pointProp >(w->markersTable->rowCount()))
 {
   this->mp_Main = w;
   int num = this->mp_Main->mp_PointsEditorDlg->tableWidget->rowCount();
@@ -207,7 +207,7 @@ void EditPoints::action()
 
 // --------------- EditEventLabel ---------------
 EditEventLabel::EditEventLabel(const QString& label, int id, const QString& desc, QTableWidgetItem* item, QUndoCommand* parent)
-: QUndoCommand(parent), m_Label(label), m_Desc(desc)
+: AcquisitionUndoCommand(parent), m_Label(label), m_Desc(desc)
 {
   this->mp_Item = item;
   this->m_Id = id;
@@ -232,7 +232,7 @@ void EditEventLabel::action()
 
 // --------------- EditEventContext ---------------
 EditEventContext::EditEventContext(const QString& context, QTableWidgetItem* item, QUndoCommand* parent)
-: QUndoCommand(parent), m_Context(context)
+: AcquisitionUndoCommand(parent), m_Context(context)
 {
   this->mp_Item = item;
 };
@@ -251,7 +251,7 @@ void EditEventContext::action()
 
 // --------------- EditEventTime ---------------
 EditEventTime::EditEventTime(double t, QTableWidgetItem* item, QUndoCommand* parent)
-: QUndoCommand(parent)
+: AcquisitionUndoCommand(parent)
 {
   this->m_Time = t;
   this->mp_Item = item;
@@ -272,7 +272,7 @@ void EditEventTime::action()
 
 // --------------- EditEventSubject ---------------
 EditEventSubject::EditEventSubject(const QString& subject, QTableWidgetItem* item, QUndoCommand* parent)
-: QUndoCommand(parent), m_Subject(subject)
+: AcquisitionUndoCommand(parent), m_Subject(subject)
 {
   this->mp_Item = item;
 };
@@ -291,6 +291,7 @@ void EditEventSubject::action()
 
 // --------------- NewEvent ---------------
 NewEvent::NewEvent(MainWindow* w, int frame, double freq, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent)
 {
   this->mp_Main = w;
   this->m_Frame = frame;
@@ -329,6 +330,7 @@ void NewEvent::redo()
 
 // --------------- DeleteEvent ---------------
 DeleteEvent::DeleteEvent(MainWindow* w, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent)
 {
   this->mp_Main = w;
   this->mp_Item = w->eventsTable->currentItem();

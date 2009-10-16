@@ -86,7 +86,7 @@ public Q_SLOTS:
   // Menu
   void about();
   void visitBTKWebsite();
-  void setAcquisitionModifed(int modified);
+  void setAcquisitionModified(int modified);
   void editMetadata();
   void editPoints();
   void openRecentFile();
@@ -143,6 +143,7 @@ public Q_SLOTS:
 private:
   void openFile(const QString& filename);
   void saveFile(const QString& filename);
+  void clearUI();
   void fillFileInformations(const QString& filename, btk::AcquisitionFileIO::Pointer io, btk::Acquisition::Pointer acq);
   void readSettings(); 
   void writeSettings();
