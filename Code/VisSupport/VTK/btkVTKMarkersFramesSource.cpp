@@ -566,7 +566,7 @@ namespace btk
         }
         points->Delete();
         centers->Delete();
-        for (int i = 0 ; i < this->mp_TrajectoryIds->size() ; ++i)
+        for (int i = 0 ; i < static_cast<int>(this->mp_TrajectoryIds->size()) ; ++i)
         {
           this->mp_TrajectoryIds->operator[](i)->InsertNextCell(trajectoryPaths[i]);
           trajectoryPaths[i]->Delete();
