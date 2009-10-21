@@ -73,7 +73,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   grws->Update();
 
   const char* fieldnames[] = {"P", "F", "M"};
-  int numberOfFields =  sizeof(fieldnames) / (sizeof(char) * 4);
+  int numberOfFields =  sizeof(fieldnames) / sizeof(char*);
   int numberOfForcePlates = grws->GetItemNumber();
   
   plhs[0] = mxCreateStructMatrix(numberOfForcePlates, 1, numberOfFields, fieldnames);

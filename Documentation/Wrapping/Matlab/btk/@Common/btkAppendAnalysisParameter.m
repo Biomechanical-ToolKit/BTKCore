@@ -33,6 +33,6 @@ function btkAppendAnalysisParameter(h, name, context, unit, value, subject, desc
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.
 %# mex
 
-error(generatemsgid('NotSupported'),'MEX file for function BTKAPPENDANALYSISPARAMETER not found');
+error(generatemsgid('NotSupported'),'MEX file for BTKAPPENDANALYSISPARAMETER not found');
 
 % [EOF] btkAppendAnalysisParameter.m

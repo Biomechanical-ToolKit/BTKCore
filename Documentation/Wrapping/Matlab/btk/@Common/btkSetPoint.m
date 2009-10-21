@@ -60,6 +60,6 @@ function btkSetPoint(h, idx_or_label, values, residuals, masks) %#ok
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.
 %# mex
 
-error(generatemsgid('NotSupported'),'MEX file for function not found');
+error(generatemsgid('NotSupported'),'MEX file for BTKSETPOINT not found');
 
 % [EOF] btkSetPoint.m

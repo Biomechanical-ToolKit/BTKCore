@@ -46,6 +46,6 @@ function btkAppendPoint(h, type, label, values, residuals, masks, desc) %#ok
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.
 %# mex
 
-error(generatemsgid('NotSupported'),'MEX file for function BTKAPPENDPOINT not found');
+error(generatemsgid('NotSupported'),'MEX file for BTKAPPENDPOINT not found');
 
 % [EOF] btkAppendPoint.m

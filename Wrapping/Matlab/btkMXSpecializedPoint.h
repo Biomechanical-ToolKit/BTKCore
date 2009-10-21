@@ -94,7 +94,7 @@ void btkMXCreateSpecializedPointsStructure(
     }
 
     const char* info[] = {"frequency", "units"};
-    int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
+    int numberOfFields =  sizeof(info) / sizeof(char*);
 
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);

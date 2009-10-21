@@ -93,7 +93,7 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
   {
     std::vector<std::string> units = std::vector<std::string>(numberOfPoints, "");
     const char* info[] = {"firstFrame", "frequency", "units"};
-    int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
+    int numberOfFields =  sizeof(info) / sizeof(char*);
        
     int inc = 0;
     for(btk::PointCollection::ConstIterator itPt = points->Begin() ; itPt != points->End() ; ++itPt)

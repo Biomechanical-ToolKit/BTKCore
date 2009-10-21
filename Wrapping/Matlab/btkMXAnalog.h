@@ -87,7 +87,7 @@ void btkMXCreateAnalogsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArra
   else
   {
     const char* info[] = {"gain", "offset", "scale", "frequency", "units"};
-    int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
+    int numberOfFields =  sizeof(info) / sizeof(char*);
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     // frequency field
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);

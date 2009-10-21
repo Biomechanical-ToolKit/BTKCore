@@ -102,7 +102,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   
   char* option = 0;
   const char* options[] = {"BYTEORDER", "STORAGEFORMAT"};
-  int numberOfOptions =  sizeof(options) / (sizeof(char) * 4);
+  int numberOfOptions =  sizeof(options) / sizeof(char*);
   for (int i = 2 ; i < nrhs ; i += 2)
   {
     strlen = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;

@@ -105,7 +105,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   char* labelOption = 0, contextOption = 0, subjectOption = 0;
   char* option = 0;
   const char* options[] = {"TIME", "LABEL", "CONTEXT", "SUBJECT"};
-  int numberOfOptions =  sizeof(options) / (sizeof(char) * 4);
+  int numberOfOptions =  sizeof(options) / sizeof(char*);
   for (int i = 1 ; i < nrhs ; i += 2)
   {
     if (!mxIsChar(prhs[i]) || mxIsEmpty(prhs[i]))

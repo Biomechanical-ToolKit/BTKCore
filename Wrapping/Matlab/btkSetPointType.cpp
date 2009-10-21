@@ -58,6 +58,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   char* type = (char*)mxMalloc(strlen);
   mxGetString(prhs[2], type, strlen);
   std::string uppercase = std::string(type);
+  mxFree(type);
   std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
   if (uppercase.compare("MARKER") == 0)
     point->SetType(btk::Point::Marker);
@@ -78,7 +79,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     std::string err = "Unknown point's type: '" + std::string(type) + "'.";    
     mexErrMsgTxt(err.c_str());
   }
-  mxFree(type);
 
   // Return updated points
   btkMXCreatePointsStructure(acq, nlhs, plhs);

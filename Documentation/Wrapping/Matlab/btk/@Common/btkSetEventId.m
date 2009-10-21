@@ -30,6 +30,6 @@ function btkSetEventId(h, label, new_id) %#ok
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.
 %# mex
 
-error(generatemsgid('NotSupported'),'MEX file for function BTKSETEVENTID not found');
+error(generatemsgid('NotSupported'),'MEX file for BTKSETEVENTID not found');
 
 % [EOF] btkSetEventId.m

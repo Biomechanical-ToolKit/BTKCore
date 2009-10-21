@@ -68,7 +68,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs >= 2)
   {
     const char* info[] = {"frequency", "units"};
-    int numberOfFields =  sizeof(info) / (sizeof(char) * 4); 
+    int numberOfFields =  sizeof(info) / sizeof(char*); 
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
     *mxGetPr(frequency) = acq->GetPointFrequency();

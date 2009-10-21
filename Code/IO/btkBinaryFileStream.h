@@ -47,7 +47,7 @@
     #error Processor not supported
   #endif
 #elif defined __GNUC__
-  #if defined __i386__
+  #if defined __i386__ || defined __x86_64__
     #define PROCESSOR_TYPE 1 /* IEEE_LittleEndian */
   #elif defined __vax__
     #define PROCESSOR_TYPE 2 /* VAX_LittleEndian */

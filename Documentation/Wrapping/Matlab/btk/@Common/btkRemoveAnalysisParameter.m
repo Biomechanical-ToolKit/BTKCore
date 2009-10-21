@@ -26,6 +26,6 @@ function btkRemoveAnalysisParameter(h, idx_or_context, name) %#ok
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.
 %# mex
 
-error(generatemsgid('NotSupported'),'MEX file for function BTKREMOVEANALYSISPARAMETER not found');
+error(generatemsgid('NotSupported'),'MEX file for BTKREMOVEANALYSISPARAMETER not found');
 
 % [EOF] btkRemoveAnalysisParameter.m

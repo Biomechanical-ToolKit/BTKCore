@@ -72,7 +72,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
   std::vector<double> parameterValues = std::vector<double>(0);
 
   const char* names[] = {"NAMES", "CONTEXTS", "SUBJECTS", "UNITS"};
-  int numberOfNames =  sizeof(names) / (sizeof(char) * 4);
+  int numberOfNames =  sizeof(names) / sizeof(char*);
   
   if (itAnalysis != metadata->End())
   {
@@ -173,7 +173,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
   else
   {
     const char* info[] = {"subjects", "units"};
-    int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
+    int numberOfFields =  sizeof(info) / sizeof(char*);
     int inc = 0;
 
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);

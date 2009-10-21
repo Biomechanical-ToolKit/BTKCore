@@ -33,53 +33,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(_MSC_VER)
-  // Disable unsafe warning (use of the function 'strcpy' instead of 
-  // 'strcpy_s' for portability reasons;
-  #pragma warning( disable : 4996 ) 
-#endif
-
 #include "btkMXObjectHandle.h"
+#include "btkMXPoint.h"
 
-#include <btkAcquisition.h>
-#include <btkMetaDataUtils.h>
+#include <algorithm>
+#include <cctype>
 
+// btkSetPointsUnit(h, type, unit)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs!=1)
-    mexErrMsgTxt("One input required.");
+  if(nrhs < 3)
+    mexErrMsgTxt("Three inputs required.");
   if (nlhs > 0)
    mexErrMsgTxt("Too many output arguments.");
 
+  if (!mxIsChar(prhs[1]) || mxIsEmpty(prhs[1]))
+    mexErrMsgTxt("Point's type must be set by a non-empty string.");
+  
+  if (!mxIsChar(prhs[2]) || mxIsEmpty(prhs[2]))
+    mexErrMsgTxt("Unit must be set by a non-empty string.");
+  
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  btk::MetaData::Pointer metadata = acq->GetMetaData();
-  btk::MetaData::ConstIterator itAnalysis = metadata->FindChild("ANALYSIS");
-
-  if (itAnalysis == metadata->End())
-    return;
-
-  // Char
-  const char* names[] = {"NAMES", "CONTEXTS", "SUBJECTS", "UNITS", "DESCRIPTIONS"};
-  int numberOfNames =  sizeof(names) / sizeof(char*);
-  std::vector<uint8_t> dims = std::vector<uint8_t>(2,0);
-  for (int i = 0 ; i < numberOfNames ; ++i)
-  {
-    btk::MetaData::ConstIterator it = (*itAnalysis)->FindChild(names[i]);
-    if (it != (*itAnalysis)->End())
-    {
-      if ((*it)->HasInfo())
-        (*it)->GetInfo()->SetDimensions(dims);
-    }
+  
+  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+  char* type = (char*)mxMalloc(strlen);
+  mxGetString(prhs[1], type, strlen);
+  
+  strlen = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
+  char* unit = (char*)mxMalloc(strlen);
+  mxGetString(prhs[2], unit, strlen);
+  
+  std::string uppercase = std::string(type);
+  mxFree(type);
+  std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
+  if (uppercase.compare("MARKER") == 0)
+    acq->SetPointUnit(btk::Point::Marker, unit);
+  else if(uppercase.compare("ANGLE") == 0)
+    acq->SetPointUnit(btk::Point::Angle, unit);
+  else if(uppercase.compare("FORCE") == 0)
+    acq->SetPointUnit(btk::Point::Force, unit);
+  else if(uppercase.compare("MOMENT") == 0)
+    acq->SetPointUnit(btk::Point::Moment, unit);
+  else if(uppercase.compare("POWER") == 0)
+    acq->SetPointUnit(btk::Point::Power, unit);
+  else
+  { 
+    mxFree(unit);
+    std::string err = "Unknown point's type: '" + std::string(type) + "'.";    
+    mexErrMsgTxt(err.c_str());
   }
-  // Real
-  btk::MetaData::ConstIterator it = (*itAnalysis)->FindChild("VALUES");
-  if (it != (*itAnalysis)->End())
-  {
-    if ((*it)->HasInfo())
-      (*it)->GetInfo()->SetDimensions(std::vector<uint8_t>(1,0));
-  }
-  // Integer
-  btk::MetaDataCreateChild((*itAnalysis), "USED", (int16_t)0);
+  mxFree(unit);
 };
-
 

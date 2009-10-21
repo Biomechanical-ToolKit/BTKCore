@@ -59,7 +59,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   fpExtractor->Update();
 
   const char* fieldnames[] = {"channels", "corners", "origin", "type"};
-  int numberOfFields =  sizeof(fieldnames) / (sizeof(char) * 4);
+  int numberOfFields =  sizeof(fieldnames) / sizeof(char*);
   int numberOfForcePlates = fps->GetItemNumber();
   
   plhs[0] = mxCreateStructMatrix(numberOfForcePlates, 1, numberOfFields, fieldnames);
@@ -110,7 +110,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   else
   {
     const char* infos[] = {"frequency", "units", "cal_matrix"};
-    int numberOfInfos =  sizeof(infos) / (sizeof(char) * 4);
+    int numberOfInfos =  sizeof(infos) / sizeof(char*);
     plhs[1] = mxCreateStructMatrix(numberOfForcePlates, 1, numberOfInfos, infos);
     itPlatform = fps->Begin();
     for (int i = 0 ; i < numberOfForcePlates ; ++i)

@@ -392,12 +392,12 @@ namespace btk
         offset -= 2;
         if (id < 0)
         {
-          groupIds.push_back(id);
           MetaData::Pointer entry = MetaData::New(label);
           entry->SetUnlockState((nbCharLabel > 0 ? true : false));
           uint8_t nbCharDesc = ibfs->ReadU8(); offset -= 1;
           entry->SetDescription(ibfs->ReadString(nbCharDesc)); offset -= nbCharDesc;
-          root->AppendChild(entry);
+          if (root->AppendChild(entry))
+            groupIds.push_back(id);
         }
         else
         {
@@ -781,7 +781,7 @@ namespace btk
             input->SetPointUnit((*itPointUnits)->GetInfo()->ToString(0));
           // POINT type and special units
           const char* names[] = {"ANGLE", "FORCE", "MOMENT", "POWER", "SCALAR", "REACTION"}; 
-          int numberOfNames =  sizeof(names) / (sizeof(char) * 4);
+          int numberOfNames =  sizeof(names) / sizeof(char*);
           for(int i = 0 ; i < numberOfNames ; ++i)
           {
             // unit

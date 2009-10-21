@@ -228,7 +228,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
   else
   {
     const char* info[] = {"subjects", "units"};
-    int numberOfFields =  sizeof(info) / (sizeof(char) * 4);
+    int numberOfFields =  sizeof(info) / sizeof(char*);
     
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames_sorted);

@@ -33,6 +33,6 @@ function btkSetAnalogGain(h, idx_or_label, new_gain) %#ok
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.
 %# mex
 
-error(generatemsgid('NotSupported'),'MEX file for function not found');
+error(generatemsgid('NotSupported'),'MEX file for BTKSETANALOGGAIN not found');
 
 % [EOF] btkSetAnalogGain.m
