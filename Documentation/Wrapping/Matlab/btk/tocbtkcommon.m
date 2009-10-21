@@ -15,12 +15,13 @@ function tocbtkcommon
 %
 % Acquisition modifier
 %   <a href="matlab:help btkAppendAnalysisParameter">btkAppendAnalysisParameter</a>  - Append or set a paremeter into the analysis
+%   <a href="matlab:help btkAppendMetada">btkAppendMetadata</a>           - Append metadata in the acquisition
 %   <a href="matlab:help btkClearAnalysis">btkClearAnalysis</a>            - Clear the metadata ANALYSIS
 %   <a href="matlab:help btkNewAcquisition">btkNewAcquisition</a>           - Create an empty acquisition
 %   <a href="matlab:help btkRemoveAnalysisParameter">btkRemoveAnalysisParameter</a>  - Erase a paremeter from the analysis
 %   <a href="matlab:help btkSetFirstFrame">btkSetFirstFrame</a>            - Acquisition's first frame modifier
 %   <a href="matlab:help btkSetFrameNumber">btkSetFrameNumber</a>           - Point and analog frame number modifier
-%   <a href="matlab:help btkSetFrequency">btkSetFrequency</a>             - Set the main frequency.
+%   <a href="matlab:help btkSetFrequency">btkSetFrequency</a>             - Set the main frequency
 %   <a href="matlab:help btkSetPointNumber">btkSetPointNumber</a>           - Point's number modifier
 %
 % Point accessor
@@ -50,7 +51,8 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetMomentsValues">btkSetMomentsValues</a>         - Set moments's value from a matrix
 %   <a href="matlab:help btkSetPowersValues">btkSetPowersValues</a>          - Set power's value from a matrix
 %   <a href="matlab:help btkSetMarkersValues">btkSetMarkersValues</a>         - Set markers's value from a matrix
-%   <a href="matlab:help btkSetScalarsValues">btkSetScalarsValues</a>         - Set scalars's value from a matrix 
+%   <a href="matlab:help btkSetScalarsValues">btkSetScalarsValues</a>         - Set scalars's value from a matrix
+%   <a href="matlab:help btkSetPointUnit">btkSetPointUnit</a>             - Set unit for a type of point
 %
 % Analog accessor
 %   <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>               - Analog channels extraction
@@ -83,4 +85,3 @@ function tocbtkcommon
 % Copyright 2009 Biomechanical ToolKit
 
 % [EOF]
-
