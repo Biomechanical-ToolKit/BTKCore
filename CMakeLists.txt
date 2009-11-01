@@ -67,6 +67,24 @@ ELSE(BTK_USE_VTK)
   SET(BTK_VTKSUPPORT_NO_DOCUMENTATION ${BTK_SOURCE_DIR}/Code/VisSupport/VTK)
 ENDIF(BTK_USE_VTK)
 
+# Find the header memory[.hpp] in specific path.
+# This header contains the share_ptr class.
+CHECK_INCLUDE_FILE_CXX(memory HAVE_MEMORY_H)
+CHECK_INCLUDE_FILE_CXX(tr1/memory HAVE_TR1_MEMORY_H)
+CHECK_INCLUDE_FILE(boost/memory.hpp HAVE_BOOST_MEMORY_HPP)
+CHECK_INCLUDE_FILE(boost/tr1/memory.hpp HAVE_BOOST_TR1_MEMORY_HPP)
+IF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
+  IF(MSVC AND MSVC_VERSION LESS 1500)
+    SET(USE_INCLUDED_BOOST 1)
+  ELSEIF(UNIX AND NOT HAVE_TR1_MEMORY_H)
+    SET(USE_INCLUDED_BOOST 1)
+  ENDIF(MSVC AND MSVC_VERSION LESS 1500)
+  
+  IF(USE_INCLUDED_BOOST)
+    SET(BTK_INCLUDE_DIRS_BUILD_TREE ${BTK_INCLUDE_DIRS_BUILD_TREE} ${BTK_SOURCE_DIR}/Utilities/boost)
+  ENDIF(USE_INCLUDED_BOOST)
+ENDIF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
+
 # The entire BTK tree should use the same include path
 # Create the list of include directories needed for BTK header files.
 INCLUDE(${CMAKE_MODULE_PATH}/btkIncludeDirectories.cmake)
@@ -78,12 +96,6 @@ INCLUDE_DIRECTORIES(
   ${BTK_INCLUDE_DIRS_SYSTEM}
 )
 
-# Find the header memory.h in specific path.
-# This header contains the share_ptr class.
-CHECK_INCLUDE_FILE_CXX(memory HAVE_MEMORY_H)
-CHECK_INCLUDE_FILE_CXX(tr1/memory HAVE_TR1_MEMORY_H)
-CHECK_INCLUDE_FILE(boost/memory.hpp HAVE_BOOST_MEMORY_HPP)
-CHECK_INCLUDE_FILE(boost/tr1/memory.hpp HAVE_BOOST_TR1_MEMORY_HPP)
 # BTK build configuration options.
 OPTION(BUILD_SHARED_LIBS "Build BTK with shared libraries." OFF)
 SET(BTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
@@ -226,6 +238,9 @@ IF(BUILD_TESTING)
   ENABLE_TESTING()
   ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING)
+
+# Utilities (boost/eigen2/...)
+ADD_SUBDIRECTORY(Utilities)
 
 # Wrapping
 ADD_SUBDIRECTORY(Wrapping)

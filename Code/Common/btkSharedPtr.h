@@ -52,10 +52,10 @@ namespace btk // For documentation purpose
  * @ingroup BTKCommon
  */ 
 };
-// TODO: Need to add the experimental case with  GCC 4.3 (–std=c++0x) 
+// TODO: Need to add the experimental case with  GCC 4.3 (-std=c++0x) 
 //       Use BTK_USE_GCC_EXPERIMENTAL for this
 /* Native header */
-#if defined(__GNUC__)
+#if defined(__GNUC__) && (__GNUC__ > 3)
   #if defined(HAVE_TR1_MEMORY_H) && !defined(BTK_USE_GCC_EXPERIMENTAL)
      #include <tr1/memory>
     namespace btk { 
@@ -70,7 +70,7 @@ namespace btk // For documentation purpose
       #define static_pointer_cast std::static_pointer_cast
     };
   #endif
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && (_MSC_VER >= 1500)
   /* included with MSVC 2008 SP1 */
   #if defined(HAVE_MEMORY_H)
     #include <memory>
@@ -79,26 +79,20 @@ namespace btk // For documentation purpose
       #define static_pointer_cast std::tr1::static_pointer_cast
     };
   #endif
-#endif
-/* Boost header */
-#if !defined(HAVE_TR1_MEMORY_H) && !defined(HAVE_MEMORY_H)
-  /* From Boost 1.34 */
-  #if defined(HAVE_BOOST_TR1_MEMORY_HPP)
-    #include <boost/tr1/memory.hpp>
-    namespace btk { 
-      #define SharedPtr boost::tr1::shared_ptr
-      #define static_pointer_cast boost::tr1::static_pointer_cast
-    };
-  #elif defined(HAVE_BOOST_MEMORY_HPP)
-    #include <boost/memory.hpp>
-    namespace btk { 
-      #define SharedPtr boost::shared_ptr
-      #define static_pointer_cast boost::static_pointer_cast
-    };
-  #else
-    #error "No recognized library which embeds a shared_ptr class."
-  #endif
+#elif defined(HAVE_BOOST_MEMORY_HPP)
+  #include <boost/memory.hpp>
+  namespace btk { 
+    #define SharedPtr boost::shared_ptr
+    #define static_pointer_cast boost::static_pointer_cast
+  };
+#else
+// #elif defined(HAVE_BOOST_TR1_MEMORY_HPP)
+  // From boost 1.34
+  #include <boost/tr1/memory.hpp>
+  namespace btk { 
+    #define SharedPtr std::tr1::shared_ptr
+    #define static_pointer_cast std::tr1::static_pointer_cast
+  };
 #endif
 
-#endif
-
+#endif // __btkSharedPtr_h
