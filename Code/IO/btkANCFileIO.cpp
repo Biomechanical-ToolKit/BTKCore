@@ -324,7 +324,7 @@ namespace btk
       throw(ANCFileIOException("Invalid file path."));
 
     //Adjust the frame number of each analog channel if necessary
-    input->Resize(input->GetPointNumber(), input->GetPointFrameNumber(), input->GetAnalogNumber(), input->GetAnalogFrameNumber() / input->GetPointFrameNumber());
+    input->Resize(input->GetPointNumber(), input->GetPointFrameNumber(), input->GetAnalogNumber(), input->GetNumberAnalogSamplePerFrame());
     // Determine ANC generation
     // Generation 2 uses the gains and generation 1 uses the analog resolution
     int gen = 0;

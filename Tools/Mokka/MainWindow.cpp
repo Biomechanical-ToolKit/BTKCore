@@ -1048,7 +1048,7 @@ void MainWindow::saveFile(const QString& filename)
   // Analog
   target->SetAnalogs(source->GetAnalogs()->Clone());
   // Final setup
-  target->Resize(inc, source->GetPointFrameNumber(), source->GetAnalogNumber(), source->GetAnalogFrameNumber() / source->GetPointFrameNumber());
+  target->Resize(inc, source->GetPointFrameNumber(), source->GetAnalogNumber(), source->GetNumberAnalogSamplePerFrame());
   // BTK writer
   btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
   writer->SetFilename(filename.toStdString());

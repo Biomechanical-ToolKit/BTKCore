@@ -57,7 +57,7 @@ namespace btk
    * Vector of double representing the parts of the system which measured the coordinates (if applicable).
    */
 
- /**
+  /**
    * @enum Point::Type
    * Enums used to specify the point's type.
    */
@@ -156,7 +156,7 @@ namespace btk
    */
   void Point::SetMasks(const Masks& m)
   {
-    this->m_Residuals = m;
+    this->m_Masks = m;
     this->Modified();
   };
   

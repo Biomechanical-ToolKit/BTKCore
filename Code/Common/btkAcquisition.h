@@ -136,10 +136,15 @@ namespace btk
     void ClearAnalogs() {this->m_Analogs->Clear();};
     BTK_COMMON_EXPORT AnalogIterator FindAnalog(const std::string& label);
     BTK_COMMON_EXPORT AnalogConstIterator FindAnalog(const std::string& label) const;
+    void AppendAnalog(Analog::Pointer ac) {this->m_Analogs->InsertItem(ac);};
         
     // Others
     BTK_COMMON_EXPORT void Init(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1);
     BTK_COMMON_EXPORT void Resize(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1);
+    BTK_COMMON_EXPORT void ResizePointNumber(int pointNumber);
+    BTK_COMMON_EXPORT void ResizeAnalogNumber(int analogNumber);
+    BTK_COMMON_EXPORT void ResizeFrameNumber(int frameNumber);
+    BTK_COMMON_EXPORT void ResizeFrameNumberFromEnd(int frameNumber);
     BTK_COMMON_EXPORT void Reset();
     double GetDuration() {return ((this->m_PointFrequency == 0) ? 0 : 1 / this->m_PointFrequency * this->m_PointFrameNumber);};
     int GetFirstFrame() const {return this->m_FirstFrame;};
@@ -153,6 +158,7 @@ namespace btk
     double GetPointFrequency() const {return this->m_PointFrequency;};
     BTK_COMMON_EXPORT void SetPointFrequency(double frequency);
     int GetAnalogFrameNumber() const {return this->m_PointFrameNumber * this->m_AnalogSampleNumberPerPointFrame;};    
+    int GetNumberAnalogSamplePerFrame() const {return this->m_AnalogSampleNumberPerPointFrame;};
     double GetAnalogFrequency() {return this->m_PointFrequency * this->m_AnalogSampleNumberPerPointFrame;};
     AnalogResolution GetAnalogResolution() const {return this->m_AnalogResolution;};
     BTK_COMMON_EXPORT void SetAnalogResolution(AnalogResolution r);

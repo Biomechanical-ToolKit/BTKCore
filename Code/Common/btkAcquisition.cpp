@@ -677,6 +677,11 @@ namespace btk
   };
   
   /**
+   * @fn void Acquisition::AppendAnalog(Analog::Pointer ac)
+   * Append the analog channel @a ac in the acquisition
+   */
+  
+  /**
    * @fn void Acquisition::Init(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1)
    * Initialize the acquisition with @a pointNumber which have @a frameNumber
    * frame. The analog part has @a analogNumber analog channels and their number of frames
@@ -701,60 +706,132 @@ namespace btk
   void Acquisition::Resize(int pointNumber, int frameNumber,
                            int analogNumber, int analogSampleNumberPerPointFrame)
   {
-    // Point
-    if (frameNumber <= 0)
-    {
-      btkErrorMacro("Impossible to set the frame number to 0 or lower. The number of frames is now equals to 1.");
-      frameNumber = 1;
-    }
     if (analogSampleNumberPerPointFrame <= 0)
     {
       btkErrorMacro("Impossible to set the analog sample number to 0. The numbers of analog samples per point frame is now equals to 1.");
       analogSampleNumberPerPointFrame = 1;
     }
-    if (pointNumber == 0)
+    this->m_AnalogSampleNumberPerPointFrame = analogSampleNumberPerPointFrame;
+    this->ResizeFrameNumber(frameNumber);
+    this->ResizePointNumber(pointNumber);
+    this->ResizeAnalogNumber(analogNumber);
+    this->Modified();
+  };
+  
+  /**
+   * Resize the number of points.
+   */
+  void Acquisition::ResizePointNumber(int pointNumber)
+  {
+    if (pointNumber < this->GetPointNumber())
+      this->m_Points->SetItemNumber(pointNumber);
+    else
     {
-      this->m_Points->SetItemNumber(0);
-      this->m_PointFrameNumber = frameNumber;
+      for (int inc = this->GetPointNumber() ; inc < pointNumber ; ++inc)
+      {
+        Point::Pointer pt = Point::New(this->m_PointFrameNumber == 0 ? 1 : this->m_PointFrameNumber);
+        pt->SetParent(this);
+        this->m_Points->InsertItem(pt);
+      }
+    }
+    this->Modified();
+  };
+  
+  /**
+   * Resize the number of analog channels.
+   */
+  void Acquisition::ResizeAnalogNumber(int analogNumber)
+  {
+    if (analogNumber < this->GetAnalogNumber())
+      this->m_Analogs->SetItemNumber(analogNumber);
+    else
+    {
+      for (int inc = this->GetAnalogNumber() ; inc < analogNumber ; ++inc)
+      {
+        Analog::Pointer pt = Analog::New((this->m_PointFrameNumber == 0 ? 1 : this->m_PointFrameNumber) * this->m_AnalogSampleNumberPerPointFrame);
+        pt->SetParent(this);
+        this->m_Analogs->InsertItem(pt);
+      }
+    }
+    this->Modified();
+  };
+  
+  /**
+   * Resize the number of frames.
+   */
+  void Acquisition::ResizeFrameNumber(int frameNumber)
+  {
+    if (frameNumber <= 0)
+    {
+      btkErrorMacro("Impossible to set the frame number to 0 or lower. The number of frames is now equals to 1.");
+      frameNumber = 1;
+    }
+    this->SetPointFrameNumber(frameNumber);
+    this->SetAnalogFrameNumber(this->m_AnalogSampleNumberPerPointFrame);
+    this->Modified();
+  };
+  
+  /**
+   * Resize the number of frames by adding the new frames at the beginning of the acquisition and 
+   * set automaticaly the new first frame index.
+   */
+  void Acquisition::ResizeFrameNumberFromEnd(int frameNumber)
+  {
+    if (frameNumber == this->m_PointFrameNumber)
+      return;
+      
+    if (frameNumber < this->m_PointFrameNumber)
+    {
+      int startRow = this->m_PointFrameNumber - frameNumber;
+      for (PointIterator it = this->BeginPoint() ; it != this->EndPoint() ; ++it)
+      {
+        Point::Values v = (*it)->GetValues().block(startRow,0,frameNumber,3);
+        (*it)->SetValues(v);
+        Point::Residuals r = (*it)->GetResiduals().block(startRow,0,frameNumber,1);
+        (*it)->SetResiduals(r);
+        Point::Masks m = (*it)->GetMasks().block(startRow,0,frameNumber,1);
+        (*it)->SetMasks(m);
+      }
+      for (AnalogIterator it = this->BeginAnalog() ; it != this->EndAnalog() ; ++it)
+      {
+        Analog::Values v = (*it)->GetValues().block(startRow * this->m_AnalogSampleNumberPerPointFrame, 0, frameNumber * this->m_AnalogSampleNumberPerPointFrame, 1);
+        (*it)->SetValues(v);
+      } 
+      this->m_FirstFrame = startRow + 1;
     }
     else
     {
-      if (pointNumber < this->GetPointNumber())
-        this->m_Points->SetItemNumber(pointNumber);
-      else
+      int startRow = frameNumber - this->m_PointFrameNumber;
+      int actualFrameNumber = this->m_PointFrameNumber;
+      for (PointIterator it = this->BeginPoint() ; it != this->EndPoint() ; ++it)
       {
-        for (int inc = this->GetPointNumber() ; inc < pointNumber ; ++inc)
-        {
-          Point::Pointer pt = Point::New(frameNumber);
-          pt->SetParent(this);
-          this->m_Points->InsertItem(pt);
-        }
+        Point::Values v(frameNumber, 3);
+        v.block(startRow,0, actualFrameNumber,3) = (*it)->GetValues();
+        (*it)->SetValues(v);
+
+        Point::Residuals r(frameNumber, 1);
+        r.block(startRow,0,actualFrameNumber,1) = (*it)->GetResiduals();
+        (*it)->SetResiduals(r);
+
+        Point::Masks m(frameNumber, 1);
+        m.block(startRow,0,actualFrameNumber,1) = (*it)->GetMasks();
+        (*it)->SetMasks(m);
       }
-      this->SetPointFrameNumber(frameNumber);
-    }
-    // Analog
-    if (analogNumber == 0)
-    {
-      this->m_Analogs->SetItemNumber(0);
-      this->m_AnalogSampleNumberPerPointFrame = analogSampleNumberPerPointFrame;
-    }
-    else
-    {
-      if (analogNumber < this->GetAnalogNumber())
-        this->m_Analogs->SetItemNumber(analogNumber);
-      else
+      for (AnalogIterator it = this->BeginAnalog() ; it != this->EndAnalog() ; ++it)
       {
-        for (int inc = this->GetAnalogNumber() ; inc < analogNumber ; ++inc)
-        {
-          Analog::Pointer pt = Analog::New(this->m_PointFrameNumber * analogSampleNumberPerPointFrame);
-          pt->SetParent(this);
-          this->m_Analogs->InsertItem(pt);
-        }
+        Analog::Values v(frameNumber * this->m_AnalogSampleNumberPerPointFrame, 1);
+        v.block(startRow * this->m_AnalogSampleNumberPerPointFrame, 0, actualFrameNumber * this->m_AnalogSampleNumberPerPointFrame, 1) = (*it)->GetValues();
+        (*it)->SetValues(v);
       }
-      this->SetAnalogFrameNumber(analogSampleNumberPerPointFrame);
+      this->m_FirstFrame = this->m_FirstFrame - frameNumber + this->m_PointFrameNumber;
+      if (this->m_FirstFrame <= 0)
+      {
+        btkErrorMacro("The index of the first frame can't be set to 0 or lower. It is forced to 1.");
+        this->m_FirstFrame = 1;
+      }
     }
-    // Modification update
-    this->Modified();  
+    this->m_PointFrameNumber = frameNumber;
+    this->Modified();
   };
 
   /**
@@ -845,9 +922,13 @@ namespace btk
   
   /**
    * Sets the point's unit for the Point's type @a t with the value @a units.
+   *
+   * The type Point::Reaction cannot have any unit. You cannot set it.
    */
   void Acquisition::SetPointUnit(Point::Type t, const std::string& units)
   {
+    if (t == Point::Reaction)
+      return;
     std::string u = units;
     u = u.erase(u.find_last_not_of(' ') + 1);
     u = u.erase(0, u.find_first_not_of(' '));
@@ -889,6 +970,11 @@ namespace btk
   /**
    * @fn int Acquisition::GetAnalogFrameNumber() const
    * Returns the number of frames for the analog channels.
+   */
+   
+  /**
+   * @fn int Acquisition::GetNumberAnalogSamplePerFrame() const
+   * Returns the number of analog sample (acquired by each channel) per point frame.
    */
 
   /**

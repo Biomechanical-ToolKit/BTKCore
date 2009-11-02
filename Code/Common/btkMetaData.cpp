@@ -210,6 +210,39 @@ namespace btk
    */
   
   /**
+   * @brief Extract the information related to the metadata with the label @a l.
+   * 
+   * Check if a child exists with the label @a l and correspond to the given format @a f 
+   * plus the number of dimensions @a numDims with or without values (@a noPossibleEmptyValue). The informations of the metadata are extracted in 
+   * @a info if all the checks are ok. Otherwise, @a info return an empty MetaDataInfo::Pointer.
+   */
+  MetaDataInfo::Pointer MetaData::ExtractChildInfo(const std::string& l, MetaDataInfo::Format f, int numDims, bool noPossibleEmptyValue)
+  {
+    MetaData::Iterator it = this->FindChild(l);
+    if (it != this->End())
+    {
+      if ((*it)->HasInfo())
+      {
+        MetaDataInfo::Pointer info = (*it)->GetInfo();
+        if (info->GetFormat() == f)
+        {
+          if (info->GetDimensions().size() == numDims)
+          {
+            if (noPossibleEmptyValue)
+            {
+              if (info->GetValues().size() != 0)
+                return info;
+            }
+            else
+              return info;
+          }
+        }
+      }
+    }
+    return MetaDataInfo::Pointer();
+  }
+  
+  /**
    * @fn bool MetaData::HasMetaDataAsParent() const
    * Checks if this object has MetaData object as parents.
    */
@@ -421,12 +454,13 @@ namespace btk
   /**
    * Removes the child entry at the iterator @a loc.
    */
-  void MetaData::RemoveChild(Iterator loc)
+  MetaData::Iterator MetaData::RemoveChild(Iterator loc)
   {
     if (loc == this->End())
-      return;
-    this->m_Children.erase(loc);
+      return this->End();
+    Iterator temp = this->m_Children.erase(loc);
     this->Modified();
+    return temp;
   };
 
   /**
@@ -508,7 +542,44 @@ namespace btk
       pt->AppendChild((*it)->Clone());
     return pt;
   };
- 
+  
+  /**
+   * @fn friend bool MetaData::operator==(const MetaData& rLHS, const MetaData& rRHS)
+   * Equality operator. Doesn't check the parent's value.
+   */
+  bool operator==(const MetaData& rLHS, const MetaData& rRHS)
+  {
+    if (rLHS.m_Label.compare(rRHS.m_Label) != 0)
+      return false;
+    if (rLHS.m_Description.compare(rRHS.m_Description) != 0)
+      return false;
+    if (rLHS.m_Unlocked != rRHS.m_Unlocked)
+      return false;
+    if (rLHS.HasInfo() && rRHS.HasInfo())
+    {
+      if (*(rLHS.m_Info) != *(rRHS.m_Info))
+        return false;
+    }
+    else if (rLHS.HasInfo() != rRHS.HasInfo())
+      return false;
+    MetaData::ConstIterator itLHS = rLHS.Begin();
+    MetaData::ConstIterator itRHS = rRHS.Begin();
+    while ((itLHS != rLHS.End()) && (itRHS != rRHS.End()))
+    {
+      if (*(*itLHS) != *(*itRHS))
+        return false;
+      ++itLHS; ++itRHS;
+    }
+    if ((itLHS != rLHS.End()) || (itRHS != rRHS.End()))
+      return false;
+    
+    return true;
+  };
+  
+  /**
+   * @fn friend bool MetaData::operator!=(const MetaData& rLHS, const MetaData& rRHS)
+   * Inequality operator.
+   */
  
   /**
    * Constructor for an entry without a MetaDataInfo.

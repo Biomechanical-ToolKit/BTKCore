@@ -56,6 +56,25 @@ CXXTEST_SUITE(MetaDataTest)
     TS_ASSERT_EQUALS(values[0], "1300");
   };
   
+  CXXTEST_TEST(Equality)
+  {
+    btk::MetaData::Pointer point = btk::MetaData::New("POINT", "point group", false);
+    btk::MetaData::Pointer pointUsed = btk::MetaData::New("USED", (int16_t)16);
+    btk::MetaData::Pointer pointScale = btk::MetaData::New("SCALE", (float)-0.0833);
+    point->AppendChild(pointUsed);
+    point->AppendChild(pointScale);
+    TS_ASSERT(*point == *point);
+    TS_ASSERT(*point != *pointUsed);
+    btk::MetaData::Pointer point2 = point->Clone();
+    TS_ASSERT(*point == *point2);
+    point2->GetChild("SCALE")->GetInfo()->SetValue(0, (float)10.0);
+    TS_ASSERT(*point != *point2);
+    point2->GetChild("SCALE")->GetInfo()->SetValue(0, (float)-0.0833);
+    TS_ASSERT(*point == *point2);
+    point2->GetChild("USED")->GetInfo()->SetValue(0, (int16_t)10);
+    TS_ASSERT(*point != *point2);
+  };
+  
   CXXTEST_TEST(Find)
   {
     btk::MetaData::Pointer point = btk::MetaData::New("POINT", "point group", false);
@@ -228,6 +247,7 @@ CXXTEST_TEST_REGISTRATION(MetaDataTest, SimpleCtor)
 CXXTEST_TEST_REGISTRATION(MetaDataTest, CtorWithValue)
 CXXTEST_TEST_REGISTRATION(MetaDataTest, CtorAndChild)
 CXXTEST_TEST_REGISTRATION(MetaDataTest, Clone)
+CXXTEST_TEST_REGISTRATION(MetaDataTest, Equality)
 CXXTEST_TEST_REGISTRATION(MetaDataTest, Find)
 CXXTEST_TEST_REGISTRATION(MetaDataTest, TakeChild)
 CXXTEST_TEST_REGISTRATION(MetaDataTest, InsertAndSetChildren)

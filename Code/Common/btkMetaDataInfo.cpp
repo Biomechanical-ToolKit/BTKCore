@@ -36,7 +36,7 @@
 #include "btkMetaDataInfo.h"
 #include "btkMetaDataInfo_p.h"
 
-//#include "btkConvert.h"
+#include <math.h>
 
 namespace btk
 {
@@ -196,22 +196,6 @@ namespace btk
       {
         Clear_p(this->m_Format, this->m_Values);
         Resize_p(format, this->m_Values, this->GetDimensionsProduct());
-        /*
-        switch(this->m_Format)
-        {
-          case Byte:
-            Voidify_p(std::vector<int8_t>(this->GetDimensionsProduct(), 0), this->m_Values);
-            break;
-          case Integer:
-            Voidify_p(std::vector<int16_t>(this->GetDimensionsProduct(), 0), this->m_Values);
-            break;
-          case Real:
-            Voidify_p(std::vector<float>(this->GetDimensionsProduct(), 0.0), this->m_Values);
-            break;
-          case Char:
-            break;
-        }
-        */
       }
     }
     this->m_Format = format;
@@ -873,9 +857,23 @@ namespace btk
       return false;
     if (rLHS.m_Dims != rRHS.m_Dims) 
       return false;
-    if (rLHS.m_Values != rRHS.m_Values) 
-      return false;
-    return true;
+    bool equal = false;
+    switch (rLHS.m_Format)
+    {
+    case MetaDataInfo::Char:
+      equal = OperatorEqual_p<std::string>(rLHS.m_Values, rRHS.m_Values);
+      break;
+    case MetaDataInfo::Byte:
+      equal = OperatorEqual_p<char>(rLHS.m_Values, rRHS.m_Values);
+      break;
+    case MetaDataInfo::Integer:
+      equal = OperatorEqual_p<int16_t>(rLHS.m_Values, rRHS.m_Values);
+      break;
+    case MetaDataInfo::Real:
+      equal = OperatorEqual_p<float>(rLHS.m_Values, rRHS.m_Values);
+      break;
+    }
+    return equal;
   };
   
   /**

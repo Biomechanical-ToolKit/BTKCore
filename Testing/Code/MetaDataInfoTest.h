@@ -345,6 +345,24 @@ CXXTEST_SUITE(MetaDataInfoTest)
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test2->GetValue(0)), "test");
     TS_ASSERT_EQUALS(test2->GetFormat(), btk::MetaDataInfo::Char);
   };
+  
+  CXXTEST_TEST(Equality)
+  {
+    btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((float)1.435);
+    btk::MetaDataInfo::Pointer test2 = btk::MetaDataInfo::New((float)1.435);
+    TS_ASSERT(*test == *test2);
+    test2->SetValues("Allo");
+    TS_ASSERT(*test != *test2);
+    test2->SetValues((float)1.435);
+    TS_ASSERT(*test == *test2);
+    test2->SetValues((float)2.5);
+    TS_ASSERT(*test != *test2);
+    test->SetValues(std::vector<int8_t>(5,5));
+    test2->SetValues(std::vector<int8_t>(5,5));
+    TS_ASSERT(*test == *test2);
+    test2->SetValue(0, (int8_t)15);
+    TS_ASSERT(*test != *test2);
+  };
 
   CXXTEST_TEST(String2String)
   {
@@ -542,6 +560,7 @@ CXXTEST_TEST_REGISTRATION(MetaDataInfoTest, ResizeDimensionsFrom0To1Byte)
 CXXTEST_TEST_REGISTRATION(MetaDataInfoTest, ResizeDimensionsFrom3To1Float)
 CXXTEST_TEST_REGISTRATION(MetaDataInfoTest, ResizeDimensionsFrom1To0Char)
 CXXTEST_TEST_REGISTRATION(MetaDataInfoTest, Clone)
+CXXTEST_TEST_REGISTRATION(MetaDataInfoTest, Equality)
 CXXTEST_TEST_REGISTRATION(MetaDataInfoTest, String2String)
 CXXTEST_TEST_REGISTRATION(MetaDataInfoTest, Byte2String)
 CXXTEST_TEST_REGISTRATION(MetaDataInfoTest, Integer2String)

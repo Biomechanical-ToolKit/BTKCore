@@ -39,6 +39,8 @@
 #include "btkConvert.h"
 
 #include <vector>
+#include <limits.h>
+#include <math.h>
 
 namespace btk
 {
@@ -400,6 +402,38 @@ namespace btk
         break;
     }
   };
+  
+  // Operator equal
+  template <typename T>
+  inline bool OperatorEqual_p(void* lhs, void* rhs)
+  {
+    return (Devoidify_p<T>(lhs) == Devoidify_p<T>(rhs));
+  };
 
+  template <>
+  inline bool OperatorEqual_p<std::string>(void* lhs, void* rhs)
+  {
+    return (Devoidify_p<std::string>(lhs).compare(Devoidify_p<std::string>(rhs)) == 0);
+  };
+
+  template <>
+  inline bool OperatorEqual_p<float>(void* lhs, void* rhs)
+  {
+    return (fabs(Devoidify_p<float>(lhs) - Devoidify_p<float>(rhs)) < std::numeric_limits<float>::epsilon());
+  };
+   
+  template <typename T>
+  inline bool OperatorEqual_p(const std::vector<void*>& lhs, const std::vector<void*>& rhs)
+  {
+    if (lhs.size() != rhs.size())
+      return false;
+    int num = lhs.size();
+    for (int i = 0 ; i != num ; ++i)
+    {
+      if (!OperatorEqual_p<T>(const_cast<void*>(lhs[i]), const_cast<void*>(rhs[i])))
+        return false;
+    }
+    return true;
+  };
 };
 #endif // __btkMetaDataInfo_p_h

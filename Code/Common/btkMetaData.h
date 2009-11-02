@@ -120,6 +120,7 @@ namespace btk
     MetaDataInfo::ConstPointer GetInfo() const {return this->m_Info;};
     void SetInfo(MetaDataInfo::Pointer val) {this->m_Info = val;};
     bool HasInfo() const {return (this->m_Info.get() != 0);};
+    BTK_COMMON_EXPORT MetaDataInfo::Pointer ExtractChildInfo(const std::string& l, MetaDataInfo::Format f, int numDims, bool noPossibleEmptyValue = true);
     bool HasMetaDataAsParent() const {return this->m_MetaDataParentAssigned;};
     void SetParent(DataObject* parent = 0) {this->m_MetaDataParentAssigned = false; this->DataObject::SetParent(parent);};
     void SetParent(MetaData* parent = 0) {this->m_MetaDataParentAssigned = true; this->DataObject::SetParent(parent);};
@@ -138,7 +139,7 @@ namespace btk
     BTK_COMMON_EXPORT MetaData::Pointer TakeChild(Iterator loc);
     BTK_COMMON_EXPORT MetaData::Pointer TakeChild(int idx);
     BTK_COMMON_EXPORT MetaData::Pointer TakeChild(const std::string& label);
-    BTK_COMMON_EXPORT void RemoveChild(Iterator loc);
+    BTK_COMMON_EXPORT Iterator RemoveChild(Iterator loc);
     BTK_COMMON_EXPORT void RemoveChild(int idx);
     BTK_COMMON_EXPORT void RemoveChild(const std::string& label);
     bool HasChildren() const {return (this->m_Children.size() != 0);};
@@ -146,7 +147,13 @@ namespace btk
     BTK_COMMON_EXPORT Iterator FindChild(const std::string& label);
     BTK_COMMON_EXPORT ConstIterator FindChild(const std::string& label) const;
     BTK_COMMON_EXPORT Pointer Clone() const;
-
+    //! @cond
+    BTK_COMMON_EXPORT friend bool operator==(const MetaData& rLHS, const MetaData& rRHS);
+    //! @endcond
+    friend bool operator!=(const MetaData& rLHS, const MetaData& rRHS)
+    {
+      return !(rLHS == rRHS);
+    }
     /*
     BTK_COMMON_EXPORT MetaData::Pointer CreateChild(const std::string& label);
     BTK_COMMON_EXPORT void CreateChild(const std::string& label, int8_t val);

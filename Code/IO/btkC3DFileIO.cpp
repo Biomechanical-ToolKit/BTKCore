@@ -975,7 +975,7 @@ namespace btk
         // The (false) number of the first block of the Data section
         writtenBytes += obfs->Write(static_cast<uint16_t>(0));
         // The number of analog samples per analog channel
-        numberSamplesPerAnalogChannel = static_cast<uint16_t>(input->GetAnalogFrameNumber() / input->GetPointFrameNumber());
+        numberSamplesPerAnalogChannel = static_cast<uint16_t>(input->GetNumberAnalogSamplePerFrame());
         writtenBytes += obfs->Write(numberSamplesPerAnalogChannel);
         // The 3D frame rate
         writtenBytes += obfs->Write(static_cast<float>(input->GetPointFrequency()));

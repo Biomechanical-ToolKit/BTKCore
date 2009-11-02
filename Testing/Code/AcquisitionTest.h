@@ -78,6 +78,23 @@ CXXTEST_SUITE(AcquisitionTest)
     TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 200);
     TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 200);
   }
+  
+  CXXTEST_TEST(ResizeFromEnd)
+  {
+    btk::Acquisition::Pointer test = btk::Acquisition::New();
+    test->Init(2, 200, 10, 2);
+    TS_ASSERT_EQUALS(test->GetFirstFrame(), 1);
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 2);
+    TS_ASSERT_EQUALS(test->GetAnalogNumber(), 10);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 200);
+    TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 400);
+    test->ResizeFrameFromEnd(50);
+    TS_ASSERT_EQUALS(test->GetFirstFrame(), 51);
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 2);
+    TS_ASSERT_EQUALS(test->GetAnalogNumber(), 10);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 50);
+    TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 100);
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(AcquisitionTest)
@@ -87,5 +104,6 @@ CXXTEST_TEST_REGISTRATION(AcquisitionTest, SetNumber)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, SetAnalogFrequencyOnly)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitPointAndAnalog)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitPointOnly)
-CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitAnalogOnly) 
+CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitAnalogOnly)
+CXXTEST_TEST_REGISTRATION(AcquisitionTest, ResizeFromEnd)
 #endif
