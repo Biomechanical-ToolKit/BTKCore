@@ -1,5 +1,7 @@
 SET(BTKBasicFilters_SRCS
+      btkAcquisitionUnitConverter.cpp
       btkForcePlatformsExtractor.cpp
+      btkMergeAcquisitionFilter.cpp
       btkSpecializedPointsExtractor.cpp
       btkGroundReactionWrenchFilter.cpp
   )

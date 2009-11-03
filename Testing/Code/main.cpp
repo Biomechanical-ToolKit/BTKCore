@@ -35,6 +35,7 @@ int main()
 #define TRCFilePathIN std::string(TDD_FilePathIN) + "TRCSamples/"
 #define TRCFilePathOUT std::string(TDD_FilePathOUT) + "TRCSamples/"
 
+#include "AcquisitionUnitConverterTest.h"
 #include "AcquisitionTest.h"
 #include "ANCFileIOTest.h"
 #include "ANCFileReaderTest.h"
@@ -48,6 +49,7 @@ int main()
 #include "PointTest.h"
 #include "PointCollectionTest.h"
 #include "MeasureFrameExtractorTest.h"
+#include "MergeAcquisitionFilterTest.h"
 #include "MetaDataInfoTest.h"
 #include "MetaDataTest.h"
 #include "PipelineTest.h"

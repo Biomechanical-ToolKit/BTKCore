@@ -88,8 +88,8 @@ CXXTEST_SUITE(AcquisitionTest)
     TS_ASSERT_EQUALS(test->GetAnalogNumber(), 10);
     TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 200);
     TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 400);
-    test->ResizeFrameFromEnd(50);
-    TS_ASSERT_EQUALS(test->GetFirstFrame(), 51);
+    test->ResizeFrameNumberFromEnd(50);
+    TS_ASSERT_EQUALS(test->GetFirstFrame(), 151);
     TS_ASSERT_EQUALS(test->GetPointNumber(), 2);
     TS_ASSERT_EQUALS(test->GetAnalogNumber(), 10);
     TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 50);
