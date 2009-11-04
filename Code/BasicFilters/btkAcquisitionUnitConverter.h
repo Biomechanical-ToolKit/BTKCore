@@ -71,6 +71,7 @@ namespace btk
   private:
     BTK_BASICFILTERS_EXPORT bool ConvertUnit(double* scale, int num, const char** units, const double* scales, const std::string& out, const std::string& in);
     BTK_BASICFILTERS_EXPORT bool CheckUnit(int* idx, int num, const char** units, const std::string& unit);
+    inline bool ConvertCalMatrix(std::vector<float>& values, int alreadyConverted, int total, int columnsStep, int rows, int cols, const double* scales);
     
     AcquisitionUnitConverter(const AcquisitionUnitConverter& ); // Not implemented.
     AcquisitionUnitConverter& operator=(const AcquisitionUnitConverter& ); // Not implemented.
@@ -89,6 +90,23 @@ namespace btk
     static const double PowerScale[1];
     static const char* VoltageUnit[2];
     static const double VoltageScale[4];
+  };
+  
+  bool AcquisitionUnitConverter::ConvertCalMatrix(std::vector<float>& values, int alreadyConverted, int total, int columnsStep, int rows, int cols, const double* scales)
+  {
+    if (alreadyConverted + rows*cols > total)
+      return false;
+    else
+    {
+      for (int i = 0 ; i < cols ; ++i)
+      {
+        for (int j = 0 ; j < rows ; ++j)
+        {
+          values[j + i*columnsStep + alreadyConverted] = static_cast<float>(values[j + i*columnsStep + alreadyConverted] * scales[j]);
+        }
+      }
+    }
+    return true; 
   };
 };
 

@@ -359,7 +359,6 @@ namespace btk
           }
           ++inc;
         }
-        ++it;
       }
       
       // Special case: BTK metadata
@@ -673,7 +672,7 @@ namespace btk
         {
           for (int j = (i * chanNum) ; j < (chanOut + i * chanNum) ; ++j)
             chanVal[j] = chanValOut[j - i * (chanNum - chanOut)];
-          if (calMatrixValOut.size() >= ((i + 1) * chanOut * calRowOut))
+          if (static_cast<int>(calMatrixValOut.size()) >= ((i + 1) * chanOut * calRowOut))
           {
             int diff = 0, inc = 0;
             for (int j = (i * chanNum * calRowNum) ; j < (chanOut * calRowOut + (i * chanNum * calRowNum)) ; ++j)
@@ -694,7 +693,7 @@ namespace btk
             originValOut[j] = originValIn[j - (usedOut * 3)];
           for (int j = (i * chanNum) ; j < (chanIn + i * chanNum) ; ++j)
             chanVal[j] = chanValIn[j - usedOut * chanIn - i *(chanNum - chanIn)] + usedOut * chanNum;
-          if (calMatrixValIn.size() >= ((i + 1 - usedOut) * chanIn * calRowIn))
+          if (static_cast<int>(calMatrixValIn.size()) >= ((i + 1 - usedOut) * chanIn * calRowIn))
           {
             int diff = 0, inc = 0;
             for (int j = (i * chanNum * calRowNum) ; j < (chanIn * calRowIn + (i * chanNum * calRowNum)) ; ++j)
@@ -791,7 +790,7 @@ namespace btk
     }
     int usedValue = used->ToInt(0);
     std::vector<int> typeValues = type->ToInt();
-    if (usedValue < typeValues.size())
+    if (usedValue < static_cast<int>(typeValues.size()))
     {
       btkErrorMacro("Metadata '" + fp->GetLabel() + "' seems corrupted. The number of force platform used is greater than the number of force platform.");
       return -1;

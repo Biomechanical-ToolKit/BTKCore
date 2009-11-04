@@ -63,6 +63,9 @@ namespace btk
    *  - degree (deg);
    * The known unit for the power are:
    *  - watt (W);
+   * Moreover, the metadata known to be influenced by these unit (FORCE_PLATFORM, 
+   * SEG) are also converted. The metadata POINT:*UNITS are not updated as they are not
+   * used in BTK (instead, you can use the methods btk::Acquisition::GetPointUnit()).
    *
    * Use the method AcquisitionUnitConverter::SetUnit() to selected the wanted units.
    *
@@ -383,16 +386,16 @@ namespace btk
         if (parameterIt != (*groupIt)->End())
         {
           (*parameterIt)->GetInfo()->ToFloat(values);
-          for (int i = 0 ; i < values.size() ; ++i)
-            values[i] *= scales[Length];
+          for (int i = 0 ; i < static_cast<int>(values.size()) ; ++i)
+            values[i] = static_cast<float>(values[i] * scales[Length]);
           (*parameterIt)->GetInfo()->SetValues((*parameterIt)->GetInfo()->GetDimensions(), values);
         }
         parameterIt = (*groupIt)->FindChild("ORIGIN");
         if (parameterIt != (*groupIt)->End())
         {
           (*parameterIt)->GetInfo()->ToFloat(values);
-          for (int i = 0 ; i < values.size() ; ++i)
-            values[i] *= scales[Length];
+          for (int i = 0 ; i < static_cast<int>(values.size()) ; ++i)
+            values[i] = static_cast<float>(values[i] * scales[Length]);
           (*parameterIt)->GetInfo()->SetValues((*parameterIt)->GetInfo()->GetDimensions(), values);
         }
         parameterIt = (*groupIt)->FindChild("CAL_MATRIX");
@@ -439,93 +442,35 @@ namespace btk
                 switch (types[i])
                 {
                 case 1:
-                  if (i*valuesStep + 6*6 > total)
                   {
-                    corrupted = true;
-                    break;
-                  }
-                  for (int j = 0 ; j < 6 ; ++j)
-                  {
-                    values[j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[1 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[2* j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[3 + j*columnsStep + i*valuesStep] *= scales[Length];
-                    values[4 + j*columnsStep + i*valuesStep] *= scales[Length];
-                    values[5 + j*columnsStep + i*valuesStep] *= scales[Moment];
+                  const double sf[6] = {scales[Force], scales[Force], scales[Force], scales[Length], scales[Length], scales[Moment]};
+                  corrupted = !this->ConvertCalMatrix(values, i*valuesStep, total, columnsStep, 6, 6, sf);
                   }
                   break;
                 case 2:
                 case 4:
-                  if (i*valuesStep + 6*6 > total)
                   {
-                    corrupted = true;
-                    break;
-                  }
-                  for (int j = 0 ; j < 6 ; ++j)
-                  {
-                    values[j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[1 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[2* j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[3 + j*columnsStep + i*valuesStep] *= scales[Moment];
-                    values[4 + j*columnsStep + i*valuesStep] *= scales[Moment];
-                    values[5 + j*columnsStep + i*valuesStep] *= scales[Moment];
+                  const double sf[6] = {scales[Force], scales[Force], scales[Force], scales[Moment], scales[Moment], scales[Moment]};
+                  corrupted = !this->ConvertCalMatrix(values, i*valuesStep, total, columnsStep, 6, 6, sf);
                   }
                   break;
                 case 5:
-                  if (i*valuesStep + 6*8 > total)
                   {
-                    corrupted = true;
-                    break;
-                  }
-                  for (int j = 0 ; j < 8 ; ++j)
-                  {
-                    values[j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[1 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[2* j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[3 + j*columnsStep + i*valuesStep] *= scales[Moment];
-                    values[4 + j*columnsStep + i*valuesStep] *= scales[Moment];
-                    values[5 + j*columnsStep + i*valuesStep] *= scales[Moment];
+                  const double sf[6] = {scales[Force], scales[Force], scales[Force], scales[Moment], scales[Moment], scales[Moment]};
+                  corrupted = !this->ConvertCalMatrix(values, i*valuesStep, total, columnsStep, 6, 8, sf);
                   }
                   break;
                 case 3:
                 case 7:
-                  if (i*valuesStep + 8*8 > total)
                   {
-                    corrupted = true;
-                    break;
-                  }
-                  for (int j = 0 ; j < 8 ; ++j)
-                  {
-                    values[j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[1 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[2* j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[3 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[4 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[5 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[6 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[7 + j*columnsStep + i*valuesStep] *= scales[Force];
+                  const double sf[8] = {scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force]};
+                  corrupted = !this->ConvertCalMatrix(values, i*valuesStep, total, columnsStep, 8, 8, sf);
                   }
                   break;
                 case 6:
-                  if (i*valuesStep + 12*12 > total)
                   {
-                    corrupted = true;
-                    break;
-                  }
-                  for (int j = 0 ; j < 8 ; ++j)
-                  {
-                    values[j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[1 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[2* j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[3 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[4 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[5 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[6 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[7 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[8 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[9 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[10 + j*columnsStep + i*valuesStep] *= scales[Force];
-                    values[11 + j*columnsStep + i*valuesStep] *= scales[Force];
+                  const double sf[12] = {scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force]};
+                  corrupted = !this->ConvertCalMatrix(values, i*valuesStep, total, columnsStep, 12, 12, sf);
                   }
                 case 11:
                   btkErrorMacro("Force Platform type 11 is not yet supported. Please, report this to the developers");
@@ -572,7 +517,7 @@ namespace btk
       {
         // Check if this channel belongs to a force platform using a calibration matrix.
         bool noScale = false;
-        for (int i = 0 ; i < channelsToNoScale.size() ; ++i)
+        for (int i = 0 ; i < static_cast<int>(channelsToNoScale.size()) ; ++i)
         {
           if (channelsToNoScale[i] == idxChannel)
           {
@@ -590,7 +535,7 @@ namespace btk
       {
         // Check if this channel belongs to a force platform using a calibration matrix.
         bool noScale = false;
-        for (int i = 0 ; i < channelsToNoScale.size() ; ++i)
+        for (int i = 0 ; i < static_cast<int>(channelsToNoScale.size()) ; ++i)
         {
           if (channelsToNoScale[i] == idxChannel)
           {

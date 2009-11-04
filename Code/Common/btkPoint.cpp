@@ -222,7 +222,7 @@ namespace btk
    */
   Point::Point(const std::string& label, int frameNumber, Type t)
   : Measure<3>(label, frameNumber),
-    m_Residuals(Residuals(frameNumber, 1)), m_Masks(Masks(frameNumber, 1))
+    m_Residuals(Residuals::Zero(frameNumber, 1)), m_Masks(Masks::Zero(frameNumber, 1))
   {
     this->m_Type = t;
   };
