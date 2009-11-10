@@ -61,9 +61,9 @@ namespace btk
     static Pointer New(int16_t val) {return Pointer(new MetaDataInfo(std::vector<uint8_t>(0), std::vector<int16_t>(1, val)));};
     static Pointer New(float val) {return Pointer(new MetaDataInfo(std::vector<uint8_t>(0), std::vector<float>(1, val)));};
     static Pointer New(std::string val) {return Pointer(new MetaDataInfo(val));};
-    static Pointer New(const std::vector<int8_t>& val)  {return Pointer(new MetaDataInfo(std::vector<uint8_t>(1,val.size()), val));};
-    static Pointer New(const std::vector<int16_t>& val) {return Pointer(new MetaDataInfo(std::vector<uint8_t>(1,val.size()), val));};
-    static Pointer New(const std::vector<float>& val) {return Pointer(new MetaDataInfo(std::vector<uint8_t>(1,val.size()), val));};
+    static Pointer New(const std::vector<int8_t>& val)  {return Pointer(new MetaDataInfo(std::vector<uint8_t>(1,static_cast<uint8_t>(val.size())), val));};
+    static Pointer New(const std::vector<int16_t>& val) {return Pointer(new MetaDataInfo(std::vector<uint8_t>(1,static_cast<uint8_t>(val.size())), val));};
+    static Pointer New(const std::vector<float>& val) {return Pointer(new MetaDataInfo(std::vector<uint8_t>(1,static_cast<uint8_t>(val.size())), val));};
     static Pointer New(const std::vector<std::string>& val) {return Pointer(new MetaDataInfo(val));};
     static Pointer New(const std::vector<uint8_t>& dim, const std::vector<int8_t>& val)  {return Pointer(new MetaDataInfo(dim, val));};
     static Pointer New(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val) {return Pointer(new MetaDataInfo(dim, val));};
@@ -90,10 +90,10 @@ namespace btk
     void SetValues(int8_t val) {this->SetValues(std::vector<uint8_t>(0), std::vector<int8_t>(1, val));};
     void SetValues(int16_t val) {this->SetValues(std::vector<uint8_t>(0), std::vector<int16_t>(1, val));};
     void SetValues(float val) {this->SetValues(std::vector<uint8_t>(0), std::vector<float>(1, val));};
-    void SetValues(const std::string& val) {this->SetValues(std::vector<uint8_t>(1, val.length()), std::vector<std::string>(1, val));};
-    void SetValues(const std::vector<int8_t>& val) {this->SetValues(std::vector<uint8_t>(1,val.size()), val);};
-    void SetValues(const std::vector<int16_t>& val) {this->SetValues(std::vector<uint8_t>(1,val.size()), val);};
-    void SetValues(const std::vector<float>& val) {this->SetValues(std::vector<uint8_t>(1,val.size()), val);};
+    void SetValues(const std::string& val) {this->SetValues(std::vector<uint8_t>(1, static_cast<uint8_t>(val.length())), std::vector<std::string>(1, val));};
+    void SetValues(const std::vector<int8_t>& val) {this->SetValues(std::vector<uint8_t>(1,static_cast<uint8_t>(val.size())), val);};
+    void SetValues(const std::vector<int16_t>& val) {this->SetValues(std::vector<uint8_t>(1,static_cast<uint8_t>(val.size())), val);};
+    void SetValues(const std::vector<float>& val) {this->SetValues(std::vector<uint8_t>(1,static_cast<uint8_t>(val.size())), val);};
     BTK_COMMON_EXPORT void SetValues(const std::vector<std::string>& val);
     BTK_COMMON_EXPORT void SetValues(const std::vector<uint8_t>& dims, const std::vector<int8_t>& val);
     BTK_COMMON_EXPORT void SetValues(const std::vector<uint8_t>& dims, const std::vector<int16_t>& val);

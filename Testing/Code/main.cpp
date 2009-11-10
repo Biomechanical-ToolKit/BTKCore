@@ -32,6 +32,8 @@ int main()
 #define ANCFilePathOUT std::string(TDD_FilePathOUT) + "ANCSamples/"
 #define C3DFilePathIN std::string(TDD_FilePathIN) + "C3DSamples/"
 #define C3DFilePathOUT std::string(TDD_FilePathOUT) + "C3DSamples/"
+#define CALForcePlateFilePathIN std::string(TDD_FilePathIN) + "CALForcePlateSamples/"
+#define CALForcePlateFilePathOUT std::string(TDD_FilePathOUT) + "CALForcePlateSamples/"
 #define TRCFilePathIN std::string(TDD_FilePathIN) + "TRCSamples/"
 #define TRCFilePathOUT std::string(TDD_FilePathOUT) + "TRCSamples/"
 
@@ -43,6 +45,8 @@ int main()
 #include "C3DFileIOTest.h"
 #include "C3DFileReaderTest.h"
 #include "C3DFileWriterTest.h"
+#include "CALForcePlateFileIOTest.h"
+#include "CALForcePlateFileReaderTest.h"
 #include "ForcePlatformTypesTest.h"
 #include "ForcePlatformsExtractorTest.h"
 #include "GroundReactionWrenchFilterTest.h"

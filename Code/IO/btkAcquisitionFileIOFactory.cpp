@@ -38,6 +38,7 @@
 #include "btkANCFileIO.h"
 #include "btkC3DFileIO.h"
 #include "btkTRCFileIO.h"
+#include "btkCALForcePlateFileIO.h"
 
 namespace btk
 {
@@ -78,6 +79,8 @@ namespace btk
       if (io->CanReadFile(filename)) return io; 
       io = ANCFileIO::New();
       if (io->CanReadFile(filename)) return io;
+      io = CALForcePlateFileIO::New();
+      if (io->CanReadFile(filename)) return io;
     }
     else
     {
@@ -87,6 +90,8 @@ namespace btk
       if (io->CanWriteFile(filename)) return io;
       io = ANCFileIO::New();
       if (io->CanWriteFile(filename)) return io;
+      //io = CALForcePlateFileIO::New();
+      //if (io->CanWriteFile(filename)) return io;
     }
     return AcquisitionFileIO::Pointer();
   };
