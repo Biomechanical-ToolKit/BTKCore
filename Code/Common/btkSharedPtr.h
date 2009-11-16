@@ -56,14 +56,14 @@ namespace btk // For documentation purpose
 //       Use BTK_USE_GCC_EXPERIMENTAL for this
 /* Native header */
 #if defined(__GNUC__) && (__GNUC__ > 3)
-  #if defined(HAVE_TR1_MEMORY_H) && !defined(BTK_USE_GCC_EXPERIMENTAL)
+  #if defined(HAVE_SYS_TR1_MEMORY_H) && !defined(BTK_USE_GCC_EXPERIMENTAL)
      #include <tr1/memory>
     namespace btk { 
       #define SharedPtr std::tr1::shared_ptr
       #define static_pointer_cast std::tr1::static_pointer_cast
     };
   /* Experimental with GCC 4.3 */
-  #elif defined(HAVE_MEMORY_H)
+  #elif defined(HAVE_SYS_MEMORY_H)
     #include <memory>
     namespace btk { 
       #define SharedPtr std::shared_ptr
@@ -72,7 +72,7 @@ namespace btk // For documentation purpose
   #endif
 #elif defined(_MSC_VER) && (_MSC_VER >= 1500)
   /* included with MSVC 2008 SP1 */
-  #if defined(HAVE_MEMORY_H)
+  #if defined(HAVE_SYS_MEMORY_H)
     #include <memory>
     namespace btk { 
       #define SharedPtr std::tr1::shared_ptr

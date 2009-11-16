@@ -56,13 +56,17 @@ namespace btk
                        const std::string& desc = "", bool isUnlocked = true)
     {return Pointer(new MetaData(label, desc, isUnlocked));};
     static Pointer New(const std::string& label, int8_t val,
-                       const std::string& desc = "", bool isUnlocked = true)    {return Pointer(new MetaData(label, val, desc, isUnlocked));};
+                       const std::string& desc = "", bool isUnlocked = true)
+    {return Pointer(new MetaData(label, val, desc, isUnlocked));};
     static Pointer New(const std::string& label, int16_t val, 
-                       const std::string& desc = "", bool isUnlocked = true)    {return Pointer(new MetaData(label, val, desc, isUnlocked));};
+                       const std::string& desc = "", bool isUnlocked = true)
+    {return Pointer(new MetaData(label, val, desc, isUnlocked));};
     static Pointer New(const std::string& label, float val, 
-                       const std::string& desc = "", bool isUnlocked = true)    {return Pointer(new MetaData(label, val, desc, isUnlocked));};
+                       const std::string& desc = "", bool isUnlocked = true)
+    {return Pointer(new MetaData(label, val, desc, isUnlocked));};
     static Pointer New(const std::string& label, const std::string& val,
-                       const std::string& desc = "", bool isUnlocked = true)    {return Pointer(new MetaData(label, val, desc, isUnlocked));};
+                       const std::string& desc = "", bool isUnlocked = true)
+    {return Pointer(new MetaData(label, val, desc, isUnlocked));};
     static Pointer New(const std::string& label, 
                        const std::vector<int8_t>& val, 
                        const std::string& desc = "",
@@ -154,17 +158,6 @@ namespace btk
     {
       return !(rLHS == rRHS);
     }
-    /*
-    BTK_COMMON_EXPORT MetaData::Pointer CreateChild(const std::string& label);
-    BTK_COMMON_EXPORT void CreateChild(const std::string& label, int8_t val);
-    BTK_COMMON_EXPORT void CreateChild(const std::string& label, int16_t val);
-    BTK_COMMON_EXPORT void CreateChild(const std::string& label, float val);
-    BTK_COMMON_EXPORT void CreateChild(const std::string& label, const std::string& val);
-     BTK_COMMON_EXPORT void CreateChild(const std::string& label, const std::vector<int8_t> val, int inc = 1);
-    BTK_COMMON_EXPORT void CreateChild(const std::string& label, const std::vector<int16_t> val, int inc = 1);
-    BTK_COMMON_EXPORT void CreateChild(const std::string& label, const std::vector<float> val, int inc = 1);
-    BTK_COMMON_EXPORT void CreateChild(const std::string& label, const std::vector<std::string>& val, int inc = 1);
-    */
     
   protected:
     BTK_COMMON_EXPORT MetaData(const std::string& label, 

@@ -69,5 +69,5 @@ namespace btk
       btkErrorMacro("No parent.");
       return entry;
     }
-  }; 
+  };
 };

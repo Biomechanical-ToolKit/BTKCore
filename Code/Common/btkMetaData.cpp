@@ -585,7 +585,7 @@ namespace btk
    * Constructor for an entry without a MetaDataInfo.
    */
   MetaData::MetaData(const std::string& label,
-                               const std::string& desc, bool isUnlocked)
+                     const std::string& desc, bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::Pointer()),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -597,7 +597,7 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo with a single BYTE.
    */
   MetaData::MetaData(const std::string& label, int8_t val,
-                               const std::string& desc, bool isUnlocked)
+                     const std::string& desc, bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -609,7 +609,7 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo with a single INTEGER.
    */
   MetaData::MetaData(const std::string& label, int16_t val, 
-                               const std::string& desc, bool isUnlocked)
+                     const std::string& desc, bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -621,7 +621,7 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo with a single FLOAT.
    */
   MetaData::MetaData(const std::string& label, float val, 
-                               const std::string& desc, bool isUnlocked)
+                     const std::string& desc, bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -633,7 +633,7 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo with a single string.
    */
   MetaData::MetaData(const std::string& label, const std::string& val, 
-                               const std::string& desc, bool isUnlocked)
+                     const std::string& desc, bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -645,8 +645,8 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo of BYTE valuescorresponding to a 1D vector.
    */
   MetaData::MetaData(const std::string& label,
-                               const std::vector<int8_t>& val, const std::string& desc,
-                               bool isUnlocked)
+                     const std::vector<int8_t>& val, const std::string& desc,
+                     bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -658,8 +658,8 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo of INTEGER values corresponding to a 1D vector.
    */
   MetaData::MetaData(const std::string& label, 
-                               const std::vector<int16_t>& val, const std::string& desc,
-                               bool isUnlocked)
+                     const std::vector<int16_t>& val, const std::string& desc,
+                     bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -671,8 +671,8 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo of FLOAT values corresponding to a 1D vector.
    */
   MetaData::MetaData(const std::string& label,
-                               const std::vector<float>& val, const std::string& desc,
-                               bool isUnlocked)
+                     const std::vector<float>& val, const std::string& desc,
+                     bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -683,8 +683,9 @@ namespace btk
   /**
    * Constructor for an entry containing a MetaDataInfo of string values corresponding to a 1D vector.
    */
-  MetaData::MetaData(const std::string& label,                               const std::vector<std::string>& val, const std::string& desc,
-                               bool isUnlocked)
+  MetaData::MetaData(const std::string& label,
+                     const std::vector<std::string>& val, const std::string& desc,
+                     bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -696,8 +697,8 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo of BYTE values.
    */
   MetaData::MetaData(const std::string& label, const std::vector<uint8_t>& dim, 
-                               const std::vector<int8_t>& val, const std::string& desc,
-                               bool isUnlocked)
+                     const std::vector<int8_t>& val, const std::string& desc,
+                     bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(dim, val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -709,8 +710,8 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo of INTEGER values.
    */
   MetaData::MetaData(const std::string& label, const std::vector<uint8_t>& dim, 
-                               const std::vector<int16_t>& val, const std::string& desc,
-                               bool isUnlocked)
+                     const std::vector<int16_t>& val, const std::string& desc,
+                     bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(dim, val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -722,8 +723,8 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo of FLOAT values.
    */
   MetaData::MetaData(const std::string& label, const std::vector<uint8_t>& dim, 
-                               const std::vector<float>& val, const std::string& desc,
-                               bool isUnlocked)
+                     const std::vector<float>& val, const std::string& desc,
+                     bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(dim, val)),
   m_Children(std::list<MetaData::Pointer>(0))
@@ -735,8 +736,8 @@ namespace btk
    * Constructor for an entry containing a MetaDataInfo of string values.
    */
   MetaData::MetaData(const std::string& label, const std::vector<uint8_t>& dim, 
-                               const std::vector<std::string>& val, const std::string& desc,
-                               bool isUnlocked)
+                     const std::vector<std::string>& val, const std::string& desc,
+                     bool isUnlocked)
   : DataObject(), m_Label(label), m_Description(desc),
   m_Info(MetaDataInfo::New(dim, val)),
   m_Children(std::list<MetaData::Pointer>(0))

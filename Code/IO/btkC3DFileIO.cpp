@@ -1239,7 +1239,7 @@ namespace btk
    */
   void C3DFileIO::KeepAcquisitionCompatibleVicon(Acquisition::Pointer input)
   {
-    std::string blank = std::string(1, '    ');
+    std::string blank = std::string(4, ' ');
     // Frequency
     if (input->GetPointFrequency() == 0.0)
     {
