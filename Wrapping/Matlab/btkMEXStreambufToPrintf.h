@@ -44,7 +44,9 @@
 
 #include <streambuf>
 #include <iostream>
-#include <mex.h>
+#include <cstdio> // EOF for linux
+
+#include "btkMex.h"
 
 namespace btk
 {
@@ -71,8 +73,8 @@ namespace btk
     // MEXStreambufToPrintf& operator=(const MEXStreambufToPrintf& toCopy); // Implicit.
 
   protected:
-    virtual std::streamsize xsputn(const char* s, std::streamsize n); 
-    virtual int overflow(int c = EOF);
+    inline virtual std::streamsize xsputn(const char* s, std::streamsize n); 
+    inline virtual int overflow(int c = EOF);
   };
 
   /**
@@ -80,8 +82,16 @@ namespace btk
    */
   std::streamsize MEXStreambufToPrintf::xsputn(const char* s, std::streamsize n) 
   {
-     mexPrintf("%.*s", n, s);
-     return n;
+    /*
+    #if defined(SCI_MEX) && SCI_VERSION_MAJOR <= 5 && SCI_VERSION_MINOR < 2
+      mexPrintf(const_cast<char*>("%.*s"), n, s);
+    #else
+      mexPrintf("%.*s", n, s);
+    #endif
+    */
+    mexPrintf("%.*s", n, s);
+    
+    return n;
   };
 
   /**
@@ -90,7 +100,17 @@ namespace btk
   int MEXStreambufToPrintf::overflow(int c) 
   {
     if (c != EOF)
+    {
+      /*
+      #if defined(SCI_MEX) && SCI_VERSION_MAJOR <= 5 && SCI_VERSION_MINOR < 2
+        mexPrintf(const_cast<char*>("%.1s"), &c);
+      #else
+        mexPrintf("%.1s", &c);
+      #endif
+      */
       mexPrintf("%.1s", &c);
+    }
+      
     return 1;
   }
 };

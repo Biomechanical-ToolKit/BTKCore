@@ -33,13 +33,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <btkGroundReactionWrenchFilter.h> // First (Fix for MSVC LNK2019)
+
 #include "btkMXObjectHandle.h"
 #include "btkMXMeasure.h"
 #include "btkMEXStreambufToWarnMsgTxt.h"
 
 #include <btkAcquisition.h>
 #include <btkForcePlatformsExtractor.h>
-#include <btkGroundReactionWrenchFilter.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {

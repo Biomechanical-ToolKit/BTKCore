@@ -33,17 +33,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMXTypesFix_h
-#define __btkMXTypesFix_h
+#ifndef __btkMex_h
+#define __btkMex_h
 
-#include <matrix.h> // Header from Matlab
+#if defined(_MSC_VER)
+  // Disable unsafe warning (use of the function 'strcpy' instead of 
+  // 'strcpy_s' for portability reasons;
+  #pragma warning( disable : 4996 ) 
+#endif
+
+#include <Eigen/Eigen> // Fix for some conflicts between Scilab and Eigen
+#include <btkSharedPtr.h> // Fix for some conflicts between Scilab and C++ type (bool)
+#include <mex.h>
 
 // Fix types definition introduced in Matlab version 7.3
-// to be used with prior version. 
-// WARNING: This fix only support 32bits system,
+// Fix types not provided in Scilab. 
+// FIXME: What about 64 bits OS?,
+#if !defined(SCI_MEX)
+  #include <matrix.h> // Header from Matlab
+#endif
 #if !defined(MX_API_VER) || MX_API_VER < 0x07030000
 typedef int mwSize;
 typedef int mwIndex;
 #endif
 
-#endif // __btkMXType_h
+#if defined(SCI_MEX)
+  // Fix for Scilab and its macro GetType which is in conflict with the method btk::Point::GetType
+  #ifdef GetType
+    #undef GetType
+  #endif
+  // Prior to Scilab 5.2, functions mexErrMsgTxt and mexWarnMsgTxt require a char* argument
+  #if SCI_VERSION_MAJOR <= 5 && SCI_VERSION_MINOR < 2
+    inline void mexErrMsgTxt(const char* err_msg) {mexErrMsgTxt(const_cast<char*>(err_msg));};
+    inline void mexWarnMsgTxt(const char* err_msg) {mexWarnMsgTxt(const_cast<char*>(err_msg));};
+    // For mexPrintf
+    #include <stdarg.h>
+    #include <cstdio>
+    inline void mexPrintf(const char* fmt, ...)
+    {
+      va_list args; char buf[2048];
+      va_start(args, fmt);
+      vsprintf(buf, fmt, args);
+      mexPrintf(const_cast<char*>("%s"), buf);
+      va_end(args);
+    };
+  #endif
+#endif
+
+#endif // __btkMex_h

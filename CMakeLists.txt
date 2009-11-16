@@ -23,6 +23,11 @@ INCLUDE(CMakeDependentOption)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
 
+# By default BTK is compiled in Release mode
+IF(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
 # Output directories.
 IF(NOT LIBRARY_OUTPUT_PATH)
   SET (LIBRARY_OUTPUT_PATH ${BTK_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all libraries.")
@@ -69,8 +74,8 @@ ENDIF(BTK_USE_VTK)
 
 # Find the header memory[.hpp] in specific path.
 # This header contains the share_ptr class.
-CHECK_INCLUDE_FILE_CXX(memory HAVE_MEMORY_H)
-CHECK_INCLUDE_FILE_CXX(tr1/memory HAVE_TR1_MEMORY_H)
+CHECK_INCLUDE_FILE_CXX(memory HAVE_SYS_MEMORY_H)
+CHECK_INCLUDE_FILE_CXX(tr1/memory HAVE_SYS_TR1_MEMORY_H)
 CHECK_INCLUDE_FILE(boost/memory.hpp HAVE_BOOST_MEMORY_HPP)
 CHECK_INCLUDE_FILE(boost/tr1/memory.hpp HAVE_BOOST_TR1_MEMORY_HPP)
 IF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
@@ -261,6 +266,11 @@ IF(NOT BTK_WRAP_MATLAB OR NOT BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
     ENDIF(MSVC)
   ENDIF(CMAKE_OLD_BUILD_TYPE)
 ENDIF(NOT BTK_WRAP_MATLAB OR NOT BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
+# Scilab wrapping
+OPTION(BTK_WRAP_SCILAB "Wrap BTK classes into Scilab functions." OFF)
+IF(BTK_WRAP_SCILAB)
+  ADD_SUBDIRECTORY(Wrapping/Scilab)
+ENDIF(BTK_WRAP_SCILAB)
 
 # Documentation
 OPTION(BUILD_DOCUMENTATION "Build BTK Documentation." OFF)

@@ -33,6 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <btkEvent.h> // First (Fix for MSVC LNK2019)
+
 #include "btkMXObjectHandle.h"
 #include "btkMXEvent.h"
 

@@ -33,12 +33,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <btkMetaDataUtils.h> // First (Fix for MSVC LNK2019)
+
+#include "btkMXObjectHandle.h"
 #include "btkMXMetaData.h"
 
-#include <btkMetaDataUtils.h>
+#include <btkAcquisition.h>
 
- #include <algorithm>
- #include <cctype>
+#include <algorithm>
+#include <cctype>
  
 // btkAppendMetaData(h, label)
 // btkAppendMetaData(h, label, sublabel, ..., btkMetaDataInfo((CHAR|BYTE|INTEGER|REAL), values))
@@ -169,7 +172,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       }
       dims[0] = maxLen;
       int prod = 1;
-      for (int i = 0 ; i < dims.size() ; ++i)
+      for (int i = 0 ; i < static_cast<int>(dims.size()) ; ++i)
         prod *= dims[i];
       if (prod > 65535)
         mexErrMsgTxt("The number of characters exceed the maximum number (65535) available for a metadata.");

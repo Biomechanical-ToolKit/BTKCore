@@ -36,18 +36,12 @@
 #ifndef __btkMXMeasure_h
 #define __btkMXMeasure_h
 
-#if defined(_MSC_VER)
-  // Disable unsafe warning (use of the function 'strcpy' instead of 
-  // 'strcpy_s' for portability reasons;
-  #pragma warning( disable : 4996 ) 
-#endif
-
 #include "btkASCIIConverter.h"
 
 #include <btkCollection.h>
 #include <btkConvert.h>
 
-#include <mex.h>
+#include "btkMex.h"
 
 /**
  * Adapt the label of the measures stored in @a m and create a Matlab 
@@ -63,7 +57,7 @@
  * @ingroup BTKWrappingMatlab
  */
 template <class T>
-mxArray* btkMXCreateMeasuresStructure(typename btk::Collection<T>::Pointer m, char*** fieldnamesPtr)
+inline mxArray* btkMXCreateMeasuresStructure(typename btk::Collection<T>::Pointer m, char*** fieldnamesPtr)
 {
   typedef typename btk::Collection<T> itemCollection;
   int numberOfMeasures = m->GetItemNumber();

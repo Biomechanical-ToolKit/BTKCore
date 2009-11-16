@@ -33,16 +33,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(_MSC_VER)
-  // Disable unsafe warning (use of the function 'strcpy' instead of 
-  // 'strcpy_s' for portability reasons;
-  #pragma warning( disable : 4996 ) 
-#endif
+#include <btkMetaDataUtils.h>  // First (Fix for MSVC LNK2019)
 
 #include "btkMXObjectHandle.h"
 
 #include <btkAcquisition.h>
-#include <btkMetaDataUtils.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {

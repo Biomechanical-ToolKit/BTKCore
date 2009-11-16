@@ -36,91 +36,15 @@
 #ifndef __btkMXAnalog_h
 #define __btkMXAnalog_h
 
-#include "btkMXMeasure.h"
+#include "btkMex.h"
 
 #include <btkAcquisition.h>
 
-btk::Analog::Pointer btkMXGetAnalog(btk::Acquisition::Pointer acq, int nrhs, const mxArray* prhs[])
-{
-  if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
-    mexErrMsgTxt("Analog's index must be a non-empty string or an integer.");
-  btk::Analog::Pointer analog;
-  if (mxIsChar(prhs[1]))
-  {
-    int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-    char* label = (char*)mxMalloc(strlen);
-    mxGetString(prhs[1], label, strlen);
-    btk::Acquisition::AnalogIterator itAnalog = acq->FindAnalog(label);
-    if (itAnalog == acq->EndAnalog())
-    {
-      std::string err = "No analog channel with label: '" + std::string(label) + "'.";
-      mexErrMsgTxt(err.c_str());
-    }
-    analog = *itAnalog;
-    mxFree(label);
-  }
-  else
-  {
-    int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
-    if ((idx < 0) || (idx > acq->GetAnalogNumber()))
-      mexErrMsgTxt("Analog's index out of range.");
-    analog = acq->GetAnalog(idx);
-  }
-  return analog;
-};
+btk::Analog::Pointer btkMXGetAnalog(btk::Acquisition::Pointer acq, int nrhs, const mxArray* prhs[]);
+void btkMXCreateAnalogsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[]);
 
-void btkMXCreateAnalogsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
-{
-  // First output
-  btk::AnalogCollection::Pointer analogs = acq->GetAnalogs();
-  char** fieldnames = 0;
-  plhs[0] = btkMXCreateMeasuresStructure<btk::Analog>(analogs, &fieldnames);
-  int numberOfAnalogs = acq->GetAnalogNumber();
-
-  // Second output (optionnal)
-  if (nlhs != 2)
-  {
-    for (int i = 0 ; i < numberOfAnalogs ; ++i)
-      delete[] fieldnames[i];
-    delete[] fieldnames;
-  }
-  else
-  {
-    const char* info[] = {"gain", "offset", "scale", "frequency", "units"};
-    int numberOfFields =  sizeof(info) / sizeof(char*);
-    plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
-    // frequency field
-    mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
-    *mxGetPr(frequency) = acq->GetAnalogFrequency();
-    // gain, offset, scale and units field
-    btk::AnalogCollection::ConstIterator itAnalog = analogs->Begin();
-    mxArray* gainStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
-    mxArray* offsetStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
-    mxArray* scaleStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
-    mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
-    for (int i = 0 ; i < numberOfAnalogs ;++i)
-    {
-      mxArray* gain = mxCreateDoubleMatrix(1, 1, mxREAL);
-      mxArray* offset = mxCreateDoubleMatrix(1, 1, mxREAL);
-      mxArray* scale = mxCreateDoubleMatrix(1, 1, mxREAL);
-      *mxGetPr(gain) = static_cast<double>((*itAnalog)->GetGain());
-      *mxGetPr(offset) = static_cast<double>((*itAnalog)->GetOffset());
-      *mxGetPr(scale) = (*itAnalog)->GetScale();
-      mxSetFieldByNumber(gainStruct, 0, i, gain);
-      mxSetFieldByNumber(offsetStruct, 0, i, offset);
-      mxSetFieldByNumber(scaleStruct, 0, i, scale);
-      mxSetFieldByNumber(unitsStruct, 0, i, mxCreateString((*itAnalog)->GetUnit().c_str()));
-      
-      ++itAnalog;
-      delete[] fieldnames[i];
-    }
-    delete[] fieldnames;
-    mxSetFieldByNumber(plhs[1], 0, 0, gainStruct);
-    mxSetFieldByNumber(plhs[1], 0, 1, offsetStruct);
-    mxSetFieldByNumber(plhs[1], 0, 2, scaleStruct);
-    mxSetFieldByNumber(plhs[1], 0, 3, frequency);
-    mxSetFieldByNumber(plhs[1], 0, 4, unitsStruct);
-  }
-};
+#if !defined(SCI_MEX)
+  #include "btkMXAnalog.cxx"
+#endif
 
 #endif // __btkMXAnalog_h

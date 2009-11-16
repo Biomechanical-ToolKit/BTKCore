@@ -39,9 +39,9 @@
 #include "btkMXClassID.h"
 
 #include <btkSharedPtr.h>
-
-#include <mex.h>
 #include <list>
+
+#include "btkMex.h" // Must be the last included header
 
 namespace btk
 {
@@ -163,6 +163,13 @@ namespace btk
 
     if (obj->m_ClassID != MEXClassID<T>()) // check type 
      {
+      /*
+      #if defined(SCI_MEX) && SCI_VERSION_MAJOR <= 5 && SCI_VERSION_MINOR < 2
+        mexPrintf(const_cast<char*>("Given: <%i>, Required: <%i>.\n"), obj->m_ClassID, MEXClassID<T>());
+      #else
+        mexPrintf("Given: <%i>, Required: <%i>.\n", obj->m_ClassID, MEXClassID<T>());
+      #endif
+      */
       mexPrintf("Given: <%i>, Required: <%i>.\n", obj->m_ClassID, MEXClassID<T>());
       mexErrMsgTxt("Given MEXObjectHandle does not represent the correct type.");
     }

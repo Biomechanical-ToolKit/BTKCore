@@ -44,7 +44,9 @@
 
 #include <streambuf>
 #include <iostream>
-#include <mex.h>
+#include <cstdio> // EOF for linux
+
+#include "btkMex.h"
 
 namespace btk
 {
@@ -65,15 +67,15 @@ namespace btk
   class MEXStreambufToWarnMsgTxt : public std::streambuf
   {
   public:
-    MEXStreambufToWarnMsgTxt();
+    inline MEXStreambufToWarnMsgTxt();
     // MEXStreambufToWarnMsgTxt(const MEXStreambufToWarnMsgTxt& toCopy); // Implicit.
     // ~MEXStreambufToWarnMsgTxt(); // Implicit.
     // MEXStreambufToWarnMsgTxt& operator=(const MEXStreambufToWarnMsgTxt& toCopy); // Implicit.
-   void requestNewLine(); 
+    inline void requestNewLine(); 
 
   protected:
-    virtual std::streamsize xsputn(const char* s, std::streamsize n); 
-    virtual int overflow(int c = EOF);
+    inline virtual std::streamsize xsputn(const char* s, std::streamsize n); 
+    inline virtual int overflow(int c = EOF);
 
   private:
     std::string m_Message;
