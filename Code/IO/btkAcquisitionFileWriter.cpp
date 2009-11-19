@@ -176,7 +176,7 @@ namespace btk
   
   /**
    * @fn Acquisition::Pointer AcquisitionFileWriter::GetInput(int idx)
-   * Returns the intput at the index @a idx.
+   * Returns the input at the index @a idx.
    */
   
   /**

@@ -292,13 +292,13 @@ namespace btk
           int numMaxChannel = 0;
           for (std::vector< std::vector<int16_t> >::const_iterator it = fpChan.begin() ; it != fpChan.end() ; ++it)
           {
-            if (numMaxChannel < it->size())
+            if (numMaxChannel < static_cast<int>(it->size()))
               numMaxChannel = it->size();
           }
           std::vector<int16_t> channel(numFp * numMaxChannel, 65535);
           for (int i = 0 ; i < numFp ; ++i)
           {
-            for (int j = 0 ; j < fpChan[i].size() ; ++j)
+            for (int j = 0 ; j < static_cast<int>(fpChan[i].size()) ; ++j)
               channel[i * numMaxChannel + j] = fpChan[i][j];
           }
           std::vector<uint8_t> dims(2, 0); dims[0] = numMaxChannel; dims[1] = numFp;
@@ -554,7 +554,7 @@ namespace btk
   
   void ANCFileIO::ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const char** labels, int num) const
   {
-    if ((fpChan.size() - output->GetAnalogNumber()) < num)
+    if ((output->GetAnalogNumber() - static_cast<int>(fpChan.size())) < num)
       return;
     std::vector<std::string> labels2(num, "");
     std::string suffix = "";
@@ -581,7 +581,7 @@ namespace btk
   
   void ANCFileIO::ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::string& prefix, const char** labels, int num) const
   {
-    if ((fpChan.size() - output->GetAnalogNumber()) < 6)
+    if ((output->GetAnalogNumber() - fpChan.size()) < 6)
       return;
     std::vector<std::string> labels2(num, "");
     std::string suffix = "";
@@ -599,7 +599,7 @@ namespace btk
   void ANCFileIO::ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::vector<std::string>& labels) const
   {
     std::vector<int16_t> fp;
-    for (int i = 0 ; i < labels.size() ; ++i)
+    for (int i = 0 ; i < static_cast<int>(labels.size()) ; ++i)
     {
       int idx = this->FindAnalogLabeCaselInsensitive(labels[i], output);
       if (idx <= output->GetAnalogNumber())
@@ -608,7 +608,7 @@ namespace btk
     if (fp.size() == labels.size())
     {
       fpChan.push_back(fp);
-      for (int i = 0 ; i < fp.size() ; ++i)
+      for (int i = 0 ; i < static_cast<int>(fp.size()) ; ++i)
       {
         Analog::Pointer a = output->GetAnalog(fp[i]-1);
         a->SetScale(a->GetScale() / 4000.0 / 10.0 * 1000000.0 * -1.0);
