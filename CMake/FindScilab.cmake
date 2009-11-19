@@ -1,14 +1,6 @@
 # - Try to find a version of Scilab and headers/library required by the 
 #   used compiler.
 #
-# For Windows, this module detects a Matlab's version between Matlab 7.0 
-# (R14) and Matlab 7.9 (r2009b). 
-# The MacOS X part of this module detect if a Matlab version exist based on the 
-# name of the applications in /Applications.
-# The Linux part of this module doesn't detect the Matlab version. To use it,
-# it is necessary to set the SCILAB_ROOT with the path of the Matlab
-# installation.
-#
 # This module defines: 
 #  SCILAB_ROOT: Scilab installation path
 #  SCILAB_MEX_INCLUDE_DIR: include path for mex.h (used for libmex)
@@ -32,54 +24,63 @@ IF(WIN32)
   # LIBMEX, LIBMX names
   SET(LIBMEX "libmex.dll")
   SET(LIBMX "libmx.dll")
+  SET(LIBSCILAB "LibScilab")
 ELSEIF(APPLE)
   FILE(GLOB SCILAB_PATHS "/Applications/Scilab*")
   SET(LIBMEX "libmex.dylib")
   SET(LIBMX "libmx.dylib")
+  SET(LIBSCILAB "scilab")
 ELSE(WIN32)
   SET(SCILAB_PATHS 
     "/usr/share/scilab"
     "/usr/local/share/scilab"
     "/opt/local/share/scilab")
-  SET(SCILAB_MODULE_PATH 
+  SET(SCILAB_MODULE_PATHS 
     "/usr/include/scilab"
     "/usr/local/include/scilab"
     "/opt/local/include/scilab")
-  SET(SCILAB_LIBRARIES_PATH 
+  SET(SCILAB_LIBRARIES_PATHS
     "/usr/lib/scilab"
     "/usr/local/lib/scilab"
     "/opt/local/lib/scilab")
+  SET(SCILAB_MODULES_MEXLIB_PATHS 
+    "/usr/include/scilab/mexlib"
+    "/usr/local/include/scilab/mexlib"
+    "/opt/local/include/scilab/mexlib")
+  SET(SCILAB_MODULES_CORE_PATHS
+    "/usr/include/scilab/core"
+    "/usr/local/include/scilab/core"
+    "/opt/local/include/scilab/core")
   SET(LIBMEX "libmex.so")
   SET(LIBMX "libmx.so")
+  SET(LIBSCILAB "scilab")
 ENDIF(WIN32)
 
 FIND_PATH(SCILAB_ROOT "etc/scilab.start" ${SCILAB_PATHS})
 
 IF(WIN32 OR APPLE)
   FIND_PATH(SCILAB_ROOT "etc/scilab.start" ${SCILAB_PATHS})
-  SET(SCILAB_MODULE_PATH "${SCILAB_ROOT}/modules")
-  SET(SCILAB_LIBRARIES_PATH "${SCILAB_ROOT}/bin")
+  SET(SCILAB_MODULE_PATHS "${SCILAB_ROOT}/modules")
+  SET(SCILAB_LIBRARIES_PATHS "${SCILAB_ROOT}/bin")
+  SET(SCILAB_MODULES_MEXLIB_PATHS "${SCILAB_MODULE_PATHS}/mexlib/includes")
+  SET(SCILAB_MODULES_CORE_PATHS "${SCILAB_MODULE_PATHS}/core/includes")
 ENDIF(WIN32 OR APPLE)
 
 FIND_LIBRARY(SCILAB_IMPL_LIBRARY
-    "LibScilab"
-    ${SCILAB_LIBRARIES_PATH} NO_DEFAULT_PATH
-    )
+    ${LIBSCILAB}
+    ${SCILAB_LIBRARIES_PATHS} NO_DEFAULT_PATH)
 FIND_FILE(SCILAB_MEX_LIBRARY
     ${LIBMEX}
-    ${SCILAB_LIBRARIES_PATH} NO_DEFAULT_PATH
-    )
+    ${SCILAB_LIBRARIES_PATHS} NO_DEFAULT_PATH)
 FIND_FILE(SCILAB_MX_LIBRARY
     ${LIBMX}
-    ${SCILAB_LIBRARIES_PATH} NO_DEFAULT_PATH
-    )
+    ${SCILAB_LIBRARIES_PATHS} NO_DEFAULT_PATH)
 FIND_PATH(SCILAB_MEX_INCLUDE_DIR
     "mex.h"
-    "${SCILAB_MODULE_PATH}/mexlib/includes" NO_DEFAULT_PATH
-    )
+    ${SCILAB_MODULES_MEXLIB_PATHS} NO_DEFAULT_PATH)
 FIND_PATH(SCILAB_CORE_INCLUDE_DIR
     "core_math.h"
-    "${SCILAB_MODULE_PATH}/core/includes" NO_DEFAULT_PATH
+    ${SCILAB_MODULES_CORE_PATHS} NO_DEFAULT_PATH
     )
 
 SET(SCILAB_LIBRARIES
