@@ -52,6 +52,25 @@ CXXTEST_SUITE(ANCFileReaderTest)
     TS_ASSERT_DELTA(acq->GetAnalog(13)->GetValues()(0), -0.2627, 0.0001);
     TS_ASSERT_DELTA(acq->GetAnalog(13)->GetValues()(1), -0.3169, 0.0001);
     TS_ASSERT_DELTA(acq->GetAnalog(13)->GetValues()(2), -0.2481, 0.0001);
+    
+    std::vector<int16_t> channel = acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CHAN")->GetChild("CHANNEL")->GetInfo()->ToInt16();
+    std::vector<uint8_t> dims = acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CHAN")->GetChild("CHANNEL")->GetInfo()->GetDimensions();
+    TS_ASSERT_EQUALS(channel.size(), 12);
+    TS_ASSERT_EQUALS(dims.size(), 2);
+    TS_ASSERT_EQUALS(dims.at(0), 6);
+    TS_ASSERT_EQUALS(dims.at(1), 2);
+    TS_ASSERT_EQUALS(channel.at(0), 1);
+    TS_ASSERT_EQUALS(channel.at(1), 2);
+    TS_ASSERT_EQUALS(channel.at(2), 3);
+    TS_ASSERT_EQUALS(channel.at(3), 4);
+    TS_ASSERT_EQUALS(channel.at(4), 5);
+    TS_ASSERT_EQUALS(channel.at(5), 6);
+    TS_ASSERT_EQUALS(channel.at(6), 7);
+    TS_ASSERT_EQUALS(channel.at(7), 8);
+    TS_ASSERT_EQUALS(channel.at(8), 9);
+    TS_ASSERT_EQUALS(channel.at(9), 10);
+    TS_ASSERT_EQUALS(channel.at(10), 11);
+    TS_ASSERT_EQUALS(channel.at(11), 12);
   };
 };
 

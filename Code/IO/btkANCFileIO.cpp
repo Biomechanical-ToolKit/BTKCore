@@ -72,6 +72,8 @@ namespace btk
    * @brief Interface to read/write ANC files.
    *
    * The ANC file format is created by Motion Analysis Corp.
+   * @warning The force platforms contained in this file format seem to be only force platforms of type II. 
+   * @warning Moreover, Due to the file format, it is impossible to detect the correct scale for the force platforms' channels. Then, it is supposed, that the gain is 4000 and the excitation voltage is 10V. Plus, the scale factor is set as the opposite of the result to compute reactive forces.
    *
    * @ingroup BTKIO
    */
@@ -262,6 +264,47 @@ namespace btk
           }
           ++itLabel; ++itRange;
         }
+        // Extract force platform channel.
+        // WARNING: This part only supports some format. For example:
+        //  - FX, FY, FZ, MX, MY, MZ
+        //  - F<idx>X, F<idx>Y, F<idx>Z, M<idx>X, M<idx>Y, M<idx>Z
+        //  - FX<idx>, FY<idx>, FZ<idx>, MX<idx>, MY<idx>, MZ<idx>
+        //  - The prefix FP or FP<idx> can also be added.
+        std::vector< std::vector<int16_t> > fpChan;
+        //const char* labelsTypeI[] = {"FX", "FY", "FZ", "PX", "PY", "MZ"};
+        const char* labelsTypeII[] = {"FX", "FY", "FZ", "MX", "MY", "MZ"};
+        //const char* labelsTypeIII[] = {"FX12", "FX34", "FY14", "FY23", "FZ1", "FZ2", "FZ3", "FZ4"};
+        // FP type II start as the initial CAL format is composed of this type of force platform
+        // The scale adataption is realized in the next lines.
+        this->ExtractForcePlatformChannel(fpChan, output, labelsTypeII, sizeof(labelsTypeII) / sizeof(char*));
+        this->ExtractForcePlatformChannel(fpChan, output, "FP", labelsTypeII, sizeof(labelsTypeII) / sizeof(char*));
+        //this->ExtractForcePlatformChannel(fpChan, output, labelsTypeI, sizeof(labelsTypeI) / sizeof(char*));
+        //this->ExtractForcePlatformChannel(fpChan, output, "FP", labelsTypeI, sizeof(labelsTypeI) / sizeof(char*));
+        //this->ExtractForcePlatformChannel(fpChan, output, "FP", labelsTypeIII, sizeof(labelsTypeIII) / sizeof(char*));
+        
+        if (fpChan.size() != 0)
+        {  
+          // Create the metadata BTK_PARTIAL_FP_CHAN
+          btk::MetaData::Pointer partial = btk::MetaData::New("BTK_PARTIAL_FP_CHAN");
+          output->GetMetaData()->AppendChild(partial);
+          // - BTK_PARTIAL_FP_CHAN:CHANNEL
+          int numFp = fpChan.size();
+          int numMaxChannel = 0;
+          for (std::vector< std::vector<int16_t> >::const_iterator it = fpChan.begin() ; it != fpChan.end() ; ++it)
+          {
+            if (numMaxChannel < it->size())
+              numMaxChannel = it->size();
+          }
+          std::vector<int16_t> channel(numFp * numMaxChannel, 65535);
+          for (int i = 0 ; i < numFp ; ++i)
+          {
+            for (int j = 0 ; j < fpChan[i].size() ; ++j)
+              channel[i * numMaxChannel + j] = fpChan[i][j];
+          }
+          std::vector<uint8_t> dims(2, 0); dims[0] = numMaxChannel; dims[1] = numFp;
+          partial->AppendChild(btk::MetaData::New("CHANNEL", dims, channel));
+        }
+        // Extract values
         std::string buf;
         double val = 0.0;
         for(int i = 0 ; i < numberOfFrames ; ++i)
@@ -507,5 +550,83 @@ namespace btk
         info.push_back(buf);
       }
     }
+  };
+  
+  void ANCFileIO::ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const char** labels, int num) const
+  {
+    if ((fpChan.size() - output->GetAnalogNumber()) < num)
+      return;
+    std::vector<std::string> labels2(num, "");
+    std::string suffix = "";
+    // Looking for label with suffix "",0,1,2,3,4,5
+    for (int i = 0 ; i < 6 ; ++i)
+    {
+      for (int j = 0 ; j < num ; ++j)
+        labels2[j] = std::string(labels[j]) + suffix;
+      this->ExtractForcePlatformChannel(fpChan, output, labels2);
+      suffix = ToString(i);
+    }
+    // Looking for label with index 0,1,2,3,4,5 after the first letter.
+    for (int i = 0 ; i < 6 ; ++i)
+    {
+      suffix = ToString(i);
+      for (int j = 0 ; j < num ; ++j)
+      {
+        labels2[j] = std::string(labels[j]);
+        labels2[j].insert(1, suffix);
+      }
+      this->ExtractForcePlatformChannel(fpChan, output, labels2);
+    }
+  };
+  
+  void ANCFileIO::ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::string& prefix, const char** labels, int num) const
+  {
+    if ((fpChan.size() - output->GetAnalogNumber()) < 6)
+      return;
+    std::vector<std::string> labels2(num, "");
+    std::string suffix = "";
+    // Looking for label with prefix and a possible index between 0 and 5 (included).
+    for (int i = 0 ; i < 6 ; ++i)
+    {
+      for (int j = 0 ; j < num ; ++j)
+        labels2[j] =  prefix + suffix + std::string(labels[j]);
+      this->ExtractForcePlatformChannel(fpChan, output, labels2);
+      suffix = ToString(i);
+    }
+  };
+  
+  // Adapt also the scale of the force platform channels.
+  void ANCFileIO::ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::vector<std::string>& labels) const
+  {
+    std::vector<int16_t> fp;
+    for (int i = 0 ; i < labels.size() ; ++i)
+    {
+      int idx = this->FindAnalogLabeCaselInsensitive(labels[i], output);
+      if (idx <= output->GetAnalogNumber())
+        fp.push_back(idx);
+    }
+    if (fp.size() == labels.size())
+    {
+      fpChan.push_back(fp);
+      for (int i = 0 ; i < fp.size() ; ++i)
+      {
+        Analog::Pointer a = output->GetAnalog(fp[i]-1);
+        a->SetScale(a->GetScale() / 4000.0 / 10.0 * 1000000.0 * -1.0);
+      }
+    }
+  };
+  
+  int ANCFileIO::FindAnalogLabeCaselInsensitive(const std::string& label, Acquisition::Pointer output) const
+  {
+    int idx = 1;
+    for (Acquisition::AnalogConstIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
+    {
+      std::string l = (*it)->GetLabel();
+      std::transform(l.begin(), l.end(), l.begin(), toupper);
+      if (label.compare(l) == 0)
+        break;
+      ++idx;
+    }
+    return idx;
   };
 };

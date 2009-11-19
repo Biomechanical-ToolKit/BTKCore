@@ -72,6 +72,10 @@ namespace btk
   private:
     std::string ExtractKeywordValue(const std::string& line, const std::string& keyword) const;
     void ExtractDataInfo(const std::string& line, const std::string& keyword, std::list<std::string>& info) const;
+    void ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const char** labels, int num) const;
+    void ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::string& prefix, const char** labels, int num) const;
+    void ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::vector<std::string>& labels) const;
+    int FindAnalogLabeCaselInsensitive(const std::string& label, Acquisition::Pointer output) const;
 
     ANCFileIO(const ANCFileIO& ); // Not implemented.
     ANCFileIO& operator=(const ANCFileIO& ); // Not implemented. 
