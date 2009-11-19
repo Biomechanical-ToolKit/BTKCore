@@ -150,27 +150,27 @@ namespace btk
       return;
     
     // Check the frequency
-    if ((in->GetPointFrequency() != 0) && (out->GetPointFrequency() != 0) && (in->GetPointFrequency() != out->GetPointFrequency()))
+    if ((in->GetPointFrequency() != 0) && (out->GetPointFrequency() != 0) && !in->IsEmptyPoint() && !out->IsEmptyPoint() && (in->GetPointFrequency() != out->GetPointFrequency()))
     {
-      btkErrorMacro("Input #" + ToString(idx) + "is not merged: Frame rates are not equal.");
+      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Frame rates are not equal.");
       return;
     }
     // Check the analog resolution
-    if ((in->GetAnalogResolution() != 0) && (out->GetAnalogResolution() != 0) && !out->IsEmptyAnalog() && (in->GetAnalogResolution() != out->GetAnalogResolution()))
+    if ((in->GetAnalogResolution() != 0) && (out->GetAnalogResolution() != 0) && !in->IsEmptyAnalog() && !out->IsEmptyAnalog() && (in->GetAnalogResolution() != out->GetAnalogResolution()))
     {
-      btkErrorMacro("Input #" + ToString(idx) + "is not merged: Analog resolutions are not equal.");
+      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Analog resolutions are not equal.");
       return;
     }
     // Check the number of analog samples per point frame
     if ((in->GetAnalogFrameNumber() != 0) && (out->GetAnalogFrameNumber() != 0) && (in->GetNumberAnalogSamplePerFrame() != out->GetNumberAnalogSamplePerFrame()))
     {
-      btkErrorMacro("Input #" + ToString(idx) + "is not merged: Number of frames for the points are not equal.");
+      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of frames for the points are not equal.");
       return;
     }
     /*
     if ((in->GetAnalogFrameNumber() != 0) && (out->GetAnalogFrameNumber() != 0) && (in->GetAnalogFrameNumber() != out->GetAnalogFrameNumber()))
     {
-      btkErrorMacro("Input #" + ToString(idx) + "is not merged: Number of analog samples per point frame are not equal.");
+      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
       return;
     }
     */
@@ -206,7 +206,7 @@ namespace btk
           || (out->GetPointUnit(Point::Power).compare(input->GetPointUnit(Point::Power)) != 0)
           || (out->GetPointUnit(Point::Scalar).compare(input->GetPointUnit(Point::Scalar)) != 0))
       {
-        btkErrorMacro("Input #" + ToString(idx) + "is not merged: Units don't correspond.");
+        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Units don't correspond.");
         return;
       }
       // Global orientation
@@ -224,7 +224,7 @@ namespace btk
           if ((xScreenIn->ToString(0).compare(xScreenOut->ToString(0)) != 0)
               || (yScreenIn->ToString(0).compare(yScreenOut->ToString(0)) != 0))
           {
-            btkErrorMacro("Input #" + ToString(idx) + "is not merged: Global orientations don't correspond.");
+            btkErrorMacro("Input #" + ToString(idx) + " is not merged: Global orientations don't correspond.");
             return;
           }
         }
@@ -237,8 +237,8 @@ namespace btk
       if (out->IsEmptyAnalog())
         out->SetAnalogResolution(input->GetAnalogResolution());
       // Number of analog samples per point frame
-      if (out->GetAnalogFrameNumber() == 0) 
-        out->Resize(out->GetPointNumber(), out->GetPointFrameNumber(), 0, input->GetNumberAnalogSamplePerFrame());
+      if (out->GetAnalogFrameNumber() == 0 || out->IsEmptyAnalog())
+        out->Resize(out->GetPointNumber(), out->GetPointFrameNumber(), 0, input->GetAnalogFrameNumber() /  out->GetPointFrameNumber());
       
       // Merge or concat?
       bool mergeData = false;
@@ -592,9 +592,10 @@ namespace btk
           {
             (*itConfig)->AppendChild((*itChan)->GetChild("CHANNEL"));
             this->UpdateForcePlatformMetaData(out, *itConfig);
-            if ((*itConfig)->GetLabel().compare("FORCE_PLATFORM") != 0)
-              out->RemoveChild((*itConfig)->GetLabel());
-            out->RemoveChild((*itChan)->GetLabel());
+            if ((*itConfig)->GetLabel().compare("FORCE_PLATFORM") == 0)
+              out->RemoveChild((*itChan)->GetLabel());
+            //  out->RemoveChild((*itConfig)->GetLabel());
+            //out->RemoveChild((*itChan)->GetLabel());
             fpChanList.erase(itChan);
             break;
           }
@@ -619,10 +620,11 @@ namespace btk
     }
     if (this->CheckForcePlatform(forcePlatform))
     {
-      if ((fpIt == out->End()) || (*fpIt)->GetLabel().compare("FORCE_PLATFORM") != 0)
+      if ((fpIt == out->End()) || ((*fpIt)->GetLabel().compare("FORCE_PLATFORM") != 0))
       {
         forcePlatform->SetLabel("FORCE_PLATFORM");
-        out->AppendChild(forcePlatform);
+        if (out->FindChild("FORCE_PLATFORM") == out->End()) // Come from a partial configuration?
+          out->AppendChild(forcePlatform);
       }
       else
       {

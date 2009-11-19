@@ -3,6 +3,8 @@
 
 #include <btkMergeAcquisitionFilter.h>
 #include <btkAcquisitionFileReader.h>
+#include <btkForcePlatformsExtractor.h>
+#include <btkGroundReactionWrenchFilter.h>
 #include <btkConvert.h>
 
 CXXTEST_SUITE(MergeAcquisitionFilterTest)
@@ -390,6 +392,138 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
       TS_ASSERT_DELTA(calMatrix->ToFloat(i + 36), calMatrix2Val.at(i), 1e-5);
     }
   };
+  
+  CXXTEST_TEST(ThreeFiles_Concat_TRC_and_ANC_and_CAL)
+  {
+    btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
+    trcReader->SetFilename(TRCFilePathIN + "Gait.trc");
+    btk::AcquisitionFileReader::Pointer ancReader = btk::AcquisitionFileReader::New();
+    ancReader->SetFilename(ANCFilePathIN + "Gait.anc");
+    btk::AcquisitionFileReader::Pointer calReader = btk::AcquisitionFileReader::New();
+    calReader->SetFilename(CALForcePlateFilePathIN + "Forcepla.cal");
+    
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, trcReader->GetOutput());
+    merger->SetInput(1, ancReader->GetOutput());
+    merger->SetInput(2, calReader->GetOutput());
+    merger->Update();
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), 100.0);
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), 1000.0);
+    TS_ASSERT_EQUALS(output->GetPointNumber(), 33);
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), 28);
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 487);
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), 4870);
+    TS_ASSERT_EQUALS(output->GetEventNumber(), 0);
+    
+    btk::MetaData::Pointer md = output->GetMetaData();
+    TS_ASSERT_EQUALS(md->GetChildNumber(), 2); // FORCE_PLATFORM & ANALOG
+    btk::MetaData::Pointer fp = md->GetChild("FORCE_PLATFORM");
+    int used = fp->GetChild("USED")->GetInfo()->ToInt(0);
+    TS_ASSERT_EQUALS(used, 2);
+    btk::MetaDataInfo::Pointer calMatrix = fp->GetChild("CAL_MATRIX")->GetInfo();
+    TS_ASSERT_EQUALS(calMatrix->GetDimensions()[2], used);
+    TS_ASSERT_EQUALS(calMatrix->GetValues().size(), 72);
+  };
+  
+  CXXTEST_TEST(C3D_vs_ThreeFiles_Concat_TRC_and_ANC_and_CAL)
+  {
+    // Merge
+    btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
+    trcReader->SetFilename(TRCFilePathIN + "Gait.trc");
+    btk::AcquisitionFileReader::Pointer ancReader = btk::AcquisitionFileReader::New();
+    ancReader->SetFilename(ANCFilePathIN + "Gait.anc");
+    btk::AcquisitionFileReader::Pointer calReader = btk::AcquisitionFileReader::New();
+    calReader->SetFilename(CALForcePlateFilePathIN + "Forcepla.cal");
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, trcReader->GetOutput());
+    merger->SetInput(1, ancReader->GetOutput());
+    merger->SetInput(2, calReader->GetOutput());
+    merger->Update();
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    // C3D
+    btk::AcquisitionFileReader::Pointer c3dReader = btk::AcquisitionFileReader::New();
+    c3dReader->SetFilename(C3DFilePathIN + "others/Gait.c3d");
+    btk::Acquisition::Pointer input = c3dReader->GetOutput();
+    input->Update();
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), input->GetPointFrequency());
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), input->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(output->GetPointNumber(), input->GetPointNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), input->GetAnalogNumber());
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), input->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), input->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(output->GetEventNumber(), input->GetEventNumber());
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      for (int j = 0 ; j < output->GetPointNumber() ; ++j)
+      {
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues()(i,0), input->GetPoint(j)->GetValues()(i,0), 1e-4);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues()(i,1), input->GetPoint(j)->GetValues()(i,1), 1e-4);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues()(i,2), input->GetPoint(j)->GetValues()(i,2), 1e-4);
+      }
+      TS_ASSERT_DELTA(output->GetAnalog(0)->GetValues()(i), input->GetAnalog(0)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(1)->GetValues()(i), input->GetAnalog(1)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(2)->GetValues()(i), input->GetAnalog(2)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(3)->GetValues()(i), input->GetAnalog(3)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(4)->GetValues()(i), input->GetAnalog(4)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(5)->GetValues()(i), input->GetAnalog(5)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(6)->GetValues()(i), input->GetAnalog(6)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(7)->GetValues()(i), input->GetAnalog(7)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(8)->GetValues()(i), input->GetAnalog(8)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(9)->GetValues()(i), input->GetAnalog(9)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(10)->GetValues()(i), input->GetAnalog(10)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(11)->GetValues()(i), input->GetAnalog(11)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(12)->GetValues()(i), input->GetAnalog(12)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(13)->GetValues()(i), input->GetAnalog(13)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(14)->GetValues()(i), input->GetAnalog(14)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(15)->GetValues()(i), input->GetAnalog(15)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(16)->GetValues()(i), input->GetAnalog(16)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(17)->GetValues()(i), input->GetAnalog(17)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(18)->GetValues()(i), input->GetAnalog(18)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(19)->GetValues()(i), input->GetAnalog(19)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(20)->GetValues()(i), input->GetAnalog(20)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(21)->GetValues()(i), input->GetAnalog(21)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(22)->GetValues()(i), input->GetAnalog(22)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(23)->GetValues()(i), input->GetAnalog(23)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(24)->GetValues()(i), input->GetAnalog(24)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(25)->GetValues()(i), input->GetAnalog(25)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(26)->GetValues()(i), input->GetAnalog(26)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(27)->GetValues()(i), input->GetAnalog(27)->GetValues()(i), 1e-3);
+    }
+    // GRWs
+    btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
+    btk::GroundReactionWrenchFilter::Pointer grwf = btk::GroundReactionWrenchFilter::New();
+    grwf->SetThresholdValue(5.0);
+    pfe->SetInput(output);
+    grwf->SetInput(pfe->GetOutput());
+    grwf->Update();
+    btk::WrenchCollection::Pointer grwOutput = grwf->GetOutput()->Clone();
+    pfe->SetInput(input);
+    grwf->Update();
+    btk::WrenchCollection::Pointer grwInput = grwf->GetOutput();
+    TS_ASSERT_EQUALS(grwOutput->GetItemNumber(), 2);
+    TS_ASSERT_EQUALS(grwInput->GetItemNumber(), 2);
+
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      for (int j = 0 ; j < grwOutput->GetItemNumber() ; ++j)
+      {
+        // Position
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,0), grwInput->GetItem(j)->GetPosition()->GetValues()(i,0), 1e-2);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,1), grwInput->GetItem(j)->GetPosition()->GetValues()(i,1), 1e-2);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,2), grwInput->GetItem(j)->GetPosition()->GetValues()(i,2), 1e-2);
+        // Force
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,0), grwInput->GetItem(j)->GetForce()->GetValues()(i,0), 1e-2);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,1), grwInput->GetItem(j)->GetForce()->GetValues()(i,1), 1e-2);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,2), grwInput->GetItem(j)->GetForce()->GetValues()(i,2), 1e-2);
+        // Moment
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,0), grwInput->GetItem(j)->GetMoment()->GetValues()(i,0), 1e-0);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,1), grwInput->GetItem(j)->GetMoment()->GetValues()(i,1), 1e-0);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,2), grwInput->GetItem(j)->GetMoment()->GetValues()(i,2), 1e-0);
+      }
+    }
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(MergeAcquisitionFilterTest)
@@ -404,4 +538,6 @@ CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Concat)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Concat2)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Merge)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoFiles_Concat_CalMatrix)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_TRC_and_ANC_and_CAL)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_ThreeFiles_Concat_TRC_and_ANC_and_CAL)
 #endif
