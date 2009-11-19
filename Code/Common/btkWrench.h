@@ -58,11 +58,13 @@ namespace btk
     Point::Pointer GetMoment() const {return this->m_Moment;};
     BTK_COMMON_EXPORT void SetMoment(Point::Pointer moment);
     
+    Pointer Clone() const {return Pointer(new Wrench(*this));};
+    
   protected:
     BTK_COMMON_EXPORT Wrench(const std::string& label, int frameNumber);
     
   private:
-    Wrench(const Wrench& ); // Not implemented.
+    BTK_COMMON_EXPORT Wrench(const Wrench& toCopy);
     Wrench& operator=(const Wrench& ); // Not implemented.
 
     Point::Pointer m_Position;

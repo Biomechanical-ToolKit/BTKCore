@@ -117,6 +117,11 @@ namespace btk
     this->m_Position->SetType(Point::Moment);
     this->Modified();
   };
+  
+  /**
+   * @fn Pointer Wrench::Clone() const
+   * Returns a deep copy of the object as a smart pointer.
+   */
 
   /**
    * Constructor.
@@ -132,6 +137,14 @@ namespace btk
     this->m_Position = Point::New(label, frameNumber);
     this->m_Force = Point::New(label + ".F", frameNumber, Point::Force);
     this->m_Moment = Point::New(label + ".M", frameNumber, Point::Moment);
+  };
+  
+  Wrench::Wrench(const Wrench& toCopy)
+  : DataObject()
+  {
+    this->m_Position = toCopy.m_Position->Clone();
+    this->m_Force = toCopy.m_Force->Clone();
+    this->m_Moment = toCopy.m_Moment->Clone();
   };
 
 }
