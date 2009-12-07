@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkAppendMetaData" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkAppendMetaData</refname>
+    <refpurpose>Insert or set a metadata into the acquisition</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkAppendMetaData(h, label, [sublabel, [..., [info]]])
+md = btkAppendMetaData(h, label, [sublabel, [..., [info]]])</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>label</term>
+        <listitem><para>A non empty string to represent the label of the metadata.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>sublabel</term>
+        <listitem><para>A non empty string to represent the label of the sub metadata.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>...</term>
+        <listitem><para>Other label to increase the level of sub metadata.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>info</term>
+        <listitem>
+          <para>A structure containing additional information.</para>
+          <variablelist>
+            <varlistentry>
+              <term>format</term>
+              <listitem><para>This field contains a string (Char, Byte, Integer or Real) with the format of the information.</para></listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>values</term>
+              <listitem><para>This field contains an array of numerical values or a cell of strings. The array is used for information with the format Byte, Integer or Real. The cell of strings is only use for information with the format Char.</para></listitem>
+            </varlistentry>
+          </variablelist>
+        </listitem>
+        <listitem><para>This stucture should be constructed with the use of the function <link linkend="btkMetaDataInfo">btkMetaDataInfo</link>.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para> Insert or set a metatada into the acquisition. The number of sub-level is infinite. However, the main common use of the metadata is to use two levels. This use was introduced in the C3D format.</para>
+    <para>The format of the output <literal>md</literal> is a structure presented in details in the function <link linkend="btkGetMetaData">btkGetMetaData</link>.</para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">btkAppendMetaData(h, 'POINT')
+md = btkAppendMetaData(h, 'POINT', 'LABEL', btkMetaDataInfo('Char', {'RKNE', 'LKNE', 'SACR'}))</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkGetMetaData">btkGetMetaData</link>
+      </member>
+      <member>
+        <link linkend="btkMetaDataInfo">btkMetaDataInfo</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

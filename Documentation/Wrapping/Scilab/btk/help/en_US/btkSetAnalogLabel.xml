@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkSetAnalogLabel" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkSetAnalogLabel</refname>
+    <refpurpose>Modify the label of the selected analog channel</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkSetAnalogLabel(h, index, newlabel)
+analogs = btkSetAnalogLabel(h, index, newlabel)
+[analogs, analogsInfo] = btkSetAnalogLabel(h, index, newlabel)
+btkSetAnalogLabel(h, label, newlabel)
+analogs = btkSetAnalogLabel(h, label, newlabel)
+[analogs, analogsInfo] = btkSetAnalogLabel(h, label, newlabel)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>index</term>
+        <listitem><para>The index of the analog channel (start from the value 1)</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>label</term>
+        <listitem><para>A non empty string to represent the label of the analog channel.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>newlabel</term>
+        <listitem><para>A non empty string to represent the new label of the selected analog channel.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Modify the label of the selected analog channel.</para>
+    <para>The format of the outputs <literal>analogs</literal> and <literal>analogsInfo</literal> are structures presented in details in the function <link linkend="btkGetAnalogs">btkGetAnalogs</link>.</para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">btkSetAnalogLabel(h, 1, 'FP1FX1')</programlisting>
+    <programlisting role="example">btkSetAnalogLabel(h, 'FX1', 'FP1FX1')</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkSetAnalogDescription">btkSetAnalogDescription</link>
+      </member>
+      <member>
+        <link linkend="btkSetAnalogGain">btkSetAnalogGain</link>
+      </member>
+      <member>
+        <link linkend="btkSetAnalogOffset">btkSetAnalogOffset</link>
+      </member>
+      <member>
+        <link linkend="btkSetAnalogScale">btkSetAnalogScale</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

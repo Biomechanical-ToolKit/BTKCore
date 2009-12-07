@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkSetEventDescription" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkSetEventDescription</refname>
+    <refpurpose>Modify the description of the selected event</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkSetEventDescription(h, label, desc)
+events = btkSetEventDescription(h, label, desc)
+[events, eventsInfo] = btkSetEventDescription(h, label, desc)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>label</term>
+        <listitem><para>A non empty string to represent the label of event.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>desc</term>
+        <listitem><para>A string to represent the new description.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Modify the description of the selected event.</para>
+    <para>The format of the outputs <literal>events</literal> and <literal>eventsInfo</literal> are structures presented in details in the function <link linkend="btkGetEvents">btkGetEvents</link>.</para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">btkSetEventDescription(h, 'ToeOff', 'Starting the swing phase')</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkSetEventId">btkSetEventId</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

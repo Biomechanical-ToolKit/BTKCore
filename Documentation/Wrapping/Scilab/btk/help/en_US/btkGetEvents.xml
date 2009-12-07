@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkGetEvents" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkGetEvents</refname>
+    <refpurpose>Extract events from a biomechanical acquisition</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkGetEvents(h)
+events = btkGetEvents(h)
+[events, eventsInfo] = btkGetEvents(h)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Returns a structure of events.</para>
+    <para>Each fieldname in the output argument <literal>events</literal> corresponds to an event's label. The value of each field corresponds to the time(s) where this event occurred. If the events represent actions realized by more than one subject, each event starts by the name of the corresponding subject. Time of each event are reordered. Events are also reordered based on their first time.</para>
+    <para>The output argument <literal>eventsInfo</literal> is composed of the following fieldname:
+    <itemizedlist>
+      <listitem><literal>subjects</literal>: contains the name of the subject related to each event ;</listitem>
+      <listitem><literal>units</literal>: contains the unit of each event.</listitem>
+    </itemizedlist>
+    </para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">[events, events] = btkGetEvents(h)</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkClearEvents">btkClearEvents</link>
+      </member>
+      <member>
+        <link linkend="btkRemoveEvent">btkRemoveEvent</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

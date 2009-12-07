@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkSetFrameNumber" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkSetFrameNumber</refname>
+    <refpurpose>Set points and analogs frames number</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkSetFrameNumber(h, num)
+btkSetFrameNumber(h, num, r)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>num</term>
+        <listitem><para>Single integer value.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>r</term>
+        <listitem><para>Single integer value representing the number of analog samples per point frame.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Resize the frame number for the points and the analog channels. If the third input argument is not given, the analogs' frames number is determined by multiplying the new number of points' frame by the actual number of analog samples per point frame. In the other case, the new number of analogs' frame is calculated by multiplying <literal>num</literal> by <literal>r</literal>. The value <literal>r</literal> will also be used to set the new number of analog samples per point frame.</para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">btkSetFrameNumber(h, 511)
+btkSetFrameNumber(h, 511, 2)</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkGetAnalogFrameNumber">btkGetAnalogFrameNumber</link>
+      </member>
+      <member>
+        <link linkend="btkGetPointFrameNumber">btkGetPointFrameNumber</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkMergeAcquisitions" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkMergeAcquisitions</refname>
+    <refpurpose>Merge acquisitions together</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>
+h = btkMergeAcquisitions(h1, h2, ...)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h1</term>
+        <listitem><para>A handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>h2</term>
+        <listitem><para>Another handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>...</term>
+        <listitem><para>Others handles used to represent acquisitions.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Merge or contatenate the acquisitions given in input. The difference between the merging or the concatenating depends of the acquisitions' informations.</para>
+    <para>If the acquisitions are exactly the same (same label for points and analog channels) and the first frame of the n+1th acquistion corresponds to the last frame of the nth acquistion, then the acquisitions are merged, otherwise, the data are concatenated. Merged acquisitions means that the output will have the same number of points, analog channels, events than each output but the number of frames corresponds to the sum of the input's frame number.</para>
+    <para>Rules to merge/concatenate acquisitions are:
+      <itemizedlist>
+        <listitem>Must have the same acquisition frequency (or 0) if there are points ;</listitem>
+        <listitem>Must have the same number of analog samples per point frame (if there are points and analog channels) ;</listitem>
+        <listitem>Must have the same analog resolution if there are analog channels ;</listitem>
+        <listitem>Must have the same units ;</listitem>
+        <listitem>Must have the same global frame orientation (check POINT:X_SCREEN and POINT:Y_SCREEN) ;</listitem>
+        <listitem>The first input which has a non-zero acquisition frequency is used ;</listitem>
+        <listitem>The first input which has analog channels is used to set the analog resolution of the output.</listitem>
+      </itemizedlist>
+    </para>
+      
+    <para>Actions during the merging/concatenation:
+      <itemizedlist>
+        <listitem>If the first frame of the nth acquisition correspond to the last frame + 1 of the nth-1 acquisition, AND the points / analog channels correspond exactly, then acquisitions are truncated.</listitem>
+        <listitem>If the first frame of two inputs are not the same, the final acquisition is adapted to contain the number of frames plus the difference between the first frame of each input.</listitem>
+        <listitem>If points have the same label (and the first frames doesn't correspond), then, the second and more are incremented (i.e. from Heel to Heel_2).</listitem>
+        <listitem>Idem for the analog channels.</listitem>
+        <listitem>Events with the same label, context, id and time are merged.</listitem>
+        <listitem>Metadata (if number of inputs greater than 1):
+          <itemizedlist>
+            <listitem> Only metdata defined by the user are inserted (i.e. POINT, ANALOG, EVENTS, etc. are not inserted as they are only used in a C3D file.).</listitem>
+            
+            <listitem>If metadata are equivalent or equal, then they are merged, else the metadata is appended with a suffix (i.e. from STATIC_CALIBRATION:USED to STATIC_CALIBRATION:USED_2)</listitem>
+          </itemizedlist>
+        </listitem>
+      </itemizedlist>
+    </para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">info = h3 btkMergeAcquisitions(h1, h2)</programlisting>
+  </refsection>
+</refentry>

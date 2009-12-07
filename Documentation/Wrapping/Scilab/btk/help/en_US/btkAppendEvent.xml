@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkAppendEvent" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkAppendEvent</refname>
+    <refpurpose>Insert or set an event in the acquisition</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkAppendEvent(h, label, time, context, subject, [description, [id]])
+events = btkAppendEvent(h, label, time, context, subject, [description, [id]])
+[events, eventsInfo] = btkAppendEvent(h, label, time, context, subject, [description, [id]])</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>label</term>
+        <listitem><para>A non empty string to represent the label of the event.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>time</term>
+        <listitem><para>A real representing the time in seconds of the event.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>context</term>
+        <listitem><para>A non empty string to represent the context of the event.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>subject</term>
+        <listitem><para>An non empty string containing the subject's name.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>description</term>
+        <listitem><para>An optional empty string containing a description of the event.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>id</term>
+        <listitem><para>A real to represent the id of the event.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Append an event to the acquisition. Even if there is no rule for the context, these 3 contexts are oftenly used: General, Left, Right. Moreover, as an event is defined by also a subject, description and id and they are not provided by this function, they are automatically set. If the metadata exists, the first value in the metadata SUBJECTS:NAMES is used to set event's subject. The description and id members are set with informations found in the first event with the same label.</para>
+    <para>The format of the outputs <literal>events</literal> and <literal>eventsInfo</literal> are structures presented in details in the function <link linkend="btkGetEvents">btkGetEvents</link>.</para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">btkAppendEvent(h, 'ToeOff', 'Left', 1.5)
+events = btkAppendEvent(h, 'ToeOff', 'Left', 1.5)</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkGetEvents">btkGetEvents</link>
+      </member>
+      <member>
+        <link linkend="btkRemoveEvent">btkRemoveEvent</link>
+      </member>
+      <member>
+        <link linkend="btkSetEventDescription">btkSetEventDescription</link>
+      </member>
+      <member>
+        <link linkend="btkSetEventId">btkSetEventId</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

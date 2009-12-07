@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkRemoveEvent" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkRemoveEvent</refname>
+    <refpurpose>Delete events corresponding to the given criterias</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkRemoveEvent(h, [option, value, [...]])
+events = btkRemoveEvent(h [option, value, [...]])
+[events, eventsInfo] = btkRemoveEvent(h [option, value, [...]])
+</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>option</term>
+        <listitem><para>Option's label used to refine the events to remove.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>value</term>
+        <listitem><para>Option's value used to refine the events to remove.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>...</term>
+        <listitem><para>Others duo of option/value.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Remove only event(s) described by the options. There are four options which can combined to refine the request:
+<itemizedlist>
+<listitem><literal>Time</literal> followed by a single real value delete all events with this time +/- 0.00005 seconds</listitem>
+<listitem><literal>Label</literal> followed by a string delete all events which have this label ;</listitem>
+<listitem><literal>Context</literal> followed by a string delete all events which contains this context's name ;</listitem>
+<listitem><literal>Subject</literal> followed by a string delete all events which contains this subject's name.</listitem>
+</itemizedlist>
+The combination of several options only delete events which match all criterias. If no option are given, all the events are removed. </para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">
+// Clear all events
+btkRemoveEvent(h)
+// Clear only event corresponding to the left toe-off
+analysis = btkRemoveAnalysisParameter(h, 'Context', 'Left', 'Label', 'ToeOff')</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkClearEvents">btkClearEvents</link>
+      </member>
+      <member>
+        <link linkend="btkGetEvents">btkGetEvents</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

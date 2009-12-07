@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkRemovePoint" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkRemovePoint</refname>
+    <refpurpose>Delete the point with the given index or label</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkRemovePoint(h, index)
+points = btkRemovePoint(h, index)
+[points, pointsInfo] = btkRemovePoint(h, index)
+btkRemovePoint(h, label)
+points = btkRemovePoint(h, label)
+[points, pointsInfo] = btkRemovePoint(h, label)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>index</term>
+        <listitem><para>The index of the point to remove (start from the value 1)</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>label</term>
+        <listitem><para>A non empty string to represent the label of the point.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Delete the point with the given index or label.</para>
+    <para>The format of the outputs <literal>points</literal> and <literal>pointsInfo</literal> are structures presented in details in the function <link linkend="btkGetPoints">btkGetPoints</link>.</para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">btkRemovePoint(h, 'LKNE')
+points = btkRemovePoint(h, 14)</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkAppendPoint">btkAppendPoint</link>
+      </member>
+      <member>
+        <link linkend="btkGetPoints">btkGetPoints</link>
+      </member>
+      <member>
+        <link linkend="btkSetPoint">btkSetPoint</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

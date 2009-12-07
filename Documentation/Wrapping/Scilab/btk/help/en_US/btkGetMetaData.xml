@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkGetMetaData" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkGetMetaData</refname>
+    <refpurpose>Extract acquisition's metadata</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>
+md = btkGetMetaData(h, label, ...)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>label</term>
+        <listitem><para>A string containing the label of the metadata to extract</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>...</term>
+        <listitem><para>Other labels representing the sub metadata to extract.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Returns a structure containing the desired metadata. The use of this function with only the acquisition handle extrac the whole metadata. If the desired label doesn't exist in the metadata, then an error is thown.</para>
+    <para>The output argument <literal>md</literal> is a structure composed of the following fields:
+    <itemizedlist>
+      <listitem><literal>info</literal>: structure of metadata's informations (if present) or the value 0.
+        <itemizedlist>
+          <listitem><literal>format</literal>: Only the following formats are used: Char, Byte, Integer, Real.</listitem>
+          <listitem><literal>values</literal>:  Depending of the format, data are scalar, matrix or array. Metadata with format Char are stored in cells.</listitem>
+        </itemizedlist>
+      </listitem>
+      <listitem><literal>children</literal>: Contains children of this metadata or 0 if there is no child.</listitem>
+      <listitem><literal>description</literal>: Description of the metadata.</listitem>
+    </itemizedlist>
+    </para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">md = btkGetMetaData(h)
+pointMd = btkGetMetaData(h, 'POINT')</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkAppendMetaData">btkAppendMetaData</link>
+      </member>
+      <member>
+        <link linkend="btkMetaDataInfo">btkMetaDataInfo</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

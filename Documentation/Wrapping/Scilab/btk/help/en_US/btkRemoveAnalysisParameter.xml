@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkRemoveAnalysisParameter" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkRemoveAnalysisParameter</refname>
+    <refpurpose>Erase in the metadata ANALYSIS the parameter the given index or context</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkRemoveAnalysisParameter(h, index)
+analysis = btkRemoveAnalysisParameter(h, index)
+[analysis, analysisInfo] = btkRemoveAnalysisParameter(h, index)
+btkRemoveAnalysisParameter(h, context, name)
+analysis = btkRemoveAnalysisParameter(h, context, name)
+[analysis, analysisInfo] = btkRemoveAnalysisParameter(h, context, name)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>index</term>
+        <listitem><para>Index of the parameter.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>context</term>
+        <listitem><para>A non empty string to represent the context of the parameter.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>name</term>
+        <listitem><para>A non empty string to represent the name of the parameter.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Erase the parameter at the given <literal>index</literal>. The parameter to erase can also be selected by its <literal>context</literal> and <literal>name</literal>. The format of the outputs <literal>analysis</literal> and <literal>analysisInfo</literal> are structures presented in details in the function <link linkend="btkGetAnalysis">btkGetAnalysis</link>.</para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">btkRemoveAnalysisParameter(h, 1)
+analysis = btkRemoveAnalysisParameter(h, 'Left', 'LowerLimbLength')</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkClearAnalysis">btkClearAnalysis</link>
+      </member>
+      <member>
+        <link linkend="btkGetAnalysis">btkGetAnalysis</link>
+      </member>
+      <member>
+        <link linkend="btkAppendAnalysisParameter">btkAppendAnalysisParameter</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

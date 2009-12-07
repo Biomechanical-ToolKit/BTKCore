@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkNewAcquisition" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkNewAcquisition</refname>
+    <refpurpose>Create a new and initialized acquisition.</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>
+h = btkNewAcquisition(pn, fn)
+h = btkNewAcquisition(pn, fn, an)
+h = btkNewAcquisition(pn, fn, an, r)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>pn</term>
+        <listitem><para>Number of points in the new acquisition</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>fn</term>
+        <listitem><para>Number of frames for the points in the new acquisition</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>an</term>
+        <listitem><para>Number of analog channels in the new acquisition (default: 0)</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>r</term>
+        <listitem><para>Ratio between the number of analog samples and the number of point samples. (default: 1)</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Return the handle <literal>h</literal> of an initialized biomechanical acquisition. The points created are tagged with the type 'Marker'. To change the type of theses points, use <link linkend="btkSetPointType">btkSetPointType</link> or <link linkend="btkSetPoint">btkSetPoint</link>.</para>
+    <para>Other parameters of the acquisition are set to:
+      <itemizedlist>
+        <listitem>First frame equals to 1: use <link linkend="btkSetFirstFrame">btkSetFirstFrame</link> to modify it ;</listitem>
+        <listitem>Points' frequency equals to 0: use <link linkend="btkSetFrequency">btkSetFrequency</link> to modify it ;</listitem>
+        <listitem>Points' units set to "mm", "deg", "N", "Nmm", "W", "" for markers, angles, forces, moments, powers and scalars respectively. Use <link linkend="btkSetPointUnit">btkSetPointUnit</link> to modify them ;</listitem>
+        <listitem>Analogs' frequency equals to 0. Updated when the points' frequency is ;</listitem>
+        <listitem>Analog channel resolution sets to 12 bits: use <link linkend="btkSetAnalogResolution">btkSetAnalogResolution</link> to modify it.</listitem>
+      </itemizedlist>
+    </para>
+    <para>This handle is returned as a 32-bit integer and can be only used with the btk* functions.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">// 10 points, 1000 frames and no analog channels.
+h = btkNewAcquisition(10, 1000)
+// 10 points, 1000 frames and 12 analog channels with the same number of frames.
+h = btkNewAcquisition(10, 1000, 12)
+// 10 points, 1000 frames and 12 analog channels with a number of frame equals to 2 times the number of frames for the points.
+h = btkNewAcquisition(10, 1000, 12, 2)</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkReadAcquisition">btkReadAcquisition</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

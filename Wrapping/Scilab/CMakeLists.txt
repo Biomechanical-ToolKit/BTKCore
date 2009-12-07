@@ -9,9 +9,6 @@ FILE(GLOB SCILAB_MEX_SRCS "${BTK_SOURCE_DIR}/Wrapping/Matlab/*.cpp")
 # And the the internal functions
 FILE(GLOB SCILAB_CXX_SRCS "${BTK_SOURCE_DIR}/Wrapping/Matlab/*.cxx")
 
-#SET(SCILAB_MEX_SRCS "${BTK_SOURCE_DIR}/Wrapping/Matlab/btkAppendMetaData.cpp")
-#SET(SCILAB_CXX_SRCS "${BTK_SOURCE_DIR}/Wrapping/Matlab/btkMXEvent.cxx")
-
 # Generate the gateway file: libBTK.c
 SET(LIBBTKC_PATH "${CMAKE_BINARY_DIR}/Wrapping/Scilab/lib${SCILAB_TOOLBOX_NAME}.c")
 FILE(WRITE ${LIBBTKC_PATH} "\#include <mex.h>\nstatic int direct_gateway(char *fname,void F(void)) { F();return 0;};\n")
@@ -55,8 +52,8 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # Generate the associated Loader.sce
-SET(GATEWAY_LOADER "${CMAKE_BINARY_DIR}/bin/loader.sce")
-FILE(WRITE ${GATEWAY_LOADER} "lib${SCILAB_TOOLBOX_NAME}_path = get_file_path('loader.sce');\nlist_functions = [\n")
+SET(GATEWAY_LOADER "${CMAKE_BINARY_DIR}/bin/loader_mex_gateway.sce")
+FILE(WRITE ${GATEWAY_LOADER} "lib${SCILAB_TOOLBOX_NAME}_path = get_file_path('loader_mex_gateway.sce');\nlist_functions = [\n")
 FOREACH(FUNCTION ${SCILAB_MEX_SRCS})
   GET_FILENAME_COMPONENT(FUNC ${FUNCTION} NAME_WE)
   FILE(APPEND ${GATEWAY_LOADER} "  '${FUNC}';\n")
@@ -65,7 +62,26 @@ FILE(APPEND ${GATEWAY_LOADER} "];\naddinter(lib${SCILAB_TOOLBOX_NAME}_path+'/lib
 
 ENDIF(SCILAB_ROOT)
 
-IF(NOT BTK_INSTALL_NO_DEVELOPMENT)
-  
-ENDIF(NOT BTK_INSTALL_NO_DEVELOPMENT)
+IF(NOT BTK_INSTALL_NO_LIBRARIES)
+  INSTALL(DIRECTORY ${BTK_SOURCE_DIR}/Documentation/Wrapping/Scilab/btk
+          DESTINATION ${BTK_INSTALL_SHARE_DIR_CM24}/Wrapping/Scilab  
+          COMPONENT Development
+          PATTERN ".svn" EXCLUDE
+          PATTERN ".DS_Store" EXCLUDE)
+
+  INSTALL(FILES ${GATEWAY_LOADER}
+    DESTINATION ${BTK_INSTALL_SHARE_DIR_CM24}/Wrapping/Scilab/btk/sci_gateway
+    COMPONENT Development)
+
+# Because CMake copy btk.lib on windows and is not necessary
+IF(WIN32)
+  INSTALL(TARGETS ${SCILAB_TOOLBOX_NAME}
+    RUNTIME DESTINATION ${BTK_INSTALL_SHARE_DIR_CM24}/Wrapping/Scilab/btk/sci_gateway COMPONENT RuntimeLibraries)
+ELSE(WIN32)
+  INSTALL(TARGETS ${SCILAB_TOOLBOX_NAME}
+    LIBRARY DESTINATION ${BTK_INSTALL_SHARE_DIR_CM24}/Wrapping/Scilab/btk/sci_gateway COMPONENT RuntimeLibraries)
+ENDIF(WIN32)
+
+  INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${SCILAB_BINARY} -f -nwni \"${CMAKE_INSTALL_PREFIX}/${BTK_INSTALL_SHARE_DIR_CM24}/Wrapping/Scilab/btk/builder.sce\")")
+ENDIF(NOT BTK_INSTALL_NO_LIBRARIES)
 

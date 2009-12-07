@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkSetPointDescription" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkSetPointDescription</refname>
+    <refpurpose>Modify the description of the selected point</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkSetPointDescription(h, index, desc)
+points = btkSetPointDescription(h, index, desc)
+[points, pointsInfo] = btkSetPointDescription(h, index, desc)
+btkSetPointDescription(h, label, desc)
+points = btkSetPointDescription(h, label, desc)
+[points, pointsInfo] = btkSetPointDescription(h, label, desc)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>index</term>
+        <listitem><para>The index of the point (start from the value 1).</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>label</term>
+        <listitem><para>A non empty string to represent the label of the point.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>desc</term>
+        <listitem><para>A string to represent the new description of the selected point.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Modify the description of the selected point.</para>
+    <para>The format of the outputs <literal>points</literal> and <literal>pointsInfo</literal> are structures presented in details in the function <link linkend="btkGetPoints">btkGetPoints</link>.</para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">btkSetPointDescription(h, 'RKNE', 'Right knee joint center')</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkSetPointLabel">btkSetPointLabel</link>
+      </member>
+      <member>
+        <link linkend="btkSetPointType">btkSetPointType</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkMetaDataInfo" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkMetaDataInfo</refname>
+    <refpurpose>Create a structure containing the required fields for the informations of a metadata</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>
+info = btkMetaDataInfo(format, values)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>format</term>
+        <listitem><para>A string containing the format of the information (must be on the following string: Char, Byte, Integer or Real).</para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>values</term>
+        <listitem><para>Depending of the format, data are scalar, matrix or array. Data with format Char must be stored in cells.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Create the structure <literal>info</literal> which embed the fields <literal>format</literal> and <literal>values</literal> to simplify the construction of the information used in <link linkend="btkAppendMetaData">btkAppendMetaData</link>.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">info = btkMetaDataInfo('Char', {'LKNE', 'TEST', '1234'})</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkAppendMetaData">btkAppendMetaData</link>
+      </member>
+      <member>
+        <link linkend="btkGetMetaData">btkGetMetaData</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>

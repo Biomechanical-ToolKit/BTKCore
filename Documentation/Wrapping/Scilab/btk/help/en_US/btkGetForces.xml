@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<refentry version="5.0-subset Scilab" xml:id="btkGetForces" xml:lang="en"
+          xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:svg="http://www.w3.org/2000/svg"
+          xmlns:ns3="http://www.w3.org/1999/xhtml"
+          xmlns:mml="http://www.w3.org/1998/Math/MathML"
+          xmlns:db="http://docbook.org/ns/docbook">
+  <info>
+    <pubdate>$LastChangedDate$</pubdate>
+  </info>
+  <refnamediv>
+    <refname>btkGetForces</refname>
+    <refpurpose>Extract forces from a biomechanical acquisition</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <title>Calling Sequence</title>
+    <synopsis>btkGetForces(h)
+forces = btkGetForces(h)
+[forces, forcesInfo] = btkGetForces(h)</synopsis>
+  </refsynopsisdiv>
+  <refsection>
+    <title>Parameters</title>
+    <variablelist>
+      <varlistentry>
+        <term>h</term>
+        <listitem><para>The handle used to represent an acquisition.</para></listitem>
+      </varlistentry>
+    </variablelist>
+  </refsection>
+  <refsection>
+    <title>Description</title>
+    <para>Return a structure of forces.</para>
+    <para>Each fieldname in the output argument <literal>forces</literal> corresponds to a force's label.</para>
+    <para>The output argument <literal>forcesInfo</literal> is composed of the following fieldname:
+    <itemizedlist>
+      <listitem><literal>frequency</literal>: forces' frequency ;</listitem>
+      <listitem><literal>units</literal>: unit of each force.</listitem>
+    </itemizedlist>
+    </para>
+    <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
+  </refsection>
+  <refsection>
+    <title>Examples</title>
+    <programlisting role="example">[forces, forcesInfo] = btkGetForces(h)</programlisting>
+  </refsection>
+  <refsection>
+    <title>See Also</title>
+    <simplelist type="inline">
+      <member>
+        <link linkend="btkGetAnalogs">btkGetAnalogs</link>
+      </member>
+      <member>
+        <link linkend="btkGetAngles">btkGetAngles</link>
+      </member>
+      <member>
+        <link linkend="btkGetMarkers">btkGetMarkers</link>
+      </member>
+      <member>
+        <link linkend="btkGetMoments">btkGetMoments</link>
+      </member>
+      <member>
+        <link linkend="btkGetPoints">btkGetPoints</link>
+      </member>
+      <member>
+        <link linkend="btkGetPowers">btkGetPowers</link>
+      </member>
+      <member>
+        <link linkend="btkGetScalars">btkGetScalars</link>
+      </member>
+    </simplelist>
+  </refsection>
+</refentry>
