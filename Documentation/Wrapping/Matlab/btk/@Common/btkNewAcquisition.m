@@ -1,10 +1,10 @@
 function h = btkNewAcquisition(pn, fn, an, r) %#ok
-%BTKNEWACQUISITION Create an initialized acquisition
+%BTKNEWACQUISITION Create a new and initialized acquisition
 % 
 %  H = BTKNEWACQUISITION(PN, FN) returns the handle H of an initialized 
 %  biomechanical acquisition with PN points and FN frames. There is no analog
 %  channels. The points created are tagged with the type 'Marker'. To change the type
-%  of theses points, use <a href="matlab:help btkSetPointType">btkSetPointType</a> or <a href="matlab:help btkSetPoint">btkSetPoint</a>
+%  of theses points, use <a href="matlab:help btkSetPointType">btkSetPointType</a> or <a href="matlab:help btkSetPoint">btkSetPoint</a>.
 %  Other parameters of the acquisition are set to:
 %  - First frame equals to 1: use <a href="matlab:help btkSetFirstFrame">btkSetFirstFrame</a> to modify it.
 %  - Points' frequency equals to 0: use <a href="matlab:help btkSetFrequency">btkSetFrequency</a> to modify it.
@@ -22,7 +22,7 @@ function h = btkNewAcquisition(pn, fn, an, r) %#ok
 %  are differents. The number of frames for analog channels is set by mutiplying FN by R.
 %  R corresponds to the analog samples number by point frame.
 %
-%  This handle is returned as a 32-bit and can be only used with the btk* functions.
+%  This handle is returned as a 32-bit integer and can be only used with the btk* functions.
 
 %  Author: A. Barré
 %  Copyright 2009- Biomechanical ToolKit (BTK).

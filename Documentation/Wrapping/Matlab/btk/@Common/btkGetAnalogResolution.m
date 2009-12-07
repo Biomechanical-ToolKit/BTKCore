@@ -1,7 +1,7 @@
-function btkGetAnalogResolution(h) %#ok
-%BTKGETANALOGRESOLUTION Returns ADC resolution.
+function ar = btkGetAnalogResolution(h) %#ok
+%BTKGETANALOGRESOLUTION Returns the ADC resolution.
 % 
-%  BTKGETANALOGRESOLUTION(H) returns the resolution of the analog to
+%  AR = BTKGETANALOGRESOLUTION(H) returns the resolution of the analog to
 %  digital converter. The acquisition is represented by the handle H.  
 %  This handle is obtained by the use of a btk* function.
 

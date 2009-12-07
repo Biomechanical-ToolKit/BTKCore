@@ -5,7 +5,7 @@ function btkAppendMetaData(h, label, sublabel, ..., info) %#ok
 %  This metadata has no child, nor information.
 %
 %  BTKAPPENDMETADATA(H, LABEL, SUBLABEL) append a metatada with the label SUBLABEL in
-%  another metadata with the label LABEL.  The metada 'LABEL' will be automaticaly generated
+%  another metadata with the label LABEL.  The metadata 'LABEL' will be automaticaly generated
 %  if it doesn't exist. The metadata 'SUBLABEL' has no child, nor information.
 %  The number of sub-level is infinite. However, the main common use of the metadata is to 
 %  use LABEL as a group and SUBLABEL as a parameter.  So the metadata has 2 levels.  This use was 
@@ -17,7 +17,7 @@ function btkAppendMetaData(h, label, sublabel, ..., info) %#ok
 %   - INFO.VALUES: contains an array of numerical values or a cell of strings.
 %                  - The array is used for information with the format Byte, Integer or Real.
 %                  - The cell of strings is only use for information with the format Char.
-%  The stucture INFO can be construct with the use of the function <a href="matlab:help btkMetaDataInfo">btkMetaDataInfo</a>.  
+%  The stucture INFO should be constructed with the use of the function <a href="matlab:help btkMetaDataInfo">btkMetaDataInfo</a>.  
 %
 %  This function can also returns updated list of metadata.
 %  MD = BTKAPPENDMETADATA(H, LABEL, )

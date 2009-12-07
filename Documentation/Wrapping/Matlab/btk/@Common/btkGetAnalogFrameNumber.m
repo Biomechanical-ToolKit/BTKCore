@@ -1,5 +1,5 @@
-function pfn = btkGetAnalogFrameNumber(h) %#ok
-%BTKGETANALOGFRAMENUMBER Returns number of frame for the points.
+function afn = btkGetAnalogFrameNumber(h) %#ok
+%BTKGETANALOGFRAMENUMBER Returns the number of frames for the analog channels.
 % 
 %  AFN = BTKGETANALOGFRAMENUMBER(H) returns the number of frame used in the analog's data.
 %  The acquistion is represented by the handle H, obtained by the use of a 

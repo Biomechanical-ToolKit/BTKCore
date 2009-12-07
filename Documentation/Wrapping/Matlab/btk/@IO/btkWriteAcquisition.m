@@ -1,7 +1,7 @@
 function h = btkWriteAcquisition(filename) %#ok
 %BTKWRITEACQUISITION Write acquisition's data into file (C3D, TRC, ...)
 % 
-%  BTKWRITEACQUISITION(H, FILENAME, ...) export acquisition's data represented 
+%  BTKWRITEACQUISITION(H, FILENAME, ...) exports acquisition's data represented 
 %  as the handle H into the file FILENAME.  The choice of the file format is
 %  based on the file extension in FILENAME (for example, '.trc' or '.c3d').
 %  This handle H must be obtained by the use of a btk* function.  
@@ -9,7 +9,7 @@ function h = btkWriteAcquisition(filename) %#ok
 %  Some formats (for example C3D) have options to store an acquisition. In a 
 %  binary format, it is possible to specify the byte order (see BYTEORDER 
 %  option) and the storage format (see STORAGEFORMAT option). The options are 
-%  given to BTKWRITEACQUISITION after the filename by first, the name of the
+%  given in BTKWRITEACQUISITION after the filename by first the name of the
 %  option and its value. 
 %
 %  The BYTEORDER option can receive 3 values:

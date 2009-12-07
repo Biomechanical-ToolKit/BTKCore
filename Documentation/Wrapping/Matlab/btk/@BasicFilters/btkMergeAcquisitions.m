@@ -1,5 +1,5 @@
 function acq = btkMergeAcquisitions(acq1, acq2, ...) %#ok
-%BTKMERGEACQUISITIONS Merge acquisition together.
+%BTKMERGEACQUISITIONS Merge acquisitions together.
 % 
 %  ACQ = BTKMERGEACQUISITIONS(ACQ1, ACQ2, ...) merges or contatenates the acquisitions given in input.
 %  The difference between the merging or the concatenating depends of the acquisitions' informations.
@@ -8,7 +8,7 @@ function acq = btkMergeAcquisitions(acq1, acq2, ...) %#ok
 %  frame of the n+1th acquistion corresponds to the last frame of the nth acquistion, then the 
 %  acquisitions are merged, otherwise, the data are concatenated. Merged acquisitions means that the 
 %  output will have the same number of points, analog channels, events than each output but the number
-%  of frames corresponds to the sum of the input's frame number. 
+%  of frames corresponds to the sum of the input's frame number.
 %
 %  Rules to merge/concatenate acquisitions are:
 %   - Must have the same acquisition frequency (or 0) if there are points.

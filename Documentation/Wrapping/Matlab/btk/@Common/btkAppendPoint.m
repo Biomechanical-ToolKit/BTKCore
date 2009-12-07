@@ -8,18 +8,18 @@ function btkAppendPoint(h, type, label, values, residuals, masks, desc) %#ok
 %  BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS) set also the point's 
 %  residuals. RESIDUALS is matrix (N,1) and corresponds to the residuals of
 %  the 3D reconstruction of markers. 
-%  NOTE: This parameter is an informational parameter and seems not used in 
+%  NOTE: This parameter is an informational parameter and is not used in 
 %  some commercial softwares.
 %
 %  BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS) set also the 
-%  masks of the camera used to reconstruct markers' positions. MASKS is a 
+%  mask of the cameras used to reconstruct markers' positions. MASKS is a 
 %  matrix (N,1) of integer corresponding to a conversion of a binary number.
 %  For example, the value 14 correspond to the mask 0b0001110 meaning that
-%  cameras #2, #3 and #4 was used to reconstruct the point 
-%  NOTE: This parameter is an informational parameter and seems not used in 
+%  cameras #2, #3 and #4 was used to reconstruct the point.
+%  NOTE: This parameter is an informational parameter and is not used in 
 %  some commercial software.
 %
-%  BTKSETPBTKAPPENDPOINTOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION) 
+%  BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION) 
 %  modifies also the description of the point.
 %
 %  This function can also returns updated list of points.

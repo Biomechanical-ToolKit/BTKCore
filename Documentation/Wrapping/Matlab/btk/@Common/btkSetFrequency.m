@@ -2,7 +2,7 @@ function btkSetFrequency(h, freq) %#ok
 %BTKSETFREQUENCY Set the main frequency.
 % 
 %  BTKSETFREQUENCY(H, FREQ) set the main frequency of the acquisition
-%  byte the value FREQ. The acquisitions is represented by the handle H.  
+%  by the value FREQ. The acquisitions is represented by the handle H.  
 %  This handle is obtained by using a btk* function.
 
 %  Author: A. Barré

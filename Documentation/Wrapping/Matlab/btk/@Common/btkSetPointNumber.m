@@ -1,5 +1,5 @@
 function btkSetPointNumber(h, pn) %#ok
-%BTKSETPOINTNUMBER Set the number of points.
+%BTKSETPOINTNUMBER Sets the number of points.
 % 
 %  BTKSETPOINTNUMBER(H, PN) resizes the number of points by PN for the 
 %  acquisition represented by the handle H.  This handle is obtained by the 

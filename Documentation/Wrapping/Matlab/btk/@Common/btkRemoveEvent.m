@@ -3,7 +3,7 @@ function btkRemoveEvent(h, options) %#ok
 % 
 %  BTKREMOVEEVENT(H) is equivalent to the function <a href="matlab:help btkClearEvents">btkClearEvents</a>.
 %
-%  BTKREMOVEEVENT(H, OPTION, VALUE) remove only event(s) described by the options.
+%  BTKREMOVEEVENT(H, OPTION, VALUE) removes only event(s) described by the options.
 %  There are four options which can combined to refine the request.
 %   - 'Time' followed by a single real value delete all events with this time +/- 0.00005 seconds
 %   - 'Label' followed by a string delete all events which have this label

@@ -76,6 +76,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     acq->SetPointUnit(btk::Point::Moment, unit);
   else if(uppercase.compare("POWER") == 0)
     acq->SetPointUnit(btk::Point::Power, unit);
+  else if(uppercase.compare("SCALAR") == 0)
+    acq->SetPointUnit(btk::Point::Scalar, unit);
+  else if(uppercase.compare("REACTION") == 0)
+    mexWarnMsgTxt("The type Reaction is a special case and doesn't have a unit.");
   else
   { 
     mxFree(unit);

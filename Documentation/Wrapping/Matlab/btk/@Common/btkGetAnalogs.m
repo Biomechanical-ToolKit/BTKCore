@@ -2,7 +2,7 @@ function [analogs analogsInfo] = btkGetAnalogs(h) %#ok
 %BTKGETANALOGS Extract analogs from a biomechanical acquisition
 % 
 %  ANALOGS = BTKGETANALOGS(H) returns a structure of analogs.  Each 
-%  fieldname in ANALOGS corresponds to a analog channel's label.  The biomechanical 
+%  fieldname in ANALOGS corresponds to an analog channel's label.  The biomechanical 
 %  acquisition handle H is represented as a 32-bit integer and can be only
 %  used with the btk* functions.
 %

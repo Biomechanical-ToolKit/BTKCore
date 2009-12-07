@@ -1,7 +1,7 @@
-function btkSetAnalogScale(h, idx_or_label, new_offset) %#ok
-%BTKSETANALOGSCALE Modify analog's offset and return updated analogs.
+function btkSetAnalogScale(h, idx_or_label, newscale) %#ok
+%BTKSETANALOGSCALE Modify analog's scale and return updated analogs.
 % 
-%  BTKSETANALOGSCALE(H, INDEX, NEWSCALE) modifies analog's offset by NEWSCALE for 
+%  BTKSETANALOGSCALE(H, INDEX, NEWSCALE) modifies analog's scale by NEWSCALE for 
 %  the analog at the index INDEX. This scale is used to convert numeric data into analog 
 %  data or vice versa.
 %

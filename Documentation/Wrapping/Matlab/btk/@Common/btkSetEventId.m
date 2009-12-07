@@ -1,4 +1,4 @@
-function btkSetEventId(h, label, new_id) %#ok
+function btkSetEventId(h, label, newid) %#ok
 %BTKSETEVENTID Modify the id of all events which have the required label.
 % 
 %  BTKSETEVENTID(H, LABEL, NEWID) modifies event's id by NEWID
@@ -13,12 +13,12 @@ function btkSetEventId(h, label, new_id) %#ok
 %  values set to 0.
 %
 %  This function can also returns updated list of events.
-%  EVENTS = BTKSETEVENTID(H, LABEL, NEWDESCRIPTION)
+%  EVENTS = BTKSETEVENTID(H, LABEL, NEWID)
 %  The format of EVENTS is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %
 %  This function can also returns updated list of events' informations.
-%  [EVENTS, EVENTSINFO] = BTKSETEVENTID(H, LABEL, NEWDESCRIPTION)
-%  The format of BTKSETEVENTID is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
+%  [EVENTS, EVENTSINFO] = BTKSETEVENTID(H, LABEL, NEWID)
+%  The format of EVENTSINFO is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %
 %  The acquisition is represented by the handle H.  This handle is obtained
 %  by the use of a btk* function.

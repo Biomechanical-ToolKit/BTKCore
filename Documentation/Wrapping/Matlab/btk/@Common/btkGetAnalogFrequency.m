@@ -1,7 +1,7 @@
 function af = btkGetAnalogFrequency(h) %#ok
 %BTKGETANALOGFREQUENCY Returns the analog frequency.
 % 
-%  AF = BTKGETANALOGFREQUENCY(H) returns the acquisition frequency used for the analog channels.
+%  AF = BTKGETANALOGFREQUENCY(H) returns the acquisition's' frequency used for the analog channels.
 %  The acquistion is represented by the handle H, obtained by the use of a 
 %  btk* function.
 

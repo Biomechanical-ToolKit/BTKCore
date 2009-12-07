@@ -1,7 +1,7 @@
 function info = btkMetaDataInfo(format, values)
 %BTKMETADATAINFO Create a structure containing the required fields for the informations of a metadata.
 %
-%  INFO = BTKMETADATAINFO(FORMAT, VALUES) create the structure INFO which embbed FORMAT and VALUES 
+%  INFO = BTKMETADATAINFO(FORMAT, VALUES) creates the structure INFO which embed FORMAT and VALUES 
 %  in the field 'format' and 'values' respectively.
 %
 %  This function simplify the construction of the information used in <a href="matlab:help btkAppendMetaData">btkAppendMetaData</a>.

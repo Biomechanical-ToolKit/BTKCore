@@ -1,5 +1,5 @@
 function btkRemoveAnalysisParameter(h, idx_or_context, name) %#ok
-%BTKREMOVEANALYSISPARAMETER Erase in metadata ANALYSIS the parameter the given index or context/name. 
+%BTKREMOVEANALYSISPARAMETER Erase in the metadata ANALYSIS the parameter the given index or context/name. 
 % 
 %  BTKREMOVEANALYSISPARAMETER(H, INDEX) erases the parameter at the given index.
 %

@@ -1,7 +1,7 @@
 function an = btkGetAnalogNumber(h) %#ok
 %BTKGETANALOGNUMBER Returns number of channels.
 % 
-%  AN = BTKGETANALOGNUMBER(H) returns the number of analog channels in one acquisition.
+%  AN = BTKGETANALOGNUMBER(H) returns the number of analog channels in the acquisition.
 %  The acquistion is represented by the handle H, obtained by the use of a 
 %  btk* function.
 

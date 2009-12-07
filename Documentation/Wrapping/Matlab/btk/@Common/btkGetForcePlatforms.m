@@ -1,14 +1,14 @@
 function [forceplates forceplatesInfo] = btkGetForcePlatforms(h) %#ok
 %BTKGETFORCEPLATFORMS Extract force platforms' informations  from a biomechanical acquisition
 % 
-%  FORCEPLATES = BTKGETFORCEPLATFORMS(H) returns a structure of force platform's. 
+%  FORCEPLATES = BTKGETFORCEPLATFORMS(H) returns a structure of force platforms. 
 %  The structure FORCEPLATFORMS is a row structure where each row contains 
 %  data for one force platform. Fieldnames for each row are:
 %   - FORCEPLATES(i).CHANNELS
 %   - FORCEPLATES(i).CORNERS
 %   - FORCEPLATES(i).ORIGIN
 %   - FORCEPLATES(i).TYPE
-%  Field CHANNELS is also a structure with field corresponding to analog 
+%  The field CHANNELS is also a structure with field corresponding to analog 
 %  channel.  Their fieldname's label is the label of the analog channel.
 %  Field CORNERS is a matrix (3,4) of double with the 3D coordinates 
 %  of the four corners of the force platform (expressed in the global frame).
@@ -27,7 +27,8 @@ function [forceplates forceplatesInfo] = btkGetForcePlatforms(h) %#ok
 %    - FORCEPLATESINFO(i).CAL_MATRIX
 %  Field FREQUENCY contains the force platform's channel' frequency.  
 %  Field UNITS contains the unit of each analog channel.  Each fieldname in
-%  UNITS corresponds to analog channel's label.  Field CAL_MATRIX contains a%  matrix which is used to correct the cross talk between channel.  This 
+%  UNITS corresponds to analog channel's label.  Field CAL_MATRIX contains a
+%  matrix which is used to correct the cross talk between channel.  This 
 %  matrix is only used with supported force platform type.
 
 %  Author: A. Barré

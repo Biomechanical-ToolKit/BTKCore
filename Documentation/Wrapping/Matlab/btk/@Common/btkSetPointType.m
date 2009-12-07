@@ -3,7 +3,7 @@ function btkSetPointType(h, idx_or_label, new_type) %#ok
 % 
 %  BTKSETPOINTTYPE(H, INDEX, NEWTYPE) modifies point's type by NEWTYPE for 
 %  the point at the index INDEX.  NEWTYPE must be a string corresponding to
-%  to one type of points:
+%  one of the following type:
 %   - marker
 %   - angle
 %   - force

@@ -1,8 +1,8 @@
 function btkSetAnalogDescription(h, idx_or_label, new_desc) %#ok
-%BTKSETANALOGDESCRIPTION Modify point's description and return updated points.
+%BTKSETANALOGDESCRIPTION Modify the analog's description and return a list of the updated analog channels.
 % 
-%  BTKSETANALOGDESCRIPTION(H, INDEX, NEWDESC) modifies point's description by
-%  NEWDESC for the point at the index INDEX.  NEWDESC must be a string.
+%  BTKSETANALOGDESCRIPTION(H, INDEX, NEWDESC) modifies analog's description by
+%  NEWDESC for the analog channel at the index INDEX.  NEWDESC must be a string.
 %
 %  The point to modify can also be selected by its LABEL.
 %  BTKSETANALOGDESCRIPTION(H, LABEL, NEWDESC)

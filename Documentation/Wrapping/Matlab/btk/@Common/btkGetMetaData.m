@@ -6,7 +6,7 @@ function btkGetMetaData(h) %#ok
 %    - METADATA.INFO contains metadata's informations if present 
 %                    or the value 0
 %    - METADATA.INFO.FORMAT contains information's format Only the following
-%                           format are used: Char, Byte, Integer, Real
+%                           formats are used: Char, Byte, Integer, Real
 %    - METADATA.INFO.VALUES contains information's values. Depending of the format,
 %                           data are scalar, matrix or array. Metadata with format
 %                           Char are stored in cells.
