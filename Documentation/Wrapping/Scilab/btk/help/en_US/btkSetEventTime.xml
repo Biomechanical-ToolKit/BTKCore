@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<refentry version="5.0-subset Scilab" xml:id="btkSetEventDescription" xml:lang="en"
+<refentry version="5.0-subset Scilab" xml:id="btkSetEventTime" xml:lang="en"
           xmlns="http://docbook.org/ns/docbook"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns:svg="http://www.w3.org/2000/svg"
@@ -10,14 +10,14 @@
     <pubdate>$LastChangedDate$</pubdate>
   </info>
   <refnamediv>
-    <refname>btkSetEventDescription</refname>
-    <refpurpose>Modify the description of the selected event</refpurpose>
+    <refname>btkSetEventTime</refname>
+    <refpurpose>Modify the time of the selected event</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <title>Calling Sequence</title>
-    <synopsis>btkSetEventDescription(h, label, desc)
-events = btkSetEventDescription(h, label, desc)
-[events, eventsInfo] = btkSetEventDescription(h, label, desc)</synopsis>
+    <synopsis>btkSetEventTime(h, index, newtime)
+events = btkSetEventTime(h, index, newtime)
+[events, eventsInfo] = btkSetEventTime(h, index, newtime)</synopsis>
   </refsynopsisdiv>
   <refsection>
     <title>Parameters</title>
@@ -27,24 +27,24 @@ events = btkSetEventDescription(h, label, desc)
         <listitem><para>The handle used to represent an acquisition.</para></listitem>
       </varlistentry>
       <varlistentry>
-        <term>label</term>
-        <listitem><para>A non empty string to represent the label of event.</para></listitem>
+        <term>index</term>
+        <listitem><para>A single integer value.</para></listitem>
       </varlistentry>
       <varlistentry>
-        <term>desc</term>
-        <listitem><para>A string to represent the new description.</para></listitem>
+        <term>newtime</term>
+        <listitem><para>A single real value.</para></listitem>
       </varlistentry>
     </variablelist>
   </refsection>
   <refsection>
     <title>Description</title>
-    <para>Modify the description of the selected event.</para>
+    <para>Modify event's time by <literal>newtime</literal>.</para>
     <para>The format of the outputs <literal>events</literal> and <literal>eventsInfo</literal> are structures presented in details in the function <link linkend="btkGetEvents">btkGetEvents</link>.</para>
     <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
   </refsection>
   <refsection>
     <title>Examples</title>
-    <programlisting role="example">btkSetEventDescription(h, 'ToeOff', 'Starting the swing phase')</programlisting>
+    <programlisting role="example">btkSetEventTime(h, 5, 1.3333)</programlisting>
   </refsection>
   <refsection>
     <title>See Also</title>
@@ -53,7 +53,7 @@ events = btkSetEventDescription(h, label, desc)
         <link linkend="btkSetEventId">btkSetEventId</link>
       </member>
       <member>
-        <link linkend="btkSetEventTime">btkSetEventTime</link>
+        <link linkend="btkSetEventDescription">btkSetEventDescription</link>
       </member>
     </simplelist>
   </refsection>

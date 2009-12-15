@@ -42,7 +42,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs != 3)
     mexErrMsgTxt("Three input arguments required.");
-  if (nlhs > 0)
+  if (nlhs > 1)
     mexErrMsgTxt("Too many output arguments.");
   
   if (!mxIsChar(prhs[1]) ||  mxIsEmpty(prhs[1]))

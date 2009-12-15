@@ -40,35 +40,65 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs != 3)
-    mexErrMsgTxt("Three input arguments required.");
-  if (nlhs > 1)
-    mexErrMsgTxt("Too many output arguments.");
-  
-  if (!mxIsChar(prhs[1]) ||  mxIsEmpty(prhs[1]))
-    mexErrMsgTxt("The event's label must be a non-empty string.");
-   
-  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
-    mexErrMsgTxt("The id must be set by a single integer value.");
+  if(nrhs!=1)
+    mexErrMsgTxt("One input required.");
+  if (nlhs > 4)
+   mexErrMsgTxt("Too many output arguments.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  btk::EventCollection::Pointer events = acq->GetEvents();
   
-  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-  char* l = (char*)mxMalloc(strlen);
-  mxGetString(prhs[1], l, strlen);
-  std::string label = std::string(l);
+  btk::EventCollection::Pointer evts = acq->GetEvents();
+  int numberOfEvents = evts->GetItemNumber();
   
-  int id = static_cast<int>(mxGetScalar(prhs[2]));
+  mwSize dims[1];
+  dims[0] = numberOfEvents;
+  btk::EventCollection::ConstIterator it;
   
-  for (btk::EventCollection::Iterator it = events->Begin() ; it != events->End() ; ++it)
+  // Time
+  if (nlhs >= 1)
   {
-    if ((*it)->GetLabel().compare(label) == 0)
-      (*it)->SetId(id);
+    it = evts->Begin();
+    plhs[0] = mxCreateDoubleMatrix(numberOfEvents, 1, mxREAL);
+    double* values = mxGetPr(plhs[0]);
+    for (int i = 0 ; i < numberOfEvents ; ++i)
+    {
+      values[i] = (*it)->GetTime();
+      ++it;
+    }
   }
-  
-  mxFree(l);
-  
-  btkMXCreateEventsStructure(acq, nlhs, plhs);
+  // Label
+  if (nlhs >= 2)
+  {
+    plhs[1] = mxCreateCellArray(1, dims);
+    it = evts->Begin();
+    for (int i = 0 ; i < numberOfEvents ; ++i)
+    {
+      mxSetCell(plhs[1], (mwIndex)i, mxCreateString((*it)->GetLabel().c_str()));
+      ++it;
+    }
+    
+  }
+  // Description
+  if (nlhs >= 3)
+  {
+    plhs[2] = mxCreateCellArray(1, dims);
+    it = evts->Begin();
+    for (int i = 0 ; i < numberOfEvents ; ++i)
+    {
+      mxSetCell(plhs[2], (mwIndex)i, mxCreateString((*it)->GetDescription().c_str()));
+      ++it;
+    }
+  }
+  // ID
+  if (nlhs >= 4)
+  {
+    it = evts->Begin();
+    plhs[3] = mxCreateDoubleMatrix(numberOfEvents, 1, mxREAL);
+    double* values = mxGetPr(plhs[3]);
+    for (int i = 0 ; i < numberOfEvents ; ++i)
+    {
+      values[i] = (*it)->GetId();
+      ++it;
+    }
+  }
 };
-

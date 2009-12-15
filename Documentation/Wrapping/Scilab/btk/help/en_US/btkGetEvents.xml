@@ -15,8 +15,7 @@
   </refnamediv>
   <refsynopsisdiv>
     <title>Calling Sequence</title>
-    <synopsis>btkGetEvents(h)
-events = btkGetEvents(h)
+    <synopsis>events = btkGetEvents(h)
 [events, eventsInfo] = btkGetEvents(h)</synopsis>
   </refsynopsisdiv>
   <refsection>

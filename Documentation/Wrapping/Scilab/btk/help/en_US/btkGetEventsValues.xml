@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<refentry version="5.0-subset Scilab" xml:id="btkSetEventDescription" xml:lang="en"
+<refentry version="5.0-subset Scilab" xml:id="btkGetEventsValues" xml:lang="en"
           xmlns="http://docbook.org/ns/docbook"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns:svg="http://www.w3.org/2000/svg"
@@ -10,14 +10,15 @@
     <pubdate>$LastChangedDate$</pubdate>
   </info>
   <refnamediv>
-    <refname>btkSetEventDescription</refname>
-    <refpurpose>Modify the description of the selected event</refpurpose>
+    <refname>btkGetEventsValues</refname>
+    <refpurpose>Extract events' values from a biomechanical acquisition</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <title>Calling Sequence</title>
-    <synopsis>btkSetEventDescription(h, label, desc)
-events = btkSetEventDescription(h, label, desc)
-[events, eventsInfo] = btkSetEventDescription(h, label, desc)</synopsis>
+    <synopsis>times = btkGetEventsValues(h)
+[times, labels] = btkGetEventsValues(h)
+[times, labels, descriptions] = btkGetEventsValues(h)
+[times, labels, descriptions, ids] = btkGetEventsValues(h)</synopsis>
   </refsynopsisdiv>
   <refsection>
     <title>Parameters</title>
@@ -26,34 +27,31 @@ events = btkSetEventDescription(h, label, desc)
         <term>h</term>
         <listitem><para>The handle used to represent an acquisition.</para></listitem>
       </varlistentry>
-      <varlistentry>
-        <term>label</term>
-        <listitem><para>A non empty string to represent the label of event.</para></listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>desc</term>
-        <listitem><para>A string to represent the new description.</para></listitem>
-      </varlistentry>
     </variablelist>
   </refsection>
   <refsection>
     <title>Description</title>
-    <para>Modify the description of the selected event.</para>
-    <para>The format of the outputs <literal>events</literal> and <literal>eventsInfo</literal> are structures presented in details in the function <link linkend="btkGetEvents">btkGetEvents</link>.</para>
+    <para>Returns matrices containing the <literal>n</literal> events stored in the acquisition. The output arguments contain the following information:
+<itemizedlist>
+<listitem><literal>times</literal>: A vector of reals</listitem>
+<listitem><literal>labels</literal>: An array of cells</listitem>
+<listitem><literal>descriptions</literal>: An array of cells</listitem>
+<listitem><literal>ids</literal>: A vector of integers</listitem>
+</itemizedlist></para>
     <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
   </refsection>
   <refsection>
     <title>Examples</title>
-    <programlisting role="example">btkSetEventDescription(h, 'ToeOff', 'Starting the swing phase')</programlisting>
+    <programlisting role="example">times = btkGetEventsValues(h)</programlisting>
   </refsection>
   <refsection>
     <title>See Also</title>
     <simplelist type="inline">
       <member>
-        <link linkend="btkSetEventId">btkSetEventId</link>
+        <link linkend="btkAppendEvent">btkAppendEvent</link>
       </member>
       <member>
-        <link linkend="btkSetEventTime">btkSetEventTime</link>
+        <link linkend="btkGetEvents">btkGetEvents</link>
       </member>
     </simplelist>
   </refsection>

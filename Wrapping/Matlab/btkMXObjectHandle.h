@@ -81,7 +81,7 @@ namespace btk
 
   template <typename T>
   class MEXHandleCollector
-   {
+  {
   public:
     static void RegisterHandle(MEXObjectHandle<T>* obj)
     {

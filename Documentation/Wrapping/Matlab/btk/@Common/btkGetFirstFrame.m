@@ -1,4 +1,4 @@
-function h = btkGetFirstFrame(filename) %#ok
+function ff = btkGetFirstFrame(h) %#ok
 %BTKGETFIRSTFRAME Returns acquisition's first frame index.
 % 
 %  FF = BTKGETFIRSTFRAME(H) returns the first frame index of the acquisition.

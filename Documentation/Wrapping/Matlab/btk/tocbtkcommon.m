@@ -17,6 +17,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkAppendAnalysisParameter">btkAppendAnalysisParameter</a>  - Append or set a paremeter into the analysis
 %   <a href="matlab:help btkAppendMetada">btkAppendMetadata</a>           - Append metadata in the acquisition
 %   <a href="matlab:help btkClearAnalysis">btkClearAnalysis</a>            - Clear the metadata ANALYSIS
+%   <a href="matlab:help btkDeleteAcquisition">btkDeleteAcquisition</a>            - Delete an acquisition and free the used memory
 %   <a href="matlab:help btkNewAcquisition">btkNewAcquisition</a>           - Create an empty acquisition
 %   <a href="matlab:help btkRemoveAnalysisParameter">btkRemoveAnalysisParameter</a>  - Erase a paremeter from the analysis
 %   <a href="matlab:help btkSetFirstFrame">btkSetFirstFrame</a>            - Acquisition's first frame modifier
@@ -71,6 +72,7 @@ function tocbtkcommon
 %
 % Event accessor
 %   <a href="matlab:help btkGetEvents">btkGetEvents</a>                - Events extraction
+%   <a href="matlab:help btkGetEventsValues">btkGetEventsValues</a>          - Events values (time, label, id, description)
 %
 % Event modifier
 %   <a href="matlab:help btkAppendEvent">btkAppendEvent</a>              - Append event into an acquisition
@@ -78,6 +80,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkRemoveEvent">btkRemoveEvent</a>              - Remove event from an acquisition
 %   <a href="matlab:help btkSetEventDescription">btkSetEventDescription</a>      - Set event's description
 %   <a href="matlab:help btkSetEventId">btkSetEventId</a>               - Set event's ID
+%   <a href="matlab:help btkSetEventTime">btkSetEventId</a>               - Set event's time
 %
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>
 

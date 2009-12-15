@@ -52,6 +52,9 @@ events = btkSetEventId(h, label, id)
       <member>
         <link linkend="btkSetEventDescription">btkSetEventDescription</link>
       </member>
+      <member>
+        <link linkend="btkSetEventTime">btkSetEventTime</link>
+      </member>
     </simplelist>
   </refsection>
 </refentry>

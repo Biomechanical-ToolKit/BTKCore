@@ -34,41 +34,16 @@
  */
 
 #include "btkMXObjectHandle.h"
-#include "btkMXEvent.h"
 
 #include <btkAcquisition.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs != 3)
-    mexErrMsgTxt("Three input arguments required.");
-  if (nlhs > 1)
+  if(nrhs != 1)
+    mexErrMsgTxt("One input argument required.");
+  if (nlhs > 0)
     mexErrMsgTxt("Too many output arguments.");
   
-  if (!mxIsChar(prhs[1]) ||  mxIsEmpty(prhs[1]))
-    mexErrMsgTxt("The event's label must be a non-empty string.");
-   
-  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
-    mexErrMsgTxt("The id must be set by a single integer value.");
-
-  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  btk::EventCollection::Pointer events = acq->GetEvents();
-  
-  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-  char* l = (char*)mxMalloc(strlen);
-  mxGetString(prhs[1], l, strlen);
-  std::string label = std::string(l);
-  
-  int id = static_cast<int>(mxGetScalar(prhs[2]));
-  
-  for (btk::EventCollection::Iterator it = events->Begin() ; it != events->End() ; ++it)
-  {
-    if ((*it)->GetLabel().compare(label) == 0)
-      (*it)->SetId(id);
-  }
-  
-  mxFree(l);
-  
-  btkMXCreateEventsStructure(acq, nlhs, plhs);
+  btk_MOH_destroy_handle<btk::Acquisition>(prhs[0]);
 };
 

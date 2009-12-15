@@ -45,29 +45,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 1)
     mexErrMsgTxt("Too many output arguments.");
   
-  if (!mxIsChar(prhs[1]) ||  mxIsEmpty(prhs[1]))
-    mexErrMsgTxt("The event's label must be a non-empty string.");
-   
+  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
+    mexErrMsgTxt("The index of the event must be set by a single integer value.");
+  
   if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
-    mexErrMsgTxt("The id must be set by a single integer value.");
+    mexErrMsgTxt("The new time must be a single real value.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  btk::EventCollection::Pointer events = acq->GetEvents();
   
-  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-  char* l = (char*)mxMalloc(strlen);
-  mxGetString(prhs[1], l, strlen);
-  std::string label = std::string(l);
+  int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
+  if ((idx < 0) || (idx >= acq->GetEventNumber()))
+    mexErrMsgTxt("Event's index out of range.");
+  btk::Event::Pointer evt = acq->GetEvent(idx);
   
-  int id = static_cast<int>(mxGetScalar(prhs[2]));
-  
-  for (btk::EventCollection::Iterator it = events->Begin() ; it != events->End() ; ++it)
-  {
-    if ((*it)->GetLabel().compare(label) == 0)
-      (*it)->SetId(id);
-  }
-  
-  mxFree(l);
+  double t = mxGetScalar(prhs[2]);
+    
+  evt->SetTime(t);
   
   btkMXCreateEventsStructure(acq, nlhs, plhs);
 };
