@@ -39,6 +39,7 @@
 #include "btkC3DFileIO.h"
 #include "btkTRCFileIO.h"
 #include "btkCALForcePlateFileIO.h"
+#include "btkXLSOrthotrackFileIO.h"
 
 namespace btk
 {
@@ -81,6 +82,8 @@ namespace btk
       if (io->CanReadFile(filename)) return io;
       io = CALForcePlateFileIO::New();
       if (io->CanReadFile(filename)) return io;
+      io = XLSOrthotrackFileIO::New();
+      if (io->CanReadFile(filename)) return io;
     }
     else
     {
@@ -92,6 +95,9 @@ namespace btk
       if (io->CanWriteFile(filename)) return io;
       //io = CALForcePlateFileIO::New();
       //if (io->CanWriteFile(filename)) return io;
+      //io = XLSOrthotrackFileIO::New();
+      //if (io->CanWriteFile(filename)) return io;
+      
     }
     return AcquisitionFileIO::Pointer();
   };

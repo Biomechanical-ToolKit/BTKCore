@@ -8,6 +8,7 @@ SET(BTKIO_SRCS
   btkBinaryFileStream.cpp
   btkC3DFileIO.cpp
   btkTRCFileIO.cpp
+  btkXLSOrthotrackFileIO.cpp
 )
 
 ADD_LIBRARY(BTKIO ${BTK_LIBS_BUILD_TYPE} ${BTKIO_SRCS})

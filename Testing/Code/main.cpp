@@ -36,6 +36,8 @@ int main()
 #define CALForcePlateFilePathOUT std::string(TDD_FilePathOUT) + "CALForcePlateSamples/"
 #define TRCFilePathIN std::string(TDD_FilePathIN) + "TRCSamples/"
 #define TRCFilePathOUT std::string(TDD_FilePathOUT) + "TRCSamples/"
+#define XLSOrthotrackFilePathIN std::string(TDD_FilePathIN) + "XLSOrthotrackSamples/"
+#define XLSOrthotrackFilePathOUT std::string(TDD_FilePathOUT) + "XLSOrthotrackSamples/"
 
 #include "AcquisitionUnitConverterTest.h"
 #include "AcquisitionTest.h"
@@ -61,5 +63,7 @@ int main()
 #include "TRCFileIOTest.h"
 #include "TRCFileReaderTest.h"
 #include "TRCFileWriterTest.h"
+#include "XLSOrthotrackFileIOTest.h"
+#include "XLSOrthotrackFileReaderTest.h"
 
 #include <cxxtest/Root.cpp>
