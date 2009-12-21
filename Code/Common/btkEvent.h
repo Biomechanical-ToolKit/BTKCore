@@ -45,11 +45,18 @@ namespace btk
   class Event: public DataObject
   {
   public:
+    typedef enum {Unknown = 0x00,
+                  Manual = 0x02, 
+                  Automatic = 0x04,
+                  FromForcePlatform = 0x08} DetectionFlag;
+    
     typedef SharedPtr<Event> Pointer;
     typedef SharedPtr<const Event> ConstPointer;
     
-    static Pointer New(const std::string& label = "", double t = 0.0, const std::string& context = "", const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, t, context, subject, desc, id));};
-
+    static Pointer New() {return Pointer(new Event("", -1.0, -1, "", Unknown, "", "", 0));};
+    static Pointer New(const std::string& label, double t, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, t, -1, context, detectionFlags, subject, desc, id));};
+    static Pointer New(const std::string& label, int f, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, -1.0, f, context, detectionFlags, subject, desc, id));};
+    static Pointer New(const std::string& label, double t, int f, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, t, f, context, detectionFlags, subject, desc, id));};
     // ~Event(); // Implicit.
     const std::string& GetLabel() const {return this->m_Label;};
     BTK_COMMON_EXPORT void SetLabel(const std::string& label);
@@ -61,8 +68,14 @@ namespace btk
     BTK_COMMON_EXPORT void SetSubject(const std::string& subject);
     double GetTime() const {return this->m_Time;};
     BTK_COMMON_EXPORT void SetTime(double t);
+    int GetFrame() const {return this->m_Frame;};
+    BTK_COMMON_EXPORT void SetFrame(int f);
+    int GetDetectionFlags() const {return this->m_DetectionFlags;};
+    BTK_COMMON_EXPORT void SetDetectionFlags(int flags);
+    BTK_COMMON_EXPORT bool HasDetectionFlag(DetectionFlag flag);
     int GetId() const {return this->m_Id;};
     BTK_COMMON_EXPORT void SetId(int id);
+    
     Pointer Clone() const {return Pointer(new Event(*this));};
     //! @cond
     BTK_COMMON_EXPORT friend bool operator==(const Event& rLHS, const Event& rRHS);
@@ -73,7 +86,7 @@ namespace btk
     };
 
   private:
-    BTK_COMMON_EXPORT Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc, int id);
+    BTK_COMMON_EXPORT Event(const std::string& label, double t, int f, const std::string& context, int detectionFlags, const std::string& subject, const std::string& desc, int id);
     BTK_COMMON_EXPORT Event(const Event& toCopy);
     Event& operator=(const Event& ); // Not implemented.
 
@@ -81,7 +94,9 @@ namespace btk
     std::string m_Description;
     std::string m_Context;
     std::string m_Subject;
+    int m_DetectionFlags;
     double m_Time;
+    int m_Frame;
     int m_Id;
   };
 };

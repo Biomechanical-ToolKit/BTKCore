@@ -42,9 +42,30 @@ namespace btk
 {
   /**
    * @class Event 
-   * @brief Label a specific time during an acquisition.
+   * @brief Label a specific time/frame during an acquisition.
    *
    * @ingroup BTKCommon
+   */
+  
+  /**
+   * @enum Event::DetectionFlag
+   * Enums used to determine the method(s) used to detect the event.
+   */
+  /**
+   * @var Event::DetectionFlag Event::Unknown
+   * Unknown method.
+   */
+  /**
+   * @var Event::DetectionFlag Event::Manual
+   * Manual method.
+   */
+  /**
+   * @var Event::DetectionFlag Event::Automatic
+   * Automatic method.
+   */
+  /**
+   * @var Event::DetectionFlag Event::FromForcePlatform
+   * Method based on force platform data.
    */
 
   /**
@@ -58,7 +79,22 @@ namespace btk
    */
 
   /**
-   * @fn Pointer Event::New(const std::string& label = "", double t = 0.0, const std::string& context = "", const std::string& subject = "", const std::string& desc = "", int id = 0)
+   * @fn Pointer Event::New()
+   * Creates a smart pointer associated with an Event object.
+   */
+  
+  /**
+   * @fn Pointer Event::New(const std::string& label, double t, const std::string& context, int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0)
+   * Creates a smart pointer associated with an Event object.
+   */
+  
+  /**
+   * @fn Pointer Event::New(const std::string& label, int f, const std::string& context, int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0)
+   * Creates a smart pointer associated with an Event object.
+   */
+  
+  /**
+   * @fn Pointer Event::New(const std::string& label, double t, int f, const std::string& context, int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0)
    * Creates a smart pointer associated with an Event object.
    */
 
@@ -143,11 +179,54 @@ namespace btk
   };
   
   /**
+   * @fn int Event::GetFrame() const
+   * Returns event's frame index.
+   */
+  
+  /**
+   * Sets event's frame index.
+   */
+  void Event::SetFrame(int f)
+  {
+    if (this->m_Frame == f)
+      return;
+    this->m_Frame = f;
+    this->Modified();
+  };
+  
+  /**
+   * @fn int Event::GetDetectionFlags() const
+   * Returns the method(s) which generate the event.
+   */
+  
+  /**
+   * Sets the event's detection.
+   * Use the enumeration Event::DetectionFlag to set the method(s) of detection.
+   */
+  void Event::SetDetectionFlags(int flags)
+  {
+    if (this->m_DetectionFlags == flags)
+      return;
+    this->m_DetectionFlags = flags;
+    this->Modified();
+  };
+  
+  /**
+   * Checks if the given detection flag is contained in the event.
+   */
+  bool Event::HasDetectionFlag(DetectionFlag flag)
+  {
+    if ((this->m_DetectionFlags & flag) == flag)
+      return true;
+    else
+      return false;
+  };
+  
+  /**
    * @fn int Event::GetId() const
    * Returns the event's ID. Can be used by software (as Vicon Workstation) 
    * to indicate event (independently of the label).
    */
-  
   
   /**
    * Sets the event's ID. 
@@ -181,23 +260,29 @@ namespace btk
       return false;
     if (fabs(rLHS.m_Time - rRHS.m_Time) >= std::numeric_limits<double>::epsilon())
       return false;
+    if (rLHS.m_Frame != rRHS.m_Frame)
+      return false;
+    if (rLHS.m_DetectionFlags != rRHS.m_DetectionFlags)
+      return false;
     if (rLHS.m_Id != rRHS.m_Id) 
       return false;
     return true;
   };
   
   /**
-    * @fn friend bool Event::operator!=(const Event& rLHS, const Event& rRHS)
-    * Inequality operator.
-    */
+   * @fn friend bool Event::operator!=(const Event& rLHS, const Event& rRHS)
+   * Inequality operator.
+   */
   
   /**
    * Constructor.
    */
-  Event::Event(const std::string& label, double t, const std::string& context, const std::string& subject, const std::string& desc, int id)
+  Event::Event(const std::string& label, double t, int f, const std::string& context, int detectionFlags, const std::string& subject, const std::string& desc, int id)
   : DataObject(), m_Label(label), m_Context(context), m_Subject(subject), m_Description(desc)
   {
     this->m_Time = t;
+    this->m_Frame = f;
+    this->m_DetectionFlags = detectionFlags;
     this->m_Id = id;
   };
 
@@ -209,6 +294,8 @@ namespace btk
     m_Label(toCopy.m_Label), m_Context(toCopy.m_Context), m_Subject(toCopy.m_Subject), m_Description(toCopy.m_Description)
   {
     this->m_Time = toCopy.m_Time;
+    this->m_Frame = toCopy.m_Frame;
+    this->m_DetectionFlags = toCopy.m_DetectionFlags;
     this->m_Id = toCopy.m_Id;
   };
 };

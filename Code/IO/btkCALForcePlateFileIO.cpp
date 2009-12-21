@@ -363,6 +363,7 @@ namespace btk
    */
   void CALForcePlateFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
+    /*
     if (input.get() == 0)
     {
       btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
@@ -373,6 +374,9 @@ namespace btk
       throw(CALForcePlateFileIOException("Invalid file path."));
     
     ofs.close();
+    */
+    btkErrorMacro("Method not yet implemented.");
+    return;
   };
   
   /**
@@ -383,15 +387,7 @@ namespace btk
   {
     this->SetFileType(AcquisitionFileIO::Binary);
   };
-  /*
-  void CALForcePlateFileIO::RemoveBlank(std::string& str)
-  {
-    str = str.erase(str.find_last_not_of(' ') + 1);
-    str = str.erase(0, str.find_first_not_of(' '));
-    str = str.erase(str.find_last_not_of('\t') + 1);
-    str = str.erase(0, str.find_first_not_of('\t'));
-  };
-  */
+
   bool CALForcePlateFileIO::ExtractValues(double* values, int num, std::ifstream* ifs)
   {
     std::string line;

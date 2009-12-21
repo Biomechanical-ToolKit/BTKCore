@@ -322,6 +322,7 @@ namespace btk
           while(it != events->End())
           {
             (*it)->SetTime(ibfs->ReadFloat());
+            (*it)->SetFrame(static_cast<int>((*it)->GetTime() * pointFrameRate) + 1);
             ++it;
           }
           ibfs->SeekRead((maxEvents * 4) - (eventNumber * 4), std::ios_base::cur);
@@ -535,9 +536,11 @@ namespace btk
                 eventsLabel[incEvt],
                 eventsTime[2 * incEvt] * 60 + eventsTime[2 * incEvt + 1],
                 eventsContext[incEvt],
+                Event::Unknown,
                 eventsSubject[incEvt],
                 eventsDescription[incEvt],
                 eventsId[incEvt]);
+            evt->SetFrame(static_cast<int>(evt->GetTime() * pointFrameRate) + 1);
             events->InsertItem(evt);
           }
         }

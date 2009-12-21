@@ -73,7 +73,6 @@ namespace btk
     BTK_IO_EXPORT CALForcePlateFileIO();
     
   private:
-    //void RemoveBlank(std::string& str);
     bool ExtractValues(double* values, int num, std::ifstream* ifs);
     
     CALForcePlateFileIO(const CALForcePlateFileIO& ); // Not implemented.
