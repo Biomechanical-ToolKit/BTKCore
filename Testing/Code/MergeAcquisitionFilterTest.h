@@ -524,6 +524,43 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
       }
     }
   }
+  
+  CXXTEST_TEST(FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
+  {
+    btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
+    trcReader->SetFilename(TRCFilePathIN + "Gait.trc");
+    btk::AcquisitionFileReader::Pointer ancReader = btk::AcquisitionFileReader::New();
+    ancReader->SetFilename(ANCFilePathIN + "Gait.anc");
+    btk::AcquisitionFileReader::Pointer calReader = btk::AcquisitionFileReader::New();
+    calReader->SetFilename(CALForcePlateFilePathIN + "Forcepla.cal");
+    btk::AcquisitionFileReader::Pointer xlsReader = btk::AcquisitionFileReader::New();
+    xlsReader->SetFilename(XLSOrthotrackFilePathIN + "Gait.xls");
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, trcReader->GetOutput());
+    merger->SetInput(1, ancReader->GetOutput());
+    merger->SetInput(2, calReader->GetOutput());
+    merger->SetInput(3, xlsReader->GetOutput());
+    merger->Update();
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), 100.0);
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), 1000.0);
+    TS_ASSERT_EQUALS(output->GetPointNumber(), 84);
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), 28);
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 487);
+
+    TS_ASSERT_EQUALS(output->GetEventNumber(), 8);
+    TS_ASSERT_EQUALS(output->GetEvent(0)->GetTime(), (70.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(1)->GetTime(), (166.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(2)->GetTime(), (19.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(3)->GetTime(), (119.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(4)->GetTime(), (32.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(5)->GetTime(), (129.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(6)->GetTime(), (78.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(7)->GetTime(), (177.0 - 1.0) / 100.0);
+    
+    TS_ASSERT_EQUALS(output->GetPoint(33)->GetLabel(), "R_HIP_ANGLE");
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(MergeAcquisitionFilterTest)
@@ -540,4 +577,5 @@ CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Merge)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoFiles_Concat_CalMatrix)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_TRC_and_ANC_and_CAL)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_ThreeFiles_Concat_TRC_and_ANC_and_CAL)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
 #endif

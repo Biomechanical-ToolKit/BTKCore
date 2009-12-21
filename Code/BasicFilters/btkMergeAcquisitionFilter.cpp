@@ -162,9 +162,9 @@ namespace btk
       return;
     }
     // Check the number of analog samples per point frame
-    if ((in->GetAnalogFrameNumber() != 0) && (out->GetAnalogFrameNumber() != 0) && (in->GetNumberAnalogSamplePerFrame() != out->GetNumberAnalogSamplePerFrame()))
+    if (!in->IsEmptyAnalog() && !out->IsEmptyAnalog() && (in->GetAnalogFrameNumber() != 0) && (out->GetAnalogFrameNumber() != 0) && (in->GetNumberAnalogSamplePerFrame() != out->GetNumberAnalogSamplePerFrame()))
     {
-      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of frames for the points are not equal.");
+      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
       return;
     }
     /*
@@ -249,14 +249,20 @@ namespace btk
         if (abs(diffFF) == out->GetLastFrame())
           mergeData = true;
         input->ResizeFrameNumberFromEnd(input->GetPointFrameNumber() - diffFF);
-        out->ResizeFrameNumber(out->GetPointFrameNumber() - diffFF);
+        if (input->GetPointFrameNumber() > out->GetPointFrameNumber())
+          out->ResizeFrameNumber(out->GetPointFrameNumber() - diffFF);
+        else
+          input->ResizeFrameNumber(out->GetPointFrameNumber());
       }
       else if (diffFF > 0)
       {
         if (diffFF == input->GetLastFrame())
           mergeData = true;
-        input->ResizeFrameNumber(input->GetPointFrameNumber() + diffFF);
         out->ResizeFrameNumberFromEnd(out->GetPointFrameNumber() + diffFF);
+        if (out->GetPointFrameNumber() > input->GetPointFrameNumber())
+          input->ResizeFrameNumber(input->GetPointFrameNumber() + diffFF);
+        else
+          out->ResizeFrameNumber(input->GetPointFrameNumber());
       }
       
       // To be sure to merge the data, it is necessary to check if the label of each point and analog channel 
@@ -291,12 +297,15 @@ namespace btk
       // Event
       for (Acquisition::EventIterator itIn = input->BeginEvent() ; itIn != input->EndEvent() ; ++itIn)
       {
+        // Compute the event's time if necessary (for example, if the acquisition comes from an XLS file).
+        if (((*itIn)->GetTime() + 1.0)  <= std::numeric_limits<double>::epsilon())
+          (*itIn)->SetTime(static_cast<double>((*itIn)->GetFrame() - 1) / out->GetPointFrequency());
         Acquisition::EventIterator itOut;
         for (itOut = out->BeginEvent() ; itOut != out->EndEvent() ; ++itOut)
         {
           if ((*itIn)->GetLabel().compare((*itOut)->GetLabel()) == 0)
           {
-            if ((fabs((*itIn)->GetTime() - (*itOut)->GetTime()) <= std::numeric_limits<double>::epsilon())
+            if (((*itIn)->GetFrame() == (*itOut)->GetFrame())
                 && ((*itIn)->GetContext().compare((*itOut)->GetContext()) == 0)
                 && ((*itIn)->GetSubject().compare((*itOut)->GetSubject()) == 0))
               break;
