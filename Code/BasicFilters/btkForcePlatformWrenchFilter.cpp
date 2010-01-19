@@ -33,123 +33,78 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkGroundReactionWrenchFilter.h"
+#include "btkForcePlatformWrenchFilter.h"
 #include "btkConvert.h"
 
 namespace btk
 {
   /**
-   * @class GroundReactionWrenchFilter
-   * @brief Transform force platform data into ground reaction wrenches.
-   * Theses wrenches are expressed in the global frame.
-   *
-   * The point of application of each wrench is calculated from :
-   * Shimba T. (1984), 
-   * "An estimation of center of gravity from force platform data", 
-   * Journal of Biomechanics 17(1), 53–60.
+   * @class ForcePlatformWrenchFilter
+   * @brief Transform force platform data into wrenches expressed in the global frame.
+   * The point of application of each wrench corresponds to the center of each force platfom.
    *
    * @ingroup BTKBasicFilters
    */
   
   /**
-   * @typedef GroundReactionWrenchFilter::Pointer
-   * Smart pointer associated with a GroundReactionWrenchFilter object.
+   * @typedef ForcePlatformWrenchFilter::Pointer
+   * Smart pointer associated with a ForcePlatformWrenchFilter object.
    */
   
   /**
-   * @typedef GroundReactionWrenchFilter::ConstPointer
-   * Smart pointer associated with a const GroundReactionWrenchFilter object.
+   * @typedef ForcePlatformWrenchFilter::ConstPointer
+   * Smart pointer associated with a const ForcePlatformWrenchFilter object.
    */
     
   /**
-   * @fn static Pointer GroundReactionWrenchFilter::New();
-   * Creates a smart pointer associated with a GroundReactionWrenchFilter object.
+   * @fn static Pointer ForcePlatformWrenchFilter::New();
+   * Creates a smart pointer associated with a ForcePlatformWrenchFilter object.
    */
 
   /**
-   * @fn bool GroundReactionWrenchFilter::GetThresholdState() const
-   * Returns the state of the threshold used to suppress false PWA.
-   */
-
-  /**
-   * Sets the threshold state.
-   */
-  void GroundReactionWrenchFilter::SetThresholdState(bool activated)
-  {
-    if (this->m_ThresholdActivated == activated)
-      return;
-    this->m_ThresholdActivated = activated;
-    this->Modified();
-  };
-
-  /**
-   * @fn double GroundReactionWrenchFilter::GetThresholdValue() const
-   * Returns the value used to suppress PWA computed with a Fz value lower or equal than it.
-   * 
-   * The threshold must be activated (see GroundReactionWrenchFilter::SetThresholdState) to be used during the computation of the PWA.
-   */
-  
-  /**
-   * Sets the threshold value.
-   *
-   * The threshold must be activated (see GroundReactionWrenchFilter::SetThresholdState) to be used during the computation of the PWA.
-   */
-  void GroundReactionWrenchFilter::SetThresholdValue(double v)
-  {
-    if (fabs(this->m_ThresholdValue - v) <= std::numeric_limits<double>::epsilon())
-      return;
-    if (v < 0.0)
-      btkErrorMacro("Negative threshold has no effect on the algorithm because it compares the threshold value with the absolute value of Fz.");
-    this->m_ThresholdValue = v;
-    this->Modified();
-  };
-
-  /**
-   * @fn WrenchCollection::Pointer GroundReactionWrenchFilter::GetInput()
+   * @fn WrenchCollection::Pointer ForcePlatformWrenchFilter::GetInput()
    * Gets the input registered with this process.
    */
 
   /**
-   * @fn void GroundReactionWrenchFilter::SetInput(ForcePlatform::Pointer input)
+   * @fn void ForcePlatformWrenchFilter::SetInput(ForcePlatform::Pointer input)
    * Sets the input required with this process. This input is transformed in a collection a force platform with a single force platform.
    */
   
   /**
-   * @fn void GroundReactionWrenchFilter::SetInput(ForcePlatformCollection::Pointer input)
+   * @fn void ForcePlatformWrenchFilter::SetInput(ForcePlatformCollection::Pointer input)
    * Sets the input required with this process.
    */
   
   /**
-   * @fn PointCollection::Pointer GroundReactionWrenchFilter::GetOutput()
+   * @fn PointCollection::Pointer ForcePlatformWrenchFilter::GetOutput()
    * Gets the output created with this process.
    */
 
   /**
    * Constructor. Sets the number of inputs and outputs to 1.
    */
-  GroundReactionWrenchFilter::GroundReactionWrenchFilter()
+  ForcePlatformWrenchFilter::ForcePlatformWrenchFilter()
   : ProcessObject()
   {
     this->SetInputNumber(1);
     this->SetOutputNumber(1);
-    this->m_ThresholdActivated = false;
-    this->m_ThresholdValue = 0.0;
   };
 
   /**
-   * @fn ForcePlatformCollection::Pointer GroundReactionWrenchFilter::GetInput(int idx)
+   * @fn ForcePlatformCollection::Pointer ForcePlatformWrenchFilter::GetInput(int idx)
    * Returns the input at the index @a idx.
    */
   
   /**
-   * @fn WrenchCollection::Pointer GroundReactionWrenchFilter::GetOutput(int idx)
+   * @fn WrenchCollection::Pointer ForcePlatformWrenchFilter::GetOutput(int idx)
    * Returns the output at the index @a idx.
    */
   
   /**
    * Creates a WrenchCollection:Pointer object and return it as a DataObject::Pointer.
    */
-  DataObject::Pointer GroundReactionWrenchFilter::MakeOutput(int /* idx */)
+  DataObject::Pointer ForcePlatformWrenchFilter::MakeOutput(int /* idx */)
   {
     return WrenchCollection::New();
   };
@@ -157,7 +112,7 @@ namespace btk
   /**
    * Generates the outputs' data.
    */
-  void GroundReactionWrenchFilter::GenerateData()
+  void ForcePlatformWrenchFilter::GenerateData()
   {
     WrenchCollection::Pointer output = this->GetOutput();
     output->Clear();
@@ -176,7 +131,6 @@ namespace btk
         int frameNumber = (*it)->GetChannel(0)->GetFrameNumber();
         Wrench::Pointer grw = Wrench::New("GRW" + ToString(inc), frameNumber);
         output->InsertItem(grw);
-        ForcePlatform::Origin origin;
         // Residuals & masks
         grw->GetPosition()->GetMasks().setZero(frameNumber);
         grw->GetPosition()->GetResiduals().setZero(frameNumber);        
@@ -198,14 +152,6 @@ namespace btk
             grw->GetMoment()->GetValues().col(0).setZero();
             grw->GetMoment()->GetValues().col(1).setZero();
             grw->GetMoment()->GetValues().col(2) = (*it)->GetChannel(5)->GetValues();
-            origin << 0, 0, (*it)->GetOrigin().z();
-            if (origin.z()  > 0)
-            {
-              btkErrorMacro("Vertical offset between the origin of the force platform #" + ToString(inc) + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
-              origin.z() *= -1;
-            }
-            //this->FinishGRWComputation(grw, origin);
-            this->TransformGRWToGlobal(grw, (*it)->GetCorners());
             break;
           case 2:
           case 4:
@@ -216,14 +162,6 @@ namespace btk
             grw->GetMoment()->GetValues().col(0) = (*it)->GetChannel(3)->GetValues();
             grw->GetMoment()->GetValues().col(1) = (*it)->GetChannel(4)->GetValues();
             grw->GetMoment()->GetValues().col(2) = (*it)->GetChannel(5)->GetValues();
-            origin = (*it)->GetOrigin();
-            if (origin.z() > 0)
-            {
-              btkErrorMacro("Origin for the force platform #" + ToString(inc) + " seems to be located from the center of the working surface instead of the inverse. Data are inversed to locate the center of the working surface from the platform's origin.");
-              origin *= -1;
-            }
-            this->FinishGRWComputation(grw, origin);
-            this->TransformGRWToGlobal(grw, (*it)->GetCorners());
             break;
           case 3:
             // Fx
@@ -238,14 +176,6 @@ namespace btk
             grw->GetMoment()->GetValues().col(1) = (*it)->GetOrigin().x() * ((*it)->GetChannel(5)->GetValues() + (*it)->GetChannel(6)->GetValues() - (*it)->GetChannel(4)->GetValues() - (*it)->GetChannel(7)->GetValues());
             // Mz
             grw->GetMoment()->GetValues().col(2) = (*it)->GetOrigin().y() * ((*it)->GetChannel(1)->GetValues() - (*it)->GetChannel(0)->GetValues()) + (*it)->GetOrigin().x() * ((*it)->GetChannel(2)->GetValues() - (*it)->GetChannel(3)->GetValues());
-            origin << 0, 0, (*it)->GetOrigin().z();
-            if (origin.z()  > 0)
-            {
-              btkErrorMacro("Vertical offset between the origin of the force platform #" + ToString(inc) + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
-              origin.z() *= -1;
-            }
-            this->FinishGRWComputation(grw, origin);
-            this->TransformGRWToGlobal(grw, (*it)->GetCorners());
             break;
           case 6:
             btkErrorMacro("Force Platform type 6 is not yet supported. Please, report this to the developers");
@@ -263,6 +193,7 @@ namespace btk
             btkErrorMacro("Force Platform type 21 is not yet supported. Please, report this to the developers");
             break;
         }
+        this->TransformGRWToGlobal(grw, (*it)->GetCorners());
       }
     }
   };  

@@ -28,8 +28,6 @@ int main()
 #endif
 };
 
-#define ANBFilePathIN std::string(TDD_FilePathIN) + "ANBSamples/"
-#define ANBFilePathOUT std::string(TDD_FilePathOUT) + "ANBSamples/"
 #define ANCFilePathIN std::string(TDD_FilePathIN) + "ANCSamples/"
 #define ANCFilePathOUT std::string(TDD_FilePathOUT) + "ANCSamples/"
 #define C3DFilePathIN std::string(TDD_FilePathIN) + "C3DSamples/"
@@ -41,14 +39,8 @@ int main()
 #define XLSOrthotrackFilePathIN std::string(TDD_FilePathIN) + "XLSOrthotrackSamples/"
 #define XLSOrthotrackFilePathOUT std::string(TDD_FilePathOUT) + "XLSOrthotrackSamples/"
 
-/*
 #include "AcquisitionUnitConverterTest.h"
 #include "AcquisitionTest.h"
-*/
-#include "ANBFileIOTest.h"
-#include "ANBFileReaderTest.h"
-#include "ANBFileWriterTest.h"
-/*
 #include "ANCFileIOTest.h"
 #include "ANCFileReaderTest.h"
 #include "ANCFileWriterTest.h"
@@ -59,6 +51,7 @@ int main()
 #include "CALForcePlateFileReaderTest.h"
 #include "ForcePlatformTypesTest.h"
 #include "ForcePlatformsExtractorTest.h"
+#include "ForcePlatformWrenchFilterTest.h"
 #include "GroundReactionWrenchFilterTest.h"
 #include "PointTest.h"
 #include "PointCollectionTest.h"
@@ -73,5 +66,5 @@ int main()
 #include "TRCFileWriterTest.h"
 #include "XLSOrthotrackFileIOTest.h"
 #include "XLSOrthotrackFileReaderTest.h"
-*/
+
 #include <cxxtest/Root.cpp>
