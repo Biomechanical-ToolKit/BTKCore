@@ -73,7 +73,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   catch(...)
   {
-    mexErrMsgTxt("An unexpected error occured.");
+    mexErrMsgTxt("An unexpected error occurred.");
   }
   plhs[0] = btk_MOH_create_handle(reader->GetOutput());
 

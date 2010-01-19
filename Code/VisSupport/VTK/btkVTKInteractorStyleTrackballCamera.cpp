@@ -40,8 +40,10 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
-#include <vtkPerspectiveTransform.h>
+#include <vtkTransform.h>
 #include <vtkMath.h>
+
+#define TRACKBALLSIZE 0.8
 
 namespace btk
 {
@@ -73,6 +75,72 @@ namespace btk
   void VTKInteractorStyleTrackballCamera::Rotate()
   {
     this->Superclass::Rotate();
+    /*
+    if (this->CurrentRenderer == NULL)
+      return;
+    
+    vtkRenderWindowInteractor *rwi = this->Interactor;
+    int* size = this->CurrentRenderer->GetRenderWindow()->GetSize();
+    double width = size[0];
+    double height = size[1];
+    
+    // Viewport coordinates must be between -1.0 and 1.0
+    // old position
+    double p1[3];
+    int* lastMousePos = this->Interactor->GetLastEventPosition();
+    p1[0] = (2.0 * static_cast<double>(lastMousePos[0]) - width) / width;
+    p1[1] = (height - 2.0 * static_cast<double>(lastMousePos[1])) / height;
+    p1[2] = this->ProjectToSphere(TRACKBALLSIZE, p1[0], p1[1]);
+    //std::cout << "p1: "<< p1[0] << " ; " << p1[1] << " ; " << p1[2] << std::endl;
+    // new position
+    double p2[3];
+    int* currentMousePos = this->Interactor->GetEventPosition();
+    p2[0] = (2.0 * static_cast<double>(currentMousePos[0]) - width) / width;
+    p2[1] = (height - 2.0 * static_cast<double>(currentMousePos[1])) / height,
+    p2[2] = this->ProjectToSphere(TRACKBALLSIZE, p2[0], p2[1]);
+    //std::cout << "p2: "<< p2[0] << " ; " << p2[1] << " ; " << p2[2] <<std::endl;
+    
+    double axis[3];
+    vtkMath::Cross(p2, p1, axis);
+    double norm = sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
+    axis[0] /= norm;
+    axis[1] /= norm;
+    axis[2] /= -norm;
+    
+    double diff[3];
+    diff[0] = p1[0] - p2[0];
+    diff[1] = p1[1] - p2[1];
+    diff[2] = p1[2] - p2[2];
+    
+    double t = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]) / (2 * TRACKBALLSIZE);
+    if (t > 1.0) t = 1.0;
+    if (t < -1.0) t = -1.0;
+    double angle = 2.0 * asin(t) * 180.0 / 3.141592653589793;;
+    
+    vtkCamera* camera = this->CurrentRenderer->GetActiveCamera();
+    vtkTransform* Transform = vtkTransform::New(); 
+    Transform->Identity();
+    Transform->PostMultiply();
+    double* fp = camera->GetFocalPoint();
+    Transform->Translate(+fp[0],+fp[1],+fp[2]);
+    Transform->RotateWXYZ(angle, axis);
+    Transform->Translate(-fp[0],-fp[1],-fp[2]);
+    //double newPosition[3];
+    //Transform->TransformPoint(camera->GetPosition(), newPosition);
+    //camera->SetPosition(newPosition);
+    camera->ApplyTransform(Transform);
+    Transform->Delete();
+    
+    double* vu = camera->GetViewUp();
+    fp = camera->GetFocalPoint();
+    double* p = camera->GetPosition();
+    //std::cout << "Axes: (" << axis[0] << " ; " << axis[1] << " ; " << axis[2] << "): " << angle << std::endl;
+    std::cout << "View Up: (" << vu[0] << " ; " << vu[1] << " ; " << vu[2] << ")" << std::endl;
+    std::cout << "Focal Point: (" << fp[0] << " ; " << fp[1] << " ; " << fp[2] << ")" << std::endl;
+    std::cout << "Position: (" << p[0] << " ; " << p[1] << " ; " << p[2] << ")" << std::endl;
+    std::cout << "----------------------" << std::endl;
+    rwi->Render();
+    */
   
     /*
     if (this->CurrentRenderer == NULL)
@@ -177,6 +245,8 @@ namespace btk
    * @fn VTKInteractorStyleTrackballCamera::~VTKInteractorStyleTrackballCamera()
    * Empty destructor.
    */
+   
+  /*
   void VTKInteractorStyleTrackballCamera::ProjectToSphere(int* size, int* pos, double* vec)
   {
     double x = pos[0];
@@ -204,4 +274,20 @@ namespace btk
     vec[1] = y;
     vec[2] = -z;
   };
+  */
+  
+  double VTKInteractorStyleTrackballCamera::ProjectToSphere(double r, double x, double y) const
+  {
+    double d, t, z;
+
+    d = sqrt(x * x + y * y);
+    if (d < r * 0.70710678118654752440)   /* Inside sphere */
+        z = sqrt(r * r - d * d);
+    else  /* On hyperbola */
+    {
+      t = r / 1.41421356237309504880;
+      z = t * t / d;
+    }
+    return z;
+  }
 };

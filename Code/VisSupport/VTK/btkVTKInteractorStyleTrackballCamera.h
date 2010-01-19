@@ -57,7 +57,8 @@ namespace btk
     ~VTKInteractorStyleTrackballCamera() {};
     
   private:
-    BTK_VTK_EXPORT void ProjectToSphere(int* size, int* pos, double* vec);
+    //BTK_VTK_EXPORT void ProjectToSphere(int* size, int* pos, double* vec);
+    double ProjectToSphere(double r, double x, double y) const;
     
     double m_Radius;
   };

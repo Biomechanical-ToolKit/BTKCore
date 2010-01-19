@@ -197,7 +197,7 @@ namespace btk
         {
           //FromString(*it, rates[inc]);
           if (fabs(preciseRate - FromString<double>(*it)) > 0.1)
-            throw(ANCFileIOException("Only analog channels with equal rates is supported for the moment. Please, send an email to the developers to explain the problem."));
+            throw(ANCFileIOException("Only analog channels with equal rates are supported for the moment. Please, send an email to the developers to explain the problem."));
           ++inc;
         }
         // Set the btk::Acquisition object.
@@ -256,7 +256,7 @@ namespace btk
                 (*it)->SetGain(Analog::PlusMinus1);
                 break;
               default:
-                btkIOErrorMacro(filename, "Unknown range: '" + *itRange + "'. Default value used: ");
+                btkIOErrorMacro(filename, "Unknown range: '" + *itRange + "'. Default value used: +/- 10 V");
                 (*it)->SetGain(Analog::PlusMinus10);
                 break;
             }
@@ -324,7 +324,7 @@ namespace btk
       if (!ifs.is_open())
         excmsg = "Invalid file path.";
       else if (ifs.eof())
-        excmsg = "Unexcepted end of file.";
+        excmsg = "Unexpected end of file.";
       else if(ifs.bad())
         excmsg = "Loss of integrity of the filestream.";
       else if(ifs.fail())
@@ -343,7 +343,7 @@ namespace btk
     catch (std::exception& e)
     {
       if (ifs.is_open()) ifs.close(); 
-      throw(ANCFileIOException("Unexcepted exception occured: " + std::string(e.what())));
+      throw(ANCFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
@@ -504,7 +504,7 @@ namespace btk
   ANCFileIO::ANCFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::Binary);
+    this->SetFileType(AcquisitionFileIO::ASCII);
   };
 
   std::string ANCFileIO::ExtractKeywordValue(const std::string& line, const std::string& keyword) const

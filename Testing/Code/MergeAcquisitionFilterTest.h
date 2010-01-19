@@ -495,6 +495,7 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
     btk::GroundReactionWrenchFilter::Pointer grwf = btk::GroundReactionWrenchFilter::New();
     grwf->SetThresholdValue(5.0);
+    grwf->SetThresholdState(true);
     pfe->SetInput(output);
     grwf->SetInput(pfe->GetOutput());
     grwf->Update();

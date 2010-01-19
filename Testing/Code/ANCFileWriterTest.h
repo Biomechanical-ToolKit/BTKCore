@@ -2,6 +2,7 @@
 #define ANCFileWriterTest_h
 
 #include <btkAcquisitionFileWriter.h>
+#include <btkANCFileIO.h>
 
 CXXTEST_SUITE(ANCFileWriterTest)
 {
@@ -64,7 +65,7 @@ CXXTEST_SUITE(ANCFileWriterTest)
   CXXTEST_TEST(Gait_from_c3d)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "Gait.c3d");
+    reader->SetFilename(C3DFilePathIN + "others/Gait.c3d");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(ANCFilePathOUT + "Gait_from_c3d.anc");
@@ -90,7 +91,7 @@ CXXTEST_SUITE(ANCFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
     TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
-    //TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    // TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber()); // Not the same number of frames due to a truncated C3D file.
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
     TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
     std::string boardInfo = acq2->GetMetaData()->GetChild("ANALOG")->GetChild("BOARD")->GetInfo()->ToString(0);
@@ -117,5 +118,5 @@ CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, NoFileNoInput)
 CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, NoFile)
 CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, NoFileWithIO)
 CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, Gait_rewrited)
-//CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, Gait_from_c3d)  
+CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, Gait_from_c3d)  
 #endif

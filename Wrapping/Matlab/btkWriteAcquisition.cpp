@@ -168,7 +168,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   catch(...)
   {
     std::remove(filename);
-    errMsg = "An unexpected error occured.";
+    errMsg = "An unexpected error occurred.";
   }
 
   mxFree(filename);

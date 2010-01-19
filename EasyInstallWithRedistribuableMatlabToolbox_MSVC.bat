@@ -77,19 +77,19 @@ goto wait
 
 :error_CMAKE
 echo:
-echo An error occured during the configuration of the project
+echo An error occurred during the configuration of the project
 echo Report this to the project maintainer
 goto wait
 
 :error_MSVS_COMPILE
 echo:
-echo An error occured during the compilation of the project
+echo An error occurred during the compilation of the project
 echo Report this to the project maintainer
 goto wait
 
 :error_MSVS_INSTALL
 echo:
-echo An error occured during the installation of the project
+echo An error occurred during the installation of the project
 echo Report this to the project maintainer
 goto wait
 

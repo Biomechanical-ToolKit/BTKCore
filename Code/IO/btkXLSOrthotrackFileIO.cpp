@@ -405,7 +405,7 @@ namespace btk
     {
       if (ifs.is_open()) ifs.close();
       if (values) delete[] values;
-      throw(XLSOrthotrackFileIOException("Unexpected exception occured: " + std::string(e.what())));
+      throw(XLSOrthotrackFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {

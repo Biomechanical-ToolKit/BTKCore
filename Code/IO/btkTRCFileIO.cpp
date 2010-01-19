@@ -267,7 +267,7 @@ namespace btk
     catch (std::exception& e)
     {
       if (ifs.is_open()) ifs.close(); 
-      throw(TRCFileIOException("Unexpected exception occured: " + std::string(e.what())));
+      throw(TRCFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
@@ -357,6 +357,6 @@ namespace btk
   TRCFileIO::TRCFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::Binary);
+    this->SetFileType(AcquisitionFileIO::ASCII);
   };
 };

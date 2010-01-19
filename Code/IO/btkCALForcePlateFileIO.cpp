@@ -349,7 +349,7 @@ namespace btk
     catch (std::exception& e)
     {
       if (ifs.is_open()) ifs.close(); 
-      throw(CALForcePlateFileIOException("Unexpected exception occured: " + std::string(e.what())));
+      throw(CALForcePlateFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
@@ -385,7 +385,7 @@ namespace btk
   CALForcePlateFileIO::CALForcePlateFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::Binary);
+    this->SetFileType(AcquisitionFileIO::ASCII);
   };
 
   bool CALForcePlateFileIO::ExtractValues(double* values, int num, std::ifstream* ifs)

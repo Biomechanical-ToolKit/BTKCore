@@ -786,7 +786,7 @@ void MainWindow::openFile(const QString& filename)
   if (reader->GetFilename().compare(filename.toStdString()))
     reader->SetAcquisitionIO();
   reader->SetFilename(filename.toStdString());
-  QMessageBox error(QMessageBox::Critical, "File error", "Error occured during the file reading", QMessageBox::Ok , this);
+  QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file reading", QMessageBox::Ok , this);
   try
   {
     reader->Update();
@@ -1053,7 +1053,7 @@ void MainWindow::saveFile(const QString& filename)
   btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
   writer->SetFilename(filename.toStdString());
   writer->SetInput(target);
-  QMessageBox error(QMessageBox::Critical, "File error", "Error occured during the file saving", QMessageBox::Ok , this);
+  QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file saving", QMessageBox::Ok , this);
   try
   {
     writer->Update();

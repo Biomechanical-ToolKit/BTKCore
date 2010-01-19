@@ -235,11 +235,11 @@ namespace btk
   };
   
   /**
-   * Read the file designated by @a filename and fill @a input.
+   * Read the file designated by @a filename and fill @a output.
    */
-  void C3DFileIO::Read(const std::string& filename, Acquisition::Pointer input)
+  void C3DFileIO::Read(const std::string& filename, Acquisition::Pointer output)
   {
-    input->Reset();
+    output->Reset();
     // Open the stream
     std::fstream ifs;
     BinaryFileStream* ibfs = 0;
@@ -291,7 +291,7 @@ namespace btk
     // Header
         pointNumber = ibfs->ReadU16(); // (word 02)
         totalAnalogSamplesPer3dFrame = ibfs->ReadU16(); // (word 03)
-        input->SetFirstFrame(ibfs->ReadU16()); // (word 04)
+        output->SetFirstFrame(ibfs->ReadU16()); // (word 04)
         lastFrame = ibfs->ReadU16(); // (word 05)
         pointMaximumFillGap = ibfs->ReadU16(); // (word 06)
         pointScaleFactor = ibfs->ReadFloat(); // (word 07-08)
@@ -312,9 +312,9 @@ namespace btk
             btkIOErrorMacro(filename, "The 'Label and Range Section' address is incorrect.");
         }
         uint16_t labelEventFormat = ibfs->ReadU16(); // (word 150)
-        EventCollection::Pointer events = input->GetEvents();
+        EventCollection::Pointer events = output->GetEvents();
         uint16_t eventNumber = ibfs->ReadU16();
-        input->SetEventNumber(eventNumber); // (word 151)
+        output->SetEventNumber(eventNumber); // (word 151)
         if (eventNumber != 0)
         {
           ibfs->SeekRead(2, std::ios_base::cur); // (word 152)
@@ -376,7 +376,7 @@ namespace btk
       std::list<int8_t> groupIds;
       std::list<int8_t> parameterIds;
       std::list<MetaData::Pointer> parameters;
-      MetaData::Pointer root = input->GetMetaData();
+      MetaData::Pointer root = output->GetMetaData();
       while (1)
       {
         nbCharLabel = ibfs->ReadI8(); totalBytesRead += nbCharLabel + 1;
@@ -529,7 +529,7 @@ namespace btk
           MetaDataCollapseChildrenValues(eventsId, *itEvent, "ICON_IDS");
           eventsId.resize(eventsNumber, 0);
           
-          EventCollection::Pointer events = input->GetEvents();
+          EventCollection::Pointer events = output->GetEvents();
           for (int incEvt = 0 ; incEvt < eventsNumber ; ++incEvt)
           {
             Event::Pointer evt = Event::New(
@@ -594,29 +594,29 @@ namespace btk
             switch(bits)
             {
               case 8:
-                input->SetAnalogResolution(Acquisition::Bit8);
+                output->SetAnalogResolution(Acquisition::Bit8);
                 break;
               case 12:
-                input->SetAnalogResolution(Acquisition::Bit12);
+                output->SetAnalogResolution(Acquisition::Bit12);
                 break;
               case 14:
-                input->SetAnalogResolution(Acquisition::Bit14);
+                output->SetAnalogResolution(Acquisition::Bit14);
                 break;
               case 16:
-                input->SetAnalogResolution(Acquisition::Bit16);
+                output->SetAnalogResolution(Acquisition::Bit16);
                 break;
               default:
                 btkIOErrorMacro(filename, "Unknown analog resolution. Set by default to 12.");
-                input->SetAnalogResolution(Acquisition::Bit12);
+                output->SetAnalogResolution(Acquisition::Bit12);
                 break;
             }
           }
           else
-            input->SetAnalogResolution(Acquisition::Bit12);
+            output->SetAnalogResolution(Acquisition::Bit12);
           // Check if values in ANALOG:OFFSET correspond to the informations in ANALOG:FORMAT and ANALOG:BITS
           std::vector<int16_t> analogZeroOffset_t;
           MetaDataCollapseChildrenValues<int16_t>(analogZeroOffset_t, *itAnalog, "OFFSET", analogNumber, 0);
-          bits = input->GetAnalogResolution();
+          bits = output->GetAnalogResolution();
           for (unsigned inc = 0 ; inc < this->m_AnalogZeroOffset.size() ; ++inc)
           {
             if (fabs(static_cast<double>(analogZeroOffset_t[inc])) > pow(2.0, bits))
@@ -625,15 +625,15 @@ namespace btk
               --inc;
             }
           }
-          if (bits != input->GetAnalogResolution())
+          if (bits != output->GetAnalogResolution())
           {
             if (bits >= 16)
             {
-              input->SetAnalogResolution(Acquisition::Bit16);
+              output->SetAnalogResolution(Acquisition::Bit16);
               this->m_AnalogIntegerFormat = Unsigned;
             }
             else
-              input->SetAnalogResolution(static_cast<Acquisition::AnalogResolution>(bits));
+              output->SetAnalogResolution(static_cast<Acquisition::AnalogResolution>(bits));
             btkIOErrorMacro(filename, "Analog format and/or their resolution are inconsistents with Analog offsets. They were update.");
           }
           // - ANALOG:OFFSET
@@ -703,13 +703,13 @@ namespace btk
           else
             fdf = new FloatFormatSignedAnalog(ibfs);
         }
-        int frameNumber = lastFrame - input->GetFirstFrame() + 1;
-        input->Init(pointNumber, frameNumber, analogNumber, numberSamplesPerAnalogChannel);
-        input->SetPointFrequency(pointFrameRate);
+        int frameNumber = lastFrame - output->GetFirstFrame() + 1;
+        output->Init(pointNumber, frameNumber, analogNumber, numberSamplesPerAnalogChannel);
+        output->SetPointFrequency(pointFrameRate);
         for (int frame = 0 ; frame < frameNumber ; ++frame)
         {
-          Acquisition::PointIterator itM = input->BeginPoint(); 
-          while (itM != input->EndPoint())
+          Acquisition::PointIterator itM = output->BeginPoint(); 
+          while (itM != output->EndPoint())
           {
             Point* point = itM->get();
             fdf->ReadPoint(&(point->GetValues().data()[frame]),
@@ -722,14 +722,14 @@ namespace btk
           }
           
           unsigned inc = 0, incChannel = 0, analogFrame = numberSamplesPerAnalogChannel * frame;
-          Acquisition::AnalogIterator itA = input->BeginAnalog();
-          while (itA != input->EndAnalog())
+          Acquisition::AnalogIterator itA = output->BeginAnalog();
+          while (itA != output->EndAnalog())
           {
             (*itA)->GetValues().data()[analogFrame] = (fdf->ReadAnalog() - static_cast<double>(this->m_AnalogZeroOffset[incChannel])) * this->m_AnalogChannelScale[incChannel] * this->m_AnalogUniversalScale;
             ++itA; ++incChannel;
-            if ((itA == input->EndAnalog()) && (inc < static_cast<unsigned>(numberSamplesPerAnalogChannel - 1)))
+            if ((itA == output->EndAnalog()) && (inc < static_cast<unsigned>(numberSamplesPerAnalogChannel - 1)))
             {
-              itA = input->BeginAnalog();
+              itA = output->BeginAnalog();
               incChannel = 0;
               ++inc; ++analogFrame;
             }
@@ -760,11 +760,11 @@ namespace btk
           {
             // POINT:LABELS
             MetaDataCollapseChildrenValues<std::string>(collapsed, *itPoint, "LABELS", pointNumber, "uname*");
-            inc = 0; for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+            inc = 0; for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
               (*it)->SetLabel(collapsed[inc++]);
             // POINT:DESCRIPTIONS
             MetaDataCollapseChildrenValues(collapsed, *itPoint, "DESCRIPTIONS", pointNumber);
-            inc = 0; for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+            inc = 0; for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
             {
               if (inc >= static_cast<int>(collapsed.size()))
                 break;
@@ -775,13 +775,13 @@ namespace btk
           {
             // POINT:LABELS
             MetaDataCollapseChildrenValues<std::string>(collapsed, *itPoint, "DESCRIPTIONS", pointNumber, "uname*");
-            inc = 0; for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+            inc = 0; for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
               (*it)->SetLabel(collapsed[inc++]);
           }
           // POINT:UNITS
           MetaData::ConstIterator itPointUnits = (*itPoint)->FindChild("UNITS");
           if (itPointUnits != (*itPoint)->End())
-            input->SetPointUnit((*itPointUnits)->GetInfo()->ToString(0));
+            output->SetPointUnit((*itPointUnits)->GetInfo()->ToString(0));
           // POINT type and special units
           const char* names[] = {"ANGLE", "FORCE", "MOMENT", "POWER", "SCALAR", "REACTION"}; 
           int numberOfNames =  sizeof(names) / sizeof(char*);
@@ -790,13 +790,13 @@ namespace btk
             // unit
             MetaData::ConstIterator itU = (*itPoint)->FindChild(std::string(names[i]) + "_UNITS");
             if (itU != (*itPoint)->End())
-              input->SetPointUnit(static_cast<Point::Type>(i + 1), (*itU)->GetInfo()->ToString(0));
+              output->SetPointUnit(static_cast<Point::Type>(i + 1), (*itU)->GetInfo()->ToString(0));
             // type
             MetaDataCollapseChildrenValues(collapsed, *itPoint, std::string(names[i]) + "S");
             for (int j = 0 ; j < static_cast<int>(collapsed.size()) ; ++j)
             {
-              Acquisition::PointIterator itPt = input->FindPoint(collapsed[j]);
-              if (itPt != input->EndPoint())
+              Acquisition::PointIterator itPt = output->FindPoint(collapsed[j]);
+              if (itPt != output->EndPoint())
                 (*itPt)->SetType(static_cast<Point::Type>(i + 1));
             }
           }
@@ -807,7 +807,7 @@ namespace btk
           if (!c3dFromMotion)
           {
             MetaDataCollapseChildrenValues<std::string>(collapsed, *itAnalog, "LABELS", analogNumber, "uname*");
-            inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+            inc = 0; for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
             {
               (*it)->SetLabel(collapsed[inc]);
               (*it)->SetOffset(this->m_AnalogZeroOffset[inc]);
@@ -815,7 +815,7 @@ namespace btk
               ++inc;
             }
             MetaDataCollapseChildrenValues(collapsed, *itAnalog, "DESCRIPTIONS", analogNumber);
-            inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+            inc = 0; for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
             {
               if (inc >= static_cast<int>(collapsed.size()))
                 break;
@@ -825,7 +825,7 @@ namespace btk
           else
           {
             MetaDataCollapseChildrenValues<std::string>(collapsed, *itAnalog, "DESCRIPTIONS", analogNumber, "uname*");
-            inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+            inc = 0; for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
             {
               (*it)->SetLabel(collapsed[inc]);
               (*it)->SetOffset(this->m_AnalogZeroOffset[inc]);
@@ -834,7 +834,7 @@ namespace btk
             }
           }
           MetaDataCollapseChildrenValues(collapsed, *itAnalog, "UNITS", analogNumber);
-          inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+          inc = 0; for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
           {
             if (inc >= static_cast<int>(collapsed.size()))
               break;
@@ -843,13 +843,13 @@ namespace btk
           // - ANALOG:GAIN
           std::vector<int16_t> gains;
           MetaDataCollapseChildrenValues(gains, *itAnalog, "GAIN");
-          inc = 0; for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+          inc = 0; for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
           {
             if (inc >= static_cast<int>(gains.size()))
               break;
             if (gains[inc] < 0 || gains[inc] > 5)
             {
-              btkIOErrorMacro(filename, "Unknown gain. If the value corresping to this unknown gain is a real value, please contact a developer to add it in the list.");
+              btkIOErrorMacro(filename, "Unknown gain. If the value corresponding to this unknown gain is a real value, please contact a developer to add it in the list.");
               (*it)->SetGain(Analog::Unknown);
             }
             else
@@ -865,7 +865,7 @@ namespace btk
       if (!ifs.is_open())
         excmsg = "Invalid file path";
       else if (ifs.eof())
-        excmsg = "Unexcepted end of file";
+        excmsg = "Unexpected end of file";
       else if(ifs.bad())
         excmsg = "Loss of integrity of the filestream";
       else if(ifs.fail())
@@ -888,7 +888,7 @@ namespace btk
     {
       if (ibfs) delete ibfs;
       if (fdf) delete fdf;
-      throw(C3DFileIOException("Unexcepted exception occured: " + std::string(e.what())));
+      throw(C3DFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
@@ -1132,7 +1132,7 @@ namespace btk
     {
       if (obfs) delete obfs;
       if (fdf) delete fdf;
-      throw(C3DFileIOException("Unexcepted exception occured: " + std::string(e.what())));
+      throw(C3DFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
