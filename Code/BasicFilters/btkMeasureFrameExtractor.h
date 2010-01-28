@@ -202,18 +202,12 @@ namespace btk
   {
     ItemPointer output = this->GetOutput();
     CollectionPointer input = this->GetInput();
-    if (input.get() == 0)
+    if (input.get() == 0 || input->IsEmpty())
     {
-      output->SetFrameNumber(1);
+      btkErrorMacro("Invalid input. The output does not contains any values");
       return;
     }
-    int inputItemNumber = input->GetItemNumber();
-    if (inputItemNumber == 0)
-    {
-      output->SetFrameNumber(1);
-      return;
-    }
-    output->SetFrameNumber(inputItemNumber);
+    output->SetFrameNumber(input->GetItemNumber());
     typename Collection<T>::ConstIterator it = input->Begin();
     int index = this->m_Index;
     int frameNumber = (*it)->GetFrameNumber();

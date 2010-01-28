@@ -230,15 +230,26 @@ namespace btk
         }
       }
       
+      // Transform acquisition (input or output) to priorize the point data.
+      if ((out->GetPointNumber() != 0) && (input->GetPointNumber() == 0) && (out->GetAnalogNumber() == 0) && (input->GetAnalogNumber() != 0) && (input->GetAnalogFrameNumber() != 0))
+      {
+        input->Resize(0, out->GetPointFrameNumber(), input->GetAnalogNumber(), input->GetAnalogFrameNumber() /  out->GetPointFrameNumber());
+        input->SetPointFrequency(input->GetPointFrequency() / input->GetNumberAnalogSamplePerFrame());
+        out->Resize(out->GetPointNumber(), out->GetPointFrameNumber(), out->GetAnalogNumber(), input->GetAnalogFrameNumber() /  out->GetPointFrameNumber());
+      }
+      else if ((input->GetPointNumber() != 0) && (out->GetPointNumber() == 0) && (input->GetAnalogNumber() == 0) && (out->GetAnalogNumber() != 0) && (out->GetAnalogFrameNumber() != 0))
+      {
+        out->Resize(0, input->GetPointFrameNumber(), out->GetAnalogNumber(), out->GetAnalogFrameNumber() /  input->GetPointFrameNumber());
+        out->SetPointFrequency(out->GetPointFrequency() / out->GetNumberAnalogSamplePerFrame());
+        input->Resize(input->GetPointNumber(), input->GetPointFrameNumber(), input->GetAnalogNumber(), out->GetAnalogFrameNumber() /  input->GetPointFrameNumber());
+      }
+      
       // Frequency
       if (out->GetPointFrequency() == 0.0)
         out->SetPointFrequency(input->GetPointFrequency());
       // Analog resolution
       if (out->IsEmptyAnalog())
         out->SetAnalogResolution(input->GetAnalogResolution());
-      // Number of analog samples per point frame
-      if (out->GetAnalogFrameNumber() == 0 || out->IsEmptyAnalog())
-        out->Resize(out->GetPointNumber(), out->GetPointFrameNumber(), 0, input->GetAnalogFrameNumber() /  out->GetPointFrameNumber());
       
       // Merge or concat?
       bool mergeData = false;
@@ -262,6 +273,14 @@ namespace btk
         if (out->GetPointFrameNumber() > input->GetPointFrameNumber())
           input->ResizeFrameNumber(input->GetPointFrameNumber() + diffFF);
         else
+          out->ResizeFrameNumber(input->GetPointFrameNumber());
+      }
+      else
+      {
+        int diffFN = out->GetPointFrameNumber() - input->GetPointFrameNumber();
+        if ((diffFN > 0) && !out->IsEmptyPoint())
+          input->ResizeFrameNumber(out->GetPointFrameNumber());
+        else if ((diffFN < 0) && !input->IsEmptyPoint())
           out->ResizeFrameNumber(input->GetPointFrameNumber());
       }
       
