@@ -159,7 +159,7 @@ namespace btk
     BTK_COMMON_EXPORT void SetPointFrequency(double frequency);
     int GetAnalogFrameNumber() const {return this->m_PointFrameNumber * this->m_AnalogSampleNumberPerPointFrame;};    
     int GetNumberAnalogSamplePerFrame() const {return this->m_AnalogSampleNumberPerPointFrame;};
-    double GetAnalogFrequency() {return this->m_PointFrequency * this->m_AnalogSampleNumberPerPointFrame;};
+    double GetAnalogFrequency() {return this->m_PointFrequency * static_cast<double>(this->m_AnalogSampleNumberPerPointFrame);};
     AnalogResolution GetAnalogResolution() const {return this->m_AnalogResolution;};
     BTK_COMMON_EXPORT void SetAnalogResolution(AnalogResolution r);
     

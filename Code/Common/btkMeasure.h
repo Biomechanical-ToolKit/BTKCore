@@ -37,6 +37,7 @@
 #define __btkMeasure_h
 
 #include "btkDataObject.h"
+#include "btkMacro.h"
 
 #include <Eigen/Core>
 #include <string>
@@ -52,7 +53,8 @@ namespace btk
     typedef SharedPtr<Measure> Pointer;
     typedef SharedPtr<const Measure> ConstPointer;
     
-    static Pointer New(int frameNumber = 1) {return Pointer(new Measure("", frameNumber));};
+    static Pointer New(const std::string& label = "") {return Pointer(new Measure(label));};
+    static Pointer New(int frameNumber) {return Pointer(new Measure("", frameNumber));};
     static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Measure(label, frameNumber));};
     
     virtual ~Measure() {};
@@ -69,6 +71,7 @@ namespace btk
     Pointer Clone() const {return Pointer(new Measure<d>(*this));};
     
   protected:
+    Measure(const std::string& label);
     Measure(const std::string& label, int frameNumber);
     Measure(const Measure& toCopy);
     
@@ -120,8 +123,17 @@ namespace btk
    * Smart pointer associated with a const Measure object.
    */
   
- /**
-   * @fn template <int d> static Pointer Measure<d>::New(int frameNumber = 1)
+  /**
+   * @fn template <int d> static Pointer Measure<d>::New(const std::string& label = "")
+   * @brief Creates a smart pointer associated with a Measure object.
+   *
+   * The measure created has no values.
+   * @warning The call of this function must be followed by the use of the method Measure::SetFrameNumber
+   * as it creates a null matrix for the values.
+   */ 
+   
+  /**
+   * @fn template <int d> static Pointer Measure<d>::New(int frameNumber)
    * @brief Creates a smart pointer associated with a Measure object.
    *
    * The measure created has an empty label and a number of frame equals to @a framenumber.
@@ -210,21 +222,37 @@ namespace btk
   template <int d>
   void Measure<d>::SetFrameNumber(int frameNumber)
   {
+    if (frameNumber <= 0)
+    {
+      btkErrorMacro("Impossible to set a number of frames lower or equal to 0.");
+      return;
+    }
     if (frameNumber == this->GetFrameNumber())
       return;
     else if (frameNumber > this->GetFrameNumber())
     {
-      Values v(frameNumber, d);
-      v.block(0,0,this->GetFrameNumber(),d) = this->m_Values;
+      Values v = Values::Zero(frameNumber, d);
+      if (this->m_Values.data() != 0)
+        v.block(0,0,this->GetFrameNumber(),d) = this->m_Values;
       this->m_Values = v;
     }
     else
     {
-      Values v = this->m_Values.block(0,0,frameNumber,3);
+      Values v = this->m_Values.block(0,0,frameNumber,d);
       this->m_Values = v;
     }
     this->Modified();
   };
+
+   /**
+   * Constructor.
+   * @warning The use of this constructor must be followed by the use of the method Measure::SetFrameNumber
+   * as it creates a null matrix for the values.
+   */
+  template <int d>
+  Measure<d>::Measure(const std::string& label)
+  : DataObject(), m_Label(label), m_Description(""), m_Values()
+  {};
 
   /**
    * Constructor.

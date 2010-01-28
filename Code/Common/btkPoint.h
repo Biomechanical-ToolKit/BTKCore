@@ -50,7 +50,8 @@ namespace btk
     typedef SharedPtr<Point> Pointer;
     typedef SharedPtr<const Point> ConstPointer;
     
-    static Pointer New(int frameNumber = 1) {return Pointer(new Point("", frameNumber, Marker));};
+    static Pointer New(const std::string& label = "", Type t = Marker) {return Pointer(new Point(label, t));};
+    static Pointer New(int frameNumber) {return Pointer(new Point("", frameNumber, Marker));};
     static Pointer New(const std::string& label, int frameNumber, Type t = Marker) {return Pointer(new Point(label, frameNumber, t));};
     
     virtual ~Point() {};
@@ -67,6 +68,7 @@ namespace btk
     Pointer Clone() const {return Pointer(new Point(*this));};
     
   protected:
+    BTK_COMMON_EXPORT Point(const std::string& label, Type t);
     BTK_COMMON_EXPORT Point(const std::string& label, int frameNumber, Type t);
     
   private:

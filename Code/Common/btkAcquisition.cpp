@@ -805,15 +805,15 @@ namespace btk
       int actualFrameNumber = this->m_PointFrameNumber;
       for (PointIterator it = this->BeginPoint() ; it != this->EndPoint() ; ++it)
       {
-        Point::Values v(frameNumber, 3);
+        Point::Values v = Point::Values::Zero(frameNumber, 3);
         v.block(startRow,0, actualFrameNumber,3) = (*it)->GetValues();
         (*it)->SetValues(v);
 
-        Point::Residuals r(frameNumber, 1);
+        Point::Residuals r = Point::Residuals::Zero(frameNumber, 1);
         r.block(startRow,0,actualFrameNumber,1) = (*it)->GetResiduals();
         (*it)->SetResiduals(r);
 
-        Point::Masks m(frameNumber, 1);
+        Point::Masks m = Point::Masks::Zero(frameNumber, 1);
         m.block(startRow,0,actualFrameNumber,1) = (*it)->GetMasks();
         (*it)->SetMasks(m);
       }

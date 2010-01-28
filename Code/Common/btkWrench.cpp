@@ -53,9 +53,18 @@ namespace btk
    * @typedef Wrench::ConstPointer
    * Smart pointer associated with a const Wrench object.
    */
+   
+  /**
+   * @fn static Pointer Wrench::New(const std::string& label = "")
+   * @brief Creates a smart pointer associated with a Wrench object.
+   *
+   * The Wrench created has no values.
+   * @warning The call of this function must be followed by the use of the method Wrench::SetFrameNumber
+   * as it creates a null matrix for the values.
+   */
 
   /**
-   * @fn static Pointer Wrench::New(int frameNumber = 1)
+   * @fn static Pointer Wrench::New(int frameNumber)
    * @brief Creates a smart pointer associated with a Wrench object.
    */
 
@@ -119,9 +128,43 @@ namespace btk
   };
   
   /**
+   * Sets the number of frames.
+   * The input @a frameNumber must be greater than 0.
+   */
+  void Wrench::SetFrameNumber(int frameNumber)
+  {
+    if (frameNumber <= 0)
+    {
+      btkErrorMacro("Impossible to set a number of frames lower or equal to 0.");
+      return;
+    }
+    this->m_Position->SetFrameNumber(frameNumber);
+    this->m_Force->SetFrameNumber(frameNumber);
+    this->m_Moment->SetFrameNumber(frameNumber);
+  };
+  
+  /**
    * @fn Pointer Wrench::Clone() const
    * Returns a deep copy of the object as a smart pointer.
    */
+
+  /**
+   * Constructor.
+   *
+   *  The position's label corresponds to @a label. The force's label
+   *  has the string ".F" added to @a label. The moments's label
+   *  has the string ".M" added to @a label. 
+   *
+   * The Wrench created has no values.
+   * @warning The call of this function must be followed by the use of the method Wrench::SetFrameNumber
+   * as it creates a null matrix for the values.
+   */
+  Wrench::Wrench(const std::string& label)
+  {
+    this->m_Position = Point::New(label);
+    this->m_Force = Point::New(label + ".F", Point::Force);
+    this->m_Moment = Point::New(label + ".M", Point::Moment);
+  };
 
   /**
    * Constructor.

@@ -47,7 +47,8 @@ namespace btk
     typedef SharedPtr<Wrench> Pointer;
     typedef SharedPtr<const Wrench> ConstPointer;
     
-    static Pointer New(int frameNumber = 1) {return Pointer(new Wrench("", frameNumber));};
+    static Pointer New(const std::string& label = "") {return Pointer(new Wrench(label));};
+    static Pointer New(int frameNumber) {return Pointer(new Wrench("", frameNumber));};
     static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Wrench(label, frameNumber));};
     
     // ~Wrench(); // Implicit.
@@ -58,9 +59,12 @@ namespace btk
     Point::Pointer GetMoment() const {return this->m_Moment;};
     BTK_COMMON_EXPORT void SetMoment(Point::Pointer moment);
     
+    BTK_COMMON_EXPORT void SetFrameNumber(int frameNumber);
+    
     Pointer Clone() const {return Pointer(new Wrench(*this));};
     
   protected:
+    BTK_COMMON_EXPORT Wrench(const std::string& label);
     BTK_COMMON_EXPORT Wrench(const std::string& label, int frameNumber);
     
   private:

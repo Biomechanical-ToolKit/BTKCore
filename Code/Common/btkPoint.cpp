@@ -100,9 +100,18 @@ namespace btk
    * @typedef Point::ConstPointer
    * Smart pointer associated with a const Point object.
    */
+   
+  /**
+   * @fn static Pointer Point::New(const std::string& label = "", Type t = Marker)
+   * @brief Creates a smart pointer associated with a Point object.
+   *
+   * The Point created has no values.
+   * @warning The call of this function must be followed by the use of the method Point::SetFrameNumber
+   * as it creates a null matrix for the values.
+   */ 
 
   /**
-   * @fn static Pointer Point::New(int frameNumber = 1)
+   * @fn static Pointer Point::New(int frameNumber)
    * @brief Creates a smart pointer associated with a Point object.
    *
    * The point created has an empty label and a number of frame equals to @a framenumber.
@@ -166,21 +175,29 @@ namespace btk
    */
   void Point::SetFrameNumber(int frameNumber)
   {
+    if (frameNumber <= 0)
+    {
+      btkErrorMacro("Impossible to set a number of frames lower or equal to 0.");
+      return;
+    }
     int actualFrameNumber = this->GetFrameNumber();
     if (frameNumber == actualFrameNumber)
       return;
     else if (frameNumber > actualFrameNumber)
     {
-      Values v(frameNumber, 3);
-      v.block(0,0,actualFrameNumber,3) = this->m_Values;
+      Values v = Values::Zero(frameNumber, 3);
+      if (this->m_Values.data() != 0)
+        v.block(0,0,actualFrameNumber,3) = this->m_Values;
       this->m_Values = v;
       
-      Residuals r(frameNumber, 1);
-      r.block(0,0,actualFrameNumber,1) = this->m_Residuals;
+      Residuals r = Residuals::Zero(frameNumber, 1);
+      if (this->m_Residuals.data() != 0)
+        r.block(0,0,actualFrameNumber,1) = this->m_Residuals;
       this->m_Residuals = r;
       
-      Masks m(frameNumber, 1);
-      m.block(0,0,actualFrameNumber,1) = this->m_Masks;
+      Masks m = Masks::Zero(frameNumber, 1);
+      if (this->m_Masks.data() != 0)
+        m.block(0,0,actualFrameNumber,1) = this->m_Masks;
       this->m_Masks = m;
     }
     else
@@ -216,6 +233,18 @@ namespace btk
    * Returns a deep copy of this object.
    */
 
+
+  /**
+   * Constructor.
+   * @warning The use of this constructor must be followed by the use of the method Measure::SetFrameNumber
+   * as it creates a null matrix for the values.
+   */
+  Point::Point(const std::string& label, Type t)
+  : Measure<3>(label), m_Residuals(), m_Masks()
+  {
+    this->m_Type = t;
+  };
+  
   /**
    * Constructor.
    * @warning The number of frames must be greater than 0.

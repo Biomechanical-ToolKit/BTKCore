@@ -84,7 +84,16 @@ namespace btk
    */
 
   /**
-   * @fn static Pointer Analog::New(int frameNumber = 1)
+   * @fn static Pointer Analog::New(const std::string& label)
+   * @brief Creates a smart pointer associated with a Analog object.
+   *
+   * The measure created has no values.
+   * @warning The call of this function must be followed by the use of the method Measure::SetFrameNumber
+   * as it creates a null matrix for the values.
+   */
+
+  /**
+   * @fn static Pointer Analog::New(int frameNumber)
    * @brief Creates a smart pointer associated with a Analog object.
    *
    * The analog channel created has an empty label and a number of frame equals to @a framenumber.
@@ -178,6 +187,19 @@ namespace btk
    * Deep copy of the current object.
    */
 
+  /**
+   * Constructor.
+   * @warning The use of this constructor must be followed by the use of the method Measure::SetFrameNumber
+   * as it creates a null matrix for the values.
+   */
+  Analog::Analog(const std::string& label)
+  : Measure<1>(label), m_Unit("V")
+  {
+    this->m_Gain = Unknown;
+    this->m_Offset = 0;
+    this->m_Scale = 1.0;
+  };
+  
   /**
    * Constructor.
    * @warning The number of frames must be greater than 0.

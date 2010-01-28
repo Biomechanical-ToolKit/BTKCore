@@ -44,12 +44,13 @@ namespace btk
   class Analog : public Measure<1>
   {
   public:
-    typedef enum {Unknown = 0, PlusMinus10, PlusMinus5, PlusMinus2Dot5, PlusMinus1Dot25, PlusMinus1} Gain;
+    typedef enum {Unknown = 0, PlusMinus10 = 10000, PlusMinus5 = 5000, PlusMinus2Dot5 = 2500 , PlusMinus1Dot25 = 1250, PlusMinus1 = 1000} Gain;
 
     typedef SharedPtr<Analog> Pointer;
     typedef SharedPtr<const Analog> ConstPointer;
     
-    static Pointer New(int frameNumber = 1) {return Pointer(new Analog("", frameNumber));};
+    static Pointer New(const std::string& label = "") {return Pointer(new Analog(label));};
+    static Pointer New(int frameNumber) {return Pointer(new Analog("", frameNumber));};
     static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Analog(label, frameNumber));};
     
     virtual ~Analog() {};
@@ -65,6 +66,7 @@ namespace btk
     Pointer Clone() const {return Pointer(new Analog(*this));}
     
   protected:
+    BTK_COMMON_EXPORT Analog(const std::string& label);
     BTK_COMMON_EXPORT Analog(const std::string& label, int frameNumber, Gain g = Unknown);
     
   private:
