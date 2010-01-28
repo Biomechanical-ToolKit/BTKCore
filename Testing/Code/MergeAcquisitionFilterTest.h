@@ -3,6 +3,7 @@
 
 #include <btkMergeAcquisitionFilter.h>
 #include <btkAcquisitionFileReader.h>
+#include <btkAcquisitionFileWriter.h>
 #include <btkForcePlatformsExtractor.h>
 #include <btkGroundReactionWrenchFilter.h>
 #include <btkConvert.h>
@@ -393,6 +394,28 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     }
   };
   
+  CXXTEST_TEST(TwoFiles_Concat_NoSameFrameNumber)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(TRCFilePathIN + "MOTEK/T.trc");
+    btk::Acquisition::Pointer input = reader->GetOutput();
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(TRCFilePathIN + "MOTEK/ballet_reduced.trc");
+    btk::Acquisition::Pointer input2 = reader2->GetOutput();
+
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, input);
+    merger->SetInput(1, input2);
+    merger->Update();
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 100);
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), 100);
+    TS_ASSERT_EQUALS(output->GetPointNumber(), 82);
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), 0);
+  }
+  
   CXXTEST_TEST(ThreeFiles_Concat_TRC_and_ANC_and_CAL)
   {
     btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
@@ -406,6 +429,74 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     merger->SetInput(0, trcReader->GetOutput());
     merger->SetInput(1, ancReader->GetOutput());
     merger->SetInput(2, calReader->GetOutput());
+    merger->Update();
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), 100.0);
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), 1000.0);
+    TS_ASSERT_EQUALS(output->GetPointNumber(), 33);
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), 28);
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 487);
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), 4870);
+    TS_ASSERT_EQUALS(output->GetEventNumber(), 0);
+    
+    btk::MetaData::Pointer md = output->GetMetaData();
+    TS_ASSERT_EQUALS(md->GetChildNumber(), 2); // FORCE_PLATFORM & ANALOG
+    btk::MetaData::Pointer fp = md->GetChild("FORCE_PLATFORM");
+    int used = fp->GetChild("USED")->GetInfo()->ToInt(0);
+    TS_ASSERT_EQUALS(used, 2);
+    btk::MetaDataInfo::Pointer calMatrix = fp->GetChild("CAL_MATRIX")->GetInfo();
+    TS_ASSERT_EQUALS(calMatrix->GetDimensions()[2], used);
+    TS_ASSERT_EQUALS(calMatrix->GetValues().size(), 72);
+  };
+  
+  CXXTEST_TEST(ThreeFiles_Concat_ANC_and_CAL_and_TRC)
+  {
+    btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
+    trcReader->SetFilename(TRCFilePathIN + "Gait.trc");
+    btk::AcquisitionFileReader::Pointer ancReader = btk::AcquisitionFileReader::New();
+    ancReader->SetFilename(ANCFilePathIN + "Gait.anc");
+    btk::AcquisitionFileReader::Pointer calReader = btk::AcquisitionFileReader::New();
+    calReader->SetFilename(CALForcePlateFilePathIN + "Forcepla.cal");
+    
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(2, trcReader->GetOutput());
+    merger->SetInput(0, ancReader->GetOutput());
+    merger->SetInput(1, calReader->GetOutput());
+    merger->Update();
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), 100.0);
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), 1000.0);
+    TS_ASSERT_EQUALS(output->GetPointNumber(), 33);
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), 28);
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 487);
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), 4870);
+    TS_ASSERT_EQUALS(output->GetEventNumber(), 0);
+    
+    btk::MetaData::Pointer md = output->GetMetaData();
+    TS_ASSERT_EQUALS(md->GetChildNumber(), 2); // FORCE_PLATFORM & ANALOG
+    btk::MetaData::Pointer fp = md->GetChild("FORCE_PLATFORM");
+    int used = fp->GetChild("USED")->GetInfo()->ToInt(0);
+    TS_ASSERT_EQUALS(used, 2);
+    btk::MetaDataInfo::Pointer calMatrix = fp->GetChild("CAL_MATRIX")->GetInfo();
+    TS_ASSERT_EQUALS(calMatrix->GetDimensions()[2], used);
+    TS_ASSERT_EQUALS(calMatrix->GetValues().size(), 72);
+  };
+  
+  CXXTEST_TEST(ThreeFiles_Concat_CAL_and_TRC_and_ANC)
+  {
+    btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
+    trcReader->SetFilename(TRCFilePathIN + "Gait.trc");
+    btk::AcquisitionFileReader::Pointer ancReader = btk::AcquisitionFileReader::New();
+    ancReader->SetFilename(ANCFilePathIN + "Gait.anc");
+    btk::AcquisitionFileReader::Pointer calReader = btk::AcquisitionFileReader::New();
+    calReader->SetFilename(CALForcePlateFilePathIN + "Forcepla.cal");
+    
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(1, trcReader->GetOutput());
+    merger->SetInput(2, ancReader->GetOutput());
+    merger->SetInput(0, calReader->GetOutput());
     merger->Update();
     btk::Acquisition::Pointer output = merger->GetOutput();
     
@@ -576,7 +667,10 @@ CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Concat)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Concat2)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Merge)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoFiles_Concat_CalMatrix)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoFiles_Concat_NoSameFrameNumber)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_TRC_and_ANC_and_CAL)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_ANC_and_CAL_and_TRC)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_CAL_and_TRC_and_ANC)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_ThreeFiles_Concat_TRC_and_ANC_and_CAL)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
 #endif
