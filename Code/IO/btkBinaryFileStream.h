@@ -140,6 +140,7 @@ namespace btk
     virtual size_t Write(int16_t i16);
     virtual size_t Write(uint16_t u16);
     virtual size_t Write(float f);
+    using BinaryFileStream::Write;
   
   private:
     VAXLittleEndianBinaryFileStream(const VAXLittleEndianBinaryFileStream& ); // Not implemented.
@@ -160,6 +161,7 @@ namespace btk
     virtual size_t Write(int16_t i16);
     virtual size_t Write(uint16_t u16);
     virtual size_t Write(float f);
+    using BinaryFileStream::Write;
   
   private:
     IEEELittleEndianBinaryFileStream(const IEEELittleEndianBinaryFileStream& ); // Not implemented.
@@ -180,6 +182,7 @@ namespace btk
     virtual size_t Write(int16_t i16);
     virtual size_t Write(uint16_t u16);
     virtual size_t Write(float f);
+    using BinaryFileStream::Write;
   
   private:
     IEEEBigEndianBinaryFileStream(const IEEEBigEndianBinaryFileStream& ); // Not implemented.

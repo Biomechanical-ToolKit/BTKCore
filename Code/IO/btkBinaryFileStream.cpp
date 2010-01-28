@@ -104,7 +104,7 @@ namespace btk
     {
       vCFs[inc++] = this->ReadChar();
     }
-    return vCFs;    
+    return vCFs;
   };
   
   /** 
@@ -128,7 +128,7 @@ namespace btk
     {
       vI8Fs[inc++] = this->ReadI8();
     }
-    return vI8Fs;    
+    return vI8Fs;
   };
   
   /** 
@@ -152,7 +152,7 @@ namespace btk
     {
       vU8Fs[inc++] = this->ReadU8();
     }
-    return vU8Fs;    
+    return vU8Fs;
   };
   
   /** 
@@ -171,7 +171,7 @@ namespace btk
     {
       vI16Fs[inc++] = this->ReadI16();
     }
-    return vI16Fs;    
+    return vI16Fs;
   };
   
   /** 
@@ -190,7 +190,7 @@ namespace btk
     {
       vU16Fs[inc++] = this->ReadU16();
     }
-    return vU16Fs;    
+    return vU16Fs;
   };
   
   /** 
@@ -209,7 +209,7 @@ namespace btk
     {
       vFFs[inc++] = this->ReadFloat();
     }
-    return vFFs;    
+    return vFFs;
   };
   
   /** 
@@ -244,7 +244,7 @@ namespace btk
       *it = this->ReadString(nbChar);
       ++it;
     }
-    return vSFs;    
+    return vSFs;
   };
   
   /** 
@@ -474,10 +474,10 @@ namespace btk
   size_t VAXLittleEndianBinaryFileStream::Write(int16_t i16)
   {
     char byteptr[2];
-    memcpy(&byteptr, &i16, sizeof(byteptr));    
+    memcpy(&byteptr, &i16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 2);    
+    this->mr_Fstream.write(foo, 2);
 #else
     this->mr_Fstream.write(byteptr, 2);
 #endif
@@ -490,7 +490,7 @@ namespace btk
   size_t VAXLittleEndianBinaryFileStream::Write(uint16_t u16)
   {
     char byteptr[2];
-    memcpy(&byteptr, &u16, sizeof(byteptr));    
+    memcpy(&byteptr, &u16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
     this->mr_Fstream.write(foo, 2); 
@@ -506,7 +506,7 @@ namespace btk
   size_t VAXLittleEndianBinaryFileStream::Write(float f)
   {
     char byteptr[4];
-    memcpy(&byteptr, &f, sizeof(byteptr));    
+    memcpy(&byteptr, &f, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[4] = {byteptr[1], byteptr[0] + 1 * (byteptr[0] == 0 ? 0 : 1),  byteptr[3], byteptr[2]};
     this->mr_Fstream.write(foo, 4);
@@ -587,9 +587,9 @@ namespace btk
   size_t IEEEBigEndianBinaryFileStream::Write(int16_t i16)
   {
     char byteptr[2];
-    memcpy(&byteptr, &i16, sizeof(byteptr));    
+    memcpy(&byteptr, &i16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-    this->mr_Fstream.write(byteptr, 2);     
+    this->mr_Fstream.write(byteptr, 2); 
 #else
     char foo[2] = {byteptr[1], byteptr[0]};
     this->mr_Fstream.write(foo, 2);
@@ -603,9 +603,9 @@ namespace btk
   size_t IEEEBigEndianBinaryFileStream::Write(uint16_t u16)
   {
     char byteptr[2];
-    memcpy(&byteptr, &u16, sizeof(byteptr));    
+    memcpy(&byteptr, &u16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-    this->mr_Fstream.write(byteptr, 2);     
+    this->mr_Fstream.write(byteptr, 2); 
 #else
     char foo[2] = {byteptr[1], byteptr[0]};
     this->mr_Fstream.write(foo, 2);
@@ -619,15 +619,15 @@ namespace btk
   size_t IEEEBigEndianBinaryFileStream::Write(float f)
   {
     char byteptr[4];
-    memcpy(&byteptr, &f, sizeof(byteptr));    
+    memcpy(&byteptr, &f, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-    this->mr_Fstream.write(byteptr, 4);    
+    this->mr_Fstream.write(byteptr, 4);
 #elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
     char foo[4] = {byteptr[1] - 1 * (byteptr[1] == 0 ? 0 : 1), byteptr[0], byteptr[3], byteptr[2]};
     this->mr_Fstream.write(foo, 4);
 #else
     char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 4);    
+    this->mr_Fstream.write(foo, 4);
 #endif
     return 4;
   };
@@ -700,7 +700,7 @@ namespace btk
   size_t IEEELittleEndianBinaryFileStream::Write(int16_t i16)
   {
     char byteptr[2];
-    memcpy(&byteptr, &i16, sizeof(byteptr));    
+    memcpy(&byteptr, &i16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
     this->mr_Fstream.write(foo, 2); 
@@ -716,7 +716,7 @@ namespace btk
   size_t IEEELittleEndianBinaryFileStream::Write(uint16_t u16)
   {
     char byteptr[2];
-    memcpy(&byteptr, &u16, sizeof(byteptr));    
+    memcpy(&byteptr, &u16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
     this->mr_Fstream.write(foo, 2); 
@@ -733,10 +733,10 @@ namespace btk
   size_t IEEELittleEndianBinaryFileStream::Write(float f)
   {
     char byteptr[4];
-    memcpy(&byteptr, &f, sizeof(byteptr));    
+    memcpy(&byteptr, &f, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 4);    
+    this->mr_Fstream.write(foo, 4);
 #elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
     char foo[4] = {byteptr[2], byteptr[3], byteptr[0], byteptr[1] - 1 * (byteptr[1] == 0 ? 0 : 1)};
     this->mr_Fstream.write(foo, 4);

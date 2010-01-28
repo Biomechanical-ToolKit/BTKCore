@@ -149,7 +149,7 @@ namespace btk
     // Extract data
       std::istringstream iss(line, std::istringstream::in);
       std::string buf;
-      std::getline(iss, buf, '\t');; // Starting Frame
+      std::getline(iss, buf, '\t'); // Starting Frame
       iss >> buf; 
       output->SetFirstFrame(FromString<int>(buf));
       
@@ -439,12 +439,12 @@ namespace btk
     std::string buf;
     *iss >> buf; // label
     double frame;
-    *iss >> frame;
-    while(!iss->eof())
+    do
     {
-      output->AppendEvent(Event::New(label, static_cast<int>(frame), context, Event::Unknown, "", "", id));
       *iss >> frame;
+      output->AppendEvent(Event::New(label, static_cast<int>(frame), context, Event::Unknown, "", "", id));
     }
+    while(!iss->eof());
   };
   
   void XLSOrthotrackFileIO::ExtractEventDetectionFlag(Acquisition::Pointer output, std::istringstream* iss, const std::string& label, const std::string& context)
@@ -454,9 +454,9 @@ namespace btk
     *iss >> buf; // label
     *iss >> buf; // FP
     double frame;
-    *iss >> frame;
-    while(!iss->eof())
+    do
     { 
+      *iss >> frame;
       for (Acquisition::EventIterator it = output->BeginEvent() ; it != output->EndEvent() ; ++it)
       {
         if (((*it)->GetLabel().compare(label) == 0) 
@@ -467,8 +467,8 @@ namespace btk
           break;
         }
       }
-      *iss >> frame;
     }
+    while(!iss->eof());
   };
   
   void XLSOrthotrackFileIO::AppendSpatiotemparalParameter(MetaData::Pointer st, std::istringstream* iss, double scale)
@@ -476,14 +476,15 @@ namespace btk
     iss->clear();
     std::string name;
     float val;
-    std::vector<float>  values;
+    std::vector<float> values;
     *iss >> name;
-    *iss >> val;
-    while (!iss->eof())
+    float s = static_cast<float>(scale);
+    do
     {
-      values.push_back(val * scale);
       *iss >> val;
+      values.push_back(val * s);
     }
+    while (!iss->eof());
     MetaDataCreateChild(st, name, values);
   };
   

@@ -910,7 +910,6 @@ namespace btk
    */
   void C3DFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
-    //throw(C3DFileIOException("Method not yet implemented. Impossible to savean acquisition in a C3D file."));
     if (input.get() == 0)
     {
       btkErrorMacro("Null acquisition.");
