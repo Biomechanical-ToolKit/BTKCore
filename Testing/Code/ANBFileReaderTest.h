@@ -1,9 +1,9 @@
-#ifndef ANCFileReaderTest_h
-#define ANCFileReaderTest_h
+#ifndef ANBFileReaderTest_h
+#define ANBFileReaderTest_h
 
 #include <btkAcquisitionFileReader.h>
 
-CXXTEST_SUITE(ANCFileReaderTest)
+CXXTEST_SUITE(ANBFileReaderTest)
 {
   CXXTEST_TEST(NoFile)
   {
@@ -14,14 +14,14 @@ CXXTEST_SUITE(ANCFileReaderTest)
   CXXTEST_TEST(MisspelledFile)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename("test.anc");
-    TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::AcquisitionFileReaderException &e, e.what(), std::string("File doesn't exist\nFilename: test.anc"));
+    reader->SetFilename("test.anb");
+    TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::AcquisitionFileReaderException &e, e.what(), std::string("File doesn't exist\nFilename: test.anb"));
   };
   
   CXXTEST_TEST(Gait)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(ANCFilePathIN + "Gait.anc");
+    reader->SetFilename(ANBFilePathIN + "Gait.anb");
     reader->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
 
@@ -52,7 +52,38 @@ CXXTEST_SUITE(ANCFileReaderTest)
     TS_ASSERT_DELTA(acq->GetAnalog(13)->GetValues()(0), -0.2627, 0.0001);
     TS_ASSERT_DELTA(acq->GetAnalog(13)->GetValues()(1), -0.3169, 0.0001);
     TS_ASSERT_DELTA(acq->GetAnalog(13)->GetValues()(2), -0.2481, 0.0001);
-    
+    /*
+    std::vector<int16_t> analogIndex = acq->GetMetaData()->GetChild("ANALOG")->GetChild("INDEX")->GetInfo()->ToInt16();
+    TS_ASSERT_EQUALS(analogIndex.size(), 28);
+    TS_ASSERT_EQUALS(analogIndex.at(0), 1);
+    TS_ASSERT_EQUALS(analogIndex.at(1), 2);
+    TS_ASSERT_EQUALS(analogIndex.at(2), 3);
+    TS_ASSERT_EQUALS(analogIndex.at(3), 4);
+    TS_ASSERT_EQUALS(analogIndex.at(4), 5);
+    TS_ASSERT_EQUALS(analogIndex.at(5), 6);
+    TS_ASSERT_EQUALS(analogIndex.at(6), 7);
+    TS_ASSERT_EQUALS(analogIndex.at(7), 8);
+    TS_ASSERT_EQUALS(analogIndex.at(8), 9);
+    TS_ASSERT_EQUALS(analogIndex.at(9), 10);
+    TS_ASSERT_EQUALS(analogIndex.at(10), 11);
+    TS_ASSERT_EQUALS(analogIndex.at(11), 12);
+    TS_ASSERT_EQUALS(analogIndex.at(12), 13);
+    TS_ASSERT_EQUALS(analogIndex.at(13), 14);
+    TS_ASSERT_EQUALS(analogIndex.at(14), 15);
+    TS_ASSERT_EQUALS(analogIndex.at(15), 16);
+    TS_ASSERT_EQUALS(analogIndex.at(16), 17);
+    TS_ASSERT_EQUALS(analogIndex.at(17), 18);
+    TS_ASSERT_EQUALS(analogIndex.at(18), 19);
+    TS_ASSERT_EQUALS(analogIndex.at(19), 20);
+    TS_ASSERT_EQUALS(analogIndex.at(20), 21);
+    TS_ASSERT_EQUALS(analogIndex.at(21), 22);
+    TS_ASSERT_EQUALS(analogIndex.at(22), 23);
+    TS_ASSERT_EQUALS(analogIndex.at(23), 24);
+    TS_ASSERT_EQUALS(analogIndex.at(24), 25);
+    TS_ASSERT_EQUALS(analogIndex.at(25), 26);
+    TS_ASSERT_EQUALS(analogIndex.at(26), 27);
+    TS_ASSERT_EQUALS(analogIndex.at(27), 28);
+    */
     std::vector<int16_t> channel = acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CHAN")->GetChild("CHANNEL")->GetInfo()->ToInt16();
     std::vector<uint8_t> dims = acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CHAN")->GetChild("CHANNEL")->GetInfo()->GetDimensions();
     TS_ASSERT_EQUALS(channel.size(), 12);
@@ -74,8 +105,8 @@ CXXTEST_SUITE(ANCFileReaderTest)
   };
 };
 
-CXXTEST_SUITE_REGISTRATION(ANCFileReaderTest)
-CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, NoFile)
-CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, MisspelledFile)
-CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, Gait)
+CXXTEST_SUITE_REGISTRATION(ANBFileReaderTest)
+CXXTEST_TEST_REGISTRATION(ANBFileReaderTest, NoFile)
+CXXTEST_TEST_REGISTRATION(ANBFileReaderTest, MisspelledFile)
+CXXTEST_TEST_REGISTRATION(ANBFileReaderTest, Gait)
 #endif

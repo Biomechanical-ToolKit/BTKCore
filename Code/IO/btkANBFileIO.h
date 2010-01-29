@@ -33,33 +33,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkANCFileIO_h
-#define __btkANCFileIO_h
+#ifndef __btkANBFileIO_h
+#define __btkANBFileIO_h
 
 #include "btkAcquisitionFileIO.h"
+#include "btkBinaryFileStream.h"
 #include "btkException.h"
 
 namespace btk
 {
-  class ANCFileIOException : public Exception
+  class ANBFileIOException : public Exception
   {
   public:
-    explicit ANCFileIOException(const std::string& msg)
+    explicit ANBFileIOException(const std::string& msg)
     : Exception(msg)
     {};
       
-    virtual ~ANCFileIOException() throw() {};
+    virtual ~ANBFileIOException() throw() {};
   };
   
-  class ANCFileIO : public AcquisitionFileIO
+  class ANBFileIO : public AcquisitionFileIO
   {
   public:
-    typedef SharedPtr<ANCFileIO> Pointer;
-    typedef SharedPtr<const ANCFileIO> ConstPointer;
+    typedef SharedPtr<ANBFileIO> Pointer;
+    typedef SharedPtr<const ANBFileIO> ConstPointer;
     
-    static Pointer New() {return Pointer(new ANCFileIO());};
+    static Pointer New() {return Pointer(new ANBFileIO());};
     
-    // ~ANCFileIO(); // Implicit.
+    // ~ANBFileIO(); // Implicit.
     
     BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
     BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename);
@@ -67,15 +68,30 @@ namespace btk
     BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input);
     
   protected:
-    BTK_IO_EXPORT ANCFileIO();
+    BTK_IO_EXPORT ANBFileIO();
     
   private:
-    std::string ExtractKeywordValue(const std::string& line, const std::string& keyword) const;
-    void ExtractDataInfo(const std::string& line, const std::string& keyword, std::list<std::string>& info) const;
+    size_t ReadKeyValueU8(uint8_t* val, IEEELittleEndianBinaryFileStream* bifs, int key);
+    size_t ReadKeyValueU8(std::vector<uint8_t>& val, IEEELittleEndianBinaryFileStream* bifs, int key);
+    size_t ReadKeyValueU16(uint16_t* val, IEEELittleEndianBinaryFileStream* bifs, int key);
+    size_t ReadKeyValueU16(std::vector<uint16_t>& val, IEEELittleEndianBinaryFileStream* bifs, int key);
+    size_t ReadKeyValueU32(uint32_t* val, IEEELittleEndianBinaryFileStream* bifs, int key);
+    size_t ReadKeyValueFloat(float* val, IEEELittleEndianBinaryFileStream* bifs, int key);
+    size_t ReadKeyValueString(std::string& val, IEEELittleEndianBinaryFileStream* bifs, int key);
+    void ReadKey(IEEELittleEndianBinaryFileStream* bifs, int key) const;
+    void CheckSizeForSingleValue(IEEELittleEndianBinaryFileStream* bifs) const;
     
-    ANCFileIO(const ANCFileIO& ); // Not implemented.
-    ANCFileIO& operator=(const ANCFileIO& ); // Not implemented. 
+    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint8_t>& val);
+    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint16_t>& val);
+    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, uint32_t val);
+    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, float val);
+    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::string& val);
+    
+    uint16_t DetectAnalogRange(double s, int bitDepth);
+    
+    ANBFileIO(const ANBFileIO& ); // Not implemented.
+    ANBFileIO& operator=(const ANBFileIO& ); // Not implemented. 
    };
 };
 
-#endif // __btkANCFileIO_h
+#endif // __btkANBFileIO_h

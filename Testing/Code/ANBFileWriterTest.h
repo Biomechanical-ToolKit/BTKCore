@@ -1,10 +1,11 @@
-#ifndef ANCFileWriterTest_h
-#define ANCFileWriterTest_h
+#ifndef ANBFileWriterTest_h
+#define ANBFileWriterTest_h
 
 #include <btkAcquisitionFileWriter.h>
-#include <btkANCFileIO.h>
+#include <btkAcquisitionFileReader.h>
+#include <btkANBFileIO.h>
 
-CXXTEST_SUITE(ANCFileWriterTest)
+CXXTEST_SUITE(ANBFileWriterTest)
 {
   CXXTEST_TEST(NoFileNoInput)
   {
@@ -15,7 +16,7 @@ CXXTEST_SUITE(ANCFileWriterTest)
   CXXTEST_TEST(NoFile)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(ANCFilePathIN + "Gait.anc");
+    reader->SetFilename(ANBFilePathIN + "Gait.anb");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     writer->SetInput(reader->GetOutput());
     TS_ASSERT_THROWS_EQUALS(writer->Update(), const btk::AcquisitionFileWriterException &e, e.what(), std::string("Filename must be specified."));
@@ -25,9 +26,9 @@ CXXTEST_SUITE(ANCFileWriterTest)
   CXXTEST_TEST(NoFileWithIO)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(ANCFilePathIN + "Gait.anc");
+    reader->SetFilename(ANBFilePathIN + "Gait.anb");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
-    btk::ANCFileIO::Pointer io = btk::ANCFileIO::New();
+    btk::ANBFileIO::Pointer io = btk::ANBFileIO::New();
     writer->SetAcquisitionIO(io);
     TS_ASSERT_THROWS_EQUALS(writer->Update(), const btk::AcquisitionFileWriterException &e, e.what(), std::string("Filename must be specified."));
   };
@@ -35,13 +36,14 @@ CXXTEST_SUITE(ANCFileWriterTest)
   CXXTEST_TEST(Gait_rewrited)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(ANCFilePathIN + "Gait.anc");
+    reader->SetFilename(ANBFilePathIN + "Gait.anb");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     writer->SetInput(reader->GetOutput());
-    writer->SetFilename(ANCFilePathOUT + "Gait_rewrited.anc");
+    writer->SetFilename(ANBFilePathOUT + "Gait_rewrited.anb");
     writer->Update();
+
     btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
-    reader2->SetFilename(ANCFilePathOUT + "Gait_rewrited.anc");
+    reader2->SetFilename(ANBFilePathOUT + "Gait_rewrited.anb");
     reader2->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
     btk::Acquisition::Pointer acq2 = reader2->GetOutput();
@@ -68,30 +70,30 @@ CXXTEST_SUITE(ANCFileWriterTest)
     reader->SetFilename(C3DFilePathIN + "others/Gait.c3d");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     writer->SetInput(reader->GetOutput());
-    writer->SetFilename(ANCFilePathOUT + "Gait_from_c3d.anc");
+    writer->SetFilename(ANBFilePathOUT + "Gait_from_c3d.anb");
     writer->Update();
     
     btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
     reader->SetAcquisitionIO(); // Reset IO
-    reader->SetFilename(ANCFilePathIN + "Gait.anc");
+    reader->SetFilename(ANBFilePathIN + "Gait.anb");
     reader->Update();
-    reader2->SetFilename(ANCFilePathOUT + "Gait_from_c3d.anc");
+    reader2->SetFilename(ANBFilePathOUT + "Gait_from_c3d.anb");
     reader2->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
     btk::Acquisition::Pointer acq2 = reader2->GetOutput();
-
+    
     for(int i = 12 ; i < 28 ; ++i)
     {
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetGain(), acq2->GetAnalog(i)->GetGain());
       for(int j = 0 ; j < 4870 ; ++j)
       {
         TS_ASSERT_DELTA(acq->GetAnalog(i)->GetValues()(j), acq2->GetAnalog(i)->GetValues()(j), 0.001);
       }
     }
-
+    
     TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
     TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
-    // TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber()); // Not the same number of frames due to a truncated C3D file.
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
     TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
     std::string boardInfo = acq2->GetMetaData()->GetChild("ANALOG")->GetChild("BOARD")->GetInfo()->ToString(0);
@@ -113,10 +115,10 @@ CXXTEST_SUITE(ANCFileWriterTest)
   };
 };
 
-CXXTEST_SUITE_REGISTRATION(ANCFileWriterTest)
-CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, NoFileNoInput)
-CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, NoFile)
-CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, NoFileWithIO)
-CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, Gait_rewrited)
-CXXTEST_TEST_REGISTRATION(ANCFileWriterTest, Gait_from_c3d)  
+CXXTEST_SUITE_REGISTRATION(ANBFileWriterTest)
+CXXTEST_TEST_REGISTRATION(ANBFileWriterTest, NoFileNoInput)
+CXXTEST_TEST_REGISTRATION(ANBFileWriterTest, NoFile)
+CXXTEST_TEST_REGISTRATION(ANBFileWriterTest, NoFileWithIO)
+CXXTEST_TEST_REGISTRATION(ANBFileWriterTest, Gait_rewrited)
+CXXTEST_TEST_REGISTRATION(ANBFileWriterTest, Gait_from_c3d)  
 #endif

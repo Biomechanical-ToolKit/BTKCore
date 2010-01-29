@@ -33,49 +33,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkANCFileIO_h
-#define __btkANCFileIO_h
+#ifndef __btkANxFileIOUtils_h
+#define __btkANxFileIOUtils_h
 
-#include "btkAcquisitionFileIO.h"
+#include "btkAcquisition.h"
 #include "btkException.h"
+#include <vector>
+
+#ifdef _MSC_VER
+  #include "../../Utilities/stdint.h"
+#else
+  #include <stdint.h>
+#endif
 
 namespace btk
 {
-  class ANCFileIOException : public Exception
+  class ANxFileIOException : public Exception
   {
   public:
-    explicit ANCFileIOException(const std::string& msg)
+    explicit ANxFileIOException(const std::string& msg)
     : Exception(msg)
     {};
       
-    virtual ~ANCFileIOException() throw() {};
+    virtual ~ANxFileIOException() throw() {};
   };
   
-  class ANCFileIO : public AcquisitionFileIO
-  {
-  public:
-    typedef SharedPtr<ANCFileIO> Pointer;
-    typedef SharedPtr<const ANCFileIO> ConstPointer;
-    
-    static Pointer New() {return Pointer(new ANCFileIO());};
-    
-    // ~ANCFileIO(); // Implicit.
-    
-    BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
-    BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename);
-    BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output);
-    BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input);
-    
-  protected:
-    BTK_IO_EXPORT ANCFileIO();
-    
-  private:
-    std::string ExtractKeywordValue(const std::string& line, const std::string& keyword) const;
-    void ExtractDataInfo(const std::string& line, const std::string& keyword, std::list<std::string>& info) const;
-    
-    ANCFileIO(const ANCFileIO& ); // Not implemented.
-    ANCFileIO& operator=(const ANCFileIO& ); // Not implemented. 
-   };
+  void ANxFileIOCheckHeader(double preciseRate, int channelNumber, 
+                            const std::vector<uint16_t>& channelRate, 
+                            const std::vector<uint16_t>& channelRange);
+  void ANxFileIOStoreHeader(Acquisition::Pointer output,
+                            double preciseRate, int frameNumber, int channelNumber,
+                            const std::vector<std::string>& channelLabel,
+                            const std::vector<uint16_t>& channelRate,
+                            const std::vector<uint16_t>& channelRange,
+                            const std::string& boardType, int bitDepth, int gen = 2);
+  void ANxFileIOExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, 
+                            Acquisition::Pointer output, const char** labels, int num);
+  void ANxFileIOExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, 
+                            Acquisition::Pointer output, const std::string& prefix, const char** labels, int num);
+  void ANxFileIOExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, 
+                            Acquisition::Pointer output, const std::vector<std::string>& labels);
+  int ANxFileIOFindAnalogLabeCaselInsensitive(const std::string& label, Acquisition::Pointer output);
+
 };
 
-#endif // __btkANCFileIO_h
+#endif // __btkANxFileIOUtils_h

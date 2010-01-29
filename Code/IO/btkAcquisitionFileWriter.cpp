@@ -206,7 +206,7 @@ namespace btk
     {
       this->m_AcquisitionIO = AcquisitionFileIOFactory::CreateAcquisitionIO(this->m_Filename.c_str(), AcquisitionFileIOFactory::WriteMode);
       if (this->m_AcquisitionIO.get() == 0)
-        throw AcquisitionFileWriterException("No IO found, the file is not  supported or the file suffix is misspelled (IOs use it to verify they can write the file)\nFilename: " + this->m_Filename);
+        throw AcquisitionFileWriterException("No IO found, the file is not supported or the file suffix is misspelled (IOs use it to verify they can write the file)\nFilename: " + this->m_Filename);
     }
     
     this->m_AcquisitionIO->Write(this->m_Filename, this->GetInput());

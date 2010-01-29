@@ -3,7 +3,9 @@ SET(BTKIO_SRCS
   btkAcquisitionFileIOFactory.cpp
   btkAcquisitionFileReader.cpp
   btkAcquisitionFileWriter.cpp
+  btkANBFileIO.cpp
   btkANCFileIO.cpp
+  btkANxFileIOUtils.cpp
   btkCALForcePlateFileIO.cpp
   btkBinaryFileStream.cpp
   btkC3DFileIO.cpp

@@ -44,7 +44,7 @@ namespace btk
   class Analog : public Measure<1>
   {
   public:
-    typedef enum {Unknown = 0, PlusMinus10 = 10000, PlusMinus5 = 5000, PlusMinus2Dot5 = 2500 , PlusMinus1Dot25 = 1250, PlusMinus1 = 1000} Gain;
+    typedef enum {Unknown = 0, PlusMinus10 = 10000, PlusMinus5 = 5000, PlusMinus2Dot5 = 2500, PlusMinus1Dot25 = 1250, PlusMinus1 = 1000} Gain;
 
     typedef SharedPtr<Analog> Pointer;
     typedef SharedPtr<const Analog> ConstPointer;

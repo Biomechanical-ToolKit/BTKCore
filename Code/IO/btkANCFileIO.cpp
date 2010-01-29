@@ -35,6 +35,7 @@
 
 #include "btkANCFileIO.h"
 #include "btkMetaDataUtils.h"
+#include "btkANxFileIOUtils.h"
 #include "btkConvert.h"
 
 #if defined(_MSC_VER)
@@ -183,127 +184,28 @@ namespace btk
         // Analog channels' rate
         std::getline(ifs, line);
         this->ExtractDataInfo(line, "Rate", rates);
-        if (numberOfChannels != rates.size())
-          throw(ANCFileIOException("ANC corrupted file: Incorrect number of analog rates."));
         // Analog channels' range
         std::getline(ifs, line);
         this->ExtractDataInfo(line, "Range", ranges);
-        if (numberOfChannels != ranges.size())
-          throw(ANCFileIOException("ANC corrupted file: Incorrect number of analog ranges."));
-        // Check that all analog channels' rate are the same. Only equal rates are supported for the moment.
-        //std::vector<double> rates = std::vector<double>(numberOfChannels, 0.0);
+        int numberOfFrames = static_cast<int>(duration * preciseRate) + 1;
+        
+        // Data conversion
+        std::vector<std::string> channelLabel(labels.size());
+        std::vector<uint16_t> channelRate(rates.size());
+        std::vector<uint16_t> channelRange(ranges.size());
         int inc = 0;
         for (std::list<std::string>::const_iterator it = rates.begin() ; it != rates.end() ; ++it)
-        {
-          //FromString(*it, rates[inc]);
-          if (fabs(preciseRate - FromString<double>(*it)) > 0.1)
-            throw(ANCFileIOException("Only analog channels with equal rates are supported for the moment. Please, send an email to the developers to explain the problem."));
-          ++inc;
-        }
-        // Set the btk::Acquisition object.
-        int numberOfFrames = static_cast<int>(duration * preciseRate);
-        output->Init(0, numberOfFrames, numberOfChannels);
-        output->SetPointFrequency(preciseRate);
-        MetaData::Pointer analog = MetaDataCreateChild(output->GetMetaData(), "ANALOG");
-        MetaDataCreateChild(analog, "BOARD", boardType);
-        switch(bitDepth)
-        {
-          case 8:
-            output->SetAnalogResolution(Acquisition::Bit8);
-            break;
-          case 12:
-            output->SetAnalogResolution(Acquisition::Bit12);            
-            break;
-          case 14:
-            output->SetAnalogResolution(Acquisition::Bit14);            
-            break;
-          case 16:
-            output->SetAnalogResolution(Acquisition::Bit16);            
-            break;
-          default:
-            btkIOErrorMacro(filename, "Unknown bit depth resolution. Default value used: 12 bits.");
-            output->SetAnalogResolution(Acquisition::Bit12);            
-            break;
-        }
-        std::list<std::string>::const_iterator itLabel = labels.begin();
-        std::list<std::string>::const_iterator itRange = ranges.begin();
-        for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
-        {
-          (*it)->SetLabel(*itLabel);
-          if (gen == 1)
-          {
-            int range = FromString<int>(*itRange);
-            (*it)->SetScale(pow(2.0, bitDepth) / static_cast<double>(range));
-          }
-          else
-          {
-            int range = FromString<int>(*itRange);
-            switch(range) // range is in mV
-            {
-              case 10000:
-                (*it)->SetGain(Analog::PlusMinus10);
-                break;
-              case 5000:
-                (*it)->SetGain(Analog::PlusMinus5);
-                break;
-              case 2500:
-                (*it)->SetGain(Analog::PlusMinus2Dot5);
-                break;
-              case 1250:
-                (*it)->SetGain(Analog::PlusMinus1Dot25);
-                break;
-              case 1000:
-                (*it)->SetGain(Analog::PlusMinus1);
-                break;
-              default:
-                btkIOErrorMacro(filename, "Unknown range: '" + *itRange + "'. Default value used: +/- 10 V");
-                (*it)->SetGain(Analog::PlusMinus10);
-                break;
-            }
-            (*it)->SetScale(2.0 * static_cast<double>(range) / 1000.0 / pow(2.0, bitDepth));
-          }
-          ++itLabel; ++itRange;
-        }
-        // Extract force platform channel.
-        // WARNING: This part only supports some format. For example:
-        //  - FX, FY, FZ, MX, MY, MZ
-        //  - F<idx>X, F<idx>Y, F<idx>Z, M<idx>X, M<idx>Y, M<idx>Z
-        //  - FX<idx>, FY<idx>, FZ<idx>, MX<idx>, MY<idx>, MZ<idx>
-        //  - The prefix FP or FP<idx> can also be added.
-        std::vector< std::vector<int16_t> > fpChan;
-        //const char* labelsTypeI[] = {"FX", "FY", "FZ", "PX", "PY", "MZ"};
-        const char* labelsTypeII[] = {"FX", "FY", "FZ", "MX", "MY", "MZ"};
-        //const char* labelsTypeIII[] = {"FX12", "FX34", "FY14", "FY23", "FZ1", "FZ2", "FZ3", "FZ4"};
-        // FP type II start as the initial CAL format is composed of this type of force platform
-        // The scale adataption is realized in the next lines.
-        this->ExtractForcePlatformChannel(fpChan, output, labelsTypeII, sizeof(labelsTypeII) / sizeof(char*));
-        this->ExtractForcePlatformChannel(fpChan, output, "FP", labelsTypeII, sizeof(labelsTypeII) / sizeof(char*));
-        //this->ExtractForcePlatformChannel(fpChan, output, labelsTypeI, sizeof(labelsTypeI) / sizeof(char*));
-        //this->ExtractForcePlatformChannel(fpChan, output, "FP", labelsTypeI, sizeof(labelsTypeI) / sizeof(char*));
-        //this->ExtractForcePlatformChannel(fpChan, output, "FP", labelsTypeIII, sizeof(labelsTypeIII) / sizeof(char*));
+          FromString(*it, channelRate[inc++]);
+        inc = 0;
+        for (std::list<std::string>::const_iterator it = ranges.begin() ; it != ranges.end() ; ++it)
+          FromString(*it, channelRange[inc++]);
+        inc = 0;
+        for (std::list<std::string>::const_iterator it = labels.begin() ; it != labels.end() ; ++it)
+          channelLabel[inc++] = *it;
+
+        ANxFileIOCheckHeader(preciseRate, numberOfChannels, channelRate, channelRange);
+        ANxFileIOStoreHeader(output, preciseRate, numberOfFrames, numberOfChannels, channelLabel, channelRate, channelRange, boardType, bitDepth, gen);
         
-        if (fpChan.size() != 0)
-        {  
-          // Create the metadata BTK_PARTIAL_FP_CHAN
-          btk::MetaData::Pointer partial = btk::MetaData::New("BTK_PARTIAL_FP_CHAN");
-          output->GetMetaData()->AppendChild(partial);
-          // - BTK_PARTIAL_FP_CHAN:CHANNEL
-          int numFp = fpChan.size();
-          int numMaxChannel = 0;
-          for (std::vector< std::vector<int16_t> >::const_iterator it = fpChan.begin() ; it != fpChan.end() ; ++it)
-          {
-            if (numMaxChannel < static_cast<int>(it->size()))
-              numMaxChannel = it->size();
-          }
-          std::vector<int16_t> channel(numFp * numMaxChannel, 65535);
-          for (int i = 0 ; i < numFp ; ++i)
-          {
-            for (int j = 0 ; j < static_cast<int>(fpChan[i].size()) ; ++j)
-              channel[i * numMaxChannel + j] = fpChan[i][j];
-          }
-          std::vector<uint8_t> dims(2, 0); dims[0] = numMaxChannel; dims[1] = numFp;
-          partial->AppendChild(btk::MetaData::New("CHANNEL", dims, channel));
-        }
         // Extract values
         std::string buf;
         double val = 0.0;
@@ -339,6 +241,11 @@ namespace btk
     {
       if (ifs.is_open()) ifs.close(); 
       throw;
+    }
+    catch (ANxFileIOException& e)
+    {
+      if (ifs.is_open()) ifs.close();
+      throw(ANCFileIOException(e.what()));
     }
     catch (std::exception& e)
     {
@@ -391,13 +298,13 @@ namespace btk
       case Acquisition::Bit8:
         bitDepth = 8;
         break;
-      case 12:
+      case Acquisition::Bit12:
         bitDepth = 12;
         break;
-      case 14:
+      case Acquisition::Bit14:
         bitDepth = 14;
         break;
-      case 16:
+      case Acquisition::Bit16:
         bitDepth = 16;
         break;
       default:         
@@ -428,7 +335,7 @@ namespace btk
         << static_cast<std::string>("\tPolarity:\tBipolar");
     ofs << static_cast<std::string>("\nTrial_Name:\t") << onlyFilename.substr(0, onlyFilename.length() - 4)
         << static_cast<std::string>("\tTrial#:\t") << 1 
-        << static_cast<std::string>("\tDuration(Sec.):\t") << stepTime * input->GetAnalogFrameNumber() 
+        << static_cast<std::string>("\tDuration(Sec.):\t") << stepTime * (input->GetAnalogFrameNumber() - 1) 
         << static_cast<std::string>("\t#Channels:\t") << input->GetAnalogNumber();
     ofs << static_cast<std::string>("\nBitDepth:\t") << bitDepth
         << static_cast<std::string>("\tPreciseRate:\t") << freq
@@ -452,10 +359,7 @@ namespace btk
         ofs << std::endl << time << static_cast<std::string>("\t");
         ofs.precision(8);
         for (AnalogCollection::ConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-        {
-          
           ofs << (*it)->GetValues().coeffRef(frame) << static_cast<std::string>("\t");
-        };
         time += stepTime;
       };
     }
@@ -488,9 +392,7 @@ namespace btk
         ofs.precision(6);
         ofs << std::endl << time << static_cast<std::string>("\t");
         for (AnalogCollection::ConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-        {
           ofs << static_cast<int>((*it)->GetValues().coeffRef(frame) / (*it)->GetScale()) << static_cast<std::string>("\t");
-        };
         time += stepTime;
       };
     }
@@ -550,83 +452,5 @@ namespace btk
         info.push_back(buf);
       }
     }
-  };
-  
-  void ANCFileIO::ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const char** labels, int num) const
-  {
-    if ((output->GetAnalogNumber() - static_cast<int>(fpChan.size())) < num)
-      return;
-    std::vector<std::string> labels2(num, "");
-    std::string suffix = "";
-    // Looking for label with suffix "",0,1,2,3,4,5
-    for (int i = 0 ; i < 6 ; ++i)
-    {
-      for (int j = 0 ; j < num ; ++j)
-        labels2[j] = std::string(labels[j]) + suffix;
-      this->ExtractForcePlatformChannel(fpChan, output, labels2);
-      suffix = ToString(i);
-    }
-    // Looking for label with index 0,1,2,3,4,5 after the first letter.
-    for (int i = 0 ; i < 6 ; ++i)
-    {
-      suffix = ToString(i);
-      for (int j = 0 ; j < num ; ++j)
-      {
-        labels2[j] = std::string(labels[j]);
-        labels2[j].insert(1, suffix);
-      }
-      this->ExtractForcePlatformChannel(fpChan, output, labels2);
-    }
-  };
-  
-  void ANCFileIO::ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::string& prefix, const char** labels, int num) const
-  {
-    if ((output->GetAnalogNumber() - fpChan.size()) < 6)
-      return;
-    std::vector<std::string> labels2(num, "");
-    std::string suffix = "";
-    // Looking for label with prefix and a possible index between 0 and 5 (included).
-    for (int i = 0 ; i < 6 ; ++i)
-    {
-      for (int j = 0 ; j < num ; ++j)
-        labels2[j] =  prefix + suffix + std::string(labels[j]);
-      this->ExtractForcePlatformChannel(fpChan, output, labels2);
-      suffix = ToString(i);
-    }
-  };
-  
-  // Adapt also the scale of the force platform channels.
-  void ANCFileIO::ExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::vector<std::string>& labels) const
-  {
-    std::vector<int16_t> fp;
-    for (int i = 0 ; i < static_cast<int>(labels.size()) ; ++i)
-    {
-      int idx = this->FindAnalogLabeCaselInsensitive(labels[i], output);
-      if (idx <= output->GetAnalogNumber())
-        fp.push_back(idx);
-    }
-    if (fp.size() == labels.size())
-    {
-      fpChan.push_back(fp);
-      for (int i = 0 ; i < static_cast<int>(fp.size()) ; ++i)
-      {
-        Analog::Pointer a = output->GetAnalog(fp[i]-1);
-        a->SetScale(a->GetScale() / 4000.0 / 10.0 * 1000000.0 * -1.0);
-      }
-    }
-  };
-  
-  int ANCFileIO::FindAnalogLabeCaselInsensitive(const std::string& label, Acquisition::Pointer output) const
-  {
-    int idx = 1;
-    for (Acquisition::AnalogConstIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
-    {
-      std::string l = (*it)->GetLabel();
-      std::transform(l.begin(), l.end(), l.begin(), toupper);
-      if (label.compare(l) == 0)
-        break;
-      ++idx;
-    }
-    return idx;
   };
 };
