@@ -162,69 +162,69 @@ namespace btk
       iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss, 10.0);
       // R_Velocity
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss, 10.0);
       // R_Stride_Len
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss, 10.0);
       // R_Cadence
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss);
       // L_Velocity
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss, 10.0);
       // L_Stride_Len
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss, 10.0);
       // L_Cadence
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss);
       // R_Support_Time
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss);
       // L_Support_Time
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss);
       // R_Non_Support
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss);
       // L_Non_Support
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss);
       // R_Step_Len
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss, 10.0);
       // L_Step_Len
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss, 10.0);
       // R_Dbl_Support
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss);
       // L_Dbl_Support
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendSpatiotemparalParameter(spatiotemp, &iss);
       
       // Events 
       // Only the frame index is set. There is no information on the acquisition frequency
       // RHS
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendEvent(output, &iss, "Foot Strike", "Right", 1);
       // LHS
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendEvent(output, &iss, "Foot Strike", "Left", 1);
       // RTO
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendEvent(output, &iss, "Foot Off", "Right", 2);
       // LTO
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->AppendEvent(output, &iss, "Foot Off", "Left", 2);
       
       // Determine the event detected from the force platforms' data
       // RHS FP
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->ExtractEventDetectionFlag(output, &iss, "Foot Strike", "Right");
       // LHS FP
-      std::getline(ifs, line); iss.str(line);
+      std::getline(ifs, line); line.erase(line.find_last_of('\r'), 1); iss.str(line);
       this->ExtractEventDetectionFlag(output, &iss, "Foot Strike", "Left");
       
       // Extract labels
