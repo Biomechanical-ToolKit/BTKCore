@@ -36,6 +36,9 @@
 #include "btkANxFileIOUtils.h"
 #include "btkMetaDataUtils.h"
 
+#include <algorithm>
+#include <cctype>
+
 namespace btk
 {
   /**
@@ -61,10 +64,10 @@ namespace btk
                             const std::vector<uint16_t>& channelRange)
   {
     // Analog channels' rate
-    if (channelNumber > channelRate.size())
+    if (channelNumber > static_cast<int>(channelRate.size()))
       throw(ANxFileIOException("Incorrect number of analog rates."));
     // Analog channels' range
-    if (channelNumber > channelRange.size())
+    if (channelNumber > static_cast<int>(channelRange.size()))
       throw(ANxFileIOException("Incorrect number of analog ranges."));
     // Check that all analog channels' rate are the same. Only equal rates are supported for the moment.
     int inc = 0;

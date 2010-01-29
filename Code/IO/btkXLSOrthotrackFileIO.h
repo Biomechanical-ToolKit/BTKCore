@@ -75,10 +75,19 @@ namespace btk
     void AppendSpatiotemparalParameter(MetaData::Pointer st, std::istringstream* iss, double scale = 1.0);
     bool ExtractSpecialAngleLabel(std::string& label, const std::string& str) const;
     bool ExtractSpecialForceLabel(std::string& label, const std::string& str) const;
+    inline void ConvertCRLFToCF(std::istringstream* iss, std::string& line);
     
     XLSOrthotrackFileIO(const XLSOrthotrackFileIO& ); // Not implemented.
     XLSOrthotrackFileIO& operator=(const XLSOrthotrackFileIO& ); // Not implemented.
-   };
+  };
+   
+  void XLSOrthotrackFileIO::ConvertCRLFToCF(std::istringstream* iss, std::string& line)
+  { 
+    size_t pos = line.find_last_of('\r');
+    if (pos != std::string::npos)
+      line.erase(pos, 1); 
+    iss->str(line);
+  }; 
 };
 
 #endif // __btkXLSOrthotrackFileIO_h

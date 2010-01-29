@@ -38,6 +38,9 @@
 #include "btkMetaDataUtils.h"
 #include "btkConvert.h"
 
+#include <algorithm>
+#include <cctype>
+
 namespace btk
 {
   /**
@@ -143,7 +146,7 @@ namespace btk
       counter += this->ReadKeyValueFloat(&firstTime, &bifs, 0x0105);
       counter += this->ReadKeyValueU16(channelRange, &bifs, 0x0106);
       std::vector<std::string> channelLabel = std::vector<std::string>(channelNumber);
-      for (int i = 0 ; i < channelNumber ; ++i)
+      for (int i = 0 ; i < static_cast<int>(channelNumber) ; ++i)
         counter += this->ReadKeyValueString(channelLabel[i], &bifs, 0x0107);
       if (counter != headerSize)
         throw ANBFileIOException("The size of the header is not equal to the number of words read.");
@@ -156,7 +159,7 @@ namespace btk
       
       ANxFileIOCheckHeader(preciseRate, channelNumber, channelRate, channelRange);
       ANxFileIOStoreHeader(output, preciseRate, frameNumber, channelNumber, channelLabel, channelRate, channelRange, boardType, bitDepth);
-      output->SetFirstFrame(firstTime * preciseRate + 1);
+      output->SetFirstFrame(static_cast<int>(firstTime * preciseRate) + 1);
         
       // Convert hexIndex to metadata ANALOG:INDEX
       // FIXME: What is really the content of the key 0x0103? Its data are not stored in an acquisition
@@ -179,7 +182,7 @@ namespace btk
       */
       
       // ReadKeyValue values
-      for(int i = 0 ; i < frameNumber ; ++i)
+      for(int i = 0 ; i < static_cast<int>(frameNumber) ; ++i)
       {
         for (AnalogCollection::Iterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
         {
@@ -277,7 +280,7 @@ namespace btk
       int inc = input->GetAnalogNumber(); int i = 0;
       while (inc > 0)
       {
-        hexIndex[i] = (inc > 8) ? 0xFF : pow(2, inc) - 1;
+        hexIndex[i] = (inc > 8) ? 0xFF : static_cast<uint8_t>(pow(2.0, inc) - 1);
         ++i;
         inc -= 8;
       }
@@ -390,7 +393,7 @@ namespace btk
     this->ReadKey(bifs, key);
     int16_t size = bifs->ReadU16();
     val.resize(size * 4);
-    for (int i = 0 ; i < val.size() ; ++i)
+    for (int i = 0 ; i < static_cast<int>(val.size()) ; ++i)
       val[i] = bifs->ReadU8();
     return 1 + size;
   };
@@ -408,7 +411,7 @@ namespace btk
     this->ReadKey(bifs, key);
     int16_t size = bifs->ReadU16();
     val.resize(size * 2);
-    for (int i = 0 ; i < val.size() ; ++i)
+    for (int i = 0 ; i < static_cast<int>(val.size()) ; ++i)
       val[i] = bifs->ReadU16();
     return 1 + size;
   };
@@ -461,7 +464,7 @@ namespace btk
   size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint8_t>& val)
   {
     bofs->Write(key); bofs->Write(static_cast<uint16_t>(val.size() / 4));
-    for (int i = 0 ; i < val.size() ; ++i)
+    for (int i = 0 ; i < static_cast<int>(val.size()) ; ++i)
       bofs->Write(val[i]);
     int size = val.size() / 4;
     size += ((val.size() % 4) > 0 ? 1 : 0);
@@ -472,7 +475,7 @@ namespace btk
   size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint16_t>& val)
   {
     bofs->Write(key); bofs->Write(static_cast<uint16_t>(val.size() / 2));
-    for (int i = 0 ; i < val.size() ; ++i)
+    for (int i = 0 ; i < static_cast<int>(val.size()) ; ++i)
       bofs->Write(val[i]); 
     int size = val.size() / 2;
     size += ((val.size() % 2) > 0 ? 1 : 0);
