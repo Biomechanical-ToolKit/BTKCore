@@ -8,10 +8,15 @@
 - @ref compil_sec
   - @ref build_sec
   - @ref config_sec 
-    - @ref config_tools
     - @ref config_vissupport
       - @ref config_vtk
+    - @ref config_tools
+    - @ref config_examples
+    - @ref config_shared
+    - @ref config_test
+    - @ref config_doc
     - @ref config_matlab
+    - @ref config_scilab
 - @ref install_sec
 - @ref pb_sec
 - @ref data_sec
@@ -98,9 +103,9 @@ The BTK source code is commented and permits to construct the API documentation 
 
 @section compil_sec Compilation
 
-The Biomechanical ToolKit (BTK) was tested on PC (Windows XP) with <a href="Visual C++ 2008 Express">Microsoft Visual C++ 2008 Express</a>, Mac OS X (Leopard) with <a href="http://developer.apple.com/tools/xcode/">XCode 3.1</a> and should works on Linux with GCC 4.0 or greater. The compilation process only requires the use of a terminal/command prompt. BTK use <a href="http://www.cmake.org">CMake</a> 2.6.2 or greater to generate its build system, so it is necessary to download it from <a>http://www.cmake.org/HTML/Download.html</a>. The instructions below cover the basics of running CMake for BTK under the assumption that CMake is already installed. See the CMake web page for details on <a href="http://www.cmake.org/HTML/Install.html">intalling</a> and <a href="http://www.cmake.org/HTML/RunningCMake.html">running</a> CMake. 
+The Biomechanical ToolKit (BTK) was tested on PC (Windows XP, Windows Vista, Windows 7) with <a href="http://www.microsoft.com/express/vc/">Microsoft Visual C++ 2008 Express</a>, Mac OS X (Panther, Leopard) with <a href="http://developer.apple.com/tools/xcode/">XCode</a> (3.1 and 1.5 respectively) and Linux (Ubuntu 9.10). The compilation process only requires the use of a terminal/command prompt. BTK use <a href="http://www.cmake.org">CMake</a> 2.6.2 or greater to generate its build system, so it is necessary to download it from <a>http://www.cmake.org/HTML/Download.html</a>. The instructions below cover the basics of running CMake for BTK under the assumption that CMake is already installed. See the CMake web page for details on <a href="http://www.cmake.org/HTML/Install.html">intalling</a> and <a href="http://www.cmake.org/HTML/RunningCMake.html">running</a> CMake. 
 
-Compiling BTK requires a complete BTK source tree. Running BTK regression tests (see option @ref config_test in @ref config_sec "Configuration Options in CMake") requires for the first time this option is activate an internet connection to download data files from <a>ftp://ftp.c3d.org</a>. 
+Compiling BTK requires a complete BTK source tree. Running BTK regression tests (see option @ref config_test in @ref config_sec "Configuration Options in CMake") requires for the first an internet connection to download data files from <a>ftp://ftp.c3d.org</a>. 
 
 @subsection build_sec Building with CMake
 
@@ -153,10 +158,10 @@ Permits to use the <a href="http://eigen.tuxfamily.org/">Eigen</a> library insta
 Active the building of tools embedded in BTK. These tools are:
  - Mokka: Visualizer/editor of acquisition data. Requires <a href="http://www.vtk.org">VTK</a> 5.4 or above and <a href="http://www.qtsoftware.com">Qt</a> 4.5 or above. The option @ref config_vtk must be activated.
 
-@subsubsection BUILD_EXAMPLES
+@subsubsection config_examples BUILD_EXAMPLES
 Active the building of examples in the folder Examples.
 
-@subsubsection BUILD_SHARED_LIBS
+@subsubsection config_shared BUILD_SHARED_LIBS
 Sets whether the compiled BTK libraries will be shared libraries or static libraries. When linking executables against static libraries the needed symbols will be copied from the libraries into the executables enabling them to run without access to the original libraries. When linking executables against shared libraries references to the symbols are placed into the executables. This has the advantage that many executables can share a large library without producing many copies of its code.
 @n@n
 Shared libraries have the disadvantage that they must be found at runtime in order for an executable to run. Each operating system supporting shared libraries has a component known as the dynamic loader. This component is responsible for finding the shared libraries needed by an executable when it is run. In order to run BTK executables from the build tree when using shared libraries one may need to help the dynamic loader find the libraries (usually the bin subdirectory of the build tree).
@@ -179,12 +184,21 @@ This option generate the API documentation and can be found in "Documentation/AP
 
 @subsubsection config_matlab BTK_WRAP_MATLAB
 <div class="important">
-@b Note: Matlab users using Microsoft Visual Studio 2008 can use the script @a EasyInstallWithRedistribuableMatlabToolbox_MSVC2008.bat to compile and install BTK with a single click! This script is in the root of BTK sources.
+@b Note: Matlab users using Microsoft Visual Studio (2003|2005|2008|2010) can use the script @a EasyInstallWithRedistribuableMatlabToolbox_MSVC.bat to compile and install BTK with a single click! This script is in the root of BTK sources.
 </div>
-Enable/Disable generation of BTK bindings in the Matlab language. In order to build the Matlab-based BTK interpreter, the target computer needs to have Matlab 7.0 or newer installed. To turn on Matlab wrapping, set BTK_WRAP_MATLAB to ON during the configuration process.
+Enable/Disable generation of BTK bindings in the Matlab language. In order to build the Matlab-based BTK interpreter, the target computer needs to have Matlab 7.0.4 or above installed. To turn on Matlab wrapping, set BTK_WRAP_MATLAB to ON during the configuration process.
 
 @paragraph config_matlab_redistribuable BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES
 This option is activated if BTK_WRAP_MATLAB was activated during the previous CMake configuration iteration. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is usefull for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is not compatible with BUILD_SHARED_LIBS.
+
+@subsubsection config_scilab BTK_WRAP_SCILAB
+<div class="important">
+@b Note: Scilab users using Microsoft Visual Studio (2003|2005|2008|2010) can use the script @a EasyInstallWithRedistribuableScilabToolbox_MSVC.bat to compile and install BTK with a single click! This script is in the root of BTK sources.
+</div>
+Enable/Disable generation of BTK bindings in the Scilab language. In order to build the Scilab-based BTK interpreter, the target computer needs to have Scilab 5.1 or above installed. To turn on Scilab wrapping, set BTK_WRAP_SCILAB to ON during the configuration process.
+
+@paragraph config_scilab_redistribuable BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES
+This option is activated if BTK_WRAP_SCILAB was activated during the previous CMake configuration iteration. BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES is usefull for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES is not compatible with BUILD_SHARED_LIBS.
 
 @htmlonly <hr> @endhtmlonly
 
@@ -204,8 +218,6 @@ In Matlab, the BTK project can be seen as a toolbox. You have only to add in the
 
 @section pb_sec Common Problems
 
-- BTK is not yet tested on Linux systems but should works fine.
-- The Wrapping/Matlab is not yet ready for Linux/Mac OS X due to a lack in the FindMatlab.cmake script.
 - Some compiler could not be used with Wrapping/Matlab into some OS. Mathwoks doesn't support all compiler on every plateform (Linux/Mac/Windows).
 
 @htmlonly <hr> @endhtmlonly
