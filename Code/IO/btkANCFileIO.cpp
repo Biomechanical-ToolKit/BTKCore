@@ -72,6 +72,14 @@ namespace btk
    * @class ANCFileIO
    * @brief Interface to read/write ANC files.
    *
+   * A ANC file contains analog channels data stored in ASCII format.
+   * Two generation of ANC file is known:
+   *  - Generation 1 uses the analog resolution to scale the data;
+   *  - Generation 2 uses the gains to scale the data.
+   * The use of the generation 2 (by default) creates file with a smaller size.
+   * You can use the method GetFileGeneration() and SetFileGeneration() to extract or set the 
+   * the generation file respectively.
+   *
    * The ANC file format is created by Motion Analysis Corp.
    * @warning The force platforms contained in this file format seem to be only force platforms of type II. 
    * @warning Moreover, Due to the file format, it is impossible to detect the correct scale for the force platforms' channels. Then, it is supposed, that the gain is 4000 and the excitation voltage is 10V. Plus, the scale factor is set as the opposite of the result to compute reactive forces.
@@ -140,8 +148,8 @@ namespace btk
       if (line.substr(0,41).compare("File_Type:	Analog R/C ASCII	Generation#:	") != 0)
         throw(ANCFileIOException("Invalid ANC file."));
     // Check the file generation.
-      int gen = FromString<int>(line.substr(41,1));
-      if ((gen != 1) && (gen != 2))
+      this->m_Generation = FromString<int>(line.substr(41,1));
+      if ((this->m_Generation != 1) && (this->m_Generation != 2))
         throw(ANCFileIOException("Unknown ANC file generation: " + line.substr(42,43) + "."));
     // Extract header data
       // Board_Type & Polarity
@@ -204,7 +212,7 @@ namespace btk
           channelLabel[inc++] = *it;
 
         ANxFileIOCheckHeader(preciseRate, numberOfChannels, channelRate, channelRange);
-        ANxFileIOStoreHeader(output, preciseRate, numberOfFrames, numberOfChannels, channelLabel, channelRate, channelRange, boardType, bitDepth, gen);
+        ANxFileIOStoreHeader(output, preciseRate, numberOfFrames, numberOfChannels, channelLabel, channelRate, channelRange, boardType, bitDepth, this->m_Generation);
         
         // Extract values
         std::string buf;
@@ -277,6 +285,7 @@ namespace btk
     input->Resize(input->GetPointNumber(), input->GetPointFrameNumber(), input->GetAnalogNumber(), input->GetNumberAnalogSamplePerFrame());
     // Determine ANC generation
     // Generation 2 uses the gains and generation 1 uses the analog resolution
+    /*
     int gen = 0;
     bool gainOk = true;
     for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
@@ -291,7 +300,9 @@ namespace btk
       gen = 2;
     else
       gen = 1;
+    */
     // BitDepth
+    /*
     int bitDepth = 12;
     switch(input->GetAnalogResolution())
     {
@@ -310,6 +321,7 @@ namespace btk
       default:         
         break;
     }
+    */
     // Frequency
     double freq = 100.0;
     if (input->GetAnalogFrequency() != 0)
@@ -330,14 +342,14 @@ namespace btk
     // Acquisition exportation
     ofs.setf(std::ios::fixed, std::ios::floatfield);
     ofs.precision(6); 
-    ofs << static_cast<std::string>("File_Type:\tAnalog R/C ASCII\tGeneration#:\t") << gen;
+    ofs << static_cast<std::string>("File_Type:\tAnalog R/C ASCII\tGeneration#:\t") << this->m_Generation;
     ofs << static_cast<std::string>("\nBoard_Type:\t") << boardType
         << static_cast<std::string>("\tPolarity:\tBipolar");
     ofs << static_cast<std::string>("\nTrial_Name:\t") << onlyFilename.substr(0, onlyFilename.length() - 4)
         << static_cast<std::string>("\tTrial#:\t") << 1 
         << static_cast<std::string>("\tDuration(Sec.):\t") << stepTime * (input->GetAnalogFrameNumber() - 1) 
         << static_cast<std::string>("\t#Channels:\t") << input->GetAnalogNumber();
-    ofs << static_cast<std::string>("\nBitDepth:\t") << bitDepth
+    ofs << static_cast<std::string>("\nBitDepth:\t") << input->GetAnalogResolution()//bitDepth
         << static_cast<std::string>("\tPreciseRate:\t") << freq
         << static_cast<std::string>("\n\n\n\n") << std::endl;
     ofs << static_cast<std::string>("Name\t");
@@ -348,9 +360,9 @@ namespace btk
       ofs << static_cast<int>(freq) << static_cast<std::string>("\t");
     ofs << static_cast<std::string>("\nRange\t");
     double time = 0.0;
-    if (gen == 1)
+    if (this->m_Generation == 1)
     {
-      int res = static_cast<int>(pow(2.0, bitDepth));
+      int res = static_cast<int>(pow(2.0, input->GetAnalogResolution()));//bitDepth));
       for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
         ofs << res << static_cast<std::string>("\t");
       for (int frame = 0 ; frame < input->GetAnalogFrameNumber() ; ++frame)
@@ -363,8 +375,9 @@ namespace btk
         time += stepTime;
       };
     }
-    else
+    else if (this->m_Generation == 2)
     {
+      int i = 0;
       for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
       {
         switch((*it)->GetGain()) // range is in mV
@@ -384,8 +397,14 @@ namespace btk
           case Analog::PlusMinus1:
             ofs << 1000;
             break;
+          case Analog::Unknown:
+            uint16_t range = ANxFileIODetectAnalogRange((*it)->GetScale(), input->GetAnalogResolution());
+            ofs << range;
+            btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(range / 1000)  + " volts in the file.");
+            break;
         }
         ofs << static_cast<std::string>("\t");
+        ++i;
       }
       for (int frame = 0 ; frame < input->GetAnalogFrameNumber() ; ++frame)
       {
@@ -396,9 +415,21 @@ namespace btk
         time += stepTime;
       };
     }
+    else
+      throw(ANCFileIOException("Unknown ANC file generation."));
     ofs << std::endl;
     ofs.close();
   };
+  
+  /**
+   * @fn int ANCFileIO::GetFileGeneration() const
+   * Returns the generation of the ANC file.
+   */
+  
+  /**
+   * @fn void ANCFileIO::SetFileGeneration(int gen)
+   * Set the generation of the ANC file.
+   */
   
   /**
    * Constructor.
@@ -407,6 +438,7 @@ namespace btk
   : AcquisitionFileIO()
   {
     this->SetFileType(AcquisitionFileIO::ASCII);
+    this->m_Generation = 2;
   };
 
   std::string ANCFileIO::ExtractKeywordValue(const std::string& line, const std::string& keyword) const

@@ -281,4 +281,23 @@ namespace btk
     }
     return idx;
   };
+  
+  /**
+   * Detect analog channel's range by its scale and the analog resolution used.
+   */
+  uint16_t ANxFileIODetectAnalogRange(double s, int bitDepth)
+  {
+    uint16_t gain = static_cast<uint16_t>(fabs(s) / 2.0 * 1000.0 * pow(2.0, static_cast<double>(bitDepth)));
+    if (gain <= Analog::PlusMinus1)
+      gain = Analog::PlusMinus1;
+    else if (gain <= Analog::PlusMinus1Dot25)
+      gain = Analog::PlusMinus1Dot25;
+    else if (gain <= Analog::PlusMinus2Dot5)
+      gain = Analog::PlusMinus2Dot5;
+    else if (gain <= Analog::PlusMinus5)
+      gain = Analog::PlusMinus5;
+    else
+      gain = Analog::PlusMinus10;;
+    return gain;
+  };
 };

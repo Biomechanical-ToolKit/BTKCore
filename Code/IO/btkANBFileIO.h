@@ -85,9 +85,7 @@ namespace btk
     size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint16_t>& val);
     size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, uint32_t val);
     size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, float val);
-    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::string& val);
-    
-    uint16_t DetectAnalogRange(double s, int bitDepth);
+    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::string& val, bool spacing = false);
     
     ANBFileIO(const ANBFileIO& ); // Not implemented.
     ANBFileIO& operator=(const ANBFileIO& ); // Not implemented. 

@@ -66,6 +66,9 @@ namespace btk
     BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output);
     BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input);
     
+    int GetFileGeneration() const {return this->m_Generation;};
+    BTK_IO_EXPORT void SetFileGeneration(int gen) {this->m_Generation = gen;};
+    
   protected:
     BTK_IO_EXPORT ANCFileIO();
     
@@ -75,6 +78,8 @@ namespace btk
     
     ANCFileIO(const ANCFileIO& ); // Not implemented.
     ANCFileIO& operator=(const ANCFileIO& ); // Not implemented. 
+    
+    int m_Generation;
    };
 };
 

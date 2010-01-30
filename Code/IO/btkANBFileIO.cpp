@@ -62,6 +62,54 @@ namespace btk
    * @class ANBFileIO
    * @brief Interface to read/write ANB files.
    *
+   * A ANB file contains analog channels data stored in the IEEE Little endian binary format.
+   *
+   * Based on reverse engineering, the file format is composed of a header part and a data part.
+   * The header is composed of keys and values. 
+   * 
+   * The known keys are:
+   *  - <tt>0x8000</tt>: Number of words for the header
+   *  - <tt>0x0101</tt>: ID?
+   *  - <tt>0x0108</tt>: Board Type
+   *  - <tt>0x0109</tt>: Bit Depth
+   *  - <tt>0x010A</tt>: Precise Rate
+   *  - <tt>0x0102</tt>: Channel Number
+   *  - <tt>0x0103</tt>: Channel Index? (use a decimal to binary converter to found the index 0xFF = 0b11111111)
+   *  - <tt>0x0104</tt>: Channel Rate
+   *  - <tt>0x0105</tt>: First time? (index of the first frame)?
+   *  - <tt>0x0106</tt>: Channel Range (each range is write on 2 bytes)
+   *  - <tt>0x0107</tt>: Channel Label (if label's size % 4 == 0, then add a word of 0x00)
+   *  - <tt>0x8100</tt>: Number of words for the data
+   *
+   * A key is always followed by the size of its value and is write on 2 bytes. The size correspond to
+   * number of word associated with the key. A word corresponds to four bytes.
+   * For example, the following string:
+   * @verbatim 0800 0001 0000 024C @endverbatim
+   * corresponds to the key @c 0x0800 with a size of 1 word (<tt>0x0001</tt>) and a value equal to 588 (<tt>0x024C</tt>).
+   *
+   * The number of frames is determined as <tt>number_of_frames = (number_of_words - 3) * 2 / number_of_channels</tt>
+   *
+   * The structure of the file can be summarized as the following:
+   * @code
+   * 0x0000 0000 // Begin Header
+   * 0x8000 ... 
+   * 0x0101 ... 
+   * 0x0108 ... 
+   * 0x0109 ... 
+   * 0x010A ...
+   * 0x0102 ...
+   * 0x0103 ...
+   * 0x0104 ...
+   * 0x0105 ...
+   * 0x0106 ...
+   * 0x0107 ...
+   *   |- // repeated by the number of channels
+   * 0x0107 ...
+   * 0x0000 0000 // End Header / Begin Data
+   * 0x8100 ...
+   * // ... scaled data ...
+   * @endcode
+   *
    * The ANB file format is created by Motion Analysis Corp.
    *
    * @ingroup BTKIO
@@ -324,8 +372,8 @@ namespace btk
       {
         if ((*it)->GetGain() == Analog::Unknown)
         {
-          channelRange[i] = this->DetectAnalogRange((*it)->GetScale(), input->GetAnalogResolution());
-          btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(channelRange[i] / 1000.0)  + " volts in the file.");
+          channelRange[i] = ANxFileIODetectAnalogRange((*it)->GetScale(), input->GetAnalogResolution());
+          btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(channelRange[i] / 1000)  + " volts in the file.");
         }
         else
           channelRange[i] = (*it)->GetGain();
@@ -334,7 +382,7 @@ namespace btk
       counter += this->WriteKeyValue(&bofs, 0x0106, channelRange);
       // Labels
       for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-        counter += this->WriteKeyValue(&bofs, 0x0107, (*it)->GetLabel());
+        counter += this->WriteKeyValue(&bofs, 0x0107, (*it)->GetLabel(), true);
       // Back to the key 0x8000 and rewrite it
       bofs.SeekWrite(4, std::ios_base::beg);
       this->WriteKeyValue(&bofs, 0x8000, static_cast<uint32_t>(counter / 4));
@@ -502,29 +550,17 @@ namespace btk
     return 4 + 4;
   };
   
-  size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::string& val)
+  size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::string& val, bool spacing)
   {
     uint16_t size = val.size() / 4;
-    size += ((val.size() % 4) > 0 ? 1 : 0);
+    uint16_t sizeUpdated = size + ((val.size() % 4) > 0 ? 1 : 0);
+    if ((size == sizeUpdated) && spacing)
+      size += 1;
+    else
+      size = sizeUpdated;
     bofs->Write(key); bofs->Write(size);
     bofs->Write(val); 
     bofs->Fill(size * 4 - val.size());
     return 4 + size * 4;
-  };
-  
-  uint16_t ANBFileIO::DetectAnalogRange(double s, int bitDepth)
-  {
-    uint16_t gain = static_cast<uint16_t>(fabs(s) / 2.0 * 1000.0 * pow(2.0, static_cast<double>(bitDepth)));
-    if (gain <= Analog::PlusMinus1)
-      gain = Analog::PlusMinus1;
-    else if (gain <= Analog::PlusMinus1Dot25)
-      gain = Analog::PlusMinus1Dot25;
-    else if (gain <= Analog::PlusMinus2Dot5)
-      gain = Analog::PlusMinus2Dot5;
-    else if (gain <= Analog::PlusMinus5)
-      gain = Analog::PlusMinus5;
-    else
-      gain = Analog::PlusMinus10;;
-    return gain;
   };
 };

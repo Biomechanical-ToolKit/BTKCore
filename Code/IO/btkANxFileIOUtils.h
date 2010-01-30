@@ -74,6 +74,7 @@ namespace btk
   void ANxFileIOExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, 
                             Acquisition::Pointer output, const std::vector<std::string>& labels);
   int ANxFileIOFindAnalogLabeCaselInsensitive(const std::string& label, Acquisition::Pointer output);
+  uint16_t ANxFileIODetectAnalogRange(double s, int bitDepth);
 
 };
 
