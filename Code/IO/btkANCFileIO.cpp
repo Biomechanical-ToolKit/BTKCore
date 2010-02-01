@@ -195,7 +195,7 @@ namespace btk
         // Analog channels' range
         std::getline(ifs, line);
         this->ExtractDataInfo(line, "Range", ranges);
-        int numberOfFrames = static_cast<int>(duration * preciseRate) + 1;
+        int numberOfFrames = static_cast<int>(ceil(duration * preciseRate)) + 1;
         
         // Data conversion
         std::vector<std::string> channelLabel(labels.size());
