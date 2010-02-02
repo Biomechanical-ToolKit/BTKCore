@@ -50,8 +50,8 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
  int numberOfEvents = 0;
 
  std::vector< std::vector<double> > times_sorted;
- char** fieldnames;
- char** fieldnames_sorted;
+ char** fieldnames = 0;
+ char** fieldnames_sorted = 0;
  std::vector<std::string> subjects_sorted;
 
  if (!events->IsEmpty())
