@@ -843,17 +843,36 @@ namespace btk
           // - ANALOG:GAIN
           std::vector<int16_t> gains;
           MetaDataCollapseChildrenValues(gains, *itAnalog, "GAIN");
-          inc = 0; for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
+          inc = 0; 
+          for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
           {
             if (inc >= static_cast<int>(gains.size()))
               break;
-            if (gains[inc] < 0 || gains[inc] > 5)
+            switch(gains[inc])
             {
+            case 0:
+              (*it)->SetGain(Analog::Unknown);
+              break;
+            case 1:
+              (*it)->SetGain(Analog::PlusMinus10);
+              break;
+            case 2:
+              (*it)->SetGain(Analog::PlusMinus5);
+              break;
+            case 3:
+              (*it)->SetGain(Analog::PlusMinus2Dot5);
+              break;
+            case 4:
+              (*it)->SetGain(Analog::PlusMinus1Dot25);
+              break;
+            case 5:
+              (*it)->SetGain(Analog::PlusMinus1);
+              break;
+            default:
               btkIOErrorMacro(filename, "Unknown gain. If the value corresponding to this unknown gain is a real value, please contact a developer to add it in the list.");
               (*it)->SetGain(Analog::Unknown);
+              break;
             }
-            else
-              (*it)->SetGain(static_cast<Analog::Gain>(gains[inc]));
             ++inc;
           }
         }
@@ -1543,7 +1562,27 @@ namespace btk
       labels[inc] = (*itAnalog)->GetLabel();
       descs[inc] = (*itAnalog)->GetDescription();
       units[inc] = (*itAnalog)->GetUnit();
-      gain[inc] = (*itAnalog)->GetGain();
+      switch((*itAnalog)->GetGain())
+      {
+      case Analog::Unknown:
+        gain[inc] = 0;
+        break;
+      case Analog::PlusMinus10:
+        gain[inc] = 1;
+        break;
+      case Analog::PlusMinus5:
+        gain[inc] = 2;
+        break;
+      case Analog::PlusMinus2Dot5:
+        gain[inc] = 3;
+        break;
+      case Analog::PlusMinus1Dot25:
+        gain[inc] = 4;
+        break;
+      case Analog::PlusMinus1:
+        gain[inc] = 5;
+        break;
+      }
       analogChannelScale[inc] = static_cast<float>(this->m_AnalogChannelScale[inc]);
       analogZeroOffset[inc] = this->m_AnalogZeroOffset[inc];
       ++inc;

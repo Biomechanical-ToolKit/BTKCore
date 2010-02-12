@@ -373,7 +373,7 @@ namespace btk
         if ((*it)->GetGain() == Analog::Unknown)
         {
           channelRange[i] = ANxFileIODetectAnalogRange((*it)->GetScale(), input->GetAnalogResolution());
-          btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(channelRange[i] / 1000)  + " volts in the file.");
+          btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(channelRange[i]) / 1000.0)  + " volts in the file.");
         }
         else
           channelRange[i] = (*it)->GetGain();

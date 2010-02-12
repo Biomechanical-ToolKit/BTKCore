@@ -925,6 +925,43 @@ CXXTEST_SUITE(C3DFileWriterTest)
         TS_ASSERT_DELTA(acq->GetAnalog(j)->GetValues()(i), acq2->GetAnalog(j)->GetValues()(i), 0.00001);
       }
     }
+    
+    TS_ASSERT_EQUALS(acq2->GetAnalog(0)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(1)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(2)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(3)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(4)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(5)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(6)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(7)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(8)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(9)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(10)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(11)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(12)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(13)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(14)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(15)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(16)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(17)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(18)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(19)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(20)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(21)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(22)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(23)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(24)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(25)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(26)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(27)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(28)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(29)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(30)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(31)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(32)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(33)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(34)->GetGain(), btk::Analog::PlusMinus5);
+    TS_ASSERT_EQUALS(acq2->GetAnalog(35)->GetGain(), btk::Analog::PlusMinus5);
   }
 
   CXXTEST_TEST(sample19_sample19_rewrited)

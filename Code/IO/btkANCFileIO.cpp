@@ -195,8 +195,8 @@ namespace btk
         // Analog channels' range
         std::getline(ifs, line);
         this->ExtractDataInfo(line, "Range", ranges);
-        int numberOfFrames = static_cast<int>(ceil(duration * preciseRate)) + 1;
-        
+        double nf = duration * preciseRate; // Must be separate in two step due to some rounding errors
+        int numberOfFrames = (int)nf + 1;
         // Data conversion
         std::vector<std::string> channelLabel(labels.size());
         std::vector<uint16_t> channelRate(rates.size());
@@ -400,7 +400,7 @@ namespace btk
           case Analog::Unknown:
             uint16_t range = ANxFileIODetectAnalogRange((*it)->GetScale(), input->GetAnalogResolution());
             ofs << range;
-            btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(range / 1000)  + " volts in the file.");
+            btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(range) / 1000)  + " volts in the file.");
             break;
         }
         ofs << static_cast<std::string>("\t");

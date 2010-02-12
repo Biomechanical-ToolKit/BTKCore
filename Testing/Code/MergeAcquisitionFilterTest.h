@@ -617,6 +617,110 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     }
   }
   
+  CXXTEST_TEST(C3D_vs_exportedC3D)
+  {
+    // Merge
+    btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
+    trcReader->SetFilename(TRCFilePathIN + "Gait.trc");
+    btk::AcquisitionFileReader::Pointer ancReader = btk::AcquisitionFileReader::New();
+    ancReader->SetFilename(ANCFilePathIN + "Gait.anc");
+    btk::AcquisitionFileReader::Pointer calReader = btk::AcquisitionFileReader::New();
+    calReader->SetFilename(CALForcePlateFilePathIN + "Forcepla.cal");
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, trcReader->GetOutput());
+    merger->SetInput(1, ancReader->GetOutput());
+    merger->SetInput(2, calReader->GetOutput());
+    // C3D
+    btk::AcquisitionFileReader::Pointer c3dReader = btk::AcquisitionFileReader::New();
+    c3dReader->SetFilename(C3DFilePathIN + "others/Gait.c3d");
+    btk::Acquisition::Pointer input = c3dReader->GetOutput();
+    input->Update();
+    // Exported C3D writer
+    btk::AcquisitionFileWriter::Pointer c3dWriter = btk::AcquisitionFileWriter::New();
+    c3dWriter->SetFilename(C3DFilePathOUT + "others_Gait.c3d");
+    c3dWriter->SetInput(merger->GetOutput());
+    c3dWriter->Update();
+    // Exported C3D reader
+    btk::AcquisitionFileReader::Pointer c3dReader2 = btk::AcquisitionFileReader::New();
+    c3dReader2->SetFilename(C3DFilePathOUT + "others_Gait.c3d");
+    btk::Acquisition::Pointer output = c3dReader2->GetOutput();
+    output->Update();
+    //
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), input->GetPointFrequency());
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), input->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(output->GetPointNumber(), input->GetPointNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), input->GetAnalogNumber());
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), input->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), input->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(output->GetEventNumber(), input->GetEventNumber());
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      for (int j = 0 ; j < output->GetPointNumber() ; ++j)
+      {
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues()(i,0), input->GetPoint(j)->GetValues()(i,0), 1e-4);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues()(i,1), input->GetPoint(j)->GetValues()(i,1), 1e-4);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues()(i,2), input->GetPoint(j)->GetValues()(i,2), 1e-4);
+      }
+      TS_ASSERT_DELTA(output->GetAnalog(0)->GetValues()(i), input->GetAnalog(0)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(1)->GetValues()(i), input->GetAnalog(1)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(2)->GetValues()(i), input->GetAnalog(2)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(3)->GetValues()(i), input->GetAnalog(3)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(4)->GetValues()(i), input->GetAnalog(4)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(5)->GetValues()(i), input->GetAnalog(5)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(6)->GetValues()(i), input->GetAnalog(6)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(7)->GetValues()(i), input->GetAnalog(7)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(8)->GetValues()(i), input->GetAnalog(8)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(9)->GetValues()(i), input->GetAnalog(9)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(10)->GetValues()(i), input->GetAnalog(10)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(11)->GetValues()(i), input->GetAnalog(11)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(12)->GetValues()(i), input->GetAnalog(12)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(13)->GetValues()(i), input->GetAnalog(13)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(14)->GetValues()(i), input->GetAnalog(14)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(15)->GetValues()(i), input->GetAnalog(15)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(16)->GetValues()(i), input->GetAnalog(16)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(17)->GetValues()(i), input->GetAnalog(17)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(18)->GetValues()(i), input->GetAnalog(18)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(19)->GetValues()(i), input->GetAnalog(19)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(20)->GetValues()(i), input->GetAnalog(20)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(21)->GetValues()(i), input->GetAnalog(21)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(22)->GetValues()(i), input->GetAnalog(22)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(23)->GetValues()(i), input->GetAnalog(23)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(24)->GetValues()(i), input->GetAnalog(24)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(25)->GetValues()(i), input->GetAnalog(25)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(26)->GetValues()(i), input->GetAnalog(26)->GetValues()(i), 1e-3);
+      TS_ASSERT_DELTA(output->GetAnalog(27)->GetValues()(i), input->GetAnalog(27)->GetValues()(i), 1e-3);
+    }
+    // Analog gain
+    TS_ASSERT_EQUALS(output->GetAnalog(0)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(1)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(2)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(3)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(4)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(5)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(6)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(7)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(8)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(9)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(10)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(11)->GetGain(), btk::Analog::PlusMinus10);
+    TS_ASSERT_EQUALS(output->GetAnalog(12)->GetGain(), btk::Analog::PlusMinus1);
+    TS_ASSERT_EQUALS(output->GetAnalog(13)->GetGain(), btk::Analog::PlusMinus1);
+    TS_ASSERT_EQUALS(output->GetAnalog(14)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(15)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(16)->GetGain(), btk::Analog::PlusMinus1);
+    TS_ASSERT_EQUALS(output->GetAnalog(17)->GetGain(), btk::Analog::PlusMinus1);
+    TS_ASSERT_EQUALS(output->GetAnalog(18)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(19)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(20)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(21)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(22)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(23)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(24)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(25)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(26)->GetGain(), btk::Analog::PlusMinus2Dot5);
+    TS_ASSERT_EQUALS(output->GetAnalog(27)->GetGain(), btk::Analog::PlusMinus2Dot5);
+  }
+  
   CXXTEST_TEST(FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
   {
     btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
@@ -672,5 +776,6 @@ CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_TRC_and_
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_ANC_and_CAL_and_TRC)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_CAL_and_TRC_and_ANC)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_ThreeFiles_Concat_TRC_and_ANC_and_CAL)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
 #endif
