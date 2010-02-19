@@ -42,7 +42,7 @@
 
 namespace btk
 {
-  class Event: public DataObject
+  class Event: public DataObjectLabeled
   {
   public:
     typedef enum {Unknown = 0x00,
@@ -58,10 +58,6 @@ namespace btk
     static Pointer New(const std::string& label, int f, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, -1.0, f, context, detectionFlags, subject, desc, id));};
     static Pointer New(const std::string& label, double t, int f, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, t, f, context, detectionFlags, subject, desc, id));};
     // ~Event(); // Implicit.
-    const std::string& GetLabel() const {return this->m_Label;};
-    BTK_COMMON_EXPORT void SetLabel(const std::string& label);
-    const std::string& GetDescription() const {return this->m_Description;};
-    BTK_COMMON_EXPORT void SetDescription(const std::string& desc);
     const std::string& GetContext() const {return this->m_Context;};
     BTK_COMMON_EXPORT void SetContext(const std::string& context);
     const std::string& GetSubject() const {return this->m_Subject;};
@@ -90,8 +86,6 @@ namespace btk
     BTK_COMMON_EXPORT Event(const Event& toCopy);
     Event& operator=(const Event& ); // Not implemented.
 
-    std::string m_Label;
-    std::string m_Description;
     std::string m_Context;
     std::string m_Subject;
     int m_DetectionFlags;

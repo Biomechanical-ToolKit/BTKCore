@@ -116,7 +116,7 @@ CXXTEST_SUITE(XLSOrthotrackFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetPoint(50)->GetLabel(), "R JUM INT");
     
     // Last value
-    TS_ASSERT_DELTA(acq->GetPoint(50)->GetValues().coeffRef(acq->GetPointFrameNumber()-1, 0), 25.751, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(50)->GetValues().coeff(acq->GetPointFrameNumber()-1, 0), 25.751, 1e-4);
   };
 };
 

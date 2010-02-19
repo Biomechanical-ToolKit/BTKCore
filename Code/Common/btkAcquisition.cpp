@@ -363,7 +363,7 @@ namespace btk
   Point::Pointer Acquisition::GetPoint(int idx)
   {
     if (idx >= this->GetPointNumber())
-      throw(OutOfRangeException("Acquisition::GetPoint"));
+      throw(OutOfRangeException("Acquisition::GetPoint(int)"));
     PointIterator it = this->BeginPoint();
     std::advance(it, idx);
     return *it;
@@ -375,9 +375,31 @@ namespace btk
   Point::ConstPointer Acquisition::GetPoint(int idx) const
   {
     if (idx >= this->GetPointNumber())
-      throw(OutOfRangeException("Acquisition::GetPoint"));
+      throw(OutOfRangeException("Acquisition::GetPoint(int) const"));
     PointConstIterator it = this->BeginPoint();
     std::advance(it, idx);
+    return *it;
+  };
+  
+  /**
+   * Gets the point with the label @a label as a smart pointer.
+   */
+  Point::Pointer Acquisition::GetPoint(const std::string& label)
+  {
+    PointIterator it = this->FindPoint(label);
+    if (it == this->EndPoint())
+      throw(OutOfRangeException("Acquisition::GetPoint(string)"));
+    return *it;
+  };
+  
+  /**
+   * Gets the point with the label @a label as a const smart pointer.
+   */
+  Point::ConstPointer Acquisition::GetPoint(const std::string& label) const
+  {
+    PointConstIterator it = this->FindPoint(label);
+    if (it == this->EndPoint())
+      throw(OutOfRangeException("Acquisition::GetPoint(string) const"));
     return *it;
   };
   
@@ -580,7 +602,7 @@ namespace btk
   Analog::Pointer Acquisition::GetAnalog(int idx)
   {
     if (idx >= this->GetAnalogNumber())
-      throw(OutOfRangeException("Acquisition::GetAnalog"));
+      throw(OutOfRangeException("Acquisition::GetAnalog(int)"));
     AnalogIterator it = this->BeginAnalog();
     std::advance(it, idx);
     return *it;
@@ -592,9 +614,31 @@ namespace btk
   Analog::ConstPointer Acquisition::GetAnalog(int idx) const
   {
     if (idx >= this->GetAnalogNumber())
-      throw(OutOfRangeException("Acquisition::GetAnalog"));
+      throw(OutOfRangeException("Acquisition::GetAnalog(int) const"));
     AnalogConstIterator it = this->BeginAnalog();
     std::advance(it, idx);
+    return *it;
+  };
+  
+  /**
+   * Gets the analog channel with the label @a label as a smart pointer.
+   */
+  Analog::Pointer Acquisition::GetAnalog(const std::string& label)
+  {
+    AnalogIterator it = this->FindAnalog(label);
+    if (it == this->EndAnalog())
+      throw(OutOfRangeException("Acquisition::GetAnalog(string)"));
+    return *it;
+  };
+  
+  /**
+   * Gets the analog channel with the label @a label as a const smart pointer.
+   */
+  Analog::ConstPointer Acquisition::GetAnalog(const std::string& label) const
+  {
+    AnalogConstIterator it = this->FindAnalog(label);
+    if (it == this->EndAnalog())
+      throw(OutOfRangeException("Acquisition::GetAnalog(string) const"));
     return *it;
   };
   
@@ -696,6 +740,7 @@ namespace btk
     inc = 1;
     for (AnalogIterator itAnalog = this->BeginAnalog() ; itAnalog != this->EndAnalog() ; ++itAnalog)
       (*itAnalog)->SetLabel("uname*" + ToString(inc++));
+    this->Modified();
   };
 
   /**

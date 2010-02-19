@@ -43,7 +43,7 @@
 
 namespace btk
 {
-  class MetaData : public DataObject
+  class MetaData : public DataObjectLabeled
   {
   public:
     typedef SharedPtr<MetaData> Pointer;
@@ -113,11 +113,7 @@ namespace btk
     {return Pointer(new MetaData(label, dim, val, desc, isUnlocked));};
     
     // ~MetaData(); // Implicit.
-    
-    const std::string& GetLabel() const {return this->m_Label;};
-    BTK_COMMON_EXPORT void SetLabel(const std::string& label);
-    const std::string& GetDescription() const {return this->m_Description;};
-    BTK_COMMON_EXPORT void SetDescription(const std::string& desc);
+    void SetLabel(const std::string& label);
     bool GetUnlockState(void) const {return this->m_Unlocked;};
     void SetUnlockState(bool isUnlocked) {this->m_Unlocked = isUnlocked;};
     MetaDataInfo::Pointer GetInfo() {return this->m_Info;};
@@ -216,8 +212,6 @@ namespace btk
     using DataObject::SetParent;
     
   private:
-    std::string m_Label;
-    std::string m_Description;
     bool m_Unlocked;
     MetaDataInfo::Pointer m_Info;
     bool m_MetaDataParentAssigned;

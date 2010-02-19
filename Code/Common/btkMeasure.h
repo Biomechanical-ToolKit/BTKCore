@@ -45,7 +45,7 @@
 namespace btk
 {
   template <int d>
-  class Measure : public DataObject
+  class Measure : public DataObjectLabeled
   {
   public:
     typedef Eigen::Matrix<double, Eigen::Dynamic, d> Values;
@@ -59,10 +59,6 @@ namespace btk
     
     virtual ~Measure() {};
     
-    const std::string GetLabel() const {return this->m_Label;};
-    void SetLabel(const std::string& label);
-    const std::string GetDescription() const {return this->m_Description;};
-    void SetDescription(const std::string& description);
     Values& GetValues() {return this->m_Values;};
     const Values& GetValues() const {return this->m_Values;};
     void SetValues(const Values& v);
@@ -75,8 +71,6 @@ namespace btk
     Measure(const std::string& label, int frameNumber);
     Measure(const Measure& toCopy);
     
-    std::string m_Label;
-    std::string m_Description;
     Values m_Values;
     
   private: 
@@ -149,40 +143,6 @@ namespace btk
    */
 
   /**
-   * @fn template <int d> const std::string Measure<d>::GetLabel() const
-   * Returns the measure's label.
-   */
-  
-  /**
-   * Set the label of the measure.
-   */
-  template <int d>
-  void Measure<d>::SetLabel(const std::string& label)
-  {
-    if (this->m_Label.compare(label) == 0)
-      return;
-    this->m_Label = label;
-    this->Modified();
-  };
-  
-  /**
-   * @fn template <int d> const std::string Measure<d>::GetDescription() const
-   * Returns the description.
-   */
-
-  /**
-   * Sets the description.
-   */
-  template <int d>
-  void Measure<d>::SetDescription(const std::string& description)
-  {
-    if (this->m_Description.compare(description) == 0)
-      return;
-    this->m_Description = description;
-    this->Modified();
-  };
-  
-  /**
    * @fn template <int d> Values& Measure<d>::GetValues()
    * Returns the measure's values.
    *
@@ -251,7 +211,7 @@ namespace btk
    */
   template <int d>
   Measure<d>::Measure(const std::string& label)
-  : DataObject(), m_Label(label), m_Description(""), m_Values()
+  : DataObjectLabeled(label, ""), m_Values()
   {};
 
   /**
@@ -259,7 +219,7 @@ namespace btk
    */
   template <int d>
   Measure<d>::Measure(const std::string& label, int frameNumber)
-  : DataObject(), m_Label(label), m_Description(""),
+  : DataObjectLabeled(label, ""),
     m_Values(Values::Zero(frameNumber, d))
   {};
 
@@ -268,8 +228,7 @@ namespace btk
    */
   template <int d>
   Measure<d>::Measure(const Measure& toCopy)
-  : DataObject(), m_Label(toCopy.m_Label), 
-    m_Description(toCopy.m_Description), m_Values(toCopy.m_Values)
+  : DataObjectLabeled(toCopy), m_Values(toCopy.m_Values)
   {};
 
 };

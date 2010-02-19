@@ -371,7 +371,7 @@ namespace btk
         ofs << std::endl << time << static_cast<std::string>("\t");
         ofs.precision(8);
         for (AnalogCollection::ConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-          ofs << (*it)->GetValues().coeffRef(frame) << static_cast<std::string>("\t");
+          ofs << (*it)->GetValues().coeff(frame) << static_cast<std::string>("\t");
         time += stepTime;
       };
     }
@@ -411,7 +411,7 @@ namespace btk
         ofs.precision(6);
         ofs << std::endl << time << static_cast<std::string>("\t");
         for (AnalogCollection::ConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-          ofs << static_cast<int>((*it)->GetValues().coeffRef(frame) / (*it)->GetScale()) << static_cast<std::string>("\t");
+          ofs << static_cast<int>((*it)->GetValues().coeff(frame) / (*it)->GetScale()) << static_cast<std::string>("\t");
         time += stepTime;
       };
     }

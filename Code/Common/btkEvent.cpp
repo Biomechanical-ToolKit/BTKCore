@@ -99,38 +99,6 @@ namespace btk
    */
 
   /**
-   * @fn const std::string& Event::GetLabel()  const
-   * Returns event's label.
-   */
-  
-  /**
-   * Sets event's label.
-   */
-  void Event::SetLabel(const std::string& label)
-  {
-    if (this->m_Label.compare(label) == 0)
-      return;
-    this->m_Label = label;
-    this->Modified();
-  };
-
-  /**
-   * @fn const std::string& Event::GetDescription() const
-   * Returns event's description.
-   */
-
-  /**
-   * Sets event's description.
-   */
-  void Event::SetDescription(const std::string& desc)
-  {
-    if (this->m_Description.compare(desc) == 0)
-      return;
-    this->m_Description = desc;
-    this->Modified();
-  };
-
-  /**
    * @fn const std::string& Event::GetContext() const
    * Returns event's context.
    */
@@ -278,7 +246,7 @@ namespace btk
    * Constructor.
    */
   Event::Event(const std::string& label, double t, int f, const std::string& context, int detectionFlags, const std::string& subject, const std::string& desc, int id)
-  : DataObject(), m_Label(label), m_Context(context), m_Subject(subject), m_Description(desc)
+  : DataObjectLabeled(label, desc), m_Context(context), m_Subject(subject)
   {
     this->m_Time = t;
     this->m_Frame = f;
@@ -290,8 +258,7 @@ namespace btk
    * Copy constructor. Timestamp, source and parent are reset.
    */
   Event::Event(const Event& toCopy)
-  : DataObject(), 
-    m_Label(toCopy.m_Label), m_Context(toCopy.m_Context), m_Subject(toCopy.m_Subject), m_Description(toCopy.m_Description)
+  : DataObjectLabeled(toCopy), m_Context(toCopy.m_Context), m_Subject(toCopy.m_Subject)
   {
     this->m_Time = toCopy.m_Time;
     this->m_Frame = toCopy.m_Frame;

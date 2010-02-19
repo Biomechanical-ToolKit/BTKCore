@@ -169,7 +169,7 @@ namespace btk
   
   /**
    * @fn template <class T> int Collection<T>::GetItemNumber() const
-   * Returns the number items in the list.
+   * Returns the number of items in the list.
    */
   
   /**

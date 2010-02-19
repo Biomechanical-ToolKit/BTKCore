@@ -104,6 +104,8 @@ namespace btk
     PointConstIterator EndPoint() const {return this->m_Points->End();};
     BTK_COMMON_EXPORT Point::Pointer GetPoint(int idx);
     BTK_COMMON_EXPORT Point::ConstPointer GetPoint(int idx) const;
+    BTK_COMMON_EXPORT Point::Pointer GetPoint(const std::string& label);
+    BTK_COMMON_EXPORT Point::ConstPointer GetPoint(const std::string& label) const;
     BTK_COMMON_EXPORT void SetPoint(int idx, Point::Pointer point);
     PointCollection::Pointer GetPoints() {return this->m_Points;};
     PointCollection::ConstPointer GetPoints() const {return this->m_Points;};
@@ -129,6 +131,8 @@ namespace btk
     BTK_COMMON_EXPORT void SetAnalogNumber(int num);
     BTK_COMMON_EXPORT Analog::Pointer GetAnalog(int idx);
     BTK_COMMON_EXPORT Analog::ConstPointer GetAnalog(int idx) const;
+    BTK_COMMON_EXPORT Analog::Pointer GetAnalog(const std::string& label);
+    BTK_COMMON_EXPORT Analog::ConstPointer GetAnalog(const std::string& label) const;
     BTK_COMMON_EXPORT void SetAnalog(int idx, Analog::Pointer analog);
     AnalogCollection::Pointer GetAnalogs() {return this->m_Analogs;};
     AnalogCollection::ConstPointer GetAnalogs() const {return this->m_Analogs;};

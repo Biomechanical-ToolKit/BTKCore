@@ -38,6 +38,8 @@
 
 #include "btkObject.h"
 
+#include <string>
+
 namespace btk
 {
   class ProcessObject;
@@ -78,6 +80,30 @@ namespace btk
     ProcessObject* mp_Source;
     
     friend class ProcessObject;
+  };
+  
+  class DataObjectLabeled : public DataObject
+  {
+  public:
+    typedef SharedPtr<DataObjectLabeled> Pointer;
+    typedef SharedPtr<const DataObjectLabeled> ConstPointer;
+    
+    const std::string& GetLabel() const {return this->m_Label;};
+    BTK_COMMON_EXPORT virtual void SetLabel(const std::string& label);
+    const std::string& GetDescription() const {return this->m_Description;};
+    BTK_COMMON_EXPORT virtual void SetDescription(const std::string& description);
+    
+  protected:
+    DataObjectLabeled(const std::string& label = "", const std::string& description = "")
+    : DataObject(), m_Label(label), m_Description(description)
+    {};
+    DataObjectLabeled(const DataObjectLabeled& toCopy)
+    : DataObject(toCopy), m_Label(toCopy.m_Label), m_Description(toCopy.m_Description)
+    {};
+    virtual ~DataObjectLabeled() {};
+    
+    std::string m_Label;
+    std::string m_Description;
   };
 };
 

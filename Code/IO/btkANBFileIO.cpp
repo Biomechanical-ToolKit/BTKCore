@@ -397,7 +397,7 @@ namespace btk
       for (int frame = 0 ; frame < input->GetAnalogFrameNumber() ; ++frame)
       {
         for (AnalogCollection::ConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-          bofs.Write(static_cast<int16_t>((*it)->GetValues().coeffRef(frame) / (*it)->GetScale()));
+          bofs.Write(static_cast<int16_t>((*it)->GetValues().coeff(frame) / (*it)->GetScale()));
       };
     }
     catch (ANBFileIOException& )

@@ -114,4 +114,71 @@ namespace btk
     if (this->mp_Parent)
       this->mp_Parent->Modified();
   };
+  
+  /**
+   * @class DataObjectLabeled
+   * @brief DataObject with a label and a description.
+   *
+   * @ingroup BTKCommon
+   */
+  /**
+   * @var DataObjectLabeled::m_Label
+   * Label of the object.
+   */
+  /**
+   * @var DataObjectLabeled::m_Description
+   * Description associated with the object.
+   */
+  
+  /**
+   * @typedef DataObjectLabeled::Pointer
+   * Smart pointer associated with a DataObjectLabeled object.
+   */
+  
+  /**
+   * @typedef DataObjectLabeled::ConstPointer
+   * Smart pointer associated with a const DataObjectLabeled object.
+   */
+   
+  /**
+   * @fn DataObjectLabeled::DataObjectLabeled(const std::string& label = "", const std::string& description = "")
+   * Default constructor.
+   */
+
+  /**
+   * @fn DataObjectLabeled::DataObjectLabeled(const DataObjectLabeled& toCopy)
+   * Copy constructor.
+   */
+  
+  /**
+   * @fn const std::string& DataObjectLabeled::GetLabel() const
+   * Returns the object's label.
+   */
+  
+  /**
+   * Sets the label.
+   */
+  void DataObjectLabeled::SetLabel(const std::string& label)
+  {
+    if (this->m_Label.compare(label) == 0)
+      return;
+    this->m_Label = label;
+    this->Modified();
+  };
+  
+  /**
+   * @fn const std::string& DataObjectLabeled::GetDescription() const
+   * Returns the description.
+   */
+
+  /**
+   * Sets the description.
+   */
+  void DataObjectLabeled::SetDescription(const std::string& description)
+  {
+    if (this->m_Description.compare(description) == 0)
+      return;
+    this->m_Description = description;
+    this->Modified();
+  };
 };

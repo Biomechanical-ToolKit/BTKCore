@@ -192,7 +192,7 @@ namespace btk
         WrenchCollection::ConstIterator it = input->Begin();
         while (it != input->End())
         {
-          if ((*it)->GetPosition()->GetResiduals().coeffRef(i) != -1.0)
+          if ((*it)->GetPosition()->GetResiduals().coeff(i) != -1.0)
           {
             double* positions = (*it)->GetPosition()->GetValues().data();
             double* forces = (*it)->GetForce()->GetValues().data();

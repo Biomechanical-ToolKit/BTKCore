@@ -533,7 +533,7 @@ namespace btk
                                                 ic[2 * frameNumber + i] * this->mp_Scale);
             this->mp_TrajectoryColors->SetValue(ptIdx * frameNumber + i, 0);
             // Insert only valid point
-            if ((*it)->GetResiduals().coeffRef(i) != -1.0)
+            if ((*it)->GetResiduals().coeff(i) != -1.0)
             {
               existingMarkersIds->SetValue(ptIdx, 1);
               trajectoryPaths[ptIdx]->InsertNextId(ptIdx * frameNumber + i);

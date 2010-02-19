@@ -137,11 +137,6 @@ namespace btk
    */
 
   /**
-   * @fn const std::string& MetaData::GetLabel() const
-   * Returns the label of the entry.
-   */
-  
-  /**
    * Sets the label of the entry. If @a label already exist in the parent's list,
    * then an exception is thrown.
    */
@@ -161,23 +156,6 @@ namespace btk
     this->m_Label = label;
     this->Modified();
   };
-  
-  /**
-   * @fn const std::string& MetaData::GetDescription() const
-   * Gets the description of the entry.
-   */
-  
-  /**
-   * Sets the description of the entry.
-   */
-  void MetaData::SetDescription(const std::string& desc)
-  {
-    if (this->m_Description.compare(desc) == 0)
-      return;
-    this->m_Description = desc;
-    this->Modified();
-  };
-
   
   /**
    * @fn bool MetaData::GetUnlockState(void) const
@@ -586,7 +564,7 @@ namespace btk
    */
   MetaData::MetaData(const std::string& label,
                      const std::string& desc, bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::Pointer()),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -598,7 +576,7 @@ namespace btk
    */
   MetaData::MetaData(const std::string& label, int8_t val,
                      const std::string& desc, bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -610,7 +588,7 @@ namespace btk
    */
   MetaData::MetaData(const std::string& label, int16_t val, 
                      const std::string& desc, bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -622,7 +600,7 @@ namespace btk
    */
   MetaData::MetaData(const std::string& label, float val, 
                      const std::string& desc, bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -634,7 +612,7 @@ namespace btk
    */
   MetaData::MetaData(const std::string& label, const std::string& val, 
                      const std::string& desc, bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -647,7 +625,7 @@ namespace btk
   MetaData::MetaData(const std::string& label,
                      const std::vector<int8_t>& val, const std::string& desc,
                      bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -660,7 +638,7 @@ namespace btk
   MetaData::MetaData(const std::string& label, 
                      const std::vector<int16_t>& val, const std::string& desc,
                      bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -673,7 +651,7 @@ namespace btk
   MetaData::MetaData(const std::string& label,
                      const std::vector<float>& val, const std::string& desc,
                      bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -686,7 +664,7 @@ namespace btk
   MetaData::MetaData(const std::string& label,
                      const std::vector<std::string>& val, const std::string& desc,
                      bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -699,7 +677,7 @@ namespace btk
   MetaData::MetaData(const std::string& label, const std::vector<uint8_t>& dim, 
                      const std::vector<int8_t>& val, const std::string& desc,
                      bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(dim, val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -712,7 +690,7 @@ namespace btk
   MetaData::MetaData(const std::string& label, const std::vector<uint8_t>& dim, 
                      const std::vector<int16_t>& val, const std::string& desc,
                      bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(dim, val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -725,7 +703,7 @@ namespace btk
   MetaData::MetaData(const std::string& label, const std::vector<uint8_t>& dim, 
                      const std::vector<float>& val, const std::string& desc,
                      bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(dim, val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {
@@ -738,7 +716,7 @@ namespace btk
   MetaData::MetaData(const std::string& label, const std::vector<uint8_t>& dim, 
                      const std::vector<std::string>& val, const std::string& desc,
                      bool isUnlocked)
-  : DataObject(), m_Label(label), m_Description(desc),
+  : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(dim, val)),
   m_Children(std::list<MetaData::Pointer>(0))
   {

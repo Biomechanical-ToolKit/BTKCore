@@ -118,10 +118,26 @@ CXXTEST_SUITE(PipelineTest)
     res->Update();
     TS_ASSERT_EQUALS(res->GetValue(), 7);
   };
+  
+  CXXTEST_TEST(DeleteParent)
+  {
+    Source::Pointer src = Source::New();
+    src->SetValue(5);
+    Filter::Pointer incFilt = Filter::New();
+    incFilt->SetInput(src);
+    Source::Pointer res = incFilt->GetOutput();
+    res->Update();
+    TS_ASSERT_EQUALS(res->GetValue(), 6);
+    src->SetValue(6);
+    incFilt.reset();
+    res->Update();
+    TS_ASSERT_EQUALS(res->GetValue(), 6);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(PipelineTest)
 CXXTEST_TEST_REGISTRATION(PipelineTest, PipelineOne)
 CXXTEST_TEST_REGISTRATION(PipelineTest, PipelineTwo)
 CXXTEST_TEST_REGISTRATION(PipelineTest, PipelineThree)
+CXXTEST_TEST_REGISTRATION(PipelineTest, DeleteParent)
 #endif

@@ -337,12 +337,12 @@ namespace btk
 
       for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
       {
-        if ((*it)->GetValues().row(frame).isZero() && ((*it)->GetResiduals().coeffRef(frame) == -1))
+        if ((*it)->GetValues().row(frame).isZero() && ((*it)->GetResiduals().coeff(frame) == -1))
           ofs << "\t\t\t";
         else
-           ofs << "\t" << (*it)->GetValues().coeffRef(frame, 0)
-               << "\t" << (*it)->GetValues().coeffRef(frame, 1)
-               << "\t" << (*it)->GetValues().coeffRef(frame, 2);
+           ofs << "\t" << (*it)->GetValues().coeff(frame, 0)
+               << "\t" << (*it)->GetValues().coeff(frame, 1)
+               << "\t" << (*it)->GetValues().coeff(frame, 2);
       };
       ofs << " ";
       time += stepTime;

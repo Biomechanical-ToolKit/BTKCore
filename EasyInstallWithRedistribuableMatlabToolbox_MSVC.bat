@@ -43,7 +43,7 @@ cd .
 call !MSVS!\VC\vcvarsall.bat
 mkdir build-Matlab-Release-Redistribuable
 cd build-Matlab-Release-Redistribuable
-!CMAKE!\bin\cmake.exe -DBTK_WRAP_MATLAB:BOOL=1 -DBTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES:BOOL=1 -G "NMake Makefiles" ..
+!CMAKE!\bin\cmake.exe -DBTK_WRAP_MATLAB:BOOL=1 -DBTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES:BOOL=1 -DCMAKE_BUILD_TYPE:CHAR=Release -G "NMake Makefiles" ..
 if errorlevel 1 goto error_CMAKE
 nmake
 if errorlevel 1 goto error_MSVS_COMPILE
