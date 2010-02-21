@@ -104,12 +104,23 @@ IF(MATLAB_ROOT)
 ENDIF(MATLAB_ROOT)
 
 IF(NOT BTK_INSTALL_NO_LIBRARIES)
+  # Documentation install
+  # Main document file with BTK version
+  CONFIGURE_FILE(
+    ${BTK_SOURCE_DIR}/Documentation/Wrapping/Matlab/btk/Contents.m.in
+    ${BTK_BINARY_DIR}/Documentation/Wrapping/Matlab/btk/Contents.m)
+  INSTALL(FILES ${BTK_BINARY_DIR}/Documentation/Wrapping/Matlab/btk/Contents.m
+          DESTINATION ${BTK_INSTALL_SHARE_DIR_CM24}/Wrapping/Matlab/btk
+          COMPONENT Development)
+  # Whole documentation
   INSTALL(DIRECTORY ${BTK_SOURCE_DIR}/Documentation/Wrapping/Matlab/btk
           DESTINATION ${BTK_INSTALL_SHARE_DIR_CM24}/Wrapping/Matlab  
           COMPONENT Development
           PATTERN ".svn" EXCLUDE
+          PATTERN "*.in" EXCLUDE
           PATTERN ".DS_Store" EXCLUDE)
 
+  #  MEX Files install
   # Fix a problem with this installation method and the use of the MS Visual Studio generators.
   IF(CMAKE_CXX_COMPILER MATCHES "^.*cl$")
     INSTALL(DIRECTORY "${BTK_LIBRARY_PATH}/@BUILD_TYPE@/"

@@ -1,0 +1,10 @@
+% Biomechanical ToolKit (BTK) Toolbox 
+% Version ${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}.${BTK_VERSION_PATCH}
+%
+% Table of Contents (T0C)
+% -----------------------
+%   <a href="matlab:help tocbtkbasicfilters">Basic Filters</a>     - Compute parameters from acquisition's data
+%   <a href="matlab:help tocbtkcommon">Common</a>            - Acquisition data extraction/modification
+%   <a href="matlab:help tocbtkio">I/O</a>               - Read/Write biomechanical files
+
+%   Copyright 2009-2010 Biomechanical ToolKit
