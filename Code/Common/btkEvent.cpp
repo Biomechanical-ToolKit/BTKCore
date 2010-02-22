@@ -213,7 +213,6 @@ namespace btk
    */
    
   /**
-   * @fn friend bool Event::operator==(const Event& rLHS, const Event& rRHS)
    * Equality operator.
    */
   bool operator==(const Event& rLHS, const Event& rRHS)

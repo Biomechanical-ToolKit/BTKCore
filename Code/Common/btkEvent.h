@@ -73,9 +73,7 @@ namespace btk
     BTK_COMMON_EXPORT void SetId(int id);
     
     Pointer Clone() const {return Pointer(new Event(*this));};
-    //! @cond
     BTK_COMMON_EXPORT friend bool operator==(const Event& rLHS, const Event& rRHS);
-    //! @endcond
     friend bool operator!=(const Event& rLHS, const Event& rRHS)
     {
       return !(rLHS == rRHS);

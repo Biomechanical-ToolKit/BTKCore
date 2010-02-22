@@ -129,10 +129,7 @@ namespace btk
     BTK_COMMON_EXPORT void ToFloat(std::vector<float>& val) const;
     BTK_COMMON_EXPORT const std::vector<double> ToDouble() const;
     BTK_COMMON_EXPORT void ToDouble(std::vector<double>& val) const;
-    // Strange parsing error with Doxygen... The commented lines are required
-    //! @cond
     BTK_COMMON_EXPORT friend bool operator==(const MetaDataInfo& rLHS, const MetaDataInfo& rRHS);
-    //! @endcond
     friend bool operator!=(const MetaDataInfo& rLHS, const MetaDataInfo& rRHS)
     {
       return !(rLHS == rRHS);

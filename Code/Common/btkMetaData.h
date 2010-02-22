@@ -147,9 +147,7 @@ namespace btk
     BTK_COMMON_EXPORT Iterator FindChild(const std::string& label);
     BTK_COMMON_EXPORT ConstIterator FindChild(const std::string& label) const;
     BTK_COMMON_EXPORT Pointer Clone() const;
-    //! @cond
     BTK_COMMON_EXPORT friend bool operator==(const MetaData& rLHS, const MetaData& rRHS);
-    //! @endcond
     friend bool operator!=(const MetaData& rLHS, const MetaData& rRHS)
     {
       return !(rLHS == rRHS);

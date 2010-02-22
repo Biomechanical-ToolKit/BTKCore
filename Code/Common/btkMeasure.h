@@ -90,14 +90,6 @@ namespace btk
    * @ingroup BTKCommon
    */
   /**
-   * @var Measure::m_Label
-   * Label of the measure.
-   */
-  /**
-   * @var Measure::m_Description
-   * Description of the measure.
-   */
-  /**
    * @var Measure::m_Values
    * Values of the measure.
    */

@@ -515,7 +515,7 @@ namespace btk
            MetaDataCollapseChildrenValues<std::string>(eventsLabel, *itEvent, "LABELS", eventsNumber, "uname*");
           MetaDataCollapseChildrenValues(eventsTime, *itEvent, "TIMES");
           if (static_cast<int>(eventsTime.size()) < 2 * eventsNumber)
-            btkIOErrorMacro(filename, "The EVENT:TIME doesn't contains the appropriate number of values. The extracted times could be corrupted.")
+            btkIOErrorMacro(filename, "The EVENT:TIME doesn't contain the appropriate number of values. The extracted times could be corrupted.")
           eventsTime.resize(2 * eventsNumber, 0.0);
           MetaDataCollapseChildrenValues(eventsContext, *itEvent, "CONTEXTS");
           eventsContext.resize(eventsNumber,"");

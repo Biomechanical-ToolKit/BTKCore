@@ -522,7 +522,6 @@ namespace btk
   };
   
   /**
-   * @fn friend bool MetaData::operator==(const MetaData& rLHS, const MetaData& rRHS)
    * Equality operator. Doesn't check the parent's value.
    */
   bool operator==(const MetaData& rLHS, const MetaData& rRHS)

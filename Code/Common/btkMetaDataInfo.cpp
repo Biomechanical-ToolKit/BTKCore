@@ -848,7 +848,6 @@ namespace btk
 
   
   /**
-   * @fn friend bool MetaDataInfo::operator==(const MetaDataInfo& rLHS, const MetaDataInfo& rRHS)
    * Equality operator.
    */
   bool operator==(const MetaDataInfo& rLHS, const MetaDataInfo& rRHS)
