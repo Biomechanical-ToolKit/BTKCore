@@ -61,7 +61,7 @@ h = btkNewAcquisition(pn, fn, an, r)</synopsis>
 h = btkNewAcquisition(10, 1000)
 // 10 points, 1000 frames and 12 analog channels with the same number of frames.
 h = btkNewAcquisition(10, 1000, 12)
-// 10 points, 1000 frames and 12 analog channels with a number of frame equals to 2 times the number of frames for the points.
+// 10 points, 1000 frames and 12 analog channels with a number of frames  equals to 2 times the number of frames for the points.
 h = btkNewAcquisition(10, 1000, 12, 2)</programlisting>
   </refsection>
   <refsection>

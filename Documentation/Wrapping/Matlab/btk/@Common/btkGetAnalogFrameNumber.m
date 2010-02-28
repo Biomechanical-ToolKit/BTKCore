@@ -1,7 +1,7 @@
 function afn = btkGetAnalogFrameNumber(h) %#ok
 %BTKGETANALOGFRAMENUMBER Returns the number of frames for the analog channels.
 % 
-%  AFN = BTKGETANALOGFRAMENUMBER(H) returns the number of frame used in the analog's data.
+%  AFN = BTKGETANALOGFRAMENUMBER(H) returns the number of frames  used in the analog's data.
 %  The acquistion is represented by the handle H, obtained by the use of a 
 %  btk* function.
 

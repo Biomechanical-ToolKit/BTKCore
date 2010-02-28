@@ -11,7 +11,7 @@
   </info>
   <refnamediv>
     <refname>btkGetPointFrameNumber</refname>
-    <refpurpose>Return the number of frame for the points</refpurpose>
+    <refpurpose>Return the number of frames  for the points</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <title>Calling Sequence</title>
@@ -28,7 +28,7 @@
   </refsection>
   <refsection>
     <title>Description</title>
-    <para>Return the number of frame used in the point's data.</para>
+    <para>Return the number of frames  used in the point's data.</para>
     <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
   </refsection>
   <refsection>

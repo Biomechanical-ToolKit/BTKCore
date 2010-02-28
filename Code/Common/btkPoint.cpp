@@ -114,7 +114,7 @@ namespace btk
    * @fn static Pointer Point::New(int frameNumber)
    * @brief Creates a smart pointer associated with a Point object.
    *
-   * The point created has an empty label and a number of frame equals to @a framenumber.
+   * The point created has an empty label and a number of frames  equals to @a framenumber.
    * @warning The number of frames must be greater than 0.
    */
 
@@ -122,7 +122,7 @@ namespace btk
    * @fn static Pointer Point::New(const std::string& label, int frameNumber, Type t = Marker)
    * @brief Creates a smart pointer associated with a Point object.
    *
-   * The point created has a label and a number of frame equals to @a label and @a framenumber respectively.
+   * The point created has a label and a number of frames  equals to @a label and @a framenumber respectively.
    * @warning The number of frames must be greater than 0.
    */
 

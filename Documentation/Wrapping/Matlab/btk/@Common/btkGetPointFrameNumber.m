@@ -1,7 +1,7 @@
 function pfn = btkGetPointFrameNumber(h) %#ok
-%BTKGETPOINTFRAMENUMBER Returns the number of frame for the points.
+%BTKGETPOINTFRAMENUMBER Returns the number of frames  for the points.
 % 
-%  PFN = BTKGETPOINTFRAMENUMBER(H) returns the number of frame used in the point's data.
+%  PFN = BTKGETPOINTFRAMENUMBER(H) returns the number of frames  used in the point's data.
 %  The acquistion is represented by the handle H, obtained by the use of a 
 %  btk* function.
 

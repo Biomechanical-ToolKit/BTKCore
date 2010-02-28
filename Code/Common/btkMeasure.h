@@ -122,7 +122,7 @@ namespace btk
    * @fn template <int d> static Pointer Measure<d>::New(int frameNumber)
    * @brief Creates a smart pointer associated with a Measure object.
    *
-   * The measure created has an empty label and a number of frame equals to @a framenumber.
+   * The measure created has an empty label and a number of frames  equals to @a framenumber.
    * @warning The number of frames must be greater than 0.
    */ 
 
@@ -130,7 +130,7 @@ namespace btk
    * @fn template <int d> static Pointer Measure::New(const std::string& label, int frameNumber)
    * @brief Creates a smart pointer associated with a Measure object.
    *
-   * The measure created has a label and a number of frame equals to @a label and @a framenumber respectively.
+   * The measure created has a label and a number of frames  equals to @a label and @a framenumber respectively.
    * @warning The number of frames must be greater than 0.
    */
 

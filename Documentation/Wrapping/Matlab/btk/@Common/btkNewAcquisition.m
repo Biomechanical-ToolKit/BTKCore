@@ -18,7 +18,7 @@ function h = btkNewAcquisition(pn, fn, an, r) %#ok
 %  corresponds to FN.
 %
 %  H = BTKNEWACQUISITION(PN, FN, AN, R) returns the handle H of an initialized 
-%  biomechanical acquisition where the number of frame for points and analog channels
+%  biomechanical acquisition where the number of frames  for points and analog channels
 %  are differents. The number of frames for analog channels is set by mutiplying FN by R.
 %  R corresponds to the analog samples number by point frame.
 %

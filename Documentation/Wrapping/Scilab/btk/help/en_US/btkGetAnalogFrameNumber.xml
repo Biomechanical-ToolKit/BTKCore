@@ -28,7 +28,7 @@
   </refsection>
   <refsection>
     <title>Description</title>
-    <para>Return the number of frame used in the analog's data</para>
+    <para>Return the number of frames  used in the analog's data</para>
     <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
   </refsection>
   <refsection>
