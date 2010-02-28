@@ -75,7 +75,7 @@ namespace btk
     bool InsertItem(Iterator loc, ItemPointer elt);
     bool InsertItem(int idx, ItemPointer elt);
     bool InsertItem(ItemPointer elt) {return this->InsertItem(this->End(), elt);};
-    void SetItem(int idx, ItemPointer elt);
+    bool SetItem(int idx, ItemPointer elt);
     Iterator RemoveItem(Iterator loc);
     void RemoveItem(int idx);
     ItemPointer TakeItem(Iterator loc);
@@ -212,7 +212,7 @@ namespace btk
   
   /**
    * Inserts the smart pointer @a elt in the list at the location @a loc.
-   * @return True if @a elt has been inserted or false in the contrary case.
+   * @return True if @a elt has been inserted or false otherwise.
    */
   template <class T>
   bool Collection<T>::InsertItem(Iterator loc, ItemPointer elt)
@@ -229,7 +229,7 @@ namespace btk
   
   /**
    * Inserts the smart pointer @a elt in the list at the index @a idx.
-   * @return True if @a elt has been inserted or false in the contrary case.
+   * @return True if @a elt has been inserted or false otherwise.
    */
   template <class T>
   bool Collection<T>::InsertItem(int idx, ItemPointer elt)
@@ -248,30 +248,32 @@ namespace btk
   /**
    * @fn template <class T> bool Collection<T>::InsertItem(ItemPointer elt)
    * Inserts the smart pointer @a elt at the end of the list.
-   * @return True if @a elt has been inserted or false in the contrary case.
+   * @return True if @a elt has been inserted or false otherwise.
    */
   
   
   /**
    * Sets the smart pointer @a elt in the list at the index @a idx.
+   * @return True if @a elt has been assigned or false otherwise.
    */
   template <class T>
-  void Collection<T>::SetItem(int idx, ItemPointer elt)
+  bool Collection<T>::SetItem(int idx, ItemPointer elt)
   {
     if (elt.get() == 0)
     {
       btkErrorMacro("Impossible to set an empty entry");
-      return;
+      return false;
     }
     if (idx >= static_cast<int>(this->m_Items.size()))
     {
       btkErrorMacro("Out of range");
-      return;
+      return false;
     }
     Iterator it = this->Begin();
     std::advance(it, idx);
     *it = elt;
     this->Modified();
+    return true;
   };
   
   /**

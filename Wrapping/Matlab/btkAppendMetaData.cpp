@@ -87,10 +87,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       else if(uppercase.compare("REAL") == 0)
         f = btk::MetaDataInfo::Real;
       else
-        mexErrMsgTxt("The field 'format' must be set one of the following format: Char, Byte, Integer or Real");
+        mexErrMsgTxt("The field 'format' must be set by one of the following format: Char, Byte, Integer or Real");
     }
     else
-      mexErrMsgTxt("The structure doesn't contains the field 'format' to determine the type of data.");
+      mexErrMsgTxt("The structure doesn't contain the field 'format' to determine the type of data.");
     // Check for the field 'Values'
     if ((mxValues = mxGetField(prhs[nrhs-1], 0, "values")) != NULL)
     {
@@ -118,7 +118,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       
     }
     else
-      mexErrMsgTxt("The structure doesn't contains the field 'values'.");
+      mexErrMsgTxt("The structure doesn't contain the field 'values'.");
     
     level -= 1;
   }

@@ -40,8 +40,7 @@ namespace btk
 {
   /**
    * @class ForcePlatformWrenchFilter
-   * @brief Transform force platform data into wrenches expressed in the global frame.
-   * The point of application of each wrench corresponds to the center of each force platfom.
+   * @brief Calcule the wrench of the center of the force platform data, expressed in the global frame.
    *
    * @ingroup BTKBasicFilters
    */

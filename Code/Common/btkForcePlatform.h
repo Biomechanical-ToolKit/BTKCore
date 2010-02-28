@@ -66,7 +66,7 @@ namespace btk
     ConstIterator End() const {return this->m_Channels->End();};
     int GetChannelNumber() const {return this->m_Channels->GetItemNumber();};
     Analog::Pointer GetChannel(int idx) const {return this->m_Channels->GetItem(idx);};
-    void SetChannel(int idx, Analog::Pointer c) {return this->m_Channels->SetItem(idx, c);};
+    BTK_COMMON_EXPORT void SetChannel(int idx, Analog::Pointer c);
     AnalogCollection::Pointer GetChannels() const {return this->m_Channels;};
 
     Origin& GetOrigin() {return this->m_Origin;};

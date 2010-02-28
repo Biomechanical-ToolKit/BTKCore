@@ -151,15 +151,15 @@ namespace btk
   {
     if (mxGetClassID(handle) != mxUINT32_CLASS
         || mxIsComplex(handle) || mxGetM(handle)!=1 || mxGetN(handle)!=1)
-      mexErrMsgTxt("Parameter is not an MEXObjectHandle type.");
+      mexErrMsgTxt("Parameter is not a MEXObjectHandle type.");
 
     MEXObjectHandle* obj = *reinterpret_cast<MEXObjectHandle<T>**>(mxGetPr(handle));
 
     if (!obj) // gross check to see we don't have an invalid pointer
-      mexErrMsgTxt("Parameter is NULL. It does not represent an MEXObjectHandle object.");
+      mexErrMsgTxt("Parameter is NULL. It does not represent a MEXObjectHandle object.");
 
     if (obj->mp_Signature != obj) // check memory has correct signature
-      mexErrMsgTxt("Parameter does not represent an MEXObjectHandle object.");
+      mexErrMsgTxt("Parameter does not represent a MEXObjectHandle object.");
 
     if (obj->m_ClassID != MEXClassID<T>()) // check type 
     {

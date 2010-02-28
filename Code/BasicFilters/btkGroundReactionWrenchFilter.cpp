@@ -41,12 +41,14 @@ namespace btk
   /**
    * @class GroundReactionWrenchFilter
    * @brief Transform force platform data into ground reaction wrenches.
-   * Theses wrenches are expressed in the global frame.
    *
-   * The point of application of each wrench is calculated from :
-   * Shimba T. (1984), 
-   * "An estimation of center of gravity from force platform data", 
-   * Journal of Biomechanics 17(1), 53–60.
+   * Theses wrenches are expressed in the global frame. The point of application (PWA)
+   * of each wrench is calculated from Shimba (1984),
+   *
+   * @par Reference
+   * Shimba T.@n
+   * <em>An estimation of center of gravity from force platform data</em>.@n
+   * Journal of Biomechanics, <b>1984</b>, 17(1), 53–60.
    *
    * @ingroup BTKBasicFilters
    */

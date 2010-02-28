@@ -50,7 +50,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    mexErrMsgTxt("Too many output arguments.");
 
   if (!mxIsChar(prhs[2]) || mxIsEmpty(prhs[2]))
-    mexErrMsgTxt("Analog's label must be a non-empty string.");    
+    mexErrMsgTxt("Analog's label must be a non-empty string.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);

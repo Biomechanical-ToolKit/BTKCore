@@ -222,17 +222,8 @@ namespace btk
    */
   void Acquisition::SetEvent(int idx, Event::Pointer event)
   {
-    if (idx >= this->GetEventNumber())
-    {
-      btkErrorMacro("Out of range");
-      return;
-    }
-    EventIterator it = this->BeginEvent();
-    std::advance(it, idx);
-    if (*it == event)
-      return;
-    *it = event;
-    this->Modified();
+    if (this->m_Events->SetItem(idx, event))
+      this->Modified();
   };
   
   /**
@@ -323,19 +314,42 @@ namespace btk
   };
   
   /**
-   * @fn void Acquisition::AppendEvent(Event::Pointer e)
    * Append the event @a e in the acquisition
    */
+  void Acquisition::AppendEvent(Event::Pointer e)
+  {
+    if (this->m_Events->InsertItem(e))
+      this->Modified();
+  };
    
   /**
-   * @fn void Acquisition::RemoveEvent(int idx)
    * Remove the event associated with the index @a idx
    */
+  void Acquisition::RemoveEvent(int idx)
+  {
+    int before = this->GetEventNumber();
+    this->m_Events->RemoveItem(idx);
+    int after = this->GetEventNumber();
+    if (before != after)
+      this->Modified();
+  };
   
   /**
-   * @fn EventIterator Acquisition::RemoveEvent(EventIterator it)
-   * Remove the event associated with the iterator @a it
+   * Remove the event associated with the iterator @a loc
    */
+  Acquisition::EventIterator Acquisition::RemoveEvent(Acquisition::EventIterator loc)
+  {
+    if (loc == this->EndEvent())
+    {
+      btkErrorMacro("Out of range.");
+      return loc;
+    }
+    Event::Pointer evt = *loc;
+    EventIterator it = this->m_Events->RemoveItem(loc);
+    if (*it != evt) // Must use this inequality instead of (it != loc) due to an assertion error in MSVC
+      this->Modified();
+    return it;
+  }
 
   /**
    * @fn Acquisition::PointIterator Acquisition::BeginPoint()
@@ -408,22 +422,16 @@ namespace btk
    */
   void Acquisition::SetPoint(int idx, Point::Pointer point)
   {
-    if (idx >= this->GetPointNumber())
+    if (this->m_Points->SetItem(idx, point))
     {
-      btkErrorMacro("Out of range");
-      return;
+      if (point->GetFrameNumber() != this->m_PointFrameNumber)
+      {
+        btkErrorMacro("Point's frame number is different than acquisition's frame number. Point's frame number is resized.");
+        point->SetFrameNumber(this->m_PointFrameNumber);
+      }
+      this->Modified();
     }
-    PointIterator it = this->BeginPoint();
-    std::advance(it, idx);
-    if (*it == point)
-      return;
-    if (point->GetFrameNumber() != this->m_PointFrameNumber)
-    {
-      btkErrorMacro("Point's frame number is different than acquisition's frame number. Point's frame number is resized.");
-      point->SetFrameNumber(this->m_PointFrameNumber);
-    }
-    *it = point;
-    this->Modified();
+    
   };
   
   /**
@@ -519,9 +527,21 @@ namespace btk
   };
 
   /**
-   * @fn void Acquisition::AppendPoint(Point::Pointer p)
    * Convenient method to append a point in the acquisition.
+   * This method also resizes the frame number of the inserted point if necessary.
    */
+  void Acquisition::AppendPoint(Point::Pointer p)
+  {
+    if (this->m_Points->InsertItem(p))
+    {
+      if (p->GetFrameNumber() != this->m_PointFrameNumber)
+      {
+        btkErrorMacro("Point's frame number is different than acquisition's frame number. Point's frame number is resized.");
+        p->SetFrameNumber(this->m_PointFrameNumber);
+      }
+      this->Modified();
+    }
+  };
 
   /**
    * Convenient method to delete a point from the acquisition.
@@ -535,14 +555,33 @@ namespace btk
   };
 
   /**
-   * @fn void Acquisition::RemovePoint(int idx)
    * Convenient method to delete a point from the acquisition.
    */
+  void Acquisition::RemovePoint(int idx)
+  {
+    int before = this->GetPointNumber();
+    this->m_Points->RemoveItem(idx);
+    int after = this->GetPointNumber();
+    if (before != after)
+      this->Modified();
+  };
 
   /**
-   * @fn PointIterator Acquisition::RemovePoint(PointIterator it)
    * Convenient method to delete a point from the acquisition.
    */
+  Acquisition::PointIterator Acquisition::RemovePoint(Acquisition::PointIterator loc)
+  {
+    if (loc == this->EndPoint())
+    {
+      btkErrorMacro("Out of range.");
+      return loc;
+    } 
+    Point::Pointer pnt = *loc;
+    PointIterator it = this->m_Points->RemoveItem(loc);
+    if (*it != pnt) // Must use this inequality instead of (it != loc) due to an assertion error in MSVC
+      this->Modified();
+    return it;
+  };
   
   /**
    * @fn Acquisition::AnalogIterator Acquisition::BeginAnalog()
@@ -647,17 +686,15 @@ namespace btk
    */
   void Acquisition::SetAnalog(int idx, Analog::Pointer analog)
   {
-    if (idx >= this->GetAnalogNumber())
+    if (this->m_Analogs->SetItem(idx, analog))
     {
-      btkErrorMacro("Out of range");
-      return;
+      if (analog->GetFrameNumber() != this->m_PointFrameNumber * m_AnalogSampleNumberPerPointFrame)
+      {
+        btkErrorMacro("Analog's frame number is different than acquisition's frame number. Analog's frame number is resized.");
+        analog->SetFrameNumber(this->m_PointFrameNumber * m_AnalogSampleNumberPerPointFrame);
+      }
+      this->Modified();
     }
-    AnalogIterator it = this->BeginAnalog();
-    std::advance(it, idx);
-    if (*it == analog)
-      return;
-    *it = analog;
-    this->Modified();
   };
   
   /**
@@ -721,9 +758,21 @@ namespace btk
   };
   
   /**
-   * @fn void Acquisition::AppendAnalog(Analog::Pointer ac)
    * Append the analog channel @a ac in the acquisition
+   * This method also resizes the frame number of the inserted point if necessary.
    */
+  void Acquisition::AppendAnalog(Analog::Pointer ac)
+  {
+    if (this->m_Analogs->InsertItem(ac))
+    {
+      if (ac->GetFrameNumber() != this->m_PointFrameNumber * m_AnalogSampleNumberPerPointFrame)
+      {
+        btkErrorMacro("Analog's frame number is different than acquisition's frame number. Analog's frame number is resized.");
+        ac->SetFrameNumber(this->m_PointFrameNumber * m_AnalogSampleNumberPerPointFrame);
+      }
+      this->Modified();
+    }
+  };
   
   /**
    * @fn void Acquisition::Init(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1)

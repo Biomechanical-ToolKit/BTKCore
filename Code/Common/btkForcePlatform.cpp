@@ -137,9 +137,13 @@ namespace btk
    */
 
   /**
-   * @fn void ForcePlatform::SetChannel(int idx, Analog::Pointer c)
    * Sets the channel at the index @a idx by the object @a c.
    */
+  void ForcePlatform::SetChannel(int idx, Analog::Pointer c)
+  {
+    if (this->m_Channels->SetItem(idx, c))
+      this->Modified();
+  }
 
   /**
    * @fn AnalogCollection::Pointer ForcePlatform::GetChannels() const 

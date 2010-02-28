@@ -93,9 +93,9 @@ namespace btk
     void ClearEvents() {this->m_Events->Clear();};
     BTK_COMMON_EXPORT EventIterator FindEvent(const std::string& label);
     BTK_COMMON_EXPORT EventConstIterator FindEvent(const std::string& label) const;
-    void AppendEvent(Event::Pointer e) {this->m_Events->InsertItem(e);};
-    void RemoveEvent(int idx) {this->m_Events->RemoveItem(idx);};
-    EventIterator RemoveEvent(EventIterator it) {return this->m_Events->RemoveItem(it);};
+    BTK_COMMON_EXPORT void AppendEvent(Event::Pointer e);
+    BTK_COMMON_EXPORT void RemoveEvent(int idx);
+    BTK_COMMON_EXPORT EventIterator RemoveEvent(EventIterator loc);
 
     // Point
     PointIterator BeginPoint() {return this->m_Points->Begin();};
@@ -116,10 +116,10 @@ namespace btk
     void ClearPoints() {this->m_Points->Clear();};
     BTK_COMMON_EXPORT PointIterator FindPoint(const std::string& label);
     BTK_COMMON_EXPORT PointConstIterator FindPoint(const std::string& label) const;
-    void AppendPoint(Point::Pointer p) {this->m_Points->InsertItem(p);};
+    BTK_COMMON_EXPORT void AppendPoint(Point::Pointer p);
     BTK_COMMON_EXPORT void RemovePoint(const std::string& label);
-    void RemovePoint(int idx) {this->m_Points->RemoveItem(idx);};
-    PointIterator RemovePoint(PointIterator it) {return this->m_Points->RemoveItem(it);};
+    BTK_COMMON_EXPORT void RemovePoint(int idx);
+    BTK_COMMON_EXPORT PointIterator RemovePoint(PointIterator loc);
         
     // Analog
     AnalogIterator BeginAnalog() {return this->m_Analogs->Begin();};
@@ -140,7 +140,7 @@ namespace btk
     void ClearAnalogs() {this->m_Analogs->Clear();};
     BTK_COMMON_EXPORT AnalogIterator FindAnalog(const std::string& label);
     BTK_COMMON_EXPORT AnalogConstIterator FindAnalog(const std::string& label) const;
-    void AppendAnalog(Analog::Pointer ac) {this->m_Analogs->InsertItem(ac);};
+    BTK_COMMON_EXPORT void AppendAnalog(Analog::Pointer ac);
         
     // Others
     BTK_COMMON_EXPORT void Init(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1);
