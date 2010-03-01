@@ -4,12 +4,18 @@ SET(BTKCommon_SRCS
   btkDataObject.cpp
   btkEvent.cpp
   btkForcePlatform.cpp
+  btkJoint.cpp
+  btkLandmarksTranslator.cpp
   btkPoint.cpp
-  btkMetaData.cpp  
+  btkMetaData.cpp
   btkMetaDataInfo.cpp
-  btkMetaDataUtils.cpp 
+  btkMetaDataUtils.cpp
+  btkModel.cpp
+  btkMotion.cpp
   btkObject.cpp
   btkProcessObject.cpp
+  btkSegment.cpp
+  btkSubject.cpp
   btkWrench.cpp
 )
 
