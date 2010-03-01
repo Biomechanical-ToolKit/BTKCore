@@ -33,28 +33,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMEXClassID_h
-#define __btkMEXClassID_h
+#include "btkMXObjectHandle.h"
 
-#include <btkMacro.h>
+#include <btkModel.h>
 
-namespace btk
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  class Acquisition;
-  class Model;
-  
-  template<typename T>
-  inline int MEXClassID()
-  {
-    btkErrorMacro("Unknown class! Impossible to extract the original object from the handle. A template specialization is required in the file btkMEXClassID.h")
-    return -1;
-  };
-  
-  template<> 
-  inline int MEXClassID<Acquisition>() {return 0x01;};
-  
-  template<> 
-  inline int MEXClassID<Model>() {return 0x02;};
-};
+  if(nrhs != 1)
+    mexErrMsgTxt("One input required.");
+  if (nlhs > 1)
+   mexErrMsgTxt("Too many output arguments.");
 
-#endif // __btkMEXClassID_h
+  btk::Model::Pointer model = btk_MOH_get_object<btk::Model>(prhs[0]);
+  plhs[0] = mxCreateDoubleMatrix(1, 1, mxREAL);
+  *mxGetPr(plhs[0]) = static_cast<double>(model->GetMotionFrameNumber());
+};

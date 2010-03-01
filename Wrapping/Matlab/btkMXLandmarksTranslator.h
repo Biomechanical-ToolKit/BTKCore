@@ -33,28 +33,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMEXClassID_h
-#define __btkMEXClassID_h
+#ifndef __btkMXLandmarksTranslator_h
+#define __btkMXLandmarksTranslator_h
 
-#include <btkMacro.h>
+#include "btkMex.h"
 
-namespace btk
-{
-  class Acquisition;
-  class Model;
-  
-  template<typename T>
-  inline int MEXClassID()
-  {
-    btkErrorMacro("Unknown class! Impossible to extract the original object from the handle. A template specialization is required in the file btkMEXClassID.h")
-    return -1;
-  };
-  
-  template<> 
-  inline int MEXClassID<Acquisition>() {return 0x01;};
-  
-  template<> 
-  inline int MEXClassID<Model>() {return 0x02;};
-};
+#include <btkLandmarksTranslator.h>
 
-#endif // __btkMEXClassID_h
+btk::LandmarksTranslator::Pointer btkMXGetLandmarksTranslator(const mxArray* lt);
+
+#if !defined(SCI_MEX)
+  #include "btkMXLandmarksTranslator.cxx"
+#endif
+
+#endif // __btkMXLandmarksTranslator_h

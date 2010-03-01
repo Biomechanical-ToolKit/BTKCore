@@ -33,28 +33,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMEXClassID_h
-#define __btkMEXClassID_h
+#include "btkMex.h"
+#if defined(SCI_MEX)
+  #include "btkMXLandmarksTranslator.h"
+#endif
 
-#include <btkMacro.h>
-
-namespace btk
+btk::LandmarksTranslator::Pointer btkMXGetLandmarksTranslator(const mxArray* lt)
 {
-  class Acquisition;
-  class Model;
-  
-  template<typename T>
-  inline int MEXClassID()
+  if (!mxIsCell(lt))
+    mexErrMsgTxt("Landmark translations must be set in cells.");
+  btk::LandmarksTranslator::Pointer tr = btk::LandmarksTranslator::New();
+  int len = mxGetM(lt) * mxGetN(lt);
+  for (int i = 0 ; i < len ; ++i)
   {
-    btkErrorMacro("Unknown class! Impossible to extract the original object from the handle. A template specialization is required in the file btkMEXClassID.h")
-    return -1;
-  };
-  
-  template<> 
-  inline int MEXClassID<Acquisition>() {return 0x01;};
-  
-  template<> 
-  inline int MEXClassID<Model>() {return 0x02;};
+    mxArray* cell = mxGetCell(lt, i);
+    if (!mxIsCell(cell) || (mxGetM(cell) * mxGetN(cell) != 2))
+      mexErrMsgTxt("Each Landmark translation must be contained in a cell with only 2 strings.");
+    mxArray* l = mxGetCell(cell, 0);
+    mxArray* t = mxGetCell(cell, 1);
+    if (!mxIsChar(l) || mxIsEmpty(l))
+      mexErrMsgTxt("The landmark label must be set by a non-empty string.");
+    if (!mxIsChar(t) || mxIsEmpty(t))
+      mexErrMsgTxt("The translation label must be set by a non-empty string.");
+    int strlen = (mxGetM(l) * mxGetN(l) * sizeof(mxChar)) + 1;
+    char* landmark = (char*)mxMalloc(strlen);
+    mxGetString(l, landmark, strlen);
+    strlen = (mxGetM(t) * mxGetN(t) * sizeof(mxChar)) + 1;
+    char* translation = (char*)mxMalloc(strlen);
+    mxGetString(t, translation, strlen);
+    tr->SetLandmark(landmark,translation);
+    mxFree(landmark);
+    mxFree(translation);
+  }
+  return tr;
 };
 
-#endif // __btkMEXClassID_h
