@@ -101,13 +101,6 @@ IF(MATLAB_ROOT)
   # IO
   MATLAB_MEX_CREATE(btkReadAcquisition btkReadAcquisition.cpp BTKIO)
   MATLAB_MEX_CREATE(btkWriteAcquisition btkWriteAcquisition.cpp BTKIO)
-  # Models
-  MATLAB_MEX_CREATE(btkCalibrateModel btkCalibrateModel.cpp BTKModels)
-  MATLAB_MEX_CREATE(btkCalculateModelMotion btkCalculateModelMotion.cpp BTKModels)
-  MATLAB_MEX_CREATE(btkCalculateJCSKinematics btkCalculateJCSKinematics.cpp BTKModels)
-  MATLAB_MEX_CREATE(btkNewModel btkNewModel.cpp BTKModels)
-  MATLAB_MEX_CREATE(btkGetMotionFrameNumber btkGetMotionFrameNumber.cpp BTKCommon)
-
 ENDIF(MATLAB_ROOT)
 
 IF(NOT BTK_INSTALL_NO_LIBRARIES)

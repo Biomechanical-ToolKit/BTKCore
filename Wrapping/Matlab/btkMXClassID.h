@@ -41,7 +41,6 @@
 namespace btk
 {
   class Acquisition;
-  class Model;
   
   template<typename T>
   inline int MEXClassID()
@@ -52,9 +51,6 @@ namespace btk
   
   template<> 
   inline int MEXClassID<Acquisition>() {return 0x01;};
-  
-  template<> 
-  inline int MEXClassID<Model>() {return 0x02;};
 };
 
 #endif // __btkMEXClassID_h
