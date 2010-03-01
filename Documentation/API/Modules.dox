@@ -18,10 +18,16 @@
 
 /**
  * @defgroup BTKBasicFilters BasicFilters
- * @brief Simple filters (e.g. Extract a frame of markers frome an acquisition).
+ * @brief Simple filters (e.g. Extract a frame of markers from an acquisition).
  *
  * This modules corresponds to the library BTKBasicFilters
  */
 
+ /**
+  * @defgroup BTKModels Models
+  * @brief Contains models' definition and initialization.
+  *
+  * This modules corresponds to the library BTKModels
+  */
 
 
