@@ -34,46 +34,63 @@
  */
 
 #include "btkMXObjectHandle.h"
-#include "btkMXPoint.h"
+#include "btkMXAnalog.h"
 
-// btkRemovePoint(h, i)
-// btkRemovePoint(h, label)
+#include <btkAcquisition.h>
+#include <btkAnalog.h>
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs < 2)
-    mexErrMsgTxt("Two inputs required.");
+  if(nrhs < 3)
+    mexErrMsgTxt("Minimum of three inputs required.");
   if (nlhs > 2)
    mexErrMsgTxt("Too many output arguments.");
 
-  if (mxIsEmpty(prhs[1]) || (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))))
-    mexErrMsgTxt("Point's index must be a non-empty string or an integer.");
+  int vn = 0, mn = 0, rn = 0;
 
+  if (!mxIsChar(prhs[1]) || mxIsEmpty(prhs[1]))
+    mexErrMsgTxt("Analog's label must be a non-empty string.");
+  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetN(prhs[2]) != 1))
+    mexErrMsgTxt("Analog's values must have a second dimension equals to 1.");
+  vn = mxGetM(prhs[2]);
+  if (nrhs >= 4)
+  { 
+    if (!mxIsChar(prhs[3]))
+      mexErrMsgTxt("Analog's description must be a string");
+  }
+  
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
-  if (mxIsChar(prhs[1]))
+  if (vn != acq->GetAnalogFrameNumber())
+    mexErrMsgTxt("Frame number mismatching.");
+
+  // label
+  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+  char* label = (char*)mxMalloc(strlen);
+  mxGetString(prhs[1], label, strlen);
+  if (acq->FindAnalog(label) != acq->EndAnalog())
   {
-    int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-    char* label = (char*)mxMalloc(strlen);
-    mxGetString(prhs[1], label, strlen);
-    btk::Acquisition::PointIterator itPoint = acq->FindPoint(label);
-    if (itPoint == acq->EndPoint())
-    {
-      std::string err = "No point with label: '" + std::string(label) + "'.";
-      mxFree(label);
-      mexErrMsgTxt(err.c_str());
-    }
+    std::string err = "An analog channel in the acquisition has already the label: '" + std::string(label) + "'.";
     mxFree(label);
-    acq->RemovePoint(itPoint);
-  }
-  else
-  {
-    int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
-    if ((idx < 0) || (idx >= acq->GetPointNumber()))
-      mexErrMsgTxt("Point's index out of range.");
-    acq->RemovePoint(idx);
+    mexErrMsgTxt(err.c_str());
   }
 
-  // Return updated points
-  btkMXCreatePointsStructure(acq, nlhs, plhs);
+  btk::Analog::Pointer analog = btk::Analog::New(label, vn);
+  mxFree(label);
+
+  memcpy(analog->GetValues().data(), mxGetPr(prhs[2]) , mxGetNumberOfElements(prhs[2]) * sizeof(double));
+  if (nrhs >= 4)
+  {
+    int strlen = (mxGetM(prhs[3]) * mxGetN(prhs[3]) * sizeof(mxChar)) + 1;
+    char* desc = (char*)mxMalloc(strlen);
+    mxGetString(prhs[3], desc, strlen);
+    analog->SetDescription(desc);
+    mxFree(desc);
+  }
+
+  acq->AppendAnalog(analog);
+
+  // Return updated analogs
+  btkMXCreateAnalogsStructure(acq, nlhs, plhs);
 };
 

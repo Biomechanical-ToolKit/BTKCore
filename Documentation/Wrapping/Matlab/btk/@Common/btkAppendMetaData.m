@@ -1,7 +1,7 @@
 function btkAppendMetaData(h, label, sublabel, ..., info) %#ok
 %BTKAPPENDMETADATA Append a new metada and return an updated list of the metada in the acquisition.
 % 
-%  BTKAPPENDMETADATA(H, LABEL) append a metatada with the label LABEL to the root.
+%  BTKAPPENDMETADATA(H, LABEL) appends a metatada with the label LABEL to the root.
 %  This metadata has no child, nor information.
 %
 %  BTKAPPENDMETADATA(H, LABEL, SUBLABEL) append a metatada with the label SUBLABEL in

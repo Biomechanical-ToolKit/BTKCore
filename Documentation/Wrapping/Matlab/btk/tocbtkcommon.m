@@ -15,11 +15,14 @@ function tocbtkcommon
 %
 % Acquisition modifier
 %   <a href="matlab:help btkAppendAnalysisParameter">btkAppendAnalysisParameter</a>  - Append or set a paremeter into the analysis
-%   <a href="matlab:help btkAppendMetada">btkAppendMetadata</a>           - Append metadata in the acquisition
+%   <a href="matlab:help btkAppendMetadata">btkAppendMetadata</a>           - Append a metadata in the acquisition
+%   <a href="matlab:help btkClearMetadata">btkClearMetadata</a>            - Clear metadata in the acquisition
+%   <a href="matlab:help btkCloneAcquisition">btkCloneAcquisition</a>         - Clone an acquisition
 %   <a href="matlab:help btkClearAnalysis">btkClearAnalysis</a>            - Clear the metadata ANALYSIS
-%   <a href="matlab:help btkDeleteAcquisition">btkDeleteAcquisition</a>            - Delete an acquisition and free the used memory
+%   <a href="matlab:help btkDeleteAcquisition">btkDeleteAcquisition</a>        - Delete an acquisition and free the used memory
 %   <a href="matlab:help btkNewAcquisition">btkNewAcquisition</a>           - Create an empty acquisition
 %   <a href="matlab:help btkRemoveAnalysisParameter">btkRemoveAnalysisParameter</a>  - Erase a paremeter from the analysis
+%   <a href="matlab:help btkRemoveMetaData">btkRemoveMetaData</a>           - Remove a metadata from the acquisition
 %   <a href="matlab:help btkSetFirstFrame">btkSetFirstFrame</a>            - Acquisition's first frame modifier
 %   <a href="matlab:help btkSetFrameNumber">btkSetFrameNumber</a>           - Point and analog frame number modifier
 %   <a href="matlab:help btkSetFrequency">btkSetFrequency</a>             - Set the main frequency
@@ -41,8 +44,9 @@ function tocbtkcommon
 %   <a href="matlab:help btkGetScalarsValues">btkGetScalarsValues</a>         - Extracts scalars as a simple matrix 
 %
 % Point modifier
-%   <a href="matlab:help btkAppendPoint">btkAppendPoint</a>              - Append point into an acquisition
-%   <a href="matlab:help btkRemovePoint">btkRemovePoint</a>              - Delete point from an acquisition
+%   <a href="matlab:help btkAppendPoint">btkAppendPoint</a>              - Append a point into an acquisition
+%   <a href="matlab:help btkClearPoints">btkClearPoints</a>              - Remove all points from an acquisition
+%   <a href="matlab:help btkRemovePoint">btkRemovePoint</a>              - Delete a point from an acquisition
 %   <a href="matlab:help btkSetPoint">btkSetPoint</a>                 - Point's data modifier (values, residuals, masks)
 %   <a href="matlab:help btkSetPointDescription">btkSetPointDescription</a>      - Point's description modifier
 %   <a href="matlab:help btkSetPointLabel">btkSetPointLabel</a>            - Point's label modifier
@@ -62,6 +66,9 @@ function tocbtkcommon
 %   <a href="matlab:help btkGetForcePlatforms">btkGetForcePlatforms</a>        - Force platform channels and configuration extraction
 %
 % Analog modifier
+%   <a href="matlab:help btkAppendAnalog">btkAppendAnalog</a>             - Append an analog channel into an acquisition
+%   <a href="matlab:help btkClearAnalogs">btkClearAnalogs</a>             - Remove all analog channels from an acquisition
+%   <a href="matlab:help btkRemoveAnalog">btkRemoveAnalog</a>             - Delete an analog channel from an acquisition
 %   <a href="matlab:help btkSetAnalogDescription">btkSetAnalogDescription</a>     - Set analog's description
 %   <a href="matlab:help btkSetAnalogGain">btkSetAnalogGain</a>            - Set analog's gain
 %   <a href="matlab:help btkSetAnalogLabel">btkSetAnalogLabel</a>           - Set analog's label

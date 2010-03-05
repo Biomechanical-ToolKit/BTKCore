@@ -32,13 +32,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-#if defined(_MSC_VER)
-  // Disable unsafe warning (use of the function 'strcpy' instead of 
-  // 'strcpy_s' for portability reasons;
-  #pragma warning( disable : 4996 ) 
-#endif
-
+ 
 #include "btkMXObjectHandle.h"
 
 #include <btkAcquisition.h>

@@ -34,10 +34,8 @@
  */
 
 #include "btkMXObjectHandle.h"
-#include "btkMXPoint.h"
+#include "btkMXMetaData.h"
 
-// btkRemovePoint(h, i)
-// btkRemovePoint(h, label)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs < 2)
@@ -45,35 +43,47 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 2)
    mexErrMsgTxt("Too many output arguments.");
 
-  if (mxIsEmpty(prhs[1]) || (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))))
-    mexErrMsgTxt("Point's index must be a non-empty string or an integer.");
-
+  for (int i = 1 ; i < nrhs ; ++i)
+  {
+    if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && (!mxIsNumeric(prhs[i]) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
+      mexErrMsgTxt("Metadata's label or index must be set by a non-empty string or an integer respectively.");
+  }
+  
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-
-  if (mxIsChar(prhs[1]))
+  btk::MetaData::Pointer md = acq->GetMetaData();
+  
+  btk::MetaData::Iterator it = md->End();
+  for (int i = 1 ; i < nrhs ; ++i)
   {
-    int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-    char* label = (char*)mxMalloc(strlen);
-    mxGetString(prhs[1], label, strlen);
-    btk::Acquisition::PointIterator itPoint = acq->FindPoint(label);
-    if (itPoint == acq->EndPoint())
+    if (mxIsChar(prhs[i]))
     {
-      std::string err = "No point with label: '" + std::string(label) + "'.";
+      int strlen = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
+      char* label = (char*)mxMalloc(strlen);
+      mxGetString(prhs[i], label, strlen);
+      it = md->FindChild(label);
+      if (it == md->End())
+      {
+        std::string err = "No metadata with label: '" + std::string(label) + "'.";
+        mxFree(label);
+        mexErrMsgTxt(err.c_str());
+      }
       mxFree(label);
-      mexErrMsgTxt(err.c_str());
     }
-    mxFree(label);
-    acq->RemovePoint(itPoint);
+    else
+    {
+      int idx = static_cast<int>(mxGetScalar(prhs[i])) - 1;
+      if ((idx < 0) || (idx >= md->GetChildNumber()))
+        mexErrMsgTxt("Metadata's index out of range.");
+      it = md->Begin();
+      std::advance(it, idx);
+    }
+    
+    if (i == (nrhs - 1))
+      md->RemoveChild(it);
+    else
+      md = *it;
   }
-  else
-  {
-    int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
-    if ((idx < 0) || (idx >= acq->GetPointNumber()))
-      mexErrMsgTxt("Point's index out of range.");
-    acq->RemovePoint(idx);
-  }
-
-  // Return updated points
-  btkMXCreatePointsStructure(acq, nlhs, plhs);
+  
+  plhs[0] = btkMXCreateMetaDataStructure(acq->GetMetaData());
 };
 

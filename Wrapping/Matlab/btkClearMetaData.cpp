@@ -34,46 +34,20 @@
  */
 
 #include "btkMXObjectHandle.h"
-#include "btkMXPoint.h"
 
-// btkRemovePoint(h, i)
-// btkRemovePoint(h, label)
+#include <btkAcquisition.h>
+#include <btkMetaDataUtils.h>
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs < 2)
-    mexErrMsgTxt("Two inputs required.");
-  if (nlhs > 2)
+  if(nrhs!=1)
+    mexErrMsgTxt("One input required.");
+  if (nlhs > 0)
    mexErrMsgTxt("Too many output arguments.");
 
-  if (mxIsEmpty(prhs[1]) || (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))))
-    mexErrMsgTxt("Point's index must be a non-empty string or an integer.");
-
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-
-  if (mxIsChar(prhs[1]))
-  {
-    int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-    char* label = (char*)mxMalloc(strlen);
-    mxGetString(prhs[1], label, strlen);
-    btk::Acquisition::PointIterator itPoint = acq->FindPoint(label);
-    if (itPoint == acq->EndPoint())
-    {
-      std::string err = "No point with label: '" + std::string(label) + "'.";
-      mxFree(label);
-      mexErrMsgTxt(err.c_str());
-    }
-    mxFree(label);
-    acq->RemovePoint(itPoint);
-  }
-  else
-  {
-    int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
-    if ((idx < 0) || (idx >= acq->GetPointNumber()))
-      mexErrMsgTxt("Point's index out of range.");
-    acq->RemovePoint(idx);
-  }
-
-  // Return updated points
-  btkMXCreatePointsStructure(acq, nlhs, plhs);
+  
+  acq->GetMetaData()->ClearChildren();
 };
+
 

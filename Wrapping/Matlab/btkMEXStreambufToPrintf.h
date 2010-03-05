@@ -36,12 +36,6 @@
 #ifndef __btkMEXStreambufToPrintf_h
 #define __btkMEXStreambufToPrintf_h
 
-#if defined(_MSC_VER)
-  // Disable unsafe warning (use of the function 'sprintf' instead of 
-  // 'sprintf_s' for portability reasons;
-  #pragma warning( disable : 4996 ) 
-#endif
-
 #include <streambuf>
 #include <iostream>
 #include <cstdio> // EOF for linux

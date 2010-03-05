@@ -34,10 +34,8 @@
  */
 
 #include "btkMXObjectHandle.h"
-#include "btkMXPoint.h"
+#include "btkMXAnalog.h"
 
-// btkRemovePoint(h, i)
-// btkRemovePoint(h, label)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs < 2)
@@ -46,7 +44,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    mexErrMsgTxt("Too many output arguments.");
 
   if (mxIsEmpty(prhs[1]) || (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))))
-    mexErrMsgTxt("Point's index must be a non-empty string or an integer.");
+    mexErrMsgTxt("Analog's index must be a non-empty string or an integer.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
@@ -55,25 +53,25 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
     char* label = (char*)mxMalloc(strlen);
     mxGetString(prhs[1], label, strlen);
-    btk::Acquisition::PointIterator itPoint = acq->FindPoint(label);
-    if (itPoint == acq->EndPoint())
+    btk::Acquisition::AnalogIterator itAnalog = acq->FindAnalog(label);
+    if (itAnalog == acq->EndAnalog())
     {
-      std::string err = "No point with label: '" + std::string(label) + "'.";
+      std::string err = "No analog channel with label: '" + std::string(label) + "'.";
       mxFree(label);
       mexErrMsgTxt(err.c_str());
     }
     mxFree(label);
-    acq->RemovePoint(itPoint);
+    acq->RemoveAnalog(itAnalog);
   }
   else
   {
     int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
-    if ((idx < 0) || (idx >= acq->GetPointNumber()))
-      mexErrMsgTxt("Point's index out of range.");
-    acq->RemovePoint(idx);
+    if ((idx < 0) || (idx >= acq->GetAnalogNumber()))
+      mexErrMsgTxt("Analog's index out of range.");
+    acq->RemoveAnalog(idx);
   }
 
   // Return updated points
-  btkMXCreatePointsStructure(acq, nlhs, plhs);
+  btkMXCreateAnalogsStructure(acq, nlhs, plhs);
 };
 

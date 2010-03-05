@@ -45,7 +45,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    mexErrMsgTxt("Too many output arguments.");
 
   if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]))
-    mexErrMsgTxt("The second input must be a matrix of real values corresponding to markers' coordinates."); 
+    mexErrMsgTxt("The second input must be a matrix of real values corresponding to analog channels values."); 
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
@@ -54,7 +54,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   int numberOfChannels = acq->GetAnalogNumber();
 
   if (mxGetNumberOfElements(prhs[1]) != (numberOfFrames * numberOfChannels))
-    mexErrMsgTxt("The second input doesn't have the same size than the number of markers' coordinates.");
+    mexErrMsgTxt("The second input doesn't have the same size than the number of analog channels values.");
     
   double* values = mxGetPr(prhs[1]);
 
