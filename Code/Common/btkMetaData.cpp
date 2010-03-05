@@ -467,6 +467,17 @@ namespace btk
   };
   
   /**
+   * Removes every children.
+   */ 
+  void MetaData::ClearChildren()
+  {
+    if (this->m_Children.empty())
+      return;
+    this->m_Children.clear();
+    this->Modified();
+  };
+  
+  /**
    * @fn bool MetaData::HasChildren() const
    * Checks if the entry has children
    */

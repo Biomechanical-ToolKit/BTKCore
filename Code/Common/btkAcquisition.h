@@ -141,6 +141,9 @@ namespace btk
     BTK_COMMON_EXPORT AnalogIterator FindAnalog(const std::string& label);
     BTK_COMMON_EXPORT AnalogConstIterator FindAnalog(const std::string& label) const;
     BTK_COMMON_EXPORT void AppendAnalog(Analog::Pointer ac);
+    BTK_COMMON_EXPORT void RemoveAnalog(const std::string& label);
+    BTK_COMMON_EXPORT void RemoveAnalog(int idx);
+    BTK_COMMON_EXPORT AnalogIterator RemoveAnalog(AnalogIterator loc);
         
     // Others
     BTK_COMMON_EXPORT void Init(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1);

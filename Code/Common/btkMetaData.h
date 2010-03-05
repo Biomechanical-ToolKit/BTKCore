@@ -142,6 +142,7 @@ namespace btk
     BTK_COMMON_EXPORT Iterator RemoveChild(Iterator loc);
     BTK_COMMON_EXPORT void RemoveChild(int idx);
     BTK_COMMON_EXPORT void RemoveChild(const std::string& label);
+    BTK_COMMON_EXPORT void ClearChildren();
     bool HasChildren() const {return (this->m_Children.size() != 0);};
     int GetChildNumber() const {return this->m_Children.size();};
     BTK_COMMON_EXPORT Iterator FindChild(const std::string& label);

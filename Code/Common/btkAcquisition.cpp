@@ -775,7 +775,46 @@ namespace btk
   };
   
   /**
-   * @fn void Acquisition::Init(int pointNumber, int frameNumber, int analogNumber = 0, int analogSampleNumberPerPointFrame = 1)
+   * Convenient method to delete an analog channel from the acquisition.
+   */
+  void Acquisition::RemoveAnalog(const std::string& label)
+  {
+    AnalogIterator it = this->FindAnalog(label);
+    if (it == this->EndAnalog())
+      btkErrorMacro("No analog channel with label: '" + label + "'.");
+    this->RemoveAnalog(it);
+  };
+  
+  /**
+   * Convenient method to delete an analog channel from the acquisition.
+   */
+  void Acquisition::RemoveAnalog(int idx)
+  {
+    int before = this->GetAnalogNumber();
+    this->m_Analogs->RemoveItem(idx);
+    int after = this->GetAnalogNumber();
+    if (before != after)
+      this->Modified();
+  };
+  
+  /**
+   * Convenient method to delete an analog channel from the acquisition.
+   */
+  Acquisition::AnalogIterator Acquisition::RemoveAnalog(AnalogIterator loc)
+  {
+    if (loc == this->EndAnalog())
+    {
+      btkErrorMacro("Out of range.");
+      return loc;
+    } 
+    Analog::Pointer anl = *loc;
+    AnalogIterator it = this->m_Analogs->RemoveItem(loc);
+    if (*it != anl)
+      this->Modified();
+    return it;
+  };
+  
+  /**
    * Initialize the acquisition with @a pointNumber which have @a frameNumber
    * frame. The analog part has @a analogNumber analog channels and their number of frames
    * corresponds to the integer factor @a analogSampleNumberPerPointFrame multiplied by @a frameNumber.
