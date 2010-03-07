@@ -3,14 +3,16 @@ SET(BTKIO_SRCS
   btkAcquisitionFileIOFactory.cpp
   btkAcquisitionFileReader.cpp
   btkAcquisitionFileWriter.cpp
+  btkBinaryFileStream.cpp
+  # File formats
   btkANBFileIO.cpp
   btkANCFileIO.cpp
-  btkANxFileIOUtils.cpp
-  btkCALForcePlateFileIO.cpp
-  btkBinaryFileStream.cpp
   btkC3DFileIO.cpp
+  btkCALForcePlateFileIO.cpp
   btkTRCFileIO.cpp
   btkXLSOrthotrackFileIO.cpp
+  # Private methods
+  btkANxFileIOUtils_p.cpp
 )
 
 ADD_LIBRARY(BTKIO ${BTK_LIBS_BUILD_TYPE} ${BTKIO_SRCS})

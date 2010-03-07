@@ -34,7 +34,7 @@
  */
 
 #include "btkANBFileIO.h"
-#include "btkANxFileIOUtils.h"
+#include "btkANxFileIOUtils_p.h"
 #include "btkMetaDataUtils.h"
 #include "btkConvert.h"
 
@@ -205,8 +205,8 @@ namespace btk
       this->ReadKeyValueU32(&dataSize, &bifs, 0x8100);
       uint32_t frameNumber = (dataSize - 3) * 2 / channelNumber;
       
-      ANxFileIOCheckHeader(preciseRate, channelNumber, channelRate, channelRange);
-      ANxFileIOStoreHeader(output, preciseRate, frameNumber, channelNumber, channelLabel, channelRate, channelRange, boardType, bitDepth);
+      ANxFileIOCheckHeader_p(preciseRate, channelNumber, channelRate, channelRange);
+      ANxFileIOStoreHeader_p(output, preciseRate, frameNumber, channelNumber, channelLabel, channelRate, channelRange, boardType, bitDepth);
       output->SetFirstFrame(static_cast<int>(firstTime * preciseRate) + 1);
         
       // Convert hexIndex to metadata ANALOG:INDEX
@@ -241,10 +241,10 @@ namespace btk
     catch (std::fstream::failure& )
     {
       std::string excmsg; 
-      if (!ifs.is_open())
-        excmsg = "Invalid file path.";
-      else if (ifs.eof())
+      if (ifs.eof())
         excmsg = "Unexpected end of file.";
+      else if (!ifs.is_open())
+        excmsg = "Invalid file path.";
       else if(ifs.bad())
         excmsg = "Loss of integrity of the filestream.";
       else if(ifs.fail())
@@ -372,7 +372,7 @@ namespace btk
       {
         if ((*it)->GetGain() == Analog::Unknown)
         {
-          channelRange[i] = ANxFileIODetectAnalogRange((*it)->GetScale(), input->GetAnalogResolution());
+          channelRange[i] = ANxFileIODetectAnalogRange_p((*it)->GetScale(), input->GetAnalogResolution());
           btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(channelRange[i]) / 1000.0)  + " volts in the file.");
         }
         else
@@ -424,6 +424,8 @@ namespace btk
   : AcquisitionFileIO()
   {
     this->SetFileType(AcquisitionFileIO::Binary);
+    this->SetByteOrder(AcquisitionFileIO::IEEE_LittleEndian);
+    this->SetStorageFormat(AcquisitionFileIO::Integer);
   };
   
   size_t ANBFileIO::ReadKeyValueU8(uint8_t* val, IEEELittleEndianBinaryFileStream* bifs, int key)

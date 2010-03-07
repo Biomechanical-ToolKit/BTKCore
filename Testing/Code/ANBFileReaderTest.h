@@ -18,6 +18,13 @@ CXXTEST_SUITE(ANBFileReaderTest)
     TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::AcquisitionFileReaderException &e, e.what(), std::string("File doesn't exist\nFilename: test.anb"));
   };
   
+  CXXTEST_TEST(Truncated)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(ANBFilePathIN + "Truncated.anb");
+    TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::Exception &e, e.what(), std::string("Unexpected end of file."));
+  };
+
   CXXTEST_TEST(Gait)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
@@ -138,5 +145,6 @@ CXXTEST_SUITE(ANBFileReaderTest)
 CXXTEST_SUITE_REGISTRATION(ANBFileReaderTest)
 CXXTEST_TEST_REGISTRATION(ANBFileReaderTest, NoFile)
 CXXTEST_TEST_REGISTRATION(ANBFileReaderTest, MisspelledFile)
+CXXTEST_TEST_REGISTRATION(ANBFileReaderTest, Truncated)
 CXXTEST_TEST_REGISTRATION(ANBFileReaderTest, Gait)
 #endif

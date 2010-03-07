@@ -58,23 +58,23 @@ namespace btk
     virtual ~ANxFileIOException() throw() {};
   };
   
-  void ANxFileIOCheckHeader(double preciseRate, int channelNumber, 
+  void ANxFileIOCheckHeader_p(double preciseRate, int channelNumber, 
                             const std::vector<uint16_t>& channelRate, 
                             const std::vector<uint16_t>& channelRange);
-  void ANxFileIOStoreHeader(Acquisition::Pointer output,
+  void ANxFileIOStoreHeader_p(Acquisition::Pointer output,
                             double preciseRate, int frameNumber, int channelNumber,
                             const std::vector<std::string>& channelLabel,
                             const std::vector<uint16_t>& channelRate,
                             const std::vector<uint16_t>& channelRange,
                             const std::string& boardType, int bitDepth, int gen = 2);
-  void ANxFileIOExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, 
+  void ANxFileIOExtractForcePlatformChannel_p(std::vector< std::vector<int16_t> >& fpChan, 
                             Acquisition::Pointer output, const char** labels, int num);
-  void ANxFileIOExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, 
+  void ANxFileIOExtractForcePlatformChannel_p(std::vector< std::vector<int16_t> >& fpChan, 
                             Acquisition::Pointer output, const std::string& prefix, const char** labels, int num);
-  void ANxFileIOExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, 
+  void ANxFileIOExtractForcePlatformChannel_p(std::vector< std::vector<int16_t> >& fpChan, 
                             Acquisition::Pointer output, const std::vector<std::string>& labels);
-  int ANxFileIOFindAnalogLabeCaselInsensitive(const std::string& label, Acquisition::Pointer output);
-  uint16_t ANxFileIODetectAnalogRange(double s, int bitDepth);
+  int ANxFileIOFindAnalogLabeCaselInsensitive_p(const std::string& label, Acquisition::Pointer output);
+  uint16_t ANxFileIODetectAnalogRange_p(double s, int bitDepth);
 
 };
 

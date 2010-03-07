@@ -35,14 +35,8 @@
 
 #include "btkANCFileIO.h"
 #include "btkMetaDataUtils.h"
-#include "btkANxFileIOUtils.h"
+#include "btkANxFileIOUtils_p.h"
 #include "btkConvert.h"
-
-#if defined(_MSC_VER)
-  // Disable unsafe warning (use of the function 'sprintf' instead of 
-  // 'sprintf_s' for portability reasons;
-  #pragma warning( disable : 4996 ) 
-#endif
 
 #include <fstream>
 #include <algorithm>
@@ -211,8 +205,8 @@ namespace btk
         for (std::list<std::string>::const_iterator it = labels.begin() ; it != labels.end() ; ++it)
           channelLabel[inc++] = *it;
 
-        ANxFileIOCheckHeader(preciseRate, numberOfChannels, channelRate, channelRange);
-        ANxFileIOStoreHeader(output, preciseRate, numberOfFrames, numberOfChannels, channelLabel, channelRate, channelRange, boardType, bitDepth, this->m_Generation);
+        ANxFileIOCheckHeader_p(preciseRate, numberOfChannels, channelRate, channelRange);
+        ANxFileIOStoreHeader_p(output, preciseRate, numberOfFrames, numberOfChannels, channelLabel, channelRate, channelRange, boardType, bitDepth, this->m_Generation);
         
         // Extract values
         std::string buf;
@@ -398,7 +392,7 @@ namespace btk
             ofs << 1000;
             break;
           case Analog::Unknown:
-            uint16_t range = ANxFileIODetectAnalogRange((*it)->GetScale(), input->GetAnalogResolution());
+            uint16_t range = ANxFileIODetectAnalogRange_p((*it)->GetScale(), input->GetAnalogResolution());
             ofs << range;
             btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(range) / 1000)  + " volts in the file.");
             break;

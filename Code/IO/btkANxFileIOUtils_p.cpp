@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkANxFileIOUtils.h"
+#include "btkANxFileIOUtils_p.h"
 #include "btkMetaDataUtils.h"
 
 #include <algorithm>
@@ -59,7 +59,7 @@ namespace btk
   /**
    * Check the header's informations for the (ANB|ANC)FileIO reader.
    */
-  void ANxFileIOCheckHeader(double preciseRate, int channelNumber, 
+  void ANxFileIOCheckHeader_p(double preciseRate, int channelNumber, 
                             const std::vector<uint16_t>& channelRate, 
                             const std::vector<uint16_t>& channelRange)
   {
@@ -81,12 +81,12 @@ namespace btk
   /**
    * Store the header's informations for the (ANB|ANC)FileIO reader into a btk::Acquisition.
    */
-  void ANxFileIOStoreHeader(Acquisition::Pointer output,
-                            double preciseRate, int frameNumber, int channelNumber, 
-                            const std::vector<std::string>& channelLabel, 
-                            const std::vector<uint16_t>& channelRate, 
-                            const std::vector<uint16_t>& channelRange, 
-                            const std::string& boardType, int bitDepth, int gen)
+  void ANxFileIOStoreHeader_p(Acquisition::Pointer output,
+                              double preciseRate, int frameNumber, int channelNumber, 
+                              const std::vector<std::string>& channelLabel, 
+                              const std::vector<uint16_t>& channelRate, 
+                              const std::vector<uint16_t>& channelRange, 
+                              const std::string& boardType, int bitDepth, int gen)
   {
     output->Init(0, frameNumber, channelNumber);
     output->SetPointFrequency(preciseRate);
@@ -162,11 +162,11 @@ namespace btk
     //const char* labelsTypeIII[] = {"FX12", "FX34", "FY14", "FY23", "FZ1", "FZ2", "FZ3", "FZ4"};
     // FP type II start as the initial CAL format is composed of this type of force platform
     // The scale adataption is realized in the next lines.
-    ANxFileIOExtractForcePlatformChannel(fpChan, output, labelsTypeII, sizeof(labelsTypeII) / sizeof(char*));
-    ANxFileIOExtractForcePlatformChannel(fpChan, output, "FP", labelsTypeII, sizeof(labelsTypeII) / sizeof(char*));
-    //ANxFileIOExtractForcePlatformChannel(fpChan, output, labelsTypeI, sizeof(labelsTypeI) / sizeof(char*));
-    //ANxFileIOExtractForcePlatformChannel(fpChan, output, "FP", labelsTypeI, sizeof(labelsTypeI) / sizeof(char*));
-    //ANxFileIOExtractForcePlatformChannel(fpChan, output, "FP", labelsTypeIII, sizeof(labelsTypeIII) / sizeof(char*));
+    ANxFileIOExtractForcePlatformChannel_p(fpChan, output, labelsTypeII, sizeof(labelsTypeII) / sizeof(char*));
+    ANxFileIOExtractForcePlatformChannel_p(fpChan, output, "FP", labelsTypeII, sizeof(labelsTypeII) / sizeof(char*));
+    //ANxFileIOExtractForcePlatformChannel_p(fpChan, output, labelsTypeI, sizeof(labelsTypeI) / sizeof(char*));
+    //ANxFileIOExtractForcePlatformChannel_p(fpChan, output, "FP", labelsTypeI, sizeof(labelsTypeI) / sizeof(char*));
+    //ANxFileIOExtractForcePlatformChannel_p(fpChan, output, "FP", labelsTypeIII, sizeof(labelsTypeIII) / sizeof(char*));
     
     if (fpChan.size() != 0)
     {  
@@ -195,7 +195,7 @@ namespace btk
   /**
    * Extract force platform channels.
    */
-  void ANxFileIOExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const char** labels, int num)
+  void ANxFileIOExtractForcePlatformChannel_p(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const char** labels, int num)
   {
     if ((output->GetAnalogNumber() - static_cast<int>(fpChan.size())) < num)
       return;
@@ -206,7 +206,7 @@ namespace btk
     {
       for (int j = 0 ; j < num ; ++j)
         labels2[j] = std::string(labels[j]) + suffix;
-      ANxFileIOExtractForcePlatformChannel(fpChan, output, labels2);
+      ANxFileIOExtractForcePlatformChannel_p(fpChan, output, labels2);
       suffix = ToString(i);
     }
     // Looking for label with index 0,1,2,3,4,5 after the first letter.
@@ -218,14 +218,14 @@ namespace btk
         labels2[j] = std::string(labels[j]);
         labels2[j].insert(1, suffix);
       }
-      ANxFileIOExtractForcePlatformChannel(fpChan, output, labels2);
+      ANxFileIOExtractForcePlatformChannel_p(fpChan, output, labels2);
     }
   };
   
   /**
    * Extract force platform channels.
    */
-  void ANxFileIOExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::string& prefix, const char** labels, int num)
+  void ANxFileIOExtractForcePlatformChannel_p(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::string& prefix, const char** labels, int num)
   {
     if ((output->GetAnalogNumber() - fpChan.size()) < 6)
       return;
@@ -236,7 +236,7 @@ namespace btk
     {
       for (int j = 0 ; j < num ; ++j)
         labels2[j] =  prefix + suffix + std::string(labels[j]);
-      ANxFileIOExtractForcePlatformChannel(fpChan, output, labels2);
+      ANxFileIOExtractForcePlatformChannel_p(fpChan, output, labels2);
       suffix = ToString(i);
     }
   };
@@ -245,12 +245,12 @@ namespace btk
    * Extract force platform channels.
    * Adapt also the scale of the force platform channels.
    */
-  void ANxFileIOExtractForcePlatformChannel(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::vector<std::string>& labels)
+  void ANxFileIOExtractForcePlatformChannel_p(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::vector<std::string>& labels)
   {
     std::vector<int16_t> fp;
     for (int i = 0 ; i < static_cast<int>(labels.size()) ; ++i)
     {
-      int idx = ANxFileIOFindAnalogLabeCaselInsensitive(labels[i], output);
+      int idx = ANxFileIOFindAnalogLabeCaselInsensitive_p(labels[i], output);
       if (idx <= output->GetAnalogNumber())
         fp.push_back(idx);
     }
@@ -268,7 +268,7 @@ namespace btk
   /**
    * Find analog channel lobel.
    */
-  int ANxFileIOFindAnalogLabeCaselInsensitive(const std::string& label, Acquisition::Pointer output)
+  int ANxFileIOFindAnalogLabeCaselInsensitive_p(const std::string& label, Acquisition::Pointer output)
   {
     int idx = 1;
     for (Acquisition::AnalogConstIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
@@ -285,7 +285,7 @@ namespace btk
   /**
    * Detect analog channel's range by its scale and the analog resolution used.
    */
-  uint16_t ANxFileIODetectAnalogRange(double s, int bitDepth)
+  uint16_t ANxFileIODetectAnalogRange_p(double s, int bitDepth)
   {
     uint16_t gain = static_cast<uint16_t>(fabs(s) / 2.0 * 1000.0 * pow(2.0, static_cast<double>(bitDepth)));
     if (gain <= Analog::PlusMinus1)

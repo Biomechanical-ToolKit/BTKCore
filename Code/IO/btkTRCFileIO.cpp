@@ -36,12 +36,6 @@
 #include "btkTRCFileIO.h"
 #include "btkConvert.h"
 
-#if defined(_MSC_VER)
-  // Disable unsafe warning (use of the function 'sprintf' instead of 
-  // 'sprintf_s' for portability reasons;
-  #pragma warning( disable : 4996 ) 
-#endif
-
 #include <fstream>
 #include <algorithm>
 #include <cctype>

@@ -18,6 +18,13 @@ CXXTEST_SUITE(ANCFileReaderTest)
     TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::AcquisitionFileReaderException &e, e.what(), std::string("File doesn't exist\nFilename: test.anc"));
   };
   
+  CXXTEST_TEST(Truncated)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(ANCFilePathIN + "Truncated.anc");
+    TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::Exception &e, e.what(), std::string("Unexpected end of file."));
+  };
+
   CXXTEST_TEST(Gait)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
@@ -107,5 +114,6 @@ CXXTEST_SUITE(ANCFileReaderTest)
 CXXTEST_SUITE_REGISTRATION(ANCFileReaderTest)
 CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, NoFile)
 CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, MisspelledFile)
+CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, Truncated)
 CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, Gait)
 #endif
