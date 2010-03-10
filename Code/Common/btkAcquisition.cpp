@@ -346,7 +346,7 @@ namespace btk
     }
     Event::Pointer evt = *loc;
     EventIterator it = this->m_Events->RemoveItem(loc);
-    if (*it != evt) // Must use this inequality instead of (it != loc) due to an assertion error in MSVC
+    if ((it == this->EndEvent()) || (*it != evt)) // Must use this inequality instead of (it != loc) due to an assertion error in MSVC
       this->Modified();
     return it;
   }
@@ -578,7 +578,7 @@ namespace btk
     } 
     Point::Pointer pnt = *loc;
     PointIterator it = this->m_Points->RemoveItem(loc);
-    if (*it != pnt) // Must use this inequality instead of (it != loc) due to an assertion error in MSVC
+    if ((it == this->EndPoint()) || (*it != pnt)) // Must use this inequality instead of (it != loc) due to an assertion error in MSVC
       this->Modified();
     return it;
   };
@@ -809,7 +809,7 @@ namespace btk
     } 
     Analog::Pointer anl = *loc;
     AnalogIterator it = this->m_Analogs->RemoveItem(loc);
-    if (*it != anl)
+    if ((it == this->EndAnalog()) || (*it !=anl))
       this->Modified();
     return it;
   };

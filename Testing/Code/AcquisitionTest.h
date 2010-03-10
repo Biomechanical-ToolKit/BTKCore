@@ -95,6 +95,35 @@ CXXTEST_SUITE(AcquisitionTest)
     TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 50);
     TS_ASSERT_EQUALS(test->GetAnalogFrameNumber(), 100);
   }
+  
+  CXXTEST_TEST(RemoveLastPoint)
+  {
+    btk::Acquisition::Pointer test = btk::Acquisition::New();
+    test->Init(10, 5);
+    TS_ASSERT_EQUALS(test->GetFirstFrame(), 1);
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 10);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 5);
+    test->RemovePoint("uname*10");
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 9);
+    test->RemovePoint("uname*9");
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 8);
+    test->RemovePoint("uname*8");
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 7);
+    test->RemovePoint("uname*7");
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 6);
+    test->RemovePoint("uname*6");
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 5);
+    test->RemovePoint("uname*5");
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 4);
+    test->RemovePoint("uname*4");
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 3);
+    test->RemovePoint("uname*3");
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 2);
+    test->RemovePoint("uname*2");
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 1);
+    test->RemovePoint("uname*1");
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 0);
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(AcquisitionTest)
@@ -106,4 +135,5 @@ CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitPointAndAnalog)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitPointOnly)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitAnalogOnly)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, ResizeFromEnd)
+CXXTEST_TEST_REGISTRATION(AcquisitionTest, RemoveLastPoint)
 #endif
