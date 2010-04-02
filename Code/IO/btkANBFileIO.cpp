@@ -547,8 +547,14 @@ namespace btk
     bofs->Write(key); bofs->Write((uint16_t)0x0001);
     uint16_t byteptr[2];
     memcpy(&byteptr, &val, sizeof(byteptr));
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    bofs->Write(byteptr[0]);
+    bofs->Write(byteptr[1]);
+#else
     bofs->Write(byteptr[1]);
     bofs->Write(byteptr[0]);
+#endif   
+
     return 4 + 4;
   };
   
