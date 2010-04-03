@@ -952,7 +952,7 @@ namespace btk
       }
       for (AnalogIterator it = this->BeginAnalog() ; it != this->EndAnalog() ; ++it)
       {
-        Analog::Values v(frameNumber * this->m_AnalogSampleNumberPerPointFrame, 1);
+        Analog::Values v = Analog::Values::Zero(frameNumber * this->m_AnalogSampleNumberPerPointFrame, 1);
         v.block(startRow * this->m_AnalogSampleNumberPerPointFrame, 0, actualFrameNumber * this->m_AnalogSampleNumberPerPointFrame, 1) = (*it)->GetValues();
         (*it)->SetValues(v);
       }
@@ -986,7 +986,7 @@ namespace btk
     this->m_Points->SetItemNumber(0);
     this->m_Analogs->SetItemNumber(0);
     this->m_FirstFrame = 1;
-    this->m_PointFrequency = 0;
+    this->m_PointFrequency = 0.0;
     this->m_PointFrameNumber = 0;
     this->m_AnalogSampleNumberPerPointFrame = 1;
     this->mp_MetaData = MetaData::New("ROOT");
@@ -1148,7 +1148,7 @@ namespace btk
     this->mp_MetaData = MetaData::New("ROOT");
     this->mp_MetaData->SetParent(this);
     this->m_FirstFrame = 1;
-    this->m_PointFrequency = 0;
+    this->m_PointFrequency = 0.0;
     this->m_PointFrameNumber = 0;
     this->m_AnalogSampleNumberPerPointFrame = 1;
     this->m_AnalogResolution = Bit12; 

@@ -119,10 +119,10 @@ namespace btk
    */
 
   /**
-   * @fn static Pointer Point::New(const std::string& label, int frameNumber, Type t = Marker)
+   * @fn static Pointer Point::New(const std::string& label, int frameNumber, Type t = Marker, const std::string& desc = "")
    * @brief Creates a smart pointer associated with a Point object.
    *
-   * The point created has a label and a number of frames  equals to @a label and @a framenumber respectively.
+   * The point created has a label and a number of frames equals to @a label and @a framenumber respectively.
    * @warning The number of frames must be greater than 0.
    */
 
@@ -249,7 +249,7 @@ namespace btk
    * Constructor.
    * @warning The number of frames must be greater than 0.
    */
-  Point::Point(const std::string& label, int frameNumber, Type t)
+  Point::Point(const std::string& label, int frameNumber, Type t, const std::string& desc)
   : Measure<3>(label, frameNumber),
     m_Residuals(Residuals::Zero(frameNumber, 1)), m_Masks(Masks::Zero(frameNumber, 1))
   {

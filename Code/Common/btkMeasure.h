@@ -68,7 +68,7 @@ namespace btk
     
   protected:
     Measure(const std::string& label);
-    Measure(const std::string& label, int frameNumber);
+    Measure(const std::string& label, int frameNumber, const std::string& desc = "");
     Measure(const Measure& toCopy);
     
     Values m_Values;
@@ -210,8 +210,8 @@ namespace btk
    * Constructor.
    */
   template <int d>
-  Measure<d>::Measure(const std::string& label, int frameNumber)
-  : DataObjectLabeled(label, ""),
+  Measure<d>::Measure(const std::string& label, int frameNumber, const std::string& desc)
+  : DataObjectLabeled(label, desc),
     m_Values(Values::Zero(frameNumber, d))
   {};
 

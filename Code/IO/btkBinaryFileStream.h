@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009, Arnaud BarrÈ
+ * Copyright (c) 2009-2010, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@
 #define __btkBinaryFileStream_h
 
 #if defined _MSC_VER
-  #if defined _M_IX86
+  #if defined _M_IX86 || defined _M_X64
     #define PROCESSOR_TYPE 1 /* IEEE_LittleEndian */
   #elif defined _M_ALPHA
     #define PROCESSOR_TYPE 2 /* VAX_LittleEndian */
