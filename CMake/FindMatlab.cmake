@@ -23,7 +23,7 @@
 #  - C/C++ source files;
 #  - third libraries required.
 
-# Copyright (c) 2009 Arnaud Barré <arnaud.barre@gmail.com>
+# Copyright (c) 2009-2010 Arnaud Barré <arnaud.barre@gmail.com>
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
@@ -34,6 +34,7 @@ ENDIF(MATLAB_ROOT AND MATLAB_INCLUDE_DIR AND MATLAB_LIBRARIES)
 
 IF(WIN32)
   SET(MATLAB_PATHS 
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.10;MATLABROOT]"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.9;MATLABROOT]"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.8;MATLABROOT]"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.7;MATLABROOT]"
@@ -55,10 +56,10 @@ IF(WIN32)
   #MESSAGE(STATUS "MATLAB_OLD_WIN_MEXFILE_EXT: ${MATLAB_OLD_WIN_MEXFILE_EXT}")
   
   SET(MATLAB_LIBRARIES_PATHS
-    "${MATLAB_ROOT}/extern/lib/win32/microsoft"
-    "${MATLAB_ROOT}/extern/lib/win32/microsoft/msvc71")
-  SET(MATLAB_INCLUDE_PATHS 
-    "${MATLAB_ROOT}/extern/include")
+      "${MATLAB_ROOT}/extern/lib/win64/microsoft"
+      "${MATLAB_ROOT}/extern/lib/win32/microsoft"
+      "${MATLAB_ROOT}/extern/lib/win32/microsoft/msvc71")
+  SET(MATLAB_INCLUDE_PATHS "${MATLAB_ROOT}/extern/include")
 
   # MEX files extension
   IF(CMAKE_CXX_COMPILER MATCHES "^.*cl.exe$" OR CMAKE_CXX_COMPILER MATCHES "^.*cl$")
