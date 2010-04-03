@@ -146,13 +146,19 @@ namespace btk
   {
     Acquisition::Pointer in = this->GetInput(idx);
     
-    if (in.get() == 0)
+    if (!in)
       return;
     
-    // Check the frequency
+    // Check the point's frequency
     if ((in->GetPointFrequency() != 0) && (out->GetPointFrequency() != 0) && !in->IsEmptyPoint() && !out->IsEmptyPoint() && (in->GetPointFrequency() != out->GetPointFrequency()))
     {
-      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Frame rates are not equal.");
+      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Point's frame rates are not equal.");
+      return;
+    }
+    // Check the analog's frequency
+    if ((in->GetAnalogFrequency() != 0) && (out->GetAnalogFrequency() != 0) && !in->IsEmptyAnalog() && !out->IsEmptyAnalog() && (in->GetAnalogFrequency() != out->GetAnalogFrequency()))
+    {
+      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Analog's frame rates are not equal.");
       return;
     }
     // Check the analog resolution
@@ -162,7 +168,7 @@ namespace btk
       return;
     }
     // Check the number of analog samples per point frame
-    if (!in->IsEmptyAnalog() && !out->IsEmptyAnalog() && (in->GetAnalogFrameNumber() != 0) && (out->GetAnalogFrameNumber() != 0) && (in->GetNumberAnalogSamplePerFrame() != out->GetNumberAnalogSamplePerFrame()))
+    if (!in->IsEmptyPoint() && !in->IsEmptyAnalog() && !out->IsEmptyAnalog() && (in->GetAnalogFrameNumber() != 0) && (out->GetAnalogFrameNumber() != 0) && (in->GetNumberAnalogSamplePerFrame() != out->GetNumberAnalogSamplePerFrame()))
     {
       btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
       return;
@@ -175,7 +181,6 @@ namespace btk
     }
     */
     
-    // Check if points have the same units or adpat them.
     if (this->m_FirstInput)
     {
       this->m_FirstInput = false;
@@ -185,7 +190,8 @@ namespace btk
       out->SetMetaData(in->GetMetaData()->Clone());
       out->SetFirstFrame(in->GetFirstFrame());
       out->SetPointFrequency(in->GetPointFrequency());
-      out->Resize(in->GetPointNumber(), in->GetPointFrameNumber(), in->GetAnalogNumber(), in->GetNumberAnalogSamplePerFrame());
+      if ((in->GetPointNumber() != 0) || (in->GetPointFrameNumber() != 0) ||  (in->GetAnalogNumber() != 0))
+        out->Resize(in->GetPointNumber(), in->GetPointFrameNumber(), in->GetAnalogNumber(), in->GetNumberAnalogSamplePerFrame());
       out->SetAnalogResolution(in->GetAnalogResolution());
       out->SetPointUnit(Point::Marker, in->GetPointUnit(Point::Marker));
       out->SetPointUnit(Point::Angle, in->GetPointUnit(Point::Angle));
@@ -219,7 +225,7 @@ namespace btk
         MetaDataInfo::Pointer yScreenIn = (*pointItIn)->ExtractChildInfo("Y_SCREEN", MetaDataInfo::Char, 1);
         MetaDataInfo::Pointer xScreenOut = (*pointItOut)->ExtractChildInfo("X_SCREEN", MetaDataInfo::Char, 1);
         MetaDataInfo::Pointer yScreenOut = (*pointItOut)->ExtractChildInfo("Y_SCREEN", MetaDataInfo::Char, 1);
-        if (xScreenIn.get() && yScreenIn.get() && xScreenOut.get() && yScreenOut.get())
+        if (xScreenIn && yScreenIn && xScreenOut && yScreenOut)
         {
           if ((xScreenIn->ToString(0).compare(xScreenOut->ToString(0)) != 0)
               || (yScreenIn->ToString(0).compare(yScreenOut->ToString(0)) != 0))
@@ -231,17 +237,43 @@ namespace btk
       }
       
       // Transform acquisition (input or output) to priorize the point data.
-      if ((out->GetPointNumber() != 0) && (input->GetPointNumber() == 0) && (out->GetAnalogNumber() == 0) && (input->GetAnalogNumber() != 0) && (input->GetAnalogFrameNumber() != 0))
+      if ((out->GetPointNumber() != 0) && (input->GetPointNumber() == 0) && (input->GetAnalogNumber() != 0) && (input->GetAnalogFrameNumber() != 0))
       {
-        input->Resize(0, out->GetPointFrameNumber(), input->GetAnalogNumber(), input->GetAnalogFrameNumber() /  out->GetPointFrameNumber());
-        input->SetPointFrequency(input->GetPointFrequency() / input->GetNumberAnalogSamplePerFrame());
-        out->Resize(out->GetPointNumber(), out->GetPointFrameNumber(), out->GetAnalogNumber(), input->GetAnalogFrameNumber() /  out->GetPointFrameNumber());
+        int r = 0;
+        if ((out->GetPointFrequency() == 0) || (input->GetPointFrequency() == 0))
+        {
+          r = input->GetAnalogFrameNumber() /  out->GetPointFrameNumber();
+          btkErrorMacro("At least one frequency is not set in the output or the input #" + ToString(idx) + " and may corrupt the final output.");
+        }
+        else
+          r = static_cast<int>(input->GetPointFrequency() / out->GetPointFrequency());
+        if (r > 1)
+        {
+          input->ResizeFrameNumberFromEnd(input->GetPointFrameNumber() + (input->GetFirstFrame() - 1) % r);
+          input->Resize(0, out->GetPointFrameNumber() - input->GetFirstFrame() / r, input->GetAnalogNumber(), r);
+          input->SetFirstFrame(input->GetFirstFrame() / r + 1);
+          input->SetPointFrequency(input->GetPointFrequency() / r);
+          out->Resize(out->GetPointNumber(), out->GetPointFrameNumber(), out->GetAnalogNumber(), r);
+        }
       }
-      else if ((input->GetPointNumber() != 0) && (out->GetPointNumber() == 0) && (input->GetAnalogNumber() == 0) && (out->GetAnalogNumber() != 0) && (out->GetAnalogFrameNumber() != 0))
+      else if ((input->GetPointNumber() != 0) && (out->GetPointNumber() == 0) && (out->GetAnalogNumber() != 0) && (out->GetAnalogFrameNumber() != 0))
       {
-        out->Resize(0, input->GetPointFrameNumber(), out->GetAnalogNumber(), out->GetAnalogFrameNumber() /  input->GetPointFrameNumber());
-        out->SetPointFrequency(out->GetPointFrequency() / out->GetNumberAnalogSamplePerFrame());
-        input->Resize(input->GetPointNumber(), input->GetPointFrameNumber(), input->GetAnalogNumber(), out->GetAnalogFrameNumber() /  input->GetPointFrameNumber());
+        int r = 0;
+        if ((out->GetPointFrequency() == 0) || (input->GetPointFrequency() == 0))
+        {
+          r = out->GetAnalogFrameNumber() /  input->GetPointFrameNumber();
+          btkErrorMacro("At least one frequency is not set in the output or the input #" + ToString(idx) + " and may corrupt the final output.");
+        }
+        else
+          r = static_cast<int>(out->GetPointFrequency() / input->GetPointFrequency());
+        if (r > 1)
+        {
+          out->ResizeFrameNumberFromEnd(out->GetPointFrameNumber() + (out->GetFirstFrame() - 1) % r);
+          out->Resize(0, input->GetPointFrameNumber() - out->GetFirstFrame() / r, out->GetAnalogNumber(), r);
+          out->SetFirstFrame(out->GetFirstFrame() / r + 1 );
+          out->SetPointFrequency(out->GetPointFrequency() / r);
+          input->Resize(input->GetPointNumber(), input->GetPointFrameNumber(), input->GetAnalogNumber(), r);
+        }
       }
       
       // Frequency
@@ -261,7 +293,7 @@ namespace btk
           mergeData = true;
         input->ResizeFrameNumberFromEnd(input->GetPointFrameNumber() - diffFF);
         if (input->GetPointFrameNumber() > out->GetPointFrameNumber())
-          out->ResizeFrameNumber(out->GetPointFrameNumber() - diffFF);
+          out->ResizeFrameNumber(input->GetPointFrameNumber());
         else
           input->ResizeFrameNumber(out->GetPointFrameNumber());
       }
@@ -271,7 +303,7 @@ namespace btk
           mergeData = true;
         out->ResizeFrameNumberFromEnd(out->GetPointFrameNumber() + diffFF);
         if (out->GetPointFrameNumber() > input->GetPointFrameNumber())
-          input->ResizeFrameNumber(input->GetPointFrameNumber() + diffFF);
+          input->ResizeFrameNumber(out->GetPointFrameNumber());
         else
           out->ResizeFrameNumber(input->GetPointFrameNumber());
       }
@@ -610,7 +642,7 @@ namespace btk
         while (itChan != fpChanList.end())
         {
           MetaDataInfo::Pointer channel = (*itChan)->ExtractChildInfo("CHANNEL", MetaDataInfo::Integer, 2);
-          if (channel.get() == 0)
+          if (!channel)
           {
             btkErrorMacro("Metadata '" + (*itChan)->GetLabel() + "' is corrupted. No child labeled 'CHANNEL'. Impossible to detect partial force platform configuration.");
             itChan = fpChanList.erase(itChan);
@@ -657,7 +689,7 @@ namespace btk
       else
       {
         int chanIn, calRowIn;
-        int usedIn = this->GetMaxInfoForcePlatform(*fpIt, &chanIn, &calRowIn);
+        int usedIn = this->GetMaxInfoForcePlatform(forcePlatform, &chanIn, &calRowIn);
         if (usedIn == -1)
           return false;
         int usedNum = usedOut + usedIn;
@@ -786,7 +818,9 @@ namespace btk
     MetaDataInfo::Pointer origin = forcePlatform->ExtractChildInfo("ORIGIN", MetaDataInfo::Real, 2, false);
     MetaDataInfo::Pointer channel = forcePlatform->ExtractChildInfo("CHANNEL", MetaDataInfo::Integer, 2, false);
     MetaDataInfo::Pointer calMatrix = forcePlatform->ExtractChildInfo("CAL_MATRIX", MetaDataInfo::Real, 3, false);
-    bool valid = used.get() && type.get() && corners.get() && origin.get() && channel.get();
+    
+    bool valid = used && type && corners && origin && channel;
+    
     if (valid)
     {
       int usedVal = used->ToInt(0);
@@ -797,7 +831,7 @@ namespace btk
       
       if ((typeUsedVal < usedVal) || (cornersUsedVal < usedVal) || (originUsedVal < usedVal) || (chanUsedVal < usedVal))
         return false;
-      if (calMatrix.get() != 0)
+      if (calMatrix)
       {
         int calMatrixUsedVal = calMatrix->GetDimensions()[2];
         if (calMatrixUsedVal < usedVal)
@@ -813,7 +847,7 @@ namespace btk
   {
     MetaDataInfo::Pointer used = fp->ExtractChildInfo("USED", MetaDataInfo::Integer, 0);
     MetaDataInfo::Pointer type = fp->ExtractChildInfo("TYPE", MetaDataInfo::Integer, 1);
-    if ((used.get() == 0) || (type.get() == 0))
+    if (!used || !type)
     {
       btkErrorMacro("Metadata '" + fp->GetLabel() + "' seems corrupted. No child labeled 'USED' or 'TYPE'. Impossible to detect partial force platform configuration.");
       return -1;
@@ -895,7 +929,7 @@ namespace btk
       {
         MetaData::Iterator itIn = trial->FindChild(labels[i]);
         MetaData::Iterator itOut = (*it)->FindChild(labels[i]);
-        if ((itIn == trial->End()) || (itOut != (*it)->End()) || (*(*itIn) != *(*(itOut))))
+        if ((itIn == trial->End()) || (itOut == (*it)->End()) || (*(*itIn) != *(*(itOut))))
           (*it)->RemoveChild(itOut);
       }
     }
@@ -1001,7 +1035,7 @@ namespace btk
     MetaDataInfo::Pointer desc = eventContext->ExtractChildInfo("DESCRIPTIONS", MetaDataInfo::Char, 2, false);
     MetaDataInfo::Pointer colours = eventContext->ExtractChildInfo("COLOURS", MetaDataInfo::Integer, 2, false);
 
-    bool valid = used.get() && icon.get() && label.get() && desc.get() && colours.get();
+    bool valid = used && icon && label && desc && colours;
     if (valid)
     {
       int usedVal = used->ToInt(0);
