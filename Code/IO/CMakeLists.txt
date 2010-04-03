@@ -7,12 +7,20 @@ SET(BTKIO_SRCS
   # File formats
   btkANBFileIO.cpp
   btkANCFileIO.cpp
+  btkANGFileIO.cpp
   btkC3DFileIO.cpp
   btkCALForcePlateFileIO.cpp
+  btkEMxFileIO.cpp
+  btkGRxFileIO.cpp
+  btkPWRFileIO.cpp
+  btkRAxFileIO.cpp
+  btkRICFileIO.cpp
+  btkMOMFileIO.cpp
   btkTRCFileIO.cpp
   btkXLSOrthotrackFileIO.cpp
   # Private methods
   btkANxFileIOUtils_p.cpp
+  btkEliteFileIOUtils_p.cpp
 )
 
 ADD_LIBRARY(BTKIO ${BTK_LIBS_BUILD_TYPE} ${BTKIO_SRCS})

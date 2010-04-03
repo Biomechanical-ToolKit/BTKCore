@@ -35,12 +35,22 @@
 
 #include "btkAcquisitionFileIOFactory.h"
 
+// C3D File IO
+#include "btkC3DFileIO.h"
+// Motion Analysis Corp IOs
 #include "btkANBFileIO.h"
 #include "btkANCFileIO.h"
-#include "btkC3DFileIO.h"
-#include "btkTRCFileIO.h"
 #include "btkCALForcePlateFileIO.h"
+#include "btkTRCFileIO.h"
 #include "btkXLSOrthotrackFileIO.h"
+// Elite IOs
+#include "btkANGFileIO.h"
+#include "btkEMxFileIO.h"
+#include "btkMOMFileIO.h"
+#include "btkRAxFileIO.h"
+#include "btkRICFileIO.h"
+#include "btkPWRFileIO.h"
+#include "btkGRxFileIO.h"
 
 namespace btk
 {
@@ -83,6 +93,20 @@ namespace btk
       if (io->CanReadFile(filename)) return io;
       io = ANCFileIO::New();
       if (io->CanReadFile(filename)) return io;
+      io = RAxFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      io = RICFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      io = MOMFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      io = ANGFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      io = PWRFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      io = GRxFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      io = EMxFileIO::New();
+      if (io->CanReadFile(filename)) return io;
       io = CALForcePlateFileIO::New();
       if (io->CanReadFile(filename)) return io;
       io = XLSOrthotrackFileIO::New();
@@ -98,6 +122,20 @@ namespace btk
       if (io->CanWriteFile(filename)) return io;
       io = ANCFileIO::New();
       if (io->CanWriteFile(filename)) return io;
+      //io = RAxFileIO::New();
+      //if (io->CanWriteFile(filename)) return io;
+      //io = RICFileIO::New();
+      //if (io->CanWriteFile(filename)) return io;
+      //io = MOMFileIO::New();
+      //if (io->CanWriteFile(filename)) return io;
+      //io = ANGFileIO::New();
+      //if (io->CanWriteFile(filename)) return io;
+      //io = PWRFileIO::New();
+      //if (io->CanWriteFile(filename)) return io;
+      //io = GRxFileIO::New();
+      //if (io->CanWriteFile(filename)) return io;
+      //io = EMxFileIO::New();
+      //if (io->CanWriteFile(filename)) return io;
       //io = CALForcePlateFileIO::New();
       //if (io->CanWriteFile(filename)) return io;
       //io = XLSOrthotrackFileIO::New();

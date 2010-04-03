@@ -14,7 +14,7 @@
 #include <cxxtest/ErrorPrinter.h>
 
 // BTK error messages are not displayed
-#define TDD_SILENT_CERR
+//#define TDD_SILENT_CERR
 
 int main()
 {
@@ -40,7 +40,10 @@ int main()
 #define TRCFilePathOUT std::string(TDD_FilePathOUT) + "TRCSamples/"
 #define XLSOrthotrackFilePathIN std::string(TDD_FilePathIN) + "XLSOrthotrackSamples/"
 #define XLSOrthotrackFilePathOUT std::string(TDD_FilePathOUT) + "XLSOrthotrackSamples/"
+#define EliteFilePathIN std::string(TDD_FilePathIN) + "EliteSamples/"
+#define EliteFilePathOUT std::string(TDD_FilePathOUT) + "EliteSamples/"
 
+/*
 #include "AcquisitionUnitConverterTest.h"
 #include "AcquisitionTest.h"
 #include "ANBFileIOTest.h"
@@ -61,15 +64,35 @@ int main()
 #include "PointTest.h"
 #include "PointCollectionTest.h"
 #include "MeasureFrameExtractorTest.h"
+*/
 #include "MergeAcquisitionFilterTest.h"
+/*
 #include "MetaDataInfoTest.h"
 #include "MetaDataTest.h"
 #include "PipelineTest.h"
+*/
+#include "RAHFileIOTest.h"
+#include "RAHFileReaderTest.h"
+#include "RAWFileIOTest.h"
+#include "RAWFileReaderTest.h"
+#include "RICFileIOTest.h"
+#include "RICFileReaderTest.h"
+#include "MOMFileIOTest.h"
+#include "MOMFileReaderTest.h"
+#include "ANGFileIOTest.h"
+#include "ANGFileReaderTest.h"
+#include "PWRFileIOTest.h"
+#include "PWRFileReaderTest.h"
+#include "GRxFileIOTest.h"
+#include "GRxFileReaderTest.h"
+#include "EMxFileIOTest.h"
+#include "EMxFileReaderTest.h"
+/*
 #include "SpecializedPointsExtractorTest.h"
 #include "TRCFileIOTest.h"
 #include "TRCFileReaderTest.h"
 #include "TRCFileWriterTest.h"
 #include "XLSOrthotrackFileIOTest.h"
 #include "XLSOrthotrackFileReaderTest.h"
-
+**/
 #include <cxxtest/Root.cpp>
