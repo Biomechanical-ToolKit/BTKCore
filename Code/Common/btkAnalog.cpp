@@ -84,7 +84,7 @@ namespace btk
    */
 
   /**
-   * @fn static Pointer Analog::New(const std::string& label)
+   * @fn static Pointer Analog::New(const std::string& label, const std::string& desc = "")
    * @brief Creates a smart pointer associated with a Analog object.
    *
    * The measure created has no values.
@@ -192,8 +192,8 @@ namespace btk
    * @warning The use of this constructor must be followed by the use of the method Measure::SetFrameNumber
    * as it creates a null matrix for the values.
    */
-  Analog::Analog(const std::string& label)
-  : Measure<1>(label), m_Unit("V")
+  Analog::Analog(const std::string& label, const std::string& desc)
+  : Measure<1>(label, desc), m_Unit("V")
   {
     this->m_Gain = Unknown;
     this->m_Offset = 0;

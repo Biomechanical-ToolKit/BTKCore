@@ -67,7 +67,7 @@ namespace btk
     Pointer Clone() const {return Pointer(new Measure<d>(*this));};
     
   protected:
-    Measure(const std::string& label);
+    Measure(const std::string& label, const std::string& desc = "");
     Measure(const std::string& label, int frameNumber, const std::string& desc = "");
     Measure(const Measure& toCopy);
     
@@ -202,8 +202,8 @@ namespace btk
    * as it creates a null matrix for the values.
    */
   template <int d>
-  Measure<d>::Measure(const std::string& label)
-  : DataObjectLabeled(label, ""), m_Values()
+  Measure<d>::Measure(const std::string& label, const std::string& desc)
+  : DataObjectLabeled(label, desc), m_Values()
   {};
 
   /**

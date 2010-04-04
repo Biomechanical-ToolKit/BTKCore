@@ -49,7 +49,7 @@ namespace btk
     typedef SharedPtr<Analog> Pointer;
     typedef SharedPtr<const Analog> ConstPointer;
     
-    static Pointer New(const std::string& label = "") {return Pointer(new Analog(label));};
+    static Pointer New(const std::string& label = "", const std::string& desc = "") {return Pointer(new Analog(label, desc));};
     static Pointer New(int frameNumber) {return Pointer(new Analog("", frameNumber));};
     static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Analog(label, frameNumber));};
     
@@ -66,7 +66,7 @@ namespace btk
     Pointer Clone() const {return Pointer(new Analog(*this));}
     
   protected:
-    BTK_COMMON_EXPORT Analog(const std::string& label);
+    BTK_COMMON_EXPORT Analog(const std::string& label, const std::string& desc);
     BTK_COMMON_EXPORT Analog(const std::string& label, int frameNumber, Gain g = Unknown);
     
   private:
