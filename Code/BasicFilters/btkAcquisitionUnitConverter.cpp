@@ -225,15 +225,17 @@ namespace btk
     Acquisition::Pointer output = this->GetOutput();
     output->Reset();
     
+    Acquisition::Pointer input = this->GetInput();
+    if (input.get() == 0)
+      return;
+    
     output->SetPointUnit(Point::Marker, this->m_Units[Point::Marker]);
     output->SetPointUnit(Point::Angle, this->m_Units[Point::Angle]);
     output->SetPointUnit(Point::Force, this->m_Units[Point::Force]);
     output->SetPointUnit(Point::Moment, this->m_Units[Point::Moment]);
     output->SetPointUnit(Point::Power, this->m_Units[Point::Power]);
     
-    Acquisition::Pointer input = this->GetInput();
-    if (input.get() == 0)
-      return;
+    output->Init(0,input->GetPointFrameNumber(),0,input->GetNumberAnalogSamplePerFrame());
     
     int indexesOut[5]; // Not necessary for Scalar.
     double scales[6] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0};

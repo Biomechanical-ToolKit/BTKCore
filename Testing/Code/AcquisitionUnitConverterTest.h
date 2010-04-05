@@ -29,10 +29,10 @@ CXXTEST_SUITE(AcquisitionUnitConverterTest)
     uc->SetUnit(btk::AcquisitionUnitConverter::Moment, "Nm");
     uc->Update();
     btk::Acquisition::Pointer output = uc->GetOutput();
-    TS_ASSERT_EQUALS(output->GetPointUnit(btk::Point::Marker), "m");
+    TS_ASSERT_EQUALS(output->GetPointUnit(btk::Point::Marker), "mm");
     TS_ASSERT_EQUALS(output->GetPointUnit(btk::Point::Angle), "deg");
     TS_ASSERT_EQUALS(output->GetPointUnit(btk::Point::Force), "N");
-    TS_ASSERT_EQUALS(output->GetPointUnit(btk::Point::Moment), "Nm");
+    TS_ASSERT_EQUALS(output->GetPointUnit(btk::Point::Moment), "Nmm");
     TS_ASSERT_EQUALS(output->GetPointUnit(btk::Point::Power), "W");
   };
   
