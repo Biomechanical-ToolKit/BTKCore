@@ -995,7 +995,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     }
   };
     
-  CXXTEST_TEST(emptyAcquisition)
+  CXXTEST_TEST(emptyAcquisition_Template)
   {
     btk::Acquisition::Pointer acq = btk::Acquisition::New();
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
@@ -1009,10 +1009,10 @@ CXXTEST_SUITE(C3DFileWriterTest)
     acq = reader->GetOutput();
     btk::MetaData::Pointer metadata = acq->GetMetaData();
     TS_ASSERT_EQUALS(acq->GetFirstFrame(), 1);
-    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 0);
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 0.0);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 0);
     TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), 0);
-    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 0);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 0.0);
     TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 0);
     TS_ASSERT_EQUALS(acq->GetPointUnit(), "mm");
     btk::MetaData::ConstIterator itPoint = metadata->FindChild("POINT");
@@ -1021,7 +1021,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT(itPoint != metadata->End());
     TS_ASSERT(itAnalog != metadata->End());
     TS_ASSERT(itFP != metadata->End());
-    // POINT and ANALOG are suppoed to be OK
+    // POINT and ANALOG are supposed to be OK
     btk::MetaData::ConstIterator itUsed = (*itFP)->FindChild("USED");
     btk::MetaData::ConstIterator itType = (*itFP)->FindChild("TYPE");
     btk::MetaData::ConstIterator itZero = (*itFP)->FindChild("ZERO");
@@ -1088,6 +1088,21 @@ CXXTEST_SUITE(C3DFileWriterTest)
 
     TS_ASSERT_DELTA(acq->GetPoint(70)->GetResiduals()(82), acq2->GetPoint(70)->GetResiduals()(82), 0.000001);
   };
+  
+  
+  CXXTEST_TEST(noInputModification)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "sample01/Eb015pr.c3d");
+    reader->Update();
+    btk::Acquisition::Pointer output = reader->GetOutput();
+    long timestamp = output->GetTimestamp();
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(reader->GetOutput());
+    writer->SetFilename(C3DFilePathOUT + "sample01_Eb015pr.c3d");
+    writer->Update();
+    TS_ASSERT_EQUALS(output->GetTimestamp(),timestamp);
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileWriterTest)
@@ -1116,6 +1131,7 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015sr_from_Eb015pr)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample01_Eb015pr_from_Eb015vr)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample09_PlugInC3D_rewrited)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample19_sample19_rewrited)
-CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, emptyAcquisition)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, emptyAcquisition_Template)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertTRC2C3D)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, noInputModification)
 #endif

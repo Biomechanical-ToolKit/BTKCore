@@ -929,19 +929,11 @@ namespace btk
    */
   void C3DFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
-    if (input.get() == 0)
+    if (!input)
     {
       btkErrorMacro("Null acquisition.");
       return;
     }
-    if (this->HasWritingFlag(CompatibleVicon))
-      this->KeepAcquisitionCompatibleVicon(input);
-    if (this->HasWritingFlag(ScalesFromDataUpdate))
-      this->UpdateScalingFactorsFromData(input);
-    if (this->HasWritingFlag(ScalesFromMetaDataUpdate))
-      this->UpdateScalingFactorsFromMetaData(input);
-    if (this->HasWritingFlag(MetaDataFromDataUpdate))
-      this->UpdateMetaDataFromData(input);
 
     std::fstream ofs;
     BinaryFileStream* obfs = 0;
@@ -969,6 +961,32 @@ namespace btk
       ofs.open(filename.c_str(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
       if (!ofs.is_open())
         throw(C3DFileIOException("No File access"));
+      
+      // Update data in the acquisition
+      // Require to clone somee data from the input.
+      Acquisition::Pointer in = Acquisition::New();
+      in->SetPointFrequency(input->GetPointFrequency());
+      in->SetAnalogResolution(input->GetAnalogResolution());
+      in->SetEvents(input->GetEvents()->Clone());
+      in->SetMetaData(input->GetMetaData()->Clone());
+      for (Acquisition::PointConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+        in->AppendPoint(Point::New((*it)->GetLabel(), (*it)->GetType(), (*it)->GetDescription()));
+      for (Acquisition::AnalogConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+      {
+        Analog::Pointer analog = Analog::New((*it)->GetLabel(), (*it)->GetDescription());
+        analog->SetGain((*it)->GetGain());
+        in->AppendAnalog(analog);
+      }
+      
+      if (this->HasWritingFlag(CompatibleVicon))
+        this->KeepAcquisitionCompatibleVicon(in);
+      if (this->HasWritingFlag(ScalesFromDataUpdate))
+        this->UpdateScalingFactorsFromData(input);
+      if (this->HasWritingFlag(ScalesFromMetaDataUpdate))
+        this->UpdateScalingFactorsFromMetaData(in);
+      if (this->HasWritingFlag(MetaDataFromDataUpdate))
+        this->UpdateMetaDataFromData(in);
+      
       // Acquisition
       bool templateFile = true;
       size_t writtenBytes = 0;
@@ -984,7 +1002,7 @@ namespace btk
         // Number of points
         writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetPointNumber()));
         // Total number of analog samples per 3d frame
-        writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetAnalogNumber() * input->GetAnalogFrameNumber() / input->GetPointFrameNumber()));
+        writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetAnalogNumber() * input->GetNumberAnalogSamplePerFrame()));
         // First frame
         writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetFirstFrame()));
         // Last frame
@@ -999,7 +1017,7 @@ namespace btk
         numberSamplesPerAnalogChannel = static_cast<uint16_t>(input->GetNumberAnalogSamplePerFrame());
         writtenBytes += obfs->Write(numberSamplesPerAnalogChannel);
         // The 3D frame rate
-        writtenBytes += obfs->Write(static_cast<float>(input->GetPointFrequency()));
+        writtenBytes += obfs->Write(static_cast<float>(in->GetPointFrequency())); // Use updated value
         // For future used : word 13-147 => 135 words unused => 270 bytes
         writtenBytes += obfs->Fill(270);
         // Label and Range data
@@ -1039,8 +1057,8 @@ namespace btk
       uint16_t dS = 0;
       if (!templateFile)
       {
-        MetaData::Iterator itPoint = input->GetMetaData()->FindChild("POINT");
-        pointID = std::distance(input->GetMetaData()->Begin(), itPoint) + 1;
+        MetaData::Iterator itPoint = in->GetMetaData()->FindChild("POINT");
+        pointID = std::distance(in->GetMetaData()->Begin(), itPoint) + 1;
         MetaData::Iterator itDataStart = (*itPoint)->FindChild("DATA_START");
         if (itDataStart == (*itPoint)->End())
           dataStart = MetaData::New("DATA_START", static_cast<int16_t>(0));
@@ -1052,7 +1070,7 @@ namespace btk
       }
       // MetaData
       int id = 1;
-      for (MetaData::ConstIterator it = input->GetMetaData()->Begin() ; it != input->GetMetaData()->End() ; ++it)
+      for (MetaData::ConstIterator it = in->GetMetaData()->Begin() ; it != in->GetMetaData()->End() ; ++it)
       {
         writtenBytes += this->WriteMetaData(obfs, *it, id);
         ++id;
@@ -1068,7 +1086,7 @@ namespace btk
         writtenBytes += this->WriteMetaData(obfs, dataStart, pointID);
         writtenBytes += obfs->Fill(512 - (writtenBytes % 512));
         // DATA_START is reinserted.
-        input->GetMetaData()->GetChild(pointID - 1)->AppendChild(dataStart);
+        //in->GetMetaData()->GetChild(pointID - 1)->AppendChild(dataStart);
         // Back to the parameter: number of blocks
         obfs->SeekWrite(512 * (2 - 1) + 2, std::ios_base::beg);
         obfs->Write(pNB);
@@ -1260,11 +1278,11 @@ namespace btk
    */
   void C3DFileIO::KeepAcquisitionCompatibleVicon(Acquisition::Pointer input)
   {
-    std::string blank = std::string(4, ' ');
+    const std::string blank = std::string(4, ' ');
     // Frequency
     if (input->GetPointFrequency() == 0.0)
     {
-      btkErrorMacro("Acquisition frequency can't be null and is set to 50 Hz.");
+      btkErrorMacro("Acquisition frequency cannot be null and is set to 50 Hz.");
       input->SetPointFrequency(50.0);
     }
     // Point
@@ -1386,7 +1404,7 @@ namespace btk
         {
           int bits;
           bits = (*itAnalogResolution)->GetInfo()->ToInt(0);
-          if ((bits != 8) && (bits != 8) && (bits != 12) && (bits != 14) && (bits != 16))
+          if ((bits != 8) && (bits != 10) && (bits != 12) && (bits != 14) && (bits != 16))
           {
             btkErrorMacro("Unknown analog resolution. Default resolution (12 bits) added for this acquisition.");
             input->SetAnalogResolution(Acquisition::Bit12);
