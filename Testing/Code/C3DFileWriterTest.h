@@ -993,6 +993,14 @@ CXXTEST_SUITE(C3DFileWriterTest)
       TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acq2->GetAnalog(0)->GetValues()(i), 0.00001);
       TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acq2->GetAnalog(1)->GetValues()(i), 0.00001);
     }
+    
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq->GetMetaData()->GetChild("POINT")->GetChild("FRAMES")->GetInfo()->ToUInt16(0));
+    btk::MetaDataInfo::Pointer actualFieldVal = acq->GetMetaData()->GetChild("TRIAL")->GetChild("ACTUAL_START_FIELD")->GetInfo();
+    unsigned frameIndex = (actualFieldVal->ToUInt16(1) << 16) | actualFieldVal->ToUInt16(0);
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), frameIndex);
+    actualFieldVal = acq->GetMetaData()->GetChild("TRIAL")->GetChild("ACTUAL_END_FIELD")->GetInfo();
+    frameIndex = (actualFieldVal->ToUInt16(1) << 16) | actualFieldVal->ToUInt16(0);
+    TS_ASSERT_EQUALS(acq->GetLastFrame(), frameIndex);
   };
     
   CXXTEST_TEST(emptyAcquisition_Template)
@@ -1103,6 +1111,35 @@ CXXTEST_SUITE(C3DFileWriterTest)
     writer->Update();
     TS_ASSERT_EQUALS(output->GetTimestamp(),timestamp);
   }
+  
+  CXXTEST_TEST(acq100000)
+  {
+    btk::Acquisition::Pointer acq = btk::Acquisition::New();
+    acq->Init(3,100000,1,2);
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(acq);
+    writer->SetFilename(C3DFilePathOUT + "acq100000.c3d");
+    writer->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathOUT + "acq100000.c3d");
+    reader->Update();
+    btk::Acquisition::Pointer output = reader->GetOutput();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(),100000);
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(),200000);
+    TS_ASSERT_EQUALS(output->GetPointNumber(),3);
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(),1);
+    
+    TS_ASSERT_EQUALS(output->GetMetaData()->GetChild("POINT")->GetChild("FRAMES")->GetInfo()->ToUInt16(0), 65535);
+    btk::MetaDataInfo::Pointer actualFieldVal = output->GetMetaData()->GetChild("TRIAL")->GetChild("ACTUAL_START_FIELD")->GetInfo();
+    int frameIndex = (actualFieldVal->ToUInt16(1) << 16) | actualFieldVal->ToUInt16(0);
+    TS_ASSERT_EQUALS(output->GetFirstFrame(), frameIndex);
+    actualFieldVal = output->GetMetaData()->GetChild("TRIAL")->GetChild("ACTUAL_END_FIELD")->GetInfo();
+    frameIndex = (actualFieldVal->ToUInt16(1) << 16) | actualFieldVal->ToUInt16(0);
+    TS_ASSERT_EQUALS(output->GetLastFrame(), frameIndex);
+    TS_ASSERT_EQUALS(output->GetLastFrame(), 100000);
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileWriterTest)
@@ -1134,4 +1171,5 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, sample19_sample19_rewrited)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, emptyAcquisition_Template)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertTRC2C3D)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, noInputModification)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, acq100000)
 #endif

@@ -281,10 +281,10 @@ namespace btk
         throw(C3DFileIOException("Bad header key"));
       uint16_t pointNumber = 0,
                totalAnalogSamplesPer3dFrame = 0,
-               lastFrame = 0,
                pointMaximumFillGap = 0, 
                dataFirstBlock = 0, 
                numberSamplesPerAnalogChannel = 0;
+      int lastFrame = 0;
       float pointScaleFactor = 0.0, pointFrameRate = 0.0;
       if (parameterFirstBlock != 1)
       {
@@ -681,8 +681,39 @@ namespace btk
             float pointScale = (*itPointScale)->GetInfo()->ToFloat(0);
             if (fabs(pointScale - pointScaleFactor) > std::numeric_limits<float>::epsilon())
             {
-              btkIOErrorMacro(filename, "The point scaling factor writen in the header and in the parameter POINT:SCALE are not the same. The second value is kept.");
+              btkIOErrorMacro(filename, "The point scaling factor written in the header and in the parameter POINT:SCALE are not the same. The second value is kept.");
               pointScaleFactor = pointScale;
+            }
+          }
+        }
+        // TRIAL
+        MetaData::ConstIterator itTrial = root->FindChild("TRIAL");
+        if (itTrial != root->End())
+        {
+          // TRIAL:ACTUAL_START_FIELD
+          MetaData::ConstIterator itTrialStart = (*itTrial)->FindChild("ACTUAL_START_FIELD");
+          if (itTrialStart != (*itTrial)->End())
+          {
+            int lsb = (*itTrialStart)->GetInfo()->ToUInt16(0);
+            int hsb = (*itTrialStart)->GetInfo()->ToUInt16(1);
+            int start = hsb << 16 | lsb;
+            if (start != output->GetFirstFrame())
+            {
+              if (output->GetFirstFrame() != 65535) {btkIOErrorMacro(filename, "The first frame index wrote in the header is different than in the parameter TRIAL:ACTUAL_START_FIELD. The value in the parameter is kept.");}
+              output->SetFirstFrame(start);
+            }
+          }
+          // TRIAL:ACTUAL_END_FIELD
+          MetaData::ConstIterator itTrialEnd = (*itTrial)->FindChild("ACTUAL_END_FIELD");
+          if (itTrialEnd != (*itTrial)->End())
+          {
+            int lsb = (*itTrialEnd)->GetInfo()->ToUInt16(0);
+            int hsb = (*itTrialEnd)->GetInfo()->ToUInt16(1);
+            int end = hsb << 16 | lsb;
+            if (end != lastFrame)
+            {
+              if (lastFrame != 65535) {btkIOErrorMacro(filename, "The last frame index wrote in the header is different than in the parameter TRIAL:ACTUAL_END_FIELD. The number of frames is modified by keeping the value in the parameter.");}
+              lastFrame = end;
             }
           }
         }
@@ -965,6 +996,7 @@ namespace btk
       // Update data in the acquisition
       // Require to clone somee data from the input.
       Acquisition::Pointer in = Acquisition::New();
+      in->SetFirstFrame(input->GetFirstFrame());
       in->SetPointFrequency(input->GetPointFrequency());
       in->SetAnalogResolution(input->GetAnalogResolution());
       in->SetEvents(input->GetEvents()->Clone());
@@ -977,6 +1009,7 @@ namespace btk
         analog->SetGain((*it)->GetGain());
         in->AppendAnalog(analog);
       }
+      int frameNumber = input->GetPointFrameNumber();
       
       if (this->HasWritingFlag(CompatibleVicon))
         this->KeepAcquisitionCompatibleVicon(in);
@@ -985,7 +1018,7 @@ namespace btk
       if (this->HasWritingFlag(ScalesFromMetaDataUpdate))
         this->UpdateScalingFactorsFromMetaData(in);
       if (this->HasWritingFlag(MetaDataFromDataUpdate))
-        this->UpdateMetaDataFromData(in);
+        this->UpdateMetaDataFromData(in, frameNumber);
       
       // Acquisition
       bool templateFile = true;
@@ -1004,9 +1037,9 @@ namespace btk
         // Total number of analog samples per 3d frame
         writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetAnalogNumber() * input->GetNumberAnalogSamplePerFrame()));
         // First frame
-        writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetFirstFrame()));
+        writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetFirstFrame() > 65535 ? 65535 : input->GetFirstFrame()));
         // Last frame
-        writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetLastFrame()));
+        writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetLastFrame() > 65535 ? 65535 : input->GetLastFrame()));
         // Maximum interpolation gap in 3D frames
         writtenBytes += obfs->Write(static_cast<uint16_t>(10));
         // The 3D scale factor
@@ -1122,7 +1155,6 @@ namespace btk
           else
             fdf = new FloatFormatSignedAnalog(obfs);
         }
-        int frameNumber = input->GetPointFrameNumber();
         for (int frame = 0 ; frame < frameNumber ; ++frame)
         {
           Acquisition::PointConstIterator itM = input->BeginPoint();
@@ -1498,7 +1530,7 @@ namespace btk
   /**
    * Update acquisition's metadata from its data.
    */
-  void C3DFileIO::UpdateMetaDataFromData(Acquisition::Pointer input)
+  void C3DFileIO::UpdateMetaDataFromData(Acquisition::Pointer input, int numberOfFrames)
   {
     // POINT group
     // -----------
@@ -1512,7 +1544,7 @@ namespace btk
     MetaDataCreateChild(point, "RATE", static_cast<float>(input->GetPointFrequency()));
     // POINT:DATA_START (Updated dynamicaly during the file writing)
     // POINT:FRAMES
-    MetaDataCreateChild(point, "FRAMES", static_cast<int16_t>(input->GetPointFrameNumber()));
+    MetaDataCreateChild(point, "FRAMES", static_cast<int16_t>(numberOfFrames > 65535 ? 65535 : numberOfFrames));
     // POINT:LABELS & POINT:DESCRIPTIONS (LABELS2, DESCRIPTIONS2, ...)
     std::vector<std::string> labels = std::vector<std::string>(pointNumber);
     std::vector<std::string> descs = std::vector<std::string>(pointNumber);
@@ -1646,6 +1678,18 @@ namespace btk
       std::vector<uint8_t> channelDim = std::vector<uint8_t>(2, 0); channelDim[0] = 6;
       MetaDataCreateChild(fp, "CHANNEL")->SetInfo(MetaDataInfo::New(channelDim, std::vector<int16_t>(0)));
     }
+    // TRIAL group
+    MetaData::Pointer trial = MetaDataCreateChild(input->GetMetaData(), "TRIAL");
+    std::vector<int16_t> actualField = std::vector<int16_t>(2,0);
+    // TRIAL:ACTUAL_START_FIELD
+    actualField[1] = input->GetFirstFrame() >> 16; // HSB
+    actualField[0] = input->GetFirstFrame() - (actualField[1] << 16); // LSB
+    MetaDataCreateChild(trial, "ACTUAL_START_FIELD", actualField);
+    // TRIAL:ACTUAL_END_FIELD
+    int lastFrame = input->GetFirstFrame() + numberOfFrames - 1;
+    actualField[1] = lastFrame >> 16; // HSB
+    actualField[0] = lastFrame - (actualField[1] << 16); // LSB
+    MetaDataCreateChild(trial, "ACTUAL_END_FIELD", actualField);
     // EVENT group
     // -----------
     if (input->GetEventNumber() != 0)

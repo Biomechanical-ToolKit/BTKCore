@@ -14,7 +14,7 @@
 #include <cxxtest/ErrorPrinter.h>
 
 // BTK error messages are not displayed
-//#define TDD_SILENT_CERR
+#define TDD_SILENT_CERR
 
 int main()
 {

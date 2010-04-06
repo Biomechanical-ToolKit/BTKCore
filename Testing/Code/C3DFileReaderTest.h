@@ -444,6 +444,14 @@ CXXTEST_SUITE(C3DFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetAnalog(33)->GetGain(), btk::Analog::PlusMinus5);
     TS_ASSERT_EQUALS(acq->GetAnalog(34)->GetGain(), btk::Analog::PlusMinus5);
     TS_ASSERT_EQUALS(acq->GetAnalog(35)->GetGain(), btk::Analog::PlusMinus5);
+    
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq->GetMetaData()->GetChild("POINT")->GetChild("FRAMES")->GetInfo()->ToUInt16(0));
+    btk::MetaDataInfo::Pointer actualFieldVal = acq->GetMetaData()->GetChild("TRIAL")->GetChild("ACTUAL_START_FIELD")->GetInfo();
+    int frameIndex = (actualFieldVal->ToUInt16(1) << 16) | actualFieldVal->ToUInt16(0);
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), frameIndex);
+    actualFieldVal = acq->GetMetaData()->GetChild("TRIAL")->GetChild("ACTUAL_END_FIELD")->GetInfo();
+    frameIndex = (actualFieldVal->ToUInt16(1) << 16) | actualFieldVal->ToUInt16(0);
+    TS_ASSERT_EQUALS(acq->GetLastFrame(), frameIndex);
   }
 
   CXXTEST_TEST(Sample13_Dance)

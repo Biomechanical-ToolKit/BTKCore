@@ -95,7 +95,7 @@ namespace btk
     BTK_IO_EXPORT void KeepAcquisitionCompatibleVicon(Acquisition::Pointer input);
     BTK_IO_EXPORT void UpdateScalingFactorsFromData(Acquisition::Pointer input);
     BTK_IO_EXPORT void UpdateScalingFactorsFromMetaData(Acquisition::Pointer input);
-    BTK_IO_EXPORT void UpdateMetaDataFromData(Acquisition::Pointer input);
+    BTK_IO_EXPORT void UpdateMetaDataFromData(Acquisition::Pointer input, int numberOfFrames);
     BTK_IO_EXPORT void UpdateMetaDataFromSpecializedPoint(Acquisition::Pointer input, MetaData::Pointer point, std::vector<std::string>& typeGroups, Point::Type type, const std::string& label);
 
     C3DFileIO(const C3DFileIO& ); // Not implemented.
