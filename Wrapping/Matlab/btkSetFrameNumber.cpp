@@ -42,20 +42,27 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if(nrhs < 2)
     mexErrMsgTxt("Two inputs required.");
   if (nlhs > 0)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
 
   if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
     mexErrMsgTxt("Number of frames must be set by a scalar integer value.");
-  if ((nrhs >= 3) && (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2])) || (mxGetNumberOfElements(prhs[2]) != 1))
-      mexErrMsgTxt("Number of frames must be set by a scalar integer value.");
-  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]); 
-  int r = 1;
-  if ((nrhs == 2) && (acq->GetPointFrameNumber() != 0) && (acq->GetAnalogFrameNumber() != 0))
-    r = acq->GetAnalogFrameNumber() /  acq->GetPointFrameNumber();
-  else
-    r = static_cast<int>(mxGetScalar(prhs[2]));
-  if (r == 0)
-    mexErrMsgTxt("The number of analog samples per point frame cannot be set to 0.");
+  if ((nrhs >= 3) && (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1)))
+    mexErrMsgTxt("The number of analog samples per point frame must be set by a scalar integer value.");
+    
+  int n = static_cast<int>(mxGetScalar(prhs[1]));
+  if (n <= 0)
+    mexErrMsgTxt("The number of frames cannot be set to 0 or lower.");
   
-  acq->Resize(acq->GetPointNumber(), static_cast<int>(mxGetScalar(prhs[1])), acq->GetAnalogNumber(), r);
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]); 
+  
+  int r = 1;
+  if (nrhs >= 3)
+    r = static_cast<int>(mxGetScalar(prhs[2]));
+  else
+    r = acq->GetNumberAnalogSamplePerFrame();
+  
+  if (r <= 0)
+    mexErrMsgTxt("The number of analog samples per point frame cannot be set to 0 or lower.");
+  
+  acq->Resize(acq->GetPointNumber(), n, acq->GetAnalogNumber(), r);
 };
