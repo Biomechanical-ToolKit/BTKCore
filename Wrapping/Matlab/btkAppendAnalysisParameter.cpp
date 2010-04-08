@@ -44,7 +44,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if(nrhs < 5)
     mexErrMsgTxt("Minimum of five inputs required.");
   if (nlhs > 2)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
 
   if (!mxIsChar(prhs[1]) || mxIsEmpty(prhs[1]))
     mexErrMsgTxt("Parameter's name must be a non-empty string.");

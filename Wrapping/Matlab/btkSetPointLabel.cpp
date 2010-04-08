@@ -47,7 +47,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if(nrhs < 3)
     mexErrMsgTxt("Three inputs required.");
   if (nlhs > 2)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
 
   if (!mxIsChar(prhs[2]) || mxIsEmpty(prhs[2]))
     mexErrMsgTxt("Point's label must be a non-empty string.");    

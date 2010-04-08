@@ -44,7 +44,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if(nrhs != 1)
     mexErrMsgTxt("One input required.");
   if (nlhs > 1)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
 
   if (!mxIsChar(prhs[0]) || mxIsEmpty(prhs[0]))
    mexErrMsgTxt("The filename must be a string and can't be empty.");
@@ -76,9 +76,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("An unexpected error occurred.");
   }
   plhs[0] = btk_MOH_create_handle(reader->GetOutput());
-
+  
   mxFree(filename);
-
+  
   // Back to the previous output buffers.
   matlabErrorOutput.requestNewLine();
   std::cout.rdbuf(stdStandardOutput);

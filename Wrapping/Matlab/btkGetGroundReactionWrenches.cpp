@@ -49,7 +49,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   else if (nrhs > 2)
     mexErrMsgTxt("Too many input arguments.");
   if (nlhs > 1)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
 
   if (nrhs == 2)
     if (!mxIsNumeric(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))

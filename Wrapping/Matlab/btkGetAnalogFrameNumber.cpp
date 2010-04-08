@@ -42,7 +42,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if(nrhs != 1)
     mexErrMsgTxt("One input required.");
   if (nlhs > 1)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   plhs[0] = mxCreateDoubleMatrix(1, 1, mxREAL);

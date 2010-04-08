@@ -50,7 +50,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nrhs < 2)
     mexErrMsgTxt("Minimum of two inputs required.");
   if (nlhs > 1)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
 
   int level = nrhs;
   int numberOfValues = 0;

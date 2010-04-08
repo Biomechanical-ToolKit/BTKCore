@@ -44,8 +44,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs < 3)
     mexErrMsgTxt("Three inputs required.");
+#if !defined(SCI_MEX)
   if (nlhs > 0)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
+#endif
 
   if (!mxIsChar(prhs[1]) || mxIsEmpty(prhs[1]))
     mexErrMsgTxt("Point's type must be set by a non-empty string.");

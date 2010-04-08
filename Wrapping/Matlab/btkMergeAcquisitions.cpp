@@ -44,7 +44,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if(nrhs < 1)
     mexErrMsgTxt("At least one input argument is required.");
   if (nlhs > 1)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
   
   btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
   std::vector<btk::Acquisition::Pointer> acq(nrhs);

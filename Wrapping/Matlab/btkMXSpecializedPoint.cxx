@@ -49,7 +49,7 @@ void btkMXCreateSpecializedPointsStructure(
   if(nrhs!=1)
     mexErrMsgTxt("One input required.");
   if (nlhs > 2)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
@@ -113,7 +113,7 @@ void btkMXGetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[
   if (nrhs != 1)
     mexErrMsgTxt("One input required.");
   if (nlhs > 1)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
@@ -156,8 +156,10 @@ void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[
 {
   if (nrhs != 2)
     mexErrMsgTxt("Two input required.");
+#if !defined(SCI_MEX)
   if (nlhs > 0)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
+#endif
 
   if (!mxIsNumeric(prhs[1]))
     mexErrMsgTxt("The second input must be a matrix of real values corresponding to the same dimensions than extracted points' coordinates.");

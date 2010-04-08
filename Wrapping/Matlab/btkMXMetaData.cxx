@@ -51,7 +51,7 @@ void btkMXCreateMetaDataStructure(int nlhs, mxArray *plhs[], int nrhs, const mxA
   if(nrhs < 1)
     mexErrMsgTxt("Minimum of one input required.");
   if (nlhs > 1)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
 
   for (int i = 1 ; i < nrhs ; ++i)
   {

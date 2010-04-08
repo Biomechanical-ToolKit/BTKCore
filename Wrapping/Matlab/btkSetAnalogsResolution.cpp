@@ -42,8 +42,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs!=2)
     mexErrMsgTxt("Two input required.");
+#if !defined(SCI_MEX)
   if (nlhs > 0)
-   mexErrMsgTxt("Too many output arguments.");
+    mexErrMsgTxt("Too many output arguments.");
+#endif
 
   if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
     mexErrMsgTxt("Analog resolution must be set by a scalr integer value.");
