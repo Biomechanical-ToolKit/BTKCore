@@ -62,6 +62,9 @@ typedef int mwIndex;
   #ifdef GetType
     #undef GetType
   #endif
+  #if !defined(SCI_VERSION_MAJOR)
+    #include <version.h>
+  #endif
   // Prior to Scilab 5.2, functions mexErrMsgTxt and mexWarnMsgTxt require a char* argument
   #if SCI_VERSION_MAJOR <= 5 && SCI_VERSION_MINOR < 2
     inline void mexErrMsgTxt(const char* err_msg) {mexErrMsgTxt(const_cast<char*>(err_msg));};
