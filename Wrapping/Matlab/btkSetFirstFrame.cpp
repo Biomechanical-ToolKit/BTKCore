@@ -41,10 +41,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs != 2)
     mexErrMsgTxt("Two inputs required.");
-#if !defined(SCI_MEX)
-  if (nlhs > 0)
-    mexErrMsgTxt("Too many output arguments.");
-#endif
+
+  btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 
   if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
     mexErrMsgTxt("The first frame must be set by one integer.");

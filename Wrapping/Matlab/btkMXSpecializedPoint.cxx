@@ -156,10 +156,8 @@ void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[
 {
   if (nrhs != 2)
     mexErrMsgTxt("Two input required.");
-#if !defined(SCI_MEX)
-  if (nlhs > 0)
-    mexErrMsgTxt("Too many output arguments.");
-#endif
+
+  btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 
   if (!mxIsNumeric(prhs[1]))
     mexErrMsgTxt("The second input must be a matrix of real values corresponding to the same dimensions than extracted points' coordinates.");

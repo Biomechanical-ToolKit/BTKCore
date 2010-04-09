@@ -83,4 +83,16 @@ typedef int mwIndex;
   #endif
 #endif
 
+inline void btkMXCheckNoOuput(int nlhs, mxArray *plhs[])
+{
+#if defined(SCI_MEX)
+  if (nlhs > 1)
+    mexErrMsgTxt("Too many output arguments.");
+  plhs[0] = mxCreateDoubleScalar(0.0);
+#else
+  if (nlhs > 0)
+    mexErrMsgTxt("Too many output arguments.");
+#endif
+};
+
 #endif // __btkMex_h

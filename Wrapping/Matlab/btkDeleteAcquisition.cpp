@@ -41,10 +41,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs != 1)
     mexErrMsgTxt("One input argument required.");
-#if !defined(SCI_MEX)
-  if (nlhs > 0)
-    mexErrMsgTxt("Too many output arguments.");
-#endif
+  
+  btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
   
   btk_MOH_destroy_handle<btk::Acquisition>(prhs[0]);
 };

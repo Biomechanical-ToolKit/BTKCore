@@ -43,10 +43,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs!=1)
     mexErrMsgTxt("One input required.");
-#if !defined(SCI_MEX)
-  if (nlhs > 0)
-    mexErrMsgTxt("Too many output arguments.");
-#endif
+
+  btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::MetaData::Pointer metadata = acq->GetMetaData();
