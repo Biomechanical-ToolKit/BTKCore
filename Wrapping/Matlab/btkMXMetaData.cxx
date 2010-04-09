@@ -179,8 +179,8 @@ mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
   }
   else
   {
-    mxArray* info = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
-    *reinterpret_cast<int*>(mxGetPr(info)) = 0;
+    mxArray* info = mxCreateDoubleMatrix(1, 1, mxREAL);
+    *mxGetPr(info) = 0.0;
     mxSetFieldByNumber(out, 0, 0, info);
   }
   // Children
@@ -225,8 +225,8 @@ mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
   }
   else
   {
-    mxArray* children = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
-    *reinterpret_cast<int*>(mxGetPr(children)) = 0;
+    mxArray* children = mxCreateDoubleMatrix(1, 1, mxREAL);
+    *mxGetPr(children) = 0.0;
     mxSetFieldByNumber(out, 0, 1, children);
   }
   // Description

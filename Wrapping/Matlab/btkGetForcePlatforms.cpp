@@ -82,8 +82,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       memcpy(mxGetPr(origin), fp->GetOrigin().data(), mxGetNumberOfElements(origin) * sizeof(double));
       mxSetFieldByNumber(plhs[0], i, 2, origin);
       // type field
-      mxArray* type = mxCreateNumericMatrix(1, 1, mxINT32_CLASS, mxREAL);
-      *reinterpret_cast<int*>(mxGetPr(type)) = fp->GetType();
+      mxArray* type = mxCreateDoubleMatrix(1, 1, mxREAL);
+      *mxGetPr(type) = static_cast<double>(fp->GetType());
       mxSetFieldByNumber(plhs[0], i, 3, type);
     }
     else
