@@ -2,11 +2,8 @@
 #   used compiler. It determines the right MEX-File extension and add 
 #   a macro to help the build of MEX-functions.
 #
-# For Windows, this module detects a Matlab's version between Matlab 7.0 
-# (R14) and Matlab 7.9 (r2009b). 
-# The Unix part of this module doesn't detect the Matlab version. To use it,
-# it is necessary to set the MATLAB_ROOT with the path of the Matlab
-# installation.
+# This module detects a Matlab's version between Matlab 7.0 (R14)
+# and Matlab 7.9 (r2009b).
 #
 # This module defines: 
 #  MATLAB_ROOT: Matlab installation path
@@ -47,7 +44,11 @@ IF(WIN32)
   )
   FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS} NO_DEFAULT_PATH)
   IF (NOT MATLAB_ROOT)
-    FIND_PATH(MATLAB_ROOT "license.txt" "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.0;MATLABROOT]" NO_DEFAULT_PATH)
+    SET(MATLAB_PATHS 
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.0;MATLABROOT]"
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\6.5;MATLABROOT]"
+    )
+    FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS} NO_DEFAULT_PATH)
     IF (MATLAB_ROOT)
       SET(MATLAB_OLD_WIN_MEXFILE_EXT 1 CACHE STRING "Old MEX extension for Windows")
     ENDIF (MATLAB_ROOT)
@@ -58,6 +59,7 @@ IF(WIN32)
   SET(MATLAB_LIBRARIES_PATHS
       "${MATLAB_ROOT}/extern/lib/win64/microsoft"
       "${MATLAB_ROOT}/extern/lib/win32/microsoft"
+      "${MATLAB_ROOT}/extern/lib/win32/microsoft/msvc70"
       "${MATLAB_ROOT}/extern/lib/win32/microsoft/msvc71")
   SET(MATLAB_INCLUDE_PATHS "${MATLAB_ROOT}/extern/include")
 
