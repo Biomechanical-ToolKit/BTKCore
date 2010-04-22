@@ -2,6 +2,7 @@
 #define C3DFileReaderTest_h
 
 #include <btkAcquisitionFileReader.h>
+#include <btkC3DFileIO.h>
 
 CXXTEST_SUITE(C3DFileReaderTest)
 {
@@ -579,9 +580,23 @@ CXXTEST_SUITE(C3DFileReaderTest)
     reader->SetFilename(C3DFilePathIN + "sample28/type1.C3D");
     reader->Update();
   };
+  
+  CXXTEST_TEST(ParameterOverflow)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/parameterOverflow.C3D");
+    reader->Update();
+    
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::MetaData::ConstIterator itAnalysis = acq->GetMetaData()->FindChild("ANALYSIS");
+    TS_ASSERT(itAnalysis != acq->GetMetaData()->End());
+    if (itAnalysis != acq->GetMetaData()->End())
+      TS_ASSERT((*itAnalysis)->FindChild("VALUES") != (*itAnalysis)->End());
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileReaderTest)
+
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, NoFile)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, MisspelledFile)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample01_Eb015pi)
@@ -612,5 +627,6 @@ CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample22_BKINtechnologies)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_dynamic)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_standing)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_type1)
+CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, ParameterOverflow)
 
 #endif

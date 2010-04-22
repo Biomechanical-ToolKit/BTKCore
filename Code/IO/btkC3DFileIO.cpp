@@ -377,6 +377,7 @@ namespace btk
       std::list<int8_t> parameterIds;
       std::list<MetaData::Pointer> parameters;
       MetaData::Pointer root = output->GetMetaData();
+      bool alreadyDisplayParameterOverflowMessage = false;
       while (1)
       {
         nbCharLabel = ibfs->ReadI8(); totalBytesRead += nbCharLabel + 1;
@@ -448,9 +449,17 @@ namespace btk
         // Checks if the next parameter is not pointing in the Data section.
         if ((totalBytesRead + offset) > static_cast<unsigned int>((blockNumber * 512)))
         {
-          btkIOErrorMacro(filename, "The next parameter is pointing in the Data section. Parameters' extraction is stopped.");
-          totalBytesRead -= offset;
-          break;
+          if ((totalBytesRead + offset) > static_cast<unsigned int>(((dataFirstBlock - 1) * 512)))
+          {
+            btkIOErrorMacro(filename, "The next parameter is pointing in the Data section. Parameters' extraction is stopped.");
+            totalBytesRead -= offset;
+            break;
+          }
+          else if (!alreadyDisplayParameterOverflowMessage)
+          {
+            btkIOErrorMacro(filename, "The next parameter is pointing outside the parameter section but not yet in the Data section. Trying to continue ...");
+            alreadyDisplayParameterOverflowMessage = true;
+          }
         }
         if (lastEntry)
           break; // Parameter section end
