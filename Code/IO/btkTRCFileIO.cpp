@@ -135,7 +135,7 @@ namespace btk
       std::string k, v;
       std::getline(ifs, k); // keywords
       std::getline(ifs, v); // corresponding values
-      int kf2 = -1, kf1 = 0, vf2 = -1, vf1 = 0;
+      size_t kf2 = -1, kf1 = 0, vf2 = -1, vf1 = 0;
       char sep = '\t';
       while(1)
       {
@@ -151,10 +151,10 @@ namespace btk
         vf1 = vf2 + 1;
       }
       std::string num;
-      int numberOfPoints = 0;
+      size_t numberOfPoints = 0;
       if (!(num = keywords["NumMarkers"]).empty())
         numberOfPoints = FromString<int>(num);
-      int numberOfFrames = 0;
+      size_t numberOfFrames = 0;
       if (!(num = keywords["NumFrames"]).empty())
         numberOfFrames = FromString<int>(num);
       double framerate = 0.0;
@@ -187,14 +187,14 @@ namespace btk
             labels.push_back(buf);
           }
         }
-        int numberOfLabels = labels.size();
+        size_t numberOfLabels = labels.size();
         if (numberOfPoints != numberOfLabels)
         {
           btkIOErrorMacro(filename, "Mismatch between the number of points and the number of labels extracted. Final number of points corresponds to the number of labels extracted.");
           numberOfPoints = numberOfLabels;
         }
         std::getline(ifs, line); // Coordinate's label (X1, Y1, Z1, ...)
-        output->Init(numberOfPoints, numberOfFrames);
+        output->Init(static_cast<int>(numberOfPoints), static_cast<int>(numberOfFrames));
         std::list<std::string>::const_iterator itLabel = labels.begin();
         for (PointCollection::Iterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
         {

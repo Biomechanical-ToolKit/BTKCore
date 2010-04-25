@@ -60,7 +60,7 @@ namespace btk
                                       const T& blankReplacement = T())
   {
     target.clear();
-    int collapsedNumber = 0; int inc = 2;
+    int collapsedNumber = 0, inc = 2;
     std::string label = baselabel;
     if (parent.get() != 0)
     {
@@ -72,7 +72,7 @@ namespace btk
         std::vector<T> values;
         MetaDataCollapseChildrenValues_p(values, (*it)->GetInfo());
         typename std::vector<T>::iterator itVal = values.begin();
-        int num = static_cast<int>(target.size() + values.size());
+        size_t num = target.size() + values.size();
         if (values.size() != 0)
         {
           if ((num >= targetFinalSize) && (targetFinalSize != -1))
@@ -80,7 +80,7 @@ namespace btk
           else
             itVal = values.end();
           target.insert(target.end(), values.begin(), itVal);
-          collapsedNumber = target.size();
+          collapsedNumber = static_cast<int>(target.size());
         }
         if (collapsedNumber == targetFinalSize)
           break;
@@ -195,7 +195,7 @@ namespace btk
       MetaDataInfo::ConstPointer info)
   {
     info->ToString(values);
-    for (int i = 0 ; i < static_cast<int>(values.size()) ; ++i)
+    for (size_t i = 0 ; i < values.size() ; ++i)
     {
       std::string str = values[i];
       str = str.erase(str.find_last_not_of(' ') + 1);

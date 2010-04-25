@@ -431,14 +431,14 @@ namespace btk
    */
   VTKMarkersFramesSource::~VTKMarkersFramesSource()
   {
-    for (int i = 0 ; i < static_cast<int>(this->mp_MarkersCoordinates->size()) ; ++i)
+    for (size_t i = 0 ; i < this->mp_MarkersCoordinates->size() ; ++i)
     {
       this->mp_MarkersCoordinates->operator[](i)->Delete();
       this->mp_ExistingMarkers->operator[](i)->Delete();
     }
     delete this->mp_MarkersCoordinates;
     delete this->mp_ExistingMarkers;
-    for (int i = 0 ; i < static_cast<int>(this->mp_TrajectoryIds->size()) ; ++i)
+    for (size_t i = 0 ; i < this->mp_TrajectoryIds->size() ; ++i)
       this->mp_TrajectoryIds->operator[](i)->Delete();
     delete this->mp_TrajectoryIds;
     this->mp_VisibleMarkers->Delete();
@@ -468,7 +468,7 @@ namespace btk
     {
       PointCollection::Pointer input = static_pointer_cast<PointCollection>(inObject->GetBTKDataObject());
       // RAZ
-      for (int i = 0 ; i < static_cast<int>(this->mp_MarkersCoordinates->size()) ; ++i)
+      for (size_t i = 0 ; i < this->mp_MarkersCoordinates->size() ; ++i)
       {
         this->mp_MarkersCoordinates->operator[](i)->Delete();
         this->mp_ExistingMarkers->operator[](i)->Delete();
@@ -476,7 +476,7 @@ namespace btk
       this->mp_MarkersCoordinates->clear();
       this->mp_ExistingMarkers->clear();
       int frameNumber = 0;
-      int pointNumber = input->GetItemNumber();
+      size_t pointNumber = input->GetItemNumber();
       if (pointNumber != 0)
       {
         frameNumber = input->GetItem(0)->GetFrameNumber();
@@ -491,10 +491,10 @@ namespace btk
         trajectoryPaths.resize(pointNumber, 0);
         this->mp_TrajectoryCoords->SetNumberOfPoints(pointNumber * frameNumber);
         this->mp_TrajectoryColors->SetNumberOfValues(pointNumber * frameNumber);
-        for (int i = 0 ; i < static_cast<int>(this->mp_TrajectoryIds->size()) ; ++i)
+        for (size_t i = 0 ; i < this->mp_TrajectoryIds->size() ; ++i)
           this->mp_TrajectoryIds->operator[](i)->Delete();
         this->mp_TrajectoryIds->resize(pointNumber);  
-        for (int i = 0 ; i < pointNumber ; ++i)
+        for (size_t i = 0 ; i < pointNumber ; ++i)
         {
           this->mp_MarkersRadius->SetValue(i, 8.0); // 8mm
           this->mp_SelectedMarkers->SetValue(i, 0);
@@ -508,7 +508,7 @@ namespace btk
         vtkPoints* centers = vtkPoints::New();
         centers->SetNumberOfPoints(pointNumber);
         points->SetPoints(centers);
-        for (int i = 0 ; i < static_cast<int>(this->mp_MarkersCoordinates->size()) ; ++i)
+        for (size_t i = 0 ; i < this->mp_MarkersCoordinates->size() ; ++i)
         {
           this->mp_MarkersCoordinates->operator[](i)->Delete();
           this->mp_ExistingMarkers->operator[](i)->Delete();
@@ -566,7 +566,7 @@ namespace btk
         }
         points->Delete();
         centers->Delete();
-        for (int i = 0 ; i < static_cast<int>(this->mp_TrajectoryIds->size()) ; ++i)
+        for (size_t i = 0 ; i < this->mp_TrajectoryIds->size() ; ++i)
         {
           this->mp_TrajectoryIds->operator[](i)->InsertNextCell(trajectoryPaths[i]);
           trajectoryPaths[i]->Delete();

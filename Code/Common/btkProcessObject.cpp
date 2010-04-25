@@ -162,7 +162,7 @@ namespace btk
       return;
     this->m_Updating = true;
     
-    for (int inc = 0 ; inc < static_cast<int>(this->m_Inputs.size()) ; ++inc)
+    for (size_t inc = 0 ; inc < this->m_Inputs.size() ; ++inc)
     {
       if (this->m_Inputs[inc].get() != 0)
       {
@@ -214,7 +214,7 @@ namespace btk
    */
   ProcessObject::~ProcessObject()
   {
-    for (int idx = 0; idx < static_cast<int>(this->m_Outputs.size()); ++idx)
+    for (size_t idx = 0; idx < this->m_Outputs.size(); ++idx)
     {
       if (this->m_Outputs[idx])
         this->m_Outputs[idx]->mp_Source = 0;
@@ -262,10 +262,10 @@ namespace btk
    */
   int ProcessObject::GetInputIndex(DataObject::Pointer input)
   {
-    for (int idx = 0 ; idx < static_cast<int>(this->m_Inputs.size()) ; ++idx)
+    for (size_t idx = 0 ; idx < this->m_Inputs.size() ; ++idx)
     {
       if (this->m_Inputs[idx] == input)
-        return idx;
+        return static_cast<int>(idx);
     }
     return -1;
   };
@@ -312,10 +312,10 @@ namespace btk
    */  
   int ProcessObject::GetOutputIndex(DataObject::Pointer output)
   {
-    for (int idx = 0 ; idx < static_cast<int>(this->m_Outputs.size()) ; ++idx)
+    for (size_t idx = 0 ; idx < this->m_Outputs.size() ; ++idx)
     {
       if (this->m_Outputs[idx] == output)
-        return idx;
+        return static_cast<int>(idx);
     }
     return -1;
   };

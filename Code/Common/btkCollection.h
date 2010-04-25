@@ -67,7 +67,7 @@ namespace btk
     ConstIterator End() const {return this->m_Items.end();};
    
     bool IsEmpty() const {return this->m_Items.empty();}; 
-    int GetItemNumber() const {return this->m_Items.size();};
+    int GetItemNumber() const {return static_cast<int>(this->m_Items.size());};
     void SetItemNumber(int num);
 
     ItemPointer GetItem(int idx);

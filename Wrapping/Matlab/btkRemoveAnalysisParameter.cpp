@@ -96,18 +96,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           std::vector<std::string> valContexts;
           (*its[3])->GetInfo()->ToString(valContexts);
           // paremeter's context
-          int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-          char* context = (char*)mxMalloc(strlen);
-          mxGetString(prhs[1], context, strlen);
+          size_t strlen_ = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+          char* context = (char*)mxMalloc(strlen_);
+          mxGetString(prhs[1], context, strlen_);
           std::string strContext = std::string(context);
           mxFree(context);
           // parameter's name
-          strlen = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
-          char* name = (char*)mxMalloc(strlen);
-          mxGetString(prhs[2], name, strlen);
+          strlen_ = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
+          char* name = (char*)mxMalloc(strlen_);
+          mxGetString(prhs[2], name, strlen_);
           std::string strName = std::string(name);
           mxFree(name);
-          for (int i = 0 ; i < static_cast<int>(valNames.size()) ; ++i)
+          for (size_t i = 0 ; i < valNames.size() ; ++i)
           {
             std::string strNameRef = valNames[i];
             strNameRef = strNameRef.erase(strNameRef.find_last_not_of(' ') + 1);
@@ -117,7 +117,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             strContextRef = strContextRef.erase(0, strContextRef.find_first_not_of(' '));
             if ((strNameRef.compare(strName) == 0) && (strContextRef.compare(strContext) == 0))
             {
-              idx = i;
+              idx = (int)i;
               break;
             }
           }

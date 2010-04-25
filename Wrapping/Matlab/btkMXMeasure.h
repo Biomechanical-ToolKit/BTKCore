@@ -69,7 +69,7 @@ inline mxArray* btkMXCreateMeasuresStructure(typename btk::Collection<T>::Pointe
     std::string originalLabel = (*it)->GetLabel();
     std::string convertedLabel = std::string(originalLabel.length(), '_');
     // Check bad characters
-    for(int i = 0 ; i < static_cast<int>(originalLabel.length()) ; ++i)
+    for(std::string::size_type i = 0 ; i < originalLabel.length() ; ++i)
       convertedLabel[i] = btk::ASCIIConverter[originalLabel[i]];
     char c = convertedLabel[0];
     // Check first character

@@ -46,9 +46,9 @@ btk::Analog::Pointer btkMXGetAnalog(btk::Acquisition::Pointer acq, int nrhs, con
   btk::Analog::Pointer analog;
   if (mxIsChar(prhs[1]))
   {
-    int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-    char* label = (char*)mxMalloc(strlen);
-    mxGetString(prhs[1], label, strlen);
+    size_t strlen_ = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+    char* label = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[1], label, strlen_);
     btk::Acquisition::AnalogIterator itAnalog = acq->FindAnalog(label);
     if (itAnalog == acq->EndAnalog())
     {

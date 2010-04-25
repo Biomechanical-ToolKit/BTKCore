@@ -852,15 +852,15 @@ namespace btk
       btkErrorMacro("Metadata '" + fp->GetLabel() + "' seems corrupted. No child labeled 'USED' or 'TYPE'. Impossible to detect partial force platform configuration.");
       return -1;
     }
-    int usedValue = used->ToInt(0);
+    size_t usedValue = used->ToInt(0);
     std::vector<int> typeValues = type->ToInt();
-    if (usedValue < static_cast<int>(typeValues.size()))
+    if (usedValue < typeValues.size())
     {
       btkErrorMacro("Metadata '" + fp->GetLabel() + "' seems corrupted. The number of force platform used is greater than the number of force platform.");
       return -1;
     }
     int chanInNumber = 0, chanOutNumber = 0;
-    for (int i = 0 ; i < usedValue ; ++i)
+    for (size_t i = 0 ; i < usedValue ; ++i)
     {
       switch (typeValues[i])
       {
@@ -909,7 +909,7 @@ namespace btk
       *rows = chanInNumber;
     if (cols)
       *cols = chanOutNumber;
-    return usedValue;
+    return static_cast<int>(usedValue);
   };
   
   bool MergeAcquisitionFilter::UpdateTrialMetaData(Acquisition::Pointer out, MetaData::Pointer trial, bool mergeData) const

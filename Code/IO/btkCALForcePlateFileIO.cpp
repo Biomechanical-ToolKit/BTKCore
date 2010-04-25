@@ -253,7 +253,7 @@ namespace btk
         it->calMatrix = cal;
       }
       // Format data
-      int used = forcePlates.size();
+      size_t used = forcePlates.size();
       std::vector<int16_t> types(used);
       std::vector<float> origins(3 * used);
       std::vector<float> corners(3 * 4 * used);
@@ -315,10 +315,10 @@ namespace btk
       // - BTK_PARTIAL_FP_CONFIG:TYPE
       partial->AppendChild(btk::MetaData::New("TYPE", types));
       // - BTK_PARTIAL_FP_CONFIG:ORIGIN
-      std::vector<uint8_t> dims(2,3); dims[1] = used;
+      std::vector<uint8_t> dims(2,3); dims[1] = static_cast<uint8_t>(used);
       partial->AppendChild(btk::MetaData::New("ORIGIN", dims, origins));
       // - BTK_PARTIAL_FP_CONFIG:CORNERS
-      dims.resize(3); dims[0] = 3; dims[1] = 4; dims[2] = used;
+      dims.resize(3); dims[0] = 3; dims[1] = 4; dims[2] = static_cast<uint8_t>(used);
       partial->AppendChild(btk::MetaData::New("CORNERS", dims, corners));
       // - BTK_PARTIAL_FP_CONFIG:CAL_MATRIX
       dims[0] = rows; dims[1] = chans;

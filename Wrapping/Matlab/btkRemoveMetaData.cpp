@@ -59,9 +59,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   {
     if (mxIsChar(prhs[i]))
     {
-      int strlen = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
-      char* label = (char*)mxMalloc(strlen);
-      mxGetString(prhs[i], label, strlen);
+      size_t strlen_ = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
+      char* label = (char*)mxMalloc(strlen_);
+      mxGetString(prhs[i], label, strlen_);
       it = md->FindChild(label);
       if (it == md->End())
       {

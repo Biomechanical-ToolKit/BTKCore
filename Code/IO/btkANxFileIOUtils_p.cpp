@@ -59,18 +59,17 @@ namespace btk
   /**
    * Check the header's informations for the (ANB|ANC)FileIO reader.
    */
-  void ANxFileIOCheckHeader_p(double preciseRate, int channelNumber, 
+  void ANxFileIOCheckHeader_p(double preciseRate, size_t channelNumber, 
                             const std::vector<uint16_t>& channelRate, 
                             const std::vector<uint16_t>& channelRange)
   {
     // Analog channels' rate
-    if (channelNumber > static_cast<int>(channelRate.size()))
+    if (channelNumber > channelRate.size())
       throw(ANxFileIOException("Incorrect number of analog rates."));
     // Analog channels' range
-    if (channelNumber > static_cast<int>(channelRange.size()))
+    if (channelNumber > channelRange.size())
       throw(ANxFileIOException("Incorrect number of analog ranges."));
     // Check that all analog channels' rate are the same. Only equal rates are supported for the moment.
-    int inc = 0;
     for (std::vector<uint16_t>::const_iterator it = channelRate.begin() ; it != channelRate.end() ; ++it)
     {
       if (fabs(preciseRate - static_cast<double>(*it)) > 0.1)
@@ -82,13 +81,13 @@ namespace btk
    * Store the header's informations for the (ANB|ANC)FileIO reader into a btk::Acquisition.
    */
   void ANxFileIOStoreHeader_p(Acquisition::Pointer output,
-                              double preciseRate, int frameNumber, int channelNumber, 
+                              double preciseRate, size_t frameNumber, size_t channelNumber, 
                               const std::vector<std::string>& channelLabel, 
                               const std::vector<uint16_t>& channelRate, 
                               const std::vector<uint16_t>& channelRange, 
                               const std::string& boardType, int bitDepth, int gen)
   {
-    output->Init(0, frameNumber, channelNumber);
+    output->Init(0, static_cast<int>(frameNumber), static_cast<int>(channelNumber));
     output->SetPointFrequency(preciseRate);
     Acquisition::MetaDataIterator itAnalog = output->GetMetaData()->FindChild("ANALOG");
     MetaData::Pointer analog;
@@ -174,20 +173,20 @@ namespace btk
       btk::MetaData::Pointer partial = btk::MetaData::New("BTK_PARTIAL_FP_CHAN");
       output->GetMetaData()->AppendChild(partial);
       // - BTK_PARTIAL_FP_CHAN:CHANNEL
-      int numFp = fpChan.size();
-      int numMaxChannel = 0;
+      size_t numFp = fpChan.size();
+      size_t numMaxChannel = 0;
       for (std::vector< std::vector<int16_t> >::const_iterator it = fpChan.begin() ; it != fpChan.end() ; ++it)
       {
         if (numMaxChannel < static_cast<int>(it->size()))
           numMaxChannel = it->size();
       }
-      std::vector<int16_t> channel(numFp * numMaxChannel, 65535);
-      for (int i = 0 ; i < numFp ; ++i)
+      std::vector<int16_t> channel(numFp * numMaxChannel, -32768); // 65535: default value for unknown channel.
+      for (size_t i = 0 ; i < numFp ; ++i)
       {
-        for (int j = 0 ; j < static_cast<int>(fpChan[i].size()) ; ++j)
+        for (size_t j = 0 ; j < fpChan[i].size() ; ++j)
           channel[i * numMaxChannel + j] = fpChan[i][j];
       }
-      std::vector<uint8_t> dims(2, 0); dims[0] = numMaxChannel; dims[1] = numFp;
+      std::vector<uint8_t> dims(2, 0); dims[0] = static_cast<uint8_t>(numMaxChannel); dims[1] = static_cast<uint8_t>(numFp);
       partial->AppendChild(btk::MetaData::New("CHANNEL", dims, channel));
     }
   };
@@ -248,7 +247,7 @@ namespace btk
   void ANxFileIOExtractForcePlatformChannel_p(std::vector< std::vector<int16_t> >& fpChan, Acquisition::Pointer output, const std::vector<std::string>& labels)
   {
     std::vector<int16_t> fp;
-    for (int i = 0 ; i < static_cast<int>(labels.size()) ; ++i)
+    for (size_t i = 0 ; i < labels.size() ; ++i)
     {
       int idx = ANxFileIOFindAnalogLabeCaselInsensitive_p(labels[i], output);
       if (idx <= output->GetAnalogNumber())
@@ -257,7 +256,7 @@ namespace btk
     if (fp.size() == labels.size())
     {
       fpChan.push_back(fp);
-      for (int i = 0 ; i < static_cast<int>(fp.size()) ; ++i)
+      for (size_t i = 0 ; i < fp.size() ; ++i)
       {
         Analog::Pointer a = output->GetAnalog(fp[i]-1);
         a->SetScale(a->GetScale() / 4000.0 / 10.0 * 1000000.0 * -1.0);

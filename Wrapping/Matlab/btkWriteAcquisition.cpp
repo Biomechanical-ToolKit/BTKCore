@@ -46,9 +46,9 @@
 const std::string extractByteOrderOption(const mxArray* opt, btk::AcquisitionFileIO::ByteOrder* b)
 {
   std::string errMsg;
-  int strlen = (mxGetM(opt) * mxGetN(opt) * sizeof(mxChar)) + 1;
-  char* option = (char*)mxMalloc(strlen);
-  mxGetString(opt, option, strlen);
+  size_t strlen_ = (mxGetM(opt) * mxGetN(opt) * sizeof(mxChar)) + 1;
+  char* option = (char*)mxMalloc(strlen_);
+  mxGetString(opt, option, strlen_);
   std::string uppercase = std::string(option);
   std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
   if (uppercase.compare("IEEE_BIGENDIAN") == 0)
@@ -66,9 +66,9 @@ const std::string extractByteOrderOption(const mxArray* opt, btk::AcquisitionFil
 const std::string extractStorageFormatOption(const mxArray* opt, btk::AcquisitionFileIO::StorageFormat* s)
 {
   std::string errMsg;
-  int strlen = (mxGetM(opt) * mxGetN(opt) * sizeof(mxChar)) + 1;
-  char* option = (char*)mxMalloc(strlen);
-  mxGetString(opt, option, strlen);
+  size_t strlen_ = (mxGetM(opt) * mxGetN(opt) * sizeof(mxChar)) + 1;
+  char* option = (char*)mxMalloc(strlen_);
+  mxGetString(opt, option, strlen_);
   std::string uppercase = std::string(option);
   std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
   if (uppercase.compare("FLOAT") == 0)
@@ -92,9 +92,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
-  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-  char* filename = (char*)mxMalloc(strlen);
-  mxGetString(prhs[1], filename, strlen);
+  size_t strlen_ = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+  char* filename = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[1], filename, strlen_);
 
   btk::AcquisitionFileIO::ByteOrder byteOrderOption = btk::AcquisitionFileIO::OrderNotApplicable;
   btk::AcquisitionFileIO::StorageFormat storageFormatOption = btk::AcquisitionFileIO::StorageNotApplicable;
@@ -105,9 +105,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   int numberOfOptions =  sizeof(options) / sizeof(char*);
   for (int i = 2 ; i < nrhs ; i += 2)
   {
-    strlen = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
-    option = (char*)mxMalloc(strlen);
-    mxGetString(prhs[i], option, strlen);
+    strlen_ = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
+    option = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[i], option, strlen_);
     int j = 0;
     for (j = 0 ; j < numberOfOptions ; ++j)
     {

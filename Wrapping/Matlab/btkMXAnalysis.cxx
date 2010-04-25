@@ -49,12 +49,12 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
   btk::MetaData::ConstIterator itAnalysis = metadata->FindChild("ANALYSIS");
 
   char** fieldnames = 0;
-  int numberOfParameters = 0;
+  size_t numberOfParameters = 0;
   std::vector< std::vector<std::string> > entryValues = std::vector< std::vector<std::string> >(0);
   std::vector<double> parameterValues = std::vector<double>(0);
 
   const char* names[] = {"NAMES", "CONTEXTS", "SUBJECTS", "UNITS"};
-  int numberOfNames =  sizeof(names) / sizeof(char*);
+  size_t numberOfNames =  sizeof(names) / sizeof(char*);
   
   if (itAnalysis != metadata->End())
   {
@@ -63,13 +63,13 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
     {
       numberOfParameters = (*itUsed)->GetInfo()->ToInt(0);
       entryValues = std::vector< std::vector<std::string> >(numberOfNames, std::vector<std::string>(numberOfParameters));
-      for (int inc = 0 ; inc < numberOfNames ; ++inc)
+      for (size_t inc = 0 ; inc < numberOfNames ; ++inc)
       {
         btk::MetaData::ConstIterator it = (*itAnalysis)->FindChild(names[inc]);
-        int num = 0;
+        size_t num = 0;
         if (it != (*itAnalysis)->End())
         {
-          num = ((numberOfParameters > static_cast<int>((*it)->GetInfo()->GetValues().size())) ? static_cast<int>((*it)->GetInfo()->GetValues().size()) : numberOfParameters);
+          num = ((numberOfParameters > (*it)->GetInfo()->GetValues().size()) ? (*it)->GetInfo()->GetValues().size() : numberOfParameters);
           for (int i = 0 ; i < num ; ++i)
           {
             std::string& str = entryValues[inc][i];
@@ -78,18 +78,17 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
             str = str.erase(0, str.find_first_not_of(' '));
           }
         }
-        for (int i = num ; i < numberOfParameters ; ++i)
+        for (size_t i = num ; i < numberOfParameters ; ++i)
           entryValues[inc][i] = "uname*" + btk::ToString(i);
       }
       // fieldnames generation
-      //int incLabel = 0;
       fieldnames = new char*[numberOfParameters];
-      for (int i = 0 ; i < numberOfParameters ; ++i)
+      for (size_t i = 0 ; i < numberOfParameters ; ++i)
       {
         std::string originalLabel = entryValues[1][i] + "_" + entryValues[0][i];
         std::string convertedLabel = std::string(originalLabel.length(), '_');
         // Check bad characters
-        for(int j = 0 ; j < static_cast<int>(originalLabel.length()) ; ++j)
+        for(std::string::size_type j = 0 ; j < originalLabel.length() ; ++j)
           convertedLabel[j] = btk::ASCIIConverter[originalLabel[j]];
         char c = convertedLabel[0];
         // Check first character
@@ -108,7 +107,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
           // Check label's redundancy
         int id = 0;
         std::string doubleLabel = convertedLabel;
-        for (int j = 0 ; j < i ; ++j)
+        for (size_t j = 0 ; j < i ; ++j)
         {
           if (doubleLabel.compare(fieldnames[j]) == 0)
             doubleLabel = convertedLabel + btk::ToString(++id);
@@ -124,7 +123,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
       if (itValues != (*itAnalysis)->End())
       {
         parameterValues = (*itValues)->GetInfo()->ToDouble();
-        if (static_cast<int>(parameterValues.size()) < numberOfParameters)
+        if (parameterValues.size() < numberOfParameters)
         {
           btkErrorMacro("Some parameters has no values. Data may be corrupted.");
           parameterValues.resize(numberOfParameters, 0.0);
@@ -134,10 +133,10 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
         mexErrMsgTxt("Missing ANALYSIS:VALUES. Impossible to extract values");
     }
   }
-  plhs[0] = mxCreateStructMatrix(1, 1, numberOfParameters, (const char**)fieldnames);
+  plhs[0] = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfParameters), (const char**)fieldnames);
   if (numberOfParameters != 0)
   {
-    for(int inc = 0 ; inc < numberOfParameters ; ++inc)
+    for(int inc = 0 ; inc < static_cast<int>(numberOfParameters) ; ++inc)
     {
       mxArray* value = mxCreateDoubleMatrix(1, 1, mxREAL);
       *mxGetPr(value) = parameterValues[inc];
@@ -159,8 +158,8 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
     int inc = 0;
 
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
-    mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, numberOfParameters, (const char**)fieldnames);
-    mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfParameters, (const char**)fieldnames);
+    mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfParameters), (const char**)fieldnames);
+    mxArray* unitsStruct = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfParameters), (const char**)fieldnames);
     
     for (int i = 0 ; i < numberOfParameters ;++i)
     {

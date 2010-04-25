@@ -303,7 +303,7 @@ namespace btk
         {
           bool hasAxis = true;
           label = label.substr(0, label.length() - 4);
-          int pos = label.rfind(' ');
+          std::string::size_type pos = label.rfind(' ');
           std::string straxis = "";
           if (pos != std::string::npos)
              straxis = label.substr(pos, std::string::npos);

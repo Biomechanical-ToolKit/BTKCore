@@ -63,9 +63,9 @@ void btkMXCreateMetaDataStructure(int nlhs, mxArray *plhs[], int nrhs, const mxA
   btk::MetaData::Pointer md = acq->GetMetaData();
   for (int i = 1 ; i < nrhs ; ++i)
   {
-    int strlen = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
-    char* label = (char*)mxMalloc(strlen);
-    mxGetString(prhs[i], label, strlen);
+    size_t strlen_ = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
+    char* label = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[i], label, strlen_);
     btk::MetaData::ConstIterator it = md->FindChild(label);
     mxFree(label);
     if (it == md->End())
@@ -84,9 +84,9 @@ void btkMXCreateMetaDataStructure(int nlhs, mxArray *plhs[], int nrhs, const mxA
     {
       if (i > 1)
         err += ":";
-      int strlen = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
-      char* label = (char*)mxMalloc(strlen);
-      mxGetString(prhs[i], label, strlen);
+      size_t strlen_ = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
+      char* label = (char*)mxMalloc(strlen_);
+      mxGetString(prhs[i], label, strlen_);
       err += std::string(label);
       mxFree(label);
     }
@@ -121,14 +121,14 @@ mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
       if (md->GetInfo()->GetFormat() == btk::MetaDataInfo::Char)
       {
         dims = new mwSize[ndim - 1];
-        for (int i = 1 ; i < static_cast<int>(ndim); ++i)
+        for (mwSize i = 1 ; i < ndim; ++i)
             dims[i - 1] = md->GetInfo()->GetDimensions()[i];
         ndim -= 1;
       }
       else
       {
         dims = new mwSize[ndim];
-        for (int i = 0 ; i < static_cast<int>(ndim) ; ++i)
+        for (mwSize i = 0 ; i < ndim ; ++i)
             dims[i] = md->GetInfo()->GetDimensions()[i];
       }
     }
@@ -194,7 +194,7 @@ mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
       std::string originalLabel = (*it)->GetLabel();
       std::string convertedLabel = std::string(originalLabel.length(), '_');
       // Check bad characters
-      for(int i = 0 ; i < static_cast<int>(originalLabel.length()) ; ++i)
+      for(std::string::size_type i = 0 ; i < originalLabel.length() ; ++i)
         convertedLabel[i] = btk::ASCIIConverter[originalLabel[i]];
       char c = convertedLabel[0];
       // Check first character

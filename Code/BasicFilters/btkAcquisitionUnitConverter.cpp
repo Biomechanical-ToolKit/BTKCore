@@ -388,7 +388,7 @@ namespace btk
         if (parameterIt != (*groupIt)->End())
         {
           (*parameterIt)->GetInfo()->ToFloat(values);
-          for (int i = 0 ; i < static_cast<int>(values.size()) ; ++i)
+          for (size_t i = 0 ; i < values.size() ; ++i)
             values[i] = static_cast<float>(values[i] * scales[Length]);
           (*parameterIt)->GetInfo()->SetValues((*parameterIt)->GetInfo()->GetDimensions(), values);
         }
@@ -396,7 +396,7 @@ namespace btk
         if (parameterIt != (*groupIt)->End())
         {
           (*parameterIt)->GetInfo()->ToFloat(values);
-          for (int i = 0 ; i < static_cast<int>(values.size()) ; ++i)
+          for (size_t i = 0 ; i < values.size() ; ++i)
             values[i] = static_cast<float>(values[i] * scales[Length]);
           (*parameterIt)->GetInfo()->SetValues((*parameterIt)->GetInfo()->GetDimensions(), values);
         }
@@ -410,12 +410,12 @@ namespace btk
           {
             (*parameterIt)->GetInfo()->ToFloat(values);
             std::vector<uint8_t> dims = (*parameterIt)->GetInfo()->GetDimensions();
-            int total = (*parameterIt)->GetInfo()->GetDimensionsProduct();
-            int used = (*usedIt)->GetInfo()->ToInt(0);
+            size_t total = (*parameterIt)->GetInfo()->GetDimensionsProduct();
+            //int used = (*usedIt)->GetInfo()->ToInt(0);
             std::vector<int> types, channels;
             (*typeIt)->GetInfo()->ToInt(types);
             (*channelIt)->GetInfo()->ToInt(channels);
-            int num = 0;
+            size_t num = 0;
             if (dims.size() <= 1)
             {
               btkErrorMacro("The metadata FORCE_PLATFORM:CAL_MATRIX is corrupted. Not enough dimension.");
@@ -426,12 +426,12 @@ namespace btk
                 num = 1;
               else
                 num = dims[2];
-              if (num > static_cast<int>(types.size()))
+              if (num > types.size())
                 num = types.size();
-              int valuesStep = (*parameterIt)->GetInfo()->GetDimension(0) * (*parameterIt)->GetInfo()->GetDimension(1);
-              int columnsStep = (*parameterIt)->GetInfo()->GetDimension(0);
+              size_t valuesStep = (*parameterIt)->GetInfo()->GetDimension(0) * (*parameterIt)->GetInfo()->GetDimension(1);
+              size_t columnsStep = (*parameterIt)->GetInfo()->GetDimension(0);
               bool corrupted = false;
-              for (int i = 0 ; i < num ; ++i)
+              for (size_t i = 0 ; i < num ; ++i)
               {
                 if ((types[i] != 1) && (types[i] != 2) && (types[i] != 3))
                 {
@@ -519,7 +519,7 @@ namespace btk
       {
         // Check if this channel belongs to a force platform using a calibration matrix.
         bool noScale = false;
-        for (int i = 0 ; i < static_cast<int>(channelsToNoScale.size()) ; ++i)
+        for (size_t i = 0 ; i < channelsToNoScale.size() ; ++i)
         {
           if (channelsToNoScale[i] == idxChannel)
           {

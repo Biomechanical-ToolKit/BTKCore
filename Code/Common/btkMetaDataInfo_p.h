@@ -427,8 +427,8 @@ namespace btk
   {
     if (lhs.size() != rhs.size())
       return false;
-    int num = lhs.size();
-    for (int i = 0 ; i != num ; ++i)
+    size_t num = lhs.size();
+    for (size_t i = 0 ; i != num ; ++i)
     {
       if (!OperatorEqual_p<T>(const_cast<void*>(lhs[i]), const_cast<void*>(rhs[i])))
         return false;

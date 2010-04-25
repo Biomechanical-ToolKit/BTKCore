@@ -47,7 +47,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
  btk::EventCollection::Pointer events = acq->GetEvents();
  int inc = 0;
  bool onlyOneSubject = true;
- int numberOfEvents = 0;
+ size_t numberOfEvents = 0;
 
  std::vector< std::vector<double> > times_sorted;
  char** fieldnames = 0;
@@ -87,7 +87,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
        label += (*it)->GetLabel();
      bool labelAddition = true;
 
-     for(int i = 0 ; i < static_cast<int>(labels.size()) ; ++i)
+     for(size_t i = 0 ; i < labels.size() ; ++i)
      {
        if (labels[i].compare(label) == 0)
        {
@@ -107,11 +107,11 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
 
    numberOfEvents = labels.size();
    fieldnames = new char*[numberOfEvents];
-   for (int i = 0 ; i < static_cast<int>(labels.size()) ; ++i)
+   for (size_t i = 0 ; i < labels.size() ; ++i)
    {
      std::string convertedLabel = std::string(labels[i].length(), '_');
      // Check bad characters
-     for(int j = 0 ; j < static_cast<int>(convertedLabel.length()) ; ++j)
+     for(size_t j = 0 ; j < convertedLabel.length() ; ++j)
        convertedLabel[j] = btk::ASCIIConverter[labels[i][j]];
      char c = convertedLabel[0];
      // Check first character
@@ -131,9 +131,9 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
      strcpy(fieldnames[i], convertedLabel.c_str());
    }
    // sort event's times.
-   for (int i = 0 ; i < static_cast<int>(times.size()) ; ++i)
+   for (size_t i = 0 ; i < times.size() ; ++i)
    {
-     for (int j = 0 ; j < static_cast<int>(times[i].size()) - 1 ; ++j)
+     for (size_t j = 0 ; j < times[i].size() - 1 ; ++j)
      {
        if (times[i][j] > times[i][j + 1])
        {
@@ -141,7 +141,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
          times[i][j] = times[i][j + 1];
          times[i][j + 1] = t;
        }
-       for (int k = j ; k > 0 ; --k)
+       for (size_t k = j ; k > 0 ; --k)
        {
          if (times[i][k] < times[i][k - 1])
          {
@@ -157,12 +157,12 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
    // sort event depending the first time.
    std::vector<int> indexes = std::vector<int>(times.size(),0);
    std::vector<double> firstTimes = std::vector<double>(times.size(),0);
-   for (int i = 0 ; i < static_cast<int>(times.size()) ; ++i)
+   for (size_t i = 0 ; i < times.size() ; ++i)
    {
-     indexes[i] = i;
+     indexes[i] = (int)i;
      firstTimes[i] = times[i][0];
    }
-   for (int i = 0 ; i < static_cast<int>(times.size()) -1 ; ++i)
+   for (size_t i = 0 ; i < times.size() - 1 ; ++i)
    {
      if (firstTimes[i] > firstTimes[i+1])
      {
@@ -173,7 +173,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
        firstTimes[i] = firstTimes[i+1];
        firstTimes[i + 1] = t;
      }
-     for (int k = i ; k > 0 ; --k)
+     for (size_t k = i ; k > 0 ; --k)
      {
        if (firstTimes[k] < firstTimes[k - 1])
        {
@@ -193,20 +193,20 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
    times_sorted = std::vector< std::vector<double> >(numberOfEvents);
    fieldnames_sorted = new char*[numberOfEvents];
    subjects_sorted = std::vector<std::string>(numberOfEvents);
-   for (int i = 0 ; i < static_cast<int>(indexes.size()) ; ++i)
+   for (size_t i = 0 ; i < indexes.size() ; ++i)
    {
      times_sorted[i] = times[indexes[i]];
      fieldnames_sorted[i] = fieldnames[indexes[i]];
      subjects_sorted[i] = subjects[indexes[i]];
    }
  }
- plhs[0] = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames_sorted);
+ plhs[0] = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfEvents), (const char**)fieldnames_sorted);
 
  for(int i = 0 ; i < numberOfEvents ; ++i)
  {
    mxArray* value = mxCreateDoubleMatrix(1, times_sorted[i].size(), mxREAL);
    double* v = mxGetPr(value);
-   for(int j = 0 ; j < static_cast<int>(times_sorted[i].size()) ; ++j)
+   for(size_t j = 0 ; j < times_sorted[i].size() ; ++j)
      v[j] = times_sorted[i][j]; 
    mxSetFieldByNumber(plhs[0], 0, i, value);
  }
@@ -225,7 +225,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
    int numberOfFields =  sizeof(info) / sizeof(char*);
 
    plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
-   mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, numberOfEvents, (const char**)fieldnames_sorted);
+   mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfEvents), (const char**)fieldnames_sorted);
 
    int inc = 0;
    for (int i = 0 ; i < numberOfEvents ; ++i)

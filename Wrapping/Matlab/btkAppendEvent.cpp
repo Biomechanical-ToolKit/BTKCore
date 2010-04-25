@@ -59,9 +59,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("The label must be a non-empty string.");
   else
   {
-    int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-    char* buffer = (char*)mxMalloc(strlen);
-    mxGetString(prhs[1], buffer, strlen);
+    size_t strlen_ = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+    char* buffer = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[1], buffer, strlen_);
     evt->SetLabel(buffer);
     mxFree(buffer);
     it = acq->FindEvent(evt->GetLabel());
@@ -79,9 +79,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("The context must be a string.");
   else
   {
-    int strlen = (mxGetM(prhs[3]) * mxGetN(prhs[3]) * sizeof(mxChar)) + 1;
-    char* buffer = (char*)mxMalloc(strlen);
-    mxGetString(prhs[3], buffer, strlen);
+    size_t strlen_ = (mxGetM(prhs[3]) * mxGetN(prhs[3]) * sizeof(mxChar)) + 1;
+    char* buffer = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[3], buffer, strlen_);
     evt->SetContext(buffer);
     mxFree(buffer);
   }
@@ -92,9 +92,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       mexErrMsgTxt("The subject must be a string.");
     else
     {
-      int strlen = (mxGetM(prhs[4]) * mxGetN(prhs[4]) * sizeof(mxChar)) + 1;
-      char* buffer = (char*)mxMalloc(strlen);
-      mxGetString(prhs[4], buffer, strlen);
+      size_t strlen_ = (mxGetM(prhs[4]) * mxGetN(prhs[4]) * sizeof(mxChar)) + 1;
+      char* buffer = (char*)mxMalloc(strlen_);
+      mxGetString(prhs[4], buffer, strlen_);
       evt->SetSubject(buffer);
       mxFree(buffer);
     }
@@ -127,9 +127,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       mexErrMsgTxt("The description must be a string.");
     else
     {
-      int strlen = (mxGetM(prhs[5]) * mxGetN(prhs[5]) * sizeof(mxChar)) + 1;
-      char* buffer = (char*)mxMalloc(strlen);
-      mxGetString(prhs[5], buffer, strlen);
+      size_t strlen_ = (mxGetM(prhs[5]) * mxGetN(prhs[5]) * sizeof(mxChar)) + 1;
+      char* buffer = (char*)mxMalloc(strlen_);
+      mxGetString(prhs[5], buffer, strlen_);
       evt->SetDescription(buffer);
       mxFree(buffer);
     }

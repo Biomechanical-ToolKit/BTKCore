@@ -53,8 +53,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("Too many output arguments.");
 
   int level = nrhs;
-  int numberOfValues = 0;
-  int maxDimSize = 7;
+  size_t numberOfValues = 0;
+  size_t maxDimSize = 7;
   btk::MetaDataInfo::Format f = btk::MetaDataInfo::Char;
   std::vector<uint8_t> dims;
   mxArray* mxValues;
@@ -69,9 +69,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
       if (!mxIsChar(temp) || mxIsEmpty(temp))
         mexErrMsgTxt("The field 'format' must be set by a non-empty string.");
-      int strlen = (mxGetM(temp) * mxGetN(temp) * sizeof(mxChar)) + 1;
-      char* format = (char*)mxMalloc(strlen);
-      mxGetString(temp, format, strlen);
+      size_t strlen_ = (mxGetM(temp) * mxGetN(temp) * sizeof(mxChar)) + 1;
+      char* format = (char*)mxMalloc(strlen_);
+      mxGetString(temp, format, strlen_);
       std::string uppercase = std::string(format);
       mxFree(format);
       std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
@@ -96,15 +96,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
       if (!mxIsCell(mxValues) && (!mxIsNumeric(mxValues) || mxIsComplex(mxValues)))
         mexErrMsgTxt("The field 'format' must be set by cell of strings or an array of numerical values.");
-      numberOfValues = static_cast<int>(mxGetNumberOfElements(mxValues));
+      numberOfValues = mxGetNumberOfElements(mxValues);
       if ((f != btk::MetaDataInfo::Char) && (numberOfValues > 65535))
         mexErrMsgTxt("Number of values exceed the maximum number (65535) available for each metadata.");
-      int dimsSize = static_cast<int>(mxGetNumberOfDimensions(mxValues));
+      mwSize dimsSize = mxGetNumberOfDimensions(mxValues);
       if (dimsSize > maxDimSize)
         mexErrMsgTxt("Number of dimensions exceed the maximum number (7) available for each metadata.");
       const mwSize* dimsValues = mxGetDimensions(mxValues);
       std::vector<uint8_t> _dims;
-      for (int i = dimsSize - 1 ; i >= 0 ; --i)
+      for (mwSize i = dimsSize - 1 ; i >= 0 ; --i)
       {
         int dim = static_cast<uint8_t>(dimsValues[i]);
         if (dim > 255)
@@ -133,9 +133,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   
   for (int i = 1 ; i < level ; ++i)
   {
-    int strlen = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
-    char* label = (char*)mxMalloc(strlen);
-    mxGetString(prhs[i], label, strlen);
+    size_t strlen_ = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
+    char* label = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[i], label, strlen_);
     btk::MetaData::ConstIterator it = md->FindChild(label);
     if (it == md->End())
     {
@@ -155,24 +155,24 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case btk::MetaDataInfo::Char:
       {
       std::vector<std::string> values = std::vector<std::string>(numberOfValues, "");
-      int maxLen = 0;
+      size_t maxLen = 0;
       for (int i = 0 ; i < numberOfValues ; ++i)
       {
         mxArray* temp = mxGetCell(mxValues, i);
         if (!temp || !mxIsChar(temp))
           mexErrMsgTxt("Error in the format of the values: only strings are accepted in cell.");
-        int strlen = (mxGetM(temp) * mxGetN(temp) * sizeof(mxChar)) + 1;
-        char* val = (char*)mxMalloc(strlen);
-        mxGetString(temp, val, strlen);
+        size_t strlen_ = (mxGetM(temp) * mxGetN(temp) * sizeof(mxChar)) + 1;
+        char* val = (char*)mxMalloc(strlen_);
+        mxGetString(temp, val, strlen_);
         values[i] = std::string(val);
         mxFree(val);
-        strlen = values[i].length();
-        if (strlen > maxLen)
-          maxLen = strlen;
+        strlen_ = values[i].length();
+        if (strlen_ > maxLen)
+          maxLen = strlen_;
       }
-      dims[0] = maxLen;
+      dims[0] = static_cast<uint8_t>(maxLen);
       int prod = 1;
-      for (int i = 0 ; i < static_cast<int>(dims.size()) ; ++i)
+      for (size_t i = 0 ; i < dims.size() ; ++i)
         prod *= dims[i];
       if (prod > 65535)
         mexErrMsgTxt("The number of characters exceed the maximum number (65535) available for a metadata.");

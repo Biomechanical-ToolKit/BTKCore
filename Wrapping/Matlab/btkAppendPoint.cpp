@@ -59,18 +59,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("Point's label must be a non-empty string");
   if (!mxIsNumeric(prhs[3]) || mxIsEmpty(prhs[3]) || mxIsComplex(prhs[3]) || (mxGetN(prhs[3]) != 3))
     mexErrMsgTxt("Point's values must have a second dimension equals to 3.");
-  vn = mxGetM(prhs[3]);
+  vn = static_cast<int>(mxGetM(prhs[3]));
   if (nrhs >= 5)
   {
      if (!mxIsNumeric(prhs[4]) || mxIsEmpty(prhs[4]) || mxIsComplex(prhs[4]) || (mxGetN(prhs[4]) != 1))
     mexErrMsgTxt("Point's residual must have a second dimension equals to 1.");
-    rn = mxGetM(prhs[4]);
+    rn = static_cast<int>(mxGetM(prhs[4]));
   }
   if (nrhs >= 6)
   {
      if (!mxIsNumeric(prhs[5]) || mxIsEmpty(prhs[5]) || mxIsComplex(prhs[5]) || (mxGetN(prhs[5]) != 1))
     mexErrMsgTxt("Point's mask must have a second dimension equals to 1.");
-    mn = mxGetM(prhs[5]);
+    mn = static_cast<int>(mxGetM(prhs[5]));
   }
   if (((rn != vn) && (rn != 0)) || ((mn != vn) && (mn != 0)))
     mexErrMsgTxt("Point's data have not the same number of frames.");
@@ -86,9 +86,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("Frame number mismatching.");
 
   // label
-  int strlen = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
-  char* label = (char*)mxMalloc(strlen);
-  mxGetString(prhs[2], label, strlen);
+  size_t strlen_ = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
+  char* label = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[2], label, strlen_);
   if (acq->FindPoint(label) != acq->EndPoint())
   {
     std::string err = "A point in the acquisition has already the label: '" + std::string(label) + "'.";
@@ -97,9 +97,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
 
   // type
-  strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-  char* type = (char*)mxMalloc(strlen);
-  mxGetString(prhs[1], type, strlen);
+  strlen_ = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+  char* type = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[1], type, strlen_);
   std::string uppercase = std::string(type);
   std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
   btk::Point::Type t;
@@ -134,9 +134,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     memcpy(point->GetMasks().data(), mxGetPr(prhs[5]) , mxGetNumberOfElements(prhs[5]) * sizeof(double));
   if (nrhs >= 7)
   {
-    int strlen = (mxGetM(prhs[6]) * mxGetN(prhs[6]) * sizeof(mxChar)) + 1;
-    char* desc = (char*)mxMalloc(strlen);
-    mxGetString(prhs[6], desc, strlen);
+    size_t strlen_ = (mxGetM(prhs[6]) * mxGetN(prhs[6]) * sizeof(mxChar)) + 1;
+    char* desc = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[6], desc, strlen_);
     point->SetDescription(desc);
     mxFree(desc);
   }

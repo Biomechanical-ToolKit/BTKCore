@@ -153,7 +153,7 @@ namespace btk
       // Trial_Name, Trial#, Duration(Sec.), #Channels
       std::getline(ifs, line);
       double duration = FromString<double>(this->ExtractKeywordValue(line, "Duration(Sec.):	"));
-      int numberOfChannels = FromString<int>(this->ExtractKeywordValue(line, "#Channels:	"));
+      size_t numberOfChannels = FromString<size_t>(this->ExtractKeywordValue(line, "#Channels:	"));
 
       // BitDepth & PreciseRate
       std::getline(ifs, line);
@@ -177,7 +177,7 @@ namespace btk
         std::list<std::string> labels, rates, ranges;
         std::getline(ifs, line);
         this->ExtractDataInfo(line, "Name", labels);
-        int numberOfLabels = labels.size();
+        size_t numberOfLabels = labels.size();
         if (numberOfChannels != numberOfLabels)
         {
           btkIOErrorMacro(filename, "Mismatch between the number of analog channels and the number of labels extracted. Final number of analog channels corresponds to the number of labels extracted.");
@@ -190,7 +190,7 @@ namespace btk
         std::getline(ifs, line);
         this->ExtractDataInfo(line, "Range", ranges);
         double nf = duration * preciseRate; // Must be separate in two step due to some rounding errors
-        int numberOfFrames = (int)nf + 1;
+        size_t numberOfFrames = (size_t)nf + 1;
         // Data conversion
         std::vector<std::string> channelLabel(labels.size());
         std::vector<uint16_t> channelRate(rates.size());
@@ -438,7 +438,7 @@ namespace btk
   std::string ANCFileIO::ExtractKeywordValue(const std::string& line, const std::string& keyword) const
   {
     char sep = '\t';
-    int start = 0, end = 0;
+    size_t start = 0, end = 0;
     start = line.find(keyword);
     if (start == std::string::npos)
       throw(ANCFileIOException("Corrupted ANC file: Missing keyword '" + keyword + "'."));

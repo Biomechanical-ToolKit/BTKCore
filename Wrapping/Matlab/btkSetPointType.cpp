@@ -54,9 +54,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::Point::Pointer point = btkMXGetPoint(acq, nrhs, prhs);
 
-  int strlen = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
-  char* type = (char*)mxMalloc(strlen);
-  mxGetString(prhs[2], type, strlen);
+  size_t strlen_ = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
+  char* type = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[2], type, strlen_);
   std::string uppercase = std::string(type);
   mxFree(type);
   std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);

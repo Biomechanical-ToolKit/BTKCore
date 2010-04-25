@@ -120,7 +120,7 @@ namespace btk
       if (itForcePlatformGr != input->GetMetaData()->End())
       {
         MetaData::Iterator itUsed = (*itForcePlatformGr)->FindChild("USED");
-        int numberOfForcePlatforms = 0;
+        size_t numberOfForcePlatforms = 0;
         if (itUsed != (*itForcePlatformGr)->End())
           numberOfForcePlatforms = (*itUsed)->GetInfo()->ToInt(0);
 
@@ -129,12 +129,12 @@ namespace btk
         if (itType != (*itForcePlatformGr)->End())
         {
           (*itType)->GetInfo()->ToInt(types);
-          if (static_cast<int>(types.size()) < numberOfForcePlatforms)
+          if (types.size() < numberOfForcePlatforms)
           {
             btkErrorMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE don't indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:TYPE");
             numberOfForcePlatforms = types.size();
           }
-          else if (static_cast<int>(types.size()) > numberOfForcePlatforms)
+          else if (types.size() > numberOfForcePlatforms)
           {
             btkErrorMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE don't indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:USED");
           }
@@ -147,7 +147,7 @@ namespace btk
           return;
         }
 
-        output->SetItemNumber(numberOfForcePlatforms);
+        output->SetItemNumber(static_cast<int>(numberOfForcePlatforms));
 
         MetaData::Pointer pOrigin;
         MetaData::Iterator itOrigin = (*itForcePlatformGr)->FindChild("ORIGIN");

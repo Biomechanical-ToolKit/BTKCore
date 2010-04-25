@@ -157,8 +157,8 @@ namespace btk
         label = label.erase(label.find_last_not_of(static_cast<char>(0x00)) + 1);
         label = label.erase(0, label.find_first_not_of(static_cast<char>(0x00)));
         // Known case
-        int j = 0;
-        for (j = 0 ; j < static_cast<int>(labels.size()) ; ++j)
+        size_t j = 0;
+        for (j = 0 ; j < labels.size() ; ++j)
         {
           if (label.compare(labels[j].current) == 0)
           {
@@ -168,7 +168,7 @@ namespace btk
           }
         }
         // Special *_ANKL
-        if (j >= static_cast<int>(labels.size()))
+        if (j >= labels.size())
         {
           if (label.compare("R_ANKL") == 0)
           {

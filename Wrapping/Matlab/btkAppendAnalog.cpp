@@ -46,13 +46,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 2)
     mexErrMsgTxt("Too many output arguments.");
 
-  int vn = 0, mn = 0, rn = 0;
+  int vn = 0;
 
   if (!mxIsChar(prhs[1]) || mxIsEmpty(prhs[1]))
     mexErrMsgTxt("Analog's label must be a non-empty string.");
   if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetN(prhs[2]) != 1))
     mexErrMsgTxt("Analog's values must have a second dimension equals to 1.");
-  vn = mxGetM(prhs[2]);
+  vn = static_cast<int>(mxGetM(prhs[2]));
   if (nrhs >= 4)
   { 
     if (!mxIsChar(prhs[3]))
@@ -65,9 +65,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("Frame number mismatching.");
 
   // label
-  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-  char* label = (char*)mxMalloc(strlen);
-  mxGetString(prhs[1], label, strlen);
+  size_t strlen_ = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+  char* label = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[1], label, strlen_);
   if (acq->FindAnalog(label) != acq->EndAnalog())
   {
     std::string err = "An analog channel in the acquisition has already the label: '" + std::string(label) + "'.";
@@ -81,9 +81,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   memcpy(analog->GetValues().data(), mxGetPr(prhs[2]) , mxGetNumberOfElements(prhs[2]) * sizeof(double));
   if (nrhs >= 4)
   {
-    int strlen = (mxGetM(prhs[3]) * mxGetN(prhs[3]) * sizeof(mxChar)) + 1;
-    char* desc = (char*)mxMalloc(strlen);
-    mxGetString(prhs[3], desc, strlen);
+    size_t strlen_ = (mxGetM(prhs[3]) * mxGetN(prhs[3]) * sizeof(mxChar)) + 1;
+    char* desc = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[3], desc, strlen_);
     analog->SetDescription(desc);
     mxFree(desc);
   }

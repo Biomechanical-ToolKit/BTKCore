@@ -66,27 +66,27 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   {
     if (!mxIsChar(prhs[5]))
       mexErrMsgTxt("Parameter's subject must be a string");
-    int strlen = (mxGetM(prhs[5]) * mxGetN(prhs[5]) * sizeof(mxChar)) + 1;
-    subject = (char*)mxMalloc(strlen);
-    mxGetString(prhs[5], subject, strlen);
+    size_t strlen_ = (mxGetM(prhs[5]) * mxGetN(prhs[5]) * sizeof(mxChar)) + 1;
+    subject = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[5], subject, strlen_);
   }
   if (nrhs >= 7)
   {
     if (!mxIsChar(prhs[6]))
       mexErrMsgTxt("Parameter's description must be a string");
-    int strlen = (mxGetM(prhs[6]) * mxGetN(prhs[6]) * sizeof(mxChar)) + 1;
-    description = (char*)mxMalloc(strlen);
-    mxGetString(prhs[6], description, strlen);
+    size_t strlen_ = (mxGetM(prhs[6]) * mxGetN(prhs[6]) * sizeof(mxChar)) + 1;
+    description = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[6], description, strlen_);
   }
-  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-  name = (char*)mxMalloc(strlen);
-  mxGetString(prhs[1], name, strlen);
-  strlen = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
-  context = (char*)mxMalloc(strlen);
-  mxGetString(prhs[2], context, strlen);
-  strlen = (mxGetM(prhs[3]) * mxGetN(prhs[3]) * sizeof(mxChar)) + 1;
-  unit = (char*)mxMalloc(strlen);
-  mxGetString(prhs[3], unit, strlen);
+  size_t strlen_ = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+  name = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[1], name, strlen_);
+  strlen_ = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
+  context = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[2], context, strlen_);
+  strlen_ = (mxGetM(prhs[3]) * mxGetN(prhs[3]) * sizeof(mxChar)) + 1;
+  unit = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[3], unit, strlen_);
   value = *mxGetPr(prhs[4]);
   
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);  
@@ -180,8 +180,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           std::string strName = std::string(name);
           strName = strName.erase(strName.find_last_not_of(' ') + 1);
           strName = strName.erase(0, strName.find_first_not_of(' '));
-          int i = 0;
-          for (i = 0 ; i < static_cast<int>(valNames.size()) ; ++i)
+          size_t i = 0;
+          for (i = 0 ; i < valNames.size() ; ++i)
           {
             std::string strNameRef = valNames[i];
             strNameRef = strNameRef.erase(strNameRef.find_last_not_of(' ') + 1);
@@ -192,7 +192,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             if ((strNameRef.compare(strName) == 0) && (strContextRef.compare(strContext) == 0))
               break;
           }
-          if (i >= static_cast<int>(valNames.size()))
+          if (i >= valNames.size())
           {
             (*itUsed)->GetInfo()->SetValues(static_cast<int16_t>(used + 1));
             std::vector<std::string> dataStr;
@@ -237,17 +237,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           else
           {
             // name
-            (*its[0])->GetInfo()->SetValue(i, strName);
+            (*its[0])->GetInfo()->SetValue((int)i, strName);
             // description
-            (*its[1])->GetInfo()->SetValue(i, description ? std::string(description) : "");
+            (*its[1])->GetInfo()->SetValue((int)i, description ? std::string(description) : "");
             // subject
-            (*its[2])->GetInfo()->SetValue(i, subject ? std::string(subject) : "");
+            (*its[2])->GetInfo()->SetValue((int)i, subject ? std::string(subject) : "");
             // context
-            (*its[3])->GetInfo()->SetValue(i, strContext);
+            (*its[3])->GetInfo()->SetValue((int)i, strContext);
             // unit
-            (*its[4])->GetInfo()->SetValue(i, std::string(unit));
+            (*its[4])->GetInfo()->SetValue((int)i, std::string(unit));
             // value
-            (*itValues)->GetInfo()->SetValue(i, static_cast<float>(value));
+            (*itValues)->GetInfo()->SetValue((int)i, static_cast<float>(value));
           }
         }
       } 

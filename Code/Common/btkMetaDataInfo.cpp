@@ -494,7 +494,7 @@ namespace btk
     Delete_p<std::string>(this->m_Values[idx]);    
     this->m_Values[idx] = Voidify_p(val);
 
-    int len = val.length();
+    int len = static_cast<int>(val.length());
     if (len > this->m_Dims[0])
       this->m_Dims[0] = len;
     for (int i = 0 ; i < this->GetDimensionsProduct(1) ; ++i)
@@ -885,7 +885,7 @@ namespace btk
    * The dimension's value is equal to the size of @a val.
    */
   MetaDataInfo::MetaDataInfo(std::string val)
-  : m_Dims(std::vector<uint8_t>(1,val.length()))
+  : m_Dims(std::vector<uint8_t>(1,static_cast<uint8_t>(val.length())))
   {
     this->m_Format = Char;
     Voidify_p(std::vector<std::string>(1, val), this->m_Values);
@@ -976,10 +976,10 @@ namespace btk
   void MetaDataInfo::FillDimensions(const std::vector<std::string>& val)
   {
     this->m_Dims = std::vector<uint8_t>(2,0);
-    this->m_Dims[1] = val.size();
+    this->m_Dims[1] = static_cast<uint8_t>(val.size());
     for (int i = 0 ; i < this->m_Dims[1] ; ++i)
     {
-      int len = val[i].length();
+      int len = static_cast<int>(val[i].length());
       if (len > this->m_Dims[0])
         this->m_Dims[0] = len;
     }

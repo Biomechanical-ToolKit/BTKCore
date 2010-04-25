@@ -50,10 +50,10 @@ namespace btk
     typedef SharedPtr<ProcessObject> Pointer;
     typedef SharedPtr<const ProcessObject> ConstPointer;
     
-    int GetInputNumber() const {return this->m_Inputs.size();};
+    int GetInputNumber() const {return static_cast<int>(this->m_Inputs.size());};
     BTK_COMMON_EXPORT int GetValidInputNumber() const;
     
-    int GetOutputNumber() const {return m_Outputs.size();};
+    int GetOutputNumber() const {return static_cast<int>(m_Outputs.size());};
     
     BTK_COMMON_EXPORT void Update();
     BTK_COMMON_EXPORT void ResetState();

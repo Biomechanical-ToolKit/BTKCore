@@ -49,18 +49,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetN(prhs[2]) != 3))
     mexErrMsgTxt("Point's values must have a second dimension equals to 3.");
-  vn = mxGetM(prhs[2]);
+  vn = static_cast<int>(mxGetM(prhs[2]));
   if (nrhs >= 4)
   {
     if (!mxIsNumeric(prhs[3]) || mxIsEmpty(prhs[3]) || mxIsComplex(prhs[3]) || (mxGetN(prhs[3]) != 1))
       mexErrMsgTxt("Point's residual must have a second dimension equals to 1.");
-    rn = mxGetM(prhs[3]);
+    rn = static_cast<int>(mxGetM(prhs[3]));
   }
   if (nrhs >= 5)
   {
     if (!mxIsNumeric(prhs[4]) || mxIsEmpty(prhs[4]) || mxIsComplex(prhs[4]) || (mxGetN(prhs[4]) != 1))
       mexErrMsgTxt("Point's mask must have a second dimension equals to 1.");
-    mn = mxGetM(prhs[4]);
+    mn = static_cast<int>(mxGetM(prhs[4]));
   }
   if (((rn != vn) && (rn != 0)) || ((mn != vn) && (mn != 0)))
     mexErrMsgTxt("Point's data have not the same number of frames.");
@@ -84,9 +84,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     memcpy(point->GetMasks().data(), mxGetPr(prhs[4]) , mxGetNumberOfElements(prhs[4]) * sizeof(double));
   if (nrhs >= 6)
   {
-    int strlen = (mxGetM(prhs[5]) * mxGetN(prhs[5]) * sizeof(mxChar)) + 1;
-    char* desc = (char*)mxMalloc(strlen);
-    mxGetString(prhs[5], desc, strlen);
+    size_t strlen_ = (mxGetM(prhs[5]) * mxGetN(prhs[5]) * sizeof(mxChar)) + 1;
+    char* desc = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[5], desc, strlen_);
     point->SetDescription(desc);
     mxFree(desc);
   }

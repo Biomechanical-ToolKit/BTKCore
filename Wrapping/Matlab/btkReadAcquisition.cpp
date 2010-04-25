@@ -56,9 +56,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::MEXStreambufToWarnMsgTxt matlabErrorOutput;
   std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput);
 
-  int strlen = (mxGetM(prhs[0]) * mxGetN(prhs[0]) * sizeof(mxChar)) + 1;
-  char* filename = (char*)mxMalloc(strlen);
-  mxGetString(prhs[0], filename, strlen); 
+  size_t strlen_ = (mxGetM(prhs[0]) * mxGetN(prhs[0]) * sizeof(mxChar)) + 1;
+  char* filename = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[0], filename, strlen_); 
   
   btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
   reader->SetFilename(std::string(filename));

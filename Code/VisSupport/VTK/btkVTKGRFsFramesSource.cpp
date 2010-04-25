@@ -155,7 +155,7 @@ namespace btk
    */
   VTKGRFsFramesSource::~VTKGRFsFramesSource()
   {
-    for (int i = 0 ; i < static_cast<int>(this->mp_GRFsComponents->size()) ; ++i)
+    for (size_t i = 0 ; i < this->mp_GRFsComponents->size() ; ++i)
       this->mp_GRFsComponents->operator[](i)->Delete();
     delete this->mp_GRFsComponents;
   };
@@ -172,7 +172,7 @@ namespace btk
       return 0;
     WrenchCollection::Pointer input = static_pointer_cast<WrenchCollection>(inObject->GetBTKDataObject());
     // Raz
-    for (int i = 0 ; i < static_cast<int>(this->mp_GRFsComponents->size()) ; ++i)
+    for (size_t i = 0 ; i < this->mp_GRFsComponents->size() ; ++i)
       this->mp_GRFsComponents->operator[](i)->Delete();
     this->mp_GRFsComponents->clear();
     int frameNumber = 0;

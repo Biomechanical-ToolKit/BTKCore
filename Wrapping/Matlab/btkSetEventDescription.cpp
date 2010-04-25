@@ -54,14 +54,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::EventCollection::Pointer events = acq->GetEvents();
   
-  int strlen = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
-  char* l = (char*)mxMalloc(strlen);
-  mxGetString(prhs[1], l, strlen);
+  size_t strlen_ = (mxGetM(prhs[1]) * mxGetN(prhs[1]) * sizeof(mxChar)) + 1;
+  char* l = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[1], l, strlen_);
   std::string label = std::string(l);
   
-  strlen = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
-  char* d = (char*)mxMalloc(strlen);
-  mxGetString(prhs[2], d, strlen);
+  strlen_ = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
+  char* d = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[2], d, strlen_);
   std::string desc = std::string(d);
   
   for (btk::EventCollection::Iterator it = events->Begin() ; it != events->End() ; ++it)

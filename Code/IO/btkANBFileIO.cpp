@@ -182,7 +182,7 @@ namespace btk
       std::string boardType;
       std::vector<uint8_t> hexIndex;
       std::vector<uint16_t> channelRate, channelRange;
-      int counter = 1; // First word read.
+      size_t counter = 1; // First word read.
       counter += this->ReadKeyValueU32(&headerSize, &bifs, 0x8000);
       counter += this->ReadKeyValueU32(&id, &bifs, 0x0101);
       counter += this->ReadKeyValueString(boardType, &bifs, 0x0108);
@@ -194,7 +194,7 @@ namespace btk
       counter += this->ReadKeyValueFloat(&firstTime, &bifs, 0x0105);
       counter += this->ReadKeyValueU16(channelRange, &bifs, 0x0106);
       std::vector<std::string> channelLabel = std::vector<std::string>(channelNumber);
-      for (int i = 0 ; i < static_cast<int>(channelNumber) ; ++i)
+      for (size_t i = 0 ; i < channelNumber ; ++i)
         counter += this->ReadKeyValueString(channelLabel[i], &bifs, 0x0107);
       if (counter != headerSize)
         throw ANBFileIOException("The size of the header is not equal to the number of words read.");
@@ -299,7 +299,7 @@ namespace btk
       // Header part
       // 0x0000 0000
       bofs.Fill(4);
-      int counter = 4; // First word wrote.
+      size_t counter = 4; // First word wrote.
       // Key 0x8000: False header size
       counter += this->WriteKeyValue(&bofs, 0x8000, (uint32_t)0);
       // Key 0x0101: ID?
@@ -443,7 +443,7 @@ namespace btk
     this->ReadKey(bifs, key);
     int16_t size = bifs->ReadU16();
     val.resize(size * 4);
-    for (int i = 0 ; i < static_cast<int>(val.size()) ; ++i)
+    for (size_t i = 0 ; i < val.size() ; ++i)
       val[i] = bifs->ReadU8();
     return 1 + size;
   };
@@ -514,9 +514,9 @@ namespace btk
   size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint8_t>& val)
   {
     bofs->Write(key); bofs->Write(static_cast<uint16_t>(val.size() / 4));
-    for (int i = 0 ; i < static_cast<int>(val.size()) ; ++i)
+    for (size_t i = 0 ; i < val.size() ; ++i)
       bofs->Write(val[i]);
-    int size = val.size() / 4;
+    size_t size = val.size() / 4;
     size += ((val.size() % 4) > 0 ? 1 : 0);
     bofs->Fill(size * 4 - val.size());
     return 4 + size * 4;
@@ -525,9 +525,9 @@ namespace btk
   size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint16_t>& val)
   {
     bofs->Write(key); bofs->Write(static_cast<uint16_t>(val.size() / 2));
-    for (int i = 0 ; i < static_cast<int>(val.size()) ; ++i)
+    for (size_t i = 0 ; i < val.size() ; ++i)
       bofs->Write(val[i]); 
-    int size = val.size() / 2;
+    size_t size = val.size() / 2;
     size += ((val.size() % 2) > 0 ? 1 : 0);
     bofs->Fill((size * 2 - val.size()) * 2);
     return 4 + size * 4;
@@ -560,13 +560,13 @@ namespace btk
   
   size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::string& val, bool spacing)
   {
-    uint16_t size = val.size() / 4;
-    uint16_t sizeUpdated = size + ((val.size() % 4) > 0 ? 1 : 0);
+    size_t size = val.size() / 4;
+    size_t sizeUpdated = size + ((val.size() % 4) > 0 ? 1 : 0);
     if ((size == sizeUpdated) && spacing)
       size += 1;
     else
       size = sizeUpdated;
-    bofs->Write(key); bofs->Write(size);
+    bofs->Write(key); bofs->Write(static_cast<uint16_t>(size));
     bofs->Write(val); 
     bofs->Fill(size * 4 - val.size());
     return 4 + size * 4;

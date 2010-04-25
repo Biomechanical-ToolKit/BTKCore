@@ -112,9 +112,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   {
     if (!mxIsChar(prhs[i]) || mxIsEmpty(prhs[i]))
       mexErrMsgTxt("Error during the parsing of options.");
-    int strlen = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
-    option = (char*)mxMalloc(strlen);
-    mxGetString(prhs[i], option, strlen);
+    size_t strlen_ = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
+    option = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[i], option, strlen_);
     int j = 0;
     for (j = 0 ; j < numberOfOptions ; ++j)
     {
@@ -133,9 +133,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           {
           if (!mxIsChar(prhs[i+1]))
             mexErrMsgTxt("Label option must be followed by a string.");
-          int strlen2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
-          char* buf = (char*)mxMalloc(strlen2);
-          mxGetString(prhs[i+1], buf, strlen2);
+          size_t strlen_2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
+          char* buf = (char*)mxMalloc(strlen_2);
+          mxGetString(prhs[i+1], buf, strlen_2);
           keepEventsWithLabel(buf, events);
           mxFree(buf);
           break;
@@ -144,9 +144,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           {
           if (!mxIsChar(prhs[i+1]))
             mexErrMsgTxt("Subject option must be followed by a string.");
-          int strlen2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
-          char* buf = (char*)mxMalloc(strlen2);
-          mxGetString(prhs[i+1], buf, strlen2);
+          size_t strlen_2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
+          char* buf = (char*)mxMalloc(strlen_2);
+          mxGetString(prhs[i+1], buf, strlen_2);
           keepEventsWithContext(buf, events);
           mxFree(buf);
           break;
@@ -155,9 +155,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           {
           if (!mxIsChar(prhs[i+1]))
             mexErrMsgTxt("Context option must be followed by a string.");
-          int strlen2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
-          char* buf = (char*)mxMalloc(strlen2);
-          mxGetString(prhs[i+1], buf, strlen2);
+          size_t strlen_2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
+          char* buf = (char*)mxMalloc(strlen_2);
+          mxGetString(prhs[i+1], buf, strlen_2);
           keepEventsWithSubject(buf, events);
           mxFree(buf);
           break;

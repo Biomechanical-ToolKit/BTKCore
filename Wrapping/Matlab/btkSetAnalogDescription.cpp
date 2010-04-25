@@ -54,9 +54,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);
 
-  int strlen = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
-  char* newDesc = (char*)mxMalloc(strlen);
-  mxGetString(prhs[2], newDesc, strlen);
+  size_t strlen_ = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
+  char* newDesc = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[2], newDesc, strlen_);
   analog->SetDescription(newDesc);
   mxFree(newDesc);
 
