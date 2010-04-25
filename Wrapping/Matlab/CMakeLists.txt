@@ -22,12 +22,12 @@ IF (BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
 
   SET(CMAKE_BUILD_TYPE Release CACHE STRING "The build type is fixed due to the activation of BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES, Uncheck it to go to previous options." FORCE)
   IF (MSVC)
-    IF ($CMAKE_SYSTEM_VERSION LESS 6.1) # Windows XP, VISTA
+    IF (${CMAKE_SYSTEM_VERSION} LESS 6.1) # Windows XP, VISTA
       SET(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG" CACHE STRING "The CXX flags are fixed due to the activation of BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES, Uncheck it to go to previous flags." FORCE)
       MESSAGE(STATUS "WARNING: Due to a different mechanism introduced in Windows 7, it is not possible to redistribute the MEX files compiled for Windows XP or Vista into Windows 7.")
-    ELSE ($CMAKE_SYSTEM_VERSION LESS 6.1) # Windows 7 or upper.
+    ELSE (${CMAKE_SYSTEM_VERSION} LESS 6.1) # Windows 7 or upper.
       MESSAGE(STATUS "WARNING: Due to a different mechanism introduced in Windows 7, the redistribution of the MEX files into Windows XP or Vista compiled from Windows 7 requires to install the 'Visual C++ Redistributable Package'.")
-    ENDIF ($CMAKE_SYSTEM_VERSION LESS 6.1)
+    ENDIF (${CMAKE_SYSTEM_VERSION} LESS 6.1)
   ENDIF(MSVC)  
 ENDIF(BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
 
