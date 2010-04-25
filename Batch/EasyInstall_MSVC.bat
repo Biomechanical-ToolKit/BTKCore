@@ -10,7 +10,7 @@ VER | FIND /I "6.1" >NUL
 IF NOT ERRORLEVEL 1 SET REQUIRE_PRIVILEGES=1
 
 SET MSVS=""
-IF (%2) == () (
+IF (%3) == () (
   :: Create a temporary file to list the known MSVC directories
   > %TEMP%.\BTK-MSVC.txt ECHO Known MSVC directories
   >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio .NET 2003"
@@ -26,12 +26,12 @@ IF (%2) == () (
   DEL %TEMP%.\BTK-MSVC.txt
   IF !MSVS! == "" GOTO :missing_MSVS
 ) ELSE (
-  SET MSVS=%2
-  IF NOT EXIST !MSVS!\VC\vcvarsall.bat goto missing_MSVS
+  SET MSVS=%3
+  IF NOT EXIST !MSVS!\VC\vcvarsall.bat GOTO missing_MSVS
 )
 
 SET CMAKE=""
-IF (%3) == () (
+IF (%4) == () (
   :: Create a temporary file to list the known CMAKE directories
   > %TEMP%.\BTK-CMAKE.txt ECHO Known CMAKE directories
   >> %TEMP%.\BTK-CMAKE.txt ECHO "%ProgramFiles%\CMake 2.6"
@@ -43,80 +43,81 @@ IF (%3) == () (
   DEL %TEMP%.\BTK-CMAKE.txt
   IF !CMAKE! == "" GOTO :missing_CMAKE
 ) ELSE (
-  SET CMAKE=%3
+  SET CMAKE=%4
   IF NOT EXIST !CMAKE!\bin\cmake.exe GOTO missing_CMAKE
 )
 
 SET setEnvCmd="%ProgramFiles%\Microsoft SDKs\Windows\v7.0\Bin\SetEnv.Cmd"
 
-cd .
+CD .
 IF EXIST %setEnvCmd% (
-  call %setEnvCmd%
+  CALL %setEnvCmd%
 ) ELSE (
   :: 32 or 64 bits?
   set ARCH=
   IF EXIST %SYSTEMROOT%\SysWOW64 SET ARCH=x64
   call !MSVS!\VC\vcvarsall.bat !ARCH!
 )
-mkdir build-Matlab-Release-Redistribuable
-cd build-Matlab-Release-Redistribuable
+IF EXIST %2 RMDIR /S /Q %2
+MKDIR %2
+CD %2
 !CMAKE!\bin\cmake.exe %1 -DCMAKE_BUILD_TYPE:CHAR=Release -G "NMake Makefiles" ..
-if errorlevel 1 goto error_CMAKE
-::nmake
-if errorlevel 1 goto error_MSVS_COMPILE
+IF ERRORLEVEL 1 GOTO error_CMAKE
+nmake
+IF ERRORLEVEL 1 GOTO error_MSVS_COMPILE
 if !REQUIRE_PRIVILEGES! == 1 (
   ..\Batch\elevate nmake install
-) else (
+) ELSE (
   nmake install
 )
-if errorlevel 1 goto error_MSVS_INSTALL
-cd ..
-goto :eof
+IF ERRORLEVEL 1 GOTO error_MSVS_INSTALL
+CD ..
+GOTO :eof
 
 :missing_MSVS
-echo:
-echo Impossible to find the file VC\vcvarsall.bat
-echo:
-echo Do you have Microsoft Visual Studio installed?
-goto usage
+ECHO:
+ECHO Impossible to find the file VC\vcvarsall.bat
+ECHO:
+ECHO Do you have Microsoft Visual Studio installed?
+GOTO usage
 
 :missing_CMAKE
-echo:
-echo Impossible to find the file bin\cmake.exe
-echo:
-echo Do you have CMake installed?
-goto usage
+ECHO:
+ECHO Impossible to find the file bin\cmake.exe
+ECHO:
+ECHO Do you have CMake installed?
+GOTO usage
 
 :usage
-echo:
-echo Error in script usage. The correct usage is:
-echo     %0 [CMAKE options] [MSVS installation path] [CMAKE installation path]
-echo:
-echo For example:
-echo     %0 "-DBTK_WRAP_MATLAB:BOOL=1 -DBTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES:BOOL=1" "C:\Program Files\Microsoft Visual Studio 9.0" "C:\Program Files\CMake 2.6"
-goto wait
+ECHO:
+ECHO Error in script usage. The correct usage is:
+ECHO     %0 [CMAKE options] [MSVS installation path] [CMAKE installation path]
+ECHO:
+ECHO For example:
+ECHO     %0 "-DBTK_WRAP_MATLAB:BOOL=1 -DBTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES:BOOL=1" "C:\Program Files\Microsoft Visual Studio 9.0" "C:\Program Files\CMake 2.6"
+GOTO wait
 
 :error_CMAKE
-echo:
-echo An error occurred during the configuration of the project
-echo Report this to the project maintainer
-goto wait
+ECHO:
+ECHO An error occurred during the configuration of the project
+ECHO Report this to the project maintainer
+GOTO wait
 
 :error_MSVS_COMPILE
-echo:
-echo An error occurred during the compilation of the project
-echo Report this to the project maintainer
-goto wait
+ECHO:
+ECHO An error occurred during the compilation of the project
+ECHO Report this to the project maintainer
+GOTO wait
 
 :error_MSVS_INSTALL
-echo:
-echo An error occurred during the installation of the project
-echo Report this to the project maintainer
-goto wait
+ECHO:
+ECHO An error occurred during the installation of the project
+ECHO Report this to the project maintainer
+GOTO wait
 
 :wait
-echo:
-echo Press a key to exit the program
-set /p Input=
-exit /b 1
-goto :eof
+ECHO:
+ECHO Press a key to exit the program
+SET /p Input=
+EXIT /b 1
+GOTO :eof
