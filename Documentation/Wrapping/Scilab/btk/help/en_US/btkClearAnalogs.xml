@@ -10,12 +10,12 @@
     <pubdate>$LastChangedDate$</pubdate>
   </info>
   <refnamediv>
-    <refname>btkClearEvents</refname>
-    <refpurpose>Clear acquisition's events</refpurpose>
+    <refname>btkClearAnalogs</refname>
+    <refpurpose>Clear acquisition's analog channels</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <title>Calling Sequence</title>
-    <synopsis>btkClearEvents(h)</synopsis>
+    <synopsis>btkClearAnalogs(h)</synopsis>
   </refsynopsisdiv>
   <refsection>
     <title>Parameters</title>
@@ -28,22 +28,22 @@
   </refsection>
   <refsection>
     <title>Description</title>
-    <para>Remove the events of the acquisition</para>
-    <para> Use functions <link linkend="btkAppendEvent">btkAppendEvent</link> and <link linkend="btkRemoveEvent">btkRemoveEvent</link> to set acquisition's events</para>
+    <para>Remove the analog channels of the acquisition</para>
+    <para> Use functions <link linkend="btkAppendAnalog">btkAppendAnalog</link> and <link linkend="btkRemoveAnalog">btkRemoveAnalog</link> to set acquisition's analog channels</para>
     <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained by the use of a btk* function.</para>
   </refsection>
   <refsection>
     <title>Examples</title>
-    <programlisting role="example">btkClearEvents(h)</programlisting>
+    <programlisting role="example">btkClearAnalogs(h)</programlisting>
   </refsection>
   <refsection>
     <title>See Also</title>
     <simplelist type="inline">
       <member>
-        <link linkend="btkAppendEvent">btkAppendEvent</link>
+        <link linkend="btkAppendEvent">btkAppendAnalog</link>
       </member>
       <member>
-        <link linkend="btkRemoveEvent">btkRemoveEvent</link>
+        <link linkend="btkRemoveEvent">btkRemoveAnalog</link>
       </member>
     </simplelist>
   </refsection>

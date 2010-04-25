@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<refentry version="5.0-subset Scilab" xml:id="btkClearEvents" xml:lang="en"
+<refentry version="5.0-subset Scilab" xml:id="btkClearPoints" xml:lang="en"
           xmlns="http://docbook.org/ns/docbook"
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xmlns:svg="http://www.w3.org/2000/svg"
@@ -10,12 +10,12 @@
     <pubdate>$LastChangedDate$</pubdate>
   </info>
   <refnamediv>
-    <refname>btkClearEvents</refname>
-    <refpurpose>Clear acquisition's events</refpurpose>
+    <refname>btkClearPoints</refname>
+    <refpurpose>Clear acquisition's points</refpurpose>
   </refnamediv>
   <refsynopsisdiv>
     <title>Calling Sequence</title>
-    <synopsis>btkClearEvents(h)</synopsis>
+    <synopsis>btkClearPoints(h)</synopsis>
   </refsynopsisdiv>
   <refsection>
     <title>Parameters</title>
@@ -28,22 +28,22 @@
   </refsection>
   <refsection>
     <title>Description</title>
-    <para>Remove the events of the acquisition</para>
-    <para> Use functions <link linkend="btkAppendEvent">btkAppendEvent</link> and <link linkend="btkRemoveEvent">btkRemoveEvent</link> to set acquisition's events</para>
+    <para>Remove the points of the acquisition</para>
+    <para> Use functions <link linkend="btkAppendPoint">btkAppendPoint</link> and <link linkend="btkRemovePoint">btkRemovePoint</link> to set acquisition's points</para>
     <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained by the use of a btk* function.</para>
   </refsection>
   <refsection>
     <title>Examples</title>
-    <programlisting role="example">btkClearEvents(h)</programlisting>
+    <programlisting role="example">btkClearPoints(h)</programlisting>
   </refsection>
   <refsection>
     <title>See Also</title>
     <simplelist type="inline">
       <member>
-        <link linkend="btkAppendEvent">btkAppendEvent</link>
+        <link linkend="btkAppendPoint">btkAppendPoint</link>
       </member>
       <member>
-        <link linkend="btkRemoveEvent">btkRemoveEvent</link>
+        <link linkend="btkRemovePoint">btkRemovePoint</link>
       </member>
     </simplelist>
   </refsection>
