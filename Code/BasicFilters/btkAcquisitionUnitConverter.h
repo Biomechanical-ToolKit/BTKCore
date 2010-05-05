@@ -98,9 +98,9 @@ namespace btk
       return false;
     else
     {
-      for (int i = 0 ; i < cols ; ++i)
+      for (size_t i = 0 ; i < cols ; ++i)
       {
-        for (int j = 0 ; j < rows ; ++j)
+        for (size_t j = 0 ; j < rows ; ++j)
         {
           values[j + i*columnsStep + alreadyConverted] = static_cast<float>(values[j + i*columnsStep + alreadyConverted] * scales[j]);
         }

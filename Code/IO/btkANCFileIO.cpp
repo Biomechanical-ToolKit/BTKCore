@@ -211,7 +211,7 @@ namespace btk
         // Extract values
         std::string buf;
         double val = 0.0;
-        for(int i = 0 ; i < numberOfFrames ; ++i)
+        for(size_t i = 0 ; i < numberOfFrames ; ++i)
         {
           ifs >> buf; // Time's value          
           for (AnalogCollection::Iterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)

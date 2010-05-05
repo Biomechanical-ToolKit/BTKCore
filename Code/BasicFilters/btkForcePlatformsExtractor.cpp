@@ -171,7 +171,7 @@ namespace btk
         int calMatrixStep = 0;
         if (itCalMatrix == (*itForcePlatformGr)->End())
         {
-          for(int i = 0 ; i < numberOfForcePlatforms ; ++i)
+          for(size_t i = 0 ; i < numberOfForcePlatforms ; ++i)
           {
             if (types[i] > 3)
             {
@@ -194,7 +194,7 @@ namespace btk
         int calMatrixCoefficentNumberAleadyExtracted = 0;
         bool noError = true;
 
-        for(int i = 0 ; i < numberOfForcePlatforms ; ++i)
+        for(size_t i = 0 ; i < numberOfForcePlatforms ; ++i)
         {
           switch(types[i])
           {
@@ -290,7 +290,7 @@ namespace btk
     }
   };
   
-  void ForcePlatformsExtractor::ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, int idx, int coefficientsAlreadyExtracted, MetaData::Pointer pOrigin, MetaData::Pointer pCorners, MetaData::Pointer pCalMatrix)
+  void ForcePlatformsExtractor::ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, size_t idx, int coefficientsAlreadyExtracted, MetaData::Pointer pOrigin, MetaData::Pointer pCorners, MetaData::Pointer pCalMatrix)
   {
     MetaDataInfo::Pointer pValue;
     if (pOrigin.get() != 0)
@@ -306,7 +306,7 @@ namespace btk
     if (pCorners.get() != 0)
     {
       pValue = pCorners->GetInfo();
-      if (static_cast<int>(pValue->GetValues().size()) >= 12 * (idx + 1))
+      if (pValue->GetValues().size() >= 12 * (idx + 1))
       {
         for (int i = 0 ; i < 4 ; ++i)
           for (int j = 0 ; j < 3 ; ++j)
@@ -317,7 +317,7 @@ namespace btk
     {
       pValue = pCalMatrix->GetInfo();
       ForcePlatform::CalMatrix cal = fp->GetCalMatrix();
-      if (static_cast<int>(pValue->GetValues().size()) >= (coefficientsAlreadyExtracted + cal.size()))
+      if (static_cast<size_t>(pValue->GetValues().size()) >= (coefficientsAlreadyExtracted + cal.size()))
       {
         for (int i = 0 ; i < cal.cols() ; ++i)
           for (int j = 0 ; j < cal.rows() ; ++j)

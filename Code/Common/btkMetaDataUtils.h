@@ -75,7 +75,7 @@ namespace btk
         size_t num = target.size() + values.size();
         if (values.size() != 0)
         {
-          if ((num >= targetFinalSize) && (targetFinalSize != -1))
+          if ((static_cast<int>(num) >= targetFinalSize) && (targetFinalSize != -1))
             std::advance(itVal, targetFinalSize - target.size());
           else
             itVal = values.end();

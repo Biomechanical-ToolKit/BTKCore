@@ -70,7 +70,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
         if (it != (*itAnalysis)->End())
         {
           num = ((numberOfParameters > (*it)->GetInfo()->GetValues().size()) ? (*it)->GetInfo()->GetValues().size() : numberOfParameters);
-          for (int i = 0 ; i < num ; ++i)
+          for (size_t i = 0 ; i < num ; ++i)
           {
             std::string& str = entryValues[inc][i];
             str = (*it)->GetInfo()->ToString(i);
@@ -147,7 +147,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
   // Second output (optionnal)
   if (nlhs != 2)
   {
-    for (int i = 0 ; i < numberOfParameters ; ++i)
+    for (size_t i = 0 ; i < numberOfParameters ; ++i)
       delete[] fieldnames[i];
     delete[] fieldnames;
   }
@@ -161,7 +161,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
     mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfParameters), (const char**)fieldnames);
     mxArray* unitsStruct = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfParameters), (const char**)fieldnames);
     
-    for (int i = 0 ; i < numberOfParameters ;++i)
+    for (int i = 0 ; i < static_cast<int>(numberOfParameters) ; ++i)
     {
       mxSetFieldByNumber(subjectsStruct, 0, i, mxCreateString((const char*)entryValues[2][i].c_str()));
       mxSetFieldByNumber(unitsStruct, 0, i, mxCreateString((const char*)entryValues[3][i].c_str()));

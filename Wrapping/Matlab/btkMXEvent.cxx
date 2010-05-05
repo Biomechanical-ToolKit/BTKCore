@@ -202,7 +202,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
  }
  plhs[0] = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfEvents), (const char**)fieldnames_sorted);
 
- for(int i = 0 ; i < numberOfEvents ; ++i)
+ for(size_t i = 0 ; i < numberOfEvents ; ++i)
  {
    mxArray* value = mxCreateDoubleMatrix(1, times_sorted[i].size(), mxREAL);
    double* v = mxGetPr(value);
@@ -214,7 +214,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
  // Second output (optionnal)
  if (nlhs != 2)
  {
-   for (int i = 0 ; i < numberOfEvents ; ++i)
+   for (size_t i = 0 ; i < numberOfEvents ; ++i)
      delete[] fieldnames[i];
    delete[] fieldnames;
    delete[] fieldnames_sorted;
@@ -228,7 +228,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
    mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfEvents), (const char**)fieldnames_sorted);
 
    int inc = 0;
-   for (int i = 0 ; i < numberOfEvents ; ++i)
+   for (int i = 0 ; i < static_cast<int>(numberOfEvents) ; ++i)
    {
      mxSetFieldByNumber(subjectsStruct, 0, i, mxCreateString(subjects_sorted[i].c_str()));
      delete[] fieldnames[inc];

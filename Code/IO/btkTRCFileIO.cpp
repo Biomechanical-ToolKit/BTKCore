@@ -201,7 +201,7 @@ namespace btk
           (*it)->SetLabel(*itLabel);
           ++itLabel;
         }
-        for(int i = 0 ; i < numberOfFrames ; ++i)
+        for(size_t i = 0 ; i < numberOfFrames ; ++i)
         {
           ifs >> buf; // Frame#
           ifs >> buf; // Time

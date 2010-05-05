@@ -156,7 +156,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       {
       std::vector<std::string> values = std::vector<std::string>(numberOfValues, "");
       size_t maxLen = 0;
-      for (int i = 0 ; i < numberOfValues ; ++i)
+      for (int i = 0 ; i < static_cast<int>(numberOfValues) ; ++i)
       {
         mxArray* temp = mxGetCell(mxValues, i);
         if (!temp || !mxIsChar(temp))
@@ -183,7 +183,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       {
       double* temp = mxGetPr(mxValues);
       std::vector<int8_t> values = std::vector<int8_t>(numberOfValues, 0);
-      for (int i = 0 ; i < numberOfValues ; ++i)
+      for (size_t i = 0 ; i < numberOfValues ; ++i)
         values[i] = static_cast<int8_t>(temp[i]);
       md->SetInfo(btk::MetaDataInfo::New(dims, values));
       break;
@@ -192,7 +192,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       {
       double* temp = mxGetPr(mxValues);
       std::vector<int16_t> values = std::vector<int16_t>(numberOfValues, 0);
-      for (int i = 0 ; i < numberOfValues ; ++i)
+      for (size_t i = 0 ; i < numberOfValues ; ++i)
         values[i] = static_cast<int16_t>(temp[i]);
       md->SetInfo(btk::MetaDataInfo::New(dims, values));
       break;
@@ -201,7 +201,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       {
       double* temp = mxGetPr(mxValues);
       std::vector<float> values = std::vector<float>(numberOfValues, 0);
-      for (int i = 0 ; i < numberOfValues ; ++i)
+      for (size_t i = 0 ; i < numberOfValues ; ++i)
         values[i] = static_cast<float>(temp[i]);
       md->SetInfo(btk::MetaDataInfo::New(dims, values));
       break;
