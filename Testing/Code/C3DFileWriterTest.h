@@ -910,6 +910,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
     TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
     TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+    
+    TS_ASSERT_DELTA(acq2->GetMetaData()->GetChild("ANALOG")->GetChild("RATE")->GetInfo()->ToFloat(0), acq->GetAnalogFrequency(), 1e-5);
+    
     for (int i = 1 ; i < 50 ; ++i)
     {
       for (int j = 0 ; j < acq->GetPointNumber() ; ++j)

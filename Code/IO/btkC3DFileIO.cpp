@@ -1027,7 +1027,7 @@ namespace btk
       if (this->HasWritingFlag(ScalesFromMetaDataUpdate))
         this->UpdateScalingFactorsFromMetaData(in);
       if (this->HasWritingFlag(MetaDataFromDataUpdate))
-        this->UpdateMetaDataFromData(in, frameNumber);
+        this->UpdateMetaDataFromData(in, frameNumber, input->GetNumberAnalogSamplePerFrame());
       
       // Acquisition
       bool templateFile = true;
@@ -1539,7 +1539,7 @@ namespace btk
   /**
    * Update acquisition's metadata from its data.
    */
-  void C3DFileIO::UpdateMetaDataFromData(Acquisition::Pointer input, int numberOfFrames)
+  void C3DFileIO::UpdateMetaDataFromData(Acquisition::Pointer input, int numberOfFrames, int numberAnalogSamplePerFrame)
   {
     // POINT group
     // -----------
@@ -1655,7 +1655,7 @@ namespace btk
     // ANALOG:GEN_SCALE
     MetaDataCreateChild(analog, "GEN_SCALE", static_cast<float>(this->m_AnalogUniversalScale)); 
     // ANALOG:RATE
-    MetaDataCreateChild(analog, "RATE", static_cast<float>(input->GetAnalogFrequency()));
+    MetaDataCreateChild(analog, "RATE", static_cast<float>(input->GetPointFrequency() * static_cast<double>(numberAnalogSamplePerFrame)));
     // ANALOG:BITS
     int16_t bits = static_cast<int16_t>(input->GetAnalogResolution());
     MetaDataCreateChild(analog, "BITS", bits);
