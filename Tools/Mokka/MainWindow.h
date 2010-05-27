@@ -41,23 +41,10 @@
 #include "PointsEditor.h"
 #include "UserRoles.h"
 
+#include <btkAcquisitionFileIO.h>
+
 #include <QTimer>
 #include <QUndoStack>
-
-#include <btkProcessObject.h>
-#include <btkAcquisition.h>
-#include <btkAcquisitionFileIO.h>
-#include <btkVTKAxesWidget.h>
-
-#include <map>
-
-#include <vtkObject.h>
-#include <vtkRenderer.h>
-#include <vtkMapperCollection.h>
-#include <vtkEventQtSlotConnect.h>
-
-class vtkStreamingDemandDrivenPipelineCollection;
-class vtkProcessMap;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -67,14 +54,6 @@ public:
   MainWindow(QWidget* parent = 0);
   ~MainWindow();
 
-  void initialize();
-  void setVTKMarkerRadius(int id, double r);
-  double VTKMarkerRadius(int id);
-  void setVTKMarkerColorIndex(int id, int idx);
-  int VTKMarkerColorIndex(int id);
-  void setVTKMarkerVisibility(int id, bool visible);
-  bool VTKMarkerVisibility(int id);
-  
   PointsEditor* mp_PointsEditorDlg;
 
 protected:
@@ -98,7 +77,6 @@ public Q_SLOTS:
   void closeFile();
   void changePlaybackParameters();
   void changeGroundOrientation();
-  void updateDisplay(int frame);
   // Markers dock
   void editMarkerLabel();
   void editMarkerDescription();
@@ -113,10 +91,12 @@ public Q_SLOTS:
   void hideSelectedMarkers();
   void showAllMarkers();
   void hideAllMarkers();
-  void updateMarkerVisibility(QTableWidgetItem* item);
   void updateMarkerRadius(double r);
   void toggleMarkerProperties();
   void focusOnMarkerLabelEdition();
+  void updateDisplayedMarkersList(const QVector<int>& ids);
+  void selectPickedMarker(int id);
+  void selectPickedMarkers(int id);
   // Events dock
   void editEventLabel();
   void editEventContext(const QString& context);
@@ -136,10 +116,6 @@ public Q_SLOTS:
   void toggleTimer();
   void displayPreviousFrame();
   void displayNextFrame();
-  // Qt / VTK
-  void updateDisplayedMarkersList(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  void selectPickedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   
 private:
   void openFile(const QString& filename);
@@ -154,15 +130,8 @@ private:
   void displayPreviousFrame(int step);
   void displayNextFrame(int step);
   
-  int m_FirstFrame;
-  std::map<int, btk::ProcessObject::Pointer> m_BTKProc;
-  vtkProcessMap* mp_VTKProc;
+  btk::Acquisition::Pointer mp_Acquisition;
   Metadata* mp_MetadataDlg;
-  btk::VTKAxesWidget* mp_AxesWidget;
-  vtkRenderer* mp_Renderer;
-  vtkMapperCollection* mp_Mappers;
-  vtkStreamingDemandDrivenPipelineCollection* mp_Syncro;
-  vtkEventQtSlotConnect* mp_EventQtSlotConnections;
   int m_PlaybackStep;
   int m_PlaybackDelay;
 

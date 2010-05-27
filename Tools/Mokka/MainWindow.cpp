@@ -41,18 +41,6 @@
 
 #include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileWriter.h>
-#include <btkDownsampleFilter.h>
-#include <btkWrenchCollection.h>
-#include <btkSpecializedPointsExtractor.h>
-#include <btkForcePlatformsExtractor.h>
-#include <btkGroundReactionWrenchFilter.h>
-#include <btkVTKForcePlatformsSource.h>
-#include <btkVTKGRFsFramesSource.h>
-#include <btkVTKPickerInteractionCallback.h>
-#include <btkVTKCommandEvents.h>
-#include <btkVTKInteractorStyleTrackballCamera.h>
-#include <btkVTKAxesWidget.h>
-#include <btkVTKMarkersFramesSource.h>
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -64,33 +52,183 @@
 #include <QSettings>
 #include <QDesktopServices>
 
-#include <vtkInformation.h>
-#include <vtkIdList.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
-#include <vtkActor.h>
-#include <vtkRenderWindow.h>
-#include <vtkCompositeDataPipeline.h>
-#include <vtkCamera.h>
-#include <vtkTextActor.h>
-#include <vtkTextProperty.h>
-#include <vtkstd/list>
-#include <vtkstd/map>
-#include <vtkStreamingDemandDrivenPipeline.h>
-#include <vtkCellPicker.h>
-#include <vtkCallbackCommand.h>
-#include <vtkAxesActor.h>
-#include <vtkPlaneSource.h>
-#include <vtkObjectBase.h>
+MainWindow::MainWindow(QWidget* parent)
+:QMainWindow(parent), mp_Acquisition(), m_LastDirectory(".")
+{
+  // Members
+  this->mp_Timer = new QTimer(this);
+  this->mp_MetadataDlg = new Metadata(this);
+  this->mp_PointsEditorDlg = new PointsEditor(this);
+  this->m_PlaybackStep = 1;
+  this->m_PlaybackDelay = 33; // 33 msec
+  this->mp_PlayIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_play.png"));
+  this->mp_PauseIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_pause.png"));
+  this->mp_DownArrow = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallDownBlack.png"));
+  this->mp_RightArrow = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallRightBlack.png"));
 
-enum {BTK_READER, BTK_MARKERS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
-enum {VTK_GROUND, VTK_FORCE_PLATFORMS, VTK_MARKERS, VTK_GRFS};
+  // Finalize UI
+  // Qt UI
+  this->setupUi(this);
+#ifdef Q_OS_MAC
+  QFont f = informationsDock->font();
+  f.setPointSize(10);
+  this->informationsDock->setFont(f);
+  this->markersDock->setFont(f);
+  this->markerPropertiesButton->setFont(f);
+  this->eventsDock->setFont(f);
+  this->eventInformationsButton->setFont(f);
+  this->eventsTable->setFont(f);
+  f.setPointSize(11);
+  this->showMarkersButton->setFont(f);
+  this->hideMarkersButton->setFont(f);
+#endif
+  this->markersDock->setVisible(false);
+  this->markerProperties->setVisible(false);
+  this->markerPropertiesButton->setIcon(*this->mp_RightArrow);
+  this->eventsDock->setVisible(false);
+  this->eventInformations->setVisible(false);
+  this->eventInformationsButton->setIcon(*this->mp_RightArrow);
+  this->informationsDock->setVisible(false);
+  this->informationsDock->setFloating(true); // To not show a blinking rectangle at the startup
+  this->action_FileOpen->setShortcut(QKeySequence::Open);
+  this->actionClose->setShortcut(QKeySequence::Close);
+  this->actionSave->setShortcut(QKeySequence::Save);
+  this->actionSave_As->setShortcut(QKeySequence::SaveAs);
+  this->actionCut->setShortcut(QKeySequence::Cut);
+  this->actionCopy->setShortcut(QKeySequence::Copy);
+  this->actionPaste->setShortcut(QKeySequence::Paste);
+  this->actionSelect_All->setShortcut(QKeySequence::SelectAll);
+  this->mp_PlaybackSpeedActionGroup = new QActionGroup(this);
+  this->mp_PlaybackSpeedActionGroup->addAction(actionRealtime);
+  this->mp_PlaybackSpeedActionGroup->addAction(action1_2);
+  this->mp_PlaybackSpeedActionGroup->addAction(action1_5);
+  this->mp_PlaybackSpeedActionGroup->addAction(action1_10);
+  this->mp_PlaybackSpeedActionGroup->addAction(actionFull_Frames);
+  this->mp_GroundOrientationActionGroup = new QActionGroup(this);
+  this->mp_GroundOrientationActionGroup->addAction(actionPlane_XY);
+  this->mp_GroundOrientationActionGroup->addAction(actionPlane_YZ);
+  this->mp_GroundOrientationActionGroup->addAction(actionPlane_ZX);
+  this->markerRadiusSpinBox->clear();
+  this->eventTimeSpinBox->clear();
+  for (int i = 0 ; i < maxRecentFiles ; ++i)
+  {
+      this->mp_ActionRecentFiles[i] = new QAction(this);
+      this->mp_ActionRecentFiles[i]->setVisible(false);
+      connect(this->mp_ActionRecentFiles[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
+      this->menuOpen_Recent->addAction(this->mp_ActionRecentFiles[i]);
+  }
+  this->mp_ActionSeparatorRecentFiles = this->menuOpen_Recent->addSeparator();
+  this->menuOpen_Recent->addAction(this->actionClear_Menu);
+  connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
+  QAction* actionMarkersDockView = this->markersDock->toggleViewAction();
+  QAction* actionEventsDockView = this->eventsDock->toggleViewAction();
+  QAction* actionInformationsDockView = this->informationsDock->toggleViewAction();
+  actionMarkersDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+  actionEventsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
+  actionMarkersDockView->setText(QObject::tr("Markers List"));
+  actionEventsDockView->setText(QObject::tr("Events List"));
+  this->menuView->addAction(actionInformationsDockView);
+  this->menuView->addAction(actionMarkersDockView);
+  this->menuView->addAction(actionEventsDockView);
+  
+  // Viz3D
+  this->qvtkWidget->initialize();
 
-class vtkStreamingDemandDrivenPipelineCollection : public vtkstd::list<vtkStreamingDemandDrivenPipeline*>
-{};
+  // Qt UI: Undo/Redo
+  this->mp_UndoStack = new QUndoStack(this);
+  connect(this->mp_UndoStack, SIGNAL(indexChanged(int)), this, SLOT(setAcquisitionModified(int)));
+  QAction* actionUndo = this->mp_UndoStack->createUndoAction(this);
+  actionUndo->setShortcut(QKeySequence::Undo);
+  QAction* actionRedo = this->mp_UndoStack->createRedoAction(this);
+  actionRedo->setShortcut(QKeySequence::Redo);
+  this->menuEdit->insertAction(this->actionCut, actionUndo);
+  this->menuEdit->insertAction(this->actionCut, actionRedo);
+  this->menuEdit->insertSeparator(this->actionCut);
 
-class vtkProcessMap : public vtkstd::map<int, vtkObjectBase*>
-{};
+  // Qt Signal/Slot connection
+  // Menu
+  connect(this->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+  connect(this->actionVisit_BTK_website, SIGNAL(triggered()), this, SLOT(visitBTKWebsite()));
+  connect(this->actionEdit_Metadata, SIGNAL(triggered()), this, SLOT(editMetadata()));
+  connect(this->actionEdit_Points, SIGNAL(triggered()), this, SLOT(editPoints()));
+  connect(this->action_FileOpen, SIGNAL(triggered()), this, SLOT(openFile()));
+  connect(this->actionSave, SIGNAL(triggered()), this, SLOT(saveFile()));
+  connect(this->actionSave_As, SIGNAL(triggered()), this, SLOT(saveAsFile()));
+  connect(this->actionClose, SIGNAL(triggered()), this, SLOT(closeFile()));
+  connect(this->action_Quit, SIGNAL(triggered()), this, SLOT(close()));
+  connect(this->mp_PlaybackSpeedActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changePlaybackParameters()));
+  connect(this->mp_GroundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
+  // Playback
+  connect(this->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(updateActiveEvent(int)));
+  connect(this->frameSlider, SIGNAL(valueChanged(int)), this->qvtkWidget, SLOT(updateDisplay(int)));
+  connect(this->playButton, SIGNAL(clicked()), this, SLOT(toggleTimer()));
+  connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(displayNextFrame()));
+  // Viz3D
+  connect(this->qvtkWidget, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
+  connect(this->qvtkWidget, SIGNAL(visibleMarkersChanged(QVector<int>)), this, SLOT(updateDisplayedMarkersList(QVector<int>)));
+  connect(this->qvtkWidget, SIGNAL(pickedMarkerChanged(int)), this, SLOT(selectPickedMarker(int)));
+  connect(this->qvtkWidget, SIGNAL(pickedMarkersChanged(int)), this, SLOT(selectPickedMarkers(int)));
+  // Markers dock
+  connect(this->markersTable, SIGNAL(itemChanged(QTableWidgetItem*)), this->qvtkWidget, SLOT(updateMarkerVisibility(QTableWidgetItem*)));
+  connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayMarkerProperties()));
+  connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(toggleMarkersVisibilityButtons()));
+  connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(circleSelectedMarkers()));
+  connect(this->markersTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(focusOnMarkerLabelEdition()));
+  connect(this->markerRadiusSlider, SIGNAL(valueChanged(int)), this, SLOT(updateMarkerRadiusSpinBox(int)));
+  connect(this->markerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateMarkerRadius(double)));
+  connect(this->showMarkersButton, SIGNAL(clicked()), this, SLOT(showAllMarkers()));
+  connect(this->hideMarkersButton, SIGNAL(clicked()), this, SLOT(hideAllMarkers()));
+  connect(this->markerPropertiesButton, SIGNAL(clicked()), this, SLOT(toggleMarkerProperties()));
+  connect(this->markerLabelEdit, SIGNAL(editingFinished()), this, SLOT(editMarkerLabel()));
+  connect(this->markerDescEdit, SIGNAL(editingFinished()), this, SLOT(editMarkerDescription()));
+  connect(this->markerRadiusSpinBox, SIGNAL(editingFinished()), this, SLOT(editMarkerRadius()));
+  connect(this->markerRadiusSlider, SIGNAL(sliderReleased()), this, SLOT(editMarkerRadius()));
+  connect(this->markerColorButton, SIGNAL(clicked(bool)), this, SLOT(editMarkerColor()));
+  connect(this->markersDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(markersDockLocationChanged(Qt::DockWidgetArea)));
+  // Events dock
+  connect(this->eventsTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(focusOnEventEdition()));
+  connect(this->eventsTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateEventInternalInformations(QTableWidgetItem*)));
+  connect(this->eventsTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayEventInformations()));
+  connect(this->eventsTable, SIGNAL(itemSelectionChanged()), this, SLOT(updateEventsButtonsState()));
+  connect(this->showEventButton, SIGNAL(clicked()), this, SLOT(showEvent()));
+  connect(this->newEventButton, SIGNAL(clicked()), this, SLOT(newEvent()));
+  connect(this->deleteEventButton, SIGNAL(clicked()), this, SLOT(deleteEvent()));
+  connect(this->eventLabelEdit, SIGNAL(editingFinished()), this, SLOT(editEventLabel()));
+  connect(this->eventContextCombo, SIGNAL(activated(QString)), this, SLOT(editEventContext(QString)));
+  connect(this->eventTimeSpinBox, SIGNAL(editingFinished()), this, SLOT(editEventTime()));
+  connect(this->eventSubjectEdit, SIGNAL(editingFinished()), this, SLOT(editEventSubject()));
+  connect(this->eventsDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(eventsDockLocationChanged(Qt::DockWidgetArea)));
+  connect(this->eventInformationsButton, SIGNAL(clicked()), this, SLOT(toggleEventInformations()));
+
+  // Event filter
+  this->qvtkWidget->installEventFilter(this);
+  this->frameSlider->installEventFilter(this);
+  this->markersTable->installEventFilter(this);
+  this->eventsTable->installEventFilter(this);
+  this->markerRadiusSpinBox->installEventFilter(this);
+  this->markerLabelEdit->installEventFilter(this);
+  this->markerDescEdit->installEventFilter(this);
+  this->eventLabelEdit->installEventFilter(this);
+  this->eventContextCombo->installEventFilter(this);
+  this->eventTimeSpinBox->installEventFilter(this);
+  this->eventSubjectEdit->installEventFilter(this);
+
+  // Settings
+  QCoreApplication::setOrganizationName("BTK");
+  QCoreApplication::setOrganizationDomain("btk.org");
+  QCoreApplication::setApplicationName("Mokka");
+  this->readSettings();
+  this->setCurrentFile("");
+};
+
+MainWindow::~MainWindow()
+{
+  delete this->mp_PlayIcon;
+  delete this->mp_PauseIcon;
+  delete this->mp_DownArrow;
+  delete this->mp_RightArrow;
+};
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
@@ -213,386 +351,8 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
   return QMainWindow::eventFilter(obj, event);
 };
 
-MainWindow::MainWindow(QWidget* parent)
-:QMainWindow(parent), m_BTKProc(), m_LastDirectory(".")
-{
-  // Members
-  this->mp_Syncro = new vtkStreamingDemandDrivenPipelineCollection();
-  this->mp_Timer = new QTimer(this);
-  this->mp_Renderer = vtkRenderer::New();
-  this->mp_Mappers = vtkMapperCollection::New();
-  this->mp_EventQtSlotConnections = vtkEventQtSlotConnect::New();
-  this->mp_VTKProc = new vtkProcessMap();
-  this->m_FirstFrame = 1;
-  this->mp_MetadataDlg = new Metadata(this);
-  this->mp_PointsEditorDlg = new PointsEditor(this);
-  this->mp_AxesWidget = 0;
-  this->m_PlaybackStep = 1;
-  this->m_PlaybackDelay = 33; // 33 msec
-  this->mp_PlayIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_play.png"));
-  this->mp_PauseIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_pause.png"));
-  this->mp_DownArrow = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallDownBlack.png"));
-  this->mp_RightArrow = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallRightBlack.png"));
-
-  // Finalize UI
-  // Qt UI
-  this->setupUi(this);
-#ifdef Q_OS_MAC
-  QFont f = informationsDock->font();
-  f.setPointSize(10);
-  this->informationsDock->setFont(f);
-  this->markersDock->setFont(f);
-  this->markerPropertiesButton->setFont(f);
-  this->eventsDock->setFont(f);
-  this->eventInformationsButton->setFont(f);
-  this->eventsTable->setFont(f);
-  f.setPointSize(11);
-  this->showMarkersButton->setFont(f);
-  this->hideMarkersButton->setFont(f);
-#endif
-  this->markersDock->setVisible(false);
-  this->markerProperties->setVisible(false);
-  this->markerPropertiesButton->setIcon(*this->mp_RightArrow);
-  this->eventsDock->setVisible(false);
-  this->eventInformations->setVisible(false);
-  this->eventInformationsButton->setIcon(*this->mp_RightArrow);
-  this->informationsDock->setVisible(false);
-  this->informationsDock->setFloating(true); // To not show a blinking rectangle at the startup
-  this->action_FileOpen->setShortcut(QKeySequence::Open);
-  this->actionClose->setShortcut(QKeySequence::Close);
-  this->actionSave->setShortcut(QKeySequence::Save);
-  this->actionSave_As->setShortcut(QKeySequence::SaveAs);
-  this->actionCut->setShortcut(QKeySequence::Cut);
-  this->actionCopy->setShortcut(QKeySequence::Copy);
-  this->actionPaste->setShortcut(QKeySequence::Paste);
-  this->actionSelect_All->setShortcut(QKeySequence::SelectAll);
-  this->mp_PlaybackSpeedActionGroup = new QActionGroup(this);
-  this->mp_PlaybackSpeedActionGroup->addAction(actionRealtime);
-  this->mp_PlaybackSpeedActionGroup->addAction(action1_2);
-  this->mp_PlaybackSpeedActionGroup->addAction(action1_5);
-  this->mp_PlaybackSpeedActionGroup->addAction(action1_10);
-  this->mp_PlaybackSpeedActionGroup->addAction(actionFull_Frames);
-  this->mp_GroundOrientationActionGroup = new QActionGroup(this);
-  this->mp_GroundOrientationActionGroup->addAction(actionPlane_XY);
-  this->mp_GroundOrientationActionGroup->addAction(actionPlane_YZ);
-  this->mp_GroundOrientationActionGroup->addAction(actionPlane_ZX);
-  this->markerRadiusSpinBox->clear();
-  this->eventTimeSpinBox->clear();
-  for (int i = 0 ; i < maxRecentFiles ; ++i)
-  {
-      this->mp_ActionRecentFiles[i] = new QAction(this);
-      this->mp_ActionRecentFiles[i]->setVisible(false);
-      connect(this->mp_ActionRecentFiles[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
-      this->menuOpen_Recent->addAction(this->mp_ActionRecentFiles[i]);
-  }
-  this->mp_ActionSeparatorRecentFiles = this->menuOpen_Recent->addSeparator();
-  this->menuOpen_Recent->addAction(this->actionClear_Menu);
-  connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
-  QAction* actionMarkersDockView = this->markersDock->toggleViewAction();
-  QAction* actionEventsDockView = this->eventsDock->toggleViewAction();
-  QAction* actionInformationsDockView = this->informationsDock->toggleViewAction();
-  actionMarkersDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
-  actionEventsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
-  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
-  actionMarkersDockView->setText(QObject::tr("Markers List"));
-  actionEventsDockView->setText(QObject::tr("Events List"));
-  this->menuView->addAction(actionInformationsDockView);
-  this->menuView->addAction(actionMarkersDockView);
-  this->menuView->addAction(actionEventsDockView);
-
-  // Qt UI: Undo/Redo
-  this->mp_UndoStack = new QUndoStack(this);
-  connect(this->mp_UndoStack, SIGNAL(indexChanged(int)), this, SLOT(setAcquisitionModified(int)));
-  QAction* actionUndo = this->mp_UndoStack->createUndoAction(this);
-  actionUndo->setShortcut(QKeySequence::Undo);
-  QAction* actionRedo = this->mp_UndoStack->createRedoAction(this);
-  actionRedo->setShortcut(QKeySequence::Redo);
-  this->menuEdit->insertAction(this->actionCut, actionUndo);
-  this->menuEdit->insertAction(this->actionCut, actionRedo);
-  this->menuEdit->insertSeparator(this->actionCut);
-  // VTK UI
-  //this->mp_Renderer->TwoSidedLightingOn();
-  vtkRenderWindow* renwin = vtkRenderWindow::New();
-  renwin->AddRenderer(this->mp_Renderer);
-  this->qvtkWidget->SetRenderWindow(renwin);
-  renwin->Delete();
-  // VTK cell picker
-  vtkCellPicker* cellPicker = vtkCellPicker::New();
-  cellPicker->SetTolerance(0.001);
-  this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetPicker(cellPicker);
-  cellPicker->Delete();
-  // VTK interaction style
-  btk::VTKInteractorStyleTrackballCamera* style = btk::VTKInteractorStyleTrackballCamera::New();
-  vtkCallbackCommand* pickerMouseInteraction = vtkCallbackCommand::New();
-  pickerMouseInteraction->SetClientData(style);
-  pickerMouseInteraction->SetCallback(&btk::VTKPickerInteractionCallback);
-  style->AddObserver(vtkCommand::LeftButtonPressEvent, pickerMouseInteraction);
-  style->AddObserver(vtkCommand::MouseMoveEvent, pickerMouseInteraction);
-  style->AddObserver(vtkCommand::LeftButtonReleaseEvent, pickerMouseInteraction);
-  this->qvtkWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
-  pickerMouseInteraction->Delete();
-  style->Delete();
-
-  // Qt Signal/Slot connection
-  // Menu
-  connect(this->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-  connect(this->actionVisit_BTK_website, SIGNAL(triggered()), this, SLOT(visitBTKWebsite()));
-  connect(this->actionEdit_Metadata, SIGNAL(triggered()), this, SLOT(editMetadata()));
-  connect(this->actionEdit_Points, SIGNAL(triggered()), this, SLOT(editPoints()));
-  connect(this->action_FileOpen, SIGNAL(triggered()), this, SLOT(openFile()));
-  connect(this->actionSave, SIGNAL(triggered()), this, SLOT(saveFile()));
-  connect(this->actionSave_As, SIGNAL(triggered()), this, SLOT(saveAsFile()));
-  connect(this->actionClose, SIGNAL(triggered()), this, SLOT(closeFile()));
-  connect(this->action_Quit, SIGNAL(triggered()), this, SLOT(close()));
-  connect(this->mp_PlaybackSpeedActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changePlaybackParameters()));
-  connect(this->mp_GroundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
-  // Playback
-  connect(this->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(updateActiveEvent(int)));
-  connect(this->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(updateDisplay(int)));
-  connect(this->playButton, SIGNAL(clicked()), this, SLOT(toggleTimer()));
-  connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(displayNextFrame()));
-  // Viz3D
-  connect(this->qvtkWidget, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
-  // Markers dock
-  connect(this->markersTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateMarkerVisibility(QTableWidgetItem*)));
-  connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayMarkerProperties()));
-  connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(toggleMarkersVisibilityButtons()));
-  connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(circleSelectedMarkers()));
-  connect(this->markersTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(focusOnMarkerLabelEdition()));
-  connect(this->markerRadiusSlider, SIGNAL(valueChanged(int)), this, SLOT(updateMarkerRadiusSpinBox(int)));
-  connect(this->markerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateMarkerRadius(double)));
-  connect(this->showMarkersButton, SIGNAL(clicked()), this, SLOT(showAllMarkers()));
-  connect(this->hideMarkersButton, SIGNAL(clicked()), this, SLOT(hideAllMarkers()));
-  connect(this->markerPropertiesButton, SIGNAL(clicked()), this, SLOT(toggleMarkerProperties()));
-  connect(this->markerLabelEdit, SIGNAL(editingFinished()), this, SLOT(editMarkerLabel()));
-  connect(this->markerDescEdit, SIGNAL(editingFinished()), this, SLOT(editMarkerDescription()));
-  connect(this->markerRadiusSpinBox, SIGNAL(editingFinished()), this, SLOT(editMarkerRadius()));
-  connect(this->markerRadiusSlider, SIGNAL(sliderReleased()), this, SLOT(editMarkerRadius()));
-  connect(this->markerColorButton, SIGNAL(clicked(bool)), this, SLOT(editMarkerColor()));
-  connect(this->markersDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(markersDockLocationChanged(Qt::DockWidgetArea)));
-  // Events dock
-  connect(this->eventsTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(focusOnEventEdition()));
-  connect(this->eventsTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateEventInternalInformations(QTableWidgetItem*)));
-  connect(this->eventsTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayEventInformations()));
-  connect(this->eventsTable, SIGNAL(itemSelectionChanged()), this, SLOT(updateEventsButtonsState()));
-  connect(this->showEventButton, SIGNAL(clicked()), this, SLOT(showEvent()));
-  connect(this->newEventButton, SIGNAL(clicked()), this, SLOT(newEvent()));
-  connect(this->deleteEventButton, SIGNAL(clicked()), this, SLOT(deleteEvent()));
-  connect(this->eventLabelEdit, SIGNAL(editingFinished()), this, SLOT(editEventLabel()));
-  connect(this->eventContextCombo, SIGNAL(activated(QString)), this, SLOT(editEventContext(QString)));
-  connect(this->eventTimeSpinBox, SIGNAL(editingFinished()), this, SLOT(editEventTime()));
-  connect(this->eventSubjectEdit, SIGNAL(editingFinished()), this, SLOT(editEventSubject()));
-  connect(this->eventsDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(eventsDockLocationChanged(Qt::DockWidgetArea)));
-  connect(this->eventInformationsButton, SIGNAL(clicked()), this, SLOT(toggleEventInformations()));
-
-  // Event filter
-  this->qvtkWidget->installEventFilter(this);
-  this->frameSlider->installEventFilter(this);
-  this->markersTable->installEventFilter(this);
-  this->eventsTable->installEventFilter(this);
-  this->markerRadiusSpinBox->installEventFilter(this);
-  this->markerLabelEdit->installEventFilter(this);
-  this->markerDescEdit->installEventFilter(this);
-  this->eventLabelEdit->installEventFilter(this);
-  this->eventContextCombo->installEventFilter(this);
-  this->eventTimeSpinBox->installEventFilter(this);
-  this->eventSubjectEdit->installEventFilter(this);
-
-  // Settings
-  QCoreApplication::setOrganizationName("BTK");
-  QCoreApplication::setOrganizationDomain("btk.org");
-  QCoreApplication::setApplicationName("Mokka");
-  this->readSettings();
-  this->setCurrentFile("");
-};
-
-MainWindow::~MainWindow()
-{
-  delete this->mp_Syncro;
-  this->mp_AxesWidget->Delete();
-  this->mp_EventQtSlotConnections->Delete();
-  this->mp_Mappers->Delete();
-  this->mp_Renderer->Delete();
-  (*this->mp_VTKProc)[VTK_GROUND]->Delete();
-  (*this->mp_VTKProc)[VTK_FORCE_PLATFORMS]->Delete();
-  (*this->mp_VTKProc)[VTK_MARKERS]->Delete();
-  (*this->mp_VTKProc)[VTK_GRFS]->Delete();
-  delete this->mp_VTKProc;
-  vtkAlgorithm::SetDefaultExecutivePrototype(0);
-  delete this->mp_PlayIcon;
-  delete this->mp_PauseIcon;
-  delete this->mp_DownArrow;
-  delete this->mp_RightArrow;
-};
-
-void MainWindow::initialize()
-{
-  // BTK PIPELINE
-  btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-  reader->SetDisableFilenameExceptionState(true);
-  btk::SpecializedPointsExtractor::Pointer markersExtractor = btk::SpecializedPointsExtractor::New();
-  markersExtractor->SetInput(reader->GetOutput());
-  btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = btk::ForcePlatformsExtractor::New();
-  forcePlatformsExtractor->SetInput(reader->GetOutput());
-  btk::GroundReactionWrenchFilter::Pointer GRWsFilter = btk::GroundReactionWrenchFilter::New();
-  GRWsFilter->SetThresholdValue(5.0); // PWA are not computed from vertical forces lower than 5 newtons.
-  GRWsFilter->SetThresholdState(true);
-  GRWsFilter->SetInput(forcePlatformsExtractor->GetOutput());
-  btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = btk::DownsampleFilter<btk::WrenchCollection>::New();
-  GRWsDownsampler->SetInput(GRWsFilter->GetOutput());
-  // Store BTK process to be reused later.
-  this->m_BTKProc[BTK_READER] = reader;
-  this->m_BTKProc[BTK_MARKERS] = markersExtractor;
-  this->m_BTKProc[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
-  this->m_BTKProc[BTK_GRWS] = GRWsFilter;
-  this->m_BTKProc[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
-
-  // VTK WIDGET
-  this->mp_AxesWidget = btk::VTKAxesWidget::New();
-  this->mp_AxesWidget->SetParentRenderer(this->mp_Renderer);
-  this->mp_AxesWidget->SetInteractor(this->qvtkWidget->GetRenderWindow()->GetInteractor());
-  int* size = this->mp_Renderer->GetSize();
-  double xr = 150.0 / static_cast<double>(size[0]);
-  double yr = 150.0 / static_cast<double>(size[1]);
-  this->mp_AxesWidget->SetViewport(0.0, 0.0, xr, yr);
-  vtkAxesActor* axesActor = this->mp_AxesWidget->GetAxesActor();
-  axesActor->SetShaftTypeToCylinder();
-  axesActor->SetTotalLength( 1.25, 1.25, 1.25 );
-  axesActor->SetCylinderRadius( 0.500 * axesActor->GetCylinderRadius() );
-  axesActor->SetConeRadius( 1.025 * axesActor->GetConeRadius() );
-  axesActor->SetSphereRadius( 1.500 * axesActor->GetSphereRadius() );
-  this->mp_AxesWidget->SetEnabled(1);
-  
-  // VTK PIPELINE
-  // Static data
-  // Simple ground grid
-  vtkPlaneSource* ground = vtkPlaneSource::New();
-  ground->SetXResolution(30);
-  ground->SetYResolution(30);
-  ground->SetOrigin(-15.0, -15.0, 0.0);
-  ground->SetPoint1(15.0, -15.0, 0.0);
-  ground->SetPoint2(-15.0, 15.0, 0.0);
-  vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(ground->GetOutput());
-  vtkProperty* prop = vtkProperty::New();
-  prop->SetRepresentation(VTK_WIREFRAME);
-  prop->SetColor(0.8, 0.8, 0.8);
-  prop->SetAmbient(0.5);
-  prop->SetDiffuse(0.0);
-  prop->SetSpecular(0.0);
-  vtkActor* actor = vtkActor::New();
-  actor->SetMapper(mapper);
-  actor->SetProperty(prop);
-  actor->PickableOff();
-  this->mp_Renderer->AddViewProp(actor);
-  // Cleanup for ground
-  mapper->Delete();
-  actor->Delete();
-  prop->Delete();
-  // First render
-  this->mp_Renderer->GetActiveCamera()->Elevation(-60);
-  this->mp_Renderer->ResetCamera(); 
-  this->qvtkWidget->update();
-  // Pipeline for force plaforms
-  btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::New();
-  forcePlaforms->SetInput(forcePlatformsExtractor->GetOutput());
-  mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(forcePlaforms->GetOutputPort());
-  prop = vtkProperty::New();
-  prop->SetColor(1.0, 1.0, 0.0);
-  prop->SetAmbient(0.5);
-  prop->SetDiffuse(0.0);
-  prop->SetSpecular(0.0);
-  actor = vtkActor::New();
-  actor->SetMapper(mapper);
-  actor->SetScale(0.005);
-  actor->SetProperty(prop);
-  actor->PickableOff();
-  this->mp_Renderer->AddActor(actor);
-  // Cleanup for force platforms.
-  mapper->Delete();
-  actor->Delete();
-  prop->Delete();
-  // Dynamic data
-  // Require to play with VTK information's keys TIME_*
-  vtkCompositeDataPipeline* prototype = vtkCompositeDataPipeline::New();
-  vtkAlgorithm::SetDefaultExecutivePrototype(prototype);
-  prototype->Delete();
-  // Pipeline for markers
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::New();
-  markers->SetInput(markersExtractor->GetOutput());
-  // - Display marker's position
-  mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(markers->GetOutputPort(0));
-  mapper->SetLookupTable(markers->GetMarkerColorLUT());
-  mapper->SetScalarModeToUsePointFieldData();
-  mapper->UseLookupTableScalarRangeOn();
-  mapper->SelectColorArray("Colors");
-  this->mp_Mappers->AddItem(mapper);
-  actor = vtkActor::New();
-  actor->SetMapper(mapper);
-  actor->SetScale(0.005);
-  this->mp_Renderer->AddActor(actor);
-  mapper->Delete();
-  actor->Delete();
-  // - Display marker's trajectory
-  mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(markers->GetOutputPort(1));
-  mapper->SetLookupTable(markers->GetMarkerColorLUT());
-  mapper->SetScalarModeToUsePointFieldData();
-  mapper->UseLookupTableScalarRangeOn();
-  mapper->SelectColorArray("Colors");
-  this->mp_Mappers->AddItem(mapper);
-  actor = vtkActor::New();
-  actor->SetMapper(mapper);
-  actor->SetScale(0.005);
-  actor->PickableOff();
-  this->mp_Renderer->AddActor(actor);
-  mapper->Delete();
-  actor->Delete();
-  // Pipeline for GRFs
-  btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::New();
-  GRFs->SetInput(GRWsDownsampler->GetOutput());
-  mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(GRFs->GetOutputPort());
-  this->mp_Mappers->AddItem(mapper);
-  prop = vtkProperty::New();
-  prop->SetColor(1.0, 1.0, 0.0);
-  prop->SetAmbient(0.5);
-  prop->SetDiffuse(0.0);
-  prop->SetSpecular(0.0);
-  actor = vtkActor::New();
-  actor->SetMapper(mapper);
-  actor->SetScale(0.005);
-  actor->SetProperty(prop);
-  actor->PickableOff();
-  this->mp_Renderer->AddActor(actor);
-  // Cleanup for GRFs.
-  mapper->Delete();
-  actor->Delete();
-  prop->Delete();
-  // Synchro between dynamic data
-  this->mp_Syncro->push_back(vtkStreamingDemandDrivenPipeline::SafeDownCast(markers->GetExecutive()));
-  this->mp_Syncro->push_back(vtkStreamingDemandDrivenPipeline::SafeDownCast(GRFs->GetExecutive()));
-  // Store VTK process to be reused later.
-  (*this->mp_VTKProc)[VTK_GROUND] = ground;
-  (*this->mp_VTKProc)[VTK_FORCE_PLATFORMS] = forcePlaforms;
-  (*this->mp_VTKProc)[VTK_MARKERS] = markers;
-  (*this->mp_VTKProc)[VTK_GRFS] = GRFs;
-  
-  vtkCamera* cam = this->mp_Renderer->GetActiveCamera();
-  cam->Zoom(1.6);
-
-  // Links between VTK & Qt
-  this->mp_EventQtSlotConnections->Connect(
-      markers, 
-      btk::VTKMarkersListUpdateEvent,
-      this, 
-      SLOT(updateDisplayedMarkersList(vtkObject*, unsigned long, void*, void*)));
-};
-
 void MainWindow::about()
-{ 
+{
   About aboutDlg(this);
 #ifdef Q_OS_MAC
   QFont f = aboutDlg.rights->font();
@@ -782,9 +542,7 @@ void MainWindow::openFile(const QString& filename)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
   this->clearUI();
-  btk::AcquisitionFileReader::Pointer reader = static_pointer_cast<btk::AcquisitionFileReader>(this->m_BTKProc[BTK_READER]);
-  if (reader->GetFilename().compare(filename.toStdString()))
-    reader->SetAcquisitionIO();
+  btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
   reader->SetFilename(filename.toStdString());
   QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file reading", QMessageBox::Ok , this);
   try
@@ -816,21 +574,18 @@ void MainWindow::openFile(const QString& filename)
     return;
   }
   this->setCurrentFile(filename);
-  btk::Acquisition::Pointer acq = reader->GetOutput();
-  this->m_FirstFrame = acq->GetFirstFrame();
+  this->mp_Acquisition = reader->GetOutput();
+  
   this->changePlaybackParameters();
-  this->fillFileInformations(filename, reader->GetAcquisitionIO(), acq);
-  // BTK pipeline settings
-  static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProc[BTK_GRWS_DOWNSAMPLED])->SetUpDownRatio(static_cast<int>(acq->GetAnalogFrequency() / (acq->GetPointFrequency())));
+  this->fillFileInformations(filename, reader->GetAcquisitionIO(), this->mp_Acquisition);
   // UI settings
   // Markers
   this->markersTable->blockSignals(true);
-  btk::PointCollection::Pointer markers = static_pointer_cast<btk::SpecializedPointsExtractor>(this->m_BTKProc[BTK_MARKERS])->GetOutput();
-  markers->Update();
-  btk::PointCollection::Pointer points = acq->GetPoints();
+  btk::PointCollection::Pointer points = this->mp_Acquisition->GetPoints();
   this->markersTable->setRowCount(points->GetItemNumber());
   this->mp_PointsEditorDlg->tableWidget->setRowCount(this->markersTable->rowCount());
   int incPointId = 0, incMarkerId = 0;
+  bool hasMarker = false;
   for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
   {
     QTableWidgetItem* labelItem = new QTableWidgetItem();
@@ -861,13 +616,17 @@ void MainWindow::openFile(const QString& filename)
     //this->mp_PointsEditorDlg->tableWidget->setItem(incPointId, 1, pointDescItem);
     this->mp_PointsEditorDlg->tableWidget->setItem(incPointId, 1, new PointEditorTableWidgetItem());
     ++incPointId;
+    
+    if ((*it)->GetType() == btk::Point::Marker)
+      hasMarker = true;
   }
   //this->markersTable->resizeColumnsToContents();
   this->markersTable->blockSignals(false);
   this->showMarkersButton->setEnabled(true);
   this->hideMarkersButton->setEnabled(true);
+  
   // Events
-  btk::EventCollection::Pointer events = acq->GetEvents();
+  btk::EventCollection::Pointer events = this->mp_Acquisition->GetEvents();
   //this->eventContextCombo->clear();
   //this->eventContextCombo->insertItem(0, "");
   this->eventsTable->blockSignals(true);
@@ -877,7 +636,7 @@ void MainWindow::openFile(const QString& filename)
   int row = 0;
   //std::string previousSubject = "";
   QStringList eventLabelWordList;
-  double pointFrequency = acq->GetPointFrequency();
+  double pointFrequency = this->mp_Acquisition->GetPointFrequency();
   for (btk::EventCollection::ConstIterator it = events->Begin() ; it != events->End() ; ++it)
   {
     NumericalTableWidgetItem* timeItem = new NumericalTableWidgetItem();
@@ -904,7 +663,7 @@ void MainWindow::openFile(const QString& filename)
     //if ((previousSubject.compare((*it)->GetSubject()) != 0) && !previousSubject.empty())
     //   this->eventsTable->setColumnHidden(3, false);
     //previousSubject = (*it)->GetSubject();
-    if ((frameIndex < acq->GetFirstFrame()) || (frameIndex > acq->GetLastFrame()))
+    if ((frameIndex < this->mp_Acquisition->GetFirstFrame()) || (frameIndex > this->mp_Acquisition->GetLastFrame()))
     {
       timeItem->setData(eventVisible, false);
       //timeItem->setForeground(defaultLabelColor);
@@ -937,31 +696,17 @@ void MainWindow::openFile(const QString& filename)
   eventLabelCompleter->setCompletionMode(QCompleter::InlineCompletion);
   this->eventLabelEdit->setCompleter(eventLabelCompleter);
   // Frames
-  this->frameSlider->setMinimum(acq->GetFirstFrame());
-  this->frameSlider->setMaximum(acq->GetLastFrame());
+  this->frameSlider->setMinimum(this->mp_Acquisition->GetFirstFrame());
+  this->frameSlider->setMaximum(this->mp_Acquisition->GetLastFrame());
   this->frameSlider->setEnabled(true);
   this->playButton->setEnabled(true);
   // Update the 3D view
-  vtkActorCollection* actors = this->mp_Renderer->GetActors();
-  actors->InitTraversal();
-  vtkActor* actor = actors->GetNextItem(); // Ground
-  while (actor)
-  {
-    actor->VisibilityOn();
-    actor = actors->GetNextItem();
-  }
-  std::string markerUnit = acq->GetPointUnit();
-  double scale = 1.0;
-  if (markerUnit.compare("m") == 0)
-    scale = 1000.0;
-  btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS])->SetScaleUnit(scale);
-  btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->SetScaleUnit(scale);
-  btk::VTKForcePlatformsSource::SafeDownCast((*this->mp_VTKProc)[VTK_FORCE_PLATFORMS])->SetScaleUnit(scale);
+  this->qvtkWidget->load(this->mp_Acquisition);
   
   // Fill Metadata
-  this->mp_MetadataDlg->load(acq->GetMetaData());
+  this->mp_MetadataDlg->load(this->mp_Acquisition->GetMetaData());
   // Display Docks
-  if (markers->GetItemNumber() != 0)
+  if (hasMarker != 0)
     this->markersDock->setVisible(true);
   if (events->GetItemNumber() != 0)
     this->eventsDock->setVisible(true);
@@ -969,7 +714,7 @@ void MainWindow::openFile(const QString& filename)
   QApplication::restoreOverrideCursor();
   
   this->frameSlider->setValue(this->frameSlider->minimum());
-  this->updateDisplay(this->frameSlider->minimum());
+  this->qvtkWidget->updateDisplay(this->frameSlider->minimum());
   
   this->actionClose->setEnabled(true);
   this->actionEdit_Metadata->setEnabled(true);
@@ -999,7 +744,7 @@ void MainWindow::saveAsFile()
 void MainWindow::saveFile(const QString& filename)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  btk::Acquisition::Pointer source = static_pointer_cast<btk::AcquisitionFileReader>(this->m_BTKProc[BTK_READER])->GetOutput();
+  btk::Acquisition::Pointer source = this->mp_Acquisition;
   btk::Acquisition::Pointer target = btk::Acquisition::New();
   // Acquisition info
   target->SetFirstFrame(source->GetFirstFrame());
@@ -1140,16 +885,8 @@ void MainWindow::clearUI()
   this->frameSlider->setValue(this->frameSlider->minimum());
   this->lcdNumber->display(this->frameSlider->minimum());
   this->frameSlider->blockSignals(false);
-  vtkActorCollection* actors = this->mp_Renderer->GetActors();
-  actors->InitTraversal();
-  vtkActor* actor = actors->GetNextItem(); // Ground
-  actor = actors->GetNextItem();
-  while (actor)
-  {
-    actor->VisibilityOff();
-    actor = actors->GetNextItem();
-  }
-  this->qvtkWidget->GetRenderWindow()->Render();
+  // Viz3D
+  this->qvtkWidget->clear();
 };
 
 void MainWindow::fillFileInformations(const QString& filename, btk::AcquisitionFileIO::Pointer io, btk::Acquisition::Pointer acq)
@@ -1225,8 +962,7 @@ void MainWindow::fillFileInformations(const QString& filename, btk::AcquisitionF
 
 void MainWindow::changePlaybackParameters()
 {
-  btk::Acquisition::Pointer acq = static_pointer_cast<btk::AcquisitionFileReader>(this->m_BTKProc[BTK_READER])->GetOutput();
-  double pointFrequency = acq->GetPointFrequency();
+  double pointFrequency = this->mp_Acquisition->GetPointFrequency();
   
   // Compute playback step and delay
   if ((pointFrequency == 0.0) || (actionFull_Frames->isChecked()))
@@ -1279,32 +1015,12 @@ void MainWindow::changePlaybackParameters()
 
 void MainWindow::changeGroundOrientation()
 {
-  vtkPlaneSource* ground = vtkPlaneSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
   if (actionPlane_XY->isChecked())
-    ground->SetNormal(0.0, 0.0, 1.0);
+    this->qvtkWidget->setGroundOrientation(0.0, 0.0, 1.0);
   else if (actionPlane_YZ->isChecked())
-    ground->SetNormal(1.0, 0.0, 0.0);
+    this->qvtkWidget->setGroundOrientation(1.0, 0.0, 0.0);
   else if (actionPlane_ZX->isChecked())
-    ground->SetNormal(0.0, 1.0, 0.0);
-  this->qvtkWidget->GetRenderWindow()->Render();
-};
-
-void MainWindow::updateDisplay(int frame)
-{
-  // Force to update the markers even if the required frame was the last updated.
-  btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
-  // Update
-  double t = static_cast<double>(frame - this->m_FirstFrame);
-  for (vtkStreamingDemandDrivenPipelineCollection::iterator it = this->mp_Syncro->begin() ; it != this->mp_Syncro->end() ; ++it)
-    (*it)->SetUpdateTimeStep(0, t);
-  this->mp_Mappers->InitTraversal();
-  vtkMapper* mapper = this->mp_Mappers->GetNextItem();
-  while (mapper)
-  {
-    mapper->Modified();
-    mapper = this->mp_Mappers->GetNextItem();
-  }
-  this->qvtkWidget->GetRenderWindow()->Render();
+    this->qvtkWidget->setGroundOrientation(0.0, 1.0, 0.0);
 };
 
 void MainWindow::toggleTimer()
@@ -1374,26 +1090,16 @@ void MainWindow::showSelectedMarkers()
 {
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
   this->markersTable->blockSignals(true);
-  for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-  {
-    (*it)->setCheckState(Qt::Checked);
-    btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->ShowMarker((*it)->data(markerId).toInt());
-  }
+  this->qvtkWidget->showSelectedMarkers(items);
   this->markersTable->blockSignals(false);
-  this->updateDisplay(this->frameSlider->value());
 };
 
 void MainWindow::hideSelectedMarkers()
 {
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
   this->markersTable->blockSignals(true);
-  for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-  {
-    (*it)->setCheckState(Qt::Unchecked);
-    btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->HideMarker((*it)->data(markerId).toInt());
-  }
+  this->qvtkWidget->hideSelectedMarkers(items);
   this->markersTable->blockSignals(false);
-  this->updateDisplay(this->frameSlider->value());
 };
 
 void MainWindow::showAllMarkers()
@@ -1402,8 +1108,7 @@ void MainWindow::showAllMarkers()
   for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
     this->markersTable->item(row, 0)->setCheckState(Qt::Checked);
   this->markersTable->blockSignals(false);
-  btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->ShowMarkers();
-  this->updateDisplay(this->frameSlider->value());
+  this->qvtkWidget->showAllMarkers();
 };
 
 void MainWindow::hideAllMarkers()
@@ -1412,25 +1117,7 @@ void MainWindow::hideAllMarkers()
   for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
     this->markersTable->item(row, 0)->setCheckState(Qt::Unchecked);
   this->markersTable->blockSignals(false);
-  btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->HideMarkers();
-  this->updateDisplay(this->frameSlider->value());
-};
-
-void MainWindow::updateMarkerVisibility(QTableWidgetItem* item)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  // Hide/show markers
-  if (item->checkState() == Qt::Checked)
-    markers->ShowMarker(item->data(markerId).toInt());
-  else if (item->checkState() == Qt::Unchecked)
-    markers->HideMarker(item->data(markerId).toInt());
-  // Hide/show trajectories
-  if (item->data(markerTrajectoryActived).toBool())
-    markers->ShowTrajectory(item->data(markerId).toInt());
-  else
-    markers->HideTrajectory(item->data(markerId).toInt());
-  // Update current frame
-  this->updateDisplay(this->frameSlider->value());
+  this->qvtkWidget->hideAllMarkers();
 };
 
 void MainWindow::updateMarkerRadius(double r)
@@ -1439,10 +1126,9 @@ void MainWindow::updateMarkerRadius(double r)
   this->markerRadiusSlider->setValue(r * 10.0);
   this->markerRadiusSlider->blockSignals(false);
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-    markers->SetMarkerRadius((*it)->data(markerId).toInt(), r);
-  this->updateDisplay(this->frameSlider->value());
+    this->qvtkWidget->setMarkerRadius((*it)->data(markerId).toInt(), r);
+  this->qvtkWidget->updateDisplay(this->frameSlider->value());
 };
 
 void MainWindow::updateMarkerRadiusSpinBox(int v)
@@ -1494,15 +1180,14 @@ void MainWindow::displayMarkerProperties()
     bool sameRadius = true;
     bool sameColor = true;
     QList<QTableWidgetItem*>::const_iterator it = items.begin();
-    btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-    double r = markers->GetMarkerRadius((*it)->data(markerId).toInt());
-    vtkIdType c = markers->GetMarkerColorIndex((*it)->data(markerId).toInt());
+    double r = this->qvtkWidget->markerRadius((*it)->data(markerId).toInt());
+    int c = this->qvtkWidget->markerColorIndex((*it)->data(markerId).toInt());
     ++it;
     while (it != items.end())
     {
-      if (r != markers->GetMarkerRadius((*it)->data(markerId).toInt()))
+      if (r != this->qvtkWidget->markerRadius((*it)->data(markerId).toInt()))
         sameRadius = false;
-      if (c != markers->GetMarkerColorIndex((*it)->data(markerId).toInt()))
+      if (c != this->qvtkWidget->markerColorIndex((*it)->data(markerId).toInt()))
         sameColor = false;
 
       if (!sameRadius && !sameColor)
@@ -1525,7 +1210,7 @@ void MainWindow::displayMarkerProperties()
       this->markerColorButton->setStyleSheet("");
     else
     {
-      double* rgba = markers->GetMarkerColorLUT()->GetTableValue(c);
+      double* rgba = this->qvtkWidget->markerColorValue(c);
       QString ss = "background-color: rgb( %1, %2, %3);";
       this->markerColorButton->setStyleSheet(
           ss.arg(static_cast<int>(rgba[0] * 255))
@@ -1597,24 +1282,8 @@ void MainWindow::editMarkerColor()
     return;
   if (color.isValid())
   {
-    bool modified = false;
-    vtkLookupTable* markersColorsLUT = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetMarkerColorLUT();
-    int num = markersColorsLUT->GetNumberOfTableValues();
-    int i = 0;
-    for (i = 0 ; i < num ; ++i)
-    {
-      double* c = markersColorsLUT->GetTableValue(i);
-      if ((color.redF() == c[0]) && (color.greenF() == c[1]) && (color.blueF() == c[2]))
-        break;
-    }
-    if (i >= num)
-    {
-      markersColorsLUT->SetNumberOfTableValues(num + 1);
-      markersColorsLUT->SetTableValue(num, color.redF(), color.greenF(), color.blueF());
-      markersColorsLUT->SetTableRange(0, num + 1);
-      i = num;
-      modified = true;
-    }
+    int i;
+    bool modified = this->qvtkWidget->appendNewMarkerColor(color, &i);
     if (!modified)
     {
       QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
@@ -1630,42 +1299,6 @@ void MainWindow::editMarkerColor()
     if (modified)
       this->mp_UndoStack->push(new EditMarkersColorIndex(i, items, this));
   }
-};
-
-void MainWindow::setVTKMarkerRadius(int id, double r)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markers->SetMarkerRadius(id, r);
-};
-
-double MainWindow::VTKMarkerRadius(int id)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  return markers->GetMarkerRadius(id);
-};
-
-void MainWindow::setVTKMarkerColorIndex(int id, int idx)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markers->SetMarkerColorIndex(id, idx);
-};
-
-int MainWindow::VTKMarkerColorIndex(int id)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  return markers->GetMarkerColorIndex(id);
-};
-
-void MainWindow::setVTKMarkerVisibility(int id, bool visible)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markers->SetMarkerVisibility(id, visible);
-};
-
-bool MainWindow::VTKMarkerVisibility(int id)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  return markers->GetMarkerVisibility(id);
 };
 
 void MainWindow::toggleMarkerProperties()
@@ -1684,20 +1317,8 @@ void MainWindow::toggleMarkerProperties()
 
 void MainWindow::circleSelectedMarkers()
 {
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markers->ClearSelectedMarkers();
-  QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
-  bool validSelection = false;
-  for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-  {
-    if ((*it)->checkState() == Qt::Checked)
-    {
-      markers->SetSelectedMarker((*it)->data(markerId).toInt());
-      validSelection = true;
-    }
-  }
-  if (validSelection || items.isEmpty())
-    this->updateDisplay(this->frameSlider->value());
+  this->qvtkWidget->circleSelectedMarkers(this->markersTable->selectedItems());
+  this->qvtkWidget->updateDisplay(this->frameSlider->value());
 };
 
 void MainWindow::showEvent()
@@ -1711,9 +1332,7 @@ void MainWindow::showEvent()
 
 void MainWindow::newEvent()
 {
-  btk::AcquisitionFileReader::Pointer reader = static_pointer_cast<btk::AcquisitionFileReader>(this->m_BTKProc[BTK_READER]);
-  btk::Acquisition::Pointer acq = reader->GetOutput();
-  this->mp_UndoStack->push(new NewEvent(this, this->frameSlider->value(), acq->GetPointFrequency()));
+  this->mp_UndoStack->push(new NewEvent(this, this->frameSlider->value(), this->mp_Acquisition->GetPointFrequency()));
 };
 
 void MainWindow::deleteEvent()
@@ -1814,16 +1433,14 @@ void MainWindow::toggleEventInformations()
 void MainWindow::updateEventInternalInformations(QTableWidgetItem* item)
 {
   this->eventsTable->blockSignals(true);
-  btk::AcquisitionFileReader::Pointer reader = static_pointer_cast<btk::AcquisitionFileReader>(this->m_BTKProc[BTK_READER]);
-  btk::Acquisition::Pointer acq = reader->GetOutput();
   switch(item->column())
   {
     case 0:
     {
-      double pointFrequency = acq->GetPointFrequency();
+      double pointFrequency = this->mp_Acquisition->GetPointFrequency();
       int frameIndex = static_cast<int>(item->data(eventTime).toDouble() * pointFrequency);
       item->setData(eventFrame, frameIndex);
-      if ((frameIndex < acq->GetFirstFrame()) || (frameIndex > acq->GetLastFrame()))
+      if ((frameIndex < this->mp_Acquisition->GetFirstFrame()) || (frameIndex > this->mp_Acquisition->GetLastFrame()))
         item->setData(eventVisible, false);
       else
         item->setData(eventVisible, true);
@@ -1884,6 +1501,68 @@ void MainWindow::focusOnEventEdition(int idx)
     break;
   }
   this->eventsTable->scrollToItem(item);
+};
+
+void MainWindow::updateDisplayedMarkersList(const QVector<int>& ids)
+{
+  QBrush defaultLabelColor = QBrush(QColor(Qt::gray));
+  QBrush displayLabelColor = QBrush(QColor(Qt::black));
+  this->markersTable->blockSignals(true);
+  for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
+  {
+    QTableWidgetItem* item = this->markersTable->item(row, 0);
+    if (ids[item->data(markerId).toInt()] && (item->checkState() == Qt::Checked))
+      item->setForeground(displayLabelColor);
+    else
+      item->setForeground(defaultLabelColor);
+  }
+  this->markersTable->blockSignals(false);
+};
+
+void MainWindow::selectPickedMarker(int id)
+{
+  QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
+  if (items.count() == 1)
+  {
+    if (items.first()->data(markerId).toInt() == id)
+    {
+      this->markersTable->clearSelection();
+      return;
+    }
+  }
+  for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
+  {
+    QTableWidgetItem* item = this->markersTable->item(row, 0);
+    if (item->data(markerId).toInt() == id)
+    {
+      this->markersTable->setCurrentCell(row, 0);
+      break;
+    }
+  }
+};
+
+void MainWindow::selectPickedMarkers(int id)
+{
+  QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
+  // Previously selected?
+  for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    if ((*it)->data(markerId).toInt() == id)
+    {
+      this->markersTable->setCurrentItem((*it), QItemSelectionModel::Deselect);
+      return;
+    }
+  }
+  // To be selected
+  for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
+  {
+    QTableWidgetItem* item = this->markersTable->item(row, 0);
+    if (item->data(markerId).toInt() == id)
+    {
+      this->markersTable->setCurrentItem(item, QItemSelectionModel::Select);
+      break;
+    }
+  }
 };
 
 void MainWindow::editEventLabel()
@@ -1952,7 +1631,7 @@ void MainWindow::eventsDockLocationChanged(Qt::DockWidgetArea area)
 };
 
 void MainWindow::readSettings()
-{   
+{
   QSettings settings;
   // MainWidow
   settings.beginGroup("MainWindow");
