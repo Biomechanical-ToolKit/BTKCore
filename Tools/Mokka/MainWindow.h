@@ -92,6 +92,7 @@ public Q_SLOTS:
   void openRecentFile();
   void clearRecentFiles();
   void openFile();
+  void openFileDropped(const QString& filename);
   void saveFile();
   void saveAsFile();
   void closeFile();

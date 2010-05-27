@@ -351,6 +351,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(updateDisplay(int)));
   connect(this->playButton, SIGNAL(clicked()), this, SLOT(toggleTimer()));
   connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(displayNextFrame()));
+  // Viz3D
+  connect(this->qvtkWidget, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   // Markers dock
   connect(this->markersTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateMarkerVisibility(QTableWidgetItem*)));
   connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayMarkerProperties()));
@@ -382,17 +384,6 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->eventSubjectEdit, SIGNAL(editingFinished()), this, SLOT(editEventSubject()));
   connect(this->eventsDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(eventsDockLocationChanged(Qt::DockWidgetArea)));
   connect(this->eventInformationsButton, SIGNAL(clicked()), this, SLOT(toggleEventInformations()));
-  // Qt/VTK connections
-  this->mp_EventQtSlotConnections->Connect(
-      this->qvtkWidget->GetRenderWindow()->GetInteractor(), 
-      btk::VTKMarkerPickedEvent,
-      this, 
-      SLOT(selectPickedMarker(vtkObject*, unsigned long, void*, void*)));
-  this->mp_EventQtSlotConnections->Connect(
-      this->qvtkWidget->GetRenderWindow()->GetInteractor(), 
-      btk::VTKMarkersPickedEvent,
-      this, 
-      SLOT(selectPickedMarkers(vtkObject*, unsigned long, void*, void*)));
 
   // Event filter
   this->qvtkWidget->installEventFilter(this);
@@ -775,6 +766,15 @@ void MainWindow::openFile()
       this->m_LastDirectory = QFileInfo(filename).absolutePath();
       this->openFile(filename);
     }
+  }
+};
+
+void MainWindow::openFileDropped(const QString& filename)
+{
+  if (this->isOkToContinue())
+  {
+    this->m_LastDirectory = QFileInfo(filename).absolutePath();
+    this->openFile(filename);
   }
 };
 
@@ -1933,74 +1933,6 @@ void MainWindow::editEventSubject()
   if (subject.compare(item->text()) == 0)
     return;
   this->mp_UndoStack->push(new EditEventSubject(subject, item));
-};
-
-void MainWindow::updateDisplayedMarkersList(vtkObject* caller, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
-{
-  vtkIdTypeArray* indexes = static_cast<vtkIdTypeArray*>(call_data);
-  if (!indexes)
-    return;
-
-  QBrush defaultLabelColor = QBrush(QColor(Qt::gray));
-  QBrush displayLabelColor = QBrush(QColor(Qt::black));
-  this->markersTable->blockSignals(true);
-  for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
-  {
-    QTableWidgetItem* item = this->markersTable->item(row, 0);
-    if (indexes->GetValue(item->data(markerId).toInt()) && (item->checkState() == Qt::Checked))
-      item->setForeground(displayLabelColor);
-    else
-      item->setForeground(defaultLabelColor);
-  }
-  this->markersTable->blockSignals(false);
-};
-
-void MainWindow::selectPickedMarker(vtkObject* caller, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
-{
-  int id = *static_cast<int*>(call_data);
-  QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
-  if (items.count() == 1)
-  {
-    if (items.first()->data(markerId).toInt() == id)
-    {
-      this->markersTable->clearSelection();
-      return;
-    }
-  }
-  for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
-  {
-    QTableWidgetItem* item = this->markersTable->item(row, 0);
-    if (item->data(markerId).toInt() == id)
-    {
-      this->markersTable->setCurrentCell(row, 0);
-      break;
-    }
-  }
-};
-
-void MainWindow::selectPickedMarkers(vtkObject* caller, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
-{
-  int id = *static_cast<int*>(call_data);
-  QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
-  // Previously selected?
-  for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-  {
-    if ((*it)->data(markerId).toInt() == id)
-    {
-      this->markersTable->setCurrentItem((*it), QItemSelectionModel::Deselect);
-      return;
-    }
-  }
-  // To be selected
-  for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
-  {
-    QTableWidgetItem* item = this->markersTable->item(row, 0);
-    if (item->data(markerId).toInt() == id)
-    {
-      this->markersTable->setCurrentItem(item, QItemSelectionModel::Select);
-      break;
-    }
-  }
 };
 
 void MainWindow::markersDockLocationChanged(Qt::DockWidgetArea area)

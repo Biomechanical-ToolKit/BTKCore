@@ -10,17 +10,18 @@ SET(Mokka_CPP
   PointsEditor.cpp
   TableWidget.cpp
   UndoCommands.cpp
+  Viz3DWidget.cpp
   main.cpp
   )
 
 SET(Mokka_H
-  About.h
   ComboBoxDelegate.h
   MainWindow.h
   MetadataView.h
   Metadata.h
   PointsEditor.h
-  TableWidget.h)
+  TableWidget.h
+  Viz3DWidget.h)
 
 SET(Mokka_UI
   About.ui
