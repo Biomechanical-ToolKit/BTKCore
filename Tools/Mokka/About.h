@@ -40,10 +40,7 @@
 
 class About : public QDialog, public Ui::About
 {
-  Q_OBJECT
-
 public:
   About(QWidget* parent = 0);
-  ~About();
 };
 #endif // About_h

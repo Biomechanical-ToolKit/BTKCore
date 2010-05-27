@@ -78,7 +78,7 @@
      <item>
       <widget class="QLabel" name="description">
        <property name="text">
-        <string>3D Motion Viewer Tool</string>
+        <string>3D Motion Kinematic &amp; Kinetic Analyzer</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -88,7 +88,7 @@
      <item>
       <widget class="QLabel" name="release">
        <property name="text">
-        <string>Mokka version 0.1</string>
+        <string>Mokka version </string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -121,7 +121,7 @@
      <item>
       <widget class="QLabel" name="copyright">
        <property name="text">
-        <string> Copyright (C) 2009 Arnaud Barré.</string>
+        <string> Copyright (C) 2009-2010 Arnaud Barré.</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

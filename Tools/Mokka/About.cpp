@@ -34,12 +34,11 @@
  */
 
 #include "About.h"
+#include "btkConfigure.h"
 
 About::About(QWidget* parent)
 : QDialog(parent)
 {
   this->setupUi(this);
+  this->release->setText(this->release->text() + QString::number(BTK_VERSION_MAJOR) + "." + QString::number(BTK_VERSION_MINOR) + "." + QString::number(BTK_VERSION_PATCH));
 };
-
-About::~About()
-{};
