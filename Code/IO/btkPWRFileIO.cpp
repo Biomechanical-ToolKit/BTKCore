@@ -62,7 +62,7 @@ namespace btk
    * @brief Interface to read/write PWR files.
    *
    * The PWR file format is used in the Elite acquisition system (BTS, Milan, Italy).
-   * It contains power for the first axis of each joint of the lower limbs (expressed in segmental frames).
+   * It contains power of each joint of the lower limbs (stored on the component X).
    *
    * @ingroup BTKIO
    */

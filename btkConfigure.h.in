@@ -36,6 +36,10 @@
 #ifndef __btkConfigure_h
 #define __btkConfigure_h
 
+#define BTK_VERSION_MAJOR @BTK_VERSION_MAJOR@
+#define BTK_VERSION_MINOR @BTK_VERSION_MINOR@
+#define BTK_VERSION_PATCH @BTK_VERSION_PATCH@
+
 // Looking for std::shared_ptr in memory.h
 #cmakedefine BTK_USE_GCC_EXPERIMENTAL
 #cmakedefine HAVE_SYS_TR1_MEMORY_H
