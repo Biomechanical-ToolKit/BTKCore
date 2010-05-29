@@ -243,7 +243,6 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 {
-  
   QLineEdit* lineEdit = qobject_cast<QLineEdit*>(obj);
   if (lineEdit)
   {
@@ -579,6 +578,9 @@ void MainWindow::openFile(const QString& filename)
   this->changePlaybackParameters();
   this->fillFileInformations(filename, reader->GetAcquisitionIO(), this->mp_Acquisition);
   // UI settings
+  // Update the 3D view
+  btk::SeparateKnownVirtualMarkersFilter::Pointer separator = this->qvtkWidget->load(this->mp_Acquisition);
+  this->qvtkWidget->updateDisplay(this->mp_Acquisition->GetFirstFrame()); // Required
   // Markers
   this->markersTable->blockSignals(true);
   btk::PointCollection::Pointer points = this->mp_Acquisition->GetPoints();
@@ -597,10 +599,18 @@ void MainWindow::openFile(const QString& filename)
     labelItem->setData(pointLabel, labelItem->text());
     labelItem->setData(pointDescription, QString::fromStdString((*it)->GetDescription()));
     labelItem->setData(pointDisabled, false);
-    if ((*it)->GetType() == btk::Point::Marker)
+    bool isMarker = findLabel(separator->GetOutput(0), (*it)->GetLabel());
+    bool isOtherVirtualMarker = findLabel(separator->GetOutput(2), (*it)->GetLabel());
+    if (((*it)->GetType() == btk::Point::Marker) && (isMarker || isOtherVirtualMarker))
     {
       labelItem->setData(markerId, incMarkerId);
-      labelItem->setCheckState(Qt::Checked);
+      if (isMarker)
+        labelItem->setCheckState(Qt::Checked);
+      else
+      {
+        labelItem->setCheckState(Qt::Unchecked);
+        this->qvtkWidget->setMarkerVisibility(incMarkerId, false);
+      }
       labelItem->setData(markerRadius, 8.0); // TODO: Use default radius from preferences.
       labelItem->setData(markerColorIndex, (int)0); // TODO: Use default color from preferences.
       labelItem->setData(markerTrajectoryActived, false);
@@ -700,8 +710,6 @@ void MainWindow::openFile(const QString& filename)
   this->frameSlider->setMaximum(this->mp_Acquisition->GetLastFrame());
   this->frameSlider->setEnabled(true);
   this->playButton->setEnabled(true);
-  // Update the 3D view
-  this->qvtkWidget->load(this->mp_Acquisition);
   
   // Fill Metadata
   this->mp_MetadataDlg->load(this->mp_Acquisition->GetMetaData());
@@ -1511,7 +1519,7 @@ void MainWindow::updateDisplayedMarkersList(const QVector<int>& ids)
   for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
   {
     QTableWidgetItem* item = this->markersTable->item(row, 0);
-    if (ids[item->data(markerId).toInt()] && (item->checkState() == Qt::Checked))
+    if ((ids.size() > item->data(markerId).toInt()) && ids[item->data(markerId).toInt()] && (item->checkState() == Qt::Checked))
       item->setForeground(displayLabelColor);
     else
       item->setForeground(defaultLabelColor);
@@ -1693,4 +1701,14 @@ void MainWindow::writeSettings()
   settings.setValue("size", this->eventsDock->size());
   //settings.setValue("area", this->eventsDock->area());
   settings.endGroup();
+};
+
+bool findLabel(btk::PointCollection::Pointer points, const std::string& label)
+{
+  for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
+  {
+    if ((*it)->GetLabel().compare(label) == 0)
+      return true;
+  }
+  return false;
 };

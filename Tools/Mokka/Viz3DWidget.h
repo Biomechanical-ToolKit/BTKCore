@@ -3,6 +3,7 @@
 
 #include <btkAcquisition.h>
 #include <btkProcessObject.h>
+#include <btkSeparateKnownVirtualMarkersFilter.h>
 #include <btkVTKAxesWidget.h>
 #include <btkVTKForcePlatformsSource.h>
 #include <btkVTKGRFsFramesSource.h>
@@ -41,7 +42,7 @@ public:
   double* markerColorValue(int c);
   bool appendNewMarkerColor(const QColor& color, int* idx);
   void setGroundOrientation(double x, double y, double z);
-  void load(btk::Acquisition::Pointer acq);
+  btk::SeparateKnownVirtualMarkersFilter::Pointer load(btk::Acquisition::Pointer acq);
   
 public slots:
   // Qt / VTK

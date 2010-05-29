@@ -36,7 +36,7 @@
 #include <vtkObjectBase.h>
 #include <vtkIdTypeArray.h>
 
-enum {BTK_MARKERS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
+enum {BTK_MARKERS, BTK_VIRTUALS_MARKERS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
 enum {VTK_GROUND, VTK_FORCE_PLATFORMS, VTK_MARKERS, VTK_GRFS};
 
 class vtkStreamingDemandDrivenPipelineCollection : public vtkstd::list<vtkStreamingDemandDrivenPipeline*>
@@ -79,6 +79,8 @@ void Viz3DWidget::initialize()
 {
   // BTK PIPELINE
   btk::SpecializedPointsExtractor::Pointer markersExtractor = btk::SpecializedPointsExtractor::New();
+  btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
+  virtualMarkersSeparator->SetInput(markersExtractor->GetOutput());
   btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = btk::ForcePlatformsExtractor::New();
   btk::GroundReactionWrenchFilter::Pointer GRWsFilter = btk::GroundReactionWrenchFilter::New();
   GRWsFilter->SetThresholdValue(5.0); // PWA are not computed from vertical forces lower than 5 newtons.
@@ -88,6 +90,7 @@ void Viz3DWidget::initialize()
   GRWsDownsampler->SetInput(GRWsFilter->GetOutput());
   // Store BTK process to be reused later.
   this->m_BTKProc[BTK_MARKERS] = markersExtractor;
+  this->m_BTKProc[BTK_VIRTUALS_MARKERS] = virtualMarkersSeparator;
   this->m_BTKProc[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
   this->m_BTKProc[BTK_GRWS] = GRWsFilter;
   this->m_BTKProc[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
@@ -180,7 +183,8 @@ void Viz3DWidget::initialize()
   prototype->Delete();
   // Pipeline for markers
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::New();
-  markers->SetInput(markersExtractor->GetOutput());
+  markers->SetInput(0, virtualMarkersSeparator->GetOutput(0));
+  markers->SetInput(1, virtualMarkersSeparator->GetOutput(2));
   // - Display marker's position
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(markers->GetOutputPort(0));
@@ -336,11 +340,12 @@ bool Viz3DWidget::appendNewMarkerColor(const QColor& color, int* idx)
   return modified;
 };
 
-void Viz3DWidget::load(btk::Acquisition::Pointer acq)
+btk::SeparateKnownVirtualMarkersFilter::Pointer Viz3DWidget::load(btk::Acquisition::Pointer acq)
 {
   this->m_FirstFrame = acq->GetFirstFrame();
   
   btk::SpecializedPointsExtractor::Pointer markersExtractor = static_pointer_cast<btk::SpecializedPointsExtractor>(this->m_BTKProc[BTK_MARKERS]);
+  btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProc[BTK_VIRTUALS_MARKERS]);
   btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProc[BTK_FORCE_PLATFORMS]);
   btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProc[BTK_GRWS_DOWNSAMPLED]);
   markersExtractor->SetInput(acq);
@@ -367,6 +372,9 @@ void Viz3DWidget::load(btk::Acquisition::Pointer acq)
   GRFs->SetScaleUnit(scale);
   markers->SetScaleUnit(scale);
   forcePlaforms->SetScaleUnit(scale);
+  
+  virtualMarkersSeparator->Update();
+  return virtualMarkersSeparator;
 };
 
 void Viz3DWidget::updateDisplayedMarkersList(vtkObject* caller, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)

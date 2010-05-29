@@ -42,6 +42,7 @@
 #include "UserRoles.h"
 
 #include <btkAcquisitionFileIO.h>
+#include <btkPointCollection.h>
 
 #include <QTimer>
 #include <QUndoStack>
@@ -149,6 +150,8 @@ private:
   QIcon* mp_DownArrow;
   QIcon* mp_RightArrow;
 };
+
+bool findLabel(btk::PointCollection::Pointer points, const std::string& label);
 
 class TrajectoryCheckBox : public QCheckBox
 {
