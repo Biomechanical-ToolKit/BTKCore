@@ -57,7 +57,8 @@ namespace btk
     vtkExportedTypeRevisionMacro(VTKMarkersFramesSource, vtkPolyDataAlgorithm, BTK_VTK_EXPORT);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
 
-    BTK_VTK_EXPORT void SetInput(PointCollection::Pointer input);
+    void SetInput(PointCollection::Pointer input) {this->SetInput(0,input);};
+    BTK_VTK_EXPORT void SetInput(int port, PointCollection::Pointer input);
 
     BTK_VTK_EXPORT void ClearSelectedMarkers();
     BTK_VTK_EXPORT void SetSelectedMarker(vtkIdType id);

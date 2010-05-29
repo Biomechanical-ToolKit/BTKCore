@@ -136,13 +136,18 @@ namespace btk
   };
 
   /**
+   * @fn void VTKMarkersFramesSource::SetInput(PointCollection::Pointer input)
    * Sets input.
    */
-  void VTKMarkersFramesSource::SetInput(PointCollection::Pointer input)
+  
+  /**
+   * Sets input.
+   */
+  void VTKMarkersFramesSource::SetInput(int port, PointCollection::Pointer input)
   {
     VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::New();
     inObject->SetBTKDataObject(input);
-    this->vtkPolyDataAlgorithm::SetInput(inObject);
+    this->vtkPolyDataAlgorithm::SetInput(port, inObject);
     inObject->Delete();
   };
 
@@ -394,6 +399,7 @@ namespace btk
   VTKMarkersFramesSource::VTKMarkersFramesSource()
   : vtkPolyDataAlgorithm()
   {
+    this->SetNumberOfInputPorts(2);
     this->SetNumberOfOutputPorts(2);
     
     this->mp_MarkersCoordinates = new VTKMarkersCoordinates();
@@ -459,14 +465,35 @@ namespace btk
                                                  vtkInformationVector** inputVector, 
                                                  vtkInformationVector* outputVector)
   {
-    // Convert a btk::PointCollection into a vector of polydata containing centers of visible markers.
-    vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-    VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-    if (!inObject)
-      return 0;
-    if (inObject->GetMTime() > this->GetMTime())
+    bool needUpdate = false;
+    PointCollection::Pointer input = PointCollection::New();
+    for (int i = 0 ; i < this->GetNumberOfInputPorts() ; ++i)
     {
-      PointCollection::Pointer input = static_pointer_cast<PointCollection>(inObject->GetBTKDataObject());
+      vtkInformation* inInfo = inputVector[i]->GetInformationObject(0);
+      VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
+      if (!inObject)
+        continue;
+      if (inObject->GetMTime() > this->GetMTime())
+        needUpdate = true;
+      PointCollection::Pointer in = static_pointer_cast<PointCollection>(inObject->GetBTKDataObject());
+      for (PointCollection::ConstIterator it = in->Begin() ; it != in->End() ; ++it)
+        input->InsertItem(*it);
+    }
+    size_t pointNumber = input->GetItemNumber();
+    int frameNumber = 0;
+    if (pointNumber != 0)
+      frameNumber = input->GetItem(0)->GetFrameNumber();
+    for (PointCollection::ConstIterator it = input->Begin() ; it != input->End() ; ++it)
+    {
+      if ((*it)->GetFrameNumber() != frameNumber)
+      {
+        btkErrorMacro("Inputs have not the same number of frames. Impossible to display the markers.");
+        return 0;
+      }
+    }
+    // Convert a btk::PointCollection into a vector of polydata containing centers of visible markers.
+    if (needUpdate)
+    {
       // RAZ
       for (size_t i = 0 ; i < this->mp_MarkersCoordinates->size() ; ++i)
       {
@@ -475,12 +502,8 @@ namespace btk
       }
       this->mp_MarkersCoordinates->clear();
       this->mp_ExistingMarkers->clear();
-      int frameNumber = 0;
-      size_t pointNumber = input->GetItemNumber();
       if (pointNumber != 0)
       {
-        frameNumber = input->GetItem(0)->GetFrameNumber();
-        
         // Radius, Selected & Hidden markers
         this->mp_MarkersRadius->SetNumberOfValues(pointNumber);
         this->mp_SelectedMarkers->SetNumberOfValues(pointNumber);
@@ -673,10 +696,11 @@ namespace btk
   /**
    * Sets the type of object required for the input.
    */
-  int VTKMarkersFramesSource::FillInputPortInformation(int /* port */, 
-                                                      vtkInformation* info)
+  int VTKMarkersFramesSource::FillInputPortInformation(int port, vtkInformation* info)
   {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "VTKDataObjectAdapter");
+    if (port != 0)
+      info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     return 1;
   }
 };
