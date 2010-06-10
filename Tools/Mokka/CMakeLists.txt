@@ -7,7 +7,9 @@ SET(Mokka_CPP
   MainWindow.cpp
   Metadata.cpp
   MetadataView.cpp
+  NewModelConfigurationWidget.cpp
   PointsEditor.cpp
+  ProgressWidget.cpp
   TableWidget.cpp
   UndoCommands.cpp
   Viz3DWidget.cpp
@@ -19,7 +21,9 @@ SET(Mokka_H
   MainWindow.h
   MetadataView.h
   Metadata.h
+  NewModelConfigurationWidget.h
   PointsEditor.h
+  ProgressWidget.h
   TableWidget.h
   Viz3DWidget.h)
 
@@ -27,14 +31,17 @@ SET(Mokka_UI
   About.ui
   MainWindow.ui
   Metadata.ui
-  PointsEditor.ui)
+  NewModelConfigurationWidget.ui
+  PointsEditor.ui
+  ProgressWidget.ui)
 
 SET(Mokka_QRC
   images.qrc)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}
                     ${CMAKE_CURRENT_SOURCE_DIR}
-                    ${QT_INCLUDE_DIR})
+                    ${QT_INCLUDE_DIR}
+                    ${BTK_SOURCE_DIR}/Utilities/ParserCmdLine)
 
 QT4_WRAP_UI(Mokka_UI_H ${Mokka_UI})
 QT4_WRAP_CPP(Mokka_MOC ${Mokka_H})
