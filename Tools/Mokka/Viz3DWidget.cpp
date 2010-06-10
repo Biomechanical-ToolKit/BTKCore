@@ -134,6 +134,8 @@ void Viz3DWidget::initialize()
   //this->mp_Renderer->TwoSidedLightingOn();
   vtkRenderWindow* renwin = vtkRenderWindow::New();
   renwin->AddRenderer(this->mp_Renderer);
+  renwin->LineSmoothingOn();
+  //renwin->PolygonSmoothingOn();
   this->SetRenderWindow(renwin);
   renwin->Delete();
   // VTK cell picker
