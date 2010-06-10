@@ -44,10 +44,26 @@
 class MainWindow;
 class NumericalTableWidgetItem;
 
+class MasterUndoCommand : public QUndoCommand
+{
+public:
+  MasterUndoCommand(QUndoStack* stack, QUndoCommand* cmd, QUndoCommand* parent = 0)
+  : QUndoCommand(parent)
+  {
+    this->mp_Stack = stack;
+    this->mp_Stack->push(cmd);
+  };
+  void undo() {this->mp_Stack->undo();};
+  void redo() {this->mp_Stack->redo();};
+
+private:
+  QUndoStack* mp_Stack;
+};
+
 class UndoCommand : public QUndoCommand
 {
 public:
-  typedef enum {None, Acquisition, Model} CommandType;
+  typedef enum {None, Acquisition, Configuration} CommandType;
   
   UndoCommand(QUndoCommand* parent = 0)
   : QUndoCommand(parent)
@@ -68,6 +84,16 @@ public:
   : UndoCommand(parent)
   {
     this->m_CommandType = UndoCommand::Acquisition;
+  };
+};
+
+class ConfigurationUndoCommand : public UndoCommand
+{
+public:
+  ConfigurationUndoCommand(QUndoCommand* parent = 0)
+  : UndoCommand(parent)
+  {
+    this->m_CommandType = UndoCommand::Configuration;
   };
 };
 
@@ -106,7 +132,7 @@ private:
 };
 
 // --------------- EditMarkersRadius ---------------
-class EditMarkersRadius : public UndoCommand
+class EditMarkersRadius : public ConfigurationUndoCommand
 {
 public:
   EditMarkersRadius(double r, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent = 0);
@@ -122,7 +148,7 @@ private:
 };
 
 // --------------- EditMarkerColorIndex ---------------
-class EditMarkersColorIndex : public UndoCommand
+class EditMarkersColorIndex : public ConfigurationUndoCommand
 {
 public:
   EditMarkersColorIndex(int idx, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent = 0);

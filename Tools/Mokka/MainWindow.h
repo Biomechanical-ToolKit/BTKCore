@@ -46,6 +46,7 @@
 
 #include <QTimer>
 #include <QUndoStack>
+#include <QXmlStreamWriter>
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -54,6 +55,9 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
 public:
   MainWindow(QWidget* parent = 0);
   ~MainWindow();
+
+  void openFile(const QString& filename);
+  void play();
 
   PointsEditor* mp_PointsEditorDlg;
 
@@ -67,6 +71,7 @@ public Q_SLOTS:
   void about();
   void visitBTKWebsite();
   void setAcquisitionModified(int modified);
+  void setMarkerConfigurationModified(int modified);
   void editMetadata();
   void editPoints();
   void openRecentFile();
@@ -79,6 +84,11 @@ public Q_SLOTS:
   void changePlaybackParameters();
   void changeGroundOrientation();
   // Markers dock
+  void selectMarkerConfiguration(int index);
+  void newMarkerConfiguration();
+  void saveMarkerConfiguration();
+  void loadMarkerConfiguration(const QString& filename = "");
+  void eraseMarkerConfiguration();
   void editMarkerLabel();
   void editMarkerDescription();
   void editMarkerRadius();
@@ -119,7 +129,6 @@ public Q_SLOTS:
   void displayNextFrame();
   
 private:
-  void openFile(const QString& filename);
   void saveFile(const QString& filename);
   void clearUI();
   void fillFileInformations(const QString& filename, btk::AcquisitionFileIO::Pointer io, btk::Acquisition::Pointer acq);
@@ -130,12 +139,16 @@ private:
   bool isOkToContinue();
   void displayPreviousFrame(int step);
   void displayNextFrame(int step);
+  bool isOkToContinue2();
+  bool saveMarkerConfiguration(int index);
+  bool loadMarkerConfiguration(const QString& filename, QString* name);
   
   btk::Acquisition::Pointer mp_Acquisition;
   Metadata* mp_MetadataDlg;
   int m_PlaybackStep;
   int m_PlaybackDelay;
 
+  int m_SelectedMarkerConfiguration;
   QActionGroup* mp_PlaybackSpeedActionGroup;
   QActionGroup* mp_GroundOrientationActionGroup;
   QString m_LastDirectory;
@@ -145,6 +158,8 @@ private:
   QAction* mp_ActionRecentFiles[maxRecentFiles];
   QAction* mp_ActionSeparatorRecentFiles;
   QUndoStack* mp_UndoStack;
+  QUndoStack* mp_AcquisitionUndoStack;
+  QUndoStack* mp_MarkerConfigurationUndoStack;
   QIcon* mp_PlayIcon;
   QIcon* mp_PauseIcon;
   QIcon* mp_DownArrow;

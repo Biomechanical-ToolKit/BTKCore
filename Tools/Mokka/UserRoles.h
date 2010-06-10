@@ -62,4 +62,9 @@ static int checkState2 = Qt::UserRole + 30;
 static int metadataInfoFirstValue = Qt::UserRole + 41;
 static int metadataInfoValuesCount = Qt::UserRole + 42;
 
+typedef enum {visualConfigChanged = Qt::UserRole + 50,
+              visualConfigFilename,
+              visualConfigName,
+              visualConfigNew} visualConfigProperty;
+
 #endif // UserRoles_h

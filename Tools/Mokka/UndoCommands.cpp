@@ -82,7 +82,7 @@ void EditMarkerDescription::action()
 
 // --------------- EditMarkersRadius ---------------
 EditMarkersRadius::EditMarkersRadius(double r, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent)
-: UndoCommand(parent), m_Items(items), m_Radius(QVector<double>(items.count(), r))
+: ConfigurationUndoCommand(parent), m_Items(items), m_Radius(QVector<double>(items.count(), r))
 {
   this->mp_Main = w;
 };
@@ -108,7 +108,7 @@ void EditMarkersRadius::action()
 
 // --------------- EditMarkersColorIndex ---------------
 EditMarkersColorIndex::EditMarkersColorIndex(int idx, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent)
-: UndoCommand(parent), m_Items(items), m_Indexes(QVector<int>(items.count(), idx))
+: ConfigurationUndoCommand(parent), m_Items(items), m_Indexes(QVector<int>(items.count(), idx))
 {
   this->mp_Main = w;
 };
