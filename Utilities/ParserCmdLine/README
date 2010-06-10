@@ -1,0 +1,5 @@
+This is Parser for the Command Line (PCL) version 0.1.
+
+PCL is a small C++ library for parsing command line arguments.
+
+You have only to include the header <pcl/pcl.h> to use PCL. No need to compile the library.
