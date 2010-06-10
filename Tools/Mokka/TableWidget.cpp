@@ -51,10 +51,10 @@ void MarkerTableWidget::mousePressEvent(QMouseEvent* event)
   const int checkMargin = style->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, this) + 1;
   const int iconPixelStart = checkBoxRect.x() + checkBoxRect.width() + checkMargin * 3;
   const int iconPixelEnd = iconPixelStart + 16;
-  if ((x >= iconPixelStart) && (x <= iconPixelEnd))
+  QTableWidgetItem* item;
+  if ((x >= iconPixelStart) && (x <= iconPixelEnd) && ((item = this->itemAt(pos)) != 0))
   {
     this->blockSignals(true);
-    QTableWidgetItem* item = this->itemAt(pos);
     bool actived = item->data(markerTrajectoryActived).toBool();
     if (actived)
       item->setIcon(QIcon(":/Resources/Images/trajectory_unactive.png"));
