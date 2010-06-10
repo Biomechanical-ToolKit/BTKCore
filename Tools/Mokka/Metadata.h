@@ -52,4 +52,5 @@ public:
   void load(btk::MetaData::Pointer m);
   void reset();
 };
+
 #endif // Metadata_h
