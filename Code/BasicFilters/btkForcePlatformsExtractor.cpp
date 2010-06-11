@@ -317,7 +317,7 @@ namespace btk
     {
       pValue = pCalMatrix->GetInfo();
       ForcePlatform::CalMatrix cal = fp->GetCalMatrix();
-      if (pValue->GetValues().size() >= (coefficientsAlreadyExtracted + cal.size()))
+      if (static_cast<int>(pValue->GetValues().size()) >= (coefficientsAlreadyExtracted + cal.size()))
       {
         for (int i = 0 ; i < cal.cols() ; ++i)
           for (int j = 0 ; j < cal.rows() ; ++j)
