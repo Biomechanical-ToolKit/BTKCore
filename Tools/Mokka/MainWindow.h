@@ -83,12 +83,15 @@ public Q_SLOTS:
   void closeFile();
   void changePlaybackParameters();
   void changeGroundOrientation();
+  void deselectCurrentVisualConfiguration();
+  void clearVisualConfigurationList();
   // Markers dock
   void selectMarkerConfiguration(int index);
   void newMarkerConfiguration();
   void saveMarkerConfiguration();
   void loadMarkerConfiguration(const QString& filename = "");
   void eraseMarkerConfiguration();
+  void resetMarkerConfiguration();
   void editMarkerLabel();
   void editMarkerDescription();
   void editMarkerRadius();

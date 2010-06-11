@@ -224,7 +224,15 @@
      <addaction name="actionPlane_YZ"/>
      <addaction name="actionPlane_ZX"/>
     </widget>
+    <widget class="QMenu" name="menuVisual_Configuration">
+     <property name="title">
+      <string>Visual Configuration</string>
+     </property>
+     <addaction name="actionDeselectCurrentConfiguration"/>
+     <addaction name="actionClearConfigurationList"/>
+    </widget>
     <addaction name="menuGround"/>
+    <addaction name="menuVisual_Configuration"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -1668,6 +1676,22 @@ QPushButton::flat
    </property>
    <property name="text">
     <string>Plane ZX</string>
+   </property>
+  </action>
+  <action name="actionDeselectCurrentConfiguration">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Deselect Current</string>
+   </property>
+  </action>
+  <action name="actionClearConfigurationList">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Clear List</string>
    </property>
   </action>
  </widget>

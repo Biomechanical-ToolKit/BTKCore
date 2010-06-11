@@ -171,6 +171,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->action_Quit, SIGNAL(triggered()), this, SLOT(close()));
   connect(this->mp_PlaybackSpeedActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changePlaybackParameters()));
   connect(this->mp_GroundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
+  connect(this->actionDeselectCurrentConfiguration, SIGNAL(triggered()), this, SLOT(deselectCurrentVisualConfiguration()));
+  connect(this->actionClearConfigurationList, SIGNAL(triggered()), this, SLOT(clearVisualConfigurationList()));
   // Playback
   connect(this->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(updateActiveEvent(int)));
   connect(this->frameSlider, SIGNAL(valueChanged(int)), this->qvtkWidget, SLOT(updateDisplay(int)));
@@ -1069,6 +1071,29 @@ void MainWindow::changeGroundOrientation()
     this->qvtkWidget->setGroundOrientation(0.0, 1.0, 0.0);
 };
 
+void MainWindow::deselectCurrentVisualConfiguration()
+{
+  if (this->isOkToContinue2())
+  {
+    this->modelConfigurationComboBox->setCurrentIndex(-1);
+    this->actionDeselectCurrentConfiguration->setEnabled(false);
+  }
+};
+
+void MainWindow::clearVisualConfigurationList()
+{
+  this->deselectCurrentVisualConfiguration();
+  if (this->modelConfigurationComboBox->currentIndex() == -1)
+  {
+    this->modelConfigurationComboBox->blockSignals(true);
+    int cnt = this->modelConfigurationComboBox->count() - 2;
+    for (int i = 0 ; i < cnt ; ++i)
+      this->modelConfigurationComboBox->removeItem(0);
+    this->modelConfigurationComboBox->blockSignals(false);
+    this->actionClearConfigurationList->setEnabled(false);
+  }
+};
+
 void MainWindow::play()
 {
   if (this->mp_Acquisition)
@@ -1368,10 +1393,25 @@ void MainWindow::selectMarkerConfiguration(int index)
     if (this->isOkToContinue2())
     {
       int idx = this->modelConfigurationComboBox->currentIndex(); // Update the index in the case where one configuration has been removed.
-      if ((idx == (this->modelConfigurationComboBox->count() - 1)) || (idx == -1))
+      if (idx == (this->modelConfigurationComboBox->count() - 1))
         this->newMarkerConfiguration();
+      else if (idx == -1)
+      {
+        this->resetMarkerConfiguration();
+        this->m_SelectedMarkerConfiguration = -1;
+        this->saveModelConfigurationButton->setEnabled(false);
+        this->deleteModelConfigurationButton->setEnabled(false);
+        this->actionDeselectCurrentConfiguration->setEnabled(false);
+      }
       else
-        this->loadMarkerConfiguration(this->modelConfigurationComboBox->itemData(index, visualConfigFilename).toString(),0);
+      {
+        this->loadMarkerConfiguration(this->modelConfigurationComboBox->itemData(idx, visualConfigFilename).toString(),0);
+        this->saveModelConfigurationButton->setEnabled(false);
+        this->deleteModelConfigurationButton->setEnabled(true);
+        this->m_SelectedMarkerConfiguration = idx;
+        this->actionDeselectCurrentConfiguration->setEnabled(true);
+        this->actionClearConfigurationList->setEnabled(true);
+      }
     }
     else
     {
@@ -1416,6 +1456,8 @@ void MainWindow::newMarkerConfiguration()
     
     this->saveModelConfigurationButton->setEnabled(true);
     this->deleteModelConfigurationButton->setEnabled(true);
+    this->actionDeselectCurrentConfiguration->setEnabled(true);
+    this->actionClearConfigurationList->setEnabled(true);
     //this->mp_MarkerConfigurationUndoStack->clear();
 
     // Save this new configuration in a temporary file.
@@ -1543,20 +1585,42 @@ void MainWindow::loadMarkerConfiguration(const QString& filename)
   }
   
   QString name;
-  if (!filename2.isEmpty() && this->loadMarkerConfiguration(filename, &name))
+  if (!filename2.isEmpty() && this->loadMarkerConfiguration(filename2, &name))
   {
-    // TODO: Replace or not an existing configuration
     bool alreadyExist = false;
+    int i = 0;
+    for (i = 0 ; i < (this->modelConfigurationComboBox->count() - 2) ; ++i)
+    {
+      if (name.compare(this->modelConfigurationComboBox->itemData(i,visualConfigName).toString()) == 0)
+      {
+        alreadyExist = true;
+        break;
+      }
+    }
     
-    this->modelConfigurationComboBox->blockSignals(true);
-    this->m_SelectedMarkerConfiguration = 0;
-    this->modelConfigurationComboBox->insertItem(this->m_SelectedMarkerConfiguration, name);
+    if (!alreadyExist)
+    {
+      this->m_SelectedMarkerConfiguration = 0;
+      this->modelConfigurationComboBox->blockSignals(true);
+      this->modelConfigurationComboBox->insertItem(this->m_SelectedMarkerConfiguration, name);
+      this->modelConfigurationComboBox->blockSignals(false);
+    }
+    else
+      this->m_SelectedMarkerConfiguration = i;
+      
     this->modelConfigurationComboBox->setItemData(this->m_SelectedMarkerConfiguration, false, visualConfigChanged);
     this->modelConfigurationComboBox->setItemData(this->m_SelectedMarkerConfiguration, false, visualConfigNew);
-    this->modelConfigurationComboBox->setItemData(this->m_SelectedMarkerConfiguration, filename, visualConfigFilename);
+    this->modelConfigurationComboBox->setItemData(this->m_SelectedMarkerConfiguration, filename2, visualConfigFilename);
     this->modelConfigurationComboBox->setItemData(this->m_SelectedMarkerConfiguration, name, visualConfigName);
+    
+    this->modelConfigurationComboBox->blockSignals(true);
     this->modelConfigurationComboBox->setCurrentIndex(this->m_SelectedMarkerConfiguration);
     this->modelConfigurationComboBox->blockSignals(false);
+    
+    this->saveModelConfigurationButton->setEnabled(false);
+    this->deleteModelConfigurationButton->setEnabled(true);
+    this->actionDeselectCurrentConfiguration->setEnabled(true);
+    this->actionClearConfigurationList->setEnabled(true);
   }
   
   this->qvtkWidget->setFocus();
@@ -1660,10 +1724,6 @@ bool MainWindow::loadMarkerConfiguration(const QString& filename, QString* name)
   }
   this->markersTable->blockSignals(false);
   
-  this->saveModelConfigurationButton->setEnabled(false);
-  this->deleteModelConfigurationButton->setEnabled(true);
-  this->m_SelectedMarkerConfiguration = this->modelConfigurationComboBox->currentIndex();
-  
   this->qvtkWidget->updateDisplay();
   
   return true;
@@ -1671,7 +1731,7 @@ bool MainWindow::loadMarkerConfiguration(const QString& filename, QString* name)
 
 void MainWindow::eraseMarkerConfiguration()
 {
-  int index = this->m_SelectedMarkerConfiguration;//this->modelConfigurationComboBox->currentIndex();
+  int index = this->modelConfigurationComboBox->currentIndex();
   
   if (!this->modelConfigurationComboBox->itemData(index, visualConfigNew).toBool())
   {
@@ -1692,19 +1752,28 @@ void MainWindow::eraseMarkerConfiguration()
     else if (res == QMessageBox::Cancel)
       return;
   }
+  /*
   this->modelConfigurationComboBox->blockSignals(true);
   this->modelConfigurationComboBox->removeItem(index);
   if (this->modelConfigurationComboBox->count() <= 2)
   {
-    this->m_SelectedMarkerConfiguration = -1;
     this->modelConfigurationComboBox->setCurrentIndex(-1);
     this->saveModelConfigurationButton->setEnabled(false);
     this->deleteModelConfigurationButton->setEnabled(false); 
   }
   this->modelConfigurationComboBox->blockSignals(false);
   this->selectMarkerConfiguration(this->m_SelectedMarkerConfiguration);
+  */
+  this->modelConfigurationComboBox->setCurrentIndex(-1); // Reset the visual configuration
+  this->modelConfigurationComboBox->removeItem(index);
   
-  // Go to the default visual configuration:
+  this->qvtkWidget->setFocus();
+};
+
+// Go to the default visual configuration:
+
+void MainWindow::resetMarkerConfiguration()
+{
   //  - White markers
   // - Radius : 8 mm
   double r = 8.0;
@@ -1724,9 +1793,7 @@ void MainWindow::eraseMarkerConfiguration()
   }
   this->markersTable->blockSignals(false);
   this->qvtkWidget->updateDisplay();
-  
-  this->qvtkWidget->setFocus();
-};
+}
 
 void MainWindow::editMarkerLabel()
 {
