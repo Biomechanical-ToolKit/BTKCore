@@ -758,6 +758,8 @@ void MainWindow::openFile(const QString& filename)
   
   this->modelConfigurationComboBox->setEnabled(true);
   this->loadModelConfigurationButton->setEnabled(true);
+  if (this->modelConfigurationComboBox->count() != 0)
+    this->actionClearConfigurationList->setEnabled(true);
   
   this->m_LastDirectory = QFileInfo(filename).absolutePath();
   
@@ -2264,8 +2266,11 @@ void MainWindow::writeSettings()
   QStringList recentVisualConfigName;
   for (int i = 0 ; i < (this->modelConfigurationComboBox->count() - 2) ; ++i)
   {
-    recentVisualConfigFilename << this->modelConfigurationComboBox->itemData(i,visualConfigFilename).toString();
-    recentVisualConfigName << this->modelConfigurationComboBox->itemData(i,visualConfigName).toString();
+    if (!this->modelConfigurationComboBox->itemData(i,visualConfigNew).toBool())
+    {
+      recentVisualConfigFilename << this->modelConfigurationComboBox->itemData(i,visualConfigFilename).toString();
+      recentVisualConfigName << this->modelConfigurationComboBox->itemData(i,visualConfigName).toString();
+    }
   }
   settings.setValue("recentVisualConfigFilename", recentVisualConfigFilename);
   settings.setValue("recentVisualConfigName", recentVisualConfigName);
