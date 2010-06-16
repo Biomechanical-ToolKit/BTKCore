@@ -8,6 +8,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkGetAnalogNumber">btkGetAnalogNumber</a>          - Analog's number accessor
 %   <a href="matlab:help btkGetAnalysis">btkGetAnalysis</a>              - ANALYSIS group extraction
 %   <a href="matlab:help btkGetFirstFrame">btkGetFirstFrame</a>            - Acquisition's first frame accessor
+%   <a href="matlab:help btkGetLastFrame">btkGetLastFrame</a>             - Acquisition's last frame accessor
 %   <a href="matlab:help btkGetMetaData">btkGetMetaData</a>              - Acquisition's metadata accessor	
 %   <a href="matlab:help btkGetPointFrameNumber">btkGetPointFrameNumber</a>      - Point's frame number accessor
 %   <a href="matlab:help btkGetPointFrequency">btkGetPointFrequency</a>        - Point's frequency accessor

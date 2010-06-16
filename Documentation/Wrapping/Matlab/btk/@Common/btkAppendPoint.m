@@ -2,8 +2,17 @@ function btkAppendPoint(h, type, label, values, residuals, masks, desc) %#ok
 %BTKAPPENDPOINT Append a new point and return an updated list of points.
 % 
 %  BTKAPPENDPOINT(H, TYPE, LABEL, VALUES) append a point with the type TYPE,
-%  the label LABEL and the values VALUES.  VALUES must be a matrix (N,3) 
-%  where N corresponds to the number of frames in the acquisition.
+%  the label LABEL and the values VALUES.  TYPE must be a string corresponding 
+%  to one of the following type:
+%   - marker
+%   - angle
+%   - force
+%   - moment
+%   - power
+%   - scalar
+%   - reaction
+%  The input VALUES must be a matrix (N,3) where N corresponds to the number 
+%  of frames in the acquisition.
 %
 %  BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS) set also the point's 
 %  residuals. RESIDUALS is matrix (N,1) and corresponds to the residuals of
