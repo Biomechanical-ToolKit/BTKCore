@@ -282,9 +282,6 @@
          <property name="enabled">
           <bool>false</bool>
          </property>
-         <property name="frame">
-          <bool>false</bool>
-         </property>
         </widget>
        </item>
        <item>

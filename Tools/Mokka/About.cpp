@@ -41,4 +41,5 @@ About::About(QWidget* parent)
 {
   this->setupUi(this);
   this->release->setText(this->release->text() + QString::number(BTK_VERSION_MAJOR) + "." + QString::number(BTK_VERSION_MINOR) + "." + QString::number(BTK_VERSION_PATCH));
+  this->release->setText("0.1a4");
 };

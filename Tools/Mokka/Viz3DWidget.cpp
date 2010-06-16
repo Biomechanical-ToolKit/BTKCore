@@ -421,7 +421,7 @@ void Viz3DWidget::updateDisplayedMarkersList(vtkObject* caller, unsigned long /*
     return;
     
   QVector<int> ids = QVector<int>(indexes->GetSize());
-  for (size_t i = 0; i < ids.size() ; ++i)
+  for (int i = 0; i < ids.size() ; ++i)
     ids[i] = indexes->GetValue(i);
   emit visibleMarkersChanged(ids);
 };

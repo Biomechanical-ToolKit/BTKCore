@@ -266,7 +266,7 @@ namespace pcl
           currentOpt = this->FindOptAbbreviation(it->substr(1,1));
           if (!currentOpt)
             throw(ParserError("Illegal option with abbreviation: '"+ it->substr(1,1) +"'"));
-          int idxAbbr = 2;
+          size_t idxAbbr = 2;
           while(idxAbbr < it->size())
           {
             Opt* otheo = this->FindOptAbbreviation(it->substr(idxAbbr,1));
