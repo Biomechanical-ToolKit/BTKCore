@@ -88,6 +88,12 @@ namespace pcl
       throw ConversionError("Error during type conversion from a string.");
     return target;
   };
+  
+  template<>
+  inline std::string ValueOpt<std::string>::Convert(const std::string& source) const
+  {
+    return source;
+  };
 };
 
 #endif // pcl_ValueOpt_h

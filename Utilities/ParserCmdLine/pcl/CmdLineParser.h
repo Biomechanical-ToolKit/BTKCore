@@ -43,7 +43,8 @@
 #include <iostream>
 #include <string>
 #include <list>
-//#include <utility>
+#include <algorithm>
+#include <cctype>
 
 namespace pcl
 {
@@ -214,17 +215,22 @@ namespace pcl
   void CmdLineParser::Parse(int argc, char * const argv[])
   {
     this->m_Name = argv[0];
-    /*
     std::string::size_type slashIdx = this->m_Name.find_last_of('/');
     std::string::size_type backslashIdx = this->m_Name.find_last_of('\\');
-    if (slashIdx != backslashIdx)
-    {
-      if (slashIdx > backslashIdx)
-        this->m_Name = this->m_Name.substr(slashIdx);
-      else
-        this->m_Name = this->m_Name.substr(backslashIdx);
-    }
-     */
+    if ((slashIdx == std::string::npos) && (backslashIdx == std::string::npos))
+      this->m_Name = this->m_Name;
+    else if (slashIdx == std::string::npos)
+      this->m_Name = this->m_Name.substr(backslashIdx + 1);
+    else
+      this->m_Name = this->m_Name.substr(slashIdx + 1);
+#if defined (_MSC_VER)
+    // Remove the .exe
+    std::string exe = this->m_Name.substr(this->m_Name.length()-4);
+    std::transform(exe.begin(), exe.end(), exe.begin(), tolower);
+    if (exe.compare(".exe") == 0)
+      this->m_Name = this->m_Name.substr(0,this->m_Name.length()-4);
+#endif
+    
     if (argc == 1)
       return;
     std::list<std::string> argList;
@@ -238,6 +244,13 @@ namespace pcl
     {
       if (it->compare("") == 0)
         throw(ParserError("Unexpected empty value"));
+#if defined(__APPLE__)
+      if (it->substr(0,7).compare("-psn_0_") == 0) // Process Serial Number given by MacOS X
+      {
+        it = argList.erase(it);
+        continue;
+      }
+#endif
       if (it->substr(0,1).compare("-") == 0) // Option
       {
         if (currentOpt)
@@ -312,7 +325,7 @@ namespace pcl
               }
               ++itOpt;
             }
-            while( it != argList.end())
+            while(it != argList.end())
             {
               currentOpt->SetValue(*it);
               it = argList.erase(it);
@@ -350,16 +363,25 @@ namespace pcl
     }
     catch (pcl::Exception& e)
     {
+#if defined(_MSC_VER) && defined(_WINDOWS_) // Only when using WinMain application
+      std::cerr << "\n";
+#endif
       std::cerr << e.what() << std::endl;
       this->m_Status = -1;
     }
     catch (std::exception& e)
     {
+#if defined(_MSC_VER) && defined(_WINDOWS_) // Only when using WinMain application
+      std::cerr << "\n";
+#endif
       std::cerr << "Unexpected error: " << e.what() << std::endl;
       this->m_Status = -2;
     }
     catch (...)
     {
+#if defined(_MSC_VER) && defined(_WINDOWS_) // Only when using WinMain application
+      std::cerr << "\n";
+#endif
       std::cerr << "Unknown error: Please contact the developer." << std::endl;
       this->m_Status = -3;
     }
@@ -406,6 +428,9 @@ namespace pcl
   
   inline void CmdLineParser::PrintBrief(std::ostream& os)
   {
+#if defined(_MSC_VER) && defined(_WINDOWS_) // Only when using WinMain application
+    os << "\n";
+#endif
     std::string usage; this->GenerateUsage(usage);
     os << "Brief USAGE:\n";
     os << "  " << usage << "\n\n";
@@ -415,6 +440,9 @@ namespace pcl
   
   inline void CmdLineParser::PrintHelp(std::ostream& os)
   {
+#if defined(_MSC_VER) && defined(_WINDOWS_) // Only when using WinMain application
+    os << "\n";
+#endif
     std::string usage; this->GenerateUsage(usage);
     os << "USAGE:\n";
     os << "  " << usage << "\n\n";
@@ -428,6 +456,9 @@ namespace pcl
   
   inline void CmdLineParser::PrintVersion(std::ostream& os)
   {
+#if defined(_MSC_VER) && defined(_WINDOWS_) // Only when using WinMain application
+    os << "\n";
+#endif
     os << this->m_Name << ": " << this->m_Description << " - " << this->m_Version << std::endl;
   };
   
@@ -447,18 +478,10 @@ namespace pcl
     return arg;
   };
   
-  //test1  [-r] -n <string> [--] [-v] [-h]
   void CmdLineParser::GenerateUsage(std::string& usage) const
   {
     usage.clear();
-    std::string::size_type slashIdx = this->m_Name.find_last_of('/');
-    std::string::size_type backslashIdx = this->m_Name.find_last_of('\\');
-    if ((slashIdx == std::string::npos) && (backslashIdx == std::string::npos))
-      usage = this->m_Name;
-    else if (slashIdx == std::string::npos)
-      usage = this->m_Name.substr(backslashIdx + 1);
-    else
-      usage = this->m_Name.substr(slashIdx + 1);
+    usage = this->m_Name;
     
     std::string u;
     std::list<Opt*> alreadyProcessed;

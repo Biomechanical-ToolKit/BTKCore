@@ -36,6 +36,8 @@
 #ifndef pcl_Exception_h
 #define pcl_Exception_h
 
+#include <stdexcept>
+
 namespace pcl
 {
   /**
