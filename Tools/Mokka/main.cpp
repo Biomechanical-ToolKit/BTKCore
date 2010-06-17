@@ -33,17 +33,93 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "btkConfigure.h"
+
 #include "MainWindow.h"
 
 #include <QApplication>
 
-#include <pcl/pcl.h>
+#if defined(_MSC_VER)
+#include <windows.h> // For WinMain
+#include <io.h>      // For _open_osfhandle
+#include <fcntl.h>   // For _O_TEXT
+#endif
+
+#include <pcl/pcl.h> // Must be included at the end (to detect the use of windows.h)
 
 #define xstr(s) str(s)
 #define str(s) #s
 
+// Under Windows, the main function is transformed in a WinMain function ...
+#if defined(_MSC_VER)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
+  int argc = __argc;
+  char** argv = __argv;
+
+  if (argc > 1) // Command line options
+  {
+    if (AttachConsole(ATTACH_PARENT_PROCESS))
+    {
+      int hCrt;
+      FILE *hf;
+      // Standard output
+      hCrt = _open_osfhandle((long) GetStdHandle(STD_OUTPUT_HANDLE), _O_TEXT);
+      if (hCrt == -1)
+      {
+        MessageBoxW(NULL,
+                    (LPCWSTR)L"Error: Impossible to open the standard output! Are you using the MSVC command prompt?  \n\nPlease use a regular command prompt when you want to add command line options",
+                    (LPCWSTR)L"Mokka",
+                    MB_ICONERROR | MB_OK);
+        return -1;
+      }
+      hf = _fdopen(hCrt, "w");
+      *stdout = *hf;
+      setvbuf( stdout, NULL, _IONBF, 0 );
+      // Error output
+      hCrt = _open_osfhandle((long) GetStdHandle(STD_ERROR_HANDLE), _O_TEXT);
+      if (hCrt == -1)
+      {
+        MessageBoxW(NULL,
+                    (LPCWSTR)L"Error: Impossible to open the error output! Are you using the MSVC command prompt?  \n\nPlease use a regular command prompt when you want to add command line options",
+                    (LPCWSTR)L"Mokka",
+                    MB_ICONERROR | MB_OK);
+        return -1;
+      }
+      hf = _fdopen(hCrt, "w");
+      *stderr = *hf;
+      setvbuf( stderr, NULL, _IONBF, 0 );
+      // Sync cout and cerr
+      std::ios::sync_with_stdio();
+    }
+    /*
+    else
+    {
+      unsigned int result = GetLastError();
+      if (result == ERROR_ACCESS_DENIED)
+      {
+        MessageBoxW(NULL,
+                   (LPCWSTR)L"Error: Impossible to attach the console!",
+                   (LPCWSTR)L"Mokka",
+                    MB_ICONERROR | MB_OK);
+        return -1;
+      }
+      else if (result == ERROR_INVALID_HANDLE)
+      {
+        // Could use the AllocConsole() function.
+        MessageBoxW(NULL,
+                   (LPCWSTR)L"Error: Impossible to find the console!",
+                   (LPCWSTR)L"Mokka",
+                    MB_ICONERROR | MB_OK);
+        return -1;
+      }
+    }
+    */
+  }
+#else
 int main(int argc, char *argv[])
 {
+#endif
   std::string rn = xstr(BTK_VERSION_MAJOR); rn += "."; rn += xstr(BTK_VERSION_MINOR);
   pcl::CmdLineParser clp("Motion Kinematic & Kinetic Analyzer", rn);
   clp.UseDefaultOption(pcl::Help | pcl::Version);
@@ -53,8 +129,13 @@ int main(int argc, char *argv[])
   
   clp.Add(play).Add(visualConfig).Add(acquisition);
   if (clp.Run(argc, argv) != 0)
+  {
+#if defined(_MSC_VER)
+    std::cout << std::endl << "(Press Enter to go back to the command prompt)" << std::endl;
+#endif
     return clp.GetStatus();
-  
+  }
+    
   QApplication app(argc, argv);
   MainWindow mw;
   mw.show();
@@ -65,6 +146,13 @@ int main(int argc, char *argv[])
     mw.loadMarkerConfiguration(QString::fromStdString(visualConfig.GetValue()));
   if (play.IsAssigned()) // Should be the last option
     mw.play();
-  
-  return app.exec();
+    
+  int res = app.exec();
+    
+#if defined(_MSC_VER)
+  if (argc > 1)
+    std::cout << std::endl << "(Press Enter to go back to the command prompt)" << std::endl;
+#endif
+
+  return res;
 };
