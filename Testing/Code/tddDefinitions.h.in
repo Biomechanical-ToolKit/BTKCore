@@ -1,2 +1,0 @@
-#define TDD_FilePathIN "${BTK_SOURCE_DIR}/Testing/Data/Input/"
-#define TDD_FilePathOUT "${BTK_SOURCE_DIR}/Testing/Data/Output/"

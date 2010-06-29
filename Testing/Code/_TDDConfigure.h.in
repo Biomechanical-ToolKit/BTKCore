@@ -1,0 +1,35 @@
+#ifndef _TDDConfigure_h
+#define _TDDConfigure_h
+
+#define TDD_FilePathIN "${BTK_SOURCE_DIR}/Testing/Data/Input/"
+#define TDD_FilePathOUT "${BTK_SOURCE_DIR}/Testing/Data/Output/"
+
+#ifndef CXXTEST_RUNNING
+    #define CXXTEST_RUNNING
+#endif
+
+#define _CXXTEST_HAVE_STD
+#define _CXXTEST_HAVE_EH
+
+#include <cxxtest/TestListener.h>
+#include <cxxtest/TestTracker.h>
+#include <cxxtest/TestRunner.h>
+#include <cxxtest/RealDescriptions.h>
+#include <cxxtest/ErrorPrinter.h>
+
+#define ANBFilePathIN std::string(TDD_FilePathIN) + "ANBSamples/"
+#define ANBFilePathOUT std::string(TDD_FilePathOUT) + "ANBSamples/"
+#define ANCFilePathIN std::string(TDD_FilePathIN) + "ANCSamples/"
+#define ANCFilePathOUT std::string(TDD_FilePathOUT) + "ANCSamples/"
+#define C3DFilePathIN std::string(TDD_FilePathIN) + "C3DSamples/"
+#define C3DFilePathOUT std::string(TDD_FilePathOUT) + "C3DSamples/"
+#define CALForcePlateFilePathIN std::string(TDD_FilePathIN) + "CALForcePlateSamples/"
+#define CALForcePlateFilePathOUT std::string(TDD_FilePathOUT) + "CALForcePlateSamples/"
+#define TRCFilePathIN std::string(TDD_FilePathIN) + "TRCSamples/"
+#define TRCFilePathOUT std::string(TDD_FilePathOUT) + "TRCSamples/"
+#define XLSOrthotrackFilePathIN std::string(TDD_FilePathIN) + "XLSOrthotrackSamples/"
+#define XLSOrthotrackFilePathOUT std::string(TDD_FilePathOUT) + "XLSOrthotrackSamples/"
+#define EliteFilePathIN std::string(TDD_FilePathIN) + "EliteSamples/"
+#define EliteFilePathOUT std::string(TDD_FilePathOUT) + "EliteSamples/"
+
+#endif // _TDDConfigure_h

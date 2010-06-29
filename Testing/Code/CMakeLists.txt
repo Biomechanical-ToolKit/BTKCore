@@ -1,10 +1,13 @@
 INCLUDE(${CMAKE_MODULE_PATH}/btkGetC3DSamples.cmake)
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/tddDefinitions.h.in ${CMAKE_CURRENT_BINARY_DIR}/tddDefinitions.h)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/_TDDConfigure.h.in ${CMAKE_CURRENT_BINARY_DIR}/_TDDConfigure.h)
 INCLUDE_DIRECTORIES(${BTK_BINARY_DIR}/Testing/Code)
 
 SET(TDD_SRCS
-  main.cpp
+  _TDD.cpp
+  _TDDBasicFilters.cpp
+  _TDDCommon.cpp
+  _TDDIO.cpp
   )
 
 #IF(BTK_USE_VTK)
