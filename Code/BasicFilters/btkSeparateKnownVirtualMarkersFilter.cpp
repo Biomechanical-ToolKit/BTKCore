@@ -40,6 +40,7 @@ namespace btk
  /**
    * @class SeparateKnownVirtualMarkersFilter
    * @brief Separate a collection of points in fours categories to be able to distinguish real markers from the others.
+   *
    * These categories are:
    *  -# markers
    *  -# virtual markers used for frame axes
