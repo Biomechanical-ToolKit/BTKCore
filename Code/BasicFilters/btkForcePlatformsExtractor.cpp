@@ -296,11 +296,11 @@ namespace btk
     if (pOrigin.get() != 0)
     {
       pValue = pOrigin->GetInfo();
-      if (static_cast<int>(pValue->GetValues().size()) >= 3 * (idx + 1))
+      if (pValue->GetValues().size() >= 3 * (idx + 1))
       {
-        fp->SetOrigin(pValue->ToDouble(3 * idx),
-                      pValue->ToDouble(3 * idx + 1),
-                      pValue->ToDouble(3 * idx + 2));
+        fp->SetOrigin(pValue->ToDouble(3 * static_cast<int>(idx)),
+                      pValue->ToDouble(3 * static_cast<int>(idx) + 1),
+                      pValue->ToDouble(3 * static_cast<int>(idx) + 2));
       }
     }
     if (pCorners.get() != 0)
@@ -310,7 +310,7 @@ namespace btk
       {
         for (int i = 0 ; i < 4 ; ++i)
           for (int j = 0 ; j < 3 ; ++j)
-            fp->SetCorner(j, i, pValue->ToDouble(j + i * 3 + idx * 12));
+            fp->SetCorner(j, i, pValue->ToDouble(j + i * 3 + static_cast<int>(idx) * 12));
       }
     }
     if (pCalMatrix.get() != 0)

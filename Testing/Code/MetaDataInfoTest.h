@@ -835,7 +835,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   
   CXXTEST_TEST(Real2String2Real_Number)
   {
-    btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<float>(5, 1.2345));
+    btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<float>(5, (float)1.2345));
     TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(test->GetDimensions().at(0), 5);
     test->SetFormat(btk::MetaDataInfo::Char);

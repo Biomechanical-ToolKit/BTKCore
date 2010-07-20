@@ -301,16 +301,14 @@ namespace btk
     {
       case MetaDataInfo::Byte:
         return Voidify_p(static_cast<int8_t>(source));
-        break;
       case MetaDataInfo::Integer:
         return Voidify_p(static_cast<int16_t>(source));
-        break;
       case MetaDataInfo::Real:
         return Voidify_p(static_cast<float>(source));
-        break;
       case MetaDataInfo::Char:
         return Voidify_p(ToString(source));
-        break;
+      default: // Impossible
+        return 0;
     }
   };
   
@@ -321,16 +319,14 @@ namespace btk
     {
       case MetaDataInfo::Byte:
         return Voidify_p(NumerifyFromString_p<int8_t>(source));
-        break;
       case MetaDataInfo::Integer:
         return Voidify_p(NumerifyFromString_p<int16_t>(source));
-        break;
       case MetaDataInfo::Real:
         return Voidify_p(NumerifyFromString_p<float>(source));
-        break;
       case MetaDataInfo::Char:
         return Voidify_p(source);
-        break;
+      default: // Impossible
+        return 0;
     }
   };
   

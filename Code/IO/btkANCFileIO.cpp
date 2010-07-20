@@ -190,7 +190,7 @@ namespace btk
         std::getline(ifs, line);
         this->ExtractDataInfo(line, "Range", ranges);
         double nf = duration * preciseRate; // Must be separate in two step due to some rounding errors
-        size_t numberOfFrames = (size_t)nf + 1;
+        size_t numberOfFrames = static_cast<size_t>(nf) + 1;
         // Data conversion
         std::vector<std::string> channelLabel(labels.size());
         std::vector<uint16_t> channelRate(rates.size());
@@ -217,7 +217,7 @@ namespace btk
           for (AnalogCollection::Iterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
           {
             ifs >> val;
-            (*it)->GetValues().coeffRef(i) = val * (*it)->GetScale();
+            (*it)->GetValues().coeffRef(static_cast<int>(i)) = val * (*it)->GetScale();
           }
         }
       }
