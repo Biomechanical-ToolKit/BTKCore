@@ -181,23 +181,17 @@ namespace btk
   {
     if (this->m_Format == format)
       return;
-    if (format == Char)
-    {
-      Clear_p(this->m_Format, this->m_Values);
-      if (this->m_Dims.size() == 0)
-        Voidify_p(std::vector<std::string>(1, " "), this->m_Values);
-      else
-        Voidify_p(std::vector<std::string>(this->GetDimensionsProduct(1), std::string(this->m_Dims[0], ' ')), this->m_Values);
-    }
-    else
-    {
-      if ((this->m_Format == Char) || (this->m_Format == Real)
-          || ((this->m_Format == Integer) && (format == Byte)))
-      {
-        Clear_p(this->m_Format, this->m_Values);
-        Resize_p(format, this->m_Values, this->GetDimensionsProduct());
-      }
-    }
+    
+    std::vector<void*> oldValues = this->m_Values;
+    
+    this->m_Values = Convertify_p(this->m_Format, format, this->m_Values);
+    Clear_p(this->m_Format, oldValues);
+    
+    if (this->m_Format == Char)
+      this->m_Dims.erase(this->m_Dims.begin());
+    else if ((format == Char) && (this->m_Values.size() != 0))
+      this->m_Dims.insert(this->m_Dims.begin(), static_cast<uint8_t>(static_cast<std::string*>(this->m_Values[0])->length()));
+    
     this->m_Format = format;
   };
 
@@ -277,54 +271,6 @@ namespace btk
           Insert_p(this->m_Format, this->m_Values, it, diffNb * elts);
           --inc;
         }
-        /*
-        switch(this->m_Format)
-        {
-          case Byte:
-            {
-              while(inc > 0)
-              {
-                std::vector<void*>::iterator it = this->m_Values.begin();
-                std::advance(it, step * inc);
-                this->InsertValues(it, diffNb * elts, static_cast<int8_t>(0));
-                --inc;
-              }
-            }
-            break;
-          case Integer:
-            {
-              while(inc > 0)
-              {
-                std::vector<void*>::iterator it = this->m_Values.begin();
-                std::advance(it, step * inc);
-                this->InsertValues(it, diffNb * elts, static_cast<int16_t>(0));
-                --inc;
-              }
-            }
-            break;
-          case Real:
-            {
-              while(inc > 0)
-              {
-                std::vector<void*>::iterator it = this->m_Values.begin();
-                std::advance(it, step * inc);
-                this->InsertValues(it, diffNb * elts, static_cast<float>(0.0));
-                --inc;
-              }
-            }
-            break;
-          case Char:
-            {
-              while(inc > 0)
-              {
-                std::vector<void*>::iterator it = this->m_Values.begin();
-                std::advance(it, step * inc);
-                this->InsertValues(it, diffNb * elts, std::string(this->m_Dims[0] , ' '));
-                --inc;
-              }
-            }
-            break;
-        }*/
       }
     }
   };
@@ -411,9 +357,9 @@ namespace btk
   };
 
   /**
-   * Sets @a val as the value at the specified @a idx if possible.
-   *   - This method doesn't do anything if the idx is out of range.
-   *   - This method doesn't do anything if the new value doesn't have the same format.
+   * Sets @a val as the value at the specified index @a idx.
+   *
+   * @warning This method doesn't do anything if the idx is out of range.
    */
   void MetaDataInfo::SetValue(int idx, int8_t val)
   {
@@ -422,19 +368,15 @@ namespace btk
       btkErrorMacro("Out of range");
       return;
     }
-    if (this->m_Format != Byte)
-    {
-      btkErrorMacro("Invalid input format");
-      return;
-    }
-    Delete_p<int8_t>(this->m_Values[idx]);
-    this->m_Values[idx] = Voidify_p(val);
+    
+    Delete_p(this->m_Format, this->m_Values[idx]);
+    this->m_Values[idx] = Convertify_p(this->m_Format, val);
   };
 
   /**
-   * Sets @a val as the value at the specified @a idx if possible.
-   *   - This method doesn't do anything if the idx is out of range.
-   *   - This method doesn't do anything if the new value doesn't have the same format.
+   * Sets @a val as the value (if necessary, adapt it to fit the format) at the specified index @a idx.
+   *
+   * @warning This method doesn't do anything if the idx is out of range.
    */
   void MetaDataInfo::SetValue(int idx, int16_t val)
   {
@@ -443,19 +385,15 @@ namespace btk
       btkErrorMacro("Out of range");
       return;
     }
-    if (this->m_Format != Integer)
-    {
-      btkErrorMacro("Invalid input format");
-      return;
-    }
-    Delete_p<int16_t>(this->m_Values[idx]);    
-    this->m_Values[idx] = Voidify_p(val);
+    
+    Delete_p(this->m_Format, this->m_Values[idx]);
+    this->m_Values[idx] = Convertify_p(this->m_Format, val);
   };
 
   /**
-   * Sets @a val as the value at the specified @a idx if possible.
-   *   - This method doesn't do anything if the idx is out of range.
-   *   - This method doesn't do anything if the new value doesn't have the same format.
+   * Sets @a val as the value (if necessary, adapt it to fit the format) at the specified index @a idx.
+   *
+   * @warning This method doesn't do anything if the idx is out of range.
    */
   void MetaDataInfo::SetValue(int idx, float val)
   {
@@ -464,20 +402,16 @@ namespace btk
       btkErrorMacro("Out of range");
       return;
     }
-    if (this->m_Format != Real)
-    {
-      btkErrorMacro("Invalid input format");
-      return;
-    }
-    Delete_p<float>(this->m_Values[idx]);    
-    this->m_Values[idx] = Voidify_p(val);
+    
+    Delete_p(this->m_Format, this->m_Values[idx]);
+    this->m_Values[idx] = Convertify_p(this->m_Format, val);
   };
 
   /**
-   * Sets @a val as the value at the specified @a idx if possible. 
+   * Sets @a val as the value (if necessary, adapt it to fit the format) at the specified index @a idx.
    * Dimensions are updated if necessary.
-   *   - This method doesn't do anything if the idx is out of range.
-   *   - This method doesn't do anything if the new value doesn't have the same format.
+   *
+   * @warning This method doesn't do anything if the idx is out of range.
    */
   void MetaDataInfo::SetValue(int idx, const std::string& val)
   {
@@ -486,19 +420,50 @@ namespace btk
       btkErrorMacro("Out of range");
       return;
     }
-    if (this->m_Format != Char)
+    
+    Delete_p(this->m_Format, this->m_Values[idx]);    
+    this->m_Values[idx] = Convertify_p(this->m_Format, val);
+
+    if (this->m_Format == Char)
     {
-      btkErrorMacro("Invalid input format");
+      int len = static_cast<int>(val.length());
+      if (len > this->m_Dims[0])
+        this->m_Dims[0] = len;
+      for (int i = 0 ; i < this->GetDimensionsProduct(1) ; ++i)
+        static_cast<std::string*>(this->m_Values[i])->resize(this->m_Dims[0], ' ');
+    }
+  };
+  
+  /**
+   * Sets @a val as the value (if necessary, adapt it to fit the format) at the specified index @a idx.
+   * 
+   * @warning This method doesn't do anything if the idx is out of range.
+   */
+  void MetaDataInfo::SetValue(int idx, int val)
+  {
+    if (idx >= static_cast<int>(this->m_Values.size()))
+    {
+      btkErrorMacro("Out of range");
       return;
     }
-    Delete_p<std::string>(this->m_Values[idx]);    
-    this->m_Values[idx] = Voidify_p(val);
-
-    int len = static_cast<int>(val.length());
-    if (len > this->m_Dims[0])
-      this->m_Dims[0] = len;
-    for (int i = 0 ; i < this->GetDimensionsProduct(1) ; ++i)
-      static_cast<std::string*>(this->m_Values[i])->resize(this->m_Dims[0], ' ');
+    Delete_p(this->m_Format, this->m_Values[idx]);
+    this->m_Values[idx] = Convertify_p(this->m_Format, val);
+  };
+  
+  /**
+   * Sets @a val as the value (if necessary, adapt it to fit the format) at the specified index @a idx.
+   *
+   * @warning This method doesn't do anything if the idx is out of range.
+   */
+  void MetaDataInfo::SetValue(int idx, double val)
+  {
+    if (idx >= static_cast<int>(this->m_Values.size()))
+    {
+      btkErrorMacro("Out of range");
+      return;
+    }
+    Delete_p(this->m_Format, this->m_Values[idx]);
+    this->m_Values[idx] = Convertify_p(this->m_Format, val);
   };
   
   /**

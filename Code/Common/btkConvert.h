@@ -44,6 +44,12 @@
 #include <iomanip>
 #include <limits>
 
+#ifdef _MSC_VER
+  #include "../../Utilities/stdint.h"
+#else
+  #include <stdint.h>
+#endif
+
 // This code is largely inspired of http://www.parashift.com/c++-faq-lite/misc-technical-issues.html
 
 namespace btk
@@ -153,6 +159,18 @@ namespace btk
   {
     std::ostringstream oss;
     if (!(oss << std::boolalpha << toConvert))
+      throw ConversionError("Error during stringification");
+    return oss.str();
+  }
+  
+  /**
+   * Explicit method to stringify an int8_t (string the decimal number and not the hex value).
+   */
+  template<>
+  inline std::string ToString<int8_t>(const int8_t& toConvert)
+  {
+    std::ostringstream oss;
+    if (!(oss << static_cast<int16_t>(toConvert)))
       throw ConversionError("Error during stringification");
     return oss.str();
   }

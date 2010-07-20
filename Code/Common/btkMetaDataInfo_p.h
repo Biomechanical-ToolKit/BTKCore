@@ -55,7 +55,6 @@ namespace btk
     return static_cast<void*>(target);
   };
 
-
   template <typename T>
   inline void Voidify_p(const std::vector<T>& source, std::vector<void*>& target)
   {
@@ -75,7 +74,7 @@ namespace btk
     values.resize(num);
     Voidify_p(values, target);
   };
-
+  
   // Devoidify
   template <typename T>
   inline T Devoidify_p(void* source)
@@ -119,6 +118,48 @@ namespace btk
       return T();
     }
     return static_cast<T>(Devoidify_p<S>(source[idx]));
+  };
+  
+  template <typename T>
+  inline T NumerifyFromString_p(const std::string& source)
+  {
+    std::istringstream iss(source);
+    T target;
+    if (!(iss >> target))
+      return T();
+    else
+      return target;
+  };
+  
+  // Because int8_t is compared to the char type and extract character
+  template <>
+  inline int8_t NumerifyFromString_p<int8_t>(const std::string& source)
+  {
+    std::istringstream iss(source);
+    int16_t target;
+    if (!(iss >> target))
+      return (int8_t)0;
+    else
+      return static_cast<int8_t>(target);
+  };
+  
+  template <typename T>
+  inline T NumerifyFromString_p(const std::vector<void*>& source, int idx)
+  {
+    if (idx >= static_cast<int>(source.size()))
+    {
+      btkErrorMacro("Index out of range. Default value returned.");
+      return T();
+    }
+    return NumerifyFromString_p<T>(Devoidify_p<std::string>(source[idx]));
+  };
+  
+  template <typename T>
+  inline void NumerifyFromString_p(const std::vector<void*>& source, std::vector<T>& target)
+  {
+    target.resize(source.size());
+    for (int i = 0 ; i < static_cast<int>(target.size()) ; ++i)
+      target[i] = NumerifyFromString_p<T>(Devoidify_p<std::string>(source[i]));
   };
 
   template <typename S, typename T>
@@ -168,7 +209,7 @@ namespace btk
           return Numerify_p<float, T>(source, idx);
           break;
         case MetaDataInfo::Char:
-          return T();
+        return NumerifyFromString_p<T>(source, idx);
           break;
         default:
           return T();
@@ -195,7 +236,6 @@ namespace btk
         break;
       default:
         return "";
-
     }
   };
 
@@ -219,7 +259,7 @@ namespace btk
           Numerify_p<float>(source, target);
           break;
         case MetaDataInfo::Char:
-          Nullify_p(source, target);
+          NumerifyFromString_p(source, target);
           break;
       }
     }
@@ -252,12 +292,99 @@ namespace btk
     Devoidify_p(f, source, target, of);
     return target;
   };
+  
+  // Convertify
+  template <typename T>
+  inline void* Convertify_p(MetaDataInfo::Format f, const T& source)
+  {
+    switch(f)
+    {
+      case MetaDataInfo::Byte:
+        return Voidify_p(static_cast<int8_t>(source));
+        break;
+      case MetaDataInfo::Integer:
+        return Voidify_p(static_cast<int16_t>(source));
+        break;
+      case MetaDataInfo::Real:
+        return Voidify_p(static_cast<float>(source));
+        break;
+      case MetaDataInfo::Char:
+        return Voidify_p(ToString(source));
+        break;
+    }
+  };
+  
+  template <>
+  inline void* Convertify_p<std::string>(MetaDataInfo::Format f, const std::string& source)
+  {
+    switch(f)
+    {
+      case MetaDataInfo::Byte:
+        return Voidify_p(NumerifyFromString_p<int8_t>(source));
+        break;
+      case MetaDataInfo::Integer:
+        return Voidify_p(NumerifyFromString_p<int16_t>(source));
+        break;
+      case MetaDataInfo::Real:
+        return Voidify_p(NumerifyFromString_p<float>(source));
+        break;
+      case MetaDataInfo::Char:
+        return Voidify_p(source);
+        break;
+    }
+  };
+  
+  inline std::vector<void*> Convertify_p(MetaDataInfo::Format fOld, MetaDataInfo::Format fNew, const std::vector<void*>& source)
+  {
+    std::vector<void*> target;
+    target.resize(source.size());
+    switch(fOld)
+    {
+      case MetaDataInfo::Byte:
+        for (int i = 0 ; i < static_cast<int>(target.size()) ; ++i)
+          target[i] = Convertify_p(fNew, Devoidify_p<int8_t>(source[i]));
+        break;
+      case MetaDataInfo::Integer:
+        for (int i = 0 ; i < static_cast<int>(target.size()) ; ++i)
+          target[i] = Convertify_p(fNew, Devoidify_p<int16_t>(source[i]));
+        break;
+      case MetaDataInfo::Real:
+        for (int i = 0 ; i < static_cast<int>(target.size()) ; ++i)
+          target[i] = Convertify_p(fNew, Devoidify_p<float>(source[i]));
+        break;
+      case MetaDataInfo::Char:
+        for (int i = 0 ; i < static_cast<int>(target.size()) ; ++i)
+          target[i] = Convertify_p(fNew, Devoidify_p<std::string>(source[i]));
+        break;
+    }
+    return target;
+  };
 
   // Delete / Erase / Clear
   template <typename T>
   inline void Delete_p(void* target)
   {
     delete static_cast<T*>(target);
+  };
+  
+  template <typename T>
+  inline void Delete_p(MetaDataInfo::Format f, const T& target)
+  {
+    switch(f)
+    {
+      case MetaDataInfo::Byte:
+        Delete_p<int8_t>(target);
+        break;
+      case MetaDataInfo::Integer:
+        Delete_p<int16_t>(target);
+        break;
+      case MetaDataInfo::Real:
+        Delete_p<float>(target);
+        break;
+      case MetaDataInfo::Char:
+        Delete_p<std::string>(target);
+        break;
+    }
   };
 
   template <typename T>

@@ -86,6 +86,8 @@ namespace btk
     BTK_COMMON_EXPORT void SetValue(int idx, int16_t val);
     BTK_COMMON_EXPORT void SetValue(int idx, float val);
     BTK_COMMON_EXPORT void SetValue(int idx, const std::string& val);
+    BTK_COMMON_EXPORT void SetValue(int idx, int val);
+    BTK_COMMON_EXPORT void SetValue(int idx, double val);
     const std::vector<void*>& GetValues() const {return this->m_Values;};
     void SetValues(int8_t val) {this->SetValues(std::vector<uint8_t>(0), std::vector<int8_t>(1, val));};
     void SetValues(int16_t val) {this->SetValues(std::vector<uint8_t>(0), std::vector<int16_t>(1, val));};
