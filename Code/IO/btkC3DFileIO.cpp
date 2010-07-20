@@ -643,7 +643,7 @@ namespace btk
             }
             else
               output->SetAnalogResolution(static_cast<Acquisition::AnalogResolution>(bits));
-            btkIOErrorMacro(filename, "Analog format and/or their resolution are inconsistents with Analog offsets. They were update.");
+            btkIOErrorMacro(filename, "Analog format and/or their resolution are inconsistents with Analog offsets. They were updated.");
           }
           // - ANALOG:OFFSET
           if (this->m_AnalogIntegerFormat == Unsigned) // unsigned

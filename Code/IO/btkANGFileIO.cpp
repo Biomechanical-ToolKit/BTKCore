@@ -175,20 +175,20 @@ namespace btk
             (*it)->SetLabel("RAnkleAngle");
             (*it)->SetDescription("Right Ankle Rotation");
             RFPA = btk::Point::New("RFootProgressAngle", output->GetPointFrameNumber(), Point::Angle, "Right Foot relative to Global/Body axes");
-            RFPA->GetValues().col(2) = (*it)->GetValues().col(2);
+            RFPA->GetValues().col(1) = (*it)->GetValues().col(1);
             RFPA->GetResiduals() = (*it)->GetResiduals();
-            (*it)->GetValues().col(2).setZero();
+            (*it)->GetValues().col(1).setZero();
             // Clean the -9999 which were not on the 3 coordinates
             // The column #0 contains only -9999
             (*it)->GetValues().col(0).setZero();
             for (int i = 0 ; i < output->GetPointFrameNumber() ; ++i)
             {
-              if (((*it)->GetValues().coeff(i, 1) + 9999.0) < std::numeric_limits<double>::epsilon())
+              if (((*it)->GetValues().coeff(i, 2) + 9999.0) < std::numeric_limits<double>::epsilon())
               {
-                (*it)->GetValues().coeffRef(i, 1) = 0.0;
+                (*it)->GetValues().coeffRef(i, 2) = 0.0;
                 (*it)->GetResiduals().coeffRef(i) = -1.0;
               }
-              if ((RFPA->GetValues().coeff(i, 2) + 9999.0) < std::numeric_limits<double>::epsilon())
+              if ((RFPA->GetValues().coeff(i, 1) + 9999.0) < std::numeric_limits<double>::epsilon())
               {
                 RFPA->GetValues().coeffRef(i, 1) = 0.0;
                 RFPA->GetResiduals().coeffRef(i) = -1.0;
@@ -200,20 +200,20 @@ namespace btk
             (*it)->SetLabel("LAnkleAngle");
             (*it)->SetDescription("Left Ankle Rotation");
             LFPA = btk::Point::New("LFootProgressAngle", output->GetPointFrameNumber(), Point::Angle, "Left Foot relative to Global/Body axes");
-            LFPA->GetValues().col(2) = (*it)->GetValues().col(2);
+            LFPA->GetValues().col(1) = (*it)->GetValues().col(1);
             LFPA->GetResiduals() = (*it)->GetResiduals();
-            (*it)->GetValues().col(2).setZero();
+            (*it)->GetValues().col(1).setZero();
             // Clean the -9999 which were not on the 3 coordinates
             // The column #0 contains only -9999
             (*it)->GetValues().col(0).setZero();
             for (int i = 0 ; i < output->GetPointFrameNumber() ; ++i)
             {
-              if (((*it)->GetValues().coeff(i, 1) + 9999.0) < std::numeric_limits<double>::epsilon())
+              if (((*it)->GetValues().coeff(i, 2) + 9999.0) < std::numeric_limits<double>::epsilon())
               {
-                (*it)->GetValues().coeffRef(i, 1) = 0.0;
+                (*it)->GetValues().coeffRef(i, 2) = 0.0;
                 (*it)->GetResiduals().coeffRef(i) = -1.0;
               }
-              if ((LFPA->GetValues().coeff(i, 2) + 9999.0) < std::numeric_limits<double>::epsilon())
+              if ((LFPA->GetValues().coeff(i, 1) + 9999.0) < std::numeric_limits<double>::epsilon())
               {
                 LFPA->GetValues().coeffRef(i, 1) = 0.0;
                 LFPA->GetResiduals().coeffRef(i) = -1.0;
