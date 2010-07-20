@@ -6,4 +6,5 @@
 #include "GroundReactionWrenchFilterTest.h"
 #include "MeasureFrameExtractorTest.h"
 #include "MergeAcquisitionFilterTest.h"
+#include "SeparateKnownVirtualMarkersFilterTest.h"
 #include "SpecializedPointsExtractorTest.h"

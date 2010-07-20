@@ -221,7 +221,7 @@ namespace btk
             origin = (*it)->GetOrigin();
             if (origin.z() > 0)
             {
-              btkErrorMacro("Origin for the force platform #" + ToString(inc) + " seems to be located from the center of the working surface instead of the inverse. Data are inversed to locate the center of the working surface from the platform's origin.");
+              btkErrorMacro("Origin for the force platform #" + ToString(inc) + " seems to be located from the center of the working surface instead of the inverse. Data are inverted to locate the center of the working surface from the platform's origin.");
               origin *= -1;
             }
             this->FinishGRWComputation(grw, origin);
