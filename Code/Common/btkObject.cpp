@@ -36,7 +36,7 @@
 #include "btkObject.h"
 
 #ifdef _MSC_VER
-  #include "../../Utilities/timeval.h"
+  #include "Utilities/timeval.h"
 #else
   #include <sys/time.h>
 #endif
