@@ -26,6 +26,7 @@ CXXTEST_SUITE(C3DFileReaderTest)
     reader->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
 
+    TS_ASSERT_EQUALS(acq->GetMaxInterpolationGap(), 10);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -66,6 +67,7 @@ CXXTEST_SUITE(C3DFileReaderTest)
     reader->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
     
+    TS_ASSERT_EQUALS(acq->GetMaxInterpolationGap(), 10);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -96,6 +98,7 @@ CXXTEST_SUITE(C3DFileReaderTest)
     reader->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
     
+    TS_ASSERT_EQUALS(acq->GetMaxInterpolationGap(), 10);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -126,6 +129,7 @@ CXXTEST_SUITE(C3DFileReaderTest)
     reader->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
     
+    TS_ASSERT_EQUALS(acq->GetMaxInterpolationGap(), 10);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -156,6 +160,7 @@ CXXTEST_SUITE(C3DFileReaderTest)
     reader->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
     
+    TS_ASSERT_EQUALS(acq->GetMaxInterpolationGap(), 10);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -186,6 +191,7 @@ CXXTEST_SUITE(C3DFileReaderTest)
     reader->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
     
+    TS_ASSERT_EQUALS(acq->GetMaxInterpolationGap(), 10);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);

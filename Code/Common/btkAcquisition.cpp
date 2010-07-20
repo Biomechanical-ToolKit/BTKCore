@@ -1000,6 +1000,7 @@ namespace btk
     this->m_Units[Point::Power] = "W";
     this->m_Units[Point::Scalar] = "";
     this->m_Units[Point::Reaction] = "";
+    this->m_MaxInterpolationGap = 10;
     this->Modified();
   };
 
@@ -1132,6 +1133,22 @@ namespace btk
   };
   
   /**
+   * @fn int Acquisition::GetMaxInterpolationGap() const
+   * Gets the maximum gap length that any interpolation method would fill for the 3D point data.
+   */
+   
+  /**
+   * Sets the maximum gap length that any interpolation method would fill for the 3D point data.
+   */
+  void Acquisition::SetMaxInterpolationGap(int gap)
+  {
+    if (this->m_MaxInterpolationGap == gap)
+      return;
+    this->m_MaxInterpolationGap = gap;
+    this->Modified();
+  };
+  
+  /**
    * @fn Pointer Acquisition::Clone() const
    * Returns a deep copy of this object.
    */
@@ -1159,6 +1176,7 @@ namespace btk
     this->m_Units[Point::Power] = "W";
     // this->m_Units[Point::Scalar] = "";
     // this->m_Units[Point::Reaction] = "";
+    this->m_MaxInterpolationGap = 10;
   };
   
   /**
@@ -1212,5 +1230,6 @@ namespace btk
     this->m_PointFrameNumber = toCopy.m_PointFrameNumber;
     this->m_AnalogSampleNumberPerPointFrame = toCopy.m_AnalogSampleNumberPerPointFrame;
     this->m_AnalogResolution = toCopy.m_AnalogResolution;
+    this->m_MaxInterpolationGap = toCopy.m_MaxInterpolationGap;
   };
 }

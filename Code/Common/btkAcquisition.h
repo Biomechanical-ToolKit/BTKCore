@@ -169,6 +169,8 @@ namespace btk
     double GetAnalogFrequency() {return this->m_PointFrequency * static_cast<double>(this->m_AnalogSampleNumberPerPointFrame);};
     AnalogResolution GetAnalogResolution() const {return this->m_AnalogResolution;};
     BTK_COMMON_EXPORT void SetAnalogResolution(AnalogResolution r);
+    int GetMaxInterpolationGap() const {return this->m_MaxInterpolationGap;};
+    BTK_COMMON_EXPORT void SetMaxInterpolationGap(int gap);
     
     Pointer Clone() const {return Pointer(new Acquisition(*this));};
     
@@ -192,6 +194,7 @@ namespace btk
     int m_AnalogSampleNumberPerPointFrame;
     AnalogResolution m_AnalogResolution;
     std::vector<std::string> m_Units;
+    int m_MaxInterpolationGap;
   };
 };
 

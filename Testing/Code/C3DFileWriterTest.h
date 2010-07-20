@@ -343,6 +343,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::Acquisition::Pointer acq = reader->GetOutput();
     acq->ClearPoints();
     acq->ClearEvents();
+    acq->SetMaxInterpolationGap(50);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015vr_clearPoint.c3d");
     writer->Update();
@@ -350,6 +351,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->SetFilename(C3DFilePathOUT + "sample01_Eb015vr_clearPoint.c3d");
     reader->Update();
     acq = reader->GetOutput();
+    TS_ASSERT_EQUALS(acq->GetMaxInterpolationGap(), 50);
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 0);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);

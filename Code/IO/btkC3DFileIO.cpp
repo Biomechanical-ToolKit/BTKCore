@@ -293,7 +293,7 @@ namespace btk
         totalAnalogSamplesPer3dFrame = ibfs->ReadU16(); // (word 03)
         output->SetFirstFrame(ibfs->ReadU16()); // (word 04)
         lastFrame = ibfs->ReadU16(); // (word 05)
-        pointMaximumFillGap = ibfs->ReadU16(); // (word 06)
+        output->SetMaxInterpolationGap(ibfs->ReadU16()); // (word 06)
         pointScaleFactor = ibfs->ReadFloat(); // (word 07-08)
         if (pointScaleFactor == 0)
           throw(C3DFileIOException("Incorrect 3D scale factor"));
@@ -1050,7 +1050,7 @@ namespace btk
         // Last frame
         writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetLastFrame() > 65535 ? 65535 : input->GetLastFrame()));
         // Maximum interpolation gap in 3D frames
-        writtenBytes += obfs->Write(static_cast<uint16_t>(10));
+        writtenBytes += obfs->Write(static_cast<uint16_t>(input->GetMaxInterpolationGap()));
         // The 3D scale factor
         writtenBytes += obfs->Write(static_cast<float>(this->m_PointScale * static_cast<double>(this->m_StorageFormat)));
         // The (false) number of the first block of the Data section
