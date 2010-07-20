@@ -128,53 +128,56 @@ namespace btk
           continue;
         }
         int frameNumber = (*it)->GetChannel(0)->GetFrameNumber();
-        Wrench::Pointer grw = Wrench::New("GRW" + ToString(inc), frameNumber);
-        output->InsertItem(grw);
+        Wrench::Pointer wrh = Wrench::New("FPW" + ToString(inc), frameNumber);
+        output->InsertItem(wrh);
         // Residuals & masks
-        grw->GetPosition()->GetMasks().setZero(frameNumber);
-        grw->GetPosition()->GetResiduals().setZero(frameNumber);        
-        grw->GetForce()->GetMasks().setZero(frameNumber);
-        grw->GetForce()->GetResiduals().setZero(frameNumber);
-        grw->GetMoment()->GetMasks().setZero(frameNumber);
-        grw->GetMoment()->GetResiduals().setZero(frameNumber);
+        wrh->GetPosition()->GetMasks().setZero(frameNumber);
+        wrh->GetPosition()->GetResiduals().setZero(frameNumber);        
+        wrh->GetForce()->GetMasks().setZero(frameNumber);
+        wrh->GetForce()->GetResiduals().setZero(frameNumber);
+        wrh->GetMoment()->GetMasks().setZero(frameNumber);
+        wrh->GetMoment()->GetResiduals().setZero(frameNumber);
         // Values
         switch((*it)->GetType())
         {
           // 6 channels
           case 1:
-            grw->GetForce()->GetValues().col(0) = (*it)->GetChannel(0)->GetValues();
-            grw->GetForce()->GetValues().col(1) = (*it)->GetChannel(1)->GetValues();
-            grw->GetForce()->GetValues().col(2) = (*it)->GetChannel(2)->GetValues();
-            grw->GetPosition()->GetValues().col(0) = (*it)->GetChannel(3)->GetValues();
-            grw->GetPosition()->GetValues().col(1) = (*it)->GetChannel(4)->GetValues();
-            grw->GetPosition()->GetValues().col(2).setZero();
-            grw->GetMoment()->GetValues().col(0).setZero();
-            grw->GetMoment()->GetValues().col(1).setZero();
-            grw->GetMoment()->GetValues().col(2) = (*it)->GetChannel(5)->GetValues();
+            wrh->GetForce()->GetValues().col(0) = (*it)->GetChannel(0)->GetValues();
+            wrh->GetForce()->GetValues().col(1) = (*it)->GetChannel(1)->GetValues();
+            wrh->GetForce()->GetValues().col(2) = (*it)->GetChannel(2)->GetValues();
+            wrh->GetPosition()->GetValues().col(0) = (*it)->GetChannel(3)->GetValues();
+            wrh->GetPosition()->GetValues().col(1) = (*it)->GetChannel(4)->GetValues();
+            wrh->GetPosition()->GetValues().col(2).setZero();
+            wrh->GetMoment()->GetValues().col(0).setZero();
+            wrh->GetMoment()->GetValues().col(1).setZero();
+            wrh->GetMoment()->GetValues().col(2) = (*it)->GetChannel(5)->GetValues();
+            this->FinishTypeI(wrh, *it, inc);
             break;
           case 2:
           case 4:
           case 5:
-            grw->GetForce()->GetValues().col(0) = (*it)->GetChannel(0)->GetValues();
-            grw->GetForce()->GetValues().col(1) = (*it)->GetChannel(1)->GetValues();
-            grw->GetForce()->GetValues().col(2) = (*it)->GetChannel(2)->GetValues();
-            grw->GetMoment()->GetValues().col(0) = (*it)->GetChannel(3)->GetValues();
-            grw->GetMoment()->GetValues().col(1) = (*it)->GetChannel(4)->GetValues();
-            grw->GetMoment()->GetValues().col(2) = (*it)->GetChannel(5)->GetValues();
+            wrh->GetForce()->GetValues().col(0) = (*it)->GetChannel(0)->GetValues();
+            wrh->GetForce()->GetValues().col(1) = (*it)->GetChannel(1)->GetValues();
+            wrh->GetForce()->GetValues().col(2) = (*it)->GetChannel(2)->GetValues();
+            wrh->GetMoment()->GetValues().col(0) = (*it)->GetChannel(3)->GetValues();
+            wrh->GetMoment()->GetValues().col(1) = (*it)->GetChannel(4)->GetValues();
+            wrh->GetMoment()->GetValues().col(2) = (*it)->GetChannel(5)->GetValues();
+            this->FinishAMTI(wrh, *it, inc);
             break;
           case 3:
             // Fx
-            grw->GetForce()->GetValues().col(0) = (*it)->GetChannel(0)->GetValues() + (*it)->GetChannel(1)->GetValues();
+            wrh->GetForce()->GetValues().col(0) = (*it)->GetChannel(0)->GetValues() + (*it)->GetChannel(1)->GetValues();
             // Fy
-            grw->GetForce()->GetValues().col(1) = (*it)->GetChannel(2)->GetValues() + (*it)->GetChannel(3)->GetValues();
+            wrh->GetForce()->GetValues().col(1) = (*it)->GetChannel(2)->GetValues() + (*it)->GetChannel(3)->GetValues();
             // Fz
-            grw->GetForce()->GetValues().col(2) = (*it)->GetChannel(4)->GetValues() + (*it)->GetChannel(5)->GetValues() + (*it)->GetChannel(6)->GetValues() + (*it)->GetChannel(7)->GetValues();
+            wrh->GetForce()->GetValues().col(2) = (*it)->GetChannel(4)->GetValues() + (*it)->GetChannel(5)->GetValues() + (*it)->GetChannel(6)->GetValues() + (*it)->GetChannel(7)->GetValues();
             // Mx
-            grw->GetMoment()->GetValues().col(0) = (*it)->GetOrigin().y() * ((*it)->GetChannel(4)->GetValues() + (*it)->GetChannel(5)->GetValues() - (*it)->GetChannel(6)->GetValues() - (*it)->GetChannel(7)->GetValues());
+            wrh->GetMoment()->GetValues().col(0) = (*it)->GetOrigin().y() * ((*it)->GetChannel(4)->GetValues() + (*it)->GetChannel(5)->GetValues() - (*it)->GetChannel(6)->GetValues() - (*it)->GetChannel(7)->GetValues());
             // My
-            grw->GetMoment()->GetValues().col(1) = (*it)->GetOrigin().x() * ((*it)->GetChannel(5)->GetValues() + (*it)->GetChannel(6)->GetValues() - (*it)->GetChannel(4)->GetValues() - (*it)->GetChannel(7)->GetValues());
+            wrh->GetMoment()->GetValues().col(1) = (*it)->GetOrigin().x() * ((*it)->GetChannel(5)->GetValues() + (*it)->GetChannel(6)->GetValues() - (*it)->GetChannel(4)->GetValues() - (*it)->GetChannel(7)->GetValues());
             // Mz
-            grw->GetMoment()->GetValues().col(2) = (*it)->GetOrigin().y() * ((*it)->GetChannel(1)->GetValues() - (*it)->GetChannel(0)->GetValues()) + (*it)->GetOrigin().x() * ((*it)->GetChannel(2)->GetValues() - (*it)->GetChannel(3)->GetValues());
+            wrh->GetMoment()->GetValues().col(2) = (*it)->GetOrigin().y() * ((*it)->GetChannel(1)->GetValues() - (*it)->GetChannel(0)->GetValues()) + (*it)->GetOrigin().x() * ((*it)->GetChannel(2)->GetValues() - (*it)->GetChannel(3)->GetValues());
+            this->FinishKistler(wrh, *it, inc);
             break;
           case 6:
             btkErrorMacro("Force Platform type 6 is not yet supported. Please, report this to the developers");
@@ -192,9 +195,27 @@ namespace btk
             btkErrorMacro("Force Platform type 21 is not yet supported. Please, report this to the developers");
             break;
         }
-        this->TransformGRWToGlobal(grw, (*it)->GetCorners());
+        this->TransformToGlobal(wrh, (*it)->GetCorners());
       }
     }
-  };  
+  };
+  
+  /**
+   * Finish the computation of the wrench for the force platform type I (nothing to do).
+   */
+  void ForcePlatformWrenchFilter::FinishTypeI(Wrench::Pointer /* wrh */, ForcePlatform::Pointer /* fp */, int /* index */)
+  {};
+  
+  /**
+   * Finish the computation of the wrench for the AMTI force platform (nothing to do).
+   */
+  void ForcePlatformWrenchFilter::FinishAMTI(Wrench::Pointer /* wrh */, ForcePlatform::Pointer /* fp */, int /* index */)
+  {};
+   
+  /**
+   * Finish the computation of the wrench for the Kistler force platform (nothing to do).
+   */
+  void ForcePlatformWrenchFilter::FinishKistler(Wrench::Pointer /* wrh */, ForcePlatform::Pointer /* fp */, int /* index */)
+  {};
 };
 

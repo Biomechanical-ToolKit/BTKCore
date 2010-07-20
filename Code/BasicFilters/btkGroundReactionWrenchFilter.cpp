@@ -107,166 +107,62 @@ namespace btk
   };
 
   /**
-   * @fn WrenchCollection::Pointer GroundReactionWrenchFilter::GetInput()
-   * Gets the input registered with this process.
-   */
-
-  /**
-   * @fn void GroundReactionWrenchFilter::SetInput(ForcePlatform::Pointer input)
-   * Sets the input required with this process. This input is transformed in a collection a force platform with a single force platform.
-   */
-  
-  /**
-   * @fn void GroundReactionWrenchFilter::SetInput(ForcePlatformCollection::Pointer input)
-   * Sets the input required with this process.
-   */
-  
-  /**
-   * @fn PointCollection::Pointer GroundReactionWrenchFilter::GetOutput()
-   * Gets the output created with this process.
-   */
-
-  /**
    * Constructor. Sets the number of inputs and outputs to 1.
    */
   GroundReactionWrenchFilter::GroundReactionWrenchFilter()
-  : ProcessObject()
+  : ForcePlatformWrenchFilter()
   {
     this->SetInputNumber(1);
     this->SetOutputNumber(1);
     this->m_ThresholdActivated = false;
     this->m_ThresholdValue = 0.0;
   };
-
-  /**
-   * @fn ForcePlatformCollection::Pointer GroundReactionWrenchFilter::GetInput(int idx)
-   * Returns the input at the index @a idx.
-   */
   
   /**
-   * @fn WrenchCollection::Pointer GroundReactionWrenchFilter::GetOutput(int idx)
-   * Returns the output at the index @a idx.
+   * Finish the computation of the ground reaction wrench for the force platform type I (nothing to do).
    */
-  
-  /**
-   * Creates a WrenchCollection:Pointer object and return it as a DataObject::Pointer.
-   */
-  DataObject::Pointer GroundReactionWrenchFilter::MakeOutput(int /* idx */)
+  void GroundReactionWrenchFilter::FinishTypeI(Wrench::Pointer /* wrh */, ForcePlatform::Pointer /* fp */, int /* index */)
   {
-    return WrenchCollection::New();
+    /*
+    ForcePlatform::Origin origin;
+    origin << 0, 0, fp->GetOrigin().z();
+    if (origin.z()  > 0)
+    {
+      btkErrorMacro("Vertical offset between the origin of the force platform #" + ToString(index + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
+      origin.z() *= -1;
+    }
+    */
+    //this->FinishGRWComputation(grw, origin);
   };
   
   /**
-   * Generates the outputs' data.
+   * Finish the computation of the ground reaction wrench for the AMTI force platforms.
    */
-  void GroundReactionWrenchFilter::GenerateData()
+  void GroundReactionWrenchFilter::FinishAMTI(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index)
   {
-    WrenchCollection::Pointer output = this->GetOutput();
-    output->Clear();
-    ForcePlatformCollection::Pointer input = this->GetInput();
-    if (input.get() != 0)
+    ForcePlatform::Origin origin = fp->GetOrigin();
+    if (origin.z() > 0)
     {
-      int inc = 0;
-      for (ForcePlatformCollection::ConstIterator it = input->Begin() ; it != input->End() ; ++it)
-      {
-        ++inc;
-        if ((*it)->GetChannelNumber() == 0)
-        {
-          btkErrorMacro("Unexpected number of analog channels (0) for force platfom #" + ToString(inc));
-          continue;
-        }
-        int frameNumber = (*it)->GetChannel(0)->GetFrameNumber();
-        Wrench::Pointer grw = Wrench::New("GRW" + ToString(inc), frameNumber);
-        output->InsertItem(grw);
-        ForcePlatform::Origin origin;
-        // Residuals & masks
-        grw->GetPosition()->GetMasks().setZero(frameNumber);
-        grw->GetPosition()->GetResiduals().setZero(frameNumber);        
-        grw->GetForce()->GetMasks().setZero(frameNumber);
-        grw->GetForce()->GetResiduals().setZero(frameNumber);
-        grw->GetMoment()->GetMasks().setZero(frameNumber);
-        grw->GetMoment()->GetResiduals().setZero(frameNumber);
-        // Values
-        switch((*it)->GetType())
-        {
-          // 6 channels
-          case 1:
-            grw->GetForce()->GetValues().col(0) = (*it)->GetChannel(0)->GetValues();
-            grw->GetForce()->GetValues().col(1) = (*it)->GetChannel(1)->GetValues();
-            grw->GetForce()->GetValues().col(2) = (*it)->GetChannel(2)->GetValues();
-            grw->GetPosition()->GetValues().col(0) = (*it)->GetChannel(3)->GetValues();
-            grw->GetPosition()->GetValues().col(1) = (*it)->GetChannel(4)->GetValues();
-            grw->GetPosition()->GetValues().col(2).setZero();
-            grw->GetMoment()->GetValues().col(0).setZero();
-            grw->GetMoment()->GetValues().col(1).setZero();
-            grw->GetMoment()->GetValues().col(2) = (*it)->GetChannel(5)->GetValues();
-            origin << 0, 0, (*it)->GetOrigin().z();
-            if (origin.z()  > 0)
-            {
-              btkErrorMacro("Vertical offset between the origin of the force platform #" + ToString(inc) + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
-              origin.z() *= -1;
-            }
-            //this->FinishGRWComputation(grw, origin);
-            this->TransformGRWToGlobal(grw, (*it)->GetCorners());
-            break;
-          case 2:
-          case 4:
-          case 5:
-            grw->GetForce()->GetValues().col(0) = (*it)->GetChannel(0)->GetValues();
-            grw->GetForce()->GetValues().col(1) = (*it)->GetChannel(1)->GetValues();
-            grw->GetForce()->GetValues().col(2) = (*it)->GetChannel(2)->GetValues();
-            grw->GetMoment()->GetValues().col(0) = (*it)->GetChannel(3)->GetValues();
-            grw->GetMoment()->GetValues().col(1) = (*it)->GetChannel(4)->GetValues();
-            grw->GetMoment()->GetValues().col(2) = (*it)->GetChannel(5)->GetValues();
-            origin = (*it)->GetOrigin();
-            if (origin.z() > 0)
-            {
-              btkErrorMacro("Origin for the force platform #" + ToString(inc) + " seems to be located from the center of the working surface instead of the inverse. Data are inverted to locate the center of the working surface from the platform's origin.");
-              origin *= -1;
-            }
-            this->FinishGRWComputation(grw, origin);
-            this->TransformGRWToGlobal(grw, (*it)->GetCorners());
-            break;
-          case 3:
-            // Fx
-            grw->GetForce()->GetValues().col(0) = (*it)->GetChannel(0)->GetValues() + (*it)->GetChannel(1)->GetValues();
-            // Fy
-            grw->GetForce()->GetValues().col(1) = (*it)->GetChannel(2)->GetValues() + (*it)->GetChannel(3)->GetValues();
-            // Fz
-            grw->GetForce()->GetValues().col(2) = (*it)->GetChannel(4)->GetValues() + (*it)->GetChannel(5)->GetValues() + (*it)->GetChannel(6)->GetValues() + (*it)->GetChannel(7)->GetValues();
-            // Mx
-            grw->GetMoment()->GetValues().col(0) = (*it)->GetOrigin().y() * ((*it)->GetChannel(4)->GetValues() + (*it)->GetChannel(5)->GetValues() - (*it)->GetChannel(6)->GetValues() - (*it)->GetChannel(7)->GetValues());
-            // My
-            grw->GetMoment()->GetValues().col(1) = (*it)->GetOrigin().x() * ((*it)->GetChannel(5)->GetValues() + (*it)->GetChannel(6)->GetValues() - (*it)->GetChannel(4)->GetValues() - (*it)->GetChannel(7)->GetValues());
-            // Mz
-            grw->GetMoment()->GetValues().col(2) = (*it)->GetOrigin().y() * ((*it)->GetChannel(1)->GetValues() - (*it)->GetChannel(0)->GetValues()) + (*it)->GetOrigin().x() * ((*it)->GetChannel(2)->GetValues() - (*it)->GetChannel(3)->GetValues());
-            origin << 0, 0, (*it)->GetOrigin().z();
-            if (origin.z()  > 0)
-            {
-              btkErrorMacro("Vertical offset between the origin of the force platform #" + ToString(inc) + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
-              origin.z() *= -1;
-            }
-            this->FinishGRWComputation(grw, origin);
-            this->TransformGRWToGlobal(grw, (*it)->GetCorners());
-            break;
-          case 6:
-            btkErrorMacro("Force Platform type 6 is not yet supported. Please, report this to the developers");
-            break;
-          case 7:
-            btkErrorMacro("Force Platform type 7 is not yet supported. Please, report this to the developers");
-            break;
-          case 11:
-            btkErrorMacro("Force Platform type 11 is not yet supported. Please, report this to the developers");
-            break;
-          case 12:
-            btkErrorMacro("Force Platform type 12 is not yet supported. Please, report this to the developers");
-            break;
-          case 21:
-            btkErrorMacro("Force Platform type 21 is not yet supported. Please, report this to the developers");
-            break;
-        }
-      }
+      btkErrorMacro("Origin for the force platform #" + ToString(index) + " seems to be located from the center of the working surface instead of the inverse. Data are inverted to locate the center of the working surface from the platform's origin.");
+      origin *= -1;
     }
-  };  
+    this->FinishGRWComputation(wrh, origin);
+
+  };
+   
+  /**
+   * Finish the computation of the ground reaction wrench for the Kislter force platform.
+   */
+  void GroundReactionWrenchFilter::FinishKistler(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index)
+  {
+    ForcePlatform::Origin origin;
+    origin << 0, 0, fp->GetOrigin().z();
+    if (origin.z()  > 0)
+    {
+      btkErrorMacro("Vertical offset between the origin of the force platform #" + ToString(index) + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
+      origin.z() *= -1;
+    }
+    this->FinishGRWComputation(wrh, origin);
+  };
 };
 

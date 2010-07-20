@@ -75,13 +75,16 @@ namespace btk
     BTK_BASICFILTERS_EXPORT virtual void GenerateData();
     
   private:
-    inline void TransformGRWToGlobal(Wrench::Pointer grw, const ForcePlatform::Corners& c) const;
+    virtual void FinishTypeI(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
+    virtual void FinishAMTI(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
+    virtual void FinishKistler(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
+    void TransformToGlobal(Wrench::Pointer wrh, const ForcePlatform::Corners& c) const;
 
     ForcePlatformWrenchFilter(const ForcePlatformWrenchFilter& ); // Not implemented.
     ForcePlatformWrenchFilter& operator=(const ForcePlatformWrenchFilter& ); // Not implemented.
   };
-
-  void ForcePlatformWrenchFilter::TransformGRWToGlobal(Wrench::Pointer grw, const ForcePlatform::Corners& c) const
+  
+  inline void ForcePlatformWrenchFilter::TransformToGlobal(Wrench::Pointer wrh, const ForcePlatform::Corners& c) const
   {
     Eigen::Matrix<double, 3, 3> R;
     Eigen::Matrix<double, 3, 1> t;
@@ -93,14 +96,14 @@ namespace btk
     R.col(2) = R.col(0).cross(R.col(1));
     t = (c.col(0) + c.col(2)) / 2;
     // Forces & Moments rotation
-    grw->GetForce()->GetValues() *= R.transpose();
-    grw->GetMoment()->GetValues() *= R.transpose();
+    wrh->GetForce()->GetValues() *= R.transpose();
+    wrh->GetMoment()->GetValues() *= R.transpose();
     // Position rotation
-    grw->GetPosition()->GetValues() *= R.transpose();
+    wrh->GetPosition()->GetValues() *= R.transpose();
     // Position translation
-    grw->GetPosition()->GetValues().col(0).cwise() += t.x();
-    grw->GetPosition()->GetValues().col(1).cwise() += t.y();
-    grw->GetPosition()->GetValues().col(2).cwise() += t.z();
+    wrh->GetPosition()->GetValues().col(0).cwise() += t.x();
+    wrh->GetPosition()->GetValues().col(1).cwise() += t.y();
+    wrh->GetPosition()->GetValues().col(2).cwise() += t.z();
   };
 };
 

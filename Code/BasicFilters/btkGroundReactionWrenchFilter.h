@@ -36,7 +36,7 @@
 #ifndef __btkGroundReactionWrenchFilter_h
 #define __btkGroundReactionWrenchFilter_h
 
-#include "btkProcessObject.h"
+#include "btkForcePlatformWrenchFilter.h"
 #include "btkForcePlatformCollection.h"
 #include "btkForcePlatformTypes.h"
 #include "btkWrenchCollection.h"
@@ -46,7 +46,7 @@
 
 namespace btk
 {
-  class GroundReactionWrenchFilter : public ProcessObject
+  class GroundReactionWrenchFilter : public ForcePlatformWrenchFilter
   {
   public:
     typedef SharedPtr<GroundReactionWrenchFilter> Pointer;
@@ -61,28 +61,15 @@ namespace btk
     double GetThresholdValue() const {return this->m_ThresholdValue;};
     BTK_BASICFILTERS_EXPORT void SetThresholdValue(double v);
     
-    ForcePlatformCollection::Pointer GetInput() {return this->GetInput(0);};
-    void SetInput(ForcePlatform::Pointer input)
-    {
-      ForcePlatformCollection::Pointer col = ForcePlatformCollection::New();
-      col->InsertItem(input);
-      this->SetNthInput(0, col);
-    };
-    void SetInput(ForcePlatformCollection::Pointer input) {this->SetNthInput(0, input);};
-    WrenchCollection::Pointer GetOutput() {return this->GetOutput(0);};
-
   protected:
     BTK_BASICFILTERS_EXPORT GroundReactionWrenchFilter();
     
-    ForcePlatformCollection::Pointer GetInput(int idx) {return static_pointer_cast<ForcePlatformCollection>(this->GetNthInput(idx));};  
-    WrenchCollection::Pointer GetOutput(int idx) {return static_pointer_cast<WrenchCollection>(this->GetNthOutput(idx));};
-    BTK_BASICFILTERS_EXPORT virtual DataObject::Pointer MakeOutput(int idx);
-    BTK_BASICFILTERS_EXPORT virtual void GenerateData();
-    
   private:
-    inline void FinishGRWComputation(Wrench::Pointer grw, const ForcePlatform::Origin& o) const;
-    inline void TransformGRWToGlobal(Wrench::Pointer grw, const ForcePlatform::Corners& c) const;
-
+    virtual void FinishTypeI(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
+    virtual void FinishAMTI(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
+    virtual void FinishKistler(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
+    void FinishGRWComputation(Wrench::Pointer grw, const ForcePlatform::Origin& o) const;
+    
     GroundReactionWrenchFilter(const GroundReactionWrenchFilter& ); // Not implemented.
     GroundReactionWrenchFilter& operator=(const GroundReactionWrenchFilter& ); // Not implemented.
 
@@ -90,7 +77,7 @@ namespace btk
     double m_ThresholdValue;
   };
 
-  void GroundReactionWrenchFilter::FinishGRWComputation(Wrench::Pointer grw, const ForcePlatform::Origin& o) const
+  inline void GroundReactionWrenchFilter::FinishGRWComputation(Wrench::Pointer grw, const ForcePlatform::Origin& o) const
   { 
     typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Component;
     Component Fx = grw->GetForce()->GetValues().col(0);
@@ -147,28 +134,6 @@ namespace btk
     grw->GetPosition()->GetValues().col(0) = Px;
     grw->GetPosition()->GetValues().col(1) = Py;
     grw->GetPosition()->GetValues().col(2) = Pz;
-  };
-
-  void GroundReactionWrenchFilter::TransformGRWToGlobal(Wrench::Pointer grw, const ForcePlatform::Corners& c) const
-  {
-    Eigen::Matrix<double, 3, 3> R;
-    Eigen::Matrix<double, 3, 1> t;
-
-    R.col(0) = c.col(0) - c.col(1);
-    R.col(0).normalize();
-    R.col(1) = c.col(0) - c.col(3);
-    R.col(1).normalize();
-    R.col(2) = R.col(0).cross(R.col(1));
-    t = (c.col(0) + c.col(2)) / 2;
-    // Forces & Moments rotation
-    grw->GetForce()->GetValues() *= R.transpose();
-    grw->GetMoment()->GetValues() *= R.transpose();
-    // Position rotation
-    grw->GetPosition()->GetValues() *= R.transpose();
-    // Position translation
-    grw->GetPosition()->GetValues().col(0).cwise() += t.x();
-    grw->GetPosition()->GetValues().col(1).cwise() += t.y();
-    grw->GetPosition()->GetValues().col(2).cwise() += t.z();
   };
 };
 
