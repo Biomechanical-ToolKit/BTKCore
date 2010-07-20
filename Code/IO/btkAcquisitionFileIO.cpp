@@ -133,6 +133,52 @@ namespace btk
    */
 
   /**
+   * Gets the byte order as a string
+   */
+  std::string AcquisitionFileIO::GetByteOrderAsString() const
+  {
+    std::string str = "";
+    switch (this->m_ByteOrder)
+    {
+    case OrderNotApplicable:
+      str = "OrderNotApplicable";
+      break;
+    case IEEE_LittleEndian:
+      str = "IEEE_LittleEndian";
+      break;
+    case VAX_LittleEndian:
+      str = "VAX_LittleEndian";
+      break;
+    case IEEE_BigEndian:
+      str = "IEEE_BigEndian";
+      break;
+    }
+    return str;
+  };
+  
+  
+  /**
+   * Gets the storage format as a string
+   */
+  std::string AcquisitionFileIO::GetStorageFormatAsString() const
+  {
+    std::string str = "";
+    switch (this->m_StorageFormat)
+    {
+    case StorageNotApplicable:
+      str = "StorageNotApplicable";
+      break;
+    case Float:
+      str = "Float";
+      break;
+    case Integer:
+      str = "Integer";
+      break;
+    }
+    return str;
+  };
+
+  /**
    * @fn void AcquisitionFileIO::SetByteOrder(ByteOrder b)
    * Sets the byte order of the file.
    */

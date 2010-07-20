@@ -54,8 +54,10 @@ namespace btk
 
     FileType GetFileType() const {return this->m_FileType;};
     ByteOrder GetByteOrder() const {return this->m_ByteOrder;};
+    BTK_IO_EXPORT std::string GetByteOrderAsString() const;
     void SetByteOrder(ByteOrder b) {this->m_ByteOrder = b;};
     StorageFormat GetStorageFormat() const {return this->m_StorageFormat;};
+    BTK_IO_EXPORT std::string GetStorageFormatAsString() const;
     void SetStorageFormat(StorageFormat s) {this->m_StorageFormat = s;};
 
     BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename) = 0;
