@@ -18,7 +18,6 @@ SET(BTK_VERSION_STRING "${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}")
 # ------------------------------------------------------------------------
 
 # Load some macros.
-#INCLUDE(${CMAKE_ROOT}/Modules/CMakeDependentOption.cmake)
 INCLUDE(CMakeDependentOption)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
@@ -90,6 +89,7 @@ IF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
   ENDIF(USE_INCLUDED_BOOST)
 ENDIF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
 
+INCLUDE(${CMAKE_MODULE_PATH}/btkExtraCompilerFlags.cmake)
 # The entire BTK tree should use the same include path
 # Create the list of include directories needed for BTK header files.
 INCLUDE(${CMAKE_MODULE_PATH}/btkIncludeDirectories.cmake)
