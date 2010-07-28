@@ -39,6 +39,8 @@
 #include "btkVTKCommandEvents.h"
 
 #include <vtkRenderWindow.h>
+#include <vtkPolyData.h>
+#include <vtkMapper.h>
 #include <vtkCell.h>
 #include <vtkPointData.h>
 #include <vtkIdTypeArray.h>
