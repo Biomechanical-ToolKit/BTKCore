@@ -33,44 +33,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Viz3DWidget_h
-#define Viz3DWidget_h
+#ifndef AbstractView_h
+#define AbstractView_h
 
-#include <btkVTKAxesWidget.h>
+#include "ui_AbstractView.h"
 
-#include <QVTKWidget.h>
-#include <vtkRenderer.h>
-#include <vtkEventQtSlotConnect.h>
-
-class vtkStreamingDemandDrivenPipelineCollection;
-class vtkProcessMap;
-
-class Viz3DWidget : public QVTKWidget
+class AbstractView : public QWidget, public Ui::AbstractView
 {
   Q_OBJECT
   
 public:
-  Viz3DWidget(QWidget* parent = 0);
-  ~Viz3DWidget();
+  AbstractView(QWidget* parent = 0);
+  // ~AbstractView(); // Implicit
+  // AbstractView(const AbstractView&);  // Implicit
+  // AbstractView& operator=(const AbstractView&); // Implicit.
   
-  void initialize();
-  vtkRenderer* renderer() const {return this->mp_Renderer;};
+  virtual AbstractView* clone() const;
   
 public slots:
-  // Qt / VTK
-  void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  void selectPickedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  // Qt
-  void show(bool s);
+  void setFocus(Qt::FocusReason reason);
+    
+private slots:
+  void close();
+  void splitHorizontally();
+  void splitVertically();
+  void setCurrentIndex(int idx);
   
 signals:
-  void pickedMarkerChanged(int id);
-  void pickedMarkersChanged(int id);
+  void closeTriggered(AbstractView* sender);
+  void splitTriggered(AbstractView* sender, int direction);
   
 private:
-  vtkRenderer* mp_Renderer;
-  btk::VTKAxesWidget* mp_AxesWidget;
-  vtkEventQtSlotConnect* mp_EventQtSlotConnections;
+  void finalizeUi();
 };
-
-#endif // Viz3DWidget_h
+    
+#endif // AbstractView_h

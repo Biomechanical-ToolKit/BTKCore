@@ -33,44 +33,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Viz3DWidget_h
-#define Viz3DWidget_h
+#ifndef AbstractMultiView_h
+#define AbstractMultiView_h
 
-#include <btkVTKAxesWidget.h>
+#include <QWidget>
+#include <QList>
 
-#include <QVTKWidget.h>
-#include <vtkRenderer.h>
-#include <vtkEventQtSlotConnect.h>
+class AbstractView;
+class QSplitter;
+class QGridLayout;
 
-class vtkStreamingDemandDrivenPipelineCollection;
-class vtkProcessMap;
-
-class Viz3DWidget : public QVTKWidget
+class AbstractMultiView : public QWidget
 {
   Q_OBJECT
   
 public:
-  Viz3DWidget(QWidget* parent = 0);
-  ~Viz3DWidget();
+  AbstractMultiView(QWidget* parent = 0);
+  virtual ~AbstractMultiView();
+  // AbstractMultiView(const AbstractMultiView&); // Implicit.
+  // AbstractMultiView& operator=(const AbstractMultiView&); // Implicit.
   
-  void initialize();
-  vtkRenderer* renderer() const {return this->mp_Renderer;};
+  virtual void initialize();
+  QGridLayout* gridLayout() {return this->mp_GridLayout;};
+  void setViewPrototype(const AbstractView* view);
+  const QList<AbstractView*>& views() const {return this->m_Views;};
+  
+protected:
+  virtual AbstractView* createView(AbstractView* fromAnother = 0);
   
 public slots:
-  // Qt / VTK
-  void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  void selectPickedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  // Qt
-  void show(bool s);
+  void closeAll();
   
-signals:
-  void pickedMarkerChanged(int id);
-  void pickedMarkersChanged(int id);
+protected slots:
+  void close(AbstractView* sender);
+  void split(AbstractView* sender, int direction);
   
 private:
-  vtkRenderer* mp_Renderer;
-  btk::VTKAxesWidget* mp_AxesWidget;
-  vtkEventQtSlotConnect* mp_EventQtSlotConnections;
+  void close_(AbstractView* sender);
+  QSplitter* split_(AbstractView* sender, int direction, AbstractView** splittedViews);
+  
+  void setupUi();
+  void closeAll(QWidget* w);
+  
+  QGridLayout* mp_GridLayout;
+  QList<AbstractView*> m_Views;
+  const AbstractView* mp_Prototype;
 };
 
-#endif // Viz3DWidget_h
+#endif // AbstractMultiView_h

@@ -33,44 +33,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Viz3DWidget_h
-#define Viz3DWidget_h
+#include "AbstractView.h"
 
-#include <btkVTKAxesWidget.h>
-
-#include <QVTKWidget.h>
-#include <vtkRenderer.h>
-#include <vtkEventQtSlotConnect.h>
-
-class vtkStreamingDemandDrivenPipelineCollection;
-class vtkProcessMap;
-
-class Viz3DWidget : public QVTKWidget
+AbstractView::AbstractView(QWidget* parent)
+: QWidget(parent)
 {
-  Q_OBJECT
-  
-public:
-  Viz3DWidget(QWidget* parent = 0);
-  ~Viz3DWidget();
-  
-  void initialize();
-  vtkRenderer* renderer() const {return this->mp_Renderer;};
-  
-public slots:
-  // Qt / VTK
-  void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  void selectPickedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  // Qt
-  void show(bool s);
-  
-signals:
-  void pickedMarkerChanged(int id);
-  void pickedMarkersChanged(int id);
-  
-private:
-  vtkRenderer* mp_Renderer;
-  btk::VTKAxesWidget* mp_AxesWidget;
-  vtkEventQtSlotConnect* mp_EventQtSlotConnections;
+  this->setupUi(this);
+  this->finalizeUi();
 };
 
-#endif // Viz3DWidget_h
+AbstractView* AbstractView::clone() const
+{
+  return new AbstractView;
+};
+
+void AbstractView::finalizeUi()
+{
+  // Connections
+  connect(this->hSplitButton, SIGNAL(clicked()), this, SLOT(splitHorizontally()));
+  connect(this->vSplitButton, SIGNAL(clicked()), this, SLOT(splitVertically()));
+  connect(this->closeButton, SIGNAL(clicked()), this, SLOT(close()));
+  connect(this->viewCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentIndex(int)));
+};
+
+void AbstractView::setFocus(Qt::FocusReason reason)
+{
+  if (this->stackedWidget->currentWidget())
+    this->stackedWidget->currentWidget()->setFocus(reason);
+};
+
+void AbstractView::close()
+{
+  emit this->closeTriggered(this);
+};
+
+void AbstractView::splitHorizontally()
+{
+  emit this->splitTriggered(this, Qt::Horizontal);
+};
+
+void AbstractView::splitVertically()
+{
+  emit this->splitTriggered(this, Qt::Vertical);
+};
+
+void AbstractView::setCurrentIndex(int idx)
+{
+  if (idx < this->stackedWidget->count())
+  {
+    this->stackedWidget->setCurrentIndex(idx);
+    this->stackedWidget->currentWidget()->setFocus(Qt::OtherFocusReason);
+  }
+};

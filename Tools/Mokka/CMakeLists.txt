@@ -7,9 +7,13 @@ SET(Mokka_CPP
   MainWindow.cpp
   Metadata.cpp
   MetadataView.cpp
+  MultiViewWidget.cpp
   NewModelConfigurationWidget.cpp
   PointsEditor.cpp
   ProgressWidget.cpp
+  AbstractMultiView.cpp
+  AbstractView.cpp
+  CompositeView.cpp
   TableWidget.cpp
   UndoCommands.cpp
   Viz3DWidget.cpp
@@ -21,9 +25,13 @@ SET(Mokka_H
   MainWindow.h
   MetadataView.h
   Metadata.h
+  MultiViewWidget.h
   NewModelConfigurationWidget.h
   PointsEditor.h
   ProgressWidget.h
+  AbstractMultiView.h
+  AbstractView.h
+  CompositeView.h
   TableWidget.h
   Viz3DWidget.h)
 
@@ -33,7 +41,8 @@ SET(Mokka_UI
   Metadata.ui
   NewModelConfigurationWidget.ui
   PointsEditor.ui
-  ProgressWidget.ui)
+  ProgressWidget.ui
+  AbstractView.ui)
 
 SET(Mokka_QRC
   images.qrc)

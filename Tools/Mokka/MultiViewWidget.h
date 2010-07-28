@@ -33,44 +33,83 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Viz3DWidget_h
-#define Viz3DWidget_h
+#ifndef MultiViewWidget_h
+#define MultiViewWidget_h
 
-#include <btkVTKAxesWidget.h>
+#include "AbstractMultiView.h"
 
-#include <QVTKWidget.h>
-#include <vtkRenderer.h>
+#include <btkProcessObject.h>
+#include <btkAcquisition.h>
+#include <btkSeparateKnownVirtualMarkersFilter.h>
+
+#include <map>
+
 #include <vtkEventQtSlotConnect.h>
+#include <vtkMapperCollection.h>
 
+// Forward declaration
+class AbstractView;
+class QTableWidgetItem;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
 
-class Viz3DWidget : public QVTKWidget
+class MultiViewWidget : public AbstractMultiView
 {
   Q_OBJECT
   
 public:
-  Viz3DWidget(QWidget* parent = 0);
-  ~Viz3DWidget();
+  MultiViewWidget(QWidget* parent = 0);
+  ~MultiViewWidget();
+  // MultiViewWidget(const MultiViewWidget&); // Implicit.
+  // MultiViewWidget& operator=(const MultiViewWidget&); // Implicit.
   
   void initialize();
-  vtkRenderer* renderer() const {return this->mp_Renderer;};
+  void setMarkerRadius(int id, double r);
+  double markerRadius(int id);
+  void setMarkerColorIndex(int id, int idx);
+  int markerColorIndex(int id);
+  void setMarkerVisibility(int id, bool visible);
+  bool markerVisibility(int id);
+  double* markerColorValue(int c);
+  bool appendNewMarkerColor(const QColor& color, int* idx);
+  void setGroundOrientation(double x, double y, double z);
+  btk::SeparateKnownVirtualMarkersFilter::Pointer load(btk::Acquisition::Pointer acq);
   
 public slots:
   // Qt / VTK
-  void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  void selectPickedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
+  void updateDisplayedMarkersList(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   // Qt
-  void show(bool s);
+  void clear();
+  void circleSelectedMarkers(QList<QTableWidgetItem*> items);
+  void updateDisplay();
+  void updateDisplay(int frame);
+  void showSelectedMarkers(const QList<QTableWidgetItem*>& items);
+  void hideSelectedMarkers(const QList<QTableWidgetItem*>& items);
+  void showAllMarkers();
+  void hideAllMarkers();
+  void updateMarkerVisibility(QTableWidgetItem* item);
+
+protected:
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dropEvent(QDropEvent *event);
   
+  AbstractView* createView(AbstractView* fromAnother = 0);
+
 signals:
+  void fileDropped(const QString& filename);
+  void visibleMarkersChanged(const QVector<int>& ids);
   void pickedMarkerChanged(int id);
   void pickedMarkersChanged(int id);
   
 private:
-  vtkRenderer* mp_Renderer;
-  btk::VTKAxesWidget* mp_AxesWidget;
+  void updateViews();
+  
   vtkEventQtSlotConnect* mp_EventQtSlotConnections;
+  vtkProcessMap* mp_VTKProc;
+  vtkMapperCollection* mp_Mappers;
+  vtkStreamingDemandDrivenPipelineCollection* mp_Syncro;
+  std::map<int, btk::ProcessObject::Pointer> m_BTKProc;
+  int m_FirstFrame;
 };
 
-#endif // Viz3DWidget_h
+#endif // MultiViewWidget_h

@@ -96,7 +96,7 @@ void EditMarkersRadius::action()
   {
     int id = (*it)->data(markerId).toInt();
     double r = (*it)->data(markerRadius).toDouble();
-    this->mp_Main->qvtkWidget->setMarkerRadius(id, this->m_Radius[i]);
+    this->mp_Main->multiView->setMarkerRadius(id, this->m_Radius[i]);
     (*it)->setData(markerRadius, this->m_Radius[i]);
     this->mp_Main->markersTable->setCurrentItem(*it, QItemSelectionModel::Select);
     this->m_Radius[i++] = r;
@@ -122,7 +122,7 @@ void EditMarkersColorIndex::action()
   {
     int id = (*it)->data(markerId).toInt();
     int idx = (*it)->data(markerColorIndex).toInt();
-    this->mp_Main->qvtkWidget->setMarkerColorIndex(id, this->m_Indexes[i]);
+    this->mp_Main->multiView->setMarkerColorIndex(id, this->m_Indexes[i]);
     (*it)->setData(markerColorIndex, this->m_Indexes[i]);
     this->mp_Main->markersTable->setCurrentItem(*it, QItemSelectionModel::Select);
     this->m_Indexes[i++] = idx;
@@ -181,7 +181,7 @@ void EditPoints::action()
         }
         if ((item->data(pointType).toInt() == btk::Point::Marker))
         {
-          this->mp_Main->qvtkWidget->setMarkerVisibility(item->data(markerId).toInt(), !(this->m_Items[i].disabled));
+          this->mp_Main->multiView->setMarkerVisibility(item->data(markerId).toInt(), !(this->m_Items[i].disabled));
           this->mp_Main->markersTable->setRowHidden(i, this->m_Items[i].disabled);
         }
         else

@@ -26,7 +26,7 @@
      <number>0</number>
     </property>
     <item row="1" column="0">
-     <widget class="Viz3DWidget" name="qvtkWidget" native="true">
+     <widget class="MultiViewWidget" name="multiView" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -1007,7 +1007,7 @@ QPushButton:flat {
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="showEventButton">
+        <widget class="QPushButton" name="selectEventButton">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -1240,13 +1240,13 @@ QPushButton::flat
    <property name="minimumSize">
     <size>
      <width>200</width>
-     <height>0</height>
+     <height>424</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>500</width>
-     <height>16777215</height>
+     <height>424</height>
     </size>
    </property>
    <property name="floating">
@@ -1694,9 +1694,9 @@ QPushButton::flat
  </widget>
  <customwidgets>
   <customwidget>
-   <class>Viz3DWidget</class>
+   <class>MultiViewWidget</class>
    <extends>QWidget</extends>
-   <header>Viz3DWidget.h</header>
+   <header>MultiViewWidget.h</header>
   </customwidget>
   <customwidget>
    <class>MarkerTableWidget</class>

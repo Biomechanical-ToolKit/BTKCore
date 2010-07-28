@@ -33,44 +33,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef Viz3DWidget_h
-#define Viz3DWidget_h
+#ifndef CompositeView_h
+#define CompositeView_h
 
-#include <btkVTKAxesWidget.h>
+#include "AbstractView.h"
 
-#include <QVTKWidget.h>
-#include <vtkRenderer.h>
-#include <vtkEventQtSlotConnect.h>
-
-class vtkStreamingDemandDrivenPipelineCollection;
-class vtkProcessMap;
-
-class Viz3DWidget : public QVTKWidget
+class CompositeView : public AbstractView
 {
   Q_OBJECT
   
 public:
-  Viz3DWidget(QWidget* parent = 0);
-  ~Viz3DWidget();
+  enum {Viz3D = 0, Graph};
   
-  void initialize();
-  vtkRenderer* renderer() const {return this->mp_Renderer;};
+  CompositeView(QWidget* parent = 0);
+  // ~CompositeView(); // Implicit
+  // CompositeView(const CompositeView&);  // Implicit
+  // CompositeView& operator=(const CompositeView&); // Implicit.
   
-public slots:
-  // Qt / VTK
-  void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  void selectPickedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  // Qt
+
+  void render();
   void show(bool s);
   
-signals:
-  void pickedMarkerChanged(int id);
-  void pickedMarkersChanged(int id);
-  
-private:
-  vtkRenderer* mp_Renderer;
-  btk::VTKAxesWidget* mp_AxesWidget;
-  vtkEventQtSlotConnect* mp_EventQtSlotConnections;
-};
+  virtual CompositeView* clone() const;
 
-#endif // Viz3DWidget_h
+private:
+  void finalizeUi();
+};
+    
+#endif // CompositeView_h

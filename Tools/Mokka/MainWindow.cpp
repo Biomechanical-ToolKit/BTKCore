@@ -140,7 +140,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuView->addAction(actionEventsDockView);
   
   // Viz3D
-  this->qvtkWidget->initialize();
+  this->multiView->initialize();
 
   // Qt UI: Undo/Redo
   this->mp_UndoStack = new QUndoStack(this); // One to command all.
@@ -148,11 +148,9 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_MarkerConfigurationUndoStack, SIGNAL(indexChanged(int)), this, SLOT(setMarkerConfigurationModified(int)));
   this->mp_AcquisitionUndoStack = new QUndoStack(this);
   connect(this->mp_AcquisitionUndoStack, SIGNAL(indexChanged(int)), this, SLOT(setAcquisitionModified(int)));
-  //QAction* actionUndo = new QAction(tr("Undo"), this);
   QAction* actionUndo = this->mp_UndoStack->createUndoAction(this);
   actionUndo->setShortcut(QKeySequence::Undo);
   QAction* actionRedo = this->mp_UndoStack->createRedoAction(this);
-  //QAction* actionRedo = new QAction(tr("Redo"), this);
   actionRedo->setShortcut(QKeySequence::Redo);
   this->menuEdit->insertAction(this->actionCut, actionUndo);
   this->menuEdit->insertAction(this->actionCut, actionRedo);
@@ -175,20 +173,20 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionClearConfigurationList, SIGNAL(triggered()), this, SLOT(clearVisualConfigurationList()));
   // Playback
   connect(this->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(updateActiveEvent(int)));
-  connect(this->frameSlider, SIGNAL(valueChanged(int)), this->qvtkWidget, SLOT(updateDisplay(int)));
+  connect(this->frameSlider, SIGNAL(valueChanged(int)), this->multiView, SLOT(updateDisplay(int)));
   connect(this->playButton, SIGNAL(clicked()), this, SLOT(toggleTimer()));
   connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(displayNextFrame()));
-  // Viz3D
-  connect(this->qvtkWidget, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
-  connect(this->qvtkWidget, SIGNAL(visibleMarkersChanged(QVector<int>)), this, SLOT(updateDisplayedMarkersList(QVector<int>)));
-  connect(this->qvtkWidget, SIGNAL(pickedMarkerChanged(int)), this, SLOT(selectPickedMarker(int)));
-  connect(this->qvtkWidget, SIGNAL(pickedMarkersChanged(int)), this, SLOT(selectPickedMarkers(int)));
+  // MultiView
+  connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
+  connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this, SLOT(updateDisplayedMarkersList(QVector<int>)));
+  connect(this->multiView, SIGNAL(pickedMarkerChanged(int)), this, SLOT(selectPickedMarker(int)));
+  connect(this->multiView, SIGNAL(pickedMarkersChanged(int)), this, SLOT(selectPickedMarkers(int)));
   // Markers dock
   connect(this->modelConfigurationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectMarkerConfiguration(int)));
   connect(this->saveModelConfigurationButton, SIGNAL(clicked()), this, SLOT(saveMarkerConfiguration()));
   connect(this->loadModelConfigurationButton, SIGNAL(clicked()), this, SLOT(loadMarkerConfiguration()));
   connect(this->deleteModelConfigurationButton, SIGNAL(clicked()), this, SLOT(eraseMarkerConfiguration()));
-  connect(this->markersTable, SIGNAL(itemChanged(QTableWidgetItem*)), this->qvtkWidget, SLOT(updateMarkerVisibility(QTableWidgetItem*)));
+  connect(this->markersTable, SIGNAL(itemChanged(QTableWidgetItem*)), this->multiView, SLOT(updateMarkerVisibility(QTableWidgetItem*)));
   connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayMarkerProperties()));
   connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(toggleMarkersVisibilityButtons()));
   connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(circleSelectedMarkers()));
@@ -209,7 +207,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->eventsTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateEventInternalInformations(QTableWidgetItem*)));
   connect(this->eventsTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayEventInformations()));
   connect(this->eventsTable, SIGNAL(itemSelectionChanged()), this, SLOT(updateEventsButtonsState()));
-  connect(this->showEventButton, SIGNAL(clicked()), this, SLOT(showEvent()));
+  connect(this->selectEventButton, SIGNAL(clicked()), this, SLOT(selectEvent()));
   connect(this->newEventButton, SIGNAL(clicked()), this, SLOT(newEvent()));
   connect(this->deleteEventButton, SIGNAL(clicked()), this, SLOT(deleteEvent()));
   connect(this->eventLabelEdit, SIGNAL(editingFinished()), this, SLOT(editEventLabel()));
@@ -220,7 +218,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->eventInformationsButton, SIGNAL(clicked()), this, SLOT(toggleEventInformations()));
 
   // Event filter
-  this->qvtkWidget->installEventFilter(this);
+  this->multiView->installEventFilter(this);
   this->frameSlider->installEventFilter(this);
   this->markersTable->installEventFilter(this);
   this->eventsTable->installEventFilter(this);
@@ -594,10 +592,11 @@ void MainWindow::openFile(const QString& filename)
   
   this->changePlaybackParameters();
   this->fillFileInformations(filename, reader->GetAcquisitionIO(), this->mp_Acquisition);
+  
   // UI settings
   // Update the 3D view
-  btk::SeparateKnownVirtualMarkersFilter::Pointer separator = this->qvtkWidget->load(this->mp_Acquisition);
-  this->qvtkWidget->updateDisplay(this->mp_Acquisition->GetFirstFrame()); // Required
+  btk::SeparateKnownVirtualMarkersFilter::Pointer separator = this->multiView->load(this->mp_Acquisition);
+  this->multiView->updateDisplay(this->mp_Acquisition->GetFirstFrame()); // Required
   
   pw.setProgressValue(70);
   
@@ -629,7 +628,7 @@ void MainWindow::openFile(const QString& filename)
       else
       {
         labelItem->setCheckState(Qt::Unchecked);
-        this->qvtkWidget->setMarkerVisibility(incMarkerId, false);
+        this->multiView->setMarkerVisibility(incMarkerId, false);
       }
       labelItem->setData(markerRadius, 8.0); // TODO: Use default radius from preferences.
       labelItem->setData(markerColorIndex, (int)0); // TODO: Use default color from preferences.
@@ -720,7 +719,7 @@ void MainWindow::openFile(const QString& filename)
   this->eventsTable->sortItems(0);
   this->newEventButton->setEnabled(true);
   this->deleteEventButton->setEnabled(false);
-  this->showEventButton->setEnabled(false);
+  this->selectEventButton->setEnabled(false);
   this->eventsTable->blockSignals(false);
 
   QCompleter* eventLabelCompleter = new QCompleter(eventLabelWordList, this);
@@ -748,7 +747,7 @@ void MainWindow::openFile(const QString& filename)
   QApplication::restoreOverrideCursor();
   
   this->frameSlider->setValue(this->frameSlider->minimum());
-  this->qvtkWidget->updateDisplay(this->frameSlider->minimum());
+  this->multiView->updateDisplay(this->frameSlider->minimum());
   
   this->actionClose->setEnabled(true);
   this->actionEdit_Metadata->setEnabled(true);
@@ -935,8 +934,8 @@ void MainWindow::clearUI()
   this->frameSlider->setValue(this->frameSlider->minimum());
   this->lcdNumber->display(this->frameSlider->minimum());
   this->frameSlider->blockSignals(false);
-  // Viz3D
-  this->qvtkWidget->clear();
+  // Multivew
+  this->multiView->clear();
 };
 
 void MainWindow::fillFileInformations(const QString& filename, btk::AcquisitionFileIO::Pointer io, btk::Acquisition::Pointer acq)
@@ -1066,11 +1065,11 @@ void MainWindow::changePlaybackParameters()
 void MainWindow::changeGroundOrientation()
 {
   if (actionPlane_XY->isChecked())
-    this->qvtkWidget->setGroundOrientation(0.0, 0.0, 1.0);
+    this->multiView->setGroundOrientation(0.0, 0.0, 1.0);
   else if (actionPlane_YZ->isChecked())
-    this->qvtkWidget->setGroundOrientation(1.0, 0.0, 0.0);
+    this->multiView->setGroundOrientation(1.0, 0.0, 0.0);
   else if (actionPlane_ZX->isChecked())
-    this->qvtkWidget->setGroundOrientation(0.0, 1.0, 0.0);
+    this->multiView->setGroundOrientation(0.0, 1.0, 0.0);
 };
 
 void MainWindow::deselectCurrentVisualConfiguration()
@@ -1169,7 +1168,7 @@ void MainWindow::showSelectedMarkers()
 {
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
   this->markersTable->blockSignals(true);
-  this->qvtkWidget->showSelectedMarkers(items);
+  this->multiView->showSelectedMarkers(items);
   this->markersTable->blockSignals(false);
 };
 
@@ -1177,7 +1176,7 @@ void MainWindow::hideSelectedMarkers()
 {
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
   this->markersTable->blockSignals(true);
-  this->qvtkWidget->hideSelectedMarkers(items);
+  this->multiView->hideSelectedMarkers(items);
   this->markersTable->blockSignals(false);
 };
 
@@ -1187,7 +1186,7 @@ void MainWindow::showAllMarkers()
   for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
     this->markersTable->item(row, 0)->setCheckState(Qt::Checked);
   this->markersTable->blockSignals(false);
-  this->qvtkWidget->showAllMarkers();
+  this->multiView->showAllMarkers();
 };
 
 void MainWindow::hideAllMarkers()
@@ -1196,7 +1195,7 @@ void MainWindow::hideAllMarkers()
   for (int row = 0 ; row < this->markersTable->rowCount() ; ++row)
     this->markersTable->item(row, 0)->setCheckState(Qt::Unchecked);
   this->markersTable->blockSignals(false);
-  this->qvtkWidget->hideAllMarkers();
+  this->multiView->hideAllMarkers();
 };
 
 void MainWindow::updateMarkerRadius(double r)
@@ -1206,8 +1205,8 @@ void MainWindow::updateMarkerRadius(double r)
   this->markerRadiusSlider->blockSignals(false);
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
   for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-    this->qvtkWidget->setMarkerRadius((*it)->data(markerId).toInt(), r);
-  this->qvtkWidget->updateDisplay(this->frameSlider->value());
+    this->multiView->setMarkerRadius((*it)->data(markerId).toInt(), r);
+  this->multiView->updateDisplay(this->frameSlider->value());
 };
 
 void MainWindow::updateMarkerRadiusSpinBox(int v)
@@ -1259,20 +1258,21 @@ void MainWindow::displayMarkerProperties()
     bool sameRadius = true;
     bool sameColor = true;
     QList<QTableWidgetItem*>::const_iterator it = items.begin();
-    double r = this->qvtkWidget->markerRadius((*it)->data(markerId).toInt());
-    int c = this->qvtkWidget->markerColorIndex((*it)->data(markerId).toInt());
+    double r = this->multiView->markerRadius((*it)->data(markerId).toInt());
+    int c = this->multiView->markerColorIndex((*it)->data(markerId).toInt());
     ++it;
     while (it != items.end())
     {
-      if (r != this->qvtkWidget->markerRadius((*it)->data(markerId).toInt()))
+      if (r != this->multiView->markerRadius((*it)->data(markerId).toInt()))
         sameRadius = false;
-      if (c != this->qvtkWidget->markerColorIndex((*it)->data(markerId).toInt()))
+      if (c != this->multiView->markerColorIndex((*it)->data(markerId).toInt()))
         sameColor = false;
 
       if (!sameRadius && !sameColor)
         break;
       ++it;
     }
+    
     // radius
     if (!sameRadius)
     {
@@ -1284,12 +1284,14 @@ void MainWindow::displayMarkerProperties()
       this->markerRadiusSpinBox->setValue(r);
       this->markerRadiusSlider->setValue(r * 10.0);
     }
-    // color
+    
+  
+  // color
     if (!sameColor)
       this->markerColorButton->setStyleSheet("");
     else
     {
-      double* rgba = this->qvtkWidget->markerColorValue(c);
+      double* rgba = this->multiView->markerColorValue(c);
       QString ss = "background-color: rgb( %1, %2, %3);";
       this->markerColorButton->setStyleSheet(
           ss.arg(static_cast<int>(rgba[0] * 255))
@@ -1431,7 +1433,7 @@ void MainWindow::selectMarkerConfiguration(int index)
       this->modelConfigurationComboBox->blockSignals(false);
     }
   }
-  this->qvtkWidget->setFocus();
+  this->multiView->setFocus();
   this->m_SelectedMarkerConfiguration = this->modelConfigurationComboBox->currentIndex();
 };
 
@@ -1497,7 +1499,7 @@ void MainWindow::newMarkerConfiguration()
   this->modelConfigurationComboBox->setCurrentIndex(index);
   this->modelConfigurationComboBox->blockSignals(false);
 
-  this->qvtkWidget->setFocus();
+  this->multiView->setFocus();
 };
 
 void MainWindow::saveMarkerConfiguration()
@@ -1523,7 +1525,7 @@ void MainWindow::saveMarkerConfiguration()
     this->modelConfigurationComboBox->setItemData(index, false, visualConfigChanged);
     this->modelConfigurationComboBox->setItemData(index, false, visualConfigNew);
   }
-  this->qvtkWidget->setFocus();
+  this->multiView->setFocus();
 };
 
 bool MainWindow::saveMarkerConfiguration(int index)
@@ -1565,7 +1567,7 @@ bool MainWindow::saveMarkerConfiguration(int index)
       QTableWidgetItem* item = this->markersTable->item(i,0);
       xmlWriter.writeAttribute("label", item->data(pointLabel).toString());
       xmlWriter.writeAttribute("radius", item->data(markerRadius).toString());
-      double* color = this->qvtkWidget->markerColorValue(item->data(markerColorIndex).toInt());
+      double* color = this->multiView->markerColorValue(item->data(markerColorIndex).toInt());
       xmlWriter.writeAttribute("colorR", QString::number(color[0]));
       xmlWriter.writeAttribute("colorG", QString::number(color[1]));
       xmlWriter.writeAttribute("colorB", QString::number(color[2]));
@@ -1641,7 +1643,7 @@ void MainWindow::loadMarkerConfiguration(const QString& filename)
       this->actionClearConfigurationList->setEnabled(true);
     }
   
-    this->qvtkWidget->setFocus();
+    this->multiView->setFocus();
   }
 };
 
@@ -1731,9 +1733,9 @@ bool MainWindow::loadMarkerConfiguration(const QString& filename, QString* name)
         int idxColor;
         QColor color; color.setRgbF(c[0],c[1],c[2]);
         int idxMarker = item->data(markerId).toInt();
-        this->qvtkWidget->appendNewMarkerColor(color, &idxColor);
-        this->qvtkWidget->setMarkerRadius(idxMarker, r);
-        this->qvtkWidget->setMarkerColorIndex(idxMarker, idxColor);
+        this->multiView->appendNewMarkerColor(color, &idxColor);
+        this->multiView->setMarkerRadius(idxMarker, r);
+        this->multiView->setMarkerColorIndex(idxMarker, idxColor);
         item->setData(markerRadius, r);
         item->setData(markerColorIndex, idxColor);
         
@@ -1743,7 +1745,7 @@ bool MainWindow::loadMarkerConfiguration(const QString& filename, QString* name)
   }
   this->markersTable->blockSignals(false);
   
-  this->qvtkWidget->updateDisplay();
+  this->multiView->updateDisplay();
   
   return true;
 };
@@ -1793,7 +1795,7 @@ void MainWindow::eraseMarkerConfiguration()
   this->actionDeselectCurrentConfiguration->setEnabled(false);
   this->modelConfigurationComboBox->blockSignals(false);
   
-  this->qvtkWidget->setFocus();
+  this->multiView->setFocus();
 };
 
 // Go to the default visual configuration:
@@ -1811,14 +1813,14 @@ void MainWindow::resetMarkerConfiguration()
     {
       QTableWidgetItem* item = this->markersTable->item(i,0);
       int idxMarker = item->data(markerId).toInt();
-      this->qvtkWidget->setMarkerRadius(idxMarker, 8.0);
-      this->qvtkWidget->setMarkerColorIndex(idxMarker, (int)0);
+      this->multiView->setMarkerRadius(idxMarker, 8.0);
+      this->multiView->setMarkerColorIndex(idxMarker, (int)0);
       item->setData(markerRadius, r);
       item->setData(markerColorIndex, idxColor);
     }
   }
   this->markersTable->blockSignals(false);
-  this->qvtkWidget->updateDisplay();
+  this->multiView->updateDisplay();
 }
 
 void MainWindow::editMarkerLabel()
@@ -1870,7 +1872,7 @@ void MainWindow::editMarkerColor()
   if (color.isValid())
   {
     int i;
-    bool modified = this->qvtkWidget->appendNewMarkerColor(color, &i);
+    bool modified = this->multiView->appendNewMarkerColor(color, &i);
     if (!modified)
     {
       QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
@@ -1904,11 +1906,11 @@ void MainWindow::toggleMarkerProperties()
 
 void MainWindow::circleSelectedMarkers()
 {
-  this->qvtkWidget->circleSelectedMarkers(this->markersTable->selectedItems());
-  this->qvtkWidget->updateDisplay(this->frameSlider->value());
+  this->multiView->circleSelectedMarkers(this->markersTable->selectedItems());
+  this->multiView->updateDisplay(this->frameSlider->value());
 };
 
-void MainWindow::showEvent()
+void MainWindow::selectEvent()
 {
   this->eventsTable->setStyleSheet("selection-color: rgb(255,0,0);");
 
@@ -2049,14 +2051,14 @@ void MainWindow::updateEventsButtonsState()
     this->deleteEventButton->setEnabled(true);
     int valid = this->eventsTable->item(row, 0)->data(eventVisible).toInt();
     if (valid)
-      this->showEventButton->setEnabled(true);
+      this->selectEventButton->setEnabled(true);
     else
-      this->showEventButton->setEnabled(false);
+      this->selectEventButton->setEnabled(false);
   }
   else
   {
     this->deleteEventButton->setEnabled(false);
-    this->showEventButton->setEnabled(false);
+    this->selectEventButton->setEnabled(false);
   }
 };
 

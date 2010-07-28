@@ -2,6 +2,8 @@
   <qresource>
     <file>Resources/Images/1downarrow.png</file>
     <file>Resources/Images/1uparrow.png</file>
+    <file>Resources/Images/closedock-16.png</file>
+    <file>Resources/Images/closedock-down-16.png</file>
     <file>Resources/Images/disclosureTriangleSmallDownBlack.png</file>
     <file>Resources/Images/disclosureTriangleSmallRightBlack.png</file>
     <file>Resources/Images/edit.png</file>
@@ -10,6 +12,8 @@
     <file>Resources/Images/editdelete-down.png</file>
     <file>Resources/Images/filenew.png</file>
     <file>Resources/Images/filenew-down.png</file>
+    <file>Resources/Images/horizontalsplit-16.png</file>
+    <file>Resources/Images/horizontalsplit-down-16.png</file>
     <file>Resources/Images/open.png</file>
     <file>Resources/Images/open-down.png</file>
     <file>Resources/Images/lock.png</file>
@@ -21,6 +25,9 @@
     <file>Resources/Images/save-down.png</file>
     <file>Resources/Images/trajectory_active.png</file>
     <file>Resources/Images/trajectory_unactive.png</file>
+    <file>Resources/Images/treeDownTriangleWhite.png</file>
     <file>Resources/Images/unlock.png</file>
+    <file>Resources/Images/verticalsplit-16.png</file>
+    <file>Resources/Images/verticalsplit-down-16.png</file>
   </qresource>
 </RCC>

@@ -123,7 +123,7 @@ public Q_SLOTS:
   void toggleEventInformations();
   void updateEventInternalInformations(QTableWidgetItem* item);
   void updateEventsButtonsState();
-  void showEvent();
+  void selectEvent();
   void eventsDockLocationChanged(Qt::DockWidgetArea area);
   void focusOnEventEdition(int idx = -1);
   // Playback
