@@ -71,8 +71,8 @@ namespace pcl
     std::string m_Description;
     std::string m_ValueDescription;
 
-    Opt(const Opt& rToCopy); // Not implemented.
-    Opt& operator=(const Opt& rToCopy); // Not implemented.
+    Opt(const Opt&); // Not implemented.
+    Opt& operator=(const Opt&); // Not implemented.
   };
   
   inline Opt::Opt(const std::string& name, 

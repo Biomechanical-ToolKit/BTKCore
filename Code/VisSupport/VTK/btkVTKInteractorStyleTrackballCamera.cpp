@@ -74,7 +74,9 @@ namespace btk
    */
   void VTKInteractorStyleTrackballCamera::Rotate()
   {
-    this->Superclass::Rotate();
+    if (this->RotationEnabled)
+      this->Superclass::Rotate();
+
     /*
     if (this->CurrentRenderer == NULL)
       return;
@@ -239,6 +241,7 @@ namespace btk
   : vtkInteractorStyleTrackballCamera()
   {
     this->m_Radius = 1.1;
+    this->RotationEnabled = 1;
   };
   
   /**

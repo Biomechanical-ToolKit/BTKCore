@@ -161,7 +161,7 @@ namespace btk
     void SetPointUnit(const std::string& units = "mm") {this->SetPointUnit(Point::Marker, units);};
     const std::string GetPointUnit(Point::Type t) const {return this->m_Units[t];};
     BTK_COMMON_EXPORT void SetPointUnit(Point::Type t, const std::string& units);
-    int GetPointFrameNumber() const {return this->m_PointFrameNumber;};    
+    int GetPointFrameNumber() const {return this->m_PointFrameNumber;};
     double GetPointFrequency() const {return this->m_PointFrequency;};
     BTK_COMMON_EXPORT void SetPointFrequency(double frequency);
     int GetAnalogFrameNumber() const {return this->m_PointFrameNumber * this->m_AnalogSampleNumberPerPointFrame;};    

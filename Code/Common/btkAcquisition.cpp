@@ -856,7 +856,9 @@ namespace btk
    */
   void Acquisition::ResizePointNumber(int pointNumber)
   {
-    if (pointNumber < this->GetPointNumber())
+    if (pointNumber == this->GetPointNumber())
+      return;
+    else if (pointNumber < this->GetPointNumber())
       this->m_Points->SetItemNumber(pointNumber);
     else
     {
@@ -875,7 +877,9 @@ namespace btk
    */
   void Acquisition::ResizeAnalogNumber(int analogNumber)
   {
-    if (analogNumber < this->GetAnalogNumber())
+    if (analogNumber == this->GetAnalogNumber())
+      return;
+    else if (analogNumber < this->GetAnalogNumber())
       this->m_Analogs->SetItemNumber(analogNumber);
     else
     {

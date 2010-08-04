@@ -52,6 +52,10 @@ namespace btk
     BTK_VTK_EXPORT virtual void Rotate();
     //virtual void EndRotate();
     
+    vtkGetMacro(RotationEnabled,int);
+    vtkSetMacro(RotationEnabled,int);
+    vtkBooleanMacro(RotationEnabled,int);
+    
   protected:
     BTK_VTK_EXPORT VTKInteractorStyleTrackballCamera();
     ~VTKInteractorStyleTrackballCamera() {};
@@ -61,6 +65,7 @@ namespace btk
     double ProjectToSphere(double r, double x, double y) const;
     
     double m_Radius;
+    int RotationEnabled;
   };
 };
 
