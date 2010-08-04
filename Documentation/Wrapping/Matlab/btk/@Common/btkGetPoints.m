@@ -11,10 +11,14 @@ function [points pointsInfo] = btkGet3DPoints(h) %#ok
 %    - POINTSINFO.FIRSTFRAME
 %    - POINTSINFO.FREQUENCY
 %    - POINTSINFO.UNITS
+%    - POINTSINFO.RESIDUALS
+%    - POINTSINFO.MASKS
 %  POINTSINFO.FIRSTFRAME contains the index of the first frame of the 
 %  acquisition. POINTSINFO.FREQUENCY contains the points' frequency.  
 %  POINTSINFO.UNITS contains the unit of each point.  Each fieldname in 
-%  POINTSINFO.UNITS corresponds to point's label. 
+%  POINTSINFO.UNITS corresponds to point's label.  POINTSINFO.RESIDUALS
+%  contains the point's residuals.  POINTSINFO.MASKS contains the point's
+%  masks as field of strings.  
 
 %  Author: A. Barré
 %  Copyright 2009-2010 Biomechanical ToolKit (BTK).

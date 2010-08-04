@@ -5,6 +5,19 @@ function h = btkReadAcquisition(filename) %#ok
 %  acquisition stored in file FILENAME.  This handle is returned 
 %  as a 32-bit integer and can be only used with the btk* function.  Supported 
 %  file formats are ANC, C3D AND TRC.
+%
+%  [H, BYTEORDER] = BTKREADACQUISITION(FILENAME) returns the byte order of the
+%  file as a string. The known values are:
+%   - OrderNotApplicable (In the case the file is an ASCII file).
+%   - IEEE_LittleEndian
+%   - VAX_LittleEndian
+%   - IEEE_BigEndian
+%
+%  [H, BYTEORDER, STORAGEFORMAT] = BTKREADACQUISITION(FILENAME) returns the storage
+%  format of the file as a string. The known values are:
+%   - StorageNotApplicable (In the case the file is an ASCII file).
+%   - Float
+%   - Integer
 
 %  Author: A. Barré
 %  Copyright 2009-2010 Biomechanical ToolKit (BTK).

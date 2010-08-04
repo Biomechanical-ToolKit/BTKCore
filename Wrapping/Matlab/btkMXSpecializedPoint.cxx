@@ -155,7 +155,7 @@ void btkMXGetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[
 void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if (nrhs != 2)
-    mexErrMsgTxt("Two input required.");
+    mexErrMsgTxt("Two inputs required.");
 
   btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 

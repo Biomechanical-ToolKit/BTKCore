@@ -98,19 +98,19 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexErrMsgTxt("The field 'format' must be set by cell of strings or an array of numerical values.");
       numberOfValues = mxGetNumberOfElements(mxValues);
       if ((f != btk::MetaDataInfo::Char) && (numberOfValues > 65535))
-        mexErrMsgTxt("Number of values exceed the maximum number (65535) available for each metadata.");
+        mexErrMsgTxt("Number of values exceeds the maximum number (65535) available for each metadata.");
       mwSize dimsSize = mxGetNumberOfDimensions(mxValues);
       if (dimsSize > maxDimSize)
-        mexErrMsgTxt("Number of dimensions exceed the maximum number (7) available for each metadata.");
+        mexErrMsgTxt("Number of dimensions exceeds the maximum number (7) available for each metadata.");
       const mwSize* dimsValues = mxGetDimensions(mxValues);
       std::vector<uint8_t> _dims;
-      for (mwSize i = dimsSize - 1 ; i >= 0 ; --i)
+      for (int i = dimsSize - 1 ; i >= 0 ; --i)
       {
-        int dim = static_cast<uint8_t>(dimsValues[i]);
+        int dim = static_cast<int>(dimsValues[i]);
         if (dim > 255)
-          mexErrMsgTxt("The dimension's value exceed the maximum number (255) available for each dimension.");
+          mexErrMsgTxt("The dimension's value exceeds the maximum number (255) available for each dimension.");
         if (dim != 1)
-          _dims.push_back(dim);
+          _dims.push_back(static_cast<uint8_t>(dim));
       }
       if (f == btk::MetaDataInfo::Char)
         _dims.push_back(0);

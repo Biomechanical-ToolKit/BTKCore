@@ -43,7 +43,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs != 1)
     mexErrMsgTxt("One input required.");
-  if (nlhs > 1)
+  if (nlhs > 3)
     mexErrMsgTxt("Too many output arguments.");
 
   if (!mxIsChar(prhs[0]) || mxIsEmpty(prhs[0]))
@@ -84,4 +84,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   mxFree(filename);
   
   plhs[0] = btk_MOH_create_handle(reader->GetOutput());
+  if (nlhs > 1) // Byte Order
+    plhs[1] = mxCreateString(reader->GetAcquisitionIO()->GetByteOrderAsString().c_str());
+  if (nlhs > 2) // Storage format
+    plhs[2] = mxCreateString(reader->GetAcquisitionIO()->GetStorageFormatAsString().c_str());
+  
 };

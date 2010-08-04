@@ -10,7 +10,7 @@ function GRW = btkGetGroundReactionWrenches(h, threshold) %#ok
 %   - GRW(i).M
 %  The field P is a matrix (n,3) where n is the number of frames and contains the
 %  positions of the wrench in the global frame.  The field F is a matrix (n,3) 
-%  which contains wrench's forces in the global frame.  The field M is matrix 
+%  which contains wrench's forces in the global frame.  The field M is a matrix 
 %  (n,3) which contains wrench's moments in the global frame.
 %  The biomechanical acquisition handle H is represented as a 32-bit 
 %  integer and can be only used with the btk* functions.

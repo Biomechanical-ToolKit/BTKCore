@@ -3,6 +3,7 @@ function tocbtkbasicfilters
 % ----------------
 %
 % Acquisition
+%   <a href="matlab:help btkGetForcePlatformWrenches">btkGetForcePlatformWrenches</a>    - Compute force platform wrenches
 %   <a href="matlab:help btkGetGroundReactionWrenches">btkGetGroundReactionWrenches</a>   - Compute ground reaction wrenches (positions, forces and moments)
 %                                    between the ground and the subject from force platform's data.
 %   <a href="matlab:help btkMergeAcquisitions">btkMergeAcquisitions</a>           - Merge or contatenate the acquisitions given in input.
@@ -10,6 +11,6 @@ function tocbtkbasicfilters
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>
 
 %   Author(s): A. Barré
-%   Copyright 2009 Biomechanical ToolKit
+%   Copyright 2009-2010 Biomechanical ToolKit
 
 % [EOF]

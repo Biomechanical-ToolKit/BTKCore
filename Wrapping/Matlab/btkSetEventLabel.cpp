@@ -34,39 +34,36 @@
  */
 
 #include "btkMXObjectHandle.h"
+#include "btkMXEvent.h"
 
 #include <btkAcquisition.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs!=2)
-    mexErrMsgTxt("Two input required.");
-
-  btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
-
-  if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
-    mexErrMsgTxt("Analog resolution must be set by a single integer value.");
+  if(nrhs != 3)
+    mexErrMsgTxt("Three input arguments required.");
+  if (nlhs > 1)
+    mexErrMsgTxt("Too many output arguments.");
   
-  int ar = static_cast<int>(mxGetScalar(prhs[1]));
-  btk::Acquisition::AnalogResolution res = btk::Acquisition::Bit12;
-  switch (ar)
-  {
-    case 8:
-      res = btk::Acquisition::Bit8;
-      break;
-    case 12:
-      break;
-    case 14:
-      res = btk::Acquisition::Bit14;
-      break;
-    case 16:
-      res = btk::Acquisition::Bit16;
-      break;
-    default:
-      mexErrMsgTxt("Unvalid analog resolution.");
-
-  }
+  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
+    mexErrMsgTxt("The index of the event must be set by a single integer value.");
   
+  if (!mxIsChar(prhs[2]) || mxIsEmpty(prhs[2]))
+    mexErrMsgTxt("Event's label must be a non-empty string.");    
+
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  acq->SetAnalogResolution(res);
+  
+  int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
+  if ((idx < 0) || (idx >= acq->GetEventNumber()))
+    mexErrMsgTxt("Event's index out of range.");
+  btk::Event::Pointer evt = acq->GetEvent(idx);
+  
+  size_t strlen_ = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
+  char* newLabel = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[2], newLabel, strlen_);
+  evt->SetLabel(newLabel);
+  mxFree(newLabel);
+  
+  btkMXCreateEventsStructure(acq, nlhs, plhs);
 };
+

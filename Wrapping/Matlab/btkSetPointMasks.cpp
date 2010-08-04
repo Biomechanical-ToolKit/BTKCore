@@ -34,39 +34,28 @@
  */
 
 #include "btkMXObjectHandle.h"
+#include "btkMXPoint.h"
 
 #include <btkAcquisition.h>
+#include <btkAnalog.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs!=2)
-    mexErrMsgTxt("Two input required.");
-
+  if (nrhs != 3)
+    mexErrMsgTxt("Three inputs required.");
+  
   btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
-
-  if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
-    mexErrMsgTxt("Analog resolution must be set by a single integer value.");
-  
-  int ar = static_cast<int>(mxGetScalar(prhs[1]));
-  btk::Acquisition::AnalogResolution res = btk::Acquisition::Bit12;
-  switch (ar)
-  {
-    case 8:
-      res = btk::Acquisition::Bit8;
-      break;
-    case 12:
-      break;
-    case 14:
-      res = btk::Acquisition::Bit14;
-      break;
-    case 16:
-      res = btk::Acquisition::Bit16;
-      break;
-    default:
-      mexErrMsgTxt("Unvalid analog resolution.");
-
-  }
-  
+    
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  acq->SetAnalogResolution(res);
+  btk::Point::Pointer point = btkMXGetPoint(acq, nrhs, prhs);
+  int numberOfFrames = point->GetFrameNumber();
+  
+  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetM(prhs[2]) != numberOfFrames) || (mxGetN(prhs[2]) != 1))
+    mexErrMsgTxt("The third input must be a vector of real values corresponding to the data of one point."); 
+
+  double* values = mxGetPr(prhs[2]);
+  for (int i = 0 ; i < numberOfFrames ; ++i)
+    point->GetMasks().coeffRef(i) = values[i];
 };
+
+

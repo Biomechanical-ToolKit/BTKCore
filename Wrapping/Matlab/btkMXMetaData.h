@@ -42,6 +42,7 @@
 
 void btkMXCreateMetaDataStructure(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
 mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md);
+btk::MetaData::Pointer btkMXExtractMetaDataIterator(btk::MetaData::Iterator* pit, int level, const mxArray *prhs[], btk::MetaData::Pointer md);
 
 #if !defined(SCI_MEX)
   #include "btkMXMetaData.cxx"

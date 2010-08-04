@@ -89,31 +89,62 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
   }
   else
   {
-    std::vector<std::string> units = std::vector<std::string>(numberOfPoints, "");
-    const char* info[] = {"firstFrame", "frequency", "units"};
+    const char* info[] = {"firstFrame", "frequency", "units", "residuals", "masks"};
     int numberOfFields =  sizeof(info) / sizeof(char*);
-       
-    int inc = 0;
-    for(btk::PointCollection::ConstIterator itPt = points->Begin() ; itPt != points->End() ; ++itPt)
-    {
-      if ((*itPt)->GetType() <= 5) // 0-5: known units.
-        units[inc] = acq->GetPointUnit((*itPt)->GetType());
-      ++inc;
-    }
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
+    // First frame
     mxArray* firstFrame  = mxCreateDoubleMatrix(1, 1, mxREAL);
     *mxGetPr(firstFrame) = static_cast<double>(acq->GetFirstFrame());
+    // Frequency
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
     *mxGetPr(frequency) = acq->GetPointFrequency();
+    // Units, residuals & masks
+    int inc = 0;
     mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
-    for (int i = 0 ; i < numberOfPoints ;++i)
+    mxArray* residualsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
+    mxArray* masksStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
+    for(btk::PointCollection::ConstIterator itPt = points->Begin() ; itPt != points->End() ; ++itPt)
     {
-      mxSetFieldByNumber(unitsStruct, 0, i, mxCreateString(units[i].c_str()));
-      delete[] fieldnames[i];
+      int num = (*itPt)->GetFrameNumber();
+      // Unit
+      std::string unit = "";
+      if ((*itPt)->GetType() <= 5) // 0-5: known units.
+        unit = acq->GetPointUnit((*itPt)->GetType());
+      mxSetFieldByNumber(unitsStruct, 0, inc, mxCreateString(unit.c_str()));
+      // Residuals
+      mxArray* residuals = mxCreateDoubleMatrix(num, 1, mxREAL);
+      memcpy(mxGetPr(residuals), (*itPt)->GetResiduals().data(), mxGetNumberOfElements(residuals) * sizeof(double));
+      mxSetFieldByNumber(residualsStruct, 0, inc, residuals);
+      // Masks
+      mxArray* masks = mxCreateCellMatrix(num, 1);
+      char mask[8]; mask[7] = '\0';
+      for (int i = 0 ; i < num ; ++i)
+      {
+        int inc2 = 1;
+        int incMask = 0;
+        int maskInt = static_cast<int>((*itPt)->GetMasks().coeff(i));
+        while (inc2 < 127)
+        {
+            if ((maskInt & inc2) && (maskInt != -1))
+                mask[incMask] = '1';
+            else
+                mask[incMask] = '0';
+            ++incMask;
+            inc2 *= 2;
+        }
+        mxSetCell(masks, (mwIndex)i, mxCreateString(mask));
+      }
+      mxSetFieldByNumber(masksStruct, 0, inc, masks);
+      // Cleanup
+      delete[] fieldnames[inc];
+      ++inc;
     }
+    delete[] fieldnames;
+    // Setting field
     mxSetFieldByNumber(plhs[1], 0, 0, firstFrame);
     mxSetFieldByNumber(plhs[1], 0, 1, frequency);
     mxSetFieldByNumber(plhs[1], 0, 2, unitsStruct);
-    delete[] fieldnames;
+    mxSetFieldByNumber(plhs[1], 0, 3, residualsStruct);
+    mxSetFieldByNumber(plhs[1], 0, 4, masksStruct);
   }
 }; 

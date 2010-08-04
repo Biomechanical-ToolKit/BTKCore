@@ -99,14 +99,23 @@ void btkMXCreateMetaDataStructure(int nlhs, mxArray *plhs[], int nrhs, const mxA
 
 mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
 {
-  const char* metaDataFieldnames[] = {"info", "children", "description"};
-  mxArray* out = mxCreateStructMatrix(1, 1, 3, metaDataFieldnames);
+  const char* metaDataFieldnames[] = {"info", "children", "description", "unlocked"};
+  mxArray* out = mxCreateStructMatrix(1, 1, 4, metaDataFieldnames);
   // Info
   if (md->HasInfo())
   {
-    const char* metaDataInfoFieldnames[] = {"format", "values"};
-    mxArray* info = mxCreateStructMatrix(1, 1, 2, metaDataInfoFieldnames);
+    const char* metaDataInfoFieldnames[] = {"format", "dims", "values"};
+    mxArray* info = mxCreateStructMatrix(1, 1, 3, metaDataInfoFieldnames);
+    double* data;
+    // Format
     mxSetFieldByNumber(info, 0, 0, mxCreateString(md->GetInfo()->GetFormatAsString().c_str()));
+    // Dimensions
+    mxArray* dimensions = mxCreateDoubleMatrix(1, md->GetInfo()->GetDimensions().size(), mxREAL);
+    data = static_cast<double*>(mxGetData(dimensions));
+    for (size_t i = 0 ; i < md->GetInfo()->GetDimensions().size() ; ++i)
+      data[i] = md->GetInfo()->GetDimensions()[i];
+    mxSetFieldByNumber(info, 0, 1, dimensions);
+    // Values
     mxArray* values;
     mwSize ndim = md->GetInfo()->GetDimensions().size();
     mwSize* dims = 0;
@@ -132,7 +141,7 @@ mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
             dims[i] = md->GetInfo()->GetDimensions()[i];
       }
     }
-    int prod = md->GetInfo()->GetDimensionsProduct(); 
+    
     switch(md->GetInfo()->GetFormat())
     {
       case btk::MetaDataInfo::Char:
@@ -149,32 +158,19 @@ mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
         break;
       }
       case btk::MetaDataInfo::Byte:
-      {
-        values = mxCreateNumericArray(ndim, dims, mxINT8_CLASS, mxREAL);
-        int8_t* data = static_cast<int8_t*>(mxGetData(values));
-        for (int i = 0 ; i < prod ; ++i)
-          data[i] = md->GetInfo()->ToInt8(i);
-        break;
-      }
       case btk::MetaDataInfo::Integer:
-      {
-        values = mxCreateNumericArray(ndim, dims, mxINT16_CLASS, mxREAL);
-        int16_t* data = static_cast<int16_t*>(mxGetData(values));
-        for (int i = 0 ; i < prod ; ++i)
-          data[i] = md->GetInfo()->ToInt16(i);
-        break;
-      }
       case btk::MetaDataInfo::Real:
       {
+        int prod = md->GetInfo()->GetDimensionsProduct(); 
         values = mxCreateNumericArray(ndim, dims, mxDOUBLE_CLASS, mxREAL);
-        double* data = static_cast<double*>(mxGetData(values));
+        data = static_cast<double*>(mxGetData(values));
         for (int i = 0 ; i < prod ; ++i)
           data[i] = md->GetInfo()->ToDouble(i);
         break;
       }
     }
     delete[] dims;
-    mxSetFieldByNumber(info, 0, 1, values);
+    mxSetFieldByNumber(info, 0, 2, values);
     mxSetFieldByNumber(out, 0, 0, info);
   }
   else
@@ -231,5 +227,45 @@ mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
   }
   // Description
   mxSetFieldByNumber(out, 0, 2, mxCreateString(md->GetDescription().c_str()));
+  // Locked
+  mxSetFieldByNumber(out, 0, 3, mxCreateDoubleScalar(md->GetUnlockState() ? 1.0 : 0.0));
   return out;
+};
+
+btk::MetaData::Pointer btkMXExtractMetaDataIterator(btk::MetaData::Iterator* pit, int level, const mxArray *prhs[], btk::MetaData::Pointer md)
+{
+  btk::MetaData::Iterator it = md->End();
+  for (int i = 1 ; i <= level ; ++i)
+  {
+    if (mxIsChar(prhs[i]))
+    {
+      size_t strlen_ = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
+      char* label = (char*)mxMalloc(strlen_);
+      mxGetString(prhs[i], label, strlen_);
+      it = md->FindChild(label);
+      if (it == md->End())
+      {
+        std::string err = "No metadata with label: '" + std::string(label) + "'.";
+        mxFree(label);
+        mexErrMsgTxt(err.c_str());
+      }
+      mxFree(label);
+    }
+    else
+    {
+      int idx = static_cast<int>(mxGetScalar(prhs[i])) - 1;
+      if ((idx < 0) || (idx >= md->GetChildNumber()))
+        mexErrMsgTxt("Metadata's index out of range.");
+      it = md->Begin();
+      std::advance(it, idx);
+    }
+    
+    if (i == level)
+    {
+      *pit = it;
+      return md;
+    }
+    else
+      md = *it;
+  }
 };

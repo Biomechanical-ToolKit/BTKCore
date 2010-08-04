@@ -40,22 +40,54 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs < 2)
-    mexErrMsgTxt("Two inputs required.");
+  if(nrhs < 3)
+    mexErrMsgTxt("Minimum of three inputs required.");
   if (nlhs > 1)
     mexErrMsgTxt("Too many output arguments.");
 
-  for (int i = 1 ; i < nrhs ; ++i)
+  for (int i = 1 ; i < nrhs-2 ; ++i)
   {
     if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && (!mxIsNumeric(prhs[i]) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
       mexErrMsgTxt("Metadata's label or index must be set by a non-empty string or an integer respectively.");
   }
+  if (!mxIsNumeric(prhs[nrhs-2]) || mxIsComplex(prhs[nrhs-2]) || (mxGetNumberOfElements(prhs[nrhs-2]) != 1))
+    mexErrMsgTxt("The index for the metadata's value must be set by a single integer");
+  if ((mxIsCell(prhs[nrhs-1]) && (mxGetNumberOfElements(prhs[nrhs-1]) != 1)) 
+       || (mxIsChar(prhs[nrhs-1]) && (mxGetM(prhs[nrhs-1]) != 1))
+       || (mxIsNumeric(prhs[nrhs-1]) && (mxIsComplex(prhs[nrhs-1]) || (mxGetNumberOfElements(prhs[nrhs-1]) != 1))))
+    mexErrMsgTxt("Unsupported metadata's value or the number of elements is greater than 1.");
   
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::MetaData::Iterator it;
-  btk::MetaData::Pointer parent = btkMXExtractMetaDataIterator(&it, nrhs-1,  prhs, acq->GetMetaData());
+  btk::MetaData::Pointer parent = btkMXExtractMetaDataIterator(&it, nrhs-3, prhs, acq->GetMetaData());
   
-  parent->RemoveChild(it);
+  if (!(*it)->HasInfo())
+    mexErrMsgTxt("No metadata's info.");
+  
+  size_t index = static_cast<size_t>(mxGetScalar(prhs[nrhs-2])) - 1;
+  if ((index < 0) || (index >= (*it)->GetInfo()->GetValues().size()))
+    mexErrMsgTxt("Invalid index to extract one metadata's value.");
+    
+  const mxArray* data = 0; 
+  if (mxIsCell(prhs[nrhs-1]))
+  {
+    data = mxGetCell(prhs[nrhs-1], 0);
+    if (!data || !mxIsChar(data))
+      mexErrMsgTxt("Error in the value's format: only a string are accepted in cell.");
+  }
+  else
+    data = prhs[nrhs-1];
+  
+  if (mxIsChar(data))
+  {
+    size_t strlen_ = (mxGetM(data) * mxGetN(data) * sizeof(mxChar)) + 1;
+    char* d = (char*)mxMalloc(strlen_);
+    mxGetString(data, d, strlen_);
+    (*it)->GetInfo()->SetValue(index, d);
+    mxFree(d);
+  }
+  else
+    (*it)->GetInfo()->SetValue(index, mxGetScalar(data));
   
   if (nlhs > 0)
     plhs[0] = btkMXCreateMetaDataStructure(acq->GetMetaData());

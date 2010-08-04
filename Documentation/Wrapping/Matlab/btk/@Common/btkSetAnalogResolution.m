@@ -13,6 +13,6 @@ function btkSetAnalogResolution(h, res) %#ok
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.
 %# mex
 
-error(generatemsgid('NotSupported'),'MEX file for function not found');
+error(generatemsgid('NotSupported'),'MEX file for function BTKSETANALOGRESOLUTION not found');
 
 % [EOF] btkSetAnalogResolution.m

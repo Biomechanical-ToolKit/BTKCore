@@ -1,9 +1,9 @@
 function btkSetMarkersValues(h, v) %#ok
 %BTKSETMARKERSVALUES Sets markers' coordinates from a matrix
 % 
-%  BTKSETMARKERSVALUES(H, V) uses the matrix V to sets markers' coordinates.
+%  BTKSETMARKERSVALUES(H, V) uses the matrix V to set markers' coordinates.
 %  The number of rows of the matrix corresponds to the number of frames in the acquisition. 
-%  The number of  columns of this matrix corresponds to the number of extracted 
+%  The number of columns of this matrix corresponds to the number of extracted 
 %  markers multiplied by 3 (their coordinates X,Y,Z).
 %  The biomechanical acquisition handle H is represented as a 32-bit integer
 %  and can be only used with the btk* functions.

@@ -7,6 +7,8 @@ function btkGetMetaData(h) %#ok
 %                    or the value 0
 %    - METADATA.INFO.FORMAT contains information's format Only the following
 %                           formats are used: Char, Byte, Integer, Real
+%    - METADATA.INFO.DIMS   contains information's dimensions values.  A matrix 
+%                           with the dimension's values.
 %    - METADATA.INFO.VALUES contains information's values. Depending of the format,
 %                           data are scalar, matrix or array. Metadata with format
 %                           Char are stored in cells.
@@ -15,6 +17,7 @@ function btkGetMetaData(h) %#ok
 %    - METADATA.CHILDREN.<label> contains the same structure 
 %                                (INFO, CHILDREN, DESCRIPTION)
 %    - METADATA.DESCRIPTION is the description of the metadata.
+%    - METADATA.UNLOCKED is a flag to know if the metadata is unlocked or not.
 %  The biomechanical acquisition handle H is represented as a 32-bit integer 
 %  and can be only used with the btk* functions.
 %
@@ -27,8 +30,7 @@ function btkGetMetaData(h) %#ok
 %  with the label LABEL, an error is thrown.
 %
 %  METADATA = BTKGETMETADATA(H, LABEL, SUBLABEL, SUBSUBLABEL, ...) returns the 
-%  metadata with label SUBSUBLABEL from the SUBLABEL metadata extracted from 
-%  LABEL metadata. There is not limit of depth.
+%  n-th sub-metadata. There is not limit of depth.
 %
 %  By default, BTK, use two stages of metadata representing group and parameters.
 

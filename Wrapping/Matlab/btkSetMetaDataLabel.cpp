@@ -34,39 +34,45 @@
  */
 
 #include "btkMXObjectHandle.h"
+#include "btkMXMetaData.h"
 
 #include <btkAcquisition.h>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs!=2)
-    mexErrMsgTxt("Two input required.");
+  if(nrhs < 3)
+    mexErrMsgTxt("Minimum of three inputs required.");
+  if (nlhs > 1)
+    mexErrMsgTxt("Too many output arguments.");
 
-  btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
-
-  if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
-    mexErrMsgTxt("Analog resolution must be set by a single integer value.");
-  
-  int ar = static_cast<int>(mxGetScalar(prhs[1]));
-  btk::Acquisition::AnalogResolution res = btk::Acquisition::Bit12;
-  switch (ar)
+  for (int i = 1 ; i < nrhs-1 ; ++i)
   {
-    case 8:
-      res = btk::Acquisition::Bit8;
-      break;
-    case 12:
-      break;
-    case 14:
-      res = btk::Acquisition::Bit14;
-      break;
-    case 16:
-      res = btk::Acquisition::Bit16;
-      break;
-    default:
-      mexErrMsgTxt("Unvalid analog resolution.");
-
+    if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && (!mxIsNumeric(prhs[i]) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
+      mexErrMsgTxt("Metadata's label or index must be set by a non-empty string or an integer respectively.");
   }
   
+  if (!mxIsChar(prhs[nrhs-1]) || mxIsEmpty(prhs[nrhs-1]))
+    mexErrMsgTxt("Metadata's label must be set by a non-empty string.");
+  
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  acq->SetAnalogResolution(res);
+  btk::MetaData::Iterator it;
+  btkMXExtractMetaDataIterator(&it, nrhs-2,  prhs, acq->GetMetaData());
+  
+  try
+  {
+    size_t strlen_ = (mxGetM(prhs[nrhs-1]) * mxGetN(prhs[nrhs-1]) * sizeof(mxChar)) + 1;
+    char* l = (char*)mxMalloc(strlen_);
+    mxGetString(prhs[nrhs-1], l, strlen_);
+    std::string newLabel = std::string(l);
+    mxFree(l);
+    (*it)->SetLabel(newLabel);
+  }
+  catch(std::exception& e)
+  {
+    mexErrMsgTxt(e.what());
+  }
+  
+  if (nlhs > 0)
+    plhs[0] = btkMXCreateMetaDataStructure(acq->GetMetaData());
 };
+

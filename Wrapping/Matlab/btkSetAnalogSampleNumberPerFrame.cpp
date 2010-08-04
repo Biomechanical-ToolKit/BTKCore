@@ -45,28 +45,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 
   if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
-    mexErrMsgTxt("Analog resolution must be set by a single integer value.");
-  
-  int ar = static_cast<int>(mxGetScalar(prhs[1]));
-  btk::Acquisition::AnalogResolution res = btk::Acquisition::Bit12;
-  switch (ar)
-  {
-    case 8:
-      res = btk::Acquisition::Bit8;
-      break;
-    case 12:
-      break;
-    case 14:
-      res = btk::Acquisition::Bit14;
-      break;
-    case 16:
-      res = btk::Acquisition::Bit16;
-      break;
-    default:
-      mexErrMsgTxt("Unvalid analog resolution.");
-
-  }
+    mexErrMsgTxt("The ratio must be set by a single integer value.");
   
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  acq->SetAnalogResolution(res);
+  
+  int asnpf = static_cast<int>(mxGetScalar(prhs[1]));
+  if (asnpf <= 0)
+    mexErrMsgTxt("The analog number of samples per 3D frame must be greater than 0.");
+  else if (acq->GetAnalogNumber() != 0)
+    mexErrMsgTxt("Impossible to modify of the number of analog samples per 3D frames when the acquisition already contains analog channels.");
+  else
+    acq->Resize(acq->GetPointNumber(), acq->GetPointFrameNumber(), 0, asnpf);
 };

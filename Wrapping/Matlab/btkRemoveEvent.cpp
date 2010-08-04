@@ -95,97 +95,112 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs < 1)
     mexErrMsgTxt("One input required.");
-  if ((nrhs % 2) != 1)
+  if ((nrhs == 2) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetN(prhs[1]) != 1))) 
+    mexErrMsgTxt("The index must be set by a single integer value.");
+  else if ((nrhs > 2) && ((nrhs % 2) != 1))
     mexErrMsgTxt("Incorrect number of inputs.");
   if (nlhs > 2)
     mexErrMsgTxt("Too many output arguments.");
-    
+  
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
-  btk::EventCollection::Pointer events = acq->GetEvents()->Clone();
   
-  double timeOption = -1.0;
-  char* labelOption = 0, contextOption = 0, subjectOption = 0;
-  char* option = 0;
-  const char* options[] = {"TIME", "LABEL", "CONTEXT", "SUBJECT"};
-  int numberOfOptions =  sizeof(options) / sizeof(char*);
-  for (int i = 1 ; i < nrhs ; i += 2)
+  if (nrhs == 1)
+    acq->ClearEvents();
+  else if (nrhs == 2)
   {
-    if (!mxIsChar(prhs[i]) || mxIsEmpty(prhs[i]))
-      mexErrMsgTxt("Error during the parsing of options.");
-    size_t strlen_ = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
-    option = (char*)mxMalloc(strlen_);
-    mxGetString(prhs[i], option, strlen_);
-    int j = 0;
-    for (j = 0 ; j < numberOfOptions ; ++j)
+    int idx = static_cast<int>(mxGetScalar(prhs[1])) - 1;
+    if ((idx < 0) || (idx >= acq->GetEventNumber()))
+      mexErrMsgTxt("Event's index out of range.");
+    acq->RemoveEvent(idx);
+  }
+  else
+  {
+    btk::EventCollection::Pointer events = acq->GetEvents()->Clone();
+  
+    double timeOption = -1.0;
+    char* labelOption = 0, contextOption = 0, subjectOption = 0;
+    char* option = 0;
+    const char* options[] = {"TIME", "LABEL", "CONTEXT", "SUBJECT"};
+    int numberOfOptions =  sizeof(options) / sizeof(char*);
+    for (int i = 1 ; i < nrhs ; i += 2)
     {
-      std::string uppercase = std::string(option);
-      std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
-      if (uppercase.compare(options[j]) == 0)
+      if (!mxIsChar(prhs[i]) || mxIsEmpty(prhs[i]))
+        mexErrMsgTxt("Error during the parsing of options.");
+      size_t strlen_ = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
+      option = (char*)mxMalloc(strlen_);
+      mxGetString(prhs[i], option, strlen_);
+      int j = 0;
+      for (j = 0 ; j < numberOfOptions ; ++j)
       {
-        switch(j)
+        std::string uppercase = std::string(option);
+        std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
+        if (uppercase.compare(options[j]) == 0)
         {
-        case 0:
-          if (!mxIsNumeric(prhs[i+1]) || mxIsEmpty(prhs[i+1]) || mxIsComplex(prhs[i+1]) || (mxGetN(prhs[i+1]) != 1))
-            mexErrMsgTxt("Time option must be followed by a single numerical value.");
-          keepEventsWithTime(mxGetScalar(prhs[i+1]), events);
-          break;
-        case 1:
+          switch(j)
           {
-          if (!mxIsChar(prhs[i+1]))
-            mexErrMsgTxt("Label option must be followed by a string.");
-          size_t strlen_2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
-          char* buf = (char*)mxMalloc(strlen_2);
-          mxGetString(prhs[i+1], buf, strlen_2);
-          keepEventsWithLabel(buf, events);
-          mxFree(buf);
-          break;
+          case 0:
+            if (!mxIsNumeric(prhs[i+1]) || mxIsEmpty(prhs[i+1]) || mxIsComplex(prhs[i+1]) || (mxGetN(prhs[i+1]) != 1))
+              mexErrMsgTxt("Time option must be followed by a single numerical value.");
+            keepEventsWithTime(mxGetScalar(prhs[i+1]), events);
+            break;
+          case 1:
+            {
+            if (!mxIsChar(prhs[i+1]))
+              mexErrMsgTxt("Label option must be followed by a string.");
+            size_t strlen_2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
+            char* buf = (char*)mxMalloc(strlen_2);
+            mxGetString(prhs[i+1], buf, strlen_2);
+            keepEventsWithLabel(buf, events);
+            mxFree(buf);
+            break;
+            }
+          case 2:
+            {
+            if (!mxIsChar(prhs[i+1]))
+              mexErrMsgTxt("Subject option must be followed by a string.");
+            size_t strlen_2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
+            char* buf = (char*)mxMalloc(strlen_2);
+            mxGetString(prhs[i+1], buf, strlen_2);
+            keepEventsWithContext(buf, events);
+            mxFree(buf);
+            break;
+            }
+          case 3:
+            {
+            if (!mxIsChar(prhs[i+1]))
+              mexErrMsgTxt("Context option must be followed by a string.");
+            size_t strlen_2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
+            char* buf = (char*)mxMalloc(strlen_2);
+            mxGetString(prhs[i+1], buf, strlen_2);
+            keepEventsWithSubject(buf, events);
+            mxFree(buf);
+            break;
+            }
           }
-        case 2:
-          {
-          if (!mxIsChar(prhs[i+1]))
-            mexErrMsgTxt("Subject option must be followed by a string.");
-          size_t strlen_2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
-          char* buf = (char*)mxMalloc(strlen_2);
-          mxGetString(prhs[i+1], buf, strlen_2);
-          keepEventsWithContext(buf, events);
-          mxFree(buf);
           break;
-          }
-        case 3:
-          {
-          if (!mxIsChar(prhs[i+1]))
-            mexErrMsgTxt("Context option must be followed by a string.");
-          size_t strlen_2 = (mxGetM(prhs[i+1]) * mxGetN(prhs[i+1]) * sizeof(mxChar)) + 1;
-          char* buf = (char*)mxMalloc(strlen_2);
-          mxGetString(prhs[i+1], buf, strlen_2);
-          keepEventsWithSubject(buf, events);
-          mxFree(buf);
-          break;
-          }
         }
-        break;
+      }
+      std::string errMsg;
+      if (j == numberOfOptions)
+        errMsg = "Unknown option: '" + std::string(option) + "'.";
+      mxFree(option);
+      if (!errMsg.empty())
+        mexErrMsgTxt(errMsg.c_str());
+    }
+  
+    for(btk::EventCollection::Iterator it1 = events->Begin() ; it1 != events->End() ; ++it1)
+    {
+      for(btk::Acquisition::EventIterator it2 = acq->BeginEvent() ; it2 != acq->EndEvent() ; ++it2)
+      {
+        if (*(*it1) == *(*it2))
+        {
+          acq->RemoveEvent(it2);
+          break;
+        }
       }
     }
-    std::string errMsg;
-    if (j == numberOfOptions)
-      errMsg = "Unknown option: '" + std::string(option) + "'.";
-    mxFree(option);
-    if (!errMsg.empty())
-      mexErrMsgTxt(errMsg.c_str());
   }
   
-  for(btk::EventCollection::Iterator it1 = events->Begin() ; it1 != events->End() ; ++it1)
-  {
-    for(btk::Acquisition::EventIterator it2 = acq->BeginEvent() ; it2 != acq->EndEvent() ; ++it2)
-    {
-      if (*(*it1) == *(*it2))
-      {
-        acq->RemoveEvent(it2);
-        break;
-      }
-    }
-  }
-
   btkMXCreateEventsStructure(acq, nlhs, plhs);
 };
 

@@ -3,6 +3,8 @@ function btkRemoveEvent(h, options) %#ok
 % 
 %  BTKREMOVEEVENT(H) is equivalent to the function <a href="matlab:help btkClearEvents">btkClearEvents</a>.
 %
+%  BTKREMOVEEVENT(H, INDEX) removes the events at the index INDEX. 
+%
 %  BTKREMOVEEVENT(H, OPTION, VALUE) removes only event(s) described by the options.
 %  There are four options which can combined to refine the request.
 %   - 'Time' followed by a single real value delete all events with this time +/- 0.00005 seconds
@@ -13,11 +15,13 @@ function btkRemoveEvent(h, options) %#ok
 %
 %  This function can also returns updated list of events.
 %  EVENTS = BTKREMOVEEVENT(H)
+%  EVENTS = BTKREMOVEEVENT(H, INDEX)
 %  EVENTS = BTKREMOVEEVENT(H, OPTION, VALUE)
 %  The format of EVENTS is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %
 %  This function can also returns updated list of events' informations.
 %  [EVENTS, EVENTSINFO] = BTKREMOVEEVENT(H)
+%  [EVENTS, EVENTSINFO] = BTKREMOVEEVENT(H, INDEX)
 %  [EVENTS, EVENTSINFO] = BTKREMOVEEVENT(H, OPTION, VALUE)
 %  The format of EVENTSINFO is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %
