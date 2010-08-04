@@ -65,6 +65,9 @@ namespace btk
     };
     void SetInput(ForcePlatformCollection::Pointer input) {this->SetNthInput(0, input);};
     WrenchCollection::Pointer GetOutput() {return this->GetOutput(0);};
+    
+    BTK_BASICFILTERS_EXPORT void SetTransformToGlobalFrame(bool activation = false);
+    bool GetTransformToGlobalFrame() const {return this->m_GlobalTransformationActivated;};
 
   protected:
     BTK_BASICFILTERS_EXPORT ForcePlatformWrenchFilter();
@@ -79,6 +82,8 @@ namespace btk
     virtual void FinishAMTI(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
     virtual void FinishKistler(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
     void TransformToGlobal(Wrench::Pointer wrh, const ForcePlatform::Corners& c) const;
+
+    bool m_GlobalTransformationActivated;
 
     ForcePlatformWrenchFilter(const ForcePlatformWrenchFilter& ); // Not implemented.
     ForcePlatformWrenchFilter& operator=(const ForcePlatformWrenchFilter& ); // Not implemented.

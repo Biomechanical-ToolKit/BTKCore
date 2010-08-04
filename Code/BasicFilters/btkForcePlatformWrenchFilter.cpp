@@ -40,7 +40,9 @@ namespace btk
 {
   /**
    * @class ForcePlatformWrenchFilter
-   * @brief Calcule the wrench of the center of the force platform data, expressed in the global frame.
+   * @brief Calcule the wrench of the center of the force platform data, expressed in the global frame (by default).
+   *
+   * You can use the method 
    *
    * @ingroup BTKBasicFilters
    */
@@ -79,7 +81,23 @@ namespace btk
    * @fn PointCollection::Pointer ForcePlatformWrenchFilter::GetOutput()
    * Gets the output created with this process.
    */
-
+  
+  /**
+   * Sets the flag to activate the transformation to the global frame.
+   */
+  void ForcePlatformWrenchFilter::SetTransformToGlobalFrame(bool activation)
+  {
+    if (this->m_GlobalTransformationActivated == activation)
+      return;
+    this->m_GlobalTransformationActivated = activation;
+    this->Modified();
+  };
+   
+  /**
+   * @fn bool ForcePlatformWrenchFilter::GetTransformToGlobalFrame() const
+   * Returns the activation flag for the transformation in the global frame.
+   */
+   
   /**
    * Constructor. Sets the number of inputs and outputs to 1.
    */
@@ -88,6 +106,7 @@ namespace btk
   {
     this->SetInputNumber(1);
     this->SetOutputNumber(1);
+    this->m_GlobalTransformationActivated = true;
   };
 
   /**
@@ -195,7 +214,8 @@ namespace btk
             btkErrorMacro("Force Platform type 21 is not yet supported. Please, report this to the developers");
             break;
         }
-        this->TransformToGlobal(wrh, (*it)->GetCorners());
+        if (this->m_GlobalTransformationActivated)
+          this->TransformToGlobal(wrh, (*it)->GetCorners());
       }
     }
   };
