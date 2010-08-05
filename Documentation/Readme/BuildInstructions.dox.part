@@ -1,0 +1,118 @@
+@section compil_sec Compilation
+
+The Biomechanical ToolKit (BTK) was tested on PC (Windows XP, Windows Vista, Windows 7) with <a href="http://www.microsoft.com/express/vc/">Microsoft Visual C++ 2008 Express</a>, Mac OS X (Panther, Leopard) with <a href="http://developer.apple.com/tools/xcode/">XCode</a> (3.1 and 1.5 respectively) and Linux (Ubuntu 9.10). The compilation process only requires the use of a terminal/command prompt. BTK use <a href="http://www.cmake.org">CMake</a> 2.6.2 or greater to generate its build system, so it is necessary to download it from <a>http://www.cmake.org/HTML/Download.html</a>. The instructions below cover the basics of running CMake for BTK under the assumption that CMake is already installed. See the CMake web page for details on <a href="http://www.cmake.org/HTML/Install.html">installing</a> and <a href="http://www.cmake.org/HTML/RunningCMake.html">running</a> CMake. 
+
+Compiling BTK requires a complete BTK source tree. Running BTK regression tests (see option @ref config_test in @ref config_sec "Configuration Options in CMake") requires for the first an internet connection to download data files from <a>ftp://ftp.c3d.org</a>. 
+
+@subsection build_sec Building with CMake
+
+CMake must be run to generate a build system for BTK. The build system may be placed either in the BTK source tree (an in-source build) or in a separate binary tree (an out-of-source build). The use of out-of-source builds is strongly encouraged because they make it easy to have multiple builds with different configurations sharing the same source tree. Once a single in-source build has been created it is the only build tree that can be associated with that source tree. A source tree may not be used both for an in-source build and an out-of-source build, but any number of out-of-source builds may share a source tree that does not have an in-source build. Having multiple out-of-source builds is particularly useful for installing BTK on multiple architectures using a single source tree on a shared disk.
+
+CMake provides both a command-line tool and interactive interfaces. Advanced users may wish to use the command-line tool but here only the CMake interactive interface is documented.
+
+@par - Windows
+Run the cmake-gui dialog to get started. It must be executed from an environment configured to run the compiler to be used. In the case of the Visual Studio IDE no special environment is needed and cmake-gui can be started from its icon. In the case of a Visual Studio NMake, Borland C++, or MinGW build the cmake-gui dialog should be executed from a command prompt with the appropriate environment set. 
+<div class="example">
+@b Example: Microsoft Visual C++ 2008 Express environment with NMake@n With Microsoft Visual C++ 2008 Express, use the shorcut in the Start menu: Programs > Microsoft Visual C++ 2008 Express Edition > Visual Studio Tools > Visual Studio 2008 Command Prompt. Launch cmake-gui from the new command prompt "c:\Program Files\CMake 2.6\bin\cmake-gui.exe".
+</div>
+@n
+The cmake-gui dialog prompts for the location of the source and binary trees("Where is the source code" and "Where to build the binaries" respectively). Once these are set then CMake is ready for a first pass at configuring the BTK build system. Use the "Configure" button to initiate this process. A separate dialog will appear during the first configuration step to prompt for generator selection. After a while the cmake-gui dialog will present a set of configuration options. See @ref config_sec "Configuration Options in CMake" for details on the meaning of each of these options. After setting the options as desired press "Configure" again to make another pass at configuring BTK. New options may appear when earlier options are adjusted. Keep adjusting options and pressing "Configure" until the desired configuration is reached. Finally press the "Generate" button to actually generate the build system.
+<div class="example">
+@b Example: Microsoft Visual C++ 2008 Express environment with NMake@n 
+The source tree must be set to the BTK root (e.g. "c:\Documents and Settings\jDoe\My Documents\BTK"). The binary tree should be set for an out-of-source build (e.g. "c:\Documents and Settings\jDoe\My Documents\BTK\build"). The generator to select in the separate dialog is "NMake Makefiles" with the "Use default native compilers". After required checks, red lines are added in the cmake-gui dialog.
+</div>
+@n
+Now that the build system has been generated, the corresponding native tools can be used to build BTK. In the case of the Visual Studio IDE simply run it and load the BTK workspace or solution file from the binary tree specified in the cmake-gui dialog. Select and build the ALL_BUILD target. In the case of a Visual Studio NMake, Borland C++, or MinGW build use the corresponding make tool (nmake, make, and make, respectively) from the command line.
+<div class="example">
+@b Example: Microsoft Visual C++ 2008 Express environment with NMake@n In the  Visual Studio 2008 Command Prompt, go to the build directory. After that, type nmake in the command prompt to compile the code.
+</div>
+
+@par - Mac OS X
+Double click on the CMake app bundle. The CMake dialog prompts for the location of the source and binary trees("Where is the source code" and "Where to build the binaries" respectively). Once these are set then CMake is ready for a first pass at configuring the BTK build system. Use the "Configure" button to initiate this process. A separate dialog will appear during the first configuration step to prompt for generator selection. After a while the CMake dialog will present a set of configuration options. See @ref config_sec "Configuration Options in CMake" for details on the meaning of each of these options. After setting the options as desired press "Configure" again to make another pass at configuring BTK. New options may appear when earlier options are adjusted. Keep adjusting options and pressing "Configure" until the desired configuration is reached. Finally press the "Generate" button to actually generate the build system.
+<div class="example">
+@b Example: XCode environment with Make@n The source tree must be set to the BTK root (e.g. /Users/jDoe/Downloads/BTK). The binary tree should be set for an out-of-source build (e.g. /Users/jDoe/Downloads/BTK/build). The generator to select in the separate dialog is "Unix Makefiles" with the "Use default native compilers". After required checks, red lines are added in the CMake dialog.
+</div>
+@n
+Now that the build system has been generated, the corresponding native tools can be used to build BTK. In the case of Unix Makefiles build use the make tool from the command line.
+<div class="example">
+@b Example:  XCode environment with Make@n Open a terminal (/Applications/Utilies/Terminal) and go to the build directory. After that, type @p make in the command prompt to compile the code.
+</div>
+@subsection config_sec Configuration Options in CMake 
+BTK is a toolkit providing a wide variety of functionality. Several configuration options are available to customize the BTK build system. These options are configured through an interactive CMake interface as described @ref build_sec above. Note that not all options are available on all platforms, and some options are available only when other options are set to a particular value.
+
+The interactive CMake interface provides brief documentation for every option. Some options have more meaning than can be described in one sentence, so additional documentation is provided here:
+
+@subsubsection config_extra_warnings BTK_EXTRA_COMPILER_WARNINGS
+Add compiler flags in debug mode to be more verbose when the compiler find some warnings (available only for GCC).
+
+@subsubsection config_sys_eigen2 BTK_USE_SYSTEM_EIGEN2
+Permits to use the <a href="http://eigen.tuxfamily.org/">Eigen</a> library installed on your system instead of the version embedded in BTK. Eigen 2.0 or above required.
+
+@subsubsection config_vissupport BTK_USE_VISSUPPORT
+To display BTK data in 2D/3D enviromments. This option activates sub-options to choose the environment(s) to used.
+
+@paragraph config_vtk BTK_USE_VTK
+Builds library BTKVTK to display BTK data in the <a href="http://www.vtk.org">VTK</a> environment. VTK 5.4 or above required. This option is only shown when @ref config_vissupport is activated.
+
+@subsubsection config_matlab BTK_WRAP_MATLAB
+<div class="important">
+@b Note: Matlab users using Microsoft Visual Studio (2003|2005|2008|2010) can use the script @a EasyInstallWithRedistribuableMatlabToolbox_MSVC.bat to compile and install BTK with a single click! This script is in the root of BTK sources.
+</div>
+Enable/Disable generation of BTK bindings in the Matlab language. In order to build the Matlab-based BTK interpreter, the target computer needs to have Matlab 7.0.4 or above installed. To turn on Matlab wrapping, set BTK_WRAP_MATLAB to ON during the configuration process.
+
+@paragraph config_matlab_redistribuable BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES
+This option is activated if BTK_WRAP_MATLAB was activated during the previous CMake configuration iteration. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is usefull for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is not compatible with BUILD_SHARED_LIBS.
+
+@subsubsection config_scilab BTK_WRAP_SCILAB
+<div class="important">
+@b Note: Scilab users using Microsoft Visual Studio (2003|2005|2008|2010) can use the script @a EasyInstallWithRedistribuableScilabToolbox_MSVC.bat to compile and install BTK with a single click! This script is in the root of BTK sources.
+</div>
+Enable/Disable generation of BTK bindings in the Scilab language. In order to build the Scilab-based BTK interpreter, the target computer needs to have Scilab 5.1 or above installed. To turn on Scilab wrapping, set BTK_WRAP_SCILAB to ON during the configuration process.
+
+@paragraph config_scilab_redistribuable BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES
+This option is activated if BTK_WRAP_SCILAB was activated during the previous CMake configuration iteration. BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES is usefull for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES is not compatible with BUILD_SHARED_LIBS.
+
+@subsubsection config_doc BUILD_DOCUMENTATION
+The BTK documentation is generated by <a href="http://www.doxygen.org">Doxygen</a>. The option BUILD_DOCUMENTATION only activates the sub-options BUILD_DOCUMENTATION_README and BUILD_DOCUMENTATION_API. Each of these options generate a part of the documentation.
+
+@paragraph config_doc_api BUILD_DOCUMENTATION_API
+This option generates the API documentation and can be found in "Documentation/API" from the the build directory. This documentation is in a HTML format. The main file is the file index.html. 
+
+@paragraph config_doc_api_unselected BUILD_DOCUMENTATION_API_UNSELECTED_MODULES
+This option forces to build the full API documentation.
+
+@paragraph config_doc_readme BUILD_DOCUMENTATION_README
+This option updates this file (Readme.html) by using the the file /Documentation/Readme/Readme.dox from the source directory. Modify Readme.dox, compile the project and you'll find a new Readme.html file in the BTK root.
+
+@subsubsection config_examples BUILD_EXAMPLES
+Active the building of examples in the folder Examples.
+
+@subsubsection config_shared BUILD_SHARED_LIBS
+Sets whether the compiled BTK libraries will be shared libraries or static libraries. When linking executables against static libraries the needed symbols will be copied from the libraries into the executables enabling them to run without access to the original libraries. When linking executables against shared libraries references to the symbols are placed into the executables. This has the advantage that many executables can share a large library without producing many copies of its code.
+@n@n
+Shared libraries have the disadvantage that they must be found at runtime in order for an executable to run. Each operating system supporting shared libraries has a component known as the dynamic loader. This component is responsible for finding the shared libraries needed by an executable when it is run. In order to run BTK executables from the build tree when using shared libraries one may need to help the dynamic loader find the libraries (usually the bin subdirectory of the build tree).
+@n@n
+On Windows, the dynamic loader will look for shared libraries in the directory containing the executable, in directories listed in the PATH environment variable, and in some system directories. Since BTK places all of its executables and libraries in the same directory nothing needs to be set to get them to run. However, when one builds outside projects against BTK the PATH environment variable must be set to point at the directory containing the BTK shared libraries.
+@n@n
+On UNIX-style platforms, the dynamic loader will use an environment variable such as LD_LIBRARY_PATH (Linux and many UNIX systems) or DYLD_LIBRARY_PATH (Mac OS X) to look for shared libraries. In order to run BTK executables from the build tree one must set the appropriate environment variable to point at the directory containing the BTK shared libraries. The same environment setting must be used for running outside projects build against the shared BTK libraries.
+
+@subsubsection config_test BUILD_TESTING
+Each BTK class has unit tests and/or regression tests to verify their functionnalities. All the tests are in the directory Testing/Code. All the required input data should be inserted in the Testing/Data/Input directory and the generated ouput data should be inserted in the Testing/Data/Output. These tests use a modified version of CxxTest embedded in the directory Utilities. This version suppress the Perl/Python dependencies and replace them by C macros. As with the regular CxxTest library, the tests are declared and implemented in a header file. A test class requires to be defined by macro CXXTEST_SUITE. All the class' methods used for tests purpose must be defined by CXXTEST_TEST. Finally, the class must be registred by using CXXTEST_SUITE_REGISTRATION and tests by CXXTEST_TEST_REGISTRATION. The header containing the suite of tests has to be included in the CXX file calling the runner.
+
+@subsubsection config_tools BUILD_TOOLS
+Active the building of tools embedded in BTK. These tools are:
+ - Mokka: Visualizer/editor of acquisition data. Requires <a href="http://www.vtk.org">VTK</a> 5.4 or above and <a href="http://www.qtsoftware.com">Qt</a> 4.5 or above. The option @ref config_vtk must be activated.
+
+@htmlonly <hr> @endhtmlonly
+
+@section install_sec Installation
+
+Installing BTK from a source distribution requires first that it be compiled in a build tree. See the @ref compil_sec Compilation section above for details. Once BTK has been compiled in a build tree one may build the install target to actually put BTK in an installation tree. If BTK was built using a CMake Makefile generator then this is done by running "nmake install" or "make install" from the top of the build tree. If BTK was built using a CMake project file generator (such as Visual Studio), then building the INSTALL project from inside the IDE will install BTK. The installation process will install all files in a directory structure rooted at the directory specified by CMAKE_INSTALL_PREFIX.
+<div class="example">
+@b Example: Microsoft Visual C++ 2008 Express environment with NMake@n After the end of the compilation, type <tt>nmake install</tt> to install BTK. By default CMAKE_INSTALL_PREFIX is set to "c:\Program Files\BTK")@n
+@b Example: XCode environment with Make@n After the end of the compilation, type <tt>sudo make install</tt> to install BTK. the command @c sudo is required if your user login is not in the admin group. By default CMAKE_INSTALL_PREFIX is set to "/usr/local")
+</div>
+
+For the Matlab Wrapping (see @ref config_matlab), a directory is generated containing the compiled MEX-Files and some copied M-Files. These M-Files contain the description of the MEX-Functions and their options. As with regular Matlab functions, use the @p help or @p doc @p functionname to read the function's description. You can also use the command <tt>help btk</tt> or <tt>doc btk</tt> to visualize the complete btk toolbox help.
+@n
+In Matlab, the BTK project can be seen as a toolbox. You have only to add in the Matlab Path (File > Set Path...), the root of the btk toolbox. The btk toolbox path is for example "CMAKE_INSTALL_PREFIX/share/btk-0.1/Wrapping/Matlab/btk".

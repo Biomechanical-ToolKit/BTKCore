@@ -1,0 +1,208 @@
+/**
+@page GettingStarted Getting started
+
+<div class="btkmenu">\ref index "Overview"
+| \ref BuildInstructions "Building instructions"
+| \b Getting \b started
+| \ref AdvancedTutorial "Advanced tutorial"
+| \ref Developer "Developer's instructions"
+| \ref License
+</div>
+
+@section TOC Table of contents
+- @ref BTKIntegeration
+- @ref ObjectCreation
+- @ref AcquisitionReading
+- @ref AcquisitionAccess
+- @ref AcquisitionModify
+- @ref AcquisitionFilter
+       
+@htmlonly <hr> @endhtmlonly
+
+@section BTKIntegeration Integrate BTK in your project
+
+The simplest way to integrate BTK in your programs is to use the file @p FindBTK.cmake included with the source code in the @p CMake folder or in the subfolder @p share/CMake if you use a binary release. This file will be used by @e CMake to find the include path, the libraries and all resources required to used BTK as an external library in you program.
+
+For example, the file @p CMakeLists.txt used to compile the example @p AcquisitionConverted (see the folder @p /Examples/AcquisitionConverter in the sources) can be easily modify to be built as an external project and integrating BTK.
+
+Old @p CMakeLists.txt file used to build the example @p AcquisitionConverter when compiling BTK:
+@code
+SET(AcquisitionConverter_SRCS main.cpp)
+ADD_EXECUTABLE(AcquisitionConverter ${AcquisitionConverter_SRCS})
+TARGET_LINK_LIBRARIES(AcquisitionConverter BTKIO)
+@endcode
+
+New @p CMakeLists.txt file to build @p AcquisitionConverter as an independent project:
+@code
+PROJECT(AcquisitionConverter)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6.2)
+
+# Used to find the file FindBTK.cmake
+SET(CMAKE_MODULE_PATH ${AcquisitionConverter_SOURCE_DIR})
+
+# The required lines to use FindBTK.cmake in you project
+FIND_PACKAGE(BTK REQUIRED)
+INCLUDE(${BTK_USE_FILE})
+
+SET(AcquisitionConverter_SRCS main.cpp)
+ADD_EXECUTABLE(AcquisitionConverter ${AcquisitionConverter_SRCS})
+TARGET_LINK_LIBRARIES(AcquisitionConverter BTKIO)
+@endcode
+
+@section ObjectCreation Object creation and shared pointer
+
+To simplify the way to code and manage the memory used by BTK, it is proposed to used shared pointer. A shared pointer is like a pointer but without owner. Its content is shared by all the variables assigned to the shared pointer and will be deleted when no variable use it anymore (meaning, the memory is freed automatically).
+
+To do that the most transparent as possible, each class in BTK has the type definition @p Pointer and the static method(s) @p New. So you cannot instantiate an object by using a constructor but by using one of the @p New methods proposed in each class with return a @ Pointer (i.e. a shared pointer). So, to create a object btk::Acquisition (or strictly spealing a shared pointer associated with a btk::Acquisition object), you can use the following code:
+@code
+btk::Acquisition::Pointer acq = btk::Acquisition::New();
+@endcode
+By, using this code, you create a new shared pointer assigned to the variable @p acq. If you use a second variable and assign it to the first one, then the modification done by one is reflected in the other (as a regular pointer).
+@code
+btk::Acquisition::Pointer foo = acq; // Shallow copy
+std::cout << acq->GetFirstFrame() << std::end; // 1
+foo->SetFirstFrame(10);
+std::cout << acq->GetFirstFrame() << std::end; // 10
+@endcode
+The main difference compared to a regular pointer is when you use the @p delete function (or used implicitly in the class' destructor). If you delete the content of @p acq, then you can use again the variable @p foo to access/modify the acquisition. In the case of a regular pointer, this behavior is not possible and will crash your application.
+@code
+delete acq;
+std::cout << foo->GetFirstFrame() << std::end; // 10
+// Memory will be freed automaticaly at the end of the function. No need to use the keyword delete 
+@endcode
+The only way to copy (or more exactly to create a deep copy) of the object is to use the method @p Clone.
+@code
+btk::Acquisition::Pointer acq = btk::Acquisition::New();
+btk::Acquisition::Pointer foo = acq->Clone(); // Deep copy
+std::cout << acq->GetFirstFrame() << std::end; // 1
+foo->SetFirstFrame(10);
+std::cout << acq->GetFirstFrame() << std::end; // 1
+std::cout << foo->GetFirstFrame() << std::end; // 10
+// Both, acq and foo will be freed at the end of the function.
+@endcode
+
+This is the same thing when you use a shared pointer as an input/output variable in a function. You do not need to manage the memory of the shared pointer or think about the use of a reference.
+@code
+#include <btkAcquisition.h>
+
+btk::Acquisition::Pointer defaultInit()
+{
+  btk::Acquisition::Pointer acq = btk::Acquisition::New();
+  acq->Init(10,200,20,10); // 10 points, 200 frames, 20 analog channels with a number of frames 10 times greater
+  acq->SetFrequency(100.0); // 100 Hz
+  return acq;
+};
+
+int main()
+{
+  btk::Acquisition::Pointer acq = defaultInit();
+  // ...
+};
+@endcode
+
+@section AcquisitionReading Reading an acquisition
+
+The library BTK can read a dozen of acquisition files with the most popular, the C3D file format. All the known file format read and written in BTK are presented in this @ref FileFormatSupported_Acquisition "page". 
+
+To read an acquisition file you need to use the class btk::AcquisitionFileReader. This class, embedded in the module BTKIO, is a process with one output: the read acquisition.
+@code
+#include <btkAcquisitionFileReader.h>
+#include <btkAcquisition.h>
+
+btk::Acquisition::Pointer readAcquisition(const std::string& filename)
+{
+  btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+  reader->SetFilename(filename);
+  reader->Update();
+  return reader->GetOutput();
+};
+
+int main()
+{
+  btk::Acquisition::Pointer acq = readAcquisition("myFile.c3d");
+  // ...
+};
+@endcode
+
+In the previous example, the selection of the file format is done automatically by checking the file's content and/or the file's extension. But, you can also force the file format to use. For that, you have to use the method AcquisitionFileReader::SetAcquisitionIO and give it the chosen file I/O.
+@code
+#include <btkAcquisitionFileReader.h>
+#include <btkC3DFileIO.h>
+#include <btkAcquisition.h>
+
+btk::Acquisition::Pointer readC3D(const std::string& filename)
+{
+  btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+  btk::C3DFileIO::Pointer io = btk::C3DFileIO::New();
+  reader->SetAcquisitionIO(io); // Will open the given file as a C3D file.
+  reader->SetFilename(filename);
+  reader->Update();
+  return reader->GetOutput();
+};
+
+int main()
+{
+  btk::Acquisition::Pointer acq = readC3D("myFile.foo"); //  Will read the file as a C3D 
+  // ...
+};
+@endcode
+
+@section AcquisitionAccess Accessing acquisition's data
+An acquisition (btk::Acquisition) is mostly a generic container to store points (btk::Point), analog channels (btk::Analog), events (btk::Event) and metadata (btk::MetaData). You can easily construct a new acquisition or load it from an acquisition file as shown in the above examples.
+
+@subsection AcquisitionAccess_Point Accessing to the points
+
+To access to a point and its content, you can use the methods btk::Acquisition::GetPoint() which return a btk::Point::Pointer object based on the given index or label. If you give an invalid index or an invalid point's label, an exception (btk::OutOfRangeException) will be thrown.\n
+Another way to access to the content of a specific point when you don't know it exist or not in the acquisition is to use the method btk::Acquisition::FindPoint(). Given a point's label, this method returns an iterator associated to the found point. In the case the point is not found, the iterator will point to the end of the list of points.
+@code
+// btk::Acquisition::Pointer acq = ...
+btk::Point::Pointer p = acq->GetPoint(0); // First point in the acquisition
+std::cout << p->GetLabel() << std::endl;
+p = acq->GetPoint("RHEE"); // Point with the label 'RHEE'. Could throw an exception
+std::cout << p->GetFrameNumber() << std::endl;
+btk::Acquisition::PointIterator itP = acq->FindPoint("IS_THERE_A_POINT_WITH_THIS_LABEL"); // Let's try to find this point ...
+if (itP != acq->EndPoint()) // Point found as the iterator doesn't point to the end of the list
+  std::cout << (*itP)->GetValues() << std::endl;
+else
+  std::cerr << No point found << std::endl;
+@endcode
+
+When you know that you iterator is valid, the best way to access to the content of the point is to use the following code <tt>(*itP)-></tt>. By using the code @c *itP. or @c itP->, you will access only to the methods of the shared pointer object (and not the pointed object by the shared pointer). This (little) drawback is due to the storage of pointers in the list instead of objects.
+
+The use of an iterator has also an other main advantage. It gives you the possibility to access to all the point by iterating it. This gives you a simple and fast way to access to the points' data. To do this, you can use the methods btk::Acquisition::BeginPoint() and btk::Acquisition::EndPoint().
+@code
+#include <btkAcquisitionFileReader.h>
+
+std::string GetPointTypeAsString(Point::Type t)
+{
+  if (t == Point::Marker)
+    return "Marker";
+  else if (t == Point::Angle)
+    return "Angle";
+  else if (t == Point::Force)
+    return "Force";
+  else if (t == Point::Moment)
+    return "Moment";
+  else if (t == Point::Power)
+    return "Power";
+  else if (t == Point::Scalar)
+    return "Scalar";
+};
+
+int main()
+{
+  // ...
+  // btk::Acquisition::Pointer acq = ...
+  for (btk::Acquisition::PointConstIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
+  {
+    std::cout << (*it)->GetLabel() << " (" << (*it)->GetDescription() << "): " << GetPointTypeAsString((*it)->GetType());
+  }
+  return 0;
+}
+@endcode
+
+The code above, iterate in a @p for loop, the const iterator @p it from the first point (<tt>it = acq->BeginPoint()</tt>) to the last one (<tt>it != acq->EndPoint()</tt>), one by one (@c ++it). The use of an @p Iterator or a @p ConstIterator depends of you need. An @p Iterator gives you the possibility to modify the associated object (see @ref AcquisitionModify), while a @p ConstIterator is a read-only iterator which is enough to access to the points' data.
+
+@section AcquisitionModify Modifying acquisition's data
+@section AcquisitionFilter Filtering an acquisition
+ */

@@ -1,0 +1,11 @@
+/**
+@page Developer Developer's instructions
+
+<div class="btkmenu">\ref index "Overview"
+| \ref BuildInstructions "Building instructions"
+| \ref GettingStarted "Getting started"
+| \ref AdvancedTutorial "Advanced tutorial"
+| \b Developer's \b instructions
+| \ref License
+</div>
+ */

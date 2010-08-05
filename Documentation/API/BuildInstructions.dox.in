@@ -1,0 +1,34 @@
+/**
+@page BuildInstructions Build instructions
+
+<div class="btkmenu">\ref index "Overview"
+| \b Building \b instructions
+| \ref GettingStarted "Getting started"
+| \ref AdvancedTutorial "Advanced tutorial"
+| \ref Developer "Developer's instructions"
+| \ref License
+</div>
+
+@section Introduction
+To build BTK, be sure to use the latest release packaged and downloadable in this webpage: http://code.google.com/p/b-tk/downloads/list
+
+This page is separated in the following sections and give you all the details to configure, compile and install BTK in your system.
+
+- @ref compil_sec
+  - @ref build_sec
+  - @ref config_sec 
+    - @ref config_extra_warnings
+    - @ref config_sys_eigen2
+    - @ref config_vissupport
+      - @ref config_vtk
+    - @ref config_matlab
+    - @ref config_scilab
+    - @ref config_doc
+    - @ref config_examples
+    - @ref config_shared
+    - @ref config_test
+    - @ref config_tools
+- @ref install_sec
+
+${BUILD_INSTRUCTIONS_DOX_PART}
+ */

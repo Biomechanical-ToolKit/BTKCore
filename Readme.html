@@ -90,17 +90,19 @@
 <li><a class="el" href="Readme.html#compil_sec">Compilation</a><ul>
 <li><a class="el" href="Readme.html#build_sec">Building with CMake</a></li>
 <li><a class="el" href="Readme.html#config_sec">Configuration Options in CMake</a><ul>
+<li><a class="el" href="Readme.html#config_extra_warnings">BTK_EXTRA_COMPILER_WARNINGS</a></li>
+<li><a class="el" href="Readme.html#config_sys_eigen2">BTK_USE_SYSTEM_EIGEN2</a></li>
 <li><a class="el" href="Readme.html#config_vissupport">BTK_USE_VISSUPPORT</a><ul>
 <li><a class="el" href="Readme.html#config_vtk">BTK_USE_VTK</a></li>
 </ul>
 </li>
-<li><a class="el" href="Readme.html#config_tools">BUILD_TOOLS</a></li>
+<li><a class="el" href="Readme.html#config_matlab">BTK_WRAP_MATLAB</a></li>
+<li><a class="el" href="Readme.html#config_scilab">BTK_WRAP_SCILAB</a></li>
+<li><a class="el" href="Readme.html#config_doc">BUILD_DOCUMENTATION</a></li>
 <li><a class="el" href="Readme.html#config_examples">BUILD_EXAMPLES</a></li>
 <li><a class="el" href="Readme.html#config_shared">BUILD_SHARED_LIBS</a></li>
 <li><a class="el" href="Readme.html#config_test">BUILD_TESTING</a></li>
-<li><a class="el" href="Readme.html#config_doc">BUILD_DOCUMENTATION</a></li>
-<li><a class="el" href="Readme.html#config_matlab">BTK_WRAP_MATLAB</a></li>
-<li><a class="el" href="Readme.html#config_scilab">BTK_WRAP_SCILAB</a></li>
+<li><a class="el" href="Readme.html#config_tools">BUILD_TOOLS</a></li>
 </ul>
 </li>
 </ul>
@@ -178,7 +180,7 @@ Organization</h2>
 Documentation</h2>
 <p>The BTK source code is commented and permits to construct the API documentation by using <a href="http://www.doxygen.org">Doxygen</a>. For more information to construct the API documentation, see the option <a class="el" href="Readme.html#config_doc_api">BUILD_DOCUMENTATION_API</a> in <a class="el" href="Readme.html#config_sec">Configuration Options in CMake</a>.  <hr> <h2><a class="anchor" id="compil_sec"></a>
 Compilation</h2>
-<p>The Biomechanical ToolKit (BTK) was tested on PC (Windows XP, Windows Vista, Windows 7) with <a href="http://www.microsoft.com/express/vc/">Microsoft Visual C++ 2008 Express</a>, Mac OS X (Panther, Leopard) with <a href="http://developer.apple.com/tools/xcode/">XCode</a> (3.1 and 1.5 respectively) and Linux (Ubuntu 9.10). The compilation process only requires the use of a terminal/command prompt. BTK use <a href="http://www.cmake.org">CMake</a> 2.6.2 or greater to generate its build system, so it is necessary to download it from <a href="http://www.cmake.org/HTML/Download.html">http://www.cmake.org/HTML/Download.html</a>. The instructions below cover the basics of running CMake for BTK under the assumption that CMake is already installed. See the CMake web page for details on <a href="http://www.cmake.org/HTML/Install.html">intalling</a> and <a href="http://www.cmake.org/HTML/RunningCMake.html">running</a> CMake.</p>
+<p>The Biomechanical ToolKit (BTK) was tested on PC (Windows XP, Windows Vista, Windows 7) with <a href="http://www.microsoft.com/express/vc/">Microsoft Visual C++ 2008 Express</a>, Mac OS X (Panther, Leopard) with <a href="http://developer.apple.com/tools/xcode/">XCode</a> (3.1 and 1.5 respectively) and Linux (Ubuntu 9.10). The compilation process only requires the use of a terminal/command prompt. BTK use <a href="http://www.cmake.org">CMake</a> 2.6.2 or greater to generate its build system, so it is necessary to download it from <a href="http://www.cmake.org/HTML/Download.html">http://www.cmake.org/HTML/Download.html</a>. The instructions below cover the basics of running CMake for BTK under the assumption that CMake is already installed. See the CMake web page for details on <a href="http://www.cmake.org/HTML/Install.html">installing</a> and <a href="http://www.cmake.org/HTML/RunningCMake.html">running</a> CMake.</p>
 <p>Compiling BTK requires a complete BTK source tree. Running BTK regression tests (see option <a class="el" href="Readme.html#config_test">BUILD_TESTING</a> in <a class="el" href="Readme.html#config_sec">Configuration Options in CMake</a>) requires for the first an internet connection to download data files from <a href="ftp://ftp.c3d.org">ftp://ftp.c3d.org</a>.</p>
 <h3><a class="anchor" id="build_sec"></a>
 Building with CMake</h3>
@@ -198,21 +200,42 @@ Building with CMake</h3>
 Configuration Options in CMake</h3>
 <p>BTK is a toolkit providing a wide variety of functionality. Several configuration options are available to customize the BTK build system. These options are configured through an interactive CMake interface as described <a class="el" href="Readme.html#build_sec">Building with CMake</a> above. Note that not all options are available on all platforms, and some options are available only when other options are set to a particular value.</p>
 <p>The interactive CMake interface provides brief documentation for every option. Some options have more meaning than can be described in one sentence, so additional documentation is provided here:</p>
+<h4><a class="anchor" id="config_extra_warnings"></a>
+BTK_EXTRA_COMPILER_WARNINGS</h4>
+<p>Add compiler flags in debug mode to be more verbose when the compiler find some warnings (available only for GCC).</p>
+<h4><a class="anchor" id="config_sys_eigen2"></a>
+BTK_USE_SYSTEM_EIGEN2</h4>
+<p>Permits to use the <a href="http://eigen.tuxfamily.org/">Eigen</a> library installed on your system instead of the version embedded in BTK. Eigen 2.0 or above required.</p>
 <h4><a class="anchor" id="config_vissupport"></a>
 BTK_USE_VISSUPPORT</h4>
 <p>To display BTK data in 2D/3D enviromments. This option activates sub-options to choose the environment(s) to used.</p>
 <h5><a class="anchor" id="config_vtk"></a>
 BTK_USE_VTK</h5>
 <p>Builds library BTKVTK to display BTK data in the <a href="http://www.vtk.org">VTK</a> environment. VTK 5.4 or above required. This option is only shown when <a class="el" href="Readme.html#config_vissupport">BTK_USE_VISSUPPORT</a> is activated.</p>
-<h4><a class="anchor" id="BTK_USE_SYSTEM_EIGEN2"></a>
-BTK_USE_SYSTEM_EIGEN2</h4>
-<p>Permits to use the <a href="http://eigen.tuxfamily.org/">Eigen</a> library installed on your system instead of the version embedded in BTK. Eigen 2.0 or above required.</p>
-<h4><a class="anchor" id="config_tools"></a>
-BUILD_TOOLS</h4>
-<p>Active the building of tools embedded in BTK. These tools are:</p>
-<ul>
-<li>Mokka: Visualizer/editor of acquisition data. Requires <a href="http://www.vtk.org">VTK</a> 5.4 or above and <a href="http://www.qtsoftware.com">Qt</a> 4.5 or above. The option <a class="el" href="Readme.html#config_vtk">BTK_USE_VTK</a> must be activated.</li>
-</ul>
+<h4><a class="anchor" id="config_matlab"></a>
+BTK_WRAP_MATLAB</h4>
+<div class="important"> <b>Note:</b> Matlab users using Microsoft Visual Studio (2003|2005|2008|2010) can use the script <em>EasyInstallWithRedistribuableMatlabToolbox_MSVC.bat</em> to compile and install BTK with a single click! This script is in the root of BTK sources. </div><p> Enable/Disable generation of BTK bindings in the Matlab language. In order to build the Matlab-based BTK interpreter, the target computer needs to have Matlab 7.0.4 or above installed. To turn on Matlab wrapping, set BTK_WRAP_MATLAB to ON during the configuration process.</p>
+<h5><a class="anchor" id="config_matlab_redistribuable"></a>
+BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES</h5>
+<p>This option is activated if BTK_WRAP_MATLAB was activated during the previous CMake configuration iteration. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is usefull for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is not compatible with BUILD_SHARED_LIBS.</p>
+<h4><a class="anchor" id="config_scilab"></a>
+BTK_WRAP_SCILAB</h4>
+<div class="important"> <b>Note:</b> Scilab users using Microsoft Visual Studio (2003|2005|2008|2010) can use the script <em>EasyInstallWithRedistribuableScilabToolbox_MSVC.bat</em> to compile and install BTK with a single click! This script is in the root of BTK sources. </div><p> Enable/Disable generation of BTK bindings in the Scilab language. In order to build the Scilab-based BTK interpreter, the target computer needs to have Scilab 5.1 or above installed. To turn on Scilab wrapping, set BTK_WRAP_SCILAB to ON during the configuration process.</p>
+<h5><a class="anchor" id="config_scilab_redistribuable"></a>
+BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES</h5>
+<p>This option is activated if BTK_WRAP_SCILAB was activated during the previous CMake configuration iteration. BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES is usefull for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES is not compatible with BUILD_SHARED_LIBS.</p>
+<h4><a class="anchor" id="config_doc"></a>
+BUILD_DOCUMENTATION</h4>
+<p>The BTK documentation is generated by <a href="http://www.doxygen.org">Doxygen</a>. The option BUILD_DOCUMENTATION only activates the sub-options BUILD_DOCUMENTATION_README and BUILD_DOCUMENTATION_API. Each of these options generate a part of the documentation.</p>
+<h5><a class="anchor" id="config_doc_api"></a>
+BUILD_DOCUMENTATION_API</h5>
+<p>This option generates the API documentation and can be found in "Documentation/API" from the the build directory. This documentation is in a HTML format. The main file is the file Readme.html.</p>
+<h5><a class="anchor" id="config_doc_api_unselected"></a>
+BUILD_DOCUMENTATION_API_UNSELECTED_MODULES</h5>
+<p>This option forces to build the full API documentation.</p>
+<h5><a class="anchor" id="config_doc_readme"></a>
+BUILD_DOCUMENTATION_README</h5>
+<p>This option updates this file (Readme.html) by using the the file /Documentation/Readme/Readme.dox from the source directory. Modify Readme.dox, compile the project and you'll find a new Readme.html file in the BTK root.</p>
 <h4><a class="anchor" id="config_examples"></a>
 BUILD_EXAMPLES</h4>
 <p>Active the building of examples in the folder Examples.</p>
@@ -228,27 +251,12 @@ BUILD_SHARED_LIBS</h4>
 <h4><a class="anchor" id="config_test"></a>
 BUILD_TESTING</h4>
 <p>Each BTK class has unit tests and/or regression tests to verify their functionnalities. All the tests are in the directory Testing/Code. All the required input data should be inserted in the Testing/Data/Input directory and the generated ouput data should be inserted in the Testing/Data/Output. These tests use a modified version of CxxTest embedded in the directory Utilities. This version suppress the Perl/Python dependencies and replace them by C macros. As with the regular CxxTest library, the tests are declared and implemented in a header file. A test class requires to be defined by macro CXXTEST_SUITE. All the class' methods used for tests purpose must be defined by CXXTEST_TEST. Finally, the class must be registred by using CXXTEST_SUITE_REGISTRATION and tests by CXXTEST_TEST_REGISTRATION. The header containing the suite of tests has to be included in the CXX file calling the runner.</p>
-<h4><a class="anchor" id="config_doc"></a>
-BUILD_DOCUMENTATION</h4>
-<p>The BTK documentation is generated by <a href="http://www.doxygen.org">Doxygen</a>. The option BUILD_DOCUMENTATION only activates the sub-options BUILD_DOCUMENTATION_README and BUILD_DOCUMENTATION_API. Each of these options generate a part of the documentation.</p>
-<h5><a class="anchor" id="config_doc_readme"></a>
-BUILD_DOCUMENTATION_README</h5>
-<p>This option updates this file (Readme.html) by using the the file /Documentation/Readme/Readme.dox from the source directory. Modify Readme.dox, compile the project and you'll find a new Readme.html file in the BTK root.</p>
-<h5><a class="anchor" id="config_doc_api"></a>
-BUILD_DOCUMENTATION_API</h5>
-<p>This option generate the API documentation and can be found in "Documentation/API" from the the build directory. This documentation is in a HTML format. The main file is the file Readme.html.</p>
-<h4><a class="anchor" id="config_matlab"></a>
-BTK_WRAP_MATLAB</h4>
-<div class="important"> <b>Note:</b> Matlab users using Microsoft Visual Studio (2003|2005|2008|2010) can use the script <em>EasyInstallWithRedistribuableMatlabToolbox_MSVC.bat</em> to compile and install BTK with a single click! This script is in the root of BTK sources. </div><p> Enable/Disable generation of BTK bindings in the Matlab language. In order to build the Matlab-based BTK interpreter, the target computer needs to have Matlab 7.0.4 or above installed. To turn on Matlab wrapping, set BTK_WRAP_MATLAB to ON during the configuration process.</p>
-<h5><a class="anchor" id="config_matlab_redistribuable"></a>
-BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES</h5>
-<p>This option is activated if BTK_WRAP_MATLAB was activated during the previous CMake configuration iteration. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is usefull for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is not compatible with BUILD_SHARED_LIBS.</p>
-<h4><a class="anchor" id="config_scilab"></a>
-BTK_WRAP_SCILAB</h4>
-<div class="important"> <b>Note:</b> Scilab users using Microsoft Visual Studio (2003|2005|2008|2010) can use the script <em>EasyInstallWithRedistribuableScilabToolbox_MSVC.bat</em> to compile and install BTK with a single click! This script is in the root of BTK sources. </div><p> Enable/Disable generation of BTK bindings in the Scilab language. In order to build the Scilab-based BTK interpreter, the target computer needs to have Scilab 5.1 or above installed. To turn on Scilab wrapping, set BTK_WRAP_SCILAB to ON during the configuration process.</p>
-<h5><a class="anchor" id="config_scilab_redistribuable"></a>
-BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES</h5>
-<p>This option is activated if BTK_WRAP_SCILAB was activated during the previous CMake configuration iteration. BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES is usefull for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES is not compatible with BUILD_SHARED_LIBS.</p>
+<h4><a class="anchor" id="config_tools"></a>
+BUILD_TOOLS</h4>
+<p>Active the building of tools embedded in BTK. These tools are:</p>
+<ul>
+<li>Mokka: Visualizer/editor of acquisition data. Requires <a href="http://www.vtk.org">VTK</a> 5.4 or above and <a href="http://www.qtsoftware.com">Qt</a> 4.5 or above. The option <a class="el" href="Readme.html#config_vtk">BTK_USE_VTK</a> must be activated.</li>
+</ul>
  <hr> <h2><a class="anchor" id="install_sec"></a>
 Installation</h2>
 <p>Installing BTK from a source distribution requires first that it be compiled in a build tree. See the <a class="el" href="Readme.html#compil_sec">Compilation</a> Compilation section above for details. Once BTK has been compiled in a build tree one may build the install target to actually put BTK in an installation tree. If BTK was built using a CMake Makefile generator then this is done by running "nmake install" or "make install" from the top of the build tree. If BTK was built using a CMake project file generator (such as Visual Studio), then building the INSTALL project from inside the IDE will install BTK. The installation process will install all files in a directory structure rooted at the directory specified by CMAKE_INSTALL_PREFIX. </p>

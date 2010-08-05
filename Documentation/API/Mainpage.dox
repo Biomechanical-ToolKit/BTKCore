@@ -1,9 +1,30 @@
+/** 
+ * @namespace btk
+ * @brief The "btk" namespace contains all Biomechanical ToolKit (BTK) classes.
+ */
+
 /**
- * @mainpage
- *
- * This is the API documentation for Biomechanical ToolKit (BTK).
- *
- * <b>Usefull links:</b>
- * - BTK homepage: <a>http://code.google.com/p/b-tk/</a>
- * - BTK Users group: <a>http://groups.google.com/group/btk-users</a>
+@mainpage
+
+<div class="btkmenu">\b  Overview
+| \ref BuildInstructions "Building instructions"
+| \ref GettingStarted "Getting started"
+| \ref AdvancedTutorial "Advanced tutorial"
+| \ref Developer "Developer's instructions"
+| \ref License
+ </div>\n
+
+This is the API documentation for Biomechanical ToolKit (BTK).
+
+If you downloaded the sources of BTK, then you have first to read the \ref BuildInstructions "building instructions" to configure, compile and install it.\n
+
+The simplest way to use BTK in your program is to take a look at the \ref GettingStarted "tutorial".
+
+To well understand the concept of pipelines and theirs mechanisms, look at the \ref AdvancedTutorial "advanced tutorial".
+
+And finally, for more informations about the development (code guidelines, unit tests, submit a patch, how to extend BTK's classes, etc) check the \ref Developer "developer's page".
+
+<b>Usefull links:</b>
+- BTK homepage: <a>http://code.google.com/p/b-tk/</a>
+- BTK Users group: <a>http://groups.google.com/group/btk-users</a>
  */

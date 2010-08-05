@@ -1,0 +1,110 @@
+/**
+@mainpage Welcome To The Biomechanical Toolkit (BTK)
+
+- @ref intro_sec
+- @ref copy_sec
+- @ref organisation_sec
+- @ref doc_sec
+- @ref compil_sec
+  - @ref build_sec
+  - @ref config_sec 
+    - @ref config_extra_warnings
+    - @ref config_sys_eigen2
+    - @ref config_vissupport
+      - @ref config_vtk
+    - @ref config_matlab
+    - @ref config_scilab
+    - @ref config_doc
+    - @ref config_examples
+    - @ref config_shared
+    - @ref config_test
+    - @ref config_tools
+- @ref install_sec
+- @ref pb_sec
+- @ref data_sec
+- @ref run_sec
+- @ref add_sec
+- @ref help_sec 
+
+@htmlonly <hr> @endhtmlonly
+
+@section intro_sec Introduction
+
+BTK is an open-source library for biomechanical analysis. The structure of this library is inspired by the <a href="http://www.vtk.org">VTK</a> and <a href="http://www.itk.org">ITK</a> projects. 
+
+This README is written for BTK version 0.1 and greater. For more information about BTK and additional resources see the web page at <a>http://code.google.com/p/b-tk</a>.
+
+@htmlonly <hr> @endhtmlonly
+
+${LICENSE_DOX_PART}
+
+@htmlonly <hr> @endhtmlonly
+
+@section organisation_sec Organization
+
+The BTK source code repository is organized into six major sections.
+
+- The toolkit source code is found in the directory @b Code. This directory has the following subdirectories.
+  - @b Common: Core classes commonly used by other kits
+  - @b IO: Classes for reading and writing data
+  - @b BasicFilers: Simple filters to adapt data 
+  - @b VisSupport: Visualization support in 2D/3D environment
+    - @b VTK: Visualization in VTK environment
+- The @b Examples directory contains ressources to use BTK.
+- The @b Testing directory contains lots of testing examples. These are undocumented tests but can be helpful in some cases.
+- The @b Tools directory contains applications created with BTK sources.
+- The @b Utilities directory contains ressources or libraries required to build BTK.
+- The @b Wrapping directory contains code related to BTK and various programing language to bridge BTK with them.
+
+@htmlonly <hr> @endhtmlonly
+
+@section doc_sec Documentation
+
+The BTK source code is commented and permits to construct the API documentation by using <a href="http://www.doxygen.org">Doxygen</a>. For more information to construct the API documentation, see the option @ref config_doc_api in @ref config_sec "Configuration Options in CMake".
+@htmlonly <hr> @endhtmlonly
+
+${BUILD_INSTRUCTIONS_DOX_PART}
+
+@htmlonly <hr> @endhtmlonly
+
+@section pb_sec Common Problems
+
+- Some compiler could not be used with Wrapping/Matlab into some OS. Mathwoks doesn't support all compiler on every plateform (Linux/Mac/Windows).
+
+@htmlonly <hr> @endhtmlonly
+
+@section data_sec Getting Data
+
+Regression tests in BTK required C3D files. These files are on the net
+to reduce the size of the BTK source package. The first time you want to
+build the tests (BUILD_TESTING option in CMake), CMake will download the
+required files from ftp://ftp.c3d.org. This download take a long time
+due to a check betwen EPSV and PASV mode... This problen is due to the
+CMake binary option build and cannot be fixed by a script.
+
+@htmlonly <hr> @endhtmlonly
+
+@section run_sec Running BTK
+
+Many tests/examples in Testing directory will be compiled if
+BUILD_TESTING are enable in CMake. To run these tests, just type CTest
+(or "c:\Program Files\CMake 2.6\bin\ctest.exe") or @p bin/TDD from the
+build directory. If you have built shared libraries, make sure the PATH
+environment variable (Windows) or the LD_LIBRARY_PATH (Unix) point to
+the shared libraries (see above documentation of the BUILD_SHARED_LIBS
+for details)
+
+@htmlonly <hr> @endhtmlonly
+
+@section add_sec Adding A New Class
+
+There are several ways to extend BTK. The simplest way is, in your own code,to create classes that inherit from the appropriate BTK classes. For example a filter/process will inherits from btk::Process until an input/output will inherit from btk::DataObject.
+
+@htmlonly <hr> @endhtmlonly
+
+@section help_sec Getting Help / Mailing List
+For general information go to the BTK web site http://code.google.com/p/b-tk
+
+If you run into problems, your best bet is to join the BTK mailing list. Visit http://groups.google.com/group/gaitcode to join the list. 
+
+*/

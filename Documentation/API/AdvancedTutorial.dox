@@ -1,0 +1,14 @@
+/**
+@page AdvancedTutorial Advanced tutorial
+
+<div class="btkmenu">\ref index "Overview"
+| \ref BuildInstructions "Build instructions"
+| \ref GettingStarted "Getting started"
+| \b Advanced \b tutorial
+| \ref Developer "Developer's instructions"
+| \ref License
+</div>
+ */
+ 
+ @todo
+  - Speak about (boost|std)::[tr1::]::shared_ptr

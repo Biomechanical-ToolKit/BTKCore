@@ -1,0 +1,13 @@
+/**
+@page License License
+
+<div class="btkmenu">\ref index "Overview"
+| \ref BuildInstructions "Building instructions"
+| \ref GettingStarted "Getting started"
+| \ref AdvancedTutorial "Advanced tutorial"
+| \ref Developer "Developer's instructions"
+| \b License
+</div>
+
+${LICENSE_DOX_PART}
+ */
