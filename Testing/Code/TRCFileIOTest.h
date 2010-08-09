@@ -14,13 +14,13 @@ CXXTEST_SUITE(TRCFileIOTest)
   CXXTEST_TEST(CanReadFileEmptyFile)
   {
     btk::TRCFileIO::Pointer pt = btk::TRCFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanReadFile(TRCFilePathIN + "Empty.c3d"), false);
+    TS_ASSERT_EQUALS(pt->CanReadFile(TRCFilePathIN + "Empty.trc"), false);
   };
   
-  CXXTEST_TEST(CanReadFileFail)
+  CXXTEST_TEST(CanReadFileShouldFail)
   {
     btk::TRCFileIO::Pointer pt = btk::TRCFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanReadFile(TRCFilePathIN + "Truncated.c3d"), false);
+    TS_ASSERT_EQUALS(pt->CanReadFile(TRCFilePathIN + "Truncated.trc"), true);
   };
   
   CXXTEST_TEST(CanReadFileOk)
@@ -58,7 +58,7 @@ CXXTEST_SUITE(TRCFileIOTest)
 CXXTEST_SUITE_REGISTRATION(TRCFileIOTest)
 CXXTEST_TEST_REGISTRATION(TRCFileIOTest, CanReadFileEmpty)
 CXXTEST_TEST_REGISTRATION(TRCFileIOTest, CanReadFileEmptyFile)
-CXXTEST_TEST_REGISTRATION(TRCFileIOTest, CanReadFileFail)
+CXXTEST_TEST_REGISTRATION(TRCFileIOTest, CanReadFileShouldFail)
 CXXTEST_TEST_REGISTRATION(TRCFileIOTest, CanReadFileOk)
 CXXTEST_TEST_REGISTRATION(TRCFileIOTest, CanWriteFileEmpty)
 CXXTEST_TEST_REGISTRATION(TRCFileIOTest, CanWriteFileFail)

@@ -41,6 +41,7 @@
 #include "btkANBFileIO.h"
 #include "btkANCFileIO.h"
 #include "btkCALForcePlateFileIO.h"
+#include "btkTRBFileIO.h"
 #include "btkTRCFileIO.h"
 #include "btkXLSOrthotrackFileIO.h"
 // Elite IOs
@@ -87,8 +88,10 @@ namespace btk
     {
       io = C3DFileIO::New();
       if (io->CanReadFile(filename)) return io;
+      io = TRBFileIO::New();
+      if (io->CanReadFile(filename)) return io;
       io = TRCFileIO::New();
-      if (io->CanReadFile(filename)) return io; 
+      if (io->CanReadFile(filename)) return io;
       io = ANBFileIO::New();
       if (io->CanReadFile(filename)) return io;
       io = ANCFileIO::New();
@@ -118,6 +121,8 @@ namespace btk
       if (io->CanWriteFile(filename)) return io;
       io = TRCFileIO::New();
       if (io->CanWriteFile(filename)) return io;
+      //io = TRBFileIO::New();
+      //if (io->CanWriteFile(filename)) return io;
       io = ANBFileIO::New();
       if (io->CanWriteFile(filename)) return io;
       io = ANCFileIO::New();

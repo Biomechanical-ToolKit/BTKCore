@@ -36,8 +36,7 @@
 #ifndef __btkANBFileIO_h
 #define __btkANBFileIO_h
 
-#include "btkAcquisitionFileIO.h"
-#include "btkBinaryFileStream.h"
+#include "btkMotionAnalysisFileIOUtils_p.h"
 #include "btkException.h"
 
 namespace btk
@@ -52,7 +51,7 @@ namespace btk
     virtual ~ANBFileIOException() throw() {};
   };
   
-  class ANBFileIO : public AcquisitionFileIO
+  class ANBFileIO : public MotionAnalysisBinaryFileIO
   {
   public:
     typedef SharedPtr<ANBFileIO> Pointer;
@@ -71,21 +70,7 @@ namespace btk
     BTK_IO_EXPORT ANBFileIO();
     
   private:
-    size_t ReadKeyValueU8(uint8_t* val, IEEELittleEndianBinaryFileStream* bifs, int key);
-    size_t ReadKeyValueU8(std::vector<uint8_t>& val, IEEELittleEndianBinaryFileStream* bifs, int key);
-    size_t ReadKeyValueU16(uint16_t* val, IEEELittleEndianBinaryFileStream* bifs, int key);
-    size_t ReadKeyValueU16(std::vector<uint16_t>& val, IEEELittleEndianBinaryFileStream* bifs, int key);
-    size_t ReadKeyValueU32(uint32_t* val, IEEELittleEndianBinaryFileStream* bifs, int key);
-    size_t ReadKeyValueFloat(float* val, IEEELittleEndianBinaryFileStream* bifs, int key);
-    size_t ReadKeyValueString(std::string& val, IEEELittleEndianBinaryFileStream* bifs, int key);
-    void ReadKey(IEEELittleEndianBinaryFileStream* bifs, int key) const;
-    void CheckSizeForSingleValue(IEEELittleEndianBinaryFileStream* bifs) const;
-    
-    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint8_t>& val);
-    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint16_t>& val);
-    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, uint32_t val);
-    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, float val);
-    size_t WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::string& val, bool spacing = false);
+    size_t ReadKeyValueFloatFromTwoU16(float* val, IEEELittleEndianBinaryFileStream* bifs, int key);
     
     ANBFileIO(const ANBFileIO& ); // Not implemented.
     ANBFileIO& operator=(const ANBFileIO& ); // Not implemented. 

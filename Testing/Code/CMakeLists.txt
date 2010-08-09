@@ -10,12 +10,6 @@ SET(TDD_SRCS
   _TDDIO.cpp
   )
 
-#IF(BTK_USE_VTK)
-#  ADD_DEFINITIONS(-DHAVE_BTKVTKADAPTER)
-#  SET(BTKVTKAdapter BTKVTKAdapter)
-#  SET(VTK_LIBRARIES_REQUIRED vtkFiltering)
-#ENDIF(BTK_USE_VTK)
-
 LINK_DIRECTORIES(${BTK_LIBRARY_PATH})
 
 # The CxxTest library included with BTK is modified.

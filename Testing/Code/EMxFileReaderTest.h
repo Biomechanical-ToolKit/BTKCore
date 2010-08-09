@@ -1,9 +1,9 @@
-#ifndef GRxFileReaderTest_h
-#define GRxFileReaderTest_h
+#ifndef EMxFileReaderTest_h
+#define EMxFileReaderTest_h
 
 #include <btkAcquisitionFileReader.h>
 
-CXXTEST_SUITE(GRxFileReaderTest)
+CXXTEST_SUITE(EMxFileReaderTest)
 {
   CXXTEST_TEST(NoFile)
   {
@@ -70,10 +70,10 @@ CXXTEST_SUITE(GRxFileReaderTest)
       TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acq2->GetAnalog(1)->GetValues()(i), 0.00001);
       TS_ASSERT_DELTA(acq->GetAnalog(2)->GetValues()(i), acq2->GetAnalog(2)->GetValues()(i), 0.00001);
       TS_ASSERT_DELTA(acq->GetAnalog(3)->GetValues()(i), acq2->GetAnalog(3)->GetValues()(i), 0.00001);
-      TS_ASSERT_DELTA(acq->GetAnalog(4)->GetValues()(i), acq2->GetAnalog(5)->GetValues()(i), 0.00001);
-      TS_ASSERT_DELTA(acq->GetAnalog(5)->GetValues()(i), acq2->GetAnalog(6)->GetValues()(i), 0.00001);
-      TS_ASSERT_DELTA(acq->GetAnalog(6)->GetValues()(i), acq2->GetAnalog(7)->GetValues()(i), 0.00001);
-      TS_ASSERT_DELTA(acq->GetAnalog(7)->GetValues()(i), acq2->GetAnalog(8)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(4)->GetValues()(i), acq2->GetAnalog(4)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(5)->GetValues()(i), acq2->GetAnalog(5)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(6)->GetValues()(i), acq2->GetAnalog(6)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(7)->GetValues()(i), acq2->GetAnalog(7)->GetValues()(i), 0.00001);
     }
   };
   
@@ -146,10 +146,10 @@ CXXTEST_SUITE(GRxFileReaderTest)
   };
 };
 
-CXXTEST_SUITE_REGISTRATION(GRxFileReaderTest)
-CXXTEST_TEST_REGISTRATION(GRxFileReaderTest, NoFile)
-CXXTEST_TEST_REGISTRATION(GRxFileReaderTest, MisspelledFile)
-CXXTEST_TEST_REGISTRATION(GRxFileReaderTest, File1123xa01_G)
-//CXXTEST_TEST_REGISTRATION(GRxFileReaderTest, File1123xa01_F)
-//CXXTEST_TEST_REGISTRATION(GRxFileReaderTest, File1123xa01_R)
+CXXTEST_SUITE_REGISTRATION(EMxFileReaderTest)
+CXXTEST_TEST_REGISTRATION(EMxFileReaderTest, NoFile)
+CXXTEST_TEST_REGISTRATION(EMxFileReaderTest, MisspelledFile)
+CXXTEST_TEST_REGISTRATION(EMxFileReaderTest, File1123xa01_G)
+//CXXTEST_TEST_REGISTRATION(EMxFileReaderTest, File1123xa01_F)
+//CXXTEST_TEST_REGISTRATION(EMxFileReaderTest, File1123xa01_R)
 #endif

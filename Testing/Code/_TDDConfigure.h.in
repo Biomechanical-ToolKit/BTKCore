@@ -25,6 +25,8 @@
 #define C3DFilePathOUT std::string(TDD_FilePathOUT) + "C3DSamples/"
 #define CALForcePlateFilePathIN std::string(TDD_FilePathIN) + "CALForcePlateSamples/"
 #define CALForcePlateFilePathOUT std::string(TDD_FilePathOUT) + "CALForcePlateSamples/"
+#define TRBFilePathIN std::string(TDD_FilePathIN) + "TRBSamples/"
+#define TRBFilePathOUT std::string(TDD_FilePathOUT) + "TRBSamples/"
 #define TRCFilePathIN std::string(TDD_FilePathIN) + "TRCSamples/"
 #define TRCFilePathOUT std::string(TDD_FilePathOUT) + "TRCSamples/"
 #define XLSOrthotrackFilePathIN std::string(TDD_FilePathIN) + "XLSOrthotrackSamples/"

@@ -34,7 +34,7 @@
  */
 
 #include "btkANBFileIO.h"
-#include "btkANxFileIOUtils_p.h"
+#include "btkMotionAnalysisFileIOUtils_p.h"
 #include "btkMetaDataUtils.h"
 #include "btkConvert.h"
 
@@ -187,11 +187,11 @@ namespace btk
       counter += this->ReadKeyValueU32(&id, &bifs, 0x0101);
       counter += this->ReadKeyValueString(boardType, &bifs, 0x0108);
       counter += this->ReadKeyValueU32(&bitDepth, &bifs, 0x0109);
-      counter += this->ReadKeyValueFloat(&preciseRate, &bifs, 0x010A);
+      counter += this->ReadKeyValueFloatFromTwoU16(&preciseRate, &bifs, 0x010A);
       counter += this->ReadKeyValueU32(&channelNumber, &bifs, 0x0102);
       counter += this->ReadKeyValueU8(hexIndex, &bifs, 0x0103);
       counter += this->ReadKeyValueU16(channelRate, &bifs, 0x0104);
-      counter += this->ReadKeyValueFloat(&firstTime, &bifs, 0x0105);
+      counter += this->ReadKeyValueFloatFromTwoU16(&firstTime, &bifs, 0x0105);
       counter += this->ReadKeyValueU16(channelRange, &bifs, 0x0106);
       std::vector<std::string> channelLabel = std::vector<std::string>(channelNumber);
       for (size_t i = 0 ; i < channelNumber ; ++i)
@@ -421,62 +421,10 @@ namespace btk
    * Constructor.
    */
   ANBFileIO::ANBFileIO()
-  : AcquisitionFileIO()
-  {
-    this->SetFileType(AcquisitionFileIO::Binary);
-    this->SetByteOrder(AcquisitionFileIO::IEEE_LittleEndian);
-    this->SetStorageFormat(AcquisitionFileIO::Integer);
-  };
+  : MotionAnalysisBinaryFileIO()
+  {};
   
-  size_t ANBFileIO::ReadKeyValueU8(uint8_t* val, IEEELittleEndianBinaryFileStream* bifs, int key)
-  {
-    this->ReadKey(bifs, key);
-    int16_t size = bifs->ReadU16();
-    if (size != 1)
-      throw(ANBFileIOException("Wrong value size."));
-    *val = bifs->ReadU8();
-    return 2;
-  };
-  
-  size_t ANBFileIO::ReadKeyValueU8(std::vector<uint8_t>& val, IEEELittleEndianBinaryFileStream* bifs, int key)
-  {  
-    this->ReadKey(bifs, key);
-    int16_t size = bifs->ReadU16();
-    val.resize(size * 4);
-    for (size_t i = 0 ; i < val.size() ; ++i)
-      val[i] = bifs->ReadU8();
-    return 1 + size;
-  };
-  
-  size_t ANBFileIO::ReadKeyValueU16(uint16_t* val, IEEELittleEndianBinaryFileStream* bifs, int key)
-  {
-    this->ReadKey(bifs, key);
-    this->CheckSizeForSingleValue(bifs);
-    *val = bifs->ReadU16();
-    return 2;
-  };
-  
-  size_t ANBFileIO::ReadKeyValueU16(std::vector<uint16_t>& val, IEEELittleEndianBinaryFileStream* bifs, int key)
-  {
-    this->ReadKey(bifs, key);
-    int16_t size = bifs->ReadU16();
-    val.resize(size * 2);
-    for (int i = 0 ; i < static_cast<int>(val.size()) ; ++i)
-      val[i] = bifs->ReadU16();
-    return 1 + size;
-  };
-  
-  size_t ANBFileIO::ReadKeyValueU32(uint32_t* val, IEEELittleEndianBinaryFileStream* bifs, int key)
-  {
-    this->ReadKey(bifs, key);
-    this->CheckSizeForSingleValue(bifs);
-    uint16_t hsb = bifs->ReadU16();
-    uint16_t lsb = bifs->ReadU16();
-    *val = hsb << 16 | lsb;
-    return 2;
-  };
-  
-  size_t ANBFileIO::ReadKeyValueFloat(float* val, IEEELittleEndianBinaryFileStream* bifs, int key)
+  size_t ANBFileIO::ReadKeyValueFloatFromTwoU16(float* val, IEEELittleEndianBinaryFileStream* bifs, int key)
   {
     this->ReadKey(bifs, key);
     this->CheckSizeForSingleValue(bifs);
@@ -485,90 +433,5 @@ namespace btk
     uint32_t foo = hsb << 16 | lsb;
     *val = *reinterpret_cast<float*>(&foo);
     return 2;
-  };
-  
-  size_t ANBFileIO::ReadKeyValueString(std::string& val, IEEELittleEndianBinaryFileStream* bifs, int key)
-  {
-    this->ReadKey(bifs, key);
-    int16_t size = bifs->ReadU16();
-    val = bifs->ReadString(size * 4);
-    val = val.erase(val.find_last_not_of((char)0x00) + 1);
-    val = val.erase(0, val.find_first_not_of((char)0x00));
-    return 1 + size;
-  };
-  
-  void ANBFileIO::ReadKey(IEEELittleEndianBinaryFileStream* bifs, int key) const
-  {
-    uint16_t readKey = bifs->ReadU16();
-    if (readKey != key)
-      throw(ANBFileIOException("Keys mismatch: " + ToString(readKey) + " vs " + ToString(key)));
-  };
-  
-  void ANBFileIO::CheckSizeForSingleValue(IEEELittleEndianBinaryFileStream* bifs) const
-  {
-    int16_t size = bifs->ReadU16();
-    if (size != 1)
-      throw(ANBFileIOException("Wrong value size."));
-  };
-  
-  size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint8_t>& val)
-  {
-    bofs->Write(key); bofs->Write(static_cast<uint16_t>(val.size() / 4));
-    for (size_t i = 0 ; i < val.size() ; ++i)
-      bofs->Write(val[i]);
-    size_t size = val.size() / 4;
-    size += ((val.size() % 4) > 0 ? 1 : 0);
-    bofs->Fill(size * 4 - val.size());
-    return 4 + size * 4;
-  };
-  
-  size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint16_t>& val)
-  {
-    bofs->Write(key); bofs->Write(static_cast<uint16_t>(val.size() / 2));
-    for (size_t i = 0 ; i < val.size() ; ++i)
-      bofs->Write(val[i]); 
-    size_t size = val.size() / 2;
-    size += ((val.size() % 2) > 0 ? 1 : 0);
-    bofs->Fill((size * 2 - val.size()) * 2);
-    return 4 + size * 4;
-  };
-  
-  size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, uint32_t val)
-  {
-    bofs->Write(key); bofs->Write((uint16_t)0x0001);
-    uint16_t hsb = val >> 16;
-    uint16_t lsb = val - (hsb << 16);
-    bofs->Write(hsb); bofs->Write(lsb);
-    return 4 + 4;
-  };
-  
-  size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, float val)
-  {
-    bofs->Write(key); bofs->Write((uint16_t)0x0001);
-    uint16_t byteptr[2];
-    memcpy(&byteptr, &val, sizeof(byteptr));
-#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-    bofs->Write(byteptr[0]);
-    bofs->Write(byteptr[1]);
-#else
-    bofs->Write(byteptr[1]);
-    bofs->Write(byteptr[0]);
-#endif   
-
-    return 4 + 4;
-  };
-  
-  size_t ANBFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::string& val, bool spacing)
-  {
-    size_t size = val.size() / 4;
-    size_t sizeUpdated = size + ((val.size() % 4) > 0 ? 1 : 0);
-    if ((size == sizeUpdated) && spacing)
-      size += 1;
-    else
-      size = sizeUpdated;
-    bofs->Write(key); bofs->Write(static_cast<uint16_t>(size));
-    bofs->Write(val); 
-    bofs->Fill(size * 4 - val.size());
-    return 4 + size * 4;
   };
 };

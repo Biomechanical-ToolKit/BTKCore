@@ -33,49 +33,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkANxFileIOUtils_h
-#define __btkANxFileIOUtils_h
+#ifndef __btkTRBFileIO_h
+#define __btkTRBFileIO_h
 
-#include "btkAcquisition.h"
+#include "btkMotionAnalysisFileIOUtils_p.h"
 #include "btkException.h"
-#include <vector>
-
-#ifdef _MSC_VER
-  #include "Utilities/stdint.h"
-#else
-  #include <stdint.h>
-#endif
 
 namespace btk
 {
-  class ANxFileIOException : public Exception
+  class TRBFileIOException : public Exception
   {
   public:
-    explicit ANxFileIOException(const std::string& msg)
+    explicit TRBFileIOException(const std::string& msg)
     : Exception(msg)
     {};
       
-    virtual ~ANxFileIOException() throw() {};
+    virtual ~TRBFileIOException() throw() {};
   };
   
-  void ANxFileIOCheckHeader_p(double preciseRate, size_t channelNumber, 
-                            const std::vector<uint16_t>& channelRate, 
-                            const std::vector<uint16_t>& channelRange);
-  void ANxFileIOStoreHeader_p(Acquisition::Pointer output,
-                            double preciseRate, size_t frameNumber, size_t channelNumber,
-                            const std::vector<std::string>& channelLabel,
-                            const std::vector<uint16_t>& channelRate,
-                            const std::vector<uint16_t>& channelRange,
-                            const std::string& boardType, int bitDepth, int gen = 2);
-  void ANxFileIOExtractForcePlatformChannel_p(std::vector< std::vector<int16_t> >& fpChan, 
-                            Acquisition::Pointer output, const char** labels, int num);
-  void ANxFileIOExtractForcePlatformChannel_p(std::vector< std::vector<int16_t> >& fpChan, 
-                            Acquisition::Pointer output, const std::string& prefix, const char** labels, int num);
-  void ANxFileIOExtractForcePlatformChannel_p(std::vector< std::vector<int16_t> >& fpChan, 
-                            Acquisition::Pointer output, const std::vector<std::string>& labels);
-  int ANxFileIOFindAnalogLabeCaselInsensitive_p(const std::string& label, Acquisition::Pointer output);
-  uint16_t ANxFileIODetectAnalogRange_p(double s, int bitDepth);
-
+  class TRBFileIO : public MotionAnalysisBinaryFileIO
+  {
+  public:
+    typedef SharedPtr<TRBFileIO> Pointer;
+    typedef SharedPtr<const TRBFileIO> ConstPointer;
+    
+    static Pointer New() {return Pointer(new TRBFileIO());};
+    
+    // ~TRBFileIO(); // Implicit.
+    
+    BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
+    BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename);
+    BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output);
+    BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input);
+    
+  protected:
+    BTK_IO_EXPORT TRBFileIO();
+    
+  private:
+    TRBFileIO(const TRBFileIO& ); // Not implemented.
+    TRBFileIO& operator=(const TRBFileIO& ); // Not implemented. 
+   };
 };
 
-#endif // __btkANxFileIOUtils_h
+#endif // __btkTRBFileIO_h

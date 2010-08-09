@@ -35,7 +35,7 @@
 
 #include "btkANCFileIO.h"
 #include "btkMetaDataUtils.h"
-#include "btkANxFileIOUtils_p.h"
+#include "btkMotionAnalysisFileIOUtils_p.h"
 #include "btkConvert.h"
 
 #include <fstream>

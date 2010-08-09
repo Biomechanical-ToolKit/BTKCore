@@ -16,10 +16,11 @@ SET(BTKIO_SRCS
   btkRAxFileIO.cpp
   btkRICFileIO.cpp
   btkMOMFileIO.cpp
+  btkTRBFileIO.cpp
   btkTRCFileIO.cpp
   btkXLSOrthotrackFileIO.cpp
   # Private methods
-  btkANxFileIOUtils_p.cpp
+  btkMotionAnalysisFileIOUtils_p.cpp
   btkEliteFileIOUtils_p.cpp
 )
 
