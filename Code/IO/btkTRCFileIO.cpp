@@ -157,7 +157,6 @@ namespace btk
       int numberOfFrames = 0;
       if (!(num = keywords["NumFrames"]).empty())
         numberOfFrames = FromString<int>(num);
-      double framerate = 0.0;
       if (!(num = keywords["DataRate"]).empty())
         output->SetPointFrequency(FromString<double>(num));
       if (!(num = keywords["OrigDataStartFrame"]).empty())
@@ -187,11 +186,11 @@ namespace btk
             labels.push_back(buf);
           }
         }
-        size_t numberOfLabels = labels.size();
+        int numberOfLabels = static_cast<int>(labels.size());
         if (numberOfPoints != numberOfLabels)
         {
           btkIOErrorMacro(filename, "Mismatch between the number of points and the number of labels extracted. Final number of points corresponds to the number of labels extracted.");
-          numberOfPoints = static_cast<int>(numberOfLabels);
+          numberOfPoints = numberOfLabels;
         }
         std::getline(ifs, line); // Coordinate's label (X1, Y1, Z1, ...)
         output->Init(numberOfPoints, numberOfFrames);

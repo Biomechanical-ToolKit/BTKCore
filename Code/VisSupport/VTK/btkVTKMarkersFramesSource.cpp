@@ -461,7 +461,7 @@ namespace btk
   /**
    * Generate marker's position.
    */
-  int VTKMarkersFramesSource::RequestInformation(vtkInformation* request, 
+  int VTKMarkersFramesSource::RequestInformation(vtkInformation* vtkNotUsed(request), 
                                                  vtkInformationVector** inputVector, 
                                                  vtkInformationVector* outputVector)
   {
@@ -618,8 +618,8 @@ namespace btk
   /**
    * Extract markers' frame required by a vtkStreamingDemandDrivenPipeline object.
    */
-  int VTKMarkersFramesSource::RequestData(vtkInformation* request,
-                                          vtkInformationVector** inputVector,
+  int VTKMarkersFramesSource::RequestData(vtkInformation* vtkNotUsed(request),
+                                          vtkInformationVector** vtkNotUsed(inputVector),
                                           vtkInformationVector* outputVector)
   {
     // positions

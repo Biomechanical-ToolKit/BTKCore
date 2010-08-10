@@ -109,7 +109,7 @@ namespace btk
    * @ingroup BTKCommon
    */
   template <typename T>
-  void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const T& val, int inc = 1)
+  void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const T& val)
   {
     if (parent.get() != 0)
     {
@@ -272,6 +272,7 @@ namespace btk
   template <typename T>
   inline const T MetaDataCollapseChildrenValues_p(const T& blank, int idx)
   {
+    btkNotUsed(idx);
     return blank;
   };
 

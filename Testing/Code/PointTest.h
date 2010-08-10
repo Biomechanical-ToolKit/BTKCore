@@ -24,7 +24,7 @@ CXXTEST_SUITE(PointTest)
   CXXTEST_TEST(FrameNumber)
   {
     btk::Point::Pointer test = btk::Point::New("HEEL_R", 200);
-    long t1 = test->GetTimestamp();
+    unsigned long int t1 = test->GetTimestamp();
     test->SetFrameNumber(225);
     TS_ASSERT_EQUALS(test->GetValues().rows(), 225);
     TS_ASSERT_EQUALS(test->GetResiduals().rows(), 225);

@@ -281,7 +281,6 @@ namespace btk
         throw(C3DFileIOException("Bad header key"));
       uint16_t pointNumber = 0,
                totalAnalogSamplesPer3dFrame = 0,
-               pointMaximumFillGap = 0, 
                dataFirstBlock = 0, 
                numberSamplesPerAnalogChannel = 0;
       int lastFrame = 0;
@@ -1588,7 +1587,6 @@ namespace btk
       // n: number of characters
       // m: number of types of specialized points
       std::vector<uint8_t> dims = std::vector<uint8_t>(3,0);
-      int num = -1;
       for (size_t i = 0 ; i < typeGroups.size() ; ++i)
       {
         if (typeGroups[i].size() > dims[0])

@@ -443,7 +443,7 @@ namespace btk
     if (start == std::string::npos)
       throw(ANCFileIOException("Corrupted ANC file: Missing keyword '" + keyword + "'."));
     start += keyword.length();
-    if (static_cast<int>(line.length()) <= start)
+    if (line.length() <= start)
       throw(ANCFileIOException("Corrupted ANC file: Missing value for keyword: '" + keyword + "'"));
     end = line.find(sep, start);
     if (end == std::string::npos)

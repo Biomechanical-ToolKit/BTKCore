@@ -167,6 +167,7 @@ namespace btk
    */
   DataObject::Pointer AcquisitionFileReader::MakeOutput(int idx)
   {
+    btkNotUsed(idx);
     return Acquisition::New();
   };
   

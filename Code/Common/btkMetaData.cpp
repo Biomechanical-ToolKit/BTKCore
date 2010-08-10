@@ -204,7 +204,7 @@ namespace btk
         MetaDataInfo::Pointer info = (*it)->GetInfo();
         if (info->GetFormat() == f)
         {
-          if (info->GetDimensions().size() == numDims)
+          if (static_cast<int>(info->GetDimensions().size()) == numDims)
           {
             if (noPossibleEmptyValue)
             {

@@ -40,10 +40,9 @@
 
 namespace btk
 {
-  static unsigned long VTKMarkersListUpdateEvent = vtkCommand::UserEvent + 1;
-  static unsigned long VTKMarkerPickedEvent = vtkCommand::UserEvent + 2;
-  static unsigned long VTKMarkersPickedEvent = vtkCommand::UserEvent + 3;
-
+  static const unsigned long VTKMarkersListUpdateEvent = vtkCommand::UserEvent + 1;
+  static const unsigned long VTKMarkerPickedEvent = vtkCommand::UserEvent + 2;
+  static const unsigned long VTKMarkersPickedEvent = vtkCommand::UserEvent + 3;
 };
 
 #endif // __btkVTKCommandEvents_h

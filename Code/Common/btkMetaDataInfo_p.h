@@ -60,7 +60,7 @@ namespace btk
   {
     target.resize(source.size(), 0);
     size_t inc = 0;
-    while (inc < static_cast<int>(source.size()))
+    while (inc < source.size())
     {
       target[inc] = Voidify_p(source[inc]);
       ++inc;  
@@ -220,6 +220,7 @@ namespace btk
   template <>
   inline std::string Devoidify_p<std::string>(MetaDataInfo::Format f, const std::vector<void*>& source, int idx, Convert2Format of)
   {
+    btkNotUsed(of);
     switch(f)
     {
       case MetaDataInfo::Byte:
@@ -268,6 +269,7 @@ namespace btk
   template <>
   inline void Devoidify_p<std::string>(MetaDataInfo::Format f, const std::vector<void*>& source, std::vector<std::string>& target, Convert2Format of)
   {
+    btkNotUsed(of);
     switch(f)
     {
       case MetaDataInfo::Byte:
@@ -494,7 +496,7 @@ namespace btk
   template <typename T>
   inline void Resize_p(std::vector<void*>& target, int num, const T& val)
   {
-    if (num == target.size())
+    if (num == static_cast<int>(target.size()))
       return;
     if (num > static_cast<int>(target.size()))
       Insert_p(target, target.end(), num, val);

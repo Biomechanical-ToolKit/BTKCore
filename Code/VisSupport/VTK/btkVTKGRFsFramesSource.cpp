@@ -163,7 +163,7 @@ namespace btk
   /**
    * Generate GRFs' vectors
    */
-  int VTKGRFsFramesSource::RequestInformation(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+  int VTKGRFsFramesSource::RequestInformation(vtkInformation* vtkNotUsed(request), vtkInformationVector** inputVector, vtkInformationVector* outputVector)
   {
     // Convert a btk::PointCollection into a collection of polydata containing only vertices.
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
@@ -243,9 +243,9 @@ namespace btk
   /**
    * Extract GRFs frame required by a vtkStreamingDemandDrivenPipeline object.
    */
-  int VTKGRFsFramesSource::RequestData(vtkInformation* request,
-                                   vtkInformationVector** inputVector,
-                                   vtkInformationVector* outputVector)
+  int VTKGRFsFramesSource::RequestData(vtkInformation* vtkNotUsed(request),
+                                       vtkInformationVector** vtkNotUsed(inputVector),
+                                       vtkInformationVector* outputVector)
   {
     vtkInformation* outInfo = outputVector->GetInformationObject(0);    
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));

@@ -414,6 +414,8 @@ namespace btk
    */
   void XLSOrthotrackFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
+    btkNotUsed(filename);
+    btkNotUsed(input);
     btkErrorMacro("Method not yet implemented.");
     return;
   };

@@ -13,7 +13,7 @@ CXXTEST_SUITE(SeparateKnownVirtualMarkersFilterTest)
   {
     btk::SeparateKnownVirtualMarkersFilter::Pointer skvm = btk::SeparateKnownVirtualMarkersFilter::New();
     std::list<btk::SeparateKnownVirtualMarkersFilter::StringAxes> labels = skvm->GetKnownVirtualMarkerLabelsForAxes();
-    int num = 19;
+    size_t num = 19;
     TS_ASSERT_EQUALS(labels.size(), num);
     std::list<btk::SeparateKnownVirtualMarkersFilter::StringAxes>::const_iterator it = labels.begin();
     if (labels.size() >= num)

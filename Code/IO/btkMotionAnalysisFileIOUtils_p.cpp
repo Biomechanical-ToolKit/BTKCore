@@ -258,6 +258,7 @@ namespace btk
                               const std::vector<uint16_t>& channelRange, 
                               const std::string& boardType, int bitDepth, int gen)
   {
+    btkNotUsed(channelRate);
     output->Init(0, static_cast<int>(frameNumber), static_cast<int>(channelNumber));
     output->SetPointFrequency(preciseRate);
     Acquisition::MetaDataIterator itAnalog = output->GetMetaData()->FindChild("ANALOG");
@@ -348,7 +349,7 @@ namespace btk
       size_t numMaxChannel = 0;
       for (std::vector< std::vector<int16_t> >::const_iterator it = fpChan.begin() ; it != fpChan.end() ; ++it)
       {
-        if (numMaxChannel < static_cast<int>(it->size()))
+        if (numMaxChannel < it->size())
           numMaxChannel = it->size();
       }
       std::vector<int16_t> channel(numFp * numMaxChannel, -32768); // 65535: default value for unknown channel.

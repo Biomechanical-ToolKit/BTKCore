@@ -184,7 +184,8 @@ namespace btk
    */
   DataObject::Pointer AcquisitionFileWriter::MakeOutput(int idx)
   {
-    throw(RuntimeError("btk::AcquisitionFileWriter has not ouput."));
+    btkNotUsed(idx);
+    throw(RuntimeError("btk::AcquisitionFileWriter has not output."));
   };
   
   /**

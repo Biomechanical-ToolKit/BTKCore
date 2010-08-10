@@ -110,7 +110,7 @@ namespace btk
   /**
    * Generate force platform geometry.
    */
-  int VTKForcePlatformsSource::RequestData(vtkInformation* request,
+  int VTKForcePlatformsSource::RequestData(vtkInformation* vtkNotUsed(request),
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector)
   {

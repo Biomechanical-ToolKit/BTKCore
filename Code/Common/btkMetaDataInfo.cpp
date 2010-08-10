@@ -325,7 +325,7 @@ namespace btk
    */
   void MetaDataInfo::ResizeDimensions(int nb)
   {
-    if (nb == this->m_Dims.size())
+    if (nb == static_cast<int>(this->m_Dims.size()))
       return;
     if (nb < static_cast<int>(this->m_Dims.size()))
     {

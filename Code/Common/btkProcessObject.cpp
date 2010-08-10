@@ -275,7 +275,7 @@ namespace btk
    */
   void ProcessObject::SetInputNumber(int num)
   {
-    if (num == this->m_Inputs.size())
+    if (num == static_cast<int>(this->m_Inputs.size()))
       return;
     if (num < 0)
     {
@@ -352,7 +352,7 @@ namespace btk
    */
   void ProcessObject::SetOutputNumber(int num)
   {
-    if (num == this->m_Outputs.size())
+    if (num == static_cast<int>(this->m_Outputs.size()))
       return;
     if (num < 0)
     {

@@ -648,7 +648,7 @@ namespace btk
             itChan = fpChanList.erase(itChan);
             continue;
           }
-          if (channel->GetValues().size() == (chanNumber * usedNumber))
+          if (static_cast<int>(channel->GetValues().size()) == (chanNumber * usedNumber))
           {
             (*itConfig)->AppendChild((*itChan)->GetChild("CHANNEL"));
             this->UpdateForcePlatformMetaData(out, *itConfig);

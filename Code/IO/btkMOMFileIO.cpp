@@ -153,7 +153,7 @@ namespace btk
         data[0 + side * 3]->GetValues().coeffRef(inc, axis) = bifs.ReadFloat() * 1000.0; // Conversion in Nmm
         data[1 + side * 3]->GetValues().coeffRef(inc, axis) = bifs.ReadFloat() * 1000.0;
         data[2 + side * 3]->GetValues().coeffRef(inc, axis) = bifs.ReadFloat() * 1000.0;
-        double foo = bifs.ReadFloat(); // ...
+        bifs.ReadFloat(); // ...
 
         ++side;
         if (side >= 2)
@@ -220,6 +220,8 @@ namespace btk
    */
   void MOMFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
+    btkNotUsed(filename);
+    btkNotUsed(input);
     /*
     if (input.get() == 0)
     {

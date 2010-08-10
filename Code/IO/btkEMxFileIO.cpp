@@ -246,6 +246,8 @@ namespace btk
    */
   void EMxFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
+    btkNotUsed(filename);
+    btkNotUsed(input);
     /*
     if (input.get() == 0)
     {

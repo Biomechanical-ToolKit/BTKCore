@@ -42,7 +42,7 @@ namespace btk
 {
   void ReadEliteHeader_p(Acquisition::Pointer output, IEEELittleEndianBinaryFileStream* bifs, bool extractEvents)
   {
-    int numCam = bifs->ReadU16();
+    bifs->ReadU16(); // Camera number
     int numFra = bifs->ReadU16();
     int numMkr = bifs->ReadU16();
     // 4 types of events:

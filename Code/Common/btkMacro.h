@@ -56,6 +56,12 @@
 #define XSTR(x) STR(x)
 
 /**
+ * Macro to use when an input is not used in the function.
+ * Usefull when the compiler gives you a warning to say that the variable is not used.
+ */
+#define btkNotUsed(x) (void)x;
+
+/**
  * This macro is used to print error message with the following format:
  * <source> (<line>): <message>
  */

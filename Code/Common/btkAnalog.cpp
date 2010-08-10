@@ -139,7 +139,7 @@ namespace btk
    */
   void Analog::SetGain(Gain g)
   {
-    if (this->m_Gain = g)
+    if (this->m_Gain == g)
       return;
     this->m_Gain = g;
     this->Modified();
