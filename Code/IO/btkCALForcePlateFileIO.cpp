@@ -88,7 +88,7 @@ namespace btk
    */
   bool CALForcePlateFileIO::CanReadFile(const std::string& filename)
   {
-    std::ifstream ifs(filename.c_str());
+    std::ifstream ifs(filename.c_str(), std::ios_base::in);
     int index = 0;
     bool ok = true;
     if (!(ifs >> index))
@@ -97,13 +97,6 @@ namespace btk
     
     if (ok && (index != 1))
       ok = false;
-    /*
-    char c[2];
-    ifs.read(c, 1); c[1] = '\0';
-    ifs.close();
-    if (strcmp(c,"1") != 0)
-      return false;
-    */
     return ok;
   };
   

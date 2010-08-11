@@ -37,6 +37,7 @@
 
 // C3D File IO
 #include "btkC3DFileIO.h"
+
 // Motion Analysis Corp IOs
 #include "btkANBFileIO.h"
 #include "btkANCFileIO.h"
@@ -145,7 +146,6 @@ namespace btk
       //if (io->CanWriteFile(filename)) return io;
       //io = XLSOrthotrackFileIO::New();
       //if (io->CanWriteFile(filename)) return io;
-      
     }
     return AcquisitionFileIO::Pointer();
   };

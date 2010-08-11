@@ -135,17 +135,13 @@ namespace btk
    */
   bool ANBFileIO::CanReadFile(const std::string& filename)
   {
-    std::fstream ifs;
-    ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
+    bool isReadable = true;
+    IEEELittleEndianBinaryFileStream bifs(filename, BinaryFileStream::In);
     // Three first words: 0x0000 0000 0080
-    IEEELittleEndianBinaryFileStream bifs(ifs);
-    if (bifs.ReadI16() != 0)
-      return false;
-    if (bifs.ReadI16() != 0)
-      return false;
-    if (bifs.ReadU16() != 32768)
-      return false;
-    return true;
+    if ((bifs.ReadI16() != 0x0000) || (bifs.ReadI16() != 0x000) || (bifs.ReadU16() != 0x8000))
+      isReadable = false;
+    bifs.Close();
+    return isReadable;
   };
   
   /**
@@ -168,12 +164,11 @@ namespace btk
   void ANBFileIO::Read(const std::string& filename, Acquisition::Pointer output)
   {
     output->Reset();
-    std::fstream ifs;
-    ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
+    IEEELittleEndianBinaryFileStream bifs;
+    bifs.SetExceptions(BinaryFileStream::EndFileBit | BinaryFileStream::FailBit | BinaryFileStream::BadBit);
     try
     {
-      ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-      IEEELittleEndianBinaryFileStream bifs(ifs);
+      bifs.Open(filename, BinaryFileStream::In);
       if ((bifs.ReadI16() != 0) || (bifs.ReadI16() != 0))
         throw ANBFileIOException("Invalid ANB file.");
       // Header
@@ -238,41 +233,41 @@ namespace btk
         }
       }
     }
-    catch (std::fstream::failure& )
+    catch (BinaryFileStreamException& )
     {
       std::string excmsg; 
-      if (ifs.eof())
+      if (bifs.EndFile())
         excmsg = "Unexpected end of file.";
-      else if (!ifs.is_open())
+      else if (!bifs.IsOpen())
         excmsg = "Invalid file path.";
-      else if(ifs.bad())
+      else if(bifs.Bad())
         excmsg = "Loss of integrity of the filestream.";
-      else if(ifs.fail())
+      else if(bifs.Fail())
         excmsg = "Internal logic operation error on the stream associated with the file.";
       else
         excmsg = "Unknown error associated with the filestream.";
       
-      if (ifs.is_open()) ifs.close();
+      if (bifs.IsOpen()) bifs.Close();
       throw(ANBFileIOException(excmsg));
     }
     catch (ANBFileIOException& )
     {
-      if (ifs.is_open()) ifs.close();
+      if (bifs.IsOpen()) bifs.Close();
       throw;
     }
     catch (ANxFileIOException& e)
     {
-      if (ifs.is_open()) ifs.close();
+      if (bifs.IsOpen()) bifs.Close();
       throw(ANBFileIOException(e.what()));
     }
     catch (std::exception& e)
     {
-      if (ifs.is_open()) ifs.close();
+      if (bifs.IsOpen()) bifs.Close();
       throw(ANBFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
-      if (ifs.is_open()) ifs.close();
+      if (bifs.IsOpen()) bifs.Close();
       throw(ANBFileIOException("Unknown exception"));
     }
   };
@@ -287,14 +282,13 @@ namespace btk
       btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
       return;
     }
-    std::fstream ofs;
+    IEEELittleEndianBinaryFileStream bofs;
     try
     {
       // File access
-      ofs.open(filename.c_str(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-      if (!ofs.is_open())
+      bofs.Open(filename, BinaryFileStream::Out | BinaryFileStream::Truncate);
+      if (!bofs.IsOpen())
         throw(ANBFileIOException("No File access"));
-      IEEELittleEndianBinaryFileStream bofs(ofs);
       
       // Header part
       // 0x0000 0000
@@ -384,10 +378,10 @@ namespace btk
       for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
         counter += this->WriteKeyValue(&bofs, 0x0107, (*it)->GetLabel(), true);
       // Back to the key 0x8000 and rewrite it
-      bofs.SeekWrite(4, std::ios_base::beg);
+      bofs.SeekWrite(4, BinaryFileStream::Begin);
       this->WriteKeyValue(&bofs, 0x8000, static_cast<uint32_t>(counter / 4));
       // Back to the last wrote byte
-      bofs.SeekWrite(counter, std::ios_base::beg);
+      bofs.SeekWrite(counter, BinaryFileStream::Begin);
       
       // Data part
       bofs.Fill(4);
@@ -402,17 +396,17 @@ namespace btk
     }
     catch (ANBFileIOException& )
     {
-      if (ofs.is_open()) ofs.close();
+      if (bofs.IsOpen()) bofs.Close();
       throw;
     }
     catch (std::exception& e)
     {
-      if (ofs.is_open()) ofs.close();
+      if (bofs.IsOpen()) bofs.Close();
       throw(ANBFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
-      if (ofs.is_open()) ofs.close();
+      if (bofs.IsOpen()) bofs.Close();
       throw(ANBFileIOException("Unknown exception"));
     }
   };

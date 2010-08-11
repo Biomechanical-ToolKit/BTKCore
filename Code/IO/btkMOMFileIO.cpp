@@ -96,9 +96,8 @@ namespace btk
     std::string::size_type MOMPos = lowercase.rfind(".mom");
     if ((MOMPos != std::string::npos) && (MOMPos == lowercase.length() - 4))
     {
-      std::ifstream ifs;
-      ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-      if (!ifs.is_open())
+      std::ifstream ifs(filename.c_str(), std::ios_base::in | std::ios_base::binary);
+      if (!ifs)
         return false;
       ifs.close();
       return true;
@@ -126,12 +125,11 @@ namespace btk
   void MOMFileIO::Read(const std::string& filename, Acquisition::Pointer output)
   {
     output->Reset();
-    std::fstream ifs;
-    ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
+    IEEELittleEndianBinaryFileStream bifs;
+    bifs.SetExceptions(BinaryFileStream::EndFileBit | BinaryFileStream::FailBit | BinaryFileStream::BadBit);
     try
     {
-      ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-      IEEELittleEndianBinaryFileStream bifs(ifs);
+      bifs.Open(filename, BinaryFileStream::In);
       ReadEliteHeader_p(output, &bifs);
       
       // Frontal (Hip, Knee, Ankle)     \    Hip (F,T,S)
@@ -181,36 +179,36 @@ namespace btk
         }
       }
     }
-    catch (std::fstream::failure& )
+    catch (BinaryFileStreamException& )
     {
       std::string excmsg; 
-      if (ifs.eof())
+      if (bifs.EndFile())
         excmsg = "Unexpected end of file.";
-      else if (!ifs.is_open())
+      else if (!bifs.IsOpen())
         excmsg = "Invalid file path.";
-      else if(ifs.bad())
+      else if(bifs.Bad())
         excmsg = "Loss of integrity of the filestream.";
-      else if(ifs.fail())
+      else if(bifs.Fail())
         excmsg = "Internal logic operation error on the stream associated with the file.";
       else
         excmsg = "Unknown error associated with the filestream.";
       
-      if (ifs.is_open()) ifs.close();    
+      if (bifs.IsOpen()) bifs.Close();    
       throw(MOMFileIOException(excmsg));
     }
     catch (MOMFileIOException& )
     {
-      if (ifs.is_open()) ifs.close(); 
+      if (bifs.IsOpen()) bifs.Close(); 
       throw;
     }
     catch (std::exception& e)
     {
-      if (ifs.is_open()) ifs.close(); 
+      if (bifs.IsOpen()) bifs.Close(); 
       throw(MOMFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
-      if (ifs.is_open()) ifs.close(); 
+      if (bifs.IsOpen()) bifs.Close(); 
       throw(MOMFileIOException("Unknown exception"));
     }
   };

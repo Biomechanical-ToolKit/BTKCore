@@ -209,15 +209,12 @@ namespace btk
    */
   bool C3DFileIO::CanReadFile(const std::string& filename)
   {
-    std::ifstream ifs;
-    ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-    char parameterFirstBlock = 0, headerKey = 0;
-    ifs.read(&parameterFirstBlock, 1);
-    ifs.read(&headerKey, 1);
-    ifs.close();
-    if (parameterFirstBlock <= 0 || headerKey != 80) 
-      return false;
-    return true;
+    bool isReadable = true;
+    NativeBinaryFileStream ifs(filename, BinaryFileStream::In);
+    if ((ifs.ReadI8() <= 0) || (ifs.ReadI8() != 80))
+      isReadable = false;
+    ifs.Close();
+    return isReadable;
   };
   
   /**
@@ -241,44 +238,42 @@ namespace btk
   {
     output->Reset();
     // Open the stream
-    std::fstream ifs;
-    BinaryFileStream* ibfs = 0;
+    BinaryFileStream* ibfs = new NativeBinaryFileStream();
     Format* fdf = 0; // C3D file data format
-    ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
+    ibfs->SetExceptions(BinaryFileStream::EndFileBit | BinaryFileStream::FailBit | BinaryFileStream::BadBit);
     try
     {
     // Binary stream selection
-      ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-      char buf;
-      ifs.read(&buf, 1);
-      ifs.seekg(512 * (static_cast<uint8_t>(buf) - 1) + 3, std::ios_base::beg);
-      ifs.read(&buf, 1);
-      switch (static_cast<int8_t>(buf) - 83)
-      {
-        case IEEE_LittleEndian : // IEEE LE (Intel)
-          this->SetByteOrder(IEEE_LittleEndian);
-          ibfs = new IEEELittleEndianBinaryFileStream(ifs);
-          break;
-        case VAX_LittleEndian : // VAX LE (DEC)
-          this->SetByteOrder(VAX_LittleEndian);
-          ibfs = new VAXLittleEndianBinaryFileStream(ifs);
-          break;
-        case IEEE_BigEndian : // IEEE BE (MIPS)
-          this->SetByteOrder(IEEE_BigEndian);
-          ibfs = new IEEEBigEndianBinaryFileStream(ifs);
-          break;
-        default :
-          ifs.close();
-          throw(C3DFileIOException("Invalid processor type"));
-          break;
-      };
-      ibfs->SeekRead(0, std::ios_base::beg);
+      ibfs->Open(filename, BinaryFileStream::In);
       int8_t parameterFirstBlock = ibfs->ReadI8();
-      uint8_t firstBlock = 1;
       if (parameterFirstBlock <= 0)
         throw(C3DFileIOException("Bad parameter first block number"));
       if (ibfs->ReadI8() != 80)
         throw(C3DFileIOException("Bad header key"));
+      ibfs->SeekRead(512 * (parameterFirstBlock - 1) + 3, BinaryFileStream::Begin);
+      BinaryFileStream* oldBFS = ibfs;
+      switch (ibfs->ReadI8() - 83)
+      {
+        case IEEE_LittleEndian : // IEEE LE (Intel)
+          this->SetByteOrder(IEEE_LittleEndian);
+          ibfs = new IEEELittleEndianBinaryFileStream();
+          break;
+        case VAX_LittleEndian : // VAX LE (DEC)
+          this->SetByteOrder(VAX_LittleEndian);
+          ibfs = new VAXLittleEndianBinaryFileStream();
+          break;
+        case IEEE_BigEndian : // IEEE BE (MIPS)
+          this->SetByteOrder(IEEE_BigEndian);
+          ibfs = new IEEEBigEndianBinaryFileStream();
+          break;
+        default :
+          throw(C3DFileIOException("Invalid processor type"));
+          break;
+      };
+      ibfs->SwapStream(oldBFS);
+      delete oldBFS;
+      ibfs->SeekRead(2, BinaryFileStream::Begin);
+      uint8_t firstBlock = 1;
       uint16_t pointNumber = 0,
                totalAnalogSamplesPer3dFrame = 0,
                dataFirstBlock = 0, 
@@ -299,7 +294,7 @@ namespace btk
         dataFirstBlock = ibfs->ReadU16(); // (word 09)
         numberSamplesPerAnalogChannel = ibfs->ReadU16(); // (word 10)
         pointFrameRate = ibfs->ReadFloat(); // (word 11-12)
-        ibfs->SeekRead(270, std::ios_base::cur); // word 13-147 => 135 word 
+        ibfs->SeekRead(270, BinaryFileStream::Current); // word 13-147 => 135 word 
     // Event in Header section
         const int maxEvents = 18;
         uint16_t labelRangeSection = ibfs->ReadU16(); // (word 148)
@@ -316,7 +311,7 @@ namespace btk
         output->SetEventNumber(eventNumber); // (word 151)
         if (eventNumber != 0)
         {
-          ibfs->SeekRead(2, std::ios_base::cur); // (word 152)
+          ibfs->SeekRead(2, BinaryFileStream::Current); // (word 152)
           EventCollection::Iterator it = events->Begin();
           while(it != events->End())
           {
@@ -324,10 +319,10 @@ namespace btk
             (*it)->SetFrame(static_cast<int>((*it)->GetTime() * pointFrameRate) + 1);
             ++it;
           }
-          ibfs->SeekRead((maxEvents * 4) - (eventNumber * 4), std::ios_base::cur);
+          ibfs->SeekRead((maxEvents * 4) - (eventNumber * 4), BinaryFileStream::Current);
           // No need to read event's activation status.
-          ibfs->SeekRead(maxEvents, std::ios_base::cur);
-          ibfs->SeekRead(2, std::ios_base::cur); // (word 198)
+          ibfs->SeekRead(maxEvents, BinaryFileStream::Current);
+          ibfs->SeekRead(2, BinaryFileStream::Current); // (word 198)
           it = events->Begin();
           if (labelEventFormat == 12345)
           {
@@ -353,7 +348,7 @@ namespace btk
           }
         }
     // Parameter
-        ibfs->SeekRead((512 * (parameterFirstBlock - 1)), std::ios_base::beg);
+        ibfs->SeekRead((512 * (parameterFirstBlock - 1)), BinaryFileStream::Begin);
         firstBlock = ibfs->ReadU8();
         // Some file doesn't respect the parameter key (equal to 80) 
         // if (ibfs->ReadI8() != 80) throw(C3DFileIOException("Bad parameter Key"));
@@ -364,7 +359,7 @@ namespace btk
       size_t totalBytesRead = 4; // the four bytes read previously.
       if (firstBlock > 1)
       {
-        ibfs->SeekRead((512 * (firstBlock - 1) - 4), std::ios_base::cur);
+        ibfs->SeekRead((512 * (firstBlock - 1) - 4), BinaryFileStream::Current);
         totalBytesRead += (512 * (firstBlock - 1) - 4);
       }
       int8_t nbCharLabel = 0;
@@ -462,7 +457,7 @@ namespace btk
         }
         if (lastEntry)
           break; // Parameter section end
-        ibfs->SeekRead(offset, std::ios_base::cur);
+        ibfs->SeekRead(offset, BinaryFileStream::Current);
       }
       std::list<MetaData::Pointer>::iterator itParameter = parameters.begin();
       MetaData::Iterator itGroup = root->Begin();
@@ -558,7 +553,7 @@ namespace btk
       {
         if (dataFirstBlock < (parameterFirstBlock + (firstBlock != 0 ? (firstBlock - 1) : 0) + blockNumber))
           throw(C3DFileIOException("Bad data first block"));
-        ibfs->SeekRead((512 * (dataFirstBlock - 1)), std::ios_base::beg);
+        ibfs->SeekRead((512 * (dataFirstBlock - 1)), BinaryFileStream::Begin);
         if (numberSamplesPerAnalogChannel == 0)
           numberSamplesPerAnalogChannel = 1;
         uint16_t analogNumber = totalAnalogSamplesPer3dFrame / numberSamplesPerAnalogChannel;
@@ -917,21 +912,21 @@ namespace btk
         }
       }
     }
-    catch (std::fstream::failure& )
+    catch (BinaryFileStreamException& )
     {
       std::string excmsg; 
-      if (!ifs.is_open())
+      if (!ibfs->IsOpen())
         excmsg = "Invalid file path";
-      else if (ifs.eof())
+      else if (ibfs->EndFile())
         excmsg = "Unexpected end of file";
-      else if(ifs.bad())
+      else if(ibfs->Bad())
         excmsg = "Loss of integrity of the filestream";
-      else if(ifs.fail())
+      else if(ibfs->Fail())
         excmsg = "Internal logic operation error on the stream associated with the file";
       else
         excmsg = "Unknown error associated with the filestream";
       
-      if (ifs.is_open()) ifs.close();     
+      //if (ifs.is_open()) ifs.close();     
       if (ibfs) delete ibfs;
       if (fdf) delete fdf;
       throw(C3DFileIOException(excmsg));
@@ -974,7 +969,6 @@ namespace btk
       return;
     }
 
-    std::fstream ofs;
     BinaryFileStream* obfs = 0;
     Format* fdf = 0; // C3D file data format
     try
@@ -983,22 +977,21 @@ namespace btk
       switch(this->GetByteOrder())
       {
         case IEEE_LittleEndian : // IEEE LE (Intel)
-          obfs = new IEEELittleEndianBinaryFileStream(ofs);
+          obfs = new IEEELittleEndianBinaryFileStream();
           break;
         case VAX_LittleEndian : // VAX LE (DEC)
-          obfs = new VAXLittleEndianBinaryFileStream(ofs);
+          obfs = new VAXLittleEndianBinaryFileStream();
           break;
         case IEEE_BigEndian : // IEEE BE (MIPS)
-          obfs = new IEEEBigEndianBinaryFileStream(ofs);
+          obfs = new IEEEBigEndianBinaryFileStream();
           break;
         default :
-          ofs.close();
           throw(C3DFileIOException("Invalid processor type"));
           break;
       }
       // File access
-      ofs.open(filename.c_str(), std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
-      if (!ofs.is_open())
+      obfs->Open(filename, BinaryFileStream::Out | BinaryFileStream::Truncate);
+      if (!obfs->IsOpen())
         throw(C3DFileIOException("No File access"));
       
       // Update data in the acquisition
@@ -1129,10 +1122,10 @@ namespace btk
         // DATA_START is reinserted.
         //in->GetMetaData()->GetChild(pointID - 1)->AppendChild(dataStart);
         // Back to the parameter: number of blocks
-        obfs->SeekWrite(512 * (2 - 1) + 2, std::ios_base::beg);
+        obfs->SeekWrite(512 * (2 - 1) + 2, BinaryFileStream::Begin);
         obfs->Write(pNB);
         // Back to the header: data first block
-        obfs->SeekWrite(16, std::ios_base::beg);
+        obfs->SeekWrite(16, BinaryFileStream::Begin);
         obfs->Write(dS);
       }
       else
@@ -1140,7 +1133,7 @@ namespace btk
         writtenBytes += obfs->Fill(512 - (writtenBytes % 512));
         uint8_t pNB = static_cast<uint8_t>(writtenBytes / 512);
         // Back to the parameter: number of blocks
-        obfs->SeekWrite(2, std::ios_base::beg);
+        obfs->SeekWrite(2, BinaryFileStream::Begin);
         obfs->Write(pNB);
       }
       if (writtenBytes > (255 * 512)) // 255 * 512 = max size
@@ -1148,7 +1141,7 @@ namespace btk
       // -= DATA =-
       if (!templateFile)
       {
-        obfs->SeekWrite(512 * (dS - 1), std::ios_base::beg);
+        obfs->SeekWrite(512 * (dS - 1), BinaryFileStream::Begin);
         if (this->m_StorageFormat == Integer) // integer
         {
           if (this->m_AnalogIntegerFormat == Unsigned)

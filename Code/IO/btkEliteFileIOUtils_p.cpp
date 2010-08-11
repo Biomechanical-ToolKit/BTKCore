@@ -53,7 +53,7 @@ namespace btk
     // 12 events by type
     if (extractEvents)
     {
-      bifs->SeekRead(2, std::ios_base::cur); 
+      bifs->SeekRead(2, BinaryFileStream::Current); 
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
@@ -78,17 +78,17 @@ namespace btk
         if (f != 0xFFFF)
           output->AppendEvent(Event::New("Foot Strike", f, "Right"));
       }
-      bifs->SeekRead(136, std::ios_base::cur); 
+      bifs->SeekRead(136, BinaryFileStream::Current); 
     }
     else
-      bifs->SeekRead(234, std::ios_base::cur); 
+      bifs->SeekRead(234, BinaryFileStream::Current); 
     std::vector<int16_t> date = std::vector<int16_t>(3); // MM / DD / YYYY
     date[1] = bifs->ReadU16(); // day
     date[0] = bifs->ReadU16(); // month
     date[2] = bifs->ReadU16(); // year
-    bifs->SeekRead(184, std::ios_base::cur);
+    bifs->SeekRead(184, BinaryFileStream::Current);
     double framerate = static_cast<double>(bifs->ReadU16());
-    bifs->SeekRead(80, std::ios_base::cur);
+    bifs->SeekRead(80, BinaryFileStream::Current);
     
     output->Init(numMkr, numFra);
     output->SetPointFrequency(framerate);
@@ -113,7 +113,7 @@ namespace btk
       double y = bifs->ReadFloat();
       double z = bifs->ReadFloat();
       //double w = bifs->ReadFloat(); // What is w?
-      bifs->SeekRead(4, std::ios_base::cur);
+      bifs->SeekRead(4, BinaryFileStream::Current);
       
       if ((fabs(x + 9999.0) < std::numeric_limits<double>::epsilon())
           && (fabs(y + 9999.0) < std::numeric_limits<double>::epsilon())
@@ -138,7 +138,7 @@ namespace btk
       }
     }
     
-    bifs->SeekRead(512 - (output->GetPointFrameNumber() * output->GetPointNumber() * 16) % 512, std::ios_base::cur);
+    bifs->SeekRead(512 - (output->GetPointFrameNumber() * output->GetPointNumber() * 16) % 512, BinaryFileStream::Current);
   };
   
   void ReadEliteLabel_p(Acquisition::Pointer output, IEEELittleEndianBinaryFileStream* bifs)

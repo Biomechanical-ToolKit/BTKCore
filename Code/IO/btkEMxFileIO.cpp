@@ -96,9 +96,8 @@ namespace btk
     //std::string::size_type EMxPos = lowercase.substr(0,lowercase.length()-1).rfind(".em");
     //if ((EMxPos != std::string::npos) && (EMxPos == lowercase.length() - 4) && ((*(lowercase.rbegin()) == 'f') || (*(lowercase.rbegin()) == 'g')  || (*(lowercase.rbegin()) == 'r')))
     {
-      std::ifstream ifs;
-      ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-      if (!ifs.is_open())
+      std::ifstream ifs(filename.c_str(), std::ios_base::in | std::ios_base::binary);
+      if (!ifs)
         return false;
       ifs.close();
       return true;
@@ -128,14 +127,13 @@ namespace btk
   void EMxFileIO::Read(const std::string& filename, Acquisition::Pointer output)
   {
     output->Reset();
-    std::fstream ifs;
-    ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
+    IEEELittleEndianBinaryFileStream bifs;
+    bifs.SetExceptions(BinaryFileStream::EndFileBit | BinaryFileStream::FailBit | BinaryFileStream::BadBit);
     try
     {
-      ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-      IEEELittleEndianBinaryFileStream bifs(ifs);
+      bifs.Open(filename, BinaryFileStream::In);
       // Bytes 1-2: 0x0000
-      bifs.SeekRead(4, std::ios_base::cur);
+      bifs.SeekRead(4, BinaryFileStream::Current);
       int numFra = bifs.ReadU16() + bifs.ReadU16() * 1000;
       int numCha = bifs.ReadU16();
       double freq = static_cast<double>(bifs.ReadU16());
@@ -154,7 +152,7 @@ namespace btk
         // Saving
         (*it)->SetLabel(label);
       }
-      bifs.SeekRead((32 - numCha) * 8, std::ios_base::cur);
+      bifs.SeekRead((32 - numCha) * 8, BinaryFileStream::Current);
       // Scales (init)
       std::vector<double> scales = std::vector<double>(numCha, 1.0);
       int i = 0;
@@ -175,22 +173,22 @@ namespace btk
         ++i;
       }
       // General ADC gain?
-      bifs.SeekRead((32 - numCha) * 4, std::ios_base::cur);
+      bifs.SeekRead((32 - numCha) * 4, BinaryFileStream::Current);
       double adcGain = bifs.ReadU16();
       // Others unknown data ...
-      bifs.SeekRead(114, std::ios_base::cur);
+      bifs.SeekRead(114, BinaryFileStream::Current);
       // Analog channel settings
       // First parameter ... What is it?
-      bifs.SeekRead(32*2, std::ios_base::cur);
+      bifs.SeekRead(32*2, BinaryFileStream::Current);
       // Second parameter ... What is it?
-      bifs.SeekRead(32*2, std::ios_base::cur);
+      bifs.SeekRead(32*2, BinaryFileStream::Current);
       // Third parameter ... What is it?
-      bifs.SeekRead(32*2, std::ios_base::cur);
+      bifs.SeekRead(32*2, BinaryFileStream::Current);
       // Gain
       for (int i = 0 ; i < numCha ; ++i)
         scales[i] *= 20.0 / (4096.0 * adcGain * static_cast<double>(bifs.ReadU16()));
       // Scaled values
-      bifs.SeekRead(1024, std::ios_base::beg);
+      bifs.SeekRead(1024, BinaryFileStream::Begin);
       int inc = 0;
       i = 0;
       Acquisition::AnalogIterator it = output->BeginAnalog();
@@ -207,36 +205,36 @@ namespace btk
         }
       }
     }
-    catch (std::fstream::failure& )
+    catch (BinaryFileStreamException& )
     {
       std::string excmsg; 
-      if (ifs.eof())
+      if (bifs.EndFile())
         excmsg = "Unexpected end of file.";
-      else if (!ifs.is_open())
+      else if (!bifs.IsOpen())
         excmsg = "Invalid file path.";
-      else if(ifs.bad())
+      else if(bifs.Bad())
         excmsg = "Loss of integrity of the filestream.";
-      else if(ifs.fail())
+      else if(bifs.Fail())
         excmsg = "Internal logic operation error on the stream associated with the file.";
       else
         excmsg = "Unknown error associated with the filestream.";
       
-      if (ifs.is_open()) ifs.close();    
+      if (bifs.IsOpen()) bifs.Close();    
       throw(EMxFileIOException(excmsg));
     }
     catch (EMxFileIOException& )
     {
-      if (ifs.is_open()) ifs.close(); 
+      if (bifs.IsOpen()) bifs.Close(); 
       throw;
     }
     catch (std::exception& e)
     {
-      if (ifs.is_open()) ifs.close(); 
+      if (bifs.IsOpen()) bifs.Close(); 
       throw(EMxFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
-      if (ifs.is_open()) ifs.close(); 
+      if (bifs.IsOpen()) bifs.Close(); 
       throw(EMxFileIOException("Unknown exception"));
     }
   };

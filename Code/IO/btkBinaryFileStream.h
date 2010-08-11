@@ -36,6 +36,7 @@
 #ifndef __btkBinaryFileStream_h
 #define __btkBinaryFileStream_h
 
+// Check if the processor is supported
 #if defined _MSC_VER
   #if defined _M_IX86 || defined _M_X64
     #define PROCESSOR_TYPE 1 /* IEEE_LittleEndian */
@@ -70,19 +71,60 @@
   #include <stdint.h>
 #endif
 
+// btkChooseNativeBinaryFileStream macro
+#if PROCESSOR_TYPE == 1
+  #define btkChooseNativeBinaryFileStream IEEELittleEndianBinaryFileStream
+#elif PROCESSOR_TYPE == 2
+  #define btkChooseNativeBinaryFileStream VAXLittleEndianBinaryFileStream
+#elif PROCESSOR_TYPE == 3
+  #define btkChooseNativeBinaryFileStream IEEEBigEndianBinaryFileStream
+#else
+  #error Unknown processor type
+#endif
+
 namespace btk
 {
+  typedef std::fstream::failure BinaryFileStreamException;
+  
   class BinaryFileStream
   {
   public:
-    explicit BinaryFileStream(std::fstream& fstream) : mr_Fstream(fstream) {};
+    typedef std::ios_base::iostate IOState;
+    static const IOState EndFileBit = std::ios_base::eofbit;
+    static const IOState FailBit = std::ios_base::failbit;
+    static const IOState BadBit = std::ios_base::badbit;
+    static const IOState GoodBit = std::ios_base::goodbit;
+    
+    typedef std::ios_base::openmode OpenMode;
+    static const OpenMode In = std::ios_base::in;
+    static const OpenMode Out = std::ios_base::out;
+    static const OpenMode Truncate = std::ios_base::trunc;
+    
+    typedef std::ios_base::seekdir SeekDir;
+    static const SeekDir Begin = std::ios_base::beg;
+    static const SeekDir Current = std::ios_base::cur;
+    static const SeekDir End = std::ios_base::end;
+    
+    typedef std::streampos StreamPosition;
+    typedef std::streamoff StreamOffset;
     
     virtual ~BinaryFileStream()
     {
-      if (this->mr_Fstream.is_open())
-        this->mr_Fstream.close();
+      if (this->mp_Stream->is_open())
+        this->mp_Stream->close();
+      delete this->mp_Stream;
     };
-
+    
+    void Open(const std::string& filename, OpenMode mode) {this->mp_Stream->open(filename.c_str(), std::ios_base::binary | mode);};
+    bool IsOpen() const {return this->mp_Stream->is_open();};
+    void Close() {this->mp_Stream->close();};
+    bool EndFile() const {return this->mp_Stream->eof();};
+    bool Bad() const {return this->mp_Stream->bad();};
+    bool Fail() const {return this->mp_Stream->fail();};
+    void SetExceptions(IOState except) {this->mp_Stream->exceptions(except);};
+    
+    void SwapStream(BinaryFileStream* toSwap);
+    
     virtual char ReadChar();
     virtual const std::vector<char> ReadChar(size_t nb);
     virtual int8_t ReadI8();
@@ -97,10 +139,11 @@ namespace btk
     virtual const std::vector<float> ReadFloat(size_t nb);
     virtual const std::string ReadString(size_t nbChar);
     virtual const std::vector<std::string> ReadString(size_t nb, size_t nbChar);
-    virtual void SeekRead(size_t nb, std::ios_base::seekdir dir);
+    void SeekRead(StreamOffset offset, SeekDir dir) {this->mp_Stream->seekg(offset, dir);};
+    StreamPosition TellRead() const {return this->mp_Stream->tellg();};
     
-    virtual size_t Fill(size_t nb);
-    virtual void SeekWrite(size_t nb, std::ios_base::seekdir dir);
+    size_t Fill(size_t nb);
+    void SeekWrite(StreamOffset offset, SeekDir dir) {this->mp_Stream->seekp(offset, dir);};
     // Note: MSVC doesn't like the following commented methods.
     //       char and int8_t are the same for it...
     //virtual size_t Write(char c);
@@ -119,7 +162,10 @@ namespace btk
     virtual size_t Write(const std::vector<std::string>& rVectorString);
   
   protected:
-    std::fstream& mr_Fstream;
+    BinaryFileStream() {this->mp_Stream = new std::fstream();};
+    BinaryFileStream(const std::string& filename, OpenMode mode) {this->mp_Stream = new std::fstream(filename.c_str(), mode);};
+    
+    std::fstream* mp_Stream;
 
   private:
     BinaryFileStream(const BinaryFileStream& ); // Not implemented.
@@ -129,7 +175,8 @@ namespace btk
   class VAXLittleEndianBinaryFileStream : public BinaryFileStream
   {  
   public:
-    explicit VAXLittleEndianBinaryFileStream(std::fstream& rFsteam) : BinaryFileStream(rFsteam) {};
+    VAXLittleEndianBinaryFileStream() : BinaryFileStream() {};
+    VAXLittleEndianBinaryFileStream(const std::string& filename, OpenMode mode) : BinaryFileStream(filename, mode) {};
     // ~VAXLittleEndianBinaryFileStream(); // Implicit.  
     virtual int16_t ReadI16();
     using BinaryFileStream::ReadI16;
@@ -150,7 +197,8 @@ namespace btk
   class IEEELittleEndianBinaryFileStream : public BinaryFileStream
   {  
   public:
-    explicit IEEELittleEndianBinaryFileStream(std::fstream& rFsteam) : BinaryFileStream(rFsteam) {};
+    IEEELittleEndianBinaryFileStream() : BinaryFileStream() {};
+    IEEELittleEndianBinaryFileStream(const std::string& filename, OpenMode mode) : BinaryFileStream(filename, mode) {};
     // ~IEEELittleEndianBinaryFileStream(); // Implicit.  
     virtual int16_t ReadI16(); 
     using BinaryFileStream::ReadI16;
@@ -171,7 +219,8 @@ namespace btk
   class IEEEBigEndianBinaryFileStream : public BinaryFileStream
   {  
   public:
-    explicit IEEEBigEndianBinaryFileStream(std::fstream& rFsteam) : BinaryFileStream(rFsteam) {};
+    IEEEBigEndianBinaryFileStream() : BinaryFileStream() {};
+    IEEEBigEndianBinaryFileStream(const std::string& filename, OpenMode mode) : BinaryFileStream(filename, mode) {};
     // ~IEEEBigEndianBinaryFileStream(); // Implicit.  
     virtual int16_t ReadI16();
     using BinaryFileStream::ReadI16;
@@ -187,6 +236,17 @@ namespace btk
   private:
     IEEEBigEndianBinaryFileStream(const IEEEBigEndianBinaryFileStream& ); // Not implemented.
     IEEEBigEndianBinaryFileStream& operator=(const IEEEBigEndianBinaryFileStream& ); // Not implemented.
+  };
+  
+  class NativeBinaryFileStream : public btkChooseNativeBinaryFileStream
+  {
+  public:
+    NativeBinaryFileStream() : btkChooseNativeBinaryFileStream() {};
+    NativeBinaryFileStream(const std::string& filename, OpenMode mode) : btkChooseNativeBinaryFileStream(filename, mode) {};
+    // ~NativeBinaryFileStream(); // Implicit.
+  private:
+    NativeBinaryFileStream(const NativeBinaryFileStream& ); // Not implemented.
+    NativeBinaryFileStream& operator=(const NativeBinaryFileStream& ); // Not implemented.
   };
 };
 

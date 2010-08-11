@@ -132,19 +132,13 @@ namespace btk
    */
   bool TRBFileIO::CanReadFile(const std::string& filename)
   {
-    std::fstream ifs;
-    ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
+    bool isReadable = true;
     // Three first words: 0x0000 0000 FFFF FFFF
-    IEEELittleEndianBinaryFileStream bifs(ifs);
-    if (bifs.ReadI16() != 0x0000)
-      return false;
-    if (bifs.ReadI16() != 0x0000)
-      return false;
-    if (bifs.ReadU16() != 0xFFFF)
-      return false;
-    if (bifs.ReadU16() != 0xFFFF)
-      return false;
-    return true;
+    IEEELittleEndianBinaryFileStream bifs(filename, BinaryFileStream::In);
+    if ((bifs.ReadI16() != 0x0000) || (bifs.ReadI16() != 0x0000) || (bifs.ReadU16() != 0xFFFF) || (bifs.ReadU16() != 0xFFFF))
+      isReadable = false;
+    bifs.Close();
+    return isReadable;
   };
   
   /**
@@ -167,12 +161,12 @@ namespace btk
   void TRBFileIO::Read(const std::string& filename, Acquisition::Pointer output)
   {
     output->Reset();
-    std::fstream ifs;
-    ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
+    IEEELittleEndianBinaryFileStream bifs;
+    bifs.SetExceptions(BinaryFileStream::EndFileBit | BinaryFileStream::FailBit | BinaryFileStream::BadBit);
     try
     {
-      ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-      IEEELittleEndianBinaryFileStream bifs(ifs);
+      bifs.Open(filename, BinaryFileStream::In);
+      
       if ((bifs.ReadI16() != 0x0000) || (bifs.ReadI16() != 0x0000) || (bifs.ReadU16() != 0xFFFF) ||  (bifs.ReadU16() != 0xFFFF))
         throw TRBFileIOException("Invalid header key.");
       // Header
@@ -217,14 +211,14 @@ namespace btk
       
       // Data
       // Go to the adress
-      bifs.SeekRead(dataAddress, std::ios_base::beg);
+      bifs.SeekRead(dataAddress, BinaryFileStream::Begin);
       // Get the size of the data
-      bifs.SeekRead(0, std::ios_base::end);
-      size_t dataSize = ifs.tellg();
+      bifs.SeekRead(0, BinaryFileStream::End);
+      size_t dataSize = bifs.TellRead();
       dataSize -= dataAddress;
       size_t dataSizeBis = dataSize;
       // Count the number of frames
-      bifs.SeekRead(dataAddress, std::ios_base::beg);
+      bifs.SeekRead(dataAddress, BinaryFileStream::Begin);
       int numFrames = -1;
       while (1)
       {
@@ -237,18 +231,18 @@ namespace btk
         dataSize -= offset * 4;
         if (dataSize <= 0)
           break;
-        bifs.SeekRead((offset - 2) * 4 - 2, std::ios_base::cur);
+        bifs.SeekRead((offset - 2) * 4 - 2, BinaryFileStream::Current);
       }
       
       // Initialize the acquisition
-      output->Init(indices.size(), numFrames);
+      output->Init(static_cast<int>(indices.size()), numFrames);
       output->SetPointFrequency(static_cast<double>(freq));
       output->SetFirstFrame(static_cast<int>(firstTime * freq) + 1);
-      bifs.SeekRead(dataAddress, std::ios_base::beg);
+      bifs.SeekRead(dataAddress, BinaryFileStream::Begin);
       // Construct a vector of indices to facilitate the coordinates' extraction
       // And set the markers' label
       std::vector<int> markerIndex = std::vector<int>(numMarkers, -1);
-      for (size_t i = 0 ; i < indices.size() ; ++i)
+      for (int i = 0 ; i < static_cast<int>(indices.size()) ; ++i)
       {
         output->GetPoint(i)->SetLabel(labels[i]);
         markerIndex[indices[i]] = i;
@@ -256,18 +250,18 @@ namespace btk
       //  Extract coordinates
       while (1)
       {
-        bifs.SeekRead(6, std::ios_base::cur); // 0x0000 00000 06000
+        bifs.SeekRead(6, BinaryFileStream::Current); // 0x0000 00000 06000
         index = bifs.ReadU16() - 1;
         offset = bifs.ReadU16() * 4;
         dataSizeBis -= offset;
-        bifs.SeekRead(2, std::ios_base::cur); // 0x0000
+        bifs.SeekRead(2, BinaryFileStream::Current); // 0x0000
         offset -= 12;  // Already 12 bytes read
         if (offset > 0)
         {
           while (1)
           {
             Point::Pointer point = output->GetPoint(markerIndex[bifs.ReadU16()-1]);
-            bifs.SeekRead(2, std::ios_base::cur); // 0x0000
+            bifs.SeekRead(2, BinaryFileStream::Current); // 0x0000
             point->GetValues().coeffRef(index,0) = bifs.ReadFloat(); // X
             point->GetValues().coeffRef(index,1) = bifs.ReadFloat(); // Y
             point->GetValues().coeffRef(index,2) = bifs.ReadFloat(); // Z
@@ -282,41 +276,41 @@ namespace btk
           break;
       }
     }
-    catch (std::fstream::failure& )
+    catch (BinaryFileStreamException& )
     {
       std::string excmsg; 
-      if (ifs.eof())
+      if (bifs.EndFile())
         excmsg = "Unexpected end of file.";
-      else if (!ifs.is_open())
+      else if (!bifs.IsOpen())
         excmsg = "Invalid file path.";
-      else if(ifs.bad())
+      else if(bifs.Bad())
         excmsg = "Loss of integrity of the filestream.";
-      else if(ifs.fail())
+      else if(bifs.Fail())
         excmsg = "Internal logic operation error on the stream associated with the file.";
       else
         excmsg = "Unknown error associated with the filestream.";
       
-      if (ifs.is_open()) ifs.close();
+      if (bifs.IsOpen()) bifs.Close(); 
       throw(TRBFileIOException(excmsg));
     }
     catch (TRBFileIOException& )
     {
-      if (ifs.is_open()) ifs.close();
+      if (bifs.IsOpen()) bifs.Close(); 
       throw;
     }
     catch (ANxFileIOException& e)
     {
-      if (ifs.is_open()) ifs.close();
+      if (bifs.IsOpen()) bifs.Close(); 
       throw(TRBFileIOException(e.what()));
     }
     catch (std::exception& e)
     {
-      if (ifs.is_open()) ifs.close();
+      if (bifs.IsOpen()) bifs.Close(); 
       throw(TRBFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
-      if (ifs.is_open()) ifs.close();
+      if (bifs.IsOpen()) bifs.Close(); 
       throw(TRBFileIOException("Unknown exception"));
     }
   };
@@ -326,32 +320,17 @@ namespace btk
    */
   void TRBFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
+    btkNotUsed(filename);
+    btkNotUsed(input);
+    /*
     if (input.get() == 0)
     {
       btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
       return;
     }
-    std::fstream ofs;
-    try
-    {
-      btkErrorMacro("Method not yet implemented.");
-      return;
-    }
-    catch (TRBFileIOException& )
-    {
-      if (ofs.is_open()) ofs.close();
-      throw;
-    }
-    catch (std::exception& e)
-    {
-      if (ofs.is_open()) ofs.close();
-      throw(TRBFileIOException("Unexpected exception occurred: " + std::string(e.what())));
-    }
-    catch(...)
-    {
-      if (ofs.is_open()) ofs.close();
-      throw(TRBFileIOException("Unknown exception"));
-    }
+    */
+    btkErrorMacro("Method not yet implemented.");
+    return;
   };
   
   /**

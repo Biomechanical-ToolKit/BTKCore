@@ -94,9 +94,8 @@ namespace btk
     std::string::size_type GRxPos = lowercase.substr(0,lowercase.length()-1).rfind(".gr");
     if ((GRxPos != std::string::npos) && (GRxPos == lowercase.length() - 4) && (*(lowercase.rbegin()) >= 0x31) && (*(lowercase.rbegin()) <= 0x39))
     {
-      std::ifstream ifs;
-      ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-      if (!ifs.is_open())
+      std::ifstream ifs(filename.c_str(), std::ios_base::in | std::ios_base::binary);
+      if (!ifs)
         return false;
       ifs.close();
       return true;
@@ -124,24 +123,23 @@ namespace btk
   void GRxFileIO::Read(const std::string& filename, Acquisition::Pointer output)
   {
     output->Reset();
-    std::fstream ifs;
-    ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
+    IEEELittleEndianBinaryFileStream bifs;
+    bifs.SetExceptions(BinaryFileStream::EndFileBit | BinaryFileStream::FailBit | BinaryFileStream::BadBit);
     try
     {
-      ifs.open(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-      IEEELittleEndianBinaryFileStream bifs(ifs);
+      bifs.Open(filename, BinaryFileStream::In);
       uint16_t numFra = bifs.ReadU16();
       double freq = static_cast<double>(bifs.ReadU16());
       // Some values between the bytes 0x05 and 0x49...
       // Bytes 50-51: Number of frames in the main acquisition + 1 and multiplied by 10...
       // Bytes 52-53: 0x00
-      bifs.SeekRead(50, std::ios_base::cur);
+      bifs.SeekRead(50, BinaryFileStream::Current);
       // Bytes 54-55: First frame 
       double ff = bifs.ReadU16();
       // Bytes 56-57: 0x00
       // Bytes 58-59: Last frame
       // Bytes 60-135 Other values ...
-      bifs.SeekRead(80, std::ios_base::cur);
+      bifs.SeekRead(80, BinaryFileStream::Current);
       // Bytes 136-139: Length
       double length = bifs.ReadFloat();
       // Bytes 140-143: Width
@@ -179,7 +177,7 @@ namespace btk
       channelData[0] = 1; channelData[1] = 2; channelData[2] = 3; channelData[3] = 4; channelData[4] = 5; channelData[5] = 6;
       MetaDataCreateChild(fp, "CHANNEL")->SetInfo(MetaDataInfo::New(channelDim, channelData));
       
-      bifs.SeekRead(512, std::ios_base::beg);
+      bifs.SeekRead(512, BinaryFileStream::Begin);
       btk::Wrench::Pointer fpw = btk::Wrench::New(numFra);
       for (int i = 0 ; i < output->GetPointFrameNumber() ; ++i)
       {
@@ -200,36 +198,36 @@ namespace btk
       output->GetAnalog(4)->SetLabel("Py" + str);
       output->GetAnalog(5)->SetLabel("Mz" + str);
     }
-    catch (std::fstream::failure& )
+    catch (BinaryFileStreamException& )
     {
       std::string excmsg; 
-      if (ifs.eof())
+      if (bifs.EndFile())
         excmsg = "Unexpected end of file.";
-      else if (!ifs.is_open())
+      else if (!bifs.IsOpen())
         excmsg = "Invalid file path.";
-      else if(ifs.bad())
+      else if(bifs.Bad())
         excmsg = "Loss of integrity of the filestream.";
-      else if(ifs.fail())
+      else if(bifs.Fail())
         excmsg = "Internal logic operation error on the stream associated with the file.";
       else
         excmsg = "Unknown error associated with the filestream.";
       
-      if (ifs.is_open()) ifs.close();    
+      if (bifs.IsOpen()) bifs.Close();    
       throw(GRxFileIOException(excmsg));
     }
     catch (GRxFileIOException& )
     {
-      if (ifs.is_open()) ifs.close(); 
+      if (bifs.IsOpen()) bifs.Close(); 
       throw;
     }
     catch (std::exception& e)
     {
-      if (ifs.is_open()) ifs.close(); 
+      if (bifs.IsOpen()) bifs.Close(); 
       throw(GRxFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
-      if (ifs.is_open()) ifs.close(); 
+      if (bifs.IsOpen()) bifs.Close(); 
       throw(GRxFileIOException("Unknown exception"));
     }
   };

@@ -163,8 +163,9 @@ namespace btk
   /**
    * Generate GRFs' vectors
    */
-  int VTKGRFsFramesSource::RequestInformation(vtkInformation* vtkNotUsed(request), vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+  int VTKGRFsFramesSource::RequestInformation(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
   {
+    btkNotUsed(request)
     // Convert a btk::PointCollection into a collection of polydata containing only vertices.
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -243,10 +244,12 @@ namespace btk
   /**
    * Extract GRFs frame required by a vtkStreamingDemandDrivenPipeline object.
    */
-  int VTKGRFsFramesSource::RequestData(vtkInformation* vtkNotUsed(request),
-                                       vtkInformationVector** vtkNotUsed(inputVector),
+  int VTKGRFsFramesSource::RequestData(vtkInformation* request,
+                                       vtkInformationVector** inputVector,
                                        vtkInformationVector* outputVector)
   {
+    btkNotUsed(request);
+    btkNotUsed(inputVector);
     vtkInformation* outInfo = outputVector->GetInformationObject(0);    
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
@@ -266,8 +269,9 @@ namespace btk
   };
 
   /*
-  int VTKGRFsFramesSource::RequestUpdateExtent(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+  int VTKGRFsFramesSource::RequestUpdateExtent(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
   {
+    btkNotUsed(request);
     vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
     vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
@@ -286,9 +290,10 @@ namespace btk
   /**
    * Sets the type of object required for the input.
    */
-  int VTKGRFsFramesSource::FillInputPortInformation(int /* port */, 
-                                                      vtkInformation* info)
+  int VTKGRFsFramesSource::FillInputPortInformation(int port, 
+                                                    vtkInformation* info)
   {
+    btkNotUsed(port);
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "VTKDataObjectAdapter");
     return 1;
   }

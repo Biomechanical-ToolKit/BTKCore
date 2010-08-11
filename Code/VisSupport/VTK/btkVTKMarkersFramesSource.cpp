@@ -461,10 +461,11 @@ namespace btk
   /**
    * Generate marker's position.
    */
-  int VTKMarkersFramesSource::RequestInformation(vtkInformation* vtkNotUsed(request), 
-                                                 vtkInformationVector** inputVector, 
+  int VTKMarkersFramesSource::RequestInformation(vtkInformation* request,
+                                                 vtkInformationVector** inputVector,
                                                  vtkInformationVector* outputVector)
   {
+    btkNotUsed(request)
     bool needUpdate = false;
     PointCollection::Pointer input = PointCollection::New();
     for (int i = 0 ; i < this->GetNumberOfInputPorts() ; ++i)
@@ -618,10 +619,12 @@ namespace btk
   /**
    * Extract markers' frame required by a vtkStreamingDemandDrivenPipeline object.
    */
-  int VTKMarkersFramesSource::RequestData(vtkInformation* vtkNotUsed(request),
-                                          vtkInformationVector** vtkNotUsed(inputVector),
+  int VTKMarkersFramesSource::RequestData(vtkInformation* request,
+                                          vtkInformationVector** inputVector,
                                           vtkInformationVector* outputVector)
   {
+    btkNotUsed(request);
+    btkNotUsed(inputVector);
     // positions
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -676,8 +679,9 @@ namespace btk
   };
 
   /*
-  int VTKMarkersFramesSource::RequestUpdateExtent(vtkInformation *vtkNotUsed(request), vtkInformationVector **inputVector, vtkInformationVector *outputVector)
+  int VTKMarkersFramesSource::RequestUpdateExtent(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector)
   {
+    btkNotUsed(request);
     vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
     vtkInformation *outInfo = outputVector->GetInformationObject(0);
 

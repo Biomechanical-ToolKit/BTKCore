@@ -46,36 +46,109 @@ namespace btk
    *
    * Especially, this file stream can:
    *   - read binary file encoded from a VAX (LE) and IEEE (LE, BE) processor ;
-   *   - write binary file in the used processor format.
+   *   - write binary file in the desired supported format from any supported processor format.
    *
-   * This class encapsulates a std::fstream which is already associated with a file 
-   * in a binary format.\n
-   * The following code presents the definion of input and output streams in binary format.
+   * The simplest way to use this binary file stream is to use the class btk::NativeBinaryFileStream.
+   * It creates a stream to read/write binary file encoded in the format of the porcessor used to compile the code.
+   * 
+   * As the file stream classes in the standard library you can indicates if the file is to read or
+   * write data. The following code presents the definion of input and output streams in binary format.
    * @code
-   *    std::fstream ifs, ofs;
-   *    ifs.open(filename, std::ios_base::in | std::ios_base::binary); // read
-   *    ifs.open(filename, std::ios_base::out | std::ios_base::binary); // write
+   *    btk::NativeBinaryFileStreamfstream ifs, ofs;
+   *    ifs.Open(filename, btk::BinaryFileStream::In); // read
+   *    ofs.Open(filename, btk::BinaryFileStream::Out); // write
    * @endcode
    * 
-   * This class doesn't have exception. It is necessary to set the 
-   * exception mask of the std::fstream. For example:
+   * This class has also exceptions. To use them, you have to set the exception mask.
+   * For example:
    * @code
-   *    std::fstream ifs;
-   *    ifs.exceptions ( std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
+   *    btk::NativeBinaryFileStreamfstream ifs;
+   *    ifs.SetExceptions (btk::BinaryFileStream::EndFileBit | btk::BinaryFileStream::FailBit | btk::BinaryFileStream::BadBit);
    * @endcode
    *
-   * @sa VAXLittleEndianBinaryFileStream, IEEELittleEndianBinaryFileStream, IEEEBigEndianBinaryFileStream
+   * @sa VAXLittleEndianBinaryFileStream, IEEELittleEndianBinaryFileStream, IEEEBigEndianBinaryFileStream, NativeBinaryFileStream
    *
    * @ingroup BTKIO
    */
   /**
-   * @var BinaryFileStream::mr_Fstream
+   * @typedef BinaryFileStreamException
+   * Exception for the BinaryFileStream class and inherited classes.
+   */
+  /**
+   * @typedef BinaryFileStream::IOState
+   * Bitmask type to represent stream error state flags.
+   */
+  /**
+   * @typedef BinaryFileStream::OpenMode
+   * Flags describing the requested I/O mode for the file. 
+   */
+  /**
+   * @typedef BinaryFileStream::SeekDir
+   * Flags representing the seeking direction of a stream seeking operation.
+   */
+  /**
+   * @typedef BinaryFileStream::StreamPosition
+   * Type to represent positions in a stream.
+   */
+  /**
+   * @typedef BinaryFileStream::StreamOffset
+   * Type to represent position offsets in a stream.
+   */
+  /**
+   * @var BinaryFileStream::EndFileBit
+   * End-of-File reached while performing an extracting operation on an input stream.
+   */
+  /**
+   * @var BinaryFileStream::FailBit
+   * The last input operation failed because of an error related to the internal logic of the operation itself.
+   */
+  /**
+   * @var BinaryFileStream::BadBit
+   * Error due to the failure of an input/output operation on the stream buffer.
+   */
+  /**
+   * @var BinaryFileStream::GoodBit
+   * No error. Represents the absence of all the above (the value zero).
+   */
+  /**
+   * @var BinaryFileStream::In
+   * Allows input operations on the stream.
+   */
+  /**
+   * @var BinaryFileStream::Out
+   * Allows output operations on the stream.
+   */
+  /**
+   * @var BinaryFileStream::Truncate
+   * Any content is erased.The file is assumed to be zero-length.
+   */
+  /**
+   * @var BinaryFileStream::Begin
+   * Beginning of the stream buffer.
+   */
+  /**
+   * @var BinaryFileStream::Current
+   * Current position in the stream buffer.
+   */
+  /**
+   * @var BinaryFileStream::End
+   * End of the stream buffer.
+   */
+  /**
+   * @var BinaryFileStream::mp_Stream
    * Binary stream which read/write data.
    */
   
   /**
-   * @fn BinaryFileStream::BinaryFileStream(std::fstream& fstream)
-   * Creates a new abstract binary file stream with the given @a fstream.
+   * @fn BinaryFileStream::BinaryFileStream()
+   * Default abstract constructor.
+   */
+   
+  /**
+   * @fn BinaryFileStream::BinaryFileStream(const std::string& filename, OpenMode mode)
+   * Associates the file with the filename @a filename using the option @a mode to this object.
+   *
+   * If the opening is not successfull, then the FailBit is set. You can check its state by using the method Fail().
    */
   
   /**
@@ -83,13 +156,59 @@ namespace btk
    * Destroys the abstract binary file stream.
    */
   
+  /**
+   * @fn void BinaryFileStream::Open(const std::string& filename, OpenMode mode)
+   * Opens file.
+   */
+  
+  /**
+   * @fn bool BinaryFileStream::IsOpen() const
+   * Checks if a file is open.
+   */
+  
+  /**
+   * @fn void BinaryFileStream::Close()
+   * Closes file.
+   */
+   
+  /**
+   * @fn bool BinaryFileStream::EndFile() const
+   * Checks if eofbit is set.
+   */
+  
+  /**
+   * @fn bool BinaryFileStream::Bad() const
+   * Checks if badbit is set.
+   */
+  
+  /**
+   * @fn bool BinaryFileStream::Fail() const
+   * Checks if either failbit or badbit is set.
+   */
+   
+  /**
+   * @fn void BinaryFileStream::SetExceptions(IOState except)
+   * Sets exception mask 
+   */
+  
+  /**
+   * Swap streams. 
+   * @warning The exceptions set are embedded with the stream.
+   */
+  void BinaryFileStream::SwapStream(BinaryFileStream* toSwap)
+  {
+    std::fstream* temp = this->mp_Stream;
+    this->mp_Stream = toSwap->mp_Stream;
+    toSwap->mp_Stream = temp;
+  };
+  
   /** 
    * Extracts one character from the stream.
    */
   char BinaryFileStream::ReadChar()
   {
     char byteptr[1];
-    this->mr_Fstream.read(byteptr, 1);
+    this->mp_Stream->read(byteptr, 1);
     return *byteptr;
   };
   
@@ -113,7 +232,7 @@ namespace btk
   int8_t BinaryFileStream::ReadI8()
   {
     char byteptr[1];
-    this->mr_Fstream.read(byteptr, 1);
+    this->mp_Stream->read(byteptr, 1);
     return *byteptr;
   };
   
@@ -137,7 +256,7 @@ namespace btk
   uint8_t BinaryFileStream::ReadU8()
   {
     char byteptr[1];
-    this->mr_Fstream.read(byteptr, 1);
+    this->mp_Stream->read(byteptr, 1);
     return *byteptr;
   };
   
@@ -221,7 +340,7 @@ namespace btk
     if (nbChar != 0)
     {
       char* byteptr = new char[nbChar];
-      this->mr_Fstream.read(byteptr, nbChar);
+      this->mp_Stream->read(byteptr, nbChar);
       sFs = std::string(byteptr, nbChar);
       delete[] byteptr;
     }
@@ -248,12 +367,14 @@ namespace btk
   };
   
   /** 
+   * @fn void BinaryFileStream::SeekRead(StreamOffset offset, SeekDir dir)
    * Moves the get pointer by @a nb bytes in the seeking direction @a dir.
    */
-  void BinaryFileStream::SeekRead(size_t nb, std::ios_base::seekdir dir)
-  {
-    this->mr_Fstream.seekg(nb, dir);
-  };
+  
+  /**
+   * @fn StreamPosition BinaryFileStream::TellRead() const
+   * Get position of the get pointer.
+   */
   
   /** 
    * Fills @a nb bytes with 0x00 in the stream.
@@ -261,17 +382,14 @@ namespace btk
   size_t BinaryFileStream::Fill(size_t nb)
   {
     std::string towrite = std::string(nb, 0x00);
-    this->mr_Fstream.write(towrite.c_str(), nb);
+    this->mp_Stream->write(towrite.c_str(), nb);
     return nb;
   };
   
   /** 
+   * @fn void BinaryFileStream::SeekWrite(StreamOffset offset, SeekDir dir)
    * Moves the set pointer by @a nb bytes in the seeking direction @a dir.
    */
-  void BinaryFileStream::SeekWrite(size_t nb, std::ios_base::seekdir dir)
-  {
-    this->mr_Fstream.seekp(nb, dir);
-  };
   
   /**
    * Writes the character @a c in the stream an return its size.
@@ -279,7 +397,7 @@ namespace btk
   /*
   size_t BinaryFileStream::Write(char c)
   {
-    this->mr_Fstream.write(&c, 1);
+    this->mp_Stream->write(&c, 1);
     return 1;
   };
   */
@@ -301,7 +419,7 @@ namespace btk
   size_t BinaryFileStream::Write(int8_t i8)
   {
     char c = static_cast<char>(i8);
-    this->mr_Fstream.write(&c, 1);
+    this->mp_Stream->write(&c, 1);
     return 1;
   };
   
@@ -322,7 +440,7 @@ namespace btk
   size_t BinaryFileStream::Write(uint8_t u8)
   {
     char c = static_cast<char>(u8);
-    this->mr_Fstream.write(&c, 1);
+    this->mp_Stream->write(&c, 1);
     return 1;
   };
   
@@ -390,7 +508,7 @@ namespace btk
    */
   size_t BinaryFileStream::Write(const std::string& rString)
   {
-    this->mr_Fstream.write(rString.c_str(), rString.length());
+    this->mp_Stream->write(rString.c_str(), rString.length());
     return rString.length();
   };
   
@@ -412,12 +530,19 @@ namespace btk
    * @brief Class to read and write binary file encoded from a VAX (LE) processor
    * to a VAX (LE) and IEEE (LE, BE) processor.
    *
-   * @sa BinaryFileStream, IEEELittleEndianBinaryFileStream, IEEEBigEndianBinaryFileStream
+   * @sa BinaryFileStream, IEEELittleEndianBinaryFileStream, IEEEBigEndianBinaryFileStream, NativeBinaryFileStream
    */
   
   /**
-   * @fn VAXLittleEndianBinaryFileStream::VAXLittleEndianBinaryFileStream(std::fstream& fstream)
-   * Creates a new DEC binary file stream with the given @a fstream.
+   * @fn VAXLittleEndianBinaryFileStream::VAXLittleEndianBinaryFileStream()
+    * Creates a new default DEC binary file stream.
+   */
+   
+  /**
+   * @fn VAXLittleEndianBinaryFileStream::VAXLittleEndianBinaryFileStream(const std::string& filename, OpenMode mode)
+   * Creates a new default DEC binary file stream and associates the file with the filename @a filename using the option @a mode.
+   *
+   * If the opening is not successfull, then the FailBit is set. You can check its state by using the method Fail().
    */
   
   /** 
@@ -426,7 +551,7 @@ namespace btk
   int16_t VAXLittleEndianBinaryFileStream::ReadI16()
   {
     char byteptr[2];
-    this->mr_Fstream.read(byteptr, 2);
+    this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
     return *reinterpret_cast<int16_t const*>(foo);
@@ -441,7 +566,7 @@ namespace btk
   uint16_t VAXLittleEndianBinaryFileStream::ReadU16()
   {
     char byteptr[2];
-    this->mr_Fstream.read(byteptr, 2);
+    this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
     return *reinterpret_cast<uint16_t const*>(foo);
@@ -456,7 +581,7 @@ namespace btk
   float VAXLittleEndianBinaryFileStream::ReadFloat()
   {
     char byteptr[4];
-    this->mr_Fstream.read(byteptr, 4);
+    this->mp_Stream->read(byteptr, 4);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[4] = {byteptr[1] - 1 * (byteptr[1] == 0 ? 0 : 1), byteptr[0], byteptr[3], byteptr[2]};
     return *reinterpret_cast<float const*>(foo);
@@ -477,9 +602,9 @@ namespace btk
     memcpy(&byteptr, &i16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 2);
+    this->mp_Stream->write(foo, 2);
 #else
-    this->mr_Fstream.write(byteptr, 2);
+    this->mp_Stream->write(byteptr, 2);
 #endif
     return 2;
   };
@@ -493,9 +618,9 @@ namespace btk
     memcpy(&byteptr, &u16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 2); 
+    this->mp_Stream->write(foo, 2); 
 #else
-    this->mr_Fstream.write(byteptr, 2);
+    this->mp_Stream->write(byteptr, 2);
 #endif
     return 2;
   };
@@ -509,12 +634,12 @@ namespace btk
     memcpy(&byteptr, &f, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[4] = {byteptr[1], byteptr[0] + 1 * (byteptr[0] == 0 ? 0 : 1),  byteptr[3], byteptr[2]};
-    this->mr_Fstream.write(foo, 4);
+    this->mp_Stream->write(foo, 4);
 #elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
-    this->mr_Fstream.write(byteptr, 4);
+    this->mp_Stream->write(byteptr, 4);
 #else
     char foo[4] = {byteptr[2], byteptr[3] + 1 * (byteptr[3] == 0 ? 0 : 1), byteptr[0], byteptr[1]};
-    this->mr_Fstream.write(foo, 4);
+    this->mp_Stream->write(foo, 4);
 #endif
     return 4;
   };
@@ -525,12 +650,19 @@ namespace btk
    * @brief Class to read and write binary file encoded from a IEEE (BE) to a 
    * VAX (LE) and IEEE (LE, BE) processor
    *
-   * @sa BinaryFileStream, VAXLittleEndianBinaryFileStream, IEEELittleEndianBinaryFileStream
+   * @sa BinaryFileStream, VAXLittleEndianBinaryFileStream, IEEELittleEndianBinaryFileStream, NativeBinaryFileStream
    */
   
   /**
-   * @fn IEEEBigEndianBinaryFileStream::IEEEBigEndianBinaryFileStream(std::fstream& fstream)
-   * Creates a new MIPS binary file stream with the given @a fstream.
+   * @fn IEEEBigEndianBinaryFileStream::IEEEBigEndianBinaryFileStream()
+   * Creates a new default MIPS binary file stream (IEEE Big Endian).
+   */
+   
+  /**
+   * @fn IEEEBigEndianBinaryFileStream::IEEEBigEndianBinaryFileStream(const std::string& filename, OpenMode mode)
+   * Creates a new default MIPS binary file stream and associates the file with the filename @a filename using the option @a mode.
+   *
+   * If the opening is not successfull, then the FailBit is set. You can check its state by using the method Fail().
    */
   
   /** 
@@ -539,7 +671,7 @@ namespace btk
   int16_t IEEEBigEndianBinaryFileStream::ReadI16()
   {
     char byteptr[2];
-    this->mr_Fstream.read(byteptr, 2);
+    this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     return *reinterpret_cast<int16_t const*>(byteptr);
 #else
@@ -554,7 +686,7 @@ namespace btk
   uint16_t IEEEBigEndianBinaryFileStream::ReadU16()
   {
     char byteptr[2];
-    this->mr_Fstream.read(byteptr, 2);
+    this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     return *reinterpret_cast<uint16_t const*>(byteptr);
 #else
@@ -569,7 +701,7 @@ namespace btk
   float IEEEBigEndianBinaryFileStream::ReadFloat()
   {
     char byteptr[4];
-    this->mr_Fstream.read(byteptr, 4);
+    this->mp_Stream->read(byteptr, 4);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     return *reinterpret_cast<float const*>(byteptr);
 #elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
@@ -589,10 +721,10 @@ namespace btk
     char byteptr[2];
     memcpy(&byteptr, &i16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-    this->mr_Fstream.write(byteptr, 2); 
+    this->mp_Stream->write(byteptr, 2); 
 #else
     char foo[2] = {byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 2);
+    this->mp_Stream->write(foo, 2);
 #endif
     return 2;
   };
@@ -605,10 +737,10 @@ namespace btk
     char byteptr[2];
     memcpy(&byteptr, &u16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-    this->mr_Fstream.write(byteptr, 2); 
+    this->mp_Stream->write(byteptr, 2); 
 #else
     char foo[2] = {byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 2);
+    this->mp_Stream->write(foo, 2);
 #endif
     return 2;
   };
@@ -621,13 +753,13 @@ namespace btk
     char byteptr[4];
     memcpy(&byteptr, &f, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-    this->mr_Fstream.write(byteptr, 4);
+    this->mp_Stream->write(byteptr, 4);
 #elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
     char foo[4] = {byteptr[1] - 1 * (byteptr[1] == 0 ? 0 : 1), byteptr[0], byteptr[3], byteptr[2]};
-    this->mr_Fstream.write(foo, 4);
+    this->mp_Stream->write(foo, 4);
 #else
     char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 4);
+    this->mp_Stream->write(foo, 4);
 #endif
     return 4;
   };
@@ -638,12 +770,19 @@ namespace btk
    * @brief Class to read and write binary file encoded from a IEEE (LE) to a 
    * VAX (LE) and IEEE (LE, BE) processor.
    *
-   * @sa BinaryFileStream, VAXLittleEndianBinaryFileStream, IEEEBigEndianBinaryFileStream
+   * @sa BinaryFileStream, VAXLittleEndianBinaryFileStream, IEEEBigEndianBinaryFileStream, NativeBinaryFileStream
    */
   
   /**
-   * @fn IEEELittleEndianBinaryFileStream::IEEELittleEndianBinaryFileStream(std::fstream& fstream)
-   * Creates a new IEEE (LE) binary file stream with the given @a fstream.
+   * @fn IEEELittleEndianBinaryFileStream::IEEELittleEndianBinaryFileStream()
+   * Creates a new default PC binary file stream (IEEE Little Endian).
+   */
+   
+  /**
+   * @fn IEEELittleEndianBinaryFileStream::IEEELittleEndianBinaryFileStream(const std::string& filename, OpenMode mode)
+   * Creates a new default PC binary file stream and associates the file with the filename @a filename using the option @a mode.
+   *
+   * If the opening is not successfull, then the FailBit is set. You can check its state by using the method Fail().
    */
   
   /** 
@@ -652,7 +791,7 @@ namespace btk
   int16_t IEEELittleEndianBinaryFileStream::ReadI16()
   {
     char byteptr[2];
-    this->mr_Fstream.read(byteptr, 2);
+    this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
     return *reinterpret_cast<int16_t const*>(foo);
@@ -667,7 +806,7 @@ namespace btk
   uint16_t IEEELittleEndianBinaryFileStream::ReadU16()
   {
     char byteptr[2];
-    this->mr_Fstream.read(byteptr, 2);
+    this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
     return *reinterpret_cast<uint16_t const*>(foo);
@@ -682,7 +821,7 @@ namespace btk
   float IEEELittleEndianBinaryFileStream::ReadFloat()
   {
     char byteptr[4];
-    this->mr_Fstream.read(byteptr, 4);
+    this->mp_Stream->read(byteptr, 4);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
     return *reinterpret_cast<float const*>(foo);
@@ -703,9 +842,9 @@ namespace btk
     memcpy(&byteptr, &i16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 2); 
+    this->mp_Stream->write(foo, 2); 
 #else
-    this->mr_Fstream.write(byteptr, 2);
+    this->mp_Stream->write(byteptr, 2);
 #endif
     return 2;
   };
@@ -719,9 +858,9 @@ namespace btk
     memcpy(&byteptr, &u16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 2); 
+    this->mp_Stream->write(foo, 2); 
 #else
-    this->mr_Fstream.write(byteptr, 2);
+    this->mp_Stream->write(byteptr, 2);
 #endif
     return 2;
 
@@ -736,13 +875,38 @@ namespace btk
     memcpy(&byteptr, &f, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
-    this->mr_Fstream.write(foo, 4);
+    this->mp_Stream->write(foo, 4);
 #elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
     char foo[4] = {byteptr[2], byteptr[3], byteptr[0], byteptr[1] - 1 * (byteptr[1] == 0 ? 0 : 1)};
-    this->mr_Fstream.write(foo, 4);
+    this->mp_Stream->write(foo, 4);
 #else
-    this->mr_Fstream.write(byteptr, 4);
+    this->mp_Stream->write(byteptr, 4);
 #endif
     return 4;
   };
+  
+  
+  /** 
+   * @class NativeBinaryFileStream
+   * @brief Native binary filestream chosen by the used compiler.
+   *
+   * Depending the processor, the native binary filestream will be:
+   *  - the VAX Little Endian filestream ()
+   *  - the IEEE Little Endian filestream
+   *  - the IEEE Big Endian filestream
+   *
+   * @sa BinaryFileStream, VAXLittleEndianBinaryFileStream, IEEELittleEndianBinaryFileStream, IEEEBigEndianBinaryFileStream
+   */
+   
+  /**
+   * @fn NativeBinaryFileStream::NativeBinaryFileStream()
+   * Default constructor. Use the method NativeBinaryFileStream::Open to associate a physical file.
+   */
+   
+  /**
+   * @fn NativeBinaryFileStream::NativeBinaryFileStream(const std::string& filename, OpenMode mode)
+   * Associates the file with the filename @a filename using the option @a mode to this object.
+   *
+   * If the opening is not successfull, then the FailBit is set. You can check its state by using the method Fail().
+   */
 };

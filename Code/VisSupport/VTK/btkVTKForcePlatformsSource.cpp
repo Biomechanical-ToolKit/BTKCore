@@ -110,10 +110,11 @@ namespace btk
   /**
    * Generate force platform geometry.
    */
-  int VTKForcePlatformsSource::RequestData(vtkInformation* vtkNotUsed(request),
+  int VTKForcePlatformsSource::RequestData(vtkInformation* request,
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector)
   {
+    btkNotUsed(request);
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
     if (!inObject)
