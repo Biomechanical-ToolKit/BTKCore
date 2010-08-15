@@ -634,5 +634,4 @@ CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_dynamic)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_standing)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_type1)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, ParameterOverflow)
-
 #endif

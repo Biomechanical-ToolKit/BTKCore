@@ -34,8 +34,15 @@
  */
 
 #include "btkBinaryFileStream.h"
+#include "btkConfigure.h"
 
 #include <cstring>
+
+// If it is possible to use the memory file mapping mechanism, 
+// then its code is compiled here 
+#if defined __btkBinaryFileStream_mmfstream_p_h // header declared?
+  #include "btkBinaryFileStream_mmfstream_p.cpp"
+#endif
 
 namespace btk
 {
@@ -165,6 +172,11 @@ namespace btk
    * @fn bool BinaryFileStream::IsOpen() const
    * Checks if a file is open.
    */
+   
+  /**
+   * @fn bool BinaryFileStream::Good() const
+   * Checks if the state of the stream is good for I/O operations.
+   */
   
   /**
    * @fn void BinaryFileStream::Close()
@@ -185,10 +197,20 @@ namespace btk
    * @fn bool BinaryFileStream::Fail() const
    * Checks if either failbit or badbit is set.
    */
+  
+  /**
+   * @fn IOState BinaryFileStream::GetExceptions()
+   * Gets exception mask.
+   */
    
   /**
    * @fn void BinaryFileStream::SetExceptions(IOState except)
-   * Sets exception mask 
+   * Sets exception mask.
+   */
+   
+  /**
+   * @fn void BinaryFileStream::Clear(IOState flags = GoodBit)
+   * Sets error state flags.
    */
   
   /**
@@ -197,7 +219,7 @@ namespace btk
    */
   void BinaryFileStream::SwapStream(BinaryFileStream* toSwap)
   {
-    std::fstream* temp = this->mp_Stream;
+    FStream* temp = this->mp_Stream;
     this->mp_Stream = toSwap->mp_Stream;
     toSwap->mp_Stream = temp;
   };

@@ -40,6 +40,18 @@
 #define BTK_VERSION_MINOR @BTK_VERSION_MINOR@
 #define BTK_VERSION_PATCH @BTK_VERSION_PATCH@
 
+// Compiled on a 64 bit OS?
+#if defined(__APPLE__)
+  #if defined __x86_64__ || defined __ppc64__
+    #define HAVE_64_BIT
+  #endif
+#else
+  #cmakedefine HAVE_64_BIT
+#endif
+
+// Looking for mmap
+#cmakedefine HAVE_SYS_MMAP
+
 // Looking for std::shared_ptr in memory.h
 #cmakedefine BTK_USE_GCC_EXPERIMENTAL
 #cmakedefine HAVE_SYS_TR1_MEMORY_H

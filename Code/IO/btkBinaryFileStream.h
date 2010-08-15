@@ -36,6 +36,8 @@
 #ifndef __btkBinaryFileStream_h
 #define __btkBinaryFileStream_h
 
+#include "btkConfigure.h"
+
 // Check if the processor is supported
 #if defined _MSC_VER
   #if defined _M_IX86 || defined _M_X64
@@ -61,10 +63,20 @@
   #error Development plateform not supported
 #endif
 
-#include <fstream>
+// Check if we can use the memory mapped filestream system
+#if 0//defined HAVE_SYS_MMAP //|| defined _MSC_VER
+  #define TEST_MMFSTREAM
+  #include "btkBinaryFileStream_mmfstream_p.h"
+  typedef btk::mmfstream FStream;
+#else
+  #include <fstream>
+  typedef std::fstream FStream;
+#endif
+
 #include <string>
 #include <vector>
 
+// MSVC doesn't have the header stdint.h
 #ifdef _MSC_VER
   #include "Utilities/stdint.h"
 #else
@@ -84,7 +96,7 @@
 
 namespace btk
 {
-  typedef std::fstream::failure BinaryFileStreamException;
+  typedef FStream::failure BinaryFileStreamException;
   
   class BinaryFileStream
   {
@@ -117,11 +129,14 @@ namespace btk
     
     void Open(const std::string& filename, OpenMode mode) {this->mp_Stream->open(filename.c_str(), std::ios_base::binary | mode);};
     bool IsOpen() const {return this->mp_Stream->is_open();};
+    bool Good() const {return this->mp_Stream->good();};
     void Close() {this->mp_Stream->close();};
     bool EndFile() const {return this->mp_Stream->eof();};
     bool Bad() const {return this->mp_Stream->bad();};
     bool Fail() const {return this->mp_Stream->fail();};
+    IOState GetExceptions() {return this->mp_Stream->exceptions();};
     void SetExceptions(IOState except) {this->mp_Stream->exceptions(except);};
+    void Clear(IOState flags = GoodBit) {return this->mp_Stream->clear(flags);};
     
     void SwapStream(BinaryFileStream* toSwap);
     
@@ -162,10 +177,10 @@ namespace btk
     virtual size_t Write(const std::vector<std::string>& rVectorString);
   
   protected:
-    BinaryFileStream() {this->mp_Stream = new std::fstream();};
-    BinaryFileStream(const std::string& filename, OpenMode mode) {this->mp_Stream = new std::fstream(filename.c_str(), mode);};
+    BinaryFileStream() {this->mp_Stream = new FStream();};
+    BinaryFileStream(const std::string& filename, OpenMode mode) {this->mp_Stream = new FStream(filename.c_str(), std::ios_base::binary | mode);};
     
-    std::fstream* mp_Stream;
+    FStream* mp_Stream;
 
   private:
     BinaryFileStream(const BinaryFileStream& ); // Not implemented.

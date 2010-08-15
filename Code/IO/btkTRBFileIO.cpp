@@ -128,12 +128,12 @@ namespace btk
    */
   
   /**
-   * Checks if the first word in the file corresponds to "PathFileType".
+   * Checks if the four first words are <tt>0x0000 0000 FFFF FFFF</tt>
    */
   bool TRBFileIO::CanReadFile(const std::string& filename)
   {
     bool isReadable = true;
-    // Three first words: 0x0000 0000 FFFF FFFF
+    // Four first words: 0x0000 0000 FFFF FFFF
     IEEELittleEndianBinaryFileStream bifs(filename, BinaryFileStream::In);
     if ((bifs.ReadI16() != 0x0000) || (bifs.ReadI16() != 0x0000) || (bifs.ReadU16() != 0xFFFF) || (bifs.ReadU16() != 0xFFFF))
       isReadable = false;
