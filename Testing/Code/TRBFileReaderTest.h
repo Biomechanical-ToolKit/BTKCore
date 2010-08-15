@@ -2,6 +2,7 @@
 #define TRBFileReaderTest_h
 
 #include <btkAcquisitionFileReader.h>
+#include <btkTRBFileIO.h>
 
 CXXTEST_SUITE(TRBFileReaderTest)
 {
@@ -79,6 +80,37 @@ CXXTEST_SUITE(TRBFileReaderTest)
     TS_ASSERT_DELTA(acq->GetPoint(10)->GetValues()(142,1), 125.505516, 1e-5);
     TS_ASSERT_DELTA(acq->GetPoint(15)->GetResiduals()(142), 0.231882, 1e-5);
   };
+  
+  CXXTEST_TEST(Anto_TRB_vs_TRC)
+  {
+    // TRB
+    btk::AcquisitionFileReader::Pointer trbReader = btk::AcquisitionFileReader::New();
+    trbReader->SetFilename(TRBFilePathIN + "Anto.trb");
+    btk::Acquisition::Pointer acq1 = trbReader->GetOutput();
+    acq1->Update();
+    // TRC
+    btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
+    trcReader->SetFilename(TRCFilePathIN + "Anto.trc");
+    btk::Acquisition::Pointer acq2 = trcReader->GetOutput();
+    acq2->Update();
+    TS_ASSERT_EQUALS(acq1->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq1->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq1->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq1->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq1->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq1->GetAnalogFrameNumber(), acq2->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(acq1->GetEventNumber(), acq2->GetEventNumber());
+    
+    for (int i = 1 ; i < acq1->GetPointFrameNumber() ; ++i)
+    {
+      for (int j = 0 ; j < acq1->GetPointNumber() ; ++j)
+      {
+        TS_ASSERT_DELTA(acq1->GetPoint(j)->GetValues()(i,0), acq2->GetPoint(j)->GetValues()(i,0), 1e-5);
+        TS_ASSERT_DELTA(acq1->GetPoint(j)->GetValues()(i,1), acq2->GetPoint(j)->GetValues()(i,1), 1e-5);
+        TS_ASSERT_DELTA(acq1->GetPoint(j)->GetValues()(i,2), acq2->GetPoint(j)->GetValues()(i,2), 1e-5);
+      }
+    }
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(TRBFileReaderTest)
@@ -86,4 +118,5 @@ CXXTEST_TEST_REGISTRATION(TRBFileReaderTest, NoFile)
 CXXTEST_TEST_REGISTRATION(TRBFileReaderTest, MisspelledFile)
 CXXTEST_TEST_REGISTRATION(TRBFileReaderTest, FalseFile)
 CXXTEST_TEST_REGISTRATION(TRBFileReaderTest, Gait)
+CXXTEST_TEST_REGISTRATION(TRBFileReaderTest, Anto_TRB_vs_TRC)
 #endif
