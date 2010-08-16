@@ -41,6 +41,11 @@ namespace btk
    * @class Analog
    * @brief Analog channel data along the time.
    *
+   * More than the data, you can also set informations related to the analog channel as its unit, scale, offset and gain. 
+   * These informations are useful for other classes/methods. For example, when you save
+   * an acquisition in a file, analog's data are generaly unscaled and written as integer, then the scale and offset
+   * are important.
+   *
    * @ingroup BTKCommon
    */
 

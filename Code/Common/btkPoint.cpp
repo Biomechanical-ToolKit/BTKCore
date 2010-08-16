@@ -43,6 +43,7 @@ namespace btk
    *
    * Coordinates of the point are generaly measured by an acquisition sytem.
    * Each Point object has a residual value for each frame. A mask is also added to know the parts of the system which measured the coordinates.
+   * This class is also used to represent angles, forces, moments, powers and scalars. To know/set the type of the point, you can use the methods GetType() and SetType().
    *
    * @ingroup BTKCommon
    */

@@ -13,9 +13,10 @@
 - @ref BTKIntegeration
 - @ref ObjectCreation
 - @ref AcquisitionReading
-- @ref AcquisitionAccess
-- @ref AcquisitionModify
-- @ref AcquisitionFilter
+- @ref AcquisitionAccessing
+- @ref AcquisitionModifying
+- @ref AcquisitionFiltering
+- @ref AcquisitionWriting
        
 @htmlonly <hr> @endhtmlonly
 
@@ -89,7 +90,7 @@ btk::Acquisition::Pointer defaultInit()
 {
   btk::Acquisition::Pointer acq = btk::Acquisition::New();
   acq->Init(10,200,20,10); // 10 points, 200 frames, 20 analog channels with a number of frames 10 times greater
-  acq->SetFrequency(100.0); // 100 Hz
+  acq->SetFrequency(100.0); // 100 Hz. Analog's frequency is automatically set to 1000 Hz.
   return acq;
 };
 
@@ -147,10 +148,23 @@ int main()
 };
 @endcode
 
-@section AcquisitionAccess Accessing acquisition's data
+All the IO classes are listed in the page @ref FileFormatSupported
+
+@section AcquisitionAccessing Accessing acquisition's data
 An acquisition (btk::Acquisition) is mostly a generic container to store points (btk::Point), analog channels (btk::Analog), events (btk::Event) and metadata (btk::MetaData). You can easily construct a new acquisition or load it from an acquisition file as shown in the above examples.
 
-@subsection AcquisitionAccess_Point Accessing to the points
+The others informations stored in an acquisition are the following:
+ - Index of the first frame;
+ - Number of frames;
+ - Number of analog samples per (video) frames.
+ - Point (video) and analog frequencies;
+ - Point's units;
+ - Analog resolution (most common values are 12 of 16 bits).
+ - Maximum interpolation gap.
+
+@subsection AcquisitionAccessing_Point Accessing points
+
+@b Note: In BTK, the term "point" means all data with 3 components along the time. So, a point can be also a force, a moment, a power, etc. Check btk::Point::GetType() to know the point's type.
 
 To access to a point and its content, you can use the methods btk::Acquisition::GetPoint() which return a btk::Point::Pointer object based on the given index or label. If you give an invalid index or an invalid point's label, an exception (btk::OutOfRangeException) will be thrown.\n
 Another way to access to the content of a specific point when you don't know it exist or not in the acquisition is to use the method btk::Acquisition::FindPoint(). Given a point's label, this method returns an iterator associated to the found point. In the case the point is not found, the iterator will point to the end of the list of points.
@@ -167,25 +181,26 @@ else
   std::cerr << No point found << std::endl;
 @endcode
 
-When you know that you iterator is valid, the best way to access to the content of the point is to use the following code <tt>(*itP)-></tt>. By using the code @c *itP. or @c itP->, you will access only to the methods of the shared pointer object (and not the pointed object by the shared pointer). This (little) drawback is due to the storage of pointers in the list instead of objects.
+When you know the iterator is valid, the best way to access to the content of the point is to use the following code <tt>(*itP)-></tt>. By using the code @c *itP. or @c itP->, you will access only to the methods of the shared pointer object (and not the pointed object by the shared pointer). This (little) drawback is due to the storage of pointers in the list instead of objects.
 
 The use of an iterator has also an other main advantage. It gives you the possibility to access to all the point by iterating it. This gives you a simple and fast way to access to the points' data. To do this, you can use the methods btk::Acquisition::BeginPoint() and btk::Acquisition::EndPoint().
 @code
 #include <btkAcquisitionFileReader.h>
+#include <btkPoint.h>
 
-std::string GetPointTypeAsString(Point::Type t)
+std::string GetPointTypeAsString(btk::Point::Type t)
 {
-  if (t == Point::Marker)
+  if (t == btk::Point::Marker)
     return "Marker";
-  else if (t == Point::Angle)
+  else if (t == btk::Point::Angle)
     return "Angle";
-  else if (t == Point::Force)
+  else if (t == btk::Point::Force)
     return "Force";
-  else if (t == Point::Moment)
+  else if (t == btk::Point::Moment)
     return "Moment";
-  else if (t == Point::Power)
+  else if (t == btk::Point::Power)
     return "Power";
-  else if (t == Point::Scalar)
+  else if (t == btk::Point::Scalar)
     return "Scalar";
 };
 
@@ -201,8 +216,75 @@ int main()
 }
 @endcode
 
-The code above, iterate in a @p for loop, the const iterator @p it from the first point (<tt>it = acq->BeginPoint()</tt>) to the last one (<tt>it != acq->EndPoint()</tt>), one by one (@c ++it). The use of an @p Iterator or a @p ConstIterator depends of you need. An @p Iterator gives you the possibility to modify the associated object (see @ref AcquisitionModify), while a @p ConstIterator is a read-only iterator which is enough to access to the points' data.
+The code above, iterate in a @p for loop, the const iterator @p it from the first point (<tt>it = acq->BeginPoint()</tt>) to the last one (<tt>it != acq->EndPoint()</tt>), one by one (@c ++it). The use of an @p Iterator or a @p ConstIterator depends of you need. An @p Iterator gives you the possibility to modify the associated object (see @ref AcquisitionModifying), while a @p ConstIterator is a read-only iterator which is enough to access to the points' data.
 
-@section AcquisitionModify Modifying acquisition's data
-@section AcquisitionFilter Filtering an acquisition
+@subsection AcquisitionAccessing_Analog Accessing analog channels
+
+The way to access to the analog channels is similar to the points. you can use the method btk::Acquisition::GetAnalog() or an iterator (btk::Acquisition::AnalogIterator,  btk::Acquisition::AnalogConstIterator with the methods btk::Acquisition::BeginAnalog() and btk::Acquisition::EndAnalog()). You can also use the method btk::Acquisition::FindAnalog() if you don't know if the analog exists in the acquisition. 
+
+@subsection AcquisitionAccessing_Event Accessing events
+
+As the points and the analog channels, you can access to the events stored in an acquisition by using the method btk::Acquisition::GetEvent() or an iterator (btk::Acquisition::EventIterator,  btk::Acquisition::EventConstIterator with the methods btk::Acquisition::BeginEvent() and btk::Acquisition::EndEvent()). You can also use the method btk::Acquisition::FindEvent() if you don't know if the event exists in the acquisition.
+
+@subsection AcquisitionAccessing_Metadata Accessing metadata
+
+A metadata is a generic container to store the acquisition configuration. Or said differently, a metadata contains every informations which cannot be set into markers' trajectories nor analog channels' measures, nor events. For example, if you want to include subject's informations (sex, weight, height, ...) or force platform's configuration (corner's coordinates, analog channel used, ...), then the metadata are the right place to do this. In the C3D file format, the metadata are known as groups and parameters.
+
+To access to the acquisition's metadata, you have to use the method btk::Acquisition::GetMetaData which will return the root of the metadata. From this point, you have to use the methods of the class btk::MetaData. In the case where you want to access to the informations' value of the metadata SUBJECTS:WEIGHT, you can use the following code:
+@code
+// btk::Acquisition::Pointer acq = ...
+double weight = acq->GetMetaData()->GetChild("SUBJECTS")->GetChild("WEIGHT")->GetInfo()->ToDouble(0);
+@endcode
+In the code above, the metadata WEIGHT is the child of the metadata SUBJECTS which is at the root of the metadata in the acquisition. It contains informations and at least one real value inside it.
+
+Event if this code is the most direct way to access to a metadata and its information, it can thrown an exception if the metadata doesn't exist, or worst, can crash your app if there is no info (in this case, the method btk::MetaData::GetInfo returns an empty pointer). You can also extract the wrong (or corrupted) value, if this metadata is not used to store the weight as a real but as a string. The safe way to do this is the following:
+@code
+// btk::Acquisition::Pointer acq = ...
+double weight = 0.0;
+btk::MetaData::ConstIterator itG = acq->GetMetaData()->FindChild("SUBJECTS");
+if (itG != acq->EndMetaData()) // SUBJECTS exists
+{
+  btk::MetaData::ConstIterator itP = (*itG)->FindChild("WEIGHT");
+  if (itP != (*itG)->End()) // WEIGHT exists
+  {
+    if ((*itP)->HasInfo())
+    {
+      btk::MetaDataInfo::Pointer swInfo = (*itP)->GetInfo();
+      if (swInfo->GetFormat() == btk::MetaDataInfo::Real)
+      {
+        if (swInfo->GetDimensions().size() == 0) // Only one value in the metadata
+          weight = swInfo->ToDouble(0);
+      }  
+    }
+  }
+}
+@endcode
+This safe code can be summarized by the method btk::MetaData::ExtractChildInfo(). The corresponding code is the following.
+@code
+// btk::Acquisition::Pointer acq = ...
+double weight = 0.0;
+btk::MetaData::ConstIterator itG = acq->GetMetaData()->FindChild("SUBJECTS");
+if (itG != acq->EndMetaData()) // SUBJECTS exists
+{
+  btk::MetaDataInfo::Pointer swInfo = (*itG)->ExtractChildInfo("WEIGHT",btk::MetaDataInfo::Real,0); 
+  if (swInfo) // Not an empty pointer
+    weight = swInfo->ToDouble(0);
+}
+@endcode
+
+@section AcquisitionModifying Modifying acquisition's data
+
+@subsection AcquisitionModifying_Point Modifying points
+
+@subsection AcquisitionModifying_Analog Modifying analog channels
+
+@subsection AcquisitionModifying_Event Modifying events
+
+@subsection AcquisitionModifying_Metadata Modifying metadata
+
+@b Note: Even, if you can create an infinite level of metadata, it is strongly advised to only use 2 levels of metadata. The first one corresponds to groups (without informations) and the second one to parameters). This use was introduced in the C3D file format.
+
+@section AcquisitionFiltering Filtering an acquisition
+
+@section AcquisitionWriting Writing an acquisition
  */

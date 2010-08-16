@@ -188,8 +188,6 @@ namespace btk
    */
   
   /**
-   * @brief Extract the information related to the metadata with the label @a l.
-   * 
    * Check if a child exists with the label @a l and correspond to the given format @a f 
    * plus the number of dimensions @a numDims with or without values (@a noPossibleEmptyValue). The informations of the metadata are extracted in 
    * @a info if all the checks are ok. Otherwise, @a info return an empty MetaDataInfo::Pointer.
