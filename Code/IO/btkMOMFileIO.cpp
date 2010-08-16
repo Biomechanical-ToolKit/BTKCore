@@ -36,7 +36,6 @@
 #include "btkMOMFileIO.h"
 #include "btkEliteFileIOUtils_p.h"
 
-#include <fstream>
 #include <algorithm>
 #include <cctype>
 

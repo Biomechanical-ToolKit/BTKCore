@@ -39,7 +39,6 @@
 
 #include <algorithm>
 #include <cctype>
-#include <map>
 #include <vector>
 
 namespace btk

@@ -37,7 +37,6 @@
 #include "btkMetaDataUtils.h"
 #include "btkConvert.h"
 
-#include <fstream>
 #include <algorithm>
 #include <cctype>
 #include <iostream>
@@ -1379,13 +1378,7 @@ namespace btk
     // POINT:SCALE
     double max = 0.0;
     for (Acquisition::PointConstIterator itPoint = input->BeginPoint() ; itPoint != input->EndPoint() ; ++itPoint)
-    {
-      double minVal = (*itPoint)->GetValues().minCoeff();
-      double maxVal = (*itPoint)->GetValues().maxCoeff();
-      double val = std::max(fabs(minVal), maxVal);
-      if (val > max)
-        max = val;
-    }
+      max = std::max(max, (*itPoint)->GetValues().cwise().abs().maxCoeff());
     const int currentMax = static_cast<int>(this->m_PointScale * 32000);
     // Guess to compute a new point scaling factor.
     if (((max > currentMax) || (max <= (currentMax / 2))) && (max > std::numeric_limits<double>::epsilon()))

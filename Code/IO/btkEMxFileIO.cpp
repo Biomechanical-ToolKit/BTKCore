@@ -35,10 +35,7 @@
 
 #include "btkEMxFileIO.h"
 #include "btkBinaryFileStream.h"
-#include "btkMetaDataUtils.h"
-#include "btkWrench.h"
 
-#include <fstream>
 #include <algorithm>
 #include <cctype>
 
@@ -96,10 +93,10 @@ namespace btk
     //std::string::size_type EMxPos = lowercase.substr(0,lowercase.length()-1).rfind(".em");
     //if ((EMxPos != std::string::npos) && (EMxPos == lowercase.length() - 4) && ((*(lowercase.rbegin()) == 'f') || (*(lowercase.rbegin()) == 'g')  || (*(lowercase.rbegin()) == 'r')))
     {
-      std::ifstream ifs(filename.c_str(), std::ios_base::in | std::ios_base::binary);
-      if (!ifs)
+      NativeBinaryFileStream bifs(filename, BinaryFileStream::In);
+      if (!bifs.IsOpen())
         return false;
-      ifs.close();
+      bifs.Close();
       return true;
     }
     return false;
