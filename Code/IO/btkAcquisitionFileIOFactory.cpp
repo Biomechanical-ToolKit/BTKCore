@@ -87,8 +87,10 @@ namespace btk
     AcquisitionFileIO::Pointer io;
     if (mode == ReadMode)
     {
+      // C3D
       io = C3DFileIO::New();
       if (io->CanReadFile(filename)) return io;
+      // Motion Analysis Inc
       io = TRBFileIO::New();
       if (io->CanReadFile(filename)) return io;
       io = TRCFileIO::New();
@@ -97,6 +99,11 @@ namespace btk
       if (io->CanReadFile(filename)) return io;
       io = ANCFileIO::New();
       if (io->CanReadFile(filename)) return io;
+      io = CALForcePlateFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      io = XLSOrthotrackFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      // Elite
       io = RAxFileIO::New();
       if (io->CanReadFile(filename)) return io;
       io = RICFileIO::New();
@@ -111,23 +118,22 @@ namespace btk
       if (io->CanReadFile(filename)) return io;
       io = EMxFileIO::New();
       if (io->CanReadFile(filename)) return io;
-      io = CALForcePlateFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = XLSOrthotrackFileIO::New();
-      if (io->CanReadFile(filename)) return io;
     }
     else
     {
+      // C3D
       io = C3DFileIO::New();
       if (io->CanWriteFile(filename)) return io;
-      io = TRCFileIO::New();
-      if (io->CanWriteFile(filename)) return io;
+      // Motion Analysis Inc
       //io = TRBFileIO::New();
       //if (io->CanWriteFile(filename)) return io;
+      io = TRCFileIO::New();
+      if (io->CanWriteFile(filename)) return io;
       io = ANBFileIO::New();
       if (io->CanWriteFile(filename)) return io;
       io = ANCFileIO::New();
       if (io->CanWriteFile(filename)) return io;
+      // Elite
       //io = RAxFileIO::New();
       //if (io->CanWriteFile(filename)) return io;
       //io = RICFileIO::New();

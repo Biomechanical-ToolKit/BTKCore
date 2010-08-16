@@ -150,8 +150,11 @@ namespace btk
     virtual const std::vector<int16_t> ReadI16(size_t nb);
     virtual uint16_t ReadU16() = 0;
     virtual const std::vector<uint16_t> ReadU16(size_t nb);
+    
     virtual float ReadFloat() = 0;
     virtual const std::vector<float> ReadFloat(size_t nb);
+    virtual double ReadDouble() = 0;
+    virtual const std::vector<double> ReadDouble(size_t nb);
     virtual const std::string ReadString(size_t nbChar);
     virtual const std::vector<std::string> ReadString(size_t nb, size_t nbChar);
     void SeekRead(StreamOffset offset, SeekDir dir) {this->mp_Stream->seekg(offset, dir);};
@@ -199,6 +202,8 @@ namespace btk
     using BinaryFileStream::ReadU16;
     virtual float ReadFloat();
     using BinaryFileStream::ReadFloat;
+    virtual double ReadDouble();
+    using BinaryFileStream::ReadDouble;
     virtual size_t Write(int16_t i16);
     virtual size_t Write(uint16_t u16);
     virtual size_t Write(float f);
@@ -221,6 +226,8 @@ namespace btk
     using BinaryFileStream::ReadU16;
     virtual float ReadFloat();
     using BinaryFileStream::ReadFloat;
+    virtual double ReadDouble();
+    using BinaryFileStream::ReadDouble;
     virtual size_t Write(int16_t i16);
     virtual size_t Write(uint16_t u16);
     virtual size_t Write(float f);
@@ -243,6 +250,8 @@ namespace btk
     using BinaryFileStream::ReadU16;
     virtual float ReadFloat();
     using BinaryFileStream::ReadFloat;
+    virtual double ReadDouble();
+    using BinaryFileStream::ReadDouble;
     virtual size_t Write(int16_t i16);
     virtual size_t Write(uint16_t u16);
     virtual size_t Write(float f);

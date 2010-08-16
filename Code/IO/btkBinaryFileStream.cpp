@@ -345,12 +345,31 @@ namespace btk
   const std::vector<float> BinaryFileStream::ReadFloat(size_t nb)
   {
     size_t inc = 0;
-    std::vector<float> vFFs = std::vector<float>(nb,0);
+    std::vector<float> vFFs = std::vector<float>(nb,0.0);
     while (inc < nb)
     {
       vFFs[inc++] = this->ReadFloat();
     }
     return vFFs;
+  };
+  
+  /** 
+   * @fn float BinaryFileStream::ReadDouble() = 0
+   * Extracts one double.
+   */
+  
+  /** 
+   * Extracts @a nb doubles and return them as a vector.
+   */
+  const std::vector<double> BinaryFileStream::ReadDouble(size_t nb)
+  {
+    size_t inc = 0;
+    std::vector<double> vDFs = std::vector<double>(nb,0.0);
+    while (inc < nb)
+    {
+      vDFs[inc++] = this->ReadDouble();
+    }
+    return vDFs;
   };
   
   /** 
@@ -614,6 +633,24 @@ namespace btk
     return *reinterpret_cast<float const*>(foo);
 #endif
   };
+  
+  /** 
+   * Extracts one double.
+   */
+  double VAXLittleEndianBinaryFileStream::ReadDouble()
+  {
+    char byteptr[8];
+    this->mp_Stream->read(byteptr, 8);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[8] = {byteptr[1] - 1 * (byteptr[1] == 0 ? 0 : 1), byteptr[0], byteptr[3], byteptr[2], byteptr[5], byteptr[4], byteptr[7], byteptr[6]};
+    return *reinterpret_cast<double const*>(foo);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    return *reinterpret_cast<double const*>(byteptr);
+#else
+    char foo[8] = {byteptr[6], byteptr[7], byteptr[4], byteptr[5], byteptr[2], byteptr[3], byteptr[0], byteptr[1] - 1 * (byteptr[1] == 0 ? 0 : 1)};
+    return *reinterpret_cast<double const*>(foo);
+#endif
+  };
 
   /**
    * Writes the signed 16-bit integer @a i16 in the stream an return its size.
@@ -734,6 +771,24 @@ namespace btk
     return *reinterpret_cast<float const*>(foo);
 #endif
   };
+  
+  /** 
+   * Extracts one double.
+   */
+  double IEEEBigEndianBinaryFileStream::ReadDouble()
+  {
+    char byteptr[8];
+    this->mp_Stream->read(byteptr, 8);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    return *reinterpret_cast<double const*>(byteptr);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    char foo[8] = {byteptr[1], byteptr[0] + 1 * (byteptr[0] == 0 ? 0 : 1), byteptr[3], byteptr[2], byteptr[5], byteptr[4], byteptr[7], byteptr[6]};
+    return *reinterpret_cast<double const*>(foo);
+#else
+    char foo[8] = {byteptr[7], byteptr[6], byteptr[5], byteptr[4], byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<double const*>(foo);
+#endif
+  };
 
   /**
    * Writes the signed 16-bit integer @a i16 in the stream an return its size.
@@ -852,6 +907,24 @@ namespace btk
     return *reinterpret_cast<float const*>(foo);
 #else
     return *reinterpret_cast<float const*>(byteptr);
+#endif
+  };
+  
+  /** 
+   * Extracts one float.
+   */
+  double IEEELittleEndianBinaryFileStream::ReadDouble()
+  {
+    char byteptr[8];
+    this->mp_Stream->read(byteptr, 8);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[8] = {byteptr[7], byteptr[6], byteptr[5], byteptr[4], byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<double const*>(foo);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */ 
+    char foo[8] = {byteptr[6], byteptr[7] + 1 * (byteptr[7] == 0 ? 0 : 1), byteptr[4], byteptr[5], byteptr[2], byteptr[3], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<double const*>(foo);
+#else
+    return *reinterpret_cast<double const*>(byteptr);
 #endif
   };
 
