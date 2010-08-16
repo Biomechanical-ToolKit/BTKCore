@@ -64,7 +64,7 @@
 #endif
 
 // Check if we can use the memory mapped filestream system
-#if 0//defined HAVE_SYS_MMAP //|| defined _MSC_VER
+#if defined HAVE_SYS_MMAP || defined _MSC_VER
   #define TEST_MMFSTREAM
   #include "btkBinaryFileStream_mmfstream_p.h"
   typedef btk::mmfstream FStream;

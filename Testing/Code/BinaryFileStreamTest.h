@@ -186,7 +186,9 @@ CXXTEST_SUITE(BinaryFileStreamTest)
   CXXTEST_TEST(ReadNoFile)
   {
     btk::NativeBinaryFileStream bfs;
-    TS_ASSERT_EQUALS(bfs.ReadI8(), 0x00);
+    bfs.ReadI8();
+    bfs.ReadI8();
+    bfs.ReadI8();
     TS_ASSERT_EQUALS(bfs.IsOpen(), false);
     TS_ASSERT_EQUALS(bfs.Good(), false);
     TS_ASSERT_EQUALS(bfs.EndFile(), true);
@@ -220,7 +222,7 @@ CXXTEST_SUITE(BinaryFileStreamTest)
     bfs.Open(C3DFilePathIN + "others/Gait.c3d", btk::BinaryFileStream::In);
     bfs.SeekRead(0, btk::BinaryFileStream::End);
     TS_ASSERT(bfs.TellRead().operator==(406528));
-    TS_ASSERT_EQUALS(bfs.ReadI8(), 0x00);
+    bfs.ReadI8();
     TS_ASSERT_EQUALS(bfs.IsOpen(), true);
     TS_ASSERT_EQUALS(bfs.Good(), false);
     TS_ASSERT_EQUALS(bfs.EndFile(), true);
@@ -275,8 +277,8 @@ CXXTEST_SUITE(BinaryFileStreamTest)
     TS_ASSERT_EQUALS(bfs.Bad(), false);
     TS_ASSERT_EQUALS(bfs.Fail(), false);
     bfs.Clear();
-    TS_ASSERT_EQUALS(bfs.ReadI8(), 0x00);
-    TS_ASSERT_EQUALS(bfs.ReadI8(), 0x00);
+    bfs.ReadI8();
+    bfs.ReadI8();
     TS_ASSERT_EQUALS(bfs.IsOpen(), true);
     TS_ASSERT_EQUALS(bfs.Good(), false);
     TS_ASSERT_EQUALS(bfs.EndFile(), true);
@@ -322,8 +324,8 @@ CXXTEST_SUITE(BinaryFileStreamTest)
     TS_ASSERT_EQUALS(bfs.Bad(), false);
     TS_ASSERT_EQUALS(bfs.Fail(), false);
     bfs.Clear();
-    TS_ASSERT_EQUALS(bfs.ReadI8(), 0x00);
-    TS_ASSERT_EQUALS(bfs.ReadI8(), 0x00);
+    bfs.ReadI8();
+    bfs.ReadI8();
     TS_ASSERT_EQUALS(bfs.IsOpen(), true);
     TS_ASSERT_EQUALS(bfs.Good(), false);
     TS_ASSERT_EQUALS(bfs.EndFile(), true);
@@ -370,8 +372,8 @@ CXXTEST_SUITE(BinaryFileStreamTest)
     TS_ASSERT_EQUALS(bfs.Bad(), false);
     TS_ASSERT_EQUALS(bfs.Fail(), true);
     bfs.Clear();
-    TS_ASSERT_EQUALS(bfs.ReadI8(), 0x00);
-    TS_ASSERT_EQUALS(bfs.ReadI8(), 0x00);
+    bfs.ReadI8();
+    bfs.ReadI8();
     TS_ASSERT_EQUALS(bfs.IsOpen(), true);
     TS_ASSERT_EQUALS(bfs.Good(), false);
     TS_ASSERT_EQUALS(bfs.EndFile(), true);
@@ -407,9 +409,54 @@ CXXTEST_SUITE(BinaryFileStreamTest)
     std::remove(filename.c_str());
     btk::NativeBinaryFileStream bfs;
     bfs.Open(filename, btk::BinaryFileStream::Out);
+#ifdef _MSC_VER // The granularity is not the same
+    bfs.SeekWrite(65536, btk::BinaryFileStream::Begin);
+#else
     bfs.SeekWrite(4096, btk::BinaryFileStream::Begin);
+#endif
+    TS_ASSERT_EQUALS(bfs.IsOpen(), true);
+    TS_ASSERT_EQUALS(bfs.Good(), true);
+    TS_ASSERT_EQUALS(bfs.EndFile(), false);
+    TS_ASSERT_EQUALS(bfs.Bad(), false);
+    TS_ASSERT_EQUALS(bfs.Fail(), false);
     bfs.Write((int8_t)16);
+    TS_ASSERT_EQUALS(bfs.IsOpen(), true);
+    TS_ASSERT_EQUALS(bfs.Good(), true);
+    TS_ASSERT_EQUALS(bfs.EndFile(), false);
+    TS_ASSERT_EQUALS(bfs.Bad(), false);
+    TS_ASSERT_EQUALS(bfs.Fail(), false);
     bfs.Close();
+    TS_ASSERT_EQUALS(bfs.IsOpen(), false);
+    TS_ASSERT_EQUALS(bfs.Good(), true);
+    TS_ASSERT_EQUALS(bfs.EndFile(), false);
+    TS_ASSERT_EQUALS(bfs.Bad(), false);
+    TS_ASSERT_EQUALS(bfs.Fail(), false);
+  };
+  
+  CXXTEST_TEST(SuperSeekWrite)
+  {
+    std::string filename = C3DFilePathOUT + "mmfstream.c3d";
+    std::remove(filename.c_str());
+    btk::NativeBinaryFileStream bfs;
+    bfs.Open(filename, btk::BinaryFileStream::Out);
+    bfs.SeekWrite(400000, btk::BinaryFileStream::Begin);
+    TS_ASSERT_EQUALS(bfs.IsOpen(), true);
+    TS_ASSERT_EQUALS(bfs.Good(), true);
+    TS_ASSERT_EQUALS(bfs.EndFile(), false);
+    TS_ASSERT_EQUALS(bfs.Bad(), false);
+    TS_ASSERT_EQUALS(bfs.Fail(), false);
+    bfs.Write((int8_t)16);
+    TS_ASSERT_EQUALS(bfs.IsOpen(), true);
+    TS_ASSERT_EQUALS(bfs.Good(), true);
+    TS_ASSERT_EQUALS(bfs.EndFile(), false);
+    TS_ASSERT_EQUALS(bfs.Bad(), false);
+    TS_ASSERT_EQUALS(bfs.Fail(), false);
+    bfs.Close();
+    TS_ASSERT_EQUALS(bfs.IsOpen(), false);
+    TS_ASSERT_EQUALS(bfs.Good(), true);
+    TS_ASSERT_EQUALS(bfs.EndFile(), false);
+    TS_ASSERT_EQUALS(bfs.Bad(), false);
+    TS_ASSERT_EQUALS(bfs.Fail(), false);
   };
 };
 
@@ -438,4 +485,5 @@ CXXTEST_TEST_REGISTRATION(BinaryFileStreamTest, SeekReadCurrentInvalidBackwardBi
 CXXTEST_TEST_REGISTRATION(BinaryFileStreamTest, ReadEOFException)
 CXXTEST_TEST_REGISTRATION(BinaryFileStreamTest, Write)
 CXXTEST_TEST_REGISTRATION(BinaryFileStreamTest, SeekWrite)
+CXXTEST_TEST_REGISTRATION(BinaryFileStreamTest, SuperSeekWrite)
 #endif

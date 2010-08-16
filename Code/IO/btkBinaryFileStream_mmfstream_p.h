@@ -39,7 +39,12 @@
 #if defined(_MSC_VER) // Windows
   #define WIN32_LEAN_AND_MEAN
   #define VC_EXTRALEAN
+  // Defining NOMINMAX to prevent compiler error with std::min/std::max when including windows.h
+  #ifndef NOMINMAX
+    #define NOMINMAX
+  # endif
   #include <windows.h>
+  #define MMFILEBUF_NO_FILE INVALID_HANDLE_VALUE
 #endif
 
 #include <ios>
@@ -53,7 +58,7 @@ namespace btk
     ~mmfilebuf() {this->close();};
     
     mmfilebuf* open(const char* s, std::ios_base::openmode mode);
-    bool is_open() const {return !(this->m_File == NO_FILE);};
+    bool is_open() const {return !(this->m_File == MMFILEBUF_NO_FILE);};
     mmfilebuf* close();
     
     bool is_eob() const {return (this->m_Position == this->m_BufferSize + 1);}; // End of buffer
@@ -83,11 +88,10 @@ namespace btk
     std::streamsize m_LogicalSize;
 #if defined(HAVE_SYS_MMAP)
     int m_File;
-    static const int NO_FILE = -1;
+    static const int MMFILEBUF_NO_FILE = -1;
 #else
     HANDLE m_File;
     HANDLE m_Map;
-    static const int NO_FILE = INVALID_HANDLE_VALUE;
 #endif
     std::streamoff m_Position;
     bool m_Writing;
@@ -149,7 +153,7 @@ namespace btk
     this->mp_Buffer = 0;
     this->m_BufferSize = -1;
     this->m_LogicalSize = 0;
-    this->m_File = NO_FILE;
+    this->m_File = MMFILEBUF_NO_FILE;
 #if defined(_MSC_VER)
     this->m_Map = 0;
 #endif

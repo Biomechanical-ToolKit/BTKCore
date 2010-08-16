@@ -36,9 +36,6 @@
 #include "btkBinaryFileStream_mmfstream_p.h"
 #include "btkMacro.h"
 
-#include <errno.h>
-#include <iostream>
-
 #if defined(HAVE_SYS_MMAP)
   #if defined(HAVE_64_BIT)
     #define _LARGEFILE_SOURCE
@@ -56,15 +53,17 @@ namespace btk
   // ------------------------------------------------------------ //
   mmfilebuf* mmfilebuf::open(const char* s, std::ios_base::openmode mode)
   {
-    //std::cout << "Already opened?" << std::endl;
     if (this->is_open())
       return 0;
+    std::ios_base::openmode mode_ = mode & (~std::ios_base::ate & ~std::ios_base::binary);
+    if (mode_ & std::ios_base::out)
+      this->m_Writing = true;
+    else
+      this->m_Writing = false;
     // Open the file and map it into the memory
-    // This extraction is greatly inspired by the file fstream.cxx
-    // from the Comeau Computing library
+    // The flags' extraction is inspired by the file fstream.cxx from the Comeau Computing library
 #if defined(HAVE_SYS_MMAP) // POSIX
     // Select the flags for the function open
-    std::ios_base::openmode mode_ = mode & (~std::ios_base::ate & ~std::ios_base::binary);
     int flags = 0;
     switch (mode_)
     {
@@ -87,10 +86,6 @@ namespace btk
     default: // Other flags are not supported in the C++ standard
       return 0;
     }
-    if (mode_ & std::ios_base::out)
-      this->m_Writing = true;
-    else
-      this->m_Writing = false;
     // Open the file
     if ((this->m_File = ::open(s, flags, S_IRWXU)) == -1)
       return 0;
@@ -103,26 +98,25 @@ namespace btk
     if ((this->m_BufferSize == 0) && this->m_Writing)
     {
       this->m_BufferSize = mmfilebuf::granularity();
-      if (::lseek(this->m_File, this->m_BufferSize-1, SEEK_SET) == -1)
-        return this->close();
-      if (::write(this->m_File, "", 1) == -1)
+      if ((::lseek(this->m_File, this->m_BufferSize-1, SEEK_SET) == -1)
+           || (::write(this->m_File, "", 1) == -1))
         return this->close();
     }
 #else // Windows
     // Select the flags for the function CreateFile
-    DWORD dwDesiredAccess, dwShareMode, dwCreationDisposition;
-    DWORD dwFlagsandAttributes = FILE_ATTRIBUTE_TEMPORARY;
-    switch(mode & (~std::ios_base::ate & ~std::ios_base::binary))
+    DWORD dwDesiredAccess, dwShareMode, dwCreationDisposition, dwFlagsandAttributes;
+    dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
+    dwShareMode = FILE_SHARE_READ;
+    dwFlagsandAttributes = FILE_ATTRIBUTE_TEMPORARY;
+    switch(mode_)
     {
     case std::ios_base::out:
+      dwCreationDisposition = OPEN_ALWAYS;
+      break;
     case std::ios_base::out + std::ios_base::trunc:
-      dwDesiredAccess = GENERIC_WRITE;
-      dwShareMode = FILE_SHARE_READ;
-      dwCreationDisposition = TRUNCATE_EXISTING;
+      dwCreationDisposition = CREATE_ALWAYS;
       break;
     case std::ios_base::out + std::ios_base::app:
-      dwDesiredAccess = GENERIC_WRITE;
-      dwShareMode = FILE_SHARE_READ;
       dwCreationDisposition = OPEN_ALWAYS;
       break;
     case std::ios_base::in:
@@ -132,13 +126,9 @@ namespace btk
       dwFlagsandAttributes = FILE_ATTRIBUTE_READONLY;
       break;
     case std::ios_base::in + std::ios_base::out:
-      dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
-      dwShareMode = FILE_SHARE_READ;
       dwCreationDisposition = OPEN_ALWAYS;
       break;
     case std::ios_base::in + std::ios_base::out + std::ios_base::trunc:
-      dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
-      dwShareMode = FILE_SHARE_READ;
       dwCreationDisposition = TRUNCATE_EXISTING;
       break;
     default: // Other flags are not supported in the C++ standard
@@ -150,6 +140,19 @@ namespace btk
         == INVALID_HANDLE_VALUE)
       return 0;
     // Get the size of the file
+    DWORD dwFileSizeHi = 0;
+    DWORD dwFileSizeLo = GetFileSize(this->m_File, &dwFileSizeHi);
+    this->m_BufferSize = this->m_LogicalSize = (static_cast<std::streamsize>(dwFileSizeHi) << 32) | dwFileSizeLo;
+    // New file or truncated file?
+    if ((this->m_BufferSize == 0) && this->m_Writing)
+    {
+      this->m_BufferSize = mmfilebuf::granularity();
+      LONG lDistHigh = this->m_BufferSize >> 32; // 32 = (sizeof(LONG) * 8)
+      LONG lDistLow = this->m_BufferSize & 0xFFFFFFFF;
+      if (((::SetFilePointer(this->m_File, lDistLow, &lDistHigh, FILE_BEGIN) == INVALID_SET_FILE_POINTER) 
+           && (::GetLastError() != NO_ERROR)) || (::SetEndOfFile(this->m_File) == 0))
+        return this->close();
+    }
 #endif
     // Map the file
     if (!this->mapfile())
@@ -168,24 +171,24 @@ namespace btk
   {
     if (!this->is_open())
       return 0;
-      
-    bool err = false;
+
 #if defined(HAVE_SYS_MMAP)
-    err |= !(::munmap(this->mp_Buffer, this->m_BufferSize) == 0);
+    bool err = !(::munmap(this->mp_Buffer, this->m_BufferSize) == 0);
 #else
-    err |= ::UnmapViewOfFile(this->mp_Buffer) || ::CloseHandle(this->m_Map);
+    BOOL err = (::UnmapViewOfFile(this->mp_Buffer) == 0) || (::CloseHandle(this->m_Map) == 0);
     this->m_Map = NULL;
 #endif
-
+    
     // If in write mode, truncate the file to the number of bytes wrote.
     if (this->m_Writing)
     {
 #if defined(HAVE_SYS_MMAP)
       err |= (::ftruncate(this->m_File, this->m_LogicalSize) == -1);
 #else
-      LONG sizehigh = (this->m_LogicalSize >> (sizeof(LONG) * 8));
-      LONG sizelow = (this->m_LogicalSize & 0xffffffff);      
-      err |= ((::SetEndOfFile(this->m_File, sizelow, sizehigh, FILE_BEGIN) == INVALID_SET_FILE_POINTER) || (::SetFilePointer(this->m_File) == 0));
+      LONG lDistHigh = this->m_LogicalSize >> 32; // 32 = (sizeof(LONG) * 8)
+      LONG lDistLow = this->m_LogicalSize & 0xFFFFFFFF;   
+      err |= (((::SetFilePointer(this->m_File, lDistLow, &lDistHigh, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
+               && (::GetLastError() != NO_ERROR)) || (::SetEndOfFile(this->m_File) == 0));
 #endif
     }
 
@@ -193,14 +196,16 @@ namespace btk
 #if defined(HAVE_SYS_MMAP)
     err |= ::close(this->m_File);
 #else
-    err |= ::CloseHandle(this->m_File);
+    err |= (::CloseHandle(this->m_File) == 0);
 #endif
-    this->m_File = NO_FILE;
+    this->m_File = MMFILEBUF_NO_FILE;
+    
     if (err)
       return 0;
     this->mp_Buffer = 0;
     this->m_BufferSize = 0;
     this->m_LogicalSize = 0;
+    
     return this;
   };
   
@@ -242,7 +247,7 @@ namespace btk
   
   std::streamsize mmfilebuf::sgetn(char* s, std::streamsize n)
   {
-    std::streamoff n_ = ((this->m_Position + n) > this->m_BufferSize) ? this->m_BufferSize - this->m_Position - 1 : n;
+    std::streamoff n_ = ((this->m_Position + n) > this->m_BufferSize) ? ((this->m_BufferSize - this->m_Position - 1) > 0 ? this->m_BufferSize - this->m_Position - 1 : 0) : n;
     for (std::streamoff i = 0 ; i < n_ ; ++i)
       s[i] = this->mp_Buffer[this->m_Position + i];
     this->m_Position += n_;
@@ -251,8 +256,11 @@ namespace btk
   
   std::streamsize mmfilebuf::sputn(const char* s, std::streamsize n)
   {
-    if (((this->m_Position + n) >= this->m_BufferSize) && !this->resizemap())
-      return 0;
+    while ((this->m_Position + n) >= this->m_BufferSize) 
+    {
+      if (!this->resizemap())
+        return 0;
+    }
     
     for (std::streamoff i = 0 ; i < n ; ++i)
       this->mp_Buffer[this->m_Position + i] = s[i];
@@ -271,7 +279,17 @@ namespace btk
                                                  this->m_Writing ? (PROT_READ | PROT_WRITE) : PROT_READ, 
                                                  MAP_SHARED, this->m_File, 0)) == MAP_FAILED);
 #else
-    #error ToDo
+    BOOL err = ((this->m_Map = ::CreateFileMapping(this->m_File,
+                                                   NULL, 
+                                                   this->m_Writing ? PAGE_READWRITE : PAGE_READONLY,
+                                                   0, 
+                                                   0,
+                                                   NULL)) == NULL);
+    err |= ((this->mp_Buffer = (char*)::MapViewOfFile(this->m_Map,
+                                                       this->m_Writing ? FILE_MAP_WRITE : FILE_MAP_READ,
+                                                       0,
+                                                       0,
+                                                       this->m_BufferSize)) == NULL);
 #endif
     return err ? 0 : this;
   };
@@ -282,7 +300,14 @@ namespace btk
       return 0;
     std::streamsize newBufferSize = this->m_BufferSize + this->granularity();
 #if defined(_MSC_VER)
-    #error ToDo
+    if ((::UnmapViewOfFile(this->mp_Buffer) == 0) || (::CloseHandle(this->m_Map) == 0))
+      return 0;
+    this->m_Map = NULL;
+    LONG lDistHigh = newBufferSize >> 32; // 32 = (sizeof(LONG) * 8)
+    LONG lDistLow = newBufferSize & 0xFFFFFFFF;   
+    if (((::SetFilePointer(this->m_File, lDistLow, &lDistHigh, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
+               && (::GetLastError() != NO_ERROR)) || (::SetEndOfFile(this->m_File) == 0))
+      return 0;
 #else
     if (ftruncate(this->m_File, newBufferSize) == -1)
       return 0;      
