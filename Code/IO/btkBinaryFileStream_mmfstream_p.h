@@ -44,7 +44,9 @@
     #define NOMINMAX
   # endif
   #include <windows.h>
-  #define MMFILEBUF_NO_FILE INVALID_HANDLE_VALUE
+  #define BTK_MMFILEBUF_NO_FILE INVALID_HANDLE_VALUE
+#else // POSIX
+  static const int BTK_MMFILEBUF_NO_FILE = -1;
 #endif
 
 #include <ios>
@@ -58,7 +60,7 @@ namespace btk
     ~mmfilebuf() {this->close();};
     
     mmfilebuf* open(const char* s, std::ios_base::openmode mode);
-    bool is_open() const {return !(this->m_File == MMFILEBUF_NO_FILE);};
+    bool is_open() const {return !(this->m_File == BTK_MMFILEBUF_NO_FILE);};
     mmfilebuf* close();
     
     bool is_eob() const {return (this->m_Position == this->m_BufferSize + 1);}; // End of buffer
@@ -88,7 +90,6 @@ namespace btk
     std::streamsize m_LogicalSize;
 #if defined(HAVE_SYS_MMAP)
     int m_File;
-    static const int MMFILEBUF_NO_FILE = -1;
 #else
     HANDLE m_File;
     HANDLE m_Map;
@@ -107,6 +108,7 @@ namespace btk
     // ~mmfstream(); // Implicit;
     
     // Open/Close
+    const mmfilebuf* rdbuf() const {return &this->m_Filebuf;};
     inline void open(const char* s, std::ios_base::openmode mode);
     bool is_open() const {return m_Filebuf.is_open();};
     inline void close();
@@ -131,11 +133,9 @@ namespace btk
     // Write
     mmfstream& write(const char* s, std::streamsize n);
     inline mmfstream& seekp(std::streampos pos);
-    inline mmfstream& seekp(std::streamoff off, std::ios_base::seekdir dir);
+    inline mmfstream& seekp(std::streamoff off, std::ios_base::seekdir dir);    
     
-  private:
-    //void m_Setstate(std::ios_base::iostate state);
-    
+  private:    
     mmfstream(const mmfstream& ); // Not implemented.
     mmfstream& operator=(const mmfstream& ); // Not implemnted
     
@@ -153,7 +153,7 @@ namespace btk
     this->mp_Buffer = 0;
     this->m_BufferSize = -1;
     this->m_LogicalSize = 0;
-    this->m_File = MMFILEBUF_NO_FILE;
+    this->m_File = BTK_MMFILEBUF_NO_FILE;
 #if defined(_MSC_VER)
     this->m_Map = 0;
 #endif

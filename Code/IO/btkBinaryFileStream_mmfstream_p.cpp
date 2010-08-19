@@ -198,7 +198,7 @@ namespace btk
 #else
     err |= (::CloseHandle(this->m_File) == 0);
 #endif
-    this->m_File = MMFILEBUF_NO_FILE;
+    this->m_File = BTK_MMFILEBUF_NO_FILE;
     
     if (err)
       return 0;

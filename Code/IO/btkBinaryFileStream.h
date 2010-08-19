@@ -65,12 +65,12 @@
 
 // Check if we can use the memory mapped filestream system
 #if defined HAVE_SYS_MMAP || defined _MSC_VER
-  #define TEST_MMFSTREAM
   #include "btkBinaryFileStream_mmfstream_p.h"
-  typedef btk::mmfstream FStream;
+  namespace btk {typedef btk::mmfstream RawFileStream;};
 #else
+  #define BTK_NO_MEMORY_MAPPED_FILESTREAM
   #include <fstream>
-  typedef std::fstream FStream;
+  namespace btk {typedef std::fstream RawFileStream;};
 #endif
 
 #include <string>
@@ -96,7 +96,7 @@
 
 namespace btk
 {
-  typedef FStream::failure BinaryFileStreamException;
+  typedef RawFileStream::failure BinaryFileStreamException;
   
   class BinaryFileStream
   {
@@ -138,25 +138,26 @@ namespace btk
     void SetExceptions(IOState except) {this->mp_Stream->exceptions(except);};
     void Clear(IOState flags = GoodBit) {return this->mp_Stream->clear(flags);};
     
+    const RawFileStream* GetStream() const {return this->mp_Stream;};
     void SwapStream(BinaryFileStream* toSwap);
     
-    virtual char ReadChar();
-    virtual const std::vector<char> ReadChar(size_t nb);
-    virtual int8_t ReadI8();
-    virtual const std::vector<int8_t> ReadI8(size_t nb);
-    virtual uint8_t ReadU8();
-    virtual const std::vector<uint8_t> ReadU8(size_t nb);
+    char ReadChar();
+    const std::vector<char> ReadChar(size_t nb);
+    int8_t ReadI8();
+    const std::vector<int8_t> ReadI8(size_t nb);
+    uint8_t ReadU8();
+    const std::vector<uint8_t> ReadU8(size_t nb);
     virtual int16_t ReadI16() = 0;
-    virtual const std::vector<int16_t> ReadI16(size_t nb);
+    const std::vector<int16_t> ReadI16(size_t nb);
     virtual uint16_t ReadU16() = 0;
-    virtual const std::vector<uint16_t> ReadU16(size_t nb);
+    const std::vector<uint16_t> ReadU16(size_t nb);
     
     virtual float ReadFloat() = 0;
-    virtual const std::vector<float> ReadFloat(size_t nb);
+    const std::vector<float> ReadFloat(size_t nb);
     virtual double ReadDouble() = 0;
-    virtual const std::vector<double> ReadDouble(size_t nb);
-    virtual const std::string ReadString(size_t nbChar);
-    virtual const std::vector<std::string> ReadString(size_t nb, size_t nbChar);
+    const std::vector<double> ReadDouble(size_t nb);
+    const std::string ReadString(size_t nbChar);
+    const std::vector<std::string> ReadString(size_t nb, size_t nbChar);
     void SeekRead(StreamOffset offset, SeekDir dir) {this->mp_Stream->seekg(offset, dir);};
     StreamPosition TellRead() const {return this->mp_Stream->tellg();};
     
@@ -166,24 +167,24 @@ namespace btk
     //       char and int8_t are the same for it...
     //virtual size_t Write(char c);
     //virtual size_t Write(const std::vector<char>& rVectorChar);
-    virtual size_t Write(int8_t i8);
-    virtual size_t Write(const std::vector<int8_t>& rVectorI8);
-    virtual size_t Write(uint8_t u8);
-    virtual size_t Write(const std::vector<uint8_t>& rVectorU8);
+    size_t Write(int8_t i8);
+    size_t Write(const std::vector<int8_t>& rVectorI8);
+    size_t Write(uint8_t u8);
+    size_t Write(const std::vector<uint8_t>& rVectorU8);
     virtual size_t Write(int16_t i16) = 0;
-    virtual size_t Write(const std::vector<int16_t>& rVectorI16);
+    size_t Write(const std::vector<int16_t>& rVectorI16);
     virtual size_t Write(uint16_t u16) = 0;
-    virtual size_t Write(const std::vector<uint16_t>& rVectorU16);
+    size_t Write(const std::vector<uint16_t>& rVectorU16);
     virtual size_t Write(float f) = 0;
-    virtual size_t Write(const std::vector<float>& rVectorFloat);
-    virtual size_t Write(const std::string& rString);
-    virtual size_t Write(const std::vector<std::string>& rVectorString);
+    size_t Write(const std::vector<float>& rVectorFloat);
+    size_t Write(const std::string& rString);
+    size_t Write(const std::vector<std::string>& rVectorString);
   
   protected:
-    BinaryFileStream() {this->mp_Stream = new FStream();};
-    BinaryFileStream(const std::string& filename, OpenMode mode) {this->mp_Stream = new FStream(filename.c_str(), std::ios_base::binary | mode);};
+    BinaryFileStream() {this->mp_Stream = new RawFileStream();};
+    BinaryFileStream(const std::string& filename, OpenMode mode) {this->mp_Stream = new RawFileStream(filename.c_str(), std::ios_base::binary | mode);};
     
-    FStream* mp_Stream;
+    RawFileStream* mp_Stream;
 
   private:
     BinaryFileStream(const BinaryFileStream& ); // Not implemented.

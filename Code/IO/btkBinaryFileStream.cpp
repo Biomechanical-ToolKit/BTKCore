@@ -40,12 +40,20 @@
 
 // If it is possible to use the memory file mapping mechanism, 
 // then its code is compiled here 
-#if defined __btkBinaryFileStream_mmfstream_p_h // header declared?
+#if !defined BTK_NO_MEMORY_MAPPED_FILESTREAM
   #include "btkBinaryFileStream_mmfstream_p.cpp"
 #endif
 
 namespace btk
 {
+  /**
+   * @typedef RawFileStream
+   * Raw filestream used by the btk::BinaryFileStream class. Depending
+   * your configuration, this raw stream will correspond to btk::mmfstream
+   * (default) or std::fstream. The class btk::mmfstream uses the memory 
+   * mapped file mechanism.
+   */
+  
   /** 
    * @class BinaryFileStream
    * @brief An abstract class which read/write binary file in VAX and IEEE floating 
@@ -214,12 +222,17 @@ namespace btk
    */
   
   /**
+   * @fn const RawFileStream* BinaryFileStream::GetStream() const
+   * Return the raw stream associated with this binary filestream.
+   */
+  
+  /**
    * Swap streams. 
    * @warning The exceptions set are embedded with the stream.
    */
   void BinaryFileStream::SwapStream(BinaryFileStream* toSwap)
   {
-    FStream* temp = this->mp_Stream;
+    RawFileStream* temp = this->mp_Stream;
     this->mp_Stream = toSwap->mp_Stream;
     toSwap->mp_Stream = temp;
   };
