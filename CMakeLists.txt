@@ -82,7 +82,7 @@ CHECK_INCLUDE_FILE(sys/mman.h HAVE_SYS_MMAP)
 # Find the header memory[.hpp] in specific path.
 # This header contains the share_ptr class.
 CHECK_INCLUDE_FILE_CXX(memory HAVE_SYS_MEMORY_H)
-CHECK_INCLUDE_FILE_CXX(memory HAVE_SYS_MEMORY_H)
+CHECK_INCLUDE_FILE_CXX(tr1/memory HAVE_SYS_TR1_MEMORY_H)
 CHECK_INCLUDE_FILE(boost/memory.hpp HAVE_BOOST_MEMORY_HPP)
 CHECK_INCLUDE_FILE(boost/tr1/memory.hpp HAVE_BOOST_TR1_MEMORY_HPP)
 IF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
@@ -175,7 +175,7 @@ IF(NOT BTK_INSTALL_PACKAGE_DIR)
     CACHE INTERNAL "")
 ENDIF(NOT BTK_INSTALL_PACKAGE_DIR)
 
-# There are three basic components to the VTK installation: runtime,
+# There are three basic components to the BTK installation: runtime,
 # development, and documentation.  Install rules for each component
 # are surrounded by blockers.  Parent projects or users can specify
 # BTK_INSTALL_NO_RUNTIME, BTK_INSTALL_NO_DEVELOPMENT, or
