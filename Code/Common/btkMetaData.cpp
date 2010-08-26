@@ -301,6 +301,8 @@ namespace btk
   
   /**
    * Append the child @a entry.
+   * If @a entry has a label which already exists in the parent's list, then it is not inserted.
+    * @return True if child has been inserted or false.
    */
   bool MetaData::AppendChild(MetaData::Pointer entry)
   {

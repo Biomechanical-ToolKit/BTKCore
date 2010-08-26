@@ -5,7 +5,7 @@
 | \ref BuildInstructions "Building instructions"
 | \b Getting \b started
 | \ref AdvancedTutorial "Advanced tutorial"
-| \ref Developer "Developer's instructions"
+| \ref Developer "Developer's guide"
 | \ref License
 </div>
 
@@ -15,8 +15,8 @@
 - @ref AcquisitionReading
 - @ref AcquisitionAccessing
 - @ref AcquisitionModifying
-- @ref AcquisitionFiltering
 - @ref AcquisitionWriting
+- @ref AcquisitionFiltering
        
 @htmlonly <hr> @endhtmlonly
 
@@ -166,6 +166,8 @@ The others informations stored in an acquisition are the following:
 
 @b Note: In BTK, the term "point" means all data with 3 components along the time. So, a point can be also a force, a moment, a power, etc. Check btk::Point::GetType() to know the point's type.
 
+In an acquisition, points are stored in a btk::PointCollection::Pointer object. To access to this collection, you can use the method btk::Acquisition::GetPoints.
+
 To access to a point and its content, you can use the methods btk::Acquisition::GetPoint() which return a btk::Point::Pointer object based on the given index or label. If you give an invalid index or an invalid point's label, an exception (btk::OutOfRangeException) will be thrown.\n
 Another way to access to the content of a specific point when you don't know it exist or not in the acquisition is to use the method btk::Acquisition::FindPoint(). Given a point's label, this method returns an iterator associated to the found point. In the case the point is not found, the iterator will point to the end of the list of points.
 @code
@@ -220,9 +222,13 @@ The code above, iterate in a @p for loop, the const iterator @p it from the firs
 
 @subsection AcquisitionAccessing_Analog Accessing analog channels
 
+In an acquisition, analog channels are stored in a btk::AnalogCollection::Pointer object. To access to this collection, you can use the method btk::Acquisition::GetAnalogs.
+
 The way to access to the analog channels is similar to the points. you can use the method btk::Acquisition::GetAnalog() or an iterator (btk::Acquisition::AnalogIterator,  btk::Acquisition::AnalogConstIterator with the methods btk::Acquisition::BeginAnalog() and btk::Acquisition::EndAnalog()). You can also use the method btk::Acquisition::FindAnalog() if you don't know if the analog exists in the acquisition. 
 
 @subsection AcquisitionAccessing_Event Accessing events
+
+In an acquisition, events are stored in a btk::EventCollection::Pointer object. To access to this collection, you can use the method btk::Acquisition::GetEvents.
 
 As the points and the analog channels, you can access to the events stored in an acquisition by using the method btk::Acquisition::GetEvent() or an iterator (btk::Acquisition::EventIterator,  btk::Acquisition::EventConstIterator with the methods btk::Acquisition::BeginEvent() and btk::Acquisition::EndEvent()). You can also use the method btk::Acquisition::FindEvent() if you don't know if the event exists in the acquisition.
 
@@ -230,14 +236,15 @@ As the points and the analog channels, you can access to the events stored in an
 
 A metadata is a generic container to store the acquisition configuration. Or said differently, a metadata contains every informations which cannot be set into markers' trajectories nor analog channels' measures, nor events. For example, if you want to include subject's informations (sex, weight, height, ...) or force platform's configuration (corner's coordinates, analog channel used, ...), then the metadata are the right place to do this. In the C3D file format, the metadata are known as groups and parameters.
 
-To access to the acquisition's metadata, you have to use the method btk::Acquisition::GetMetaData which will return the root of the metadata. From this point, you have to use the methods of the class btk::MetaData. In the case where you want to access to the informations' value of the metadata SUBJECTS:WEIGHT, you can use the following code:
+To access to the acquisition's metadata, you have to use the method btk::Acquisition::GetMetaData which will return the root of the metadata. From this point, you have to use the methods of the class btk::MetaData. In the case where you want to access to the informations of a metadata, you will use the method btk::MetaData::GetInfo. This method returns a btk::MetaDataInfo::Pointer object which contains the values associated with the metadata.\n
+For example, if you want to access to the value of the metadata SUBJECTS:WEIGHT, you can use the following code:
 @code
 // btk::Acquisition::Pointer acq = ...
 double weight = acq->GetMetaData()->GetChild("SUBJECTS")->GetChild("WEIGHT")->GetInfo()->ToDouble(0);
 @endcode
 In the code above, the metadata WEIGHT is the child of the metadata SUBJECTS which is at the root of the metadata in the acquisition. It contains informations and at least one real value inside it.
 
-Event if this code is the most direct way to access to a metadata and its information, it can thrown an exception if the metadata doesn't exist, or worst, can crash your app if there is no info (in this case, the method btk::MetaData::GetInfo returns an empty pointer). You can also extract the wrong (or corrupted) value, if this metadata is not used to store the weight as a real but as a string. The safe way to do this is the following:
+Even if this code is the most direct way to access to a metadata and its information, it can thrown an exception if the metadata doesn't exist, or worst, can crash your app if there is no info (in this case, the method btk::MetaData::GetInfo returns an empty pointer). You can also extract the wrong (or corrupted) value, if this metadata is not used to store the weight as a real but as a string. The safe way to do this is the following:
 @code
 // btk::Acquisition::Pointer acq = ...
 double weight = 0.0;
@@ -266,7 +273,7 @@ double weight = 0.0;
 btk::MetaData::ConstIterator itG = acq->GetMetaData()->FindChild("SUBJECTS");
 if (itG != acq->EndMetaData()) // SUBJECTS exists
 {
-  btk::MetaDataInfo::Pointer swInfo = (*itG)->ExtractChildInfo("WEIGHT",btk::MetaDataInfo::Real,0); 
+  btk::MetaDataInfo::Pointer swInfo = (*itG)->ExtractChildInfo("WEIGHT", btk::MetaDataInfo::Real, 0); 
   if (swInfo) // Not an empty pointer
     weight = swInfo->ToDouble(0);
 }
@@ -274,17 +281,205 @@ if (itG != acq->EndMetaData()) // SUBJECTS exists
 
 @section AcquisitionModifying Modifying acquisition's data
 
-@subsection AcquisitionModifying_Point Modifying points
+Starting from an acquisition you can easily modify it by, for example, removing points, adding events, resizing the number of frames, populates points or analogs values, etc. Lots of these actions are available by using the methods of the class btk::Acquisition.
 
-@subsection AcquisitionModifying_Analog Modifying analog channels
+All the classes contains methods to modify their members. It is easy to extract a point from an acquisition and then set its label or description. This is the same for every object (including analogs channels, events or metadata).
 
-@subsection AcquisitionModifying_Event Modifying events
+@code
+// acq = ...
+btk::Point::Pointer foo = acq->GetPoint(0); // Throw an exception if the point at the index 0 doesn't exist.
+foo->SetLabel("FOO");
+foo->SetDescription("BAR");
+foo->SetType(btk::Point::Angle);
+@endcode
 
-@subsection AcquisitionModifying_Metadata Modifying metadata
+In some case, these methods are not enough due to the complexity of the class. For example with the metadata, lots of methods were added to facilitate their creation with values (single or multiple values). It is the same if you want to extract them in a particular format (integer, float, double or string).
 
-@b Note: Even, if you can create an infinite level of metadata, it is strongly advised to only use 2 levels of metadata. The first one corresponds to groups (without informations) and the second one to parameters). This use was introduced in the C3D file format.
+@code
+// acq = ...
+btk::MetaData::Pointer foo = btk::MetaData::New("FOO", "little description");
+// Check here that metadata FOO doesn't exist.
+// If it is not the case, then it is not added and the method returns false. Otherwise it returns true.
+acq->GetMetaData()->AppendChild(foo);
+// Even if the metadata are added in the object 'foo', it is also included in the acquisition as we are working with pointer.
+foo->AppendChild(btk::MetaData::New("BAR","metadata with a string value", "another description")); 
+foo->AppendChild(btk::MetaData::New("JOB", (int16_t)12, "This is a metadata with an integer value"));
+foo->AppendChild(btk::MetaData::New("BAZ", 180.0, "And here a double"));
+// To replace metadata's informations you can use the method btk::MetaData::SetInfo
+foo->GetChild("BAR")->SetInfo(btk::MetaDataInfo::New((int8_t)64)); // It is now a byte instead of a string.
+@endcode
 
-@section AcquisitionFiltering Filtering an acquisition
+Finally, in some case, you want to add children in the metadata but the requirement to check if they exist pollute your code, then you can use the functions btk::MetaDataCreateChild. These functions declared in the file "btkMetaDataUtils.h" do for you the steps required to include a children in a metadata.
+
+@code
+// From our previous example, the acquisition has the metadata FOO, FOO:BAR, FOO:JOB, FOO:BAZ
+btk::MetaData::Pointer foo = acq->GetMetaData()->GetChild("FOO");
+foo->AppendChild(btk::MetaData::New("BAR")); // Will return false and don't append the metadata.
+// Use this instead
+btk::MetaDataCreateChild(foo, "BAR", "It's working this case!");
+// It is also working if the child doesn't exist
+btk::MetaDataCreateChild(foo, "FOOBAR", std::vector<int8_t>(2,0)); // A new metadata with an array of bytes.
+@endcode
+
+@b Note: Even, if you can create an infinite level of metadata, it is strongly advised to only use 2 levels of metadata. The first one corresponds to groups (without informations) and the second one to parameters. This use was introduced in the C3D file format.
 
 @section AcquisitionWriting Writing an acquisition
+Saving an acquisition is as simple as reading one. If you want to save a modified acquisition or would like to convert a format into another one, you simply have to create an btk::AcquisitionFileWriter object, plug the acquisition in the input, set the filename and update the process.
+@code
+void writeAcquisition(btk::Acquisition::Pointer acq, const std::string& filename)
+{
+  btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+  writer->SetInput(acq)
+  writer->SetFilename(filename);
+  writer->Update();
+};
+@endcode
+The choice of the format for the saving is based on the extension of the filename. But you can also set an AcquisitionIO as with the reader.
+
+@section AcquisitionFiltering Filtering an acquisition
+The library BTK offers a mechanism of pipelines to easily process an acquisition or one of these parts (points, analogs channels, etc.). A pipeline is defined as a collection of processes linked together by their input(s) and output(s). You can create loops, branches or any more complex workflow. 
+
+To link the output(s) and input(s) of processes, you have just to use the methods @c SetInput() and @c GetOutput(). Check the documentation of each class for more information.
+
+When your pipeline is created, you need only to update the latest level of processes by using the method @c Update(). This process will check if all of these inputs are updated before to use them to generate its output. If these inputs are not updated, then the previous processes will be updated to be sure to use valid inputs.
+
+@b Note: You can also update a process by using its output (if it has one). Use its method @c Update(), and it will update its parent's process (can be useful when you prefer to store inputs/outputs instead of process).
+
+@subsection ExampleSimpleAcquisitionConverter Simple example: Acquisition file converter
+As a simple example, you can create a file converter. 
+@dot
+digraph pipeline {
+      rankdir=LR;
+      node [shape=record, fontname=Helvetica, fontsize=10];
+      r [ label="Reader"];
+      w [ label="Writer"];
+      r -> w;
+  }
+@enddot
+
+The following code is based on the example @c AcquisitionConverter. Depending the given inputs, this code try to convert/save an acquisition file into another one. With this code, you can transform a C3D to a TRC file, or the reverse, etc.
+@code
+#include <btkAcquisitionFileReader.h>
+#include <btkAcquisitionFileWriter.h>
+#include <btkMacro.h>
+
+int main(int argc, char *argv[])
+{
+  if (argc != 3)
+  {
+    std::cerr << "No enough input arguements.\n\n"
+              << "Usage: " << btkStripPathMacro(argv[0]) << " input output\n\n"
+              << "Convert an acquisition file into another one, whatever the formats used."
+              << std::endl;
+    return -1;
+  }
+ 
+  // New instantiation of an acquisition file reader. 
+  btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+  // Set the path of the acquisition to read.
+  reader->SetFilename(argv[1]);
+  // New instamtiation of an acquisition file writer
+  btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+  // Set the path of the file to write. The acquisition will be exported in this file.
+  writer->SetFilename(argv[2]);
+  // Link the writer with the reader.
+  writer->SetInput(reader->GetOutput());
+
+  // Manage possible exceptions during the update of the pipeline.
+  try 
+  {
+    writer->Update();
+  }
+  catch(btk::Exception& e) // General exception for BTK
+  {
+    std::cerr << "Exception: " << e.what() << std::endl;
+    std::remove(argv[2]);    
+    return -2;
+  }
+  catch(std::exception& e) // General exception for the STL
+  {
+    std::cerr << "Unknown exception: " << e.what() << std::endl;
+    std::remove(argv[2]);    
+    return -3;
+  }
+  catch(...) // Should never happen ...
+  {
+    std::cerr << "Unknown exception";
+    return -3;
+  }
+
+  return 0;
+};
+@endcode
+
+@subsection ExampleLessSimpleAcquisitionMerger Less simple example: Acquisition merger
+A more complex example, is the possibility to create a merger of acquisitions files, convert their units and write the new acquisition in a C3D file.
+@dot
+digraph pipeline {
+      rankdir=LR;
+      node [shape=record, fontname=Helvetica, fontsize=10];
+      r1 [ label="TRB Reader"];
+      r2 [ label="ANB Reader"];
+      r3 [ label="CAL Force Plate Reader"];
+      r4 [ label="XLS OrthoTrak Reader"];
+      m [ label="Acquisition merger"];
+      uc [ label="Unit converter"];
+      w [ label="C3D Writer"];
+      r1 -> m [headport = "_"] [tailport = "_"];
+      r2 -> m [headport = "_"] [tailport = "_"];
+      r3 -> m [headport = "_"] [tailport = "_"];
+      r4 -> m [headport = "_"] [tailport = "_"];
+      m -> uc -> w;
+  }
+@enddot
+
+To create a such pipeline, we need to declare each process (readers, merger, converter and writer), link them and update the pipeline to generate the result.
+
+@code
+#include <btkAcquisitionFileReader.h>
+#include <btkMergeAcquisitionFilter.h>
+#include <btkAcquisitionUnitConverter.h>
+#include <btkAcquisitionFileWriter.h>
+
+int main()
+{
+  // Declare each process
+  // Readers
+  btk::AcquisitionFileReader::Pointer TRBReader = btk::AcquisitionFileReader::New();
+  btk::AcquisitionFileReader::Pointer ANBReader= btk::AcquisitionFileReader::New();
+  btk::AcquisitionFileReader::Pointer CALForcePlateReader = btk::AcquisitionFileReader::New();
+  btk::AcquisitionFileReader::Pointer XLSOrthoTrakReader = btk::AcquisitionFileReader::New();
+  // Merger
+  btk::MergeAcquisitionFilter::Pointer Merger = btk::MergeAcquisitionFilter::New();
+  // Converter
+  btk::AcquisitionUnitConverter::Pointer Converter = btk::AcquisitionUnitConverter::New();
+  // Writer
+  btk::AcquisitionFileWriter::Pointer C3DWriter = btk::AcquisitionFileWriter::New();
+  
+  // Link the processes together to create the pipeline
+  Merger->SetInput(0, TRBReader->GetOutput()); // From the TRB reader to the merger
+  Merger->SetInput(1, ANBReader->GetOutput()); // From the ANB reader to the merger
+  Merger->SetInput(2, CALForcePlateReader->GetOutput()); // From the CAL reader to the merger
+  Merger->SetInput(3, XLSOrthotrackReader->GetOutput()); // From the XLS reader to the merger
+  Converter->SetInput(Merger->GetOutput()); // From the merger to the converter
+  C3DWriter->SetInput(Converter->GetOutput()); // From the converter to the C3D Writer;
+  
+  // Set the option(s) for each process
+  TRBReader->SetFilename("OneAcquisition.trb");
+  ANBReader->SetFilename("OneAcquisition.anb");
+  CALForcePlateReader->SetFilename("OneAcquisition.cal");
+  XLSOrthotrackReader->SetFilename("OneAcquisition.xls");
+  // No option for the merger
+  // Use the default units for the converter: millimeter (position), degree (angle), newton (force), netown-millimeter (moment) and watt (power).
+  C3DWriter->SetFilename("OneAcquisition.c3d");
+  
+  // To execute the pipeline, it is only necessary to update the last process.
+  // The pipeline will check if the previous are already updated an do it if necessary.
+  C3DWriter->Update();
+  
+  // Now check in your folder and you will find a new C3D file!
+  
+  return 0;
+};
+@endcode
  */

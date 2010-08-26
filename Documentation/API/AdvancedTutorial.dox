@@ -5,10 +5,13 @@
 | \ref BuildInstructions "Build instructions"
 | \ref GettingStarted "Getting started"
 | \b Advanced \b tutorial
-| \ref Developer "Developer's instructions"
+| \ref Developer "Developer's guide"
 | \ref License
 </div>
  */
  
+ @b Note: When you modify an acquisition or one of its part, you modify its internal state . So, modifying the output of a process ...
+ 
  @todo
+  - 
   - Speak about (boost|std)::[tr1::]::shared_ptr
