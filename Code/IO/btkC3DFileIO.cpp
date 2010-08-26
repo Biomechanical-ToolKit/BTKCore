@@ -373,7 +373,7 @@ namespace btk
       bool alreadyDisplayParameterOverflowMessage = false;
       while (1)
       {
-        nbCharLabel = ibfs->ReadI8(); totalBytesRead += nbCharLabel + 1;
+        nbCharLabel = ibfs->ReadI8(); totalBytesRead += abs(nbCharLabel) + 1;
         if (nbCharLabel == 0)
           break; // Parameter section end
         id = ibfs->ReadI8(); totalBytesRead += 1;
