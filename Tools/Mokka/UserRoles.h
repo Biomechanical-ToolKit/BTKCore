@@ -58,9 +58,9 @@ typedef enum {eventFrame = Qt::UserRole + 20,
               eventSubject,
               eventVisible} eventInformation;
 
-static int checkState2 = Qt::UserRole + 30;
-static int metadataInfoFirstValue = Qt::UserRole + 41;
-static int metadataInfoValuesCount = Qt::UserRole + 42;
+static const int checkState2 = Qt::UserRole + 30;
+static const int metadataInfoFirstValue = Qt::UserRole + 41;
+static const int metadataInfoValuesCount = Qt::UserRole + 42;
 
 typedef enum {visualConfigChanged = Qt::UserRole + 50,
               visualConfigFilename,

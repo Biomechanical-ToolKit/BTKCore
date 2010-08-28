@@ -342,10 +342,6 @@ btk::SeparateKnownVirtualMarkersFilter::Pointer MultiViewWidget::load(btk::Acqui
   forcePlatformsExtractor->SetInput(acq);
   GRWsDownsampler->SetUpDownRatio(acq->GetNumberAnalogSamplePerFrame());
   
-  // Active the content of each view
-  for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
-    static_cast<CompositeView*>(*it)->show(true);
-  
   std::string markerUnit = acq->GetPointUnit();
   double scale = 1.0;
   if (markerUnit.compare("m") == 0)
@@ -359,6 +355,182 @@ btk::SeparateKnownVirtualMarkersFilter::Pointer MultiViewWidget::load(btk::Acqui
   forcePlaforms->SetScaleUnit(scale);
   
   virtualMarkersSeparator->Update();
+  
+  // Generate the lists for the graphs (Must be set after the update of the virtual makers separator filter)
+  QFont f;
+  QListWidgetItem* lwi;
+  // List for the points
+  QListWidget* lwPoint = new QListWidget;
+  lwi = new QListWidgetItem("Deselect All");
+  lwi->setFlags(lwi->flags() & ~Qt::ItemIsUserCheckable);
+  lwPoint->addItem(lwi);
+  lwi = new QListWidgetItem(QString());
+  f = this->font();
+  f.setPixelSize(5);
+  lwi->setFont(f);
+  lwi->setFlags(lwi->flags() & ~(Qt::ItemIsSelectable | Qt::ItemIsEnabled));
+  lwPoint->addItem(lwi);
+  // - Markers
+  btk::PointCollection::Pointer m = virtualMarkersSeparator->GetOutput(0);
+  if (!m->IsEmpty())
+  {
+    lwi = new QListWidgetItem(tr("Markers")); 
+    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
+    f = this->font();
+    f.setBold(true);
+    lwi->setFont(f);
+    lwPoint->addItem(lwi);
+    for (btk::PointCollection::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
+    {
+      lwi = new QListWidgetItem(QString::fromStdString((*it)->GetLabel()));
+      lwi->setCheckState(Qt::Unchecked);
+      lwPoint->addItem(lwi);
+    }
+  }
+  // - Virtual markers
+  btk::PointCollection::Pointer vm = virtualMarkersSeparator->GetOutput(2);
+  if (!vm->IsEmpty())
+  {
+    lwi = new QListWidgetItem(tr("Virtual Markers")); 
+    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
+    f = this->font();
+    f.setBold(true);
+    lwi->setFont(f);
+    lwPoint->addItem(lwi);
+    for (btk::PointCollection::ConstIterator it = vm->Begin() ; it != vm->End() ; ++it)
+    {
+      lwi = new QListWidgetItem(QString::fromStdString((*it)->GetLabel()));
+      lwi->setCheckState(Qt::Unchecked);
+      lwPoint->addItem(lwi);
+    }
+  }
+  // - Sort others points
+  QVector<QStringList> sop(5);
+  for (btk::Acquisition::PointConstIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
+  {
+    if ((*it)->GetType() == btk::Point::Angle)
+      sop[0].push_back(QString::fromStdString((*it)->GetLabel()));
+    else if ((*it)->GetType() == btk::Point::Force)
+      sop[1].push_back(QString::fromStdString((*it)->GetLabel()));
+    else if ((*it)->GetType() == btk::Point::Moment)
+      sop[2].push_back(QString::fromStdString((*it)->GetLabel()));
+    else if ((*it)->GetType() == btk::Point::Power)
+      sop[3].push_back(QString::fromStdString((*it)->GetLabel()));
+    else if ((*it)->GetType() == btk::Point::Scalar)
+      sop[4].push_back(QString::fromStdString((*it)->GetLabel()));
+    //else
+    //  btkErrorMacro("Unknown point's type. Cannot be sorted to display its values.");
+  }
+  // - Angles
+  if (!sop[0].empty())
+  {
+    lwi = new QListWidgetItem(tr("Angles")); 
+    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
+    f = this->font();
+    f.setBold(true);
+    lwi->setFont(f);
+    lwPoint->addItem(lwi);
+    for (QStringList::const_iterator it = sop[0].begin() ; it != sop[0].end() ; ++it)
+    {
+      lwi = new QListWidgetItem(*it);
+      lwi->setCheckState(Qt::Unchecked);
+      lwPoint->addItem(lwi);
+    }
+  }
+  // - Forces
+  if (!sop[1].empty())
+  {
+    lwi = new QListWidgetItem(tr("Forces")); 
+    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
+    f = this->font();
+    f.setBold(true);
+    lwi->setFont(f);
+    lwPoint->addItem(lwi);
+    for (QStringList::const_iterator it = sop[1].begin() ; it != sop[1].end() ; ++it)
+    {
+      lwi = new QListWidgetItem(*it);
+      lwi->setCheckState(Qt::Unchecked);
+      lwPoint->addItem(lwi);
+    }
+  }
+  // - Moments
+  if (!sop[2].empty())
+  {
+    lwi = new QListWidgetItem(tr("Moments")); 
+    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
+    f = this->font();
+    f.setBold(true);
+    lwi->setFont(f);
+    lwPoint->addItem(lwi);
+    for (QStringList::const_iterator it = sop[2].begin() ; it != sop[2].end() ; ++it)
+    {
+      lwi = new QListWidgetItem(*it);
+      lwi->setCheckState(Qt::Unchecked);
+      lwPoint->addItem(lwi);
+    }
+  }
+  // - Powers
+  if (!sop[3].empty())
+  {
+    lwi = new QListWidgetItem(tr("Powers")); 
+    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
+    f = this->font();
+    f.setBold(true);
+    lwi->setFont(f);
+    lwPoint->addItem(lwi);
+    for (QStringList::const_iterator it = sop[3].begin() ; it != sop[3].end() ; ++it)
+    {
+      lwi = new QListWidgetItem(*it);
+      lwi->setCheckState(Qt::Unchecked);
+      lwPoint->addItem(lwi);
+    }
+  }
+  // - Scalars
+  if (!sop[4].empty())
+  {
+    lwi = new QListWidgetItem(tr("Scalars")); 
+    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
+    f = this->font();
+    f.setBold(true);
+    lwi->setFont(f);
+    lwPoint->addItem(lwi);
+    for (QStringList::const_iterator it = sop[4].begin() ; it != sop[4].end() ; ++it)
+    {
+      lwi = new QListWidgetItem(*it);
+      lwi->setCheckState(Qt::Unchecked);
+      lwPoint->addItem(lwi);
+    }
+  }
+  // List for the analog channels
+  QListWidget* lwAnalog = new QListWidget;
+  lwi = new QListWidgetItem("Deselect All");
+  lwi->setFlags(lwi->flags() & ~Qt::ItemIsUserCheckable);
+  lwAnalog->addItem(lwi);
+  lwi = new QListWidgetItem(QString());
+  f = this->font();
+  f.setPixelSize(5);
+  lwi->setFont(f);
+  lwi->setFlags(lwi->flags() & ~(Qt::ItemIsSelectable | Qt::ItemIsEnabled));
+  lwAnalog->addItem(lwi);
+  for (btk::Acquisition::AnalogConstIterator it = acq->BeginAnalog() ; it != acq->EndAnalog() ; ++it)
+  {
+    lwi = new QListWidgetItem(QString::fromStdString((*it)->GetLabel()));
+    lwi->setCheckState(Qt::Unchecked);
+    lwAnalog->addItem(lwi);
+  }
+  
+  // Active the content of each view
+  for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
+  {
+    CompositeView* view = static_cast<CompositeView*>(*it);
+    view->setFunctionComboBoxOption(CompositeView::GraphPoint, lwPoint, 1);
+    view->setFunctionComboBoxOption(CompositeView::GraphAnalogChannel, lwAnalog, 1);
+    view->show(true);
+  }
+  
+  delete lwPoint;
+  delete lwAnalog;
+  
   return virtualMarkersSeparator;
 };
 
@@ -500,7 +672,6 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(pickedMarkersChanged(int)), this, SIGNAL(pickedMarkersChanged(int)));
   static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D))->installEventFilter(this->parent()->parent());
   return sv;
-  
 };
 
 void MultiViewWidget::updateViews()

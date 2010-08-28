@@ -35,20 +35,13 @@
 
 #include "AbstractView.h"
 
+#include <QListWidget>
+
 AbstractView::AbstractView(QWidget* parent)
-: QWidget(parent)
+: QWidget(parent), m_FuncOptions()
 {
   this->setupUi(this);
-  this->finalizeUi();
-};
-
-AbstractView* AbstractView::clone() const
-{
-  return new AbstractView;
-};
-
-void AbstractView::finalizeUi()
-{
+  
   // Connections
   connect(this->hSplitButton, SIGNAL(clicked()), this, SLOT(splitHorizontally()));
   connect(this->vSplitButton, SIGNAL(clicked()), this, SLOT(splitVertically()));
@@ -56,10 +49,62 @@ void AbstractView::finalizeUi()
   connect(this->viewCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentIndex(int)));
 };
 
+AbstractView::~AbstractView()
+{
+  foreach(AbstractView::FuncOption opt, this->m_FuncOptions)
+    if (opt.lw) delete opt.lw;
+}
+
+void AbstractView::setFunctionComboBoxOption(int idx, QListWidget* lw, int currentIndex)
+{
+  if (idx < this->m_FuncOptions.count())
+  {
+    this->m_FuncOptions[idx].lw->clear();
+    for (int i = 0 ; i < lw->count() ; ++i)
+      this->m_FuncOptions[idx].lw->addItem(lw->item(i)->clone());
+    this->m_FuncOptions[idx].currentIndex = currentIndex;
+  }
+};
+
 void AbstractView::setFocus(Qt::FocusReason reason)
 {
   if (this->stackedWidget->currentWidget())
     this->stackedWidget->currentWidget()->setFocus(reason);
+};
+
+void AbstractView::setCurrentIndex(int idx)
+{
+  // save the current data view
+  this->saveCurrentFuncOption(this->stackedWidget->currentIndex());
+  int stackIndex = this->stackIndexFromViewComboIndex(idx);
+  // Load the new options
+  if (stackIndex < this->stackedWidget->count())
+  {
+    this->stackedWidget->setCurrentIndex(stackIndex);
+    this->stackedWidget->currentWidget()->setFocus(Qt::OtherFocusReason);
+    if (this->m_FuncOptions.empty() || (idx >= this->m_FuncOptions.count()) || !(this->m_FuncOptions[idx].lw))
+    {
+      this->funcCombo->setVisible(false);
+      this->finalizeView(idx); // Finalize the connection of the options and more
+    }
+    else
+    {
+      QListWidget* lw = new QListWidget;
+      for (int i = 0 ; i < this->m_FuncOptions[idx].lw->count() ; ++i)
+        lw->addItem(this->m_FuncOptions[idx].lw->item(i)->clone());
+      this->funcCombo->blockSignals(true);
+      this->funcCombo->setModel(lw->model());
+      this->funcCombo->setView(lw);
+      this->funcCombo->blockSignals(false);
+      this->finalizeView(idx); // Finalize the connection of the options and more
+      this->funcCombo->setCurrentIndex(this->m_FuncOptions[idx].currentIndex);
+      if (this->m_FuncOptions[idx].filtered)
+        this->funcCombo->view()->viewport()->installEventFilter(this);
+      else
+        this->funcCombo->view()->viewport()->removeEventFilter(this);
+      this->funcCombo->setVisible(true);
+    }
+  }
 };
 
 void AbstractView::close()
@@ -75,13 +120,4 @@ void AbstractView::splitHorizontally()
 void AbstractView::splitVertically()
 {
   emit this->splitTriggered(this, Qt::Vertical);
-};
-
-void AbstractView::setCurrentIndex(int idx)
-{
-  if (idx < this->stackedWidget->count())
-  {
-    this->stackedWidget->setCurrentIndex(idx);
-    this->stackedWidget->currentWidget()->setFocus(Qt::OtherFocusReason);
-  }
 };

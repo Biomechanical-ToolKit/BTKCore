@@ -38,33 +38,50 @@
 
 #include "ui_AbstractView.h"
 
+#include <QStyledItemDelegate>
+#include <QModelIndex>
+#include <QStandardItemModel>
+#include <QPainter>
+#include <QListWidget>
+
 class AbstractView : public QWidget, public Ui::AbstractView
 {
   Q_OBJECT
   
 public:
   AbstractView(QWidget* parent = 0);
-  // ~AbstractView(); // Implicit
-  // AbstractView(const AbstractView&);  // Implicit
+  virtual ~AbstractView();
+  // AbstractView(const AbstractView&); // Implicit
   // AbstractView& operator=(const AbstractView&); // Implicit.
   
-  virtual AbstractView* clone() const;
+  virtual AbstractView* clone() const {return new AbstractView;};
+  virtual void saveCurrentFuncOption(int idx) {};
+  void setFunctionComboBoxOption(int idx, QListWidget* lw, int currentIndex);
   
 public slots:
   void setFocus(Qt::FocusReason reason);
-    
+  void setCurrentIndex(int idx);
+  
+protected:
+  struct FuncOption
+  {
+    QListWidget* lw;
+    int currentIndex;
+    bool filtered;
+  };
+  QVector<FuncOption> m_FuncOptions;
+  
+  virtual int stackIndexFromViewComboIndex(int idx) const {return idx;};
+  virtual void finalizeView(int /* idx */) {};
+  
 private slots:
   void close();
   void splitHorizontally();
   void splitVertically();
-  void setCurrentIndex(int idx);
   
 signals:
   void closeTriggered(AbstractView* sender);
   void splitTriggered(AbstractView* sender, int direction);
-  
-private:
-  void finalizeUi();
 };
-    
+
 #endif // AbstractView_h

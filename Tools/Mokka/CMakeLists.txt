@@ -1,9 +1,18 @@
 FIND_PACKAGE(Qt4 REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
+IF(VTK_MAJOR_VERSION LESS 5)
+  IF(VTK_MINOR_VERSION LESS 6)
+    MESSAGE(FATAL_ERROR "Mokka requires now VTK 5.6 or greater for the charts")
+  ENDIF(VTK_MINOR_VERSION LESS 6)
+ENDIF(VTK_MAJOR_VERSION LESS 5)
+
 SET(Mokka_CPP
   About.cpp
+  AbstractMultiView.cpp
+  AbstractView.cpp
   ComboBoxDelegate.cpp
+  CompositeView.cpp
   MainWindow.cpp
   Metadata.cpp
   MetadataView.cpp
@@ -11,9 +20,6 @@ SET(Mokka_CPP
   NewModelConfigurationWidget.cpp
   PointsEditor.cpp
   ProgressWidget.cpp
-  AbstractMultiView.cpp
-  AbstractView.cpp
-  CompositeView.cpp
   TableWidget.cpp
   UndoCommands.cpp
   Viz3DWidget.cpp
@@ -21,7 +27,10 @@ SET(Mokka_CPP
   )
 
 SET(Mokka_H
+  AbstractMultiView.h
+  AbstractView.h
   ComboBoxDelegate.h
+  CompositeView.h
   MainWindow.h
   MetadataView.h
   Metadata.h
@@ -29,20 +38,17 @@ SET(Mokka_H
   NewModelConfigurationWidget.h
   PointsEditor.h
   ProgressWidget.h
-  AbstractMultiView.h
-  AbstractView.h
-  CompositeView.h
   TableWidget.h
   Viz3DWidget.h)
 
 SET(Mokka_UI
   About.ui
+  AbstractView.ui
   MainWindow.ui
   Metadata.ui
   NewModelConfigurationWidget.ui
   PointsEditor.ui
-  ProgressWidget.ui
-  AbstractView.ui)
+  ProgressWidget.ui)
 
 SET(Mokka_QRC
   images.qrc)
