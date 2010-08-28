@@ -7,12 +7,12 @@ function btkSetAnalogDescription(h, idx_or_label, new_desc) %#ok
 %  The point to modify can also be selected by its LABEL.
 %  BTKSETANALOGDESCRIPTION(H, LABEL, NEWDESC)
 %
-%  This function can also returns updated list of points.
+%  This function can also returns an updated list of points.
 %  ANALOGS = BTKSETANALOGDESCRIPTION(H, INDEX, NEWDESC)
 %  ANALOGS = BTKSETANALOGDESCRIPTION(H, LABEL, NEWDESC)
 %  The format of ANALOGS is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>
 %
-%  This function can also returns updated list of points' informations.
+%  This function can also returns an updated list of points' informations.
 %  [ANALOGS, ANALOGSINFO] = BTKSETANALOGDESCRIPTION(H, INDEX, NEWDESC)
 %  [ANALOGS, ANALOGSINFO] = BTKSETANALOGDESCRIPTION(H, LABEL, NEWDESC)
 %  The format of ANALOGSINFO is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>

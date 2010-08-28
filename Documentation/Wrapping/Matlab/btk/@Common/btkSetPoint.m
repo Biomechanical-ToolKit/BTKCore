@@ -28,7 +28,7 @@ function btkSetPoint(h, idx_or_label, values, residuals, masks) %#ok
 %  BTKSETPOINT(H, LABEL, VALUES, RESIDUALS, MASKS)
 %  BTKSETPOINT(H, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION)
 %
-%  This function can also returns updated list of points.
+%  This function can also returns an updated list of points.
 %  POINTS = BTKSETPOINT(H, INDEX, VALUES)
 %  POINTS = BTKSETPOINT(H, INDEX, VALUES, RESIDUALS)
 %  POINTS = BTKSETPOINT(H, INDEX, VALUES, RESIDUALS, MASKS)
@@ -39,7 +39,7 @@ function btkSetPoint(h, idx_or_label, values, residuals, masks) %#ok
 %  POINTS = BTKSETPOINT(H, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION)
 %  The format of POINTS is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>
 %
-%  This function can also returns updated list of points' informations.
+%  This function can also returns an updated list of points' informations.
 %  [POINTS, POINTSINFO] = BTKSETPOINT(H, INDEX, VALUES)
 %  [POINTS, POINTSINFO] = BTKSETPOINT(H, INDEX, VALUES, RESIDUALS)
 %  [POINTS, POINTSINFO] = BTKSETPOINT(H, INDEX, VALUES, RESIDUALS, MASKS)

@@ -31,7 +31,10 @@ IF (BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
   ENDIF(MSVC)  
 ENDIF(BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
 
-IF(MATLAB_ROOT)
+IF(NOT MATLAB_ROOT)
+  MESSAGE(STATUS "")
+  MESSAGE(FATAL_ERROR "ERROR: Matlab was not found!")
+ELSE(NOT MATLAB_ROOT)
   INCLUDE_DIRECTORIES(${MATLAB_INCLUDE_DIR})
   
   # Common: accessor
@@ -83,6 +86,7 @@ IF(MATLAB_ROOT)
   MATLAB_MEX_CREATE(btkSetEventLabel btkSetEventLabel.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkSetEventId btkSetEventId.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkSetEventTime btkSetEventTime.cpp BTKCommon)
+  MATLAB_MEX_CREATE(btkSetEventSubject btkSetEventSubject.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkSetFirstFrame btkSetFirstFrame.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkSetFrameNumber btkSetFrameNumber.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkSetFrequency btkSetFrequency.cpp BTKCommon)
@@ -128,7 +132,7 @@ IF(MATLAB_ROOT)
   # IO
   MATLAB_MEX_CREATE(btkReadAcquisition btkReadAcquisition.cpp BTKIO)
   MATLAB_MEX_CREATE(btkWriteAcquisition btkWriteAcquisition.cpp BTKIO)
-ENDIF(MATLAB_ROOT)
+ENDIF(NOT MATLAB_ROOT)
 
 IF(NOT BTK_INSTALL_NO_LIBRARIES)
   # Matlab M file to configure

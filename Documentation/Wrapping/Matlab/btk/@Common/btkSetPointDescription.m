@@ -7,12 +7,12 @@ function btkSetPointDescription(h, idx_or_label, new_desc) %#ok
 %  The point to modify can also be selected by its LABEL.
 %  BTKSETPOINTDESCRIPTION(H, LABEL, NEWDESC)
 %
-%  This function can also returns updated list of points.
+%  This function can also returns an updated list of points.
 %  POINTS = BTKSETPOINTDESCRIPTION(H, INDEX, NEWDESC)
 %  POINTS = BTKSETPOINTDESCRIPTION(H, LABEL, NEWDESC)
 %  The format of POINTS is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>
 %
-%  This function can also returns updated list of points' informations.
+%  This function can also returns an updated list of points' informations.
 %  [POINTS, POINTSINFO] = BTKSETPOINTDESCRIPTION(H, INDEX, NEWDESC)
 %  [POINTS, POINTSINFO] = BTKSETPOINTDESCRIPTION(H, LABEL, NEWDESC)
 %  The format of POINTSINFO is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>

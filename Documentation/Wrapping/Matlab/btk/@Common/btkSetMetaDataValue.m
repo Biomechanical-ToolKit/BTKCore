@@ -23,7 +23,7 @@ function btkSetMetaDataValue(h, label_idx, sublabel_idx, ..., index, value) %#ok
 %
 %  You can mix label and index to select the metadata.
 %
-%  This function can also returns updated list of metadata.
+%  This function can also returns an updated list of metadata.
 %  MD = BTKSETMETADATAVALUE(H, LABEL, INDEX, VALUE)
 %  MD = BTKSETMETADATAVALUE(H, LABEL, SUBLABEL, ..., INDEX, VALUE)
 %  The format of MD is the same than using the function <a href="matlab:help btkGetMetaData">btkGetMetaData</a>.

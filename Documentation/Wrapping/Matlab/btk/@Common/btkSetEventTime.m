@@ -4,11 +4,11 @@ function btkSetEventTime(h, index, newtime) %#ok
 %  BTKSETEVENTTIME(H, INDEX, NEWTIME) modifies event's time by NEWTIME.
 %  INDEX must be a single integer value.
 %
-%  This function can also returns updated list of events.
+%  This function can also returns an updated list of events.
 %  EVENTS = BTKSETEVENTTIME(H, INDEX, NEWTIME)
 %  The format of EVENTS is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %
-%  This function can also returns updated list of events' informations.
+%  This function can also returns an updated list of events' informations.
 %  [EVENTS, EVENTSINFO] = BTKSETEVENTTIME(H, INDEX, NEWTIME)
 %  The format of EVENTSINFO is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %

@@ -4,11 +4,11 @@ function btkSetEventDescription(h, label, new_description) %#ok
 %  BTKSETEVENTDESCRIPTION(H, LABEL, NEWDESCRIPTION) modifies event's description by NEWDESCRIPTION
 %  for all events with the label LABEL. LABEL must be a non-empty string.
 %
-%  This function can also returns updated list of events.
+%  This function can also returns an updated list of events.
 %  EVENTS = BTKSETEVENTDESCRIPTION(H, LABEL, NEWDESCRIPTION)
 %  The format of EVENTS is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %
-%  This function can also returns updated list of events' informations.
+%  This function can also returns an updated list of events' informations.
 %  [EVENTS, EVENTSINFO] = BTKSETEVENTDESCRIPTION(H, LABEL, NEWDESCRIPTION)
 %  The format of BTKSETEVENTDESCRIPTION is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %

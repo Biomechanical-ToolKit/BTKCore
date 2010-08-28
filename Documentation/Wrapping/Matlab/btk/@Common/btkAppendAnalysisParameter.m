@@ -11,13 +11,13 @@ function btkAppendAnalysisParameter(h, name, context, unit, value, subject, desc
 %  BTKAPPENDANALYSISPARAMETER(H, NAME, CONTEXT, UNIT, VALUE, SUBJECT, DESCRIPTION)
 %  add a description to the inserted parameter.
 %
-%  This function can also returns updated list of parameter.
+%  This function can also returns an updated list of parameter.
 %  ANALYSIS = BTKAPPENDANALYSISPARAMETER(H, NAME, CONTEXT, UNIT, VALUE)
 %  ANALYSIS = BTKAPPENDANALYSISPARAMETER(H, NAME, CONTEXT, UNIT, VALUE, SUBJECT)
 %  ANALYSIS = BTKAPPENDANALYSISPARAMETER(H, NAME, CONTEXT, UNIT, VALUE, SUBJECT, DESCRIPTION)
 %  The format of ANALYSIS is the same than using the function <a href="matlab:help btkGetAnalysis">btkGetAnalysis</a>
 %
-%  This function can also returns updated list of analysis parameters' informations.
+%  This function can also returns an updated list of analysis parameters' informations.
 %  [ANALYSIS, ANALYSISINFO] = BTKAPPENDANALYSISPARAMETER(H, NAME, CONTEXT, UNIT, VALUE)
 %  [ANALYSIS, ANALYSISINFO] = BTKAPPENDANALYSISPARAMETER(H, NAME, CONTEXT, UNIT, VALUE, SUBJECT)
 %  [ANALYSIS, ANALYSISINFO] = BTKAPPENDANALYSISPARAMETER(H, NAME, CONTEXT, UNIT, VALUE, SUBJECT, DESCRIPTION)

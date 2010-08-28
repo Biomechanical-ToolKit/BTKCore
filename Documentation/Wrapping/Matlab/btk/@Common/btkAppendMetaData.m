@@ -19,7 +19,7 @@ function btkAppendMetaData(h, label, sublabel, ..., info) %#ok
 %                  - The cell of strings is only use for information with the format Char.
 %  The stucture INFO should be constructed with the use of the function <a href="matlab:help btkMetaDataInfo">btkMetaDataInfo</a>.  
 %
-%  This function can also returns updated list of metadata.
+%  This function can also returns an updated list of metadata.
 %  MD = BTKAPPENDMETADATA(H, LABEL, )
 %  MD = BTKAPPENDMETADATA(H, LABEL, SUBLABEL, ...)
 %  MD = BTKAPPENDMETADATA(H, LABEL, SUBLABEL, ..., INFO)

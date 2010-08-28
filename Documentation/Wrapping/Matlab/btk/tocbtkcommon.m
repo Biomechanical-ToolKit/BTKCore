@@ -73,10 +73,6 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetMarkersValues">btkSetMarkersValues</a>               - Set markers's value from a matrix
 %   <a href="matlab:help btkSetScalarsValues">btkSetScalarsValues</a>               - Set scalars's value from a matrix
 %
-
-btkSetPointLabel</a>                  - Point's label modifier
-btkSetPointResiduals</a>              - Point's residuals modifier
-
 % Analog accessor
 %   <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>                     - Analog channels extraction
 %   <a href="matlab:help btkGetAnalogsResolution">btkGetAnalogsResolution</a>           - Return ADC resolution
@@ -108,6 +104,7 @@ btkSetPointResiduals</a>              - Point's residuals modifier
 %   <a href="matlab:help btkSetEventDescription">btkSetEventDescription</a>            - Set event's description
 %   <a href="matlab:help btkSetEventLabel">btkSetEventLabel</a>                  - Set event's label
 %   <a href="matlab:help btkSetEventId">btkSetEventId</a>                     - Set event's ID
+%   <a href="matlab:help btkSetEventSubject">btkSetEventSubject</a>                - Set event's subject
 %   <a href="matlab:help btkSetEventTime">btkSetEventTime</a>                   - Set event's time
 %
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>

@@ -10,12 +10,12 @@ function btkRemoveAnalog(h, idx_or_label) %#ok
 %  The analog channel to remove can also be selected by its LABEL.
 %  BTKREMOVEANALOG(H, LABEL)
 %
-%  This function can also returns updated list of analog channels.
+%  This function can also returns an updated list of analog channels.
 %  ANALOGS = BTKREMOVEANALOG(H, INDEX)
 %  ANALOGS = BTKREMOVEANALOG(H, LABEL)
 %  The format of ANALOGS is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>
 %
-%  This function can also returns updated list of points' informations.
+%  This function can also returns an updated list of points' informations.
 %  [ANALOGS, ANALOGSINFO] = BTKREMOVEANALOG(H, INDEX)
 %  [ANALOGS, ANALOGSINFO] = BTKREMOVEANALOG(H, LABEL)
 %  The format of ANALOGSINFO is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>

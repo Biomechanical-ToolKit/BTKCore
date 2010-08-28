@@ -8,12 +8,12 @@ function btkAppendAnalog(h, label, valuesdesc) %#ok
 %  BTKAPPENDANALOG(H, LABEL, VALUES, DESCRIPTION) modifies also the description of 
 %  the analog channel.
 %
-%  This function can also returns updated list of analog channels.
+%  This function can also returns an updated list of analog channels.
 %  ANALOGS = BTKAPPENDANALOG(H, LABEL, VALUES)
 %  ANALOGS = BTKAPPENDANALOG(H, LABEL, VALUES, DESCRIPTION)
 %  The format of ANALOGS is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>.
 %
-%  This function can also returns updated list of analog channels informations.
+%  This function can also returns an updated list of analog channels informations.
 %  [ANALOGS, ANALOGSINFO] = BTKAPPENDANALOG(H, LABEL, VALUES)
 %  [ANALOGS, ANALOGSINFO] = BTKAPPENDANALOG(H, LABEL, VALUES, DESCRIPTION)
 %  The format of ANALOGSINFO is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>.

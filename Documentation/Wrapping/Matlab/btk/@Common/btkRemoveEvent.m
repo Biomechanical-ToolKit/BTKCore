@@ -13,13 +13,13 @@ function btkRemoveEvent(h, options) %#ok
 %   - 'Subject' followed by a string delete all events which contains this subject's name
 %  The combination of several options only delete events which match all criterias.
 %
-%  This function can also returns updated list of events.
+%  This function can also returns an updated list of events.
 %  EVENTS = BTKREMOVEEVENT(H)
 %  EVENTS = BTKREMOVEEVENT(H, INDEX)
 %  EVENTS = BTKREMOVEEVENT(H, OPTION, VALUE)
 %  The format of EVENTS is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %
-%  This function can also returns updated list of events' informations.
+%  This function can also returns an updated list of events' informations.
 %  [EVENTS, EVENTSINFO] = BTKREMOVEEVENT(H)
 %  [EVENTS, EVENTSINFO] = BTKREMOVEEVENT(H, INDEX)
 %  [EVENTS, EVENTSINFO] = BTKREMOVEEVENT(H, OPTION, VALUE)

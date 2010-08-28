@@ -8,12 +8,12 @@ function btkSetAnalogValues(h, idx_or_label, values) %#ok
 %  The analog to modify can also be selected by its LABEL.
 %  BTKSETANALOGVALUES(H, LABEL, VALUES)
 %
-%  This function can also returns updated list of analogs.
+%  This function can also returns an updated list of analogs.
 %  ANALOGS = BTKSETANALOGVALUES(H, INDEX, VALUES)
 %  ANALOGS = BTKSETANALOGVALUES(H, LABEL, VALUES)
 %  The format of ANALOGS is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>
 %
-%  This function can also returns updated list of analogs' informations.
+%  This function can also returns an updated list of analogs' informations.
 %  [ANALOGS, ANALOGSINFO] = BTKSETANALOGVALUES(H, INDEX, VALUES)
 %  [ANALOGS, ANALOGSINFO] = BTKSETANALOGVALUES(H, LABEL, VALUES)
 %  The format of ANALOGSINFO is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>

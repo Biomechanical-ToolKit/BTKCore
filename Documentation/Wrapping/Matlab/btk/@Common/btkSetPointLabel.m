@@ -7,12 +7,12 @@ function btkSetPointLabel(h, idx_or_label, new_label) %#ok
 %  The point to modify can also be selected by its LABEL.
 %  BTKSETPOINTLABEL(H, LABEL, NEWLABEL)
 %
-%  This function can also returns updated list of points.
+%  This function can also returns an updated list of points.
 %  POINTS = BTKSETPOINTLABEL(H, INDEX, NEWLABEL)
 %  POINTS = BTKSETPOINTLABEL(H, LABEL, NEWLABEL)
 %  The format of POINTS is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>
 %
-%  This function can also returns updated list of points' informations.
+%  This function can also returns an updated list of points' informations.
 %  [POINTS, POINTSINFO] = BTKSETPOINTLABEL(H, INDEX, NEWLABEL)
 %  [POINTS, POINTSINFO] = BTKSETPOINTLABEL(H, LABEL, NEWLABEL)
 %  The format of POINTSINFO is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>

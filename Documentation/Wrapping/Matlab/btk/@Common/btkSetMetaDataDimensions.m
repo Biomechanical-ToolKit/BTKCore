@@ -19,7 +19,7 @@ function btkSetMetaDataDimensions(h, label_idx, sublabel_idx, ..., newdims) %#ok
 %
 %  You can mix label and index to select the metadata.
 %
-%  This function can also returns updated list of metadata.
+%  This function can also returns an updated list of metadata.
 %  MD = BTKSETMETADATADIMENSIONS(H, LABEL, NEWDIMS)
 %  MD = BTKSETMETADATADIMENSIONS(H, LABEL, SUBLABEL, ..., NEWDIMS)
 %  The format of MD is the same than using the function <a href="matlab:help btkGetMetaData">btkGetMetaData</a>.

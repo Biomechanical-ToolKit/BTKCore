@@ -8,12 +8,12 @@ function btkSetAnalogScale(h, idx_or_label, newscale) %#ok
 %  The analog to modify can also be selected by its LABEL.
 %  BTKSETANALOGSCALE(H, LABEL, NEWSCALE)
 %
-%  This function can also returns updated list of analogs.
+%  This function can also returns an updated list of analogs.
 %  ANALOGS = BTKSETANALOGSCALE(H, INDEX, NEWSCALE)
 %  ANALOGS = BTKSETANALOGSCALE(H, LABEL, NEWSCALE)
 %  The format of ANALOGS is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>
 %
-%  This function can also returns updated list of analogs' informations.
+%  This function can also returns an updated list of analogs' informations.
 %  [ANALOGS, ANALOGSINFO] = BTKSETANALOGSCALE(H, INDEX, NEWSCALE)
 %  [ANALOGS, ANALOGSINFO] = BTKSETANALOGSCALE(H, LABEL, NEWSCALE)
 %  The format of ANALOGSINFO is the same than using the function <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>

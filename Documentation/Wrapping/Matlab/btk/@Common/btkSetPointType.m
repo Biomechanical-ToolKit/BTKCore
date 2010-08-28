@@ -15,12 +15,12 @@ function btkSetPointType(h, idx_or_label, new_type) %#ok
 %  The point to modify can also be selected by its LABEL.
 %  BTKSETPOINTTYPE(H, LABEL, NEWTYPE)
 %
-%  This function can also returns updated list of points.
+%  This function can also returns an updated list of points.
 %  POINTS = BTKSETPOINTTYPE(H, INDEX, NEWTYPE)
 %  POINTS = BTKSETPOINTTYPE(H, LABEL, NEWTYPE)
 %  The format of POINTS is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>
 %
-%  This function can also returns updated list of points' informations.
+%  This function can also returns an updated list of points' informations.
 %  [POINTS, POINTSINFO] = BTKSETPOINTTYPE(H, INDEX, NEWTYPE)
 %  [POINTS, POINTSINFO] = BTKSETPOINTTYPE(H, LABEL, NEWTYPE)
 %  The format of POINTSINFO is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>

@@ -20,14 +20,14 @@ function btkAppendEvent(h, label, time, context, subject, description, id) %#ok
 %  are used in Vicon Workstation and Nexus to distinguish events' type.  The value 0 is for
 %  general event. Value 1 corresponds to the foot strike event and value 2 for the foot off.
 %
-%  This function can also returns updated list of events.
+%  This function can also returns an updated list of events.
 %  EVENTS = BTKAPPENDEVENT(H, LABEL, TIME, CONTEXT)
 %  EVENTS = BTKAPPENDEVENT(H, LABEL, TIME, CONTEXT, SUBJECT)
 %  EVENTS = BTKAPPENDEVENT(H, LABEL, TIME, CONTEXT, SUBJECT, DESCRIPTION)
 %  EVENTS = BTKAPPENDEVENT(H, LABEL, TIME, CONTEXT, SUBJECT, DESCRIPTION, ID)
 %  The format of EVENTS is the same than using the function <a href="matlab:help btkGetEvents">btkGetEvents</a>.
 %
-%  This function can also returns updated list of events' informations.
+%  This function can also returns an updated list of events' informations.
 %  [EVENTS, EVENTSINFO] = BTKAPPENDEVENT(H, LABEL, TIME, CONTEXT)
 %  [EVENTS, EVENTSINFO] = BTKAPPENDEVENT(H, LABEL, TIME, CONTEXT, SUBJECT)
 %  [EVENTS, EVENTSINFO] = BTKAPPENDEVENT(H, LABEL, TIME, CONTEXT, SUBJECT, DESCRIPTION)

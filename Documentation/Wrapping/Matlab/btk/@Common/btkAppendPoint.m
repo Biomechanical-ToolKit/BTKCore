@@ -31,14 +31,14 @@ function btkAppendPoint(h, type, label, values, residuals, masks, desc) %#ok
 %  BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION) 
 %  modifies also the description of the point.
 %
-%  This function can also returns updated list of points.
+%  This function can also returns an updated list of points.
 %  POINTS = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES)
 %  POINTS = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS)
 %  POINTS = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS)
 %  POINTS = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS, DESCRIPTION)
 %  The format of POINTS is the same than using the function <a href="matlab:help btkGetPoints">btkGetPoints</a>.
 %
-%  This function can also returns updated list of points' informations.
+%  This function can also returns an updated list of points' informations.
 %  [POINTS, POINTSINFO] = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES)
 %  [POINTS, POINTSINFO] = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS)
 %  [POINTS, POINTSINFO] = BTKAPPENDPOINT(H, TYPE, LABEL, VALUES, RESIDUALS, MASKS)
