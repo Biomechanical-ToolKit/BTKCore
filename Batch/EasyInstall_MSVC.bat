@@ -9,27 +9,38 @@ IF NOT ERRORLEVEL 1 SET REQUIRE_PRIVILEGES=1
 VER | FIND /I "6.1" >NUL
 IF NOT ERRORLEVEL 1 SET REQUIRE_PRIVILEGES=1
 
+:: Detect MSVC. If MSVC is not present, the script looks for Windows SDK 7.0 (or greater)
 SET MSVS=""
 IF (%3) == () (
   :: Create a temporary file to list the known MSVC directories
   > %TEMP%.\BTK-MSVC.txt ECHO Known MSVC directories
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio .NET 2003"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio 8"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio 9.0"
   >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio 10.0"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio .NET 2003"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio 8"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio 9.0"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio 9.0"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio 8"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio .NET 2003"
   >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio 10.0"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio 9.0"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio 8"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio .NET 2003"
   :: Look for MSVC
   FOR	/F "eol=;delims=" %%i IN (%TEMP%.\BTK-MSVC.txt) DO IF EXIST %%i\VC\vcvarsall.bat SET MSVS=%%i
   DEL %TEMP%.\BTK-MSVC.txt
-  IF !MSVS! == "" GOTO :missing_MSVS
+  IF !MSVS! == "" (
+    :: Create a temporary file to list the known Windows SDK directories
+    > %TEMP%.\BTK-WINSDK.txt ECHO Known Windows SDK directories
+    >> %TEMP%.\BTK-WINSDK.txt ECHO "%ProgramFiles%\Microsoft SDKs\Windows\v7.0
+    :: Look for Windows SDK
+    FOR	/F "eol=;delims=" %%i IN (%TEMP%.\BTK-WINSDK.txt) DO IF EXIST %%i\Bin\SetEnv.Cmd SET MSVS=%%i
+    DEL %TEMP%.\BTK-WINSDK.txt
+    IF !MSVS! == "" GOTO :missing_MSVS
+  )
 ) ELSE (
   SET MSVS=%3
   IF NOT EXIST !MSVS!\VC\vcvarsall.bat GOTO missing_MSVS
 )
+SET setEnvCmd=!MSVS!\Bin\SetEnv.Cmd
 
+:: Detect CMake
 SET CMAKE=""
 IF (%4) == () (
   :: Create a temporary file to list the known CMAKE directories
@@ -47,16 +58,20 @@ IF (%4) == () (
   IF NOT EXIST !CMAKE!\bin\cmake.exe GOTO missing_CMAKE
 )
 
-SET setEnvCmd="%ProgramFiles%\Microsoft SDKs\Windows\v7.0\Bin\SetEnv.Cmd"
+:: MSVC EE doesn't contains a 64 bits compiler. 
+:: Trying to use Windows SDK for Windows 7 64 bits ...
+IF NOT EXIST !setEnvCmd! (
+  SET setEnvCmd="%ProgramW6432%\Microsoft SDKs\Windows\v7.0\Bin\SetEnv.Cmd"
+)
 
-CD .
-IF EXIST %setEnvCmd% (
-  CALL %setEnvCmd%
+CD ..
+IF EXIST !setEnvCmd! (
+  CALL !setEnvCmd!
 ) ELSE (
   :: 32 or 64 bits?
-  set ARCH=
+  SET ARCH=
   IF EXIST %SYSTEMROOT%\SysWOW64 SET ARCH=x64
-  call !MSVS!\VC\vcvarsall.bat !ARCH!
+  CALL !MSVS!\VC\vcvarsall.bat !ARCH!
 )
 IF EXIST %2 RMDIR /S /Q %2
 MKDIR %2
@@ -65,7 +80,7 @@ CD %2
 IF ERRORLEVEL 1 GOTO error_CMAKE
 nmake
 IF ERRORLEVEL 1 GOTO error_MSVS_COMPILE
-if !REQUIRE_PRIVILEGES! == 1 (
+IF !REQUIRE_PRIVILEGES! == 1 (
   ..\Batch\elevate nmake install
 ) ELSE (
   nmake install
