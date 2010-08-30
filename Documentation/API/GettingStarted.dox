@@ -52,13 +52,13 @@ TARGET_LINK_LIBRARIES(AcquisitionConverter BTKIO)
 
 @section ObjectCreation Object creation and shared pointer
 
-To simplify the way to code and manage the memory used by BTK, it is proposed to used shared pointer. A shared pointer is like a pointer but without owner. Its content is shared by all the variables assigned to the shared pointer and will be deleted when no variable use it anymore (meaning, the memory is freed automatically).
+To simplify the way to code and manage the memory used by BTK, it is proposed to use shared pointer. A shared pointer is like a pointer but without owner. Its content is shared by all the variables assigned to the shared pointer and will be deleted when no variable use it anymore (meaning, the memory is freed automatically).
 
-To do that the most transparent as possible, each class in BTK has the type definition @p Pointer and the static method(s) @p New. So you cannot instantiate an object by using a constructor but by using one of the @p New methods proposed in each class with return a @ Pointer (i.e. a shared pointer). So, to create a object btk::Acquisition (or strictly spealing a shared pointer associated with a btk::Acquisition object), you can use the following code:
+To do that the most transparent as possible, each class in BTK has the type definition @p Pointer and the static method(s) @p New. So you cannot instantiate an object by using a constructor but by using one of the @p New methods proposed in each class with return a @c Pointer (i.e. a shared pointer). So, to create a object btk::Acquisition (or strictly speaking a shared pointer associated with a btk::Acquisition object), you can use the following code:
 @code
 btk::Acquisition::Pointer acq = btk::Acquisition::New();
 @endcode
-By, using this code, you create a new shared pointer assigned to the variable @p acq. If you use a second variable and assign it to the first one, then the modification done by one is reflected in the other (as a regular pointer).
+By using this code, you create a new shared pointer assigned to the variable @p acq. If you use a second variable and assign it to the first one, then the modification done by one is reflected in the other (as a regular pointer).
 @code
 btk::Acquisition::Pointer foo = acq; // Shallow copy
 std::cout << acq->GetFirstFrame() << std::end; // 1

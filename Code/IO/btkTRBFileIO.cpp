@@ -297,11 +297,6 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close(); 
       throw;
     }
-    catch (ANxFileIOException& e)
-    {
-      if (bifs.IsOpen()) bifs.Close(); 
-      throw(TRBFileIOException(e.what()));
-    }
     catch (std::exception& e)
     {
       if (bifs.IsOpen()) bifs.Close(); 
