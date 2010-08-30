@@ -142,12 +142,12 @@ namespace btk
     // Get the size of the file
     DWORD dwFileSizeHi = 0;
     DWORD dwFileSizeLo = GetFileSize(this->m_File, &dwFileSizeHi);
-    this->m_BufferSize = this->m_LogicalSize = (static_cast<std::streamsize>(dwFileSizeHi) << 32) | dwFileSizeLo;
+    this->m_BufferSize = this->m_LogicalSize = static_cast<std::streamsize>(((uint64_t)dwFileSizeHi << 32) | dwFileSizeLo);
     // New file or truncated file?
     if ((this->m_BufferSize == 0) && this->m_Writing)
     {
       this->m_BufferSize = mmfilebuf::granularity();
-      LONG lDistHigh = this->m_BufferSize >> 32; // 32 = (sizeof(LONG) * 8)
+      LONG lDistHigh = (uint64_t)this->m_BufferSize >> 32; // 32 = (sizeof(LONG) * 8)
       LONG lDistLow = this->m_BufferSize & 0xFFFFFFFF;
       if (((::SetFilePointer(this->m_File, lDistLow, &lDistHigh, FILE_BEGIN) == INVALID_SET_FILE_POINTER) 
            && (::GetLastError() != NO_ERROR)) || (::SetEndOfFile(this->m_File) == 0))
@@ -185,7 +185,7 @@ namespace btk
 #if defined(HAVE_SYS_MMAP)
       err |= (::ftruncate(this->m_File, this->m_LogicalSize) == -1);
 #else
-      LONG lDistHigh = this->m_LogicalSize >> 32; // 32 = (sizeof(LONG) * 8)
+      LONG lDistHigh = (uint64_t)this->m_LogicalSize >> 32; // 32 = (sizeof(LONG) * 8)
       LONG lDistLow = this->m_LogicalSize & 0xFFFFFFFF;   
       err |= (((::SetFilePointer(this->m_File, lDistLow, &lDistHigh, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
                && (::GetLastError() != NO_ERROR)) || (::SetEndOfFile(this->m_File) == 0));
@@ -303,7 +303,7 @@ namespace btk
     if ((::UnmapViewOfFile(this->mp_Buffer) == 0) || (::CloseHandle(this->m_Map) == 0))
       return 0;
     this->m_Map = NULL;
-    LONG lDistHigh = newBufferSize >> 32; // 32 = (sizeof(LONG) * 8)
+    LONG lDistHigh = (uint64_t)newBufferSize >> 32; // 32 = (sizeof(LONG) * 8)
     LONG lDistLow = newBufferSize & 0xFFFFFFFF;   
     if (((::SetFilePointer(this->m_File, lDistLow, &lDistHigh, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
                && (::GetLastError() != NO_ERROR)) || (::SetEndOfFile(this->m_File) == 0))
