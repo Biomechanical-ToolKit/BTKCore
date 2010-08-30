@@ -9,26 +9,39 @@ IF NOT ERRORLEVEL 1 SET REQUIRE_PRIVILEGES=1
 VER | FIND /I "6.1" >NUL
 IF NOT ERRORLEVEL 1 SET REQUIRE_PRIVILEGES=1
 
+:: 32 or 64 bits?
+:: Force PROGFILES to be set to "C:\Program Files" instead of using "C:\Program Files (x86)"
+:: under Windows 64-bit. CMake is compiled in 32-bit and then due to the Windows-on-Windows
+:: 64-bit redirection, %ProgramFiles% is set to "C:\Program Files (x86)".
+SET ARCH=
+SET PROGFILES=
+IF EXIST %SYSTEMROOT%\SysWOW64 (
+  SET ARCH=x64
+  SET PROGFILES=%ProgramW6432%
+) ELSE (
+  SET PROGFILES=%ProgramFiles%
+)
+
 :: Detect MSVC. If MSVC is not present, the script looks for Windows SDK 7.0 (or greater)
 SET MSVS=""
 IF (%3) == () (
   :: Create a temporary file to list the known MSVC directories
   > %TEMP%.\BTK-MSVC.txt ECHO Known MSVC directories
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio 10.0"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio 9.0"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio 8"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles%\Microsoft Visual Studio .NET 2003"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio 10.0"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio 9.0"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio 8"
-  >> %TEMP%.\BTK-MSVC.txt ECHO "%ProgramFiles% (x86)\Microsoft Visual Studio .NET 2003"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "!PROGFILES!\Microsoft Visual Studio 10.0"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "!PROGFILES!\Microsoft Visual Studio 9.0"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "!PROGFILES!\Microsoft Visual Studio 8"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "!PROGFILES!\Microsoft Visual Studio .NET 2003"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "!PROGFILES! (x86)\Microsoft Visual Studio 10.0"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "!PROGFILES! (x86)\Microsoft Visual Studio 9.0"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "!PROGFILES! (x86)\Microsoft Visual Studio 8"
+  >> %TEMP%.\BTK-MSVC.txt ECHO "!PROGFILES! (x86)\Microsoft Visual Studio .NET 2003"
   :: Look for MSVC
   FOR	/F "eol=;delims=" %%i IN (%TEMP%.\BTK-MSVC.txt) DO IF EXIST %%i\VC\vcvarsall.bat SET MSVS=%%i
   DEL %TEMP%.\BTK-MSVC.txt
   IF !MSVS! == "" (
     :: Create a temporary file to list the known Windows SDK directories
     > %TEMP%.\BTK-WINSDK.txt ECHO Known Windows SDK directories
-    >> %TEMP%.\BTK-WINSDK.txt ECHO "%ProgramFiles%\Microsoft SDKs\Windows\v7.0
+    >> %TEMP%.\BTK-WINSDK.txt ECHO "!PROGFILES!\Microsoft SDKs\Windows\v7.0
     :: Look for Windows SDK
     FOR	/F "eol=;delims=" %%i IN (%TEMP%.\BTK-WINSDK.txt) DO IF EXIST %%i\Bin\SetEnv.Cmd SET MSVS=%%i
     DEL %TEMP%.\BTK-WINSDK.txt
@@ -45,10 +58,10 @@ SET CMAKE=""
 IF (%4) == () (
   :: Create a temporary file to list the known CMAKE directories
   > %TEMP%.\BTK-CMAKE.txt ECHO Known CMAKE directories
-  >> %TEMP%.\BTK-CMAKE.txt ECHO "%ProgramFiles%\CMake 2.6"
-  >> %TEMP%.\BTK-CMAKE.txt ECHO "%ProgramFiles%\CMake 2.8"
-  >> %TEMP%.\BTK-CMAKE.txt ECHO "%ProgramFiles% (x86)\CMake 2.6"
-  >> %TEMP%.\BTK-CMAKE.txt ECHO "%ProgramFiles% (x86)\CMake 2.8"
+  >> %TEMP%.\BTK-CMAKE.txt ECHO "!PROGFILES!\CMake 2.6"
+  >> %TEMP%.\BTK-CMAKE.txt ECHO "!PROGFILES!\CMake 2.8"
+  >> %TEMP%.\BTK-CMAKE.txt ECHO "!PROGFILES! (x86)\CMake 2.6"
+  >> %TEMP%.\BTK-CMAKE.txt ECHO "!PROGFILES! (x86)\CMake 2.8"
   :: Look for CMAKE
   FOR	/F "eol=;delims=," %%i IN (%TEMP%.\BTK-CMAKE.txt) DO IF EXIST %%i\bin\cmake.exe SET CMAKE=%%i
   DEL %TEMP%.\BTK-CMAKE.txt
@@ -61,16 +74,13 @@ IF (%4) == () (
 :: MSVC EE doesn't contains a 64 bits compiler. 
 :: Trying to use Windows SDK for Windows 7 64 bits ...
 IF NOT EXIST !setEnvCmd! (
-  SET setEnvCmd="%ProgramW6432%\Microsoft SDKs\Windows\v7.0\Bin\SetEnv.Cmd"
+  SET setEnvCmd="!PROGFILES!\Microsoft SDKs\Windows\v7.0\Bin\SetEnv.Cmd"
 )
 
 CD ..
 IF EXIST !setEnvCmd! (
   CALL !setEnvCmd!
 ) ELSE (
-  :: 32 or 64 bits?
-  SET ARCH=
-  IF EXIST %SYSTEMROOT%\SysWOW64 SET ARCH=x64
   CALL !MSVS!\VC\vcvarsall.bat !ARCH!
 )
 IF EXIST %2 RMDIR /S /Q %2
