@@ -202,7 +202,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
  }
  plhs[0] = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfEvents), (const char**)fieldnames_sorted);
 
- for(size_t i = 0 ; i < numberOfEvents ; ++i)
+ for(int i = 0 ; i < static_cast<int>(numberOfEvents) ; ++i)
  {
    mxArray* value = mxCreateDoubleMatrix(1, times_sorted[i].size(), mxREAL);
    double* v = mxGetPr(value);
