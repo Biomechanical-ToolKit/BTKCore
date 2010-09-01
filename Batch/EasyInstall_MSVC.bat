@@ -24,7 +24,7 @@ IF EXIST %SYSTEMROOT%\SysWOW64 (
 
 :: Detect MSVC. If MSVC is not present, the script looks for Windows SDK 7.0 (or greater)
 SET MSVS=""
-IF (%3) == () (
+IF (%2) == () (
   :: Create a temporary file to list the known MSVC directories
   > %TEMP%.\BTK-MSVC.txt ECHO Known MSVC directories
   >> %TEMP%.\BTK-MSVC.txt ECHO "!PROGFILES!\Microsoft Visual Studio 10.0"
@@ -48,14 +48,14 @@ IF (%3) == () (
     IF !MSVS! == "" GOTO :missing_MSVS
   )
 ) ELSE (
-  SET MSVS=%3
+  SET MSVS=%2
   IF NOT EXIST !MSVS!\VC\vcvarsall.bat GOTO missing_MSVS
 )
 SET setEnvCmd=!MSVS!\Bin\SetEnv.Cmd
 
 :: Detect CMake
 SET CMAKE=""
-IF (%4) == () (
+IF (%3) == () (
   :: Create a temporary file to list the known CMAKE directories
   > %TEMP%.\BTK-CMAKE.txt ECHO Known CMAKE directories
   >> %TEMP%.\BTK-CMAKE.txt ECHO "!PROGFILES!\CMake 2.6"
@@ -67,7 +67,7 @@ IF (%4) == () (
   DEL %TEMP%.\BTK-CMAKE.txt
   IF !CMAKE! == "" GOTO :missing_CMAKE
 ) ELSE (
-  SET CMAKE=%4
+  SET CMAKE=%3
   IF NOT EXIST !CMAKE!\bin\cmake.exe GOTO missing_CMAKE
 )
 
@@ -83,10 +83,10 @@ IF EXIST !setEnvCmd! (
 ) ELSE (
   CALL !MSVS!\VC\vcvarsall.bat !ARCH!
 )
-IF EXIST %2 RMDIR /S /Q %2
-MKDIR %2
-CD %2
-!CMAKE!\bin\cmake.exe %1 -DCMAKE_BUILD_TYPE:CHAR=Release -G "NMake Makefiles" ..
+IF EXIST %1 RMDIR /S /Q %1
+MKDIR %1
+CD %1
+!CMAKE!\bin\cmake.exe %options.1% %options.2% %options.3% %options.4% %options.5% -DCMAKE_BUILD_TYPE:CHAR=Release -G "NMake Makefiles" ..
 IF ERRORLEVEL 1 GOTO error_CMAKE
 nmake
 IF ERRORLEVEL 1 GOTO error_MSVS_COMPILE
