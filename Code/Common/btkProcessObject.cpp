@@ -39,7 +39,7 @@
 namespace btk
 {
   /**
-   * @class ProcessObject
+   * @class ProcessObject btkProcessObject.h
    * @brief Interface to create a filter/process in a pipeline.
    *
    * An inherited class has to implement the GenerateData() method and the 

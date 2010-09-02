@@ -42,7 +42,7 @@
 namespace btk
 {
   /**
-   * @class RAxFileIOException
+   * @class RAxFileIOException btkRAxFileIO.h
    * @brief Exception class for the RAxFileIO class.
    */
   
@@ -57,7 +57,7 @@ namespace btk
    */
   
   /**
-   * @class RAxFileIO
+   * @class RAxFileIO btkRAxFileIO.h
    * @brief Interface to read/write RAx files.
    *
    * The RAx file format is used in the Elite acquisition system (BTS, Milan, Italy).

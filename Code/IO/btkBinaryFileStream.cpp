@@ -55,7 +55,7 @@ namespace btk
    */
   
   /** 
-   * @class BinaryFileStream
+   * @class BinaryFileStream btkBinaryFileStream.h
    * @brief An abstract class which read/write binary file in VAX and IEEE floating 
    * format with the corresponding byte order
    *
@@ -580,7 +580,7 @@ namespace btk
   
   
   /** 
-   * @class VAXLittleEndianBinaryFileStream
+   * @class VAXLittleEndianBinaryFileStream btkBinaryFileStream.h
    * @brief Class to read and write binary file encoded from a VAX (LE) processor
    * to a VAX (LE) and IEEE (LE, BE) processor.
    *
@@ -718,7 +718,7 @@ namespace btk
   
   
   /** 
-   * @class IEEEBigEndianBinaryFileStream
+   * @class IEEEBigEndianBinaryFileStream btkBinaryFileStream.h
    * @brief Class to read and write binary file encoded from a IEEE (BE) to a 
    * VAX (LE) and IEEE (LE, BE) processor
    *
@@ -856,7 +856,7 @@ namespace btk
   
   
   /** 
-   * @class IEEELittleEndianBinaryFileStream
+   * @class IEEELittleEndianBinaryFileStream btkBinaryFileStream.h
    * @brief Class to read and write binary file encoded from a IEEE (LE) to a 
    * VAX (LE) and IEEE (LE, BE) processor.
    *
@@ -995,7 +995,7 @@ namespace btk
   
   
   /** 
-   * @class NativeBinaryFileStream
+   * @class NativeBinaryFileStream btkBinaryFileStream.h
    * @brief Native binary filestream chosen by the used compiler.
    *
    * Depending the processor, the native binary filestream will be:

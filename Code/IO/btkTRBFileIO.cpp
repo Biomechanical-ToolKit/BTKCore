@@ -44,7 +44,7 @@
 namespace btk
 {
   /**
-   * @class TRBFileIOException
+   * @class TRBFileIOException btkTRBFileIO.h
    * @brief Exception class for the TRBFileIO class.
    */
   
@@ -59,7 +59,7 @@ namespace btk
    */
   
   /**
-   * @class TRBFileIO
+   * @class TRBFileIO btkTRBFileIO.h
    * @brief Interface to read/write TRB files.
    *
    * A TRB file contains markers trajectories stored in the IEEE Little endian binary format.

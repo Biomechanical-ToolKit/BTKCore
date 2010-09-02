@@ -40,7 +40,7 @@
 namespace btk
 {
   /**
-   * @class Acquisition
+   * @class Acquisition btkAcquisition.h
    * @brief Contains the data related to a biomechanical acquisition.
    *
    * A biomechanical acquisition can contains:

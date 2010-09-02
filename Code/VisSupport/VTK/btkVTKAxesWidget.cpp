@@ -46,7 +46,7 @@ namespace btk
 {
 
   /**
-   * @class VTKAxesWidget 
+   * @class VTKAxesWidget btkVTKAxesWidget.h
    * @brief VTK widget displaying global axes orientation
    *
    * By default, this widget is not visible. To display it, use the method VTKAxesWidget::SetEnabled().

@@ -44,7 +44,7 @@
 namespace btk
 {
   /**
-   * @class C3DFileIOException
+   * @class C3DFileIOException btkC3DFileIO.h
    * @brief Exception class for the C3DFileIO class.
    */
   
@@ -59,7 +59,7 @@ namespace btk
    */
   
   /**
-   * @class C3DFileIO
+   * @class C3DFileIO btkC3DFileIO.h
    * @brief Interface to read/write C3D files.
    *
    * For more informations on this file's format: http:://www.c3d.org

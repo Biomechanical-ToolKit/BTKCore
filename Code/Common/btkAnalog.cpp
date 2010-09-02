@@ -38,7 +38,7 @@
 namespace btk
 {
   /**
-   * @class Analog
+   * @class Analog btkAnalog.h
    * @brief Analog channel data along the time.
    *
    * More than the data, you can also set informations related to the analog channel as its unit, scale, offset and gain. 

@@ -39,7 +39,7 @@
 namespace btk
 {
   /**
-   * @class ForcePlatformWrenchFilter
+   * @class ForcePlatformWrenchFilter btkForcePlatformWrenchFilter.h
    * @brief Calcule the wrench of the center of the force platform data, expressed in the global frame (by default).
    *
    * You can use the method 

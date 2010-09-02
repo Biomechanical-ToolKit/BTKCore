@@ -40,7 +40,7 @@
 namespace btk
 {
   /**
-   * @class AcquisitionUnitConverter
+   * @class AcquisitionUnitConverter btkAcquisitionUnitConverter.h
    * @brief Convert the units of the given input for points and analog channels.
    *
    * This filter can convert units for trajectory, force, moment, angle and power.

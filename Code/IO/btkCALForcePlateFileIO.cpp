@@ -45,7 +45,7 @@
 namespace btk
 {
   /**
-   * @class CALForcePlateFileIOException
+   * @class CALForcePlateFileIOException btkCALForcePlateFileIO.h
    * @brief Exception class for the CALForcePlateFileIO class.
    */
   
@@ -60,7 +60,7 @@ namespace btk
    */
   
   /**
-   * @class CALForcePlateFileIO
+   * @class CALForcePlateFileIO btkCALForcePlateFileIO.h
    * @brief Interface to read/write CAL files containing calibration of force platform.
    *
    * The CAL file format is created by Motion Analysis Corp.

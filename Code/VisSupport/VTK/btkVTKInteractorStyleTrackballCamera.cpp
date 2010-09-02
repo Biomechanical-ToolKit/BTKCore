@@ -48,7 +48,7 @@
 namespace btk
 {
   /**
-   * @class VTKInteractorStyleTrackballCamera
+   * @class VTKInteractorStyleTrackballCamera btkVTKInteractorStyleTrackballCamera.h
    * @brief Another implementation of a virtual trackball
    *
    * @warning This class is not yet finished. Some problems with the view-up vector.

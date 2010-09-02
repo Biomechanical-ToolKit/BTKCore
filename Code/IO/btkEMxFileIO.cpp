@@ -42,7 +42,7 @@
 namespace btk
 {
   /**
-   * @class EMxFileIOException
+   * @class EMxFileIOException btkEMxFileIO.h
    * @brief Exception class for the EMxFileIO class.
    */
   
@@ -57,7 +57,7 @@ namespace btk
    */
   
   /**
-   * @class EMxFileIO
+   * @class EMxFileIO btkEMxFileIO.h
    * @brief Interface to read/write EMx files.
    *
    * The EMx file format is used in the Elite acquisition system (BTS, Milan, Italy).

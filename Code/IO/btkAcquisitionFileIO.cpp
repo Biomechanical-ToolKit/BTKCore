@@ -38,7 +38,7 @@
 namespace btk
 {
   /**
-   * @class AcquisitionFileIO
+   * @class AcquisitionFileIO btkAcquisitionFileIO.h
    * @brief Interface to read/write acquisition's files.
    *
    * @ingroup BTKIO

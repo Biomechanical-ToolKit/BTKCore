@@ -50,35 +50,35 @@
 namespace btk
 {
   /**
-   * @class VTKMarkersCoordinates
+   * @class VTKMarkersCoordinates btkVTKMarkersFramesSource.h
    * @brief Store markers' frames as a vector of vtkPolyData.
    */
   class VTKMarkersCoordinates : public vtkstd::vector<vtkPolyData*>
   {};
 
   /**
-   * @class VTKMarkersIds
+   * @class VTKMarkersIds btkVTKMarkersFramesSource.h
    * @brief Store markers' visibility for each frame.
    */
   class VTKMarkersIds : public vtkstd::vector<vtkIntArray*>
   {};
   
   /**
-   * @class VTKTrajectoryIds
+   * @class VTKTrajectoryIds btkVTKMarkersFramesSource.h
    * @brief Store markers' visibility for each frame.
    */
   class VTKTrajectoryIds : public vtkstd::vector<vtkCellArray*>
   {};
   
   /**
-   * @class VTKTrajectoryPath
+   * @class VTKTrajectoryPath btkVTKMarkersFramesSource.h
    * @brief List of ids representing markers' path.
    */
   class VTKTrajectoryPath : public vtkstd::vector<vtkIdList*>
   {};
   
   /** 
-   * @class VTKMarkersFramesSource
+   * @class VTKMarkersFramesSource btkVTKMarkersFramesSource.h
    * @brief Display markers with interactive possibilities as hide/show markers, modify colors or diameters.
    *
    * This filter compute all markers' position when a new input is set or modified.

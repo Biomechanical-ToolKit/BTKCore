@@ -42,7 +42,7 @@
 namespace btk
 {
   /**
-   * @class RICFileIOException
+   * @class RICFileIOException btkRICFileIO.h
    * @brief Exception class for the RICFileIO class.
    */
   
@@ -57,7 +57,7 @@ namespace btk
    */
   
   /**
-   * @class RICFileIO
+   * @class RICFileIO btkRICFileIO.h
    * @brief Interface to read/write RIC files.
    *
    * The RIC file format is used in the Elite acquisition system (BTS, Milan, Italy).

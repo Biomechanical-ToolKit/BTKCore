@@ -40,7 +40,7 @@
 namespace btk
 {
   /**
-   * @class VTKMarkersSource 
+   * @class VTKMarkersSource btkVTKMarkersSource.h
    * @brief Markers' generator
    *
    * Markers' color and radius are given as arrays to the input. For more information, check 

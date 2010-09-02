@@ -42,7 +42,7 @@
 namespace btk
 {
   /**
-   * @class PWRFileIOException
+   * @class PWRFileIOException btkPWRFileIO.h
    * @brief Exception class for the PWRFileIO class.
    */
   
@@ -57,7 +57,7 @@ namespace btk
    */
   
   /**
-   * @class PWRFileIO
+   * @class PWRFileIO btkPWRFileIO.h
    * @brief Interface to read/write PWR files.
    *
    * The PWR file format is used in the Elite acquisition system (BTS, Milan, Italy).

@@ -41,7 +41,7 @@
 namespace btk
 {
   /**
-   * @class MetaDataInfo
+   * @class MetaDataInfo btkMetaDataInfo.h
    * @brief Container class to store data of a MetaData object.
    *
    * @ingroup BTKCommon

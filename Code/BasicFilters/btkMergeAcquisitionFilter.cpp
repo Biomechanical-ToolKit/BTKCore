@@ -42,7 +42,7 @@
 namespace btk
 {
  /**
-   * @class MergeAcquisitionFilter
+   * @class MergeAcquisitionFilter btkMergeAcquisitionFilter.h
    * @brief Merges or concatenates two or more btk::Acquisition objects into a single new one.
    *
    * The difference between the merging or the concatenating depends of the acquisitions' informations.

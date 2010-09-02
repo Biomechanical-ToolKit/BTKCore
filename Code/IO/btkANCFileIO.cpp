@@ -48,7 +48,7 @@
 namespace btk
 {
   /**
-   * @class ANCFileIOException
+   * @class ANCFileIOException btkANCFileIO.h
    * @brief Exception class for the ANCFileIO class.
    */
   
@@ -63,7 +63,7 @@ namespace btk
    */
   
   /**
-   * @class ANCFileIO
+   * @class ANCFileIO btkANCFileIO.h
    * @brief Interface to read/write ANC files.
    *
    * A ANC file contains analog channels data stored in ASCII format.

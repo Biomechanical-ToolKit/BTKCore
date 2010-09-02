@@ -45,7 +45,7 @@
 namespace btk
 {
   /**
-   * @class GRxFileIOException
+   * @class GRxFileIOException btkGRxFileIO.h
    * @brief Exception class for the GRxFileIO class.
    */
   
@@ -60,7 +60,7 @@ namespace btk
    */
   
   /**
-   * @class GRxFileIO
+   * @class GRxFileIO btkGRxFileIO.h
    * @brief Interface to read/write GRx files.
    *
    * The GRx file format is used in the Elite acquisition system (BTS, Milan, Italy).

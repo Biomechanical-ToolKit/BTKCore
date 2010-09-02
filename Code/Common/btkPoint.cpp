@@ -38,7 +38,7 @@
 namespace btk
 {
   /**
-   * @class Point
+   * @class Point btkPoint.h
    * @brief Coordinates of a point in a 3D space along the time.
    *
    * Coordinates of the point are generaly measured by an acquisition sytem.

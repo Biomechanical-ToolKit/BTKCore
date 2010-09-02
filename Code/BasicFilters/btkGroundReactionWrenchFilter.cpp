@@ -39,7 +39,7 @@
 namespace btk
 {
   /**
-   * @class GroundReactionWrenchFilter
+   * @class GroundReactionWrenchFilter btkGroundReactionWrenchFilter.h
    * @brief Transform force platform data into ground reaction wrenches.
    *
    * Theses wrenches are expressed in the global frame. The point of application (PWA)

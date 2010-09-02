@@ -46,7 +46,7 @@
 namespace btk
 {
   /**
-   * @class TRCFileIOException
+   * @class TRCFileIOException btkTRCFileIO.h
    * @brief Exception class for the TRCFileIO class.
    */
   
@@ -61,7 +61,7 @@ namespace btk
    */
   
   /**
-   * @class TRCFileIO
+   * @class TRCFileIO btkTRCFileIO.h
    * @brief Interface to read/write TRC files.
    *
    * The TRC file format is created by Motion Analysis Corp.

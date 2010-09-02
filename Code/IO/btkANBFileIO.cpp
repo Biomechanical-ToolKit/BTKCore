@@ -44,7 +44,7 @@
 namespace btk
 {
   /**
-   * @class ANBFileIOException
+   * @class ANBFileIOException btkANBFileIO.h
    * @brief Exception class for the ANBFileIO class.
    */
   
@@ -59,7 +59,7 @@ namespace btk
    */
   
   /**
-   * @class ANBFileIO
+   * @class ANBFileIO btkANBFileIO.h
    * @brief Interface to read/write ANB files.
    *
    * A ANB file contains analog channels data stored in the IEEE Little endian binary format.

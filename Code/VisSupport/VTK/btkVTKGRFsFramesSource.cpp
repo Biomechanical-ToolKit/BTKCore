@@ -49,7 +49,7 @@
 namespace btk
 {
   /**
-   * @class VTKGRFsComponents
+   * @class VTKGRFsComponents btkVTKGRFsFramesSource.h
    * @brief Store ground reaction forces vector as vector of vtkPolyData
    */
   class VTKGRFsComponents : public vtkstd::vector<vtkPolyData*>

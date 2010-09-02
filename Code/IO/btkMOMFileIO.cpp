@@ -42,7 +42,7 @@
 namespace btk
 {
   /**
-   * @class MOMFileIOException
+   * @class MOMFileIOException btkMOMFileIO.h
    * @brief Exception class for the MOMFileIO class.
    */
   
@@ -57,7 +57,7 @@ namespace btk
    */
   
   /**
-   * @class MOMFileIO
+   * @class MOMFileIO btkMOMFileIO.h
    * @brief Interface to read/write MOM files.
    *
    * The MOM file format is used in the Elite acquisition system (BTS, Milan, Italy).

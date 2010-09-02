@@ -38,7 +38,7 @@
 namespace btk
 {
   /**
-   * @class Wrench
+   * @class Wrench btkWrench.h
    * @brief Represents a wrench has position, force and moment.
    *
    * @ingroup BTKCommon

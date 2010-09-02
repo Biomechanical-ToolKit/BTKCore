@@ -80,7 +80,7 @@ namespace btk
   };
   
   /**
-   * @class DownsampleFilter
+   * @class DownsampleFilter btkDownsampleFilter.h
    * @brief Downsample dataExtracts a frame from a collection of btk::Measure objects
    * @tparam T Must be a class inheriting of btk::DataObject
    *

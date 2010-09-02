@@ -40,7 +40,7 @@
 namespace btk
 { 
   /**
-   * @class VTKDataObjectAdapter
+   * @class VTKDataObjectAdapter btkVTKDataObjectAdapter.h
    * @brief Adapter to use a btk::DataObject in a VTK pipeline.
    *
    * Use the method SetBTKDataObject() to set the btk::DataObject object linked

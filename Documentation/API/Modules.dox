@@ -11,14 +11,14 @@
 
 /**
  * @defgroup BTKIO IO
- * @brief Reader/Writer classes for acquistions files, models, ...
+ * @brief Reader/Writer classes for acquisitions files, models, ...
  *
  * This modules corresponds to the library BTKIO
  */
 
 /**
  * @defgroup BTKBasicFilters BasicFilters
- * @brief Simple filters (e.g. Extract a frame of markers frome an acquisition).
+ * @brief Simple filters (e.g. Extract a frame of markers from an acquisition).
  *
  * This modules corresponds to the library BTKBasicFilters
  */

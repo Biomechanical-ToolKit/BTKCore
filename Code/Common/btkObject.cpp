@@ -44,7 +44,7 @@
 namespace btk
 {
   /**
-   * @class Object
+   * @class Object btkObject.h
    * @brief Base for all objects which need to keep track of modified time.
    *
    * @ingroup BTKCommon

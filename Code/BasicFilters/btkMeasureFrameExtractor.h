@@ -84,7 +84,7 @@ namespace btk
   };
   
   /**
-   * @class MeasureFrameExtractor
+   * @class MeasureFrameExtractor btkMeasureFrameExtractor.h
    * @brief Extracts a frame from a collection of btk::Measure objects
    * @tparam T Must be a class inheriting of btk::Measure
    *

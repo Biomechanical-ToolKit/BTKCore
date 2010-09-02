@@ -45,7 +45,7 @@
 namespace btk
 {
   /**
-   * @class VTKForcePlatformsSource
+   * @class VTKForcePlatformsSource btkVTKForcePlatformsSource.h
    * @brief Displays force platform geometries from a collection of btk::ForcePlatform object.
    * 
    * @ingroup BTKVTK

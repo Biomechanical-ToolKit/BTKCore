@@ -41,7 +41,7 @@
 namespace btk
 {
   /**
-   * @class AcquisitionFileWriterException
+   * @class AcquisitionFileWriterException btkAcquisitionFileWriter.h
    * @brief Exception class for the AcquisitionFileWriter class.
    */
   

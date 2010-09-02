@@ -38,7 +38,7 @@
 namespace btk
 {
  /**
-   * @class SeparateKnownVirtualMarkersFilter
+   * @class SeparateKnownVirtualMarkersFilter btkSeparateKnownVirtualMarkersFilter.h
    * @brief Separate a collection of points in fours categories to be able to distinguish real markers from the others.
    *
    * These categories are:

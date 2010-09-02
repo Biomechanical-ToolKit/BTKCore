@@ -38,7 +38,7 @@
 namespace btk
 {
   /**
-   * @class ForcePlatform
+   * @class ForcePlatform btkForcePlatform.h
    * @brief Base class for all type of force platform.
    *
    * @ingroup BTKCommon 

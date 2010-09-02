@@ -41,7 +41,7 @@
 namespace btk // For documentation purpose
 {
 /**
- * @define SharedPtr 
+ * @define SharedPtr btkSharedPtr.h
  * Macro which uses the right shared_ptr class in BTK.
  *
  * @define static_pointer_cast 

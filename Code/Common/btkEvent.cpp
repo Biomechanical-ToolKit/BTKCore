@@ -41,7 +41,7 @@
 namespace btk
 {
   /**
-   * @class Event 
+   * @class Event btkEvent.h
    * @brief Label a specific time/frame during an acquisition.
    *
    * @ingroup BTKCommon

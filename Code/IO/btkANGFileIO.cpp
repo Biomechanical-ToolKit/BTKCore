@@ -42,7 +42,7 @@
 namespace btk
 {
   /**
-   * @class ANGFileIOException
+   * @class ANGFileIOException btkANGFileIO.h
    * @brief Exception class for the ANGFileIO class.
    */
   
@@ -57,7 +57,7 @@ namespace btk
    */
   
   /**
-   * @class ANGFileIO
+   * @class ANGFileIO btkANGFileIO.h
    * @brief Interface to read/write ANG files.
    *
    * The ANG file format is used in the Elite acquisition system (BTS, Milan, Italy).

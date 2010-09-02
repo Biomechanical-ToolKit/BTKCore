@@ -60,7 +60,7 @@ namespace btk
   };
 
   /**
-   * @class ForcePlatformWithCalibrationMatrix
+   * @class ForcePlatformWithCalibrationMatrix btkForcePlatformWithCalibrationMatrix.h
    * @brief Represents force platform with a calibration matrix
    *
    * @tparam t Force plateform type

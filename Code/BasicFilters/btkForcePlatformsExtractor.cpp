@@ -40,7 +40,7 @@
 namespace btk
 {
  /**
-   * @class ForcePlatformsExtractor
+   * @class ForcePlatformsExtractor btkForcePlatformsExtractor.h
    * @brief Extracts force platform data from a btk::Acquisition object. 
    *
    * Analog channels' data are transformed (if required) to express force and moment at the origin of the force plateform in its frame.

@@ -42,7 +42,7 @@
 namespace btk
 {
   /**
-   * @class MetaData
+   * @class MetaData btkMetaData.h
    * @brief Store data which can be embedded within an Acquisition 
    * (calibration matrix, subject informations, ...).
    *

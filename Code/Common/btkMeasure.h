@@ -78,7 +78,7 @@ namespace btk
   };
  
   /**
-   * @class Measure
+   * @class Measure btkMeasure.h
    * @brief Measure with @a d dimensions along the time.
    *
    * The measures are stored in a matrix. The measures' dimensions correspond to the columns of the matrix. The frames correspond to the line.

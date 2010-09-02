@@ -39,7 +39,7 @@
 namespace btk
 {
   /**
-   * @class DataObject
+   * @class DataObject btkDataObject.h
    * @brief Input and output entry for processes in pipelines.
    *
    * @ingroup BTKCommon
@@ -116,7 +116,7 @@ namespace btk
   };
   
   /**
-   * @class DataObjectLabeled
+   * @class DataObjectLabeled btkDataObject.h
    * @brief DataObject with a label and a description.
    *
    * @ingroup BTKCommon

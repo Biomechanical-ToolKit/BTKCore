@@ -47,7 +47,7 @@
 namespace btk
 {
   /**
-   * @class XLSOrthotrackFileIOException
+   * @class XLSOrthotrackFileIOException btkXLSOrthotrackFileIO.h
    * @brief Exception class for the XLSOrthotrackFileIO class.
    */
   
@@ -62,7 +62,7 @@ namespace btk
    */
   
   /**
-   * @class XLSOrthotrackFileIO
+   * @class XLSOrthotrackFileIO btkXLSOrthotrackFileIO.h
    * @brief Class to read XLSOrthotrack files.
    *
    * The XLSOrthotrack file format is created by Motion Analysis Corp.

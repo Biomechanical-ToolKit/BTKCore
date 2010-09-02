@@ -96,7 +96,7 @@ namespace btk
   };
   
   /**
-   * @class Collection
+   * @class Collection btkCollection.h
    * @brief List of objects.
    *  
    * @ingroup BTKCommon
