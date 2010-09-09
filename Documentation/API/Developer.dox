@@ -5,7 +5,242 @@
 | \ref BuildInstructions "Building instructions"
 | \ref GettingStarted "Getting started"
 | \ref AdvancedTutorial "Advanced tutorial"
-| \b Developer's \b instructions
+| \b Developer's \b guide
 | \ref License
 </div>
+
+@section TOC Table of contents
+- @ref SupportedCompiler
+- @ref ExtendBTK
+- @ref TDD
+- @ref ProgrammingStyle
+ - @ref CodingStyle
+ - @ref DoxygenDocumentation
+- @ref SVNBTK
+ - @ref SourceCheckout
+ - @ref SubmittingPatch
+- @ref BugReports
+- @ref MailingList
+
+@htmlonly <hr> @endhtmlonly
+
+@section SupportedCompiler Supported compiler
+The code compiles without any warning nor error under the tested configurations:
+ - MacOS X 10.3 / GCC 3.3 (PPC 32 bits)
+ - MacOS X 10.5 / GCC 4.0 (Intel 32/64 bits)
+ - MacOS X 10.6 / GCC 4.2 (Intel 64 bits)
+ - Ubuntu 9.04 "Jaunty" / GCC 4.3 (Intel 32 bits)
+ - Ubuntu 9.04 "Lucid Lynx" / GCC 4.4  (Intel 64bits)
+ - Windows XP SP3 / MSVC 2008 (Intel 32 bits)
+ - Windows XP SP3 / MSVC 2010 (Intel 32 bits)
+ - Windows Vista SP1 / MSVC 2010 (Intel 32 bits)
+ - Windows 7 / Windows SDK 3.5 SP1 (Intel 64 bits)
+
+If your configuration is not listed here, please send an email to the
+<a href="http://groups.google.com/group/btk-users">mailing list</a> to
+report it.
+
+@section ExtendBTK Extend BTK
+
+As seen in the @ref AdvancedTutorial, it is pretty easy to Write a new
+class using the existing classes in BTK. If you want to add your new
+class in the BTK source code, then you need to embed it in the CMake
+project.
+First, it is important to add your file(s) in the folder representing
+the module to extend.\n
+Edit the file @c CMakeLists.txt found in the folder where you add your
+files and add the CPP file in the sources to compile. In the case
+where your class is only composed of header, then you don't have to
+add any filename in @c CMakeLists.txt.
+
+For example, if you want to add the class @c btk::EventDetector
+composed of the files @c btkEventDetector.h and btkEventDetector.cpp
+in the module BasicFilters, then you have to:
+ - Add the files in the folder @c Code/BasicFilters
+ - Edit the @c CMakeLists.txt in the folder @c Code/BasicFilters
+ - Add in the CMake variable BTKBasicFilters_SRCS, the name of the CPP file.
+@verbatim
+# Part of the file  Code/BasicFilters/CMakeLists.txt
+SET(BTKBasicFilters_SRCS
+     btkAcquisitionUnitConverter.cpp
+     btkEventDectector.cpp # <-- New line added. Your class will be
+compiled and integrated in the module BTKBasicFilters
+     btkForcePlatformsExtractor.cpp
+     btkForcePlatformWrenchFilter.cpp
+     btkMergeAcquisitionFilter.cpp
+     btkSeparateKnownVirtualMarkersFilter.cpp
+     btkSpecializedPointsExtractor.cpp
+     btkGroundReactionWrenchFilter.cpp
+ )
+
+ADD_LIBRARY(BTKBasicFilters ${BTK_LIBS_BUILD_TYPE} ${BTKBasicFilters_SRCS})
+
+TARGET_LINK_LIBRARIES(BTKBasicFilters BTKCommon)
+# ...
+@endverbatim
+
+For other extension (add a new wrapper, a new module, ...), please
+contact the developers by using the <a
+href="http://groups.google.com/group/btk-users">mailing list</a>. In
+some case, it is possible that a developer already starts the same
+extension without commit it as it is not enough mature and can help
+you.
+
+@subsection TDD Test drive development
+When developing a new class / function / method, it is strongly advised to write at the same time, some unit tests, or regression tests. These tests give the possibility to check if the behavior of the code corresponds to the desired results. And later, to be sure that the general behavior stays the same even if you refactor the code.
+
+You will find more information using google: http://www.google.com/search?q=Test+Driven+Development
+
+The library used in BTK to write the unit tests is a modified version of <a href="http://cxxtest.sourceforge.net/guide.html">CxxTest</a>. This code is embedded in the @c Utilities folder. The source code was modified to keep only the @c ErrorPrinter runner (no GUI) and add macros to generate the test runner instead of using Perl or Python.
+
+Basically, the tests are defined in a suite of tests. So it is important to start by defining a suite by using the macro @c CXXTEST_SUITE and then, define inside the desired tests with the macro @c CXXTEST_TEST.
+@code
+CXXTEST_SUITE(C3DFileReaderTest)
+{
+  CXXTEST_TEST(NoFile)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::AcquisitionFileReaderException &e, e.what(), std::string("Filename must be specified"));
+  };
+};
+@endcode
+
+Even if the suite and its test are defined you have to active them into the runner. This is done by using the macro @c CXXTEST_SUITE_REGISTRATION and @c CXXTEST_TEST_REGISTRATION to register the suite and the selected test respectively.
+@code
+// ... Below the suite definition
+CXXTEST_SUITE_REGISTRATION(C3DFileReaderTest)
+CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, NoFile)
+@endcode
+To deactivate a test, you have only to comment its registration.
+
+In BTK, the unit tests are in the @c Testing/Code folder. The @c Testing/Data folder contains input and output files used mainly by the tests for the modules IO and BasicFilters. To stay compatible with the current design, you have to write the tests' definition in a header file. Then this file is included in the @c _TDD* file associated with the module where your class was added. Now, compile the code and execute it to see if all the tests pass (you need to activate the option @ref config_test in CMake).
+
+The following list describes the contents of the files in the @c Testing/Code folder:
+ - @c _TDD.cpp contains the @c main function where the test runner is executed ;
+ - @c _TDDBasicFilters.cpp contains the tests for the module BasicFilters ;
+ - @c _TDDCommon.cpp contains the tests for the module Common ;
+ - @c _TDDConfigure.h.in contains the required header to use CxxTest and the definition of the IO paths ;
+ - @c _TDDIO.cpp contains the tests for the module IO ;
+ - @c *.h All the tests.
+
+@section ProgrammingStyle Programming style
+
+The following subsections explain how to format the syntax of the files for the code, and its documentation.
+
+@subsection CodingStyle Coding style
+ - All the functions/classes embedded in BTK are in the namespace btk.
+ - The file extension used for the C++ header is @c .h
+ - The file extension used for the C++ source is @c .cpp
+ - Indentation with 2 spaces, no tabs ;
+ - The comparison use the right-hand comparison (as modern compiler, at least GCC, can detect the use of the assignment operation @c instead of the equal operator @c ==) ;
+ - Use explicitly parentheses into conditional statement or other logical expression
+ - Private function/class finishes by the suffix @c _p ;
+ - Use explicit names rather than short names ;
+ - Use the <a href="http://en.wikipedia.org/wiki/Allman_style#Allman_style_.28bsd_in_Emacs.29">Allman style</a> to indent the code ;
+ - Comments have to be written in english as it is the language that nearly all programmers in all countries can read.
+
+@subsection DoxygenDocumentation Doxygen documentation
+
+To keep clean the headers, it has been chosen to write the documentation into the definition part of the code (in most of the case, in the CPP file).
+
+The Doxygen documentation uses the JavaDoc style and the Doxygen command use the arobase @c @@ instead of the backslash @c @\ character. For example:
+@verbatim
+/**
+ * @class Acquisition btkAcquisition.h
+ * @brief Contains the data related to a biomechanical acquisition.
+ *
+ * A biomechanical acquisition can contains:
+ *  - 3D data (makers, points, forces, moments, ...) ;
+ *  - analog channels (force plateform, emg, ...) ;
+ *  - events
+ *  - acquisition's setup ;
+ *  - subject's informations.
+ *
+ * @ingroup BTKCommon
+ */
+@endverbatim
+
+Every function / class / method or member (public and protected) must have a block of documentation with at least a description and set into a module (using the command @c @@ingroup). The known modules are listed in @c Modules page and reported here:
+ - BTKCommon 
+ - BTKIO
+ - BTKBasicFilters
+ - BTKVTK
+ 
+A class must have also a brief description to be included in the <tt>Class Index</tt> page. 
+
+If you need to add references into the description, then you can add the name of the authors ans the date between parenthesis (e.g. Foo et al, 2009 ; Bar & Foo, 2010) and add a paragraph named @e Reference at the end of the description. This paragraph will contain the details of the reference(s). The format should be:
+ - List of authors (Authors1, initial(s) ; Authors2, initial(s) ; ...)
+ - Title in italic (<em>The name or the article</em>.)
+ - Name of the journal, Number (Issue), @b date, pages.
+ 
+For example:
+@verbatim
+@par Reference
+Shimba T.@n
+<em>An estimation of center of gravity from force platform data</em>.@n
+Journal of Biomechanics, <b>1984</b>, 17(1), 53–60.
+@endverbatim
+
+which gives the results:
+@par Reference
+Shimba T.@n
+<em>An estimation of center of gravity from force platform data</em>.@n
+Journal of Biomechanics, <b>1984</b>, 17(1), 53–60.
+
+@section SVNBTK Using SVN for BTK development
+
+The library BTK uses <a href="http://subversion.apache.org/">Subversion</a> (SVN) to manage files and directories, and the changes made to them, over time. You can use the following free clients to checkout the code.
+  - <a href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> (Windows only)
+  - <a href="http://kdesvn.alwins-world.de/">KDESvn</a> (Linux only)
+  - <a href="http://www.syntevo.com/smartsvn/index.html">SmartSVN</a> (Win/Mac/Linux)
+  - <a href="http://developer.apple.com">XCode</a> (MacOS X only)
+
+For an exhaustive list of the Subversion clients, you can check this <a href="http://en.wikipedia.org/wiki/Comparison_of_Subversion_clients">page</a> on Wikipedia.
+
+The code is hosted by google and can be browsed <a
+href="http://code.google.com/p/b-tk/source/browse/#svn/BTK/trunk">here</a>.
+It lists the trunk (the default branch) and its folder.
+If you prefer, you can also access to the list of <a
+href="http://code.google.com/p/b-tk/source/list">changes</a>.
+
+@subsection SourceCheckout Source checkout
+
+The URL to use in the SVN client to download the latest source code for the trunk is the following: http://b-tk.googlecode.com/svn/BTK/trunk.
+This URL gives you a read-only access to the source code. Only the members can commit into the source code.
+
+@subsection SubmittingPatch Submitting Patch
+
+If you add a functionality, fix a bug, add some documentation or
+correct it (or ...) and want to share it with the community, you can
+create a patch and send it to the <a
+href="http://groups.google.com/group/btk-users">mailing list</a>.
+To create a patch, few rules must be respected to be able to apply
+this patch easily.
+ - Update your working directory to be sure to create patch against the
+last revision. If it is not the case, it can create one or more
+conflicts in the code and finally gives errors during the compilation
+or worster, crash the final application.
+ - Create a patch from the top of the sources (the root) or at least
+indicate from which folder you create the patch.
+
+@b Note: For TortoiseSVN user, check this <a
+href="http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-patch.html">help</a>
+to create patch.
+
+@section BugReports Bug reports
+For bug reports and feature requests, please use the <a
+href="http://code.google.com/p/b-tk/issues/list">issue tracker</a>. It
+gives you a list of the opened issues.
+Check the closed issues (Select "All issues" instead of "Open issues"
+and click on search) before submitting a new one.
+
+@section MailingList Mailing list
+For the moment, it exists one mailing list where users and developers
+can write to each other. If necessary this mailing list could be
+splitted to separate user and developer discussions.
+
+Check the mailing list <a
+href="http://groups.google.com/group/btk-users">BTK Users</a> to
+subscribe or access to the archives
+
  */

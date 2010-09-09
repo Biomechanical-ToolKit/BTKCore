@@ -470,7 +470,7 @@ int main()
   CALForcePlateReader->SetFilename("OneAcquisition.cal");
   XLSOrthotrackReader->SetFilename("OneAcquisition.xls");
   // No option for the merger
-  // Use the default units for the converter: millimeter (position), degree (angle), newton (force), netown-millimeter (moment) and watt (power).
+  // Use the default units for the converter: millimeter (position), degree (angle), newton (force), newton-millimeter (moment) and watt (power).
   C3DWriter->SetFilename("OneAcquisition.c3d");
   
   // To execute the pipeline, it is only necessary to update the last process.
