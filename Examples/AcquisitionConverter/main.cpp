@@ -37,6 +37,8 @@
 #include <btkAcquisitionFileWriter.h>
 #include <btkMacro.h>
 
+#include <cstdio> // Include std::remove for Linux
+
 int main(int argc, char *argv[])
 {
   if (argc != 3)

@@ -36,7 +36,7 @@
 #ifndef __btkVTKForcePlatformsSource_h
 #define __btkVTKForcePlatformsSource_h
 
-#include "btkForcePlatFormCollection.h"
+#include "btkForcePlatformCollection.h"
 
 #include <vtkPolyDataAlgorithm.h>
 
