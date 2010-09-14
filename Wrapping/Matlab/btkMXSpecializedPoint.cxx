@@ -160,7 +160,7 @@ void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[
   btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 
   if (!mxIsNumeric(prhs[1]))
-    mexErrMsgTxt("The second input must be a matrix of real values corresponding to the same dimensions than extracted points' coordinates.");
+    mexErrMsgTxt("The second input must be a matrix of real values corresponding to the same dimensions than extracted points' components.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
@@ -174,7 +174,7 @@ void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[
   int numberOfPoints = points->GetItemNumber();
 
   if (mxGetNumberOfElements(prhs[1]) != (numberOfFrames * numberOfPoints * 3))
-    mexErrMsgTxt("The second input doesn't have the same size than the number of extracted points' coordinates.");
+    mexErrMsgTxt("The second input doesn't have the same size than the number of extracted points' components.");
     
   if (numberOfPoints == 0)
     return;

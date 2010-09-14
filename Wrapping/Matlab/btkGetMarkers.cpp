@@ -86,20 +86,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (numberOfPoints > 0)
     {
       int inc = 0;
-      mxArray* residual = mxCreateDoubleMatrix(acq->GetPointFrameNumber(), 1, mxREAL);
-      double* initialValues = mxGetPr(residual);
       for(btk::PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
       {
-        mxSetPr(residual, (*it)->GetResiduals().data());
-        mxArray* deepCopy = mxDuplicateArray(residual);
-        mxSetFieldByNumber(plhs[2], 0, inc, deepCopy);
-
+        mxArray* residual = mxCreateDoubleMatrix(acq->GetPointFrameNumber(), 1, mxREAL);
+        memcpy(mxGetPr(residual), (*it)->GetResiduals().data(), mxGetNumberOfElements(residual) * sizeof(double));
+        mxSetFieldByNumber(plhs[2], 0, inc, residual);
         delete[] fieldnames[inc];
         inc++;
       }
       delete[] fieldnames;
-      mxSetPr(residual, initialValues);
-      mxDestroyArray(residual);
     }
   }
 };
