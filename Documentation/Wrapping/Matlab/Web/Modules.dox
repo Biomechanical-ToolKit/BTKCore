@@ -1,0 +1,89 @@
+/** 
+ * @defgroup BTKMatlabAcquisitionAccessor Access acquisition data
+ * @brief Functions to access to the members of a C++ btk::Acquisition object from Matlab 
+ *
+ * Extract data stored in the acquisition represented by a handle and format them to be easily used by Matlab.
+ */
+ 
+/** 
+ * @defgroup BTKMatlabAcquisitionModifier Modify acquisition data
+ * @brief Functions to modify members of a C++ btk::Acquisition object from Matlab 
+ *
+ * Convert data from Matlab to store them into the given acquisition.
+ */
+
+/** 
+ * @defgroup BTKMatlabPointAccessor Access point data
+ * @brief Functions to access to the members of a C++ btk::Point object from Matlab 
+ *
+ * Extract data stored in a point (stored itself in an acquisition) format them to be easily used by Matlab.
+ */
+
+/** 
+ * @defgroup BTKMatlabPointModifier Modify point data
+ * @brief Functions to modify members of a C++ btk::Point object from Matlab 
+ *
+ * Convert data from Matlab to store them into the chosen point.
+ */
+  
+/** 
+ * @defgroup BTKMatlabAnalogAccessor Access analog data
+ * @brief Functions to access to the members of a C++ btk::Analog object from Matlab 
+ *
+ * Extract data stored in an analog channel (stored itself in an acquisition) format them to be easily used by Matlab.
+ */
+
+/** 
+ * @defgroup BTKMatlabAnalogModifier Modify analog data
+ * @brief Functions to modify members of a C++ btk::Analog object from Matlab 
+ *
+ * Convert data from Matlab to store them into the chosen analog channel.
+ */
+ 
+/** 
+ * @defgroup BTKMatlabEventAccessor Access event data
+ * @brief Functions to access to the members of a C++ btk::Event object from Matlab 
+ *
+ * Extract data stored in an event (stored itself in an acquisition) format them to be easily used by Matlab.
+ */
+
+/** 
+ * @defgroup BTKMatlabEventModifier Modify event data
+ * @brief Functions to modify members of a C++ btk::Event object from Matlab 
+ *
+ * Convert data from Matlab to store them into the chosen event.
+ */
+ 
+/** 
+ * @defgroup BTKMatlabMetaDataAccessor Access metadata data
+ * @brief Functions to access to the members of a C++ btk::MetaData object from Matlab 
+ *
+ * Extract data stored in a metadata (stored itself in an acquisition) format them to be easily used by Matlab.
+ */
+
+/** 
+ * @defgroup BTKMatlabMetaDataModifier Modify metadata data
+ * @brief Functions to modify members of a C++ btk::MetaData object from Matlab 
+ *
+ * Convert data from Matlab to store them into the chosen metadata.
+ */
+
+/**
+ * @defgroup BTKMatlabIO I/O
+ * @brief Read/Write biomechanical files
+ *
+ * Generic functions to read and write biomechanical files. Check this @ref FileFormatSupported page to know what are the file format supported by BTK.
+ */
+
+/**
+ * @defgroup BTKMatlabBasicFilters Basic filters
+ * @brief Compute parameters from acquisition's data.
+ *
+ * Simple filters (e.g. Extract a frame of markers from an acquisition) to extract data from an acquisition or generate a new one.
+ */
+
+/**
+ * @defgroup BTKMatlabGeneral General function
+ * @brief All the functions which are not related to the other groups.
+ */
+

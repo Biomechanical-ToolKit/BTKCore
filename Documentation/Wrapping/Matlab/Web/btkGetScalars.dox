@@ -1,0 +1,15 @@
+/**
+ * @class btkGetScalars
+ * @brief Extract scalars from a given biomechanical acquisition
+ * @syntax{[scalars\, scalarsInfo] = btkGetScalars(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval scalars Structure with the scalars' values. Each fieldname corresponds to an scalar's label (see note #1).
+ * @retval scalarsInfo Structure with the informations related to the scalars.
+ *   - @c scalarsInfo.frequency: Point's frequency
+ *   - @c scalarsInfo.units: Structure with one one field labeled ALLSCALARS with the unit (string) of the scalars.
+ *
+ * @par Detailed description:
+ * <b>Note #1:</b> Check the page @ref StructureFieldnameFormat to understand how the fieldnames are formated.
+ * @sa 
+ * @ingroup BTKMatlabPointAccessor
+ */

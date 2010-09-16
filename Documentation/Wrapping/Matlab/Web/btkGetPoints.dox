@@ -1,0 +1,19 @@
+/**
+ * @class btkGetPoints
+ * @brief Extract points from the given acquisition.
+ * @syntax{[points\, pointsInfo] = btkGetPoints(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval points Structure with the point' values. Each fieldname corresponds to an point's label (see note #1).
+ * @retval pointsInfo Structure with the informations related to the moments.
+ *   - @c pointsInfo.firstframe: Index of the first frame ;
+ *   - @c pointsInfo.frequency: Point's frequency ;
+ *   - @c pointsInfo.units: Structure with the unit (string) of each point.
+ *   - @c pointsInfo.residuals: Structure with the residuals of each point.
+ *   - @c pointsInfo.maks: Structure with the makss of each point.
+ *
+ * @par Detailed description:
+ * <b>Note #1:</b> Check the page @ref StructureFieldnameFormat to understand how the fieldnames are formated.
+ * 
+ * @sa btkGetAngles, btkGetForces, btkGetMarkers, btkGetMoments, btkGetPowers, btkGetScalars
+ * @ingroup BTKMatlabAcquisitionAccessor
+ */

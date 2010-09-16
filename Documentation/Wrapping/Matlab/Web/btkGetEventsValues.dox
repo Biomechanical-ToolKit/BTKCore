@@ -1,0 +1,12 @@
+/**
+ * @class btkGetEventsValues
+ * @brief Extract events' values from the given biomechanical acquisition.
+ * @syntax{[times\, labels\, descriptions\, ids] = btkGetEventsValues(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval times Matrix of real values containing the time of each event. These times are not sorted.
+ * @retval labels Array of cells containing the label (string) of each event.
+ * @retval descriptions Array of cells containing the description (string) of each event.
+ * @retval ids Matrix of integer values containing the ID of each event.
+ * @sa btkGetEvents
+ * @ingroup BTKMatlabEventAccessor
+ */

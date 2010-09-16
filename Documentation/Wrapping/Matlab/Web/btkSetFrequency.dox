@@ -1,0 +1,9 @@
+/**
+ * @class btkSetFrequency
+ * @brief Set the main frequency.
+ * @syntax{btkSetFrequency(h\, freq)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param freq Real with the video frequency.
+ * @sa btkSetAnalogResolution, btkSetAnalogSampleNumberPerFrame, btkSetFirstFrame, btkSetFrameNumber, btkSetMaxInterpolationGap, btkSetPointNumber
+ * @ingroup BTKMatlabAcquisitionModifier
+ */

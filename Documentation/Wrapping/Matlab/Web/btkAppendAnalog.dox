@@ -1,0 +1,13 @@
+/**
+ * @class btkAppendAnalog
+ * @brief Append a new analog channel into the given acquisition and (optionally) return an updated list of analog channels.
+ * @syntax{[analogs\, analogsInfo] = btkNewAcquisition(h\, label\, values)\n [analogs\, analogsInfo] = btkNewAcquisition(h\, label\, values\, description)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param label String representing the label of the appended analog channel.
+ * @param values Data for the appended analog channel. It must be a matrix (@c n,1) where @c n is the number of frames (for the analog part) into the acquisition
+ * @param description String representing the description of the appended analog channel.
+ * @retval analogs Updated list of analog channels. Its format is the same than using the function btkGetAnalogs.
+ * @retval analogsInfo Updated informations related to the analog channels. Its format is the same than using the function btkGetAnalogs.
+ * @sa btkClearAnalogs, btkGetAnalogs, btkRemoveAnalog
+ * @ingroup BTKMatlabAnalogModifier
+ */

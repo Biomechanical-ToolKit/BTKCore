@@ -1,0 +1,8 @@
+/**
+ * @class btkClearPoints
+ * @brief Remove all points in the given acquisition.
+ * @syntax{btkClearPoints(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @sa btkAppendPoints, btkGetPoints, btkRemovePoint
+ * @ingroup BTKMatlabPointModifier
+ */

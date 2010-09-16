@@ -1,0 +1,9 @@
+/**
+ * @class btkGetAnalogResolution
+ * @brief Returns the analog to digital converter (ADC) resolution
+ * @syntax{ar = btkGetAnalogResolution(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval ar Number of bits used by the converter
+ * @sa btkGetAnalogSampleNumberPerFrame
+ * @ingroup BTKMatlabAnalogAccessor
+ */

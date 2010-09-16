@@ -1,0 +1,11 @@
+/**
+ * @class btkFindMetaData
+ * @brief Return the searched metadata or 0 if not found.
+ * @syntax{md = btkFindMetaData(h\, label)\n md = %btkFindMetaData(h\, label\, ...)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param label label of one metadata
+ * @param ... label(s) for the desired metadata to search. Any level of depth is possible.
+ * @retval md Same format than the output of the function btkGetMetaData.
+ * @sa btkGetMetaData
+ * @ingroup BTKMatlabAcquisitionAccessor
+ */

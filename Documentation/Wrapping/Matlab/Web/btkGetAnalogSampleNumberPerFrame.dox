@@ -1,0 +1,15 @@
+/**
+ * @class btkGetAnalogSampleNumberPerFrame
+ * @brief Return the number of analog samples per video frame.
+ * @syntax{ratio = btkGetAnalogSampleNumberPerFrame(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval ratio Integer with the number of analog samples per video frame.
+ *
+ * @par Detailed description:
+ * <tt>btkGetAnalogSampleNumberPerFrame(h)</tt> divides the number of analog frames by 
+ * the number of point frames to determine the ratio between them. This ratio is always 
+ * greater or equal than 1.
+ * 
+ * @sa btkGetAnalogResolution
+ * @ingroup BTKMatlabAcquisitionAccessor
+ */

@@ -1,0 +1,27 @@
+/**
+ * @class btkNewAcquisition
+ * @brief Create a new and initialized acquisition.
+ * @syntax{h = btkNewAcquisition(pn\, fn)\n h = btkNewAcquisition(pn\, fn\, an)\n h = btkNewAcquisition(pn\, fn\, an\, r)}
+ * @param np Number of points.
+ * @param fn Number of frames.
+ * @param an Number of analog channels.
+ * @param r Numbre of analog samples per video frame. 
+ * @retval h Handle pointing to the newly created C++ btk::Acquisition object.
+ *
+ * @par Detailed description:
+ * <tt>btkNewAcquisition(pn, fn)</tt> returns an initialized acquisition with @c pn points and @c fn frames. 
+ * There is no analog channels. The points created are labeled with the string "uname*" and their index (e.g. uname_1, uname_2, ...).
+ * They are also tagged with the type "Marker". To change the type
+ * of theses points, use btkSetPointType or btkSetPoint. 
+ * The members of the acquisition are initialized to:
+ *  - First frame equals to 1: use btkSetFirstFrame to modify it.
+ *  - Points' frequency equals to 0: btkSetFrequency to modify it.
+ *  - Points' units set to "mm", "deg", "N", "Nmm", "W", "" for markers, angles, forces, moments, powers and scalars respectively: use btkSetPointUnits to modify them.
+ *  - Analogs' frequency equals to 0. Updated when the points' frequency is. 
+ *  - Analog channel resolution sets to 12 bits: use btkSetAnalogResolution to modify it.\n
+ *  - Number of analog samples per video frame set to 1.
+ *  .
+ * <tt>btkNewAcquisition(pn, fn, an)</tt> initializes the acquisition with @c an analog channels. Their gain is unknwow, their offset is set to 0 and the scale factor to 1. As with the points, their label is composed of the string "uname*" and their index.\n
+ * <tt>btkNewAcquisition(pn, fn, an, r)</tt> initializes the acquisition with @c r analog samples per video frame.
+ * @ingroup BTKMatlabAcquisitionModifier
+ */

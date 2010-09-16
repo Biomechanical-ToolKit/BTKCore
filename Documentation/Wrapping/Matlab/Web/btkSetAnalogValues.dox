@@ -1,0 +1,18 @@
+/**
+ * @class btkSetAnalogValues
+ * @brief Modify analog's value and return updated analogs.
+ * @syntax{[analogs\, analogsInfo] = btkSetAnalogValues(h\, idx\, newvalues)\n [analogs\, analogsInfo] = btkSetAnalogValues(h\, label\, newvalues)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param idx Integer containing the index of the analog channel to modify.
+ * @param label String containing the label of the analog channel to modify.
+ * @param newvalues Column vector of reals (i.e. scaled data) with the same size than the number of analog frames.
+ * @retval analogs Updated list of analog channels. Its format is the same than using the function btkGetAnalogs.
+ * @retval analogsInfo Updated informations related to the analog channels. Its format is the same than using the function btkGetAnalogs.
+ *
+ * @par Detailed description:
+ * <tt>btkSetAnalogValues(h, idx, newvalues)</tt> modifies the scale factor of the analog channel specified by the index @c idx.
+ * <tt>btkSetAnalogValues(h, label, newvalues)</tt> modifies the scale factor of the analog channel specified by the label @c label.
+ * 
+ * @sa btkSetAnalogDescription, btkSetAnalogGain, btkSetAnalogLabel, btkSetAnalogOffset, btkSetAnalogScale
+ * @ingroup BTKMatlabAnalogModifier
+ */

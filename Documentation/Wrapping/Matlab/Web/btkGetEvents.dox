@@ -1,0 +1,20 @@
+/**
+ * @class btkGetEvents
+ * @brief Extract events from a biomechanical acquisition.
+ * @syntax{[events\, eventsInfo] = btkGetEvents(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval events Structure where each filed corresponds to an event's label
+ * @retval eventsInfo Structure with additional informations
+ *   - @c eventsInfo.subjects: contains the name of the subject for each event
+ *   - @c eventsInfo.units: Structure with one field named ALLEVENTS for the unit used by the events.
+ *
+ * @par Detailed description:
+ * The value of each field in the output @c eventcorresponds to the time(s) where this event occurred.  
+ * If the events represent actions realized by more than one subject, each event starts by the name of 
+ * the corresponding subject. The time(s) of each event are reordered. Events are also reordered based 
+ * on their first time.
+ *
+ * @sa btkGetEventsValues
+ * @ingroup BTKMatlabEventAccessor
+ */
+

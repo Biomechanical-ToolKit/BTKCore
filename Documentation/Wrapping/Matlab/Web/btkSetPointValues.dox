@@ -1,0 +1,20 @@
+/**
+ * @class btkSetPointValues
+ * @brief Sets point's coordinates (values) from a matrix
+ * @syntax{btkSetPointValues(h\, v)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param v Matrix of reals where the number of rows corresponds to the number of frames in the acquisition and the number of columns corresponds to the components of the point.
+ *
+ * @par Detailed description:
+ * To modify only the value of a specific type of point (angles, forces, moments, ...) you can use
+ * use the following duos:
+ *   - btkGetAnglesValues / btkSetAnglesValues ;
+ *   - btkGetForcesValues / btkSetForcesValues ;
+ *   - btkGetMarkersValues / btkSetMarkersValues ;
+ *   - btkGetMomentsValues / btkSetMomentsValues ;
+ *   - btkGetPowersValues / btkSetPowersValues ;
+ *   - btkGetScalarsValues / btkSetScalarsValues.
+ *
+ * @sa btkGetPoint, btkGetPointValues.
+ * @ingroup BTKMatlabPointModifier
+ */

@@ -1,0 +1,12 @@
+/**
+ * @class btkSetEventSubject
+ * @brief Modify the subject's information of the selected event.
+ * @syntax{[events\, eventsInfo] = btkSetEventSubject(h\, index\, newsubject)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param index Integer with the index of the event to modify.
+ * @param newsubject String with the new subject's information.
+ * @retval events A structure with the same format than in the function btkGetEvents
+ * @retval eventsInfo A structure with the same format than in the function btkGetEvents
+ * @sa btkSetEventDescription, btkSetEventId, btkSetEventLabel, btkSetEventTime
+ * @ingroup BTKMatlabEventModifier
+ */

@@ -1,0 +1,9 @@
+/**
+ * @class btkSetFirstFrame
+ * @brief Set acquisition's first frame index.
+ * @syntax{btkSetFirstFrame(h\, ff)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param ff Integer with the index of the new first frame.
+ * @sa btkSetAnalogResolution, btkSetAnalogSampleNumberPerFrame, btkSetFrameNumber, btkSetFrequency, btkSetMaxInterpolationGap, btkSetPointNumber
+ * @ingroup BTKMatlabAcquisitionModifier
+ */

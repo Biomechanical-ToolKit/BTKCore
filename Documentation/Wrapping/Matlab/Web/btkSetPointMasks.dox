@@ -1,0 +1,13 @@
+/**
+ * @class btkSetPointMasks
+ * @brief Sets point's masks from a row vector
+ * @syntax{btkSetPointMasks(h\, m)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param m Vector of integers with the new masks (see note #1).
+ *
+ * @par Detailed description:
+ * <b>Note #1:</b> Each value must be between 0 and 127 and corresponds to the conversion of a binary number (coded on 7 bits) to a integer number.
+ * 
+ * @sa btkSetPointDescription, btkSetPointLabel, btkSetPointResiduals, btkSetPointType, btkSetPointUnit
+ * @ingroup BTKMatlabPointModifier
+ */

@@ -1,0 +1,8 @@
+/**
+ * @class btkGetMaxInterpolationGap
+ * @brief Return acquisition's maximum interpolation gap
+ * @syntax{gap = btkGetMaxInterpolationGap(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval gap Integer with the maximum number of frame to interpolate
+ * @ingroup BTKMatlabAcquisitionAccessor
+ */

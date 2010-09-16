@@ -1,0 +1,10 @@
+/**
+ * @class btkGetPointFrameNumber
+ * @brief Return the number of frames for the points in the given acquisition.
+ * @syntax{pfn = btkGetPointFrameNumber(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval pfn Integer with the number of frames.
+ *
+ * @sa btkGetPointNumber
+ * @ingroup BTKMatlabAcquisitionAccessor
+ */

@@ -1,0 +1,26 @@
+/**
+ * @class btkGetMetaData
+ * @brief Extract metadata for the given acquisition
+ * @syntax{md = btkGetMetaData(h)\n md = btkGetMetaData(h\, label)\n md = btkGetMetaData(h\, label\, sublabel)\n md = %btkGetMetaData(h\, label\, sublabel\, ...)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param h label String to extract only the metadata and its children with the label @c label from the root level.
+ * @param h sublabel String to extract only the metadata and its children with the label @c sublabel from the metadata @c 'label'.
+ * @param h ... Others strings to extract the metadata at any desired level.
+ * @retval md Structure with the following fields:
+ *   - @c md.info: Strucutre containing metadata's informations if present or the value 0
+ *     - @c md.info.format: String containing information's format. Only the following formats are available: 
+ *       - Char ;
+ *       - Byte ;
+ *       - Integer ;
+ *       - Real.
+ *     - @c md.info.dims: Matrix with the dimensions of the values
+ *     - @c md.info.values: Matrix of array or cells depending the format.
+ *   - @c md.children: Store the same structure for the children of 0 if there is not.
+ *   - @c md.description: String containing the metadata's description
+ *   - @c md.unlocked: Flag to know if the metadata is set as unlocked or not.
+ *
+ * @par Detailed description:
+ * If no metadata has the given label, then an error is thrown. By default, BTK, use two label of metadata representing group and parameters (as proposed in the C3D format).
+ * @sa btkFindMetaData
+ * @ingroup BTKMatlabMetaDataAccessor
+ */

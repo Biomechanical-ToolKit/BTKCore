@@ -1,0 +1,16 @@
+/**
+ * @class btkClearAnalysis
+ * @brief Clear the content of the metadata ANALYSIS.
+ * @syntax{btkClearAnalysis(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object. *
+ * @par Detailed description:
+ * Clears the following children of the metadata ANALYSIS:
+ *   - NAMES;
+ *   - CONTEXTS;
+ *   - SUBJECTS;
+ *   - UNITS;
+ *   - VALUES;
+ *   - USED.
+ * @sa btkAppendAnalysisParameter, btkGetAnalysis, btkRemoveAnalysisParameter
+ * @ingroup BTKMatlabAcquisitionModifier
+ */

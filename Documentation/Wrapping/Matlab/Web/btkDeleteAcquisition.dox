@@ -1,0 +1,21 @@
+/**
+ * @class btkDeleteAcquisition
+ * @brief Delete the acquisiton associated with the given handle.
+ * @syntax{btkDeleteAcquisition(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ *
+ * @par Detailed description:
+ * This function is generally not necessary as Matlab uses a garbage collector
+ * to free the memory automatically. However, when you launch a batch and need to
+ * extract some parameters from many acquisitions, it is advised to use this function.
+ * @verbatim For example:
+ * % files: array of cells containing 500 filenames.
+ * for i = 1:length
+ *   acq = btkReadAcquisiton(files{i});
+ *   outcome = computeOutcome(outcome, acq);
+ *   btkDeleteAcquisition(acq);
+ * end @endverbatim
+ *
+ * @sa btkCloneAcquisition, btkNewAcquisition
+ * @ingroup BTKMatlabAcquisitionModifier
+ */

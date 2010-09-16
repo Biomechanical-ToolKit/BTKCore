@@ -1,0 +1,15 @@
+/**
+ * @class btkGetMoments
+ * @brief Extract moments from a given biomechanical acquisition
+ * @syntax{[moments\, momentsInfo] = btkGetMoments(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval moments Structure with the moments' values. Each fieldname corresponds to an moment's label (see note #1).
+ * @retval momentsInfo Structure with the informations related to the moments.
+ *   - @c momentsInfo.frequency: Point's frequency
+ *   - @c momentsInfo.units: Structure with one one field labeled ALLMOMENTS with the unit (string) of the moments.
+ *
+ * @par Detailed description:
+ * <b>Note #1:</b> Check the page @ref StructureFieldnameFormat to understand how the fieldnames are formated.
+ * @sa 
+ * @ingroup BTKMatlabPointAccessor
+ */

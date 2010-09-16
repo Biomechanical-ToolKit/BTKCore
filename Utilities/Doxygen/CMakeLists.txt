@@ -1,11 +1,14 @@
 CMAKE_DEPENDENT_OPTION(BUILD_DOCUMENTATION_API 
-	                     "Build API Documentation with Doxygen" ON
+                       "Build API Documentation with Doxygen" ON
                        BUILD_DOCUMENTATION OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_DOCUMENTATION_API_UNSELECTED_MODULES
-											 "Build all the possible documentation even if the module is not selected (VizSupport, Matlab, ...)" OFF
+                       "Build all the possible documentation even if the module is not selected (VizSupport, Matlab, ...)" OFF
                        BUILD_DOCUMENTATION_API OFF)
+CMAKE_DEPENDENT_OPTION(BUILD_DOCUMENTATION_MATLAB_FOR_WEB 
+                       "Build the Matlab documentation for the web with Doxygen" OFF
+                       BUILD_DOCUMENTATION OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_DOCUMENTATION_README 
-											 "Build the Readme.html found in BTK root with Doxygen" OFF
+                       "Build the Readme.html found in BTK root with Doxygen" OFF
                        BUILD_DOCUMENTATION OFF)
   
 # Add all the known path for the extra documentation
@@ -59,7 +62,7 @@ IF(BUILD_DOCUMENTATION_README)
     COMMAND ${DOXYGEN_EXECUTABLE} ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_Readme
     MAIN_DEPENDENCY ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_Readme
     WORKING_DIRECTORY ${BTK_BINARY_DIR}/Utilities/Doxygen
-		COMMAND ${CMAKE_COMMAND} -D BTK_BINARY_DIR:STRING=${BTK_BINARY_DIR} -D BTK_SOURCE_DIR:STRING=${BTK_SOURCE_DIR} -P "${BTK_SOURCE_DIR}/Documentation/Readme/replace_link.cmake"
+    COMMAND ${CMAKE_COMMAND} -D BTK_BINARY_DIR:STRING=${BTK_BINARY_DIR} -D BTK_SOURCE_DIR:STRING=${BTK_SOURCE_DIR} -P "${BTK_SOURCE_DIR}/Documentation/Readme/replace_link.cmake"
     )
 ENDIF(BUILD_DOCUMENTATION_README)
 
@@ -77,18 +80,32 @@ IF(BUILD_DOCUMENTATION_API)
   CONFIGURE_FILE(
     ${BTK_SOURCE_DIR}/Utilities/Doxygen/Doxyfile_API.in
     ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_API)
-
+    
   ADD_CUSTOM_TARGET(Doxygen_API ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${BTK_BINARY_DIR}/Documentation/API 
     COMMAND ${DOXYGEN_EXECUTABLE} ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_API
     MAIN_DEPENDENCY ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_API
-    WORKING_DIRECTORY ${BTK_BINARY_DIR}/Utilities/Doxygen
-    )
+    WORKING_DIRECTORY ${BTK_BINARY_DIR}/Utilities/Doxygen)
 ENDIF(BUILD_DOCUMENTATION_API)
+
+# MATLAB_FOR_WEB
+IF(BUILD_DOCUMENTATION_MATLAB_FOR_WEB)
+  CONFIGURE_FILE(
+    ${BTK_SOURCE_DIR}/Utilities/Doxygen/Doxyfile_Wrapping_Matlab.in
+    ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_Wrapping_Matlab)
+    
+  ADD_CUSTOM_TARGET(Doxyfile_Wrapping_Matlab ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${BTK_BINARY_DIR}/Documentation/Wrapping/Matlab 
+    COMMAND ${DOXYGEN_EXECUTABLE} ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_Wrapping_Matlab
+    MAIN_DEPENDENCY ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_Wrapping_Matlab
+    WORKING_DIRECTORY ${BTK_BINARY_DIR}/Utilities/Doxygen
+    COMMAND ${CMAKE_COMMAND} -D BTK_BINARY_DIR:STRING=${BTK_BINARY_DIR} -D BTK_SOURCE_DIR:STRING=${BTK_SOURCE_DIR} -P "${BTK_SOURCE_DIR}/Documentation/Wrapping/Matlab/Web/finalize.cmake")
+ENDIF(BUILD_DOCUMENTATION_MATLAB_FOR_WEB)
+
 # API installation
 IF(NOT BTK_INSTALL_NO_DOCUMENTATION)
   INSTALL(DIRECTORY ${BTK_BINARY_DIR}/Documentation/API
-      		DESTINATION ${BTK_INSTALL_SHARE_DIR_CM24}/Documentation
-    			COMPONENT Development)
+          DESTINATION ${BTK_INSTALL_SHARE_DIR_CM24}/Documentation
+          COMPONENT Development)
 ENDIF(NOT BTK_INSTALL_NO_DOCUMENTATION)
 

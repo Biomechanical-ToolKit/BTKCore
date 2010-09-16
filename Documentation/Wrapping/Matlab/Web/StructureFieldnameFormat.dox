@@ -1,0 +1,14 @@
+/**
+ @page StructureFieldnameFormat Field's name format in extracted structures
+ 
+ @section FieldnameFormat Character conversion
+ 
+ Matlab has a restricted the list of characters usable for a field's name in a structure. These characters are the capital letters between A and Z, the minuscule letters between a and z, the number 0 to 9 and the symbol underscore '_'. Every letters with an accent will be replaced by the same letter without the accents. Other ASCII characters used in the label (e.g -,*,%,...) will be replaced by the character '_'. Moreoever, it is not possible to start a field's name by a number. Every label starting by a number will be prefixed by the string 'C_'. In the case where two measure has the same label, then the second one is suffixed with '_1'. In the case where more than two measures has the same label, the suffix will increment each time.
+ 
+ For example, if one marker has the label @e uname*1 in the acquisition represented by the handle @c acq. Then using the code <tt>markers = btkGetMarkers(acq)</tt> will return the structure @c markers where one of its field will have the name @e uname_1. The characters '*' will be converted by '_'.
+ 
+  Other examples:
+   - '1FE' renamed in C_1FE ;
+   - 'Fémur' renamed in 'Femur' ;
+   - If 3 markers has the label 'RTOE', then in Matlab you will find 'RTOE', 'RTOE_1', 'RTOE_2'.
+ */

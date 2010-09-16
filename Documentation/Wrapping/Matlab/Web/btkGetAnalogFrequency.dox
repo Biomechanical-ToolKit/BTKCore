@@ -1,0 +1,9 @@
+/**
+ * @class btkGetAnalogFrequency
+ * @brief Return the analog frequency used in the given acquisition.
+ * @syntax{af = btkGetAnalogFrequency(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval af Real number with the analog's frequency
+ * @sa btkGetAnalogFrameNumber, btkGetAnalogNumber
+ * @ingroup BTKMatlabAcquisitionAccessor
+ */

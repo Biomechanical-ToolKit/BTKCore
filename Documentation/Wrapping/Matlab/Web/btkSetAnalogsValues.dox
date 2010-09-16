@@ -1,0 +1,9 @@
+/**
+ * @class btkSetAnalogsValues
+ * @brief Sets analog channels' values from a matrix.
+ * @syntax{btkSetAnalogsValues(h\, v)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param v Matrix of reals where the number of rows corresponds to the number of analog's frame and the number of columns corresponds to the number of analog channels.
+ * @sa btkGetAnalogs, btkGetAnalogsValues
+ * @ingroup BTKMatlabAnalogModifier
+ */

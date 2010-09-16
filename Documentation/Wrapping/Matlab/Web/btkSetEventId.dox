@@ -1,0 +1,22 @@
+/**
+ * @class btkSetEventId
+ * @brief Modify the id of all events which have the required label.
+ * @syntax{[events\, eventsInfo] = btkSetEventId(h\, label\, newdid)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param label String with the label of the event to modify.
+ * @param newid Integer containing the new ID (see the detailed description for the list of known ID).
+ * @retval events A structure with the same format than in the function btkGetEvents
+ * @retval eventsInfo A structure with the same format than in the function btkGetEvents
+ *
+ * @par Detailed description:
+ * Even if there is no rule for the id value, these 3 next values 
+ * are used in Vicon Workstation and Nexus to distinguish events' type.
+ * The value 0 is for general event. Value 1 corresponds to the foot strike 
+ * event and value 2 for the foot off.  Without the use of these values, it 
+ * is known that Workstation and Nexus put all events in general (default 
+ * value is 0).  For Polygon, one user reported that some points had their
+ * values set to 0.
+ * 
+ * @sa btkSetEventDescription, btkSetEventLabel, btkSetEventSubject, btkSetEventTime
+ * @ingroup BTKMatlabEventModifier
+ */

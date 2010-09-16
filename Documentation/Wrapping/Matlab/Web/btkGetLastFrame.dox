@@ -1,0 +1,9 @@
+/**
+ * @class btkGetLastFrame
+ * @brief Return acquisition's last frame index.
+ * @syntax{lf = btkGetLastFrame(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval lf Single integer with index of the last frame.
+ * @sa btkGetFirstFrame
+ * @ingroup BTKMatlabAcquisitionAccessor
+ */

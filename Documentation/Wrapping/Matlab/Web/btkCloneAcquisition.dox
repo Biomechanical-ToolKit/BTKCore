@@ -1,0 +1,9 @@
+/**
+ * @class btkCloneAcquisition
+ * @brief Clone the given acquisition.
+ * @syntax{hc = btkCloneAcquisition(ho)}
+ * @param ho Original handle pointing to a C++ btk::Acquisition object.
+ * @retval hc Cloned acquisition represented as a handle.
+ * @sa btkDeleteAcquisition, btkNewAcquisition
+ * @ingroup BTKMatlabAcquisitionModifier
+ */

@@ -1,0 +1,7 @@
+/**
+ * @class btkGetVersion
+ * @brief Return the release number of BTK.
+ * @syntax{v = btkGetVersion}
+ * @retval v String with the release number of BTK formated as major.min.patch version.
+ * @ingroup BTKMatlabGeneral
+ */

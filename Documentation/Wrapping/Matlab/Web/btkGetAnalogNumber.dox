@@ -1,0 +1,9 @@
+/**
+ * @class btkGetAnalogNumber
+ * @brief Return the number of analog channels.
+ * @syntax{an = btkGetAnalogNumber(h)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @retval an Number of analog channels
+ * @sa btkGetAnalogFrequency, btkGetAnalogFrameNumber
+ * @ingroup BTKMatlabAcquisitionAccessor
+ */
