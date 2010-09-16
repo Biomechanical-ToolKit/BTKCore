@@ -1,10 +1,10 @@
 function btkSetScalarsValues(h, v) %#ok
-%BTKSETSCALARSVALUES Sets scalars' coordinates from a matrix
+%BTKSETSCALARSVALUES Sets scalars' components from a matrix
 % 
-%  BTKSETSCALARSVALUES(H, V) uses the matrix V to sets scalars' coordinates.
+%  BTKSETSCALARSVALUES(H, V) uses the matrix V to sets scalars' components.
 %  The number of rows of the matrix corresponds to the number of frames in the acquisition. 
 %  The number of  columns of this matrix corresponds to the number of extracted 
-%  scalars multiplied by 3 (their coordinates X,Y,Z).
+%  scalars multiplied by 3 (their components X,Y,Z).
 %  The biomechanical acquisition handle H is represented as a 32-bit integer
 %  and can be only used with the btk* functions.
 

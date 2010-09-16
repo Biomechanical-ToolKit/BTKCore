@@ -1,5 +1,5 @@
 function md = btkFindMetaData(h,label,varargin)
-%BTKFINDMETADATA Return the search metadata or 0 if not found.
+%BTKFINDMETADATA Return the searched metadata or 0 if not found.
 %
 %  MD = BTKFINDMETADATA(H, LABEL) finds the metadata based on the given LABEL from 
 %  the root of the acquistion's metadata.  The format of MD is the same than using 

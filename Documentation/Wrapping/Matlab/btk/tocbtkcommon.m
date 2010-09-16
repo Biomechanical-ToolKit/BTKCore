@@ -94,6 +94,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetAnalogsValues">btkSetAnalogsValues</a>               - Set analogs' values from a matrix 
 %
 % Event accessor
+%   <a href="matlab:help btkGetEventNumber">btkGetEventNumber</a>                 - Number of events
 %   <a href="matlab:help btkGetEvents">btkGetEvents</a>                      - Events extraction
 %   <a href="matlab:help btkGetEventsValues">btkGetEventsValues</a>                - Events values (time, label, id, description)
 %

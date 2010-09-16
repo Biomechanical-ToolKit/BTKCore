@@ -1,5 +1,5 @@
 function btkSetMetaDataFormat(h, label_idx, sublabel_idx, ..., newFormat) %#ok
-%BTKSETMETADATAFORMAT Set a metada's format.
+%BTKSETMETADATAFORMAT Set a metadata's format.
 %  
 %  BTKSETMETADATAFORMAT(H, LABEL, NEWFORMAT) set the format of the 
 %  metadata which has the label LABEL and contained in the root. The variable 

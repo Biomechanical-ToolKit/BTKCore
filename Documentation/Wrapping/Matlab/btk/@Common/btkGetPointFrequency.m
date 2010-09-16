@@ -1,7 +1,7 @@
-function af = btkGetPointFrequency(h) %#ok
-%BTKGETPOINTFREQUENCY Returns the analog frequency.
+function pf = btkGetPointFrequency(h) %#ok
+%BTKGETPOINTFREQUENCY Returns the point's frequency.
 % 
-%  AF = BTKGETPOINTFREQUENCY(H) returns the acquisition frequency used for the point's data.
+%  PF = BTKGETPOINTFREQUENCY(H) returns the acquisition frequency used for the point's data.
 %  The acquistion is represented by the handle H, obtained by the use of a 
 %  btk* function.
 

@@ -1,5 +1,5 @@
 function [analysis analysisInfo] = btkGetAnalysis(h) %#ok
-%BTKGETANALYSIS Extract analysis from a biomechanical acquisition
+%BTKGETANALYSIS Extract data contained in the metadata ANALYSIS.
 % 
 %  ANALYSIS = BTKGETANALYSIS(H) returns a structure of parameters related 
 %  to the metadata ANALYSIS in the acquisition represented by the handle H.

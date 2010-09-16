@@ -1,17 +1,17 @@
 function btkAppendMetaData(h, label, sublabel, ..., info) %#ok
-%BTKAPPENDMETADATA Append a new metada and return an updated list of the metada in the acquisition.
+%BTKAPPENDMETADATA Append a new metada and return an updated list of the metadata in the acquisition.
 % 
-%  BTKAPPENDMETADATA(H, LABEL) appends a metatada with the label LABEL to the root.
+%  BTKAPPENDMETADATA(H, LABEL) appends a metadata with the label LABEL to the root.
 %  This metadata has no child, nor information.
 %
-%  BTKAPPENDMETADATA(H, LABEL, SUBLABEL) append a metatada with the label SUBLABEL in
+%  BTKAPPENDMETADATA(H, LABEL, SUBLABEL) appends a metadata with the label SUBLABEL in
 %  another metadata with the label LABEL.  The metadata 'LABEL' will be automaticaly generated
 %  if it doesn't exist. The metadata 'SUBLABEL' has no child, nor information.
 %  The number of sub-level is infinite. However, the main common use of the metadata is to 
 %  use LABEL as a group and SUBLABEL as a parameter.  So the metadata has 2 levels.  This use was 
 %  introduced in the C3D format.
 %
-%  BTKAPPENDMETADATA(H, LABEL, SUBLABEL, ..., INFO) append a metatada with additional 
+%  BTKAPPENDMETADATA(H, LABEL, SUBLABEL, ..., INFO) appends a metadata with additional 
 %  informations INFO.  This additionnal information is a structure:
 %   - INFO.FORMAT: contains a string (Char, Byte, Integer or Real) with the format of the information
 %   - INFO.VALUES: contains an array of numerical values or a cell of strings.

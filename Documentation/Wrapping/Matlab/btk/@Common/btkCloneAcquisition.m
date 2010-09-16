@@ -1,5 +1,5 @@
 function hc = btkCloneAcquisition(ho) %#ok
-%BTKCLONEACQUISITION Clone the acquisitions.
+%BTKCLONEACQUISITION Clone the given acquisition.
 % 
 %  HC = BTKCLONEACQUISITION(HO) creates a deep copy (HC) of the acquisition (HO).
 %

@@ -1,5 +1,5 @@
 function btkSetMetaDataDescription(h, label_idx, sublabel_idx, ..., newDescription) %#ok
-%BTKSETMETADATADESCRIPTION Set a metada's description.
+%BTKSETMETADATADESCRIPTION Set a metadata's description.
 %  
 %  BTKSETMETADATADESCRIPTION(H, LABEL, NEWDESC) set the descritpion of the 
 %  metadata which has the label LABEL and contained in the root.

@@ -1,10 +1,10 @@
 function btkSetMomentsValues(h. v) %#ok
-%BTKSETMOMENTSVALUES Sets moments' coordinates from a matrix
+%BTKSETMOMENTSVALUES Sets moments' components from a matrix
 % 
-%  BTKSETMOMENTSVALUES(H, V) uses the matrix V to sets moments' coordinates.
+%  BTKSETMOMENTSVALUES(H, V) uses the matrix V to sets moments' components.
 %  The number of rows of the matrix corresponds to the number of frames in the acquisition. 
 %  The number of  columns of this matrix corresponds to the number of extracted 
-%  moments multiplied by 3 (their coordinates X,Y,Z).
+%  moments multiplied by 3 (their components X,Y,Z).
 %  The biomechanical acquisition handle H is represented as a 32-bit integer
 %  and can be only used with the btk* functions.
 

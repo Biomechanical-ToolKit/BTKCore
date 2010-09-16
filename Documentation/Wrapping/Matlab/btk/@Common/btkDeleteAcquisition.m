@@ -6,7 +6,7 @@ function btkDeleteAcquisition(h) %#ok
 %
 %  NOTE: This function is generally not necessary as Matlab uses a garbage collector
 %  to free the memory automatically. However, when you launch a batch and need to
-%  extract some parameters from many acquisitions, it is advided to use this function.
+%  extract some parameters from many acquisitions, it is advised to use this function.
 %  For example:
 %  % files: array of cells containing 500 filenames.
 %  for i = 1:length

@@ -1,10 +1,10 @@
 function v = btkGetAnglesValues(h) %#ok
-%BTKGETANGLESVALUES Extract angles' coordinates and store them in a matrix
+%BTKGETANGLESVALUES Extract angles' values and store them in a matrix
 % 
-%  V = BTKGETANGLESVALUES(H) returns a matrix of real.  The number of rows
+%  V = BTKGETANGLESVALUES(H) returns a matrix of reals.  The number of rows
 %  of this matrix corresponds to the number of frames in the acquisition.  The number of
 %  columns of this matrix corresponds to the number of extracted angles 
-%  multiplied by 3 (their coordinates X,Y,Z).
+%  multiplied by 3 (their components X,Y,Z).
 %  The biomechanical acquisition handle H is represented as a 32-bit integer
 %  and can be only used with the btk* functions.
 

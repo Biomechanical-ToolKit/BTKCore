@@ -1,8 +1,10 @@
 /**
  * @class btkSetPointMasks
  * @brief Sets point's masks from a row vector
- * @syntax{btkSetPointMasks(h\, m)}
+ * @syntax{btkSetPointMasks(h\, index\, m)\n btkSetPointMasks(h\, label\, m)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param index Integer containing the index of the point to modify.
+ * @param label String containing the label of the point to modify.
  * @param m Vector of integers with the new masks (see note #1).
  *
  * @par Detailed description:

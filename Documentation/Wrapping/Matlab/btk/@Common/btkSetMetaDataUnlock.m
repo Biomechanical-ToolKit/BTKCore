@@ -1,5 +1,5 @@
 function btkSetMetaDataUnlock(h, label_idx, sublabel_idx, ..., isunlocked) %#ok
-%BTKSETMETADATAUNLOCK Set the unlock state of a metada
+%BTKSETMETADATAUNLOCK Set the unlock state of a metadata.
 %  
 %  BTKSETMETADATAUNLOCK(H, LABEL, ISUNLOCKED) sets the unlock state for the metadata
 %  which has the label LABEL and contained in the root. A metadata is unlocked if 

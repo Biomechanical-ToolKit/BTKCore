@@ -1,5 +1,5 @@
 function btkSetMetaDataDimensions(h, label_idx, sublabel_idx, ..., newdims) %#ok
-%BTKSETMETADATADIMENSIONS Set metada's dimensions.
+%BTKSETMETADATADIMENSIONS Set metadata's dimensions.
 %  
 %  BTKSETMETADATADIMENSIONS(H, LABEL, NEWDIMS) set the dimensions of the 
 %  metadata which has the label LABEL and contained in the root.

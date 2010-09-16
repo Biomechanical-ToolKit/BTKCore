@@ -1,8 +1,10 @@
 /**
  * @class btkSetPointValues
  * @brief Sets point's coordinates (values) from a matrix
- * @syntax{btkSetPointValues(h\, v)}
+ * @syntax{btkSetPointValues(h\, index\, v)\n btkSetPointValues(h\, label\, v)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param index Integer containing the index of the point to modify.
+ * @param label String containing the label of the point to modify.
  * @param v Matrix of reals where the number of rows corresponds to the number of frames in the acquisition and the number of columns corresponds to the components of the point.
  *
  * @par Detailed description:
@@ -15,6 +17,6 @@
  *   - btkGetPowersValues / btkSetPowersValues ;
  *   - btkGetScalarsValues / btkSetScalarsValues.
  *
- * @sa btkGetPoint, btkGetPointValues.
+ * @sa btkGetPoints, btkGetPointsValues.
  * @ingroup BTKMatlabPointModifier
  */

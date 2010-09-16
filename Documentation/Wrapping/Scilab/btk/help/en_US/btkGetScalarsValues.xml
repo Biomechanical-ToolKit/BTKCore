@@ -28,7 +28,7 @@
   </refsection>
   <refsection>
     <title>Description</title>
-    <para>Return a matrix of real. The number of rows of this matrix corresponds to the number of frames in the acquisition. The number of columns of this matrix corresponds to the number of extracted scalars multiplied by 3 (their coordinates X,Y,Z).</para>
+    <para>Return a matrix of real. The number of rows of this matrix corresponds to the number of frames in the acquisition. The number of columns of this matrix corresponds to the number of extracted scalars multiplied by 3 (their components X,Y,Z).</para>
     <para>The acquisition is represented by the handle <literal>h</literal>. This handle is obtained  by the use of a btk* function.</para>
   </refsection>
   <refsection>

@@ -1,5 +1,5 @@
 function btkClearAnalogs(h) %#ok
-%BTKCLEARANALOGS Clear acquisition's events.
+%BTKCLEARANALOGS Remove all analog channels in the given acquisition.
 % 
 %  BTKCLEARANALOGS(H) removes the analog channels of the acquisition.
 %  Use MEX functions <a href="matlab:help btkAppendAnalog">btkAppendAnalog</a>  and <a href="matlab:help btkRemoveAnalog">btkRemoveAnalog</a> to set an analog channel.

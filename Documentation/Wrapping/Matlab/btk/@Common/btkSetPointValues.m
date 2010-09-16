@@ -1,12 +1,15 @@
-function btkSetPointValues(h, v) %#ok
+function btkSetPointValues(h, idx_or_label, v) %#ok
 %BTKSETPOINTVALUES Sets point's coordinates (values) from a matrix
 % 
-%  BTKSETPOINTVALUES(H, V) uses the matrix V to set point's coordinates.
+%  BTKSETPOINTVALUES(H, INDEX, V) uses the matrix V to set point's coordinates.
 %  The number of rows of the matrix corresponds to the number of frames 
 %  in the acquisition.  The number of columns of this matrix corresponds 
 %  to the coordinates of the point.
 %  The biomechanical acquisition handle H is represented as a 32-bit integer
 %  and can be only used with the btk* functions.
+%
+%  BTKSETPOINTVALUES(H, LABEL, V) uses the point's label to extract the point 
+%  to modify.
 
 %  Author: A. Barré
 %  Copyright 2009-2010 Biomechanical ToolKit (BTK).

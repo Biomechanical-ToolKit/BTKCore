@@ -4,7 +4,7 @@ function v = btkGetMarkersValues(h) %#ok
 %  V = BTKGETMARKERSVALUES(H) returns a matrix of real.  The number of rows
 %  of this matrix corresponds to the number of point's frame.  The number of
 %  columns of this matrix corresponds to the number of extracted markers 
-%  multiplied by 3 (their coordinates X,Y,Z).
+%  multiplied by 3 (their components X,Y,Z).
 %  The biomechanical acquisition handle H is represented as a 32-bit integer
 %  and can be only used with the btk* functions.
 

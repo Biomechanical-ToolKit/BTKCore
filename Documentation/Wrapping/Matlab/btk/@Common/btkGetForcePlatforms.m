@@ -1,5 +1,5 @@
 function [forceplates forceplatesInfo] = btkGetForcePlatforms(h) %#ok
-%BTKGETFORCEPLATFORMS Extract force platforms' informations  from a biomechanical acquisition
+%BTKGETFORCEPLATFORMS Extract force platforms' informations from a biomechanical acquisition
 % 
 %  FORCEPLATES = BTKGETFORCEPLATFORMS(H) returns a structure of force platforms. 
 %  The structure FORCEPLATFORMS is a row structure where each row contains 

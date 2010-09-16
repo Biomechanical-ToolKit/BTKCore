@@ -1,4 +1,4 @@
-function [points pointsInfo] = btkGet3DPoints(h) %#ok
+function [points pointsInfo] = btkGetPoints(h) %#ok
 %BTKGETPOINTS Extract points from a biomechanical acquisition
 % 
 %  POINTS = BTKGETPOINTS(H) returns a structure of points.  Each 
@@ -29,5 +29,5 @@ function [points pointsInfo] = btkGet3DPoints(h) %#ok
 
 error(generatemsgid('NotSupported'),'MEX file for BTKGETPOINTS not found');
 
-% [EOF] btkGet3DPoints.m
+% [EOF] btkGetPoints.m
 

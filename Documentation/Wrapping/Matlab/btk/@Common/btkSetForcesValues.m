@@ -1,10 +1,10 @@
 function btkSetForcesValues(h, v) %#ok
-%BTKSETFORCESVALUES Sets forces' coordinates from a matrix
+%BTKSETFORCESVALUES Sets forces' components from a matrix
 % 
-%  BTKSETFORCESVALUES(H, V) uses the matrix V to sets forces' coordinates.
+%  BTKSETFORCESVALUES(H, V) uses the matrix V to sets forces' v.
 %  The number of rows of the matrix corresponds to the number of frames in the acquisition. 
 %  The number of  columns of this matrix corresponds to the number of extracted 
-%  forces multiplied by 3 (their coordinates X,Y,Z).
+%  forces multiplied by 3 (their components X,Y,Z).
 %  The biomechanical acquisition handle H is represented as a 32-bit integer
 %  and can be only used with the btk* functions.
 

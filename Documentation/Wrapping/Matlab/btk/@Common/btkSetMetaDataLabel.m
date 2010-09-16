@@ -1,5 +1,5 @@
 function btkSetMetaDataLabel(h, label_idx, sublabel_idx, ..., newlabel) %#ok
-%BTKSETMETADATALABEL Set a metada's label
+%BTKSETMETADATALABEL Set a metadata's label
 % 
 %  Warning: Renaming some metadata might alter an acquisition. For example, 
 %  renaming the metadata FORCE_PLATFORM has for effect to not be able to extract
