@@ -113,9 +113,9 @@ void MultiViewWidget::initialize()
   vtkRenderer* renderer = static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D))->renderer();
   
   // BTK PIPELINE
-  btk::SpecializedPointsExtractor::Pointer markersExtractor = btk::SpecializedPointsExtractor::New();
+  //btk::SpecializedPointsExtractor::Pointer markersExtractor = btk::SpecializedPointsExtractor::New();
   btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
-  virtualMarkersSeparator->SetInput(markersExtractor->GetOutput());
+  //virtualMarkersSeparator->SetInput(markersExtractor->GetOutput());
   btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = btk::ForcePlatformsExtractor::New();
   btk::GroundReactionWrenchFilter::Pointer GRWsFilter = btk::GroundReactionWrenchFilter::New();
   GRWsFilter->SetThresholdValue(5.0); // PWA are not computed from vertical forces lower than 5 newtons.
@@ -124,7 +124,7 @@ void MultiViewWidget::initialize()
   btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = btk::DownsampleFilter<btk::WrenchCollection>::New();
   GRWsDownsampler->SetInput(GRWsFilter->GetOutput());
   // Store BTK process to be reused later.
-  this->m_BTKProc[BTK_MARKERS] = markersExtractor;
+  //this->m_BTKProc[BTK_MARKERS] = markersExtractor;
   this->m_BTKProc[BTK_VIRTUALS_MARKERS] = virtualMarkersSeparator;
   this->m_BTKProc[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
   this->m_BTKProc[BTK_GRWS] = GRWsFilter;
@@ -334,11 +334,12 @@ btk::SeparateKnownVirtualMarkersFilter::Pointer MultiViewWidget::load(btk::Acqui
 {
   this->m_FirstFrame = acq->GetFirstFrame();
   
-  btk::SpecializedPointsExtractor::Pointer markersExtractor = static_pointer_cast<btk::SpecializedPointsExtractor>(this->m_BTKProc[BTK_MARKERS]);
+  //btk::SpecializedPointsExtractor::Pointer markersExtractor = static_pointer_cast<btk::SpecializedPointsExtractor>(this->m_BTKProc[BTK_MARKERS]);
   btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProc[BTK_VIRTUALS_MARKERS]);
   btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProc[BTK_FORCE_PLATFORMS]);
   btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProc[BTK_GRWS_DOWNSAMPLED]);
-  markersExtractor->SetInput(acq);
+  //markersExtractor->SetInput(acq);
+  virtualMarkersSeparator->SetInput(acq->GetPoints());
   forcePlatformsExtractor->SetInput(acq);
   GRWsDownsampler->SetUpDownRatio(acq->GetNumberAnalogSamplePerFrame());
   

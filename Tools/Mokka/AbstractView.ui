@@ -31,7 +31,7 @@
         <bool>true</bool>
        </property>
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -39,19 +39,19 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>20</height>
+         <height>26</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>20</height>
+         <height>26</height>
         </size>
        </property>
        <property name="styleSheet">
         <string notr="true">QFrame#separatorFuncButtons {
      color: white;
-     background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(0, 0, 0, 255), stop:1 rgba(64, 64, 64, 255));
+     background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(0, 0, 0, 255), stop:0.95 rgba(64, 64, 64, 255), stop:1 rgba(200, 200, 200, 255));
  }</string>
        </property>
        <property name="frameShape">
@@ -72,22 +72,15 @@
         </property>
         <item>
          <widget class="QComboBox" name="viewCombo">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>20</height>
-           </size>
-          </property>
           <property name="styleSheet">
            <string notr="true">QComboBox {
   color: white;
-  border: 1px solid darkgray;
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
+  border-right-width: 1px;
+  border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);
+  border-right-style: solid;
   padding-left: 10px;
   padding-right: 10px;
 }
@@ -98,7 +91,7 @@ QComboBox:editable {
 
 QComboBox:!editable, QComboBox::drop-down:editable {
   color: white;
-  background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(0, 0, 0, 255), stop:1 rgba(64, 64, 64, 255));
+  background: transparent;
   selection-background-color: lightgray;
   selection-color: black;
 }
@@ -120,7 +113,7 @@ QComboBox::drop-down {
   width: 20px;
 
   border-right-width: 1px;
-  border-right-color: darkgray;
+  border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);
   border-right-style: solid; 
 }
 
@@ -147,7 +140,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>20</width>
+            <width>30</width>
             <height>11</height>
            </size>
           </property>
@@ -158,22 +151,23 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
           <property name="enabled">
            <bool>true</bool>
           </property>
-          <property name="minimumSize">
+          <property name="sizeIncrement">
            <size>
             <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>20</height>
+            <height>24</height>
            </size>
           </property>
           <property name="styleSheet">
            <string notr="true">QComboBox {
   color: white;
-  border: 1px solid darkgray;
+  border-top: none;
+  border-bottom: none;
+  border-left-width: 1px;
+  border-left-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);
+  border-left-style: solid;
+  border-right-width: 1px;
+  border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);
+  border-right-style: solid;
   padding-left: 10px;
   padding-right: 10px;
 }
@@ -184,7 +178,7 @@ QComboBox:editable {
 
 QComboBox:!editable, QComboBox::drop-down:editable {
   color: black;
-  background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(155, 155, 155, 255), stop:1 rgba(64, 64, 64, 255));
+  background: transparent;
   selection-background-color: lightgray;
 }
 
@@ -204,8 +198,8 @@ QComboBox::drop-down {
   width: 20px;
 
   border-right-width: 1px;
-  border-right-color: darkgray;
-  border-right-style: solid; 
+  border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);
+  border-right-style: solid;
 }
 
 QComboBox::down-arrow {
@@ -234,80 +228,24 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
           </property>
          </spacer>
         </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QPushButton" name="vSplitButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
-     image: url(:/Resources/Images/verticalsplit-16.png);
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(0, 0, 0, 255), stop:1 rgba(64, 64, 64, 255));
-}
-
-QPushButton:pressed {
-     image: url(:/Resources/Images/verticalsplit-down-16.png);
-}
-
-QPushButton:flat {
-     border: none;
-}</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="hSplitButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
+        <item>
+         <widget class="QPushButton" name="hSplitButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
      image: url(:/Resources/Images/horizontalsplit-16.png);
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(0, 0, 0, 255), stop:1 rgba(64, 64, 64, 255));
+background-color: transparent;
 }
 
 QPushButton:pressed {
@@ -317,39 +255,69 @@ QPushButton:pressed {
 QPushButton:flat {
      border: none;
 }</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="closeButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="vSplitButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+     image: url(:/Resources/Images/verticalsplit-16.png);
+background-color: transparent;
+}
+
+QPushButton:pressed {
+     image: url(:/Resources/Images/verticalsplit-down-16.png);
+}
+
+QPushButton:flat {
+     border: none;
+}</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="closeButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
      image: url(:/Resources/Images/closedock-16.png);
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(0, 0, 0, 255), stop:1 rgba(64, 64, 64, 255));
+background-color: transparent;
 }
 
 QPushButton:disabled {
@@ -363,16 +331,17 @@ QPushButton:pressed {
 QPushButton:flat {
      border: none;
 }</string>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </item>
     </layout>
    </item>

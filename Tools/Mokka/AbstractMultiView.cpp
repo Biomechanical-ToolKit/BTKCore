@@ -204,7 +204,7 @@ void AbstractMultiView::setupUi()
   
   this->mp_GridLayout = new QGridLayout(this);
   this->mp_GridLayout->setSpacing(0);
-  this->mp_GridLayout->setMargin(0);
+  this->mp_GridLayout->setContentsMargins(0,0,0,0);
   this->mp_GridLayout->setObjectName("GridLayout");
 };
 
