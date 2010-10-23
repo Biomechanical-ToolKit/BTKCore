@@ -2,6 +2,8 @@
   <qresource>
     <file>Resources/Images/1downarrow.png</file>
     <file>Resources/Images/1uparrow.png</file>
+    <file>Resources/Images/chart_curve.png</file>
+    <file>Resources/Images/chart_line.png</file>
     <file>Resources/Images/closedock-16.png</file>
     <file>Resources/Images/closedock-down-16.png</file>
     <file>Resources/Images/disclosureTriangleSmallDownBlack.png</file>
@@ -10,6 +12,7 @@
     <file>Resources/Images/edit-down.png</file>
     <file>Resources/Images/editdelete.png</file>
     <file>Resources/Images/editdelete-down.png</file>
+    <file>Resources/Images/eye.png</file>
     <file>Resources/Images/filenew.png</file>
     <file>Resources/Images/filenew-down.png</file>
     <file>Resources/Images/horizontalsplit-16.png</file>
@@ -17,8 +20,11 @@
     <file>Resources/Images/open.png</file>
     <file>Resources/Images/open-down.png</file>
     <file>Resources/Images/lock.png</file>
+    <file>Resources/Images/markers.png</file>
+    <file>Resources/Images/menu_button.png</file>
     <file>Resources/Images/player_pause.png</file>
     <file>Resources/Images/player_play.png</file>
+    <file>Resources/Images/process.png</file>
     <file>Resources/Images/resetzoom.png</file>
     <file>Resources/Images/resetzoom-down.png</file>
     <file>Resources/Images/save.png</file>
@@ -29,5 +35,18 @@
     <file>Resources/Images/unlock.png</file>
     <file>Resources/Images/verticalsplit-16.png</file>
     <file>Resources/Images/verticalsplit-down-16.png</file>
+    <file>Resources/Images/skip_backward.png</file>
+    <file>Resources/Images/skip_backward_active.png</file>
+    <file>Resources/Images/skip_forward.png</file>
+    <file>Resources/Images/skip_forward_active.png</file>
+    <file>Resources/Images/pause.png</file>
+    <file>Resources/Images/pause_active.png</file>
+    <file>Resources/Images/play.png</file>
+    <file>Resources/Images/play_active.png</file>
+    <file>Resources/Images/event_right.png</file>
+    <file>Resources/Images/event_left.png</file>
+    <file>Resources/Images/event_general.png</file>
+    <file>Resources/Images/event_options.png</file>
+    <file>Resources/Images/acquisition_options.png</file>
   </qresource>
 </RCC>
