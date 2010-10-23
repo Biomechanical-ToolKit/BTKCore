@@ -36,10 +36,13 @@
 #ifndef UndoCommands_h
 #define UndoCommands_h
 
-#include <btkAcquisition.h>
+//#include <btkAcquisition.h>
 
+#include <QColor>
 #include <QtGui>
 #include <QUndoCommand>
+
+#include "Acquisition.h"
 
 class MainWindow;
 class NumericalTableWidgetItem;
@@ -63,7 +66,7 @@ private:
 class UndoCommand : public QUndoCommand
 {
 public:
-  typedef enum {None, Acquisition, Configuration} CommandType;
+  typedef enum {None, AcquisitionCmd, ConfigurationCmd} CommandType;
   
   UndoCommand(QUndoCommand* parent = 0)
   : QUndoCommand(parent)
@@ -83,7 +86,7 @@ public:
   AcquisitionUndoCommand(QUndoCommand* parent = 0)
   : UndoCommand(parent)
   {
-    this->m_CommandType = UndoCommand::Acquisition;
+    this->m_CommandType = UndoCommand::AcquisitionCmd;
   };
 };
 
@@ -93,12 +96,261 @@ public:
   ConfigurationUndoCommand(QUndoCommand* parent = 0)
   : UndoCommand(parent)
   {
-    this->m_CommandType = UndoCommand::Configuration;
+    this->m_CommandType = UndoCommand::ConfigurationCmd;
   };
 };
 
 // ----------------------------------------------- //
+//                     GENERAL                     //
+// ----------------------------------------------- //
+
+class EditRegionOfInterest : public AcquisitionUndoCommand
+{
+public:
+  EditRegionOfInterest(Acquisition* acq, int lb, int rb, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  int mp_ROI[2];
+  
+  void action();
+};
+
+// ----------------------------------------------- //
 //               POINT/MARKER EDITION              //
+// ----------------------------------------------- //
+
+// --------------- EditPointLabel ---------------
+class EditPointLabel : public AcquisitionUndoCommand
+{
+public:
+  EditPointLabel(Acquisition* acq, int id, const QString& label, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  int m_Id;
+  QString m_Label;
+  
+  void action();
+};
+
+// --------------- EditPointDescription ---------------
+class EditPointDescription : public AcquisitionUndoCommand
+{
+public:
+  EditPointDescription(Acquisition* acq, const QVector<int>& ids, const QString& desc, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<QString> m_Descriptions;
+  
+  void action();
+};
+
+// --------------- EditMarkersRadius2 ---------------
+// TODO: Rename this class when the markerDock will be removed.
+class EditMarkersRadius2 : public ConfigurationUndoCommand
+{
+public:
+  EditMarkersRadius2(Acquisition* acq, const QVector<int>& ids, double radius, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<double> m_Radii;
+  
+  void action();
+};
+
+// --------------- EditMarkersColor ---------------
+class EditMarkersColor : public ConfigurationUndoCommand
+{
+public:
+  EditMarkersColor(Acquisition* acq, const QVector<int>& ids, const QColor& color, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<QColor> m_Colors;
+  
+  void action();
+};
+
+// --------------- RemovePoints ---------------
+class RemovePoints : public AcquisitionUndoCommand
+{
+public:
+  RemovePoints(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent = 0);
+  ~RemovePoints();
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  Acquisition* mp_Acquisition;
+  QList<int> m_Ids;
+  QList<Point*> m_Points;
+};
+
+// ----------------------------------------------- //
+//                  ANALOG EDITION                 //
+// ----------------------------------------------- //
+
+// --------------- EditAnalogLabel ---------------
+class EditAnalogLabel : public AcquisitionUndoCommand
+{
+public:
+  EditAnalogLabel(Acquisition* acq, int id, const QString& label, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  int m_Id;
+  QString m_Label;
+  
+  void action();
+};
+
+// --------------- EditAnalogDescription ---------------
+class EditAnalogDescription : public AcquisitionUndoCommand
+{
+public:
+  EditAnalogDescription(Acquisition* acq, const QVector<int>& ids, const QString& desc, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<QString> m_Descriptions;
+  
+  void action();
+};
+
+// --------------- EditAnalogsUnit ---------------
+class EditAnalogsUnit : public AcquisitionUndoCommand
+{
+public:
+  EditAnalogsUnit(Acquisition* acq, const QVector<int>& ids, const QString& unit, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<QString> m_Units;
+  
+  void action();
+};
+
+// --------------- EditAnalogsGain ---------------
+class EditAnalogsGain : public AcquisitionUndoCommand
+{
+public:
+  EditAnalogsGain(Acquisition* acq, const QVector<int>& ids, AnalogGain gain, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<AnalogGain> m_Gains;
+  
+  void action();
+};
+
+// --------------- EditAnalogsOffset ---------------
+class EditAnalogsOffset : public AcquisitionUndoCommand
+{
+public:
+  EditAnalogsOffset(Acquisition* acq, const QVector<int>& ids, int offset, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<int> m_Offsets;
+  
+  void action();
+};
+
+// --------------- EditAnalogsScale ---------------
+class EditAnalogsScale : public AcquisitionUndoCommand
+{
+public:
+  EditAnalogsScale(Acquisition* acq, const QVector<int>& ids, double scale, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<double> m_Scales;
+  
+  void action();
+};
+
+// --------------- RemoveAnalogs ---------------
+class RemoveAnalogs : public AcquisitionUndoCommand
+{
+public:
+  RemoveAnalogs(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent = 0);
+  ~RemoveAnalogs();
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  Acquisition* mp_Acquisition;
+  QList<int> m_Ids;
+  QList<Analog*> m_Analogs;
+};
+
+// ----------------------------------------------- //
+//                   EVENT EDITION                 //
+// ----------------------------------------------- //
+
+// --------------- RemoveEvents ---------------
+class RemoveEvents : public AcquisitionUndoCommand
+{
+public:
+  RemoveEvents(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent = 0);
+  ~RemoveEvents();
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  Acquisition* mp_Acquisition;
+  QList<int> m_Ids;
+  QList<Event*> m_Events;
+};
+
+// --------------- InsertEvent ---------------
+class InsertEvent : public AcquisitionUndoCommand
+{
+public:
+  InsertEvent(Acquisition* acq, Event* e, QUndoCommand* parent = 0);
+  ~InsertEvent();
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  Acquisition* mp_Acquisition;
+  QList<int> m_Ids;
+  QList<Event*> m_Events;
+};
+
 // ----------------------------------------------- //
 
 // --------------- EditMarkerLabel ---------------
