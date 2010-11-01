@@ -32,42 +32,41 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#ifndef UserRoles_h
-#define UserRoles_h
 
-#include <Qt>
+#ifndef NewModelDialog_h
+#define NewModelDialog_h
 
-typedef enum {pointId = Qt::UserRole + 1,
-              pointLabel, 
-              pointDescription,
-              pointType,
-              pointDisabled} pointProperty;
-              
-typedef enum {markerId = Qt::UserRole + 10,
-              markerRadius,
-              markerColorIndex,
-              markerTrajectoryActived} markerProperty;
-              
-typedef enum {analogId = Qt::UserRole + 100,
-              } analogProperty;
-              
-typedef enum {eventFrame = Qt::UserRole + 20,
-              eventId,
-              eventLabel,
-              eventDescription,
-              eventContext,
-              eventTime,
-              eventSubject,
-              eventVisible} eventInformation;
+#include "ui_NewModelDialog.h"
 
-static const int checkState2 = Qt::UserRole + 30;
-static const int metadataInfoFirstValue = Qt::UserRole + 41;
-static const int metadataInfoValuesCount = Qt::UserRole + 42;
+#include <QDialog>
 
-typedef enum {visualConfigChanged = Qt::UserRole + 50,
-              visualConfigFilename,
-              visualConfigName,
-              visualConfigNew} visualConfigProperty;
+struct ConfigurationItem
+{
+  QString name;
+  QString filename;
+  bool isNew;
+  bool isModified;
+};
 
-#endif // UserRoles_h
+class NewModelDialog : public QDialog, public Ui::NewModelDialog
+{
+  Q_OBJECT
+
+public:
+  NewModelDialog(const QList<ConfigurationItem>* configs, QWidget* parent = 0);
+  // ~NewModelDialog(); // Implicit
+
+public slots:
+  void setConfigurationName(const QString& name);
+  QString configurationName() const;
+  
+private slots:
+  void updateButton(const QString& name);
+
+private:
+  bool configurationAlreadyExists(const QString& name);
+  
+  const QList<ConfigurationItem>* mp_Configurations;
+};
+
+#endif // NewModelDialog_h
