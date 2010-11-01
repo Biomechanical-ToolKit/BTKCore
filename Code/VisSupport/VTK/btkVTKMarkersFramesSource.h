@@ -80,7 +80,9 @@ namespace btk
 
     BTK_VTK_EXPORT void SetTrajectoryVisibility(int idx, bool visible);
     BTK_VTK_EXPORT void ShowTrajectory(int idx);
+    BTK_VTK_EXPORT void ShowTrajectories();
     BTK_VTK_EXPORT void HideTrajectory(int idx);
+    BTK_VTK_EXPORT void HideTrajectories();
     
     double GetScaleUnit() {return this->mp_Scale;};
     void SetScaleUnit(double s) {this->mp_Scale = s;};

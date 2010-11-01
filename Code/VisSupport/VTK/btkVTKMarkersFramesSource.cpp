@@ -372,6 +372,15 @@ namespace btk
   };
   
   /**
+   * Convenient method to show all markers' trajectory.
+   */
+  void VTKMarkersFramesSource::ShowTrajectories()
+  {
+    for (int i = 0 ; i < this->mp_TrajectoryMarkers->GetNumberOfTuples() ; ++i)
+      this->mp_TrajectoryMarkers->SetValue(i, 1);
+  };
+  
+  /**
    * Convenient method to hide marker's trajectory.
    */
   void VTKMarkersFramesSource::HideTrajectory(int idx)
@@ -380,10 +389,19 @@ namespace btk
   };
   
   /**
+   * Convenient method to hide all markers' trajectory.
+   */
+  void VTKMarkersFramesSource::HideTrajectories()
+  {
+    for (int i = 0 ; i < this->mp_TrajectoryMarkers->GetNumberOfTuples() ; ++i)
+      this->mp_TrajectoryMarkers->SetValue(i, 0);
+  };
+  
+  /**
    * @fn double VTKMarkersFramesSource::GetScaleUnit()
    * Returns the scale factor used to adapt markers' positions
    *
-   * Usefull when visualized acquistion date are set in meter, millimeter, inch, etc.
+   * Usefull when visualized acquistion data are set in meter, millimeter, inch, etc.
    */
   
   /**
