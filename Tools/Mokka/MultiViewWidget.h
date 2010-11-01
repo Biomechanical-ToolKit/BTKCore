@@ -47,6 +47,8 @@
 #include <vtkEventQtSlotConnect.h>
 #include <vtkMapperCollection.h>
 
+#include <QMenu>
+
 // Forward declaration
 class AbstractView;
 class QTableWidgetItem;
@@ -74,13 +76,19 @@ public:
   bool appendNewMarkerColor(const QColor& color, int* idx);
   void setGroundOrientation(double x, double y, double z);
   btk::SeparateKnownVirtualMarkersFilter::Pointer load(btk::Acquisition::Pointer acq);
+  QMenu* groundOrientationMenu() const {return this->mp_GroupOrientationMenu;};
   
 public slots:
   // Qt / VTK
   void updateDisplayedMarkersList(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   // Qt
+  void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
+  void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
+  void updateHiddenMarkers(const QList<int>& ids);
+  void updateTailedMarkers(const QList<int>& ids);
   void clear();
   void circleSelectedMarkers(QList<QTableWidgetItem*> items);
+  void circleSelectedMarkers(const QList<int>& ids);
   void updateDisplay();
   void updateDisplay(int frame);
   void showSelectedMarkers(const QList<QTableWidgetItem*>& items);
@@ -101,8 +109,18 @@ signals:
   void pickedMarkerChanged(int id);
   void pickedMarkersChanged(int id);
   
+private slots:
+  void changeGroundOrientation();
+  
 private:
   void updateViews();
+  
+  QMenu* mp_GroupOrientationMenu;
+  QAction* mp_ActionRemoveAllGeneralFootOff;
+  QAction* mp_ActionGroundOrientationPlaneXY;
+  QAction* mp_ActionGroundOrientationPlaneYZ;
+  QAction* mp_ActionGroundOrientationPlaneZX;
+  QAction* mp_ActionGroundOrientationAutomatic;
   
   vtkEventQtSlotConnect* mp_EventQtSlotConnections;
   vtkProcessMap* mp_VTKProc;

@@ -69,17 +69,17 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_10);
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeedFullFrames);
   QMenu* displayOptionsMenu = new QMenu(this);
-  displayOptionsMenu->addAction(actionCropRegionOfInterest);
-  displayOptionsMenu->addSeparator();
-  QMenu* playbackSpeedMenu = new QMenu(tr("Playback speed"),this);
+  this->mp_PlaybackSpeedMenu = new QMenu(tr("Playback speed"),this);
   actionPlaybackSpeedRealtime->setChecked(true);
-  playbackSpeedMenu->addAction(this->actionPlaybackSpeedRealtime);
-  playbackSpeedMenu->addAction(this->actionPlaybackSpeed1_2);
-  playbackSpeedMenu->addAction(this->actionPlaybackSpeed1_4);
-  playbackSpeedMenu->addAction(this->actionPlaybackSpeed1_5);
-  playbackSpeedMenu->addAction(this->actionPlaybackSpeed1_10);
-  playbackSpeedMenu->addAction(this->actionPlaybackSpeedFullFrames);
-  displayOptionsMenu->addMenu(playbackSpeedMenu);
+  this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeedRealtime);
+  this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_2);
+  this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_4);
+  this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_5);
+  this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_10);
+  this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeedFullFrames);
+  displayOptionsMenu->addMenu(this->mp_PlaybackSpeedMenu);
+  displayOptionsMenu->addSeparator();
+  displayOptionsMenu->addAction(actionCropRegionOfInterest);
   this->acquisitionOptionsButtonMenu->setMenu(displayOptionsMenu);
   // Event options menu
   QMenu* eventOptionsMenu = new QMenu(this);
@@ -136,25 +136,25 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(eventSelectionChanged(QList<int>)), this, SLOT(toggleEventSelection(QList<int>)));
   // Actions
-  connect(actionCropRegionOfInterest, SIGNAL(triggered()), this, SLOT(cropRegionOfInterest()));
   connect(playbackSpeedActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changePlaybackParameters()));
-  connect(actionClearEvents, SIGNAL(triggered()), this, SLOT(clearEvents()));
-  connect(actionRemoveSelectedEvents, SIGNAL(triggered()), this, SLOT(removeSelectedEvents()));
-  connect(actionRemoveAllRightFootStrike, SIGNAL(triggered()), this, SLOT(removeAllRightFootStrikeEvents()));
-  connect(actionRemoveAllRightFootOff, SIGNAL(triggered()), this, SLOT(removeAllRightFootOffEvents()));
-  connect(actionRemoveAllLeftFootStrike, SIGNAL(triggered()), this, SLOT(removeAllLeftFootStrikeEvents()));
-  connect(actionRemoveAllLeftFootOff, SIGNAL(triggered()), this, SLOT(removeAllLeftFootOffEvents()));
-  connect(actionRemoveAllGeneralFootStrike, SIGNAL(triggered()), this, SLOT(removeAllGeneralFootStrikeEvents()));
-  connect(actionRemoveAllGeneralFootOff, SIGNAL(triggered()), this, SLOT(removeAllGeneralFootOffEvents()));
-  connect(actionInsertRightFootStrike, SIGNAL(triggered()), this, SLOT(insertRightFootStrike()));
-  connect(actionInsertRightFootOff, SIGNAL(triggered()), this, SLOT(insertRightFootOff()));
-  connect(actionInsertRightOther, SIGNAL(triggered()), this, SLOT(insertRightOther()));
-  connect(actionInsertLeftFootStrike, SIGNAL(triggered()), this, SLOT(insertLeftFootStrike()));
-  connect(actionInsertLeftFootOff, SIGNAL(triggered()), this, SLOT(insertLeftFootOff()));
-  connect(actionInsertLeftOther, SIGNAL(triggered()), this, SLOT(insertLeftOther()));
-  connect(actionInsertGeneralFootStrike, SIGNAL(triggered()), this, SLOT(insertGeneralFootStrike()));
-  connect(actionInsertGeneralFootOff, SIGNAL(triggered()), this, SLOT(insertGeneralFootOff()));
-  connect(actionInsertGeneralOther, SIGNAL(triggered()), this, SLOT(insertGeneralOther()));
+  connect(this->actionCropRegionOfInterest, SIGNAL(triggered()), this, SLOT(cropRegionOfInterest()));
+  connect(this->actionClearEvents, SIGNAL(triggered()), this, SLOT(clearEvents()));
+  connect(this->actionRemoveSelectedEvents, SIGNAL(triggered()), this, SLOT(removeSelectedEvents()));
+  connect(this->actionRemoveAllRightFootStrike, SIGNAL(triggered()), this, SLOT(removeAllRightFootStrikeEvents()));
+  connect(this->actionRemoveAllRightFootOff, SIGNAL(triggered()), this, SLOT(removeAllRightFootOffEvents()));
+  connect(this->actionRemoveAllLeftFootStrike, SIGNAL(triggered()), this, SLOT(removeAllLeftFootStrikeEvents()));
+  connect(this->actionRemoveAllLeftFootOff, SIGNAL(triggered()), this, SLOT(removeAllLeftFootOffEvents()));
+  connect(this->actionRemoveAllGeneralFootStrike, SIGNAL(triggered()), this, SLOT(removeAllGeneralFootStrikeEvents()));
+  connect(this->actionRemoveAllGeneralFootOff, SIGNAL(triggered()), this, SLOT(removeAllGeneralFootOffEvents()));
+  connect(this->actionInsertRightFootStrike, SIGNAL(triggered()), this, SLOT(insertRightFootStrike()));
+  connect(this->actionInsertRightFootOff, SIGNAL(triggered()), this, SLOT(insertRightFootOff()));
+  connect(this->actionInsertRightOther, SIGNAL(triggered()), this, SLOT(insertRightOther()));
+  connect(this->actionInsertLeftFootStrike, SIGNAL(triggered()), this, SLOT(insertLeftFootStrike()));
+  connect(this->actionInsertLeftFootOff, SIGNAL(triggered()), this, SLOT(insertLeftFootOff()));
+  connect(this->actionInsertLeftOther, SIGNAL(triggered()), this, SLOT(insertLeftOther()));
+  connect(this->actionInsertGeneralFootStrike, SIGNAL(triggered()), this, SLOT(insertGeneralFootStrike()));
+  connect(this->actionInsertGeneralFootOff, SIGNAL(triggered()), this, SLOT(insertGeneralFootOff()));
+  connect(this->actionInsertGeneralOther, SIGNAL(triggered()), this, SLOT(insertGeneralOther()));
 };
 
 TimeEventControlerWidget::~TimeEventControlerWidget()
@@ -416,6 +416,9 @@ void TimeEventControlerWidget::releaseNextEventButton()
 
 void TimeEventControlerWidget::changePlaybackParameters()
 {
+  if (!this->mp_Acquisition)
+    return;
+  
   double pointFrequency = this->mp_Acquisition->pointFrequency();
   
   // Compute playback step and delay

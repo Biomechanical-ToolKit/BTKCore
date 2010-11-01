@@ -41,6 +41,7 @@
 
 #include <QWidget>
 #include <QTimer>
+#include <QMenu>
 
 class TimeEventControlerWidget : public QWidget, public Ui::TimeEventControlerWidget
 {
@@ -51,6 +52,7 @@ public:
   ~TimeEventControlerWidget();
   
   void load(Acquisition* acq);
+  QMenu* playbackSpeedMenu() {return this->mp_PlaybackSpeedMenu;};
   
 public slots:
   void togglePlayback();
@@ -107,6 +109,7 @@ private:
   void insertEvent(const QString& label, int context, int frame);
   
   Acquisition* mp_Acquisition;
+  QMenu* mp_PlaybackSpeedMenu;
   QIcon* mp_PlayIcon;
   QIcon* mp_PlayActiveIcon;
   QIcon* mp_PauseIcon;

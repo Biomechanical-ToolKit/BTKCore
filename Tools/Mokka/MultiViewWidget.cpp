@@ -90,6 +90,27 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_Syncro = new vtkStreamingDemandDrivenPipelineCollection();
   this->mp_Mappers = vtkMapperCollection::New();
   this->m_FirstFrame = 1;
+  this->mp_GroupOrientationMenu = new QMenu(tr("Ground Orientation"),this);
+  this->mp_ActionGroundOrientationPlaneXY = new QAction(tr("Plane XY"),this);
+  this->mp_ActionGroundOrientationPlaneXY->setCheckable(true);
+  this->mp_ActionGroundOrientationPlaneYZ = new QAction(tr("Plane YZ"),this);
+  this->mp_ActionGroundOrientationPlaneYZ->setCheckable(true);
+  this->mp_ActionGroundOrientationPlaneZX = new QAction(tr("Plane ZX"),this);
+  this->mp_ActionGroundOrientationPlaneZX->setCheckable(true);
+  this->mp_ActionGroundOrientationAutomatic = new QAction(tr("Automatic"),this);
+  this->mp_ActionGroundOrientationAutomatic->setCheckable(true);
+  
+  QActionGroup* groundOrientationActionGroup = new QActionGroup(this);
+  //groundOrientationActionGroup->addAction(this->actionGroundOrientationAutomatic);
+  groundOrientationActionGroup->addAction(this->mp_ActionGroundOrientationPlaneXY);
+  groundOrientationActionGroup->addAction(this->mp_ActionGroundOrientationPlaneYZ);
+  groundOrientationActionGroup->addAction(this->mp_ActionGroundOrientationPlaneZX);
+  this->mp_ActionGroundOrientationPlaneXY->setChecked(true);
+  this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationPlaneXY);
+  this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationPlaneYZ);
+  this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationPlaneZX);
+  
+  connect(groundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
   
   this->setViewPrototype(new CompositeView);
 };
@@ -261,6 +282,62 @@ void MultiViewWidget::setMarkerRadius(int id, double r)
 {
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   markers->SetMarkerRadius(id, r);
+};
+
+void MultiViewWidget::setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markers->SetMarkerRadius(ids[i], radii[i]);
+  this->updateDisplay();
+};
+
+void MultiViewWidget::setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  vtkLookupTable* markersColorsLUT = markers->GetMarkerColorLUT();
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    int num = markersColorsLUT->GetNumberOfTableValues();
+    QColor color = colors[i];
+    int j = 0;
+    while (j < num)
+    {
+      double* c = markersColorsLUT->GetTableValue(j);
+      if ((color.redF() == c[0]) && (color.greenF() == c[1]) && (color.blueF() == c[2]))
+      {
+        markers->SetMarkerColorIndex(ids[i], j);
+        break;
+      }
+      ++j;
+    }
+    if (j >= num)
+    {
+      markersColorsLUT->SetNumberOfTableValues(num + 1);
+      markersColorsLUT->SetTableValue(num, color.redF(), color.greenF(), color.blueF());
+      markersColorsLUT->SetTableRange(0, num + 1);
+      markers->SetMarkerColorIndex(ids[i], num);
+    }
+  }
+  this->updateDisplay();
+};
+
+void MultiViewWidget::updateHiddenMarkers(const QList<int>& ids)
+{
+  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markersFramesSource->ShowMarkers();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markersFramesSource->HideMarker(ids[i]);
+  this->updateDisplay();
+};
+
+void MultiViewWidget::updateTailedMarkers(const QList<int>& ids)
+{
+  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markersFramesSource->HideTrajectories();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markersFramesSource->ShowTrajectory(ids[i]);
+  this->updateDisplay();
 };
 
 double MultiViewWidget::markerRadius(int id)
@@ -564,6 +641,15 @@ void MultiViewWidget::circleSelectedMarkers(QList<QTableWidgetItem*> items)
   }
 };
 
+void MultiViewWidget::circleSelectedMarkers(const QList<int>& ids)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markers->ClearSelectedMarkers();
+  for (QList<int>::const_iterator it = ids.begin() ; it != ids.end() ; ++it)
+    markers->SetSelectedMarker(*it);
+  this->updateDisplay();
+};
+
 void MultiViewWidget::updateDisplay()
 {
   // Force to update the markers even if the required frame was the last updated.
@@ -673,6 +759,16 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(pickedMarkersChanged(int)), this, SIGNAL(pickedMarkersChanged(int)));
   static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D))->installEventFilter(this->parent()->parent());
   return sv;
+};
+
+void MultiViewWidget::changeGroundOrientation()
+{
+  if (this->mp_ActionGroundOrientationPlaneXY->isChecked())
+    this->setGroundOrientation(0.0, 0.0, 1.0);
+  else if (this->mp_ActionGroundOrientationPlaneYZ->isChecked())
+    this->setGroundOrientation(1.0, 0.0, 0.0);
+  else if (this->mp_ActionGroundOrientationPlaneZX->isChecked())
+    this->setGroundOrientation(0.0, 1.0, 0.0);
 };
 
 void MultiViewWidget::updateViews()

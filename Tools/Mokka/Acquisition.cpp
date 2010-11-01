@@ -199,6 +199,16 @@ void Acquisition::setPointType(int id, PointType p)
   }
 };
 
+int Acquisition::findMarkers(const QString& name) const
+{
+  for (QMap<int,Point*>::const_iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
+  {
+    if ((it.value()->label.compare(name) == 0) && (it.value()->type == Marker))
+      return it.key();
+  }
+  return -1;
+};
+
 void Acquisition::setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii)
 {
   for (int i = 0 ; i < ids.count() ; ++i)
