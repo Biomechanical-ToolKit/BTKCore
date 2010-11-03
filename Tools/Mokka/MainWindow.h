@@ -37,7 +37,9 @@
 #define MainWindow_h
 
 #include "ui_MainWindow.h"
+#include "Acquisition.h"
 #include "Metadata.h"
+#include "ModelDockWidget.h"
 #include "PointsEditor.h"
 #include "UserRoles.h"
 
@@ -126,10 +128,30 @@ public Q_SLOTS:
   void selectEvent();
   void eventsDockLocationChanged(Qt::DockWidgetArea area);
   void focusOnEventEdition(int idx = -1);
+  // Model dock
+  void modelDockLocationChanged(Qt::DockWidgetArea area);
+  void setPointLabel(int id, const QString& label);
+  void setMarkersRadius(const QVector<int>& ids, double radius);
+  void setMarkersColor(const QVector<int>& ids, const QColor& color);
+  void setPointsDescription(const QVector<int>& ids, const QString& desc);
+  void removePoints(const QList<int>& ids);
+  void setAnalogLabel(int id, const QString& label);
+  void setAnalogsDescription(const QVector<int>& ids, const QString& desc);
+  void setAnalogsUnit(const QVector<int>& ids, const QString& unit);
+  void setAnalogsGain(const QVector<int>& ids, AnalogGain gain);
+  void setAnalogsOffset(const QVector<int>& ids, int offset);
+  void setAnalogsScale(const QVector<int>& ids, double scale);
+  void removeAnalogs(const QList<int>& ids);
+  // Time event
+  void setRegionOfInterest(int lf,int ff);
+  void removeEvents(const QList<int>& ids);
+  void insertEvent(Event* e);
   // Playback
   void toggleTimer();
   void displayPreviousFrame();
   void displayNextFrame();
+  // Others
+  void updateSelectedMarkersRadius(double r);
   
 private:
   void saveFile(const QString& filename);
@@ -147,7 +169,9 @@ private:
   bool loadMarkerConfiguration(const QString& filename, QString* name);
   
   btk::Acquisition::Pointer mp_Acquisition;
+  Acquisition* mp_AcquisitionQ;
   Metadata* mp_MetadataDlg;
+  ModelDockWidget* mp_ModelDock;
   int m_PlaybackStep;
   int m_PlaybackDelay;
 

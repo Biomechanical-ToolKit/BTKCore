@@ -8,6 +8,7 @@ IF(VTK_MAJOR_VERSION LESS 5)
 ENDIF(VTK_MAJOR_VERSION LESS 5)
 
 SET(Mokka_CPP
+  Acquisition.cpp
   About.cpp
   AbstractMultiView.cpp
   AbstractView.cpp
@@ -16,17 +17,23 @@ SET(Mokka_CPP
   MainWindow.cpp
   Metadata.cpp
   MetadataView.cpp
+  ModelDockWidget.cpp
   MultiViewWidget.cpp
+  NewEventDialog.cpp
   NewModelConfigurationWidget.cpp
+  NewModelDialog.cpp
   PointsEditor.cpp
   ProgressWidget.cpp
   TableWidget.cpp
+  TimeEventBarWidget.cpp
+  TimeEventControlerWidget.cpp
   UndoCommands.cpp
   Viz3DWidget.cpp
   main.cpp
   )
 
 SET(Mokka_H
+  Acquisition.h
   AbstractMultiView.h
   AbstractView.h
   ComboBoxDelegate.h
@@ -34,11 +41,16 @@ SET(Mokka_H
   MainWindow.h
   MetadataView.h
   Metadata.h
+  ModelDockWidget.h
   MultiViewWidget.h
+  NewEventDialog.h
   NewModelConfigurationWidget.h
+  NewModelDialog.h
   PointsEditor.h
   ProgressWidget.h
   TableWidget.h
+  TimeEventBarWidget.h
+  TimeEventControlerWidget.h
   Viz3DWidget.h)
 
 SET(Mokka_UI
@@ -46,9 +58,13 @@ SET(Mokka_UI
   AbstractView.ui
   MainWindow.ui
   Metadata.ui
+  ModelDockWidget.ui
+  NewEventDialog.ui
   NewModelConfigurationWidget.ui
+  NewModelDialog.ui
   PointsEditor.ui
-  ProgressWidget.ui)
+  ProgressWidget.ui
+  TimeEventControlerWidget.ui)
 
 SET(Mokka_QRC
   images.qrc)

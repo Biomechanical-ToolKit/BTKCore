@@ -122,7 +122,7 @@ QComboBox::down-arrow {
 }
 
 QComboBox::down-arrow:on { /* shift the arrow when popup is open */
-  top: 1px;
+  /* top: 1px; */
 }</string>
           </property>
           <property name="sizeAdjustPolicy">
@@ -207,7 +207,7 @@ QComboBox::down-arrow {
 }
 
 QComboBox::down-arrow:on { /* shift the arrow when popup is open */
-  top: 1px;
+ /* top: 1px; */
 }</string>
           </property>
           <property name="sizeAdjustPolicy">

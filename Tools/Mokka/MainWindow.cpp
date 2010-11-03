@@ -55,15 +55,20 @@
 #include <QDesktopServices>
 #include <QXmlStreamReader>
 #include <QTemporaryFile>
+#include <QDesktopWidget>
+
+// #define MOKKA_NEW_UI
 
 MainWindow::MainWindow(QWidget* parent)
 :QMainWindow(parent), mp_Acquisition(), m_LastDirectory(".")
 {
   // Members
+  this->mp_AcquisitionQ = new Acquisition(this);
   this->m_SelectedMarkerConfiguration = -1;
   this->mp_Timer = new QTimer(this);
   this->mp_MetadataDlg = new Metadata(this);
   this->mp_PointsEditorDlg = new PointsEditor(this);
+  this->mp_ModelDock = new ModelDockWidget(this); this->mp_ModelDock->setAcquisition(this->mp_AcquisitionQ); this->addDockWidget(Qt::RightDockWidgetArea, this->mp_ModelDock); this->mp_ModelDock->setVisible(false);
   this->m_PlaybackStep = 1;
   this->m_PlaybackDelay = 33; // 33 msec
   this->mp_PlayIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_play.png"));
@@ -74,6 +79,30 @@ MainWindow::MainWindow(QWidget* parent)
   // Finalize UI
   // Qt UI
   this->setupUi(this);
+  
+#ifdef MOKKA_NEW_UI
+  this->menuOptions->removeAction(this->actionEdit_Points);
+  this->menuOptions->removeAction(this->actionEdit_Contexts_Events);
+  this->menuOptions->removeAction(this->menuPlayback_Speed->menuAction());
+  this->menuSettings->removeAction(this->menuGround->menuAction());
+  this->menuOptions->removeAction(this->actionEdit_Metadata);
+  this->menuSettings->addMenu(this->multiView->groundOrientationMenu());
+  this->menuSettings->addMenu(this->timeEventControler->playbackSpeedMenu());
+  this->menuBar()->removeAction(this->menuOptions->menuAction());
+  this->menuVisual_Configuration->removeAction(this->actionDeselectCurrentConfiguration);
+  this->menuVisual_Configuration->removeAction(this->actionClearConfigurationList);
+  this->menuVisual_Configuration->addAction(this->mp_ModelDock->deselectConfigurationAction());
+  this->menuVisual_Configuration->addAction(this->mp_ModelDock->clearConfigurationsAction());
+  
+  this->centralWidget()->layout()->removeWidget(this->frame);
+  this->frameSlider->setVisible(false);
+  this->playButton->setVisible(false);
+  this->lcdNumber->setVisible(false);
+#else
+  this->centralWidget()->layout()->removeWidget(this->timeEventControler);
+  this->timeEventControler->setVisible(false);
+#endif
+  
 #ifdef Q_OS_MAC
   QFont f = informationsDock->font();
   f.setPointSize(10);
@@ -127,25 +156,41 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ActionSeparatorRecentFiles = this->menuOpen_Recent->addSeparator();
   this->menuOpen_Recent->addAction(this->actionClear_Menu);
   connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
+#ifdef MOKKA_NEW_UI
+  QAction* actionModelDockView = this->mp_ModelDock->toggleViewAction();
+  actionModelDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+  this->menuView->addAction(actionModelDockView);
+#else
   QAction* actionMarkersDockView = this->markersDock->toggleViewAction();
   QAction* actionEventsDockView = this->eventsDock->toggleViewAction();
-  QAction* actionInformationsDockView = this->informationsDock->toggleViewAction();
   actionMarkersDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
   actionEventsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
-  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
   actionMarkersDockView->setText(QObject::tr("Markers List"));
   actionEventsDockView->setText(QObject::tr("Events List"));
-  this->menuView->addAction(actionInformationsDockView);
   this->menuView->addAction(actionMarkersDockView);
   this->menuView->addAction(actionEventsDockView);
+#endif
+
+  QAction* actionInformationsDockView = this->informationsDock->toggleViewAction();
+  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
+  this->menuView->addAction(actionInformationsDockView);
+
+#ifdef MOKKA_NEW_UI
+  this->actionEdit_Metadata->setText(tr("Metadata"));
+  this->menuView->addAction(this->actionEdit_Metadata);
+  
+  this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
+#endif
   
   // Viz3D
   this->multiView->initialize();
+  this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->timeEventControler->playbackSpeedMenu()->menuAction(), this->multiView->groundOrientationMenu());
 
   // Qt UI: Undo/Redo
   this->mp_UndoStack = new QUndoStack(this); // One to command all.
   this->mp_MarkerConfigurationUndoStack = new QUndoStack(this);
   connect(this->mp_MarkerConfigurationUndoStack, SIGNAL(indexChanged(int)), this, SLOT(setMarkerConfigurationModified(int)));
+  connect(this->mp_MarkerConfigurationUndoStack, SIGNAL(cleanChanged(bool)), this->mp_ModelDock, SLOT(setConfigurationModified(bool)));
   this->mp_AcquisitionUndoStack = new QUndoStack(this);
   connect(this->mp_AcquisitionUndoStack, SIGNAL(indexChanged(int)), this, SLOT(setAcquisitionModified(int)));
   QAction* actionUndo = this->mp_UndoStack->createUndoAction(this);
@@ -179,6 +224,7 @@ MainWindow::MainWindow(QWidget* parent)
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this, SLOT(updateDisplayedMarkersList(QVector<int>)));
+  connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
   connect(this->multiView, SIGNAL(pickedMarkerChanged(int)), this, SLOT(selectPickedMarker(int)));
   connect(this->multiView, SIGNAL(pickedMarkersChanged(int)), this, SLOT(selectPickedMarkers(int)));
   // Markers dock
@@ -216,6 +262,53 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->eventSubjectEdit, SIGNAL(editingFinished()), this, SLOT(editEventSubject()));
   connect(this->eventsDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(eventsDockLocationChanged(Qt::DockWidgetArea)));
   connect(this->eventInformationsButton, SIGNAL(clicked()), this, SLOT(toggleEventInformations()));
+  
+  // Model dock
+  connect(this->mp_ModelDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(modelDockLocationChanged(Qt::DockWidgetArea)));
+  connect(this->mp_ModelDock, SIGNAL(markerLabelChanged(int, QString)), this, SLOT(setPointLabel(int, QString)));
+  connect(this->mp_ModelDock, SIGNAL(markersRadiusChanged(QVector<int>, double)), this, SLOT(setMarkersRadius(QVector<int>, double)));
+  connect(this->mp_ModelDock, SIGNAL(markersColorChanged(QVector<int>, QColor)), this, SLOT(setMarkersColor(QVector<int>, QColor)));
+  connect(this->mp_ModelDock, SIGNAL(markersDescriptionChanged(QVector<int>, QString)), this, SLOT(setPointsDescription(QVector<int>, QString)));
+  connect(this->mp_ModelDock, SIGNAL(pointLabelChanged(int, QString)), this, SLOT(setPointLabel(int, QString)));
+  connect(this->mp_ModelDock, SIGNAL(pointsDescriptionChanged(QVector<int>, QString)), this, SLOT(setPointsDescription(QVector<int>, QString)));
+  connect(this->mp_ModelDock, SIGNAL(pointsRemoved(QList<int>)), this, SLOT(removePoints(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(analogLabelChanged(int, QString)), this, SLOT(setAnalogLabel(int, QString)));
+  connect(this->mp_ModelDock, SIGNAL(analogsUnitChanged(QVector<int>, QString)), this, SLOT(setAnalogsUnit(QVector<int>, QString)));
+  connect(this->mp_ModelDock, SIGNAL(analogsGainChanged(QVector<int>, AnalogGain)), this, SLOT(setAnalogsGain(QVector<int>, AnalogGain)));
+  connect(this->mp_ModelDock, SIGNAL(analogsOffsetChanged(QVector<int>, int)), this, SLOT(setAnalogsOffset(QVector<int>, int)));
+  connect(this->mp_ModelDock, SIGNAL(analogsScaleChanged(QVector<int>, double)), this, SLOT(setAnalogsScale(QVector<int>, double)));
+  connect(this->mp_ModelDock, SIGNAL(analogsDescriptionChanged(QVector<int>, QString)), this, SLOT(setAnalogsDescription(QVector<int>, QString)));
+  connect(this->mp_ModelDock, SIGNAL(analogsRemoved(QList<int>)), this, SLOT(removeAnalogs(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(configurationSaved()), this->mp_MarkerConfigurationUndoStack, SLOT(setClean()));
+  connect(this->mp_ModelDock, SIGNAL(markerSelectionChanged(QList<int>)), this->multiView, SLOT(circleSelectedMarkers(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(markerHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenMarkers(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(markerTrajectorySelectionChanged(QList<int>)), this->multiView, SLOT(updateTailedMarkers(QList<int>)));
+  connect(this->mp_ModelDock->markerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateSelectedMarkersRadius(double)));
+  // Time Event
+  connect(this->timeEventControler, SIGNAL(currentFrameChanged(int)), this->multiView, SLOT(updateDisplay(int)));
+  connect(this->timeEventControler, SIGNAL(regionOfInterestChanged(int,int)), this, SLOT(setRegionOfInterest(int,int)));
+  connect(this->timeEventControler, SIGNAL(eventsRemoved(QList<int>)), this, SLOT(removeEvents(QList<int>)));
+  connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
+  // Acquisition
+  connect(this->mp_AcquisitionQ, SIGNAL(pointLabelChanged(int, QString)), this->mp_ModelDock, SLOT(setPointLabel(int, QString)));
+  connect(this->mp_AcquisitionQ, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this->mp_ModelDock, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this->multiView, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this->mp_ModelDock, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this->multiView, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(pointsDescriptionChanged(QVector<int>, QVector<QString>)), this->mp_ModelDock, SLOT(setPointsDescription(QVector<int>, QVector<QString>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(pointsRemoved(QList<int>, QList<Point*>)), this->mp_ModelDock, SLOT(removePoints(QList<int>, QList<Point*>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(pointsInserted(QList<int>, QList<Point*>)), this->mp_ModelDock, SLOT(insertPoints(QList<int>, QList<Point*>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(analogLabelChanged(int, QString)), this->mp_ModelDock, SLOT(setAnalogLabel(int, QString)));
+  connect(this->mp_AcquisitionQ, SIGNAL(analogsUnitChanged(QVector<int>, QVector<QString>)), this->mp_ModelDock, SLOT(setAnalogsUnit(QVector<int>, QVector<QString>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(analogsGainChanged(QVector<int>, QVector<AnalogGain>)), this->mp_ModelDock, SLOT(setAnalogsGain(QVector<int>, QVector<AnalogGain>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(analogsOffsetChanged(QVector<int>, QVector<int>)), this->mp_ModelDock, SLOT(setAnalogsOffset(QVector<int>, QVector<int>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(analogsScaleChanged(QVector<int>, QVector<double>)), this->mp_ModelDock, SLOT(setAnalogsScale(QVector<int>, QVector<double>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(analogsDescriptionChanged(QVector<int>, QVector<QString>)), this->mp_ModelDock, SLOT(setAnalogsDescription(QVector<int>, QVector<QString>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(analogsRemoved(QList<int>, QList<Analog*>)), this->mp_ModelDock, SLOT(removeAnalogs(QList<int>, QList<Analog*>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(analogsInserted(QList<int>, QList<Analog*>)), this->mp_ModelDock, SLOT(insertAnalogs(QList<int>, QList<Analog*>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(regionOfInterestChanged(int, int)), this->timeEventControler, SLOT(setRegionOfInterest(int, int)));
+  connect(this->mp_AcquisitionQ, SIGNAL(eventsRemoved(QList<int>, QList<Event*>)), this->timeEventControler, SLOT(removeEvents(QList<int>, QList<Event*>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(eventsInserted(QList<int>, QList<Event*>)), this->timeEventControler, SLOT(insertEvents(QList<int>, QList<Event*>)));
 
   // Event filter
   this->multiView->installEventFilter(this);
@@ -229,7 +322,17 @@ MainWindow::MainWindow(QWidget* parent)
   this->eventContextCombo->installEventFilter(this);
   this->eventTimeSpinBox->installEventFilter(this);
   this->eventSubjectEdit->installEventFilter(this);
-
+  this->mp_ModelDock->markerLabelEdit->installEventFilter(this);
+  this->mp_ModelDock->markerRadiusSpinBox->installEventFilter(this);
+  this->mp_ModelDock->markerDescEdit->installEventFilter(this);
+  this->mp_ModelDock->pointLabelEdit->installEventFilter(this);
+  this->mp_ModelDock->pointDescEdit->installEventFilter(this);
+  this->mp_ModelDock->analogLabelEdit->installEventFilter(this);
+  this->mp_ModelDock->analogUnitEdit->installEventFilter(this);
+  this->mp_ModelDock->analogScaleSpinBox->installEventFilter(this);
+  this->mp_ModelDock->analogOffsetSpinBox->installEventFilter(this);
+  this->mp_ModelDock->analogDescEdit->installEventFilter(this);
+  
   // Settings
   QCoreApplication::setOrganizationName("BTK");
   QCoreApplication::setOrganizationDomain("btk.org");
@@ -240,6 +343,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 MainWindow::~MainWindow()
 {
+  delete this->mp_AcquisitionQ;
   delete this->mp_PlayIcon;
   delete this->mp_PauseIcon;
   delete this->mp_DownArrow;
@@ -299,7 +403,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
   {
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
     // special case for spinbox widget: 'markerRadiusSpinBox' & 'eventTimeSpinBox'
-    QDoubleSpinBox* spinBox = qobject_cast<QDoubleSpinBox*>(obj);
+    QAbstractSpinBox* spinBox = qobject_cast<QAbstractSpinBox*>(obj);
     if (spinBox)
     {
       if (keyEvent->key() == Qt::Key_Escape)
@@ -486,7 +590,7 @@ bool MainWindow::isOkToContinue()
     bool acquisitionModified = false;
     for (int i = 0 ; i < this->mp_AcquisitionUndoStack->index() ; ++i)
     {
-      if (static_cast<const UndoCommand*>(this->mp_AcquisitionUndoStack->command(i))->commandType() == UndoCommand::Acquisition)
+      if (static_cast<const UndoCommand*>(this->mp_AcquisitionUndoStack->command(i))->commandType() == UndoCommand::AcquisitionCmd)
       {
         acquisitionModified = true;
         break;
@@ -597,6 +701,12 @@ void MainWindow::openFile(const QString& filename)
   // Update the 3D view
   btk::SeparateKnownVirtualMarkersFilter::Pointer separator = this->multiView->load(this->mp_Acquisition);
   this->multiView->updateDisplay(this->mp_Acquisition->GetFirstFrame()); // Required
+  
+#ifdef MOKKA_NEW_UI
+  this->mp_AcquisitionQ->init(filename, this->mp_Acquisition);
+  this->mp_ModelDock->load(separator->GetOutput(0), separator->GetOutput(2), separator->GetOutput(3), this->mp_Acquisition->GetAnalogs());
+  this->timeEventControler->load(this->mp_AcquisitionQ);
+#endif
   
   pw.setProgressValue(70);
   
@@ -737,10 +847,16 @@ void MainWindow::openFile(const QString& filename)
   // Fill Metadata
   this->mp_MetadataDlg->load(this->mp_Acquisition->GetMetaData());
   // Display Docks
+#ifndef MOKKA_NEW_UI
   if (hasMarker != 0)
     this->markersDock->setVisible(true);
   if (events->GetItemNumber() != 0)
     this->eventsDock->setVisible(true);
+#else
+  if (this->mp_AcquisitionQ->hasPoints() || this->mp_AcquisitionQ->hasAnalogs())
+    this->mp_ModelDock->setVisible(true);
+  this->timeEventControler->setEnabled(true);
+#endif
 
   pw.setProgressValue(100);
 
@@ -1196,6 +1312,14 @@ void MainWindow::hideAllMarkers()
     this->markersTable->item(row, 0)->setCheckState(Qt::Unchecked);
   this->markersTable->blockSignals(false);
   this->multiView->hideAllMarkers();
+};
+
+void MainWindow::updateSelectedMarkersRadius(double r)
+{
+  QList<int> ids = this->mp_ModelDock->selectedMarkers();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    this->multiView->setMarkerRadius(ids[i], r);
+  this->multiView->updateDisplay();
 };
 
 void MainWindow::updateMarkerRadius(double r)
@@ -1665,8 +1789,8 @@ bool MainWindow::loadMarkerConfiguration(const QString& filename, QString* name)
   }
   
   QStringList labels;
-  QList<qreal> radius;
-  QList<qreal*> colors;
+  QList<double> radius;
+  QList<double*> colors;
   QXmlStreamReader xmlReader(&file);
   
   if (xmlReader.readNextStartElement())
@@ -1686,7 +1810,7 @@ bool MainWindow::loadMarkerConfiguration(const QString& filename, QString* name)
               QXmlStreamAttributes att = xmlReader.attributes();
               labels << att.value("label").toString();
               radius << att.value("radius").toString().toDouble();
-              qreal* color = new qreal[3];
+              double* color = new double[3];
               color[0] = att.value("colorR").toString().toDouble();
               color[1] = att.value("colorG").toString().toDouble();
               color[2] = att.value("colorB").toString().toDouble();
@@ -1728,8 +1852,8 @@ bool MainWindow::loadMarkerConfiguration(const QString& filename, QString* name)
       int idx = labels.indexOf(item->data(pointLabel).toString());
       if (idx != -1)
       {
-        qreal r = radius.at(idx);
-        qreal* c = colors.at(idx);
+        double r = radius.at(idx);
+        double* c = colors.at(idx);
         int idxColor;
         QColor color; color.setRgbF(c[0],c[1],c[2]);
         int idxMarker = item->data(markerId).toInt();
@@ -2110,6 +2234,7 @@ void MainWindow::updateDisplayedMarkersList(const QVector<int>& ids)
 
 void MainWindow::selectPickedMarker(int id)
 {
+#if !defined(MOKKA_NEW_UI)
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
   if (items.count() == 1)
   {
@@ -2128,10 +2253,16 @@ void MainWindow::selectPickedMarker(int id)
       break;
     }
   }
+#else
+  QList<int> ids;
+  ids << id;
+  this->mp_ModelDock->selectMarkers(ids);
+#endif
 };
 
 void MainWindow::selectPickedMarkers(int id)
 {
+#if !defined(MOKKA_NEW_UI)
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
   // Previously selected?
   for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
@@ -2152,6 +2283,11 @@ void MainWindow::selectPickedMarkers(int id)
       break;
     }
   }
+#else
+  QList<int> ids = this->mp_ModelDock->selectedMarkers();
+  ids << id;
+  this->mp_ModelDock->selectMarkers(ids);
+#endif
 };
 
 void MainWindow::editEventLabel()
@@ -2203,6 +2339,14 @@ void MainWindow::editEventSubject()
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditEventSubject(subject, item)));
 };
 
+void MainWindow::modelDockLocationChanged(Qt::DockWidgetArea area)
+{
+  QSettings settings;
+  settings.beginGroup("MarkersDock");
+  settings.setValue("area", area);
+  settings.endGroup();
+};
+
 void MainWindow::markersDockLocationChanged(Qt::DockWidgetArea area)
 {
   QSettings settings;
@@ -2219,6 +2363,83 @@ void MainWindow::eventsDockLocationChanged(Qt::DockWidgetArea area)
   settings.endGroup();
 };
 
+
+void MainWindow::setPointLabel(int id, const QString& label)
+{
+  // TODO: Group two undo commands to modify the acquisition and the configuration
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditPointLabel(this->mp_AcquisitionQ, id, label)));
+};
+
+void MainWindow::setMarkersRadius(const QVector<int>& ids, double radius)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditMarkersRadius2(this->mp_AcquisitionQ, ids, radius)));
+};
+
+void MainWindow::setMarkersColor(const QVector<int>& ids, const QColor& color)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditMarkersColor(this->mp_AcquisitionQ, ids, color)));
+};
+
+void MainWindow::setPointsDescription(const QVector<int>& ids, const QString& desc)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditPointDescription(this->mp_AcquisitionQ, ids, desc)));
+};
+
+void MainWindow::removePoints(const QList<int>& ids)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemovePoints(this->mp_AcquisitionQ, ids)));
+};
+
+void MainWindow::setAnalogLabel(int id, const QString& label)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogLabel(this->mp_AcquisitionQ, id, label)));
+};
+
+void MainWindow::setAnalogsDescription(const QVector<int>& ids, const QString& desc)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogDescription(this->mp_AcquisitionQ, ids, desc)));
+};
+
+void MainWindow::setAnalogsUnit(const QVector<int>& ids, const QString& unit)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsUnit(this->mp_AcquisitionQ, ids, unit)));
+};
+
+void MainWindow::setAnalogsGain(const QVector<int>& ids, AnalogGain gain)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsGain(this->mp_AcquisitionQ, ids, gain)));
+};
+
+void MainWindow::setAnalogsOffset(const QVector<int>& ids, int offset)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsOffset(this->mp_AcquisitionQ, ids, offset)));
+};
+
+void MainWindow::setAnalogsScale(const QVector<int>& ids, double scale)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsScale(this->mp_AcquisitionQ, ids, scale)));
+};
+
+void MainWindow::removeAnalogs(const QList<int>& ids)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveAnalogs(this->mp_AcquisitionQ, ids)));
+};
+
+void MainWindow::removeEvents(const QList<int>& ids)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveEvents(this->mp_AcquisitionQ, ids)));
+};
+
+void MainWindow::setRegionOfInterest(int lf,int ff)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditRegionOfInterest(this->mp_AcquisitionQ, lf, ff)));
+};
+
+void MainWindow::insertEvent(Event* e)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvent(this->mp_AcquisitionQ, e)));
+};
+
 void MainWindow::readSettings()
 {
   QSettings settings;
@@ -2229,12 +2450,26 @@ void MainWindow::readSettings()
   this->resize(settings.value("size", QSize(1024, 768)).toSize());
   if (settings.value("maximized", false).toBool())
     this->showMaximized();
+  else
+    this->showNormal();
   // - Recent files submenu
   this->m_RecentFiles = settings.value("recentFiles").toStringList(); 
   this->updateRecentFileActions();
   // - Last directory
   this->m_LastDirectory = settings.value("lastDirectory", ".").toString();
   settings.endGroup();
+#ifdef MOKKA_NEW_UI
+  settings.beginGroup("MarkersDock"); // Should be ModelDock but for compatibility...
+  this->mp_ModelDock->setFloating(settings.value("floating", false).toBool());
+  this->mp_ModelDock->move(settings.value("pos", this->mp_ModelDock->pos()).toPoint());
+  this->mp_ModelDock->resize(settings.value("size", this->mp_ModelDock->size()).toSize());
+  if (!this->mp_ModelDock->isFloating())
+    this->addDockWidget(static_cast<Qt::DockWidgetArea>(settings.value("area", Qt::RightDockWidgetArea).toInt()), this->mp_ModelDock);
+  QStringList recentVisualConfigName = settings.value("recentVisualConfigName").toStringList();
+  QStringList recentVisualConfigFilename = settings.value("recentVisualConfigFilename").toStringList(); 
+  this->mp_ModelDock->setVisualConfigurations(recentVisualConfigName, recentVisualConfigFilename);
+  settings.endGroup();
+#else
   // MarkersDock
   settings.beginGroup("MarkersDock");
   //this->markersDock->setVisible(settings.value("visible", false).toBool());
@@ -2265,6 +2500,7 @@ void MainWindow::readSettings()
   if (!this->eventsDock->isFloating())
     addDockWidget(static_cast<Qt::DockWidgetArea>(settings.value("area", Qt::RightDockWidgetArea).toInt()), this->eventsDock);
   settings.endGroup();
+#endif
 };
 
 void MainWindow::writeSettings()
@@ -2273,9 +2509,15 @@ void MainWindow::writeSettings()
   // MainWindow
   // - Size & position 
   settings.beginGroup("MainWindow");
-  settings.setValue("pos", this->pos());
-  settings.setValue("size", this->size());
-  settings.setValue("maximized", (this->isMaximized() ? true : false));
+  QDesktopWidget* d = QApplication::desktop();
+  if (this->isMaximized() && (this->width() == d->width()))
+    settings.setValue("maximized", true);
+  else
+  {
+    settings.setValue("maximized", false);
+    settings.setValue("pos", this->pos());
+    settings.setValue("size", this->size());
+  }
   // - Recent files submenu
   settings.setValue("recentFiles", this->m_RecentFiles);
   // - Last directory
@@ -2290,6 +2532,9 @@ void MainWindow::writeSettings()
   //settings.setValue("area", this->markersDock->area());
   QStringList recentVisualConfigFilename; 
   QStringList recentVisualConfigName;
+#ifdef MOKKA_NEW_UI
+  this->mp_ModelDock->visualConfigurations(recentVisualConfigName, recentVisualConfigFilename);
+#else
   for (int i = 0 ; i < (this->modelConfigurationComboBox->count() - 2) ; ++i)
   {
     if (!this->modelConfigurationComboBox->itemData(i,visualConfigNew).toBool())
@@ -2298,9 +2543,11 @@ void MainWindow::writeSettings()
       recentVisualConfigName << this->modelConfigurationComboBox->itemData(i,visualConfigName).toString();
     }
   }
+#endif
   settings.setValue("recentVisualConfigFilename", recentVisualConfigFilename);
   settings.setValue("recentVisualConfigName", recentVisualConfigName);
   settings.endGroup();
+#ifndef MOKKA_NEW_UI
   // EventsDock
   settings.beginGroup("EventsDock");
   //settings.setValue("visible", this->eventsDock->isVisible());
@@ -2309,6 +2556,7 @@ void MainWindow::writeSettings()
   settings.setValue("size", this->eventsDock->size());
   //settings.setValue("area", this->eventsDock->area());
   settings.endGroup();
+#endif
 };
 
 bool findLabel(btk::PointCollection::Pointer points, const std::string& label)

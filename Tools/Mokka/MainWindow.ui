@@ -15,17 +15,14 @@
    <string>No file</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_2">
-    <property name="horizontalSpacing">
+   <layout class="QVBoxLayout" name="verticalLayout_5">
+    <property name="spacing">
      <number>0</number>
-    </property>
-    <property name="verticalSpacing">
-     <number>6</number>
     </property>
     <property name="margin">
      <number>0</number>
     </property>
-    <item row="1" column="0">
+    <item>
      <widget class="MultiViewWidget" name="multiView" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -44,7 +41,26 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item>
+     <widget class="TimeEventControlerWidget" name="timeEventControler" native="true">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>110</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QFrame" name="frame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -149,7 +165,7 @@
      <x>0</x>
      <y>0</y>
      <width>954</width>
-     <height>22</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -241,7 +257,6 @@
    <addaction name="menuOptions"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="markersDock">
    <property name="enabled">
     <bool>true</bool>
@@ -1240,13 +1255,13 @@ QPushButton::flat
    <property name="minimumSize">
     <size>
      <width>200</width>
-     <height>424</height>
+     <height>0</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
      <width>500</width>
-     <height>424</height>
+     <height>16777215</height>
     </size>
    </property>
    <property name="floating">
@@ -1269,6 +1284,9 @@ QPushButton::flat
      </sizepolicy>
     </property>
     <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+     </property>
      <item row="0" column="0">
       <widget class="QLabel" name="fileNameLabel">
        <property name="text">
@@ -1442,13 +1460,6 @@ QPushButton::flat
        </property>
       </widget>
      </item>
-     <item row="13" column="0">
-      <widget class="QLabel" name="analogNumberLabel">
-       <property name="text">
-        <string>Analog number:</string>
-       </property>
-      </widget>
-     </item>
      <item row="13" column="1">
       <widget class="QLabel" name="analogNumberValue">
        <property name="text">
@@ -1488,6 +1499,13 @@ QPushButton::flat
       <widget class="QLabel" name="eventNumberValue">
        <property name="text">
         <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="0">
+      <widget class="QLabel" name="analogNumberLabel">
+       <property name="text">
+        <string>Analog number:</string>
        </property>
       </widget>
      </item>
@@ -1702,6 +1720,12 @@ QPushButton::flat
    <class>MarkerTableWidget</class>
    <extends>QTableWidget</extends>
    <header>TableWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>TimeEventControlerWidget</class>
+   <extends>QWidget</extends>
+   <header>TimeEventControlerWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
