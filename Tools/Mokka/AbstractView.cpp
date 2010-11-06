@@ -41,6 +41,9 @@ AbstractView::AbstractView(QWidget* parent)
 : QWidget(parent), m_FuncOptions()
 {
   this->setupUi(this);
+#ifdef Q_OS_MAC
+  this->separatorFuncButtons->setMinimumSize(26,26);
+#endif
   
   // Connections
   connect(this->hSplitButton, SIGNAL(clicked()), this, SLOT(splitHorizontally()));
