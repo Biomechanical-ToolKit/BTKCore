@@ -14,6 +14,7 @@ SET(Mokka_CPP
   AbstractView.cpp
   ComboBoxDelegate.cpp
   CompositeView.cpp
+  FileInfoDockWidget.cpp
   MainWindow.cpp
   Metadata.cpp
   MetadataView.cpp
@@ -38,6 +39,7 @@ SET(Mokka_H
   AbstractView.h
   ComboBoxDelegate.h
   CompositeView.h
+  FileInfoDockWidget.h
   MainWindow.h
   MetadataView.h
   Metadata.h
@@ -56,6 +58,7 @@ SET(Mokka_H
 SET(Mokka_UI
   About.ui
   AbstractView.ui
+  FileInfoDockWidget.ui
   MainWindow.ui
   Metadata.ui
   ModelDockWidget.ui
