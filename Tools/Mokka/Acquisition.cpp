@@ -35,10 +35,16 @@
 
 #include "Acquisition.h"
 
+#include <btkAcquisitionFileReader.h>
+#include <btkAcquisitionFileWriter.h>
+
 #include <Qt>
+#include <QFileInfo>
+#include <QDateTime>
 
 Acquisition::Acquisition(QObject* parent)
-: QObject(parent), m_Filename(), mp_Acquisition(), m_Points()
+: QObject(parent), mp_BTKAcquisition(), m_BTKProcesses(), m_Filename(),
+  m_Points(), m_Analogs(), m_Events()
 {
   this->m_FirstFrame = 0;
   this->m_LastFrame = 0;
@@ -46,6 +52,20 @@ Acquisition::Acquisition(QObject* parent)
   this->mp_ROI[1] = this->m_LastFrame;
   this->m_PointFrequency = 0.0;
   this->m_LastEventId = -1;
+  
+  // BTK PIPELINE
+  btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
+  btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = btk::ForcePlatformsExtractor::New();
+  btk::GroundReactionWrenchFilter::Pointer GRWsFilter = btk::GroundReactionWrenchFilter::New();
+  GRWsFilter->SetThresholdValue(5.0); // PWA are not computed from vertical forces lower than 5 newtons.
+  GRWsFilter->SetThresholdState(true);
+  GRWsFilter->SetInput(forcePlatformsExtractor->GetOutput());
+  btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = btk::DownsampleFilter<btk::WrenchCollection>::New();
+  GRWsDownsampler->SetInput(GRWsFilter->GetOutput());
+  this->m_BTKProcesses[BTK_SORTED_POINTS] = virtualMarkersSeparator;
+  this->m_BTKProcesses[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
+  this->m_BTKProcesses[BTK_GRWS] = GRWsFilter;
+  this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
 };
 
 Acquisition::~Acquisition()
@@ -53,42 +73,64 @@ Acquisition::~Acquisition()
   this->clear();
 };
 
-void Acquisition::init(const QString& filename, btk::Acquisition::Pointer acquisition)
+void Acquisition::load(const QString& filename, QString& message)
 {
   this->clear();
-  //qDebug("Points count: %i", this->m_Points.count());
+  
+  btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+  reader->SetFilename(filename.toStdString());
+  try
+  {
+    reader->Update();
+  }
+  catch (btk::Exception& e)
+  {
+    message = e.what();
+    return;
+  }
+  catch (std::exception& e)
+  {
+    message = "Unexpected error: " + QString(e.what());
+    return;
+  }
+  catch (...)
+  {
+    message = "Unknown error.";
+    return;
+  }
+  
   this->m_Filename = filename;
-  this->mp_Acquisition = acquisition;
-  this->m_FirstFrame = acquisition->GetFirstFrame();
-  this->m_LastFrame = acquisition->GetLastFrame();
+  this->mp_BTKAcquisition = reader->GetOutput();
+  this->m_FirstFrame = this->mp_BTKAcquisition->GetFirstFrame();
+  this->m_LastFrame = this->mp_BTKAcquisition->GetLastFrame();
   this->mp_ROI[0] = this->m_FirstFrame;
   this->mp_ROI[1] = this->m_LastFrame;
-  this->m_PointFrequency = acquisition->GetPointFrequency();
+  this->m_PointFrequency = this->mp_BTKAcquisition->GetPointFrequency();
   // Points
   int inc = 0;
-  for (btk::Acquisition::PointIterator it = this->mp_Acquisition->BeginPoint() ; it != this->mp_Acquisition->EndPoint() ; ++it)
+  for (btk::Acquisition::PointIterator it = this->mp_BTKAcquisition->BeginPoint() ; it != this->mp_BTKAcquisition->EndPoint() ; ++it)
   {
     Point* p = new Point();
     p->label = QString::fromStdString((*it)->GetLabel());
     p->description = QString::fromStdString((*it)->GetDescription());
     if ((*it)->GetType() == btk::Point::Marker)
     {
-      p->type = Marker;
+      p->type = Point::Marker;
       p->radius = 8.0;
       p->color = Qt::white;
     }
     else
     {
       if ((*it)->GetType() == btk::Point::Angle)
-        p->type = Angle;
+        p->type = Point::Angle;
       else if ((*it)->GetType() == btk::Point::Force)
-        p->type = Force;
+        p->type = Point::Force;
       else if ((*it)->GetType() == btk::Point::Moment)
-        p->type = Moment;
+        p->type = Point::Moment;
       else if ((*it)->GetType() == btk::Point::Power)
-        p->type = Power;
+        p->type = Point::Power;
       else if ((*it)->GetType() == btk::Point::Scalar)
-        p->type = Scalar;
+        p->type = Point::Scalar;
       p->radius = -1.0;
       p->color = QColor::Invalid;
     }
@@ -97,7 +139,7 @@ void Acquisition::init(const QString& filename, btk::Acquisition::Pointer acquis
   }
   // Analog
   inc = 0;
-  for (btk::Acquisition::AnalogIterator it = this->mp_Acquisition->BeginAnalog() ; it != this->mp_Acquisition->EndAnalog() ; ++it)
+  for (btk::Acquisition::AnalogIterator it = this->mp_BTKAcquisition->BeginAnalog() ; it != this->mp_BTKAcquisition->EndAnalog() ; ++it)
   {
     Analog* a = new Analog();
     a->label = QString::fromStdString((*it)->GetLabel());
@@ -106,22 +148,22 @@ void Acquisition::init(const QString& filename, btk::Acquisition::Pointer acquis
     switch((*it)->GetGain())
     {
     case btk::Analog::Unknown:
-      a->gain = Unknown;
+      a->gain = Analog::Unknown;
       break;
     case btk::Analog::PlusMinus10:
-      a->gain = PlusMinus10;
+      a->gain = Analog::PlusMinus10;
       break;
     case btk::Analog::PlusMinus5:
-      a->gain = PlusMinus5;
+      a->gain = Analog::PlusMinus5;
       break;
     case btk::Analog::PlusMinus2Dot5:
-      a->gain = PlusMinus2Dot5;
+      a->gain = Analog::PlusMinus2Dot5;
       break;
     case btk::Analog::PlusMinus1Dot25:
-      a->gain = PlusMinus1Dot25;
+      a->gain = Analog::PlusMinus1Dot25;
       break;
     case btk::Analog::PlusMinus1:
-      a->gain = PlusMinus1;
+      a->gain = Analog::PlusMinus1;
       break;
     }
     a->offset = (*it)->GetOffset();
@@ -131,7 +173,7 @@ void Acquisition::init(const QString& filename, btk::Acquisition::Pointer acquis
   }
   // Event
   inc = 0;
-  for (btk::Acquisition::EventIterator it = this->mp_Acquisition->BeginEvent() ; it != this->mp_Acquisition->EndEvent() ; ++it)
+  for (btk::Acquisition::EventIterator it = this->mp_BTKAcquisition->BeginEvent() ; it != this->mp_BTKAcquisition->EndEvent() ; ++it)
   {
     Event* e = new Event();
     e->label = QString::fromStdString((*it)->GetLabel());;
@@ -145,6 +187,8 @@ void Acquisition::init(const QString& filename, btk::Acquisition::Pointer acquis
     ++inc;
   }
   this->m_LastEventId = inc - 1;
+  
+  this->emitGeneratedInformations(reader->GetAcquisitionIO());
 };
 
 void Acquisition::clear()
@@ -189,7 +233,7 @@ void Acquisition::setPointsDescription(const QVector<int>& ids, const QVector<QS
   emit pointsDescriptionChanged(ids, descs);
 };
 
-void Acquisition::setPointType(int id, PointType p)
+void Acquisition::setPointType(int id, Point::Type p)
 {
   QMap<int,Point*>::iterator it = this->m_Points.find(id);
   if (it != this->m_Points.end())
@@ -203,7 +247,7 @@ int Acquisition::findMarkers(const QString& name) const
 {
   for (QMap<int,Point*>::const_iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
   {
-    if ((it.value()->label.compare(name) == 0) && (it.value()->type == Marker))
+    if ((it.value()->label.compare(name) == 0) && (it.value()->type == Point::Marker))
       return it.key();
   }
   return -1;
@@ -312,7 +356,7 @@ void Acquisition::setAnalogsUnit(const QVector<int>& ids, const QVector<QString>
   emit analogsUnitChanged(ids, units);
 };
 
-void Acquisition::setAnalogsGain(const QVector<int>& ids, const QVector<AnalogGain>& gains)
+void Acquisition::setAnalogsGain(const QVector<int>& ids, const QVector<Analog::Gain>& gains)
 {
   for (int i = 0 ; i < ids.count() ; ++i)
   {
@@ -417,4 +461,92 @@ int Acquisition::generateNewEventId()
 {
   this->m_LastEventId += 1;
   return this->m_LastEventId;
+};
+
+void Acquisition::emitGeneratedInformations(btk::AcquisitionFileIO::Pointer io)
+{
+  QVector<QString> infos(16);
+  QFileInfo fI = QFileInfo(this->m_Filename);
+  // Filename
+  infos[0] = fI.fileName();
+  // Extension
+  infos[1] = fI.suffix().toUpper() + QString(" Document");
+  // File size
+  double sizeDouble = static_cast<double>(fI.size());
+  if (sizeDouble <= 1024.0)
+    infos[2] = QString::number(sizeDouble) + " bytes";
+  else
+  {
+    sizeDouble /= 1024.0;
+    if (sizeDouble <= 1024.0)
+      infos[2] = QString::number(sizeDouble) + " KB";
+    else
+    {
+      sizeDouble /= 1024.0;
+      infos[2] = QString::number(sizeDouble) + " MB";
+    }
+  }
+  // Creation date
+  infos[3] = fI.created().toString();
+  // Modification date
+  infos[4] = fI.lastModified().toString();
+  // File type
+  switch(io->GetFileType())
+  {
+    case btk::AcquisitionFileIO::TypeNotApplicable:
+      infos[5] = "N/A";
+      break;
+    case btk::AcquisitionFileIO::ASCII:
+      infos[5] = "ASCII";
+      break;
+    case btk::AcquisitionFileIO::Binary:
+      infos[5] = "Binary";
+      break;
+  }
+  // Byte order
+  switch(io->GetByteOrder())
+  {
+    case btk::AcquisitionFileIO::OrderNotApplicable:
+      infos[6] ="N/A";
+      break;
+    case btk::AcquisitionFileIO::IEEE_LittleEndian:
+      infos[6] = "IEEE Little Endian";
+      break;
+    case btk::AcquisitionFileIO::VAX_LittleEndian:
+      infos[6] = "VAX Little Endian";
+      break;
+    case btk::AcquisitionFileIO::IEEE_BigEndian:
+      infos[6] = "IEEE Big Endian";
+      break;
+  }
+  // Storage format
+  switch(io->GetStorageFormat())
+  {
+    case btk::AcquisitionFileIO::StorageNotApplicable:
+      infos[7] = "N/A";
+      break;
+    case btk::AcquisitionFileIO::Float:
+      infos[7] = "Float";
+      break;
+    case btk::AcquisitionFileIO::Integer:
+      infos[7] = "Integer";
+      break;
+  }
+  // First frame
+  infos[8] = QString::number(this->mp_BTKAcquisition->GetFirstFrame());
+  // Last frame
+  infos[9] = QString::number(this->mp_BTKAcquisition->GetLastFrame());
+  // Frame number
+  infos[10] = QString::number(this->mp_BTKAcquisition->GetPointFrameNumber());
+  // Point number
+  infos[11] = QString::number(this->mp_BTKAcquisition->GetPointNumber());
+  // Point frequency
+  infos[12] = QString::number(this->mp_BTKAcquisition->GetPointFrequency()) + " Hz";
+  // Analog number
+  infos[13] = QString::number(this->mp_BTKAcquisition->GetAnalogNumber());
+  // Analog frequency
+  infos[14] = QString::number(this->mp_BTKAcquisition->GetAnalogFrequency()) + " Hz";
+  // Event number
+  infos[15] = QString::number(this->mp_BTKAcquisition->GetEventNumber());
+  emit informationsChanged(infos);
 };

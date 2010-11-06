@@ -258,14 +258,14 @@ private:
 class EditAnalogsGain : public AcquisitionUndoCommand
 {
 public:
-  EditAnalogsGain(Acquisition* acq, const QVector<int>& ids, AnalogGain gain, QUndoCommand* parent = 0);
+  EditAnalogsGain(Acquisition* acq, const QVector<int>& ids, Analog::Gain gain, QUndoCommand* parent = 0);
   virtual void undo() {this->action();};
   virtual void redo() {this->action();};
   
 private:
   Acquisition* mp_Acquisition;
   QVector<int> m_Ids;
-  QVector<AnalogGain> m_Gains;
+  QVector<Analog::Gain> m_Gains;
   
   void action();
 };

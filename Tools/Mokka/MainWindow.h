@@ -38,6 +38,7 @@
 
 #include "ui_MainWindow.h"
 #include "Acquisition.h"
+#include "FileInfoDockWidget.h"
 #include "Metadata.h"
 #include "ModelDockWidget.h"
 #include "PointsEditor.h"
@@ -138,7 +139,7 @@ public Q_SLOTS:
   void setAnalogLabel(int id, const QString& label);
   void setAnalogsDescription(const QVector<int>& ids, const QString& desc);
   void setAnalogsUnit(const QVector<int>& ids, const QString& unit);
-  void setAnalogsGain(const QVector<int>& ids, AnalogGain gain);
+  void setAnalogsGain(const QVector<int>& ids, Analog::Gain gain);
   void setAnalogsOffset(const QVector<int>& ids, int offset);
   void setAnalogsScale(const QVector<int>& ids, double scale);
   void removeAnalogs(const QList<int>& ids);
@@ -171,6 +172,7 @@ private:
   btk::Acquisition::Pointer mp_Acquisition;
   Acquisition* mp_AcquisitionQ;
   Metadata* mp_MetadataDlg;
+  FileInfoDockWidget* mp_FileInfoDock;
   ModelDockWidget* mp_ModelDock;
   int m_PlaybackStep;
   int m_PlaybackDelay;

@@ -68,18 +68,23 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_Timer = new QTimer(this);
   this->mp_MetadataDlg = new Metadata(this);
   this->mp_PointsEditorDlg = new PointsEditor(this);
-  this->mp_ModelDock = new ModelDockWidget(this); this->mp_ModelDock->setAcquisition(this->mp_AcquisitionQ); this->addDockWidget(Qt::RightDockWidgetArea, this->mp_ModelDock); this->mp_ModelDock->setVisible(false);
+  this->mp_ModelDock = new ModelDockWidget(this);
+  this->mp_ModelDock->setAcquisition(this->mp_AcquisitionQ);
+  this->mp_FileInfoDock = new FileInfoDockWidget(this);
   this->m_PlaybackStep = 1;
   this->m_PlaybackDelay = 33; // 33 msec
   this->mp_PlayIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_play.png"));
   this->mp_PauseIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_pause.png"));
   this->mp_DownArrow = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallDownBlack.png"));
   this->mp_RightArrow = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallRightBlack.png"));
-
-  // Finalize UI
-  // Qt UI
-  this->setupUi(this);
   
+  // Finalize UI
+  this->mp_FileInfoDock->setVisible(false); 
+  this->mp_FileInfoDock->setFloating(true);
+  this->mp_FileInfoDock->move(100,100);
+  this->addDockWidget(Qt::RightDockWidgetArea, this->mp_ModelDock); 
+  this->mp_ModelDock->setVisible(false);
+  this->setupUi(this);
 #ifdef MOKKA_NEW_UI
   this->menuOptions->removeAction(this->actionEdit_Points);
   this->menuOptions->removeAction(this->actionEdit_Contexts_Events);
@@ -106,6 +111,7 @@ MainWindow::MainWindow(QWidget* parent)
 #ifdef Q_OS_MAC
   QFont f = informationsDock->font();
   f.setPointSize(10);
+  this->mp_FileInfoDock->setFont(f);
   this->informationsDock->setFont(f);
   this->markersDock->setFont(f);
   this->markerPropertiesButton->setFont(f);
@@ -116,6 +122,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->showMarkersButton->setFont(f);
   this->hideMarkersButton->setFont(f);
 #endif
+  this->mp_FileInfoDock->clear(); // Force to update geometry
   this->markersDock->setVisible(false);
   this->modelConfigurationComboBox->insertSeparator(99);
   this->modelConfigurationComboBox->insertItem(99,"New ...");
@@ -160,26 +167,24 @@ MainWindow::MainWindow(QWidget* parent)
   QAction* actionModelDockView = this->mp_ModelDock->toggleViewAction();
   actionModelDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
   this->menuView->addAction(actionModelDockView);
+  QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
+  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
+  this->menuView->addAction(actionInformationsDockView);
+  this->actionEdit_Metadata->setText(tr("Metadata"));
+  this->menuView->addAction(this->actionEdit_Metadata);
+  this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
 #else
   QAction* actionMarkersDockView = this->markersDock->toggleViewAction();
   QAction* actionEventsDockView = this->eventsDock->toggleViewAction();
+  QAction* actionInformationsDockView = this->informationsDock->toggleViewAction();
   actionMarkersDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
   actionEventsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
   actionMarkersDockView->setText(QObject::tr("Markers List"));
   actionEventsDockView->setText(QObject::tr("Events List"));
   this->menuView->addAction(actionMarkersDockView);
   this->menuView->addAction(actionEventsDockView);
-#endif
-
-  QAction* actionInformationsDockView = this->informationsDock->toggleViewAction();
-  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
   this->menuView->addAction(actionInformationsDockView);
-
-#ifdef MOKKA_NEW_UI
-  this->actionEdit_Metadata->setText(tr("Metadata"));
-  this->menuView->addAction(this->actionEdit_Metadata);
-  
-  this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
 #endif
   
   // Viz3D
@@ -274,7 +279,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_ModelDock, SIGNAL(pointsRemoved(QList<int>)), this, SLOT(removePoints(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(analogLabelChanged(int, QString)), this, SLOT(setAnalogLabel(int, QString)));
   connect(this->mp_ModelDock, SIGNAL(analogsUnitChanged(QVector<int>, QString)), this, SLOT(setAnalogsUnit(QVector<int>, QString)));
-  connect(this->mp_ModelDock, SIGNAL(analogsGainChanged(QVector<int>, AnalogGain)), this, SLOT(setAnalogsGain(QVector<int>, AnalogGain)));
+  connect(this->mp_ModelDock, SIGNAL(analogsGainChanged(QVector<int>, Analog::Gain)), this, SLOT(setAnalogsGain(QVector<int>, Analog::Gain)));
   connect(this->mp_ModelDock, SIGNAL(analogsOffsetChanged(QVector<int>, int)), this, SLOT(setAnalogsOffset(QVector<int>, int)));
   connect(this->mp_ModelDock, SIGNAL(analogsScaleChanged(QVector<int>, double)), this, SLOT(setAnalogsScale(QVector<int>, double)));
   connect(this->mp_ModelDock, SIGNAL(analogsDescriptionChanged(QVector<int>, QString)), this, SLOT(setAnalogsDescription(QVector<int>, QString)));
@@ -290,6 +295,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->timeEventControler, SIGNAL(eventsRemoved(QList<int>)), this, SLOT(removeEvents(QList<int>)));
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
   // Acquisition
+  connect(this->mp_AcquisitionQ, SIGNAL(informationsChanged(QVector<QString>)), this->mp_FileInfoDock, SLOT(fill(QVector<QString>)));
   connect(this->mp_AcquisitionQ, SIGNAL(pointLabelChanged(int, QString)), this->mp_ModelDock, SLOT(setPointLabel(int, QString)));
   connect(this->mp_AcquisitionQ, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this->mp_ModelDock, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
   connect(this->mp_AcquisitionQ, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this->multiView, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
@@ -300,7 +306,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_AcquisitionQ, SIGNAL(pointsInserted(QList<int>, QList<Point*>)), this->mp_ModelDock, SLOT(insertPoints(QList<int>, QList<Point*>)));
   connect(this->mp_AcquisitionQ, SIGNAL(analogLabelChanged(int, QString)), this->mp_ModelDock, SLOT(setAnalogLabel(int, QString)));
   connect(this->mp_AcquisitionQ, SIGNAL(analogsUnitChanged(QVector<int>, QVector<QString>)), this->mp_ModelDock, SLOT(setAnalogsUnit(QVector<int>, QVector<QString>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(analogsGainChanged(QVector<int>, QVector<AnalogGain>)), this->mp_ModelDock, SLOT(setAnalogsGain(QVector<int>, QVector<AnalogGain>)));
+  connect(this->mp_AcquisitionQ, SIGNAL(analogsGainChanged(QVector<int>, QVector<Analog::Gain>)), this->mp_ModelDock, SLOT(setAnalogsGain(QVector<int>, QVector<Analog::Gain>)));
   connect(this->mp_AcquisitionQ, SIGNAL(analogsOffsetChanged(QVector<int>, QVector<int>)), this->mp_ModelDock, SLOT(setAnalogsOffset(QVector<int>, QVector<int>)));
   connect(this->mp_AcquisitionQ, SIGNAL(analogsScaleChanged(QVector<int>, QVector<double>)), this->mp_ModelDock, SLOT(setAnalogsScale(QVector<int>, QVector<double>)));
   connect(this->mp_AcquisitionQ, SIGNAL(analogsDescriptionChanged(QVector<int>, QVector<QString>)), this->mp_ModelDock, SLOT(setAnalogsDescription(QVector<int>, QVector<QString>)));
@@ -657,9 +663,22 @@ void MainWindow::openFile(const QString& filename)
   ProgressWidget pw(this);
   pw.show();
   this->clearUI();
+
+  QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file reading", QMessageBox::Ok , this);
+#ifdef MOKKA_NEW_UI
+  QString errMsg;
+  this->mp_AcquisitionQ->load(filename, errMsg);
+  if (!errMsg.isEmpty())
+  {
+    QApplication::restoreOverrideCursor();
+    error.setInformativeText(errMsg);
+    error.exec();
+    return;
+  }
+  this->mp_Acquisition = this->mp_AcquisitionQ->btkAcquisition();
+#else
   btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
   reader->SetFilename(filename.toStdString());
-  QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file reading", QMessageBox::Ok , this);
   try
   {
     reader->Update();
@@ -688,14 +707,14 @@ void MainWindow::openFile(const QString& filename)
     error.exec();
     return;
   }
-  
+  this->mp_Acquisition = reader->GetOutput();
+  this->fillFileInformations(filename, reader->GetAcquisitionIO(), this->mp_Acquisition);
+#endif
   pw.setProgressValue(25);
   
   this->setCurrentFile(filename);
-  this->mp_Acquisition = reader->GetOutput();
   
   this->changePlaybackParameters();
-  this->fillFileInformations(filename, reader->GetAcquisitionIO(), this->mp_Acquisition);
   
   // UI settings
   // Update the 3D view
@@ -703,7 +722,6 @@ void MainWindow::openFile(const QString& filename)
   this->multiView->updateDisplay(this->mp_Acquisition->GetFirstFrame()); // Required
   
 #ifdef MOKKA_NEW_UI
-  this->mp_AcquisitionQ->init(filename, this->mp_Acquisition);
   this->mp_ModelDock->load(separator->GetOutput(0), separator->GetOutput(2), separator->GetOutput(3), this->mp_Acquisition->GetAnalogs());
   this->timeEventControler->load(this->mp_AcquisitionQ);
 #endif
@@ -1006,6 +1024,7 @@ void MainWindow::clearUI()
   this->actionSave_As->setEnabled(false);
   this->setCurrentFile("");
   // Informations Dock
+  this->mp_FileInfoDock->clear();
   this->fileNameValue->setText("");
   this->documentTypeValue->setText("");
   this->fileSizeValue->setText("");
@@ -1081,7 +1100,7 @@ void MainWindow::fillFileInformations(const QString& filename, btk::AcquisitionF
   switch(io->GetFileType())
   {
     case btk::AcquisitionFileIO::TypeNotApplicable:
-      this->fileFormatValue->setText("NA");
+      this->fileFormatValue->setText("N/A");
       break;
     case btk::AcquisitionFileIO::ASCII:
       this->fileFormatValue->setText("ASCII");
@@ -1093,7 +1112,7 @@ void MainWindow::fillFileInformations(const QString& filename, btk::AcquisitionF
   switch(io->GetByteOrder())
   {
     case btk::AcquisitionFileIO::OrderNotApplicable:
-      this->byteOrderValue->setText("NA");
+      this->byteOrderValue->setText("N/A");
       break;
     case btk::AcquisitionFileIO::IEEE_LittleEndian:
       this->byteOrderValue->setText("IEEE Little Endian");
@@ -1108,7 +1127,7 @@ void MainWindow::fillFileInformations(const QString& filename, btk::AcquisitionF
   switch(io->GetStorageFormat())
   {
     case btk::AcquisitionFileIO::StorageNotApplicable:
-      this->storageFormatValue->setText("NA");
+      this->storageFormatValue->setText("N/A");
       break;
     case btk::AcquisitionFileIO::Float:
       this->storageFormatValue->setText("Float");
@@ -2405,7 +2424,7 @@ void MainWindow::setAnalogsUnit(const QVector<int>& ids, const QString& unit)
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsUnit(this->mp_AcquisitionQ, ids, unit)));
 };
 
-void MainWindow::setAnalogsGain(const QVector<int>& ids, AnalogGain gain)
+void MainWindow::setAnalogsGain(const QVector<int>& ids, Analog::Gain gain)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsGain(this->mp_AcquisitionQ, ids, gain)));
 };

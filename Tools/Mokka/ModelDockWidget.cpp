@@ -59,8 +59,12 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->setupUi(this);
    
    // Finalize the UI
+   QFont f = this->modelTree->font();
 #ifdef Q_OS_MAC
-  QFont f = this->modelTree->font();
+  // TODO: What about the widget's attributes Qt::WA_MacNormalSize, Qt::WA_MacSmallSize	 and Qt::WA_MacMiniSize for mac?
+  
+  this->setStyleSheet("QDockWidget {color: white;} QDockWidget::title {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(0, 0, 0, 255), stop:0.95 rgba(64, 64, 64, 255), stop:1 rgba(200, 200, 200, 255)); text-align: center; padding-left: -25px;}");
+  
   f.setPointSize(10);
   this->modelTree->setFont(f);
   this->propertiesButton->setFont(f);
@@ -959,12 +963,14 @@ void ModelDockWidget::displayProperties()
     break;
     }
   case PointType:
+    {
     int id = items.first()->data(0,pointId).toInt();
     this->pointLabelEdit->setText(multipleSelection ? "" : this->mp_Acquisition->pointLabel(id));
     this->pointLabelEdit->setEnabled(!multipleSelection);
     this->pointDescEdit->setText(multipleSelection ? "" : this->mp_Acquisition->pointDescription(id));
     this->propertiesStack->setCurrentIndex(2);
     break;
+    }
   case AnalogType:
     {
     int id = items.first()->data(0,analogId).toInt();
@@ -973,7 +979,7 @@ void ModelDockWidget::displayProperties()
     this->analogDescEdit->setText(multipleSelection ? "" : this->mp_Acquisition->analogDescription(id));
     bool uniqueUnit = true, uniqueGain = true, uniqueOffset = true, uniqueScale = true;
     QString u = this->mp_Acquisition->analogUnit(id);
-    AnalogGain g = this->mp_Acquisition->analogGain(id);
+    Analog::Gain g = this->mp_Acquisition->analogGain(id);
     int o = this->mp_Acquisition->analogOffset(id);
     double s = this->mp_Acquisition->analogScale(id);
     QList<QTreeWidgetItem*>::const_iterator it = items.begin(); ++it;
@@ -1255,22 +1261,22 @@ void ModelDockWidget::removePoints(const QList<int>& ids, const QList<Point*>& p
   {
     switch (points[i]->type)
     {
-    case Marker:
+    case Point::Marker:
       this->treePointChild(markersRoot, ids[i])->setHidden(true);
       break;
-    case Angle:
+    case Point::Angle:
       this->treePointChild(modelOutputAngles, ids[i])->setHidden(true);
       break;
-    case Force:
+    case Point::Force:
       this->treePointChild(modelOutputForces, ids[i])->setHidden(true);
       break;
-    case Moment:
+    case Point::Moment:
       this->treePointChild(modelOutputMoments, ids[i])->setHidden(true);
       break;
-    case Power:
+    case Point::Power:
       this->treePointChild(modelOutputPowers, ids[i])->setHidden(true);
       break;
-    case Scalar:
+    case Point::Scalar:
       this->treePointChild(modelOutputScalars, ids[i])->setHidden(true);
       break;
     }
@@ -1293,22 +1299,22 @@ void ModelDockWidget::insertPoints(const QList<int>& ids, const QList<Point*>& p
   {
     switch (points[i]->type)
     {
-    case Marker:
+    case Point::Marker:
       this->treePointChild(markersRoot, ids[i])->setHidden(false);
       break;
-    case Angle:
+    case Point::Angle:
       this->treePointChild(modelOutputAngles, ids[i])->setHidden(false);
       break;
-    case Force:
+    case Point::Force:
       this->treePointChild(modelOutputForces, ids[i])->setHidden(false);
       break;
-    case Moment:
+    case Point::Moment:
       this->treePointChild(modelOutputMoments, ids[i])->setHidden(false);
       break;
-    case Power:
+    case Point::Power:
       this->treePointChild(modelOutputPowers, ids[i])->setHidden(false);
       break;
-    case Scalar:
+    case Point::Scalar:
       this->treePointChild(modelOutputScalars, ids[i])->setHidden(false);
       break;
     }
@@ -1375,10 +1381,10 @@ void ModelDockWidget::editAnalogsGain(int index)
   int inc = 0;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
     ids[inc++] = (*it)->data(0, analogId).toInt();    
-  emit analogsGainChanged(ids, static_cast<AnalogGain>(index));
+  emit analogsGainChanged(ids, static_cast<Analog::Gain>(index));
 };
 
-void ModelDockWidget::setAnalogsGain(const QVector<int>& ids, const QVector<AnalogGain>& gains)
+void ModelDockWidget::setAnalogsGain(const QVector<int>& ids, const QVector<Analog::Gain>& gains)
 {
   Q_UNUSED(ids);
   Q_UNUSED(gains);

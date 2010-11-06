@@ -36,7 +36,16 @@
 #ifndef Acquisition_h
 #define Acquisition_h
 
+#include <btkProcessObject.h>
 #include <btkAcquisition.h>
+#include <btkSeparateKnownVirtualMarkersFilter.h>
+#include <btkForcePlatformsExtractor.h>
+#include <btkGroundReactionWrenchFilter.h>
+#include <btkDownsampleFilter.h>
+#include <btkPointCollection.h>
+#include <btkForcePlatformCollection.h>
+#include <btkWrenchCollection.h>
+#include <btkAcquisitionFileIO.h>
 
 #include <QObject>
 #include <QString>
@@ -44,24 +53,23 @@
 #include <QMap>
 #include <QColor>
 
-typedef enum {Marker, Angle, Force, Moment, Power, Scalar} PointType;
-typedef enum {Unknown = 0, PlusMinus10 = 1, PlusMinus5 = 2, PlusMinus2Dot5 = 3, PlusMinus1Dot25 = 4, PlusMinus1 = 5} AnalogGain;
-
 struct Point
 {
+  typedef enum {Marker, Angle, Force, Moment, Power, Scalar} Type;
   QString label;
   QString description;
   double radius;
   QColor color;
-  PointType type;
+  Type type;
 };
 
 struct Analog
 {
+  typedef enum {Unknown = 0, PlusMinus10 = 1, PlusMinus5 = 2, PlusMinus2Dot5 = 3, PlusMinus1Dot25 = 4, PlusMinus1 = 5} Gain;
   QString label;
   QString description;
   QString unit;
-  AnalogGain gain;
+  Gain gain;
   int offset;
   double scale;
 };
@@ -85,24 +93,30 @@ public:
   Acquisition(QObject* parent = 0);
   ~Acquisition();
   
-  void init(const QString& filename, btk::Acquisition::Pointer acquisition);
+  void load(const QString& filename, QString& message);
+  void save(const QString& filename);
   void clear();
+  
   const QString& fileName() const {return this->m_Filename;};
+  btk::Acquisition::Pointer btkAcquisition() const {return this->mp_BTKAcquisition;};
+  btk::PointCollection::Pointer btkMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(0);};
+  btk::PointCollection::Pointer btkVirtualMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(2);};
+  btk::ForcePlatformCollection::Pointer btkForcePlatforms() const {return static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProcesses[BTK_FORCE_PLATFORMS])->GetOutput();};
+  btk::WrenchCollection::Pointer btkGroundReactionWrenches() const {return static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED])->GetOutput();};
   
   int firstFrame() const {return this->m_FirstFrame;};
   int lastFrame() const {return this->m_LastFrame;};
-  double pointFrequency() const {return this->m_PointFrequency;};
-  
   void regionOfInterest(int& lb, int& rb) const {lb = this->mp_ROI[0]; rb = this->mp_ROI[1];};
   void setRegionOfInterest(int lb, int rb);
   
+  double pointFrequency() const {return this->m_PointFrequency;};
   bool hasPoints() const {return !this->m_Points.empty();};
   const QString& pointLabel(int id) const {return this->m_Points[id]->label;};
   void setPointLabel(int id, const QString& label);
   const QString& pointDescription(int id) const {return this->m_Points[id]->description;};
   void setPointsDescription(const QVector<int>& ids, const QVector<QString>& descs);
-  PointType pointType(int id) const {return this->m_Points[id]->type;};
-  void setPointType(int id, PointType p);
+  Point::Type pointType(int id) const {return this->m_Points[id]->type;};
+  void setPointType(int id, Point::Type p);
   int findMarkers(const QString& name) const;
   double markerRadius(int id) const {return this->m_Points[id]->radius;};
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
@@ -120,8 +134,8 @@ public:
   void setAnalogsDescription(const QVector<int>& ids, const QVector<QString>& descs);
   const QString& analogUnit(int id) const {return this->m_Analogs[id]->unit;};
   void setAnalogsUnit(const QVector<int>& ids, const QVector<QString>& units);
-  AnalogGain analogGain(int id) const {return this->m_Analogs[id]->gain;};
-  void setAnalogsGain(const QVector<int>& ids, const QVector<AnalogGain>& gains);
+  Analog::Gain analogGain(int id) const {return this->m_Analogs[id]->gain;};
+  void setAnalogsGain(const QVector<int>& ids, const QVector<Analog::Gain>& gains);
   int analogOffset(int id) const {return this->m_Analogs[id]->offset;};
   void setAnalogsOffset(const QVector<int>& ids, const QVector<int>& offsets);
   double analogScale(int id) const {return this->m_Analogs[id]->scale;};
@@ -144,10 +158,11 @@ public:
   int generateNewEventId();
   
 signals:
+  void informationsChanged(const QVector<QString>& infos);
   void regionOfInterestChanged(int lb, int rb);
   void pointLabelChanged(int id, const QString& label);
   void pointsDescriptionChanged(const QVector<int>& ids, const QVector<QString>& descs);
-  void pointTypeChanged(int id, PointType p);
+  void pointTypeChanged(int id, Point::Type p);
   void markersRadiusChanged(const QVector<int>& ids, const QVector<double>& radii);
   void markerColorChanged(int id, const QColor& color);
   void markersColorChanged(const QVector<int>& ids, const QVector<QColor>& colors);
@@ -156,7 +171,7 @@ signals:
   void analogLabelChanged(int id, const QString& label);
   void analogsDescriptionChanged(const QVector<int>& ids, const QVector<QString>& descs);
   void analogsUnitChanged(const QVector<int>& ids, const QVector<QString>& units);
-  void analogsGainChanged(const QVector<int>& ids, const QVector<AnalogGain>& gains);
+  void analogsGainChanged(const QVector<int>& ids, const QVector<Analog::Gain>& gains);
   void analogsOffsetChanged(const QVector<int>& ids, const QVector<int>& offsets);
   void analogsScaleChanged(const QVector<int>& ids, const QVector<double>& scales);
   void analogsRemoved(const QList<int>& ids, const QList<Analog*>& analogs);
@@ -165,8 +180,13 @@ signals:
   void eventsInserted(const QList<int>& ids, const QList<Event*>& events);
   
 private:
+  void emitGeneratedInformations(btk::AcquisitionFileIO::Pointer io);
+  
+  enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
+  
+  btk::Acquisition::Pointer mp_BTKAcquisition;
+  QMap<int, btk::ProcessObject::Pointer> m_BTKProcesses;
   QString m_Filename;
-  btk::Acquisition::Pointer mp_Acquisition;
   int m_FirstFrame;
   int m_LastFrame;
   int mp_ROI[2];

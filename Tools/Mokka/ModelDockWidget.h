@@ -131,7 +131,7 @@ public Q_SLOTS:
   void editAnalogsUnit();
   void setAnalogsUnit(const QVector<int>& ids, const QVector<QString>& units);
   void editAnalogsGain(int index);
-  void setAnalogsGain(const QVector<int>& ids, const QVector<AnalogGain>& gains);
+  void setAnalogsGain(const QVector<int>& ids, const QVector<Analog::Gain>& gains);
   void editAnalogsOffset();
   void setAnalogsOffset(const QVector<int>& ids, const QVector<int>& offsets);
   void editAnalogsScale();
@@ -155,7 +155,7 @@ signals:
   void pointsRemoved(const QList<int>& ids);
   void analogLabelChanged(int id, const QString& label);
   void analogsUnitChanged(const QVector<int>& ids, const QString& unit);
-  void analogsGainChanged(const QVector<int>& ids, const AnalogGain gain);
+  void analogsGainChanged(const QVector<int>& ids, const Analog::Gain gain);
   void analogsOffsetChanged(const QVector<int>& ids, int offset);
   void analogsScaleChanged(const QVector<int>& ids, double scale);
   void analogsDescriptionChanged(const QVector<int>& ids, const QString& desc);

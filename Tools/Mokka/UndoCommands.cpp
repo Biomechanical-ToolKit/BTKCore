@@ -214,7 +214,7 @@ void EditAnalogsUnit::action()
 };
 
 // --------------- EditAnalogsGain ---------------
-EditAnalogsGain::EditAnalogsGain(Acquisition* acq, const QVector<int>& ids, AnalogGain gain, QUndoCommand* parent)
+EditAnalogsGain::EditAnalogsGain(Acquisition* acq, const QVector<int>& ids, Analog::Gain gain, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Ids(ids), m_Gains(ids.count())
 {
   this->mp_Acquisition = acq;
@@ -224,7 +224,7 @@ EditAnalogsGain::EditAnalogsGain(Acquisition* acq, const QVector<int>& ids, Anal
 
 void EditAnalogsGain::action()
 {
-  QVector<AnalogGain> temp(this->m_Ids.count());
+  QVector<Analog::Gain> temp(this->m_Ids.count());
   for (int i = 0 ; i < this->m_Ids.count() ; ++i)
     temp[i] = this->mp_Acquisition->analogGain(this->m_Ids[i]);
   this->mp_Acquisition->setAnalogsGain(this->m_Ids, this->m_Gains);
