@@ -43,6 +43,7 @@
 #include <QBrush>
 #include <QPen>
 #include <QRubberBand>
+#include <QFont>
 
 class TimeEventControlerWidget;
 
@@ -76,6 +77,8 @@ protected:
   void resizeEvent(QResizeEvent* event);
   
 private:
+  void updateEventPos(int idx);
+
   friend class TimeEventControlerWidget;
   
   struct EventItem
@@ -119,6 +122,9 @@ private:
   QVector<int> m_Ticks;
   QVector<QString> m_TicksLabel;
   QFontMetrics m_Fm;
+  QFont m_EventFont;
+  qreal m_EventSymbolSize;
+  qreal m_YEventPosRelative;
   QPoint mp_PointsSlider[4]; // 0: shape ; 1-3: shadow
   QPoint mp_PointsBoundLeft[10]; // 0-6: shape ; 7-10: shadow
   QPoint mp_PointsBoundRight[12]; // 0-6: shape ; 7-12: shadow
@@ -132,6 +138,13 @@ private:
   QList<int> m_SelectedEvents;
   QRubberBand* mp_Rubber;
   QPoint m_RubberOrigin;
+};
+
+inline void TimeEventBarWidget::updateEventPos(int idx)
+{
+  qreal xPos = this->m_LeftMargin + ((this->m_EventItems[idx].frame - this->m_ROIFirstFrame)*this->m_UnitStep) - this->m_EventSymbolSize / 2.0;// + 0.5;
+  qreal yPos = this->m_EventItems[idx].contextId * 7.0 * (this->height() - this->m_TopMargin - this->m_BottomMargin) / 22.0 + this->m_YEventPosRelative;
+  this->m_EventItems[idx].boundingRect.setRect(xPos, yPos, this->m_EventSymbolSize, this->m_YEventPosRelative);
 };
 
 #endif // TimeEventBarWidget_h
