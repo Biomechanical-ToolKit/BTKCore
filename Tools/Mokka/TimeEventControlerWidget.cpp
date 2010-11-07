@@ -178,6 +178,14 @@ void TimeEventControlerWidget::load(Acquisition* acq)
   this->actionCropRegionOfInterest->setEnabled(false);
 };
 
+void TimeEventControlerWidget::reset()
+{
+  this->mp_Timer->stop();
+  this->playButton->setIcon(*this->mp_PlayIcon);
+  this->timeEventBar->reset();
+  this->lcdNumber->display(0);
+};
+
 void TimeEventControlerWidget::togglePlayback()
 {
   if (this->mp_Timer->isActive())

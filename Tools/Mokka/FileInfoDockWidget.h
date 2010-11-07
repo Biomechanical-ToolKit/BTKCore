@@ -50,7 +50,7 @@ public:
 
 public slots:
   void fill(const QVector<QString>& infos);
-  void clear();
+  void reset();
 };
 
 #endif // FileInfoDockWidget_h

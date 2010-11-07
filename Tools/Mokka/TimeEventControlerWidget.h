@@ -52,6 +52,7 @@ public:
   ~TimeEventControlerWidget();
   
   void load(Acquisition* acq);
+  void reset();
   QMenu* playbackSpeedMenu() {return this->mp_PlaybackSpeedMenu;};
   
 public slots:

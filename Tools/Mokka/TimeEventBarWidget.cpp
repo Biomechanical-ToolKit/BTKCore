@@ -115,6 +115,21 @@ void TimeEventBarWidget::load(Acquisition* acq)
   this->update();
 };
 
+void TimeEventBarWidget::reset()
+{
+  this->m_SelectedEvents.clear();
+  this->m_EventItems.clear();
+  this->m_FirstFrame = 0;
+  this->m_LastFrame = 0;
+  this->m_ROIFirstFrame = this->m_FirstFrame;
+  this->m_ROILastFrame = this->m_LastFrame;
+  this->m_SliderPos = this->m_FirstFrame;
+  this->m_LeftBoundPos = this->m_FirstFrame;
+  this->m_RightBoundPos = this->m_LastFrame;
+  this->updateInternals();
+  this->update();
+};
+
 void TimeEventBarWidget::removeEvent(int id)
 {
   for (int i = 0 ; i < this->m_SelectedEvents.count(); ++i)

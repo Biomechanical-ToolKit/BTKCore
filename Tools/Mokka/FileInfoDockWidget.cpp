@@ -65,7 +65,7 @@ void FileInfoDockWidget::fill(const QVector<QString>& infos)
   this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 };
 
-void FileInfoDockWidget::clear()
+void FileInfoDockWidget::reset()
 {
   this->layout()->setSizeConstraint(QLayout::SetDefaultConstraint);
   this->fileNameValue->setText("                            ");

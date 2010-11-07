@@ -689,7 +689,10 @@ void ModelDockWidget::selectMarkers(QList<int> ids)
   {
     QTreeWidgetItem* item = markersRoot->child(i);
     if (ids.contains(item->data(0,pointId).toInt()))
+    {
       item->setSelected(true);
+      this->modelTree->scrollToItem(item);
+    }
   }
   this->modelTree->blockSignals(false);
   this->displayProperties();
@@ -1030,7 +1033,7 @@ void ModelDockWidget::sendHiddenMarkers()
   for (int i = 0 ; i < markersRoot->childCount() ; ++i)
   {
     QTreeWidgetItem* item = markersRoot->child(i);
-    if (item->checkState(VisibleHeader) == Qt::Unchecked)
+    if ((item->checkState(VisibleHeader) == Qt::Unchecked) || item->isHidden())
       ids << item->data(0,pointId).toInt();
   }
   emit markerHiddenSelectionChanged(ids);
@@ -1281,6 +1284,7 @@ void ModelDockWidget::removePoints(const QList<int>& ids, const QList<Point*>& p
       break;
     }
   }
+  this->sendHiddenMarkers();
   this->refresh();
 };
 
@@ -1319,6 +1323,7 @@ void ModelDockWidget::insertPoints(const QList<int>& ids, const QList<Point*>& p
       break;
     }
   }
+  this->sendHiddenMarkers();
   this->refresh();
 };
 

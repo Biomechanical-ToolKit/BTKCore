@@ -57,7 +57,7 @@
 #include <QTemporaryFile>
 #include <QDesktopWidget>
 
-// #define MOKKA_NEW_UI
+//#define MOKKA_NEW_UI
 
 MainWindow::MainWindow(QWidget* parent)
 :QMainWindow(parent), mp_Acquisition(), m_LastDirectory(".")
@@ -122,7 +122,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->showMarkersButton->setFont(f);
   this->hideMarkersButton->setFont(f);
 #endif
-  this->mp_FileInfoDock->clear(); // Force to update geometry
+  this->mp_FileInfoDock->reset(); // Force to update geometry
   this->markersDock->setVisible(false);
   this->modelConfigurationComboBox->insertSeparator(99);
   this->modelConfigurationComboBox->insertItem(99,"New ...");
@@ -505,6 +505,8 @@ void MainWindow::setAcquisitionModified(int modified)
   {
     this->actionSave->setEnabled(true);
     this->setWindowModified(true);
+    this->mp_MetadataDlg->warningIconLabel->setVisible(true);
+    this->mp_MetadataDlg->warningMsgLabel->setVisible(true);
   }
 };
 
@@ -1023,8 +1025,11 @@ void MainWindow::clearUI()
   this->actionSave->setEnabled(false); 
   this->actionSave_As->setEnabled(false);
   this->setCurrentFile("");
+  // Time & Event Controler
+  this->timeEventControler->reset();
+  this->timeEventControler->setEnabled(false);
   // Informations Dock
-  this->mp_FileInfoDock->clear();
+  this->mp_FileInfoDock->reset();
   this->fileNameValue->setText("");
   this->documentTypeValue->setText("");
   this->fileSizeValue->setText("");
@@ -1038,6 +1043,9 @@ void MainWindow::clearUI()
   this->analogNumberValue->setText("");
   this->analogFrequencyValue->setText("");
   this->eventNumberValue->setText("");
+  // Model dock
+  this->mp_ModelDock->reset();
+  this->mp_ModelDock->setVisible(false);
   // Markers dock
   this->m_SelectedMarkerConfiguration = -1;
   this->modelConfigurationComboBox->setCurrentIndex(-1);
