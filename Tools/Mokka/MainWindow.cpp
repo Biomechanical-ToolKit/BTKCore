@@ -64,13 +64,14 @@ MainWindow::MainWindow(QWidget* parent)
 {
   // Members
   this->mp_AcquisitionQ = new Acquisition(this);
-  this->m_SelectedMarkerConfiguration = -1;
-  this->mp_Timer = new QTimer(this);
   this->mp_MetadataDlg = new Metadata(this);
   this->mp_PointsEditorDlg = new PointsEditor(this);
   this->mp_ModelDock = new ModelDockWidget(this);
   this->mp_ModelDock->setAcquisition(this->mp_AcquisitionQ);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
+  
+  this->m_SelectedMarkerConfiguration = -1;
+  this->mp_Timer = new QTimer(this);
   this->m_PlaybackStep = 1;
   this->m_PlaybackDelay = 33; // 33 msec
   this->mp_PlayIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_play.png"));
@@ -109,10 +110,9 @@ MainWindow::MainWindow(QWidget* parent)
 #endif
   
 #ifdef Q_OS_MAC
-  QFont f = informationsDock->font();
+  QFont f = this->font();
   f.setPointSize(10);
   this->mp_FileInfoDock->setFont(f);
-  this->informationsDock->setFont(f);
   this->markersDock->setFont(f);
   this->markerPropertiesButton->setFont(f);
   this->eventsDock->setFont(f);
@@ -131,8 +131,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->eventsDock->setVisible(false);
   this->eventInformations->setVisible(false);
   this->eventInformationsButton->setIcon(*this->mp_RightArrow);
-  this->informationsDock->setVisible(false);
-  this->informationsDock->setFloating(true); // To not show a blinking rectangle at the startup
   this->action_FileOpen->setShortcut(QKeySequence::Open);
   this->actionClose->setShortcut(QKeySequence::Close);
   this->actionSave->setShortcut(QKeySequence::Save);
@@ -176,7 +174,7 @@ MainWindow::MainWindow(QWidget* parent)
 #else
   QAction* actionMarkersDockView = this->markersDock->toggleViewAction();
   QAction* actionEventsDockView = this->eventsDock->toggleViewAction();
-  QAction* actionInformationsDockView = this->informationsDock->toggleViewAction();
+  QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
   actionMarkersDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
   actionEventsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
   actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
@@ -667,7 +665,6 @@ void MainWindow::openFile(const QString& filename)
   this->clearUI();
 
   QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file reading", QMessageBox::Ok , this);
-#ifdef MOKKA_NEW_UI
   QString errMsg;
   this->mp_AcquisitionQ->load(filename, errMsg);
   if (!errMsg.isEmpty())
@@ -678,44 +675,10 @@ void MainWindow::openFile(const QString& filename)
     return;
   }
   this->mp_Acquisition = this->mp_AcquisitionQ->btkAcquisition();
-#else
-  btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-  reader->SetFilename(filename.toStdString());
-  try
-  {
-    reader->Update();
-  }
-  catch (btk::Exception& e)
-  {
-    QApplication::restoreOverrideCursor();
-    reader->ResetState();
-    error.setInformativeText(e.what());
-    error.exec();
-    return;
-  }
-  catch (std::exception& e)
-  {
-    QApplication::restoreOverrideCursor();
-    reader->ResetState();
-    error.setInformativeText("Unexpected error: " + QString(e.what()));
-    error.exec();
-    return;
-  }
-  catch (...)
-  {
-    QApplication::restoreOverrideCursor();
-    reader->ResetState();
-    error.setInformativeText("Unknown error.");
-    error.exec();
-    return;
-  }
-  this->mp_Acquisition = reader->GetOutput();
-  this->fillFileInformations(filename, reader->GetAcquisitionIO(), this->mp_Acquisition);
-#endif
+  
   pw.setProgressValue(25);
   
   this->setCurrentFile(filename);
-  
   this->changePlaybackParameters();
   
   // UI settings
@@ -1004,7 +967,7 @@ void MainWindow::saveFile(const QString& filename)
   }
   this->mp_AcquisitionUndoStack->setClean();
   this->setCurrentFile(filename);
-  this->fillFileInformations(filename, writer->GetAcquisitionIO(), target);
+  //this->fillFileInformations(filename, writer->GetAcquisitionIO(), target);
   QApplication::restoreOverrideCursor();
   this->setWindowModified(false);
 };
@@ -1030,19 +993,6 @@ void MainWindow::clearUI()
   this->timeEventControler->setEnabled(false);
   // Informations Dock
   this->mp_FileInfoDock->reset();
-  this->fileNameValue->setText("");
-  this->documentTypeValue->setText("");
-  this->fileSizeValue->setText("");
-  this->creationDateValue->setText("");
-  this->modificationDateValue->setText("");
-  this->fileFormatValue->setText("");
-  this->byteOrderValue->setText("");
-  this->storageFormatValue->setText("");
-  this->pointNumberValue->setText("");
-  this->pointFrequencyValue->setText("");
-  this->analogNumberValue->setText("");
-  this->analogFrequencyValue->setText("");
-  this->eventNumberValue->setText("");
   // Model dock
   this->mp_ModelDock->reset();
   this->mp_ModelDock->setVisible(false);
@@ -1079,77 +1029,6 @@ void MainWindow::clearUI()
   this->frameSlider->blockSignals(false);
   // Multivew
   this->multiView->clear();
-};
-
-void MainWindow::fillFileInformations(const QString& filename, btk::AcquisitionFileIO::Pointer io, btk::Acquisition::Pointer acq)
-{
-  // Informations Dock
-  QFileInfo fI = QFileInfo(filename);
-  this->fileNameValue->setText(fI.fileName());
-  this->documentTypeValue->setText(fI.suffix().toUpper() + QString(" Document"));
-  double sizeDouble = static_cast<double>(fI.size());
-  QString sizeText;
-  if (sizeDouble <= 1024.0)
-    sizeText = QString::number(sizeDouble) + " bytes";
-  else
-  {
-    sizeDouble /= 1024.0;
-    if (sizeDouble <= 1024.0)
-      sizeText = QString::number(sizeDouble) + " KB";
-    else
-    {
-      sizeDouble /= 1024.0;
-      sizeText = QString::number(sizeDouble) + " MB";
-    }
-  }
-  this->fileSizeValue->setText(sizeText);
-  this->creationDateValue->setText(fI.created().toString());
-  this->modificationDateValue->setText(fI.lastModified().toString());
-  switch(io->GetFileType())
-  {
-    case btk::AcquisitionFileIO::TypeNotApplicable:
-      this->fileFormatValue->setText("N/A");
-      break;
-    case btk::AcquisitionFileIO::ASCII:
-      this->fileFormatValue->setText("ASCII");
-      break;
-    case btk::AcquisitionFileIO::Binary:
-      this->fileFormatValue->setText("Binary");
-      break;
-  }
-  switch(io->GetByteOrder())
-  {
-    case btk::AcquisitionFileIO::OrderNotApplicable:
-      this->byteOrderValue->setText("N/A");
-      break;
-    case btk::AcquisitionFileIO::IEEE_LittleEndian:
-      this->byteOrderValue->setText("IEEE Little Endian");
-      break;
-    case btk::AcquisitionFileIO::VAX_LittleEndian:
-      this->byteOrderValue->setText("VAX Little Endian");
-      break;
-    case btk::AcquisitionFileIO::IEEE_BigEndian:
-      this->byteOrderValue->setText("IEEE Big Endian");
-      break;
-  }
-  switch(io->GetStorageFormat())
-  {
-    case btk::AcquisitionFileIO::StorageNotApplicable:
-      this->storageFormatValue->setText("N/A");
-      break;
-    case btk::AcquisitionFileIO::Float:
-      this->storageFormatValue->setText("Float");
-      break;
-    case btk::AcquisitionFileIO::Integer:
-      this->storageFormatValue->setText("Integer");
-      break;
-  }
-  this->pointNumberValue->setText(QString::number(acq->GetPointNumber()));
-  this->pointFrequencyValue->setText(QString::number(acq->GetPointFrequency()) + " Hz");
-  this->analogNumberValue->setText(QString::number(acq->GetAnalogNumber()));
-  this->analogFrequencyValue->setText(QString::number(acq->GetAnalogFrequency()) + " Hz");
-  this->eventNumberValue->setText(QString::number(acq->GetEventNumber()));
-  this->informationsDock->updateGeometry();
 };
 
 void MainWindow::changePlaybackParameters()
