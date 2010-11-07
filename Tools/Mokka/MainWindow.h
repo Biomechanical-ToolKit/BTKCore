@@ -59,8 +59,8 @@ public:
   MainWindow(QWidget* parent = 0);
   ~MainWindow();
 
-  void openFile(const QString& filename);
   void play();
+  void openFile(const QString& filename);
 
   PointsEditor* mp_PointsEditorDlg;
 
@@ -75,7 +75,7 @@ public Q_SLOTS:
   void visitBTKWebsite();
   void setAcquisitionModified(int modified);
   void setMarkerConfigurationModified(int modified);
-  void editMetadata();
+  void viewMetadata();
   void editPoints();
   void openRecentFile();
   void clearRecentFiles();
@@ -84,8 +84,6 @@ public Q_SLOTS:
   void saveFile();
   void saveAsFile();
   void closeFile();
-  void changePlaybackParameters();
-  void changeGroundOrientation();
   void deselectCurrentVisualConfiguration();
   void clearVisualConfigurationList();
   // Markers dock
@@ -147,10 +145,6 @@ public Q_SLOTS:
   void setRegionOfInterest(int lf,int ff);
   void removeEvents(const QList<int>& ids);
   void insertEvent(Event* e);
-  // Playback
-  void toggleTimer();
-  void displayPreviousFrame();
-  void displayNextFrame();
   // Others
   void updateSelectedMarkersRadius(double r);
   
@@ -163,8 +157,6 @@ private:
   void updateRecentFileActions();
   void setCurrentFile(const QString& rFilename);
   bool isOkToContinue();
-  void displayPreviousFrame(int step);
-  void displayNextFrame(int step);
   bool isOkToContinue2();
   bool saveMarkerConfiguration(int index);
   bool loadMarkerConfiguration(const QString& filename, QString* name);
@@ -174,14 +166,11 @@ private:
   Metadata* mp_MetadataDlg;
   FileInfoDockWidget* mp_FileInfoDock;
   ModelDockWidget* mp_ModelDock;
-  int m_PlaybackStep;
-  int m_PlaybackDelay;
 
   int m_SelectedMarkerConfiguration;
   QActionGroup* mp_PlaybackSpeedActionGroup;
   QActionGroup* mp_GroundOrientationActionGroup;
   QString m_LastDirectory;
-  QTimer* mp_Timer;
   enum { maxRecentFiles = 10 };
   QStringList m_RecentFiles;
   QAction* mp_ActionRecentFiles[maxRecentFiles];
@@ -189,8 +178,6 @@ private:
   QUndoStack* mp_UndoStack;
   QUndoStack* mp_AcquisitionUndoStack;
   QUndoStack* mp_MarkerConfigurationUndoStack;
-  QIcon* mp_PlayIcon;
-  QIcon* mp_PauseIcon;
   QIcon* mp_DownArrow;
   QIcon* mp_RightArrow;
 };

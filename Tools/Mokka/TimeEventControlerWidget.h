@@ -54,10 +54,14 @@ public:
   void load(Acquisition* acq);
   void reset();
   QMenu* playbackSpeedMenu() {return this->mp_PlaybackSpeedMenu;};
+  int currentFrame() {return this->timeEventBar->m_SliderPos;};
   
 public slots:
   void togglePlayback();
+  void setCurrentFrame(int frame);
+  void nextStep();
   void nextFrame();
+  void previousFrame();
   void cropRegionOfInterest();
   void setRegionOfInterest(int lb, int rb);
   void previousEvent();

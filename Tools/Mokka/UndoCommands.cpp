@@ -629,7 +629,7 @@ void NewEvent::redo()
   this->mp_Main->eventsTable->blockSignals(false);
   this->mp_Main->eventsTable->selectRow(this->mp_Item->row());
   
-  this->mp_Main->updateActiveEvent(this->mp_Main->frameSlider->value());
+  this->mp_Main->updateActiveEvent(this->mp_Main->timeEventControler->currentFrame());
   this->mp_Main->focusOnEventEdition(2);
 };
 
@@ -678,5 +678,5 @@ void DeleteEvent::action()
         this->mp_Main->eventsTable->clearSelection();
     }
   }
-  this->mp_Main->updateActiveEvent(this->mp_Main->frameSlider->value());
+  this->mp_Main->updateActiveEvent(this->mp_Main->timeEventControler->currentFrame());
 };

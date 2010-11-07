@@ -71,11 +71,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
   
   this->m_SelectedMarkerConfiguration = -1;
-  this->mp_Timer = new QTimer(this);
-  this->m_PlaybackStep = 1;
-  this->m_PlaybackDelay = 33; // 33 msec
-  this->mp_PlayIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_play.png"));
-  this->mp_PauseIcon = new QIcon(QString::fromUtf8(":/Resources/Images/player_pause.png"));
   this->mp_DownArrow = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallDownBlack.png"));
   this->mp_RightArrow = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallRightBlack.png"));
   
@@ -87,27 +82,30 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock->setVisible(false);
   this->setupUi(this);
 #ifdef MOKKA_NEW_UI
-  this->menuOptions->removeAction(this->actionEdit_Points);
-  this->menuOptions->removeAction(this->actionEdit_Contexts_Events);
-  this->menuOptions->removeAction(this->menuPlayback_Speed->menuAction());
-  this->menuSettings->removeAction(this->menuGround->menuAction());
-  this->menuOptions->removeAction(this->actionEdit_Metadata);
-  this->menuSettings->addMenu(this->multiView->groundOrientationMenu());
-  this->menuSettings->addMenu(this->timeEventControler->playbackSpeedMenu());
-  this->menuBar()->removeAction(this->menuOptions->menuAction());
   this->menuVisual_Configuration->removeAction(this->actionDeselectCurrentConfiguration);
   this->menuVisual_Configuration->removeAction(this->actionClearConfigurationList);
   this->menuVisual_Configuration->addAction(this->mp_ModelDock->deselectConfigurationAction());
   this->menuVisual_Configuration->addAction(this->mp_ModelDock->clearConfigurationsAction());
-  
-  this->centralWidget()->layout()->removeWidget(this->frame);
-  this->frameSlider->setVisible(false);
-  this->playButton->setVisible(false);
-  this->lcdNumber->setVisible(false);
+  QAction* actionModelDockView = this->mp_ModelDock->toggleViewAction();
+  actionModelDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+  this->menuView->addAction(actionModelDockView);
 #else
-  this->centralWidget()->layout()->removeWidget(this->timeEventControler);
-  this->timeEventControler->setVisible(false);
+  QAction* actionMarkersDockView = this->markersDock->toggleViewAction();
+  QAction* actionEventsDockView = this->eventsDock->toggleViewAction();
+  actionMarkersDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+  actionEventsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+  actionMarkersDockView->setText(QObject::tr("Markers List"));
+  actionEventsDockView->setText(QObject::tr("Events List"));
+  this->menuView->addAction(actionMarkersDockView);
+  this->menuView->addAction(actionEventsDockView);
 #endif
+  this->menuSettings->addMenu(this->multiView->groundOrientationMenu());
+  this->menuSettings->addMenu(this->timeEventControler->playbackSpeedMenu());
+  QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
+  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
+  this->menuView->addAction(actionInformationsDockView);
+  this->menuView->addAction(this->actionViewMetadata);
+  this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
   
 #ifdef Q_OS_MAC
   QFont f = this->font();
@@ -139,16 +137,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->actionCopy->setShortcut(QKeySequence::Copy);
   this->actionPaste->setShortcut(QKeySequence::Paste);
   this->actionSelect_All->setShortcut(QKeySequence::SelectAll);
-  this->mp_PlaybackSpeedActionGroup = new QActionGroup(this);
-  this->mp_PlaybackSpeedActionGroup->addAction(actionRealtime);
-  this->mp_PlaybackSpeedActionGroup->addAction(action1_2);
-  this->mp_PlaybackSpeedActionGroup->addAction(action1_5);
-  this->mp_PlaybackSpeedActionGroup->addAction(action1_10);
-  this->mp_PlaybackSpeedActionGroup->addAction(actionFull_Frames);
-  this->mp_GroundOrientationActionGroup = new QActionGroup(this);
-  this->mp_GroundOrientationActionGroup->addAction(actionPlane_XY);
-  this->mp_GroundOrientationActionGroup->addAction(actionPlane_YZ);
-  this->mp_GroundOrientationActionGroup->addAction(actionPlane_ZX);
   this->markerRadiusSpinBox->clear();
   this->eventTimeSpinBox->clear();
   for (int i = 0 ; i < maxRecentFiles ; ++i)
@@ -161,29 +149,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ActionSeparatorRecentFiles = this->menuOpen_Recent->addSeparator();
   this->menuOpen_Recent->addAction(this->actionClear_Menu);
   connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
-#ifdef MOKKA_NEW_UI
-  QAction* actionModelDockView = this->mp_ModelDock->toggleViewAction();
-  actionModelDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
-  this->menuView->addAction(actionModelDockView);
-  QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
-  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
-  this->menuView->addAction(actionInformationsDockView);
-  this->actionEdit_Metadata->setText(tr("Metadata"));
-  this->menuView->addAction(this->actionEdit_Metadata);
-  this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
-#else
-  QAction* actionMarkersDockView = this->markersDock->toggleViewAction();
-  QAction* actionEventsDockView = this->eventsDock->toggleViewAction();
-  QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
-  actionMarkersDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
-  actionEventsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
-  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
-  actionMarkersDockView->setText(QObject::tr("Markers List"));
-  actionEventsDockView->setText(QObject::tr("Events List"));
-  this->menuView->addAction(actionMarkersDockView);
-  this->menuView->addAction(actionEventsDockView);
-  this->menuView->addAction(actionInformationsDockView);
-#endif
   
   // Viz3D
   this->multiView->initialize();
@@ -208,22 +173,15 @@ MainWindow::MainWindow(QWidget* parent)
   // Menu
   connect(this->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
   connect(this->actionVisit_BTK_website, SIGNAL(triggered()), this, SLOT(visitBTKWebsite()));
-  connect(this->actionEdit_Metadata, SIGNAL(triggered()), this, SLOT(editMetadata()));
+  connect(this->actionViewMetadata, SIGNAL(triggered()), this, SLOT(viewMetadata()));
   connect(this->actionEdit_Points, SIGNAL(triggered()), this, SLOT(editPoints()));
   connect(this->action_FileOpen, SIGNAL(triggered()), this, SLOT(openFile()));
   connect(this->actionSave, SIGNAL(triggered()), this, SLOT(saveFile()));
   connect(this->actionSave_As, SIGNAL(triggered()), this, SLOT(saveAsFile()));
   connect(this->actionClose, SIGNAL(triggered()), this, SLOT(closeFile()));
   connect(this->action_Quit, SIGNAL(triggered()), this, SLOT(close()));
-  connect(this->mp_PlaybackSpeedActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changePlaybackParameters()));
-  connect(this->mp_GroundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
   connect(this->actionDeselectCurrentConfiguration, SIGNAL(triggered()), this, SLOT(deselectCurrentVisualConfiguration()));
   connect(this->actionClearConfigurationList, SIGNAL(triggered()), this, SLOT(clearVisualConfigurationList()));
-  // Playback
-  connect(this->frameSlider, SIGNAL(valueChanged(int)), this, SLOT(updateActiveEvent(int)));
-  connect(this->frameSlider, SIGNAL(valueChanged(int)), this->multiView, SLOT(updateDisplay(int)));
-  connect(this->playButton, SIGNAL(clicked()), this, SLOT(toggleTimer()));
-  connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(displayNextFrame()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this, SLOT(updateDisplayedMarkersList(QVector<int>)));
@@ -316,7 +274,6 @@ MainWindow::MainWindow(QWidget* parent)
 
   // Event filter
   this->multiView->installEventFilter(this);
-  this->frameSlider->installEventFilter(this);
   this->markersTable->installEventFilter(this);
   this->eventsTable->installEventFilter(this);
   this->markerRadiusSpinBox->installEventFilter(this);
@@ -326,6 +283,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->eventContextCombo->installEventFilter(this);
   this->eventTimeSpinBox->installEventFilter(this);
   this->eventSubjectEdit->installEventFilter(this);
+  this->timeEventControler->installEventFilter(this);
   this->mp_ModelDock->markerLabelEdit->installEventFilter(this);
   this->mp_ModelDock->markerRadiusSpinBox->installEventFilter(this);
   this->mp_ModelDock->markerDescEdit->installEventFilter(this);
@@ -348,8 +306,6 @@ MainWindow::MainWindow(QWidget* parent)
 MainWindow::~MainWindow()
 {
   delete this->mp_AcquisitionQ;
-  delete this->mp_PlayIcon;
-  delete this->mp_PauseIcon;
   delete this->mp_DownArrow;
   delete this->mp_RightArrow;
 };
@@ -403,7 +359,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
     }
     return false;
   }
-  else if ((event->type() == QEvent::KeyPress) && this->frameSlider->isEnabled())
+  else if ((event->type() == QEvent::KeyPress) && this->timeEventControler->isEnabled())
   {
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
     // special case for spinbox widget: 'markerRadiusSpinBox' & 'eventTimeSpinBox'
@@ -439,17 +395,17 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
     // general case
     else if (keyEvent->matches(QKeySequence::MoveToPreviousChar))
     {
-      this->displayPreviousFrame(1);
+      this->timeEventControler->previousFrame();
       return true;
     }
     else if (keyEvent->matches(QKeySequence::MoveToNextChar))
     {
-      this->displayNextFrame(1);
+      this->timeEventControler->nextFrame();
       return true;
     }
     else if (keyEvent->key() == Qt::Key_Space)
     {
-      this->toggleTimer();
+      this->timeEventControler->togglePlayback();
       return true;
     }
     else if (keyEvent->key() == Qt::Key_Escape)
@@ -508,7 +464,7 @@ void MainWindow::setAcquisitionModified(int modified)
   }
 };
 
-void MainWindow::editMetadata()
+void MainWindow::viewMetadata()
 {
   this->mp_MetadataDlg->exec();
 };
@@ -625,6 +581,12 @@ bool MainWindow::isOkToContinue()
   return true; 
 };
 
+void MainWindow::play()
+{
+  if (this->mp_Acquisition)
+    this->timeEventControler->togglePlayback();
+};
+
 void MainWindow::openFile()
 {
   /*
@@ -679,7 +641,6 @@ void MainWindow::openFile(const QString& filename)
   pw.setProgressValue(25);
   
   this->setCurrentFile(filename);
-  this->changePlaybackParameters();
   
   // UI settings
   // Update the 3D view
@@ -688,9 +649,8 @@ void MainWindow::openFile(const QString& filename)
   
 #ifdef MOKKA_NEW_UI
   this->mp_ModelDock->load(separator->GetOutput(0), separator->GetOutput(2), separator->GetOutput(3), this->mp_Acquisition->GetAnalogs());
-  this->timeEventControler->load(this->mp_AcquisitionQ);
 #endif
-  
+  this->timeEventControler->load(this->mp_AcquisitionQ);
   pw.setProgressValue(70);
   
   // Markers
@@ -819,11 +779,6 @@ void MainWindow::openFile(const QString& filename)
   eventLabelCompleter->setCaseSensitivity(Qt::CaseInsensitive);
   eventLabelCompleter->setCompletionMode(QCompleter::InlineCompletion);
   this->eventLabelEdit->setCompleter(eventLabelCompleter);
-  // Frames
-  this->frameSlider->setMinimum(this->mp_Acquisition->GetFirstFrame());
-  this->frameSlider->setMaximum(this->mp_Acquisition->GetLastFrame());
-  this->frameSlider->setEnabled(true);
-  this->playButton->setEnabled(true);
   
   pw.setProgressValue(90);
   
@@ -838,18 +793,15 @@ void MainWindow::openFile(const QString& filename)
 #else
   if (this->mp_AcquisitionQ->hasPoints() || this->mp_AcquisitionQ->hasAnalogs())
     this->mp_ModelDock->setVisible(true);
-  this->timeEventControler->setEnabled(true);
 #endif
+  this->timeEventControler->setEnabled(true);
 
   pw.setProgressValue(100);
 
   QApplication::restoreOverrideCursor();
   
-  this->frameSlider->setValue(this->frameSlider->minimum());
-  this->multiView->updateDisplay(this->frameSlider->minimum());
-  
   this->actionClose->setEnabled(true);
-  this->actionEdit_Metadata->setEnabled(true);
+  this->actionViewMetadata->setEnabled(true);
   this->actionEdit_Points->setEnabled(true);
   //this->actionSave->setEnabled(true); 
   this->actionSave_As->setEnabled(true);
@@ -983,7 +935,7 @@ void MainWindow::clearUI()
   this->mp_AcquisitionUndoStack->clear();
   this->mp_MarkerConfigurationUndoStack->clear();
   this->actionClose->setEnabled(false);
-  this->actionEdit_Metadata->setEnabled(false);
+  this->actionViewMetadata->setEnabled(false);
   this->actionEdit_Points->setEnabled(false);
   this->actionSave->setEnabled(false); 
   this->actionSave_As->setEnabled(false);
@@ -1017,81 +969,8 @@ void MainWindow::clearUI()
   this->eventsDock->setVisible(false);
   // Metadata
   this->mp_MetadataDlg->reset();
-  // Playback
-  this->frameSlider->setEnabled(false);
-  this->playButton->setEnabled(false);
-  this->showMarkersButton->setEnabled(false);
-  this->hideMarkersButton->setEnabled(false);
-  this->frameSlider->blockSignals(true);
-  this->frameSlider->setMinimum(0);
-  this->frameSlider->setValue(this->frameSlider->minimum());
-  this->lcdNumber->display(this->frameSlider->minimum());
-  this->frameSlider->blockSignals(false);
   // Multivew
   this->multiView->clear();
-};
-
-void MainWindow::changePlaybackParameters()
-{
-  double pointFrequency = this->mp_Acquisition->GetPointFrequency();
-  
-  // Compute playback step and delay
-  if ((pointFrequency == 0.0) || (actionFull_Frames->isChecked()))
-  {
-    this->m_PlaybackDelay = 40; // 25 Hz
-    this->m_PlaybackStep = 1;
-  }
-  else
-  {
-    double divider = 1.0;
-    if (actionRealtime->isChecked())
-      divider = 1.0;
-    else if (action1_2->isChecked())
-      divider = 0.5;
-    else if (action1_5->isChecked())
-      divider = 0.2;
-    else if (action1_10->isChecked())
-      divider = 0.1;
-
-    double freq = pointFrequency * divider;
-    int finalFreq = 1;
-    if (freq >= 24.0)
-    {
-      double r = 1.0;
-      for (int i = 24 ; i <= 30 ; ++i)
-      {
-        double residual = freq / static_cast<double>(i) - static_cast<double>(static_cast<int>(freq) / i);
-        if (residual < r)
-        {
-          finalFreq = i;
-          r = residual;
-        }
-      }
-      this->m_PlaybackDelay = 1000 / finalFreq;
-      this->m_PlaybackStep = freq / finalFreq;
-    }
-    else
-    {
-      this->m_PlaybackDelay = static_cast<int>(1000.0 / freq);
-      this->m_PlaybackStep = 1;
-    }
-  }
-  // Relaunch playback if necessary
-  if (this->mp_Timer->isActive())
-  {
-    this->mp_Timer->stop();
-    this->mp_Timer->start(this->m_PlaybackDelay);
-  }
-};
-
-void MainWindow::changeGroundOrientation()
-{
-  if (actionPlane_XY->isChecked())
-    this->multiView->setGroundOrientation(0.0, 0.0, 1.0);
-  else if (actionPlane_YZ->isChecked())
-    this->multiView->setGroundOrientation(1.0, 0.0, 0.0);
-  else if (actionPlane_ZX->isChecked())
-    this->multiView->setGroundOrientation(0.0, 1.0, 0.0);
 };
 
 void MainWindow::deselectCurrentVisualConfiguration()
@@ -1115,52 +994,6 @@ void MainWindow::clearVisualConfigurationList()
     this->modelConfigurationComboBox->blockSignals(false);
     this->actionClearConfigurationList->setEnabled(false);
   }
-};
-
-void MainWindow::play()
-{
-  if (this->mp_Acquisition)
-    this->toggleTimer();
-};
-
-void MainWindow::toggleTimer()
-{
-  if (this->mp_Timer->isActive())
-  {
-    this->mp_Timer->stop();
-    this->playButton->setIcon(*this->mp_PlayIcon);
-  }
-  else
-  {
-    this->mp_Timer->start(this->m_PlaybackDelay);
-    this->playButton->setIcon(*this->mp_PauseIcon);
-  }
-};
-
-void MainWindow::displayPreviousFrame()
-{
-  this->displayPreviousFrame(this->m_PlaybackStep);
-};
-
-void MainWindow::displayPreviousFrame(int step)
-{
-  if ((this->frameSlider->value() - step) >= this->frameSlider->minimum())
-    this->frameSlider->setValue(this->frameSlider->value() - step);
-  else
-    this->frameSlider->setValue(this->frameSlider->maximum());
-};
-
-void MainWindow::displayNextFrame()
-{
-  this->displayNextFrame(this->m_PlaybackStep);
-};
-
-void MainWindow::displayNextFrame(int step)
-{
-  if ((this->frameSlider->value() + step) <= this->frameSlider->maximum())
-    this->frameSlider->setValue(this->frameSlider->value() + step);
-  else
-    this->frameSlider->setValue(this->frameSlider->minimum());
 };
 
 void MainWindow::toggleMarkersVisibilityButtons()
@@ -1236,7 +1069,7 @@ void MainWindow::updateMarkerRadius(double r)
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
   for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
     this->multiView->setMarkerRadius((*it)->data(markerId).toInt(), r);
-  this->multiView->updateDisplay(this->frameSlider->value());
+  this->multiView->updateDisplay(this->timeEventControler->currentFrame());
 };
 
 void MainWindow::updateMarkerRadiusSpinBox(int v)
@@ -1937,7 +1770,7 @@ void MainWindow::toggleMarkerProperties()
 void MainWindow::circleSelectedMarkers()
 {
   this->multiView->circleSelectedMarkers(this->markersTable->selectedItems());
-  this->multiView->updateDisplay(this->frameSlider->value());
+  this->multiView->updateDisplay(this->timeEventControler->currentFrame());
 };
 
 void MainWindow::selectEvent()
@@ -1946,12 +1779,12 @@ void MainWindow::selectEvent()
 
   int row = this->eventsTable->currentRow();
   int frame = this->eventsTable->item(row, 0)->data(eventFrame).toInt();
-  this->frameSlider->setValue(frame);
+  this->timeEventControler->setCurrentFrame(frame);
 };
 
 void MainWindow::newEvent()
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new NewEvent(this, this->frameSlider->value(), this->mp_Acquisition->GetPointFrequency())));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new NewEvent(this, this->timeEventControler->currentFrame(), this->mp_Acquisition->GetPointFrequency())));
 };
 
 void MainWindow::deleteEvent()
@@ -2020,7 +1853,7 @@ void MainWindow::displayEventInformations()
   else
   {
     int row = this->eventsTable->currentRow();
-    if (this->frameSlider->value() == this->eventsTable->item(row, 0)->data(eventFrame).toInt())
+    if (this->timeEventControler->currentFrame() == this->eventsTable->item(row, 0)->data(eventFrame).toInt())
       this->eventsTable->setStyleSheet("selection-color: rgb(255,0,0);");
     else
       this->eventsTable->setStyleSheet("");
@@ -2068,7 +1901,7 @@ void MainWindow::updateEventInternalInformations(QTableWidgetItem* item)
       break;
   }
   this->eventsTable->blockSignals(false);
-  this->updateActiveEvent(this->frameSlider->value());
+  this->updateActiveEvent(this->timeEventControler->currentFrame());
 };
 
 void MainWindow::updateEventsButtonsState()

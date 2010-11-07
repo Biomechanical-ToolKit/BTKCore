@@ -60,103 +60,6 @@
       </property>
      </widget>
     </item>
-    <item>
-     <widget class="QFrame" name="frame">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>22</height>
-       </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Plain</enum>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <property name="spacing">
-        <number>6</number>
-       </property>
-       <property name="leftMargin">
-        <number>6</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>6</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QPushButton" name="playButton">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>32</width>
-           <height>32</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="images.qrc">
-           <normaloff>:/Resources/Images/player_play.png</normaloff>:/Resources/Images/player_play.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>28</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSlider" name="frameSlider">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLCDNumber" name="lcdNumber">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="smallDecimalPoint">
-          <bool>true</bool>
-         </property>
-         <property name="segmentStyle">
-          <enum>QLCDNumber::Flat</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -201,26 +104,6 @@
      <string>View</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuOptions">
-    <property name="title">
-     <string>Options</string>
-    </property>
-    <widget class="QMenu" name="menuPlayback_Speed">
-     <property name="title">
-      <string>Playback Speed</string>
-     </property>
-     <addaction name="actionRealtime"/>
-     <addaction name="action1_2"/>
-     <addaction name="action1_5"/>
-     <addaction name="action1_10"/>
-     <addaction name="actionFull_Frames"/>
-    </widget>
-    <addaction name="actionEdit_Points"/>
-    <addaction name="actionEdit_Contexts_Events"/>
-    <addaction name="actionEdit_Metadata"/>
-    <addaction name="separator"/>
-    <addaction name="menuPlayback_Speed"/>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
@@ -232,14 +115,6 @@
     <property name="title">
      <string>Settings</string>
     </property>
-    <widget class="QMenu" name="menuGround">
-     <property name="title">
-      <string>Ground Orientation</string>
-     </property>
-     <addaction name="actionPlane_XY"/>
-     <addaction name="actionPlane_YZ"/>
-     <addaction name="actionPlane_ZX"/>
-    </widget>
     <widget class="QMenu" name="menuVisual_Configuration">
      <property name="title">
       <string>Visual Configuration</string>
@@ -247,14 +122,12 @@
      <addaction name="actionDeselectCurrentConfiguration"/>
      <addaction name="actionClearConfigurationList"/>
     </widget>
-    <addaction name="menuGround"/>
     <addaction name="menuVisual_Configuration"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuSettings"/>
-   <addaction name="menuOptions"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QDockWidget" name="markersDock">
@@ -1345,85 +1218,15 @@ QPushButton::flat
     <string>Save As</string>
    </property>
   </action>
-  <action name="actionEdit_Metadata">
+  <action name="actionViewMetadata">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>View Metadata</string>
+    <string>Metadata</string>
    </property>
    <property name="toolTip">
-    <string>Edit Metadata</string>
-   </property>
-  </action>
-  <action name="actionRealtime">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Realtime</string>
-   </property>
-  </action>
-  <action name="action1_2">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>1/2</string>
-   </property>
-  </action>
-  <action name="action1_5">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>1/5</string>
-   </property>
-  </action>
-  <action name="action1_10">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>1/10</string>
-   </property>
-  </action>
-  <action name="actionFull_Frames">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Full Frames</string>
-   </property>
-  </action>
-  <action name="actionPlane_XY">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Plane XY</string>
-   </property>
-  </action>
-  <action name="actionPlane_YZ">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Plane YZ</string>
-   </property>
-  </action>
-  <action name="actionPlane_ZX">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Plane ZX</string>
+    <string>View Metadata</string>
    </property>
   </action>
   <action name="actionDeselectCurrentConfiguration">
@@ -1464,22 +1267,5 @@ QPushButton::flat
  <resources>
   <include location="images.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>frameSlider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>lcdNumber</receiver>
-   <slot>display(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>630</x>
-     <y>807</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>691</x>
-     <y>815</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

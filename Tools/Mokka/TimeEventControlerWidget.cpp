@@ -124,7 +124,7 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   connect(this->nextEventButton, SIGNAL(pressed()), this, SLOT(pressNextEventButton()));
   connect(this->nextEventButton, SIGNAL(clicked()), this, SLOT(nextEvent()));
   connect(this->nextEventButton, SIGNAL(released()), this, SLOT(releaseNextEventButton()));
-  connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(nextFrame()));
+  connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(nextStep()));
   // Time Event Bar
   connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
@@ -200,10 +200,24 @@ void TimeEventControlerWidget::togglePlayback()
   }
 };
 
+void TimeEventControlerWidget::setCurrentFrame(int frame)
+{
+  this->setFrame(frame);
+};
+
+void TimeEventControlerWidget::nextStep()
+{
+  this->setFrame(this->timeEventBar->m_SliderPos + this->m_PlaybackStep);
+};
 
 void TimeEventControlerWidget::nextFrame()
 {
-  this->setFrame(this->timeEventBar->m_SliderPos + this->m_PlaybackStep);
+  this->setFrame(this->timeEventBar->m_SliderPos + 1);
+};
+
+void TimeEventControlerWidget::previousFrame()
+{
+  this->setFrame(this->timeEventBar->m_SliderPos - 1);
 };
 
 void TimeEventControlerWidget::cropRegionOfInterest()
