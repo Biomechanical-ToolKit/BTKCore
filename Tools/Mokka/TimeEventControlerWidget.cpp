@@ -506,6 +506,8 @@ void TimeEventControlerWidget::setFrame(int f)
 {
   if (f > this->timeEventBar->m_RightBoundPos)
     this->timeEventBar->setSliderValue(this->timeEventBar->m_LeftBoundPos);
+  else if (f < this->timeEventBar->m_LeftBoundPos)
+    this->timeEventBar->setSliderValue(this->timeEventBar->m_RightBoundPos);
   else
     this->timeEventBar->setSliderValue(f);
 };

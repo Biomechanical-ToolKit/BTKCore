@@ -60,6 +60,7 @@ public:
   ~MainWindow();
 
   void play();
+  void loadConfiguration(const QString& filename);
   void openFile(const QString& filename);
 
   PointsEditor* mp_PointsEditorDlg;
@@ -74,9 +75,7 @@ public Q_SLOTS:
   void about();
   void visitBTKWebsite();
   void setAcquisitionModified(int modified);
-  void setMarkerConfigurationModified(int modified);
   void viewMetadata();
-  void editPoints();
   void openRecentFile();
   void clearRecentFiles();
   void openFile();
@@ -84,34 +83,6 @@ public Q_SLOTS:
   void saveFile();
   void saveAsFile();
   void closeFile();
-  void deselectCurrentVisualConfiguration();
-  void clearVisualConfigurationList();
-  // Markers dock
-  void selectMarkerConfiguration(int index);
-  void newMarkerConfiguration();
-  void saveMarkerConfiguration();
-  void loadMarkerConfiguration(const QString& filename = "");
-  void eraseMarkerConfiguration();
-  void resetMarkerConfiguration();
-  void editMarkerLabel();
-  void editMarkerDescription();
-  void editMarkerRadius();
-  void editMarkerColor();
-  void updateMarkerRadiusSpinBox(int v);
-  void markersDockLocationChanged(Qt::DockWidgetArea area);
-  void displayMarkerProperties();
-  void circleSelectedMarkers();
-  void toggleMarkersVisibilityButtons();
-  void showSelectedMarkers();
-  void hideSelectedMarkers();
-  void showAllMarkers();
-  void hideAllMarkers();
-  void updateMarkerRadius(double r);
-  void toggleMarkerProperties();
-  void focusOnMarkerLabelEdition();
-  void updateDisplayedMarkersList(const QVector<int>& ids);
-  void selectPickedMarker(int id);
-  void selectPickedMarkers(int id);
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
@@ -132,19 +103,17 @@ public Q_SLOTS:
   void insertEvent(Event* e);
   // Others
   void updateSelectedMarkersRadius(double r);
+  void selectPickedMarker(int id);
+  void selectPickedMarkers(int id);
   
 private:
   void saveFile(const QString& filename);
   void clearUI();
-  void fillFileInformations(const QString& filename, btk::AcquisitionFileIO::Pointer io, btk::Acquisition::Pointer acq);
   void readSettings(); 
   void writeSettings();
   void updateRecentFileActions();
   void setCurrentFile(const QString& rFilename);
   bool isOkToContinue();
-  bool isOkToContinue2();
-  bool saveMarkerConfiguration(int index);
-  bool loadMarkerConfiguration(const QString& filename, QString* name);
   
   btk::Acquisition::Pointer mp_Acquisition;
   Acquisition* mp_AcquisitionQ;
@@ -152,9 +121,6 @@ private:
   FileInfoDockWidget* mp_FileInfoDock;
   ModelDockWidget* mp_ModelDock;
 
-  int m_SelectedMarkerConfiguration;
-  QActionGroup* mp_PlaybackSpeedActionGroup;
-  QActionGroup* mp_GroundOrientationActionGroup;
   QString m_LastDirectory;
   enum { maxRecentFiles = 10 };
   QStringList m_RecentFiles;
@@ -163,51 +129,5 @@ private:
   QUndoStack* mp_UndoStack;
   QUndoStack* mp_AcquisitionUndoStack;
   QUndoStack* mp_MarkerConfigurationUndoStack;
-  QIcon* mp_DownArrow;
-  QIcon* mp_RightArrow;
-};
-
-bool findLabel(btk::PointCollection::Pointer points, const std::string& label);
-
-class TrajectoryCheckBox : public QCheckBox
-{
-  Q_OBJECT
-  
-public:
-  TrajectoryCheckBox(QTableWidgetItem* item)
-  : QCheckBox()
-  {
-    this->setStyleSheet(
-      "QCheckBox { spacing: 0px; margin-left:5px; }\
-       QCheckBox::indicator { width: 13px; height: 13px; }\
-       QCheckBox::indicator:unchecked { image: url(:/Resources/Images/trajectory_unactive.png); }\
-       QCheckBox::indicator:unchecked:hover { image: url(:/Resources/Images/trajectory_unactive.png); }\
-       QCheckBox::indicator:unchecked:pressed { image: url(:/Resources/Images/trajectory_unactive.png); }\
-       QCheckBox::indicator:checked { image: url(:/Resources/Images/trajectory_active.png); }\
-       QCheckBox::indicator:checked:hover { image: url(:/Resources/Images/trajectory_active.png); }\
-       QCheckBox::indicator:checked:pressed { image: url(:/Resources/Images/trajectory_active.png); }\
-       QCheckBox::indicator:indeterminate:hover { image: url(:/Resources/Images/trajectory_active.png); }\
-       QCheckBox::indicator:indeterminate:pressed { image: url(:/Resources/Images/trajectory_active.png); }"
-     );
-    this->setCheckState(Qt::Unchecked);
-    //this->setDisabled(true);
-    this->mp_Item = item;
-    connect(this, SIGNAL(stateChanged(int)), this, SLOT(itemChanged(int)));
-  };
-protected:
-/*
-  virtual void mousePressEvent(QMouseEvent* event)
-  {
-    //static_cast<QWidget*>(this->parent())->setFocus();
-  }
-*/
-private Q_SLOTS:
-  void itemChanged(int s)
-  {
-    this->mp_Item->setData(checkState2, s);
-  };
-  
-private:
-  QTableWidgetItem* mp_Item;
 };
 #endif // MainWindow_h

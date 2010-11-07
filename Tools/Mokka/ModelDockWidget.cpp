@@ -433,6 +433,38 @@ QList<int> ModelDockWidget::selectedMarkers()
   return ids;
 };
 
+bool ModelDockWidget::isOkToContinue()
+{
+  int idx = this->m_CurrentConfigurationIndex;//this->modelConfigurationComboBox->currentIndex();
+  if ((idx != -1) && (this->m_ConfigurationItems[idx].isModified))
+  {
+    QString message = "The visual configuration has been modified.\nDo you want to save your changes?";
+    if (this->m_ConfigurationItems[idx].isNew)
+      message += "\n\nThis configuration is a new one and will be deleted if you do not save it.";
+    
+    QMessageBox messageBox(QMessageBox::Question, 
+                           trUtf8("Mokka"),
+                           trUtf8(message.toAscii().constData()), 
+                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                           this, Qt::Sheet);
+    messageBox.setDefaultButton(QMessageBox::Yes);
+    messageBox.setEscapeButton(QMessageBox::Cancel);
+    int res = messageBox.exec();
+    if (res == QMessageBox::Yes)
+      return this->saveConfiguration(idx);
+    else if (res == QMessageBox::No)
+    {
+      if (this->m_ConfigurationItems[idx].isNew)
+        this->removeConfiguration(idx);
+      else
+        this->setConfigurationModified(idx, false);
+    }
+    else if (res == QMessageBox::Cancel)
+      return false;
+  }
+  return true;
+};
+
 void ModelDockWidget::selectConfiguration(int idx)
 {
   this->modelConfigurationComboBox->blockSignals(true);
@@ -440,6 +472,7 @@ void ModelDockWidget::selectConfiguration(int idx)
   this->modelConfigurationComboBox->blockSignals(false);
   if (this->isOkToContinue())
     this->loadConfiguration(this->m_ConfigurationItems[idx].filename);
+  this->modelTree->setFocus();
 };
 
 void ModelDockWidget::setConfigurationModified(bool cleaned)
@@ -594,7 +627,6 @@ void ModelDockWidget::newConfiguration()
     this->mp_DeselectConfiguration->setEnabled(true);
   }
   this->modelConfigurationComboBox->blockSignals(false);
-  //this->modelTree->setFocus();
 };
 
 void ModelDockWidget::loadConfiguration()
@@ -626,7 +658,6 @@ void ModelDockWidget::loadConfiguration()
 void ModelDockWidget::saveConfiguration()
 {
   this->saveConfiguration(this->modelConfigurationComboBox->currentIndex());
-  //this->modelTree->setFocus();
 };
 
 void ModelDockWidget::removeConfiguration()
@@ -1508,38 +1539,6 @@ void ModelDockWidget::insertAnalogs(const QList<int>& ids, const QList<Analog*>&
   for (int i = 0 ; i < ids.count() ; ++i)
     analogsRoot->child(ids[i])->setHidden(false);
   this->refresh();
-};
-
-bool ModelDockWidget::isOkToContinue()
-{
-  int idx = this->m_CurrentConfigurationIndex;//this->modelConfigurationComboBox->currentIndex();
-  if ((idx != -1) && (this->m_ConfigurationItems[idx].isModified))
-  {
-    QString message = "The visual configuration has been modified.\nDo you want to save your changes?";
-    if (this->m_ConfigurationItems[idx].isNew)
-      message += "\n\nThis configuration is a new one and will be deleted if you do not save it.";
-    
-    QMessageBox messageBox(QMessageBox::Question, 
-                           trUtf8("Mokka"),
-                           trUtf8(message.toAscii().constData()), 
-                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                           this, Qt::Sheet);
-    messageBox.setDefaultButton(QMessageBox::Yes);
-    messageBox.setEscapeButton(QMessageBox::Cancel);
-    int res = messageBox.exec();
-    if (res == QMessageBox::Yes)
-      return this->saveConfiguration(idx);
-    else if (res == QMessageBox::No)
-    {
-      if (this->m_ConfigurationItems[idx].isNew)
-        this->removeConfiguration(idx);
-      else
-        this->setConfigurationModified(idx, false);
-    }
-    else if (res == QMessageBox::Cancel)
-      return false;
-  }
-  return true;
 };
 
 void ModelDockWidget::setCurrentConfiguration(int idx)

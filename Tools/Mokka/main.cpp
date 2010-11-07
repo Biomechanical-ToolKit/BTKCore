@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
   if (acquisition.IsAssigned())
     mw.openFile(QString::fromStdString(acquisition.GetValue()));
   if(visualConfig.IsAssigned())
-    mw.loadMarkerConfiguration(QString::fromStdString(visualConfig.GetValue()));
+    mw.loadConfiguration(QString::fromStdString(visualConfig.GetValue()));
   if (play.IsAssigned()) // Should be the last option
     mw.play();
     

@@ -154,12 +154,12 @@ private:
   void action();
 };
 
-// --------------- EditMarkersRadius2 ---------------
+// --------------- EditMarkersRadius ---------------
 // TODO: Rename this class when the markerDock will be removed.
-class EditMarkersRadius2 : public ConfigurationUndoCommand
+class EditMarkersRadius : public ConfigurationUndoCommand
 {
 public:
-  EditMarkersRadius2(Acquisition* acq, const QVector<int>& ids, double radius, QUndoCommand* parent = 0);
+  EditMarkersRadius(Acquisition* acq, const QVector<int>& ids, double radius, QUndoCommand* parent = 0);
   virtual void undo() {this->action();};
   virtual void redo() {this->action();};
   
@@ -349,91 +349,6 @@ private:
   Acquisition* mp_Acquisition;
   QList<int> m_Ids;
   QList<Event*> m_Events;
-};
-
-// ----------------------------------------------- //
-
-// --------------- EditMarkerLabel ---------------
-class EditMarkerLabel : public AcquisitionUndoCommand
-{
-public:
-  EditMarkerLabel(const QString& label, QTableWidgetItem* item, QUndoCommand* parent = 0);
-  virtual void undo() {this->action();};
-  virtual void redo() {this->action();};
-  
-private:
-  QString m_Label;
-  QTableWidgetItem* mp_Item;
-  
-  void action();
-};
-
-// --------------- EditMarkerDescription ---------------
-class EditMarkerDescription : public AcquisitionUndoCommand
-{
-public:
-  EditMarkerDescription(const QString& desc, QTableWidgetItem* item, QUndoCommand* parent = 0);
-  virtual void undo() {this->action();};
-  virtual void redo() {this->action();};
-  
-private:
-  QString m_Description;
-  QTableWidgetItem* mp_Item;
-  
-  void action();
-};
-
-// --------------- EditMarkersRadius ---------------
-class EditMarkersRadius : public ConfigurationUndoCommand
-{
-public:
-  EditMarkersRadius(double r, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent = 0);
-  virtual void undo() {this->action();};
-  virtual void redo() {this->action();};
-  
-private:
-  QVector<double> m_Radius;
-  QList<QTableWidgetItem*> m_Items;
-  MainWindow* mp_Main;
-  
-  void action();
-};
-
-// --------------- EditMarkerColorIndex ---------------
-class EditMarkersColorIndex : public ConfigurationUndoCommand
-{
-public:
-  EditMarkersColorIndex(int idx, QList<QTableWidgetItem*> items, MainWindow* w, QUndoCommand* parent = 0);
-  virtual void undo() {this->action();};
-  virtual void redo() {this->action();};
-  
-private:
-  QVector<int> m_Indexes;
-  QList<QTableWidgetItem*> m_Items;
-  MainWindow* mp_Main;
-  
-  void action();
-};
-
-// --------------- ReorderMarkers ---------------
-class EditPoints : public AcquisitionUndoCommand
-{
-public:
-  EditPoints(MainWindow* w, QUndoCommand* parent = 0);
-  virtual void undo() {this->action();};
-  virtual void redo() {this->action();};
-  
-private:
-  struct pointProp {
-    int id;
-    bool disabled;
-    QString label;
-    QString description;
-  };
-  QVector< pointProp > m_Items;
-  MainWindow* mp_Main;
-  
-  void action();
 };
 
 #endif // UndoCommands_h

@@ -74,6 +74,7 @@ public:
   
 public Q_SLOTS:
   // Configuration
+  bool isOkToContinue();
   void selectConfiguration(int idx);
   void setConfigurationModified(bool cleaned);
   void newConfiguration();
@@ -166,7 +167,6 @@ private slots:
   void sendModifiedMarkersState(QTreeWidgetItem* item, int column);
   
 private:
-  bool isOkToContinue();
   void setCurrentConfiguration(int idx);
   bool saveConfiguration(int idx);
   void removeConfiguration(int idx);
