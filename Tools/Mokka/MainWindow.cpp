@@ -91,13 +91,9 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuView->addAction(actionModelDockView);
 #else
   QAction* actionMarkersDockView = this->markersDock->toggleViewAction();
-  QAction* actionEventsDockView = this->eventsDock->toggleViewAction();
   actionMarkersDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
-  actionEventsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
   actionMarkersDockView->setText(QObject::tr("Markers List"));
-  actionEventsDockView->setText(QObject::tr("Events List"));
   this->menuView->addAction(actionMarkersDockView);
-  this->menuView->addAction(actionEventsDockView);
 #endif
   this->menuSettings->addMenu(this->multiView->groundOrientationMenu());
   this->menuSettings->addMenu(this->timeEventControler->playbackSpeedMenu());
@@ -113,9 +109,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_FileInfoDock->setFont(f);
   this->markersDock->setFont(f);
   this->markerPropertiesButton->setFont(f);
-  this->eventsDock->setFont(f);
-  this->eventInformationsButton->setFont(f);
-  this->eventsTable->setFont(f);
   f.setPointSize(11);
   this->showMarkersButton->setFont(f);
   this->hideMarkersButton->setFont(f);
@@ -126,9 +119,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->modelConfigurationComboBox->insertItem(99,"New ...");
   this->markerProperties->setVisible(false);
   this->markerPropertiesButton->setIcon(*this->mp_RightArrow);
-  this->eventsDock->setVisible(false);
-  this->eventInformations->setVisible(false);
-  this->eventInformationsButton->setIcon(*this->mp_RightArrow);
   this->action_FileOpen->setShortcut(QKeySequence::Open);
   this->actionClose->setShortcut(QKeySequence::Close);
   this->actionSave->setShortcut(QKeySequence::Save);
@@ -138,7 +128,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->actionPaste->setShortcut(QKeySequence::Paste);
   this->actionSelect_All->setShortcut(QKeySequence::SelectAll);
   this->markerRadiusSpinBox->clear();
-  this->eventTimeSpinBox->clear();
   for (int i = 0 ; i < maxRecentFiles ; ++i)
   {
       this->mp_ActionRecentFiles[i] = new QAction(this);
@@ -209,21 +198,6 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->markerRadiusSlider, SIGNAL(sliderReleased()), this, SLOT(editMarkerRadius()));
   connect(this->markerColorButton, SIGNAL(clicked(bool)), this, SLOT(editMarkerColor()));
   connect(this->markersDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(markersDockLocationChanged(Qt::DockWidgetArea)));
-  // Events dock
-  connect(this->eventsTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(focusOnEventEdition()));
-  connect(this->eventsTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateEventInternalInformations(QTableWidgetItem*)));
-  connect(this->eventsTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayEventInformations()));
-  connect(this->eventsTable, SIGNAL(itemSelectionChanged()), this, SLOT(updateEventsButtonsState()));
-  connect(this->selectEventButton, SIGNAL(clicked()), this, SLOT(selectEvent()));
-  connect(this->newEventButton, SIGNAL(clicked()), this, SLOT(newEvent()));
-  connect(this->deleteEventButton, SIGNAL(clicked()), this, SLOT(deleteEvent()));
-  connect(this->eventLabelEdit, SIGNAL(editingFinished()), this, SLOT(editEventLabel()));
-  connect(this->eventContextCombo, SIGNAL(activated(QString)), this, SLOT(editEventContext(QString)));
-  connect(this->eventTimeSpinBox, SIGNAL(editingFinished()), this, SLOT(editEventTime()));
-  connect(this->eventSubjectEdit, SIGNAL(editingFinished()), this, SLOT(editEventSubject()));
-  connect(this->eventsDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(eventsDockLocationChanged(Qt::DockWidgetArea)));
-  connect(this->eventInformationsButton, SIGNAL(clicked()), this, SLOT(toggleEventInformations()));
-  
   // Model dock
   connect(this->mp_ModelDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(modelDockLocationChanged(Qt::DockWidgetArea)));
   connect(this->mp_ModelDock, SIGNAL(markerLabelChanged(int, QString)), this, SLOT(setPointLabel(int, QString)));
@@ -275,14 +249,9 @@ MainWindow::MainWindow(QWidget* parent)
   // Event filter
   this->multiView->installEventFilter(this);
   this->markersTable->installEventFilter(this);
-  this->eventsTable->installEventFilter(this);
   this->markerRadiusSpinBox->installEventFilter(this);
   this->markerLabelEdit->installEventFilter(this);
   this->markerDescEdit->installEventFilter(this);
-  this->eventLabelEdit->installEventFilter(this);
-  this->eventContextCombo->installEventFilter(this);
-  this->eventTimeSpinBox->installEventFilter(this);
-  this->eventSubjectEdit->installEventFilter(this);
   this->timeEventControler->installEventFilter(this);
   this->mp_ModelDock->markerLabelEdit->installEventFilter(this);
   this->mp_ModelDock->markerRadiusSpinBox->installEventFilter(this);
@@ -335,23 +304,9 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
           lineEdit->undo();
         if ((obj->objectName().compare("markerLabelEdit") == 0) || (obj->objectName().compare("markerDescEdit") == 0))
           this->markersTable->setFocus();
-        else if (obj->objectName().compare("eventSubjectEdit") == 0)
-          this->eventsTable->setFocus();
-        else if (obj->objectName().compare("eventLabelEdit") == 0)
-        {
-          this->eventLabelEdit->setText(this->eventsTable->item(this->eventsTable->currentItem()->row(), 2)->text());
-          this->eventsTable->setFocus();
-        }
       }
       else if (keyEvent->matches(QKeySequence::Undo) && !lineEdit->isUndoAvailable())
       {
-        if (obj->objectName().compare("eventLabelEdit") == 0)
-        {
-          this->eventLabelEdit->blockSignals(true);
-          this->eventLabelEdit->setText(this->eventsTable->item(this->eventsTable->currentItem()->row(), 2)->text());
-          this->eventLabelEdit->text();
-          this->eventLabelEdit->blockSignals(false);
-        }
         this->mp_UndoStack->undo();
       }
       else if (keyEvent->matches(QKeySequence::Redo) && !lineEdit->isRedoAvailable())
@@ -370,8 +325,6 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
       {
         if (obj->objectName().compare("markerRadiusSpinBox") == 0)
           this->markersTable->setFocus();
-        else if (obj->objectName().compare("eventTimeSpinBox") == 0)
-          this->eventsTable->setFocus();
         else
           return true;
       }  
@@ -381,16 +334,6 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
         this->mp_UndoStack->redo();
       return false;
       
-    }
-    else if (obj->objectName().compare("eventContextCombo") == 0)
-    {
-      if (keyEvent->key() == Qt::Key_Escape)
-      {
-        this->eventsTable->setFocus();
-        return true;
-      }
-      else
-        return false;
     }
     // general case
     else if (keyEvent->matches(QKeySequence::MoveToPreviousChar))
@@ -410,17 +353,13 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
     }
     else if (keyEvent->key() == Qt::Key_Escape)
     {
-      if (obj->objectName().compare("eventsTable") == 0)
-        this->eventsTable->clearSelection();
-      else
+      if (obj->objectName().compare("markersTable") == 0)
         this->markersTable->clearSelection();
       return true;
     }
     else if ((keyEvent->key() == Qt::Key_Return) || (keyEvent->key() == Qt::Key_Enter))
     {
       if (obj->objectName().compare("eventsTable") == 0)
-        this->focusOnEventEdition(2);
-      else
         this->focusOnMarkerLabelEdition();
       return true;
     }
@@ -707,79 +646,6 @@ void MainWindow::openFile(const QString& filename)
   this->showMarkersButton->setEnabled(true);
   this->hideMarkersButton->setEnabled(true);
   
-  pw.setProgressValue(80);
-  
-  // Events
-  btk::EventCollection::Pointer events = this->mp_Acquisition->GetEvents();
-  //this->eventContextCombo->clear();
-  //this->eventContextCombo->insertItem(0, "");
-  this->eventsTable->blockSignals(true);
-  this->eventsTable->setColumnCount(4);
-  this->eventsTable->setRowCount(events->GetItemNumber());
-  //this->eventsTable->setColumnHidden(3, true);
-  int row = 0;
-  //std::string previousSubject = "";
-  QStringList eventLabelWordList;
-  double pointFrequency = this->mp_Acquisition->GetPointFrequency();
-  for (btk::EventCollection::ConstIterator it = events->Begin() ; it != events->End() ; ++it)
-  {
-    NumericalTableWidgetItem* timeItem = new NumericalTableWidgetItem();
-    QTableWidgetItem* contextItem = new QTableWidgetItem();
-    QTableWidgetItem* labelItem = new QTableWidgetItem();
-    QTableWidgetItem* subjectItem = new QTableWidgetItem();
-    timeItem->setText(QString::number((*it)->GetTime(), 'f', 2));
-    timeItem->setData(eventTime, (*it)->GetTime());
-    int frameIndex = static_cast<int>((*it)->GetTime() * pointFrequency);
-    timeItem->setData(eventFrame, frameIndex);
-    labelItem->setText(QString::fromStdString((*it)->GetLabel()));
-    labelItem->setData(eventId, (*it)->GetId());
-    labelItem->setData(eventDescription, QString::fromStdString((*it)->GetDescription()));
-    eventLabelWordList << labelItem->text();
-    contextItem->setText(QString::fromStdString((*it)->GetContext()));
-    contextItem->setData(eventContext, contextItem->text());
-    subjectItem->setText(QString::fromStdString((*it)->GetSubject()));
-    this->eventsTable->setItem(row, 0, timeItem);
-    this->eventsTable->setItem(row, 1, contextItem);
-    this->eventsTable->setItem(row, 2, labelItem);
-    this->eventsTable->setItem(row, 3, subjectItem);
-    if (this->eventContextCombo->findText(contextItem->text()) == -1)
-      this->eventContextCombo->insertItem(this->eventContextCombo->count(), contextItem->text());
-    //if ((previousSubject.compare((*it)->GetSubject()) != 0) && !previousSubject.empty())
-    //   this->eventsTable->setColumnHidden(3, false);
-    //previousSubject = (*it)->GetSubject();
-    if ((frameIndex < this->mp_Acquisition->GetFirstFrame()) || (frameIndex > this->mp_Acquisition->GetLastFrame()))
-    {
-      timeItem->setData(eventVisible, false);
-      //timeItem->setForeground(defaultLabelColor);
-      //contextItem->setForeground(defaultLabelColor);
-      //labelItem->setForeground(defaultLabelColor);
-      //subjectItem->setForeground(defaultLabelColor);
-    }
-    else
-      timeItem->setData(eventVisible, true);
-    
-    ++row;
-  }
-  eventLabelWordList.removeDuplicates();
-  this->eventsTable->resizeColumnsToContents();
-  this->eventsTable->horizontalHeader()->resizeSection(0, 35);
-  this->eventsTable->horizontalHeader()->setResizeMode(0, QHeaderView::Fixed);
-  this->eventsTable->horizontalHeader()->resizeSection(1, 50);
-  this->eventsTable->horizontalHeader()->setResizeMode(1, QHeaderView::Fixed);
-  this->eventsTable->horizontalHeader()->resizeSection(3, 50);
-  this->eventsTable->horizontalHeader()->setResizeMode(3, QHeaderView::Fixed);
-  this->eventsTable->horizontalHeader()->setResizeMode(2, QHeaderView::Stretch);
-  this->eventsTable->sortItems(0);
-  this->newEventButton->setEnabled(true);
-  this->deleteEventButton->setEnabled(false);
-  this->selectEventButton->setEnabled(false);
-  this->eventsTable->blockSignals(false);
-
-  QCompleter* eventLabelCompleter = new QCompleter(eventLabelWordList, this);
-  eventLabelCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-  eventLabelCompleter->setCompletionMode(QCompleter::InlineCompletion);
-  this->eventLabelEdit->setCompleter(eventLabelCompleter);
-  
   pw.setProgressValue(90);
   
   // Fill Metadata
@@ -788,8 +654,6 @@ void MainWindow::openFile(const QString& filename)
 #ifndef MOKKA_NEW_UI
   if (hasMarker != 0)
     this->markersDock->setVisible(true);
-  if (events->GetItemNumber() != 0)
-    this->eventsDock->setVisible(true);
 #else
   if (this->mp_AcquisitionQ->hasPoints() || this->mp_AcquisitionQ->hasAnalogs())
     this->mp_ModelDock->setVisible(true);
@@ -843,6 +707,7 @@ void MainWindow::saveFile(const QString& filename)
   target->SetFirstFrame(source->GetFirstFrame());
   target->SetPointFrequency(source->GetPointFrequency());
   target->SetAnalogResolution(source->GetAnalogResolution());
+  /*
   // Event
   int eventRowNum = this->eventsTable->rowCount();
   btk::EventCollection::Pointer targetEvents = target->GetEvents();
@@ -864,6 +729,7 @@ void MainWindow::saveFile(const QString& filename)
       targetEvents->InsertItem(p);
     }
   }
+  */
   // Metadata
   target->SetMetaData(source->GetMetaData()->Clone());
   // Point
@@ -961,12 +827,6 @@ void MainWindow::clearUI()
   this->showMarkersButton->setEnabled(false);
   this->hideMarkersButton->setEnabled(false);
   this->markersDock->setVisible(false);
-  // Events dock
-  this->eventsTable->clearSelection();
-  this->eventsTable->clear();
-  this->eventsTable->setRowCount(0);
-  this->updateEventsButtonsState();
-  this->eventsDock->setVisible(false);
   // Metadata
   this->mp_MetadataDlg->reset();
   // Multivew
@@ -1773,188 +1633,6 @@ void MainWindow::circleSelectedMarkers()
   this->multiView->updateDisplay(this->timeEventControler->currentFrame());
 };
 
-void MainWindow::selectEvent()
-{
-  this->eventsTable->setStyleSheet("selection-color: rgb(255,0,0);");
-
-  int row = this->eventsTable->currentRow();
-  int frame = this->eventsTable->item(row, 0)->data(eventFrame).toInt();
-  this->timeEventControler->setCurrentFrame(frame);
-};
-
-void MainWindow::newEvent()
-{
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new NewEvent(this, this->timeEventControler->currentFrame(), this->mp_Acquisition->GetPointFrequency())));
-};
-
-void MainWindow::deleteEvent()
-{
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new DeleteEvent(this)));
-};
-
-void MainWindow::updateActiveEvent(int frame)
-{
-  this->eventsTable->blockSignals(true);
-  QBrush activeEventColor = QBrush(QColor(Qt::red));
-  QBrush defaultEventColor = QBrush(QColor(Qt::black));
-  QBrush inactiveEventColor = QBrush(QColor(Qt::gray));
-  bool eventFound = false;
-  for (int row = 0 ; row < this->eventsTable->rowCount() ; ++row)
-  {
-    if (frame == this->eventsTable->item(row, 0)->data(eventFrame).toInt())
-    {
-      if (row == this->eventsTable->currentRow())
-      {
-        this->eventsTable->setStyleSheet("selection-color: rgb(255,0,0);");
-        eventFound = true;
-      }
-      this->eventsTable->item(row, 0)->setForeground(activeEventColor);
-      this->eventsTable->item(row, 1)->setForeground(activeEventColor);
-      this->eventsTable->item(row, 2)->setForeground(activeEventColor);
-      this->eventsTable->item(row, 3)->setForeground(activeEventColor);
-    }
-    else
-    {
-      if (!eventFound)
-        this->eventsTable->setStyleSheet("");
-      if (this->eventsTable->item(row, 0)->data(eventVisible).toInt())
-      {
-        this->eventsTable->item(row, 0)->setForeground(defaultEventColor);
-        this->eventsTable->item(row, 1)->setForeground(defaultEventColor);
-        this->eventsTable->item(row, 2)->setForeground(defaultEventColor);
-        this->eventsTable->item(row, 3)->setForeground(defaultEventColor);
-      }
-      else
-      {
-        this->eventsTable->item(row, 0)->setForeground(inactiveEventColor);
-        this->eventsTable->item(row, 1)->setForeground(inactiveEventColor);
-        this->eventsTable->item(row, 2)->setForeground(inactiveEventColor);
-        this->eventsTable->item(row, 3)->setForeground(inactiveEventColor);
-      }
-    }
-  }
-  this->eventsTable->blockSignals(false);
-};
-
-void MainWindow::displayEventInformations()
-{
-  QList<QTableWidgetItem*> items = this->eventsTable->selectedItems();
-  if (items.isEmpty())
-  {
-    this->eventLabelEdit->setEnabled(false);
-    this->eventContextCombo->setEnabled(false);
-    this->eventTimeSpinBox->setEnabled(false);
-    this->eventSubjectEdit->setEnabled(false);
-    this->eventLabelEdit->clear();
-    this->eventContextCombo->setCurrentIndex(0);
-    this->eventTimeSpinBox->clear();
-    this->eventSubjectEdit->clear();
-  }
-  else
-  {
-    int row = this->eventsTable->currentRow();
-    if (this->timeEventControler->currentFrame() == this->eventsTable->item(row, 0)->data(eventFrame).toInt())
-      this->eventsTable->setStyleSheet("selection-color: rgb(255,0,0);");
-    else
-      this->eventsTable->setStyleSheet("");
-    this->eventLabelEdit->setEnabled(true);
-    this->eventContextCombo->setEnabled(true);
-    this->eventTimeSpinBox->setEnabled(true);
-    this->eventSubjectEdit->setEnabled(true);
-    this->eventTimeSpinBox->setValue(this->eventsTable->item(row, 0)->data(eventTime).toDouble());
-    this->eventContextCombo->setCurrentIndex(this->eventContextCombo->findText(this->eventsTable->item(row, 1)->text()));
-    this->eventLabelEdit->setText(this->eventsTable->item(row, 2)->text());
-    this->eventSubjectEdit->setText(this->eventsTable->item(row, 3)->text());
-  }
-};
-
-void MainWindow::toggleEventInformations()
-{
-  if (!this->eventInformations->isVisible())
-  {
-    this->eventInformations->setVisible(true);
-    this->eventInformationsButton->setIcon(*this->mp_DownArrow);
-  }
-  else
-  {
-    this->eventInformations->setVisible(false);
-    this->eventInformationsButton->setIcon(*this->mp_RightArrow);
-  }
-};
-
-void MainWindow::updateEventInternalInformations(QTableWidgetItem* item)
-{
-  this->eventsTable->blockSignals(true);
-  switch(item->column())
-  {
-    case 0:
-    {
-      double pointFrequency = this->mp_Acquisition->GetPointFrequency();
-      int frameIndex = static_cast<int>(item->data(eventTime).toDouble() * pointFrequency);
-      item->setData(eventFrame, frameIndex);
-      if ((frameIndex < this->mp_Acquisition->GetFirstFrame()) || (frameIndex > this->mp_Acquisition->GetLastFrame()))
-        item->setData(eventVisible, false);
-      else
-        item->setData(eventVisible, true);
-    }
-    default:
-      break;
-  }
-  this->eventsTable->blockSignals(false);
-  this->updateActiveEvent(this->timeEventControler->currentFrame());
-};
-
-void MainWindow::updateEventsButtonsState()
-{
-  this->newEventButton->setEnabled(true);
-  QList<QTableWidgetItem*> items = this->eventsTable->selectedItems();
-  if (!items.isEmpty())
-  {
-    int row = this->eventsTable->currentRow();
-    this->deleteEventButton->setEnabled(true);
-    int valid = this->eventsTable->item(row, 0)->data(eventVisible).toInt();
-    if (valid)
-      this->selectEventButton->setEnabled(true);
-    else
-      this->selectEventButton->setEnabled(false);
-  }
-  else
-  {
-    this->deleteEventButton->setEnabled(false);
-    this->selectEventButton->setEnabled(false);
-  }
-};
-
-void MainWindow::focusOnEventEdition(int idx)
-{
-  int selectedIdx = idx;
-  QTableWidgetItem* item = this->eventsTable->currentItem();
-  if (selectedIdx == -1)
-    selectedIdx = item->column();
-  
-  this->eventInformations->setVisible(true);
-  this->eventInformationsButton->setIcon(*this->mp_DownArrow);
-  switch(selectedIdx)
-  {
-  case 0:
-    this->eventTimeSpinBox->setFocus();
-    this->eventTimeSpinBox->selectAll();
-    break;
-  case 1:
-    this->eventContextCombo->setFocus();
-    break;
-  case 2:
-    this->eventLabelEdit->setFocus();
-    this->eventLabelEdit->selectAll();
-    break;
-  case 3:
-    this->eventSubjectEdit->setFocus();
-    this->eventSubjectEdit->selectAll();
-    break;
-  }
-  this->eventsTable->scrollToItem(item);
-};
-
 void MainWindow::updateDisplayedMarkersList(const QVector<int>& ids)
 {
   QBrush defaultLabelColor = QBrush(QColor(Qt::gray));
@@ -2029,55 +1707,6 @@ void MainWindow::selectPickedMarkers(int id)
 #endif
 };
 
-void MainWindow::editEventLabel()
-{
-  QString label = this->eventLabelEdit->text();
-  QTableWidgetItem* item = this->eventsTable->item(this->eventsTable->currentRow(), 2);
-  if (label.compare(item->text()) == 0)
-    return;
-  int id = 0;
-  QString desc = "";
-  for (int i = 0 ; i < this->eventsTable->rowCount() ; ++i)
-  {
-    QTableWidgetItem* itemLabel = this->eventsTable->item(i,2);
-    if (itemLabel->text().compare(label) == 0)
-    {
-      id = itemLabel->data(eventId).toInt();
-      desc = itemLabel->data(eventDescription).toString();
-      break;
-    }
-  }
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditEventLabel(label, id, desc, item)));
-};
-
-void MainWindow::editEventContext(const QString& context)
-{
-  QTableWidgetItem* item = this->eventsTable->item(this->eventsTable->currentRow(), 1);
-  if (context.compare(item->data(eventContext).toString()) == 0)
-    return;
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditEventContext(context, item)));
-};
-
-void MainWindow::editEventTime()
-{
-  double t = this->eventTimeSpinBox->value();
-  if (this->eventTimeSpinBox->text().isEmpty())
-    return;
-  QTableWidgetItem* item = this->eventsTable->item(this->eventsTable->currentRow(), 0);
-  if (fabs(t - item->data(eventTime).toDouble()) < 0.00001)
-    return;
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditEventTime(t, item)));
-};
-
-void MainWindow::editEventSubject()
-{
-  QString subject = this->eventSubjectEdit->text();
-  QTableWidgetItem* item = this->eventsTable->item(this->eventsTable->currentRow(), 3);
-  if (subject.compare(item->text()) == 0)
-    return;
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditEventSubject(subject, item)));
-};
-
 void MainWindow::modelDockLocationChanged(Qt::DockWidgetArea area)
 {
   QSettings settings;
@@ -2093,15 +1722,6 @@ void MainWindow::markersDockLocationChanged(Qt::DockWidgetArea area)
   settings.setValue("area", area);
   settings.endGroup();
 };
-
-void MainWindow::eventsDockLocationChanged(Qt::DockWidgetArea area)
-{
-  QSettings settings;
-  settings.beginGroup("EventsDock");
-  settings.setValue("area", area);
-  settings.endGroup();
-};
-
 
 void MainWindow::setPointLabel(int id, const QString& label)
 {
@@ -2230,15 +1850,6 @@ void MainWindow::readSettings()
   }
   this->modelConfigurationComboBox->blockSignals(false);
   settings.endGroup();
-  // EventsDock
-  settings.beginGroup("EventsDock");
-  //this->eventsDock->setVisible(settings.value("visible", false).toBool());
-  this->eventsDock->setFloating(settings.value("floating", false).toBool());
-  this->eventsDock->move(settings.value("pos", this->eventsDock->pos()).toPoint());
-  this->eventsDock->resize(settings.value("size", this->eventsDock->size()).toSize());
-  if (!this->eventsDock->isFloating())
-    addDockWidget(static_cast<Qt::DockWidgetArea>(settings.value("area", Qt::RightDockWidgetArea).toInt()), this->eventsDock);
-  settings.endGroup();
 #endif
 };
 
@@ -2287,14 +1898,6 @@ void MainWindow::writeSettings()
   settings.setValue("recentVisualConfigName", recentVisualConfigName);
   settings.endGroup();
 #ifndef MOKKA_NEW_UI
-  // EventsDock
-  settings.beginGroup("EventsDock");
-  //settings.setValue("visible", this->eventsDock->isVisible());
-  settings.setValue("floating", this->eventsDock->isFloating());
-  settings.setValue("pos", this->eventsDock->pos());
-  settings.setValue("size", this->eventsDock->size());
-  //settings.setValue("area", this->eventsDock->area());
-  settings.endGroup();
 #endif
 };
 

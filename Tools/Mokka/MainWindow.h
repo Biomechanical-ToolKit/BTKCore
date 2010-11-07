@@ -112,21 +112,6 @@ public Q_SLOTS:
   void updateDisplayedMarkersList(const QVector<int>& ids);
   void selectPickedMarker(int id);
   void selectPickedMarkers(int id);
-  // Events dock
-  void editEventLabel();
-  void editEventContext(const QString& context);
-  void editEventTime();
-  void editEventSubject();
-  void newEvent();
-  void deleteEvent();
-  void updateActiveEvent(int frame);
-  void displayEventInformations();
-  void toggleEventInformations();
-  void updateEventInternalInformations(QTableWidgetItem* item);
-  void updateEventsButtonsState();
-  void selectEvent();
-  void eventsDockLocationChanged(Qt::DockWidgetArea area);
-  void focusOnEventEdition(int idx = -1);
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
