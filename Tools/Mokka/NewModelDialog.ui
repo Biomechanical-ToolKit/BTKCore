@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>310</width>
-    <height>130</height>
+    <width>332</width>
+    <height>141</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -47,7 +47,17 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="errorLabel">
+      <widget class="QLabel" name="errorIconLabel">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="images.qrc">:/Resources/Images/error.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="errorMsgLabel">
        <property name="styleSheet">
         <string notr="true">QLabel
 {
@@ -76,7 +86,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

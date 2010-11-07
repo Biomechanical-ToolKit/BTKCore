@@ -48,7 +48,8 @@ NewModelDialog::NewModelDialog(const QList<ConfigurationItem>* configs, QWidget*
   ok->setEnabled(false);
   QPushButton* cancel = this->buttonBox->button(QDialogButtonBox::Cancel);
   cancel->setAutoDefault(false);
-  this->errorLabel->setText("");
+  this->errorIconLabel->setVisible(false);
+  this->errorMsgLabel->setVisible(false);
   
   connect(this->lineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateButton(QString)));
   //connect(this->lineEdit, SIGNAL(returnPressed()), this, SLOT(validateName()));
@@ -83,17 +84,20 @@ void NewModelDialog::updateButton(const QString& name)
   if (name.isEmpty())
   {
     this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    this->errorLabel->setText("");
+    this->errorIconLabel->setVisible(false);
+    this->errorMsgLabel->setVisible(false);
   }
   else if (this->configurationAlreadyExists(name))
   {
     this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    this->errorLabel->setText("Already exists");
+    this->errorIconLabel->setVisible(true);
+    this->errorMsgLabel->setVisible(true);
   }
   else
   {
     this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
-    this->errorLabel->setText("");
+    this->errorIconLabel->setVisible(false);
+    this->errorMsgLabel->setVisible(false);
   }
 };
 

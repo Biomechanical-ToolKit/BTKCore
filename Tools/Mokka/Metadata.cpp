@@ -41,6 +41,8 @@ Metadata::Metadata(QWidget* parent)
 : QDialog(parent)
 {
   this->setupUi(this);
+  this->warningIconLabel->setVisible(false);
+  this->warningMsgLabel->setVisible(false);
 };
 
 void Metadata::load(btk::MetaData::Pointer m)
@@ -51,4 +53,6 @@ void Metadata::load(btk::MetaData::Pointer m)
 void Metadata::reset()
 {
   this->treeView->reset();
+  this->warningIconLabel->setVisible(false);
+  this->warningMsgLabel->setVisible(false);
 };
