@@ -113,13 +113,13 @@ void Viz3DWidget::initialize()
       SLOT(selectPickedMarkers(vtkObject*, unsigned long, void*, void*)));
 };
 
-void Viz3DWidget::selectPickedMarker(vtkObject* caller, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
+void Viz3DWidget::selectPickedMarker(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
 {
   int id = *static_cast<int*>(call_data);
   emit pickedMarkerChanged(id);
 };
 
-void Viz3DWidget::selectPickedMarkers(vtkObject* caller, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
+void Viz3DWidget::selectPickedMarkers(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
 {
   int id = *static_cast<int*>(call_data);
   emit pickedMarkersChanged(id);

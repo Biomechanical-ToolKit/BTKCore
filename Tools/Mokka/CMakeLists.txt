@@ -12,7 +12,6 @@ SET(Mokka_CPP
   About.cpp
   AbstractMultiView.cpp
   AbstractView.cpp
-  ComboBoxDelegate.cpp
   CompositeView.cpp
   FileInfoDockWidget.cpp
   MainWindow.cpp
@@ -21,9 +20,7 @@ SET(Mokka_CPP
   ModelDockWidget.cpp
   MultiViewWidget.cpp
   NewEventDialog.cpp
-  NewModelConfigurationWidget.cpp
   NewModelDialog.cpp
-  PointsEditor.cpp
   ProgressWidget.cpp
   TableWidget.cpp
   TimeEventBarWidget.cpp
@@ -37,7 +34,6 @@ SET(Mokka_H
   Acquisition.h
   AbstractMultiView.h
   AbstractView.h
-  ComboBoxDelegate.h
   CompositeView.h
   FileInfoDockWidget.h
   MainWindow.h
@@ -46,9 +42,7 @@ SET(Mokka_H
   ModelDockWidget.h
   MultiViewWidget.h
   NewEventDialog.h
-  NewModelConfigurationWidget.h
   NewModelDialog.h
-  PointsEditor.h
   ProgressWidget.h
   TableWidget.h
   TimeEventBarWidget.h
@@ -63,9 +57,7 @@ SET(Mokka_UI
   Metadata.ui
   ModelDockWidget.ui
   NewEventDialog.ui
-  NewModelConfigurationWidget.ui
   NewModelDialog.ui
-  PointsEditor.ui
   ProgressWidget.ui
   TimeEventControlerWidget.ui)
 

@@ -55,7 +55,7 @@ public:
   // AbstractView& operator=(const AbstractView&); // Implicit.
   
   virtual AbstractView* clone() const {return new AbstractView;};
-  virtual void saveCurrentFuncOption(int idx) {};
+  virtual void saveCurrentFuncOption(int /* idx */) {};
   void setFunctionComboBoxOption(int idx, QListWidget* lw, int currentIndex);
   
 public slots:

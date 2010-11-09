@@ -156,7 +156,7 @@ void CompositeView::setOrthogonalView(int view)
   this->stackedWidget->currentWidget()->setFocus(Qt::OtherFocusReason);
 };
 
-void CompositeView::toggleGraphedMeasure(int idx)
+void CompositeView::toggleGraphedMeasure(int /* idx */)
 {
   //qDebug("CompositeView::toggleGraphedMeasure");
   //GraphAnalogWidget* analog = static_cast<GraphAnalogWidget*>(this->stackedWidget->widget(2));

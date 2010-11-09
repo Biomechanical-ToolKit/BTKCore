@@ -34,7 +34,6 @@
  */
 
 #include "MetadataView.h"
-#include "ComboBoxDelegate.h"
 
 MetadataView::MetadataView(QWidget* parent)
 : QTreeView(parent)
@@ -53,10 +52,6 @@ MetadataView::MetadataView(QWidget* parent)
   header->setResizeMode (1, QHeaderView::Fixed);
   header->resizeSection(4, 16);
   header->setResizeMode (4, QHeaderView::Fixed);
-  // Delegate
-  ComboBoxDelegate* format = new ComboBoxDelegate(this);
-  format->setList(QStringList() << "" << "Char" << "Byte" << "Integer" << "Real");
-  this->setItemDelegateForColumn(2, format);
   // Connection
   connect(this->mp_Model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(dispatchChangement(QStandardItem*)));
   
