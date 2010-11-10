@@ -221,7 +221,7 @@ CXXTEST_SUITE(BinaryFileStreamTest)
     btk::NativeBinaryFileStream bfs;
     bfs.Open(C3DFilePathIN + "others/Gait.c3d", btk::BinaryFileStream::In);
     bfs.SeekRead(0, btk::BinaryFileStream::End);
-    TS_ASSERT(bfs.TellRead().operator==(406528));
+    TS_ASSERT(bfs.TellRead() == std::streampos(406528));
     bfs.ReadI8();
     TS_ASSERT_EQUALS(bfs.IsOpen(), true);
     TS_ASSERT_EQUALS(bfs.Good(), false);
