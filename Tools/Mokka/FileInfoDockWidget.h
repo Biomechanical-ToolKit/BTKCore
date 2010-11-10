@@ -40,6 +40,8 @@
 
 #include <QDockWidget>
 
+class Acquisition;
+
 class FileInfoDockWidget : public QDockWidget, public Ui::FileInfoDockWidget
 {
   Q_OBJECT
@@ -48,9 +50,14 @@ public:
   FileInfoDockWidget(QWidget* parent = 0);
   // ~FileInfoDockWidget(); // Implicit
 
+  void setAcquisition(Acquisition* acq);
+
 public slots:
   void fill(const QVector<QString>& infos);
   void reset();
+  
+private:
+  Acquisition* mp_Acquisition;
 };
 
 #endif // FileInfoDockWidget_h

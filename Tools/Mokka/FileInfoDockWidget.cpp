@@ -34,11 +34,21 @@
  */
 
 #include "FileInfoDockWidget.h"
+#include "Acquisition.h"
 
 FileInfoDockWidget::FileInfoDockWidget(QWidget* parent)
 : QDockWidget(parent)
 {
+  this->mp_Acquisition = 0;
   this->setupUi(this);
+};
+
+void FileInfoDockWidget::setAcquisition(Acquisition* acq)
+{
+  if (this->mp_Acquisition)
+    disconnect(this->mp_Acquisition, 0, this, 0);
+  this->mp_Acquisition = acq;
+  connect(this->mp_Acquisition, SIGNAL(informationsChanged(QVector<QString>)), this, SLOT(fill(QVector<QString>)));
 };
 
 void FileInfoDockWidget::fill(const QVector<QString>& infos)

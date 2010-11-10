@@ -34,15 +34,10 @@
  */
 
 #include "MainWindow.h"
-#include "Metadata.h"
 #include "About.h"
 #include "ProgressWidget.h"
-#include "NewModelConfigurationWidget.h"
 #include "UndoCommands.h"
 #include "UserRoles.h"
-
-#include <btkAcquisitionFileReader.h>
-#include <btkAcquisitionFileWriter.h>
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -63,9 +58,7 @@ MainWindow::MainWindow(QWidget* parent)
   // Members
   this->mp_AcquisitionQ = new Acquisition(this);
   this->mp_MetadataDlg = new Metadata(this);
-  this->mp_PointsEditorDlg = new PointsEditor(this);
   this->mp_ModelDock = new ModelDockWidget(this);
-  this->mp_ModelDock->setAcquisition(this->mp_AcquisitionQ);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
     
   // Finalize UI
@@ -87,7 +80,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuView->addAction(actionInformationsDockView);
   this->menuView->addAction(this->actionViewMetadata);
   this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
-  
 #ifdef Q_OS_MAC
   QFont f = this->font();
   f.setPointSize(10);
@@ -112,11 +104,15 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ActionSeparatorRecentFiles = this->menuOpen_Recent->addSeparator();
   this->menuOpen_Recent->addAction(this->actionClear_Menu);
   connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
-  
-  // Viz3D
-  this->multiView->initialize();
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->timeEventControler->playbackSpeedMenu()->menuAction(), this->multiView->groundOrientationMenu());
-
+  this->multiView->initialize();
+  
+  // Setting the acquisition
+  this->multiView->setAcquisition(this->mp_AcquisitionQ);
+  this->mp_ModelDock->setAcquisition(this->mp_AcquisitionQ);
+  this->mp_FileInfoDock->setAcquisition(this->mp_AcquisitionQ);
+  this->timeEventControler->setAcquisition(this->mp_AcquisitionQ);
+  
   // Qt UI: Undo/Redo
   this->mp_UndoStack = new QUndoStack(this); // One to command all.
   this->mp_MarkerConfigurationUndoStack = new QUndoStack(this);
@@ -172,27 +168,6 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->timeEventControler, SIGNAL(regionOfInterestChanged(int,int)), this, SLOT(setRegionOfInterest(int,int)));
   connect(this->timeEventControler, SIGNAL(eventsRemoved(QList<int>)), this, SLOT(removeEvents(QList<int>)));
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
-  // Acquisition
-  connect(this->mp_AcquisitionQ, SIGNAL(informationsChanged(QVector<QString>)), this->mp_FileInfoDock, SLOT(fill(QVector<QString>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(pointLabelChanged(int, QString)), this->mp_ModelDock, SLOT(setPointLabel(int, QString)));
-  connect(this->mp_AcquisitionQ, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this->mp_ModelDock, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this->multiView, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this->mp_ModelDock, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this->multiView, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(pointsDescriptionChanged(QVector<int>, QVector<QString>)), this->mp_ModelDock, SLOT(setPointsDescription(QVector<int>, QVector<QString>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(pointsRemoved(QList<int>, QList<Point*>)), this->mp_ModelDock, SLOT(removePoints(QList<int>, QList<Point*>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(pointsInserted(QList<int>, QList<Point*>)), this->mp_ModelDock, SLOT(insertPoints(QList<int>, QList<Point*>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(analogLabelChanged(int, QString)), this->mp_ModelDock, SLOT(setAnalogLabel(int, QString)));
-  connect(this->mp_AcquisitionQ, SIGNAL(analogsUnitChanged(QVector<int>, QVector<QString>)), this->mp_ModelDock, SLOT(setAnalogsUnit(QVector<int>, QVector<QString>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(analogsGainChanged(QVector<int>, QVector<Analog::Gain>)), this->mp_ModelDock, SLOT(setAnalogsGain(QVector<int>, QVector<Analog::Gain>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(analogsOffsetChanged(QVector<int>, QVector<int>)), this->mp_ModelDock, SLOT(setAnalogsOffset(QVector<int>, QVector<int>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(analogsScaleChanged(QVector<int>, QVector<double>)), this->mp_ModelDock, SLOT(setAnalogsScale(QVector<int>, QVector<double>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(analogsDescriptionChanged(QVector<int>, QVector<QString>)), this->mp_ModelDock, SLOT(setAnalogsDescription(QVector<int>, QVector<QString>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(analogsRemoved(QList<int>, QList<Analog*>)), this->mp_ModelDock, SLOT(removeAnalogs(QList<int>, QList<Analog*>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(analogsInserted(QList<int>, QList<Analog*>)), this->mp_ModelDock, SLOT(insertAnalogs(QList<int>, QList<Analog*>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(regionOfInterestChanged(int, int)), this->timeEventControler, SLOT(setRegionOfInterest(int, int)));
-  connect(this->mp_AcquisitionQ, SIGNAL(eventsRemoved(QList<int>, QList<Event*>)), this->timeEventControler, SLOT(removeEvents(QList<int>, QList<Event*>)));
-  connect(this->mp_AcquisitionQ, SIGNAL(eventsInserted(QList<int>, QList<Event*>)), this->timeEventControler, SLOT(insertEvents(QList<int>, QList<Event*>)));
 
   // Event filter
   this->multiView->installEventFilter(this);
@@ -295,13 +270,6 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 void MainWindow::about()
 {
   About aboutDlg(this);
-#ifdef Q_OS_MAC
-  QFont f = aboutDlg.rights->font();
-  f.setPointSize(11);
-  aboutDlg.release->setFont(f);
-  aboutDlg.copyright->setFont(f);
-  aboutDlg.rights->setFont(f);
-#endif
   aboutDlg.exec();
 };
 
@@ -469,48 +437,42 @@ void MainWindow::openFile(const QString& filename)
   QApplication::setOverrideCursor(Qt::WaitCursor);
   ProgressWidget pw(this);
   pw.show();
-  this->clearUI();
+  this->reset();
 
-  QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file reading", QMessageBox::Ok , this);
-  QString errMsg;
-  this->mp_AcquisitionQ->load(filename, errMsg);
+  QString errMsg = this->mp_AcquisitionQ->load(filename);
   if (!errMsg.isEmpty())
   {
     QApplication::restoreOverrideCursor();
+    QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file reading", QMessageBox::Ok , this);
     error.setInformativeText(errMsg);
     error.exec();
     return;
   }
   this->mp_Acquisition = this->mp_AcquisitionQ->btkAcquisition();
+  this->setCurrentFile(filename);
   
   pw.setProgressValue(25);
   
-  this->setCurrentFile(filename);
+  this->multiView->load();
+  this->multiView->updateDisplay(this->mp_AcquisitionQ->firstFrame()); // Required
   
-  // UI settings
-  // Update the 3D view
-  btk::SeparateKnownVirtualMarkersFilter::Pointer separator = this->multiView->load(this->mp_Acquisition);
-  this->multiView->updateDisplay(this->mp_Acquisition->GetFirstFrame()); // Required
+  pw.setProgressValue(60);
   
-
-  this->mp_ModelDock->load(separator->GetOutput(0), separator->GetOutput(2), separator->GetOutput(3), this->mp_Acquisition->GetAnalogs());
-  this->timeEventControler->load(this->mp_AcquisitionQ);
-  pw.setProgressValue(80);
-  
-  // Fill Metadata
+  this->timeEventControler->load();
   this->mp_MetadataDlg->load(this->mp_Acquisition->GetMetaData());
-  // Display Docks
+  this->mp_ModelDock->load();
   if (this->mp_AcquisitionQ->hasPoints() || this->mp_AcquisitionQ->hasAnalogs())
     this->mp_ModelDock->setVisible(true);
-  this->timeEventControler->setEnabled(true);
+  
+  pw.setProgressValue(85);
 
   pw.setProgressValue(100);
 
   QApplication::restoreOverrideCursor();
   
+  this->timeEventControler->setEnabled(true);
   this->actionClose->setEnabled(true);
   this->actionViewMetadata->setEnabled(true);
-  //this->actionSave->setEnabled(true); 
   this->actionSave_As->setEnabled(true);
   
   this->m_LastDirectory = QFileInfo(filename).absolutePath();
@@ -538,106 +500,30 @@ void MainWindow::saveAsFile()
 
 void MainWindow::saveFile(const QString& filename)
 {
-  Q_UNUSED(filename);
-  QMessageBox::warning(this, "Mokka", "The save option is disabled during the transition between the old UI and the new one.");
-  /*
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  btk::Acquisition::Pointer source = this->mp_Acquisition;
-  btk::Acquisition::Pointer target = btk::Acquisition::New();
-  // Acquisition info
-  target->SetFirstFrame(source->GetFirstFrame());
-  target->SetPointFrequency(source->GetPointFrequency());
-  target->SetAnalogResolution(source->GetAnalogResolution());
   
-  // Event
-  int eventRowNum = this->eventsTable->rowCount();
-  btk::EventCollection::Pointer targetEvents = target->GetEvents();
-  for (int i = 0 ; i < eventRowNum ; ++i)
-  {
-    if (!this->eventsTable->isRowHidden(i))
-    {
-      btk::Event::Pointer p = btk::Event::New();
-      QTableWidgetItem* item = this->eventsTable->item(i, 0);
-      p->SetTime(item->data(eventTime).toDouble());
-      item = this->eventsTable->item(i, 1);
-      p->SetContext(item->text().toStdString());
-      item = this->eventsTable->item(i, 2);
-      p->SetLabel(item->text().toStdString());
-      p->SetId(item->data(eventId).toInt());
-      p->SetDescription(item->data(eventDescription).toString().toStdString());
-      item = this->eventsTable->item(i, 3);
-      p->SetSubject(item->text().toStdString());
-      targetEvents->InsertItem(p);
-    }
-  }
-  // Metadata
-  target->SetMetaData(source->GetMetaData()->Clone());
-  // Point
-  int inc = 0;
-  int pointRowNum = this->markersTable->rowCount();
-  btk::PointCollection::Pointer sourcePoints = source->GetPoints();
-  btk::PointCollection::Pointer targetPoints = target->GetPoints();
-  for (int i = 0 ; i < pointRowNum ; ++i)
-  {
-    QTableWidgetItem* item = this->markersTable->item(i, 0);
-    if (!item->data(pointDisabled).toBool())
-    {
-      btk::Point::Pointer p = sourcePoints->GetItem(item->data(pointId).toInt())->Clone() ;
-      p->SetLabel(item->data(pointLabel).toString().toStdString());
-      p->SetDescription(item->data(pointDescription).toString().toStdString());
-      targetPoints->InsertItem(p);
-      ++inc;
-    }
-  }
-  // Analog
-  target->SetAnalogs(source->GetAnalogs()->Clone());
-  // Final setup
-  target->Resize(inc, source->GetPointFrameNumber(), source->GetAnalogNumber(), source->GetNumberAnalogSamplePerFrame());
-  // BTK writer
-  btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
-  writer->SetFilename(filename.toStdString());
-  writer->SetInput(target);
-  QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file saving", QMessageBox::Ok , this);
-  try
-  {
-    writer->Update();
-  }
-  catch (btk::Exception& e)
+  QString errMsg = this->mp_AcquisitionQ->save(filename);
+  if (!errMsg.isEmpty())
   {
     QApplication::restoreOverrideCursor();
-    error.setInformativeText(e.what());
-    error.exec();
-    return;
-  }
-  catch (std::exception& e)
-  {
-    QApplication::restoreOverrideCursor();
-    error.setInformativeText("Unexpected error: " + QString(e.what()));
-    error.exec();
-    return;
-  }
-  catch (...)
-  {
-    QApplication::restoreOverrideCursor();
-    error.setInformativeText("Unknown error.");
+    QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file saving", QMessageBox::Ok , this);
+    error.setInformativeText(errMsg);
     error.exec();
     return;
   }
   this->mp_AcquisitionUndoStack->setClean();
   this->setCurrentFile(filename);
-  //this->fillFileInformations(filename, writer->GetAcquisitionIO(), target);
   QApplication::restoreOverrideCursor();
   this->setWindowModified(false);
-  */
 };
 
 void MainWindow::closeFile()
 {
   if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
-    this->clearUI();
+    this->reset();
 }
 
-void MainWindow::clearUI()
+void MainWindow::reset()
 {
   this->mp_AcquisitionUndoStack->clear();
   this->mp_MarkerConfigurationUndoStack->clear();

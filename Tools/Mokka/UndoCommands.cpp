@@ -45,11 +45,23 @@
 
 // --------------- EditRegionOfInterest ---------------
 EditRegionOfInterest::EditRegionOfInterest(Acquisition* acq, int lb, int rb, QUndoCommand* parent)
-: AcquisitionUndoCommand(parent)
+: AcquisitionUndoCommand(parent), m_Ids(), m_Events()
 {
   this->mp_Acquisition = acq;
   this->mp_ROI[0] = lb;
   this->mp_ROI[1] = rb;
+  
+  for (QMap<int,Event*>::const_iterator it = this->mp_Acquisition->events().begin() ; it != this->mp_Acquisition->events().end() ; ++it)
+  {
+    if ((it.value()->frame < this->mp_ROI[0]) || (it.value()->frame > this->mp_ROI[1]))
+      this->m_Ids << it.key();
+  }
+};
+
+EditRegionOfInterest::~EditRegionOfInterest()
+{
+  for (int i = 0 ; i < this->m_Events.count() ; ++i)
+    delete this->m_Events[i];
 };
 
 void EditRegionOfInterest::action()
@@ -60,6 +72,19 @@ void EditRegionOfInterest::action()
   this->mp_ROI[0] = temp[0];
   this->mp_ROI[1] = temp[1];
 };
+
+void EditRegionOfInterest::undo()
+{
+  this->action();
+  this->mp_Acquisition->insertEvents(this->m_Ids, this->m_Events);
+  this->m_Events.clear();
+}
+
+void EditRegionOfInterest::redo()
+{
+  this->action();
+  this->m_Events = this->mp_Acquisition->takeEvents(this->m_Ids);
+}
 
 // ----------------------------------------------- //
 //               POINT/MARKER EDITION              //

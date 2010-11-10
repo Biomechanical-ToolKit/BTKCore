@@ -34,15 +34,11 @@
  */
 
 #include "MultiViewWidget.h"
+#include "Acquisition.h"
 #include "CompositeView.h"
 #include "Viz3DWidget.h"
 #include "UserRoles.h"
 
-#include <btkDownsampleFilter.h>
-#include <btkWrenchCollection.h>
-#include <btkSpecializedPointsExtractor.h>
-#include <btkForcePlatformsExtractor.h>
-#include <btkGroundReactionWrenchFilter.h>
 #include <btkVTKForcePlatformsSource.h>
 #include <btkVTKGRFsFramesSource.h>
 #include <btkVTKCommandEvents.h>
@@ -72,7 +68,6 @@
 #include <vtkIdTypeArray.h>
 #include <vtkCamera.h>
 
-enum {BTK_MARKERS, BTK_VIRTUALS_MARKERS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
 enum {VTK_GROUND, VTK_FORCE_PLATFORMS, VTK_MARKERS, VTK_GRFS};
 
 class vtkStreamingDemandDrivenPipelineCollection : public vtkstd::list<vtkStreamingDemandDrivenPipeline*>
@@ -85,11 +80,11 @@ class vtkProcessMap : public vtkstd::map<int, vtkObjectBase*>
 MultiViewWidget::MultiViewWidget(QWidget* parent)
 : AbstractMultiView(parent)
 {
+  this->mp_Acquisition = 0;
   this->mp_EventQtSlotConnections = vtkEventQtSlotConnect::New();
   this->mp_VTKProc = new vtkProcessMap();
   this->mp_Syncro = new vtkStreamingDemandDrivenPipelineCollection();
   this->mp_Mappers = vtkMapperCollection::New();
-  this->m_FirstFrame = 1;
   this->mp_GroupOrientationMenu = new QMenu(tr("Ground Orientation"),this);
   this->mp_ActionGroundOrientationPlaneXY = new QAction(tr("Plane XY"),this);
   this->mp_ActionGroundOrientationPlaneXY->setCheckable(true);
@@ -133,23 +128,23 @@ void MultiViewWidget::initialize()
   CompositeView* sv = static_cast<CompositeView*>(this->gridLayout()->itemAtPosition(0,0)->widget());
   vtkRenderer* renderer = static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D))->renderer();
   
-  // BTK PIPELINE
-  //btk::SpecializedPointsExtractor::Pointer markersExtractor = btk::SpecializedPointsExtractor::New();
-  btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
-  //virtualMarkersSeparator->SetInput(markersExtractor->GetOutput());
-  btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = btk::ForcePlatformsExtractor::New();
-  btk::GroundReactionWrenchFilter::Pointer GRWsFilter = btk::GroundReactionWrenchFilter::New();
-  GRWsFilter->SetThresholdValue(5.0); // PWA are not computed from vertical forces lower than 5 newtons.
-  GRWsFilter->SetThresholdState(true);
-  GRWsFilter->SetInput(forcePlatformsExtractor->GetOutput());
-  btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = btk::DownsampleFilter<btk::WrenchCollection>::New();
-  GRWsDownsampler->SetInput(GRWsFilter->GetOutput());
-  // Store BTK process to be reused later.
-  //this->m_BTKProc[BTK_MARKERS] = markersExtractor;
-  this->m_BTKProc[BTK_VIRTUALS_MARKERS] = virtualMarkersSeparator;
-  this->m_BTKProc[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
-  this->m_BTKProc[BTK_GRWS] = GRWsFilter;
-  this->m_BTKProc[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
+  // // BTK PIPELINE
+  // //btk::SpecializedPointsExtractor::Pointer markersExtractor = btk::SpecializedPointsExtractor::New();
+  // btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
+  // //virtualMarkersSeparator->SetInput(markersExtractor->GetOutput());
+  // btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = btk::ForcePlatformsExtractor::New();
+  // btk::GroundReactionWrenchFilter::Pointer GRWsFilter = btk::GroundReactionWrenchFilter::New();
+  // GRWsFilter->SetThresholdValue(5.0); // PWA are not computed from vertical forces lower than 5 newtons.
+  // GRWsFilter->SetThresholdState(true);
+  // GRWsFilter->SetInput(forcePlatformsExtractor->GetOutput());
+  // btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = btk::DownsampleFilter<btk::WrenchCollection>::New();
+  // GRWsDownsampler->SetInput(GRWsFilter->GetOutput());
+  // // Store BTK process to be reused later.
+  // //this->m_BTKProc[BTK_MARKERS] = markersExtractor;
+  // this->m_BTKProc[BTK_VIRTUALS_MARKERS] = virtualMarkersSeparator;
+  // this->m_BTKProc[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
+  // this->m_BTKProc[BTK_GRWS] = GRWsFilter;
+  // this->m_BTKProc[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
   
   // VTK PIPELINE
   // Static data
@@ -177,9 +172,15 @@ void MultiViewWidget::initialize()
   mapper->Delete();
   actor->Delete();
   prop->Delete();
+  // Camera
+  renderer->GetActiveCamera()->Elevation(-60);
+  renderer->ResetCamera();
+  renderer->GetActiveCamera()->Zoom(1.6);
+  
+  // Dynamic data
   // Pipeline for force plaforms
   btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::New();
-  forcePlaforms->SetInput(forcePlatformsExtractor->GetOutput());
+  //forcePlaforms->SetInput(forcePlatformsExtractor->GetOutput());
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(forcePlaforms->GetOutputPort());
   prop = vtkProperty::New();
@@ -204,8 +205,8 @@ void MultiViewWidget::initialize()
   prototype->Delete();
   // Pipeline for markers
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::New();
-  markers->SetInput(0, virtualMarkersSeparator->GetOutput(0));
-  markers->SetInput(1, virtualMarkersSeparator->GetOutput(2));
+  //markers->SetInput(0, virtualMarkersSeparator->GetOutput(0));
+  //markers->SetInput(1, virtualMarkersSeparator->GetOutput(2));
   // - Display marker's position
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(markers->GetOutputPort(0));
@@ -237,7 +238,7 @@ void MultiViewWidget::initialize()
   actor->Delete();
   // Pipeline for GRFs
   btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::New();
-  GRFs->SetInput(GRWsDownsampler->GetOutput());
+  //GRFs->SetInput(GRWsDownsampler->GetOutput());
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(GRFs->GetOutputPort());
   this->mp_Mappers->AddItem(mapper);
@@ -264,11 +265,6 @@ void MultiViewWidget::initialize()
   (*this->mp_VTKProc)[VTK_FORCE_PLATFORMS] = forcePlaforms;
   (*this->mp_VTKProc)[VTK_MARKERS] = markers;
   (*this->mp_VTKProc)[VTK_GRFS] = GRFs;
-  
-  // Camera
-  renderer->GetActiveCamera()->Elevation(-60);
-  renderer->ResetCamera();
-  renderer->GetActiveCamera()->Zoom(1.6);
 
   // Links between VTK & Qt
   this->mp_EventQtSlotConnections->Connect(
@@ -278,139 +274,30 @@ void MultiViewWidget::initialize()
       SLOT(updateDisplayedMarkersList(vtkObject*, unsigned long, void*, void*)));
 };
 
-void MultiViewWidget::setMarkerRadius(int id, double r)
+void MultiViewWidget::setAcquisition(Acquisition* acq)
 {
+  if (this->mp_Acquisition)
+    disconnect(this->mp_Acquisition, 0, this, 0);
+  this->mp_Acquisition = acq;
+  // BTK->VTK connection
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markers->SetMarkerRadius(id, r);
-};
-
-void MultiViewWidget::setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  for (int i = 0 ; i < ids.count() ; ++i)
-    markers->SetMarkerRadius(ids[i], radii[i]);
-  this->updateDisplay();
-};
-
-void MultiViewWidget::setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  vtkLookupTable* markersColorsLUT = markers->GetMarkerColorLUT();
-  for (int i = 0 ; i < ids.count() ; ++i)
-  {
-    int num = markersColorsLUT->GetNumberOfTableValues();
-    QColor color = colors[i];
-    int j = 0;
-    while (j < num)
-    {
-      double* c = markersColorsLUT->GetTableValue(j);
-      if ((color.redF() == c[0]) && (color.greenF() == c[1]) && (color.blueF() == c[2]))
-      {
-        markers->SetMarkerColorIndex(ids[i], j);
-        break;
-      }
-      ++j;
-    }
-    if (j >= num)
-    {
-      markersColorsLUT->SetNumberOfTableValues(num + 1);
-      markersColorsLUT->SetTableValue(num, color.redF(), color.greenF(), color.blueF());
-      markersColorsLUT->SetTableRange(0, num + 1);
-      markers->SetMarkerColorIndex(ids[i], num);
-    }
-  }
-  this->updateDisplay();
-};
-
-void MultiViewWidget::updateHiddenMarkers(const QList<int>& ids)
-{
-  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markersFramesSource->ShowMarkers();
-  for (int i = 0 ; i < ids.count() ; ++i)
-    markersFramesSource->HideMarker(ids[i]);
-  this->updateDisplay();
-};
-
-void MultiViewWidget::updateTailedMarkers(const QList<int>& ids)
-{
-  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markersFramesSource->HideTrajectories();
-  for (int i = 0 ; i < ids.count() ; ++i)
-    markersFramesSource->ShowTrajectory(ids[i]);
-  this->updateDisplay();
-};
-
-double MultiViewWidget::markerRadius(int id)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  return markers->GetMarkerRadius(id);
-};
-
-void MultiViewWidget::setMarkerColorIndex(int id, int idx)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markers->SetMarkerColorIndex(id, idx);
-};
-
-int MultiViewWidget::markerColorIndex(int id)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  return markers->GetMarkerColorIndex(id);
-};
-
-void MultiViewWidget::setMarkerVisibility(int id, bool visible)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markers->SetMarkerVisibility(id, visible);
-};
-
-bool MultiViewWidget::markerVisibility(int id)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  return markers->GetMarkerVisibility(id);
-};
-
-double* MultiViewWidget::markerColorValue(int c)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  return markers->GetMarkerColorLUT()->GetTableValue(c);
+  markers->SetInput(0, this->mp_Acquisition->btkMarkers());
+  markers->SetInput(1, this->mp_Acquisition->btkVirtualMarkers());
+  btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
+  GRFs->SetInput(this->mp_Acquisition->btkGroundReactionWrenches());
+  btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::SafeDownCast((*this->mp_VTKProc)[VTK_FORCE_PLATFORMS]);
+  forcePlaforms->SetInput(this->mp_Acquisition->btkForcePlatforms());
+  // Object connection
+  connect(this->mp_Acquisition, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
+  connect(this->mp_Acquisition, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
 }
 
-void MultiViewWidget::setGroundOrientation(double x, double y, double z)
+void MultiViewWidget::load()
 {
-  vtkPlaneSource* ground = vtkPlaneSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
-  ground->SetNormal(x,y,z);
-  this->updateViews();
-}
-
-bool MultiViewWidget::appendNewMarkerColor(const QColor& color, int* idx)
-{
-  bool modified = false;
-  vtkLookupTable* markersColorsLUT = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetMarkerColorLUT();
-  int num = markersColorsLUT->GetNumberOfTableValues();
-  int i = 0;
-  for (i = 0 ; i < num ; ++i)
-  {
-    double* c = markersColorsLUT->GetTableValue(i);
-    if ((color.redF() == c[0]) && (color.greenF() == c[1]) && (color.blueF() == c[2]))
-      break;
-  }
-  if (i >= num)
-  {
-    markersColorsLUT->SetNumberOfTableValues(num + 1);
-    markersColorsLUT->SetTableValue(num, color.redF(), color.greenF(), color.blueF());
-    markersColorsLUT->SetTableRange(0, num + 1);
-    i = num;
-    modified = true;
-  }
-  *idx = i;
-  return modified;
-};
-
-btk::SeparateKnownVirtualMarkersFilter::Pointer MultiViewWidget::load(btk::Acquisition::Pointer acq)
-{
-  this->m_FirstFrame = acq->GetFirstFrame();
+  if (!this->mp_Acquisition)
+    return;
   
+  /*
   //btk::SpecializedPointsExtractor::Pointer markersExtractor = static_pointer_cast<btk::SpecializedPointsExtractor>(this->m_BTKProc[BTK_MARKERS]);
   btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProc[BTK_VIRTUALS_MARKERS]);
   btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProc[BTK_FORCE_PLATFORMS]);
@@ -419,8 +306,9 @@ btk::SeparateKnownVirtualMarkersFilter::Pointer MultiViewWidget::load(btk::Acqui
   virtualMarkersSeparator->SetInput(acq->GetPoints());
   forcePlatformsExtractor->SetInput(acq);
   GRWsDownsampler->SetUpDownRatio(acq->GetNumberAnalogSamplePerFrame());
+  */
   
-  std::string markerUnit = acq->GetPointUnit();
+  QString markerUnit = this->mp_Acquisition->pointUnit(Point::Marker);
   double scale = 1.0;
   if (markerUnit.compare("m") == 0)
     scale = 1000.0;
@@ -432,9 +320,8 @@ btk::SeparateKnownVirtualMarkersFilter::Pointer MultiViewWidget::load(btk::Acqui
   markers->SetScaleUnit(scale);
   forcePlaforms->SetScaleUnit(scale);
   
-  virtualMarkersSeparator->Update();
-  
   // Generate the lists for the graphs (Must be set after the update of the virtual makers separator filter)
+  /*
   QFont f;
   QListWidgetItem* lwi;
   // List for the points
@@ -596,20 +483,147 @@ btk::SeparateKnownVirtualMarkersFilter::Pointer MultiViewWidget::load(btk::Acqui
     lwi->setCheckState(Qt::Unchecked);
     lwAnalog->addItem(lwi);
   }
+  delete lwPoint;
+  delete lwAnalog;
+  */
   
   // Active the content of each view
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
   {
     CompositeView* view = static_cast<CompositeView*>(*it);
-    view->setFunctionComboBoxOption(CompositeView::GraphPoint, lwPoint, 1);
-    view->setFunctionComboBoxOption(CompositeView::GraphAnalogChannel, lwAnalog, 1);
+    //view->setFunctionComboBoxOption(CompositeView::GraphPoint, lwPoint, 1);
+    //view->setFunctionComboBoxOption(CompositeView::GraphAnalogChannel, lwAnalog, 1);
     view->show(true);
   }
-  
-  delete lwPoint;
-  delete lwAnalog;
-  
-  return virtualMarkersSeparator;
+};
+
+void MultiViewWidget::setMarkerRadius(int id, double r)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markers->SetMarkerRadius(id, r);
+};
+
+void MultiViewWidget::setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markers->SetMarkerRadius(ids[i], radii[i]);
+  this->updateDisplay();
+};
+
+void MultiViewWidget::setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  vtkLookupTable* markersColorsLUT = markers->GetMarkerColorLUT();
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    int num = markersColorsLUT->GetNumberOfTableValues();
+    QColor color = colors[i];
+    int j = 0;
+    while (j < num)
+    {
+      double* c = markersColorsLUT->GetTableValue(j);
+      if ((color.redF() == c[0]) && (color.greenF() == c[1]) && (color.blueF() == c[2]))
+      {
+        markers->SetMarkerColorIndex(ids[i], j);
+        break;
+      }
+      ++j;
+    }
+    if (j >= num)
+    {
+      markersColorsLUT->SetNumberOfTableValues(num + 1);
+      markersColorsLUT->SetTableValue(num, color.redF(), color.greenF(), color.blueF());
+      markersColorsLUT->SetTableRange(0, num + 1);
+      markers->SetMarkerColorIndex(ids[i], num);
+    }
+  }
+  this->updateDisplay();
+};
+
+void MultiViewWidget::updateHiddenMarkers(const QList<int>& ids)
+{
+  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markersFramesSource->ShowMarkers();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markersFramesSource->HideMarker(ids[i]);
+  this->updateDisplay();
+};
+
+void MultiViewWidget::updateTailedMarkers(const QList<int>& ids)
+{
+  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markersFramesSource->HideTrajectories();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markersFramesSource->ShowTrajectory(ids[i]);
+  this->updateDisplay();
+};
+
+double MultiViewWidget::markerRadius(int id)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  return markers->GetMarkerRadius(id);
+};
+
+void MultiViewWidget::setMarkerColorIndex(int id, int idx)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markers->SetMarkerColorIndex(id, idx);
+};
+
+int MultiViewWidget::markerColorIndex(int id)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  return markers->GetMarkerColorIndex(id);
+};
+
+void MultiViewWidget::setMarkerVisibility(int id, bool visible)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markers->SetMarkerVisibility(id, visible);
+};
+
+bool MultiViewWidget::markerVisibility(int id)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  return markers->GetMarkerVisibility(id);
+};
+
+double* MultiViewWidget::markerColorValue(int c)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  return markers->GetMarkerColorLUT()->GetTableValue(c);
+}
+
+void MultiViewWidget::setGroundOrientation(double x, double y, double z)
+{
+  vtkPlaneSource* ground = vtkPlaneSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
+  ground->SetNormal(x,y,z);
+  this->updateViews();
+}
+
+bool MultiViewWidget::appendNewMarkerColor(const QColor& color, int* idx)
+{
+  bool modified = false;
+  vtkLookupTable* markersColorsLUT = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetMarkerColorLUT();
+  int num = markersColorsLUT->GetNumberOfTableValues();
+  int i = 0;
+  for (i = 0 ; i < num ; ++i)
+  {
+    double* c = markersColorsLUT->GetTableValue(i);
+    if ((color.redF() == c[0]) && (color.greenF() == c[1]) && (color.blueF() == c[2]))
+      break;
+  }
+  if (i >= num)
+  {
+    markersColorsLUT->SetNumberOfTableValues(num + 1);
+    markersColorsLUT->SetTableValue(num, color.redF(), color.greenF(), color.blueF());
+    markersColorsLUT->SetTableRange(0, num + 1);
+    i = num;
+    modified = true;
+  }
+  *idx = i;
+  return modified;
 };
 
 void MultiViewWidget::updateDisplayedMarkersList(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
@@ -628,6 +642,7 @@ void MultiViewWidget::clear()
 {
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
     static_cast<CompositeView*>(*it)->show(false);
+  this->updateDisplay(this->mp_Acquisition->firstFrame());
 };
 
 void MultiViewWidget::circleSelectedMarkers(QList<QTableWidgetItem*> items)
@@ -670,7 +685,7 @@ void MultiViewWidget::updateDisplay(int frame)
   // Force to update the markers even if the required frame was the last updated.
   btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
   // Update
-  double t = static_cast<double>(frame - this->m_FirstFrame);
+  double t = static_cast<double>(frame - this->mp_Acquisition->firstFrame());
   for (vtkStreamingDemandDrivenPipelineCollection::iterator it = this->mp_Syncro->begin() ; it != this->mp_Syncro->end() ; ++it)
     (*it)->SetUpdateTimeStep(0, t);
   this->mp_Mappers->InitTraversal();

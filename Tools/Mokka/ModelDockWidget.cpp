@@ -301,55 +301,67 @@ ModelDockWidget::~ModelDockWidget()
   delete this->mp_AnalogsIcon;
   delete this->mp_ModelOutputsIcon;
 };
+
+void ModelDockWidget::setAcquisition(Acquisition* acq)
+{
+  if (this->mp_Acquisition)
+    disconnect(this->mp_Acquisition, 0, this, 0);
+  this->mp_Acquisition = acq;
+  connect(this->mp_Acquisition, SIGNAL(pointLabelChanged(int, QString)), this, SLOT(setPointLabel(int, QString)));
+  connect(this->mp_Acquisition, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
+  connect(this->mp_Acquisition, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
+  connect(this->mp_Acquisition, SIGNAL(pointsDescriptionChanged(QVector<int>, QVector<QString>)), this, SLOT(setPointsDescription(QVector<int>, QVector<QString>)));
+  connect(this->mp_Acquisition, SIGNAL(pointsRemoved(QList<int>, QList<Point*>)), this, SLOT(removePoints(QList<int>, QList<Point*>)));
+  connect(this->mp_Acquisition, SIGNAL(pointsInserted(QList<int>, QList<Point*>)), this, SLOT(insertPoints(QList<int>, QList<Point*>)));
+  connect(this->mp_Acquisition, SIGNAL(analogLabelChanged(int, QString)), this, SLOT(setAnalogLabel(int, QString)));
+  connect(this->mp_Acquisition, SIGNAL(analogsUnitChanged(QVector<int>, QVector<QString>)), this, SLOT(setAnalogsUnit(QVector<int>, QVector<QString>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsGainChanged(QVector<int>, QVector<Analog::Gain>)), this, SLOT(setAnalogsGain(QVector<int>, QVector<Analog::Gain>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsOffsetChanged(QVector<int>, QVector<int>)), this, SLOT(setAnalogsOffset(QVector<int>, QVector<int>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsScaleChanged(QVector<int>, QVector<double>)), this, SLOT(setAnalogsScale(QVector<int>, QVector<double>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsDescriptionChanged(QVector<int>, QVector<QString>)), this, SLOT(setAnalogsDescription(QVector<int>, QVector<QString>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsRemoved(QList<int>, QList<Analog*>)), this, SLOT(removeAnalogs(QList<int>, QList<Analog*>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsInserted(QList<int>, QList<Analog*>)), this, SLOT(insertAnalogs(QList<int>, QList<Analog*>)));
+};
   
-void ModelDockWidget::load(btk::PointCollection::Pointer markers, btk::PointCollection::Pointer virtuals, btk::PointCollection::Pointer others, btk::AnalogCollection::Pointer analogs)
+void ModelDockWidget::load()
 {
   // Clear the UI
   this->reset();
+  
+  if (!this->mp_Acquisition)
+    return;
+    
   // Create the tree
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(0);
-  // Markers
-  for (btk::PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
-    markersRoot->addChild(this->createMarkerItem(QString::fromStdString((*it)->GetLabel())));
-  for (btk::PointCollection::ConstIterator it = virtuals->Begin() ; it != virtuals->End() ; ++it)
-    markersRoot->addChild(this->createMarkerItem(QString::fromStdString((*it)->GetLabel()), false));
-  markersRoot->setExpanded(true);
-  // Other points
   QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(2);
   QTreeWidgetItem* modelOutputAngles = modelOutputsRoot->child(0);
   QTreeWidgetItem* modelOutputForces = modelOutputsRoot->child(1);
   QTreeWidgetItem* modelOutputMoments = modelOutputsRoot->child(2);
   QTreeWidgetItem* modelOutputPowers = modelOutputsRoot->child(3);
   QTreeWidgetItem* modelOutputScalars = modelOutputsRoot->child(4);
-  for (btk::PointCollection::ConstIterator it = others->Begin() ; it != others->End() ; ++it)
+  // - Points
+  for (QMap<int, Point*>::const_iterator it = this->mp_Acquisition->points().begin() ; it != this->mp_Acquisition->points().end() ; ++it)
   {
-    switch ((*it)->GetType())
-    {
-    case btk::Point::Marker:
-    case btk::Point::Reaction:
-      break;
-    case btk::Point::Angle:
-      modelOutputAngles->addChild(this->createModelOutputItem(QString::fromStdString((*it)->GetLabel())));
-      break;
-    case btk::Point::Force:
-      modelOutputForces->addChild(this->createModelOutputItem(QString::fromStdString((*it)->GetLabel())));
-      break;
-    case btk::Point::Moment:
-      modelOutputMoments->addChild(this->createModelOutputItem(QString::fromStdString((*it)->GetLabel())));
-      break;
-    case btk::Point::Power:
-      modelOutputPowers->addChild(this->createModelOutputItem(QString::fromStdString((*it)->GetLabel())));
-      break;
-    case btk::Point::Scalar:
-      modelOutputScalars->addChild(this->createModelOutputItem(QString::fromStdString((*it)->GetLabel())));
-      break;
-    }
+    if (it.value()->type == Point::Marker)
+      markersRoot->addChild(this->createMarkerItem(it.value()->label, it.key()));
+    else if (it.value()->type == Point::VirtualMarker)
+      markersRoot->addChild(this->createMarkerItem(it.value()->label, it.key(), false));
+    else if (it.value()->type == Point::Angle)
+      modelOutputAngles->addChild(this->createModelOutputItem(it.value()->label, it.key()));
+    else if (it.value()->type == Point::Force)
+      modelOutputForces->addChild(this->createModelOutputItem(it.value()->label, it.key()));
+    else if (it.value()->type == Point::Moment)
+      modelOutputMoments->addChild(this->createModelOutputItem(it.value()->label, it.key()));
+    else if (it.value()->type == Point::Power)
+      modelOutputPowers->addChild(this->createModelOutputItem(it.value()->label, it.key()));
+    else if (it.value()->type == Point::Scalar)
+      modelOutputScalars->addChild(this->createModelOutputItem(it.value()->label, it.key()));
   }
-  // Analogs
+  markersRoot->setExpanded(true);
+  // - Analogs
   QTreeWidgetItem* analogsRoot = this->modelTree->topLevelItem(1);
-  int inc = 0;
-  for (btk::AnalogCollection::ConstIterator it = analogs->Begin() ; it != analogs->End() ; ++it)
-    analogsRoot->addChild(this->createAnalogItem(QString::fromStdString((*it)->GetLabel()), inc++));
+  for (QMap<int, Analog*>::const_iterator it = this->mp_Acquisition->analogs().begin() ; it != this->mp_Acquisition->analogs().end() ; ++it)
+    analogsRoot->addChild(this->createAnalogItem(it.value()->label, it.key()));
   // Refresh the tree and these actions
   this->refresh();
   this->modelTree->clearSelection();
@@ -361,6 +373,8 @@ void ModelDockWidget::load(btk::PointCollection::Pointer markers, btk::PointColl
   // ...
   // Update the recent colors
   this->drawRecentColors();
+  
+  this->sendHiddenMarkers(); // For the virtual markers hideen by default.
 };
 
 void ModelDockWidget::reset()
@@ -883,6 +897,7 @@ void ModelDockWidget::removeSelectedItems()
     emit pointsRemoved(pointIds);
   if (!analogIds.isEmpty())
     emit analogsRemoved(analogIds);
+  this->modelTree->clearSelection();
 };
 
 void ModelDockWidget::toggleProperties()
@@ -1296,6 +1311,7 @@ void ModelDockWidget::removePoints(const QList<int>& ids, const QList<Point*>& p
     switch (points[i]->type)
     {
     case Point::Marker:
+    case Point::VirtualMarker:
       this->treePointChild(markersRoot, ids[i])->setHidden(true);
       break;
     case Point::Angle:
@@ -1312,6 +1328,8 @@ void ModelDockWidget::removePoints(const QList<int>& ids, const QList<Point*>& p
       break;
     case Point::Scalar:
       this->treePointChild(modelOutputScalars, ids[i])->setHidden(true);
+      break;
+    default:
       break;
     }
   }
@@ -1335,6 +1353,7 @@ void ModelDockWidget::insertPoints(const QList<int>& ids, const QList<Point*>& p
     switch (points[i]->type)
     {
     case Point::Marker:
+    case Point::VirtualMarker:
       this->treePointChild(markersRoot, ids[i])->setHidden(false);
       break;
     case Point::Angle:
@@ -1351,6 +1370,8 @@ void ModelDockWidget::insertPoints(const QList<int>& ids, const QList<Point*>& p
       break;
     case Point::Scalar:
       this->treePointChild(modelOutputScalars, ids[i])->setHidden(false);
+      break;
+    default:
       break;
     }
   }
@@ -1661,13 +1682,13 @@ void ModelDockWidget::setConfigurationModified(int idx, bool modified)
   this->mp_SaveConfiguration->setEnabled(modified ? false : true);
 };
 
-QTreeWidgetItem* ModelDockWidget::createMarkerItem(const QString& label, bool checked)
+QTreeWidgetItem* ModelDockWidget::createMarkerItem(const QString& label, int id, bool checked)
 {
   QTreeWidgetItem* markerItem = new QTreeWidgetItem(QStringList(label), MarkerType);
   markerItem->setIcon(LabelHeader, this->createMarkerIcon(Qt::white));
   markerItem->setCheckState(VisibleHeader, checked ? Qt::Checked : Qt::Unchecked);
   markerItem->setCheckState(TrajectoryHeader, Qt::Unchecked);
-  markerItem->setData(0, pointId, this->mp_Acquisition->findPointIdFromLabel(markerItem->text(0)));
+  markerItem->setData(0, pointId, id);
   return markerItem;
 }
 
@@ -1679,11 +1700,11 @@ QTreeWidgetItem* ModelDockWidget::createAnalogItem(const QString& label, int id)
   return analogItem;
 };
 
-QTreeWidgetItem* ModelDockWidget::createModelOutputItem(const QString& label)
+QTreeWidgetItem* ModelDockWidget::createModelOutputItem(const QString& label, int id)
 {
   QTreeWidgetItem* modelOutputItem = new QTreeWidgetItem(QStringList(label), PointType);
   modelOutputItem->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
-  modelOutputItem->setData(0, pointId, this->mp_Acquisition->findPointIdFromLabel(modelOutputItem->text(0)));
+  modelOutputItem->setData(0, pointId, id);
   return modelOutputItem;
 };
 

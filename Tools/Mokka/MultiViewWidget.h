@@ -38,12 +38,6 @@
 
 #include "AbstractMultiView.h"
 
-#include <btkProcessObject.h>
-#include <btkAcquisition.h>
-#include <btkSeparateKnownVirtualMarkersFilter.h>
-
-#include <map>
-
 #include <vtkEventQtSlotConnect.h>
 #include <vtkMapperCollection.h>
 
@@ -51,6 +45,7 @@
 
 // Forward declaration
 class AbstractView;
+class Acquisition;
 class QTableWidgetItem;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
@@ -66,6 +61,9 @@ public:
   // MultiViewWidget& operator=(const MultiViewWidget&); // Implicit.
   
   void initialize();
+  void setAcquisition(Acquisition* acq);
+  void load();
+    
   void setMarkerRadius(int id, double r);
   double markerRadius(int id);
   void setMarkerColorIndex(int id, int idx);
@@ -75,7 +73,6 @@ public:
   double* markerColorValue(int c);
   bool appendNewMarkerColor(const QColor& color, int* idx);
   void setGroundOrientation(double x, double y, double z);
-  btk::SeparateKnownVirtualMarkersFilter::Pointer load(btk::Acquisition::Pointer acq);
   QMenu* groundOrientationMenu() const {return this->mp_GroupOrientationMenu;};
   
 public slots:
@@ -115,19 +112,17 @@ private slots:
 private:
   void updateViews();
   
+  Acquisition* mp_Acquisition;
+  vtkEventQtSlotConnect* mp_EventQtSlotConnections;
+  vtkProcessMap* mp_VTKProc;
+  vtkMapperCollection* mp_Mappers;
+  vtkStreamingDemandDrivenPipelineCollection* mp_Syncro;
   QMenu* mp_GroupOrientationMenu;
   QAction* mp_ActionRemoveAllGeneralFootOff;
   QAction* mp_ActionGroundOrientationPlaneXY;
   QAction* mp_ActionGroundOrientationPlaneYZ;
   QAction* mp_ActionGroundOrientationPlaneZX;
   QAction* mp_ActionGroundOrientationAutomatic;
-  
-  vtkEventQtSlotConnect* mp_EventQtSlotConnections;
-  vtkProcessMap* mp_VTKProc;
-  vtkMapperCollection* mp_Mappers;
-  vtkStreamingDemandDrivenPipelineCollection* mp_Syncro;
-  std::map<int, btk::ProcessObject::Pointer> m_BTKProc;
-  int m_FirstFrame;
 };
 
 #endif // MultiViewWidget_h

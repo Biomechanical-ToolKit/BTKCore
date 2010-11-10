@@ -34,6 +34,7 @@
  */
 
 #include "TimeEventControlerWidget.h"
+#include "Acquisition.h"
 #include "NewEventDialog.h"
 
 #include <QMenu>
@@ -169,10 +170,21 @@ TimeEventControlerWidget::~TimeEventControlerWidget()
   delete this->mp_NextEventActiveIcon;
 };
 
-void TimeEventControlerWidget::load(Acquisition* acq)
+void TimeEventControlerWidget::setAcquisition(Acquisition* acq)
 {
+  if (this->mp_Acquisition)
+    disconnect(this->mp_Acquisition, 0, this, 0);
   this->mp_Acquisition = acq;
-  this->timeEventBar->load(acq);
+  connect(this->mp_Acquisition, SIGNAL(regionOfInterestChanged(int, int)), this, SLOT(setRegionOfInterest(int, int)));
+  connect(this->mp_Acquisition, SIGNAL(eventsRemoved(QList<int>, QList<Event*>)), this, SLOT(removeEvents(QList<int>, QList<Event*>)));
+  connect(this->mp_Acquisition, SIGNAL(eventsInserted(QList<int>, QList<Event*>)), this, SLOT(insertEvents(QList<int>, QList<Event*>)));
+}
+
+void TimeEventControlerWidget::load()
+{
+  if (!this->mp_Acquisition)
+    return;
+  this->timeEventBar->load(this->mp_Acquisition);
   this->changePlaybackParameters();
   this->updateEventActions();
   this->actionCropRegionOfInterest->setEnabled(false);

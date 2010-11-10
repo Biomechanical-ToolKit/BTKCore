@@ -41,7 +41,6 @@
 #include "FileInfoDockWidget.h"
 #include "Metadata.h"
 #include "ModelDockWidget.h"
-#include "PointsEditor.h"
 #include "UserRoles.h"
 
 #include <btkAcquisitionFileIO.h>
@@ -62,8 +61,6 @@ public:
   void play();
   void loadConfiguration(const QString& filename);
   void openFile(const QString& filename);
-
-  PointsEditor* mp_PointsEditorDlg;
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -108,7 +105,7 @@ public Q_SLOTS:
   
 private:
   void saveFile(const QString& filename);
-  void clearUI();
+  void reset();
   void readSettings(); 
   void writeSettings();
   void updateRecentFileActions();

@@ -37,11 +37,8 @@
 #define ModelDockWidget_h
 
 #include "ui_ModelDockWidget.h"
-#include "NewModelDialog.h"
 #include "Acquisition.h"
-
-#include <btkPointCollection.h>
-#include <btkAnalogCollection.h>
+#include "NewModelDialog.h"
 
 #include <QDockWidget>
 #include <QMenu>
@@ -61,8 +58,8 @@ public:
   ModelDockWidget(QWidget* parent = 0);
   ~ModelDockWidget();
   
-  void setAcquisition(Acquisition* acquisition) {this->mp_Acquisition = acquisition;};
-  void load(btk::PointCollection::Pointer markers, btk::PointCollection::Pointer virtuals, btk::PointCollection::Pointer others, btk::AnalogCollection::Pointer analogs);
+  void setAcquisition(Acquisition* acq);
+  void load();
   void reset();
   void visualConfigurations(QStringList& names, QStringList& filenames);
   void setVisualConfigurations(const QStringList& names, const QStringList& filenames);
@@ -173,9 +170,9 @@ private:
   void setConfigurationModified(int idx, bool modified);
   void sendHiddenMarkers();
   void sendTailedMarkers();
-  QTreeWidgetItem* createMarkerItem(const QString& label, bool checked = true);
+  QTreeWidgetItem* createMarkerItem(const QString& label, int id, bool checked = true);
   QTreeWidgetItem* createAnalogItem(const QString& label, int id);
-  QTreeWidgetItem* createModelOutputItem(const QString& label);
+  QTreeWidgetItem* createModelOutputItem(const QString& label, int id);
   QPixmap createMarkerIcon(const QColor& c, bool circled = false, bool enabled = true) const;
   void editMarkersColor(const QColor& color);
   void setRecentColor(int idx, const QColor& color);

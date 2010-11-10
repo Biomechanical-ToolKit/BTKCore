@@ -107,8 +107,9 @@ void TimeEventBarWidget::load(Acquisition* acq)
   this->m_RightBoundPos = this->m_LastFrame;
   
   this->m_EventItems.resize(acq->eventCount());
-  for (int i = 0 ; i < this->m_EventItems.count() ; ++i)
-    this->setEventItem(this->m_EventItems[i], i, acq->eventAt(i));
+  int inc = 0;
+  for (QMap<int,Event*>::const_iterator it = acq->events().begin() ; it != acq->events().end() ; ++it)
+    this->setEventItem(this->m_EventItems[inc++], it.key(), it.value());
   
   this->setSliderValue(this->m_FirstFrame);
   this->updateInternals();

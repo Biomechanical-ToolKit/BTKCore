@@ -108,12 +108,15 @@ class EditRegionOfInterest : public AcquisitionUndoCommand
 {
 public:
   EditRegionOfInterest(Acquisition* acq, int lb, int rb, QUndoCommand* parent = 0);
-  virtual void undo() {this->action();};
-  virtual void redo() {this->action();};
+  ~EditRegionOfInterest();
+  virtual void undo();
+  virtual void redo();
   
 private:
   Acquisition* mp_Acquisition;
   int mp_ROI[2];
+  QList<int> m_Ids;
+  QList<Event*> m_Events;
   
   void action();
 };

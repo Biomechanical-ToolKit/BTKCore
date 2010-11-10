@@ -37,11 +37,12 @@
 #define TimeEventControlerWidget_h
 
 #include "ui_TimeEventControlerWidget.h"
-#include "Acquisition.h"
 
 #include <QWidget>
 #include <QTimer>
 #include <QMenu>
+
+class Acquisition;
 
 class TimeEventControlerWidget : public QWidget, public Ui::TimeEventControlerWidget
 {
@@ -51,7 +52,8 @@ public:
   TimeEventControlerWidget(QWidget* parent = 0);
   ~TimeEventControlerWidget();
   
-  void load(Acquisition* acq);
+  void setAcquisition(Acquisition* acq);
+  void load();
   void reset();
   QMenu* playbackSpeedMenu() {return this->mp_PlaybackSpeedMenu;};
   int currentFrame() {return this->timeEventBar->m_SliderPos;};
