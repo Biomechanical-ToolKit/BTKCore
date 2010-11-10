@@ -55,7 +55,7 @@
 
 struct Point
 {
-  typedef enum {Marker, Angle, Force, Moment, Power, Scalar} Type;
+  typedef enum {Marker, VirtualMarker, VirtualMarkerForFrame, Angle, Force, Moment, Power, Scalar} Type;
   QString label;
   QString description;
   double radius;
@@ -93,14 +93,15 @@ public:
   Acquisition(QObject* parent = 0);
   ~Acquisition();
   
-  void load(const QString& filename, QString& message);
-  void save(const QString& filename);
+  QString load(const QString& filename);
+  QString save(const QString& filename);
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
   btk::Acquisition::Pointer btkAcquisition() const {return this->mp_BTKAcquisition;};
   btk::PointCollection::Pointer btkMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(0);};
   btk::PointCollection::Pointer btkVirtualMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(2);};
+  btk::PointCollection::Pointer btkOtherPoints() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(3);};
   btk::ForcePlatformCollection::Pointer btkForcePlatforms() const {return static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProcesses[BTK_FORCE_PLATFORMS])->GetOutput();};
   btk::WrenchCollection::Pointer btkGroundReactionWrenches() const {return static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED])->GetOutput();};
   
@@ -109,8 +110,10 @@ public:
   void regionOfInterest(int& lb, int& rb) const {lb = this->mp_ROI[0]; rb = this->mp_ROI[1];};
   void setRegionOfInterest(int lb, int rb);
   
-  double pointFrequency() const {return this->m_PointFrequency;};
+  double pointFrequency() const {return this->mp_BTKAcquisition->GetPointFrequency();};
+  QString pointUnit(Point::Type t) const;
   bool hasPoints() const {return !this->m_Points.empty();};
+  const QMap<int, Point*> points() const {return this->m_Points;};
   const QString& pointLabel(int id) const {return this->m_Points[id]->label;};
   void setPointLabel(int id, const QString& label);
   const QString& pointDescription(int id) const {return this->m_Points[id]->description;};
@@ -127,7 +130,10 @@ public:
   void insertPoints(const QList<int>& ids, const QList<Point*> points);
   int findPointIdFromLabel(const QString& label) const;
   
+  double analogFrequency() const {return this->mp_BTKAcquisition->GetAnalogFrequency();};
   bool hasAnalogs() const {return !this->m_Analogs.empty();};
+  int analogCount() const {return this->m_Analogs.count();};
+  const QMap<int, Analog*> analogs() const {return this->m_Analogs;};
   const QString& analogLabel(int id) const {return this->m_Analogs[id]->label;};
   void setAnalogLabel(int id, const QString& label);
   const QString& analogDescription(int id) const {return this->m_Analogs[id]->description;};
@@ -145,6 +151,7 @@ public:
   
   bool hasEvents() const {return !this->m_Events.empty();};
   int eventCount() const {return this->m_Events.count();};
+  const QMap<int, Event*> events() const {return this->m_Events;};
   const Event* eventAt(int id) const;
   const QString& eventLabel(int id) const {return this->m_Events[id]->label;};
   const QString& eventDescription(int id) const {return this->m_Events[id]->description;};
@@ -190,7 +197,6 @@ private:
   int m_FirstFrame;
   int m_LastFrame;
   int mp_ROI[2];
-  double m_PointFrequency;
   QMap<int,Point*> m_Points;
   QMap<int,Analog*> m_Analogs;
   QMap<int,Event*> m_Events;
