@@ -39,20 +39,17 @@
     <number>9</number>
    </property>
    <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QLabel" name="icon">
+     <property name="text">
+      <string/>
      </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
+     <property name="pixmap">
+      <pixmap resource="images.qrc">:/Resources/Images/Mokka_128.png</pixmap>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>140</height>
-      </size>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
-    </spacer>
+    </widget>
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -121,7 +118,7 @@
      <item>
       <widget class="QLabel" name="copyright">
        <property name="text">
-        <string> Copyright (C) 2009-2010 Arnaud Barré.</string>
+        <string> Copyright © 2009-2010 Arnaud Barré.</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -142,6 +139,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

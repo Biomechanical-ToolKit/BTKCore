@@ -34,12 +34,17 @@
  */
 
 #include "About.h"
-#include "btkConfigure.h"
 
 About::About(QWidget* parent)
 : QDialog(parent)
 {
   this->setupUi(this);
-  this->release->setText(this->release->text() + QString::number(BTK_VERSION_MAJOR) + "." + QString::number(BTK_VERSION_MINOR) + "." + QString::number(BTK_VERSION_PATCH));
-  this->release->setText("0.1a4");
+  
+#ifdef Q_OS_MAC
+  this->release->setAttribute(Qt::WA_MacSmallSize);
+  this->copyright->setAttribute(Qt::WA_MacSmallSize);
+  this->rights->setAttribute(Qt::WA_MacSmallSize);
+#endif
+  
+  this->release->setText("Mokka version @MOKKA_VERSION@");
 };

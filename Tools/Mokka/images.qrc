@@ -50,5 +50,6 @@
     <file>Resources/Images/acquisition_options.png</file>
     <file>Resources/Images/warning.png</file>
     <file>Resources/Images/error.png</file>
+    <file>Resources/Images/Mokka_128.png</file>
   </qresource>
 </RCC>
