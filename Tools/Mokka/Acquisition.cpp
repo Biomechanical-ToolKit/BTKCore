@@ -93,6 +93,20 @@ QString Acquisition::load(const QString& filename)
   {
     return "Unknown error.";
   }
+  this->mp_BTKAcquisition = reader->GetOutput();
+  
+  std::string labelPrefix = "";
+  btk::MetaData::Pointer subjects = this->mp_BTKAcquisition->GetMetaData()->GetChild("SUBJECTS");
+  if (subjects)
+  {
+    btk::MetaDataInfo::Pointer labelPrefixesInfo = subjects->ExtractChildInfo("LABEL_PREFIXES", btk::MetaDataInfo::Char, 2, false);
+    if (labelPrefixesInfo)
+    {
+      labelPrefix = labelPrefixesInfo->ToString(0);
+      labelPrefix = labelPrefix.erase(labelPrefix.find_last_not_of(' ') + 1);
+      labelPrefix = labelPrefix.erase(0, labelPrefix.find_first_not_of(' '));
+    }
+  }
   
   btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS]);
   btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProcesses[BTK_FORCE_PLATFORMS]);
@@ -101,10 +115,10 @@ QString Acquisition::load(const QString& filename)
   forcePlatformsExtractor->SetInput(reader->GetOutput());
   GRWsDownsampler->SetUpDownRatio(reader->GetOutput()->GetNumberAnalogSamplePerFrame());
   // Need to update the separator right now.
+  virtualMarkersSeparator->SetLabelPrefix(labelPrefix);
   virtualMarkersSeparator->Update();
   
   this->m_Filename = filename;
-  this->mp_BTKAcquisition = reader->GetOutput();
   this->m_FirstFrame = this->mp_BTKAcquisition->GetFirstFrame();
   this->m_LastFrame = this->mp_BTKAcquisition->GetLastFrame();
   this->mp_ROI[0] = this->m_FirstFrame;
