@@ -178,13 +178,14 @@ void MultiViewWidget::initialize()
   renderer->GetActiveCamera()->Zoom(1.6);
   
   // Dynamic data
-  // Pipeline for force plaforms
+  // Pipeline for force plaforms (plane)
   btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::New();
   //forcePlaforms->SetInput(forcePlatformsExtractor->GetOutput());
   mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(forcePlaforms->GetOutputPort());
+  mapper->SetInputConnection(forcePlaforms->GetOutputPort(0));
   prop = vtkProperty::New();
   prop->SetColor(1.0, 1.0, 0.0);
+  prop->SetOpacity(0.9);
   prop->SetAmbient(0.5);
   prop->SetDiffuse(0.0);
   prop->SetSpecular(0.0);
@@ -194,11 +195,42 @@ void MultiViewWidget::initialize()
   actor->SetProperty(prop);
   actor->PickableOff();
   renderer->AddActor(actor);
-  // Cleanup for force platforms.
+  // Cleanup for force platforms (plane)
   mapper->Delete();
   actor->Delete();
   prop->Delete();
-  // Dynamic data
+  // Pipeline for force plaforms (axes)
+  mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(forcePlaforms->GetOutputPort(1));
+  mapper->SetScalarModeToUseCellData();
+  actor = vtkActor::New();
+  actor->SetMapper(mapper);
+  actor->SetScale(0.005);
+  actor->SetProperty(prop);
+  actor->PickableOff();
+  renderer->AddActor(actor);
+  // Cleanup for force platforms (axes)
+  mapper->Delete();
+  actor->Delete();
+  // Pipeline for force plaforms (index)
+  mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(forcePlaforms->GetOutputPort(2));
+  prop = vtkProperty::New();
+  prop->SetColor(1.0, 1.0, 1.0);
+  prop->SetOpacity(0.9);
+  prop->SetAmbient(0.5);
+  prop->SetDiffuse(0.0);
+  prop->SetSpecular(0.0);
+  actor = vtkActor::New();
+  actor->SetMapper(mapper);
+  actor->SetScale(0.005);
+  actor->SetProperty(prop);
+  actor->PickableOff();
+  renderer->AddActor(actor);
+  // Cleanup for force platforms (index)
+  mapper->Delete();
+  actor->Delete();
+  prop->Delete();
   // Require to play with VTK information's keys TIME_*
   vtkCompositeDataPipeline* prototype = vtkCompositeDataPipeline::New();
   vtkAlgorithm::SetDefaultExecutivePrototype(prototype);
