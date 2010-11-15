@@ -51,8 +51,8 @@ namespace btk
 
     BTK_VTK_EXPORT void SetInput(ForcePlatformCollection::Pointer input);
     
-    double GetScaleUnit() {return this->mp_Scale;};
-    void SetScaleUnit(double s) {this->mp_Scale = s;};
+    double GetScaleUnit() {return this->m_Scale;};
+    void SetScaleUnit(double s) {this->m_Scale = s;};
     
   protected:
     BTK_VTK_EXPORT VTKForcePlatformsSource();
@@ -66,7 +66,7 @@ namespace btk
     VTKForcePlatformsSource(const VTKForcePlatformsSource& );  // Not implemented.
     VTKForcePlatformsSource& operator=(const VTKForcePlatformsSource& );  // Not implemented.
     
-    double mp_Scale;
+    double m_Scale;
   };
 };
 #endif // __btkVTKForcePlatformsSource_h
