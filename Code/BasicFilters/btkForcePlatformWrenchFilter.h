@@ -93,12 +93,11 @@ namespace btk
   {
     Eigen::Matrix<double, 3, 3> R;
     Eigen::Matrix<double, 3, 1> t;
-
     R.col(0) = c.col(0) - c.col(1);
     R.col(0).normalize();
-    R.col(1) = c.col(0) - c.col(3);
-    R.col(1).normalize();
-    R.col(2) = R.col(0).cross(R.col(1));
+    R.col(2) = R.col(0).cross(c.col(0) - c.col(3));
+    R.col(2).normalize();
+    R.col(1) = R.col(2).cross(R.col(0));
     t = (c.col(0) + c.col(2)) / 2;
     // Forces & Moments rotation
     wrh->GetForce()->GetValues() *= R.transpose();
