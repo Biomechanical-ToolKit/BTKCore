@@ -324,10 +324,10 @@ namespace btk
       // Separate points representing frame virtuals
       for (std::list<StringAxes>::const_iterator it = this->m_VirtualMarkerLabelsAxes.begin() ; it != this->m_VirtualMarkerLabelsAxes.end() ; ++it)
       {
-        PointCollection::ConstIterator it0 = this->FindLabel(markers.get(), it->Origin, true);
-        PointCollection::ConstIterator it1 = this->FindLabel(markers.get(), it->Axis1, true);
-        PointCollection::ConstIterator it2 = this->FindLabel(markers.get(), it->Axis2, true);
-        PointCollection::ConstIterator it3 = this->FindLabel(markers.get(), it->Axis3, true);
+        PointCollection::ConstIterator it0 = this->FindLabel(markers.get(), this->m_Prefix + it->Origin, false);
+        PointCollection::ConstIterator it1 = this->FindLabel(markers.get(), this->m_Prefix + it->Axis1, false);
+        PointCollection::ConstIterator it2 = this->FindLabel(markers.get(), this->m_Prefix + it->Axis2, false);
+        PointCollection::ConstIterator it3 = this->FindLabel(markers.get(), this->m_Prefix + it->Axis3, false);
         
         if ((it0 != markers->End()) && (it1 != markers->End()) && (it2 != markers->End()) && (it3 != markers->End()))
         {
