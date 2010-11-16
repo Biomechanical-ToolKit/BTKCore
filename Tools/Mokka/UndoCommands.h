@@ -36,8 +36,6 @@
 #ifndef UndoCommands_h
 #define UndoCommands_h
 
-//#include <btkAcquisition.h>
-
 #include <QColor>
 #include <QtGui>
 #include <QUndoCommand>
@@ -45,7 +43,6 @@
 #include "Acquisition.h"
 
 class MainWindow;
-class NumericalTableWidgetItem;
 
 class MasterUndoCommand : public QUndoCommand
 {

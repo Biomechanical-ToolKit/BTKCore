@@ -34,7 +34,6 @@
  */
 
 #include "ModelDockWidget.h"
-#include "NewModelDialog.h"
 #include "UserRoles.h"
 
 #include <QPainter>

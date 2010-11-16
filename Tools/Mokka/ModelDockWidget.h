@@ -37,13 +37,15 @@
 #define ModelDockWidget_h
 
 #include "ui_ModelDockWidget.h"
-#include "Acquisition.h"
-#include "NewModelDialog.h"
+#include "NewModelDialog.h" // ConfigurationItem
+#include "Acquisition.h" // Point, Analog, ...
 
 #include <QDockWidget>
 #include <QMenu>
 #include <QVector>
 #include <QColor>
+
+class Acquisition;
 
 class ModelDockWidget : public QDockWidget, public Ui::ModelDockWidget
 {

@@ -27,7 +27,6 @@ SET(Mokka_CPP
   NewEventDialog.cpp
   NewModelDialog.cpp
   ProgressWidget.cpp
-  TableWidget.cpp
   TimeEventBarWidget.cpp
   TimeEventControlerWidget.cpp
   UndoCommands.cpp
@@ -49,7 +48,6 @@ SET(Mokka_H
   NewEventDialog.h
   NewModelDialog.h
   ProgressWidget.h
-  TableWidget.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
   Viz3DWidget.h)
@@ -87,9 +85,9 @@ ELSEIF(APPLE)
   SET(MACOSX_BUNDLE_ICON_FILE "Mokka.icns")
   SET(MACOSX_BUNDLE_INFO_STRING "${MOKKA_VERSION}, Copyright 2009-2010 Arnaud Barré.")
   SET(MACOSX_BUNDLE_GUI_IDENTIFIER "org.btk.Mokka")
-  #SET(MACOSX_BUNDLE_LONG_VERSION_STRING "")
   SET(MACOSX_BUNDLE_BUNDLE_NAME "Mokka")
   SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${MOKKA_VERSION}")
+  SET(MACOSX_BUNDLE_LONG_VERSION_STRING "Version ${MOKKA_VERSION}")
   SET(MACOSX_BUNDLE_BUNDLE_VERSION "1")
   SET(MACOSX_BUNDLE_COPYRIGHT "© 2009-2010 Arnaud Barré")
   SET(MOKKA_ICON "${CMAKE_CURRENT_SOURCE_DIR}/Resources/${MACOSX_BUNDLE_ICON_FILE}")
@@ -109,6 +107,8 @@ TARGET_LINK_LIBRARIES(Mokka BTKCommon BTKIO BTKBasicFilters BTKVTK QVTK ${QT_LIB
 
 IF(WIN32)
 	TARGET_LINK_LIBRARIES(Mokka ${QT_QTMAIN_LIBRARY})
+ELSEIF(APPLE)
+  SET_TARGET_PROPERTIES(Mokka PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Resources/OSXBundle/ApplicationInfo.plist.in")
 ENDIF(WIN32)
 
 # Installation
