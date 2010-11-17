@@ -1576,7 +1576,7 @@ bool ModelDockWidget::saveConfiguration(int idx)
 #if 1
     filename = QFileDialog::getSaveFileName(this,
                          tr("Save Model Visual Configuration"),
-                         fileInfo.path() + "/" + fileInfo.baseName() + ".mvc",
+                         fileInfo.path() + "/" + this->m_ConfigurationItems[idx].name + ".mvc",
                          tr("Model Visual Configuration Files (*.mvc)"));
     if (filename.isEmpty())
       return false;
