@@ -70,6 +70,7 @@ public Q_SLOTS:
   // Qt
   // Menu
   void about();
+  void help();
   void visitBTKWebsite();
   void setAcquisitionModified(int modified);
   void viewMetadata();

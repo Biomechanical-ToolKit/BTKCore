@@ -94,6 +94,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->actionCopy->setShortcut(QKeySequence::Copy);
   this->actionPaste->setShortcut(QKeySequence::Paste);
   this->actionSelect_All->setShortcut(QKeySequence::SelectAll);
+  this->actionHelp->setShortcut(QKeySequence::HelpContents);
   for (int i = 0 ; i < maxRecentFiles ; ++i)
   {
       this->mp_ActionRecentFiles[i] = new QAction(this);
@@ -131,6 +132,7 @@ MainWindow::MainWindow(QWidget* parent)
   // Menu
   connect(this->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
   connect(this->actionVisit_BTK_website, SIGNAL(triggered()), this, SLOT(visitBTKWebsite()));
+  connect(this->actionHelp, SIGNAL(triggered()), this, SLOT(help()));
   connect(this->actionViewMetadata, SIGNAL(triggered()), this, SLOT(viewMetadata()));
   connect(this->action_FileOpen, SIGNAL(triggered()), this, SLOT(openFile()));
   connect(this->actionSave, SIGNAL(triggered()), this, SLOT(saveFile()));
@@ -271,6 +273,17 @@ void MainWindow::about()
 {
   About aboutDlg(this);
   aboutDlg.exec();
+};
+
+void MainWindow::help()
+{
+#if defined(Q_OS_MAC)
+  QDesktopServices::openUrl(QUrl("file:///" + QCoreApplication::applicationDirPath() + "/../Resources/MokkaHelp/index.html", QUrl::TolerantMode));
+#elif defined(Q_OS_WIN)
+  QDesktopServices::openUrl(QUrl("file:///" + QCoreApplication::applicationDirPath() + "/MokkaHelp/index.html", QUrl::TolerantMode));
+#elif defined(Q_OS_LINUX)
+  QMessageBox::information(this, "Mokka", "The help in not yet integrated with Linux. Need more informations about application's deployment under Linux.");
+#endif
 };
 
 void MainWindow::visitBTKWebsite()
