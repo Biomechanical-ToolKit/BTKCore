@@ -82,17 +82,52 @@ namespace btk
    */
   void VTKGroundSource::SetOrientation(Orientation o)
   {
+    if (this->m_Orientation == o)
+      return;
+    this->m_Orientation = o;
+    this->Modified();
+  };
+  
+  /**
+   * Constructor.
+   *
+   * Filter with one input and output.
+   */
+  VTKGroundSource::VTKGroundSource()
+  : vtkPolyDataAlgorithm()
+  {
+    this->m_Orientation = Automatic;
+    // Plane XY by default.
+    this->mp_Normal[0] = 0.0; 
+    this->mp_Normal[1] = 0.0;
+    this->mp_Normal[2] = 1.0;
+  };
+
+  /**
+   * @fn VTKGroundSource::~VTKGroundSource()
+   * Empty destructor.
+   */
+  
+  /**
+   * Prepare force platform geometry.
+   */
+  int VTKGroundSource::RequestInformation(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+  {
+    btkNotUsed(request);
+    btkNotUsed(outputVector);
+    
     double n[3];
-    switch (o)
+    switch (this->m_Orientation)
     {
     case Automatic:
       {
       // Plane XY by default
       n[0] = 0.0; n[1] = 0.0; n[2] = 1.0;
-      VTKDataObjectAdapter* in = VTKDataObjectAdapter::SafeDownCast(this->GetInput());
-      if (in)
+      vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+      VTKDataObjectAdapter* inObject;
+      if (inInfo && ((inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()))) != NULL))
       {
-        Acquisition::Pointer input = static_pointer_cast<Acquisition>(in->GetBTKDataObject());
+        Acquisition::Pointer input = static_pointer_cast<Acquisition>(inObject->GetBTKDataObject());
         if (input)
         {
           btk::MetaData::ConstIterator itPoint = input->GetMetaData()->FindChild("POINT");
@@ -124,32 +159,12 @@ namespace btk
       n[0] = 0.0; n[1] = 1.0; n[2] = 0.0;
       break;
     }
-    if ((n[0] == this->mp_Normal[0]) && (n[1] == this->mp_Normal[1]) && (n[2] == this->mp_Normal[2]))
-      return;
     this->mp_Normal[0] = n[0]; 
     this->mp_Normal[1] = n[1];
     this->mp_Normal[2] = n[2];
-    this->Modified();
+    
+    return 1;
   };
-  
-  /**
-   * Constructor.
-   *
-   * Filter with one input and output.
-   */
-  VTKGroundSource::VTKGroundSource()
-  : vtkPolyDataAlgorithm()
-  {
-    // Plane XY by default.
-    this->mp_Normal[0] = 0.0; 
-    this->mp_Normal[1] = 0.0;
-    this->mp_Normal[2] = 1.0;
-  };
-
-  /**
-   * @fn VTKGroundSource::~VTKGroundSource()
-   * Empty destructor.
-   */
   
   /**
    * Generate force platform geometry.
@@ -181,12 +196,12 @@ namespace btk
   /**
    * Sets the type of object required for the input.
    */
-  int VTKGroundSource::FillInputPortInformation(int /* port */, 
-                                                      vtkInformation* info)
+  int VTKGroundSource::FillInputPortInformation(int port, 
+                                                vtkInformation* info)
   {
+    btkNotUsed(port);
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "VTKDataObjectAdapter");
     info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     return 1;
   }
-
 };

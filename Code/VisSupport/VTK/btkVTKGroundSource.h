@@ -59,7 +59,7 @@ namespace btk
     VTKGroundSource();
     ~VTKGroundSource() {};
     
-    //BTK_VTK_EXPORT virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+    BTK_VTK_EXPORT virtual int RequestInformation(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
     BTK_VTK_EXPORT virtual int RequestData(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
     //BTK_VTK_EXPORT virtual int RequestUpdateExtent(vtkInformation* request, vtkInformationVector** inputVector, vtkInformationVector* outputVector);
 
@@ -69,6 +69,7 @@ namespace btk
     VTKGroundSource(const VTKGroundSource& );  // Not implemented.
     VTKGroundSource& operator=(const VTKGroundSource& );  // Not implemented.
     
+    Orientation m_Orientation;
     double mp_Normal[3];
   };
 };
