@@ -96,10 +96,10 @@ QString Acquisition::load(const QString& filename)
   this->mp_BTKAcquisition = reader->GetOutput();
   
   std::string labelPrefix = "";
-  btk::MetaData::Pointer subjects = this->mp_BTKAcquisition->GetMetaData()->GetChild("SUBJECTS");
-  if (subjects)
+  btk::MetaData::ConstIterator itSubjects = this->mp_BTKAcquisition->GetMetaData()->FindChild("SUBJECTS");
+  if (itSubjects != this->mp_BTKAcquisition->GetMetaData()->End())
   {
-    btk::MetaDataInfo::Pointer labelPrefixesInfo = subjects->ExtractChildInfo("LABEL_PREFIXES", btk::MetaDataInfo::Char, 2, false);
+    btk::MetaDataInfo::Pointer labelPrefixesInfo = (*itSubjects)->ExtractChildInfo("LABEL_PREFIXES", btk::MetaDataInfo::Char, 2, false);
     if (labelPrefixesInfo)
     {
       labelPrefix = labelPrefixesInfo->ToString(0);
