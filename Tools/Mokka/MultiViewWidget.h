@@ -72,7 +72,6 @@ public:
   bool markerVisibility(int id);
   double* markerColorValue(int c);
   bool appendNewMarkerColor(const QColor& color, int* idx);
-  void setGroundOrientation(double x, double y, double z);
   QMenu* groundOrientationMenu() const {return this->mp_GroupOrientationMenu;};
   
 public slots:
@@ -117,12 +116,11 @@ private:
   vtkProcessMap* mp_VTKProc;
   vtkMapperCollection* mp_Mappers;
   vtkStreamingDemandDrivenPipelineCollection* mp_Syncro;
-  QMenu* mp_GroupOrientationMenu;
-  QAction* mp_ActionRemoveAllGeneralFootOff;
+  QMenu* mp_GroupOrientationMenu;;
+  QAction* mp_ActionGroundOrientationAutomatic;
   QAction* mp_ActionGroundOrientationPlaneXY;
   QAction* mp_ActionGroundOrientationPlaneYZ;
   QAction* mp_ActionGroundOrientationPlaneZX;
-  QAction* mp_ActionGroundOrientationAutomatic;
 };
 
 #endif // MultiViewWidget_h

@@ -40,6 +40,7 @@
 #include "UserRoles.h"
 
 #include <btkVTKForcePlatformsSource.h>
+#include <btkVTKGroundSource.h>
 #include <btkVTKGRFsFramesSource.h>
 #include <btkVTKCommandEvents.h>
 #include <btkVTKMarkersFramesSource.h>
@@ -86,21 +87,21 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_Syncro = new vtkStreamingDemandDrivenPipelineCollection();
   this->mp_Mappers = vtkMapperCollection::New();
   this->mp_GroupOrientationMenu = new QMenu(tr("Ground Orientation"),this);
+  this->mp_ActionGroundOrientationAutomatic = new QAction(tr("Automatic"),this);
+  this->mp_ActionGroundOrientationAutomatic->setCheckable(true);
   this->mp_ActionGroundOrientationPlaneXY = new QAction(tr("Plane XY"),this);
   this->mp_ActionGroundOrientationPlaneXY->setCheckable(true);
   this->mp_ActionGroundOrientationPlaneYZ = new QAction(tr("Plane YZ"),this);
   this->mp_ActionGroundOrientationPlaneYZ->setCheckable(true);
   this->mp_ActionGroundOrientationPlaneZX = new QAction(tr("Plane ZX"),this);
   this->mp_ActionGroundOrientationPlaneZX->setCheckable(true);
-  this->mp_ActionGroundOrientationAutomatic = new QAction(tr("Automatic"),this);
-  this->mp_ActionGroundOrientationAutomatic->setCheckable(true);
-  
   QActionGroup* groundOrientationActionGroup = new QActionGroup(this);
-  //groundOrientationActionGroup->addAction(this->actionGroundOrientationAutomatic);
+  groundOrientationActionGroup->addAction(this->mp_ActionGroundOrientationAutomatic);
   groundOrientationActionGroup->addAction(this->mp_ActionGroundOrientationPlaneXY);
   groundOrientationActionGroup->addAction(this->mp_ActionGroundOrientationPlaneYZ);
   groundOrientationActionGroup->addAction(this->mp_ActionGroundOrientationPlaneZX);
-  this->mp_ActionGroundOrientationPlaneXY->setChecked(true);
+  this->mp_ActionGroundOrientationAutomatic->setChecked(true);
+  this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationAutomatic);
   this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationPlaneXY);
   this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationPlaneYZ);
   this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationPlaneZX);
@@ -146,15 +147,12 @@ void MultiViewWidget::initialize()
   // this->m_BTKProc[BTK_GRWS] = GRWsFilter;
   // this->m_BTKProc[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
   
+  vtkMapper::GlobalImmediateModeRenderingOn(); // For large dataset.
+  
   // VTK PIPELINE
   // Static data
   // Simple ground grid
-  vtkPlaneSource* ground = vtkPlaneSource::New();
-  ground->SetXResolution(30);
-  ground->SetYResolution(30);
-  ground->SetOrigin(-15.0, -15.0, 0.0);
-  ground->SetPoint1(15.0, -15.0, 0.0);
-  ground->SetPoint2(-15.0, 15.0, 0.0);
+  btk::VTKGroundSource* ground = btk::VTKGroundSource::New();
   vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
   mapper->SetInput(ground->GetOutput());
   vtkProperty* prop = vtkProperty::New();
@@ -312,6 +310,8 @@ void MultiViewWidget::setAcquisition(Acquisition* acq)
     disconnect(this->mp_Acquisition, 0, this, 0);
   this->mp_Acquisition = acq;
   // BTK->VTK connection
+  btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
+  ground->SetInput(this->mp_Acquisition->btkAcquisition());
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   markers->SetInput(0, this->mp_Acquisition->btkMarkers());
   markers->SetInput(1, this->mp_Acquisition->btkVirtualMarkers());
@@ -329,22 +329,13 @@ void MultiViewWidget::load()
   if (!this->mp_Acquisition)
     return;
   
-  /*
-  //btk::SpecializedPointsExtractor::Pointer markersExtractor = static_pointer_cast<btk::SpecializedPointsExtractor>(this->m_BTKProc[BTK_MARKERS]);
-  btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProc[BTK_VIRTUALS_MARKERS]);
-  btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProc[BTK_FORCE_PLATFORMS]);
-  btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProc[BTK_GRWS_DOWNSAMPLED]);
-  //markersExtractor->SetInput(acq);
-  virtualMarkersSeparator->SetInput(acq->GetPoints());
-  forcePlatformsExtractor->SetInput(acq);
-  GRWsDownsampler->SetUpDownRatio(acq->GetNumberAnalogSamplePerFrame());
-  */
-  
   QString markerUnit = this->mp_Acquisition->pointUnit(Point::Marker);
   double scale = 1.0;
   if (markerUnit.compare("m") == 0)
     scale = 1000.0;
   
+  btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
+  ground->Modified(); // Force to update
   btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::SafeDownCast((*this->mp_VTKProc)[VTK_FORCE_PLATFORMS]);
@@ -627,13 +618,6 @@ double* MultiViewWidget::markerColorValue(int c)
   return markers->GetMarkerColorLUT()->GetTableValue(c);
 }
 
-void MultiViewWidget::setGroundOrientation(double x, double y, double z)
-{
-  vtkPlaneSource* ground = vtkPlaneSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
-  ground->SetNormal(x,y,z);
-  this->updateViews();
-}
-
 bool MultiViewWidget::appendNewMarkerColor(const QColor& color, int* idx)
 {
   bool modified = false;
@@ -810,12 +794,16 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
 
 void MultiViewWidget::changeGroundOrientation()
 {
-  if (this->mp_ActionGroundOrientationPlaneXY->isChecked())
-    this->setGroundOrientation(0.0, 0.0, 1.0);
+  btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
+  if (this->mp_ActionGroundOrientationAutomatic->isChecked())
+    ground->SetOrientation(btk::VTKGroundSource::Automatic);
+  else if (this->mp_ActionGroundOrientationPlaneXY->isChecked())
+    ground->SetOrientation(btk::VTKGroundSource::PlaneXY);
   else if (this->mp_ActionGroundOrientationPlaneYZ->isChecked())
-    this->setGroundOrientation(1.0, 0.0, 0.0);
+    ground->SetOrientation(btk::VTKGroundSource::PlaneYZ);
   else if (this->mp_ActionGroundOrientationPlaneZX->isChecked())
-    this->setGroundOrientation(0.0, 1.0, 0.0);
+    ground->SetOrientation(btk::VTKGroundSource::PlaneZX);
+  this->updateViews();
 };
 
 void MultiViewWidget::updateViews()
