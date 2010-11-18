@@ -41,7 +41,6 @@
 #include <vtkInformationVector.h>
 #include <vtkObjectFactory.h>
 #include <vtkAppendPolyData.h>
-#include <vtkPropAssembly.h>
 #include <vtkCellArray.h>
 #include <vtkAxes.h>
 #include <vtkTransformPolyDataFilter.h>
@@ -51,9 +50,6 @@
 #include <vtkMatrix4x4.h>
 #include <vtkVectorText.h>
 #include <vtkBoundingBox.h>
-#include <vtkSphereSource.h>
-
-#include <Eigen/Geometry>
 
 namespace btk
 {
@@ -268,6 +264,7 @@ namespace btk
           //  pose->SetElement(i,j,R(i,j));
           pose->SetElement(i, 3, (bbForcePlateCenter[i] - bbIndexCenter[i]) * this->m_Scale);
         }
+        
         transform->SetMatrix(pose);
         indexTranslate->Update();
         index->Delete();

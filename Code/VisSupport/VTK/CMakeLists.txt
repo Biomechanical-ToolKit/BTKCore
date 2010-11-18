@@ -3,6 +3,7 @@ SET(BTKVTK_SRCS
   btkVTKDataObjectAdapter.cpp
   btkVTKForcePlatformsSource.cpp
   btkVTKGRFsFramesSource.cpp
+  btkVTKGroundSource.cpp
   btkVTKInteractorStyleTrackballCamera.cpp
   btkVTKMarkersSource.cpp
   btkVTKMarkersFramesSource.cpp
