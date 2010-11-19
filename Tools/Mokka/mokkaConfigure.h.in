@@ -33,18 +33,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "About.h"
+#ifndef mokkaConfigure_h
+#define mokkaConfigure_h
 
-About::About(QWidget* parent)
-: QDialog(parent)
-{
-  this->setupUi(this);
-  
-#ifdef Q_OS_MAC
-  this->release->setAttribute(Qt::WA_MacSmallSize);
-  this->copyright->setAttribute(Qt::WA_MacSmallSize);
-  this->rights->setAttribute(Qt::WA_MacSmallSize);
-#endif
-  
-  this->release->setText("Mokka version @MOKKA_VERSION@");
-};
+#define MOKKA_VERSION_MAJOR @MOKKA_VERSION_MAJOR@
+#define MOKKA_VERSION_MINOR @MOKKA_VERSION_MINOR@
+#define MOKKA_VERSION_PATCH @MOKKA_VERSION_PATCH@
+#define MOKKA_VERSION_STRING @MOKKA_VERSION_STRING@
+
+#define xstr(s) _str(s)
+#define _str(s) #s
+
+#endif // mokkaConfigure_h

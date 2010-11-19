@@ -33,22 +33,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkConfigure.h"
+#include "mokkaConfigure.h"
 
 #include "MainWindow.h"
 
 #include <QApplication>
 
 #if defined(_MSC_VER)
-#include <windows.h> // For WinMain
-#include <io.h>      // For _open_osfhandle
-#include <fcntl.h>   // For _O_TEXT
+  #include <windows.h> // For WinMain
+  #include <io.h>      // For _open_osfhandle
+  #include <fcntl.h>   // For _O_TEXT
 #endif
 
 #include <pcl/pcl.h> // Must be included at the end (to detect the use of windows.h)
-
-#define xstr(s) str(s)
-#define str(s) #s
 
 // Under Windows, the main function is transformed in a WinMain function ...
 #if defined(_MSC_VER)
@@ -120,8 +117,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 int main(int argc, char *argv[])
 {
 #endif
-  std::string rn = xstr(BTK_VERSION_MAJOR); rn += "."; rn += xstr(BTK_VERSION_MINOR);
-  pcl::CmdLineParser clp("Motion Kinematic & Kinetic Analyzer", rn);
+  pcl::CmdLineParser clp("Motion Kinematic & Kinetic Analyzer", xstr(MOKKA_VERSION_STRING));
   clp.UseDefaultOption(pcl::Help | pcl::Version);
   pcl::FlagOpt play("play","p","Start to play the acquisition", false);
   pcl::ValueOpt<std::string> visualConfig("visual-config","c","Set the default visual configuration", "file", false);
