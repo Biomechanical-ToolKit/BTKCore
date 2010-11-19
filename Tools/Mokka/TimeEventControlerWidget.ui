@@ -13,6 +13,11 @@
   <property name="windowTitle">
    <string>TimeEventControlerWidget</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QFrame#timeEventControler, QFrame#timeEventBar {
+  background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:0.05 rgba(255, 255, 255, 255));
+}</string>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,10">
    <property name="spacing">
     <number>0</number>
@@ -29,9 +34,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QFrame#timeEventControler {
-  background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:0.05 rgba(0, 0, 0, 0));
-}</string>
+      <string notr="true"/>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_10">
       <property name="rightMargin">
@@ -360,9 +363,7 @@ QPushButton::menu-indicator {
       <bool>true</bool>
      </property>
      <property name="styleSheet">
-      <string notr="true">QFrame {
-  background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:0.05 rgba(0, 0, 0, 0));
-}</string>
+      <string notr="true"/>
      </property>
     </widget>
    </item>
@@ -503,6 +504,11 @@ QPushButton::menu-indicator {
   <action name="actionRemoveAllGeneralFootOff">
    <property name="text">
     <string>Remove all General Foot Off</string>
+   </property>
+  </action>
+  <action name="actionEditSelectedEvents">
+   <property name="text">
+    <string>Edit selected events</string>
    </property>
   </action>
  </widget>
