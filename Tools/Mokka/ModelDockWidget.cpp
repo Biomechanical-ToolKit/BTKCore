@@ -68,6 +68,7 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->modelTree->setFont(f);
   this->propertiesButton->setFont(f);
   //  - Marker page
+  static_cast<QGridLayout*>(this->markerPage->layout())->setVerticalSpacing(3);
   this->markerLabelLabel->setFont(f);
   this->markerLabelEdit->setFont(f);
   this->markerRadiusLabel->setFont(f);
@@ -78,11 +79,13 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->markerDescLabel->setFont(f);
   this->markerDescEdit->setFont(f);
   // - Point page
+  static_cast<QGridLayout*>(this->pointPage->layout())->setVerticalSpacing(3);
   this->pointLabelLabel->setFont(f);
   this->pointLabelEdit->setFont(f);
   this->pointDescLabel->setFont(f);
   this->pointDescEdit->setFont(f);
   // - Analog page
+  static_cast<QGridLayout*>(this->analogPage->layout())->setVerticalSpacing(3);
   this->analogLabelLabel->setFont(f);
   this->analogLabelEdit->setFont(f);
   this->analogUnitLabel->setFont(f);
