@@ -126,25 +126,25 @@ void CompositeView::setOrthogonalView(int view)
   {
   case Top:
     cam->SetPosition(0.0,0.0,1.0);
-     cam->SetRoll(180.0);
     break;
   case Bottom:
     cam->SetPosition(0.0,0.0,-1.0);
+    cam->SetRoll(180.0);
     break;
   case Left:
-    cam->SetPosition(1.0,0.0,0.0);
-    cam->SetRoll(-90.0);
-    break;
-  case Right:
     cam->SetPosition(-1.0,0.0,0.0);
     cam->SetRoll(90.0);
     break;
+  case Right:
+    cam->SetPosition(1.0,0.0,0.0);
+    cam->SetRoll(-90.0);
+    break;
   case Back:
-    cam->SetPosition(0.0,-1.0,0.0);
+    cam->SetPosition(0.0,1.0,0.0);
     cam->SetViewUp(0.0,0.0,1.0);
     break;
   case Front:
-    cam->SetPosition(0.0,1.0,0.0);
+    cam->SetPosition(0.0,-1.0,0.0);
     cam->SetViewUp(0.0,0.0,1.0);
     break;
   default:
