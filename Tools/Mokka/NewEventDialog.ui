@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>240</height>
+    <width>341</width>
+    <height>221</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,90 +17,155 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>New Event</string>
+   <string>Event editor</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <property name="labelAlignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="labelCheckBox">
+       <property name="text">
+        <string>Label</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="labelLabel">
        <property name="text">
         <string>Label</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="labelEdit"/>
+    </layout>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="labelEdit"/>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="contextCheckBox">
+       <property name="text">
+        <string>Context</string>
+       </property>
+      </widget>
      </item>
-     <item row="1" column="0">
+     <item>
       <widget class="QLabel" name="contextLabel">
        <property name="text">
         <string>Context</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="contextComboBox">
-       <property name="currentIndex">
-        <number>-1</number>
+    </layout>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="contextComboBox">
+     <property name="currentIndex">
+      <number>-1</number>
+     </property>
+     <item>
+      <property name="text">
+       <string>Right</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Left</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>General</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="frameCheckBox">
+       <property name="text">
+        <string>Frame</string>
        </property>
-       <item>
-        <property name="text">
-         <string>Right</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Left</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>General</string>
-        </property>
-       </item>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item>
       <widget class="QLabel" name="frameLabel">
        <property name="text">
         <string>Frame</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QSpinBox" name="frameSpinBox"/>
+    </layout>
+   </item>
+   <item row="2" column="1">
+    <widget class="QSpinBox" name="frameSpinBox"/>
+   </item>
+   <item row="3" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="subjectCheckBox">
+       <property name="text">
+        <string>Subject</string>
+       </property>
+      </widget>
      </item>
-     <item row="3" column="0">
+     <item>
       <widget class="QLabel" name="subjectLabel">
        <property name="text">
         <string>Subject</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="subjectEdit"/>
+    </layout>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="subjectEdit"/>
+   </item>
+   <item row="4" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="descriptionCheckBox">
+       <property name="text">
+        <string>Description</string>
+       </property>
+      </widget>
      </item>
-     <item row="4" column="0">
+     <item>
       <widget class="QLabel" name="descriptionLabel">
        <property name="text">
         <string>Description</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="descriptionEdit"/>
-     </item>
     </layout>
    </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="descriptionEdit"/>
    </item>
-   <item>
+   <item row="5" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -121,8 +186,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>257</x>
+     <y>163</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -137,8 +202,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>290</x>
+     <y>163</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

@@ -69,6 +69,7 @@ public slots:
   void previousEvent();
   void nextEvent();
   void clearEvents();
+  void editSelectedEvents();
   void removeSelectedEvents();
   void removeAllRightFootStrikeEvents();
   void removeAllRightFootOffEvents();
@@ -85,6 +86,7 @@ public slots:
   void insertGeneralFootStrike();
   void insertGeneralFootOff();
   void insertGeneralOther();
+  void setEvents(const QList<int>& ids, const QList<Event*>& events);
   void removeEvents(const QList<int>& ids, const QList<Event*>& events);
   void insertEvents(const QList<int>& ids, const QList<Event*>& events);
   
@@ -94,6 +96,7 @@ protected:
 signals:
   void currentFrameChanged(int frame);
   void regionOfInterestChanged(int ff, int lf);
+  void eventsModified(const QList<int>& ids, const QList<Event*>& events);
   void eventsRemoved(const QList<int>& ids);
   void eventInserted(Event* e);
   
@@ -107,6 +110,8 @@ private slots:
   void changePlaybackParameters();
   void toggleEventSelection(const QList<int>& selectedIndices);
   void updateROIAction(int frame);
+  void setEventIconId(Event* e);
+  void setEventTime(Event* e);
   
 private:
   void setFrame(int f);
@@ -129,5 +134,10 @@ private:
   int m_PlaybackStep;
   int m_PlaybackDelay;
 };
+
+inline void TimeEventControlerWidget::setEventTime(Event* e)
+{
+  e->time = (e->frame - this->mp_Acquisition->firstFrame()) / this->mp_Acquisition->pointFrequency(); // e->frame starts at 1 not 0.
+}
 
 #endif // TimeEventControlerWidget_h

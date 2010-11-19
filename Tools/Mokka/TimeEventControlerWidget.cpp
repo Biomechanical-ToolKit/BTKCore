@@ -84,7 +84,9 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->acquisitionOptionsButtonMenu->setMenu(displayOptionsMenu);
   // Event options menu
   QMenu* eventOptionsMenu = new QMenu(this);
+  this->actionEditSelectedEvents->setEnabled(false);
   this->actionRemoveSelectedEvents->setEnabled(false);
+  eventOptionsMenu->addAction(this->actionEditSelectedEvents);
   eventOptionsMenu->addAction(this->actionRemoveSelectedEvents);
   eventOptionsMenu->addAction(this->actionClearEvents);
   this->eventOptionsButtonMenu->setMenu(eventOptionsMenu);
@@ -140,6 +142,7 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   connect(playbackSpeedActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changePlaybackParameters()));
   connect(this->actionCropRegionOfInterest, SIGNAL(triggered()), this, SLOT(cropRegionOfInterest()));
   connect(this->actionClearEvents, SIGNAL(triggered()), this, SLOT(clearEvents()));
+  connect(this->actionEditSelectedEvents, SIGNAL(triggered()), this, SLOT(editSelectedEvents()));
   connect(this->actionRemoveSelectedEvents, SIGNAL(triggered()), this, SLOT(removeSelectedEvents()));
   connect(this->actionRemoveAllRightFootStrike, SIGNAL(triggered()), this, SLOT(removeAllRightFootStrikeEvents()));
   connect(this->actionRemoveAllRightFootOff, SIGNAL(triggered()), this, SLOT(removeAllRightFootOffEvents()));
@@ -176,6 +179,7 @@ void TimeEventControlerWidget::setAcquisition(Acquisition* acq)
     disconnect(this->mp_Acquisition, 0, this, 0);
   this->mp_Acquisition = acq;
   connect(this->mp_Acquisition, SIGNAL(regionOfInterestChanged(int, int)), this, SLOT(setRegionOfInterest(int, int)));
+  connect(this->mp_Acquisition, SIGNAL(eventsModified(QList<int>, QList<Event*>)), this, SLOT(setEvents(QList<int>, QList<Event*>)));
   connect(this->mp_Acquisition, SIGNAL(eventsRemoved(QList<int>, QList<Event*>)), this, SLOT(removeEvents(QList<int>, QList<Event*>)));
   connect(this->mp_Acquisition, SIGNAL(eventsInserted(QList<int>, QList<Event*>)), this, SLOT(insertEvents(QList<int>, QList<Event*>)));
 }
@@ -292,6 +296,90 @@ void TimeEventControlerWidget::clearEvents()
   this->updateEventActions();
 };
 
+void TimeEventControlerWidget::editSelectedEvents()
+{
+  if (!this->timeEventBar->m_SelectedEvents.isEmpty())
+  {
+    QString label, description, context, subject;
+    int frame;
+    const Event* e = this->mp_Acquisition->eventAt(this->timeEventBar->m_SelectedEvents[0]);
+    label = e->label;
+    description = e->description;
+    context = e->context;
+    subject = e->subject;
+    frame = e->frame;
+    for (int i = 1 ; i < this->timeEventBar->m_SelectedEvents.count() ; ++i)
+    {
+      e = this->mp_Acquisition->eventAt(this->timeEventBar->m_SelectedEvents[i]);
+      if (label.compare(e->label) != 0)
+        label = "";
+      if (description.compare(e->description) != 0)
+        description = "";
+      if (context.compare(e->context) != 0)
+        context = "";
+      if (subject.compare(e->subject) != 0)
+        subject = "";
+      if (frame != e->frame)
+        frame = -1;
+    }
+    NewEventDialog ned(NewEventDialog::Edit, this);
+    int  frameAndROI[3] = {frame, this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame};
+    ned.setInformations(label, ned.contextComboBox->findText(context), frameAndROI, subject, description);
+    ned.exec();
+    if (ned.result() == QDialog::Accepted)
+    {
+      // Check if there is some modifications
+      if ((ned.labelCheckBox->checkState() == Qt::Checked)
+       || (ned.contextCheckBox->checkState() == Qt::Checked)
+       || (ned.frameCheckBox->checkState() == Qt::Checked)
+       || (ned.subjectCheckBox->checkState() == Qt::Checked)
+       || (ned.descriptionCheckBox->checkState() == Qt::Checked))
+      {
+        qDebug("Send modifications");
+        QList<Event*> events;
+        // Create events with modified informations
+        for (int i = 0 ; i < this->timeEventBar->m_SelectedEvents.count() ; ++i)
+        {
+          e = this->mp_Acquisition->eventAt(this->timeEventBar->m_SelectedEvents[i]);
+          Event* ev = new Event;
+          // Label modification?
+          if (ned.labelCheckBox->checkState() == Qt::Checked)
+            ev->label = ned.labelEdit->text();
+          else
+            ev->label = e->label;
+          // Context modification?
+          if (ned.contextCheckBox->checkState() == Qt::Checked)
+            ev->context= ned.contextComboBox->currentText();
+          else
+            ev->context= e->context;
+          // Frame modification?
+          if (ned.frameCheckBox->checkState() == Qt::Checked)
+            ev->frame = ned.frameSpinBox->value();
+          else
+            ev->frame = e->frame;
+          // Subject modification?
+          if (ned.subjectCheckBox->checkState() == Qt::Checked)
+            ev->subject = ned.subjectEdit->text();
+          else
+            ev->subject = e->subject;
+          // Description modification?
+          if (ned.descriptionCheckBox->checkState() == Qt::Checked)
+            ev->description = ned.descriptionEdit->text();
+          else
+            ev->description = e->description;
+          // Select the icon id
+          this->setEventIconId(ev);
+          // Set the time
+          this->setEventTime(ev);
+          
+          events.push_back(ev);
+        }
+        emit eventsModified(this->timeEventBar->m_SelectedEvents, events);
+      }
+    }
+  }
+};
+
 void TimeEventControlerWidget::removeSelectedEvents()
 {
   if (!this->timeEventBar->m_SelectedEvents.isEmpty())
@@ -385,6 +473,13 @@ void TimeEventControlerWidget::insertGeneralFootOff()
 void TimeEventControlerWidget::insertGeneralOther()
 {
   this->insertEvent("", 2, this->timeEventBar->m_SliderPos);
+};
+
+void TimeEventControlerWidget::setEvents(const QList<int>& ids, const QList<Event*>& events)
+{
+  for (int i = 0 ; i < ids.count() ; ++i)
+    this->timeEventBar->setEvent(ids[i], events[i]);
+  this->updateEventActions();
 };
 
 void TimeEventControlerWidget::removeEvents(const QList<int>& ids, const QList<Event*>& events)
@@ -509,9 +604,15 @@ void TimeEventControlerWidget::changePlaybackParameters()
 void TimeEventControlerWidget::toggleEventSelection(const QList<int>& selectedIndices)
 {
   if (!selectedIndices.isEmpty())
+  {
+    this->actionEditSelectedEvents->setEnabled(true);
     this->actionRemoveSelectedEvents->setEnabled(true);
+  }
   else
+  {
+    this->actionEditSelectedEvents->setEnabled(false);
     this->actionRemoveSelectedEvents->setEnabled(false);
+  }
 };
 
 void TimeEventControlerWidget::setFrame(int f)
@@ -554,11 +655,9 @@ QList<int> TimeEventControlerWidget::removeEvent(const QString& context, const Q
 
 void TimeEventControlerWidget::insertEvent(const QString& label, int context, int frame)
 {
-  NewEventDialog ned(this);
-  ned.labelEdit->setText(label);
-  ned.contextComboBox->setCurrentIndex(context);
-  ned.frameSpinBox->setRange(this->mp_Acquisition->firstFrame(), this->mp_Acquisition->lastFrame());
-  ned.frameSpinBox->setValue(frame);
+  NewEventDialog ned(NewEventDialog::New, this);
+  int  frameAndROI[3] = {frame, this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame};
+  ned.setInformations(label, context, frameAndROI, "", "");
   ned.exec();
   if (ned.result() == QDialog::Accepted)
   {
@@ -568,39 +667,8 @@ void TimeEventControlerWidget::insertEvent(const QString& label, int context, in
     e->context = ned.contextComboBox->currentText();
     e->subject = ned.subjectEdit->text().trimmed();
     e->frame = ned.frameSpinBox->value();
-    e->time = (e->frame - this->mp_Acquisition->firstFrame() + 1) / this->mp_Acquisition->pointFrequency();
-    e->iconId = -1;
-    // Look for the symbol to assign (icon ID)
-    if (e->label.compare("Foot Strike", Qt::CaseInsensitive) == 0)
-      e->iconId = 1;
-    else if (e->label.compare("Foot Strike", Qt::CaseInsensitive) == 0)
-      e->iconId = 2;
-    else
-    {
-      QList<int> iconsUsed;
-      for (int i = 0 ; i < this->timeEventBar->m_EventItems.count() ; ++i)
-      {
-        const Event* ev = this->mp_Acquisition->eventAt(this->timeEventBar->m_EventItems[i].id);
-        if (ev && (ev->label.compare(e->label) == 0))
-        {
-          e->iconId = ev->iconId;
-          break;
-        }
-        else if (!iconsUsed.contains(ev->iconId))
-          iconsUsed.push_back(ev->iconId);
-      }
-      if (e->iconId == -1)
-      {
-        for (int i = 2 ; this->timeEventBar->m_EventSymbols.count() ; ++i)
-        {
-          if (!iconsUsed.contains(i+1))
-          {
-            e->iconId = i + 1;
-            break;
-          }
-        }
-      }
-    }
+    this->setEventTime(e);
+    this->setEventIconId(e);
     emit eventInserted(e);
   }
 };
@@ -612,3 +680,39 @@ void TimeEventControlerWidget::updateROIAction(int frame)
   else
     this->actionCropRegionOfInterest->setEnabled(false);
 };
+
+void TimeEventControlerWidget::setEventIconId(Event* e)
+{
+  e->iconId = -1;
+  // Look for the symbol to assign (icon ID)
+  if (e->label.compare("Foot Strike", Qt::CaseInsensitive) == 0)
+    e->iconId = 1;
+  else if (e->label.compare("Foot Strike", Qt::CaseInsensitive) == 0)
+    e->iconId = 2;
+  else
+  {
+    QList<int> iconsUsed;
+    for (int i = 0 ; i < this->timeEventBar->m_EventItems.count() ; ++i)
+    {
+      const Event* ev = this->mp_Acquisition->eventAt(this->timeEventBar->m_EventItems[i].id);
+      if (ev && (ev->label.compare(e->label) == 0))
+      {
+        e->iconId = ev->iconId;
+        break;
+      }
+      else if (!iconsUsed.contains(ev->iconId))
+        iconsUsed.push_back(ev->iconId);
+    }
+    if (e->iconId == -1)
+    {
+      for (int i = 2 ; this->timeEventBar->m_EventSymbols.count() ; ++i)
+      {
+        if (!iconsUsed.contains(i+1))
+        {
+          e->iconId = i + 1;
+          break;
+        }
+      }
+    }
+  }
+}

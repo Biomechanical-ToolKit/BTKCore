@@ -131,6 +131,29 @@ void TimeEventBarWidget::reset()
   this->update();
 };
 
+void TimeEventBarWidget::setEvent(int id, const Event* e)
+{
+  for (int i = 0 ; i < this->m_EventItems.count() ; ++i)
+  {
+    if (this->m_EventItems[i].id == id)
+    {
+      this->setEventItem(this->m_EventItems[i], id, e);
+      this->updateEventPos(i);
+      if (this->m_SelectedEvents.contains(this->m_EventItems[i].id))
+      {
+        if (this->m_EventItems[i].contextId == 0) // Right
+          this->m_EventItems[i].color = Qt::green;
+        else if (this->m_EventItems[i].contextId == 1) // Left
+          this->m_EventItems[i].color = Qt::red;
+        else // General
+          this->m_EventItems[i].color = Qt::yellow;
+      }
+      this->update();
+      break;
+    }
+  }
+};
+
 void TimeEventBarWidget::removeEvent(int id)
 {
   for (int i = 0 ; i < this->m_SelectedEvents.count(); ++i)
@@ -222,7 +245,7 @@ void TimeEventBarWidget::paintEvent(QPaintEvent* event)
   painter.setFont(this->m_EventFont);
   for (int i = 0 ; i < this->m_EventItems.count() ; ++i)
   {
-    if ((this->m_EventItems[i].frame > this->m_ROIFirstFrame) && (this->m_EventItems[i].frame < this->m_ROILastFrame))
+    if ((this->m_EventItems[i].frame >= this->m_ROIFirstFrame) && (this->m_EventItems[i].frame <= this->m_ROILastFrame))
     {
       painter.setPen(this->m_EventItems[i].color);
       painter.drawText(this->m_EventItems[i].boundingRect, Qt::AlignCenter, this->m_EventItems[i].symbol);

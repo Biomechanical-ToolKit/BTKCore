@@ -37,18 +37,98 @@
 
 #include <QPushButton>
 
-NewEventDialog::NewEventDialog(QWidget* parent)
+NewEventDialog::NewEventDialog(Mode m, QWidget* parent)
 : QDialog(parent)
 {
   this->setupUi(this);
-  this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-  connect(this->labelEdit, SIGNAL(textChanged(QString)), this, SLOT(validateLabel(QString)));
+  // Field modification
+  connect(this->labelEdit, SIGNAL(textChanged(QString)), this, SLOT(validateInformations()));
+  connect(this->labelEdit, SIGNAL(textChanged(QString)), this, SLOT(activateLabelCheckBox()));
+  connect(this->contextComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(validateInformations()));
+  connect(this->contextComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(activateContextCheckBox()));
+  connect(this->frameSpinBox, SIGNAL(valueChanged(int)), this, SLOT(validateInformations()));
+  connect(this->frameSpinBox, SIGNAL(valueChanged(int)), this, SLOT(activateFrameCheckBox()));
+  // CheckBox
+  connect(this->labelCheckBox, SIGNAL(stateChanged(int)), this, SLOT(validateInformations()));
+  connect(this->contextCheckBox, SIGNAL(stateChanged(int)), this, SLOT(validateInformations()));
+  connect(this->frameCheckBox, SIGNAL(stateChanged(int)), this, SLOT(validateInformations()));
+  // Options
+  if (m == New) // New event
+  {
+    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    this->labelCheckBox->setVisible(false);
+    this->contextCheckBox->setVisible(false);
+    this->frameCheckBox->setVisible(false);
+    this->subjectCheckBox->setVisible(false);
+    this->descriptionCheckBox->setVisible(false);
+  }
+  else // Edition
+  {
+    this->labelLabel->setVisible(false);
+    this->contextLabel->setVisible(false);
+    this->frameLabel->setVisible(false);
+    this->subjectLabel->setVisible(false);
+    this->descriptionLabel->setVisible(false);
+    connect(this->contextComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(activateContextCheckBox()));
+    connect(this->frameSpinBox, SIGNAL(valueChanged(int)), this, SLOT(activateFrameCheckBox()));
+    connect(this->subjectEdit, SIGNAL(textChanged(QString)), this, SLOT(activateSubjectCheckBox()));
+    connect(this->descriptionEdit, SIGNAL(textChanged(QString)), this, SLOT(activateDescriptionCheckBox()));
+  }
 };
 
-void NewEventDialog::validateLabel(const QString& label)
+void NewEventDialog::setInformations(const QString& label, int context, int frameAndROI[3], const QString& subject, const QString& description)
 {
-  if (label.trimmed().isEmpty())
+  this->labelEdit->setText(label);
+  this->contextComboBox->setCurrentIndex(context);
+  this->frameSpinBox->setRange(frameAndROI[1], frameAndROI[2]);
+  this->frameSpinBox->setValue(frameAndROI[0]);
+  if (frameAndROI[0] == -1)
+    this->frameSpinBox->clear();
+  this->subjectEdit->setText(subject);
+  this->descriptionEdit->setText(description);
+  this->unactiveAllCheckBox();
+};
+
+void NewEventDialog::validateInformations()
+{
+  if (((this->labelCheckBox->checkState() == Qt::Checked) && (this->labelEdit->text().trimmed().isEmpty()))
+   || ((this->contextCheckBox->checkState() == Qt::Checked) && (this->contextComboBox->currentIndex() == -1))
+   || ((this->frameCheckBox->checkState() == Qt::Checked) && (this->frameSpinBox->text().isEmpty())))
     this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
   else
     this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+};
+
+void NewEventDialog::unactiveAllCheckBox()
+{
+  this->labelCheckBox->setCheckState(Qt::Unchecked);
+  this->contextCheckBox->setCheckState(Qt::Unchecked);
+  this->frameCheckBox->setCheckState(Qt::Unchecked);
+  this->subjectCheckBox->setCheckState(Qt::Unchecked);
+  this->descriptionCheckBox->setCheckState(Qt::Unchecked);
+};
+
+void NewEventDialog::activateLabelCheckBox()
+{
+  this->labelCheckBox->setCheckState(Qt::Checked);
+};
+
+void NewEventDialog::activateContextCheckBox()
+{
+  this->contextCheckBox->setCheckState(Qt::Checked);
+};
+
+void NewEventDialog::activateFrameCheckBox()
+{
+  this->frameCheckBox->setCheckState(Qt::Checked);
+};
+
+void NewEventDialog::activateSubjectCheckBox()
+{
+  this->subjectCheckBox->setCheckState(Qt::Checked);
+};
+
+void NewEventDialog::activateDescriptionCheckBox()
+{
+  this->descriptionCheckBox->setCheckState(Qt::Checked);
 };

@@ -168,6 +168,7 @@ MainWindow::MainWindow(QWidget* parent)
   // Time Event
   connect(this->timeEventControler, SIGNAL(currentFrameChanged(int)), this->multiView, SLOT(updateDisplay(int)));
   connect(this->timeEventControler, SIGNAL(regionOfInterestChanged(int,int)), this, SLOT(setRegionOfInterest(int,int)));
+  connect(this->timeEventControler, SIGNAL(eventsModified(QList<int>, QList<Event*>)), this, SLOT(setEvents(QList<int>, QList<Event*>)));
   connect(this->timeEventControler, SIGNAL(eventsRemoved(QList<int>)), this, SLOT(removeEvents(QList<int>)));
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
 
@@ -648,6 +649,11 @@ void MainWindow::setAnalogsScale(const QVector<int>& ids, double scale)
 void MainWindow::removeAnalogs(const QList<int>& ids)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveAnalogs(this->mp_AcquisitionQ, ids)));
+};
+
+void MainWindow::setEvents(QList<int> ids, QList<Event*> events)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new SetEvents(this->mp_AcquisitionQ, ids, events)));
 };
 
 void MainWindow::removeEvents(const QList<int>& ids)

@@ -45,11 +45,20 @@ class NewEventDialog : public QDialog, public Ui::NewEventDialog
   Q_OBJECT
 
 public:
-  NewEventDialog(QWidget* parent = 0);
+  typedef enum {New, Edit} Mode;
+  NewEventDialog(Mode m = New, QWidget* parent = 0);
   // ~NewEventDialog(); // Implicit
   
+  void setInformations(const QString& label, int context, int frameAndROI[3], const QString& subject, const QString& description);
+  
 public slots:
-  void validateLabel(const QString& label);
+  void validateInformations();
+  void unactiveAllCheckBox();
+  void activateLabelCheckBox();
+  void activateContextCheckBox();
+  void activateFrameCheckBox();
+  void activateSubjectCheckBox();
+  void activateDescriptionCheckBox();
 };
 
 #endif // NewEventDialog_h

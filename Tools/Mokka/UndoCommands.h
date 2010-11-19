@@ -321,6 +321,23 @@ private:
 //                   EVENT EDITION                 //
 // ----------------------------------------------- //
 
+// --------------- SetEvents ---------------
+class SetEvents : public AcquisitionUndoCommand
+{
+public:
+  SetEvents(Acquisition* acq, const QList<int>& ids, const QList<Event*>& events, QUndoCommand* parent = 0);
+  ~SetEvents();
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QList<int> m_Ids;
+  QList<Event*> m_Events;
+  
+  void action();
+};
+
 // --------------- RemoveEvents ---------------
 class RemoveEvents : public AcquisitionUndoCommand
 {

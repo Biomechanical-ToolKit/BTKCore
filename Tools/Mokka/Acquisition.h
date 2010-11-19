@@ -113,7 +113,7 @@ public:
   double pointFrequency() const {return this->mp_BTKAcquisition->GetPointFrequency();};
   QString pointUnit(Point::Type t) const;
   bool hasPoints() const {return !this->m_Points.empty();};
-  const QMap<int, Point*> points() const {return this->m_Points;};
+  const QMap<int, Point*>& points() const {return this->m_Points;};
   const QString& pointLabel(int id) const {return this->m_Points[id]->label;};
   void setPointLabel(int id, const QString& label);
   const QString& pointDescription(int id) const {return this->m_Points[id]->description;};
@@ -133,7 +133,7 @@ public:
   double analogFrequency() const {return this->mp_BTKAcquisition->GetAnalogFrequency();};
   bool hasAnalogs() const {return !this->m_Analogs.empty();};
   int analogCount() const {return this->m_Analogs.count();};
-  const QMap<int, Analog*> analogs() const {return this->m_Analogs;};
+  const QMap<int, Analog*>& analogs() const {return this->m_Analogs;};
   const QString& analogLabel(int id) const {return this->m_Analogs[id]->label;};
   void setAnalogLabel(int id, const QString& label);
   const QString& analogDescription(int id) const {return this->m_Analogs[id]->description;};
@@ -151,7 +151,7 @@ public:
   
   bool hasEvents() const {return !this->m_Events.empty();};
   int eventCount() const {return this->m_Events.count();};
-  const QMap<int, Event*> events() const {return this->m_Events;};
+  const QMap<int, Event*>& events() const {return this->m_Events;};
   const Event* eventAt(int id) const;
   const QString& eventLabel(int id) const {return this->m_Events[id]->label;};
   const QString& eventDescription(int id) const {return this->m_Events[id]->description;};
@@ -160,6 +160,7 @@ public:
   int eventFrame(int id) const {return this->m_Events[id]->frame;};
   double eventTime(int id) const {return this->m_Events[id]->time;};
   int eventIconId(int id) const {return this->m_Events[id]->iconId;};
+  void setEvents(const QList<int>& ids, const QList<Event*> events);
   QList<Event*> takeEvents(const QList<int>& ids);
   void insertEvents(const QList<int>& ids, const QList<Event*> events);
   int generateNewEventId();
@@ -183,6 +184,7 @@ signals:
   void analogsScaleChanged(const QVector<int>& ids, const QVector<double>& scales);
   void analogsRemoved(const QList<int>& ids, const QList<Analog*>& analogs);
   void analogsInserted(const QList<int>& ids, const QList<Analog*>& analogs);
+  void eventsModified(const QList<int>& ids, const QList<Event*>& events);
   void eventsRemoved(const QList<int>& ids, const QList<Event*>& events);
   void eventsInserted(const QList<int>& ids, const QList<Event*>& events);
   

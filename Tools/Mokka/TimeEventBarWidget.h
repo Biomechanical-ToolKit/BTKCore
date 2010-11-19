@@ -55,6 +55,7 @@ public:
   TimeEventBarWidget(QWidget* parent = 0);
   void load(Acquisition* acq);
   void reset();
+  void setEvent(int id, const Event* e);
   void removeEvent(int id);
   void insertEvent(int id, const Event* e);
   

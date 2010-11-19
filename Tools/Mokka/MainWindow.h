@@ -97,6 +97,7 @@ public Q_SLOTS:
   void removeAnalogs(const QList<int>& ids);
   // Time event
   void setRegionOfInterest(int lf,int ff);
+  void setEvents(QList<int> ids, QList<Event*> events);
   void removeEvents(const QList<int>& ids);
   void insertEvent(Event* e);
   // Others

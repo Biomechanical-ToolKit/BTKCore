@@ -284,9 +284,9 @@ QString Acquisition::save(const QString& filename)
       type = btk::Point::Scalar;
     btk::Point::Pointer sourceP = sourcePoints->GetItem(it.key());
     btk::Point::Pointer targetP = btk::Point::New(p->label.toStdString(), numFramePoint, type, p->description.toStdString());
-    targetP->SetValues(sourceP->GetValues().block(this->mp_ROI[0]-1,0,numFramePoint,3));
-    targetP->SetResiduals(sourceP->GetResiduals().block(this->mp_ROI[0]-1,0,numFramePoint,1));
-    targetP->SetMasks(sourceP->GetMasks().block(this->mp_ROI[0]-1,0,numFramePoint,1));
+    targetP->SetValues(sourceP->GetValues().block(this->mp_ROI[0]-this->m_FirstFrame,0,numFramePoint,3));
+    targetP->SetResiduals(sourceP->GetResiduals().block(this->mp_ROI[0]-this->m_FirstFrame,0,numFramePoint,1));
+    targetP->SetMasks(sourceP->GetMasks().block(this->mp_ROI[0]-this->m_FirstFrame,0,numFramePoint,1));
     targetPoints->InsertItem(targetP);
     ++numPoints;
   }
@@ -316,7 +316,7 @@ QString Acquisition::save(const QString& filename)
     targetA->SetScale(a->scale);
     targetA->SetOffset(a->offset);
     targetA->SetDescription(a->description.toStdString());
-    targetA->SetValues(sourceA->GetValues().block((this->mp_ROI[0]-1)*source->GetNumberAnalogSamplePerFrame(),0,numFrameAnalog,1));
+    targetA->SetValues(sourceA->GetValues().block((this->mp_ROI[0]-this->m_FirstFrame)*source->GetNumberAnalogSamplePerFrame(),0,numFrameAnalog,1));
     targetAnalogs->InsertItem(targetA);
     ++numAnalogs;
   }
@@ -607,6 +607,18 @@ const Event* Acquisition::eventAt(int id) const
   if (it != this->m_Events.end())
     return *it;
   return 0;
+};
+
+// Warning: Doesn't free the memory of the replaced events
+void Acquisition::setEvents(const QList<int>& ids, const QList<Event*> events)
+{
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    QMap<int,Event*>::iterator it = this->m_Events.find(ids[i]);
+    if (it != this->m_Events.end())
+      *it = events[i];
+  }
+  emit eventsModified(ids, events);
 };
 
 QList<Event*> Acquisition::takeEvents(const QList<int>& ids)

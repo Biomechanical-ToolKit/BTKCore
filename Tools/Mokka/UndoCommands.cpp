@@ -320,6 +320,28 @@ void RemoveAnalogs::redo()
 //                   EVENT EDITION                 //
 // ----------------------------------------------- //
 
+// --------------- SetEvents  ---------------
+SetEvents::SetEvents(Acquisition* acq, const QList<int>& ids, const QList<Event*>& events, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent), m_Ids(ids), m_Events(events)
+{
+  this->mp_Acquisition = acq;
+};
+
+SetEvents::~SetEvents()
+{
+  for (int i = 0 ; i < this->m_Events.count() ; ++i)
+    delete this->m_Events[i];
+};
+
+void SetEvents::action()
+{
+  QList<Event*> temp;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp << this->mp_Acquisition->events().value(this->m_Ids[i], NULL);
+  this->mp_Acquisition->setEvents(this->m_Ids, this->m_Events);
+  this->m_Events = temp;
+};
+
 // --------------- RemoveEvents  ---------------
 RemoveEvents::RemoveEvents(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Ids(ids), m_Events()
