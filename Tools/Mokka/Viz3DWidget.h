@@ -60,12 +60,18 @@ public slots:
   // Qt / VTK
   void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   void selectPickedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
+  void toggleTrajectoryMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   // Qt
   void show(bool s);
   
 signals:
   void pickedMarkerChanged(int id);
   void pickedMarkersChanged(int id);
+  void trajectoryMarkerToggled(int id);
+  
+protected:
+  void keyPressEvent(QKeyEvent* event);
+  void keyReleaseEvent(QKeyEvent* event);
   
 private:
   vtkRenderer* mp_Renderer;

@@ -45,6 +45,8 @@
 #include <vtkCallbackCommand.h>
 #include <vtkAxesActor.h>
 
+#include <QKeyEvent>
+
 Viz3DWidget::Viz3DWidget(QWidget* parent)
 : QVTKWidget(parent)
 {
@@ -73,17 +75,19 @@ void Viz3DWidget::initialize()
   renwin->Delete();
   // VTK cell picker
   vtkCellPicker* cellPicker = vtkCellPicker::New();
-  cellPicker->SetTolerance(0.001);
+  cellPicker->SetTolerance(0.005);
   this->GetRenderWindow()->GetInteractor()->SetPicker(cellPicker);
   cellPicker->Delete();
   // VTK interaction style
   btk::VTKInteractorStyleTrackballCamera* style = btk::VTKInteractorStyleTrackballCamera::New();
+  style->CharEventEnabledOff();
   vtkCallbackCommand* pickerMouseInteraction = vtkCallbackCommand::New();
   pickerMouseInteraction->SetClientData(style);
   pickerMouseInteraction->SetCallback(&btk::VTKPickerInteractionCallback);
   style->AddObserver(vtkCommand::LeftButtonPressEvent, pickerMouseInteraction);
   style->AddObserver(vtkCommand::MouseMoveEvent, pickerMouseInteraction);
   style->AddObserver(vtkCommand::LeftButtonReleaseEvent, pickerMouseInteraction);
+  
   this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
   pickerMouseInteraction->Delete();
   style->Delete();
@@ -111,6 +115,11 @@ void Viz3DWidget::initialize()
       btk::VTKMarkersPickedEvent,
       this, 
       SLOT(selectPickedMarkers(vtkObject*, unsigned long, void*, void*)));
+  this->mp_EventQtSlotConnections->Connect(
+      this->GetRenderWindow()->GetInteractor(), 
+      btk::VTKMarkersToggleTrajectoryEvent,
+      this, 
+      SLOT(toggleTrajectoryMarker(vtkObject*, unsigned long, void*, void*)));
 };
 
 void Viz3DWidget::selectPickedMarker(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
@@ -125,6 +134,12 @@ void Viz3DWidget::selectPickedMarkers(vtkObject* /* caller */, unsigned long /* 
   emit pickedMarkersChanged(id);
 };
 
+void Viz3DWidget::toggleTrajectoryMarker(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
+{
+  int id = *static_cast<int*>(call_data);
+  emit trajectoryMarkerToggled(id);
+};
+
 void Viz3DWidget::show(bool s)
 {
   vtkActorCollection* actors = this->mp_Renderer->GetActors();
@@ -137,4 +152,16 @@ void Viz3DWidget::show(bool s)
     actor = actors->GetNextItem();
   }
   this->GetRenderWindow()->Render();
+};
+
+void Viz3DWidget::keyPressEvent(QKeyEvent* event)
+{
+  this->GetRenderWindow()->GetInteractor()->SetAltKey(event->modifiers() == Qt::AltModifier ? 1 : 0);
+  this->QVTKWidget::keyPressEvent(event);
+};
+
+void Viz3DWidget::keyReleaseEvent(QKeyEvent* event)
+{
+  this->GetRenderWindow()->GetInteractor()->SetAltKey(event->modifiers() == Qt::AltModifier ? 1 : 0);
+  this->QVTKWidget::keyPressEvent(event);
 };
