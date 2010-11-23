@@ -320,6 +320,22 @@ void RemoveAnalogs::redo()
 //                   EVENT EDITION                 //
 // ----------------------------------------------- //
 
+// --------------- EditEventFrame ---------------
+EditEventFrame::EditEventFrame(Acquisition* acq, int id, int frame, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent)
+{
+  this->mp_Acquisition = acq;
+  this->m_Id = id;
+  this->m_Frame = frame;
+};
+
+void EditEventFrame::action()
+{
+  int temp = this->mp_Acquisition->eventFrame(this->m_Id);
+  this->mp_Acquisition->setEventFrame(this->m_Id, this->m_Frame);
+  this->m_Frame = temp;
+};
+
 // --------------- SetEvents  ---------------
 SetEvents::SetEvents(Acquisition* acq, const QList<int>& ids, const QList<Event*>& events, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Ids(ids), m_Events(events)

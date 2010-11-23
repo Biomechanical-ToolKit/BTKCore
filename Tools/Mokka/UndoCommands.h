@@ -321,6 +321,22 @@ private:
 //                   EVENT EDITION                 //
 // ----------------------------------------------- //
 
+// --------------- EditEventFrame ---------------
+class EditEventFrame : public AcquisitionUndoCommand
+{
+public:
+  EditEventFrame(Acquisition* acq, int id, int frame, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  int m_Id;
+  int m_Frame;
+  
+  void action();
+};
+
 // --------------- SetEvents ---------------
 class SetEvents : public AcquisitionUndoCommand
 {

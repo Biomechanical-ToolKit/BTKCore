@@ -97,6 +97,7 @@ public Q_SLOTS:
   void removeAnalogs(const QList<int>& ids);
   // Time event
   void setRegionOfInterest(int lf,int ff);
+  void setEventFrame(int id, int frame);
   void setEvents(QList<int> ids, QList<Event*> events);
   void removeEvents(const QList<int>& ids);
   void insertEvent(Event* e);
@@ -104,6 +105,7 @@ public Q_SLOTS:
   void updateSelectedMarkersRadius(double r);
   void selectPickedMarker(int id);
   void selectPickedMarkers(int id);
+  void toggleMarkerTrajectory(int id);
   
 private:
   void saveFile(const QString& filename);

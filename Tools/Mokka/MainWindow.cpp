@@ -144,6 +144,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
   connect(this->multiView, SIGNAL(pickedMarkerChanged(int)), this, SLOT(selectPickedMarker(int)));
   connect(this->multiView, SIGNAL(pickedMarkersChanged(int)), this, SLOT(selectPickedMarkers(int)));
+  connect(this->multiView, SIGNAL(trajectoryMarkerToggled(int)), this, SLOT(toggleMarkerTrajectory(int)));
   // Model dock
   connect(this->mp_ModelDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(modelDockLocationChanged(Qt::DockWidgetArea)));
   connect(this->mp_ModelDock, SIGNAL(markerLabelChanged(int, QString)), this, SLOT(setPointLabel(int, QString)));
@@ -168,6 +169,7 @@ MainWindow::MainWindow(QWidget* parent)
   // Time Event
   connect(this->timeEventControler, SIGNAL(currentFrameChanged(int)), this->multiView, SLOT(updateDisplay(int)));
   connect(this->timeEventControler, SIGNAL(regionOfInterestChanged(int,int)), this, SLOT(setRegionOfInterest(int,int)));
+  connect(this->timeEventControler, SIGNAL(eventFrameModified(int,int)), this, SLOT(setEventFrame(int,int)));
   connect(this->timeEventControler, SIGNAL(eventsModified(QList<int>, QList<Event*>)), this, SLOT(setEvents(QList<int>, QList<Event*>)));
   connect(this->timeEventControler, SIGNAL(eventsRemoved(QList<int>)), this, SLOT(removeEvents(QList<int>)));
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
@@ -578,14 +580,29 @@ void MainWindow::selectPickedMarker(int id)
 void MainWindow::selectPickedMarkers(int id)
 {
   QList<int> ids = this->mp_ModelDock->selectedMarkers();
-  ids << id;
+  int idx = ids.indexOf(id);
+  if (idx == -1)
+    ids << id;
+  else
+    ids.removeAt(idx);
   this->mp_ModelDock->selectMarkers(ids);
+};
+
+void MainWindow::toggleMarkerTrajectory(int id)
+{
+  QList<int> ids = this->mp_ModelDock->tailedMarkers();
+  int idx = ids.indexOf(id);
+  if (idx == -1)
+    ids << id;
+  else
+    ids.removeAt(idx);
+  this->mp_ModelDock->setTailedMarkers(ids);
 };
 
 void MainWindow::modelDockLocationChanged(Qt::DockWidgetArea area)
 {
   QSettings settings;
-  settings.beginGroup("MarkersDock");
+  settings.beginGroup("MarkersDock"); // For compatibilty
   settings.setValue("area", area);
   settings.endGroup();
 };
@@ -649,6 +666,11 @@ void MainWindow::setAnalogsScale(const QVector<int>& ids, double scale)
 void MainWindow::removeAnalogs(const QList<int>& ids)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveAnalogs(this->mp_AcquisitionQ, ids)));
+};
+
+void MainWindow::setEventFrame(int id, int frame)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditEventFrame(this->mp_AcquisitionQ, id, frame)));
 };
 
 void MainWindow::setEvents(QList<int> ids, QList<Event*> events)
