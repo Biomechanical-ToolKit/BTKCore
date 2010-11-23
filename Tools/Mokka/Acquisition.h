@@ -158,12 +158,15 @@ public:
   const QString& eventContext(int id) const {return this->m_Events[id]->context;};
   const QString& eventSubject(int id) const {return this->m_Events[id]->subject;};
   int eventFrame(int id) const {return this->m_Events[id]->frame;};
+  void setEventFrame(int id, int frame);
   double eventTime(int id) const {return this->m_Events[id]->time;};
   int eventIconId(int id) const {return this->m_Events[id]->iconId;};
   void setEvents(const QList<int>& ids, const QList<Event*> events);
   QList<Event*> takeEvents(const QList<int>& ids);
   void insertEvents(const QList<int>& ids, const QList<Event*> events);
   int generateNewEventId();
+  
+  double timeFromFrame(int frame);
   
 signals:
   void informationsChanged(const QVector<QString>& infos);
@@ -184,6 +187,7 @@ signals:
   void analogsScaleChanged(const QVector<int>& ids, const QVector<double>& scales);
   void analogsRemoved(const QList<int>& ids, const QList<Analog*>& analogs);
   void analogsInserted(const QList<int>& ids, const QList<Analog*>& analogs);
+  void eventFrameChanged(int id, int frame);
   void eventsModified(const QList<int>& ids, const QList<Event*>& events);
   void eventsRemoved(const QList<int>& ids, const QList<Event*>& events);
   void eventsInserted(const QList<int>& ids, const QList<Event*>& events);
@@ -204,5 +208,11 @@ private:
   QMap<int,Event*> m_Events;
   int m_LastEventId;
 };
+
+ // frame starts at 1 not 0.
+inline double Acquisition::timeFromFrame(int frame)
+{
+  return static_cast<double>(frame - 1) / this->pointFrequency();
+}
 
 #endif // Acquisition_h

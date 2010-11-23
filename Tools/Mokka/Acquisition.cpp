@@ -216,9 +216,10 @@ QString Acquisition::load(const QString& filename)
     ++inc;
   }
   // Event
-  inc = 0;
+  inc = -1;
   for (btk::Acquisition::EventIterator it = this->mp_BTKAcquisition->BeginEvent() ; it != this->mp_BTKAcquisition->EndEvent() ; ++it)
   {
+    ++inc;
     Event* e = new Event();
     e->label = QString::fromStdString((*it)->GetLabel());;
     e->description = QString::fromStdString((*it)->GetDescription());
@@ -228,9 +229,8 @@ QString Acquisition::load(const QString& filename)
     e->frame = (*it)->GetFrame();
     e->iconId = (*it)->GetId();
     this->m_Events.insert(inc, e);
-    ++inc;
   }
-  this->m_LastEventId = inc - 1;
+  this->m_LastEventId = inc;
   
   this->emitGeneratedInformations(reader->GetAcquisitionIO());
   
@@ -607,6 +607,17 @@ const Event* Acquisition::eventAt(int id) const
   if (it != this->m_Events.end())
     return *it;
   return 0;
+};
+
+void Acquisition::setEventFrame(int id, int frame)
+{
+  QMap<int,Event*>::iterator it = this->m_Events.find(id);
+  if (it != this->m_Events.end())
+  {
+    (*it)->frame = frame;
+    (*it)->time = this->timeFromFrame(frame);
+    emit eventFrameChanged(id, frame);
+  }
 };
 
 // Warning: Doesn't free the memory of the replaced events
