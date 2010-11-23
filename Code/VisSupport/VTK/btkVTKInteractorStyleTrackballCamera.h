@@ -40,6 +40,8 @@
 
 #include <vtkInteractorStyleTrackballCamera.h>
 
+class vtkUnsignedCharArray;
+
 namespace btk
 {
   class VTKInteractorStyleTrackballCamera : public vtkInteractorStyleTrackballCamera
@@ -49,23 +51,46 @@ namespace btk
     vtkExportedTypeRevisionMacro(VTKInteractorStyleTrackballCamera, vtkInteractorStyleTrackballCamera, BTK_VTK_EXPORT);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
-    BTK_VTK_EXPORT virtual void Rotate();
+    BTK_VTK_EXPORT void Rotate();
     //virtual void EndRotate();
+    BTK_VTK_EXPORT void Spin();
+    BTK_VTK_EXPORT void Pan();
+    BTK_VTK_EXPORT void Dolly();
+    using Superclass::Dolly;
     
     vtkGetMacro(RotationEnabled,int);
     vtkSetMacro(RotationEnabled,int);
     vtkBooleanMacro(RotationEnabled,int);
     
+    vtkGetMacro(CharEventEnabled,int);
+    vtkSetMacro(CharEventEnabled,int);
+    vtkBooleanMacro(CharEventEnabled,int);
+    
+    vtkGetMacro(RubberBandSelection,int);
+    vtkSetMacro(RubberBandSelection,int);
+    vtkBooleanMacro(RubberBandSelection,int);
+    
+    BTK_VTK_EXPORT virtual void OnLeftButtonDown();
+    BTK_VTK_EXPORT virtual void OnLeftButtonUp();
+    BTK_VTK_EXPORT virtual void OnMouseMove();
+    BTK_VTK_EXPORT virtual void OnChar();
+    
+    void GetRubberBandPoints(int pts[4]) const;
+    
   protected:
     BTK_VTK_EXPORT VTKInteractorStyleTrackballCamera();
-    ~VTKInteractorStyleTrackballCamera() {};
+    ~VTKInteractorStyleTrackballCamera();
     
   private:
     //BTK_VTK_EXPORT void ProjectToSphere(int* size, int* pos, double* vec);
     double ProjectToSphere(double r, double x, double y) const;
     
     double m_Radius;
+    int mp_RubberBandGeometry[2][2];
     int RotationEnabled;
+    int CharEventEnabled;
+    vtkUnsignedCharArray* mp_PixelArray;
+    int RubberBandSelection;
   };
 };
 

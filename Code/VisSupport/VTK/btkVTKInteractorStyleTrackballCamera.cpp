@@ -43,6 +43,8 @@
 #include <vtkTransform.h>
 #include <vtkMath.h>
 
+#include <vtkUnsignedCharArray.h>
+
 #define TRACKBALLSIZE 0.8
 
 namespace btk
@@ -235,19 +237,63 @@ namespace btk
   */
   
   /**
+   * Overloaded method to spin the camera.
+   */
+  void VTKInteractorStyleTrackballCamera::VTKInteractorStyleTrackballCamera::Spin()
+  {
+    if (this->RotationEnabled)
+      this->Superclass::Spin();
+  };
+  
+  /**
+   * Overloaded method to pan the camera.
+   */
+  void VTKInteractorStyleTrackballCamera::VTKInteractorStyleTrackballCamera::Pan()
+  {
+    if (this->RotationEnabled)
+      this->Superclass::Pan();
+  };
+  
+  /**
+   * Overloaded method to doll the camera.
+   */
+  void VTKInteractorStyleTrackballCamera::VTKInteractorStyleTrackballCamera::Dolly()
+  {
+    if (this->RotationEnabled)
+      this->Superclass::Dolly();
+  };
+  
+  
+  /**
    * Constructor.
    */
   VTKInteractorStyleTrackballCamera::VTKInteractorStyleTrackballCamera()
   : vtkInteractorStyleTrackballCamera()
   {
     this->m_Radius = 1.1;
+    // Rubber band geometry
+    //  - Corner #1
+    this->mp_RubberBandGeometry[0][0] = 0;
+    this->mp_RubberBandGeometry[0][1] = 0;
+    //  - Corner #2 (diagonal opposed to corner #1)
+    this->mp_RubberBandGeometry[1][0] = 0;
+    this->mp_RubberBandGeometry[1][1] = 0;
+    // VTK macro members
     this->RotationEnabled = 1;
+    this->CharEventEnabled = 1;
+    // Rubber band
+    this->RubberBandSelection = 0;
+    this->mp_PixelArray = vtkUnsignedCharArray::New();
   };
   
   /**
    * @fn VTKInteractorStyleTrackballCamera::~VTKInteractorStyleTrackballCamera()
    * Empty destructor.
    */
+  VTKInteractorStyleTrackballCamera::~VTKInteractorStyleTrackballCamera()
+  {
+    this->mp_PixelArray->Delete();
+  };
    
   /*
   void VTKInteractorStyleTrackballCamera::ProjectToSphere(int* size, int* pos, double* vec)
@@ -279,6 +325,205 @@ namespace btk
   };
   */
   
+  /**
+   * Overload method to enable/disable VTK key event by using Get/Set CharEventEnabled.
+   */ 
+  void VTKInteractorStyleTrackballCamera::OnChar()
+  {
+    if (this->CharEventEnabled)
+      this->Superclass::OnChar();
+  };
+  
+  /**
+   * Return the screen coordinates of the 2 points defining the rubber band.
+   */
+  void VTKInteractorStyleTrackballCamera::GetRubberBandPoints(int pts[4]) const
+  {
+    pts[0] = this->mp_RubberBandGeometry[0][0];
+    pts[1] = this->mp_RubberBandGeometry[0][1];
+    pts[2] = this->mp_RubberBandGeometry[1][0];
+    pts[3] = this->mp_RubberBandGeometry[1][1];
+  };
+  
+  /**
+   * Overload method to set the rubber band geometry.
+   */ 
+  void VTKInteractorStyleTrackballCamera::OnLeftButtonDown()
+  {
+    if (this->RubberBandSelection == 0)
+    {
+      this->Superclass::OnLeftButtonDown();
+      return;
+    }
+    
+    if (!this->Interactor)
+      return;
+
+    vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
+    this->mp_RubberBandGeometry[0][0] = this->Interactor->GetEventPosition()[0];
+    this->mp_RubberBandGeometry[0][1] = this->Interactor->GetEventPosition()[1];
+    this->mp_RubberBandGeometry[1][0] = this->mp_RubberBandGeometry[0][0];
+    this->mp_RubberBandGeometry[1][1] = this->mp_RubberBandGeometry[0][1];
+
+    this->mp_PixelArray->Initialize();
+    this->mp_PixelArray->SetNumberOfComponents(3);
+    int* size = renWin->GetSize();
+    this->mp_PixelArray->SetNumberOfTuples(size[0]*size[1]);
+
+    renWin->GetPixelData(0, 0, size[0]-1, size[1]-1, renWin->GetDoubleBuffer() ? 0 : 1, this->mp_PixelArray);
+
+    //this->FindPokedRenderer(this->mp_RubberBandGeometry[0][0], this->mp_RubberBandGeometry[0][1]);
+  };
+  
+  /**
+   * Overload method to set the rubber band geometry.
+   */
+  void VTKInteractorStyleTrackballCamera::OnLeftButtonUp()
+  {
+    if (this->RubberBandSelection == 0)
+    {
+      this->Superclass::OnLeftButtonUp();
+      return;
+    }
+
+    if (!this->Interactor)
+      return;
+/*
+    //otherwise record the rubber band end coordinate and then fire off a pick
+    if (   (this->mp_RubberBandGeometry[0][0] != this->mp_RubberBandGeometry[1][0])
+        || (this->mp_RubberBandGeometry[0][1] != this->mp_RubberBandGeometry[1][1]) )
+      {
+      this->Pick();
+      }
+*/
+    this->RubberBandSelection = 0;
+    
+    // Erase the rubber band
+    vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
+    int* size = renWin->GetSize();
+    renWin->SetPixelData(0, 0, size[0]-1, size[1]-1, this->mp_PixelArray->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->Frame();
+  };
+  
+  /**
+   * Overload method to set the rubber band geometry.
+   */
+  void VTKInteractorStyleTrackballCamera::OnMouseMove()
+  {
+    if (this->RubberBandSelection == 0)
+    {
+      this->Superclass::OnMouseMove();
+      return;
+    }
+
+    if (!this->Interactor)
+      return;
+
+    this->mp_RubberBandGeometry[1][0] = this->Interactor->GetEventPosition()[0];
+    this->mp_RubberBandGeometry[1][1] = this->Interactor->GetEventPosition()[1];  
+    vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
+    int* size = renWin->GetSize();  
+    if (this->mp_RubberBandGeometry[1][0] > (size[0]-1))
+      this->mp_RubberBandGeometry[1][0] = size[0]-1;
+    if (this->mp_RubberBandGeometry[1][0] < 0)
+      this->mp_RubberBandGeometry[1][0] = 0;
+    if (this->mp_RubberBandGeometry[1][1] > (size[1]-1))
+      this->mp_RubberBandGeometry[1][1] = size[1]-1;
+    if (this->mp_RubberBandGeometry[1][1] < 0)
+      this->mp_RubberBandGeometry[1][1] = 0;
+    
+    int leftBottomCorner[2] = {this->mp_RubberBandGeometry[0][0], this->mp_RubberBandGeometry[0][1]};
+    int rightTopCorner[2] = {this->mp_RubberBandGeometry[1][0], this->mp_RubberBandGeometry[1][1]};
+    
+    if (this->mp_RubberBandGeometry[0][0] > this->mp_RubberBandGeometry[1][0])
+    {
+      leftBottomCorner[0] = this->mp_RubberBandGeometry[1][0];
+      rightTopCorner[0] = this->mp_RubberBandGeometry[0][0];
+    }
+    if (this->mp_RubberBandGeometry[0][1] > this->mp_RubberBandGeometry[1][1])
+    {
+      leftBottomCorner[1] = this->mp_RubberBandGeometry[1][1];
+      rightTopCorner[1] = this->mp_RubberBandGeometry[0][1];
+    }
+    
+    //this->DrawRubberBand();
+    
+    vtkUnsignedCharArray* temp = vtkUnsignedCharArray::New();
+    temp->DeepCopy(this->mp_PixelArray);  
+    unsigned char* pixels = temp->GetPointer(0);
+    
+    
+    for (int i = leftBottomCorner[0]; i <= rightTopCorner[0]; i+=15)
+    {
+      for (int j = i ; j < (i+10 <= rightTopCorner[0] ? i+10 : rightTopCorner[0]) ; ++j)
+      {
+        pixels[3*(leftBottomCorner[1]*size[0]+j)] = 255;
+        pixels[3*(leftBottomCorner[1]*size[0]+j)+1] = 255;
+        pixels[3*(leftBottomCorner[1]*size[0]+j)+2] = 255;
+    
+        pixels[3*(rightTopCorner[1]*size[0]+j)] = 255;
+        pixels[3*(rightTopCorner[1]*size[0]+j)+1] = 255;
+        pixels[3*(rightTopCorner[1]*size[0]+j)+2] = 255;
+      }
+    }
+    for (int i = leftBottomCorner[1]+1; i < rightTopCorner[1]; i+=15)
+    {
+      for (int j = i ; j < (i+10 <= rightTopCorner[1] ? i+10 : rightTopCorner[1]); ++j)
+      {
+        pixels[3*(j*size[0]+leftBottomCorner[0])] = 255;
+        pixels[3*(j*size[0]+leftBottomCorner[0])+1] = 255;
+        pixels[3*(j*size[0]+leftBottomCorner[0])+2] = 255;
+      
+        pixels[3*(j*size[0]+rightTopCorner[0])] = 255;
+        pixels[3*(j*size[0]+rightTopCorner[0])+1] = 255;
+        pixels[3*(j*size[0]+rightTopCorner[0])+2] = 255;
+      }
+    }
+    
+    /*
+    for (int i = leftBottomCorner[0]; i <= rightTopCorner[0]; ++i)
+    {
+      pixels[3*(leftBottomCorner[1]*size[0]+i)] = 255;
+      pixels[3*(leftBottomCorner[1]*size[0]+i)+1] = 0;
+      pixels[3*(leftBottomCorner[1]*size[0]+i)+2] = 0;
+      
+      // pixels[3*((leftBottomCorner[1]+1)*size[0]+i)] = 255;
+      // pixels[3*((leftBottomCorner[1]+1)*size[0]+i)+1] = 0;
+      // pixels[3*((leftBottomCorner[1]+1)*size[0]+i)+2] = 0;
+      
+      pixels[3*(rightTopCorner[1]*size[0]+i)] = 255;
+      pixels[3*(rightTopCorner[1]*size[0]+i)+1] = 0;
+      pixels[3*(rightTopCorner[1]*size[0]+i)+2] = 0;
+      
+      // pixels[3*((rightTopCorner[1]-1)*size[0]+i)] = 255;
+      // pixels[3*((rightTopCorner[1]-1)*size[0]+i)+1] = 0;
+      // pixels[3*((rightTopCorner[1]-1)*size[0]+i)+2] = 0;
+    }
+    for (int i = leftBottomCorner[1]+1; i < rightTopCorner[1]; ++i)
+    {
+      pixels[3*(i*size[0]+leftBottomCorner[0])] = 255;
+      pixels[3*(i*size[0]+leftBottomCorner[0])+1] = 0;
+      pixels[3*(i*size[0]+leftBottomCorner[0])+2] = 0;
+      
+      // pixels[3*(i*size[0]+(leftBottomCorner[0]+1))] = 255;
+      // pixels[3*(i*size[0]+(leftBottomCorner[0]+1))+1] = 0;
+      // pixels[3*(i*size[0]+(leftBottomCorner[0]+1))+2] = 0;
+      
+      pixels[3*(i*size[0]+rightTopCorner[0])] = 255;
+      pixels[3*(i*size[0]+rightTopCorner[0])+1] = 0;
+      pixels[3*(i*size[0]+rightTopCorner[0])+2] = 0;
+      
+      // pixels[3*(i*size[0]+(rightTopCorner[0]-1))] = 255;
+      // pixels[3*(i*size[0]+(rightTopCorner[0]-1))+1] = 0;
+      // pixels[3*(i*size[0]+(rightTopCorner[0]-1))+2] = 0;
+    }
+    */
+    renWin->SetPixelData(0, 0, size[0]-1, size[1]-1, pixels, renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->Frame();
+    
+    temp->Delete();
+  }
+  
   double VTKInteractorStyleTrackballCamera::ProjectToSphere(double r, double x, double y) const
   {
     double d, t, z;
@@ -292,5 +537,5 @@ namespace btk
       z = t * t / d;
     }
     return z;
-  }
+  };
 };
