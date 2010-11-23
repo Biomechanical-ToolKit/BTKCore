@@ -66,7 +66,8 @@ public:
   void visualConfigurations(QStringList& names, QStringList& filenames);
   void setVisualConfigurations(const QStringList& names, const QStringList& filenames);
   void loadConfiguration(const QString& filename);
-  QList<int> selectedMarkers();
+  QList<int> selectedMarkers() const;
+  QList<int> tailedMarkers() const;
   
   QAction* deselectConfigurationAction() {return this->mp_DeselectConfiguration;};
   QAction* clearConfigurationsAction() {return this->mp_ClearConfigurations;};
@@ -84,6 +85,7 @@ public Q_SLOTS:
   void clearConfigurations();
   // Markers & Points
   void updateDisplayedMarkers(const QVector<int>& ids);
+  void setTailedMarkers(const QList<int>& ids);
   void selectMarkers(QList<int> ids);
   void selectAllMarkers();
   void hideSelectedMarkers();
@@ -201,6 +203,7 @@ private:
   QAction* mp_RemoveConfiguration;
   QAction* mp_DeselectConfiguration;
   QAction* mp_ClearConfigurations;
+  // Points & Analogs actions
   QAction* mp_SelectAllMarkers;
   QAction* mp_HideSelectedMarkers;
   QAction* mp_UnhideSelectedMarkers;

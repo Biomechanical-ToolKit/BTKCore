@@ -436,7 +436,7 @@ void ModelDockWidget::setVisualConfigurations(const QStringList& names, const QS
   this->modelConfigurationComboBox->blockSignals(false);
 };
 
-QList<int> ModelDockWidget::selectedMarkers()
+QList<int> ModelDockWidget::selectedMarkers() const
 {
   QList<int> ids;
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(0);
@@ -444,6 +444,19 @@ QList<int> ModelDockWidget::selectedMarkers()
   {
     QTreeWidgetItem* item = markersRoot->child(i);
     if (item->isSelected())
+      ids << item->data(0, pointId).toInt();
+  }
+  return ids;
+};
+
+QList<int> ModelDockWidget::tailedMarkers() const
+{
+  QList<int> ids;
+  QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(0);
+  for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* item = markersRoot->child(i);
+    if (item->checkState(TrajectoryHeader) == Qt::Checked)
       ids << item->data(0, pointId).toInt();
   }
   return ids;
@@ -724,6 +737,24 @@ void ModelDockWidget::updateDisplayedMarkers(const QVector<int>& ids)
   }
   this->modelTree->blockSignals(false);
 };
+
+void ModelDockWidget::setTailedMarkers(const QList<int>& ids)
+{
+  this->modelTree->blockSignals(true);
+  QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(0);
+  for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* item = markersRoot->child(i);
+    //bool selected = item->isSelected();
+    if (ids.contains(item->data(0,pointId).toInt()))
+      item->setCheckState(TrajectoryHeader, Qt::Checked);
+    else
+      item->setCheckState(TrajectoryHeader, Qt::Unchecked);
+    //item->setSelected(selected);
+  }
+  this->modelTree->blockSignals(false);
+  emit markerTrajectorySelectionChanged(ids);
+}
 
 void ModelDockWidget::selectMarkers(QList<int> ids)
 {
