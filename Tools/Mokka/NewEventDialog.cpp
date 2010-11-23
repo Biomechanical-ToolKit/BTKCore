@@ -41,6 +41,30 @@ NewEventDialog::NewEventDialog(Mode m, QWidget* parent)
 : QDialog(parent)
 {
   this->setupUi(this);
+  
+#ifdef Q_OS_MAC
+  this->labelCheckBox->setAttribute(Qt::WA_MacSmallSize);
+  this->labelLabel->setAttribute(Qt::WA_MacSmallSize);
+  this->labelEdit->setAttribute(Qt::WA_MacSmallSize);
+  this->frameCheckBox->setAttribute(Qt::WA_MacSmallSize);
+  this->frameLabel->setAttribute(Qt::WA_MacSmallSize);
+  this->frameSpinBox->setAttribute(Qt::WA_MacSmallSize);
+  this->subjectCheckBox->setAttribute(Qt::WA_MacSmallSize);
+  this->subjectLabel->setAttribute(Qt::WA_MacSmallSize);
+  this->subjectEdit->setAttribute(Qt::WA_MacSmallSize);
+  this->descriptionCheckBox->setAttribute(Qt::WA_MacSmallSize);
+  this->descriptionLabel->setAttribute(Qt::WA_MacSmallSize);
+  this->descriptionEdit->setAttribute(Qt::WA_MacSmallSize);
+  this->contextCheckBox->setAttribute(Qt::WA_MacSmallSize);
+  this->contextLabel->setAttribute(Qt::WA_MacSmallSize);
+  this->contextComboBox->setAttribute(Qt::WA_MacSmallSize);
+  
+  this->resize(340, 220);
+#endif
+  // Fix the size
+  this->setMaximumSize(this->width(),this->height());
+  this->setMinimumSize(this->width(),this->height());
+  
   // Field modification
   connect(this->labelEdit, SIGNAL(textChanged(QString)), this, SLOT(validateInformations()));
   connect(this->labelEdit, SIGNAL(textChanged(QString)), this, SLOT(activateLabelCheckBox()));
