@@ -46,7 +46,6 @@
 // Forward declaration
 class AbstractView;
 class Acquisition;
-class QTableWidgetItem;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
 
@@ -75,23 +74,16 @@ public:
   QMenu* groundOrientationMenu() const {return this->mp_GroupOrientationMenu;};
   
 public slots:
-  // Qt / VTK
-  void updateDisplayedMarkersList(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  // Qt
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
   void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
   void updateHiddenMarkers(const QList<int>& ids);
   void updateTailedMarkers(const QList<int>& ids);
   void clear();
-  void circleSelectedMarkers(QList<QTableWidgetItem*> items);
   void circleSelectedMarkers(const QList<int>& ids);
   void updateDisplay();
   void updateDisplay(int frame);
-  void showSelectedMarkers(const QList<QTableWidgetItem*>& items);
-  void hideSelectedMarkers(const QList<QTableWidgetItem*>& items);
   void showAllMarkers();
   void hideAllMarkers();
-  void updateMarkerVisibility(QTableWidgetItem* item);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
@@ -104,8 +96,12 @@ signals:
   void visibleMarkersChanged(const QVector<int>& ids);
   void pickedMarkerChanged(int id);
   void pickedMarkersChanged(int id);
+  void trajectoryMarkerToggled(int id);
   
 private slots:
+  // Qt / VTK
+  void updateDisplayedMarkersList(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
+  // Qt
   void changeGroundOrientation();
   
 private:

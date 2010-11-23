@@ -47,7 +47,6 @@
 
 #include <QDragEnterEvent>
 #include <QUrl>
-#include <QTableWidgetItem>
 
 #include <vtkInformation.h>
 #include <vtkIdList.h>
@@ -661,17 +660,6 @@ void MultiViewWidget::clear()
   this->updateDisplay(this->mp_Acquisition->firstFrame());
 };
 
-void MultiViewWidget::circleSelectedMarkers(QList<QTableWidgetItem*> items)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markers->ClearSelectedMarkers();
-  for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-  {
-    if ((*it)->checkState() == Qt::Checked)
-      markers->SetSelectedMarker((*it)->data(markerId).toInt());
-  }
-};
-
 void MultiViewWidget::circleSelectedMarkers(const QList<int>& ids)
 {
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
@@ -714,26 +702,6 @@ void MultiViewWidget::updateDisplay(int frame)
   this->updateViews();
 };
 
-void MultiViewWidget::showSelectedMarkers(const QList<QTableWidgetItem*>& items)
-{
-  for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-  {
-    (*it)->setCheckState(Qt::Checked);
-    btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->ShowMarker((*it)->data(markerId).toInt());
-  }
-  this->updateDisplay();
-};
-
-void MultiViewWidget::hideSelectedMarkers(const QList<QTableWidgetItem*>& items)
-{
-  for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-  {
-    (*it)->setCheckState(Qt::Unchecked);
-    btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->HideMarker((*it)->data(markerId).toInt());
-  }
-  this->updateDisplay();
-};
-
 void MultiViewWidget::showAllMarkers()
 {
   btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->ShowMarkers();
@@ -743,23 +711,6 @@ void MultiViewWidget::showAllMarkers()
 void MultiViewWidget::hideAllMarkers()
 {
   btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->HideMarkers();
-  this->updateDisplay();
-};
-
-void MultiViewWidget::updateMarkerVisibility(QTableWidgetItem* item)
-{
-  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  // Hide/show markers
-  if (item->checkState() == Qt::Checked)
-    markers->ShowMarker(item->data(markerId).toInt());
-  else if (item->checkState() == Qt::Unchecked)
-    markers->HideMarker(item->data(markerId).toInt());
-  // Hide/show trajectories
-  if (item->data(markerTrajectoryActived).toBool())
-    markers->ShowTrajectory(item->data(markerId).toInt());
-  else
-    markers->HideTrajectory(item->data(markerId).toInt());
-  // Update current frame
   this->updateDisplay();
 };
 
@@ -788,6 +739,7 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   CompositeView* sv = static_cast<CompositeView*>(this->AbstractMultiView::createView(fromAnother));
   connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(pickedMarkerChanged(int)), this, SIGNAL(pickedMarkerChanged(int)));
   connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(pickedMarkersChanged(int)), this, SIGNAL(pickedMarkersChanged(int)));
+  connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(trajectoryMarkerToggled(int)), this, SIGNAL(trajectoryMarkerToggled(int)));
   static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D))->installEventFilter(this->parent()->parent());
   return sv;
 };
