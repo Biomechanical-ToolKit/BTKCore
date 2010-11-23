@@ -511,6 +511,27 @@ QPushButton::menu-indicator {
     <string>Edit selected events</string>
    </property>
   </action>
+  <action name="actionZoomUnzoomRegionOfInterest">
+   <property name="text">
+    <string>Zoom Region of Interest</string>
+   </property>
+  </action>
+  <action name="actionNextEvent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Next Event</string>
+   </property>
+  </action>
+  <action name="actionPreviousEvent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Previous Event</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

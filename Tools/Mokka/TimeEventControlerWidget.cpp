@@ -61,6 +61,11 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->prevEventButton->setIcon(*this->mp_PrevEventIcon);
   this->playButton->setIcon(*this->mp_PlayIcon);
   this->nextEventButton->setIcon(*this->mp_NextEventIcon);
+  // Shortcuts
+  this->actionEditSelectedEvents->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+  this->actionRemoveSelectedEvents->setShortcut(QKeySequence::Delete);
+  this->actionNextEvent->setShortcut(QKeySequence::MoveToNextWord);
+  this->actionPreviousEvent->setShortcut(QKeySequence::MoveToPreviousWord);
   // Display options menu
   QActionGroup* playbackSpeedActionGroup = new QActionGroup(this);
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeedRealtime);
@@ -80,6 +85,7 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeedFullFrames);
   displayOptionsMenu->addMenu(this->mp_PlaybackSpeedMenu);
   displayOptionsMenu->addSeparator();
+  displayOptionsMenu->addAction(actionZoomUnzoomRegionOfInterest);
   displayOptionsMenu->addAction(actionCropRegionOfInterest);
   this->acquisitionOptionsButtonMenu->setMenu(displayOptionsMenu);
   // Event options menu
@@ -118,6 +124,32 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   eventGeneralOptionsMenu->addAction(this->actionRemoveAllGeneralFootOff);
   this->eventGeneralOptionsButtonMenu->setMenu(eventGeneralOptionsMenu);
   
+  // Add a contextual menu
+  QMenu* insertEventMenu = new QMenu("Insert Event", this);
+  insertEventMenu->addAction(this->actionInsertRightFootStrike);
+  insertEventMenu->addAction(this->actionInsertRightFootOff);
+  insertEventMenu->addAction(this->actionInsertRightOther);
+  insertEventMenu->addSeparator();
+  insertEventMenu->addAction(this->actionInsertLeftFootStrike);
+  insertEventMenu->addAction(this->actionInsertLeftFootOff);
+  insertEventMenu->addAction(this->actionInsertLeftOther);
+  insertEventMenu->addSeparator();
+  insertEventMenu->addAction(this->actionInsertGeneralFootStrike);
+  insertEventMenu->addAction(this->actionInsertGeneralFootOff);
+  insertEventMenu->addAction(this->actionInsertGeneralOther);
+  this->addAction(insertEventMenu->menuAction());
+  QAction* sep1 = new QAction(this); sep1->setSeparator(true); this->addAction(sep1);
+  this->addAction(this->actionEditSelectedEvents);
+  this->addAction(this->actionRemoveSelectedEvents);
+  this->addAction(this->actionClearEvents);
+  QAction* sep2 = new QAction(this); sep2->setSeparator(true); this->addAction(sep2);
+  this->addAction(this->actionNextEvent);
+  this->addAction(this->actionPreviousEvent);
+  QAction* sep3 = new QAction(this); sep3->setSeparator(true); this->addAction(sep3);
+  this->addAction(actionZoomUnzoomRegionOfInterest);
+  this->addAction(actionCropRegionOfInterest);
+  this->setContextMenuPolicy(Qt::ActionsContextMenu);
+  
   connect(this->playButton, SIGNAL(pressed()), this, SLOT(pressPlayButton()));
   connect(this->playButton, SIGNAL(clicked()), this, SLOT(togglePlayback()));
   connect(this->playButton, SIGNAL(released()), this, SLOT(releasePlayButton()));
@@ -130,17 +162,29 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(nextStep()));
   // Time Event Bar
   connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
-  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(updateROIAction(int)));
+  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(updateROIAction(int)));
   connect(this->timeEventBar, SIGNAL(boundSelected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this->lcdNumber, SLOT(display(int)));
-  connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(eventSelectionChanged(QList<int>)), this, SLOT(toggleEventSelection(QList<int>)));
+  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
+  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+  connect(this->timeEventBar, SIGNAL(eventMotionFinished(int, int)), this, SLOT(checkEventFrameModification(int, int)));
   // Actions
   connect(playbackSpeedActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changePlaybackParameters()));
+  connect(this->actionZoomUnzoomRegionOfInterest, SIGNAL(triggered()), this, SLOT(toggleZoomRegionOfInterest()));
   connect(this->actionCropRegionOfInterest, SIGNAL(triggered()), this, SLOT(cropRegionOfInterest()));
+  connect(this->actionPreviousEvent, SIGNAL(triggered()), this, SLOT(previousEvent()));
+  connect(this->actionNextEvent, SIGNAL(triggered()), this, SLOT(nextEvent()));
   connect(this->actionClearEvents, SIGNAL(triggered()), this, SLOT(clearEvents()));
   connect(this->actionEditSelectedEvents, SIGNAL(triggered()), this, SLOT(editSelectedEvents()));
   connect(this->actionRemoveSelectedEvents, SIGNAL(triggered()), this, SLOT(removeSelectedEvents()));
@@ -179,6 +223,7 @@ void TimeEventControlerWidget::setAcquisition(Acquisition* acq)
     disconnect(this->mp_Acquisition, 0, this, 0);
   this->mp_Acquisition = acq;
   connect(this->mp_Acquisition, SIGNAL(regionOfInterestChanged(int, int)), this, SLOT(setRegionOfInterest(int, int)));
+  connect(this->mp_Acquisition, SIGNAL(eventFrameChanged(int,int)), this, SLOT(setEventFrame(int,int)));
   connect(this->mp_Acquisition, SIGNAL(eventsModified(QList<int>, QList<Event*>)), this, SLOT(setEvents(QList<int>, QList<Event*>)));
   connect(this->mp_Acquisition, SIGNAL(eventsRemoved(QList<int>, QList<Event*>)), this, SLOT(removeEvents(QList<int>, QList<Event*>)));
   connect(this->mp_Acquisition, SIGNAL(eventsInserted(QList<int>, QList<Event*>)), this, SLOT(insertEvents(QList<int>, QList<Event*>)));
@@ -192,12 +237,15 @@ void TimeEventControlerWidget::load()
   this->changePlaybackParameters();
   this->updateEventActions();
   this->actionCropRegionOfInterest->setEnabled(false);
+  this->actionZoomUnzoomRegionOfInterest->setEnabled(false);
+  this->actionNextEvent->setEnabled(this->timeEventBar->m_EventItems.isEmpty() ? false : true);
+  this->actionPreviousEvent->setEnabled(this->timeEventBar->m_EventItems.isEmpty() ? false : true);
 };
 
 void TimeEventControlerWidget::reset()
 {
-  this->mp_Timer->stop();
-  this->playButton->setIcon(*this->mp_PlayIcon);
+  if (this->mp_Timer->isActive())
+    this->stopPlayback();
   this->timeEventBar->reset();
   this->lcdNumber->display(0);
 };
@@ -205,16 +253,46 @@ void TimeEventControlerWidget::reset()
 void TimeEventControlerWidget::togglePlayback()
 {
   if (this->mp_Timer->isActive())
-  {
-    this->mp_Timer->stop();
-    this->playButton->setIcon(*this->mp_PlayIcon);
-  }
+    this->stopPlayback();
   else
-  {
-    this->mp_Timer->start(this->m_PlaybackDelay);
-    this->playButton->setIcon(*this->mp_PauseIcon);
-  }
+    this->startPlayback();
 };
+
+void TimeEventControlerWidget::startPlayback()
+{
+  this->mp_Timer->start(this->m_PlaybackDelay);
+  this->playButton->setIcon(*this->mp_PauseIcon);
+  disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+  disconnect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+  disconnect(this->timeEventBar, SIGNAL(boundSelected(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SIGNAL(currentFrameChanged(int)));
+  disconnect(this->timeEventBar, SIGNAL(boundDeselected(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SIGNAL(currentFrameChanged(int)));
+  disconnect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
+  disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+}
+
+void TimeEventControlerWidget::stopPlayback()
+{
+  this->mp_Timer->stop();
+  this->playButton->setIcon(*this->mp_PlayIcon);
+  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SIGNAL(currentFrameChanged(int)));
+  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SIGNAL(currentFrameChanged(int)));
+  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
+  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+}
 
 void TimeEventControlerWidget::setCurrentFrame(int frame)
 {
@@ -234,6 +312,21 @@ void TimeEventControlerWidget::nextFrame()
 void TimeEventControlerWidget::previousFrame()
 {
   this->setFrame(this->timeEventBar->m_SliderPos - 1);
+};
+
+void TimeEventControlerWidget::toggleZoomRegionOfInterest()
+{
+  // Zoom mode
+  if ((this->timeEventBar->m_FirstFrame == this->timeEventBar->m_ROIFirstFrame) && (this->timeEventBar->m_LastFrame == this->timeEventBar->m_ROILastFrame))
+  {
+    this->setRegionOfInterest(this->timeEventBar->m_LeftBoundPos, this->timeEventBar->m_RightBoundPos);
+    this->actionZoomUnzoomRegionOfInterest->setText(tr("Unzoom Region of Interest"));
+  }
+  else
+  {
+    this->setRegionOfInterest(this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame);
+    this->actionZoomUnzoomRegionOfInterest->setText(tr("Zoom Region of Interest"));
+  }
 };
 
 void TimeEventControlerWidget::cropRegionOfInterest()
@@ -335,7 +428,6 @@ void TimeEventControlerWidget::editSelectedEvents()
        || (ned.subjectCheckBox->checkState() == Qt::Checked)
        || (ned.descriptionCheckBox->checkState() == Qt::Checked))
       {
-        qDebug("Send modifications");
         QList<Event*> events;
         // Create events with modified informations
         for (int i = 0 ; i < this->timeEventBar->m_SelectedEvents.count() ; ++i)
@@ -370,7 +462,7 @@ void TimeEventControlerWidget::editSelectedEvents()
           // Select the icon id
           this->setEventIconId(ev);
           // Set the time
-          this->setEventTime(ev);
+          ev->time = this->mp_Acquisition->timeFromFrame(ev->frame);
           
           events.push_back(ev);
         }
@@ -495,17 +587,7 @@ void TimeEventControlerWidget::insertEvents(const QList<int>& ids, const QList<E
   for (int i = 0 ; i < ids.count() ; ++i)
     this->timeEventBar->insertEvent(ids[i], events[i]);
   this->updateEventActions();
-};
-
-void TimeEventControlerWidget::keyPressEvent(QKeyEvent* event)
-{
-  if ((event->key() == Qt::Key_Backspace) || (event->key() == Qt::Key_Delete))
-  {
-    this->removeSelectedEvents();
-    return;
-  }
-  this->QWidget::keyPressEvent(event);
-};
+}; 
 
 void TimeEventControlerWidget::pressPlayButton()
 {
@@ -630,12 +712,16 @@ void TimeEventControlerWidget::updateEventActions()
   if (this->mp_Acquisition->hasEvents())
   {
     this->actionClearEvents->setEnabled(true);
+    this->actionPreviousEvent->setEnabled(true);
+    this->actionNextEvent->setEnabled(true);
     this->prevEventButton->setEnabled(true);
     this->nextEventButton->setEnabled(true);
   }
   else
   {
     this->actionClearEvents->setEnabled(false);
+    this->actionPreviousEvent->setEnabled(false);
+    this->actionNextEvent->setEnabled(false);
     this->prevEventButton->setEnabled(false);
     this->nextEventButton->setEnabled(false);
   }
@@ -667,7 +753,7 @@ void TimeEventControlerWidget::insertEvent(const QString& label, int context, in
     e->context = ned.contextComboBox->currentText();
     e->subject = ned.subjectEdit->text().trimmed();
     e->frame = ned.frameSpinBox->value();
-    this->setEventTime(e);
+    e->time = this->mp_Acquisition->timeFromFrame(e->frame);
     this->setEventIconId(e);
     emit eventInserted(e);
   }
@@ -675,10 +761,42 @@ void TimeEventControlerWidget::insertEvent(const QString& label, int context, in
 
 void TimeEventControlerWidget::updateROIAction(int frame)
 {
-  if ((frame != this->timeEventBar->m_ROIFirstFrame) && (frame != this->timeEventBar->m_ROILastFrame))
+  Q_UNUSED(frame);
+  //if ((this->timeEventBar->m_ROIFirstFrame != this->mp_Acquisition->firstFrame()) || (this->timeEventBar->m_ROILastFrame != this->mp_Acquisition->lastFrame()))
+  //if ((this->timeEventBar->m_ROIFirstFrame != this->timeEventBar->m_FirstFrame) || (this->timeEventBar->m_ROILastFrame != this->timeEventBar->m_LastFrame))
+  if ((this->timeEventBar->m_LeftBoundPos != this->timeEventBar->m_ROIFirstFrame) || (this->timeEventBar->m_RightBoundPos != this->timeEventBar->m_ROILastFrame))
+  {
     this->actionCropRegionOfInterest->setEnabled(true);
+    this->actionZoomUnzoomRegionOfInterest->setEnabled(true);
+  }
   else
+  {
     this->actionCropRegionOfInterest->setEnabled(false);
+    this->actionZoomUnzoomRegionOfInterest->setEnabled(false);
+  }
+};
+
+void TimeEventControlerWidget::checkEventFrameModification(int id, int frame)
+{
+  const Event* ev = this->mp_Acquisition->eventAt(id);
+  if (ev && ev->frame != frame)
+    emit eventFrameModified(id, frame);
+};
+
+void TimeEventControlerWidget::setEventFrame(int id, int frame)
+{
+  const Event* ev = this->mp_Acquisition->eventAt(id);
+  for (int i = 0 ; i < this->timeEventBar->m_EventItems.count() ; ++i)
+  {
+    if (this->timeEventBar->m_EventItems[i].id == id)
+    {
+      this->timeEventBar->m_EventItems[i].frame = frame;
+      this->timeEventBar->setEventToolTip(this->timeEventBar->m_EventItems[i], ev);
+      this->timeEventBar->updateEventPos(i);
+      break;
+    }
+  }
+  this->timeEventBar->update();
 };
 
 void TimeEventControlerWidget::setEventIconId(Event* e)
@@ -687,7 +805,7 @@ void TimeEventControlerWidget::setEventIconId(Event* e)
   // Look for the symbol to assign (icon ID)
   if (e->label.compare("Foot Strike", Qt::CaseInsensitive) == 0)
     e->iconId = 1;
-  else if (e->label.compare("Foot Strike", Qt::CaseInsensitive) == 0)
+  else if (e->label.compare("Foot Off", Qt::CaseInsensitive) == 0)
     e->iconId = 2;
   else
   {
@@ -715,4 +833,4 @@ void TimeEventControlerWidget::setEventIconId(Event* e)
       }
     }
   }
-}
+};

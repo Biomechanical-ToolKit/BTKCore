@@ -60,10 +60,13 @@ public:
   
 public slots:
   void togglePlayback();
+  void stopPlayback();
+  void startPlayback();
   void setCurrentFrame(int frame);
   void nextStep();
   void nextFrame();
   void previousFrame();
+  void toggleZoomRegionOfInterest();
   void cropRegionOfInterest();
   void setRegionOfInterest(int lb, int rb);
   void previousEvent();
@@ -89,13 +92,11 @@ public slots:
   void setEvents(const QList<int>& ids, const QList<Event*>& events);
   void removeEvents(const QList<int>& ids, const QList<Event*>& events);
   void insertEvents(const QList<int>& ids, const QList<Event*>& events);
-  
-protected:
-  void keyPressEvent(QKeyEvent* event);
 
 signals:
   void currentFrameChanged(int frame);
   void regionOfInterestChanged(int ff, int lf);
+  void eventFrameModified(int id, int frame);
   void eventsModified(const QList<int>& ids, const QList<Event*>& events);
   void eventsRemoved(const QList<int>& ids);
   void eventInserted(Event* e);
@@ -110,8 +111,8 @@ private slots:
   void changePlaybackParameters();
   void toggleEventSelection(const QList<int>& selectedIndices);
   void updateROIAction(int frame);
-  void setEventIconId(Event* e);
-  void setEventTime(Event* e);
+  void checkEventFrameModification(int id, int frame);
+  void setEventFrame(int id, int frame);
   
 private:
   void setFrame(int f);
@@ -119,6 +120,8 @@ private:
   void updateEventActions();
   QList<int> removeEvent(const QString& context, const QString& label);
   void insertEvent(const QString& label, int context, int frame);
+  void setEventIconId(Event* e);
+  void setEventTime(Event* e);
   
   Acquisition* mp_Acquisition;
   QMenu* mp_PlaybackSpeedMenu;
@@ -134,10 +137,5 @@ private:
   int m_PlaybackStep;
   int m_PlaybackDelay;
 };
-
-inline void TimeEventControlerWidget::setEventTime(Event* e)
-{
-  e->time = (e->frame - this->mp_Acquisition->firstFrame()) / this->mp_Acquisition->pointFrequency(); // e->frame starts at 1 not 0.
-}
 
 #endif // TimeEventControlerWidget_h

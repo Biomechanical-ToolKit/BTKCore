@@ -42,6 +42,8 @@
 #include <cmath>
 #define NUMLENGTH(num) ((num==0)?1:(int)log10(std::fabs((float)num))+1)
 
+static int oldMouseX = 0;
+
 TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
 : QFrame(parent), m_EventContexts(), m_Ticks(), m_TicksLabel(), 
   m_Fm(this->font()), m_EventItems(), m_EventSymbols(8), m_SelectedEvents(),
@@ -70,7 +72,7 @@ TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
 #endif 
 #ifdef Q_WS_WIN
   this->m_YEventPosRelative = 13.0;
-  this->m_EventSymbolSize = 14.0;
+  this->m_EventSymbolSize = 15.0;
   this->m_EventFont = QFont("Lucida Sans Unicode", 14);
 #else
   this->m_YEventPosRelative = 16.0;
@@ -82,6 +84,7 @@ TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
   this->m_MovPen = QColor(0, 127, 255);
   QColor movShadowColor = QColor(100, 100, 100); movShadowColor.setAlpha(128);
   this->m_MovShadowPen = movShadowColor;
+  this->m_MovingEventIndex = -1;
   this->mp_Rubber = new QRubberBand(QRubberBand::Rectangle, this);
   
   ushort s;
@@ -309,11 +312,18 @@ bool TimeEventBarWidget::event(QEvent *event)
 
 void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
 {
+  // Fine movement: +/- 1 frame
+  int fineShift = 1;
+  if ((event->pos().x() - oldMouseX) < 0)
+    fineShift = -1;
+    
   if ((event->buttons() & Qt::LeftButton) && (this->m_Mode != None))
   {
     int frame = (int)((qreal)(event->pos().x() - this->m_LeftMargin) / this->m_UnitStep) + this->m_ROIFirstFrame;
     if (this->m_Mode == MoveSlider)
     {
+      if (event->modifiers() & Qt::ShiftModifier) 
+        frame = this->m_SliderPos + fineShift;
       if (frame < this->m_LeftBoundPos)
         frame = this->m_LeftBoundPos;
       else if (frame > this->m_RightBoundPos)
@@ -323,6 +333,8 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
     }
     else if (this->m_Mode == MoveLeftBound)
     {
+      if (event->modifiers() & Qt::ShiftModifier) 
+        frame = this->m_LeftBoundPos + fineShift;
       if (frame > this->m_SliderPos)
         frame = this->m_SliderPos;
       else if (frame < this->m_ROIFirstFrame)
@@ -336,6 +348,8 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
     }
     else if (this->m_Mode == MoveRightBound)
     {
+      if (event->modifiers() & Qt::ShiftModifier) 
+        frame = this->m_RightBoundPos + fineShift;
       if (frame < this->m_SliderPos)
         frame = this->m_SliderPos;
       else if (frame < this->m_ROIFirstFrame)
@@ -347,8 +361,22 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
       emit rightBoundPositionChanged(this->m_RightBoundPos);
       this->repaint();
     }
-    else if (this->m_Mode == Rubber)
+    else if (this->m_Mode == MoveEvent)
+    {
+      if (event->modifiers() & Qt::ShiftModifier) 
+        frame = this->m_EventItems[this->m_MovingEventIndex].frame + fineShift;
+      if (frame < this->m_LeftBoundPos)
+          frame = this->m_LeftBoundPos;
+        else if (frame > this->m_RightBoundPos)
+          frame = this->m_RightBoundPos;
+      this->m_EventItems[this->m_MovingEventIndex].frame = frame;
+      this->updateEventPos(this->m_MovingEventIndex);
+      emit eventPositionChanged(frame);
+      this->repaint();
+    }
+    else if ((this->m_Mode == Rubber) && (event->modifiers() & Qt::ShiftModifier))
       this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, event->pos()).normalized());
+    oldMouseX = event->pos().x();
   }
 };
 
@@ -379,16 +407,37 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
       emit boundSelected(this->m_RightBoundPos);
       return;
     }
-    // Rubber
+    // Event movement
+    if (event->modifiers() & Qt::AltModifier)
+    {
+      this->m_RubberOrigin = event->pos();
+      this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, QSize(1,1)));
+      QRectF rubberRect = QRectF(this->mp_Rubber->x(), this->mp_Rubber->y(), this->mp_Rubber->rect().width(), this->mp_Rubber->rect().height());
+      for (int i = 0 ; i <  this->m_EventItems.count() ; ++i)
+      {
+        if (rubberRect.intersects(this->m_EventItems[i].boundingRect))
+        {
+          this->m_Mode = MoveEvent;
+          emit eventAboutToBeMoved(this->m_EventItems[i].frame);
+          this->m_MovingEventIndex = i;
+          this->m_EventItems[i].color = this->m_MovBrushColor;
+          this->update();
+          break;
+        }
+      }
+      return;
+    }
+    // Selection (point or rectangle)
     this->m_Mode = Rubber;
     this->m_RubberOrigin = event->pos();
     this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, QSize(1,1)));
-    this->mp_Rubber->show();
     if (!(event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier)))
     {
       this->m_SelectedEvents.clear();
       this->updateEventSelection();
     }
+    if (event->modifiers() & Qt::ShiftModifier)
+      this->mp_Rubber->show();
   }
   else
     this->m_Mode = None;
@@ -396,15 +445,31 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
 
 void TimeEventBarWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-  Q_UNUSED(event);
-  
-  if (this->m_Mode == Rubber)
+  if (this->m_Mode == MoveEvent)
   {
-    QRectF rubberRect = QRectF(this->mp_Rubber->x(), this->mp_Rubber->y(), this->mp_Rubber->rect().width(), this->mp_Rubber->rect().height());
+    emit eventMotionFinished(this->m_EventItems[this->m_MovingEventIndex].id, this->m_EventItems[this->m_MovingEventIndex].frame);
+    this->m_MovingEventIndex = -1;
+    this->updateEventSelection();
+  }
+  else if (this->m_Mode == Rubber)
+  {
+    // Point or rectlangle selection?
+    QRectF rubberRect;
+    if (this->mp_Rubber->isVisible())
+      rubberRect = QRectF(this->mp_Rubber->x(), this->mp_Rubber->y(), this->mp_Rubber->rect().width(), this->mp_Rubber->rect().height());
+    else
+      rubberRect = QRectF(event->pos().x(), event->pos().y(), this->mp_Rubber->rect().width(), this->mp_Rubber->rect().height());
+      
     for (int i = 0 ; i <  this->m_EventItems.count() ; ++i)
     {
       if (rubberRect.intersects(this->m_EventItems[i].boundingRect))
-        this->m_SelectedEvents.push_back(this->m_EventItems[i].id);
+      {
+        int idx = this->m_SelectedEvents.indexOf(this->m_EventItems[i].id);
+        if (idx == -1)
+          this->m_SelectedEvents.append(this->m_EventItems[i].id);
+        else
+          this->m_SelectedEvents.removeAt(idx);
+      }
     }
     this->updateEventSelection();
     this->mp_Rubber->hide();
@@ -449,7 +514,7 @@ void TimeEventBarWidget::setEventItem(EventItem& item, int id, const Event* e)
   else
     item.symbol = "?";
   item.frame = e->frame;
-  item.toolTip = QString("<b>Event:</b> %1 %2<br/><b>Subject:</b> %3<br/><b>Frame:</b> %4<br/><b>Time:</b> %5 second(s)").arg(e->context, e->label, e->subject).arg(e->frame).arg(e->time);
+  this->setEventToolTip(item, e);
 };
 
 void TimeEventBarWidget::updateInternals()

@@ -69,6 +69,9 @@ signals:
   void boundSelected(int frame);
   void boundDeselected(int frame);
   void eventSelectionChanged(const QList<int>& selectedIndices);
+  void eventAboutToBeMoved(int frame);
+  void eventPositionChanged(int frame); // Mouse motion
+  void eventMotionFinished(int id, int frame); // Mouse release
   
 protected:
   bool event(QEvent *event);
@@ -79,8 +82,6 @@ protected:
   void resizeEvent(QResizeEvent* event);
   
 private:
-  void updateEventPos(int idx);
-
   friend class TimeEventControlerWidget;
   
   struct EventItem
@@ -94,15 +95,17 @@ private:
     QRectF boundingRect;
   };
   
-  enum {None, MoveSlider, MoveLeftBound, MoveRightBound, Rubber};
+  enum {None, MoveSlider, MoveLeftBound, MoveRightBound, MoveEvent, Rubber};
   int eventItemAt(const QPoint& pos) const;
   void setEventItem(EventItem& item, int id, const Event* e);
+  void setEventToolTip(EventItem& item, const Event* e);
   void updateInternals();
   void updateSliderPostion();
   void updateLeftBoundPostion();
   void updateRightBoundPostion();
   void updateEventsPosition();
   void updateEventPosition(int id);
+  void updateEventPos(int idx);
   void updateEventSelection();
   
   int m_FirstFrame;
@@ -138,6 +141,7 @@ private:
   QVector<EventItem> m_EventItems;
   QVector<QString> m_EventSymbols;
   QList<int> m_SelectedEvents;
+  int m_MovingEventIndex;
   QRubberBand* mp_Rubber;
   QPoint m_RubberOrigin;
 };
@@ -148,5 +152,13 @@ inline void TimeEventBarWidget::updateEventPos(int idx)
   qreal yPos = this->m_EventItems[idx].contextId * 7.0 * (this->height() - this->m_TopMargin - this->m_BottomMargin) / 22.0 + this->m_YEventPosRelative;
   this->m_EventItems[idx].boundingRect.setRect(xPos, yPos, this->m_EventSymbolSize, this->m_YEventPosRelative);
 };
+
+inline void TimeEventBarWidget::setEventToolTip(EventItem& item, const Event* e)
+{
+  if (e)
+    item.toolTip = QString("<b>Event:</b> %1 %2<br/><b>Subject:</b> %3<br/><b>Frame:</b> %4<br/><b>Time:</b> %5 second(s)").arg(e->context, e->label, e->subject).arg(e->frame).arg(e->time);
+  else
+    item.toolTip = "";
+}
 
 #endif // TimeEventBarWidget_h
