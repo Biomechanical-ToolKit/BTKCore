@@ -104,7 +104,8 @@ public Q_SLOTS:
   // Others
   void updateSelectedMarkersRadius(double r);
   void selectPickedMarker(int id);
-  void selectPickedMarkers(int id);
+  void togglePickedMarker(int id);
+  void selectSelectedMarkers(const QList<int>& ids);
   void toggleMarkerTrajectory(int id);
   
 private:

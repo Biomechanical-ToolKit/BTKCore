@@ -298,7 +298,7 @@ void MultiViewWidget::initialize()
   // Links between VTK & Qt
   this->mp_EventQtSlotConnections->Connect(
       markers, 
-      btk::VTKMarkersListUpdateEvent,
+      btk::VTKMarkersListUpdatedEvent,
       this, 
       SLOT(updateDisplayedMarkersList(vtkObject*, unsigned long, void*, void*)));
 };
@@ -675,12 +675,9 @@ void MultiViewWidget::updateDisplay()
   btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
   // Update
   this->mp_Mappers->InitTraversal();
-  vtkMapper* mapper = this->mp_Mappers->GetNextItem();
-  while (mapper)
-  {
+  vtkMapper* mapper;
+  while ((mapper = this->mp_Mappers->GetNextItem()) != NULL)
     mapper->Modified();
-    mapper = this->mp_Mappers->GetNextItem();
-  }
   this->updateViews();
 };
 
@@ -738,7 +735,8 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
 {
   CompositeView* sv = static_cast<CompositeView*>(this->AbstractMultiView::createView(fromAnother));
   connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(pickedMarkerChanged(int)), this, SIGNAL(pickedMarkerChanged(int)));
-  connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(pickedMarkersChanged(int)), this, SIGNAL(pickedMarkersChanged(int)));
+  connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(pickedMarkerToggled(int)), this, SIGNAL(pickedMarkerToggled(int)));
+  connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(selectedMarkersToggled(QList<int>)), this, SIGNAL(selectedMarkersToggled(QList<int>)));
   connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(trajectoryMarkerToggled(int)), this, SIGNAL(trajectoryMarkerToggled(int)));
   static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D))->installEventFilter(this->parent()->parent());
   return sv;

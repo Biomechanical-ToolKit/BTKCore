@@ -95,7 +95,8 @@ signals:
   void fileDropped(const QString& filename);
   void visibleMarkersChanged(const QVector<int>& ids);
   void pickedMarkerChanged(int id);
-  void pickedMarkersChanged(int id);
+  void pickedMarkerToggled(int id);
+  void selectedMarkersToggled(const QList<int>& ids);
   void trajectoryMarkerToggled(int id);
   
 private slots:

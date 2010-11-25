@@ -42,6 +42,8 @@
 #include <vtkRenderer.h>
 #include <vtkEventQtSlotConnect.h>
 
+#include <QList>
+
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
 
@@ -59,14 +61,16 @@ public:
 public slots:
   // Qt / VTK
   void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
-  void selectPickedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
+  void togglePickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
+  void toggleSelectedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   void toggleTrajectoryMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   // Qt
   void show(bool s);
   
 signals:
   void pickedMarkerChanged(int id);
-  void pickedMarkersChanged(int id);
+  void pickedMarkerToggled(int id);
+  void selectedMarkersToggled(const QList<int>& ids);
   void trajectoryMarkerToggled(int id);
   
 protected:

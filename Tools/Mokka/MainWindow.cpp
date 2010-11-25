@@ -143,7 +143,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
   connect(this->multiView, SIGNAL(pickedMarkerChanged(int)), this, SLOT(selectPickedMarker(int)));
-  connect(this->multiView, SIGNAL(pickedMarkersChanged(int)), this, SLOT(selectPickedMarkers(int)));
+  connect(this->multiView, SIGNAL(pickedMarkerToggled(int)), this, SLOT(togglePickedMarker(int)));
+  connect(this->multiView, SIGNAL(selectedMarkersToggled(QList<int>)), this, SLOT(selectSelectedMarkers(QList<int>)));
   connect(this->multiView, SIGNAL(trajectoryMarkerToggled(int)), this, SLOT(toggleMarkerTrajectory(int)));
   // Model dock
   connect(this->mp_ModelDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(modelDockLocationChanged(Qt::DockWidgetArea)));
@@ -577,7 +578,7 @@ void MainWindow::selectPickedMarker(int id)
   this->mp_ModelDock->selectMarkers(ids);
 };
 
-void MainWindow::selectPickedMarkers(int id)
+void MainWindow::togglePickedMarker(int id)
 {
   QList<int> ids = this->mp_ModelDock->selectedMarkers();
   int idx = ids.indexOf(id);
@@ -586,6 +587,20 @@ void MainWindow::selectPickedMarkers(int id)
   else
     ids.removeAt(idx);
   this->mp_ModelDock->selectMarkers(ids);
+};
+
+void MainWindow::selectSelectedMarkers(const QList<int>& ids)
+{
+  QList<int> selectedIds = this->mp_ModelDock->selectedMarkers();
+  for (QList<int>::const_iterator it = ids.begin() ; it != ids.end() ; ++it)
+  {
+    int idx = selectedIds.indexOf(*it);
+    if (idx == -1)
+      selectedIds << *it;
+    else
+      selectedIds.removeAt(idx);
+  }
+  this->mp_ModelDock->selectMarkers(selectedIds);
 };
 
 void MainWindow::toggleMarkerTrajectory(int id)

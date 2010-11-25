@@ -37,13 +37,14 @@
 
 #include <btkVTKAxesWidget.h>
 #include <btkVTKPickerInteractionCallback.h>
-#include <btkVTKCommandEvents.h>
+#include <btkVTKRubberRenderInteractionCallback.h>
 #include <btkVTKInteractorStyleTrackballCamera.h>
 
 #include <vtkRenderWindow.h>
 #include <vtkCellPicker.h>
 #include <vtkCallbackCommand.h>
 #include <vtkAxesActor.h>
+#include <vtkIdList.h>
 
 #include <QKeyEvent>
 
@@ -87,10 +88,15 @@ void Viz3DWidget::initialize()
   style->AddObserver(vtkCommand::LeftButtonPressEvent, pickerMouseInteraction);
   style->AddObserver(vtkCommand::MouseMoveEvent, pickerMouseInteraction);
   style->AddObserver(vtkCommand::LeftButtonReleaseEvent, pickerMouseInteraction);
-  
   this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
   pickerMouseInteraction->Delete();
   style->Delete();
+  // Rubber callback
+  vtkCallbackCommand* rubberRenderInteraction = vtkCallbackCommand::New();
+  rubberRenderInteraction->SetClientData(style);
+  rubberRenderInteraction->SetCallback(&btk::VTKRubberRenderInteractionCallback);
+  this->GetRenderWindow()->AddObserver(vtkCommand::EndEvent, rubberRenderInteraction);
+  rubberRenderInteraction->Delete();
   
   // VTK WIDGET
   this->mp_AxesWidget->SetParentRenderer(this->mp_Renderer);
@@ -98,10 +104,10 @@ void Viz3DWidget::initialize()
   this->mp_AxesWidget->SetViewport(0.0, 0.0, 0.15, 0.2);
   vtkAxesActor* axesActor = this->mp_AxesWidget->GetAxesActor();
   axesActor->SetShaftTypeToCylinder();
-  axesActor->SetTotalLength( 1.25, 1.25, 1.25 );
-  axesActor->SetCylinderRadius( 0.500 * axesActor->GetCylinderRadius() );
-  axesActor->SetConeRadius( 1.025 * axesActor->GetConeRadius() );
-  axesActor->SetSphereRadius( 1.500 * axesActor->GetSphereRadius() );
+  axesActor->SetTotalLength(1.25, 1.25, 1.25);
+  axesActor->SetCylinderRadius( 0.500 * axesActor->GetCylinderRadius());
+  axesActor->SetConeRadius(1.025 * axesActor->GetConeRadius());
+  axesActor->SetSphereRadius(1.500 * axesActor->GetSphereRadius());
   this->mp_AxesWidget->SetEnabled(1);
   
   // Links between VTK & Qt
@@ -112,12 +118,17 @@ void Viz3DWidget::initialize()
       SLOT(selectPickedMarker(vtkObject*, unsigned long, void*, void*)));
   this->mp_EventQtSlotConnections->Connect(
       this->GetRenderWindow()->GetInteractor(), 
-      btk::VTKMarkersPickedEvent,
+      btk::VTKToggleMarkerPickedEvent,
       this, 
-      SLOT(selectPickedMarkers(vtkObject*, unsigned long, void*, void*)));
+      SLOT(togglePickedMarker(vtkObject*, unsigned long, void*, void*)));
   this->mp_EventQtSlotConnections->Connect(
       this->GetRenderWindow()->GetInteractor(), 
-      btk::VTKMarkersToggleTrajectoryEvent,
+      btk::VTKToggleMarkersSelectedEvent,
+      this, 
+      SLOT(toggleSelectedMarkers(vtkObject*, unsigned long, void*, void*)));
+  this->mp_EventQtSlotConnections->Connect(
+      this->GetRenderWindow()->GetInteractor(), 
+      btk::VTKToggleMarkerTrajectoryPickedEvent,
       this, 
       SLOT(toggleTrajectoryMarker(vtkObject*, unsigned long, void*, void*)));
 };
@@ -128,10 +139,19 @@ void Viz3DWidget::selectPickedMarker(vtkObject* /* caller */, unsigned long /* v
   emit pickedMarkerChanged(id);
 };
 
-void Viz3DWidget::selectPickedMarkers(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
+void Viz3DWidget::togglePickedMarker(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
 {
   int id = *static_cast<int*>(call_data);
-  emit pickedMarkersChanged(id);
+  emit pickedMarkerToggled(id);
+};
+
+void Viz3DWidget::toggleSelectedMarkers(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
+{
+  QList<int> ids;
+  vtkIdList* selectionIds = static_cast<vtkIdList*>(call_data);
+  for (int i = 0 ; i < selectionIds->GetNumberOfIds() ; ++i)
+    ids << selectionIds->GetId(i);
+  emit selectedMarkersToggled(ids);
 };
 
 void Viz3DWidget::toggleTrajectoryMarker(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
