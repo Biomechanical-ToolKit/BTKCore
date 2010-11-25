@@ -2,6 +2,7 @@ SET(BTKVTK_SRCS
   btkVTKAxesWidget.cpp
   btkVTKDataObjectAdapter.cpp
   btkVTKForcePlatformsSource.cpp
+  btkVTKFrustumFromTwoPoints.cpp
   btkVTKGRFsFramesSource.cpp
   btkVTKGroundSource.cpp
   btkVTKInteractorStyleTrackballCamera.cpp

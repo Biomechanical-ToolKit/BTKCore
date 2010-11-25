@@ -26,25 +26,55 @@
  * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
  * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * LOSS OF USE, DATA, OR PROFITS;OR BUSINESS INTERRUPTION) HOWEVER
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKCommandEvents_h
-#define __btkVTKCommandEvents_h
+#ifndef __btkVTKFrustumFromTwoPoints_h
+#define __btkVTKFrustumFromTwoPoints_h
 
-#include <vtkCommand.h>
+#include "btkConfigure.h"
+
+#include <vtkAreaPicker.h>
+
+class vtkPlanes;
 
 namespace btk
 {
-  static const unsigned long VTKMarkersListUpdatedEvent = vtkCommand::UserEvent + 1;
-  static const unsigned long VTKMarkerPickedEvent = vtkCommand::UserEvent + 2;
-  static const unsigned long VTKToggleMarkerPickedEvent = vtkCommand::UserEvent + 3;
-  static const unsigned long VTKToggleMarkerTrajectoryPickedEvent = vtkCommand::UserEvent + 4;
-  static const unsigned long VTKToggleMarkersSelectedEvent = vtkCommand::UserEvent + 5;
+  class VTKFrustumGenerator_p;
+  
+  class VTKFrustumFromTwoPoints : public vtkObject
+  {
+    public:
+      BTK_VTK_EXPORT static VTKFrustumFromTwoPoints* New();
+      vtkExportedTypeRevisionMacro(VTKFrustumFromTwoPoints, vtkObject, BTK_VTK_EXPORT);
+      vtkPlanes* Generate(double x0, double y0, double x1, double y1, vtkRenderer* renderer);
+      
+    protected:
+      VTKFrustumFromTwoPoints();
+      ~VTKFrustumFromTwoPoints();
+      
+    private:
+       VTKFrustumFromTwoPoints(const VTKFrustumFromTwoPoints& );  // Not implemented.
+       VTKFrustumFromTwoPoints& operator=(const VTKFrustumFromTwoPoints& );  // Not implemented.
+       
+       VTKFrustumGenerator_p* mp_FrustumGenerator;
+  };
+  
+  class VTKFrustumGenerator_p : public vtkAreaPicker
+  {
+   public:
+     BTK_VTK_EXPORT static VTKFrustumGenerator_p* New();
+     vtkExportedTypeRevisionMacro(VTKFrustumGenerator_p, vtkAreaPicker, BTK_VTK_EXPORT);
+     using vtkAreaPicker::DefineFrustum;
+
+   protected:
+     VTKFrustumGenerator_p(): vtkAreaPicker() {};
+     // ~FrustumGenerator(); // Implicit
+  };
 };
 
-#endif // __btkVTKCommandEvents_h
+#endif

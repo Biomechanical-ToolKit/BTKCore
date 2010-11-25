@@ -40,6 +40,8 @@
 
 #include <vtkInteractorStyleTrackballCamera.h>
 
+#define btk_VTKISTC_RUBBER 99
+
 class vtkUnsignedCharArray;
 
 namespace btk
@@ -66,9 +68,9 @@ namespace btk
     vtkSetMacro(CharEventEnabled,int);
     vtkBooleanMacro(CharEventEnabled,int);
     
-    vtkGetMacro(RubberBandSelection,int);
-    vtkSetMacro(RubberBandSelection,int);
-    vtkBooleanMacro(RubberBandSelection,int);
+    //vtkGetMacro(RubberBandSelection,int);
+    //vtkSetMacro(RubberBandSelection,int);
+    //vtkBooleanMacro(RubberBandSelection,int);
     
     BTK_VTK_EXPORT virtual void OnLeftButtonDown();
     BTK_VTK_EXPORT virtual void OnLeftButtonUp();
@@ -76,13 +78,16 @@ namespace btk
     BTK_VTK_EXPORT virtual void OnChar();
     
     void GetRubberBandPoints(int pts[4]) const;
+    void Rubber();
+    void UpdateRubberBackground();
+    virtual void StartRubberBand();
+    virtual void EndRubberBand();
     
   protected:
     BTK_VTK_EXPORT VTKInteractorStyleTrackballCamera();
     ~VTKInteractorStyleTrackballCamera();
     
   private:
-    //BTK_VTK_EXPORT void ProjectToSphere(int* size, int* pos, double* vec);
     double ProjectToSphere(double r, double x, double y) const;
     
     double m_Radius;
@@ -90,7 +95,6 @@ namespace btk
     int RotationEnabled;
     int CharEventEnabled;
     vtkUnsignedCharArray* mp_PixelArray;
-    int RubberBandSelection;
   };
 };
 

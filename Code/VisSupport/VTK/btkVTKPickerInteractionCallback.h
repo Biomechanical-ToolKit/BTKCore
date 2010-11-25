@@ -38,36 +38,43 @@
 
 #include "btkVTKCommandEvents.h"
 #include "btkVTKFrustumFromTwoPoints.h"
+#include "btkVTKInteractorStyleTrackballCamera.h"
 
 #include <vtkRenderWindow.h>
 #include <vtkPolyData.h>
 #include <vtkMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkCell.h>
+#include <vtkCellArray.h>
 #include <vtkPointData.h>
 #include <vtkIdTypeArray.h>
 #include <vtkRenderWindowInteractor.h>
-#include <btkVTKInteractorStyleTrackballCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 #include <vtkCellPicker.h>
-#include <vtkExtractGeometry.h>
+#include <vtkExtractPolyDataGeometry.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkPlanes.h>
 #include <vtkPropCollection.h>
-
+#include <vtkTransform.h>
+/*
 #include <vtkFrustumSource.h>
 #include <vtkProperty.h>
+*/
 
 namespace btk
 {
   static int VTKPickerMouseMotion = 0;
 
   /**
-   * Simple way to add mouse picking to an interactor style.
-   * Mouse picking are done with the left click. 
-   * The sequence Ctrl + left click keeps previous selected markers.
-   * Using the sequence Alt + left click send the event VTKMarkersToggleTrajectoryEvent
+   * Add mouse picking to the interactor VTKInteractorStyleTrackballCamera style.
+   * Multiple choices are available, by priority:
+   *  - In static mode (no mouse mouvement):
+   *     - LMB + Ctrl + Shift: Send the event VTKToggleTrajectoryMarkerPickedEvent when the cell picker found a marker (gives you the possibility to display marker's trajectory).
+   *     - LMB + Ctrl: Send the event VTKToggleMarkerPickedEvent when the cell picker found a marker (gives you the possibility to keep the previous selection).
+   *     - LMB (Left Mouse Button): Send the event VTKMarkerPickedEvent when the cell picker found a marker.
+   *  - In dynamic mode (after mouse mouvement):
+  *      _ LMB + Shift: Send the event VTKToggleMarkersSelectedEvent when the marker(s) was (were) selected by the rubber band. 
    * @ingroup BTKVTK
    */
   void VTKPickerInteractionCallback(
@@ -88,10 +95,6 @@ namespace btk
     { 
       case vtkCommand::LeftButtonPressEvent: 
         VTKPickerMouseMotion = 0;
-/*
-        if (iren->GetAltKey())
-          style->RubberBandSelectionOn();
-*/
         style->OnLeftButtonDown();
         break;
       case vtkCommand::LeftButtonReleaseEvent:
@@ -114,18 +117,17 @@ namespace btk
             { 
               int id = static_cast<int>(inputPointIds->GetTuple1(pnt));
               if (iren->GetControlKey() && iren->GetShiftKey())
-                iren->InvokeEvent(VTKMarkersToggleTrajectoryEvent, static_cast<void*>(&id));
+                iren->InvokeEvent(VTKToggleMarkerTrajectoryPickedEvent, static_cast<void*>(&id));
               else if (iren->GetControlKey())
-                iren->InvokeEvent(VTKMarkersPickedEvent, static_cast<void*>(&id));
+                iren->InvokeEvent(VTKToggleMarkerPickedEvent, static_cast<void*>(&id));
               else
                 iren->InvokeEvent(VTKMarkerPickedEvent, static_cast<void*>(&id));
             } 
           }
         }
-/*
         else
         {
-          if (style->GetRubberBandSelection() != 0)
+          if (style->GetState() == btk_VTKISTC_RUBBER)
           {
             int pts[4]; style->GetRubberBandPoints(pts);
             btk::VTKFrustumFromTwoPoints* fftp = btk::VTKFrustumFromTwoPoints::New();
@@ -149,16 +151,40 @@ namespace btk
             }
             if (mapper)
             {
-              vtkExtractGeometry* extractGeometry = vtkExtractGeometry::New();
+              vtkExtractPolyDataGeometry* extractGeometry = vtkExtractPolyDataGeometry::New();
+              vtkTransform* s = vtkTransform::New();
+              s->Scale(actor->GetScale());
+              frustum->SetTransform(s);
               extractGeometry->SetImplicitFunction(frustum);
               extractGeometry->SetInput(mapper->GetInput());
-              //extractGeometry->ExtractInsideOff();
               extractGeometry->Update();
-              //extractGeometry->PrintSelf(std::cout, vtkIndent(2));
-              extractGeometry->GetOutput()->PrintSelf(std::cout, vtkIndent(2));
-              //mapper->GetInput()->PrintSelf(std::cout, vtkIndent(2));
+              vtkPolyData* selection = extractGeometry->GetOutput();
+              vtkIdTypeArray* inputPointIds = vtkIdTypeArray::SafeDownCast(selection->GetPointData()->GetArray("MarkersIds"));
+              if ( inputPointIds )
+              { 
+                selection->GetPolys()->InitTraversal();
+                vtkIdType numIds;
+                vtkIdType* ptIds;
+                vtkIdList* selectionIds = vtkIdList::New();
+                while (selection->GetPolys()->GetNextCell(numIds, ptIds))
+                  selectionIds->InsertUniqueId(inputPointIds->GetTuple1(ptIds[0]));
+                  
+                /*
+                vtkIdType numCells = selection->GetNumberOfCells();
+                vtkIdList* pointIds;
+                vtkIdList* selectionIds = vtkIdList::New();
+                for (vtkIdType cellId = 0 ; cellId < numCells ; ++cellId) 
+                {
+                  selection->GetCellPoints(cellId, pointIds);
+                  if (pointIds)
+                    selectionIds->InsertUniqueId(pointIds->GetId(0));
+                }
+                */
+                if (selectionIds->GetNumberOfIds() != 0)
+                  iren->InvokeEvent(VTKToggleMarkersSelectedEvent, static_cast<void*>(selectionIds));
+                selectionIds->Delete();
+              }
               extractGeometry->Delete();
-              
 #if 0
               vtkFrustumSource* fs = vtkFrustumSource::New();
               fs->SetPlanes(frustum);
@@ -181,14 +207,15 @@ namespace btk
               actor->Delete();
               prop->Delete();
 #endif
-              
+              s->Delete();
             }
             frustum->Delete();
             fftp->Delete();
           }
         }
-*/
         style->OnLeftButtonUp();
+        // Need to force a new rendering as the method to erase the rubber uses a previous rendering.
+        //renderer->Render();
         break;
       case vtkCommand::MouseMoveEvent: 
         VTKPickerMouseMotion = 1;

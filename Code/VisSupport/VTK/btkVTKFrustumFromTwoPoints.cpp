@@ -26,25 +26,67 @@
  * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
  * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * LOSS OF USE, DATA, OR PROFITS;OR BUSINESS INTERRUPTION) HOWEVER
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKCommandEvents_h
-#define __btkVTKCommandEvents_h
+#include "btkVTKFrustumFromTwoPoints.h"
 
-#include <vtkCommand.h>
+#include <vtkObjectFactory.h>
+#include <vtkPlanes.h>
 
 namespace btk
 {
-  static const unsigned long VTKMarkersListUpdatedEvent = vtkCommand::UserEvent + 1;
-  static const unsigned long VTKMarkerPickedEvent = vtkCommand::UserEvent + 2;
-  static const unsigned long VTKToggleMarkerPickedEvent = vtkCommand::UserEvent + 3;
-  static const unsigned long VTKToggleMarkerTrajectoryPickedEvent = vtkCommand::UserEvent + 4;
-  static const unsigned long VTKToggleMarkersSelectedEvent = vtkCommand::UserEvent + 5;
+  /**
+   * @class VTKFrustumFromTwoPoints VTKFrustumFromTwoPoints.h
+   * @brief Frustum's generator from two points defining a rectangle
+   * 
+   * @ingroup BTKVTK
+   */
+   
+  /**
+   * @fn static VTKFrustumFromTwoPoints* VTKFrustumFromTwoPoints::New();
+   * Creates a VTKMarkersSource object and return it as a pointer.
+   */
+  vtkStandardNewMacro(VTKFrustumFromTwoPoints);
+  vtkCxxRevisionMacro(VTKFrustumFromTwoPoints, "$Revision: 0.1 $");
+  
+  vtkPlanes* VTKFrustumFromTwoPoints::Generate(double x0, double y0, double x1, double y1, vtkRenderer* renderer)
+  {
+    if (renderer == NULL)
+    {
+      vtkErrorMacro("Must specify renderer!");
+      return 0;
+    }
+    
+    vtkPlanes* frustum = vtkPlanes::New();
+    this->mp_FrustumGenerator->DefineFrustum(x0, y0, x1, y1, renderer);
+    frustum->SetPoints(this->mp_FrustumGenerator->GetFrustum()->GetPoints());
+    frustum->SetNormals(this->mp_FrustumGenerator->GetFrustum()->GetNormals());
+    return frustum;
+  };
+  
+  /**
+   * Constructor.
+   */
+  VTKFrustumFromTwoPoints::VTKFrustumFromTwoPoints()
+  : vtkObject()
+  {
+    this->mp_FrustumGenerator = VTKFrustumGenerator_p::New();
+  };
+  
+  /**
+   * Destructor
+   */
+  VTKFrustumFromTwoPoints::~VTKFrustumFromTwoPoints()
+  {
+    this->mp_FrustumGenerator->Delete();
+  };
+  
+  // Internals 
+  vtkStandardNewMacro(VTKFrustumGenerator_p);
+  vtkCxxRevisionMacro(VTKFrustumGenerator_p, "$Revision: 0.1 $");
 };
-
-#endif // __btkVTKCommandEvents_h

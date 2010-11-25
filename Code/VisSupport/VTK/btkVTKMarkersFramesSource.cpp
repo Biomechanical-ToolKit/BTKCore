@@ -685,7 +685,7 @@ namespace btk
       trajectoryIds->Delete();
       
       // Invoke btk::VTKMarkersListUpdateEvent
-      this->InvokeEvent(btk::VTKMarkersListUpdateEvent, static_cast<void*>(this->mp_ExistingMarkers->operator[](index)));
+      this->InvokeEvent(btk::VTKMarkersListUpdatedEvent, static_cast<void*>(this->mp_ExistingMarkers->operator[](index)));
     }
     else
     {

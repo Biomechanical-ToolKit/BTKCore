@@ -26,25 +26,37 @@
  * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
  * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * LOSS OF USE, DATA, OR PROFITS;OR BUSINESS INTERRUPTION) HOWEVER
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKCommandEvents_h
-#define __btkVTKCommandEvents_h
+#ifndef __btkVTKRubberRenderInteractionCallback_h
+#define __btkVTKRubberRenderInteractionCallback_h
 
-#include <vtkCommand.h>
+#include "btkVTKCommandEvents.h"
+#include "btkVTKInteractorStyleTrackballCamera.h"
 
 namespace btk
 {
-  static const unsigned long VTKMarkersListUpdatedEvent = vtkCommand::UserEvent + 1;
-  static const unsigned long VTKMarkerPickedEvent = vtkCommand::UserEvent + 2;
-  static const unsigned long VTKToggleMarkerPickedEvent = vtkCommand::UserEvent + 3;
-  static const unsigned long VTKToggleMarkerTrajectoryPickedEvent = vtkCommand::UserEvent + 4;
-  static const unsigned long VTKToggleMarkersSelectedEvent = vtkCommand::UserEvent + 5;
+  /**
+   * To update the rubber even if the scene is moving
+   * @ingroup BTKVTK
+   */
+  void VTKRubberRenderInteractionCallback(
+      vtkObject* /* object */, 
+      unsigned long /* event */, 
+      void* clientdata, 
+      void* /* calldata */)
+  { 
+    VTKInteractorStyleTrackballCamera* style = static_cast<VTKInteractorStyleTrackballCamera*>(clientdata);
+    if (style->GetState() == btk_VTKISTC_RUBBER)
+    {
+      style->UpdateRubberBackground();
+      //style->Rubber();
+    }
+  };
 };
-
-#endif // __btkVTKCommandEvents_h
+#endif // __btkVTKRubberRenderInteractionCallback_h

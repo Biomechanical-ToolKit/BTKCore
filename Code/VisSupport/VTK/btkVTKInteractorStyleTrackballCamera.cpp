@@ -42,7 +42,7 @@
 #include <vtkRenderer.h>
 #include <vtkTransform.h>
 #include <vtkMath.h>
-
+#include <vtkCallbackCommand.h>
 #include <vtkUnsignedCharArray.h>
 
 #define TRACKBALLSIZE 0.8
@@ -239,7 +239,7 @@ namespace btk
   /**
    * Overloaded method to spin the camera.
    */
-  void VTKInteractorStyleTrackballCamera::VTKInteractorStyleTrackballCamera::Spin()
+  void VTKInteractorStyleTrackballCamera::Spin()
   {
     if (this->RotationEnabled)
       this->Superclass::Spin();
@@ -248,7 +248,7 @@ namespace btk
   /**
    * Overloaded method to pan the camera.
    */
-  void VTKInteractorStyleTrackballCamera::VTKInteractorStyleTrackballCamera::Pan()
+  void VTKInteractorStyleTrackballCamera::Pan()
   {
     if (this->RotationEnabled)
       this->Superclass::Pan();
@@ -257,12 +257,11 @@ namespace btk
   /**
    * Overloaded method to doll the camera.
    */
-  void VTKInteractorStyleTrackballCamera::VTKInteractorStyleTrackballCamera::Dolly()
+  void VTKInteractorStyleTrackballCamera::Dolly()
   {
     if (this->RotationEnabled)
       this->Superclass::Dolly();
   };
-  
   
   /**
    * Constructor.
@@ -282,8 +281,9 @@ namespace btk
     this->RotationEnabled = 1;
     this->CharEventEnabled = 1;
     // Rubber band
-    this->RubberBandSelection = 0;
     this->mp_PixelArray = vtkUnsignedCharArray::New();
+    this->mp_PixelArray->Initialize();
+    this->mp_PixelArray->SetNumberOfComponents(3);
   };
   
   /**
@@ -346,79 +346,110 @@ namespace btk
   };
   
   /**
-   * Overload method to set the rubber band geometry.
+   * Select the task to do based on the key modifiers pressed.
    */ 
   void VTKInteractorStyleTrackballCamera::OnLeftButtonDown()
   {
-    if (this->RubberBandSelection == 0)
-    {
-      this->Superclass::OnLeftButtonDown();
+    if (this->Interactor == NULL)
       return;
-    }
     
-    if (!this->Interactor)
+    this->FindPokedRenderer(this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
+    if (this->CurrentRenderer == NULL)
       return;
-
-    vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
-    this->mp_RubberBandGeometry[0][0] = this->Interactor->GetEventPosition()[0];
-    this->mp_RubberBandGeometry[0][1] = this->Interactor->GetEventPosition()[1];
-    this->mp_RubberBandGeometry[1][0] = this->mp_RubberBandGeometry[0][0];
-    this->mp_RubberBandGeometry[1][1] = this->mp_RubberBandGeometry[0][1];
-
-    this->mp_PixelArray->Initialize();
-    this->mp_PixelArray->SetNumberOfComponents(3);
-    int* size = renWin->GetSize();
-    this->mp_PixelArray->SetNumberOfTuples(size[0]*size[1]);
-
-    renWin->GetPixelData(0, 0, size[0]-1, size[1]-1, renWin->GetDoubleBuffer() ? 0 : 1, this->mp_PixelArray);
-
-    //this->FindPokedRenderer(this->mp_RubberBandGeometry[0][0], this->mp_RubberBandGeometry[0][1]);
+    
+    this->GrabFocus(this->EventCallbackCommand);
+    
+    if (this->Interactor->GetShiftKey()) 
+      this->StartRubberBand();
+    else if (this->Interactor->GetAltKey()) 
+    {
+      if (this->Interactor->GetControlKey()) 
+        this->StartDolly();
+      else 
+        this->StartPan();
+    } 
+    else 
+    {
+      if (this->Interactor->GetControlKey()) 
+        this->StartSpin();
+      else 
+        this->StartRotate();
+    }
+    return;
   };
   
   /**
-   * Overload method to set the rubber band geometry.
+   * Select the task to do based on the key modifiers pressed.
    */
   void VTKInteractorStyleTrackballCamera::OnLeftButtonUp()
   {
-    if (this->RubberBandSelection == 0)
+    switch (this->State) 
     {
-      this->Superclass::OnLeftButtonUp();
-      return;
+    case VTKIS_DOLLY:
+      this->EndDolly();
+      break;
+    case VTKIS_PAN:
+      this->EndPan();
+      break;
+    case VTKIS_SPIN:
+      this->EndSpin();
+      break;
+    case VTKIS_ROTATE:
+      this->EndRotate();
+      break;
+    case btk_VTKISTC_RUBBER:
+      this->EndRubberBand();
     }
-
-    if (!this->Interactor)
-      return;
-/*
-    //otherwise record the rubber band end coordinate and then fire off a pick
-    if (   (this->mp_RubberBandGeometry[0][0] != this->mp_RubberBandGeometry[1][0])
-        || (this->mp_RubberBandGeometry[0][1] != this->mp_RubberBandGeometry[1][1]) )
-      {
-      this->Pick();
-      }
-*/
-    this->RubberBandSelection = 0;
-    
-    // Erase the rubber band
-    vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
-    int* size = renWin->GetSize();
-    renWin->SetPixelData(0, 0, size[0]-1, size[1]-1, this->mp_PixelArray->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
-    renWin->Frame();
+    if (this->Interactor)
+      this->ReleaseFocus();
   };
   
   /**
-   * Overload method to set the rubber band geometry.
+   * Select the task to do based on the key modifiers pressed.
    */
   void VTKInteractorStyleTrackballCamera::OnMouseMove()
   {
-    if (this->RubberBandSelection == 0)
+    int x = this->Interactor->GetEventPosition()[0];
+    int y = this->Interactor->GetEventPosition()[1];
+
+    switch (this->State) 
     {
-      this->Superclass::OnMouseMove();
-      return;
+    case VTKIS_ROTATE:
+      this->FindPokedRenderer(x, y);
+      this->Rotate();
+      this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
+      break;
+    case VTKIS_PAN:
+      this->FindPokedRenderer(x, y);
+      this->Pan();
+      this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
+      break;
+    case VTKIS_DOLLY:
+      this->FindPokedRenderer(x, y);
+      this->Dolly();
+      this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
+      break;
+    case VTKIS_SPIN:
+      this->FindPokedRenderer(x, y);
+      this->Spin();
+      this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
+      break;
+    case btk_VTKISTC_RUBBER:
+      this->FindPokedRenderer(x, y);
+      this->Rubber();
+      this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
+      break;
     }
-
-    if (!this->Interactor)
+  };
+  
+  /**
+   * Update the rubber band and draw it
+   */
+  void VTKInteractorStyleTrackballCamera::Rubber()
+  {
+    if (this->CurrentRenderer == NULL)
       return;
-
+    
     this->mp_RubberBandGeometry[1][0] = this->Interactor->GetEventPosition()[0];
     this->mp_RubberBandGeometry[1][1] = this->Interactor->GetEventPosition()[1];  
     vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
@@ -446,16 +477,18 @@ namespace btk
       rightTopCorner[1] = this->mp_RubberBandGeometry[0][1];
     }
     
-    //this->DrawRubberBand();
-    
+    // Draw the rubber
     vtkUnsignedCharArray* temp = vtkUnsignedCharArray::New();
     temp->DeepCopy(this->mp_PixelArray);  
     unsigned char* pixels = temp->GetPointer(0);
     
+    const int dashLineLength = 3;
+    const int dashSpaceLength = 3;
+    int dashTotalLength = dashLineLength + dashSpaceLength;
     
-    for (int i = leftBottomCorner[0]; i <= rightTopCorner[0]; i+=15)
+    for (int i = leftBottomCorner[0]; i <= rightTopCorner[0]; i += dashTotalLength)
     {
-      for (int j = i ; j < (i+10 <= rightTopCorner[0] ? i+10 : rightTopCorner[0]) ; ++j)
+      for (int j = i ; j < (i+dashSpaceLength <= rightTopCorner[0] ? i+dashSpaceLength : rightTopCorner[0]) ; ++j)
       {
         pixels[3*(leftBottomCorner[1]*size[0]+j)] = 255;
         pixels[3*(leftBottomCorner[1]*size[0]+j)+1] = 255;
@@ -466,9 +499,9 @@ namespace btk
         pixels[3*(rightTopCorner[1]*size[0]+j)+2] = 255;
       }
     }
-    for (int i = leftBottomCorner[1]+1; i < rightTopCorner[1]; i+=15)
+    for (int i = leftBottomCorner[1]+1; i < rightTopCorner[1]; i+=dashTotalLength)
     {
-      for (int j = i ; j < (i+10 <= rightTopCorner[1] ? i+10 : rightTopCorner[1]); ++j)
+      for (int j = i ; j < (i+dashSpaceLength <= rightTopCorner[1] ? i+dashSpaceLength : rightTopCorner[1]); ++j)
       {
         pixels[3*(j*size[0]+leftBottomCorner[0])] = 255;
         pixels[3*(j*size[0]+leftBottomCorner[0])+1] = 255;
@@ -518,11 +551,56 @@ namespace btk
       // pixels[3*(i*size[0]+(rightTopCorner[0]-1))+2] = 0;
     }
     */
+    
     renWin->SetPixelData(0, 0, size[0]-1, size[1]-1, pixels, renWin->GetDoubleBuffer() ? 0 : 1);
     renWin->Frame();
     
     temp->Delete();
-  }
+  };
+  
+  void VTKInteractorStyleTrackballCamera::UpdateRubberBackground()
+  {
+    vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
+    int* size = renWin->GetSize();
+    this->mp_PixelArray->SetNumberOfTuples(size[0]*size[1]);
+    renWin->GetPixelData(0, 0, size[0]-1, size[1]-1, renWin->GetDoubleBuffer() ? 0 : 1, this->mp_PixelArray);
+  };
+  
+  /**
+   * Activate the rubber band.
+   */
+  void VTKInteractorStyleTrackballCamera::StartRubberBand()
+  {
+    if (this->State != VTKIS_NONE) 
+      return;
+    this->StartState(btk_VTKISTC_RUBBER);
+    
+    this->mp_RubberBandGeometry[0][0] = this->Interactor->GetEventPosition()[0];
+    this->mp_RubberBandGeometry[0][1] = this->Interactor->GetEventPosition()[1];
+    this->mp_RubberBandGeometry[1][0] = this->mp_RubberBandGeometry[0][0];
+    this->mp_RubberBandGeometry[1][1] = this->mp_RubberBandGeometry[0][1];
+    
+    this->UpdateRubberBackground();
+  };
+  
+  /**
+   * Stop the rubber band and erase it from the screen.
+   */
+  void VTKInteractorStyleTrackballCamera::EndRubberBand()
+  {
+    if (this->State != btk_VTKISTC_RUBBER) 
+      return;
+    this->StopState();
+    
+    // Erase the rubber band
+    /*
+    vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
+    int* size = renWin->GetSize();
+    renWin->SetPixelData(0, 0, size[0]-1, size[1]-1, this->mp_PixelArray->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->Frame();
+    */
+    this->Interactor->Render();
+  };
   
   double VTKInteractorStyleTrackballCamera::ProjectToSphere(double r, double x, double y) const
   {
