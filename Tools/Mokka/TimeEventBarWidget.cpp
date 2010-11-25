@@ -384,6 +384,26 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
 {
   if ((event->button() == Qt::LeftButton) && this->isEnabled())
   {
+    // Event movement
+    if (event->modifiers() & Qt::AltModifier)
+    {
+      this->m_RubberOrigin = event->pos();
+      this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, QSize(1,1)));
+      QRectF rubberRect = QRectF(this->mp_Rubber->x(), this->mp_Rubber->y(), this->mp_Rubber->rect().width(), this->mp_Rubber->rect().height());
+      for (int i = 0 ; i <  this->m_EventItems.count() ; ++i)
+      {
+        if (rubberRect.intersects(this->m_EventItems[i].boundingRect))
+        {
+          this->m_Mode = MoveEvent;
+          emit eventAboutToBeMoved(this->m_EventItems[i].frame);
+          this->m_MovingEventIndex = i;
+          this->m_EventItems[i].color = this->m_MovBrushColor;
+          this->update();
+          break;
+        }
+      }
+      return;
+    }
     // Slider
     QRect slider(this->mp_PointsSlider[0].x()-(this->m_WSlider+4)/2, this->mp_PointsSlider[0].y(), this->m_WSlider+4, this->height() - this->m_TopMargin - this->m_BottomMargin + 5);
     if (slider.contains(event->pos()))
@@ -405,26 +425,6 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
     {
       this->m_Mode = MoveRightBound;
       emit boundSelected(this->m_RightBoundPos);
-      return;
-    }
-    // Event movement
-    if (event->modifiers() & Qt::AltModifier)
-    {
-      this->m_RubberOrigin = event->pos();
-      this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, QSize(1,1)));
-      QRectF rubberRect = QRectF(this->mp_Rubber->x(), this->mp_Rubber->y(), this->mp_Rubber->rect().width(), this->mp_Rubber->rect().height());
-      for (int i = 0 ; i <  this->m_EventItems.count() ; ++i)
-      {
-        if (rubberRect.intersects(this->m_EventItems[i].boundingRect))
-        {
-          this->m_Mode = MoveEvent;
-          emit eventAboutToBeMoved(this->m_EventItems[i].frame);
-          this->m_MovingEventIndex = i;
-          this->m_EventItems[i].color = this->m_MovBrushColor;
-          this->update();
-          break;
-        }
-      }
       return;
     }
     // Selection (point or rectangle)
