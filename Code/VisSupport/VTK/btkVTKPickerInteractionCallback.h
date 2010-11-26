@@ -144,7 +144,7 @@ namespace btk
               {
                 if ((actor = vtkActor::SafeDownCast(prop)) != NULL)
                 {
-                  if ((mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper())) != NULL);
+                  if ((mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper())) != NULL)
                     break;
                 }
               }
@@ -168,18 +168,6 @@ namespace btk
                 vtkIdList* selectionIds = vtkIdList::New();
                 while (selection->GetPolys()->GetNextCell(numIds, ptIds))
                   selectionIds->InsertUniqueId(inputPointIds->GetTuple1(ptIds[0]));
-                  
-                /*
-                vtkIdType numCells = selection->GetNumberOfCells();
-                vtkIdList* pointIds;
-                vtkIdList* selectionIds = vtkIdList::New();
-                for (vtkIdType cellId = 0 ; cellId < numCells ; ++cellId) 
-                {
-                  selection->GetCellPoints(cellId, pointIds);
-                  if (pointIds)
-                    selectionIds->InsertUniqueId(pointIds->GetId(0));
-                }
-                */
                 if (selectionIds->GetNumberOfIds() != 0)
                   iren->InvokeEvent(VTKToggleMarkersSelectedEvent, static_cast<void*>(selectionIds));
                 selectionIds->Delete();
