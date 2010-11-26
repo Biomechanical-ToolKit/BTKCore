@@ -542,11 +542,7 @@ namespace btk
                 eventsSubject[incEvt],
                 eventsDescription[incEvt],
                 eventsId[incEvt]);
-#if defined(_MSC_VER)
             evt->SetFrame(static_cast<int>(std::floor((evt->GetTime() * pointFrameRate) + 1.5)));
-#else
-            evt->SetFrame(static_cast<int>(evt->GetTime() * pointFrameRate) + 1);
-#endif
             events->InsertItem(evt);
           }
         }
