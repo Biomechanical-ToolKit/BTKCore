@@ -68,6 +68,9 @@ protected slots:
   void close(AbstractView* sender);
   void split(AbstractView* sender, int direction);
   
+protected:
+  QList<AbstractView*> m_Views;
+  
 private:
   void close_(AbstractView* sender);
   QSplitter* split_(AbstractView* sender, int direction, AbstractView** splittedViews);
@@ -76,7 +79,6 @@ private:
   void closeAll(QWidget* w);
   
   QGridLayout* mp_GridLayout;
-  QList<AbstractView*> m_Views;
   const AbstractView* mp_Prototype;
 };
 

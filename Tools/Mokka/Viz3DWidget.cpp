@@ -82,6 +82,7 @@ void Viz3DWidget::initialize()
   // VTK interaction style
   btk::VTKInteractorStyleTrackballCamera* style = btk::VTKInteractorStyleTrackballCamera::New();
   style->CharEventEnabledOff();
+  style->DollyEnabledOff(); // Conflict with the right click button for the contextual menu.
   vtkCallbackCommand* pickerMouseInteraction = vtkCallbackCommand::New();
   pickerMouseInteraction->SetClientData(style);
   pickerMouseInteraction->SetCallback(&btk::VTKPickerInteractionCallback);

@@ -323,6 +323,16 @@ void MultiViewWidget::setAcquisition(Acquisition* acq)
   connect(this->mp_Acquisition, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
 }
 
+void MultiViewWidget::setViewActions(QList<QAction*> actions)
+{
+  this->m_ViewActions = actions;
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    (*it)->insertActions(0, this->m_ViewActions);
+    (*it)->setContextMenuPolicy(Qt::ActionsContextMenu);
+  }
+};
+
 void MultiViewWidget::load()
 {
   if (!this->mp_Acquisition)
@@ -572,7 +582,7 @@ void MultiViewWidget::updateHiddenMarkers(const QList<int>& ids)
   this->updateDisplay();
 };
 
-void MultiViewWidget::updateTailedMarkers(const QList<int>& ids)
+void MultiViewWidget::updateTrackedMarkers(const QList<int>& ids)
 {
   btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   markersFramesSource->HideTrajectories();
@@ -734,11 +744,14 @@ void MultiViewWidget::dropEvent(QDropEvent *event)
 AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
 {
   CompositeView* sv = static_cast<CompositeView*>(this->AbstractMultiView::createView(fromAnother));
-  connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(pickedMarkerChanged(int)), this, SIGNAL(pickedMarkerChanged(int)));
-  connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(pickedMarkerToggled(int)), this, SIGNAL(pickedMarkerToggled(int)));
-  connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(selectedMarkersToggled(QList<int>)), this, SIGNAL(selectedMarkersToggled(QList<int>)));
-  connect(static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D)), SIGNAL(trajectoryMarkerToggled(int)), this, SIGNAL(trajectoryMarkerToggled(int)));
-  static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D))->installEventFilter(this->parent()->parent());
+  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D));
+  connect(viz3D, SIGNAL(pickedMarkerChanged(int)), this, SIGNAL(pickedMarkerChanged(int)));
+  connect(viz3D, SIGNAL(pickedMarkerToggled(int)), this, SIGNAL(pickedMarkerToggled(int)));
+  connect(viz3D, SIGNAL(selectedMarkersToggled(QList<int>)), this, SIGNAL(selectedMarkersToggled(QList<int>)));
+  connect(viz3D, SIGNAL(trajectoryMarkerToggled(int)), this, SIGNAL(trajectoryMarkerToggled(int)));
+  viz3D->installEventFilter(this->parent()->parent());
+  viz3D->insertActions(0, this->m_ViewActions);
+  viz3D->setContextMenuPolicy(Qt::ActionsContextMenu);
   return sv;
 };
 

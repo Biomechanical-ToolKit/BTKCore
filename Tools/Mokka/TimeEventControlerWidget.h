@@ -56,6 +56,7 @@ public:
   void load();
   void reset();
   QMenu* playbackSpeedMenu() {return this->mp_PlaybackSpeedMenu;};
+  QMenu* insertEventMenu() {return this->mp_InsertEventMenu;};
   int currentFrame() {return this->timeEventBar->m_SliderPos;};
   
 public slots:
@@ -125,6 +126,7 @@ private:
   
   Acquisition* mp_Acquisition;
   QMenu* mp_PlaybackSpeedMenu;
+  QMenu* mp_InsertEventMenu;
   QIcon* mp_PlayIcon;
   QIcon* mp_PlayActiveIcon;
   QIcon* mp_PauseIcon;

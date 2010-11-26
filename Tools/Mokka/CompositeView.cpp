@@ -247,7 +247,7 @@ void CompositeView::finalizeView(int idx)
     {
       cam->ParallelProjectionOff();
       style->RotationEnabledOn();
-      //viz3D->GetRenderWindow()->Render();
+      style->SpinEnabledOn();
     }
   }
   else if (idx == Viz3DOrthogonal)
@@ -255,7 +255,7 @@ void CompositeView::finalizeView(int idx)
     connect(this->funcCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setOrthogonalView(int)));
     cam->ParallelProjectionOn();
     style->RotationEnabledOff();
-    //viz3D->GetRenderWindow()->Render();
+    style->SpinEnabledOff();
   }
 };
 

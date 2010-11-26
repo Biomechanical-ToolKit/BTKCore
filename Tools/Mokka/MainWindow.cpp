@@ -107,6 +107,17 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->timeEventControler->playbackSpeedMenu()->menuAction(), this->multiView->groundOrientationMenu());
   this->multiView->initialize();
+  QList<QAction*> actions;
+  actions.push_back(this->mp_ModelDock->selectAllMarkersAction());
+  actions.push_back(this->mp_ModelDock->hideSelectedMarkersAction());
+  actions.push_back(this->mp_ModelDock->unhideSelectedMarkersAction());
+  actions.push_back(this->mp_ModelDock->activeTrajectorySelectedMarkersAction());
+  actions.push_back(this->mp_ModelDock->uactiveTrajectorySelectedMarkersAction());
+  QAction* sep1 = new QAction(this); sep1->setSeparator(true);
+  actions.push_back(sep1);
+  actions.push_back(this->timeEventControler->insertEventMenu()->menuAction());
+  actions.push_back(this->timeEventControler->playbackSpeedMenu()->menuAction());
+  this->multiView->setViewActions(actions);
   
   // Setting the acquisition
   this->multiView->setAcquisition(this->mp_AcquisitionQ);
@@ -165,7 +176,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_ModelDock, SIGNAL(configurationSaved()), this->mp_MarkerConfigurationUndoStack, SLOT(setClean()));
   connect(this->mp_ModelDock, SIGNAL(markerSelectionChanged(QList<int>)), this->multiView, SLOT(circleSelectedMarkers(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(markerHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenMarkers(QList<int>)));
-  connect(this->mp_ModelDock, SIGNAL(markerTrajectorySelectionChanged(QList<int>)), this->multiView, SLOT(updateTailedMarkers(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(markerTrajectorySelectionChanged(QList<int>)), this->multiView, SLOT(updateTrackedMarkers(QList<int>)));
   connect(this->mp_ModelDock->markerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateSelectedMarkersRadius(double)));
   // Time Event
   connect(this->timeEventControler, SIGNAL(currentFrameChanged(int)), this->multiView, SLOT(updateDisplay(int)));
@@ -611,7 +622,7 @@ void MainWindow::toggleMarkerTrajectory(int id)
     ids << id;
   else
     ids.removeAt(idx);
-  this->mp_ModelDock->setTailedMarkers(ids);
+  this->mp_ModelDock->setTrackedMarkers(ids);
 };
 
 void MainWindow::modelDockLocationChanged(Qt::DockWidgetArea area)

@@ -60,6 +60,8 @@ public:
   // MultiViewWidget& operator=(const MultiViewWidget&); // Implicit.
   
   void initialize();
+  void setViewActions(QList<QAction*> actions);
+  
   void setAcquisition(Acquisition* acq);
   void load();
     
@@ -77,7 +79,7 @@ public slots:
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
   void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
   void updateHiddenMarkers(const QList<int>& ids);
-  void updateTailedMarkers(const QList<int>& ids);
+  void updateTrackedMarkers(const QList<int>& ids);
   void clear();
   void circleSelectedMarkers(const QList<int>& ids);
   void updateDisplay();
@@ -118,6 +120,7 @@ private:
   QAction* mp_ActionGroundOrientationPlaneXY;
   QAction* mp_ActionGroundOrientationPlaneYZ;
   QAction* mp_ActionGroundOrientationPlaneZX;
+  QList<QAction*> m_ViewActions;
 };
 
 #endif // MultiViewWidget_h

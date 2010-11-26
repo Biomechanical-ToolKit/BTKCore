@@ -69,8 +69,13 @@ public:
   QList<int> selectedMarkers() const;
   QList<int> tailedMarkers() const;
   
-  QAction* deselectConfigurationAction() {return this->mp_DeselectConfiguration;};
-  QAction* clearConfigurationsAction() {return this->mp_ClearConfigurations;};
+  QAction* deselectConfigurationAction() const {return this->mp_DeselectConfiguration;};
+  QAction* clearConfigurationsAction() const {return this->mp_ClearConfigurations;};
+  QAction* selectAllMarkersAction() {return this->mp_SelectAllMarkers;};  
+  QAction* hideSelectedMarkersAction() {return this->mp_HideSelectedMarkers;};
+  QAction* unhideSelectedMarkersAction() {return this->mp_UnhideSelectedMarkers;};
+  QAction* activeTrajectorySelectedMarkersAction() {return this->mp_TrackSelectedMarkers;};
+  QAction* uactiveTrajectorySelectedMarkersAction() {return this->mp_UntrackSelectedMarkers;};
   
 public Q_SLOTS:
   // Configuration
@@ -85,11 +90,13 @@ public Q_SLOTS:
   void clearConfigurations();
   // Markers & Points
   void updateDisplayedMarkers(const QVector<int>& ids);
-  void setTailedMarkers(const QList<int>& ids);
+  void setTrackedMarkers(const QList<int>& ids);
   void selectMarkers(QList<int> ids);
   void selectAllMarkers();
   void hideSelectedMarkers();
   void unhideSelectedMarkers();
+  void trackSelectedMarkers();
+  void untrackSelectedMarkers();
   void selectAllAnalogs();
   void selectAllModelOutputs();
   void selectAllAngles(bool appending = false);
@@ -173,7 +180,7 @@ private:
   void removeConfiguration(int idx);
   void setConfigurationModified(int idx, bool modified);
   void sendHiddenMarkers();
-  void sendTailedMarkers();
+  void sendTrackedMarkers();
   QTreeWidgetItem* createMarkerItem(const QString& label, int id, bool checked = true);
   QTreeWidgetItem* createAnalogItem(const QString& label, int id);
   QTreeWidgetItem* createModelOutputItem(const QString& label, int id);
@@ -207,6 +214,8 @@ private:
   QAction* mp_SelectAllMarkers;
   QAction* mp_HideSelectedMarkers;
   QAction* mp_UnhideSelectedMarkers;
+  QAction* mp_TrackSelectedMarkers;
+  QAction* mp_UntrackSelectedMarkers;
   QAction* mp_SelectAllAnalogs;
   QAction* mp_SelectAllModelOutputs;
   QAction* mp_SelectAllAngles;

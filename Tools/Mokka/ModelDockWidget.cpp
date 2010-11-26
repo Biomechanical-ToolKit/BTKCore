@@ -113,10 +113,15 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->mp_DeselectConfiguration->setEnabled(false);
   this->mp_ClearConfigurations = new QAction(tr("Clear configurations"), this);
   this->mp_SelectAllMarkers = new QAction(tr("Select all markers"), this);
+  this->mp_SelectAllMarkers->setEnabled(false);
   this->mp_HideSelectedMarkers = new QAction(tr("Hide selected markers"), this);
   this->mp_HideSelectedMarkers->setEnabled(false);
   this->mp_UnhideSelectedMarkers = new QAction(tr("Unhide selected markers"), this);
   this->mp_UnhideSelectedMarkers->setEnabled(false);
+  this->mp_TrackSelectedMarkers = new QAction(tr("Track selected markers"), this);
+  this->mp_TrackSelectedMarkers->setEnabled(false);
+  this->mp_UntrackSelectedMarkers = new QAction(tr("Untrack selected markers"), this);
+  this->mp_UntrackSelectedMarkers->setEnabled(false);
   this->mp_SelectAllAnalogs = new QAction(tr("Select all analog channels"), this);
   this->mp_SelectAllModelOutputs = new QAction(tr("Select all model outputs"), this);
   this->mp_SelectAllAngles = new QAction(tr("Select all angles"), this);
@@ -255,6 +260,8 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   connect(this->mp_SelectAllMarkers, SIGNAL(triggered()), this, SLOT(selectAllMarkers()));
   connect(this->mp_HideSelectedMarkers, SIGNAL(triggered()), this, SLOT(hideSelectedMarkers()));
   connect(this->mp_UnhideSelectedMarkers, SIGNAL(triggered()), this, SLOT(unhideSelectedMarkers()));
+  connect(this->mp_TrackSelectedMarkers, SIGNAL(triggered()), this, SLOT(trackSelectedMarkers()));
+  connect(this->mp_UntrackSelectedMarkers, SIGNAL(triggered()), this, SLOT(untrackSelectedMarkers()));
   connect(this->mp_SelectAllAnalogs, SIGNAL(triggered()), this, SLOT(selectAllAnalogs()));
   connect(this->mp_SelectAllModelOutputs, SIGNAL(triggered()), this, SLOT(selectAllModelOutputs()));
   connect(this->mp_SelectAllAngles, SIGNAL(triggered()), this, SLOT(selectAllAngles()));
@@ -738,7 +745,7 @@ void ModelDockWidget::updateDisplayedMarkers(const QVector<int>& ids)
   this->modelTree->blockSignals(false);
 };
 
-void ModelDockWidget::setTailedMarkers(const QList<int>& ids)
+void ModelDockWidget::setTrackedMarkers(const QList<int>& ids)
 {
   this->modelTree->blockSignals(true);
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(0);
@@ -809,6 +816,26 @@ void ModelDockWidget::unhideSelectedMarkers()
     (*it)->setCheckState(VisibleHeader, Qt::Checked);
   this->modelTree->blockSignals(false);
   this->sendHiddenMarkers();
+};
+
+void ModelDockWidget::trackSelectedMarkers()
+{
+  this->modelTree->blockSignals(true);
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+    (*it)->setCheckState(TrajectoryHeader, Qt::Checked);
+  this->modelTree->blockSignals(false);
+  this->sendTrackedMarkers();
+};
+
+void ModelDockWidget::untrackSelectedMarkers()
+{
+  this->modelTree->blockSignals(true);
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+    (*it)->setCheckState(TrajectoryHeader, Qt::Unchecked);
+  this->modelTree->blockSignals(false);
+  this->sendTrackedMarkers();
 };
 
 void ModelDockWidget::selectAllAnalogs()
@@ -955,6 +982,8 @@ void ModelDockWidget::displayProperties()
   {
     this->mp_HideSelectedMarkers->setEnabled(false);
     this->mp_UnhideSelectedMarkers->setEnabled(false);
+    this->mp_TrackSelectedMarkers->setEnabled(false);
+    this->mp_UntrackSelectedMarkers->setEnabled(false);
     this->mp_RemoveSelectedItems->setEnabled(false);
     this->propertiesStack->setCurrentIndex(0);
     return;
@@ -968,6 +997,8 @@ void ModelDockWidget::displayProperties()
       {
         this->mp_HideSelectedMarkers->setEnabled(false);
         this->mp_UnhideSelectedMarkers->setEnabled(false);
+        this->mp_TrackSelectedMarkers->setEnabled(false);
+        this->mp_UntrackSelectedMarkers->setEnabled(false);
         this->propertiesStack->setCurrentIndex(0);
         return;
       }
@@ -981,6 +1012,8 @@ void ModelDockWidget::displayProperties()
     {
     this->markerRadiusSpinBox->blockSignals(true);
     this->mp_HideSelectedMarkers->setEnabled(true);
+    this->mp_TrackSelectedMarkers->setEnabled(true);
+    this->mp_UntrackSelectedMarkers->setEnabled(true);
     this->mp_UnhideSelectedMarkers->setEnabled(true);
     int id = items.first()->data(0,pointId).toInt();
     this->markerLabelEdit->setText(multipleSelection ? "" : this->mp_Acquisition->pointLabel(id));
@@ -1118,7 +1151,7 @@ void ModelDockWidget::sendHiddenMarkers()
   emit markerHiddenSelectionChanged(ids);
 };
 
-void ModelDockWidget::sendTailedMarkers()
+void ModelDockWidget::sendTrackedMarkers()
 {
   QList<int> ids;
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(0);
@@ -1137,7 +1170,7 @@ void ModelDockWidget::sendModifiedMarkersState(QTreeWidgetItem* item, int column
   if (column == VisibleHeader)
     this->sendHiddenMarkers();
   else if (column == TrajectoryHeader)
-    this->sendTailedMarkers();
+    this->sendTrackedMarkers();
 };
 
 void ModelDockWidget::editMarkerLabel()

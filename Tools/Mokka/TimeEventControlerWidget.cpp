@@ -123,21 +123,22 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   eventGeneralOptionsMenu->addAction(this->actionRemoveAllGeneralFootStrike);
   eventGeneralOptionsMenu->addAction(this->actionRemoveAllGeneralFootOff);
   this->eventGeneralOptionsButtonMenu->setMenu(eventGeneralOptionsMenu);
+  // Other extra menu
+  this->mp_InsertEventMenu = new QMenu(tr("Insert Event"), this);
+  this->mp_InsertEventMenu->addAction(this->actionInsertRightFootStrike);
+  this->mp_InsertEventMenu->addAction(this->actionInsertRightFootOff);
+  this->mp_InsertEventMenu->addAction(this->actionInsertRightOther);
+  this->mp_InsertEventMenu->addSeparator();
+  this->mp_InsertEventMenu->addAction(this->actionInsertLeftFootStrike);
+  this->mp_InsertEventMenu->addAction(this->actionInsertLeftFootOff);
+  this->mp_InsertEventMenu->addAction(this->actionInsertLeftOther);
+  this->mp_InsertEventMenu->addSeparator();
+  this->mp_InsertEventMenu->addAction(this->actionInsertGeneralFootStrike);
+  this->mp_InsertEventMenu->addAction(this->actionInsertGeneralFootOff);
+  this->mp_InsertEventMenu->addAction(this->actionInsertGeneralOther);
   
   // Add a contextual menu
-  QMenu* insertEventMenu = new QMenu("Insert Event", this);
-  insertEventMenu->addAction(this->actionInsertRightFootStrike);
-  insertEventMenu->addAction(this->actionInsertRightFootOff);
-  insertEventMenu->addAction(this->actionInsertRightOther);
-  insertEventMenu->addSeparator();
-  insertEventMenu->addAction(this->actionInsertLeftFootStrike);
-  insertEventMenu->addAction(this->actionInsertLeftFootOff);
-  insertEventMenu->addAction(this->actionInsertLeftOther);
-  insertEventMenu->addSeparator();
-  insertEventMenu->addAction(this->actionInsertGeneralFootStrike);
-  insertEventMenu->addAction(this->actionInsertGeneralFootOff);
-  insertEventMenu->addAction(this->actionInsertGeneralOther);
-  this->addAction(insertEventMenu->menuAction());
+  this->addAction(this->mp_InsertEventMenu->menuAction());
   QAction* sep1 = new QAction(this); sep1->setSeparator(true); this->addAction(sep1);
   this->addAction(this->actionEditSelectedEvents);
   this->addAction(this->actionRemoveSelectedEvents);
