@@ -237,33 +237,6 @@ namespace btk
   */
   
   /**
-   * Overloaded method to spin the camera.
-   */
-  void VTKInteractorStyleTrackballCamera::Spin()
-  {
-    if (this->RotationEnabled)
-      this->Superclass::Spin();
-  };
-  
-  /**
-   * Overloaded method to pan the camera.
-   */
-  void VTKInteractorStyleTrackballCamera::Pan()
-  {
-    if (this->RotationEnabled)
-      this->Superclass::Pan();
-  };
-  
-  /**
-   * Overloaded method to doll the camera.
-   */
-  void VTKInteractorStyleTrackballCamera::Dolly()
-  {
-    if (this->RotationEnabled)
-      this->Superclass::Dolly();
-  };
-  
-  /**
    * Constructor.
    */
   VTKInteractorStyleTrackballCamera::VTKInteractorStyleTrackballCamera()
@@ -279,6 +252,9 @@ namespace btk
     this->mp_RubberBandGeometry[1][1] = 0;
     // VTK macro members
     this->RotationEnabled = 1;
+    this->SpinEnabled = 1;
+    this->PanEnabled = 1;
+    this->DollyEnabled = 1;
     this->CharEventEnabled = 1;
     // Rubber band
     this->mp_PixelArray = vtkUnsignedCharArray::New();
@@ -363,16 +339,16 @@ namespace btk
       this->StartRubberBand();
     else if (this->Interactor->GetAltKey()) 
     {
-      if (this->Interactor->GetControlKey()) 
+      if (this->Interactor->GetControlKey() && this->DollyEnabled) 
         this->StartDolly();
-      else 
+      else if (this->PanEnabled)
         this->StartPan();
     } 
     else 
     {
-      if (this->Interactor->GetControlKey()) 
+      if (this->Interactor->GetControlKey() && this->SpinEnabled) 
         this->StartSpin();
-      else 
+      else if (this->RotationEnabled)
         this->StartRotate();
     }
     return;
@@ -399,9 +375,28 @@ namespace btk
       break;
     case btk_VTKISTC_RUBBER:
       this->EndRubberBand();
+      break;
     }
     if (this->Interactor)
       this->ReleaseFocus();
+  };
+  
+  /**
+   * Select the task to do based on the key modifiers pressed.
+   */ 
+  void VTKInteractorStyleTrackballCamera::OnRightButtonDown()
+  {
+    if (this->DollyEnabled)
+      this->Superclass::OnRightButtonDown();
+  };
+  
+  /**
+   * Select the task to do based on the key modifiers pressed.
+   */
+  void VTKInteractorStyleTrackballCamera::OnRightButtonUp()
+  {
+    if (this->DollyEnabled)
+      this->Superclass::OnRightButtonUp();
   };
   
   /**

@@ -53,27 +53,29 @@ namespace btk
     vtkExportedTypeRevisionMacro(VTKInteractorStyleTrackballCamera, vtkInteractorStyleTrackballCamera, BTK_VTK_EXPORT);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
-    BTK_VTK_EXPORT void Rotate();
-    //virtual void EndRotate();
-    BTK_VTK_EXPORT void Spin();
-    BTK_VTK_EXPORT void Pan();
-    BTK_VTK_EXPORT void Dolly();
-    using Superclass::Dolly;
+    BTK_VTK_EXPORT virtual void Rotate();
     
     vtkGetMacro(RotationEnabled,int);
     vtkSetMacro(RotationEnabled,int);
     vtkBooleanMacro(RotationEnabled,int);
+    vtkGetMacro(SpinEnabled,int);
+    vtkSetMacro(SpinEnabled,int);
+    vtkBooleanMacro(SpinEnabled,int);
+    vtkGetMacro(PanEnabled,int);
+    vtkSetMacro(PanEnabled,int);
+    vtkBooleanMacro(PanEnabled,int);
+    vtkGetMacro(DollyEnabled,int);
+    vtkSetMacro(DollyEnabled,int);
+    vtkBooleanMacro(DollyEnabled,int);
     
     vtkGetMacro(CharEventEnabled,int);
     vtkSetMacro(CharEventEnabled,int);
     vtkBooleanMacro(CharEventEnabled,int);
     
-    //vtkGetMacro(RubberBandSelection,int);
-    //vtkSetMacro(RubberBandSelection,int);
-    //vtkBooleanMacro(RubberBandSelection,int);
-    
     BTK_VTK_EXPORT virtual void OnLeftButtonDown();
     BTK_VTK_EXPORT virtual void OnLeftButtonUp();
+    BTK_VTK_EXPORT virtual void OnRightButtonDown();
+    BTK_VTK_EXPORT virtual void OnRightButtonUp();
     BTK_VTK_EXPORT virtual void OnMouseMove();
     BTK_VTK_EXPORT virtual void OnChar();
     
@@ -93,6 +95,9 @@ namespace btk
     double m_Radius;
     int mp_RubberBandGeometry[2][2];
     int RotationEnabled;
+    int SpinEnabled;
+    int PanEnabled;
+    int DollyEnabled;
     int CharEventEnabled;
     vtkUnsignedCharArray* mp_PixelArray;
   };
