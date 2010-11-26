@@ -71,11 +71,12 @@ public:
   
   QAction* deselectConfigurationAction() const {return this->mp_DeselectConfiguration;};
   QAction* clearConfigurationsAction() const {return this->mp_ClearConfigurations;};
+  QAction* deleteSelectedMarkersAction() {return this->mp_DeleteSelectedMarkers;};  
   QAction* selectAllMarkersAction() {return this->mp_SelectAllMarkers;};  
   QAction* hideSelectedMarkersAction() {return this->mp_HideSelectedMarkers;};
   QAction* unhideSelectedMarkersAction() {return this->mp_UnhideSelectedMarkers;};
   QAction* activeTrajectorySelectedMarkersAction() {return this->mp_TrackSelectedMarkers;};
-  QAction* uactiveTrajectorySelectedMarkersAction() {return this->mp_UntrackSelectedMarkers;};
+  QAction* unactiveTrajectorySelectedMarkersAction() {return this->mp_UntrackSelectedMarkers;};
   
 public Q_SLOTS:
   // Configuration
@@ -216,6 +217,7 @@ private:
   QAction* mp_UnhideSelectedMarkers;
   QAction* mp_TrackSelectedMarkers;
   QAction* mp_UntrackSelectedMarkers;
+  QAction* mp_DeleteSelectedMarkers;
   QAction* mp_SelectAllAnalogs;
   QAction* mp_SelectAllModelOutputs;
   QAction* mp_SelectAllAngles;

@@ -122,6 +122,8 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->mp_TrackSelectedMarkers->setEnabled(false);
   this->mp_UntrackSelectedMarkers = new QAction(tr("Untrack selected markers"), this);
   this->mp_UntrackSelectedMarkers->setEnabled(false);
+  this->mp_DeleteSelectedMarkers = new QAction(tr("Delete selected markers"), this);
+  this->mp_DeleteSelectedMarkers->setEnabled(false);
   this->mp_SelectAllAnalogs = new QAction(tr("Select all analog channels"), this);
   this->mp_SelectAllModelOutputs = new QAction(tr("Select all model outputs"), this);
   this->mp_SelectAllAngles = new QAction(tr("Select all angles"), this);
@@ -262,6 +264,7 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   connect(this->mp_UnhideSelectedMarkers, SIGNAL(triggered()), this, SLOT(unhideSelectedMarkers()));
   connect(this->mp_TrackSelectedMarkers, SIGNAL(triggered()), this, SLOT(trackSelectedMarkers()));
   connect(this->mp_UntrackSelectedMarkers, SIGNAL(triggered()), this, SLOT(untrackSelectedMarkers()));
+  connect(this->mp_DeleteSelectedMarkers, SIGNAL(triggered()), this, SLOT(removeSelectedItems()));
   connect(this->mp_SelectAllAnalogs, SIGNAL(triggered()), this, SLOT(selectAllAnalogs()));
   connect(this->mp_SelectAllModelOutputs, SIGNAL(triggered()), this, SLOT(selectAllModelOutputs()));
   connect(this->mp_SelectAllAngles, SIGNAL(triggered()), this, SLOT(selectAllAngles()));
@@ -984,6 +987,7 @@ void ModelDockWidget::displayProperties()
     this->mp_UnhideSelectedMarkers->setEnabled(false);
     this->mp_TrackSelectedMarkers->setEnabled(false);
     this->mp_UntrackSelectedMarkers->setEnabled(false);
+    this->mp_DeleteSelectedMarkers->setEnabled(false);
     this->mp_RemoveSelectedItems->setEnabled(false);
     this->propertiesStack->setCurrentIndex(0);
     return;
@@ -999,6 +1003,7 @@ void ModelDockWidget::displayProperties()
         this->mp_UnhideSelectedMarkers->setEnabled(false);
         this->mp_TrackSelectedMarkers->setEnabled(false);
         this->mp_UntrackSelectedMarkers->setEnabled(false);
+        this->mp_DeleteSelectedMarkers->setEnabled(false);
         this->propertiesStack->setCurrentIndex(0);
         return;
       }
@@ -1015,6 +1020,7 @@ void ModelDockWidget::displayProperties()
     this->mp_TrackSelectedMarkers->setEnabled(true);
     this->mp_UntrackSelectedMarkers->setEnabled(true);
     this->mp_UnhideSelectedMarkers->setEnabled(true);
+    this->mp_DeleteSelectedMarkers->setEnabled(true);
     int id = items.first()->data(0,pointId).toInt();
     this->markerLabelEdit->setText(multipleSelection ? "" : this->mp_Acquisition->pointLabel(id));
     this->markerLabelEdit->setEnabled(!multipleSelection);

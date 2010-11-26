@@ -112,7 +112,8 @@ MainWindow::MainWindow(QWidget* parent)
   actions.push_back(this->mp_ModelDock->hideSelectedMarkersAction());
   actions.push_back(this->mp_ModelDock->unhideSelectedMarkersAction());
   actions.push_back(this->mp_ModelDock->activeTrajectorySelectedMarkersAction());
-  actions.push_back(this->mp_ModelDock->uactiveTrajectorySelectedMarkersAction());
+  actions.push_back(this->mp_ModelDock->unactiveTrajectorySelectedMarkersAction());
+  actions.push_back(this->mp_ModelDock->deleteSelectedMarkersAction());
   QAction* sep1 = new QAction(this); sep1->setSeparator(true);
   actions.push_back(sep1);
   actions.push_back(this->timeEventControler->insertEventMenu()->menuAction());
