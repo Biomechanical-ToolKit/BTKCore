@@ -308,6 +308,9 @@ void MultiViewWidget::setAcquisition(Acquisition* acq)
   if (this->mp_Acquisition)
     disconnect(this->mp_Acquisition, 0, this, 0);
   this->mp_Acquisition = acq;
+  // Views
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+    static_cast<CompositeView*>(*it)->setAcquisition(this->mp_Acquisition);
   // BTK->VTK connection
   btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
   ground->SetInput(this->mp_Acquisition->btkAcquisition());

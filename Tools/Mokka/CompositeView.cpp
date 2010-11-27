@@ -35,6 +35,7 @@
 
 #include "CompositeView.h"
 #include "Viz3DWidget.h"
+#include "Acquisition.h"
 
 #include <btkMacro.h>
 #include <btkVTKInteractorStyleTrackballCamera.h>
@@ -55,6 +56,11 @@ CompositeView::CompositeView(QWidget* parent)
   this->viewCombo->setCurrentIndex(Viz3DProjection); // Adapt the index of the stack widget
 };
 
+void CompositeView::setAcquisition(Acquisition* acq)
+{
+  static_cast<Viz3DWidget*>(this->stackedWidget->widget(Viz3D))->setAcquisition(acq);
+};
+
 void CompositeView::render()
 {
   // Viz3D
@@ -70,11 +76,14 @@ void CompositeView::show(bool s)
 CompositeView* CompositeView::clone() const
 {
   CompositeView* sv = new CompositeView;
-  
+  //  Copy the acquisition pointer
+  Viz3DWidget* sourceViz3D = static_cast<Viz3DWidget*>(this->stackedWidget->widget(Viz3D));
+  Viz3DWidget* targetViz3D = static_cast<Viz3DWidget*>(sv->stackedWidget->widget(Viz3D));
+  targetViz3D->setAcquisition(sourceViz3D->acquisition());
   // Clone the 3D view
   // Add vtkViewProp to the new QVtkDialogWidget
-  vtkRenderer* sourceRenderer = static_cast<Viz3DWidget*>(this->stackedWidget->widget(Viz3D))->renderer();
-  vtkRenderer* targetRenderer = static_cast<Viz3DWidget*>(sv->stackedWidget->widget(Viz3D))->renderer();
+  vtkRenderer* sourceRenderer = sourceViz3D->renderer();
+  vtkRenderer* targetRenderer = targetViz3D->renderer();
   vtkCollectionIterator* it = sourceRenderer->GetViewProps()->NewIterator();
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())

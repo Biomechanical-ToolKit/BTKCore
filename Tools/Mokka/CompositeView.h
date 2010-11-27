@@ -38,6 +38,8 @@
 
 #include "AbstractView.h"
 
+class Acquisition;
+
 class CompositeView : public AbstractView
 {
   Q_OBJECT
@@ -51,7 +53,7 @@ public:
   // CompositeView(const CompositeView&);  // Implicit
   // CompositeView& operator=(const CompositeView&); // Implicit.
   
-
+  void setAcquisition(Acquisition* acq);
   void render();
   void show(bool s);
   

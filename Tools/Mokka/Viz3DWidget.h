@@ -44,6 +44,7 @@
 
 #include <QList>
 
+class Acquisition;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
 
@@ -56,6 +57,8 @@ public:
   ~Viz3DWidget();
   
   void initialize();
+  Acquisition* acquisition() const {return this->mp_Acquisition;};
+  void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
   vtkRenderer* renderer() const {return this->mp_Renderer;};
   
 public slots:
@@ -74,10 +77,12 @@ signals:
   void trajectoryMarkerToggled(int id);
   
 protected:
+  bool event(QEvent* event);
   void keyPressEvent(QKeyEvent* event);
   void keyReleaseEvent(QKeyEvent* event);
   
 private:
+  Acquisition* mp_Acquisition;
   vtkRenderer* mp_Renderer;
   btk::VTKAxesWidget* mp_AxesWidget;
   vtkEventQtSlotConnect* mp_EventQtSlotConnections;

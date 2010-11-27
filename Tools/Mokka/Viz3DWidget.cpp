@@ -34,6 +34,7 @@
  */
 
 #include "Viz3DWidget.h"
+#include "Acquisition.h"
 
 #include <btkVTKAxesWidget.h>
 #include <btkVTKPickerInteractionCallback.h>
@@ -47,11 +48,13 @@
 #include <vtkIdList.h>
 
 #include <QKeyEvent>
+#include <QToolTip>
 
 Viz3DWidget::Viz3DWidget(QWidget* parent)
 : QVTKWidget(parent)
 {
   // Member
+  this->mp_Acquisition = 0;
   this->mp_Renderer = vtkRenderer::New();
   this->mp_AxesWidget = btk::VTKAxesWidget::New();
   this->mp_EventQtSlotConnections = vtkEventQtSlotConnect::New();
@@ -173,6 +176,40 @@ void Viz3DWidget::show(bool s)
     actor = actors->GetNextItem();
   }
   this->GetRenderWindow()->Render();
+};
+
+bool Viz3DWidget::event(QEvent* event)
+{
+  if ((event->type() == QEvent::ToolTip) && this->mp_Acquisition)
+  {
+    QHelpEvent* helpEvent = static_cast<QHelpEvent*>(event);
+    vtkCellPicker* picker = static_cast<vtkCellPicker*>(this->GetRenderWindow()->GetInteractor()->GetPicker());
+    picker->Pick((double)helpEvent->x(), (double)(this->height()-helpEvent->y()-1), 0.0, this->mp_Renderer);
+    if (picker->GetCellId() >= 0 )
+    {
+      vtkActor* pickedActor = picker->GetActor();
+      if (pickedActor)
+      {
+        vtkPolyData* pd = vtkPolyData::SafeDownCast(pickedActor->GetMapper()->GetInput());
+        if (pd)
+        { 
+          vtkCell* pickedCell = pd->GetCell(picker->GetCellId());
+          int pnt = pickedCell->GetPointId(0);
+          vtkIdTypeArray* inputPointIds = vtkIdTypeArray::SafeDownCast(pd->GetPointData()->GetArray("MarkersIds"));
+          if (inputPointIds)
+          { 
+            int id = static_cast<int>(inputPointIds->GetTuple1(pnt));
+            QToolTip::showText(helpEvent->globalPos(), this->mp_Acquisition->pointLabel(id));
+            return true;
+          } 
+        }
+      }
+    }
+    QToolTip::hideText();
+    event->ignore();
+    return true;
+  }
+  return QWidget::event(event);
 };
 
 void Viz3DWidget::keyPressEvent(QKeyEvent* event)
