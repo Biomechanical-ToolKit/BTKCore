@@ -416,13 +416,17 @@ void TimeEventControlerWidget::editSelectedEvents()
       if (frame != e->frame)
         frame = -1;
     }
+    int oldFrame = this->currentFrame();
     NewEventDialog ned(NewEventDialog::Edit, this);
     int  frameAndROI[3] = {frame, this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame};
     ned.setInformations(label, ned.contextComboBox->findText(context), frameAndROI, subject, description);
     ned.move(this->eventDialogGlobaPos(&ned));
-    connect(ned.frameSpinBox,SIGNAL(valueChanged(int)),this,SLOT(setCurrentFrame(int)));
-    if (frame != -1)
-      this->setCurrentFrame(frame);
+    if (!this->mp_Timer->isActive())
+    {
+      connect(ned.frameSpinBox,SIGNAL(valueChanged(int)),this,SLOT(setCurrentFrame(int)));
+      if (frame != -1)
+        this->setCurrentFrame(frame);
+    }
     ned.exec();
     if (ned.result() == QDialog::Accepted)
     {
@@ -474,6 +478,8 @@ void TimeEventControlerWidget::editSelectedEvents()
         emit eventsModified(this->timeEventBar->m_SelectedEvents, events);
       }
     }
+    else if (!this->mp_Timer->isActive())
+      this->setCurrentFrame(oldFrame);
   }
 };
 
@@ -746,11 +752,13 @@ QList<int> TimeEventControlerWidget::removeEvent(const QString& context, const Q
 
 void TimeEventControlerWidget::insertEvent(const QString& label, int context, int frame)
 {
+  int oldFrame = this->currentFrame();
   NewEventDialog ned(NewEventDialog::New, this);
   int  frameAndROI[3] = {frame, this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame};
   ned.setInformations(label, context, frameAndROI, "", "");
   ned.move(this->eventDialogGlobaPos(&ned));
-  connect(ned.frameSpinBox,SIGNAL(valueChanged(int)),this,SLOT(setCurrentFrame(int)));
+  if (!this->mp_Timer->isActive())
+    connect(ned.frameSpinBox,SIGNAL(valueChanged(int)),this,SLOT(setCurrentFrame(int)));
   ned.exec();
   if (ned.result() == QDialog::Accepted)
   {
@@ -764,6 +772,8 @@ void TimeEventControlerWidget::insertEvent(const QString& label, int context, in
     this->setEventIconId(e);
     emit eventInserted(e);
   }
+  else if (!this->mp_Timer->isActive())
+    this->setCurrentFrame(oldFrame);
 };
 
 void TimeEventControlerWidget::updateROIAction(int frame)
