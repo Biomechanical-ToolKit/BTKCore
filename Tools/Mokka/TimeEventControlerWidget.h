@@ -43,6 +43,7 @@
 #include <QMenu>
 
 class Acquisition;
+class NewEventDialog;
 
 class TimeEventControlerWidget : public QWidget, public Ui::TimeEventControlerWidget
 {
@@ -123,6 +124,7 @@ private:
   void insertEvent(const QString& label, int context, int frame);
   void setEventIconId(Event* e);
   void setEventTime(Event* e);
+  QPoint eventDialogGlobaPos(const NewEventDialog* ned) const;
   
   Acquisition* mp_Acquisition;
   QMenu* mp_PlaybackSpeedMenu;

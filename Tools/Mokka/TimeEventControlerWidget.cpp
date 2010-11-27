@@ -419,6 +419,10 @@ void TimeEventControlerWidget::editSelectedEvents()
     NewEventDialog ned(NewEventDialog::Edit, this);
     int  frameAndROI[3] = {frame, this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame};
     ned.setInformations(label, ned.contextComboBox->findText(context), frameAndROI, subject, description);
+    ned.move(this->eventDialogGlobaPos(&ned));
+    connect(ned.frameSpinBox,SIGNAL(valueChanged(int)),this,SLOT(setCurrentFrame(int)));
+    if (frame != -1)
+      this->setCurrentFrame(frame);
     ned.exec();
     if (ned.result() == QDialog::Accepted)
     {
@@ -745,6 +749,8 @@ void TimeEventControlerWidget::insertEvent(const QString& label, int context, in
   NewEventDialog ned(NewEventDialog::New, this);
   int  frameAndROI[3] = {frame, this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame};
   ned.setInformations(label, context, frameAndROI, "", "");
+  ned.move(this->eventDialogGlobaPos(&ned));
+  connect(ned.frameSpinBox,SIGNAL(valueChanged(int)),this,SLOT(setCurrentFrame(int)));
   ned.exec();
   if (ned.result() == QDialog::Accepted)
   {
@@ -834,4 +840,20 @@ void TimeEventControlerWidget::setEventIconId(Event* e)
       }
     }
   }
+};
+
+QPoint TimeEventControlerWidget::eventDialogGlobaPos(const NewEventDialog* ned) const
+{
+  QStyle* wStyle = ned->style();
+  QStyleOptionTitleBar so;
+  so.titleBarState = 1;		// kThemeStateActive
+  so.titleBarFlags = Qt::Window;
+  int titleBarHeight = wStyle->pixelMetric(QStyle::PM_TitleBarHeight,&so,ned);
+#if defined(Q_WS_MAC) // see http://bugreports.qt.nokia.com/browse/QTBUG-13475
+  titleBarHeight -= 4;
+#endif
+  QRect thisRect = this->rect();
+  QRect nedRect = ned->rect();
+  QPoint p = this->mapToGlobal(thisRect.topRight());
+  return p - QPoint(nedRect.width() + 15, nedRect.height() + titleBarHeight + 15);
 };
