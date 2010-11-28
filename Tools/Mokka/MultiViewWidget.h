@@ -86,6 +86,8 @@ public slots:
   void updateDisplay(int frame);
   void showAllMarkers();
   void hideAllMarkers();
+  void forceRubberBandDrawingOn();
+  void forceRubberBandDrawingOff();
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event);

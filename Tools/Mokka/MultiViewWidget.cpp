@@ -39,6 +39,7 @@
 #include "Viz3DWidget.h"
 #include "UserRoles.h"
 
+#include <btkVTKInteractorStyleTrackballCamera.h>
 #include <btkVTKForcePlatformsSource.h>
 #include <btkVTKGroundSource.h>
 #include <btkVTKGRFsFramesSource.h>
@@ -146,7 +147,7 @@ void MultiViewWidget::initialize()
   // this->m_BTKProc[BTK_GRWS] = GRWsFilter;
   // this->m_BTKProc[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
   
-  vtkMapper::GlobalImmediateModeRenderingOn(); // For large dataset.
+  //vtkMapper::GlobalImmediateModeRenderingOn(); // For large dataset.
   
   // VTK PIPELINE
   // Static data
@@ -722,6 +723,18 @@ void MultiViewWidget::hideAllMarkers()
 {
   btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->HideMarkers();
   this->updateDisplay();
+};
+
+void MultiViewWidget::forceRubberBandDrawingOn()
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+    static_cast<btk::VTKInteractorStyleTrackballCamera*>(static_cast<Viz3DWidget*>((*it)->stackedWidget->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOn();
+};
+
+void MultiViewWidget::forceRubberBandDrawingOff()
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+    static_cast<btk::VTKInteractorStyleTrackballCamera*>(static_cast<Viz3DWidget*>((*it)->stackedWidget->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOff();
 };
 
 void MultiViewWidget::dragEnterEvent(QDragEnterEvent *event)

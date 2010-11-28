@@ -275,6 +275,7 @@ void TimeEventControlerWidget::startPlayback()
   disconnect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
   disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
   disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+  emit playbackStarted();
 }
 
 void TimeEventControlerWidget::stopPlayback()
@@ -293,6 +294,7 @@ void TimeEventControlerWidget::stopPlayback()
   connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
   connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+  emit playbackStopped();
 }
 
 void TimeEventControlerWidget::setCurrentFrame(int frame)

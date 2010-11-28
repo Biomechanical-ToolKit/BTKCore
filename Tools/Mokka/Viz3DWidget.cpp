@@ -99,7 +99,7 @@ void Viz3DWidget::initialize()
   vtkCallbackCommand* rubberRenderInteraction = vtkCallbackCommand::New();
   rubberRenderInteraction->SetClientData(style);
   rubberRenderInteraction->SetCallback(&btk::VTKRubberRenderInteractionCallback);
-  this->GetRenderWindow()->AddObserver(vtkCommand::EndEvent, rubberRenderInteraction);
+  this->mp_Renderer->AddObserver(vtkCommand::EndEvent, rubberRenderInteraction);
   rubberRenderInteraction->Delete();
   
   // VTK WIDGET

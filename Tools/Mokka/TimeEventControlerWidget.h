@@ -96,6 +96,8 @@ public slots:
   void insertEvents(const QList<int>& ids, const QList<Event*>& events);
 
 signals:
+  void playbackStarted();
+  void playbackStopped();
   void currentFrameChanged(int frame);
   void regionOfInterestChanged(int ff, int lf);
   void eventFrameModified(int id, int frame);
