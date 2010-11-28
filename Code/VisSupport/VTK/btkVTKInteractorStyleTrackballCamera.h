@@ -90,9 +90,6 @@ namespace btk
     ~VTKInteractorStyleTrackballCamera();
     
   private:
-    double ProjectToSphere(double r, double x, double y) const;
-    
-    double m_Radius;
     int mp_RubberBandGeometry[2][2];
     int RotationEnabled;
     int SpinEnabled;
