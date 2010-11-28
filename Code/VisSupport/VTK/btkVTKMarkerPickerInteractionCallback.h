@@ -33,12 +33,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKPickerInteractionCallback_h
-#define __btkVTKPickerInteractionCallback_h
+#ifndef __btkVTKMarkerPickerInteractionCallback_h
+#define __btkVTKMarkerPickerInteractionCallback_h
 
 #include "btkVTKCommandEvents.h"
 #include "btkVTKFrustumFromTwoPoints.h"
-#include "btkVTKInteractorStyleTrackballCamera.h"
+#include "btkVTKInteractorStyleTrackballFixedUpCamera.h"
 
 #include <vtkRenderWindow.h>
 #include <vtkPolyData.h>
@@ -202,8 +202,6 @@ namespace btk
           }
         }
         style->OnLeftButtonUp();
-        // Need to force a new rendering as the method to erase the rubber uses a previous rendering.
-        //renderer->Render();
         break;
       case vtkCommand::MouseMoveEvent: 
         VTKPickerMouseMotion = 1;
@@ -212,4 +210,4 @@ namespace btk
     } 
   };
 };
-#endif // __btkVTKPickerInteractionCallback_h
+#endif // __btkVTKMarkerPickerInteractionCallback_h

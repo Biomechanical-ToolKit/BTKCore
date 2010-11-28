@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKInteractorStyleTrackballCamera_h
-#define __btkVTKInteractorStyleTrackballCamera_h
+#ifndef __btkVTKInteractorStyleTrackballFixedUpCamera_h
+#define __btkVTKInteractorStyleTrackballFixedUpCamera_h
 
 #include "btkConfigure.h"
 
@@ -106,4 +106,4 @@ namespace btk
   };
 };
 
-#endif // __btkVTKInteractorStyleTrackballCamera_h
+#endif // __btkVTKInteractorStyleTrackballFixedUpCamera_h

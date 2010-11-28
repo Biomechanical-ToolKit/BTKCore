@@ -37,7 +37,7 @@
 #define __btkVTKRubberRenderInteractionCallback_h
 
 #include "btkVTKCommandEvents.h"
-#include "btkVTKInteractorStyleTrackballCamera.h"
+#include "btkVTKInteractorStyleTrackballFixedUpCamera.h"
 
 namespace btk
 {

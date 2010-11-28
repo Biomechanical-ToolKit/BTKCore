@@ -5,7 +5,7 @@ SET(BTKVTK_SRCS
   btkVTKFrustumFromTwoPoints.cpp
   btkVTKGRFsFramesSource.cpp
   btkVTKGroundSource.cpp
-  btkVTKInteractorStyleTrackballCamera.cpp
+  btkVTKInteractorStyleTrackballFixedUpCamera.cpp
   btkVTKMarkersSource.cpp
   btkVTKMarkersFramesSource.cpp
   )

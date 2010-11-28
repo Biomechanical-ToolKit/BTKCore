@@ -39,7 +39,7 @@
 #include "Viz3DWidget.h"
 #include "UserRoles.h"
 
-#include <btkVTKInteractorStyleTrackballCamera.h>
+#include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
 #include <btkVTKForcePlatformsSource.h>
 #include <btkVTKGroundSource.h>
 #include <btkVTKGRFsFramesSource.h>

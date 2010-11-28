@@ -38,7 +38,7 @@
 #include "Acquisition.h"
 
 #include <btkMacro.h>
-#include <btkVTKInteractorStyleTrackballCamera.h>
+#include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
 
 #include <vtkCamera.h>
 #include <vtkCollectionIterator.h>

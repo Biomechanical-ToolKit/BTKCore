@@ -37,9 +37,9 @@
 #include "Acquisition.h"
 
 #include <btkVTKAxesWidget.h>
-#include <btkVTKPickerInteractionCallback.h>
+#include <btkVTKMarkerPickerInteractionCallback.h>
 #include <btkVTKRubberRenderInteractionCallback.h>
-#include <btkVTKInteractorStyleTrackballCamera.h>
+#include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
 
 #include <vtkRenderWindow.h>
 #include <vtkCellPicker.h>

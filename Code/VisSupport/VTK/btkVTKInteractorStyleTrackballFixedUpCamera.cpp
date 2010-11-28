@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkVTKInteractorStyleTrackballCamera.h"
+#include "btkVTKInteractorStyleTrackballFixedUpCamera.h"
 
 #include <Eigen/Eigen>
 
@@ -50,7 +50,7 @@
 namespace btk
 {
   /**
-   * @class VTKInteractorStyleTrackballCamera btkVTKInteractorStyleTrackballCamera.h
+   * @class VTKInteractorStyleTrackballCamera btkVTKInteractorStyleTrackballFixedUpCamera.h
    * @brief Another implementation of a virtual trackball
    *
    * @warning This class is not yet finished. Some problems with the view-up vector.
