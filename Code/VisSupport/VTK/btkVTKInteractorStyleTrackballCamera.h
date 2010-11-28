@@ -79,8 +79,12 @@ namespace btk
     BTK_VTK_EXPORT virtual void OnMouseMove();
     BTK_VTK_EXPORT virtual void OnChar();
     
+    vtkGetMacro(ForceRubberBandDrawing,int);
+    vtkSetMacro(ForceRubberBandDrawing,int);
+    vtkBooleanMacro(ForceRubberBandDrawing,int);
     void GetRubberBandPoints(int pts[4]) const;
     void Rubber();
+    void RedrawRubberBand();
     void UpdateRubberBackground();
     virtual void StartRubberBand();
     virtual void EndRubberBand();
@@ -90,13 +94,15 @@ namespace btk
     ~VTKInteractorStyleTrackballCamera();
     
   private:
-    int mp_RubberBandGeometry[2][2];
     int RotationEnabled;
     int SpinEnabled;
     int PanEnabled;
     int DollyEnabled;
     int CharEventEnabled;
-    vtkUnsignedCharArray* mp_PixelArray;
+    int mp_RubberBandCorners[2][2];
+    vtkUnsignedCharArray* mp_RubberBandHorizontalLinesForeground[4];
+    vtkUnsignedCharArray* mp_RubberBandHorizontalLinesBackground[4];
+    int ForceRubberBandDrawing;
   };
 };
 
