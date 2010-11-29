@@ -46,11 +46,11 @@ class vtkUnsignedCharArray;
 
 namespace btk
 {
-  class VTKInteractorStyleTrackballCamera : public vtkInteractorStyleTrackballCamera
+  class VTKInteractorStyleTrackballFixedUpCamera : public vtkInteractorStyleTrackballCamera
   {
   public:
-    BTK_VTK_EXPORT static VTKInteractorStyleTrackballCamera* New();
-    vtkExportedTypeRevisionMacro(VTKInteractorStyleTrackballCamera, vtkInteractorStyleTrackballCamera, BTK_VTK_EXPORT);
+    BTK_VTK_EXPORT static VTKInteractorStyleTrackballFixedUpCamera* New();
+    vtkExportedTypeRevisionMacro(VTKInteractorStyleTrackballFixedUpCamera, vtkInteractorStyleTrackballCamera, BTK_VTK_EXPORT);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
     BTK_VTK_EXPORT virtual void Rotate();
@@ -90,8 +90,8 @@ namespace btk
     virtual void EndRubberBand();
     
   protected:
-    BTK_VTK_EXPORT VTKInteractorStyleTrackballCamera();
-    ~VTKInteractorStyleTrackballCamera();
+    BTK_VTK_EXPORT VTKInteractorStyleTrackballFixedUpCamera();
+    ~VTKInteractorStyleTrackballFixedUpCamera();
     
   private:
     int RotationEnabled;

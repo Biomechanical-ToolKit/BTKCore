@@ -67,7 +67,7 @@ namespace btk
   static int VTKPickerMouseMotion = 0;
 
   /**
-   * Add mouse picking to the interactor VTKInteractorStyleTrackballCamera style.
+   * Add mouse picking to the interactor VTKInteractorStyleTrackballFixedUpCamera style.
    * Multiple choices are available, by priority:
    *  - In static mode (no mouse mouvement):
    *     - LMB + Ctrl + Shift: Send the event VTKToggleTrajectoryMarkerPickedEvent when the cell picker found a marker (gives you the possibility to display marker's trajectory).
@@ -83,7 +83,7 @@ namespace btk
       void* clientdata, 
       void* /* calldata */)
   { 
-    VTKInteractorStyleTrackballCamera* style = static_cast<VTKInteractorStyleTrackballCamera*>(clientdata);
+    VTKInteractorStyleTrackballFixedUpCamera* style = static_cast<VTKInteractorStyleTrackballFixedUpCamera*>(clientdata);
     vtkRenderWindowInteractor* iren = style->GetInteractor();
     if (!iren)
       return;

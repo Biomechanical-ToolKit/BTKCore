@@ -50,23 +50,23 @@
 namespace btk
 {
   /**
-   * @class VTKInteractorStyleTrackballCamera btkVTKInteractorStyleTrackballFixedUpCamera.h
+   * @class VTKInteractorStyleTrackballFixedUpCamera btkVTKInteractorStyleTrackballFixedUpCamera.h
    * @brief Another implementation of a virtual trackball
    *
    * @warning This class is not yet finished. Some problems with the view-up vector.
    */
    
   /**
-   * @fn static VTKInteractorStyleTrackballCamera* VTKInteractorStyleTrackballCamera::New();
-   * Creates a VTKInteractorStyleTrackballCamera object and return it as a pointer.
+   * @fn static VTKInteractorStyleTrackballFixedUpCamera* VTKInteractorStyleTrackballFixedUpCamera::New();
+   * Creates a VTKInteractorStyleTrackballFixedUpCamera object and return it as a pointer.
    */
-  vtkStandardNewMacro(VTKInteractorStyleTrackballCamera);
-  vtkCxxRevisionMacro(VTKInteractorStyleTrackballCamera, "$Revision: 0.1 $");
+  vtkStandardNewMacro(VTKInteractorStyleTrackballFixedUpCamera);
+  vtkCxxRevisionMacro(VTKInteractorStyleTrackballFixedUpCamera, "$Revision: 0.1 $");
   
   /**
    * Prints Superclass informations.
    */
-  void VTKInteractorStyleTrackballCamera::PrintSelf(ostream& os, vtkIndent indent)
+  void VTKInteractorStyleTrackballFixedUpCamera::PrintSelf(ostream& os, vtkIndent indent)
   {
     this->Superclass::PrintSelf(os,indent);
   };
@@ -74,7 +74,7 @@ namespace btk
   /**
    * Overloaded method to determine the position of the camera around the centre.
    */
-  void VTKInteractorStyleTrackballCamera::Rotate()
+  void VTKInteractorStyleTrackballFixedUpCamera::Rotate()
   {
 #if 0
     if (this->RotationEnabled)
@@ -133,7 +133,7 @@ namespace btk
   /**
    * Constructor.
    */
-  VTKInteractorStyleTrackballCamera::VTKInteractorStyleTrackballCamera()
+  VTKInteractorStyleTrackballFixedUpCamera::VTKInteractorStyleTrackballFixedUpCamera()
   : vtkInteractorStyleTrackballCamera()
   {
     // Rubber band geometry
@@ -162,10 +162,10 @@ namespace btk
   };
   
   /**
-   * @fn VTKInteractorStyleTrackballCamera::~VTKInteractorStyleTrackballCamera()
+   * @fn VTKInteractorStyleTrackballFixedUpCamera::~VTKInteractorStyleTrackballFixedUpCamera()
    * Empty destructor.
    */
-  VTKInteractorStyleTrackballCamera::~VTKInteractorStyleTrackballCamera()
+  VTKInteractorStyleTrackballFixedUpCamera::~VTKInteractorStyleTrackballFixedUpCamera()
   {
     this->mp_RubberBandHorizontalLinesForeground[0]->Delete();
     this->mp_RubberBandHorizontalLinesForeground[1]->Delete();
@@ -180,7 +180,7 @@ namespace btk
   /**
    * Overload method to enable/disable VTK key event by using Get/Set CharEventEnabled.
    */ 
-  void VTKInteractorStyleTrackballCamera::OnChar()
+  void VTKInteractorStyleTrackballFixedUpCamera::OnChar()
   {
     if (this->CharEventEnabled)
       this->Superclass::OnChar();
@@ -189,7 +189,7 @@ namespace btk
   /**
    * Return the screen coordinates of the 2 points defining the rubber band.
    */
-  void VTKInteractorStyleTrackballCamera::GetRubberBandPoints(int pts[4]) const
+  void VTKInteractorStyleTrackballFixedUpCamera::GetRubberBandPoints(int pts[4]) const
   {
     pts[0] = this->mp_RubberBandCorners[0][0];
     pts[1] = this->mp_RubberBandCorners[0][1];
@@ -200,7 +200,7 @@ namespace btk
   /**
    * Select the task to do based on the key modifiers pressed.
    */ 
-  void VTKInteractorStyleTrackballCamera::OnLeftButtonDown()
+  void VTKInteractorStyleTrackballFixedUpCamera::OnLeftButtonDown()
   {
     if (this->Interactor == NULL)
       return;
@@ -215,15 +215,15 @@ namespace btk
       this->StartRubberBand();
     else if (this->Interactor->GetAltKey()) 
     {
-      if (this->Interactor->GetControlKey() && this->DollyEnabled) 
-        this->StartDolly();
+      if (this->Interactor->GetControlKey() && this->SpinEnabled) 
+        this->StartSpin();
       else if (this->PanEnabled)
         this->StartPan();
     } 
     else 
     {
-      if (this->Interactor->GetControlKey() && this->SpinEnabled) 
-        this->StartSpin();
+      if (this->Interactor->GetControlKey() && this->DollyEnabled) 
+        this->StartDolly();
       else if (this->RotationEnabled)
         this->StartRotate();
     }
@@ -233,7 +233,7 @@ namespace btk
   /**
    * Select the task to do based on the key modifiers pressed.
    */
-  void VTKInteractorStyleTrackballCamera::OnLeftButtonUp()
+  void VTKInteractorStyleTrackballFixedUpCamera::OnLeftButtonUp()
   {
     switch (this->State) 
     {
@@ -260,7 +260,7 @@ namespace btk
   /**
    * Select the task to do based on the key modifiers pressed.
    */ 
-  void VTKInteractorStyleTrackballCamera::OnRightButtonDown()
+  void VTKInteractorStyleTrackballFixedUpCamera::OnRightButtonDown()
   {
     if (this->DollyEnabled)
       this->Superclass::OnRightButtonDown();
@@ -269,7 +269,7 @@ namespace btk
   /**
    * Select the task to do based on the key modifiers pressed.
    */
-  void VTKInteractorStyleTrackballCamera::OnRightButtonUp()
+  void VTKInteractorStyleTrackballFixedUpCamera::OnRightButtonUp()
   {
     if (this->DollyEnabled)
       this->Superclass::OnRightButtonUp();
@@ -278,7 +278,7 @@ namespace btk
   /**
    * Select the task to do based on the key modifiers pressed.
    */
-  void VTKInteractorStyleTrackballCamera::OnMouseMove()
+  void VTKInteractorStyleTrackballFixedUpCamera::OnMouseMove()
   {
     int x = this->Interactor->GetEventPosition()[0];
     int y = this->Interactor->GetEventPosition()[1];
@@ -316,7 +316,7 @@ namespace btk
   /**
    * Update the rubber band and draw it
    */
-  void VTKInteractorStyleTrackballCamera::Rubber()
+  void VTKInteractorStyleTrackballFixedUpCamera::Rubber()
   {
     if (this->CurrentRenderer == NULL)
       return;
@@ -404,7 +404,7 @@ namespace btk
       renWin->Frame();
   };
   
-  void VTKInteractorStyleTrackballCamera::RedrawRubberBand()
+  void VTKInteractorStyleTrackballFixedUpCamera::RedrawRubberBand()
   {
     vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
     int* size = renWin->GetSize();
@@ -414,7 +414,7 @@ namespace btk
     renWin->SetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, this->mp_RubberBandHorizontalLinesForeground[3]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
   };
   
-  void VTKInteractorStyleTrackballCamera::UpdateRubberBackground()
+  void VTKInteractorStyleTrackballFixedUpCamera::UpdateRubberBackground()
   {
     vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
     int* size = renWin->GetSize();
@@ -433,7 +433,7 @@ namespace btk
   /**
    * Activate the rubber band.
    */
-  void VTKInteractorStyleTrackballCamera::StartRubberBand()
+  void VTKInteractorStyleTrackballFixedUpCamera::StartRubberBand()
   {
     if (this->State != VTKIS_NONE) 
       return;
@@ -455,7 +455,7 @@ namespace btk
   /**
    * Stop the rubber band and erase it from the screen.
    */
-  void VTKInteractorStyleTrackballCamera::EndRubberBand()
+  void VTKInteractorStyleTrackballFixedUpCamera::EndRubberBand()
   {
     if (this->State != btk_VTKISTC_RUBBER) 
       return;

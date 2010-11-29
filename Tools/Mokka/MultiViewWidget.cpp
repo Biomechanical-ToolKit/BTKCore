@@ -728,13 +728,13 @@ void MultiViewWidget::hideAllMarkers()
 void MultiViewWidget::forceRubberBandDrawingOn()
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-    static_cast<btk::VTKInteractorStyleTrackballCamera*>(static_cast<Viz3DWidget*>((*it)->stackedWidget->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOn();
+    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>((*it)->stackedWidget->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOn();
 };
 
 void MultiViewWidget::forceRubberBandDrawingOff()
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-    static_cast<btk::VTKInteractorStyleTrackballCamera*>(static_cast<Viz3DWidget*>((*it)->stackedWidget->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOff();
+    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>((*it)->stackedWidget->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOff();
 };
 
 void MultiViewWidget::dragEnterEvent(QDragEnterEvent *event)

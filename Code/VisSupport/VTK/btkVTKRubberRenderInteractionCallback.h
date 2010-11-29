@@ -51,7 +51,7 @@ namespace btk
       void* clientdata, 
       void* /* calldata */)
   { 
-    VTKInteractorStyleTrackballCamera* style = static_cast<VTKInteractorStyleTrackballCamera*>(clientdata);
+    VTKInteractorStyleTrackballFixedUpCamera* style = static_cast<VTKInteractorStyleTrackballFixedUpCamera*>(clientdata);
     if (style->GetState() == btk_VTKISTC_RUBBER)
     {
       style->RedrawRubberBand();

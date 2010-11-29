@@ -248,7 +248,7 @@ void CompositeView::finalizeView(int idx)
 {
   disconnect(this->funcCombo, 0, 0, 0);
   Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->stackedWidget->widget(Viz3D));
-  btk::VTKInteractorStyleTrackballCamera* style = static_cast<btk::VTKInteractorStyleTrackballCamera*>(viz3D->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
+  btk::VTKInteractorStyleTrackballFixedUpCamera* style = static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(viz3D->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
   vtkCamera* cam = viz3D->renderer()->GetActiveCamera();
   if (idx == Viz3DProjection)
   {
