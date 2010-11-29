@@ -72,6 +72,10 @@ namespace btk
     vtkSetMacro(CharEventEnabled,int);
     vtkBooleanMacro(CharEventEnabled,int);
     
+    vtkGetMacro(RightButtonEnabled,int);
+    vtkSetMacro(RightButtonEnabled,int);
+    vtkBooleanMacro(RightButtonEnabled,int);
+    
     BTK_VTK_EXPORT virtual void OnLeftButtonDown();
     BTK_VTK_EXPORT virtual void OnLeftButtonUp();
     BTK_VTK_EXPORT virtual void OnRightButtonDown();
@@ -99,6 +103,7 @@ namespace btk
     int PanEnabled;
     int DollyEnabled;
     int CharEventEnabled;
+    int RightButtonEnabled;
     int mp_RubberBandCorners[2][2];
     vtkUnsignedCharArray* mp_RubberBandHorizontalLinesForeground[4];
     vtkUnsignedCharArray* mp_RubberBandHorizontalLinesBackground[4];

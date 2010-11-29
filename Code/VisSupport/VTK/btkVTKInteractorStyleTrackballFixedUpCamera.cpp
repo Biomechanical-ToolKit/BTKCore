@@ -149,6 +149,7 @@ namespace btk
     this->PanEnabled = 1;
     this->DollyEnabled = 1;
     this->CharEventEnabled = 1;
+    this->RightButtonEnabled = 1;
     this->ForceRubberBandDrawing = 1;
     // Rubber band
     this->mp_RubberBandHorizontalLinesForeground[0] = vtkUnsignedCharArray::New();
@@ -262,7 +263,7 @@ namespace btk
    */ 
   void VTKInteractorStyleTrackballFixedUpCamera::OnRightButtonDown()
   {
-    if (this->DollyEnabled)
+    if (this->RightButtonEnabled)
       this->Superclass::OnRightButtonDown();
   };
   
@@ -271,7 +272,7 @@ namespace btk
    */
   void VTKInteractorStyleTrackballFixedUpCamera::OnRightButtonUp()
   {
-    if (this->DollyEnabled)
+    if (this->RightButtonEnabled)
       this->Superclass::OnRightButtonUp();
   };
   
