@@ -386,7 +386,9 @@ void ModelDockWidget::load()
   // Update the recent colors
   this->drawRecentColors();
   
-  this->sendHiddenMarkers(); // For the virtual markers hideen by default.
+  this->sendHiddenMarkers(); // For the virtual markers hidden by default.
+  if (this->m_CurrentConfigurationIndex != -1)
+    this->loadConfiguration(this->m_ConfigurationItems[this->m_CurrentConfigurationIndex].filename); // Reload the current configuration
 };
 
 void ModelDockWidget::reset()

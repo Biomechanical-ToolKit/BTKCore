@@ -85,7 +85,7 @@ void Viz3DWidget::initialize()
   // VTK interaction style
   btk::VTKInteractorStyleTrackballFixedUpCamera* style = btk::VTKInteractorStyleTrackballFixedUpCamera::New();
   style->CharEventEnabledOff();
-  style->SpinEnabledOff(); // Conflict with the right click button for the contextual menu, and not really needed with the style used.
+  style->RightButtonEnabledOff(); // Conflict with the right click button for the contextual menu.
   vtkCallbackCommand* pickerMouseInteraction = vtkCallbackCommand::New();
   pickerMouseInteraction->SetClientData(style);
   pickerMouseInteraction->SetCallback(&btk::VTKPickerInteractionCallback);
