@@ -37,6 +37,8 @@
 #include "btkVTKDataObjectAdapter.h"
 #include "btkConvert.h"
 
+#include <Eigen/Eigen>
+
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkObjectFactory.h>
