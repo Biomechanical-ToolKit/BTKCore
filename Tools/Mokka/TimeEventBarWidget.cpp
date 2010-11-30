@@ -335,13 +335,16 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
     {
       if (event->modifiers() & Qt::ShiftModifier) 
         frame = this->m_LeftBoundPos + fineShift;
-      if (frame > this->m_SliderPos)
-        frame = this->m_SliderPos;
-      else if (frame < this->m_ROIFirstFrame)
+      if (frame < this->m_ROIFirstFrame)
         frame = this->m_ROIFirstFrame;
-      else if (frame > this->m_ROILastFrame)
-        frame = this->m_ROILastFrame;
+      else if (frame > this->m_RightBoundPos)
+        frame = this->m_RightBoundPos;
       this->m_LeftBoundPos = frame;
+      if (this->m_SliderPos < this->m_LeftBoundPos)
+      {
+        this->m_SliderPos = this->m_LeftBoundPos;
+        this->updateSliderPostion();
+      }
       this->updateLeftBoundPostion();
       emit leftBoundPositionChanged(this->m_LeftBoundPos);
       this->repaint();
@@ -350,13 +353,16 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
     {
       if (event->modifiers() & Qt::ShiftModifier) 
         frame = this->m_RightBoundPos + fineShift;
-      if (frame < this->m_SliderPos)
-        frame = this->m_SliderPos;
-      else if (frame < this->m_ROIFirstFrame)
-        frame = this->m_ROIFirstFrame;
+      if (frame < this->m_LeftBoundPos)
+        frame = this->m_LeftBoundPos;
       else if (frame > this->m_ROILastFrame)
         frame = this->m_ROILastFrame;
       this->m_RightBoundPos = frame;
+      if (this->m_SliderPos > this->m_RightBoundPos)
+      {
+        this->m_SliderPos = this->m_RightBoundPos;
+        this->updateSliderPostion();
+      }
       this->updateRightBoundPostion();
       emit rightBoundPositionChanged(this->m_RightBoundPos);
       this->repaint();
