@@ -387,8 +387,22 @@ void ModelDockWidget::load()
   this->drawRecentColors();
   
   this->sendHiddenMarkers(); // For the virtual markers hidden by default.
-  if (this->m_CurrentConfigurationIndex != -1)
-    this->loadConfiguration(this->m_ConfigurationItems[this->m_CurrentConfigurationIndex].filename); // Reload the current configuration
+  
+  // Detect the visual configuration or reload the current one
+  QFileInfo fi(this->mp_Acquisition->fileName());
+  int configIndex = this->modelConfigurationComboBox->findText(fi.baseName());
+  if (configIndex != -1)
+    this->selectConfiguration(configIndex);
+  else
+  {
+    fi.setFile(fi.canonicalPath() + "/" + fi.completeBaseName() + ".mvc");
+    if (fi.exists())
+      this->loadConfiguration(fi.canonicalFilePath());
+    else if (this->m_CurrentConfigurationIndex != -1)
+      this->loadConfiguration(this->m_ConfigurationItems[this->m_CurrentConfigurationIndex].filename); // Reload the current configuration
+  }
+  
+  
 };
 
 void ModelDockWidget::reset()
