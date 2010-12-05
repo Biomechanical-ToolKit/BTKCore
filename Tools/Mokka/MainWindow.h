@@ -43,12 +43,7 @@
 #include "ModelDockWidget.h"
 #include "UserRoles.h"
 
-#include <btkAcquisitionFileIO.h>
-#include <btkPointCollection.h>
-
-#include <QTimer>
-#include <QUndoStack>
-#include <QXmlStreamWriter>
+class QUndoStack;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -117,8 +112,7 @@ private:
   void setCurrentFile(const QString& rFilename);
   bool isOkToContinue();
   
-  btk::Acquisition::Pointer mp_Acquisition;
-  Acquisition* mp_AcquisitionQ;
+  Acquisition* mp_Acquisition;
   Metadata* mp_MetadataDlg;
   FileInfoDockWidget* mp_FileInfoDock;
   ModelDockWidget* mp_ModelDock;

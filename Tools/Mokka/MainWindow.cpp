@@ -41,22 +41,18 @@
 
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QDateTime>
 #include <QCloseEvent>
-#include <QTableWidgetItem>
-#include <QColorDialog>
 #include <QMessageBox>
 #include <QSettings>
 #include <QDesktopServices>
-#include <QXmlStreamReader>
-#include <QTemporaryFile>
 #include <QDesktopWidget>
+#include <QUndoStack>
 
 MainWindow::MainWindow(QWidget* parent)
-:QMainWindow(parent), mp_Acquisition(), m_LastDirectory(".")
+:QMainWindow(parent), m_LastDirectory(".")
 {
   // Members
-  this->mp_AcquisitionQ = new Acquisition(this);
+  this->mp_Acquisition = new Acquisition(this);
   this->mp_MetadataDlg = new Metadata(this);
   this->mp_ModelDock = new ModelDockWidget(this);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
@@ -121,10 +117,10 @@ MainWindow::MainWindow(QWidget* parent)
   this->multiView->setViewActions(actions);
   
   // Setting the acquisition
-  this->multiView->setAcquisition(this->mp_AcquisitionQ);
-  this->mp_ModelDock->setAcquisition(this->mp_AcquisitionQ);
-  this->mp_FileInfoDock->setAcquisition(this->mp_AcquisitionQ);
-  this->timeEventControler->setAcquisition(this->mp_AcquisitionQ);
+  this->multiView->setAcquisition(this->mp_Acquisition);
+  this->mp_ModelDock->setAcquisition(this->mp_Acquisition);
+  this->mp_FileInfoDock->setAcquisition(this->mp_Acquisition);
+  this->timeEventControler->setAcquisition(this->mp_Acquisition);
   
   // Qt UI: Undo/Redo
   this->mp_UndoStack = new QUndoStack(this); // One to command all.
@@ -215,7 +211,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 MainWindow::~MainWindow()
 {
-  delete this->mp_AcquisitionQ;
+  delete this->mp_Acquisition;
 };
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -422,8 +418,7 @@ bool MainWindow::isOkToContinue()
 
 void MainWindow::play()
 {
-  if (this->mp_Acquisition)
-    this->timeEventControler->togglePlayback();
+  this->timeEventControler->togglePlayback();
 };
 
 void MainWindow::loadConfiguration(const QString& filename)
@@ -470,7 +465,7 @@ void MainWindow::openFile(const QString& filename)
   pw.show();
   this->reset();
 
-  QString errMsg = this->mp_AcquisitionQ->load(filename);
+  QString errMsg = this->mp_Acquisition->load(filename);
   if (!errMsg.isEmpty())
   {
     QApplication::restoreOverrideCursor();
@@ -479,20 +474,19 @@ void MainWindow::openFile(const QString& filename)
     error.exec();
     return;
   }
-  this->mp_Acquisition = this->mp_AcquisitionQ->btkAcquisition();
   this->setCurrentFile(filename);
   
   pw.setProgressValue(25);
   
   this->multiView->load();
-  this->multiView->updateDisplay(this->mp_AcquisitionQ->firstFrame()); // Required
+  this->multiView->updateDisplay(this->mp_Acquisition->firstFrame()); // Required
   
   pw.setProgressValue(60);
   
   this->timeEventControler->load();
-  this->mp_MetadataDlg->load(this->mp_Acquisition->GetMetaData());
+  this->mp_MetadataDlg->load(this->mp_Acquisition->btkAcquisition()->GetMetaData());
   this->mp_ModelDock->load();
-  if (this->mp_AcquisitionQ->hasPoints() || this->mp_AcquisitionQ->hasAnalogs())
+  if (this->mp_Acquisition->hasPoints() || this->mp_Acquisition->hasAnalogs())
     this->mp_ModelDock->setVisible(true);
   
   pw.setProgressValue(85);
@@ -533,7 +527,7 @@ void MainWindow::saveFile(const QString& filename)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
   
-  QString errMsg = this->mp_AcquisitionQ->save(filename);
+  QString errMsg = this->mp_Acquisition->save(filename);
   if (!errMsg.isEmpty())
   {
     QApplication::restoreOverrideCursor();
@@ -639,87 +633,87 @@ void MainWindow::modelDockLocationChanged(Qt::DockWidgetArea area)
 void MainWindow::setPointLabel(int id, const QString& label)
 {
   // TODO: Group two undo commands to modify the acquisition and the configuration
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditPointLabel(this->mp_AcquisitionQ, id, label)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditPointLabel(this->mp_Acquisition, id, label)));
 };
 
 void MainWindow::setMarkersRadius(const QVector<int>& ids, double radius)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditMarkersRadius(this->mp_AcquisitionQ, ids, radius)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditMarkersRadius(this->mp_Acquisition, ids, radius)));
 };
 
 void MainWindow::setMarkersColor(const QVector<int>& ids, const QColor& color)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditMarkersColor(this->mp_AcquisitionQ, ids, color)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditMarkersColor(this->mp_Acquisition, ids, color)));
 };
 
 void MainWindow::setPointsDescription(const QVector<int>& ids, const QString& desc)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditPointDescription(this->mp_AcquisitionQ, ids, desc)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditPointDescription(this->mp_Acquisition, ids, desc)));
 };
 
 void MainWindow::removePoints(const QList<int>& ids)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemovePoints(this->mp_AcquisitionQ, ids)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemovePoints(this->mp_Acquisition, ids)));
 };
 
 void MainWindow::setAnalogLabel(int id, const QString& label)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogLabel(this->mp_AcquisitionQ, id, label)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogLabel(this->mp_Acquisition, id, label)));
 };
 
 void MainWindow::setAnalogsDescription(const QVector<int>& ids, const QString& desc)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogDescription(this->mp_AcquisitionQ, ids, desc)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogDescription(this->mp_Acquisition, ids, desc)));
 };
 
 void MainWindow::setAnalogsUnit(const QVector<int>& ids, const QString& unit)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsUnit(this->mp_AcquisitionQ, ids, unit)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsUnit(this->mp_Acquisition, ids, unit)));
 };
 
 void MainWindow::setAnalogsGain(const QVector<int>& ids, Analog::Gain gain)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsGain(this->mp_AcquisitionQ, ids, gain)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsGain(this->mp_Acquisition, ids, gain)));
 };
 
 void MainWindow::setAnalogsOffset(const QVector<int>& ids, int offset)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsOffset(this->mp_AcquisitionQ, ids, offset)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsOffset(this->mp_Acquisition, ids, offset)));
 };
 
 void MainWindow::setAnalogsScale(const QVector<int>& ids, double scale)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsScale(this->mp_AcquisitionQ, ids, scale)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditAnalogsScale(this->mp_Acquisition, ids, scale)));
 };
 
 void MainWindow::removeAnalogs(const QList<int>& ids)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveAnalogs(this->mp_AcquisitionQ, ids)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveAnalogs(this->mp_Acquisition, ids)));
 };
 
 void MainWindow::setEventFrame(int id, int frame)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditEventFrame(this->mp_AcquisitionQ, id, frame)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditEventFrame(this->mp_Acquisition, id, frame)));
 };
 
 void MainWindow::setEvents(QList<int> ids, QList<Event*> events)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new SetEvents(this->mp_AcquisitionQ, ids, events)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new SetEvents(this->mp_Acquisition, ids, events)));
 };
 
 void MainWindow::removeEvents(const QList<int>& ids)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveEvents(this->mp_AcquisitionQ, ids)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveEvents(this->mp_Acquisition, ids)));
 };
 
 void MainWindow::setRegionOfInterest(int lf,int ff)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditRegionOfInterest(this->mp_AcquisitionQ, lf, ff)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditRegionOfInterest(this->mp_Acquisition, lf, ff)));
 };
 
 void MainWindow::insertEvent(Event* e)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvent(this->mp_AcquisitionQ, e)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvent(this->mp_Acquisition, e)));
 };
 
 void MainWindow::readSettings()

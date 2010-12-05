@@ -253,10 +253,13 @@ void TimeEventControlerWidget::reset()
 
 void TimeEventControlerWidget::togglePlayback()
 {
-  if (this->mp_Timer->isActive())
-    this->stopPlayback();
-  else
-    this->startPlayback();
+  if (this->isEnabled())
+  {
+    if (this->mp_Timer->isActive())
+      this->stopPlayback();
+    else
+      this->startPlayback();
+  }
 };
 
 void TimeEventControlerWidget::startPlayback()
