@@ -120,7 +120,7 @@ namespace btk
     output->Reset();
     // Open the stream
     std::ifstream ifs;
-    ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
+    //ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
     try
     {
       std::string line;
@@ -202,6 +202,9 @@ namespace btk
         }
         for(int i = 0 ; i < numberOfFrames ; ++i)
         {
+          if (ifs.eof())
+            throw(TRCFileIOException("Unexpected end of file."));
+          
           ifs >> buf; // Frame#
           ifs >> buf; // Time
           std::getline(ifs, line);
