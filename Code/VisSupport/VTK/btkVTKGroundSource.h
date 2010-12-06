@@ -54,6 +54,8 @@ namespace btk
     BTK_VTK_EXPORT void SetInput(Acquisition::Pointer input);
     
     BTK_VTK_EXPORT void SetOrientation(Orientation o);
+    
+    void GetNormal(double n[3]) const {n[0] = this->mp_Normal[0]; n[1] = this->mp_Normal[1]; n[2] = this->mp_Normal[2];};
         
   protected:
     VTKGroundSource();

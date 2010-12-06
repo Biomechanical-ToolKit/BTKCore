@@ -133,7 +133,7 @@ namespace btk
           btk::MetaData::ConstIterator itPoint = input->GetMetaData()->FindChild("POINT");
           if (itPoint != input->GetMetaData()->End())
           {
-            btk::MetaDataInfo::Pointer yScreenInfo = (*itPoint)->ExtractChildInfo("Y_SCREEN", MetaDataInfo::Char, 2);
+            btk::MetaDataInfo::Pointer yScreenInfo = (*itPoint)->ExtractChildInfo("Y_SCREEN", MetaDataInfo::Char, 1);
             if (yScreenInfo)
             {
               std::string yScreenVal = yScreenInfo->ToString(0);
