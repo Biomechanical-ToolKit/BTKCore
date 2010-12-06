@@ -74,6 +74,7 @@ public:
   double* markerColorValue(int c);
   bool appendNewMarkerColor(const QColor& color, int* idx);
   QMenu* groundOrientationMenu() const {return this->mp_GroupOrientationMenu;};
+  const QString groundNormalAsString() const;
   
 public slots:
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
@@ -110,6 +111,7 @@ private slots:
   void changeGroundOrientation();
   
 private:
+  void updateCameras();
   void updateViews();
   
   Acquisition* mp_Acquisition;

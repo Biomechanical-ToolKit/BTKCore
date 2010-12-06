@@ -313,8 +313,6 @@ void MultiViewWidget::setAcquisition(Acquisition* acq)
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
     static_cast<CompositeView*>(*it)->setAcquisition(this->mp_Acquisition);
   // BTK->VTK connection
-  btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
-  ground->SetInput(this->mp_Acquisition->btkAcquisition());
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   markers->SetInput(0, this->mp_Acquisition->btkMarkers());
   markers->SetInput(1, this->mp_Acquisition->btkVirtualMarkers());
@@ -348,7 +346,8 @@ void MultiViewWidget::load()
     scale = 1000.0;
   
   btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
-  ground->Modified(); // Force to update
+  ground->SetInput(this->mp_Acquisition->btkAcquisition());
+  ground->Update();
   btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::SafeDownCast((*this->mp_VTKProc)[VTK_FORCE_PLATFORMS]);
@@ -523,6 +522,8 @@ void MultiViewWidget::load()
   delete lwAnalog;
   */
   
+  this->updateCameras();
+  
   // Active the content of each view
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
   {
@@ -655,6 +656,18 @@ bool MultiViewWidget::appendNewMarkerColor(const QColor& color, int* idx)
   return modified;
 };
 
+const QString MultiViewWidget::groundNormalAsString() const
+{
+  QString str = "+Z";
+  btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
+  double n[3]; ground->GetNormal(n);
+  if (n[0] == 1.0)
+    str = "+X";
+  else if (n[1] == 1.0)
+    str = "+Y";
+  return str;
+};
+
 void MultiViewWidget::updateDisplayedMarkersList(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
 {
   vtkIdTypeArray* indexes = static_cast<vtkIdTypeArray*>(call_data);
@@ -782,7 +795,21 @@ void MultiViewWidget::changeGroundOrientation()
     ground->SetOrientation(btk::VTKGroundSource::PlaneYZ);
   else if (this->mp_ActionGroundOrientationPlaneZX->isChecked())
     ground->SetOrientation(btk::VTKGroundSource::PlaneZX);
+    
+  this->updateCameras();
   this->updateViews();
+};
+
+void MultiViewWidget::updateCameras()
+{
+  btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
+  ground->Update();
+  double n[3]; ground->GetNormal(n);
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    Viz3DWidget* viz3d = static_cast<Viz3DWidget*>((*it)->stackedWidget->widget(CompositeView::Viz3D));
+    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(viz3d->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->SetGlobalUp(n);
+  }
 };
 
 void MultiViewWidget::updateViews()
