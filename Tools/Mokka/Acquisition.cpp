@@ -37,10 +37,12 @@
 
 #include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileWriter.h>
+#include <btkMetaDataUtils.h>
 
 #include <Qt>
 #include <QFileInfo>
 #include <QDateTime>
+#include <QVariant>
 
 Acquisition::Acquisition(QObject* parent)
 : QObject(parent), mp_BTKAcquisition(), m_BTKProcesses(), m_Filename(),
@@ -237,7 +239,7 @@ QString Acquisition::load(const QString& filename)
   return "";
 };
 
-QString Acquisition::save(const QString& filename)
+QString Acquisition::save(const QString& filename, const QMap<int, QVariant>& properties)
 {
   btk::Acquisition::Pointer source = this->mp_BTKAcquisition;
   btk::Acquisition::Pointer target = btk::Acquisition::New();
@@ -263,6 +265,28 @@ QString Acquisition::save(const QString& filename)
   }
   // Metadata
   target->SetMetaData(source->GetMetaData()->Clone());
+  // - POINT
+  btk::MetaData::Pointer point;
+  btk::MetaData::Iterator it = target->GetMetaData()->FindChild("POINT");
+  if (it != target->GetMetaData()->End())
+    point = *it;
+  else
+  {
+    point = btk::MetaData::New("POINT");
+    target->GetMetaData()->AppendChild(point);
+  }
+  QString strProp;
+  QMap<int, QVariant>::const_iterator itProp;
+  // - POINT:X_SCREEN
+  strProp = "+X";
+  if ((itProp = properties.find(xScreen)) != properties.end())
+    strProp = itProp.value().toString();
+  btk::MetaDataCreateChild(point,"X_SCREEN", strProp.toStdString());
+  // - POINT:Y_SCREEN
+  strProp = "+Z";
+  if ((itProp = properties.find(yScreen)) != properties.end())
+    strProp = itProp.value().toString();
+  btk::MetaDataCreateChild(point,"Y_SCREEN", strProp.toStdString());
   // Point
   int numFramePoint = this->mp_ROI[1] - this->mp_ROI[0] + 1;
   int numPoints = 0;

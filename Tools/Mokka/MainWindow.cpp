@@ -527,7 +527,15 @@ void MainWindow::saveFile(const QString& filename)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
   
-  QString errMsg = this->mp_Acquisition->save(filename);
+  QMap<int, QVariant> properties;
+  QString strProp = this->multiView->groundNormalAsString();
+  properties.insert(Acquisition::yScreen, strProp);
+  if (strProp.compare("+X") == 0)
+    strProp = "+Y";
+  else
+    strProp = "+X";
+  properties.insert(Acquisition::xScreen, strProp);
+  QString errMsg = this->mp_Acquisition->save(filename,properties);
   if (!errMsg.isEmpty())
   {
     QApplication::restoreOverrideCursor();

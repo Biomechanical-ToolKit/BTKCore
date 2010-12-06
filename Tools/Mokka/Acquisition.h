@@ -90,11 +90,13 @@ class Acquisition : public QObject
   Q_OBJECT
   
 public:
+  typedef enum {xScreen, yScreen} Property;
+
   Acquisition(QObject* parent = 0);
   ~Acquisition();
   
   QString load(const QString& filename);
-  QString save(const QString& filename);
+  QString save(const QString& filename, const QMap<int, QVariant>& properties);
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
