@@ -88,9 +88,9 @@ TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
   this->mp_Rubber = new QRubberBand(QRubberBand::Rectangle, this);
   
   ushort s;
-  s = 0x25C8; this->m_EventSymbols[0].setUtf16(&s,1); // Foot strike: White diamond containing black small diamond
-  s = 0x25B2; this->m_EventSymbols[1].setUtf16(&s,1); // Foot off:    Black up-pointing triangle
-  s = 0x25C9; this->m_EventSymbols[2].setUtf16(&s,1); // Fisheye
+  s = 0x25C9; this->m_EventSymbols[0].setUtf16(&s,1); // General: Fisheye
+  s = 0x25C8; this->m_EventSymbols[1].setUtf16(&s,1); // Foot strike: White diamond containing black small diamond
+  s = 0x25B2; this->m_EventSymbols[2].setUtf16(&s,1); // Foot off:    Black up-pointing triangle
   s = 0x25CF; this->m_EventSymbols[3].setUtf16(&s,1); // Black circle
   s = 0x25CE; this->m_EventSymbols[4].setUtf16(&s,1); // Bullseye
   s = 0x25D2; this->m_EventSymbols[5].setUtf16(&s,1); // Circle with lower half black
@@ -514,9 +514,8 @@ void TimeEventBarWidget::setEventItem(EventItem& item, int id, const Event* e)
     item.contextId = 2;
     item.color = Qt::darkYellow;
   }
-  int iconId = e->iconId - 1; // Because Vicon use id 1 and 2 for the foot strike and foot off respectively
-  if ((iconId >= 0) && (iconId < this->m_EventSymbols.count()))
-    item.symbol = this->m_EventSymbols[iconId];
+  if ((e->iconId >= 0) && (e->iconId < this->m_EventSymbols.count()))
+    item.symbol = this->m_EventSymbols[e->iconId];
   else
     item.symbol = "?";
   item.frame = e->frame;
