@@ -58,25 +58,25 @@ namespace btk
       {
         int f = bifs->ReadU16();
         if (f != 0xFFFF)
-          output->AppendEvent(Event::New("Foot Off", f, "Left"));
+          output->AppendEvent(Event::New("Foot Off", f, "Left", Event::Unknown, "", "", 2));
       }
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
         if (f != 0xFFFF)
-          output->AppendEvent(Event::New("Foot Off", f, "Right"));
+          output->AppendEvent(Event::New("Foot Off", f, "Right", Event::Unknown, "", "", 2));
       }
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
         if (f != 0xFFFF)
-          output->AppendEvent(Event::New("Foot Strike", f, "Left"));
+          output->AppendEvent(Event::New("Foot Strike", f, "Left", Event::Unknown, "", "", 1));
       }
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
         if (f != 0xFFFF)
-          output->AppendEvent(Event::New("Foot Strike", f, "Right"));
+          output->AppendEvent(Event::New("Foot Strike", f, "Right", Event::Unknown, "", "", 1));
       }
       bifs->SeekRead(136, BinaryFileStream::Current); 
     }
