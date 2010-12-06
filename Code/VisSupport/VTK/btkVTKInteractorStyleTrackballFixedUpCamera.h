@@ -53,6 +53,9 @@ namespace btk
     vtkExportedTypeRevisionMacro(VTKInteractorStyleTrackballFixedUpCamera, vtkInteractorStyleTrackballCamera, BTK_VTK_EXPORT);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
+    void GetGlobalUp(double n[3]) const {n[0] = this->mp_GlobalUp[0]; n[1] = this->mp_GlobalUp[1]; n[2] = this->mp_GlobalUp[2];};
+    void SetGlobalUp(const double n[3]);
+    
     BTK_VTK_EXPORT virtual void Rotate();
     
     vtkGetMacro(RotationEnabled,int);
@@ -98,6 +101,7 @@ namespace btk
     ~VTKInteractorStyleTrackballFixedUpCamera();
     
   private:
+    double mp_GlobalUp[3];
     int RotationEnabled;
     int SpinEnabled;
     int PanEnabled;

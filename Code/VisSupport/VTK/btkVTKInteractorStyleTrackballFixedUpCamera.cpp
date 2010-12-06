@@ -71,6 +71,31 @@ namespace btk
     this->Superclass::PrintSelf(os,indent);
   };
   
+  void VTKInteractorStyleTrackballFixedUpCamera::SetGlobalUp(const double n[3])
+  {
+    this->FindPokedRenderer(0,0);
+    
+    if ((this->CurrentRenderer == NULL)
+      || (this->mp_GlobalUp[0] == n[0]) && (this->mp_GlobalUp[1] == n[1]) && (this->mp_GlobalUp[2] == n[2]))
+      return;
+      
+    vtkCamera* camera = this->CurrentRenderer->GetActiveCamera();
+    double* fp = camera->GetFocalPoint();
+    vtkTransform* Transform = vtkTransform::New(); 
+    Transform->Identity();
+    Transform->Translate(+fp[0],+fp[1],+fp[2]);
+    Transform->RotateWXYZ(90.0, Eigen::Matrix<double,3,1>(this->mp_GlobalUp).cross(Eigen::Matrix<double,3,1>(n)).normalized().data());
+    Transform->Translate(-fp[0],-fp[1],-fp[2]);
+    camera->ApplyTransform(Transform);
+    Transform->Delete();
+
+    camera->OrthogonalizeViewUp();
+    
+    this->mp_GlobalUp[0] = n[0];
+    this->mp_GlobalUp[1] = n[1];
+    this->mp_GlobalUp[2] = n[2];
+  };
+  
   /**
    * Overloaded method to determine the position of the camera around the centre.
    */
@@ -91,7 +116,7 @@ namespace btk
     
     Eigen::Matrix<double,3,1> cameraUp(camera->GetViewUp());
     Eigen::Matrix<double,3,1> cameraProj(camera->GetDirectionOfProjection());
-    Eigen::Matrix<double,3,1> globalUp = Eigen::Matrix<double,3,1>::UnitZ();
+    Eigen::Matrix<double,3,1> globalUp(this->mp_GlobalUp);
     
     //double angleRightTotal = std::acos(cameraProj.dot(globalUp)) * 180.0/M_PI;
     Eigen::Matrix<double,3,1> axisRight = cameraProj.cross(globalUp).normalized();
@@ -108,7 +133,6 @@ namespace btk
 #endif
 
     double* fp = camera->GetFocalPoint();
-
     vtkTransform* Transform = vtkTransform::New(); 
     Transform->Identity();
     Transform->Translate(+fp[0],+fp[1],+fp[2]);
@@ -136,6 +160,10 @@ namespace btk
   VTKInteractorStyleTrackballFixedUpCamera::VTKInteractorStyleTrackballFixedUpCamera()
   : vtkInteractorStyleTrackballCamera()
   {
+    // Global Up defined as the axis Z
+    this->mp_GlobalUp[0] = 0.0;
+    this->mp_GlobalUp[1] = 0.0;
+    this->mp_GlobalUp[2] = 1.0;
     // Rubber band geometry
     //  - Corner #1
     this->mp_RubberBandCorners[0][0] = 0;
