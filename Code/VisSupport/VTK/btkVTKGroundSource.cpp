@@ -50,6 +50,26 @@ namespace btk
    * 
    * @ingroup BTKVTK
    */
+  /**
+   * @enum VTKGroundSource::Orientation
+   * Enums used to specify the orientation of the ground.
+   */
+  /**
+   * @var VTKGroundSource::Orientation VTKGroundSource::Automatic
+   * Use the metada POINT:Y_SCREEN if available or set the orientation to PlaneXY.
+   */
+  /**
+   * @var VTKGroundSource::Orientation VTKGroundSource::PlaneXY
+   * Force the orientation to be defined by the axes X and Y.
+   */
+  /**
+   * @var VTKGroundSource::Orientation VTKGroundSource::PlaneYZ
+   * Force the orientation to be defined by the axes Y and Z.
+   */
+  /**
+   * @var VTKGroundSource::Orientation VTKGroundSource::PlaneZX
+   * Force the orientation to be defined by the axes Z and X.
+   */
   
   /**
    * @fn static VTKGroundSource* VTKGroundSource::New();
@@ -87,6 +107,11 @@ namespace btk
     this->m_Orientation = o;
     this->Modified();
   };
+  
+  /**
+   * @fn void VTKGroundSource::GetNormal(double n[3]) const 
+   * Returns the normal to the ground as a XYZ vector.
+   */
   
   /**
    * Constructor.

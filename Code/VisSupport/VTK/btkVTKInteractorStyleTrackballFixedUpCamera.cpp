@@ -71,6 +71,14 @@ namespace btk
     this->Superclass::PrintSelf(os,indent);
   };
   
+  /**
+   * @fn void VTKInteractorStyleTrackballFixedUpCamera::GetGlobalUp(double n[3]) const
+   * Returns the global up vector.
+   */
+  
+  /**
+   * Sets the global up vector and modify the camera orientation in consequence.
+   */
   void VTKInteractorStyleTrackballFixedUpCamera::SetGlobalUp(const double n[3])
   {
     this->FindPokedRenderer(0,0);
@@ -433,6 +441,9 @@ namespace btk
       renWin->Frame();
   };
   
+  /**
+   * Set the pixels' data into the final image with these representing the rubber band.
+   */
   void VTKInteractorStyleTrackballFixedUpCamera::RedrawRubberBand()
   {
     vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
@@ -443,6 +454,9 @@ namespace btk
     renWin->SetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, this->mp_RubberBandHorizontalLinesForeground[3]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
   };
   
+  /**
+   * Copy pixels' data from the final image to the the rubber band pixel data..
+   */
   void VTKInteractorStyleTrackballFixedUpCamera::UpdateRubberBackground()
   {
     vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();

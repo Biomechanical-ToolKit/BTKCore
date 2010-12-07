@@ -64,6 +64,8 @@ namespace btk
        VTKFrustumGenerator_p* mp_FrustumGenerator;
   };
   
+  // Doxygen commands cond/endcond used to not show this class in the documentation.
+  //! @cond
   class VTKFrustumGenerator_p : public vtkAreaPicker
   {
    public:
@@ -75,6 +77,7 @@ namespace btk
      VTKFrustumGenerator_p(): vtkAreaPicker() {};
      // ~FrustumGenerator(); // Implicit
   };
+  //! @endcond
 };
 
 #endif

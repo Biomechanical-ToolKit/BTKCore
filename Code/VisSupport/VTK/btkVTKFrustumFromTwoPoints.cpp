@@ -41,7 +41,7 @@
 namespace btk
 {
   /**
-   * @class VTKFrustumFromTwoPoints VTKFrustumFromTwoPoints.h
+   * @class VTKFrustumFromTwoPoints btkVTKFrustumFromTwoPoints.h
    * @brief Frustum's generator from two points defining a rectangle
    * 
    * @ingroup BTKVTK
@@ -54,6 +54,9 @@ namespace btk
   vtkStandardNewMacro(VTKFrustumFromTwoPoints);
   vtkCxxRevisionMacro(VTKFrustumFromTwoPoints, "$Revision: 0.1 $");
   
+  /**
+   * Generate a frustrum based on two points picked on the screen
+   */
   vtkPlanes* VTKFrustumFromTwoPoints::Generate(double x0, double y0, double x1, double y1, vtkRenderer* renderer)
   {
     if (renderer == NULL)
