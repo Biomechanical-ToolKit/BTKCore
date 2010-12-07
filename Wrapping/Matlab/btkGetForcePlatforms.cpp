@@ -48,7 +48,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("Too many output arguments.");
 
   // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput;
+  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput("btk:GetForcePlatforms");
   std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput);
 
   // First output
@@ -142,6 +142,5 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
   }
 
-  matlabErrorOutput.requestNewLine();
   std::cerr.rdbuf(stdErrorOutput);
 };

@@ -2,8 +2,9 @@
  @mainpage 
  This is the documentation to use BTK in Matlab.
  
- This documentation is separated in three parts:
+ This documentation is separated in four parts:
  - @ref Tutorial and @ref FAQ ;
+ - @ref ListWarnings "Warning identifiers" ;
  - <a class="el" href="modules.html">Modules</a> and associated functions ;
  - List of the implemented <a class="el" href="annotated.html">functions</a> and their description.
  

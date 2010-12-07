@@ -61,45 +61,32 @@ namespace btk
   class MEXStreambufToWarnMsgTxt : public std::streambuf
   {
   public:
-    inline MEXStreambufToWarnMsgTxt();
+    inline MEXStreambufToWarnMsgTxt(const std::string& id);
     // MEXStreambufToWarnMsgTxt(const MEXStreambufToWarnMsgTxt& toCopy); // Implicit.
     // ~MEXStreambufToWarnMsgTxt(); // Implicit.
     // MEXStreambufToWarnMsgTxt& operator=(const MEXStreambufToWarnMsgTxt& toCopy); // Implicit.
-    inline void requestNewLine(); 
 
   protected:
     inline virtual std::streamsize xsputn(const char* s, std::streamsize n); 
     inline virtual int overflow(int c = EOF);
 
   private:
+    std::string m_Id;
     std::string m_Message;
-    bool m_Used;
   };
 
   /**
    * Constructor
    */
-  MEXStreambufToWarnMsgTxt::MEXStreambufToWarnMsgTxt()
-  : m_Message()
-  {
-    this->m_Used = false;
-  }; 
-
-  /**
-   * Display a new line if some error was displayed.
-   */
-  void MEXStreambufToWarnMsgTxt::requestNewLine()
-  {
-    if (this->m_Used)
-      mexPrintf("\n");
-  };
+  MEXStreambufToWarnMsgTxt::MEXStreambufToWarnMsgTxt(const std::string& id)
+  : m_Id(id), m_Message()
+  {}; 
   
   /**
    * Overloaded method which calls the function mexWarnMsgTxt
    */
   std::streamsize MEXStreambufToWarnMsgTxt::xsputn(const char* s, std::streamsize n) 
   {
-    this->m_Used = true;
     this->m_Message += std::string(s);
     return n;
   };
@@ -111,7 +98,7 @@ namespace btk
   {
     if (c == 10) // New line
     {
-      mexWarnMsgTxt(this->m_Message.c_str());
+      mexWarnMsgIdAndTxt(this->m_Id.c_str(), this->m_Message.c_str());
       this->m_Message.clear();
     }
     else

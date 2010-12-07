@@ -53,7 +53,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::MEXStreambufToPrintf matlabStandardOutput;
   std::streambuf* stdStandardOutput = std::cout.rdbuf(&matlabStandardOutput);
   // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput;
+  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput("btk:ReadAcquisition");
   std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput);
 
   size_t strlen_ = (mxGetM(prhs[0]) * mxGetN(prhs[0]) * sizeof(mxChar)) + 1;
@@ -77,7 +77,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
    
   // Back to the previous output buffers.
-  matlabErrorOutput.requestNewLine();
   std::cout.rdbuf(stdStandardOutput);
   std::cerr.rdbuf(stdErrorOutput);
   

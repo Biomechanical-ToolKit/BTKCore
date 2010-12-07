@@ -52,13 +52,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     merger->SetInput(i, btk_MOH_get_object<btk::Acquisition>(prhs[i]));
 
   // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput;
+  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput("btk:MergeAcquisitions");
   std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput);
   
   merger->Update();
   
   // Back to the previous output buffers.
-  matlabErrorOutput.requestNewLine();
   std::cerr.rdbuf(stdErrorOutput);
   
   plhs[0] = btk_MOH_create_handle(merger->GetOutput());

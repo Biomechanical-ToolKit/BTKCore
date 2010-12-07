@@ -1,0 +1,25 @@
+/**
+ @page WarningsID Warnings identifier
+ 
+ @section ListWarnings List of warnings added into Matlab
+ 
+ Matlab gives you the possibility to filter warnings based on their ID to enable or disable them. 
+ Using BTK into Matlab can gives you lots of these warnings when, for example, you read a C3D file
+ with wrong informations than BTK detects and corrects.
+ 
+By default, the warnings are enabled. To disable them, you have to use the Matlab function @c warning. For example:
+@code
+warning('OFF', 'btk:ReadAcquisition'); % Disable the warning(s) for the function btkReadAcquisition.
+h1 = btkReadAcquisition('myFileWithWarnings.c3d'); % No warning displayed.
+% ...
+warning('ON', 'btk:ReadAcquisition'); % Enable the warning(s) for the function btkReadAcquisition.
+h2 = btkReadAcquisition('myFileWithWarnings.c3d'); % Warning displayed.
+@endcode
+ 
+ The following list gives you the ID used by BTK into Matlab:
+ - @c btk:GetForcePlatforms
+ - @c btk:GetGroundReactionWrenches
+ - @c btk:MergeAcquisitions
+ - @c btk:ReadAcquisition
+ - @c btk:WriteAcquisition 
+ */

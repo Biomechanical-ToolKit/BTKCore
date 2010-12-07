@@ -138,7 +138,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::MEXStreambufToPrintf matlabStandardOutput;
   std::streambuf* stdStandardOutput = std::cout.rdbuf(&matlabStandardOutput);
   // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput;
+  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput("btk:WriteAcquisition");
   std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput); 
 
   // The IO detection is done here to be able to set options.
@@ -174,7 +174,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   mxFree(filename);
 
   // Back to the previous output buffer.
-  matlabErrorOutput.requestNewLine();
   std::cout.rdbuf(stdStandardOutput);
   std::cerr.rdbuf(stdErrorOutput);
 

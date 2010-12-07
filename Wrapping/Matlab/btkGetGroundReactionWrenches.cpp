@@ -56,7 +56,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       mexErrMsgTxt("Second input argument must be a real value.");
 
   // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput;
+  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput("btk:GetGroundReactionWrenches");
   std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput);
 
   // First output
@@ -105,6 +105,5 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     ++itWrench;
   }
  
-  matlabErrorOutput.requestNewLine();
   std::cerr.rdbuf(stdErrorOutput);
 };
