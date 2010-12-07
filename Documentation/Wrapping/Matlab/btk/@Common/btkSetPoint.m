@@ -15,7 +15,9 @@ function btkSetPoint(h, idx_or_label, values, residuals, masks) %#ok
 %  masks of the camera used to reconstruct markers' positions. MASKS is a 
 %  matrix (N,1) of integer corresponding to a conversion of a binary number.
 %  For example, the value 14 correspond to the mask 0b0001110 meaning that
-%  cameras #2, #3 and #4 was used to reconstruct the point 
+%  cameras #2, #3 and #4 was used to reconstruct the point. You can use the
+%  function <a href="matlab:help btkConvertBinaryMasks2Decimals">btkConvertBinaryMasks2Decimals</a> to convert the binary masks into 
+%  decimal values.
 %  NOTE: This parameter is an informational parameter and seems not used in 
 %  some commercial softwares.
 %

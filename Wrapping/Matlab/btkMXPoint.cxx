@@ -70,6 +70,30 @@ btk::Point::Pointer btkMXGetPoint(btk::Acquisition::Pointer acq, int nrhs, const
   return point;
 };
 
+mxArray* btkMXCreatePointBinaryMask(btk::Point::Pointer point)
+{
+  int num = point->GetFrameNumber();
+  mxArray* masks = mxCreateCellMatrix(num, 1);
+  char mask[8]; mask[7] = '\0';
+  for (int i = 0 ; i < num ; ++i)
+  {
+    int inc2 = 1;
+    int incMask = 0;
+    int maskInt = static_cast<int>(point->GetMasks().coeff(i));
+    while (inc2 < 127)
+    {
+        if ((maskInt & inc2) && (maskInt != -1))
+            mask[incMask] = '1';
+        else
+            mask[incMask] = '0';
+        ++incMask;
+        inc2 *= 2;
+    }
+    mxSetCell(masks, (mwIndex)i, mxCreateString(mask));
+  }
+  return masks;
+}
+
 void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
 { 
   if (nlhs == 0)
@@ -116,25 +140,7 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
       memcpy(mxGetPr(residuals), (*itPt)->GetResiduals().data(), mxGetNumberOfElements(residuals) * sizeof(double));
       mxSetFieldByNumber(residualsStruct, 0, inc, residuals);
       // Masks
-      mxArray* masks = mxCreateCellMatrix(num, 1);
-      char mask[8]; mask[7] = '\0';
-      for (int i = 0 ; i < num ; ++i)
-      {
-        int inc2 = 1;
-        int incMask = 0;
-        int maskInt = static_cast<int>((*itPt)->GetMasks().coeff(i));
-        while (inc2 < 127)
-        {
-            if ((maskInt & inc2) && (maskInt != -1))
-                mask[incMask] = '1';
-            else
-                mask[incMask] = '0';
-            ++incMask;
-            inc2 *= 2;
-        }
-        mxSetCell(masks, (mwIndex)i, mxCreateString(mask));
-      }
-      mxSetFieldByNumber(masksStruct, 0, inc, masks);
+      mxSetFieldByNumber(masksStruct, 0, inc, btkMXCreatePointBinaryMask(*itPt));
       // Cleanup
       delete[] fieldnames[inc];
       ++inc;

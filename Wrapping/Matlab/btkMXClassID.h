@@ -42,6 +42,9 @@ namespace btk
 {
   class Acquisition;
   
+  /**
+   * Abstrat function to determine the ID associated with the class.
+   */
   template<typename T>
   inline int MEXClassID()
   {
@@ -49,6 +52,9 @@ namespace btk
     return -1;
   };
   
+  /**
+   * Specialized function for the class btk::Acquisition.
+   */
   template<> 
   inline int MEXClassID<Acquisition>() {return 0x01;};
 };

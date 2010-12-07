@@ -15,7 +15,7 @@
  * @par Detailed description:
  * <b>Remark:</b> The residuals and the masks are informational parameters and seems to not be used in commercial softwares.
  * \n\n
- * <b>Note #1:</b> The masks corresponds to conversions from binary number to integer. For example, the value 14 correspond to the mask 0b0001110, meaning that cameras #2, #3 and #4 was used to reconstruct the point.
+ * <b>Note #1:</b> The masks corresponds to conversions from binary number to integer. For example, the value 14 correspond to the mask 0b0001110, meaning that cameras #2, #3 and #4 was used to reconstruct the point. You can use the function btkConvertBinaryMasks2Decimals to convert the binary masks into decimal values.
  * 
  * @ingroup BTKMatlabPointModifier
  */

@@ -38,6 +38,7 @@ ELSE(NOT MATLAB_ROOT)
   INCLUDE_DIRECTORIES(${MATLAB_INCLUDE_DIR})
   
   # Common: accessor
+  MATLAB_MEX_CREATE(btkGetAnalog btkGetAnalog.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkGetAnalogFrameNumber btkGetAnalogFrameNumber.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkGetAnalogFrequency btkGetAnalogFrequency.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkGetAnalogNumber btkGetAnalogNumber.cpp BTKCommon)
@@ -53,6 +54,7 @@ ELSE(NOT MATLAB_ROOT)
   MATLAB_MEX_CREATE(btkGetPointFrameNumber btkGetPointFrameNumber.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkGetPointFrequency btkGetPointFrequency.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkGetPointNumber btkGetPointNumber.cpp BTKCommon)
+  MATLAB_MEX_CREATE(btkGetPoint btkGetPoint.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkGetPoints btkGetPoints.cpp BTKCommon)
   # Common: modifier
   MATLAB_MEX_CREATE(btkAppendAnalysisParameter btkAppendAnalysisParameter.cpp BTKCommon)

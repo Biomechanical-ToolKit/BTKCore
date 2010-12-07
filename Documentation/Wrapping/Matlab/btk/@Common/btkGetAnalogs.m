@@ -13,8 +13,8 @@ function [analogs analogsInfo] = btkGetAnalogs(h) %#ok
 %    - ANALOGSINFO.SCALE
 %    - ANALOGSINFO.FREQUENCY
 %    - ANALOGSINFO.UNITS
-%  ANALOGSINFO.GAIN, ANALOGSINFO.OFFSET and ANALOGSINFO.SCALE contains the required parameter
-%  to convert the digital measure into it analog variant. ANALOGSINFO.FREQUENCY contains the 
+%  ANALOGSINFO.GAIN, ANALOGSINFO.OFFSET and ANALOGSINFO.SCALE contains the required parameters
+%  to convert the digital measure into its analog variant. ANALOGSINFO.FREQUENCY contains the 
 %  analogs' frequency.  ANALOGSINFO.UNITS contains the unit of each analog channel.  
 %  Each fieldname in ANALOGSINFO.UNITS corresponds to analog channel's label. 
 

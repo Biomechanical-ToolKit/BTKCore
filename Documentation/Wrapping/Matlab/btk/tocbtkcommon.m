@@ -40,6 +40,8 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetPointNumber">btkSetPointNumber</a>                 - Point's number modifier
 %
 % Point accessor
+%   <a href="matlab:help btkConvertBinaryMasks2Decimals">btkConvertBinaryMasks2Decimals</a>    - Convert binary values into decimals
+%   <a href="matlab:help btkGetPoint">btkGetPoint</a>                       - Point extraction
 %   <a href="matlab:help btkGetAngles">btkGetAngles</a>                      - Angles extraction
 %   <a href="matlab:help btkGetAnglesValues">btkGetAnglesValues</a>                - Extracts angles as a simple matrix 
 %   <a href="matlab:help btkGetForces">btkGetForces</a>                      - Forces extraction
@@ -74,6 +76,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetScalarsValues">btkSetScalarsValues</a>               - Set scalars's value from a matrix
 %
 % Analog accessor
+%   <a href="matlab:help btkGetAnalog">btkGetAnalog</a>                       - Analog channel extraction
 %   <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>                     - Analog channels extraction
 %   <a href="matlab:help btkGetAnalogsResolution">btkGetAnalogsResolution</a>           - Return ADC resolution
 %   <a href="matlab:help btkGetAnalogsValues">btkGetAnalogsValues</a>               - Extract analogs channels' values in a simple matrix 

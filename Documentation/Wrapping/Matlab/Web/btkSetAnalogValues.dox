@@ -13,6 +13,6 @@
  * <tt>btkSetAnalogValues(h, idx, newvalues)</tt> modifies the scale factor of the analog channel specified by the index @c idx.
  * <tt>btkSetAnalogValues(h, label, newvalues)</tt> modifies the scale factor of the analog channel specified by the label @c label.
  * 
- * @sa btkSetAnalogDescription, btkSetAnalogGain, btkSetAnalogLabel, btkSetAnalogOffset, btkSetAnalogScale
+ * @sa btkGetAnalog, btkSetAnalogDescription, btkSetAnalogGain, btkSetAnalogLabel, btkSetAnalogOffset, btkSetAnalogScale
  * @ingroup BTKMatlabAnalogModifier
  */

@@ -53,9 +53,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetM(prhs[2]) != numberOfFrames) || (mxGetN(prhs[2]) != 1))
     mexErrMsgTxt("The third input must be a vector of real values corresponding to the data of one point."); 
 
-  double* values = mxGetPr(prhs[2]);
-  for (int i = 0 ; i < numberOfFrames ; ++i)
-    point->GetResiduals().coeffRef(i) = values[i];
+  // double* values = mxGetPr(prhs[2]);
+  // for (int i = 0 ; i < numberOfFrames ; ++i)
+  //   point->GetResiduals().coeffRef(i) = values[i];
+    
+  memcpy(point->GetResiduals().data(), mxGetPr(prhs[2]) , numberOfFrames * sizeof(double)); 
 };
 
 

@@ -20,6 +20,6 @@
  *   - Float: Values are stored on 4 bytes as a real.
  *   - Integer: Values are stored on 2 bytes as integer and are scaled.
  *
- * @sa btkReadAcquisition
+ * @sa btkWriteAcquisition
  * @ingroup BTKMatlabIO
  */

@@ -13,6 +13,6 @@
  * <tt>btkSetAnalogDescription(h, idx, newdesc)</tt> modifies the description of the analog channel specified by the index @c idx.
  * <tt>btkSetAnalogDescription(h, label, newdesc)</tt> modifies the description of the analog channel specified by the label @c label.
  * 
- * @sa btkSetAnalogGain, btkSetAnalogLabel, btkSetAnalogOffset, btkSetAnalogScale, btkSetAnalogValues
+ * @sa btkGetAnalog, btkSetAnalogGain, btkSetAnalogLabel, btkSetAnalogOffset, btkSetAnalogScale, btkSetAnalogValues
  * @ingroup BTKMatlabAnalogModifier
  */

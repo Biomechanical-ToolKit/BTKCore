@@ -21,7 +21,7 @@
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY aAND FITNESS
  * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
  * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
@@ -33,19 +33,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMXPoint_h
-#define __btkMXPoint_h
-
-#include "btkMex.h"
+#include "btkMXObjectHandle.h"
+#include "btkMXAnalog.h"
 
 #include <btkAcquisition.h>
 
-btk::Point::Pointer btkMXGetPoint(btk::Acquisition::Pointer acq, int nrhs, const mxArray* prhs[]);
-mxArray* btkMXCreatePointBinaryMask(btk::Point::Pointer point);
-void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[]);
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+  if(nrhs != 2)
+    mexErrMsgTxt("Two inputs required.");
+  if (nlhs > 2)
+    mexErrMsgTxt("Too many output arguments.");
 
-#if !defined(SCI_MEX)
-  #include "btkMXPoint.cxx"
-#endif
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);
+  plhs[0] = mxCreateDoubleMatrix(acq->GetAnalogFrameNumber(), 1, mxREAL);
+  memcpy(mxGetPr(plhs[0]), analog->GetValues().data(), mxGetNumberOfElements(plhs[0]) * sizeof(double));
+  // Residuals
+  if (nlhs > 1)
+  {
+    const char* info[] = {"gain", "offset", "scale", "frequency", "units"};
+    int numberOfFields =  sizeof(info) / sizeof(char*);
+    plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
+    mxSetFieldByNumber(plhs[1], 0, 0, mxCreateDoubleScalar(analog->GetGain()));
+    mxSetFieldByNumber(plhs[1], 0, 1, mxCreateDoubleScalar(analog->GetOffset()));
+    mxSetFieldByNumber(plhs[1], 0, 2, mxCreateDoubleScalar(analog->GetScale()));
+    mxSetFieldByNumber(plhs[1], 0, 3, mxCreateDoubleScalar(acq->GetAnalogFrequency()));
+    mxSetFieldByNumber(plhs[1], 0, 4, mxCreateString(analog->GetUnit().c_str()));
+  }
+};
 
-#endif // __btkMXPoint_h 

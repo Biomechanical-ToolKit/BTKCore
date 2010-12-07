@@ -33,19 +33,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMXPoint_h
-#define __btkMXPoint_h
-
-#include "btkMex.h"
+#include "btkMXObjectHandle.h"
+#include "btkMXPoint.h"
 
 #include <btkAcquisition.h>
 
-btk::Point::Pointer btkMXGetPoint(btk::Acquisition::Pointer acq, int nrhs, const mxArray* prhs[]);
-mxArray* btkMXCreatePointBinaryMask(btk::Point::Pointer point);
-void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[]);
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+  if(nrhs != 2)
+    mexErrMsgTxt("Two inputs required.");
+  if (nlhs > 3)
+    mexErrMsgTxt("Too many output arguments.");
 
-#if !defined(SCI_MEX)
-  #include "btkMXPoint.cxx"
-#endif
-
-#endif // __btkMXPoint_h 
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  
+  btk::Point::Pointer point = btkMXGetPoint(acq, nrhs, prhs);
+  // Values
+  plhs[0] = mxCreateDoubleMatrix(acq->GetPointFrameNumber(), 3, mxREAL);
+  memcpy(mxGetPr(plhs[0]), point->GetValues().data(), mxGetNumberOfElements(plhs[0]) * sizeof(double));
+  // Residuals
+  if (nlhs > 1)
+  {
+    plhs[1] = mxCreateDoubleMatrix(acq->GetPointFrameNumber(), 1, mxREAL);
+    memcpy(mxGetPr(plhs[1]), point->GetResiduals().data(), mxGetNumberOfElements(plhs[1]) * sizeof(double));
+  }
+  // Masks
+  if (nlhs > 2)
+    plhs[2] = btkMXCreatePointBinaryMask(point);
+};
