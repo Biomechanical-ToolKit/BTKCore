@@ -120,7 +120,7 @@ namespace btk
     output->Reset();
     // Open the stream
     std::ifstream ifs;
-    //ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
+    ifs.exceptions(std::ios_base::eofbit | std::ios_base::failbit | std::ios_base::badbit);
     try
     {
       std::string line;
@@ -200,6 +200,7 @@ namespace btk
           (*it)->SetLabel(*itLabel);
           ++itLabel;
         }
+        ifs.exceptions(std::ios_base::goodbit); // Remove exceptions
         for(int i = 0 ; i < numberOfFrames ; ++i)
         {
           if (ifs.eof())

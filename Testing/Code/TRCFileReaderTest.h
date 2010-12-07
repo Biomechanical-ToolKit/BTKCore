@@ -24,7 +24,6 @@ CXXTEST_SUITE(TRCFileReaderTest)
     reader->SetFilename(TRCFilePathIN + "Truncated.trc");
     TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::TRCFileIOException &e, e.what(), std::string("Unexpected end of file."));
   };
-
   
   CXXTEST_TEST(MOTEK_T)
   {
