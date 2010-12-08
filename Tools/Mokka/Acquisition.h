@@ -61,6 +61,7 @@ struct Point
   double radius;
   QColor color;
   Type type;
+  int btkidx;
 };
 
 struct Analog

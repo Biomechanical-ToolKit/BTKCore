@@ -126,6 +126,7 @@ QString Acquisition::load(const QString& filename)
   this->mp_ROI[0] = this->m_FirstFrame;
   this->mp_ROI[1] = this->m_LastFrame;
   int inc = 0;
+  // The orders for the points are important as their ID follows the same rule than in the class btk::VTKMarkersFramesSource
   // Markers
   btk::PointCollection::Pointer points = virtualMarkersSeparator->GetOutput(0);
   for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
@@ -136,6 +137,7 @@ QString Acquisition::load(const QString& filename)
     p->type = Point::Marker;
     p->radius = 8.0;
     p->color = Qt::white;
+    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
     this->m_Points.insert(inc++, p);
   }
   // Virtual markers (CoM, CoG, ...)
@@ -148,6 +150,7 @@ QString Acquisition::load(const QString& filename)
     p->type = Point::VirtualMarker;
     p->radius = 8.0;
     p->color = Qt::white;
+    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
     this->m_Points.insert(inc++, p);
   }
   // Virtual markers used to define frames
@@ -160,6 +163,7 @@ QString Acquisition::load(const QString& filename)
     p->type = Point::VirtualMarkerForFrame;
     p->radius = -1.0;
     p->color = QColor::Invalid;
+    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
     this->m_Points.insert(inc++, p);
   }
   // Other points
@@ -181,6 +185,7 @@ QString Acquisition::load(const QString& filename)
       p->type = Point::Scalar;
     p->radius = -1.0;
     p->color = QColor::Invalid;
+    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
     this->m_Points.insert(inc++, p);
   }
   // Analog
@@ -214,8 +219,7 @@ QString Acquisition::load(const QString& filename)
     }
     a->offset = (*it)->GetOffset();
     a->scale = (*it)->GetScale();
-    this->m_Analogs.insert(inc, a);
-    ++inc;
+    this->m_Analogs.insert(inc++, a);
   }
   // Event
   inc = -1;
@@ -306,7 +310,7 @@ QString Acquisition::save(const QString& filename, const QMap<int, QVariant>& pr
       type = btk::Point::Power;
     else if (p->type == Point::Scalar)
       type = btk::Point::Scalar;
-    btk::Point::Pointer sourceP = sourcePoints->GetItem(it.key());
+    btk::Point::Pointer sourceP = sourcePoints->GetItem(p->btkidx);
     btk::Point::Pointer targetP = btk::Point::New(p->label.toStdString(), numFramePoint, type, p->description.toStdString());
     targetP->SetValues(sourceP->GetValues().block(this->mp_ROI[0]-this->m_FirstFrame,0,numFramePoint,3));
     targetP->SetResiduals(sourceP->GetResiduals().block(this->mp_ROI[0]-this->m_FirstFrame,0,numFramePoint,1));

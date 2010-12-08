@@ -70,6 +70,7 @@ namespace btk
     int GetItemNumber() const {return static_cast<int>(this->m_Items.size());};
     void SetItemNumber(int num);
 
+    int GetIndexOf(ItemPointer elt) const;
     ItemPointer GetItem(int idx);
     ItemConstPointer GetItem(int idx) const;
     bool InsertItem(Iterator loc, ItemPointer elt);
@@ -182,6 +183,22 @@ namespace btk
       return;
     this->m_Items.resize(num);
     this->Modified();
+  };
+  
+  /**
+   * Return the index associated with the item @c elt or -1 if not found
+   */
+  template <class T>
+  int Collection<T>::GetIndexOf(ItemPointer elt) const
+  {
+    int idx = 0;
+    for (ConstIterator it = this->Begin() ; it != this->End() ; ++it)
+    {
+      if (it->get() == elt.get())
+        return idx;
+      ++idx;
+    }
+    return -1;
   };
   
   /**
