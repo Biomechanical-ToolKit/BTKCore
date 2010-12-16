@@ -579,6 +579,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -591,6 +592,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -603,6 +605,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -615,6 +618,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -627,6 +631,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
 
   /**
@@ -640,6 +645,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -653,6 +659,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -666,6 +673,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -679,6 +687,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -692,6 +701,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -705,6 +715,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -718,6 +729,7 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
   
   /**
@@ -731,5 +743,6 @@ namespace btk
   m_Children(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
+    this->m_MetaDataParentAssigned = false;
   };
 }

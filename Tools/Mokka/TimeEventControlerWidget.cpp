@@ -669,9 +669,9 @@ void TimeEventControlerWidget::changePlaybackParameters()
       divider = 0.1;
 
     double freq = pointFrequency * divider;
-    int finalFreq = 1;
     if (freq >= 24.0)
     {
+      int finalFreq = 1;
       double r = 1.0;
       for (int i = 24 ; i <= 30 ; ++i)
       {

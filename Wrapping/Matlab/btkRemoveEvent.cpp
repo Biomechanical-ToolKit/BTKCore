@@ -117,8 +117,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   {
     btk::EventCollection::Pointer events = acq->GetEvents()->Clone();
   
-    double timeOption = -1.0;
-    char* labelOption = 0, contextOption = 0, subjectOption = 0;
     char* option = 0;
     const char* options[] = {"TIME", "LABEL", "CONTEXT", "SUBJECT"};
     int numberOfOptions =  sizeof(options) / sizeof(char*);

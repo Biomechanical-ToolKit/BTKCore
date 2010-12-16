@@ -155,7 +155,6 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
   {
     const char* info[] = {"subjects", "units"};
     int numberOfFields =  sizeof(info) / sizeof(char*);
-    int inc = 0;
 
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     mxArray* subjectsStruct = mxCreateStructMatrix(1, 1, static_cast<int>(numberOfParameters), (const char**)fieldnames);

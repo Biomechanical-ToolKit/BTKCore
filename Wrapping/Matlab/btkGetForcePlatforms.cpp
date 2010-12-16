@@ -64,7 +64,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   
   plhs[0] = mxCreateStructMatrix(numberOfForcePlates, 1, numberOfFields, fieldnames);
   std::vector<char**> channelFieldnames = std::vector<char**>(numberOfForcePlates);
-  double* initialValues = 0;
   btk::ForcePlatformCollection::ConstIterator itPlatform = fps->Begin();
   for (int i = 0 ; i < numberOfForcePlates ; ++i)
   {

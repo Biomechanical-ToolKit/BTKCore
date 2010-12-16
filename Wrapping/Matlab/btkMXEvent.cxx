@@ -45,7 +45,6 @@
 void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
 {
  btk::EventCollection::Pointer events = acq->GetEvents();
- int inc = 0;
  bool onlyOneSubject = true;
  size_t numberOfEvents = 0;
 
