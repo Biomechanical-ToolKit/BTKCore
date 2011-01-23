@@ -446,7 +446,13 @@ void MainWindow::openFile()
     QString filename = QFileDialog::getOpenFileName(this,
                          trUtf8("Open Acquisition"),
                          this->m_LastDirectory,
-                         trUtf8("Acquisition Files (*.c3d *.trc)"));
+                         tr("Acquisition Files (*.c3d *.rah *.raw *.ric *.trc *.trb);; \
+                             C3D Files (*.c3d);; \
+                             RAH Files (*.rah);; \
+                             RAW Files (*.raw);; \
+                             RIC Files (*.ric);; \
+                             TRB Files (*.trb);; \
+                             TRC Files (*.trc)"));
     if (!filename.isEmpty())
       this->openFile(filename);
   }
@@ -512,10 +518,15 @@ void MainWindow::saveFile()
 
 void MainWindow::saveAsFile()
 {
+  QString file = this->m_RecentFiles.first();
+  QString suffix = QFileInfo(file).suffix();
+  QString selectedFilter = suffix.toUpper() + " Files (*." + suffix.toLower() + ")";
   QString filename = QFileDialog::getSaveFileName(this,
                        trUtf8("Save As Acquisition"),
-                       this->m_RecentFiles.first(),
-                       trUtf8("C3D Files (*.c3d);;TRC Files (*.trc)"));
+                       file,
+                       tr("C3D Files (*.c3d);; \
+                           TRC Files (*.trc)"),
+                       &selectedFilter);
   if (!filename.isEmpty())
   {
     this->m_LastDirectory = QFileInfo(filename).absolutePath();
