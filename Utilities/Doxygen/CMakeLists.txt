@@ -103,7 +103,7 @@ IF(BUILD_DOCUMENTATION_MOKKA)
   SET(MOKKA_HELP "${BTK_BINARY_DIR}/Documentation/MokkaHelp")
 
   ADD_CUSTOM_TARGET(Doxygen_Mokka ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${BTK_BINARY_DIR}/Documentation/Mokka
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${BTK_BINARY_DIR}/Documentation/MokkaHelp
     COMMAND ${DOXYGEN_EXECUTABLE} ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_Mokka
     MAIN_DEPENDENCY ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_Mokka
     WORKING_DIRECTORY ${BTK_BINARY_DIR}/Utilities/Doxygen
