@@ -1,0 +1,20 @@
+/**
+@mokkaworkingheader
+@page Mokka3DView 3D View
+@section Mokka3DViewSection 3D View
+@subsection Mokka3DGeneralView General use
+- The view can be changed between perspective or orthogonal from the left top menu.
+- Select marker using the left click. Ctrl + left click can be use to select more than one marker. Shift + left click create a selection box and toggle marker selection (selection markers if not selection, or remove them of the selection if selected).
+- To display a marker trajectory, click on the a marker by using the combination Shift + Ctrl + Left mouse button.
+- Use the right click on the main window to quickly select, unselect markers, delete selected markers, track or untrack selected markers, insert events or change the playback speed.
+
+@subsection Mokka3DPerspectiveView How to navigate in the 3D perspective view
+- Use the left click to rotate.
+- Press on the wheel mouse or use Alt+left click to move up, down, left or right.  
+- Use the wheel mouse forward and backward to zoom in and out
+
+@subsection Mokka3DPOrthogonalView How to navigate in the 3D orthogonal view
+- The view can be change for top, bottom, left, right, back or front from the newly displayed drop-down menu
+- Press on the wheel mouse or use Alt+left click to move up, down, left or right.  
+- Use the wheel mouse forward and backward to zoom in and out.
+*/

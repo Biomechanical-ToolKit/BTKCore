@@ -1,0 +1,93 @@
+/**
+@mokkaworkingheader
+@page MokkaModelPane Model Pane
+@section MokkaModelPaneSection Model Pane
+
+This pane contains functions to enhance the visualization and edition of the data. Markers in the 3D pane can be displayed with different colors and sizes. The trajectory of markers can be displayed. The options of this pane permit to save the configuration of visualization of the markers in the 3D pane.
+This panel permits also to change the label of the markers, the proprieties of the analog channels and the label of model outputs.
+
+@subsection MokkaModelResources Resources Menu
+The button @htmlonly <img src="process.png"/> @endhtmlonly returns a menu with the following actions:
+- Visual configuration
+  - <tt>New configuration</tt>: Create a new configuration
+  - <tt>Load configuration</tt>: Load a new configuration
+  - <tt>Save configuration</tt>: Save the active configuration
+  - <tt>Remove configuration</tt>: Clear the active configuration from the list of known visual configuration 
+  - <tt>Deselect configuration</tt>: Deselect the active configuration
+  - <tt>Clear configurations</tt>: Clear the list of known visual configuration 
+- Markers
+  - <tt>Select all markers</tt>: Select all the markers in the 3D view and in the Model Pane. It’s also possible to do this operation in the @ref Mokka3DView
+  - <tt>Hide selected markers</tt>: Hide the selected markers in the 3D view. It’s also possible to do this operation in the @ref Mokka3DView
+  - <tt>Unhide selected markers</tt>: Unhide the selected markers in the 3D view. It’s also possible to do this operation in the @ref Mokka3DView
+- Analog channels
+  - <tt>Select all analog channels</tt>: Select all analog channels in the Model Pane. It’s possible to modify the proprieties of analog channels all together
+- Model outputs
+  - <tt>Select all model outputs</tt>:
+  Select all Model outputs in the Model Pane. It’s possible to modify the proprieties all together
+  - <tt>Select all angles</tt>:
+  Select all angles from Model outputs in the Model Pane. It’s possible to modify the proprieties all together
+  - <tt>Select all forces</tt>:
+  Select all forces from Model outputs in the Model Pane. It’s possible to modify the proprieties all together
+  - <tt>Select all moments</tt>:
+  Select all moments from Model outputs in the Model Pane. It’s possible to modify the proprieties all together
+  - <tt>Select all powers</tt>:
+  Select all powers from Model outputs in the Model Pane. It’s possible to modify the proprieties all together
+  - <tt>Select all scalars</tt>:
+  Select all scalars from Model outputs in the Model Pane. It’s possible to modify the proprieties all together
+- <tt>Remove selected items</tt>:
+  Remove (delete) the selected items from the Model Pane (Markers, Analog channel, Model outputs)
+
+Once the items are modified or removed, it’s possible to save the modifications in the loaded file or a new one.
+
+@subsection MokkaModelProperties Item's list
+@subsubsection MokkaModelMarkerProperties Markers
+@htmlonly
+<ul class=twocolumns>
+<li>
+The marker's list in the Model pane contains the options to visualize <img src="eye.png"/> @endhtmlonly and track @htmlonly <img src="trajectory_active.png" width="16px" height="16px"/> markers in the  @endhtmlonly @ref Mokka3DView @htmlonly.  Moreoever, when a marker or a group of markers are selected, it’s possible to change their proprieties (Label, Radius, Color and Description)<br/>
+<br/>
+To assign a color to the selected markers, you can click on the first circle which will open a dialog box where you will pick the desired color. This color is then saved in the color history (others circle). To reuse the color in the history, click only on it and the selected markers will be repainted.
+</li>
+<li>
+@endhtmlonly
+@image html marker_properties.png Properties associated with markers
+@htmlonly
+</li>
+</ul>
+@endhtmlonly
+
+@subsection MokkaModelAnalogProperties Analogs
+@htmlonly
+<ul class=twocolumns>
+<li>
+The analogs channels <img src="chart_line.png"/> are 1D temporal signal acquired synchronously with the video data. 
+By using the properties panel you can check or modify the informations related to the selected analog channels.
+<br/><br/>
+<b>Note</b>: In a future release, it will be possible to display the data as graph.
+<br/><br/>
+<b>Warning</b>: Modifying the analog offset, scale and gain could modify values when saving the acquisition and reading it again. Moreover, removing an analog channel can corrupt the acquisition. For example, if it used to register force platform data and you remove it, Mokka won't be able to compute these force platform data the next time.
+</li>
+<li>
+@endhtmlonly
+@image html analog_properties.png Properties associated with analog channels
+@htmlonly
+</li>
+</ul>
+@endhtmlonly
+
+@subsection MokkaModelOutputsProperties Model outputs
+@htmlonly
+<ul class=twocolumns>
+<li>
+The model output <img src="chart_curve.png"/> contains data computed (for example with the PluginGait Model). There are 5 sub-sections: Angles, Forces, Moments, Powers and Scalar. If the subsection is empty, it is not displayed.
+<br/><br/>
+<b>Note</b>: In a future release, it will be possible to display the data as graph.
+</li>
+<li>
+@endhtmlonly
+@image html model_outputs_properties.png Properties associated with model outputs
+@htmlonly
+</li>
+</ul>
+@endhtmlonly
+*/

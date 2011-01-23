@@ -1,0 +1,44 @@
+/**
+@mokkaworkingheader
+@page MokkaMenuBar Menu Bar
+@section MokkaMenuBarSection Menu Bar
+
+@subsection File
+The menu @c File contains the actions to interact with acquisition.
+- <tt>Open</tt>: Selection of the acquisitions to load
+- <tt>Open Recent</tt>: Menu with the 10 last acquisitions opened
+  - <tt>Clear Menu:</tt>: Clear the list of the recent files opened
+- <tt>Save</tt>: Save the modified acquisition
+- <tt>Save As</tt>: Save the acquisition as a new one
+- <tt>Close File</tt>: Close the opened acquisition and reset the display
+- <tt>Quit</tt>: Quit the application
+
+@subsection Edit
+- <tt>Undo</tt>: Undo the modifications done previously
+- <tt>Redo</tt>: Redo the last modifications
+- <tt>Cut</tt>: Cut the selected text and put it in the clipboard
+- <tt>Copy</tt>: Copy the selected text and put it in the clipboard
+- <tt>Select All</tt>: Select all the text in the focused widget
+
+@subsection View 
+The menu View contains the actions to toggle dock windows related to the data into the loaded acquisition
+- <tt>Model</tt>: Show/Hide model pane
+- <tt>Information</tt>: Show/Hide file information
+- <tt>Metadata</tt>: Show/Hide metadata information (read-only)
+
+@image html view.png Information view, Metadata view and model pane displayed
+
+@subsection Settings 
+The menu Settings contains actions related to the 3D view
+- <tt>Visual Configuration</tt>
+  - <tt>Deselect configuration</tt>: 
+Deselect the current visual configuration and reset the configuration of the markers (color white, diameter of 8 mm) 
+  - <tt>Clear configuration</tt>: Clear the list of known visual configuration 
+- <tt>Ground Orientation</tt>: Select the ground orientation (see @ref MokkaTimeBarGroundOrientation)
+- <tt>Playback speed</tt>: Select the playback speed (see @ref MokkaTimeBarPlaybackSpeed)
+
+@subsection Help
+- <tt>About</tt>: Dialog box with the release number of Mokka
+- <tt>Mokka Help</tt>: This current help
+- <tt>Visit BTK website</tt>: Please visit the <a href="http://b-tk.googlecode.com">BTK website</a> to have the last developments
+ */

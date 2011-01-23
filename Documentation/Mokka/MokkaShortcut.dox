@@ -1,0 +1,33 @@
+/**
+@mokkahelpheader
+@page MokkaShortcut Shortcuts
+@section MokkaShortcutSection Shortcuts
+
+The principal shortcuts in Mokka are: 
+- left/right arrows: previous/next frame 
+- Alt + left/right arrows: previous/next event
+- spacebar: start/stop acquisition playback 
+- escape: deselect selected markers
+- Ctrl + z: undo last modifications
+- Ctrl + Shift + z: redo last modifications (Unix and MacOS X)
+- Ctrl + y: redo last modifications (Unix and MacOS X)
+- Ctrl + i: show/hide file informations 
+- Ctrl + m: show/hide model pane 
+- Ctrl + o: open a dialog box to select the acquisition to load 
+- Ctrl + s: save the modified acquisition 
+- Shift + Ctrl + s: save the acquisition as a new one
+
+@b Note: For MacOS X user, the Ctrl is replaced by the command key. 
+
+@section MokkaShortcut3DView 3D View
+Some shortcut are dedicated to the 3D view.
+- Ctrl + Left mouse button: Toggle marker selection.
+- Shift + Ctrl + Left mouse button: Toggle marker trajectory.
+
+@section MokkaShortcutTimeBar Time Bar
+Some shortcut are dedicated to the time bar.
+- Ctrl + e: Edit selected events
+- Backspace: Delete selected events
+- Alt + Left mouse button (over an event): Interactive mode to edit event's frame until the mouse button is released.
+- Shift + Alt + Left mouse button (over an event): Interactive mode to edit event's frame with a translation frame by frame.
+ */

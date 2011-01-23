@@ -1,0 +1,34 @@
+/**
+@mokkahelpheader
+@page MokkaReleaseNote Release Notes
+@section MokkaReleaseNoteSection Release Notes / Changelog
+
+- <b>06/18/10: Mokka 0.1a4</b> released
+      - ENH: Drag and drop support for Mokka.
+      - ENH: New widget to show the loading progress of a file
+      - ENH: It is now possible to create/save/load a visual configuration for the marker.
+      - ENH: Addition of command line options (open an acquisition, load a visual configuration, play the acquisition).
+      - ENH: New menus to deselect the current visual configuration and clear the list of the visual configurations.
+      - UPD: User guide updated and detailed: MokkaUserGuide
+      - UPD: Virtual markers are now distinguished and removed in the case where they are used for segmental frame axes. Other virtual markers are listed but not visible by default.
+      - UPD: Lines in the 3D window are now smoothed for a better rendering.
+      - UPD: The undo/redo is enhanced by splitting the actions between the modification of an acquisition file and the modification of the visual configuration.
+      - FIX: Clicking in the markers' list when it is empty can crash Mokka.
+      - FIX: On MacOS X, sometimes the loading of a file doesn't happen and keep the previous files (an crash in some case) 
+
+- <b>10/16/09: Mokka 0.1a3</b> released
+      - ENH: Markers trajectory can be displayed (click on the icon at the left of the marker's label).
+      - ENH: Modification of acquisition data (points and events) with undo/redo support.
+      - ENH: Acquisition can be saved in C3D or TRC format.
+      - FIX: Menu Options > Edit Metadata renamed Options > View Metadata as it is not possible to edit them.
+      - FIX: Open/Save dialogs use native dialogs. 
+
+- <b>09/10/09: Mokka 0.1a2</b> released
+      - ENH: FPS replaced by 3D global axes.
+      - ENH: Metadata are diplayed in a modal window (see menu Options > Edit Metadata).
+      - ENH: Events information & markers properties can be collapsed.
+      - FIX: Executing Mokka on Windows opens a command prompt.
+      - FIX: C3D data with POINTS:UNITS in meters drawn in millimeters ( Issue 1 ). 
+
+- <b>08/24/09: Mokka 0.1a1</b> initial alpha release
+ */
