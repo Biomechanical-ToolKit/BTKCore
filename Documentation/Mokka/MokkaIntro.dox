@@ -14,4 +14,5 @@
   - RAW file format: BTS Bioengineering (Elite)
   - RIC file format: BTS Bioengineering (Elite)
 - Mokka uses the file format MVC (<em>Mokka Model Visual Configuration</em>) to configure the visual aspects of the acquisition (markers' color, markers' size…)
+- Mokka is able to receive file dragged and dropped from your file browser to the 3D view.
  */
