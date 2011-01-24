@@ -6,7 +6,7 @@ function lf = btkGetLastFrame(h) %#ok
 %  btk* function.
 
 %  Author: A. Barré
-%  Copyright 2009-2010 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2011 Biomechanical ToolKit (BTK).
 
 lf = btkGetFirstFrame(h) + btkGetPointFrameNumber(h) - 1;
 

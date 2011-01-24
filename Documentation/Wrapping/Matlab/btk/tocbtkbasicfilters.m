@@ -11,6 +11,6 @@ function tocbtkbasicfilters
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>
 
 %   Author(s): A. Barré
-%   Copyright 2009-2010 Biomechanical ToolKit
+%   Copyright 2009-2011 Biomechanical ToolKit
 
 % [EOF]

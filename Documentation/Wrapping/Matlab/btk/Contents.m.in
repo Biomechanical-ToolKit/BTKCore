@@ -12,4 +12,4 @@
 % General functions
 %   <a href="matlab:help btkGetVersion">btkGetVersion</a>        - Return the BTK release number
 
-%   Copyright 2009-2010 Biomechanical ToolKit
+%   Copyright 2009-2011 Biomechanical ToolKit

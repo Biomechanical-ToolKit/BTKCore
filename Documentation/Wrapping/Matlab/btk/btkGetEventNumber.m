@@ -6,6 +6,6 @@ function num = btkGetEventNumber(h)
 %  a btk* function.
 
 %  Author: A. Barré
-%  Copyright 2009-2010 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2011 Biomechanical ToolKit (BTK).
 
 num = length(btkGetEventsValues(h));

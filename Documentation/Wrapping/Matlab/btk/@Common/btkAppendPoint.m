@@ -49,7 +49,7 @@ function btkAppendPoint(h, type, label, values, residuals, masks, desc) %#ok
 %  by the use of a btk* function.
 
 %  Author: A. Barré
-%  Copyright 2009-2010 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2011 Biomechanical ToolKit (BTK).
 
 % The following comment, MATLAB compiler pragma, is necessary to avoid 
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.
