@@ -698,7 +698,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see 
 # the \image command).
 
-IMAGE_PATH             = "${BTK_SOURCE_DIR}/Documentation/Mokka/images" \
+IMAGE_PATH             = "${MOKKA_HELP_IMAGES}" \
                          "${BTK_SOURCE_DIR}/Tools/Mokka/Resources/Images"
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 

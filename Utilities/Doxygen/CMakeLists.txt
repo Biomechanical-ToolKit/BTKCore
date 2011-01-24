@@ -95,12 +95,16 @@ ENDIF(BUILD_DOCUMENTATION_API)
 
 # MOKKA target
 IF(BUILD_DOCUMENTATION_MOKKA)
+  SET(MOKKA_RESOURCES_IMAGES "${BTK_SOURCE_DIR}/Tools/Mokka/Resources/Images")
+  SET(MOKKA_HELP "${BTK_BINARY_DIR}/Documentation/MokkaHelp")
+  SET(MOKKA_HELP_IMAGES "${BTK_SOURCE_DIR}/Documentation/Mokka/images/mac")
+  IF(WIN32 OR CYGWIN)
+    SET(MOKKA_HELP_IMAGES "${BTK_SOURCE_DIR}/Documentation/Mokka/images/win")
+  ENDIF(WIN32 OR CYGWIN)
+  
   CONFIGURE_FILE(
     ${BTK_SOURCE_DIR}/Utilities/Doxygen/Doxyfile_Mokka.in
     ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_Mokka)
-    
-  SET(MOKKA_RESOURCES_IMAGES "${BTK_SOURCE_DIR}/Tools/Mokka/Resources/Images")
-  SET(MOKKA_HELP "${BTK_BINARY_DIR}/Documentation/MokkaHelp")
 
   ADD_CUSTOM_TARGET(Doxygen_Mokka ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${BTK_BINARY_DIR}/Documentation/MokkaHelp

@@ -60,6 +60,11 @@ div.navigation {
   visibility:hidden;
 }
 
+div.tabs {
+  display:none;
+  visibility:hidden;
+}
+
 div.header {
   display:none;
   visibility:hidden;
