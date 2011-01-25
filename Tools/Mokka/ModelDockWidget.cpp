@@ -44,8 +44,11 @@
 #include <QMessageBox>
 #include <QXmlStreamReader>
 
+static const QBrush defaultLabelColor = QBrush(QColor(Qt::gray));
+static const QBrush displayLabelColor = QBrush(QColor(Qt::black));
+
 ModelDockWidget::ModelDockWidget(QWidget* parent)
-: QDockWidget(parent), m_ConfigurationItems(), m_RecentColors(5)
+: QDockWidget(parent), m_ConfigurationItems(), m_RecentColors(5), m_DisplayedIds()
 {
   this->m_CurrentConfigurationIndex = -1;
   this->mp_Acquisition = 0;
@@ -61,8 +64,14 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
    QFont f = this->modelTree->font();
 #ifdef Q_OS_MAC
   // TODO: What about the widget's attributes Qt::WA_MacNormalSize, Qt::WA_MacSmallSize	 and Qt::WA_MacMiniSize for mac?
-  
+  // TODO: Think to use this dockwidget as a drawer: // this->setWindowFlags(Qt::Drawer); // Need to check the bug http://bugreports.qt.nokia.com/browse/QTBUG-15897
   this->setStyleSheet("QDockWidget {color: white;} QDockWidget::title {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(0, 0, 0, 255), stop:0.95 rgba(64, 64, 64, 255), stop:1 rgba(200, 200, 200, 255)); text-align: center; padding-left: -25px;}");
+  this->modelTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
+  
+  // A white background looks better when the tree is disabled
+  QPalette palette = this->modelTree->viewport()->palette();
+  palette.setBrush(QPalette::Disabled, QPalette::Base, Qt::white);
+  this->modelTree->viewport()->setPalette(palette);
   
   f.setPointSize(10);
   this->modelTree->setFont(f);
@@ -386,6 +395,8 @@ void ModelDockWidget::load()
   // Update the recent colors
   this->drawRecentColors();
   
+  this->m_DisplayedIds.resize(markersRoot->childCount());
+  
   this->sendHiddenMarkers(); // For the virtual markers hidden by default.
   
   // Detect the visual configuration or reload the current one
@@ -493,21 +504,37 @@ bool ModelDockWidget::isOkToContinue()
   int idx = this->m_CurrentConfigurationIndex;//this->modelConfigurationComboBox->currentIndex();
   if ((idx != -1) && (this->m_ConfigurationItems[idx].isModified))
   {
+#if 0    
     QString message = "The visual configuration has been modified.\nDo you want to save your changes?";
     if (this->m_ConfigurationItems[idx].isNew)
       message += "\n\nThis configuration is a new one and will be deleted if you do not save it.";
-    
     QMessageBox messageBox(QMessageBox::Question, 
-                           trUtf8("Mokka"),
-                           trUtf8(message.toAscii().constData()), 
+                           tr("Mokka"),
+                           tr(message.toAscii().constData()), 
                            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                            this, Qt::Sheet);
     messageBox.setDefaultButton(QMessageBox::Yes);
     messageBox.setEscapeButton(QMessageBox::Cancel);
+#else
+      QMessageBox messageBox(this->parentWidget());
+      messageBox.setIcon(QMessageBox::Information);
+      messageBox.setText(tr("<nobr>The visual configuration has been modified.</nobr>"));
+      if (this->m_ConfigurationItems[idx].isNew)
+        messageBox.setInformativeText(tr("Do you want to save your changes?\n\nThis configuration is a new one and will be deleted if you do not save it."));
+      else
+        messageBox.setInformativeText(tr("Do you want to save your changes?"));
+      messageBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+#ifdef Q_OS_MAC
+      messageBox.setWindowFlags(Qt::Sheet);
+      messageBox.setWindowModality(Qt::WindowModal);
+#endif
+      messageBox.setDefaultButton(QMessageBox::Save);
+      messageBox.setEscapeButton(QMessageBox::Cancel);
+#endif
     int res = messageBox.exec();
-    if (res == QMessageBox::Yes)
+    if (res == QMessageBox::Save)
       return this->saveConfiguration(idx);
-    else if (res == QMessageBox::No)
+    else if (res == QMessageBox::Discard)
     {
       if (this->m_ConfigurationItems[idx].isNew)
         this->removeConfiguration(idx);
@@ -552,17 +579,21 @@ void ModelDockWidget::setConfigurationModified(bool cleaned)
 
 void ModelDockWidget::loadConfiguration(const QString& filename)
 {
-  QMessageBox messageBox(QMessageBox::Critical, 
-                         trUtf8("Mokka"),
+  QMessageBox messageBox(QMessageBox::Warning, 
                          "",
+                         "Cannot read file: ",
                          QMessageBox::Ok,
-                         this, Qt::Sheet);
+                         this->parentWidget());
   messageBox.setDefaultButton(QMessageBox::Ok);
-  
+#ifdef Q_OS_MAC
+  messageBox.setWindowModality(Qt::WindowModal);
+  messageBox.setWindowFlags(Qt::Sheet);
+#endif
   QFile file(filename);
   if (!file.open(QFile::ReadOnly | QFile::Text))
   {
-    messageBox.setText("Cannot read file: " + filename + "\n" + file.errorString());
+    messageBox.setText(messageBox.text() + filename);
+    messageBox.setInformativeText(file.errorString());
     messageBox.exec();
     return;
   }
@@ -657,7 +688,7 @@ void ModelDockWidget::newConfiguration()
 {
   if (!this->isOkToContinue())
     return;
-  NewModelDialog nmd(&(this->m_ConfigurationItems), this);
+  NewModelDialog nmd(&(this->m_ConfigurationItems), this->parentWidget());
   if (this->mp_Acquisition)
   {
     QFileInfo fileInfo(this->mp_Acquisition->fileName());
@@ -665,6 +696,10 @@ void ModelDockWidget::newConfiguration()
     nmd.setConfigurationName(name);
   }
   this->modelConfigurationComboBox->blockSignals(true);
+#ifdef Q_OS_MAC
+  nmd.setWindowFlags(Qt::Sheet);
+  nmd.setWindowModality(Qt::WindowModal);
+#endif
   if (nmd.exec())
   {
     ConfigurationItem config;
@@ -748,8 +783,6 @@ void ModelDockWidget::clearConfigurations()
 
 void ModelDockWidget::updateDisplayedMarkers(const QVector<int>& ids)
 {
-  static const QBrush defaultLabelColor = QBrush(QColor(Qt::gray));
-  static const QBrush displayLabelColor = QBrush(QColor(Qt::black));
   this->modelTree->blockSignals(true);
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(0);
   for (int i = 0 ; i < markersRoot->childCount() ; ++i)
@@ -1650,6 +1683,31 @@ void ModelDockWidget::insertAnalogs(const QList<int>& ids, const QList<Analog*>&
   this->refresh();
 };
 
+void ModelDockWidget::changeEvent(QEvent* event)
+{
+  if (event->type() == QEvent::EnabledChange)
+  {
+    if (this->isEnabled())
+    {
+      this->updateDisplayedMarkers(this->m_DisplayedIds);
+    }
+    else
+    {
+      QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(0);
+      for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+      {
+        QTreeWidgetItem* item = markersRoot->child(i);
+        if (item->foreground(0) == displayLabelColor)
+          this->m_DisplayedIds[i] = 1;
+        else
+          this->m_DisplayedIds[i] = 0;
+      }
+      this->updateDisplayedMarkers(QVector<int>());
+    }
+  }
+  this->QDockWidget::changeEvent(event);
+};
+
 void ModelDockWidget::setCurrentConfiguration(int idx)
 {
   this->modelConfigurationComboBox->setCurrentIndex(idx);
@@ -1692,17 +1750,21 @@ bool ModelDockWidget::saveConfiguration(int idx)
   
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(0);
   
-  QMessageBox messageBox(QMessageBox::Critical, 
-                         trUtf8("Mokka"),
-                         trUtf8("Cannot write file: "),
+  QMessageBox messageBox(QMessageBox::Warning, 
+                         "",
+                         tr("Cannot write file: "),
                          QMessageBox::Ok,
-                         this, Qt::Sheet);
+                         this->parentWidget());
   messageBox.setDefaultButton(QMessageBox::Ok);
-  
+#ifdef Q_OS_MAC
+  messageBox.setWindowModality(Qt::WindowModal);
+  messageBox.setWindowFlags(Qt::Sheet);
+#endif
   QFile file(filename);
   if (!file.open(QFile::WriteOnly | QFile::Text))
   {
-    messageBox.setText(messageBox.text() + filename + "\n" + file.errorString());
+    messageBox.setText(messageBox.text() + filename);
+    messageBox.setInformativeText(file.errorString());
     messageBox.exec();
     return false;
   }
@@ -2020,12 +2082,16 @@ bool ModelDockWidget::hasChildVisible(QTreeWidgetItem* parent) const
 
 bool ModelDockWidget::isOkToModifyAnalog()
 {
-  QMessageBox messageBox(QMessageBox::Question, 
-                         trUtf8("Mokka"),
-                         trUtf8("The modification of this parameter might corrupt the data when saved in a file.\nDo you want to continue?"), 
+  QMessageBox messageBox(QMessageBox::Information, 
+                         "",
+                         tr("The modification of this parameter might corrupt the data when saved in a file."),
                          QMessageBox::Yes | QMessageBox::No,
-                         this, Qt::Sheet);
-  //messageBox.setWindowModality(Qt::WindowModal);
+                         this->parentWidget());
+  messageBox.setInformativeText("Do you want to continue?");
+#ifdef Q_OS_MAC
+  messageBox.setWindowModality(Qt::WindowModal);
+  messageBox.setWindowFlags(Qt::Sheet);
+#endif
   messageBox.setDefaultButton(QMessageBox::Yes);
   messageBox.setEscapeButton(QMessageBox::No);
   if (messageBox.exec() == QMessageBox::Yes)

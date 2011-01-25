@@ -39,6 +39,10 @@
  : QDialog(parent)
  {
    this->setupUi(this);
+#ifdef Q_OS_MAC
+   this->setWindowFlags(Qt::Sheet);
+   this->setWindowModality(Qt::WindowModal);
+#endif
  };
  
 void ProgressWidget::setProgressValue(int val)

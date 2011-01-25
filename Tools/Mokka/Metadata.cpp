@@ -41,6 +41,9 @@ Metadata::Metadata(QWidget* parent)
 : QDialog(parent)
 {
   this->setupUi(this);
+#ifdef Q_OS_MAC
+  this->treeView->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#endif
   this->warningIconLabel->setVisible(false);
   this->warningMsgLabel->setVisible(false);
 };

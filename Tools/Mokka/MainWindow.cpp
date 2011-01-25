@@ -35,6 +35,10 @@
 
 #include "MainWindow.h"
 #include "About.h"
+#include "Acquisition.h"
+#include "FileInfoDockWidget.h"
+#include "Metadata.h"
+#include "ModelDockWidget.h"
 #include "ProgressWidget.h"
 #include "UndoCommands.h"
 #include "UserRoles.h"
@@ -395,12 +399,16 @@ bool MainWindow::isOkToContinue()
     }
     if (acquisitionModified)
     {
-      QMessageBox messageBox(QMessageBox::Question, 
-                             trUtf8("Mokka"),
-                             trUtf8("The document has been modified.\nDo you want to save your changes?"), 
-                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                             this, Qt::Sheet);
-      messageBox.setDefaultButton(QMessageBox::Yes);
+      QMessageBox messageBox(this);
+      messageBox.setIcon(QMessageBox::Information);
+      messageBox.setText(tr("The document has been modified."));
+      messageBox.setInformativeText(tr("Do you want to save your changes?"));
+      messageBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+#ifdef Q_OS_MAC
+      messageBox.setWindowFlags(Qt::Sheet);
+      messageBox.setWindowModality(Qt::WindowModal);
+#endif
+      messageBox.setDefaultButton(QMessageBox::Save);
       messageBox.setEscapeButton(QMessageBox::Cancel);
       switch(messageBox.exec())
       {
@@ -428,19 +436,6 @@ void MainWindow::loadConfiguration(const QString& filename)
 
 void MainWindow::openFile()
 {
-  /*
-  QFileDialog open(this,
-                   trUtf8("Open Acquisition"),
-                   this->m_LastDirectory,
-                   trUtf8("Acquisition Files (*.c3d *.trc)"));
-  if (open.exec())
-  {
-    this->m_LastDirectory = open.directory().absolutePath();
-    QStringList filenames = open.selectedFiles();
-    if (!filenames.isEmpty())
-      this->openFile(filenames.first());
-  }
-  */
   if (this->isOkToContinue())
   {
     QString filename = QFileDialog::getOpenFileName(this,
@@ -474,8 +469,14 @@ void MainWindow::openFile(const QString& filename)
   QString errMsg = this->mp_Acquisition->load(filename);
   if (!errMsg.isEmpty())
   {
+    pw.hide();
     QApplication::restoreOverrideCursor();
-    QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file reading", QMessageBox::Ok , this);
+    QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file reading", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+    error.setWindowFlags(Qt::Sheet);
+    error.setWindowModality(Qt::WindowModal);
+#endif
+    error.setDefaultButton(QMessageBox::Ok);
     error.setInformativeText(errMsg);
     error.exec();
     return;
@@ -550,7 +551,11 @@ void MainWindow::saveFile(const QString& filename)
   if (!errMsg.isEmpty())
   {
     QApplication::restoreOverrideCursor();
-    QMessageBox error(QMessageBox::Critical, "File error", "Error occurred during the file saving", QMessageBox::Ok , this);
+    QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file saving", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+    error.setWindowFlags(Qt::Sheet);
+    error.setWindowModality(Qt::WindowModal);
+#endif
     error.setInformativeText(errMsg);
     error.exec();
     return;

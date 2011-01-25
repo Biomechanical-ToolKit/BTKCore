@@ -37,11 +37,11 @@
 #define MainWindow_h
 
 #include "ui_MainWindow.h"
-#include "Acquisition.h"
-#include "FileInfoDockWidget.h"
-#include "Metadata.h"
-#include "ModelDockWidget.h"
-#include "UserRoles.h"
+
+class Acquisition;
+class FileInfoDockWidget;
+class Metadata;
+class ModelDockWidget;
 
 class QUndoStack;
 

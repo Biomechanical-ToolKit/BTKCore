@@ -170,6 +170,9 @@ signals:
   void analogsScaleChanged(const QVector<int>& ids, double scale);
   void analogsDescriptionChanged(const QVector<int>& ids, const QString& desc);
   void analogsRemoved(const QList<int>& ids);
+
+protected:
+  void changeEvent(QEvent* event);
   
 private slots:
   void sendSelectedMarkers();
@@ -198,6 +201,7 @@ private:
   int m_CurrentConfigurationIndex;
   QList<ConfigurationItem> m_ConfigurationItems;
   Acquisition* mp_Acquisition;
+  QVector<int> m_DisplayedIds;
   // Icon
   QIcon* mp_DownArrowIcon;
   QIcon* mp_RightArrowIcon;
