@@ -66,8 +66,8 @@ namespace btk
     DataObject(const DataObject& toCopy)
     : Object(toCopy) 
     {
-      this->mp_Parent = toCopy.mp_Parent;
-      this->mp_Source = toCopy.mp_Source;
+      this->mp_Parent = 0;
+      this->mp_Source = 0;
     };
     virtual ~DataObject() {};
 
