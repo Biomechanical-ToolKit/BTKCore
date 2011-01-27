@@ -171,6 +171,8 @@ namespace btk
     VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
     if (!inObject)
       return 0;
+    if (inObject->GetMTime() < this->GetMTime())
+      return 0;
     WrenchCollection::Pointer input = static_pointer_cast<WrenchCollection>(inObject->GetBTKDataObject());
     // Raz
     for (size_t i = 0 ; i < this->mp_GRFsComponents->size() ; ++i)
