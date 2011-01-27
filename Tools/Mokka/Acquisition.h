@@ -98,6 +98,8 @@ public:
   
   QString load(const QString& filename);
   QString save(const QString& filename, const QMap<int, QVariant>& properties);
+  QString exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb);
+  QString importFrom(const QStringList& filenames, QString& importWarnings);
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
@@ -197,6 +199,8 @@ signals:
   
 private:
   void emitGeneratedInformations(btk::AcquisitionFileIO::Pointer io);
+  void write(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb, QString& errMsg, bool updateInfo = false);
+  void loadAcquisition();
   
   enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
   

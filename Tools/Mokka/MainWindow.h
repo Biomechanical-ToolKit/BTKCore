@@ -39,9 +39,11 @@
 #include "ui_MainWindow.h"
 
 class Acquisition;
+class ImportAssistantDialog;
 class FileInfoDockWidget;
 class Metadata;
 class ModelDockWidget;
+class ProgressWidget;
 
 class QUndoStack;
 
@@ -76,6 +78,26 @@ public Q_SLOTS:
   void saveFile();
   void saveAsFile();
   void closeFile();
+  void importAssistant();
+  void importC3D();
+  void importTRC();
+  void importTRB();
+  void importANC();
+  void importANB();
+  void importForcePlatformCAL();
+  void importOrthotrackXLS();
+  void importRAH();
+  void importRAW();
+  void importRIC();
+  void importGRx();
+  void importANG();
+  void importEMG();
+  void importMOM();
+  void importPWR();
+  void exportC3D();
+  void exportTRC();
+  void exportANB();
+  void exportANC();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
@@ -104,8 +126,13 @@ public Q_SLOTS:
   void toggleMarkerTrajectory(int id);
   
 private:
+  void loadAcquisition(const QString& errMsg, ProgressWidget* pw);
   void saveFile(const QString& filename);
+  void exportAcquisition(const QString& filter);
+  void importAcquisition(const QString& filter);
+  void importAcquisitions(const QStringList& filenames);
   void reset();
+  void setAcquisitionProperties(QMap<int, QVariant>& properties);
   void readSettings(); 
   void writeSettings();
   void updateRecentFileActions();
@@ -116,6 +143,7 @@ private:
   Metadata* mp_MetadataDlg;
   FileInfoDockWidget* mp_FileInfoDock;
   ModelDockWidget* mp_ModelDock;
+  ImportAssistantDialog* mp_ImportAssistant;
 
   QString m_LastDirectory;
   enum { maxRecentFiles = 10 };

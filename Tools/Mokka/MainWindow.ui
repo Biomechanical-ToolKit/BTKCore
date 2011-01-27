@@ -81,11 +81,65 @@
      </property>
      <addaction name="actionClear_Menu"/>
     </widget>
+    <widget class="QMenu" name="menuImport">
+     <property name="title">
+      <string>Import</string>
+     </property>
+     <widget class="QMenu" name="menuMotion_Analysis_Corp_2">
+      <property name="title">
+       <string>Motion Analysis Corp.</string>
+      </property>
+      <addaction name="actionImportTRB"/>
+      <addaction name="actionImportTRC"/>
+      <addaction name="actionImportANB"/>
+      <addaction name="actionImportANC"/>
+      <addaction name="actionImportCAL"/>
+      <addaction name="actionImportOrthotrackXLS"/>
+     </widget>
+     <widget class="QMenu" name="menuBTS_Bioengineering">
+      <property name="title">
+       <string>BTS Bioengineering</string>
+      </property>
+      <addaction name="actionImportRIC"/>
+      <addaction name="actionImportRAH"/>
+      <addaction name="actionImportRAW"/>
+      <addaction name="actionImportANG"/>
+      <addaction name="actionImportMOM"/>
+      <addaction name="actionImportPWR"/>
+      <addaction name="actionImportGR"/>
+     </widget>
+     <addaction name="actionImportAssistant"/>
+     <addaction name="separator"/>
+     <addaction name="actionImportC3D"/>
+     <addaction name="menuMotion_Analysis_Corp_2"/>
+     <addaction name="menuBTS_Bioengineering"/>
+    </widget>
+    <widget class="QMenu" name="menuExport">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <widget class="QMenu" name="menuMotion_Analysis_Corp">
+      <property name="title">
+       <string>Motion Analysis Corp.</string>
+      </property>
+      <addaction name="actionExportTRC"/>
+      <addaction name="actionExportANB"/>
+      <addaction name="actionExportANC"/>
+     </widget>
+     <addaction name="actionExportC3D"/>
+     <addaction name="menuMotion_Analysis_Corp"/>
+    </widget>
     <addaction name="action_FileOpen"/>
     <addaction name="menuOpen_Recent"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
+    <addaction name="separator"/>
+    <addaction name="menuImport"/>
+    <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
     <addaction name="action_Quit"/>
@@ -227,6 +281,101 @@
   <action name="actionHelp">
    <property name="text">
     <string>Mokka Help</string>
+   </property>
+  </action>
+  <action name="actionImportAssistant">
+   <property name="text">
+    <string>Assistant</string>
+   </property>
+  </action>
+  <action name="actionExportC3D">
+   <property name="text">
+    <string>C3D file...</string>
+   </property>
+  </action>
+  <action name="actionExportANB">
+   <property name="text">
+    <string>ANB file...</string>
+   </property>
+  </action>
+  <action name="actionExportANC">
+   <property name="text">
+    <string>ANC file...</string>
+   </property>
+  </action>
+  <action name="actionExportTRC">
+   <property name="text">
+    <string>TRC file...</string>
+   </property>
+  </action>
+  <action name="actionImportC3D">
+   <property name="text">
+    <string>C3D file...</string>
+   </property>
+  </action>
+  <action name="actionImportTRB">
+   <property name="text">
+    <string>TRB file...</string>
+   </property>
+  </action>
+  <action name="actionImportTRC">
+   <property name="text">
+    <string>TRC file...</string>
+   </property>
+  </action>
+  <action name="actionImportANB">
+   <property name="text">
+    <string>ANB file...</string>
+   </property>
+  </action>
+  <action name="actionImportANC">
+   <property name="text">
+    <string>ANC file..</string>
+   </property>
+  </action>
+  <action name="actionImportCAL">
+   <property name="text">
+    <string>CAL file...</string>
+   </property>
+  </action>
+  <action name="actionImportOrthotrackXLS">
+   <property name="text">
+    <string>XLS Orthotrack file...</string>
+   </property>
+  </action>
+  <action name="actionImportRIC">
+   <property name="text">
+    <string>RIC file...</string>
+   </property>
+  </action>
+  <action name="actionImportRAH">
+   <property name="text">
+    <string>RAH file...</string>
+   </property>
+  </action>
+  <action name="actionImportRAW">
+   <property name="text">
+    <string>RAW file...</string>
+   </property>
+  </action>
+  <action name="actionImportANG">
+   <property name="text">
+    <string>ANG file...</string>
+   </property>
+  </action>
+  <action name="actionImportMOM">
+   <property name="text">
+    <string>MOM file...</string>
+   </property>
+  </action>
+  <action name="actionImportPWR">
+   <property name="text">
+    <string>PWR file...</string>
+   </property>
+  </action>
+  <action name="actionImportGR">
+   <property name="text">
+    <string>GR* file...</string>
    </property>
   </action>
  </widget>

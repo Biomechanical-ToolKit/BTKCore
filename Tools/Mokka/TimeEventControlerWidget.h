@@ -56,9 +56,11 @@ public:
   void setAcquisition(Acquisition* acq);
   void load();
   void reset();
-  QMenu* playbackSpeedMenu() {return this->mp_PlaybackSpeedMenu;};
-  QMenu* insertEventMenu() {return this->mp_InsertEventMenu;};
-  int currentFrame() {return this->timeEventBar->m_SliderPos;};
+  QMenu* playbackSpeedMenu() const {return this->mp_PlaybackSpeedMenu;};
+  QMenu* insertEventMenu() const {return this->mp_InsertEventMenu;};
+  int currentFrame() const {return this->timeEventBar->m_SliderPos;};
+  int leftBound() const {return this->timeEventBar->m_LeftBoundPos;};
+  int rightBound() const {return this->timeEventBar->m_RightBoundPos;};
   
 public slots:
   void togglePlayback();

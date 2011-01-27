@@ -34,10 +34,12 @@
  */
 
 #include "Acquisition.h"
+#include "Utilities/StringStreamBuf.h"
 
 #include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileWriter.h>
 #include <btkMetaDataUtils.h>
+#include <btkMergeAcquisitionFilter.h>
 
 #include <Qt>
 #include <QFileInfo>
@@ -76,7 +78,6 @@ Acquisition::~Acquisition()
 
 QString Acquisition::load(const QString& filename)
 {
-  this->clear();
   btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
   reader->SetFilename(filename.toStdString());
   try
@@ -95,268 +96,41 @@ QString Acquisition::load(const QString& filename)
   {
     return "Unknown error.";
   }
+  this->clear();
   this->mp_BTKAcquisition = reader->GetOutput();
-  
-  std::string labelPrefix = "";
-  btk::MetaData::ConstIterator itSubjects = this->mp_BTKAcquisition->GetMetaData()->FindChild("SUBJECTS");
-  if (itSubjects != this->mp_BTKAcquisition->GetMetaData()->End())
-  {
-    btk::MetaDataInfo::Pointer labelPrefixesInfo = (*itSubjects)->ExtractChildInfo("LABEL_PREFIXES", btk::MetaDataInfo::Char, 2, false);
-    if (labelPrefixesInfo)
-    {
-      labelPrefix = labelPrefixesInfo->ToString(0);
-      labelPrefix = labelPrefix.erase(labelPrefix.find_last_not_of(' ') + 1);
-      labelPrefix = labelPrefix.erase(0, labelPrefix.find_first_not_of(' '));
-    }
-  }
-  
-  btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS]);
-  btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProcesses[BTK_FORCE_PLATFORMS]);
-  btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED]);
-  virtualMarkersSeparator->SetInput(reader->GetOutput()->GetPoints());
-  forcePlatformsExtractor->SetInput(reader->GetOutput());
-  GRWsDownsampler->SetUpDownRatio(reader->GetOutput()->GetNumberAnalogSamplePerFrame());
-  // Need to update the separator right now.
-  virtualMarkersSeparator->SetLabelPrefix(labelPrefix);
-  virtualMarkersSeparator->Update();
-  
+  this->loadAcquisition();
   this->m_Filename = filename;
-  this->m_FirstFrame = this->mp_BTKAcquisition->GetFirstFrame();
-  this->m_LastFrame = this->mp_BTKAcquisition->GetLastFrame();
-  this->mp_ROI[0] = this->m_FirstFrame;
-  this->mp_ROI[1] = this->m_LastFrame;
-  int inc = 0;
-  // The orders for the points are important as their ID follows the same rule than in the class btk::VTKMarkersFramesSource
-  // Markers
-  btk::PointCollection::Pointer points = virtualMarkersSeparator->GetOutput(0);
-  for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
-  {
-    Point* p = new Point();
-    p->label = QString::fromStdString((*it)->GetLabel());
-    p->description = QString::fromStdString((*it)->GetDescription());
-    p->type = Point::Marker;
-    p->radius = 8.0;
-    p->color = Qt::white;
-    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
-  }
-  // Virtual markers (CoM, CoG, ...)
-  points = virtualMarkersSeparator->GetOutput(2);
-  for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
-  {
-    Point* p = new Point();
-    p->label = QString::fromStdString((*it)->GetLabel());
-    p->description = QString::fromStdString((*it)->GetDescription());
-    p->type = Point::VirtualMarker;
-    p->radius = 8.0;
-    p->color = Qt::white;
-    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
-  }
-  // Virtual markers used to define frames
-  points = virtualMarkersSeparator->GetOutput(1);
-  for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
-  {
-    Point* p = new Point();
-    p->label = QString::fromStdString((*it)->GetLabel());
-    p->description = QString::fromStdString((*it)->GetDescription());
-    p->type = Point::VirtualMarkerForFrame;
-    p->radius = -1.0;
-    p->color = QColor::Invalid;
-    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
-  }
-  // Other points
-  points = virtualMarkersSeparator->GetOutput(3);
-  for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
-  {
-    Point* p = new Point();
-    p->label = QString::fromStdString((*it)->GetLabel());
-    p->description = QString::fromStdString((*it)->GetDescription());
-    if ((*it)->GetType() == btk::Point::Angle)
-      p->type = Point::Angle;
-    else if ((*it)->GetType() == btk::Point::Force)
-      p->type = Point::Force;
-    else if ((*it)->GetType() == btk::Point::Moment)
-      p->type = Point::Moment;
-    else if ((*it)->GetType() == btk::Point::Power)
-      p->type = Point::Power;
-    else if ((*it)->GetType() == btk::Point::Scalar)
-      p->type = Point::Scalar;
-    p->radius = -1.0;
-    p->color = QColor::Invalid;
-    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
-  }
-  // Analog
-  inc = 0;
-  for (btk::Acquisition::AnalogIterator it = this->mp_BTKAcquisition->BeginAnalog() ; it != this->mp_BTKAcquisition->EndAnalog() ; ++it)
-  {
-    Analog* a = new Analog();
-    a->label = QString::fromStdString((*it)->GetLabel());
-    a->description = QString::fromStdString((*it)->GetDescription());
-    a->unit = QString::fromStdString((*it)->GetUnit());
-    switch((*it)->GetGain())
-    {
-    case btk::Analog::Unknown:
-      a->gain = Analog::Unknown;
-      break;
-    case btk::Analog::PlusMinus10:
-      a->gain = Analog::PlusMinus10;
-      break;
-    case btk::Analog::PlusMinus5:
-      a->gain = Analog::PlusMinus5;
-      break;
-    case btk::Analog::PlusMinus2Dot5:
-      a->gain = Analog::PlusMinus2Dot5;
-      break;
-    case btk::Analog::PlusMinus1Dot25:
-      a->gain = Analog::PlusMinus1Dot25;
-      break;
-    case btk::Analog::PlusMinus1:
-      a->gain = Analog::PlusMinus1;
-      break;
-    }
-    a->offset = (*it)->GetOffset();
-    a->scale = (*it)->GetScale();
-    this->m_Analogs.insert(inc++, a);
-  }
-  // Event
-  inc = -1;
-  for (btk::Acquisition::EventIterator it = this->mp_BTKAcquisition->BeginEvent() ; it != this->mp_BTKAcquisition->EndEvent() ; ++it)
-  {
-    ++inc;
-    Event* e = new Event();
-    e->label = QString::fromStdString((*it)->GetLabel());;
-    e->description = QString::fromStdString((*it)->GetDescription());
-    e->context = QString::fromStdString((*it)->GetContext());
-    e->subject = QString::fromStdString((*it)->GetSubject());
-    e->time = (*it)->GetTime();
-    e->frame = (*it)->GetFrame();
-    e->iconId = (*it)->GetId();
-    this->m_Events.insert(inc, e);
-  }
-  this->m_LastEventId = inc;
-  
   this->emitGeneratedInformations(reader->GetAcquisitionIO());
-  
   return "";
 };
 
 QString Acquisition::save(const QString& filename, const QMap<int, QVariant>& properties)
 {
-  btk::Acquisition::Pointer source = this->mp_BTKAcquisition;
-  btk::Acquisition::Pointer target = btk::Acquisition::New();
-  // Acquisition info
-  target->SetFirstFrame(this->mp_ROI[0]);
-  target->SetPointFrequency(source->GetPointFrequency());
-  target->SetAnalogResolution(source->GetAnalogResolution());
-  // Event
-  btk::EventCollection::Pointer targetEvents = target->GetEvents();
-  for (QMap<int,Event*>::const_iterator it = this->m_Events.begin() ; it != this->m_Events.end() ; ++it)
-  {
-    Event* e = it.value();
-    if ((e->frame >= this->mp_ROI[0]) && (e->frame <= this->mp_ROI[1]))
-    {
-      targetEvents->InsertItem(btk::Event::New(e->label.toStdString(), 
-                                             e->time,
-                                             e->context.toStdString(),
-                                             btk::Event::Unknown,
-                                             e->subject.toStdString(),
-                                             e->description.toStdString(),
-                                             e->iconId));
-    }
-  }
-  // Metadata
-  target->SetMetaData(source->GetMetaData()->Clone());
-  // - POINT
-  btk::MetaData::Pointer point;
-  btk::MetaData::Iterator it = target->GetMetaData()->FindChild("POINT");
-  if (it != target->GetMetaData()->End())
-    point = *it;
-  else
-  {
-    point = btk::MetaData::New("POINT");
-    target->GetMetaData()->AppendChild(point);
-  }
-  QString strProp;
-  QMap<int, QVariant>::const_iterator itProp;
-  // - POINT:X_SCREEN
-  strProp = "+X";
-  if ((itProp = properties.find(xScreen)) != properties.end())
-    strProp = itProp.value().toString();
-  btk::MetaDataCreateChild(point,"X_SCREEN", strProp.toStdString());
-  // - POINT:Y_SCREEN
-  strProp = "+Z";
-  if ((itProp = properties.find(yScreen)) != properties.end())
-    strProp = itProp.value().toString();
-  btk::MetaDataCreateChild(point,"Y_SCREEN", strProp.toStdString());
-  // Point
-  int numFramePoint = this->mp_ROI[1] - this->mp_ROI[0] + 1;
-  int numPoints = 0;
-  btk::PointCollection::Pointer sourcePoints = source->GetPoints();
-  btk::PointCollection::Pointer targetPoints = target->GetPoints();
-  for (QMap<int,Point*>::const_iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
-  {
-    Point* p = it.value();
-    btk::Point::Type type = btk::Point::Marker;
-    if (p->type == Point::Angle)
-      type = btk::Point::Angle;
-    else if (p->type == Point::Force)
-      type = btk::Point::Force;
-    else if (p->type == Point::Moment)
-      type = btk::Point::Moment;
-    else if (p->type == Point::Power)
-      type = btk::Point::Power;
-    else if (p->type == Point::Scalar)
-      type = btk::Point::Scalar;
-    btk::Point::Pointer sourceP = sourcePoints->GetItem(p->btkidx);
-    btk::Point::Pointer targetP = btk::Point::New(p->label.toStdString(), numFramePoint, type, p->description.toStdString());
-    targetP->SetValues(sourceP->GetValues().block(this->mp_ROI[0]-this->m_FirstFrame,0,numFramePoint,3));
-    targetP->SetResiduals(sourceP->GetResiduals().block(this->mp_ROI[0]-this->m_FirstFrame,0,numFramePoint,1));
-    targetP->SetMasks(sourceP->GetMasks().block(this->mp_ROI[0]-this->m_FirstFrame,0,numFramePoint,1));
-    targetPoints->InsertItem(targetP);
-    ++numPoints;
-  }
-  // Analog
-  int numAnalogs = 0;
-  int numFrameAnalog = numFramePoint * source->GetNumberAnalogSamplePerFrame();
-  btk::AnalogCollection::Pointer sourceAnalogs = source->GetAnalogs();
-  btk::AnalogCollection::Pointer targetAnalogs = target->GetAnalogs();
-  for (QMap<int,Analog*>::const_iterator it = this->m_Analogs.begin() ; it != this->m_Analogs.end() ; ++it)
-  {
-    Analog* a = it.value();
-    btk::Analog::Gain gain = btk::Analog::Unknown;
-    if (a->gain == Analog::PlusMinus10)
-      gain = btk::Analog::PlusMinus10;
-    else if (a->gain == Analog::PlusMinus5)
-      gain = btk::Analog::PlusMinus5;
-    else if (a->gain == Analog::PlusMinus2Dot5)
-      gain = btk::Analog::PlusMinus2Dot5;
-    else if (a->gain == Analog::PlusMinus1Dot25)
-      gain = btk::Analog::PlusMinus1Dot25;
-    else if (a->gain == Analog::PlusMinus1)
-      gain = btk::Analog::PlusMinus1;
-    btk::Analog::Pointer sourceA = sourceAnalogs->GetItem(it.key());
-    btk::Analog::Pointer targetA = btk::Analog::New(a->label.toStdString(), numFrameAnalog);
-    targetA->SetUnit(a->unit.toStdString());
-    targetA->SetGain(gain);
-    targetA->SetScale(a->scale);
-    targetA->SetOffset(a->offset);
-    targetA->SetDescription(a->description.toStdString());
-    targetA->SetValues(sourceA->GetValues().block((this->mp_ROI[0]-this->m_FirstFrame)*source->GetNumberAnalogSamplePerFrame(),0,numFrameAnalog,1));
-    targetAnalogs->InsertItem(targetA);
-    ++numAnalogs;
-  }
-  // Final setup
-  target->Resize(numPoints, numFramePoint, numAnalogs, source->GetNumberAnalogSamplePerFrame());
-  // BTK writer
-  btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
-  writer->SetFilename(filename.toStdString());
-  writer->SetInput(target);
+  QString errMsg;
+  this->write(filename, properties, this->mp_ROI[0], this->mp_ROI[1], errMsg, true);
+  return errMsg;
+}
+
+QString Acquisition::exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb)
+{
+  QString errMsg;
+  this->write(filename, properties, lb, rb, errMsg);
+  return errMsg;
+};
+
+QString Acquisition::importFrom(const QStringList& filenames, QString& importWarnings)
+{
+  // Try to read the given file
+  QList<btk::AcquisitionFileReader::Pointer> readers;
   try
   {
-    writer->Update();
+    for (int i = 0 ; i < filenames.count() ; ++i)
+    {
+      btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+      reader->SetFilename(filenames[i].toStdString());
+      reader->Update();
+      readers << reader;
+    }
   }
   catch (btk::Exception& e)
   {
@@ -370,9 +144,40 @@ QString Acquisition::save(const QString& filename, const QMap<int, QVariant>& pr
   {
     return "Unknown error.";
   }
-  this->emitGeneratedInformations(writer->GetAcquisitionIO());
+  // Check if the original acquisition need to be cropped
+  if (this->mp_BTKAcquisition)
+  {
+    if ((this->mp_ROI[0] != this->m_FirstFrame) || (this->mp_ROI[1] != this->m_LastFrame))
+    {
+      // Resize the data.
+      this->mp_BTKAcquisition->ResizeFrameNumber(this->mp_BTKAcquisition->GetPointFrameNumber() - (this->m_LastFrame - this->mp_ROI[1]));
+      this->mp_BTKAcquisition->ResizeFrameNumberFromEnd(this->mp_BTKAcquisition->GetPointFrameNumber() - (this->m_FirstFrame - this->mp_ROI[0]));
+      // Remove the events outside of the bounds
+      btk::EventCollection::Iterator it = this->mp_BTKAcquisition->BeginEvent();
+      while (it != this->mp_BTKAcquisition->EndEvent())
+      {
+        if (((*it)->GetFrame() < this->mp_ROI[0]) || ((*it)->GetFrame() > this->mp_ROI[1]))
+          it = this->mp_BTKAcquisition->RemoveEvent(it);
+        else
+          ++it;
+      }
+    }
+  }
+  // Launch the merging/concatenation
+  int shift = !this->mp_BTKAcquisition ? 0 : 1;
+  StringStreamBuf err(std::cerr);
+  btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+  merger->SetInput(0, this->mp_BTKAcquisition);
+  for (int i = 0 ; i < readers.count() ; ++i)
+    merger->SetInput(i+shift, readers[i]->GetOutput());  
+  merger->Update();
+  this->clear();
+  this->mp_BTKAcquisition = merger->GetOutput();
+  this->loadAcquisition();
+  emit informationsChanged(QVector<QString>(16,"N/A"));
+  importWarnings = QString::fromStdString(err.str());
   return "";
-}
+};
 
 void Acquisition::clear()
 {
@@ -386,6 +191,7 @@ void Acquisition::clear()
     delete *it;
   this->m_Events.clear();
   this->m_LastEventId = -1;
+  this->mp_BTKAcquisition = btk::Acquisition::Pointer(); // NULL
 }
 
 void Acquisition::setRegionOfInterest(int lb, int rb)
@@ -783,4 +589,279 @@ void Acquisition::emitGeneratedInformations(btk::AcquisitionFileIO::Pointer io)
   // Event number
   infos[15] = QString::number(this->m_Events.count());
   emit informationsChanged(infos);
+};
+
+void Acquisition::write(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb, QString& errMsg, bool updateInfo)
+{
+  btk::Acquisition::Pointer source = this->mp_BTKAcquisition;
+  btk::Acquisition::Pointer target = btk::Acquisition::New();
+  // Acquisition info
+  target->SetFirstFrame(lb);
+  target->SetPointFrequency(source->GetPointFrequency());
+  target->SetAnalogResolution(source->GetAnalogResolution());
+  // Event
+  btk::EventCollection::Pointer targetEvents = target->GetEvents();
+  for (QMap<int,Event*>::const_iterator it = this->m_Events.begin() ; it != this->m_Events.end() ; ++it)
+  {
+    Event* e = it.value();
+    if ((e->frame >= lb) && (e->frame <= rb))
+    {
+      targetEvents->InsertItem(btk::Event::New(e->label.toStdString(), 
+                                             e->time,
+                                             e->context.toStdString(),
+                                             btk::Event::Unknown,
+                                             e->subject.toStdString(),
+                                             e->description.toStdString(),
+                                             e->iconId));
+    }
+  }
+  // Metadata
+  target->SetMetaData(source->GetMetaData()->Clone());
+  // - POINT
+  btk::MetaData::Pointer point;
+  btk::MetaData::Iterator it = target->GetMetaData()->FindChild("POINT");
+  if (it != target->GetMetaData()->End())
+    point = *it;
+  else
+  {
+    point = btk::MetaData::New("POINT");
+    target->GetMetaData()->AppendChild(point);
+  }
+  QString strProp;
+  QMap<int, QVariant>::const_iterator itProp;
+  // - POINT:X_SCREEN
+  strProp = "+X";
+  if ((itProp = properties.find(xScreen)) != properties.end())
+    strProp = itProp.value().toString();
+  btk::MetaDataCreateChild(point,"X_SCREEN", strProp.toStdString());
+  // - POINT:Y_SCREEN
+  strProp = "+Z";
+  if ((itProp = properties.find(yScreen)) != properties.end())
+    strProp = itProp.value().toString();
+  btk::MetaDataCreateChild(point,"Y_SCREEN", strProp.toStdString());
+  // Point
+  int numFramePoint = rb - lb + 1;
+  int numPoints = 0;
+  btk::PointCollection::Pointer sourcePoints = source->GetPoints();
+  btk::PointCollection::Pointer targetPoints = target->GetPoints();
+  for (QMap<int,Point*>::const_iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
+  {
+    Point* p = it.value();
+    btk::Point::Type type = btk::Point::Marker;
+    if (p->type == Point::Angle)
+      type = btk::Point::Angle;
+    else if (p->type == Point::Force)
+      type = btk::Point::Force;
+    else if (p->type == Point::Moment)
+      type = btk::Point::Moment;
+    else if (p->type == Point::Power)
+      type = btk::Point::Power;
+    else if (p->type == Point::Scalar)
+      type = btk::Point::Scalar;
+    btk::Point::Pointer sourceP = sourcePoints->GetItem(p->btkidx);
+    btk::Point::Pointer targetP = btk::Point::New(p->label.toStdString(), numFramePoint, type, p->description.toStdString());
+    targetP->SetValues(sourceP->GetValues().block(lb-this->m_FirstFrame,0,numFramePoint,3));
+    targetP->SetResiduals(sourceP->GetResiduals().block(lb-this->m_FirstFrame,0,numFramePoint,1));
+    targetP->SetMasks(sourceP->GetMasks().block(lb-this->m_FirstFrame,0,numFramePoint,1));
+    targetPoints->InsertItem(targetP);
+    ++numPoints;
+  }
+  // Analog
+  int numAnalogs = 0;
+  int numFrameAnalog = numFramePoint * source->GetNumberAnalogSamplePerFrame();
+  btk::AnalogCollection::Pointer sourceAnalogs = source->GetAnalogs();
+  btk::AnalogCollection::Pointer targetAnalogs = target->GetAnalogs();
+  for (QMap<int,Analog*>::const_iterator it = this->m_Analogs.begin() ; it != this->m_Analogs.end() ; ++it)
+  {
+    Analog* a = it.value();
+    btk::Analog::Gain gain = btk::Analog::Unknown;
+    if (a->gain == Analog::PlusMinus10)
+      gain = btk::Analog::PlusMinus10;
+    else if (a->gain == Analog::PlusMinus5)
+      gain = btk::Analog::PlusMinus5;
+    else if (a->gain == Analog::PlusMinus2Dot5)
+      gain = btk::Analog::PlusMinus2Dot5;
+    else if (a->gain == Analog::PlusMinus1Dot25)
+      gain = btk::Analog::PlusMinus1Dot25;
+    else if (a->gain == Analog::PlusMinus1)
+      gain = btk::Analog::PlusMinus1;
+    btk::Analog::Pointer sourceA = sourceAnalogs->GetItem(it.key());
+    btk::Analog::Pointer targetA = btk::Analog::New(a->label.toStdString(), numFrameAnalog);
+    targetA->SetUnit(a->unit.toStdString());
+    targetA->SetGain(gain);
+    targetA->SetScale(a->scale);
+    targetA->SetOffset(a->offset);
+    targetA->SetDescription(a->description.toStdString());
+    targetA->SetValues(sourceA->GetValues().block((lb-this->m_FirstFrame)*source->GetNumberAnalogSamplePerFrame(),0,numFrameAnalog,1));
+    targetAnalogs->InsertItem(targetA);
+    ++numAnalogs;
+  }
+  // Final setup
+  target->Resize(numPoints, numFramePoint, numAnalogs, source->GetNumberAnalogSamplePerFrame());
+  // BTK writer
+  btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+  writer->SetFilename(filename.toStdString());
+  writer->SetInput(target);
+  try
+  {
+    writer->Update();
+  }
+  catch (btk::Exception& e)
+  {
+    errMsg = e.what();
+  }
+  catch (std::exception& e)
+  {
+    errMsg = "Unexpected error: " + QString(e.what());
+  }
+  catch (...)
+  {
+    errMsg = "Unknown error.";
+  }
+  if (updateInfo)
+    this->emitGeneratedInformations(writer->GetAcquisitionIO());
+  errMsg = "";
+};
+
+void Acquisition::loadAcquisition()
+{
+  std::string labelPrefix = "";
+  btk::MetaData::ConstIterator itSubjects = this->mp_BTKAcquisition->GetMetaData()->FindChild("SUBJECTS");
+  if (itSubjects != this->mp_BTKAcquisition->GetMetaData()->End())
+  {
+    btk::MetaDataInfo::Pointer labelPrefixesInfo = (*itSubjects)->ExtractChildInfo("LABEL_PREFIXES", btk::MetaDataInfo::Char, 2, false);
+    if (labelPrefixesInfo)
+    {
+      labelPrefix = labelPrefixesInfo->ToString(0);
+      labelPrefix = labelPrefix.erase(labelPrefix.find_last_not_of(' ') + 1);
+      labelPrefix = labelPrefix.erase(0, labelPrefix.find_first_not_of(' '));
+    }
+  }
+  
+  btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS]);
+  btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProcesses[BTK_FORCE_PLATFORMS]);
+  btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED]);
+  virtualMarkersSeparator->SetInput(this->mp_BTKAcquisition->GetPoints());
+  forcePlatformsExtractor->SetInput(this->mp_BTKAcquisition);
+  GRWsDownsampler->SetUpDownRatio(this->mp_BTKAcquisition->GetNumberAnalogSamplePerFrame());
+  // Need to update the separator right now.
+  virtualMarkersSeparator->SetLabelPrefix(labelPrefix);
+  virtualMarkersSeparator->Update();
+  
+  this->m_FirstFrame = this->mp_BTKAcquisition->GetFirstFrame();
+  this->m_LastFrame = this->mp_BTKAcquisition->GetLastFrame();
+  this->mp_ROI[0] = this->m_FirstFrame;
+  this->mp_ROI[1] = this->m_LastFrame;
+  int inc = 0;
+  // The orders for the points are important as their ID follows the same rule than in the class btk::VTKMarkersFramesSource
+  // Markers
+  btk::PointCollection::Pointer points = virtualMarkersSeparator->GetOutput(0);
+  for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
+  {
+    Point* p = new Point();
+    p->label = QString::fromStdString((*it)->GetLabel());
+    p->description = QString::fromStdString((*it)->GetDescription());
+    p->type = Point::Marker;
+    p->radius = 8.0;
+    p->color = Qt::white;
+    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
+    this->m_Points.insert(inc++, p);
+  }
+  // Virtual markers (CoM, CoG, ...)
+  points = virtualMarkersSeparator->GetOutput(2);
+  for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
+  {
+    Point* p = new Point();
+    p->label = QString::fromStdString((*it)->GetLabel());
+    p->description = QString::fromStdString((*it)->GetDescription());
+    p->type = Point::VirtualMarker;
+    p->radius = 8.0;
+    p->color = Qt::white;
+    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
+    this->m_Points.insert(inc++, p);
+  }
+  // Virtual markers used to define frames
+  points = virtualMarkersSeparator->GetOutput(1);
+  for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
+  {
+    Point* p = new Point();
+    p->label = QString::fromStdString((*it)->GetLabel());
+    p->description = QString::fromStdString((*it)->GetDescription());
+    p->type = Point::VirtualMarkerForFrame;
+    p->radius = -1.0;
+    p->color = QColor::Invalid;
+    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
+    this->m_Points.insert(inc++, p);
+  }
+  // Other points
+  points = virtualMarkersSeparator->GetOutput(3);
+  for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
+  {
+    Point* p = new Point();
+    p->label = QString::fromStdString((*it)->GetLabel());
+    p->description = QString::fromStdString((*it)->GetDescription());
+    if ((*it)->GetType() == btk::Point::Angle)
+      p->type = Point::Angle;
+    else if ((*it)->GetType() == btk::Point::Force)
+      p->type = Point::Force;
+    else if ((*it)->GetType() == btk::Point::Moment)
+      p->type = Point::Moment;
+    else if ((*it)->GetType() == btk::Point::Power)
+      p->type = Point::Power;
+    else if ((*it)->GetType() == btk::Point::Scalar)
+      p->type = Point::Scalar;
+    p->radius = -1.0;
+    p->color = QColor::Invalid;
+    p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
+    this->m_Points.insert(inc++, p);
+  }
+  // Analog
+  inc = 0;
+  for (btk::Acquisition::AnalogIterator it = this->mp_BTKAcquisition->BeginAnalog() ; it != this->mp_BTKAcquisition->EndAnalog() ; ++it)
+  {
+    Analog* a = new Analog();
+    a->label = QString::fromStdString((*it)->GetLabel());
+    a->description = QString::fromStdString((*it)->GetDescription());
+    a->unit = QString::fromStdString((*it)->GetUnit());
+    switch((*it)->GetGain())
+    {
+    case btk::Analog::Unknown:
+      a->gain = Analog::Unknown;
+      break;
+    case btk::Analog::PlusMinus10:
+      a->gain = Analog::PlusMinus10;
+      break;
+    case btk::Analog::PlusMinus5:
+      a->gain = Analog::PlusMinus5;
+      break;
+    case btk::Analog::PlusMinus2Dot5:
+      a->gain = Analog::PlusMinus2Dot5;
+      break;
+    case btk::Analog::PlusMinus1Dot25:
+      a->gain = Analog::PlusMinus1Dot25;
+      break;
+    case btk::Analog::PlusMinus1:
+      a->gain = Analog::PlusMinus1;
+      break;
+    }
+    a->offset = (*it)->GetOffset();
+    a->scale = (*it)->GetScale();
+    this->m_Analogs.insert(inc++, a);
+  }
+  // Event
+  inc = -1;
+  for (btk::Acquisition::EventIterator it = this->mp_BTKAcquisition->BeginEvent() ; it != this->mp_BTKAcquisition->EndEvent() ; ++it)
+  {
+    ++inc;
+    Event* e = new Event();
+    e->label = QString::fromStdString((*it)->GetLabel());;
+    e->description = QString::fromStdString((*it)->GetDescription());
+    e->context = QString::fromStdString((*it)->GetContext());
+    e->subject = QString::fromStdString((*it)->GetSubject());
+    e->time = (*it)->GetTime();
+    e->frame = (*it)->GetFrame();
+    e->iconId = (*it)->GetId();
+    this->m_Events.insert(inc, e);
+  }
+  this->m_LastEventId = inc;
 };

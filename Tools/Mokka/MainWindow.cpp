@@ -37,6 +37,7 @@
 #include "About.h"
 #include "Acquisition.h"
 #include "FileInfoDockWidget.h"
+#include "ImportAssistantDialog.h"
 #include "Metadata.h"
 #include "ModelDockWidget.h"
 #include "ProgressWidget.h"
@@ -60,7 +61,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_MetadataDlg = new Metadata(this);
   this->mp_ModelDock = new ModelDockWidget(this);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
-    
+  this->mp_ImportAssistant = new ImportAssistantDialog(this);
   // Finalize UI
   this->mp_FileInfoDock->setVisible(false); 
   this->mp_FileInfoDock->setFloating(true);
@@ -151,6 +152,25 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionSave_As, SIGNAL(triggered()), this, SLOT(saveAsFile()));
   connect(this->actionClose, SIGNAL(triggered()), this, SLOT(closeFile()));
   connect(this->action_Quit, SIGNAL(triggered()), this, SLOT(close()));
+  connect(this->actionImportAssistant, SIGNAL(triggered()), this, SLOT(importAssistant()));
+  connect(this->actionImportC3D, SIGNAL(triggered()), this, SLOT(importC3D()));
+  connect(this->actionImportTRB, SIGNAL(triggered()), this, SLOT(importTRB()));
+  connect(this->actionImportTRC, SIGNAL(triggered()), this, SLOT(importTRC()));
+  connect(this->actionImportANB, SIGNAL(triggered()), this, SLOT(importANB()));
+  connect(this->actionImportANC, SIGNAL(triggered()), this, SLOT(importANC()));
+  connect(this->actionImportCAL, SIGNAL(triggered()), this, SLOT(importForcePlatformCAL()));
+  connect(this->actionImportOrthotrackXLS, SIGNAL(triggered()), this, SLOT(importOrthotrackXLS()));
+  connect(this->actionImportRIC, SIGNAL(triggered()), this, SLOT(importRIC()));
+  connect(this->actionImportRAH, SIGNAL(triggered()), this, SLOT(importRAH()));
+  connect(this->actionImportRAW, SIGNAL(triggered()), this, SLOT(importRAW()));
+  connect(this->actionImportANG, SIGNAL(triggered()), this, SLOT(importANG()));
+  connect(this->actionImportMOM, SIGNAL(triggered()), this, SLOT(importMOM()));
+  connect(this->actionImportPWR, SIGNAL(triggered()), this, SLOT(importPWR()));
+  connect(this->actionImportGR, SIGNAL(triggered()), this, SLOT(importGRx()));
+  connect(this->actionExportC3D, SIGNAL(triggered()), this, SLOT(exportC3D()));
+  connect(this->actionExportTRC, SIGNAL(triggered()), this, SLOT(exportTRC()));
+  connect(this->actionExportANB, SIGNAL(triggered()), this, SLOT(exportANB()));
+  connect(this->actionExportANC, SIGNAL(triggered()), this, SLOT(exportANC()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -333,7 +353,7 @@ void MainWindow::viewMetadata()
 void MainWindow::setCurrentFile(const QString& filename) 
 { 
   this->setWindowModified(false); 
-  QString shownName = trUtf8("No File"); 
+  QString shownName = tr("No File"); 
   if (!filename.isEmpty())
   { 
     shownName = QFileInfo(filename).fileName(); 
@@ -341,7 +361,7 @@ void MainWindow::setCurrentFile(const QString& filename)
     this->m_RecentFiles.prepend(filename); 
   } 
   this->updateRecentFileActions(); 
-  this->setWindowTitle(trUtf8("%1[*] - %2").arg(shownName).arg(trUtf8("Mokka"))); 
+  this->setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("Mokka"))); 
 };
 
 void MainWindow::updateRecentFileActions()
@@ -387,18 +407,18 @@ void MainWindow::clearRecentFiles()
 bool MainWindow::isOkToContinue() 
 { 
   if (this->isWindowModified())
-  {
-    bool acquisitionModified = false;
-    for (int i = 0 ; i < this->mp_AcquisitionUndoStack->index() ; ++i)
-    {
-      if (static_cast<const UndoCommand*>(this->mp_AcquisitionUndoStack->command(i))->commandType() == UndoCommand::AcquisitionCmd)
-      {
-        acquisitionModified = true;
-        break;
-      }
-    }
-    if (acquisitionModified)
-    {
+  {    
+    // bool acquisitionModified = false;
+    // for (int i = 0 ; i < this->mp_AcquisitionUndoStack->index() ; ++i)
+    // {
+    //   if (static_cast<const UndoCommand*>(this->mp_AcquisitionUndoStack->command(i))->commandType() == UndoCommand::AcquisitionCmd)
+    //   {
+    //     acquisitionModified = true;
+    //     break;
+    //   }
+    // }
+    // if (acquisitionModified)
+    // {
       QMessageBox messageBox(this);
       messageBox.setIcon(QMessageBox::Information);
       messageBox.setText(tr("The document has been modified."));
@@ -419,8 +439,8 @@ bool MainWindow::isOkToContinue()
               return false;
               break;
       }
-    }
-  } 
+    // }
+  }
   return true; 
 };
 
@@ -438,8 +458,7 @@ void MainWindow::openFile()
 {
   if (this->isOkToContinue())
   {
-    QString filename = QFileDialog::getOpenFileName(this,
-                         trUtf8("Open Acquisition"),
+    QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
                          tr("Acquisition Files (*.c3d *.rah *.raw *.ric *.trc *.trb);; \
                              C3D Files (*.c3d);; \
@@ -461,17 +480,22 @@ void MainWindow::openFileDropped(const QString& filename)
 
 void MainWindow::openFile(const QString& filename)
 {
-  QApplication::setOverrideCursor(Qt::WaitCursor);
   ProgressWidget pw(this);
   pw.show();
-  this->reset();
-
   QString errMsg = this->mp_Acquisition->load(filename);
+  this->loadAcquisition(errMsg, &pw);
+  this->setCurrentFile(filename);
+  this->m_LastDirectory = QFileInfo(filename).absolutePath();
+};
+
+void MainWindow::loadAcquisition(const QString& errMsg, ProgressWidget* pw)
+{
+  QApplication::setOverrideCursor(Qt::WaitCursor);
   if (!errMsg.isEmpty())
   {
-    pw.hide();
+    pw->hide();
     QApplication::restoreOverrideCursor();
-    QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file reading", QMessageBox::Ok , this);
+    QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file reading.", QMessageBox::Ok , this);
 #ifdef Q_OS_MAC
     error.setWindowFlags(Qt::Sheet);
     error.setWindowModality(Qt::WindowModal);
@@ -481,14 +505,14 @@ void MainWindow::openFile(const QString& filename)
     error.exec();
     return;
   }
-  this->setCurrentFile(filename);
+  this->reset();
   
-  pw.setProgressValue(25);
+  pw->setProgressValue(30);
   
   this->multiView->load();
   this->multiView->updateDisplay(this->mp_Acquisition->firstFrame()); // Required
   
-  pw.setProgressValue(60);
+  pw->setProgressValue(80);
   
   this->timeEventControler->load();
   this->mp_MetadataDlg->load(this->mp_Acquisition->btkAcquisition()->GetMetaData());
@@ -496,9 +520,7 @@ void MainWindow::openFile(const QString& filename)
   if (this->mp_Acquisition->hasPoints() || this->mp_Acquisition->hasAnalogs())
     this->mp_ModelDock->setVisible(true);
   
-  pw.setProgressValue(85);
-
-  pw.setProgressValue(100);
+  pw->setProgressValue(100);
 
   QApplication::restoreOverrideCursor();
   
@@ -506,10 +528,7 @@ void MainWindow::openFile(const QString& filename)
   this->actionClose->setEnabled(true);
   this->actionViewMetadata->setEnabled(true);
   this->actionSave_As->setEnabled(true);
-  
-  this->m_LastDirectory = QFileInfo(filename).absolutePath();
-  
-  pw.setProgressValue(100);
+  this->menuExport->menuAction()->setEnabled(true);
 };
 
 void MainWindow::saveFile()
@@ -522,8 +541,7 @@ void MainWindow::saveAsFile()
   QString file = this->m_RecentFiles.first();
   QString suffix = QFileInfo(file).suffix();
   QString selectedFilter = suffix.toUpper() + " Files (*." + suffix.toLower() + ")";
-  QString filename = QFileDialog::getSaveFileName(this,
-                       trUtf8("Save As Acquisition"),
+  QString filename = QFileDialog::getSaveFileName(this, "",
                        file,
                        tr("C3D Files (*.c3d);; \
                            TRC Files (*.trc)"),
@@ -540,18 +558,12 @@ void MainWindow::saveFile(const QString& filename)
   QApplication::setOverrideCursor(Qt::WaitCursor);
   
   QMap<int, QVariant> properties;
-  QString strProp = this->multiView->groundNormalAsString();
-  properties.insert(Acquisition::yScreen, strProp);
-  if (strProp.compare("+X") == 0)
-    strProp = "+Y";
-  else
-    strProp = "+X";
-  properties.insert(Acquisition::xScreen, strProp);
+  this->setAcquisitionProperties(properties);
   QString errMsg = this->mp_Acquisition->save(filename,properties);
   if (!errMsg.isEmpty())
   {
     QApplication::restoreOverrideCursor();
-    QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file saving", QMessageBox::Ok , this);
+    QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file saving.", QMessageBox::Ok , this);
 #ifdef Q_OS_MAC
     error.setWindowFlags(Qt::Sheet);
     error.setWindowModality(Qt::WindowModal);
@@ -569,8 +581,190 @@ void MainWindow::saveFile(const QString& filename)
 void MainWindow::closeFile()
 {
   if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
+  {
     this->reset();
+    this->mp_FileInfoDock->reset();
+    this->mp_Acquisition->clear();
+  }
 }
+
+void MainWindow::importAssistant()
+{
+  this->mp_ModelDock->setEnabled(false);
+  this->mp_ImportAssistant->clear(this->m_LastDirectory);
+  this->mp_ImportAssistant->appendAcquisitionRadioButton->setEnabled(this->actionClose->isEnabled());
+  if (this->mp_ImportAssistant->exec())
+  {
+    if (this->mp_ImportAssistant->newAcquisitionRadioButton->isChecked())
+      this->mp_Acquisition->clear();
+    this->importAcquisitions(this->mp_ImportAssistant->filenames());
+  }
+  this->mp_ModelDock->setEnabled(true);
+};
+
+void MainWindow::importC3D()
+{
+  this->importAcquisition(tr("C3D Files (*.c3d)"));
+};
+
+void MainWindow::importTRC()
+{
+  this->importAcquisition(tr("TRC Files (*.trc)"));
+};
+
+void MainWindow::importTRB()
+{
+  this->importAcquisition(tr("TRB Files (*.trb)"));
+};
+
+void MainWindow::importANC()
+{
+  this->importAcquisition(tr("ANC Files (*.anc)"));
+};
+
+void MainWindow::importANB()
+{
+  this->importAcquisition(tr("ANB Files (*.anb)"));
+};
+
+void MainWindow::importForcePlatformCAL()
+{
+  this->importAcquisition(tr("CAL Files (*.cal)"));
+};
+
+void MainWindow::importOrthotrackXLS()
+{
+  this->importAcquisition(tr("Orthotrack XLS Files (*.xls)"));
+};
+
+void MainWindow::importRAH()
+{
+  this->importAcquisition(tr("RAH Files (*.rah)"));
+};
+
+void MainWindow::importRAW()
+{
+  this->importAcquisition(tr("RAW Files (*.raw)"));
+};
+
+void MainWindow::importRIC()
+{
+  this->importAcquisition(tr("RIC Files (*.ric)"));
+};
+
+void MainWindow::importGRx()
+{
+#if 1
+  this->importAcquisition(tr("GR* Files (*.gr*)"));
+#else
+  QStringList filenames = QFileDialog::getOpenFileNames(this, "",
+                            this->m_LastDirectory,
+                            tr("GR* Files (*.gr*)"));
+  this->importAcquisitions(filenames);
+#endif
+};
+
+void MainWindow::importANG()
+{
+  this->importAcquisition(tr("ANG Files (*.ang)"));
+};
+
+void MainWindow::importEMG()
+{
+  this->importAcquisition(tr("EMG Files (*.emg)"));
+};
+
+void MainWindow::importMOM()
+{
+  this->importAcquisition(tr("MOM Files (*.mom)"));
+};
+
+void MainWindow::importPWR()
+{
+  this->importAcquisition(tr("PWR Files (*.pwr)"));
+};
+
+void MainWindow::importAcquisition(const QString& filter)
+{
+  QString filename = QFileDialog::getOpenFileName(this, "",
+                       this->m_LastDirectory,
+                       filter);
+  if (!filename.isEmpty())
+    this->importAcquisitions(QStringList(filename));
+};
+
+void MainWindow::importAcquisitions(const QStringList& filenames)
+{
+  if (!filenames.isEmpty())
+  {
+    QString title = this->windowTitle();
+    QString importWarnings;
+    ProgressWidget pw(this);
+    pw.show();
+    QString errMsg = this->mp_Acquisition->importFrom(filenames, importWarnings);
+    this->loadAcquisition(errMsg, &pw);
+    this->setWindowTitle(title);
+    this->setWindowModified(true);
+    pw.hide();
+    if (!importWarnings.isEmpty())
+    {
+      QMessageBox error(QMessageBox::Warning, tr("Import warnings"), tr("Warnings appears during importing."), QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.setInformativeText(importWarnings);
+      error.exec();
+    }
+  }
+}
+
+void MainWindow::exportC3D()
+{
+  this->exportAcquisition(tr("C3D Files (*.c3d)"));
+};
+
+void MainWindow::exportTRC()
+{
+  this->exportAcquisition(tr("TRC Files (*.trc)"));
+};
+
+void MainWindow::exportANB()
+{
+  this->exportAcquisition(tr("ANB Files (*.anb)"));
+};
+
+void MainWindow::exportANC()
+{
+  this->exportAcquisition(tr("ANC Files (*.anc)"));
+};
+
+void MainWindow::exportAcquisition(const QString& filter)
+{
+  QString filename = QFileDialog::getSaveFileName(this, "",
+                       this->m_LastDirectory,
+                       filter);
+  if (!filename.isEmpty())
+  {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    QMap<int, QVariant> properties;
+    this->setAcquisitionProperties(properties);
+    QString errMsg = this->mp_Acquisition->exportTo(filename, properties, this->timeEventControler->leftBound(), this->timeEventControler->rightBound());
+    if (!errMsg.isEmpty())
+    {
+      QApplication::restoreOverrideCursor();
+      QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file exporting.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.setInformativeText(errMsg);
+      error.exec();
+      return;
+    }
+    QApplication::restoreOverrideCursor();
+  }
+};
 
 void MainWindow::reset()
 {
@@ -580,12 +774,11 @@ void MainWindow::reset()
   this->actionViewMetadata->setEnabled(false);
   this->actionSave->setEnabled(false); 
   this->actionSave_As->setEnabled(false);
+  this->menuExport->menuAction()->setEnabled(false);
   this->setCurrentFile("");
   // Time & Event Controler
   this->timeEventControler->reset();
   this->timeEventControler->setEnabled(false);
-  // Informations Dock
-  this->mp_FileInfoDock->reset();
   // Model dock
   this->mp_ModelDock->reset();
   this->mp_ModelDock->setVisible(false);
@@ -738,6 +931,18 @@ void MainWindow::setRegionOfInterest(int lf,int ff)
 void MainWindow::insertEvent(Event* e)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvent(this->mp_Acquisition, e)));
+};
+
+void MainWindow::setAcquisitionProperties(QMap<int, QVariant>& properties)
+{
+  properties.clear();
+  QString strProp = this->multiView->groundNormalAsString();
+  properties.insert(Acquisition::yScreen, strProp);
+  if (strProp.compare("+X") == 0)
+    strProp = "+Y";
+  else
+    strProp = "+X";
+  properties.insert(Acquisition::xScreen, strProp);
 };
 
 void MainWindow::readSettings()

@@ -20,6 +20,7 @@ SET(Mokka_CPP
   AbstractView.cpp
   CompositeView.cpp
   FileInfoDockWidget.cpp
+  ImportAssistantDialog.cpp
   MainWindow.cpp
   Metadata.cpp
   MetadataView.cpp
@@ -41,6 +42,7 @@ SET(Mokka_H
   AbstractView.h
   CompositeView.h
   FileInfoDockWidget.h
+  ImportAssistantDialog.h
   MainWindow.h
   MetadataView.h
   Metadata.h
@@ -57,6 +59,7 @@ SET(Mokka_UI
   About.ui
   AbstractView.ui
   FileInfoDockWidget.ui
+  ImportAssistantDialog.ui
   MainWindow.ui
   Metadata.ui
   ModelDockWidget.ui
