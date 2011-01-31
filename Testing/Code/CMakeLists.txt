@@ -5,8 +5,8 @@ INCLUDE_DIRECTORIES(${BTK_BINARY_DIR}/Testing/Code)
 
 SET(TDD_SRCS
   _TDD.cpp
-  _TDDBasicFilters.cpp
-  _TDDCommon.cpp
+#  _TDDBasicFilters.cpp
+#  _TDDCommon.cpp
   _TDDIO.cpp
   )
 

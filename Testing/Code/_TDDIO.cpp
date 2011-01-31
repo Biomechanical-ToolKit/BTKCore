@@ -14,6 +14,8 @@
 #include "C3DFileIOTest.h"
 #include "C3DFileReaderTest.h"
 #include "C3DFileWriterTest.h"
+#include "EMFFileIOTest.h"
+#include "EMFFileReaderTest.h"
 #include "EMxFileIOTest.h"
 #include "EMxFileReaderTest.h"
 #include "GRxFileIOTest.h"

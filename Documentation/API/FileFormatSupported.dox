@@ -52,6 +52,13 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>Motion Analysis</i> ASCII file format for force platform calibration</td>
   </tr>
   <tr>
+    <td style="border: 1px solid #aaa; padding: 5px;"> EMF </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::EMFFileIO @htmlonly</p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>Ascension Technology Corporation </i> ASCII file format containing 3D trajectories</td>
+  </tr>
+  <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> EMG </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>

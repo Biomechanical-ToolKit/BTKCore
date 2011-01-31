@@ -33,5 +33,7 @@
 #define XLSOrthotrackFilePathOUT std::string(TDD_FilePathOUT) + "XLSOrthotrackSamples/"
 #define EliteFilePathIN std::string(TDD_FilePathIN) + "EliteSamples/"
 #define EliteFilePathOUT std::string(TDD_FilePathOUT) + "EliteSamples/"
+#define EMFFilePathIN std::string(TDD_FilePathIN) + "EMFSamples/"
+#define EMFFilePathOUT std::string(TDD_FilePathOUT) + "EMFSamples/"
 
 #endif // _TDDConfigure_h

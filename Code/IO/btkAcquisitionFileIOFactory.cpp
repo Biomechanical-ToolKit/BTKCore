@@ -37,7 +37,6 @@
 
 // C3D File IO
 #include "btkC3DFileIO.h"
-
 // Motion Analysis Corp IOs
 #include "btkANBFileIO.h"
 #include "btkANCFileIO.h"
@@ -53,6 +52,8 @@
 #include "btkRICFileIO.h"
 #include "btkPWRFileIO.h"
 #include "btkGRxFileIO.h"
+// Others
+#include "btkEMFFileIO.h"
 
 namespace btk
 {
@@ -118,6 +119,9 @@ namespace btk
       if (io->CanReadFile(filename)) return io;
       io = EMxFileIO::New();
       if (io->CanReadFile(filename)) return io;
+      // Others
+      io = EMFFileIO::New();
+      if (io->CanReadFile(filename)) return io;
     }
     else
     {
@@ -125,33 +129,12 @@ namespace btk
       io = C3DFileIO::New();
       if (io->CanWriteFile(filename)) return io;
       // Motion Analysis Inc
-      //io = TRBFileIO::New();
-      //if (io->CanWriteFile(filename)) return io;
       io = TRCFileIO::New();
       if (io->CanWriteFile(filename)) return io;
       io = ANBFileIO::New();
       if (io->CanWriteFile(filename)) return io;
       io = ANCFileIO::New();
       if (io->CanWriteFile(filename)) return io;
-      // Elite
-      //io = RAxFileIO::New();
-      //if (io->CanWriteFile(filename)) return io;
-      //io = RICFileIO::New();
-      //if (io->CanWriteFile(filename)) return io;
-      //io = MOMFileIO::New();
-      //if (io->CanWriteFile(filename)) return io;
-      //io = ANGFileIO::New();
-      //if (io->CanWriteFile(filename)) return io;
-      //io = PWRFileIO::New();
-      //if (io->CanWriteFile(filename)) return io;
-      //io = GRxFileIO::New();
-      //if (io->CanWriteFile(filename)) return io;
-      //io = EMxFileIO::New();
-      //if (io->CanWriteFile(filename)) return io;
-      //io = CALForcePlateFileIO::New();
-      //if (io->CanWriteFile(filename)) return io;
-      //io = XLSOrthotrackFileIO::New();
-      //if (io->CanWriteFile(filename)) return io;
     }
     return AcquisitionFileIO::Pointer();
   };
