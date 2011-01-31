@@ -38,7 +38,9 @@
 
 #if defined(HAVE_SYS_MMAP)
   #if defined(HAVE_64_BIT)
-    #define _LARGEFILE_SOURCE
+    #ifndef _LARGEFILE_SOURCE
+      #define _LARGEFILE_SOURCE
+    #endif
     #define _FILE_OFFSET_BITS 64 // Replace all the functions (mmap, lssek, ...) by their 64 bit version
   #endif
   #include <sys/mman.h> // mmap, munmap

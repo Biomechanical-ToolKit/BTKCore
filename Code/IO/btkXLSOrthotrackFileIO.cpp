@@ -438,7 +438,7 @@ namespace btk
     do
     {
       *iss >> frame;
-      output->AppendEvent(Event::New(label, static_cast<int>(frame), context, Event::Unknown, "", "", id));
+      output->AppendEvent(Event::New(label, static_cast<int>(frame) + output->GetFirstFrame() - 1, context, Event::Unknown, "", "", id));
     }
     while(!iss->eof());
   };

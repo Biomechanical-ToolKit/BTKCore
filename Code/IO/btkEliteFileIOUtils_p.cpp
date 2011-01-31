@@ -82,10 +82,12 @@ namespace btk
     }
     else
       bifs->SeekRead(234, BinaryFileStream::Current); 
-    std::vector<int16_t> date = std::vector<int16_t>(3); // MM / DD / YYYY
-    date[1] = bifs->ReadU16(); // day
-    date[0] = bifs->ReadU16(); // month
-    date[2] = bifs->ReadU16(); // year
+    std::vector<int16_t> date = std::vector<int16_t>(3);
+    // The date is converted from DD/MM/YYYY to YYYY/MM/DD (Western calendar system as proposed by the C3D format).
+    date[2] = bifs->ReadU16(); // day
+    date[1] = bifs->ReadU16(); // month
+    date[0] = bifs->ReadU16(); // year
+    
     bifs->SeekRead(184, BinaryFileStream::Current);
     double framerate = static_cast<double>(bifs->ReadU16());
     bifs->SeekRead(80, BinaryFileStream::Current);

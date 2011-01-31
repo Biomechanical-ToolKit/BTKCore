@@ -61,7 +61,7 @@ namespace btk
    * @brief Interface to read/write EMx files.
    *
    * The EMx file format is used in the Elite acquisition system (BTS, Milan, Italy).
-   * The exported acquisition contain force platform data expressed in the platform axes.
+   * The exported acquisition contain EMG data.
    *
    * @ingroup BTKIO
    */
