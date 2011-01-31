@@ -45,8 +45,8 @@ ImportAssistantDialog::ImportAssistantDialog(QWidget* parent)
 #ifdef Q_OS_MAC
   this->setWindowFlags(Qt::Sheet);
   this->setWindowModality(Qt::WindowModal);
+  this->resize(this->width(), this->height()-1); // FIXME: Only the way to remove the size grip under MacOS X?
 #endif
-  
   connect(this->acquisitionSystemComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setAcquisitionSystem(int)));
   connect(this->motionTrajectoryButton, SIGNAL(clicked()), this, SLOT(openMotionTrajectoryFileDialog()));
   connect(this->motionAnalogButton, SIGNAL(clicked()), this, SLOT(openMotionAnalogFileDialog()));

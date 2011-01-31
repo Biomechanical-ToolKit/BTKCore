@@ -94,6 +94,7 @@ public Q_SLOTS:
   void importEMG();
   void importMOM();
   void importPWR();
+  void importEMF();
   void exportC3D();
   void exportTRC();
   void exportANB();

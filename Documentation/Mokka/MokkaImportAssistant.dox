@@ -1,0 +1,41 @@
+/**
+@htmlonly<div class="home"><img class="home" src="Mokka_128.png" height="32px" width="32px"/>Mokka Help<a href="index.html">Home</a><a href="_mokka_working.html">Working with Mokka</a><a href="_mokka_menu_bar.html">Menu Bar</a></div>@endhtmlonly
+@page MokkaImportAssistant Import Assistant
+@section MokkaImportAssistantSection Import Assistant
+
+The assistant will help you to import files categorized by acquisition system. For example, if you have a Motion Analysis system, this one generates 3 files (one for the markers: file TRB/TRC, one for the analog channels: ANB/ANC, one for the configuration of the force platforms: CA). Using the assistant you can easily merge them to create an acquisition with all the data. Then, you can save it in a C3D file by using the menu <tt>File > Save As</tt> or <tt>File > Export > C3D file...</tt>
+
+@image html import_assistant.png Dialog box to import several files for an acquisition system
+
+@section MokkaImportAssistantRules Rules to merge/concatenate acquisitions
+
+The difference between the merging or the concatenation depends of the acquisitions' informations.
+
+If the acquisitions are exactly the same (same label for points and analog channels) and the first 
+frame of the n+1th acquisition corresponds to the last frame of the nth acquisition, then the 
+acquisitions are merged, otherwise, the data are concatenated. Merged acquisitions means that the 
+output will have the same number of points, analog channels, events than each output but the number
+of frames corresponds to the sum of the input's frame number. 
+
+Rules to merge/concatenate acquisitions are:
+ - Must have the same acquisition frequency (or 0).
+ - Must have the same number of analog samples per point frame (if there are points and analog channels).
+ - Must have the same analog resolution.
+ - Must have the same units.
+ - Must have the same global frame orientation (check POINT:X_SCREEN and POINT:Y_SCREEN)
+ - The first input which has a non-zero acquisition frequency is used.
+ - The first input which has analog channels is used to set the analog resolution of the output.
+
+Actions during the merging/concatenation:
+ - If the first frame of the nth acquisition correspond to the last frame + 1 of the nth-1 acquisition, 
+   AND the points / analog channels correspond exactly, then acquisitions are truncated.
+ - If the first frame of two inputs are not the same, the final acquisition is adapted to contain the number of frames plus the difference between the first frame of each input.
+ - If points have the same label (and the first frames doesn't correspond), then, the second and more are incremented (i.e. from Heel to Heel_2).
+ - Idem for the analog channels.
+ - Events with the same label, context, id and time are merged.
+ - Metadata (if number of inputs greater than 1):
+    - Only metadata defined by the user are inserted (i.e. POINT, ANALOG, EVENTS, etc. are not inserted as they are only used in a C3D file.).
+    - If metadata are equivalent or equal, then they are merged, else the metadata is appended with a suffix (i.e. from STATIC_CALIBRATION:USED to STATIC_CALIBRATION:USED_2)
+
+
+*/

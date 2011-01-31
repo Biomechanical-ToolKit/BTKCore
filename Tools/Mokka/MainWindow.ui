@@ -68,7 +68,7 @@
      <x>0</x>
      <y>0</y>
      <width>954</width>
-     <height>22</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -104,6 +104,7 @@
       <addaction name="actionImportRAH"/>
       <addaction name="actionImportRAW"/>
       <addaction name="actionImportANG"/>
+      <addaction name="actionImportEMG"/>
       <addaction name="actionImportMOM"/>
       <addaction name="actionImportPWR"/>
       <addaction name="actionImportGR"/>
@@ -113,11 +114,9 @@
      <addaction name="actionImportC3D"/>
      <addaction name="menuMotion_Analysis_Corp_2"/>
      <addaction name="menuBTS_Bioengineering"/>
+     <addaction name="actionImportEMF"/>
     </widget>
     <widget class="QMenu" name="menuExport">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
      <property name="title">
       <string>Export</string>
      </property>
@@ -376,6 +375,16 @@
   <action name="actionImportGR">
    <property name="text">
     <string>GR* file...</string>
+   </property>
+  </action>
+  <action name="actionImportEMG">
+   <property name="text">
+    <string>EMG file...</string>
+   </property>
+  </action>
+  <action name="actionImportEMF">
+   <property name="text">
+    <string>EMF Ascension file...</string>
    </property>
   </action>
  </widget>

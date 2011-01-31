@@ -69,6 +69,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->addDockWidget(Qt::RightDockWidgetArea, this->mp_ModelDock); 
   this->mp_ModelDock->setVisible(false);
   this->setupUi(this);
+  this->menuExport->menuAction()->setEnabled(false);
   this->menuVisual_Configuration->addAction(this->mp_ModelDock->deselectConfigurationAction());
   this->menuVisual_Configuration->addAction(this->mp_ModelDock->clearConfigurationsAction());
   QAction* actionModelDockView = this->mp_ModelDock->toggleViewAction();
@@ -120,6 +121,8 @@ MainWindow::MainWindow(QWidget* parent)
   actions.push_back(this->timeEventControler->insertEventMenu()->menuAction());
   actions.push_back(this->timeEventControler->playbackSpeedMenu()->menuAction());
   this->multiView->setViewActions(actions);
+  //this->mp_ImportAssistant->resize(this->mp_ImportAssistant->width(), this->mp_ImportAssistant->height());
+  this->mp_ImportAssistant->layout()->setSizeConstraint(QLayout::SetFixedSize);
   
   // Setting the acquisition
   this->multiView->setAcquisition(this->mp_Acquisition);
@@ -390,7 +393,7 @@ void MainWindow::updateRecentFileActions()
 
 void MainWindow::openRecentFile()
 {
-  if (this->isOkToContinue())
+  if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
   { 
     QAction* pAction = qobject_cast<QAction*>(sender()); 
     if (pAction) 
@@ -423,16 +426,20 @@ bool MainWindow::isOkToContinue()
       messageBox.setIcon(QMessageBox::Information);
       messageBox.setText(tr("The document has been modified."));
       messageBox.setInformativeText(tr("Do you want to save your changes?"));
-      messageBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 #ifdef Q_OS_MAC
+      messageBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
       messageBox.setWindowFlags(Qt::Sheet);
       messageBox.setWindowModality(Qt::WindowModal);
-#endif
       messageBox.setDefaultButton(QMessageBox::Save);
+#else
+      messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+      messageBox.setDefaultButton(QMessageBox::Yes);
+#endif
       messageBox.setEscapeButton(QMessageBox::Cancel);
       switch(messageBox.exec())
       {
           case QMessageBox::Yes:
+          case QMessageBox::Save:
               this->saveFile();
               break;
           case QMessageBox::Cancel:
@@ -460,8 +467,9 @@ void MainWindow::openFile()
   {
     QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
-                         tr("Acquisition Files (*.c3d *.rah *.raw *.ric *.trc *.trb);; \
+                         tr("Acquisition Files (*.c3d *.emf *.rah *.raw *.ric *.trc *.trb);; \
                              C3D Files (*.c3d);; \
+                             EMF Ascension Files (*.emf);; \
                              RAH Files (*.rah);; \
                              RAW Files (*.raw);; \
                              RIC Files (*.ric);; \
@@ -482,6 +490,7 @@ void MainWindow::openFile(const QString& filename)
 {
   ProgressWidget pw(this);
   pw.show();
+  pw.setProgressValue(10);
   QString errMsg = this->mp_Acquisition->load(filename);
   this->loadAcquisition(errMsg, &pw);
   this->setCurrentFile(filename);
@@ -507,12 +516,12 @@ void MainWindow::loadAcquisition(const QString& errMsg, ProgressWidget* pw)
   }
   this->reset();
   
-  pw->setProgressValue(30);
+  pw->setProgressValue(40);
   
   this->multiView->load();
   this->multiView->updateDisplay(this->mp_Acquisition->firstFrame()); // Required
   
-  pw->setProgressValue(80);
+  pw->setProgressValue(90);
   
   this->timeEventControler->load();
   this->mp_MetadataDlg->load(this->mp_Acquisition->btkAcquisition()->GetMetaData());
@@ -684,6 +693,11 @@ void MainWindow::importPWR()
   this->importAcquisition(tr("PWR Files (*.pwr)"));
 };
 
+void MainWindow::importEMF()
+{
+  this->importAcquisition(tr("EMF Ascension Files (*.emf)"));
+};
+
 void MainWindow::importAcquisition(const QString& filter)
 {
   QString filename = QFileDialog::getOpenFileName(this, "",
@@ -701,6 +715,7 @@ void MainWindow::importAcquisitions(const QStringList& filenames)
     QString importWarnings;
     ProgressWidget pw(this);
     pw.show();
+    pw.setProgressValue(10);
     QString errMsg = this->mp_Acquisition->importFrom(filenames, importWarnings);
     this->loadAcquisition(errMsg, &pw);
     this->setWindowTitle(title);

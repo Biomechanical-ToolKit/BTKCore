@@ -2,15 +2,12 @@
 <ui version="4.0">
  <class>ImportAssistantDialog</class>
  <widget class="QDialog" name="ImportAssistantDialog">
-  <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
-  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>603</width>
-    <height>510</height>
+    <width>604</width>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -199,7 +196,7 @@ QPushButton::pressed {
 }</string>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page"/>
      <widget class="QWidget" name="motionPage">

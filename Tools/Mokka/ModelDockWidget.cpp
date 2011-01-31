@@ -504,37 +504,27 @@ bool ModelDockWidget::isOkToContinue()
   int idx = this->m_CurrentConfigurationIndex;//this->modelConfigurationComboBox->currentIndex();
   if ((idx != -1) && (this->m_ConfigurationItems[idx].isModified))
   {
-#if 0    
-    QString message = "The visual configuration has been modified.\nDo you want to save your changes?";
+    QMessageBox messageBox(this->parentWidget());
+    messageBox.setIcon(QMessageBox::Information);
+    messageBox.setText(tr("<nobr>The visual configuration has been modified.</nobr>"));
     if (this->m_ConfigurationItems[idx].isNew)
-      message += "\n\nThis configuration is a new one and will be deleted if you do not save it.";
-    QMessageBox messageBox(QMessageBox::Question, 
-                           tr("Mokka"),
-                           tr(message.toAscii().constData()), 
-                           QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                           this, Qt::Sheet);
-    messageBox.setDefaultButton(QMessageBox::Yes);
-    messageBox.setEscapeButton(QMessageBox::Cancel);
-#else
-      QMessageBox messageBox(this->parentWidget());
-      messageBox.setIcon(QMessageBox::Information);
-      messageBox.setText(tr("<nobr>The visual configuration has been modified.</nobr>"));
-      if (this->m_ConfigurationItems[idx].isNew)
-        messageBox.setInformativeText(tr("Do you want to save your changes?\n\nThis configuration is a new one and will be deleted if you do not save it."));
-      else
-        messageBox.setInformativeText(tr("Do you want to save your changes?"));
-      messageBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+      messageBox.setInformativeText(tr("Do you want to save your changes?\n\nThis configuration is a new one and will be deleted if you do not save it."));
+    else
+      messageBox.setInformativeText(tr("Do you want to save your changes?"));
 #ifdef Q_OS_MAC
-      messageBox.setWindowFlags(Qt::Sheet);
-      messageBox.setWindowModality(Qt::WindowModal);
+    messageBox.setWindowFlags(Qt::Sheet);
+    messageBox.setWindowModality(Qt::WindowModal);
+    messageBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    messageBox.setDefaultButton(QMessageBox::Save);
+#else
+    messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    messageBox.setDefaultButton(QMessageBox::Yes);
 #endif
-      messageBox.setDefaultButton(QMessageBox::Save);
-      messageBox.setEscapeButton(QMessageBox::Cancel);
-#endif
+    messageBox.setEscapeButton(QMessageBox::Cancel);
     int res = messageBox.exec();
-    if (res == QMessageBox::Save)
+    if ((res == QMessageBox::Save) ||(res == QMessageBox::Yes))
       return this->saveConfiguration(idx);
-    else if (res == QMessageBox::Discard)
+    else if ((res == QMessageBox::Discard) ||(res == QMessageBox::No))
     {
       if (this->m_ConfigurationItems[idx].isNew)
         this->removeConfiguration(idx);
