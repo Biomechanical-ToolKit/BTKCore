@@ -571,7 +571,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
 {
   QMessageBox messageBox(QMessageBox::Warning, 
                          "",
-                         "Cannot read file: ",
+                         "Cannot read configuration",
                          QMessageBox::Ok,
                          this->parentWidget());
   messageBox.setDefaultButton(QMessageBox::Ok);
@@ -582,9 +582,17 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   QFile file(filename);
   if (!file.open(QFile::ReadOnly | QFile::Text))
   {
-    messageBox.setText(messageBox.text() + filename);
-    messageBox.setInformativeText(file.errorString());
+    messageBox.setText(messageBox.text());
+    messageBox.setInformativeText("<nobr>" + filename + ": " + file.errorString() + "</nobr>\n\nThis configuration is removed from the list");
     messageBox.exec();
+    for (int i = 0 ; i < this->m_ConfigurationItems.count() ; ++i)
+    {
+      if (this->m_ConfigurationItems[i].filename.compare(filename) == 0)
+      {
+        this->modelConfigurationComboBox->removeItem(i);
+        break;
+      }
+    }
     return;
   }
   
