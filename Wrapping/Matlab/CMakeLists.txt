@@ -31,12 +31,23 @@ IF (BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
   ENDIF(MSVC)  
 ENDIF(BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
 
+IF(MATLAB_MEXFILE_EXT STREQUAL mexa64)
+  # Force to build library (Common, IO, ...) as shared objects for linux 64-bit.
+  # See issue 9: http://code.google.com/p/b-tk/issues/detail?id=9
+  MESSAGE(STATUS "-------------------------------------------------------------------------")
+  MESSAGE(STATUS "WARNING: Due to the impossibility to mix static and dynamic library under\nlinux 64-bit, BTK is set to build shared libraries.")
+  SET(BUILD_SHARED_LIBS TRUE CACHE BOOL "This option is fixed because you cannot mix static and dynamic library under linux 64-bit." FORCE)
+  # Message about the incompatibility with the library 'libstdc++' embedded into Matlab
+  MESSAGE(STATUS "-------------------------------------------------------------------------")
+  MESSAGE(STATUS "WARNING: Because Matlab embeds its own version of the library 'libstdc++'\nand then create incompatibility with MEX files, this library will be\nmoved during the installation step into {MATLAB_ROOT}/sys/os/glnxa64/_fix_btk_linux_64\ninstead of {MATLAB_ROOT}/sys/os/glnxa64")
+  MESSAGE(STATUS "-------------------------------------------------------------------------")
+ENDIF(MATLAB_MEXFILE_EXT STREQUAL mexa64)
+
 IF(NOT MATLAB_ROOT)
   MESSAGE(STATUS "")
   MESSAGE(FATAL_ERROR "ERROR: Matlab was not found!")
 ELSE(NOT MATLAB_ROOT)
   INCLUDE_DIRECTORIES(${MATLAB_INCLUDE_DIR})
-  
   # Common: accessor
   MATLAB_MEX_CREATE(btkGetAnalog btkGetAnalog.cpp BTKCommon)
   MATLAB_MEX_CREATE(btkGetAnalogFrameNumber btkGetAnalogFrameNumber.cpp BTKCommon)
@@ -160,7 +171,7 @@ IF(NOT BTK_INSTALL_NO_LIBRARIES)
           PATTERN "*.in" EXCLUDE
           PATTERN ".DS_Store" EXCLUDE)
 
-  #  MEX Files install
+  # MEX Files install
   # Fix a problem with this installation method and the use of the MS Visual Studio generators.
   IF(CMAKE_CXX_COMPILER MATCHES "^.*cl$")
     INSTALL(DIRECTORY "${BTK_LIBRARY_PATH}/@BUILD_TYPE@/"
@@ -173,5 +184,17 @@ IF(NOT BTK_INSTALL_NO_LIBRARIES)
             COMPONENT Development
             FILES_MATCHING PATTERN "*.${MATLAB_MEXFILE_EXT}")
   ENDIF(CMAKE_CXX_COMPILER MATCHES "^.*cl$")
+  
+  IF(MATLAB_MEXFILE_EXT STREQUAL mexa64)
+    # Move dynamic library libstdc++ embedded with Matlab
+    # See issue 8: http://code.google.com/p/b-tk/issues/detail?id=8
+    FILE(GLOB MATLAB_LIBSTDCXX_LIBRARY_FILES "${MATLAB_ROOT}/sys/os/glnxa64/libstdc++.so*")
+    INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E make_directory \"${MATLAB_ROOT}/sys/os/glnxa64/_fix_btk_linux_64\")")
+    FOREACH(_file ${MATLAB_LIBSTDCXX_LIBRARY_FILES})
+       INSTALL(CODE "EXECUTE_PROCESS(COMMAND sudo cp -R \"${_file}\" \"${MATLAB_ROOT}/sys/os/glnxa64/_fix_btk_linux_64/\"
+                                     COMMAND sudo rm \"${_file}\")")
+    ENDFOREACH(_file)
+                                  
+  ENDIF(MATLAB_MEXFILE_EXT STREQUAL mexa64)
 ENDIF(NOT BTK_INSTALL_NO_LIBRARIES)
 
