@@ -2,6 +2,7 @@
 #define BinaryFileStream_h
 
 #include <btkBinaryFileStream.h>
+#include <cstdio>
 
 CXXTEST_SUITE(BinaryFileStreamTest)
 {
