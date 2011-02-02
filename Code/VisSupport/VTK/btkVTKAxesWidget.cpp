@@ -41,6 +41,8 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkCaptionActor2D.h>
+#include <vtkTextProperty.h>
 
 namespace btk
 {
@@ -218,6 +220,9 @@ namespace btk
     this->mp_Renderer->SetLayer(1);
     this->mp_Renderer->InteractiveOff();
     this->mp_AxesActor = vtkAxesActor::New();
+    this->mp_AxesActor->GetXAxisCaptionActor2D()->GetCaptionTextProperty()->ShadowOff();
+    this->mp_AxesActor->GetYAxisCaptionActor2D()->GetCaptionTextProperty()->ShadowOff();
+    this->mp_AxesActor->GetZAxisCaptionActor2D()->GetCaptionTextProperty()->ShadowOff();
     this->mp_AxesActor->SetVisibility(0);
     this->mp_Renderer->AddActor(this->mp_AxesActor);
     this->mp_ParentRenderer = 0;
