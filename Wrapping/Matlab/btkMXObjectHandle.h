@@ -123,9 +123,10 @@ namespace btk
   template <typename T>
   mxArray* MEXObjectHandle<T>::ToMEXHandle() 
   {
-    mxArray* handle  = mxCreateNumericMatrix(1, 1, mxUINT32_CLASS, mxREAL);
-    *reinterpret_cast<MEXObjectHandle<T>**>(mxGetPr(handle)) = this;
-    return handle;
+	  mxArray* handle  = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
+
+	  *static_cast<MEXObjectHandle<T>**>(mxGetData(handle)) = this;
+	  return handle;
   }
 
   /**
@@ -149,18 +150,18 @@ namespace btk
   template <typename T>
   MEXObjectHandle<T>* MEXObjectHandle<T>::FromMEXHandle(const mxArray* handle) 
   {
-    if (mxGetClassID(handle) != mxUINT32_CLASS
+    if (mxGetClassID(handle) != mxDOUBLE_CLASS
         || mxIsComplex(handle) || mxGetM(handle)!=1 || mxGetN(handle)!=1)
       mexErrMsgTxt("Parameter is not a MEXObjectHandle type.");
-
-    MEXObjectHandle* obj = *reinterpret_cast<MEXObjectHandle<T>**>(mxGetPr(handle));
+	  
+    MEXObjectHandle* obj = *static_cast<MEXObjectHandle<T>**>(mxGetData(handle));
 
     if (!obj) // gross check to see we don't have an invalid pointer
       mexErrMsgTxt("Parameter is NULL. It does not represent a MEXObjectHandle object.");
-
+	  
     if (obj->mp_Signature != obj) // check memory has correct signature
       mexErrMsgTxt("Parameter does not represent a MEXObjectHandle object.");
-
+	  
     if (obj->m_ClassID != MEXClassID<T>()) // check type 
     {
       mexPrintf("Given: <%i>, Required: <%i>.\n", obj->m_ClassID, MEXClassID<T>());
