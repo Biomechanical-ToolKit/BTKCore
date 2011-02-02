@@ -590,6 +590,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
       if (this->m_ConfigurationItems[i].filename.compare(filename) == 0)
       {
         this->modelConfigurationComboBox->removeItem(i);
+        this->m_ConfigurationItems.removeAt(i);
         break;
       }
     }
