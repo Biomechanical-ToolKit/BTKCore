@@ -457,7 +457,7 @@ namespace btk
       {
         if (((*it)->GetLabel().compare(label) == 0) 
             && ((*it)->GetContext().compare(context) == 0)
-            && ((*it)->GetFrame() == static_cast<int>(frame)))
+            && ((*it)->GetFrame() == static_cast<int>(frame + output->GetFirstFrame() - 1)))
         {
           (*it)->SetDetectionFlags(Event::FromForcePlatform);
           break;
