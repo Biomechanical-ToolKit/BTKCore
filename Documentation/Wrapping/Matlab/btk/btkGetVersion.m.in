@@ -3,4 +3,4 @@ function v = btkGetVersion()
 
 %  Author: A. Barré
 %   Copyright 2009-2011 Biomechanical ToolKit
-v = '${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}.${BTK_VERSION_PATCH}'
+v = '${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}.${BTK_VERSION_PATCH}';
