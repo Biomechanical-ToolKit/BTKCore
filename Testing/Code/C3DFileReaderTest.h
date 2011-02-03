@@ -510,7 +510,7 @@ CXXTEST_SUITE(C3DFileReaderTest)
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
     reader->SetFilename(C3DFilePathIN + "sample18/bad_parameter_section.c3d");
 
-    TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::C3DFileIOException &e, e.what(), std::string("Error during the pointing of another parameter|group"));
+    TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::C3DFileIOException &e, e.what(), std::string("Bad data first block"));
   };
 
   CXXTEST_TEST(Sample19_sample19)

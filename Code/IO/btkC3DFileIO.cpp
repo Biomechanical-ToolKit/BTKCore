@@ -251,17 +251,23 @@ namespace btk
         throw(C3DFileIOException("Bad header key"));
       ibfs->SeekRead(512 * (parameterFirstBlock - 1) + 3, BinaryFileStream::Begin);
       BinaryFileStream* oldBFS = ibfs;
-      switch (ibfs->ReadI8() - 83)
+      switch (ibfs->ReadI8())
       {
-        case IEEE_LittleEndian : // IEEE LE (Intel)
+        case IEEE_LittleEndian :
+          btkIOErrorMacro(filename, "Wrong processor type. Trying to continue by using the INTEL processor.");
+        case IEEE_LittleEndian + 83 : // IEEE LE (Intel)
           this->SetByteOrder(IEEE_LittleEndian);
           ibfs = new IEEELittleEndianBinaryFileStream();
           break;
-        case VAX_LittleEndian : // VAX LE (DEC)
+        case VAX_LittleEndian :
+          btkIOErrorMacro(filename, "Wrong processor type. Trying to continue by using the DEC processor.");
+        case VAX_LittleEndian + 83 : // VAX LE (DEC)
           this->SetByteOrder(VAX_LittleEndian);
           ibfs = new VAXLittleEndianBinaryFileStream();
           break;
-        case IEEE_BigEndian : // IEEE BE (MIPS)
+        case IEEE_BigEndian :
+          btkIOErrorMacro(filename, "Wrong processor type. Trying to continue by using the MIPS processor.");
+        case IEEE_BigEndian + 83 : // IEEE BE (MIPS)
           this->SetByteOrder(IEEE_BigEndian);
           ibfs = new IEEEBigEndianBinaryFileStream();
           break;
@@ -272,7 +278,6 @@ namespace btk
       ibfs->SwapStream(oldBFS);
       delete oldBFS;
       ibfs->SeekRead(2, BinaryFileStream::Begin);
-      uint8_t firstBlock = 1;
       uint16_t pointNumber = 0,
                totalAnalogSamplesPer3dFrame = 0,
                dataFirstBlock = 0, 
@@ -348,19 +353,16 @@ namespace btk
         }
     // Parameter
         ibfs->SeekRead((512 * (parameterFirstBlock - 1)), BinaryFileStream::Begin);
-        firstBlock = ibfs->ReadU8();
-        // Some file doesn't respect the parameter key (equal to 80) 
-        // if (ibfs->ReadI8() != 80) throw(C3DFileIOException("Bad parameter Key"));
+        // From the C3D documentation:
+        // "The first two bytes of the parameter record are only meaningful if they also form the first word of the file"
+        // [...]
+        // "This is because one common technique for creating C3D files used to be to maintain a parameter “template” as a separate file"
+        ibfs->ReadU8();
         ibfs->ReadI8();
       }
       uint8_t blockNumber = ibfs->ReadU8();
       ibfs->ReadU8(); // Processor type
       size_t totalBytesRead = 4; // the four bytes read previously.
-      if (firstBlock > 1)
-      {
-        ibfs->SeekRead((512 * (firstBlock - 1) - 4), BinaryFileStream::Current);
-        totalBytesRead += (512 * (firstBlock - 1) - 4);
-      }
       int8_t nbCharLabel = 0;
       int8_t id = 0;
       int offset = 0;
@@ -438,7 +440,11 @@ namespace btk
         if (lastEntry)
           offset = 0;
         if (offset < 0)
-          throw(C3DFileIOException("Error during the pointing of another parameter|group"));
+        {
+          btkIOErrorMacro(filename, "Error during the pointing of another parameter|group. Trying to continue...");
+          ibfs->SeekRead(offset, BinaryFileStream::Current);
+          offset = 0;
+        }
         // Checks if the next parameter is not pointing in the Data section.
         if ((totalBytesRead + offset) > static_cast<unsigned int>((blockNumber * 512)))
         {
@@ -450,7 +456,7 @@ namespace btk
           }
           else if (!alreadyDisplayParameterOverflowMessage)
           {
-            btkIOErrorMacro(filename, "The next parameter is pointing outside the parameter section but not yet in the Data section. Trying to continue ...");
+            btkIOErrorMacro(filename, "The next parameter is pointing outside the parameter section but not yet in the Data section. Trying to continue...");
             alreadyDisplayParameterOverflowMessage = true;
           }
         }
@@ -550,7 +556,7 @@ namespace btk
     // Data
       if (dataFirstBlock != 0)
       {
-        if (dataFirstBlock < (parameterFirstBlock + (firstBlock != 0 ? (firstBlock - 1) : 0) + blockNumber))
+        if (dataFirstBlock < (parameterFirstBlock + blockNumber))
           throw(C3DFileIOException("Bad data first block"));
         ibfs->SeekRead((512 * (dataFirstBlock - 1)), BinaryFileStream::Begin);
         if (numberSamplesPerAnalogChannel == 0)
