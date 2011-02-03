@@ -493,8 +493,11 @@ void MainWindow::openFile(const QString& filename)
   pw.setProgressValue(10);
   QString errMsg = this->mp_Acquisition->load(filename);
   this->loadAcquisition(errMsg, &pw);
-  this->setCurrentFile(filename);
-  this->m_LastDirectory = QFileInfo(filename).absolutePath();
+  if (errMsg.isEmpty())
+  {
+    this->setCurrentFile(filename);
+    this->m_LastDirectory = QFileInfo(filename).absolutePath();
+  }
 };
 
 void MainWindow::loadAcquisition(const QString& errMsg, ProgressWidget* pw)
