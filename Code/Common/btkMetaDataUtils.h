@@ -147,12 +147,10 @@ namespace btk
       if (val.size() >= 256)
       {
         std::vector<T> val1, val2;
-        typename std::vector<T>::const_iterator it1 = val.begin();
-        std::advance(it1, 255);
-        typename std::vector<T>::const_iterator it2 = val.begin(); 
-        std::advance(it2, 255);
-        val1.assign(val.begin(), it1);
-        val2.assign(it2, val.end());
+        typename std::vector<T>::const_iterator it = val.begin();
+        std::advance(it, 255);
+        val1.assign(val.begin(), it);
+        val2.assign(it, val.end());
         MetaDataCreateChild(parent, label, val1, inc);
         MetaDataCreateChild(parent, label, val2, inc + 1);
       }
@@ -173,6 +171,61 @@ namespace btk
         }
         else
           parent->AppendChild(MetaData::New(l, val));
+      }
+    }
+    else
+      btkErrorMacro("No parent.");
+  };
+  
+  /**
+   * @fn template <typename T> void MetaDataCreateChild2D(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val, int inc = 1)
+   * Creates an new MetaData or replaces its data if it already exists.
+   *
+   * This method constructs an unlocked MetaData with an 1D vector @a val as values, an integer @a numCol for the number of column, a string @a label for the label and an empty description.
+   * This method is a recursive method which give the possibility to create more than one entry if the vector's length is greater or equal to 256 * @a numCol. The parameter @a inc give the value added to the label to give the next label. For @a inc=1, The label is not modified.
+   * The number of column must be lower than 256. The number of columns is written in the first dimension.
+   *
+   * @ingroup BTKCommon
+   */
+  template <typename T>
+  void MetaDataCreateChild2D(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val, int numCol, int inc = 1)
+  {
+    if (parent.get() != 0)
+    {
+      if (numCol >= 256)
+      {
+        btkErrorMacro("Number of column is greater or equal to 256.");
+        return;
+      }
+      if (val.size() / numCol >= 256)
+      {
+        std::vector<T> val1, val2;
+        typename std::vector<T>::const_iterator it = val.begin();
+        std::advance(it, 255 * numCol);
+        val1.assign(val.begin(), it);
+        val2.assign(it, val.end());
+        MetaDataCreateChild2D(parent, label, val1, numCol, inc);
+        MetaDataCreateChild2D(parent, label, val2, numCol, inc + 1);
+      }
+      else
+      {
+        std::string l = label;
+        if (inc != 1)
+          l += ToString(inc);
+        MetaData::Iterator it = parent->FindChild(l);
+        std::vector<uint8_t> dims(2, static_cast<uint8_t>(numCol));
+        dims[1] = static_cast<uint8_t>(val.size() / 2);
+        if (it != parent->End())
+        {
+          (*it)->SetDescription("");
+          if ((*it)->HasInfo())
+            (*it)->GetInfo()->SetValues(dims, val);
+          else
+            (*it)->SetInfo(MetaDataInfo::New(dims, val));
+          (*it)->SetUnlockState(true);
+        }
+        else
+          parent->AppendChild(MetaData::New(l, dims, val));
       }
     }
     else

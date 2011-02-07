@@ -41,7 +41,6 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    io->SetWritingFlags(btk::C3DFileIO::None);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015pi.c3d");
@@ -50,7 +49,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
     reader2->SetFilename(C3DFilePathOUT + "sample01_Eb015pi.c3d");
     reader2->Update();
-    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::Acquisition::Pointer acq = reader2->GetOutput();
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -72,11 +71,13 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
 
     
-    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+    btk::Acquisition::Pointer acqRef = reader->GetOutput();
     for (int i = 1 ; i < 50 ; ++i)
     {
-      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acq2->GetAnalog(0)->GetValues()(i), 0.00001);
-      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acq2->GetAnalog(1)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acqRef->GetAnalog(0)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acqRef->GetAnalog(1)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acqRef->GetAnalog(0)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acqRef->GetAnalog(1)->GetValues()(i), 0.00001);
     }
 
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
@@ -88,6 +89,10 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_DELTA(acq->GetEvent(1)->GetTime(), 5.40, 0.0001);
     TS_ASSERT_EQUALS(acq->GetEvent(2)->GetLabel(), "RTO");
     TS_ASSERT_DELTA(acq->GetEvent(2)->GetTime(), 7.32, 0.0001);
+    
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("EVENT")->GetChild("TIMES")->GetInfo()->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("EVENT")->GetChild("TIMES")->GetInfo()->GetDimensions()[0], 2);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("EVENT")->GetChild("TIMES")->GetInfo()->GetDimensions()[1], 3);
   };
 
   CXXTEST_TEST(sample01_Eb015pr_rewrited)
@@ -106,7 +111,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
     reader2->SetFilename(C3DFilePathOUT + "sample01_Eb015pi.c3d");
     reader2->Update();
-    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::Acquisition::Pointer acq = reader2->GetOutput();
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -127,13 +132,13 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetAnalog(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
 
-    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+    btk::Acquisition::Pointer acqRef = reader->GetOutput();
     for (int i = 1 ; i < 50 ; ++i)
     {
-      TS_ASSERT_DELTA(acq->GetPoint(0)->GetResiduals()(i), acq->GetPoint(0)->GetResiduals()(i), 0.0001);
-      TS_ASSERT_DELTA(acq->GetPoint(14)->GetResiduals()(i), acq->GetPoint(14)->GetResiduals()(i), 0.0001);
-      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acq2->GetAnalog(0)->GetValues()(i), 0.00001);
-      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acq2->GetAnalog(1)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetPoint(0)->GetResiduals()(i), acqRef->GetPoint(0)->GetResiduals()(i), 0.0001);
+      TS_ASSERT_DELTA(acq->GetPoint(14)->GetResiduals()(i), acqRef->GetPoint(14)->GetResiduals()(i), 0.0001);
+      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acqRef->GetAnalog(0)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acqRef->GetAnalog(1)->GetValues()(i), 0.00001);
     }
 
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
@@ -152,9 +157,10 @@ CXXTEST_SUITE(C3DFileWriterTest)
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015si.c3d");
     writer->Update();
 
-    reader->SetFilename(C3DFilePathOUT + "sample01_Eb015si.c3d");
-    reader->Update();
-    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "sample01_Eb015si.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq = reader2->GetOutput();
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -174,7 +180,16 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetPoint(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetAnalog(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
-
+    
+    btk::Acquisition::Pointer acqRef = reader->GetOutput();
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      TS_ASSERT_DELTA(acq->GetPoint(0)->GetResiduals()(i), acqRef->GetPoint(0)->GetResiduals()(i), 0.0001);
+      TS_ASSERT_DELTA(acq->GetPoint(14)->GetResiduals()(i), acqRef->GetPoint(14)->GetResiduals()(i), 0.0001);
+      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acqRef->GetAnalog(0)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acqRef->GetAnalog(1)->GetValues()(i), 0.00001);
+    }
+    
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
   };
 
@@ -191,9 +206,10 @@ CXXTEST_SUITE(C3DFileWriterTest)
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015sr.c3d");
     writer->Update();
 
-    reader->SetFilename(C3DFilePathOUT + "sample01_Eb015sr.c3d");
-    reader->Update();
-    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "sample01_Eb015sr.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq = reader2->GetOutput();
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -213,6 +229,15 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetPoint(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetAnalog(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
+    
+    btk::Acquisition::Pointer acqRef = reader->GetOutput();
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      TS_ASSERT_DELTA(acq->GetPoint(0)->GetResiduals()(i), acqRef->GetPoint(0)->GetResiduals()(i), 0.0001);
+      TS_ASSERT_DELTA(acq->GetPoint(14)->GetResiduals()(i), acqRef->GetPoint(14)->GetResiduals()(i), 0.0001);
+      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acqRef->GetAnalog(0)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acqRef->GetAnalog(1)->GetValues()(i), 0.00001);
+    }
 
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
   };
@@ -230,9 +255,10 @@ CXXTEST_SUITE(C3DFileWriterTest)
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015vi.c3d");
     writer->Update();
 
-    reader->SetFilename(C3DFilePathOUT + "sample01_Eb015vi.c3d");
-    reader->Update();
-    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "sample01_Eb015vi.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq = reader2->GetOutput();
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -252,6 +278,15 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetPoint(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetAnalog(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
+    
+    btk::Acquisition::Pointer acqRef = reader->GetOutput();
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      TS_ASSERT_DELTA(acq->GetPoint(0)->GetResiduals()(i), acqRef->GetPoint(0)->GetResiduals()(i), 0.0001);
+      TS_ASSERT_DELTA(acq->GetPoint(14)->GetResiduals()(i), acqRef->GetPoint(14)->GetResiduals()(i), 0.0001);
+      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acqRef->GetAnalog(0)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acqRef->GetAnalog(1)->GetValues()(i), 0.00001);
+    }
 
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
   };
@@ -269,9 +304,10 @@ CXXTEST_SUITE(C3DFileWriterTest)
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015vr.c3d");
     writer->Update();
 
-    reader->SetFilename(C3DFilePathOUT + "sample01_Eb015vr.c3d");
-    reader->Update();
-    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "sample01_Eb015vr.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq = reader2->GetOutput();
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 26);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200);
@@ -292,6 +328,15 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetAnalog(14)->HasParent(), true);
     TS_ASSERT_EQUALS(acq->GetMetaData()->HasParent(), true);
 
+    btk::Acquisition::Pointer acqRef = reader->GetOutput();
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      TS_ASSERT_DELTA(acq->GetPoint(0)->GetResiduals()(i), acqRef->GetPoint(0)->GetResiduals()(i), 0.0001);
+      TS_ASSERT_DELTA(acq->GetPoint(14)->GetResiduals()(i), acqRef->GetPoint(14)->GetResiduals()(i), 0.0001);
+      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acqRef->GetAnalog(0)->GetValues()(i), 0.00001);
+      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acqRef->GetAnalog(1)->GetValues()(i), 0.00001);
+    }
+    
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
   };
 
