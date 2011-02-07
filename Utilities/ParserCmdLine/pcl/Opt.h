@@ -47,7 +47,7 @@ namespace pcl
   public:
     enum Property {None = 0x00, Required = 0x01, Assigned = 0x02, ValueRequired = 0x04, MultipleValues = 0x08, Unlabeled = 0x10};
     
-    // virtual ~Opt(); // Implicit destructor used.
+    virtual ~Opt() {};
     const std::string& GetName() const {return this->m_Name;};
     const std::string& GetAbbreviation() const {return this->m_Abbreviation;};
     const std::string& GetDescription() const {return this->m_Description;};

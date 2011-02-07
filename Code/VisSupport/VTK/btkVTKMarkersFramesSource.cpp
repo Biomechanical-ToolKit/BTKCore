@@ -274,7 +274,7 @@ namespace btk
       this->mp_MarkersColorsLUT->SetTableRange(0, num + 1);
       i = num;
     }
-    int frameNumber = this->mp_ExistingMarkers->size();
+    int frameNumber = static_cast<int>(this->mp_ExistingMarkers->size());
     for (int j = 0 ; j < ids->GetNumberOfTuples() ; ++j)
     {
       int markerIdx = ids->GetValue(j);
@@ -308,7 +308,7 @@ namespace btk
       return;
     }
     this->mp_MarkersColorIndex->SetValue(id, color);
-    int frameNumber = this->mp_ExistingMarkers->size();
+    int frameNumber = static_cast<int>(this->mp_ExistingMarkers->size());
     for (int i = 0 ; i < frameNumber ; ++i)
       this->mp_TrajectoryColors->SetValue(id * frameNumber + i, color);
   };

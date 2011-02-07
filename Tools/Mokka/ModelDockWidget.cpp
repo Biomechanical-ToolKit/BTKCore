@@ -48,7 +48,7 @@ static const QBrush defaultLabelColor = QBrush(QColor(Qt::gray));
 static const QBrush displayLabelColor = QBrush(QColor(Qt::black));
 
 ModelDockWidget::ModelDockWidget(QWidget* parent)
-: QDockWidget(parent), m_ConfigurationItems(), m_RecentColors(5), m_DisplayedIds()
+: QDockWidget(parent), m_ConfigurationItems(), m_DisplayedIds(), m_RecentColors(5)
 {
   this->m_CurrentConfigurationIndex = -1;
   this->mp_Acquisition = 0;

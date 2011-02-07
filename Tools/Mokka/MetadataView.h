@@ -77,10 +77,10 @@ public:
     QString dims = "";
     if (info.get() != 0)
     {
-      int size = info->GetDimensions().size();
+      size_t size = info->GetDimensions().size();
       if (size != 0)
       {
-        for (int j = 0 ; j < size ; ++j)
+        for (size_t j = 0 ; j < size ; ++j)
         {
           dims += QString::number(static_cast<int>(info->GetDimensions()[j]));
           if (j < (size - 1))
@@ -101,7 +101,7 @@ public:
     QString txt = "";
     if ((info.get() != 0) && (info->GetValues().size() != 0))
     {
-      int size = info->GetValues().size();
+      int size = static_cast<int>(info->GetValues().size());
       switch(info->GetFormat())
       {
         case btk::MetaDataInfo::Char:

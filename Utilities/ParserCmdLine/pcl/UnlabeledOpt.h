@@ -48,7 +48,7 @@ namespace pcl
     // ~UnlabeledOpt(); // Implicit destructor used.
     
     virtual void SetValue(const std::string& val);
-    virtual std::string PrintDescription(const std::string& indent) const {return "";};
+    virtual std::string PrintDescription(const std::string& /* indent */) const {return "";};
     
   private:
     UnlabeledOpt(const UnlabeledOpt&); // Not implemented.

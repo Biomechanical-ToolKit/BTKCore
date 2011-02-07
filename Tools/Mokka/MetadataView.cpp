@@ -138,28 +138,28 @@ void MetadataView::constructView(btk::MetaData::Pointer m, QStandardItem* parent
         case btk::MetaDataInfo::Char:
           for (size_t i = 1 ; i < info->GetValues().size() ; ++i)
           {
-            parent->setChild(++idx, 5, new QStandardItem(QString::fromStdString(info->ToString(i))));
+            parent->setChild(++idx, 5, new QStandardItem(QString::fromStdString(info->ToString((int)i))));
             this->setRowHidden(idx, parent->index(), true);
           }
           break;
         case btk::MetaDataInfo::Byte:
           for (size_t i = 1 ; i < info->GetValues().size() ; ++i)
           {
-            parent->setChild(++idx, 5, new QStandardItem(QString::number(info->ToInt(i))));
+            parent->setChild(++idx, 5, new QStandardItem(QString::number(info->ToInt((int)i))));
             this->setRowHidden(idx, parent->index(), true);
           }
           break;
         case btk::MetaDataInfo::Integer:
           for (size_t i = 1 ; i < info->GetValues().size() ; ++i)
           {
-            parent->setChild(++idx, 5, new QStandardItem(QString::number(info->ToInt(i))));
+            parent->setChild(++idx, 5, new QStandardItem(QString::number(info->ToInt((int)i))));
             this->setRowHidden(idx, parent->index(), true);
           }
           break;
         case btk::MetaDataInfo::Real:
           for (size_t i = 1 ; i < info->GetValues().size() ; ++i)
           {
-            parent->setChild(++idx, 5, new QStandardItem(QString::number(info->ToDouble(i))));
+            parent->setChild(++idx, 5, new QStandardItem(QString::number(info->ToDouble((int)i))));
             this->setRowHidden(idx, parent->index(), true);
           }
           break;

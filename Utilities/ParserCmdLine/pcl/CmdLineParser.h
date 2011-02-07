@@ -82,7 +82,7 @@ namespace pcl
     std::string m_Version;
     std::list<Opt*> m_OptList;
     std::list<ConstraintOption> m_ConstraintList;
-    int m_RequiredOption;
+    size_t m_RequiredOption;
     int m_DefaultOption;
     bool m_UnlabeledAdded;
     int m_Status;
@@ -176,7 +176,7 @@ namespace pcl
     }
     this->m_ConstraintList.push_back(c);
     if (requiredOpt)
-      this->m_RequiredOption = this->m_RequiredOption - c.second.size() + 1;
+      this->m_RequiredOption -= c.second.size() + 1;
   };
   
   inline void CmdLineParser::CheckConstraint()
@@ -200,7 +200,7 @@ namespace pcl
   
   inline void CmdLineParser::CheckRequiredOption()
   {
-    int requiredOpt = 0;
+    size_t requiredOpt = 0;
     std::list<Opt*>::iterator itOpt = this->m_OptList.begin();
     while (itOpt != this->m_OptList.end())
     {
