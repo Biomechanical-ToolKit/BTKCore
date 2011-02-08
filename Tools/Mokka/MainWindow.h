@@ -85,7 +85,7 @@ public Q_SLOTS:
   void importANC();
   void importANB();
   void importForcePlatformCAL();
-  void importOrthotrackXLS();
+  void importOrthoTrakXLS();
   void importRAH();
   void importRAW();
   void importRIC();

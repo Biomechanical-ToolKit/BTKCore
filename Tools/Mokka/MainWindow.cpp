@@ -162,7 +162,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionImportANB, SIGNAL(triggered()), this, SLOT(importANB()));
   connect(this->actionImportANC, SIGNAL(triggered()), this, SLOT(importANC()));
   connect(this->actionImportCAL, SIGNAL(triggered()), this, SLOT(importForcePlatformCAL()));
-  connect(this->actionImportOrthotrackXLS, SIGNAL(triggered()), this, SLOT(importOrthotrackXLS()));
+  connect(this->actionImportOrthoTrakXLS, SIGNAL(triggered()), this, SLOT(importOrthoTrakXLS()));
   connect(this->actionImportRIC, SIGNAL(triggered()), this, SLOT(importRIC()));
   connect(this->actionImportRAH, SIGNAL(triggered()), this, SLOT(importRAH()));
   connect(this->actionImportRAW, SIGNAL(triggered()), this, SLOT(importRAW()));
@@ -644,9 +644,9 @@ void MainWindow::importForcePlatformCAL()
   this->importAcquisition(tr("CAL Files (*.cal)"));
 };
 
-void MainWindow::importOrthotrackXLS()
+void MainWindow::importOrthoTrakXLS()
 {
-  this->importAcquisition(tr("Orthotrack XLS Files (*.xls)"));
+  this->importAcquisition(tr("OrthoTrak XLS Files (*.xls)"));
 };
 
 void MainWindow::importRAH()

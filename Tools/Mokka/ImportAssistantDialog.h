@@ -55,7 +55,7 @@ public slots:
   void openMotionTrajectoryFileDialog();
   void openMotionAnalogFileDialog();
   void openMotionForcePlatformFileDialog();
-  void openMotionOrthotrackFileDialog();
+  void openMotionOrthoTrakFileDialog();
   void openEliteTrajectoryFileDialog();
   void openEliteForcePlatformFileDialog();
   void openEliteEMGFileDialog();

@@ -460,7 +460,7 @@ int main()
   Merger->SetInput(0, TRBReader->GetOutput()); // From the TRB reader to the merger
   Merger->SetInput(1, ANBReader->GetOutput()); // From the ANB reader to the merger
   Merger->SetInput(2, CALForcePlateReader->GetOutput()); // From the CAL reader to the merger
-  Merger->SetInput(3, XLSOrthotrackReader->GetOutput()); // From the XLS reader to the merger
+  Merger->SetInput(3, XLSOrthoTrakReader->GetOutput()); // From the XLS reader to the merger
   Converter->SetInput(Merger->GetOutput()); // From the merger to the converter
   C3DWriter->SetInput(Converter->GetOutput()); // From the converter to the C3D Writer;
   
@@ -468,7 +468,7 @@ int main()
   TRBReader->SetFilename("OneAcquisition.trb");
   ANBReader->SetFilename("OneAcquisition.anb");
   CALForcePlateReader->SetFilename("OneAcquisition.cal");
-  XLSOrthotrackReader->SetFilename("OneAcquisition.xls");
+  XLSOrthoTrakReader->SetFilename("OneAcquisition.xls");
   // No option for the merger
   // Use the default units for the converter: millimeter (position), degree (angle), newton (force), newton-millimeter (moment) and watt (power).
   C3DWriter->SetFilename("OneAcquisition.c3d");

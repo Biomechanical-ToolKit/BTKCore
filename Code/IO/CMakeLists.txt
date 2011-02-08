@@ -19,7 +19,7 @@ SET(BTKIO_SRCS
   btkMOMFileIO.cpp
   btkTRBFileIO.cpp
   btkTRCFileIO.cpp
-  btkXLSOrthotrackFileIO.cpp
+  btkXLSOrthoTrakFileIO.cpp
   # Private methods
   btkMotionAnalysisFileIOUtils_p.cpp
   btkEliteFileIOUtils_p.cpp

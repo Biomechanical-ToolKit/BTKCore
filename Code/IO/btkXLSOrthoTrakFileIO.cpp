@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkXLSOrthotrackFileIO.h"
+#include "btkXLSOrthoTrakFileIO.h"
 #include "btkMetaDataUtils.h"
 #include "btkConvert.h"
 
@@ -47,25 +47,25 @@
 namespace btk
 {
   /**
-   * @class XLSOrthotrackFileIOException btkXLSOrthotrackFileIO.h
-   * @brief Exception class for the XLSOrthotrackFileIO class.
+   * @class XLSOrthoTrakFileIOException btkXLSOrthoTrakFileIO.h
+   * @brief Exception class for the XLSOrthoTrakFileIO class.
    */
   
   /**
-   * @fn XLSOrthotrackFileIOException::XLSOrthotrackFileIOException(const std::string& msg)
+   * @fn XLSOrthoTrakFileIOException::XLSOrthoTrakFileIOException(const std::string& msg)
    * Constructor.
    */
   
   /**
-   * @fn virtual XLSOrthotrackFileIOException::~XLSOrthotrackFileIOException()
+   * @fn virtual XLSOrthoTrakFileIOException::~XLSOrthoTrakFileIOException()
    * Empty destructor.
    */
   
   /**
-   * @class XLSOrthotrackFileIO btkXLSOrthotrackFileIO.h
-   * @brief Class to read XLSOrthotrack files.
+   * @class XLSOrthoTrakFileIO btkXLSOrthoTrakFileIO.h
+   * @brief Class to read XLSOrthoTrak files.
    *
-   * The XLSOrthotrack file format is created by Motion Analysis Corp.
+   * The XLSOrthoTrak file format is created by Motion Analysis Corp.
    *
    * @warning The events stocked in XLS files are only set by their frame. It is not possible to determine the time associated with it due to the lack of information. You should use the filter btk::GenerateTimeEvent to determine the time of the events.
    *
@@ -73,24 +73,24 @@ namespace btk
    */
   
   /**
-   * @typedef XLSOrthotrackFileIO::Pointer
-   * Smart pointer associated with a XLSOrthotrackFileIO object.
+   * @typedef XLSOrthoTrakFileIO::Pointer
+   * Smart pointer associated with a XLSOrthoTrakFileIO object.
    */
   
   /**
-   * @typedef XLSOrthotrackFileIO::ConstPointer
-   * Smart pointer associated with a const XLSOrthotrackFileIO object.
+   * @typedef XLSOrthoTrakFileIO::ConstPointer
+   * Smart pointer associated with a const XLSOrthoTrakFileIO object.
    */
   
   /**
-   * @fn static XLSOrthotrackFileIO::Pointer XLSOrthotrackFileIO::New()
-   * Create a XLSOrthotrackFileIO object an return it as a smart pointer.
+   * @fn static XLSOrthoTrakFileIO::Pointer XLSOrthoTrakFileIO::New()
+   * Create a XLSOrthoTrakFileIO object an return it as a smart pointer.
    */
   
   /**
    * Checks if the first word in the file corresponds to "PathFileType".
    */
-  bool XLSOrthotrackFileIO::CanReadFile(const std::string& filename)
+  bool XLSOrthoTrakFileIO::CanReadFile(const std::string& filename)
   {
     std::ifstream ifs(filename.c_str());
     bool canBeRead = true;
@@ -106,14 +106,14 @@ namespace btk
   };
   
   /**
-   * Checks if the suffix of @a filename is XLSOrthotrack.
+   * Checks if the suffix of @a filename is XLSOrthoTrak.
    */
-  bool XLSOrthotrackFileIO::CanWriteFile(const std::string& filename)
+  bool XLSOrthoTrakFileIO::CanWriteFile(const std::string& filename)
   {
     std::string lowercase = filename;
     std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type XLSOrthotrackPos = lowercase.rfind(".xls");
-    if ((XLSOrthotrackPos != std::string::npos) && (XLSOrthotrackPos == lowercase.length() - 4))
+    std::string::size_type XLSOrthoTrakPos = lowercase.rfind(".xls");
+    if ((XLSOrthoTrakPos != std::string::npos) && (XLSOrthoTrakPos == lowercase.length() - 4))
       return true;
     else
       return false;
@@ -122,7 +122,7 @@ namespace btk
   /**
    * Read the file designated by @a filename and fill @a output.
    */
-  void XLSOrthotrackFileIO::Read(const std::string& filename, Acquisition::Pointer output)
+  void XLSOrthoTrakFileIO::Read(const std::string& filename, Acquisition::Pointer output)
   {
     output->Reset();
     double* values = 0;
@@ -135,11 +135,11 @@ namespace btk
     // Check the first header keyword: "Version"
       std::getline(ifs, line);
       if (line.substr(0,8).compare("Version\t") != 0)
-        throw(XLSOrthotrackFileIOException("Invalid XLS (Orthotrack) file."));
+        throw(XLSOrthoTrakFileIOException("Invalid XLS (OrthoTrak) file."));
     // Check the second line to be sure.
       std::getline(ifs, line);
       if (line.substr(0,15).compare("Starting Frame\t") != 0)
-        throw(XLSOrthotrackFileIOException("Invalid XLS (Orthotrack) file."));
+        throw(XLSOrthoTrakFileIOException("Invalid XLS (OrthoTrak) file."));
     // Extract data
       std::istringstream iss(line, std::istringstream::in);
       std::string buf;
@@ -387,9 +387,9 @@ namespace btk
       
       if (ifs.is_open()) ifs.close();
       if (values) delete[] values;
-      throw(XLSOrthotrackFileIOException(excmsg));
+      throw(XLSOrthoTrakFileIOException(excmsg));
     }
-    catch (XLSOrthotrackFileIOException& )
+    catch (XLSOrthoTrakFileIOException& )
     {
       if (ifs.is_open()) ifs.close();
       if (values) delete[] values;
@@ -399,20 +399,20 @@ namespace btk
     {
       if (ifs.is_open()) ifs.close();
       if (values) delete[] values;
-      throw(XLSOrthotrackFileIOException("Unexpected exception occurred: " + std::string(e.what())));
+      throw(XLSOrthoTrakFileIOException("Unexpected exception occurred: " + std::string(e.what())));
     }
     catch(...)
     {
       if (ifs.is_open()) ifs.close();
       if (values) delete[] values;
-      throw(XLSOrthotrackFileIOException("Unknown exception"));
+      throw(XLSOrthoTrakFileIOException("Unknown exception"));
     }
   };
   
   /**
    * Write the file designated by @a filename with the content of @a input.
    */
-  void XLSOrthotrackFileIO::Write(const std::string& filename, Acquisition::Pointer input)
+  void XLSOrthoTrakFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
     btkNotUsed(filename);
     btkNotUsed(input);
@@ -423,13 +423,13 @@ namespace btk
   /**
    * Constructor.
    */
-  XLSOrthotrackFileIO::XLSOrthotrackFileIO()
+  XLSOrthoTrakFileIO::XLSOrthoTrakFileIO()
   : AcquisitionFileIO()
   {
     this->SetFileType(AcquisitionFileIO::ASCII);
   };
   
-  void XLSOrthotrackFileIO::AppendEvent(Acquisition::Pointer output, std::istringstream* iss, const std::string& label, const std::string& context, int id)
+  void XLSOrthoTrakFileIO::AppendEvent(Acquisition::Pointer output, std::istringstream* iss, const std::string& label, const std::string& context, int id)
   {
     iss->clear();
     std::string buf;
@@ -443,7 +443,7 @@ namespace btk
     while(!iss->eof());
   };
   
-  void XLSOrthotrackFileIO::ExtractEventDetectionFlag(Acquisition::Pointer output, std::istringstream* iss, const std::string& label, const std::string& context)
+  void XLSOrthoTrakFileIO::ExtractEventDetectionFlag(Acquisition::Pointer output, std::istringstream* iss, const std::string& label, const std::string& context)
   {
     iss->clear();
     std::string buf;
@@ -467,7 +467,7 @@ namespace btk
     while(!iss->eof());
   };
   
-  void XLSOrthotrackFileIO::AppendSpatiotemparalParameter(MetaData::Pointer st, std::istringstream* iss, double scale)
+  void XLSOrthoTrakFileIO::AppendSpatiotemparalParameter(MetaData::Pointer st, std::istringstream* iss, double scale)
   {
     iss->clear();
     std::string name;
@@ -484,7 +484,7 @@ namespace btk
     MetaDataCreateChild(st, name, values);
   };
   
-  bool XLSOrthotrackFileIO::ExtractSpecialAngleLabel(std::string& label, const std::string& str) const
+  bool XLSOrthoTrakFileIO::ExtractSpecialAngleLabel(std::string& label, const std::string& str) const
   {
     std::string::size_type pos = label.rfind(str);
     if (pos != std::string::npos)
@@ -495,7 +495,7 @@ namespace btk
     return false;
   };
   
-  bool XLSOrthotrackFileIO::ExtractSpecialForceLabel(std::string& label, const std::string& str) const
+  bool XLSOrthoTrakFileIO::ExtractSpecialForceLabel(std::string& label, const std::string& str) const
   {
     std::string::size_type pos = label.rfind(str);
     if (pos != std::string::npos)

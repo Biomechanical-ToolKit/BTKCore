@@ -295,17 +295,17 @@ QPushButton::pressed {
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="motionOrthotrackLabel">
+        <widget class="QLabel" name="motionOrthoTrakLabel">
          <property name="text">
-          <string>XLS Orthotrack file (.xls)</string>
+          <string>XLS OrthoTrak file (.xls)</string>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLineEdit" name="motionOrthotrackLineEdit"/>
+        <widget class="QLineEdit" name="motionOrthoTrakLineEdit"/>
        </item>
        <item row="3" column="2">
-        <widget class="QPushButton" name="motionOrthotrackButton">
+        <widget class="QPushButton" name="motionOrthoTrakButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>

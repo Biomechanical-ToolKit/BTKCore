@@ -35,5 +35,5 @@
 #include "TRCFileIOTest.h"
 #include "TRCFileReaderTest.h"
 #include "TRCFileWriterTest.h"
-#include "XLSOrthotrackFileIOTest.h"
-#include "XLSOrthotrackFileReaderTest.h"
+#include "XLSOrthoTrakFileIOTest.h"
+#include "XLSOrthoTrakFileReaderTest.h"

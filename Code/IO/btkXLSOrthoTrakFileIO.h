@@ -33,33 +33,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkXLSOrthotrackFileIO_h
-#define __btkXLSOrthotrackFileIO_h
+#ifndef __btkXLSOrthoTrakFileIO_h
+#define __btkXLSOrthoTrakFileIO_h
 
 #include "btkAcquisitionFileIO.h"
 #include "btkException.h"
 
 namespace btk
 {
-  class XLSOrthotrackFileIOException : public Exception
+  class XLSOrthoTrakFileIOException : public Exception
   {
   public:
-    explicit XLSOrthotrackFileIOException(const std::string& msg)
+    explicit XLSOrthoTrakFileIOException(const std::string& msg)
     : Exception(msg)
     {};
       
-    virtual ~XLSOrthotrackFileIOException() throw() {};
+    virtual ~XLSOrthoTrakFileIOException() throw() {};
   };
   
-  class XLSOrthotrackFileIO : public AcquisitionFileIO
+  class XLSOrthoTrakFileIO : public AcquisitionFileIO
   {
   public:
-    typedef SharedPtr<XLSOrthotrackFileIO> Pointer;
-    typedef SharedPtr<const XLSOrthotrackFileIO> ConstPointer;
+    typedef SharedPtr<XLSOrthoTrakFileIO> Pointer;
+    typedef SharedPtr<const XLSOrthoTrakFileIO> ConstPointer;
     
-    static Pointer New() {return Pointer(new XLSOrthotrackFileIO());};
+    static Pointer New() {return Pointer(new XLSOrthoTrakFileIO());};
     
-    // ~XLSOrthotrackFileIO(); // Implicit.
+    // ~XLSOrthoTrakFileIO(); // Implicit.
     
     BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
     BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename);
@@ -67,7 +67,7 @@ namespace btk
     BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input);
     
   protected:
-    BTK_IO_EXPORT XLSOrthotrackFileIO();
+    BTK_IO_EXPORT XLSOrthoTrakFileIO();
     
   private:
     void AppendEvent(Acquisition::Pointer output, std::istringstream* iss, const std::string& label, const std::string& context, int id);
@@ -77,11 +77,11 @@ namespace btk
     bool ExtractSpecialForceLabel(std::string& label, const std::string& str) const;
     inline void ConvertCRLFToCF(std::istringstream* iss, std::string& line);
     
-    XLSOrthotrackFileIO(const XLSOrthotrackFileIO& ); // Not implemented.
-    XLSOrthotrackFileIO& operator=(const XLSOrthotrackFileIO& ); // Not implemented.
+    XLSOrthoTrakFileIO(const XLSOrthoTrakFileIO& ); // Not implemented.
+    XLSOrthoTrakFileIO& operator=(const XLSOrthoTrakFileIO& ); // Not implemented.
   };
    
-  void XLSOrthotrackFileIO::ConvertCRLFToCF(std::istringstream* iss, std::string& line)
+  void XLSOrthoTrakFileIO::ConvertCRLFToCF(std::istringstream* iss, std::string& line)
   { 
     size_t pos = line.find_last_of('\r');
     if (pos != std::string::npos)
@@ -90,4 +90,4 @@ namespace btk
   }; 
 };
 
-#endif // __btkXLSOrthotrackFileIO_h
+#endif // __btkXLSOrthoTrakFileIO_h

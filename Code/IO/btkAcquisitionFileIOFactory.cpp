@@ -43,7 +43,7 @@
 #include "btkCALForcePlateFileIO.h"
 #include "btkTRBFileIO.h"
 #include "btkTRCFileIO.h"
-#include "btkXLSOrthotrackFileIO.h"
+#include "btkXLSOrthoTrakFileIO.h"
 // Elite IOs
 #include "btkANGFileIO.h"
 #include "btkEMxFileIO.h"
@@ -102,7 +102,7 @@ namespace btk
       if (io->CanReadFile(filename)) return io;
       io = CALForcePlateFileIO::New();
       if (io->CanReadFile(filename)) return io;
-      io = XLSOrthotrackFileIO::New();
+      io = XLSOrthoTrakFileIO::New();
       if (io->CanReadFile(filename)) return io;
       // Elite
       io = RAxFileIO::New();

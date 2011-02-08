@@ -94,7 +94,7 @@
       <addaction name="actionImportANB"/>
       <addaction name="actionImportANC"/>
       <addaction name="actionImportCAL"/>
-      <addaction name="actionImportOrthotrackXLS"/>
+      <addaction name="actionImportOrthoTrakXLS"/>
      </widget>
      <widget class="QMenu" name="menuBTS_Bioengineering">
       <property name="title">
@@ -337,9 +337,9 @@
     <string>CAL file...</string>
    </property>
   </action>
-  <action name="actionImportOrthotrackXLS">
+  <action name="actionImportOrthoTrakXLS">
    <property name="text">
-    <string>XLS Orthotrack file...</string>
+    <string>XLS OrthoTrak file...</string>
    </property>
   </action>
   <action name="actionImportRIC">

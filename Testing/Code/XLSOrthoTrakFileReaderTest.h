@@ -1,9 +1,9 @@
-#ifndef XLSOrthotrackFileReaderTest_h
-#define XLSOrthotrackFileReaderTest_h
+#ifndef XLSOrthoTrakFileReaderTest_h
+#define XLSOrthoTrakFileReaderTest_h
 
 #include <btkAcquisitionFileReader.h>
 
-CXXTEST_SUITE(XLSOrthotrackFileReaderTest)
+CXXTEST_SUITE(XLSOrthoTrakFileReaderTest)
 {
   CXXTEST_TEST(NoFile)
   {
@@ -21,7 +21,7 @@ CXXTEST_SUITE(XLSOrthotrackFileReaderTest)
   CXXTEST_TEST(Gait)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(XLSOrthotrackFilePathIN + "Gait.xls");
+    reader->SetFilename(XLSOrthoTrakFilePathIN + "Gait.xls");
     reader->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
 
@@ -120,8 +120,8 @@ CXXTEST_SUITE(XLSOrthotrackFileReaderTest)
   };
 };
 
-CXXTEST_SUITE_REGISTRATION(XLSOrthotrackFileReaderTest)
-CXXTEST_TEST_REGISTRATION(XLSOrthotrackFileReaderTest, NoFile)
-CXXTEST_TEST_REGISTRATION(XLSOrthotrackFileReaderTest, MisspelledFile)
-CXXTEST_TEST_REGISTRATION(XLSOrthotrackFileReaderTest, Gait)
+CXXTEST_SUITE_REGISTRATION(XLSOrthoTrakFileReaderTest)
+CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileReaderTest, NoFile)
+CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileReaderTest, MisspelledFile)
+CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileReaderTest, Gait)
 #endif

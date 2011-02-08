@@ -51,7 +51,7 @@ ImportAssistantDialog::ImportAssistantDialog(QWidget* parent)
   connect(this->motionTrajectoryButton, SIGNAL(clicked()), this, SLOT(openMotionTrajectoryFileDialog()));
   connect(this->motionAnalogButton, SIGNAL(clicked()), this, SLOT(openMotionAnalogFileDialog()));
   connect(this->motionForcePlatformButton, SIGNAL(clicked()), this, SLOT(openMotionForcePlatformFileDialog()));
-  connect(this->motionOrthotrackButton, SIGNAL(clicked()), this, SLOT(openMotionOrthotrackFileDialog()));
+  connect(this->motionOrthoTrakButton, SIGNAL(clicked()), this, SLOT(openMotionOrthoTrakFileDialog()));
   connect(this->eliteTrajectoryButton, SIGNAL(clicked()), this, SLOT(openEliteTrajectoryFileDialog()));
   connect(this->eliteForcePlatformButton, SIGNAL(clicked()), this, SLOT(openEliteForcePlatformFileDialog()));
   connect(this->eliteEMGButton, SIGNAL(clicked()), this, SLOT(openEliteEMGFileDialog()));
@@ -72,7 +72,7 @@ void ImportAssistantDialog::clear(const QString& dir)
   this->motionTrajectoryLineEdit->clear();
   this->motionAnalogLineEdit->clear();
   this->motionForcePlatformLineEdit->clear();
-  this->motionOrthotrackLineEdit->clear();
+  this->motionOrthoTrakLineEdit->clear();
   // Elite page
   this->eliteTrajectoryLineEdit->clear();
   this->eliteForcePlatformLineEdit->clear();
@@ -90,7 +90,7 @@ QStringList ImportAssistantDialog::filenames() const
     files << this->motionTrajectoryLineEdit->text().split(",", QString::SkipEmptyParts)
           << this->motionAnalogLineEdit->text().split(",", QString::SkipEmptyParts)
           << this->motionForcePlatformLineEdit->text().split(",", QString::SkipEmptyParts)
-          << this->motionOrthotrackLineEdit->text().split(",", QString::SkipEmptyParts);
+          << this->motionOrthoTrakLineEdit->text().split(",", QString::SkipEmptyParts);
   }
   else // Elite
   {
@@ -125,9 +125,9 @@ void ImportAssistantDialog::openMotionForcePlatformFileDialog()
   this->openFileDialog(tr("Force Platform Calibration Files (*.cal)"), this->motionForcePlatformLineEdit);
 };
 
-void ImportAssistantDialog::openMotionOrthotrackFileDialog()
+void ImportAssistantDialog::openMotionOrthoTrakFileDialog()
 {
-  this->openFileDialog(tr("Orthotrack XLS Files (*.xls)"), this->motionOrthotrackLineEdit);
+  this->openFileDialog(tr("OrthoTrak XLS Files (*.xls)"), this->motionOrthoTrakLineEdit);
 };
 
 void ImportAssistantDialog::openEliteTrajectoryFileDialog()

@@ -731,7 +731,7 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     btk::AcquisitionFileReader::Pointer calReader = btk::AcquisitionFileReader::New();
     calReader->SetFilename(CALForcePlateFilePathIN + "Forcepla.cal");
     btk::AcquisitionFileReader::Pointer xlsReader = btk::AcquisitionFileReader::New();
-    xlsReader->SetFilename(XLSOrthotrackFilePathIN + "Gait.xls");
+    xlsReader->SetFilename(XLSOrthoTrakFilePathIN + "Gait.xls");
     btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
     merger->SetInput(0, trcReader->GetOutput());
     merger->SetInput(1, ancReader->GetOutput());

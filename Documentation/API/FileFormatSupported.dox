@@ -125,8 +125,8 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> XLS </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::XLSOrthotrackFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>Motion Analysis</i> ASCII file format exported from the software <i>Orthotrack</i> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::XLSOrthoTrakFileIO @htmlonly</p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>Motion Analysis</i> ASCII file format exported from the software <i>OrthoTrak</i> </td>
   </tr>
 </table>
 <p>
