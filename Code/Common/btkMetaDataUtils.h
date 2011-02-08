@@ -178,7 +178,7 @@ namespace btk
   };
   
   /**
-   * @fn template <typename T> void MetaDataCreateChild2D(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val, int inc = 1)
+   * @fn template <typename T> void MetaDataCreateChild2D(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val, int numCol, int inc = 1)
    * Creates an new MetaData or replaces its data if it already exists.
    *
    * This method constructs an unlocked MetaData with an 1D vector @a val as values, an integer @a numCol for the number of column, a string @a label for the label and an empty description.

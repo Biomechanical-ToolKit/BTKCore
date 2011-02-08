@@ -3,6 +3,27 @@
 @page MokkaReleaseNote Release Notes
 @section MokkaReleaseNoteSection Release Notes / Changelog
 
+- <b>02/12/11: Mokka 0.2</b> released
+      - ENH: Multiple views added.
+      - ENH: Orthogonal projection added.
+      - ENH: New dock widget to show acquisition's data (markers, analog channels, angles, etc.).
+      - ENH: New widget for the timeline and the events.
+      - ENH: Staying over a marker in the 3D view will show a balloon with its label.
+      - ENH: Import / export actions.
+      - ENH: Assistant to import files categorized by company.
+      - ENH: Rubber band added to select markers in the 3D view
+      - ENH: New keyboard shortcut and mouse interaction (check the help).
+      - ENH: Help added.
+      - ENH: Icon added.
+      - UPD: Camera interaction improved for a better user experience.
+      - UPD: Loading time to create 3D objects reduced.
+      - UPD: File's format read and saved updated.
+      - UPD: New FileInfo dock.
+      - UPD: Loading a new acquisition will try to load a visual configuration based on the file name.
+      - UPD: Contextual menus added in the 3D view and the time bar
+      - UPD: Use BTK 0.1.7.
+      - FIX: Several UI fixes.
+
 - <b>06/18/10: Mokka 0.1a4</b> released
       - ENH: Drag and drop support for Mokka.
       - ENH: New widget to show the loading progress of a file

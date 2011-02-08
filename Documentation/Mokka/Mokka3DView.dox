@@ -7,6 +7,9 @@
 - Select marker using the left click. Ctrl + left click can be use to select more than one marker. Shift + left click create a selection box and toggle marker selection (selection markers if not selection, or remove them of the selection if selected).
 - To display a marker trajectory, click on the a marker by using the combination Shift + Ctrl + Left mouse button.
 - Use the right click on the main window to quickly select, unselect markers, delete selected markers, track or untrack selected markers, insert events or change the playback speed.
+- Staying over a marker will show you a balloon with its label.
+
+@b Note: For MacOS X user, the Ctrl is replaced by the command key. 
 
 @subsection Mokka3DPerspectiveView How to navigate in the 3D perspective view
 - Use the left click to rotate.

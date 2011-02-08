@@ -1,10 +1,14 @@
 @section compil_sec Compilation
 
-The Biomechanical ToolKit (BTK) was tested on PC (Windows XP, Windows Vista, Windows 7) with <a href="http://www.microsoft.com/express/vc/">Microsoft Visual C++ 2008 Express</a>, Mac OS X (Panther, Leopard) with <a href="http://developer.apple.com/tools/xcode/">XCode</a> (1.5 and 3.1 respectively) and Linux (Ubuntu 9.10). The compilation process only requires the use of a terminal/command prompt. BTK use <a href="http://www.cmake.org">CMake</a> 2.6.2 or greater to generate its build system, so it is necessary to download it from <a>http://www.cmake.org/HTML/Download.html</a>. The instructions below cover the basics of running CMake for BTK under the assumption that CMake is already installed. See the CMake web page for details on <a href="http://www.cmake.org/HTML/Install.html">installing</a> and <a href="http://www.cmake.org/HTML/RunningCMake.html">running</a> CMake. 
+The Biomechanical ToolKit (BTK) was tested on 32-bit and 64-bit architectures under Windows (Windows XP, Windows Vista, Windows 7) with <a href="http://www.microsoft.com/express/vc/">Microsoft Visual C++ Express</a> (2008 and 2010), Mac OS X (Panther, Leopard, Snow Leopard) with <a href="http://developer.apple.com/tools/xcode/">XCode</a> (1.5, 3.1 and 3.2.5 respectively) and Linux (Ubuntu 9.10, 10.04 and 10.10) with GCC (4.3, 4.4 and 4.5 respectively). The compilation process only requires the use of a terminal/command prompt. BTK use <a href="http://www.cmake.org">CMake</a> 2.6.2 or greater to generate its build system, so it is necessary to download it from <a>http://www.cmake.org/HTML/Download.html</a>. The instructions below cover the basics of running CMake for BTK under the assumption that CMake is already installed. See the CMake web page for details on <a href="http://www.cmake.org/HTML/Install.html">installing</a> and <a href="http://www.cmake.org/HTML/RunningCMake.html">running</a> CMake. 
 
 Compiling BTK requires a complete BTK source tree. Running BTK regression tests (see option @ref config_test in @ref config_sec "Configuration Options in CMake") requires for the first an internet connection to download data files from <a>ftp://ftp.c3d.org</a>. 
 
 @subsection build_sec Building with CMake
+
+<div class="important">
+@b Note: For the users which want to build BTK with the Matlab wrapping option on any OS, you can use the java utility "EasyInstallWithRedistribuableMatlabToolbox.jar" located in the root of BTK sources. It is a little utility which call scripts to configure/compile/install BTK with the options @ref config_matlab and @ref config_matlab_redistribuable.
+</div>
 
 CMake must be run to generate a build system for BTK. The build system may be placed either in the BTK source tree (an in-source build) or in a separate binary tree (an out-of-source build). The use of out-of-source builds is strongly encouraged because they make it easy to have multiple builds with different configurations sharing the same source tree. Once a single in-source build has been created it is the only build tree that can be associated with that source tree. A source tree may not be used both for an in-source build and an out-of-source build, but any number of out-of-source builds may share a source tree that does not have an in-source build. Having multiple out-of-source builds is particularly useful for installing BTK on multiple architectures using a single source tree on a shared disk.
 
@@ -55,9 +59,6 @@ To display BTK data in 2D/3D enviromments. This option activates sub-options to 
 Builds library BTKVTK to display BTK data in the <a href="http://www.vtk.org">VTK</a> environment. VTK 5.4 or above required. This option is only shown when @ref config_vissupport is activated.
 
 @subsubsection config_matlab BTK_WRAP_MATLAB
-<div class="important">
-@b Note: Matlab users using Microsoft Visual Studio (2003|2005|2008|2010) can use the script @a EasyInstallWithRedistribuableMatlabToolbox_MSVC.bat to compile and install BTK with a single click! This script is in the root of BTK sources.
-</div>
 Enable/Disable generation of BTK bindings in the Matlab language. In order to build the Matlab-based BTK interpreter, the target computer needs to have Matlab 7.0.4 or above installed. To turn on Matlab wrapping, set BTK_WRAP_MATLAB to ON during the configuration process.
 
 @paragraph config_matlab_redistribuable BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES
@@ -65,7 +66,7 @@ This option is activated if BTK_WRAP_MATLAB was activated during the previous CM
 
 @subsubsection config_scilab BTK_WRAP_SCILAB
 <div class="important">
-@b Note: Scilab users using Microsoft Visual Studio (2003|2005|2008|2010) can use the script @a EasyInstallWithRedistribuableScilabToolbox_MSVC.bat to compile and install BTK with a single click! This script is in the root of BTK sources.
+@b Warning: Scilab wrapping is not updated since BTK 0.1.6 and its easy installer was removed due to a major <a href="http://bugzilla.scilab.org/show_bug.cgi?id=6886">bug</a> in their mexlib library.
 </div>
 Enable/Disable generation of BTK bindings in the Scilab language. In order to build the Scilab-based BTK interpreter, the target computer needs to have Scilab 5.1 or above installed. To turn on Scilab wrapping, set BTK_WRAP_SCILAB to ON during the configuration process.
 
@@ -80,6 +81,9 @@ This option generates the API documentation and can be found in "Documentation/A
 
 @paragraph config_doc_api_unselected BUILD_DOCUMENTATION_API_UNSELECTED_MODULES
 This option forces to build the full API documentation.
+
+@paragraph config_doc_mokka BUILD_DOCUMENTATION_MOKKA
+This option build the documentation of the tool Mokka and can be found in "Documentation/Mokka" from the the build directory. This documentation is in a HTML format. The main file is the file index.html. Each time you build Mokka, the documentation will be copied.
 
 @paragraph config_doc_readme BUILD_DOCUMENTATION_README
 This option updates this file (Readme.html) by using the the file /Documentation/Readme/Readme.dox from the source directory. Modify Readme.dox, compile the project and you'll find a new Readme.html file in the BTK root.

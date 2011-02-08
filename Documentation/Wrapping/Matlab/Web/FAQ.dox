@@ -96,7 +96,7 @@
  @section BTKBehavior Behavior of BTK in Matlab
  
  @subsection q6 What are all these warnings when I read an acquisition file?
- These messages are only here to explain you that something is wrong in you acquisition's file and BTK attempts to correct them. 
+ These messages are only here to explain you that something is wrong in you acquisition's file and BTK attempts to correct them. To disable them, check the @ref WarningsID page.
  
  @subsection q7 Error when I try to set/remove a point/analog channel/event using its label?
  This problem can occur when you have complex labels and you try to use the field's name extracting from one the given structure. As explained in the @ref StructureFieldnameFormat, Matlab cannot manage all the characters for the field's name of a structure. To correct this problem, you can, for example, try to remove the desired point/analog channel/event by using its index. Or you can also modify the label to simplify it.
