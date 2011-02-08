@@ -78,6 +78,9 @@ public:
   QAction* activeTrajectorySelectedMarkersAction() {return this->mp_TrackSelectedMarkers;};
   QAction* unactiveTrajectorySelectedMarkersAction() {return this->mp_UntrackSelectedMarkers;};
   
+  void setRecentColor(int idx, const QColor& color);
+  const QColor& recentColor(int idx) const {return this->m_RecentColors[idx];};
+  
 public Q_SLOTS:
   // Configuration
   bool isOkToContinue();
@@ -190,7 +193,6 @@ private:
   QTreeWidgetItem* createModelOutputItem(const QString& label, int id);
   QPixmap createMarkerIcon(const QColor& c, bool circled = false, bool enabled = true) const;
   void editMarkersColor(const QColor& color);
-  void setRecentColor(int idx, const QColor& color);
   void pushRecentColor(const QColor& color);
   void drawRecentColors();
   void refresh();

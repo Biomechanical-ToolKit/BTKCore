@@ -990,6 +990,11 @@ void MainWindow::readSettings()
   QStringList recentVisualConfigName = settings.value("recentVisualConfigName").toStringList();
   QStringList recentVisualConfigFilename = settings.value("recentVisualConfigFilename").toStringList(); 
   this->mp_ModelDock->setVisualConfigurations(recentVisualConfigName, recentVisualConfigFilename);
+  this->mp_ModelDock->setRecentColor(0, settings.value("recentColor1", QColor()).value<QColor>());
+  this->mp_ModelDock->setRecentColor(1, settings.value("recentColor2", QColor()).value<QColor>());
+  this->mp_ModelDock->setRecentColor(2, settings.value("recentColor3", QColor()).value<QColor>());
+  this->mp_ModelDock->setRecentColor(3, settings.value("recentColor4", QColor()).value<QColor>());
+  this->mp_ModelDock->setRecentColor(4, settings.value("recentColor5", QColor()).value<QColor>());
   settings.endGroup();
 };
 
@@ -1025,5 +1030,10 @@ void MainWindow::writeSettings()
   this->mp_ModelDock->visualConfigurations(recentVisualConfigName, recentVisualConfigFilename);
   settings.setValue("recentVisualConfigFilename", recentVisualConfigFilename);
   settings.setValue("recentVisualConfigName", recentVisualConfigName);
+  settings.setValue("recentColor1", this->mp_ModelDock->recentColor(0));
+  settings.setValue("recentColor2", this->mp_ModelDock->recentColor(1));
+  settings.setValue("recentColor3", this->mp_ModelDock->recentColor(2));
+  settings.setValue("recentColor4", this->mp_ModelDock->recentColor(3));
+  settings.setValue("recentColor5", this->mp_ModelDock->recentColor(4));
   settings.endGroup();
 };
