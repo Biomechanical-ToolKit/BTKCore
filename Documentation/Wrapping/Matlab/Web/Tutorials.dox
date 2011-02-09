@@ -7,6 +7,7 @@
  - @ref TutorialGettingStarted
  - @ref TutorialAcquisitionExplained
  - @ref TutorialProcessingData
+ - @ref TutorialBatchProcessing
  
  @htmlonly <hr> @endhtmlonly
  
@@ -190,7 +191,19 @@ end
  figure; plot(grws(1).M) % Moment
  @endcode
  
-  @section References References
+ @section TutorialBatchProcessing Batch processing
+ Even if BTK is well adapted to open hundred of acquisition files and process them, there is a limitation in the mechanism used to manage memory between the C++ objects and Matlab. If you open too many acquisitions without releasing the memory, Matlab can send you an "Out of Memory" error and may crash... (see @ref q3 "FAQ"). One way to correct this problem is to use the function btkDeleteAcquisition which will delete the C++ object and then freed the associated memory. You can see this function as a "Close" function.
+ 
+ @code
+  % acquisitionsFilename: Large list of filenames
+  for 1:length(acquisitionsFilename)
+    acq = btkReadAcquistion(acquisitionsFilename{i});
+    % ... All of your code processing the acquisition's data
+    btkDeleteAcquisition(acq);
+  end
+  @endcode
+ 
+ @section References References
 
  -# Shimba T., <em>An estimation of center of gravity from force platform data</em>, Journal of Biomechanics, @b 1984, 17(1), 53–60.
  -# Zatsiorsky V.M., Kinetics of Human Motion, Human Kinetics Publishers, Champaign, IL, @b 2002.
