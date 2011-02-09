@@ -52,8 +52,8 @@ namespace btk
    * @brief VTK widget displaying global axes orientation
    *
    * By default, this widget is not visible. To display it, use the method VTKAxesWidget::SetEnabled().
-   * However, before enable it, you must set the interactor (@see VTKAxesWidget::SetInteractor()) 
-   * and the parent's renderer (@see VTKAxesWidget::SetParentRenderer()).
+   * However, before enable it, you must set the interactor (see VTKAxesWidget::SetInteractor()) 
+     * and the parent's renderer (see VTKAxesWidget::SetParentRenderer()).
    * This class contains its own vtkAxesActor.
    *
    * This class is inpired of the class vtkOrientationMarkerWidget in VTK.

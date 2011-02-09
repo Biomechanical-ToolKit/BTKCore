@@ -135,8 +135,8 @@ namespace btk
   /**
    * Set the AcquisitionIO helper class. This method forces the AcquisitionIO
    * to be used to read a particular file. The AcquisitionIO is oftenly created 
-   * via the objectfactory mechanism that determines whether a particular 
-   * AcquisitionIO can read a certain file (@see AcquisitionFileIOFactory). 
+   * via the object factory mechanism that determines whether a particular 
+   * AcquisitionIO can read a certain file (see AcquisitionFileIOFactory). 
    */
   void AcquisitionFileReader::SetAcquisitionIO(AcquisitionFileIO::Pointer io)
   {

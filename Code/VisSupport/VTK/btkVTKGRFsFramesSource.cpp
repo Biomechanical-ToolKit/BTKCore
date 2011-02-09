@@ -59,7 +59,7 @@ namespace btk
    * @class VTKGRFsFramesSource
    * @brief Display ground reaction forces (GRF).
    *
-   * This filter compute all GRFs when a new input is set or modified (@see VTKGRFsFramesSource::RequestInformation).
+   * This filter compute all GRFs when a new input is set or modified (see VTKGRFsFramesSource::RequestInformation).
    * The display of GRFs for each frame use the vtk TIME mechanism by setting the required frame
    * to a vtkStreamingDemandDrivenPipeline object and call the vtkRenderer::Renderer() method.
    * For example:
