@@ -7,7 +7,7 @@ PROJECT(BTK)
 # BTK version number. An even minor number corresponds to releases.
 SET(BTK_VERSION_MAJOR 0)
 SET(BTK_VERSION_MINOR 1)
-SET(BTK_VERSION_PATCH 7a1)
+SET(BTK_VERSION_PATCH 7)
 
 # Version string should not include patch level.  The major.minor is
 # enough to distinguish available features of the toolkit.
