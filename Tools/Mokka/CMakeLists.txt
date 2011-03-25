@@ -1,4 +1,5 @@
 FIND_PACKAGE(Qt4 REQUIRED)
+SET(QT_USE_QTNETWORK TRUE)
 INCLUDE(${QT_USE_FILE})
 
 SET(MOKKA_VERSION_MAJOR 0)
@@ -32,6 +33,7 @@ SET(Mokka_CPP
   TimeEventBarWidget.cpp
   TimeEventControlerWidget.cpp
   UndoCommands.cpp
+  UpdateChecker.cpp
   Viz3DWidget.cpp
   main.cpp
   )
@@ -53,6 +55,7 @@ SET(Mokka_H
   ProgressWidget.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
+  UpdateChecker.h
   Viz3DWidget.h)
 
 SET(Mokka_UI
@@ -66,7 +69,8 @@ SET(Mokka_UI
   NewEventDialog.ui
   NewModelDialog.ui
   ProgressWidget.ui
-  TimeEventControlerWidget.ui)
+  TimeEventControlerWidget.ui
+  UpdateChecker.ui)
 
 SET(Mokka_QRC
   images.qrc)

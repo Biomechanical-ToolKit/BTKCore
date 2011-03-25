@@ -33,6 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "mokkaConfigure.h"
 #include "MainWindow.h"
 #include "About.h"
 #include "Acquisition.h"
@@ -43,6 +44,7 @@
 #include "ProgressWidget.h"
 #include "UndoCommands.h"
 #include "UserRoles.h"
+#include "UpdateChecker.h"
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -62,6 +64,8 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock = new ModelDockWidget(this);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
   this->mp_ImportAssistant = new ImportAssistantDialog(this);
+  this->mp_UpdateChecker = new UpdateChecker(xstr(MOKKA_VERSION_STRING), "http://b-tk.googlecode.com/svn/latestMokka",
+                                             ":/Resources/Images/Mokka_128.png", this);
   // Finalize UI
   this->mp_FileInfoDock->setVisible(false); 
   this->mp_FileInfoDock->setFloating(true);
@@ -211,6 +215,12 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
   connect(this->timeEventControler, SIGNAL(playbackStarted()), this->multiView, SLOT(forceRubberBandDrawingOff()));
   connect(this->timeEventControler, SIGNAL(playbackStopped()), this->multiView, SLOT(forceRubberBandDrawingOn()));
+  
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+  this->menuHelp->addSeparator();
+  QAction* actionCheckUpdate = this->menuHelp->addAction(tr("Check for Updates..."));
+  connect(actionCheckUpdate, SIGNAL(triggered()), this->mp_UpdateChecker, SLOT(check()));
+#endif
 
   // Event filter
   this->multiView->installEventFilter(this);
@@ -234,6 +244,13 @@ MainWindow::MainWindow(QWidget* parent)
   QCoreApplication::setApplicationName("Mokka");
   this->readSettings();
   this->setCurrentFile("");
+  
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+  #if defined(NDEBUG)
+    if (settings.value("Preferences/checkUpdateStartup", true).toBool())
+      this->mp_UpdateChecker->check(true);
+  #endif
+#endif
 };
 
 MainWindow::~MainWindow()
