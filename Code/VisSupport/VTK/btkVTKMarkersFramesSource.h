@@ -83,6 +83,8 @@ namespace btk
     BTK_VTK_EXPORT void ShowTrajectories();
     BTK_VTK_EXPORT void HideTrajectory(int idx);
     BTK_VTK_EXPORT void HideTrajectories();
+    int GetTrajectoryLength() const {return this->m_TrajectoryLength;};
+    void SetTrajectoryLength(int len) {this->m_TrajectoryLength = len;};
     
     double GetScaleUnit() {return this->mp_Scale;};
     void SetScaleUnit(double s) {this->mp_Scale = s;};
@@ -114,6 +116,7 @@ namespace btk
     vtkLookupTable* mp_MarkersColorsLUT;
     VTKMarkersSource* mp_MarkersGenerator;
     double mp_Scale;
+    int m_TrajectoryLength;
   };
 };
 #endif // __btkVTKMarkersFramesSource_h
