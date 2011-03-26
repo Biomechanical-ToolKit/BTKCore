@@ -75,6 +75,7 @@ public:
   bool appendNewMarkerColor(const QColor& color, int* idx);
   QMenu* groundOrientationMenu() const {return this->mp_GroupOrientationMenu;};
   const QString groundNormalAsString() const;
+  QMenu* markerTrajectoryLengthMenu() const {return this->mp_MarkerTrajectoryLengthMenu;};
   
 public slots:
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
@@ -109,6 +110,7 @@ private slots:
   void updateDisplayedMarkersList(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   // Qt
   void changeGroundOrientation();
+  void changeMarkerTrajectoryLength();
   
 private:
   void updateCameras();
@@ -124,6 +126,12 @@ private:
   QAction* mp_ActionGroundOrientationPlaneXY;
   QAction* mp_ActionGroundOrientationPlaneYZ;
   QAction* mp_ActionGroundOrientationPlaneZX;
+  QMenu* mp_MarkerTrajectoryLengthMenu;
+  QAction* mp_ActionMarkerTrajectoryFull;
+  QAction* mp_ActionMarkerTrajectory25;
+  QAction* mp_ActionMarkerTrajectory50;
+  QAction* mp_ActionMarkerTrajectory100;
+  QAction* mp_ActionMarkerTrajectory200;
   QList<QAction*> m_ViewActions;
 };
 

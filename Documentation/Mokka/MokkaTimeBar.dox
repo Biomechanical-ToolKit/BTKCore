@@ -16,18 +16,29 @@
 
 @subsection MokkaTimeBarGroundOrientation Ground orientation
 Menu to choose the ground orientation
-- By defaut the visual ground orientation is Plane XY. 
-- Ground orientation can be modified to Plane YZ or Plane ZX using @htmlonly <img src="acquisition_options.png"> @endhtmlonly tip from the drop-down menu
+- By defaut the visual ground orientation is Plane XY.
+- Ground orientation can be modified to Plane YZ or Plane ZX using @htmlonly <img src="acquisition_options.png"> @endhtmlonly tip from the drop-down menu.
 
 @subsection MokkaTimeBarPlaybackSpeed Playback speed
-Menu to choose the speed of the playback 
-- By defaut the playback speed corresponds to the RealTime
-- The playback speed can be modified to 1/2,  1/4, 1/5, 1/10 or Full frames by using @htmlonly <img src="acquisition_options.png"> @endhtmlonly￼tip from the drop-down menu
-- Playback Speed > Real time: Play the acquisition at its frame rate (default) 
-- Playback Speed at 1/2: Play the acquisition at 50% of its frame rate 
-- Playback Speed at 1/5: Play the acquisition at 20% of its frame rate 
-- Playback Speed at 1/10: Play the acquisition at 10% of its frame rate 
-- Playback Speed at Full Frames: Play all frames 
+Menu to choose the speed of the playback.
+- By defaut the playback speed corresponds to the RealTime.
+- The playback speed can be modified to 1/2,  1/4, 1/5, 1/10 or Full frames by using @htmlonly <img src="acquisition_options.png"> @endhtmlonly￼tip from the drop-down menu.
+- Playback Speed at Real time: Play the acquisition at its frame rate (default).
+- Playback Speed at 1/2: Play the acquisition at 50% of its frame rate.
+- Playback Speed at 1/4: Play the acquisition at 25% of its frame rate.
+- Playback Speed at 1/5: Play the acquisition at 20% of its frame rate.
+- Playback Speed at 1/10: Play the acquisition at 10% of its frame rate.
+- Playback Speed at Full Frames: Play all frames.
+
+@subsection MokkaTimeBarMarkerTrajectory Marker Trajectory Length
+Menu to choose the length of the markers' trajectory.
+- By defaut the length is set to 100 frames.
+- The length can be set to Full, 25, 50, 100 or 200 frames by using￼tip from the drop-down menu.
+- Trajectory length will all frames: Draw the whole trajectory.
+- Trajectory length of 25 frames: Draw a total of 25 frames including holes.
+- Trajectory length of 50 frames: Draw a total of 50 frames including holes.
+- Trajectory length of 100 frames: Draw a total of 100 frames including holes (default).
+- Trajectory length of 200 frames: Draw a total of 200 frames including holes.
 
 @htmlonly
 <div class="twocolumns">
@@ -38,9 +49,9 @@ Menu to choose the speed of the playback
 - New or current event can be edited (Label / Context / Frame / Subject / Description) by using the Event editor window.
 @n
 @subsection MokkaTimeBarEditSelectedEvents Edit selected events 
-- Right click on the event. To selected more than one event, use Shift or Ctrl
-- Left click on the event options button @htmlonly <img src="event_options.png"> @endhtmlonly to see the drop-down menu and choose Edit selected events or use Ctrl + e
-- New or current event can be edited (Label / Context / Frame / Subject / Description) by using the Event editor window
+- Right click on the event. To selected more than one event, use Shift or Ctrl.
+- Left click on the event options button @htmlonly <img src="event_options.png"> @endhtmlonly to see the drop-down menu and choose Edit selected events or use Ctrl + e.
+- New or current event can be edited (Label / Context / Frame / Subject / Description) by using the Event editor window.
 @htmlonly
 </div>
 <div class="rightcolumn">
@@ -51,12 +62,12 @@ Menu to choose the speed of the playback
 @endhtmlonly
 
 @subsection MokkaTimeBarRemoveSelectedEvents Remove selected events
-- Left click on the event or use Shift or Ctrl key to selected more than one event 
-- Right click on the Time bar and choose Removed selected events form the drop-down menu or use the delete key (backspace) to remove selected events
-- Action can be reversed by using undo/redo
+- Left click on the event or use Shift or Ctrl key to selected more than one event.
+- Right click on the Time bar and choose Removed selected events form the drop-down menu or use the delete key (backspace) to remove selected events.
+- Action can be reversed by using undo/redo.
 
 @subsection MokkaTimeBarRemoveSelectedEvents Clear events
-- Use @htmlonly <img src="event_options.png"> @endhtmlonly￼and choose Clear events form the drop-down menu to clear all events. 
+- Use @htmlonly <img src="event_options.png"> @endhtmlonly￼and choose Clear events form the drop-down menu to clear all events.
 - Or right click on the time bar and selected Clear events from the drop-down menu. All the events will be removed from the time bar.
 
 @subsection MokkaTimeBarRemoveNextEvent Next event

@@ -80,6 +80,7 @@ MainWindow::MainWindow(QWidget* parent)
   actionModelDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
   this->menuView->addAction(actionModelDockView);
   this->menuSettings->addMenu(this->multiView->groundOrientationMenu());
+  this->menuSettings->addMenu(this->multiView->markerTrajectoryLengthMenu());
   this->menuSettings->addMenu(this->timeEventControler->playbackSpeedMenu());
   QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
   actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
@@ -112,6 +113,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuOpen_Recent->addAction(this->actionClear_Menu);
   connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->timeEventControler->playbackSpeedMenu()->menuAction(), this->multiView->groundOrientationMenu());
+  this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->multiView->groundOrientationMenu()->menuAction(), this->multiView->markerTrajectoryLengthMenu());
   this->multiView->initialize();
   QList<QAction*> actions;
   actions.push_back(this->mp_ModelDock->selectAllMarkersAction());

@@ -106,7 +106,32 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationPlaneYZ);
   this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationPlaneZX);
   
+  this->mp_MarkerTrajectoryLengthMenu = new QMenu(tr("Marker Trajectory Length"),this);
+  this->mp_ActionMarkerTrajectoryFull = new QAction(tr("All Frames"),this);;
+  this->mp_ActionMarkerTrajectoryFull->setCheckable(true);
+  this->mp_ActionMarkerTrajectory25 = new QAction(tr("25 Frames"),this);
+  this->mp_ActionMarkerTrajectory25->setCheckable(true);
+  this->mp_ActionMarkerTrajectory50 = new QAction(tr("50 Frames"),this);
+  this->mp_ActionMarkerTrajectory50->setCheckable(true);
+  this->mp_ActionMarkerTrajectory100 = new QAction(tr("100 Frames"),this);
+  this->mp_ActionMarkerTrajectory100->setCheckable(true);
+  this->mp_ActionMarkerTrajectory200 = new QAction(tr("200 Frames"),this);
+  this->mp_ActionMarkerTrajectory200->setCheckable(true);
+  QActionGroup* trajectoryLengthActionGroup = new QActionGroup(this);
+  trajectoryLengthActionGroup->addAction(this->mp_ActionMarkerTrajectoryFull);
+  trajectoryLengthActionGroup->addAction(this->mp_ActionMarkerTrajectory25);
+  trajectoryLengthActionGroup->addAction(this->mp_ActionMarkerTrajectory50);
+  trajectoryLengthActionGroup->addAction(this->mp_ActionMarkerTrajectory100);
+  trajectoryLengthActionGroup->addAction(this->mp_ActionMarkerTrajectory200);
+  this->mp_ActionMarkerTrajectory100->setChecked(true);
+  this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectoryFull);
+  this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectory25);
+  this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectory50);
+  this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectory100);
+  this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectory200);
+  
   connect(groundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
+  connect(trajectoryLengthActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeMarkerTrajectoryLength()));
   
   this->setViewPrototype(new CompositeView);
 };
@@ -799,6 +824,23 @@ void MultiViewWidget::changeGroundOrientation()
   this->updateCameras();
   this->updateViews();
 };
+
+void MultiViewWidget::changeMarkerTrajectoryLength()
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  if (this->mp_ActionMarkerTrajectoryFull->isChecked())
+    markers->SetTrajectoryLength(-1);
+  else if (this->mp_ActionMarkerTrajectory25->isChecked())
+    markers->SetTrajectoryLength(25);
+  else if (this->mp_ActionMarkerTrajectory50->isChecked())
+    markers->SetTrajectoryLength(50);
+  else if (this->mp_ActionMarkerTrajectory100->isChecked())
+    markers->SetTrajectoryLength(100);
+  else if (this->mp_ActionMarkerTrajectory200->isChecked())
+    markers->SetTrajectoryLength(200);
+    
+  this->updateDisplay();
+}
 
 void MultiViewWidget::updateCameras()
 {

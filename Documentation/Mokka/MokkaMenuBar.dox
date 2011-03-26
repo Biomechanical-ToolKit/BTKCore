@@ -63,10 +63,13 @@ The menu Settings contains actions related to the 3D view
 Deselect the current visual configuration and reset the configuration of the markers (color white, diameter of 8 mm) 
   - <tt>Clear configuration</tt>: Clear the list of known visual configuration 
 - <tt>Ground Orientation</tt>: Select the ground orientation (see @ref MokkaTimeBarGroundOrientation)
+- <tt>Marker Trajectory Length</tt>: Select the length of the markers' trajectory (see @ref MokkaTimeBarMarkerTrajectory)
 - <tt>Playback speed</tt>: Select the playback speed (see @ref MokkaTimeBarPlaybackSpeed)
 
 @subsection Help
 - <tt>About</tt>: Dialog box with the release number of Mokka
 - <tt>Mokka Help</tt>: This current help
-- <tt>Visit BTK website</tt>: Please visit the <a href="http://b-tk.googlecode.com">BTK website</a> to have the last developments
+- <tt>Visit BTK website</tt>: Please visit the <a href="http://b-tk.googlecode.com">BTK website</a> to have the last
+ developments
+- <tt>Check Updates...</tt>: Check on the web server if a new version was released.
  */
