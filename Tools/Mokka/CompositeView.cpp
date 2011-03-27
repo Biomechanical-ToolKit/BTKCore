@@ -52,33 +52,34 @@ CompositeView::CompositeView(QWidget* parent)
 : AbstractView(parent)
 {
   this->finalizeUi();
-  //this->setCurrentIndex(Viz3DProjection);
+  this->viewCombo->blockSignals(true);
   this->viewCombo->setCurrentIndex(Viz3DProjection); // Adapt the index of the stack widget
+  this->viewCombo->blockSignals(false);
 };
 
 void CompositeView::setAcquisition(Acquisition* acq)
 {
-  static_cast<Viz3DWidget*>(this->stackedWidget->widget(Viz3D))->setAcquisition(acq);
+  static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D))->setAcquisition(acq);
 };
 
 void CompositeView::render()
 {
   // Viz3D
-  static_cast<Viz3DWidget*>(this->stackedWidget->widget(Viz3D))->GetRenderWindow()->Render();
+  static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D))->GetRenderWindow()->Render();
 };
 
 void CompositeView::show(bool s)
 {
   // Viz3D
-  static_cast<Viz3DWidget*>(this->stackedWidget->widget(Viz3D))->show(s);
+  static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D))->show(s);
 }
 
-CompositeView* CompositeView::clone() const
+AbstractView* CompositeView::clone() const
 {
   CompositeView* sv = new CompositeView;
   //  Copy the acquisition pointer
-  Viz3DWidget* sourceViz3D = static_cast<Viz3DWidget*>(this->stackedWidget->widget(Viz3D));
-  Viz3DWidget* targetViz3D = static_cast<Viz3DWidget*>(sv->stackedWidget->widget(Viz3D));
+  Viz3DWidget* sourceViz3D = static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D));
+  Viz3DWidget* targetViz3D = static_cast<Viz3DWidget*>(sv->viewStack->widget(Viz3D));
   targetViz3D->setAcquisition(sourceViz3D->acquisition());
   // Clone the 3D view
   // Add vtkViewProp to the new QVtkDialogWidget
@@ -105,70 +106,49 @@ CompositeView* CompositeView::clone() const
   return sv;
 };
 
-void CompositeView::saveCurrentFuncOption(int idx)
+void CompositeView::copyOptions(CompositeView* from)
 {
-  QListWidget* lw = qobject_cast<QListWidget*>(this->funcCombo->view());
-  if (lw)
+  if (!from)
+    return;
+
+  switch (from->viewCombo->currentIndex())
   {
-    if (idx == Viz3DOrthogonal)
-      this->m_FuncOptions[idx].currentIndex = this->funcCombo->currentIndex();
-    else if ((idx == GraphPoint) || (idx == GraphAnalogChannel) || (idx == GraphForcePlatform))
-    {    
-      for (int i = 0 ; i < lw->count() ; ++i)
-      {
-        if ((lw->item(i)->flags() & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
-          this->m_FuncOptions[idx].lw->item(i)->setCheckState(lw->item(i)->checkState());
-      }
-    }
+  case Viz3D: // Impossible
+    break;
+  case Viz3DProjection:
+    this->optionStack->setCurrentIndex(0);
+    break;
+  case Viz3DOrthogonal:
+    this->optionStack->setCurrentIndex(1);
+    static_cast<QComboBox*>(this->optionStack->currentWidget())->setCurrentIndex(static_cast<QComboBox*>(from->optionStack->currentWidget())->currentIndex());
+    static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D))->copyProjectionCameraConfiguration(static_cast<Viz3DWidget*>(from->viewStack->widget(Viz3D)));
+    break;
+  case Graph: // Impossible
+    break;
+  case GraphPoint:
+    break;
+  case GraphAnalogChannel:
+    break;
+  case GraphForcePlatform:
+    break;
+  default: // Impossible
+    break;
   }
 };
 
 void CompositeView::setOrthogonalView(int view)
 {
-  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->stackedWidget->widget(Viz3D));
-  vtkCamera* cam = viz3D->renderer()->GetActiveCamera();
-  cam->SetPosition(0.0,0.0,1.0);
-  cam->SetFocalPoint(0.0,0.0,0.0);
-  cam->SetViewUp(0.0,1.0,0.0);
-  cam->SetRoll(0.0);
-  switch (view)
-  {
-  case Top:
-    cam->SetPosition(0.0,0.0,1.0);
-    break;
-  case Bottom:
-    cam->SetPosition(0.0,0.0,-1.0);
-    cam->SetRoll(180.0);
-    break;
-  case Left:
-    cam->SetPosition(-1.0,0.0,0.0);
-    cam->SetRoll(90.0);
-    break;
-  case Right:
-    cam->SetPosition(1.0,0.0,0.0);
-    cam->SetRoll(-90.0);
-    break;
-  case Back:
-    cam->SetPosition(0.0,1.0,0.0);
-    cam->SetViewUp(0.0,0.0,1.0);
-    break;
-  case Front:
-    cam->SetPosition(0.0,-1.0,0.0);
-    cam->SetViewUp(0.0,0.0,1.0);
-    break;
-  default:
-    btkErrorMacro("Unknown orthogonal view.");
-  }
-  viz3D->renderer()->ResetCamera();
-  cam->Zoom(1.6);
-  //viz3D->GetRenderWindow()->Render();
-  this->stackedWidget->currentWidget()->setFocus(Qt::OtherFocusReason);
+  if (view == -1)
+    return;
+  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D));
+  viz3D->setOrthogonalView(view);
+  this->viewStack->currentWidget()->setFocus(Qt::OtherFocusReason);
 };
 
 void CompositeView::toggleGraphedMeasure(int /* idx */)
 {
   //qDebug("CompositeView::toggleGraphedMeasure");
-  //GraphAnalogWidget* analog = static_cast<GraphAnalogWidget*>(this->stackedWidget->widget(2));
+  //GraphAnalogWidget* analog = static_cast<GraphAnalogWidget*>(this->viewStack->widget(2));
   //analog->setXAxisRange(1,281,1200/60);
   //analog->addAnalogChannel(btk::Analog::New("Test", 5620));
   //analog->show();
@@ -186,7 +166,7 @@ void CompositeView::clearGraph()
   }
   */
 };
-
+/*
 bool CompositeView::eventFilter(QObject* object, QEvent* event)
 {
   if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonRelease)
@@ -218,19 +198,38 @@ bool CompositeView::eventFilter(QObject* object, QEvent* event)
   this->funcCombo->setCurrentIndex(1);
   return QObject::eventFilter(object, event);
 };
+*/
 
-int CompositeView::stackIndexFromViewComboIndex(int idx) const
+int CompositeView::optionStackIndexFromViewComboIndex(int idx) const
 {
   switch (idx)
   {
   case Viz3D: // Impossible
-    btkErrorMacro("Incorrect view index! Impossible to find the corresponding stack!");
+  case Viz3DProjection:
+    return 0;
+  case Viz3DOrthogonal:
+    return 1;
+  case Graph:
+  case GraphPoint:
+  case GraphAnalogChannel:
+  case GraphForcePlatform:
+  default:
+    return 0;
+  }
+};
+
+int CompositeView::viewStackIndexFromViewComboIndex(int idx) const
+{
+  switch (idx)
+  {
+  case Viz3D: // Impossible
+    qDebug("Incorrect view index! Impossible to find the corresponding stack!");
     return 0;
   case Viz3DProjection:
   case Viz3DOrthogonal:
     return 0;
   case Graph:
-    btkErrorMacro("Incorrect view index! Impossible to find the corresponding stack!");
+    qDebug("Incorrect view index! Impossible to find the corresponding stack!");
     return 0;
   case GraphPoint:
     return 1;
@@ -239,99 +238,87 @@ int CompositeView::stackIndexFromViewComboIndex(int idx) const
   case GraphForcePlatform:
     return 3;
   default:
-    btkErrorMacro("Incorrect view index! Impossible to find the corresponding stack!");
+    qDebug("Incorrect view index! Impossible to find the corresponding stack!");
     return 0;
   }
 };
 
 void CompositeView::finalizeView(int idx)
 {
-  disconnect(this->funcCombo, 0, 0, 0);
-  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->stackedWidget->widget(Viz3D));
+  //disconnect(this->funcCombo, 0, 0, 0);
+  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D));
   btk::VTKInteractorStyleTrackballFixedUpCamera* style = static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(viz3D->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
   vtkCamera* cam = viz3D->renderer()->GetActiveCamera();
   if (idx == Viz3DProjection)
   {
-    if (cam->GetParallelProjection() != 0)
-    {
-      cam->ParallelProjectionOff();
-      style->RotationEnabledOn();
-      style->SpinEnabledOn();
-    }
+    cam->ParallelProjectionOff();
+    style->RotationEnabledOn();
+    style->SpinEnabledOn();
+    viz3D->restoreProjectionCameraConfiguration();
   }
   else if (idx == Viz3DOrthogonal)
   {
-    connect(this->funcCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setOrthogonalView(int)));
+    //connect(this->funcCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setOrthogonalView(int)));
+    viz3D->saveProjectionCameraConfiguration();
     cam->ParallelProjectionOn();
     style->RotationEnabledOff();
     style->SpinEnabledOff();
+    // Refresh
+    QComboBox* orthogonalComboBox = static_cast<QComboBox*>(this->optionStack->currentWidget());
+    int index = orthogonalComboBox->currentIndex();
+    orthogonalComboBox->setCurrentIndex(-1);
+    orthogonalComboBox->setCurrentIndex(index);
   }
+  this->render();
 };
 
 void CompositeView::finalizeUi()
 {
   QFont f;
-  // View combo
-  QListWidget* lw = new QListWidget(this);
+  QListWidget* lw;
   QListWidgetItem* lwi;
+  // View combo
+  lw = new QListWidget(this);
   // 3D View
   lwi = new QListWidgetItem(tr("3D View"));
   lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
-  f = this->funcCombo->font();
+  f = this->viewCombo->font();
   f.setBold(true);
   lwi->setFont(f);
   lw->addItem(lwi);
   // - Perspective
-  lwi = new QListWidgetItem(tr("  Perspective")); lw->addItem(lwi);
+  lw->addItem(new QListWidgetItem(tr("  Perspective")));
   // - Orthogonal
-  lwi = new QListWidgetItem(tr("  Orthogonal")); lw->addItem(lwi);
+  lw->addItem(new QListWidgetItem(tr("  Orthogonal")));
   // Update the model & view
   this->viewCombo->blockSignals(true);
   this->viewCombo->setModel(lw->model());
   this->viewCombo->setView(lw);
   this->viewCombo->blockSignals(false);
   
-  // (Fake) Func combo option for the 3D view
-  AbstractView::FuncOption opt3DView;
-  opt3DView.filtered = false;
-  opt3DView.lw = 0;
-  opt3DView.currentIndex = -1;
-  this->m_FuncOptions.append(opt3DView);
-  // (Empty) Func combo option for the perspective 3D view
-  AbstractView::FuncOption opt3DViewPerspective;
-  opt3DViewPerspective.filtered = false;
-  opt3DViewPerspective.lw = 0;
-  opt3DViewPerspective.currentIndex = -1;
-  this->m_FuncOptions.append(opt3DViewPerspective);
-  // Func combo option for the perspective 3D view
-  AbstractView::FuncOption opt3DViewOrthogonal;
-  opt3DViewOrthogonal.filtered = false;
-  opt3DViewOrthogonal.lw = new QListWidget;
-  opt3DViewOrthogonal.currentIndex = Front;
-  // - Top
-  lwi = new QListWidgetItem("Top");
-  opt3DViewOrthogonal.lw->addItem(lwi);
-  // - Bottom
-  lwi = new QListWidgetItem("Bottom");
-  opt3DViewOrthogonal.lw->addItem(lwi);
-  // - Left
-  lwi = new QListWidgetItem("Left");
-  opt3DViewOrthogonal.lw->addItem(lwi);
-  // - Right
-  lwi = new QListWidgetItem("Right");
-  opt3DViewOrthogonal.lw->addItem(lwi);
-  // - Back
-  lwi = new QListWidgetItem("Back");
-  opt3DViewOrthogonal.lw->addItem(lwi);
-  // - Front
-  lwi = new QListWidgetItem("Front");
-  opt3DViewOrthogonal.lw->addItem(lwi);
-  // Appending
-  this->m_FuncOptions.append(opt3DViewOrthogonal);
-  
-  // Widget in the stack
-  // 3D View
+  // Widget in the view stack
+  // - 3D View
   Viz3DWidget* viz3d = new Viz3DWidget(this);
-  this->stackedWidget->addWidget(viz3d);
+  this->viewStack->addWidget(viz3d);
   viz3d->initialize();
+  
+  // Widget in the function stack
+  // - 3D View
+  this->optionStack->addWidget(new QWidget(this)); // empty
+  // - Perspective 3D view
+  QComboBox* orthogonalComboBox = new QComboBox(this);
+  orthogonalComboBox->setStyleSheet("QComboBox {\n  color: white;\n  border-top: none;\n  border-bottom: none;\n  border-left-width: 1px;\n  border-left-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);\n  border-left-style: solid;\n  border-right-width: 1px;\n  border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);\n  border-right-style: solid;\n  padding-left: 10px;\n  padding-right: 10px;\n}\n\nQComboBox:editable {\n  background: white;\n}\n\nQComboBox:!editable, QComboBox::drop-down:editable {\n  color: black;\n  background: transparent;\n  selection-background-color: lightgray;\n}\n\n/* QComboBox gets the \"on\" state when the popup is open */\nQComboBox:!editable:on, QComboBox::drop-down:editable:on {\n  color: black;\n}\n\nQComboBox:on { /* shift the text when the popup opens */\n  /* padding-top: 3px;\n  padding-left: 4px; */\n}\n\nQComboBox::drop-down {\n  subcontrol-origin: padding;\n  subcontrol-position: top left;\n  width: 20px;\n\n  border-right-width: 1px;\n  border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);\n  border-right-style: solid;\n}\n\nQComboBox::down-arrow {\n  image: url(:/Resources/Images/treeDownTriangleWhite.png);\n}\n\nQComboBox::down-arrow:on { /* shift the arrow when popup is open */\n /* top: 1px; */\n}");
+  lw = new QListWidget(this);
+  lw->addItem(new QListWidgetItem("Top"));
+  lw->addItem(new QListWidgetItem("Bottom"));
+  lw->addItem(new QListWidgetItem("Left"));
+  lw->addItem(new QListWidgetItem("Right"));
+  lw->addItem(new QListWidgetItem("Back"));
+  lw->addItem(new QListWidgetItem("Front"));
+  orthogonalComboBox->setModel(lw->model());
+  orthogonalComboBox->setView(lw);
+  connect(orthogonalComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setOrthogonalView(int)));
+  this->optionStack->addWidget(orthogonalComboBox);
+  
+  this->optionStack->setCurrentIndex(0);
 };

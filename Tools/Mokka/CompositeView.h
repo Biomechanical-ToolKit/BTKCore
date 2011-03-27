@@ -46,7 +46,6 @@ class CompositeView : public AbstractView
   
 public:
   enum {Viz3D = 0, Viz3DProjection, Viz3DOrthogonal, Graph, GraphPoint, GraphAnalogChannel, GraphForcePlatform};
-  typedef enum {Top, Bottom, Left, Right, Back, Front} OrthogonalView;
   
   CompositeView(QWidget* parent = 0);
   // ~CompositeView(); // Implicit
@@ -57,8 +56,8 @@ public:
   void render();
   void show(bool s);
   
-  virtual CompositeView* clone() const;
-  virtual void saveCurrentFuncOption(int idx);
+  virtual AbstractView* clone() const;
+  void copyOptions(CompositeView* from);
   
 public slots:
   void setOrthogonalView(int view);
@@ -66,8 +65,9 @@ public slots:
   void clearGraph();
 
 protected:
-  bool eventFilter(QObject* object, QEvent* event);
-  virtual int stackIndexFromViewComboIndex(int idx) const;
+  //bool eventFilter(QObject* object, QEvent* event);
+  virtual int optionStackIndexFromViewComboIndex(int idx) const;
+  virtual int viewStackIndexFromViewComboIndex(int idx) const;
   virtual void finalizeView(int idx);
   
 private:

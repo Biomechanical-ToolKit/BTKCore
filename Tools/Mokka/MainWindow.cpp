@@ -249,6 +249,7 @@ MainWindow::MainWindow(QWidget* parent)
   
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
   #if defined(NDEBUG)
+    QSettings settings;
     if (settings.value("Preferences/checkUpdateStartup", true).toBool())
       this->mp_UpdateChecker->check(true);
   #endif

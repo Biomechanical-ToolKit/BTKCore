@@ -152,7 +152,7 @@ void MultiViewWidget::initialize()
   this->AbstractMultiView::initialize();
   
   CompositeView* sv = static_cast<CompositeView*>(this->gridLayout()->itemAtPosition(0,0)->widget());
-  vtkRenderer* renderer = static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D))->renderer();
+  vtkRenderer* renderer = static_cast<Viz3DWidget*>(sv->viewStack->widget(CompositeView::Viz3D))->renderer();
   
   // // BTK PIPELINE
   // //btk::SpecializedPointsExtractor::Pointer markersExtractor = btk::SpecializedPointsExtractor::New();
@@ -766,13 +766,13 @@ void MultiViewWidget::hideAllMarkers()
 void MultiViewWidget::forceRubberBandDrawingOn()
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>((*it)->stackedWidget->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOn();
+    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>((*it)->viewStack->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOn();
 };
 
 void MultiViewWidget::forceRubberBandDrawingOff()
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>((*it)->stackedWidget->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOff();
+    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>((*it)->viewStack->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOff();
 };
 
 void MultiViewWidget::dragEnterEvent(QDragEnterEvent *event)
@@ -798,7 +798,8 @@ void MultiViewWidget::dropEvent(QDropEvent *event)
 AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
 {
   CompositeView* sv = static_cast<CompositeView*>(this->AbstractMultiView::createView(fromAnother));
-  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(sv->stackedWidget->widget(CompositeView::Viz3D));
+  sv->copyOptions(static_cast<CompositeView*>(fromAnother));
+  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(sv->viewStack->widget(CompositeView::Viz3D));
   connect(viz3D, SIGNAL(pickedMarkerChanged(int)), this, SIGNAL(pickedMarkerChanged(int)));
   connect(viz3D, SIGNAL(pickedMarkerToggled(int)), this, SIGNAL(pickedMarkerToggled(int)));
   connect(viz3D, SIGNAL(selectedMarkersToggled(QList<int>)), this, SIGNAL(selectedMarkersToggled(QList<int>)));
@@ -849,7 +850,7 @@ void MultiViewWidget::updateCameras()
   double n[3]; ground->GetNormal(n);
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
   {
-    Viz3DWidget* viz3d = static_cast<Viz3DWidget*>((*it)->stackedWidget->widget(CompositeView::Viz3D));
+    Viz3DWidget* viz3d = static_cast<Viz3DWidget*>((*it)->viewStack->widget(CompositeView::Viz3D));
     static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(viz3d->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->SetGlobalUp(n);
   }
 };

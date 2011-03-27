@@ -145,8 +145,9 @@ void AbstractMultiView::split(AbstractView* sender, int direction)
 QSplitter* AbstractMultiView::split_(AbstractView* sender, int direction, AbstractView** splittedViews)
 {
   AbstractView* sv = this->createView(sender);
+  sv->viewCombo->blockSignals(true);
   sv->viewCombo->setCurrentIndex(sender->viewCombo->currentIndex());
-  sv->funcCombo->setCurrentIndex(sender->funcCombo->currentIndex());
+  sv->viewCombo->blockSignals(false);
   sv->setFocus(Qt::OtherFocusReason);
   this->m_Views.append(sv);
   

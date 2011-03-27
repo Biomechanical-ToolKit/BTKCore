@@ -50,28 +50,19 @@ class AbstractView : public QWidget, public Ui::AbstractView
   
 public:
   AbstractView(QWidget* parent = 0);
-  virtual ~AbstractView();
+  virtual ~AbstractView() {};
   // AbstractView(const AbstractView&); // Implicit
   // AbstractView& operator=(const AbstractView&); // Implicit.
   
   virtual AbstractView* clone() const {return new AbstractView;};
-  virtual void saveCurrentFuncOption(int /* idx */) {};
-  void setFunctionComboBoxOption(int idx, QListWidget* lw, int currentIndex);
   
 public slots:
   void setFocus(Qt::FocusReason reason);
   void setCurrentIndex(int idx);
   
 protected:
-  struct FuncOption
-  {
-    QListWidget* lw;
-    int currentIndex;
-    bool filtered;
-  };
-  QVector<FuncOption> m_FuncOptions;
-  
-  virtual int stackIndexFromViewComboIndex(int idx) const {return idx;};
+  virtual int optionStackIndexFromViewComboIndex(int /* idx */) const {return -1;};
+  virtual int viewStackIndexFromViewComboIndex(int /* idx */) const {return -1;};
   virtual void finalizeView(int /* idx */) {};
   
 private slots:

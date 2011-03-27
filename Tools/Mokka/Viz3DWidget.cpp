@@ -46,6 +46,7 @@
 #include <vtkCallbackCommand.h>
 #include <vtkAxesActor.h>
 #include <vtkIdList.h>
+#include <vtkCamera.h>
 
 #include <QKeyEvent>
 #include <QToolTip>
@@ -135,7 +136,79 @@ void Viz3DWidget::initialize()
       btk::VTKToggleMarkerTrajectoryPickedEvent,
       this, 
       SLOT(toggleTrajectoryMarker(vtkObject*, unsigned long, void*, void*)));
+      
+  this->saveProjectionCameraConfiguration();
 };
+
+void Viz3DWidget::restoreProjectionCameraConfiguration()
+{
+  vtkCamera* cam = this->mp_Renderer->GetActiveCamera();
+  cam->SetPosition(this->mp_CamPosition);
+  cam->SetViewUp(this->mp_CamViewUp);
+  cam->SetFocalPoint(this->mp_CamFocalPoint);
+  this->mp_Renderer->ResetCamera();
+  cam->Zoom(1.6);
+};
+
+void Viz3DWidget::saveProjectionCameraConfiguration()
+{
+  vtkCamera* cam = this->mp_Renderer->GetActiveCamera();
+  cam->GetPosition(this->mp_CamPosition);
+  cam->GetViewUp(this->mp_CamViewUp);
+  cam->GetFocalPoint(this->mp_CamFocalPoint);
+};
+
+void Viz3DWidget::copyProjectionCameraConfiguration(Viz3DWidget* source)
+{
+  this->mp_CamPosition[0] = source->mp_CamPosition[0];
+  this->mp_CamPosition[1] = source->mp_CamPosition[1];
+  this->mp_CamPosition[2] = source->mp_CamPosition[2];
+  this->mp_CamViewUp[0] = source->mp_CamViewUp[0];
+  this->mp_CamViewUp[1] = source->mp_CamViewUp[1];
+  this->mp_CamViewUp[2] = source->mp_CamViewUp[2];
+  this->mp_CamFocalPoint[0] = source->mp_CamFocalPoint[0];
+  this->mp_CamFocalPoint[1] = source->mp_CamFocalPoint[1];
+  this->mp_CamFocalPoint[2] = source->mp_CamFocalPoint[2];
+};
+
+void Viz3DWidget::setOrthogonalView(int view)
+{
+  vtkCamera* cam = this->mp_Renderer->GetActiveCamera();
+  cam->SetFocalPoint(0.0,0.0,0.0);
+  cam->SetViewUp(0.0,1.0,0.0);
+  cam->SetRoll(0.0);
+  switch (view)
+  {
+  case Top:
+    cam->SetPosition(0.0,0.0,1.0);
+    break;
+  case Bottom:
+    cam->SetPosition(0.0,0.0,-1.0);
+    cam->SetRoll(180.0);
+    break;
+  case Left:
+    cam->SetPosition(-1.0,0.0,0.0);
+    cam->SetRoll(90.0);
+    break;
+  case Right:
+    cam->SetPosition(1.0,0.0,0.0);
+    cam->SetRoll(-90.0);
+    break;
+  case Back:
+    cam->SetPosition(0.0,1.0,0.0);
+    cam->SetViewUp(0.0,0.0,1.0);
+    break;
+  case Front:
+    cam->SetPosition(0.0,-1.0,0.0);
+    cam->SetViewUp(0.0,0.0,1.0);
+    break;
+  default:
+    qDebug("Unknown orthogonal view.");
+  }
+  this->mp_Renderer->ResetCamera();
+  cam->Zoom(1.6);
+  this->GetRenderWindow()->Render();
+}
 
 void Viz3DWidget::selectPickedMarker(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
 {

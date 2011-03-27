@@ -57,7 +57,7 @@
        <property name="lineWidth">
         <number>0</number>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1,0,0,0">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -141,65 +141,12 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
          </spacer>
         </item>
         <item>
-         <widget class="QComboBox" name="funcCombo">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QComboBox {
-  color: white;
-  border-top: none;
-  border-bottom: none;
-  border-left-width: 1px;
-  border-left-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);
-  border-left-style: solid;
-  border-right-width: 1px;
-  border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);
-  border-right-style: solid;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-QComboBox:editable {
-  background: white;
-}
-
-QComboBox:!editable, QComboBox::drop-down:editable {
-  color: black;
-  background: transparent;
-  selection-background-color: lightgray;
-}
-
-/* QComboBox gets the &quot;on&quot; state when the popup is open */
-QComboBox:!editable:on, QComboBox::drop-down:editable:on {
-  color: black;
-}
-
-QComboBox:on { /* shift the text when the popup opens */
-  /* padding-top: 3px;
-  padding-left: 4px; */
-}
-
-QComboBox::drop-down {
-  subcontrol-origin: padding;
-  subcontrol-position: top left;
-  width: 20px;
-
-  border-right-width: 1px;
-  border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);
-  border-right-style: solid;
-}
-
-QComboBox::down-arrow {
-  image: url(:/Resources/Images/treeDownTriangleWhite.png);
-}
-
-QComboBox::down-arrow:on { /* shift the arrow when popup is open */
- /* top: 1px; */
-}</string>
-          </property>
-          <property name="sizeAdjustPolicy">
-           <enum>QComboBox::AdjustToContents</enum>
+         <widget class="QStackedWidget" name="optionStack">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
          </widget>
         </item>
@@ -334,7 +281,7 @@ QPushButton:flat {
     </layout>
    </item>
    <item>
-    <widget class="QStackedWidget" name="stackedWidget">
+    <widget class="QStackedWidget" name="viewStack">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>

@@ -53,6 +53,7 @@ class Viz3DWidget : public QVTKWidget
   Q_OBJECT
   
 public:
+  enum {Top, Bottom, Left, Right, Back, Front};
   Viz3DWidget(QWidget* parent = 0);
   ~Viz3DWidget();
   
@@ -60,6 +61,10 @@ public:
   Acquisition* acquisition() const {return this->mp_Acquisition;};
   void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
   vtkRenderer* renderer() const {return this->mp_Renderer;};
+  void restoreProjectionCameraConfiguration();
+  void saveProjectionCameraConfiguration();
+  void copyProjectionCameraConfiguration(Viz3DWidget* source);
+  void setOrthogonalView(int view);
   
 public slots:
   // Qt / VTK
@@ -86,6 +91,10 @@ private:
   vtkRenderer* mp_Renderer;
   btk::VTKAxesWidget* mp_AxesWidget;
   vtkEventQtSlotConnect* mp_EventQtSlotConnections;
+  
+  double mp_CamFocalPoint[3];
+  double mp_CamPosition[3];
+  double mp_CamViewUp[3];
 };
 
 #endif // Viz3DWidget_h
