@@ -260,9 +260,13 @@ namespace btk
           maxLengths[bbIdx][0] = std::max(bbLengths[bbIdx][0], bbLengths[bbIdx][1]);
           maxLengths[bbIdx][1] = std::max(bbLengths[bbIdx][1], bbLengths[bbIdx][2]);
           maxLengths[bbIdx][2] = std::max(bbLengths[bbIdx][0], bbLengths[bbIdx][2]);
-          minTwoLengths[bbIdx][0] = std::min(maxLengths[bbIdx][0], maxLengths[bbIdx][1]);
-          minTwoLengths[bbIdx][1] = std::min(maxLengths[bbIdx][1], maxLengths[bbIdx][2]);
         }
+        // Force platfrom width
+        minTwoLengths[0][0] = std::min(maxLengths[0][0], maxLengths[0][1]);
+        minTwoLengths[0][1] = std::min(maxLengths[0][1], maxLengths[0][2]);
+        // Index length
+        minTwoLengths[1][0] = std::max(maxLengths[1][0], maxLengths[1][1]);
+        minTwoLengths[1][1] = std::max(maxLengths[1][1], maxLengths[1][2]);
         double scale = std::min(minTwoLengths[0][0] / minTwoLengths[1][0], minTwoLengths[0][1] / minTwoLengths[1][1]) / 2.0;
         transform->Identity();
         transform->Scale(scale, scale, scale);
