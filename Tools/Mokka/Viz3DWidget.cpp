@@ -173,38 +173,110 @@ void Viz3DWidget::copyProjectionCameraConfiguration(Viz3DWidget* source)
 
 void Viz3DWidget::setOrthogonalView(int view)
 {
+  double n[3];
+  static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(this->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->GetGlobalUp(n);
   vtkCamera* cam = this->mp_Renderer->GetActiveCamera();
   cam->SetFocalPoint(0.0,0.0,0.0);
-  cam->SetViewUp(0.0,1.0,0.0);
-  cam->SetRoll(0.0);
-  switch (view)
+  if (n[0] == 1.0)
   {
-  case Top:
-    cam->SetPosition(0.0,0.0,1.0);
-    break;
-  case Bottom:
-    cam->SetPosition(0.0,0.0,-1.0);
-    cam->SetRoll(180.0);
-    break;
-  case Left:
-    cam->SetPosition(-1.0,0.0,0.0);
-    cam->SetRoll(90.0);
-    break;
-  case Right:
-    cam->SetPosition(1.0,0.0,0.0);
-    cam->SetRoll(-90.0);
-    break;
-  case Back:
-    cam->SetPosition(0.0,1.0,0.0);
-    cam->SetViewUp(0.0,0.0,1.0);
-    break;
-  case Front:
-    cam->SetPosition(0.0,-1.0,0.0);
-    cam->SetViewUp(0.0,0.0,1.0);
-    break;
-  default:
-    qDebug("Unknown orthogonal view.");
+    cam->SetViewUp(0.0,1.0,0.0);
+    cam->SetRoll(0.0);
+    switch (view)
+    {
+    case Top:
+      cam->SetPosition(1.0,0.0,0.0);
+      break;
+    case Bottom:
+      cam->SetPosition(-1.0,0.0,0.0);
+      cam->SetRoll(180.0);
+      break;
+    case Left:
+      cam->SetPosition(0.0,0.0,1.0);
+      cam->SetRoll(90.0);
+      break;
+    case Right:
+      cam->SetPosition(0.0,0.0,-1.0);
+      cam->SetRoll(-90.0);
+      break;
+    case Back:
+      cam->SetPosition(0.0,1.0,0.0);
+      cam->SetViewUp(1.0,0.0,0.0);
+      cam->SetRoll(90.0);
+      break;
+    case Front:
+      cam->SetPosition(0.0,-1.0,0.0);
+      cam->SetViewUp(1.0,0.0,0.0);
+      cam->SetRoll(90.0);
+      break;
+    default:
+      qDebug("Unknown orthogonal view.");
+    }
   }
+  else if (n[1] == 1.0)
+  {
+    cam->SetViewUp(0.0,1.0,0.0);
+    cam->SetRoll(0.0);
+    switch (view)
+    {
+    case Top:
+      cam->SetViewUp(0.0,0.0,-1.0);
+      cam->SetPosition(0.0,1.0,0.0);
+      break;
+    case Bottom:
+      cam->SetViewUp(0.0,0.0,1.0);
+      cam->SetPosition(0.0,-1.0,0.0);
+      break;
+    case Left:
+      cam->SetPosition(-1.0,0.0,0.0);
+      break;
+    case Right:
+      cam->SetPosition(1.0,0.0,0.0);
+      break;
+    case Back:
+      cam->SetPosition(0.0,0.0,-1.0);
+      break;
+    case Front:
+      cam->SetPosition(0.0,0.0,1.0);
+      break;
+    default:
+      qDebug("Unknown orthogonal view.");
+    }
+  }
+  else if (n[2] == 1.0)
+  {
+    cam->SetViewUp(0.0,1.0,0.0);
+    cam->SetRoll(0.0);
+    switch (view)
+    {
+    case Top:
+      cam->SetPosition(0.0,0.0,1.0);
+      break;
+    case Bottom:
+      cam->SetPosition(0.0,0.0,-1.0);
+      cam->SetRoll(180.0);
+      break;
+    case Left:
+      cam->SetPosition(-1.0,0.0,0.0);
+      cam->SetRoll(90.0);
+      break;
+    case Right:
+      cam->SetPosition(1.0,0.0,0.0);
+      cam->SetRoll(-90.0);
+      break;
+    case Back:
+      cam->SetPosition(0.0,1.0,0.0);
+      cam->SetViewUp(0.0,0.0,1.0);
+      break;
+    case Front:
+      cam->SetPosition(0.0,-1.0,0.0);
+      cam->SetViewUp(0.0,0.0,1.0);
+      break;
+    default:
+      qDebug("Unknown orthogonal view.");
+    }
+  }
+  else
+    qDebug("Unsupported global up vector.");
   this->mp_Renderer->ResetCamera();
   cam->Zoom(1.6);
   this->GetRenderWindow()->Render();
