@@ -420,7 +420,19 @@ namespace btk
    *
    * Usefull when visualized acquistion date are set in meter, millimeter, inch, etc.
    */
-
+   
+  /**
+   * @fn double VTKMarkersFramesSource::GetDefaultMarkerRadius() const
+   * Gets the marker radius used by default.
+   */
+   
+  /**
+   * @fn void VTKMarkersFramesSource::SetDefaultMarkerRadius(double r)
+   * Sets the marker radius used by default. 
+   *
+   * Setting this parameter doesn't call the method Modified(). It will be taken into account when the input is modified.
+   */
+  
   /**
    * Constructor.
    *
@@ -461,10 +473,11 @@ namespace btk
     this->mp_MarkersGenerator->SetColorModeToColorByScalar();
     this->mp_MarkersGenerator->SetVisibleMarkers(this->mp_VisibleMarkers);
     this->mp_MarkersColorsLUT->SetNumberOfTableValues(1);
-    this->mp_MarkersColorsLUT->SetTableValue(0, 1.0, 1.0, 1.0);
-    
+    // Default values
     this->mp_Scale = 1.0;
+    this->m_DefaultMarkerRadius = 8.0; // 8.0 mm
     this->m_TrajectoryLength = 100;
+    this->mp_MarkersColorsLUT->SetTableValue(0, 1.0, 1.0, 1.0); // White
   };
   
   /**
@@ -555,7 +568,7 @@ namespace btk
         this->mp_TrajectoryIds->resize(pointNumber);  
         for (size_t i = 0 ; i < pointNumber ; ++i)
         {
-          this->mp_MarkersRadius->SetValue(i, 8.0); // 8mm
+          this->mp_MarkersRadius->SetValue(i, this->m_DefaultMarkerRadius);
           this->mp_SelectedMarkers->SetValue(i, 0);
           this->mp_VisibleMarkers->SetValue(i, 1);
           this->mp_TrajectoryMarkers->SetValue(i, 0);

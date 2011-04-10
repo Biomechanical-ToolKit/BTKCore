@@ -53,9 +53,11 @@ namespace btk
 
     BTK_VTK_EXPORT void SetInput(Acquisition::Pointer input);
     
+    Orientation GetOrientation() const {return this->m_Orientation;};
     BTK_VTK_EXPORT void SetOrientation(Orientation o);
-    
     void GetNormal(double n[3]) const {n[0] = this->mp_Normal[0]; n[1] = this->mp_Normal[1]; n[2] = this->mp_Normal[2];};
+    Orientation GetAutomaticDefaultOrientation() const {return this->m_AutomaticDefaultOrientation;};
+    BTK_VTK_EXPORT void SetAutomaticDefaultOrientation(Orientation o);
         
   protected:
     VTKGroundSource();
@@ -73,6 +75,7 @@ namespace btk
     
     Orientation m_Orientation;
     double mp_Normal[3];
+    Orientation m_AutomaticDefaultOrientation;
   };
 };
 #endif // __btkVTKGroundSource_h

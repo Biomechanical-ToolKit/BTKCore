@@ -103,6 +103,40 @@ namespace btk
    */
   
   /**
+   * @fn bool VTKForcePlatformsSource::GetShowAxes() const
+   * Gets the status for the displaying of the axes.
+   */
+   
+  /**
+   * Switch on/off the displaying of the axes for each force platform.
+   */
+  void VTKForcePlatformsSource::SetShowAxes(bool actived)
+  {
+    if (this->m_ShowAxes == actived)
+      return;
+    this->m_ShowAxes = actived;
+    this->Modified();
+    this->m_PropertiesModified = true;
+  };
+   
+  /**
+   * @fn bool VTKForcePlatformsSource::GetShowIndex() const
+   * Gets the status for the displaying of the index.
+   */
+   
+  /**
+   * Switch on/off the displaying of the index for each force platform.
+   */
+ void VTKForcePlatformsSource::SetShowIndex(bool actived)
+ {
+   if (this->m_ShowIndex == actived)
+     return;
+   this->m_ShowIndex = actived;
+   this->Modified();
+   this->m_PropertiesModified = true;
+ };
+  
+  /**
    * Constructor.
    *
    * Filter with one input and output.
@@ -111,6 +145,9 @@ namespace btk
   : vtkPolyDataAlgorithm()
   {
     this->m_Scale = 1.0;
+    this->m_ShowAxes = true;
+    this->m_ShowIndex = true;
+    this->m_PropertiesModified = false;
     this->SetNumberOfOutputPorts(3);
   };
 
@@ -131,8 +168,10 @@ namespace btk
     VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
     if (!inObject)
       return 0;
-    if (inObject->GetMTime() < this->GetMTime())
+    if ((inObject->GetMTime() < this->GetMTime()) && !this->m_PropertiesModified)
       return 0;
+      
+    this->m_PropertiesModified = false;
 
     ForcePlatformCollection::Pointer input = static_pointer_cast<ForcePlatformCollection>(inObject->GetBTKDataObject());
     vtkInformation* outInfo1 = outputVector->GetInformationObject(0);    
@@ -321,10 +360,15 @@ namespace btk
       append1->Update();
       output1->ShallowCopy(append1->GetOutput());
       append1->Delete();
-      append2->Update();
-      output2->ShallowCopy(append2->GetOutput());
-      append2->Delete();
-      if (input->GetItemNumber() > 1)
+      if (this->m_ShowAxes)
+      {
+        append2->Update();
+        output2->ShallowCopy(append2->GetOutput());
+        append2->Delete();
+      }
+      else 
+        output2->Initialize();
+      if ((input->GetItemNumber() > 1) && this->m_ShowIndex)
       {
         append3->Update();
         output3->ShallowCopy(append3->GetOutput());

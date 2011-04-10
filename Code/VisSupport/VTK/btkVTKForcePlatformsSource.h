@@ -54,6 +54,12 @@ namespace btk
     double GetScaleUnit() {return this->m_Scale;};
     void SetScaleUnit(double s) {this->m_Scale = s;};
     
+    bool GetShowAxes() const {return this->m_ShowAxes;};
+    BTK_VTK_EXPORT void SetShowAxes(bool actived);
+    
+    bool GetShowIndex() const {return this->m_ShowIndex;};
+    BTK_VTK_EXPORT void SetShowIndex(bool actived);
+    
   protected:
     BTK_VTK_EXPORT VTKForcePlatformsSource();
     ~VTKForcePlatformsSource() {};
@@ -67,6 +73,9 @@ namespace btk
     VTKForcePlatformsSource& operator=(const VTKForcePlatformsSource& );  // Not implemented.
     
     double m_Scale;
+    bool m_ShowAxes;
+    bool m_ShowIndex;
+    bool m_PropertiesModified; // FIXME: Really necessary to add this parameter? 
   };
 };
 #endif // __btkVTKForcePlatformsSource_h

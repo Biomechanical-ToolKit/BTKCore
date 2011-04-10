@@ -98,6 +98,11 @@ namespace btk
   };
   
   /**
+   * @fn Orientation VTKGroundSource::GetOrientation() const
+   * Gets the orientation used for the ground source.
+   */
+  
+  /**
    * Set the orientation automatically or manually. The automatic orientation use the metadata POINT:Y_SCREEN.
    */
   void VTKGroundSource::SetOrientation(Orientation o)
@@ -114,6 +119,31 @@ namespace btk
    */
   
   /**
+   * @fn Orientation VTKGroundSource::GetAutomaticDefaultOrientation() const
+   * Gets the default plane use by the automatic orientation if the metadata POINT:Y_SCREEN is not found.
+   */
+  
+  
+  /**
+   * Sets the default plane use by the automatic orientation if the metadata POINT:Y_SCREEN is not found.
+   *
+   * The value Automatic is not useable with this method.
+   */
+  void VTKGroundSource::SetAutomaticDefaultOrientation(Orientation o)
+  {
+    if (o == Automatic)
+    {
+      btkErrorMacro("Only value PlaneXY, PlaneYZ and PlaneZX can be used.");
+      return;
+    }
+    if (this->m_AutomaticDefaultOrientation == o)
+      return;
+    this->m_AutomaticDefaultOrientation = o;
+    if (this->m_Orientation == Automatic)
+      this->Modified();
+  };
+  
+  /**
    * Constructor.
    *
    * Filter with one input and output.
@@ -126,6 +156,7 @@ namespace btk
     this->mp_Normal[0] = 0.0; 
     this->mp_Normal[1] = 0.0;
     this->mp_Normal[2] = 1.0;
+    this->m_AutomaticDefaultOrientation = PlaneXY;
   };
 
   /**
@@ -146,8 +177,21 @@ namespace btk
     {
     case Automatic:
       {
-      // Plane XY by default
-      n[0] = 0.0; n[1] = 0.0; n[2] = 1.0;
+      switch (this->m_AutomaticDefaultOrientation)
+      {
+      default:
+        btkErrorMacro("Unknown default orientation. Set to plane XY");
+      case PlaneXY:
+        n[0] = 0.0; n[1] = 0.0; n[2] = 1.0;
+        break;
+      case PlaneYZ:
+        n[0] = 1.0; n[1] = 0.0; n[2] = 0.0;
+        break;
+      case PlaneZX:
+        n[0] = 0.0; n[1] = 1.0; n[2] = 0.0;
+        break;
+      }
+      
       vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
       VTKDataObjectAdapter* inObject;
       if (inInfo && ((inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()))) != NULL))

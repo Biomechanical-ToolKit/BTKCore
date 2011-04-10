@@ -88,6 +88,9 @@ namespace btk
     
     double GetScaleUnit() {return this->mp_Scale;};
     void SetScaleUnit(double s) {this->mp_Scale = s;};
+    
+    double GetDefaultMarkerRadius() const {return this->m_DefaultMarkerRadius;};
+    void SetDefaultMarkerRadius(double r) {this->m_DefaultMarkerRadius = r;};
  
   protected:
     BTK_VTK_EXPORT VTKMarkersFramesSource();
@@ -116,6 +119,7 @@ namespace btk
     vtkLookupTable* mp_MarkersColorsLUT;
     VTKMarkersSource* mp_MarkersGenerator;
     double mp_Scale;
+    double m_DefaultMarkerRadius;
     int m_TrajectoryLength;
   };
 };
