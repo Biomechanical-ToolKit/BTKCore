@@ -77,14 +77,15 @@ class vtkStreamingDemandDrivenPipelineCollection : public vtkstd::list<vtkStream
 class vtkProcessMap : public vtkstd::map<int, vtkObjectBase*>
 {};
 
-
 MultiViewWidget::MultiViewWidget(QWidget* parent)
-: AbstractMultiView(parent)
+: AbstractMultiView(parent), m_ForcePlatformColor(255, 255, 0), m_ForceVectorColor(255, 255, 0)
 {
   this->mp_Acquisition = 0;
   this->mp_EventQtSlotConnections = vtkEventQtSlotConnect::New();
   this->mp_VTKProc = new vtkProcessMap();
   this->mp_Syncro = new vtkStreamingDemandDrivenPipelineCollection();
+  this->mp_ForcePlatformActor = 0;
+  this->mp_ForceVectorActor = 0;
   this->mp_Mappers = vtkMapperCollection::New();
   this->mp_GroupOrientationMenu = new QMenu(tr("Ground Orientation"),this);
   this->mp_ActionGroundOrientationAutomatic = new QAction(tr("Automatic"),this);
@@ -144,6 +145,8 @@ MultiViewWidget::~MultiViewWidget()
    delete this->mp_VTKProc;
    delete this->mp_Syncro;
    this->mp_Mappers->Delete();
+   if (this->mp_ForcePlatformActor != 0) this->mp_ForcePlatformActor->Delete();
+   if (this->mp_ForceVectorActor != 0) this->mp_ForceVectorActor->Delete();
    vtkAlgorithm::SetDefaultExecutivePrototype(0);
 };
 
@@ -153,24 +156,6 @@ void MultiViewWidget::initialize()
   
   CompositeView* sv = static_cast<CompositeView*>(this->gridLayout()->itemAtPosition(0,0)->widget());
   vtkRenderer* renderer = static_cast<Viz3DWidget*>(sv->viewStack->widget(CompositeView::Viz3D))->renderer();
-  
-  // // BTK PIPELINE
-  // //btk::SpecializedPointsExtractor::Pointer markersExtractor = btk::SpecializedPointsExtractor::New();
-  // btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
-  // //virtualMarkersSeparator->SetInput(markersExtractor->GetOutput());
-  // btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = btk::ForcePlatformsExtractor::New();
-  // btk::GroundReactionWrenchFilter::Pointer GRWsFilter = btk::GroundReactionWrenchFilter::New();
-  // GRWsFilter->SetThresholdValue(5.0); // PWA are not computed from vertical forces lower than 5 newtons.
-  // GRWsFilter->SetThresholdState(true);
-  // GRWsFilter->SetInput(forcePlatformsExtractor->GetOutput());
-  // btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = btk::DownsampleFilter<btk::WrenchCollection>::New();
-  // GRWsDownsampler->SetInput(GRWsFilter->GetOutput());
-  // // Store BTK process to be reused later.
-  // //this->m_BTKProc[BTK_MARKERS] = markersExtractor;
-  // this->m_BTKProc[BTK_VIRTUALS_MARKERS] = virtualMarkersSeparator;
-  // this->m_BTKProc[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
-  // this->m_BTKProc[BTK_GRWS] = GRWsFilter;
-  // this->m_BTKProc[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
   
   //vtkMapper::GlobalImmediateModeRenderingOn(); // For large dataset.
   
@@ -207,7 +192,7 @@ void MultiViewWidget::initialize()
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(forcePlaforms->GetOutputPort(0));
   prop = vtkProperty::New();
-  prop->SetColor(1.0, 1.0, 0.0);
+  prop->SetColor(this->m_ForcePlatformColor.redF(), this->m_ForcePlatformColor.greenF(), this->m_ForcePlatformColor.blueF());
   prop->SetOpacity(0.9);
   prop->SetAmbient(0.5);
   prop->SetDiffuse(0.0);
@@ -218,9 +203,10 @@ void MultiViewWidget::initialize()
   actor->SetProperty(prop);
   actor->PickableOff();
   renderer->AddActor(actor);
+  this->mp_ForcePlatformActor = actor;
   // Cleanup for force platforms (plane)
   mapper->Delete();
-  actor->Delete();
+  //actor->Delete();
   prop->Delete();
   // Pipeline for force plaforms (axes)
   mapper = vtkPolyDataMapper::New();
@@ -298,7 +284,7 @@ void MultiViewWidget::initialize()
   mapper->SetInputConnection(GRFs->GetOutputPort());
   this->mp_Mappers->AddItem(mapper);
   prop = vtkProperty::New();
-  prop->SetColor(1.0, 1.0, 0.0);
+  prop->SetColor(this->m_ForceVectorColor.redF(), this->m_ForceVectorColor.greenF(), this->m_ForceVectorColor.blueF());
   prop->SetAmbient(0.5);
   prop->SetDiffuse(0.0);
   prop->SetSpecular(0.0);
@@ -308,9 +294,10 @@ void MultiViewWidget::initialize()
   actor->SetProperty(prop);
   actor->PickableOff();
   renderer->AddActor(actor);
+  this->mp_ForceVectorActor = actor;
   // Cleanup for GRFs.
   mapper->Delete();
-  actor->Delete();
+  //actor->Delete();
   prop->Delete();
   // Synchro between dynamic data
   this->mp_Syncro->push_back(vtkStreamingDemandDrivenPipeline::SafeDownCast(markers->GetExecutive()));
@@ -691,6 +678,89 @@ const QString MultiViewWidget::groundNormalAsString() const
   else if (n[1] == 1.0)
     str = "+Y";
   return str;
+};
+
+void MultiViewWidget::setDefaultGroundOrientation(int index)
+{
+  btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
+  if (index == 0)
+    ground->SetAutomaticDefaultOrientation(btk::VTKGroundSource::PlaneXY);
+  else if (index == 1)
+    ground->SetAutomaticDefaultOrientation(btk::VTKGroundSource::PlaneYZ);
+  else if (index == 2)
+    ground->SetAutomaticDefaultOrientation(btk::VTKGroundSource::PlaneZX);
+  else
+  {
+    qDebug("Unknown index to set the default ground orientation");
+    return;
+  }
+    
+  if (ground->GetOrientation() == btk::VTKGroundSource::Automatic)
+  {
+    this->updateCameras();
+    this->updateViews();
+  }
+};
+
+void MultiViewWidget::setDefaultMarkerRadius(double r)
+{
+  this->mp_Acquisition->setDefaultMarkerRadius(r);
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markers->SetDefaultMarkerRadius(r);
+};
+
+void MultiViewWidget::setDefaultMarkerColor(const QColor& color)
+{
+  this->mp_Acquisition->setDefaultMarkerColor(color);
+  vtkLookupTable* markersColorsLUT = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetMarkerColorLUT();
+  markersColorsLUT->SetTableValue(0, color.redF(), color.greenF(), color.blueF());
+  this->updateViews();
+};
+
+void MultiViewWidget::setMarkerTrajectoryLength(int index)
+{
+  if (index == 0) // All
+    this->mp_ActionMarkerTrajectoryFull->trigger();
+  else if (index == 1) // 25 frames
+    this->mp_ActionMarkerTrajectory25->trigger();
+  else if (index == 2) // 50 frames
+    this->mp_ActionMarkerTrajectory50->trigger();
+  else if (index == 3) // 100 frames
+    this->mp_ActionMarkerTrajectory100->trigger();
+  else if (index == 4) // 200 frames
+    this->mp_ActionMarkerTrajectory200->trigger();
+};
+
+void MultiViewWidget::showForcePlatformAxes(bool isShown)
+{
+  btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::SafeDownCast((*this->mp_VTKProc)[VTK_FORCE_PLATFORMS]);
+  forcePlaforms->SetShowAxes(isShown);
+  this->updateDisplay();
+};
+
+void MultiViewWidget::showForcePlatformIndex(bool isShown)
+{
+  btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::SafeDownCast((*this->mp_VTKProc)[VTK_FORCE_PLATFORMS]);
+  forcePlaforms->SetShowIndex(isShown);
+  this->updateDisplay();
+};
+
+void MultiViewWidget::setForcePlatformColor(const QColor& color)
+{
+  this->m_ForcePlatformColor = color;
+  if (!this->mp_ForcePlatformActor)
+    return;
+  this->mp_ForcePlatformActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+  this->updateViews();
+};
+
+void MultiViewWidget::setForceVectorColor(const QColor& color)
+{
+  this->m_ForceVectorColor = color;
+  if (!this->mp_ForceVectorActor)
+    return;
+  this->mp_ForceVectorActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+  this->updateViews();
 };
 
 void MultiViewWidget::updateDisplayedMarkersList(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)

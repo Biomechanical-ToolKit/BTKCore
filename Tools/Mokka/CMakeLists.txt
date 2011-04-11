@@ -75,6 +75,16 @@ SET(Mokka_UI
 SET(Mokka_QRC
   images.qrc)
 
+IF(APPLE)
+  SET(Mokka_UI ${Mokka_UI} Preferences_mac.ui)
+  SET(Mokka_H ${Mokka_H} Preferences_mac.h)
+  SET(Mokka_CPP ${Mokka_CPP} Preferences_mac.cpp)
+ELSE(APPLE)
+  SET(Mokka_UI ${Mokka_UI} Preferences.ui)
+  SET(Mokka_H ${Mokka_H} Preferences.h)
+  SET(Mokka_CPP ${Mokka_CPP} Preferences.cpp)
+ENDIF(APPLE)
+
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}
                     ${CMAKE_CURRENT_SOURCE_DIR}
                     ${QT_INCLUDE_DIR}

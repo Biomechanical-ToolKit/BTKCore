@@ -55,6 +55,7 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->mp_Timer = new QTimer(this);
   this->m_PlaybackStep = 1;
   this->m_PlaybackDelay = 33; // msec
+  this->m_OpenEditorWhenInserting = true;
   
   this->setupUi(this);
   this->setFocusPolicy(Qt::StrongFocus);
@@ -764,8 +765,9 @@ void TimeEventControlerWidget::insertEvent(const QString& label, int context, in
   ned.move(this->eventDialogGlobaPos(&ned));
   if (!this->mp_Timer->isActive())
     connect(ned.frameSpinBox,SIGNAL(valueChanged(int)),this,SLOT(setCurrentFrame(int)));
-  ned.exec();
-  if (ned.result() == QDialog::Accepted)
+  if (this->m_OpenEditorWhenInserting)
+    ned.exec();
+  if ((ned.result() == QDialog::Accepted) || !this->m_OpenEditorWhenInserting)
   {
     Event* e = new Event;
     e->label = ned.labelEdit->text().trimmed();

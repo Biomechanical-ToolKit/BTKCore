@@ -64,7 +64,7 @@ public:
   
   void setAcquisition(Acquisition* acq);
   void load();
-    
+  
   void setMarkerRadius(int id, double r);
   double markerRadius(int id);
   void setMarkerColorIndex(int id, int idx);
@@ -76,6 +76,16 @@ public:
   QMenu* groundOrientationMenu() const {return this->mp_GroupOrientationMenu;};
   const QString groundNormalAsString() const;
   QMenu* markerTrajectoryLengthMenu() const {return this->mp_MarkerTrajectoryLengthMenu;};
+  
+  void setDefaultGroundOrientation(int index);
+  void setDefaultMarkerColor(const QColor& color);
+  void setDefaultMarkerRadius(double r);
+  void setMarkerTrajectoryLength(int index);
+  
+  void showForcePlatformAxes(bool isShown);
+  void showForcePlatformIndex(bool isShown);
+  void setForcePlatformColor(const QColor& color);
+  void setForceVectorColor(const QColor& color);
   
 public slots:
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
@@ -121,7 +131,11 @@ private:
   vtkProcessMap* mp_VTKProc;
   vtkMapperCollection* mp_Mappers;
   vtkStreamingDemandDrivenPipelineCollection* mp_Syncro;
-  QMenu* mp_GroupOrientationMenu;;
+  QColor m_ForcePlatformColor;
+  vtkActor* mp_ForcePlatformActor;
+  QColor m_ForceVectorColor;
+  vtkActor* mp_ForceVectorActor;
+  QMenu* mp_GroupOrientationMenu;
   QAction* mp_ActionGroundOrientationAutomatic;
   QAction* mp_ActionGroundOrientationPlaneXY;
   QAction* mp_ActionGroundOrientationPlaneYZ;

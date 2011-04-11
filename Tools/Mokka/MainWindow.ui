@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>954</width>
-    <height>836</height>
+    <width>928</width>
+    <height>606</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,8 +67,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>954</width>
-     <height>18</height>
+     <width>928</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -151,6 +151,8 @@
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
     <addaction name="actionSelect_All"/>
+    <addaction name="separator"/>
+    <addaction name="actionPreferences"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -385,6 +387,11 @@
   <action name="actionImportEMF">
    <property name="text">
     <string>EMF Ascension file...</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Options</string>
    </property>
   </action>
  </widget>

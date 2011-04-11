@@ -412,8 +412,6 @@ void ModelDockWidget::load()
     else if (this->m_CurrentConfigurationIndex != -1)
       this->loadConfiguration(this->m_ConfigurationItems[this->m_CurrentConfigurationIndex].filename); // Reload the current configuration
   }
-  
-  
 };
 
 void ModelDockWidget::reset()
@@ -762,6 +760,7 @@ void ModelDockWidget::deselectConfiguration()
     return;
   this->modelConfigurationComboBox->blockSignals(true);
   this->modelConfigurationComboBox->setCurrentIndex(-1);
+  this->m_CurrentConfigurationIndex = -1;
   this->mp_SaveConfiguration->setEnabled(false);
   this->mp_RemoveConfiguration->setEnabled(false);
   this->mp_DeselectConfiguration->setEnabled(false);
@@ -773,6 +772,7 @@ void ModelDockWidget::clearConfigurations()
   this->m_ConfigurationItems.clear();
   this->modelConfigurationComboBox->blockSignals(true);
   this->modelConfigurationComboBox->setCurrentIndex(-1);
+  this->m_CurrentConfigurationIndex = -1;
   this->modelConfigurationComboBox->clear();
   this->mp_SaveConfiguration->setEnabled(false);
   this->mp_RemoveConfiguration->setEnabled(false);
@@ -1834,7 +1834,7 @@ void ModelDockWidget::setConfigurationModified(int idx, bool modified)
 QTreeWidgetItem* ModelDockWidget::createMarkerItem(const QString& label, int id, bool checked)
 {
   QTreeWidgetItem* markerItem = new QTreeWidgetItem(QStringList(label), MarkerType);
-  markerItem->setIcon(LabelHeader, this->createMarkerIcon(Qt::white));
+  markerItem->setIcon(LabelHeader, this->createMarkerIcon(this->mp_Acquisition->markerColor(id)));
   markerItem->setCheckState(VisibleHeader, checked ? Qt::Checked : Qt::Unchecked);
   markerItem->setCheckState(TrajectoryHeader, Qt::Unchecked);
   markerItem->setData(0, pointId, id);

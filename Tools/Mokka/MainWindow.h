@@ -38,6 +38,7 @@
 
 #include "ui_MainWindow.h"
 
+class Preferences;
 class Acquisition;
 class ImportAssistantDialog;
 class FileInfoDockWidget;
@@ -45,7 +46,6 @@ class Metadata;
 class ModelDockWidget;
 class ProgressWidget;
 class UpdateChecker;
-
 class QUndoStack;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
@@ -100,6 +100,7 @@ public Q_SLOTS:
   void exportTRC();
   void exportANB();
   void exportANC();
+  void showPreferences();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
@@ -120,6 +121,19 @@ public Q_SLOTS:
   void setEvents(QList<int> ids, QList<Event*> events);
   void removeEvents(const QList<int>& ids);
   void insertEvent(Event* e);
+  // Preferences
+  void setPreferenceUseDefaultConfiguration(bool isUsed);
+  void setPreferenceDefaultConfigurationPath(const QString& path);
+  void setPreferenceUseEventEditorWhenInserting(bool isUsed);
+  void setPreferenceDefaultOrientation(int index);
+  void setPreferenceDefaultMarkerColor(const QColor& color);
+  void setPreferenceDefaultMarkerRadius(double radius);
+  void setPreferenceDefaultTrajectoryLength(int index);
+  void setPreferenceShowForcePlatformAxes(int index);
+  void setPreferenceShowForcePlatformIndex(int index);
+  void setPreferenceDefaultForcePlateColor(const QColor& color);
+  void setPreferenceDefaultForceVectorColor(const QColor& color);
+  void setPreferenceAutomaticCheckUpdate(bool isChecked);
   // Others
   void updateSelectedMarkersRadius(double r);
   void selectPickedMarker(int id);
@@ -147,7 +161,8 @@ private:
   ModelDockWidget* mp_ModelDock;
   ImportAssistantDialog* mp_ImportAssistant;
   UpdateChecker* mp_UpdateChecker;
-
+  Preferences* mp_Preferences;
+  
   QString m_LastDirectory;
   enum { maxRecentFiles = 10 };
   QStringList m_RecentFiles;

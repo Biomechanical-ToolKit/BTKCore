@@ -62,6 +62,9 @@ public:
   int leftBound() const {return this->timeEventBar->m_LeftBoundPos;};
   int rightBound() const {return this->timeEventBar->m_RightBoundPos;};
   
+  bool openEditorWhenInsertingEventFlag() const {return this->m_OpenEditorWhenInserting;};
+  void setOpenEditorWhenInsertingEventFlag(bool isUsed) {this->m_OpenEditorWhenInserting = isUsed;};
+  
 public slots:
   void togglePlayback();
   void stopPlayback();
@@ -144,6 +147,7 @@ private:
   QTimer* mp_Timer;
   int m_PlaybackStep;
   int m_PlaybackDelay;
+  bool m_OpenEditorWhenInserting;
 };
 
 #endif // TimeEventControlerWidget_h

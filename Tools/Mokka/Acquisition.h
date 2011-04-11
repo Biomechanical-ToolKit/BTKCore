@@ -134,6 +134,8 @@ public:
   QList<Point*> takePoints(const QList<int>& ids);
   void insertPoints(const QList<int>& ids, const QList<Point*> points);
   int findPointIdFromLabel(const QString& label) const;
+  void setDefaultMarkerColor(const QColor& color) {this->m_DefaultMarkerColor = color;};
+  void setDefaultMarkerRadius(double r) {this->m_DefaultMarkerRadius = r;};
   
   double analogFrequency() const {return this->mp_BTKAcquisition->GetAnalogFrequency();};
   bool hasAnalogs() const {return !this->m_Analogs.empty();};
@@ -214,6 +216,8 @@ private:
   QMap<int,Analog*> m_Analogs;
   QMap<int,Event*> m_Events;
   int m_LastEventId;
+  double m_DefaultMarkerRadius;
+  QColor m_DefaultMarkerColor;
 };
 
  // frame starts at 1 not 0.

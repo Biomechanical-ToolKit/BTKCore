@@ -66,6 +66,7 @@ public:
   void visualConfigurations(QStringList& names, QStringList& filenames);
   void setVisualConfigurations(const QStringList& names, const QStringList& filenames);
   void loadConfiguration(const QString& filename);
+  int currentConfigurationIndex() const {return this->m_CurrentConfigurationIndex;};
   QList<int> selectedMarkers() const;
   QList<int> tailedMarkers() const;
   

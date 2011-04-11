@@ -2,6 +2,7 @@
   <qresource>
     <file>Resources/Images/1downarrow.png</file>
     <file>Resources/Images/1uparrow.png</file>
+    <file>Resources/Images/advanced_preferences.png</file>
     <file>Resources/Images/chart_curve.png</file>
     <file>Resources/Images/chart_line.png</file>
     <file>Resources/Images/closedock-16.png</file>
@@ -16,6 +17,7 @@
     <file>Resources/Images/folder.png</file>
     <file>Resources/Images/filenew.png</file>
     <file>Resources/Images/filenew-down.png</file>
+    <file>Resources/Images/general_preferences.png</file>
     <file>Resources/Images/horizontalsplit-16.png</file>
     <file>Resources/Images/horizontalsplit-down-16.png</file>
     <file>Resources/Images/open.png</file>
@@ -50,6 +52,7 @@
     <file>Resources/Images/event_options.png</file>
     <file>Resources/Images/acquisition_options.png</file>
     <file>Resources/Images/warning.png</file>
+    <file>Resources/Images/visualisation_preferences.png</file>
     <file>Resources/Images/error.png</file>
     <file>Resources/Images/Mokka_128.png</file>
   </qresource>

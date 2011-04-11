@@ -45,6 +45,7 @@
 #include "UndoCommands.h"
 #include "UserRoles.h"
 #include "UpdateChecker.h"
+#include "Preferences.h"
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -66,6 +67,11 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ImportAssistant = new ImportAssistantDialog(this);
   this->mp_UpdateChecker = new UpdateChecker(xstr(MOKKA_VERSION_STRING), "http://b-tk.googlecode.com/svn/latestMokka",
                                              ":/Resources/Images/Mokka_128.png", this);
+#if def Q_OS_MAC
+  this->mp_Preferences = new Preferences(0); // No parent: to be independant of the main window
+#else
+  this->mp_Preferences = new Preferences(this);
+#endif
   // Finalize UI
   this->mp_FileInfoDock->setVisible(false); 
   this->mp_FileInfoDock->setFloating(true);
@@ -88,6 +94,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuView->addAction(this->actionViewMetadata);
   this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
 #ifdef Q_OS_MAC
+  this->mp_Preferences->setMenuBar(this->menuBar()); // After setupUi
   QFont f = this->font();
   f.setPointSize(10);
   this->mp_FileInfoDock->setFont(f);
@@ -180,6 +187,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionExportTRC, SIGNAL(triggered()), this, SLOT(exportTRC()));
   connect(this->actionExportANB, SIGNAL(triggered()), this, SLOT(exportANB()));
   connect(this->actionExportANC, SIGNAL(triggered()), this, SLOT(exportANC()));
+  connect(this->actionPreferences, SIGNAL(triggered()), this, SLOT(showPreferences()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -217,10 +225,24 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
   connect(this->timeEventControler, SIGNAL(playbackStarted()), this->multiView, SLOT(forceRubberBandDrawingOff()));
   connect(this->timeEventControler, SIGNAL(playbackStopped()), this->multiView, SLOT(forceRubberBandDrawingOn()));
+  // Preferences
+  connect(this->mp_Preferences, SIGNAL(useDefaultConfigurationStateChanged(bool)), this, SLOT(setPreferenceUseDefaultConfiguration(bool)));
+  connect(this->mp_Preferences, SIGNAL(defaultConfigurationPathChanged(QString)), this, SLOT(setPreferenceDefaultConfigurationPath(QString)));
+  connect(this->mp_Preferences, SIGNAL(defaultGroundOrientationChanged(int)), this, SLOT(setPreferenceDefaultOrientation(int)));
+  connect(this->mp_Preferences, SIGNAL(useEventEditorWhenInsertingStateChanged(bool)), this, SLOT(setPreferenceUseEventEditorWhenInserting(bool)));
+  connect(this->mp_Preferences, SIGNAL(defaultMarkerColorChanged(QColor)), this, SLOT(setPreferenceDefaultMarkerColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(defaultMarkerRadiusChanged(double)), this, SLOT(setPreferenceDefaultMarkerRadius(double)));
+  connect(this->mp_Preferences, SIGNAL(defaultMarkerTrajectoryLengthChanged(int)), this, SLOT(setPreferenceDefaultTrajectoryLength(int)));
+  connect(this->mp_Preferences, SIGNAL(showForcePlatformAxesChanged(int)), this, SLOT(setPreferenceShowForcePlatformAxes(int)));
+  connect(this->mp_Preferences, SIGNAL(showForcePlatformIndexChanged(int)), this, SLOT(setPreferenceShowForcePlatformIndex(int)));
+  connect(this->mp_Preferences, SIGNAL(defaultForcePlateColorChanged(QColor)), this, SLOT(setPreferenceDefaultForcePlateColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(defaultForceVectorColorChanged(QColor)), this, SLOT(setPreferenceDefaultForceVectorColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(automaticCheckUpdateStateChanged(bool)), this, SLOT(setPreferenceAutomaticCheckUpdate(bool)));
   
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
   this->menuHelp->addSeparator();
   QAction* actionCheckUpdate = this->menuHelp->addAction(tr("Check for Updates..."));
+  actionCheckUpdate->setMenuRole(QAction::ApplicationSpecificRole);
   connect(actionCheckUpdate, SIGNAL(triggered()), this->mp_UpdateChecker, SLOT(check()));
 #endif
 
@@ -259,6 +281,9 @@ MainWindow::MainWindow(QWidget* parent)
 MainWindow::~MainWindow()
 {
   delete this->mp_Acquisition;
+#ifdef Q_OS_MAC
+  delete this->mp_Preferences;
+#endif
 };
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -266,6 +291,9 @@ void MainWindow::closeEvent(QCloseEvent* event)
   if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
   {
     this->writeSettings();
+#ifdef Q_OS_MAC
+    this->mp_Preferences->hide();
+#endif
     event->accept();
   }
   else
@@ -551,6 +579,14 @@ void MainWindow::loadAcquisition(const QString& errMsg, ProgressWidget* pw)
   this->mp_ModelDock->load();
   if (this->mp_Acquisition->hasPoints() || this->mp_Acquisition->hasAnalogs())
     this->mp_ModelDock->setVisible(true);
+  if (this->mp_ModelDock->currentConfigurationIndex() == -1) // No configuration loaded
+  {
+    QSettings settings;
+    bool defaultConfigurationUsed = settings.value("Preferences/defaultConfigurationUsed", false).toBool();
+    QString defaultConfigurationPath = settings.value("Preferences/defaultConfigurationPath", "").toString();
+    if (defaultConfigurationUsed && !defaultConfigurationPath.isEmpty())
+      this->mp_ModelDock->loadConfiguration(defaultConfigurationPath);
+  }
   
   pw->setProgressValue(100);
 
@@ -777,6 +813,17 @@ void MainWindow::exportANC()
   this->exportAcquisition(tr("ANC Files (*.anc)"));
 };
 
+void MainWindow::showPreferences()
+{
+#ifdef Q_OS_MAC
+  this->mp_Preferences->hide(); // Force the preferences to go back to the top.
+  this->mp_Preferences->show();
+#else
+  if (this->mp_Preferences->exec())
+    this->mp_Preferences->saveSettings();
+#endif
+};
+
 void MainWindow::exportAcquisition(const QString& filter)
 {
   QString filename = QFileDialog::getSaveFileName(this, "",
@@ -971,6 +1018,108 @@ void MainWindow::insertEvent(Event* e)
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvent(this->mp_Acquisition, e)));
 };
 
+void MainWindow::setPreferenceUseDefaultConfiguration(bool isUsed)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultConfigurationUsed", isUsed);
+  QString path = settings.value("Preferences/defaultConfigurationPath").toString();
+  if (isUsed && !path.isEmpty() && (this->mp_ModelDock->modelConfigurationComboBox->currentIndex() == -1))
+    this->mp_ModelDock->loadConfiguration(path);
+};
+
+void MainWindow::setPreferenceDefaultConfigurationPath(const QString& path)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultConfigurationPath", path);
+  
+  bool isUsed = settings.value("Preferences/defaultConfigurationUsed").toBool();
+  if (isUsed && !path.isEmpty() && (this->mp_ModelDock->modelConfigurationComboBox->currentIndex() == -1))
+    this->mp_ModelDock->loadConfiguration(path);
+};
+
+void MainWindow::setPreferenceUseEventEditorWhenInserting(bool isUsed)
+{
+  QSettings settings;
+  settings.setValue("Preferences/openEventEditorWhenInserting", isUsed);
+  this->timeEventControler->setOpenEditorWhenInsertingEventFlag(isUsed);
+};
+
+void MainWindow::setPreferenceDefaultOrientation(int index)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultPlaneOrientation", index);
+  this->multiView->setDefaultGroundOrientation(index);
+};
+
+void MainWindow::setPreferenceDefaultMarkerColor(const QColor& color)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultMarkerColor", color);
+  
+  QTreeWidgetItem* markersRoot = this->mp_ModelDock->modelTree->topLevelItem(0);
+  QVector<int> ids;
+  for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+  {
+    int id = markersRoot->child(i)->data(0,pointId).toInt();
+    if (this->multiView->markerColorIndex(id) == 0)
+      ids.push_back(id);
+  }
+  QVector<QColor> colors(ids.count(), color);
+  this->mp_Acquisition->blockSignals(true);
+  this->mp_Acquisition->setMarkersColor(ids, colors);
+  this->mp_Acquisition->blockSignals(false);
+  this->mp_ModelDock->setMarkersColor(ids, colors);
+  this->multiView->setDefaultMarkerColor(color);
+};
+
+void MainWindow::setPreferenceDefaultMarkerRadius(double radius)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultMarkerRadius", radius);
+  this->multiView->setDefaultMarkerRadius(radius);
+};
+
+void MainWindow::setPreferenceDefaultTrajectoryLength(int index)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultMarkerTrajectoryLength", index);
+  this->multiView->setMarkerTrajectoryLength(index);
+};
+
+void MainWindow::setPreferenceShowForcePlatformAxes(int index)
+{
+  QSettings settings;
+  settings.setValue("Preferences/showForcePlatformAxes", index);
+  this->multiView->showForcePlatformAxes(index == 0);
+};
+
+void MainWindow::setPreferenceShowForcePlatformIndex(int index)
+{
+  QSettings settings;
+  settings.setValue("Preferences/showForcePlatformIndex", index);
+  this->multiView->showForcePlatformIndex(index == 0);
+};
+
+void MainWindow::setPreferenceDefaultForcePlateColor(const QColor& color)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultForcePlateColor", color);
+  this->multiView->setForcePlatformColor(color);
+};
+
+void MainWindow::setPreferenceDefaultForceVectorColor(const QColor& color)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultForceVectorColor", color);
+  this->multiView->setForceVectorColor(color);
+};
+
+void MainWindow::setPreferenceAutomaticCheckUpdate(bool isChecked)
+{
+  QSettings settings;
+  settings.setValue("Preferences/checkUpdateStartup", isChecked);
+};
+
 void MainWindow::setAcquisitionProperties(QMap<int, QVariant>& properties)
 {
   properties.clear();
@@ -1001,6 +1150,8 @@ void MainWindow::readSettings()
   // - Last directory
   this->m_LastDirectory = settings.value("lastDirectory", ".").toString();
   settings.endGroup();
+  
+  // MarkersDock
   settings.beginGroup("MarkersDock"); // Should be ModelDock but for compatibility...
   this->mp_ModelDock->setFloating(settings.value("floating", false).toBool());
   this->mp_ModelDock->move(settings.value("pos", this->mp_ModelDock->pos()).toPoint());
@@ -1016,6 +1167,75 @@ void MainWindow::readSettings()
   this->mp_ModelDock->setRecentColor(3, settings.value("recentColor4", QColor()).value<QColor>());
   this->mp_ModelDock->setRecentColor(4, settings.value("recentColor5", QColor()).value<QColor>());
   settings.endGroup();
+
+  // Preferences
+  settings.beginGroup("Preferences");
+  bool defaultConfigurationUsed = settings.value("defaultConfigurationUsed", false).toBool();
+  QString defaultConfigurationPath = settings.value("defaultConfigurationPath", "").toString();
+  bool openEventEditorWhenInserting = settings.value("openEventEditorWhenInserting", true).toBool();
+  int defaultPlaneOrientation = settings.value("defaultPlaneOrientation", 0).toInt();
+  QColor defaultMarkerColor = settings.value("defaultMarkerColor", QColor(255,255,255)).value<QColor>();
+  double defaultMarkerRadius = settings.value("defaultMarkerRadius", 8.0).toDouble();
+  int defaultMarkerTrajectoryLength = settings.value("defaultMarkerTrajectoryLength", 3).toInt();
+  int showForcePlatformAxes = settings.value("showForcePlatformAxes", 0).toInt();
+  int showForcePlatformIndex = settings.value("showForcePlatformIndex", 0).toInt();
+  QColor defaultForcePlateColor = settings.value("defaultForcePlateColor", QColor(255,255,0)).value<QColor>();
+  QColor defaultForceVectorColor = settings.value("defaultForceVectorColor", QColor(255,255,0)).value<QColor>();
+  bool checkUpdateStartup = settings.value("checkUpdateStartup", true).toBool();
+  settings.endGroup();
+  this->mp_Preferences->lastDirectory = this->m_LastDirectory;
+  this->mp_Preferences->defaultConfigurationCheckBox->blockSignals(true);
+  this->mp_Preferences->openEventEditorCheckBox->blockSignals(true);
+  this->mp_Preferences->defaultPlaneOrientationComboBox->blockSignals(true);
+  this->mp_Preferences->defaultMarkerRadiusSpinBox->blockSignals(true);
+  this->mp_Preferences->showForcePlatformAxesComboBox->blockSignals(true);
+  this->mp_Preferences->showForcePlatformIndexComboBox->blockSignals(true);
+  this->mp_Preferences->automaticCheckUpdateCheckBox->blockSignals(true);
+  this->mp_Preferences->defaultConfigurationCheckBox->setChecked(defaultConfigurationUsed);
+  this->mp_Preferences->defaultConfigurationLineEdit->setText(defaultConfigurationPath);
+  this->mp_Preferences->openEventEditorCheckBox->setChecked(openEventEditorWhenInserting);
+  this->mp_Preferences->defaultPlaneOrientationComboBox->setCurrentIndex(defaultPlaneOrientation);
+  colorizeButton(this->mp_Preferences->defaultMarkerColorButton, defaultMarkerColor);
+  this->mp_Preferences->defaultMarkerRadiusSpinBox->setValue(defaultMarkerRadius);
+  this->mp_Preferences->defaultMarkerTrajectoryLengthComboBox->setCurrentIndex(defaultMarkerTrajectoryLength);
+  this->mp_Preferences->showForcePlatformAxesComboBox->setCurrentIndex(showForcePlatformAxes);
+  this->mp_Preferences->showForcePlatformIndexComboBox->setCurrentIndex(showForcePlatformIndex);
+  colorizeButton(this->mp_Preferences->defaultForcePlateColorButton, defaultForcePlateColor);
+  colorizeButton(this->mp_Preferences->defaultForceVectorColorButton, defaultForceVectorColor);
+  this->mp_Preferences->automaticCheckUpdateCheckBox->setChecked(checkUpdateStartup);
+  this->mp_Preferences->defaultConfigurationCheckBox->blockSignals(false);
+  this->mp_Preferences->openEventEditorCheckBox->blockSignals(false);
+  this->mp_Preferences->defaultPlaneOrientationComboBox->blockSignals(false);
+  this->mp_Preferences->defaultMarkerRadiusSpinBox->blockSignals(false);
+  this->mp_Preferences->showForcePlatformAxesComboBox->blockSignals(false);
+  this->mp_Preferences->showForcePlatformIndexComboBox->blockSignals(false);
+  this->mp_Preferences->automaticCheckUpdateCheckBox->blockSignals(false);
+#ifdef Q_OS_WIN
+  this->mp_Preferences->setPreference(Preferences::DefaultConfigurationUse, defaultConfigurationUsed);
+  this->mp_Preferences->setPreference(Preferences::DefaultConfigurationPath, defaultConfigurationPath);
+  this->mp_Preferences->setPreference(Preferences::EventEditorWhenInserting, openEventEditorWhenInserting);
+  this->mp_Preferences->setPreference(Preferences::DefaultGroundOrientation, defaultPlaneOrientation);
+  this->mp_Preferences->setPreference(Preferences::DefaultMarkerColor, defaultMarkerColor);
+  this->mp_Preferences->setPreference(Preferences::DefaultMarkerRadius, defaultMarkerRadius);
+  this->mp_Preferences->setPreference(Preferences::DefaultTrajectoryLength, defaultMarkerTrajectoryLength);
+  this->mp_Preferences->setPreference(Preferences::ForcePlatformAxesDisplay, showForcePlatformAxes);
+  this->mp_Preferences->setPreference(Preferences::ForcePlatformIndexDisplay, showForcePlatformIndex);
+  this->mp_Preferences->setPreference(Preferences::DefaultForcePlateColor, defaultForcePlateColor);
+  this->mp_Preferences->setPreference(Preferences::DefaultForceVectorColor, defaultForceVectorColor);
+  this->mp_Preferences->setPreference(Preferences::AutomaticCheckUpdateUse, checkUpdateStartup);
+#endif  
+  
+  if (defaultConfigurationUsed && !defaultConfigurationPath.isEmpty())
+    this->mp_ModelDock->loadConfiguration(defaultConfigurationPath);
+  this->timeEventControler->setOpenEditorWhenInsertingEventFlag(openEventEditorWhenInserting);
+  this->multiView->setDefaultGroundOrientation(defaultPlaneOrientation);
+  this->multiView->setDefaultMarkerColor(defaultMarkerColor);
+  this->multiView->setDefaultMarkerRadius(defaultMarkerRadius);
+  this->multiView->setMarkerTrajectoryLength(defaultMarkerRadius);
+  this->multiView->showForcePlatformAxes(showForcePlatformAxes == 0);
+  this->multiView->showForcePlatformIndex(showForcePlatformIndex == 0);
+  this->multiView->setForcePlatformColor(defaultForcePlateColor);
+  this->multiView->setForceVectorColor(defaultForceVectorColor);
 };
 
 void MainWindow::writeSettings()

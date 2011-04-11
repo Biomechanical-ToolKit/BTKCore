@@ -48,13 +48,14 @@
 
 Acquisition::Acquisition(QObject* parent)
 : QObject(parent), mp_BTKAcquisition(), m_BTKProcesses(), m_Filename(),
-  m_Points(), m_Analogs(), m_Events()
+  m_Points(), m_Analogs(), m_Events(), m_DefaultMarkerColor(Qt::white)
 {
   this->m_FirstFrame = 0;
   this->m_LastFrame = 0;
   this->mp_ROI[0] = this->m_FirstFrame;
   this->mp_ROI[1] = this->m_LastFrame;
   this->m_LastEventId = -1;
+  this->m_DefaultMarkerRadius = 8.0; // mm
   
   // BTK PIPELINE
   btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
@@ -762,8 +763,8 @@ void Acquisition::loadAcquisition()
     p->label = QString::fromStdString((*it)->GetLabel());
     p->description = QString::fromStdString((*it)->GetDescription());
     p->type = Point::Marker;
-    p->radius = 8.0;
-    p->color = Qt::white;
+    p->radius = this->m_DefaultMarkerRadius;
+    p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
     this->m_Points.insert(inc++, p);
   }
@@ -775,8 +776,8 @@ void Acquisition::loadAcquisition()
     p->label = QString::fromStdString((*it)->GetLabel());
     p->description = QString::fromStdString((*it)->GetDescription());
     p->type = Point::VirtualMarker;
-    p->radius = 8.0;
-    p->color = Qt::white;
+    p->radius = this->m_DefaultMarkerRadius;
+    p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
     this->m_Points.insert(inc++, p);
   }
