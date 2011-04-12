@@ -131,15 +131,15 @@ void UpdateChecker::setUrl(const QString& path)
 // Parser
 
 UpdateParser::UpdateParser(const QString& appVer, const QString& u)
-: QObject(NULL), url(u), m_CurrentVersion(appVer.split("."))//, m_Updates()
+: QObject(NULL), url(u), m_CurrentVersion(appVer.split("."))
 {
-  this->mp_Manager = new QNetworkAccessManager(this);
-  
-  connect(this->mp_Manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(parseReply(QNetworkReply*)));
+  this->mp_Manager = 0;
 };
 
 void UpdateParser::check()
 {
+  this->mp_Manager = new QNetworkAccessManager(this);
+  connect(this->mp_Manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(parseReply(QNetworkReply*)));
   this->mp_Manager->get(QNetworkRequest(QUrl(this->url)));
 };
 
@@ -147,8 +147,7 @@ void UpdateParser::parseReply(QNetworkReply* reply)
 {
   bool updateAvailable = false;  
   QString appName, appNewVer, appLatestNewVer, appNote, appUrl, appPubDate;
-  if ((reply->error() != QNetworkReply::NoError)
-       || !reply->open(QIODevice::ReadOnly | QIODevice::ReadOnly))
+  if ((reply->error() != QNetworkReply::NoError) || !reply->open(QIODevice::ReadOnly))
   {
     qDebug("Unable to check update.");
   }
@@ -221,6 +220,7 @@ void UpdateParser::parseReply(QNetworkReply* reply)
         }
       }
     }
+    reply->close();
   }
   
   if (updateAvailable)
@@ -231,6 +231,7 @@ void UpdateParser::parseReply(QNetworkReply* reply)
   emit parsingFinished();
   
   reply->deleteLater();
+  reply->manager()->deleteLater();
 };
 
 bool UpdateParser::isGreaterRelease(const QStringList& max, const QStringList& rel) const

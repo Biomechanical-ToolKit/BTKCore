@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ImportAssistant = new ImportAssistantDialog(this);
   this->mp_UpdateChecker = new UpdateChecker(xstr(MOKKA_VERSION_STRING), "http://b-tk.googlecode.com/svn/latestMokka",
                                              ":/Resources/Images/Mokka_128.png", this);
-#if def Q_OS_MAC
+#ifdef Q_OS_MAC
   this->mp_Preferences = new Preferences(0); // No parent: to be independant of the main window
 #else
   this->mp_Preferences = new Preferences(this);
