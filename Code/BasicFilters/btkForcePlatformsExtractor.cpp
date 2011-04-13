@@ -214,18 +214,14 @@ namespace btk
             noError = this->ExtractForcePlatformData((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 4:
-            {
             (*itFP) = ForcePlatformType4::New();
             this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
             noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
-            }
             break;
           case 5:
-            {
             (*itFP) = ForcePlatformType5::New();
             this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
             noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
-            }
             break;
           case 6:
             {
@@ -271,7 +267,7 @@ namespace btk
             btkErrorMacro("Unsupported force platform type. Impossible to extract corresponding data");
             break;
           }
-          // Fill emty force platform channel if necessary
+          // Fill empty force platform channel if necessary
           if (!noError)
           {
             btkErrorMacro("Error(s) occurred during channel extraction for force platform #" + ToString(i + 1) + ". Replacement by vector of zeros.")
@@ -368,10 +364,14 @@ namespace btk
   bool ForcePlatformsExtractor::ExtractForcePlatformDataWithCalibrationMatrix(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex)
   {
     int numberOfChannelToExtract = fp->GetChannelNumber();
+    int numberOfChannels = channels->GetItemNumber();
     bool noError = true;
-    if ((numberOfChannelToExtract + *alreadyExtracted) > static_cast<int>(channelsIndex.size()))
+    // Test on the number of analog channels
+    if ((numberOfChannelToExtract + *alreadyExtracted) > numberOfChannels)
+      noError = false;
+    else if ((numberOfChannelToExtract + *alreadyExtracted) > static_cast<int>(channelsIndex.size()))
      noError = false;
-    if (noError)
+    else
     {
       int numberOfFrame = channels->GetItem(0)->GetFrameNumber();
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> data = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(numberOfFrame, numberOfChannelToExtract);
