@@ -635,7 +635,7 @@ namespace btk
           }
           if (bits != output->GetAnalogResolution())
           {
-            if (bits >= 16)
+            if (bits > 16)
             {
               output->SetAnalogResolution(Acquisition::Bit16);
               this->m_AnalogIntegerFormat = Unsigned;
@@ -1650,10 +1650,7 @@ namespace btk
     int16_t bits = static_cast<int16_t>(input->GetAnalogResolution());
     MetaDataCreateChild(analog, "BITS", bits);
     // ANALOG:FORMAT
-    if (bits == 16)
-      MetaDataCreateChild(analog, "FORMAT", "UNSIGNED");
-    else
-      MetaDataCreateChild(analog, "FORMAT", (this->m_AnalogIntegerFormat == Unsigned ? "UNSIGNED" : "SIGNED"));
+    MetaDataCreateChild(analog, "FORMAT", (this->m_AnalogIntegerFormat == Unsigned ? "UNSIGNED" : "SIGNED"));
     // FORCE_PLATFORM group
     // --------------------
     MetaData::ConstIterator itFPGr = input->GetMetaData()->FindChild("FORCE_PLATFORM");
