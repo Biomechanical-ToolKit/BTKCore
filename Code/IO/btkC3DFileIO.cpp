@@ -41,6 +41,8 @@
 #include <cctype>
 #include <iostream>
 
+#include <Eigen/Array>
+
 namespace btk
 {
   /**
@@ -781,7 +783,8 @@ namespace btk
         // POINT Label, description, unit
         if (itPoint != root->End())
         {
-          // NOTE: C3D files exported from "Motion Analysis Corp." softwares (EvaRT, Cortex) seem to use POINT:LABELS and POINTS:DESCRIPTIONS as a short and long version of the points' label respecively. Point's Label used in EvaRT and Cortex correspond to values stored in POINTS:DESCRIPTIONS. To distinguish C3D files exported from "Motion Analysis Corp." softwares, it is possible to check the value in the parameter MANUFACTURER:Company.     
+          // NOTE: C3D files exported from "Motion Analysis Corp." softwares (EvaRT, Cortex) seem to use POINT:LABELS and POINTS:DESCRIPTIONS as a short and long version of the points' label respectively. Point's Label used in EvaRT and Cortex correspond to values stored in POINTS:DESCRIPTIONS. To distinguish C3D files exported from "Motion Analysis Corp." softwares, it is possible to check the value in the parameter MANUFACTURER:Company.
+          // NOTE #2: Moreover, With (at least) Cortex 2.1.1 the occlusion of markers are not set by a mask and residuals equals to -1 but by coordinates set by 9999999 ...
           MetaData::Iterator itManufacturer = root->FindChild("MANUFACTURER");
           if (itManufacturer != root->End())
           {
@@ -816,6 +819,25 @@ namespace btk
             MetaDataCollapseChildrenValues<std::string>(collapsed, *itPoint, "DESCRIPTIONS", pointNumber, "uname*");
             inc = 0; for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
               (*it)->SetLabel(collapsed[inc++]);
+            // Set correctly coordinates, residuals and masks for occluded markers
+            for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
+            {
+              Point::Values& coords = (*it)->GetValues();
+              Eigen::Matrix<double, Eigen::Dynamic, 1> diff = (coords.rowwise().sum() / 3.0).cwise() - 9999999.0;
+              Point::Residuals& res = (*it)->GetResiduals();
+              Point::Masks& masks = (*it)->GetMasks();
+              for (int k = 0 ; k < (*it)->GetFrameNumber() ; ++k)
+              {
+                if (fabs(diff.coeff(k)) < std::numeric_limits<float>::epsilon())
+                {
+                  coords.coeffRef(k,0) = 0.0;
+                  coords.coeffRef(k,1) = 0.0;
+                  coords.coeffRef(k,2) = 0.0;
+                  res.coeffRef(k) = -1.0;
+                  masks.coeffRef(k) = -1.0;
+                }
+              }
+            }
           }
           // POINT:UNITS
           MetaData::ConstIterator itPointUnits = (*itPoint)->FindChild("UNITS");
