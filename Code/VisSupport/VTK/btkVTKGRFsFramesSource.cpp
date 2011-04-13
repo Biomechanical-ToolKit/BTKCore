@@ -38,13 +38,11 @@
 
 #include <vtkstd/vector>
 #include <vtkPolyData.h>
-#include <vtkLineSource.h>
-#include <vtkAppendPolyData.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkObjectFactory.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
-
+#include <vtkCellArray.h>
 
 namespace btk
 {
@@ -174,7 +172,7 @@ namespace btk
     if (inObject->GetMTime() < this->GetMTime())
       return 0;
     WrenchCollection::Pointer input = static_pointer_cast<WrenchCollection>(inObject->GetBTKDataObject());
-    // Raz
+    // Reset
     for (size_t i = 0 ; i < this->mp_GRFsComponents->size() ; ++i)
       this->mp_GRFsComponents->operator[](i)->Delete();
     this->mp_GRFsComponents->clear();
@@ -184,14 +182,14 @@ namespace btk
     {
       frameNumber = input->GetItem(0)->GetPosition()->GetFrameNumber();
       this->mp_GRFsComponents->resize(frameNumber);
-      vtkAppendPolyData* append = vtkAppendPolyData::New();
-      append->UserManagedInputsOn();
-      append->SetNumberOfInputs(wrenchNumber);
-      vtkLineSource* lineGenerator = vtkLineSource::New();
-
       for (int i = 0 ; i < frameNumber ; ++i)
       {
         int wrenchIdx = 0;
+        
+        vtkPolyData* GRFs = vtkPolyData::New();
+        vtkPoints* points = vtkPoints::New(); points->SetNumberOfPoints(2*wrenchNumber); // 2 points by wrench
+        vtkCellArray* lines = vtkCellArray::New(); lines->Allocate(lines->EstimateSize(1*wrenchNumber,2)); // 1 line by wrench
+        
         WrenchCollection::ConstIterator it = input->Begin();
         while (it != input->End())
         {
@@ -199,31 +197,32 @@ namespace btk
           {
             double* positions = (*it)->GetPosition()->GetValues().data();
             double* forces = (*it)->GetForce()->GetValues().data();
-            lineGenerator->SetPoint1(positions[i] * this->mp_Scale,
-                                     positions[i + frameNumber] * this->mp_Scale,
-                                     positions[i + 2 * frameNumber] * this->mp_Scale);
-            lineGenerator->SetPoint2(positions[i] * this->mp_Scale + forces[i], 
-                                     positions[i + frameNumber] * this->mp_Scale + forces[i + frameNumber], 
-                                     positions[i + 2 * frameNumber] * this->mp_Scale + forces[i + 2 * frameNumber]);
+            
+            points->SetPoint(wrenchIdx * 2 + 0,
+                             positions[i] * this->mp_Scale,
+                             positions[i + frameNumber] * this->mp_Scale,
+                             positions[i + 2 * frameNumber] * this->mp_Scale);
+            points->SetPoint(wrenchIdx * 2 + 1,positions[i] * this->mp_Scale + forces[i], 
+                             positions[i + frameNumber] * this->mp_Scale + forces[i + frameNumber], 
+                             positions[i + 2 * frameNumber] * this->mp_Scale + forces[i + 2 * frameNumber]);
 
-            lineGenerator->Update();
-            vtkPolyData* GRF = vtkPolyData::New();
-            GRF->DeepCopy(lineGenerator->GetOutput());
-            append->SetInputByNumber(wrenchIdx, GRF);
-            GRF->Delete();
+            lines->InsertNextCell(2);
+            lines->InsertCellPoint(wrenchIdx * 2 + 0);
+            lines->InsertCellPoint(wrenchIdx * 2 + 1);
+            
+            ++wrenchIdx;
           }
-          else
-            append->SetInputByNumber(wrenchIdx, 0);
-
-          ++it; ++wrenchIdx;
+          ++it;
         }
-        append->Update();
-        vtkPolyData* GRFs = vtkPolyData::New();
-        GRFs->DeepCopy(append->GetOutput());
+        
+        points->SetNumberOfPoints(2 * wrenchIdx); // Update the number of points and the memory allocated
+        GRFs->SetPoints(points);
+        points->Delete();
+        GRFs->SetLines(lines);
+        lines->Delete();
+        
         this->mp_GRFsComponents->operator[](i) = GRFs;
       }
-      lineGenerator->Delete();
-      append->Delete();
     }
     // Update output informations
     vtkInformation *outInfo = outputVector->GetInformationObject(0);
