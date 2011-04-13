@@ -227,13 +227,20 @@ void TimeEventBarWidget::paintEvent(QPaintEvent* event)
     painter.drawLine(this->m_LeftMargin, tStep, this->m_LeftMargin, tStep - 9);
     painter.drawLine(xMax, tStep, xMax, tStep - 9);
     // Ticks
-    for (int j = 1 ; j < numTicks-1 ; ++j)
-      painter.drawLine(this->m_LeftMargin + this->m_Ticks[j] * this->m_UnitStep, tStep, this->m_LeftMargin + this->m_Ticks[j] * this->m_UnitStep, tStep - 6);
-    // SubTicks
+
+    // Ticks & SubTicks
     int incST = subTicksStart;
     while (incST < numFrames)
     {
-      painter.drawLine(QPoint(this->m_LeftMargin + incST * this->m_UnitStep, tStep), QPoint(this->m_LeftMargin + incST * this->m_UnitStep, tStep - 3));
+      for (int j = 1 ; j < numTicks-1 ; ++j)
+      {
+        if (abs(this->m_Ticks[j] - incST) < dd / 2) // Final adjustment for the ticks
+        {
+          painter.drawLine(this->m_LeftMargin + incST * this->m_UnitStep, tStep, this->m_LeftMargin + incST * this->m_UnitStep, tStep - 6);
+          break;
+        }
+      }
+      painter.drawLine(this->m_LeftMargin + incST * this->m_UnitStep, tStep, this->m_LeftMargin + incST * this->m_UnitStep, tStep - 3);
       incST += dd; 
     }
   }
@@ -534,7 +541,7 @@ void TimeEventBarWidget::updateInternals()
   if (this->m_UnitStep > 1.5)
   {
     dTrig = 1000;
-    uTrig = 4;
+    uTrig = 4.0;
   }
   
   this->m_TickDivider = 1;

@@ -225,19 +225,6 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
   connect(this->timeEventControler, SIGNAL(playbackStarted()), this->multiView, SLOT(forceRubberBandDrawingOff()));
   connect(this->timeEventControler, SIGNAL(playbackStopped()), this->multiView, SLOT(forceRubberBandDrawingOn()));
-  // Preferences
-  connect(this->mp_Preferences, SIGNAL(useDefaultConfigurationStateChanged(bool)), this, SLOT(setPreferenceUseDefaultConfiguration(bool)));
-  connect(this->mp_Preferences, SIGNAL(defaultConfigurationPathChanged(QString)), this, SLOT(setPreferenceDefaultConfigurationPath(QString)));
-  connect(this->mp_Preferences, SIGNAL(defaultGroundOrientationChanged(int)), this, SLOT(setPreferenceDefaultOrientation(int)));
-  connect(this->mp_Preferences, SIGNAL(useEventEditorWhenInsertingStateChanged(bool)), this, SLOT(setPreferenceUseEventEditorWhenInserting(bool)));
-  connect(this->mp_Preferences, SIGNAL(defaultMarkerColorChanged(QColor)), this, SLOT(setPreferenceDefaultMarkerColor(QColor)));
-  connect(this->mp_Preferences, SIGNAL(defaultMarkerRadiusChanged(double)), this, SLOT(setPreferenceDefaultMarkerRadius(double)));
-  connect(this->mp_Preferences, SIGNAL(defaultMarkerTrajectoryLengthChanged(int)), this, SLOT(setPreferenceDefaultTrajectoryLength(int)));
-  connect(this->mp_Preferences, SIGNAL(showForcePlatformAxesChanged(int)), this, SLOT(setPreferenceShowForcePlatformAxes(int)));
-  connect(this->mp_Preferences, SIGNAL(showForcePlatformIndexChanged(int)), this, SLOT(setPreferenceShowForcePlatformIndex(int)));
-  connect(this->mp_Preferences, SIGNAL(defaultForcePlateColorChanged(QColor)), this, SLOT(setPreferenceDefaultForcePlateColor(QColor)));
-  connect(this->mp_Preferences, SIGNAL(defaultForceVectorColorChanged(QColor)), this, SLOT(setPreferenceDefaultForceVectorColor(QColor)));
-  connect(this->mp_Preferences, SIGNAL(automaticCheckUpdateStateChanged(bool)), this, SLOT(setPreferenceAutomaticCheckUpdate(bool)));
   
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
   this->menuHelp->addSeparator();
@@ -276,6 +263,20 @@ MainWindow::MainWindow(QWidget* parent)
       this->mp_UpdateChecker->check(true);
   #endif
 #endif
+
+  // Preferences connections. Must be set after the reading of the settings.
+  connect(this->mp_Preferences, SIGNAL(useDefaultConfigurationStateChanged(bool)), this, SLOT(setPreferenceUseDefaultConfiguration(bool)));
+  connect(this->mp_Preferences, SIGNAL(defaultConfigurationPathChanged(QString)), this, SLOT(setPreferenceDefaultConfigurationPath(QString)));
+  connect(this->mp_Preferences, SIGNAL(defaultGroundOrientationChanged(int)), this, SLOT(setPreferenceDefaultOrientation(int)));
+  connect(this->mp_Preferences, SIGNAL(useEventEditorWhenInsertingStateChanged(bool)), this, SLOT(setPreferenceUseEventEditorWhenInserting(bool)));
+  connect(this->mp_Preferences, SIGNAL(defaultMarkerColorChanged(QColor)), this, SLOT(setPreferenceDefaultMarkerColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(defaultMarkerRadiusChanged(double)), this, SLOT(setPreferenceDefaultMarkerRadius(double)));
+  connect(this->mp_Preferences, SIGNAL(defaultMarkerTrajectoryLengthChanged(int)), this, SLOT(setPreferenceDefaultTrajectoryLength(int)));
+  connect(this->mp_Preferences, SIGNAL(showForcePlatformAxesChanged(int)), this, SLOT(setPreferenceShowForcePlatformAxes(int)));
+  connect(this->mp_Preferences, SIGNAL(showForcePlatformIndexChanged(int)), this, SLOT(setPreferenceShowForcePlatformIndex(int)));
+  connect(this->mp_Preferences, SIGNAL(defaultForcePlateColorChanged(QColor)), this, SLOT(setPreferenceDefaultForcePlateColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(defaultForceVectorColorChanged(QColor)), this, SLOT(setPreferenceDefaultForceVectorColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(automaticCheckUpdateStateChanged(bool)), this, SLOT(setPreferenceAutomaticCheckUpdate(bool)));
 };
 
 MainWindow::~MainWindow()
@@ -1184,13 +1185,6 @@ void MainWindow::readSettings()
   bool checkUpdateStartup = settings.value("checkUpdateStartup", true).toBool();
   settings.endGroup();
   this->mp_Preferences->lastDirectory = this->m_LastDirectory;
-  this->mp_Preferences->defaultConfigurationCheckBox->blockSignals(true);
-  this->mp_Preferences->openEventEditorCheckBox->blockSignals(true);
-  this->mp_Preferences->defaultPlaneOrientationComboBox->blockSignals(true);
-  this->mp_Preferences->defaultMarkerRadiusSpinBox->blockSignals(true);
-  this->mp_Preferences->showForcePlatformAxesComboBox->blockSignals(true);
-  this->mp_Preferences->showForcePlatformIndexComboBox->blockSignals(true);
-  this->mp_Preferences->automaticCheckUpdateCheckBox->blockSignals(true);
   this->mp_Preferences->defaultConfigurationCheckBox->setChecked(defaultConfigurationUsed);
   this->mp_Preferences->defaultConfigurationLineEdit->setText(defaultConfigurationPath);
   this->mp_Preferences->openEventEditorCheckBox->setChecked(openEventEditorWhenInserting);
@@ -1203,13 +1197,7 @@ void MainWindow::readSettings()
   colorizeButton(this->mp_Preferences->defaultForcePlateColorButton, defaultForcePlateColor);
   colorizeButton(this->mp_Preferences->defaultForceVectorColorButton, defaultForceVectorColor);
   this->mp_Preferences->automaticCheckUpdateCheckBox->setChecked(checkUpdateStartup);
-  this->mp_Preferences->defaultConfigurationCheckBox->blockSignals(false);
-  this->mp_Preferences->openEventEditorCheckBox->blockSignals(false);
-  this->mp_Preferences->defaultPlaneOrientationComboBox->blockSignals(false);
-  this->mp_Preferences->defaultMarkerRadiusSpinBox->blockSignals(false);
-  this->mp_Preferences->showForcePlatformAxesComboBox->blockSignals(false);
-  this->mp_Preferences->showForcePlatformIndexComboBox->blockSignals(false);
-  this->mp_Preferences->automaticCheckUpdateCheckBox->blockSignals(false);
+
 #ifdef Q_OS_WIN
   this->mp_Preferences->setPreference(Preferences::DefaultConfigurationUse, defaultConfigurationUsed);
   this->mp_Preferences->setPreference(Preferences::DefaultConfigurationPath, defaultConfigurationPath);
