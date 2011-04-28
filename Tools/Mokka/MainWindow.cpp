@@ -779,8 +779,10 @@ void MainWindow::importAcquisitions(const QStringList& filenames)
     QString errMsg = this->mp_Acquisition->importFrom(filenames, importWarnings);
     this->loadAcquisition(errMsg, &pw);
     this->setWindowTitle(title);
-    this->setWindowModified(true);
     pw.hide();
+    if (!errMsg.isEmpty())
+      return;
+    this->setWindowModified(true);
     if (!importWarnings.isEmpty())
     {
       QMessageBox error(QMessageBox::Warning, tr("Import warnings"), tr("Warnings appears during importing."), QMessageBox::Ok , this);
