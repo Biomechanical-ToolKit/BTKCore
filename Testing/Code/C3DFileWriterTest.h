@@ -1028,7 +1028,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader2->SetFilename(C3DFilePathOUT + "sample19_sample19.c3d");
     reader2->Update();
     btk::Acquisition::Pointer acq = reader->GetOutput();
-    btk::Acquisition::Pointer acq2 = reader->GetOutput();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
 
     TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
@@ -1038,10 +1038,16 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
     TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), acq2->GetAnalogFrameNumber());
     TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
-    for (int i = 1 ; i < 50 ; i+=10)
+    
+    for (int i = 0 ; i < acq->GetAnalogNumber() ; ++i)
     {
-      TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(i), acq2->GetAnalog(0)->GetValues()(i), 0.00001);
-      TS_ASSERT_DELTA(acq->GetAnalog(1)->GetValues()(i), acq2->GetAnalog(1)->GetValues()(i), 0.00001);
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel(), acq2->GetAnalog(i)->GetLabel());
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetOffset(), acq2->GetAnalog(i)->GetOffset());
+      TS_ASSERT_DELTA(acq->GetAnalog(i)->GetScale(), acq2->GetAnalog(i)->GetScale(), 1e-5);
+      for (int j = 0 ; j < 1000 ; j+=50)
+      {
+        TS_ASSERT_DELTA(acq->GetAnalog(i)->GetValues()(j), acq2->GetAnalog(i)->GetValues()(j), 1e-5);
+      }
     }
     
     TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq->GetMetaData()->GetChild("POINT")->GetChild("FRAMES")->GetInfo()->ToUInt16(0));
