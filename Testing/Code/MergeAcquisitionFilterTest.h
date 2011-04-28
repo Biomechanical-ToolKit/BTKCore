@@ -722,6 +722,55 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(output->GetAnalog(27)->GetGain(), btk::Analog::PlusMinus2Dot5);
   };
   
+  CXXTEST_TEST(C3D_vs_exportedC3D_Signed16bits)
+  {
+    // Merge
+    btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
+    trcReader->SetFilename(TRCFilePathIN + "Res16bits.trc");
+    btk::AcquisitionFileReader::Pointer ancReader = btk::AcquisitionFileReader::New();
+    ancReader->SetFilename(ANCFilePathIN + "Res16bits.anc");
+    btk::AcquisitionFileReader::Pointer calReader = btk::AcquisitionFileReader::New();
+    calReader->SetFilename(CALForcePlateFilePathIN + "forcepla6.cal");
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, trcReader->GetOutput());
+    merger->SetInput(1, ancReader->GetOutput());
+    merger->SetInput(2, calReader->GetOutput());
+    // C3D
+    btk::AcquisitionFileReader::Pointer c3dReader = btk::AcquisitionFileReader::New();
+    c3dReader->SetFilename(C3DFilePathIN + "others/Res16bits.c3d");
+    btk::Acquisition::Pointer input = c3dReader->GetOutput();
+    input->Update();
+    // Exported C3D writer
+    btk::AcquisitionFileWriter::Pointer c3dWriter = btk::AcquisitionFileWriter::New();
+    c3dWriter->SetFilename(C3DFilePathOUT + "others_Res16bits.c3d");
+    c3dWriter->SetInput(merger->GetOutput());
+    c3dWriter->Update();
+    // Exported C3D reader
+    btk::AcquisitionFileReader::Pointer c3dReader2 = btk::AcquisitionFileReader::New();
+    c3dReader2->SetFilename(C3DFilePathOUT + "others_Res16bits.c3d");
+    btk::Acquisition::Pointer output = c3dReader2->GetOutput();
+    output->Update();
+    //
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), input->GetPointFrequency());
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), input->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(output->GetPointNumber(), input->GetPointNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), input->GetAnalogNumber());
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), input->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), input->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(output->GetEventNumber(), input->GetEventNumber());
+    for (int i = 0 ; i < output->GetPointFrameNumber() ; i+=2)
+    {
+      for (int j = 0 ; j < output->GetPointNumber() ; ++j)
+      {
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues()(i,0), input->GetPoint(j)->GetValues()(i,0), 1e-5);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues()(i,1), input->GetPoint(j)->GetValues()(i,1), 1e-5);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues()(i,2), input->GetPoint(j)->GetValues()(i,2), 1e-5);
+      }
+      for (int j = 0 ; j < output->GetAnalogNumber() ; ++j)
+        TS_ASSERT_DELTA(output->GetAnalog(j)->GetValues()(i), input->GetAnalog(j)->GetValues()(i), 1e-5);
+    }
+  };
+  
   CXXTEST_TEST(FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
   {
     btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
@@ -1431,6 +1480,7 @@ CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_ANC_and_
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_CAL_and_TRC_and_ANC)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_ThreeFiles_Concat_TRC_and_ANC_and_CAL)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D_Signed16bits)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite_vs_C3D)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, EliteGrFirst_vs_C3D)

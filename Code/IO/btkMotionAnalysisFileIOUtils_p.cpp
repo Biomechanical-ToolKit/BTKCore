@@ -274,17 +274,17 @@ namespace btk
         output->SetAnalogResolution(Acquisition::Bit8);
         break;
       case 12:
-        output->SetAnalogResolution(Acquisition::Bit12);            
+        output->SetAnalogResolution(Acquisition::Bit12);
         break;
       case 14:
-        output->SetAnalogResolution(Acquisition::Bit14);            
+        output->SetAnalogResolution(Acquisition::Bit14);
         break;
       case 16:
-        output->SetAnalogResolution(Acquisition::Bit16);            
+        output->SetAnalogResolution(Acquisition::Bit16);
         break;
       default:
         btkErrorMacro("Unknown bit depth resolution. Default value used: 12 bits.");
-        output->SetAnalogResolution(Acquisition::Bit12);            
+        output->SetAnalogResolution(Acquisition::Bit12);
         break;
     }
     int inc = 0;
@@ -372,16 +372,16 @@ namespace btk
       return;
     std::vector<std::string> labels2(num, "");
     std::string suffix = "";
-    // Looking for label with suffix "",0,1,2,3,4,5
-    for (int i = 0 ; i < 6 ; ++i)
+    // Looking for label with suffix "",0,1,2,3,4,5,6,7,8,9
+    for (int i = 0 ; i < 10 ; ++i)
     {
       for (int j = 0 ; j < num ; ++j)
         labels2[j] = std::string(labels[j]) + suffix;
       ANxFileIOExtractForcePlatformChannel_p(fpChan, output, labels2);
       suffix = ToString(i);
     }
-    // Looking for label with index 0,1,2,3,4,5 after the first letter.
-    for (int i = 0 ; i < 6 ; ++i)
+    // Looking for label with index 0,1,2,3,4,5,6,7,8,9 after the first letter.
+    for (int i = 0 ; i < 10 ; ++i)
     {
       suffix = ToString(i);
       for (int j = 0 ; j < num ; ++j)
@@ -402,8 +402,8 @@ namespace btk
       return;
     std::vector<std::string> labels2(num, "");
     std::string suffix = "";
-    // Looking for label with prefix and a possible index between 0 and 5 (included).
-    for (int i = 0 ; i < 6 ; ++i)
+    // Looking for label with prefix and a possible index between 0 and 9 (included).
+    for (int i = 0 ; i < 10 ; ++i)
     {
       for (int j = 0 ; j < num ; ++j)
         labels2[j] =  prefix + suffix + std::string(labels[j]);
@@ -431,7 +431,10 @@ namespace btk
       for (size_t i = 0 ; i < fp.size() ; ++i)
       {
         Analog::Pointer a = output->GetAnalog(fp[i]-1);
-        a->SetScale(a->GetScale() / 4000.0 / 10.0 * 1000000.0 * -1.0);
+        if (output->GetAnalogResolution() == Acquisition::Bit16)
+          a->SetScale(a->GetScale() * -1.0);
+        else
+          a->SetScale(a->GetScale() / 4000.0 / 10.0 * 1000000.0 * -1.0);
       }
     }
   };

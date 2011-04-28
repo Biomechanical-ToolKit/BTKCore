@@ -293,8 +293,6 @@ namespace btk
           it->calMatrix.row(5) *= 1000;
         }
         
-        
-        
         const double* cm = it->calMatrix.data();
         for (int i = 0 ; i < rows * chans ; ++i)
           calMatrix[inc3 + i] = static_cast<float>(cm[i]);

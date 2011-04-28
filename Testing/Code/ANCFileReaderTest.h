@@ -109,6 +109,45 @@ CXXTEST_SUITE(ANCFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetAnalog(26)->GetGain(), btk::Analog::PlusMinus2Dot5);
     TS_ASSERT_EQUALS(acq->GetAnalog(27)->GetGain(), btk::Analog::PlusMinus2Dot5);
   };
+  
+  CXXTEST_TEST(Res16Bits)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(ANCFilePathIN + "Res16bits.anc");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), 1);
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 1000.0);
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), 0);
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), 1000);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), 1000);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 1000.0);
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 81);
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathIN + "others/Res16bits.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+    
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency() * 10.0);
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber() * 10.0);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), acq2->GetAnalogFrameNumber());
+    
+    for (int i = 0 ; i < acq->GetAnalogNumber() ; ++i)
+    {
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel(), acq2->GetAnalog(i)->GetLabel());
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetOffset(), acq2->GetAnalog(i)->GetOffset());
+      TS_ASSERT_DELTA(acq->GetAnalog(i)->GetScale(), acq2->GetAnalog(i)->GetScale(), 1e-5);
+      for (int j = 0 ; j < acq->GetAnalogFrameNumber() ; j+=50)
+      {
+        TS_ASSERT_DELTA(acq->GetAnalog(i)->GetValues()(j), acq2->GetAnalog(i)->GetValues()(j), 1e-5);
+      }
+    }
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(ANCFileReaderTest)
@@ -116,4 +155,5 @@ CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, NoFile)
 CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, MisspelledFile)
 CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, Truncated)
 CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, Gait)
+CXXTEST_TEST_REGISTRATION(ANCFileReaderTest, Res16Bits)
 #endif

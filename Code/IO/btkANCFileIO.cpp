@@ -460,23 +460,22 @@ namespace btk
   {
     if (line.substr(0,keyword.length()).compare(keyword) != 0)
         throw(ANCFileIOException("Corrupted ANC file: Waiting for keyword: '" + keyword + "' and found '" + line.substr(0,keyword.length()) + "'."));
-    std::string line2;;
-    if (line[line.length() - 1] == 0x0D) // Suppress the CR character
+    std::string line2;
+    if (!line.empty() && (line[line.length() - 1] == 0x0D)) // Suppress the CR character
       line2 = line.substr(0, line.length() - 1);
     else
       line2 = line;
+    if (!line2.empty() && (line2[line2.length() - 1] == 0x09)) // Suppress the \t character
+      line2 = line2.substr(0, line2.length() - 1);
     std::istringstream iss(line2, std::istringstream::in);
     std::string buf;
-    iss >> buf; // Keyword
-    while (iss)
+    iss >> buf; iss.ignore(1, '\t'); // Keyword 
+    while (!iss.eof())
     {
       std::getline(iss, buf, '\t');
-      if (!buf.empty())
-      {
-        buf = buf.erase(buf.find_last_not_of(' ') + 1);
-        buf = buf.erase(0, buf.find_first_not_of(' '));
-        info.push_back(buf);
-      }
+      buf = buf.erase(buf.find_last_not_of(' ') + 1);
+      buf = buf.erase(0, buf.find_first_not_of(' '));
+      info.push_back(buf);
     }
   };
 };

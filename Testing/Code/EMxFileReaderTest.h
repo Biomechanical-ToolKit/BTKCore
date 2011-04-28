@@ -54,7 +54,7 @@ CXXTEST_SUITE(EMxFileReaderTest)
     btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
     reader2->SetFilename(C3DFilePathIN + "others/1123x01EMG.c3d");
     reader2->Update();
-    btk::Acquisition::Pointer acq2 = reader->GetOutput();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
     
     TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
     TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
