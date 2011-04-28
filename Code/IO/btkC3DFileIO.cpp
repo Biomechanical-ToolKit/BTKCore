@@ -644,7 +644,7 @@ namespace btk
             }
             else
               output->SetAnalogResolution(static_cast<Acquisition::AnalogResolution>(bits));
-            btkIOErrorMacro(filename, "Analog format and/or their resolution are inconsistents with Analog offsets. They were updated.");
+            btkIOErrorMacro(filename, "Analog format and/or their resolution are inconsistent with analog offsets. They were updated.");
           }
           // - ANALOG:OFFSET
           if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
@@ -1424,6 +1424,18 @@ namespace btk
     }
     // ANALOG:GEN_SCALE
     this->m_AnalogUniversalScale = 1.0;
+    // ANALOG:FORMAT
+    this->m_AnalogIntegerFormat = Signed;
+    MetaData::ConstIterator itAnalog = input->GetMetaData()->FindChild("ANALOG");
+    if (itAnalog != input->GetMetaData()->End())
+    {
+      MetaData::ConstIterator itAnalogFormat = (*itAnalog)->FindChild("FORMAT");
+      if ((itAnalogFormat != (*itAnalog)->End()) && (*itAnalogFormat)->HasInfo())
+      {
+        if ((*itAnalogFormat)->GetInfo()->ToString(0).compare("UNSIGNED") == 0)
+          this->m_AnalogIntegerFormat = Unsigned;
+      }
+    }
   };
   
   /**
