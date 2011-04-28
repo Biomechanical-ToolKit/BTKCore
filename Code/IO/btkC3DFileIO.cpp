@@ -747,34 +747,46 @@ namespace btk
         int frameNumber = lastFrame - output->GetFirstFrame() + 1;
         output->Init(pointNumber, frameNumber, analogNumber, numberSamplesPerAnalogChannel);
         output->SetPointFrequency(pointFrameRate);
-        for (int frame = 0 ; frame < frameNumber ; ++frame)
+        try
         {
-          Acquisition::PointIterator itM = output->BeginPoint(); 
-          while (itM != output->EndPoint())
+          for (int frame = 0 ; frame < frameNumber ; ++frame)
           {
-            Point* point = itM->get();
-            fdf->ReadPoint(&(point->GetValues().data()[frame]),
-                           &(point->GetValues().data()[frame + frameNumber]),
-                           &(point->GetValues().data()[frame + 2*frameNumber]),
-                           &(point->GetResiduals().data()[frame]), 
-                           &(point->GetMasks().data()[frame]),
-                           this->m_PointScale);
-            ++itM;
-          }
-          
-          unsigned inc = 0, incChannel = 0, analogFrame = numberSamplesPerAnalogChannel * frame;
-          Acquisition::AnalogIterator itA = output->BeginAnalog();
-          while (itA != output->EndAnalog())
-          {
-            (*itA)->GetValues().data()[analogFrame] = (fdf->ReadAnalog() - static_cast<double>(this->m_AnalogZeroOffset[incChannel])) * this->m_AnalogChannelScale[incChannel] * this->m_AnalogUniversalScale;
-            ++itA; ++incChannel;
-            if ((itA == output->EndAnalog()) && (inc < static_cast<unsigned>(numberSamplesPerAnalogChannel - 1)))
+            Acquisition::PointIterator itM = output->BeginPoint(); 
+            while (itM != output->EndPoint())
             {
-              itA = output->BeginAnalog();
-              incChannel = 0;
-              ++inc; ++analogFrame;
+              Point* point = itM->get();
+              fdf->ReadPoint(&(point->GetValues().data()[frame]),
+                             &(point->GetValues().data()[frame + frameNumber]),
+                             &(point->GetValues().data()[frame + 2*frameNumber]),
+                             &(point->GetResiduals().data()[frame]), 
+                             &(point->GetMasks().data()[frame]),
+                             this->m_PointScale);
+              ++itM;
+            }
+            unsigned inc = 0, incChannel = 0, analogFrame = numberSamplesPerAnalogChannel * frame;
+            Acquisition::AnalogIterator itA = output->BeginAnalog();
+            while (itA != output->EndAnalog())
+            {
+              (*itA)->GetValues().data()[analogFrame] = (fdf->ReadAnalog() - static_cast<double>(this->m_AnalogZeroOffset[incChannel])) * this->m_AnalogChannelScale[incChannel] * this->m_AnalogUniversalScale;
+              ++itA; ++incChannel;
+              if ((itA == output->EndAnalog()) && (inc < static_cast<unsigned>(numberSamplesPerAnalogChannel - 1)))
+              {
+                itA = output->BeginAnalog();
+                incChannel = 0;
+                ++inc; ++analogFrame;
+              }
             }
           }
+        }
+        catch (BinaryFileStreamException& )
+        {
+          // Let's try to continue even if the file is corrupted
+          if (ibfs->EndFile())
+          {  
+            btkIOErrorMacro(filename, "Some points and/or analog data cannot be extracted and are set as invalid.");
+          }
+          else
+            throw;
         }
     // Label, description, unit and type
         size_t inc = 0; 
