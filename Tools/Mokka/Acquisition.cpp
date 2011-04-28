@@ -175,7 +175,8 @@ QString Acquisition::importFrom(const QStringList& filenames, QString& importWar
   this->clear();
   this->mp_BTKAcquisition = merger->GetOutput();
   this->loadAcquisition();
-  emit informationsChanged(QVector<QString>(16,"N/A"));
+  QVector<QString> infos(16,"N/A"); infos[0] = "N/A                         ";
+  emit informationsChanged(infos);
   importWarnings = QString::fromStdString(err.str());
   return "";
 };

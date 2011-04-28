@@ -662,13 +662,14 @@ void MainWindow::importAssistant()
   this->mp_ModelDock->setEnabled(false);
   this->mp_ImportAssistant->clear(this->m_LastDirectory);
   this->mp_ImportAssistant->appendAcquisitionRadioButton->setEnabled(this->actionClose->isEnabled());
-  if (this->mp_ImportAssistant->exec())
+  bool accepted = this->mp_ImportAssistant->exec();
+  this->mp_ModelDock->setEnabled(true); // If the dock is not enabled before the import, then its signals are not emited.
+  if (accepted)
   {
     if (this->mp_ImportAssistant->newAcquisitionRadioButton->isChecked())
       this->mp_Acquisition->clear();
     this->importAcquisitions(this->mp_ImportAssistant->filenames());
   }
-  this->mp_ModelDock->setEnabled(true);
 };
 
 void MainWindow::importC3D()
