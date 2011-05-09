@@ -44,6 +44,7 @@ Preferences::Preferences(QWidget* parent)
   this->setupUi(this);
   
   connect(this->defaultConfigurationButton, SIGNAL(clicked()), this, SLOT(setDefaultConfiguration()));
+  connect(this->defaultSegmentColorButton, SIGNAL(clicked()), this, SLOT(setDefaultSegmentColor()));
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultForcePlateColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForcePlateColor()));
   connect(this->defaultForceVectorColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForceVectorColor()));
@@ -162,6 +163,13 @@ void Preferences::setDefaultConfiguration()
     tr("Model Visual Configuration Files (*.mvc)"));
   if (!filename.isEmpty())
     this->defaultConfigurationLineEdit->setText(filename);
+};
+
+void Preferences::setDefaultSegmentColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultSegmentColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+    colorizeButton(this->defaultSegmentColorButton, color);
 };
 
 void Preferences::setDefaultMarkerColor()

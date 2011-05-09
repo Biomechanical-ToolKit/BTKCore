@@ -64,6 +64,7 @@ public slots:
   void setDefaultConfigurationPath();
   void useEventEditorWhenInserting(bool isUsed);
   void setDefaultOrientation(int index);
+  void setDefaultSegmentColor();
   void setDefaultMarkerColor();
   void setDefaultMarkerRadius(double radius);
   void setDefaultTrajectoryLength(int index);
@@ -78,6 +79,7 @@ signals:
   void defaultConfigurationPathChanged(const QString& path);
   void defaultGroundOrientationChanged(int index);
   void useEventEditorWhenInsertingStateChanged(bool isChecked);
+  void defaultSegmentColorChanged(const QColor& color);
   void defaultMarkerColorChanged(const QColor& color);
   void defaultMarkerRadiusChanged(double radius);
   void defaultMarkerTrajectoryLengthChanged(int index);

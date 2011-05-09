@@ -125,7 +125,7 @@ public:
   void setPointsDescription(const QVector<int>& ids, const QVector<QString>& descs);
   Point::Type pointType(int id) const {return this->m_Points[id]->type;};
   void setPointType(int id, Point::Type p);
-  int findMarkers(const QString& name) const;
+  int findMarkerIdFromLabel(const QString& label) const;
   double markerRadius(int id) const {return this->m_Points[id]->radius;};
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
   const QColor& markerColor(int id) const {return this->m_Points[id]->color;};

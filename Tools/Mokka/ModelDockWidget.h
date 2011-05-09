@@ -39,6 +39,7 @@
 #include "ui_ModelDockWidget.h"
 #include "NewModelDialog.h" // ConfigurationItem
 #include "Acquisition.h" // Point, Analog, ...
+#include "Model.h" // Segment
 
 #include <QDockWidget>
 #include <QMenu>
@@ -53,14 +54,17 @@ class ModelDockWidget : public QDockWidget, public Ui::ModelDockWidget
 
 public:
   enum {LabelHeader = 0, VisibleHeader = 2, TrajectoryHeader = 1};
-  enum {MarkerType = QTreeWidgetItem::UserType + 1,
-        PointType = QTreeWidgetItem::UserType + 2,
-        AnalogType = QTreeWidgetItem::UserType + 3};
+  enum {SegmentType = QTreeWidgetItem::UserType + 1,
+        MarkerType = QTreeWidgetItem::UserType + 2,
+        PointType = QTreeWidgetItem::UserType + 3,
+        AnalogType = QTreeWidgetItem::UserType + 4};
+  enum {SegmentsItem = 0, MarkersItem, AnalogsItem, ModelOutputsItem};
   
   ModelDockWidget(QWidget* parent = 0);
   ~ModelDockWidget();
   
   void setAcquisition(Acquisition* acq);
+  void setModel(Model* m);
   void load();
   void reset();
   void visualConfigurations(QStringList& names, QStringList& filenames);
@@ -93,6 +97,20 @@ public Q_SLOTS:
   void removeConfiguration();
   void deselectConfiguration();
   void clearConfigurations();
+  // Segments
+  void hideSelectedSegments();
+  void unhideSelectedSegments();
+  void newSegment();
+  void setSegments(const QList<int>& ids, const QList<Segment*>& segments);
+  void setSegmentLabel(int id, const QString& label);
+  void setSegmentLink(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors);
+  void setSegmentsDescription(const QVector<int>& ids, const QVector<QString>& descs);
+  void removeSegments(const QList<int>& ids, const QList<Segment*>& segments);
+  void insertSegments(const QList<int>& ids, const QList<Segment*>& segments);
+  void editSegmentLabel();
+  void editSegmentsDescription();
+  void editSegmentLinks();
   // Markers & Points
   void updateDisplayedMarkers(const QVector<int>& ids);
   void setTrackedMarkers(const QList<int>& ids);
@@ -157,6 +175,15 @@ public Q_SLOTS:
   
 signals:
   void configurationSaved();
+  void segmentCreated(Segment* seg);
+  void segmentLabelChanged(int id, const QString& label);
+  void segmentsColorChanged(const QVector<int>& ids, const QColor& color);
+  void segmentsDescriptionChanged(const QVector<int>& ids, QString desc);
+  void segmentLinksChanged(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void segmentsRemoved(const QList<int>& ids);
+  void segmentsCleared();
+  void newSegmentsInserted(const QList<int>& ids, const QList<Segment*>& segments);
+  void segmentHiddenSelectionChanged(const QList<int>& ids);
   void markerSelectionChanged(const QList<int>& ids);
   void markerHiddenSelectionChanged(const QList<int>& ids);
   void markerTrajectorySelectionChanged(const QList<int>& ids);
@@ -187,11 +214,14 @@ private:
   bool saveConfiguration(int idx);
   void removeConfiguration(int idx);
   void setConfigurationModified(int idx, bool modified);
+  void sendHiddenSegments();
   void sendHiddenMarkers();
   void sendTrackedMarkers();
+  QTreeWidgetItem* createSegmentItem(const QString& label, int id);
   QTreeWidgetItem* createMarkerItem(const QString& label, int id, bool checked = true);
   QTreeWidgetItem* createAnalogItem(const QString& label, int id);
   QTreeWidgetItem* createModelOutputItem(const QString& label, int id);
+  QPixmap createSegmentIcon(const QColor& c) const;
   QPixmap createMarkerIcon(const QColor& c, bool circled = false, bool enabled = true) const;
   void editMarkersColor(const QColor& color);
   void pushRecentColor(const QColor& color);
@@ -204,10 +234,12 @@ private:
   int m_CurrentConfigurationIndex;
   QList<ConfigurationItem> m_ConfigurationItems;
   Acquisition* mp_Acquisition;
+  Model* mp_Model;
   QVector<int> m_DisplayedIds;
   // Icon
   QIcon* mp_DownArrowIcon;
   QIcon* mp_RightArrowIcon;
+  QIcon* mp_SegmentsIcon;
   QIcon* mp_MarkersIcon;
   QIcon* mp_AnalogsIcon;
   QIcon* mp_ModelOutputsIcon;
@@ -218,6 +250,10 @@ private:
   QAction* mp_RemoveConfiguration;
   QAction* mp_DeselectConfiguration;
   QAction* mp_ClearConfigurations;
+  // Segments actions
+  QAction* mp_NewSegment;
+  QAction* mp_HideSelectedSegments;
+  QAction* mp_UnhideSelectedSegments;
   // Points & Analogs actions
   QAction* mp_SelectAllMarkers;
   QAction* mp_HideSelectedMarkers;

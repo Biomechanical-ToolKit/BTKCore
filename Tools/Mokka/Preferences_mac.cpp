@@ -84,6 +84,7 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->defaultConfigurationLineEdit, SIGNAL(editingFinished()), this, SLOT(setDefaultConfigurationPath()));
   connect(this->openEventEditorCheckBox, SIGNAL(toggled(bool)), this, SLOT(useEventEditorWhenInserting(bool)));
   connect(this->defaultPlaneOrientationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultOrientation(int)));
+  connect(this->defaultSegmentColorButton, SIGNAL(clicked()), this, SLOT(setDefaultSegmentColor()));
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultMarkerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setDefaultMarkerRadius(double)));
   connect(this->defaultMarkerTrajectoryLengthComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultTrajectoryLength(int)));
@@ -161,6 +162,16 @@ void Preferences::useEventEditorWhenInserting(bool isUsed)
 void Preferences::setDefaultOrientation(int index)
 {
   emit defaultGroundOrientationChanged(index);
+};
+
+void Preferences::setDefaultSegmentColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultSegmentColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+  {
+    colorizeButton(this->defaultSegmentColorButton, color);
+    emit defaultSegmentColorChanged(color);
+  }
 };
 
 void Preferences::setDefaultMarkerColor()

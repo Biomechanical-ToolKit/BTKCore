@@ -46,6 +46,8 @@
 // Forward declaration
 class AbstractView;
 class Acquisition;
+class Segment;
+class Model;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
 
@@ -63,7 +65,10 @@ public:
   void setViewActions(QList<QAction*> actions);
   
   void setAcquisition(Acquisition* acq);
+  void setModel(Model* m);
   void load();
+  
+  int segmentColorIndex(int id);
   
   void setMarkerRadius(int id, double r);
   double markerRadius(int id);
@@ -78,6 +83,7 @@ public:
   QMenu* markerTrajectoryLengthMenu() const {return this->mp_MarkerTrajectoryLengthMenu;};
   
   void setDefaultGroundOrientation(int index);
+  void setDefaultSegmentColor(const QColor& color);
   void setDefaultMarkerColor(const QColor& color);
   void setDefaultMarkerRadius(double r);
   void setMarkerTrajectoryLength(int index);
@@ -88,12 +94,19 @@ public:
   void setForceVectorColor(const QColor& color);
   
 public slots:
+  void appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments);
+  void clearSegments();
+  void setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors);
+  void setSegmentLink(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void updateHiddenSegments(const QList<int>& ids);
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
   void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
   void updateHiddenMarkers(const QList<int>& ids);
   void updateTrackedMarkers(const QList<int>& ids);
   void clear();
   void circleSelectedMarkers(const QList<int>& ids);
+  void updateSegmentsDisplay();
+  void updateMarkersDisplay();
   void updateDisplay();
   void updateDisplay(int frame);
   void showAllMarkers();
@@ -127,6 +140,7 @@ private:
   void updateViews();
   
   Acquisition* mp_Acquisition;
+  Model* mp_Model;
   vtkEventQtSlotConnect* mp_EventQtSlotConnections;
   vtkProcessMap* mp_VTKProc;
   vtkMapperCollection* mp_Mappers;

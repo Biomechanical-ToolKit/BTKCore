@@ -32,47 +32,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#ifndef UserRoles_h
-#define UserRoles_h
 
-#include <Qt>
+#ifndef NewSegmentDialog_h
+#define NewSegmentDialog_h
 
-typedef enum {pointId = Qt::UserRole + 1,
-              pointLabel, 
-              pointDescription,
-              pointType,
-              pointDisabled} pointProperty;
-              
-typedef enum {markerId = Qt::UserRole + 10,
-              markerRadius,
-              markerColorIndex,
-              markerTrajectoryActived} markerProperty;
-              
-typedef enum {analogId = Qt::UserRole + 100,
-              } analogProperty;
-              
-typedef enum {eventFrame = Qt::UserRole + 20,
-              eventId,
-              eventLabel,
-              eventDescription,
-              eventContext,
-              eventTime,
-              eventSubject,
-              eventVisible} eventInformation;
-              
-typedef enum {segmentId = Qt::UserRole + 110,
-              segmentLabel, 
-              segmentDescription,
-              segmentDisabled} segmentProperty;
+#include "ui_NewSegmentDialog.h"
 
-static const int checkState2 = Qt::UserRole + 30;
-static const int metadataInfoFirstValue = Qt::UserRole + 41;
-static const int metadataInfoValuesCount = Qt::UserRole + 42;
+#include <QDialog>
 
-typedef enum {visualConfigChanged = Qt::UserRole + 50,
-              visualConfigFilename,
-              visualConfigName,
-              visualConfigNew} visualConfigProperty;
+class NewSegmentDialog : public QDialog, public Ui::NewSegmentDialog
+{
+  Q_OBJECT
 
-#endif // UserRoles_h
+public:
+  NewSegmentDialog(QWidget* parent = 0);
+  // ~NewSegmentDialog(); // Implicit
+
+  void setEditLinksMode();
+public slots:
+  void validate();
+  
+private:
+
+};
+
+#endif // NewSegmentDialog_h

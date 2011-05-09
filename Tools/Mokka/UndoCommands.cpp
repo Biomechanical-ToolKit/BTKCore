@@ -407,3 +407,121 @@ void InsertEvent::redo()
   this->mp_Acquisition->insertEvents(this->m_Ids, this->m_Events);
   this->m_Events.clear();
 };
+
+// --------------- EditSegmentLabel ---------------
+EditSegmentLabel::EditSegmentLabel(Model* m, int id, const QString& label, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Label(label)
+{
+  this->mp_Model = m;
+  this->m_Id = id;
+};
+
+void EditSegmentLabel::action()
+{
+  QString temp = this->mp_Model->segmentLabel(this->m_Id);
+  this->mp_Model->setSegmentLabel(this->m_Id, this->m_Label);
+  this->m_Label = temp;
+};
+
+// --------------- EditSegmentsDescription ---------------
+EditSegmentsDescription::EditSegmentsDescription(Model* m, const QVector<int>& ids, const QString& desc, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Descriptions(ids.count())
+{
+  this->mp_Model = m;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Descriptions[i] = desc;
+};
+
+void EditSegmentsDescription::action()
+{
+  QVector<QString> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Model->segmentDescription(this->m_Ids[i]);
+  this->mp_Model->setSegmentsDescription(this->m_Ids, this->m_Descriptions);
+  this->m_Descriptions = temp;
+};
+
+// --------------- EditSegmentsColor ---------------
+EditSegmentsColor::EditSegmentsColor(Model* m, const QVector<int>& ids, const QColor& color, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Colors(ids.count())
+{
+  this->mp_Model = m;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Colors[i] = color;
+};
+
+void EditSegmentsColor::action()
+{
+  QVector<QColor> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Model->segmentColor(this->m_Ids[i]);
+  this->mp_Model->setSegmentsColor(this->m_Ids, this->m_Colors);
+  this->m_Colors = temp;
+};
+
+// --------------- EditSegmentLinks ---------------
+EditSegmentLinks::EditSegmentLinks(Model* m, int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_MarkerIds(markerIds), m_Links(links)
+{
+  this->mp_Model = m;
+  this->m_Id = id;
+};
+
+void EditSegmentLinks::action()
+{
+  QVector<int> tempMarkerIds = this->mp_Model->segmentMarkerIds(this->m_Id);
+  QVector< QPair<int,int> > tempLinks = this->mp_Model->segmentLinks(this->m_Id);
+  this->mp_Model->setSegmentLinks(this->m_Id, this->m_MarkerIds, this->m_Links);
+  this->m_MarkerIds = tempMarkerIds;
+  this->m_Links = tempLinks;
+};
+
+// --------------- RemoveSegments ---------------
+RemoveSegments::RemoveSegments(Model* m, const QList<int>& ids, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Segments()
+{
+  this->mp_Model = m;
+};
+
+RemoveSegments::~RemoveSegments()
+{
+  for (int i = 0 ; i < this->m_Segments.count() ; ++i)
+    delete this->m_Segments[i];
+};
+
+void RemoveSegments::undo()
+{
+  this->mp_Model->insertSegments(this->m_Ids, this->m_Segments);
+  this->m_Segments.clear();
+};
+
+void RemoveSegments::redo()
+{
+  this->m_Segments = this->mp_Model->takeSegments(this->m_Ids);
+};
+
+// --------------- InsertSegment  ---------------
+InsertSegment::InsertSegment(Model* m, Segment* seg, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(), m_Segments()
+{
+  this->mp_Model = m;
+  this->m_Ids.push_back(m->generateNewSegmentId());
+  this->m_Segments.push_back(seg);
+};
+
+InsertSegment::~InsertSegment()
+{
+  for (int i = 0 ; i < this->m_Segments.count() ; ++i)
+    delete this->m_Segments[i];
+};
+
+void InsertSegment::undo()
+{
+  this->m_Segments = this->mp_Model->takeSegments(this->m_Ids);
+};
+
+void InsertSegment::redo()
+{
+  this->mp_Model->insertSegments(this->m_Ids, this->m_Segments);
+  this->m_Segments.clear();
+};

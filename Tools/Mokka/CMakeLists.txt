@@ -25,10 +25,12 @@ SET(Mokka_CPP
   MainWindow.cpp
   Metadata.cpp
   MetadataView.cpp
+  Model.cpp
   ModelDockWidget.cpp
   MultiViewWidget.cpp
   NewEventDialog.cpp
   NewModelDialog.cpp
+  NewSegmentDialog.cpp
   ProgressWidget.cpp
   TimeEventBarWidget.cpp
   TimeEventControlerWidget.cpp
@@ -48,10 +50,12 @@ SET(Mokka_H
   MainWindow.h
   MetadataView.h
   Metadata.h
+  Model.h
   ModelDockWidget.h
   MultiViewWidget.h
   NewEventDialog.h
   NewModelDialog.h
+  NewSegmentDialog.h
   ProgressWidget.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
@@ -68,6 +72,7 @@ SET(Mokka_UI
   ModelDockWidget.ui
   NewEventDialog.ui
   NewModelDialog.ui
+  NewSegmentDialog.ui
   ProgressWidget.ui
   TimeEventControlerWidget.ui
   UpdateChecker.ui)

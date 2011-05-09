@@ -40,6 +40,9 @@
 
 class Preferences;
 class Acquisition;
+class Event;
+class Model;
+class Segment;
 class ImportAssistantDialog;
 class FileInfoDockWidget;
 class Metadata;
@@ -115,6 +118,12 @@ public Q_SLOTS:
   void setAnalogsOffset(const QVector<int>& ids, int offset);
   void setAnalogsScale(const QVector<int>& ids, double scale);
   void removeAnalogs(const QList<int>& ids);
+  void setSegmentLabel(int id, const QString& label);
+  void setSegmentsColor(const QVector<int>& ids, const QColor& color);
+  void setSegmentsDescription(const QVector<int>& ids, QString desc);
+  void setSegmentLinks(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void removeSegments(const QList<int>& ids);
+  void insertSegment(Segment* seg);
   // Time event
   void setRegionOfInterest(int lf,int ff);
   void setEventFrame(int id, int frame);
@@ -126,6 +135,7 @@ public Q_SLOTS:
   void setPreferenceDefaultConfigurationPath(const QString& path);
   void setPreferenceUseEventEditorWhenInserting(bool isUsed);
   void setPreferenceDefaultOrientation(int index);
+  void setPreferenceDefaultSegmentColor(const QColor& color);
   void setPreferenceDefaultMarkerColor(const QColor& color);
   void setPreferenceDefaultMarkerRadius(double radius);
   void setPreferenceDefaultTrajectoryLength(int index);
@@ -156,6 +166,7 @@ private:
   bool isOkToContinue();
   
   Acquisition* mp_Acquisition;
+  Model* mp_Model;
   Metadata* mp_MetadataDlg;
   FileInfoDockWidget* mp_FileInfoDock;
   ModelDockWidget* mp_ModelDock;

@@ -49,7 +49,7 @@
 
   public:
     enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, 
-          DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
+          DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
           ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, AutomaticCheckUpdateUse};
   
     Preferences(QWidget* parent = 0);
@@ -63,6 +63,7 @@
   
   public slots:
     void setDefaultConfiguration();
+    void setDefaultSegmentColor();
     void setDefaultMarkerColor();
     void setDefaultForcePlateColor();
     void setDefaultForceVectorColor();
@@ -72,6 +73,7 @@
     void defaultConfigurationPathChanged(const QString& path);
     void defaultGroundOrientationChanged(int index);
     void useEventEditorWhenInsertingStateChanged(bool isChecked);
+    void defaultSegmentColorChanged(const QColor& color);
     void defaultMarkerColorChanged(const QColor& color);
     void defaultMarkerRadiusChanged(double radius);
     void defaultMarkerTrajectoryLengthChanged(int index);

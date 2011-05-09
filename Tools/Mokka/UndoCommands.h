@@ -41,8 +41,7 @@
 #include <QUndoCommand>
 
 #include "Acquisition.h"
-
-class MainWindow;
+#include "Model.h"
 
 class MasterUndoCommand : public QUndoCommand
 {
@@ -382,6 +381,105 @@ private:
   Acquisition* mp_Acquisition;
   QList<int> m_Ids;
   QList<Event*> m_Events;
+};
+
+// ----------------------------------------------- //
+//                 SEGMENT EDITION                 //
+// ----------------------------------------------- //
+
+// --------------- EditSegmentLabel ---------------
+class EditSegmentLabel : public ConfigurationUndoCommand
+{
+public:
+  EditSegmentLabel(Model* m, int id, const QString& label, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Model* mp_Model;
+  int m_Id;
+  QString m_Label;
+  
+  void action();
+};
+
+// --------------- EditSegmentsDescription ---------------
+class EditSegmentsDescription : public ConfigurationUndoCommand
+{
+public:
+  EditSegmentsDescription(Model* m, const QVector<int>& ids, const QString& desc, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Model* mp_Model;
+  QVector<int> m_Ids;
+  QVector<QString> m_Descriptions;
+  
+  void action();
+};
+
+// --------------- EditSegmentsColor ---------------
+class EditSegmentsColor : public ConfigurationUndoCommand
+{
+public:
+  EditSegmentsColor(Model* m, const QVector<int>& ids, const QColor& color, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Model* mp_Model;
+  QVector<int> m_Ids;
+  QVector<QColor> m_Colors;
+  
+  void action();
+};
+
+// --------------- EditSegmentLinks ---------------
+class EditSegmentLinks : public ConfigurationUndoCommand
+{
+public:
+  EditSegmentLinks(Model* m, int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Model* mp_Model;
+  int m_Id;
+  QVector<int> m_MarkerIds;
+  QVector< QPair<int,int> > m_Links;
+  
+  void action();
+};
+
+// --------------- RemoveSegments ---------------
+class RemoveSegments : public ConfigurationUndoCommand
+{
+public:
+  RemoveSegments(Model* m, const QList<int>& ids, QUndoCommand* parent = 0);
+  ~RemoveSegments();
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  Model* mp_Model;
+  QList<int> m_Ids;
+  QList<Segment*> m_Segments;
+};
+
+// --------------- InsertSegment ---------------
+class InsertSegment : public ConfigurationUndoCommand
+{
+public:
+  InsertSegment(Model* m, Segment* seg, QUndoCommand* parent = 0);
+  ~InsertSegment();
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  Model* mp_Model;
+  QList<int> m_Ids;
+  QList<Segment*> m_Segments;
 };
 
 #endif // UndoCommands_h

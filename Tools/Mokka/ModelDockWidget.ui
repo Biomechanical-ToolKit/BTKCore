@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>225</width>
+    <width>232</width>
     <height>726</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>200</width>
-    <height>467</height>
+    <width>232</width>
+    <height>506</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -156,9 +156,6 @@ QPushButton::menu-indicator {
           <attribute name="headerStretchLastSection">
            <bool>false</bool>
           </attribute>
-          <attribute name="headerStretchLastSection">
-           <bool>false</bool>
-          </attribute>
           <column>
            <property name="text">
             <string>Label</string>
@@ -274,9 +271,90 @@ QPushButton::flat
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>3</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="emptyPage"/>
+             <widget class="QWidget" name="segmentPage">
+              <layout class="QGridLayout" name="gridLayout_4">
+               <property name="margin">
+                <number>6</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QLabel" name="segmentLabelLabel">
+                 <property name="text">
+                  <string>Label</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="segmentLabelEdit">
+                 <property name="maxLength">
+                  <number>255</number>
+                 </property>
+                 <property name="readOnly">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="segmentColorLabel">
+                 <property name="text">
+                  <string>Color</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="segmentDescLabel">
+                 <property name="text">
+                  <string>Desc.</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="segmentDescEdit">
+                 <property name="maxLength">
+                  <number>255</number>
+                 </property>
+                 <property name="readOnly">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="segmentLinkLabel">
+                 <property name="text">
+                  <string>Links</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QToolButton" name="segmentEditLinksButton">
+                 <property name="text">
+                  <string>     Edit     </string>
+                 </property>
+                 <property name="toolButtonStyle">
+                  <enum>Qt::ToolButtonTextBesideIcon</enum>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <spacer name="verticalSpacer_5">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Expanding</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>183</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
              <widget class="QWidget" name="markerPage">
               <layout class="QGridLayout" name="gridLayout_3">
                <property name="margin">

@@ -37,6 +37,7 @@
 #include "MainWindow.h"
 #include "About.h"
 #include "Acquisition.h"
+#include "Model.h"
 #include "FileInfoDockWidget.h"
 #include "ImportAssistantDialog.h"
 #include "Metadata.h"
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget* parent)
 {
   // Members
   this->mp_Acquisition = new Acquisition(this);
+  this->mp_Model = new Model(this);
   this->mp_MetadataDlg = new Metadata(this);
   this->mp_ModelDock = new ModelDockWidget(this);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
@@ -142,6 +144,9 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock->setAcquisition(this->mp_Acquisition);
   this->mp_FileInfoDock->setAcquisition(this->mp_Acquisition);
   this->timeEventControler->setAcquisition(this->mp_Acquisition);
+  // Setting the model
+  this->mp_ModelDock->setModel(this->mp_Model);
+  this->multiView->setModel(this->mp_Model);
   
   // Qt UI: Undo/Redo
   this->mp_UndoStack = new QUndoStack(this); // One to command all.
@@ -212,10 +217,19 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_ModelDock, SIGNAL(analogsDescriptionChanged(QVector<int>, QString)), this, SLOT(setAnalogsDescription(QVector<int>, QString)));
   connect(this->mp_ModelDock, SIGNAL(analogsRemoved(QList<int>)), this, SLOT(removeAnalogs(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(configurationSaved()), this->mp_MarkerConfigurationUndoStack, SLOT(setClean()));
+  connect(this->mp_ModelDock, SIGNAL(newSegmentsInserted(QList<int>, QList<Segment*>)), this->multiView, SLOT(appendNewSegments(QList<int>, QList<Segment*>)));
+  connect(this->mp_ModelDock, SIGNAL(segmentsCleared()), this->multiView, SLOT(clearSegments()));
   connect(this->mp_ModelDock, SIGNAL(markerSelectionChanged(QList<int>)), this->multiView, SLOT(circleSelectedMarkers(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(markerHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenMarkers(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(markerTrajectorySelectionChanged(QList<int>)), this->multiView, SLOT(updateTrackedMarkers(QList<int>)));
   connect(this->mp_ModelDock->markerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateSelectedMarkersRadius(double)));
+  connect(this->mp_ModelDock, SIGNAL(segmentLabelChanged(int, QString)), this, SLOT(setSegmentLabel(int, QString)));
+  connect(this->mp_ModelDock, SIGNAL(segmentsColorChanged(QVector<int>, QColor)), this, SLOT(setSegmentsColor(QVector<int>, QColor)));
+  connect(this->mp_ModelDock, SIGNAL(segmentsDescriptionChanged(QVector<int>, QString)), this, SLOT(setSegmentsDescription(QVector<int>, QString)));
+  connect(this->mp_ModelDock, SIGNAL(segmentLinksChanged(int, QVector<int>, QVector< QPair<int,int> >)), this, SLOT(setSegmentLinks(int, QVector<int>, QVector< QPair<int,int> >)));
+  connect(this->mp_ModelDock, SIGNAL(segmentsRemoved(QList<int>)), this, SLOT(removeSegments(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(segmentCreated(Segment*)), this, SLOT(insertSegment(Segment*)));
+  connect(this->mp_ModelDock, SIGNAL(segmentHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenSegments(QList<int>)));
   // Time Event
   connect(this->timeEventControler, SIGNAL(currentFrameChanged(int)), this->multiView, SLOT(updateDisplay(int)));
   connect(this->timeEventControler, SIGNAL(regionOfInterestChanged(int,int)), this, SLOT(setRegionOfInterest(int,int)));
@@ -238,6 +252,8 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock->installEventFilter(this);
   this->timeEventControler->installEventFilter(this);
   this->mp_ModelDock->modelTree->installEventFilter(this);
+  this->mp_ModelDock->segmentLabelEdit->installEventFilter(this);
+  this->mp_ModelDock->segmentDescEdit->installEventFilter(this);
   this->mp_ModelDock->markerLabelEdit->installEventFilter(this);
   this->mp_ModelDock->markerRadiusSpinBox->installEventFilter(this);
   this->mp_ModelDock->markerDescEdit->installEventFilter(this);
@@ -269,6 +285,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(defaultConfigurationPathChanged(QString)), this, SLOT(setPreferenceDefaultConfigurationPath(QString)));
   connect(this->mp_Preferences, SIGNAL(defaultGroundOrientationChanged(int)), this, SLOT(setPreferenceDefaultOrientation(int)));
   connect(this->mp_Preferences, SIGNAL(useEventEditorWhenInsertingStateChanged(bool)), this, SLOT(setPreferenceUseEventEditorWhenInserting(bool)));
+  connect(this->mp_Preferences, SIGNAL(defaultSegmentColorChanged(QColor)), this, SLOT(setPreferenceDefaultSegmentColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultMarkerColorChanged(QColor)), this, SLOT(setPreferenceDefaultMarkerColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultMarkerRadiusChanged(double)), this, SLOT(setPreferenceDefaultMarkerRadius(double)));
   connect(this->mp_Preferences, SIGNAL(defaultMarkerTrajectoryLengthChanged(int)), this, SLOT(setPreferenceDefaultTrajectoryLength(int)));
@@ -997,6 +1014,36 @@ void MainWindow::removeAnalogs(const QList<int>& ids)
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveAnalogs(this->mp_Acquisition, ids)));
 };
 
+void MainWindow::setSegmentLabel(int id, const QString& label)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentLabel(this->mp_Model, id, label)));
+};
+
+void MainWindow::setSegmentsColor(const QVector<int>& ids, const QColor& color)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentsColor(this->mp_Model, ids, color)));
+};
+
+void MainWindow::setSegmentsDescription(const QVector<int>& ids, QString desc)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentsDescription(this->mp_Model, ids, desc)));
+};
+
+void MainWindow::setSegmentLinks(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentLinks(this->mp_Model, id, markerIds, links)));
+};
+
+void MainWindow::removeSegments(const QList<int>& ids)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new RemoveSegments(this->mp_Model, ids)));
+};
+
+void MainWindow::insertSegment(Segment* seg)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new InsertSegment(this->mp_Model, seg)));
+};
+
 void MainWindow::setEventFrame(int id, int frame)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditEventFrame(this->mp_Acquisition, id, frame)));
@@ -1055,12 +1102,33 @@ void MainWindow::setPreferenceDefaultOrientation(int index)
   this->multiView->setDefaultGroundOrientation(index);
 };
 
+void MainWindow::setPreferenceDefaultSegmentColor(const QColor& color)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultSegmentColor", color);
+  
+  QTreeWidgetItem* segmentsRoot = this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::SegmentsItem);
+  QVector<int> ids;
+  for (int i = 0 ; i < segmentsRoot->childCount() ; ++i)
+  {
+    int id = segmentsRoot->child(i)->data(0,segmentId).toInt();
+    if (this->multiView->segmentColorIndex(id) == 0)
+      ids.push_back(id);
+  }
+  QVector<QColor> colors(ids.count(), color);
+  this->mp_Model->blockSignals(true);
+  this->mp_Model->setSegmentsColor(ids, colors);
+  this->mp_Model->blockSignals(false);
+  this->mp_ModelDock->setSegmentsColor(ids, colors);
+  this->multiView->setDefaultSegmentColor(color);
+};
+
 void MainWindow::setPreferenceDefaultMarkerColor(const QColor& color)
 {
   QSettings settings;
   settings.setValue("Preferences/defaultMarkerColor", color);
   
-  QTreeWidgetItem* markersRoot = this->mp_ModelDock->modelTree->topLevelItem(0);
+  QTreeWidgetItem* markersRoot = this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::MarkersItem);
   QVector<int> ids;
   for (int i = 0 ; i < markersRoot->childCount() ; ++i)
   {
@@ -1178,6 +1246,7 @@ void MainWindow::readSettings()
   QString defaultConfigurationPath = settings.value("defaultConfigurationPath", "").toString();
   bool openEventEditorWhenInserting = settings.value("openEventEditorWhenInserting", true).toBool();
   int defaultPlaneOrientation = settings.value("defaultPlaneOrientation", 0).toInt();
+  QColor defaultSegmentColor = settings.value("defaultSegmentColor", QColor(255,255,255)).value<QColor>();
   QColor defaultMarkerColor = settings.value("defaultMarkerColor", QColor(255,255,255)).value<QColor>();
   double defaultMarkerRadius = settings.value("defaultMarkerRadius", 8.0).toDouble();
   int defaultMarkerTrajectoryLength = settings.value("defaultMarkerTrajectoryLength", 3).toInt();
@@ -1192,6 +1261,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->defaultConfigurationLineEdit->setText(defaultConfigurationPath);
   this->mp_Preferences->openEventEditorCheckBox->setChecked(openEventEditorWhenInserting);
   this->mp_Preferences->defaultPlaneOrientationComboBox->setCurrentIndex(defaultPlaneOrientation);
+  colorizeButton(this->mp_Preferences->defaultSegmentColorButton, defaultSegmentColor);
   colorizeButton(this->mp_Preferences->defaultMarkerColorButton, defaultMarkerColor);
   this->mp_Preferences->defaultMarkerRadiusSpinBox->setValue(defaultMarkerRadius);
   this->mp_Preferences->defaultMarkerTrajectoryLengthComboBox->setCurrentIndex(defaultMarkerTrajectoryLength);
@@ -1206,6 +1276,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::DefaultConfigurationPath, defaultConfigurationPath);
   this->mp_Preferences->setPreference(Preferences::EventEditorWhenInserting, openEventEditorWhenInserting);
   this->mp_Preferences->setPreference(Preferences::DefaultGroundOrientation, defaultPlaneOrientation);
+  this->mp_Preferences->setPreference(Preferences::DefaultSegmentColor, defaultSegmentColor);
   this->mp_Preferences->setPreference(Preferences::DefaultMarkerColor, defaultMarkerColor);
   this->mp_Preferences->setPreference(Preferences::DefaultMarkerRadius, defaultMarkerRadius);
   this->mp_Preferences->setPreference(Preferences::DefaultTrajectoryLength, defaultMarkerTrajectoryLength);
@@ -1220,6 +1291,7 @@ void MainWindow::readSettings()
     this->mp_ModelDock->loadConfiguration(defaultConfigurationPath);
   this->timeEventControler->setOpenEditorWhenInsertingEventFlag(openEventEditorWhenInserting);
   this->multiView->setDefaultGroundOrientation(defaultPlaneOrientation);
+  this->multiView->setDefaultSegmentColor(defaultSegmentColor);
   this->multiView->setDefaultMarkerColor(defaultMarkerColor);
   this->multiView->setDefaultMarkerRadius(defaultMarkerRadius);
   this->multiView->setMarkerTrajectoryLength(defaultMarkerRadius);

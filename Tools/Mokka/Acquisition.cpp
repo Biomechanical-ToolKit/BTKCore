@@ -262,11 +262,11 @@ void Acquisition::setPointType(int id, Point::Type p)
   }
 };
 
-int Acquisition::findMarkers(const QString& name) const
+int Acquisition::findMarkerIdFromLabel(const QString& label) const
 {
   for (QMap<int,Point*>::const_iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
   {
-    if ((it.value()->label.compare(name) == 0) && ((it.value()->type == Point::Marker) || (it.value()->type == Point::VirtualMarker)))
+    if ((it.value()->label.compare(label) == 0) && ((it.value()->type == Point::Marker) || (it.value()->type == Point::VirtualMarker)))
       return it.key();
   }
   return -1;
