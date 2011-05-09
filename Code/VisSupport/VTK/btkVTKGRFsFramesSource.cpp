@@ -259,7 +259,6 @@ namespace btk
       double t = 0;
       if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
         t = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0];
-      outInfo->Set(vtkDataObject::DATA_TIME_STEPS(), &t, 1);
       vtkPolyData* poly = vtkPolyData::SafeDownCast(this->mp_GRFsComponents->operator[](static_cast<int>(t)));
       output->ShallowCopy(poly);
     }
