@@ -92,7 +92,7 @@ namespace btk
    */
   int VTKMarkersSource::IsPointVisible(vtkDataSet* /* points */, vtkIdType id)
   {
-    if (this->mp_ExistingMarkers && this->mp_ExistingMarkers->GetValue(id)
+    if (this->mp_ExistingMarkers && (this->mp_ExistingMarkers->GetValue(id) != -1)
         && this->mp_VisibleMarkers && this->mp_VisibleMarkers->GetValue(id))
       return 1;
     else

@@ -598,12 +598,12 @@ namespace btk
             // Insert only valid point
             if ((*it)->GetResiduals().coeff(i) >= 0.0)
             {
-              existingMarkersIds->SetValue(ptIdx, 1);
+              existingMarkersIds->SetValue(ptIdx, validPointIdx);
               trajectoryPaths[ptIdx]->InsertNextId(validPointIdx);
             }
             else
             {
-              existingMarkersIds->SetValue(ptIdx, 0);
+              existingMarkersIds->SetValue(ptIdx, -1);
               this->mp_TrajectoryIds->operator[](ptIdx)->InsertNextCell(trajectoryPaths[ptIdx]);
               trajectoryPaths[ptIdx]->Reset();
             }
@@ -721,7 +721,7 @@ namespace btk
             for (int j = lowerBound ; j < upperBound ; ++j)
             {
               // Insert only valid point
-              if (this->mp_ExistingMarkers->operator[](j)->GetValue(i))
+              if (this->mp_ExistingMarkers->operator[](j)->GetValue(i) != -1)
                 ids->SetId(sublen++, this->mp_ExistingMarkers->operator[](j)->GetValue(i));
               else if (sublen != 0)
               {
