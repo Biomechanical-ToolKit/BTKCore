@@ -43,7 +43,6 @@
 #include <vtkObjectFactory.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkPointData.h>
-#include <vtkTimerLog.h>
 #include <vtkstd/vector>
 #include <vtkCellArray.h>
 
@@ -104,15 +103,6 @@ namespace btk
    * vtkActor* actor = vtkActor::New();
    * actor->SetMapper(mapper);
    * renderer->AddActor(actor);
-   * // ...
-   * int numberOfFrames = reader->GetPointFrameNumber();
-   * vtkStreamingDemandDrivenPipeline* exec = vtkStreamingDemandDrivenPipeline::SafeDownCast(GRFs->GetExecutive());
-   * for (int i = 1 ; i < numberOfFrames ; ++i)
-   * {
-   *   exec->SetUpdateTimeStep(0, i);
-   *   mapper->Modified();
-   *   renderer->Render();
-   * }
    * // Code cleanup
    * // ...
    * @endcode
@@ -185,7 +175,7 @@ namespace btk
    */
   bool VTKMarkersFramesSource::GetMarkerVisibility(vtkIdType id)
   {
-    if (id >= this->mp_MarkersRadius->GetNumberOfTuples())
+    if (id >= this->mp_VisibleMarkers->GetNumberOfTuples())
     {
       vtkErrorMacro("Out of range.");
       return false;
@@ -606,9 +596,9 @@ namespace btk
                                                 ic[2 * frameNumber + i] * this->mp_Scale);
             this->mp_TrajectoryColors->SetValue(validPointIdx, 0);
             // Insert only valid point
-            if ((*it)->GetResiduals().coeff(i) != -1.0)
+            if ((*it)->GetResiduals().coeff(i) >= 0.0)
             {
-              existingMarkersIds->SetValue(ptIdx, validPointIdx);
+              existingMarkersIds->SetValue(ptIdx, 1);
               trajectoryPaths[ptIdx]->InsertNextId(validPointIdx);
             }
             else
