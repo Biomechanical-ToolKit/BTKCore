@@ -816,24 +816,12 @@ void ModelDockWidget::loadConfiguration()
     return;
   
   QFileInfo fileInfo(this->mp_Acquisition->fileName());
-  
-#if 1
   QString filename = QFileDialog::getOpenFileName(this,
     tr("Open Model Visual Configuration"),
     fileInfo.path(),
     tr("Model Visual Configuration Files (*.mvc)"));
   if (!filename.isEmpty())
     this->loadConfiguration(filename);
-#else
-  QFileDialog* openConfig = new QFileDialog(this);
-  openConfig->setFileMode(QFileDialog::ExistingFile);
-  openConfig->setDirectory(fileInfo.dir());
-  openConfig->setNameFilter(tr("Model Visual Configuration Files (*.mvc)"));
-  openConfig->setViewMode(QFileDialog::List);
-  if (openConfig->exec())
-    this->loadConfiguration(openConfig->selectedFiles()[0]);
-  delete openConfig;
-#endif
 };
 
 void ModelDockWidget::saveConfiguration()

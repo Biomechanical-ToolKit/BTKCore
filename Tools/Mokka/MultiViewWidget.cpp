@@ -586,9 +586,12 @@ void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segme
 {
   Q_UNUSED(ids);
   btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
+  QVector<QColor> colors(segments.size());
   // Assume new segments are appended at the end. No use of the IDs
+  int inc = 0;
   for (QList<Segment*>::const_iterator it = segments.begin() ; it != segments.end() ; ++it)
   {
+    colors[inc++] = (*it)->color;
     std::vector<int> btkPointIds((*it)->markerIds.size());
     std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks((*it)->links.size());
     for (int i = 0 ; i < (*it)->markerIds.size() ; ++i)
@@ -600,6 +603,7 @@ void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segme
     }
     segmentsFramesSource->AppendDefinition(btkPointIds, btkLinks);
   }
+  this->setSegmentsColor(ids.toVector(), colors);
 };
 
 /*
@@ -919,7 +923,7 @@ void MultiViewWidget::updateDisplayedMarkersList(vtkObject* /* caller */, unsign
     
   QVector<int> ids = QVector<int>(indexes->GetSize());
   for (int i = 0; i < ids.size() ; ++i)
-    ids[i] = indexes->GetValue(i);
+    ids[i] = (indexes->GetValue(i) == -1 ? 0 : 1);
   emit visibleMarkersChanged(ids);
 };
 

@@ -76,6 +76,7 @@ public:
   
   QAction* deselectConfigurationAction() const {return this->mp_DeselectConfiguration;};
   QAction* clearConfigurationsAction() const {return this->mp_ClearConfigurations;};
+  QAction* newSegmentAction() const {return this->mp_NewSegment;};
   QAction* deleteSelectedMarkersAction() {return this->mp_DeleteSelectedMarkers;};  
   QAction* selectAllMarkersAction() {return this->mp_SelectAllMarkers;};  
   QAction* hideSelectedMarkersAction() {return this->mp_HideSelectedMarkers;};
