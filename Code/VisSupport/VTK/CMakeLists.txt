@@ -8,6 +8,7 @@ SET(BTKVTK_SRCS
   btkVTKInteractorStyleTrackballFixedUpCamera.cpp
   btkVTKMarkersSource.cpp
   btkVTKMarkersFramesSource.cpp
+  btkVTKSegmentsFramesSource.cpp
   )
 
 ADD_LIBRARY(BTKVTK ${BTK_LIBS_BUILD_TYPE} ${BTKVTK_SRCS})
