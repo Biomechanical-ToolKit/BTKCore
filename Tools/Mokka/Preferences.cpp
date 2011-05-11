@@ -53,6 +53,7 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[DefaultConfigurationPath] = "";
   this->m_Data[EventEditorWhenInserting] = false;
   this->m_Data[DefaultGroundOrientation] = -1;
+  this->m_Data[DefaultSegmentColor] = QColor();
   this->m_Data[DefaultMarkerColor] = QColor();
   this->m_Data[DefaultMarkerRadius] = -1;
   this->m_Data[DefaultTrajectoryLength] = -1;
@@ -95,6 +96,13 @@ void Preferences::saveSettings()
   {
     this->m_Data[DefaultGroundOrientation] = index;
     emit defaultGroundOrientationChanged(index);
+  }
+  
+  color = this->defaultSegmentColorButton->property("backgroundColor").value<QColor>();
+  if (this->m_Data[DefaultSegmentColor].value<QColor>() != color)
+  {
+    this->m_Data[DefaultSegmentColor] = color;
+    emit defaultSegmentColorChanged(color);
   }
   
   color = this->defaultMarkerColorButton->property("backgroundColor").value<QColor>();

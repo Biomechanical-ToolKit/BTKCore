@@ -348,7 +348,7 @@ QPushButton::flat
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>20</width>
-                   <height>183</height>
+                   <height>0</height>
                   </size>
                  </property>
                 </spacer>

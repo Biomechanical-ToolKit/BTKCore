@@ -46,7 +46,7 @@
 // Forward declaration
 class AbstractView;
 class Acquisition;
-class Segment;
+struct Segment;
 class Model;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;

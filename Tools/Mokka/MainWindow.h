@@ -40,9 +40,9 @@
 
 class Preferences;
 class Acquisition;
-class Event;
+struct Event;
 class Model;
-class Segment;
+struct Segment;
 class ImportAssistantDialog;
 class FileInfoDockWidget;
 class Metadata;

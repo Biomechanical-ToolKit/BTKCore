@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>544</width>
-    <height>478</height>
+    <height>385</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -199,10 +199,13 @@
           <string>Segment</string>
          </property>
          <layout class="QFormLayout" name="formLayout_3">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+          </property>
           <item row="0" column="0">
            <widget class="QLabel" name="defaultSegmentColorLabel">
             <property name="text">
-             <string>Default color:</string>
+             <string>Default color:                   </string>
             </property>
            </widget>
           </item>
