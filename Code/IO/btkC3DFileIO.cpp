@@ -385,7 +385,7 @@ namespace btk
           throw(C3DFileIOException("Error during the ID extraction in the parameter section - ID equal to 0"));
         bool lastEntry = false; // Used too to determine the end of the Parameter section
         std::string label = ibfs->ReadString(abs(nbCharLabel));
-        offset = ibfs->ReadU16(); totalBytesRead += offset; 
+        offset = ibfs->ReadU16(); totalBytesRead += offset;
         if (offset == 0)
           lastEntry = true;
         offset -= 2;
@@ -450,10 +450,10 @@ namespace btk
         // Checks if the next parameter is not pointing in the Data section.
         if ((totalBytesRead + offset) > static_cast<unsigned int>((blockNumber * 512)))
         {
-          if ((totalBytesRead + offset) > static_cast<unsigned int>(((dataFirstBlock - 1) * 512)))
+          if ((totalBytesRead + offset) > static_cast<unsigned int>(((dataFirstBlock - 2) * 512)))
           {
             btkIOErrorMacro(filename, "The next parameter is pointing in the Data section. Parameters' extraction is stopped.");
-            totalBytesRead -= offset;
+            totalBytesRead = blockNumber * 512; // Force the number of totalBytesRead to not trigger the "Bad data first block" exception.
             break;
           }
           else if (!alreadyDisplayParameterOverflowMessage)
@@ -575,8 +575,8 @@ namespace btk
             analogUsed = (*itAnalogUsed)->GetInfo()->ToInt(0);
             if (analogNumber != static_cast<uint16_t>(analogUsed))
             {
-              btkIOErrorMacro(filename, "The number of analog channels wrote in the header section and in the parameter section are not the same. The value kept is from the parameter section.");
-              analogNumber = static_cast<uint16_t>(analogUsed);
+              btkIOErrorMacro(filename, "The number of analog channels wrote in the header section and in the parameter section are not the same. The value kept is from the header section.");
+              //analogNumber = static_cast<uint16_t>(analogUsed);
             }
           }
         }
@@ -680,8 +680,8 @@ namespace btk
             pointUsed = (*itPointUsed)->GetInfo()->ToInt(0);
             if (pointNumber != static_cast<uint16_t>(pointUsed))
             {
-              btkIOErrorMacro(filename, "The number of points wrote in the header section and in the parameter section are not the same. The value kept is from the parameter section.");
-              pointNumber = static_cast<uint16_t>(pointUsed);
+              btkIOErrorMacro(filename, "The number of points wrote in the header section and in the parameter section are not the same. The value kept is from the header section.");
+              //pointNumber = static_cast<uint16_t>(pointUsed);
             }
           }
           // POINT:SCALE
@@ -691,8 +691,8 @@ namespace btk
             float pointScale = (*itPointScale)->GetInfo()->ToFloat(0);
             if (fabs(pointScale - pointScaleFactor) > std::numeric_limits<float>::epsilon())
             {
-              btkIOErrorMacro(filename, "The point scaling factor written in the header and in the parameter POINT:SCALE are not the same. The second value is kept.");
-              pointScaleFactor = pointScale;
+              btkIOErrorMacro(filename, "The point scaling factor written in the header and in the parameter POINT:SCALE are not the same. The first value is kept.");
+              //pointScaleFactor = pointScale;
             }
           }
         }
