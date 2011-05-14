@@ -182,6 +182,8 @@ namespace btk
       counter += this->ReadKeyValueU32(&id, &bifs, 0x0101);
       counter += this->ReadKeyValueString(boardType, &bifs, 0x0108);
       counter += this->ReadKeyValueU32(&bitDepth, &bifs, 0x0109);
+      if (bitDepth >= 65536)
+        bitDepth = 16; // One file has the bitDepth set to 65552 instead of 16 ... Need more files from system using 16 bit ADC.
       counter += this->ReadKeyValueFloatFromTwoU16(&preciseRate, &bifs, 0x010A);
       counter += this->ReadKeyValueU32(&channelNumber, &bifs, 0x0102);
       counter += this->ReadKeyValueU8(hexIndex, &bifs, 0x0103);
@@ -193,6 +195,7 @@ namespace btk
         counter += this->ReadKeyValueString(channelLabel[i], &bifs, 0x0107);
       if (counter != headerSize)
         throw ANBFileIOException("The size of the header is not equal to the number of words read.");
+      
       // Data
       uint32_t dataSize;
       if ((bifs.ReadI16() != 0) || (bifs.ReadI16() != 0))
@@ -224,7 +227,7 @@ namespace btk
       MetaDataCreateChild(analog, "INDEX", channelIndex);
       */
       
-      // ReadKeyValue values
+      // Read analog channel values
       for(int i = 0 ; i < static_cast<int>(frameNumber) ; ++i)
       {
         for (AnalogCollection::Iterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
