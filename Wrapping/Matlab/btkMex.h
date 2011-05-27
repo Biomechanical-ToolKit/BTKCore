@@ -43,6 +43,14 @@
   // Workaround for the char16_t type defined in Matlab and MSVC 2010
   #if (_MSC_VER >= 1600)
     #define __STDC_UTF_16__
+    // From Matlab R2010b the previous workaround is not enough
+    #ifndef CHAR16_T
+      #if defined(_WIN32)
+        #define CHAR16_T wchar_t
+      #else
+        #define CHAR16_T UINT16_T
+      #endif
+    #endif
   #endif
 #endif
 
