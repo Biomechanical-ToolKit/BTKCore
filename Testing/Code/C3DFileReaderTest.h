@@ -599,6 +599,13 @@ CXXTEST_SUITE(C3DFileReaderTest)
     if (itAnalysis != acq->GetMetaData()->End())
       TS_ASSERT((*itAnalysis)->FindChild("VALUES") != (*itAnalysis)->End());
   };
+  
+  CXXTEST_TEST(Mocap36)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/mocap36.c3d");
+    reader->Update();
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileReaderTest)
@@ -633,4 +640,5 @@ CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_dynamic)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_standing)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_type1)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, ParameterOverflow)
+CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Mocap36)
 #endif

@@ -406,7 +406,8 @@ namespace btk
           dataDim = ibfs->ReadU8(nbDim); offset -= nbDim;
           int prod = 1;
           int8_t inc = 0 ; while (inc < nbDim) prod *= dataDim[inc++];
-          if ((static_cast<int>(prod * abs(type)) >= offset) && (!lastEntry))
+          int sizeData = static_cast<int>(prod * abs(type));
+          if ((sizeData > offset) && (!lastEntry))
             throw(C3DFileIOException("Error in the number of elements in the parameter's data. The number is superior to the offset."));
           MetaData::Pointer entry;
           switch (type)
@@ -433,10 +434,15 @@ namespace btk
               throw(C3DFileIOException("Data parameter type unknown for the entry: '" + label + "'"));
               break;
           }
-          offset -= (prod * abs(type));
-          uint8_t nbCharDesc = ibfs->ReadU8(); offset -= 1;
-          entry->SetDescription(ibfs->ReadString(nbCharDesc)); 
-          offset -= nbCharDesc;
+          offset -= sizeData;
+          if (offset != 0)
+          {
+            uint8_t nbCharDesc = ibfs->ReadU8(); offset -= 1;
+            entry->SetDescription(ibfs->ReadString(nbCharDesc)); 
+            offset -= nbCharDesc;
+          }
+          else
+            btkIOErrorMacro(filename, "Where is the byte to set the number of characters in the description of the parameter '" + label + "'? Trying to continue...");
           parameters.push_back(entry);
         }
         if (lastEntry)
