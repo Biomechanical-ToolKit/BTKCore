@@ -7,7 +7,9 @@ The Mokka user interface is designed so that you can have access at all of the d
 - @ref MokkaMenuBar
 - @ref MokkaModelPane
 - @ref MokkaTimeBar
-- @ref Mokka3DView@n
+- @ref Mokka3DView
+
+You have also access to @ref MokkaPreferences "preferences" to select default behaviors in Mokka.@n
 
 @image html main.png Main window of Mokka
 

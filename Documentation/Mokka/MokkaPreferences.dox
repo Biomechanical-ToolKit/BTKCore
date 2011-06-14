@@ -1,0 +1,63 @@
+/**
+@mokkaworkingheader
+@page MokkaPreferences Preferences / Options
+@section MokkaPreferencesSection Preferences / Options
+
+@subsection MokkaPreferencesGeneral General
+@htmlonly
+<ul class=twocolumns>
+<li>
+<ul class=default>
+<li><tt>Startup</tt>: Option to load a default configuration at startup</li>
+<br/>
+<li><tt>Event</tt>: Option to open (or not) the event editor when inserting an event</li>
+<br/>
+<li><tt>Ground Orientation</tt>: To choose the default orientation for the automatic detection (Plane XY, Plane YZ, Plane ZX)</li>
+</ul>
+</li>
+<li>
+@endhtmlonly
+@image html preferences_general.png General options/preferences
+@htmlonly
+</li>
+</ul>
+@endhtmlonly
+
+@subsection MokkaPreferencesVisualisation Visualisation
+
+@htmlonly
+<ul class=twocolumns>
+<li>
+<ul class=default>
+<li><tt>Segment</tt>: Selection of the default color for the visualization of segments in the 3D view</li>
+<br/>
+<li><tt>Marker</tt>: Selection of the default color, radius and trajectory's length to display for the visualization of markers in the 3D view</li>
+<br/>
+<li><tt>Force platform</tt>: Options to show (or not) the axes and the index of the platforms in the 3D view as well as the selection of the colors for the platform and the force vector</li>
+</ul>
+</li>
+<li>
+@endhtmlonly
+@image html preferences_visualisation.png Visualisation options/preferences
+@htmlonly
+</li>
+</ul>
+@endhtmlonly
+    
+@subsection MokkaPreferencesAdvanced Advanced
+
+@htmlonly
+<ul class=twocolumns>
+<li>
+<ul class=default>
+<li><tt>Update</tt>: Permit to choose if Mokka automatically check for update at startup. Firewall must authorize Mokka to have an internet access.</li>
+</ul>
+</li>
+<li>
+@endhtmlonly
+@image html preferences_advanced.png Advanced options/preferences
+@htmlonly
+</li>
+</ul>
+@endhtmlonly
+*/

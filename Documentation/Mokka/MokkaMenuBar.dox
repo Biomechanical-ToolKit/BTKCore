@@ -47,6 +47,7 @@ The menu @c File contains the actions to interact with acquisition.
 - <tt>Cut</tt>: Cut the selected text and put it in the clipboard
 - <tt>Copy</tt>: Copy the selected text and put it in the clipboard
 - <tt>Select All</tt>: Select all the text in the focused widget
+- <tt>Options</tt>: Edit the preferences of Mokka (Replaced under MacOS X by <tt>Preferences</tt> in the application menu).
 
 @subsection View 
 The menu View contains the actions to toggle dock windows related to the data into the loaded acquisition

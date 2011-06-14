@@ -190,7 +190,8 @@ TAB_SIZE               = 2
 # You can put \n's in the value part of an alias to insert newlines.
 
 ALIASES                = "mokkahelpheader = @htmlonly<div class=\"home\"><img class=\"home\" src=\"Mokka_128.png\" height=\"32px\" width=\"32px\"/>Mokka Help<a href=\"index.html\">Home</a></div>@endhtmlonly" \
-                         "mokkaworkingheader = @htmlonly<div class=\"home\"><img class=\"home\" src=\"Mokka_128.png\" height=\"32px\" width=\"32px\"/>Mokka Help<a href=\"index.html\">Home</a><a href=\"_mokka_working.html\">Working with Mokka</a></div>@endhtmlonly"
+                         "mokkaworkingheader = @htmlonly<div class=\"home\"><img class=\"home\" src=\"Mokka_128.png\" height=\"32px\" width=\"32px\"/>Mokka Help<a href=\"index.html\">Home</a><a href=\"_mokka_working.html\">Working with Mokka</a></div>@endhtmlonly" \
+                         "mokkatutorialheader = @htmlonly<div class=\"home\"><img class=\"home\" src=\"Mokka_128.png\" height=\"32px\" width=\"32px\"/>Mokka Help<a href=\"index.html\">Home</a><a href=\"_mokka_tutorial.html\">Getting Started</a></div>@endhtmlonly"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 

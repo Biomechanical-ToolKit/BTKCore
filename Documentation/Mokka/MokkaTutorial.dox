@@ -3,4 +3,13 @@
 @page MokkaTutorial Getting Started
 @section MokkaTutorialSection Getting Started
 
+The following tutorials will help you to:
+- @ref MokkaTutorial_AddRemoveEvent
+- @ref MokkaTutorial_EditEvent
+- @ref MokkaTutorial_ChangeColorMarker
+- @ref MokkaTutorial_CreateNewSegment
+- @ref MokkaTutorial_CreateSaveNewConfiguration
+
+For any other tutorial, contact the developers using the mailing list <a href="http://groups.google.com/group/btk-users">BTK Users</a>.
+
  */

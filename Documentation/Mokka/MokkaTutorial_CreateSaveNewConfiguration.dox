@@ -1,0 +1,12 @@
+/**
+@mokkatutorialheader
+@page MokkaTutorial_CreateSaveNewConfiguration Create/Save a new configuration
+@section MokkaTutorial_CreateSaveNewConfigurationSection Create/Save a new configuration
+
+To save or create a new configuration you can proceed this way:
+- When all your configuration has been modified (markers name, segments, analog channels, model outputs…) you can decided to save this configuration
+- To do so, select New configuration from the Model Pane by clicking on the gear @htmlonly <img src="process.png"> @endhtmlonly.
+- From the New Model configuration window you can save your actual configuration 
+- The new configuration will be applied to other loaded acquisition by selecting it from the drop-down menu or by using the Startup option in the @ref MokkaPreferences "preferences".
+
+ */

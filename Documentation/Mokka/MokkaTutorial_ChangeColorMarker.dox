@@ -1,0 +1,16 @@
+/**
+@mokkatutorialheader
+@page MokkaTutorial_ChangeColorMarker Change color of marker
+@section MokkaTutorial_ChangeColorMarkerSection Change color of marker
+
+To change the color of markers you can proceed this way:
+- Use the Left click to select the marker you want to modify the color
+- To select more than one marker you can used Ctrl 
+- Left click on the left color circle in the marker properties (bottom of the model panel) and you will see a color dialog box appear
+- Choose a color, then click OK
+- The color selected will be applied to all selected markers
+- You can also left click on a previous color selection in the marker properties (to the right of the color property), to apply it to the selected markers
+
+@image html tutorial_changecolormarker.png Markers with colors.
+
+ */

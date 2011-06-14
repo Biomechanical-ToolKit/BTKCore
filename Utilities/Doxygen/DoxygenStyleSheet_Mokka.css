@@ -185,3 +185,16 @@ ul.twocolumns li {
   width: 50%;
   margin: 0;
 }
+
+ul.default {
+  float: none;
+  width: 100%;
+  padding: 0px;
+  padding-left: 35px;
+  margin: 0px;
+}
+
+ul.default li {
+  float: none;
+  width: 90%;
+}

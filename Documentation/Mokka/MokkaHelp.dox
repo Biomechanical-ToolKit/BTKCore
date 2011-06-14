@@ -23,7 +23,6 @@
       Start here for a general overview of Mokka
       </div>
     </li>
-    <!--
     <li class="help_box">
       <div class="help_box_section">
       @endhtmlonly
@@ -34,7 +33,6 @@
       A set of short tutorials on how to get started with Mokka
       </div>
     </li>
-    -->
     <li class="help_box">
       <div class="help_box_section">
       @endhtmlonly
