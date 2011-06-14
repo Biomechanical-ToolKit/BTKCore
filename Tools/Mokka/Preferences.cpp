@@ -62,6 +62,9 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[DefaultForcePlateColor] = QColor();
   this->m_Data[DefaultForceVectorColor] = QColor();
   this->m_Data[AutomaticCheckUpdateUse] = false;
+  
+  // Force the General tab to be the current.
+  this->tabWidget->setCurrentIndex(0);
 };
 
 void Preferences::saveSettings()
@@ -161,6 +164,25 @@ void Preferences::saveSettings()
     emit automaticCheckUpdateStateChanged(checked);
   }
 };
+
+void Preferences::resetSettings()
+{
+  this->defaultConfigurationCheckBox->setChecked(this->m_Data[DefaultConfigurationUse].toBool());
+  this->defaultConfigurationLineEdit->setText(this->m_Data[DefaultConfigurationPath].toString());
+  this->openEventEditorCheckBox->setChecked(this->m_Data[EventEditorWhenInserting].toBool());
+  this->defaultPlaneOrientationComboBox->setCurrentIndex(this->m_Data[DefaultGroundOrientation].toInt());
+  colorizeButton(this->defaultSegmentColorButton, this->m_Data[DefaultSegmentColor].value<QColor>());
+  colorizeButton(this->defaultMarkerColorButton, this->m_Data[DefaultMarkerColor].value<QColor>() );
+  this->defaultMarkerRadiusSpinBox->setValue(this->m_Data[DefaultMarkerRadius].toDouble());
+  this->defaultMarkerTrajectoryLengthComboBox->setCurrentIndex(this->m_Data[DefaultTrajectoryLength].toInt());
+  this->showForcePlatformAxesComboBox->setCurrentIndex(this->m_Data[ForcePlatformAxesDisplay].toInt());
+  this->showForcePlatformIndexComboBox->setCurrentIndex(this->m_Data[ForcePlatformIndexDisplay].toInt());
+  colorizeButton(this->defaultForcePlateColorButton, this->m_Data[DefaultForcePlateColor].value<QColor>());
+  colorizeButton(this->defaultForceVectorColorButton, this->m_Data[DefaultForceVectorColor].value<QColor>());
+  this->automaticCheckUpdateCheckBox->setChecked(this->m_Data[AutomaticCheckUpdateUse].toBool());
+  
+  this->tabWidget->setCurrentIndex(0);
+}
 
 void Preferences::setDefaultConfiguration()
 {

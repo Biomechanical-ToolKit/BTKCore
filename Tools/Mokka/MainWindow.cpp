@@ -536,14 +536,14 @@ void MainWindow::openFile()
   {
     QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
-                         tr("Acquisition Files (*.c3d *.emf *.rah *.raw *.ric *.trc *.trb);; \
-                             C3D Files (*.c3d);; \
-                             EMF Ascension Files (*.emf);; \
-                             RAH Files (*.rah);; \
-                             RAW Files (*.raw);; \
-                             RIC Files (*.ric);; \
-                             TRB Files (*.trb);; \
-                             TRC Files (*.trc)"));
+                         tr("Acquisition Files (*.c3d *.emf *.rah *.raw *.ric *.trc *.trb);;"
+                            "C3D Files (*.c3d);;"
+                            "EMF Ascension Files (*.emf);;"
+                            "RAH Files (*.rah);;"
+                            "RAW Files (*.raw);;"
+                            "RIC Files (*.ric);;"
+                            "TRB Files (*.trb);;"
+                            "TRC Files (*.trc)"));
     if (!filename.isEmpty())
       this->openFile(filename);
   }
@@ -845,6 +845,8 @@ void MainWindow::showPreferences()
 #else
   if (this->mp_Preferences->exec())
     this->mp_Preferences->saveSettings();
+  else
+    this->mp_Preferences->resetSettings();
 #endif
 };
 

@@ -58,6 +58,7 @@
     void setPreference(int preference, QVariant data) {this->m_Data[preference] = data;};
   
     void saveSettings();
+    void resetSettings();
   
     QString lastDirectory;
   
