@@ -59,6 +59,10 @@ NewEventDialog::NewEventDialog(Mode m, QWidget* parent)
   this->contextLabel->setAttribute(Qt::WA_MacSmallSize);
   this->contextComboBox->setAttribute(Qt::WA_MacSmallSize);
   
+  // Fix to see correctly the end of the letters 'j' and 'p'
+  this->subjectLabel->setMinimumHeight(12);
+  this->descriptionLabel->setMinimumHeight(12);
+  
   this->resize(340, 220);
 #endif
   // Fix the size
