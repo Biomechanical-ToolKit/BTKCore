@@ -44,7 +44,6 @@
 #include <QColorDialog>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QXmlStreamReader>
 
 static const QBrush defaultLabelColor = QBrush(QColor(Qt::gray));
 static const QBrush displayLabelColor = QBrush(QColor(Qt::black));
@@ -652,10 +651,13 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   QList<QColor> colors;
   QList<Segment> segments;
   QXmlStreamReader xmlReader(&file);
+  bool isMokkaModelConfig = false;
   if (xmlReader.readNextStartElement())
   {
+    // Mokka model configuration
     if ((xmlReader.name() == "MokkaModelVisualConfiguration") && (xmlReader.attributes().value("version") == "1.0"))
     {
+      isMokkaModelConfig = true;
       configName = xmlReader.attributes().value("name").toString();
       while (xmlReader.readNextStartElement())
       {
@@ -726,6 +728,96 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
           xmlReader.skipCurrentElement();
       }
     }
+    // Vicon model configuration
+    else if ((xmlReader.name() == "KinematicModel") && xmlReader.attributes().hasAttribute("MODEL"))
+    {
+      configName = xmlReader.attributes().value("MODEL").toString();
+      while (xmlReader.readNextStartElement())
+      {
+        if (xmlReader.name() == "Skeleton")
+        {
+          this->appendSegments(xmlReader, segments);
+        }
+        else if (xmlReader.name() == "MarkerSet")
+        {
+          QStringList segmentsLabel;
+          while (xmlReader.readNextStartElement())
+          {
+            if (xmlReader.name() == "Markers")
+            {
+              while (xmlReader.readNextStartElement())
+              {
+                if (xmlReader.name() == "Marker")
+                {
+                  QXmlStreamAttributes att = xmlReader.attributes();
+                  int id = this->mp_Acquisition->findMarkerIdFromLabel(att.value("NAME").toString());
+                  if (id != -1)
+                  {
+                    ids << id;
+                    radii << att.value("RADIUS").toString().toDouble();
+                    QStringList rgb = att.value("RGB").toString().split(' ');
+                    if (rgb.size() < 3)
+                    {
+                      btkErrorMacro("The RGB attribute for the marker element doesn't contain 3 values and is replaced by the default color.");
+                      colors << this->mp_Acquisition->defaultMarkerColor();
+                    }
+                    else
+                      colors << QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
+                    segmentsLabel << att.value("SEGMENT").toString();
+                  }
+                  xmlReader.skipCurrentElement();
+                }
+                else
+                  xmlReader.skipCurrentElement();
+                xmlReader.readNext();
+              }
+            }
+            else if (xmlReader.name() == "Sticks")
+            {
+              while (xmlReader.readNextStartElement())
+              {
+                if (xmlReader.name() == "Stick")
+                {
+                  QXmlStreamAttributes att = xmlReader.attributes();
+                  int idPt1 = this->mp_Acquisition->findMarkerIdFromLabel(att.value("MARKER1").toString());
+                  int idPt2 = this->mp_Acquisition->findMarkerIdFromLabel(att.value("MARKER2").toString());
+                  if ((idPt1 != -1) && (idPt2 != -1))
+                  {
+                    for (int i = 0 ; i < ids.size() ; ++i)
+                    {
+                      if (ids[i] == idPt2)
+                      {
+                        for (int j = 0 ; j < segments.size() ; ++j)
+                        {
+                          if (segments[j].label.compare(segmentsLabel[i]) == 0)
+                          {
+                            if (segments[j].markerIds.indexOf(idPt1) == -1)
+                              segments[j].markerIds.push_back(idPt1);
+                            if (segments[j].markerIds.indexOf(idPt2) == -1)
+                              segments[j].markerIds.push_back(idPt2);
+                            segments[j].links.push_back(qMakePair(idPt1, idPt2));
+                            break;
+                          }
+                        }
+                        break;
+                      }
+                    }
+                  }
+                }
+                else
+                  xmlReader.skipCurrentElement();
+                xmlReader.readNext();
+              }
+            }
+            else
+              xmlReader.skipCurrentElement();
+            xmlReader.readNext();
+          }
+        }
+        else
+          xmlReader.skipCurrentElement();
+      }
+    }
     else
       xmlReader.raiseError(QObject::tr("The file is not a Mokka Model Visual Configuration file."));
   }
@@ -757,9 +849,9 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   {
     ConfigurationItem config;
     config.name = configName;
-    config.filename = filename;
-    config.isNew = false;
     config.isModified = false;
+    config.filename = filename;
+    config.isNew = (isMokkaModelConfig ? false : true);
     this->m_ConfigurationItems.push_back(config);
     this->modelConfigurationComboBox->addItem(configName);
     id = this->m_ConfigurationItems.count()-1;
@@ -773,6 +865,33 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   this->mp_Acquisition->setMarkersRadius(ids.toVector(), radii.toVector());
   this->mp_Acquisition->setMarkersColor(ids.toVector(), colors.toVector());
   this->mp_Model->setSegments(segments);
+};
+
+void ModelDockWidget::appendSegments(QXmlStreamReader& xmlReader, QList<Segment>& segments) const
+{
+  while (xmlReader.readNextStartElement())
+  {
+    if (xmlReader.name() == "Segment")
+    {
+      QXmlStreamAttributes att = xmlReader.attributes();
+      QString segLabel = att.value("NAME").toString();
+      QStringList rgb = att.value("RGB").toString().split(' ');
+      QColor segColor;
+      if (rgb.size() < 3)
+      {
+        btkErrorMacro("The RGB attribute for the segment element doesn't contain 3 values and is replaced by the default color.");
+        segColor = this->mp_Model->defaultSegmentColor();
+      }
+      else
+        segColor = QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
+      segments << Segment(segLabel, "", segColor, QVector<int>(), QVector< QPair<int,int> >());
+      
+      this->appendSegments(xmlReader, segments);
+    }
+    else
+      xmlReader.skipCurrentElement();
+    xmlReader.readNext();
+  }
 };
 
 void ModelDockWidget::newConfiguration()
@@ -819,7 +938,9 @@ void ModelDockWidget::loadConfiguration()
   QString filename = QFileDialog::getOpenFileName(this,
     tr("Open Model Visual Configuration"),
     fileInfo.path(),
-    tr("Model Visual Configuration Files (*.mvc)"));
+    tr("Model Configuration Files (*.mvc *.vst *.vsk);;"
+       "Mokka Model Configuration Files (*.mvc);;"
+       "Vicon Model Configuration Files (*.vsk *.vst)"));
   if (!filename.isEmpty())
     this->loadConfiguration(filename);
 };

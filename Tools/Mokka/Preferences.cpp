@@ -190,7 +190,9 @@ void Preferences::setDefaultConfiguration()
   filename = QFileDialog::getOpenFileName(this,
     tr("Open Model Visual Configuration"),
     filename.isEmpty() ? this->lastDirectory : filename,
-    tr("Model Visual Configuration Files (*.mvc)"));
+    tr("Model Configuration Files (*.mvc *.vst *.vsk);;"
+       "Mokka Model Configuration Files (*.mvc);;"
+       "Vicon Model Configuration Files (*.vsk *.vst)"));
   if (!filename.isEmpty())
     this->defaultConfigurationLineEdit->setText(filename);
 };

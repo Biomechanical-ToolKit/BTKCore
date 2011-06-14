@@ -45,6 +45,7 @@
 #include <QMenu>
 #include <QVector>
 #include <QColor>
+#include <QXmlStreamReader>
 
 class Acquisition;
 
@@ -211,6 +212,7 @@ private slots:
   void sendModifiedMarkersState(QTreeWidgetItem* item, int column);
   
 private:
+  void appendSegments(QXmlStreamReader& xmlReader, QList<Segment>& segments) const;
   void setCurrentConfiguration(int idx);
   bool saveConfiguration(int idx);
   void removeConfiguration(int idx);

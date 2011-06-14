@@ -134,6 +134,7 @@ public:
   QList<Point*> takePoints(const QList<int>& ids);
   void insertPoints(const QList<int>& ids, const QList<Point*> points);
   int findPointIdFromLabel(const QString& label) const;
+  const QColor& defaultMarkerColor() const {return this->m_DefaultMarkerColor;};
   void setDefaultMarkerColor(const QColor& color) {this->m_DefaultMarkerColor = color;};
   void setDefaultMarkerRadius(double r) {this->m_DefaultMarkerRadius = r;};
   
