@@ -637,8 +637,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
     {
       if (this->m_ConfigurationItems[i].filename.compare(filename) == 0)
       {
-        this->modelConfigurationComboBox->removeItem(i);
-        this->m_ConfigurationItems.removeAt(i);
+        this->removeConfiguration(i);
         break;
       }
     }
@@ -851,19 +850,20 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
     config.name = configName;
     config.isModified = false;
     config.filename = filename;
-    config.isNew = (isMokkaModelConfig ? false : true);
+    config.isNew = false;
     this->m_ConfigurationItems.push_back(config);
     this->modelConfigurationComboBox->addItem(configName);
     id = this->m_ConfigurationItems.count()-1;
   }
+  this->m_ConfigurationItems[id].isNew = (isMokkaModelConfig ? false : true); // Force the flag to note save over other file format than MVC.
   this->setCurrentConfiguration(id);
   this->mp_SaveConfiguration->setEnabled(false);
   this->mp_RemoveConfiguration->setEnabled(true);
   this->mp_DeselectConfiguration->setEnabled(true);
   this->modelConfigurationComboBox->blockSignals(false);
   
-  this->mp_Acquisition->setMarkersRadius(ids.toVector(), radii.toVector());
-  this->mp_Acquisition->setMarkersColor(ids.toVector(), colors.toVector());
+  this->mp_Acquisition->resetMarkersRadius(ids.toVector(), radii.toVector());
+  this->mp_Acquisition->resetMarkersColor(ids.toVector(), colors.toVector());
   this->mp_Model->setSegments(segments);
 };
 
