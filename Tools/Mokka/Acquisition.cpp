@@ -283,6 +283,30 @@ void Acquisition::setMarkersRadius(const QVector<int>& ids, const QVector<double
   emit markersRadiusChanged(ids, radii);
 };
 
+void Acquisition::resetMarkersRadius(const QVector<int>& ids, const QVector<double>& radii)
+{
+  QList<int> ids_;
+  QList<double> radii_;
+  for (QMap<int,Point*>::iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
+  {
+    if (((*it)->type != Point::Marker) && ((*it)->type != Point::VirtualMarker))
+      continue;
+    ids_ << it.key();
+    int idx = ids.indexOf(it.key());
+    if (idx != -1)
+    {
+      (*it)->radius = radii[idx];
+      radii_ << radii[idx];
+    }
+    else
+    {
+      (*it)->radius = this->m_DefaultMarkerRadius;
+      radii_ << this->m_DefaultMarkerRadius;
+    }
+  }
+  emit markersRadiusChanged(ids_.toVector(), radii_.toVector());
+};
+
 void Acquisition::setMarkerColor(int id, const QColor& color)
 {
   QMap<int,Point*>::iterator it = this->m_Points.find(id);
@@ -302,6 +326,30 @@ void Acquisition::setMarkersColor(const QVector<int>& ids, const QVector<QColor>
       (*it)->color = colors[i];
   }
   emit markersColorChanged(ids, colors);
+};
+
+void Acquisition::resetMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors)
+{
+  QList<int> ids_;
+  QList<QColor> colors_;
+  for (QMap<int,Point*>::iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
+  {
+    if (((*it)->type != Point::Marker) && ((*it)->type != Point::VirtualMarker))
+      continue;
+    ids_ << it.key();
+    int idx = ids.indexOf(it.key());
+    if (idx != -1)
+    {
+      (*it)->color = colors[idx];
+      colors_ << colors[idx];
+    }
+    else
+    {
+      (*it)->color = this->m_DefaultMarkerColor;
+      colors_ << this->m_DefaultMarkerColor;
+    }
+  }
+  emit markersColorChanged(ids_.toVector(), colors_.toVector());
 };
 
 QList<Point*> Acquisition::takePoints(const QList<int>& ids)

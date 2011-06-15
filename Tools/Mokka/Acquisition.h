@@ -128,9 +128,11 @@ public:
   int findMarkerIdFromLabel(const QString& label) const;
   double markerRadius(int id) const {return this->m_Points[id]->radius;};
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
+  void resetMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
   const QColor& markerColor(int id) const {return this->m_Points[id]->color;};
   void setMarkerColor(int id, const QColor& color);
   void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
+  void resetMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
   QList<Point*> takePoints(const QList<int>& ids);
   void insertPoints(const QList<int>& ids, const QList<Point*> points);
   int findPointIdFromLabel(const QString& label) const;
