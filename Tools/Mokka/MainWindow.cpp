@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock = new ModelDockWidget(this);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
   this->mp_ImportAssistant = new ImportAssistantDialog(this);
-  this->mp_UpdateChecker = new UpdateChecker(xstr(MOKKA_VERSION_STRING), "http://b-tk.googlecode.com/svn/latestMokka",
+  this->mp_UpdateChecker = new UpdateChecker(xstr(MOKKA_VERSION_STRING), "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
                                              ":/Resources/Images/Mokka_128.png", this);
 #ifdef Q_OS_MAC
   this->mp_Preferences = new Preferences(0); // No parent: to be independant of the main window

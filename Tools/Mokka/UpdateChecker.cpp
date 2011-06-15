@@ -173,13 +173,13 @@ void UpdateParser::parseReply(QNetworkReply* reply)
               if (this->isGreaterRelease(appNewVer.split("."), appLatestNewVer.split(".")))
                 appLatestNewVer = appNewVer;
               appNote += "<div style=\"margin-top:15px;\">";
-              appNote += "<div style=\"background-color:#A4DDED;\">&nbsp;" + appPubDate + " - " + appName + " " + appNewVer + " released<div>";
+              appNote += "<div style=\"background-color:#A4DDED;\"><b>&nbsp;" + appPubDate + " - " + appName + " " + appNewVer + " released</b><div>";
               appNote += "<div><ul style=\"margin:5 0 0 -25;\">";
               while (xmlReader.readNextStartElement())
               {
                 if (xmlReader.name() == "Enhancement")
                 {
-                  appNote += "<li>Enhancements:</li><ul style=\"margin:5 0 5 -25;\">";
+                  appNote += "<li><b>Enhancements</b></li><ul style=\"margin:5 0 5 -25;\">";
                   while (xmlReader.readNextStartElement())
                   {
                     if (xmlReader.name() == "item")
@@ -189,7 +189,7 @@ void UpdateParser::parseReply(QNetworkReply* reply)
                 }
                 else if (xmlReader.name() == "Update")
                 {
-                  appNote += "<li>Updates:</li><ul style=\"margin:5 0 5 -25;\">";
+                  appNote += "<li><b>Updates</b></li><ul style=\"margin:5 0 5 -25;\">";
                   while (xmlReader.readNextStartElement())
                   {
                     if (xmlReader.name() == "item")
@@ -199,7 +199,7 @@ void UpdateParser::parseReply(QNetworkReply* reply)
                 }
                 else if (xmlReader.name() == "Fix")
                 {
-                  appNote += "<li>Fixes:</li><ul style=\"margin:5 0 5 -25;\">";
+                  appNote += "<li><b>Fixes</b></li><ul style=\"margin:5 0 5 -25;\">";
                   while (xmlReader.readNextStartElement())
                   {
                     if (xmlReader.name() == "item")
@@ -287,7 +287,7 @@ UpdateCheckerDialog::UpdateCheckerDialog(const QString& image, QWidget* parent)
     this->iconLabel->setPixmap(QPixmap(image));
 #ifdef Q_OS_MAC
   QFont f = this->textBrowser->font();
-  f.setPointSize(12);
+  f.setPointSize(11);
   this->textBrowser->setFont(f);
 #endif
   
