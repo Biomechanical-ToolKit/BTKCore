@@ -61,6 +61,8 @@ void Model::setSegments(const QList<Segment>& segments)
   QList<int> ids;
   for (QList<Segment>::const_iterator it = segments.begin() ; it != segments.end() ; ++it)
   {
+    if (it->markerIds.isEmpty())
+      continue;
     Segment* seg = new Segment(*it);
     int id = this->generateNewSegmentId();
     this->m_Segments.insert(id, seg);
