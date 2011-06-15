@@ -551,7 +551,7 @@ void MainWindow::openFile()
 
 void MainWindow::openFileDropped(const QString& filename)
 {
-  if (this->isOkToContinue())
+  if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
     this->openFile(filename);
 };
 
