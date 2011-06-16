@@ -3,53 +3,89 @@
 @page MokkaReleaseNote Release Notes
 @section MokkaReleaseNoteSection Release Notes / Changelog
 
+- <b>06/16/11: Mokka 0.3</b> released
+  - Enhancements:
+    - User preferences panel added.
+    - Visualization of segments added. You can add/remove/edit segments' informations (links, label, descriptions, color). The segment definitions is saved in the Model Visualization Configuration (MVC) file. Undo/Redo support. Preferences for the default segment color added.
+    - Mokka is able to load Vicon VST/VSK files to configure models.
+    - New option to check software update.
+    - Tutorials integrated into the documentation.
+  - Updates:
+    - New option to select the length of the markers' trajectory.
+    - New submenu in "Settings" and in the display configuration button to select the length of the marker trajectory. By default the length is set to 100 frames.
+    - Camera configuration saved and reloaded when switching between perspective and orthogonal projection.
+    - Icon for the markers in the model pane rotated.
+    - Use BTK 0.1.8.
+  - Fixes
+    - The visual configuration unselected is still loaded when opening another acquisition.
+    - In some case, a subtick appears close to each stick in the time event bar.
+    - Wrong orthogonal planes when the global up vector is not Z.
+    - Importing an erroneous file leads to set the window as modified.
+    - Using the import assistant, all the markers are set as hidden in the dock (only after the loading). 
+    - Width of the file information panel is not adapted when importing data (all infos are set to N/A).
+    - The first marker for the first frame is every time set as invalid and is not displayed.
+    - When inserting an event under MacOS X, the end of the letters 'j' and 'p' is not displayed.
+    - Corrupted model configuration (file not found) is removed but can load another configuration in the list.
+    - Loading a model configuration from another one doesn't reset radius and color for markers not specified in the new model.
+    - Loading a dropped file doesn't check if the model configuration is modified or not.
+
 - <b>02/12/11: Mokka 0.2</b> released
-      - ENH: Multiple views added.
-      - ENH: Orthogonal projection added.
-      - ENH: New dock widget to show acquisition's data (markers, analog channels, angles, etc.).
-      - ENH: New widget for the timeline and the events.
-      - ENH: Staying over a marker in the 3D view will show a balloon with its label.
-      - ENH: Import / export actions.
-      - ENH: Assistant to import files categorized by company.
-      - ENH: Rubber band added to select markers in the 3D view
-      - ENH: New keyboard shortcut and mouse interaction (check the help).
-      - ENH: Help added.
-      - ENH: Icon added.
-      - UPD: Camera interaction improved for a better user experience.
-      - UPD: Loading time to create 3D objects reduced.
-      - UPD: File's format read and saved updated.
-      - UPD: New FileInfo dock.
-      - UPD: Loading a new acquisition will try to load a visual configuration based on the file name.
-      - UPD: Contextual menus added in the 3D view and the time bar
-      - UPD: Use BTK 0.1.7.
-      - FIX: Several UI fixes.
+  - Enhancements:
+    - Multiple views added.
+    - Orthogonal projection added.
+    - New dock widget to show acquisition's data (markers, analog channels, angles, etc.).
+    - New widget for the timeline and the events.
+    - Staying over a marker in the 3D view will show a balloon with its label.
+    - Import / export actions.
+    - Assistant to import files categorized by company.
+    - Rubber band added to select markers in the 3D view
+    - New keyboard shortcut and mouse interaction (check the help).
+    - Help added.
+    - Icon added.
+  - Updates:
+    - Camera interaction improved for a better user experience.
+    - Loading time to create 3D objects reduced.
+    - File's format read and saved updated.
+    - New FileInfo dock.
+    - Loading a new acquisition will try to load a visual configuration based on the file name.
+    - Contextual menus added in the 3D view and the time bar
+    - Use BTK 0.1.7.
+  - Fixes:
+    - Several UI fixes.
 
 - <b>06/18/10: Mokka 0.1a4</b> released
-      - ENH: Drag and drop support for Mokka.
-      - ENH: New widget to show the loading progress of a file
-      - ENH: It is now possible to create/save/load a visual configuration for the marker.
-      - ENH: Addition of command line options (open an acquisition, load a visual configuration, play the acquisition).
-      - ENH: New menus to deselect the current visual configuration and clear the list of the visual configurations.
-      - UPD: User guide updated and detailed: MokkaUserGuide
-      - UPD: Virtual markers are now distinguished and removed in the case where they are used for segmental frame axes. Other virtual markers are listed but not visible by default.
-      - UPD: Lines in the 3D window are now smoothed for a better rendering.
-      - UPD: The undo/redo is enhanced by splitting the actions between the modification of an acquisition file and the modification of the visual configuration.
-      - FIX: Clicking in the markers' list when it is empty can crash Mokka.
-      - FIX: On MacOS X, sometimes the loading of a file doesn't happen and keep the previous files (an crash in some case) 
+  - Enhancements:
+    - Drag and drop support for Mokka.
+    - New widget to show the loading progress of a file
+    - It is now possible to create/save/load a visual configuration for the marker.
+    - Addition of command line options (open an acquisition, load a visual configuration, play the acquisition).
+    - New menus to deselect the current visual configuration and clear the list of the visual configurations.
+  - Updates:
+    - User guide updated and detailed: MokkaUserGuide
+    - Virtual markers are now distinguished and removed in the case where they are used for segmental frame axes. Other virtual markers are listed but not visible by default.
+    - Lines in the 3D window are now smoothed for a better rendering.
+    - The undo/redo is enhanced by splitting the actions between the modification of an acquisition file and the modification of the visual configuration.
+  - Fixes:
+    - Clicking in the markers' list when it is empty can crash Mokka.
+    - On MacOS X, sometimes the loading of a file doesn't happen and keep the previous files (an crash in some case) 
 
 - <b>10/16/09: Mokka 0.1a3</b> released
-      - ENH: Markers trajectory can be displayed (click on the icon at the left of the marker's label).
-      - ENH: Modification of acquisition data (points and events) with undo/redo support.
-      - ENH: Acquisition can be saved in C3D or TRC format.
-      - FIX: Menu Options > Edit Metadata renamed Options > View Metadata as it is not possible to edit them.
-      - FIX: Open/Save dialogs use native dialogs. 
+  - Updates:
+    - Markers trajectory can be displayed (click on the icon at the left of the marker's label).
+    - Modification of acquisition data (points and events) with undo/redo support.
+    - Acquisition can be saved in C3D or TRC format.
+  - Fixes:
+    - Menu Options > Edit Metadata renamed Options > View Metadata as it is not possible to edit them.
+    - Open/Save dialogs use native dialogs. 
 
 - <b>09/10/09: Mokka 0.1a2</b> released
-      - ENH: FPS replaced by 3D global axes.
-      - ENH: Metadata are diplayed in a modal window (see menu Options > Edit Metadata).
-      - ENH: Events information & markers properties can be collapsed.
-      - FIX: Executing Mokka on Windows opens a command prompt.
-      - FIX: C3D data with POINTS:UNITS in meters drawn in millimeters ( Issue 1 ). 
+  - Enhancements:
+    - ENH: FPS replaced by 3D global axes.
+    - ENH: Metadata are diplayed in a modal window (see menu Options > Edit Metadata).
+    - ENH: Events information & markers properties can be collapsed.
+  - Fixes:
+    - Executing Mokka on Windows opens a command prompt.
+    - C3D data with POINTS:UNITS in meters drawn in millimeters ( Issue 1 ). 
 
 - <b>08/24/09: Mokka 0.1a1</b> initial alpha release
  */
