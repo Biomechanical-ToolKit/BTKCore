@@ -917,7 +917,7 @@ void MultiViewWidget::setForceVectorColor(const QColor& color)
 
 void MultiViewWidget::updateDisplayedMarkersList(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
 {
-  vtkIdTypeArray* indexes = static_cast<vtkIdTypeArray*>(call_data);
+  vtkIntArray* indexes = static_cast<vtkIntArray*>(call_data);
   if (!indexes)
     return;
     
