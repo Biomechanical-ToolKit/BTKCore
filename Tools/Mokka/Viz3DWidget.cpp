@@ -75,6 +75,7 @@ void Viz3DWidget::initialize()
   vtkRenderWindow* renwin = vtkRenderWindow::New();
   renwin->AddRenderer(this->mp_Renderer);
   renwin->LineSmoothingOn();
+  renwin->DoubleBufferOff(); // Required for Windows 7 (32-bit and 64-bit) when selecting markers with the rubber (no playback mode).
   //renwin->PolygonSmoothingOn();
   this->SetRenderWindow(renwin);
   renwin->Delete();
