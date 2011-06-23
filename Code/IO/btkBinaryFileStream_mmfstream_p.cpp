@@ -311,7 +311,9 @@ namespace btk
                && (::GetLastError() != NO_ERROR)) || (::SetEndOfFile(this->m_File) == 0))
       return 0;
 #else
-    if (ftruncate(this->m_File, newBufferSize) == -1)
+    if (::munmap(this->mp_Buffer, this->m_BufferSize) == -1)
+          return 0;
+    if (::ftruncate(this->m_File, newBufferSize) == -1)
       return 0;      
 #endif
     this->m_BufferSize = newBufferSize;
