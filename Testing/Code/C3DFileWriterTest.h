@@ -90,7 +90,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetEvent(2)->GetLabel(), "RTO");
     TS_ASSERT_DELTA(acq->GetEvent(2)->GetTime(), 7.32, 0.0001);
     
-    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("EVENT")->GetChild("TIMES")->GetInfo()->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)acq->GetMetaData()->GetChild("EVENT")->GetChild("TIMES")->GetInfo()->GetDimensions().size(), 2);
     TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("EVENT")->GetChild("TIMES")->GetInfo()->GetDimensions()[0], 2);
     TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("EVENT")->GetChild("TIMES")->GetInfo()->GetDimensions()[1], 3);
   };
@@ -1053,10 +1053,10 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq->GetMetaData()->GetChild("POINT")->GetChild("FRAMES")->GetInfo()->ToUInt16(0));
     btk::MetaDataInfo::Pointer actualFieldVal = acq->GetMetaData()->GetChild("TRIAL")->GetChild("ACTUAL_START_FIELD")->GetInfo();
     unsigned frameIndex = (actualFieldVal->ToUInt16(1) << 16) | actualFieldVal->ToUInt16(0);
-    TS_ASSERT_EQUALS(acq->GetFirstFrame(), frameIndex);
+    TS_ASSERT_EQUALS((unsigned)acq->GetFirstFrame(), frameIndex);
     actualFieldVal = acq->GetMetaData()->GetChild("TRIAL")->GetChild("ACTUAL_END_FIELD")->GetInfo();
     frameIndex = (actualFieldVal->ToUInt16(1) << 16) | actualFieldVal->ToUInt16(0);
-    TS_ASSERT_EQUALS(acq->GetLastFrame(), frameIndex);
+    TS_ASSERT_EQUALS((unsigned)acq->GetLastFrame(), frameIndex);
   };
     
   CXXTEST_TEST(emptyAcquisition_Template)
@@ -1110,12 +1110,12 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS((*itCorners)->GetInfo()->GetDimensionsProduct(), 0);
     TS_ASSERT_EQUALS((*itOrigin)->GetInfo()->GetDimensionsProduct(), 0);
     TS_ASSERT_EQUALS((*itChannel)->GetInfo()->GetDimensionsProduct(), 0);
-    TS_ASSERT_EQUALS((*itUsed)->GetInfo()->GetDimensions().size(), 0);
-    TS_ASSERT_EQUALS((*itType)->GetInfo()->GetDimensions().size(), 1);
-    TS_ASSERT_EQUALS((*itZero)->GetInfo()->GetDimensions().size(), 1);
-    TS_ASSERT_EQUALS((*itCorners)->GetInfo()->GetDimensions().size(), 3);
-    TS_ASSERT_EQUALS((*itOrigin)->GetInfo()->GetDimensions().size(), 2);
-    TS_ASSERT_EQUALS((*itChannel)->GetInfo()->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)(*itUsed)->GetInfo()->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)(*itType)->GetInfo()->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)(*itZero)->GetInfo()->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)(*itCorners)->GetInfo()->GetDimensions().size(), 3);
+    TS_ASSERT_EQUALS((int)(*itOrigin)->GetInfo()->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)(*itChannel)->GetInfo()->GetDimensions().size(), 2);
   };
 
   CXXTEST_TEST(convertTRC2C3D)
@@ -1160,7 +1160,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->SetFilename(C3DFilePathIN + "sample01/Eb015pr.c3d");
     reader->Update();
     btk::Acquisition::Pointer output = reader->GetOutput();
-    long timestamp = output->GetTimestamp();
+    unsigned long timestamp = output->GetTimestamp();
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015pr.c3d");

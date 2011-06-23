@@ -231,7 +231,7 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(used, 4);
     btk::MetaDataInfo::Pointer corners = fp->GetChild("CORNERS")->GetInfo();
     TS_ASSERT_EQUALS(corners->GetDimensions()[2], used);
-    TS_ASSERT_EQUALS(corners->GetValues().size(), 48);
+    TS_ASSERT_EQUALS((int)corners->GetValues().size(), 48);
     std::vector<float> corners2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("CORNERS")->GetInfo()->ToFloat();
     for (int i = 0 ; i < 24 ; ++i)
     {
@@ -240,7 +240,7 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     }
     btk::MetaDataInfo::Pointer channel = fp->GetChild("CHANNEL")->GetInfo();
     TS_ASSERT_EQUALS(channel->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(channel->GetValues().size(), 24);
+    TS_ASSERT_EQUALS((int)channel->GetValues().size(), 24);
     std::vector<int> channel2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("CHANNEL")->GetInfo()->ToInt();
     for (int i = 0 ; i < 12 ; ++i)
     {
@@ -249,7 +249,7 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     }
     btk::MetaDataInfo::Pointer type = fp->GetChild("TYPE")->GetInfo();
     TS_ASSERT_EQUALS(type->GetDimensions()[0], used);
-    TS_ASSERT_EQUALS(type->GetValues().size(), 4);
+    TS_ASSERT_EQUALS((int)type->GetValues().size(), 4);
     std::vector<int> type2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("TYPE")->GetInfo()->ToInt();
     for (int i = 0 ; i < 2 ; ++i)
     {
@@ -258,7 +258,7 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     }
     btk::MetaDataInfo::Pointer origin = fp->GetChild("ORIGIN")->GetInfo();
     TS_ASSERT_EQUALS(origin->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(origin->GetValues().size(), 12);
+    TS_ASSERT_EQUALS((int)origin->GetValues().size(), 12);
     std::vector<float> origin2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("ORIGIN")->GetInfo()->ToFloat();
     for (int i = 0 ; i < 6 ; ++i)
     {
@@ -386,7 +386,7 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(used, 2);
     btk::MetaDataInfo::Pointer calMatrix = fp->GetChild("CAL_MATRIX")->GetInfo();
     TS_ASSERT_EQUALS(calMatrix->GetDimensions()[2], used);
-    TS_ASSERT_EQUALS(calMatrix->GetValues().size(), 72);
+    TS_ASSERT_EQUALS((int)calMatrix->GetValues().size(), 72);
     std::vector<float> calMatrix2Val = input2->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("CAL_MATRIX")->GetInfo()->ToFloat();
     for (int i = 0 ; i < 36 ; ++i)
     {
@@ -448,7 +448,7 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(used, 2);
     btk::MetaDataInfo::Pointer calMatrix = fp->GetChild("CAL_MATRIX")->GetInfo();
     TS_ASSERT_EQUALS(calMatrix->GetDimensions()[2], used);
-    TS_ASSERT_EQUALS(calMatrix->GetValues().size(), 72);
+    TS_ASSERT_EQUALS((int)calMatrix->GetValues().size(), 72);
   };
   
   CXXTEST_TEST(ThreeFiles_Concat_ANC_and_CAL_and_TRC)
@@ -482,7 +482,7 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(used, 2);
     btk::MetaDataInfo::Pointer calMatrix = fp->GetChild("CAL_MATRIX")->GetInfo();
     TS_ASSERT_EQUALS(calMatrix->GetDimensions()[2], used);
-    TS_ASSERT_EQUALS(calMatrix->GetValues().size(), 72);
+    TS_ASSERT_EQUALS((int)calMatrix->GetValues().size(), 72);
   };
   
   CXXTEST_TEST(ThreeFiles_Concat_CAL_and_TRC_and_ANC)
@@ -516,7 +516,7 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(used, 2);
     btk::MetaDataInfo::Pointer calMatrix = fp->GetChild("CAL_MATRIX")->GetInfo();
     TS_ASSERT_EQUALS(calMatrix->GetDimensions()[2], used);
-    TS_ASSERT_EQUALS(calMatrix->GetValues().size(), 72);
+    TS_ASSERT_EQUALS((int)calMatrix->GetValues().size(), 72);
   };
   
   CXXTEST_TEST(C3D_vs_ThreeFiles_Concat_TRC_and_ANC_and_CAL)
@@ -912,27 +912,27 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(used, 3);
     btk::MetaDataInfo::Pointer corners = fp->GetChild("CORNERS")->GetInfo();
     TS_ASSERT_EQUALS(corners->GetDimensions()[2], used);
-    TS_ASSERT_EQUALS(corners->GetValues().size(), 36);
+    TS_ASSERT_EQUALS((int)corners->GetValues().size(), 36);
     std::vector<float> corners2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("CORNERS")->GetInfo()->ToFloat();
     for (int i = 0 ; i < 36 ; ++i)
       TS_ASSERT_DELTA(corners->ToFloat(i), corners2Val.at(i), 1e-5);
     btk::MetaDataInfo::Pointer channel = fp->GetChild("CHANNEL")->GetInfo();
     TS_ASSERT_EQUALS(channel->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(channel->GetValues().size(), 18);
+    TS_ASSERT_EQUALS((int)channel->GetValues().size(), 18);
     std::vector<int> channel2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("CHANNEL")->GetInfo()->ToInt();
     for (int i = 0 ; i < 18 ; ++i)
       TS_ASSERT_EQUALS(channel->ToInt(i), channel2Val.at(i));
     btk::MetaDataInfo::Pointer type = fp->GetChild("TYPE")->GetInfo();
     TS_ASSERT_EQUALS(type->GetDimensions()[0], used);
-    TS_ASSERT_EQUALS(type->GetValues().size(), 3);
+    TS_ASSERT_EQUALS((int)type->GetValues().size(), 3);
     std::vector<int> type2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("TYPE")->GetInfo()->ToInt();
     for (int i = 0 ; i < used ; ++i)
       TS_ASSERT_EQUALS(type->ToInt(i), type2Val.at(i));
     btk::MetaDataInfo::Pointer origin = fp->GetChild("ORIGIN")->GetInfo();
     TS_ASSERT_EQUALS(origin->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(origin->GetValues().size(), 9);
+    TS_ASSERT_EQUALS((int)origin->GetValues().size(), 9);
     TS_ASSERT_EQUALS(origin->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(origin->GetValues().size(), 9);
+    TS_ASSERT_EQUALS((int)origin->GetValues().size(), 9);
     TS_ASSERT_DELTA(origin->ToFloat(0), 300.0, 1e-5);
     TS_ASSERT_DELTA(origin->ToFloat(1), 200.0, 1e-5);
     TS_ASSERT_DELTA(origin->ToFloat(2), -27.0, 1e-5);
@@ -1075,27 +1075,27 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(used, 3);
     btk::MetaDataInfo::Pointer corners = fp->GetChild("CORNERS")->GetInfo();
     TS_ASSERT_EQUALS(corners->GetDimensions()[2], used);
-    TS_ASSERT_EQUALS(corners->GetValues().size(), 36);
+    TS_ASSERT_EQUALS((int)corners->GetValues().size(), 36);
     std::vector<float> corners2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("CORNERS")->GetInfo()->ToFloat();
     for (int i = 0 ; i < 36 ; ++i)
       TS_ASSERT_DELTA(corners->ToFloat(i), corners2Val.at(i), 1e-5);
     btk::MetaDataInfo::Pointer channel = fp->GetChild("CHANNEL")->GetInfo();
     TS_ASSERT_EQUALS(channel->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(channel->GetValues().size(), 18);
+    TS_ASSERT_EQUALS((int)channel->GetValues().size(), 18);
     std::vector<int> channel2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("CHANNEL")->GetInfo()->ToInt();
     for (int i = 0 ; i < 18 ; ++i)
       TS_ASSERT_EQUALS(channel->ToInt(i), channel2Val.at(i));
     btk::MetaDataInfo::Pointer type = fp->GetChild("TYPE")->GetInfo();
     TS_ASSERT_EQUALS(type->GetDimensions()[0], used);
-    TS_ASSERT_EQUALS(type->GetValues().size(), 3);
+    TS_ASSERT_EQUALS((int)type->GetValues().size(), 3);
     std::vector<int> type2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("TYPE")->GetInfo()->ToInt();
     for (int i = 0 ; i < used ; ++i)
       TS_ASSERT_EQUALS(type->ToInt(i), type2Val.at(i));
     btk::MetaDataInfo::Pointer origin = fp->GetChild("ORIGIN")->GetInfo();
     TS_ASSERT_EQUALS(origin->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(origin->GetValues().size(), 9);
+    TS_ASSERT_EQUALS((int)origin->GetValues().size(), 9);
     TS_ASSERT_EQUALS(origin->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(origin->GetValues().size(), 9);
+    TS_ASSERT_EQUALS((int)origin->GetValues().size(), 9);
     TS_ASSERT_DELTA(origin->ToFloat(0), 300.0, 1e-5);
     TS_ASSERT_DELTA(origin->ToFloat(1), 200.0, 1e-5);
     TS_ASSERT_DELTA(origin->ToFloat(2), -27.0, 1e-5);
@@ -1247,27 +1247,27 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(used, 3);
     btk::MetaDataInfo::Pointer corners = fp->GetChild("CORNERS")->GetInfo();
     TS_ASSERT_EQUALS(corners->GetDimensions()[2], used);
-    TS_ASSERT_EQUALS(corners->GetValues().size(), 36);
+    TS_ASSERT_EQUALS((int)corners->GetValues().size(), 36);
     std::vector<float> corners2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("CORNERS")->GetInfo()->ToFloat();
     for (int i = 0 ; i < 36 ; ++i)
       TS_ASSERT_DELTA(corners->ToFloat(i), corners2Val.at(i), 1e-5);
     btk::MetaDataInfo::Pointer channel = fp->GetChild("CHANNEL")->GetInfo();
     TS_ASSERT_EQUALS(channel->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(channel->GetValues().size(), 18);
+    TS_ASSERT_EQUALS((int)channel->GetValues().size(), 18);
     std::vector<int> channel2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("CHANNEL")->GetInfo()->ToInt();
     for (int i = 0 ; i < 18 ; ++i)
       TS_ASSERT_EQUALS(channel->ToInt(i), channel2Val.at(i));
     btk::MetaDataInfo::Pointer type = fp->GetChild("TYPE")->GetInfo();
     TS_ASSERT_EQUALS(type->GetDimensions()[0], used);
-    TS_ASSERT_EQUALS(type->GetValues().size(), 3);
+    TS_ASSERT_EQUALS((int)type->GetValues().size(), 3);
     std::vector<int> type2Val = input->GetMetaData()->GetChild("FORCE_PLATFORM")->GetChild("TYPE")->GetInfo()->ToInt();
     for (int i = 0 ; i < used ; ++i)
       TS_ASSERT_EQUALS(type->ToInt(i), type2Val.at(i));
     btk::MetaDataInfo::Pointer origin = fp->GetChild("ORIGIN")->GetInfo();
     TS_ASSERT_EQUALS(origin->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(origin->GetValues().size(), 9);
+    TS_ASSERT_EQUALS((int)origin->GetValues().size(), 9);
     TS_ASSERT_EQUALS(origin->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(origin->GetValues().size(), 9);
+    TS_ASSERT_EQUALS((int)origin->GetValues().size(), 9);
     TS_ASSERT_DELTA(origin->ToFloat(0), 300.0, 1e-5);
     TS_ASSERT_DELTA(origin->ToFloat(1), 200.0, 1e-5);
     TS_ASSERT_DELTA(origin->ToFloat(2), -27.0, 1e-5);

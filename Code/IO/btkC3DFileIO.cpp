@@ -501,7 +501,7 @@ namespace btk
       }
       if (parameters.size() != 0)
         btkIOErrorMacro(filename, "Some parameters are orphans. No group has the same id. These parameters are lost");
-      int totalBlocksRead = static_cast<int>(ceil((double)totalBytesRead / 512));
+      int totalBlocksRead = static_cast<int>(ceil((double)totalBytesRead / 512.0));
       if (totalBlocksRead != blockNumber)
       {
         btkIOErrorMacro(filename, "The number of blocks to be read in the parameter section is different than the number of blocks read. The value kept is the number of blocks read.");

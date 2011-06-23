@@ -53,20 +53,20 @@ CXXTEST_SUITE(GRxFileReaderTest)
     TS_ASSERT_DELTA(cornersVal[11], 690.05688, 1e-5);
     
     TS_ASSERT_EQUALS(corners->GetDimensions()[2], used);
-    TS_ASSERT_EQUALS(corners->GetValues().size(), 12);
+    TS_ASSERT_EQUALS((int)corners->GetValues().size(), 12);
     btk::MetaDataInfo::Pointer channel = fp->GetChild("CHANNEL")->GetInfo();
     TS_ASSERT_EQUALS(channel->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(channel->GetValues().size(), 6);
+    TS_ASSERT_EQUALS((int)channel->GetValues().size(), 6);
     for (int i = 0 ; i < 6 ; ++i)
       TS_ASSERT_EQUALS(channel->ToInt(i), i+1);
     btk::MetaDataInfo::Pointer type = fp->GetChild("TYPE")->GetInfo();
     TS_ASSERT_EQUALS(type->GetDimensions()[0], used);
-    TS_ASSERT_EQUALS(type->GetValues().size(), 1);
+    TS_ASSERT_EQUALS((int)type->GetValues().size(), 1);
     for (int i = 0 ; i < used ; ++i)
       TS_ASSERT_EQUALS(type->ToInt(i), 1);
     btk::MetaDataInfo::Pointer origin = fp->GetChild("ORIGIN")->GetInfo();
     TS_ASSERT_EQUALS(origin->GetDimensions()[1], used);
-    TS_ASSERT_EQUALS(origin->GetValues().size(), 3);
+    TS_ASSERT_EQUALS((int)origin->GetValues().size(), 3);
     TS_ASSERT_DELTA(origin->ToFloat(0), 300.0, 1e-5);
     TS_ASSERT_DELTA(origin->ToFloat(1), 200.0, 1e-5);
     TS_ASSERT_DELTA(origin->ToFloat(2), -11.0, 1e-5);

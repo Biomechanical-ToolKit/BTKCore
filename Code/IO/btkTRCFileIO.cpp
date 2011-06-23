@@ -141,8 +141,8 @@ namespace btk
       {
         kf2 = k.find(sep, kf2 + 1);
         vf2 = v.find(sep, vf2 + 1);
-        if ((kf2 == std::string::npos) && (vf2 != std::string::npos)
-            || (kf2 != std::string::npos) && (vf2 == std::string::npos))
+        if (((kf2 == std::string::npos) && (vf2 != std::string::npos))
+            || ((kf2 != std::string::npos) && (vf2 == std::string::npos)))
           throw(TRCFileIOException("Error between TRC header keywords and values."));
         if ((kf2 == std::string::npos) && (vf2 == std::string::npos))
           break;

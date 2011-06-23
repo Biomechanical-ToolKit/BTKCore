@@ -93,8 +93,8 @@ CXXTEST_SUITE(ANBFileReaderTest)
     */
     std::vector<int16_t> channel = acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CHAN")->GetChild("CHANNEL")->GetInfo()->ToInt16();
     std::vector<uint8_t> dims = acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CHAN")->GetChild("CHANNEL")->GetInfo()->GetDimensions();
-    TS_ASSERT_EQUALS(channel.size(), 12);
-    TS_ASSERT_EQUALS(dims.size(), 2);
+    TS_ASSERT_EQUALS((int)channel.size(), 12);
+    TS_ASSERT_EQUALS((int)dims.size(), 2);
     TS_ASSERT_EQUALS(dims.at(0), 6);
     TS_ASSERT_EQUALS(dims.at(1), 2);
     TS_ASSERT_EQUALS(channel.at(0), 1);

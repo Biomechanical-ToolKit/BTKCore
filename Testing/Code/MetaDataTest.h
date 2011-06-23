@@ -129,15 +129,15 @@ CXXTEST_SUITE(MetaDataTest)
     root->AppendChild(point);
     TS_ASSERT_EQUALS(root->GetChildNumber(), 1);
     TS_ASSERT_EQUALS(point->GetLabel(), "POINT");
-    TS_ASSERT_EQUALS(point->GetDescription().length(), 11);
+    TS_ASSERT_EQUALS((int)point->GetDescription().length(), 11);
     TS_ASSERT_EQUALS(point->GetUnlockState(), false);
     btk::MetaData::Pointer point2 = btk::MetaDataCreateChild(root, "POINT");
     TS_ASSERT_EQUALS(root->GetChildNumber(), 1);
     TS_ASSERT_EQUALS(point->GetLabel(), "POINT");
-    TS_ASSERT_EQUALS(point->GetDescription().length(), 0);
+    TS_ASSERT_EQUALS((int)point->GetDescription().length(), 0);
     TS_ASSERT_EQUALS(point2->GetUnlockState(), true);
     TS_ASSERT_EQUALS(point2->GetLabel(), "POINT");
-    TS_ASSERT_EQUALS(point2->GetDescription().length(), 0);
+    TS_ASSERT_EQUALS((int)point2->GetDescription().length(), 0);
     TS_ASSERT_EQUALS(point2->GetUnlockState(), true);
   };
 
@@ -149,7 +149,7 @@ CXXTEST_SUITE(MetaDataTest)
     btk::MetaData::Pointer scale = analog->GetChild("SCALE");
     TS_ASSERT_EQUALS(analog->GetChildNumber(), 1);
     TS_ASSERT_EQUALS(scale->GetLabel(), "SCALE");
-    TS_ASSERT_EQUALS(scale->GetDescription().length(), 0);
+    TS_ASSERT_EQUALS((int)scale->GetDescription().length(), 0);
     TS_ASSERT_DELTA(scale->GetInfo()->ToFloat()[0], 0.08333, 0.0001);
   };
 
@@ -160,8 +160,8 @@ CXXTEST_SUITE(MetaDataTest)
     btk::MetaData::Pointer scale = analog->GetChild("SCALE");    
     TS_ASSERT_EQUALS(analog->GetChildNumber(), 1);
     TS_ASSERT_EQUALS(scale->GetLabel(), "SCALE");
-    TS_ASSERT_EQUALS(scale->GetDescription().length(), 0);
-    TS_ASSERT_EQUALS(scale->GetInfo()->GetValues().size(), 12);
+    TS_ASSERT_EQUALS((int)scale->GetDescription().length(), 0);
+    TS_ASSERT_EQUALS((int)scale->GetInfo()->GetValues().size(), 12);
   };
 
   CXXTEST_TEST(UtilsCreateChildFloat300Values)
@@ -171,12 +171,12 @@ CXXTEST_SUITE(MetaDataTest)
     btk::MetaData::Pointer scale = analog->GetChild("SCALE");    
     TS_ASSERT_EQUALS(analog->GetChildNumber(), 2);
     TS_ASSERT_EQUALS(scale->GetLabel(), "SCALE");
-    TS_ASSERT_EQUALS(scale->GetDescription().length(), 0);
-    TS_ASSERT_EQUALS(scale->GetInfo()->GetValues().size(), 255);
+    TS_ASSERT_EQUALS((int)scale->GetDescription().length(), 0);
+    TS_ASSERT_EQUALS((int)scale->GetInfo()->GetValues().size(), 255);
     btk::MetaData::Pointer scale2 = analog->GetChild("SCALE2");
     TS_ASSERT_EQUALS(scale2->GetLabel(), "SCALE2");
-    TS_ASSERT_EQUALS(scale2->GetDescription().length(), 0);
-    TS_ASSERT_EQUALS(scale2->GetInfo()->GetValues().size(), 45);
+    TS_ASSERT_EQUALS((int)scale2->GetDescription().length(), 0);
+    TS_ASSERT_EQUALS((int)scale2->GetInfo()->GetValues().size(), 45);
   };
 
   CXXTEST_TEST(UtilsMetaDataCollapseString)
@@ -185,18 +185,18 @@ CXXTEST_SUITE(MetaDataTest)
     btk::MetaDataCreateChild(point, "LABELS", std::vector<std::string>(1120, "TESTS"));
     TS_ASSERT_EQUALS(point->GetChildNumber(), 5);    
     btk::MetaData::Pointer labels = point->GetChild("LABELS");    
-    TS_ASSERT_EQUALS(labels->GetInfo()->GetValues().size(), 255);
+    TS_ASSERT_EQUALS((int)labels->GetInfo()->GetValues().size(), 255);
     btk::MetaData::Pointer labels2 = point->GetChild("LABELS2");
-    TS_ASSERT_EQUALS(labels2->GetInfo()->GetValues().size(), 255);
+    TS_ASSERT_EQUALS((int)labels2->GetInfo()->GetValues().size(), 255);
     btk::MetaData::Pointer labels3 = point->GetChild("LABELS3");
-    TS_ASSERT_EQUALS(labels3->GetInfo()->GetValues().size(), 255);
+    TS_ASSERT_EQUALS((int)labels3->GetInfo()->GetValues().size(), 255);
     btk::MetaData::Pointer labels4 = point->GetChild("LABELS4");
-    TS_ASSERT_EQUALS(labels4->GetInfo()->GetValues().size(), 255);
+    TS_ASSERT_EQUALS((int)labels4->GetInfo()->GetValues().size(), 255);
     btk::MetaData::Pointer labels5 = point->GetChild("LABELS5");
-    TS_ASSERT_EQUALS(labels5->GetInfo()->GetValues().size(), 100);
+    TS_ASSERT_EQUALS((int)labels5->GetInfo()->GetValues().size(), 100);
     std::vector<std::string> values;
     btk::MetaDataCollapseChildrenValues(values, point, "LABELS");
-    TS_ASSERT_EQUALS(values.size(), 1120);
+    TS_ASSERT_EQUALS((int)values.size(), 1120);
   };
 
   CXXTEST_TEST(UtilsMetaDataCollapseStringAndBlank)
@@ -205,7 +205,7 @@ CXXTEST_SUITE(MetaDataTest)
     btk::MetaDataCreateChild(point, "LABELS", std::vector<std::string>(125, "TESTS"));
     std::vector<std::string> values;
     btk::MetaDataCollapseChildrenValues<std::string>(values, point, "LABELS", 150, "uname*");
-    TS_ASSERT_EQUALS(values.size(), 150);
+    TS_ASSERT_EQUALS((int)values.size(), 150);
     for (int i = 125 ; i < 150 ; ++i)
       TS_ASSERT_EQUALS(values.at(i), "uname*" + btk::ToString(i+1));
   };
@@ -216,18 +216,18 @@ CXXTEST_SUITE(MetaDataTest)
     btk::MetaDataCreateChild(point, "LABELS", std::vector<int16_t>(1120, 54));
     TS_ASSERT_EQUALS(point->GetChildNumber(), 5);    
     btk::MetaData::Pointer labels = point->GetChild("LABELS");    
-    TS_ASSERT_EQUALS(labels->GetInfo()->GetValues().size(), 255);
+    TS_ASSERT_EQUALS((int)labels->GetInfo()->GetValues().size(), 255);
     btk::MetaData::Pointer labels2 = point->GetChild("LABELS2");
-    TS_ASSERT_EQUALS(labels2->GetInfo()->GetValues().size(), 255);
+    TS_ASSERT_EQUALS((int)labels2->GetInfo()->GetValues().size(), 255);
     btk::MetaData::Pointer labels3 = point->GetChild("LABELS3");
-    TS_ASSERT_EQUALS(labels3->GetInfo()->GetValues().size(), 255);
+    TS_ASSERT_EQUALS((int)labels3->GetInfo()->GetValues().size(), 255);
     btk::MetaData::Pointer labels4 = point->GetChild("LABELS4");
-    TS_ASSERT_EQUALS(labels4->GetInfo()->GetValues().size(), 255);
+    TS_ASSERT_EQUALS((int)labels4->GetInfo()->GetValues().size(), 255);
     btk::MetaData::Pointer labels5 = point->GetChild("LABELS5");
-    TS_ASSERT_EQUALS(labels5->GetInfo()->GetValues().size(), 100);
+    TS_ASSERT_EQUALS((int)labels5->GetInfo()->GetValues().size(), 100);
     std::vector<int16_t> values;
     btk::MetaDataCollapseChildrenValues(values, point, "LABELS");
-    TS_ASSERT_EQUALS(values.size(), 1120);
+    TS_ASSERT_EQUALS((int)values.size(), 1120);
   };
 
   CXXTEST_TEST(UtilsMetaDataCollapseIntegerAndBlank)
@@ -236,7 +236,7 @@ CXXTEST_SUITE(MetaDataTest)
     btk::MetaDataCreateChild(point, "LABELS", std::vector<int16_t>(125, 54));
     std::vector<int16_t> values;
     btk::MetaDataCollapseChildrenValues<int16_t>(values, point, "LABELS", 150);
-    TS_ASSERT_EQUALS(values.size(), 150);
+    TS_ASSERT_EQUALS((int)values.size(), 150);
     for (int i = 125 ; i < 150 ; ++i)
       TS_ASSERT_EQUALS(values.at(i), 0);
   };

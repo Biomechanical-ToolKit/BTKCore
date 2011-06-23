@@ -10,7 +10,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Byte);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int8_t*>(test->GetValues()[0]), 5);
   };
   
@@ -18,7 +18,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int16_t)5);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValues()[0]), 5);
   };
   
@@ -26,7 +26,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((float)5.0);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_DELTA(*static_cast<float*>(test->GetValues()[0]), 5.0, 0.00001);
   };
   
@@ -34,7 +34,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New("test");
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(test->GetDimensions()[0], 4);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "test");
   };
@@ -45,7 +45,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<int8_t> val = std::vector<int8_t>(4, 55);
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Byte);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
     for (int i = 0 ; i < 4 ; ++i)
       TS_ASSERT_EQUALS(*static_cast<int8_t*>(test->GetValues()[i]), 55);
   };
@@ -56,7 +56,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<int16_t> val = std::vector<int16_t>(4, 655);
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
     for (int i = 0 ; i < 4 ; ++i)
       TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValues()[i]), 655);
     TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValues()[4]), 0);
@@ -69,7 +69,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<float> val = std::vector<float>(4, (float)273.45);
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
     for (int i = 0 ; i < 4 ; ++i)
       TS_ASSERT_DELTA(*static_cast<float*>(test->GetValues()[i]), 273.45, 0.0001);
     TS_ASSERT_DELTA(*static_cast<float*>(test->GetValues()[4]), 0.0, 0.00001);
@@ -82,7 +82,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<std::string> val = std::vector<std::string>(4, "test");
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 4);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 4);
     for (int i = 0 ; i < 4 ; ++i)
       TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[i]), "test");
   };
@@ -93,8 +93,8 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<std::string> val = std::vector<std::string>(0);
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), " ");
 
   };
@@ -105,8 +105,8 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<std::string> val = std::vector<std::string>(4, "test");
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "t");
   };
   
@@ -116,7 +116,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<std::string> val = std::vector<std::string>(4, "test");
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "test ");
   };
   
@@ -126,8 +126,8 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<std::string> val = std::vector<std::string>(0);
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 5);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[i]), "     ");
   };
@@ -138,8 +138,8 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<std::string> val = std::vector<std::string>(4, "test");
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 2);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "te");
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[1]), "te");
   };
@@ -150,8 +150,8 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<std::string> val = std::vector<std::string>(4, "test");
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 5);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 5);
     for (int i = 0 ; i < 4 ; ++i)
     {
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[i]), "test ");
@@ -166,8 +166,8 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<std::string> val = std::vector<std::string>(0);
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 0);
   };
   
   CXXTEST_TEST(SetValueCharInChar)
@@ -175,7 +175,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New("FOO");
     test->SetValue(0, "FOOBAR");
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "FOOBAR");
   };
   
@@ -184,7 +184,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     test->SetValue(0, "FOOBAR");
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Byte);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int8_t*>(test->GetValues()[0]), 0);
   };
   
@@ -193,7 +193,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int16_t)5);
     test->SetValue(0, "FOOBAR");
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValues()[0]), 0);
   };
   
@@ -202,7 +202,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((float)5.1234);
     test->SetValue(0, "FOOBAR");
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<float*>(test->GetValues()[0]), 0.0);
   };
   
@@ -211,7 +211,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New("FOO");
     test->SetValue(0, "12345");
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "12345");
   };
   
@@ -220,7 +220,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     test->SetValue(0, "45");
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Byte);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int8_t*>(test->GetValues()[0]), 45);
   };
   
@@ -229,7 +229,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int16_t)5);
     test->SetValue(0, "12345");
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValues()[0]), 12345);
   };
   
@@ -238,7 +238,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((float)5.1234);
     test->SetValue(0, "1.2345");
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_DELTA(*static_cast<float*>(test->GetValues()[0]), 1.2345, 1e-5);
   };
   
@@ -247,7 +247,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New("FOO");
     test->SetValue(0, (int8_t)15);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "15");
   };
   
@@ -256,7 +256,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New("FOO");
     test->SetValue(0, (int8_t)128);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "-128");
   };
   
@@ -265,7 +265,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     test->SetValue(0, (int8_t)15);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Byte);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int8_t*>(test->GetValues()[0]), 15);
   };
   
@@ -274,7 +274,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int16_t)5);
     test->SetValue(0, (int8_t)15);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValues()[0]), 15);
   };
   
@@ -283,7 +283,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((float)5.1234);
     test->SetValue(0, (int8_t)15);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<float*>(test->GetValues()[0]), 15.0);
   };
   
@@ -292,7 +292,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New("FOO");
     test->SetValue(0, (int16_t)1024);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "1024");
   };
   
@@ -301,7 +301,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     test->SetValue(0, (int16_t)12456);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Byte);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int8_t*>(test->GetValues()[0]), (int8_t)168);
   };
   
@@ -310,7 +310,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int16_t)2048);
     test->SetValue(0, (int16_t)12456);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValues()[0]), 12456);
   };
   
@@ -319,7 +319,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((float)2.456);
     test->SetValue(0, (int16_t)4000);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<float*>(test->GetValues()[0]), 4000.0);
   };
   
@@ -328,7 +328,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New("FOO");
     test->SetValue(0, (float)1.2345);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "1.2345");
   };
   
@@ -337,7 +337,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     test->SetValue(0, (float)1.2345);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Byte);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int8_t*>(test->GetValues()[0]), (int8_t)1);
   };
   
@@ -346,7 +346,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int16_t)2048);
     test->SetValue(0, (float)1.2345);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValues()[0]), 1);
   };
   
@@ -355,7 +355,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((float)2.456);
     test->SetValue(0, (float)3.14);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_DELTA(*static_cast<float*>(test->GetValues()[0]), 3.14, 1e-5);
   };
   
@@ -364,7 +364,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New("FOO");
     test->SetValue(0, 1234567);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "1234567");
   };
   
@@ -373,7 +373,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     test->SetValue(0, 1234567);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Byte);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int8_t*>(test->GetValues()[0]), (int8_t)135);
   };
   
@@ -382,7 +382,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int16_t)2048);
     test->SetValue(0, 1234567);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValues()[0]), -10617);
   };
   
@@ -391,7 +391,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((float)2.456);
     test->SetValue(0, 1234567);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_DELTA(*static_cast<float*>(test->GetValues()[0]), 1234567.0, 1e-5);
   };
   
@@ -400,7 +400,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New("FOO");
     test->SetValue(0, 1.23456789);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValues()[0]), "1.23456789");
   };
   
@@ -409,7 +409,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     test->SetValue(0, 1.23456789);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Byte);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int8_t*>(test->GetValues()[0]), (int8_t)1);
   };
   
@@ -418,7 +418,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int16_t)2048);
     test->SetValue(0, 1.23456789);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValues()[0]), 1);
   };
   
@@ -427,7 +427,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((float)2.456);
     test->SetValue(0, 1.23456789);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
     TS_ASSERT_DELTA(*static_cast<float*>(test->GetValues()[0]), (float)1.23456, 1e-5);
   };
 
@@ -441,10 +441,10 @@ CXXTEST_SUITE(MetaDataInfoTest)
     val.push_back("DATE");
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(val);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
     TS_ASSERT_EQUALS(test->GetDimension(0), 16);
     TS_ASSERT_EQUALS(test->GetDimension(1), 5);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 5);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 5);
     TS_ASSERT_EQUALS(*static_cast<const std::string*>(test->GetValue(0)), "NAME            ");
     TS_ASSERT_EQUALS(*static_cast<const std::string*>(test->GetValue(1)), "CALIBRATION     ");
     TS_ASSERT_EQUALS(*static_cast<const std::string*>(test->GetValue(2)), "FULL_DESCRIPTION");
@@ -463,10 +463,10 @@ CXXTEST_SUITE(MetaDataInfoTest)
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(val);
     test->SetValue(2,"SHORTER");
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
     TS_ASSERT_EQUALS(test->GetDimension(0), 16);
     TS_ASSERT_EQUALS(test->GetDimension(1), 5);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 5);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 5);
     TS_ASSERT_EQUALS(*static_cast<const std::string*>(test->GetValue(0)), "NAME            ");
     TS_ASSERT_EQUALS(*static_cast<const std::string*>(test->GetValue(1)), "CALIBRATION     ");
     TS_ASSERT_EQUALS(*static_cast<const std::string*>(test->GetValue(2)), "SHORTER         ");
@@ -475,7 +475,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
     test->SetValue(2,"BIGGERANDBIGGERANDBIGGER");
     TS_ASSERT_EQUALS(test->GetDimension(0), 24);
     TS_ASSERT_EQUALS(test->GetDimension(1), 5);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 5);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 5);
     TS_ASSERT_EQUALS(*static_cast<const std::string*>(test->GetValue(0)), "NAME                    ");
     TS_ASSERT_EQUALS(*static_cast<const std::string*>(test->GetValue(1)), "CALIBRATION             ");
     TS_ASSERT_EQUALS(*static_cast<const std::string*>(test->GetValue(2)), "BIGGERANDBIGGERANDBIGGER");
@@ -491,8 +491,8 @@ CXXTEST_SUITE(MetaDataInfoTest)
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
     test->SetFormat(btk::MetaDataInfo::Integer);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 5);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValue(i)), 0);
   };
@@ -505,8 +505,8 @@ CXXTEST_SUITE(MetaDataInfoTest)
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
     test->SetFormat(btk::MetaDataInfo::Integer);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Integer);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 25);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 25);
     for (int i = 0 ; i < 25 ; ++i)
     {
       TS_ASSERT_EQUALS(*static_cast<int16_t*>(test->GetValue(i)), 1);
@@ -521,9 +521,9 @@ CXXTEST_SUITE(MetaDataInfoTest)
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
     test->SetFormat(btk::MetaDataInfo::Char);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(test->GetDimensions().at(0), 4);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValue(0)), "1.95");
   };
 
@@ -535,11 +535,11 @@ CXXTEST_SUITE(MetaDataInfoTest)
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Real);
     test->SetFormat(btk::MetaDataInfo::Char);
     TS_ASSERT_EQUALS(test->GetFormat(), btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 3);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 3);
     TS_ASSERT_EQUALS(test->GetDimensions().at(0), 4);
     TS_ASSERT_EQUALS(test->GetDimensions().at(1), 5);
     TS_ASSERT_EQUALS(test->GetDimensions().at(2), 5);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 25);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 25);
     for (int i = 0 ; i < 25 ; ++i)
       TS_ASSERT_EQUALS(test->ToString(i), "1.95");
       //TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValue(i)), "1.95");
@@ -551,12 +551,12 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<float> val = std::vector<float>(25, (float)1.950);
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     test->SetDimension(0, 6);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 30);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 30);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(*static_cast<float*>(test->GetValue(i*6+5)), 0.0);
     test->SetDimension(1, 6);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 36);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 36);
     for (int i = 30 ; i < 35 ; ++i)
       TS_ASSERT_EQUALS(*static_cast<float*>(test->GetValue(i)), 0.0);
   };
@@ -567,8 +567,8 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<std::string> val = std::vector<std::string>(5, "test ");
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     test->SetDimension(0, 2);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 5);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValue(i)), "te");
   };
@@ -577,8 +577,8 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)0);
     test->ResizeDimensions(1);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 1);
   };
   
   CXXTEST_TEST(ResizeDimensionsFrom3To1Float)
@@ -587,16 +587,16 @@ CXXTEST_SUITE(MetaDataInfoTest)
     std::vector<float> val = std::vector<float>(27, (float)1.950);
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(dim, val);
     test->ResizeDimensions(1);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 3);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 3);
   };
   
   CXXTEST_TEST(ResizeDimensionsFrom1To0Char)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New("test");
     test->ResizeDimensions(0);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 0);
-    TS_ASSERT_EQUALS(test->GetValues().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 0);
+    TS_ASSERT_EQUALS((int)test->GetValues().size(), 1);
     TS_ASSERT_EQUALS(*static_cast<std::string*>(test->GetValue(0)), "t");
 
   };
@@ -634,7 +634,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<std::string>(5, "test"));
     std::vector<std::string> val = test->ToString();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), "test");
   };
@@ -643,7 +643,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     std::vector<std::string> val = test->ToString();
-    TS_ASSERT_EQUALS(val.size(), 1);
+    TS_ASSERT_EQUALS((int)val.size(), 1);
     TS_ASSERT_EQUALS(val.at(0), "5");
   };
 
@@ -651,7 +651,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<int16_t>(5, 379));
     std::vector<std::string> val = test->ToString();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), "379");
   };
@@ -660,7 +660,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<float>(5, 0.83333f));
     std::vector<std::string> val = test->ToString();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), "0.83333");
   };
@@ -669,7 +669,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<std::string>(5, "test"));
     std::vector<int8_t> val = test->ToInt8();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), 0);
   };
@@ -678,7 +678,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     std::vector<int8_t> val = test->ToInt8();
-    TS_ASSERT_EQUALS(val.size(), 1);
+    TS_ASSERT_EQUALS((int)val.size(), 1);
     TS_ASSERT_EQUALS(val.at(0), 5);
   };
 
@@ -686,7 +686,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<int16_t>(5, 379));
     std::vector<int8_t> val = test->ToInt8();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), 123);
   };
@@ -695,7 +695,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<float>(5, 0.1f));
     std::vector<int8_t> val = test->ToInt8();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), 0);
   };
@@ -704,7 +704,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<std::string>(5, "test"));
     std::vector<int16_t> val = test->ToInt16();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), 0);
   };
@@ -713,7 +713,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     std::vector<int16_t> val = test->ToInt16();
-    TS_ASSERT_EQUALS(val.size(), 1);
+    TS_ASSERT_EQUALS((int)val.size(), 1);
     TS_ASSERT_EQUALS(val.at(0), 5);
   };
 
@@ -721,7 +721,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<int16_t>(5, 379));
     std::vector<int16_t> val = test->ToInt16();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), 379);
   };
@@ -730,7 +730,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<float>(5, 0.1f));
     std::vector<int16_t> val = test->ToInt16();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), 0);
   };
@@ -739,7 +739,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<std::string>(5, "test"));
     std::vector<float> val = test->ToFloat();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_DELTA(val.at(i), 0, 0.0001);
   };
@@ -748,7 +748,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New((int8_t)5);
     std::vector<float> val = test->ToFloat();
-    TS_ASSERT_EQUALS(val.size(), 1);
+    TS_ASSERT_EQUALS((int)val.size(), 1);
     TS_ASSERT_DELTA(val.at(0), 5, 0.0001);
   };
 
@@ -756,7 +756,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<int16_t>(5, 379));
     std::vector<float> val = test->ToFloat();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_DELTA(val.at(i), 379, 0.0001);
   };
@@ -765,7 +765,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<float>(5, 0.1f));
     std::vector<float> val = test->ToFloat();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_DELTA(val.at(i), 0.1, 0.0001);
   };
@@ -774,7 +774,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<float>(5, 0.1f));
     std::vector<double> val = test->ToDouble();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_DELTA(val.at(i), 0.1, 0.0001);
   };
@@ -783,7 +783,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<int8_t>(5, 45));
     std::vector<int> val = test->ToInt();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), 45);
   };
@@ -792,7 +792,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<int16_t>(5, 369));
     std::vector<double> val = test->ToDouble();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), 369);
   };
@@ -801,7 +801,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<std::string>(5, "12345"));
     std::vector<std::string> val = test->ToString();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), "12345");
   };
@@ -810,7 +810,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<std::string>(5, "45"));
     std::vector<int8_t> val = test->ToInt8();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), (int8_t)45);
   };
@@ -819,7 +819,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<std::string>(5, "12345"));
     std::vector<int16_t> val = test->ToInt16();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), 12345);
   };
@@ -828,7 +828,7 @@ CXXTEST_SUITE(MetaDataInfoTest)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<std::string>(5, "1.2345"));
     std::vector<float> val = test->ToFloat();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_DELTA(val.at(i), 1.2345, 0.0001);
   };
@@ -836,22 +836,22 @@ CXXTEST_SUITE(MetaDataInfoTest)
   CXXTEST_TEST(Real2String2Real_Number)
   {
     btk::MetaDataInfo::Pointer test = btk::MetaDataInfo::New(std::vector<float>(5, (float)1.2345));
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(test->GetDimensions().at(0), 5);
     test->SetFormat(btk::MetaDataInfo::Char);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 2);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 2);
     TS_ASSERT_EQUALS(test->GetDimensions().at(0), 6);
     TS_ASSERT_EQUALS(test->GetDimensions().at(1), 5);
     std::vector<std::string> val = test->ToString();
-    TS_ASSERT_EQUALS(val.size(), 5);
+    TS_ASSERT_EQUALS((int)val.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_EQUALS(val.at(i), "1.2345");
     
     test->SetFormat(btk::MetaDataInfo::Real);
-    TS_ASSERT_EQUALS(test->GetDimensions().size(), 1);
+    TS_ASSERT_EQUALS((int)test->GetDimensions().size(), 1);
     TS_ASSERT_EQUALS(test->GetDimensions().at(0), 5);
     std::vector<float> val2 = test->ToFloat();
-    TS_ASSERT_EQUALS(val2.size(), 5);
+    TS_ASSERT_EQUALS((int)val2.size(), 5);
     for (int i = 0 ; i < 5 ; ++i)
       TS_ASSERT_DELTA(val2.at(i), 1.2345, 0.0001);
   };

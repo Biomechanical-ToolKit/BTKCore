@@ -28,7 +28,7 @@ CXXTEST_SUITE(CALForcePlateFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CONFIG")->GetChild("USED")->GetInfo()->ToInt(0), 2);
     
     std::vector<int> type = acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CONFIG")->GetChild("TYPE")->GetInfo()->ToInt();
-    TS_ASSERT_EQUALS(type.size(), 2);
+    TS_ASSERT_EQUALS((int)type.size(), 2);
     TS_ASSERT_EQUALS(type[0], 4);
     TS_ASSERT_EQUALS(type[1], 4);
     
