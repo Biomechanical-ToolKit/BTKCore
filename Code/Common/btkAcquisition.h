@@ -153,7 +153,7 @@ namespace btk
     BTK_COMMON_EXPORT void ResizeFrameNumber(int frameNumber);
     BTK_COMMON_EXPORT void ResizeFrameNumberFromEnd(int frameNumber);
     BTK_COMMON_EXPORT void Reset();
-    double GetDuration() {return ((this->m_PointFrequency == 0) ? 0 : 1 / this->m_PointFrequency * this->m_PointFrameNumber);};
+    double GetDuration() const {return ((this->m_PointFrequency == 0) ? 0 : 1 / this->m_PointFrequency * this->m_PointFrameNumber);};
     int GetFirstFrame() const {return this->m_FirstFrame;};
     BTK_COMMON_EXPORT void SetFirstFrame(int num);
     int GetLastFrame() const {return (this->m_FirstFrame + this->GetPointFrameNumber() - 1);};
@@ -166,7 +166,7 @@ namespace btk
     BTK_COMMON_EXPORT void SetPointFrequency(double frequency);
     int GetAnalogFrameNumber() const {return this->m_PointFrameNumber * this->m_AnalogSampleNumberPerPointFrame;};    
     int GetNumberAnalogSamplePerFrame() const {return this->m_AnalogSampleNumberPerPointFrame;};
-    double GetAnalogFrequency() {return this->m_PointFrequency * static_cast<double>(this->m_AnalogSampleNumberPerPointFrame);};
+    double GetAnalogFrequency() const {return this->m_PointFrequency * static_cast<double>(this->m_AnalogSampleNumberPerPointFrame);};
     AnalogResolution GetAnalogResolution() const {return this->m_AnalogResolution;};
     BTK_COMMON_EXPORT void SetAnalogResolution(AnalogResolution r);
     int GetMaxInterpolationGap() const {return this->m_MaxInterpolationGap;};

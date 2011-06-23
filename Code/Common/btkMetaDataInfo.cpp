@@ -95,7 +95,7 @@ namespace btk
    */
 
   /**
-   * @fn MetaDataInfo::Pointer MetaDataInfo::New(std::string val)
+   * @fn MetaDataInfo::Pointer MetaDataInfo::New(const std::string& val)
    * Creates a smart pointer from the MetaDataInfo(std::string) constructor.
    */
 
@@ -849,7 +849,7 @@ namespace btk
    * Constructor which store @a val in a Char format with a dimension equal to 1.
    * The dimension's value is equal to the size of @a val.
    */
-  MetaDataInfo::MetaDataInfo(std::string val)
+  MetaDataInfo::MetaDataInfo(const std::string& val)
   : m_Dims(std::vector<uint8_t>(1,static_cast<uint8_t>(val.length())))
   {
     this->m_Format = Char;
