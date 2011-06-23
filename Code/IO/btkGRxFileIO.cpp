@@ -150,7 +150,7 @@ namespace btk
       std::vector<float> cornersData = bifs.ReadFloat(3*4);
       
       output->Init(0, numFra, 6, 1);
-      output->SetFirstFrame(static_cast<int>(ff / 1000.0 * freq + 1.0));
+      output->SetFirstFrame(static_cast<int>(ceil(ff / 1000.0 * freq + 1.0)));
       output->SetPointFrequency(freq);
       // Metadata FORCE_PLATFORM
       MetaData::Pointer fp = MetaDataCreateChild(output->GetMetaData(), "FORCE_PLATFORM");
