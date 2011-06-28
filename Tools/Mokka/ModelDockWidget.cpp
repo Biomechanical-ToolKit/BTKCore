@@ -137,7 +137,7 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->mp_NewSegment->setEnabled(false);
   this->mp_HideSelectedSegments = new QAction(tr("Hide selected segments"), this);
   this->mp_HideSelectedSegments->setEnabled(false);
-  this->mp_UnhideSelectedSegments = new QAction(tr("Unhide selected markers"), this);
+  this->mp_UnhideSelectedSegments = new QAction(tr("Unhide selected segments"), this);
   this->mp_UnhideSelectedSegments->setEnabled(false);
   this->mp_SelectAllMarkers = new QAction(tr("Select all markers"), this);
   this->mp_SelectAllMarkers->setEnabled(false);
