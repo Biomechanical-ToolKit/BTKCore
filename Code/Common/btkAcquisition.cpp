@@ -1009,7 +1009,7 @@ namespace btk
   };
 
   /**
-   * @fn double Acquisition::GetDuration()
+   * @fn double Acquisition::GetDuration() const
    * Returns the duration of the thisuistion. The duration is computed as the 
    * multiplication of the points' frequency with the points frame number.
    */
@@ -1116,7 +1116,7 @@ namespace btk
    */
 
   /**
-   * @fn double Acquisition::GetAnalogFrequency()
+   * @fn double Acquisition::GetAnalogFrequency() const
    * Returns the points sample rate.
    */
 

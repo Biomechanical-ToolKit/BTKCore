@@ -47,5 +47,5 @@ About::About(QWidget* parent)
   this->rights->setAttribute(Qt::WA_MacSmallSize);
 #endif
   
-  this->release->setText("Mokka version " + QString(xstr(MOKKA_VERSION_STRING)));
+  this->release->setText("Mokka version " + QString(btkStringifyMacro(MOKKA_VERSION_STRING)));
 };

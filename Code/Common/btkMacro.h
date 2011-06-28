@@ -52,8 +52,8 @@
     (strrchr(f, '/') ? strrchr(f, '/') + 1 : f)
 #endif
 
-#define STR(x) #x
-#define XSTR(x) STR(x)
+#define _btkStringifyMacro(x) #x
+#define btkStringifyMacro(x) _btkStringifyMacro(x)
 
 /**
  * Macro to use when an input is not used in the function.
@@ -66,13 +66,13 @@
  * <source> (<line>): <message>
  */
 #define btkErrorMacro(m) \
-  std::cerr << btkStripPathMacro(__FILE__) << "(" << XSTR(__LINE__) << "): " << m << std::endl;
+  std::cerr << btkStripPathMacro(__FILE__) << "(" << btkStringifyMacro(__LINE__) << "): " << m << std::endl;
 
 /**
  * This macro is used to print error message with the following format:
  * <source> (<line>): '<file>' <message>
  */
 #define btkIOErrorMacro(f, m) \
-  std::cerr << btkStripPathMacro(__FILE__) << "(" << XSTR(__LINE__) << "): '" << btkStripPathMacro(f.c_str()) << "' - " << m << std::endl;
+  std::cerr << btkStripPathMacro(__FILE__) << "(" << btkStringifyMacro(__LINE__) << "): '" << btkStripPathMacro(f.c_str()) << "' - " << m << std::endl;
 
 #endif // __btkMacro_h

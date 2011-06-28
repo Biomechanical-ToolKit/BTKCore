@@ -117,7 +117,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 int main(int argc, char *argv[])
 {
 #endif
-  pcl::CmdLineParser clp("Motion Kinematic & Kinetic Analyzer", xstr(MOKKA_VERSION_STRING));
+  pcl::CmdLineParser clp("Motion Kinematic & Kinetic Analyzer", btkStringifyMacro(MOKKA_VERSION_STRING));
   clp.UseDefaultOption(pcl::Help | pcl::Version);
   pcl::FlagOpt play("play","p","Start to play the acquisition", false);
   pcl::ValueOpt<std::string> visualConfig("visual-config","c","Set the default visual configuration", "file", false);

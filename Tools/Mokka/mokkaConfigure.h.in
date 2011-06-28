@@ -41,7 +41,4 @@
 #define MOKKA_VERSION_PATCH @MOKKA_VERSION_PATCH@
 #define MOKKA_VERSION_STRING @MOKKA_VERSION_STRING@
 
-#define xstr(s) _str(s)
-#define _str(s) #s
-
 #endif // mokkaConfigure_h
