@@ -36,6 +36,8 @@
 #ifndef mokkaConfigure_h
 #define mokkaConfigure_h
 
+#include "btkMacro.h"
+
 #define MOKKA_VERSION_MAJOR @MOKKA_VERSION_MAJOR@
 #define MOKKA_VERSION_MINOR @MOKKA_VERSION_MINOR@
 #define MOKKA_VERSION_PATCH @MOKKA_VERSION_PATCH@
