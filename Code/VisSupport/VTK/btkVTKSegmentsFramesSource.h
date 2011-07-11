@@ -44,6 +44,8 @@
 #include <vtkIdTypeArray.h>
 #include <vtkLookupTable.h>
 
+#include <vector>
+
 namespace btk
 {
   class VTKSegmentsFramesSource : public vtkPolyDataAlgorithm
