@@ -409,8 +409,8 @@ namespace btk
     int linkNumber = 0;
     for (std::list<SegmentDefinition>::const_iterator itS = this->m_Definitions.begin() ; itS != this->m_Definitions.end() ; ++itS)
     {
-      markerNumber += itS->markerIds.size();
-      linkNumber += itS->links.size();
+      markerNumber += static_cast<int>(itS->markerIds.size());
+      linkNumber += static_cast<int>(itS->links.size());
     }
     
     vtkIntArray* colors = vtkIntArray::New(); colors->SetName("Colors"); colors->SetNumberOfValues(linkNumber);
