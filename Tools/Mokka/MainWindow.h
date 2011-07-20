@@ -64,8 +64,8 @@ public:
   void openFile(const QString& filename);
 
 protected:
-    void closeEvent(QCloseEvent* event);
-    bool eventFilter(QObject* obj, QEvent* event);
+  void closeEvent(QCloseEvent* event);
+  bool eventFilter(QObject* obj, QEvent* event);
 
 public Q_SLOTS:
   // Qt
@@ -150,6 +150,7 @@ public Q_SLOTS:
   void togglePickedMarker(int id);
   void selectSelectedMarkers(const QList<int>& ids);
   void toggleMarkerTrajectory(int id);
+  void toggleEditActions(QWidget* old, QWidget* now);
   
 private:
   void loadAcquisition(const QString& errMsg, ProgressWidget* pw);
@@ -174,6 +175,7 @@ private:
   UpdateChecker* mp_UpdateChecker;
   Preferences* mp_Preferences;
   
+  QMenuBar* mp_MenuBar;
   QString m_LastDirectory;
   enum { maxRecentFiles = 10 };
   QStringList m_RecentFiles;

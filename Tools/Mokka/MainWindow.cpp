@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget* parent)
 :QMainWindow(parent), m_LastDirectory(".")
 {
   // Members
+  this->mp_MenuBar = 0;
   this->mp_Acquisition = new Acquisition(this);
   this->mp_Model = new Model(this);
   this->mp_MetadataDlg = new Metadata(this);
@@ -96,7 +97,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuView->addAction(this->actionViewMetadata);
   this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
 #ifdef Q_OS_MAC
-  this->mp_Preferences->setMenuBar(this->menuBar()); // After setupUi
   QFont f = this->font();
   f.setPointSize(10);
   this->mp_FileInfoDock->setFont(f);
@@ -113,10 +113,10 @@ MainWindow::MainWindow(QWidget* parent)
   this->actionHelp->setShortcut(QKeySequence::HelpContents);
   for (int i = 0 ; i < maxRecentFiles ; ++i)
   {
-      this->mp_ActionRecentFiles[i] = new QAction(this);
-      this->mp_ActionRecentFiles[i]->setVisible(false);
-      connect(this->mp_ActionRecentFiles[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
-      this->menuOpen_Recent->addAction(this->mp_ActionRecentFiles[i]);
+    this->mp_ActionRecentFiles[i] = new QAction(this);
+    this->mp_ActionRecentFiles[i]->setVisible(false);
+    connect(this->mp_ActionRecentFiles[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
+    this->menuOpen_Recent->addAction(this->mp_ActionRecentFiles[i]);
   }
   this->mp_ActionSeparatorRecentFiles = this->menuOpen_Recent->addSeparator();
   this->menuOpen_Recent->addAction(this->actionClear_Menu);
@@ -141,6 +141,10 @@ MainWindow::MainWindow(QWidget* parent)
   this->multiView->setViewActions(actions);
   //this->mp_ImportAssistant->resize(this->mp_ImportAssistant->width(), this->mp_ImportAssistant->height());
   this->mp_ImportAssistant->layout()->setSizeConstraint(QLayout::SetFixedSize);
+  // To share the menu between windows (main window, preferences, options, ...)
+  this->mp_MenuBar = this->menuBar();
+  this->mp_MenuBar->setParent(0);
+  this->setMenuBar(0);
   
   // Setting the acquisition
   this->multiView->setAcquisition(this->mp_Acquisition);
@@ -301,6 +305,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 MainWindow::~MainWindow()
 {
+  delete this->mp_MenuBar;
   delete this->mp_Acquisition;
 #ifdef Q_OS_MAC
   delete this->mp_Preferences;
@@ -948,6 +953,21 @@ void MainWindow::toggleMarkerTrajectory(int id)
   else
     ids.removeAt(idx);
   this->mp_ModelDock->setTrackedMarkers(ids);
+};
+
+void MainWindow::toggleEditActions(QWidget* old, QWidget* now)
+{
+  Q_UNUSED(old);
+  bool e = false;
+  if ((now != NULL)
+       && (now->inherits("QLineEdit")
+        || now->inherits("QAbstractSpinBox")
+        || now->inherits("QTextEdit")))
+    e = true;
+  this->actionCut->setEnabled(e);
+  this->actionCopy->setEnabled(e);
+  this->actionPaste->setEnabled(e);
+  this->actionSelect_All->setEnabled(e);
 };
 
 void MainWindow::modelDockLocationChanged(Qt::DockWidgetArea area)

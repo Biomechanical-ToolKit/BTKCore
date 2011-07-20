@@ -131,9 +131,10 @@ int main(int argc, char *argv[])
 #endif
     return clp.GetStatus();
   }
-    
+  
   QApplication app(argc, argv);
   MainWindow mw;
+  QObject::connect(&app, SIGNAL(focusChanged(QWidget*, QWidget*)), &mw, SLOT(toggleEditActions(QWidget*, QWidget*)));
   mw.show();
   
   if (acquisition.IsAssigned())
