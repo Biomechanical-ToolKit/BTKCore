@@ -59,6 +59,7 @@ Viz3DWidget::Viz3DWidget(QWidget* parent)
   this->mp_Renderer = vtkRenderer::New();
   this->mp_AxesWidget = btk::VTKAxesWidget::New();
   this->mp_EventQtSlotConnections = vtkEventQtSlotConnect::New();
+  this->m_CameraConfigurationSaved = false;
 }
 
 Viz3DWidget::~Viz3DWidget()
@@ -75,7 +76,9 @@ void Viz3DWidget::initialize()
   vtkRenderWindow* renwin = vtkRenderWindow::New();
   renwin->AddRenderer(this->mp_Renderer);
   renwin->LineSmoothingOn();
+#if 0
   renwin->DoubleBufferOff(); // Required for Windows 7 (32-bit and 64-bit) when selecting markers with the rubber (no playback mode).
+#endif
   //renwin->PolygonSmoothingOn();
   this->SetRenderWindow(renwin);
   renwin->Delete();
@@ -138,25 +141,31 @@ void Viz3DWidget::initialize()
       this, 
       SLOT(toggleTrajectoryMarker(vtkObject*, unsigned long, void*, void*)));
       
-  this->saveProjectionCameraConfiguration();
+  // this->saveProjectionCameraConfiguration();
 };
 
 void Viz3DWidget::restoreProjectionCameraConfiguration()
 {
+  if (!this->m_CameraConfigurationSaved) // No configuration saved
+    return;
   vtkCamera* cam = this->mp_Renderer->GetActiveCamera();
   cam->SetPosition(this->mp_CamPosition);
   cam->SetViewUp(this->mp_CamViewUp);
   cam->SetFocalPoint(this->mp_CamFocalPoint);
   this->mp_Renderer->ResetCamera();
   cam->Zoom(1.6);
+  this->m_CameraConfigurationSaved = false;
 };
 
 void Viz3DWidget::saveProjectionCameraConfiguration()
 {
+  if (this->m_CameraConfigurationSaved) // Configuration already saved
+    return;
   vtkCamera* cam = this->mp_Renderer->GetActiveCamera();
   cam->GetPosition(this->mp_CamPosition);
   cam->GetViewUp(this->mp_CamViewUp);
   cam->GetFocalPoint(this->mp_CamFocalPoint);
+  this->m_CameraConfigurationSaved = true;
 };
 
 void Viz3DWidget::copyProjectionCameraConfiguration(Viz3DWidget* source)
@@ -308,6 +317,11 @@ void Viz3DWidget::toggleTrajectoryMarker(vtkObject* /* caller */, unsigned long 
 {
   int id = *static_cast<int*>(call_data);
   emit trajectoryMarkerToggled(id);
+};
+
+void Viz3DWidget::render()
+{
+  this->GetRenderWindow()->Render();
 };
 
 void Viz3DWidget::show(bool s)

@@ -73,6 +73,7 @@ public slots:
   void toggleSelectedMarkers(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   void toggleTrajectoryMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   // Qt
+  void render();
   void show(bool s);
   
 signals:
@@ -92,6 +93,7 @@ private:
   btk::VTKAxesWidget* mp_AxesWidget;
   vtkEventQtSlotConnect* mp_EventQtSlotConnections;
   
+  bool m_CameraConfigurationSaved;
   double mp_CamFocalPoint[3];
   double mp_CamPosition[3];
   double mp_CamViewUp[3];
