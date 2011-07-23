@@ -143,9 +143,12 @@ QPushButton::menu-indicator {
          </layout>
         </item>
         <item>
-         <widget class="QTreeWidget" name="modelTree">
+         <widget class="ModelTreeWidget" name="modelTree">
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::InternalMove</enum>
           </property>
           <property name="selectionMode">
            <enum>QAbstractItemView::ExtendedSelection</enum>
@@ -958,6 +961,13 @@ QPushButton::menu-indicator {
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ModelTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>ModelTreeWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="images.qrc"/>
  </resources>
