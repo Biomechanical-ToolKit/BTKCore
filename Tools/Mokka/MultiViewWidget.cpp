@@ -137,7 +137,7 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   connect(groundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
   connect(trajectoryLengthActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeMarkerTrajectoryLength()));
   
-  this->setViewPrototype(new CompositeView);
+  this->setViewPrototype(new CompositeView(this));
 };
 
 MultiViewWidget::~MultiViewWidget()
