@@ -115,6 +115,7 @@ public:
   void regionOfInterest(int& lb, int& rb) const {lb = this->mp_ROI[0]; rb = this->mp_ROI[1];};
   void setRegionOfInterest(int lb, int rb);
   
+  int pointFrameNumber() const {return this->mp_BTKAcquisition->GetPointFrameNumber();}
   double pointFrequency() const {return this->mp_BTKAcquisition->GetPointFrequency();};
   QString pointUnit(Point::Type t) const;
   bool hasPoints() const {return !this->m_Points.empty();};
@@ -140,6 +141,8 @@ public:
   void setDefaultMarkerColor(const QColor& color) {this->m_DefaultMarkerColor = color;};
   void setDefaultMarkerRadius(double r) {this->m_DefaultMarkerRadius = r;};
   
+  int analogFrameNumber() const {return this->mp_BTKAcquisition->GetAnalogFrameNumber();}
+  int analogSamplePerPointFrame() const {return this->mp_BTKAcquisition->GetNumberAnalogSamplePerFrame();};
   double analogFrequency() const {return this->mp_BTKAcquisition->GetAnalogFrequency();};
   bool hasAnalogs() const {return !this->m_Analogs.empty();};
   int analogCount() const {return this->m_Analogs.count();};
