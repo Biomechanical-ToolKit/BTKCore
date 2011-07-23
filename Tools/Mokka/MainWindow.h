@@ -174,8 +174,9 @@ private:
   ImportAssistantDialog* mp_ImportAssistant;
   UpdateChecker* mp_UpdateChecker;
   Preferences* mp_Preferences;
-  
-  QMenuBar* mp_MenuBar;
+#ifdef Q_OS_MAC
+  QMenuBar* mp_MacMenuBar;
+#endif
   QString m_LastDirectory;
   enum { maxRecentFiles = 10 };
   QStringList m_RecentFiles;

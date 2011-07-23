@@ -61,7 +61,6 @@ MainWindow::MainWindow(QWidget* parent)
 :QMainWindow(parent), m_LastDirectory(".")
 {
   // Members
-  this->mp_MenuBar = 0;
   this->mp_Acquisition = new Acquisition(this);
   this->mp_Model = new Model(this);
   this->mp_MetadataDlg = new Metadata(this);
@@ -71,6 +70,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_UpdateChecker = new UpdateChecker(btkStringifyMacro(MOKKA_VERSION_STRING), "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
                                              ":/Resources/Images/Mokka_128.png", this);
 #ifdef Q_OS_MAC
+  this->mp_MacMenuBar = 0;
   this->mp_Preferences = new Preferences(0); // No parent: to be independant of the main window
 #else
   this->mp_Preferences = new Preferences(this);
@@ -100,6 +100,10 @@ MainWindow::MainWindow(QWidget* parent)
   QFont f = this->font();
   f.setPointSize(10);
   this->mp_FileInfoDock->setFont(f);
+  // To share the menu between windows (main window, preferences, options, ...)
+  this->mp_MacMenuBar = this->menuBar();
+  this->mp_MacMenuBar->setParent(0);
+  this->setMenuBar(0);
 #endif
   this->mp_FileInfoDock->reset(); // Force to update geometry
   this->action_FileOpen->setShortcut(QKeySequence::Open);
@@ -141,10 +145,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->multiView->setViewActions(actions);
   //this->mp_ImportAssistant->resize(this->mp_ImportAssistant->width(), this->mp_ImportAssistant->height());
   this->mp_ImportAssistant->layout()->setSizeConstraint(QLayout::SetFixedSize);
-  // To share the menu between windows (main window, preferences, options, ...)
-  this->mp_MenuBar = this->menuBar();
-  this->mp_MenuBar->setParent(0);
-  this->setMenuBar(0);
   
   // Setting the acquisition
   this->multiView->setAcquisition(this->mp_Acquisition);
@@ -255,7 +255,7 @@ MainWindow::MainWindow(QWidget* parent)
 #endif
 
   // Event filter
-  this->multiView->installEventFilter(this);
+  // this->multiView->installEventFilter(this);
   this->mp_ModelDock->installEventFilter(this);
   this->timeEventControler->installEventFilter(this);
   this->mp_ModelDock->modelTree->installEventFilter(this);
@@ -305,9 +305,9 @@ MainWindow::MainWindow(QWidget* parent)
 
 MainWindow::~MainWindow()
 {
-  delete this->mp_MenuBar;
   delete this->mp_Acquisition;
 #ifdef Q_OS_MAC
+  delete this->mp_MacMenuBar;
   delete this->mp_Preferences;
 #endif
 };
