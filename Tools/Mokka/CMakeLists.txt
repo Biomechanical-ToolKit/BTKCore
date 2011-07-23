@@ -18,7 +18,9 @@ SET(Mokka_CPP
   Acquisition.cpp
   About.cpp
   AbstractMultiView.cpp
+  ChartAnalogWidget.cpp
   AbstractView.cpp
+  ChartOptionsWidget.cpp
   CompositeView.cpp
   FileInfoDockWidget.cpp
   ImportAssistantDialog.cpp
@@ -27,10 +29,12 @@ SET(Mokka_CPP
   MetadataView.cpp
   Model.cpp
   ModelDockWidget.cpp
+  ModelTreeWidget.cpp
   MultiViewWidget.cpp
   NewEventDialog.cpp
   NewModelDialog.cpp
   NewSegmentDialog.cpp
+  ChartPointWidget.cpp
   ProgressWidget.cpp
   TimeEventBarWidget.cpp
   TimeEventControlerWidget.cpp
@@ -44,6 +48,8 @@ SET(Mokka_H
   Acquisition.h
   AbstractMultiView.h
   AbstractView.h
+  ChartAnalogWidget.h
+  ChartOptionsWidget.h
   CompositeView.h
   FileInfoDockWidget.h
   ImportAssistantDialog.h
@@ -52,10 +58,12 @@ SET(Mokka_H
   Metadata.h
   Model.h
   ModelDockWidget.h
+  ModelTreeWidget.h
   MultiViewWidget.h
   NewEventDialog.h
   NewModelDialog.h
   NewSegmentDialog.h
+  ChartPointWidget.h
   ProgressWidget.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
@@ -65,6 +73,7 @@ SET(Mokka_H
 SET(Mokka_UI
   About.ui
   AbstractView.ui
+  ChartOptionsWidget.ui
   FileInfoDockWidget.ui
   ImportAssistantDialog.ui
   MainWindow.ui
@@ -126,7 +135,7 @@ ELSEIF(APPLE)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(Mokka ${GUI} ${MOKKA_ICON} ${Mokka_UI_H} ${Mokka_MOC} ${Mokka_RCC} ${Mokka_CPP})
-TARGET_LINK_LIBRARIES(Mokka BTKCommon BTKIO BTKBasicFilters BTKVTK QVTK ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(Mokka BTKCommon BTKIO BTKBasicFilters BTKVTK QVTK vtkCharts ${QT_LIBRARIES})
 
 SET(MOKKA_HELP_DIR "${BTK_EXECUTABLE_PATH}/MokkaHelp")
 IF(WIN32)
