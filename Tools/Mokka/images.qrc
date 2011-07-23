@@ -26,8 +26,12 @@
     <file>Resources/Images/lock.png</file>
     <file>Resources/Images/markers.png</file>
     <file>Resources/Images/menu_button.png</file>
+    <file>Resources/Images/option_editor-16.png</file>
+    <file>Resources/Images/option_editor-down-16.png</file>
     <file>Resources/Images/player_pause.png</file>
     <file>Resources/Images/player_play.png</file>
+    <file>Resources/Images/plot_delete.png</file>
+    <file>Resources/Images/plot_delete-down.png</file>
     <file>Resources/Images/process.png</file>
     <file>Resources/Images/resetzoom.png</file>
     <file>Resources/Images/resetzoom-down.png</file>
