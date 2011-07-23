@@ -35,6 +35,9 @@
 
 #include "CompositeView.h"
 #include "Viz3DWidget.h"
+#include "ChartPointWidget.h"
+#include "ChartAnalogWidget.h"
+#include "ChartOptionsWidget.h"
 #include "Acquisition.h"
 
 #include <btkMacro.h>
@@ -47,6 +50,7 @@
 #include <QListWidget>
 #include <QMouseEvent>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 
 CompositeView::CompositeView(QWidget* parent)
 : AbstractView(parent)
@@ -59,30 +63,47 @@ CompositeView::CompositeView(QWidget* parent)
 
 void CompositeView::setAcquisition(Acquisition* acq)
 {
-  static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D))->setAcquisition(acq);
+  static_cast<Viz3DWidget*>(this->viewStack->widget(this->viewStackIndexFromViewComboIndex(Viz3D)))->setAcquisition(acq);
+  static_cast<ChartAnalogWidget*>(this->viewStack->widget(this->viewStackIndexFromViewComboIndex(ChartAnalog)))->setAcquisition(acq);
 };
 
 void CompositeView::render()
 {
-  // Viz3D
-  static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D))->GetRenderWindow()->Render();
+  QWidget* w = this->viewStack->currentWidget();
+  switch (this->viewCombo->currentIndex())
+  {
+  case Viz3DProjection:
+  case Viz3DOrthogonal:
+    static_cast<Viz3DWidget*>(w)->render();
+    break;
+  case ChartPoint:
+    static_cast<ChartPointWidget*>(w)->render();
+    break;
+  case ChartAnalog:
+    static_cast<ChartAnalogWidget*>(w)->render();
+    break;
+  default: // Impossible
+    break;
+  }
 };
 
 void CompositeView::show(bool s)
 {
   // Viz3D
-  static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D))->show(s);
+  static_cast<Viz3DWidget*>(this->viewStack->widget(this->viewStackIndexFromViewComboIndex(Viz3D)))->show(s);
+  // Chart Analog
+  static_cast<ChartAnalogWidget*>(this->viewStack->widget(this->viewStackIndexFromViewComboIndex(ChartAnalog)))->show(s);
 }
 
 AbstractView* CompositeView::clone() const
 {
-  CompositeView* sv = new CompositeView;
-  //  Copy the acquisition pointer
+  CompositeView* sv = new CompositeView(this->parentWidget());
+  // Clone the 3D view
   Viz3DWidget* sourceViz3D = static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D));
   Viz3DWidget* targetViz3D = static_cast<Viz3DWidget*>(sv->viewStack->widget(Viz3D));
-  targetViz3D->setAcquisition(sourceViz3D->acquisition());
-  // Clone the 3D view
-  // Add vtkViewProp to the new QVtkDialogWidget
+  // - Copy the acquisition pointer
+  sv->setAcquisition(sourceViz3D->acquisition());
+  // - Add vtkViewProp to the new QVtkDialogWidget
   vtkRenderer* sourceRenderer = sourceViz3D->renderer();
   vtkRenderer* targetRenderer = targetViz3D->renderer();
   vtkCollectionIterator* it = sourceRenderer->GetViewProps()->NewIterator();
@@ -111,25 +132,18 @@ void CompositeView::copyOptions(CompositeView* from)
   if (!from)
     return;
 
+  this->optionStack->setCurrentIndex(this->optionStackIndexFromViewComboIndex(from->viewCombo->currentIndex()));
   switch (from->viewCombo->currentIndex())
   {
-  case Viz3D: // Impossible
-    break;
   case Viz3DProjection:
-    this->optionStack->setCurrentIndex(0);
     break;
   case Viz3DOrthogonal:
-    this->optionStack->setCurrentIndex(1);
     static_cast<QComboBox*>(this->optionStack->currentWidget())->setCurrentIndex(static_cast<QComboBox*>(from->optionStack->currentWidget())->currentIndex());
     static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D))->copyProjectionCameraConfiguration(static_cast<Viz3DWidget*>(from->viewStack->widget(Viz3D)));
     break;
-  case Graph: // Impossible
+  case ChartPoint:
     break;
-  case GraphPoint:
-    break;
-  case GraphAnalogChannel:
-    break;
-  case GraphForcePlatform:
+  case ChartAnalog:
     break;
   default: // Impossible
     break;
@@ -145,75 +159,29 @@ void CompositeView::setOrthogonalView(int view)
   this->viewStack->currentWidget()->setFocus(Qt::OtherFocusReason);
 };
 
-void CompositeView::toggleGraphedMeasure(int /* idx */)
+void CompositeView::toggleChartOptions()
 {
-  //qDebug("CompositeView::toggleGraphedMeasure");
-  //GraphAnalogWidget* analog = static_cast<GraphAnalogWidget*>(this->viewStack->widget(2));
-  //analog->setXAxisRange(1,281,1200/60);
-  //analog->addAnalogChannel(btk::Analog::New("Test", 5620));
-  //analog->show();
+  QLayout* layout = this->optionStack->currentWidget()->layout();
+  QWidget* w = layout->itemAt(layout->count()-1)->widget(); // Chart options button
+  // QPoint pos = QPoint(w->x() + w->width() / 2, w->y() + w->height());
+  QPoint pos = w->mapToGlobal(QPoint(0,0)) + QPoint(w->width() / 2, w->height());
+  // QPoint pos = QPoint(w->x() + w->width() / 2, 0);
+  static_cast<ChartAnalogWidget*>(this->viewStack->widget(this->viewStackIndexFromViewComboIndex(ChartAnalog)))->toggleOptions(pos);
 };
-
-void CompositeView::clearGraph()
-{
-  /*
-  for (int i = 0 ; i < this->funcCombo->model()->rowCount() ; ++i)
-  {
-    QModelIndex index = this->funcCombo->model()->index(i,0);
-    if ((this->funcCombo->model()->flags(index) & Qt::ItemIsUserCheckable)
-        && (this->funcCombo->model()->flags(index) & Qt::ItemIsSelectable))
-      this->funcCombo->model()->setData(index, Qt::Unchecked, Qt::CheckStateRole);
-  }
-  */
-};
-/*
-bool CompositeView::eventFilter(QObject* object, QEvent* event)
-{
-  if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonRelease)
-  {
-    QMouseEvent* m = static_cast<QMouseEvent*>(event); 
-    QModelIndex index = this->funcCombo->view()->indexAt(m->pos());
-    QRect vrect = this->funcCombo->view()->visualRect(index);
-
-    if ((event->type() == QEvent::MouseButtonPress)
-        && (this->funcCombo->model()->flags(index) & Qt::ItemIsUserCheckable)
-        && (this->funcCombo->model()->flags(index) & Qt::ItemIsSelectable)
-        && vrect.contains(m->pos()))
-    {
-      if (this->funcCombo->model()->data(index, Qt::CheckStateRole).toInt() == Qt::Checked)
-        this->funcCombo->model()->setData(index, Qt::Unchecked, Qt::CheckStateRole);
-      else 
-        this->funcCombo->model()->setData(index, Qt::Checked, Qt::CheckStateRole);
-      this->toggleGraphedMeasure(index.row());
-    }
-    else if ((event->type() == QEvent::MouseButtonRelease)
-            && ((this->funcCombo->model()->flags(index) & Qt::ItemIsUserCheckable) != Qt::ItemIsUserCheckable))
-    {
-      this->clearGraph();
-      this->funcCombo->setCurrentIndex(1);
-      return false;
-    }
-    return true;
-  }
-  this->funcCombo->setCurrentIndex(1);
-  return QObject::eventFilter(object, event);
-};
-*/
 
 int CompositeView::optionStackIndexFromViewComboIndex(int idx) const
 {
   switch (idx)
   {
-  case Viz3D: // Impossible
   case Viz3DProjection:
     return 0;
   case Viz3DOrthogonal:
     return 1;
-  case Graph:
-  case GraphPoint:
-  case GraphAnalogChannel:
-  case GraphForcePlatform:
-  default:
+  case ChartPoint:
+    return 2;
+  case ChartAnalog:
+    return 3;
+  default:  // Impossible
     return 0;
   }
 };
@@ -222,22 +190,15 @@ int CompositeView::viewStackIndexFromViewComboIndex(int idx) const
 {
   switch (idx)
   {
-  case Viz3D: // Impossible
-    qDebug("Incorrect view index! Impossible to find the corresponding stack!");
-    return 0;
+  case Viz3D:
   case Viz3DProjection:
   case Viz3DOrthogonal:
     return 0;
-  case Graph:
-    qDebug("Incorrect view index! Impossible to find the corresponding stack!");
-    return 0;
-  case GraphPoint:
+  case ChartPoint:
     return 1;
-  case GraphAnalogChannel:
+  case ChartAnalog:
     return 2;
-  case GraphForcePlatform:
-    return 3;
-  default:
+  default:  // Impossible
     qDebug("Incorrect view index! Impossible to find the corresponding stack!");
     return 0;
   }
@@ -245,7 +206,9 @@ int CompositeView::viewStackIndexFromViewComboIndex(int idx) const
 
 void CompositeView::finalizeView(int idx)
 {
-  //disconnect(this->funcCombo, 0, 0, 0);
+  if ((idx != Viz3DProjection) && (idx != Viz3DOrthogonal))
+    return;
+  
   Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D));
   btk::VTKInteractorStyleTrackballFixedUpCamera* style = static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(viz3D->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
   vtkCamera* cam = viz3D->renderer()->GetActiveCamera();
@@ -258,7 +221,6 @@ void CompositeView::finalizeView(int idx)
   }
   else if (idx == Viz3DOrthogonal)
   {
-    //connect(this->funcCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setOrthogonalView(int)));
     viz3D->saveProjectionCameraConfiguration();
     cam->ParallelProjectionOn();
     style->RotationEnabledOff();
@@ -270,6 +232,22 @@ void CompositeView::finalizeView(int idx)
     orthogonalComboBox->setCurrentIndex(index);
   }
   this->render();
+};
+
+void CompositeView::adaptLayoutStrech(int idx)
+{
+  QHBoxLayout* layout = static_cast<QHBoxLayout*>(this->separatorFuncButtons->layout());
+  switch(idx)
+  {
+  case ChartAnalog:
+  case ChartPoint:
+    layout->setStretch(2,1);
+    layout->setStretch(3,0);
+    break;
+  default:
+    layout->setStretch(2,0);
+    layout->setStretch(3,1);
+  };
 };
 
 void CompositeView::finalizeUi()
@@ -290,6 +268,18 @@ void CompositeView::finalizeUi()
   lw->addItem(new QListWidgetItem(tr("  Perspective")));
   // - Orthogonal
   lw->addItem(new QListWidgetItem(tr("  Orthogonal")));
+  // Chart
+  lwi = new QListWidgetItem(tr("Chart"));
+  lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
+  lwi->setFont(f);
+  lw->addItem(lwi);
+  // - Point
+  lw->addItem(new QListWidgetItem(tr("  Point")));
+  lw->item(lw->count()-1)->setFlags(lw->item(lw->count()-1)->flags() & ~Qt::ItemIsSelectable);
+  lw->item(lw->count()-1)->setForeground(Qt::gray);
+  // - Analog channel
+  lw->addItem(new QListWidgetItem(tr("  Analog")));
+  
   // Update the model & view
   this->viewCombo->blockSignals(true);
   this->viewCombo->setModel(lw->model());
@@ -301,9 +291,18 @@ void CompositeView::finalizeUi()
   Viz3DWidget* viz3d = new Viz3DWidget(this);
   this->viewStack->addWidget(viz3d);
   viz3d->initialize();
+  // - Charts
+  //   + Points
+  ChartPointWidget* pointChart = new ChartPointWidget(this);
+  this->viewStack->addWidget(pointChart);
+  pointChart->initialize();
+  //   + Analog channels
+  ChartAnalogWidget* analogChart = new ChartAnalogWidget(this);
+  this->viewStack->addWidget(analogChart);
+  analogChart->initialize();
   
   // Widget in the function stack
-  // - 3D View
+  // - Projection 3D View
   this->optionStack->addWidget(new QWidget(this)); // empty
   // - Perspective 3D view
   QComboBox* orthogonalComboBox = new QComboBox(this);
@@ -319,6 +318,24 @@ void CompositeView::finalizeUi()
   orthogonalComboBox->setView(lw);
   connect(orthogonalComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setOrthogonalView(int)));
   this->optionStack->addWidget(orthogonalComboBox);
+  // - Points' chart
+  this->optionStack->addWidget(new QWidget(this)); // empty
+  // - Analogs' chart
+  QHBoxLayout* analogChartOptionLayout = new QHBoxLayout;
+  analogChartOptionLayout->insertStretch(0,1);
+  QPushButton* analogChartOptionButton = new QPushButton(this);
+  analogChartOptionButton->setMaximumWidth(20);
+  analogChartOptionButton->setFlat(true);
+  analogChartOptionButton->setText("");
+  analogChartOptionButton->setStyleSheet("QPushButton {\n     image: url(:/Resources/Images/option_editor-16.png);\nbackground-color: transparent;\n}\n\nQPushButton:pressed {\n     image: url(:/Resources/Images/option_editor-down-16.png);\n}\n\nQPushButton:flat {\n     border: none;\n}");
+  analogChartOptionButton->setToolTip("Chart options");
+  connect(analogChartOptionButton, SIGNAL(clicked()), this, SLOT(toggleChartOptions()));
+  analogChartOptionLayout->addWidget(analogChartOptionButton);
+  analogChartOptionLayout->setContentsMargins(0,0,0,0);
+  analogChartOptionLayout->setSpacing(0);
+  QWidget* analogChartOptionWidget = new QWidget(this);
+  analogChartOptionWidget->setLayout(analogChartOptionLayout);
+  this->optionStack->addWidget(analogChartOptionWidget);
   
   this->optionStack->setCurrentIndex(0);
 };
