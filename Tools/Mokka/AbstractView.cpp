@@ -35,8 +35,6 @@
 
 #include "AbstractView.h"
 
-#include <QListWidget>
-
 AbstractView::AbstractView(QWidget* parent)
 : QWidget(parent)
 {
@@ -51,13 +49,7 @@ AbstractView::AbstractView(QWidget* parent)
   connect(this->closeButton, SIGNAL(clicked()), this, SLOT(close()));
   connect(this->viewCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentIndex(int)));
 };
-/*
-AbstractView::~AbstractView()
-{
-  foreach(AbstractView::FuncOption opt, this->m_FuncOptions)
-    if (opt.lw) delete opt.lw;
-};
-*/
+
 void AbstractView::setFocus(Qt::FocusReason reason)
 {
   if (this->viewStack->currentWidget())
@@ -66,6 +58,7 @@ void AbstractView::setFocus(Qt::FocusReason reason)
 
 void AbstractView::setCurrentIndex(int idx)
 {
+  this->adaptLayoutStrech(idx);
   int stackIndex = this->optionStackIndexFromViewComboIndex(idx);
   if (stackIndex < this->optionStack->count())
     this->optionStack->setCurrentIndex(stackIndex);
@@ -76,39 +69,6 @@ void AbstractView::setCurrentIndex(int idx)
     this->viewStack->currentWidget()->setFocus(Qt::OtherFocusReason);
     this->finalizeView(idx);
   }
-/*
-  // save the current data view
-  this->saveCurrentFuncOption(this->viewStack->currentIndex());
-  int stackIndex = this->stackIndexFromViewComboIndex(idx);
-  // Load the new options
-  if (stackIndex < this->viewStack->count())
-  {
-    this->viewStack->setCurrentIndex(stackIndex);
-    this->viewStack->currentWidget()->setFocus(Qt::OtherFocusReason);
-    if (this->m_FuncOptions.empty() || (idx >= this->m_FuncOptions.count()) || !(this->m_FuncOptions[idx].lw))
-    {
-      this->funcCombo->setVisible(false);
-      this->finalizeView(idx); // Finalize the connection of the options and more
-    }
-    else
-    {
-      QListWidget* lw = new QListWidget;
-      for (int i = 0 ; i < this->m_FuncOptions[idx].lw->count() ; ++i)
-        lw->addItem(this->m_FuncOptions[idx].lw->item(i)->clone());
-      this->funcCombo->blockSignals(true);
-      this->funcCombo->setModel(lw->model());
-      this->funcCombo->setView(lw);
-      this->funcCombo->blockSignals(false);
-      this->finalizeView(idx); // Finalize the connection of the options and more
-      this->funcCombo->setCurrentIndex(this->m_FuncOptions[idx].currentIndex);
-      if (this->m_FuncOptions[idx].filtered)
-        this->funcCombo->view()->viewport()->installEventFilter(this);
-      else
-        this->funcCombo->view()->viewport()->removeEventFilter(this);
-      this->funcCombo->setVisible(true);
-    }
-  }
-*/
 };
 
 void AbstractView::close()

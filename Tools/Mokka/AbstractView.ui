@@ -157,7 +157,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>62</width>
+            <width>0</width>
             <height>11</height>
            </size>
           </property>
@@ -176,6 +176,9 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
             <width>20</width>
             <height>16777215</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Split view horizontally</string>
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton {
@@ -213,6 +216,9 @@ QPushButton:flat {
             <height>16777215</height>
            </size>
           </property>
+          <property name="toolTip">
+           <string>Split view vertically</string>
+          </property>
           <property name="styleSheet">
            <string notr="true">QPushButton {
      image: url(:/Resources/Images/verticalsplit-16.png);
@@ -248,6 +254,9 @@ QPushButton:flat {
             <width>20</width>
             <height>16777215</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Close view</string>
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton {

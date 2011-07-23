@@ -38,12 +38,6 @@
 
 #include "ui_AbstractView.h"
 
-#include <QStyledItemDelegate>
-#include <QModelIndex>
-#include <QStandardItemModel>
-#include <QPainter>
-#include <QListWidget>
-
 class AbstractView : public QWidget, public Ui::AbstractView
 {
   Q_OBJECT
@@ -64,6 +58,7 @@ protected:
   virtual int optionStackIndexFromViewComboIndex(int /* idx */) const {return -1;};
   virtual int viewStackIndexFromViewComboIndex(int /* idx */) const {return -1;};
   virtual void finalizeView(int /* idx */) {};
+  virtual void adaptLayoutStrech(int /* idx */) {};
   
 private slots:
   void close();
