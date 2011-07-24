@@ -54,7 +54,6 @@
 #include <QScrollArea>
 #include <QDragEnterEvent>
 #include <QDropEvent>
-#include <QPaintEvent>
 #include <QMimeData>
 #include <QTreeWidget>
 #include <QDockWidget>
@@ -66,7 +65,7 @@ ChartAnalogWidget::ChartAnalogWidget(QWidget* parent)
   this->mp_Acquisition = 0;
   this->mp_VTKChart = 0;
   this->mp_ArrayFrames = 0;
-  this->mp_ChartOptions = new ChartOptionsWidget(this); // Set as a window
+  this->mp_ChartOptions = new ChartOptionsWidget(this);
   this->mp_ChartOptions->setVisible(false);
   this->mp_ChartOptions->clear();
   
@@ -80,8 +79,8 @@ ChartAnalogWidget::ChartAnalogWidget(QWidget* parent)
 ChartAnalogWidget::~ChartAnalogWidget()
 {
   this->mp_VTKChart->Delete();
-  this->mp_ArrayFrames->Delete();
-  this->mp_ChartOptions->setVisible(false);
+  if (this->mp_ArrayFrames != NULL)
+    this->mp_ArrayFrames->Delete();
   delete this->mp_ChartOptions;
 };
 
@@ -100,91 +99,26 @@ void ChartAnalogWidget::initialize()
   view->GetScene()->AddItem(this->mp_VTKChart);
   view->Delete();
   
-  this->mp_ArrayFrames = vtkDoubleArray::New();
-  this->mp_ArrayFrames->SetName("Frame");
-  
   this->mp_VTKChart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
   // this->mp_VTKChart->GetAxis(vtkAxis::TOP)->SetVisible(true);
   this->mp_VTKChart->GetAxis(vtkAxis::LEFT)->SetTitle("Values"); // Y axis
   // this->mp_VTKChart->GetAxis(vtkAxis::RIGHT)->SetVisible(true);
   
   this->show(false); // Reset the chart
-  
-  // vtkTable* table = vtkTable::New();
-  //   
-  // vtkDoubleArray* arrF = vtkDoubleArray::New();
-  // arrF->SetName("Frame");
-  // table->AddColumn(arrF);
-  // 
-  // vtkDoubleArray* arrX = vtkDoubleArray::New();
-  // arrX->SetName("Values");
-  // table->AddColumn(arrX);
-  // 
-  // int numFrames = 2;
-  // table->SetNumberOfRows(numFrames);
-  // for (int i = 0; i < numFrames; ++i)
-  // {
-  //   table->SetValue(i, 0, 0.0);
-  //   table->SetValue(i, 1, (double)i);
-  // }
-  // 
-  // vtkPlot* points = this->mp_VTKChart->AddPlot(vtkChart::POINTS);
-  // points->SetInput(table, 0, 1);
-  // // points->GetXAxis()->SetVisible(false);
-  // // points->GetYAxis()->SetVisible(false);
-  // 
-  // arrF->Delete();
-  // arrX->Delete();
-  // table->Delete();
-  
-  // // Create a table with some points in it
-  //   vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::New();
-  // 
-  //   vtkSmartPointer<vtkDoubleArray> arrX = vtkSmartPointer<vtkDoubleArray>::New();
-  //   arrX->SetName("X Axis");
-  //   table->AddColumn(arrX);
-  // 
-  //   vtkSmartPointer<vtkDoubleArray> arrC = vtkSmartPointer<vtkDoubleArray>::New();
-  //   arrC->SetName("Cosine");
-  //   table->AddColumn(arrC);
-  // 
-  //   vtkSmartPointer<vtkDoubleArray> arrS = vtkSmartPointer<vtkDoubleArray>::New();
-  //   arrS->SetName("Sine");
-  //   table->AddColumn(arrS);
-  // 
-  //   // Fill in the table with some example values
-  //   int numFrames = 69;
-  //   double inc = 7.5 / (numFrames-1);
-  //   table->SetNumberOfRows(numFrames);
-  //   for (int i = 0; i < numFrames; ++i)
-  //   {
-  //     table->SetValue(i, 0, i * inc);
-  //     table->SetValue(i, 1, cos(i * inc));
-  //     table->SetValue(i, 2, sin(i * inc));
-  //   }
-  // 
-  //   // Set up the view
-  //   // vtkSmartPointer<vtkContextView> view = vtkSmartPointer<vtkContextView>::New();
-  //   // view->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
-  // 
-  //   // Add multiple line plots, setting the colors etc
-  //   vtkPlot *line = this->mp_VTKChart->AddPlot(vtkChart::LINE);
-  //   line->SetInput(table, 0, 1);
-  //   line->SetColor(0, 255, 0, 255);
-  //   line->SetWidth(1.0);
-  //   line = this->mp_VTKChart->AddPlot(vtkChart::LINE);
-  //   line->SetInput(table, 0, 2);
-  //   line->SetColor(255, 0, 0, 255);
-  //   line->SetWidth(5.0);
- 
- 
-  // std::cout << "ChartAnalogWidget::initialize" << std::endl; 
-  //
+};
+
+void ChartAnalogWidget::setFrameArray(vtkDoubleArray* array)
+{
+  if (this->mp_ArrayFrames == array)
+    return;
+  else if (this->mp_ArrayFrames != NULL)
+    this->mp_ArrayFrames->Delete();
+  this->mp_ArrayFrames = array;
 };
 
 void ChartAnalogWidget::show(bool s)
 {
-  // Crash when using vtkChartXY::ClearPlots()
+  // Crash when using vtkChartXY::ClearPlots(), should be fixed with VTK 5.8
   for (int i = this->mp_VTKChart->GetNumberOfPlots()-1 ; i >= 0 ; --i)
     this->mp_VTKChart->RemovePlot(i);
   
@@ -205,8 +139,6 @@ void ChartAnalogWidget::show(bool s)
       table->SetValue(i, 0, 0.0);
       table->SetValue(i, 1, 0.0);
     }
-    this->mp_ArrayFrames->Initialize();
-    this->mp_ChartOptions->setVisible(false);
   }
   else // Load
   {
@@ -217,18 +149,6 @@ void ChartAnalogWidget::show(bool s)
     // Y
     table->SetValue(0, 1, 0.0);
     table->SetValue(1, 1, 0.0);
-    // Prepare the true frames axis
-    // FIXME: SHOULD BE DONE IN MULTIVIEWWIDGET AS THE FRAME AXIS WILL BE THE SAME FOR EVERY CHARTS
-    this->mp_ArrayFrames->SetNumberOfValues(this->mp_Acquisition->analogFrameNumber());
-    double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
-    for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
-    {
-      int inc = i * this->mp_Acquisition->analogSamplePerPointFrame();
-      double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
-      this->mp_ArrayFrames->SetValue(inc, val);
-      for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
-        this->mp_ArrayFrames->SetValue(inc + j, val + j * sub);
-    }
   }
   vtkPlot* points = this->mp_VTKChart->AddPlot(vtkChart::POINTS);
   points->SetInput(table,0,1);
@@ -240,7 +160,6 @@ void ChartAnalogWidget::show(bool s)
   {
     this->mp_VTKChart->GetAxis(vtkAxis::BOTTOM)->SetRange(0.0, 0.0); // X axis
     this->mp_VTKChart->GetAxis(vtkAxis::LEFT)->SetRange(0.0, 0.0); // Y axis
-    this->mp_ArrayFrames->Initialize();
     this->mp_ChartOptions->setVisible(false);
   }
   else // Load
@@ -248,17 +167,6 @@ void ChartAnalogWidget::show(bool s)
     this->mp_VTKChart->GetAxis(vtkAxis::BOTTOM)->SetRange((double)this->mp_Acquisition->firstFrame(), 
                                                           (double)this->mp_Acquisition->lastFrame()); // X axis
     this->mp_VTKChart->GetAxis(vtkAxis::LEFT)->SetRange(0.0, 0.0); // Y axis
-    // Prepare the true frames axis
-    this->mp_ArrayFrames->SetNumberOfValues(this->mp_Acquisition->analogFrameNumber());
-    double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
-    for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
-    {
-      int inc = i * this->mp_Acquisition->analogSamplePerPointFrame();
-      double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
-      this->mp_ArrayFrames->SetValue(inc, val);
-      for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
-        this->mp_ArrayFrames->SetValue(inc + j, val + j * sub);
-    }
   }
 #endif
 };
@@ -318,7 +226,6 @@ void ChartAnalogWidget::toggleOptions(const QPoint& pos)
     this->mp_ChartOptions->setVisible(false);
   else
   {
-    //this->mp_ChartOptions->setGeometry(pos.x(), pos.y(), this->mp_ChartOptions->width(), this->mp_ChartOptions->height());
     this->mp_ChartOptions->move(pos - QPoint(this->mp_ChartOptions->width() / 2, 0));
     this->mp_ChartOptions->setVisible(true);
   }
@@ -379,12 +286,6 @@ void ChartAnalogWidget::dropEvent(QDropEvent* event)
     int color[3] = {static_cast<int>(c[0]*255.0), static_cast<int>(c[1]*255.0), static_cast<int>(c[2]*255.0)};
     this->mp_ChartOptions->appendPlot(QString::fromStdString(legend), color, line->GetWidth());
   }
-};
-
-void ChartAnalogWidget::hideEvent(QHideEvent* event)
-{
-  this->mp_ChartOptions->setVisible(false);
-  this->QVTKWidget::hideEvent(event);
 };
 
 void ChartAnalogWidget::paintEvent(QPaintEvent* event)

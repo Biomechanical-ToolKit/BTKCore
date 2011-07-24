@@ -50,6 +50,7 @@ struct Segment;
 class Model;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
+class vtkDoubleArray;
 
 class MultiViewWidget : public AbstractMultiView
 {
@@ -145,6 +146,8 @@ private:
   vtkProcessMap* mp_VTKProc;
   vtkMapperCollection* mp_Mappers;
   vtkStreamingDemandDrivenPipelineCollection* mp_Syncro;
+  vtkDoubleArray* mp_PointChartFrames; // Values for the X axis shared by each point chart.
+  vtkDoubleArray* mp_AnalogChartFrames; // Values for the X axis shared by each analog chart.
   QColor m_ForcePlatformColor;
   vtkActor* mp_ForcePlatformActor;
   QColor m_ForceVectorColor;

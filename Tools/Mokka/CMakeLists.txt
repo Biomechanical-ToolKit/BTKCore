@@ -18,9 +18,10 @@ SET(Mokka_CPP
   Acquisition.cpp
   About.cpp
   AbstractMultiView.cpp
-  ChartAnalogWidget.cpp
   AbstractView.cpp
+  ChartAnalogWidget.cpp
   ChartOptionsWidget.cpp
+  ChartPointWidget.cpp
   CompositeView.cpp
   FileInfoDockWidget.cpp
   ImportAssistantDialog.cpp
@@ -34,7 +35,6 @@ SET(Mokka_CPP
   NewEventDialog.cpp
   NewModelDialog.cpp
   NewSegmentDialog.cpp
-  ChartPointWidget.cpp
   ProgressWidget.cpp
   TimeEventBarWidget.cpp
   TimeEventControlerWidget.cpp
@@ -50,6 +50,7 @@ SET(Mokka_H
   AbstractView.h
   ChartAnalogWidget.h
   ChartOptionsWidget.h
+  ChartPointWidget.h
   CompositeView.h
   FileInfoDockWidget.h
   ImportAssistantDialog.h
@@ -63,7 +64,6 @@ SET(Mokka_H
   NewEventDialog.h
   NewModelDialog.h
   NewSegmentDialog.h
-  ChartPointWidget.h
   ProgressWidget.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h

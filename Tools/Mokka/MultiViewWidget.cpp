@@ -37,6 +37,8 @@
 #include "Acquisition.h"
 #include "Model.h"
 #include "CompositeView.h"
+#include "ChartPointWidget.h"
+#include "ChartAnalogWidget.h"
 #include "Viz3DWidget.h"
 #include "UserRoles.h"
 
@@ -87,6 +89,10 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_EventQtSlotConnections = vtkEventQtSlotConnect::New();
   this->mp_VTKProc = new vtkProcessMap();
   this->mp_Syncro = new vtkStreamingDemandDrivenPipelineCollection();
+  this->mp_PointChartFrames = vtkDoubleArray::New();
+  this->mp_PointChartFrames->SetName("Frame");
+  this->mp_AnalogChartFrames = vtkDoubleArray::New();
+  this->mp_AnalogChartFrames->SetName("Frame");
   this->mp_ForcePlatformActor = 0;
   this->mp_ForceVectorActor = 0;
   this->mp_Mappers = vtkMapperCollection::New();
@@ -147,6 +153,8 @@ MultiViewWidget::~MultiViewWidget()
      it->second->Delete();
    delete this->mp_VTKProc;
    delete this->mp_Syncro;
+   this->mp_PointChartFrames->Delete();
+   this->mp_AnalogChartFrames->Delete();
    this->mp_Mappers->Delete();
    if (this->mp_ForcePlatformActor != 0) this->mp_ForcePlatformActor->Delete();
    if (this->mp_ForceVectorActor != 0) this->mp_ForceVectorActor->Delete();
@@ -158,7 +166,9 @@ void MultiViewWidget::initialize()
   this->AbstractMultiView::initialize();
   
   CompositeView* sv = static_cast<CompositeView*>(this->gridLayout()->itemAtPosition(0,0)->widget());
-  vtkRenderer* renderer = static_cast<Viz3DWidget*>(sv->viewStack->widget(CompositeView::Viz3D))->renderer();
+  vtkRenderer* renderer = static_cast<Viz3DWidget*>(sv->view(CompositeView::Viz3D))->renderer();
+  ChartPointWidget* pointChart = static_cast<ChartPointWidget*>(sv->view(CompositeView::ChartPoint));
+  ChartAnalogWidget* analogChart = static_cast<ChartAnalogWidget*>(sv->view(CompositeView::ChartAnalog));  
   
   //vtkMapper::GlobalImmediateModeRenderingOn(); // For large dataset.
   
@@ -335,6 +345,10 @@ void MultiViewWidget::initialize()
       btk::VTKMarkersListUpdatedEvent,
       this, 
       SLOT(updateDisplayedMarkersList(vtkObject*, unsigned long, void*, void*)));
+      
+  // initialize the charts
+  pointChart->setFrameArray(this->mp_PointChartFrames);
+  analogChart->setFrameArray(this->mp_AnalogChartFrames);
 };
 
 void MultiViewWidget::setAcquisition(Acquisition* acq)
@@ -390,6 +404,7 @@ void MultiViewWidget::load()
   if (markerUnit.compare("m") == 0)
     scale = 1000.0;
   
+  // Update the 3D view
   btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
   ground->SetInput(this->mp_Acquisition->btkAcquisition());
   ground->Update();
@@ -402,184 +417,30 @@ void MultiViewWidget::load()
   forcePlaforms->SetScaleUnit(scale);
   segments->ClearDefinitions(); // Reset the segments.
   segments->SetScaleUnit(scale);
-  
-  // Generate the lists for the graphs (Must be set after the update of the virtual makers separator filter)
-  /*
-  QFont f;
-  QListWidgetItem* lwi;
-  // List for the points
-  QListWidget* lwPoint = new QListWidget;
-  lwi = new QListWidgetItem("Deselect All");
-  lwi->setFlags(lwi->flags() & ~Qt::ItemIsUserCheckable);
-  lwPoint->addItem(lwi);
-  lwi = new QListWidgetItem(QString());
-  f = this->font();
-  f.setPixelSize(5);
-  lwi->setFont(f);
-  lwi->setFlags(lwi->flags() & ~(Qt::ItemIsSelectable | Qt::ItemIsEnabled));
-  lwPoint->addItem(lwi);
-  // - Markers
-  btk::PointCollection::Pointer m = virtualMarkersSeparator->GetOutput(0);
-  if (!m->IsEmpty())
-  {
-    lwi = new QListWidgetItem(tr("Markers")); 
-    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
-    f = this->font();
-    f.setBold(true);
-    lwi->setFont(f);
-    lwPoint->addItem(lwi);
-    for (btk::PointCollection::ConstIterator it = m->Begin() ; it != m->End() ; ++it)
-    {
-      lwi = new QListWidgetItem(QString::fromStdString((*it)->GetLabel()));
-      lwi->setCheckState(Qt::Unchecked);
-      lwPoint->addItem(lwi);
-    }
-  }
-  // - Virtual markers
-  btk::PointCollection::Pointer vm = virtualMarkersSeparator->GetOutput(2);
-  if (!vm->IsEmpty())
-  {
-    lwi = new QListWidgetItem(tr("Virtual Markers")); 
-    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
-    f = this->font();
-    f.setBold(true);
-    lwi->setFont(f);
-    lwPoint->addItem(lwi);
-    for (btk::PointCollection::ConstIterator it = vm->Begin() ; it != vm->End() ; ++it)
-    {
-      lwi = new QListWidgetItem(QString::fromStdString((*it)->GetLabel()));
-      lwi->setCheckState(Qt::Unchecked);
-      lwPoint->addItem(lwi);
-    }
-  }
-  // - Sort others points
-  QVector<QStringList> sop(5);
-  for (btk::Acquisition::PointConstIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
-  {
-    if ((*it)->GetType() == btk::Point::Angle)
-      sop[0].push_back(QString::fromStdString((*it)->GetLabel()));
-    else if ((*it)->GetType() == btk::Point::Force)
-      sop[1].push_back(QString::fromStdString((*it)->GetLabel()));
-    else if ((*it)->GetType() == btk::Point::Moment)
-      sop[2].push_back(QString::fromStdString((*it)->GetLabel()));
-    else if ((*it)->GetType() == btk::Point::Power)
-      sop[3].push_back(QString::fromStdString((*it)->GetLabel()));
-    else if ((*it)->GetType() == btk::Point::Scalar)
-      sop[4].push_back(QString::fromStdString((*it)->GetLabel()));
-    //else
-    //  btkErrorMacro("Unknown point's type. Cannot be sorted to display its values.");
-  }
-  // - Angles
-  if (!sop[0].empty())
-  {
-    lwi = new QListWidgetItem(tr("Angles")); 
-    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
-    f = this->font();
-    f.setBold(true);
-    lwi->setFont(f);
-    lwPoint->addItem(lwi);
-    for (QStringList::const_iterator it = sop[0].begin() ; it != sop[0].end() ; ++it)
-    {
-      lwi = new QListWidgetItem(*it);
-      lwi->setCheckState(Qt::Unchecked);
-      lwPoint->addItem(lwi);
-    }
-  }
-  // - Forces
-  if (!sop[1].empty())
-  {
-    lwi = new QListWidgetItem(tr("Forces")); 
-    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
-    f = this->font();
-    f.setBold(true);
-    lwi->setFont(f);
-    lwPoint->addItem(lwi);
-    for (QStringList::const_iterator it = sop[1].begin() ; it != sop[1].end() ; ++it)
-    {
-      lwi = new QListWidgetItem(*it);
-      lwi->setCheckState(Qt::Unchecked);
-      lwPoint->addItem(lwi);
-    }
-  }
-  // - Moments
-  if (!sop[2].empty())
-  {
-    lwi = new QListWidgetItem(tr("Moments")); 
-    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
-    f = this->font();
-    f.setBold(true);
-    lwi->setFont(f);
-    lwPoint->addItem(lwi);
-    for (QStringList::const_iterator it = sop[2].begin() ; it != sop[2].end() ; ++it)
-    {
-      lwi = new QListWidgetItem(*it);
-      lwi->setCheckState(Qt::Unchecked);
-      lwPoint->addItem(lwi);
-    }
-  }
-  // - Powers
-  if (!sop[3].empty())
-  {
-    lwi = new QListWidgetItem(tr("Powers")); 
-    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
-    f = this->font();
-    f.setBold(true);
-    lwi->setFont(f);
-    lwPoint->addItem(lwi);
-    for (QStringList::const_iterator it = sop[3].begin() ; it != sop[3].end() ; ++it)
-    {
-      lwi = new QListWidgetItem(*it);
-      lwi->setCheckState(Qt::Unchecked);
-      lwPoint->addItem(lwi);
-    }
-  }
-  // - Scalars
-  if (!sop[4].empty())
-  {
-    lwi = new QListWidgetItem(tr("Scalars")); 
-    lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
-    f = this->font();
-    f.setBold(true);
-    lwi->setFont(f);
-    lwPoint->addItem(lwi);
-    for (QStringList::const_iterator it = sop[4].begin() ; it != sop[4].end() ; ++it)
-    {
-      lwi = new QListWidgetItem(*it);
-      lwi->setCheckState(Qt::Unchecked);
-      lwPoint->addItem(lwi);
-    }
-  }
-  // List for the analog channels
-  QListWidget* lwAnalog = new QListWidget;
-  lwi = new QListWidgetItem("Deselect All");
-  lwi->setFlags(lwi->flags() & ~Qt::ItemIsUserCheckable);
-  lwAnalog->addItem(lwi);
-  lwi = new QListWidgetItem(QString());
-  f = this->font();
-  f.setPixelSize(5);
-  lwi->setFont(f);
-  lwi->setFlags(lwi->flags() & ~(Qt::ItemIsSelectable | Qt::ItemIsEnabled));
-  lwAnalog->addItem(lwi);
-  for (btk::Acquisition::AnalogConstIterator it = acq->BeginAnalog() ; it != acq->EndAnalog() ; ++it)
-  {
-    lwi = new QListWidgetItem(QString::fromStdString((*it)->GetLabel()));
-    lwi->setCheckState(Qt::Unchecked);
-    lwAnalog->addItem(lwi);
-  }
-  delete lwPoint;
-  delete lwAnalog;
-  */
-  
+
   this->updateCameras();
+  
+  // Update the X axis values for the charts
+  this->mp_PointChartFrames->Initialize(); // Reset
+  this->mp_PointChartFrames->SetNumberOfValues(this->mp_Acquisition->pointFrameNumber());
+  this->mp_AnalogChartFrames->Initialize(); // Reset
+  this->mp_AnalogChartFrames->SetNumberOfValues(this->mp_Acquisition->analogFrameNumber());
+  double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
+  for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
+  {
+    // Point
+    this->mp_PointChartFrames->SetValue(i, this->mp_Acquisition->firstFrame() + i);
+    // Analog
+    int inc = i * this->mp_Acquisition->analogSamplePerPointFrame();
+    double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
+    this->mp_AnalogChartFrames->SetValue(inc, val);
+    for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
+      this->mp_AnalogChartFrames->SetValue(inc + j, val + j * sub);
+  }
   
   // Active the content of each view
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
-  {
-    CompositeView* view = static_cast<CompositeView*>(*it);
-    //view->setFunctionComboBoxOption(CompositeView::GraphPoint, lwPoint, 1);
-    //view->setFunctionComboBoxOption(CompositeView::GraphAnalogChannel, lwAnalog, 1);
-    view->show(true);
-  }
+    static_cast<CompositeView*>(*it)->show(true);
 };
 
 

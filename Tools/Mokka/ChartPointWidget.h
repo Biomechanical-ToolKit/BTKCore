@@ -36,10 +36,13 @@
 #ifndef ChartPointWidget_h
 #define ChartPointWidget_h
 
+#include "Acquisition.h"
+
 #include <QWidget>
 
 class QVTKWidget;
 class vtkChartXY;
+class vtkDoubleArray;
 
 class ChartPointWidget : public QWidget
 {
@@ -50,6 +53,8 @@ public:
   ~ChartPointWidget();
   
   void initialize();
+  void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
+  void setFrameArray(vtkDoubleArray* array);
   
 public slots:
   void render();
@@ -59,8 +64,10 @@ signals:
 protected:
   
 private:
+  Acquisition* mp_Acquisition;
   QVTKWidget* mp_VTKView[3];
   vtkChartXY* mp_VTKChart[3];
+  vtkDoubleArray* mp_ArrayFrames;
 };
 
 #endif // ChartPointWidget_h

@@ -54,6 +54,9 @@
 ChartPointWidget::ChartPointWidget(QWidget* parent)
 : QWidget(parent)
 {
+  this->mp_Acquisition = 0;
+  this->mp_ArrayFrames = 0;
+  
 #if 0
   vtkContextView* view;
   this->mp_VTKView[0] = new QVTKWidget(this);
@@ -128,6 +131,8 @@ ChartPointWidget::ChartPointWidget(QWidget* parent)
 
 ChartPointWidget::~ChartPointWidget()
 {
+  if (this->mp_ArrayFrames != NULL)
+    this->mp_ArrayFrames->Delete();
   // for (int i = 0 ; i < 3 ; ++i)
   //   this->mp_VTKChart[i]->Delete();
 };
@@ -265,6 +270,15 @@ void ChartPointWidget::initialize()
   chart2->Delete();
   chart3->Delete();
 */  
+};
+
+void ChartPointWidget::setFrameArray(vtkDoubleArray* array)
+{
+  if (this->mp_ArrayFrames == array)
+    return;
+  else if (this->mp_ArrayFrames != NULL)
+    this->mp_ArrayFrames->Delete();
+  this->mp_ArrayFrames = array;
 };
 
 void ChartPointWidget::render()

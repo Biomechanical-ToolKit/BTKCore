@@ -45,8 +45,6 @@ class vtkDoubleArray;
 
 class QDragEnterEvent;
 class QDropEvent;
-class QHideEvent;
-class QPaintEvent;
 
 class ChartOptionsWidget;
 
@@ -59,6 +57,7 @@ public:
   ~ChartAnalogWidget();
   
   void initialize();
+  void setFrameArray(vtkDoubleArray* array);
   void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
   void show(bool s);
   ChartOptionsWidget* options() {return mp_ChartOptions;};
@@ -69,12 +68,11 @@ public slots:
   void render();
   void setPlotLineColor(const QList<int>& indices, const QColor& color);
   void setPlotLineWidth(const QList<int>& indices, double value);
-signals:
+
   
 protected:
   virtual void dragEnterEvent(QDragEnterEvent *event);
   virtual void dropEvent(QDropEvent* event);
-  virtual void hideEvent(QHideEvent* event);
   virtual void paintEvent(QPaintEvent* event);
   
 private:
