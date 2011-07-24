@@ -46,11 +46,6 @@ AbstractMultiView::AbstractMultiView(QWidget* parent)
   this->setupUi();
 };
 
-AbstractMultiView::~AbstractMultiView()
-{
-  if (this->mp_Prototype) delete this->mp_Prototype;
-};
-
 void AbstractMultiView::initialize()
 {
   // UI init
@@ -60,13 +55,9 @@ void AbstractMultiView::initialize()
   this->m_Views.append(sv);
 };
 
-void AbstractMultiView::setViewPrototype(const AbstractView* view)
+void AbstractMultiView::setViewPrototype(AbstractView *(*view)(QWidget*))
 {
-  if (this->mp_Prototype != view)
-  {
-    delete this->mp_Prototype;
-    this->mp_Prototype = view;
-  } 
+  this->mp_Prototype = view;
 };
 
 void AbstractMultiView::closeAll()
@@ -215,7 +206,7 @@ AbstractView* AbstractMultiView::createView(AbstractView* fromAnother)
   if (fromAnother)
     sv = fromAnother->clone();
   else
-    sv = (this->mp_Prototype ? this->mp_Prototype->clone() : new AbstractView);
+    sv = (this->mp_Prototype ? (*this->mp_Prototype)(this) : new AbstractView(this));
   sv->setObjectName("singleView_" + QDateTime::currentDateTime().toString(Qt::ISODate));
   connect(sv, SIGNAL(closeTriggered(AbstractView*)), this, SLOT(close(AbstractView*)));
   connect(sv, SIGNAL(splitTriggered(AbstractView*, int)), this, SLOT(split(AbstractView*, int)));

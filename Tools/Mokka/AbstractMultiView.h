@@ -43,19 +43,21 @@ class AbstractView;
 class QSplitter;
 class QGridLayout;
 
+template <class T> AbstractView* ViewFactory(QWidget* parent = 0) {return new T(parent);};
+
 class AbstractMultiView : public QWidget
 {
   Q_OBJECT
   
 public:
   AbstractMultiView(QWidget* parent = 0);
-  virtual ~AbstractMultiView();
+  virtual ~AbstractMultiView() {};
   // AbstractMultiView(const AbstractMultiView&); // Implicit.
   // AbstractMultiView& operator=(const AbstractMultiView&); // Implicit.
   
   virtual void initialize();
   QGridLayout* gridLayout() {return this->mp_GridLayout;};
-  void setViewPrototype(const AbstractView* view);
+  void setViewPrototype(AbstractView* (*view)(QWidget*));
   const QList<AbstractView*>& views() const {return this->m_Views;};
   
 protected:
@@ -79,7 +81,7 @@ private:
   void closeAll(QWidget* w);
   
   QGridLayout* mp_GridLayout;
-  const AbstractView* mp_Prototype;
+  AbstractView* (*mp_Prototype)(QWidget*);
 };
 
 #endif // AbstractMultiView_h
