@@ -46,13 +46,6 @@ ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
   connect(this->plotTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayPlotOption()));
   connect(this->lineWidthSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setLineWidth(double)));
   connect(this->lineColorButton, SIGNAL(clicked()), this, SLOT(setLineColor()));
-  
-  // int color[3] = {255, 0, 0};
-  // this->appendPlot("F1X (N)", color, 0.75);
-  // this->appendPlot("F2Z (N)", color, 0.75);
-  // this->appendPlot("M1X (Nmm)", color, 0.75);
-  
-  layout->activate(); // Update the layout geometry (important for the first display)
 };
 
 void ChartOptionsWidget::appendPlot(const QString& label, int color[3], double width)
