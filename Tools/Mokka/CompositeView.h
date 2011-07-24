@@ -57,6 +57,8 @@ public:
   void render();
   void show(bool s);
   
+  QWidget* view(int viewComboIndex) {return this->viewStack->widget(this->viewStackIndexFromViewComboIndex(viewComboIndex));};
+  
   virtual AbstractView* clone() const;
   void copyOptions(CompositeView* from);
   

@@ -63,8 +63,9 @@ CompositeView::CompositeView(QWidget* parent)
 
 void CompositeView::setAcquisition(Acquisition* acq)
 {
-  static_cast<Viz3DWidget*>(this->viewStack->widget(this->viewStackIndexFromViewComboIndex(Viz3D)))->setAcquisition(acq);
-  static_cast<ChartAnalogWidget*>(this->viewStack->widget(this->viewStackIndexFromViewComboIndex(ChartAnalog)))->setAcquisition(acq);
+  static_cast<Viz3DWidget*>(this->view(Viz3D))->setAcquisition(acq);
+  static_cast<ChartPointWidget*>(this->view(ChartPoint))->setAcquisition(acq);
+  static_cast<ChartAnalogWidget*>(this->view(ChartAnalog))->setAcquisition(acq);
 };
 
 void CompositeView::render()
@@ -90,9 +91,11 @@ void CompositeView::render()
 void CompositeView::show(bool s)
 {
   // Viz3D
-  static_cast<Viz3DWidget*>(this->viewStack->widget(this->viewStackIndexFromViewComboIndex(Viz3D)))->show(s);
+  static_cast<Viz3DWidget*>(this->view(Viz3D))->show(s);
+  // Chart Point
+  // static_cast<ChartPointWidget*>(this->view(ChartPoint))->show(s);
   // Chart Analog
-  static_cast<ChartAnalogWidget*>(this->viewStack->widget(this->viewStackIndexFromViewComboIndex(ChartAnalog)))->show(s);
+  static_cast<ChartAnalogWidget*>(this->view(ChartAnalog))->show(s);
 }
 
 AbstractView* CompositeView::clone() const
@@ -166,7 +169,7 @@ void CompositeView::toggleChartOptions()
   // QPoint pos = QPoint(w->x() + w->width() / 2, w->y() + w->height());
   QPoint pos = w->mapToGlobal(QPoint(0,0)) + QPoint(w->width() / 2, w->height());
   // QPoint pos = QPoint(w->x() + w->width() / 2, 0);
-  static_cast<ChartAnalogWidget*>(this->viewStack->widget(this->viewStackIndexFromViewComboIndex(ChartAnalog)))->toggleOptions(pos);
+  static_cast<ChartAnalogWidget*>(this->view(ChartAnalog))->toggleOptions(pos);
 };
 
 int CompositeView::optionStackIndexFromViewComboIndex(int idx) const
