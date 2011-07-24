@@ -57,11 +57,15 @@ public:
   ~ChartAnalogWidget();
   
   void initialize();
-  void setFrameArray(vtkDoubleArray* array);
+  Acquisition* acquisition() {return this->mp_Acquisition;};
   void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
+  vtkDoubleArray* frameArray() {return this->mp_ArrayFrames;};
+  void setFrameArray(vtkDoubleArray* array);
   void show(bool s);
   ChartOptionsWidget* options() {return mp_ChartOptions;};
   void toggleOptions(const QPoint& pos);
+  
+  void copy(ChartAnalogWidget* source);
   
 public slots:
   void removePlot(int index);

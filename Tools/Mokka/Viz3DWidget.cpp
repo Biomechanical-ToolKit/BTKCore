@@ -47,6 +47,7 @@
 #include <vtkAxesActor.h>
 #include <vtkIdList.h>
 #include <vtkCamera.h>
+#include <vtkCollectionIterator.h>
 
 #include <QKeyEvent>
 #include <QToolTip>
@@ -291,6 +292,34 @@ void Viz3DWidget::setOrthogonalView(int view)
   cam->Zoom(1.6);
   this->GetRenderWindow()->Render();
 }
+
+void Viz3DWidget::copy(Viz3DWidget* source)
+{
+  // Clean the 3D view
+  this->mp_Renderer->RemoveAllViewProps();
+  
+  // Copy the acquisition pointer
+  this->setAcquisition(source->acquisition());
+  // Add vtkViewProp to the new QVtkDialogWidget
+  vtkRenderer* sourceRenderer = source->mp_Renderer;
+  vtkCollectionIterator* it = sourceRenderer->GetViewProps()->NewIterator();
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+  {
+    this->mp_Renderer->AddViewProp(static_cast<vtkProp*>(it->GetCurrentObject()));
+    it->GoToNextItem();
+  }
+  // Copy camera orientation
+  vtkCamera* sourceCamera = sourceRenderer->GetActiveCamera();
+  vtkCamera* targetCamera = this->mp_Renderer->GetActiveCamera();
+  targetCamera->SetPosition(sourceCamera->GetPosition()); 
+  targetCamera->SetFocalPoint(sourceCamera->GetFocalPoint()); 
+  targetCamera->SetViewUp(sourceCamera->GetViewUp());
+  targetCamera->SetViewAngle(sourceCamera->GetViewAngle());
+  this->mp_Renderer->ResetCamera();
+  // FIXME: Add a zoom member or static variable in Viz3DWidget.h
+  targetCamera->Zoom(1.6);
+};
 
 void Viz3DWidget::selectPickedMarker(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
 {

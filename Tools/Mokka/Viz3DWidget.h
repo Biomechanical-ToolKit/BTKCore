@@ -66,6 +66,8 @@ public:
   void copyProjectionCameraConfiguration(Viz3DWidget* source);
   void setOrthogonalView(int view);
   
+  void copy(Viz3DWidget* source);
+  
 public slots:
   // Qt / VTK
   void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);

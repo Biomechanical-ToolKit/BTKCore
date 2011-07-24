@@ -89,7 +89,8 @@ void ChartAnalogWidget::initialize()
   vtkContextView* view = vtkContextView::New();
   view->SetInteractor(this->GetInteractor());
   this->SetRenderWindow(view->GetRenderWindow());
-  this->GetRenderWindow()->LineSmoothingOn();
+  // this->GetRenderWindow()->LineSmoothingOn(); // Strange behavior under MacOX X... Each plot has two colors.
+  this->GetRenderWindow()->DoubleBufferOff();
   this->mp_VTKChart = vtkChartXY::New();
   this->mp_VTKChart->SetShowLegend(true);
   this->mp_VTKChart->SetAutoAxes(false);
@@ -114,6 +115,7 @@ void ChartAnalogWidget::setFrameArray(vtkDoubleArray* array)
   else if (this->mp_ArrayFrames != NULL)
     this->mp_ArrayFrames->Delete();
   this->mp_ArrayFrames = array;
+  array->Register(this->mp_ArrayFrames);
 };
 
 void ChartAnalogWidget::show(bool s)
@@ -228,6 +230,37 @@ void ChartAnalogWidget::toggleOptions(const QPoint& pos)
   {
     this->mp_ChartOptions->move(pos - QPoint(this->mp_ChartOptions->width() / 2, 0));
     this->mp_ChartOptions->setVisible(true);
+  }
+};
+
+void ChartAnalogWidget::copy(ChartAnalogWidget* source)
+{
+  // Clean if necessary
+  for (int i = this->mp_VTKChart->GetNumberOfPlots()-1 ; i >= 0 ; --i)
+    this->mp_VTKChart->RemovePlot(i);
+  this->mp_ChartOptions->clear();
+  
+  // Copy the acquisition pointer
+  this->setAcquisition(source->acquisition());
+  // Copy the X axis
+  this->setFrameArray(source->frameArray());
+  // Copy the plots
+  this->mp_VTKChart->AddPlot(vtkChart::POINTS)->SetInput(source->mp_VTKChart->GetPlot(0)->GetInput(),0,1); // FIXME: MUST BE REMOVED WITH VTK 5.8
+  for (int i = 1 ; i < source->mp_VTKChart->GetNumberOfPlots() ; ++i)
+  {
+    vtkPlot* targetLine = this->mp_VTKChart->AddPlot(vtkChart::LINE);
+    vtkPlot*  sourceLine = source->mp_VTKChart->GetPlot(i);
+    targetLine->SetInput(sourceLine->GetInput(), 0, 1);
+    targetLine->SetWidth(sourceLine->GetWidth());
+    double color[3]; sourceLine->GetColor(color); targetLine->SetColor(color[0], color[1], color[2]);
+  }
+  // Copy the plots' options
+  for (int i = 0 ; i < source->mp_ChartOptions->plotTable->rowCount() ; ++i)
+  {
+    QTableWidgetItem* item = source->mp_ChartOptions->plotTable->item(i,0);
+    QColor c = item->data(ChartOptionsWidget::LineColor).value<QColor>();
+    int color[3] = {c.red(), c.green(), c.blue()};
+    this->mp_ChartOptions->appendPlot(item->text(), color, item->data(ChartOptionsWidget::LineWidth).toDouble());
   }
 };
 

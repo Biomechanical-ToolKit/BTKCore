@@ -44,7 +44,6 @@
 #include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
 
 #include <vtkCamera.h>
-#include <vtkCollectionIterator.h>
 #include <vtkRenderWindow.h>
 
 #include <QListWidget>
@@ -93,7 +92,7 @@ void CompositeView::show(bool s)
   // Viz3D
   static_cast<Viz3DWidget*>(this->view(Viz3D))->show(s);
   // Chart Point
-  // static_cast<ChartPointWidget*>(this->view(ChartPoint))->show(s);
+  static_cast<ChartPointWidget*>(this->view(ChartPoint))->show(s);
   // Chart Analog
   static_cast<ChartAnalogWidget*>(this->view(ChartAnalog))->show(s);
 }
@@ -101,31 +100,14 @@ void CompositeView::show(bool s)
 AbstractView* CompositeView::clone() const
 {
   CompositeView* sv = new CompositeView(this->parentWidget());
+  
   // Clone the 3D view
-  Viz3DWidget* sourceViz3D = static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D));
-  Viz3DWidget* targetViz3D = static_cast<Viz3DWidget*>(sv->viewStack->widget(Viz3D));
-  // - Copy the acquisition pointer
-  sv->setAcquisition(sourceViz3D->acquisition());
-  // - Add vtkViewProp to the new QVtkDialogWidget
-  vtkRenderer* sourceRenderer = sourceViz3D->renderer();
-  vtkRenderer* targetRenderer = targetViz3D->renderer();
-  vtkCollectionIterator* it = sourceRenderer->GetViewProps()->NewIterator();
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-  {
-    targetRenderer->AddViewProp(static_cast<vtkProp*>(it->GetCurrentObject()));
-    it->GoToNextItem();
-  }
-  // Copy camera orientation
-  vtkCamera* sourceCamera = sourceRenderer->GetActiveCamera();
-  vtkCamera* targetCamera = targetRenderer->GetActiveCamera();
-  targetCamera->SetPosition(sourceCamera->GetPosition()); 
-  targetCamera->SetFocalPoint(sourceCamera->GetFocalPoint()); 
-  targetCamera->SetViewUp(sourceCamera->GetViewUp());
-  targetCamera->SetViewAngle(sourceCamera->GetViewAngle());
-  targetRenderer->ResetCamera();
-  // FIXME: Add a zoom member or static variable in Viz3DWidget.h
-  targetCamera->Zoom(1.6);
+  static_cast<Viz3DWidget*>(sv->view(Viz3D))->copy(static_cast<Viz3DWidget*>(this->view(Viz3D)));
+  // Clone the charts
+  //  - Point
+  static_cast<ChartPointWidget*>(sv->view(ChartPoint))->copy(static_cast<ChartPointWidget*>(this->view(ChartPoint)));
+  //  - Analog
+  static_cast<ChartAnalogWidget*>(sv->view(ChartAnalog))->copy(static_cast<ChartAnalogWidget*>(this->view(ChartAnalog)));
   
   return sv;
 };

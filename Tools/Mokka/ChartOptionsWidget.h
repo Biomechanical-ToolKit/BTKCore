@@ -45,6 +45,8 @@ class ChartOptionsWidget : public QWidget, public Ui::ChartOptionsWidget
   Q_OBJECT
   
 public:
+  enum {LineColor = Qt::UserRole + 1, LineWidth};
+  
   ChartOptionsWidget(QWidget* parent = 0);
   
   void appendPlot(const QString& label, int color[3], double width);
@@ -68,8 +70,6 @@ protected:
 private:
   QPixmap createLineIcon(const QColor& color, double width);
   void setLineColorButtonColor(const QColor& color);
-  
-  enum {LineColor = Qt::UserRole + 1, LineWidth};
 };
 
 #endif // ChartOptionsWidget_h

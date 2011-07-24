@@ -57,7 +57,7 @@ public:
   void render();
   void show(bool s);
   
-  QWidget* view(int viewComboIndex) {return this->viewStack->widget(this->viewStackIndexFromViewComboIndex(viewComboIndex));};
+  QWidget* view(int viewComboIndex) const {return this->viewStack->widget(this->viewStackIndexFromViewComboIndex(viewComboIndex));};
   
   virtual AbstractView* clone() const;
   void copyOptions(CompositeView* from);
@@ -67,7 +67,6 @@ public slots:
   void toggleChartOptions();
 
 protected:
-  //bool eventFilter(QObject* object, QEvent* event);
   virtual int optionStackIndexFromViewComboIndex(int idx) const;
   virtual int viewStackIndexFromViewComboIndex(int idx) const;
   virtual void finalizeView(int idx);

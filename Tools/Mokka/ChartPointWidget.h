@@ -53,8 +53,13 @@ public:
   ~ChartPointWidget();
   
   void initialize();
+  Acquisition* acquisition() {return this->mp_Acquisition;};
   void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
+  vtkDoubleArray* frameArray() {return this->mp_ArrayFrames;};
   void setFrameArray(vtkDoubleArray* array);
+  void show(bool s);
+  
+  void copy(ChartPointWidget* source);
   
 public slots:
   void render();

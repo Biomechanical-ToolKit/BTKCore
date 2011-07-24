@@ -96,7 +96,7 @@ void ChartOptionsWidget::appendPlot(const QString& label, int color[3], double w
 
 void ChartOptionsWidget::clear()
 {
-  this->plotTable->clear();
+  this->plotTable->clearContents();
   this->setPlotOptionEnabled(false);
 };
 
@@ -157,10 +157,12 @@ void ChartOptionsWidget::displayPlotOption()
     else
       this->setLineColorButtonColor(lineColor);
       
+    this->lineWidthSpinBox->blockSignals(true);
     if (lineWidth == -1.0)
       this->lineWidthSpinBox->clear();
     else
       this->lineWidthSpinBox->setValue(lineWidth);
+    this->lineWidthSpinBox->blockSignals(false);
     
     this->setPlotOptionEnabled(true);
   }

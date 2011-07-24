@@ -279,6 +279,21 @@ void ChartPointWidget::setFrameArray(vtkDoubleArray* array)
   else if (this->mp_ArrayFrames != NULL)
     this->mp_ArrayFrames->Delete();
   this->mp_ArrayFrames = array;
+  array->Register(this->mp_ArrayFrames);
+};
+
+void ChartPointWidget::show(bool s)
+{
+  Q_UNUSED(s)
+};
+
+void ChartPointWidget::copy(ChartPointWidget* source)
+{
+  // Copy the acquisition pointer
+  this->setAcquisition(source->acquisition());
+  // Copy the X axis
+  this->setFrameArray(source->frameArray());
+  // Copy the plots
 };
 
 void ChartPointWidget::render()

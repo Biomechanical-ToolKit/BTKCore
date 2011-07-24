@@ -346,7 +346,7 @@ void MultiViewWidget::initialize()
       this, 
       SLOT(updateDisplayedMarkersList(vtkObject*, unsigned long, void*, void*)));
       
-  // initialize the charts
+  // Initialize the charts
   pointChart->setFrameArray(this->mp_PointChartFrames);
   analogChart->setFrameArray(this->mp_AnalogChartFrames);
 };
