@@ -251,11 +251,11 @@ bool UpdateParser::isGreaterRelease(const QString& max, const QString& rel) cons
   {
     QChar m, r;
     if (i >= max.count())
-      m = QChar::fromAscii('0');
+      m = QChar::fromAscii(0x00);
     else
       m = max[i];
     if (i >= rel.count())
-      r = QChar::fromAscii('0');
+      r = QChar::fromAscii(0x00);
     else
       r = rel[i];
     
