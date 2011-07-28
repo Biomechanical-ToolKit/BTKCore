@@ -40,7 +40,9 @@ AbstractView::AbstractView(QWidget* parent)
 {
   this->setupUi(this);
 #ifdef Q_OS_MAC
-  this->separatorFuncButtons->setMinimumSize(26,26);
+  // To have the same height than the title bar used by the dock widgets.
+  this->separatorFuncButtons->setMinimumHeight(26); 
+  this->separatorFuncButtons->setMaximumHeight(26); 
 #endif
   
   // Connections

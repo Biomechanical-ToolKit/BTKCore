@@ -50,6 +50,13 @@
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QCheckBox>
+
+class ChartPointComponentCheckBox : public QCheckBox
+{
+public:
+  ChartPointComponentCheckBox::ChartPointComponentCheckBox(const QString& text, QWidget* parent = 0);
+};
 
 CompositeView::CompositeView(QWidget* parent)
 : AbstractView(parent)
@@ -148,10 +155,11 @@ void CompositeView::toggleChartOptions()
 {
   QLayout* layout = this->optionStack->currentWidget()->layout();
   QWidget* w = layout->itemAt(layout->count()-1)->widget(); // Chart options button
-  // QPoint pos = QPoint(w->x() + w->width() / 2, w->y() + w->height());
   QPoint pos = w->mapToGlobal(QPoint(0,0)) + QPoint(w->width() / 2, w->height());
-  // QPoint pos = QPoint(w->x() + w->width() / 2, 0);
-  static_cast<ChartAnalogWidget*>(this->view(ChartAnalog))->toggleOptions(pos);
+  if (this->viewCombo->currentIndex() == ChartPoint)
+    static_cast<ChartPointWidget*>(this->view(ChartPoint))->toggleOptions(pos);
+  else
+    static_cast<ChartAnalogWidget*>(this->view(ChartAnalog))->toggleOptions(pos);
 };
 
 int CompositeView::optionStackIndexFromViewComboIndex(int idx) const
@@ -260,8 +268,8 @@ void CompositeView::finalizeUi()
   lw->addItem(lwi);
   // - Point
   lw->addItem(new QListWidgetItem(tr("  Point")));
-  lw->item(lw->count()-1)->setFlags(lw->item(lw->count()-1)->flags() & ~Qt::ItemIsSelectable);
-  lw->item(lw->count()-1)->setForeground(Qt::gray);
+  //lw->item(lw->count()-1)->setFlags(lw->item(lw->count()-1)->flags() & ~Qt::ItemIsSelectable);
+  //lw->item(lw->count()-1)->setForeground(Qt::gray);
   // - Analog channel
   lw->addItem(new QListWidgetItem(tr("  Analog")));
   
@@ -304,11 +312,47 @@ void CompositeView::finalizeUi()
   connect(orthogonalComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setOrthogonalView(int)));
   this->optionStack->addWidget(orthogonalComboBox);
   // - Points' chart
-  this->optionStack->addWidget(new QWidget(this)); // empty
+  const int spacing = 9;
+  QWidget* pointChartOptionPage = new QWidget;
+  QHBoxLayout* pointChartOptionLayout = new QHBoxLayout(pointChartOptionPage);
+  pointChartOptionLayout->setContentsMargins(0,0,0,0);
+  QHBoxLayout* pointChartOptionLayout2 = new QHBoxLayout; // Second layout to fix the size and position of the button for the options
+  pointChartOptionLayout2->setContentsMargins(0,0,0,0);
+  ChartPointComponentCheckBox* pointChartXCheckBox = new ChartPointComponentCheckBox("x", pointChartOptionPage);
+  pointChartXCheckBox->setToolTip("Display X component");
+  pointChartXCheckBox->setCheckState(Qt::Checked);
+  connect(pointChartXCheckBox, SIGNAL(stateChanged(int)), pointChart, SLOT(diplayComponentX(int)));
+  pointChartOptionLayout2->addWidget(pointChartXCheckBox);
+  pointChartOptionLayout2->addSpacing(spacing);
+  ChartPointComponentCheckBox* pointChartYCheckBox = new ChartPointComponentCheckBox("y", pointChartOptionPage);
+  pointChartYCheckBox->setToolTip("Display Y component");
+  pointChartYCheckBox->setCheckState(Qt::Checked);
+  connect(pointChartYCheckBox, SIGNAL(stateChanged(int)), pointChart, SLOT(diplayComponentY(int)));
+  pointChartOptionLayout2->addWidget(pointChartYCheckBox);
+  pointChartOptionLayout2->addSpacing(spacing);
+  ChartPointComponentCheckBox* pointChartZCheckBox = new ChartPointComponentCheckBox("z", pointChartOptionPage);
+  pointChartZCheckBox->setToolTip("Display Z component");
+  pointChartZCheckBox->setCheckState(Qt::Checked);
+  connect(pointChartZCheckBox, SIGNAL(stateChanged(int)), pointChart, SLOT(diplayComponentZ(int)));
+  pointChartOptionLayout2->addWidget(pointChartZCheckBox);
+  pointChartOptionLayout->addLayout(pointChartOptionLayout2);
+  pointChartOptionLayout->addStretch(1);
+  QPushButton* pointChartOptionButton = new QPushButton(pointChartOptionPage);
+  pointChartOptionButton->setMaximumWidth(20);
+  pointChartOptionButton->setFlat(true);
+  pointChartOptionButton->setText("");
+  pointChartOptionButton->setStyleSheet("QPushButton {\n     image: url(:/Resources/Images/option_editor-16.png);\nbackground-color: transparent;\n}\n\nQPushButton:pressed {\n     image: url(:/Resources/Images/option_editor-down-16.png);\n}\n\nQPushButton:flat {\n     border: none;\n}");
+  pointChartOptionButton->setToolTip("Chart options");
+  connect(pointChartOptionButton, SIGNAL(clicked()), this, SLOT(toggleChartOptions()));
+  pointChartOptionLayout->addWidget(pointChartOptionButton);
+  this->optionStack->addWidget(pointChartOptionPage);
   // - Analogs' chart
-  QHBoxLayout* analogChartOptionLayout = new QHBoxLayout;
-  analogChartOptionLayout->insertStretch(0,1);
-  QPushButton* analogChartOptionButton = new QPushButton(this);
+  QWidget* analogChartOptionPage = new QWidget;
+  QHBoxLayout* analogChartOptionLayout = new QHBoxLayout(analogChartOptionPage);
+  analogChartOptionLayout->setContentsMargins(0,0,0,0);
+  analogChartOptionLayout->setSpacing(0);
+  analogChartOptionLayout->addStretch(1);
+  QPushButton* analogChartOptionButton = new QPushButton(analogChartOptionPage);
   analogChartOptionButton->setMaximumWidth(20);
   analogChartOptionButton->setFlat(true);
   analogChartOptionButton->setText("");
@@ -316,11 +360,37 @@ void CompositeView::finalizeUi()
   analogChartOptionButton->setToolTip("Chart options");
   connect(analogChartOptionButton, SIGNAL(clicked()), this, SLOT(toggleChartOptions()));
   analogChartOptionLayout->addWidget(analogChartOptionButton);
-  analogChartOptionLayout->setContentsMargins(0,0,0,0);
-  analogChartOptionLayout->setSpacing(0);
-  QWidget* analogChartOptionWidget = new QWidget(this);
-  analogChartOptionWidget->setLayout(analogChartOptionLayout);
-  this->optionStack->addWidget(analogChartOptionWidget);
+  this->optionStack->addWidget(analogChartOptionPage);
   
   this->optionStack->setCurrentIndex(0);
+};
+
+// --------------------------------------------------------
+
+ChartPointComponentCheckBox::ChartPointComponentCheckBox(const QString& text, QWidget* parent)
+: QCheckBox(text, parent)
+{
+  this->setStyleSheet(
+  "QCheckBox { \
+     color: white; \
+   } \
+   QCheckBox::indicator:unchecked { \
+       image: url(:/Resources/Images/checkbox_unchecked-13.png); \
+   } \
+   QCheckBox::indicator:unchecked:hover { \
+       image: url(:/Resources/Images/checkbox_unchecked-hover-13.png); \
+   } \
+   QCheckBox::indicator:unchecked:pressed { \
+       image: url(:/Resources/Images/checkbox_unchecked-pressed-13.png); \
+   } \
+   QCheckBox::indicator:checked { \
+       image: url(:/Resources/Images/checkbox_checked-13.png); \
+   } \
+   QCheckBox::indicator:checked:hover { \
+       image: url(:/Resources/Images/checkbox_checked-hover-13.png); \
+   } \
+   QCheckBox::indicator:checked:pressed { \
+       image: url(:/Resources/Images/checkbox_checked-pressed-13.png); \
+   } \
+   ");
 };

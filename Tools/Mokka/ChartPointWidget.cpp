@@ -34,270 +34,119 @@
  */
 
 #include "ChartPointWidget.h"
+#include "UserRoles.h"
 
-#include <vtkChartXY.h>
-#include <vtkContextScene.h>
-#include <vtkContextView.h>
-#include <vtkDoubleArray.h>
-#include <vtkPlotPoints.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkRenderer.h>
-#include <vtkTable.h>
-#include <vtkAxis.h>
-#include <vtkTextProperty.h>
-
-#include <QVTKWidget.h>
-#include <QVBoxLayout>
-#include <QScrollArea>
+#include <QLayout>
 
 ChartPointWidget::ChartPointWidget(QWidget* parent)
-: QWidget(parent)
-{
-  this->mp_Acquisition = 0;
-  this->mp_ArrayFrames = 0;
-  
-#if 0
-  vtkContextView* view;
-  this->mp_VTKView[0] = new QVTKWidget(this);
-  view = vtkContextView::New();
-  view->SetInteractor(this->mp_VTKView[0]->GetInteractor());
-  this->mp_VTKView[0]->SetRenderWindow(view->GetRenderWindow());
-  // this->mp_VTKView[0]->setMinimumSize(320,200);
-  this->mp_VTKChart[0] = vtkChartXY::New();
-  //this->mp_VTKChart[0]->GetAxis(vtkAxis::BOTTOM)->SetVisible(false);
-  // this->mp_VTKChart[0]->GetAxis(0)->SetVisible(false);
-  // this->mp_VTKChart[0]->GetAxis(1)->SetVisible(false);
-  // this->mp_VTKChart[0]->GetAxis(2)->SetVisible(false);
-  // this->mp_VTKChart[0]->GetAxis(3)->SetVisible(false);
-  view->GetScene()->AddItem(this->mp_VTKChart[0]);
-  //this->mp_VTKChart[0]->SetShowLegend(true);
-  //this->mp_VTKChart[0]->GetAxis(vtkAxis::BOTTOM)->GetTitleProperties()->SetFontSize(0);
-  //this->mp_VTKChart[0]->GetAxis(1)->SetTitle("X axis");
-  //this->mp_VTKChart[0]->GetAxis(0)->setVisible(false);
-  view->Delete();
-  
-  this->mp_VTKView[1] = new QVTKWidget(this);
-  view = vtkContextView::New();
-  view->SetInteractor(this->mp_VTKView[1]->GetInteractor());
-  this->mp_VTKView[1]->SetRenderWindow(view->GetRenderWindow());
-  // this->mp_VTKView[1]->setMinimumSize(320,200);
-  this->mp_VTKChart[1] = vtkChartXY::New();
-  this->mp_VTKChart[1]->GetAxis(vtkAxis::BOTTOM)->SetVisible(false);
-  view->GetScene()->AddItem(this->mp_VTKChart[1]);
-  //this->mp_VTKChart[1]->SetShowLegend(true);
-  //this->mp_VTKChart[0]->GetAxis(vtkAxis::BOTTOM)->GetTitleProperties()->SetFontSize(20);
-  //this->mp_VTKChart[1]->GetAxis(0)->SetLabelsVisible(false);
-  //this->mp_VTKChart[1]->GetAxis(1)->SetTitle("Y axis");
-  //this->mp_VTKChart[1]->GetAxis(0)->setVisible(false);
-  view->Delete();
-  
-  this->mp_VTKView[2] = new QVTKWidget(this);
-  view = vtkContextView::New();
-  view->SetInteractor(this->mp_VTKView[2]->GetInteractor());
-  this->mp_VTKView[2]->SetRenderWindow(view->GetRenderWindow());
-  // this->mp_VTKView[2]->setMinimumSize(320,200);
-  this->mp_VTKChart[2] = vtkChartXY::New();
-  this->mp_VTKChart[2]->GetAxis(vtkAxis::BOTTOM)->SetVisible(false);
-  view->GetScene()->AddItem(this->mp_VTKChart[2]);
-  //this->mp_VTKChart[2]->SetShowLegend(true);
-  //this->mp_VTKChart[2]->GetAxis(0)->SetTitle("Frames");
-  //this->mp_VTKChart[2]->GetAxis(1)->SetTitle("Z axis");
-  view->Delete();
-  
-  QVBoxLayout* layout = new QVBoxLayout;
-  layout->setContentsMargins(0,0,0,0);
-  layout->setSpacing(0);
-  layout->addWidget(this->mp_VTKView[0]);
-  layout->addWidget(this->mp_VTKView[1]);
-  layout->addWidget(this->mp_VTKView[2]);
-  
-  QWidget* layoutWidget = new QWidget(this);
-  layoutWidget->setMinimumSize(200,400);
-  layoutWidget->setLayout(layout);
-  
-  QScrollArea* scrollArea = new QScrollArea(this);
-  scrollArea->setWidget(layoutWidget);
-  scrollArea->setWidgetResizable(true);
-  // scrollArea->setLayout(layout);
-  
-  layout = new QVBoxLayout;
-  layout->setContentsMargins(0,0,0,0);
-  layout->setSpacing(0);
-  layout->addWidget(scrollArea);
-  this->setLayout(layout);
-#endif
-}
+: AbstractChartWidget(3, parent)
+{};
 
 ChartPointWidget::~ChartPointWidget()
-{
-  if (this->mp_ArrayFrames != NULL)
-    this->mp_ArrayFrames->Delete();
-  // for (int i = 0 ; i < 3 ; ++i)
-  //   this->mp_VTKChart[i]->Delete();
-};
+{};
 
 void ChartPointWidget::initialize()
 {
- 
- 
-#if 0
- 
-  vtkTable* table = vtkTable::New();
+  this->AbstractChartWidget::initialize();
   
-  vtkDoubleArray* arrF = vtkDoubleArray::New();
-  arrF->SetName("Frame");
-  table->AddColumn(arrF);
+  vtkChartXY* chart = 0;
   
-  vtkDoubleArray* arrX = vtkDoubleArray::New();
-  arrX->SetName("Axis X");
-  table->AddColumn(arrX);
+  chart = this->mp_VTKCharts->operator[](0);
+  chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
+  chart->GetAxis(vtkAxis::LEFT)->SetTitle("X-Axis"); // Y axis
   
-  vtkDoubleArray* arrY = vtkDoubleArray::New();
-  arrY->SetName("Axis Y");
-  table->AddColumn(arrY);
+  chart = this->mp_VTKCharts->operator[](1);
+  chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
+  chart->GetAxis(vtkAxis::LEFT)->SetTitle("Y-Axis"); // Y axis
   
-  vtkDoubleArray* arrZ = vtkDoubleArray::New();
-  arrZ->SetName("Axis Z");
-  table->AddColumn(arrZ);
-  
-  int numPoints = 2;
-  table->SetNumberOfRows(numPoints);
-  for (int i = 0; i < numPoints; ++i)
+  chart = this->mp_VTKCharts->operator[](2);
+  chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
+  chart->GetAxis(vtkAxis::LEFT)->SetTitle("Z-Axis"); // Y axis
+};
+
+bool ChartPointWidget::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
+{
+  // FIXME: The accepted type must be replaced by ModelDockWidget::(MarkerType|PointType) or enum values corresponding to a point
+  if ((item->type() == QTreeWidgetItem::UserType + 2) || (item->type() == QTreeWidgetItem::UserType + 3))
+    return true;
+  return false;
+};
+
+void ChartPointWidget::diplayComponentX(int state)
+{
+  this->layout()->itemAt(0)->widget()->setVisible((state == Qt::Checked) ? true : false);
+};
+
+void ChartPointWidget::diplayComponentY(int state)
+{
+  this->layout()->itemAt(1)->widget()->setVisible((state == Qt::Checked) ? true : false);
+};
+
+void ChartPointWidget::diplayComponentZ(int state)
+{
+  this->layout()->itemAt(2)->widget()->setVisible((state == Qt::Checked) ? true : false);
+};
+
+bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, QString& legend, double* color, double* width)
+{
+  int id = item->data(0, pointId).toInt();
+  if (id > this->mp_Acquisition->pointCount())
   {
-    table->SetValue(i, 0, 0.0);
-    table->SetValue(i, 1, (double)i);
-    table->SetValue(i, 2, (double)i);
-    table->SetValue(i, 3, (double)i);
+    qDebug("Point ID greater than the number of points.");
+    return false;
   }
+  Point* p = this->mp_Acquisition->points().value(id);
+  btk::Point::Pointer point = this->mp_Acquisition->btkAcquisition()->GetPoint(p->btkidx);
+  int numFrames = this->mp_Acquisition->pointFrameNumber();
+  // Need to create 3 table instead of 1 with 4 columns as VTK doesn't recognize the 2 last columns (due to the use of the same data?) 
+  vtkTable* tableX = vtkTable::New();
+  vtkTable* tableY = vtkTable::New();
+  vtkTable* tableZ = vtkTable::New();
+  tableX->SetNumberOfRows(numFrames); // Must be set before adding column
+  tableX->AddColumn(this->mp_ArrayFrames);
+  tableY->SetNumberOfRows(numFrames);
+  tableY->AddColumn(this->mp_ArrayFrames);
+  tableZ->SetNumberOfRows(numFrames);
+  tableZ->AddColumn(this->mp_ArrayFrames);
+  vtkDoubleArray* arrValX = vtkDoubleArray::New();
+  vtkDoubleArray* arrValY = vtkDoubleArray::New();
+  vtkDoubleArray* arrValZ = vtkDoubleArray::New();
+  legend = p->label + " (" + this->mp_Acquisition->pointUnit(p->type) + ")";
+  arrValX->SetName(legend.toUtf8().constData());
+  arrValY->SetName(legend.toUtf8().constData());
+  arrValZ->SetName(legend.toUtf8().constData());
+  // FIXME: Conflict into VTK 5.6.1 between the documentation and the code to save or not the data. Need to check with VTK 5.8
+  arrValX->SetArray(point->GetValues().data(), numFrames, 1); // Would be 0?
+  arrValY->SetArray(point->GetValues().data() + numFrames, numFrames, 1); // Would be 0?
+  arrValZ->SetArray(point->GetValues().data() + 2*numFrames, numFrames, 1); // Would be 0?
+  tableX->AddColumn(arrValX);
+  tableY->AddColumn(arrValY);
+  tableZ->AddColumn(arrValZ);
   
-  // Add multiple scatter plots, setting the colors etc
-  vtkPlot *points = this->mp_VTKChart[0]->AddPlot(vtkChart::POINTS);
-  points->SetInput(table, 0, 1);
-  //points->GetXAxis()->SetLabelsVisible(false);
-  points->GetXAxis()->SetVisible(false);
-  //points->GetXAxis()->SetTitle("");
-  //points->SetXAxis(0);
-  points->GetYAxis()->SetTitle("X axis");
-  //points->SetColor(0, 0, 0, 255);
-  //points->SetWidth(1.0);
-  //vtkPlotPoints::SafeDownCast(points)->SetMarkerStyle(vtkPlotPoints::CROSS);
- 
-  points = this->mp_VTKChart[1]->AddPlot(vtkChart::POINTS);
-  points->SetInput(table, 0, 2);
-  //points->GetXAxis()->SetLabelsVisible(false);
-  points->GetXAxis()->SetVisible(false);
-  //points->GetXAxis()->SetTitle("");
-  points->GetYAxis()->SetTitle("Y axis");
-  //points->SetColor(0, 0, 0, 255);
-  //points->SetWidth(1.0);
-  //vtkPlotPoints::SafeDownCast(points)->SetMarkerStyle(vtkPlotPoints::PLUS);
- 
-  points = this->mp_VTKChart[2]->AddPlot(vtkChart::POINTS);
-  points->SetInput(table, 0, 3);
-  points->SetInput(table, 0, 3);
-  points->GetXAxis()->SetTitle("Frame");
-  points->GetYAxis()->SetTitle("Z axis");
-  //points->SetColor(0, 0, 255, 255);
-  //points->SetWidth(1.0);
-  //vtkPlotPoints::SafeDownCast(points)->SetMarkerStyle(vtkPlotPoints::CIRCLE);
-
-  arrF->Delete();
-  arrX->Delete();
-  arrY->Delete();
-  arrZ->Delete();
-  table->Delete();
-#endif
- /*
-  vtkTable* table = vtkTable::New();
+  vtkPlot* line = 0;
+  // X axis  
+  line = this->mp_VTKCharts->operator[](0)->AddPlot(vtkChart::LINE);
+  line->SetInput(tableX,0,1);
+  line->SetWidth(0.75);
+  // Y axis
+  line = this->mp_VTKCharts->operator[](1)->AddPlot(vtkChart::LINE);
+  line->SetInput(tableY,0,1);
+  line->SetWidth(0.75);
+  // Z axis
+  line = this->mp_VTKCharts->operator[](2)->AddPlot(vtkChart::LINE);
+  line->SetInput(tableZ,0,1);
+  line->SetWidth(0.75);
   
-  vtkDoubleArray* arrX = vtkDoubleArray::New();
-  arrX->SetName("X Axis");
-  table->AddColumn(arrX);
+  arrValX->Delete();
+  arrValY->Delete();
+  arrValZ->Delete();
+  tableX->Delete();
+  tableY->Delete();
+  tableZ->Delete();
   
-  vtkDoubleArray* arrC = vtkDoubleArray::New();
-  arrC->SetName("Cosine");
-  table->AddColumn(arrC);
+  double c[3]; line->GetColor(c);
+  color[0] = c[0]; color[1] = c[1]; color[2] = c[2];
+  *width = line->GetWidth();
   
-  vtkDoubleArray* arrS = vtkDoubleArray::New();
-  arrS->SetName("Sine");
-  table->AddColumn(arrS);
-  
-  vtkDoubleArray* arrT = vtkDoubleArray::New();
-  arrT->SetName("Sine - Cosine");
-  table->AddColumn(arrT);
-  
-  int numPoints = 3600;
-  float inc = 10 * 7.5 / (numPoints-1);
-  table->SetNumberOfRows(numPoints);
-  for (int i = 0; i < numPoints; ++i)
-  {
-    table->SetValue(i, 0, i * inc);
-    table->SetValue(i, 1, cos(i * inc) + 0.0);
-    table->SetValue(i, 2, sin(i * inc) + 0.0);
-    table->SetValue(i, 3, sin(i * inc) - cos(i * inc));
-  }
-  
-  // Add multiple scatter plots, setting the colors etc
-  vtkPlot *points = this->mp_VTKChart[0]->AddPlot(vtkChart::LINE);
-  points->SetInput(table, 0, 1);
-  points->SetColor(0, 0, 0, 255);
-  points->SetWidth(1.0);
-  vtkPlotPoints::SafeDownCast(points)->SetMarkerStyle(vtkPlotPoints::CROSS);
- 
-  points = this->mp_VTKChart[1]->AddPlot(vtkChart::LINE);
-  points->SetInput(table, 0, 2);
-  points->SetColor(0, 0, 0, 255);
-  points->SetWidth(1.0);
-  vtkPlotPoints::SafeDownCast(points)->SetMarkerStyle(vtkPlotPoints::PLUS);
- 
-  points = this->mp_VTKChart[2]->AddPlot(vtkChart::LINE);
-  points->SetInput(table, 0, 3);
-  points->SetColor(0, 0, 255, 255);
-  points->SetWidth(1.0);
-  vtkPlotPoints::SafeDownCast(points)->SetMarkerStyle(vtkPlotPoints::CIRCLE);
-
-  arrX->Delete();
-  arrC->Delete();
-  arrS->Delete();
-  arrT->Delete();
-  table->Delete();
-  */
-  
-/*
-  view->Delete();
-  chart1->Delete();
-  chart2->Delete();
-  chart3->Delete();
-*/  
-};
-
-void ChartPointWidget::setFrameArray(vtkDoubleArray* array)
-{
-  if (this->mp_ArrayFrames == array)
-    return;
-  else if (this->mp_ArrayFrames != NULL)
-    this->mp_ArrayFrames->Delete();
-  this->mp_ArrayFrames = array;
-  array->Register(this->mp_ArrayFrames);
-};
-
-void ChartPointWidget::show(bool s)
-{
-  Q_UNUSED(s)
-};
-
-void ChartPointWidget::copy(ChartPointWidget* source)
-{
-  // Copy the acquisition pointer
-  this->setAcquisition(source->acquisition());
-  // Copy the X axis
-  this->setFrameArray(source->frameArray());
-  // Copy the plots
-};
-
-void ChartPointWidget::render()
-{
-  for (int i = 0 ; i < 3 ; ++i)
-    this->mp_VTKView[i]->GetRenderWindow()->Render();
+  return true;
 };

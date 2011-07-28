@@ -36,15 +36,9 @@
 #ifndef ChartPointWidget_h
 #define ChartPointWidget_h
 
-#include "Acquisition.h"
+#include "AbstractChartWidget.h"
 
-#include <QWidget>
-
-class QVTKWidget;
-class vtkChartXY;
-class vtkDoubleArray;
-
-class ChartPointWidget : public QWidget
+class ChartPointWidget : public AbstractChartWidget
 {
   Q_OBJECT
   
@@ -52,27 +46,16 @@ public:
   ChartPointWidget(QWidget* parent = 0);
   ~ChartPointWidget();
   
-  void initialize();
-  Acquisition* acquisition() {return this->mp_Acquisition;};
-  void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
-  vtkDoubleArray* frameArray() {return this->mp_ArrayFrames;};
-  void setFrameArray(vtkDoubleArray* array);
-  void show(bool s);
-  
-  void copy(ChartPointWidget* source);
-  
+  virtual void initialize();
+  virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* item);
+
 public slots:
-  void render();
-  
-signals:
-  
+  void diplayComponentX(int state);
+  void diplayComponentY(int state);
+  void diplayComponentZ(int state);
+
 protected:
-  
-private:
-  Acquisition* mp_Acquisition;
-  QVTKWidget* mp_VTKView[3];
-  vtkChartXY* mp_VTKChart[3];
-  vtkDoubleArray* mp_ArrayFrames;
+  virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, QString& legend, double* color, double* width);
 };
 
 #endif // ChartPointWidget_h

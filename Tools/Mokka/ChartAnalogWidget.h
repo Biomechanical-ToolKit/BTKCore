@@ -36,19 +36,9 @@
 #ifndef ChartAnalogWidget_h
 #define ChartAnalogWidget_h
 
-#include "Acquisition.h"
+#include "AbstractChartWidget.h"
 
-#include <QVTKWidget.h>
-
-class vtkChartXY;
-class vtkDoubleArray;
-
-class QDragEnterEvent;
-class QDropEvent;
-
-class ChartOptionsWidget;
-
-class ChartAnalogWidget : public QVTKWidget
+class ChartAnalogWidget : public AbstractChartWidget
 {
   Q_OBJECT
   
@@ -56,34 +46,11 @@ public:
   ChartAnalogWidget(QWidget* parent = 0);
   ~ChartAnalogWidget();
   
-  void initialize();
-  Acquisition* acquisition() {return this->mp_Acquisition;};
-  void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
-  vtkDoubleArray* frameArray() {return this->mp_ArrayFrames;};
-  void setFrameArray(vtkDoubleArray* array);
-  void show(bool s);
-  ChartOptionsWidget* options() {return mp_ChartOptions;};
-  void toggleOptions(const QPoint& pos);
-  
-  void copy(ChartAnalogWidget* source);
-  
-public slots:
-  void removePlot(int index);
-  void render();
-  void setPlotLineColor(const QList<int>& indices, const QColor& color);
-  void setPlotLineWidth(const QList<int>& indices, double value);
+  virtual void initialize();
+  virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* item);
 
-  
 protected:
-  virtual void dragEnterEvent(QDragEnterEvent *event);
-  virtual void dropEvent(QDropEvent* event);
-  virtual void paintEvent(QPaintEvent* event);
-  
-private:
-  Acquisition* mp_Acquisition;
-  vtkChartXY* mp_VTKChart;
-  vtkDoubleArray* mp_ArrayFrames;
-  ChartOptionsWidget* mp_ChartOptions;
+  virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, QString& legend, double* color, double* width);
 };
 
 #endif // ChartAnalogWidget_h

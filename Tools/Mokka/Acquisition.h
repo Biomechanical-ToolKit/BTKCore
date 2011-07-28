@@ -119,6 +119,7 @@ public:
   double pointFrequency() const {return this->mp_BTKAcquisition->GetPointFrequency();};
   QString pointUnit(Point::Type t) const;
   bool hasPoints() const {return !this->m_Points.empty();};
+  int pointCount() const {return this->m_Points.count();};
   const QMap<int, Point*>& points() const {return this->m_Points;};
   const QString& pointLabel(int id) const {return this->m_Points[id]->label;};
   void setPointLabel(int id, const QString& label);

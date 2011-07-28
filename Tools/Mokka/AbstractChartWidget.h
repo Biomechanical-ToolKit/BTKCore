@@ -33,47 +33,70 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CompositeView_h
-#define CompositeView_h
+#ifndef AbstractChartWidget_h
+#define AbstractChartWidget_h
 
-#include "AbstractView.h"
+#include <QVTKWidget.h>
 
-class Acquisition;
+#include "Acquisition.h"
 
-class CompositeView : public AbstractView
+#include <QTreeWidgetItem>
+
+#include <vtkTable.h>
+#include <vtkDoubleArray.h>
+#include <vtkChartXY.h>
+#include <vtkPlot.h>
+#include <vtkLine.h>
+#include <vtkAxis.h>
+#include <vtkstd/vector>
+
+class QDragEnterEvent;
+class QDropEvent;
+
+class ChartOptionsWidget;
+
+class VTKCharts : public vtkstd::vector<vtkChartXY*>
+{};
+
+class AbstractChartWidget : public QWidget
 {
   Q_OBJECT
   
 public:
-  enum {Viz3D = 0, Viz3DProjection, Viz3DOrthogonal, 
-        Chart, ChartPoint, ChartAnalog};
+  AbstractChartWidget(int numCharts, QWidget* parent = 0);
+  virtual ~AbstractChartWidget();
   
-  CompositeView(QWidget* parent = 0);
-  // ~CompositeView(); // Implicit
-  // CompositeView(const CompositeView&);  // Implicit
-  // CompositeView& operator=(const CompositeView&); // Implicit.
+  virtual void initialize();
+  virtual void copy(AbstractChartWidget* source);
+  virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* /* item */) {return false;};
   
-  void setAcquisition(Acquisition* acq);
+  Acquisition* acquisition() {return this->mp_Acquisition;};
+  void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
+  vtkDoubleArray* frameArray() {return this->mp_ArrayFrames;};
+  void setFrameArray(vtkDoubleArray* array);
+  ChartOptionsWidget* options() {return mp_ChartOptions;};
+  void toggleOptions(const QPoint& pos);
+  
   void render();
   void show(bool s);
   
-  QWidget* view(int viewComboIndex) const {return this->viewStack->widget(this->viewStackIndexFromViewComboIndex(viewComboIndex));};
-  
-  virtual AbstractView* clone() const;
-  void copyOptions(CompositeView* from);
-  
 public slots:
-  void setOrthogonalView(int view);
-  void toggleChartOptions();
+  void removePlot(int index);
+  void setPlotLineColor(const QList<int>& indices, const QColor& color);
+  void setPlotLineWidth(const QList<int>& indices, double value);
 
 protected:
-  virtual int optionStackIndexFromViewComboIndex(int idx) const;
-  virtual int viewStackIndexFromViewComboIndex(int idx) const;
-  virtual void finalizeView(int idx);
-  virtual void adaptLayoutStrech(int idx);
+  virtual void dragEnterEvent(QDragEnterEvent *event);
+  virtual void dropEvent(QDropEvent* event);
+  virtual void paintEvent(QPaintEvent* event);
+  virtual void resizeEvent(QResizeEvent* event);
   
-private:
-  void finalizeUi();
+  virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, QString& legend, double* color, double* width) = 0;
+  
+  Acquisition* mp_Acquisition;
+  VTKCharts* mp_VTKCharts;
+  vtkDoubleArray* mp_ArrayFrames;
+  ChartOptionsWidget* mp_ChartOptions;
 };
 
-#endif // CompositeView_h
+#endif // AbstractChartWidget_h

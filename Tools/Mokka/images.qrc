@@ -5,6 +5,12 @@
     <file>Resources/Images/advanced_preferences.png</file>
     <file>Resources/Images/chart_curve.png</file>
     <file>Resources/Images/chart_line.png</file>
+    <file>Resources/Images/checkbox_checked-13.png</file>
+    <file>Resources/Images/checkbox_checked-hover-13.png</file>
+    <file>Resources/Images/checkbox_checked-pressed-13.png</file>
+    <file>Resources/Images/checkbox_unchecked-13.png</file>
+    <file>Resources/Images/checkbox_unchecked-hover-13.png</file>
+    <file>Resources/Images/checkbox_unchecked-pressed-13.png</file>
     <file>Resources/Images/closedock-16.png</file>
     <file>Resources/Images/closedock-down-16.png</file>
     <file>Resources/Images/disclosureTriangleSmallDownBlack.png</file>
