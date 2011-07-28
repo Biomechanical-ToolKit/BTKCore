@@ -1,0 +1,8 @@
+/** 
+ * @defgroup BTKWrappingOctave Octave
+ * @brief Wraps BTK in Octave by using the MEX API. 
+ *
+ * As BTK uses the MEX API implemented in Octave, there is no specific information related to the wrapping of BTK into Octave. The code used to compile the Octave's toolbox is based on the Matlab MEX functions. You will find more information in the @ref BTKWrappingMatlab module.
+ *
+ * @ingroup BTKWrapping
+ */

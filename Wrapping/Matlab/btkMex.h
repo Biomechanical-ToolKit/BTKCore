@@ -59,9 +59,9 @@
 #include <mex.h>
 
 // Fix types definition introduced in Matlab version 7.3
-// Fix types not provided in Scilab. 
+// Fix types not provided in Scilab.
 // FIXME: What about 64 bits OS?,
-#if !defined(SCI_MEX)
+#if !defined(SCI_MEX) && !defined(HAVE_OCTAVE)
   #include <matrix.h> // Header from Matlab
 #endif
 #if !defined(MX_API_VER) || MX_API_VER < 0x07030000
