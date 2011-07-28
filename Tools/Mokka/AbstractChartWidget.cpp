@@ -60,6 +60,8 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   this->mp_ChartOptions->setVisible(false);
   this->mp_ChartOptions->clear();
   
+  this->setFocusPolicy(Qt::StrongFocus);
+  
   QVBoxLayout* layout = new QVBoxLayout(this);
   for (int i = 0 ; i < numCharts ; ++i)
     layout->addWidget(new QVTKWidget(this));
@@ -102,7 +104,7 @@ void AbstractChartWidget::initialize()
   {
     vtkRenderer* ren = vtkRenderer::New();
     ren->SetBackground(1.0,1.0,1.0);
-    vtkRenderWindow* renwin = static_cast<QVTKWidget*>(this->layout()->itemAt(i)->widget())->GetRenderWindow();
+    vtkRenderWindow* renwin = static_cast<QVTKWidget*>(this->layout()->itemAt((int)i)->widget())->GetRenderWindow();
     renwin->AddRenderer(ren);
     
     vtkChartXY* chart = vtkChartXY::New(); // Do not delete
@@ -263,7 +265,7 @@ void AbstractChartWidget::removePlot(int index)
     for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
       this->mp_VTKCharts->operator[](i)->GetPlot(0)->SetVisible(true);
   }
-  this->update();
+  this->render();
 };
 
 void AbstractChartWidget::render()
@@ -271,7 +273,7 @@ void AbstractChartWidget::render()
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
     //this->mp_VTKCharts->operator[](i)->RecalculateBounds(); // FIXME: Only when resizing and not dropping things
-    QVTKWidget* w = static_cast<QVTKWidget*>(this->layout()->itemAt(i)->widget());
+    QVTKWidget* w = static_cast<QVTKWidget*>(this->layout()->itemAt((int)i)->widget());
     if (w->isVisible())
       w->GetRenderWindow()->Render();
   }
@@ -287,7 +289,7 @@ void AbstractChartWidget::setPlotLineColor(const QList<int>& indices, const QCol
       plot->SetColor(color.redF(), color.greenF(), color.blueF());
     }
   }
-  this->update();
+  this->render();
 };
 
 void AbstractChartWidget::setPlotLineWidth(const QList<int>& indices, double value)
@@ -300,7 +302,7 @@ void AbstractChartWidget::setPlotLineWidth(const QList<int>& indices, double val
       plot->SetWidth(static_cast<float>(value));
     }
   }
-  this->update();
+  this->render();
 };
 
 void AbstractChartWidget::toggleOptions(const QPoint& pos)
@@ -360,7 +362,7 @@ void AbstractChartWidget::dropEvent(QDropEvent* event)
     for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
       this->mp_VTKCharts->operator[](i)->GetPlot(0)->SetVisible(false);
   }
-  this->update();
+  this->render();
 };
 
 void AbstractChartWidget::paintEvent(QPaintEvent* event)
