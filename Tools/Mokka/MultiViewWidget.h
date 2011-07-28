@@ -94,6 +94,9 @@ public:
   void setForcePlatformColor(const QColor& color);
   void setForceVectorColor(const QColor& color);
   
+  QObject* eventFilterObject() const {return this->mp_EventFilterObject;};
+  void setEventFilterObject(QObject* filter);
+  
 public slots:
   void appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void clearSegments();
@@ -140,6 +143,7 @@ private:
   void updateCameras();
   void updateViews();
   
+  QObject* mp_EventFilterObject;
   Acquisition* mp_Acquisition;
   Model* mp_Model;
   vtkEventQtSlotConnect* mp_EventQtSlotConnections;

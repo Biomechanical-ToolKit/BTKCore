@@ -84,6 +84,7 @@ class vtkProcessMap : public vtkstd::map<int, vtkObjectBase*>
 MultiViewWidget::MultiViewWidget(QWidget* parent)
 : AbstractMultiView(parent), m_ForcePlatformColor(255, 255, 0), m_ForceVectorColor(255, 255, 0)
 {
+  this->mp_EventFilterObject = 0;
   this->mp_Acquisition = 0;
   this->mp_Model = 0;
   this->mp_EventQtSlotConnections = vtkEventQtSlotConnect::New();
@@ -443,6 +444,13 @@ void MultiViewWidget::load()
     static_cast<CompositeView*>(*it)->show(true);
 };
 
+void MultiViewWidget::setEventFilterObject(QObject* filter)
+{
+  this->mp_EventFilterObject = filter;
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+    for (int i = 0 ; i < (*it)->viewStack->count() ; ++i)
+      (*it)->viewStack->widget(i)->installEventFilter(this->mp_EventFilterObject);
+};
 
 void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments)
 {
@@ -912,9 +920,13 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   connect(viz3D, SIGNAL(pickedMarkerToggled(int)), this, SIGNAL(pickedMarkerToggled(int)));
   connect(viz3D, SIGNAL(selectedMarkersToggled(QList<int>)), this, SIGNAL(selectedMarkersToggled(QList<int>)));
   connect(viz3D, SIGNAL(trajectoryMarkerToggled(int)), this, SIGNAL(trajectoryMarkerToggled(int)));
-  viz3D->installEventFilter(this->parent()->parent());
   viz3D->insertActions(0, this->m_ViewActions);
   viz3D->setContextMenuPolicy(Qt::ActionsContextMenu);
+  if (this->mp_EventFilterObject)
+  {
+    for (int i = 0 ; i < sv->viewStack->count() ; ++i)
+      sv->viewStack->widget(i)->installEventFilter(this->mp_EventFilterObject);
+  }
   return sv;
 };
 

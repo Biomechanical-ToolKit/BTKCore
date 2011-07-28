@@ -255,7 +255,7 @@ MainWindow::MainWindow(QWidget* parent)
 #endif
 
   // Event filter
-  // this->multiView->installEventFilter(this);
+  this->multiView->setEventFilterObject(this);
   this->mp_ModelDock->installEventFilter(this);
   this->timeEventControler->installEventFilter(this);
   this->mp_ModelDock->modelTree->installEventFilter(this);
