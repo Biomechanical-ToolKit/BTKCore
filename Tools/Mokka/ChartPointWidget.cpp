@@ -80,19 +80,19 @@ bool ChartPointWidget::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
   return false;
 };
 
-void ChartPointWidget::diplayComponentX(int state)
+void ChartPointWidget::displayComponentX(int state)
 {
-  this->layout()->itemAt(0)->widget()->setVisible((state == Qt::Checked) ? true : false);
+  this->displayComponent(0, state);
 };
 
-void ChartPointWidget::diplayComponentY(int state)
+void ChartPointWidget::displayComponentY(int state)
 {
-  this->layout()->itemAt(1)->widget()->setVisible((state == Qt::Checked) ? true : false);
+  this->displayComponent(1, state);
 };
 
-void ChartPointWidget::diplayComponentZ(int state)
+void ChartPointWidget::displayComponentZ(int state)
 {
-  this->layout()->itemAt(2)->widget()->setVisible((state == Qt::Checked) ? true : false);
+  this->displayComponent(2, state);
 };
 
 QString ChartPointWidget::createPlotLabel(int id)
@@ -165,4 +165,11 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* ite
   *width = line->GetWidth();
   
   return true;
+};
+
+void ChartPointWidget::displayComponent(int idx, int state)
+{
+  this->layout()->itemAt(idx)->widget()->setVisible((state == Qt::Checked) ? true : false);
+  for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
+    this->mp_VTKCharts->operator[](i)->GetAxis(vtkAxis::LEFT)->RecalculateTickSpacing(); // Y axis
 };

@@ -51,13 +51,16 @@ public:
   virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* item);
 
 public slots:
-  void diplayComponentX(int state);
-  void diplayComponentY(int state);
-  void diplayComponentZ(int state);
+  void displayComponentX(int state);
+  void displayComponentY(int state);
+  void displayComponentZ(int state);
 
 protected:
   virtual QString createPlotLabel(int id);
   virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, int* itemId, QString& legend, double* color, double* width);
+  
+private:
+  void displayComponent(int idx, int state);
 };
 
 #endif // ChartPointWidget_h
