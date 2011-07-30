@@ -48,6 +48,8 @@ void ChartAnalogWidget::setAcquisition(Acquisition* acq)
   this->AbstractChartWidget::setAcquisition(acq);
   connect(this->mp_Acquisition, SIGNAL(analogLabelChanged(int, QString)), this, SLOT(updatePlotLabel(int)));
   connect(this->mp_Acquisition, SIGNAL(analogsUnitChanged(QVector<int>, QVector<QString>)), this, SLOT(updatePlotLabel(QVector<int>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsRemoved(QList<int>, QList<Analog*>)), this, SLOT(hidePlots(QList<int>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsInserted(QList<int>, QList<Analog*>)), this, SLOT(showPlots(QList<int>)));
 };
 
 void ChartAnalogWidget::initialize()

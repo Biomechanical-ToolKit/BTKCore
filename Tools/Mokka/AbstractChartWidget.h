@@ -85,6 +85,8 @@ public slots:
   void setPlotLineColor(const QList<int>& indices, const QColor& color);
   void setPlotLineWidth(const QList<int>& indices, double value);
   void updatePlotLabel(int itemId);
+  void hidePlots(const QList<int>& itemIds);
+  void showPlots(const QList<int>& itemIds);
   
 protected:
   virtual void dragEnterEvent(QDragEnterEvent *event);
@@ -95,6 +97,8 @@ protected:
   bool isAlreadyPlotted(int id);
   virtual QString createPlotLabel(int id) = 0;
   virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, int* itemId, QString& legend, double* color, double* width) = 0;
+  void setPlotsVisible(const QList<int>& itemIds, bool show);
+  void fixAxesVisibility();
   
   Acquisition* mp_Acquisition;
   VTKCharts* mp_VTKCharts;

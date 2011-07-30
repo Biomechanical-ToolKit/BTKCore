@@ -49,6 +49,8 @@ void ChartPointWidget::setAcquisition(Acquisition* acq)
 {
   this->AbstractChartWidget::setAcquisition(acq);
   connect(this->mp_Acquisition, SIGNAL(pointLabelChanged(int, QString)), this, SLOT(updatePlotLabel(int)));
+  connect(this->mp_Acquisition, SIGNAL(pointsRemoved(QList<int>, QList<Point*>)), this, SLOT(hidePlots(QList<int>)));
+  connect(this->mp_Acquisition, SIGNAL(pointsInserted(QList<int>, QList<Point*>)), this, SLOT(showPlots(QList<int>)));
 };
 
 void ChartPointWidget::initialize()

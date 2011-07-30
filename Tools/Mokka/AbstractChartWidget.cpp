@@ -260,11 +260,7 @@ void AbstractChartWidget::removePlot(int index)
 {
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
     this->mp_VTKCharts->operator[](i)->RemovePlot(index + 1); // FIXME: +1 required due to the first plot used to fix the X axis range ... MUST BE REMOVED WITH VTK 5.8
-  if (this->mp_ChartOptions->plotTable->rowCount() == 0)
-  {
-    for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
-      this->mp_VTKCharts->operator[](i)->GetPlot(0)->SetVisible(true);
-  }
+  this->fixAxesVisibility(); // Show the first plot if the others were removed or hidden
   this->render();
 };
 
@@ -316,7 +312,7 @@ void AbstractChartWidget::updatePlotLabel(int itemId)
     {
       label = this->createPlotLabel(itemId);
       item->setText(label);
-      plotIdx = this->mp_ChartOptions->plotTable->cellWidget(i,1)->property("plotIndex").toInt();
+      plotIdx = i;
       break;
     }
   }
@@ -329,6 +325,16 @@ void AbstractChartWidget::updatePlotLabel(int itemId)
     }
   }
   this->render();
+};
+
+void AbstractChartWidget::hidePlots(const QList<int>& itemIds)
+{
+  this->setPlotsVisible(itemIds, false);
+};
+
+void AbstractChartWidget::showPlots(const QList<int>& itemIds)
+{
+  this->setPlotsVisible(itemIds, true);
 };
 
 void AbstractChartWidget::toggleOptions(const QPoint& pos)
@@ -430,4 +436,48 @@ bool AbstractChartWidget::isAlreadyPlotted(int id)
       return true;
   }
   return false;
+};
+
+void AbstractChartWidget::setPlotsVisible(const QList<int>& itemIds, bool show)
+{
+  for (int i = 0 ; i < itemIds.count() ; ++i)
+  {
+    for (int j = 0 ; j < this->mp_ChartOptions->plotTable->rowCount() ; ++j)
+    {
+      QTableWidgetItem* item = this->mp_ChartOptions->plotTable->item(j, 0);
+      if (item->data(ChartOptionsWidget::ItemId).toInt() == itemIds[i])
+      {
+        if (show)
+          this->mp_ChartOptions->plotTable->showRow(j);
+        else
+          this->mp_ChartOptions->plotTable->hideRow(j);
+        for (size_t k = 0 ; k < this->mp_VTKCharts->size() ; ++k)
+          this->mp_VTKCharts->operator[](k)->GetPlot(j + 1)->SetVisible(show); // FIXME: +1 required due to the first plot used to fix the X axis range ... MUST BE REMOVED WITH VTK 5.8
+      }
+    }
+  }
+  this->fixAxesVisibility(); // Show the first plot if the others were removed or hidden
+  this->render();
+};
+
+void AbstractChartWidget::fixAxesVisibility()
+{
+  bool plotVisible = false;
+  for (int i = 0 ; i < this->mp_ChartOptions->plotTable->rowCount() ; ++i)
+  {
+    if (!this->mp_ChartOptions->plotTable->isRowHidden(i))
+    {
+      plotVisible = true;
+      break;
+    }
+  }
+  for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
+  {
+    vtkChartXY* chart = this->mp_VTKCharts->operator[](i);
+    if (plotVisible == chart->GetPlot(0)->GetVisible())
+    {
+      chart->GetPlot(0)->SetVisible(!plotVisible);
+      chart->RecalculateBounds();
+    }
+  }
 };
