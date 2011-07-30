@@ -61,6 +61,9 @@ Viz3DWidget::Viz3DWidget(QWidget* parent)
   this->mp_AxesWidget = btk::VTKAxesWidget::New();
   this->mp_EventQtSlotConnections = vtkEventQtSlotConnect::New();
   this->m_CameraConfigurationSaved = false;
+  
+  // No need to send mouse events to VTK when a mouse button isn't down
+  this->setMouseTracking(false);
 }
 
 Viz3DWidget::~Viz3DWidget()

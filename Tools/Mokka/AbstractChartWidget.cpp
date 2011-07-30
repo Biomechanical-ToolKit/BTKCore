@@ -48,6 +48,7 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include <QTreeWidget>
+#include <QToolTip>
 
 AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
 : QWidget(parent)
@@ -64,7 +65,12 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   
   QVBoxLayout* layout = new QVBoxLayout(this);
   for (int i = 0 ; i < numCharts ; ++i)
-    layout->addWidget(new QVTKWidget(this));
+  {
+    QVTKWidget* w = new QVTKWidget(this);
+    layout->addWidget(w);
+    // No need to send mouse events to VTK when a mouse button isn't down
+    w->setMouseTracking(false);
+  }
   layout->setContentsMargins(0,0,0,0);
   layout->setSpacing(0);
   
@@ -346,6 +352,52 @@ void AbstractChartWidget::toggleOptions(const QPoint& pos)
     this->mp_ChartOptions->move(pos - QPoint(this->mp_ChartOptions->width() / 2, 0));
     this->mp_ChartOptions->setVisible(true);
   }
+};
+
+bool AbstractChartWidget::event(QEvent* event)
+{
+  if ((event->type() == QEvent::ToolTip) && this->mp_Acquisition)
+  {
+    QHelpEvent* helpEvent = static_cast<QHelpEvent*>(event);
+    QVTKWidget* w = qobject_cast<QVTKWidget*>(this->childAt(helpEvent->pos()));
+    int idx = -1;
+    if ((w != 0) && ((idx = this->layout()->indexOf(w)) != -1))
+    {
+      vtkChartXY* chart = this->mp_VTKCharts->operator[](idx);
+      int pt1[2]; chart->GetPoint1(pt1); // Bottom left
+      
+      vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
+      float pt1X[2]; axisX->GetPoint1(pt1X);
+      float pt2X[2]; axisX->GetPoint2(pt2X);
+      double miniX = axisX->GetMinimum(); double maxiX = axisX->GetMaximum();
+      double scaleX = (maxiX - miniX) / (double)(pt2X[0] - pt1X[0]);
+      
+      vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
+      float pt1Y[2]; axisY->GetPoint1(pt1Y);
+      float pt2Y[2]; axisY->GetPoint2(pt2Y);
+      double miniY = axisY->GetMinimum(); double maxiY = axisY->GetMaximum();
+      double scaleY = (maxiY - miniY) / (double)(pt2Y[1] - pt1Y[1]);
+      
+      QPoint p = w->mapFromParent(helpEvent->pos()) - QPoint(pt1[0], -pt1[1]);
+      vtkVector2f pos((double)p.x() * scaleX + miniX, (double)(w->height()-p.y()-1) * scaleY + miniY), coord, tolerance(5.0*scaleX,5.0*scaleY); // tolerance +/- 5 pixels 
+
+      for (int i = 1 ; i < chart->GetNumberOfPlots() ; ++i)  // FIXME: Should be between 0 and number of plots. +1 required due to the first plot used to fix the X axis range ... MUST BE REMOVED WITH VTK 5.8
+      {
+        vtkPlot* plot = chart->GetPlot(i);
+        if (plot->GetVisible() && plot->GetNearestPoint(pos, tolerance, &coord))
+        {
+          // FIXME: item(i-1,...: -1 is due to the first plot used for the axes. MUST BE REMOVED WITH VTK 5.8
+          QString str = "Frame: #" + QString::number(coord.X()) + "<br/>" + this->mp_ChartOptions->plotTable->item(i-1, 0)->text() + ": " + QString::number(coord.Y(), 'f', 1);
+          QToolTip::showText(helpEvent->globalPos(), str);
+          return true;
+        }
+      }
+    }
+    QToolTip::hideText();
+    event->ignore();
+    return true;
+  }
+  return QWidget::event(event);
 };
 
 void AbstractChartWidget::dragEnterEvent(QDragEnterEvent* event)

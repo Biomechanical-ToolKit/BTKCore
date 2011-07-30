@@ -89,6 +89,7 @@ public slots:
   void showPlots(const QList<int>& itemIds);
   
 protected:
+  virtual bool event(QEvent* event);
   virtual void dragEnterEvent(QDragEnterEvent *event);
   virtual void dropEvent(QDropEvent* event);
   virtual void paintEvent(QPaintEvent* event);
