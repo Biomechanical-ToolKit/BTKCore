@@ -75,7 +75,7 @@ ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
   connect(this->lineColorButton, SIGNAL(clicked()), this, SLOT(setLineColor()));
 };
 
-void ChartOptionsWidget::appendPlot(const QString& label, int color[3], double width)
+void ChartOptionsWidget::appendPlot(int itemId, const QString& label, int color[3], double width)
 {
   int rowIdx = this->plotTable->rowCount();
   this->plotTable->insertRow(rowIdx);
@@ -83,6 +83,7 @@ void ChartOptionsWidget::appendPlot(const QString& label, int color[3], double w
   QTableWidgetItem* item = new QTableWidgetItem(this->createLineIcon(c, width), label);
   item->setData(LineColor, c);
   item->setData(LineWidth, width);
+  item->setData(ItemId, itemId);
   this->plotTable->setItem(rowIdx, 0, item);
   QPushButton* button = new QPushButton("", this);
   button->setFlat(true);

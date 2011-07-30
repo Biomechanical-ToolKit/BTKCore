@@ -43,6 +43,13 @@ ChartAnalogWidget::ChartAnalogWidget(QWidget* parent)
 ChartAnalogWidget::~ChartAnalogWidget()
 {};
 
+void ChartAnalogWidget::setAcquisition(Acquisition* acq)
+{
+  this->AbstractChartWidget::setAcquisition(acq);
+  connect(this->mp_Acquisition, SIGNAL(analogLabelChanged(int, QString)), this, SLOT(updatePlotLabel(int)));
+  connect(this->mp_Acquisition, SIGNAL(analogsUnitChanged(QVector<int>, QVector<QString>)), this, SLOT(updatePlotLabel(QVector<int>)));
+};
+
 void ChartAnalogWidget::initialize()
 {
   this->AbstractChartWidget::initialize();
@@ -61,7 +68,18 @@ bool ChartAnalogWidget::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
   return false;
 };
 
-bool ChartAnalogWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, QString& legend, double* color, double* width)
+void ChartAnalogWidget::updatePlotLabel(const QVector<int>& itemIds)
+{
+  for (int i = 0 ; i < itemIds.count() ; ++i)
+    this->AbstractChartWidget::updatePlotLabel(itemIds[i]);
+};
+
+QString ChartAnalogWidget::createPlotLabel(int id)
+{
+  return this->mp_Acquisition->analogLabel(id) + " (" + this->mp_Acquisition->analogUnit(id) + ")";
+};
+
+bool ChartAnalogWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* itemId, QString& legend, double* color, double* width)
 {
   int id = item->data(0, analogId).toInt();
   if (id > this->mp_Acquisition->analogCount())
@@ -74,7 +92,7 @@ bool ChartAnalogWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, QString
   table->SetNumberOfRows(this->mp_Acquisition->analogFrameNumber()); // Must be set before adding column
   table->AddColumn(this->mp_ArrayFrames);
   vtkDoubleArray* arrVal = vtkDoubleArray::New();
-  legend = this->mp_Acquisition->analogLabel(id) + " (" + this->mp_Acquisition->analogUnit(id) + ")";
+  legend = this->createPlotLabel(id);
   arrVal->SetName(legend.toUtf8().constData());
   // FIXME: Conflict into VTK 5.6.1 between the documentation and the code to save or not the data. Need to check with VTK 5.8
   arrVal->SetArray(analog->GetValues().data(), analog->GetFrameNumber(), 1); // Would be 0?
@@ -86,6 +104,7 @@ bool ChartAnalogWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, QString
   arrVal->Delete();
   table->Delete();
   
+  *itemId = id;
   double c[3]; line->GetColor(c);
   color[0] = c[0]; color[1] = c[1]; color[2] = c[2];
   *width = line->GetWidth();

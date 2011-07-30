@@ -268,8 +268,6 @@ void CompositeView::finalizeUi()
   lw->addItem(lwi);
   // - Point
   lw->addItem(new QListWidgetItem(tr("  Point")));
-  //lw->item(lw->count()-1)->setFlags(lw->item(lw->count()-1)->flags() & ~Qt::ItemIsSelectable);
-  //lw->item(lw->count()-1)->setForeground(Qt::gray);
   // - Analog channel
   lw->addItem(new QListWidgetItem(tr("  Analog")));
   

@@ -45,6 +45,12 @@ ChartPointWidget::ChartPointWidget(QWidget* parent)
 ChartPointWidget::~ChartPointWidget()
 {};
 
+void ChartPointWidget::setAcquisition(Acquisition* acq)
+{
+  this->AbstractChartWidget::setAcquisition(acq);
+  connect(this->mp_Acquisition, SIGNAL(pointLabelChanged(int, QString)), this, SLOT(updatePlotLabel(int)));
+};
+
 void ChartPointWidget::initialize()
 {
   this->AbstractChartWidget::initialize();
@@ -87,7 +93,13 @@ void ChartPointWidget::diplayComponentZ(int state)
   this->layout()->itemAt(2)->widget()->setVisible((state == Qt::Checked) ? true : false);
 };
 
-bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, QString& legend, double* color, double* width)
+QString ChartPointWidget::createPlotLabel(int id)
+{
+  Point* p = this->mp_Acquisition->points().value(id);
+  return p->label + " (" + this->mp_Acquisition->pointUnit(p->type) + ")";
+};
+
+bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* itemId, QString& legend, double* color, double* width)
 {
   int id = item->data(0, pointId).toInt();
   if (id > this->mp_Acquisition->pointCount())
@@ -95,8 +107,7 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, QString&
     qDebug("Point ID greater than the number of points.");
     return false;
   }
-  Point* p = this->mp_Acquisition->points().value(id);
-  btk::Point::Pointer point = this->mp_Acquisition->btkAcquisition()->GetPoint(p->btkidx);
+  btk::Point::Pointer point = this->mp_Acquisition->btkAcquisition()->GetPoint(this->mp_Acquisition->points().value(id)->btkidx);
   int numFrames = this->mp_Acquisition->pointFrameNumber();
   // Need to create 3 table instead of 1 with 4 columns as VTK doesn't recognize the 2 last columns (due to the use of the same data?) 
   vtkTable* tableX = vtkTable::New();
@@ -111,7 +122,7 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, QString&
   vtkDoubleArray* arrValX = vtkDoubleArray::New();
   vtkDoubleArray* arrValY = vtkDoubleArray::New();
   vtkDoubleArray* arrValZ = vtkDoubleArray::New();
-  legend = p->label + " (" + this->mp_Acquisition->pointUnit(p->type) + ")";
+  legend = this->createPlotLabel(id);
   arrValX->SetName(legend.toUtf8().constData());
   arrValY->SetName(legend.toUtf8().constData());
   arrValZ->SetName(legend.toUtf8().constData());
@@ -144,6 +155,7 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, QString&
   tableY->Delete();
   tableZ->Delete();
   
+  *itemId = id;
   double c[3]; line->GetColor(c);
   color[0] = c[0]; color[1] = c[1]; color[2] = c[2];
   *width = line->GetWidth();

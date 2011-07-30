@@ -305,6 +305,32 @@ void AbstractChartWidget::setPlotLineWidth(const QList<int>& indices, double val
   this->render();
 };
 
+void AbstractChartWidget::updatePlotLabel(int itemId)
+{
+  int plotIdx = -1;
+  QString label;
+  for (int i = 0 ; i < this->mp_ChartOptions->plotTable->rowCount() ; ++i)
+  {
+    QTableWidgetItem* item = this->mp_ChartOptions->plotTable->item(i, 0);
+    if (item->data(ChartOptionsWidget::ItemId) == itemId)
+    {
+      label = this->createPlotLabel(itemId);
+      item->setText(label);
+      plotIdx = this->mp_ChartOptions->plotTable->cellWidget(i,1)->property("plotIndex").toInt();
+      break;
+    }
+  }
+  if (plotIdx != -1)
+  {
+    for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
+    {
+      vtkPlot* plot = this->mp_VTKCharts->operator[](i)->GetPlot(plotIdx + 1); // FIXME: +1 required due to the first plot used to fix the X axis range ... MUST BE REMOVED WITH VTK 5.8
+      plot->SetLabel(label.toUtf8().constData());
+    }
+  }
+  this->render();
+};
+
 void AbstractChartWidget::toggleOptions(const QPoint& pos)
 {
   if (this->mp_ChartOptions->isVisible())
@@ -348,11 +374,11 @@ void AbstractChartWidget::dropEvent(QDropEvent* event)
     QString legend;
     double color[3] = {1.0, 1.0, 1.0};
     double width = 1.0;
-    
-    if (this->appendPlotFromDroppedItem(*it, legend, color, &width))
+    int itemId = -1;
+    if (this->appendPlotFromDroppedItem(*it, &itemId, legend, color, &width))
     {
       int c[3] = {static_cast<int>(color[0]*255.0), static_cast<int>(color[1]*255.0), static_cast<int>(color[2]*255.0)};
-      this->mp_ChartOptions->appendPlot(legend, c, width);
+      this->mp_ChartOptions->appendPlot(itemId, legend, c, width);
       plotAdded = true;
     }
   }
@@ -376,10 +402,19 @@ void AbstractChartWidget::paintEvent(QPaintEvent* event)
 
 void AbstractChartWidget::resizeEvent(QResizeEvent* event)
 {
+  // FIXME: When a chart is splitted, the sender does not update the spacing between ticks nor
+  // its number (The split set the sender as not visible). WAIT FOR VTK 5.8 TO FIX THIS.
+  
   // Crash when an acquisition is loaded and switching for the first time to a graph
   // Not happens when the view is switched to a graph before the loading of an acquisition...
+#if 0
   if (event->oldSize().width() <= 0 || event->oldSize().height() <= 0)
       return;
+#else
+  Q_UNUSED(event)
+  if (!this->isVisible())
+    return;
+#endif
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
     this->mp_VTKCharts->operator[](i)->GetAxis(vtkAxis::BOTTOM)->RecalculateTickSpacing(); // X axis

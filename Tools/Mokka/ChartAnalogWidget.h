@@ -46,11 +46,16 @@ public:
   ChartAnalogWidget(QWidget* parent = 0);
   ~ChartAnalogWidget();
   
+  virtual void setAcquisition(Acquisition* acq);
   virtual void initialize();
   virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* item);
+  
+public slots:
+  void updatePlotLabel(const QVector<int>& itemIds);
 
 protected:
-  virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, QString& legend, double* color, double* width);
+  virtual QString createPlotLabel(int id);
+  virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, int* itemId, QString& legend, double* color, double* width);
 };
 
 #endif // ChartAnalogWidget_h

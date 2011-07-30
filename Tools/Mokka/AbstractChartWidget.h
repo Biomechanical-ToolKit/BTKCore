@@ -71,7 +71,7 @@ public:
   virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* /* item */) {return false;};
   
   Acquisition* acquisition() {return this->mp_Acquisition;};
-  void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
+  virtual void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
   vtkDoubleArray* frameArray() {return this->mp_ArrayFrames;};
   void setFrameArray(vtkDoubleArray* array);
   ChartOptionsWidget* options() {return mp_ChartOptions;};
@@ -84,14 +84,16 @@ public slots:
   void removePlot(int index);
   void setPlotLineColor(const QList<int>& indices, const QColor& color);
   void setPlotLineWidth(const QList<int>& indices, double value);
-
+  void updatePlotLabel(int itemId);
+  
 protected:
   virtual void dragEnterEvent(QDragEnterEvent *event);
   virtual void dropEvent(QDropEvent* event);
   virtual void paintEvent(QPaintEvent* event);
   virtual void resizeEvent(QResizeEvent* event);
   
-  virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, QString& legend, double* color, double* width) = 0;
+  virtual QString createPlotLabel(int id) = 0;
+  virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, int* itemId, QString& legend, double* color, double* width) = 0;
   
   Acquisition* mp_Acquisition;
   VTKCharts* mp_VTKCharts;

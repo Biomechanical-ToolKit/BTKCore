@@ -45,11 +45,11 @@ class ChartOptionsWidget : public QWidget, public Ui::ChartOptionsWidget
   Q_OBJECT
   
 public:
-  enum {LineColor = Qt::UserRole + 1, LineWidth};
+  enum {LineColor = Qt::UserRole + 1, LineWidth, ItemId};
   
   ChartOptionsWidget(QWidget* parent = 0);
   
-  void appendPlot(const QString& label, int color[3], double width);
+  void appendPlot(int itemId, const QString& label, int color[3], double width);
   void clear();
   void setPlotOptionEnabled(bool enabled);
   
