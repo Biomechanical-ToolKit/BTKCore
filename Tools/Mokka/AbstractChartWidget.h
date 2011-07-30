@@ -92,6 +92,7 @@ protected:
   virtual void paintEvent(QPaintEvent* event);
   virtual void resizeEvent(QResizeEvent* event);
   
+  bool isAlreadyPlotted(int id);
   virtual QString createPlotLabel(int id) = 0;
   virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, int* itemId, QString& legend, double* color, double* width) = 0;
   

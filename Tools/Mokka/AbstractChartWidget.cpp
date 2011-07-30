@@ -312,7 +312,7 @@ void AbstractChartWidget::updatePlotLabel(int itemId)
   for (int i = 0 ; i < this->mp_ChartOptions->plotTable->rowCount() ; ++i)
   {
     QTableWidgetItem* item = this->mp_ChartOptions->plotTable->item(i, 0);
-    if (item->data(ChartOptionsWidget::ItemId) == itemId)
+    if (item->data(ChartOptionsWidget::ItemId).toInt() == itemId)
     {
       label = this->createPlotLabel(itemId);
       item->setText(label);
@@ -420,4 +420,14 @@ void AbstractChartWidget::resizeEvent(QResizeEvent* event)
     this->mp_VTKCharts->operator[](i)->GetAxis(vtkAxis::BOTTOM)->RecalculateTickSpacing(); // X axis
     this->mp_VTKCharts->operator[](i)->GetAxis(vtkAxis::LEFT)->RecalculateTickSpacing(); // Y axis
   }
+};
+
+bool AbstractChartWidget::isAlreadyPlotted(int id)
+{
+  for (int i = 0 ; i < this->mp_ChartOptions->plotTable->rowCount() ; ++i)
+  {
+    if (this->mp_ChartOptions->plotTable->item(i, 0)->data(ChartOptionsWidget::ItemId).toInt() == id)
+      return true;
+  }
+  return false;
 };

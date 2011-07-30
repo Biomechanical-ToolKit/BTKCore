@@ -107,6 +107,8 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* ite
     qDebug("Point ID greater than the number of points.");
     return false;
   }
+  else if (this->isAlreadyPlotted(id))
+    return false;
   btk::Point::Pointer point = this->mp_Acquisition->btkAcquisition()->GetPoint(this->mp_Acquisition->points().value(id)->btkidx);
   int numFrames = this->mp_Acquisition->pointFrameNumber();
   // Need to create 3 table instead of 1 with 4 columns as VTK doesn't recognize the 2 last columns (due to the use of the same data?) 

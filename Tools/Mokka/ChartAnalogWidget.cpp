@@ -87,6 +87,8 @@ bool ChartAnalogWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* it
     qDebug("Analog ID greater than the number of analog channels.");
     return false;
   }
+  else if (this->isAlreadyPlotted(id))
+    return false;
   btk::Analog::Pointer analog = this->mp_Acquisition->btkAcquisition()->GetAnalog(id);
   vtkTable* table = vtkTable::New();
   table->SetNumberOfRows(this->mp_Acquisition->analogFrameNumber()); // Must be set before adding column
