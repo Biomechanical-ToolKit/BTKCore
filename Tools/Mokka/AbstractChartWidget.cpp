@@ -50,6 +50,15 @@
 #include <QTreeWidget>
 #include <QToolTip>
 
+class ChartViewWidget : public QVTKWidget
+{
+public:
+  ChartViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+protected:
+  virtual void mousePressEvent(QMouseEvent* event);
+  virtual void mouseReleaseEvent(QMouseEvent* event);
+};
+
 AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
 : QWidget(parent)
 {
@@ -66,7 +75,7 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   QVBoxLayout* layout = new QVBoxLayout(this);
   for (int i = 0 ; i < numCharts ; ++i)
   {
-    QVTKWidget* w = new QVTKWidget(this);
+    ChartViewWidget* w = new ChartViewWidget(this);
     layout->addWidget(w);
     // No need to send mouse events to VTK when a mouse button isn't down
     w->setMouseTracking(false);
@@ -379,6 +388,7 @@ bool AbstractChartWidget::event(QEvent* event)
       double scaleY = (maxiY - miniY) / (double)(pt2Y[1] - pt1Y[1]);
       
       QPoint p = w->mapFromParent(helpEvent->pos()) - QPoint(pt1[0], -pt1[1]);
+      
       vtkVector2f pos((double)p.x() * scaleX + miniX, (double)(w->height()-p.y()-1) * scaleY + miniY), coord, tolerance(5.0*scaleX,5.0*scaleY); // tolerance +/- 5 pixels 
 
       for (int i = 1 ; i < chart->GetNumberOfPlots() ; ++i)  // FIXME: Should be between 0 and number of plots. +1 required due to the first plot used to fix the X axis range ... MUST BE REMOVED WITH VTK 5.8
@@ -532,4 +542,24 @@ void AbstractChartWidget::fixAxesVisibility()
       chart->RecalculateBounds();
     }
   }
+};
+
+// -----------------------------------------------------------------------------
+
+ChartViewWidget::ChartViewWidget(QWidget* parent, Qt::WindowFlags f)
+: QVTKWidget(parent, f)
+{};
+
+// To not propagate the middle and right click to the charts
+void ChartViewWidget::mousePressEvent(QMouseEvent* event)
+{
+  if (event->button() == Qt::LeftButton)
+    this->QVTKWidget::mousePressEvent(event);
+};
+
+// To not propagate the middle and right click to the charts
+void ChartViewWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+  if (event->button() == Qt::LeftButton)
+    this->QVTKWidget::mouseReleaseEvent(event);
 };
