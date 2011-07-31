@@ -406,12 +406,18 @@ bool Viz3DWidget::event(QEvent* event)
 
 void Viz3DWidget::keyPressEvent(QKeyEvent* event)
 {
-  this->GetRenderWindow()->GetInteractor()->SetAltKey(event->modifiers() == Qt::AltModifier ? 1 : 0);
-  this->QVTKWidget::keyPressEvent(event);
+  event->accept(); // Keyboard events are not sent to VTK
+  //this->QVTKWidget::keyPressEvent(event);
 };
 
 void Viz3DWidget::keyReleaseEvent(QKeyEvent* event)
 {
+  event->accept(); // Keyboard events are not sent to VTK
+  //this->QVTKWidget::keyReleaseEvent(event);
+};
+
+void Viz3DWidget::mousePressEvent(QMouseEvent* event)
+{
   this->GetRenderWindow()->GetInteractor()->SetAltKey(event->modifiers() == Qt::AltModifier ? 1 : 0);
-  this->QVTKWidget::keyPressEvent(event);
+  this->QVTKWidget::mousePressEvent(event);
 };
