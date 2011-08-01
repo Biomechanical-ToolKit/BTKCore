@@ -513,6 +513,7 @@ bool AbstractChartWidget::isAlreadyPlotted(int id)
 
 void AbstractChartWidget::setPlotsVisible(const QList<int>& itemIds, bool show)
 {
+  QList<QTableWidgetItem*> selectedItems = this->mp_ChartOptions->plotTable->selectedItems();
   for (int i = 0 ; i < itemIds.count() ; ++i)
   {
     for (int j = 0 ; j < this->mp_ChartOptions->plotTable->rowCount() ; ++j)
@@ -523,7 +524,11 @@ void AbstractChartWidget::setPlotsVisible(const QList<int>& itemIds, bool show)
         if (show)
           this->mp_ChartOptions->plotTable->showRow(j);
         else
+        {
           this->mp_ChartOptions->plotTable->hideRow(j);
+          if (selectedItems.contains(item))
+            this->mp_ChartOptions->plotTable->clearSelection();
+        }
         for (size_t k = 0 ; k < this->mp_VTKCharts->size() ; ++k)
           this->mp_VTKCharts->operator[](k)->GetPlot(j + 1)->SetVisible(show); // FIXME: +1 required due to the first plot used to fix the X axis range ... MUST BE REMOVED WITH VTK 5.8
       }
