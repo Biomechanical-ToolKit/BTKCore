@@ -54,9 +54,14 @@ class ChartViewWidget : public QVTKWidget
 {
 public:
   ChartViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  void setChart(btk::VTKChartXY* chart) {this->mp_Chart = chart;};
 protected:
   virtual void mousePressEvent(QMouseEvent* event);
   virtual void mouseReleaseEvent(QMouseEvent* event);
+  virtual void mouseMoveEvent(QMouseEvent* event);
+  virtual void wheelEvent(QWheelEvent* event);
+private:
+  btk::VTKChartXY* mp_Chart;
 };
 
 AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
@@ -94,7 +99,7 @@ AbstractChartWidget::~AbstractChartWidget()
 {
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
-    vtkChartXY* chart = this->mp_VTKCharts->operator[](i);
+    btk::VTKChartXY* chart = this->mp_VTKCharts->operator[](i);
     if (chart != NULL)
       chart->Delete();
   }
@@ -119,10 +124,11 @@ void AbstractChartWidget::initialize()
   {
     vtkRenderer* ren = vtkRenderer::New();
     ren->SetBackground(1.0,1.0,1.0);
-    vtkRenderWindow* renwin = static_cast<QVTKWidget*>(this->layout()->itemAt((int)i)->widget())->GetRenderWindow();
+    ChartViewWidget* w = static_cast<ChartViewWidget*>(this->layout()->itemAt((int)i)->widget());
+    vtkRenderWindow* renwin = w->GetRenderWindow();
     renwin->AddRenderer(ren);
     
-    vtkChartXY* chart = vtkChartXY::New(); // Do not delete
+    btk::VTKChartXY* chart = btk::VTKChartXY::New(); // Do not delete
     // chart->SetShowLegend(true);
     chart->SetAutoAxes(false);
     // this->mp_VTKChart->SetForceAxesToBounds(true); // VTK 5.8
@@ -130,6 +136,7 @@ void AbstractChartWidget::initialize()
     chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
     // chart->GetAxis(vtkAxis::LEFT)->SetTitle("Values"); // Y axis
     this->mp_VTKCharts->operator[](i) = chart;
+    w->setChart(chart);
     
     vtkContextScene* scene = vtkContextScene::New();
     vtkContextActor* actor = vtkContextActor::New();
@@ -152,7 +159,7 @@ void AbstractChartWidget::copy(AbstractChartWidget* source)
   // Clean if necessary
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
-    vtkChartXY* chart = this->mp_VTKCharts->operator[](i);
+    btk::VTKChartXY* chart = this->mp_VTKCharts->operator[](i);
     while (chart->GetNumberOfPlots() > 0)
       chart->RemovePlot(0);
     this->mp_ChartOptions->clear();
@@ -167,16 +174,16 @@ void AbstractChartWidget::copy(AbstractChartWidget* source)
   // Copy only the first (fake) plot 
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
-    vtkChartXY* sourceChart = source->mp_VTKCharts->operator[](i);
-    vtkChartXY* targetChart = this->mp_VTKCharts->operator[](i);
+    btk::VTKChartXY* sourceChart = source->mp_VTKCharts->operator[](i);
+    btk::VTKChartXY* targetChart = this->mp_VTKCharts->operator[](i);
     targetChart->AddPlot(vtkChart::POINTS)->SetInput(sourceChart->GetPlot(0)->GetInput(),0,1);
   }
 #else
   // Copy the plots
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
-    vtkChartXY* sourceChart = source->mp_VTKCharts->operator[](i);
-    vtkChartXY* targetChart = this->mp_VTKCharts->operator[](i);
+    btk::VTKChartXY* sourceChart = source->mp_VTKCharts->operator[](i);
+    btk::VTKChartXY* targetChart = this->mp_VTKCharts->operator[](i);
     targetChart->AddPlot(vtkChart::POINTS)->SetInput(sourceChart->GetPlot(0)->GetInput(),0,1); // FIXME: MUST BE REMOVED WITH VTK 5.8
     for (int j = 1 ; j < sourceChart->GetNumberOfPlots() ; ++j)
     {
@@ -212,8 +219,8 @@ void AbstractChartWidget::show(bool s)
 {
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
-    vtkChartXY* chart = this->mp_VTKCharts->operator[](i);
-    
+    btk::VTKChartXY* chart = this->mp_VTKCharts->operator[](i);
+    chart->SetInteractionEnabled(false);
     // Crash when using vtkChartXY::ClearPlots(), should be fixed with VTK 5.8
     for (int i = chart->GetNumberOfPlots()-1 ; i >= 0 ; --i)
       chart->RemovePlot(i);
@@ -372,7 +379,7 @@ bool AbstractChartWidget::event(QEvent* event)
     int idx = -1;
     if ((w != 0) && ((idx = this->layout()->indexOf(w)) != -1))
     {
-      vtkChartXY* chart = this->mp_VTKCharts->operator[](idx);
+      btk::VTKChartXY* chart = this->mp_VTKCharts->operator[](idx);
       int pt1[2]; chart->GetPoint1(pt1); // Bottom left
       
       vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
@@ -454,7 +461,11 @@ void AbstractChartWidget::dropEvent(QDropEvent* event)
   if (plotAdded)
   {
     for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
-      this->mp_VTKCharts->operator[](i)->GetPlot(0)->SetVisible(false);
+    {
+      btk::VTKChartXY* chart = this->mp_VTKCharts->operator[](i);
+      chart->GetPlot(0)->SetVisible(false);
+      chart->SetInteractionEnabled(true);
+    }
   }
   this->render();
 };
@@ -535,7 +546,8 @@ void AbstractChartWidget::fixAxesVisibility()
   }
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
-    vtkChartXY* chart = this->mp_VTKCharts->operator[](i);
+    btk::VTKChartXY* chart = this->mp_VTKCharts->operator[](i);
+    chart->SetInteractionEnabled(plotVisible);
     if (plotVisible == chart->GetPlot(0)->GetVisible())
     {
       chart->GetPlot(0)->SetVisible(!plotVisible);
@@ -548,7 +560,9 @@ void AbstractChartWidget::fixAxesVisibility()
 
 ChartViewWidget::ChartViewWidget(QWidget* parent, Qt::WindowFlags f)
 : QVTKWidget(parent, f)
-{};
+{
+  this->mp_Chart = 0;
+};
 
 // To not propagate the middle and right click to the charts
 void ChartViewWidget::mousePressEvent(QMouseEvent* event)
@@ -562,4 +576,20 @@ void ChartViewWidget::mouseReleaseEvent(QMouseEvent* event)
 {
   if (event->button() == Qt::LeftButton)
     this->QVTKWidget::mouseReleaseEvent(event);
+};
+
+// To not propagate the middle and right click to the charts
+void ChartViewWidget::mouseMoveEvent(QMouseEvent* event)
+{
+  // No need to check the state of the other buttons.
+  // The left mouse interaction is implemented in first in QVTKWidget.
+  if (event->buttons() & Qt::LeftButton == Qt::LeftButton)
+    this->QVTKWidget::mouseMoveEvent(event);
+};
+
+void ChartViewWidget::wheelEvent(QWheelEvent* event)
+{
+  if (this->mp_Chart)
+    this->mp_Chart->SetZoomMode((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? btk::VTKChartXY::HORIZONTAL : btk::VTKChartXY::BOTH);
+  this->QVTKWidget::wheelEvent(event);
 };

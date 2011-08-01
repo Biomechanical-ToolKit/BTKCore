@@ -36,7 +36,7 @@
 #ifndef AbstractChartWidget_h
 #define AbstractChartWidget_h
 
-#include <QVTKWidget.h>
+#include <btkVTKChartXY.h>
 
 #include "Acquisition.h"
 
@@ -44,7 +44,6 @@
 
 #include <vtkTable.h>
 #include <vtkDoubleArray.h>
-#include <vtkChartXY.h>
 #include <vtkPlot.h>
 #include <vtkLine.h>
 #include <vtkAxis.h>
@@ -55,7 +54,7 @@ class QDropEvent;
 
 class ChartOptionsWidget;
 
-class VTKCharts : public vtkstd::vector<vtkChartXY*>
+class VTKCharts : public vtkstd::vector<btk::VTKChartXY*>
 {};
 
 class AbstractChartWidget : public QWidget
