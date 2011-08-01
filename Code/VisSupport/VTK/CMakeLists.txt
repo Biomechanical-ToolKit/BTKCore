@@ -1,5 +1,6 @@
 SET(BTKVTK_SRCS
   btkVTKAxesWidget.cpp
+  btkVTKChartXY.cpp
   btkVTKDataObjectAdapter.cpp
   btkVTKForcePlatformsSource.cpp
   btkVTKFrustumFromTwoPoints.cpp
