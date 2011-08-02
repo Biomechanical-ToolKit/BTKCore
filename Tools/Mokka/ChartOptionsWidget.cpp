@@ -97,6 +97,7 @@ void ChartOptionsWidget::appendPlot(int itemId, const QString& label, int color[
 void ChartOptionsWidget::clear()
 {
   this->plotTable->clearContents();
+  this->plotTable->setRowCount(0);
   this->setPlotOptionEnabled(false);
 };
 

@@ -172,4 +172,5 @@ void ChartPointWidget::displayComponent(int idx, int state)
   this->layout()->itemAt(idx)->widget()->setVisible((state == Qt::Checked) ? true : false);
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
     this->mp_VTKCharts->operator[](i)->GetAxis(vtkAxis::LEFT)->RecalculateTickSpacing(); // Y axis
+  this->repaint();
 };

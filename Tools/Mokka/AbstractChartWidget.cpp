@@ -217,6 +217,9 @@ void AbstractChartWidget::setFrameArray(vtkDoubleArray* array)
 
 void AbstractChartWidget::show(bool s)
 {
+  if (!s)
+    this->mp_ChartOptions->clear();
+  
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
     btk::VTKChartXY* chart = this->mp_VTKCharts->operator[](i);
@@ -404,7 +407,7 @@ bool AbstractChartWidget::event(QEvent* event)
         if (plot->GetVisible() && plot->GetNearestPoint(pos, tolerance, &coord))
         {
           // FIXME: item(i-1,...: -1 is due to the first plot used for the axes. MUST BE REMOVED WITH VTK 5.8
-          QString str = "Frame: #" + QString::number(coord.X()) + "<br/>" + this->mp_ChartOptions->plotTable->item(i-1, 0)->text() + ": " + QString::number(coord.Y(), 'f', 1);
+          QString str = "Frame: " + QString::number(coord.X()) + "<br/>" + this->mp_ChartOptions->plotTable->item(i-1, 0)->text() + ": " + QString::number(coord.Y(), 'f', 1);
           QToolTip::showText(helpEvent->globalPos(), str);
           return true;
         }
@@ -588,7 +591,7 @@ void ChartViewWidget::mouseMoveEvent(QMouseEvent* event)
 {
   // No need to check the state of the other buttons.
   // The left mouse interaction is implemented in first in QVTKWidget.
-  if (event->buttons() & Qt::LeftButton == Qt::LeftButton)
+  if ((event->buttons() & Qt::LeftButton) == Qt::LeftButton)
     this->QVTKWidget::mouseMoveEvent(event);
 };
 
