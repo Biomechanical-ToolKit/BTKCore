@@ -65,7 +65,7 @@ private:
 };
 
 AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
-: QWidget(parent)
+: QWidget(parent), m_ViewActions()
 {
   this->mp_Acquisition = 0;
   this->mp_VTKCharts = new VTKCharts;
@@ -77,10 +77,17 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   
   this->setFocusPolicy(Qt::StrongFocus);
   
+  QAction* resetZoomAction = new QAction(tr("Reset Zoom"), this); this->m_ViewActions.push_back(resetZoomAction);
+  QAction* exportToAction = new QAction(tr("Export To..."), this); // this->m_ViewActions.push_back(exportToAction);
+  QAction* separator = new QAction(this); separator->setSeparator(true); this->m_ViewActions.push_back(separator);
+  QAction* removeAllPlotAction = new QAction(tr("Clear Chart"), this); this->m_ViewActions.push_back(removeAllPlotAction);
+  
   QVBoxLayout* layout = new QVBoxLayout(this);
   for (int i = 0 ; i < numCharts ; ++i)
   {
     ChartViewWidget* w = new ChartViewWidget(this);
+    w->insertActions(0, this->m_ViewActions);
+    w->setContextMenuPolicy(Qt::ActionsContextMenu);
     layout->addWidget(w);
     // No need to send mouse events to VTK when a mouse button isn't down
     w->setMouseTracking(false);
@@ -91,6 +98,9 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   connect(this->mp_ChartOptions, SIGNAL(lineColorChanged(QList<int>, QColor)), this, SLOT(setPlotLineColor(QList<int>, QColor)));
   connect(this->mp_ChartOptions, SIGNAL(lineWidthChanged(QList<int>, double)), this, SLOT(setPlotLineWidth(QList<int>, double)));
   connect(this->mp_ChartOptions, SIGNAL(plotRemoved(int)), this, SLOT(removePlot(int)));
+  connect(resetZoomAction, SIGNAL(triggered()), this, SLOT(resetZoom()));
+  connect(exportToAction, SIGNAL(triggered()), this, SLOT(exportToImage()));
+  connect(removeAllPlotAction, SIGNAL(triggered()), this, SLOT(removeAllPlot()));
   
   this->setAcceptDrops(true);
 }
@@ -219,6 +229,8 @@ void AbstractChartWidget::show(bool s)
 {
   if (!s)
     this->mp_ChartOptions->clear();
+  for (QList<QAction*>::iterator it = this->m_ViewActions.begin() ; it != this->m_ViewActions.end() ; ++it)
+    (*it)->setEnabled(s);
   
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
@@ -360,6 +372,27 @@ void AbstractChartWidget::hidePlots(const QList<int>& itemIds)
 void AbstractChartWidget::showPlots(const QList<int>& itemIds)
 {
   this->setPlotsVisible(itemIds, true);
+};
+
+void AbstractChartWidget::resetZoom()
+{
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->childAt(this->mapFromGlobal(QCursor::pos())));
+  int idx = -1;
+  if ((w != 0) && ((idx = this->layout()->indexOf(w)) != -1))
+    this->mp_VTKCharts->operator[](idx)->RecalculateBounds();
+  this->render();
+};
+
+void AbstractChartWidget::exportToImage()
+{
+  // TODO
+};
+
+void AbstractChartWidget::removeAllPlot()
+{
+  this->mp_ChartOptions->clear();
+  this->show(true); // Easy way to reset the chart.
+  this->render();
 };
 
 void AbstractChartWidget::toggleOptions(const QPoint& pos)

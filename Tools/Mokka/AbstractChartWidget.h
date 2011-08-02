@@ -86,6 +86,9 @@ public slots:
   void updatePlotLabel(int itemId);
   void hidePlots(const QList<int>& itemIds);
   void showPlots(const QList<int>& itemIds);
+  void resetZoom();
+  void exportToImage();
+  void removeAllPlot();
   
 protected:
   virtual bool event(QEvent* event);
@@ -104,6 +107,7 @@ protected:
   VTKCharts* mp_VTKCharts;
   vtkDoubleArray* mp_ArrayFrames;
   ChartOptionsWidget* mp_ChartOptions;
+  QList<QAction*> m_ViewActions;
 };
 
 #endif // AbstractChartWidget_h
