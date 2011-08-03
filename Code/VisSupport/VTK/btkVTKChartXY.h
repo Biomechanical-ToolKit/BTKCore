@@ -45,7 +45,7 @@ namespace btk
   class VTKChartXY : public vtkChartXY
   {
   public:
-    enum {BOTH, HORIZONTAL, VERTICAL}; // Zoom mode
+    enum {HORIZONTAL, VERTICAL, BOTH}; // Zoom mode
     
     BTK_VTK_EXPORT static VTKChartXY* New();
     vtkExportedTypeRevisionMacro(VTKChartXY, vtkChartXY, BTK_VTK_EXPORT);
@@ -55,6 +55,13 @@ namespace btk
     
     int GetZoomMode() const {return this->m_ZoomMode;};
     void SetZoomMode(int mode) {this->m_ZoomMode = mode;};
+    
+    bool GetBoundsEnabled() {return this->m_BoundsEnabled;};
+    void SetBoundsEnabled(bool enabled) {this->m_BoundsEnabled = enabled;};
+    double* GetBounds() {return this->mp_Bounds;};
+    void SetBounds(double xMin, double xMax, double yMin, double yMax) {double bounds[4] = {xMin, xMax, yMin, yMax}; this->SetBounds(bounds);};
+    BTK_VTK_EXPORT void SetBounds(double bounds[4]);
+    BTK_VTK_EXPORT void RecalculateBounds();
     
     BTK_VTK_EXPORT virtual bool MouseMoveEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta);
@@ -68,6 +75,8 @@ namespace btk
     
     bool m_InteractionEnabled;
     int m_ZoomMode;
+    bool m_BoundsEnabled;
+    double mp_Bounds[4]; // xMin, xMax, yMin, yMax
   };
 };
 

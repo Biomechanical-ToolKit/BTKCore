@@ -44,7 +44,9 @@ namespace btk
 {
   /**
    * @class VTKChartXY btkVTKChartXY.h
-   * @brief VTK XY chart with additional zooms (horizontal & vertical zoom).
+   * @brief VTK XY chart with additional interation (horizontal & vertical zoom, chart's boundaries).
+   *
+   * The top and bottom axes as well as the left and right axes uses the same range.
    * 
    * @ingroup BTKVTK
    */
@@ -63,7 +65,7 @@ namespace btk
    
   /**
    * @fn void VTKChartXY::SetInteractionEnabled(bool enabled)
-   * Enable / Disable the user interactions (move & zoom).
+   * Enable / disable the user interactions (move & zoom).
    */
   
   /**
@@ -77,12 +79,102 @@ namespace btk
    */
   
   /**
+   * @fn bool VTKChartXY::GetBoundsEnabled()
+   * Get the status for the use of the bounds on the chart's axes.
+   */
+
+  /**
+   * @fn void VTKChartXY::SetBoundsEnabled(bool enabled)
+   * Enable / disable the use of the bounds on the chart's axes.
+   */
+  
+  /**
+   * @fn double* VTKChartXY::GetBounds()
+   * Returns the boundaries set for the charts as xMin, xMax, yMin, yMax.
+   *
+   * If this is enabled (see the method SetBoundsEnabled()), then the zoom interaction will be limited by these bounds. 
+   */
+  
+  /**
+   * @fn void VTKChartXY::SetBounds(double xMin, double xMax, double yMin, double yMax)
+   * Convenient method to set the chart's bounds.
+   */
+  
+  /**
+   * Sets the boundaries for the charts.
+   * The input format is xMin, xMax, yMin, yMax.
+   * Need to be enabled (see the method SetBoundsEnabled()) to constraint the interactions on the chart.
+   */
+  void VTKChartXY::SetBounds(double bounds[4])
+  {
+    if ((bounds[0] == this->mp_Bounds[0]) && (bounds[1] == this->mp_Bounds[1]) && (bounds[2] == this->mp_Bounds[2]) && (bounds[3] == this->mp_Bounds[3]))
+      return;
+    
+    this->mp_Bounds[0] = bounds[0];
+    this->mp_Bounds[1] = bounds[1];
+    this->mp_Bounds[2] = bounds[2];
+    this->mp_Bounds[3] = bounds[3];
+    
+    this->GetAxis(vtkAxis::BOTTOM)->SetRange(bounds[0], bounds[1]);
+    this->GetAxis(vtkAxis::TOP)->SetRange(bounds[0], bounds[1]);
+    this->GetAxis(vtkAxis::LEFT)->SetRange(bounds[2], bounds[3]);
+    this->GetAxis(vtkAxis::RIGHT)->SetRange(bounds[2], bounds[3]);
+    
+    this->RecalculatePlotTransforms();
+    this->Scene->SetDirty(true);
+  };
+  
+  /**
+   * Update the vertical bounds based on the plot's bounds.
+   */
+  void VTKChartXY::RecalculateBounds()
+  {
+    // TODO: Could be refactored to be more efficient as RecalculatePlotBounds() do more than expected.
+    this->Update();
+    vtkAxis* axis = this->GetAxis(vtkAxis::LEFT);
+    axis->SetBehavior(0);
+    this->RecalculatePlotBounds();
+    axis->SetBehavior(1);
+    this->SetBounds(this->mp_Bounds[0], this->mp_Bounds[1], axis->GetMinimum(), axis->GetMaximum());
+  };
+  
+  /**
    * Overloaded method to move the chart only if the user interaction are enabled.
    */
   bool VTKChartXY::MouseMoveEvent(const vtkContextMouseEvent& mouse)
   {
     if (this->m_InteractionEnabled)
-      return this->vtkChartXY::MouseMoveEvent(mouse);
+    {
+      for (int i = 0 ; i < 2 ; ++i)
+      {
+        int mai = 1-i; // Map between the axis and the corresponding index in the array
+        vtkAxis* axis = this->GetAxis(mai);
+        float pt1[2]; axis->GetPoint1(pt1);
+        float pt2[2]; axis->GetPoint2(pt2);
+        double min = axis->GetMinimum(); double max = axis->GetMaximum();
+        double scale = (max - min) / (double)(pt2[i] - pt1[i]);
+        double delta = (mouse.LastScreenPos[i] - mouse.ScreenPos[i]) * scale;
+        
+        min = axis->GetMinimum() + delta;
+        max = axis->GetMaximum() + delta;
+        if (this->m_BoundsEnabled && (min < this->mp_Bounds[i*2]))
+        {
+          min = this->mp_Bounds[i*2];
+          max = axis->GetMaximum();
+        }
+        else if (this->m_BoundsEnabled && (max > this->mp_Bounds[i*2+1]))
+        {
+          min = axis->GetMinimum();
+          max = this->mp_Bounds[i*2+1];
+        }
+        axis->SetRange(min, max);
+        // Because we forces the opposite axes to have the same range it is not necessary to recompute the delta.
+        this->GetAxis(mai+2)->SetRange(min, max);
+      }
+      
+      this->RecalculatePlotTransforms();
+      this->Scene->SetDirty(true);
+    }
     return true;
   };
   
@@ -95,47 +187,31 @@ namespace btk
     
     if (this->m_InteractionEnabled)
     {
-      int start = 0;
-      int step = 1;
-    
-      // Assume the following values for the axis (from enum definition in vtkAxis.h):
-      //  - LEFT: 0
-      //  - BOTTOM: 1
-      //  - RIGHT: 2
-      //  - TOP: 3
-    
-      if (this->m_ZoomMode == VERTICAL)
+      for (int i = 0 ; i < 2 ; ++i)
       {
-        start = 0;
-        step = 2;
-      }
-      else if (this->m_ZoomMode == HORIZONTAL)
-      {
-        start = 1;
-        step = 2;
-      }
-    
-      for (int i = start; i < 4; i+=step)
-      {
-        vtkAxis* axis = this->GetAxis(i);
-        double min = axis->GetMinimum();
-        double max = axis->GetMaximum();
-        double frac = (max - min) * 0.1;
-        if (frac > 0.0)
+        int mai = 1-i; // Map between the axis and the corresponding index in the array
+        if ((this->m_ZoomMode == i) || (this->m_ZoomMode == BOTH)) // i=0: Horizontal, i=1: Vertical.
         {
+          vtkAxis* axis = this->GetAxis(mai);
+          double min = axis->GetMinimum();
+          double max = axis->GetMaximum();
+          double frac = (max - min) * 0.05;
           min += delta*frac;
           max -= delta*frac;
+          if (this->m_BoundsEnabled)
+          {
+            if (min < this->mp_Bounds[i*2])
+              min = this->mp_Bounds[i*2];
+            if (max > this->mp_Bounds[i*2+1])
+              max = this->mp_Bounds[i*2+1];
+          }
+          axis->SetRange(min,max);
+          vtkAxis* axis2 = this->GetAxis(mai+2);
+          axis2->SetRange(min,max);
+          axis->RecalculateTickSpacing();
+          axis2->RecalculateTickSpacing();
         }
-        else
-        {
-          min -= delta*frac;
-          max += delta*frac;
-        }
-        axis->SetMinimum(min);
-        axis->SetMaximum(max);
-        axis->RecalculateTickSpacing();
       }
-    
       this->RecalculatePlotTransforms();
       this->Scene->SetDirty(true);
     }
@@ -147,5 +223,18 @@ namespace btk
   {
     this->m_InteractionEnabled = true;
     this->m_ZoomMode = 0;
+    this->m_BoundsEnabled = false;
+    this->mp_Bounds[0] = 0.0;
+    this->mp_Bounds[1] = 0.0;
+    this->mp_Bounds[2] = 0.0;
+    this->mp_Bounds[3] = 0.0;
+    
+    // Set axes properties
+    for (int i = 0 ; i < 4 ; ++i)
+    {
+      vtkAxis* axis = this->GetAxis(i);
+      axis->SetBehavior(1); // Fixed
+      axis->SetRange(0.0, 0.0);
+    }
   };
 };
