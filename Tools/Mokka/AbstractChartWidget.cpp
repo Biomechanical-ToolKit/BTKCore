@@ -145,6 +145,7 @@ void AbstractChartWidget::initialize()
     // ColorSeries?
     chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
     // chart->GetAxis(vtkAxis::LEFT)->SetTitle("Values"); // Y axis
+    chart->SetBoundsEnabled(true);
     this->mp_VTKCharts->operator[](i) = chart;
     w->setChart(chart);
     
@@ -186,6 +187,7 @@ void AbstractChartWidget::copy(AbstractChartWidget* source)
   {
     btk::VTKChartXY* sourceChart = source->mp_VTKCharts->operator[](i);
     btk::VTKChartXY* targetChart = this->mp_VTKCharts->operator[](i);
+    targetChart->SetBounds(sourceChart->GetBounds()[0], sourceChart->GetBounds()[1], 0.0, 0.0);
     targetChart->AddPlot(vtkChart::POINTS)->SetInput(sourceChart->GetPlot(0)->GetInput(),0,1);
   }
 #else
@@ -257,6 +259,7 @@ void AbstractChartWidget::show(bool s)
         table->SetValue(i, 0, 0.0);
         table->SetValue(i, 1, 0.0);
       }
+      chart->SetBounds(0.0, 0.0, 0.0, 0.0);
     }
     else // Load
     {
@@ -266,7 +269,7 @@ void AbstractChartWidget::show(bool s)
       double lf = (double)this->mp_Acquisition->lastFrame();
       table->SetValue(0, 0, ff);
       table->SetValue(1, 0, lf);
-      chart->GetAxis(vtkAxis::BOTTOM)->SetRange(ff, lf); // X axis
+      chart->SetBounds(ff, lf, 0.0, 0.0);
       // Y
       table->SetValue(0, 1, 0.0);
       table->SetValue(1, 1, 0.0);
@@ -305,7 +308,6 @@ void AbstractChartWidget::render()
 {
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
-    //this->mp_VTKCharts->operator[](i)->RecalculateBounds(); // FIXME: Only when resizing and not dropping things
     QVTKWidget* w = static_cast<QVTKWidget*>(this->layout()->itemAt((int)i)->widget());
     if (w->isVisible())
       w->GetRenderWindow()->Render();
@@ -475,7 +477,7 @@ void AbstractChartWidget::dragEnterEvent(QDragEnterEvent* event)
 
 void AbstractChartWidget::dropEvent(QDropEvent* event)
 {
-  event->setDropAction(Qt::IgnoreAction); // Only to know which Analog IDs were dropped.
+  event->setDropAction(Qt::IgnoreAction); // Only to know which Analog|Marker IDs were dropped.
   event->accept();
   QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(event->source());
   QList<QTreeWidgetItem*> selectedItems = treeWidget->selectedItems();
@@ -501,6 +503,7 @@ void AbstractChartWidget::dropEvent(QDropEvent* event)
       btk::VTKChartXY* chart = this->mp_VTKCharts->operator[](i);
       chart->GetPlot(0)->SetVisible(false);
       chart->SetInteractionEnabled(true);
+      chart->RecalculateBounds();
     }
   }
   this->render();
@@ -590,10 +593,8 @@ void AbstractChartWidget::fixAxesVisibility()
     btk::VTKChartXY* chart = this->mp_VTKCharts->operator[](i);
     chart->SetInteractionEnabled(plotVisible);
     if (plotVisible == chart->GetPlot(0)->GetVisible())
-    {
       chart->GetPlot(0)->SetVisible(!plotVisible);
-      chart->RecalculateBounds();
-    }
+    chart->RecalculateBounds();
   }
 };
 
