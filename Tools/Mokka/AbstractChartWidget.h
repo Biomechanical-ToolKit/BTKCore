@@ -36,7 +36,7 @@
 #ifndef AbstractChartWidget_h
 #define AbstractChartWidget_h
 
-#include <btkVTKChartXY.h>
+#include <btkVTKChartTimeSeries.h>
 
 #include "Acquisition.h"
 
@@ -52,9 +52,10 @@
 class QDragEnterEvent;
 class QDropEvent;
 
+class vtkColorSeries;
 class ChartOptionsWidget;
 
-class VTKCharts : public vtkstd::vector<btk::VTKChartXY*>
+class VTKCharts : public vtkstd::vector<btk::VTKChartTimeSeries*>
 {};
 
 class AbstractChartWidget : public QWidget
@@ -91,21 +92,19 @@ public slots:
   void removeAllPlot();
   
 protected:
-  virtual bool event(QEvent* event);
   virtual void dragEnterEvent(QDragEnterEvent *event);
   virtual void dropEvent(QDropEvent* event);
-  virtual void paintEvent(QPaintEvent* event);
-  virtual void resizeEvent(QResizeEvent* event);
   
   bool isAlreadyPlotted(int id);
   virtual QString createPlotLabel(int id) = 0;
   virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, int* itemId, QString& legend, double* color, double* width) = 0;
   void setPlotsVisible(const QList<int>& itemIds, bool show);
-  void fixAxesVisibility();
+  void checkResetAxes();
   
   Acquisition* mp_Acquisition;
   VTKCharts* mp_VTKCharts;
   vtkDoubleArray* mp_ArrayFrames;
+  vtkColorSeries* mp_ColorGenerator;
   ChartOptionsWidget* mp_ChartOptions;
   QList<QAction*> m_ViewActions;
 };

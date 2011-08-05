@@ -57,7 +57,7 @@ void ChartPointWidget::initialize()
 {
   this->AbstractChartWidget::initialize();
   
-  vtkChartXY* chart = 0;
+  vtkChart* chart = 0;
   
   chart = this->mp_VTKCharts->operator[](0);
   chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis

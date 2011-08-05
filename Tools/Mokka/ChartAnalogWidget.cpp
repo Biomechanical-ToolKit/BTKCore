@@ -56,7 +56,7 @@ void ChartAnalogWidget::initialize()
 {
   this->AbstractChartWidget::initialize();
   
-  vtkChartXY* chart = this->mp_VTKCharts->operator[](0);
+  vtkChart* chart = this->mp_VTKCharts->operator[](0);
   chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
   chart->GetAxis(vtkAxis::LEFT)->SetTitle("Values"); // Y axis
 };
