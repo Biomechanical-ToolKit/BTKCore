@@ -71,6 +71,8 @@ namespace btk
    *  - Pan the chart only into boundaries
    *
    * You are able also to enable/disable interaction.
+   *
+   * The vtkAnnotationLink object is not taken into account during the painting.
    * 
    * @ingroup BTKVTK
    */
@@ -222,7 +224,7 @@ namespace btk
    */
   
    /**
-    * Modify the size of the borders and request to update them in the next painting operation.
+    * Modify the size of the borders. This method doesn't request to repaint the chart.
     */
   void VTKChartTimeSeries::SetBorders(int left, int bottom, int right, int top)
   {
@@ -235,7 +237,6 @@ namespace btk
     this->mp_Borders[2] = this->Geometry[0] - this->Point2[0]; // Right
     this->mp_Borders[3] = this->Geometry[1] - this->Point2[1]; // Top
     this->m_BordersChanged = true;
-    this->Scene->SetDirty(true);
   };
    
   /**
