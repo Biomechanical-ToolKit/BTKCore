@@ -40,11 +40,9 @@
 
 #include <vtkChart.h>
 
- class vtkChartLegend;
- class vtkColorSeries;
- class vtkAxis;
- class vtkPlotGrid;
- class vtkTransform2D;
+class vtkChartLegend;
+class vtkColorSeries;
+class vtkPlotGrid;
 
 namespace btk
 {
@@ -84,6 +82,7 @@ namespace btk
     BTK_VTK_EXPORT virtual void Update();
     BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
     BTK_VTK_EXPORT virtual vtkPlot* AddPlot(int type);
+    BTK_VTK_EXPORT virtual vtkIdType AddPlot(vtkPlot* plot);
     BTK_VTK_EXPORT virtual bool RemovePlot(vtkIdType index);
     BTK_VTK_EXPORT virtual void ClearPlots();
     BTK_VTK_EXPORT virtual vtkPlot* GetPlot(vtkIdType index);

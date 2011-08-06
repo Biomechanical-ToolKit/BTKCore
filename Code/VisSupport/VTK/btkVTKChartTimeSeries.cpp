@@ -352,17 +352,26 @@ namespace btk
     default:
       btkErrorMacro("Only the plot type LINE is supported by this chart");
     }
-    if (plot)
-    {
-      plot->SetXAxis(this->mp_AxisX);
-      plot->SetYAxis(this->mp_AxisY);
-      this->mp_Plots->push_back(plot);
-      // Ensure that the bounds of the chart are updated to contain the new plot
-      this->m_ChartBoundsValid = false;
-      // Mark the scene as dirty to update it.
-      this->Scene->SetDirty(true);
-    }
+    this->AddPlot(plot);
     return plot;
+  };
+  
+  /**
+   * Add the plot previously defined and return its index.
+   */
+  vtkIdType VTKChartTimeSeries::AddPlot(vtkPlot* plot)
+  {
+    if (plot == NULL)
+       return -1;
+     plot->SetXAxis(this->mp_AxisX);
+     plot->SetYAxis(this->mp_AxisY);
+     this->mp_Plots->push_back(plot);
+     vtkIdType plotIndex = this->mp_Plots->size() - 1;
+     // Ensure that the bounds of the chart are updated to contain the new plot
+     this->m_ChartBoundsValid = false;
+     // Mark the scene as dirty to update it.
+     this->Scene->SetDirty(true);
+    return plotIndex;
   };
   
   /**
