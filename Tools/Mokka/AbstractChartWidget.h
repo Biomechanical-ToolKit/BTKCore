@@ -100,6 +100,7 @@ protected:
   virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, int* itemId, QString& legend, double* color, double* width) = 0;
   void setPlotsVisible(const QList<int>& itemIds, bool show);
   void checkResetAxes();
+  void GenerateColor(double color[3]);
   
   Acquisition* mp_Acquisition;
   VTKCharts* mp_VTKCharts;

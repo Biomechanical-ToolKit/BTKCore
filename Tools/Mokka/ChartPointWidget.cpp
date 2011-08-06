@@ -36,6 +36,9 @@
 #include "ChartPointWidget.h"
 #include "UserRoles.h"
 
+#include <vtkPlotLine.h>
+#include <vtkPen.h>
+
 #include <QLayout>
 
 ChartPointWidget::ChartPointWidget(QWidget* parent)
@@ -138,17 +141,24 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* ite
   tableY->AddColumn(arrValY);
   tableZ->AddColumn(arrValZ);
   
-  vtkPlot* line = 0;
-  // X axis  
-  line = this->mp_VTKCharts->operator[](0)->AddPlot(vtkChart::LINE);
+  vtkPlotLine* line = 0;
+  this->GenerateColor(color);
+  // X axis 
+  line = vtkPlotLine::New();
+  this->mp_VTKCharts->operator[](0)->AddPlot(line);
+  line->GetPen()->SetColorF(color);
   line->SetInput(tableX,0,1);
   line->SetWidth(0.75);
   // Y axis
-  line = this->mp_VTKCharts->operator[](1)->AddPlot(vtkChart::LINE);
+  line = vtkPlotLine::New();
+  this->mp_VTKCharts->operator[](1)->AddPlot(line);
+  line->GetPen()->SetColorF(color);
   line->SetInput(tableY,0,1);
   line->SetWidth(0.75);
   // Z axis
-  line = this->mp_VTKCharts->operator[](2)->AddPlot(vtkChart::LINE);
+  line = vtkPlotLine::New();
+  this->mp_VTKCharts->operator[](2)->AddPlot(line);
+  line->GetPen()->SetColorF(color);
   line->SetInput(tableZ,0,1);
   line->SetWidth(0.75);
   
@@ -160,8 +170,6 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* ite
   tableZ->Delete();
   
   *itemId = id;
-  double c[3]; line->GetColor(c);
-  color[0] = c[0]; color[1] = c[1]; color[2] = c[2];
   *width = line->GetWidth();
   
   return true;

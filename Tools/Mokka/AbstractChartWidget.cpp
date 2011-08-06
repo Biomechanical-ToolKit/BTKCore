@@ -43,6 +43,7 @@
 #include <vtkRenderer.h>
 #include <vtkInteractorStyle.h>
 #include <vtkColorSeries.h>
+#include <vtkPen.h>
 #include <QVTKWidget.h>
 
 #include <QDragEnterEvent>
@@ -458,6 +459,29 @@ void AbstractChartWidget::checkResetAxes()
     if (!plotVisible)
       chart->SetBounds((double)this->mp_Acquisition->firstFrame(), (double)this->mp_Acquisition->lastFrame(), 0.0, 0.0);
   }
+};
+
+void AbstractChartWidget::GenerateColor(double color[3])
+{
+  btk::VTKChartTimeSeries* chart = this->mp_VTKCharts->operator[](0);
+  int numPlots = chart->GetNumberOfPlots();
+  int colorIndex = numPlots;
+  vtkColor3ub c = this->mp_ColorGenerator->GetColorRepeating(colorIndex);
+  int inc = 0;
+  while (inc < numPlots)
+  {
+    unsigned char rgb[3];
+    chart->GetPlot(inc)->GetPen()->GetColor(rgb);
+    if ((c.Red() == rgb[0]) && (c.Green() == rgb[1]) && (c.Blue() == rgb[2]))
+    {
+      c = this->mp_ColorGenerator->GetColorRepeating(++colorIndex);
+      inc = 0;
+    }
+    ++inc;
+  }
+  color[0] = c[0] / 255.0;
+  color[1] = c[1] / 255.0;
+  color[2] = c[2] / 255.0;
 };
 
 // -----------------------------------------------------------------------------

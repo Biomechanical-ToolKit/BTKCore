@@ -36,6 +36,9 @@
 #include "ChartAnalogWidget.h"
 #include "UserRoles.h"
 
+#include <vtkPlotLine.h>
+#include <vtkPen.h>
+
 ChartAnalogWidget::ChartAnalogWidget(QWidget* parent)
 : AbstractChartWidget(1, parent)
 {};
@@ -102,15 +105,17 @@ bool ChartAnalogWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* it
   arrVal->SetArray(analog->GetValues().data(), analog->GetFrameNumber(), 1); // Would be 0?
   table->AddColumn(arrVal);
   
-  vtkPlot* line = this->mp_VTKCharts->operator[](0)->AddPlot(vtkChart::LINE);
+  this->GenerateColor(color);
+  vtkPlotLine* line = vtkPlotLine::New();
+  this->mp_VTKCharts->operator[](0)->AddPlot(line);
+  line->GetPen()->SetColorF(color);
   line->SetInput(table,0,1);
   line->SetWidth(0.75);
   arrVal->Delete();
   table->Delete();
   
   *itemId = id;
-  double c[3]; line->GetColor(c);
-  color[0] = c[0]; color[1] = c[1]; color[2] = c[2];
   *width = line->GetWidth();
+  
   return true;
 };
