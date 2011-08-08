@@ -1,5 +1,6 @@
 SET(BTKVTK_SRCS
   btkVTKAxesWidget.cpp
+  btkVTKAxis.cpp
   btkVTKChartTimeSeries.cpp
   btkVTKDataObjectAdapter.cpp
   btkVTKForcePlatformsSource.cpp

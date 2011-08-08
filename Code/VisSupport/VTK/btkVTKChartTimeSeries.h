@@ -37,6 +37,8 @@
 #define __btkVTKChartTimeSeries_h
 
 #include "btkConfigure.h"
+#include "btkSharedPtr.h"
+#include "btkVTKAxis.h"
 
 #include <vtkChart.h>
 
@@ -47,6 +49,32 @@ class vtkPlotGrid;
 namespace btk
 {
   class VTKPlots;
+  
+  class VTKCurrentFrameFunctor
+  {
+  public:
+    typedef SharedPtr<VTKCurrentFrameFunctor> Pointer;
+    virtual ~VTKCurrentFrameFunctor() {};
+    virtual int operator()() = 0;
+  protected:
+    VTKCurrentFrameFunctor() {};
+  private:
+    VTKCurrentFrameFunctor(const VTKCurrentFrameFunctor& ); // Not implemented.
+    VTKCurrentFrameFunctor& operator=(const VTKCurrentFrameFunctor& ); // Not implemented.
+  };
+  
+  class VTKRegionOfInterestFunctor
+  {
+  public:
+    typedef SharedPtr<VTKRegionOfInterestFunctor> Pointer;
+    virtual ~VTKRegionOfInterestFunctor() {};
+    virtual void operator()(int& left, int& right) = 0;
+  protected:
+    VTKRegionOfInterestFunctor() {};
+  private:
+    VTKRegionOfInterestFunctor(const VTKRegionOfInterestFunctor& ); // Not implemented.
+    VTKRegionOfInterestFunctor& operator=(const VTKRegionOfInterestFunctor& ); // Not implemented.
+  };
   
   class VTKChartTimeSeries : public vtkChart
   {
@@ -78,6 +106,11 @@ namespace btk
     vtkColorSeries* GetColorSeries() {return this->mp_Colors;};
     
     BTK_VTK_EXPORT void SetBorders(int left, int bottom, int right, int top);
+    
+    VTKCurrentFrameFunctor::Pointer GetCurrentFrameFunctor() const {return this->mp_CurrentFrameFunctor;};
+    BTK_VTK_EXPORT void SetCurrentFrameFunctor(VTKCurrentFrameFunctor::Pointer functor);
+    VTKRegionOfInterestFunctor::Pointer GetRegionOfInterestFunctor() const {return this->mp_RegionOfInterestFunctor;};
+    BTK_VTK_EXPORT void SetRegionOfInterestFunctor(VTKRegionOfInterestFunctor::Pointer functor);
     
     BTK_VTK_EXPORT virtual void Update();
     BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
@@ -112,13 +145,16 @@ namespace btk
     
     vtkChartLegend* mp_Legend;
     vtkColorSeries* mp_Colors;
-    vtkAxis* mp_AxisX;
-    vtkAxis* mp_AxisY;
+    VTKAxis* mp_AxisX;
+    VTKAxis* mp_AxisY;
     vtkPlotGrid* mp_Grid;
     VTKPlots* mp_Plots;
     vtkTransform2D* mp_PlotsTransform;
     bool m_ChartBoundsValid;
     bool m_PlotsTransformValid;
+    
+    VTKCurrentFrameFunctor::Pointer mp_CurrentFrameFunctor;
+    VTKRegionOfInterestFunctor::Pointer mp_RegionOfInterestFunctor;
   };
 };
 

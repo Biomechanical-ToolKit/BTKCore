@@ -48,6 +48,7 @@
 #include <vtkColor.h>
 #include <vtkPlotLine.h>
 #include <vtkPen.h>
+#include <vtkBrush.h>
 #include <vtkTransform2D.h>
 #include <vtkContextDevice2D.h>
 
@@ -55,6 +56,34 @@
 
 namespace btk
 {
+  /**
+   * @class VTKCurrentFrameFunctor btkVTKChartTimeSeries.h
+   * @brief Functor to get easily to this chart the current frame displayed.
+   *
+   * This is usefull when combined with a timer or other view, like a 3D view.
+   */
+  /**
+   * @typedef VTKCurrentFrameFunctor::Pointer
+   * Smart pointer associated with a VTKCurrentFrameFunctor object.
+   */
+  /**
+   * @fn virtual int VTKCurrentFrameFunctor::operator()() = 0;
+   * Operator used to return the current frame displayed.
+   */
+   
+  /**
+   * @class VTKRegionOfInterestFunctor btkVTKChartTimeSeries.h
+   * @brief Functor to get easily to this chart the region of interest of the time series.
+   */
+  /**
+   * @typedef VTKRegionOfInterestFunctor::Pointer
+   * Smart pointer associated with a VTKCurrentFrameFunctor object.
+   */
+  /**
+   * @fn virtual void VTKRegionOfInterestFunctor::operator()(int& left, int& right) = 0;
+   * Operator used to get the left and right bounds of the region of interest.
+   */
+  
   /**
    * @class VTKPlots btkVTKChartTimeSeries.h
    * @brief List of pointer to vtkPlot objects.
@@ -72,7 +101,11 @@ namespace btk
    *
    * You are able also to enable/disable interaction.
    *
-   * The vtkAnnotationLink object is not taken into account during the painting.
+   * You have also the possibilty to display the current frame and the region of interest of the time series.
+   * To be able to display these informations, you have to create functors inheriting from VTKCurrentFrameFunctor and 
+   * VTKRegionOfInterestFunctor. Then set the functor by using the methods SetCurrentFrameFunctor() and SetRegionOfInterestFunctor().
+   *
+   * NOTE: The vtkAnnotationLink object is not taken into account during the painting.
    * 
    * @ingroup BTKVTK
    */
@@ -238,6 +271,32 @@ namespace btk
     this->mp_Borders[3] = this->Geometry[1] - this->Point2[1]; // Top
     this->m_BordersChanged = true;
   };
+  
+  /**
+   * @fn VTKCurrentFrameFunctor::Pointer VTKChartTimeSeries::GetCurrentFrameFunctor() const
+   * Returns the functor used to know the current frame to display.
+   */
+  
+  /**
+   * Sets the functor used to know the current frame to display.
+   */
+  void VTKChartTimeSeries::SetCurrentFrameFunctor(VTKCurrentFrameFunctor::Pointer functor)
+  {
+    this->mp_CurrentFrameFunctor = functor;
+  };
+  
+  /**
+   * @fn VTKRegionOfInterestFunctor::Pointer VTKChartTimeSeries::GetRegionOfInterestFunctor() const
+   * Returns the functor used to know the region of interest to display.
+   */
+  
+  /**
+   * Sets the functor used to know the region of interest to display.
+   */
+  void VTKChartTimeSeries::SetRegionOfInterestFunctor(VTKRegionOfInterestFunctor::Pointer functor)
+  {
+    this->mp_RegionOfInterestFunctor = functor;
+  };
    
   /**
    * Update the content of the chart which is not graphical. This function is called by the method Paint().
@@ -289,33 +348,89 @@ namespace btk
     this->mp_AxisY->Update();
     
     // Draw the items used in the chart. The order is important.
-    // I. The grid is in the back
+    // 1. The grid is in the back
     this->mp_Grid->Paint(painter);
-    // Then the plots
-    // II.1. Clip the plot between the axes
+    // 2. Clip the painting area between the axes
     float clipF[4] = {this->Point1[0], this->Point1[1], this->Point2[0]-this->Point1[0], this->Point2[1]-this->Point1[1] };
-    // II.1.1 Check if the scene has a transform and use it
+    // 2.1 Check if the scene has a transform and use it
     if (this->Scene->HasTransform())
       this->Scene->GetTransform()->InverseTransformPoints(clipF, clipF, 2);
     int clip[4] = {(int)clipF[0], (int)clipF[1], (int)clipF[2], (int)clipF[3]};
     painter->GetDevice()->SetClipping(clip);
-    // II.2. Plot rendering
+    // 3. Paint the plots
+#if 1
     painter->PushMatrix();
     painter->AppendTransform(this->mp_PlotsTransform);
     for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
       (*it)->Paint(painter);
+#else
+    float pt1X[2]; this->mp_AxisX->GetPoint1(pt1X);
+    float pt2X[2]; this->mp_AxisX->GetPoint2(pt2X);
+    float scaleX = (pt2X[0] - pt1X[0]) / static_cast<float>(this->mp_AxisX->GetMaximum() - this->mp_AxisX->GetMinimum());
+    bool markerDisplayed = (scaleX > 30.0f); // 30 pixels by unit. NOT ENOUGH FOR ANALOG DATA WITH BIGGER SAMPLE RATE
+    painter->PushMatrix();
+    painter->AppendTransform(this->mp_PlotsTransform);
+    for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+    {
+      vtkPlotPoints* points = vtkPlotPoints::SafeDownCast(*it);
+      if (points != 0)
+        points->SetMarkerStyle(markerDisplayed ? vtkPlotPoints::CIRCLE : vtkPlotPoints::NONE);
+      (*it)->Paint(painter);
+    }
+#endif
     painter->PopMatrix();
-    // II.3. Disable cliping
+    // 4. Disable cliping
     painter->GetDevice()->DisableClipping();
-    // III. The axes
-    painter->GetPen()->SetColorF(0.0, 0.0, 0.0, 1.0);
-    painter->GetPen()->SetWidth(1.0);
+    // 5. Paint the frame line and its bounds
+    float pt1X[2]; this->mp_AxisX->GetPoint1(pt1X);
+    float pt2X[2]; this->mp_AxisX->GetPoint2(pt2X);
+    float pt2Y[2]; this->mp_AxisY->GetPoint2(pt2Y);
+    float scaleX = (pt2X[0] - pt1X[0]) / static_cast<float>(this->mp_AxisX->GetMaximum() - this->mp_AxisX->GetMinimum());
+    // 5.1 Bounds
+    if (this->mp_RegionOfInterestFunctor != NULL)
+    {
+      painter->GetPen()->SetLineType(vtkPen::NO_PEN);
+#ifdef VTK_USE_QT
+      // For the record: If you compile VTK with the support of Qt, then VTK will use
+      // the vtkQtLabelRenderStrategy class to render the text in the scene. However, 
+      // to do this, they use an image cache mechanism based on images using the format 
+      // Qt::Format_ARGB32_Premultiplied. As written in the Qt documentation, using this 
+      // format implies that the RGB values cannot be greater than the alpha value, 
+      // otherwise, the behavior is unknown. In this case, we have to normalized the RGB 
+      // value by the alpha value.
+      painter->GetBrush()->SetColor(0, 32, 64, 64);
+#else
+      painter->GetBrush()->SetColor(0, 127, 255, 64);
+#endif
+      int lbi, rbi;
+      (*this->mp_RegionOfInterestFunctor)(lbi, rbi);
+      float left = static_cast<float>(lbi) - this->mp_AxisX->GetMinimum();
+      float right = this->mp_AxisX->GetMaximum() - static_cast<float>(rbi);
+      if (left > 0.0f)
+        painter->DrawRect(pt1X[0],pt1X[1],left*scaleX,pt2Y[1]-pt1X[1]);
+      if (right > 1.0f)
+        painter->DrawRect(pt2X[0]-right*scaleX,pt2X[1],right*scaleX,pt2Y[1]-pt1X[1]);
+    }
+    // 5.2 Frame line
+    if (this->mp_CurrentFrameFunctor != NULL)
+    {    
+      float frameIndex = static_cast<float>((*this->mp_CurrentFrameFunctor)());
+      if ((frameIndex >= this->mp_AxisX->GetMinimum()) && (frameIndex <= this->mp_AxisX->GetMaximum()))
+      {
+        painter->GetPen()->SetLineType(vtkPen::SOLID_LINE);
+        painter->GetPen()->SetColor(0, 127, 255);
+        painter->GetPen()->SetWidth(3.0);
+        float valX = pt1X[0] + (frameIndex - this->mp_AxisX->GetMinimum()) * scaleX;
+        painter->DrawLine(valX, pt1X[1], valX, pt2Y[1]);
+      }
+    }
+    // 6. The axes
     this->mp_AxisX->Paint(painter);
     this->mp_AxisY->Paint(painter);
-    // IV. The legend
+    // 7. The legend
     if (this->mp_Legend && this->ShowLegend)
       this->mp_Legend->Paint(painter);
-    // V. The title
+    // 8. The title
     if (this->Title)
     {
       vtkPoints2D* rect = vtkPoints2D::New();
@@ -554,7 +669,7 @@ namespace btk
   };
   
   VTKChartTimeSeries::VTKChartTimeSeries()
-  : vtkChart()
+  : vtkChart(), mp_CurrentFrameFunctor(), mp_RegionOfInterestFunctor()
   {
     // No legend by defaut.
     this->mp_Legend = 0;
@@ -563,11 +678,11 @@ namespace btk
     this->mp_Colors = 0;
     
     // Only two axes (bottom: X axis, left: Y axis)
-    this->mp_AxisX = vtkAxis::New();
+    this->mp_AxisX = VTKAxis::New();
     this->mp_AxisX->SetPosition(vtkAxis::BOTTOM);
     this->mp_AxisX->SetTitle("X Axis");
     this->mp_AxisX->SetVisible(true);
-    this->mp_AxisY = vtkAxis::New();
+    this->mp_AxisY = VTKAxis::New();
     this->mp_AxisY->SetPosition(vtkAxis::LEFT);
     this->mp_AxisY->SetTitle("Y Axis");
     this->mp_AxisY->SetVisible(true);
@@ -617,8 +732,8 @@ namespace btk
     delete this->mp_Plots;
     if (this->mp_Legend)
       this->mp_Legend->Delete();
-    if (this->mp_Legend)
-      this->mp_Legend->Delete();
+    if (this->mp_Colors)
+      this->mp_Colors->Delete();
     this->mp_AxisX->Delete();
     this->mp_AxisY->Delete();
     this->mp_Grid->Delete();
