@@ -39,6 +39,7 @@ SET(Mokka_CPP
   ProgressWidget.cpp
   TimeEventBarWidget.cpp
   TimeEventControlerWidget.cpp
+  TimeEventFunctors.cpp
   UndoCommands.cpp
   UpdateChecker.cpp
   Viz3DWidget.cpp

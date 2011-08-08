@@ -77,6 +77,12 @@ public:
   ChartOptionsWidget* options() {return mp_ChartOptions;};
   void toggleOptions(const QPoint& pos);
   
+  btk::VTKCurrentFrameFunctor::Pointer currentFrameFunctor() const;
+  void setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor);
+  
+  btk::VTKRegionOfInterestFunctor::Pointer regionOfInterestFunctor() const;
+  void setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor);
+  
   void render();
   void show(bool s);
   

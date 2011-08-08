@@ -38,6 +38,8 @@
 
 #include "AbstractMultiView.h"
 
+#include <btkVTKChartTimeSeries.h>
+
 #include <vtkEventQtSlotConnect.h>
 #include <vtkMapperCollection.h>
 
@@ -93,6 +95,9 @@ public:
   void showForcePlatformIndex(bool isShown);
   void setForcePlatformColor(const QColor& color);
   void setForceVectorColor(const QColor& color);
+  
+  void setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor);
+  void setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor);
   
   QObject* eventFilterObject() const {return this->mp_EventFilterObject;};
   void setEventFilterObject(QObject* filter);

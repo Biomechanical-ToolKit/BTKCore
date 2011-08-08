@@ -47,6 +47,7 @@
 #include "UserRoles.h"
 #include "UpdateChecker.h"
 #include "Preferences.h"
+#include "TimeEventFunctors.h"
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -246,6 +247,11 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
   connect(this->timeEventControler, SIGNAL(playbackStarted()), this->multiView, SLOT(forceRubberBandDrawingOff()));
   connect(this->timeEventControler, SIGNAL(playbackStopped()), this->multiView, SLOT(forceRubberBandDrawingOn()));
+  
+  // Functors to link the TimeEventWidget object with the VTK charts.
+  // Give an easy way to update the displayed current frame and bounds in the charts.
+  this->multiView->setCurrentFrameFunctor(CurrentFrameFunctor::New(this->timeEventControler));
+  this->multiView->setRegionOfInterestFunctor(RegionOfInterestFunctor::New(this->timeEventControler));
   
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
   this->menuHelp->addSeparator();

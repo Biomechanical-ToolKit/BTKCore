@@ -131,7 +131,7 @@ void CompositeView::copyOptions(CompositeView* from)
     break;
   case Viz3DOrthogonal:
     static_cast<QComboBox*>(this->optionStack->currentWidget())->setCurrentIndex(static_cast<QComboBox*>(from->optionStack->currentWidget())->currentIndex());
-    static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D))->copyProjectionCameraConfiguration(static_cast<Viz3DWidget*>(from->viewStack->widget(Viz3D)));
+    static_cast<Viz3DWidget*>(this->view(Viz3D))->copyProjectionCameraConfiguration(static_cast<Viz3DWidget*>(from->view(Viz3D)));
     break;
   case ChartPoint:
     break;
@@ -146,7 +146,7 @@ void CompositeView::setOrthogonalView(int view)
 {
   if (view == -1)
     return;
-  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D));
+  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->view(Viz3D));
   viz3D->setOrthogonalView(view);
   this->viewStack->currentWidget()->setFocus(Qt::OtherFocusReason);
 };
@@ -202,7 +202,7 @@ void CompositeView::finalizeView(int idx)
   if ((idx != Viz3DProjection) && (idx != Viz3DOrthogonal))
     return;
   
-  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->viewStack->widget(Viz3D));
+  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->view(Viz3D));
   btk::VTKInteractorStyleTrackballFixedUpCamera* style = static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(viz3D->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
   vtkCamera* cam = viz3D->renderer()->GetActiveCamera();
   if (idx == Viz3DProjection)

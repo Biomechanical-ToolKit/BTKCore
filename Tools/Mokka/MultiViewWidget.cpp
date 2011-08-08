@@ -150,16 +150,16 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
 MultiViewWidget::~MultiViewWidget()
 {
   this->mp_EventQtSlotConnections->Delete();
-   for (vtkProcessMap::iterator it = this->mp_VTKProc->begin() ; it != this->mp_VTKProc->end() ; ++it)
-     it->second->Delete();
-   delete this->mp_VTKProc;
-   delete this->mp_Syncro;
-   this->mp_PointChartFrames->Delete();
-   this->mp_AnalogChartFrames->Delete();
-   this->mp_Mappers->Delete();
-   if (this->mp_ForcePlatformActor != 0) this->mp_ForcePlatformActor->Delete();
-   if (this->mp_ForceVectorActor != 0) this->mp_ForceVectorActor->Delete();
-   vtkAlgorithm::SetDefaultExecutivePrototype(0);
+  for (vtkProcessMap::iterator it = this->mp_VTKProc->begin() ; it != this->mp_VTKProc->end() ; ++it)
+    it->second->Delete();
+  delete this->mp_VTKProc;
+  delete this->mp_Syncro;
+  this->mp_PointChartFrames->Delete();
+  this->mp_AnalogChartFrames->Delete();
+  this->mp_Mappers->Delete();
+  if (this->mp_ForcePlatformActor != 0) this->mp_ForcePlatformActor->Delete();
+  if (this->mp_ForceVectorActor != 0) this->mp_ForceVectorActor->Delete();
+  vtkAlgorithm::SetDefaultExecutivePrototype(0);
 };
 
 void MultiViewWidget::initialize()
@@ -442,6 +442,26 @@ void MultiViewWidget::load()
   // Active the content of each view
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
     static_cast<CompositeView*>(*it)->show(true);
+};
+
+void MultiViewWidget::setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor)
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    CompositeView* sv = static_cast<CompositeView*>(*it);
+    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartPoint))->setCurrentFrameFunctor(functor);
+    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartAnalog))->setCurrentFrameFunctor(functor);
+  }
+};
+
+void MultiViewWidget::setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor)
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    CompositeView* sv = static_cast<CompositeView*>(*it);
+    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartPoint))->setRegionOfInterestFunctor(functor);
+    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartAnalog))->setRegionOfInterestFunctor(functor);
+  }
 };
 
 void MultiViewWidget::setEventFilterObject(QObject* filter)
@@ -858,12 +878,9 @@ void MultiViewWidget::updateDisplay(int frame)
   for (vtkStreamingDemandDrivenPipelineCollection::iterator it = this->mp_Syncro->begin() ; it != this->mp_Syncro->end() ; ++it)
     (*it)->SetUpdateTimeStep(0, t);
   this->mp_Mappers->InitTraversal();
-  vtkMapper* mapper = this->mp_Mappers->GetNextItem();
-  while (mapper)
-  {
+  vtkMapper* mapper;
+  while ((mapper = this->mp_Mappers->GetNextItem()) != NULL)
     mapper->Modified();
-    mapper = this->mp_Mappers->GetNextItem();
-  }
   this->updateViews();
 };
 
@@ -882,13 +899,13 @@ void MultiViewWidget::hideAllMarkers()
 void MultiViewWidget::forceRubberBandDrawingOn()
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>((*it)->viewStack->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOn();
+    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOn();
 };
 
 void MultiViewWidget::forceRubberBandDrawingOff()
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>((*it)->viewStack->widget(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOff();
+    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOff();
 };
 
 void MultiViewWidget::dragEnterEvent(QDragEnterEvent *event)
@@ -915,13 +932,15 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
 {
   CompositeView* sv = static_cast<CompositeView*>(this->AbstractMultiView::createView(fromAnother));
   sv->copyOptions(static_cast<CompositeView*>(fromAnother));
-  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(sv->viewStack->widget(CompositeView::Viz3D));
+  // Viz3D final settings
+  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(sv->view(CompositeView::Viz3D));
   connect(viz3D, SIGNAL(pickedMarkerChanged(int)), this, SIGNAL(pickedMarkerChanged(int)));
   connect(viz3D, SIGNAL(pickedMarkerToggled(int)), this, SIGNAL(pickedMarkerToggled(int)));
   connect(viz3D, SIGNAL(selectedMarkersToggled(QList<int>)), this, SIGNAL(selectedMarkersToggled(QList<int>)));
   connect(viz3D, SIGNAL(trajectoryMarkerToggled(int)), this, SIGNAL(trajectoryMarkerToggled(int)));
   viz3D->insertActions(0, this->m_ViewActions);
   viz3D->setContextMenuPolicy(Qt::ActionsContextMenu);
+  // Event filter
   if (this->mp_EventFilterObject)
   {
     for (int i = 0 ; i < sv->viewStack->count() ; ++i)
@@ -970,13 +989,13 @@ void MultiViewWidget::updateCameras()
   double n[3]; ground->GetNormal(n);
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
   {
-    Viz3DWidget* viz3d = static_cast<Viz3DWidget*>((*it)->viewStack->widget(CompositeView::Viz3D));
+    Viz3DWidget* viz3d = static_cast<Viz3DWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D));
     static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(viz3d->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->SetGlobalUp(n);
   }
 };
 
 void MultiViewWidget::updateViews()
 {
-  for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
+  for (QList<AbstractView*>::const_iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
     static_cast<CompositeView*>(*it)->render();
 };

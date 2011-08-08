@@ -59,6 +59,8 @@ public:
   void setChart(btk::VTKChartTimeSeries* chart) {this->mp_Chart = chart;};
 protected:
   virtual bool event(QEvent* event);
+  virtual void keyPressEvent(QKeyEvent* event);
+  virtual void keyReleaseEvent(QKeyEvent* event);
   virtual void mousePressEvent(QMouseEvent* event);
   virtual void mouseReleaseEvent(QMouseEvent* event);
   virtual void mouseMoveEvent(QMouseEvent* event);
@@ -96,6 +98,9 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
     layout->addWidget(w);
     // No need to send mouse events to VTK when a mouse button isn't down
     w->setMouseTracking(false);
+    // w->GetRenderWindow()->SwapBuffersOff();
+    // w->GetRenderWindow()->DoubleBufferOff();
+    // w->GetRenderWindow()->SetMultiSamples(0);
   }
   layout->setContentsMargins(0,0,0,0);
   layout->setSpacing(0);
@@ -173,6 +178,9 @@ void AbstractChartWidget::copy(AbstractChartWidget* source)
   
   // Copy the acquisition pointer
   this->setAcquisition(source->acquisition());
+  // Copy the functors;
+  this->setCurrentFrameFunctor(source->currentFrameFunctor());
+  this->setRegionOfInterestFunctor(source->regionOfInterestFunctor());
   // Copy the X axis
   this->setFrameArray(source->frameArray());
 #if 1
@@ -339,6 +347,34 @@ void AbstractChartWidget::removeAllPlot()
   this->show(true); // Easy way to reset the chart.
   this->render();
 };
+
+btk::VTKCurrentFrameFunctor::Pointer AbstractChartWidget::currentFrameFunctor() const
+{
+  btk::VTKCurrentFrameFunctor::Pointer functor;
+  if (!this->mp_VTKCharts->empty())
+    functor = this->mp_VTKCharts->operator[](0)->GetCurrentFrameFunctor();
+  return functor;
+};
+
+void AbstractChartWidget::setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor)
+{
+  for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
+    this->mp_VTKCharts->operator[](i)->SetCurrentFrameFunctor(functor);
+};
+
+btk::VTKRegionOfInterestFunctor::Pointer AbstractChartWidget::regionOfInterestFunctor() const
+{
+  btk::VTKRegionOfInterestFunctor::Pointer functor;
+  if (!this->mp_VTKCharts->empty())
+    functor = this->mp_VTKCharts->operator[](0)->GetRegionOfInterestFunctor();
+  return functor;
+};
+
+void AbstractChartWidget::setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor)
+{
+  for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
+    this->mp_VTKCharts->operator[](i)->SetRegionOfInterestFunctor(functor);
+}
 
 void AbstractChartWidget::toggleOptions(const QPoint& pos)
 {
@@ -531,6 +567,18 @@ bool ChartViewWidget::event(QEvent* event)
     return true;
   }
   return QVTKWidget::event(event);
+};
+
+void ChartViewWidget::keyPressEvent(QKeyEvent* event)
+{
+  // Keyboard events are not sent to VTK and ignored to be sent to its parent
+  event->ignore(); 
+};
+
+void ChartViewWidget::keyReleaseEvent(QKeyEvent* event)
+{
+  // Keyboard events are not sent to VTK and ignored to be sent to its parent
+  event->ignore();
 };
 
 // To not propagate the middle and right click to the charts
