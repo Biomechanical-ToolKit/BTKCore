@@ -68,12 +68,33 @@ public:
   virtual ~RegionOfInterestFunctor() {};
   
   virtual void operator()(int& left, int& right);
+  
 protected:
   RegionOfInterestFunctor(TimeEventControlerWidget* w);
   
 private:
   RegionOfInterestFunctor(const RegionOfInterestFunctor& ); // Not implemented.
   RegionOfInterestFunctor& operator=(const RegionOfInterestFunctor& ); // Not implemented.
+  
+  TimeEventControlerWidget* mp_Object;
+};
+
+class EventsFunctor : public btk::VTKEventsFunctor
+{
+public:
+  typedef SharedPtr<EventsFunctor> Pointer;
+  static EventsFunctor::Pointer New(TimeEventControlerWidget* w) {return Pointer(new EventsFunctor(w));};
+  
+  virtual ~EventsFunctor() {};
+  
+  virtual bool operator()(int index, int& typeId, int& frame, double rgb[3]);
+  
+protected:
+  EventsFunctor(TimeEventControlerWidget* w);
+  
+private:
+  EventsFunctor(const EventsFunctor& ); // Not implemented.
+  EventsFunctor& operator=(const EventsFunctor& ); // Not implemented.
   
   TimeEventControlerWidget* mp_Object;
 };

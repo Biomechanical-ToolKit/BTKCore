@@ -38,8 +38,6 @@
 
 #include <vtkObjectFactory.h>
 
-#include <limits>
-
 // ----------------------- CurrentFrameFunctor ----------------------- //
 
 int CurrentFrameFunctor::operator()()
@@ -73,6 +71,23 @@ void RegionOfInterestFunctor::operator()(int& left, int& right)
 
 RegionOfInterestFunctor::RegionOfInterestFunctor(TimeEventControlerWidget* w)
 : btk::VTKRegionOfInterestFunctor()
+{
+  this->mp_Object = w;
+};
+
+// ----------------------- RegionOfInterestFunctor ----------------------- //
+
+bool EventsFunctor::operator()(int index, int& typeId, int& frame, double rgb[3])
+{
+  typeId = -1;
+  frame = 0;
+  rgb[0] = 0.0; rgb[1] = 0.0; rgb[2] = 0.0;
+  if (!this->mp_Object)
+    return false;
+  return this->mp_Object->eventItemData(index, typeId, frame, rgb);
+};
+
+EventsFunctor::EventsFunctor(TimeEventControlerWidget* w)
 {
   this->mp_Object = w;
 };

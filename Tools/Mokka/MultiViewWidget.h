@@ -98,6 +98,7 @@ public:
   
   void setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor);
   void setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor);
+  void setEventsFunctor(btk::VTKEventsFunctor::Pointer functor);
   
   QObject* eventFilterObject() const {return this->mp_EventFilterObject;};
   void setEventFilterObject(QObject* filter);

@@ -252,6 +252,7 @@ MainWindow::MainWindow(QWidget* parent)
   // Give an easy way to update the displayed current frame and bounds in the charts.
   this->multiView->setCurrentFrameFunctor(CurrentFrameFunctor::New(this->timeEventControler));
   this->multiView->setRegionOfInterestFunctor(RegionOfInterestFunctor::New(this->timeEventControler));
+  this->multiView->setEventsFunctor(EventsFunctor::New(this->timeEventControler));
   
 #if defined(Q_OS_WIN) || defined(Q_OS_MAC)
   this->menuHelp->addSeparator();

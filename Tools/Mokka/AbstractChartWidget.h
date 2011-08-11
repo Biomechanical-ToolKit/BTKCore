@@ -83,6 +83,9 @@ public:
   btk::VTKRegionOfInterestFunctor::Pointer regionOfInterestFunctor() const;
   void setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor);
   
+  btk::VTKEventsFunctor::Pointer eventsFunctor() const;
+  void setEventsFunctor(btk::VTKEventsFunctor::Pointer functor);
+  
   void render();
   void show(bool s);
   

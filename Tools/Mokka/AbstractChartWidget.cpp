@@ -146,6 +146,7 @@ void AbstractChartWidget::initialize()
     // chart->SetShowLegend(true);
     chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
     chart->SetBoundsEnabled(true);
+    chart->DisplayEventsOn();
     chart->SetColorSeries(this->mp_ColorGenerator);
     this->mp_VTKCharts->operator[](i) = chart;
     w->setChart(chart);
@@ -181,6 +182,8 @@ void AbstractChartWidget::copy(AbstractChartWidget* source)
   // Copy the functors;
   this->setCurrentFrameFunctor(source->currentFrameFunctor());
   this->setRegionOfInterestFunctor(source->regionOfInterestFunctor());
+  this->setEventsFunctor(source->eventsFunctor());
+  
   // Copy the X axis
   this->setFrameArray(source->frameArray());
 #if 1
@@ -375,6 +378,20 @@ void AbstractChartWidget::setRegionOfInterestFunctor(btk::VTKRegionOfInterestFun
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
     this->mp_VTKCharts->operator[](i)->SetRegionOfInterestFunctor(functor);
 }
+
+btk::VTKEventsFunctor::Pointer AbstractChartWidget::eventsFunctor() const
+{
+  btk::VTKEventsFunctor::Pointer functor;
+  if (!this->mp_VTKCharts->empty())
+    functor = this->mp_VTKCharts->operator[](0)->GetEventsFunctor();
+  return functor;
+};
+
+void AbstractChartWidget::setEventsFunctor(btk::VTKEventsFunctor::Pointer functor)
+{
+  for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
+    this->mp_VTKCharts->operator[](i)->SetEventsFunctor(functor);
+};
 
 void AbstractChartWidget::toggleOptions(const QPoint& pos)
 {

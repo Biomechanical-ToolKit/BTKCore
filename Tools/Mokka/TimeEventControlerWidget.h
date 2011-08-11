@@ -65,6 +65,8 @@ public:
   bool openEditorWhenInsertingEventFlag() const {return this->m_OpenEditorWhenInserting;};
   void setOpenEditorWhenInsertingEventFlag(bool isUsed) {this->m_OpenEditorWhenInserting = isUsed;};
   
+  bool eventItemData(int index, int& typeId, int& frame, double rgb[3]);
+  
 public slots:
   void togglePlayback();
   void stopPlayback();

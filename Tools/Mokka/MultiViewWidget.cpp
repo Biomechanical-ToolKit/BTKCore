@@ -464,6 +464,16 @@ void MultiViewWidget::setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor
   }
 };
 
+void MultiViewWidget::setEventsFunctor(btk::VTKEventsFunctor::Pointer functor)
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    CompositeView* sv = static_cast<CompositeView*>(*it);
+    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartPoint))->setEventsFunctor(functor);
+    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartAnalog))->setEventsFunctor(functor);
+  }
+};
+
 void MultiViewWidget::setEventFilterObject(QObject* filter)
 {
   this->mp_EventFilterObject = filter;

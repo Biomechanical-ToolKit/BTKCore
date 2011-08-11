@@ -252,6 +252,19 @@ void TimeEventControlerWidget::reset()
   this->lcdNumber->display(0);
 };
 
+bool TimeEventControlerWidget::eventItemData(int index, int& typeId, int& frame, double rgb[3])
+{
+  if (index >= this->timeEventBar->m_EventItems.count())
+    return false;
+  const Event* evt = this->mp_Acquisition->eventAt(this->timeEventBar->m_EventItems[index].id);
+  if (evt == 0)
+    return false;
+  typeId = evt->iconId;
+  frame = this->timeEventBar->m_EventItems[index].frame;
+  this->timeEventBar->m_EventItems[index].color.getRgbF(&rgb[0], &rgb[1], &rgb[2]);
+  return true;
+};
+
 void TimeEventControlerWidget::togglePlayback()
 {
   if (this->isEnabled())
@@ -589,6 +602,7 @@ void TimeEventControlerWidget::setEvents(const QList<int>& ids, const QList<Even
   for (int i = 0 ; i < ids.count() ; ++i)
     this->timeEventBar->setEvent(ids[i], events[i]);
   this->updateEventActions();
+  emit currentFrameChanged(this->timeEventBar->m_SliderPos);
 };
 
 void TimeEventControlerWidget::removeEvents(const QList<int>& ids, const QList<Event*>& events)
@@ -597,6 +611,7 @@ void TimeEventControlerWidget::removeEvents(const QList<int>& ids, const QList<E
   for (int i = 0 ; i < ids.count() ; ++i)
     this->timeEventBar->removeEvent(ids[i]);
   this->updateEventActions();
+  emit currentFrameChanged(this->timeEventBar->m_SliderPos);
 };
 
 void TimeEventControlerWidget::insertEvents(const QList<int>& ids, const QList<Event*>& events)
@@ -604,6 +619,7 @@ void TimeEventControlerWidget::insertEvents(const QList<int>& ids, const QList<E
   for (int i = 0 ; i < ids.count() ; ++i)
     this->timeEventBar->insertEvent(ids[i], events[i]);
   this->updateEventActions();
+  emit currentFrameChanged(this->timeEventBar->m_SliderPos);
 }; 
 
 void TimeEventControlerWidget::pressPlayButton()
@@ -821,6 +837,7 @@ void TimeEventControlerWidget::setEventFrame(int id, int frame)
     }
   }
   this->timeEventBar->update();
+  emit currentFrameChanged(this->timeEventBar->m_SliderPos);
 };
 
 void TimeEventControlerWidget::setEventIconId(Event* e)
