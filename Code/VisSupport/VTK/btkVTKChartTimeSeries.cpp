@@ -117,9 +117,11 @@ namespace btk
    *
    * You are able also to enable/disable interaction.
    *
-   * You have also the possibilty to display the current frame and the region of interest of the time series.
-   * To be able to display these informations, you have to create functors inheriting from VTKCurrentFrameFunctor and 
-   * VTKRegionOfInterestFunctor. Then set the functor by using the methods SetCurrentFrameFunctor() and SetRegionOfInterestFunctor().
+   * You have also the possibilty to display the current frame and the region of interest of the time series, as well as events.
+   * To be able to display these informations, you have to create functors inheriting from VTKCurrentFrameFunctor,  
+   * VTKRegionOfInterestFunctor and VTKEventsFunctor. Then set the functor by using the methods SetCurrentFrameFunctor(), SetRegionOfInterestFunctor() and SetEventsFunctor.
+   *
+   * The events are optional and hidden by default (and there is no functor). To display them, and after setting the functor, you have to use the function DisplayEventsOn().
    *
    * NOTE: The vtkAnnotationLink object is not taken into account during the painting.
    * 
