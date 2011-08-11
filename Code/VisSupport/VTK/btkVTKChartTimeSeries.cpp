@@ -83,6 +83,22 @@ namespace btk
    * @fn virtual void VTKRegionOfInterestFunctor::operator()(int& left, int& right) = 0;
    * Operator used to get the left and right bounds of the region of interest.
    */
+   
+  /**
+   * @class VTKEventsFunctor btkVTKChartTimeSeries.h
+   * @brief Functor to get easily to this chart the events as types, frames and colors.
+   *
+   * The types are represented by integer where the values 0, 1 and 2 are for 
+   * "General", "Foot strike" and "Foot off" respectively. All of the ohers values have no specific meanings.
+   */
+  /**
+   * @typedef VTKEventsFunctor::Pointer
+   * Smart pointer associated with a VTKCurrentFrameFunctor object.
+   */
+  /**
+   * @fn virtual bool VTKEventsFunctor::operator()(int index, int& typeId, int& frame, double rgb[3]) = 0;
+   * Operator used to extract each event. Asking for an event out of range returns false.
+   */
   
   /**
    * @class VTKPlots btkVTKChartTimeSeries.h
@@ -297,6 +313,45 @@ namespace btk
   {
     this->mp_RegionOfInterestFunctor = functor;
   };
+  
+  /**
+   * @fn VTKEventsFunctor::Pointer VTKChartTimeSeries::GetEventsFunctor() const
+   * Returns the functor used to know events' informations.
+   */
+  
+  /**
+   * Sets the functor used to know events' informations.
+   */
+  void VTKChartTimeSeries::SetEventsFunctor(VTKEventsFunctor::Pointer functor)
+  {
+    this->mp_EventsFunctor = functor;
+  };
+  
+  /**
+   * @fn int VTKChartTimeSeries::GetDisplayEvents() const
+   * Get the status of the events display.
+   */
+   
+  /**
+   * Enable/Disable the displaying of the events as vertical lines into the chart
+   */
+  void VTKChartTimeSeries::SetDisplayEvents(int enabled)
+  {
+    if (this->m_DisplayEvents == enabled)
+      return;
+    this->m_DisplayEvents = enabled;
+    this->Modified();
+  };
+  
+  /**
+   * @fn void VTKChartTimeSeries::DisplayEventsOn()
+   * Enable the displaying of the events as vertical lines into the chart
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::DisplayEventsOff()
+   * Disable the displaying of the events as vertical lines into the chart
+   */
    
   /**
    * Update the content of the chart which is not graphical. This function is called by the method Paint().
@@ -348,6 +403,11 @@ namespace btk
     this->mp_AxisY->Update();
     
     // Draw the items used in the chart. The order is important.
+    // 0. Init (values used later)
+    float pt1X[2]; this->mp_AxisX->GetPoint1(pt1X);
+    float pt2X[2]; this->mp_AxisX->GetPoint2(pt2X);
+    float pt2Y[2]; this->mp_AxisY->GetPoint2(pt2Y);
+    float scaleX = (pt2X[0] - pt1X[0]) / static_cast<float>(this->mp_AxisX->GetMaximum() - this->mp_AxisX->GetMinimum());
     // 1. The grid is in the back
     this->mp_Grid->Paint(painter);
     // 2. Clip the painting area between the axes
@@ -364,10 +424,7 @@ namespace btk
     for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
       (*it)->Paint(painter);
 #else
-    float pt1X[2]; this->mp_AxisX->GetPoint1(pt1X);
-    float pt2X[2]; this->mp_AxisX->GetPoint2(pt2X);
-    float scaleX = (pt2X[0] - pt1X[0]) / static_cast<float>(this->mp_AxisX->GetMaximum() - this->mp_AxisX->GetMinimum());
-    bool markerDisplayed = (scaleX > 30.0f); // 30 pixels by unit. NOT ENOUGH FOR ANALOG DATA WITH BIGGER SAMPLE RATE
+    bool markerDisplayed = (scaleX > 30.0f); // 30 pixels by unit. FIXME: NOT ENOUGH FOR ANALOG DATA WITH BIGGER SAMPLE RATE
     painter->PushMatrix();
     painter->AppendTransform(this->mp_PlotsTransform);
     for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
@@ -381,12 +438,42 @@ namespace btk
     painter->PopMatrix();
     // 4. Disable cliping
     painter->GetDevice()->DisableClipping();
-    // 5. Paint the frame line and its bounds
-    float pt1X[2]; this->mp_AxisX->GetPoint1(pt1X);
-    float pt2X[2]; this->mp_AxisX->GetPoint2(pt2X);
-    float pt2Y[2]; this->mp_AxisY->GetPoint2(pt2Y);
-    float scaleX = (pt2X[0] - pt1X[0]) / static_cast<float>(this->mp_AxisX->GetMaximum() - this->mp_AxisX->GetMinimum());
-    // 5.1 Bounds
+    // 5. Paint the events
+    if ((this->mp_EventsFunctor != NULL) && this->m_DisplayEvents)
+    {
+      int inc = 0, typeId = -1, idx = 0;
+      double color[3] = {0.0, 0.0, 0.0};
+      while ((*this->mp_EventsFunctor)(inc++, typeId, idx, color))
+      {
+        int lineType = vtkPen::NO_PEN;
+        switch (typeId)
+        {
+        case 0: // General
+          lineType = vtkPen::DASH_DOT_DOT_LINE;
+          break;
+        case 1: // Foot Strike
+          lineType = vtkPen::DASH_LINE;
+          break;
+        case 2: // Foot Off
+          lineType = vtkPen::DASH_DOT_LINE;
+          break;
+        default:
+          lineType = vtkPen::DOT_LINE;
+        }
+        float frameIndex = static_cast<float>(idx);
+        if ((frameIndex >= this->mp_AxisX->GetMinimum()) && (frameIndex <= this->mp_AxisX->GetMaximum()))
+        {
+          unsigned char rgb[3] = {static_cast<unsigned char>(color[0] * 255), static_cast<unsigned char>(color[1] * 255), static_cast<unsigned char>(color[2] * 255)};
+          painter->GetPen()->SetLineType(lineType);
+          painter->GetPen()->SetColor(rgb);
+          painter->GetPen()->SetWidth(1.0);
+          float valX = pt1X[0] + (frameIndex - this->mp_AxisX->GetMinimum()) * scaleX;
+          painter->DrawLine(valX, pt1X[1], valX, pt2Y[1]);
+        }
+      }
+    }
+    // 6. Paint the frame line and its bounds
+    // 6.1 Bounds
     if (this->mp_RegionOfInterestFunctor != NULL)
     {
       painter->GetPen()->SetLineType(vtkPen::NO_PEN);
@@ -411,7 +498,7 @@ namespace btk
       if (right > 1.0f)
         painter->DrawRect(pt2X[0]-right*scaleX,pt2X[1],right*scaleX,pt2Y[1]-pt1X[1]);
     }
-    // 5.2 Frame line
+    // 6.2 Frame line
     if (this->mp_CurrentFrameFunctor != NULL)
     {    
       float frameIndex = static_cast<float>((*this->mp_CurrentFrameFunctor)());
@@ -424,13 +511,13 @@ namespace btk
         painter->DrawLine(valX, pt1X[1], valX, pt2Y[1]);
       }
     }
-    // 6. The axes
+    // 7. The axes
     this->mp_AxisX->Paint(painter);
     this->mp_AxisY->Paint(painter);
-    // 7. The legend
+    // 8. The legend
     if (this->mp_Legend && this->ShowLegend)
       this->mp_Legend->Paint(painter);
-    // 8. The title
+    // 9. The title
     if (this->Title)
     {
       vtkPoints2D* rect = vtkPoints2D::New();
@@ -669,7 +756,7 @@ namespace btk
   };
   
   VTKChartTimeSeries::VTKChartTimeSeries()
-  : vtkChart(), mp_CurrentFrameFunctor(), mp_RegionOfInterestFunctor()
+  : vtkChart(), mp_CurrentFrameFunctor(), mp_RegionOfInterestFunctor(), mp_EventsFunctor()
   {
     // No legend by defaut.
     this->mp_Legend = 0;
@@ -715,6 +802,9 @@ namespace btk
     
     // Plots
     this->mp_Plots = new VTKPlots();
+    
+    // Display events disabled by defaut (no functor)
+    this->m_DisplayEvents = 0;
     
     // Linear transformation to scale and translate the plots
     this->mp_PlotsTransform = vtkTransform2D::New();

@@ -76,6 +76,19 @@ namespace btk
     VTKRegionOfInterestFunctor& operator=(const VTKRegionOfInterestFunctor& ); // Not implemented.
   };
   
+  class VTKEventsFunctor
+  {
+  public:
+    typedef SharedPtr<VTKEventsFunctor> Pointer;
+    virtual ~VTKEventsFunctor() {};
+    virtual bool operator()(int index, int& typeId, int& frame, double rgb[3]) = 0;
+  protected:
+    VTKEventsFunctor() {};
+  private:
+    VTKEventsFunctor(const VTKEventsFunctor& ); // Not implemented.
+    VTKEventsFunctor& operator=(const VTKEventsFunctor& ); // Not implemented.
+  };
+  
   class VTKChartTimeSeries : public vtkChart
   {
   public:
@@ -111,6 +124,13 @@ namespace btk
     BTK_VTK_EXPORT void SetCurrentFrameFunctor(VTKCurrentFrameFunctor::Pointer functor);
     VTKRegionOfInterestFunctor::Pointer GetRegionOfInterestFunctor() const {return this->mp_RegionOfInterestFunctor;};
     BTK_VTK_EXPORT void SetRegionOfInterestFunctor(VTKRegionOfInterestFunctor::Pointer functor);
+    VTKEventsFunctor::Pointer GetEventsFunctor() const {return this->mp_EventsFunctor;};
+    BTK_VTK_EXPORT void SetEventsFunctor(VTKEventsFunctor::Pointer functor);
+    
+    int GetDisplayEvents() const {return this->m_DisplayEvents;};
+    BTK_VTK_EXPORT void SetDisplayEvents(int enabled);
+    void DisplayEventsOn() {this->SetDisplayEvents(1);};
+    void DisplayEventsOff() {this->SetDisplayEvents(0);};
     
     BTK_VTK_EXPORT virtual void Update();
     BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
@@ -155,6 +175,8 @@ namespace btk
     
     VTKCurrentFrameFunctor::Pointer mp_CurrentFrameFunctor;
     VTKRegionOfInterestFunctor::Pointer mp_RegionOfInterestFunctor;
+    VTKEventsFunctor::Pointer mp_EventsFunctor;
+    int m_DisplayEvents;
   };
 };
 
