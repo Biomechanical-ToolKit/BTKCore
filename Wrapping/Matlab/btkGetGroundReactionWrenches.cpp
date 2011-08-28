@@ -37,7 +37,7 @@
 
 #include "btkMXObjectHandle.h"
 #include "btkMXMeasure.h"
-#include "btkMEXStreambufToWarnMsgTxt.h"
+#include "btkMEXOutputRedirection.h"
 
 #include <btkAcquisition.h>
 #include <btkForcePlatformsExtractor.h>
@@ -56,8 +56,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       mexErrMsgTxt("Second input argument must be a real value.");
 
   // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput("btk:GetGroundReactionWrenches");
-  std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput);
+  btk::MEXCerrToWarnMsgTxt cerrRedir = btk::MEXCerrToWarnMsgTxt("btk:GetGroundReactionWrenches");
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
@@ -104,6 +103,4 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     ++itWrench;
   }
- 
-  std::cerr.rdbuf(stdErrorOutput);
 };

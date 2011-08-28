@@ -34,7 +34,7 @@
  */
 
 #include "btkMXObjectHandle.h"
-#include "btkMEXStreambufToWarnMsgTxt.h"
+#include "btkMEXOutputRedirection.h"
 
 #include <btkMergeAcquisitionFilter.h>
 #include <btkAcquisition.h>
@@ -52,13 +52,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     merger->SetInput(i, btk_MOH_get_object<btk::Acquisition>(prhs[i]));
 
   // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput("btk:MergeAcquisitions");
-  std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput);
+  btk::MEXCerrToWarnMsgTxt cerrRedir = btk::MEXCerrToWarnMsgTxt("btk:MergeAcquisitions");
   
   merger->Update();
-  
-  // Back to the previous output buffers.
-  std::cerr.rdbuf(stdErrorOutput);
   
   plhs[0] = btk_MOH_create_handle(merger->GetOutput());
 };

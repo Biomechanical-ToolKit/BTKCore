@@ -34,8 +34,7 @@
  */
 
 #include "btkMXObjectHandle.h"
-#include "btkMEXStreambufToPrintf.h"
-#include "btkMEXStreambufToWarnMsgTxt.h"
+#include "btkMEXOutputRedirection.h"
 
 #include <btkAcquisitionFileWriter.h>
 #include <btkAcquisitionFileIOFactory.h>
@@ -135,11 +134,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   
   // std::cout redirection to the mexPrintf function.
-  btk::MEXStreambufToPrintf matlabStandardOutput;
-  std::streambuf* stdStandardOutput = std::cout.rdbuf(&matlabStandardOutput);
+  btk::MEXCoutToPrintf coutRedir = btk::MEXCoutToPrintf();
   // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput("btk:WriteAcquisition");
-  std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput); 
+  btk::MEXCerrToWarnMsgTxt cerrRedir = btk::MEXCerrToWarnMsgTxt("btk:WriteAcquisition");
 
   // The IO detection is done here to be able to set options.
   btk::AcquisitionFileIO::Pointer io = btk::AcquisitionFileIOFactory::CreateAcquisitionIO(filename, btk::AcquisitionFileIOFactory::WriteMode);
@@ -153,8 +150,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
   writer->SetAcquisitionIO(io);
-  writer->SetFilename(filename);
+  writer->SetFilename(std::string(filename));
   writer->SetInput(acq);
+  
+  mxFree(filename);
   
   try
   {
@@ -170,12 +169,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     std::remove(filename);
     errMsg = "An unexpected error occurred.";
   }
-
-  mxFree(filename);
-
-  // Back to the previous output buffer.
-  std::cout.rdbuf(stdStandardOutput);
-  std::cerr.rdbuf(stdErrorOutput);
 
   if (!errMsg.empty())
     mexErrMsgTxt(errMsg.c_str());

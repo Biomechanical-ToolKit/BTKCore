@@ -36,7 +36,7 @@
 #include "btkMXObjectHandle.h"
 #include "btkForcePlatformsExtractor.h"
 #include "btkMXMeasure.h"
-#include "btkMEXStreambufToWarnMsgTxt.h"
+#include "btkMEXOutputRedirection.h"
 
 #include <btkAcquisition.h>
 
@@ -48,8 +48,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("Too many output arguments.");
 
   // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput("btk:GetForcePlatforms");
-  std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput);
+  btk::MEXCerrToWarnMsgTxt cerrRedir = btk::MEXCerrToWarnMsgTxt("btk:GetForcePlatforms");
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
@@ -140,6 +139,4 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       }
     }
   }
-
-  std::cerr.rdbuf(stdErrorOutput);
 };

@@ -34,8 +34,7 @@
  */
 
 #include "btkMXObjectHandle.h"
-#include "btkMEXStreambufToPrintf.h"
-#include "btkMEXStreambufToWarnMsgTxt.h"
+#include "btkMEXOutputRedirection.h"
 
 #include <btkAcquisitionFileReader.h>
 
@@ -50,11 +49,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    mexErrMsgTxt("The filename must be a string and can't be empty.");
 
   // std::cout redirection to the mexPrintf function.
-  btk::MEXStreambufToPrintf matlabStandardOutput;
-  std::streambuf* stdStandardOutput = std::cout.rdbuf(&matlabStandardOutput);
+  btk::MEXCoutToPrintf coutRedir = btk::MEXCoutToPrintf();
   // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXStreambufToWarnMsgTxt matlabErrorOutput("btk:ReadAcquisition");
-  std::streambuf* stdErrorOutput = std::cerr.rdbuf(&matlabErrorOutput);
+  btk::MEXCerrToWarnMsgTxt cerrRedir = btk::MEXCerrToWarnMsgTxt("btk:ReadAcquisition");
 
   size_t strlen_ = (mxGetM(prhs[0]) * mxGetN(prhs[0]) * sizeof(mxChar)) + 1;
   char* filename = (char*)mxMalloc(strlen_);
@@ -62,6 +59,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   
   btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
   reader->SetFilename(std::string(filename));
+  
+  mxFree(filename);
   
   try
   {
@@ -75,12 +74,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   {
     mexErrMsgTxt("An unexpected error occurred.");
   }
-   
-  // Back to the previous output buffers.
-  std::cout.rdbuf(stdStandardOutput);
-  std::cerr.rdbuf(stdErrorOutput);
-  
-  mxFree(filename);
   
   plhs[0] = btk_MOH_create_handle(reader->GetOutput());
   if (nlhs > 1) // Byte Order
