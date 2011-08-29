@@ -110,7 +110,7 @@ bool ChartAnalogWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* it
   this->mp_VTKCharts->operator[](0)->AddPlot(line);
   line->GetPen()->SetColorF(color);
   line->SetInput(table,0,1);
-  line->SetWidth(0.75);
+  line->SetWidth(1.0);
   arrVal->Delete();
   table->Delete();
   

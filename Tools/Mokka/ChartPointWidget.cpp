@@ -141,6 +141,7 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* ite
   tableY->AddColumn(arrValY);
   tableZ->AddColumn(arrValZ);
   
+  const double lineWidth = 1.0;
   vtkPlotLine* line = 0;
   this->GenerateColor(color);
   // X axis 
@@ -148,19 +149,19 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* ite
   this->mp_VTKCharts->operator[](0)->AddPlot(line);
   line->GetPen()->SetColorF(color);
   line->SetInput(tableX,0,1);
-  line->SetWidth(0.75);
+  line->SetWidth(lineWidth);
   // Y axis
   line = vtkPlotLine::New();
   this->mp_VTKCharts->operator[](1)->AddPlot(line);
   line->GetPen()->SetColorF(color);
   line->SetInput(tableY,0,1);
-  line->SetWidth(0.75);
+  line->SetWidth(lineWidth);
   // Z axis
   line = vtkPlotLine::New();
   this->mp_VTKCharts->operator[](2)->AddPlot(line);
   line->GetPen()->SetColorF(color);
   line->SetInput(tableZ,0,1);
-  line->SetWidth(0.75);
+  line->SetWidth(lineWidth);
   
   arrValX->Delete();
   arrValY->Delete();
