@@ -271,7 +271,21 @@ void AbstractChartWidget::removePlot(int index)
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
     this->mp_VTKCharts->operator[](i)->RemovePlot(index);
   this->checkResetAxes(); // If no more plot or all of them are hidden, then the axes are reset.
+#ifdef Q_OS_WIN
+  // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
+  // The side effect is a possible blinking of the options but it's better than to see nothing.
+  if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
+  {
+    this->mp_ChartOptions->hide();
+    QApplication::processEvents();
+    this->render();
+    this->mp_ChartOptions->show();
+  }
+  else
+    this->render();
+#else
   this->render();
+#endif
 };
 
 void AbstractChartWidget::render()
@@ -294,7 +308,21 @@ void AbstractChartWidget::setPlotLineColor(const QList<int>& indices, const QCol
       plot->SetColor(color.redF(), color.greenF(), color.blueF());
     }
   }
+#ifdef Q_OS_WIN
+  // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
+  // The side effect is a possible blinking of the options but it's better than to see nothing.
+  if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
+  {
+    this->mp_ChartOptions->hide();
+    QApplication::processEvents();
+    this->render();
+    this->mp_ChartOptions->show();
+  }
+  else
+    this->render();
+#else
   this->render();
+#endif
 };
 
 void AbstractChartWidget::setPlotLineWidth(const QList<int>& indices, double value)
@@ -307,7 +335,21 @@ void AbstractChartWidget::setPlotLineWidth(const QList<int>& indices, double val
       plot->SetWidth(static_cast<float>(value));
     }
   }
+#ifdef Q_OS_WIN
+  // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
+  // The side effect is a possible blinking of the options but it's better than to see nothing.
+  if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
+  {
+    this->mp_ChartOptions->hide();
+    QApplication::processEvents();
+    this->render();
+    this->mp_ChartOptions->show();
+  }
+  else
+    this->render();
+#else
   this->render();
+#endif
 };
 
 void AbstractChartWidget::updatePlotLabel(int itemId)
