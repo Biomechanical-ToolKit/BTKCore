@@ -184,11 +184,24 @@ void ChartOptionsWidget::removePlot()
 
 void ChartOptionsWidget::setLineColor()
 {
-  QColor color = QColorDialog::getColor(Qt::white, this);
+  QList<QTableWidgetItem*> selectedItems = this->plotTable->selectedItems();
+  if (selectedItems.isEmpty())
+    return;
+  
+  QColor c = selectedItems[0]->data(LineColor).value<QColor>();
+  for (QList<QTableWidgetItem*>::const_iterator it = selectedItems.begin() ; it != selectedItems.end() ; ++it)
+  {
+    if (c != (*it)->data(LineColor).value<QColor>())
+    {
+      c = Qt::white;
+      break;
+    }
+  }
+    
+  QColor color = QColorDialog::getColor(c, this);
   QList<int> indices;
   if (color.isValid())
   {
-    QList<QTableWidgetItem*> selectedItems = this->plotTable->selectedItems();
     for (QList<QTableWidgetItem*>::const_iterator it = selectedItems.begin() ; it != selectedItems.end() ; ++it)
     {
       if ((*it)->column() == 0)
