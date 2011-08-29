@@ -33,20 +33,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
  
- #include "ProgressWidget.h"
+#include "ProgressWidget.h"
  
- ProgressWidget::ProgressWidget(QWidget* parent)
- : QDialog(parent)
- {
-   this->setupUi(this);
+ProgressWidget::ProgressWidget(QWidget* parent)
+: QDialog(parent)
+{
+  this->setupUi(this);
 #ifdef Q_OS_MAC
-   this->setWindowFlags(Qt::Sheet);
-   this->setWindowModality(Qt::WindowModal);
+  this->setWindowFlags(Qt::Sheet);
+  this->setWindowModality(Qt::WindowModal);
 #endif
- };
- 
+};
+
 void ProgressWidget::setProgressValue(int val)
- {
-   this->progressBar->setValue(val);
-   QCoreApplication::processEvents();
- }
+{
+  this->progressBar->setValue(val);
+  QCoreApplication::processEvents();
+};
