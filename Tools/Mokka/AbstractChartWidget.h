@@ -99,6 +99,7 @@ public slots:
   void resetZoom();
   void exportToImage();
   void removeAllPlot();
+  void toggleEventDisplay();
   
 protected:
   virtual void dragEnterEvent(QDragEnterEvent *event);

@@ -58,6 +58,7 @@ public:
   ChartViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   void setChart(btk::VTKChartTimeSeries* chart) {this->mp_Chart = chart;};
 protected:
+  virtual void contextMenuEvent(QContextMenuEvent* event);
   virtual bool event(QEvent* event);
   virtual void keyPressEvent(QKeyEvent* event);
   virtual void keyReleaseEvent(QKeyEvent* event);
@@ -72,6 +73,11 @@ private:
 AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
 : QWidget(parent), m_ViewActions()
 {
+  QPalette p(this->palette());
+  p.setColor(QPalette::Window, Qt::white);
+  this->setPalette(p);
+  this->setAutoFillBackground(true);
+  
   this->mp_Acquisition = 0;
   this->mp_VTKCharts = new VTKCharts;
   this->mp_VTKCharts->resize(numCharts);
@@ -86,6 +92,7 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   
   QAction* resetZoomAction = new QAction(tr("Reset Zoom"), this); this->m_ViewActions.push_back(resetZoomAction);
   QAction* separator = new QAction(this); separator->setSeparator(true); this->m_ViewActions.push_back(separator);
+  QAction* toggleEventDisplayAction = new QAction(tr("Toggle Events Display"), this); this->m_ViewActions.push_back(toggleEventDisplayAction);
   QAction* removeAllPlotAction = new QAction(tr("Clear Chart"), this); this->m_ViewActions.push_back(removeAllPlotAction);
   QAction* exportToAction = new QAction(tr("Export To..."), this); // this->m_ViewActions.push_back(exportToAction);
   
@@ -102,15 +109,16 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
     // w->GetRenderWindow()->DoubleBufferOff();
     // w->GetRenderWindow()->SetMultiSamples(0);
   }
-  layout->setContentsMargins(0,0,0,0);
+  layout->setContentsMargins(0,5,0,0);
   layout->setSpacing(0);
   
   connect(this->mp_ChartOptions, SIGNAL(lineColorChanged(QList<int>, QColor)), this, SLOT(setPlotLineColor(QList<int>, QColor)));
   connect(this->mp_ChartOptions, SIGNAL(lineWidthChanged(QList<int>, double)), this, SLOT(setPlotLineWidth(QList<int>, double)));
   connect(this->mp_ChartOptions, SIGNAL(plotRemoved(int)), this, SLOT(removePlot(int)));
   connect(resetZoomAction, SIGNAL(triggered()), this, SLOT(resetZoom()));
-  connect(exportToAction, SIGNAL(triggered()), this, SLOT(exportToImage()));
+  connect(toggleEventDisplayAction, SIGNAL(triggered()), this, SLOT(toggleEventDisplay()));
   connect(removeAllPlotAction, SIGNAL(triggered()), this, SLOT(removeAllPlot()));
+  connect(exportToAction, SIGNAL(triggered()), this, SLOT(exportToImage()));
   
   this->setAcceptDrops(true);
 }
@@ -143,7 +151,7 @@ void AbstractChartWidget::initialize()
     renwin->AddRenderer(ren);
     
     btk::VTKChartTimeSeries* chart = btk::VTKChartTimeSeries::New(); // Do not delete
-    // chart->SetShowLegend(true);
+    chart->SetBorders(60, 45, 20, 5);
     chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
     chart->SetBoundsEnabled(true);
     chart->DisplayEventsOn();
@@ -244,9 +252,17 @@ void AbstractChartWidget::show(bool s)
     chart->ClearPlots();
   
     if (!s) // Reset
+    {
       chart->SetBounds(0.0, 0.0, 0.0, 0.0);
+      chart->GetAxis(vtkAxis::BOTTOM)->SetLabelsVisible(false);
+      chart->GetAxis(vtkAxis::LEFT)->SetLabelsVisible(false);
+    }
     else // Load
+    {
       chart->SetBounds((double)this->mp_Acquisition->firstFrame(), (double)this->mp_Acquisition->lastFrame(), 0.0, 0.0);
+      chart->GetAxis(vtkAxis::BOTTOM)->SetLabelsVisible(true);
+      chart->GetAxis(vtkAxis::LEFT)->SetLabelsVisible(true);
+    }
   }
 };
 
@@ -335,7 +351,9 @@ void AbstractChartWidget::resetZoom()
   QVTKWidget* w = qobject_cast<QVTKWidget*>(this->childAt(this->mapFromGlobal(QCursor::pos())));
   int idx = -1;
   if ((w != 0) && ((idx = this->layout()->indexOf(w)) != -1))
-    this->mp_VTKCharts->operator[](idx)->RecalculateBounds();
+  {
+    this->mp_VTKCharts->operator[](idx)->ResetZoom();
+  }
   this->render();
 };
 
@@ -348,6 +366,16 @@ void AbstractChartWidget::removeAllPlot()
 {
   this->mp_ChartOptions->clear();
   this->show(true); // Easy way to reset the chart.
+  this->render();
+};
+
+void AbstractChartWidget::toggleEventDisplay()
+{
+  for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
+  {
+    btk::VTKChartTimeSeries* chart = this->mp_VTKCharts->operator[](i);
+    chart->SetDisplayEvents(chart->GetDisplayEvents() == 1 ? 0 : 1);
+  }
   this->render();
 };
 
@@ -545,6 +573,12 @@ ChartViewWidget::ChartViewWidget(QWidget* parent, Qt::WindowFlags f)
   this->mp_Chart = 0;
 };
 
+void ChartViewWidget::contextMenuEvent(QContextMenuEvent* event)
+{
+  // No need to send this event to VTK.
+  this->QWidget::contextMenuEvent(event);
+};
+
 bool ChartViewWidget::event(QEvent* event)
 {
   if (event->type() == QEvent::ToolTip)
@@ -588,42 +622,88 @@ bool ChartViewWidget::event(QEvent* event)
 
 void ChartViewWidget::keyPressEvent(QKeyEvent* event)
 {
-  // Keyboard events are not sent to VTK and ignored to be sent to its parent
-  event->ignore(); 
+  // Keyboard events are not sent to VTK.
+  this->QWidget::keyPressEvent(event);
 };
 
 void ChartViewWidget::keyReleaseEvent(QKeyEvent* event)
 {
-  // Keyboard events are not sent to VTK and ignored to be sent to its parent
-  event->ignore();
+  // Keyboard events are not sent to VTK.
+  this->QWidget::keyReleaseEvent(event);
 };
 
 // To not propagate the middle and right click to the charts
 void ChartViewWidget::mousePressEvent(QMouseEvent* event)
 {
-  if (event->button() == Qt::LeftButton)
-    this->QVTKWidget::mousePressEvent(event);
+  vtkRenderWindowInteractor* iren = NULL;
+  if(this->mRenWin)
+    iren = this->mRenWin->GetInteractor();
+  if(!iren || !iren->GetEnabled())
+    return;
+  
+  // give vtk event information (without modifiers informations: always set to 0)
+  iren->SetEventInformationFlipY(event->x(), event->y(), 0, 0, 0, (event->type() == QEvent::MouseButtonDblClick ? 1 : 0));
+  
+  // invoke appropriate vtk event only for the left button
+  if(event->button() == Qt::LeftButton)
+  {
+    if (this->mp_Chart)
+      this->mp_Chart->SetDisplayZoomBox((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? 1 : 0);
+    iren->InvokeEvent(vtkCommand::LeftButtonPressEvent, event);
+  }
 };
 
 // To not propagate the middle and right click to the charts
 void ChartViewWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-  if (event->button() == Qt::LeftButton)
-    this->QVTKWidget::mouseReleaseEvent(event);
+  vtkRenderWindowInteractor* iren = NULL;
+  if(this->mRenWin)
+    iren = this->mRenWin->GetInteractor();
+  if(!iren || !iren->GetEnabled())
+    return;
+  
+  // give vtk event information (without modifiers informations: always set to 0)
+  iren->SetEventInformationFlipY(event->x(), event->y(), 0, 0);
+  
+  // invoke appropriate vtk event only for the left button
+  if(event->button() == Qt::LeftButton)
+    iren->InvokeEvent(vtkCommand::LeftButtonReleaseEvent, event);
 };
 
 // To not propagate the middle and right click to the charts
 void ChartViewWidget::mouseMoveEvent(QMouseEvent* event)
 {
-  // No need to check the state of the other buttons.
-  // The left mouse interaction is implemented in first in QVTKWidget.
+  vtkRenderWindowInteractor* iren = NULL;
+  if(this->mRenWin)
+    iren = this->mRenWin->GetInteractor();
+  if(!iren || !iren->GetEnabled())
+    return;
+  
+  // give interactor the event information (without modifiers informations: always set to 0)
+  iren->SetEventInformationFlipY(event->x(), event->y(), 0, 0);
+  
+  // invoke vtk event only if the left button is activated
   if ((event->buttons() & Qt::LeftButton) == Qt::LeftButton)
-    this->QVTKWidget::mouseMoveEvent(event);
+    iren->InvokeEvent(vtkCommand::MouseMoveEvent, event);
 };
 
 void ChartViewWidget::wheelEvent(QWheelEvent* event)
 {
+  vtkRenderWindowInteractor* iren = NULL;
+  if(this->mRenWin)
+    iren = this->mRenWin->GetInteractor();
+  if(!iren || !iren->GetEnabled())
+    return;
+  
   if (this->mp_Chart)
     this->mp_Chart->SetZoomMode((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? btk::VTKChartTimeSeries::HORIZONTAL : btk::VTKChartTimeSeries::BOTH);
-  this->QVTKWidget::wheelEvent(event);
+  
+  // give vtk event information (without modifiers informations: always set to 0)
+  iren->SetEventInformationFlipY(event->x(), event->y(), 0, 0);
+
+  // invoke vtk event: if delta is positive, it is a forward wheel event
+  if(event->delta() > 0)
+    iren->InvokeEvent(vtkCommand::MouseWheelForwardEvent, event);
+  else
+    iren->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, event);
 };
