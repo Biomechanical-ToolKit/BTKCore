@@ -51,8 +51,11 @@
 #include <vtkBrush.h>
 #include <vtkTransform2D.h>
 #include <vtkContextDevice2D.h>
+#include <vtkTextProperty.h>
+#include <vtkOpenGLContextDevice2D.h>
 
 #include <vtkstd/list>
+#include <vtkgl.h>
 
 namespace btk
 {
@@ -112,16 +115,18 @@ namespace btk
    * @brief Chart for the time series data with only a bottom and left axes.
    *
    * This chart has several interaction to constraint pan and zoom
-   *  - Select only a horizontal or vertical zoom
-   *  - Pan the chart only into boundaries
+   *  - Select only a horizontal or vertical zoom;
+   *  - Pan the chart only into boundaries;
    *
-   * You are able also to enable/disable interaction.
+   * You can also enable/disable the interactions .
    *
    * You have also the possibilty to display the current frame and the region of interest of the time series, as well as events.
    * To be able to display these informations, you have to create functors inheriting from VTKCurrentFrameFunctor,  
    * VTKRegionOfInterestFunctor and VTKEventsFunctor. Then set the functor by using the methods SetCurrentFrameFunctor(), SetRegionOfInterestFunctor() and SetEventsFunctor.
    *
    * The events are optional and hidden by default (and there is no functor). To display them, and after setting the functor, you have to use the function DisplayEventsOn().
+   *
+   * This class take into account the transformation given to the object to paint correctly the legend into the scene (only the scale and translation are supported).
    *
    * NOTE: The vtkAnnotationLink object is not taken into account during the painting.
    * 
@@ -135,6 +140,16 @@ namespace btk
   vtkStandardNewMacro(VTKChartTimeSeries);
   vtkCxxRevisionMacro(VTKChartTimeSeries, "$Revision: 0.1 $");
   
+  /**
+   * @fn bool VTKChartTimeSeries::GetClippingEnabled() const
+   * Returns the status of the clippling for the plots (cannot be drawn outside of the axis.)
+   */
+   
+  /**
+   * @fn void VTKChartTimeSeries::SetClippingEnabled(bool enabled)
+   * Sets the status of the clippling for the plots (cannot be drawn outside of the axis.)
+   */
+    
   /**
    * @fn bool VTKChartTimeSeries::GetInteractionEnabled() const
    * Get the status of the user interactions (move & zoom).
@@ -273,13 +288,34 @@ namespace btk
    * @fn vtkColorSeries* VTKChartTimeSeries::GetColorSeries()
    * Returns the generator of colors (NULL by default).
    */
+   
+  /**
+   * @fn int VTKChartTimeSeries::GetTitleMargin() const
+   * Returns the margin between the border and the title.
+   */
   
-   /**
-    * Modify the size of the borders. This method doesn't request to repaint the chart.
-    */
+  /**
+   * Sets the margin between the border and the title.
+   */ 
+  void VTKChartTimeSeries::SetTitleMargin(int margin)
+  {
+    if (this->m_TitleMargin == margin)
+      return;
+    this->m_TitleMargin = margin;
+    this->Scene->SetDirty(true);
+  };
+  
+  /**
+   * @fn const int* VTKChartTimeSeries::GetBorders() const
+   * Returns the borders as an array of 4 elements. The order is left, bottom. right, top.
+   */
+  
+  /**
+   * Modify the size of the borders. This method doesn't request to repaint the chart.
+   */
   void VTKChartTimeSeries::SetBorders(int left, int bottom, int right, int top)
   {
-    if ((this->mp_Borders[0] == left) && (this->mp_Borders[0] == left) && (this->mp_Borders[0] == left) && (this->mp_Borders[0] == left))
+    if ((this->mp_Borders[0] == left) && (this->mp_Borders[1] == bottom) && (this->mp_Borders[2] == right) && (this->mp_Borders[3] == top))
       return;
     this->vtkChart::SetBorders(left, bottom, right, top);
     // Set the borders value after as the method SetBorders(), check the given value and modify them if necessary
@@ -287,6 +323,10 @@ namespace btk
     this->mp_Borders[1] = this->Point1[1]; // Bottom
     this->mp_Borders[2] = this->Geometry[0] - this->Point2[0]; // Right
     this->mp_Borders[3] = this->Geometry[1] - this->Point2[1]; // Top
+    this->mp_AxisX->SetPoint1(this->mp_Borders[0], this->mp_Borders[1]);
+    this->mp_AxisY->SetPoint1(this->mp_Borders[0], this->mp_Borders[1]);
+    this->mp_AxisX->SetPoint2(this->mp_Borders[2], this->mp_Borders[1]);
+    this->mp_AxisY->SetPoint2(this->mp_Borders[0], this->mp_Borders[3]);
     this->m_BordersChanged = true;
   };
   
@@ -327,6 +367,42 @@ namespace btk
   void VTKChartTimeSeries::SetEventsFunctor(VTKEventsFunctor::Pointer functor)
   {
     this->mp_EventsFunctor = functor;
+  };
+  
+  /**
+   * @fn float VTKChartTimeSeries::GetEventLineWidth() const
+   * Returns the width of the vertical line used to display the events.
+   */
+  
+  /**
+   * Sets the width of the vertical line used to display the events.
+   */
+  void VTKChartTimeSeries::SetEventLineWidth(float width)
+  {
+    if (this->m_EventLineWidth == width)
+      return;
+    this->m_EventLineWidth = width;
+    this->Scene->SetDirty(true);
+  };
+  
+  /**
+   * @fn int VTKChartTimeSeries::GetEventLineTypeFactor() const
+   * Returns the factor used in the spacing of the elements in the pattern to draw non-solid line.
+   *
+   * By default the dash, dot line, etc has a space of few pixels, but this function can scale this spacing.
+   */
+  
+  /**
+   * Sets the factor used in the spacing of the elements in the pattern to draw non-solid line.
+   *
+   * By default the dash, dot line, etc has a space of few pixels, but this function can scale this spacing.
+   */
+  void VTKChartTimeSeries::SetEventLineTypeFactor(int factor)
+  {
+    if (this->m_EventLineTypeFactor == factor)
+      return;
+    this->m_EventLineTypeFactor = factor;
+    this->Scene->SetDirty(true);
   };
   
   /**
@@ -389,9 +465,13 @@ namespace btk
       this->mp_AxisX->SetPoint2(this->Point2[0], this->Point1[1]);
       this->mp_AxisY->SetPoint1(this->Point1[0], this->Point1[1]);
       this->mp_AxisY->SetPoint2(this->Point1[0], this->Point2[1]);
-      // And the legend
+      // And the legend (reset to the right top corner)
       if (this->mp_Legend != 0)
+      {
+        this->mp_Legend->SetHorizontalAlignment(vtkChartLegend::RIGHT);
+        this->mp_Legend->SetVerticalAlignment(vtkChartLegend::TOP);
         this->mp_Legend->SetPoint(this->Point2[0], this->Point2[1]);
+      }
       this->m_BordersChanged = false;
       this->m_PlotsTransformValid = false;
     }
@@ -413,12 +493,15 @@ namespace btk
     // 1. The grid is in the back
     this->mp_Grid->Paint(painter);
     // 2. Clip the painting area between the axes
-    float clipF[4] = {this->Point1[0], this->Point1[1], this->Point2[0]-this->Point1[0], this->Point2[1]-this->Point1[1] };
-    // 2.1 Check if the scene has a transform and use it
-    if (this->Scene->HasTransform())
-      this->Scene->GetTransform()->InverseTransformPoints(clipF, clipF, 2);
-    int clip[4] = {(int)clipF[0], (int)clipF[1], (int)clipF[2], (int)clipF[3]};
-    painter->GetDevice()->SetClipping(clip);
+    if (this->m_ClippingEnabled)
+    {
+      float clipF[4] = {this->Point1[0], this->Point1[1], this->Point2[0]-this->Point1[0], this->Point2[1]-this->Point1[1] };
+      // 2.1 Check if the scene has a transform and use it
+      if (this->Scene->HasTransform())
+        this->Scene->GetTransform()->InverseTransformPoints(clipF, clipF, 2);
+      int clip[4] = {(int)clipF[0], (int)clipF[1], (int)clipF[2], (int)clipF[3]};
+      painter->GetDevice()->SetClipping(clip);
+    }
     // 3. Paint the plots
 #if 1
     painter->PushMatrix();
@@ -441,7 +524,7 @@ namespace btk
     // 4. Disable cliping
     painter->GetDevice()->DisableClipping();
     // 5. Paint the events
-    if ((this->mp_EventsFunctor != NULL) && this->m_DisplayEvents)
+    if ((this->mp_EventsFunctor != NULL) && (this->m_DisplayEvents != 0))
     {
       int inc = 0, typeId = -1, idx = 0;
       double color[3] = {0.0, 0.0, 0.0};
@@ -465,12 +548,60 @@ namespace btk
         float frameIndex = static_cast<float>(idx);
         if ((frameIndex >= this->mp_AxisX->GetMinimum()) && (frameIndex <= this->mp_AxisX->GetMaximum()))
         {
-          unsigned char rgb[3] = {static_cast<unsigned char>(color[0] * 255), static_cast<unsigned char>(color[1] * 255), static_cast<unsigned char>(color[2] * 255)};
+#ifdef VTK_USE_QT
+          const double opacityEvent = 0.75;
+          double maxColor = std::max(std::max(color[0], color[1]), color[2]);
+          double scaleColor = (maxColor > opacityEvent) ? opacityEvent / maxColor : 1.0;
+          unsigned char rgb[3] = {static_cast<unsigned char>(color[0] * scaleColor * 255.0), static_cast<unsigned char>(color[1] * scaleColor * 255.0), static_cast<unsigned char>(color[2] * scaleColor * 255.0)};
+#else
+          unsigned char rgb[3] = {static_cast<unsigned char>(color[0] * 255.0), static_cast<unsigned char>(color[1] * 255.0), static_cast<unsigned char>(color[2] * 255.0)};
+#endif
           painter->GetPen()->SetLineType(lineType);
           painter->GetPen()->SetColor(rgb);
-          painter->GetPen()->SetWidth(1.0);
+          painter->GetPen()->SetOpacity(191);
+          painter->GetPen()->SetWidth(this->m_EventLineWidth);
           float valX = pt1X[0] + (frameIndex - this->mp_AxisX->GetMinimum()) * scaleX;
-          painter->DrawLine(valX, pt1X[1], valX, pt2Y[1]);
+          // Because VTK 5.6 doesn't give the possibilty to set the line factor given by OpenGL, it is 
+          // necessary to modify the OpenGL device directly.
+          vtkOpenGLContextDevice2D* device = vtkOpenGLContextDevice2D::SafeDownCast(painter->GetDevice());
+          if (device != NULL)
+          {
+            float x[4] = {valX, pt1X[1], valX, pt2Y[1]};
+            device->SetColor4(painter->GetPen()->GetColor());
+            device->SetLineWidth(painter->GetPen()->GetWidth());
+            device->SetPointSize(painter->GetPen()->GetWidth());
+            // Code adapted to set the line type factor
+            if (painter->GetPen()->GetLineType() == vtkPen::SOLID_LINE)
+              glDisable(GL_LINE_STIPPLE);
+            else
+              glEnable(GL_LINE_STIPPLE);
+            GLushort pattern = 0x0000;
+            switch (painter->GetPen()->GetLineType())
+            {
+            case vtkPen::NO_PEN:
+              pattern = 0x0000;
+              break;
+            case vtkPen::DASH_LINE:
+              pattern = 0x00FF;
+              break;
+            case vtkPen::DOT_LINE:
+              pattern = 0x0101;
+              break;
+            case vtkPen::DASH_DOT_LINE:
+              pattern = 0x0C0F;
+              break;
+            case vtkPen::DASH_DOT_DOT_LINE:
+              pattern = 0x1C47;
+              break;
+            default:
+              pattern = 0x0000;
+            }
+            glLineStipple(this->m_EventLineTypeFactor, pattern);
+            // Draw the line
+            device->DrawPoly(&x[0], 2);
+          }
+          else
+            painter->DrawLine(valX, pt1X[1], valX, pt2Y[1]);
         }
       }
     }
@@ -507,7 +638,11 @@ namespace btk
       if ((frameIndex >= this->mp_AxisX->GetMinimum()) && (frameIndex <= this->mp_AxisX->GetMaximum()))
       {
         painter->GetPen()->SetLineType(vtkPen::SOLID_LINE);
-        painter->GetPen()->SetColor(0, 127, 255);
+#ifdef VTK_USE_QT
+        painter->GetPen()->SetColor(0, 95, 191, 191); // Normalized
+#else
+        painter->GetPen()->SetColor(0, 127, 255, 191);
+#endif
         painter->GetPen()->SetWidth(3.0);
         float valX = pt1X[0] + (frameIndex - this->mp_AxisX->GetMinimum()) * scaleX;
         painter->DrawLine(valX, pt1X[1], valX, pt2Y[1]);
@@ -522,12 +657,11 @@ namespace btk
     // 9. The title
     if (this->Title)
     {
-      vtkPoints2D* rect = vtkPoints2D::New();
-      rect->InsertNextPoint(this->Point1[0], this->Point2[1]);
-      rect->InsertNextPoint(this->Point2[0]-this->Point1[0], 10);
       painter->ApplyTextProp(this->TitleProperties);
-      painter->DrawStringRect(rect, this->Title);
-      rect->Delete();
+      float pt[2] = {(this->Point2[0]+this->mp_Borders[2]) / 2, this->Point2[1] + this->mp_Borders[3] - this->m_TitleMargin};
+      if (this->GetTransform() != NULL)
+        this->GetTransform()->TransformPoints(pt, pt, 1);
+      painter->DrawString(pt[0], pt[1], this->Title);
     }
     
     return true;
@@ -663,6 +797,16 @@ namespace btk
   };
   
   /**
+   * Sets the vtkContextScene for the chart and its axis.
+   */
+  void VTKChartTimeSeries::SetScene(vtkContextScene* scene)
+  {
+    this->vtkContextItem::SetScene(scene);
+    this->mp_AxisX->SetScene(scene);
+    this->mp_AxisY->SetScene(scene);
+  };
+  
+  /**
    * Return true if the supplied x, y coordinate is inside the item.
    * Required for the MouseWheelEvent() method.
    */
@@ -749,7 +893,7 @@ namespace btk
           axis->RecalculateTickSpacing();
           // axis2->RecalculateTickSpacing();
         }
-      }
+      }      
       // this->RecalculatePlotsTransform();
       this->m_PlotsTransformValid = false;
       this->Scene->SetDirty(true);
@@ -770,6 +914,7 @@ namespace btk
     this->mp_AxisX = VTKAxis::New();
     this->mp_AxisX->SetPosition(vtkAxis::BOTTOM);
     this->mp_AxisX->SetTitle("X Axis");
+    this->mp_AxisX->SetLabelMargin(7.0f);
     this->mp_AxisX->SetVisible(true);
     this->mp_AxisY = VTKAxis::New();
     this->mp_AxisY->SetPosition(vtkAxis::LEFT);
@@ -787,6 +932,7 @@ namespace btk
     this->mp_Grid->SetYAxis(this->mp_AxisY);
     
     // Interaction and bounds
+    this->m_ClippingEnabled = true;
     this->m_InteractionEnabled = true;
     this->m_ZoomMode = 0;
     this->m_BoundsEnabled = false;
@@ -807,10 +953,16 @@ namespace btk
     
     // Display events disabled by defaut (no functor)
     this->m_DisplayEvents = 0;
+    this->m_EventLineWidth = 0.5f;
+    this->m_EventLineTypeFactor = 1;
     
     // Linear transformation to scale and translate the plots
     this->mp_PlotsTransform = vtkTransform2D::New();
     this->m_PlotsTransformValid = true;
+    
+    // Title
+    this->TitleProperties->SetVerticalJustificationToTop();
+    this->m_TitleMargin = 10;
     
     // Defaut borders for the chart
     this->m_BordersChanged = false;

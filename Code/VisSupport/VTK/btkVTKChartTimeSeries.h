@@ -99,6 +99,9 @@ namespace btk
     
     virtual ~VTKChartTimeSeries();
     
+    bool GetClippingEnabled() const {return this->m_ClippingEnabled;};
+    void SetClippingEnabled(bool enabled) {this->m_ClippingEnabled = enabled;};
+    
     bool GetInteractionEnabled() const {return this->m_InteractionEnabled;};
     void SetInteractionEnabled(bool enabled) {this->m_InteractionEnabled = enabled;};
     
@@ -118,6 +121,10 @@ namespace btk
     BTK_VTK_EXPORT void SetColorSeries(vtkColorSeries* colors);
     vtkColorSeries* GetColorSeries() {return this->mp_Colors;};
     
+    int GetTitleMargin() const {return this->m_TitleMargin;};
+    BTK_VTK_EXPORT void SetTitleMargin(int margin);
+    
+    const int* GetBorders() const {return this->mp_Borders;};
     BTK_VTK_EXPORT void SetBorders(int left, int bottom, int right, int top);
     
     VTKCurrentFrameFunctor::Pointer GetCurrentFrameFunctor() const {return this->mp_CurrentFrameFunctor;};
@@ -132,6 +139,12 @@ namespace btk
     void DisplayEventsOn() {this->SetDisplayEvents(1);};
     void DisplayEventsOff() {this->SetDisplayEvents(0);};
     
+    float GetEventLineWidth() const {return this->m_EventLineWidth;};
+    void SetEventLineWidth(float width);
+    
+    int GetEventLineTypeFactor() const {return this->m_EventLineTypeFactor;};
+    void SetEventLineTypeFactor(int factor);
+    
     BTK_VTK_EXPORT virtual void Update();
     BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
     BTK_VTK_EXPORT virtual vtkPlot* AddPlot(int type);
@@ -142,6 +155,7 @@ namespace btk
     BTK_VTK_EXPORT virtual vtkIdType GetNumberOfPlots();
     BTK_VTK_EXPORT virtual vtkAxis* GetAxis(int axisIndex);
     BTK_VTK_EXPORT virtual vtkIdType GetNumberOfAxes();
+    BTK_VTK_EXPORT virtual void SetScene(vtkContextScene* scene);
     
     BTK_VTK_EXPORT bool Hit(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseMoveEvent(const vtkContextMouseEvent& mouse);
@@ -156,6 +170,7 @@ namespace btk
     VTKChartTimeSeries(const VTKChartTimeSeries& ); // Not implemented.
     void operator=(const VTKChartTimeSeries& );   // Not implemented.
     
+    bool m_ClippingEnabled;
     bool m_InteractionEnabled;
     int m_ZoomMode;
     bool m_BoundsEnabled;
@@ -172,11 +187,14 @@ namespace btk
     vtkTransform2D* mp_PlotsTransform;
     bool m_ChartBoundsValid;
     bool m_PlotsTransformValid;
+    int m_TitleMargin;
     
     VTKCurrentFrameFunctor::Pointer mp_CurrentFrameFunctor;
     VTKRegionOfInterestFunctor::Pointer mp_RegionOfInterestFunctor;
     VTKEventsFunctor::Pointer mp_EventsFunctor;
     int m_DisplayEvents;
+    float m_EventLineWidth;
+    int m_EventLineTypeFactor;
   };
 };
 
