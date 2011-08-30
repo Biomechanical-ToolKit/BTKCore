@@ -991,9 +991,7 @@ namespace btk
    */
   bool VTKChartTimeSeries::MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta)
   {
-    btkNotUsed(mouse);
-    
-    if (this->m_InteractionEnabled)
+    if ((this->m_InteractionEnabled) && (this->m_ZoomBoxDisplayed == 0))
     {
       for (int i = 0 ; i < 2 ; ++i)
       {
@@ -1001,11 +999,18 @@ namespace btk
         if ((this->m_ZoomMode == i) || (this->m_ZoomMode == BOTH)) // i=0: Horizontal, i=1: Vertical.
         {
           vtkAxis* axis = this->GetAxis(mai);
+          float pt[2];
+          this->mp_PlotsTransform->InverseTransformPoints(mouse.Pos.GetData(), pt, 1);
+          double oldRange = axis->GetMaximum() - axis->GetMinimum();
+          double offsetCenter = (pt[i] - axis->GetMinimum()) - oldRange * 0.5;
           double min = axis->GetMinimum();
           double max = axis->GetMaximum();
           double frac = (max - min) * 0.05;
           min += delta*frac;
           max -= delta*frac;
+          double shift = offsetCenter * oldRange / (max - min) - offsetCenter; // scale = oldRange / newRange; newRange = (max - min);
+          min += shift;
+          max += shift;
           if (this->m_BoundsEnabled)
           {
             if (min < this->mp_Bounds[i*2])
