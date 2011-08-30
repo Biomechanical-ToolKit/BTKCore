@@ -41,6 +41,7 @@
 #include "btkVTKAxis.h"
 
 #include <vtkChart.h>
+#include <vtkVector.h> // vtkRectf, ...,
 
 class vtkChartLegend;
 class vtkColorSeries;
@@ -145,6 +146,14 @@ namespace btk
     int GetEventLineTypeFactor() const {return this->m_EventLineTypeFactor;};
     void SetEventLineTypeFactor(int factor);
     
+    BTK_VTK_EXPORT void ResetZoom();
+    BTK_VTK_EXPORT void ApplyZoom(const vtkRectf& box);
+    const vtkRectf& GetZoomBox() const {return this->m_ZoomBox;};
+    int GetDisplayZoomBox() const {return this->m_ZoomBoxDisplayed;};
+    BTK_VTK_EXPORT void SetDisplayZoomBox(int enabled);
+    void DisplayZoomBoxOn() {this->SetDisplayZoomBox(1);};
+    void DisplayZoomBoxOff() {this->SetDisplayZoomBox(0);};
+    
     BTK_VTK_EXPORT virtual void Update();
     BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
     BTK_VTK_EXPORT virtual vtkPlot* AddPlot(int type);
@@ -158,12 +167,14 @@ namespace btk
     BTK_VTK_EXPORT virtual void SetScene(vtkContextScene* scene);
     
     BTK_VTK_EXPORT bool Hit(const vtkContextMouseEvent& mouse);
+    BTK_VTK_EXPORT virtual bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse);
+    BTK_VTK_EXPORT virtual bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseMoveEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta);
     
   protected:
     BTK_VTK_EXPORT VTKChartTimeSeries();
-    
+
     BTK_VTK_EXPORT void RecalculatePlotsTransform();
     
   private:
@@ -177,6 +188,8 @@ namespace btk
     double mp_Bounds[4]; // xMin, xMax, yMin, yMax
     int mp_Borders[4]; // left, bottom, right, top
     bool m_BordersChanged;
+    vtkRectf m_ZoomBox;
+    int m_ZoomBoxDisplayed;
     
     vtkChartLegend* mp_Legend;
     vtkColorSeries* mp_Colors;

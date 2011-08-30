@@ -117,6 +117,7 @@ namespace btk
    * This chart has several interaction to constraint pan and zoom
    *  - Select only a horizontal or vertical zoom;
    *  - Pan the chart only into boundaries;
+   *  - Zoom box activated by the method SetDisplayZoomBox().
    *
    * You can also enable/disable the interactions .
    *
@@ -406,6 +407,48 @@ namespace btk
   };
   
   /**
+   * Set the axes' range to the chart's bounds. Available only if the bounds are enabled.
+   */
+  void VTKChartTimeSeries::ResetZoom()
+  {
+    this->mp_AxisX->SetRange(this->mp_Bounds[0], this->mp_Bounds[1]);
+    this->mp_AxisY->SetRange(this->mp_Bounds[2], this->mp_Bounds[3]);
+    
+    this->m_PlotsTransformValid = false;
+    this->Scene->SetDirty(true);
+  };
+  
+  /**
+   * Apply a zoom box on the plots. Update the axis.
+   */
+  void VTKChartTimeSeries::ApplyZoom(const vtkRectf& box)
+  {
+    // Minimum size for a valid zoom box: 0.5 x 0.5
+    if (fabs(box[2]) > 0.5f && fabs(box[3]) > 0.5f)
+    {
+      float pixelMin[2], pixelMax[2];
+      pixelMin[0] = box[0] + (box[2] > 0 ? 0 : box[2]);
+      pixelMin[1] = box[1] + (box[3] > 0 ? 0 : box[3]);
+      pixelMax[0] = pixelMin[0] + fabs(box[2]);
+      pixelMax[1] = pixelMin[1] + fabs(box[3]);
+      float sceneMin[2], sceneMax[2];
+      this->mp_PlotsTransform->InverseTransformPoints(pixelMin, sceneMin, 1);
+      this->mp_PlotsTransform->InverseTransformPoints(pixelMax, sceneMax, 1);
+      this->mp_AxisX->SetRange(sceneMin[0], sceneMax[0]);
+      this->mp_AxisY->SetRange(sceneMin[1], sceneMax[1]);
+      
+      this->m_PlotsTransformValid = false;
+      this->Scene->SetDirty(true);
+    }
+    this->m_ZoomBoxDisplayed = 0;
+  };
+  
+  /**
+   * @fn const vtkRectf& VTKChartTimeSeries::GetZoomBox() const
+   * Returns the last box used to zoom on the plots.
+   */
+  
+  /**
    * @fn int VTKChartTimeSeries::GetDisplayEvents() const
    * Get the status of the events display.
    */
@@ -429,6 +472,32 @@ namespace btk
   /**
    * @fn void VTKChartTimeSeries::DisplayEventsOff()
    * Disable the displaying of the events as vertical lines into the chart
+   */
+   
+  /**
+   * @fn int VTKChartTimeSeries::GetDisplayZoomBox() const
+   * Get the status of the zoom box display.
+   */
+   
+  /**
+   * Enable/Disable the zoom box.
+   */
+  void VTKChartTimeSeries::SetDisplayZoomBox(int enabled)
+  {
+    if (this->m_ZoomBoxDisplayed == enabled)
+      return;
+    this->m_ZoomBoxDisplayed = enabled;
+    this->Modified();
+  };
+  
+  /**
+   * @fn void VTKChartTimeSeries::DisplayZoomBoxOn()
+   * Enable the displaying of zoom box.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::DisplayZoomBoxOff()
+   * Disable the displaying of zoom box.
    */
    
   /**
@@ -654,7 +723,17 @@ namespace btk
     // 8. The legend
     if (this->mp_Legend && this->ShowLegend)
       this->mp_Legend->Paint(painter);
-    // 9. The title
+    // 9. The zoom box
+    // Draw the selection box if necessary
+    if (this->m_ZoomBoxDisplayed != 0)
+    {
+      painter->GetPen()->SetLineType(vtkPen::DASH_LINE);
+      painter->GetBrush()->SetColor(255, 255, 255, 0);
+      painter->GetPen()->SetColor(0, 0, 0, 255);
+      painter->GetPen()->SetWidth(1.0);
+      painter->DrawRect(this->m_ZoomBox[0], this->m_ZoomBox[1], this->m_ZoomBox[2], this->m_ZoomBox[3]);
+    }
+    // 10. The title
     if (this->Title)
     {
       painter->ApplyTextProp(this->TitleProperties);
@@ -820,44 +899,91 @@ namespace btk
   };
   
   /**
-   * Overloaded method to move the chart only if the user interaction are enabled.
+   * Overloaded method used for the zoom box only if the user interactions are enabled.
+   */
+  bool VTKChartTimeSeries::MouseButtonPressEvent(const vtkContextMouseEvent& mouse)
+  {
+    if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
+    {
+      // Pan or zoom box action?
+      if (this->m_ZoomBoxDisplayed != 0)
+      {
+        this->m_ZoomBox[0] = mouse.Pos[0];
+        this->m_ZoomBox[1] = mouse.Pos[1];
+        this->m_ZoomBox[2] = this->m_ZoomBox[3] = 0.0f;
+      }
+      return true;
+    }
+    return false;
+  };
+  
+  /**
+   * Overloaded method used for the zoom box only if the user interactions are enabled.
+   */
+  bool VTKChartTimeSeries::MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse)
+  {
+    if ((this->m_InteractionEnabled) && (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON))
+    {
+      if (this->m_ZoomBoxDisplayed != 0)
+      {
+        // this->m_ZoomBox[2] = mouse.Pos[0] - this->m_ZoomBox[0];
+        // this->m_ZoomBox[3] = mouse.Pos[1] - this->m_ZoomBox[1];
+        this->ApplyZoom(this->m_ZoomBox);
+      }
+      return true;
+    }
+    return false;
+  };
+  
+  /**
+   * Overloaded method to move the chart only if the user interaction are enabled. Also used for the zoom box
    */
   bool VTKChartTimeSeries::MouseMoveEvent(const vtkContextMouseEvent& mouse)
   {
-    if (this->m_InteractionEnabled)
+    if ((this->m_InteractionEnabled) && (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON))
     {
-      for (int i = 0 ; i < 2 ; ++i)
+      if (this->m_ZoomBoxDisplayed != 0)
       {
-        int mai = 1-i; // Map between the axis and the corresponding index in the array
-        vtkAxis* axis = this->GetAxis(mai);
-        float pt1[2]; axis->GetPoint1(pt1);
-        float pt2[2]; axis->GetPoint2(pt2);
-        double min = axis->GetMinimum(); double max = axis->GetMaximum();
-        double scale = (max - min) / (double)(pt2[i] - pt1[i]);
-        double delta = (mouse.LastScreenPos[i] - mouse.ScreenPos[i]) * scale;
-        
-        min = axis->GetMinimum() + delta;
-        max = axis->GetMaximum() + delta;
-        if (this->m_BoundsEnabled && (min < this->mp_Bounds[i*2]))
+        this->m_ZoomBox[2] = mouse.Pos[0] - this->m_ZoomBox[0];
+        this->m_ZoomBox[3] = mouse.Pos[1] - this->m_ZoomBox[1];
+      }
+      else
+      {
+        for (int i = 0 ; i < 2 ; ++i)
         {
-          min = this->mp_Bounds[i*2];
-          max = axis->GetMaximum();
+          int mai = 1-i; // Map between the axis and the corresponding index in the array
+          vtkAxis* axis = this->GetAxis(mai);
+          float pt1[2]; axis->GetPoint1(pt1);
+          float pt2[2]; axis->GetPoint2(pt2);
+          double min = axis->GetMinimum(); double max = axis->GetMaximum();
+          double scale = (max - min) / (double)(pt2[i] - pt1[i]);
+          double delta = (mouse.LastScreenPos[i] - mouse.ScreenPos[i]) * scale;
+      
+          min = axis->GetMinimum() + delta;
+          max = axis->GetMaximum() + delta;
+          if (this->m_BoundsEnabled && (min < this->mp_Bounds[i*2]))
+          {
+            min = this->mp_Bounds[i*2];
+            max = axis->GetMaximum();
+          }
+          else if (this->m_BoundsEnabled && (max > this->mp_Bounds[i*2+1]))
+          {
+            min = axis->GetMinimum();
+            max = this->mp_Bounds[i*2+1];
+          }
+          axis->SetRange(min, max);
+          // Because we forces the opposite axes to have the same range it is not necessary to recompute the delta.
+          // this->GetAxis(mai+2)->SetRange(min, max);
         }
-        else if (this->m_BoundsEnabled && (max > this->mp_Bounds[i*2+1]))
-        {
-          min = axis->GetMinimum();
-          max = this->mp_Bounds[i*2+1];
-        }
-        axis->SetRange(min, max);
-        // Because we forces the opposite axes to have the same range it is not necessary to recompute the delta.
-        // this->GetAxis(mai+2)->SetRange(min, max);
+        // this->RecalculatePlotsTransform();
+        this->m_PlotsTransformValid = false;
       }
       
-      // this->RecalculatePlotsTransform();
-      this->m_PlotsTransformValid = false;
       this->Scene->SetDirty(true);
+      
+      return true;
     }
-    return true;
+    return false;
   };
   
   /**
@@ -902,7 +1028,8 @@ namespace btk
   };
   
   VTKChartTimeSeries::VTKChartTimeSeries()
-  : vtkChart(), mp_CurrentFrameFunctor(), mp_RegionOfInterestFunctor(), mp_EventsFunctor()
+  : vtkChart(), m_ZoomBox(),
+    mp_CurrentFrameFunctor(), mp_RegionOfInterestFunctor(), mp_EventsFunctor()
   {
     // No legend by defaut.
     this->mp_Legend = 0;
@@ -941,6 +1068,7 @@ namespace btk
     this->mp_Bounds[2] = 0.0;
     this->mp_Bounds[3] = 0.0;
     this->m_ChartBoundsValid = true;
+    this->m_ZoomBoxDisplayed = 0;
     
     // Borders
     this->mp_Borders[0] = 0;
