@@ -45,15 +45,40 @@ namespace btk
   class VTKAxis : public vtkAxis
   {
   public:
+    enum {INSIDE = 0, OUTSIDE};
+    
     BTK_VTK_EXPORT static VTKAxis* New();
     vtkExportedTypeRevisionMacro(VTKAxis, vtkAxis, BTK_VTK_EXPORT);
     
     virtual ~VTKAxis() {};
     
+    float GetTickLength() const {return this->m_TickLength;};
+    BTK_VTK_EXPORT void SetTickLength(float len);
+    
+    int GetTickDirection() const {return this->m_TickDirection;};
+    BTK_VTK_EXPORT void SetTickDirection(int dir);
+    
+    float GetMinimumTickSpacing() const {return this->m_MinimumTickSpacing;};
+    BTK_VTK_EXPORT void SetMinimumTickSpacing(float min);
+    
+    float GetTitleMargin() const {return this->m_TitleMargin;};
+    BTK_VTK_EXPORT void SetTitleMargin(float margin);
+    
+    float GetLabelMargin() const {return this->m_LabelMargin;}
+    BTK_VTK_EXPORT void SetLabelMargin(float margin);
+    
+    virtual bool Paint(vtkContext2D *painter);
     virtual void RecalculateTickSpacing();
     
   protected:
     BTK_VTK_EXPORT VTKAxis();
+    BTK_VTK_EXPORT double CalculateNiceMinMax(double& min, double& max);
+    
+    float m_TickLength;
+    int m_TickDirection;
+    float m_MinimumTickSpacing;
+    float m_TitleMargin;
+    float m_LabelMargin;
     
   private:
     VTKAxis(const VTKAxis& ); // Not implemented.
