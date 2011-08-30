@@ -695,9 +695,9 @@ namespace btk
       (*this->mp_RegionOfInterestFunctor)(lbi, rbi);
       float left = static_cast<float>(lbi) - this->mp_AxisX->GetMinimum();
       float right = this->mp_AxisX->GetMaximum() - static_cast<float>(rbi);
-      if (left > 0.0f)
+      if ((left > 0.0f) && (lbi > 0))
         painter->DrawRect(pt1X[0],pt1X[1],left*scaleX,pt2Y[1]-pt1X[1]);
-      if (right > 1.0f)
+      if ((right > 1.0f) && (rbi > 0))
         painter->DrawRect(pt2X[0]-right*scaleX,pt2X[1],right*scaleX,pt2Y[1]-pt1X[1]);
     }
     // 6.2 Frame line

@@ -123,8 +123,8 @@ void TimeEventBarWidget::reset()
 {
   this->m_SelectedEvents.clear();
   this->m_EventItems.clear();
-  this->m_FirstFrame = std::numeric_limits<int>::min();
-  this->m_LastFrame = std::numeric_limits<int>::max();
+  this->m_FirstFrame = 0;
+  this->m_LastFrame = 0;
   this->m_ROIFirstFrame = this->m_FirstFrame;
   this->m_ROILastFrame = this->m_LastFrame;
   this->m_SliderPos = this->m_FirstFrame;
