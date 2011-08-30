@@ -21,8 +21,10 @@ SET(Mokka_CPP
   AbstractMultiView.cpp
   AbstractView.cpp
   ChartAnalogWidget.cpp
+  ChartExportDialog.cpp
   ChartOptionsWidget.cpp
   ChartPointWidget.cpp
+  ChartImagePreview.cpp
   CompositeView.cpp
   FileInfoDockWidget.cpp
   ImportAssistantDialog.cpp
@@ -52,8 +54,10 @@ SET(Mokka_H
   AbstractMultiView.h
   AbstractView.h
   ChartAnalogWidget.h
+  ChartExportDialog.h
   ChartOptionsWidget.h
   ChartPointWidget.h
+  ChartImagePreview.h
   CompositeView.h
   FileInfoDockWidget.h
   ImportAssistantDialog.h
@@ -76,6 +80,7 @@ SET(Mokka_H
 SET(Mokka_UI
   About.ui
   AbstractView.ui
+  ChartExportDialog.ui
   ChartOptionsWidget.ui
   FileInfoDockWidget.ui
   ImportAssistantDialog.ui

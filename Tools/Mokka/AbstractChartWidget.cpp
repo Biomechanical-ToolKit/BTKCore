@@ -35,6 +35,7 @@
 
 #include "AbstractChartWidget.h"
 #include "ChartOptionsWidget.h"
+#include "ChartExportDialog.h"
 
 #include <vtkContextScene.h>
 #include <vtkContextActor.h>
@@ -91,10 +92,10 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   this->setFocusPolicy(Qt::StrongFocus);
   
   QAction* resetZoomAction = new QAction(tr("Reset Zoom"), this); this->m_ViewActions.push_back(resetZoomAction);
+  QAction* exportToAction = new QAction(tr("Export to Image"), this); this->m_ViewActions.push_back(exportToAction);
   QAction* separator = new QAction(this); separator->setSeparator(true); this->m_ViewActions.push_back(separator);
   QAction* toggleEventDisplayAction = new QAction(tr("Toggle Events Display"), this); this->m_ViewActions.push_back(toggleEventDisplayAction);
   QAction* removeAllPlotAction = new QAction(tr("Clear Chart"), this); this->m_ViewActions.push_back(removeAllPlotAction);
-  QAction* exportToAction = new QAction(tr("Export To..."), this); // this->m_ViewActions.push_back(exportToAction);
   
   QVBoxLayout* layout = new QVBoxLayout(this);
   for (int i = 0 ; i < numCharts ; ++i)
@@ -401,7 +402,14 @@ void AbstractChartWidget::resetZoom()
 
 void AbstractChartWidget::exportToImage()
 {
-  // TODO
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->childAt(this->mapFromGlobal(QCursor::pos())));
+  int idx = -1;
+  if ((w != 0) && ((idx = this->layout()->indexOf(w)) != -1))
+  {
+    ChartExportDialog exportDlg(this);
+    exportDlg.setChart(this->mp_VTKCharts->operator[](idx));
+    exportDlg.exec();
+  }
 };
 
 void AbstractChartWidget::removeAllPlot()
@@ -703,6 +711,15 @@ void ChartViewWidget::mouseReleaseEvent(QMouseEvent* event)
     iren = this->mRenWin->GetInteractor();
   if(!iren || !iren->GetEnabled())
     return;
+    
+  // To fix a possible conflict between Qt and VTK when you use a contextual menu event.
+  // VTK or the scene doesn't receive the event vtkCommand::LeftButtonReleaseEvent
+  // In our case, the zoom box is not applied after using the reset zoom action
+  if (this->mp_Chart && (this->mp_Chart->GetDisplayZoomBox() == 1))
+  {
+    this->mp_Chart->ApplyZoom(this->mp_Chart->GetZoomBox());
+    this->mRenWin->Render();
+  }
   
   // give vtk event information (without modifiers informations: always set to 0)
   iren->SetEventInformationFlipY(event->x(), event->y(), 0, 0);
