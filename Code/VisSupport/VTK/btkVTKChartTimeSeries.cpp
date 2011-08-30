@@ -57,6 +57,8 @@
 #include <vtkstd/list>
 #include <vtkgl.h>
 
+#include <limits>
+
 namespace btk
 {
   /**
