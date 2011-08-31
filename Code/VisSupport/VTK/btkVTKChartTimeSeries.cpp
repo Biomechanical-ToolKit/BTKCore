@@ -675,6 +675,9 @@ namespace btk
             painter->DrawLine(valX, pt1X[1], valX, pt2Y[1]);
         }
       }
+      // The line stipple must be disabled. Otherwise, under Windows XP, the next drawn line will use it (even if another pen is given).
+      glDisable(GL_LINE_STIPPLE);
+      glLineStipple(1, 0x0000);
     }
     // 6. Paint the frame line and its bounds
     // 6.1 Bounds
