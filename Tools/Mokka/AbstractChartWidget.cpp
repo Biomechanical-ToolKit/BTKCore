@@ -101,7 +101,7 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   for (int i = 0 ; i < numCharts ; ++i)
   {
     ChartViewWidget* w = new ChartViewWidget(this);
-    w->insertActions(0, this->m_ViewActions);
+    w->addActions(this->m_ViewActions);
     w->setContextMenuPolicy(Qt::ActionsContextMenu);
     layout->addWidget(w);
     // No need to send mouse events to VTK when a mouse button isn't down

@@ -65,7 +65,8 @@ public:
   // MultiViewWidget& operator=(const MultiViewWidget&); // Implicit.
   
   void initialize();
-  void setViewActions(QList<QAction*> actions);
+  void setView3dActions(QList<QAction*> actions);
+  void setViewChartActions(QList<QAction*> actions);
   
   void setAcquisition(Acquisition* acq);
   void setModel(Model* m);
@@ -173,7 +174,8 @@ private:
   QAction* mp_ActionMarkerTrajectory50;
   QAction* mp_ActionMarkerTrajectory100;
   QAction* mp_ActionMarkerTrajectory200;
-  QList<QAction*> m_ViewActions;
+  QList<QAction*> m_View3dActions;
+  QList<QAction*> m_ViewChartActions;
 };
 
 #endif // MultiViewWidget_h

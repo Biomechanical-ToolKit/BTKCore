@@ -129,21 +129,30 @@ MainWindow::MainWindow(QWidget* parent)
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->timeEventControler->playbackSpeedMenu()->menuAction(), this->multiView->groundOrientationMenu());
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->multiView->groundOrientationMenu()->menuAction(), this->multiView->markerTrajectoryLengthMenu());
   this->multiView->initialize();
-  QList<QAction*> actions;
-  actions.push_back(this->mp_ModelDock->newSegmentAction());
+  // Contextual menu for the 3D views
+  QList<QAction*> actions3d;
+  actions3d.push_back(this->mp_ModelDock->newSegmentAction());
   QAction* sep1 = new QAction(this); sep1->setSeparator(true);
-  actions.push_back(sep1);
-  actions.push_back(this->mp_ModelDock->selectAllMarkersAction());
-  actions.push_back(this->mp_ModelDock->hideSelectedMarkersAction());
-  actions.push_back(this->mp_ModelDock->unhideSelectedMarkersAction());
-  actions.push_back(this->mp_ModelDock->activeTrajectorySelectedMarkersAction());
-  actions.push_back(this->mp_ModelDock->unactiveTrajectorySelectedMarkersAction());
-  actions.push_back(this->mp_ModelDock->deleteSelectedMarkersAction());
+  actions3d.push_back(sep1);
+  actions3d.push_back(this->mp_ModelDock->selectAllMarkersAction());
+  actions3d.push_back(this->mp_ModelDock->hideSelectedMarkersAction());
+  actions3d.push_back(this->mp_ModelDock->unhideSelectedMarkersAction());
+  actions3d.push_back(this->mp_ModelDock->activeTrajectorySelectedMarkersAction());
+  actions3d.push_back(this->mp_ModelDock->unactiveTrajectorySelectedMarkersAction());
+  actions3d.push_back(this->mp_ModelDock->deleteSelectedMarkersAction());
   QAction* sep2 = new QAction(this); sep2->setSeparator(true);
-  actions.push_back(sep2);
-  actions.push_back(this->timeEventControler->insertEventMenu()->menuAction());
-  actions.push_back(this->timeEventControler->playbackSpeedMenu()->menuAction());
-  this->multiView->setViewActions(actions);
+  actions3d.push_back(sep2);
+  actions3d.push_back(this->timeEventControler->insertEventMenu()->menuAction());
+  actions3d.push_back(this->timeEventControler->playbackSpeedMenu()->menuAction());
+  this->multiView->setView3dActions(actions3d);
+  // Contextual menu for the charts (append to the default list)
+  QList<QAction*> actionsChart;
+  QAction* sep3 = new QAction(this); sep3->setSeparator(true);
+  actionsChart.push_back(sep3);
+  actionsChart.push_back(this->timeEventControler->insertEventMenu()->menuAction());
+  actionsChart.push_back(this->timeEventControler->playbackSpeedMenu()->menuAction());
+  this->multiView->setViewChartActions(actionsChart);
+  
   //this->mp_ImportAssistant->resize(this->mp_ImportAssistant->width(), this->mp_ImportAssistant->height());
   this->mp_ImportAssistant->layout()->setSizeConstraint(QLayout::SetFixedSize);
   

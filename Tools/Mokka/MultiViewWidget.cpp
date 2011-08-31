@@ -82,7 +82,8 @@ class vtkProcessMap : public vtkstd::map<int, vtkObjectBase*>
 {};
 
 MultiViewWidget::MultiViewWidget(QWidget* parent)
-: AbstractMultiView(parent), m_ForcePlatformColor(255, 255, 0), m_ForceVectorColor(255, 255, 0)
+: AbstractMultiView(parent), m_ForcePlatformColor(255, 255, 0), m_ForceVectorColor(255, 255, 0),
+  m_View3dActions(), m_ViewChartActions()
 {
   this->mp_EventFilterObject = 0;
   this->mp_Acquisition = 0;
@@ -385,13 +386,40 @@ void MultiViewWidget::setModel(Model* m)
   connect(this->mp_Model, SIGNAL(segmentLinksChanged(int, QVector<int>, QVector< QPair<int,int> >)), this, SLOT(setSegmentLink(int, QVector<int>, QVector< QPair<int,int> >)));
 }
 
-void MultiViewWidget::setViewActions(QList<QAction*> actions)
+void MultiViewWidget::setView3dActions(QList<QAction*> actions)
 {
-  this->m_ViewActions = actions;
+  this->m_View3dActions = actions;
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
   {
-    (*it)->insertActions(0, this->m_ViewActions);
-    (*it)->setContextMenuPolicy(Qt::ActionsContextMenu);
+    CompositeView* sv = static_cast<CompositeView*>(*it);
+    QWidget* w = sv->view(CompositeView::Viz3D);
+    w->insertActions(0, this->m_View3dActions);
+    w->setContextMenuPolicy(Qt::ActionsContextMenu);
+  }
+};
+
+void MultiViewWidget::setViewChartActions(QList<QAction*> actions)
+{
+  this->m_ViewChartActions = actions;
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    CompositeView* sv = static_cast<CompositeView*>(*it);
+    // Point
+    QWidget* chart = sv->view(CompositeView::ChartPoint);
+    for (int i = 0 ; i < chart->layout()->count() ; ++i)
+    {
+      QWidget* w = chart->layout()->itemAt(i)->widget();
+      w->addActions(this->m_ViewChartActions);
+      w->setContextMenuPolicy(Qt::ActionsContextMenu);
+    }
+    // Analog
+    chart = sv->view(CompositeView::ChartAnalog);
+    for (int i = 0 ; i < chart->layout()->count() ; ++i)
+    {
+      QWidget* w = chart->layout()->itemAt(i)->widget();
+      w->addActions(this->m_ViewChartActions);
+      w->setContextMenuPolicy(Qt::ActionsContextMenu);
+    }
   }
 };
 
@@ -948,8 +976,25 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   connect(viz3D, SIGNAL(pickedMarkerToggled(int)), this, SIGNAL(pickedMarkerToggled(int)));
   connect(viz3D, SIGNAL(selectedMarkersToggled(QList<int>)), this, SIGNAL(selectedMarkersToggled(QList<int>)));
   connect(viz3D, SIGNAL(trajectoryMarkerToggled(int)), this, SIGNAL(trajectoryMarkerToggled(int)));
-  viz3D->insertActions(0, this->m_ViewActions);
+  viz3D->addActions(this->m_View3dActions);
   viz3D->setContextMenuPolicy(Qt::ActionsContextMenu);
+  // Charts final settings
+  // - Point
+  QWidget* chartPoint = sv->view(CompositeView::ChartPoint);
+  for (int i = 0 ; i < chartPoint->layout()->count() ; ++i)
+  {
+    QWidget* w = chartPoint->layout()->itemAt(i)->widget();
+    w->addActions(this->m_ViewChartActions);
+    w->setContextMenuPolicy(Qt::ActionsContextMenu);
+  }
+  // - Analog
+  QWidget* chartAnalog = sv->view(CompositeView::ChartAnalog);
+  for (int i = 0 ; i < chartAnalog->layout()->count() ; ++i)
+  {
+    QWidget* w = chartAnalog->layout()->itemAt(i)->widget();
+    w->addActions(this->m_ViewChartActions);
+    w->setContextMenuPolicy(Qt::ActionsContextMenu);
+  }
   // Event filter
   if (this->mp_EventFilterObject)
   {
