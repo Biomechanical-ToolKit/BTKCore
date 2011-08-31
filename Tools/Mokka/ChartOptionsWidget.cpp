@@ -45,7 +45,7 @@ ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
   this->setupUi(this);
   
   this->setAttribute(Qt::WA_TranslucentBackground);
-  this->resize(150,250);
+  this->resize(175,250);
   
   QHeaderView* header = this->plotTable->horizontalHeader();
   header->setMovable(false);
