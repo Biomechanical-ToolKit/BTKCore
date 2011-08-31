@@ -193,7 +193,7 @@ namespace btk
     float rectSymbol[4] = {box[0] + this->mp_Padding[0], pos[1], this->m_SymbolWidth, sizeText[1]};
 
     // Draw all of the legend labels and marks
-    painter->ComputeStringBounds("asc", stringBounds->GetData()); // String withough descender glyph.
+    painter->ComputeStringBounds("ascT", stringBounds->GetData()); // String without descender glyph.
     float baseHeight = stringBounds[1].Y();
     for(size_t i = 0; i < this->Storage->ActivePlots.size(); ++i)
     {
