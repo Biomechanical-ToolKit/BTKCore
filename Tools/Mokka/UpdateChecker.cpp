@@ -102,7 +102,12 @@ void UpdateChecker::notifyNoUpdate(const QString& appName, const QString& appCur
     msg.setIconPixmap(this->mp_Dialog->iconLabel->pixmap()->scaled(64,64));
   else
     msg.setIcon(QMessageBox::Information);
-  msg.setInformativeText("<nobr>" + appName + " " + appCurVer + tr(" is currently the newest version available.") + "</nobr>");
+  QString infoStr = appName + " " + appCurVer + tr(" is currently the newest version available.");
+#ifdef Q_OS_MAC
+  msg.setInformativeText("<nobr>" + infoStr + "</nobr>");
+#else
+  msg.setText(msg.text() + "\n\n" + infoStr);
+#endif
   msg.exec();
 };
 
@@ -116,7 +121,13 @@ void UpdateChecker::notifyUpdateError()
     msg.setIconPixmap(this->mp_Dialog->iconLabel->pixmap()->scaled(64,64));
   else
     msg.setIcon(QMessageBox::Critical);
-  msg.setInformativeText("<nobr>An error occurred in retrieving update information.</nobr>\nPlease try again later.");
+  QString infoStr1 = tr("An error occurred in retrieving update information.");
+  QString infoStr2 = tr("Please try again later.");
+#ifdef Q_OS_MAC
+  msg.setInformativeText("<nobr>" + infoStr1 + "</nobr>\n" + infoStr2);
+#else
+  msg.setText(msg.text() + "\n\n" + infoStr1 + "\n" + infoStr2);
+#endif
   msg.exec();
 };
 
