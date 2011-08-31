@@ -107,10 +107,10 @@ void ChartExportDialog::accept()
   QString selectedFilter = "PNG Files (*.png)";
   QString filename = QFileDialog::getSaveFileName(this, "",
                        (!this->chartTitle->text().isEmpty() ? this->chartTitle->text() : "untitled") + ".png",
-                       tr("BMP Files (*.bmp) ;; \
-                           JPEG Files (*.jpg, *.jpeg) ;; \
-                           PNG Files (*.png);; \
-                           TIFF Files (*.tiff)"),
+                       tr("BMP Files (*.bmp) ;;"
+                          "JPEG Files (*.jpg, *.jpeg) ;;"
+                          "PNG Files (*.png);;"
+                          "TIFF Files (*.tiff)"),
                        &selectedFilter);
   if (!filename.isEmpty())
   {
@@ -300,7 +300,7 @@ void ChartExportDialog::updateChartTile(const QString& title, int value)
     this->mp_Chart->SetTitle(title.toUtf8().constData());
   }
   
-  this->update();
+  this->imagePreview->GetRenderWindow()->Render();
 };
 
 void ChartExportDialog::updateChartFont(int index)
@@ -336,7 +336,7 @@ void ChartExportDialog::updateChartFont(int index)
     this->mp_Chart->GetAxis(vtkAxis::LEFT)->GetTitleProperties()->SetFontFamilyToArial();
     this->mp_Chart->GetAxis(vtkAxis::LEFT)->GetLabelProperties()->SetFontFamilyToArial();
   }
-  this->update();
+  this->imagePreview->GetRenderWindow()->Render();
 };
 
 void ChartExportDialog::updateChartFontSize(int value)
@@ -349,7 +349,7 @@ void ChartExportDialog::updateChartFontSize(int value)
   this->mp_Chart->GetLegend()->SetLabelSize(static_cast<int>((double)value * 0.8));
   // Update the borders of the chart (conflict between axis' title and ticks' label?)
   this->updateChartTile(this->chartTitle->text(), value);
-  this->update();
+  this->imagePreview->GetRenderWindow()->Render();
 };
 
 void ChartExportDialog::updateChartFontBold(bool toggled)
@@ -358,7 +358,7 @@ void ChartExportDialog::updateChartFontBold(bool toggled)
   this->mp_Chart->GetTitleProperties()->SetBold(activated);
   this->mp_Chart->GetAxis(vtkAxis::BOTTOM)->GetTitleProperties()->SetBold(activated);
   this->mp_Chart->GetAxis(vtkAxis::LEFT)->GetTitleProperties()->SetBold(activated);
-  this->update();
+  this->imagePreview->GetRenderWindow()->Render();
 };
 
 void ChartExportDialog::updateChartFontItalic(bool toggled)
@@ -367,25 +367,25 @@ void ChartExportDialog::updateChartFontItalic(bool toggled)
   this->mp_Chart->GetTitleProperties()->SetItalic(activated);
   this->mp_Chart->GetAxis(vtkAxis::BOTTOM)->GetTitleProperties()->SetItalic(activated);
   this->mp_Chart->GetAxis(vtkAxis::LEFT)->GetTitleProperties()->SetItalic(activated);
-  this->update();
+  this->imagePreview->GetRenderWindow()->Render();
 };
 
 void ChartExportDialog::updateAxisXTitle(const QString& title)
 {
   this->mp_Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(title.toUtf8().constData());
-  this->update();
+  this->imagePreview->GetRenderWindow()->Render();
 };
 
 void ChartExportDialog::updateAxisYTitle(const QString& title)
 {
   this->mp_Chart->GetAxis(vtkAxis::LEFT)->SetTitle(title.toUtf8().constData());
-  this->update();
+  this->imagePreview->GetRenderWindow()->Render();
 };
 
 void ChartExportDialog::updateLegendVisibility(int checked)
 {
   this->mp_Chart->SetShowLegend((checked != 0) ? true : false);
-  this->update();
+  this->imagePreview->GetRenderWindow()->Render();
 };
 
 void ChartExportDialog::updateLegendUnitVisibility(int checked)
@@ -406,7 +406,7 @@ void ChartExportDialog::updateLegendUnitVisibility(int checked)
     }
     plot->SetLabel(label);
   }
-  this->update();
+  this->imagePreview->GetRenderWindow()->Render();
 };
 
 void ChartExportDialog::updateLegendLocation(int index)
@@ -480,7 +480,7 @@ void ChartExportDialog::updateLegendLocation(int index)
     break;
     }
   }
-  this->update();
+  this->imagePreview->GetRenderWindow()->Render();
 };
 
 void ChartExportDialog::convertWidthUnit(int index)

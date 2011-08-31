@@ -71,14 +71,12 @@ ChartImagePreview::~ChartImagePreview()
 void ChartImagePreview::initialize()
 {
   vtkRenderWindow* renwin = vtkRenderWindow::New();
-  // renwin->OffScreenRenderingOn();
-  renwin->DoubleBufferOff();
-  // renwin->SwapBuffersOff();
   renwin->AddRenderer(this->mp_Renderer);
   this->SetRenderWindow(renwin);
   renwin->Delete();
   
   this->mp_Chart = btk::VTKChartTimeSeries::New();
+  this->mp_Chart->SetInteractionEnabled(false);
   vtkChartLegend* legend = btk::VTKChartLegend::New();
   this->mp_Chart->SetLegend(legend);
   this->mp_Chart->SetShowLegend(true);
