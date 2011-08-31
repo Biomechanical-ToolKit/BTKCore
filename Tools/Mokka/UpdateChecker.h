@@ -63,7 +63,8 @@ public slots:
 
 private slots:
   void notifyUpdate(const QString& appName, const QString& appCurVer, const QString& appNewVer, const QString& appNote, const QString& appUrl);
-  void notifyNoUpdate();
+  void notifyNoUpdate(const QString& appName, const QString& appCurVer);
+  void notifyUpdateError();
   void resetThread();
   
 private:
@@ -93,7 +94,8 @@ private slots:
   
 signals:
   void updateFound(const QString& appName, const QString& appCurVer, const QString& appNewVer, const QString& appNote, const QString& appUrl);
-  void updateNotFound();
+  void updateNotFound(const QString& appName, const QString& appCurVer);
+  void updateIncomplete();
   void parsingFinished();
   
 private:

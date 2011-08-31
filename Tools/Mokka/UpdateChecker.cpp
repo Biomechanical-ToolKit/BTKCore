@@ -41,6 +41,7 @@
 #include <QDesktopServices>
 #include <QXmlStreamReader>
 #include <QScrollBar>
+#include <QMessageBox>
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -56,7 +57,8 @@ UpdateChecker::UpdateChecker(const QString& appVer, const QString& url, const QS
   
   connect(this->mp_Thread, SIGNAL(started()), this->mp_Parser, SLOT(check()));
   connect(this->mp_Parser, SIGNAL(updateFound(QString, QString, QString, QString, QString)), this, SLOT(notifyUpdate(QString, QString, QString, QString, QString)));
-  connect(this->mp_Parser, SIGNAL(updateNotFound()), this, SLOT(notifyNoUpdate()));
+  connect(this->mp_Parser, SIGNAL(updateNotFound(QString, QString)), this, SLOT(notifyNoUpdate(QString, QString)));
+  connect(this->mp_Parser, SIGNAL(updateIncomplete()), this, SLOT(notifyUpdateError()));
   connect(this->mp_Parser, SIGNAL(parsingFinished()), this, SLOT(resetThread()));
 }
 
@@ -85,38 +87,44 @@ void UpdateChecker::notifyUpdate(const QString& appName, const QString& appCurVe
   this->mp_Dialog->textBrowser->setHtml(appNote);
   this->mp_Dialog->url = appUrl;
   this->mp_Dialog->appNewVer = appNewVer;
-  this->mp_Dialog->noteLabel->setEnabled(true);
-  this->mp_Dialog->skipButton->setVisible(true);
-  this->mp_Dialog->remindButton->setVisible(true);
-  this->mp_Dialog->downloadButton->setText("Download Update");
   this->mp_Dialog->textBrowser->verticalScrollBar()->setValue(0);
   
   this->mp_Dialog->exec();
 };
 
-void UpdateChecker::notifyNoUpdate()
+void UpdateChecker::notifyNoUpdate(const QString& appName, const QString& appCurVer)
 {
   if (this->m_QuietNoUpdate)
     return;
 
-  this->mp_Dialog->titleLabel->setText("No updates found.");
-  this->mp_Dialog->descriptionLabel->setText("There are no updates available.");
-  this->mp_Dialog->textBrowser->clear();
-  this->mp_Dialog->url = "";
-  this->mp_Dialog->noteLabel->setEnabled(false);
-  this->mp_Dialog->textBrowser->clear();
-  this->mp_Dialog->skipButton->setVisible(false);
-  this->mp_Dialog->remindButton->setVisible(false);
-  this->mp_Dialog->downloadButton->setText("   Ok   ");
-  
-  this->mp_Dialog->exec();
-}
+  QMessageBox msg(QMessageBox::NoIcon, tr("Software Update"), tr("You're up-to-date!"), QMessageBox::Ok, this->mp_Dialog->parentWidget());
+  if (this->mp_Dialog->iconLabel->pixmap() != 0)
+    msg.setIconPixmap(this->mp_Dialog->iconLabel->pixmap()->scaled(64,64));
+  else
+    msg.setIcon(QMessageBox::Information);
+  msg.setInformativeText("<nobr>" + appName + " " + appCurVer + tr(" is currently the newest version available.") + "</nobr>");
+  msg.exec();
+};
+
+void UpdateChecker::notifyUpdateError()
+{
+  if (this->m_QuietNoUpdate)
+    return;
+
+  QMessageBox msg(QMessageBox::NoIcon, tr("Software Update"), tr("Update Error!"), QMessageBox::Ok, this->mp_Dialog->parentWidget());
+  if (this->mp_Dialog->iconLabel->pixmap() != 0)
+    msg.setIconPixmap(this->mp_Dialog->iconLabel->pixmap()->scaled(64,64));
+  else
+    msg.setIcon(QMessageBox::Critical);
+  msg.setInformativeText("<nobr>An error occurred in retrieving update information.</nobr>\nPlease try again later.");
+  msg.exec();
+};
 
 void UpdateChecker::resetThread()
 {
   this->mp_Thread->quit();
   this->mp_Thread->wait();
-}
+};
 
 void UpdateChecker::setIcon(const QString& path)
 {
@@ -145,13 +153,9 @@ void UpdateParser::check()
 
 void UpdateParser::parseReply(QNetworkReply* reply)
 {
-  bool updateAvailable = false;  
+  bool updateAvailable = false, updateError = true;  
   QString appName, appNewVer, appLatestNewVer, appNote, appUrl, appPubDate;
-  if ((reply->error() != QNetworkReply::NoError) || !reply->open(QIODevice::ReadOnly))
-  {
-    qDebug("Unable to check update.");
-  }
-  else
+  if ((reply->error() == QNetworkReply::NoError) && reply->open(QIODevice::ReadOnly))
   {
     QXmlStreamReader xmlReader(reply);
     if (xmlReader.readNextStartElement())
@@ -161,6 +165,7 @@ void UpdateParser::parseReply(QNetworkReply* reply)
       {
         appName = xmlReader.attributes().value("name").toString();
         appUrl = xmlReader.attributes().value("url").toString();
+        updateError = false;
         while (xmlReader.readNextStartElement())
         {
           if (xmlReader.name() == "Release")
@@ -223,10 +228,12 @@ void UpdateParser::parseReply(QNetworkReply* reply)
     reply->close();
   }
   
-  if (updateAvailable)
+  if (updateError)
+    emit updateIncomplete();
+  else if (updateAvailable)
     emit updateFound(appName, this->m_CurrentVersion.join("."), appLatestNewVer, appNote, appUrl);
   else
-    emit updateNotFound();
+    emit updateNotFound(appName, this->m_CurrentVersion.join("."));
   
   emit parsingFinished();
   
@@ -286,7 +293,13 @@ UpdateCheckerDialog::UpdateCheckerDialog(const QString& image, QWidget* parent)
   if (!image.isEmpty())
     this->iconLabel->setPixmap(QPixmap(image));
 #ifdef Q_OS_MAC
-  QFont f = this->textBrowser->font();
+  QFont f = this->noteLabel->font(); // Bold by default
+  f.setPointSize(11);
+  this->noteLabel->setFont(f);
+  f = this->descriptionLabel->font();
+  f.setPointSize(11);
+  this->descriptionLabel->setFont(f);
+  f = this->textBrowser->font();
   f.setPointSize(11);
   this->textBrowser->setFont(f);
 #endif
