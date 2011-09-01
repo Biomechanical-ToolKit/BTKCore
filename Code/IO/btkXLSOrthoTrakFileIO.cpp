@@ -259,7 +259,7 @@ namespace btk
         ifs >> strVal;
         if (ifs.eof() || strVal.empty())
         {
-          btkIOErrorMacro(filename, "File corrupted. There is not enough values to fill data. Others values will be set by 0.");
+          btkIOErrorMacro(filename, "File corrupted. There is not enough values to fill data. Others values will be set to 0.");
           break;
         }
         FromString(strVal, values[i]);
@@ -365,7 +365,7 @@ namespace btk
           point = *it;
         double* data = point->GetValues().data();
         for (int j = 0 ; j < frameNumber ; ++j)
-          data[j + axis * frameNumber] = values[inc * frameNumber + j];
+          data[j + axis * frameNumber] = values[j * colNumber + inc];
         ++inc;
       }
       
