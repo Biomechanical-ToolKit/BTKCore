@@ -186,6 +186,10 @@ void AbstractChartWidget::copy(AbstractChartWidget* source)
     this->mp_ChartOptions->clear();
   }
   
+  // Enable / disable the actions
+  for (int i = 0 ; i < this->m_ViewActions.size() ; ++i)
+    this->m_ViewActions[i]->setEnabled(source->m_ViewActions[i]->isEnabled());
+  
   // Copy the acquisition pointer
   this->setAcquisition(source->acquisition());
   // Copy the functors;
