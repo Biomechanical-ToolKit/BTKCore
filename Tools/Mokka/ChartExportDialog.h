@@ -54,6 +54,7 @@ public:
   
 public slots:
   virtual void accept();
+  void render();
   void updateChartTile(const QString& title);
   void updateChartFont(int index);
   void updateChartFontSize(int value);
