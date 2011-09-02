@@ -61,18 +61,21 @@ ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
   this->plotTable->setFont(f);
   this->lineWidthSpinBox->setFont(f);
   this->labelLineWidth->setFont(f);
-  this->labelLineColor->setFont(f);  
+  this->labelLineColor->setFont(f);
+  this->chartTitleLineEdit->setFont(f);
   this->plotTable->setAttribute(Qt::WA_MacShowFocusRect, false);
   this->lineWidthSpinBox->setAttribute(Qt::WA_MacShowFocusRect, false);
+  this->chartTitleLineEdit->setAttribute(Qt::WA_MacShowFocusRect, false);
 #endif
   this->plotTable->verticalHeader()->setDefaultSectionSize(20); 
   QLayout* layout = this->layout();
   layout->setSpacing(6);
-  layout->setContentsMargins(6, 15, 6, 6);
+  layout->setContentsMargins(6, 15, 6, 9);
 
   connect(this->plotTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayPlotOption()));
   connect(this->lineWidthSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setLineWidth(double)));
   connect(this->lineColorButton, SIGNAL(clicked()), this, SLOT(setLineColor()));
+  connect(this->chartTitleLineEdit, SIGNAL(textEdited(QString)), this, SIGNAL(chartTitleChanged(QString)));
 };
 
 void ChartOptionsWidget::appendPlot(int itemId, const QString& label, int color[3], double width)

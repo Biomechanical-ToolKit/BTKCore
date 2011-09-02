@@ -98,6 +98,11 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   QAction* removeAllPlotAction = new QAction(tr("Clear Chart"), this); this->m_ViewActions.push_back(removeAllPlotAction);
   
   QVBoxLayout* layout = new QVBoxLayout(this);
+  QLabel* chartTitle = new QLabel(this);
+  chartTitle->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+  chartTitle->setVisible(false);
+  chartTitle->setStyleSheet("margin-bottom: 5px;");
+  layout->addWidget(chartTitle);
   for (int i = 0 ; i < numCharts ; ++i)
   {
     ChartViewWidget* w = new ChartViewWidget(this);
@@ -116,6 +121,7 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   connect(this->mp_ChartOptions, SIGNAL(lineColorChanged(QList<int>, QColor)), this, SLOT(setPlotLineColor(QList<int>, QColor)));
   connect(this->mp_ChartOptions, SIGNAL(lineWidthChanged(QList<int>, double)), this, SLOT(setPlotLineWidth(QList<int>, double)));
   connect(this->mp_ChartOptions, SIGNAL(plotRemoved(int)), this, SLOT(removePlot(int)));
+  connect(this->mp_ChartOptions, SIGNAL(chartTitleChanged(QString)), this, SLOT(setChartTitle(QString)));
   connect(resetZoomAction, SIGNAL(triggered()), this, SLOT(resetZoom()));
   connect(toggleEventDisplayAction, SIGNAL(triggered()), this, SLOT(toggleEventDisplay()));
   connect(removeAllPlotAction, SIGNAL(triggered()), this, SLOT(removeAllPlot()));
@@ -147,7 +153,7 @@ void AbstractChartWidget::initialize()
   {
     vtkRenderer* ren = vtkRenderer::New();
     ren->SetBackground(1.0,1.0,1.0);
-    ChartViewWidget* w = static_cast<ChartViewWidget*>(this->layout()->itemAt((int)i)->widget());
+    ChartViewWidget* w = static_cast<ChartViewWidget*>(this->layout()->itemAt((int)i+1)->widget());
     vtkRenderWindow* renwin = w->GetRenderWindow();
     renwin->AddRenderer(ren);
     
@@ -297,7 +303,7 @@ void AbstractChartWidget::render()
 {
   for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
   {
-    QVTKWidget* w = static_cast<QVTKWidget*>(this->layout()->itemAt((int)i)->widget());
+    QVTKWidget* w = static_cast<QVTKWidget*>(this->layout()->itemAt((int)i+1)->widget());
     if (w->isVisible())
       w->GetRenderWindow()->Render();
   }
@@ -355,6 +361,20 @@ void AbstractChartWidget::setPlotLineWidth(const QList<int>& indices, double val
 #else
   this->render();
 #endif
+};
+
+void AbstractChartWidget::setChartTitle(const QString& title)
+{
+  QLabel* titleChart = qobject_cast<QLabel*>(this->layout()->itemAt(0)->widget());
+  if (titleChart != 0)
+  {
+    titleChart->setText("<b>" + title + "</b>");
+    if (title.isEmpty())
+      titleChart->setVisible(false);
+    else
+      titleChart->setVisible(true);
+    this->update();
+  }
 };
 
 void AbstractChartWidget::updatePlotLabel(int itemId)

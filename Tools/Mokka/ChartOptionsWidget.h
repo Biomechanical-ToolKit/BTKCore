@@ -63,6 +63,7 @@ signals:
   void lineColorChanged(const QList<int>& indices, const QColor& color);
   void lineWidthChanged(const QList<int>& indices, double value);
   void plotRemoved(int);
+  void chartTitleChanged(const QString& title);
   
 protected:
   virtual void paintEvent(QPaintEvent* event);

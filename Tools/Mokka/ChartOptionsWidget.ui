@@ -6,14 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>185</width>
-    <height>293</height>
+    <width>210</width>
+    <height>307</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Options</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLineEdit" name="chartTitleLineEdit">
+     <property name="frame">
+      <bool>false</bool>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="placeholderText">
+      <string>Chart title (optional)</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QTableWidget" name="plotTable">
      <property name="frameShape">
@@ -62,6 +82,9 @@
      <property name="rightMargin">
       <number>6</number>
      </property>
+     <property name="horizontalSpacing">
+      <number>3</number>
+     </property>
      <item row="0" column="0">
       <widget class="QLabel" name="labelLineWidth">
        <property name="sizePolicy">
@@ -71,12 +94,18 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Line width:</string>
+        <string>Width</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QDoubleSpinBox" name="lineWidthSpinBox">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>22</height>
+        </size>
+       </property>
        <property name="maximum">
         <double>10.000000000000000</double>
        </property>
@@ -85,20 +114,20 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="0" column="3">
       <widget class="QLabel" name="labelLineColor">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Line color:</string>
+        <string>Color </string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
+     <item row="0" column="4">
       <widget class="QPushButton" name="lineColorButton">
        <property name="maximumSize">
         <size>
@@ -123,6 +152,22 @@ QPushButton:pressed {
         <bool>true</bool>
        </property>
       </widget>
+     </item>
+     <item row="0" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>

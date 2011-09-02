@@ -85,17 +85,17 @@ bool ChartPointWidget::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
 
 void ChartPointWidget::displayComponentX(int state)
 {
-  this->displayComponent(0, state);
+  this->displayComponent(1, state);
 };
 
 void ChartPointWidget::displayComponentY(int state)
 {
-  this->displayComponent(1, state);
+  this->displayComponent(2, state);
 };
 
 void ChartPointWidget::displayComponentZ(int state)
 {
-  this->displayComponent(2, state);
+  this->displayComponent(3, state);
 };
 
 QString ChartPointWidget::createPlotLabel(int id)
