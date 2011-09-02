@@ -42,6 +42,7 @@
 
 #include <QTreeWidgetItem>
 
+#include <QVTKWidget.h>
 #include <vtkTable.h>
 #include <vtkDoubleArray.h>
 #include <vtkPlot.h>
@@ -102,6 +103,9 @@ public slots:
   void removeAllPlot();
   void toggleEventDisplay();
   
+private slots:
+  void setLastContextMenuPosition(const QPoint& globalPos);
+  
 protected:
   virtual void dragEnterEvent(QDragEnterEvent *event);
   virtual void dropEvent(QDropEvent* event);
@@ -119,6 +123,29 @@ protected:
   vtkColorSeries* mp_ColorGenerator;
   ChartOptionsWidget* mp_ChartOptions;
   QList<QAction*> m_ViewActions;
+  QPoint m_LastContextMenuPosition;
+};
+
+class ChartViewWidget : public QVTKWidget
+{
+  Q_OBJECT
+  
+public:
+  ChartViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  void setChart(btk::VTKChartTimeSeries* chart) {this->mp_Chart = chart;};
+signals:
+  void contextMenuRequested(const QPoint& pos);
+protected:
+  virtual void contextMenuEvent(QContextMenuEvent* event);
+  virtual bool event(QEvent* event);
+  virtual void keyPressEvent(QKeyEvent* event);
+  virtual void keyReleaseEvent(QKeyEvent* event);
+  virtual void mousePressEvent(QMouseEvent* event);
+  virtual void mouseReleaseEvent(QMouseEvent* event);
+  virtual void mouseMoveEvent(QMouseEvent* event);
+  virtual void wheelEvent(QWheelEvent* event);
+private:
+  btk::VTKChartTimeSeries* mp_Chart;
 };
 
 #endif // AbstractChartWidget_h

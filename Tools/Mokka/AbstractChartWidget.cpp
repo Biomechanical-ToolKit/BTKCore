@@ -45,7 +45,6 @@
 #include <vtkInteractorStyle.h>
 #include <vtkColorSeries.h>
 #include <vtkPen.h>
-#include <QVTKWidget.h>
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -53,26 +52,8 @@
 #include <QTreeWidget>
 #include <QToolTip>
 
-class ChartViewWidget : public QVTKWidget
-{
-public:
-  ChartViewWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  void setChart(btk::VTKChartTimeSeries* chart) {this->mp_Chart = chart;};
-protected:
-  virtual void contextMenuEvent(QContextMenuEvent* event);
-  virtual bool event(QEvent* event);
-  virtual void keyPressEvent(QKeyEvent* event);
-  virtual void keyReleaseEvent(QKeyEvent* event);
-  virtual void mousePressEvent(QMouseEvent* event);
-  virtual void mouseReleaseEvent(QMouseEvent* event);
-  virtual void mouseMoveEvent(QMouseEvent* event);
-  virtual void wheelEvent(QWheelEvent* event);
-private:
-  btk::VTKChartTimeSeries* mp_Chart;
-};
-
 AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
-: QWidget(parent), m_ViewActions()
+: QWidget(parent), m_ViewActions(), m_LastContextMenuPosition()
 {
   QPalette p(this->palette());
   p.setColor(QPalette::Window, Qt::white);
@@ -114,6 +95,7 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
     // w->GetRenderWindow()->SwapBuffersOff();
     // w->GetRenderWindow()->DoubleBufferOff();
     // w->GetRenderWindow()->SetMultiSamples(0);
+    connect(w, SIGNAL(contextMenuRequested(QPoint)), this, SLOT(setLastContextMenuPosition(QPoint)));
   }
   layout->setContentsMargins(0,5,0,0);
   layout->setSpacing(0);
@@ -415,23 +397,23 @@ void AbstractChartWidget::showPlots(const QList<int>& itemIds)
 
 void AbstractChartWidget::resetZoom()
 {
-  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->childAt(this->mapFromGlobal(QCursor::pos())));
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->childAt(this->m_LastContextMenuPosition));
   int idx = -1;
-  if ((w != 0) && ((idx = this->layout()->indexOf(w)) != -1))
+  if ((w != 0) && ((idx = this->layout()->indexOf(w)) > 0))
   {
-    this->mp_VTKCharts->operator[](idx)->ResetZoom();
+    this->mp_VTKCharts->operator[](idx-1)->ResetZoom();
   }
   this->render();
 };
 
 void AbstractChartWidget::exportToImage()
 {
-  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->childAt(this->mapFromGlobal(QCursor::pos())));
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(this->childAt(this->m_LastContextMenuPosition));
   int idx = -1;
-  if ((w != 0) && ((idx = this->layout()->indexOf(w)) != -1))
+  if ((w != 0) && ((idx = this->layout()->indexOf(w)) > 0))
   {
     ChartExportDialog exportDlg(this);
-    exportDlg.setChart(this->mp_VTKCharts->operator[](idx));
+    exportDlg.setChart(this->mp_VTKCharts->operator[](idx-1));
     exportDlg.exec();
   }
 };
@@ -451,6 +433,11 @@ void AbstractChartWidget::toggleEventDisplay()
     chart->SetDisplayEvents(chart->GetDisplayEvents() == 1 ? 0 : 1);
   }
   this->render();
+};
+
+void AbstractChartWidget::setLastContextMenuPosition(const QPoint& globalPos)
+{
+  this->m_LastContextMenuPosition = this->mapFromGlobal(globalPos);
 };
 
 btk::VTKCurrentFrameFunctor::Pointer AbstractChartWidget::currentFrameFunctor() const
@@ -690,6 +677,11 @@ bool ChartViewWidget::event(QEvent* event)
     QToolTip::hideText();
     event->ignore();
     return true;
+  }
+  else if (event->type() == QEvent::ContextMenu)
+  {
+    QContextMenuEvent* contextMenuEvent = static_cast<QContextMenuEvent*>(event);
+    emit contextMenuRequested(contextMenuEvent->globalPos());
   }
   return QVTKWidget::event(event);
 };

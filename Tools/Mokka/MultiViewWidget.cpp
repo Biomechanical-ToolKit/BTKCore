@@ -406,7 +406,7 @@ void MultiViewWidget::setViewChartActions(QList<QAction*> actions)
     CompositeView* sv = static_cast<CompositeView*>(*it);
     // Point
     QWidget* chart = sv->view(CompositeView::ChartPoint);
-    for (int i = 0 ; i < chart->layout()->count() ; ++i)
+    for (int i = 1 ; i < chart->layout()->count() ; ++i)
     {
       QWidget* w = chart->layout()->itemAt(i)->widget();
       w->addActions(this->m_ViewChartActions);
@@ -414,7 +414,7 @@ void MultiViewWidget::setViewChartActions(QList<QAction*> actions)
     }
     // Analog
     chart = sv->view(CompositeView::ChartAnalog);
-    for (int i = 0 ; i < chart->layout()->count() ; ++i)
+    for (int i = 1 ; i < chart->layout()->count() ; ++i)
     {
       QWidget* w = chart->layout()->itemAt(i)->widget();
       w->addActions(this->m_ViewChartActions);
