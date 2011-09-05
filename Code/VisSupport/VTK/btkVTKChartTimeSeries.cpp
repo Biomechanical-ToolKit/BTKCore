@@ -971,8 +971,35 @@ namespace btk
     {
       if (this->m_ZoomBoxDisplayed != 0)
       {
-        this->m_ZoomBox[2] = mouse.Pos[0] - this->m_ZoomBox[0];
-        this->m_ZoomBox[3] = mouse.Pos[1] - this->m_ZoomBox[1];
+        float pixel[2] = {1.0f, 1.0f}; // Shift to not have the box over the axes' lines.
+        if (this->GetTransform() != NULL)
+        {
+          pixel[0] /= this->GetTransform()->GetMatrix()->GetElement(0,0);
+          pixel[1] /= this->GetTransform()->GetMatrix()->GetElement(1,1);
+        }
+        float pts[4];
+        this->mp_AxisX->GetPoint1(pts);
+        pts[2] = this->mp_AxisX->GetPoint2()[0];
+        pts[3] = this->mp_AxisY->GetPoint2()[1];
+        // Check if the mouse is in the plots area.
+        if ((mouse.Pos[0] > pts[0]) && (mouse.Pos[0] < pts[2]))
+          this->m_ZoomBox[2] = mouse.Pos[0] - this->m_ZoomBox[0];
+        else
+        {
+          if (this->m_ZoomBox[2] < 0)
+            this->m_ZoomBox[2] = pts[0] - this->m_ZoomBox[0] + pixel[0];
+          else
+            this->m_ZoomBox[2] = pts[2] - this->m_ZoomBox[0] - pixel[0];
+        }
+        if ((mouse.Pos[1] > pts[1]) && (mouse.Pos[1] < pts[3]))
+          this->m_ZoomBox[3] = mouse.Pos[1] - this->m_ZoomBox[1];
+        else
+        {
+          if (this->m_ZoomBox[3] < 0)
+            this->m_ZoomBox[3] = pts[1] - this->m_ZoomBox[1] + pixel[1];
+          else
+            this->m_ZoomBox[3] = pts[3] - this->m_ZoomBox[1] - pixel[1];
+        }
       }
       else
       {
