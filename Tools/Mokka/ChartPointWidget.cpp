@@ -62,15 +62,15 @@ void ChartPointWidget::initialize()
   
   vtkChart* chart = 0;
   
-  chart = this->mp_VTKCharts->operator[](0);
+  chart = this->mp_Charts->operator[](0);
   chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
   chart->GetAxis(vtkAxis::LEFT)->SetTitle("X-Axis"); // Y axis
   
-  chart = this->mp_VTKCharts->operator[](1);
+  chart = this->mp_Charts->operator[](1);
   chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
   chart->GetAxis(vtkAxis::LEFT)->SetTitle("Y-Axis"); // Y axis
   
-  chart = this->mp_VTKCharts->operator[](2);
+  chart = this->mp_Charts->operator[](2);
   chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
   chart->GetAxis(vtkAxis::LEFT)->SetTitle("Z-Axis"); // Y axis
 };
@@ -85,17 +85,17 @@ bool ChartPointWidget::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
 
 void ChartPointWidget::displayComponentX(int state)
 {
-  this->displayComponent(1, state);
+  this->displayComponent(0, state);
 };
 
 void ChartPointWidget::displayComponentY(int state)
 {
-  this->displayComponent(2, state);
+  this->displayComponent(1, state);
 };
 
 void ChartPointWidget::displayComponentZ(int state)
 {
-  this->displayComponent(3, state);
+  this->displayComponent(2, state);
 };
 
 QString ChartPointWidget::createPlotLabel(int id)
@@ -143,22 +143,22 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* ite
   
   const double lineWidth = 1.0;
   vtkPlotLine* line = 0;
-  this->GenerateColor(color);
+  this->generateColor(color);
   // X axis 
   line = vtkPlotLine::New();
-  this->mp_VTKCharts->operator[](0)->AddPlot(line);
+  this->mp_Charts->operator[](0)->AddPlot(line);
   line->GetPen()->SetColorF(color);
   line->SetInput(tableX,0,1);
   line->SetWidth(lineWidth);
   // Y axis
   line = vtkPlotLine::New();
-  this->mp_VTKCharts->operator[](1)->AddPlot(line);
+  this->mp_Charts->operator[](1)->AddPlot(line);
   line->GetPen()->SetColorF(color);
   line->SetInput(tableY,0,1);
   line->SetWidth(lineWidth);
   // Z axis
   line = vtkPlotLine::New();
-  this->mp_VTKCharts->operator[](2)->AddPlot(line);
+  this->mp_Charts->operator[](2)->AddPlot(line);
   line->GetPen()->SetColorF(color);
   line->SetInput(tableZ,0,1);
   line->SetWidth(lineWidth);
@@ -178,8 +178,11 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* ite
 
 void ChartPointWidget::displayComponent(int idx, int state)
 {
-  this->layout()->itemAt(idx)->widget()->setVisible((state == Qt::Checked) ? true : false);
-  for (size_t i = 0 ; i < this->mp_VTKCharts->size() ; ++i)
-    this->mp_VTKCharts->operator[](i)->GetAxis(vtkAxis::LEFT)->RecalculateTickSpacing(); // Y axis
-  this->repaint();
+  this->mp_Charts->operator[](idx)->SetVisible((state == Qt::Checked) ? true : false);
+  bool axisXTitleVisible = false;
+  for (size_t i = 0 ; i < this->mp_Charts->size() ; ++i)
+    axisXTitleVisible |= this->mp_Charts->operator[](i)->GetVisible();
+  this->mp_ChartAxisXLabel->setVisible(axisXTitleVisible);
+  this->chartContent()->resizeCharts();
+  this->render();
 };

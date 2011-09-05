@@ -405,21 +405,9 @@ void MultiViewWidget::setViewChartActions(QList<QAction*> actions)
   {
     CompositeView* sv = static_cast<CompositeView*>(*it);
     // Point
-    QWidget* chart = sv->view(CompositeView::ChartPoint);
-    for (int i = 1 ; i < chart->layout()->count() ; ++i)
-    {
-      QWidget* w = chart->layout()->itemAt(i)->widget();
-      w->addActions(this->m_ViewChartActions);
-      w->setContextMenuPolicy(Qt::ActionsContextMenu);
-    }
+    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartPoint))->chartContent()->addActions(this->m_ViewChartActions);
     // Analog
-    chart = sv->view(CompositeView::ChartAnalog);
-    for (int i = 1 ; i < chart->layout()->count() ; ++i)
-    {
-      QWidget* w = chart->layout()->itemAt(i)->widget();
-      w->addActions(this->m_ViewChartActions);
-      w->setContextMenuPolicy(Qt::ActionsContextMenu);
-    }
+    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartAnalog))->chartContent()->addActions(this->m_ViewChartActions);
   }
 };
 
@@ -980,21 +968,9 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   viz3D->setContextMenuPolicy(Qt::ActionsContextMenu);
   // Charts final settings
   // - Point
-  QWidget* chartPoint = sv->view(CompositeView::ChartPoint);
-  for (int i = 0 ; i < chartPoint->layout()->count() ; ++i)
-  {
-    QWidget* w = chartPoint->layout()->itemAt(i)->widget();
-    w->addActions(this->m_ViewChartActions);
-    w->setContextMenuPolicy(Qt::ActionsContextMenu);
-  }
+  static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartPoint))->chartContent()->addActions(this->m_ViewChartActions);
   // - Analog
-  QWidget* chartAnalog = sv->view(CompositeView::ChartAnalog);
-  for (int i = 0 ; i < chartAnalog->layout()->count() ; ++i)
-  {
-    QWidget* w = chartAnalog->layout()->itemAt(i)->widget();
-    w->addActions(this->m_ViewChartActions);
-    w->setContextMenuPolicy(Qt::ActionsContextMenu);
-  }
+  static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartAnalog))->chartContent()->addActions(this->m_ViewChartActions);
   // Event filter
   if (this->mp_EventFilterObject)
   {

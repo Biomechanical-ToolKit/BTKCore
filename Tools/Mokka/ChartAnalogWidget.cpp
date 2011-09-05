@@ -59,7 +59,7 @@ void ChartAnalogWidget::initialize()
 {
   this->AbstractChartWidget::initialize();
   
-  vtkChart* chart = this->mp_VTKCharts->operator[](0);
+  vtkChart* chart = this->mp_Charts->operator[](0);
   chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Frames"); // X axis
   chart->GetAxis(vtkAxis::LEFT)->SetTitle("Values"); // Y axis
 };
@@ -105,9 +105,9 @@ bool ChartAnalogWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* it
   arrVal->SetArray(analog->GetValues().data(), analog->GetFrameNumber(), 1); // Would be 0?
   table->AddColumn(arrVal);
   
-  this->GenerateColor(color);
+  this->generateColor(color);
   vtkPlotLine* line = vtkPlotLine::New();
-  this->mp_VTKCharts->operator[](0)->AddPlot(line);
+  this->mp_Charts->operator[](0)->AddPlot(line);
   line->GetPen()->SetColorF(color);
   line->SetInput(table,0,1);
   line->SetWidth(1.0);
