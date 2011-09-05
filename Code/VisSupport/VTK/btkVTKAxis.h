@@ -52,6 +52,9 @@ namespace btk
     
     virtual ~VTKAxis() {};
     
+    bool GetTitleVisible() const {return this->m_TitleVisible;};
+    BTK_VTK_EXPORT void SetTitleVisible(bool visible);
+    
     float GetTickLength() const {return this->m_TickLength;};
     BTK_VTK_EXPORT void SetTickLength(float len);
     
@@ -74,6 +77,7 @@ namespace btk
     BTK_VTK_EXPORT VTKAxis();
     BTK_VTK_EXPORT double CalculateNiceMinMax(double& min, double& max);
     
+    bool m_TitleVisible;
     float m_TickLength;
     int m_TickDirection;
     float m_MinimumTickSpacing;

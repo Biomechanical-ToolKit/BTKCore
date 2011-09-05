@@ -55,6 +55,10 @@ namespace btk
    * This class take into account the transformation given to the object to paint correctly the legend into the scene (only the scale and translation are supported).
    */
   /**
+   * @var VTKAxis::m_TitleVisible
+   * Status for the visibility of the title.
+   */
+  /**
    * @var VTKAxis::m_TickLength
    * Length in pixel of the ticks.
    */
@@ -95,6 +99,22 @@ namespace btk
    * @fn virtual VTKAxis::~VTKAxis();
    * Destructor.
    */
+   
+  /**
+   * @fn float VTKAxis::GetTitleVisible() const
+   * Returns the status for the visibility of the title.
+   */
+  
+  /**
+   * Sets the status for the visibility of the title.
+   */
+  void VTKAxis::SetTitleVisible(bool visible)
+  {
+    if (this->m_TitleVisible == visible)
+      return;
+    this->m_TitleVisible = visible;
+    this->Modified();
+  };
   
   /**
    * @fn float VTKAxis::GetTickLength() const
@@ -109,7 +129,8 @@ namespace btk
     if (this->m_TickLength == len)
       return;
     this->m_TickLength = len;
-    this->Scene->SetDirty(true);
+    this->TickMarksDirty = true;
+    this->Modified();
   };
   
   /**
@@ -128,7 +149,8 @@ namespace btk
     if (this->m_TickDirection == dir)
       return;
     this->m_TickDirection = dir;
-    this->Scene->SetDirty(true);
+    this->TickMarksDirty = true;
+    this->Modified();
   };
   
   /**
@@ -196,7 +218,7 @@ namespace btk
     vtkTextProperty* prop = painter->GetTextProp();
 
     // Draw the axis title if there is one
-    if (this->Title && this->Title[0])
+    if (this->m_TitleVisible && this->Title && this->Title[0])
     {
       float x = 0.0f;
       float y = 0.0f;
@@ -361,6 +383,7 @@ namespace btk
   VTKAxis::VTKAxis()
   : vtkAxis()
   {
+    this->m_TitleVisible = true;
     this->Pen->SetWidth(0.5);
     this->GridPen->SetWidth(0.5);
     this->m_TickLength = 5.0f;
