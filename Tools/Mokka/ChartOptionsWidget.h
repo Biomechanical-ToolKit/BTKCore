@@ -66,7 +66,11 @@ signals:
   void chartTitleChanged(const QString& title);
   
 protected:
+  virtual bool eventFilter(QObject* object, QEvent* event);
   virtual void paintEvent(QPaintEvent* event);
+  
+private slots:
+  void emitChartTitleChanged();
   
 private:
   QPixmap createLineIcon(const QColor& color, double width);

@@ -38,6 +38,7 @@
 #include <QPainter>
 #include <QHeaderView>
 #include <QColorDialog>
+#include <QKeyEvent>
 
 ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
 : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
@@ -75,7 +76,20 @@ ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
   connect(this->plotTable, SIGNAL(itemSelectionChanged()), this, SLOT(displayPlotOption()));
   connect(this->lineWidthSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setLineWidth(double)));
   connect(this->lineColorButton, SIGNAL(clicked()), this, SLOT(setLineColor()));
+  
+#ifdef Q_OS_WIN
+  // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
+  // The side effect is that you can see the modification only when the lineedit loose the focus or when you press Enter.
+  if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
+  {
+    this->chartTitleLineEdit->installEventFilter(this);
+    connect(this->chartTitleLineEdit, SIGNAL(editingFinished()), this, SLOT(emitChartTitleChanged()));
+  }
+  else
+    connect(this->chartTitleLineEdit, SIGNAL(textEdited(QString)), this, SIGNAL(chartTitleChanged(QString)));
+#else
   connect(this->chartTitleLineEdit, SIGNAL(textEdited(QString)), this, SIGNAL(chartTitleChanged(QString)));
+#endif
 };
 
 void ChartOptionsWidget::appendPlot(int itemId, const QString& label, int color[3], double width)
@@ -237,6 +251,22 @@ void ChartOptionsWidget::setLineWidth(double value)
   emit lineWidthChanged(indices, value);
 };
 
+bool ChartOptionsWidget::eventFilter(QObject* object, QEvent* event)
+{
+  QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);
+  if ((lineEdit != 0) && (event->type() == QEvent::KeyPress))
+  {
+    QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+    if ((keyEvent->key() == Qt::Key_Return) || (keyEvent->key() == Qt::Key_Enter))
+    {
+      // Eat these keys to not have several blinkings under Windows XP.
+      this->setFocus();
+      return true; 
+    }
+  }
+  return false;
+};
+
 void ChartOptionsWidget::paintEvent(QPaintEvent* event)
 {
   Q_UNUSED(event)
@@ -262,6 +292,11 @@ void ChartOptionsWidget::paintEvent(QPaintEvent* event)
  
   painter.setPen(QPen(Qt::gray, penWidth));
   painter.drawPolyline(points,3);
+};
+
+void ChartOptionsWidget::emitChartTitleChanged()
+{
+  emit chartTitleChanged(this->chartTitleLineEdit->text());
 };
 
 QPixmap ChartOptionsWidget::createLineIcon(const QColor& color, double width)

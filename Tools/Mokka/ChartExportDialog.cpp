@@ -511,10 +511,9 @@ void ChartExportDialog::convertUnit(int index, QDoubleSpinBox* unit)
 
 QRectF ChartExportDialog::computeStringBounds(const QString& str, vtkTextProperty* f) const
 {
-  QFont font(f->GetFontFamilyAsString());
+  QFont font(f->GetFontFamilyAsString(), f->GetFontSize());
   font.setBold(f->GetBold());
   font.setItalic(f->GetItalic());
-  font.setPixelSize(f->GetFontSize());
   font.setStyleStrategy(QFont::PreferAntialias);
   QPainterPath path;
   path.addText(0, 0, font, str);

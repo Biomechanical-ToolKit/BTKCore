@@ -94,7 +94,7 @@ public:
   btk::VTKEventsFunctor::Pointer eventsFunctor() const;
   void setEventsFunctor(btk::VTKEventsFunctor::Pointer functor);
   
-  void render();
+  void render(bool optionsShown = false);
   void show(bool s);
   
 public slots:

@@ -53,6 +53,13 @@
 #include <QTreeWidget>
 #include <QToolTip>
 
+#ifdef Q_OS_WIN
+  #ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+  #endif
+  #include <windows.h>
+#endif
+
 AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
 : QWidget(parent), m_ViewActions(), m_LastContextMenuPosition()
 {
@@ -79,30 +86,37 @@ AbstractChartWidget::AbstractChartWidget(int numCharts, QWidget* parent)
   QAction* toggleEventDisplayAction = new QAction(tr("Toggle Events Display"), this); this->m_ViewActions.push_back(toggleEventDisplayAction);
   QAction* removeAllPlotAction = new QAction(tr("Clear Chart"), this); this->m_ViewActions.push_back(removeAllPlotAction);
   
-  QFont f("Arial", 12);
-  f.setStyleStrategy(QFont::PreferAntialias);
-  f.setBold(true);
-  
-  QVBoxLayout* layout = new QVBoxLayout(this);
-  this->mp_ChartTitleLabel = new QLabel(this);
-  this->mp_ChartTitleLabel->setFont(f);
-  this->mp_ChartTitleLabel->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
-  this->mp_ChartTitleLabel->setVisible(false);
-  // this->mp_ChartTitleLabel->setStyleSheet("margin-bottom: 5px;");
-  layout->addWidget(this->mp_ChartTitleLabel);
   this->mp_ChartContentWidget = new VTKChartWidget(this);
   this->mp_ChartContentWidget->addActions(this->m_ViewActions);
   this->mp_ChartContentWidget->setContextMenuPolicy(Qt::ActionsContextMenu);
-  layout->addWidget(this->mp_ChartContentWidget);
   this->mp_ChartContentWidget->setMouseTracking(false); // No need to send mouse events to VTK when a mouse button isn't down
   // this->mp_ChartContentWidget->GetRenderWindow()->SwapBuffersOff();
   // this->mp_ChartContentWidget->GetRenderWindow()->DoubleBufferOff();
   // this->mp_ChartContentWidget->GetRenderWindow()->SetMultiSamples(0);
   connect(this->mp_ChartContentWidget, SIGNAL(contextMenuRequested(QPoint)), this, SLOT(setLastContextMenuPosition(QPoint)));
+  
+  
+#ifdef Q_OS_WIN
+  QFont f("Arial", 9);
+#else
+  QFont f("Arial", 12);
+#endif
+  f.setStyleStrategy(QFont::PreferAntialias);
+  f.setBold(true);
+
+  this->mp_ChartTitleLabel = new QLabel(this);
+  this->mp_ChartTitleLabel->setFont(f);
+  this->mp_ChartTitleLabel->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+  this->mp_ChartTitleLabel->setVisible(false);
+
   this->mp_ChartAxisXLabel = new QLabel(tr("Frames"), this);
   this->mp_ChartAxisXLabel->setFont(f);
   this->mp_ChartAxisXLabel->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
   this->mp_ChartAxisXLabel->setVisible(true);
+
+  QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->addWidget(this->mp_ChartTitleLabel);
+  layout->addWidget(this->mp_ChartContentWidget);
   layout->addWidget(this->mp_ChartAxisXLabel);
   layout->setContentsMargins(0,5,0,5);
   layout->setSpacing(0);
@@ -199,6 +213,8 @@ void AbstractChartWidget::copy(AbstractChartWidget* source)
     btk::VTKChartTimeSeries* sourceChart = source->mp_Charts->operator[](i);
     btk::VTKChartTimeSeries* targetChart = this->mp_Charts->operator[](i);
     targetChart->SetBounds(sourceChart->GetBounds()[0], sourceChart->GetBounds()[1], 0.0, 0.0);
+    targetChart->GetAxis(vtkAxis::BOTTOM)->SetLabelsVisible(sourceChart->GetAxis(vtkAxis::BOTTOM)->GetLabelsVisible());
+    targetChart->GetAxis(vtkAxis::LEFT)->SetLabelsVisible(sourceChart->GetAxis(vtkAxis::LEFT)->GetLabelsVisible());
   }
 #else
   // Copy the plots
@@ -270,26 +286,33 @@ void AbstractChartWidget::removePlot(int index)
   for (size_t i = 0 ; i < this->mp_Charts->size() ; ++i)
     this->mp_Charts->operator[](i)->RemovePlot(index);
   this->checkResetAxes(); // If no more plot or all of them are hidden, then the axes are reset.
-#ifdef Q_OS_WIN
-  // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
-  // The side effect is a possible blinking of the options but it's better than to see nothing.
-  if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
-  {
-    this->mp_ChartOptions->hide();
-    QApplication::processEvents();
-    this->render();
-    this->mp_ChartOptions->show();
-  }
-  else
-    this->render();
-#else
-  this->render();
-#endif
+  this->render(true); // Options are shown
 };
 
-void AbstractChartWidget::render()
+void AbstractChartWidget::render(bool optionsShown)
 {
-  if (this->mp_ChartContentWidget->isVisible())
+  if (optionsShown)
+  {
+#ifdef Q_OS_WIN
+    // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
+    // The side effect is a possible blinking of the options but it's better than to see nothing.
+    if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
+    {
+      this->mp_ChartOptions->setFocus();
+      QApplication::processEvents(); // For the text placeholder
+      this->mp_ChartOptions->hide();
+      this->render();
+      ::Sleep(20);
+      QApplication::processEvents();
+      this->mp_ChartOptions->show();
+    }
+    else
+      this->render();
+#else
+    this->render();
+#endif
+  }
+  else if (this->mp_ChartContentWidget->isVisible())
     this->mp_ChartContentWidget->GetRenderWindow()->Render();
 };
 
@@ -303,21 +326,7 @@ void AbstractChartWidget::setPlotLineColor(const QList<int>& indices, const QCol
       plot->SetColor(color.redF(), color.greenF(), color.blueF());
     }
   }
-#ifdef Q_OS_WIN
-  // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
-  // The side effect is a possible blinking of the options but it's better than to see nothing.
-  if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
-  {
-    this->mp_ChartOptions->hide();
-    QApplication::processEvents();
-    this->render();
-    this->mp_ChartOptions->show();
-  }
-  else
-    this->render();
-#else
-  this->render();
-#endif
+  this->render(true); // Options are shown
 };
 
 void AbstractChartWidget::setPlotLineWidth(const QList<int>& indices, double value)
@@ -330,31 +339,36 @@ void AbstractChartWidget::setPlotLineWidth(const QList<int>& indices, double val
       plot->SetWidth(static_cast<float>(value));
     }
   }
+  this->render(true); // Options are shown
+};
+
+void AbstractChartWidget::setChartTitle(const QString& title)
+{
+  if (this->mp_ChartTitleLabel->text().compare(title) == 0)
+      return;
+    
+  this->mp_ChartTitleLabel->setText(title);
+  if (title.isEmpty())
+    this->mp_ChartTitleLabel->setVisible(false);
+  else
+    this->mp_ChartTitleLabel->setVisible(true);
 #ifdef Q_OS_WIN
   // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
   // The side effect is a possible blinking of the options but it's better than to see nothing.
   if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
   {
+    QApplication::processEvents(); // For the text placeholder
     this->mp_ChartOptions->hide();
+    this->update();
     QApplication::processEvents();
-    this->render();
+    ::Sleep(20);
     this->mp_ChartOptions->show();
   }
   else
-    this->render();
+    this->update();
 #else
-  this->render();
-#endif
-};
-
-void AbstractChartWidget::setChartTitle(const QString& title)
-{
-  this->mp_ChartTitleLabel->setText("<b>" + title + "</b>");
-  if (title.isEmpty())
-    this->mp_ChartTitleLabel->setVisible(false);
-  else
-    this->mp_ChartTitleLabel->setVisible(true);
   this->update();
+#endif
 };
 
 void AbstractChartWidget::updatePlotLabel(int itemId)
