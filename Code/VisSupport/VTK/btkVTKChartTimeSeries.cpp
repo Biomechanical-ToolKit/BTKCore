@@ -518,6 +518,9 @@ namespace btk
    */
   bool VTKChartTimeSeries::Paint(vtkContext2D *painter)
   {
+    if (!this->GetVisible())
+      return false;
+    
     int geometry[] = {this->GetScene()->GetSceneWidth(), this->GetScene()->GetSceneHeight()};
     // Do we have a scene with a valid geometry?
     if ((geometry[0] == 0) || (geometry[1] == 0))
@@ -566,8 +569,12 @@ namespace btk
     // 2. Clip the painting area between the axes
     if (this->m_ClippingEnabled)
     {
-      float clipF[4] = {this->Point1[0], this->Point1[1], this->Point2[0]-this->Point1[0], this->Point2[1]-this->Point1[1] };
+      float pts[4] = {this->Point1[0], this->Point1[1], this->Point2[0], this->Point2[1]};
       // 2.1 Check if the scene has a transform and use it
+      if (this->GetTransform() != 0)
+        this->GetTransform()->TransformPoints(pts, pts, 2);
+      // 2.2 Check if the scene has a transform and use it
+      float clipF[4] = {pts[0], pts[1], pts[2]-pts[0], pts[3]-pts[1]};
       if (this->Scene->HasTransform())
         this->Scene->GetTransform()->InverseTransformPoints(clipF, clipF, 2);
       int clip[4] = {(int)clipF[0], (int)clipF[1], (int)clipF[2], (int)clipF[3]};
@@ -891,13 +898,28 @@ namespace btk
   };
   
   /**
-   * Return true if the supplied x, y coordinate is inside the item.
+   * @fn bool VTKChartTimeSeries::Hit(const vtkContextMouseEvent &mouse)
+   * Return true if the supplied mouse event is inside the item.
    * Required for the MouseWheelEvent() method.
    */
-  bool VTKChartTimeSeries::Hit(const vtkContextMouseEvent &mouse)
+  
+  /**
+   * Return true if the supplied x, y coordinate is inside the item.
+   */
+  bool VTKChartTimeSeries::Hit(int x, int y)
   {
-    if ((mouse.ScreenPos[0] > this->Point1[0]) && (mouse.ScreenPos[0] < this->Point2[0])
-     && (mouse.ScreenPos[1] > this->Point1[1]) && (mouse.ScreenPos[1] < this->Point2[1]))
+    if (!this->Visible)
+      return false;
+    
+    float pt1[2] = {this->Point1[0], this->Point1[1]};
+    float pt2[2] = {this->Point2[0], this->Point2[1]};
+    if (this->GetTransform() != NULL)
+    {
+      this->GetTransform()->TransformPoints(pt1, pt1, 1);
+      this->GetTransform()->TransformPoints(pt2, pt2, 1);
+    }
+      
+    if ((x > pt1[0]) && (x < pt2[0]) && (y > pt1[1]) && (y < pt2[1]))
       return true;
     else
       return false;
