@@ -88,6 +88,7 @@ void AbstractMultiView::close(AbstractView* sender)
 
 void AbstractMultiView::close_(AbstractView* sender)
 {
+  this->setUpdatesEnabled(false);
   this->m_Views.removeOne(sender);
   bool lastView = false;
   if (sender->parent()->parent() == this)
@@ -122,10 +123,16 @@ void AbstractMultiView::close_(AbstractView* sender)
   }
   else
   {
-    QSplitter* splitter = qobject_cast<QSplitter*>(otherWidget);
-    if (splitter)
-      static_cast<AbstractView*>(splitter->widget(0))->setFocus(Qt::OtherFocusReason);
+    splitter = 0;
+    AbstractView* view = 0;
+    while ((splitter = qobject_cast<QSplitter*>(otherWidget)) != 0)
+      otherWidget = splitter->widget(0);
+    if ((view = qobject_cast<AbstractView*>(otherWidget)) != 0)
+      view->setFocus(Qt::OtherFocusReason);
+    else
+      qDebug("Unable to focus on the remaining widget");
   }
+  this->setUpdatesEnabled(true);
 };
 
 void AbstractMultiView::split(AbstractView* sender, int direction)
@@ -135,6 +142,7 @@ void AbstractMultiView::split(AbstractView* sender, int direction)
 
 QSplitter* AbstractMultiView::split_(AbstractView* sender, int direction, AbstractView** splittedViews)
 {
+  this->setUpdatesEnabled(false);
   AbstractView* sv = this->createView(sender);
   //sv->viewCombo->blockSignals(true);
   sv->viewCombo->setCurrentIndex(sender->viewCombo->currentIndex());
@@ -176,7 +184,7 @@ QSplitter* AbstractMultiView::split_(AbstractView* sender, int direction, Abstra
     static_cast<QSplitter*>(senderParent)->insertWidget(indexOfSender, splitter);
     static_cast<QSplitter*>(senderParent)->setSizes(parentSizes);
   }
-  
+  this->setUpdatesEnabled(true);
   // Focus for the sender
   sender->setFocus(Qt::OtherFocusReason);
   
