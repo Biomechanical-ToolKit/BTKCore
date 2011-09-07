@@ -160,6 +160,7 @@ namespace btk
     BTK_VTK_EXPORT virtual vtkPlot* AddPlot(int type);
     BTK_VTK_EXPORT virtual vtkIdType AddPlot(vtkPlot* plot);
     BTK_VTK_EXPORT virtual bool RemovePlot(vtkIdType index);
+    BTK_VTK_EXPORT virtual vtkPlot* TakePlot(vtkIdType index);
     BTK_VTK_EXPORT virtual void ClearPlots();
     BTK_VTK_EXPORT virtual vtkPlot* GetPlot(vtkIdType index);
     BTK_VTK_EXPORT virtual vtkIdType GetNumberOfPlots();

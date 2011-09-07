@@ -3,6 +3,7 @@ SET(BTKVTK_SRCS
   btkVTKAxis.cpp
   btkVTKChartTimeSeries.cpp
   btkVTKChartLegend.cpp
+  btkVTKContextScene.cpp
   btkVTKDataObjectAdapter.cpp
   btkVTKForcePlatformsSource.cpp
   btkVTKFrustumFromTwoPoints.cpp

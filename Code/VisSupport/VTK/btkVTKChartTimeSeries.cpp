@@ -794,6 +794,7 @@ namespace btk
        return -1;
      plot->SetXAxis(this->mp_AxisX);
      plot->SetYAxis(this->mp_AxisY);
+     plot->Register(this);
      this->mp_Plots->push_back(plot);
      vtkIdType plotIndex = this->mp_Plots->size() - 1;
      // Ensure that the bounds of the chart are updated to contain the new plot
@@ -804,7 +805,7 @@ namespace btk
   };
   
   /**
-   * Removes a plot with the index @a index and request to update the bounds.
+   * Removes and delete a plot with the index @a index and request to update the bounds.
    */
   bool VTKChartTimeSeries::RemovePlot(vtkIdType index)
   {
@@ -821,6 +822,25 @@ namespace btk
       return true;
     }
     return false;
+  };
+  
+  
+  /**
+   * Extract the plot and remove it from the chart wihtout delete it.
+   */
+  vtkPlot* VTKChartTimeSeries::TakePlot(vtkIdType index)
+  {
+    vtkPlot* plot = NULL;
+    if (static_cast<vtkIdType>(this->mp_Plots->size()) > index)
+    {
+      vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
+      vtkstd::advance(it, index);
+      plot = *it;
+      this->mp_Plots->erase(it);
+      this->m_ChartBoundsValid = false;
+      this->Scene->SetDirty(true);
+    }
+    return plot;
   };
   
   /**
