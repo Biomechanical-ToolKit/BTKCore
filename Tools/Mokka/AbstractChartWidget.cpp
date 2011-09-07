@@ -37,7 +37,8 @@
 #include "ChartOptionsWidget.h"
 #include "ChartExportDialog.h"
 
-#include <vtkContextScene.h>
+#include <btkVTKContextScene.h>
+
 #include <vtkContextActor.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -156,7 +157,7 @@ void AbstractChartWidget::initialize()
   ren->SetBackground(1.0,1.0,1.0);
   vtkRenderWindow* renwin = this->mp_ChartContentWidget->GetRenderWindow();
   renwin->AddRenderer(ren);
-  vtkContextScene* scene = vtkContextScene::New();
+  btk::VTKContextScene* scene = btk::VTKContextScene::New();
   
   for (size_t i = 0 ; i < this->mp_Charts->size() ; ++i)
   {
@@ -615,21 +616,26 @@ void AbstractChartWidget::checkResetAxes()
 
 void AbstractChartWidget::generateColor(double color[3])
 {
-  btk::VTKChartTimeSeries* chart = this->mp_Charts->operator[](0);
-  int numPlots = chart->GetNumberOfPlots();
+  int numPlots = this->mp_ChartOptions->plotTable->rowCount();
   int colorIndex = numPlots;
   vtkColor3ub c = this->mp_ColorGenerator->GetColorRepeating(colorIndex);
-  int inc = 0;
-  while (inc < numPlots)
+  int num = 0, inc = 0, inc2 = 0;
+  while (num < numPlots)
   {
     unsigned char rgb[3];
-    chart->GetPlot(inc)->GetPen()->GetColor(rgb);
+    this->mp_Charts->operator[](inc2)->GetPlot(inc)->GetPen()->GetColor(rgb);
     if ((c.Red() == rgb[0]) && (c.Green() == rgb[1]) && (c.Blue() == rgb[2]))
     {
       c = this->mp_ColorGenerator->GetColorRepeating(++colorIndex);
+      num = 0; inc = 0; inc2 = 0;
+    }
+    else
+      ++num; ++inc;
+    if (inc >= this->mp_Charts->operator[](inc2)->GetNumberOfPlots())
+    {
+      ++inc2;
       inc = 0;
     }
-    ++inc;
   }
   color[0] = c[0] / 255.0;
   color[1] = c[1] / 255.0;

@@ -142,26 +142,32 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* ite
   tableZ->AddColumn(arrValZ);
   
   const double lineWidth = 1.0;
-  vtkPlotLine* line = 0;
+  vtkPlotLine* plot = 0;
   this->generateColor(color);
   // X axis 
-  line = vtkPlotLine::New();
-  this->mp_Charts->operator[](0)->AddPlot(line);
-  line->GetPen()->SetColorF(color);
-  line->SetInput(tableX,0,1);
-  line->SetWidth(lineWidth);
+  plot = vtkPlotLine::New();
+  this->mp_Charts->operator[](0)->AddPlot(plot);
+  plot->GetPen()->SetColorF(color);
+  plot->SetInput(tableX,0,1);
+  plot->SetWidth(lineWidth);
+  plot->Delete();
   // Y axis
-  line = vtkPlotLine::New();
-  this->mp_Charts->operator[](1)->AddPlot(line);
-  line->GetPen()->SetColorF(color);
-  line->SetInput(tableY,0,1);
-  line->SetWidth(lineWidth);
+  plot = vtkPlotLine::New();
+  this->mp_Charts->operator[](1)->AddPlot(plot);
+  plot->GetPen()->SetColorF(color);
+  plot->SetInput(tableY,0,1);
+  plot->SetWidth(lineWidth);
+  plot->Delete();
   // Z axis
-  line = vtkPlotLine::New();
-  this->mp_Charts->operator[](2)->AddPlot(line);
-  line->GetPen()->SetColorF(color);
-  line->SetInput(tableZ,0,1);
-  line->SetWidth(lineWidth);
+  plot = vtkPlotLine::New();
+  this->mp_Charts->operator[](2)->AddPlot(plot);
+  plot->GetPen()->SetColorF(color);
+  plot->SetInput(tableZ,0,1);
+  plot->SetWidth(lineWidth);
+  plot->Delete();
+  
+  *itemId = id;
+  *width = lineWidth;
   
   arrValX->Delete();
   arrValY->Delete();
@@ -169,9 +175,6 @@ bool ChartPointWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* ite
   tableX->Delete();
   tableY->Delete();
   tableZ->Delete();
-  
-  *itemId = id;
-  *width = line->GetWidth();
   
   return true;
 };

@@ -51,11 +51,17 @@ public:
   virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* item);
   
 public slots:
+  virtual void removePlot(int index);
   void updatePlotLabel(const QVector<int>& itemIds);
+  void setExpandableChart(int expandable);
 
 protected:
   virtual QString createPlotLabel(int id);
   virtual bool appendPlotFromDroppedItem(QTreeWidgetItem* item, int* itemId, QString& legend, double* color, double* width);
+  btk::VTKChartTimeSeries* createChart(btk::VTKChartTimeSeries* sourceChart);
+  
+private:
+  bool m_Expanded;
 };
 
 #endif // ChartAnalogWidget_h

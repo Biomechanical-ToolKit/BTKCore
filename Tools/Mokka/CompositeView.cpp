@@ -52,10 +52,22 @@
 #include <QHBoxLayout>
 #include <QCheckBox>
 
+class HeaderOptionComboBox : public QComboBox
+{
+public:
+  HeaderOptionComboBox(QWidget* parent = 0);
+};
+
 class ChartPointComponentCheckBox : public QCheckBox
 {
 public:
-  ChartPointComponentCheckBox::ChartPointComponentCheckBox(const QString& text, QWidget* parent = 0);
+  ChartPointComponentCheckBox(const QString& text, QWidget* parent = 0);
+};
+
+class ChartOptionPushButton : public QPushButton
+{
+public:
+  ChartOptionPushButton(QWidget* parent = 0);
 };
 
 CompositeView::CompositeView(QWidget* parent)
@@ -136,6 +148,7 @@ void CompositeView::copyOptions(CompositeView* from)
   case ChartPoint:
     break;
   case ChartAnalog:
+    static_cast<QComboBox*>(this->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->setCurrentIndex(static_cast<QComboBox*>(from->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->currentIndex());
     break;
   default: // Impossible
     break;
@@ -296,8 +309,7 @@ void CompositeView::finalizeUi()
   // - Projection 3D View
   this->optionStack->addWidget(new QWidget(this)); // empty
   // - Perspective 3D view
-  QComboBox* orthogonalComboBox = new QComboBox(this);
-  orthogonalComboBox->setStyleSheet("QComboBox {\n  color: white;\n  border-top: none;\n  border-bottom: none;\n  border-left-width: 1px;\n  border-left-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);\n  border-left-style: solid;\n  border-right-width: 1px;\n  border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);\n  border-right-style: solid;\n  padding-left: 10px;\n  padding-right: 10px;\n}\n\nQComboBox:editable {\n  background: white;\n}\n\nQComboBox:!editable, QComboBox::drop-down:editable {\n  color: black;\n  background: transparent;\n  selection-background-color: lightgray;\n}\n\n/* QComboBox gets the \"on\" state when the popup is open */\nQComboBox:!editable:on, QComboBox::drop-down:editable:on {\n  color: black;\n}\n\nQComboBox:on { /* shift the text when the popup opens */\n  /* padding-top: 3px;\n  padding-left: 4px; */\n}\n\nQComboBox::drop-down {\n  subcontrol-origin: padding;\n  subcontrol-position: top left;\n  width: 20px;\n\n  border-right-width: 1px;\n  border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent);\n  border-right-style: solid;\n}\n\nQComboBox::down-arrow {\n  image: url(:/Resources/Images/treeDownTriangleWhite.png);\n}\n\nQComboBox::down-arrow:on { /* shift the arrow when popup is open */\n /* top: 1px; */\n}");
+  HeaderOptionComboBox* orthogonalComboBox = new HeaderOptionComboBox(this);
   lw = new QListWidget(this);
   lw->addItem(new QListWidgetItem("Top"));
   lw->addItem(new QListWidgetItem("Bottom"));
@@ -335,12 +347,7 @@ void CompositeView::finalizeUi()
   pointChartOptionLayout2->addWidget(pointChartZCheckBox);
   pointChartOptionLayout->addLayout(pointChartOptionLayout2);
   pointChartOptionLayout->addStretch(1);
-  QPushButton* pointChartOptionButton = new QPushButton(pointChartOptionPage);
-  pointChartOptionButton->setMaximumWidth(20);
-  pointChartOptionButton->setFlat(true);
-  pointChartOptionButton->setText("");
-  pointChartOptionButton->setStyleSheet("QPushButton {\n     image: url(:/Resources/Images/option_editor-16.png);\nbackground-color: transparent;\n}\n\nQPushButton:pressed {\n     image: url(:/Resources/Images/option_editor-down-16.png);\n}\n\nQPushButton:flat {\n     border: none;\n}");
-  pointChartOptionButton->setToolTip("Chart options");
+  ChartOptionPushButton* pointChartOptionButton = new ChartOptionPushButton(pointChartOptionPage);
   connect(pointChartOptionButton, SIGNAL(clicked()), this, SLOT(toggleChartOptions()));
   pointChartOptionLayout->addWidget(pointChartOptionButton);
   this->optionStack->addWidget(pointChartOptionPage);
@@ -349,19 +356,76 @@ void CompositeView::finalizeUi()
   QHBoxLayout* analogChartOptionLayout = new QHBoxLayout(analogChartOptionPage);
   analogChartOptionLayout->setContentsMargins(0,0,0,0);
   analogChartOptionLayout->setSpacing(0);
+  QHBoxLayout* analogChartOptionLayout2 = new QHBoxLayout; // Second layout to fix the size and position of the button for the options
+  analogChartOptionLayout2->setContentsMargins(0,0,0,0);
+  HeaderOptionComboBox* expandableComboBox = new HeaderOptionComboBox(this);
+  lw = new QListWidget(this);
+  lw->addItem(new QListWidgetItem("Collapsed"));
+  lw->addItem(new QListWidgetItem("Expanded"));
+  expandableComboBox->setModel(lw->model());
+  expandableComboBox->setView(lw);
+  connect(expandableComboBox, SIGNAL(currentIndexChanged(int)), analogChart, SLOT(setExpandableChart(int)));
+  analogChartOptionLayout2->addWidget(expandableComboBox);
+  analogChartOptionLayout->addLayout(analogChartOptionLayout2);
   analogChartOptionLayout->addStretch(1);
-  QPushButton* analogChartOptionButton = new QPushButton(analogChartOptionPage);
-  analogChartOptionButton->setMaximumWidth(20);
-  analogChartOptionButton->setFlat(true);
-  analogChartOptionButton->setText("");
-  analogChartOptionButton->setStyleSheet("QPushButton {\n     image: url(:/Resources/Images/option_editor-16.png);\nbackground-color: transparent;\n}\n\nQPushButton:pressed {\n     image: url(:/Resources/Images/option_editor-down-16.png);\n}\n\nQPushButton:flat {\n     border: none;\n}");
-  analogChartOptionButton->setToolTip("Chart options");
+  ChartOptionPushButton* analogChartOptionButton = new ChartOptionPushButton(analogChartOptionPage);
   connect(analogChartOptionButton, SIGNAL(clicked()), this, SLOT(toggleChartOptions()));
   analogChartOptionLayout->addWidget(analogChartOptionButton);
   this->optionStack->addWidget(analogChartOptionPage);
   
   this->optionStack->setCurrentIndex(0);
 };
+
+// --------------------------------------------------------
+
+HeaderOptionComboBox::HeaderOptionComboBox(QWidget* parent)
+: QComboBox(parent)
+{
+  this->setStyleSheet(
+  "QComboBox { \
+     color: white; \
+     border-top: none; \
+     border-bottom: none; \
+     border-left-width: 1px; \
+     border-left-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent); \
+     border-left-style: solid; \
+     border-right-width: 1px; \
+     border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent); \
+     border-right-style: solid; \
+     padding-left: 10px; \
+     padding-right: 10px; \
+   } \
+   QComboBox:editable { \
+     background: white; \
+   } \
+   QComboBox:!editable, QComboBox::drop-down:editable { \
+     color: black; \
+     background: transparent; \
+     selection-background-color: lightgray; \
+   } \
+   /* QComboBox gets the \"on\" state when the popup is open */ \
+   QComboBox:!editable:on, QComboBox::drop-down:editable:on { \
+     color: black; \
+   } \
+   QComboBox:on { /* shift the text when the popup opens */ \
+     /* padding-top: 3px; \
+     padding-left: 4px; */ \
+   } \
+   QComboBox::drop-down { \
+     subcontrol-origin: padding; \
+     subcontrol-position: top left; \
+     width: 20px; \
+     border-right-width: 1px; \
+     border-right-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 transparent, stop:0.5 rgba(200, 200, 200, 255), stop:1 transparent); \
+     border-right-style: solid; \
+   } \
+   QComboBox::down-arrow { \
+     image: url(:/Resources/Images/treeDownTriangleWhite.png); \
+   } \
+   QComboBox::down-arrow:on { /* shift the arrow when popup is open */ \
+    /* top: 1px; */ \
+   }");
+}
 
 // --------------------------------------------------------
 
@@ -389,6 +453,17 @@ ChartPointComponentCheckBox::ChartPointComponentCheckBox(const QString& text, QW
    } \
    QCheckBox::indicator:checked:pressed { \
        image: url(:/Resources/Images/checkbox_checked-pressed-13.png); \
-   } \
-   ");
+   }");
+};
+
+// --------------------------------------------------------
+
+ChartOptionPushButton::ChartOptionPushButton(QWidget* parent)
+: QPushButton(parent)
+{
+  this->setMaximumWidth(20);
+  this->setFlat(true);
+  this->setText("");
+  this->setStyleSheet("QPushButton {\n     image: url(:/Resources/Images/option_editor-16.png);\nbackground-color: transparent;\n}\n\nQPushButton:pressed {\n     image: url(:/Resources/Images/option_editor-down-16.png);\n}\n\nQPushButton:flat {\n     border: none;\n}");
+  this->setToolTip("Chart options");
 };

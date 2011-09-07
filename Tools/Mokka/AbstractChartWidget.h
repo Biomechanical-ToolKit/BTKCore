@@ -98,7 +98,7 @@ public:
   void show(bool s);
   
 public slots:
-  void removePlot(int index);
+  virtual void removePlot(int index);
   void setPlotLineColor(const QList<int>& indices, const QColor& color);
   void setPlotLineWidth(const QList<int>& indices, double value);
   void setChartTitle(const QString& title);

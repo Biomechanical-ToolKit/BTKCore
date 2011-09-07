@@ -34,14 +34,19 @@
  */
 
 #include "ChartAnalogWidget.h"
+#include "ChartOptionsWidget.h"
 #include "UserRoles.h"
+
+#include <btkVTKContextScene.h>
 
 #include <vtkPlotLine.h>
 #include <vtkPen.h>
 
 ChartAnalogWidget::ChartAnalogWidget(QWidget* parent)
 : AbstractChartWidget(1, parent)
-{};
+{
+  this->m_Expanded = false;
+};
 
 ChartAnalogWidget::~ChartAnalogWidget()
 {};
@@ -73,10 +78,83 @@ bool ChartAnalogWidget::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
   return false;
 };
 
+void ChartAnalogWidget::removePlot(int index)
+{
+  if (!this->m_Expanded)
+    this->AbstractChartWidget::removePlot(index);
+  else
+  {
+    btk::VTKChartTimeSeries* chartZero = this->mp_Charts->operator[](0);
+    if (this->mp_ChartOptions->plotTable->rowCount() != 0)
+    {
+      VTKCharts::iterator it = this->mp_Charts->begin();
+      std::advance(it, index);
+      static_cast<btk::VTKContextScene*>(chartZero->GetScene())->RemoveItem(*it);
+      (*it)->Delete();
+      it = this->mp_Charts->erase(it);
+    }
+    else
+    {
+      chartZero->RemovePlot(0);
+      chartZero->GetAxis(vtkAxis::LEFT)->SetTitle("Values");
+      this->checkResetAxes(); // If no more plot or all of them are hidden, then the axes are reset.
+    }
+    this->mp_ChartContentWidget->resizeCharts();
+    this->render(true); // Options are shown
+  }
+};
+
 void ChartAnalogWidget::updatePlotLabel(const QVector<int>& itemIds)
 {
   for (int i = 0 ; i < itemIds.count() ; ++i)
     this->AbstractChartWidget::updatePlotLabel(itemIds[i]);
+};
+
+void ChartAnalogWidget::setExpandableChart(int expandable)
+{
+  bool expanded = (expandable == 1); // otherwise collapsed
+  if (this->m_Expanded == expanded)
+    return;
+  this->m_Expanded = expanded;
+  
+  if (this->mp_ChartOptions->plotTable->rowCount() == 0)
+    return;
+  
+  btk::VTKChartTimeSeries* chartZero = this->mp_Charts->operator[](0);
+  // Expand of collapose the chart
+  if (this->m_Expanded)
+  {
+    int numPlots = chartZero->GetNumberOfPlots();
+    this->mp_Charts->resize(numPlots);
+    for (int i = 1 ; i < numPlots ; ++i)
+    {
+      btk::VTKChartTimeSeries* chart = this->createChart(chartZero);
+      vtkPlot* plot = chartZero->TakePlot(1);
+      chart->AddPlot(plot);
+      chart->GetAxis(vtkAxis::LEFT)->SetTitle(plot->GetLabel());
+      plot->Delete();
+      this->mp_Charts->operator[](i) = chart;
+    }
+    chartZero->GetAxis(vtkAxis::LEFT)->SetTitle(chartZero->GetPlot(0)->GetLabel());
+  }
+  else
+  {
+    // Can have only 1 plot per chart
+    VTKCharts::iterator it = this->mp_Charts->begin();
+    std::advance(it, 1); // Go to the second element
+    while (it != this->mp_Charts->end())
+    {
+      chartZero->AddPlot((*it)->GetPlot(0));
+      static_cast<btk::VTKContextScene*>(chartZero->GetScene())->RemoveItem(*it);
+      (*it)->Delete();
+      it = this->mp_Charts->erase(it);
+    }
+    chartZero->GetAxis(vtkAxis::LEFT)->SetTitle("Values");
+  };
+  this->mp_ChartContentWidget->resizeCharts();
+  this->render();
+  
+  this->setFocus();
 };
 
 QString ChartAnalogWidget::createPlotLabel(int id)
@@ -104,18 +182,46 @@ bool ChartAnalogWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item, int* it
   // FIXME: Conflict into VTK 5.6.1 between the documentation and the code to save or not the data. Need to check with VTK 5.8
   arrVal->SetArray(analog->GetValues().data(), analog->GetFrameNumber(), 1); // Would be 0?
   table->AddColumn(arrVal);
-  
   this->generateColor(color);
-  vtkPlotLine* line = vtkPlotLine::New();
-  this->mp_Charts->operator[](0)->AddPlot(line);
-  line->GetPen()->SetColorF(color);
-  line->SetInput(table,0,1);
-  line->SetWidth(1.0);
-  arrVal->Delete();
-  table->Delete();
+  vtkPlotLine* plot = vtkPlotLine::New();
+  if (!this->m_Expanded || (this->mp_Charts->operator[](0)->GetNumberOfPlots() == 0))
+  {
+    this->mp_Charts->operator[](0)->AddPlot(plot);
+    if (this->m_Expanded)
+      this->mp_Charts->operator[](0)->GetAxis(vtkAxis::LEFT)->SetTitle(legend.toUtf8().constData());
+  }
+  else
+  {
+    btk::VTKChartTimeSeries* chart = this->createChart(this->mp_Charts->operator[](0));
+    chart->GetAxis(vtkAxis::LEFT)->SetTitle(legend.toUtf8().constData());
+    chart->AddPlot(plot);
+    this->mp_Charts->push_back(chart);
+    this->mp_ChartContentWidget->resizeCharts();
+  }
+  plot->GetPen()->SetColorF(color);
+  plot->SetInput(table,0,1);
+  plot->SetWidth(1.0);
   
   *itemId = id;
-  *width = line->GetWidth();
+  *width = plot->GetWidth();
+  
+  arrVal->Delete();
+  table->Delete();
+  plot->Delete();
   
   return true;
+};
+
+btk::VTKChartTimeSeries* ChartAnalogWidget::createChart(btk::VTKChartTimeSeries* sourceChart)
+{
+  btk::VTKChartTimeSeries* targetChart = btk::VTKChartTimeSeries::New();
+  static_cast<btk::VTKAxis*>(targetChart->GetAxis(vtkAxis::BOTTOM))->SetTitleVisible(false); // Frames // X axis
+  targetChart->SetBoundsEnabled(true);
+  targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
+  targetChart->SetRegionOfInterestFunctor(sourceChart->GetRegionOfInterestFunctor());
+  targetChart->SetEventsFunctor(sourceChart->GetEventsFunctor());
+  targetChart->DisplayEventsOn();
+  targetChart->SetColorSeries(this->mp_ColorGenerator);
+  sourceChart->GetScene()->AddItem(targetChart);
+  return targetChart;
 };
