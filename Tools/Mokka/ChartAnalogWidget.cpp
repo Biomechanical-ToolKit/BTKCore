@@ -104,6 +104,36 @@ void ChartAnalogWidget::removePlot(int index)
   }
 };
 
+void ChartAnalogWidget::setPlotLineColor(const QList<int>& indices, const QColor& color)
+{
+  if (!this->m_Expanded)
+    this->AbstractChartWidget::setPlotLineColor(indices, color);
+  else
+  {
+    for (QList<int>::const_iterator it = indices.begin() ; it != indices.end() ; ++it)
+    {
+      vtkPlot* plot = this->mp_Charts->operator[](*it)->GetPlot(0);
+      plot->SetColor(color.redF(), color.greenF(), color.blueF());
+    }
+    this->render(true); // Options are shown
+  }
+};
+
+void ChartAnalogWidget::setPlotLineWidth(const QList<int>& indices, double value)
+{
+  if (!this->m_Expanded)
+    this->AbstractChartWidget::setPlotLineWidth(indices, value);
+  else
+  {
+    for (QList<int>::const_iterator it = indices.begin() ; it != indices.end() ; ++it)
+    {
+      vtkPlot* plot = this->mp_Charts->operator[](*it)->GetPlot(0);
+      plot->SetWidth(static_cast<float>(value));
+    }
+    this->render(true); // Options are shown
+  }
+};
+
 void ChartAnalogWidget::updatePlotLabel(const QVector<int>& itemIds)
 {
   for (int i = 0 ; i < itemIds.count() ; ++i)

@@ -52,6 +52,8 @@ public:
   
 public slots:
   virtual void removePlot(int index);
+  virtual void setPlotLineColor(const QList<int>& indices, const QColor& color);
+  virtual void setPlotLineWidth(const QList<int>& indices, double value);
   void updatePlotLabel(const QVector<int>& itemIds);
   void setExpandableChart(int expandable);
 
