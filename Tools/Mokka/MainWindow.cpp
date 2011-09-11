@@ -40,6 +40,8 @@
 #include "Model.h"
 #include "FileInfoDockWidget.h"
 #include "ImportAssistantDialog.h"
+#include "LoggerMessage.h"
+#include "LoggerWidget.h"
 #include "Metadata.h"
 #include "ModelDockWidget.h"
 #include "ProgressWidget.h"
@@ -210,6 +212,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionExportANB, SIGNAL(triggered()), this, SLOT(exportANB()));
   connect(this->actionExportANC, SIGNAL(triggered()), this, SLOT(exportANC()));
   connect(this->actionPreferences, SIGNAL(triggered()), this, SLOT(showPreferences()));
+  connect(this->actionSelect_All,  SIGNAL(triggered()), this, SLOT(selectAll()));
+  connect(this->actionCopy,  SIGNAL(triggered()), this, SLOT(copy()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -578,22 +582,24 @@ void MainWindow::openFileDropped(const QString& filename)
 
 void MainWindow::openFile(const QString& filename)
 {
+  QFileInfo fI(filename);
+  LOG_INFO(tr("Loading acquisition from file: ") + fI.fileName());
   ProgressWidget pw(this);
   pw.show();
   pw.setProgressValue(10);
-  QString errMsg = this->mp_Acquisition->load(filename);
-  this->loadAcquisition(errMsg, &pw);
-  if (errMsg.isEmpty())
+  bool noOpenError = this->mp_Acquisition->load(filename);
+  this->loadAcquisition(noOpenError, &pw);
+  if (noOpenError)
   {
     this->setCurrentFile(filename);
-    this->m_LastDirectory = QFileInfo(filename).absolutePath();
+    this->m_LastDirectory = fI.absolutePath();
   }
 };
 
-void MainWindow::loadAcquisition(const QString& errMsg, ProgressWidget* pw)
+void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  if (!errMsg.isEmpty())
+  if (!noOpenError)
   {
     pw->hide();
     QApplication::restoreOverrideCursor();
@@ -602,8 +608,7 @@ void MainWindow::loadAcquisition(const QString& errMsg, ProgressWidget* pw)
     error.setWindowFlags(Qt::Sheet);
     error.setWindowModality(Qt::WindowModal);
 #endif
-    error.setDefaultButton(QMessageBox::Ok);
-    error.setInformativeText(errMsg);
+    error.setInformativeText("Check the logger for more informations.");
     error.exec();
     return;
   }
@@ -665,12 +670,13 @@ void MainWindow::saveAsFile()
 
 void MainWindow::saveFile(const QString& filename)
 {
+  LOG_INFO(tr("Saving acquisition to file: ") + QFileInfo(filename).fileName());
+  
   QApplication::setOverrideCursor(Qt::WaitCursor);
   
   QMap<int, QVariant> properties;
   this->setAcquisitionProperties(properties);
-  QString errMsg = this->mp_Acquisition->save(filename,properties);
-  if (!errMsg.isEmpty())
+  if (!this->mp_Acquisition->save(filename,properties))
   {
     QApplication::restoreOverrideCursor();
     QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file saving.", QMessageBox::Ok , this);
@@ -678,7 +684,7 @@ void MainWindow::saveFile(const QString& filename)
     error.setWindowFlags(Qt::Sheet);
     error.setWindowModality(Qt::WindowModal);
 #endif
-    error.setInformativeText(errMsg);
+    error.setInformativeText("Check the logger for more informations.");
     error.exec();
     return;
   }
@@ -692,6 +698,7 @@ void MainWindow::closeFile()
 {
   if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
   {
+    LOG_INFO(tr("Closing acquisition."));
     this->reset();
     this->mp_FileInfoDock->reset();
     this->mp_Acquisition->clear();
@@ -811,30 +818,20 @@ void MainWindow::importAcquisition(const QString& filter)
 
 void MainWindow::importAcquisitions(const QStringList& filenames)
 {
+  LOG_INFO(tr("Importing acquisition(s)."));
   if (!filenames.isEmpty())
   {
     QString title = this->windowTitle();
-    QString importWarnings;
     ProgressWidget pw(this);
     pw.show();
     pw.setProgressValue(10);
-    QString errMsg = this->mp_Acquisition->importFrom(filenames, importWarnings);
-    this->loadAcquisition(errMsg, &pw);
+    bool noImportError = this->mp_Acquisition->importFrom(filenames);
+    this->loadAcquisition(noImportError, &pw);
     this->setWindowTitle(title);
     pw.hide();
-    if (!errMsg.isEmpty())
+    if (!noImportError)
       return;
     this->setWindowModified(true);
-    if (!importWarnings.isEmpty())
-    {
-      QMessageBox error(QMessageBox::Warning, tr("Import warnings"), tr("Warnings appears during importing."), QMessageBox::Ok , this);
-#ifdef Q_OS_MAC
-      error.setWindowFlags(Qt::Sheet);
-      error.setWindowModality(Qt::WindowModal);
-#endif
-      error.setInformativeText(importWarnings);
-      error.exec();
-    }
   }
 }
 
@@ -871,6 +868,22 @@ void MainWindow::showPreferences()
 #endif
 };
 
+void MainWindow::selectAll()
+{
+  QWidget* w = QApplication::focusWidget();
+  LoggerWidget* logger = qobject_cast<LoggerWidget*>(w);
+  if (w != 0)
+    logger->selectAll();
+};
+
+void MainWindow::copy()
+{
+  QWidget* w = QApplication::focusWidget();
+  LoggerWidget* logger = qobject_cast<LoggerWidget*>(w);
+  if (w != 0)
+    logger->copySelectedItemsToClipboard();
+};
+
 void MainWindow::exportAcquisition(const QString& filter)
 {
   QString filename = QFileDialog::getSaveFileName(this, "",
@@ -878,11 +891,11 @@ void MainWindow::exportAcquisition(const QString& filter)
                        filter);
   if (!filename.isEmpty())
   {
+    LOG_INFO(tr("Exporting acquisition to file: ") + QFileInfo(filename).fileName());
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QMap<int, QVariant> properties;
     this->setAcquisitionProperties(properties);
-    QString errMsg = this->mp_Acquisition->exportTo(filename, properties, this->timeEventControler->leftBound(), this->timeEventControler->rightBound());
-    if (!errMsg.isEmpty())
+    if (!this->mp_Acquisition->exportTo(filename, properties, this->timeEventControler->leftBound(), this->timeEventControler->rightBound()))
     {
       QApplication::restoreOverrideCursor();
       QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file exporting.", QMessageBox::Ok , this);
@@ -890,7 +903,7 @@ void MainWindow::exportAcquisition(const QString& filter)
       error.setWindowFlags(Qt::Sheet);
       error.setWindowModality(Qt::WindowModal);
 #endif
-      error.setInformativeText(errMsg);
+      error.setInformativeText("Check the logger for more informations.");
       error.exec();
       return;
     }
@@ -974,16 +987,26 @@ void MainWindow::toggleMarkerTrajectory(int id)
 void MainWindow::toggleEditActions(QWidget* old, QWidget* now)
 {
   Q_UNUSED(old);
-  bool e = false;
-  if ((now != NULL)
-       && (now->inherits("QLineEdit")
-        || now->inherits("QAbstractSpinBox")
-        || now->inherits("QTextEdit")))
-    e = true;
-  this->actionCut->setEnabled(e);
-  this->actionCopy->setEnabled(e);
-  this->actionPaste->setEnabled(e);
-  this->actionSelect_All->setEnabled(e);
+  if (now != NULL)
+  {
+    if (qobject_cast<LoggerWidget*>(now) != 0)
+    {
+      this->actionCopy->setEnabled(true);
+      this->actionSelect_All->setEnabled(true);
+    }
+    else
+    {
+      bool e = false;
+      if ((now->inherits("QLineEdit")
+           || now->inherits("QAbstractSpinBox")
+           || now->inherits("QTextEdit")))
+        e = true;
+      this->actionCut->setEnabled(e);
+      this->actionCopy->setEnabled(e);
+      this->actionPaste->setEnabled(e);
+      this->actionSelect_All->setEnabled(e);
+    }
+  }
 };
 
 void MainWindow::modelDockLocationChanged(Qt::DockWidgetArea area)

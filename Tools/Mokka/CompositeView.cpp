@@ -38,6 +38,7 @@
 #include "ChartPointWidget.h"
 #include "ChartAnalogWidget.h"
 #include "ChartOptionsWidget.h"
+#include "LoggerWidget.h"
 #include "Acquisition.h"
 
 #include <btkMacro.h>
@@ -101,7 +102,7 @@ void CompositeView::render()
   case ChartAnalog:
     static_cast<ChartAnalogWidget*>(w)->render();
     break;
-  default: // Impossible
+  default:
     break;
   }
 };
@@ -127,6 +128,8 @@ AbstractView* CompositeView::clone() const
   static_cast<ChartPointWidget*>(sv->view(ChartPoint))->copy(static_cast<ChartPointWidget*>(this->view(ChartPoint)));
   //  - Analog
   static_cast<ChartAnalogWidget*>(sv->view(ChartAnalog))->copy(static_cast<ChartAnalogWidget*>(this->view(ChartAnalog)));
+  // Clone the consoles
+  //  - Logger (nothing to copy)
   
   return sv;
 };
@@ -149,6 +152,8 @@ void CompositeView::copyOptions(CompositeView* from)
     break;
   case ChartAnalog:
     static_cast<QComboBox*>(this->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->setCurrentIndex(static_cast<QComboBox*>(from->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->currentIndex());
+    break;
+  case ConsoleLogger:
     break;
   default: // Impossible
     break;
@@ -187,6 +192,8 @@ int CompositeView::optionStackIndexFromViewComboIndex(int idx) const
     return 2;
   case ChartAnalog:
     return 3;
+  case ConsoleLogger:
+    return 4;
   default:  // Impossible
     return 0;
   }
@@ -204,6 +211,8 @@ int CompositeView::viewStackIndexFromViewComboIndex(int idx) const
     return 1;
   case ChartAnalog:
     return 2;
+  case ConsoleLogger:
+    return 3;
   default:  // Impossible
     qDebug("Incorrect view index! Impossible to find the corresponding stack!");
     return 0;
@@ -283,6 +292,13 @@ void CompositeView::finalizeUi()
   lw->addItem(new QListWidgetItem(tr("  Point")));
   // - Analog channel
   lw->addItem(new QListWidgetItem(tr("  Analog")));
+  // Console
+  lwi = new QListWidgetItem(tr("Console"));
+  lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
+  lwi->setFont(f);
+  lw->addItem(lwi);
+  // - Point
+  lw->addItem(new QListWidgetItem(tr("  Logger")));
   
   // Update the model & view
   this->viewCombo->blockSignals(true);
@@ -304,6 +320,10 @@ void CompositeView::finalizeUi()
   ChartAnalogWidget* analogChart = new ChartAnalogWidget(this);
   this->viewStack->addWidget(analogChart);
   analogChart->initialize();
+  // - Console
+  //   + Journal
+  LoggerWidget* logger = new LoggerWidget(this);
+  this->viewStack->addWidget(logger);
   
   // Widget in the function stack
   // - Projection 3D View
@@ -372,6 +392,8 @@ void CompositeView::finalizeUi()
   connect(analogChartOptionButton, SIGNAL(clicked()), this, SLOT(toggleChartOptions()));
   analogChartOptionLayout->addWidget(analogChartOptionButton);
   this->optionStack->addWidget(analogChartOptionPage);
+  // - Journal
+  this->optionStack->addWidget(new QWidget(this)); // empty
   
   this->optionStack->setCurrentIndex(0);
 };

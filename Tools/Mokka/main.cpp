@@ -36,6 +36,7 @@
 #include "mokkaConfigure.h"
 
 #include "MainWindow.h"
+#include "LoggerWidget.h"
 
 #include <QApplication>
 
@@ -132,7 +133,12 @@ int main(int argc, char *argv[])
     return clp.GetStatus();
   }
   
+  LoggerWidget::redirectCout();
+  LoggerWidget::redirectCerr();
+  qInstallMsgHandler(LoggerWidget::messageHandler);
+  
   QApplication app(argc, argv);
+  LOG_INFO(QObject::tr("Starting Mokka.")); // The QApplication must be created before this line ("QPixmap: Must construct a QApplication before a QPaintDevice").
   MainWindow mw;
   QObject::connect(&app, SIGNAL(focusChanged(QWidget*, QWidget*)), &mw, SLOT(toggleEditActions(QWidget*, QWidget*)));
   mw.show();

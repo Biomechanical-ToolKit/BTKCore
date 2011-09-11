@@ -37,6 +37,7 @@
 #include "Model.h"
 #include "NewSegmentDialog.h"
 #include "UserRoles.h"
+#include "LoggerMessage.h"
 
 #include <QPainter>
 #include <QFileDialog>
@@ -627,9 +628,13 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   messageBox.setWindowModality(Qt::WindowModal);
   messageBox.setWindowFlags(Qt::Sheet);
 #endif
+  
+  LOG_INFO("Loading model configuration: " + QFileInfo(filename).fileName());
+
   QFile file(filename);
   if (!file.open(QFile::ReadOnly | QFile::Text))
   {
+    LOG_CRITICAL("Error when reading the file: " + filename + ": " + file.errorString());
     messageBox.setText(messageBox.text());
     messageBox.setInformativeText("<nobr>" + filename + ": " + file.errorString() + "</nobr>\n\nThis configuration is removed from the list");
     messageBox.exec();
@@ -2352,6 +2357,7 @@ bool ModelDockWidget::saveConfiguration(int idx)
   QFile file(filename);
   if (!file.open(QFile::WriteOnly | QFile::Text))
   {
+    LOG_CRITICAL("Error when writing the file: " + filename + ":" + file.errorString());
     messageBox.setText(messageBox.text() + filename);
     messageBox.setInformativeText(file.errorString());
     messageBox.exec();

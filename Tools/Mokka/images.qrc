@@ -19,6 +19,7 @@
     <file>Resources/Images/edit-down.png</file>
     <file>Resources/Images/editdelete.png</file>
     <file>Resources/Images/editdelete-down.png</file>
+    <file>Resources/Images/error.png</file>
     <file>Resources/Images/eye.png</file>
     <file>Resources/Images/folder.png</file>
     <file>Resources/Images/filenew.png</file>
@@ -28,6 +29,7 @@
     <file>Resources/Images/horizontalsplit-down-16.png</file>
     <file>Resources/Images/open.png</file>
     <file>Resources/Images/open-down.png</file>
+    <file>Resources/Images/info.png</file>
     <file>Resources/Images/link2.png</file>
     <file>Resources/Images/lock.png</file>
     <file>Resources/Images/markers.png</file>
@@ -62,9 +64,8 @@
     <file>Resources/Images/event_general.png</file>
     <file>Resources/Images/event_options.png</file>
     <file>Resources/Images/acquisition_options.png</file>
-    <file>Resources/Images/warning.png</file>
     <file>Resources/Images/visualisation_preferences.png</file>
-    <file>Resources/Images/error.png</file>
     <file>Resources/Images/Mokka_128.png</file>
+    <file>Resources/Images/warning.png</file>
   </qresource>
 </RCC>

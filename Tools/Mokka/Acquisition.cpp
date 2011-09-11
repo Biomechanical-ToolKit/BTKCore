@@ -35,6 +35,7 @@
 
 #include "Acquisition.h"
 #include "Utilities/StringStreamBuf.h"
+#include "LoggerMessage.h"
 
 #include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileWriter.h>
@@ -77,7 +78,7 @@ Acquisition::~Acquisition()
   this->clear();
 };
 
-QString Acquisition::load(const QString& filename)
+bool Acquisition::load(const QString& filename)
 {
   btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
   reader->SetFilename(filename.toStdString());
@@ -87,39 +88,38 @@ QString Acquisition::load(const QString& filename)
   }
   catch (btk::Exception& e)
   {
-    return e.what();
+    LOG_CRITICAL(e.what());
+    return false;
   }
   catch (std::exception& e)
   {
-    return "Unexpected error: " + QString(e.what());
+    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    return false;
   }
   catch (...)
   {
-    return "Unknown error.";
+    LOG_CRITICAL("Unknown error.");
+    return false;
   }
   this->clear();
   this->mp_BTKAcquisition = reader->GetOutput();
   this->loadAcquisition();
   this->m_Filename = filename;
   this->emitGeneratedInformations(reader->GetAcquisitionIO());
-  return "";
+  return true;
 };
 
-QString Acquisition::save(const QString& filename, const QMap<int, QVariant>& properties)
+bool Acquisition::save(const QString& filename, const QMap<int, QVariant>& properties)
 {
-  QString errMsg;
-  this->write(filename, properties, this->mp_ROI[0], this->mp_ROI[1], errMsg, true);
-  return errMsg;
+  return this->write(filename, properties, this->mp_ROI[0], this->mp_ROI[1], true);
 }
 
-QString Acquisition::exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb)
+bool Acquisition::exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb)
 {
-  QString errMsg;
-  this->write(filename, properties, lb, rb, errMsg);
-  return errMsg;
+  return this->write(filename, properties, lb, rb);
 };
 
-QString Acquisition::importFrom(const QStringList& filenames, QString& importWarnings)
+bool Acquisition::importFrom(const QStringList& filenames)
 {
   // Try to read the given file
   QList<btk::AcquisitionFileReader::Pointer> readers;
@@ -127,6 +127,7 @@ QString Acquisition::importFrom(const QStringList& filenames, QString& importWar
   {
     for (int i = 0 ; i < filenames.count() ; ++i)
     {
+      LOG_INFO(tr("Loading acquisition for importation from file:") + QFileInfo(filenames[i]).fileName());
       btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
       reader->SetFilename(filenames[i].toStdString());
       reader->Update();
@@ -135,15 +136,18 @@ QString Acquisition::importFrom(const QStringList& filenames, QString& importWar
   }
   catch (btk::Exception& e)
   {
-    return e.what();
+    LOG_CRITICAL(e.what());
+    return false;
   }
   catch (std::exception& e)
   {
-    return "Unexpected error: " + QString(e.what());
+    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    return false;
   }
   catch (...)
   {
-    return "Unknown error.";
+    LOG_CRITICAL("Unknown error.");
+    return false;
   }
   // Check if the original acquisition need to be cropped
   if (this->mp_BTKAcquisition)
@@ -166,19 +170,17 @@ QString Acquisition::importFrom(const QStringList& filenames, QString& importWar
   }
   // Launch the merging/concatenation
   int shift = !this->mp_BTKAcquisition ? 0 : 1;
-  StringStreamBuf err(std::cerr);
   btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
   merger->SetInput(0, this->mp_BTKAcquisition);
   for (int i = 0 ; i < readers.count() ; ++i)
-    merger->SetInput(i+shift, readers[i]->GetOutput());  
+    merger->SetInput(i+shift, readers[i]->GetOutput());
   merger->Update();
   this->clear();
   this->mp_BTKAcquisition = merger->GetOutput();
   this->loadAcquisition();
   QVector<QString> infos(16,"N/A"); infos[0] = "N/A                         ";
   emit informationsChanged(infos);
-  importWarnings = QString::fromStdString(err.str());
-  return "";
+  return true;
 };
 
 void Acquisition::clear()
@@ -641,7 +643,7 @@ void Acquisition::emitGeneratedInformations(btk::AcquisitionFileIO::Pointer io)
   emit informationsChanged(infos);
 };
 
-void Acquisition::write(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb, QString& errMsg, bool updateInfo)
+bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb, bool updateInfo)
 {
   btk::Acquisition::Pointer source = this->mp_BTKAcquisition;
   btk::Acquisition::Pointer target = btk::Acquisition::New();
@@ -758,19 +760,22 @@ void Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
   }
   catch (btk::Exception& e)
   {
-    errMsg = e.what();
+    LOG_CRITICAL(e.what());
+    return false;
   }
   catch (std::exception& e)
   {
-    errMsg = "Unexpected error: " + QString(e.what());
+    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    return false;
   }
   catch (...)
   {
-    errMsg = "Unknown error.";
+    LOG_CRITICAL("Unknown error.");
+    return false;
   }
   if (updateInfo)
     this->emitGeneratedInformations(writer->GetAcquisitionIO());
-  errMsg = "";
+  return true;
 };
 
 void Acquisition::loadAcquisition()

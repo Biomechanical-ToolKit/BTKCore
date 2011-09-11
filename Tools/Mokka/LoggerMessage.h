@@ -33,48 +33,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CompositeView_h
-#define CompositeView_h
 
-#include "AbstractView.h"
+#ifndef LoggerMessage_h
+#define LoggerMessage_h
 
-class Acquisition;
+#define LOGGER_EXTERNAL_MESSAGE_ID "b5t5k5"
 
-class CompositeView : public AbstractView
+#include <QString>
+
+inline void sengLogMessage(void (*sender)(const char * str, ...), const QString& msg)
 {
-  Q_OBJECT
-  
-public:
-  enum {Viz3D = 0, Viz3DProjection, Viz3DOrthogonal, 
-        Chart, ChartPoint, ChartAnalog,
-        Console, ConsoleLogger};
-  
-  CompositeView(QWidget* parent = 0);
-  // ~CompositeView(); // Implicit
-  // CompositeView(const CompositeView&);  // Implicit
-  // CompositeView& operator=(const CompositeView&); // Implicit.
-  
-  void setAcquisition(Acquisition* acq);
-  void render();
-  void show(bool s);
-  
-  QWidget* view(int viewComboIndex) const {return this->viewStack->widget(this->viewStackIndexFromViewComboIndex(viewComboIndex));};
-  
-  virtual AbstractView* clone() const;
-  void copyOptions(CompositeView* from);
-  
-public slots:
-  void setOrthogonalView(int view);
-  void toggleChartOptions();
-
-protected:
-  virtual int optionStackIndexFromViewComboIndex(int idx) const;
-  virtual int viewStackIndexFromViewComboIndex(int idx) const;
-  virtual void finalizeView(int idx);
-  virtual void adaptLayoutStrech(int idx);
-  
-private:
-  void finalizeUi();
+  (*sender)("%s%s", LOGGER_EXTERNAL_MESSAGE_ID, qPrintable(msg));
 };
 
-#endif // CompositeView_h
+inline void sengLogMessage(void (*sender)(const char * str, ...), const char* msg)
+{
+  (*sender)("%s%s", LOGGER_EXTERNAL_MESSAGE_ID, msg);
+};
+
+#define LOG_INFO(msg) \
+  sengLogMessage(&qDebug, msg)
+ 
+#define LOG_WARNING(msg) \
+  sengLogMessage(&qWarning, msg)
+  
+#define LOG_CRITICAL(msg) \
+  sengLogMessage(&qCritical, msg)
+
+#define LOG_FATAL(msg) \
+  sengLogMessage(&qFatal, msg)
+
+#endif // LoggerMessage_h

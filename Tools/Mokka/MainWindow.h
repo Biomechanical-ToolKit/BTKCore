@@ -104,6 +104,8 @@ public Q_SLOTS:
   void exportANB();
   void exportANC();
   void showPreferences();
+  void selectAll();
+  void copy();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
@@ -153,7 +155,7 @@ public Q_SLOTS:
   void toggleEditActions(QWidget* old, QWidget* now);
   
 private:
-  void loadAcquisition(const QString& errMsg, ProgressWidget* pw);
+  void loadAcquisition(bool noOpenError, ProgressWidget* pw);
   void saveFile(const QString& filename);
   void exportAcquisition(const QString& filter);
   void importAcquisition(const QString& filter);
