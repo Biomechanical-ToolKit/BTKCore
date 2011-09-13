@@ -34,7 +34,6 @@
  */
 
 #include "Acquisition.h"
-#include "Utilities/StringStreamBuf.h"
 #include "LoggerMessage.h"
 
 #include <btkAcquisitionFileReader.h>
