@@ -35,8 +35,7 @@
 
 #include "CompositeView.h"
 #include "Viz3DWidget.h"
-#include "ChartPointWidget.h"
-#include "ChartAnalogWidget.h"
+#include "ChartWidget.h"
 #include "ChartOptionsWidget.h"
 #include "LoggerWidget.h"
 #include "Acquisition.h"
@@ -83,8 +82,7 @@ CompositeView::CompositeView(QWidget* parent)
 void CompositeView::setAcquisition(Acquisition* acq)
 {
   static_cast<Viz3DWidget*>(this->view(Viz3D))->setAcquisition(acq);
-  static_cast<ChartPointWidget*>(this->view(ChartPoint))->setAcquisition(acq);
-  static_cast<ChartAnalogWidget*>(this->view(ChartAnalog))->setAcquisition(acq);
+  static_cast<ChartWidget*>(this->view(Chart))->setAcquisition(acq);
 };
 
 void CompositeView::render()
@@ -97,10 +95,8 @@ void CompositeView::render()
     static_cast<Viz3DWidget*>(w)->render();
     break;
   case ChartPoint:
-    static_cast<ChartPointWidget*>(w)->render();
-    break;
   case ChartAnalog:
-    static_cast<ChartAnalogWidget*>(w)->render();
+    static_cast<ChartWidget*>(w)->render();
     break;
   default:
     break;
@@ -112,9 +108,7 @@ void CompositeView::show(bool s)
   // Viz3D
   static_cast<Viz3DWidget*>(this->view(Viz3D))->show(s);
   // Chart Point
-  static_cast<ChartPointWidget*>(this->view(ChartPoint))->show(s);
-  // Chart Analog
-  static_cast<ChartAnalogWidget*>(this->view(ChartAnalog))->show(s);
+  static_cast<ChartWidget*>(this->view(Chart))->show(s);
 }
 
 AbstractView* CompositeView::clone() const
@@ -124,10 +118,7 @@ AbstractView* CompositeView::clone() const
   // Clone the 3D view
   static_cast<Viz3DWidget*>(sv->view(Viz3D))->copy(static_cast<Viz3DWidget*>(this->view(Viz3D)));
   // Clone the charts
-  //  - Point
-  static_cast<ChartPointWidget*>(sv->view(ChartPoint))->copy(static_cast<ChartPointWidget*>(this->view(ChartPoint)));
-  //  - Analog
-  static_cast<ChartAnalogWidget*>(sv->view(ChartAnalog))->copy(static_cast<ChartAnalogWidget*>(this->view(ChartAnalog)));
+  static_cast<ChartWidget*>(sv->view(Chart))->copy(static_cast<ChartWidget*>(this->view(Chart)));
   // Clone the consoles
   //  - Logger (nothing to copy)
   
@@ -174,10 +165,7 @@ void CompositeView::toggleChartOptions()
   QLayout* layout = this->optionStack->currentWidget()->layout();
   QWidget* w = layout->itemAt(layout->count()-1)->widget(); // Chart options button
   QPoint pos = w->mapToGlobal(QPoint(0,0)) + QPoint(w->width() / 2, w->height());
-  if (this->viewCombo->currentIndex() == ChartPoint)
-    static_cast<ChartPointWidget*>(this->view(ChartPoint))->toggleOptions(pos);
-  else
-    static_cast<ChartAnalogWidget*>(this->view(ChartAnalog))->toggleOptions(pos);
+  static_cast<ChartWidget*>(this->view(Chart))->toggleOptions(pos);
 };
 
 int CompositeView::optionStackIndexFromViewComboIndex(int idx) const
@@ -207,12 +195,12 @@ int CompositeView::viewStackIndexFromViewComboIndex(int idx) const
   case Viz3DProjection:
   case Viz3DOrthogonal:
     return 0;
+  case Chart:
   case ChartPoint:
-    return 1;
   case ChartAnalog:
-    return 2;
+    return 1;
   case ConsoleLogger:
-    return 3;
+    return 2;
   default:  // Impossible
     qDebug("Incorrect view index! Impossible to find the corresponding stack!");
     return 0;
@@ -221,32 +209,41 @@ int CompositeView::viewStackIndexFromViewComboIndex(int idx) const
 
 void CompositeView::finalizeView(int idx)
 {
-  if ((idx != Viz3DProjection) && (idx != Viz3DOrthogonal))
-    return;
-  
-  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->view(Viz3D));
-  btk::VTKInteractorStyleTrackballFixedUpCamera* style = static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(viz3D->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
-  vtkCamera* cam = viz3D->renderer()->GetActiveCamera();
-  if (idx == Viz3DProjection)
+  if ((idx == Viz3DProjection) || (idx == Viz3DOrthogonal))
   {
-    cam->ParallelProjectionOff();
-    style->RotationEnabledOn();
-    style->SpinEnabledOn();
-    viz3D->restoreProjectionCameraConfiguration();
+    Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->view(Viz3D));
+    btk::VTKInteractorStyleTrackballFixedUpCamera* style = static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(viz3D->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
+    vtkCamera* cam = viz3D->renderer()->GetActiveCamera();
+    if (idx == Viz3DProjection)
+    {
+      cam->ParallelProjectionOff();
+      style->RotationEnabledOn();
+      style->SpinEnabledOn();
+      viz3D->restoreProjectionCameraConfiguration();
+    }
+    else if (idx == Viz3DOrthogonal)
+    {
+      viz3D->saveProjectionCameraConfiguration();
+      cam->ParallelProjectionOn();
+      style->RotationEnabledOff();
+      style->SpinEnabledOff();
+      // Refresh
+      QComboBox* orthogonalComboBox = static_cast<QComboBox*>(this->optionStack->currentWidget());
+      int index = orthogonalComboBox->currentIndex();
+      orthogonalComboBox->setCurrentIndex(-1);
+      orthogonalComboBox->setCurrentIndex(index);
+    }
+    this->render();
   }
-  else if (idx == Viz3DOrthogonal)
+  else if ((idx == ChartPoint) || (idx == ChartAnalog))
   {
-    viz3D->saveProjectionCameraConfiguration();
-    cam->ParallelProjectionOn();
-    style->RotationEnabledOff();
-    style->SpinEnabledOff();
-    // Refresh
-    QComboBox* orthogonalComboBox = static_cast<QComboBox*>(this->optionStack->currentWidget());
-    int index = orthogonalComboBox->currentIndex();
-    orthogonalComboBox->setCurrentIndex(-1);
-    orthogonalComboBox->setCurrentIndex(index);
+    ChartWidget* chart = static_cast<ChartWidget*>(this->view(Chart));
+    if (idx == ChartPoint)
+      chart->displayPointChart();
+    else if (idx == ChartAnalog)
+      chart->displayAnalogChart();
+    this->render();
   }
-  this->render();
 };
 
 void CompositeView::adaptLayoutStrech(int idx)
@@ -312,16 +309,11 @@ void CompositeView::finalizeUi()
   this->viewStack->addWidget(viz3d);
   viz3d->initialize();
   // - Charts
-  //   + Points
-  ChartPointWidget* pointChart = new ChartPointWidget(this);
-  this->viewStack->addWidget(pointChart);
-  pointChart->initialize();
-  //   + Analog channels
-  ChartAnalogWidget* analogChart = new ChartAnalogWidget(this);
-  this->viewStack->addWidget(analogChart);
-  analogChart->initialize();
+  ChartWidget* chart = new ChartWidget(this);
+  this->viewStack->addWidget(chart);
+  chart->initialize();
   // - Console
-  //   + Journal
+  //   + Logger
   LoggerWidget* logger = new LoggerWidget(this);
   this->viewStack->addWidget(logger);
   
@@ -351,19 +343,19 @@ void CompositeView::finalizeUi()
   ChartPointComponentCheckBox* pointChartXCheckBox = new ChartPointComponentCheckBox("x", pointChartOptionPage);
   pointChartXCheckBox->setToolTip("Display X component");
   pointChartXCheckBox->setCheckState(Qt::Checked);
-  connect(pointChartXCheckBox, SIGNAL(stateChanged(int)), pointChart, SLOT(displayComponentX(int)));
+  connect(pointChartXCheckBox, SIGNAL(stateChanged(int)), chart, SLOT(displayPointComponentX(int)));
   pointChartOptionLayout2->addWidget(pointChartXCheckBox);
   pointChartOptionLayout2->addSpacing(spacing);
   ChartPointComponentCheckBox* pointChartYCheckBox = new ChartPointComponentCheckBox("y", pointChartOptionPage);
   pointChartYCheckBox->setToolTip("Display Y component");
   pointChartYCheckBox->setCheckState(Qt::Checked);
-  connect(pointChartYCheckBox, SIGNAL(stateChanged(int)), pointChart, SLOT(displayComponentY(int)));
+  connect(pointChartYCheckBox, SIGNAL(stateChanged(int)), chart, SLOT(displayPointComponentY(int)));
   pointChartOptionLayout2->addWidget(pointChartYCheckBox);
   pointChartOptionLayout2->addSpacing(spacing);
   ChartPointComponentCheckBox* pointChartZCheckBox = new ChartPointComponentCheckBox("z", pointChartOptionPage);
   pointChartZCheckBox->setToolTip("Display Z component");
   pointChartZCheckBox->setCheckState(Qt::Checked);
-  connect(pointChartZCheckBox, SIGNAL(stateChanged(int)), pointChart, SLOT(displayComponentZ(int)));
+  connect(pointChartZCheckBox, SIGNAL(stateChanged(int)), chart, SLOT(displayPointComponentZ(int)));
   pointChartOptionLayout2->addWidget(pointChartZCheckBox);
   pointChartOptionLayout->addLayout(pointChartOptionLayout2);
   pointChartOptionLayout->addStretch(1);
@@ -384,7 +376,7 @@ void CompositeView::finalizeUi()
   lw->addItem(new QListWidgetItem("Expanded"));
   expandableComboBox->setModel(lw->model());
   expandableComboBox->setView(lw);
-  connect(expandableComboBox, SIGNAL(currentIndexChanged(int)), analogChart, SLOT(setExpandableChart(int)));
+  connect(expandableComboBox, SIGNAL(currentIndexChanged(int)), chart, SLOT(setExpandableAnalog(int)));
   analogChartOptionLayout2->addWidget(expandableComboBox);
   analogChartOptionLayout->addLayout(analogChartOptionLayout2);
   analogChartOptionLayout->addStretch(1);
@@ -392,7 +384,7 @@ void CompositeView::finalizeUi()
   connect(analogChartOptionButton, SIGNAL(clicked()), this, SLOT(toggleChartOptions()));
   analogChartOptionLayout->addWidget(analogChartOptionButton);
   this->optionStack->addWidget(analogChartOptionPage);
-  // - Journal
+  // - Logger
   this->optionStack->addWidget(new QWidget(this)); // empty
   
   this->optionStack->setCurrentIndex(0);

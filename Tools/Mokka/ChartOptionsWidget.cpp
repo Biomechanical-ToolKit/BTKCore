@@ -46,7 +46,7 @@ ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
   this->setupUi(this);
   
   this->setAttribute(Qt::WA_TranslucentBackground);
-  this->resize(175,250);
+  this->resize(190,250);
   
   QHeaderView* header = this->plotTable->horizontalHeader();
   header->setMovable(false);
@@ -92,21 +92,17 @@ ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
 #endif
 };
 
-void ChartOptionsWidget::appendPlot(int itemId, const QString& label, int color[3], double width)
+void ChartOptionsWidget::setPlot(int rowIdx, const QString& label, const QColor& color, double width, bool visible)
 {
-  int rowIdx = this->plotTable->rowCount();
-  this->plotTable->insertRow(rowIdx);
-  QColor c = QColor(color[0], color[1], color[2]);
-  QTableWidgetItem* item = new QTableWidgetItem(this->createLineIcon(c, width), label);
-  item->setData(LineColor, c);
+  QTableWidgetItem* item = new QTableWidgetItem(this->createLineIcon(color, width), label);
+  item->setData(LineColor, color);
   item->setData(LineWidth, width);
-  item->setData(ItemId, itemId);
   this->plotTable->setItem(rowIdx, 0, item);
   QPushButton* button = new QPushButton("", this);
   button->setFlat(true);
-  button->setProperty("plotIndex", rowIdx);
   button->setStyleSheet("QPushButton {image: url(:/Resources/Images/plot_delete.png);} QPushButton:pressed {image: url(:/Resources/Images/plot_delete-down.png);} QPushButton:flat {border: none;}");
   this->plotTable->setCellWidget(rowIdx, 1, button);
+  this->plotTable->setRowHidden(rowIdx, !visible);
   
   connect(button, SIGNAL(clicked()), this, SLOT(removePlot()));
 };
@@ -128,6 +124,26 @@ void ChartOptionsWidget::setPlotOptionEnabled(bool enabled)
   {
     this->lineWidthSpinBox->clear();
     this->setLineColorButtonColor(Qt::white);
+  }
+};
+
+QList<int> ChartOptionsWidget::selectedPlots() const
+{
+  QList<int> selectedPlots;
+  for (int i = 0 ; i < this->plotTable->rowCount() ; ++i)
+  {
+    if (this->plotTable->selectionModel()->isRowSelected(i, this->plotTable->rootIndex()))
+      selectedPlots << i;
+  }
+  return selectedPlots;
+};
+
+void ChartOptionsWidget::setSelectedPlots(const QList<int>& indices)
+{
+  for (QList<int>::const_iterator it = indices.begin() ; it != indices.end() ; ++it)
+  {
+    if ((*it < this->plotTable->rowCount()) && !this->plotTable->isRowHidden(*it))
+      this->plotTable->selectionModel()->select(this->plotTable->model()->index(*it,0), QItemSelectionModel::Select | QItemSelectionModel::Rows);
   }
 };
 
@@ -189,14 +205,17 @@ void ChartOptionsWidget::displayPlotOption()
 void ChartOptionsWidget::removePlot()
 {
   QObject* obj = sender();
-  int idx = obj->property("plotIndex").toInt();
-  this->plotTable->removeRow(idx);
-  // Update the other indices
-  for (int i = idx ; i < this->plotTable->rowCount() ; ++i)
-    this->plotTable->cellWidget(i,1)->setProperty("plotIndex", i);
+  for (int i = 0 ; i < this->plotTable->rowCount() ; ++i)
+  {
+    if (this->plotTable->cellWidget(i,1) == obj)
+    {
+      this->plotTable->removeRow(i);
+      emit plotRemoved(i);
+      break;
+    }
+  }
   if (this->plotTable->rowCount() == 0)
     this->setPlotOptionEnabled(false);
-  emit plotRemoved(idx);
 };
 
 void ChartOptionsWidget::setLineColor()

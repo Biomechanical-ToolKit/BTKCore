@@ -49,9 +49,11 @@ public:
   
   ChartOptionsWidget(QWidget* parent = 0);
   
-  void appendPlot(int itemId, const QString& label, int color[3], double width);
+  void setPlot(int rowIdx, const QString& label, const QColor& color, double width, bool visible);
   void clear();
   void setPlotOptionEnabled(bool enabled);
+  QList<int> selectedPlots() const;
+  void setSelectedPlots(const QList<int>& indices);
   
 public slots:
   void displayPlotOption();

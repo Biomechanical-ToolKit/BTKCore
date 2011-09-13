@@ -37,8 +37,7 @@
 #include "Acquisition.h"
 #include "Model.h"
 #include "CompositeView.h"
-#include "ChartPointWidget.h"
-#include "ChartAnalogWidget.h"
+#include "ChartWidget.h"
 #include "Viz3DWidget.h"
 #include "UserRoles.h"
 
@@ -169,8 +168,7 @@ void MultiViewWidget::initialize()
   
   CompositeView* sv = static_cast<CompositeView*>(this->gridLayout()->itemAtPosition(0,0)->widget());
   vtkRenderer* renderer = static_cast<Viz3DWidget*>(sv->view(CompositeView::Viz3D))->renderer();
-  ChartPointWidget* pointChart = static_cast<ChartPointWidget*>(sv->view(CompositeView::ChartPoint));
-  ChartAnalogWidget* analogChart = static_cast<ChartAnalogWidget*>(sv->view(CompositeView::ChartAnalog));  
+  ChartWidget* chart = static_cast<ChartWidget*>(sv->view(CompositeView::Chart));
   
   //vtkMapper::GlobalImmediateModeRenderingOn(); // For large dataset.
   
@@ -349,8 +347,8 @@ void MultiViewWidget::initialize()
       SLOT(updateDisplayedMarkersList(vtkObject*, unsigned long, void*, void*)));
       
   // Initialize the charts
-  pointChart->setFrameArray(this->mp_PointChartFrames);
-  analogChart->setFrameArray(this->mp_AnalogChartFrames);
+  chart->setPointFrameArray(this->mp_PointChartFrames);
+  chart->setAnalogFrameArray(this->mp_AnalogChartFrames);
 };
 
 void MultiViewWidget::setAcquisition(Acquisition* acq)
@@ -402,13 +400,7 @@ void MultiViewWidget::setViewChartActions(QList<QAction*> actions)
 {
   this->m_ViewChartActions = actions;
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-  {
-    CompositeView* sv = static_cast<CompositeView*>(*it);
-    // Point
-    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartPoint))->chartContent()->addActions(this->m_ViewChartActions);
-    // Analog
-    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartAnalog))->chartContent()->addActions(this->m_ViewChartActions);
-  }
+    static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->addActions(this->m_ViewChartActions);
 };
 
 void MultiViewWidget::load()
@@ -463,31 +455,19 @@ void MultiViewWidget::load()
 void MultiViewWidget::setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor)
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-  {
-    CompositeView* sv = static_cast<CompositeView*>(*it);
-    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartPoint))->setCurrentFrameFunctor(functor);
-    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartAnalog))->setCurrentFrameFunctor(functor);
-  }
+    static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->setCurrentFrameFunctor(functor);
 };
 
 void MultiViewWidget::setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor)
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-  {
-    CompositeView* sv = static_cast<CompositeView*>(*it);
-    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartPoint))->setRegionOfInterestFunctor(functor);
-    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartAnalog))->setRegionOfInterestFunctor(functor);
-  }
+    static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->setRegionOfInterestFunctor(functor);
 };
 
 void MultiViewWidget::setEventsFunctor(btk::VTKEventsFunctor::Pointer functor)
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-  {
-    CompositeView* sv = static_cast<CompositeView*>(*it);
-    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartPoint))->setEventsFunctor(functor);
-    static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartAnalog))->setEventsFunctor(functor);
-  }
+    static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->setEventsFunctor(functor);
 };
 
 void MultiViewWidget::setEventFilterObject(QObject* filter)
@@ -966,11 +946,8 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   connect(viz3D, SIGNAL(trajectoryMarkerToggled(int)), this, SIGNAL(trajectoryMarkerToggled(int)));
   viz3D->addActions(this->m_View3dActions);
   viz3D->setContextMenuPolicy(Qt::ActionsContextMenu);
-  // Charts final settings
-  // - Point
-  static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartPoint))->chartContent()->addActions(this->m_ViewChartActions);
-  // - Analog
-  static_cast<AbstractChartWidget*>(sv->view(CompositeView::ChartAnalog))->chartContent()->addActions(this->m_ViewChartActions);
+  // Chart final settings
+  static_cast<ChartWidget*>(sv->view(CompositeView::Chart))->addActions(this->m_ViewChartActions);
   // Event filter
   if (this->mp_EventFilterObject)
   {

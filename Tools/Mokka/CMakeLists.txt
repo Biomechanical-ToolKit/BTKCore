@@ -17,14 +17,12 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/mokkaConfigure.h.in
 SET(Mokka_CPP
   Acquisition.cpp
   About.cpp
-  AbstractChartWidget.cpp
   AbstractMultiView.cpp
   AbstractView.cpp
-  ChartAnalogWidget.cpp
   ChartExportDialog.cpp
   ChartOptionsWidget.cpp
-  ChartPointWidget.cpp
   ChartImagePreview.cpp
+  ChartWidget.cpp
   CompositeView.cpp
   FileInfoDockWidget.cpp
   ImportAssistantDialog.cpp
@@ -51,14 +49,12 @@ SET(Mokka_CPP
 
 SET(Mokka_H
   Acquisition.h
-  AbstractChartWidget.h
   AbstractMultiView.h
   AbstractView.h
-  ChartAnalogWidget.h
   ChartExportDialog.h
   ChartOptionsWidget.h
-  ChartPointWidget.h
   ChartImagePreview.h
+  ChartWidget.h
   CompositeView.h
   FileInfoDockWidget.h
   ImportAssistantDialog.h
