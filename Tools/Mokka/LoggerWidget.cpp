@@ -44,6 +44,8 @@
 #include <QApplication>
 #include <QClipboard>
 
+#include <cstdio> // EOF under Linux
+
 void LoggerWidget::redirectCout(const QString& id)
 {
   static LoggerCoutRediction logCout(id);
