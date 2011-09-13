@@ -41,7 +41,6 @@
 #include <vtkFloatArray.h>
 #include <vtkStdString.h>
 #include <vtkStringArray.h>
-#include <vtkContextScene.h>
 #include <vtkPen.h>
 #include <vtkTransform2D.h>
 

@@ -215,7 +215,7 @@ namespace btk
     
     this->m_ChartBoundsValid = true;
     this->m_PlotsTransformValid = false;
-    this->Scene->SetDirty(true);
+    if (this->Scene != NULL) this->Scene->SetDirty(true);
   };
   
   /**
@@ -305,7 +305,7 @@ namespace btk
     if (this->m_TitleMargin == margin)
       return;
     this->m_TitleMargin = margin;
-    this->Scene->SetDirty(true);
+    if (this->Scene != NULL) this->Scene->SetDirty(true);
   };
   
   /**
@@ -385,7 +385,7 @@ namespace btk
     if (this->m_EventLineWidth == width)
       return;
     this->m_EventLineWidth = width;
-    this->Scene->SetDirty(true);
+    if (this->Scene != NULL) this->Scene->SetDirty(true);
   };
   
   /**
@@ -405,7 +405,7 @@ namespace btk
     if (this->m_EventLineTypeFactor == factor)
       return;
     this->m_EventLineTypeFactor = factor;
-    this->Scene->SetDirty(true);
+    if (this->Scene != NULL) this->Scene->SetDirty(true);
   };
   
   /**
@@ -417,7 +417,7 @@ namespace btk
     this->mp_AxisY->SetRange(this->mp_Bounds[2], this->mp_Bounds[3]);
     
     this->m_PlotsTransformValid = false;
-    this->Scene->SetDirty(true);
+    if (this->Scene != NULL) this->Scene->SetDirty(true);
   };
   
   /**
@@ -440,7 +440,7 @@ namespace btk
       this->mp_AxisY->SetRange(sceneMin[1], sceneMax[1]);
       
       this->m_PlotsTransformValid = false;
-      this->Scene->SetDirty(true);
+      if (this->Scene != NULL) this->Scene->SetDirty(true);
     }
     this->m_ZoomBoxDisplayed = 0;
   };
@@ -800,7 +800,7 @@ namespace btk
      // Ensure that the bounds of the chart are updated to contain the new plot
      this->m_ChartBoundsValid = false;
      // Mark the scene as dirty to update it.
-     this->Scene->SetDirty(true);
+     if (this->Scene != NULL) this->Scene->SetDirty(true);
     return plotIndex;
   };
   
@@ -818,7 +818,7 @@ namespace btk
       // Ensure that the bounds of the chart are updated to fit well the plots
       this->m_ChartBoundsValid = false;
       // Mark the scene as dirty
-      this->Scene->SetDirty(true);
+      if (this->Scene != NULL) this->Scene->SetDirty(true);
       return true;
     }
     return false;
@@ -838,7 +838,7 @@ namespace btk
       plot = *it;
       this->mp_Plots->erase(it);
       this->m_ChartBoundsValid = false;
-      this->Scene->SetDirty(true);
+      if (this->Scene != NULL) this->Scene->SetDirty(true);
     }
     return plot;
   };
@@ -852,7 +852,7 @@ namespace btk
       (*it)->Delete();
     this->mp_Plots->clear();
     this->m_ChartBoundsValid = false;
-    this->Scene->SetDirty(true);
+    if (this->Scene != NULL) this->Scene->SetDirty(true);
   };
   
   /**
@@ -905,16 +905,6 @@ namespace btk
   vtkIdType VTKChartTimeSeries::GetNumberOfAxes()
   {
     return 2;
-  };
-  
-  /**
-   * Sets the vtkContextScene for the chart and its axis.
-   */
-  void VTKChartTimeSeries::SetScene(vtkContextScene* scene)
-  {
-    this->vtkContextItem::SetScene(scene);
-    this->mp_AxisX->SetScene(scene);
-    this->mp_AxisY->SetScene(scene);
   };
   
   /**
@@ -1053,7 +1043,7 @@ namespace btk
         this->m_PlotsTransformValid = false;
       }
       
-      this->Scene->SetDirty(true);
+      if (this->Scene != NULL) this->Scene->SetDirty(true);
       
       return true;
     }
@@ -1101,7 +1091,7 @@ namespace btk
       }      
       // this->RecalculatePlotsTransform();
       this->m_PlotsTransformValid = false;
-      this->Scene->SetDirty(true);
+      if (this->Scene != NULL) this->Scene->SetDirty(true);
     }
     return true;
   };

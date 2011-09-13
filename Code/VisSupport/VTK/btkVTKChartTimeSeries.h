@@ -41,8 +41,8 @@
 #include "btkVTKAxis.h"
 
 #include <vtkChart.h>
-#include <vtkVector.h> // vtkRectf, ...,
-#include <vtkContextScene.h>
+#include <vtkVector.h> // vtkRectf
+#include <vtkContextScene.h> // vtkContextMouseEvent
 
 class vtkChartLegend;
 class vtkColorSeries;
@@ -166,7 +166,6 @@ namespace btk
     BTK_VTK_EXPORT virtual vtkIdType GetNumberOfPlots();
     BTK_VTK_EXPORT virtual vtkAxis* GetAxis(int axisIndex);
     BTK_VTK_EXPORT virtual vtkIdType GetNumberOfAxes();
-    BTK_VTK_EXPORT virtual void SetScene(vtkContextScene* scene);
     
     bool Hit(const vtkContextMouseEvent& mouse) {return this->Hit(mouse.ScreenPos[0], mouse.ScreenPos[1]);};
     BTK_VTK_EXPORT bool Hit(int x, int y);
