@@ -12,7 +12,7 @@
 #  MATLAB_MX_LIBRARY:  path to libmx.lib
 #  MATLAB_ENG_LIBRARY: path to libeng.lib
 #  MATLAB_LIBRARIES:   required libraries: libmex, libmx, libeng
-#  MATLAB_MEXFILE_EXT: MEX extension required for the current plateform
+#  MATLAB_MEXFILE_EXT: MEX extension required for the current platform
 #  MATLAB_CREATE_MEX: macro to build a MEX-file
 #
 # The macro MATLAB_CREATE_MEX requires in this order:

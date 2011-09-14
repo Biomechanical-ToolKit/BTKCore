@@ -69,7 +69,7 @@ ${BUILD_INSTRUCTIONS_DOX_PART}
 
 @section pb_sec Common Problems
 
-- Some compiler could not be used with Wrapping/Matlab into some OS. Mathwoks doesn't support all compiler on every plateform (Linux/Mac/Windows).
+- Some compiler could not be used with Wrapping/Matlab into some OS. Mathwoks doesn't support all compiler on every platform (Linux/Mac/Windows).
 
 @htmlonly <hr> @endhtmlonly
 

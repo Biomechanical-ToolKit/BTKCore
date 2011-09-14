@@ -60,7 +60,7 @@
     #error Processor not supported
   #endif
 #else
-  #error Development plateform not supported
+  #error Development platform not supported
 #endif
 
 // Check if we can use the memory mapped filestream system

@@ -45,7 +45,7 @@ namespace btk
    */
   /**
    * @var ForcePlatform::m_Type
-   * Type of the force platform. Used to determine necessary data for a particular force plateform model.
+   * Type of the force platform. Used to determine necessary data for a particular force platform model.
    */
   /**
    * @var ForcePlatform::m_Channels
@@ -58,7 +58,7 @@ namespace btk
 
   /**
    * @typedef ForcePlatform::Corners
-   * Type which represents the coordinates of the four corners of the force plateform.
+   * Type which represents the coordinates of the four corners of the force platform.
    */
 
   /**
@@ -68,12 +68,12 @@ namespace btk
 
   /**
    * @typedef ForcePlatform::Origin
-   * Type which represents the origin of the force plateform.
+   * Type which represents the origin of the force platform.
    */
 
   /**
    * @typedef ForcePlatform::CalMatrix
-   * Type which represents a possible calibration matrix used with the force plateform.
+   * Type which represents a possible calibration matrix used with the force platform.
    */
 
   /**

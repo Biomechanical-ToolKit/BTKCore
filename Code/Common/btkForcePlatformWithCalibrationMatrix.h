@@ -63,7 +63,7 @@ namespace btk
    * @class ForcePlatformWithCalibrationMatrix btkForcePlatformWithCalibrationMatrix.h
    * @brief Represents force platform with a calibration matrix
    *
-   * @tparam t Force plateform type
+   * @tparam t Force platform type
    * @tparam r Number of rows in the calibration matrix
    * @tparam c Number of columns in the calibration matrix. Set also the number of channels.
    *

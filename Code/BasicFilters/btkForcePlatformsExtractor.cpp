@@ -43,7 +43,7 @@ namespace btk
    * @class ForcePlatformsExtractor btkForcePlatformsExtractor.h
    * @brief Extracts force platform data from a btk::Acquisition object. 
    *
-   * Analog channels' data are transformed (if required) to express force and moment at the origin of the force plateform in its frame.
+   * Analog channels' data are transformed (if required) to express force and moment at the origin of the force platform in its frame.
    *
    * @ingroup BTKBasicFilters
    */
@@ -143,7 +143,7 @@ namespace btk
         MetaData::Iterator itChannels = (*itForcePlatformGr)->FindChild("CHANNEL");
         if (itChannels == (*itForcePlatformGr)->End())
         {
-          btkErrorMacro("No FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force plateform(s). Force plateforms' data are empty.");
+          btkErrorMacro("No FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
           return;
         }
 

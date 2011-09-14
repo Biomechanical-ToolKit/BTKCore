@@ -45,7 +45,7 @@ namespace btk
    *
    * A biomechanical acquisition can contains:
    *  - 3D data (makers, points, forces, moments, ...) ;
-   *  - analog channels (force plateform, emg, ...) ;
+   *  - analog channels (force platform, emg, ...) ;
    *  - events
    *  - acquisition's setup ;
    *  - subject's informations.
