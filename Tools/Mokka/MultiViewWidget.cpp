@@ -39,7 +39,6 @@
 #include "CompositeView.h"
 #include "ChartWidget.h"
 #include "Viz3DWidget.h"
-#include "UserRoles.h"
 
 #include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
 #include <btkVTKForcePlatformsSource.h>

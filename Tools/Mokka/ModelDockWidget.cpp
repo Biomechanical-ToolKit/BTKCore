@@ -36,8 +36,8 @@
 #include "ModelDockWidget.h"
 #include "Model.h"
 #include "NewSegmentDialog.h"
-#include "UserRoles.h"
 #include "LoggerMessage.h"
+#include "UserDefined.h"
 
 #include <QPainter>
 #include <QFileDialog>
@@ -440,9 +440,6 @@ void ModelDockWidget::load()
   // Enable the visual configuration
   this->modelConfigurationComboBox->setEnabled(true);
   this->modelConfigurationButton->setEnabled(true);
-  // Recent markers' color
-  // Extract the 5 most colors used
-  // ...
   // Update the recent colors
   this->drawRecentColors();
   
@@ -530,7 +527,7 @@ QList<int> ModelDockWidget::selectedMarkers() const
   {
     QTreeWidgetItem* item = markersRoot->child(i);
     if (item->isSelected())
-      ids << item->data(0, pointId).toInt();
+      ids << item->data(0, PointId).toInt();
   }
   return ids;
 };
@@ -543,7 +540,7 @@ QList<int> ModelDockWidget::tailedMarkers() const
   {
     QTreeWidgetItem* item = markersRoot->child(i);
     if (item->checkState(TrajectoryHeader) == Qt::Checked)
-      ids << item->data(0, pointId).toInt();
+      ids << item->data(0, PointId).toInt();
   }
   return ids;
 };
@@ -1073,7 +1070,7 @@ void ModelDockWidget::setSegmentLabel(int id, const QString& label)
   QTreeWidgetItem* segmentsRoot = this->modelTree->topLevelItem(SegmentsItem);
   for (int i = 0 ; i < segmentsRoot->childCount() ; ++i)
   {
-    if (segmentsRoot->child(i)->data(0, segmentId).toInt() == id)
+    if (segmentsRoot->child(i)->data(0, SegmentId).toInt() == id)
     {
       segmentsRoot->child(i)->setText(0, label);
       break;
@@ -1097,7 +1094,7 @@ void ModelDockWidget::setSegmentsColor(const QVector<int>& ids, const QVector<QC
   {
     for (int j = 0 ; j < segmentsRoot->childCount() ; ++j)
     {
-      if (segmentsRoot->child(j)->data(0, segmentId).toInt() == ids[i])
+      if (segmentsRoot->child(j)->data(0, SegmentId).toInt() == ids[i])
       {
         segmentsRoot->child(j)->setIcon(0, this->createSegmentIcon(colors[i]));
         break;
@@ -1174,7 +1171,7 @@ void ModelDockWidget::insertSegments(const QList<int>& ids, const QList<Segment*
 
 void ModelDockWidget::editSegmentLabel()
 {
-  int id = this->modelTree->currentItem()->data(0, segmentId).toInt();
+  int id = this->modelTree->currentItem()->data(0, SegmentId).toInt();
   QString label = this->segmentLabelEdit->text();
   if (label.compare(this->mp_Model->segmentLabel(id)) != 0)
     emit segmentLabelChanged(id, label);
@@ -1189,7 +1186,7 @@ void ModelDockWidget::editSegmentsDescription()
   bool descModified = false;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    ids[inc] = (*it)->data(0, segmentId).toInt();
+    ids[inc] = (*it)->data(0, SegmentId).toInt();
     if (this->mp_Model->segmentDescription(ids[inc]).compare(desc) != 0)
       descModified = true;
     ++inc;
@@ -1202,7 +1199,7 @@ void ModelDockWidget::editSegmentLinks()
 {
   NewSegmentDialog nsd(this->parentWidget());
   nsd.setEditLinksMode();
-  int id = this->modelTree->currentItem()->data(0, segmentId).toInt();
+  int id = this->modelTree->currentItem()->data(0, SegmentId).toInt();
   QVector<int> markerIds = this->mp_Model->segmentMarkerIds(id);
   QVector< QPair<int,int> > currentLinks = this->mp_Model->segmentLinks(id);
   int numMaxLink = 1;
@@ -1257,7 +1254,7 @@ void ModelDockWidget::updateDisplayedMarkers(const QVector<int>& ids)
   for (int i = 0 ; i < markersRoot->childCount() ; ++i)
   {
     QTreeWidgetItem* item = markersRoot->child(i);
-    int id = item->data(0,pointId).toInt();
+    int id = item->data(0,PointId).toInt();
     if ((id < ids.count()) && ids[id] && (item->checkState(VisibleHeader) == Qt::Checked))
       item->setForeground(0,displayLabelColor);
     else
@@ -1274,7 +1271,7 @@ void ModelDockWidget::setTrackedMarkers(const QList<int>& ids)
   {
     QTreeWidgetItem* item = markersRoot->child(i);
     //bool selected = item->isSelected();
-    if (ids.contains(item->data(0,pointId).toInt()))
+    if (ids.contains(item->data(0,PointId).toInt()))
       item->setCheckState(TrajectoryHeader, Qt::Checked);
     else
       item->setCheckState(TrajectoryHeader, Qt::Unchecked);
@@ -1294,7 +1291,7 @@ void ModelDockWidget::selectMarkers(QList<int> ids)
   for (int i = 0 ; i < markersRoot->childCount() ; ++i)
   {
     QTreeWidgetItem* item = markersRoot->child(i);
-    if (ids.contains(item->data(0,pointId).toInt()))
+    if (ids.contains(item->data(0,PointId).toInt()))
     {
       item->setSelected(true);
       this->modelTree->scrollToItem(item);
@@ -1464,25 +1461,25 @@ void ModelDockWidget::selectAllScalars(bool appending)
 void ModelDockWidget::removeSelectedItems()
 {
   QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
-  QList<int> segmentIds, pointIds, analogIds;
+  QList<int> SegmentIds, PointIds, AnalogIds;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    QVariant sV = (*it)->data(0, segmentId);
-    QVariant pV = (*it)->data(0, pointId);
-    QVariant aV = (*it)->data(0, analogId);
+    QVariant sV = (*it)->data(0, SegmentId);
+    QVariant pV = (*it)->data(0, PointId);
+    QVariant aV = (*it)->data(0, AnalogId);
     if (sV.isValid())
-      segmentIds.push_back(sV.toInt());
+      SegmentIds.push_back(sV.toInt());
     if (pV.isValid())
-      pointIds.push_back(pV.toInt());
+      PointIds.push_back(pV.toInt());
     else if (aV.isValid())
-      analogIds.push_back(aV.toInt());
+      AnalogIds.push_back(aV.toInt());
   }
-  if (!segmentIds.isEmpty())
-    emit segmentsRemoved(segmentIds);
-  if (!pointIds.isEmpty())
-    emit pointsRemoved(pointIds);
-  if (!analogIds.isEmpty())
-    emit analogsRemoved(analogIds);
+  if (!SegmentIds.isEmpty())
+    emit segmentsRemoved(SegmentIds);
+  if (!PointIds.isEmpty())
+    emit pointsRemoved(PointIds);
+  if (!AnalogIds.isEmpty())
+    emit analogsRemoved(AnalogIds);
   this->modelTree->clearSelection();
 };
 
@@ -1538,7 +1535,7 @@ void ModelDockWidget::displayProperties()
     {
     this->mp_HideSelectedSegments->setEnabled(true);
     this->mp_UnhideSelectedSegments->setEnabled(true);
-    int id = items.first()->data(0,segmentId).toInt();
+    int id = items.first()->data(0,SegmentId).toInt();
     this->segmentLabelEdit->setText(multipleSelection ? "" : this->mp_Model->segmentLabel(id));
     this->segmentLabelEdit->setEnabled(!multipleSelection);
     this->segmentDescEdit->setText(multipleSelection ? "" : this->mp_Model->segmentDescription(id));
@@ -1562,7 +1559,7 @@ void ModelDockWidget::displayProperties()
       ++it;
       while (it != items.end())
       {
-        id = (*it)->data(0,segmentId).toInt();
+        id = (*it)->data(0,SegmentId).toInt();
         if (this->mp_Model->segmentColor(id) != c)
         {
           uniqueColor = false;
@@ -1590,7 +1587,7 @@ void ModelDockWidget::displayProperties()
     this->mp_UntrackSelectedMarkers->setEnabled(true);
     this->mp_UnhideSelectedMarkers->setEnabled(true);
     this->mp_DeleteSelectedMarkers->setEnabled(true);
-    int id = items.first()->data(0,pointId).toInt();
+    int id = items.first()->data(0,PointId).toInt();
     this->markerLabelEdit->setText(multipleSelection ? "" : this->mp_Acquisition->pointLabel(id));
     this->markerLabelEdit->setEnabled(!multipleSelection);
     this->markerDescEdit->setText(multipleSelection ? "" : this->mp_Acquisition->pointDescription(id));
@@ -1620,7 +1617,7 @@ void ModelDockWidget::displayProperties()
       ++it;
       while (it != items.end())
       {
-        id = (*it)->data(0,pointId).toInt();
+        id = (*it)->data(0,PointId).toInt();
         if (this->mp_Acquisition->markerRadius(id) != r)
           uniqueRadius = false;
         if (this->mp_Acquisition->markerColor(id) != c)
@@ -1656,7 +1653,7 @@ void ModelDockWidget::displayProperties()
     }
   case PointType:
     {
-    int id = items.first()->data(0,pointId).toInt();
+    int id = items.first()->data(0,PointId).toInt();
     this->pointLabelEdit->setText(multipleSelection ? "" : this->mp_Acquisition->pointLabel(id));
     this->pointLabelEdit->setEnabled(!multipleSelection);
     this->pointDescEdit->setText(multipleSelection ? "" : this->mp_Acquisition->pointDescription(id));
@@ -1665,7 +1662,7 @@ void ModelDockWidget::displayProperties()
     }
   case AnalogType:
     {
-    int id = items.first()->data(0,analogId).toInt();
+    int id = items.first()->data(0,AnalogId).toInt();
     this->analogLabelEdit->setText(multipleSelection ? "" : this->mp_Acquisition->analogLabel(id));
     this->analogLabelEdit->setEnabled(!multipleSelection);
     this->analogDescEdit->setText(multipleSelection ? "" : this->mp_Acquisition->analogDescription(id));
@@ -1677,7 +1674,7 @@ void ModelDockWidget::displayProperties()
     QList<QTreeWidgetItem*>::const_iterator it = items.begin(); ++it;
     while (it != items.end())
     {
-      id = (*it)->data(0,analogId).toInt();
+      id = (*it)->data(0,AnalogId).toInt();
       if (this->mp_Acquisition->analogUnit(id).compare(u) != 0)
         uniqueUnit = false;
       if (this->mp_Acquisition->analogGain(id) != g)
@@ -1711,7 +1708,7 @@ void ModelDockWidget::sendHiddenSegments()
   {
     QTreeWidgetItem* item = segmentsRoot->child(i);
     if ((item->checkState(VisibleHeader) == Qt::Unchecked) || item->isHidden())
-      ids << item->data(0,segmentId).toInt();
+      ids << item->data(0,SegmentId).toInt();
   }
   emit segmentHiddenSelectionChanged(ids);
 };
@@ -1723,7 +1720,7 @@ void ModelDockWidget::sendSelectedMarkers()
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
     if ((*it)->type() == MarkerType)
-      ids << (*it)->data(0,pointId).toInt();
+      ids << (*it)->data(0,PointId).toInt();
   }
   emit markerSelectionChanged(ids);
 };
@@ -1736,7 +1733,7 @@ void ModelDockWidget::sendHiddenMarkers()
   {
     QTreeWidgetItem* item = markersRoot->child(i);
     if ((item->checkState(VisibleHeader) == Qt::Unchecked) || item->isHidden())
-      ids << item->data(0,pointId).toInt();
+      ids << item->data(0,PointId).toInt();
   }
   emit markerHiddenSelectionChanged(ids);
 };
@@ -1749,7 +1746,7 @@ void ModelDockWidget::sendTrackedMarkers()
   {
     QTreeWidgetItem* item = markersRoot->child(i);
     if (item->checkState(TrajectoryHeader) == Qt::Checked)
-      ids << item->data(0,pointId).toInt();
+      ids << item->data(0,PointId).toInt();
   }
   emit markerTrajectorySelectionChanged(ids);
 };
@@ -1770,7 +1767,7 @@ void ModelDockWidget::sendModifiedMarkersState(QTreeWidgetItem* item, int column
 
 void ModelDockWidget::editMarkerLabel()
 {
-  int id = this->modelTree->currentItem()->data(0, pointId).toInt();
+  int id = this->modelTree->currentItem()->data(0, PointId).toInt();
   QString label = this->markerLabelEdit->text();
   if (label.compare(this->mp_Acquisition->pointLabel(id)) != 0)
     emit markerLabelChanged(id, label);
@@ -1785,7 +1782,7 @@ void ModelDockWidget::editMarkersDescription()
   bool descModified = false;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    ids[inc] = (*it)->data(0, pointId).toInt();
+    ids[inc] = (*it)->data(0, PointId).toInt();
     if (this->mp_Acquisition->pointDescription(ids[inc]).compare(desc) != 0)
       descModified = true;
     ++inc;
@@ -1815,7 +1812,7 @@ void ModelDockWidget::editMarkersRadius()
   bool radiusModified = false;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    ids[inc] = (*it)->data(0, pointId).toInt();
+    ids[inc] = (*it)->data(0, PointId).toInt();
     if (this->mp_Acquisition->markerRadius(ids[inc]) != radius)
       radiusModified = true;
     ++inc;
@@ -1897,7 +1894,7 @@ void ModelDockWidget::setMarkerRecentColor5()
 
 void ModelDockWidget::editPointLabel()
 {
-  int id = this->modelTree->currentItem()->data(0, pointId).toInt();
+  int id = this->modelTree->currentItem()->data(0, PointId).toInt();
   QString label = this->pointLabelEdit->text();
   if (label.compare(this->mp_Acquisition->pointLabel(id)) != 0)
     emit pointLabelChanged(id, label);
@@ -1909,7 +1906,7 @@ void ModelDockWidget::setPointLabel(int id, const QString& label)
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
   for (int i = 0 ; i < markersRoot->childCount() ; ++i)
   {
-    if (markersRoot->child(i)->data(0, pointId).toInt() == id)
+    if (markersRoot->child(i)->data(0, PointId).toInt() == id)
     {
       markersRoot->child(i)->setText(0, label);
       this->displayProperties();
@@ -1923,7 +1920,7 @@ void ModelDockWidget::setPointLabel(int id, const QString& label)
     QTreeWidgetItem* child = modelOutputsRoot->child(i);
     for (int j = 0 ; j < modelOutputsRoot->childCount() ; ++j)
     {
-      if (child->child(j)->data(0, pointId).toInt() == id)
+      if (child->child(j)->data(0, PointId).toInt() == id)
       {
         child->child(j)->setText(0, label);
         this->displayProperties();
@@ -1942,7 +1939,7 @@ void ModelDockWidget::editPointsDescription()
   bool descModified = false;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    ids[inc] = (*it)->data(0, pointId).toInt();
+    ids[inc] = (*it)->data(0, PointId).toInt();
     if (this->mp_Acquisition->pointDescription(ids[inc]).compare(desc) != 0)
       descModified = true;
     ++inc;
@@ -2071,7 +2068,7 @@ void ModelDockWidget::insertPoints(const QList<int>& ids, const QList<Point*>& p
 
 void ModelDockWidget::editAnalogLabel()
 {
-  int id = this->modelTree->currentItem()->data(0, analogId).toInt();
+  int id = this->modelTree->currentItem()->data(0, AnalogId).toInt();
   QString label = this->analogLabelEdit->text();
   if (label.compare(this->mp_Acquisition->analogLabel(id)) != 0)
     emit analogLabelChanged(id, label);
@@ -2082,7 +2079,7 @@ void ModelDockWidget::setAnalogLabel(int id, const QString& label)
   QTreeWidgetItem* analogsRoot = this->modelTree->topLevelItem(AnalogsItem);
   for (int i = 0 ; i < analogsRoot->childCount() ; ++i)
   {
-    if (analogsRoot->child(i)->data(0, analogId).toInt() == id)
+    if (analogsRoot->child(i)->data(0, AnalogId).toInt() == id)
     {
       analogsRoot->child(i)->setText(0, label);
       break;
@@ -2100,7 +2097,7 @@ void ModelDockWidget::editAnalogsUnit()
   bool unitModified = false;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    ids[inc] = (*it)->data(0, analogId).toInt();
+    ids[inc] = (*it)->data(0, AnalogId).toInt();
     if (this->mp_Acquisition->analogUnit(ids[inc]).compare(unit) != 0)
       unitModified = true;
     ++inc;
@@ -2127,7 +2124,7 @@ void ModelDockWidget::editAnalogsGain(int index)
   QVector<int> ids = QVector<int>(items.count());
   int inc = 0;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-    ids[inc++] = (*it)->data(0, analogId).toInt();    
+    ids[inc++] = (*it)->data(0, AnalogId).toInt();    
   emit analogsGainChanged(ids, static_cast<Analog::Gain>(index));
 };
 
@@ -2147,7 +2144,7 @@ void ModelDockWidget::editAnalogsOffset()
   bool offsetModified = false;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    ids[inc] = (*it)->data(0, analogId).toInt();
+    ids[inc] = (*it)->data(0, AnalogId).toInt();
     if (this->mp_Acquisition->analogOffset(ids[inc]) != offset)
       offsetModified = true;
     ++inc;
@@ -2182,7 +2179,7 @@ void ModelDockWidget::editAnalogsScale()
   bool scaleModified = false;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    ids[inc] = (*it)->data(0, analogId).toInt();
+    ids[inc] = (*it)->data(0, AnalogId).toInt();
     if (fabs(this->mp_Acquisition->analogScale(ids[inc]) - scale) >= 1.0e-6)
       scaleModified = true;
     ++inc;
@@ -2217,7 +2214,7 @@ void ModelDockWidget::editAnalogsDescription()
   bool descModified = false;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    ids[inc] = (*it)->data(0, analogId).toInt();
+    ids[inc] = (*it)->data(0, AnalogId).toInt();
     if (this->mp_Acquisition->analogDescription(ids[inc]).compare(desc) != 0)
       descModified = true;
     ++inc;
@@ -2379,7 +2376,7 @@ bool ModelDockWidget::saveConfiguration(int idx)
     QTreeWidgetItem* item = markersRoot->child(i);
     if (!item->isHidden())
     {
-      int id = item->data(0,pointId).toInt();
+      int id = item->data(0,PointId).toInt();
       xmlWriter.writeStartElement("Marker");
       xmlWriter.writeAttribute("label", item->text(0));
       xmlWriter.writeAttribute("radius", QString::number(this->mp_Acquisition->markerRadius(id)));
@@ -2397,7 +2394,7 @@ bool ModelDockWidget::saveConfiguration(int idx)
     QTreeWidgetItem* item = segmentsRoot->child(i);
     if (!item->isHidden())
     {
-      int id = item->data(0,segmentId).toInt();
+      int id = item->data(0,SegmentId).toInt();
       xmlWriter.writeStartElement("Segment");
       xmlWriter.writeAttribute("label", item->text(0));
       QColor c = this->mp_Model->segmentColor(id);
@@ -2468,7 +2465,7 @@ QTreeWidgetItem* ModelDockWidget::createSegmentItem(const QString& label, int id
   segmentItem->setIcon(LabelHeader, this->createSegmentIcon(this->mp_Model->segmentColor(id)));
   segmentItem->setCheckState(VisibleHeader, Qt::Checked);
   //segmentItem->setCheckState(TrajectoryHeader, Qt::Unchecked);
-  segmentItem->setData(0, segmentId, id);
+  segmentItem->setData(0, SegmentId, id);
   return segmentItem;
 };
 
@@ -2478,7 +2475,7 @@ QTreeWidgetItem* ModelDockWidget::createMarkerItem(const QString& label, int id,
   markerItem->setIcon(LabelHeader, this->createMarkerIcon(this->mp_Acquisition->markerColor(id)));
   markerItem->setCheckState(VisibleHeader, checked ? Qt::Checked : Qt::Unchecked);
   markerItem->setCheckState(TrajectoryHeader, Qt::Unchecked);
-  markerItem->setData(0, pointId, id);
+  markerItem->setData(0, PointId, id);
   return markerItem;
 }
 
@@ -2486,7 +2483,7 @@ QTreeWidgetItem* ModelDockWidget::createAnalogItem(const QString& label, int id)
 {
   QTreeWidgetItem* analogItem = new QTreeWidgetItem(QStringList(label), AnalogType);
   analogItem->setIcon(LabelHeader, *this->mp_AnalogsIcon);
-  analogItem->setData(0, analogId, id);
+  analogItem->setData(0, AnalogId, id);
   return analogItem;
 };
 
@@ -2494,7 +2491,7 @@ QTreeWidgetItem* ModelDockWidget::createModelOutputItem(const QString& label, in
 {
   QTreeWidgetItem* modelOutputItem = new QTreeWidgetItem(QStringList(label), PointType);
   modelOutputItem->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
-  modelOutputItem->setData(0, pointId, id);
+  modelOutputItem->setData(0, PointId, id);
   return modelOutputItem;
 };
 
@@ -2564,13 +2561,13 @@ void ModelDockWidget::editMarkersColor(const QColor& color)
   if (this->propertiesStack->currentWidget() == this->segmentPage)
   {
     for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-      ids[inc++] = (*it)->data(0, segmentId).toInt();
+      ids[inc++] = (*it)->data(0, SegmentId).toInt();
     emit segmentsColorChanged(ids, color);
   }
   else if (this->propertiesStack->currentWidget() == this->markerPage)
   {
     for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
-      ids[inc++] = (*it)->data(0, pointId).toInt();
+      ids[inc++] = (*it)->data(0, PointId).toInt();
     emit markersColorChanged(ids, color);
   }
   else
@@ -2593,7 +2590,7 @@ void ModelDockWidget::setMarkersColor(const QVector<int>& ids, const QVector<QCo
   {
     for (int j = 0 ; j < markersRoot->childCount() ; ++j)
     {
-      if (markersRoot->child(j)->data(0, pointId).toInt() == ids[i])
+      if (markersRoot->child(j)->data(0, PointId).toInt() == ids[i])
       {
         markersRoot->child(j)->setIcon(0, this->createMarkerIcon(colors[i]));
         break;
@@ -2749,7 +2746,7 @@ QTreeWidgetItem* ModelDockWidget::treePointChild(QTreeWidgetItem* parent, int id
   for (int i = 0 ; i < parent->childCount() ; ++i)
   {
     QTreeWidgetItem* child = parent->child(i);
-    if (child->data(0, pointId).toInt() == id)
+    if (child->data(0, PointId).toInt() == id)
       return child;
   }
   return 0;

@@ -83,11 +83,11 @@ void MetadataView::dispatchChangement(QStandardItem* item)
 void MetadataView::expandItem(QStandardItem* item)
 {
   this->mp_Model->blockSignals(true);
-  int state = item->data(checkState2).toInt();
+  int state = item->data(MetadataInfoExpanded).toInt();
   QModelIndex index = this->mp_Model->indexFromItem(item);
   QStandardItem* parent = item->parent();
   QStandardItem* values = parent->child(index.row(), index.column() + 1);
-  int count = values->data(metadataInfoValuesCount).toInt();
+  int count = values->data(MetadataInfoValuesCount).toInt();
   QFont f = values->font();
   if (state == 0) // collapsed
   {
@@ -99,7 +99,7 @@ void MetadataView::expandItem(QStandardItem* item)
   else
   {
     f.setItalic(false);
-    values->setText(values->data(metadataInfoFirstValue).toString());
+    values->setText(values->data(MetadataInfoFirstValue).toString());
     for (int i = 1 ; i < count ; ++i)
       this->setRowHidden(index.row() + i, parent->index(), false);
   }

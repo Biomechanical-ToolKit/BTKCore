@@ -55,10 +55,6 @@ class ModelDockWidget : public QDockWidget, public Ui::ModelDockWidget
 
 public:
   enum {LabelHeader = 0, VisibleHeader = 2, TrajectoryHeader = 1};
-  enum {SegmentType = QTreeWidgetItem::UserType + 1,
-        MarkerType = QTreeWidgetItem::UserType + 2,
-        PointType = QTreeWidgetItem::UserType + 3,
-        AnalogType = QTreeWidgetItem::UserType + 4};
   enum {SegmentsItem = 0, MarkersItem, AnalogsItem, ModelOutputsItem};
   
   ModelDockWidget(QWidget* parent = 0);

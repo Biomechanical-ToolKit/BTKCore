@@ -34,10 +34,6 @@
  */
  
 #include "UndoCommands.h"
-#include "UserRoles.h"
-#include "MainWindow.h"
-
-#include <btkVTKMarkersFramesSource.h>
 
 // ----------------------------------------------- //
 //                     GENERAL                     //

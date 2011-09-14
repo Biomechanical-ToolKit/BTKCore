@@ -43,13 +43,13 @@
 
 #include <btkMetaData.h>
 
-#include "UserRoles.h"
-
 class MetadataView : public QTreeView
 {
   Q_OBJECT
 
 public:
+  enum {MetadataInfoExpanded = Qt::UserRole + 1, MetadataInfoFirstValue, MetadataInfoValuesCount};
+
   MetadataView(QWidget* parent = 0);
   ~MetadataView() { delete this->mp_Model; };
   
@@ -117,8 +117,8 @@ public:
           txt = QString::number(info->ToDouble(0));
           break;
       }
-      this->setData(QVariant(txt), metadataInfoFirstValue);
-      this->setData(QVariant(size), metadataInfoValuesCount);
+      this->setData(QVariant(txt), MetadataView::MetadataInfoFirstValue);
+      this->setData(QVariant(size), MetadataView::MetadataInfoValuesCount);
       if (size != 1)
       {
         txt = "<multiple lines>";
@@ -183,7 +183,7 @@ private Q_SLOTS:
   void itemChanged(int s)
   {
     if (!this->m_Invisible)
-      this->mp_Item->setData(s, checkState2);
+      this->mp_Item->setData(s, MetadataView::MetadataInfoExpanded);
   };
 
 private:

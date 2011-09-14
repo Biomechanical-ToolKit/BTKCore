@@ -37,7 +37,7 @@
 #include "Acquisition.h"
 #include "ChartOptionsWidget.h"
 #include "ChartExportDialog.h"
-#include "UserRoles.h"
+#include "UserDefined.h"
 
 #include <btkVTKContextScene.h>
 
@@ -863,8 +863,7 @@ PointChartData::PointChartData()
 
 bool PointChartData::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
 {
-  // FIXME: The accepted type must be replaced by ModelDockWidget::(MarkerType|PointType) or enum values corresponding to a point
-  if ((item->type() == QTreeWidgetItem::UserType + 2) || (item->type() == QTreeWidgetItem::UserType + 3))
+  if ((item->type() == MarkerType) || (item->type() == PointType))
     return true;
   return false;
 };
@@ -976,8 +975,7 @@ AnalogChartData::AnalogChartData()
 
 bool AnalogChartData::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
 {
-  // FIXME: The accepted type must be replaced by ModelDockWidget::AnalogType or an enum value for the type analog channel
-  if (item->type() == QTreeWidgetItem::UserType + 4)
+  if (item->type() == AnalogType)
     return true;
   return false;
 };
@@ -985,8 +983,8 @@ bool AnalogChartData::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
 bool AnalogChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries* colorGenerator, QTreeWidgetItem* item, bool* layoutModified)
 {
   *layoutModified = false;
-  int id = item->data(0, analogId).toInt();
-  if (id > acq->analogCount())
+  int id = item->data(0, AnalogId).toInt();
+  if (id >= acq->analogCount())
   {
     qDebug("Analog ID greater than the number of analog channels.");
     return false;

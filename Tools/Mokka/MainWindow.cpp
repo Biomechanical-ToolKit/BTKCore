@@ -46,10 +46,10 @@
 #include "ModelDockWidget.h"
 #include "ProgressWidget.h"
 #include "UndoCommands.h"
-#include "UserRoles.h"
 #include "UpdateChecker.h"
 #include "Preferences.h"
 #include "TimeEventFunctors.h"
+#include "UserDefined.h"
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -70,8 +70,9 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock = new ModelDockWidget(this);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
   this->mp_ImportAssistant = new ImportAssistantDialog(this);
-  this->mp_UpdateChecker = new UpdateChecker(btkStringifyMacro(MOKKA_VERSION_STRING), "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
-                                             ":/Resources/Images/Mokka_128.png", this);
+  this->mp_UpdateChecker = new UpdateChecker(btkStringifyMacro(MOKKA_VERSION_STRING), 
+                                              "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
+                                              ":/Resources/Images/Mokka_128.png", this);
 #ifdef Q_OS_MAC
   this->mp_MacMenuBar = 0;
   this->mp_Preferences = new Preferences(0); // No parent: to be independant of the main window
@@ -1175,7 +1176,7 @@ void MainWindow::setPreferenceDefaultSegmentColor(const QColor& color)
   QVector<int> ids;
   for (int i = 0 ; i < segmentsRoot->childCount() ; ++i)
   {
-    int id = segmentsRoot->child(i)->data(0,segmentId).toInt();
+    int id = segmentsRoot->child(i)->data(0,SegmentId).toInt();
     if (this->multiView->segmentColorIndex(id) == 0)
       ids.push_back(id);
   }
@@ -1196,7 +1197,7 @@ void MainWindow::setPreferenceDefaultMarkerColor(const QColor& color)
   QVector<int> ids;
   for (int i = 0 ; i < markersRoot->childCount() ; ++i)
   {
-    int id = markersRoot->child(i)->data(0,pointId).toInt();
+    int id = markersRoot->child(i)->data(0,PointId).toInt();
     if (this->multiView->markerColorIndex(id) == 0)
       ids.push_back(id);
   }

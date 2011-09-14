@@ -33,46 +33,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
  
-#ifndef UserRoles_h
-#define UserRoles_h
+#ifndef UserDefined_h
+#define UserDefined_h
 
-#include <Qt>
+#include <QTreeWidgetItem>
 
-typedef enum {pointId = Qt::UserRole + 1,
-              pointLabel, 
-              pointDescription,
-              pointType,
-              pointDisabled} pointProperty;
-              
-typedef enum {markerId = Qt::UserRole + 10,
-              markerRadius,
-              markerColorIndex,
-              markerTrajectoryActived} markerProperty;
-              
-typedef enum {analogId = Qt::UserRole + 100,
-              } analogProperty;
-              
-typedef enum {eventFrame = Qt::UserRole + 20,
-              eventId,
-              eventLabel,
-              eventDescription,
-              eventContext,
-              eventTime,
-              eventSubject,
-              eventVisible} eventInformation;
-              
-typedef enum {segmentId = Qt::UserRole + 110,
-              segmentLabel, 
-              segmentDescription,
-              segmentDisabled} segmentProperty;
+typedef enum {
+  SegmentType = QTreeWidgetItem::UserType + 1,
+  MarkerType,
+  PointType,
+  AnalogType,
+} ModelItemTypes;
 
-static const int checkState2 = Qt::UserRole + 30;
-static const int metadataInfoFirstValue = Qt::UserRole + 41;
-static const int metadataInfoValuesCount = Qt::UserRole + 42;
+typedef enum {
+  PointId = Qt::UserRole + 1, 
+  AnalogId,
+  SegmentId
+} ModelItemIdRole;
 
-typedef enum {visualConfigChanged = Qt::UserRole + 50,
-              visualConfigFilename,
-              visualConfigName,
-              visualConfigNew} visualConfigProperty;
-
-#endif // UserRoles_h
+#endif // UserDefined_h
