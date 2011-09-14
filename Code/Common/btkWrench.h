@@ -59,6 +59,8 @@ namespace btk
     Point::Pointer GetMoment() const {return this->m_Moment;};
     BTK_COMMON_EXPORT void SetMoment(Point::Pointer moment);
     
+    BTK_COMMON_EXPORT Point::Pointer GetComponent(int idx);
+    
     BTK_COMMON_EXPORT void SetFrameNumber(int frameNumber);
     
     Pointer Clone() const {return Pointer(new Wrench(*this));};

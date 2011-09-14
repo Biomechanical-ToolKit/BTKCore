@@ -34,6 +34,7 @@
  */
 
 #include "btkWrench.h"
+#include "btkException.h"
 
 namespace btk
 {
@@ -141,6 +142,31 @@ namespace btk
     this->m_Position->SetFrameNumber(frameNumber);
     this->m_Force->SetFrameNumber(frameNumber);
     this->m_Moment->SetFrameNumber(frameNumber);
+  };
+  
+  /**
+   * Returns the component with the given index @a idx.
+   * The possible value for the index are:
+   *   - 0: Returns the position.
+   *   - 1: Returns the force.
+   *   - 2: Returns the moment.
+   * Any other value will trigger an exception.
+   */
+  Point::Pointer Wrench::GetComponent(int idx)
+  {
+    if ((idx < 0) || (idx > 2))
+      throw(OutOfRangeException("Wrench::GetComponent"));
+    switch(idx)
+    {
+    case 0:
+      return this->m_Position;
+    case 1:
+      return this->m_Force;
+    case 2:
+      return this->m_Moment;
+    default // Impossible
+      return Point::Pointer();
+    }
   };
   
   /**
