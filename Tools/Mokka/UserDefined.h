@@ -43,11 +43,13 @@ typedef enum {
   MarkerType,
   PointType,
   AnalogType,
+  ForcePlateType
 } ModelItemTypes;
 
 typedef enum {
   PointId = Qt::UserRole + 1, 
   AnalogId,
+  ForcePlateId, 
   SegmentId
 } ModelItemIdRole;
 

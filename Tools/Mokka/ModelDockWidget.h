@@ -55,7 +55,7 @@ class ModelDockWidget : public QDockWidget, public Ui::ModelDockWidget
 
 public:
   enum {LabelHeader = 0, VisibleHeader = 2, TrajectoryHeader = 1};
-  enum {SegmentsItem = 0, MarkersItem, AnalogsItem, ModelOutputsItem};
+  enum {SegmentsItem = 0, MarkersItem, AnalogsItem, ForcePlatesItem, ModelOutputsItem};
   
   ModelDockWidget(QWidget* parent = 0);
   ~ModelDockWidget();
@@ -242,6 +242,7 @@ private:
   QIcon* mp_MarkersIcon;
   QIcon* mp_AnalogsIcon;
   QIcon* mp_ModelOutputsIcon;
+  QIcon* mp_ForcePlatesIcon;
   // Model configuration actions
   QAction* mp_NewConfiguration;
   QAction* mp_LoadConfiguration;

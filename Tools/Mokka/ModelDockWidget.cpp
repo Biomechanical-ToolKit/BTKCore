@@ -61,6 +61,7 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->mp_MarkersIcon  = new QIcon(QString::fromUtf8(":/Resources/Images/markers.png"));
   this->mp_AnalogsIcon = new QIcon(QString::fromUtf8(":/Resources/Images/chart_line.png"));
   this->mp_ModelOutputsIcon = new QIcon(QString::fromUtf8(":/Resources/Images/chart_curve.png"));
+  this->mp_ForcePlatesIcon = new QIcon(QString::fromUtf8(":/Resources/Images/forceplate-16.png"));
   
   this->setupUi(this);
    
@@ -231,6 +232,12 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   analogsRoot->setIcon(LabelHeader, *this->mp_AnalogsIcon);
   analogsRoot->setFlags(analogsRoot->flags() & ~Qt::ItemIsSelectable);
   items.append(analogsRoot);
+  // Force plates
+  QTreeWidgetItem* forcePlatesRoot = new QTreeWidgetItem(QStringList(QString("Force platform reactions")));
+  forcePlatesRoot->setFont(LabelHeader, f);
+  forcePlatesRoot->setIcon(LabelHeader, *this->mp_ForcePlatesIcon);
+  forcePlatesRoot->setFlags(forcePlatesRoot->flags() & ~Qt::ItemIsSelectable);
+  items.append(forcePlatesRoot);
   // Model outputs
   QTreeWidgetItem* modelOutputsRoot = new QTreeWidgetItem(QStringList(QString("Model outputs")));
   modelOutputsRoot->setFont(LabelHeader, f);
@@ -242,6 +249,7 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   segmentsRoot->setHidden(true);
   markersRoot->setHidden(true);
   analogsRoot->setHidden(true);
+  forcePlatesRoot->setHidden(true);
   modelOutputsRoot->setHidden(true);
   items.clear();
   // Model outputs: Angles
@@ -434,6 +442,32 @@ void ModelDockWidget::load()
   QTreeWidgetItem* analogsRoot = this->modelTree->topLevelItem(AnalogsItem);
   for (QMap<int, Analog*>::const_iterator it = this->mp_Acquisition->analogs().begin() ; it != this->mp_Acquisition->analogs().end() ; ++it)
     analogsRoot->addChild(this->createAnalogItem(it.value()->label, it.key()));
+  // - Force platforms
+  QTreeWidgetItem* forcePlatesRoot = this->modelTree->topLevelItem(ForcePlatesItem);
+  int numFP = this->mp_Acquisition->btkForcePlatforms()->GetItemNumber();
+  for (int i = 0 ; i < numFP ; ++i)
+  {
+    QTreeWidgetItem* forcePlateItem = new QTreeWidgetItem(QStringList("Force platform #" + QString::number(i+1)), ForcePlateType);
+    forcePlateItem->setFont(LabelHeader, forcePlatesRoot->font(LabelHeader));
+    forcePlateItem->setFlags(forcePlateItem->flags() & ~Qt::ItemIsSelectable);
+    forcePlateItem->setIcon(LabelHeader, *this->mp_ForcePlatesIcon);
+    forcePlatesRoot->addChild(forcePlateItem);
+    // Force
+    QTreeWidgetItem* forcePlateForceItem = new QTreeWidgetItem(QStringList("Force"), ForcePlateType);
+    forcePlateForceItem->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
+    forcePlateForceItem->setData(0, ForcePlateId, 65535+i*3+1); // 65535 (to have a unique ID) + FP index * 3 + component index
+    forcePlateItem->addChild(forcePlateForceItem);
+    // Moment
+    QTreeWidgetItem* forcePlateMomentItem = new QTreeWidgetItem(QStringList("Moment"), ForcePlateType);
+    forcePlateMomentItem->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
+    forcePlateMomentItem->setData(0, ForcePlateId, 65535+i*3+2);
+    forcePlateItem->addChild(forcePlateMomentItem);
+    // Position
+    QTreeWidgetItem* forcePlatePositionItem = new QTreeWidgetItem(QStringList("Position"), ForcePlateType);
+    forcePlatePositionItem->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
+    forcePlatePositionItem->setData(0, ForcePlateId, 65535+i*3+0);
+    forcePlateItem->addChild(forcePlatePositionItem);
+  }
   // Refresh the tree and these actions
   this->refresh();
   this->modelTree->clearSelection();
@@ -2673,6 +2707,7 @@ void ModelDockWidget::refresh()
   QTreeWidgetItem* segmentsRoot = this->modelTree->topLevelItem(SegmentsItem);
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
   QTreeWidgetItem* analogsRoot = this->modelTree->topLevelItem(AnalogsItem);
+  QTreeWidgetItem* forcePlatesRoot = this->modelTree->topLevelItem(ForcePlatesItem);
   QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(ModelOutputsItem);
   QTreeWidgetItem* modelOutputAngles = modelOutputsRoot->child(0);
   QTreeWidgetItem* modelOutputForces = modelOutputsRoot->child(1);
@@ -2683,6 +2718,7 @@ void ModelDockWidget::refresh()
   segmentsRoot->setHidden(true);
   markersRoot->setHidden(true);
   analogsRoot->setHidden(true);
+  forcePlatesRoot->setHidden(true);
   modelOutputsRoot->setHidden(true);
   modelOutputAngles->setHidden(true);
   modelOutputForces->setHidden(true);
@@ -2703,6 +2739,10 @@ void ModelDockWidget::refresh()
   {
     this->mp_SelectAllAnalogs->setEnabled(true);
     analogsRoot->setHidden(false);
+  }
+  if ((forcePlatesRoot->childCount() != 0) && this->hasChildVisible(forcePlatesRoot))
+  {
+    forcePlatesRoot->setHidden(false);
   }
   if ((modelOutputAngles->childCount() != 0) && this->hasChildVisible(modelOutputAngles))
   {

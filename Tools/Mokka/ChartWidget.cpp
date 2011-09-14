@@ -863,7 +863,7 @@ PointChartData::PointChartData()
 
 bool PointChartData::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
 {
-  if ((item->type() == MarkerType) || (item->type() == PointType))
+  if ((item->type() == MarkerType) || (item->type() == PointType) || (item->type() == ForcePlateType))
     return true;
   return false;
 };
@@ -871,15 +871,58 @@ bool PointChartData::acceptDroppedTreeWidgetItem(QTreeWidgetItem* item)
 bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries* colorGenerator, QTreeWidgetItem* item, bool* layoutModified)
 {
   *layoutModified = false;
-  int id = item->data(0, pointId).toInt();
-  if (id > acq->pointCount())
+  int id = 0;
+  btk::Point::Pointer point;
+  QString label;
+  if ((item->type() == MarkerType) || (item->type() == PointType))
   {
-    qDebug("Point ID greater than the number of points.");
-    return false;
+    id = item->data(0, PointId).toInt();
+    if (id >= acq->pointCount())
+    {
+      qDebug("Point ID greater or equal to the number of points.");
+      return false;
+    }
+    else if (this->isAlreadyPlotted(id))
+      return false;
+    
+    point = acq->btkAcquisition()->GetPoint(acq->points().value(id)->btkidx);
+    label = this->createPlotLabel(acq, id); // Limited only to the point in the acquisition. Moreover, the data from FP cannot be modified.
   }
-  else if (this->isAlreadyPlotted(id))
-    return false;
-  btk::Point::Pointer point = acq->btkAcquisition()->GetPoint(acq->points().value(id)->btkidx);
+  else if (item->type() == ForcePlateType)
+  {
+    id = item->data(0, ForcePlateId).toInt();
+    int idxFp = (id - 65535) / 3;
+    int idxCpt = (id - 65535) % 3; 
+    if (idxFp >= acq->btkGroundReactionWrenches()->GetItemNumber())
+    {
+      qDebug("Force platform ID greater than the number of plateforms.");
+      return false;
+    }
+    if (idxCpt > 3)
+    {
+      qDebug("Force platform component ID greater than the number of components.");
+      return false;
+    }
+    else if (this->isAlreadyPlotted(id))
+      return false;
+      
+    point = acq->btkGroundReactionWrenches()->GetItem(idxFp)->GetComponent(idxCpt);
+    
+    label = "Platform #" + QString::number(idxFp) + " - ";
+    switch(idxCpt)
+    {
+    case 0:
+      label += "Position (" + acq->pointUnit(Point::Marker) + ")";
+      break;
+    case 1:
+      label += "Force reaction (" + acq->pointUnit(Point::Force) + ")";
+      break;
+    case 2:
+      label += "Moment reaction (" + acq->pointUnit(Point::Moment) + ")";
+      break;
+    }
+  }
+  
   int numFrames = acq->pointFrameNumber();
   // Need to create 3 table instead of 1 with 4 columns as VTK doesn't recognize the 2 last columns (due to the use of the same data?) 
   vtkTable* tableX = vtkTable::New();
@@ -894,7 +937,6 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
   vtkDoubleArray* arrValX = vtkDoubleArray::New();
   vtkDoubleArray* arrValY = vtkDoubleArray::New();
   vtkDoubleArray* arrValZ = vtkDoubleArray::New();
-  QString label = this->createPlotLabel(acq, id);
   arrValX->SetName(label.toUtf8().constData());
   arrValY->SetName(label.toUtf8().constData());
   arrValZ->SetName(label.toUtf8().constData());
