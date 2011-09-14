@@ -270,6 +270,10 @@ void LoggerItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
   rect.setWidth(rect.width() - iconSize.width() - 2*padding);
   painter->setPen(option.palette.color(QPalette::Normal, QPalette::Text));
   // - Draw the date
+  if (option.state & QStyle::State_Selected)
+    painter->setPen(option.palette.color(QPalette::Normal, QPalette::HighlightedText));
+  else
+    painter->setPen(option.palette.color(QPalette::Normal, QPalette::Text));
   QFont f = painter->font() ;
   f.setBold(true);
   painter->setFont(f);
@@ -286,7 +290,10 @@ void LoggerItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
     painter->translate(0, bounding.height()); rect.setHeight(rect.height() - bounding.height());
   }
   // Draw detailed message
-  painter->setPen(option.palette.color(QPalette::Normal, QPalette::Text));
+  if (option.state & QStyle::State_Selected)
+    painter->setPen(option.palette.color(QPalette::Normal, QPalette::HighlightedText));
+  else
+    painter->setPen(option.palette.color(QPalette::Normal, QPalette::Text));
   f.setBold(false);
   painter->setFont(f);
   painter->drawText(rect, Qt::AlignLeft | Qt::TextWordWrap, msgDetail.toString());
