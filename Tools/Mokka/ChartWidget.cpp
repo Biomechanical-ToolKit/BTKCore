@@ -400,7 +400,10 @@ void ChartWidget::exportToImage()
 void ChartWidget::removeAllPlot()
 {
   this->mp_ChartOptions->clear();
-  this->show(true); // Easy way to reset the chart.
+  bool layoutModified = false;
+  this->m_ChartData[this->m_CurrentChartType]->show(this->mp_Acquisition, true, &layoutModified); // Easy way to reset the chart.
+  if (layoutModified)
+    this->mp_ChartContentWidget->resizeCharts();
   this->render();
 };
 
@@ -1116,11 +1119,10 @@ void AnalogChartData::removePlot(int index, bool* layoutModified)
 
 void AnalogChartData::show(Acquisition* acq, bool s, bool* layoutModified)
 {
-  if (!this->m_Expanded || s) // All the possible loading or standard reset
+  if (!this->m_Expanded)
     this->AbstractChartData::show(acq, s, layoutModified);
   else
   {
-    this->m_PlotsProperties.clear();
     btk::VTKChartTimeSeries* chartZero = this->chart(0);
     VTKCharts::iterator it = this->mp_Charts->begin();
     std::advance(it, 1);
@@ -1132,10 +1134,8 @@ void AnalogChartData::show(Acquisition* acq, bool s, bool* layoutModified)
       it = this->mp_Charts->erase(it);
     }
     chartZero->GetAxis(vtkAxis::LEFT)->SetTitle("Values");
-    chartZero->ClearPlots();
-    chartZero->SetBounds(0.0, 0.0, 0.0, 0.0);
-    chartZero->GetAxis(vtkAxis::BOTTOM)->SetLabelsVisible(false);
-    chartZero->GetAxis(vtkAxis::LEFT)->SetLabelsVisible(false);
+    this->AbstractChartData::show(acq, s, layoutModified);
+    *layoutModified = true;
   }
 };
 
