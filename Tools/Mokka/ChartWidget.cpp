@@ -908,7 +908,7 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
       
     point = acq->btkGroundReactionWrenches()->GetItem(idxFp)->GetComponent(idxCpt);
     
-    label = "Platform #" + QString::number(idxFp) + " - ";
+    label = "Platform #" + QString::number(idxFp+1) + " - ";
     switch(idxCpt)
     {
     case 0:
@@ -1282,7 +1282,7 @@ bool VTKChartWidget::event(QEvent* event)
         vtkPlot* plot = chart->GetPlot(i);
         if (plot->GetVisible() && plot->GetNearestPoint(pos, tolerance, &coord))
         {
-          QString str = "Frame: " + QString::number(coord.X()) + "<br/>" + QString::fromUtf8(plot->GetLabel()) + ": " + QString::number(coord.Y(), 'f', 1);
+          QString str = "Frame: " + QString::number(coord.X()) + "<br/><nobr>" + QString::fromUtf8(plot->GetLabel()) + ": " + QString::number(coord.Y(), 'f', 1) + "</nobr>";
           QToolTip::showText(helpEvent->globalPos(), str);
           return true;
         }
