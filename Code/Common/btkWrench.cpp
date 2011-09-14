@@ -164,7 +164,7 @@ namespace btk
       return this->m_Force;
     case 2:
       return this->m_Moment;
-    default // Impossible
+    default: // Impossible
       return Point::Pointer();
     }
   };
