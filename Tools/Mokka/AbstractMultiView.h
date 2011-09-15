@@ -56,7 +56,6 @@ public:
   // AbstractMultiView& operator=(const AbstractMultiView&); // Implicit.
   
   virtual void initialize();
-  QGridLayout* gridLayout() {return this->mp_GridLayout;};
   void setViewPrototype(AbstractView* (*view)(QWidget*));
   const QList<AbstractView*>& views() const {return this->m_Views;};
   
@@ -80,7 +79,6 @@ private:
   void setupUi();
   void closeAll(QWidget* w);
   
-  QGridLayout* mp_GridLayout;
   AbstractView* (*mp_Prototype)(QWidget*);
 };
 

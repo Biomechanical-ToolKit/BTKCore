@@ -165,7 +165,7 @@ void MultiViewWidget::initialize()
 {
   this->AbstractMultiView::initialize();
   
-  CompositeView* sv = static_cast<CompositeView*>(this->gridLayout()->itemAtPosition(0,0)->widget());
+  CompositeView* sv = static_cast<CompositeView*>(static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget());
   vtkRenderer* renderer = static_cast<Viz3DWidget*>(sv->view(CompositeView::Viz3D))->renderer();
   ChartWidget* chart = static_cast<ChartWidget*>(sv->view(CompositeView::Chart));
   

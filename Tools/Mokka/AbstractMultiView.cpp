@@ -50,7 +50,7 @@ void AbstractMultiView::initialize()
 {
   // UI init
   AbstractView* sv = this->createView();
-  this->mp_GridLayout->addWidget(sv, 0, 0);
+  static_cast<QGridLayout*>(this->layout())->addWidget(sv, 0, 0);
   sv->closeButton->setEnabled(false);
   this->m_Views.append(sv);
 };
@@ -62,7 +62,7 @@ void AbstractMultiView::setViewPrototype(AbstractView *(*view)(QWidget*))
 
 void AbstractMultiView::closeAll()
 {
-  this->closeAll(this->mp_GridLayout->itemAtPosition(0,0)->widget());
+  this->closeAll(static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget());
 };
 
 void AbstractMultiView::closeAll(QWidget* w)
@@ -101,8 +101,8 @@ void AbstractMultiView::close_(AbstractView* sender)
     otherWidget = splitter->widget(0);
   if (lastView)
   {
-    this->mp_GridLayout->addWidget(otherWidget, 0, 0);
-    this->mp_GridLayout->removeWidget(splitter);
+    static_cast<QGridLayout*>(this->layout())->addWidget(otherWidget, 0, 0);
+    this->layout()->removeWidget(splitter);
   }
   else
   {
@@ -172,7 +172,7 @@ QSplitter* AbstractMultiView::split_(AbstractView* sender, int direction, Abstra
     splitter->addWidget(sv);
     splitter->setSizes(sizes);
     sender->closeButton->setEnabled(true);
-    this->mp_GridLayout->addWidget(splitter,0,0);
+    static_cast<QGridLayout*>(this->layout())->addWidget(splitter,0,0);
   }
   else
   {
@@ -202,10 +202,10 @@ void AbstractMultiView::setupUi()
     this->setObjectName("AbstractMultiView");
   //this->resize(1024, 768);
   
-  this->mp_GridLayout = new QGridLayout(this);
-  this->mp_GridLayout->setSpacing(0);
-  this->mp_GridLayout->setContentsMargins(0,0,0,0);
-  this->mp_GridLayout->setObjectName("GridLayout");
+  QGridLayout* gridLayout = new QGridLayout(this);
+  gridLayout->setSpacing(0);
+  gridLayout->setContentsMargins(0,0,0,0);
+  gridLayout->setObjectName("GridLayout");
 };
 
 AbstractView* AbstractMultiView::createView(AbstractView* fromAnother)
