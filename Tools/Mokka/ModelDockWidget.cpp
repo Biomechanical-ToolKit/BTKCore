@@ -34,7 +34,6 @@
  */
 
 #include "ModelDockWidget.h"
-#include "Model.h"
 #include "NewSegmentDialog.h"
 #include "LoggerMessage.h"
 #include "UserDefined.h"
@@ -607,7 +606,10 @@ bool ModelDockWidget::isOkToContinue()
     else if ((res == QMessageBox::Discard) ||(res == QMessageBox::No))
     {
       if (this->m_ConfigurationItems[idx].isNew)
+      {
         this->removeConfiguration(idx);
+        this->m_CurrentConfigurationIndex = -1;
+      }
       else
         this->setConfigurationModified(idx, false);
     }

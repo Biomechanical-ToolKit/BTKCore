@@ -47,8 +47,6 @@
 #include <QColor>
 #include <QXmlStreamReader>
 
-class Acquisition;
-
 class ModelDockWidget : public QDockWidget, public Ui::ModelDockWidget
 {
   Q_OBJECT
@@ -84,7 +82,7 @@ public:
   void setRecentColor(int idx, const QColor& color);
   const QColor& recentColor(int idx) const {return this->m_RecentColors[idx];};
   
-public Q_SLOTS:
+public slots:
   // Configuration
   bool isOkToContinue();
   void selectConfiguration(int idx);
