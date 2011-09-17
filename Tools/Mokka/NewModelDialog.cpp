@@ -35,33 +35,22 @@
  
 #include "NewModelDialog.h"
 
-#include <QPushButton>
- 
 NewModelDialog::NewModelDialog(const QList<ConfigurationItem>* configs, QWidget* parent)
-: QDialog(parent)
+: NewItemTemplateDialog<ConfigurationItem>(configs, parent)
 {
-  this->mp_Configurations = configs;
-  
-  this->setupUi(this);
-  QPushButton* ok = this->buttonBox->button(QDialogButtonBox::Ok);
-  ok->setDefault(true);
-  ok->setEnabled(false);
-  QPushButton* cancel = this->buttonBox->button(QDialogButtonBox::Cancel);
-  cancel->setAutoDefault(false);
-  this->errorIconLabel->setVisible(false);
-  this->errorMsgLabel->setVisible(false);
+  this->setWindowTitle(tr("New Model"));
+  this->label->setText(tr("New Model Configuration"));
   
   connect(this->lineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateButton(QString)));
-  //connect(this->lineEdit, SIGNAL(returnPressed()), this, SLOT(validateName()));
 };
 
 void NewModelDialog::setConfigurationName(const QString& name)
 {
   QString n = name;
   int i = 0, inc = 0;
-  while (i < this->mp_Configurations->count())
+  while (i < this->mp_Items->count())
   {
-    if (this->mp_Configurations->operator[](i).name.compare(n) == 0)
+    if (this->mp_Items->operator[](i).name.compare(n) == 0)
     {
       ++inc;
       n = name + "-" + QString::number(inc);
@@ -74,39 +63,17 @@ void NewModelDialog::setConfigurationName(const QString& name)
   this->lineEdit->selectAll();
 };
 
-QString NewModelDialog::configurationName() const
+bool NewModelDialog::itemAlreadyExists(const QString& name)
 {
-  return this->lineEdit->text();
+  for (int i = 0 ; i < this->mp_Items->count() ; ++i)
+  {
+    if (name.compare(this->mp_Items->operator[](i).name) == 0)
+      return true;
+  }
+  return false;
 };
 
 void NewModelDialog::updateButton(const QString& name)
 {
-  if (name.isEmpty())
-  {
-    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    this->errorIconLabel->setVisible(false);
-    this->errorMsgLabel->setVisible(false);
-  }
-  else if (this->configurationAlreadyExists(name))
-  {
-    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    this->errorIconLabel->setVisible(true);
-    this->errorMsgLabel->setVisible(true);
-  }
-  else
-  {
-    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
-    this->errorIconLabel->setVisible(false);
-    this->errorMsgLabel->setVisible(false);
-  }
-};
-
-bool NewModelDialog::configurationAlreadyExists(const QString& name)
-{
-  for (int i = 0 ; i < this->mp_Configurations->count() ; ++i)
-  {
-    if (name.compare(this->mp_Configurations->operator[](i).name) == 0)
-      return true;
-  }
-  return false;
+  this->updateButtonState(name);
 };

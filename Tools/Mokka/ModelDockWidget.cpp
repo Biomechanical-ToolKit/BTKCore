@@ -944,10 +944,6 @@ void ModelDockWidget::newConfiguration()
     nmd.setConfigurationName(name);
   }
   this->modelConfigurationComboBox->blockSignals(true);
-#ifdef Q_OS_MAC
-  nmd.setWindowFlags(Qt::Sheet);
-  nmd.setWindowModality(Qt::WindowModal);
-#endif
   if (nmd.exec())
   {
     ConfigurationItem config;

@@ -36,9 +36,7 @@
 #ifndef NewModelDialog_h
 #define NewModelDialog_h
 
-#include "ui_NewModelDialog.h"
-
-#include <QDialog>
+#include "NewItemTemplateDialog.h"
 
 struct ConfigurationItem
 {
@@ -48,25 +46,22 @@ struct ConfigurationItem
   bool isModified;
 };
 
-class NewModelDialog : public QDialog, public Ui::NewModelDialog
+class NewModelDialog : public NewItemTemplateDialog<ConfigurationItem>
 {
   Q_OBJECT
-
+  
 public:
   NewModelDialog(const QList<ConfigurationItem>* configs, QWidget* parent = 0);
   // ~NewModelDialog(); // Implicit
-
-public slots:
+  
   void setConfigurationName(const QString& name);
-  QString configurationName() const;
+  QString configurationName() const {return this->lineEdit->text();};
+  
+protected:
+  virtual bool itemAlreadyExists(const QString& name);
   
 private slots:
   void updateButton(const QString& name);
-
-private:
-  bool configurationAlreadyExists(const QString& name);
-  
-  const QList<ConfigurationItem>* mp_Configurations;
 };
 
 #endif // NewModelDialog_h

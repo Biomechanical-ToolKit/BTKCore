@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NewModelDialog</class>
- <widget class="QDialog" name="NewModelDialog">
+ <class>NewItemDialog</class>
+ <widget class="QDialog" name="NewItemDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>290</width>
-    <height>92</height>
+    <width>320</width>
+    <height>114</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>New Model</string>
+   <string>New Item</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
    <item>
@@ -25,7 +25,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>New Model Configuration</string>
+        <string>New Item</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -86,7 +86,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>NewModelDialog</receiver>
+   <receiver>NewItemDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -102,7 +102,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>NewModelDialog</receiver>
+   <receiver>NewItemDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
