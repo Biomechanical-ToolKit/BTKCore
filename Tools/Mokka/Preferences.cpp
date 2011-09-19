@@ -48,6 +48,9 @@ Preferences::Preferences(QWidget* parent)
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultForcePlateColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForcePlateColor()));
   connect(this->defaultForceVectorColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForceVectorColor()));
+  connect(this->layoutTable, SIGNAL(userLayoutRemoved(int)), this, SLOT(removeUserLayout(int)));
+  connect(this->layoutTable, SIGNAL(userLayoutLabelChanged(int, QString)), this, SLOT(relabelUserLayout(int, QString)));
+  connect(this->layoutTable, SIGNAL(userLayoutDropped(int, int)), this, SLOT(updateDroppedUserLayouts(int, int)));
   
   this->m_Data[DefaultConfigurationUse] = false;
   this->m_Data[DefaultConfigurationPath] = "";
@@ -61,6 +64,8 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[ForcePlatformIndexDisplay] = -1;
   this->m_Data[DefaultForcePlateColor] = QColor();
   this->m_Data[DefaultForceVectorColor] = QColor();
+  this->m_Data[UserLayoutIndex] = -1;
+  this->m_Data[UserLayouts] = QList<QVariant>();
   this->m_Data[AutomaticCheckUpdateUse] = false;
   
   // Force the General tab to be the current.
@@ -157,6 +162,12 @@ void Preferences::saveSettings()
     emit defaultForceVectorColorChanged(color);
   }
   
+  QList<QVariant> vList = this->m_Data[UserLayouts].toList();
+  if (vList != *(this->layoutTable->userLayouts()))
+  {
+    emit userLayoutsChanged(vList, this->m_Data[UserLayoutIndex].toInt());
+  }
+  
   checked = this->automaticCheckUpdateCheckBox->checkState() == Qt::Checked;
   if (this->m_Data[AutomaticCheckUpdateUse].toBool() != checked)
   {
@@ -179,6 +190,7 @@ void Preferences::resetSettings()
   this->showForcePlatformIndexComboBox->setCurrentIndex(this->m_Data[ForcePlatformIndexDisplay].toInt());
   colorizeButton(this->defaultForcePlateColorButton, this->m_Data[DefaultForcePlateColor].value<QColor>());
   colorizeButton(this->defaultForceVectorColorButton, this->m_Data[DefaultForceVectorColor].value<QColor>());
+  this->layoutTable->refresh(); this->m_Data[UserLayouts] = *(this->layoutTable->userLayouts());
   this->automaticCheckUpdateCheckBox->setChecked(this->m_Data[AutomaticCheckUpdateUse].toBool());
   
   this->tabWidget->setCurrentIndex(0);
@@ -223,4 +235,49 @@ void Preferences::setDefaultForceVectorColor()
   QColor color = QColorDialog::getColor(this->defaultForceVectorColorButton->property("backgroundColor").value<QColor>(), this);
   if (color.isValid())
     colorizeButton(this->defaultForceVectorColorButton, color);
+};
+
+void Preferences::removeUserLayout(int index)
+{
+  int userLayoutIndex = this->m_Data[UserLayoutIndex].toInt();
+  QList<QVariant> userLayouts = this->m_Data[UserLayouts].toList();
+  userLayouts.removeAt(index*2); // Name
+  userLayouts.removeAt(index*2); // Data
+  if ((userLayoutIndex != -1) && (userLayoutIndex == index + 3))
+    userLayoutIndex = 0;
+  this->m_Data[UserLayoutIndex] = userLayoutIndex;
+  this->m_Data[UserLayouts] = userLayouts;
+};
+
+void Preferences::relabelUserLayout(int index, const QString& label)
+{
+  QList<QVariant> userLayouts = this->m_Data[UserLayouts].toList();
+  userLayouts[index*2] = label;
+  this->m_Data[UserLayouts] = userLayouts;
+};
+
+void Preferences::updateDroppedUserLayouts(int newRow, int oldRow)
+{
+  int userLayoutIndex = this->m_Data[UserLayoutIndex].toInt();
+  QList<QVariant> userLayouts = this->m_Data[UserLayouts].toList();
+  QVariant name = userLayouts.takeAt(oldRow*2);
+  QVariant data = userLayouts.takeAt(oldRow*2);
+  userLayouts.insert(newRow*2, data);
+  userLayouts.insert(newRow*2, name);
+  
+  if (userLayoutIndex != -1)
+  {
+    if (userLayoutIndex == oldRow)
+      userLayoutIndex = newRow;
+    else
+    {
+      if ((newRow > oldRow) && (oldRow < userLayoutIndex))
+        userLayoutIndex -= 1;
+      else if ((newRow < oldRow) && (newRow < userLayoutIndex))
+        userLayoutIndex += 1;
+    }
+  }
+  
+  this->m_Data[UserLayoutIndex] = userLayoutIndex;
+  this->m_Data[UserLayouts] = userLayouts;
 };

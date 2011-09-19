@@ -67,7 +67,7 @@ protected:
   void closeEvent(QCloseEvent* event);
   bool eventFilter(QObject* obj, QEvent* event);
 
-public Q_SLOTS:
+public slots:
   // Qt
   // Menu
   void about();
@@ -75,7 +75,6 @@ public Q_SLOTS:
   void visitBTKWebsite();
   void setAcquisitionModified(int modified);
   void viewMetadata();
-  void openRecentFile();
   void clearRecentFiles();
   void openFile();
   void openFileDropped(const QString& filename);
@@ -106,6 +105,11 @@ public Q_SLOTS:
   void showPreferences();
   void selectAll();
   void copy();
+  void saveCurrentLayout();
+  void manageUserLayouts();
+  void restoreLayout3DOnly();
+  void restoreLayout3DVerbose();
+  void restoreLayout3DCharts();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
@@ -153,6 +157,14 @@ public Q_SLOTS:
   void selectSelectedMarkers(const QList<int>& ids);
   void toggleMarkerTrajectory(int id);
   void toggleEditActions(QWidget* old, QWidget* now);
+  void removeUserLayout(int index);
+  void relabelUserLayout(int index, const QString& label);
+  void updateDroppedUserLayouts(int newRow, int oldRow);
+  void updateUserLayouts(const QList<QVariant>& layouts, int index);
+  
+protected slots:
+  void openRecentFile();
+  void restoreLayout();
   
 private:
   void loadAcquisition(bool noOpenError, ProgressWidget* pw);
@@ -167,6 +179,7 @@ private:
   void updateRecentFileActions();
   void setCurrentFile(const QString& rFilename);
   bool isOkToContinue();
+  void updateUserLayoutActions();
   
   Acquisition* mp_Acquisition;
   Model* mp_Model;
@@ -180,10 +193,13 @@ private:
   QMenuBar* mp_MacMenuBar;
 #endif
   QString m_LastDirectory;
-  enum { maxRecentFiles = 10 };
+  enum {maxRecentFiles = 10, maxUserLayouts = 15};
   QStringList m_RecentFiles;
   QAction* mp_ActionRecentFiles[maxRecentFiles];
   QAction* mp_ActionSeparatorRecentFiles;
+  QList<QVariant> m_UserLayouts;
+  QAction* mp_ActionUserLayouts[maxUserLayouts];
+  QAction* mp_ActionSeparatorUserLayouts;
   QUndoStack* mp_UndoStack;
   QUndoStack* mp_AcquisitionUndoStack;
   QUndoStack* mp_MarkerConfigurationUndoStack;

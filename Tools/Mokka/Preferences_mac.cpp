@@ -77,6 +77,7 @@ Preferences::Preferences(QMainWindow* parent)
   
   connect(this->actionGeneral, SIGNAL(triggered()), this, SLOT(showGeneralPreferences()));
   connect(this->actionVisualisation, SIGNAL(triggered()), this, SLOT(showVisualisationPreferences()));
+  connect(this->actionLayouts, SIGNAL(triggered()), this, SLOT(showLayoutsPreferences()));
   connect(this->actionAdvanced, SIGNAL(triggered()), this, SLOT(showAdvancedPreferences()));
   connect(this->defaultConfigurationButton, SIGNAL(clicked()), this, SLOT(setDefaultConfiguration()));
   
@@ -93,6 +94,9 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->defaultForcePlateColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForcePlateColor()));
   connect(this->defaultForceVectorColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForceVectorColor()));
   connect(this->automaticCheckUpdateCheckBox, SIGNAL(toggled(bool)), this, SLOT(setAutomaticCheckUpdate(bool)));
+  connect(this->layoutTable, SIGNAL(userLayoutRemoved(int)), this, SIGNAL(userLayoutRemoved(int)));
+  connect(this->layoutTable, SIGNAL(userLayoutLabelChanged(int, QString)), this, SIGNAL(userLayoutLabelChanged(int, QString)));
+  connect(this->layoutTable, SIGNAL(userLayoutDropped(int, int)), this, SIGNAL(userLayoutDropped(int, int)));
   
   this->setCurrentIndex(General);
   this->setFocus();
@@ -122,6 +126,12 @@ void Preferences::showVisualisationPreferences()
 {
   this->setCurrentIndex(Visualisation);
   this->setWindowTitle(tr("Visualisation"));
+};
+
+void Preferences::showLayoutsPreferences()
+{
+  this->setCurrentIndex(Layouts);
+  this->setWindowTitle(tr("Layouts"));
 };
 
 void Preferences::showAdvancedPreferences()

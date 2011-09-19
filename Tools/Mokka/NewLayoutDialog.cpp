@@ -32,43 +32,29 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+#include "NewLayoutDialog.h"
 
-#ifndef AbstractView_h
-#define AbstractView_h
-
-#include "ui_AbstractView.h"
-
-class AbstractView : public QWidget, public Ui::AbstractView
+NewLayoutDialog::NewLayoutDialog(const QList<QVariant>* configs, QWidget* parent)
+: NewItemTemplateDialog<QVariant>(configs, parent)
 {
-  Q_OBJECT
+  this->setWindowTitle(tr("New Layout"));
+  this->label->setText(tr("New View's Layout"));
   
-public:
-  AbstractView(QWidget* parent = 0);
-  virtual ~AbstractView() {};
-  // AbstractView(const AbstractView&); // Implicit
-  // AbstractView& operator=(const AbstractView&); // Implicit.
-  
-  virtual AbstractView* clone() const {return new AbstractView;};
-  
-  virtual int optionStackIndexFromViewComboIndex(int /* idx */) const {return -1;};
-  virtual int viewStackIndexFromViewComboIndex(int /* idx */) const {return -1;};
-  
-public slots:
-  void setFocus(Qt::FocusReason reason);
-  void setCurrentIndex(int idx);
-  
-protected:
-  virtual void finalizeView(int /* idx */) {};
-  virtual void adaptLayoutStrech(int /* idx */) {};
-  
-private slots:
-  void close();
-  void splitHorizontally();
-  void splitVertically();
-  
-signals:
-  void closeTriggered(AbstractView* sender);
-  void splitTriggered(AbstractView* sender, int direction);
+  connect(this->lineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateButton(QString)));
 };
 
-#endif // AbstractView_h
+bool NewLayoutDialog::itemAlreadyExists(const QString& name)
+{
+  for (int i = 0 ; i < this->mp_Items->count() ; i+=2)
+  {
+    if (name.compare(this->mp_Items->operator[](i).toString()) == 0)
+      return true;
+  }
+  return false;
+};
+
+void NewLayoutDialog::updateButton(const QString& name)
+{
+  this->updateButtonState(name);
+};

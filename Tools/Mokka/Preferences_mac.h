@@ -51,12 +51,16 @@ public:
   Preferences(QMainWindow* parent = 0);
   // ~Preferences(); // Implicit
 
+  void setUserLayouts(QList<QVariant>* layouts) {this->layoutTable->setUserLayouts(layouts);};
+  void refreshUserLayouts() {this->layoutTable->refresh();};
+
   QString lastDirectory;
 
 public slots:
   void setCurrentIndex(int index);
   void showGeneralPreferences();
   void showVisualisationPreferences();
+  void showLayoutsPreferences();
   void showAdvancedPreferences();
 
   void setDefaultConfiguration();
@@ -88,6 +92,9 @@ signals:
   void defaultForcePlateColorChanged(const QColor& color);
   void defaultForceVectorColorChanged(const QColor& color);
   void automaticCheckUpdateStateChanged(bool isChecked);
+  void userLayoutRemoved(int index);
+  void userLayoutLabelChanged(int index, const QString& label);
+  void userLayoutDropped(int newRow, int oldRow);
 
 protected:
   bool eventFilter(QObject* obj, QEvent* event);
@@ -95,7 +102,7 @@ protected:
   void focusOutEvent(QFocusEvent* event);
 
 private:
-  enum {General = 0, Visualisation = 1, Advanced = 2};
+  enum {General = 0, Visualisation, Layouts, Advanced};
 
   void stylizeFocusedCurrentAction();
   void unstylizeFocusedCurrentAction();

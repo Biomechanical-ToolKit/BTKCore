@@ -47,6 +47,7 @@
 
 // Forward declaration
 class AbstractView;
+class CompositeView;
 class Acquisition;
 struct Segment;
 class Model;
@@ -104,6 +105,9 @@ public:
   QObject* eventFilterObject() const {return this->mp_EventFilterObject;};
   void setEventFilterObject(QObject* filter);
   
+  QByteArray saveLayout() const;
+  bool restoreLayout(const QByteArray& state);
+  
 public slots:
   void appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void clearSegments();
@@ -124,12 +128,16 @@ public slots:
   void hideAllMarkers();
   void forceRubberBandDrawingOn();
   void forceRubberBandDrawingOff();
+  void restoreLayout3DOnly();
+  void restoreLayout3DVerbose();
+  void restoreLayout3DCharts();
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
   void dropEvent(QDropEvent *event);
-  
   AbstractView* createView(AbstractView* fromAnother = 0);
+  bool saveLayout(QDataStream& stream, QWidget* w) const;
+  bool restoreLayout(QDataStream& stream, CompositeView* view, const QSize& size);
 
 signals:
   void fileDropped(const QString& filename);

@@ -50,6 +50,8 @@
 
 #include <QDragEnterEvent>
 #include <QUrl>
+#include <QSplitter>
+#include <QCheckBox>
 
 #include <vtkInformation.h>
 #include <vtkIdList.h>
@@ -475,6 +477,250 @@ void MultiViewWidget::setEventFilterObject(QObject* filter)
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
     for (int i = 0 ; i < (*it)->viewStack->count() ; ++i)
       (*it)->viewStack->widget(i)->installEventFilter(this->mp_EventFilterObject);
+};
+
+static const int MultiViewWidgetMagic = 0x0abc;
+static const int MultiViewWidgetVersion = 0x0100; // 1.0 
+static const int MultiViewWidgetViewId = 0x0001;
+static const int MultiViewWidgetSplitterId = 0x0002;
+
+QByteArray MultiViewWidget::saveLayout() const
+{
+  QByteArray data;
+  QDataStream stream(&data, QIODevice::WriteOnly);
+  stream.setVersion(QDataStream::Qt_4_6);
+  
+  stream << qint32(MultiViewWidgetMagic);
+  stream << qint32(MultiViewWidgetVersion);
+  
+  if (!this->saveLayout(stream, static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget()))
+    return QByteArray();
+  
+  return data;
+};
+
+bool MultiViewWidget::saveLayout(QDataStream& stream, QWidget* w) const
+{
+  QSplitter* splitter = qobject_cast<QSplitter*>(w);
+  if (splitter)
+  {
+    float ratio = 0.0f;
+    QList<int> sizes = splitter->sizes();
+    if (splitter->orientation() == Qt::Vertical)
+      ratio = (float)sizes[0] / (float)splitter->height();
+    else
+      ratio = (float)sizes[0] / (float)splitter->width();
+    
+    stream << qint32(MultiViewWidgetSplitterId);
+    stream << qint32(splitter->orientation());
+    stream << ratio;
+    
+    if (!this->saveLayout(stream, splitter->widget(0)) || !this->saveLayout(stream, splitter->widget(1)))
+      return false;
+  }
+  else
+  {
+    CompositeView* view = qobject_cast<CompositeView*>(w);
+    if (view == 0)
+    {
+      qCritical("Impossible to save the layout of the view. One of the given widget, is not a view.");
+      return false;
+    }
+    stream << qint32(MultiViewWidgetViewId);
+    stream << qint32(view->viewCombo->currentIndex());
+    // WARNING: The following code is very dependant of the order of the widget set in the composite view.
+    //          Its modification must be reflected here. Otherwise, the layout will be corrupted.
+    // View options
+    switch(view->viewCombo->currentIndex())
+    {
+    case 2: // Orthogonal 3D view
+      stream << qint32(static_cast<QComboBox*>(view->optionStack->currentWidget())->currentIndex());
+      break;
+    case 4: // Point chart
+      stream << qint32(static_cast<QCheckBox*>(view->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->checkState());
+      stream << qint32(static_cast<QCheckBox*>(view->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(2)->widget())->checkState());
+      stream << qint32(static_cast<QCheckBox*>(view->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(4)->widget())->checkState());
+      break;
+    case 5: // Analog chart
+      stream << qint32(static_cast<QComboBox*>(view->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->currentIndex());
+      break;
+    }
+  }
+  return true;
+};
+
+bool MultiViewWidget::restoreLayout(const QByteArray& state)
+{
+  QByteArray sd = state;
+  QDataStream stream(&sd, QIODevice::ReadOnly);
+  
+  qint32 magic;
+  qint32 version;
+  
+  stream >> magic;
+  stream >> version;
+  if (magic != MultiViewWidgetMagic)
+  {
+    qCritical("The data given to set the layout of the views are not recognized.");
+    return false;
+  }
+  if (version == 0x0100)
+  {
+    stream.setVersion(QDataStream::Qt_4_6);
+    this->closeAll();
+    CompositeView* view = static_cast<CompositeView*>(static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget());
+    return this->restoreLayout(stream, view, this->size());
+  }
+  else
+    qCritical("Unknwon version number for serialized data containing the layout of the views. You may have used a new version containing some major changes in the data format.");
+  return false;
+};
+
+bool MultiViewWidget::restoreLayout(QDataStream& stream, CompositeView* view, const QSize& size)
+{
+  int id;
+  stream >> id;
+  if (id == MultiViewWidgetSplitterId)
+  {
+    AbstractView* views[2];
+    QSize viewsSize[2];
+    int orientation;
+    float ratio;
+    int wol; //width or length
+    stream >> orientation;
+    stream >> ratio;
+    
+    QSplitter* splitter = this->split(view, orientation, views);
+    if (orientation == Qt::Horizontal)
+    {
+      wol = size.width() - splitter->handleWidth();
+      viewsSize[0].setWidth(ratio * wol);
+      viewsSize[1].setWidth((1.0 - ratio) * wol);
+      viewsSize[0].setHeight(size.height());
+      viewsSize[1].setHeight(size.height());
+    }
+    else if (orientation == Qt::Vertical)
+    {
+      wol = size.height() - splitter->handleWidth();
+      viewsSize[0].setWidth(size.width());
+      viewsSize[1].setWidth(size.width());
+      viewsSize[0].setHeight(ratio * wol);
+      viewsSize[1].setHeight((1.0 - ratio) * wol);
+    }
+    else
+    {
+      qCritical("Unknown orientation when extracting data to set the layout of the views.");
+      return false;
+    }
+    
+    if (!this->restoreLayout(stream, static_cast<CompositeView*>(views[0]), viewsSize[0]) || !this->restoreLayout(stream, static_cast<CompositeView*>(views[1]), viewsSize[1]))
+      return false;
+    
+    QList<int> sizes; sizes << ratio * wol << (1.0 - ratio) * wol;
+    splitter->setSizes(sizes);
+  }
+  else if (id == MultiViewWidgetViewId)
+  {
+    int index;
+    stream >> index;
+    view->viewCombo->setCurrentIndex(index);
+    int optionIndex = view->optionStackIndexFromViewComboIndex(index);
+    switch(index)
+    {
+    case 2: // Orthogonal 3D view
+      {
+      int index2;
+      stream >> index2;
+      static_cast<QComboBox*>(view->optionStack->widget(optionIndex))->setCurrentIndex(index2);
+      break;
+      }
+    case 4: // Point chart
+      {
+      int checked;
+      stream >> checked;
+      static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(0)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
+      stream >> checked;
+      static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(2)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
+      stream >> checked;
+      static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(4)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
+      break;
+      }
+    case 5: // Analog chart
+      {
+      int index2;
+      stream >> index2;
+      static_cast<QComboBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(0)->widget())->setCurrentIndex(index2);
+      break;
+      }
+    }
+  }
+  else
+  {
+    qCritical("Unknown ID when extracting data to set the layout of the views.");
+    return false;
+  }
+  return true;
+};
+
+void MultiViewWidget::restoreLayout3DOnly()
+{
+  QByteArray data;
+  QDataStream stream(&data, QIODevice::WriteOnly);
+  stream.setVersion(QDataStream::Qt_4_6);
+  
+  stream << qint32(MultiViewWidgetMagic);
+  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetViewId);
+  stream << qint32(1); // 1: Perspective 3D
+  
+  this->restoreLayout(data);
+};
+
+void MultiViewWidget::restoreLayout3DVerbose()
+{
+  QByteArray data;
+  QDataStream stream(&data, QIODevice::WriteOnly);
+  stream.setVersion(QDataStream::Qt_4_6);
+  
+  stream << qint32(MultiViewWidgetMagic);
+  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetSplitterId);
+  stream << qint32(Qt::Vertical);
+  stream << 0.8f;
+  stream << qint32(MultiViewWidgetViewId);
+  stream << qint32(1); // 1: Perspective 3D
+  stream << qint32(MultiViewWidgetViewId);
+  stream << qint32(7); // 7: Logger
+  
+  this->restoreLayout(data);
+};
+
+void MultiViewWidget::restoreLayout3DCharts()
+{
+  QByteArray data;
+  QDataStream stream(&data, QIODevice::WriteOnly);
+  stream.setVersion(QDataStream::Qt_4_6);
+  
+  stream << qint32(MultiViewWidgetMagic);
+  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetSplitterId);
+  stream << qint32(Qt::Horizontal);
+  stream << 0.5f;
+  stream << qint32(MultiViewWidgetViewId);
+  stream << qint32(1); // 1: Perspective 3D
+  stream << qint32(MultiViewWidgetSplitterId);
+  stream << qint32(Qt::Vertical);
+  stream << 0.5f;
+  stream << qint32(MultiViewWidgetViewId);
+  stream << qint32(4); // 4: Point chart
+  stream << qint32(Qt::Checked); // Component X displayed
+  stream << qint32(Qt::Checked); // Component Y displayed
+  stream << qint32(Qt::Checked); // Component Z displayed
+  stream << qint32(MultiViewWidgetViewId);
+  stream << qint32(5); // 5: Analog chart
+  stream << qint32(0); // Collapsed mode
+  
+  this->restoreLayout(data);
 };
 
 void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments)

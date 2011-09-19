@@ -63,13 +63,14 @@ public:
   virtual AbstractView* clone() const;
   void copyOptions(CompositeView* from);
   
+  virtual int optionStackIndexFromViewComboIndex(int idx) const;
+  virtual int viewStackIndexFromViewComboIndex(int idx) const;
+  
 public slots:
   void setOrthogonalView(int view);
   void toggleChartOptions();
 
 protected:
-  virtual int optionStackIndexFromViewComboIndex(int idx) const;
-  virtual int viewStackIndexFromViewComboIndex(int idx) const;
   virtual void finalizeView(int idx);
   virtual void adaptLayoutStrech(int idx);
   

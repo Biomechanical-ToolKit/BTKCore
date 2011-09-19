@@ -49,6 +49,7 @@
 #include "UpdateChecker.h"
 #include "Preferences.h"
 #include "TimeEventFunctors.h"
+#include "NewLayoutDialog.h"
 #include "UserDefined.h"
 
 #include <QFileDialog>
@@ -61,7 +62,7 @@
 #include <QUndoStack>
 
 MainWindow::MainWindow(QWidget* parent)
-:QMainWindow(parent), m_LastDirectory(".")
+:QMainWindow(parent), m_LastDirectory("."), m_RecentFiles(), m_UserLayouts()
 {
   // Members
   this->mp_Acquisition = new Acquisition(this);
@@ -79,6 +80,7 @@ MainWindow::MainWindow(QWidget* parent)
 #else
   this->mp_Preferences = new Preferences(this);
 #endif
+  this->mp_Preferences->setUserLayouts(&this->m_UserLayouts);
   // Finalize UI
   this->mp_FileInfoDock->setVisible(false);
   this->mp_FileInfoDock->setFloating(true);
@@ -108,6 +110,11 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_MacMenuBar = this->menuBar();
   this->mp_MacMenuBar->setParent(0);
   this->setMenuBar(0);
+  QAction* actionMinimise = new QAction(tr("Minimize"), this);
+  actionMinimise->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_M));
+  this->menuWindow->insertAction(this->menuLayouts->menuAction(), actionMinimise);
+  this->menuWindow->insertSeparator(this->menuLayouts->menuAction());
+  connect(actionMinimise,  SIGNAL(triggered()), this, SLOT(showMinimized()));
 #endif
   this->mp_FileInfoDock->reset(); // Force to update geometry
   this->action_FileOpen->setShortcut(QKeySequence::Open);
@@ -119,6 +126,9 @@ MainWindow::MainWindow(QWidget* parent)
   this->actionPaste->setShortcut(QKeySequence::Paste);
   this->actionSelect_All->setShortcut(QKeySequence::SelectAll);
   this->actionHelp->setShortcut(QKeySequence::HelpContents);
+  this->actionLayout3DOnly->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_1));
+  this->actionLayout3DVerbose->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_2));
+  this->actionLayout3DCharts->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_3));
   for (int i = 0 ; i < maxRecentFiles ; ++i)
   {
     this->mp_ActionRecentFiles[i] = new QAction(this);
@@ -129,6 +139,24 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ActionSeparatorRecentFiles = this->menuOpen_Recent->addSeparator();
   this->menuOpen_Recent->addAction(this->actionClear_Menu);
   connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
+  this->mp_ActionSeparatorUserLayouts = this->menuLayouts->addSeparator();
+  QActionGroup* layoutActionGroup = new QActionGroup(this);
+  layoutActionGroup->addAction(this->actionLayout3DOnly);
+  layoutActionGroup->addAction(this->actionLayout3DVerbose);
+  layoutActionGroup->addAction(this->actionLayout3DCharts);
+  for (int i = 0 ; i < maxUserLayouts ; ++i)
+  {
+    this->mp_ActionUserLayouts[i] = new QAction(layoutActionGroup);
+    this->mp_ActionUserLayouts[i]->setCheckable(true);
+    this->mp_ActionUserLayouts[i]->setVisible(false);
+    connect(this->mp_ActionUserLayouts[i], SIGNAL(triggered()), this, SLOT(restoreLayout()));
+    this->menuLayouts->addAction(this->mp_ActionUserLayouts[i]);
+    if (i < 6)
+      this->mp_ActionUserLayouts[i]->setShortcut(QKeySequence(Qt::ControlModifier + static_cast<Qt::Key>(52+i))); // Starting from Qt::Key_4
+    else if (i == 6)
+      this->mp_ActionUserLayouts[i]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_0));
+    // layoutActionGroup->addAction(this->mp_ActionUserLayouts[i]);
+  }
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->timeEventControler->playbackSpeedMenu()->menuAction(), this->multiView->groundOrientationMenu());
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->multiView->groundOrientationMenu()->menuAction(), this->multiView->markerTrajectoryLengthMenu());
   this->multiView->initialize();
@@ -213,8 +241,13 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionExportANB, SIGNAL(triggered()), this, SLOT(exportANB()));
   connect(this->actionExportANC, SIGNAL(triggered()), this, SLOT(exportANC()));
   connect(this->actionPreferences, SIGNAL(triggered()), this, SLOT(showPreferences()));
-  connect(this->actionSelect_All,  SIGNAL(triggered()), this, SLOT(selectAll()));
-  connect(this->actionCopy,  SIGNAL(triggered()), this, SLOT(copy()));
+  connect(this->actionSelect_All, SIGNAL(triggered()), this, SLOT(selectAll()));
+  connect(this->actionCopy, SIGNAL(triggered()), this, SLOT(copy()));
+  connect(this->actionSaveCurrentLayout, SIGNAL(triggered()), this, SLOT(saveCurrentLayout()));
+  connect(this->actionManageUserLayouts, SIGNAL(triggered()), this, SLOT(manageUserLayouts()));
+  connect(this->actionLayout3DOnly, SIGNAL(triggered()), this, SLOT(restoreLayout3DOnly()));
+  connect(this->actionLayout3DVerbose, SIGNAL(triggered()), this, SLOT(restoreLayout3DVerbose()));
+  connect(this->actionLayout3DCharts, SIGNAL(triggered()), this, SLOT(restoreLayout3DCharts()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -322,6 +355,13 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(defaultForcePlateColorChanged(QColor)), this, SLOT(setPreferenceDefaultForcePlateColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultForceVectorColorChanged(QColor)), this, SLOT(setPreferenceDefaultForceVectorColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(automaticCheckUpdateStateChanged(bool)), this, SLOT(setPreferenceAutomaticCheckUpdate(bool)));
+#ifdef Q_OS_MAC
+  connect(this->mp_Preferences, SIGNAL(userLayoutRemoved(int)), this, SLOT(removeUserLayout(int)));
+  connect(this->mp_Preferences, SIGNAL(userLayoutLabelChanged(int, QString)), this, SLOT(relabelUserLayout(int, QString)));
+  connect(this->mp_Preferences, SIGNAL(userLayoutDropped(int, int)), this, SLOT(updateDroppedUserLayouts(int, int)));
+#else
+  connect(this->mp_Preferences, SIGNAL(userLayoutsChanged(QList<QVariant>, int)), this, SLOT(updateUserLayouts(QList<QVariant>, int)));
+#endif
 };
 
 MainWindow::~MainWindow()
@@ -464,7 +504,7 @@ void MainWindow::setCurrentFile(const QString& filename)
 
 void MainWindow::updateRecentFileActions()
 {
-  QMutableStringListIterator i(m_RecentFiles); 
+  QMutableStringListIterator i(this->m_RecentFiles); 
   while (i.hasNext())
   {
     if (!QFile::exists(i.next())) 
@@ -476,7 +516,7 @@ void MainWindow::updateRecentFileActions()
     {
       QString text = QFileInfo(this->m_RecentFiles[i]).fileName(); 
       this->mp_ActionRecentFiles[i]->setText(text); 
-      this->mp_ActionRecentFiles[i]->setData(m_RecentFiles[i]); 
+      this->mp_ActionRecentFiles[i]->setData(this->m_RecentFiles[i]); 
       this->mp_ActionRecentFiles[i]->setVisible(true); 
     } 
     else
@@ -544,6 +584,119 @@ bool MainWindow::isOkToContinue()
     // }
   }
   return true; 
+};
+
+void MainWindow::updateUserLayoutActions()
+{
+  int inc = 0;
+  for (int i = 0 ; i < maxUserLayouts ; ++i)
+  { 
+    if (inc < this->m_UserLayouts.count())
+    {
+      this->mp_ActionUserLayouts[i]->setText(this->m_UserLayouts[inc].toString().replace("&", "&&")); 
+      this->mp_ActionUserLayouts[i]->setData(this->m_UserLayouts[inc+1]);
+      this->mp_ActionUserLayouts[i]->setVisible(true);
+    } 
+    else
+      this->mp_ActionUserLayouts[i]->setVisible(false); 
+    inc += 2;
+  } 
+  this->mp_ActionSeparatorUserLayouts->setVisible(!this->m_UserLayouts.isEmpty());
+  this->actionManageUserLayouts->setEnabled(!this->m_UserLayouts.isEmpty());
+};
+
+void MainWindow::restoreLayout()
+{
+  QAction* pAction = qobject_cast<QAction*>(sender()); 
+  if (pAction)
+  {
+    LOG_INFO(tr("Restoring layout's views: ") + pAction->text());
+    if (!this->multiView->restoreLayout(pAction->data().toByteArray()))
+    {
+      LOG_WARNING("Impossible to restore the previous layout.");
+      this->restoreLayout3DOnly();
+    }
+    else
+    {
+      int index = -1;
+      for (int i = 0 ; i < maxUserLayouts ; ++i)
+      {
+        if (this->mp_ActionUserLayouts[i] == pAction)
+        {
+          index = i;
+          break;
+        }
+      }
+      if (index != -1)
+      {
+        QSettings settings;
+        settings.setValue("MainWindow/currentLayout", index + 3);
+      }
+      else
+        LOG_WARNING("Impossible to save the restored layout: unknown index.");
+    }
+  }
+};
+
+void MainWindow::restoreLayout3DOnly()
+{
+  LOG_INFO(tr("Restoring layout's views: 3D Only"));
+  this->multiView->restoreLayout3DOnly();
+  QSettings settings;
+  settings.setValue("MainWindow/currentLayout", 0);
+};
+
+void MainWindow::restoreLayout3DVerbose()
+{
+  LOG_INFO(tr("Restoring layout's views: 3D Verbose"));
+  this->multiView->restoreLayout3DVerbose();
+  QSettings settings;
+  settings.setValue("MainWindow/currentLayout", 1);
+};
+
+void MainWindow::restoreLayout3DCharts()
+{
+  LOG_INFO(tr("Restoring layout's views: 3D And Charts"));
+  this->multiView->restoreLayout3DCharts();
+  QSettings settings;
+  settings.setValue("MainWindow/currentLayout", 2);
+};
+
+void MainWindow::saveCurrentLayout()
+{
+  if (this->m_UserLayouts.count() >= maxUserLayouts * 2)
+  {
+    QMessageBox error(QMessageBox::Warning, "Layout manager", "The number of predefined layouts is reached.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+    error.setWindowFlags(Qt::Sheet);
+    error.setWindowModality(Qt::WindowModal);
+#endif
+    error.setInformativeText("Use the layout manager to remove some of them.");
+    error.exec();
+  }
+  else
+  {
+    NewLayoutDialog nld(&(this->m_UserLayouts), this);
+    if (nld.exec())
+    {
+      this->m_UserLayouts.push_back(nld.layoutName());
+      this->m_UserLayouts.push_back(this->multiView->saveLayout());
+      this->updateUserLayoutActions();
+      int index = this->m_UserLayouts.count() / 2 - 1;
+      this->mp_ActionUserLayouts[index]->setChecked(true);
+      QSettings settings;
+      settings.setValue("MainWindow/userLayouts", this->m_UserLayouts);
+      settings.setValue("MainWindow/currentLayout", index+3);
+      this->mp_Preferences->refreshUserLayouts();
+      LOG_INFO(tr("Saving the new user's layout: ") + nld.layoutName());
+    }
+  }
+};
+
+void MainWindow::manageUserLayouts()
+{
+  this->mp_Preferences->showLayoutsPreferences();
+  this->showPreferences();
 };
 
 void MainWindow::play()
@@ -862,6 +1015,19 @@ void MainWindow::showPreferences()
   this->mp_Preferences->hide(); // Force the preferences to go back to the top.
   this->mp_Preferences->show();
 #else
+  // Update the data for the user layouts
+  int userLayoutIndex = -1;
+  for (int i = 0 ; i < maxUserLayouts ; ++i)
+  {
+    if (this->mp_ActionUserLayouts[i]->isChecked())
+    {
+      userLayoutIndex = i;
+      break;
+    }
+  }
+  this->mp_Preferences->setPreference(Preferences::UserLayoutIndex, userLayoutIndex);
+  this->mp_Preferences->setPreference(Preferences::UserLayouts, this->m_UserLayouts);
+  
   if (this->mp_Preferences->exec())
     this->mp_Preferences->saveSettings();
   else
@@ -1257,6 +1423,85 @@ void MainWindow::setPreferenceAutomaticCheckUpdate(bool isChecked)
   settings.setValue("Preferences/checkUpdateStartup", isChecked);
 };
 
+void MainWindow::removeUserLayout(int index)
+{
+  this->m_UserLayouts.removeAt(index*2); // Name
+  this->m_UserLayouts.removeAt(index*2); // Data
+  QSettings settings;
+  settings.setValue("MainWindow/userLayouts", this->m_UserLayouts);
+  int layoutIndex = settings.value("MainWindow/currentLayout", -1).toInt();
+  if ((layoutIndex != -1) && (layoutIndex == index + 3))
+  {
+    settings.setValue("MainWindow/currentLayout", 0); // Reset to the default view.
+    this->actionLayout3DOnly->setChecked(true);
+  }
+  this->updateUserLayoutActions();
+};
+
+void MainWindow::relabelUserLayout(int index, const QString& label)
+{
+  this->m_UserLayouts[index*2] = label;
+  this->updateUserLayoutActions();
+  QSettings settings;
+  settings.setValue("MainWindow/userLayouts", this->m_UserLayouts);
+};
+
+void MainWindow::updateDroppedUserLayouts(int newRow, int oldRow)
+{
+  QVariant name = this->m_UserLayouts.takeAt(oldRow*2);
+  QVariant data = this->m_UserLayouts.takeAt(oldRow*2);
+  this->m_UserLayouts.insert(newRow*2, data);
+  this->m_UserLayouts.insert(newRow*2, name);
+  int checkedRow = -1;
+  if (this->mp_ActionUserLayouts[oldRow]->isChecked())
+  {
+    checkedRow = newRow;
+    this->mp_ActionUserLayouts[checkedRow]->setChecked(true);
+  }
+  else
+  {
+    for (int i = 0 ; i < maxUserLayouts ; ++i)
+    {
+      if (this->mp_ActionUserLayouts[i]->isChecked())
+      {
+        checkedRow = i;
+        break;
+      }
+    }
+    if (checkedRow != -1)
+    {
+      if ((newRow > oldRow) && (oldRow < checkedRow))
+      {
+        checkedRow -= 1;
+        this->mp_ActionUserLayouts[checkedRow]->setChecked(true);
+      }
+      else if ((newRow < oldRow) && (newRow < checkedRow))
+      {
+        checkedRow += 1;
+        this->mp_ActionUserLayouts[checkedRow]->setChecked(true);
+      }
+    }
+  }
+  this->updateUserLayoutActions();
+  QSettings settings;
+  if (checkedRow != -1)
+    settings.setValue("MainWindow/currentLayout", checkedRow+3);
+  settings.setValue("MainWindow/userLayouts", this->m_UserLayouts);
+};
+
+void MainWindow::updateUserLayouts(const QList<QVariant>& layouts, int index)
+{
+  this->m_UserLayouts = layouts;
+  this->updateUserLayoutActions();
+  QSettings settings;
+  if (index != -1)
+  {
+    this->mp_ActionUserLayouts[index]->setChecked(true);
+    settings.setValue("MainWindow/currentLayout", index+3);
+  }
+  settings.setValue("MainWindow/userLayouts", this->m_UserLayouts);
+};
+
 void MainWindow::setAcquisitionProperties(QMap<int, QVariant>& properties)
 {
   properties.clear();
@@ -1286,6 +1531,26 @@ void MainWindow::readSettings()
   this->updateRecentFileActions();
   // - Last directory
   this->m_LastDirectory = settings.value("lastDirectory", ".").toString();
+  // - Layout
+  this->m_UserLayouts = settings.value("userLayouts").toList();
+  this->updateUserLayoutActions();
+  this->mp_Preferences->refreshUserLayouts();
+  int layoutIndex = settings.value("currentLayout", 0).toInt();
+  switch (layoutIndex)
+  {
+  case 0:
+    this->actionLayout3DOnly->trigger();
+    break;
+  case 1:
+    this->actionLayout3DVerbose->trigger();
+    break;
+  case 2:
+    this->actionLayout3DCharts->trigger();
+    break;
+  default:
+    if (layoutIndex-3 < maxUserLayouts)
+      this->mp_ActionUserLayouts[layoutIndex-3]->trigger();
+  }
   settings.endGroup();
   
   // MarkersDock
@@ -1349,6 +1614,8 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::ForcePlatformIndexDisplay, showForcePlatformIndex);
   this->mp_Preferences->setPreference(Preferences::DefaultForcePlateColor, defaultForcePlateColor);
   this->mp_Preferences->setPreference(Preferences::DefaultForceVectorColor, defaultForceVectorColor);
+  this->mp_Preferences->setPreference(Preferences::UserLayoutIndex, layoutIndex);
+  this->mp_Preferences->setPreference(Preferences::UserLayouts, this->m_UserLayouts);
   this->mp_Preferences->setPreference(Preferences::AutomaticCheckUpdateUse, checkUpdateStartup);
 #endif  
   

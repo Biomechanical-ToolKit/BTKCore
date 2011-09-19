@@ -70,11 +70,12 @@ protected slots:
   void split(AbstractView* sender, int direction);
   
 protected:
+  QSplitter* split(AbstractView* sender, int direction, AbstractView** splittedViews);
+  
   QList<AbstractView*> m_Views;
   
 private:
   void close_(AbstractView* sender);
-  QSplitter* split_(AbstractView* sender, int direction, AbstractView** splittedViews);
   
   void setupUi();
   void closeAll(QWidget* w);

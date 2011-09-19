@@ -32,43 +32,43 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+#ifndef Preferences_Layouts_h
+#define Preferences_Layouts_h
+ 
+#include <QTableWidget>
 
-#ifndef AbstractView_h
-#define AbstractView_h
+class QDragMoveEvent;
 
-#include "ui_AbstractView.h"
-
-class AbstractView : public QWidget, public Ui::AbstractView
+class LayoutsTableWidget : public QTableWidget
 {
   Q_OBJECT
   
 public:
-  AbstractView(QWidget* parent = 0);
-  virtual ~AbstractView() {};
-  // AbstractView(const AbstractView&); // Implicit
-  // AbstractView& operator=(const AbstractView&); // Implicit.
+  LayoutsTableWidget(QWidget* parent = 0);
   
-  virtual AbstractView* clone() const {return new AbstractView;};
-  
-  virtual int optionStackIndexFromViewComboIndex(int /* idx */) const {return -1;};
-  virtual int viewStackIndexFromViewComboIndex(int /* idx */) const {return -1;};
-  
-public slots:
-  void setFocus(Qt::FocusReason reason);
-  void setCurrentIndex(int idx);
+  const QList<QVariant>* userLayouts() const {return this->mp_UserLayouts;};
+  void setUserLayouts(QList<QVariant>* layouts) {this->mp_UserLayouts = layouts;};
+  void refresh();
+  virtual QRect visualRect(const QModelIndex& index) const;
   
 protected:
-  virtual void finalizeView(int /* idx */) {};
-  virtual void adaptLayoutStrech(int /* idx */) {};
-  
-private slots:
-  void close();
-  void splitHorizontally();
-  void splitVertically();
+  void dragMoveEvent(QDragMoveEvent* event);
+  void dropEvent(QDropEvent* event);
   
 signals:
-  void closeTriggered(AbstractView* sender);
-  void splitTriggered(AbstractView* sender, int direction);
+  void userLayoutRemoved(int index);
+  void userLayoutLabelChanged(int index, const QString& label);
+  void userLayoutDropped(int newRow, int oldRow);
+  
+private slots:
+  void updateLayout(int row, int col);
+  void removeLayout();
+  
+private:
+  QPoint adaptDragDropEventPosition(const QPoint& p, QTableWidgetItem* item);
+  
+  QList<QVariant>* mp_UserLayouts;
 };
 
-#endif // AbstractView_h
+#endif // Preferences_Layouts_h

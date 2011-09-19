@@ -151,23 +151,6 @@ void CompositeView::copyOptions(CompositeView* from)
   }
 };
 
-void CompositeView::setOrthogonalView(int view)
-{
-  if (view == -1)
-    return;
-  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->view(Viz3D));
-  viz3D->setOrthogonalView(view);
-  this->viewStack->currentWidget()->setFocus(Qt::OtherFocusReason);
-};
-
-void CompositeView::toggleChartOptions()
-{
-  QLayout* layout = this->optionStack->currentWidget()->layout();
-  QWidget* w = layout->itemAt(layout->count()-1)->widget(); // Chart options button
-  QPoint pos = w->mapToGlobal(QPoint(0,0)) + QPoint(w->width() / 2, w->height());
-  static_cast<ChartWidget*>(this->view(Chart))->toggleOptions(pos);
-};
-
 int CompositeView::optionStackIndexFromViewComboIndex(int idx) const
 {
   switch (idx)
@@ -205,6 +188,23 @@ int CompositeView::viewStackIndexFromViewComboIndex(int idx) const
     qDebug("Incorrect view index! Impossible to find the corresponding stack!");
     return 0;
   }
+};
+
+void CompositeView::setOrthogonalView(int view)
+{
+  if (view == -1)
+    return;
+  Viz3DWidget* viz3D = static_cast<Viz3DWidget*>(this->view(Viz3D));
+  viz3D->setOrthogonalView(view);
+  this->viewStack->currentWidget()->setFocus(Qt::OtherFocusReason);
+};
+
+void CompositeView::toggleChartOptions()
+{
+  QLayout* layout = this->optionStack->currentWidget()->layout();
+  QWidget* w = layout->itemAt(layout->count()-1)->widget(); // Chart options button
+  QPoint pos = w->mapToGlobal(QPoint(0,0)) + QPoint(w->width() / 2, w->height());
+  static_cast<ChartWidget*>(this->view(Chart))->toggleOptions(pos);
 };
 
 void CompositeView::finalizeView(int idx)

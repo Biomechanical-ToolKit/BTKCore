@@ -137,10 +137,10 @@ void AbstractMultiView::close_(AbstractView* sender)
 
 void AbstractMultiView::split(AbstractView* sender, int direction)
 {
-  this->split_(sender, direction, 0);
+  this->split(sender, direction, 0);
 };
 
-QSplitter* AbstractMultiView::split_(AbstractView* sender, int direction, AbstractView** splittedViews)
+QSplitter* AbstractMultiView::split(AbstractView* sender, int direction, AbstractView** splittedViews)
 {
   this->setUpdatesEnabled(false);
   AbstractView* sv = this->createView(sender);

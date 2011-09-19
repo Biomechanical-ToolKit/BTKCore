@@ -56,7 +56,7 @@ public:
   void load(btk::MetaData::Pointer m);
   void reset();
 
-public Q_SLOTS:
+public slots:
   void dispatchChangement(QStandardItem*);
   void expandItem(QStandardItem*);
   
@@ -179,7 +179,7 @@ public:
     connect(this, SIGNAL(stateChanged(int)), this, SLOT(itemChanged(int)));
   };
 
-private Q_SLOTS:
+private slots:
   void itemChanged(int s)
   {
     if (!this->m_Invisible)

@@ -33,42 +33,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef AbstractView_h
-#define AbstractView_h
+#ifndef NewLayoutDialog_h
+#define NewLayoutDialog_h
 
-#include "ui_AbstractView.h"
+#include "NewItemTemplateDialog.h"
 
-class AbstractView : public QWidget, public Ui::AbstractView
+class NewLayoutDialog : public NewItemTemplateDialog<QVariant>
 {
   Q_OBJECT
   
 public:
-  AbstractView(QWidget* parent = 0);
-  virtual ~AbstractView() {};
-  // AbstractView(const AbstractView&); // Implicit
-  // AbstractView& operator=(const AbstractView&); // Implicit.
+  NewLayoutDialog(const QList<QVariant>* configs, QWidget* parent = 0);
+  // ~NewLayoutDialog(); // Implicit
   
-  virtual AbstractView* clone() const {return new AbstractView;};
-  
-  virtual int optionStackIndexFromViewComboIndex(int /* idx */) const {return -1;};
-  virtual int viewStackIndexFromViewComboIndex(int /* idx */) const {return -1;};
-  
-public slots:
-  void setFocus(Qt::FocusReason reason);
-  void setCurrentIndex(int idx);
+  QString layoutName() const {return this->lineEdit->text();};
   
 protected:
-  virtual void finalizeView(int /* idx */) {};
-  virtual void adaptLayoutStrech(int /* idx */) {};
+  virtual bool itemAlreadyExists(const QString& name);
   
 private slots:
-  void close();
-  void splitHorizontally();
-  void splitVertically();
-  
-signals:
-  void closeTriggered(AbstractView* sender);
-  void splitTriggered(AbstractView* sender, int direction);
+  void updateButton(const QString& name);
 };
 
-#endif // AbstractView_h
+#endif // NewLayoutDialog_h

@@ -50,7 +50,7 @@
   public:
     enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, 
           DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
-          ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, AutomaticCheckUpdateUse};
+          ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse};
   
     Preferences(QWidget* parent = 0);
     // ~Preferences(); // Implicit
@@ -59,6 +59,14 @@
   
     void saveSettings();
     void resetSettings();
+    
+    void showGeneralPreferences() {this->tabWidget->setCurrentWidget(this->generalTab);};
+    void showVisualisationPreferences() {this->tabWidget->setCurrentWidget(this->visualisationTab);};
+    void showLayoutsPreferences() {this->tabWidget->setCurrentWidget(this->layoutsTab);};
+    void showAdvancedPreferences() {this->tabWidget->setCurrentWidget(this->advancedTab);};
+    
+    void setUserLayouts(QList<QVariant>* layouts) {this->layoutTable->setUserLayouts(layouts);};
+    void refreshUserLayouts() {this->layoutTable->refresh();};
   
     QString lastDirectory;
   
@@ -83,6 +91,12 @@
     void defaultForcePlateColorChanged(const QColor& color);
     void defaultForceVectorColorChanged(const QColor& color);
     void automaticCheckUpdateStateChanged(bool isChecked);
+    void userLayoutsChanged(const QList<QVariant>& layouts, int index);
+    
+  private slots:
+    void removeUserLayout(int index);
+    void relabelUserLayout(int index, const QString& label);
+    void updateDroppedUserLayouts(int newRow, int oldRow);
   
   private:
     QMap<int, QVariant> m_Data;
