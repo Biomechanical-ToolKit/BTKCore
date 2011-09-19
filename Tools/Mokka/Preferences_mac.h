@@ -40,6 +40,7 @@
 
 #include <QToolButton>
 #include <QMainWindow>
+#include <QPropertyAnimation>
 
 class QFocusEvent;
 
@@ -77,6 +78,8 @@ public slots:
   void setDefaultForcePlateColor();
   void setDefaultForceVectorColor();
   void setAutomaticCheckUpdate(bool isChecked);
+  
+  virtual void setVisible(bool visible);
 
 signals:
   void useDefaultConfigurationStateChanged(bool isUsed);
@@ -101,6 +104,9 @@ protected:
   void focusInEvent(QFocusEvent* event);
   void focusOutEvent(QFocusEvent* event);
 
+private slots:
+  void finalizeAnimation();
+
 private:
   enum {General = 0, Visualisation, Layouts, Advanced};
 
@@ -108,9 +114,11 @@ private:
   void unstylizeFocusedCurrentAction();
   void stylizeUnfocusedCurrentAction();
   void unstylizeAction(QToolButton* tb);
+  void animateHeight(const QRect& rectLim);
 
   int m_CurrentIndex;
   QList<QToolButton*> m_Buttons;
+  QPropertyAnimation* mp_GeometryAnimation;
 };
 
 inline void Preferences::stylizeFocusedCurrentAction()
@@ -144,6 +152,20 @@ inline void Preferences::unstylizeAction(QToolButton* tb)
                      border: 0px; \
                      border-left: 1px solid rgba(0, 0, 0, 0); \
                      border-right: 1px solid rgba(0, 0, 0, 0);");
+};
+
+inline void Preferences::animateHeight(const QRect& rectLim)
+{
+  int height = rectLim.top() + rectLim.height() + 20;
+  if (height < 200) height = 200;
+  QRect geometry = this->geometry(); geometry.setHeight(height);
+  this->stackedWidget->setCurrentWidget(this->emptyPage);
+  this->mp_GeometryAnimation->setStartValue(this->geometry());
+  this->mp_GeometryAnimation->setEndValue(geometry);
+  // int diff = abs(this->height() - height);
+  // this->mp_GeometryAnimation->setDuration(this->isVisible() ? diff * 1000 / 750 : 1); // 750 pixels by second
+  this->mp_GeometryAnimation->setDuration(this->isVisible() ? 150 : 1);
+  this->mp_GeometryAnimation->start();
 };
 
 inline void colorizeButton(QPushButton* button, const QColor& color)

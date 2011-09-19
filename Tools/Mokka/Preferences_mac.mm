@@ -42,9 +42,10 @@
 #include <QColorDialog>
 
 Preferences::Preferences(QMainWindow* parent)
-: QMainWindow(parent, Qt::Window | Qt::WindowTitleHint | Qt::WindowCloseButtonHint), lastDirectory(".")
+: QMainWindow(parent), lastDirectory("."), m_Buttons()
 {
   this->m_CurrentIndex = -1;
+  this->mp_GeometryAnimation = new QPropertyAnimation(this, "geometry");
   
   this->setupUi(this);
   this->setFocusPolicy(Qt::StrongFocus);
@@ -74,13 +75,15 @@ Preferences::Preferences(QMainWindow* parent)
   defaultMarkerTrajectoryLengthComboBox->installEventFilter(this);
   showForcePlatformAxesComboBox->installEventFilter(this);
   showForcePlatformIndexComboBox->installEventFilter(this);
+  layoutTable->installEventFilter(this);
   
   connect(this->actionGeneral, SIGNAL(triggered()), this, SLOT(showGeneralPreferences()));
   connect(this->actionVisualisation, SIGNAL(triggered()), this, SLOT(showVisualisationPreferences()));
   connect(this->actionLayouts, SIGNAL(triggered()), this, SLOT(showLayoutsPreferences()));
   connect(this->actionAdvanced, SIGNAL(triggered()), this, SLOT(showAdvancedPreferences()));
-  connect(this->defaultConfigurationButton, SIGNAL(clicked()), this, SLOT(setDefaultConfiguration()));
+  connect(this->mp_GeometryAnimation, SIGNAL(finished()), this, SLOT(finalizeAnimation()));
   
+  connect(this->defaultConfigurationButton, SIGNAL(clicked()), this, SLOT(setDefaultConfiguration()));
   connect(this->defaultConfigurationCheckBox, SIGNAL(toggled(bool)), this, SLOT(useDefaultConfiguration(bool)));
   connect(this->defaultConfigurationLineEdit, SIGNAL(editingFinished()), this, SLOT(setDefaultConfigurationPath()));
   connect(this->openEventEditorCheckBox, SIGNAL(toggled(bool)), this, SLOT(useEventEditorWhenInserting(bool)));
@@ -120,24 +123,32 @@ void Preferences::showGeneralPreferences()
 {
   this->setCurrentIndex(General);
   this->setWindowTitle(tr("General"));
+  
+  this->animateHeight(this->groundLayout->geometry());
 };
 
 void Preferences::showVisualisationPreferences()
 {
   this->setCurrentIndex(Visualisation);
   this->setWindowTitle(tr("Visualisation"));
+  
+  this->animateHeight(this->platformLayout->geometry());
 };
 
 void Preferences::showLayoutsPreferences()
 {
   this->setCurrentIndex(Layouts);
   this->setWindowTitle(tr("Layouts"));
+  
+  this->animateHeight(this->layoutLayout->geometry());
 };
 
 void Preferences::showAdvancedPreferences()
 {
   this->setCurrentIndex(Advanced);
   this->setWindowTitle(tr("Advanced"));
+  
+  this->animateHeight(this->updateLayout->geometry());
 };
 
 void Preferences::setDefaultConfiguration()
@@ -239,6 +250,25 @@ void Preferences::setAutomaticCheckUpdate(bool isChecked)
   emit automaticCheckUpdateStateChanged(isChecked);
 };
 
+void Preferences::setVisible(bool visible)
+{
+  // Hugly hack to be able to have the good geometry without the blinking of the window (due to the unified toolbar and the use of an animation).
+  // The end of this hack is in the method finalizeAnimation(), to set the opacity to 1.0.
+  static bool preferencesFirstDisplay = true;
+  if (preferencesFirstDisplay)
+  {
+    this->setWindowOpacity(0.0);
+    this->showGeneralPreferences();
+    preferencesFirstDisplay = false;
+  }
+  this->QWidget::setVisible(visible);
+  // Cocoa code
+  OSWindowRef window = qt_mac_window_for(this);
+  [[window standardWindowButton:NSWindowZoomButton] setEnabled:NO];
+  [window setShowsToolbarButton:NO];
+  [window setShowsResizeIndicator:NO];
+}
+
 bool Preferences::eventFilter(QObject* obj, QEvent* event)
 {
   Q_UNUSED(obj)
@@ -254,6 +284,10 @@ bool Preferences::eventFilter(QObject* obj, QEvent* event)
         && (static_cast<QFocusEvent*>(event)->reason() == Qt::ActiveWindowFocusReason))
       this->stylizeUnfocusedCurrentAction();
   }
+  else if (event->type() == QEvent::FocusIn)
+  {
+    this->stylizeFocusedCurrentAction();
+  }
   return false;
 };
 
@@ -268,4 +302,10 @@ void Preferences::focusOutEvent(QFocusEvent* event)
   if (!this->isAncestorOf(QApplication::focusWidget()))
     this->stylizeUnfocusedCurrentAction();
   this->QMainWindow::focusOutEvent(event);
+};
+
+void Preferences::finalizeAnimation()
+{
+  this->stackedWidget->setCurrentIndex(this->m_CurrentIndex);
+  this->setWindowOpacity(1.0);
 };

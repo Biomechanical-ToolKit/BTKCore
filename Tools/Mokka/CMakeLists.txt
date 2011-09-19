@@ -102,7 +102,7 @@ SET(Mokka_QRC
 IF(APPLE)
   SET(Mokka_UI ${Mokka_UI} Preferences_mac.ui)
   SET(Mokka_H ${Mokka_H} Preferences_mac.h)
-  SET(Mokka_CPP ${Mokka_CPP} Preferences_mac.cpp)
+  SET(Mokka_CPP ${Mokka_CPP} Preferences_mac.mm)
 ELSE(APPLE)
   SET(Mokka_UI ${Mokka_UI} Preferences.ui)
   SET(Mokka_H ${Mokka_H} Preferences.h)
