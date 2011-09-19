@@ -58,7 +58,7 @@ void LoggerWidget::redirectCerr(const QString& id)
 
 void LoggerWidget::messageHandler(QtMsgType type, const char* msg)
 {
-  QString msgDetail(msg);
+  QString msgDetail = QString::fromLocal8Bit(msg);
   bool internalMessage = true;
   size_t lenId = strlen(LOGGER_EXTERNAL_MESSAGE_ID);
   if (msgDetail.left(lenId).compare(LOGGER_EXTERNAL_MESSAGE_ID) == 0)
