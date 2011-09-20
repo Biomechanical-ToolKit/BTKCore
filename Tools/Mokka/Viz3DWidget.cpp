@@ -48,6 +48,9 @@
 #include <vtkIdList.h>
 #include <vtkCamera.h>
 #include <vtkCollectionIterator.h>
+#include <vtkCaptionActor2D.h>
+#include <vtkTextProperty.h>
+#include <vtkTextActor.h>
 
 #include <QKeyEvent>
 #include <QToolTip>
@@ -114,13 +117,18 @@ void Viz3DWidget::initialize()
   // VTK WIDGET
   this->mp_AxesWidget->SetParentRenderer(this->mp_Renderer);
   this->mp_AxesWidget->SetInteractor(this->GetRenderWindow()->GetInteractor());
-  this->mp_AxesWidget->SetViewport(0.0, 0.0, 0.15, 0.2);
+  this->mp_AxesWidget->SetZoomFactor(1.25);
   vtkAxesActor* axesActor = this->mp_AxesWidget->GetAxesActor();
   axesActor->SetShaftTypeToCylinder();
-  axesActor->SetTotalLength(1.25, 1.25, 1.25);
-  axesActor->SetCylinderRadius( 0.500 * axesActor->GetCylinderRadius());
+  axesActor->SetNormalizedLabelPosition(1.25, 1.25, 1.25);
+  axesActor->SetCylinderRadius(0.500 * axesActor->GetCylinderRadius());
   axesActor->SetConeRadius(1.025 * axesActor->GetConeRadius());
-  axesActor->SetSphereRadius(1.500 * axesActor->GetSphereRadius());
+  axesActor->GetXAxisCaptionActor2D()->GetTextActor()->SetTextScaleModeToNone();
+  axesActor->GetYAxisCaptionActor2D()->GetTextActor()->SetTextScaleModeToNone();
+  axesActor->GetZAxisCaptionActor2D()->GetTextActor()->SetTextScaleModeToNone();
+  axesActor->GetXAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(10);
+  axesActor->GetYAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(10);
+  axesActor->GetZAxisCaptionActor2D()->GetCaptionTextProperty()->SetFontSize(10);
   this->mp_AxesWidget->SetEnabled(1);
   
   // Links between VTK & Qt
@@ -420,4 +428,14 @@ void Viz3DWidget::mousePressEvent(QMouseEvent* event)
 {
   this->GetRenderWindow()->GetInteractor()->SetAltKey(event->modifiers() == Qt::AltModifier ? 1 : 0);
   this->QVTKWidget::mousePressEvent(event);
+};
+
+void Viz3DWidget::resizeEvent(QResizeEvent* event)
+{
+  this->QVTKWidget::resizeEvent(event);
+  QSize size = event->size();
+  const double l = 100.0;
+  double width = l / static_cast<double>(size.width());
+  double height = l / static_cast<double>(size.height());
+  this->mp_AxesWidget->SetViewport(0, 0, width, height);
 };
