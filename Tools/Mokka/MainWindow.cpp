@@ -719,14 +719,22 @@ void MainWindow::openFile()
   {
     QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
-                         tr("Acquisition Files (*.c3d *.emf *.rah *.raw *.ric *.trc *.trb);;"
+                         tr("Acquisition Files (*.anb *.anc *.ang *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *.trb *.trc);;"
+                            "ANB Files (*.anb);;"
+                            "ANC Files (*.anc);;"
+                            "ANG Files (*.ang);;"
                             "C3D Files (*.c3d);;"
                             "EMF Ascension Files (*.emf);;"
+                            "EMG Files (*.emg);;"
+                            "GR* Files (*.gr*);;"
+                            "MOM Files (*.mom);;"
+                            "PWR Files (*.pwr);;"
                             "RAH Files (*.rah);;"
                             "RAW Files (*.raw);;"
                             "RIC Files (*.ric);;"
                             "TRB Files (*.trb);;"
-                            "TRC Files (*.trc)"));
+                            "TRC Files (*.trc);;"
+                            "XLS OrthoTrak Files (*.xls)"));
     if (!filename.isEmpty())
       this->openFile(filename);
   }
@@ -816,8 +824,10 @@ void MainWindow::saveAsFile()
   QString selectedFilter = suffix.toUpper() + " Files (*." + suffix.toLower() + ")";
   QString filename = QFileDialog::getSaveFileName(this, "",
                        file,
-                       tr("C3D Files (*.c3d);; \
-                           TRC Files (*.trc)"),
+                       tr("ANB Files (*.anb);;"
+                          "ANC Files (*.anc);;"
+                          "C3D Files (*.c3d);;"
+                          "TRC Files (*.trc)"),
                        &selectedFilter);
   if (!filename.isEmpty())
   {
@@ -1031,7 +1041,6 @@ void MainWindow::showPreferences()
   }
   this->mp_Preferences->setPreference(Preferences::UserLayoutIndex, userLayoutIndex);
   this->mp_Preferences->setPreference(Preferences::UserLayouts, this->m_UserLayouts);
-  
   if (this->mp_Preferences->exec())
     this->mp_Preferences->saveSettings();
   else
@@ -1621,7 +1630,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::UserLayoutIndex, layoutIndex);
   this->mp_Preferences->setPreference(Preferences::UserLayouts, this->m_UserLayouts);
   this->mp_Preferences->setPreference(Preferences::AutomaticCheckUpdateUse, checkUpdateStartup);
-#endif  
+#endif
   
   if (defaultConfigurationUsed && !defaultConfigurationPath.isEmpty())
     this->mp_ModelDock->loadConfiguration(defaultConfigurationPath);
