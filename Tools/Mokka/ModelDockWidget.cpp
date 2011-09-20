@@ -123,7 +123,6 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->analogDescLabel->setFont(f);
   this->analogDescEdit->setFont(f);
 #endif
-  // Model configuration menu
   QMenu* modelConfigurationMenu = new QMenu(this);
   this->mp_NewConfiguration = new QAction(tr("New configuration"), this);
   this->mp_LoadConfiguration = new QAction(tr("Load configuration"), this);
@@ -135,23 +134,14 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->mp_DeselectConfiguration->setEnabled(false);
   this->mp_ClearConfigurations = new QAction(tr("Clear configurations"), this);
   this->mp_NewSegment = new QAction(tr("New Segment"), this);
-  this->mp_NewSegment->setEnabled(false);
   this->mp_HideSelectedSegments = new QAction(tr("Hide selected segments"), this);
-  this->mp_HideSelectedSegments->setEnabled(false);
   this->mp_UnhideSelectedSegments = new QAction(tr("Unhide selected segments"), this);
-  this->mp_UnhideSelectedSegments->setEnabled(false);
   this->mp_SelectAllMarkers = new QAction(tr("Select all markers"), this);
-  this->mp_SelectAllMarkers->setEnabled(false);
   this->mp_HideSelectedMarkers = new QAction(tr("Hide selected markers"), this);
-  this->mp_HideSelectedMarkers->setEnabled(false);
   this->mp_UnhideSelectedMarkers = new QAction(tr("Unhide selected markers"), this);
-  this->mp_UnhideSelectedMarkers->setEnabled(false);
   this->mp_TrackSelectedMarkers = new QAction(tr("Track selected markers"), this);
-  this->mp_TrackSelectedMarkers->setEnabled(false);
   this->mp_UntrackSelectedMarkers = new QAction(tr("Untrack selected markers"), this);
-  this->mp_UntrackSelectedMarkers->setEnabled(false);
   this->mp_DeleteSelectedMarkers = new QAction(tr("Delete selected markers"), this);
-  this->mp_DeleteSelectedMarkers->setEnabled(false);
   this->mp_SelectAllAnalogs = new QAction(tr("Select all analog channels"), this);
   this->mp_SelectAllModelOutputs = new QAction(tr("Select all model outputs"), this);
   this->mp_SelectAllAngles = new QAction(tr("Select all angles"), this);
@@ -160,33 +150,36 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->mp_SelectAllPowers = new QAction(tr("Select all powers"), this);
   this->mp_SelectAllScalars = new QAction(tr("Select all scalars"), this);
   this->mp_RemoveSelectedItems = new QAction(tr("Remove selected items"), this);
-  this->mp_RemoveSelectedItems->setEnabled(false);
+  // Model configuration menu
   modelConfigurationMenu->addAction(this->mp_NewConfiguration);
   modelConfigurationMenu->addAction(this->mp_LoadConfiguration);
   modelConfigurationMenu->addAction(this->mp_SaveConfiguration);
   modelConfigurationMenu->addAction(this->mp_RemoveConfiguration);
   modelConfigurationMenu->addAction(this->mp_DeselectConfiguration);
-  //modelConfigurationMenu->addSeparator();
+  modelConfigurationMenu->addSeparator();
   modelConfigurationMenu->addAction(this->mp_ClearConfigurations);
-  modelConfigurationMenu->addSeparator();
-  modelConfigurationMenu->addAction(this->mp_NewSegment);
-  modelConfigurationMenu->addAction(this->mp_HideSelectedSegments);
-  modelConfigurationMenu->addAction(this->mp_UnhideSelectedSegments);
-  modelConfigurationMenu->addSeparator();
-  modelConfigurationMenu->addAction(this->mp_SelectAllMarkers);
-  modelConfigurationMenu->addAction(this->mp_HideSelectedMarkers);
-  modelConfigurationMenu->addAction(this->mp_UnhideSelectedMarkers);
-  modelConfigurationMenu->addSeparator();
-  modelConfigurationMenu->addAction(this->mp_SelectAllAnalogs);
-  modelConfigurationMenu->addAction(this->mp_SelectAllModelOutputs);
-  modelConfigurationMenu->addAction(this->mp_SelectAllAngles);
-  modelConfigurationMenu->addAction(this->mp_SelectAllForces);
-  modelConfigurationMenu->addAction(this->mp_SelectAllMoments);
-  modelConfigurationMenu->addAction(this->mp_SelectAllPowers);
-  modelConfigurationMenu->addAction(this->mp_SelectAllScalars);
-  modelConfigurationMenu->addSeparator();
-  modelConfigurationMenu->addAction(this->mp_RemoveSelectedItems);
   this->modelConfigurationButton->setMenu(modelConfigurationMenu);
+  // Contextual menu
+  QList<QAction*> actions;
+  actions.push_back(this->mp_NewSegment);
+  actions.push_back(this->mp_HideSelectedSegments);
+  actions.push_back(this->mp_UnhideSelectedSegments);
+  QAction* sep1 = new QAction(this); sep1->setSeparator(true); actions.push_back(sep1);
+  actions.push_back(this->mp_SelectAllMarkers);
+  actions.push_back(this->mp_HideSelectedMarkers);
+  actions.push_back(this->mp_UnhideSelectedMarkers);
+  QAction* sep2 = new QAction(this); sep2->setSeparator(true); actions.push_back(sep2);
+  actions.push_back(this->mp_SelectAllAnalogs);
+  actions.push_back(this->mp_SelectAllModelOutputs);
+  actions.push_back(this->mp_SelectAllAngles);
+  actions.push_back(this->mp_SelectAllForces);
+  actions.push_back(this->mp_SelectAllMoments);
+  actions.push_back(this->mp_SelectAllPowers);
+  actions.push_back(this->mp_SelectAllScalars);
+  QAction* sep3 = new QAction(this); sep3->setSeparator(true); actions.push_back(sep3);
+  actions.push_back(this->mp_RemoveSelectedItems);
+  this->modelTree->addActions(actions);
+  this->modelTree->setContextMenuPolicy(Qt::ActionsContextMenu);
   // Marker color menu
   QMenu* markerColorMenu = new QMenu(this);
   this->mp_ResetMarkerColorHistory = new QAction(tr("Reset recent colors"), this);
@@ -245,11 +238,6 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   items.append(modelOutputsRoot);
   // Insert top level items
   this->modelTree->addTopLevelItems(items);
-  segmentsRoot->setHidden(true);
-  markersRoot->setHidden(true);
-  analogsRoot->setHidden(true);
-  forcePlatesRoot->setHidden(true);
-  modelOutputsRoot->setHidden(true);
   items.clear();
   // Model outputs: Angles
   QTreeWidgetItem* modelOutputAngles = new QTreeWidgetItem(QStringList(QString("Angles")));
@@ -294,8 +282,6 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->splitter->setSizes(sizes);
   this->toggleProperties();
   */
-  // Force to the empty property page
-  this->propertiesStack->setCurrentWidget(this->emptyPage);
   
   // Connections
   connect(this->modelConfigurationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectConfiguration(int)));
@@ -355,6 +341,9 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   connect(this->analogScaleSpinBox, SIGNAL(editingFinished()), this, SLOT(editAnalogsScale()));
   connect(this->analogOffsetSpinBox, SIGNAL(editingFinished()), this, SLOT(editAnalogsOffset()));
   connect(this->analogDescEdit, SIGNAL(editingFinished()), this, SLOT(editAnalogsDescription()));
+  
+  this->refresh(); // Disable the "Select *" actions in the contextual menu and hide the items in the tree.
+  this->displayProperties(); // Disable the other actions in the contextual menu and set the properties widget to the empty page.
 };
   
 ModelDockWidget::~ModelDockWidget()

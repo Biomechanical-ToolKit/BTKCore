@@ -63,7 +63,7 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->playButton->setIcon(*this->mp_PlayIcon);
   this->nextEventButton->setIcon(*this->mp_NextEventIcon);
   // Shortcuts
-  this->actionEditSelectedEvents->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+  this->actionEditSelectedEvents->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_E));
   this->actionRemoveSelectedEvents->setShortcut(QKeySequence::Delete);
   this->actionNextEvent->setShortcut(QKeySequence::MoveToNextWord);
   this->actionPreviousEvent->setShortcut(QKeySequence::MoveToPreviousWord);

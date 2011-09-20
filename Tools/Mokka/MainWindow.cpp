@@ -92,13 +92,17 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuVisual_Configuration->addAction(this->mp_ModelDock->deselectConfigurationAction());
   this->menuVisual_Configuration->addAction(this->mp_ModelDock->clearConfigurationsAction());
   QAction* actionModelDockView = this->mp_ModelDock->toggleViewAction();
-  actionModelDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+#ifdef Q_OS_MAC
+  actionModelDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::ShiftModifier + Qt::Key_M));
+#else
+  actionModelDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_M));
+#endif
   this->menuView->addAction(actionModelDockView);
   this->menuSettings->addMenu(this->multiView->groundOrientationMenu());
   this->menuSettings->addMenu(this->multiView->markerTrajectoryLengthMenu());
   this->menuSettings->addMenu(this->timeEventControler->playbackSpeedMenu());
   QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
-  actionInformationsDockView->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
+  actionInformationsDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I));
   this->menuView->addAction(actionInformationsDockView);
   this->menuView->addAction(this->actionViewMetadata);
   this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
