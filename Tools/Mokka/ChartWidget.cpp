@@ -1242,8 +1242,6 @@ VTKChartWidget::VTKChartWidget(QWidget* parent, Qt::WindowFlags f)
 : QVTKWidget(parent, f)
 {
   this->mp_Charts = 0;
-  // No need to send mouse events to VTK when a mouse button isn't down
-  this->setMouseTracking(false);
 };
 
 void VTKChartWidget::contextMenuEvent(QContextMenuEvent* event)
