@@ -71,9 +71,7 @@ LayoutsTableWidget::LayoutsTableWidget(QWidget* parent)
   header->setResizeMode(0, QHeaderView::Stretch);
   header->setVisible(false);
   
-#ifdef Q_OS_MAC
   connect(this, SIGNAL(cellChanged(int,int)), this, SLOT(updateLayout(int, int)));
-#endif
 };
 
 void LayoutsTableWidget::refresh()
