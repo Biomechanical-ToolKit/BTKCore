@@ -137,6 +137,22 @@ namespace btk
   };
   
   /**
+   * @fn double VTKAxesWidget::GetZoomFactor() const
+   * Returns the zoom factor used by the camera to zoom-in/out on the axes.
+   */
+  
+  /**
+   * Sets the zoom factor used by the camera to zoom-in/out on the axes.
+   */
+  void VTKAxesWidget::SetZoomFactor(double s)
+  {
+    if (this->m_ZoomFactor == s)
+      return;
+    this->m_ZoomFactor = s;
+    this->Modified();
+  };
+  
+  /**
    * Sets the visibility state of the widget.
    */
   void VTKAxesWidget::SetEnabled(int enabling)
@@ -205,6 +221,8 @@ namespace btk
     camera->SetFocalPoint(fp);
     camera->SetViewUp(viewup);
     this->mp_Renderer->ResetCamera();
+    camera->Dolly(this->m_ZoomFactor);
+    this->mp_Renderer->ResetCameraClippingRange();
   };
   
   /**
@@ -228,6 +246,7 @@ namespace btk
     this->mp_ParentRenderer = 0;
     this->mp_WindowInteractor = 0;
     this->mp_StartEventObserverId = 0;
+    this->m_ZoomFactor = 1.0;
   };
   
   /**

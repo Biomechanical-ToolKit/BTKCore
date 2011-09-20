@@ -67,6 +67,9 @@ namespace btk
     BTK_VTK_EXPORT void SetViewport(double minX, double minY, double maxX, double maxY);
     BTK_VTK_EXPORT double* GetViewport();
     
+    double GetZoomFactor() const {return this->m_ZoomFactor;};
+    BTK_VTK_EXPORT void SetZoomFactor(double s);
+    
     BTK_VTK_EXPORT void SetEnabled(int);
     BTK_VTK_EXPORT void ExecuteEvent(vtkObject *o, unsigned long event, void *calldata);
     
@@ -103,6 +106,7 @@ namespace btk
     VTKAxesWidgetObserver* mp_Observer;
     vtkRenderWindowInteractor* mp_WindowInteractor;
     unsigned long mp_StartEventObserverId;
+    double m_ZoomFactor;
   };
 };
 
