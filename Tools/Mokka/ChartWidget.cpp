@@ -759,12 +759,18 @@ void AbstractChartData::generateColor(vtkColorSeries* colorGenerator, double col
   int colorIndex = numPlots;
   vtkColor3ub c = colorGenerator->GetColorRepeating(colorIndex);
   int num = 0, inc = 0, inc2 = 0;
-  while (num < numPlots)
+  while ((num < numPlots) && (inc2 < (int)this->mp_Charts->size()))
   {
     unsigned char rgb[3];
     this->chart(inc2)->GetPlot(inc)->GetPen()->GetColor(rgb);
     if ((c.Red() == rgb[0]) && (c.Green() == rgb[1]) && (c.Blue() == rgb[2]))
     {
+      // Look if the color generator is wrapping around the range of color.
+      // If yes, then stop to look for a new, non-used color.
+      // Can create an infinite loop.
+      if (colorIndex > colorGenerator->GetNumberOfColors())
+        break;
+        
       c = colorGenerator->GetColorRepeating(++colorIndex);
       num = 0; inc = 0; inc2 = 0;
     }
