@@ -27,6 +27,7 @@ SET(Mokka_CPP
   FileInfoDockWidget.cpp
   ImportAssistantDialog.cpp
   LoggerWidget.cpp
+  LoggerVTKOutput.cpp
   MainWindow.cpp
   Metadata.cpp
   MetadataView.cpp

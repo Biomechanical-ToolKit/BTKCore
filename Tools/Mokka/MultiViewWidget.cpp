@@ -38,6 +38,7 @@
 #include "Model.h"
 #include "CompositeView.h"
 #include "ChartWidget.h"
+#include "LoggerVTKOutput.h"
 #include "Viz3DWidget.h"
 
 #include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
@@ -350,6 +351,11 @@ void MultiViewWidget::initialize()
   // Initialize the charts
   chart->setPointFrameArray(this->mp_PointChartFrames);
   chart->setAnalogFrameArray(this->mp_AnalogChartFrames);
+  
+  // Redirect the VTK message to the Logger
+  vtkOutputWindow* w = LoggerVTKOutput::New();
+  vtkOutputWindow::SetInstance(w);
+  w->Delete();
 };
 
 void MultiViewWidget::setAcquisition(Acquisition* acq)
