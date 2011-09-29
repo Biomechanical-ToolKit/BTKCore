@@ -8,6 +8,6 @@
  * @par Detailed description:
  * This function only works if the acquisition doesn't contains any analog channel. In the other case, an error will be thrown. The ratio cannot be lower than 1.
  * 
- * @sa btkSetAnalogResolution, btkSetFirstFrame, btkSetFrameNumber, btkSetFrequency, btkSetMaxInterpolationGap, btkSetPointNumber
+ * @sa btkSetAnalogNumber, btkSetAnalogResolution, btkSetFirstFrame, btkSetFrameNumber, btkSetFrequency, btkSetMaxInterpolationGap, btkSetPointNumber
  * @ingroup BTKMatlabAcquisitionModifier
  */
