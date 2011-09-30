@@ -884,7 +884,7 @@ void MainWindow::importAssistant()
   {
     if (this->mp_ImportAssistant->newAcquisitionRadioButton->isChecked())
       this->mp_Acquisition->clear();
-    this->importAcquisitions(this->mp_ImportAssistant->filenames());
+    this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked());
   }
 };
 
@@ -984,7 +984,7 @@ void MainWindow::importAcquisition(const QString& filter)
     this->importAcquisitions(QStringList(filename));
 };
 
-void MainWindow::importAcquisitions(const QStringList& filenames)
+void MainWindow::importAcquisitions(const QStringList& filenames, bool allFramesKept)
 {
   LOG_INFO(tr("Importing acquisition(s)."));
   if (!filenames.isEmpty())
@@ -993,7 +993,7 @@ void MainWindow::importAcquisitions(const QStringList& filenames)
     ProgressWidget pw(this);
     pw.show();
     pw.setProgressValue(10);
-    bool noImportError = this->mp_Acquisition->importFrom(filenames);
+    bool noImportError = this->mp_Acquisition->importFrom(filenames, allFramesKept);
     this->loadAcquisition(noImportError, &pw);
     this->setWindowTitle(title);
     pw.hide();

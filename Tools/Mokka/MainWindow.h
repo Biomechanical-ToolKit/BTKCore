@@ -171,7 +171,7 @@ private:
   void saveFile(const QString& filename);
   void exportAcquisition(const QString& filter);
   void importAcquisition(const QString& filter);
-  void importAcquisitions(const QStringList& filenames);
+  void importAcquisitions(const QStringList& filenames, bool allFramesKept = true);
   void reset();
   void setAcquisitionProperties(QMap<int, QVariant>& properties);
   void readSettings(); 

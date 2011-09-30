@@ -118,7 +118,7 @@ bool Acquisition::exportTo(const QString& filename, const QMap<int, QVariant>& p
   return this->write(filename, properties, lb, rb);
 };
 
-bool Acquisition::importFrom(const QStringList& filenames)
+bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
 {
   // Try to read the given file
   QList<btk::AcquisitionFileReader::Pointer> readers;
@@ -170,6 +170,7 @@ bool Acquisition::importFrom(const QStringList& filenames)
   // Launch the merging/concatenation
   int shift = !this->mp_BTKAcquisition ? 0 : 1;
   btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+  merger->SetFirstFrameRule(allFramesKept ? btk::MergeAcquisitionFilter::KeepAllFrames : btk::MergeAcquisitionFilter::KeepFromHighestFirstFrame);
   merger->SetInput(0, this->mp_BTKAcquisition);
   for (int i = 0 ; i < readers.count() ; ++i)
     merger->SetInput(i+shift, readers[i]->GetOutput());

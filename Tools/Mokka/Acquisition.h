@@ -99,7 +99,7 @@ public:
   bool load(const QString& filename);
   bool save(const QString& filename, const QMap<int, QVariant>& properties);
   bool exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb);
-  bool importFrom(const QStringList& filenames);
+  bool importFrom(const QStringList& filenames, bool allFramesKept = true);
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
