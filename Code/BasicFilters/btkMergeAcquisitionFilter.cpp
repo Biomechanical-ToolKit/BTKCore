@@ -462,7 +462,7 @@ namespace btk
     
     if ((this->m_FirstFrameRule == KeepFromHighestFirstFrame) && (finalFirstFrame != output->GetFirstFrame()))
     {
-      output->ResizeFrameNumber(output->GetPointFrameNumber() - finalFirstFrame - output->GetFirstFrame() + 1);
+      output->ResizeFrameNumberFromEnd(output->GetPointFrameNumber() - finalFirstFrame - output->GetFirstFrame() + 1);
       output->SetFirstFrame(finalFirstFrame);
     }
   };
