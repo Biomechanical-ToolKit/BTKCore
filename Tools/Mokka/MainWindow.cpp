@@ -298,6 +298,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
   connect(this->timeEventControler, SIGNAL(playbackStarted()), this->multiView, SLOT(forceRubberBandDrawingOff()));
   connect(this->timeEventControler, SIGNAL(playbackStopped()), this->multiView, SLOT(forceRubberBandDrawingOn()));
+  connect(this->timeEventControler, SIGNAL(acquisitionReframed(int)), this, SLOT(reframeAcquisition(int)));
   
   // Functors to link the TimeEventWidget object with the VTK charts.
   // Give an easy way to update the displayed current frame and bounds in the charts.
@@ -1311,6 +1312,11 @@ void MainWindow::setRegionOfInterest(int lf,int ff)
 void MainWindow::insertEvent(Event* e)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvent(this->mp_Acquisition, e)));
+};
+
+void MainWindow::reframeAcquisition(int ff)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new ReframeAcquisition(this->mp_Acquisition, ff)));
 };
 
 void MainWindow::setPreferenceUseDefaultConfiguration(bool isUsed)

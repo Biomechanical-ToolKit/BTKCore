@@ -111,6 +111,7 @@ public:
   btk::WrenchCollection::Pointer btkGroundReactionWrenches() const {return static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED])->GetOutput();};
   
   int firstFrame() const {return this->m_FirstFrame;};
+  void setFirstFrame(int ff);
   int lastFrame() const {return this->m_LastFrame;};
   void regionOfInterest(int& lb, int& rb) const {lb = this->mp_ROI[0]; rb = this->mp_ROI[1];};
   void setRegionOfInterest(int lb, int rb);
@@ -184,6 +185,7 @@ public:
   
 signals:
   void informationsChanged(const QVector<QString>& infos);
+  void firstFrameChanged(int ff);
   void regionOfInterestChanged(int lb, int rb);
   void pointLabelChanged(int id, const QString& label);
   void pointsDescriptionChanged(const QVector<int>& ids, const QVector<QString>& descs);

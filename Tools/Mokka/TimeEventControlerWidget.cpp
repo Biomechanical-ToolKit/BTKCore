@@ -86,8 +86,10 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeedFullFrames);
   displayOptionsMenu->addMenu(this->mp_PlaybackSpeedMenu);
   displayOptionsMenu->addSeparator();
-  displayOptionsMenu->addAction(actionZoomUnzoomRegionOfInterest);
-  displayOptionsMenu->addAction(actionCropRegionOfInterest);
+  displayOptionsMenu->addAction(this->actionReframeFromOne);
+  displayOptionsMenu->addSeparator();
+  displayOptionsMenu->addAction(this->actionZoomUnzoomRegionOfInterest);
+  displayOptionsMenu->addAction(this->actionCropRegionOfInterest);
   this->acquisitionOptionsButtonMenu->setMenu(displayOptionsMenu);
   // Event options menu
   QMenu* eventOptionsMenu = new QMenu(this);
@@ -205,6 +207,7 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   connect(this->actionInsertGeneralFootStrike, SIGNAL(triggered()), this, SLOT(insertGeneralFootStrike()));
   connect(this->actionInsertGeneralFootOff, SIGNAL(triggered()), this, SLOT(insertGeneralFootOff()));
   connect(this->actionInsertGeneralOther, SIGNAL(triggered()), this, SLOT(insertGeneralOther()));
+  connect(this->actionReframeFromOne, SIGNAL(triggered()), this, SLOT(emitAcquisitionReframedFromOne()));
 };
 
 TimeEventControlerWidget::~TimeEventControlerWidget()
@@ -224,6 +227,7 @@ void TimeEventControlerWidget::setAcquisition(Acquisition* acq)
   if (this->mp_Acquisition)
     disconnect(this->mp_Acquisition, 0, this, 0);
   this->mp_Acquisition = acq;
+  connect(this->mp_Acquisition, SIGNAL(firstFrameChanged(int)), this, SLOT(reframeAcquisition(int)));
   connect(this->mp_Acquisition, SIGNAL(regionOfInterestChanged(int, int)), this, SLOT(setRegionOfInterest(int, int)));
   connect(this->mp_Acquisition, SIGNAL(eventFrameChanged(int,int)), this, SLOT(setEventFrame(int,int)));
   connect(this->mp_Acquisition, SIGNAL(eventsModified(QList<int>, QList<Event*>)), this, SLOT(setEvents(QList<int>, QList<Event*>)));
@@ -260,7 +264,7 @@ bool TimeEventControlerWidget::eventItemData(int index, int& typeId, int& frame,
   if (evt == 0)
     return false;
   typeId = evt->iconId;
-  frame = this->timeEventBar->m_EventItems[index].frame;
+  frame = this->timeEventBar->m_EventItems[index].ptr->frame;
   this->timeEventBar->m_EventItems[index].color.getRgbF(&rgb[0], &rgb[1], &rgb[2]);
   return true;
 };
@@ -334,6 +338,21 @@ void TimeEventControlerWidget::previousFrame()
   this->setFrame(this->timeEventBar->m_SliderPos - 1);
 };
 
+void TimeEventControlerWidget::reframeAcquisition(int ff)
+{
+  int diff = this->timeEventBar->m_FirstFrame - ff;
+  this->timeEventBar->m_FirstFrame = this->mp_Acquisition->firstFrame();
+  this->timeEventBar->m_LastFrame = this->mp_Acquisition->lastFrame();
+  this->timeEventBar->m_ROIFirstFrame -= diff;
+  this->timeEventBar->m_ROILastFrame -= diff;
+  this->timeEventBar->m_SliderPos -= diff;
+  this->timeEventBar->m_LeftBoundPos -= diff;
+  this->timeEventBar->m_RightBoundPos -= diff;
+  this->timeEventBar->updateInternals();
+  this->timeEventBar->update();
+  this->lcdNumber->display(this->timeEventBar->m_SliderPos);
+};
+
 void TimeEventControlerWidget::toggleZoomRegionOfInterest()
 {
   // Zoom mode
@@ -369,7 +388,7 @@ void TimeEventControlerWidget::previousEvent()
   int prevEventFrame = this->timeEventBar->m_ROIFirstFrame - 1;
   for (int i = 0 ; i < this->timeEventBar->m_EventItems.count() ; ++i)
   {
-    int f = this->timeEventBar->m_EventItems[i].frame;
+    int f = this->timeEventBar->m_EventItems[i].ptr->frame;
     if ((f > lastEventFrame) && (f < this->timeEventBar->m_RightBoundPos))
       lastEventFrame = f;
     if ((f > prevEventFrame) && (f < this->timeEventBar->m_SliderPos))
@@ -388,7 +407,7 @@ void TimeEventControlerWidget::nextEvent()
   int nextEventFrame = this->timeEventBar->m_ROILastFrame + 1;
   for (int i = 0 ; i < this->timeEventBar->m_EventItems.count() ; ++i)
   {
-    int f = this->timeEventBar->m_EventItems[i].frame;
+    int f = this->timeEventBar->m_EventItems[i].ptr->frame;
     if ((f  < firstEventFrame) && (f > this->timeEventBar->m_LeftBoundPos))
       firstEventFrame = f;
     if ((f < nextEventFrame) && (f > this->timeEventBar->m_SliderPos))
@@ -638,6 +657,11 @@ void TimeEventControlerWidget::releasePlayButton()
     this->playButton->setIcon(*this->mp_PlayIcon);
 };
 
+void TimeEventControlerWidget::emitAcquisitionReframedFromOne()
+{
+  emit acquisitionReframed(1);
+};
+
 void TimeEventControlerWidget::pressPrevEventButton()
 {
   this->prevEventButton->setIcon(*this->mp_PrevEventActiveIcon);
@@ -825,14 +849,12 @@ void TimeEventControlerWidget::checkEventFrameModification(int id, int frame)
 
 void TimeEventControlerWidget::setEventFrame(int id, int frame)
 {
-  const Event* ev = this->mp_Acquisition->eventAt(id);
+  Q_UNUSED(frame);
   for (int i = 0 ; i < this->timeEventBar->m_EventItems.count() ; ++i)
   {
     if (this->timeEventBar->m_EventItems[i].id == id)
     {
-      this->timeEventBar->m_EventItems[i].frame = frame;
-      this->timeEventBar->setEventToolTip(this->timeEventBar->m_EventItems[i], ev);
-      this->timeEventBar->updateEventPos(i);
+      this->timeEventBar->updateEventGeometry(i);
       break;
     }
   }

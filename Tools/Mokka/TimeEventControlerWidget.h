@@ -75,6 +75,7 @@ public slots:
   void nextStep();
   void nextFrame();
   void previousFrame();
+  void reframeAcquisition(int ff);
   void toggleZoomRegionOfInterest();
   void cropRegionOfInterest();
   void setRegionOfInterest(int lb, int rb);
@@ -106,6 +107,7 @@ signals:
   void playbackStarted();
   void playbackStopped();
   void currentFrameChanged(int frame);
+  void acquisitionReframed(int firstFrame);
   void regionOfInterestChanged(int ff, int lf);
   void eventFrameModified(int id, int frame);
   void eventsModified(const QList<int>& ids, const QList<Event*>& events);
@@ -115,6 +117,7 @@ signals:
 private slots:
   void pressPlayButton();
   void releasePlayButton();
+  void emitAcquisitionReframedFromOne();
   void pressPrevEventButton();
   void releasePrevEventButton();
   void pressNextEventButton();

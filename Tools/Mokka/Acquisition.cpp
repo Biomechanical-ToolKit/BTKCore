@@ -198,6 +198,18 @@ void Acquisition::clear()
   this->mp_BTKAcquisition = btk::Acquisition::Pointer(); // NULL
 }
 
+void Acquisition::setFirstFrame(int ff)
+{
+  int diff = this->m_FirstFrame - ff;
+  this->m_FirstFrame -= diff;
+  this->m_LastFrame -= diff;
+  this->mp_ROI[0] -= diff;
+  this->mp_ROI[1] -= diff;
+  for (QMap<int,Event*>::iterator it = this->m_Events.begin() ; it != this->m_Events.end() ; ++it)
+    (*it)->frame -= diff;
+  emit firstFrameChanged(ff);
+};
+
 void Acquisition::setRegionOfInterest(int lb, int rb)
 {
   this->mp_ROI[0] = lb;

@@ -136,6 +136,7 @@ public slots:
   void setEvents(QList<int> ids, QList<Event*> events);
   void removeEvents(const QList<int>& ids);
   void insertEvent(Event* e);
+  void reframeAcquisition(int ff);
   // Preferences
   void setPreferenceUseDefaultConfiguration(bool isUsed);
   void setPreferenceDefaultConfigurationPath(const QString& path);
