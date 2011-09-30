@@ -1483,6 +1483,7 @@ void ModelDockWidget::removeSelectedItems()
 {
   QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
   QList<int> SegmentIds, PointIds, AnalogIds;
+  bool platformWarningDisplayed = false;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
     QVariant sV = (*it)->data(0, SegmentId);
@@ -1494,6 +1495,11 @@ void ModelDockWidget::removeSelectedItems()
       PointIds.push_back(pV.toInt());
     else if (aV.isValid())
       AnalogIds.push_back(aV.toInt());
+    else if ((*it)->data(0, ForcePlateId).isValid() && !platformWarningDisplayed)
+    {
+      LOG_WARNING("You cannot delete force platform component, nor force platform itself. These data are computed from the analog channels and some metadata.");
+      platformWarningDisplayed = true;
+    }
   }
   if (!SegmentIds.isEmpty())
     emit segmentsRemoved(SegmentIds);
