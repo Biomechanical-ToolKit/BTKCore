@@ -57,25 +57,25 @@ namespace btk
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
-        if (f != 0xFFFF)
+        if ((f != 0xFFFF) && (f != 0x0000))
           output->AppendEvent(Event::New("Foot Off", f, "Left", Event::Unknown, "", "", 2));
       }
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
-        if (f != 0xFFFF)
+        if ((f != 0xFFFF) && (f != 0x0000))
           output->AppendEvent(Event::New("Foot Off", f, "Right", Event::Unknown, "", "", 2));
       }
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
-        if (f != 0xFFFF)
+        if ((f != 0xFFFF) && (f != 0x0000))
           output->AppendEvent(Event::New("Foot Strike", f, "Left", Event::Unknown, "", "", 1));
       }
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
-        if (f != 0xFFFF)
+        if ((f != 0xFFFF) && (f != 0x0000))
           output->AppendEvent(Event::New("Foot Strike", f, "Right", Event::Unknown, "", "", 1));
       }
       bifs->SeekRead(136, BinaryFileStream::Current); 
@@ -154,7 +154,8 @@ namespace btk
       // Remove 0x00
       label = label.erase(label.find_last_not_of(static_cast<char>(0x00)) + 1);
       label = label.erase(0, label.find_first_not_of(static_cast<char>(0x00)));
-      (*it)->SetLabel(label);
+      if (!label.empty())
+        (*it)->SetLabel(label);
     }
   };
 };
