@@ -868,6 +868,7 @@ void MainWindow::closeFile()
   {
     LOG_INFO(tr("Closing acquisition."));
     this->reset();
+    this->mp_ModelDock->setVisible(false);
     this->mp_FileInfoDock->reset();
     this->mp_Acquisition->clear();
   }
@@ -1106,7 +1107,6 @@ void MainWindow::reset()
   this->timeEventControler->setEnabled(false);
   // Model dock
   this->mp_ModelDock->reset();
-  this->mp_ModelDock->setVisible(false);
   // Metadata
   this->mp_MetadataDlg->reset();
   // Multivew
