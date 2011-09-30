@@ -73,7 +73,17 @@ namespace btk
    *     - Only metadata defined by the user are inserted (i.e. POINT, ANALOG, EVENTS, etc. are not inserted as they are only used in a C3D file.).
    *     - If metadata are equivalent or equal, then they are merged, else the metadata is appended with a suffix (i.e. from STATIC_CALIBRATION:USED to STATIC_CALIBRATION:USED_2)
    *
+   * Moreover, you can set a rule to keep only the data from the higher or the lower first frame. Use the method SetFirstFrameRule() with the values KeepAllFrames or KeepFromHighestFirstFrame.
+   *
    * @ingroup BTKBasicFilters
+   */
+  /**
+   * @var MergeAcquisitionFilter::KeepAllFrames
+   *
+   */
+  /**
+   * @var MergeAcquisitionFilter::KeepFromHighestFirstFrame
+   *
    */
   
   /**
@@ -90,6 +100,30 @@ namespace btk
    * @fn static Pointer MergeAcquisitionFilter::New();
    * Creates a smart pointer associated with a MergeAcquisitionFilter object.
    */
+   
+  /**
+   * @fn int MergeAcquisitionFilter::GetFirstFrameRule() const
+   * Returns the rule for the first frame kept.
+   *
+   * Two rules are available:
+   *  - KeepAllFrames: Use the lower first frame;
+   *  - KeepFromHighestFirstFrame: Use the higher first frame.
+   */
+  
+  /**
+   * Sets the rule for the first frame kept.
+   *
+   * Two rules are available:
+   *  - KeepAllFrames: Use the lower first frame;
+   *  - KeepFromHighestFirstFrame: Use the higher first frame.
+   */ 
+  void MergeAcquisitionFilter::SetFirstFrameRule(int rule)
+  {
+    if (this->m_FirstFrameRule == rule)
+      return;
+    this->m_FirstFrameRule = rule;
+    this->Modified();
+  };
 
   /**
    * @fn Acquisition::Pointer MergeAcquisitionFilter::GetInput(int idx)
@@ -114,7 +148,7 @@ namespace btk
   {
     this->SetInputNumber(2);
     this->SetOutputNumber(1);
-    this->m_FirstInput = true;
+    this->m_FirstFrameRule = KeepAllFrames;
   };
   
   /**
@@ -137,292 +171,299 @@ namespace btk
   {
     Acquisition::Pointer output = this->GetOutput();
     output->Reset();
+    bool firstInput = true;
+    int finalFirstFrame = 1;
     
-    for (int i = 0 ; i < this->GetInputNumber() ; ++i)
-      this->MergeAcquisition(i, output);
-  };
-  
-  void MergeAcquisitionFilter::MergeAcquisition(int idx, Acquisition::Pointer out)
-  {
-    Acquisition::Pointer in = this->GetInput(idx);
-    
-    if (!in)
-      return;
-    
-    // Check the point's frequency
-    if ((in->GetPointFrequency() != 0) && (out->GetPointFrequency() != 0) && !in->IsEmptyPoint() && !out->IsEmptyPoint() && (in->GetPointFrequency() != out->GetPointFrequency()))
+    for (int idx = 0 ; idx < this->GetInputNumber() ; ++idx)
     {
-      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Point's frame rates are not equal.");
-      return;
-    }
-    // Check the analog's frequency
-    if ((in->GetAnalogFrequency() != 0) && (out->GetAnalogFrequency() != 0) && !in->IsEmptyAnalog() && !out->IsEmptyAnalog() && (in->GetAnalogFrequency() != out->GetAnalogFrequency()))
-    {
-      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Analog's frame rates are not equal.");
-      return;
-    }
-    // Check the analog resolution
-    if ((in->GetAnalogResolution() != 0) && (out->GetAnalogResolution() != 0) && !in->IsEmptyAnalog() && !out->IsEmptyAnalog() && (in->GetAnalogResolution() != out->GetAnalogResolution()))
-    {
-      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Analog resolutions are not equal.");
-      return;
-    }
-    // Check the number of analog samples per point frame
-    if (!in->IsEmptyPoint() && !in->IsEmptyAnalog() && !out->IsEmptyAnalog() && (in->GetAnalogFrameNumber() != 0) && (out->GetAnalogFrameNumber() != 0) && (in->GetNumberAnalogSamplePerFrame() != out->GetNumberAnalogSamplePerFrame()))
-    {
-      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
-      return;
-    }
-    /*
-    if ((in->GetAnalogFrameNumber() != 0) && (out->GetAnalogFrameNumber() != 0) && (in->GetAnalogFrameNumber() != out->GetAnalogFrameNumber()))
-    {
-      btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
-      return;
-    }
-    */
-    
-    if (this->m_FirstInput)
-    {
-      this->m_FirstInput = false;
-      out->SetEvents(in->GetEvents()->Clone());
-      out->SetPoints(in->GetPoints()->Clone());
-      out->SetAnalogs(in->GetAnalogs()->Clone());
-      out->SetMetaData(in->GetMetaData()->Clone());
-      out->SetFirstFrame(in->GetFirstFrame());
-      out->SetPointFrequency(in->GetPointFrequency());
-      if ((in->GetPointNumber() != 0) || (in->GetPointFrameNumber() != 0) ||  (in->GetAnalogNumber() != 0))
-        out->Resize(in->GetPointNumber(), in->GetPointFrameNumber(), in->GetAnalogNumber(), in->GetNumberAnalogSamplePerFrame());
-      out->SetAnalogResolution(in->GetAnalogResolution());
-      out->SetPointUnit(Point::Marker, in->GetPointUnit(Point::Marker));
-      out->SetPointUnit(Point::Angle, in->GetPointUnit(Point::Angle));
-      out->SetPointUnit(Point::Force, in->GetPointUnit(Point::Force));
-      out->SetPointUnit(Point::Moment, in->GetPointUnit(Point::Moment));
-      out->SetPointUnit(Point::Power, in->GetPointUnit(Point::Power));
-      out->SetPointUnit(Point::Scalar, in->GetPointUnit(Point::Scalar));
-    }
-    else
-    {
-      // Final check
-      btk::Acquisition::Pointer input = in->Clone();
-      // Check units
-      if ((out->GetPointUnit(Point::Scalar).compare(input->GetPointUnit(Point::Scalar)) != 0)
-          || (out->GetPointUnit(Point::Angle).compare(input->GetPointUnit(Point::Angle)) != 0)
-          || (out->GetPointUnit(Point::Force).compare(input->GetPointUnit(Point::Force)) != 0)
-          || (out->GetPointUnit(Point::Moment).compare(input->GetPointUnit(Point::Moment)) != 0)
-          || (out->GetPointUnit(Point::Power).compare(input->GetPointUnit(Point::Power)) != 0)
-          || (out->GetPointUnit(Point::Scalar).compare(input->GetPointUnit(Point::Scalar)) != 0))
+      Acquisition::Pointer in = this->GetInput(idx);
+      if (!in)
+        return;
+      
+      // Check the point's frequency
+      if ((in->GetPointFrequency() != 0) && (output->GetPointFrequency() != 0) && !in->IsEmptyPoint() && !output->IsEmptyPoint() && (in->GetPointFrequency() != output->GetPointFrequency()))
       {
-        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Units don't correspond.");
+        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Point's frame rates are not equal.");
         return;
       }
-      // Global orientation
-      MetaData::ConstIterator pointItIn, pointItOut;
-      pointItIn = in->GetMetaData()->FindChild("POINT");
-      pointItOut = out->GetMetaData()->FindChild("POINT");
-      if ((pointItIn != in->EndMetaData()) && (pointItOut != out->EndMetaData()))
+      // Check the analog's frequency
+      if ((in->GetAnalogFrequency() != 0) && (output->GetAnalogFrequency() != 0) && !in->IsEmptyAnalog() && !output->IsEmptyAnalog() && (in->GetAnalogFrequency() != output->GetAnalogFrequency()))
       {
-        MetaDataInfo::Pointer xScreenIn = (*pointItIn)->ExtractChildInfo("X_SCREEN", MetaDataInfo::Char, 1);
-        MetaDataInfo::Pointer yScreenIn = (*pointItIn)->ExtractChildInfo("Y_SCREEN", MetaDataInfo::Char, 1);
-        MetaDataInfo::Pointer xScreenOut = (*pointItOut)->ExtractChildInfo("X_SCREEN", MetaDataInfo::Char, 1);
-        MetaDataInfo::Pointer yScreenOut = (*pointItOut)->ExtractChildInfo("Y_SCREEN", MetaDataInfo::Char, 1);
-        if (xScreenIn && yScreenIn && xScreenOut && yScreenOut)
-        {
-          if ((xScreenIn->ToString(0).compare(xScreenOut->ToString(0)) != 0)
-              || (yScreenIn->ToString(0).compare(yScreenOut->ToString(0)) != 0))
-          {
-            btkErrorMacro("Input #" + ToString(idx) + " is not merged: Global orientations don't correspond.");
-            return;
-          }
-        }
+        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Analog's frame rates are not equal.");
+        return;
       }
+      // Check the analog resolution
+      if ((in->GetAnalogResolution() != 0) && (output->GetAnalogResolution() != 0) && !in->IsEmptyAnalog() && !output->IsEmptyAnalog() && (in->GetAnalogResolution() != output->GetAnalogResolution()))
+      {
+        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Analog resolutions are not equal.");
+        return;
+      }
+      // Check the number of analog samples per point frame
+      if (!in->IsEmptyPoint() && !in->IsEmptyAnalog() && !output->IsEmptyAnalog() && (in->GetAnalogFrameNumber() != 0) && (output->GetAnalogFrameNumber() != 0) && (in->GetNumberAnalogSamplePerFrame() != output->GetNumberAnalogSamplePerFrame()))
+      {
+        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
+        return;
+      }
+      /*
+      if ((in->GetAnalogFrameNumber() != 0) && (output->GetAnalogFrameNumber() != 0) && (in->GetAnalogFrameNumber() != output->GetAnalogFrameNumber()))
+      {
+        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
+        return;
+      }
+      */
       
-      // Transform acquisition (input or output) to priorize the point data.
-      if ((out->GetPointNumber() != 0) && (input->GetPointNumber() == 0) && (input->GetAnalogNumber() != 0) && (input->GetAnalogFrameNumber() != 0))
+      if (firstInput)
       {
-        int r = 0;
-        if ((out->GetPointFrequency() == 0) || (input->GetPointFrequency() == 0))
-        {
-          r = input->GetAnalogFrameNumber() /  out->GetPointFrameNumber();
-          btkErrorMacro("At least one frequency is not set in the output or the input #" + ToString(idx) + " and may corrupt the final output.");
-        }
-        else
-          r = static_cast<int>(input->GetPointFrequency() / out->GetPointFrequency());
-        if (r > 1)
-        {
-          input->ResizeFrameNumberFromEnd(input->GetPointFrameNumber() + (input->GetFirstFrame() - 1) % r);
-          input->Resize(0, out->GetPointFrameNumber() - input->GetFirstFrame() / r, input->GetAnalogNumber(), r);
-          input->SetFirstFrame(input->GetFirstFrame() / r + 1);
-          input->SetPointFrequency(input->GetPointFrequency() / r);
-          out->Resize(out->GetPointNumber(), out->GetPointFrameNumber(), out->GetAnalogNumber(), r);
-        }
-      }
-      else if ((input->GetPointNumber() != 0) && (out->GetPointNumber() == 0) && (out->GetAnalogNumber() != 0) && (out->GetAnalogFrameNumber() != 0))
-      {
-        int r = 0;
-        if ((out->GetPointFrequency() == 0) || (input->GetPointFrequency() == 0))
-        {
-          r = out->GetAnalogFrameNumber() /  input->GetPointFrameNumber();
-          btkErrorMacro("At least one frequency is not set in the output or the input #" + ToString(idx) + " and may corrupt the final output.");
-        }
-        else
-          r = static_cast<int>(out->GetPointFrequency() / input->GetPointFrequency());
-        if (r > 1)
-        {
-          out->ResizeFrameNumberFromEnd(out->GetPointFrameNumber() + (out->GetFirstFrame() - 1) % r);
-          out->Resize(0, input->GetPointFrameNumber() - out->GetFirstFrame() / r, out->GetAnalogNumber(), r);
-          out->SetFirstFrame(out->GetFirstFrame() / r + 1 );
-          out->SetPointFrequency(out->GetPointFrequency() / r);
-          input->Resize(input->GetPointNumber(), input->GetPointFrameNumber(), input->GetAnalogNumber(), r);
-        }
-      }
-      
-      // Frequency
-      if (out->GetPointFrequency() == 0.0)
-        out->SetPointFrequency(input->GetPointFrequency());
-      // Analog resolution
-      if (out->IsEmptyAnalog())
-        out->SetAnalogResolution(input->GetAnalogResolution());
-      
-      // Merge or concat?
-      bool mergeData = false;
-      // First frame
-      int diffFF = out->GetFirstFrame() - input->GetFirstFrame();
-      if (diffFF < 0)
-      {
-        if (abs(diffFF) == out->GetLastFrame())
-          mergeData = true;
-        input->ResizeFrameNumberFromEnd(input->GetPointFrameNumber() - diffFF);
-        if (input->GetPointFrameNumber() > out->GetPointFrameNumber())
-          out->ResizeFrameNumber(input->GetPointFrameNumber());
-        else
-          input->ResizeFrameNumber(out->GetPointFrameNumber());
-      }
-      else if (diffFF > 0)
-      {
-        if (diffFF == input->GetLastFrame())
-          mergeData = true;
-        out->ResizeFrameNumberFromEnd(out->GetPointFrameNumber() + diffFF);
-        if (out->GetPointFrameNumber() > input->GetPointFrameNumber())
-          input->ResizeFrameNumber(out->GetPointFrameNumber());
-        else
-          out->ResizeFrameNumber(input->GetPointFrameNumber());
+        firstInput = false;
+        output->SetEvents(in->GetEvents()->Clone());
+        output->SetPoints(in->GetPoints()->Clone());
+        output->SetAnalogs(in->GetAnalogs()->Clone());
+        output->SetMetaData(in->GetMetaData()->Clone());
+        output->SetFirstFrame(in->GetFirstFrame());
+        output->SetPointFrequency(in->GetPointFrequency());
+        if ((in->GetPointNumber() != 0) || (in->GetPointFrameNumber() != 0) ||  (in->GetAnalogNumber() != 0))
+          output->Resize(in->GetPointNumber(), in->GetPointFrameNumber(), in->GetAnalogNumber(), in->GetNumberAnalogSamplePerFrame());
+        output->SetAnalogResolution(in->GetAnalogResolution());
+        output->SetPointUnit(Point::Marker, in->GetPointUnit(Point::Marker));
+        output->SetPointUnit(Point::Angle, in->GetPointUnit(Point::Angle));
+        output->SetPointUnit(Point::Force, in->GetPointUnit(Point::Force));
+        output->SetPointUnit(Point::Moment, in->GetPointUnit(Point::Moment));
+        output->SetPointUnit(Point::Power, in->GetPointUnit(Point::Power));
+        output->SetPointUnit(Point::Scalar, in->GetPointUnit(Point::Scalar));
+        finalFirstFrame = in->GetFirstFrame();
       }
       else
       {
-        int diffFN = out->GetPointFrameNumber() - input->GetPointFrameNumber();
-        if ((diffFN > 0) && !out->IsEmptyPoint())
-          input->ResizeFrameNumber(out->GetPointFrameNumber());
-        else if ((diffFN < 0) && !input->IsEmptyPoint())
-          out->ResizeFrameNumber(input->GetPointFrameNumber());
-      }
+        finalFirstFrame = std::max(finalFirstFrame, in->GetFirstFrame());
       
-      // To be sure to merge the data, it is necessary to check if the label of each point and analog channel 
-      // are exactly the same.
-      if (mergeData)
-      {
-        for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+        // Final check
+        btk::Acquisition::Pointer input = in->Clone();
+        // Check units
+        if ((output->GetPointUnit(Point::Scalar).compare(input->GetPointUnit(Point::Scalar)) != 0)
+            || (output->GetPointUnit(Point::Angle).compare(input->GetPointUnit(Point::Angle)) != 0)
+            || (output->GetPointUnit(Point::Force).compare(input->GetPointUnit(Point::Force)) != 0)
+            || (output->GetPointUnit(Point::Moment).compare(input->GetPointUnit(Point::Moment)) != 0)
+            || (output->GetPointUnit(Point::Power).compare(input->GetPointUnit(Point::Power)) != 0)
+            || (output->GetPointUnit(Point::Scalar).compare(input->GetPointUnit(Point::Scalar)) != 0))
         {
-          if (out->FindPoint((*it)->GetLabel()) == out->EndPoint())
+          btkErrorMacro("Input #" + ToString(idx) + " is not merged: Units don't correspond.");
+          return;
+        }
+        // Global orientation
+        MetaData::ConstIterator pointItIn, pointItOut;
+        pointItIn = in->GetMetaData()->FindChild("POINT");
+        pointItOut = output->GetMetaData()->FindChild("POINT");
+        if ((pointItIn != in->EndMetaData()) && (pointItOut != output->EndMetaData()))
+        {
+          MetaDataInfo::Pointer xScreenIn = (*pointItIn)->ExtractChildInfo("X_SCREEN", MetaDataInfo::Char, 1);
+          MetaDataInfo::Pointer yScreenIn = (*pointItIn)->ExtractChildInfo("Y_SCREEN", MetaDataInfo::Char, 1);
+          MetaDataInfo::Pointer xScreenOut = (*pointItOut)->ExtractChildInfo("X_SCREEN", MetaDataInfo::Char, 1);
+          MetaDataInfo::Pointer yScreenOut = (*pointItOut)->ExtractChildInfo("Y_SCREEN", MetaDataInfo::Char, 1);
+          if (xScreenIn && yScreenIn && xScreenOut && yScreenOut)
           {
-            mergeData = false;
-            break;
+            if ((xScreenIn->ToString(0).compare(xScreenOut->ToString(0)) != 0)
+                || (yScreenIn->ToString(0).compare(yScreenOut->ToString(0)) != 0))
+            {
+              btkErrorMacro("Input #" + ToString(idx) + " is not merged: Global orientations don't correspond.");
+              return;
+            }
           }
         }
-      }
-      if (mergeData)
-      {
-        for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+        
+        // Transform acquisition (input or output) to priorize the point data.
+        if ((output->GetPointNumber() != 0) && (input->GetPointNumber() == 0) && (input->GetAnalogNumber() != 0) && (input->GetAnalogFrameNumber() != 0))
         {
-          if (out->FindAnalog((*it)->GetLabel()) == out->EndAnalog())
+          int r = 0;
+          if ((output->GetPointFrequency() == 0) || (input->GetPointFrequency() == 0))
           {
-            mergeData = false;
-            break;
+            r = input->GetAnalogFrameNumber() /  output->GetPointFrameNumber();
+            btkErrorMacro("At least one frequency is not set in the output or the input #" + ToString(idx) + " and may corrupt the final output.");
+          }
+          else
+            r = static_cast<int>(input->GetPointFrequency() / output->GetPointFrequency());
+          if (r > 1)
+          {
+            input->ResizeFrameNumberFromEnd(input->GetPointFrameNumber() + (input->GetFirstFrame() - 1) % r);
+            input->Resize(0, output->GetPointFrameNumber() - input->GetFirstFrame() / r, input->GetAnalogNumber(), r);
+            input->SetFirstFrame(input->GetFirstFrame() / r + 1);
+            input->SetPointFrequency(input->GetPointFrequency() / r);
+            output->Resize(output->GetPointNumber(), output->GetPointFrameNumber(), output->GetAnalogNumber(), r);
           }
         }
-      }
-      if (mergeData)
-        this->MergeData(out, input, diffFF);
-      else
-        this->ConcatData(out, input);
-      
-      // Event
-      for (Acquisition::EventIterator itIn = input->BeginEvent() ; itIn != input->EndEvent() ; ++itIn)
-      {
-        // Compute the event's time if necessary (for example, if the acquisition comes from an XLS file).
-        if (((*itIn)->GetTime() + 1.0)  <= std::numeric_limits<double>::epsilon())
-          (*itIn)->SetTime(static_cast<double>((*itIn)->GetFrame() - 1) / out->GetPointFrequency());
-        Acquisition::EventIterator itOut;
-        for (itOut = out->BeginEvent() ; itOut != out->EndEvent() ; ++itOut)
+        else if ((input->GetPointNumber() != 0) && (output->GetPointNumber() == 0) && (output->GetAnalogNumber() != 0) && (output->GetAnalogFrameNumber() != 0))
         {
-          if ((*itIn)->GetLabel().compare((*itOut)->GetLabel()) == 0)
+          int r = 0;
+          if ((output->GetPointFrequency() == 0) || (input->GetPointFrequency() == 0))
           {
-            if (((*itIn)->GetFrame() == (*itOut)->GetFrame())
-                && ((*itIn)->GetContext().compare((*itOut)->GetContext()) == 0)
-                && ((*itIn)->GetSubject().compare((*itOut)->GetSubject()) == 0))
+            r = output->GetAnalogFrameNumber() /  input->GetPointFrameNumber();
+            btkErrorMacro("At least one frequency is not set in the output or the input #" + ToString(idx) + " and may corrupt the final output.");
+          }
+          else
+            r = static_cast<int>(output->GetPointFrequency() / input->GetPointFrequency());
+          if (r > 1)
+          {
+            output->ResizeFrameNumberFromEnd(output->GetPointFrameNumber() + (output->GetFirstFrame() - 1) % r);
+            output->Resize(0, input->GetPointFrameNumber() - output->GetFirstFrame() / r, output->GetAnalogNumber(), r);
+            output->SetFirstFrame(output->GetFirstFrame() / r + 1 );
+            output->SetPointFrequency(output->GetPointFrequency() / r);
+            input->Resize(input->GetPointNumber(), input->GetPointFrameNumber(), input->GetAnalogNumber(), r);
+          }
+        }
+        
+        // Frequency
+        if (output->GetPointFrequency() == 0.0)
+          output->SetPointFrequency(input->GetPointFrequency());
+        // Analog resolution
+        if (output->IsEmptyAnalog())
+          output->SetAnalogResolution(input->GetAnalogResolution());
+        
+        // Merge or concat?
+        bool mergeData = false;
+        // First frame
+        int diffFF = output->GetFirstFrame() - input->GetFirstFrame();
+        if (diffFF < 0)
+        {
+          if (abs(diffFF) == output->GetLastFrame())
+            mergeData = true;
+          input->ResizeFrameNumberFromEnd(input->GetPointFrameNumber() - diffFF);
+          if (input->GetPointFrameNumber() > output->GetPointFrameNumber())
+            output->ResizeFrameNumber(input->GetPointFrameNumber());
+          else
+            input->ResizeFrameNumber(output->GetPointFrameNumber());
+        }
+        else if (diffFF > 0)
+        {
+          if (diffFF == input->GetLastFrame())
+            mergeData = true;
+          output->ResizeFrameNumberFromEnd(output->GetPointFrameNumber() + diffFF);
+          if (output->GetPointFrameNumber() > input->GetPointFrameNumber())
+            input->ResizeFrameNumber(output->GetPointFrameNumber());
+          else
+            output->ResizeFrameNumber(input->GetPointFrameNumber());
+        }
+        else
+        {
+          int diffFN = output->GetPointFrameNumber() - input->GetPointFrameNumber();
+          if ((diffFN > 0) && !output->IsEmptyPoint())
+            input->ResizeFrameNumber(output->GetPointFrameNumber());
+          else if ((diffFN < 0) && !input->IsEmptyPoint())
+            output->ResizeFrameNumber(input->GetPointFrameNumber());
+        }
+        
+        // To be sure to merge the data, it is necessary to check if the label of each point and analog channel 
+        // are exactly the same.
+        if (mergeData)
+        {
+          for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+          {
+            if (output->FindPoint((*it)->GetLabel()) == output->EndPoint())
+            {
+              mergeData = false;
               break;
-            (*itIn)->SetId((*itOut)->GetId());
+            }
           }
         }
-        if (itOut == out->EndEvent())
-          out->AppendEvent(*itIn);
-      }
-      
-      // Metadata
-      // Clean obsolete metadata
-      if (!mergeData)
-      {
-        this->RemoveDeprecatedMetaData(out->GetMetaData());
-        this->RemoveDeprecatedMetaData(input->GetMetaData(), true);
-      }
-      this->CleanMetaData(out->GetMetaData());
-      this->CleanMetaData(input->GetMetaData());
-      
-      // Append new metadata coming from the input.
-      // Only the first level is checked
-      Acquisition::MetaDataIterator it = input->GetMetaData()->Begin();
-      while (it != input->GetMetaData()->End())
-      {
-        if (out->GetMetaData()->FindChild((*it)->GetLabel()) == out->GetMetaData()->End())
+        if (mergeData)
         {
-          out->GetMetaData()->AppendChild(*it);
-          it = input->GetMetaData()->RemoveChild(it);
-        }
-        else
-          ++it;
-      }
-      this->UpdateKnownMetaData(out, input->GetMetaData(), mergeData);
-      // Merge metadata which is exactly the same (including children & info) than one found in the output.
-      it = input->GetMetaData()->Begin();
-      while (it != input->GetMetaData()->End())
-      {
-        MetaData::Iterator it2 = out->GetMetaData()->FindChild((*it)->GetLabel());
-        if ((it2 != out->GetMetaData()->End()) && (*(*it) == *(*it2)))
-          it = input->GetMetaData()->RemoveChild(it);
-        else
-          ++it;
-      }
-      // Add metadata which exist in both (input and output) but which are not identical.
-      // This addition will correspond to a suffix ("_<inc>") added in the metadata's label of the first level.
-      it = input->GetMetaData()->Begin();
-      while (it != input->GetMetaData()->End())
-      {
-        int inc = 2;
-        while (1)
-        {
-          std::string suffix = "_" + ToString(inc);
-          (*it)->SetLabel((*it)->GetLabel() + suffix);
-          if (out->GetMetaData()->FindChild((*it)->GetLabel()) == out->GetMetaData()->End())
+          for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
           {
-            out->GetMetaData()->AppendChild(*it);
-            it = input->GetMetaData()->RemoveChild(it);
-            break;
+            if (output->FindAnalog((*it)->GetLabel()) == output->EndAnalog())
+            {
+              mergeData = false;
+              break;
+            }
           }
-          ++inc;
         }
+        if (mergeData)
+          this->MergeData(output, input, diffFF);
+        else
+          this->ConcatData(output, input);
+        
+        // Event
+        for (Acquisition::EventIterator itIn = input->BeginEvent() ; itIn != input->EndEvent() ; ++itIn)
+        {
+          // Compute the event's time if necessary (for example, if the acquisition comes from an XLS file).
+          if (((*itIn)->GetTime() + 1.0)  <= std::numeric_limits<double>::epsilon())
+            (*itIn)->SetTime(static_cast<double>((*itIn)->GetFrame() - 1) / output->GetPointFrequency());
+          Acquisition::EventIterator itOut;
+          for (itOut = output->BeginEvent() ; itOut != output->EndEvent() ; ++itOut)
+          {
+            if ((*itIn)->GetLabel().compare((*itOut)->GetLabel()) == 0)
+            {
+              if (((*itIn)->GetFrame() == (*itOut)->GetFrame())
+                  && ((*itIn)->GetContext().compare((*itOut)->GetContext()) == 0)
+                  && ((*itIn)->GetSubject().compare((*itOut)->GetSubject()) == 0))
+                break;
+              (*itIn)->SetId((*itOut)->GetId());
+            }
+          }
+          if (itOut == output->EndEvent())
+            output->AppendEvent(*itIn);
+        }
+        
+        // Metadata
+        // Clean obsolete metadata
+        if (!mergeData)
+        {
+          this->RemoveDeprecatedMetaData(output->GetMetaData());
+          this->RemoveDeprecatedMetaData(input->GetMetaData(), true);
+        }
+        this->CleanMetaData(output->GetMetaData());
+        this->CleanMetaData(input->GetMetaData());
+        
+        // Append new metadata coming from the input.
+        // Only the first level is checked
+        Acquisition::MetaDataIterator it = input->GetMetaData()->Begin();
+        while (it != input->GetMetaData()->End())
+        {
+          if (output->GetMetaData()->FindChild((*it)->GetLabel()) == output->GetMetaData()->End())
+          {
+            output->GetMetaData()->AppendChild(*it);
+            it = input->GetMetaData()->RemoveChild(it);
+          }
+          else
+            ++it;
+        }
+        this->UpdateKnownMetaData(output, input->GetMetaData(), mergeData);
+        // Merge metadata which is exactly the same (including children & info) than one found in the output.
+        it = input->GetMetaData()->Begin();
+        while (it != input->GetMetaData()->End())
+        {
+          MetaData::Iterator it2 = output->GetMetaData()->FindChild((*it)->GetLabel());
+          if ((it2 != output->GetMetaData()->End()) && (*(*it) == *(*it2)))
+            it = input->GetMetaData()->RemoveChild(it);
+          else
+            ++it;
+        }
+        // Add metadata which exist in both (input and output) but which are not identical.
+        // This addition will correspond to a suffix ("_<inc>") added in the metadata's label of the first level.
+        it = input->GetMetaData()->Begin();
+        while (it != input->GetMetaData()->End())
+        {
+          int inc = 2;
+          while (1)
+          {
+            std::string suffix = "_" + ToString(inc);
+            (*it)->SetLabel((*it)->GetLabel() + suffix);
+            if (output->GetMetaData()->FindChild((*it)->GetLabel()) == output->GetMetaData()->End())
+            {
+              output->GetMetaData()->AppendChild(*it);
+              it = input->GetMetaData()->RemoveChild(it);
+              break;
+            }
+            ++inc;
+          }
+        }
+        
+        // Special case: BTK metadata
+        this->UpdatePartialForcePlateMetaData(output->GetMetaData());
       }
-      
-      // Special case: BTK metadata
-      this->UpdatePartialForcePlateMetaData(out->GetMetaData());
+    }
+    
+    if ((this->m_FirstFrameRule == KeepFromHighestFirstFrame) && (finalFirstFrame != output->GetFirstFrame()))
+    {
+      output->ResizeFrameNumber(output->GetPointFrameNumber() - finalFirstFrame - output->GetFirstFrame() + 1);
+      output->SetFirstFrame(finalFirstFrame);
     }
   };
   

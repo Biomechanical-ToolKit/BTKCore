@@ -903,6 +903,8 @@ namespace btk
       btkErrorMacro("Impossible to set the frame number to 0 or lower. The number of frames is now equals to 1.");
       frameNumber = 1;
     }
+    else if (frameNumber == this->m_PointFrameNumber)
+      return;
     this->SetPointFrameNumber(frameNumber);
     this->SetAnalogFrameNumber(this->m_AnalogSampleNumberPerPointFrame);
     this->Modified();
@@ -1029,6 +1031,8 @@ namespace btk
       btkErrorMacro("Impossible to set the first frame to 0 or lower.");
       return;
     }
+    else if (this->m_FirstFrame == num)
+      return;
     this->m_FirstFrame = num;
     this->Modified();
   };
