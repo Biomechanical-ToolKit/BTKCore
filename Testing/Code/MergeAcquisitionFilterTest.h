@@ -808,6 +808,45 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(output->GetPoint(33)->GetLabel(), "R_HIP_ANGLE");
   };
   
+  CXXTEST_TEST(FourFiles_BIS_Concat_TRC_and_ANC_and_CAL_and_XLS_Higher_Frame)
+  {
+    btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
+    trcReader->SetFilename(TRCFilePathIN + "Gait.trc");
+    btk::AcquisitionFileReader::Pointer ancReader = btk::AcquisitionFileReader::New();
+    ancReader->SetFilename(ANCFilePathIN + "Gait.anc");
+    btk::AcquisitionFileReader::Pointer calReader = btk::AcquisitionFileReader::New();
+    calReader->SetFilename(CALForcePlateFilePathIN + "Forcepla.cal");
+    btk::AcquisitionFileReader::Pointer xlsReader = btk::AcquisitionFileReader::New();
+    xlsReader->SetFilename(XLSOrthoTrakFilePathIN + "Gait.xls");
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, trcReader->GetOutput());
+    merger->SetInput(1, ancReader->GetOutput());
+    merger->SetInput(2, calReader->GetOutput());
+    merger->SetInput(3, xlsReader->GetOutput());
+    merger->SetFirstFrameRule(btk::MergeAcquisitionFilter::KeepFromHighestFirstFrame);
+    merger->Update();
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), 100.0);
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), 1000.0);
+    TS_ASSERT_EQUALS(output->GetFirstFrame(), 137);
+    TS_ASSERT_EQUALS(output->GetPointNumber(), 84);
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), 28);
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 350);
+
+    TS_ASSERT_EQUALS(output->GetEventNumber(), 8);
+    TS_ASSERT_EQUALS(output->GetEvent(0)->GetTime(), (137.0 + 70.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(1)->GetTime(), (137.0 + 166.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(2)->GetTime(), (137.0 + 19.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(3)->GetTime(), (137.0 + 119.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(4)->GetTime(), (137.0 + 32.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(5)->GetTime(), (137.0 + 129.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(6)->GetTime(), (137.0 + 78.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(7)->GetTime(), (137.0 + 177.0 - 1.0 - 1.0) / 100.0);
+    
+    TS_ASSERT_EQUALS(output->GetPoint(33)->GetLabel(), "R_HIP_ANGLE");
+  };
+  
   CXXTEST_TEST(Elite_vs_C3D)
   {
     btk::AcquisitionFileReader::Pointer angReader = btk::AcquisitionFileReader::New();
@@ -1482,6 +1521,7 @@ CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_ThreeFiles_Concat_T
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D_Signed16bits)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_BIS_Concat_TRC_and_ANC_and_CAL_and_XLS_Higher_Frame)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite_vs_C3D)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, EliteGrFirst_vs_C3D)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ExportedC3DElite_vs_C3D)
