@@ -204,6 +204,7 @@ public:
   VTKChartWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   void setCharts(VTKCharts* charts) {this->mp_Charts = charts;};
   btk::VTKChartTimeSeries* focusedChart(const QPoint& pos) const;
+  btk::VTKChartTimeSeries* focusedPlotArea(const QPoint& pos) const;
   void resizeCharts();
   
 signals:

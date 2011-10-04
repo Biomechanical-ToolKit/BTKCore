@@ -1262,33 +1262,33 @@ bool VTKChartWidget::event(QEvent* event)
   {
     QHelpEvent* helpEvent = static_cast<QHelpEvent*>(event);
     
-    btk::VTKChartTimeSeries* chart = this->focusedChart(helpEvent->pos());
+    btk::VTKChartTimeSeries* chart = this->focusedPlotArea(helpEvent->pos());
     if (chart != 0)
     {
-      int pt1[2]; chart->GetPoint1(pt1); // Bottom left
-    
-      vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
-      float pt1X[2]; axisX->GetPoint1(pt1X);
-      float pt2X[2]; axisX->GetPoint2(pt2X);
-      double miniX = axisX->GetMinimum(); double maxiX = axisX->GetMaximum();
-      double scaleX = (maxiX - miniX) / (double)(pt2X[0] - pt1X[0]);
-    
-      vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
-      float pt1Y[2]; axisY->GetPoint1(pt1Y);
-      float pt2Y[2]; axisY->GetPoint2(pt2Y);
-      double miniY = axisY->GetMinimum(); double maxiY = axisY->GetMaximum();
-      double scaleY = (maxiY - miniY) / (double)(pt2Y[1] - pt1Y[1]);
-    
-      QPoint p = helpEvent->pos() - QPoint(pt1[0], -pt1[1]);
-    
-      vtkVector2f pos((double)p.x() * scaleX + miniX, (double)(this->height()-p.y()-1) * scaleY + miniY), coord, tolerance(5.0*scaleX,5.0*scaleY); // tolerance +/- 5 pixels 
+      QPoint p(helpEvent->pos().x(), this->height() - helpEvent->pos().y());
+      float pt[2] = {p.x(), p.y()};
+      if (chart->GetTransform() != 0)
+        chart->GetTransform()->InverseTransformPoints(pt,pt,1);
+      chart->GetPlotsTransform()->InverseTransformPoints(pt,pt,1);
+      vtkVector2f pos(pt[0], pt[1]), coord, tolerance(2.0 / chart->GetPlotsTransform()->GetMatrix()->GetElement(0,0), 7.5 / chart->GetPlotsTransform()->GetMatrix()->GetElement(1,1));
 
       for (int i = 0 ; i < chart->GetNumberOfPlots() ; ++i)
       {
         vtkPlot* plot = chart->GetPlot(i);
         if (plot->GetVisible() && plot->GetNearestPoint(pos, tolerance, &coord))
         {
-          QString str = "Frame: " + QString::number(coord.X()) + "<br/><nobr>" + QString::fromUtf8(plot->GetLabel()) + ": " + QString::number(coord.Y(), 'f', 1) + "</nobr>";
+          QString valueStr;
+          if (fabs(coord.Y()) > 1.0)
+            valueStr = QString::number(coord.Y(), 'f', 1);
+          else if (fabs(coord.Y()) > 0.1)
+            valueStr = QString::number(coord.Y(), 'f', 2);
+          else if (fabs(coord.Y()) > 0.01)
+            valueStr = QString::number(coord.Y(), 'f', 3);
+          else if (fabs(coord.Y()) > 0.001)
+            valueStr = QString::number(coord.Y(), 'f', 4);
+          else
+            valueStr = QString::number(coord.Y(), 'f', 5);
+          QString str = "Frame: " + QString::number(coord.X()) + "<br/><nobr>" + QString::fromUtf8(plot->GetLabel()) + ": " + valueStr + "</nobr>";
           QToolTip::showText(helpEvent->globalPos(), str);
           return true;
         }
@@ -1333,7 +1333,7 @@ void VTKChartWidget::mousePressEvent(QMouseEvent* event)
   // invoke appropriate vtk event only for the left button
   if(event->button() == Qt::LeftButton)
   {
-    btk::VTKChartTimeSeries* chart = this->focusedChart(event->pos());
+    btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
     if (chart != 0)
       chart->SetDisplayZoomBox((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? 1 : 0);
     iren->InvokeEvent(vtkCommand::LeftButtonPressEvent, event);
@@ -1352,7 +1352,7 @@ void VTKChartWidget::mouseReleaseEvent(QMouseEvent* event)
   // To fix a possible conflict between Qt and VTK when you use a contextual menu event.
   // VTK or the scene doesn't receive the event vtkCommand::LeftButtonReleaseEvent
   // In our case, the zoom box is not applied after using the reset zoom action
-  btk::VTKChartTimeSeries* chart = this->focusedChart(event->pos());
+  btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
   if (chart && (chart->GetDisplayZoomBox() == 1))
   {
     chart->ApplyZoom(chart->GetZoomBox());
@@ -1398,7 +1398,7 @@ void VTKChartWidget::wheelEvent(QWheelEvent* event)
   if(!iren || !iren->GetEnabled())
     return;
   
-  btk::VTKChartTimeSeries* chart = this->focusedChart(event->pos());
+  btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
   if (chart != 0)
     chart->SetZoomMode((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? btk::VTKChartTimeSeries::HORIZONTAL : btk::VTKChartTimeSeries::BOTH);
   
@@ -1419,7 +1419,7 @@ btk::VTKChartTimeSeries* VTKChartWidget::focusedChart(const QPoint& pos) const
   {
     for (size_t i = 0 ; i < this->mp_Charts->size() ; ++i)
     {
-      if (this->mp_Charts->operator[](i)->Hit(pos.x(), this->height() - pos.y()))
+      if (this->mp_Charts->operator[](i)->Hit2(pos.x(), this->height() - pos.y()))
       {
         chart = this->mp_Charts->operator[](i);
         break;
@@ -1428,6 +1428,23 @@ btk::VTKChartTimeSeries* VTKChartWidget::focusedChart(const QPoint& pos) const
   }
   return chart;
 };
+
+btk::VTKChartTimeSeries* VTKChartWidget::focusedPlotArea(const QPoint& pos) const
+{
+  btk::VTKChartTimeSeries* chart = 0;
+  if (this->mp_Charts != NULL)
+  {
+    for (size_t i = 0 ; i < this->mp_Charts->size() ; ++i)
+    {
+      if (this->mp_Charts->operator[](i)->Hit(pos.x(), this->height() - pos.y()))
+      {
+        chart = this->mp_Charts->operator[](i);
+        break;
+      }
+    }
+  }
+  return chart;
+}
 
 void VTKChartWidget::resizeCharts()
 {
