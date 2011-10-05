@@ -105,10 +105,19 @@ void CompositeView::render()
 
 void CompositeView::show(bool s)
 {
-  // Viz3D
-  static_cast<Viz3DWidget*>(this->view(Viz3D))->show(s);
-  // Chart Point
-  static_cast<ChartWidget*>(this->view(Chart))->show(s);
+  switch (this->viewCombo->currentIndex())
+  {
+  case Viz3DProjection:
+  case Viz3DOrthogonal:
+    static_cast<Viz3DWidget*>(this->view(Viz3D))->show(s);
+    break;
+  case ChartPoint:
+  case ChartAnalog:
+    static_cast<ChartWidget*>(this->view(Chart))->show(s);
+    break;
+  default:
+    break;
+  }
 }
 
 AbstractView* CompositeView::clone() const
