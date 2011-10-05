@@ -1255,6 +1255,7 @@ void MultiViewWidget::updateCameras()
 
 void MultiViewWidget::updateViews()
 {
+  btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->Update(); // To update the markers' list when only charts are displayed.
   for (QList<AbstractView*>::const_iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
     static_cast<CompositeView*>(*it)->render();
 };
