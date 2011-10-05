@@ -375,7 +375,8 @@ void Viz3DWidget::show(bool s)
     actor->SetVisibility(s ? true : false);
     actor = actors->GetNextItem();
   }
-  this->GetRenderWindow()->Render();
+  if (this->isVisible())
+    this->GetRenderWindow()->Render();
 };
 
 bool Viz3DWidget::event(QEvent* event)
