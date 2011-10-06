@@ -121,6 +121,9 @@ public slots:
   void showAnalogPlots(const QList<int>& itemIds);
   void setExpandableAnalog(int expandable);
   
+signals:
+  void pausePlaybackRequested(bool paused);
+  
 private slots:
   void setLastContextMenuPosition(const QPoint& globalPos);
   

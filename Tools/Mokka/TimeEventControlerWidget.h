@@ -53,6 +53,8 @@ public:
   TimeEventControlerWidget(QWidget* parent = 0);
   ~TimeEventControlerWidget();
   
+  bool playbackStatus() const {return this->mp_Timer->isActive();};
+  
   void setAcquisition(Acquisition* acq);
   void load();
   void reset();

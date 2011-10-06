@@ -146,6 +146,7 @@ signals:
   void pickedMarkerToggled(int id);
   void selectedMarkersToggled(const QList<int>& ids);
   void trajectoryMarkerToggled(int id);
+  void pausePlaybackRequested(bool paused);
   
 private slots:
   // Qt / VTK

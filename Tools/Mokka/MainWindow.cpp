@@ -259,6 +259,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->multiView, SIGNAL(pickedMarkerToggled(int)), this, SLOT(togglePickedMarker(int)));
   connect(this->multiView, SIGNAL(selectedMarkersToggled(QList<int>)), this, SLOT(selectSelectedMarkers(QList<int>)));
   connect(this->multiView, SIGNAL(trajectoryMarkerToggled(int)), this, SLOT(toggleMarkerTrajectory(int)));
+  connect(this->multiView, SIGNAL(pausePlaybackRequested(bool)), this, SLOT(playPausePlayback(bool)));
   // Model dock
   connect(this->mp_ModelDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(modelDockLocationChanged(Qt::DockWidgetArea)));
   connect(this->mp_ModelDock, SIGNAL(markerLabelChanged(int, QString)), this, SLOT(setPointLabel(int, QString)));
@@ -589,6 +590,15 @@ bool MainWindow::isOkToContinue()
     // }
   }
   return true; 
+};
+
+void MainWindow::playPausePlayback(bool paused)
+{
+  static bool previouslyActived = false;
+  if (paused && (previouslyActived = this->timeEventControler->playbackStatus()))
+    this->timeEventControler->stopPlayback();
+  else if (!paused && !this->timeEventControler->playbackStatus() && previouslyActived)
+    this->timeEventControler->startPlayback();
 };
 
 void MainWindow::updateUserLayoutActions()

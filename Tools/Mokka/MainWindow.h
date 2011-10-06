@@ -162,6 +162,7 @@ public slots:
   void relabelUserLayout(int index, const QString& label);
   void updateDroppedUserLayouts(int newRow, int oldRow);
   void updateUserLayouts(const QList<QVariant>& layouts, int index);
+  void playPausePlayback(bool paused);
   
 protected slots:
   void openRecentFile();

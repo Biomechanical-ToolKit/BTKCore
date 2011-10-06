@@ -1198,7 +1198,9 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   viz3D->addActions(this->m_View3dActions);
   viz3D->setContextMenuPolicy(Qt::ActionsContextMenu);
   // Chart final settings
-  static_cast<ChartWidget*>(sv->view(CompositeView::Chart))->addActions(this->m_ViewChartActions);
+  ChartWidget* chart2D = static_cast<ChartWidget*>(sv->view(CompositeView::Chart));
+  chart2D->addActions(this->m_ViewChartActions);
+  connect(chart2D, SIGNAL(pausePlaybackRequested(bool)), this, SIGNAL(pausePlaybackRequested(bool)));
   // Event filter
   if (this->mp_EventFilterObject)
   {
