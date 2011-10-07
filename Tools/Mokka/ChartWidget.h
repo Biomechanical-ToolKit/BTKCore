@@ -98,6 +98,8 @@ public:
   void displayPointChart() {this->displayChart(PointChart);};
   void displayAnalogChart() {this->displayChart(AnalogChart);};
   
+  void updateAxisX();
+  
 public slots:
   void removePlot(int index);
   void setPlotLineColor(const QList<int>& indices, const QColor& color);

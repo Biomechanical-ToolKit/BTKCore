@@ -379,6 +379,7 @@ void MultiViewWidget::setAcquisition(Acquisition* acq)
   // Object connection
   connect(this->mp_Acquisition, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
   connect(this->mp_Acquisition, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
+  connect(this->mp_Acquisition, SIGNAL(firstFrameChanged(int)), this, SLOT(updateChartFramesIndex(int)));
 }
 
 void MultiViewWidget::setModel(Model* m)
@@ -727,6 +728,28 @@ void MultiViewWidget::restoreLayout3DCharts()
   stream << qint32(0); // Collapsed mode
   
   this->restoreLayout(data);
+};
+
+void MultiViewWidget::updateChartFramesIndex(int ff)
+{
+  Q_UNUSED(ff)
+  double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
+  for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
+  {
+    // Point
+    this->mp_PointChartFrames->SetValue(i, this->mp_Acquisition->firstFrame() + i);
+    // Analog
+    int inc = i * this->mp_Acquisition->analogSamplePerPointFrame();
+    double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
+    this->mp_AnalogChartFrames->SetValue(inc, val);
+    for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
+      this->mp_AnalogChartFrames->SetValue(inc + j, val + j * sub);
+  }
+  for (QList<AbstractView*>::const_iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->updateAxisX();
+    static_cast<CompositeView*>(*it)->render();
+  }
 };
 
 void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments)

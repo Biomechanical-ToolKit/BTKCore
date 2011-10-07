@@ -270,6 +270,21 @@ void ChartOptionsWidget::setLineWidth(double value)
   emit lineWidthChanged(indices, value);
 };
 
+bool ChartOptionsWidget::event(QEvent* event)
+{
+#ifdef Q_OS_WIN
+  // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
+  if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
+  {
+    if ((event->type() == QEvent::Hide) && !this->m_FixUpdateWindowsXP)
+    {
+      emit pausePlaybackRequested(false);
+    }
+  }
+#endif
+  return QWidget::event(event);
+};
+
 bool ChartOptionsWidget::eventFilter(QObject* object, QEvent* event)
 {
   QLineEdit* lineEdit = qobject_cast<QLineEdit*>(object);

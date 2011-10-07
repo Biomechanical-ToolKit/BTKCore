@@ -128,8 +128,9 @@ ChartWidget::ChartWidget(QWidget* parent)
   // this->mp_ChartContentWidget->GetRenderWindow()->SwapBuffersOff();
   // this->mp_ChartContentWidget->GetRenderWindow()->DoubleBufferOff();
   // this->mp_ChartContentWidget->GetRenderWindow()->SetMultiSamples(0);
-  connect(this->mp_ChartContentWidget, SIGNAL(contextMenuRequested(QPoint)), this, SLOT(setLastContextMenuPosition(QPoint)));
   
+  connect(this->mp_ChartContentWidget, SIGNAL(contextMenuRequested(QPoint)), this, SLOT(setLastContextMenuPosition(QPoint)));
+  connect(this->mp_ChartOptions, SIGNAL(pausePlaybackRequested(bool)), this, SIGNAL(pausePlaybackRequested(bool)));
   
 #ifdef Q_OS_WIN
   QFont f("Arial", 9);
@@ -260,6 +261,28 @@ void ChartWidget::show(bool s)
   }
 };
 
+void ChartWidget::updateAxisX()
+{
+  for (int i = 0 ; i < this->m_ChartData.size() ; ++i)
+  {
+    for (size_t j = 0 ; j < this->m_ChartData[i]->charts()->size() ; ++j)
+    {
+      btk::VTKChartTimeSeries* chart = static_cast<btk::VTKChartTimeSeries*>(this->m_ChartData[i]->chart(j));
+      vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
+      vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
+      double* bounds = chart->GetBounds();
+      double diff = (double)this->mp_Acquisition->firstFrame() - bounds[0];
+      double rangeX[2] = {axisX->GetMinimum() + diff, axisX->GetMaximum() + diff};
+      double rangeY[2] = {axisY->GetMinimum(), axisY->GetMaximum()};
+      chart->SetBounds(bounds[0] + diff, bounds[1] + diff, bounds[2], bounds[3]);
+      axisX->SetRange(rangeX[0], rangeX[1]);
+      axisY->SetRange(rangeY[0], rangeY[1]);
+      for (int k = 0 ; k < chart->GetNumberOfPlots() ; ++k)
+        chart->GetPlot(i)->Modified(); // To update the frames index
+    }
+  }
+};
+
 void ChartWidget::displayChart(int chartType)
 {
   // Save the current selection in the options
@@ -290,6 +313,7 @@ void ChartWidget::render(bool optionsShown)
     // The side effect is a possible blinking of the options but it's better than to see nothing.
     if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
     {
+      this->mp_ChartOptions->m_FixUpdateWindowsXP = true;
       this->mp_ChartOptions->setFocus();
       QApplication::processEvents(); // For the text placeholder
       this->mp_ChartOptions->hide();
@@ -297,6 +321,7 @@ void ChartWidget::render(bool optionsShown)
       ::Sleep(20); // 20 ms
       QApplication::processEvents();
       this->mp_ChartOptions->show();
+      this->mp_ChartOptions->m_FixUpdateWindowsXP = false;
     }
     else
       this->render();
@@ -362,12 +387,14 @@ void ChartWidget::setChartTitle(const QString& title)
   // The side effect is a possible blinking of the options but it's better than to see nothing.
   if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
   {
+    this->mp_ChartOptions->m_FixUpdateWindowsXP = true;
     QApplication::processEvents(); // For the text placeholder
     this->mp_ChartOptions->hide();
     this->update();
     QApplication::processEvents();
     ::Sleep(20);
     this->mp_ChartOptions->show();
+    this->mp_ChartOptions->m_FixUpdateWindowsXP = false;
   }
   else
     this->update();
@@ -524,6 +551,15 @@ void ChartWidget::toggleOptions(const QPoint& pos)
     this->mp_ChartOptions->setVisible(false);
   else
   {
+#ifdef Q_OS_WIN
+    // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
+    if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
+    {
+      emit pausePlaybackRequested(true);
+      QApplication::processEvents();
+      ::Sleep(20);
+    }
+#endif
     this->mp_ChartOptions->move(pos - QPoint(this->mp_ChartOptions->width() / 2, 0));
     this->mp_ChartOptions->setVisible(true);
   }

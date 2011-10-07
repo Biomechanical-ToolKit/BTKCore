@@ -192,10 +192,10 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ImportAssistant->layout()->setSizeConstraint(QLayout::SetFixedSize);
   
   // Setting the acquisition
+  this->timeEventControler->setAcquisition(this->mp_Acquisition); // Must be set before the multiview.
   this->multiView->setAcquisition(this->mp_Acquisition);
   this->mp_ModelDock->setAcquisition(this->mp_Acquisition);
   this->mp_FileInfoDock->setAcquisition(this->mp_Acquisition);
-  this->timeEventControler->setAcquisition(this->mp_Acquisition);
   // Setting the model
   this->mp_ModelDock->setModel(this->mp_Model);
   this->multiView->setModel(this->mp_Model);
