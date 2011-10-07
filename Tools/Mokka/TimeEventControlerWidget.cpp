@@ -805,9 +805,9 @@ void TimeEventControlerWidget::insertEvent(const QString& label, int context, in
   ned.move(this->eventDialogGlobaPos(&ned));
   if (!this->mp_Timer->isActive())
     connect(ned.frameSpinBox,SIGNAL(valueChanged(int)),this,SLOT(setCurrentFrame(int)));
-  if (this->m_OpenEditorWhenInserting)
+  if (this->m_OpenEditorWhenInserting || label.isEmpty())
     ned.exec();
-  if ((ned.result() == QDialog::Accepted) || !this->m_OpenEditorWhenInserting)
+  if ((ned.result() == QDialog::Accepted) || (!this->m_OpenEditorWhenInserting && !label.isEmpty()))
   {
     Event* e = new Event;
     e->label = ned.labelEdit->text().trimmed();
