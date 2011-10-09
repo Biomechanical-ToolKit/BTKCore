@@ -663,6 +663,23 @@ void ChartWidget::setPlotsVisible(int chartType, const QList<int>& itemIds, bool
     if (itId == itemIds.end())
       break;
   }
+  // Update the boundaries
+  for (size_t i = 0 ; i < this->m_ChartData[chartType]->charts()->size() ; ++i)
+  {
+    btk::VTKChartTimeSeries* chart = this->m_ChartData[chartType]->chart(i);
+    vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
+    vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
+    double rangeX[2] = {axisX->GetMinimum(), axisX->GetMaximum()};
+    double rangeY[2] = {axisY->GetMinimum(), axisY->GetMaximum()};
+    chart->RecalculateBounds();
+    double* bounds = chart->GetBounds();
+    axisX->SetRange(rangeX[0], rangeX[1]);
+    if (!show)
+      axisY->SetRange(std::max(rangeY[0], bounds[2]), std::min(rangeY[1], bounds[3]));
+    else
+      axisY->SetRange(std::min(rangeY[0], bounds[2]), std::max(rangeY[1], bounds[3]));
+  }
+  // 
   if (this->m_CurrentChartType == chartType)
   {
     if (regenerateChartsLayout)
