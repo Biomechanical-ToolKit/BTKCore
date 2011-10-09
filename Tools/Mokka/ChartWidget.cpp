@@ -848,6 +848,7 @@ void AbstractChartData::initialize(vtkColorSeries* colorGenerator)
   {
     btk::VTKChartTimeSeries* chart = btk::VTKChartTimeSeries::New(); // Do not delete
     static_cast<btk::VTKAxis*>(chart->GetAxis(vtkAxis::BOTTOM))->SetTitleVisible(false); // Frames // X axis
+    static_cast<btk::VTKAxis*>(chart->GetAxis(vtkAxis::LEFT))->SetMinimumTickSpacing(25.0f);
     chart->SetBoundsEnabled(true);
     chart->DisplayEventsOn();
     chart->SetColorSeries(colorGenerator);
