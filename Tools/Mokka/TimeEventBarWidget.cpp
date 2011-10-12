@@ -202,7 +202,6 @@ void TimeEventBarWidget::paintEvent(QPaintEvent* event)
   QPainter painter(this);
   
   // --------------------- Timeline ---------------------
-  int numTicks = this->m_Ticks.size();
   int numFrames = this->m_ROILastFrame - this->m_ROIFirstFrame + 1;
   QPen axisPen = QPen();
   painter.setPen(axisPen);
@@ -226,25 +225,21 @@ void TimeEventBarWidget::paintEvent(QPaintEvent* event)
     // Extremities
     painter.drawLine(LeftMargin, tStep, LeftMargin, tStep - 9);
     painter.drawLine(xMax, tStep, xMax, tStep - 9);
-    // Ticks
-
     // Ticks & SubTicks
     int incST = subTicksStart;
+    int tickInc = 1;
     while (incST < numFrames)
     {
-      for (int j = 1 ; j < numTicks-1 ; ++j)
+      if (abs(this->m_Ticks[tickInc] - incST) <= dd / 2) // Final adjustment for the ticks
       {
-        if (abs(this->m_Ticks[j] - incST) < dd / 2) // Final adjustment for the ticks
-        {
-          painter.drawLine(LeftMargin + incST * this->m_UnitStep, tStep, LeftMargin + incST * this->m_UnitStep, tStep - 6);
-          break;
-        }
+        painter.drawLine(LeftMargin + incST * this->m_UnitStep, tStep, LeftMargin + incST * this->m_UnitStep, tStep - 6);
+        ++tickInc;
       }
       painter.drawLine(LeftMargin + incST * this->m_UnitStep, tStep, LeftMargin + incST * this->m_UnitStep, tStep - 3);
       incST += dd; 
     }
   }
-  // Text for this->m_Ticks
+  // Text for the ticks
   for (int i = 0 ; i < this->m_TicksLabel.count() ; ++i)
   {
     int wTextFrame = this->m_Fm.width(this->m_TicksLabel[i]);
