@@ -46,6 +46,8 @@
 
 #include "btkSwigMacros.h"
 
+%include "btkCommonSwig_Docstring.i"
+
 // ------------------------------------------------------------------------- //
 //                                    Event                                  //
 // ------------------------------------------------------------------------- //
@@ -63,7 +65,7 @@ public:
   BTK_SWIG_DECLARE_IMPL_GETSET(Time, double);
   BTK_SWIG_DECLARE_IMPL_GETSET(Frame, int);
   BTK_SWIG_DECLARE_IMPL_GETSET(DetectionFlags, int);
-  bool HasDetectionFlag(DetectionFlag flag);
+  bool HasDetectionFlag(DetectionFlag );
   BTK_SWIG_DECLARE_IMPL_GETSET(Id, int);
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(Event);

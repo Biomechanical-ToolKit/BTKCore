@@ -256,5 +256,21 @@
   protected: \
     BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(elt##Collection); \
   };
+  
+  
+// ------------------------------------------------------------------------- //
+//                  Macros for extra documentation
+// ------------------------------------------------------------------------- //
+#define BTK_SWIG_AUTODOC(classname, method, text) \
+  %feature("autodoc", text) btk##classname##::method;
+
+#define BTK_SWIG_DOCSTRING(classname, method, text); \
+  %feature("docstring")  btk##classname::method text;
+  
+#define BTK_SWIG_AUTODOC_IMPL(classname, method, text) \
+  %feature("autodoc", text) btk##classname##_impl::method;
+  
+#define BTK_SWIG_DOCSTRING_IMPL(classname, method, text); \
+  %feature("docstring")  btk##classname##_impl::method text;
 
 #endif // btkSwigMacro_h

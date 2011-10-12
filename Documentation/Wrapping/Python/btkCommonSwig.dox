@@ -1,0 +1,85 @@
+namespace btk
+{
+/**
+ * @class btkEvent
+ * @brief Label a specific time/frame during an acquisition.
+ */
+/**
+ * @var btkEvent::Unknown
+ * Unknown method used to detect the event.
+ */
+/**
+ * @var btkEvent::Manual
+ * Event detected manually.
+ */
+/**
+ * @var btkEvent::Automatic
+ * Automatic method used to detect the event.
+ */
+/**
+ * @var btkEvent::FromForcePlatform
+ * Method based on force platform data to detect the event.
+ */
+ 
+/** 
+ * @class btkAnalog
+ * @brief Analog channel data along the time.
+ */
+/**
+ * @var btkAnalog::Unknown
+ * Unknown gain.
+ */
+/**
+ * @var btkAnalog::PlusMinus10
+ * Gain for the range +/- 10 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus5
+ * Gain for the range +/- 5 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus2Dot5
+ * Gain for the range +/- 2.5 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus1Dot25
+ * Gain for the range +/- 1.25 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus1
+ * Gain for the range +/- 1 volts.
+ */
+ 
+/** 
+ * @class btkPoint
+ * @brief Coordinates of a point in a 3D space along the time.
+ */
+/**
+ * @var btkPoint::Marker
+ * Enum value which set the point object as a marker.
+ */
+/**
+ * @var btkPoint::Angle
+ * Enum value which set the point object as an angle.
+ */
+/**
+ * @var btkPoint::Force
+ * Enum value which set the point object as a force.
+ */
+/**
+ * @var btkPoint::Moment
+ * Enum value which set the point object as a moment.
+ */
+/**
+ * @var btkPoint::Power
+ * Enum value which set the point object as a power.
+ */
+/**
+ * @var btkPoint::Scalar
+ * Enum value which set the point object as a scalar.
+ */
+/**
+ * @var btkPoint::Reaction
+ * Special type to indicate the point corresponds to one part of a wrench (not really used);
+ */
+}

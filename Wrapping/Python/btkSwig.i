@@ -33,7 +33,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-%module btk
+%define DOCSTRING
+"Biomechanical ToolKit (BTK) for Python
+High level classes and functions to open, edit and modify biomechanical acquisitions."
+%enddef
+
+%module(docstring=DOCSTRING) btk
 %{
 #include "btkException.h"
 %}
@@ -50,6 +55,8 @@
       SWIG_exception(SWIG_RuntimeError,"Unknown exception");
   }
 }
+
+%feature("autodoc", "0");
 
 // One file to govern the others.
 %include "btkCommonSwig.i"
