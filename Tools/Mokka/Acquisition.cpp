@@ -126,7 +126,7 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
   {
     for (int i = 0 ; i < filenames.count() ; ++i)
     {
-      LOG_INFO(tr("Loading acquisition for importation from file:") + QFileInfo(filenames[i]).fileName());
+      LOG_INFO(tr("Loading acquisition for importation from file: ") + QFileInfo(filenames[i]).fileName());
       btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
       reader->SetFilename(filenames[i].toStdString());
       reader->Update();
