@@ -36,49 +36,114 @@
 #ifndef __btkForcePlatformTypes_h
 #define __btkForcePlatformTypes_h
 
-//#include "btkForcePlatformWithoutCalibrationMatrix.h"
-#include "btkForcePlatformWithCalibrationMatrix.h"
+#include "btkForcePlatform.h"
 
 namespace btk
 {
+  // Forward declaration
+  template <int t, int r, int c> class ForcePlatformType;
+  
   /**
    * Represents Force platform Type-1 (6 channels: FX, FY, FZ, PX, PY, MZ)
    * @ingroup BTKCommon
    */
-  typedef ForcePlatformWithCalibrationMatrix<1,6,6> ForcePlatformType1;
+  typedef ForcePlatformType<1,6,6> ForcePlatformType1;
   /**
    * Represents Force platform Type-2 (6 channels: FX, FY, FZ, MX, MY, MZ)
-)
    * @ingroup BTKCommon
    */
-  typedef ForcePlatformWithCalibrationMatrix<2,6,6> ForcePlatformType2;
+  typedef ForcePlatformType<2,6,6> ForcePlatformType2;
   /**
    * Represents Force platform Type-3 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23)
    * @ingroup BTKCommon
    */
-  typedef ForcePlatformWithCalibrationMatrix<3,8,8> ForcePlatformType3;
+  typedef ForcePlatformType<3,8,8> ForcePlatformType3;
   /**
    * Represents Force platform Type-4 (Same as Type-2 + calibration matrix 6 by 6)
    * @ingroup BTKCommon
    */
-  typedef ForcePlatformWithCalibrationMatrix<4,6,6> ForcePlatformType4;
+  typedef ForcePlatformType<4,6,6> ForcePlatformType4;
   /**
    * Represents Force platform Type-5 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23 + calibration matrix 6 (columns) by 8 (rows))
    * @ingroup BTKCommon
    */
-  typedef ForcePlatformWithCalibrationMatrix<5,8,6> ForcePlatformType5;
+  typedef ForcePlatformType<5,8,6> ForcePlatformType5;
   /**
    * Represents Force platform Type-6 (12 channels: FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4] + calibration matrix 12 by 12)
 
    * @ingroup BTKCommon
    */
-  typedef ForcePlatformWithCalibrationMatrix<6,12,12> ForcePlatformType6;
-};
+  typedef ForcePlatformType<6,12,12> ForcePlatformType6;
+  
+  // btkForcePlatformType7
+  // btkForcePlatformType11
+  // btkForcePlatformType12
+  // btkForcePlatformType21
+  
+  // ----------------------------------------------------------------------- //
+  
+  template <int t, int r, int c>
+  class ForcePlatformType : public ForcePlatform
+  {
+  public:
+    typedef SharedPtr<ForcePlatformType> Pointer;
+    typedef SharedPtr<const ForcePlatformType> ConstPointer;
 
-//#include "btkForcePlatformType7.h"
-//#include "btkForcePlatformType11.h"
-//#include "btkForcePlatformType12.h"
-//#include "btkForcePlatformType21.h"
+    static Pointer New() {return Pointer(new ForcePlatformType());};
+
+    ~ForcePlatformType() {};
+
+  protected:
+    ForcePlatformType();
+    
+  private:
+    ForcePlatformType(const ForcePlatformType& ); // Not implemeted.
+    ForcePlatformType& operator=(const ForcePlatformType& ); // Not implemented 
+  };
+
+  /**
+   * @class ForcePlatformType btkForcePlatformType.h
+   * @brief Represents a concrete force platform
+   *
+   * @tparam t Force platform type
+   * @tparam r Number of rows in the calibration matrix
+   * @tparam c Number of columns in the calibration matrix. Set also the number of channels.
+   *
+   * @ingroup BTKCommon
+   */
+
+  /**
+   * @typedef ForcePlatformType<t,r,c>::Pointer
+   * Smart pointer associated with a ForcePlatformType object.
+   */
+  
+  /**
+   * @typedef ForcePlatformType<t,r,c>::ConstPointer
+   * Smart pointer associated with a const ForcePlatformType object.
+   */
+
+  /**
+   * @fn Pointer ForcePlatformType<t,r,c>::New()
+   * Creates a smart pointer associated with a ForcePlatformType object.
+   */
+
+  /**
+   * @fn ForcePlatformType<t,r,c>::~ForcePlatformType()
+   * Empty destructor.
+   */
+
+  /**
+   * Constructor.
+   */
+  template <int t, int r, int c>
+  ForcePlatformType<t,r,c>::ForcePlatformType()
+  : ForcePlatform()
+  {
+    this->m_Type = t;
+    this->m_Channels->SetItemNumber(c);
+    this->m_CalMatrix = CalMatrix::Identity(r, c);
+  };
+};
 
 #endif // __btkForcePlatformTypes_h
 

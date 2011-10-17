@@ -87,6 +87,8 @@ namespace btk
     BTK_COMMON_EXPORT void SetCalMatrix(const CalMatrix& cal);
 
     int GetType() const {return this->m_Type;};
+    
+    Pointer Clone() const {return Pointer(new ForcePlatform(*this));};
 
   protected:
     BTK_COMMON_EXPORT ForcePlatform();
@@ -96,7 +98,7 @@ namespace btk
     CalMatrix m_CalMatrix;
     
   private:
-    ForcePlatform(const ForcePlatform& ); // Not implemeted.
+    BTK_COMMON_EXPORT ForcePlatform(const ForcePlatform& toCopy);
     ForcePlatform& operator=(const ForcePlatform& ); // Not implemented
 
     Origin m_Origin;
