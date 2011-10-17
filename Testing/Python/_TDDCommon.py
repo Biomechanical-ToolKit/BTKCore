@@ -3,6 +3,7 @@ import unittest
 import EventTest
 import AnalogTest
 import PointTest
+import ForcePlatformTypesTest
 import EventCollectionTest
 import PointCollectionTest
 import MetaDataInfoTest
@@ -14,6 +15,7 @@ def suite():
     suite.addTest(unittest.makeSuite(EventTest.EventTest))
     suite.addTest(unittest.makeSuite(AnalogTest.AnalogTest))
     suite.addTest(unittest.makeSuite(PointTest.PointTest))
+    suite.addTest(unittest.makeSuite(ForcePlatformTypesTest.ForcePlatformTypesTest))
     suite.addTest(unittest.makeSuite(EventCollectionTest.EventCollectionTest))
     suite.addTest(unittest.makeSuite(PointCollectionTest.PointCollectionTest))
     suite.addTest(unittest.makeSuite(MetaDataInfoTest.MetaDataInfoTest))

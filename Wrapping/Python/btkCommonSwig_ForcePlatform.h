@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2011, Arnaud BarrÃ©
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,34 +33,52 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef btkCommonSwig_h
-#define btkCommonSwig_h
+BTK_SWIG_DECLARE_CLASS(ForcePlatform)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_CTOR(ForcePlatform);
+  BTK_SWIG_DECLARE_CLONE(ForcePlatform);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatform);
+};
 
-#define BTK_SWIG_HEADER_DECLARATION
+BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType1, ForcePlatform)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType1, ForcePlatform);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType1);
+};
 
-#include "btkSwigUtils.h"
-#include "btkSwigMacros.h"
+BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType2, ForcePlatform)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType2, ForcePlatform);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType2);
+};
 
-#include <btkEvent.h>
-#include <btkAnalog.h>
-#include <btkPoint.h>
-#include <btkForcePlatform.h>
-#include <btkForcePlatformTypes.h>
-#include <btkEventCollection.h>
-#include <btkAnalogCollection.h>
-#include <btkPointCollection.h>
-#include <btkForcePlatformCollection.h>
-#include <btkMetaDataInfo.h>
-#include <btkMetaData.h>
-#include <btkMetaDataUtils.h>
-#include <btkAcquisition.h>
+BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType3, ForcePlatform)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType3, ForcePlatform);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType3);
+};
 
-#include "btkCommonSwig_Event.h"
-#include "btkCommonSwig_Analog.h"
-#include "btkCommonSwig_Point.h"
-#include "btkCommonSwig_ForcePlatform.h"
-#include "btkCommonSwig_Collection.h"
-#include "btkCommonSwig_MetaData.h"
-#include "btkCommonSwig_Acquisition.h"
+BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType4, ForcePlatform)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType4, ForcePlatform);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType4);
+};
 
-#endif // btkCommonSwig_h
+BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType5, ForcePlatform)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType5, ForcePlatform);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType5);
+};
+
+BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType6, ForcePlatform)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType6, ForcePlatform);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType6);
+};

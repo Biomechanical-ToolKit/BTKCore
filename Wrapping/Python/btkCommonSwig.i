@@ -125,6 +125,58 @@ protected:
 };
 
 // ------------------------------------------------------------------------- //
+//                                 ForcePlatform                             //
+// ------------------------------------------------------------------------- //
+
+%eigen_typemaps(btk::ForcePlatform::Corners)
+%eigen_typemaps(btk::ForcePlatform::Corner)
+%eigen_typemaps(btk::ForcePlatform::Origin)
+%eigen_typemaps(btk::ForcePlatform::CalMatrix)
+
+%include "btkCommonSwig_ForcePlatform.h"
+
+BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatform)
+{
+public:
+  typedef btkAnalogIterator Iterator; // Defined by the macro BTK_SWIG_DECLARE_IMPL_COLLECTION(Analog);
+  Iterator Begin();
+  Iterator End();
+  int GetChannelNumber() const;
+  btkAnalog GetChannel(int );
+  void SetChannel(int , btkAnalog );
+  btkAnalogCollection GetChannels() const;
+  BTK_SWIG_DECLARE_IMPL_GETSET(Origin, btk::ForcePlatform::Origin& );
+  void SetOrigin(double , double , double );
+  const btk::ForcePlatform::Corner GetCorner(int ) const;
+  void SetCorner(int , int , double );
+  void SetCorner(int , double , double , double );
+  void SetCorner(int , const btk::ForcePlatform::Corner& );
+  BTK_SWIG_DECLARE_IMPL_GETSET(Corners, btk::ForcePlatform::Corners& );
+  BTK_SWIG_DECLARE_IMPL_GETSET(CalMatrix, btk::ForcePlatform::CalMatrix& );
+  int GetType() const;
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(ForcePlatform);
+};
+
+BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType1) : public btkForcePlatform_impl
+{};
+
+BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType2) : public btkForcePlatform_impl
+{};
+
+BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType3) : public btkForcePlatform_impl
+{};
+
+BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType4) : public btkForcePlatform_impl
+{};
+
+BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType5) : public btkForcePlatform_impl
+{};
+
+BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType6) : public btkForcePlatform_impl
+{};
+
+// ------------------------------------------------------------------------- //
 //                                  Collection                               //
 // ------------------------------------------------------------------------- //
 
@@ -133,6 +185,7 @@ protected:
 BTK_SWIG_DECLARE_IMPL_COLLECTION(Event);
 BTK_SWIG_DECLARE_IMPL_COLLECTION(Analog);
 BTK_SWIG_DECLARE_IMPL_COLLECTION(Point);
+BTK_SWIG_DECLARE_IMPL_COLLECTION(ForcePlatform);
 
 // ------------------------------------------------------------------------- //
 //                                     MetaData                              //
@@ -380,8 +433,7 @@ public:
   AnalogResolution GetAnalogResolution() const;
   void SetAnalogResolution(AnalogResolution r);
   int GetMaxInterpolationGap() const;
-  void SetMaxInterpolationGap(int gap);
-  
+  void SetMaxInterpolationGap(int gap);  
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(Acquisition);
 };

@@ -204,3 +204,102 @@ BTK_SWIG_DOCSTRING_IMPL(Point, GetFrameNumber, "Returns the number of frames");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetFrameNumber, "Sets the number of frames");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetType, "Returns the point's type");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetType, "Sets the point's type");
+
+// ------------------------------------------------------------------------- //
+//                                 ForcePlatform                             //
+// ------------------------------------------------------------------------- //
+%feature("docstring") btkForcePlatform "
+This class is generic and doesn't know its type, nor the number of analog channels used.
+To use predefined force platform as proposed in the documentation of the C3D file format, check the following classes:
+ - btk::ForcePlatformType1: 6 channels (FX, FY, FZ, PX, PY, MZ);
+ - btk::ForcePlatformType2: 6 channels (FX, FY, FZ, MX, MY, MZ);
+ - btk::ForcePlatformType3: 8 channels (FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23);
+ - btk::ForcePlatformType4: Same as Type-2 + calibration matrix 6 (columns) by 6 (rows);
+ - btk::ForcePlatformType5: Same as Type-3 + calibration matrix 6 (columns) by 8 (rows);
+ - btk::ForcePlatformType6: 12 channels (FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4] + calibration matrix 12 by 12)."
+
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, Begin, "Begin(self) -> btkAnalogIterator");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, End, "End(self) -> btkAnalogIterator");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, GetChannel, "GetChannel(self, int) -> btkAnalog)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetChannel, "SetChannel(self, int , btkAnalog)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, GetOrigin, "GetOrigin(self) -> array (NumPy)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetOrigin(double , double , double ), "SetOrigin(self, double , double , double )");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetOrigin(const btk::ForcePlatform::Origin& ), "SetOrigin(self, array)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, GetCorner, "GetCorner(self, int) -> array (NumPy)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetCorner(int, int, double ), "SetCorner(self, int, int, double)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetCorner(int, double, double, double ), "SetCorner(self, int, double, double, double )");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetCorner(int, const btk::ForcePlatform::Corner& ), "SetCorner(self, int, array)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, GetCorners, "GetCorners(self) -> array (NumPy)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetCorners, "SetCorners(self, array)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, GetCalMatrix, "GetCalMatrix(self) -> array (NumPy)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetCalMatrix, "SetCalMatrix(self, array)");
+
+BTK_SWIG_DOCSTRING(ForcePlatform, Clone, "Deep copy of the object");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, Begin, "Returns an iterator to the beginning of the list of items.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, End, "Returns an iterator just past the last item.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, GetChannelNumber, "Returns the number of analog channels used by the force platform");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, GetChannel, "Returns the analog channel for the given index.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, SetChannel, "Sets the analog channel for the given index");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, GetChannels, "Returns force platform's channels.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, GetOrigin, "Returns the origin of the force platform.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, SetOrigin, "Sets the origin.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, GetCorner, "Returns the corner for the given index.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, SetCorner, "Sets the corner for the given index.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, GetCorners, "Returns corners' coordinates.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, SetCorners, "Sets corners' coordinates.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, GetCalMatrix, "Returns the calibration matrix.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, SetCalMatrix, "Sets the calibration matrix.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatform, GetType, "Returns the type of the force platform.");
+
+%feature("docstring") btkForcePlatformType1 "
+Force platform composed of 6 channels:
+ - FX: Horizontal forces on the axis X of the platform;
+ - FY: Horizontal forces on the axis Y of the platform;
+ - FZ: Vertical forces on the axis Z of the platform;
+ - PX: Position of the centre of pressure (CoP) on the axis X of the platform;
+ - PY: Position of the centre of pressure (CoP) on the axis Y of the platform;
+ _ MZ: Vertical moment on the axis Z of the platform."
+
+%feature("docstring") btkForcePlatformType2 "
+Force platform composed of 6 channels:
+ - FX: Horizontal forces on the axis X of the platform;
+ - FY: Horizontal forces on the axis Y of the platform;
+ - FZ: Vertical forces on the axis Z of the platform;
+ - MX: Horizontal moment on the axis X of the platform;
+ - MY: Horizontal moment on the axis Y of the platform;
+ _ MZ: Vertical moment on the axis Z of the platform."
+
+%feature("docstring") btkForcePlatformType3 "
+Force platform composed of 8 channels:
+ - FZ1: Vertical forces measured by the sensor on the corner 1;
+ - FZ2: Vertical forces measured by the sensor on the corner 2;
+ - FZ3: Vertical forces measured by the sensor on the corner 3;
+ - FZ4: Vertical forces measured by the sensor on the corner 4;
+ - FX12: Horizontal forces measured by the sensors 1 & 2;
+ - FX34: Horizontal forces measured by the sensors 3 & 4;
+ - FY14: Horizontal forces measured by the sensors 1 & 4;
+ - FY23: Horizontal forces measured by the sensors 2 & 3.
+"
+
+%feature("docstring") btkForcePlatformType4 "
+Force platform composed of 6 channels and a 6 columns by 6 rows calibration matrix. 
+The definition of the channels are the same than the force platform Type 2."
+
+%feature("docstring") btkForcePlatformType5 "
+Force platform composed of 8 channels and a 8 columns by 6 rows calibration matrix. 
+The definition of the channels are the same than the force platform Type 3."
+ 
+%feature("docstring") btkForcePlatformType6 "
+Force platform composed of 12 channels and a 12 columns by 12 rows calibration matrix:
+ - FX1: Horizontal forces measured by the sensor on the corner 1;
+ - FX2: Horizontal forces measured by the sensor on the corner 2;
+ - FX3: Horizontal forces measured by the sensor on the corner 3;
+ - FX4: Horizontal forces measured by the sensor on the corner 4;
+ - FY1: Horizontal forces measured by the sensor on the corner 1;
+ - FY2: Horizontal forces measured by the sensor on the corner 2;
+ - FY3: Horizontal forces measured by the sensor on the corner 3;
+ - FY4: Horizontal forces measured by the sensor on the corner 4;
+ - FZ1: Vertical forces measured by the sensor on the corner 1;
+ - FZ2: Vertical forces measured by the sensor on the corner 2;
+ - FZ3: Vertical forces measured by the sensor on the corner 3;
+ - FZ4: Vertical forces measured by the sensor on the corner 4."

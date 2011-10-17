@@ -18,7 +18,7 @@ This is the API documentation for Biomechanical ToolKit (BTK), a cross-platform 
 
 If you downloaded the sources of BTK, then you have first to read the \ref BuildInstructions "building instructions" to configure, compile and install it.\n
 
-The simplest way to use BTK in your program is to take a look at the \ref GettingStarted "tutorial".
+The simplest way to use BTK in your program is to take a look in this \ref GettingStarted "tutorial".
 
 To well understand the concept of pipelines and theirs mechanisms, look at the \ref AdvancedTutorial "advanced tutorial".
 
@@ -27,4 +27,5 @@ And finally, for more informations about the development (code guidelines, unit 
 <b>Usefull links:</b>
 - BTK homepage: <a>http://code.google.com/p/b-tk/</a>
 - BTK Users group: <a>http://groups.google.com/group/btk-users</a>
+- Twitter: \@<a href="http://twitter.com/btkwww">btkwww</a>
  */

@@ -33,13 +33,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
  
- #include "btkCommonSwig.h"
+#include "btkCommonSwig.h"
 
 // ------------------------------------------------------------------------- //
 //                                  Event                                    //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DEFINE_DEFAULT_CTOR(Event)
-BTK_SWIG_DEFINE_CLONE(Event)
+BTK_SWIG_DEFINE_DEFAULT_CTOR(Event);
+BTK_SWIG_DEFINE_CLONE(Event);
 
 btkEvent::btkEvent(const std::string& label, double t, const std::string& context, int detectionFlags, const std::string& subject, const std::string& desc, int id)
 : btkEvent_shared(btk::Event::New(label, t, context, detectionFlags, subject, desc, id))
@@ -56,7 +56,7 @@ btkEvent::btkEvent(const std::string& label, double t, int f, const std::string&
 // ------------------------------------------------------------------------- //
 //                                  Analog                                   //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DEFINE_CLONE(Analog)
+BTK_SWIG_DEFINE_CLONE(Analog);
 
 btkAnalog::btkAnalog(const std::string& label, const std::string& desc)
 : btkAnalog_shared(btk::Analog::New(label, desc))
@@ -73,7 +73,7 @@ btkAnalog::btkAnalog(const std::string& label, int frameNumber)
 // ------------------------------------------------------------------------- //
 //                                  Point                                    //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DEFINE_CLONE(Point)
+BTK_SWIG_DEFINE_CLONE(Point);
 
 // shadowed by the last constructor...
 // btkPoint::btkPoint(const std::string& label, btkPoint_impl::Type t, const std::string& desc)
@@ -89,22 +89,43 @@ btkPoint::btkPoint(const std::string& label, int frameNumber, btkPoint_impl::Typ
 {};
 
 // ------------------------------------------------------------------------- //
+//                                 ForcePlatform                             //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DEFINE_DEFAULT_CTOR(ForcePlatform);
+BTK_SWIG_DEFINE_CLONE(ForcePlatform);
+
+BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType1, ForcePlatform);
+
+BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType2, ForcePlatform);
+
+BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType3, ForcePlatform);
+
+BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType4, ForcePlatform);
+
+BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType5, ForcePlatform);
+
+BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType6, ForcePlatform);
+
+// ------------------------------------------------------------------------- //
 //                                Collection                                 //
 // ------------------------------------------------------------------------- //
 // - EventCollection
-BTK_SWIG_DEFINE_DEFAULT_CTOR(EventCollection)
-BTK_SWIG_DEFINE_CLONE(EventCollection)
+BTK_SWIG_DEFINE_DEFAULT_CTOR(EventCollection);
+BTK_SWIG_DEFINE_CLONE(EventCollection);
 // - AnalogCollection
-BTK_SWIG_DEFINE_DEFAULT_CTOR(AnalogCollection)
-BTK_SWIG_DEFINE_CLONE(AnalogCollection)
+BTK_SWIG_DEFINE_DEFAULT_CTOR(AnalogCollection);
+BTK_SWIG_DEFINE_CLONE(AnalogCollection);
 // - PointCollection
-BTK_SWIG_DEFINE_DEFAULT_CTOR(PointCollection)
-BTK_SWIG_DEFINE_CLONE(PointCollection)
+BTK_SWIG_DEFINE_DEFAULT_CTOR(PointCollection);
+BTK_SWIG_DEFINE_CLONE(PointCollection);
+// - ForcePlatformCollection
+BTK_SWIG_DEFINE_DEFAULT_CTOR(ForcePlatformCollection);
+BTK_SWIG_DEFINE_CLONE(ForcePlatformCollection);
 
 // ------------------------------------------------------------------------- //
 //                               MetaDataInfo                                //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DEFINE_CLONE(MetaDataInfo)
+BTK_SWIG_DEFINE_CLONE(MetaDataInfo);
 
 
 btkMetaDataInfo::btkMetaDataInfo(int val)
@@ -146,7 +167,7 @@ btkMetaDataInfo::btkMetaDataInfo(const std::vector<int>& dim, const std::vector<
 // ------------------------------------------------------------------------- //
 //                                 MetaData                                  //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DEFINE_CLONE(MetaData)
+BTK_SWIG_DEFINE_CLONE(MetaData);
 
 btkMetaData::btkMetaData(const std::string& label) // . const std::string& desc, bool isUnlocked)
 : btkMetaData_shared(btk::MetaData::New(label, "", true))
@@ -191,5 +212,5 @@ btkMetaData::btkMetaData(const std::string& label, const std::vector<int>& dim, 
 // ------------------------------------------------------------------------- //
 //                               Acquisition                                 //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DEFINE_DEFAULT_CTOR(Acquisition)
-BTK_SWIG_DEFINE_CLONE(Acquisition)
+BTK_SWIG_DEFINE_DEFAULT_CTOR(Acquisition);
+BTK_SWIG_DEFINE_CLONE(Acquisition);

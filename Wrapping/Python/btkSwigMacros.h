@@ -51,16 +51,17 @@
     
   #define BTK_SWIG_DECLARE_DEFAULT_CTOR(classname) \
     btk##classname()
-    
-  #define BTK_SWIG_DECLARE_DEFAULT_IO_CTOR(classname) \
+  
+  #define BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(classname, inheritname) \
     BTK_SWIG_DECLARE_DEFAULT_CTOR(classname); \
-    btk##classname(const btkAcquisitionFileIO toCopy)
+    btk##classname(const btk##inheritname toCopy)
+  
+  #define BTK_SWIG_DECLARE_DEFAULT_IO_CTOR(classname) \
+    BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(classname, AcquisitionFileIO)
 
   #define BTK_SWIG_DECLARE_CLONE(classname) \
     btk##classname Clone(); \
-    public: \
-      btk##classname(const btk##classname##_shared toCopy); \
-    public:
+    btk##classname(const btk##classname##_shared toCopy)
   
   #define BTK_SWIG_DECLARE_POINTER_OPERATOR(classname)
 #else
@@ -72,10 +73,13 @@
     
   #define BTK_SWIG_DECLARE_DEFAULT_CTOR(classname) \
     btk##classname()
+    
+  #define BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(classname, inheritname) \
+    BTK_SWIG_DECLARE_DEFAULT_CTOR(classname); \
+    btk##classname(const btk##inheritname toCopy)
 
   #define BTK_SWIG_DECLARE_DEFAULT_IO_CTOR(classname) \
-    BTK_SWIG_DECLARE_DEFAULT_CTOR(classname); \
-    btk##classname(const btkAcquisitionFileIO toCopy)
+    BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(classname, AcquisitionFileIO)
 
   #define BTK_SWIG_DECLARE_CLONE(classname) \
     btk##classname Clone();
@@ -97,11 +101,14 @@
   : btk##classname##_shared(btk::classname::New()) \
   {};
   
-#define BTK_SWIG_DEFINE_DEFAULT_IO_CTOR(classname) \
+#define BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(classname, inheritname) \
   BTK_SWIG_DEFINE_DEFAULT_CTOR(classname); \
-  btk##classname::btk##classname(const btkAcquisitionFileIO toCopy) \
+  btk##classname::btk##classname(const btk##inheritname toCopy) \
   : btk##classname##_shared(static_pointer_cast<btk::classname>(toCopy)) \
   {};
+
+#define BTK_SWIG_DEFINE_DEFAULT_IO_CTOR(classname) \
+  BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(classname, AcquisitionFileIO)
 
 #define BTK_SWIG_DEFINE_CLONE(classname) \
   btk##classname btk##classname::Clone() \
@@ -186,7 +193,7 @@
   BTK_SWIG_DECLARE_ITERATOR(elt##Collection,elt) \
   BTK_SWIG_DECLARE_CLASS(elt##Collection) \
   { \
-    public: \
+  public: \
     BTK_SWIG_DECLARE_DEFAULT_CTOR(elt##Collection); \
     BTK_SWIG_DECLARE_CLONE(elt##Collection); \
     BTK_SWIG_DECLARE_POINTER_OPERATOR(elt##Collection); \
