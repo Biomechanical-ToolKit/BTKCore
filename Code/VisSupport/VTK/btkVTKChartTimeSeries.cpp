@@ -703,7 +703,7 @@ namespace btk
 #else
       painter->GetBrush()->SetColor(0, 127, 255, 64);
 #endif
-      int lbi, rbi;
+      int lbi = 0, rbi = 0;
       (*this->mp_RegionOfInterestFunctor)(lbi, rbi);
       float left = static_cast<float>(lbi) - this->mp_AxisX->GetMinimum();
       float right = this->mp_AxisX->GetMaximum() - static_cast<float>(rbi);

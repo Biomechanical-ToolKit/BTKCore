@@ -84,6 +84,7 @@ TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
   f.setPointSize(10); this->setFont(f);
   this->m_Fm = f;
 #endif
+  this->m_Mode = None;
   this->m_MovingEventIndex = -1;
   this->mp_Rubber = new QRubberBand(QRubberBand::Rectangle, this);
   

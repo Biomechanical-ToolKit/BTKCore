@@ -302,7 +302,7 @@ namespace btk
     if (this->m_Dims == dims)
       return;
     this->m_Dims = dims;
-    if (dims.size() == 0)
+    if (dims.empty())
       Resize_p(this->m_Format, this->m_Values, 1);
     else
     {

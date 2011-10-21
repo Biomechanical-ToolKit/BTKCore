@@ -184,9 +184,9 @@ public:
   void setFrameArray(vtkDoubleArray* array);
   virtual void setPlotVisible(int index, bool show, bool* layoutModified);
   virtual void show(Acquisition* acq, bool s, bool* layoutModified);
-  const QString& title() {return this->m_Title;};
+  const QString& title() const {return this->m_Title;};
   void setTitle(const QString& title) {this->m_Title = title;};
-  const QList<int>& optionSelection() {return this->m_OptionSelection;};
+  const QList<int>& optionSelection() const {return this->m_OptionSelection;};
   void setOptionSelection(const QList<int>& selection) {this->m_OptionSelection = selection;};
   
   virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* item) = 0;

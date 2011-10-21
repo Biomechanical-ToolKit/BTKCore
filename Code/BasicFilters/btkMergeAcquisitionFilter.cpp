@@ -671,7 +671,7 @@ namespace btk
         fpConfigList.push_back(*it);
     }
     
-    if ((fpChanList.size() != 0) && (fpConfigString.size() != 0))
+    if (!fpChanList.empty() && !fpConfigString.empty())
     {
       for (std::list<MetaData::Pointer>::iterator itConfig = fpConfigList.begin() ; itConfig != fpConfigList.end() ; ++itConfig)
       {
@@ -825,7 +825,7 @@ namespace btk
         dims = originInfoOut->GetDimensions();
         dims[1] = usedNum;
         originInfoOut->SetValues(dims, originValOut);
-        if ((calMatrixValOut.size() != 0) || (calMatrixValIn.size() != 0))
+        if (!calMatrixValOut.empty() || !calMatrixValIn.empty())
         {
           MetaData::Pointer calMatrix;
           if (calMatrixOutIt == (*fpIt)->End())
