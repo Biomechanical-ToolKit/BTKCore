@@ -88,6 +88,7 @@ public:
   virtual void setPlotVisible(int index, bool show, bool* layoutModified);
   virtual void show(Acquisition* acq, bool s, bool* layoutModified);
   void setExpandable(bool expandable);
+  bool isExpanded() const {return this->m_Expanded;};
 
 protected:
   btk::VTKChartTimeSeries* createChart(btk::VTKChartTimeSeries* sourceChart);
@@ -345,28 +346,52 @@ void ChartWidget::removePlot(int index)
 
 void ChartWidget::setPlotLineColor(const QList<int>& indices, const QColor& color)
 {
-  for (QList<int>::const_iterator it = indices.begin() ; it != indices.end() ; ++it)
+  if ((this->m_CurrentChartType == AnalogChart) && static_cast<AnalogChartData*>(this->m_ChartData[this->m_CurrentChartType])->isExpanded())
   {
-    for (int i = 0 ; i < static_cast<int>(this->m_ChartData[this->m_CurrentChartType]->charts()->size()) ; ++i)
+    for (QList<int>::const_iterator it = indices.begin() ; it != indices.end() ; ++it)
     {
-      vtkPlot* plot = this->m_ChartData[this->m_CurrentChartType]->chart(i)->GetPlot(*it);
+      vtkPlot* plot = this->m_ChartData[this->m_CurrentChartType]->chart(*it)->GetPlot(0);
       plot->SetColor(color.redF(), color.greenF(), color.blueF());
+      this->m_ChartData[this->m_CurrentChartType]->plotsProperties()[*it].color = color;
     }
-    this->m_ChartData[this->m_CurrentChartType]->plotsProperties()[*it].color = color;
+  }
+  else
+  {
+    for (QList<int>::const_iterator it = indices.begin() ; it != indices.end() ; ++it)
+    {
+      for (int i = 0 ; i < static_cast<int>(this->m_ChartData[this->m_CurrentChartType]->charts()->size()) ; ++i)
+      {
+        vtkPlot* plot = this->m_ChartData[this->m_CurrentChartType]->chart(i)->GetPlot(*it);
+        plot->SetColor(color.redF(), color.greenF(), color.blueF());
+      }
+      this->m_ChartData[this->m_CurrentChartType]->plotsProperties()[*it].color = color;
+    }
   }
   this->render(true); // Options are shown
 };
 
 void ChartWidget::setPlotLineWidth(const QList<int>& indices, double value)
 {
-  for (QList<int>::const_iterator it = indices.begin() ; it != indices.end() ; ++it)
+  if ((this->m_CurrentChartType == AnalogChart) && static_cast<AnalogChartData*>(this->m_ChartData[this->m_CurrentChartType])->isExpanded())
   {
-    for (int i = 0 ; i < static_cast<int>(this->m_ChartData[this->m_CurrentChartType]->charts()->size()) ; ++i)
+    for (QList<int>::const_iterator it = indices.begin() ; it != indices.end() ; ++it)
     {
-      vtkPlot* plot = this->m_ChartData[this->m_CurrentChartType]->chart(i)->GetPlot(*it);
+      vtkPlot* plot = this->m_ChartData[this->m_CurrentChartType]->chart(*it)->GetPlot(0);
       plot->SetWidth(static_cast<float>(value));
+      this->m_ChartData[this->m_CurrentChartType]->plotsProperties()[*it].lineWidth = value;
     }
-    this->m_ChartData[this->m_CurrentChartType]->plotsProperties()[*it].lineWidth = value;
+  }
+  else
+  {
+    for (QList<int>::const_iterator it = indices.begin() ; it != indices.end() ; ++it)
+    {
+      for (int i = 0 ; i < static_cast<int>(this->m_ChartData[this->m_CurrentChartType]->charts()->size()) ; ++i)
+      {
+        vtkPlot* plot = this->m_ChartData[this->m_CurrentChartType]->chart(i)->GetPlot(*it);
+        plot->SetWidth(static_cast<float>(value));
+      }
+      this->m_ChartData[this->m_CurrentChartType]->plotsProperties()[*it].lineWidth = value;
+    }
   }
   this->render(true); // Options are shown
 };

@@ -142,7 +142,6 @@ protected:
   
   int m_CurrentChartType;
   QVector<AbstractChartData*> m_ChartData;
-  bool m_AnalogExpanded;
   
   QLabel* mp_ChartTitleLabel;
   VTKChartWidget* mp_ChartContentWidget;
