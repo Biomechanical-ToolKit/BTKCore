@@ -1334,7 +1334,9 @@ bool VTKChartWidget::event(QEvent* event)
         if (plot->GetVisible() && plot->GetNearestPoint(pos, tolerance, &coord))
         {
           QString valueStr;
-          if (fabs(coord.Y()) > 1.0)
+          if (coord.Y() == 0.0)
+            valueStr = "0";
+          else if (fabs(coord.Y()) > 1.0)
             valueStr = QString::number(coord.Y(), 'f', 1);
           else if (fabs(coord.Y()) > 0.1)
             valueStr = QString::number(coord.Y(), 'f', 2);
