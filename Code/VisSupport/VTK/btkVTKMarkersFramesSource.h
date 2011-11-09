@@ -86,8 +86,8 @@ namespace btk
     int GetTrajectoryLength() const {return this->m_TrajectoryLength;};
     void SetTrajectoryLength(int len) {this->m_TrajectoryLength = len;};
     
-    double GetScaleUnit() {return this->mp_Scale;};
-    void SetScaleUnit(double s) {this->mp_Scale = s;};
+    double GetScaleUnit() {return this->m_Scale;};
+    void SetScaleUnit(double s) {this->m_Scale = s;};
     
     double GetDefaultMarkerRadius() const {return this->m_DefaultMarkerRadius;};
     void SetDefaultMarkerRadius(double r) {this->m_DefaultMarkerRadius = r;};
@@ -118,7 +118,7 @@ namespace btk
     vtkIdTypeArray* mp_MarkersColorIndex;
     vtkLookupTable* mp_MarkersColorsLUT;
     VTKMarkersSource* mp_MarkersGenerator;
-    double mp_Scale;
+    double m_Scale;
     double m_DefaultMarkerRadius;
     int m_TrajectoryLength;
   };
