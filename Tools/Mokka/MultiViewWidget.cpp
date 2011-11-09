@@ -1103,7 +1103,6 @@ void MultiViewWidget::clear()
 {
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
     static_cast<CompositeView*>(*it)->show(false);
-  this->updateDisplay(this->mp_Acquisition->firstFrame());
 };
 
 void MultiViewWidget::circleSelectedMarkers(const QList<int>& ids)
