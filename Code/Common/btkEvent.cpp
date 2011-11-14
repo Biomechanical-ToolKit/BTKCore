@@ -44,6 +44,27 @@ namespace btk
    * @class Event btkEvent.h
    * @brief Label a specific time/frame during an acquisition.
    *
+   * An event is defined as:
+   *  - a label;
+   *  - a time;
+   *  - a frame;
+   *  - a context;
+   *  - a detection flag;
+   *  - a description;
+   *  - an ID.
+   *
+   * The ID is not used as a unique identifier but more to determine the type of the event.
+   * Even if there is no rule for the id value, these 3 next values are used in Vicon Workstation and Nexus to distinguish events' type:
+   *  - The value 0 is for general event;
+   *  - Value 1 corresponds to the foot strike event;
+   *  - Value 2 for the foot off. 
+   * Without the use of these values, it is known that Workstation and Nexus put all events in general (default value is 0). For Polygon, one user reported that some points had their values set to 0.
+   *
+   * For example, a heel strike event on the left leg or the subject John Doe at frame 143 can be set by
+   * @code
+   * btk::Event::Pointer evt = btk::Event::New('FootStrike', 143, 'Left', btk.btkEvent.Manual, 'John Doe', 'Heel strike event', 2)";
+   * @endcode
+   *
    * @ingroup BTKCommon
    */
   

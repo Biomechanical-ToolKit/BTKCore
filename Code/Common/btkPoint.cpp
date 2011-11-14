@@ -41,9 +41,21 @@ namespace btk
    * @class Point btkPoint.h
    * @brief Coordinates of a point in a 3D space along the time.
    *
-   * Coordinates of the point are generaly measured by an acquisition sytem.
-   * Each Point object has a residual value for each frame. A mask is also added to know the parts of the system which measured the coordinates.
-   * This class is also used to represent angles, forces, moments, powers and scalars. To know/set the type of the point, you can use the methods GetType() and SetType().
+   * The coordinates of the point are generally measured by an acquisition system. For each frame, the
+   * 3D value has a residual and mask. They can provide informations on the quality of these 3D data 
+   * (residual associated with the reconstruction of the marker by camera) as well as the part(s) of 
+   * the system which measured the coordinates (the masks is used mainly to know which camera detect 
+   * the markers). 
+   * 
+   *  This class is also used to represent angles, forces, moments, powers and scalars. 
+   *  To know/set the type of the point, you can use the methods GetType() and SetType(). 
+   * 
+   * Note: In some case the values at specific frames are invalid (mainly due to marker's occlusion).
+   * To detect if the frame is invalid, you can check the residual as well as the mask which will be 
+   * set to the value -1. It is the same thing if you want to set the frame as invalid. You can set
+   * the values of the frames to 0 and the associated residual and mask to -1.
+   * 
+   * Note: A residual with a value equal to 0 means that this frame has been post-processed (interpolation, filtering, etc.).
    *
    * @ingroup BTKCommon
    */
@@ -88,9 +100,8 @@ namespace btk
    */
   /**
    * @var Point::Type Point::Reaction
-   * Enum value which set the point object as a wrench (force, moment).
+   * Special type to indicate the point corresponds to one part of a wrench (not really used);
    */
-
 
   /**
    * @typedef Point::Pointer

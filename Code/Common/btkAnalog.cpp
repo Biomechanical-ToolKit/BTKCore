@@ -41,10 +41,14 @@ namespace btk
    * @class Analog btkAnalog.h
    * @brief Analog channel data along the time.
    *
-   * More than the data, you can also set informations related to the analog channel as its unit, scale, offset and gain. 
-   * These informations are useful for other classes/methods. For example, when you save
-   * an acquisition in a file, analog's data are generaly unscaled and written as integer, then the scale and offset
-   * are important.
+   * An analog channel is defined as:
+   *  - a matrix of double;
+   *  - a unit;
+   *  - a scale;
+   *  - an offset;
+   *  - a gain.
+   *
+   * The use of the unit, scale, offset and gain are useful for other classes/methods. For example, when you save an acquisition in a file, analog's data are generally unscaled and written as integer, then the scale and offset are important.
    *
    * @ingroup BTKCommon
    */

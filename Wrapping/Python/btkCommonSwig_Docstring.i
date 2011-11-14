@@ -258,7 +258,7 @@ Force platform composed of 6 channels:
  - FZ: Vertical forces on the axis Z of the platform;
  - PX: Position of the centre of pressure (CoP) on the axis X of the platform;
  - PY: Position of the centre of pressure (CoP) on the axis Y of the platform;
- _ MZ: Vertical moment on the axis Z of the platform."
+ - MZ: Vertical moment on the axis Z of the platform."
 
 %feature("docstring") btkForcePlatformType2 "
 Force platform composed of 6 channels:
@@ -267,7 +267,7 @@ Force platform composed of 6 channels:
  - FZ: Vertical forces on the axis Z of the platform;
  - MX: Horizontal moment on the axis X of the platform;
  - MY: Horizontal moment on the axis Y of the platform;
- _ MZ: Vertical moment on the axis Z of the platform."
+ - MZ: Vertical moment on the axis Z of the platform."
 
 %feature("docstring") btkForcePlatformType3 "
 Force platform composed of 8 channels:
