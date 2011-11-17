@@ -1047,6 +1047,7 @@ namespace btk
       in->SetAnalogResolution(input->GetAnalogResolution());
       in->SetEvents(input->GetEvents()->Clone());
       in->SetMetaData(input->GetMetaData()->Clone());
+      in->SetPointUnits(input->GetPointUnits());
       for (Acquisition::PointConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
         in->AppendPoint(Point::New((*it)->GetLabel(), (*it)->GetType(), (*it)->GetDescription()));
       for (Acquisition::AnalogConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)

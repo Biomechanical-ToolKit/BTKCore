@@ -1053,7 +1053,7 @@ namespace btk
    */
 
   /**
-   * @fn void Acquisition::SetPointUnit(const std::string& units)
+   * @fn void Acquisition::SetPointUnit(const std::string& unit)
    * Sets the unit for points of type Point::Marker.
    */
 
@@ -1061,6 +1061,22 @@ namespace btk
    * @fn const std::string Acquisition::GetPointUnit(Point::Type t) const
    * Returns the unit for points of type @a t.
    */
+  
+  /**
+   * @fn const std::vector<std::string>& Acquisition::GetPointUnits() const
+   * Returns all the units used for the points (Marker, Angle, Force, Moment, Power, Scalar).
+   */
+   
+  /**
+   * Sets the units for all the kinds of points.
+   */
+  void Acquisition::SetPointUnits(const std::vector<std::string>& units)
+  {
+    if (this->m_Units == units)
+      return;
+    this->m_Units = units;
+    this->Modified();
+  };
   
   /**
    * Sets the point's unit for the Point's type @a t with the value @a units.
@@ -1101,7 +1117,7 @@ namespace btk
       return;
     if (frequency == 0)
     {
-      btkErrorMacro("Impossible to set the point's frequecy to 0.");
+      btkErrorMacro("Impossible to set the point's frequency to 0.");
       return;
     }
     this->m_PointFrequency = frequency;

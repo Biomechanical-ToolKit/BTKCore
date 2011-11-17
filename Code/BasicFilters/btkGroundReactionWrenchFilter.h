@@ -106,18 +106,15 @@ namespace btk
          - (Fx.cwise() * (Fy.cwise() * My) - Fy.cwise().square().cwise() * Mx).cwise() / (sNF.cwise() * Fz);
     Pz.setZero();
     // Suppress false PWA
-    if (this->m_ThresholdActivated)
+    for (int i = 0 ; i < Fz.rows() ; ++i)
     {
-      for (int i = 0 ; i < Fz.rows() ; ++i)
+      if ((sNF.coeff(i) == 0.0) || (this->m_ThresholdActivated && (fabs(Fz.coeff(i)) <= this->m_ThresholdValue)))
       {
-        if (fabs(Fz.coeffRef(i)) <= this->m_ThresholdValue)
-        {
-          Px.coeffRef(i) = 0.0;
-          Py.coeffRef(i) = 0.0;
-          Pz.coeffRef(i) = 0.0;
-          grw->GetPosition()->GetResiduals().coeffRef(i) = -1.0;
-          grw->GetPosition()->GetMasks().coeffRef(i) = -1.0;
-        }
+        Px.coeffRef(i) = 0.0;
+        Py.coeffRef(i) = 0.0;
+        // Pz.coeffRef(i) = 0.0; // Already set to 0
+        grw->GetPosition()->GetResiduals().coeffRef(i) = -1.0;
+        grw->GetPosition()->GetMasks().coeffRef(i) = -1.0;
       }
     }
     // M_pwa = M_s + F_s x PWA
