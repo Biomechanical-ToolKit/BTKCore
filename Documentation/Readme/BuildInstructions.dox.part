@@ -64,6 +64,9 @@ Enable/Disable generation of BTK bindings in the Matlab language. In order to bu
 @paragraph config_matlab_redistribuable BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES
 This option is activated if BTK_WRAP_MATLAB was activated during the previous CMake configuration iteration. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is usefull for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is not compatible with BUILD_SHARED_LIBS.
 
+@subsubsection config_octave BTK_WRAP_OCTAVE
+Enable/Disable generation of BTK bindings in the Octave language. In order to build the Octave-based BTK interpreter, the target computer needs to have Octave 3.2.4 or above installed. To turn on Octave wrapping, set BTK_WRAP_OCTAVE to ON during the configuration process.
+
 @subsubsection config_scilab BTK_WRAP_SCILAB
 <div class="important">
 @b Warning: Scilab wrapping is not updated since BTK 0.1.6 and its easy installer was removed due to a major <a href="http://bugzilla.scilab.org/show_bug.cgi?id=6886">bug</a> in their mexlib library.
