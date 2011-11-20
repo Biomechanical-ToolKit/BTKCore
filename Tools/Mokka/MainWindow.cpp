@@ -794,7 +794,6 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   pw->setProgressValue(40);
   
   this->multiView->load();
-  this->multiView->updateDisplay(this->mp_Acquisition->firstFrame()); // Required
   
   pw->setProgressValue(90);
   

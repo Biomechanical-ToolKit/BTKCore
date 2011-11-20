@@ -436,6 +436,7 @@ void MultiViewWidget::load()
   segments->SetScaleUnit(scale);
 
   this->updateCameras();
+  this->updateDisplay(this->mp_Acquisition->firstFrame());
   
   // Update the X axis values for the charts
   this->mp_PointChartFrames->Initialize(); // Reset
