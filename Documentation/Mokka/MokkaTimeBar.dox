@@ -9,7 +9,7 @@
   <li>Use <img src="play.png" height="16px" width="16px"> and <img src="pause.png" height="16px" width="16px"> from the time bar to start and stop the to animation.</li>
   <li>Use <img src="skip_forward.png" height="16px" width="16px"> and <img src="skip_backward.png" height="16px" width="16px"> to move from an event to the next or previous one.</li>
   <li>Use <img src="event_right.png"> and <img src="event_left.png"> and <img src="event_general.png"> to quickly add or remove events.</li>
-  <li>Use <img src="acquisition_options.png"> to change ground orientation, speed, zoom or crop region of interest.</li>
+  <li>Use <img src="acquisition_options.png"> to change marker trajectory length, ground orientation, playback speed and other options related to acquisition.</li>
   <li>Use <img src="event_options.png"> to edit, remove or clear events.</li>
 </ul>
 @endhtmlonly
@@ -22,7 +22,7 @@ Menu to choose the ground orientation
 @subsection MokkaTimeBarPlaybackSpeed Playback speed
 Menu to choose the speed of the playback.
 - By defaut the playback speed corresponds to the RealTime.
-- The playback speed can be modified to 1/2,  1/4, 1/5, 1/10 or Full frames by using @htmlonly <img src="acquisition_options.png"> @endhtmlonly￼tip from the drop-down menu.
+- The playback speed can be modified to 1/2,  1/4, 1/5, 1/10 or Full frames by using @htmlonly <img src="acquisition_options.png"> @endhtmlonly tip from the drop-down menu.
 - Playback Speed at Real time: Play the acquisition at its frame rate (default).
 - Playback Speed at 1/2: Play the acquisition at 50% of its frame rate.
 - Playback Speed at 1/4: Play the acquisition at 25% of its frame rate.
@@ -39,6 +39,9 @@ Menu to choose the length of the markers' trajectory.
 - Trajectory length of 50 frames: Draw a total of 50 frames including holes.
 - Trajectory length of 100 frames: Draw a total of 100 frames including holes (default).
 - Trajectory length of 200 frames: Draw a total of 200 frames including holes.
+
+@subsection MokkaTimeBarReframe Reframe from One
+By defaut, the acquisition starts at the frame 1 or at the first frame of the selected region of interest. By choosing the Reframe one option you can reset your acquisition frame and set the first frame to 1. You can always undo the action.
 
 @htmlonly
 <div class="twocolumns">
