@@ -163,6 +163,8 @@ public slots:
   void updateDroppedUserLayouts(int newRow, int oldRow);
   void updateUserLayouts(const QList<QVariant>& layouts, int index);
   void playPausePlayback(bool paused);
+  // Update
+  void checkSoftwareUpdateStartup();
   
 protected slots:
   void openRecentFile();

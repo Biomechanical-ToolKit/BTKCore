@@ -150,6 +150,8 @@ int main(int argc, char *argv[])
   if (play.IsAssigned()) // Should be the last option
     mw.play();
     
+  QTimer::singleShot(500, &mw, SLOT(checkSoftwareUpdateStartup()));
+    
   int res = app.exec();
     
 #if defined(_MSC_VER)

@@ -339,14 +339,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->readSettings();
   this->setCurrentFile("");
   
-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
-  #if defined(NDEBUG)
-    QSettings settings;
-    if (settings.value("Preferences/checkUpdateStartup", true).toBool())
-      this->mp_UpdateChecker->check(true);
-  #endif
-#endif
-
   // Preferences connections. Must be set after the reading of the settings.
   connect(this->mp_Preferences, SIGNAL(useDefaultConfigurationStateChanged(bool)), this, SLOT(setPreferenceUseDefaultConfiguration(bool)));
   connect(this->mp_Preferences, SIGNAL(defaultConfigurationPathChanged(QString)), this, SLOT(setPreferenceDefaultConfigurationPath(QString)));
@@ -449,6 +441,17 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
       return false;
   }
   return QMainWindow::eventFilter(obj, event);
+};
+
+void MainWindow::checkSoftwareUpdateStartup()
+{
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+  #if defined(NDEBUG)
+    QSettings settings;
+    if (settings.value("Preferences/checkUpdateStartup", true).toBool())
+      this->mp_UpdateChecker->check(true);
+  #endif
+#endif
 };
 
 void MainWindow::about()
