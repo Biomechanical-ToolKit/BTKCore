@@ -53,7 +53,7 @@ h = btkNewAcquisition(pn, fn, an, r)</synopsis>
         <listitem>Analog channel resolution sets to 12 bits: use <link linkend="btkSetAnalogResolution">btkSetAnalogResolution</link> to modify it.</listitem>
       </itemizedlist>
     </para>
-    <para>This handle is returned as a 32-bit integer and can be only used with the btk* functions.</para>
+    <para>This handle is returned as a double and can be only used with the btk* functions.</para>
   </refsection>
   <refsection>
     <title>Examples</title>

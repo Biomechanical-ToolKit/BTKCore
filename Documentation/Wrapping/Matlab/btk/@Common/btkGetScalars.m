@@ -3,7 +3,7 @@ function [scalars scalarsInfo] = btkGetScalars(h) %#ok
 % 
 %  SCALARS = BTKGETSCALARS(H) returns a structure of scalars.  Each 
 %  fieldname in SCALARS corresponds to a scalar's label.  The biomechanical 
-%  acquisition handle H is represented as a 32-bit integer and can be only
+%  acquisition handle H is represented as a double and can be only
 %  used with the btk* functions.
 %
 %  [SCALARS SCALARSINFO] = BTKGETSCALARS(H) returns scalars' informations  

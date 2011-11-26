@@ -16,8 +16,8 @@ function [forceplates forceplatesInfo] = btkGetForcePlatforms(h) %#ok
 %  of the origin the force platform (expressed in the global frame).
 %  Field TYPE is an integer which indicate the force platform type.  For
 %  much information on this type, see the C3D documentation (www.c3d.org).
-%  The biomechanical acquisition handle H is represented as a 32-bit 
-%  integer and can be only used with the btk* functions.
+%  The biomechanical acquisition handle H is represented as a double and can
+%  be only used with the btk* functions.
 %
 %  [FORCEPLATES FORCEPLATESINFO] = BTKGETFORCEPLATFORMS(H) returns 
 %  force platform's channel' informations in FORCEPLATESINFO.  The structure 

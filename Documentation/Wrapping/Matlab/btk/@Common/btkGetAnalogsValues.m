@@ -4,8 +4,8 @@ function av = btkGetAnalogsValues(h) %#ok
 %  AV = BTKGETANALOGSVALUES(H) returns a matrix of reals.  The number of rows
 %  of this matrix corresponds to the number of analog's frame.  The number 
 %  of columns of this matrix corresponds to the number of analog channels.
-%  The biomechanical acquisition handle H is represented as a 32-bit integer
-%  and can be only used with the btk* functions.
+%  The biomechanical acquisition handle H is represented as a double and can 
+%  be only used with the btk* functions.
 
 %  Author: A. Barré
 %  Copyright 2009-2011 Biomechanical ToolKit (BTK).

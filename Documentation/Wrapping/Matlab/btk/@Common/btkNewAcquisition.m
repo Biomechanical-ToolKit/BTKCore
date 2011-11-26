@@ -22,7 +22,7 @@ function h = btkNewAcquisition(pn, fn, an, r) %#ok
 %  are differents. The number of frames for analog channels is set by mutiplying FN by R.
 %  R corresponds to the analog samples number by point frame.
 %
-%  This handle is returned as a 32-bit integer and can be only used with the btk* functions.
+%  This handle is returned as a double and can be only used with the btk* functions.
 
 %  Author: A. Barré
 %  Copyright 2009-2011 Biomechanical ToolKit (BTK).

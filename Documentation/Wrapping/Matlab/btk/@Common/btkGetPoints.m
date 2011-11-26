@@ -3,7 +3,7 @@ function [points pointsInfo] = btkGetPoints(h) %#ok
 % 
 %  POINTS = BTKGETPOINTS(H) returns a structure of points.  Each 
 %  fieldname in POINTS corresponds to a point's label.  The biomechanical 
-%  acquisition handle H is represented as a 32-bit integer and can be only
+%  acquisition handle H is represented as a double and can be only
 %  used with the btk* functions.
 %
 %  [POINTS POINTSINFO] = BTKGETPOINTS(H) returns points' informations  

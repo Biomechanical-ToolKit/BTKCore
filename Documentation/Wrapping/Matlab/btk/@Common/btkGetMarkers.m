@@ -3,7 +3,7 @@ function [markers markersInfo] = btkGetMarkers(h) %#ok
 % 
 %  MARKERS = BTKGETMARKERS(H) returns a structure of markers.  Each 
 %  fieldname in MARKERS corresponds to a marker's label.  The biomechanical 
-%  acquisition handle H is represented as a 32-bit integer and can be only
+%  acquisition handle H is represented as a double and can be only
 %  used with the btk* functions.
 %
 %  [MARKERS MARKERSINFO] = BTKGETMARKERS(H) returns markers' informations  

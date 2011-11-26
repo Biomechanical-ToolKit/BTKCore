@@ -3,7 +3,7 @@ function [forces forcesInfo] = btkGetForces(h) %#ok
 % 
 %  FORCES = BTKGETFORCES(H) returns a structure of forces.  Each 
 %  fieldname in FORCES corresponds to a force's label.  The biomechanical 
-%  acquisition handle H is represented as a 32-bit integer and can be only
+%  acquisition handle H is represented as a double and can be only
 %  used with the btk* functions.
 %
 %  [FORCES FORCESINFO] = BTKGETFORCES(H) returns forces' informations  

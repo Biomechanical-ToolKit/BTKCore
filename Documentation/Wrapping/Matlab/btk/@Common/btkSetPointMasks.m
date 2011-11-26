@@ -6,8 +6,8 @@ function btkSetPointMasks(h, idx_or_label, m) %#ok
 %  in the acquisition.  The number of columns must be equal to 1. Each value
 %  must be between 0 and 127 and corresponds to the conversion of a binary
 %  number (coded on 7 bits) to a integer number.
-%  The biomechanical acquisition handle H is represented as a 32-bit integer
-%  and can be only used with the btk* functions.
+%  The biomechanical acquisition handle H is represented as a double and
+%  can be only used with the btk* functions.
 %
 %  BTKSETPOINTMASKS(H, LABEL, M) uses the point's label to extract the point 
 %  to modify.

@@ -3,7 +3,7 @@ function [values info] = btkGetAnalog(h) %#ok
 % 
 %  VALUES = BTKGETANALOG(H, INDEX) returns a column vector with the values for one 
 %  analog channel based on the given INDEX. The biomechanical acquisition handle H is 
-%  represented as a 32-bit integer and can be only used with the btk* functions.
+%  represented as a double and can be only used with the btk* functions.
 %
 %  [VALUES INFO] = BTKGETANALOG(H, INDEX) returns the informations associated with the 
 %  the selected analog channel. The structure INFO has the followig fields:

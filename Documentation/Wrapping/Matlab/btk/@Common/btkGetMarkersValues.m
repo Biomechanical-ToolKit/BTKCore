@@ -5,8 +5,8 @@ function v = btkGetMarkersValues(h) %#ok
 %  of this matrix corresponds to the number of point's frame.  The number of
 %  columns of this matrix corresponds to the number of extracted markers 
 %  multiplied by 3 (their components X,Y,Z).
-%  The biomechanical acquisition handle H is represented as a 32-bit integer
-%  and can be only used with the btk* functions.
+%  The biomechanical acquisition handle H is represented as a double and can 
+%  be only used with the btk* functions.
 
 %  Author: A. Barré
 %  Copyright 2009-2011 Biomechanical ToolKit (BTK).

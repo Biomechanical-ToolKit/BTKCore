@@ -17,7 +17,7 @@ function FPW = btkGetForcePlatformWrenches(h, threshold) %#ok
 %  the force platform in the local frame when INGLOBALFRAME is equal to 0. Other values
 %  for INGLOBALFRAME compute the force platform wrenches in the global frame.
 %
-%  The biomechanical acquisition handle H is represented as a 32-bit integer and can be 
+%  The biomechanical acquisition handle H is represented as a double and can be 
 %  only used with the btk* functions.
 
 %  Author: A. Barré

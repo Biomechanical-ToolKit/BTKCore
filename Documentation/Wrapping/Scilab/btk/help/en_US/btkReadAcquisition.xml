@@ -29,7 +29,7 @@
   <refsection>
     <title>Description</title>
     <para>Read an acquisition stored in the file <literal>filename</literal> and return the handle <literal>h</literal> associated it.</para>
-    <para>This handle is returned as a 32-bit integer and can be only used with the btk* function.</para>
+    <para>This handle is returned as a double and can be only used with the btk* function.</para>
   </refsection>
   <refsection>
     <title>Examples</title>
