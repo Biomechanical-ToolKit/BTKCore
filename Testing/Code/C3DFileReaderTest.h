@@ -19,6 +19,13 @@ CXXTEST_SUITE(C3DFileReaderTest)
     TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::AcquisitionFileReaderException &e, e.what(), std::string("File doesn't exist\nFilename: test.c3d"));
   };
   
+  CXXTEST_TEST(Empty)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/Empty.c3d");
+    TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::AcquisitionFileReaderException &e, e.what(), std::string("No IO found, the file is not supported or valid or the file suffix is misspelled (Some IO use it to verify they can read the file)\nFilename: " + C3DFilePathIN + "others/Empty.c3d"));
+  };
+  
   CXXTEST_TEST(Sample01_Eb015pi)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
@@ -611,6 +618,7 @@ CXXTEST_SUITE(C3DFileReaderTest)
 CXXTEST_SUITE_REGISTRATION(C3DFileReaderTest)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, NoFile)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, MisspelledFile)
+CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Empty)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample01_Eb015pi)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample01_Eb015si)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample01_Eb015vi)

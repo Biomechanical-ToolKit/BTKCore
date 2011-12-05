@@ -1684,6 +1684,18 @@ namespace btk
       case Analog::PlusMinus1:
         gain[inc] = 5;
         break;
+      case Analog::PlusMinus0Dot5:
+        gain[inc] = 6;
+        break;
+      case Analog::PlusMinus0Dot25:
+        gain[inc] = 7;
+        break;
+      case Analog::PlusMinus0Dot1:
+        gain[inc] = 8;
+        break;
+      case Analog::PlusMinus0Dot05:
+        gain[inc] = 9;
+        break;
       }
       analogChannelScale[inc] = static_cast<float>(this->m_AnalogChannelScale[inc]);
       analogZeroOffset[inc] = this->m_AnalogZeroOffset[inc];
