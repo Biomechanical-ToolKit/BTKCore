@@ -312,6 +312,18 @@ namespace btk
           case 1000:
             (*it)->SetGain(Analog::PlusMinus1);
             break;
+          case 500:
+            (*it)->SetGain(Analog::PlusMinus0Dot5);
+            break;
+          case 250:
+            (*it)->SetGain(Analog::PlusMinus0Dot25);
+            break;
+          case 100:
+            (*it)->SetGain(Analog::PlusMinus0Dot1);
+            break;
+          case 50:
+            (*it)->SetGain(Analog::PlusMinus0Dot05);
+            break;
           default:
             btkErrorMacro("Unknown range: '" + channelLabel[inc] + "'. Default value used: +/- 10 V");
             (*it)->SetGain(Analog::PlusMinus10);
@@ -462,7 +474,15 @@ namespace btk
   uint16_t ANxFileIODetectAnalogRange_p(double s, int bitDepth)
   {
     uint16_t gain = static_cast<uint16_t>(fabs(s) / 2.0 * 1000.0 * pow(2.0, static_cast<double>(bitDepth)));
-    if (gain <= Analog::PlusMinus1)
+    if (gain <= Analog::PlusMinus0Dot05)
+      gain = Analog::PlusMinus0Dot05;
+    else if (gain <= Analog::PlusMinus0Dot1)
+      gain = Analog::PlusMinus0Dot1;
+    else if (gain <= Analog::PlusMinus0Dot25)
+      gain = Analog::PlusMinus0Dot25;
+    else if (gain <= Analog::PlusMinus0Dot5)
+      gain = Analog::PlusMinus0Dot5;
+    else if (gain <= Analog::PlusMinus1)
       gain = Analog::PlusMinus1;
     else if (gain <= Analog::PlusMinus1Dot25)
       gain = Analog::PlusMinus1Dot25;
@@ -473,5 +493,45 @@ namespace btk
     else
       gain = Analog::PlusMinus10;;
     return gain;
+  };
+  
+  uint16_t AnxFileIOExtractAnalogRangeFromGain(int idx, int gain, double scale, int bitDepth)
+  {
+    uint16_t range;
+    switch(gain) // range is in mV
+    {
+      case Analog::PlusMinus10:
+        range = 10000;
+        break;
+      case Analog::PlusMinus5:
+        range = 5000;
+        break;
+      case Analog::PlusMinus2Dot5:
+        range = 2500;
+        break;
+      case Analog::PlusMinus1Dot25:
+        range = 1250;
+        break;
+      case Analog::PlusMinus1:
+        range = 1000;
+        break;
+      case Analog::PlusMinus0Dot5:
+        range = 500;
+        break;
+      case Analog::PlusMinus0Dot25:
+        range = 250;
+        break;
+      case Analog::PlusMinus0Dot1:
+        range = 100;
+        break;
+      case Analog::PlusMinus0Dot05:
+        range = 50;
+        break;
+      case Analog::Unknown:
+        range = ANxFileIODetectAnalogRange_p(scale, bitDepth);
+        btkErrorMacro("Unknown gain for channel #" + ToString(idx+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(range) / 1000)  + " volts in the file. Could corrupt the data in the written file!");
+        break;
+    }
+    return range;
   };
 };

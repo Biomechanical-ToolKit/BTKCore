@@ -166,7 +166,7 @@ namespace btk
       std::getline(ifs, line);
 
       // DEVELOPER CHECK
-      // Check polarity's value. On ly Bipolar is supported for the moment.
+      // Check polarity's value. Only Bipolar is supported for the moment.
       if (polarity.compare("Bipolar") != 0)
         throw(ANCFileIOException("Unsupported ANC file. Only Bipolar board type is supported for the moment. Please, send an email to the developers to explain the problem."));
 
@@ -221,6 +221,9 @@ namespace btk
           }
         }
       }
+    // Add a metadata to notify that the first frame was not set.
+      MetaData::Pointer btkPointConfig = MetaDataCreateChild(output->GetMetaData(), "BTK_POINT_CONFIG");
+      MetaDataCreateChild(btkPointConfig, "NO_FIRST_FRAME", static_cast<int8_t>(1));
     }
     catch (std::fstream::failure& )
     {
@@ -274,48 +277,6 @@ namespace btk
     std::ofstream ofs(filename.c_str());
     if (!ofs)
       throw(ANCFileIOException("Invalid file path."));
-
-    //Adjust the frame number of each analog channel if necessary
-    input->Resize(input->GetPointNumber(), input->GetPointFrameNumber(), input->GetAnalogNumber(), input->GetNumberAnalogSamplePerFrame());
-    // Determine ANC generation
-    // Generation 2 uses the gains and generation 1 uses the analog resolution
-    /*
-    int gen = 0;
-    bool gainOk = true;
-    for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-    {
-      if ((*it)->GetGain() == Analog::Unknown)
-      {
-        gainOk = false;
-        break;
-      }
-    }
-    if (gainOk)
-      gen = 2;
-    else
-      gen = 1;
-    */
-    // BitDepth
-    /*
-    int bitDepth = 12;
-    switch(input->GetAnalogResolution())
-    {
-      case Acquisition::Bit8:
-        bitDepth = 8;
-        break;
-      case Acquisition::Bit12:
-        bitDepth = 12;
-        break;
-      case Acquisition::Bit14:
-        bitDepth = 14;
-        break;
-      case Acquisition::Bit16:
-        bitDepth = 16;
-        break;
-      default:         
-        break;
-    }
-    */
     // Frequency
     double freq = 100.0;
     if (input->GetAnalogFrequency() != 0)
@@ -333,6 +294,7 @@ namespace btk
       if (itBoard != (*itAnalog)->End())
         boardType = (*itBoard)->GetInfo()->ToString(0);
     }
+    bool scaleWarning = false;;
     // Acquisition exportation
     ofs.setf(std::ios::fixed, std::ios::floatfield);
     ofs.precision(6); 
@@ -354,63 +316,32 @@ namespace btk
       ofs << static_cast<int>(freq) << static_cast<std::string>("\t");
     ofs << static_cast<std::string>("\nRange\t");
     double time = 0.0;
-    if (this->m_Generation == 1)
+    if (this->m_Generation != 2)
     {
-      int res = static_cast<int>(pow(2.0, input->GetAnalogResolution()));//bitDepth));
-      for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-        ofs << res << static_cast<std::string>("\t");
-      for (int frame = 0 ; frame < input->GetAnalogFrameNumber() ; ++frame)
-      {
-        ofs.precision(6);
-        ofs << std::endl << time << static_cast<std::string>("\t");
-        ofs.precision(8);
-        for (AnalogCollection::ConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-          ofs << (*it)->GetValues().coeff(frame) << static_cast<std::string>("\t");
-        time += stepTime;
-      };
+      btkIOErrorMacro(filename, "Only the second generation is now supported. The exportation in the first generation of ANC file was removed due to the lack of data and to stay compatible with the interoperability of file formats.");
     }
-    else if (this->m_Generation == 2)
+    int i = 0;
+    for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
     {
-      int i = 0;
-      for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-      {
-        switch((*it)->GetGain()) // range is in mV
-        {
-          case Analog::PlusMinus10:
-            ofs << 10000;
-            break;
-          case Analog::PlusMinus5:
-            ofs << 5000;
-            break;
-          case Analog::PlusMinus2Dot5:
-            ofs << 2500;
-            break;
-          case Analog::PlusMinus1Dot25:
-            ofs << 1250;
-            break;
-          case Analog::PlusMinus1:
-            ofs << 1000;
-            break;
-          case Analog::Unknown:
-            uint16_t range = ANxFileIODetectAnalogRange_p((*it)->GetScale(), input->GetAnalogResolution());
-            ofs << range;
-            btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(range) / 1000)  + " volts in the file.");
-            break;
-        }
-        ofs << static_cast<std::string>("\t");
-        ++i;
-      }
-      for (int frame = 0 ; frame < input->GetAnalogFrameNumber() ; ++frame)
-      {
-        ofs.precision(6);
-        ofs << std::endl << time << static_cast<std::string>("\t");
-        for (AnalogCollection::ConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
-          ofs << static_cast<int>((*it)->GetValues().coeff(frame) / (*it)->GetScale()) << static_cast<std::string>("\t");
-        time += stepTime;
-      };
+      uint16_t range = AnxFileIOExtractAnalogRangeFromGain(i, (*it)->GetGain(), (*it)->GetScale(), input->GetAnalogResolution());
+      ofs << range;
+      ofs << static_cast<std::string>("\t");
+      ++i;
+      if (fabs((*it)->GetScale()) != fabs(ANxFileIOComputeScaleFactor(range, input->GetAnalogResolution())))
+        scaleWarning = true;
     }
-    else
-      throw(ANCFileIOException("Unknown ANC file generation."));
+    if (scaleWarning && (input->GetAnalogResolution() == Acquisition::Bit16))
+    {
+      btkIOErrorMacro(filename, "The scale factors used in the ANC file don't correspond to these of the acquisition. Some of the data might be scaled. In case of force platform data, you have to create a calibration file (CAL) to restore exactly the data.");
+    }
+    for (int frame = 0 ; frame < input->GetAnalogFrameNumber() ; ++frame)
+    {
+      ofs.precision(6);
+      ofs << std::endl << time << static_cast<std::string>("\t");
+      for (AnalogCollection::ConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
+        ofs << static_cast<int>((*it)->GetValues().coeff(frame) / (*it)->GetScale()) << static_cast<std::string>("\t");
+      time += stepTime;
+    };
     ofs << std::endl;
     ofs.close();
   };
