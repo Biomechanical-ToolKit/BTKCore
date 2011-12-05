@@ -74,6 +74,7 @@ namespace btk
     
   private:
     bool ExtractValues(double* values, int num, std::ifstream* ifs);
+    void ExtractCalibrationMatrix(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>* cal, MetaDataInfo::Pointer data, int i);
     
     CALForcePlateFileIO(const CALForcePlateFileIO& ); // Not implemented.
     CALForcePlateFileIO& operator=(const CALForcePlateFileIO& ); // Not implemented. 

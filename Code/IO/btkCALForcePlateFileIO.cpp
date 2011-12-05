@@ -34,9 +34,12 @@
  */
 
 #include "btkCALForcePlateFileIO.h"
+#include "btkMotionAnalysisFileIOUtils_p.h"
 #include "btkConvert.h"
+#include "btkMetaDataUtils.h"
 
 #include <Eigen/Array>
+#include <Eigen/Geometry>
 
 #include <algorithm>
 #include <cctype>
@@ -150,13 +153,6 @@ namespace btk
         fpConfigurationComplete = false;
         ForcePlateInfo fp = ForcePlateInfo();
         
-        /*
-        std::getline(ifs, line);
-        this->RemoveBlank(line);
-        std::cout << "'" << line.length() << "'" << std::endl;
-        if ((line.substr(0,1).compare(ToString(inc)) != 0) || line.length() > 1)
-          throw(CALForcePlateFileIOException("Unable to extract the index of the force platform #"  + ToString(inc) + "."));
-          */
         // Dimension (h x w x l)
         if (!this->ExtractValues(fp.dimensions, 3, &ifs))
           throw(CALForcePlateFileIOException("The dimensions of the force platform #" + ToString(inc) + " can't be extracted."));
@@ -259,9 +255,9 @@ namespace btk
         
         // Origin in a CAL file is defined in centimeters and from the center of the platform
         // The data are converted in the global frame with the default unit: mm
-        origins[inc1] = static_cast<float>(it->origin[0] * -10);
-        origins[inc1+1] = static_cast<float>(it->origin[1] * -10);
-        origins[inc1+2] = static_cast<float>(it->origin[2] * -10);
+        origins[inc1] = static_cast<float>(it->origin[0] * -10.0);
+        origins[inc1+1] = static_cast<float>(it->origin[1] * -10.0);
+        origins[inc1+2] = static_cast<float>(it->origin[2] * -10.0);
         inc1 += 3;
         
         // Corners must be in millimeters
@@ -277,9 +273,9 @@ namespace btk
         temp *= 10.0;
         temp = it->orientation * temp;
         //Eigen::Matrix<double, 3, 1> origin(it->position);
-        temp.row(0).cwise() += (it->position[0] * 10);
-        temp.row(1).cwise() += (it->position[1] * 10);
-        temp.row(2).cwise() += (it->position[2] * 10);
+        temp.row(0).cwise() += (it->position[0] * 10.0);
+        temp.row(1).cwise() += (it->position[1] * 10.0);
+        temp.row(2).cwise() += (it->position[2] * 10.0);
         double* c = temp.data();
         for (int i = 0 ; i < 12 ; ++i)
           corners[inc2 + i] = static_cast<float>(c[i]);
@@ -288,9 +284,9 @@ namespace btk
         // Convert calibration matrix factor in Nmm instead of Nm (if applicable)
         if ((it->type == 4) || (it->type == 5))
         {
-          it->calMatrix.row(3) *= 1000;
-          it->calMatrix.row(4) *= 1000;
-          it->calMatrix.row(5) *= 1000;
+          it->calMatrix.row(3) *= 1000.0;
+          it->calMatrix.row(4) *= 1000.0;
+          it->calMatrix.row(5) *= 1000.0;
         }
         
         const double* cm = it->calMatrix.data();
@@ -314,6 +310,9 @@ namespace btk
       // - BTK_PARTIAL_FP_CONFIG:CAL_MATRIX
       dims[0] = rows; dims[1] = chans;
       partial->AppendChild(btk::MetaData::New("CAL_MATRIX", dims, calMatrix));
+      // Add a metadata to notify that the first frame was not set.
+      MetaData::Pointer btkPointConfig = MetaDataCreateChild(output->GetMetaData(), "BTK_POINT_CONFIG");
+      MetaDataCreateChild(btkPointConfig, "NO_FIRST_FRAME", static_cast<int8_t>(1));
     }
     catch (std::fstream::failure& )
     {
@@ -354,9 +353,6 @@ namespace btk
    */
   void CALForcePlateFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    /*
     if (input.get() == 0)
     {
       btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
@@ -365,11 +361,169 @@ namespace btk
     std::ofstream ofs(filename.c_str());
     if (!ofs) 
       throw(CALForcePlateFileIOException("Invalid file path."));
+      
+    // Look for the metadata FORCE_PLATFORM or BTK_PARTIAL_FP_CONFIG
+    MetaData::Iterator itFP;
+    MetaData::Pointer forcePlatform;
+    bool partial = false;
+    if ((itFP = input->GetMetaData()->FindChild("FORCE_PLATFORM")) != input->EndMetaData())
+      forcePlatform = *itFP;
+    else if ((itFP = input->GetMetaData()->FindChild("BTK_PARTIAL_FP_CONFIG")) != input->EndMetaData())
+    {
+      forcePlatform = *itFP;
+      partial = true;
+    }
+    else
+    {
+      // Nothing to do
+      ofs.close();
+      return;
+    }
     
+    MetaDataInfo::Pointer fpUsed = forcePlatform->ExtractChildInfo("USED", MetaDataInfo::Integer, 0, true);
+    MetaDataInfo::Pointer fpType = forcePlatform->ExtractChildInfo("TYPE", MetaDataInfo::Integer, 1, true);
+    MetaDataInfo::Pointer fpOrigin = forcePlatform->ExtractChildInfo("ORIGIN", MetaDataInfo::Real, 2, true);
+    MetaDataInfo::Pointer fpCorners = forcePlatform->ExtractChildInfo("CORNERS", MetaDataInfo::Real, 3, true);
+    MetaDataInfo::Pointer fpCalMatrix = forcePlatform->ExtractChildInfo("CAL_MATRIX", MetaDataInfo::Real, 3, false);
+    MetaDataInfo::Pointer fpChannel = forcePlatform->ExtractChildInfo("CHANNEL", MetaDataInfo::Integer, 2, true);
+    
+    if (fpUsed && fpType && fpOrigin && fpCorners)
+    {
+      ofs.setf(std::ios::fixed, std::ios::floatfield);
+      for (int i = 0 ; i < fpUsed->ToInt(0) ; ++i)
+      {
+        // Pre
+        // - Rotation matrix used for the orientation
+        Eigen::Matrix<double, 3, 1> col0, col1, col3;
+        col0 << fpCorners->ToDouble(0 + 12 * i), fpCorners->ToDouble(1 + 12 * i), fpCorners->ToDouble(2 + 12 * i);
+        col1 << fpCorners->ToDouble(3 + 12 * i), fpCorners->ToDouble(4 + 12 * i), fpCorners->ToDouble(5 + 12 * i);
+        col3 << fpCorners->ToDouble(9 + 12 * i), fpCorners->ToDouble(10 + 12 * i), fpCorners->ToDouble(11 + 12 * i);
+        Eigen::Matrix<double, 3, 3> R;
+        R.col(0) = col0 - col1;
+        R.col(0).normalize();
+        R.col(2) = R.col(0).cross(col0 - col3);
+        R.col(2).normalize();
+        R.col(1) = R.col(2).cross(R.col(0));
+        // - Express the corners in the local frame
+        col0 = R * col0;
+        col1 = R * col1;
+        col3 = R * col3;
+        // - Prepare the data for the calibration matrix
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cal;
+        int type = fpType->ToInt(i);
+        int numChannels = 0;
+        switch(type)
+        {
+        //   * No calibration matrix for the type 1, 2 & 3.
+        case 1:
+        case 2:
+          numChannels = 6;
+          cal.setIdentity(6,6);
+          break;
+        case 3:
+          numChannels = 8;
+          cal.setIdentity(8,8);
+          break;
+        case 4:
+          numChannels = 6;
+          cal.setIdentity(6,6);
+          this->ExtractCalibrationMatrix(&cal,fpCalMatrix,i);
+          break;
+        case 5:
+          numChannels = 8;
+          cal.setIdentity(6,8);
+          this->ExtractCalibrationMatrix(&cal,fpCalMatrix,i);
+          break;
+        default:
+          {
+          btkErrorMacro("Force platform type " + ToString(fpType->ToInt(i)) + " no yet supported. Please report this problem to the developers.");
+          break;
+          }
+        }
+        
+        // Write the data into the file
+        // Platform's index
+        ofs << i+1 << "\n";
+        // Platform's dimensions
+        ofs.precision(3);
+        // - Use the the coordinate of the corners
+        double width = (col0.x() - col1.x()) / 10.0; // x1 - x2 (unit: centimeter)
+        double length = (col0.y() - col3.y()) / 10.0; // y1 - y4 (unit: centimeter)
+        // - No guess on the height of the platform => set as 1cm
+        ofs << 1.0 << " " << width << " " << length << "\n";
+        // Calibration matrix
+        ofs.precision(6);
+        // - Its content can adapted to be able to scale correctly the analog channels
+        // - It is due in some case case to the incompatibility between the scale factor in C3D and ANC/ANB file format
+        if (partial)
+        {
+          // - Because the CAL reader forced the values to be displayed in Nmm instead of Nm.
+          if ((type == 4) || (type == 5))
+          {
+            cal.row(3) /= 1000.0;
+            cal.row(4) /= 1000.0;
+            cal.row(5) /= 1000.0;
+          }
+        }
+        else if (fpChannel && (input->GetAnalogResolution() == Acquisition::Bit16) && (numChannels != 0))
+        {
+          // - Adapt the scaling factor if necessary
+          int maxChannelPerPlatform = fpChannel->GetDimension(0);
+          for (int j = 0 ; j < numChannels ; ++j)
+          {
+            int idxChannel = j + maxChannelPerPlatform * i;
+            if ((idxChannel >= static_cast<int>(fpChannel->GetValues().size())) || (idxChannel >= input->GetAnalogNumber()))
+            {
+              btkErrorMacro("Index for the analog channel used by the force platform #" + ToString(i+1) + " is out of range.");
+            }
+            else
+            {
+              Analog::Pointer analog = input->GetAnalog(idxChannel);
+              uint16_t range = AnxFileIOExtractAnalogRangeFromGain(idxChannel, analog->GetGain(), analog->GetScale(), input->GetAnalogResolution());
+              double scale = ANxFileIOComputeScaleFactor(range, input->GetAnalogResolution());
+              if (fabs(analog->GetScale()) != fabs(scale))
+              {
+                cal.col(j) *= -1.0 * analog->GetScale() / scale;
+              }
+            }
+          }
+          if (input->GetPointUnit(Point::Moment).compare("Nmm") == 0)
+          {
+            // - The calibration matrix seems to be for Nm not Nmm
+            if (type != 3)
+            {
+              cal.row(3) /= 1000.0;
+              cal.row(4) /= 1000.0;
+              cal.row(5) /= 1000.0;
+            }
+          }
+        }
+        for (int m = 0 ; m < cal.rows() ; ++m)
+        {
+          for (int n = 0 ; n < cal.cols() ; ++n)
+            ofs << cal.coeff(m,n) << ((n < cal.cols()-1) ? " " : "");
+          ofs << "\n";
+        }
+        // Origin in centimeters and from the surfacic origin to the physical origin
+        ofs << fpOrigin->ToDouble(0+i*3) / -10.0 << " " << fpOrigin->ToDouble(1+i*3) / -10.0 << " " << fpOrigin->ToDouble(2+i*3) / -10.0 << "\n";
+        // Position of the force plate center in the global frame (in centimeters)
+        ofs << (fpCorners->ToDouble(0 + 12 * i) + fpCorners->ToDouble(6 + 12 * i)) / 2.0 / 10.0 << " "
+            << (fpCorners->ToDouble(1 + 12 * i) + fpCorners->ToDouble(7 + 12 * i)) / 2.0 / 10.0 << " "
+            << (fpCorners->ToDouble(2 + 12 * i) + fpCorners->ToDouble(8 + 12 * i)) / 2.0 / 10.0 << "\n";
+        // Orientation
+        for (int m = 0 ; m < R.rows() ; ++m)
+        {
+          for (int n = 0 ; n < R.cols() ; ++n)
+            ofs << R.coeff(m,n) << ((n < R.cols()-1) ? " " : "");
+          ofs << "\n";
+        }
+      }
+    }
+    else
+    {
+      btkErrorMacro("Missing metadata informations to create the force platform calibration file.");
+    }
     ofs.close();
-    */
-    btkErrorMacro("Method not yet implemented.");
-    return;
   };
   
   /**
@@ -393,4 +547,19 @@ namespace btk
     }
     return true;
   };
+  
+  void CALForcePlateFileIO::ExtractCalibrationMatrix(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>* cal, MetaDataInfo::Pointer data, int idx)
+  {
+    int coefficientsAlreadyExtracted = data->GetDimension(0) * data->GetDimension(1) * idx;
+    if (static_cast<int>(data->GetValues().size()) >= (coefficientsAlreadyExtracted + cal->size()))
+    {
+      for (int i = 0 ; i < cal->cols() ; ++i)
+        for (int j = 0 ; j < cal->rows() ; ++j)
+          cal->coeffRef(j,i) = data->ToDouble(j + i * cal->rows() + coefficientsAlreadyExtracted);
+    }
+    else
+    {
+      btkErrorMacro("Missing coefficients to build the calibration matrix #" + ToString(idx+1) + ". Its content might be corrupted.");
+    }
+  }
 };
