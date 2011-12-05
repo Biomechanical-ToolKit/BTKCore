@@ -310,6 +310,50 @@ namespace btk
           }
         }
         
+        // Check if the first frame is set correctly (no metadata BTK_POINT_CONFIG:NO_FIRST_FRAME)
+        bool noFirstFrameIn = false, noFirstFrameOut = false;
+        MetaData::Iterator btkPointConfig;
+        MetaDataInfo::Pointer noFirstFrame;
+        // - Input
+        btkPointConfig = input->GetMetaData()->FindChild("BTK_POINT_CONFIG");
+        if (btkPointConfig != input->EndMetaData())
+        {
+          noFirstFrame = (*btkPointConfig)->ExtractChildInfo("NO_FIRST_FRAME", MetaDataInfo::Byte, 0);
+          if (noFirstFrame)
+            noFirstFrameIn = (noFirstFrame->ToInt(0) != 0);
+        }
+        // - Ouput
+        btkPointConfig = output->GetMetaData()->FindChild("BTK_POINT_CONFIG");
+        if (btkPointConfig != output->EndMetaData())
+        {
+          noFirstFrame = (*btkPointConfig)->ExtractChildInfo("NO_FIRST_FRAME", MetaDataInfo::Byte, 0);
+          if (noFirstFrame)
+            noFirstFrameOut = (noFirstFrame->ToInt(0) != 0);
+        }
+        // - Check their content
+        if (noFirstFrameIn != noFirstFrameOut)
+        {
+          MetaData::Pointer pntCfg;
+          Acquisition::Pointer src;
+          if (noFirstFrameIn)
+          {
+            input->SetFirstFrame(output->GetFirstFrame());
+            pntCfg = input->GetMetaData()->GetChild("BTK_POINT_CONFIG");
+            src = input;
+          }
+          else
+          {
+            output->SetFirstFrame(input->GetFirstFrame());
+            pntCfg = output->GetMetaData()->GetChild("BTK_POINT_CONFIG");
+            src = output;
+          }
+          // No more need of the metadata used for that
+          pntCfg->RemoveChild("NO_FIRST_FRAME");
+          // No more child? => Remove the metadata BTK_POINT_CONFIG
+          if (!pntCfg->HasChildren())
+            src->GetMetaData()->RemoveChild("BTK_POINT_CONFIG");
+        }
+        
         // Frequency
         if (output->GetPointFrequency() == 0.0)
           output->SetPointFrequency(input->GetPointFrequency());
@@ -321,7 +365,7 @@ namespace btk
         bool mergeData = false;
         // First frame
         int diffFF = output->GetFirstFrame() - input->GetFirstFrame();
-        if (diffFF < 0)
+        if ((diffFF < 0) && (input->GetPointFrameNumber() != 0))
         {
           if (abs(diffFF) == output->GetLastFrame())
             mergeData = true;
@@ -331,7 +375,7 @@ namespace btk
           else
             input->ResizeFrameNumber(output->GetPointFrameNumber());
         }
-        else if (diffFF > 0)
+        else if ((diffFF > 0) && (input->GetPointFrameNumber() != 0))
         {
           if (diffFF == input->GetLastFrame())
             mergeData = true;
@@ -344,9 +388,9 @@ namespace btk
         else
         {
           int diffFN = output->GetPointFrameNumber() - input->GetPointFrameNumber();
-          if ((diffFN > 0) && !output->IsEmptyPoint())
+          if ((diffFN > 0) && (!output->IsEmptyPoint() || !output->IsEmptyAnalog()))
             input->ResizeFrameNumber(output->GetPointFrameNumber());
-          else if ((diffFN < 0) && !input->IsEmptyPoint())
+          else if ((diffFN < 0) && (!input->IsEmptyPoint() || !input->IsEmptyAnalog()))
             output->ResizeFrameNumber(input->GetPointFrameNumber());
         }
         
@@ -695,8 +739,6 @@ namespace btk
             this->UpdateForcePlatformMetaData(out, *itConfig);
             if ((*itConfig)->GetLabel().compare("FORCE_PLATFORM") == 0)
               out->RemoveChild((*itChan)->GetLabel());
-            //  out->RemoveChild((*itConfig)->GetLabel());
-            //out->RemoveChild((*itChan)->GetLabel());
             fpChanList.erase(itChan);
             break;
           }
