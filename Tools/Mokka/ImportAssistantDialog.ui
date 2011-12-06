@@ -407,7 +407,7 @@ QPushButton::pressed {
        <item row="0" column="0">
         <widget class="QLabel" name="eliteTrajectoryLabel">
          <property name="text">
-          <string>Trajectory file (.rah, .raw, .ric)</string>
+          <string>Trajectory file (.rah, .raw, .ric, .rif)</string>
          </property>
         </widget>
        </item>

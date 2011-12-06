@@ -140,7 +140,7 @@ void ImportAssistantDialog::openMotionOrthoTrakFileDialog()
 
 void ImportAssistantDialog::openEliteTrajectoryFileDialog()
 {
-  this->openFileDialog(tr("Trajectory Files (*.rah *.raw *.ric)"), this->eliteTrajectoryLineEdit);
+  this->openFileDialog(tr("Trajectory Files (*.rah *.raw *.ric *.rif)"), this->eliteTrajectoryLineEdit);
 };
 
 void ImportAssistantDialog::openEliteForcePlatformFileDialog()

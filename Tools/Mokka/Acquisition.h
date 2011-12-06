@@ -66,7 +66,8 @@ struct Point
 
 struct Analog
 {
-  typedef enum {Unknown = 0, PlusMinus10 = 1, PlusMinus5 = 2, PlusMinus2Dot5 = 3, PlusMinus1Dot25 = 4, PlusMinus1 = 5} Gain;
+  typedef enum {Unknown = 0, PlusMinus10 = 1, PlusMinus5 = 2, PlusMinus2Dot5 = 3, PlusMinus1Dot25 = 4, 
+                PlusMinus1 = 5, PlusMinus0Dot5 = 6, PlusMinus0Dot25 = 7, PlusMinus0Dot1 = 8, PlusMinus0Dot05 = 9} Gain;
   QString label;
   QString description;
   QString unit;

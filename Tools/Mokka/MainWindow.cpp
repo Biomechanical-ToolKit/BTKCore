@@ -234,6 +234,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionImportCAL, SIGNAL(triggered()), this, SLOT(importForcePlatformCAL()));
   connect(this->actionImportOrthoTrakXLS, SIGNAL(triggered()), this, SLOT(importOrthoTrakXLS()));
   connect(this->actionImportRIC, SIGNAL(triggered()), this, SLOT(importRIC()));
+  connect(this->actionImportRIF, SIGNAL(triggered()), this, SLOT(importRIF()));
   connect(this->actionImportRAH, SIGNAL(triggered()), this, SLOT(importRAH()));
   connect(this->actionImportRAW, SIGNAL(triggered()), this, SLOT(importRAW()));
   connect(this->actionImportANG, SIGNAL(triggered()), this, SLOT(importANG()));
@@ -244,6 +245,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionExportTRC, SIGNAL(triggered()), this, SLOT(exportTRC()));
   connect(this->actionExportANB, SIGNAL(triggered()), this, SLOT(exportANB()));
   connect(this->actionExportANC, SIGNAL(triggered()), this, SLOT(exportANC()));
+  connect(this->actionExportCAL, SIGNAL(triggered()), this, SLOT(exportCAL()));
   connect(this->actionPreferences, SIGNAL(triggered()), this, SLOT(showPreferences()));
   connect(this->actionSelect_All, SIGNAL(triggered()), this, SLOT(selectAll()));
   connect(this->actionCopy, SIGNAL(triggered()), this, SLOT(copy()));
@@ -733,7 +735,7 @@ void MainWindow::openFile()
   {
     QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
-                         tr("Acquisition Files (*.anb *.anc *.ang *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *.trb *.trc);;"
+                         tr("Acquisition Files (*.anb *.anc *.ang *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *rif *.trb *.trc);;"
                             "ANB Files (*.anb);;"
                             "ANC Files (*.anc);;"
                             "ANG Files (*.ang);;"
@@ -746,6 +748,7 @@ void MainWindow::openFile()
                             "RAH Files (*.rah);;"
                             "RAW Files (*.raw);;"
                             "RIC Files (*.ric);;"
+                            "RIF Files (*.rif);;"
                             "TRB Files (*.trb);;"
                             "TRC Files (*.trc);;"
                             "XLS OrthoTrak Files (*.xls)"));
@@ -952,6 +955,11 @@ void MainWindow::importRIC()
   this->importAcquisition(tr("RIC Files (*.ric)"));
 };
 
+void MainWindow::importRIF()
+{
+  this->importAcquisition(tr("RIF Files (*.rif)"));
+};
+
 void MainWindow::importGRx()
 {
 #if 1
@@ -1035,6 +1043,11 @@ void MainWindow::exportANB()
 void MainWindow::exportANC()
 {
   this->exportAcquisition(tr("ANC Files (*.anc)"));
+};
+
+void MainWindow::exportCAL()
+{
+  this->exportAcquisition(tr("CAL Files (*.cal)"));
 };
 
 void MainWindow::showPreferences()

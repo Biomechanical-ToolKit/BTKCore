@@ -92,6 +92,7 @@ public slots:
   void importRAH();
   void importRAW();
   void importRIC();
+  void importRIF();
   void importGRx();
   void importANG();
   void importEMG();
@@ -102,6 +103,7 @@ public slots:
   void exportTRC();
   void exportANB();
   void exportANC();
+  void exportCAL();
   void showPreferences();
   void selectAll();
   void copy();

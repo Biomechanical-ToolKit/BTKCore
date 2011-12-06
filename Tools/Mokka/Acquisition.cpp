@@ -910,6 +910,18 @@ void Acquisition::loadAcquisition()
     case btk::Analog::PlusMinus1:
       a->gain = Analog::PlusMinus1;
       break;
+    case btk::Analog::PlusMinus0Dot5:
+      a->gain = Analog::PlusMinus0Dot5;
+      break;
+    case btk::Analog::PlusMinus0Dot25:
+      a->gain = Analog::PlusMinus0Dot25;
+      break;
+    case btk::Analog::PlusMinus0Dot1:
+      a->gain = Analog::PlusMinus0Dot1;
+      break;
+    case btk::Analog::PlusMinus0Dot05:
+      a->gain = Analog::PlusMinus0Dot05;
+      break;
     }
     a->offset = (*it)->GetOffset();
     a->scale = (*it)->GetScale();
