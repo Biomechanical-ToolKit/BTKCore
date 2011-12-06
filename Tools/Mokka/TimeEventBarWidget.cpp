@@ -102,8 +102,17 @@ TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
 void TimeEventBarWidget::load(Acquisition* acq)
 {
   this->m_SelectedEvents.clear();
-  this->m_FirstFrame = acq->firstFrame();
-  this->m_LastFrame = acq->lastFrame();
+  if (acq->pointFrameNumber() == 0)
+  {
+    this->m_FirstFrame = 0;
+    this->m_LastFrame = 0;
+  }
+  else
+  {
+    this->m_FirstFrame = acq->firstFrame();
+    this->m_LastFrame = acq->lastFrame();
+  }
+    
   this->m_ROIFirstFrame = this->m_FirstFrame;
   this->m_ROILastFrame = this->m_LastFrame;
   this->m_SliderPos = this->m_FirstFrame;
