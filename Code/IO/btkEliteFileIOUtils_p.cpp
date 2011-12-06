@@ -40,7 +40,7 @@
 
 namespace btk
 {
-  void ReadEliteHeader_p(Acquisition::Pointer output, IEEELittleEndianBinaryFileStream* bifs, bool extractEvents)
+  void ReadEliteHeader_p(Acquisition::Pointer output, IEEELittleEndianBinaryFileStream* bifs, bool extractEvents, bool checkDataFiltered)
   {
     bifs->ReadU16(); // Camera number
     int numFra = bifs->ReadU16();
@@ -87,19 +87,32 @@ namespace btk
     date[2] = bifs->ReadU16(); // day
     date[1] = bifs->ReadU16(); // month
     date[0] = bifs->ReadU16(); // year
-    
-    bifs->SeekRead(184, BinaryFileStream::Current);
+    // Filter flag
+    bifs->SeekRead(2, BinaryFileStream::Current);
+    int16_t filtered = bifs->ReadI16();
+    // First frame
+    bifs->SeekRead(24, BinaryFileStream::Current);
+    int ff = bifs->ReadU16();
+    // Frame rate
+    bifs->SeekRead(154, BinaryFileStream::Current);
     double framerate = static_cast<double>(bifs->ReadU16());
+    // Go to the end of the header
     bifs->SeekRead(80, BinaryFileStream::Current);
     
     output->Init(numMkr, numFra);
+    output->SetFirstFrame(ff);
     output->SetPointFrequency(framerate);
     if ((date[0] != 0) && (date[1] != 0) && (date[2] != 0))
     {
       MetaData::Pointer trial = MetaDataCreateChild(output->GetMetaData(), "TRIAL");
       MetaDataCreateChild(trial, "DATE", date);
     }
-    
+    // If the flag is acticated, create the metadata POINT:MARKERS_FILTERED and set its value.
+    if (checkDataFiltered)
+    {
+      MetaData::Pointer point = MetaDataCreateChild(output->GetMetaData(), "POINT");
+      MetaDataCreateChild(point, "MARKERS_FILTERED", filtered);
+    }
     // Compute the event's time.
     for (Acquisition::EventIterator it = output->BeginEvent() ; it != output->EndEvent() ; ++it)
       (*it)->SetTime(static_cast<double>((*it)->GetFrame()) / framerate);

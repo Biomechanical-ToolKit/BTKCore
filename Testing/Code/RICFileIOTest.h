@@ -40,6 +40,12 @@ CXXTEST_SUITE(RICFileIOTest)
     btk::RICFileIO::Pointer pt = btk::RICFileIO::New();
     TS_ASSERT_EQUALS(pt->CanWriteFile("1123xa01/test.ric"), true);
   };
+  
+  CXXTEST_TEST(CanWriteFileOkBis)
+  {
+    btk::RICFileIO::Pointer pt = btk::RICFileIO::New();
+    TS_ASSERT_EQUALS(pt->CanWriteFile("foo/bar.rif"), true);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(RICFileIOTest)
@@ -49,4 +55,5 @@ CXXTEST_TEST_REGISTRATION(RICFileIOTest, CanReadFileOk)
 CXXTEST_TEST_REGISTRATION(RICFileIOTest, CanWriteFileEmpty)
 CXXTEST_TEST_REGISTRATION(RICFileIOTest, CanWriteFileFail)
 CXXTEST_TEST_REGISTRATION(RICFileIOTest, CanWriteFileOk)
+CXXTEST_TEST_REGISTRATION(RICFileIOTest, CanWriteFileOkBis)
 #endif
