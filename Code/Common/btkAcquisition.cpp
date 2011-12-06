@@ -1198,7 +1198,7 @@ namespace btk
     this->m_Units[Point::Force] = "N";
     this->m_Units[Point::Moment] = "Nmm";
     this->m_Units[Point::Power] = "W";
-    // this->m_Units[Point::Scalar] = "";
+    this->m_Units[Point::Scalar] = "mm";
     // this->m_Units[Point::Reaction] = "";
     this->m_MaxInterpolationGap = 10;
   };
