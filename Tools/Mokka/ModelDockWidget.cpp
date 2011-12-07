@@ -2186,7 +2186,7 @@ void ModelDockWidget::editAnalogsOffset()
     }
     else
       emit analogsOffsetChanged(ids, offset);
-    this->analogOffsetSpinBox->blockSignals(true);
+    this->analogOffsetSpinBox->blockSignals(false);
   }
 };
 
@@ -2207,7 +2207,7 @@ void ModelDockWidget::editAnalogsScale()
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
     ids[inc] = (*it)->data(0, AnalogId).toInt();
-    if (fabs(this->mp_Acquisition->analogScale(ids[inc]) - scale) >= 1.0e-6)
+    if (fabs(this->mp_Acquisition->analogScale(ids[inc]) - scale) >= 5.0e-6)
       scaleModified = true;
     ++inc;
   }
