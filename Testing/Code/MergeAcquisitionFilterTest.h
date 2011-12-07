@@ -1740,37 +1740,57 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
       }
     }
   };
+  
+  CXXTEST_TEST(SH01_C3D_ANC_FP)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/shd01.c3d");
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(ANCFilePathOUT + "shd01.anc");
+    
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, reader->GetOutput());
+    merger->SetInput(1, reader2->GetOutput());
+    
+    btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
+    pfe->SetInput(merger->GetOutput());
+    pfe->Update();
+    
+    TS_ASSERT_EQUALS(pfe->GetOutput()->GetItemNumber(), 2);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(MergeAcquisitionFilterTest)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, NoInput)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, OneInput)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoInputsFromScratch)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoInputsFromScratch_FirstFrame1)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoInputsFromScratch_FirstFrame2)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoInputsFromScratch_Merging1)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoInputsFromScratch_Merging2)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Concat)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Concat2)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Merge)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoFiles_Concat_CalMatrix)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoFiles_Concat_NoSameFrameNumber)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_TRC_and_ANC_and_CAL)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_ANC_and_CAL_and_TRC)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_CAL_and_TRC_and_ANC)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_ThreeFiles_Concat_TRC_and_ANC_and_CAL)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D_Signed16bits)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_BIS_Concat_TRC_and_ANC_and_CAL_and_XLS_Higher_Frame)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite_vs_C3D)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, EliteGrFirst_vs_C3D)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ExportedC3DElite_vs_C3D)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite200)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite2000)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite2000Reversed)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, DifferentAnalogFrequencies)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_TRC_ANC_CAL)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_CAL_ANC_TRC)
-CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_ANC_CAL_TRC)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, NoInput)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, OneInput)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoInputsFromScratch)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoInputsFromScratch_FirstFrame1)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoInputsFromScratch_FirstFrame2)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoInputsFromScratch_Merging1)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoInputsFromScratch_Merging2)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Concat)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Concat2)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwinsFromFile_Merge)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoFiles_Concat_CalMatrix)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, TwoFiles_Concat_NoSameFrameNumber)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_TRC_and_ANC_and_CAL)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_ANC_and_CAL_and_TRC)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ThreeFiles_Concat_CAL_and_TRC_and_ANC)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_ThreeFiles_Concat_TRC_and_ANC_and_CAL)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D_Signed16bits)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_BIS_Concat_TRC_and_ANC_and_CAL_and_XLS_Higher_Frame)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite_vs_C3D)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, EliteGrFirst_vs_C3D)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ExportedC3DElite_vs_C3D)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite200)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite2000)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite2000Reversed)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, DifferentAnalogFrequencies)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_TRC_ANC_CAL)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_CAL_ANC_TRC)
+// CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_ANC_CAL_TRC)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, SH01_C3D_ANC_FP)
 #endif

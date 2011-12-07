@@ -373,6 +373,19 @@ namespace btk
      noError = false;
     else
     {
+      // Index check
+      for (int i = 0 ; i < numberOfChannelToExtract ; ++i)
+      {
+        if (channelsIndex[i + *alreadyExtracted] > numberOfChannels)
+        {
+          noError = false;
+          break;
+        }
+      }
+    }
+    // Assignment
+    if (noError)
+    {
       int numberOfFrame = channels->GetItem(0)->GetFrameNumber();
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> data = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(numberOfFrame, numberOfChannelToExtract);
       for (int i = 0 ; i < numberOfChannelToExtract ; ++i)
