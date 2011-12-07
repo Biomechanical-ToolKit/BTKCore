@@ -104,10 +104,30 @@ CXXTEST_SUITE(CALForcePlateFileReaderTest)
     TS_ASSERT_DELTA(calMatrix[34], 0.0001 * 1000, 1e-5);
     TS_ASSERT_DELTA(calMatrix[35], 0.9558 * 1000, 1e-4);
   };
+  
+  CXXTEST_TEST(shd01_truncated)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(CALForcePlateFilePathIN + "shd01_truncated.cal");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CONFIG")->GetChild("USED")->GetInfo()->ToInt(0), 1);
+    
+    std::vector<int> type = acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CONFIG")->GetChild("TYPE")->GetInfo()->ToInt();
+    TS_ASSERT_EQUALS((int)type.size(), 1);
+    TS_ASSERT_EQUALS(type[0], 4);
+    
+    std::vector<float> origin = acq->GetMetaData()->GetChild("BTK_PARTIAL_FP_CONFIG")->GetChild("ORIGIN")->GetInfo()->ToFloat();
+    TS_ASSERT_DELTA(origin[0], 0.0, 1e-5);
+    TS_ASSERT_DELTA(origin[1], 0.0, 1e-5);
+    TS_ASSERT_DELTA(origin[2], 0.0, 1e-5);
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(CALForcePlateFileReaderTest)
 CXXTEST_TEST_REGISTRATION(CALForcePlateFileReaderTest, NoFile)
 CXXTEST_TEST_REGISTRATION(CALForcePlateFileReaderTest, MisspelledFile)
 CXXTEST_TEST_REGISTRATION(CALForcePlateFileReaderTest, Forcepla)
+CXXTEST_TEST_REGISTRATION(CALForcePlateFileReaderTest, shd01_truncated)
 #endif

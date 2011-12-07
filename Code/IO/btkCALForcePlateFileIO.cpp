@@ -135,13 +135,14 @@ namespace btk
       std::istringstream iss;
       ifs.open(filename.c_str());
       bool fpConfigurationComplete = false;
-      while (!ifs.eof())
+      int numLine = 0;
+      while (!std::getline(ifs, line).eof())
       {
+        // Feed the string stream
+        iss.str(line);
+        iss.clear();
+      
         // Check for forceplate index
-        std::getline(ifs, line);
-        if (ifs.eof())
-          break;
-        iss.str(line); iss.clear();
         if (!(iss >> index))
           throw(CALForcePlateFileIOException("Unable to extract the index of the force platform #"  + ToString(inc) + "."));
         if (index != inc)
@@ -156,9 +157,10 @@ namespace btk
         // Dimension (h x w x l)
         if (!this->ExtractValues(fp.dimensions, 3, &ifs))
           throw(CALForcePlateFileIOException("The dimensions of the force platform #" + ToString(inc) + " can't be extracted."));
+        
         // Calibration matrix
         // - Count the number of cols
-        std::streampos pos = ifs.tellg();
+        numLine += 2;
         std::getline(ifs, line);
         iss.str(line); iss.clear();
         int cols = 0;
@@ -186,14 +188,15 @@ namespace btk
         }
         delete[] temp;
         // - Back to the first line of the calibration matrix
-        ifs.seekg(pos, std::ios::beg);
+        ifs.seekg(0, std::ios::beg);
+        for (int l = 0 ; l < numLine ; ++l)
+          std::getline(ifs, line);
         // - Extract values
         fp.calMatrix.resize(rows, cols);
         for (int i = 0 ; i < rows ; ++i)
           this->ExtractValues(fp.calMatrix.data() + i * cols, cols, &ifs);
         fp.calMatrix.transposeInPlace();
-        
-        // Detect the type of the matrix:
+        // - Detect the type of the matrix:
         if ((rows == 6) || (cols ==  6))
           fp.type = 4;
         else if ((rows == 6) || (cols ==  8))
@@ -204,12 +207,16 @@ namespace btk
           fp.type = 6;
         else
           throw(CALForcePlateFileIOException("Unknown type of for the force platform #" + ToString(inc) + "."));
+        numLine += rows;
+        
         // Origin
         if (!this->ExtractValues(fp.origin, 3, &ifs))
           throw(CALForcePlateFileIOException("The origin of the force platform #" + ToString(inc) + " can't be extracted."));
+        
         // Position of the force plate center in the global frame
         if (!this->ExtractValues(fp.position, 3, &ifs))
           throw(CALForcePlateFileIOException("The position of the force platform #" + ToString(inc) + " can't be extracted."));
+        
         // Orientation;
         if (!this->ExtractValues(fp.orientation.data(), 3, &ifs))
           throw(CALForcePlateFileIOException("The orientation (row #1) of the force platform #" + ToString(inc) + " can't be extracted."));
@@ -217,6 +224,8 @@ namespace btk
           throw(CALForcePlateFileIOException("The orientation (row #2) of the force platform #" + ToString(inc) + " can't be extracted."));
         if (!this->ExtractValues(fp.orientation.data()+6, 3, &ifs))
           throw(CALForcePlateFileIOException("The orientation (row #3) of the force platform #" + ToString(inc) + " can't be extracted."));
+        
+        numLine += 5;
         ++inc;
         fpConfigurationComplete = true;
         forcePlates.push_back(fp);
