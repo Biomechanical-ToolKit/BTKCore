@@ -32,7 +32,7 @@ for i = 1:size(times,1)
         timeFormatRatio = '%6.3f';
     end
 end
-timeStr = ['| ',timeFormatC3Dserver,' vs ',timeFormatBTK,' '];
+timeStr = ['| ',timeFormatC3Dserver,' vs ',timeFormatBTK,' '];
 ratioStr = ['| ',timeFormatRatio];
 for i = 1:size(times,1)
     t = max([t, length(sprintf(timeStr,times{i,2},times{i,3}))]);
@@ -86,9 +86,9 @@ itf.Open(d.filename,3);
 t = toc(t0);
 
 function t = benchGetHeader(itfHandle,d)
-t0 = tic;
 itf = itfHandle();
 itf.Open(d.filename,3);
+t0 = tic;
 itf.GetNumber3DPoints();
 itf.GetAnalogChannels();
 itf.GetVideoFrame(0);
