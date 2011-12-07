@@ -791,7 +791,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
     error.setWindowFlags(Qt::Sheet);
     error.setWindowModality(Qt::WindowModal);
 #endif
-    error.setInformativeText("Check the logger for more informations.");
+    error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
     error.exec();
     return;
   }
@@ -868,7 +868,7 @@ void MainWindow::saveFile(const QString& filename)
     error.setWindowFlags(Qt::Sheet);
     error.setWindowModality(Qt::WindowModal);
 #endif
-    error.setInformativeText("Check the logger for more informations.");
+    error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
     error.exec();
     return;
   }
@@ -1110,7 +1110,7 @@ void MainWindow::exportAcquisition(const QString& filter)
       error.setWindowFlags(Qt::Sheet);
       error.setWindowModality(Qt::WindowModal);
 #endif
-      error.setInformativeText("Check the logger for more informations.");
+      error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
       error.exec();
       return;
     }
