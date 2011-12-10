@@ -52,8 +52,8 @@ namespace btk
 
     BTK_VTK_EXPORT void SetInput(WrenchCollection::Pointer input);
     
-    double GetScaleUnit() {return this->mp_Scale;};
-    void SetScaleUnit(double s) {this->mp_Scale = s;};
+    double GetScaleUnit() {return this->m_Scale;};
+    void SetScaleUnit(double s) {this->m_Scale = s;};
     
   protected:
     VTKGRFsFramesSource();
@@ -70,7 +70,7 @@ namespace btk
     VTKGRFsFramesSource& operator=(const VTKGRFsFramesSource& );  // Not implemented.
 
     VTKGRFsComponents* mp_GRFsComponents;
-    double mp_Scale;
+    double m_Scale;
   };
 };
 #endif // __btkVTKGRFsFramesSource_h

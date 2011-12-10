@@ -464,7 +464,7 @@ namespace btk
     this->mp_MarkersGenerator->SetVisibleMarkers(this->mp_VisibleMarkers);
     this->mp_MarkersColorsLUT->SetNumberOfTableValues(1);
     // Default values
-    this->mp_Scale = 1.0;
+    this->m_Scale = 1.0;
     this->m_DefaultMarkerRadius = 8.0; // 8.0 mm
     this->m_TrajectoryLength = 100;
     this->mp_MarkersColorsLUT->SetTableValue(0, 1.0, 1.0, 1.0); // White
@@ -588,12 +588,12 @@ namespace btk
           {
             int validPointIdx = ptIdx * frameNumber + i;
             double* ic = (*it)->GetValues().data();
-            centers->SetPoint(ptIdx, ic[i] * this->mp_Scale, 
-                              ic[frameNumber + i] * this->mp_Scale,
-                              ic[2 * frameNumber + i] * this->mp_Scale);
-            this->mp_TrajectoryCoords->SetPoint(validPointIdx, ic[i] * this->mp_Scale, 
-                                                ic[frameNumber + i] * this->mp_Scale,
-                                                ic[2 * frameNumber + i] * this->mp_Scale);
+            centers->SetPoint(ptIdx, ic[i] * this->m_Scale, 
+                              ic[frameNumber + i] * this->m_Scale,
+                              ic[2 * frameNumber + i] * this->m_Scale);
+            this->mp_TrajectoryCoords->SetPoint(validPointIdx, ic[i] * this->m_Scale, 
+                                                ic[frameNumber + i] * this->m_Scale,
+                                                ic[2 * frameNumber + i] * this->m_Scale);
             this->mp_TrajectoryColors->SetValue(validPointIdx, 0);
             // Insert only valid point
             if ((*it)->GetResiduals().coeff(i) >= 0.0)

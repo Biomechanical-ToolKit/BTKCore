@@ -106,7 +106,7 @@ namespace btk
       return;
     this->m_Force = force;
     // force point's type
-    this->m_Position->SetType(Point::Force);
+    this->m_Force->SetType(Point::Force);
     this->Modified();
   };
 
@@ -124,7 +124,7 @@ namespace btk
       return;
     this->m_Moment = moment;
     // force point's type
-    this->m_Position->SetType(Point::Moment);
+    this->m_Moment->SetType(Point::Moment);
     this->Modified();
   };
   

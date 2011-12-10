@@ -11,6 +11,7 @@
 #include "ANGFileReaderTest.h"
 #include "CALForcePlateFileIOTest.h"
 #include "CALForcePlateFileReaderTest.h"
+#include "CALForcePlateFileWriterTest.h"
 #include "C3DFileIOTest.h"
 #include "C3DFileReaderTest.h"
 #include "C3DFileWriterTest.h"

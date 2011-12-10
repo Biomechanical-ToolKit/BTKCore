@@ -43,6 +43,26 @@
 #define NUMLENGTH(num) ((num==0)?1:(int)log10(std::fabs((float)num))+1)
 
 static int oldMouseX = 0;
+static int oldEventFrame = 0;
+static const int WBound = 10;
+static const int WSlider = 10;
+static const int TopMargin = 10;
+static const int BottomMargin = 30;
+static const int LeftMargin = 60;
+static const int RightMargin = 30;
+#ifdef Q_WS_WIN
+static const qreal EventRelativePosY = 13.0;
+static const qreal EventSymbolSize = 15.0;
+static const QFont EventFont = QFont("Lucida Sans Unicode", 14);
+#else
+static const qreal EventRelativePosY = 16.0;
+static const qreal EventSymbolSize = 12.0;
+static const QFont EventFont = QFont("Arial", 12);
+#endif
+static const QColor MoveBrushColor = QColor(0, 127, 255, 128);
+static const QColor BoundBrushColor = QColor(0, 127, 255, 64);
+static const QPen MovePen = QColor(0, 127, 255);
+static const QPen MoveShadowPen = QColor(100, 100, 100, 128);
 
 TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
 : QFrame(parent), m_EventContexts(), m_Ticks(), m_TicksLabel(), 
@@ -58,32 +78,13 @@ TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
   this->m_LeftBoundPos = this->m_FirstFrame;
   this->m_RightBoundPos = this->m_LastFrame;
   this->m_UnitStep = 1.0;
-  this->m_WBound = 10;
-  this->m_WSlider = 10;
-  this->m_TopMargin = 10;
-  this->m_BottomMargin = 30;
-  this->m_LeftMargin = 60;
-  this->m_RightMargin = 30;
   this->m_TickDivider = 1;
 #ifdef Q_OS_MAC
   QFont f = this->font();
   f.setPointSize(10); this->setFont(f);
   this->m_Fm = f;
-#endif 
-#ifdef Q_WS_WIN
-  this->m_YEventPosRelative = 13.0;
-  this->m_EventSymbolSize = 15.0;
-  this->m_EventFont = QFont("Lucida Sans Unicode", 14);
-#else
-  this->m_YEventPosRelative = 16.0;
-  this->m_EventSymbolSize = 12.0;
-  this->m_EventFont = QFont("Arial", 12);
 #endif
-  this->m_MovBrushColor = QColor(0, 127, 255); this->m_MovBrushColor.setAlpha(128);
-  this->m_BoundBrushColor = QColor(0, 127, 255); this->m_BoundBrushColor.setAlpha(64);
-  this->m_MovPen = QColor(0, 127, 255);
-  QColor movShadowColor = QColor(100, 100, 100); movShadowColor.setAlpha(128);
-  this->m_MovShadowPen = movShadowColor;
+  this->m_Mode = None;
   this->m_MovingEventIndex = -1;
   this->mp_Rubber = new QRubberBand(QRubberBand::Rectangle, this);
   
@@ -101,8 +102,17 @@ TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
 void TimeEventBarWidget::load(Acquisition* acq)
 {
   this->m_SelectedEvents.clear();
-  this->m_FirstFrame = acq->firstFrame();
-  this->m_LastFrame = acq->lastFrame();
+  if (acq->pointFrameNumber() == 0)
+  {
+    this->m_FirstFrame = 0;
+    this->m_LastFrame = 0;
+  }
+  else
+  {
+    this->m_FirstFrame = acq->firstFrame();
+    this->m_LastFrame = acq->lastFrame();
+  }
+    
   this->m_ROIFirstFrame = this->m_FirstFrame;
   this->m_ROILastFrame = this->m_LastFrame;
   this->m_SliderPos = this->m_FirstFrame;
@@ -134,14 +144,14 @@ void TimeEventBarWidget::reset()
   this->update();
 };
 
-void TimeEventBarWidget::setEvent(int id, const Event* e)
+void TimeEventBarWidget::setEvent(int id, Event* e)
 {
   for (int i = 0 ; i < this->m_EventItems.count() ; ++i)
   {
     if (this->m_EventItems[i].id == id)
     {
       this->setEventItem(this->m_EventItems[i], id, e);
-      this->updateEventPos(i);
+      this->updateEventGeometry(i);
       if (this->m_SelectedEvents.contains(this->m_EventItems[i].id))
       {
         if (this->m_EventItems[i].contextId == 0) // Right
@@ -179,7 +189,7 @@ void TimeEventBarWidget::removeEvent(int id)
   emit eventSelectionChanged(this->m_SelectedEvents);
 };
 
-void TimeEventBarWidget::insertEvent(int id, const Event* e)
+void TimeEventBarWidget::insertEvent(int id, Event* e)
 {
   EventItem item;
   this->setEventItem(item, id, e);
@@ -202,11 +212,10 @@ void TimeEventBarWidget::paintEvent(QPaintEvent* event)
   QPainter painter(this);
   
   // --------------------- Timeline ---------------------
-  int numTicks = this->m_Ticks.size();
   int numFrames = this->m_ROILastFrame - this->m_ROIFirstFrame + 1;
   QPen axisPen = QPen();
   painter.setPen(axisPen);
-  qreal h = this->height() - this->m_TopMargin - this->m_BottomMargin;
+  qreal h = this->height() - TopMargin - BottomMargin;
   qreal hStep = h / 22.0;
   int yStep = 7;
   int dd = 1;
@@ -215,47 +224,43 @@ void TimeEventBarWidget::paintEvent(QPaintEvent* event)
     dd = this->m_TickDivider / 10;
   if (dd != 1)
     subTicksStart = ((this->m_ROIFirstFrame / dd) + 1) * dd - this->m_ROIFirstFrame;
-  int xMax = this->m_LeftMargin + (numFrames - (numFrames>1?1:0)) * this->m_UnitStep;
+  int xMax = LeftMargin + (numFrames - (numFrames>1?1:0)) * this->m_UnitStep;
   for (int i = 0 ; i < 3 ; ++i)
   {
     // Context
-    painter.drawText(0, i * yStep * hStep + 2 + this->m_TopMargin, this->m_LeftMargin - 20, yStep * hStep, Qt::AlignLeft | Qt::AlignBottom, this->m_EventContexts[i]);
+    painter.drawText(0, i * yStep * hStep + 2 + TopMargin, LeftMargin - 20, yStep * hStep, Qt::AlignLeft | Qt::AlignBottom, this->m_EventContexts[i]);
     // Base (time axis)
-    qreal tStep = (21 - i * yStep) * hStep + this->m_TopMargin;
-    painter.drawLine(this->m_LeftMargin, tStep, xMax, tStep);
+    qreal tStep = (21 - i * yStep) * hStep + TopMargin;
+    painter.drawLine(LeftMargin, tStep, xMax, tStep);
     // Extremities
-    painter.drawLine(this->m_LeftMargin, tStep, this->m_LeftMargin, tStep - 9);
+    painter.drawLine(LeftMargin, tStep, LeftMargin, tStep - 9);
     painter.drawLine(xMax, tStep, xMax, tStep - 9);
-    // Ticks
-
     // Ticks & SubTicks
     int incST = subTicksStart;
+    int tickInc = 1;
     while (incST < numFrames)
     {
-      for (int j = 1 ; j < numTicks-1 ; ++j)
+      if (abs(this->m_Ticks[tickInc] - incST) <= dd / 2) // Final adjustment for the ticks
       {
-        if (abs(this->m_Ticks[j] - incST) < dd / 2) // Final adjustment for the ticks
-        {
-          painter.drawLine(this->m_LeftMargin + incST * this->m_UnitStep, tStep, this->m_LeftMargin + incST * this->m_UnitStep, tStep - 6);
-          break;
-        }
+        painter.drawLine(LeftMargin + incST * this->m_UnitStep, tStep, LeftMargin + incST * this->m_UnitStep, tStep - 6);
+        ++tickInc;
       }
-      painter.drawLine(this->m_LeftMargin + incST * this->m_UnitStep, tStep, this->m_LeftMargin + incST * this->m_UnitStep, tStep - 3);
+      painter.drawLine(LeftMargin + incST * this->m_UnitStep, tStep, LeftMargin + incST * this->m_UnitStep, tStep - 3);
       incST += dd; 
     }
   }
-  // Text for this->m_Ticks
+  // Text for the ticks
   for (int i = 0 ; i < this->m_TicksLabel.count() ; ++i)
   {
     int wTextFrame = this->m_Fm.width(this->m_TicksLabel[i]);
-    painter.drawText(this->m_LeftMargin + this->m_Ticks[i] * this->m_UnitStep - wTextFrame / 2, h + this->m_TopMargin + 10, wTextFrame, 20, Qt::AlignHCenter | Qt::AlignTop, this->m_TicksLabel[i]);
+    painter.drawText(LeftMargin + this->m_Ticks[i] * this->m_UnitStep - wTextFrame / 2, h + TopMargin + 10, wTextFrame, 20, Qt::AlignHCenter | Qt::AlignTop, this->m_TicksLabel[i]);
   }
   
   // --------------------- Events ---------------------
-  painter.setFont(this->m_EventFont);
+  painter.setFont(EventFont);
   for (int i = 0 ; i < this->m_EventItems.count() ; ++i)
   {
-    if ((this->m_EventItems[i].frame >= this->m_ROIFirstFrame) && (this->m_EventItems[i].frame <= this->m_ROILastFrame))
+    if ((this->m_EventItems[i].ptr->frame >= this->m_ROIFirstFrame) && (this->m_EventItems[i].ptr->frame <= this->m_ROILastFrame))
     {
       painter.setPen(this->m_EventItems[i].color);
       painter.drawText(this->m_EventItems[i].boundingRect, Qt::AlignCenter, this->m_EventItems[i].symbol);
@@ -271,21 +276,21 @@ void TimeEventBarWidget::paintEvent(QPaintEvent* event)
     int xRB = xMax - wRRB + 1;
     // - left & right rectangle
     painter.setPen(Qt::NoPen);
-    painter.setBrush(this->m_BoundBrushColor);
-    painter.drawRect(this->m_LeftMargin, this->m_TopMargin, wLRB, h+5);
-    painter.drawRect(xRB, this->m_TopMargin, wRRB+1, h+5);
+    painter.setBrush(BoundBrushColor);
+    painter.drawRect(LeftMargin, TopMargin, wLRB, h+5);
+    painter.drawRect(xRB, TopMargin, wRRB+1, h+5);
     // - shadows
-    painter.setPen(this->m_MovShadowPen);
+    painter.setPen(MoveShadowPen);
     painter.drawPolyline(this->mp_PointsSlider+1, 3);
     painter.drawPolyline(this->mp_PointsBoundRight+7, 5);
     painter.drawPolyline(this->mp_PointsBoundLeft+7, 3);
     // - left & right bounds
-    painter.setPen(this->m_MovPen);
-    painter.setBrush(this->m_MovBrushColor);
+    painter.setPen(MovePen);
+    painter.setBrush(MoveBrushColor);
     painter.drawPolygon(this->mp_PointsBoundRight, 7);
     painter.drawPolygon(this->mp_PointsBoundLeft, 7);
     // - slider
-    painter.drawRect(this->mp_PointsSlider[0].x()-this->m_WSlider/2, this->mp_PointsSlider[0].y(), this->m_WSlider, h+5);
+    painter.drawRect(this->mp_PointsSlider[0].x()-WSlider/2, this->mp_PointsSlider[0].y(), WSlider, h+5);
     painter.drawLine(this->mp_PointsSlider[0].x(), this->mp_PointsSlider[0].y(), this->mp_PointsSlider[0].x(), this->mp_PointsSlider[0].y()+h+5);
   }
   
@@ -306,7 +311,11 @@ bool TimeEventBarWidget::event(QEvent *event)
     QHelpEvent* helpEvent = static_cast<QHelpEvent*>(event);
     int index = this->eventItemAt(helpEvent->pos());
     if (index != -1)
-      QToolTip::showText(helpEvent->globalPos(), this->m_EventItems[index].toolTip);
+    {
+      Event* e = this->m_EventItems[index].ptr;
+      QString text = QString("<b>Event:</b> %1 %2<br/><b>Subject:</b> %3<br/><b>Frame:</b> %4<br/><b>Time:</b> %5 second(s)").arg(e->context, e->label, e->subject).arg(e->frame).arg(e->time);
+      QToolTip::showText(helpEvent->globalPos(), text);
+    }
     else
     {
       QToolTip::hideText();
@@ -326,7 +335,7 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
     
   if ((event->buttons() & Qt::LeftButton) && (this->m_Mode != None))
   {
-    int frame = (int)((qreal)(event->pos().x() - this->m_LeftMargin) / this->m_UnitStep) + this->m_ROIFirstFrame;
+    int frame = (int)((qreal)(event->pos().x() - LeftMargin) / this->m_UnitStep) + this->m_ROIFirstFrame;
     if (this->m_Mode == MoveSlider)
     {
       if (event->modifiers() & Qt::ShiftModifier) 
@@ -376,14 +385,15 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
     }
     else if (this->m_Mode == MoveEvent)
     {
+      oldEventFrame = this->m_EventItems[this->m_MovingEventIndex].ptr->frame;
       if (event->modifiers() & Qt::ShiftModifier) 
-        frame = this->m_EventItems[this->m_MovingEventIndex].frame + fineShift;
+        frame = this->m_EventItems[this->m_MovingEventIndex].ptr->frame + fineShift;
       if (frame < this->m_LeftBoundPos)
           frame = this->m_LeftBoundPos;
-        else if (frame > this->m_RightBoundPos)
-          frame = this->m_RightBoundPos;
-      this->m_EventItems[this->m_MovingEventIndex].frame = frame;
-      this->updateEventPos(this->m_MovingEventIndex);
+      else if (frame > this->m_RightBoundPos)
+        frame = this->m_RightBoundPos;
+      this->m_EventItems[this->m_MovingEventIndex].ptr->frame = frame;
+      this->updateEventGeometry(this->m_MovingEventIndex);
       emit eventPositionChanged(frame);
       this->repaint();
     }
@@ -408,9 +418,9 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
         if (rubberRect.intersects(this->m_EventItems[i].boundingRect))
         {
           this->m_Mode = MoveEvent;
-          emit eventAboutToBeMoved(this->m_EventItems[i].frame);
+          emit eventAboutToBeMoved(this->m_EventItems[i].ptr->frame);
           this->m_MovingEventIndex = i;
-          this->m_EventItems[i].color = this->m_MovBrushColor;
+          this->m_EventItems[i].color = MoveBrushColor;
           this->update();
           break;
         }
@@ -418,14 +428,14 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
       return;
     }
     // Slider
-    QRect slider(this->mp_PointsSlider[0].x()-(this->m_WSlider+4)/2, this->mp_PointsSlider[0].y(), this->m_WSlider+4, this->height() - this->m_TopMargin - this->m_BottomMargin + 5);
+    QRect slider(this->mp_PointsSlider[0].x()-(WSlider+4)/2, this->mp_PointsSlider[0].y(), WSlider+4, this->height() - TopMargin - BottomMargin + 5);
     if (slider.contains(event->pos()))
     {
       this->m_Mode = MoveSlider;
       return;
     }
     // Left bound
-    QRect leftBound(this->mp_PointsBoundLeft[1].x()-this->m_WBound, this->mp_PointsBoundLeft[1].y()-20, this->m_WBound, 20);
+    QRect leftBound(this->mp_PointsBoundLeft[1].x()-WBound, this->mp_PointsBoundLeft[1].y()-20, WBound, 20);
     if (leftBound.contains(event->pos()))
     {
       this->m_Mode = MoveLeftBound;
@@ -433,7 +443,7 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
       return;
     }
     // Right bound
-    QRect rightBound(this->mp_PointsBoundRight[1].x(), this->mp_PointsBoundRight[1].y()-20, this->m_WBound, 20);
+    QRect rightBound(this->mp_PointsBoundRight[1].x(), this->mp_PointsBoundRight[1].y()-20, WBound, 20);
     if (rightBound.contains(event->pos()))
     {
       this->m_Mode = MoveRightBound;
@@ -460,7 +470,9 @@ void TimeEventBarWidget::mouseReleaseEvent(QMouseEvent* event)
 {
   if (this->m_Mode == MoveEvent)
   {
-    emit eventMotionFinished(this->m_EventItems[this->m_MovingEventIndex].id, this->m_EventItems[this->m_MovingEventIndex].frame);
+    int newEventFrame = this->m_EventItems[this->m_MovingEventIndex].ptr->frame;
+    this->m_EventItems[this->m_MovingEventIndex].ptr->frame = oldEventFrame;
+    emit eventMotionFinished(this->m_EventItems[this->m_MovingEventIndex].id, newEventFrame);
     this->m_MovingEventIndex = -1;
     this->updateEventSelection();
   }
@@ -503,8 +515,9 @@ int TimeEventBarWidget::eventItemAt(const QPoint& pos) const
   return -1;
 };
 
-void TimeEventBarWidget::setEventItem(EventItem& item, int id, const Event* e)
+void TimeEventBarWidget::setEventItem(EventItem& item, int id, Event* e)
 {
+  item.ptr = e;
   item.id = id;
   if (e->context.compare("Right", Qt::CaseInsensitive) == 0)
   {
@@ -525,14 +538,12 @@ void TimeEventBarWidget::setEventItem(EventItem& item, int id, const Event* e)
     item.symbol = this->m_EventSymbols[e->iconId];
   else
     item.symbol = "?";
-  item.frame = e->frame;
-  this->setEventToolTip(item, e);
 };
 
 void TimeEventBarWidget::updateInternals()
 {
-  int xMax = this->width() - this->m_RightMargin;
-  qreal timeLength = xMax - this->m_LeftMargin;
+  int xMax = this->width() - RightMargin;
+  qreal timeLength = xMax - LeftMargin;
   int numFrames = this->m_ROILastFrame - this->m_ROIFirstFrame + 1;
   this->m_UnitStep = timeLength / (qreal)numFrames;
   
@@ -579,12 +590,12 @@ void TimeEventBarWidget::updateInternals()
   
   int wTextFrame = this->m_Fm.width(m_TicksLabel[0]);
   int wTextFrameTemp = this->m_Fm.width(m_TicksLabel[1]);
-  int xTemp = this->m_LeftMargin + this->m_Ticks[1] * this->m_UnitStep - wTextFrameTemp / 2;
-  if (xTemp <= (this->m_LeftMargin + wTextFrame / 2 + 5))
+  int xTemp = LeftMargin + this->m_Ticks[1] * this->m_UnitStep - wTextFrameTemp / 2;
+  if (xTemp <= (LeftMargin + wTextFrame / 2 + 5))
     this->m_TicksLabel[1] = "";
   wTextFrameTemp = this->m_Fm.width(m_TicksLabel[numTicks-2]);
   wTextFrame = this->m_Fm.width(m_TicksLabel[numTicks-1]);
-  xTemp = this->m_LeftMargin + this->m_Ticks[numTicks - 2] * this->m_UnitStep - wTextFrameTemp / 2;
+  xTemp = LeftMargin + this->m_Ticks[numTicks - 2] * this->m_UnitStep - wTextFrameTemp / 2;
   if (xTemp + wTextFrameTemp >= (xMax - wTextFrame / 2 - 5))
     this->m_TicksLabel[numTicks-2] = "";
     
@@ -596,84 +607,84 @@ void TimeEventBarWidget::updateInternals()
 
 void TimeEventBarWidget::updateSliderPostion()
 {
-  int xSP = this->m_LeftMargin + (int)((this->m_SliderPos - this->m_ROIFirstFrame)*this->m_UnitStep);
-  int h = this->height() - this->m_TopMargin - this->m_BottomMargin;
+  int xSP = LeftMargin + (int)((this->m_SliderPos - this->m_ROIFirstFrame)*this->m_UnitStep);
+  int h = this->height() - TopMargin - BottomMargin;
   // X Coordinates
   this->mp_PointsSlider[0].setX(xSP);
-  this->mp_PointsSlider[1].setX(xSP+this->m_WSlider/2+1);
-  this->mp_PointsSlider[2].setX(xSP+this->m_WSlider/2+1);
-  this->mp_PointsSlider[3].setX(xSP-this->m_WSlider/2+2);
+  this->mp_PointsSlider[1].setX(xSP+WSlider/2+1);
+  this->mp_PointsSlider[2].setX(xSP+WSlider/2+1);
+  this->mp_PointsSlider[3].setX(xSP-WSlider/2+2);
   // Y Coordinates
-  this->mp_PointsSlider[0].setY(this->m_TopMargin);
-  this->mp_PointsSlider[1].setY(this->m_TopMargin+2);
-  this->mp_PointsSlider[2].setY(this->m_TopMargin+h+5+1);
-  this->mp_PointsSlider[3].setY(this->m_TopMargin+h+5+1);
+  this->mp_PointsSlider[0].setY(TopMargin);
+  this->mp_PointsSlider[1].setY(TopMargin+2);
+  this->mp_PointsSlider[2].setY(TopMargin+h+5+1);
+  this->mp_PointsSlider[3].setY(TopMargin+h+5+1);
 };
 
 void TimeEventBarWidget::updateLeftBoundPostion()
 {
-  int xLB = this->m_LeftMargin + (int)((this->m_LeftBoundPos - this->m_ROIFirstFrame) * this->m_UnitStep) - 1 - 1;
-  int h = this->height() - this->m_TopMargin - this->m_BottomMargin;
+  int xLB = LeftMargin + (int)((this->m_LeftBoundPos - this->m_ROIFirstFrame) * this->m_UnitStep) - 1 - 1;
+  int h = this->height() - TopMargin - BottomMargin;
   // X Coordinates
   this->mp_PointsBoundLeft[0].setX(xLB);
   this->mp_PointsBoundLeft[1].setX(xLB);
-  this->mp_PointsBoundLeft[2].setX(xLB-this->m_WBound);
-  this->mp_PointsBoundLeft[3].setX(xLB-this->m_WBound);
+  this->mp_PointsBoundLeft[2].setX(xLB-WBound);
+  this->mp_PointsBoundLeft[3].setX(xLB-WBound);
   this->mp_PointsBoundLeft[4].setX(xLB-2);
   this->mp_PointsBoundLeft[5].setX(xLB-2);
   this->mp_PointsBoundLeft[6].setX(xLB);
   this->mp_PointsBoundLeft[7].setX(xLB+1);
   this->mp_PointsBoundLeft[8].setX(xLB+1);
-  this->mp_PointsBoundLeft[9].setX(xLB-this->m_WBound+2);
+  this->mp_PointsBoundLeft[9].setX(xLB-WBound+2);
   // Y Coordinates
-  this->mp_PointsBoundLeft[0].setY(this->m_TopMargin);
-  this->mp_PointsBoundLeft[1].setY(this->m_TopMargin+h+5);
-  this->mp_PointsBoundLeft[2].setY(this->m_TopMargin+h+5);
-  this->mp_PointsBoundLeft[3].setY(this->m_TopMargin+h-5);
-  this->mp_PointsBoundLeft[4].setY(this->m_TopMargin+h-15);
-  this->mp_PointsBoundLeft[5].setY(this->m_TopMargin+2);
-  this->mp_PointsBoundLeft[6].setY(this->m_TopMargin);
-  this->mp_PointsBoundLeft[7].setY(this->m_TopMargin+2);
-  this->mp_PointsBoundLeft[8].setY(this->m_TopMargin+h+5+1);
-  this->mp_PointsBoundLeft[9].setY(this->m_TopMargin+h+5+1);
+  this->mp_PointsBoundLeft[0].setY(TopMargin);
+  this->mp_PointsBoundLeft[1].setY(TopMargin+h+5);
+  this->mp_PointsBoundLeft[2].setY(TopMargin+h+5);
+  this->mp_PointsBoundLeft[3].setY(TopMargin+h-5);
+  this->mp_PointsBoundLeft[4].setY(TopMargin+h-15);
+  this->mp_PointsBoundLeft[5].setY(TopMargin+2);
+  this->mp_PointsBoundLeft[6].setY(TopMargin);
+  this->mp_PointsBoundLeft[7].setY(TopMargin+2);
+  this->mp_PointsBoundLeft[8].setY(TopMargin+h+5+1);
+  this->mp_PointsBoundLeft[9].setY(TopMargin+h+5+1);
 };
 
 void TimeEventBarWidget::updateRightBoundPostion()
 {
-  int xRB = this->m_LeftMargin + (int)((this->m_RightBoundPos - this->m_ROIFirstFrame + (this->m_ROIFirstFrame == this->m_ROILastFrame ? 1 : 0))*this->m_UnitStep) + 1;
-  int h = this->height() - this->m_TopMargin - this->m_BottomMargin;
+  int xRB = LeftMargin + (int)((this->m_RightBoundPos - this->m_ROIFirstFrame + (this->m_ROIFirstFrame == this->m_ROILastFrame ? 1 : 0))*this->m_UnitStep) + 1;
+  int h = this->height() - TopMargin - BottomMargin;
   // X Coordinates
   this->mp_PointsBoundRight[0].setX(xRB);
   this->mp_PointsBoundRight[1].setX(xRB);
-  this->mp_PointsBoundRight[2].setX(xRB+this->m_WBound);
-  this->mp_PointsBoundRight[3].setX(xRB+this->m_WBound);
+  this->mp_PointsBoundRight[2].setX(xRB+WBound);
+  this->mp_PointsBoundRight[3].setX(xRB+WBound);
   this->mp_PointsBoundRight[4].setX(xRB+2);
   this->mp_PointsBoundRight[5].setX(xRB+2);
   this->mp_PointsBoundRight[6].setX(xRB);
   this->mp_PointsBoundRight[7].setX(xRB+2+1);
   this->mp_PointsBoundRight[8].setX(xRB+2+1);
-  this->mp_PointsBoundRight[9].setX(xRB+this->m_WBound+1);
-  this->mp_PointsBoundRight[10].setX(xRB+this->m_WBound+1);
+  this->mp_PointsBoundRight[9].setX(xRB+WBound+1);
+  this->mp_PointsBoundRight[10].setX(xRB+WBound+1);
   this->mp_PointsBoundRight[11].setX(xRB+2);
   // Y Coordinates
-  this->mp_PointsBoundRight[0].setY(this->m_TopMargin);
-  this->mp_PointsBoundRight[1].setY(this->m_TopMargin+h+5);
-  this->mp_PointsBoundRight[2].setY(this->m_TopMargin+h+5);
-  this->mp_PointsBoundRight[3].setY(this->m_TopMargin+h-5);
-  this->mp_PointsBoundRight[4].setY(this->m_TopMargin+h-15);
-  this->mp_PointsBoundRight[5].setY(this->m_TopMargin+2);
-  this->mp_PointsBoundRight[6].setY(this->m_TopMargin);
-  this->mp_PointsBoundRight[7].setY(this->m_TopMargin+2+2);
-  this->mp_PointsBoundRight[8].setY(this->m_TopMargin+h-15);
-  this->mp_PointsBoundRight[9].setY(this->m_TopMargin+h-5);
-  this->mp_PointsBoundRight[10].setY(this->m_TopMargin+h+5+1);
-  this->mp_PointsBoundRight[11].setY(this->m_TopMargin+h+5+1);
+  this->mp_PointsBoundRight[0].setY(TopMargin);
+  this->mp_PointsBoundRight[1].setY(TopMargin+h+5);
+  this->mp_PointsBoundRight[2].setY(TopMargin+h+5);
+  this->mp_PointsBoundRight[3].setY(TopMargin+h-5);
+  this->mp_PointsBoundRight[4].setY(TopMargin+h-15);
+  this->mp_PointsBoundRight[5].setY(TopMargin+2);
+  this->mp_PointsBoundRight[6].setY(TopMargin);
+  this->mp_PointsBoundRight[7].setY(TopMargin+2+2);
+  this->mp_PointsBoundRight[8].setY(TopMargin+h-15);
+  this->mp_PointsBoundRight[9].setY(TopMargin+h-5);
+  this->mp_PointsBoundRight[10].setY(TopMargin+h+5+1);
+  this->mp_PointsBoundRight[11].setY(TopMargin+h+5+1);
 };
 
 void TimeEventBarWidget::updateEventsPosition()
 {
   for (int i = 0 ; i < this->m_EventItems.count() ; ++i)
-    this->updateEventPos(i);
+    this->updateEventGeometry(i);
 };
 
 void TimeEventBarWidget::updateEventPosition(int id)
@@ -682,10 +693,17 @@ void TimeEventBarWidget::updateEventPosition(int id)
   {
     if (this->m_EventItems[i].id == id)
     {
-      this->updateEventPos(i);
+      this->updateEventGeometry(i);
       break;
     }
   }
+};
+
+void TimeEventBarWidget::updateEventGeometry(int idx)
+{
+  qreal xPos = LeftMargin + ((this->m_EventItems[idx].ptr->frame - this->m_ROIFirstFrame)*this->m_UnitStep) - EventSymbolSize / 2.0;// + 0.5;
+  qreal yPos = this->m_EventItems[idx].contextId * 7.0 * (this->height() - TopMargin - BottomMargin) / 22.0 + EventRelativePosY;
+  this->m_EventItems[idx].boundingRect.setRect(xPos, yPos, EventSymbolSize, EventRelativePosY);
 };
 
 void TimeEventBarWidget::updateEventSelection()

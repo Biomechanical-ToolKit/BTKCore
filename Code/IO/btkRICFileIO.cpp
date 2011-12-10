@@ -81,14 +81,14 @@ namespace btk
    */
   
   /**
-   * Only check if the file extension correspond to RIC.
+   * Only check if the file extension correspond to RIC or RIF.
    */
   bool RICFileIO::CanReadFile(const std::string& filename)
   {
     std::string lowercase = filename;
     std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type RICPos = lowercase.rfind(".ric");
-    if ((RICPos != std::string::npos) && (RICPos == lowercase.length() - 4))
+    std::string::size_type RIxPos = lowercase.substr(0,lowercase.length()-1).rfind(".ri");
+    if ((RIxPos != std::string::npos) && (RIxPos == lowercase.length() - 4) && ((*(lowercase.rbegin()) == 'c') || (*(lowercase.rbegin()) == 'f')))
     {
       std::ifstream ifs(filename.c_str(), std::ios_base::in | std::ios_base::binary);
       if (!ifs)
@@ -106,8 +106,8 @@ namespace btk
   {
     std::string lowercase = filename;
     std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type RICPos = lowercase.rfind(".ric");
-    if ((RICPos != std::string::npos) && (RICPos == lowercase.length() - 4))
+    std::string::size_type RIxPos = lowercase.substr(0,lowercase.length()-1).rfind(".ri");
+    if ((RIxPos != std::string::npos) && (RIxPos == lowercase.length() - 4) && ((*(lowercase.rbegin()) == 'c') || (*(lowercase.rbegin()) == 'f')))
       return true;
     else
       return false;
@@ -124,9 +124,20 @@ namespace btk
     try
     {
       bifs.Open(filename, BinaryFileStream::In);
-      ReadEliteHeader_p(output, &bifs, true);
+      // Determine the size of the file
+      bifs.SeekRead(0, BinaryFileStream::End);
+      BinaryFileStream::StreamPosition sizeFile = bifs.TellRead();
+      bifs.SeekRead(0, BinaryFileStream::Begin);
+      
+      ReadEliteHeader_p(output, &bifs, true, true);
       ReadEliteMarkersValues_p(output, &bifs);
-      ReadEliteLabel_p(output, &bifs);
+      // Check if the file contains a section with the labels
+      if (bifs.TellRead() < sizeFile)
+        ReadEliteLabel_p(output, &bifs);
+      else
+      {
+        btkIOErrorMacro(filename, "There is no section containing the labels of the markers.");
+      }
     }
     catch (BinaryFileStreamException& )
     {

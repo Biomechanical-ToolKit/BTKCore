@@ -249,7 +249,7 @@ namespace btk
   
   std::streamsize mmfilebuf::sgetn(char* s, std::streamsize n)
   {
-    std::streamoff n_ = ((this->m_Position + n) > this->m_BufferSize) ? ((this->m_BufferSize - this->m_Position - 1) > 0 ? this->m_BufferSize - this->m_Position - 1 : 0) : n;
+    std::streamoff n_ = (((this->m_Position + n)  == 0) || ((this->m_Position + n) > this->m_BufferSize)) ? ((this->m_BufferSize - this->m_Position - 1) > 0 ? this->m_BufferSize - this->m_Position - 1 : 0) : n;
     for (std::streamoff i = 0 ; i < n_ ; ++i)
       s[i] = this->mp_Buffer[this->m_Position + i];
     this->m_Position += n_;

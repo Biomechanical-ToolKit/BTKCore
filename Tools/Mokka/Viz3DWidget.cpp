@@ -64,6 +64,9 @@ Viz3DWidget::Viz3DWidget(QWidget* parent)
   this->mp_AxesWidget = btk::VTKAxesWidget::New();
   this->mp_EventQtSlotConnections = vtkEventQtSlotConnect::New();
   this->m_CameraConfigurationSaved = false;
+  this->mp_CamFocalPoint[0] = 0.0; this->mp_CamFocalPoint[1] = 0.0; this->mp_CamFocalPoint[2] = 0.0;
+  this->mp_CamPosition[0] = 0.0; this->mp_CamPosition[1] = 0.0; this->mp_CamPosition[2] = 0.0;
+  this->mp_CamViewUp[0] = 0.0; this->mp_CamViewUp[1] = 0.0; this->mp_CamViewUp[2] = 0.0;
   
   // No need to send mouse events to VTK when a mouse button isn't down
   this->setMouseTracking(false);
@@ -375,7 +378,8 @@ void Viz3DWidget::show(bool s)
     actor->SetVisibility(s ? true : false);
     actor = actors->GetNextItem();
   }
-  this->GetRenderWindow()->Render();
+  if (this->isVisible())
+    this->GetRenderWindow()->Render();
 };
 
 bool Viz3DWidget::event(QEvent* event)

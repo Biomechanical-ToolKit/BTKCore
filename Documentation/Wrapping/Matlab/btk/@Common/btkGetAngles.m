@@ -3,7 +3,7 @@ function [angles anglesInfo] = btkGetAngles(h) %#ok
 % 
 %  ANGLES = BTKGETANGLES(H) returns a structure of angles.  Each 
 %  fieldname in ANGLES corresponds to an angle's label.  The biomechanical 
-%  acquisition handle H is represented as a 32-bit integer and can be only
+%  acquisition handle H is represented as a double and can be only
 %  used with the btk* functions.
 %
 %  [ANGLES ANGLESINFO] = BTKGETANGLES(H) returns angles' informations  

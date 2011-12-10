@@ -119,7 +119,7 @@ namespace btk
     vtkCamera* camera = this->CurrentRenderer->GetActiveCamera();
     vtkRenderWindowInteractor *rwi = this->Interactor;
     int* size = this->CurrentRenderer->GetRenderWindow()->GetSize();
-    double rz = -180.0 * static_cast<double>(rwi->GetEventPosition()[0] - rwi->GetLastEventPosition()[0]) / static_cast<double>(size[0]);
+    double rz = -360.0 * static_cast<double>(rwi->GetEventPosition()[0] - rwi->GetLastEventPosition()[0]) / static_cast<double>(size[0]);
     double rx =  90.0 * static_cast<double>(rwi->GetEventPosition()[1] - rwi->GetLastEventPosition()[1]) / static_cast<double>(size[1]);
     
     Eigen::Matrix<double,3,1> cameraUp(camera->GetViewUp());

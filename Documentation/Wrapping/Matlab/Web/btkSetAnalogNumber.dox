@@ -1,0 +1,9 @@
+/**
+ * @class btkSetAnalogNumber
+ * @brief Sets the number of analog channels.
+ * @syntax{btkSetPointNumber(h\, an)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param an Integer with the new number of analog channels.
+ * @sa btkSetAnalogResolution, btkSetAnalogSampleNumberPerFrame, btkSetFirstFrame, btkSetFrameNumber, btkSetFrequency, btkSetMaxInterpolationGap, btkSetPointNumber
+ * @ingroup BTKMatlabPointModifier
+ */

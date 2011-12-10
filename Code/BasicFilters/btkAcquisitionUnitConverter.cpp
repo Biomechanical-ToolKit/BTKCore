@@ -415,13 +415,13 @@ namespace btk
             std::vector<int> types, channels;
             (*typeIt)->GetInfo()->ToInt(types);
             (*channelIt)->GetInfo()->ToInt(channels);
-            size_t num = 0;
             if (dims.size() <= 1)
             {
               btkErrorMacro("The metadata FORCE_PLATFORM:CAL_MATRIX is corrupted. Not enough dimension.");
             }
             else
             {
+              size_t num = 0;
               if (dims.size() < 3)
                 num = 1;
               else

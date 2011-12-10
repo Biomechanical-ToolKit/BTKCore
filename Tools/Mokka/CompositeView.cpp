@@ -105,10 +105,8 @@ void CompositeView::render()
 
 void CompositeView::show(bool s)
 {
-  // Viz3D
   static_cast<Viz3DWidget*>(this->view(Viz3D))->show(s);
-  // Chart Point
-  static_cast<ChartWidget*>(this->view(Chart))->show(s);
+  static_cast<ChartWidget*>(this->view(Chart))->show(s); // Init the frame and activate the actions.
 }
 
 AbstractView* CompositeView::clone() const

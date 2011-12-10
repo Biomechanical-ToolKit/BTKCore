@@ -145,7 +145,7 @@ namespace btk
   : vtkPolyDataAlgorithm()
   {
     this->mp_GRFsComponents = new VTKGRFsComponents();
-    this->mp_Scale = 1.0;
+    this->m_Scale = 1.0;
   };
   
   /**
@@ -199,12 +199,12 @@ namespace btk
             double* forces = (*it)->GetForce()->GetValues().data();
             
             points->SetPoint(wrenchIdx * 2 + 0,
-                             positions[i] * this->mp_Scale,
-                             positions[i + frameNumber] * this->mp_Scale,
-                             positions[i + 2 * frameNumber] * this->mp_Scale);
-            points->SetPoint(wrenchIdx * 2 + 1,positions[i] * this->mp_Scale + forces[i], 
-                             positions[i + frameNumber] * this->mp_Scale + forces[i + frameNumber], 
-                             positions[i + 2 * frameNumber] * this->mp_Scale + forces[i + 2 * frameNumber]);
+                             positions[i] * this->m_Scale,
+                             positions[i + frameNumber] * this->m_Scale,
+                             positions[i + 2 * frameNumber] * this->m_Scale);
+            points->SetPoint(wrenchIdx * 2 + 1,positions[i] * this->m_Scale + forces[i], 
+                             positions[i + frameNumber] * this->m_Scale + forces[i + frameNumber], 
+                             positions[i + 2 * frameNumber] * this->m_Scale + forces[i + 2 * frameNumber]);
 
             lines->InsertNextCell(2);
             lines->InsertCellPoint(wrenchIdx * 2 + 0);

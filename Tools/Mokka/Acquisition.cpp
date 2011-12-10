@@ -118,7 +118,7 @@ bool Acquisition::exportTo(const QString& filename, const QMap<int, QVariant>& p
   return this->write(filename, properties, lb, rb);
 };
 
-bool Acquisition::importFrom(const QStringList& filenames)
+bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
 {
   // Try to read the given file
   QList<btk::AcquisitionFileReader::Pointer> readers;
@@ -126,7 +126,7 @@ bool Acquisition::importFrom(const QStringList& filenames)
   {
     for (int i = 0 ; i < filenames.count() ; ++i)
     {
-      LOG_INFO(tr("Loading acquisition for importation from file:") + QFileInfo(filenames[i]).fileName());
+      LOG_INFO(tr("Loading acquisition for importation from file: ") + QFileInfo(filenames[i]).fileName());
       btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
       reader->SetFilename(filenames[i].toStdString());
       reader->Update();
@@ -170,6 +170,7 @@ bool Acquisition::importFrom(const QStringList& filenames)
   // Launch the merging/concatenation
   int shift = !this->mp_BTKAcquisition ? 0 : 1;
   btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+  merger->SetFirstFrameRule(allFramesKept ? btk::MergeAcquisitionFilter::KeepAllFrames : btk::MergeAcquisitionFilter::KeepFromHighestFirstFrame);
   merger->SetInput(0, this->mp_BTKAcquisition);
   for (int i = 0 ; i < readers.count() ; ++i)
     merger->SetInput(i+shift, readers[i]->GetOutput());
@@ -196,6 +197,18 @@ void Acquisition::clear()
   this->m_LastEventId = -1;
   this->mp_BTKAcquisition = btk::Acquisition::Pointer(); // NULL
 }
+
+void Acquisition::setFirstFrame(int ff)
+{
+  int diff = this->m_FirstFrame - ff;
+  this->m_FirstFrame -= diff;
+  this->m_LastFrame -= diff;
+  this->mp_ROI[0] -= diff;
+  this->mp_ROI[1] -= diff;
+  for (QMap<int,Event*>::iterator it = this->m_Events.begin() ; it != this->m_Events.end() ; ++it)
+    (*it)->frame -= diff;
+  emit firstFrameChanged(ff);
+};
 
 void Acquisition::setRegionOfInterest(int lb, int rb)
 {
@@ -896,6 +909,18 @@ void Acquisition::loadAcquisition()
       break;
     case btk::Analog::PlusMinus1:
       a->gain = Analog::PlusMinus1;
+      break;
+    case btk::Analog::PlusMinus0Dot5:
+      a->gain = Analog::PlusMinus0Dot5;
+      break;
+    case btk::Analog::PlusMinus0Dot25:
+      a->gain = Analog::PlusMinus0Dot25;
+      break;
+    case btk::Analog::PlusMinus0Dot1:
+      a->gain = Analog::PlusMinus0Dot1;
+      break;
+    case btk::Analog::PlusMinus0Dot05:
+      a->gain = Analog::PlusMinus0Dot05;
       break;
     }
     a->offset = (*it)->GetOffset();

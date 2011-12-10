@@ -40,6 +40,8 @@
 
 #include <QWidget>
 
+class ChartWidget;
+
 class ChartOptionsWidget : public QWidget, public Ui::ChartOptionsWidget
 {
   Q_OBJECT
@@ -66,8 +68,10 @@ signals:
   void lineWidthChanged(const QList<int>& indices, double value);
   void plotRemoved(int);
   void chartTitleChanged(const QString& title);
+  void pausePlaybackRequested(bool paused);
   
 protected:
+  virtual bool event(QEvent* event);
   virtual bool eventFilter(QObject* object, QEvent* event);
   virtual void paintEvent(QPaintEvent* event);
   
@@ -75,8 +79,14 @@ private slots:
   void emitChartTitleChanged();
   
 private:
+  friend class ChartWidget;
+
   QPixmap createLineIcon(const QColor& color, double width);
   void setLineColorButtonColor(const QColor& color);
+  
+#ifdef Q_OS_WIN
+  bool m_FixUpdateWindowsXP;
+#endif
 };
 
 #endif // ChartOptionsWidget_h

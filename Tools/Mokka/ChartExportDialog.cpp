@@ -218,6 +218,9 @@ void ChartExportDialog::accept()
     }
     // - Set new borders.
     this->mp_Chart->SetBorders(left, bottom, right, top);
+    // - Force the legend's location as it will be reseted by the next rendering.
+    this->imagePreview->GetRenderWindow()->Render();
+    this->updateLegendLocation(this->legendLocationComboBox->currentIndex());
     
     QImage img(w, h, QImage::Format_RGB32);
     

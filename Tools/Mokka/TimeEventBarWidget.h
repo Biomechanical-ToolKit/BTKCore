@@ -55,9 +55,9 @@ public:
   TimeEventBarWidget(QWidget* parent = 0);
   void load(Acquisition* acq);
   void reset();
-  void setEvent(int id, const Event* e);
+  void setEvent(int id, Event* e);
   void removeEvent(int id);
-  void insertEvent(int id, const Event* e);
+  void insertEvent(int id, Event* e);
   
 public slots:
   void setSliderValue(int frame);
@@ -74,7 +74,7 @@ signals:
   void eventMotionFinished(int id, int frame); // Mouse release
   
 protected:
-  bool event(QEvent *event);
+  bool event(QEvent* event);
   void mouseMoveEvent(QMouseEvent* event);
   void mousePressEvent(QMouseEvent* event);
   void mouseReleaseEvent(QMouseEvent* event);
@@ -86,26 +86,24 @@ private:
   
   struct EventItem
   {
+    Event* ptr;
     int id;
     int contextId;
-    int frame;
     QString symbol;
     QColor color;
-    QString toolTip;
     QRectF boundingRect;
   };
   
   enum {None, MoveSlider, MoveLeftBound, MoveRightBound, MoveEvent, Rubber};
   int eventItemAt(const QPoint& pos) const;
-  void setEventItem(EventItem& item, int id, const Event* e);
-  void setEventToolTip(EventItem& item, const Event* e);
+  void setEventItem(EventItem& item, int id, Event* e);
   void updateInternals();
   void updateSliderPostion();
   void updateLeftBoundPostion();
   void updateRightBoundPostion();
   void updateEventsPosition();
   void updateEventPosition(int id);
-  void updateEventPos(int idx);
+  void updateEventGeometry(int idx);
   void updateEventSelection();
   
   int m_FirstFrame;
@@ -117,26 +115,13 @@ private:
   int m_LeftBoundPos;
   int m_RightBoundPos;
   qreal m_UnitStep;
-  int m_WBound;
-  int m_WSlider;
-  int m_TopMargin;
-  int m_BottomMargin;
-  int m_LeftMargin;
-  int m_RightMargin;
   int m_TickDivider;
   QVector<int> m_Ticks;
   QVector<QString> m_TicksLabel;
   QFontMetrics m_Fm;
-  QFont m_EventFont;
-  qreal m_EventSymbolSize;
-  qreal m_YEventPosRelative;
   QPoint mp_PointsSlider[4]; // 0: shape ; 1-3: shadow
   QPoint mp_PointsBoundLeft[10]; // 0-6: shape ; 7-10: shadow
   QPoint mp_PointsBoundRight[12]; // 0-6: shape ; 7-12: shadow
-  QColor m_MovBrushColor;
-  QColor m_BoundBrushColor;
-  QPen m_MovPen;
-  QPen m_MovShadowPen;
   int m_Mode;
   QVector<EventItem> m_EventItems;
   QVector<QString> m_EventSymbols;
@@ -145,20 +130,5 @@ private:
   QRubberBand* mp_Rubber;
   QPoint m_RubberOrigin;
 };
-
-inline void TimeEventBarWidget::updateEventPos(int idx)
-{
-  qreal xPos = this->m_LeftMargin + ((this->m_EventItems[idx].frame - this->m_ROIFirstFrame)*this->m_UnitStep) - this->m_EventSymbolSize / 2.0;// + 0.5;
-  qreal yPos = this->m_EventItems[idx].contextId * 7.0 * (this->height() - this->m_TopMargin - this->m_BottomMargin) / 22.0 + this->m_YEventPosRelative;
-  this->m_EventItems[idx].boundingRect.setRect(xPos, yPos, this->m_EventSymbolSize, this->m_YEventPosRelative);
-};
-
-inline void TimeEventBarWidget::setEventToolTip(EventItem& item, const Event* e)
-{
-  if (e)
-    item.toolTip = QString("<b>Event:</b> %1 %2<br/><b>Subject:</b> %3<br/><b>Frame:</b> %4<br/><b>Time:</b> %5 second(s)").arg(e->context, e->label, e->subject).arg(e->frame).arg(e->time);
-  else
-    item.toolTip = "";
-}
 
 #endif // TimeEventBarWidget_h

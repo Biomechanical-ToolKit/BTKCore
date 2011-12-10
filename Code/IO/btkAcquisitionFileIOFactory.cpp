@@ -135,6 +135,8 @@ namespace btk
       if (io->CanWriteFile(filename)) return io;
       io = ANCFileIO::New();
       if (io->CanWriteFile(filename)) return io;
+      io = CALForcePlateFileIO::New();
+      if (io->CanWriteFile(filename)) return io;
     }
     return AcquisitionFileIO::Pointer();
   };

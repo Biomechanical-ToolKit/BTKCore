@@ -207,7 +207,6 @@ namespace btk
         throw(EMFFileIOException("Corrupted EMF file. No :Data section."));
 
       ifs.exceptions(std::ios_base::goodbit); // Remove exceptions
-      std::string buf;
       int indexMarker;
       double x,y,z;
       for(int i = 0 ; i < numFrames ; ++i)

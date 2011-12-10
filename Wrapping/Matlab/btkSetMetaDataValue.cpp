@@ -65,7 +65,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("No metadata's info.");
   
   size_t index = static_cast<size_t>(mxGetScalar(prhs[nrhs-2])) - 1;
-  if ((index < 0) || (index >= (*it)->GetInfo()->GetValues().size()))
+  if (index >= (*it)->GetInfo()->GetValues().size())
     mexErrMsgTxt("Invalid index to extract one metadata's value.");
     
   const mxArray* data = 0; 

@@ -703,7 +703,7 @@ namespace btk
 #else
       painter->GetBrush()->SetColor(0, 127, 255, 64);
 #endif
-      int lbi, rbi;
+      int lbi = 0, rbi = 0;
       (*this->mp_RegionOfInterestFunctor)(lbi, rbi);
       float left = static_cast<float>(lbi) - this->mp_AxisX->GetMinimum();
       float right = this->mp_AxisX->GetMaximum() - static_cast<float>(rbi);
@@ -908,13 +908,18 @@ namespace btk
   };
   
   /**
+   * @fn vtkTransform2D* VTKChartTimeSeries::GetPlotsTransform() const
+   * Returns the 2D transformation used to fit the plots in the chart area.
+   */
+  
+  /**
    * @fn bool VTKChartTimeSeries::Hit(const vtkContextMouseEvent &mouse)
    * Return true if the supplied mouse event is inside the item.
    * Required for the MouseWheelEvent() method.
    */
   
   /**
-   * Return true if the supplied x, y coordinate is inside the item.
+   * Return true if the supplied x, y coordinate is inside the area reserved for the plots.
    */
   bool VTKChartTimeSeries::Hit(int x, int y)
   {
@@ -923,6 +928,28 @@ namespace btk
     
     float pt1[2] = {this->Point1[0], this->Point1[1]};
     float pt2[2] = {this->Point2[0], this->Point2[1]};
+    if (this->GetTransform() != NULL)
+    {
+      this->GetTransform()->TransformPoints(pt1, pt1, 1);
+      this->GetTransform()->TransformPoints(pt2, pt2, 1);
+    }
+      
+    if ((x > pt1[0]) && (x < pt2[0]) && (y > pt1[1]) && (y < pt2[1]))
+      return true;
+    else
+      return false;
+  };
+  
+  /**
+   * Return true if the supplied x, y coordinate is inside the item.
+   */
+  bool VTKChartTimeSeries::Hit2(int x, int y)
+  {
+    if (!this->Visible)
+      return false;
+    
+    float pt1[2] = {0.0f, 0.0f};
+    float pt2[2] = {this->Point2[0] + this->mp_Borders[2], this->Point2[1] + this->mp_Borders[3]};
     if (this->GetTransform() != NULL)
     {
       this->GetTransform()->TransformPoints(pt1, pt1, 1);

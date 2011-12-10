@@ -66,7 +66,8 @@ struct Point
 
 struct Analog
 {
-  typedef enum {Unknown = 0, PlusMinus10 = 1, PlusMinus5 = 2, PlusMinus2Dot5 = 3, PlusMinus1Dot25 = 4, PlusMinus1 = 5} Gain;
+  typedef enum {Unknown = 0, PlusMinus10 = 1, PlusMinus5 = 2, PlusMinus2Dot5 = 3, PlusMinus1Dot25 = 4, 
+                PlusMinus1 = 5, PlusMinus0Dot5 = 6, PlusMinus0Dot25 = 7, PlusMinus0Dot1 = 8, PlusMinus0Dot05 = 9} Gain;
   QString label;
   QString description;
   QString unit;
@@ -99,7 +100,7 @@ public:
   bool load(const QString& filename);
   bool save(const QString& filename, const QMap<int, QVariant>& properties);
   bool exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb);
-  bool importFrom(const QStringList& filenames);
+  bool importFrom(const QStringList& filenames, bool allFramesKept = true);
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
@@ -111,6 +112,7 @@ public:
   btk::WrenchCollection::Pointer btkGroundReactionWrenches() const {return static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED])->GetOutput();};
   
   int firstFrame() const {return this->m_FirstFrame;};
+  void setFirstFrame(int ff);
   int lastFrame() const {return this->m_LastFrame;};
   void regionOfInterest(int& lb, int& rb) const {lb = this->mp_ROI[0]; rb = this->mp_ROI[1];};
   void setRegionOfInterest(int lb, int rb);
@@ -184,6 +186,7 @@ public:
   
 signals:
   void informationsChanged(const QVector<QString>& infos);
+  void firstFrameChanged(int ff);
   void regionOfInterestChanged(int lb, int rb);
   void pointLabelChanged(int id, const QString& label);
   void pointsDescriptionChanged(const QVector<int>& ids, const QVector<QString>& descs);

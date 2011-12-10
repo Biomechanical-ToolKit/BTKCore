@@ -4,8 +4,8 @@ function [analysis analysisInfo] = btkGetAnalysis(h) %#ok
 %  ANALYSIS = BTKGETANALYSIS(H) returns a structure of parameters related 
 %  to the metadata ANALYSIS in the acquisition represented by the handle H.
 %  Each fieldname in ANALYSIS corresponds to a parameter's label.  
-%  The biomechanical acquisition handle H is represented as a 32-bit integer
-%  and can be only used with the btk* functions.
+%  The biomechanical acquisition handle H is represented as a double and 
+%  can be only used with the btk* functions.
 %
 %  [ANALYSIS ANALYSISINFO] = BTKGETANALYSIS(H) returns analysis' informations  
 %  in ANALYSISINFO.  The structure ANALYSISINFO has the followig fields:

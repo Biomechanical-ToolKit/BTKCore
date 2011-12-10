@@ -111,6 +111,8 @@ namespace btk
                             Acquisition::Pointer output, const std::vector<std::string>& labels);
   int ANxFileIOFindAnalogLabeCaselInsensitive_p(const std::string& label, Acquisition::Pointer output);
   uint16_t ANxFileIODetectAnalogRange_p(double s, int bitDepth);
+  inline double ANxFileIOComputeScaleFactor(int range, int bitDepth) {return 2.0 * static_cast<double>(range) / 1000.0 / pow(2.0, bitDepth);};
+  uint16_t AnxFileIOExtractAnalogRangeFromGain(int idx, int gain, double scale, int bitDepth);
 };
 
 #endif // __btkMotionAnalysisFileIOUtils_h

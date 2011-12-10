@@ -38,6 +38,7 @@
 #include "Model.h"
 #include "CompositeView.h"
 #include "ChartWidget.h"
+#include "LoggerVTKOutput.h"
 #include "Viz3DWidget.h"
 
 #include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
@@ -350,6 +351,11 @@ void MultiViewWidget::initialize()
   // Initialize the charts
   chart->setPointFrameArray(this->mp_PointChartFrames);
   chart->setAnalogFrameArray(this->mp_AnalogChartFrames);
+  
+  // Redirect the VTK message to the Logger
+  vtkOutputWindow* w = LoggerVTKOutput::New();
+  vtkOutputWindow::SetInstance(w);
+  w->Delete();
 };
 
 void MultiViewWidget::setAcquisition(Acquisition* acq)
@@ -373,6 +379,7 @@ void MultiViewWidget::setAcquisition(Acquisition* acq)
   // Object connection
   connect(this->mp_Acquisition, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
   connect(this->mp_Acquisition, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
+  connect(this->mp_Acquisition, SIGNAL(firstFrameChanged(int)), this, SLOT(updateChartFramesIndex(int)));
 }
 
 void MultiViewWidget::setModel(Model* m)
@@ -429,6 +436,7 @@ void MultiViewWidget::load()
   segments->SetScaleUnit(scale);
 
   this->updateCameras();
+  this->updateDisplay(this->mp_Acquisition->firstFrame());
   
   // Update the X axis values for the charts
   this->mp_PointChartFrames->Initialize(); // Reset
@@ -447,7 +455,9 @@ void MultiViewWidget::load()
     for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
       this->mp_AnalogChartFrames->SetValue(inc + j, val + j * sub);
   }
-  
+  // Force the update for the generation of the force platforms and their forces (In case there is no 3D view, they are not updated).
+  forcePlaforms->Update();
+  GRFs->Update();
   // Active the content of each view
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
     static_cast<CompositeView*>(*it)->show(true);
@@ -721,6 +731,28 @@ void MultiViewWidget::restoreLayout3DCharts()
   stream << qint32(0); // Collapsed mode
   
   this->restoreLayout(data);
+};
+
+void MultiViewWidget::updateChartFramesIndex(int ff)
+{
+  Q_UNUSED(ff)
+  double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
+  for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
+  {
+    // Point
+    this->mp_PointChartFrames->SetValue(i, this->mp_Acquisition->firstFrame() + i);
+    // Analog
+    int inc = i * this->mp_Acquisition->analogSamplePerPointFrame();
+    double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
+    this->mp_AnalogChartFrames->SetValue(inc, val);
+    for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
+      this->mp_AnalogChartFrames->SetValue(inc + j, val + j * sub);
+  }
+  for (QList<AbstractView*>::const_iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->updateAxisX();
+    static_cast<CompositeView*>(*it)->render();
+  }
 };
 
 void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments)
@@ -1072,7 +1104,6 @@ void MultiViewWidget::clear()
 {
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
     static_cast<CompositeView*>(*it)->show(false);
-  this->updateDisplay(this->mp_Acquisition->firstFrame());
 };
 
 void MultiViewWidget::circleSelectedMarkers(const QList<int>& ids)
@@ -1192,7 +1223,9 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   viz3D->addActions(this->m_View3dActions);
   viz3D->setContextMenuPolicy(Qt::ActionsContextMenu);
   // Chart final settings
-  static_cast<ChartWidget*>(sv->view(CompositeView::Chart))->addActions(this->m_ViewChartActions);
+  ChartWidget* chart2D = static_cast<ChartWidget*>(sv->view(CompositeView::Chart));
+  chart2D->addActions(this->m_ViewChartActions);
+  connect(chart2D, SIGNAL(pausePlaybackRequested(bool)), this, SIGNAL(pausePlaybackRequested(bool)));
   // Event filter
   if (this->mp_EventFilterObject)
   {
@@ -1249,6 +1282,7 @@ void MultiViewWidget::updateCameras()
 
 void MultiViewWidget::updateViews()
 {
+  btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->Update(); // To update the markers' list when only charts are displayed.
   for (QList<AbstractView*>::const_iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
     static_cast<CompositeView*>(*it)->render();
 };

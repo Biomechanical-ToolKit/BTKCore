@@ -130,11 +130,11 @@ namespace btk
         residualAndMask = this->m_Bfs->ReadI16();
         memcpy(&byteptr, &residualAndMask, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-        *cam = byteptr[0];
-        *residual = (byteptr[0] >= 0 ? byteptr[1] * pointScaleFactor : -1);
+        *cam = static_cast<double>(byteptr[0]);
+        *residual = (byteptr[0] >= 0 ? static_cast<double>(byteptr[1]) * pointScaleFactor : -1.0);
 #else
-        *cam = byteptr[1];
-        *residual = (byteptr[1] >= 0 ? byteptr[0] * pointScaleFactor : -1);
+        *cam = static_cast<double>(byteptr[1]);
+        *residual = (byteptr[1] >= 0 ? static_cast<double>(byteptr[0]) * pointScaleFactor : -1.0);
 #endif
       };
       virtual double ReadAnalog() {return static_cast<float>(this->m_Bfs->ReadI16());};
@@ -189,13 +189,13 @@ namespace btk
         residualAndMask = static_cast<int16_t>(this->m_Bfs->ReadFloat());
         memcpy(&byteptr, &residualAndMask, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-        *cam = byteptr[0];
+        *cam = static_cast<double>(byteptr[0]);
         // FIX: It seems that for UNSGINED 16 bits in float format, the residual is negative.
         //      The residual is now calculated as the fabs(byteptr[1] * scaleFactor3d).
-        *residual = (byteptr[0] >= 0 ? fabs(byteptr[1] * pointScaleFactor) : -1);
+        *residual = (byteptr[0] >= 0 ? fabs(static_cast<double>(byteptr[1]) * pointScaleFactor) : -1.0);
 #else
-        *cam = byteptr[1];
-        *residual = (byteptr[1] >= 0 ? fabs(byteptr[0] * pointScaleFactor) : -1);
+        *cam = static_cast<double>(byteptr[1]);
+        *residual = (byteptr[1] >= 0 ? fabs(static_cast<double>(byteptr[0]) * pointScaleFactor) : -1.0);
 #endif
       };
       virtual double ReadAnalog() {return this->m_Bfs->ReadFloat();};

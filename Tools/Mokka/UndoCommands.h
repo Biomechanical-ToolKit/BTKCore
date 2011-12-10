@@ -117,6 +117,21 @@ private:
   void action();
 };
 
+class ReframeAcquisition : public AcquisitionUndoCommand
+{
+public:
+  ReframeAcquisition(Acquisition* acq, int ff, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  int m_FirstFrame;
+  
+  void action();
+};
+
+
 // ----------------------------------------------- //
 //               POINT/MARKER EDITION              //
 // ----------------------------------------------- //

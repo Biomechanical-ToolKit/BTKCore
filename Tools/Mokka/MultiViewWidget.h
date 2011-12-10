@@ -109,6 +109,7 @@ public:
   bool restoreLayout(const QByteArray& state);
   
 public slots:
+  void updateChartFramesIndex(int ff);
   void appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void clearSegments();
   void setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors);
@@ -146,6 +147,7 @@ signals:
   void pickedMarkerToggled(int id);
   void selectedMarkersToggled(const QList<int>& ids);
   void trajectoryMarkerToggled(int id);
+  void pausePlaybackRequested(bool paused);
   
 private slots:
   // Qt / VTK

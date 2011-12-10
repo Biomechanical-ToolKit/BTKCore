@@ -57,6 +57,7 @@ ChartImagePreview::ChartImagePreview(QWidget* parent)
   // Member
   this->mp_Renderer = vtkRenderer::New();
   this->mp_Renderer->SetBackground(1.0,1.0,1.0);
+  this->mp_Chart = 0;
   
   // No need to send mouse events to VTK when a mouse button isn't down
   this->setMouseTracking(false);

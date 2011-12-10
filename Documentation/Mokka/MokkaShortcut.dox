@@ -17,12 +17,29 @@ The principal shortcuts in Mokka are:
 - Ctrl + s: save the modified acquisition 
 - Shift + Ctrl + s: save the acquisition as a new one
 
+Some shortcuts are dedicated to the switch between views' configurations.
+- Ctrl + 1: Update the view’s layout to have only a 3D view
+- Ctrl + 2: 3D view Verbose: Update the view’s layout a 3D view and a logger splitted verticaly
+- Ctrl + 3: 3D view And Charts: Update the view’s layout a 3D view and a logger splitted verticaly
+- Ctrl + (4 - 9, 0): Load the layout configured by the user.
+
 @b Note: For MacOS X user, the Ctrl is replaced by the command key. 
 
 @section MokkaShortcut3DView 3D View
 Some shortcut are dedicated to the 3D view.
 - Ctrl + Left mouse button: Toggle marker selection.
 - Shift + Ctrl + Left mouse button: Toggle marker trajectory.
+- Shift + Left mouse button: Open a rubber band to select several markers at the same time.
+
+@section MokkaShortcutChartView Chart View
+Some shortcut are dedicated to the chart view.
+- Shift + Left mouse button: Zoom rectangle.
+- Shift + Mouse wheel (forward / backward): Zoom (stretch) only the X axis.
+
+@section MokkaShortcutChartView Logger
+Some shortcut are dedicated to the logger.
+- Ctrl + A: Select all the logs.
+- Ctrl + C: Copy only the selected logs.
 
 @section MokkaShortcutTimeBar Time Bar
 Some shortcut are dedicated to the time bar.

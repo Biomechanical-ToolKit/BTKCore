@@ -167,8 +167,11 @@ namespace btk
     BTK_VTK_EXPORT virtual vtkAxis* GetAxis(int axisIndex);
     BTK_VTK_EXPORT virtual vtkIdType GetNumberOfAxes();
     
+    vtkTransform2D* GetPlotsTransform() const {return this->mp_PlotsTransform;};
+    
     bool Hit(const vtkContextMouseEvent& mouse) {return this->Hit(mouse.ScreenPos[0], mouse.ScreenPos[1]);};
     BTK_VTK_EXPORT bool Hit(int x, int y);
+    BTK_VTK_EXPORT bool Hit2(int x, int y);
     BTK_VTK_EXPORT virtual bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseMoveEvent(const vtkContextMouseEvent& mouse);

@@ -4,13 +4,13 @@
 @section MokkaModelPaneSection Model Pane
 
 This pane contains functions to enhance the visualization and edition of the data. Markers in the 3D pane can be displayed with different colors and sizes. The trajectory of markers can be displayed. The options of this pane permit to save the configuration of visualization of the markers in the 3D pane.
-This panel permits also to change the label of the markers, the properties of the analog channels and the label of model outputs.
+This panel permits also to change the label of the markers, the properties of the analog channels and the label of model outputs, as well as other properties.
 
 The file formats supported by Mokka to configure a model are the following:
 - MVC: Mokka Visualization Configuration files.
 - VSK/VST: Vicon Skeleton (Template) files.
 
-@subsection MokkaModelResources Resources Menu
+@subsection MokkaModelResources Configuration menu
 The button @htmlonly <img src="process.png"/> @endhtmlonly returns a menu with the following actions:
 - Visual configuration
   - <tt>New configuration</tt>: Create a new configuration
@@ -19,42 +19,22 @@ The button @htmlonly <img src="process.png"/> @endhtmlonly returns a menu with t
   - <tt>Remove configuration</tt>: Clear the active configuration from the list of known visual configuration 
   - <tt>Deselect configuration</tt>: Deselect the active configuration
   - <tt>Clear configurations</tt>: Clear the list of known visual configurations
-- Segments
-  - <tt>New Segment</tt>: To create a new segment, you have to select markers of segments in the Model Pane or in the 3D view. In the new opened window, you can define the label of the segment, a description of the segment and links between markers that will be displayed in the 3D view. Once the segment is created, you will see it in the Segments section. This operation can be done from the contextual menu of the @ref Mokka3DView
-  - <tt>Hide selected segments</tt>: Hide the selected segments in the 3D view
-  - <tt>Unhide selected segments</tt>: Unhide the selected segments in the 3D view
-- Markers
-  - <tt>Select all markers</tt>: Select all the markers in the 3D view and in the Model Pane. It’s also possible to do this operation in the @ref Mokka3DView
-  - <tt>Hide selected markers</tt>: Hide the selected markers in the 3D view. It’s also possible to do this operation in the @ref Mokka3DView
-  - <tt>Unhide selected markers</tt>: Unhide the selected markers in the 3D view. It’s also possible to do this operation in the @ref Mokka3DView
-- Analog channels
-  - <tt>Select all analog channels</tt>: Select all analog channels in the Model Pane. It’s possible to modify the properties of analog channels all together
-- Model outputs
-  - <tt>Select all model outputs</tt>:
-  Select all Model outputs in the Model Pane. It’s possible to modify the properties all together
-  - <tt>Select all angles</tt>:
-  Select all angles from Model outputs in the Model Pane. It’s possible to modify the properties all together
-  - <tt>Select all forces</tt>:
-  Select all forces from Model outputs in the Model Pane. It’s possible to modify the properties all together
-  - <tt>Select all moments</tt>:
-  Select all moments from Model outputs in the Model Pane. It’s possible to modify the properties all together
-  - <tt>Select all powers</tt>:
-  Select all powers from Model outputs in the Model Pane. It’s possible to modify the properties all together
-  - <tt>Select all scalars</tt>:
-  Select all scalars from Model outputs in the Model Pane. It’s possible to modify the properties all together
-- <tt>Remove selected items</tt>:
-  Remove (delete) the selected items from the Model Pane (Markers, Analog channel, Model outputs)
 
-Once the items are modified or removed, it’s possible to save the modifications in the loaded file or a new one.
-
-@subsection MokkaModelProperties Item's list
+@subsection MokkaModelProperties Ressources' list
 @subsubsection MokkaModelSegmentProperties Segments
 @htmlonly
 <ul class=twocolumns>
 <li>
-The segments' list <img src="link2.png"/> in the Model pane contains the option to visualize segments <img src="eye.png"/> in the 3D view. The options to change the propreties of the segments appears when one segment or a group of segments are selected.<br/>
+The segments' list <img src="link2.png"/> in the Model pane contains the option to visualize segments <img src="eye.png"/> in 3D views. This item is only visible if at least one segment is defined. The options to change the propreties (located at the bottom of the panel) of the segments appears when one segment or a group of segments are selected.<br/>
 <br/>
 To assign a color to the selected segments, you can click on the first circle which will open a dialog box where you will pick the desired color. This color is then saved in the color history (other circles). To reuse the color in the history, click only on it and the selected markers will be repainted.
+<br/><br/>
+There are also options in the contextual menu for the segment (right click onto the segment item):
+<ul class=default>
+<li><tt>New Segment</tt>: To create a new segment, you have to select markers of segments in the Model Pane or in the 3D view. In the new opened window, you can define the label of the segment, a description of the segment and links between markers that will be displayed in the 3D view. Once the segment is created, you will see it in the Segments section. This operation can be done from the contextual menu of the @endhtmlonly@ref Mokka3DViewer@htmlonly</li>
+<li><tt>Hide selected segments</tt>: Hide the selected segments in the @endhtmlonly@ref Mokka3DViewer@htmlonly</li>
+<li><tt>Unhide selected segments</tt>: Unhide the selected segments in the @endhtmlonly@ref Mokka3DViewer@htmlonly</li>
+</ul>
 </li>
 <li>
 @endhtmlonly
@@ -68,9 +48,18 @@ To assign a color to the selected segments, you can click on the first circle wh
 @htmlonly
 <ul class=twocolumns>
 <li>
-The markers' list <img src="markers.png"/> in the Model pane contains the options to visualize <img src="eye.png"/> @endhtmlonly and track @htmlonly <img src="trajectory_active.png" width="16px" height="16px"/> markers in the  @endhtmlonly @ref Mokka3DView @htmlonly.  Moreoever, when a marker or a group of markers are selected, it’s possible to change their properties (Label, Radius, Color and Description)<br/>
+The markers' list <img src="markers.png"/> in the Model pane contains the options to visualize <img src="eye.png"/> @endhtmlonly and track @htmlonly <img src="trajectory_active.png" width="16px" height="16px"/> markers in the  @endhtmlonly @ref Mokka3DViewer @htmlonly.  Moreoever, when a marker or a group of markers are selected, it’s possible to change their properties (Label, Radius, Color and Description)<br/>
 <br/>
-To assign a color to the selected markers, you can click on the first circle which will open a dialog box where you will pick the desired color. This color is then saved in the color history (other circles). To reuse the color in the history, click only on it and the selected markers will be repainted.
+To assign a color to the selected markers, you can click on the first circle which will open a dialog box where you will pick the desired color. This color is then saved in the color history (other circles). To reuse the color in the history, click only on it and the selected markers will be repainted. The options to change the properties of the markers appear at the bottom of the panel when one marker or a group of markers are selected.
+<br/><br/>
+The marker items are also used by the charts. Drag the selected markers into the Point chart to plot them.
+<br/><br/>
+There are also options in the contextual menu for the markers (right click onto the marker item):
+<ul class=default>
+<li><tt>Select all markers</tt>: Select all the markers in the 3D view and in the Model Pane. It’s also possible to do this operation in the @endhtmlonly@ref Mokka3DViewer@htmlonly</li>
+<li><tt>Hide selected markers</tt>: Hide the selected markers in the 3D view. It’s also possible to do this operation in the @endhtmlonly@ref Mokka3DViewer@htmlonly</li>
+<li><tt>Unhide selected markers</tt>: Unhide the selected markers in the 3D view. It’s also possible to do this operation in the @endhtmlonly@ref Mokka3DViewer@htmlonly</li>
+</ul>
 </li>
 <li>
 @endhtmlonly
@@ -79,7 +68,6 @@ To assign a color to the selected markers, you can click on the first circle whi
 </li>
 </ul>
 @endhtmlonly
-
 @subsubsection MokkaModelAnalogProperties Analogs
 @htmlonly
 <ul class=twocolumns>
@@ -87,9 +75,14 @@ To assign a color to the selected markers, you can click on the first circle whi
 The analog channels <img src="chart_line.png"/> are 1D temporal signal acquired synchronously with the video data. 
 By using the properties panel you can check or modify the informations related to the selected analog channels.
 <br/><br/>
-<b>Note</b>: In a future release, it will be possible to display the data as graph.
-<br/><br/>
 <b>Warning</b>: Modifying the analog offset, scale and gain could modify values when saving the acquisition and reading it again. Moreover, removing an analog channel can corrupt the acquisition. For example, if it used to register force platform data and you remove it, Mokka won't be able to compute these force platform data the next time.
+<br/><br/>
+The analog items are also used by the charts. Drag the selected analog channels into Analog chart to plot them.
+<br/><br/>
+There are also options in the contextual menu for the analog channels (right click onto the analog item):
+<ul class=default>
+<li><tt>Select all analog channels</tt>: Select all analog channels in the Model Pane. It’s possible to modify the properties of analog channels all together</li>
+</ul>
 </li>
 <li>
 @endhtmlonly
@@ -99,13 +92,31 @@ By using the properties panel you can check or modify the informations related t
 </ul>
 @endhtmlonly
 
+@subsubsection MokkaModelForcePlatformProperties Force platform reactions
+@htmlonly
+<ul class=twocolumns>
+<li>
+The component of each force platform can be plotted in chart. Drag the selected component into Point chart to plot it.
+</ul>
+@endhtmlonly
+
 @subsubsection MokkaModelOutputsProperties Model outputs
 @htmlonly
 <ul class=twocolumns>
 <li>
 The model output <img src="chart_curve.png"/> contains data computed (for example with the PluginGait Model). There are 5 sub-sections: Angles, Forces, Moments, Powers and Scalar. If the subsection is empty, it is not displayed.
 <br/><br/>
-<b>Note</b>: In a future release, it will be possible to display the data as graph.
+These items are also used by the charts. Drag the selected output into Point chart to plot them.
+<br/><br/>
+There are also options in the contextual menu for the model outputs (right click onto the output item):
+<ul class=default>
+<li><tt>Select all model outputs</tt>: Select all Model outputs in the Model Pane. It’s possible to modify the properties all together</li>
+<li><tt>Select all angles</tt>: Select all angles from Model outputs in the Model Pane. It’s possible to modify the properties all together</li>
+<li><tt>Select all forces</tt>: Select all forces from Model outputs in the Model Pane. It’s possible to modify the properties all together</li>
+<li><tt>Select all moments</tt>: Select all moments from Model outputs in the Model Pane. It’s possible to modify the properties all together</li>
+<li><tt>Select all powers</tt>: Select all powers from Model outputs in the Model Pane. It’s possible to modify the properties all together</li>
+<li><tt>Select all scalars</tt>: Select all scalars from Model outputs in the Model Pane. It’s possible to modify the properties all together</li>
+</ul>
 </li>
 <li>
 @endhtmlonly

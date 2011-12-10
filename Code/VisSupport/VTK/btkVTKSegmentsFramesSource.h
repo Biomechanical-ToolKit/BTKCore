@@ -76,8 +76,8 @@ namespace btk
     BTK_VTK_EXPORT void ShowSegment(vtkIdType id);
     BTK_VTK_EXPORT void ShowSegments();
 
-    double GetScaleUnit() {return this->mp_Scale;};
-    void SetScaleUnit(double s) {this->mp_Scale = s;};
+    double GetScaleUnit() {return this->m_Scale;};
+    void SetScaleUnit(double s) {this->m_Scale = s;};
  
   protected:
     BTK_VTK_EXPORT VTKSegmentsFramesSource();
@@ -106,7 +106,7 @@ namespace btk
     vtkIntArray* mp_VisibleSegments;
     vtkIdTypeArray* mp_SegmentsColorIndex;
     vtkLookupTable* mp_SegmentsColorsLUT;
-    double mp_Scale;
+    double m_Scale;
   };
 };
 #endif // __btkVTKSegmentsFramesSource_h

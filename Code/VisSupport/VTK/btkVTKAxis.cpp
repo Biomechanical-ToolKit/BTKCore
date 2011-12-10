@@ -419,9 +419,12 @@ namespace btk
 
     // Calculate an upper limit on the number of tick marks - at least 30 pixels
     // should be between each tick mark.
-    float pixelRange = this->Point1[0] == this->Point2[0] ?
-                       this->Point2[1] - this->Point1[1] :
-                       this->Point2[0] - this->Point1[0];
+    float pt[4] = {this->Point1[0], this->Point1[1], this->Point2[0], this->Point2[1]};
+    if (this->GetTransform() != NULL)
+      this->GetTransform()->TransformPoints(pt, pt, 2);
+    float pixelRange = pt[0] == pt[2] ?
+                       pt[3] - pt[1] :
+                       pt[2] - pt[0];
     int maxTicks = static_cast<int>(pixelRange / this->m_MinimumTickSpacing);
     if (maxTicks == 0)
     {
@@ -434,8 +437,8 @@ namespace btk
     double normTickSpacing = tickSpacing * pow(10.0f, -order);
     double niceTickSpacing = this->NiceNumber(normTickSpacing, true);
     niceTickSpacing *= pow(10.0f, order);
-    if (niceTickSpacing < this->m_MinimumTickSpacing)
-      niceTickSpacing = this->m_MinimumTickSpacing;
+    // if (niceTickSpacing < this->m_MinimumTickSpacing)
+    //   niceTickSpacing = this->m_MinimumTickSpacing;
 
     if (isNegative)
     {

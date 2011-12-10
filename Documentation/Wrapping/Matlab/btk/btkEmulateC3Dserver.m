@@ -75,7 +75,7 @@ function itf = btkEmulateC3Dserver()
 %      number of analog frames is at least equal to the number of video
 %      frames.
 %
-%  Author: A. Barré
+%  Author: A. BarrÃ©
 %  Copyright 2009-2011 Biomechanical ToolKit (BTK).
 
 %  TODO:

@@ -37,11 +37,19 @@
 
 #include <QFileDialog>
 #include <QLineEdit>
+#include <QButtonGroup>
 
 ImportAssistantDialog::ImportAssistantDialog(QWidget* parent)
 : QDialog(parent), m_Directory("")
 {
   this->setupUi(this);
+  QButtonGroup* acquisitonRadioButtonGroup = new QButtonGroup(this);
+  acquisitonRadioButtonGroup->addButton(this->newAcquisitionRadioButton);
+  acquisitonRadioButtonGroup->addButton(this->appendAcquisitionRadioButton);
+  QButtonGroup* firstFrameRadioButtonGroup = new QButtonGroup(this);
+  firstFrameRadioButtonGroup->addButton(this->keepAllFrameRadioButton);
+  firstFrameRadioButtonGroup->addButton(this->keepHighestFirstFrameRadioButton);
+  
 #ifdef Q_OS_MAC
   this->setWindowFlags(Qt::Sheet);
   this->setWindowModality(Qt::WindowModal);
@@ -58,7 +66,6 @@ ImportAssistantDialog::ImportAssistantDialog(QWidget* parent)
   connect(this->eliteAngleButton, SIGNAL(clicked()), this, SLOT(openEliteAngleFileDialog()));
   connect(this->eliteMomentButton, SIGNAL(clicked()), this, SLOT(openEliteMomentFileDialog()));
   connect(this->elitePowerButton, SIGNAL(clicked()), this, SLOT(openElitePowerFileDialog()));
-  connect(this->elitePowerButton, SIGNAL(clicked()), this, SLOT(openElitePowerFileDialog()));
 };
 
 void ImportAssistantDialog::clear(const QString& dir)
@@ -66,6 +73,7 @@ void ImportAssistantDialog::clear(const QString& dir)
   this->m_Directory = dir;
   this->newAcquisitionRadioButton->setChecked(true);
   this->acquisitionSystemComboBox->setCurrentIndex(-1);
+  this->keepAllFrameRadioButton->setChecked(true);
   this->stackedWidget->setCurrentIndex(0);
   this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
   // Motion page
@@ -132,7 +140,7 @@ void ImportAssistantDialog::openMotionOrthoTrakFileDialog()
 
 void ImportAssistantDialog::openEliteTrajectoryFileDialog()
 {
-  this->openFileDialog(tr("Trajectory Files (*.rah *.raw *.ric)"), this->eliteTrajectoryLineEdit);
+  this->openFileDialog(tr("Trajectory Files (*.rah *.raw *.ric *.rif)"), this->eliteTrajectoryLineEdit);
 };
 
 void ImportAssistantDialog::openEliteForcePlatformFileDialog()

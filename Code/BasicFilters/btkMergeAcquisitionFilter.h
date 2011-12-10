@@ -46,12 +46,17 @@ namespace btk
   class MergeAcquisitionFilter : public ProcessObject
   {
   public:
+    enum {KeepAllFrames = 0, KeepFromHighestFirstFrame};
+    
     typedef SharedPtr<MergeAcquisitionFilter> Pointer;
     typedef SharedPtr<const MergeAcquisitionFilter> ConstPointer;
 
     static Pointer New() {return Pointer(new MergeAcquisitionFilter());};
     
     // ~MergeAcquisitionFilter(); // Implicit
+    
+    int GetFirstFrameRule() const {return this->m_FirstFrameRule;};
+    BTK_BASICFILTERS_EXPORT void SetFirstFrameRule(int rule);
     
     Acquisition::Pointer GetInput(int idx) {return static_pointer_cast<Acquisition>(this->GetNthInput(idx));};
     void SetInput(int idx, Acquisition::Pointer input) {this->SetNthInput(idx, input);};
@@ -82,7 +87,7 @@ namespace btk
     MergeAcquisitionFilter(const MergeAcquisitionFilter& ); // Not implemented.
     MergeAcquisitionFilter& operator=(const MergeAcquisitionFilter& ); // Not implemented.
     
-    bool m_FirstInput;
+    int m_FirstFrameRule;
   };
 };
 

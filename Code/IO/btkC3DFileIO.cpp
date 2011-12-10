@@ -592,15 +592,6 @@ namespace btk
 
         if ((analogNumber != 0) && (itAnalog != root->End()))
         {
-          // - ANALOG:FORMAT
-          MetaData::ConstIterator itAnalogFormat = (*itAnalog)->FindChild("FORMAT");
-          if (itAnalogFormat != (*itAnalog)->End())
-          {
-            if ((*itAnalogFormat)->GetInfo()->ToString(0).compare("UNSIGNED") == 0)
-              this->m_AnalogIntegerFormat = Unsigned;
-            else
-              this->m_AnalogIntegerFormat = Signed;
-          }
           // - ANALOG:BITS
           MetaData::ConstIterator itAnalogBits = (*itAnalog)->FindChild("BITS");
           int bits = 0;
@@ -643,7 +634,7 @@ namespace btk
           }
           if (bits != output->GetAnalogResolution())
           {
-            if (bits > 16)
+            if (bits >= 16)
             {
               output->SetAnalogResolution(Acquisition::Bit16);
               this->m_AnalogIntegerFormat = Unsigned;
@@ -651,6 +642,15 @@ namespace btk
             else
               output->SetAnalogResolution(static_cast<Acquisition::AnalogResolution>(bits));
             btkIOErrorMacro(filename, "Analog format and/or their resolution are inconsistent with analog offsets. They were updated.");
+          }
+          // - ANALOG:FORMAT
+          MetaData::ConstIterator itAnalogFormat = (*itAnalog)->FindChild("FORMAT");
+          if (itAnalogFormat != (*itAnalog)->End())
+          {
+            if ((*itAnalogFormat)->GetInfo()->ToString(0).compare("UNSIGNED") == 0)
+              this->m_AnalogIntegerFormat = Unsigned;
+            else
+              this->m_AnalogIntegerFormat = Signed;
           }
           // - ANALOG:OFFSET
           if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
@@ -1047,6 +1047,7 @@ namespace btk
       in->SetAnalogResolution(input->GetAnalogResolution());
       in->SetEvents(input->GetEvents()->Clone());
       in->SetMetaData(input->GetMetaData()->Clone());
+      in->SetPointUnits(input->GetPointUnits());
       for (Acquisition::PointConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
         in->AppendPoint(Point::New((*it)->GetLabel(), (*it)->GetType(), (*it)->GetDescription()));
       for (Acquisition::AnalogConstIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
@@ -1682,6 +1683,18 @@ namespace btk
         break;
       case Analog::PlusMinus1:
         gain[inc] = 5;
+        break;
+      case Analog::PlusMinus0Dot5:
+        gain[inc] = 6;
+        break;
+      case Analog::PlusMinus0Dot25:
+        gain[inc] = 7;
+        break;
+      case Analog::PlusMinus0Dot1:
+        gain[inc] = 8;
+        break;
+      case Analog::PlusMinus0Dot05:
+        gain[inc] = 9;
         break;
       }
       analogChannelScale[inc] = static_cast<float>(this->m_AnalogChannelScale[inc]);

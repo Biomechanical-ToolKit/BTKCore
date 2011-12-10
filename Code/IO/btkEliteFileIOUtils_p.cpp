@@ -40,7 +40,7 @@
 
 namespace btk
 {
-  void ReadEliteHeader_p(Acquisition::Pointer output, IEEELittleEndianBinaryFileStream* bifs, bool extractEvents)
+  void ReadEliteHeader_p(Acquisition::Pointer output, IEEELittleEndianBinaryFileStream* bifs, bool extractEvents, bool checkDataFiltered)
   {
     bifs->ReadU16(); // Camera number
     int numFra = bifs->ReadU16();
@@ -57,25 +57,25 @@ namespace btk
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
-        if (f != 0xFFFF)
+        if ((f != 0xFFFF) && (f != 0x0000))
           output->AppendEvent(Event::New("Foot Off", f, "Left", Event::Unknown, "", "", 2));
       }
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
-        if (f != 0xFFFF)
+        if ((f != 0xFFFF) && (f != 0x0000))
           output->AppendEvent(Event::New("Foot Off", f, "Right", Event::Unknown, "", "", 2));
       }
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
-        if (f != 0xFFFF)
+        if ((f != 0xFFFF) && (f != 0x0000))
           output->AppendEvent(Event::New("Foot Strike", f, "Left", Event::Unknown, "", "", 1));
       }
       for (int i = 0 ; i < 12 ; ++i)
       {
         int f = bifs->ReadU16();
-        if (f != 0xFFFF)
+        if ((f != 0xFFFF) && (f != 0x0000))
           output->AppendEvent(Event::New("Foot Strike", f, "Right", Event::Unknown, "", "", 1));
       }
       bifs->SeekRead(136, BinaryFileStream::Current); 
@@ -87,19 +87,32 @@ namespace btk
     date[2] = bifs->ReadU16(); // day
     date[1] = bifs->ReadU16(); // month
     date[0] = bifs->ReadU16(); // year
-    
-    bifs->SeekRead(184, BinaryFileStream::Current);
+    // Filter flag
+    bifs->SeekRead(2, BinaryFileStream::Current);
+    int16_t filtered = bifs->ReadI16();
+    // First frame
+    bifs->SeekRead(24, BinaryFileStream::Current);
+    int ff = bifs->ReadU16();
+    // Frame rate
+    bifs->SeekRead(154, BinaryFileStream::Current);
     double framerate = static_cast<double>(bifs->ReadU16());
+    // Go to the end of the header
     bifs->SeekRead(80, BinaryFileStream::Current);
     
     output->Init(numMkr, numFra);
+    output->SetFirstFrame(ff);
     output->SetPointFrequency(framerate);
     if ((date[0] != 0) && (date[1] != 0) && (date[2] != 0))
     {
       MetaData::Pointer trial = MetaDataCreateChild(output->GetMetaData(), "TRIAL");
       MetaDataCreateChild(trial, "DATE", date);
     }
-    
+    // If the flag is acticated, create the metadata POINT:MARKERS_FILTERED and set its value.
+    if (checkDataFiltered)
+    {
+      MetaData::Pointer point = MetaDataCreateChild(output->GetMetaData(), "POINT");
+      MetaDataCreateChild(point, "MARKERS_FILTERED", filtered);
+    }
     // Compute the event's time.
     for (Acquisition::EventIterator it = output->BeginEvent() ; it != output->EndEvent() ; ++it)
       (*it)->SetTime(static_cast<double>((*it)->GetFrame()) / framerate);
@@ -154,7 +167,8 @@ namespace btk
       // Remove 0x00
       label = label.erase(label.find_last_not_of(static_cast<char>(0x00)) + 1);
       label = label.erase(0, label.find_first_not_of(static_cast<char>(0x00)));
-      (*it)->SetLabel(label);
+      if (!label.empty())
+        (*it)->SetLabel(label);
     }
   };
 };

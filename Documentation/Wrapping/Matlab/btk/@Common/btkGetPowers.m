@@ -3,7 +3,7 @@ function [powers powersInfo] = btkGetPowers(h) %#ok
 % 
 %  POWERS = BTKGETPOWERS(H) returns a structure of powers.  Each 
 %  fieldname in POWERS corresponds to a power's label.  The biomechanical 
-%  acquisition handle H is represented as a 32-bit integer and can be only
+%  acquisition handle H is represented as a double and can be only
 %  used with the btk* functions.
 %
 %  [POWERS POWERSINFO] = BTKGETPOWERS(H) returns powers' informations  

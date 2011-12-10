@@ -13,10 +13,10 @@ To add a new event on your loaded acquisition you can proceed in 2 different way
   - Right click on the time bar and you will see the <tt>Insert event</tt> option. 
   - From this option, you can choose to insert: Foot off, Foot Strike or General event.
   - The new event will be created at selected frame.
-  - The frame can be edited afterward.
-
+  - The frame can be edited afterward.\n
+\n
 @image html tutorial_addevent_contextualmenu.png Time bar with the contextual menu to insert event.
-
+\n
 -# Use @htmlonly <img src="event_right.png"> @endhtmlonly, @htmlonly <img src="event_left.png"> @endhtmlonly, @htmlonly <img src="event_general.png"> @endhtmlonly on the time bar
   - Choose either @htmlonly <img src="event_right.png"> @endhtmlonly or @htmlonly <img src="event_left.png"> @endhtmlonly or @htmlonly <img src="event_general.png"> @endhtmlonly to create a new event. 
   - @htmlonly <img src="event_right.png"> @endhtmlonly will open the Event editor box to add a new event for the right side. 
@@ -34,10 +34,10 @@ To remove one or many events on your loaded acquisition you can proceed in 3 dif
 -# Left click on the event
   - Left click on the event you want to delete or use Shift or Ctrl key to select more than one event 
   - Right click on the Time bar and choose <tt>Removed selected events</tt> form the drop-down menu or use the delete key to remove selected events
-
+\n\n
 -# Use @htmlonly <img src="event_options.png"> @endhtmlonly from the time bar 
   - Use @htmlonly <img src="event_options.png"> @endhtmlonly and choose <tt>Clear events</tt> from the drop-down menu to clear all events.
-  
+\n\n
 -# Right click on the Time bar
   - Right click on the Time bar and choose <tt>Clear events</tt>.
 

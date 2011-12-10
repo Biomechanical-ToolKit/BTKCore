@@ -808,6 +808,45 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(output->GetPoint(33)->GetLabel(), "R_HIP_ANGLE");
   };
   
+  CXXTEST_TEST(FourFiles_BIS_Concat_TRC_and_ANC_and_CAL_and_XLS_Higher_Frame)
+  {
+    btk::AcquisitionFileReader::Pointer trcReader = btk::AcquisitionFileReader::New();
+    trcReader->SetFilename(TRCFilePathIN + "Gait.trc");
+    btk::AcquisitionFileReader::Pointer ancReader = btk::AcquisitionFileReader::New();
+    ancReader->SetFilename(ANCFilePathIN + "Gait.anc");
+    btk::AcquisitionFileReader::Pointer calReader = btk::AcquisitionFileReader::New();
+    calReader->SetFilename(CALForcePlateFilePathIN + "Forcepla.cal");
+    btk::AcquisitionFileReader::Pointer xlsReader = btk::AcquisitionFileReader::New();
+    xlsReader->SetFilename(XLSOrthoTrakFilePathIN + "Gait.xls");
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, trcReader->GetOutput());
+    merger->SetInput(1, ancReader->GetOutput());
+    merger->SetInput(2, calReader->GetOutput());
+    merger->SetInput(3, xlsReader->GetOutput());
+    merger->SetFirstFrameRule(btk::MergeAcquisitionFilter::KeepFromHighestFirstFrame);
+    merger->Update();
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), 100.0);
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), 1000.0);
+    TS_ASSERT_EQUALS(output->GetFirstFrame(), 137);
+    TS_ASSERT_EQUALS(output->GetPointNumber(), 84);
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), 28);
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 350);
+
+    TS_ASSERT_EQUALS(output->GetEventNumber(), 8);
+    TS_ASSERT_EQUALS(output->GetEvent(0)->GetTime(), (137.0 + 70.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(1)->GetTime(), (137.0 + 166.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(2)->GetTime(), (137.0 + 19.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(3)->GetTime(), (137.0 + 119.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(4)->GetTime(), (137.0 + 32.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(5)->GetTime(), (137.0 + 129.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(6)->GetTime(), (137.0 + 78.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(7)->GetTime(), (137.0 + 177.0 - 1.0 - 1.0) / 100.0);
+    
+    TS_ASSERT_EQUALS(output->GetPoint(33)->GetLabel(), "R_HIP_ANGLE");
+  };
+  
   CXXTEST_TEST(Elite_vs_C3D)
   {
     btk::AcquisitionFileReader::Pointer angReader = btk::AcquisitionFileReader::New();
@@ -1460,6 +1499,266 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), 46);
     TS_ASSERT_EQUALS(output->GetEventNumber(), 0);
   };
+  
+  CXXTEST_TEST(C3D_Reconstructed_From_TRC_ANC_CAL)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/shd01.c3d");
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(reader->GetOutput());
+    // Export data into TRC format
+    writer->SetFilename(TRCFilePathOUT + "shd01.trc");
+    writer->SetAcquisitionIO(); // Reset the IO
+    writer->Update();
+    // Export data into ANC format
+    writer->SetFilename(ANCFilePathOUT + "shd01.anc");
+    writer->SetAcquisitionIO(); // Reset the IO
+    writer->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(TRCFilePathOUT + "shd01.trc");
+    btk::AcquisitionFileReader::Pointer reader3 = btk::AcquisitionFileReader::New();
+    reader3->SetFilename(ANCFilePathOUT + "shd01.anc");
+    // Need to use a pre written and truncated CAL file, as the C3D file is configured
+    // with two force platforms, but contains only the analog channel for the first one.
+    btk::AcquisitionFileReader::Pointer reader4 = btk::AcquisitionFileReader::New();
+    reader4->SetFilename(CALForcePlateFilePathIN + "shd01_truncated.cal");
+    
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, reader2->GetOutput());
+    merger->SetInput(1, reader3->GetOutput());
+    merger->SetInput(2, reader4->GetOutput());
+    
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    output->Update();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), acq->GetPointFrequency());
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), acq->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(output->GetPointNumber(), acq->GetPointNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), acq->GetAnalogNumber());
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), acq->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), acq->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(output->GetEventNumber(), acq->GetEventNumber());
+    
+    for (int i = 0 ; i < output->GetPointFrameNumber() ; i+=2)  
+    {
+      for (int j = 0 ; j < output->GetPointNumber() ; ++j)
+      {
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,0), acq->GetPoint(j)->GetValues().coeff(i,0), 1e-5);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,1), acq->GetPoint(j)->GetValues().coeff(i,1), 1e-5);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,2), acq->GetPoint(j)->GetValues().coeff(i,2), 1e-5);
+      }   
+    }
+    
+    // GRWs
+    btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
+    btk::GroundReactionWrenchFilter::Pointer grwf = btk::GroundReactionWrenchFilter::New();
+    grwf->SetThresholdValue(5.0);
+    grwf->SetThresholdState(true);
+    pfe->SetInput(output);
+    grwf->SetInput(pfe->GetOutput());
+    grwf->Update();
+    btk::WrenchCollection::Pointer grwOutput = grwf->GetOutput()->Clone();
+    pfe->SetInput(acq);
+    grwf->Update();
+    btk::WrenchCollection::Pointer grwInput = grwf->GetOutput();
+    TS_ASSERT_EQUALS(grwOutput->GetItemNumber(), 1);
+    TS_ASSERT_EQUALS(grwInput->GetItemNumber(), 2);
+
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      for (int j = 0 ; j < 1 ; ++j)
+      {
+        // Position
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,0), grwInput->GetItem(j)->GetPosition()->GetValues()(i,0), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,1), grwInput->GetItem(j)->GetPosition()->GetValues()(i,1), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,2), grwInput->GetItem(j)->GetPosition()->GetValues()(i,2), 1e-3);
+        // Force
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,0), grwInput->GetItem(j)->GetForce()->GetValues()(i,0), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,1), grwInput->GetItem(j)->GetForce()->GetValues()(i,1), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,2), grwInput->GetItem(j)->GetForce()->GetValues()(i,2), 1e-3);
+        // Moment
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,0), grwInput->GetItem(j)->GetMoment()->GetValues()(i,0), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,1), grwInput->GetItem(j)->GetMoment()->GetValues()(i,1), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,2), grwInput->GetItem(j)->GetMoment()->GetValues()(i,2), 1e-3);
+      }
+    }
+  };
+  
+  CXXTEST_TEST(C3D_Reconstructed_From_CAL_ANC_TRC)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/shd01.c3d");
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    acq->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(TRCFilePathOUT + "shd01.trc");
+    btk::AcquisitionFileReader::Pointer reader3 = btk::AcquisitionFileReader::New();
+    reader3->SetFilename(ANCFilePathOUT + "shd01.anc");
+    // Need to use a pre written and truncated CAL file, as the C3D file is configured
+    // with two force platforms, but contains only the analog channel for the first one.
+    btk::AcquisitionFileReader::Pointer reader4 = btk::AcquisitionFileReader::New();
+    reader4->SetFilename(CALForcePlateFilePathIN + "shd01_truncated.cal");
+    
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, reader4->GetOutput());
+    merger->SetInput(1, reader3->GetOutput());
+    merger->SetInput(2, reader2->GetOutput());
+    
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    output->Update();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), acq->GetPointFrequency());
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), acq->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(output->GetPointNumber(), acq->GetPointNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), acq->GetAnalogNumber());
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), acq->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), acq->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(output->GetEventNumber(), acq->GetEventNumber());
+    
+    for (int i = 0 ; i < output->GetPointFrameNumber() ; i+=2)  
+    {
+      for (int j = 0 ; j < output->GetPointNumber() ; ++j)
+      {
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,0), acq->GetPoint(j)->GetValues().coeff(i,0), 1e-5);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,1), acq->GetPoint(j)->GetValues().coeff(i,1), 1e-5);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,2), acq->GetPoint(j)->GetValues().coeff(i,2), 1e-5);
+      }   
+    }
+    
+    // GRWs
+    btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
+    btk::GroundReactionWrenchFilter::Pointer grwf = btk::GroundReactionWrenchFilter::New();
+    grwf->SetThresholdValue(5.0);
+    grwf->SetThresholdState(true);
+    pfe->SetInput(output);
+    grwf->SetInput(pfe->GetOutput());
+    grwf->Update();
+    btk::WrenchCollection::Pointer grwOutput = grwf->GetOutput()->Clone();
+    pfe->SetInput(acq);
+    grwf->Update();
+    btk::WrenchCollection::Pointer grwInput = grwf->GetOutput();
+    TS_ASSERT_EQUALS(grwOutput->GetItemNumber(), 1);
+    TS_ASSERT_EQUALS(grwInput->GetItemNumber(), 2);
+
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      for (int j = 0 ; j < 1 ; ++j)
+      {
+        // Position
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,0), grwInput->GetItem(j)->GetPosition()->GetValues()(i,0), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,1), grwInput->GetItem(j)->GetPosition()->GetValues()(i,1), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,2), grwInput->GetItem(j)->GetPosition()->GetValues()(i,2), 1e-3);
+        // Force
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,0), grwInput->GetItem(j)->GetForce()->GetValues()(i,0), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,1), grwInput->GetItem(j)->GetForce()->GetValues()(i,1), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,2), grwInput->GetItem(j)->GetForce()->GetValues()(i,2), 1e-3);
+        // Moment
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,0), grwInput->GetItem(j)->GetMoment()->GetValues()(i,0), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,1), grwInput->GetItem(j)->GetMoment()->GetValues()(i,1), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,2), grwInput->GetItem(j)->GetMoment()->GetValues()(i,2), 1e-3);
+      }
+    }
+  };
+  
+  CXXTEST_TEST(C3D_Reconstructed_From_ANC_CAL_TRC)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/shd01.c3d");
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    acq->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(TRCFilePathOUT + "shd01.trc");
+    btk::AcquisitionFileReader::Pointer reader3 = btk::AcquisitionFileReader::New();
+    reader3->SetFilename(ANCFilePathOUT + "shd01.anc");
+    // Need to use a pre written and truncated CAL file, as the C3D file is configured
+    // with two force platforms, but contains only the analog channel for the first one.
+    btk::AcquisitionFileReader::Pointer reader4 = btk::AcquisitionFileReader::New();
+    reader4->SetFilename(CALForcePlateFilePathIN + "shd01_truncated.cal");
+    
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, reader3->GetOutput());
+    merger->SetInput(1, reader4->GetOutput());
+    merger->SetInput(2, reader2->GetOutput());
+    
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    output->Update();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), acq->GetPointFrequency());
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), acq->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(output->GetPointNumber(), acq->GetPointNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), acq->GetAnalogNumber());
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), acq->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), acq->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(output->GetEventNumber(), acq->GetEventNumber());
+    
+    for (int i = 0 ; i < output->GetPointFrameNumber() ; i+=2)  
+    {
+      for (int j = 0 ; j < output->GetPointNumber() ; ++j)
+      {
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,0), acq->GetPoint(j)->GetValues().coeff(i,0), 1e-5);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,1), acq->GetPoint(j)->GetValues().coeff(i,1), 1e-5);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,2), acq->GetPoint(j)->GetValues().coeff(i,2), 1e-5);
+      }   
+    }
+    
+    // GRWs
+    btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
+    btk::GroundReactionWrenchFilter::Pointer grwf = btk::GroundReactionWrenchFilter::New();
+    grwf->SetThresholdValue(5.0);
+    grwf->SetThresholdState(true);
+    pfe->SetInput(output);
+    grwf->SetInput(pfe->GetOutput());
+    grwf->Update();
+    btk::WrenchCollection::Pointer grwOutput = grwf->GetOutput()->Clone();
+    pfe->SetInput(acq);
+    grwf->Update();
+    btk::WrenchCollection::Pointer grwInput = grwf->GetOutput();
+    TS_ASSERT_EQUALS(grwOutput->GetItemNumber(), 1);
+    TS_ASSERT_EQUALS(grwInput->GetItemNumber(), 2);
+
+    for (int i = 1 ; i < 50 ; ++i)
+    {
+      for (int j = 0 ; j < 1 ; ++j)
+      {
+        // Position
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,0), grwInput->GetItem(j)->GetPosition()->GetValues()(i,0), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,1), grwInput->GetItem(j)->GetPosition()->GetValues()(i,1), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetPosition()->GetValues()(i,2), grwInput->GetItem(j)->GetPosition()->GetValues()(i,2), 1e-3);
+        // Force
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,0), grwInput->GetItem(j)->GetForce()->GetValues()(i,0), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,1), grwInput->GetItem(j)->GetForce()->GetValues()(i,1), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetForce()->GetValues()(i,2), grwInput->GetItem(j)->GetForce()->GetValues()(i,2), 1e-3);
+        // Moment
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,0), grwInput->GetItem(j)->GetMoment()->GetValues()(i,0), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,1), grwInput->GetItem(j)->GetMoment()->GetValues()(i,1), 1e-3);
+        TS_ASSERT_DELTA(grwOutput->GetItem(j)->GetMoment()->GetValues()(i,2), grwInput->GetItem(j)->GetMoment()->GetValues()(i,2), 1e-3);
+      }
+    }
+  };
+  
+  CXXTEST_TEST(SH01_C3D_ANC_FP)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/shd01.c3d");
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(ANCFilePathOUT + "shd01.anc");
+    
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, reader->GetOutput());
+    merger->SetInput(1, reader2->GetOutput());
+    
+    btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
+    pfe->SetInput(merger->GetOutput());
+    pfe->Update();
+    
+    TS_ASSERT_EQUALS(pfe->GetOutput()->GetItemNumber(), 2);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(MergeAcquisitionFilterTest)
@@ -1482,6 +1781,7 @@ CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_ThreeFiles_Concat_T
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_vs_exportedC3D_Signed16bits)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_Concat_TRC_and_ANC_and_CAL_and_XLS)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, FourFiles_BIS_Concat_TRC_and_ANC_and_CAL_and_XLS_Higher_Frame)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite_vs_C3D)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, EliteGrFirst_vs_C3D)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, ExportedC3DElite_vs_C3D)
@@ -1489,4 +1789,8 @@ CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite200)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite2000)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Elite2000Reversed)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, DifferentAnalogFrequencies)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_TRC_ANC_CAL)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_CAL_ANC_TRC)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_ANC_CAL_TRC)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, SH01_C3D_ANC_FP)
 #endif

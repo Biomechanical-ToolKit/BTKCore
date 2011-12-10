@@ -7,7 +7,7 @@ function [events eventsInfo] = btkGetEvents(h) %#ok
 %  represent actions realized by more than one subject, each event starts 
 %  by the name of the corresponding subject.  Time of each event are reordered. 
 %  Events are also reordered based on their first time. 
-%  Biomechanical acquisition handle H is represented as a 32-bit integer 
+%  Biomechanical acquisition handle H is represented as a double
 %  and can be only used with the btk* functions.
 %
 %  [EVENTS EVENTSINFO] = BTKGETEVENTS(H) returns events' informations  

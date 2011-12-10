@@ -32,6 +32,8 @@ CXXTEST_SUITE(RICFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 100.0);
     TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 0);
     
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("POINT")->GetChild("MARKERS_FILTERED")->GetInfo()->ToInt(0), 1);
+    
     TS_ASSERT_EQUALS(acq->GetEventNumber(), 6);
     TS_ASSERT_EQUALS(acq->GetEvent(0)->GetLabel(), "Foot Off");
     TS_ASSERT_EQUALS(acq->GetEvent(0)->GetContext(), "Left");
@@ -112,10 +114,26 @@ CXXTEST_SUITE(RICFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetPoint(12)->GetLabel(), "l ankle");
     TS_ASSERT_EQUALS(acq->GetPoint(13)->GetLabel(), "l met");
   };
+  
+  CXXTEST_TEST(FileBlO05_NoLabel)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(EliteFilePathIN + "BlO05.RIF");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), 1);
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 100.0);
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), 18);
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), 2000);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 100.0);
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 0);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(RICFileReaderTest)
 CXXTEST_TEST_REGISTRATION(RICFileReaderTest, NoFile)
 CXXTEST_TEST_REGISTRATION(RICFileReaderTest, MisspelledFile)
 CXXTEST_TEST_REGISTRATION(RICFileReaderTest, File1123xa01)
+CXXTEST_TEST_REGISTRATION(RICFileReaderTest, FileBlO05_NoLabel)
 #endif

@@ -98,6 +98,8 @@ public:
   void displayPointChart() {this->displayChart(PointChart);};
   void displayAnalogChart() {this->displayChart(AnalogChart);};
   
+  void updateAxisX();
+  
 public slots:
   void removePlot(int index);
   void setPlotLineColor(const QList<int>& indices, const QColor& color);
@@ -121,6 +123,9 @@ public slots:
   void showAnalogPlots(const QList<int>& itemIds);
   void setExpandableAnalog(int expandable);
   
+signals:
+  void pausePlaybackRequested(bool paused);
+  
 private slots:
   void setLastContextMenuPosition(const QPoint& globalPos);
   
@@ -137,7 +142,6 @@ protected:
   
   int m_CurrentChartType;
   QVector<AbstractChartData*> m_ChartData;
-  bool m_AnalogExpanded;
   
   QLabel* mp_ChartTitleLabel;
   VTKChartWidget* mp_ChartContentWidget;
@@ -179,9 +183,9 @@ public:
   void setFrameArray(vtkDoubleArray* array);
   virtual void setPlotVisible(int index, bool show, bool* layoutModified);
   virtual void show(Acquisition* acq, bool s, bool* layoutModified);
-  const QString& title() {return this->m_Title;};
+  const QString& title() const {return this->m_Title;};
   void setTitle(const QString& title) {this->m_Title = title;};
-  const QList<int>& optionSelection() {return this->m_OptionSelection;};
+  const QList<int>& optionSelection() const {return this->m_OptionSelection;};
   void setOptionSelection(const QList<int>& selection) {this->m_OptionSelection = selection;};
   
   virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* item) = 0;
@@ -204,6 +208,7 @@ public:
   VTKChartWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   void setCharts(VTKCharts* charts) {this->mp_Charts = charts;};
   btk::VTKChartTimeSeries* focusedChart(const QPoint& pos) const;
+  btk::VTKChartTimeSeries* focusedPlotArea(const QPoint& pos) const;
   void resizeCharts();
   
 signals:

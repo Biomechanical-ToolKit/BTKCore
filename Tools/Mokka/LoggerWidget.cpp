@@ -60,7 +60,7 @@ void LoggerWidget::messageHandler(QtMsgType type, const char* msg)
 {
   QString msgDetail = QString::fromLocal8Bit(msg);
   bool internalMessage = true;
-  size_t lenId = strlen(LOGGER_EXTERNAL_MESSAGE_ID);
+  int lenId = static_cast<int>(strlen(LOGGER_EXTERNAL_MESSAGE_ID));
   if (msgDetail.left(lenId).compare(LOGGER_EXTERNAL_MESSAGE_ID) == 0)
   {
     msgDetail = msgDetail.right(msgDetail.length() - lenId); // Remove the message ID.

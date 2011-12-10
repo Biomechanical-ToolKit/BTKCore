@@ -82,6 +82,21 @@ void EditRegionOfInterest::redo()
   this->m_Events = this->mp_Acquisition->takeEvents(this->m_Ids);
 }
 
+// --------------- ReframeAcquisition ---------------
+ReframeAcquisition::ReframeAcquisition(Acquisition* acq, int ff, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent)
+{
+  this->mp_Acquisition = acq;
+  this->m_FirstFrame = ff;
+};
+
+void ReframeAcquisition::action()
+{
+  int temp = this->mp_Acquisition->firstFrame();
+  this->mp_Acquisition->setFirstFrame(this->m_FirstFrame);
+  this->m_FirstFrame = temp;
+};
+
 // ----------------------------------------------- //
 //               POINT/MARKER EDITION              //
 // ----------------------------------------------- //

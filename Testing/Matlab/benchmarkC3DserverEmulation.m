@@ -2,7 +2,7 @@ function benchmarkC3DserverEmulation
 d.filename = '../Data/Input/C3DSamples/sample01/Eb015pi.c3d';
 num = 10;
 fprintf('\n-----------------------------------------------------\n');
-fprintf('      C3Dserver Emulation Benchmark - v0.5\n');
+fprintf('      C3Dserver Emulation Benchmark - v0.6\n');
 fprintf('-----------------------------------------------------\n\n');
 times = {};
 times(end+1,:) = runBench(num,d,'COM object creation',@benchCOM);
@@ -32,7 +32,7 @@ for i = 1:size(times,1)
         timeFormatRatio = '%6.3f';
     end
 end
-timeStr = ['| ',timeFormatC3Dserver,' vs ',timeFormatBTK,' '];
+timeStr = ['| ',timeFormatC3Dserver,' vs ',timeFormatBTK,' '];
 ratioStr = ['| ',timeFormatRatio];
 for i = 1:size(times,1)
     t = max([t, length(sprintf(timeStr,times{i,2},times{i,3}))]);
@@ -86,9 +86,9 @@ itf.Open(d.filename,3);
 t = toc(t0);
 
 function t = benchGetHeader(itfHandle,d)
-t0 = tic;
 itf = itfHandle();
 itf.Open(d.filename,3);
+t0 = tic;
 itf.GetNumber3DPoints();
 itf.GetAnalogChannels();
 itf.GetVideoFrame(0);
@@ -102,9 +102,9 @@ itf.GetDataType();
 t = toc(t0);
 
 function t = benchGetEvent(itfHandle,d)
-t0 = tic;
 itf = itfHandle();
 itf.Open(d.filename,3);
+t0 = tic;
 itf.GetNumberEvents();
 for i=1:itf.GetNumberEvents()
     itf.GetEventTime(i-1);
@@ -114,9 +114,9 @@ end
 t = toc(t0);
 
 function t = benchGetParameter(itfHandle,d)
-t0 = tic;
 itf = itfHandle();
 itf.Open(d.filename,3);
+t0 = tic;
 for i=1:itf.GetNumberGroups()
     itf.GetGroupName(i-1);
     itf.GetGroupDescription(i-1);
@@ -138,9 +138,9 @@ itf.Close();
 t = toc(t0);
 
 function t = benchGetPointData(itfHandle,d)
-t0 = tic;
 itf = itfHandle();
 itf.Open(d.filename,3);
+t0 = tic;
 % Generate random frame number
 num = 10;
 frames = itf.GetVideoFrame(0) + ceil(rand(1,num) * (itf.GetVideoFrame(1) - itf.GetVideoFrame(0)));
@@ -160,9 +160,9 @@ itf.Close();
 t = toc(t0);
 
 function t = benchGetPointDataEx(itfHandle,d)
-t0 = tic;
 itf = itfHandle();
 itf.Open(d.filename,3);
+t0 = tic;
 num = 10;
 % Generate random coordinates
 coords = floor(rand(1,num) * 3);
@@ -177,9 +177,9 @@ itf.Close();
 t = toc(t0);
 
 function t = benchGetAnalogData(itfHandle,d)
-t0 = tic;
 itf = itfHandle();
 itf.Open(d.filename,3);
+t0 = tic;
 % Generate random frame number
 num = 10;
 frames = itf.GetVideoFrame(0) + ceil(rand(1,num) * (itf.GetVideoFrame(1) - itf.GetVideoFrame(0)));
@@ -199,9 +199,9 @@ itf.Close();
 t = toc(t0);
 
 function t = benchGetAnalogDataEx(itfHandle,d)
-t0 = tic;
 itf = itfHandle();
 itf.Open(d.filename,3);
+t0 = tic;
 num = 10;
 % Generate random subframe
 subframes = ceil(rand(1,num) * itf.GetAnalogVideoRatio());

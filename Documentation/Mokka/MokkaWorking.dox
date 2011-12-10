@@ -3,11 +3,13 @@
 @page MokkaWorking Working with Mokka
 @section MokkaWorkingSection Working with Mokka
 
-The Mokka user interface is designed so that you can have access at all of the data involved in a particular motion study. It is divided in 4 mains parts:
+The Mokka user interface is designed to have both access and visualisation  of all the data included in a particular motion study.
+
+It is divided in 4 mains parts:
 - @ref MokkaMenuBar
 - @ref MokkaModelPane
 - @ref MokkaTimeBar
-- @ref Mokka3DView
+- @ref MokkaView "Views" (3D views, charts, console logger)
 
 You have also access to @ref MokkaPreferences "preferences" to select default behaviors in Mokka.@n
 

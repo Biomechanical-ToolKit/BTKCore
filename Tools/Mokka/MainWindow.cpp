@@ -192,10 +192,10 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ImportAssistant->layout()->setSizeConstraint(QLayout::SetFixedSize);
   
   // Setting the acquisition
+  this->timeEventControler->setAcquisition(this->mp_Acquisition); // Must be set before the multiview.
   this->multiView->setAcquisition(this->mp_Acquisition);
   this->mp_ModelDock->setAcquisition(this->mp_Acquisition);
   this->mp_FileInfoDock->setAcquisition(this->mp_Acquisition);
-  this->timeEventControler->setAcquisition(this->mp_Acquisition);
   // Setting the model
   this->mp_ModelDock->setModel(this->mp_Model);
   this->multiView->setModel(this->mp_Model);
@@ -234,6 +234,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionImportCAL, SIGNAL(triggered()), this, SLOT(importForcePlatformCAL()));
   connect(this->actionImportOrthoTrakXLS, SIGNAL(triggered()), this, SLOT(importOrthoTrakXLS()));
   connect(this->actionImportRIC, SIGNAL(triggered()), this, SLOT(importRIC()));
+  connect(this->actionImportRIF, SIGNAL(triggered()), this, SLOT(importRIF()));
   connect(this->actionImportRAH, SIGNAL(triggered()), this, SLOT(importRAH()));
   connect(this->actionImportRAW, SIGNAL(triggered()), this, SLOT(importRAW()));
   connect(this->actionImportANG, SIGNAL(triggered()), this, SLOT(importANG()));
@@ -244,6 +245,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionExportTRC, SIGNAL(triggered()), this, SLOT(exportTRC()));
   connect(this->actionExportANB, SIGNAL(triggered()), this, SLOT(exportANB()));
   connect(this->actionExportANC, SIGNAL(triggered()), this, SLOT(exportANC()));
+  connect(this->actionExportCAL, SIGNAL(triggered()), this, SLOT(exportCAL()));
   connect(this->actionPreferences, SIGNAL(triggered()), this, SLOT(showPreferences()));
   connect(this->actionSelect_All, SIGNAL(triggered()), this, SLOT(selectAll()));
   connect(this->actionCopy, SIGNAL(triggered()), this, SLOT(copy()));
@@ -259,6 +261,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->multiView, SIGNAL(pickedMarkerToggled(int)), this, SLOT(togglePickedMarker(int)));
   connect(this->multiView, SIGNAL(selectedMarkersToggled(QList<int>)), this, SLOT(selectSelectedMarkers(QList<int>)));
   connect(this->multiView, SIGNAL(trajectoryMarkerToggled(int)), this, SLOT(toggleMarkerTrajectory(int)));
+  connect(this->multiView, SIGNAL(pausePlaybackRequested(bool)), this, SLOT(playPausePlayback(bool)));
   // Model dock
   connect(this->mp_ModelDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(modelDockLocationChanged(Qt::DockWidgetArea)));
   connect(this->mp_ModelDock, SIGNAL(markerLabelChanged(int, QString)), this, SLOT(setPointLabel(int, QString)));
@@ -298,6 +301,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
   connect(this->timeEventControler, SIGNAL(playbackStarted()), this->multiView, SLOT(forceRubberBandDrawingOff()));
   connect(this->timeEventControler, SIGNAL(playbackStopped()), this->multiView, SLOT(forceRubberBandDrawingOn()));
+  connect(this->timeEventControler, SIGNAL(acquisitionReframed(int)), this, SLOT(reframeAcquisition(int)));
   
   // Functors to link the TimeEventWidget object with the VTK charts.
   // Give an easy way to update the displayed current frame and bounds in the charts.
@@ -337,14 +341,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->readSettings();
   this->setCurrentFile("");
   
-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
-  #if defined(NDEBUG)
-    QSettings settings;
-    if (settings.value("Preferences/checkUpdateStartup", true).toBool())
-      this->mp_UpdateChecker->check(true);
-  #endif
-#endif
-
   // Preferences connections. Must be set after the reading of the settings.
   connect(this->mp_Preferences, SIGNAL(useDefaultConfigurationStateChanged(bool)), this, SLOT(setPreferenceUseDefaultConfiguration(bool)));
   connect(this->mp_Preferences, SIGNAL(defaultConfigurationPathChanged(QString)), this, SLOT(setPreferenceDefaultConfigurationPath(QString)));
@@ -447,6 +443,17 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
       return false;
   }
   return QMainWindow::eventFilter(obj, event);
+};
+
+void MainWindow::checkSoftwareUpdateStartup()
+{
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+  #if defined(NDEBUG)
+    QSettings settings;
+    if (settings.value("Preferences/checkUpdateStartup", true).toBool())
+      this->mp_UpdateChecker->check(true);
+  #endif
+#endif
 };
 
 void MainWindow::about()
@@ -590,6 +597,15 @@ bool MainWindow::isOkToContinue()
   return true; 
 };
 
+void MainWindow::playPausePlayback(bool paused)
+{
+  static bool previouslyActived = false;
+  if (paused && (previouslyActived = this->timeEventControler->playbackStatus()))
+    this->timeEventControler->stopPlayback();
+  else if (!paused && !this->timeEventControler->playbackStatus() && previouslyActived)
+    this->timeEventControler->startPlayback();
+};
+
 void MainWindow::updateUserLayoutActions()
 {
   int inc = 0;
@@ -719,7 +735,7 @@ void MainWindow::openFile()
   {
     QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
-                         tr("Acquisition Files (*.anb *.anc *.ang *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *.trb *.trc);;"
+                         tr("Acquisition Files (*.anb *.anc *.ang *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *rif *.trb *.trc);;"
                             "ANB Files (*.anb);;"
                             "ANC Files (*.anc);;"
                             "ANG Files (*.ang);;"
@@ -732,6 +748,7 @@ void MainWindow::openFile()
                             "RAH Files (*.rah);;"
                             "RAW Files (*.raw);;"
                             "RIC Files (*.ric);;"
+                            "RIF Files (*.rif);;"
                             "TRB Files (*.trb);;"
                             "TRC Files (*.trc);;"
                             "XLS OrthoTrak Files (*.xls)"));
@@ -774,7 +791,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
     error.setWindowFlags(Qt::Sheet);
     error.setWindowModality(Qt::WindowModal);
 #endif
-    error.setInformativeText("Check the logger for more informations.");
+    error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
     error.exec();
     return;
   }
@@ -783,7 +800,6 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   pw->setProgressValue(40);
   
   this->multiView->load();
-  this->multiView->updateDisplay(this->mp_Acquisition->firstFrame()); // Required
   
   pw->setProgressValue(90);
   
@@ -852,7 +868,7 @@ void MainWindow::saveFile(const QString& filename)
     error.setWindowFlags(Qt::Sheet);
     error.setWindowModality(Qt::WindowModal);
 #endif
-    error.setInformativeText("Check the logger for more informations.");
+    error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
     error.exec();
     return;
   }
@@ -868,6 +884,7 @@ void MainWindow::closeFile()
   {
     LOG_INFO(tr("Closing acquisition."));
     this->reset();
+    this->mp_ModelDock->setVisible(false);
     this->mp_FileInfoDock->reset();
     this->mp_Acquisition->clear();
   }
@@ -884,7 +901,7 @@ void MainWindow::importAssistant()
   {
     if (this->mp_ImportAssistant->newAcquisitionRadioButton->isChecked())
       this->mp_Acquisition->clear();
-    this->importAcquisitions(this->mp_ImportAssistant->filenames());
+    this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked());
   }
 };
 
@@ -938,6 +955,11 @@ void MainWindow::importRIC()
   this->importAcquisition(tr("RIC Files (*.ric)"));
 };
 
+void MainWindow::importRIF()
+{
+  this->importAcquisition(tr("RIF Files (*.rif)"));
+};
+
 void MainWindow::importGRx()
 {
 #if 1
@@ -984,7 +1006,7 @@ void MainWindow::importAcquisition(const QString& filter)
     this->importAcquisitions(QStringList(filename));
 };
 
-void MainWindow::importAcquisitions(const QStringList& filenames)
+void MainWindow::importAcquisitions(const QStringList& filenames, bool allFramesKept)
 {
   LOG_INFO(tr("Importing acquisition(s)."));
   if (!filenames.isEmpty())
@@ -993,7 +1015,7 @@ void MainWindow::importAcquisitions(const QStringList& filenames)
     ProgressWidget pw(this);
     pw.show();
     pw.setProgressValue(10);
-    bool noImportError = this->mp_Acquisition->importFrom(filenames);
+    bool noImportError = this->mp_Acquisition->importFrom(filenames, allFramesKept);
     this->loadAcquisition(noImportError, &pw);
     this->setWindowTitle(title);
     pw.hide();
@@ -1021,6 +1043,11 @@ void MainWindow::exportANB()
 void MainWindow::exportANC()
 {
   this->exportAcquisition(tr("ANC Files (*.anc)"));
+};
+
+void MainWindow::exportCAL()
+{
+  this->exportAcquisition(tr("CAL Files (*.cal)"));
 };
 
 void MainWindow::showPreferences()
@@ -1083,7 +1110,7 @@ void MainWindow::exportAcquisition(const QString& filter)
       error.setWindowFlags(Qt::Sheet);
       error.setWindowModality(Qt::WindowModal);
 #endif
-      error.setInformativeText("Check the logger for more informations.");
+      error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
       error.exec();
       return;
     }
@@ -1106,7 +1133,6 @@ void MainWindow::reset()
   this->timeEventControler->setEnabled(false);
   // Model dock
   this->mp_ModelDock->reset();
-  this->mp_ModelDock->setVisible(false);
   // Metadata
   this->mp_MetadataDlg->reset();
   // Multivew
@@ -1311,6 +1337,11 @@ void MainWindow::setRegionOfInterest(int lf,int ff)
 void MainWindow::insertEvent(Event* e)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvent(this->mp_Acquisition, e)));
+};
+
+void MainWindow::reframeAcquisition(int ff)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new ReframeAcquisition(this->mp_Acquisition, ff)));
 };
 
 void MainWindow::setPreferenceUseDefaultConfiguration(bool isUsed)

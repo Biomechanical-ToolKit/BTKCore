@@ -4,8 +4,8 @@ function btkSetAnalogsValues(h, v) %#ok
 %  BTKSETANALOGSVALUES(H, V) uses data of matrix V to set analog channels' values.
 %  The number of rows of the matrix corresponds to the number of analog's frame.
 %  Its number of columns corresponds to the number of analog channels.
-%  The biomechanical acquisition handle H is represented as a 32-bit integer
-%  and can be only used with the btk* functions.
+%  The biomechanical acquisition handle H is represented as a double and can
+%  be only used with the btk* functions.
 
 %  Author: A. Barré
 %  Copyright 2009-2011 Biomechanical ToolKit (BTK).

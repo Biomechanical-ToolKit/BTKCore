@@ -2,10 +2,10 @@ function v = btkGetScalarsValues(h) %#ok
 %BTKGETSCALARSVALUES Extract scalars' components and store them in a matrix
 % 
 %  V = BTKGETSCALARSVALUES(H) returns a matrix of real.  The number of rows
-%  of this matrix corresponds to the number of frames in the acquisition.  The number of
-%  columns of this matrix corresponds to the number of extracted scalars 
-%  multiplied by 3 (their components X,Y,Z).
-%  The biomechanical acquisition handle H is represented as a 32-bit integer
+%  of this matrix corresponds to the number of frames in the acquisition.
+%  The number of columns of this matrix corresponds to the number of 
+% extracted scalars multiplied by 3 (their components X,Y,Z).
+%  The biomechanical acquisition handle H is represented as a double
 %  and can be only used with the btk* functions.
 
 %  Author: A. Barré

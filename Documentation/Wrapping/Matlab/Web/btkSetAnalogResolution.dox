@@ -4,6 +4,6 @@
  * @syntax{btkSetAnalogResolution(h\, res)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param res Integer value which must be 8, 12, 14 or 16.
- * @sa btkSetAnalogSampleNumberPerFrame, btkSetFirstFrame, btkSetFrameNumber, btkSetFrequency, btkSetMaxInterpolationGap, btkSetPointNumber
+ * @sa btkSetAnalogNumber, btkSetAnalogSampleNumberPerFrame, btkSetFirstFrame, btkSetFrameNumber, btkSetFrequency, btkSetMaxInterpolationGap, btkSetPointNumber
  * @ingroup BTKMatlabAcquisitionModifier
  */

@@ -336,7 +336,7 @@ namespace btk
     this->mp_SegmentsColorsLUT->SetNumberOfTableValues(1);
 
     // Default values
-    this->mp_Scale = 1.0;
+    this->m_Scale = 1.0;
     this->mp_SegmentsColorsLUT->SetTableValue(0, 1.0, 1.0, 1.0); // White
   };
   
@@ -439,9 +439,9 @@ namespace btk
           idPts[markerIndex] = pointId;
           validPts[markerIndex] = true;
           points->SetPoint(pointId,
-                           marker->GetValues().coeff(frameIndex,0) * this->mp_Scale,
-                           marker->GetValues().coeff(frameIndex,1) * this->mp_Scale,
-                           marker->GetValues().coeff(frameIndex,2) * this->mp_Scale);
+                           marker->GetValues().coeff(frameIndex,0) * this->m_Scale,
+                           marker->GetValues().coeff(frameIndex,1) * this->m_Scale,
+                           marker->GetValues().coeff(frameIndex,2) * this->m_Scale);
           ++pointId;
         }
         ++markerIndex;

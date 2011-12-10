@@ -3,8 +3,8 @@ function [moments momentsInfo] = btkGetMoments(h) %#ok
 % 
 %  MOMENTS = BTKGETMOMENTS(H) returns a structure of moments.  Each 
 %  fieldname in MOMENTS corresponds to a moment's label.  The biomechanical 
-%  acquisition handle H is represented as a 32-bit integer and can be only
-%  used with the btk* functions.
+%  acquisition handle H is represented as a double and can be only used 
+%  with the btk* functions.
 %
 %  [MOMENTS MOMENTSINFO] = BTKGETMOMENTS(H) returns moments' informations  
 %  in MOMENTSINFO.  The structure MOMENTSINFO has the followig fields:

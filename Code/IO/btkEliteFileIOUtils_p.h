@@ -43,7 +43,7 @@
 
 namespace btk
 {
-  void ReadEliteHeader_p(Acquisition::Pointer output, IEEELittleEndianBinaryFileStream* bifs, bool extractEvents = false);
+  void ReadEliteHeader_p(Acquisition::Pointer output, IEEELittleEndianBinaryFileStream* bifs, bool extractEvents = false, bool checkDataFiltered = false);
   void ReadEliteMarkersValues_p(Acquisition::Pointer output, IEEELittleEndianBinaryFileStream* bifs);
   void ReadEliteLabel_p(Acquisition::Pointer output, IEEELittleEndianBinaryFileStream* bifs);
 };

@@ -532,6 +532,11 @@ QPushButton::menu-indicator {
     <string>Previous Event</string>
    </property>
   </action>
+  <action name="actionReframeFromOne">
+   <property name="text">
+    <string>Reframe From One</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

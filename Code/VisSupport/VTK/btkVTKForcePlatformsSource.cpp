@@ -269,7 +269,7 @@ namespace btk
           btkErrorMacro("Force Platform type 21 is not yet supported. Please, report this to the developers");
           break;
       }
-      t /= this->m_Scale;
+      t *= this->m_Scale;
       pose->Identity();
       for (int i = 0 ; i < 3 ; ++i)
       {

@@ -3,6 +3,34 @@
 @page MokkaReleaseNote Release Notes
 @section MokkaReleaseNoteSection Release Notes / Changelog
 
+- <b>11/30/11: Mokka 0.4</b> released
+  - Enhancements:
+    - Chart viewer to display analog signals and components of points (markers, angles, forces, etc.) into 2D plots.
+    - Export plot to bitmap images.
+    - Console logger to display all the messages coming from Mokka or its dependencies.
+    - New Layout Manager to save and load the layout of the views and their properties.
+    - New items in the model pane to represent force platform reactions (force, moment, position).
+    - Acquisition can now be reframed from the index 1. The events are adapted in consequence.
+  - Updates:
+    - Sticks used to display segments are now wider (line width set to 2).
+    - Improvement in the memory management of the views.
+    - UI modified for the checker of update when there is no update or when an error occurred.
+    - The axes used to show the orientation of the 3D view are scaled to have a fixed and squared size.
+    - Actions in the model configuration menu (gear button) were split. All the actions related to the model tree are in a contextual menu.
+    - The model panel is no more hidden and then shown when an acquisition is loaded (and the model panel is already visible).
+    - Acquisition file formats containing only analog data can be opened directly.
+    - Menu actions updated to be able to import RIF file and export force plateform CAL file.
+    - (MacOS X only) The preferences window under MacOS X seems native (animation for height, zoom button disabled, no toolbar button, no resize indicator).
+    - (Windows only): Windows VersionInfo are now set for Mokka.
+    - Use BTK 0.1.9.
+  - Fixes
+    - List of markers stated as visible into the model pane is wrong under Windows 7 64-bit (issue 14)
+    - If the unit for the markers is set to meter in the first loaded acquisition, then the coordinates are not correctly scaled.
+    - In some case in the 3D perspective view, the camera is translated instead of rotated when switching from another application (using the key sequence Alt + Tab).
+    - Checker of update can be wrongly triggered with alpha release number.
+    - (MacOS X only) Under MacOS X, the shortcut Command + M is used to minimize the application. The shortcut used to view the model panel is now set to Command + Shift + M (only under MacOS X).
+    - Minor UI fixes
+
 - <b>06/16/11: Mokka 0.3</b> released
   - Enhancements:
     - User preferences panel added.

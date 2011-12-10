@@ -92,6 +92,7 @@ public slots:
   void importRAH();
   void importRAW();
   void importRIC();
+  void importRIF();
   void importGRx();
   void importANG();
   void importEMG();
@@ -102,6 +103,7 @@ public slots:
   void exportTRC();
   void exportANB();
   void exportANC();
+  void exportCAL();
   void showPreferences();
   void selectAll();
   void copy();
@@ -136,6 +138,7 @@ public slots:
   void setEvents(QList<int> ids, QList<Event*> events);
   void removeEvents(const QList<int>& ids);
   void insertEvent(Event* e);
+  void reframeAcquisition(int ff);
   // Preferences
   void setPreferenceUseDefaultConfiguration(bool isUsed);
   void setPreferenceDefaultConfigurationPath(const QString& path);
@@ -161,6 +164,9 @@ public slots:
   void relabelUserLayout(int index, const QString& label);
   void updateDroppedUserLayouts(int newRow, int oldRow);
   void updateUserLayouts(const QList<QVariant>& layouts, int index);
+  void playPausePlayback(bool paused);
+  // Update
+  void checkSoftwareUpdateStartup();
   
 protected slots:
   void openRecentFile();
@@ -171,7 +177,7 @@ private:
   void saveFile(const QString& filename);
   void exportAcquisition(const QString& filter);
   void importAcquisition(const QString& filter);
-  void importAcquisitions(const QStringList& filenames);
+  void importAcquisitions(const QStringList& filenames, bool allFramesKept = true);
   void reset();
   void setAcquisitionProperties(QMap<int, QVariant>& properties);
   void readSettings(); 

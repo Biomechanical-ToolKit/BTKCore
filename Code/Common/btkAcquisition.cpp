@@ -903,6 +903,8 @@ namespace btk
       btkErrorMacro("Impossible to set the frame number to 0 or lower. The number of frames is now equals to 1.");
       frameNumber = 1;
     }
+    else if (frameNumber == this->m_PointFrameNumber)
+      return;
     this->SetPointFrameNumber(frameNumber);
     this->SetAnalogFrameNumber(this->m_AnalogSampleNumberPerPointFrame);
     this->Modified();
@@ -1002,7 +1004,7 @@ namespace btk
     this->m_Units[Point::Force] = "N";
     this->m_Units[Point::Moment] = "Nmm";
     this->m_Units[Point::Power] = "W";
-    this->m_Units[Point::Scalar] = "";
+    this->m_Units[Point::Scalar] = "mm";
     this->m_Units[Point::Reaction] = "";
     this->m_MaxInterpolationGap = 10;
     this->Modified();
@@ -1029,6 +1031,8 @@ namespace btk
       btkErrorMacro("Impossible to set the first frame to 0 or lower.");
       return;
     }
+    else if (this->m_FirstFrame == num)
+      return;
     this->m_FirstFrame = num;
     this->Modified();
   };
@@ -1049,7 +1053,7 @@ namespace btk
    */
 
   /**
-   * @fn void Acquisition::SetPointUnit(const std::string& units)
+   * @fn void Acquisition::SetPointUnit(const std::string& unit)
    * Sets the unit for points of type Point::Marker.
    */
 
@@ -1057,6 +1061,22 @@ namespace btk
    * @fn const std::string Acquisition::GetPointUnit(Point::Type t) const
    * Returns the unit for points of type @a t.
    */
+  
+  /**
+   * @fn const std::vector<std::string>& Acquisition::GetPointUnits() const
+   * Returns all the units used for the points (Marker, Angle, Force, Moment, Power, Scalar).
+   */
+   
+  /**
+   * Sets the units for all the kinds of points.
+   */
+  void Acquisition::SetPointUnits(const std::vector<std::string>& units)
+  {
+    if (this->m_Units == units)
+      return;
+    this->m_Units = units;
+    this->Modified();
+  };
   
   /**
    * Sets the point's unit for the Point's type @a t with the value @a units.
@@ -1097,7 +1117,7 @@ namespace btk
       return;
     if (frequency == 0)
     {
-      btkErrorMacro("Impossible to set the point's frequecy to 0.");
+      btkErrorMacro("Impossible to set the point's frequency to 0.");
       return;
     }
     this->m_PointFrequency = frequency;
@@ -1178,7 +1198,7 @@ namespace btk
     this->m_Units[Point::Force] = "N";
     this->m_Units[Point::Moment] = "Nmm";
     this->m_Units[Point::Power] = "W";
-    // this->m_Units[Point::Scalar] = "";
+    this->m_Units[Point::Scalar] = "mm";
     // this->m_Units[Point::Reaction] = "";
     this->m_MaxInterpolationGap = 10;
   };

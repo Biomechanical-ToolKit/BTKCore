@@ -18,8 +18,8 @@ function btkGetMetaData(h) %#ok
 %                                (INFO, CHILDREN, DESCRIPTION)
 %    - METADATA.DESCRIPTION is the description of the metadata.
 %    - METADATA.UNLOCKED is a flag to know if the metadata is unlocked or not.
-%  The biomechanical acquisition handle H is represented as a 32-bit integer 
-%  and can be only used with the btk* functions.
+%  The biomechanical acquisition handle H is represented as a double and can
+%  be only used with the btk* functions.
 %
 %  METADATA = BTKGETMETADATA(H, LABEL) returns the metadata from the root
 %  with the label LABEL.  If the label is not find in the children of the 

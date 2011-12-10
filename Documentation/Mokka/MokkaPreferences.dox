@@ -43,6 +43,23 @@
 </li>
 </ul>
 @endhtmlonly
+
+@subsection MokkaPreferencesLayouts Layouts
+
+@htmlonly
+<ul class=twocolumns>
+<li>
+<ul class=default>
+<li>This is the manager of the layouts which will affect the menu <tt>Windows > Layouts</tt>. You can rename the layouts, reorder them (by a simple drag and drop) and delete them.</li>
+</ul>
+</li>
+<li>
+@endhtmlonly
+@image html preferences_layouts.png Layouts manager
+@htmlonly
+</li>
+</ul>
+@endhtmlonly
     
 @subsection MokkaPreferencesAdvanced Advanced
 
