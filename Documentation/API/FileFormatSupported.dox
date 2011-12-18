@@ -40,14 +40,13 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> C3D </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::C3DFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> Most common used file format. More informations on <a href="http://www.c3d.org" rel="nofollow">http://www.c3d.org</a> </td>
-    </tr>
+  </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> CAL </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::CALForcePlateFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>Motion Analysis</i> ASCII file format for force platform calibration</td>
   </tr>
@@ -102,6 +101,13 @@
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> RIC </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::RICFileIO @htmlonly</p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing 3D trajectories <br>(<strong>Experimental</strong>: Need more files/informations to implement the writer)</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #aaa; padding: 5px;"> RIF </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::RICFileIO @htmlonly</p> </td>
