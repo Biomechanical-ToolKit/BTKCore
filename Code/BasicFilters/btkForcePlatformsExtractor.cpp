@@ -146,6 +146,11 @@ namespace btk
           btkErrorMacro("No FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
           return;
         }
+        else if (!(*itChannels)->HasInfo() || (*itChannels)->GetInfo()->GetDimensions().size() != 2)
+        {
+          btkErrorMacro("Wrong format for the FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
+          return;
+        }
 
         output->SetItemNumber(static_cast<int>(numberOfForcePlatforms));
 
@@ -190,6 +195,7 @@ namespace btk
         AnalogCollection::Pointer analogs = input->GetAnalogs();
         std::vector<int> channelsIndex;
         (*itChannels)->GetInfo()->ToInt(channelsIndex);
+        int channelStep = (*itChannels)->GetInfo()->GetDimension(0);
         int channelNumberAlreadyExtracted = 0;
         int calMatrixCoefficentNumberAleadyExtracted = 0;
         bool noError = true;
@@ -201,27 +207,27 @@ namespace btk
           case 1:
             (*itFP) = ForcePlatformType1::New();
             this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            noError = this->ExtractForcePlatformData((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
+            noError = this->ExtractForcePlatformData((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 2:
             (*itFP) = ForcePlatformType2::New();
             this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            noError = this->ExtractForcePlatformData((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
+            noError = this->ExtractForcePlatformData((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 3:
             (*itFP) = ForcePlatformType3::New();
             this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            noError = this->ExtractForcePlatformData((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
+            noError = this->ExtractForcePlatformData((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 4:
             (*itFP) = ForcePlatformType4::New();
             this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
+            noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 5:
             (*itFP) = ForcePlatformType5::New();
             this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, &channelNumberAlreadyExtracted, channelsIndex);
+            noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
             break;
           case 6:
             {
@@ -281,6 +287,7 @@ namespace btk
           }
           ++itFP;
           calMatrixCoefficentNumberAleadyExtracted += calMatrixStep;
+          channelNumberAlreadyExtracted += channelStep;
         }
       }
     }
@@ -328,61 +335,25 @@ namespace btk
   /**
    *
    */
-  bool ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex)
+  bool ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int alreadyExtracted, std::vector<int> channelsIndex)
   {
     int numberOfChannelToExtract = fp->GetChannelNumber();
     int numberOfChannels = channels->GetItemNumber();
-    bool noError = true;
-    // Test on the number of analog channels
-    if ((numberOfChannelToExtract + *alreadyExtracted) > numberOfChannels)
-      noError = false;
-    else if ((numberOfChannelToExtract + *alreadyExtracted) > static_cast<int>(channelsIndex.size()))
-      noError = false;
-    else
-    {
-      // Index check
-      for (int i = 0 ; i < numberOfChannelToExtract ; ++i)
-      {
-        if (channelsIndex[i + *alreadyExtracted] > numberOfChannels)
-        {
-          noError = false;
-          break;
-        }
-      }
-    }
+    bool noError = this->CheckAnalogIndicesForForcePlatform(channelsIndex, alreadyExtracted, numberOfChannelToExtract, numberOfChannels);
     // Assignment
     if (noError)
     {
       for (int i = 0 ; i < numberOfChannelToExtract ; ++i)
-        fp->SetChannel(i, channels->GetItem(channelsIndex[i + *alreadyExtracted] - 1)->Clone());
+        fp->SetChannel(i, channels->GetItem(channelsIndex[i + alreadyExtracted] - 1)->Clone());
     }
-    (*alreadyExtracted) += fp->GetChannelNumber();
-
     return noError;
   };
 
-  bool ForcePlatformsExtractor::ExtractForcePlatformDataWithCalibrationMatrix(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex)
+  bool ForcePlatformsExtractor::ExtractForcePlatformDataWithCalibrationMatrix(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int alreadyExtracted, std::vector<int> channelsIndex)
   {
     int numberOfChannelToExtract = fp->GetChannelNumber();
     int numberOfChannels = channels->GetItemNumber();
-    bool noError = true;
-    // Test on the number of analog channels
-    if ((numberOfChannelToExtract + *alreadyExtracted) > numberOfChannels)
-      noError = false;
-    else if ((numberOfChannelToExtract + *alreadyExtracted) > static_cast<int>(channelsIndex.size()))
-     noError = false;
-    else
-    {
-      // Index check
-      for (int i = 0 ; i < numberOfChannelToExtract ; ++i)
-      {
-        if (channelsIndex[i + *alreadyExtracted] > numberOfChannels)
-        {
-          noError = false;
-          break;
-        }
-      }
-    }
+    bool noError = this->CheckAnalogIndicesForForcePlatform(channelsIndex, alreadyExtracted, numberOfChannelToExtract, numberOfChannels);
     // Assignment
     if (noError)
     {
@@ -391,7 +362,7 @@ namespace btk
       for (int i = 0 ; i < numberOfChannelToExtract ; ++i)
       {
         Analog::Pointer channel = Analog::New();
-        Analog::Pointer channelToCopy = channels->GetItem(channelsIndex[i + *alreadyExtracted] - 1);
+        Analog::Pointer channelToCopy = channels->GetItem(channelsIndex[i + alreadyExtracted] - 1);
         channel->SetLabel(channelToCopy->GetLabel());
         channel->SetDescription(channelToCopy->GetDescription());
         fp->SetChannel(i, channel);
@@ -402,8 +373,6 @@ namespace btk
       for (int i = 0 ; i < numberOfChannelToExtract ; ++i)
         fp->GetChannel(i)->SetValues(data.col(i));
     }
-
-    (*alreadyExtracted) += fp->GetChannelNumber();
     return noError;
   };
 /*
@@ -429,4 +398,23 @@ namespace btk
   void ForcePlatformsExtractor::ExtractForcePlatformData(ForcePlatformType21::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr)
   {};
   */
+  
+  bool ForcePlatformsExtractor::CheckAnalogIndicesForForcePlatform(std::vector<int> channelsIndex, int alreadyExtracted, int numberOfChannelToExtract, int numberOfChannels) const
+  {
+    // Test on the number of analog channels
+    if ((numberOfChannelToExtract + alreadyExtracted) > numberOfChannels)
+      return false;
+    else if ((numberOfChannelToExtract + alreadyExtracted) > static_cast<int>(channelsIndex.size()))
+      return false;
+    else
+    {
+      // Index check
+      for (int i = 0 ; i < numberOfChannelToExtract ; ++i)
+      {
+        if (channelsIndex[i + alreadyExtracted] > numberOfChannels)
+          return false;
+      }
+    }
+    return true;
+  };
 };

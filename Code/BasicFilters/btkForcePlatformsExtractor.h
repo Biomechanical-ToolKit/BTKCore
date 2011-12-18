@@ -67,13 +67,14 @@ namespace btk
     
   private:
     void ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, size_t idx, int coefficientsAlreadyExtracted, MetaData::Pointer pOrigin, MetaData::Pointer pCorners, MetaData::Pointer pCalMatrix);
-    bool ExtractForcePlatformData(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex);
-    bool ExtractForcePlatformDataWithCalibrationMatrix(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int* alreadyExtracted, std::vector<int> channelsIndex);
+    bool ExtractForcePlatformData(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int alreadyExtracted, std::vector<int> channelsIndex);
+    bool ExtractForcePlatformDataWithCalibrationMatrix(ForcePlatform::Pointer fp, AnalogCollection::Pointer channels, int alreadyExtracted, std::vector<int> channelsIndex);
     //void ExtractForcePlatformData(ForcePlatformType6::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
     //void ExtractForcePlatformData(ForcePlatformType7::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
     //void ExtractForcePlatformData(ForcePlatformType11::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
     //void ExtractForcePlatformData(ForcePlatformType12::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
     //void ExtractForcePlatformData(ForcePlatformType21::Pointer fp, AnalogCollection::Pointer channels, MetaData::Pointer fpGr);
+    bool CheckAnalogIndicesForForcePlatform(std::vector<int> channelsIndex, int alreadyExtracted, int numberOfChannelToExtract, int numberOfChannels) const;
 
     ForcePlatformsExtractor(const ForcePlatformsExtractor& ); // Not implemented.
     ForcePlatformsExtractor& operator=(const ForcePlatformsExtractor& ); // Not implemented.
