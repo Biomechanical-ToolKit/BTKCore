@@ -49,6 +49,22 @@ namespace btk
  * @var btkAnalog::PlusMinus1
  * Gain for the range +/- 1 volts.
  */
+/**
+ * @var btkAnalog::PlusMinus0Dot5
+ * Gain for the range +/- 0.5 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus0Dot25
+ * Gain for the range +/- 0.25 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus0Dot1
+ * Gain for the range +/- 0.1 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus0Dot05
+ * Gain for the range +/- 0.05 volts.
+ */
  
 /** 
  * @class btkPoint
@@ -116,5 +132,94 @@ namespace btk
 /**
  * @class btkForcePlatformType6
  * @brief Force platform Type-6 (12 channels: FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4] + calibration matrix 12 by 12).
+ */
+ 
+/**
+ * @class btkAcquisition
+ * @brief Contains the data related to a biomechanical acquisition
+ *
+ * A biomechanical acquisition can contains:
+ *   - 3D data (makers, points, forces, moments, ...) ;
+ *   - analog channels (force platform, emg, ...) ;
+ *   - events ;
+ *   - acquisition's setup ;
+ *   - subject's informations.
+ */
+/**
+ * @var btkAcquisition::Bit8
+ * 8-bit resolution for the analog to digital converter (ADC).
+ */
+/**
+ * @var btkAcquisition::Bit12
+ * 12-bit resolution for the analog to digital converter (ADC).
+ */
+/**
+ * @var btkAcquisition::Bit14
+ * 14-bit resolution for the analog to digital converter (ADC).
+ */
+/**
+ * @var btkAcquisition::Bit16
+ * 16-bit resolution for the analog to digital converter (ADC).
+ */
+  
+/**
+ * @class btkEventCollection
+ * @brief Collection of events stored in a list.
+ */
+/**
+ * @class btkEventCollectionIterator
+ * @brief Iterator to pass trough the collection of events.
+ */
+ 
+/**
+ * @class btkAnalogCollection
+ * @brief Collection of analog channels stored in a list.
+ */
+/**
+ * @class btkAnalogCollectionIterator
+ * @brief Iterator to pass trough the collection of analog channels.
+ */
+   
+/**
+ * @class btkForcePlatformCollection
+ * @brief Collection of force platform stored in a list.
+ */
+/**
+ * @class btkForcePlatformCollectionIterator
+ * @brief Iterator to pass trough the collection of force platform.
+ */
+  
+/**
+ * @class btkPointCollection
+ * @brief Collection of points stored in a list.
+ */
+/**
+ * @class btkPointCollectionIterator
+ * @brief Iterator to pass trough the collection of points.
+ */
+
+/**
+ * @class btkMetaData
+ * @brief Store data which cannot be embedded within timeseries (calibration matrix, subject informations, ...).
+ */
+/**
+ * @class btkMetaDataInfo
+ * @brief Container class to store data of a btkMetaData object.
+ */
+/**
+ * @var btkMetaDataInfo::Char
+ * Enum value which represents the string.
+ */
+/**
+ * @var btkMetaDataInfo::Byte
+ * Enum value which represents the signed 8-bit integers.
+ */
+/**
+ * @var btkMetaDataInfo::Integer
+ * Enum value which represents the the signed 16-bit integers.
+ */
+/**
+ * @var btkMetaDataInfo::Real
+ * Enum value which represents the floats.
  */
 }

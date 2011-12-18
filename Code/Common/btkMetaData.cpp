@@ -43,7 +43,7 @@ namespace btk
 {
   /**
    * @class MetaData btkMetaData.h
-   * @brief Store data which can be embedded within an Acquisition 
+   * @brief Store data which cannot be embedded within timeseries
    * (calibration matrix, subject informations, ...).
    *
    * @sa MetaDataCollapseChildrenValues, MetaDataCreateChild (located in btkMetaDataUtils.h) to create or collapse Metadata objects. 

@@ -143,6 +143,7 @@ BTK_SWIG_DOCSTRING_IMPL(Analog, SetGain, "Sets the analog's gain");
 // ------------------------------------------------------------------------- //
 //                                    Point                                  //
 // ------------------------------------------------------------------------- //
+
 %feature("docstring") btkPoint "
 The coordinates of the point are generally measured by an acquisition system. For each frame, the
 3D value has a residual and mask. They can provide informations on the quality of these 3D data 
@@ -208,6 +209,7 @@ BTK_SWIG_DOCSTRING_IMPL(Point, SetType, "Sets the point's type");
 // ------------------------------------------------------------------------- //
 //                                 ForcePlatform                             //
 // ------------------------------------------------------------------------- //
+
 %feature("docstring") btkForcePlatform "
 This class is generic and doesn't know its type, nor the number of analog channels used.
 To use predefined force platform as proposed in the documentation of the C3D file format, check the following classes:
@@ -223,11 +225,11 @@ BTK_SWIG_AUTODOC_IMPL(ForcePlatform, End, "End(self) -> btkAnalogIterator");
 BTK_SWIG_AUTODOC_IMPL(ForcePlatform, GetChannel, "GetChannel(self, int) -> btkAnalog)");
 BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetChannel, "SetChannel(self, int , btkAnalog)");
 BTK_SWIG_AUTODOC_IMPL(ForcePlatform, GetOrigin, "GetOrigin(self) -> array (NumPy)");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetOrigin(double , double , double ), "SetOrigin(self, double , double , double )");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetOrigin(double , double , double ), "SetOrigin(self, double, double, double)");
 BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetOrigin(const btk::ForcePlatform::Origin& ), "SetOrigin(self, array)");
 BTK_SWIG_AUTODOC_IMPL(ForcePlatform, GetCorner, "GetCorner(self, int) -> array (NumPy)");
 BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetCorner(int, int, double ), "SetCorner(self, int, int, double)");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetCorner(int, double, double, double ), "SetCorner(self, int, double, double, double )");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetCorner(int, double, double, double ), "SetCorner(self, int, double, double, double)");
 BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetCorner(int, const btk::ForcePlatform::Corner& ), "SetCorner(self, int, array)");
 BTK_SWIG_AUTODOC_IMPL(ForcePlatform, GetCorners, "GetCorners(self) -> array (NumPy)");
 BTK_SWIG_AUTODOC_IMPL(ForcePlatform, SetCorners, "SetCorners(self, array)");
@@ -303,3 +305,150 @@ Force platform composed of 12 channels and a 12 columns by 12 rows calibration m
  - FZ2: Vertical forces measured by the sensor on the corner 2;
  - FZ3: Vertical forces measured by the sensor on the corner 3;
  - FZ4: Vertical forces measured by the sensor on the corner 4."
+ 
+// ------------------------------------------------------------------------- //
+//                              EventCollection                              //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkEventCollection "
+Collection of events stored in a list."
+
+BTK_SWIG_AUTODOC_IMPL(EventCollection, Begin, "Begin(self) -> btkEventIterator");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, End, "End(self) -> btkEventIterator");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, GetIndexOf, "GetIndexOf(self, int) -> btkEvent");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, GetItem, "GetItem(self, int) -> btkEvent");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, InsertItem(Iterator , ItemPointer ), "InsertItem(self, btkEventIterator, btkEvent) -> bool");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, InsertItem(int , ItemPointer ), "InsertItem(self, int, btkEvent) -> bool");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, InsertItem(ItemPointer ), "InsertItem(self, btkEvent) -> bool");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, RemoveItem(Iterator ), "RemoveItem(self, btkEventIterator) -> btkEventIterator");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, RemoveItem(int ), "RemoveItem(self, int)");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, TakeItem(Iterator ), "TakeItem(self, btkEventIterator) -> btkEvent");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, TakeItem(int ), "TakeItem(self, int) -> btkEvent");
+BTK_SWIG_AUTODOC_IMPL(EventCollection, SetItem, "SetItem(self, int) -> btkEvent");
+
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, Begin, "Returns an iterator to the beginning of the list of items.");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, End, "Returns an iterator just past the last item.");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, GetIndexOf, "Returns the index of the given item.");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, GetItemNumber, "Returns the number of events");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, SetItemNumber, "Sets the number of events");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, GetItem, "Returns the event for the given index.");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, SetItem, "Sets the event for the given index");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, InsertItem, "Inserts an event in the list.");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, IsEmpty, "Returns true if the collection is empty.");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, RemoveItem, "Removes an event.");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, SetItem, "Sets an event.");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, TakeItem, "Removes an event and return it.");
+BTK_SWIG_DOCSTRING_IMPL(EventCollection, Clear, "Clear the contents of the collection.");
+BTK_SWIG_DOCSTRING(EventCollection, Clone, "Deep copy of the object");
+
+// ------------------------------------------------------------------------- //
+//                              AnalogCollection                             //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkAnalogCollection "
+Collection of analog channels stored in a list."
+
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, Begin, "Begin(self) -> btkAnalogIterator");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, End, "End(self) -> btkAnalogIterator");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, GetIndexOf, "GetIndexOf(self, int) -> btkAnalog");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, GetItem, "GetItem(self, int) -> btkAnalog");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, InsertItem(Iterator , ItemPointer ), "InsertItem(self, btkAnalogIterator, btkAnalog) -> bool");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, InsertItem(int , ItemPointer ), "InsertItem(self, int, btkAnalog) -> bool");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, InsertItem(ItemPointer ), "InsertItem(self, btkAnalog) -> bool");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, RemoveItem(Iterator ), "RemoveItem(self, btkAnalogIterator) -> btkAnalogIterator");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, RemoveItem(int ), "RemoveItem(self, int)");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, TakeItem(Iterator ), "TakeItem(self, btkAnalogIterator) -> btkAnalog");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, TakeItem(int ), "TakeItem(self, int) -> btkAnalog");
+BTK_SWIG_AUTODOC_IMPL(AnalogCollection, SetItem, "SetItem(self, int) -> btkAnalog");
+
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, Begin, "Returns an iterator to the beginning of the list of items.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, End, "Returns an iterator just past the last item.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, GetIndexOf, "Returns the index of the given item.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, GetItemNumber, "Returns the number of analog channels");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, SetItemNumber, "Sets the number of analog channels");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, GetItem, "Returns the analog channel for the given index.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, SetItem, "Sets the analog channel for the given index");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, InsertItem, "Inserts an analog channel in the list.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, IsEmpty, "Returns true if the collection is empty.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, RemoveItem, "Removes an analog channel.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, SetItem, "Sets an analog channel.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, TakeItem, "Removes an analog channel and return it.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, Clear, "Clear the contents of the collection.");
+BTK_SWIG_DOCSTRING(AnalogCollection, Clone, "Deep copy of the object");
+
+// ------------------------------------------------------------------------- //
+//                           ForcePlatformCollection                         //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkForcePlatformCollection "
+Collection of force platform stored in a list."
+
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, Begin, "Begin(self) -> btkForcePlatformIterator");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, End, "End(self) -> btkForcePlatformIterator");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, GetIndexOf, "GetIndexOf(self, int) -> btkForcePlatform");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, GetItem, "GetItem(self, int) -> btkForcePlatform");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, InsertItem(Iterator , ItemPointer ), "InsertItem(self, btkForcePlatformIterator, btkForcePlatform) -> bool");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, InsertItem(int , ItemPointer ), "InsertItem(self, int, btkForcePlatform) -> bool");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, InsertItem(ItemPointer ), "InsertItem(self, btkForcePlatform) -> bool");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, RemoveItem(Iterator ), "RemoveItem(self, btkForcePlatformIterator) -> btkForcePlatformIterator");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, RemoveItem(int ), "RemoveItem(self, int)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, TakeItem(Iterator ), "TakeItem(self, btkForcePlatformIterator) -> btkForcePlatform");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, TakeItem(int ), "TakeItem(self, int) -> btkForcePlatform");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, SetItem, "SetItem(self, int) -> btkForcePlatform");
+
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, Begin, "Returns an iterator to the beginning of the list of items.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, End, "Returns an iterator just past the last item.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, GetIndexOf, "Returns the index of the given item.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, GetItemNumber, "Returns the number of force platforms");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, SetItemNumber, "Sets the number of force platforms");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, GetItem, "Returns the force platform for the given index.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, SetItem, "Sets the force platform for the given index");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, InsertItem, "Inserts a force platform in the list.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, IsEmpty, "Returns true if the collection is empty.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, RemoveItem, "Removes a force platform.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, SetItem, "Sets a force platform.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, TakeItem, "Removes a force platform and return it.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, Clear, "Clear the contents of the collection.");
+BTK_SWIG_DOCSTRING(ForcePlatformCollection, Clone, "Deep copy of the object");
+
+// ------------------------------------------------------------------------- //
+//                               PointCollection                             //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkPointCollection "
+Collection of point stored in a list."
+
+BTK_SWIG_AUTODOC_IMPL(PointCollection, Begin, "Begin(self) -> btkPointIterator");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, End, "End(self) -> btkPointIterator");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, GetIndexOf, "GetIndexOf(self, int) -> btkPoint");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, GetItem, "GetItem(self, int) -> btkPoint");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, InsertItem(Iterator , ItemPointer ), "InsertItem(self, btkPointIterator, btkPoint) -> bool");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, InsertItem(int , ItemPointer ), "InsertItem(self, int, btkPoint) -> bool");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, InsertItem(ItemPointer ), "InsertItem(self, btkPoint) -> bool");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, RemoveItem(Iterator ), "RemoveItem(self, btkPointIterator) -> btkPointIterator");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, RemoveItem(int ), "RemoveItem(self, int)");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, TakeItem(Iterator ), "TakeItem(self, btkPointIterator) -> btkPoint");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, TakeItem(int ), "TakeItem(self, int) -> btkPoint");
+BTK_SWIG_AUTODOC_IMPL(PointCollection, SetItem, "SetItem(self, int) -> btkPoint");
+
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, Begin, "Returns an iterator to the beginning of the list of items.");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, End, "Returns an iterator just past the last item.");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, GetIndexOf, "Returns the index of the given item.");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, GetItemNumber, "Returns the number of points");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, SetItemNumber, "Sets the number of points");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, GetItem, "Returns the point for the given index.");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, SetItem, "Sets the point for the given index");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, InsertItem, "Inserts a point in the list.");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, IsEmpty, "Returns true if the collection is empty.");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, RemoveItem, "Removes a point.");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, SetItem, "Sets a point.");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, TakeItem, "Removes a point and return it.");
+BTK_SWIG_DOCSTRING_IMPL(PointCollection, Clear, "Clear the contents of the collection.");
+BTK_SWIG_DOCSTRING(PointCollection, Clone, "Deep copy of the object");
+
+// ------------------------------------------------------------------------- //
+//                                     MetaData                              //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkMetaData "
+Store data which cannot be embedded within timeseries (calibration matrix, subject informations, ...)."
