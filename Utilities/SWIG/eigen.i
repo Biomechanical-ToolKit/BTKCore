@@ -110,7 +110,11 @@
       PyErr_SetString(PyExc_ValueError, "Impossible to convert the input into a Python array object.");
       return;
     }
-    out->derived() = Eigen::Map< Derived >( static_cast<typename Derived::Scalar*>(PyArray_DATA(temp)), rows, cols);
+    out->derived().setZero(rows, cols);
+    typename Derived::Scalar* data = static_cast<typename Derived::Scalar*>(PyArray_DATA(temp));
+    for (int i = 0; i != rows; ++i)
+      for (int j = 0; j != cols; ++j)
+        out->coeffRef(i,j) = data[i*cols+j];
   };
   
   template <class Derived>
