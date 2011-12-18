@@ -36,7 +36,7 @@
 BTK_SWIG_DECLARE_CLASS(Analog)
 {
 public:
-  enum {Unknown = 0, PlusMinus10 = 10000, PlusMinus5 = 5000, PlusMinus2Dot5 = 2500, PlusMinus1Dot25 = 1250, PlusMinus1 = 1000};
+  enum {Unknown = btk::Analog::Unknown, PlusMinus10 = btk::Analog::PlusMinus10, PlusMinus5 = btk::Analog::PlusMinus5, PlusMinus2Dot5 = btk::Analog::PlusMinus2Dot5, PlusMinus1Dot25 = btk::Analog::PlusMinus1Dot25, PlusMinus1 = btk::Analog::PlusMinus1, PlusMinus0Dot5 = btk::Analog::PlusMinus0Dot5, PlusMinus0Dot25 = btk::Analog::PlusMinus0Dot25, PlusMinus0Dot1 = btk::Analog::PlusMinus0Dot1, PlusMinus0Dot05 = btk::Analog::PlusMinus0Dot05};
   btkAnalog(const std::string& label = "", const std::string& desc = "");
   btkAnalog(int frameNumber);
   btkAnalog(const std::string& label, int frameNumber);

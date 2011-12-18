@@ -40,7 +40,7 @@
 BTK_SWIG_DECLARE_CLASS(MetaDataInfo)
 {
 public:
-  enum {Char = -1, Byte = 1, Integer = 2, Real = 4};
+  enum {Char = btk::MetaDataInfo::Char, Byte = btk::MetaDataInfo::Byte, Integer = btk::MetaDataInfo::Integer, Real = btk::MetaDataInfo::Real};
   btkMetaDataInfo(int val);
   btkMetaDataInfo(double val);
   btkMetaDataInfo(const std::string& val);

@@ -57,7 +57,7 @@
 BTK_SWIG_DECLARE_IMPL_CLASS(Event)
 {
 public:
-  typedef enum {Unknown = 0x00, Manual = 0x02, Automatic = 0x04, FromForcePlatform = 0x08} DetectionFlag;
+  typedef enum {Unknown = btk::Event::Unknown, Manual = btk::Event::Manual, Automatic = btk::Event::Automatic, FromForcePlatform = btk::Event::FromForcePlatform} DetectionFlag;
   BTK_SWIG_DECLARE_IMPL_GETSET(Label, std::string&);
   BTK_SWIG_DECLARE_IMPL_GETSET(Description, std::string&);
   BTK_SWIG_DECLARE_IMPL_GETSET(Context, std::string&);
@@ -83,7 +83,7 @@ BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Analog, Value);
 BTK_SWIG_DECLARE_IMPL_CLASS(Analog)
 {
 public:
-  typedef enum {Unknown = 0, PlusMinus10 = 10000, PlusMinus5 = 5000, PlusMinus2Dot5 = 2500, PlusMinus1Dot25 = 1250, PlusMinus1 = 1000} Gain;
+  typedef enum {Unknown = btk::Analog::Unknown, PlusMinus10 = btk::Analog::PlusMinus10, PlusMinus5 = btk::Analog::PlusMinus5, PlusMinus2Dot5 = btk::Analog::PlusMinus2Dot5, PlusMinus1Dot25 = btk::Analog::PlusMinus1Dot25, PlusMinus1 = btk::Analog::PlusMinus1, PlusMinus0Dot5 = btk::Analog::PlusMinus0Dot5, PlusMinus0Dot25 = btk::Analog::PlusMinus0Dot25, PlusMinus0Dot1 = btk::Analog::PlusMinus0Dot1, PlusMinus0Dot05 = btk::Analog::PlusMinus0Dot05} Gain;
   BTK_SWIG_DECLARE_IMPL_GETSET(Label, std::string&);
   BTK_SWIG_DECLARE_IMPL_GETSET(Description, std::string&);
   BTK_SWIG_DECLARE_IMPL_GETSET(Values, btk::Analog::Values&);
@@ -112,7 +112,7 @@ BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Point, Mask);
 BTK_SWIG_DECLARE_IMPL_CLASS(Point)
 {
 public:
-  typedef enum {Marker = 0, Angle, Force, Moment, Power, Scalar, Reaction} Type;
+  typedef enum {Marker = btk::Point::Marker, Angle = btk::Point::Angle, Force = btk::Point::Force, Moment = btk::Point::Moment, Power = btk::Point::Power, Scalar = btk::Point::Scalar, Reaction = btk::Point::Reaction} Type;
   BTK_SWIG_DECLARE_IMPL_GETSET(Label, std::string&);
   BTK_SWIG_DECLARE_IMPL_GETSET(Description, std::string&);
   BTK_SWIG_DECLARE_IMPL_GETSET(Values, btk::Point::Values&);
@@ -240,7 +240,7 @@ namespace std
 BTK_SWIG_DECLARE_IMPL_CLASS(MetaDataInfo)
 {
 public:
-  typedef enum {Char = -1, Byte = 1, Integer = 2, Real = 4} Format;
+  typedef enum {Char = btk::MetaDataInfo::Char, Byte = btk::MetaDataInfo::Byte, Integer = btk::MetaDataInfo::Integer, Real = btk::MetaDataInfo::Real} Format;
   Format GetFormat() const;
   std::string GetFormatAsString() const;
   void SetFormat(Format format);
@@ -349,7 +349,7 @@ protected:
 BTK_SWIG_DECLARE_IMPL_CLASS(Acquisition)
 {
 public:
-  typedef enum {Bit8 = 8, Bit12 = 12, Bit14 = 14, Bit16 = 16}  AnalogResolution;
+  typedef enum {Bit8 = btk::Acquisition::Bit8, Bit12 = btk::Acquisition::Bit12, Bit14 = btk::Acquisition::Bit14, Bit16 = btk::Acquisition::Bit16}  AnalogResolution;
   typedef btkEventCollectionIterator EventIterator;
   typedef btkPointCollectionIterator PointIterator;
   typedef btkAnalogCollectionIterator AnalogIterator;

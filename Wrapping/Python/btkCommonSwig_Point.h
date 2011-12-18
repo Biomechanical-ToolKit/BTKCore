@@ -36,7 +36,7 @@
 BTK_SWIG_DECLARE_CLASS(Point)
 {
 public:
-  enum {Marker = 0, Angle, Force, Moment, Power, Scalar, Reaction};
+  enum {Marker = btk::Point::Marker, Angle = btk::Point::Angle, Force = btk::Point::Force, Moment = btk::Point::Moment, Power = btk::Point::Power, Scalar = btk::Point::Scalar, Reaction = btk::Point::Reaction};
   // btkPoint(const std::string& label = "", btkPoint_impl::Type t = btkPoint_impl::Marker, const std::string& desc = ""); // shadowed by the last constructor...
   btkPoint(int frameNumber);
   btkPoint(const std::string& label, int frameNumber, btkPoint_impl::Type t = btkPoint_impl::Marker, const std::string& desc = "");

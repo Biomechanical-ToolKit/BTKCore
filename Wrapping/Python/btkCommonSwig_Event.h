@@ -36,7 +36,7 @@
 BTK_SWIG_DECLARE_CLASS(Event)
 {
 public:
-  enum {Unknown = 0x00, Manual = 0x02, Automatic = 0x04, FromForcePlatform = 0x08};
+  enum {Unknown = btk::Event::Unknown, Manual = btk::Event::Manual, Automatic = btk::Event::Automatic, FromForcePlatform = btk::Event::FromForcePlatform};
   BTK_SWIG_DECLARE_DEFAULT_CTOR(Event);
   btkEvent(const std::string& label, double t, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0);
   btkEvent(const std::string& label, int f, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0);

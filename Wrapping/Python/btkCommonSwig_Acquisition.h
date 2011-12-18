@@ -36,7 +36,7 @@
 BTK_SWIG_DECLARE_CLASS(Acquisition)
 {
 public:
-  enum {Bit8 = 8, Bit12 = 12, Bit14 = 14, Bit16 = 16};
+  enum {Bit8 = btk::Acquisition::Bit8, Bit12 = btk::Acquisition::Bit12, Bit14 = btk::Acquisition::Bit14, Bit16 = btk::Acquisition::Bit16};
   BTK_SWIG_DECLARE_DEFAULT_CTOR(Acquisition);
   BTK_SWIG_DECLARE_CLONE(Acquisition);
   BTK_SWIG_DECLARE_POINTER_OPERATOR(Acquisition);
