@@ -266,4 +266,10 @@ namespace btk
   {
     this->m_Type = toCopy.m_Type;
   };
+  
+  /**
+   * @fn void Point::SetFrame(int frame, double x, double y, double z, double res = 0.0, double mask = 0.0)
+   * Convenient method to easily set the coordinates @a x, @a y, @a z, the residual @a res and the @a mask for the given @a frame.
+   * @warning This function is not safe. There is no cheching to determine if the frame is out of range or not. It has the advantage to be faster.
+   */
 }

@@ -229,5 +229,10 @@ namespace btk
 
   };
 
+  /**
+   * @fn void Analog::SetFrame(int frame, double val)
+   * Convenient method to set easily the value @a val for the given @a frame.
+   * @warning This function is not safe. There is no cheching to determine if the frame is out of range or not. It has the advantage to be faster.
+   */
 }
 
