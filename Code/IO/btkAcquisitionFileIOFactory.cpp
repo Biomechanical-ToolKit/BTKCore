@@ -44,6 +44,8 @@
 #include "btkTRBFileIO.h"
 #include "btkTRCFileIO.h"
 #include "btkXLSOrthoTrakFileIO.h"
+// BTS IO
+#include "btkTDFFileIO.h"
 // Elite IOs
 #include "btkANGFileIO.h"
 #include "btkEMxFileIO.h"
@@ -103,6 +105,9 @@ namespace btk
       io = CALForcePlateFileIO::New();
       if (io->CanReadFile(filename)) return io;
       io = XLSOrthoTrakFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      // BTS
+      io = TDFFileIO::New();
       if (io->CanReadFile(filename)) return io;
       // Elite
       io = RAxFileIO::New();

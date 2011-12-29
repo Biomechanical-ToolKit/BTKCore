@@ -31,6 +31,8 @@
 #include "RAWFileReaderTest.h"
 #include "RICFileIOTest.h"
 #include "RICFileReaderTest.h"
+#include "TDFFileIOTest.h"
+#include "TDFFileReaderTest.h"
 #include "TRBFileIOTest.h"
 #include "TRBFileReaderTest.h"
 #include "TRCFileIOTest.h"

@@ -35,5 +35,7 @@
 #define EliteFilePathOUT std::string(TDD_FilePathOUT) + "EliteSamples/"
 #define EMFFilePathIN std::string(TDD_FilePathIN) + "EMFSamples/"
 #define EMFFilePathOUT std::string(TDD_FilePathOUT) + "EMFSamples/"
+#define TDFFilePathIN std::string(TDD_FilePathIN) + "TDFSamples/"
+#define TDFFilePathOUT std::string(TDD_FilePathOUT) + "TDFSamples/"
 
 #endif // _TDDConfigure_h

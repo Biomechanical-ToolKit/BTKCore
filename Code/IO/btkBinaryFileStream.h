@@ -151,6 +151,10 @@ namespace btk
     const std::vector<int16_t> ReadI16(size_t nb);
     virtual uint16_t ReadU16() = 0;
     const std::vector<uint16_t> ReadU16(size_t nb);
+    virtual int32_t ReadI32() = 0;
+    const std::vector<int32_t> ReadI32(size_t nb);
+    virtual uint32_t ReadU32() = 0;
+    const std::vector<uint32_t> ReadU32(size_t nb);
     
     virtual float ReadFloat() = 0;
     const std::vector<float> ReadFloat(size_t nb);
@@ -201,6 +205,10 @@ namespace btk
     using BinaryFileStream::ReadI16;
     virtual uint16_t ReadU16();
     using BinaryFileStream::ReadU16;
+    virtual int32_t ReadI32(); 
+    using BinaryFileStream::ReadI32;
+    virtual uint32_t ReadU32();
+    using BinaryFileStream::ReadU32;
     virtual float ReadFloat();
     using BinaryFileStream::ReadFloat;
     virtual double ReadDouble();
@@ -225,6 +233,10 @@ namespace btk
     using BinaryFileStream::ReadI16;
     virtual uint16_t ReadU16();
     using BinaryFileStream::ReadU16;
+    virtual int32_t ReadI32(); 
+    using BinaryFileStream::ReadI32;
+    virtual uint32_t ReadU32();
+    using BinaryFileStream::ReadU32;
     virtual float ReadFloat();
     using BinaryFileStream::ReadFloat;
     virtual double ReadDouble();
@@ -249,6 +261,10 @@ namespace btk
     using BinaryFileStream::ReadI16;
     virtual uint16_t ReadU16();
     using BinaryFileStream::ReadU16;
+    virtual int32_t ReadI32(); 
+    using BinaryFileStream::ReadI32;
+    virtual uint32_t ReadU32();
+    using BinaryFileStream::ReadU32;
     virtual float ReadFloat();
     using BinaryFileStream::ReadFloat;
     virtual double ReadDouble();
