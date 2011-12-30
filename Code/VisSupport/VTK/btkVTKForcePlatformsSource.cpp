@@ -336,7 +336,7 @@ namespace btk
         indexTransform->SetInput(index);
         pose->Identity();
         for (int i = 0 ; i < 3 ; ++i)
-          pose->SetElement(i, 3, (bbForcePlateCenter[i] - bbIndexCenter[i]) * this->m_Scale);
+          pose->SetElement(i, 3, (bbForcePlateCenter[i] - bbIndexCenter[i]));
         transform->SetMatrix(pose);
         indexTransform->Update();
         index->Delete();
