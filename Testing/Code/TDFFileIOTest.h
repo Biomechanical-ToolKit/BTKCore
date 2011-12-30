@@ -26,7 +26,7 @@ CXXTEST_SUITE(TDFFileIOTest)
   CXXTEST_TEST(CanReadFileOk)
   {
     btk::TDFFileIO::Pointer pt = btk::TDFFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanReadFile(TDFFilePathIN + "gait2.tdf"), true);
+    TS_ASSERT_EQUALS(pt->CanReadFile(TDFFilePathIN + "gait9.tdf"), true);
   };
   
   CXXTEST_TEST(CanWriteFileEmpty)

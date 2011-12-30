@@ -93,7 +93,7 @@ namespace btk
   bool EMFFileIO::CanReadFile(const std::string& filename)
   {
     std::ifstream ifs(filename.c_str());
-    char c[43];
+    char c[43] = {0};
     ifs.read(c, 42); c[42] = '\0';
     ifs.close();
     if (strcmp(c,"EMF1.0     ## HyperVision EMF ASCII Format") != 0)

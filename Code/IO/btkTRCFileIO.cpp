@@ -90,7 +90,7 @@ namespace btk
   bool TRCFileIO::CanReadFile(const std::string& filename)
   {
     std::ifstream ifs(filename.c_str());
-    char c[13];
+    char c[13] = {0};
     ifs.read(c, 12); c[12] = '\0';
     ifs.close();
     if (strcmp(c,"PathFileType") != 0)
