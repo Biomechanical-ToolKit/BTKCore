@@ -663,6 +663,7 @@ bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
   target->SetFirstFrame(lb);
   target->SetPointFrequency(source->GetPointFrequency());
   target->SetAnalogResolution(source->GetAnalogResolution());
+  target->SetPointUnits(source->GetPointUnits());
   // Event
   btk::EventCollection::Pointer targetEvents = target->GetEvents();
   for (QMap<int,Event*>::const_iterator it = this->m_Events.begin() ; it != this->m_Events.end() ; ++it)
