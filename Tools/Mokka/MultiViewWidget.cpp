@@ -289,6 +289,7 @@ void MultiViewWidget::initialize()
   actor->SetMapper(mapper);
   actor->PickableOff();
   actor->SetScale(0.005);
+  actor->UseBoundsOff(); // Do not use this actor to compute the camera's bounds and its clipping planes.
   renderer->AddActor(actor);
   mapper->Delete();
   actor->Delete();
