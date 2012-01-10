@@ -13,7 +13,7 @@ function info = btkMetaDataInfo(format, values)
 %                  - The cell of strings is only use for information with the format Char.
 
 %  Author: A. Barré
-%  Copyright 2009-2011 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
 
 info.format = format;
 info.values = values;

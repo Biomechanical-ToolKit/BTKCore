@@ -18,7 +18,7 @@ function [events eventsInfo] = btkGetEvents(h) %#ok
 %  event.  EVENTSINFO.UNITS contains the unit of each event.
 
 %  Author: A. Barré
-%  Copyright 2009-2011 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
 
 % The following comment, MATLAB compiler pragma, is necessary to avoid 
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.

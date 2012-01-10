@@ -76,7 +76,7 @@ function itf = btkEmulateC3Dserver()
 %      frames.
 %
 %  Author: A. Barré
-%  Copyright 2009-2011 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
 
 %  TODO:
 %    - How to set parameter's values with the type 'Char'?

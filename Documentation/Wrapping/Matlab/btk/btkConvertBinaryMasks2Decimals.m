@@ -5,7 +5,7 @@ function d = btkConvertBinaryMasks2Decimals(b)
 %  of decimal values using the inverse order than BIN2DEC.
 
 %  Author: A. Barré
-%  Copyright 2009-2011 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
 
 s = char(b);
 [m,n] = size(s);
