@@ -38,6 +38,9 @@
 #include "btkConvert.h"
 #include "btkMetaDataUtils.h"
 
+#include <algorithm>
+#include <cctype>
+
 namespace btk
 {
   static const uint32_t TDFKey[4] = {0x41604B82, 0xCA8411D3, 0xACB60060, 0x080C6816};
@@ -637,7 +640,8 @@ namespace btk
         bifs.SeekRead(4, BinaryFileStream::Current);
         bifs.SeekRead(numPFs*2, BinaryFileStream::Current);
         
-        const int16_t numPlatforms = FPDoubleFormat ? numPFs * 2 : numPFs;
+        // Need to test 'numPlatforms' ? Should not be physicaly to have more than 256 force platforms...
+        const int8_t numPlatforms = FPDoubleFormat ? numPFs * 2 : numPFs;
         
         std::vector<float> cornersData;
         for (int i = 0 ; i < numPFs ; ++i)
