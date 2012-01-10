@@ -371,11 +371,11 @@ void Viz3DWidget::show(bool s)
 {
   vtkActorCollection* actors = this->mp_Renderer->GetActors();
   actors->InitTraversal();
-  vtkActor* actor = actors->GetNextItem(); // Ground
-  actor = actors->GetNextItem();
+  vtkActor* actor = actors->GetNextItem();
+  actor = actors->GetNextItem(); // Ground
   while (actor)
   {
-    actor->SetVisibility(s ? true : false);
+    actor->SetVisibility(s ? 1 : 0);
     actor = actors->GetNextItem();
   }
   if (this->isVisible())
