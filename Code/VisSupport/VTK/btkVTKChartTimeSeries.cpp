@@ -53,6 +53,9 @@
 #include <vtkContextDevice2D.h>
 #include <vtkTextProperty.h>
 #include <vtkOpenGLContextDevice2D.h>
+#include <vtkTable.h>
+#include <vtkDoubleArray.h>
+#include <vtkMath.h>
 
 #include <vtkstd/list>
 #include <vtkgl.h>
@@ -238,6 +241,24 @@ namespace btk
       x[1] = std::max(x[1], bounds[1]);
       y[0] = std::min(y[0], bounds[2]);
       y[1] = std::max(y[1], bounds[3]);
+      // Look for +/- Inf in the bounds for the Y axis only. Should not be possible for the X axis.
+      if (vtkMath::IsInf(y[0]) || vtkMath::IsInf(y[1]))
+      {
+        y[0] = std::numeric_limits<double>::max();
+        y[1] = std::numeric_limits<double>::min();
+        vtkDoubleArray* array = static_cast<vtkDoubleArray*>((*it)->GetInput()->GetColumn(1));
+        double* data = array->GetPointer(0);
+        for (int i = 0 ; i < array->GetNumberOfTuples() ; ++i)
+        {
+          if (!vtkMath::IsInf(data[i]))
+          {
+            if (data[i] < y[0])
+              y[0] = data[i];
+            else if (data[i] > y[1])
+              y[1] = data[i];
+          }
+        }
+      }
       validBounds = true;
     }
     if (!validBounds) // No (visible) plot
