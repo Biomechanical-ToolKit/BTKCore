@@ -385,7 +385,6 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
     }
     else if (this->m_Mode == MoveEvent)
     {
-      oldEventFrame = this->m_EventItems[this->m_MovingEventIndex].ptr->frame;
       if (event->modifiers() & Qt::ShiftModifier) 
         frame = this->m_EventItems[this->m_MovingEventIndex].ptr->frame + fineShift;
       if (frame < this->m_LeftBoundPos)
@@ -420,6 +419,7 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
           this->m_Mode = MoveEvent;
           emit eventAboutToBeMoved(this->m_EventItems[i].ptr->frame);
           this->m_MovingEventIndex = i;
+          oldEventFrame = this->m_EventItems[this->m_MovingEventIndex].ptr->frame;
           this->m_EventItems[i].color = MoveBrushColor;
           this->update();
           break;
