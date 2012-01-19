@@ -100,6 +100,8 @@
       <property name="title">
        <string>BTS Bioengineering</string>
       </property>
+      <addaction name="actionImportTDF"/>
+      <addaction name="separator"/>
       <addaction name="actionImportRIC"/>
       <addaction name="actionImportRIF"/>
       <addaction name="actionImportRAH"/>
@@ -469,6 +471,11 @@
   <action name="actionImportRIF">
    <property name="text">
     <string>RIF file...</string>
+   </property>
+  </action>
+  <action name="actionImportTDF">
+   <property name="text">
+    <string>TDF file...</string>
    </property>
   </action>
  </widget>

@@ -89,6 +89,7 @@ public slots:
   void importANB();
   void importForcePlatformCAL();
   void importOrthoTrakXLS();
+  void importTDF();
   void importRAH();
   void importRAW();
   void importRIC();

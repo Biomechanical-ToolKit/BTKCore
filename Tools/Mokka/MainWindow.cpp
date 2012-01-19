@@ -233,11 +233,13 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionImportANC, SIGNAL(triggered()), this, SLOT(importANC()));
   connect(this->actionImportCAL, SIGNAL(triggered()), this, SLOT(importForcePlatformCAL()));
   connect(this->actionImportOrthoTrakXLS, SIGNAL(triggered()), this, SLOT(importOrthoTrakXLS()));
+  connect(this->actionImportTDF, SIGNAL(triggered()), this, SLOT(importTDF()));
   connect(this->actionImportRIC, SIGNAL(triggered()), this, SLOT(importRIC()));
   connect(this->actionImportRIF, SIGNAL(triggered()), this, SLOT(importRIF()));
   connect(this->actionImportRAH, SIGNAL(triggered()), this, SLOT(importRAH()));
   connect(this->actionImportRAW, SIGNAL(triggered()), this, SLOT(importRAW()));
   connect(this->actionImportANG, SIGNAL(triggered()), this, SLOT(importANG()));
+  connect(this->actionImportEMG, SIGNAL(triggered()), this, SLOT(importEMG()));
   connect(this->actionImportMOM, SIGNAL(triggered()), this, SLOT(importMOM()));
   connect(this->actionImportPWR, SIGNAL(triggered()), this, SLOT(importPWR()));
   connect(this->actionImportGR, SIGNAL(triggered()), this, SLOT(importGRx()));
@@ -735,7 +737,7 @@ void MainWindow::openFile()
   {
     QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
-                         tr("Acquisition Files (*.anb *.anc *.ang *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *rif *.trb *.trc);;"
+                         tr("Acquisition Files (*.anb *.anc *.ang *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *rif *tdf *.trb *.trc *.xls);;"
                             "ANB Files (*.anb);;"
                             "ANC Files (*.anc);;"
                             "ANG Files (*.ang);;"
@@ -749,6 +751,7 @@ void MainWindow::openFile()
                             "RAW Files (*.raw);;"
                             "RIC Files (*.ric);;"
                             "RIF Files (*.rif);;"
+                            "TDF Files (*.tdf);;"
                             "TRB Files (*.trb);;"
                             "TRC Files (*.trc);;"
                             "XLS OrthoTrak Files (*.xls)"));
@@ -938,6 +941,11 @@ void MainWindow::importForcePlatformCAL()
 void MainWindow::importOrthoTrakXLS()
 {
   this->importAcquisition(tr("OrthoTrak XLS Files (*.xls)"));
+};
+
+void MainWindow::importTDF()
+{
+  this->importAcquisition(tr("TDF Files (*.tdf)"));
 };
 
 void MainWindow::importRAH()
