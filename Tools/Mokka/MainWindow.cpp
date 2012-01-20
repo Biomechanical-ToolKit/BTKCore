@@ -849,15 +849,13 @@ void MainWindow::saveAsFile()
                           "TRC Files (*.trc)"),
                        &selectedFilter);
   if (!filename.isEmpty())
-  {
-    this->m_LastDirectory = QFileInfo(filename).absolutePath();
     this->saveFile(filename);
-  }
 };
 
 void MainWindow::saveFile(const QString& filename)
 {
-  LOG_INFO(tr("Saving acquisition to file: ") + QFileInfo(filename).fileName());
+  QFileInfo fI(filename);
+  LOG_INFO(tr("Saving acquisition to file: ") + fI.fileName());
   
   QApplication::setOverrideCursor(Qt::WaitCursor);
   
@@ -879,6 +877,7 @@ void MainWindow::saveFile(const QString& filename)
   this->setCurrentFile(filename);
   QApplication::restoreOverrideCursor();
   this->setWindowModified(false);
+  this->m_LastDirectory = fI.absolutePath();
 };
 
 void MainWindow::closeFile()
@@ -1030,6 +1029,7 @@ void MainWindow::importAcquisitions(const QStringList& filenames, bool allFrames
     if (!noImportError)
       return;
     this->setWindowModified(true);
+    this->m_LastDirectory = QFileInfo(filenames.last()).absolutePath();
   }
 }
 
@@ -1122,6 +1122,7 @@ void MainWindow::exportAcquisition(const QString& filter)
       error.exec();
       return;
     }
+    this->m_LastDirectory = QFileInfo(filename).absolutePath();
     QApplication::restoreOverrideCursor();
   }
 };
