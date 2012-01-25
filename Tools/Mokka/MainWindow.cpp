@@ -833,14 +833,26 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
 
 void MainWindow::saveFile()
 {
-  this->saveFile(this->m_RecentFiles.first());
+  if (!this->mp_Acquisition->fileName().isEmpty())
+    this->saveFile(this->m_RecentFiles.first());
+  else
+    this->saveAsFile();
 };
 
 void MainWindow::saveAsFile()
 {
-  QString file = this->m_RecentFiles.first();
-  QString suffix = QFileInfo(file).suffix();
-  QString selectedFilter = suffix.toUpper() + " Files (*." + suffix.toLower() + ")";
+  QString file;
+  if (this->mp_Acquisition->fileName().isEmpty())
+    file = this->m_LastDirectory + "/untitled.c3d";
+  else
+    file = this->m_RecentFiles.first();
+  QString suffix = QFileInfo(file).suffix().toUpper();
+  if ((suffix.compare("C3D") != 0) && (suffix.compare("ANB") != 0) && (suffix.compare("ANC") != 0) && (suffix.compare("TRC") != 0))
+  {
+    file += ".c3d";
+    suffix = "C3D";
+  }
+  QString selectedFilter = suffix + " Files (*." + suffix.toLower() + ")";
   QString filename = QFileDialog::getSaveFileName(this, "",
                        file,
                        tr("ANB Files (*.anb);;"
@@ -1029,6 +1041,7 @@ void MainWindow::importAcquisitions(const QStringList& filenames, bool allFrames
     if (!noImportError)
       return;
     this->setWindowModified(true);
+    this->actionSave->setEnabled(true);
     this->m_LastDirectory = QFileInfo(filenames.last()).absolutePath();
   }
 }
@@ -1133,7 +1146,7 @@ void MainWindow::reset()
   this->mp_MarkerConfigurationUndoStack->clear();
   this->actionClose->setEnabled(false);
   this->actionViewMetadata->setEnabled(false);
-  this->actionSave->setEnabled(false); 
+  this->actionSave->setEnabled(false);
   this->actionSave_As->setEnabled(false);
   this->menuExport->menuAction()->setEnabled(false);
   this->setCurrentFile("");
