@@ -467,6 +467,11 @@ namespace btk
   };
   
   /**
+   * @fn bool MetaDataInfo::HasValues() const
+   * Returns if there is or not some data.
+   */
+  
+  /**
    * @fn const std::vector<std::string>& MetaDataInfo::GetValues() const
    * Returns the values as a vector of strings.
    */
