@@ -1,5 +1,6 @@
 FIND_PACKAGE(Qt4 REQUIRED)
 SET(QT_USE_QTNETWORK TRUE)
+SET(QT_USE_PHONON TRUE)
 INCLUDE(${QT_USE_FILE})
 
 SET(MOKKA_VERSION_MAJOR 0)
@@ -47,6 +48,7 @@ SET(Mokka_CPP
   UndoCommands.cpp
   UpdateChecker.cpp
   Viz3DWidget.cpp
+  VideoWidget.cpp
   main.cpp
   )
 
@@ -78,7 +80,9 @@ SET(Mokka_H
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
   UpdateChecker.h
-  Viz3DWidget.h)
+  Viz3DWidget.h
+  VideoWidget.h
+  )
 
 SET(Mokka_UI
   About.ui

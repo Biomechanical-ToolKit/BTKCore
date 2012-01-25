@@ -40,6 +40,7 @@
 #include "ChartWidget.h"
 #include "LoggerVTKOutput.h"
 #include "Viz3DWidget.h"
+#include "VideoWidget.h"
 
 #include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
 #include <btkVTKForcePlatformsSource.h>
@@ -83,7 +84,8 @@ class vtkProcessMap : public vtkstd::map<int, vtkObjectBase*>
 {};
 
 MultiViewWidget::MultiViewWidget(QWidget* parent)
-: AbstractMultiView(parent), m_ForcePlatformColor(255, 255, 0), m_ForceVectorColor(255, 255, 0),
+: AbstractMultiView(parent), m_VideoDelays(),
+  m_ForcePlatformColor(255, 255, 0), m_ForceVectorColor(255, 255, 0),
   m_View3dActions(), m_ViewChartActions()
 {
   this->mp_EventFilterObject = 0;
@@ -171,6 +173,7 @@ void MultiViewWidget::initialize()
   CompositeView* sv = static_cast<CompositeView*>(static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget());
   vtkRenderer* renderer = static_cast<Viz3DWidget*>(sv->view(CompositeView::Viz3D))->renderer();
   ChartWidget* chart = static_cast<ChartWidget*>(sv->view(CompositeView::Chart));
+  VideoWidget* video = static_cast<VideoWidget*>(sv->view(CompositeView::MediaVideo));
   
   //vtkMapper::GlobalImmediateModeRenderingOn(); // For large dataset.
   
@@ -353,6 +356,9 @@ void MultiViewWidget::initialize()
   chart->setPointFrameArray(this->mp_PointChartFrames);
   chart->setAnalogFrameArray(this->mp_AnalogChartFrames);
   
+  // Initialize the video delays
+  video->setDelays(&this->m_VideoDelays);
+  
   // Redirect the VTK message to the Logger
   vtkOutputWindow* w = LoggerVTKOutput::New();
   vtkOutputWindow::SetInstance(w);
@@ -380,7 +386,8 @@ void MultiViewWidget::setAcquisition(Acquisition* acq)
   // Object connection
   connect(this->mp_Acquisition, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
   connect(this->mp_Acquisition, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
-  connect(this->mp_Acquisition, SIGNAL(firstFrameChanged(int)), this, SLOT(updateChartFramesIndex(int)));
+  connect(this->mp_Acquisition, SIGNAL(firstFrameChanged(int)), this, SLOT(updateFramesIndex(int)));
+  connect(this->mp_Acquisition, SIGNAL(videosDelayChanged(QVector<int>, QVector<qint64>)), this, SLOT(setVideoDelays(QVector<int>, QVector<qint64>)));
 }
 
 void MultiViewWidget::setModel(Model* m)
@@ -456,9 +463,16 @@ void MultiViewWidget::load()
     for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
       this->mp_AnalogChartFrames->SetValue(inc + j, val + j * sub);
   }
+  
+  // Update video delays
+  this->m_VideoDelays.clear();
+  for (QMap<int, Video*>::const_iterator it = this->mp_Acquisition->videos().begin() ; it != this->mp_Acquisition->videos().end() ; ++it)
+    this->m_VideoDelays.insert(it.key(), it.value()->delay);
+  
   // Force the update for the generation of the force platforms and their forces (In case there is no 3D view, they are not updated).
   forcePlaforms->Update();
   GRFs->Update();
+  
   // Active the content of each view
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
     static_cast<CompositeView*>(*it)->show(true);
@@ -467,7 +481,10 @@ void MultiViewWidget::load()
 void MultiViewWidget::setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor)
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
     static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->setCurrentFrameFunctor(functor);
+    static_cast<VideoWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::MediaVideo))->setCurrentFrameFunctor(functor);
+  }
 };
 
 void MultiViewWidget::setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor)
@@ -537,22 +554,23 @@ bool MultiViewWidget::saveLayout(QDataStream& stream, QWidget* w) const
       qCritical("Impossible to save the layout of the view. One of the given widget, is not a view.");
       return false;
     }
+    int index = view->convertComboIndexToEnumIndex(view->viewCombo->currentIndex());
     stream << qint32(MultiViewWidgetViewId);
-    stream << qint32(view->viewCombo->currentIndex());
+    stream << qint32(index);
     // WARNING: The following code is very dependant of the order of the widget set in the composite view.
     //          Its modification must be reflected here. Otherwise, the layout will be corrupted.
     // View options
-    switch(view->viewCombo->currentIndex())
+    switch(index)
     {
-    case 2: // Orthogonal 3D view
+    case CompositeView::Viz3DOrthogonal:
       stream << qint32(static_cast<QComboBox*>(view->optionStack->currentWidget())->currentIndex());
       break;
-    case 4: // Point chart
+    case CompositeView::ChartPoint:
       stream << qint32(static_cast<QCheckBox*>(view->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->checkState());
       stream << qint32(static_cast<QCheckBox*>(view->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(2)->widget())->checkState());
       stream << qint32(static_cast<QCheckBox*>(view->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(4)->widget())->checkState());
       break;
-    case 5: // Analog chart
+    case CompositeView::ChartAnalog:
       stream << qint32(static_cast<QComboBox*>(view->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->currentIndex());
       break;
     }
@@ -583,7 +601,7 @@ bool MultiViewWidget::restoreLayout(const QByteArray& state)
     return this->restoreLayout(stream, view, this->size());
   }
   else
-    qCritical("Unknwon version number for serialized data containing the layout of the views. You may have used a new version containing some major changes in the data format.");
+    qCritical("Unknown version number for serialized data containing the layout of the views. You may have used a new version containing some major changes in the data format.");
   return false;
 };
 
@@ -634,7 +652,7 @@ bool MultiViewWidget::restoreLayout(QDataStream& stream, CompositeView* view, co
   {
     int index;
     stream >> index;
-    view->viewCombo->setCurrentIndex(index);
+    view->viewCombo->setCurrentIndex(view->convertEnumIndexToComboIndex(index));
     int optionIndex = view->optionStackIndexFromViewComboIndex(index);
     switch(index)
     {
@@ -734,9 +752,10 @@ void MultiViewWidget::restoreLayout3DCharts()
   this->restoreLayout(data);
 };
 
-void MultiViewWidget::updateChartFramesIndex(int ff)
+void MultiViewWidget::updateFramesIndex(int ff)
 {
   Q_UNUSED(ff)
+  // Chart
   double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
   for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
   {
@@ -749,6 +768,10 @@ void MultiViewWidget::updateChartFramesIndex(int ff)
     for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
       this->mp_AnalogChartFrames->SetValue(inc + j, val + j * sub);
   }
+  // Video
+  for (QMap<int, Video*>::const_iterator it = this->mp_Acquisition->videos().begin() ; it != this->mp_Acquisition->videos().end() ; ++it)
+    this->m_VideoDelays[it.key()] = it.value()->delay;
+  // Display
   for (QList<AbstractView*>::const_iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
   {
     static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->updateAxisX();
@@ -1086,6 +1109,18 @@ void MultiViewWidget::setForceVectorColor(const QColor& color)
   if (!this->mp_ForceVectorActor)
     return;
   this->mp_ForceVectorActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+  this->updateViews();
+};
+
+void MultiViewWidget::setVideoDelay(int id, double d)
+{
+  this->m_VideoDelays[id] = static_cast<qint64>(d * 1000.0);
+};
+
+void MultiViewWidget::setVideoDelays(QVector<int> ids, QVector<qint64> delays)
+{
+  for (int i = 0 ; i < ids.count() ; ++i)
+    this->m_VideoDelays[ids[i]] = delays[i];
   this->updateViews();
 };
 

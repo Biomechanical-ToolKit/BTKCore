@@ -53,7 +53,7 @@ class ModelDockWidget : public QDockWidget, public Ui::ModelDockWidget
 
 public:
   enum {LabelHeader = 0, VisibleHeader = 2, TrajectoryHeader = 1};
-  enum {SegmentsItem = 0, MarkersItem, AnalogsItem, ForcePlatesItem, ModelOutputsItem};
+  enum {SegmentsItem = 0, MarkersItem, AnalogsItem, ForcePlatesItem, ModelOutputsItem, VideosItem};
   
   ModelDockWidget(QWidget* parent = 0);
   ~ModelDockWidget();
@@ -68,6 +68,7 @@ public:
   int currentConfigurationIndex() const {return this->m_CurrentConfigurationIndex;};
   QList<int> selectedMarkers() const;
   QList<int> tailedMarkers() const;
+  QList<int> selectedVideos() const;
   
   QAction* deselectConfigurationAction() const {return this->mp_DeselectConfiguration;};
   QAction* clearConfigurationsAction() const {return this->mp_ClearConfigurations;};
@@ -168,6 +169,14 @@ public slots:
   void setAnalogsDescription(const QVector<int>& ids, const QVector<QString>& descs);
   void removeAnalogs(const QList<int>& ids, const QList<Analog*>& analogs);
   void insertAnalogs(const QList<int>& ids, const QList<Analog*>& analogs);
+  // Videos
+  void editVideosDelay();
+  void setVideosDelay(const QVector<int>& ids, const QVector<qint64>& delay);
+  void updateVideoDelaySpinBox(int d);
+  void updateVideoDelay(double d);
+  void removeVideos(const QList<int>& ids, const QList<Video*>& videos);
+  void insertVideos(const QList<int>& ids, const QList<Video*>& videos);
+  void importVideos(const QList<int>& ids, const QList<Video*>& videos);
   
 signals:
   void configurationSaved();
@@ -197,6 +206,8 @@ signals:
   void analogsScaleChanged(const QVector<int>& ids, double scale);
   void analogsDescriptionChanged(const QVector<int>& ids, const QString& desc);
   void analogsRemoved(const QList<int>& ids);
+  void videosDelayChanged(const QVector<int>& ids, qint64 delay);
+  void videosRemoved(const QList<int>& ids);
 
 protected:
   void changeEvent(QEvent* event);
@@ -218,6 +229,7 @@ private:
   QTreeWidgetItem* createMarkerItem(const QString& label, int id, bool checked = true);
   QTreeWidgetItem* createAnalogItem(const QString& label, int id);
   QTreeWidgetItem* createModelOutputItem(const QString& label, int id);
+  QTreeWidgetItem* createVideoItem(const QString& label, int id, bool error);
   QPixmap createSegmentIcon(const QColor& c) const;
   QPixmap createMarkerIcon(const QColor& c, bool circled = false, bool enabled = true) const;
   void editMarkersColor(const QColor& color);
@@ -241,6 +253,8 @@ private:
   QIcon* mp_AnalogsIcon;
   QIcon* mp_ModelOutputsIcon;
   QIcon* mp_ForcePlatesIcon;
+  QIcon* mp_VideosIcon;
+  QIcon* mp_VideoErrorIcon;
   // Model configuration actions
   QAction* mp_NewConfiguration;
   QAction* mp_LoadConfiguration;

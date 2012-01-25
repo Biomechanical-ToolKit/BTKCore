@@ -536,3 +536,49 @@ void InsertSegment::redo()
   this->mp_Model->insertSegments(this->m_Ids, this->m_Segments);
   this->m_Segments.clear();
 };
+
+// ----------------------------------------------- //
+//                   VIDEO EDITION                 //
+// ----------------------------------------------- //
+
+// --------------- EditVideosDelay ---------------
+EditVideosDelay::EditVideosDelay(Acquisition* acq, const QVector<int>& ids, qint64 delay, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent) , m_Ids(ids), m_Delays(ids.count())
+{
+  this->mp_Acquisition = acq;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Delays[i] = delay;
+};
+
+void EditVideosDelay::action()
+{
+  QVector<qint64> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Acquisition->videoDelay(this->m_Ids[i]);
+  this->mp_Acquisition->setVideoDelay(this->m_Ids, this->m_Delays);
+  this->m_Delays = temp;
+};
+
+// --------------- RemoveVideos ---------------
+RemoveVideos::RemoveVideos(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent), m_Ids(ids), m_Videos()
+{
+  this->mp_Acquisition = acq;
+};
+
+RemoveVideos::~RemoveVideos()
+{
+  for (int i = 0 ; i < this->m_Videos.count() ; ++i)
+    delete this->m_Videos[i];
+};
+
+void RemoveVideos::undo()
+{
+  this->mp_Acquisition->insertVideos(this->m_Ids, this->m_Videos);
+  this->m_Videos.clear();
+};
+
+void RemoveVideos::redo()
+{
+  this->m_Videos = this->mp_Acquisition->takeVideos(this->m_Ids);
+};

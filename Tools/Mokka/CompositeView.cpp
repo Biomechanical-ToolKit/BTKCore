@@ -37,6 +37,7 @@
 #include "Viz3DWidget.h"
 #include "ChartWidget.h"
 #include "ChartOptionsWidget.h"
+#include "VideoWidget.h"
 #include "LoggerWidget.h"
 #include "Acquisition.h"
 
@@ -83,12 +84,13 @@ void CompositeView::setAcquisition(Acquisition* acq)
 {
   static_cast<Viz3DWidget*>(this->view(Viz3D))->setAcquisition(acq);
   static_cast<ChartWidget*>(this->view(Chart))->setAcquisition(acq);
+  static_cast<VideoWidget*>(this->view(MediaVideo))->setAcquisition(acq);
 };
 
 void CompositeView::render()
 {
   QWidget* w = this->viewStack->currentWidget();
-  switch (this->viewCombo->currentIndex())
+  switch (this->convertComboIndexToEnumIndex(this->viewCombo->currentIndex()))
   {
   case Viz3DProjection:
   case Viz3DOrthogonal:
@@ -97,6 +99,9 @@ void CompositeView::render()
   case ChartPoint:
   case ChartAnalog:
     static_cast<ChartWidget*>(w)->render();
+    break;
+  case MediaVideo:
+    static_cast<VideoWidget*>(w)->render();
     break;
   default:
     break;
@@ -107,16 +112,18 @@ void CompositeView::show(bool s)
 {
   static_cast<Viz3DWidget*>(this->view(Viz3D))->show(s);
   static_cast<ChartWidget*>(this->view(Chart))->show(s); // Init the frame and activate the actions.
+  static_cast<VideoWidget*>(this->view(MediaVideo))->show(s);
 }
 
 AbstractView* CompositeView::clone() const
 {
   CompositeView* sv = new CompositeView(this->parentWidget());
-  
   // Clone the 3D view
   static_cast<Viz3DWidget*>(sv->view(Viz3D))->copy(static_cast<Viz3DWidget*>(this->view(Viz3D)));
   // Clone the charts
   static_cast<ChartWidget*>(sv->view(Chart))->copy(static_cast<ChartWidget*>(this->view(Chart)));
+  // Clone the video
+  static_cast<VideoWidget*>(sv->view(MediaVideo))->copy(static_cast<VideoWidget*>(this->view(MediaVideo)));
   // Clone the consoles
   //  - Logger (nothing to copy)
   
@@ -131,20 +138,14 @@ void CompositeView::copyOptions(CompositeView* from)
   this->optionStack->setCurrentIndex(this->optionStackIndexFromViewComboIndex(from->viewCombo->currentIndex()));
   switch (from->viewCombo->currentIndex())
   {
-  case Viz3DProjection:
-    break;
   case Viz3DOrthogonal:
     static_cast<QComboBox*>(this->optionStack->currentWidget())->setCurrentIndex(static_cast<QComboBox*>(from->optionStack->currentWidget())->currentIndex());
     static_cast<Viz3DWidget*>(this->view(Viz3D))->copyProjectionCameraConfiguration(static_cast<Viz3DWidget*>(from->view(Viz3D)));
     break;
-  case ChartPoint:
-    break;
   case ChartAnalog:
     static_cast<QComboBox*>(this->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->setCurrentIndex(static_cast<QComboBox*>(from->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->currentIndex());
     break;
-  case ConsoleLogger:
-    break;
-  default: // Impossible
+  default: // All others cases
     break;
   }
 };
@@ -153,24 +154,21 @@ int CompositeView::optionStackIndexFromViewComboIndex(int idx) const
 {
   switch (idx)
   {
-  case Viz3DProjection:
-    return 0;
   case Viz3DOrthogonal:
     return 1;
   case ChartPoint:
     return 2;
   case ChartAnalog:
     return 3;
-  case ConsoleLogger:
-    return 4;
-  default:  // Impossible
+  default: // All others cases
     return 0;
   }
 };
 
 int CompositeView::viewStackIndexFromViewComboIndex(int idx) const
 {
-  switch (idx)
+  int index = this->convertComboIndexToEnumIndex(idx);
+  switch (index)
   {
   case Viz3D:
   case Viz3DProjection:
@@ -180,11 +178,48 @@ int CompositeView::viewStackIndexFromViewComboIndex(int idx) const
   case ChartPoint:
   case ChartAnalog:
     return 1;
-  case ConsoleLogger:
+  case MediaVideo:
     return 2;
+  case ConsoleLogger:
+    return 3;
   default:  // Impossible
     qDebug("Incorrect view index! Impossible to find the corresponding stack!");
-    return 0;
+    return this->viewStack->currentIndex();
+  }
+};
+
+int CompositeView::convertEnumIndexToComboIndex(int idx) const
+{
+  switch (idx)
+  {
+  case Media:
+    return 6;
+  case MediaVideo:
+    return 7;
+  case Console:
+    return 8;
+  case ConsoleLogger:
+    return 9;
+  default:
+    return idx;
+  }
+};
+
+// Map between the index of the selected item in the combobox and the its harcoded index used to save/restore the layout
+int CompositeView::convertComboIndexToEnumIndex(int idx) const
+{
+  switch (idx)
+  {
+  case 6:
+    return Media;
+  case 7:
+    return MediaVideo;
+  case 8:
+    return Console;
+  case 9:
+    return ConsoleLogger;
+  default:
+    return idx;
   }
 };
 
@@ -287,12 +322,19 @@ void CompositeView::finalizeUi()
   lw->addItem(new QListWidgetItem(tr("  Point")));
   // - Analog channel
   lw->addItem(new QListWidgetItem(tr("  Analog")));
+  // Media
+  lwi = new QListWidgetItem(tr("Media"));
+  lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
+  lwi->setFont(f);
+  lw->addItem(lwi);
+  // - Synchronized / unynchronized video
+  lw->addItem(new QListWidgetItem(tr("  Video")));
   // Console
   lwi = new QListWidgetItem(tr("Console"));
   lwi->setFlags(lwi->flags() & ~Qt::ItemIsSelectable);
   lwi->setFont(f);
   lw->addItem(lwi);
-  // - Point
+  // - Logger
   lw->addItem(new QListWidgetItem(tr("  Logger")));
   
   // Update the model & view
@@ -310,6 +352,9 @@ void CompositeView::finalizeUi()
   ChartWidget* chart = new ChartWidget(this);
   this->viewStack->addWidget(chart);
   chart->initialize();
+  // - Videos
+  VideoWidget* video = new VideoWidget(this);
+  this->viewStack->addWidget(video);
   // - Console
   //   + Logger
   LoggerWidget* logger = new LoggerWidget(this);
@@ -382,8 +427,8 @@ void CompositeView::finalizeUi()
   connect(analogChartOptionButton, SIGNAL(clicked()), this, SLOT(toggleChartOptions()));
   analogChartOptionLayout->addWidget(analogChartOptionButton);
   this->optionStack->addWidget(analogChartOptionPage);
-  // - Logger
-  this->optionStack->addWidget(new QWidget(this)); // empty
+  // - Logger (No need of a new empty widget)
+  // - Video (No need of a new empty widget)
   
   this->optionStack->setCurrentIndex(0);
 };

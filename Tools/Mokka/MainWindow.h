@@ -100,6 +100,7 @@ public slots:
   void importMOM();
   void importPWR();
   void importEMF();
+  void importVideos();
   void exportC3D();
   void exportTRC();
   void exportANB();
@@ -133,6 +134,8 @@ public slots:
   void setSegmentLinks(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
   void removeSegments(const QList<int>& ids);
   void insertSegment(Segment* seg);
+  void setVideosDelay(const QVector<int>& ids, qint64 delay);
+  void removeVideos(const QList<int>& ids);
   // Time event
   void setRegionOfInterest(int lf,int ff);
   void setEventFrame(int id, int frame);
@@ -156,6 +159,7 @@ public slots:
   void setPreferenceAutomaticCheckUpdate(bool isChecked);
   // Others
   void updateSelectedMarkersRadius(double r);
+  void updateSelectedVideosDelay(double d);
   void selectPickedMarker(int id);
   void togglePickedMarker(int id);
   void selectSelectedMarkers(const QList<int>& ids);

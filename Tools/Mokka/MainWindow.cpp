@@ -143,6 +143,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ActionSeparatorRecentFiles = this->menuOpen_Recent->addSeparator();
   this->menuOpen_Recent->addAction(this->actionClear_Menu);
   connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
+  this->actionImportVideo->setEnabled(false); // Only enabled when an acquisition is opened or imported.
   this->mp_ActionSeparatorUserLayouts = this->menuLayouts->addSeparator();
   QActionGroup* layoutActionGroup = new QActionGroup(this);
   layoutActionGroup->addAction(this->actionLayout3DOnly);
@@ -243,6 +244,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionImportMOM, SIGNAL(triggered()), this, SLOT(importMOM()));
   connect(this->actionImportPWR, SIGNAL(triggered()), this, SLOT(importPWR()));
   connect(this->actionImportGR, SIGNAL(triggered()), this, SLOT(importGRx()));
+  connect(this->actionImportVideo, SIGNAL(triggered()), this, SLOT(importVideos()));
   connect(this->actionExportC3D, SIGNAL(triggered()), this, SLOT(exportC3D()));
   connect(this->actionExportTRC, SIGNAL(triggered()), this, SLOT(exportTRC()));
   connect(this->actionExportANB, SIGNAL(triggered()), this, SLOT(exportANB()));
@@ -294,6 +296,9 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_ModelDock, SIGNAL(segmentsRemoved(QList<int>)), this, SLOT(removeSegments(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(segmentCreated(Segment*)), this, SLOT(insertSegment(Segment*)));
   connect(this->mp_ModelDock, SIGNAL(segmentHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenSegments(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(videosRemoved(QList<int>)), this, SLOT(removeVideos(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(videosDelayChanged(QVector<int>, qint64)), this, SLOT(setVideosDelay(QVector<int>, qint64)));
+  connect(this->mp_ModelDock->videoDelaySpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateSelectedVideosDelay(double)));
   // Time Event
   connect(this->timeEventControler, SIGNAL(currentFrameChanged(int)), this->multiView, SLOT(updateDisplay(int)));
   connect(this->timeEventControler, SIGNAL(regionOfInterestChanged(int,int)), this, SLOT(setRegionOfInterest(int,int)));
@@ -335,6 +340,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock->analogScaleSpinBox->installEventFilter(this);
   this->mp_ModelDock->analogOffsetSpinBox->installEventFilter(this);
   this->mp_ModelDock->analogDescEdit->installEventFilter(this);
+  this->mp_ModelDock->videoDelaySpinBox->installEventFilter(this);
   
   // Settings
   QCoreApplication::setOrganizationName("BTK");
@@ -416,6 +422,11 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
       this->mp_UndoStack->undo();
     if (keyEvent->matches(QKeySequence::Redo))
       this->mp_UndoStack->redo();
+    else if (keyEvent->key() == Qt::Key_Space)
+    {
+      this->timeEventControler->togglePlayback();
+      return true;
+    }
     return false;
   }
   else if ((event->type() == QEvent::KeyPress) && this->timeEventControler->isEnabled())
@@ -828,6 +839,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionClose->setEnabled(true);
   this->actionViewMetadata->setEnabled(true);
   this->actionSave_As->setEnabled(true);
+  this->actionImportVideo->setEnabled(true);
   this->menuExport->menuAction()->setEnabled(true);
 };
 
@@ -1046,6 +1058,24 @@ void MainWindow::importAcquisitions(const QStringList& filenames, bool allFrames
   }
 }
 
+void MainWindow::importVideos()
+{
+  QStringList filenames = QFileDialog::getOpenFileNames(this, "",
+                            this->m_LastDirectory,
+                            tr("Video Files (*.avi *.mov *.mpeg *.mpg *.ogg *.wmv);;"
+                               "All Files (*);;"
+                               "AVI Files (*.avi);;"
+                               "MOV Files (*.mov);;"
+                               "MPEG Files (*.mpeg *.mpg);;"
+                               "OGG Files (*.ogg);;"
+                               "WMV Files (*.wmv)"));
+  if (!filenames.isEmpty())
+  {
+    this->mp_Acquisition->importVideos(filenames);
+    this->setWindowModified(true);
+  }
+};
+
 void MainWindow::exportC3D()
 {
   this->exportAcquisition(tr("C3D Files (*.c3d)"));
@@ -1148,6 +1178,7 @@ void MainWindow::reset()
   this->actionViewMetadata->setEnabled(false);
   this->actionSave->setEnabled(false);
   this->actionSave_As->setEnabled(false);
+  this->actionImportVideo->setEnabled(false);
   this->menuExport->menuAction()->setEnabled(false);
   this->setCurrentFile("");
   // Time & Event Controler
@@ -1166,6 +1197,14 @@ void MainWindow::updateSelectedMarkersRadius(double r)
   QList<int> ids = this->mp_ModelDock->selectedMarkers();
   for (int i = 0 ; i < ids.count() ; ++i)
     this->multiView->setMarkerRadius(ids[i], r);
+  this->multiView->updateDisplay();
+};
+
+void MainWindow::updateSelectedVideosDelay(double d)
+{
+  QList<int> ids = this->mp_ModelDock->selectedVideos();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    this->multiView->setVideoDelay(ids[i], d);
   this->multiView->updateDisplay();
 };
 
@@ -1334,6 +1373,16 @@ void MainWindow::removeSegments(const QList<int>& ids)
 void MainWindow::insertSegment(Segment* seg)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new InsertSegment(this->mp_Model, seg)));
+};
+
+void MainWindow::setVideosDelay(const QVector<int>& ids, qint64 delay)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditVideosDelay(this->mp_Acquisition, ids, delay)));
+};
+
+void MainWindow::removeVideos(const QList<int>& ids)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveVideos(this->mp_Acquisition, ids)));
 };
 
 void MainWindow::setEventFrame(int id, int frame)

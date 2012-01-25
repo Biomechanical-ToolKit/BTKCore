@@ -47,24 +47,27 @@ class CompositeView : public AbstractView
 public:
   enum {Viz3D = 0, Viz3DProjection, Viz3DOrthogonal, 
         Chart, ChartPoint, ChartAnalog,
-        Console, ConsoleLogger};
+        Console, ConsoleLogger,
+        Media, MediaVideo};
   
   CompositeView(QWidget* parent = 0);
   // ~CompositeView(); // Implicit
-  // CompositeView(const CompositeView&);  // Implicit
+  // CompositeView(const CompositeView&); // Implicit
   // CompositeView& operator=(const CompositeView&); // Implicit.
   
   void setAcquisition(Acquisition* acq);
   void render();
   void show(bool s);
   
-  QWidget* view(int viewComboIndex) const {return this->viewStack->widget(this->viewStackIndexFromViewComboIndex(viewComboIndex));};
+  QWidget* view(int viewEnumIndex) const {return this->viewStack->widget(this->viewStackIndexFromViewComboIndex(this->convertEnumIndexToComboIndex(viewEnumIndex)));};
   
   virtual AbstractView* clone() const;
   void copyOptions(CompositeView* from);
   
   virtual int optionStackIndexFromViewComboIndex(int idx) const;
   virtual int viewStackIndexFromViewComboIndex(int idx) const;
+  int convertEnumIndexToComboIndex(int idx) const;
+  int convertComboIndexToEnumIndex(int idx) const;
   
 public slots:
   void setOrthogonalView(int view);

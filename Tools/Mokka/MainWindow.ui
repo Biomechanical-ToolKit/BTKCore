@@ -118,6 +118,8 @@
      <addaction name="menuMotion_Analysis_Corp_2"/>
      <addaction name="menuBTS_Bioengineering"/>
      <addaction name="actionImportEMF"/>
+     <addaction name="separator"/>
+     <addaction name="actionImportVideo"/>
     </widget>
     <widget class="QMenu" name="menuExport">
      <property name="title">
@@ -476,6 +478,11 @@
   <action name="actionImportTDF">
    <property name="text">
     <string>TDF file...</string>
+   </property>
+  </action>
+  <action name="actionImportVideo">
+   <property name="text">
+    <string>Video files...</string>
    </property>
   </action>
  </widget>

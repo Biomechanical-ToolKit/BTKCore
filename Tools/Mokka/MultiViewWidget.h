@@ -98,6 +98,8 @@ public:
   void setForcePlatformColor(const QColor& color);
   void setForceVectorColor(const QColor& color);
   
+  void setVideoDelay(int id, double d);
+  
   void setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor);
   void setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor);
   void setEventsFunctor(btk::VTKEventsFunctor::Pointer functor);
@@ -109,7 +111,7 @@ public:
   bool restoreLayout(const QByteArray& state);
   
 public slots:
-  void updateChartFramesIndex(int ff);
+  void updateFramesIndex(int ff);
   void appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void clearSegments();
   void setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors);
@@ -132,6 +134,7 @@ public slots:
   void restoreLayout3DOnly();
   void restoreLayout3DVerbose();
   void restoreLayout3DCharts();
+  void setVideoDelays(QVector<int> ids, QVector<qint64> delays);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
@@ -163,6 +166,7 @@ private:
   QObject* mp_EventFilterObject;
   Acquisition* mp_Acquisition;
   Model* mp_Model;
+  QMap<int, qint64> m_VideoDelays;
   vtkEventQtSlotConnect* mp_EventQtSlotConnections;
   vtkProcessMap* mp_VTKProc;
   vtkMapperCollection* mp_Mappers;

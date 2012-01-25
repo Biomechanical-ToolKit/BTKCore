@@ -31,28 +31,71 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- */
- 
-#ifndef UserDefined_h
-#define UserDefined_h
+ */ 
 
-#include <QTreeWidgetItem>
+#ifndef VideoWidget_h
+#define VideoWidget_h
 
-typedef enum {
-  SegmentType = QTreeWidgetItem::UserType + 1,
-  MarkerType,
-  PointType,
-  AnalogType,
-  ForcePlateType,
-  VideoType
-} ModelItemTypes;
+#include "TimeEventFunctors.h"
 
-typedef enum {
-  PointId = Qt::UserRole + 1, 
-  AnalogId,
-  ForcePlateId, 
-  SegmentId,
-  VideoId
-} ModelItemIdRole;
+#include <Phonon/VideoWidget>
+#include <Phonon/MediaObject>
+#include <QLabel>
 
-#endif // UserDefined_h
+class Acquisition;
+
+typedef QMap<int, qint64> VideoDelays;
+
+class VideoOverlayWidget;
+
+class VideoWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+  enum {SynchronizedVideo = 0, UnsynchronizedVideo};
+
+  VideoWidget(QWidget* parent = 0);
+  // ~VideoWidget(); // Implicit.
+
+  Acquisition* acquisition() {return this->mp_Acquisition;};
+  void setAcquisition(Acquisition* acq) {this->mp_Acquisition = acq;};
+  VideoDelays* delays() {return this->mp_Delays;}
+  void setDelays(VideoDelays* delays) {this->mp_Delays = delays;};
+  void setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor) {this->mp_CurrentFrameFunctor = functor;};
+  
+  void render();
+  void show(bool s);
+  
+  void copy(VideoWidget* source);
+
+protected:
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dragLeaveEvent(QDragLeaveEvent* event);
+  void dropEvent(QDropEvent* event);
+  void paintEvent(QPaintEvent* event);
+  
+private:
+  friend class VideoOverlayWidget;
+  
+  void setVideoVisible(bool v);
+  
+  Acquisition* mp_Acquisition;
+  VideoDelays* mp_Delays;
+  int m_VideoId;
+  Phonon::MediaObject* mp_MediaObject;
+  Phonon::VideoWidget* mp_Video;
+  VideoOverlayWidget* mp_Overlay;
+  btk::VTKCurrentFrameFunctor::Pointer mp_CurrentFrameFunctor;
+};
+
+// Required to be able to drag and drop over the Phonon::VideoWidget widget
+class VideoOverlayWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+  VideoOverlayWidget(QWidget* parent = 0);
+  // ~VideoOverlayWidget(); // Implicit.
+};
+#endif // VideoWidget_h
