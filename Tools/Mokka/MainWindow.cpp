@@ -1130,7 +1130,7 @@ void MainWindow::selectAll()
 {
   QWidget* w = QApplication::focusWidget();
   LoggerWidget* logger = qobject_cast<LoggerWidget*>(w);
-  if (w != 0)
+  if (logger != 0)
     logger->selectAll();
 };
 
@@ -1138,7 +1138,7 @@ void MainWindow::copy()
 {
   QWidget* w = QApplication::focusWidget();
   LoggerWidget* logger = qobject_cast<LoggerWidget*>(w);
-  if (w != 0)
+  if (logger != 0)
     logger->copySelectedItemsToClipboard();
 };
 
