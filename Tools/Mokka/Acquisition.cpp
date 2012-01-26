@@ -1073,8 +1073,8 @@ void Acquisition::loadAcquisition()
         // Look if the video file exists
         QFileInfo fI = QFileInfo(this->m_Filename);
         QString filenamePart = fI.baseName() + "." +  str + ".*";
-        QDir dir = QDir(fI.canonicalPath(), filenamePart,  QDir::Name | QDir::IgnoreCase, QDir::Files | QDir::Readable);
-        QStringList videoList = dir.entryList();
+        QDir dir = QDir(fI.canonicalPath());
+        QStringList videoList = dir.entryList(QStringList() << filenamePart, QDir::Files | QDir::Readable);
         QString filename, path;
         bool error = false;
         if (videoList.isEmpty())
@@ -1111,8 +1111,8 @@ void Acquisition::loadAcquisition()
         str = str.trimmed();
         // Look if the video file exists
         QFileInfo fI = QFileInfo(this->m_Filename);
-        QDir dir = QDir(fI.canonicalPath(), str,  QDir::Name | QDir::IgnoreCase, QDir::Files | QDir::Readable);
-        QStringList videoList = dir.entryList();
+        QDir dir = QDir(fI.canonicalPath());
+        QStringList videoList = dir.entryList(QStringList() << str, QDir::Files | QDir::Readable);
         QString filename, path;
         bool error = false;
         if (videoList.isEmpty())
