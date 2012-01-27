@@ -798,15 +798,20 @@ bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
     }
     ++inc;
   }
-  // - POINT:MOVIE_FILENAME
-  btk::MetaDataCreateChild(point, "MOVIE_FILENAME", movieFilename);
   // - POINT:MOVIE_DELAY
   btk::MetaDataCreateChild(point, "MOVIE_DELAY", movieDelay);
-  // - POINT:MOVIE_ID (Try to be compatible with Vicon)
+  // Try first to be compatible with VICON using the metadata POINT:MOVIE_ID...
   if (videoCompatibleVicon)
+  {
     btk::MetaDataCreateChild(point, "MOVIE_ID", movieId);
+    point->RemoveChild("MOVIE_FILENAME");
+  }
+  // ... Or if it is not possible, then create the metadata POINT:MOVIE_FILENAME
   else
+  {
+    btk::MetaDataCreateChild(point, "MOVIE_FILENAME", movieFilename);
     point->RemoveChild("MOVIE_ID");
+  }
   // Point
   int numFramePoint = rb - lb + 1;
   int numPoints = 0;
@@ -1080,6 +1085,7 @@ void Acquisition::loadAcquisition()
         if (videoList.isEmpty())
         {
           LOG_WARNING("No video file found with the ID " +  str + ".");
+          filename = fI.baseName() + "." +  str + ".avi"; // Generic filename based on the ID
           error = true;
         }
         else
@@ -1118,6 +1124,7 @@ void Acquisition::loadAcquisition()
         if (videoList.isEmpty())
         {
           LOG_WARNING("No video file found with the name " +  str + ". You need to put the video files in the same folder than the acquisition.");
+          filename = str;
           error = true;
         }
         else
