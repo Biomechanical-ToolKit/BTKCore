@@ -38,23 +38,18 @@
 
 #include "TimeEventFunctors.h"
 
-#include <Phonon/VideoWidget>
-#include <Phonon/MediaObject>
-#include <QLabel>
+#include <QMediaPlayer>
+#include <QVideoWidget>
 
 class Acquisition;
 
 typedef QMap<int, qint64> VideoDelays;
-
-class VideoOverlayWidget;
 
 class VideoWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  enum {SynchronizedVideo = 0, UnsynchronizedVideo};
-
   VideoWidget(QWidget* parent = 0);
   // ~VideoWidget(); // Implicit.
 
@@ -76,26 +71,12 @@ protected:
   void paintEvent(QPaintEvent* event);
   
 private:
-  friend class VideoOverlayWidget;
-  
-  void setVideoVisible(bool v);
-  
   Acquisition* mp_Acquisition;
   VideoDelays* mp_Delays;
   int m_VideoId;
-  Phonon::MediaObject* mp_MediaObject;
-  Phonon::VideoWidget* mp_Video;
-  VideoOverlayWidget* mp_Overlay;
+  QMediaPlayer* mp_MediaPlayer;
+  QVideoWidget* mp_VideoWidget;
   btk::VTKCurrentFrameFunctor::Pointer mp_CurrentFrameFunctor;
 };
 
-// Required to be able to drag and drop over the Phonon::VideoWidget widget
-class VideoOverlayWidget : public QWidget
-{
-  Q_OBJECT
-
-public:
-  VideoOverlayWidget(QWidget* parent = 0);
-  // ~VideoOverlayWidget(); // Implicit.
-};
 #endif // VideoWidget_h
