@@ -104,7 +104,8 @@ private:
   void updateEventsPosition();
   void updateEventPosition(int id);
   void updateEventGeometry(int idx);
-  void updateEventSelection();
+  void updateEventSelection(const QList<int>& selection);
+  QList<int> extractSelectedEvents() const;
   
   int m_FirstFrame;
   int m_LastFrame;
