@@ -70,13 +70,20 @@ protected:
   void dropEvent(QDropEvent* event);
   void paintEvent(QPaintEvent* event);
   
+private slots:
+  void checkMediaStatus(QMediaPlayer::MediaStatus status);
+  void finalizeVideoLoading(qint64 pos);
+  
 private:
+  qint64 referencePosition() const;
+  
   Acquisition* mp_Acquisition;
   VideoDelays* mp_Delays;
   int m_VideoId;
   QMediaPlayer* mp_MediaPlayer;
   QVideoWidget* mp_VideoWidget;
   btk::VTKCurrentFrameFunctor::Pointer mp_CurrentFrameFunctor;
+  bool m_VideoLoading;
 };
 
 #endif // VideoWidget_h

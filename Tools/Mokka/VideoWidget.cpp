@@ -56,6 +56,7 @@ VideoWidget::VideoWidget(QWidget* parent)
   this->mp_VideoWidget = new QVideoWidget(this);
   this->mp_MediaPlayer->setVideoOutput(this->mp_VideoWidget);
   this->mp_MediaPlayer->setMuted(true);
+  this->m_VideoLoading = false;
   // Drag and drop
   this->setAcceptDrops(true);
   
@@ -71,16 +72,20 @@ VideoWidget::VideoWidget(QWidget* parent)
   layout->setContentsMargins(0,0,0,0);
   this->setLayout(layout);
   this->mp_VideoWidget->setVisible(false);
+  
+  connect(this->mp_MediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(checkMediaStatus(QMediaPlayer::MediaStatus)));
+  connect(this->mp_MediaPlayer, SIGNAL(positionChanged(qint64)), this, SLOT(finalizeVideoLoading(qint64)));
 };
 
 void VideoWidget::render()
 {
   if (this->mp_VideoWidget->isVisible())
   {
-    int frame = (*this->mp_CurrentFrameFunctor)();
-    qint64 time = static_cast<qint64>(static_cast<double>(frame - 1) / this->mp_Acquisition->pointFrequency() * 1000.0) - this->mp_Delays->operator[](this->m_VideoId);
-    if (time >= 0)
-      this->mp_MediaPlayer->setPosition(time);
+    qint64 pos = this->referencePosition();
+    if (pos >= 0)
+    {
+      this->mp_MediaPlayer->setPosition(pos);
+    }
   }
 };
 
@@ -113,29 +118,25 @@ void VideoWidget::dragEnterEvent(QDragEnterEvent* event)
       for (QList<QTreeWidgetItem*>::const_iterator it = selectedItems.begin() ; it != selectedItems.end() ; ++it)
       {
         if ((*it)->type() != VideoType)
-          return;
+          break;
       }
       event->setDropAction(Qt::CopyAction); // To have the cross (+) symbol
       event->accept();
     }
   }
+  this->QWidget::dragEnterEvent(event);
 };
 
 void VideoWidget::dragLeaveEvent(QDragLeaveEvent* event)
 {
-  if ((this->mp_MediaPlayer->mediaStatus() != QMediaPlayer::InvalidMedia) && (this->mp_MediaPlayer->mediaStatus() != QMediaPlayer::NoMedia))
+  if (this->mp_MediaPlayer->mediaStatus() != QMediaPlayer::NoMedia)
     this->mp_VideoWidget->setVisible(true);
   this->QWidget::dragLeaveEvent(event);
+  this->render(); // Force to update the content of the video widget as it was previously hidden
 }
 
 void VideoWidget::dropEvent(QDropEvent* event)
 {
-  QMessageBox error(QMessageBox::Warning, "Video player", "Error when loading the video.", QMessageBox::Ok , this);
-  #ifdef Q_OS_MAC
-    error.setWindowFlags(Qt::Sheet);
-    error.setWindowModality(Qt::WindowModal);
-  #endif
-
   event->setDropAction(Qt::IgnoreAction); // Only to know which Video IDs were dropped.
   event->accept();
   QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(event->source());
@@ -145,33 +146,35 @@ void VideoWidget::dropEvent(QDropEvent* event)
   if (this->mp_MediaPlayer->media().canonicalUrl() == videoFileUrl) // same file?
   {
     this->mp_VideoWidget->setVisible(true);
-    return;
+    this->render(); // Force to update the content of the video widget as it was previously hidden
   }
   else if (this->mp_Acquisition->videoPath(id).isEmpty())
   {
+    QMessageBox error(QMessageBox::Warning, "Video player", "Video file not found.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+    error.setWindowFlags(Qt::Sheet);
+    error.setWindowModality(Qt::WindowModal);
+#endif
     LOG_CRITICAL("Error when loading the video file: File not found.");
-    error.setInformativeText("File not found.<br/>"
-                             "<nobr>Video(s) must be in the same folder than the acquisition.</nobr>");
-    error.exec();
-    return;
-  }
-  LOG_INFO("Loading video from file: " + this->mp_Acquisition->videoFilename(id));
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-  this->mp_MediaPlayer->setMedia(videoFileUrl);
-  QApplication::restoreOverrideCursor();
-  if (this->mp_MediaPlayer->mediaStatus() == QMediaPlayer::InvalidMedia)
-  {
-    LOG_CRITICAL("Error when loading the video file: " + this->mp_MediaPlayer->errorString());
-    error.setInformativeText("<nobr>Have you the right video codec installed?</nobr>");
+    error.setInformativeText("<nobr>Video(s) must be in the same folder than the acquisition.</nobr>");
     error.exec();
   }
   else
   {
+    LOG_INFO("Loading video from file: " + this->mp_Acquisition->videoFilename(id));
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    this->mp_MediaPlayer->setMedia(QMediaContent()); // Reset the internal states of the media: Required to be sure that the video will start at the current "3D" frame
+    this->m_VideoLoading = true;
+    this->mp_MediaPlayer->setMedia(videoFileUrl);
+    QApplication::restoreOverrideCursor();
     this->m_VideoId = id;
-    this->mp_VideoWidget->setVisible(true);
-    this->mp_MediaPlayer->pause(); // Force the loading
-    this->render();
+#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
+    // Never tried under Linux.
+    // Under windows, the mechanism is different and use the status of the media
+    this->mp_MediaPlayer->pause(); // Force the loading and sync the video with the curent 3D frame
+#endif
   }
+  this->QWidget::dropEvent(event);
 };
 
 void VideoWidget::paintEvent(QPaintEvent* event)
@@ -195,5 +198,64 @@ void VideoWidget::paintEvent(QPaintEvent* event)
     painter.drawRoundedRect(QRectF(center - QPointF(side, side) / 2.0, QSizeF(side, side)), 25.0, 25.0);
   }
   else
+  {
+    this->render(); // Force the rendering of the current frame if previously hidden
     this->QWidget::paintEvent(event);
+  }
+};
+
+void VideoWidget::checkMediaStatus(QMediaPlayer::MediaStatus status)
+{
+  switch(status)
+  {
+  case QMediaPlayer::LoadedMedia:
+    this->mp_VideoWidget->setVisible(true);
+#ifdef Q_OS_WIN
+    this->mp_MediaPlayer->play(); // Force the buffering of the media (which will be paused when buffered).
+#endif
+    break;
+  case QMediaPlayer::BufferedMedia:
+    this->render();
+    break;
+  case QMediaPlayer::InvalidMedia:
+    {
+    QMessageBox error(QMessageBox::Warning, "Video player", "Error when loading the video.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+    error.setWindowFlags(Qt::Sheet);
+    error.setWindowModality(Qt::WindowModal);
+#endif
+    LOG_CRITICAL("Error when loading the video file: Have you the right video codec installed?");
+    error.setInformativeText("<nobr>Have you the right video codec installed?</nobr>");
+    error.exec();
+    this->m_VideoId = -1;
+    this->mp_MediaPlayer->setMedia(QMediaContent()); // Reset the player
+    this->mp_VideoWidget->setVisible(false);
+    this->update();
+    }
+    break;
+  default:
+    break;
+  }
+};
+
+void VideoWidget::finalizeVideoLoading(qint64 pos)
+{
+#ifdef Q_OS_WIN
+  if (this->m_VideoLoading)
+  {
+    if ((pos - this->referencePosition()) >= 0)
+    {
+      this->mp_MediaPlayer->pause();
+      this->m_VideoLoading = false;
+    }
+  }
+#else
+  Q_UNUSED(pos);
+  this->m_VideoLoading = false;
+#endif
+};
+
+inline qint64 VideoWidget::referencePosition() const
+{
+  return static_cast<qint64>(static_cast<double>((*this->mp_CurrentFrameFunctor)() - 1) / this->mp_Acquisition->pointFrequency() * 1000.0) - this->mp_Delays->operator[](this->m_VideoId);
 };
