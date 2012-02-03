@@ -53,8 +53,8 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->mp_NextEventIcon = new QIcon(QString::fromUtf8(":/Resources/Images/skip_forward.png"));
   this->mp_NextEventActiveIcon = new QIcon(QString::fromUtf8(":/Resources/Images/skip_forward_active.png"));
   this->mp_Timer = new QTimer(this);
-  this->m_PlaybackStep = 1;
-  this->m_PlaybackDelay = 33; // msec
+  this->m_PlaybackStep = 1.0;
+  this->m_PlaybackDelay = 40; // msec
   this->m_OpenEditorWhenInserting = true;
   
   this->setupUi(this);
@@ -282,8 +282,6 @@ void TimeEventControlerWidget::togglePlayback()
 
 void TimeEventControlerWidget::startPlayback()
 {
-  this->mp_Timer->start(this->m_PlaybackDelay);
-  this->playButton->setIcon(*this->mp_PauseIcon);
   disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
   disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   disconnect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
@@ -296,6 +294,8 @@ void TimeEventControlerWidget::startPlayback()
   disconnect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
   disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
   disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
+  this->playButton->setIcon(*this->mp_PauseIcon);
+  this->mp_Timer->start(this->m_PlaybackDelay);
   emit playbackStarted();
 }
 
@@ -325,17 +325,17 @@ void TimeEventControlerWidget::setCurrentFrame(int frame)
 
 void TimeEventControlerWidget::nextStep()
 {
-  this->setFrame(this->timeEventBar->m_SliderPos + this->m_PlaybackStep);
+  this->setFrame(this->timeEventBar->m_SliderPos + static_cast<int>(this->m_PlaybackStep));
 };
 
 void TimeEventControlerWidget::nextFrame()
 {
-  this->setFrame(this->timeEventBar->m_SliderPos + 1);
+  this->setFrame(this->timeEventBar->m_SliderPos + 1.0);
 };
 
 void TimeEventControlerWidget::previousFrame()
 {
-  this->setFrame(this->timeEventBar->m_SliderPos - 1);
+  this->setFrame(this->timeEventBar->m_SliderPos - 1.0);
 };
 
 void TimeEventControlerWidget::reframeAcquisition(int ff)
@@ -687,13 +687,12 @@ void TimeEventControlerWidget::changePlaybackParameters()
   if (!this->mp_Acquisition)
     return;
   
-  double pointFrequency = this->mp_Acquisition->pointFrequency();
-  
+  double freq = this->mp_Acquisition->pointFrequency();
+  this->m_PlaybackDelay = 40; // 25 Hz
   // Compute playback step and delay
-  if ((pointFrequency == 0.0) || (this->actionPlaybackSpeedFullFrames->isChecked()))
+  if ((freq == 0.0) || (this->actionPlaybackSpeedFullFrames->isChecked()))
   {
-    this->m_PlaybackDelay = 40; // 25 Hz
-    this->m_PlaybackStep = 1;
+    this->m_PlaybackStep = 1.0;
   }
   else
   {
@@ -709,27 +708,13 @@ void TimeEventControlerWidget::changePlaybackParameters()
     else if (this->actionPlaybackSpeed1_10->isChecked())
       divider = 0.1;
 
-    double freq = pointFrequency * divider;
-    if (freq >= 24.0)
+    freq *= divider;
+    this->m_PlaybackStep = freq / 25.0; // 25 images by second
+    
+    if (this->m_PlaybackStep < 1.0)
     {
-      int finalFreq = 1;
-      double r = 1.0;
-      for (int i = 24 ; i <= 30 ; ++i)
-      {
-        double residual = freq / static_cast<double>(i) - static_cast<double>(static_cast<int>(freq) / i);
-        if (residual < r)
-        {
-          finalFreq = i;
-          r = residual;
-        }
-      }
-      this->m_PlaybackDelay = 1000 / finalFreq;
-      this->m_PlaybackStep = freq / finalFreq;
-    }
-    else
-    {
-      this->m_PlaybackDelay = static_cast<int>(1000.0 / freq);
-      this->m_PlaybackStep = 1;
+      this->m_PlaybackDelay = static_cast<int>(static_cast<double>(this->m_PlaybackDelay) * 1.0 / this->m_PlaybackStep);
+      this->m_PlaybackStep = 1.0;
     }
   }
   // Relaunch playback if necessary

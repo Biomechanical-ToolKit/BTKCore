@@ -152,7 +152,7 @@ private:
   QIcon* mp_NextEventIcon;
   QIcon* mp_NextEventActiveIcon;
   QTimer* mp_Timer;
-  int m_PlaybackStep;
+  double m_PlaybackStep;
   int m_PlaybackDelay;
   bool m_OpenEditorWhenInserting;
 };
