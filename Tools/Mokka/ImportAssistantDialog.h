@@ -41,6 +41,8 @@
 #include <QDialog>
 #include <QString>
 
+#include <btkAMTIForcePlatformFileIO.h>
+
 class ImportAssistantDialog : public QDialog, public Ui::ImportAssistantDialog
 {
   Q_OBJECT
@@ -50,8 +52,13 @@ public:
   void clear(const QString& dir);
   QStringList filenames() const;
   
+  QList<QVariant> amtiDimensions();
+  void setAmtiDimensions(const QList<QVariant>& dims);
+  QList<QVariant> amtiOrigin();
+  QList<QVariant> amtiCorners();
+  void setAmtiGeometry(const QList<QVariant>& corners, const QList<QVariant>& origin);
+  
 public slots:
-  void setAcquisitionSystem(int index);
   void openMotionTrajectoryFileDialog();
   void openMotionAnalogFileDialog();
   void openMotionForcePlatformFileDialog();
@@ -62,10 +69,17 @@ public slots:
   void openEliteAngleFileDialog();
   void openEliteMomentFileDialog();
   void openElitePowerFileDialog();
+  void openAmtiFileDialog();
+  
+private slots:
+  void setAcquisitionSystem(int index);
+  void setAmtiInformationUsed(int index);
   
 private:
   void openFileDialog(const QString& filter, QLineEdit* lineEdit);
+  btk::AMTIForcePlatformFileIO::Pointer amtiFileIOCache();
   
   QString m_Directory;
+  btk::AMTIForcePlatformFileIO::Pointer mp_AMTIFileIOCache;
 };
 #endif // ImportAssistantDialog_h

@@ -117,6 +117,7 @@
      <addaction name="actionImportC3D"/>
      <addaction name="menuMotion_Analysis_Corp_2"/>
      <addaction name="menuBTS_Bioengineering"/>
+     <addaction name="actionImportAMTI"/>
      <addaction name="actionImportEMF"/>
      <addaction name="separator"/>
      <addaction name="actionImportVideo"/>
@@ -483,6 +484,11 @@
   <action name="actionImportVideo">
    <property name="text">
     <string>Video files...</string>
+   </property>
+  </action>
+  <action name="actionImportAMTI">
+   <property name="text">
+    <string>AMTI forceplate file...</string>
    </property>
   </action>
  </widget>

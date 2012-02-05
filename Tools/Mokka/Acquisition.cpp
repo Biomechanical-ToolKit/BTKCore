@@ -36,7 +36,6 @@
 #include "Acquisition.h"
 #include "LoggerMessage.h"
 
-#include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileWriter.h>
 #include <btkMetaDataUtils.h>
 #include <btkMergeAcquisitionFilter.h>
@@ -151,6 +150,11 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
     LOG_CRITICAL("Unknown error.");
     return false;
   }
+  return this->importFrom(readers, allFramesKept);
+};
+
+bool Acquisition::importFrom(const QList<btk::AcquisitionFileReader::Pointer>& readers, bool allFramesKept)
+{
   // Check if the original acquisition need to be cropped
   if (this->mp_BTKAcquisition)
   {
@@ -184,6 +188,55 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
   QVector<QString> infos(16,"N/A"); infos[0] = "N/A                         ";
   emit informationsChanged(infos);
   return true;
+}
+
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions)
+{
+  btk::AMTIForcePlatformFileIO::Pointer io = btk::AMTIForcePlatformFileIO::New();
+  io->SetDimensions(dimensions[0].toFloat(), dimensions[1].toFloat(), dimensions[2].toFloat());
+  return this->importFromAMTI(filename, allFramesKept, io);
+};
+
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin)
+{
+  std::vector<float> c(12), o(3);
+  for (int i = 0 ; i < 12 ; ++i)
+    c[i] = corners[i].toFloat();
+  for (int i = 0 ; i < 3 ; ++i)
+    o[i] = origin[i].toFloat();
+  btk::AMTIForcePlatformFileIO::Pointer io = btk::AMTIForcePlatformFileIO::New();
+  io->SetGeometry(c,o);
+  return this->importFromAMTI(filename, allFramesKept, io);
+};
+
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io)
+{
+  // Try to read the given file
+  QList<btk::AcquisitionFileReader::Pointer> readers;
+  try
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetAcquisitionIO(io);
+    reader->SetFilename(filename.toStdString());
+    reader->Update();
+    readers << reader;
+  }
+  catch (btk::Exception& e)
+  {
+    LOG_CRITICAL(e.what());
+    return false;
+  }
+  catch (std::exception& e)
+  {
+    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    return false;
+  }
+  catch (...)
+  {
+    LOG_CRITICAL("Unknown error.");
+    return false;
+  }
+  return this->importFrom(readers, allFramesKept);
 };
 
 void Acquisition::clear()

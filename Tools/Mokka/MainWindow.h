@@ -99,6 +99,7 @@ public slots:
   void importEMG();
   void importMOM();
   void importPWR();
+  void importAMTI();
   void importEMF();
   void importVideos();
   void exportC3D();
@@ -182,7 +183,9 @@ private:
   void saveFile(const QString& filename);
   void exportAcquisition(const QString& filter);
   void importAcquisition(const QString& filter);
-  void importAcquisitions(const QStringList& filenames, bool allFramesKept = true);
+  bool importAcquisitions(const QStringList& filenames, bool allFramesKept = true);
+  void importAssistant(int systemIndex, bool systemLocked = false, bool allFramesKeptOnly = false);
+  bool importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept);
   void reset();
   void setAcquisitionProperties(QMap<int, QVariant>& properties);
   void readSettings(); 

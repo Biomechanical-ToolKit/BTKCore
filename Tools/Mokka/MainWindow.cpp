@@ -244,6 +244,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionImportMOM, SIGNAL(triggered()), this, SLOT(importMOM()));
   connect(this->actionImportPWR, SIGNAL(triggered()), this, SLOT(importPWR()));
   connect(this->actionImportGR, SIGNAL(triggered()), this, SLOT(importGRx()));
+  connect(this->actionImportEMF, SIGNAL(triggered()), this, SLOT(importEMF()));
+  connect(this->actionImportAMTI, SIGNAL(triggered()), this, SLOT(importAMTI()));
   connect(this->actionImportVideo, SIGNAL(triggered()), this, SLOT(importVideos()));
   connect(this->actionExportC3D, SIGNAL(triggered()), this, SLOT(exportC3D()));
   connect(this->actionExportTRC, SIGNAL(triggered()), this, SLOT(exportTRC()));
@@ -748,7 +750,8 @@ void MainWindow::openFile()
   {
     QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
-                         tr("Acquisition Files (*.anb *.anc *.ang *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *rif *tdf *.trb *.trc *.xls);;"
+                         tr("Acquisition Files (*.anb *.anc *.ang *.asc *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *rif *tdf *.trb *.trc *.xls);;"
+                            "AMTI Files (*.asc);;"
                             "ANB Files (*.anb);;"
                             "ANC Files (*.anc);;"
                             "ANG Files (*.ang);;"
@@ -780,11 +783,39 @@ void MainWindow::openFileDropped(const QString& filename)
 void MainWindow::openFile(const QString& filename)
 {
   QFileInfo fI(filename);
+  bool specialCaseAMTI = false;
+  
+  // Special case for AMTI file
+  if (fI.suffix().toUpper().compare("ASC") == 0)
+  {
+    specialCaseAMTI = true;
+    this->mp_ModelDock->setEnabled(false);
+    this->mp_ImportAssistant->acquisitionSystemComboBox->setCurrentIndex(this->mp_ImportAssistant->stackedWidget->indexOf(this->mp_ImportAssistant->amtiPage)-1);
+    this->mp_ImportAssistant->acquisitionSystemComboBox->setEnabled(false);
+    this->mp_ImportAssistant->newAcquisitionRadioButton->setChecked(true);
+    this->mp_ImportAssistant->appendAcquisitionRadioButton->setEnabled(false);
+    this->mp_ImportAssistant->keepAllFrameRadioButton->setChecked(true);
+    this->mp_ImportAssistant->keepHighestFirstFrameRadioButton->setEnabled(false);
+    this->mp_ImportAssistant->amtiForceMomentLineEdit->setText(filename);
+    this->mp_ImportAssistant->amtiForceMomentLineEdit->setReadOnly(true);
+    bool accepted = this->mp_ImportAssistant->exec();
+    this->mp_ModelDock->setEnabled(true); // If the dock is not enabled before the import, then its signals are not emited.
+    if (!accepted)
+      return;
+  }
+  
   LOG_INFO(tr("Loading acquisition from file: ") + fI.fileName());
   ProgressWidget pw(this);
   pw.show();
   pw.setProgressValue(10);
-  bool noOpenError = this->mp_Acquisition->load(filename);
+  bool noOpenError = false;
+  if (specialCaseAMTI)
+  {
+    this->mp_Acquisition->clear();
+    noOpenError = this->importAssistantAMTI(filename, this->mp_ImportAssistant->amtiInformationsComboBox->currentIndex(), true);
+  }
+  else
+    noOpenError = this->mp_Acquisition->load(filename);
   this->loadAcquisition(noOpenError, &pw);
   if (noOpenError)
   {
@@ -918,17 +949,87 @@ void MainWindow::closeFile()
 
 void MainWindow::importAssistant()
 {
+  this->importAssistant(this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
+}
+
+void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFramesKeptOnly)
+{
   this->mp_ModelDock->setEnabled(false);
   this->mp_ImportAssistant->clear(this->m_LastDirectory);
+  this->mp_ImportAssistant->acquisitionSystemComboBox->setCurrentIndex(systemIndex);
+  this->mp_ImportAssistant->acquisitionSystemComboBox->setEnabled(systemLocked ? false : true);
   this->mp_ImportAssistant->appendAcquisitionRadioButton->setEnabled(this->actionClose->isEnabled());
+  this->mp_ImportAssistant->keepHighestFirstFrameRadioButton->setEnabled(allFramesKeptOnly ? false : true);
   bool accepted = this->mp_ImportAssistant->exec();
   this->mp_ModelDock->setEnabled(true); // If the dock is not enabled before the import, then its signals are not emited.
   if (accepted)
   {
     if (this->mp_ImportAssistant->newAcquisitionRadioButton->isChecked())
       this->mp_Acquisition->clear();
-    this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked());
+    if (this->mp_ImportAssistant->stackedWidget->currentWidget() != this->mp_ImportAssistant->amtiPage)
+    {
+      if (this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked()))
+      {
+        QSettings settings;
+        settings.setValue("ImportAssistant/lastAcquisitionSystem", this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
+      }
+    }
+    else
+    {
+      QStringList filenames = this->mp_ImportAssistant->filenames();
+      if (!filenames.isEmpty())
+      {
+        LOG_INFO(tr("Importing acquisition."));
+        QSettings settings;
+        QString title = this->windowTitle();
+        ProgressWidget pw(this);
+        pw.show();
+        pw.setProgressValue(10);
+        
+        bool allFramesKept = this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked();
+        int infoIndex = this->mp_ImportAssistant->amtiInformationsComboBox->currentIndex();
+        LOG_INFO(tr("Loading acquisition for importation from file: ") + QFileInfo(filenames[0]).fileName());
+        bool noImportError = this->importAssistantAMTI(filenames[0], infoIndex, allFramesKept);
+        
+        this->loadAcquisition(noImportError, &pw);
+        this->setWindowTitle(title);
+        pw.hide();
+        if (!noImportError)
+          return;
+        settings.setValue("ImportAssistant/lastAcquisitionSystem", this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
+        this->setWindowModified(true);
+        this->actionSave->setEnabled(true);
+        this->m_LastDirectory = QFileInfo(filenames.last()).absolutePath();
+      }
+    }
   }
+};
+
+bool MainWindow::importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept)
+{
+  QSettings settings;
+  bool noImportError = false;
+  if (infoIndex == 0)
+  {
+    QList<QVariant> dims = this->mp_ImportAssistant->amtiDimensions();
+    noImportError = this->mp_Acquisition->importFromAMTI(filename, allFramesKept, dims);
+    if (noImportError)
+      settings.setValue("ImportAssistant/AMTIDimensions", dims);
+  }
+  else
+  {
+    QList<QVariant> corners = this->mp_ImportAssistant->amtiCorners();
+    QList<QVariant> origin = this->mp_ImportAssistant->amtiOrigin();
+    noImportError = this->mp_Acquisition->importFromAMTI(filename, allFramesKept, corners, origin);
+    if (noImportError)
+    {
+      settings.setValue("ImportAssistant/AMTICorners", corners);
+      settings.setValue("ImportAssistant/AMTIOrigin", origin);
+    }
+  }
+  if (noImportError)
+    settings.setValue("ImportAssistant/AMTILastInfoUsed", infoIndex);
+  return noImportError;
 };
 
 void MainWindow::importC3D()
@@ -1023,6 +1124,11 @@ void MainWindow::importPWR()
   this->importAcquisition(tr("PWR Files (*.pwr)"));
 };
 
+void MainWindow::importAMTI()
+{
+  this->importAssistant(this->mp_ImportAssistant->stackedWidget->indexOf(this->mp_ImportAssistant->amtiPage)-1, true, true);
+};
+
 void MainWindow::importEMF()
 {
   this->importAcquisition(tr("EMF Ascension Files (*.emf)"));
@@ -1037,25 +1143,28 @@ void MainWindow::importAcquisition(const QString& filter)
     this->importAcquisitions(QStringList(filename));
 };
 
-void MainWindow::importAcquisitions(const QStringList& filenames, bool allFramesKept)
+bool MainWindow::importAcquisitions(const QStringList& filenames, bool allFramesKept)
 {
-  LOG_INFO(tr("Importing acquisition(s)."));
+  bool noImportError = false;
   if (!filenames.isEmpty())
   {
+    LOG_INFO(tr("Importing acquisition(s)."));
     QString title = this->windowTitle();
     ProgressWidget pw(this);
     pw.show();
     pw.setProgressValue(10);
-    bool noImportError = this->mp_Acquisition->importFrom(filenames, allFramesKept);
+    noImportError = this->mp_Acquisition->importFrom(filenames, allFramesKept);
     this->loadAcquisition(noImportError, &pw);
     this->setWindowTitle(title);
     pw.hide();
-    if (!noImportError)
-      return;
-    this->setWindowModified(true);
-    this->actionSave->setEnabled(true);
-    this->m_LastDirectory = QFileInfo(filenames.last()).absolutePath();
+    if (noImportError)
+    {
+      this->setWindowModified(true);
+      this->actionSave->setEnabled(true);
+      this->m_LastDirectory = QFileInfo(filenames.last()).absolutePath();
+    }
   }
+  return noImportError;
 }
 
 void MainWindow::importVideos()
@@ -1746,6 +1855,15 @@ void MainWindow::readSettings()
   this->multiView->showForcePlatformIndex(showForcePlatformIndex == 0);
   this->multiView->setForcePlatformColor(defaultForcePlateColor);
   this->multiView->setForceVectorColor(defaultForceVectorColor);
+  
+  // Import assistant
+  settings.beginGroup("ImportAssistant");
+  this->mp_ImportAssistant->acquisitionSystemComboBox->setCurrentIndex(settings.value("lastAcquisitionSystem", -1).toInt());
+  this->mp_ImportAssistant->amtiInformationsComboBox->setCurrentIndex(settings.value("AMTILastInfoUsed", 0).toInt());
+  this->mp_ImportAssistant->setAmtiDimensions(settings.value("AMTIDimensions", QList<QVariant>()).toList());
+  this->mp_ImportAssistant->setAmtiGeometry(settings.value("AMTICorners", QList<QVariant>()).toList(),
+                                            settings.value("AMTIOrigin", QList<QVariant>()).toList());
+  settings.endGroup();
 };
 
 void MainWindow::writeSettings()
