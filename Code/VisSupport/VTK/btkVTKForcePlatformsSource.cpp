@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -336,7 +336,7 @@ namespace btk
         indexTransform->SetInput(index);
         pose->Identity();
         for (int i = 0 ; i < 3 ; ++i)
-          pose->SetElement(i, 3, (bbForcePlateCenter[i] - bbIndexCenter[i]) * this->m_Scale);
+          pose->SetElement(i, 3, (bbForcePlateCenter[i] - bbIndexCenter[i]));
         transform->SetMatrix(pose);
         indexTransform->Update();
         index->Delete();

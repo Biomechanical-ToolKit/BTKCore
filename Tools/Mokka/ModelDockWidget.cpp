@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -61,6 +61,8 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->mp_AnalogsIcon = new QIcon(QString::fromUtf8(":/Resources/Images/chart_line.png"));
   this->mp_ModelOutputsIcon = new QIcon(QString::fromUtf8(":/Resources/Images/chart_curve.png"));
   this->mp_ForcePlatesIcon = new QIcon(QString::fromUtf8(":/Resources/Images/forceplate-16.png"));
+  this->mp_VideosIcon = new QIcon(QString::fromUtf8(":/Resources/Images/video.png"));
+  this->mp_VideoErrorIcon = new QIcon(QString::fromUtf8(":/Resources/Images/video_error.png"));
   
   this->setupUi(this);
    
@@ -122,6 +124,12 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->analogOffsetSpinBox->setStyleSheet("QSpinBox {font-size: 10px;};");
   this->analogDescLabel->setFont(f);
   this->analogDescEdit->setFont(f);
+  // - Video page
+  static_cast<QGridLayout*>(this->videoPage->layout())->setVerticalSpacing(3);
+  this->videoFilenameLabel->setFont(f);
+  this->videoFilenameEdit->setFont(f);
+  this->videoDelayLabel->setFont(f);
+  this->videoDelaySpinBox->setStyleSheet("QDoubleSpinBox {font-size: 10px;};");
 #endif
   QMenu* modelConfigurationMenu = new QMenu(this);
   this->mp_NewConfiguration = new QAction(tr("New configuration"), this);
@@ -236,6 +244,12 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   modelOutputsRoot->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
   modelOutputsRoot->setFlags(modelOutputsRoot->flags() & ~Qt::ItemIsSelectable);
   items.append(modelOutputsRoot);
+  // Model videos
+  QTreeWidgetItem* videosRoot = new QTreeWidgetItem(QStringList(QString("Videos")));
+  videosRoot->setFont(LabelHeader, f);
+  videosRoot->setIcon(LabelHeader, *this->mp_VideosIcon);
+  videosRoot->setFlags(videosRoot->flags() & ~Qt::ItemIsSelectable);
+  items.append(videosRoot);
   // Insert top level items
   this->modelTree->addTopLevelItems(items);
   items.clear();
@@ -341,6 +355,10 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   connect(this->analogScaleSpinBox, SIGNAL(editingFinished()), this, SLOT(editAnalogsScale()));
   connect(this->analogOffsetSpinBox, SIGNAL(editingFinished()), this, SLOT(editAnalogsOffset()));
   connect(this->analogDescEdit, SIGNAL(editingFinished()), this, SLOT(editAnalogsDescription()));
+  connect(this->videoDelaySlider, SIGNAL(valueChanged(int)), this, SLOT(updateVideoDelaySpinBox(int)));
+  connect(this->videoDelaySpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateVideoDelay(double)));
+  connect(this->videoDelaySpinBox, SIGNAL(editingFinished()), this, SLOT(editVideosDelay()));
+  connect(this->videoDelaySlider, SIGNAL(sliderReleased()), this, SLOT(editVideosDelay()));
   
   this->refresh(); // Disable the "Select *" actions in the contextual menu and hide the items in the tree.
   this->displayProperties(); // Disable the other actions in the contextual menu and set the properties widget to the empty page.
@@ -354,6 +372,9 @@ ModelDockWidget::~ModelDockWidget()
   delete this->mp_MarkersIcon;
   delete this->mp_AnalogsIcon;
   delete this->mp_ModelOutputsIcon;
+  delete this->mp_ForcePlatesIcon;
+  delete this->mp_VideosIcon;
+  delete this->mp_VideoErrorIcon;
 };
 
 void ModelDockWidget::setAcquisition(Acquisition* acq)
@@ -375,6 +396,11 @@ void ModelDockWidget::setAcquisition(Acquisition* acq)
   connect(this->mp_Acquisition, SIGNAL(analogsDescriptionChanged(QVector<int>, QVector<QString>)), this, SLOT(setAnalogsDescription(QVector<int>, QVector<QString>)));
   connect(this->mp_Acquisition, SIGNAL(analogsRemoved(QList<int>, QList<Analog*>)), this, SLOT(removeAnalogs(QList<int>, QList<Analog*>)));
   connect(this->mp_Acquisition, SIGNAL(analogsInserted(QList<int>, QList<Analog*>)), this, SLOT(insertAnalogs(QList<int>, QList<Analog*>)));
+  connect(this->mp_Acquisition, SIGNAL(videosRemoved(QList<int>, QList<Video*>)), this, SLOT(removeVideos(QList<int>, QList<Video*>)));
+  connect(this->mp_Acquisition, SIGNAL(videosInserted(QList<int>, QList<Video*>)), this, SLOT(insertVideos(QList<int>, QList<Video*>)));
+  connect(this->mp_Acquisition, SIGNAL(videosImported(QList<int>, QList<Video*>)), this, SLOT(importVideos(QList<int>, QList<Video*>)));
+  connect(this->mp_Acquisition, SIGNAL(videosDelayChanged(QVector<int>, QVector<qint64>)), this, SLOT(setVideosDelay(QVector<int>, QVector<qint64>)));
+  connect(this->mp_Acquisition, SIGNAL(firstFrameChanged(int)), this, SLOT(displayProperties()));
 };
 
 void ModelDockWidget::setModel(Model* m)
@@ -456,6 +482,10 @@ void ModelDockWidget::load()
     forcePlatePositionItem->setData(0, ForcePlateId, 65535+i*3+0);
     forcePlateItem->addChild(forcePlatePositionItem);
   }
+  // - Videos
+  QTreeWidgetItem* videosRoot = this->modelTree->topLevelItem(VideosItem);
+  for (QMap<int, Video*>::const_iterator it = this->mp_Acquisition->videos().begin() ; it != this->mp_Acquisition->videos().end() ; ++it)
+    videosRoot->addChild(this->createVideoItem(it.value()->label, it.key(), it.value()->error));
   // Refresh the tree and these actions
   this->refresh();
   this->modelTree->clearSelection();
@@ -488,15 +518,17 @@ void ModelDockWidget::reset()
 {
   // Clean the tree
   this->modelTree->clearSelection();
-  for (int i = 0 ; i < this->modelTree->topLevelItemCount() - 1 ; ++i)
+  for (int i = 0 ; i < this->modelTree->topLevelItemCount() ; ++i)
   {
+    if (i == ModelOutputsItem)
+      continue;
     QTreeWidgetItem* item = this->modelTree->topLevelItem(i);
     while (item->childCount() > 0)
       delete item->takeChild(0);
     item->setExpanded(false);
   }
   // Special case: model outputs
-  QTreeWidgetItem* item = this->modelTree->topLevelItem(this->modelTree->topLevelItemCount() - 1);
+  QTreeWidgetItem* item = this->modelTree->topLevelItem(ModelOutputsItem);
   for (int i = 0 ; i < item->childCount() ; ++i)
   {
     QTreeWidgetItem* subitem = item->child(i);
@@ -563,6 +595,19 @@ QList<int> ModelDockWidget::tailedMarkers() const
     QTreeWidgetItem* item = markersRoot->child(i);
     if (item->checkState(TrajectoryHeader) == Qt::Checked)
       ids << item->data(0, PointId).toInt();
+  }
+  return ids;
+};
+
+QList<int> ModelDockWidget::selectedVideos() const
+{
+  QList<int> ids;
+  QTreeWidgetItem* videosRoot = this->modelTree->topLevelItem(VideosItem);
+  for (int i = 0 ; i < videosRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* item = videosRoot->child(i);
+    if (item->isSelected())
+      ids << item->data(0, VideoId).toInt();
   }
   return ids;
 };
@@ -1482,13 +1527,14 @@ void ModelDockWidget::selectAllScalars(bool appending)
 void ModelDockWidget::removeSelectedItems()
 {
   QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
-  QList<int> SegmentIds, PointIds, AnalogIds;
+  QList<int> SegmentIds, PointIds, AnalogIds, VideoIds;
   bool platformWarningDisplayed = false;
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
     QVariant sV = (*it)->data(0, SegmentId);
     QVariant pV = (*it)->data(0, PointId);
     QVariant aV = (*it)->data(0, AnalogId);
+    QVariant vV = (*it)->data(0, VideoId);
     if (sV.isValid())
       SegmentIds.push_back(sV.toInt());
     if (pV.isValid())
@@ -1500,6 +1546,8 @@ void ModelDockWidget::removeSelectedItems()
       LOG_WARNING("You cannot delete force platform component, nor force platform itself. These data are computed from the analog channels and some metadata.");
       platformWarningDisplayed = true;
     }
+    else if (vV.isValid())
+      VideoIds.push_back(vV.toInt());
   }
   if (!SegmentIds.isEmpty())
     emit segmentsRemoved(SegmentIds);
@@ -1507,6 +1555,8 @@ void ModelDockWidget::removeSelectedItems()
     emit pointsRemoved(PointIds);
   if (!AnalogIds.isEmpty())
     emit analogsRemoved(AnalogIds);
+  if (!VideoIds.isEmpty())
+    emit videosRemoved(VideoIds);
   this->modelTree->clearSelection();
 };
 
@@ -1719,6 +1769,27 @@ void ModelDockWidget::displayProperties()
     this->analogScaleSpinBox->setValue(uniqueScale ? s : 0.0); if (!uniqueOffset) this->analogScaleSpinBox->clear();
     this->analogOffsetSpinBox->setValue(uniqueOffset ? o : 0); if (!uniqueOffset) this->analogOffsetSpinBox->clear();
     this->propertiesStack->setCurrentWidget(this->analogPage);
+    break;
+    }
+  case VideoType:
+    {
+    int id = items.first()->data(0,VideoId).toInt();
+    this->videoFilenameEdit->setText(multipleSelection ? "" : this->mp_Acquisition->videoFilename(id));
+    bool uniqueDelay = true;
+    qint64 d = this->mp_Acquisition->videoDelay(id);
+    QList<QTreeWidgetItem*>::const_iterator it = items.begin(); ++it;
+    while (it != items.end())
+    {
+      id = (*it)->data(0,VideoId).toInt();
+      if (this->mp_Acquisition->videoDelay(id) != d)
+      {
+        uniqueDelay = false;
+        break;
+      }
+      ++it;
+    }
+    this->videoDelaySpinBox->setValue(uniqueDelay ? static_cast<double>(d) / 1000.0 : 0.0); if (!uniqueDelay) this->videoDelaySpinBox->clear();
+    this->propertiesStack->setCurrentWidget(this->videoPage);
     break;
     }
   default:
@@ -2303,6 +2374,95 @@ void ModelDockWidget::insertAnalogs(const QList<int>& ids, const QList<Analog*>&
   this->refresh();
 };
 
+void ModelDockWidget::editVideosDelay()
+{
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  QVector<int> ids = QVector<int>(items.count());
+  int inc = 0;
+  qint64 delay = static_cast<qint64>(this->videoDelaySpinBox->value() * 1000.0);
+  bool delayModified = false;
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    ids[inc] = (*it)->data(0, VideoId).toInt();
+    if (this->mp_Acquisition->videoDelay(ids[inc]) != delay)
+      delayModified = true;
+    ++inc;
+  }
+  if (delayModified)
+    emit videosDelayChanged(ids, delay);
+};
+
+void ModelDockWidget::setVideosDelay(const QVector<int>& ids, const QVector<qint64>& delays)
+{
+  Q_UNUSED(ids);
+  Q_UNUSED(delays);
+  this->displayProperties();
+};
+
+void ModelDockWidget::updateVideoDelaySpinBox(int d)
+{
+  this->videoDelaySpinBox->setValue(static_cast<double>(d) / 10.0);
+};
+
+void ModelDockWidget::updateVideoDelay(double d)
+{
+  this->videoDelaySlider->blockSignals(true);
+  this->videoDelaySlider->setValue(static_cast<int>(d * 10.0));
+  this->videoDelaySlider->blockSignals(false);
+};
+
+void ModelDockWidget::removeVideos(const QList<int>& ids, const QList<Video*>& videos)
+{
+  Q_UNUSED(videos);
+  this->modelTree->blockSignals(true);
+  bool itemUnselected = false;
+  QTreeWidgetItem* vdeosRoot = this->modelTree->topLevelItem(VideosItem);
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    QTreeWidgetItem* item = vdeosRoot->child(ids[i]);
+    if (item->isSelected())
+    {
+      this->modelTree->setCurrentItem(item, 0, QItemSelectionModel::Deselect);
+      this->modelTree->setCurrentItem(item, 1, QItemSelectionModel::Deselect);
+      this->modelTree->setCurrentItem(item, 2, QItemSelectionModel::Deselect);
+      itemUnselected = true;
+    }
+    item->setHidden(true);
+  }
+  this->modelTree->blockSignals(false);
+  this->refresh();
+  if (itemUnselected)
+  {
+    this->videoFilenameEdit->blockSignals(true);
+    this->videoDelaySpinBox->blockSignals(true);
+    this->displayProperties();
+    this->videoFilenameEdit->blockSignals(false);
+    this->videoDelaySpinBox->blockSignals(false);
+  }
+};
+
+void ModelDockWidget::insertVideos(const QList<int>& ids, const QList<Video*>& videos)
+{
+  Q_UNUSED(videos);
+  QTreeWidgetItem* videosRoot = this->modelTree->topLevelItem(VideosItem);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    videosRoot->child(ids[i])->setHidden(false);
+  this->refresh();
+};
+
+void ModelDockWidget::importVideos(const QList<int>& ids, const QList<Video*>& videos)
+{
+  // Append new videos
+  QTreeWidgetItem* videosRoot = this->modelTree->topLevelItem(VideosItem);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    videosRoot->addChild(this->createVideoItem(videos[i]->label, ids[i], videos[i]->error));
+  // Update the tree
+  if ((videosRoot->childCount() != 0) && this->hasChildVisible(videosRoot))
+    videosRoot->setHidden(false);
+  else
+    videosRoot->setHidden(true);
+};
+
 void ModelDockWidget::changeEvent(QEvent* event)
 {
   if (event->type() == QEvent::EnabledChange)
@@ -2522,6 +2682,16 @@ QTreeWidgetItem* ModelDockWidget::createModelOutputItem(const QString& label, in
   return modelOutputItem;
 };
 
+QTreeWidgetItem* ModelDockWidget::createVideoItem(const QString& label, int id, bool error)
+{
+  QTreeWidgetItem* videoItem = new QTreeWidgetItem(QStringList(label), VideoType);
+  videoItem->setIcon(LabelHeader, !error ? *this->mp_VideosIcon : *this->mp_VideoErrorIcon);
+  videoItem->setData(0, VideoId, id);
+  if (error)
+    videoItem->setForeground(0, Qt::red);
+  return videoItem;
+};
+
 QPixmap ModelDockWidget::createSegmentIcon(const QColor& c) const
 {
   QColor col = c;
@@ -2707,6 +2877,7 @@ void ModelDockWidget::refresh()
   QTreeWidgetItem* modelOutputMoments = modelOutputsRoot->child(2);
   QTreeWidgetItem* modelOutputPowers = modelOutputsRoot->child(3);
   QTreeWidgetItem* modelOutputScalars = modelOutputsRoot->child(4);
+  QTreeWidgetItem* videosRoot = this->modelTree->topLevelItem(VideosItem);
   
   segmentsRoot->setHidden(true);
   markersRoot->setHidden(true);
@@ -2718,6 +2889,7 @@ void ModelDockWidget::refresh()
   modelOutputMoments->setHidden(true);
   modelOutputPowers->setHidden(true);
   modelOutputScalars->setHidden(true);
+  videosRoot->setHidden(true);
   
   if ((segmentsRoot->childCount() != 0) && this->hasChildVisible(segmentsRoot))
   {
@@ -2771,6 +2943,10 @@ void ModelDockWidget::refresh()
     this->mp_SelectAllModelOutputs->setEnabled(true);
     modelOutputScalars->setHidden(false);
     modelOutputsRoot->setHidden(false);
+  }
+  if ((videosRoot->childCount() != 0) && this->hasChildVisible(videosRoot))
+  {
+    videosRoot->setHidden(false);
   }
 };
 

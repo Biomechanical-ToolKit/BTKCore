@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -90,7 +90,7 @@ namespace btk
   bool TRCFileIO::CanReadFile(const std::string& filename)
   {
     std::ifstream ifs(filename.c_str());
-    char c[13];
+    char c[13] = {0};
     ifs.read(c, 12); c[12] = '\0';
     ifs.close();
     if (strcmp(c,"PathFileType") != 0)

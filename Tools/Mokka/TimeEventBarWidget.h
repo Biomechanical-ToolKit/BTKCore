@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -104,7 +104,8 @@ private:
   void updateEventsPosition();
   void updateEventPosition(int id);
   void updateEventGeometry(int idx);
-  void updateEventSelection();
+  void updateEventSelection(const QList<int>& selection);
+  QList<int> extractSelectedEvents() const;
   
   int m_FirstFrame;
   int m_LastFrame;

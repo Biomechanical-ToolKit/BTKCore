@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -102,7 +102,7 @@ namespace btk
   bool ANCFileIO::CanReadFile(const std::string& filename)
   {
     std::ifstream ifs(filename.c_str());
-    char c[42];
+    char c[42] = {0};
     ifs.read(c, 41); c[41] = '\0';
     ifs.close();
     if (strcmp(c, "File_Type:	Analog R/C ASCII	Generation#:	") != 0)

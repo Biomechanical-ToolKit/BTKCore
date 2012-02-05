@@ -796,14 +796,14 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 487);
 
     TS_ASSERT_EQUALS(output->GetEventNumber(), 8);
-    TS_ASSERT_EQUALS(output->GetEvent(0)->GetTime(), (137.0 + 70.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(1)->GetTime(), (137.0 + 166.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(2)->GetTime(), (137.0 + 19.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(3)->GetTime(), (137.0 + 119.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(4)->GetTime(), (137.0 + 32.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(5)->GetTime(), (137.0 + 129.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(6)->GetTime(), (137.0 + 78.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(7)->GetTime(), (137.0 + 177.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(0)->GetTime(), (137.0 + 70.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(1)->GetTime(), (137.0 + 166.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(2)->GetTime(), (137.0 + 19.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(3)->GetTime(), (137.0 + 119.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(4)->GetTime(), (137.0 + 32.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(5)->GetTime(), (137.0 + 129.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(6)->GetTime(), (137.0 + 78.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(7)->GetTime(), (137.0 + 177.0) / 100.0);
     
     TS_ASSERT_EQUALS(output->GetPoint(33)->GetLabel(), "R_HIP_ANGLE");
   };
@@ -829,20 +829,20 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     
     TS_ASSERT_EQUALS(output->GetPointFrequency(), 100.0);
     TS_ASSERT_EQUALS(output->GetAnalogFrequency(), 1000.0);
-    TS_ASSERT_EQUALS(output->GetFirstFrame(), 137);
+    TS_ASSERT_EQUALS(output->GetFirstFrame(), 138);
     TS_ASSERT_EQUALS(output->GetPointNumber(), 84);
     TS_ASSERT_EQUALS(output->GetAnalogNumber(), 28);
-    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 350);
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 349);
 
     TS_ASSERT_EQUALS(output->GetEventNumber(), 8);
-    TS_ASSERT_EQUALS(output->GetEvent(0)->GetTime(), (137.0 + 70.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(1)->GetTime(), (137.0 + 166.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(2)->GetTime(), (137.0 + 19.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(3)->GetTime(), (137.0 + 119.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(4)->GetTime(), (137.0 + 32.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(5)->GetTime(), (137.0 + 129.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(6)->GetTime(), (137.0 + 78.0 - 1.0 - 1.0) / 100.0);
-    TS_ASSERT_EQUALS(output->GetEvent(7)->GetTime(), (137.0 + 177.0 - 1.0 - 1.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(0)->GetTime(), (137.0 + 70.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(1)->GetTime(), (137.0 + 166.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(2)->GetTime(), (137.0 + 19.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(3)->GetTime(), (137.0 + 119.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(4)->GetTime(), (137.0 + 32.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(5)->GetTime(), (137.0 + 129.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(6)->GetTime(), (137.0 + 78.0) / 100.0);
+    TS_ASSERT_EQUALS(output->GetEvent(7)->GetTime(), (137.0 + 177.0) / 100.0);
     
     TS_ASSERT_EQUALS(output->GetPoint(33)->GetLabel(), "R_HIP_ANGLE");
   };

@@ -13,4 +13,4 @@
 %   <a href="matlab:help btkEmulateC3Dserver">btkEmulateC3Dserver</a>  - Creates an emulated COM object for C3Dserver
 %   <a href="matlab:help btkGetVersion">btkGetVersion</a>        - Return the BTK release number
 
-%   Copyright 2009-2011 Biomechanical ToolKit
+%   Copyright 2009-2012 Biomechanical ToolKit

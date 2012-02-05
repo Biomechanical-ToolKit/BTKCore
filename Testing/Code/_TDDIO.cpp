@@ -1,6 +1,8 @@
 #include "_TDDConfigure.h"
 
 #include "BinaryFileStreamTest.h" // Be the first to test the stream
+#include "AMTIForcePlatformFileIOTest.h"
+#include "AMTIForcePlatformFileReaderTest.h"
 #include "ANBFileIOTest.h"
 #include "ANBFileReaderTest.h"
 #include "ANBFileWriterTest.h"
@@ -31,6 +33,8 @@
 #include "RAWFileReaderTest.h"
 #include "RICFileIOTest.h"
 #include "RICFileReaderTest.h"
+#include "TDFFileIOTest.h"
+#include "TDFFileReaderTest.h"
 #include "TRBFileIOTest.h"
 #include "TRBFileReaderTest.h"
 #include "TRCFileIOTest.h"

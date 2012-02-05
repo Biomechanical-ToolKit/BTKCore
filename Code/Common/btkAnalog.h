@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -68,6 +68,8 @@ namespace btk
     BTK_COMMON_EXPORT void SetScale(double s);
     Pointer Clone() const {return Pointer(new Analog(*this));}
     
+    void SetFrame(int frame, double val);
+    
   protected:
     BTK_COMMON_EXPORT Analog(const std::string& label, const std::string& desc);
     BTK_COMMON_EXPORT Analog(const std::string& label, int frameNumber, Gain g = Unknown);
@@ -80,6 +82,11 @@ namespace btk
     Gain m_Gain;
     int m_Offset;
     double m_Scale;
+  };
+  
+  inline void Analog::SetFrame(int frame, double val)
+  {
+    this->m_Values.coeffRef(frame, 0) = val;
   };
 };
 

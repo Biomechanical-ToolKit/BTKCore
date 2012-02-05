@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -465,6 +465,11 @@ namespace btk
     Delete_p(this->m_Format, this->m_Values[idx]);
     this->m_Values[idx] = Convertify_p(this->m_Format, val);
   };
+  
+  /**
+   * @fn bool MetaDataInfo::HasValues() const
+   * Returns if there is or not some data.
+   */
   
   /**
    * @fn const std::vector<std::string>& MetaDataInfo::GetValues() const

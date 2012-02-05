@@ -15,7 +15,7 @@
 #  - C/C++ source files;
 #  - third libraries required.
 
-# Copyright (c) 2009-2011 Arnaud Barré <arnaud.barre@gmail.com>
+# Copyright (c) 2009-2012 Arnaud Barré <arnaud.barre@gmail.com>
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
@@ -27,16 +27,44 @@ ENDIF(OCTAVE_ROOT AND OCTAVE_INCLUDE_DIR AND OCTAVE_LIBRARIES)
 SET(OCTAVE_MEXFILE_EXT mex)
 
 IF(WIN32)
-  FILE(GLOB OCTAVE_PATHS "c:/Octave/*")
+  SET(OCTAVE_PATHS_L1 )
+  SET(OCTAVE_PATHS_L2 )
+  # Level 0
+  FILE(GLOB OCTAVE_PATHS_L0 "c:/Octave*")
+  # Level 1
+  FOREACH(_file_ ${OCTAVE_PATHS_L0})
+    FILE(GLOB OCTAVE_PATHS_TEMP "${_file_}/*")
+    SET(OCTAVE_PATHS_L1 ${OCTAVE_PATHS_L1};${OCTAVE_PATHS_TEMP})
+  ENDFOREACH(_file_ OCTAVE_PATHS_L0)
+  # Level 2
+  FOREACH(_file_ ${OCTAVE_PATHS_L1})
+    FILE(GLOB OCTAVE_PATHS_TEMP "${_file_}/*")
+    SET(OCTAVE_PATHS_L2 ${OCTAVE_PATHS_L2};${OCTAVE_PATHS_TEMP})
+  ENDFOREACH(_file_ OCTAVE_PATHS_L1)
+  # Merge levels
+  SET(OCTAVE_PATHS ${OCTAVE_PATHS_L0} ${OCTAVE_PATHS_L1} ${OCTAVE_PATHS_L2})
+  
   FIND_PATH(OCTAVE_ROOT "bin/octave.exe" ${OCTAVE_PATHS})
+  FIND_PATH(OCTAVE_USE_MINGW32 "bin/mingw32-make.exe" "${OCTAVE_ROOT}/mingw32")
+  
+  IF(MSVC AND OCTAVE_USE_MINGW32)
+    MESSAGE(FATAL_ERROR 
+      "You must use the generator \"MinGW Makefiles\" as the "
+      "version of Octave installed on your computer was compiled "
+      "with MinGW. You should also specify the native compiler "
+      "(GCC, G++ and GFortan) and add the path of MinGW in the "
+      "environment variable PATH. Contact the developers of the "
+      "project for more details")
+  ENDIF(MSVC AND OCTAVE_USE_MINGW32)
   
   FILE(GLOB OCTAVE_INCLUDE_PATHS "${OCTAVE_ROOT}/include/octave-*/octave")
   FILE(GLOB OCTAVE_LIBRARIES_PATHS "${OCTAVE_ROOT}/lib/octave-*")
-
+  
   # LIBOCTINTERP, LIBOCTAVE, LIBCRUFT names
   SET(LIBOCTINTERP "liboctinterp")
   SET(LIBOCTAVE "liboctave")
   SET(LIBCRUFT "libcruft")
+  
 ELSE(WIN32)
   IF(APPLE)
     FILE(GLOB OCTAVE_PATHS "/Applications/Octave*")

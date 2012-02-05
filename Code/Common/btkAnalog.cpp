@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -233,5 +233,10 @@ namespace btk
 
   };
 
+  /**
+   * @fn void Analog::SetFrame(int frame, double val)
+   * Convenient method to set easily the value @a val for the given @a frame.
+   * @warning This function is not safe. There is no cheching to determine if the frame is out of range or not. It has the advantage to be faster.
+   */
 }
 

@@ -15,7 +15,7 @@ function md = btkFindMetaData(h,label,varargin)
 %  By default, BTK, use two stages of metadata representing group and parameters.
 
 %  Author: A. Barré
-%  Copyright 2009-2011 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
 
 if (nargin < 2)
   error('At least two inputs are required.');

@@ -17,6 +17,8 @@
 #include <cxxtest/RealDescriptions.h>
 #include <cxxtest/ErrorPrinter.h>
 
+#define AMTIForcePlatformFilePathIN std::string(TDD_FilePathIN) + "AMTIForcePlatformSamples/"
+#define AMTIForcePlatformFilePathOUT std::string(TDD_FilePathOUT) + "AMTIForcePlatformSamples/"
 #define ANBFilePathIN std::string(TDD_FilePathIN) + "ANBSamples/"
 #define ANBFilePathOUT std::string(TDD_FilePathOUT) + "ANBSamples/"
 #define ANCFilePathIN std::string(TDD_FilePathIN) + "ANCSamples/"
@@ -35,5 +37,7 @@
 #define EliteFilePathOUT std::string(TDD_FilePathOUT) + "EliteSamples/"
 #define EMFFilePathIN std::string(TDD_FilePathIN) + "EMFSamples/"
 #define EMFFilePathOUT std::string(TDD_FilePathOUT) + "EMFSamples/"
+#define TDFFilePathIN std::string(TDD_FilePathIN) + "TDFSamples/"
+#define TDFFilePathOUT std::string(TDD_FilePathOUT) + "TDFSamples/"
 
 #endif // _TDDConfigure_h

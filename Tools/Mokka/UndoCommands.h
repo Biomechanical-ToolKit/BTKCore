@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -495,6 +495,41 @@ private:
   Model* mp_Model;
   QList<int> m_Ids;
   QList<Segment*> m_Segments;
+};
+
+// ----------------------------------------------- //
+//                   VIDEO EDITION                 //
+// ----------------------------------------------- //
+
+// --------------- EditVideosDelay ---------------
+class EditVideosDelay : public AcquisitionUndoCommand
+{
+public:
+  EditVideosDelay(Acquisition* acq, const QVector<int>& ids, qint64 delay, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<qint64> m_Delays;
+  
+  void action();
+};
+
+// --------------- RemoveSegments ---------------
+class RemoveVideos : public AcquisitionUndoCommand
+{
+public:
+  RemoveVideos(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent = 0);
+  ~RemoveVideos();
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  Acquisition* mp_Acquisition;
+  QList<int> m_Ids;
+  QList<Video*> m_Videos;
 };
 
 #endif // UndoCommands_h

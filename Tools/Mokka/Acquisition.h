@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,9 @@
 #include <btkPointCollection.h>
 #include <btkForcePlatformCollection.h>
 #include <btkWrenchCollection.h>
+#include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileIO.h>
+#include <btkAMTIForcePlatformFileIO.h> // Special case for AMTI files
 
 #include <QObject>
 #include <QString>
@@ -87,6 +89,15 @@ struct Event
   int iconId;
 };
 
+struct Video
+{
+  QString label;
+  QString filename;
+  QString path;
+  qint64 delay;
+  bool error;
+};
+
 class Acquisition : public QObject
 {
   Q_OBJECT
@@ -101,6 +112,8 @@ public:
   bool save(const QString& filename, const QMap<int, QVariant>& properties);
   bool exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb);
   bool importFrom(const QStringList& filenames, bool allFramesKept = true);
+  bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions);
+  bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin);
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
@@ -182,6 +195,17 @@ public:
   void insertEvents(const QList<int>& ids, const QList<Event*> events);
   int generateNewEventId();
   
+  const QMap<int, Video*>& videos() const {return this->m_Videos;};
+  const QString& videoLabel(int id) const {return this->m_Videos[id]->label;};
+  const QString& videoFilename(int id) const {return this->m_Videos[id]->filename;};
+  const QString& videoPath(int id) const {return this->m_Videos[id]->path;};
+  qint64 videoDelay(int id) const {return this->m_Videos[id]->delay;};
+  void setVideoDelay(const QVector<int>& ids, const QVector<qint64>& delays);
+  bool videoError(int id) const {return this->m_Videos[id]->error;};
+  QList<Video*> takeVideos(const QList<int>& ids);
+  void insertVideos(const QList<int>& ids, const QList<Video*> videos);
+  void importVideos(const QStringList& paths);
+  
   double timeFromFrame(int frame);
   
 signals:
@@ -208,11 +232,18 @@ signals:
   void eventsModified(const QList<int>& ids, const QList<Event*>& events);
   void eventsRemoved(const QList<int>& ids, const QList<Event*>& events);
   void eventsInserted(const QList<int>& ids, const QList<Event*>& events);
+  void videosRemoved(const QList<int>& ids, const QList<Video*>& videos);
+  void videosInserted(const QList<int>& ids, const QList<Video*>& videos);
+  void videosImported(const QList<int>& ids, const QList<Video*>& videos);
+  void videosDelayChanged(const QVector<int>& ids, const QVector<qint64>& delays);
   
 private:
   void emitGeneratedInformations(btk::AcquisitionFileIO::Pointer io);
   bool write(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb, bool updateInfo = false);
   void loadAcquisition();
+  void extractVideos(const std::vector<std::string>& filename, std::vector<double>& delays, bool completeFilename = true);
+  bool importFrom(const QList<btk::AcquisitionFileReader::Pointer>& readers, bool allFramesKept);
+  bool importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io);
   
   enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
   
@@ -226,6 +257,8 @@ private:
   QMap<int,Analog*> m_Analogs;
   QMap<int,Event*> m_Events;
   int m_LastEventId;
+  QMap<int,Video*> m_Videos;
+  int m_LastVideoId;
   double m_DefaultMarkerRadius;
   QColor m_DefaultMarkerColor;
 };

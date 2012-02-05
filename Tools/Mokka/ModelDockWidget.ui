@@ -13,7 +13,7 @@
   <property name="minimumSize">
    <size>
     <width>232</width>
-    <height>506</height>
+    <height>508</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -274,7 +274,7 @@ QPushButton::flat
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>5</number>
              </property>
              <widget class="QWidget" name="emptyPage"/>
              <widget class="QWidget" name="segmentPage">
@@ -933,6 +933,119 @@ QPushButton::menu-indicator {
                   </size>
                  </property>
                 </spacer>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="videoPage">
+              <layout class="QGridLayout" name="gridLayout_5">
+               <property name="margin">
+                <number>6</number>
+               </property>
+               <item row="1" column="0">
+                <widget class="QLabel" name="videoDelayLabel">
+                 <property name="toolTip">
+                  <string>Negative delay: forward video</string>
+                 </property>
+                 <property name="text">
+                  <string>Delay</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_8">
+                 <property name="spacing">
+                  <number>6</number>
+                 </property>
+                 <item>
+                  <widget class="QSlider" name="videoDelaySlider">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimum">
+                    <number>-50</number>
+                   </property>
+                   <property name="maximum">
+                    <number>50</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>1</number>
+                   </property>
+                   <property name="value">
+                    <number>0</number>
+                   </property>
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QDoubleSpinBox" name="videoDelaySpinBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>50</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>70</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true"/>
+                   </property>
+                   <property name="minimum">
+                    <double>-5.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>5.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="4" column="0">
+                <spacer name="verticalSpacer_6">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Expanding</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="videoFilenameLabel">
+                 <property name="text">
+                  <string>File</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="videoFilenameEdit">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>

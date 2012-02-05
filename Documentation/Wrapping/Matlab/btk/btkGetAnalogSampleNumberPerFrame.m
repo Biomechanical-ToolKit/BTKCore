@@ -7,6 +7,6 @@ function ratio = btkGetAnalogSampleNumberPerFrame(h)
 %  use of a btk* function.
 
 %  Author: A. Barré
-%  Copyright 2009-2011 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
 
 ratio = btkGetAnalogFrameNumber(h) / btkGetPointFrameNumber(h);

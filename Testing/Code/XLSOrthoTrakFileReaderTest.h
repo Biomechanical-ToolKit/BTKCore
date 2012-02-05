@@ -47,20 +47,20 @@ CXXTEST_SUITE(XLSOrthoTrakFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetEvent(0)->GetLabel(), "Foot Strike");
     TS_ASSERT_EQUALS(acq->GetEvent(0)->GetContext(), "Right");
     TS_ASSERT_EQUALS(acq->GetEvent(0)->GetId(), 1);
-    TS_ASSERT_EQUALS(acq->GetEvent(0)->GetFrame(), 137 + 70 - 1);
+    TS_ASSERT_EQUALS(acq->GetEvent(0)->GetFrame(), 137 + 70 + 1);
     TS_ASSERT_EQUALS(acq->GetEvent(0)->GetDetectionFlags(), btk::Event::FromForcePlatform);
-    TS_ASSERT_EQUALS(acq->GetEvent(1)->GetFrame(), 137 + 166 - 1);
+    TS_ASSERT_EQUALS(acq->GetEvent(1)->GetFrame(), 137 + 166 + 1);
     TS_ASSERT_EQUALS(acq->GetEvent(1)->GetLabel(), "Foot Strike");
     TS_ASSERT_EQUALS(acq->GetEvent(1)->GetContext(), "Right");
-    TS_ASSERT_EQUALS(acq->GetEvent(2)->GetFrame(), 137 + 19 - 1);
-    TS_ASSERT_EQUALS(acq->GetEvent(3)->GetFrame(), 137 + 119 - 1);
+    TS_ASSERT_EQUALS(acq->GetEvent(2)->GetFrame(), 137 + 19 + 1);
+    TS_ASSERT_EQUALS(acq->GetEvent(3)->GetFrame(), 137 + 119 + 1);
     TS_ASSERT_EQUALS(acq->GetEvent(3)->GetDetectionFlags(), btk::Event::FromForcePlatform);
-    TS_ASSERT_EQUALS(acq->GetEvent(4)->GetFrame(), 137 + 32 - 1);
-    TS_ASSERT_EQUALS(acq->GetEvent(5)->GetFrame(), 137 + 129 - 1);
+    TS_ASSERT_EQUALS(acq->GetEvent(4)->GetFrame(), 137 + 32 + 1);
+    TS_ASSERT_EQUALS(acq->GetEvent(5)->GetFrame(), 137 + 129 + 1);
     TS_ASSERT_EQUALS(acq->GetEvent(6)->GetLabel(), "Foot Off");
     TS_ASSERT_EQUALS(acq->GetEvent(6)->GetContext(), "Left");
-    TS_ASSERT_EQUALS(acq->GetEvent(6)->GetFrame(), 137 + 78 - 1);
-    TS_ASSERT_EQUALS(acq->GetEvent(7)->GetFrame(), 137 + 177 - 1);
+    TS_ASSERT_EQUALS(acq->GetEvent(6)->GetFrame(), 137 + 78 + 1);
+    TS_ASSERT_EQUALS(acq->GetEvent(7)->GetFrame(), 137 + 177 + 1);
     
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 51);
     TS_ASSERT_EQUALS(acq->GetPoint(0)->GetLabel(), "R_HIP_ANGLE");

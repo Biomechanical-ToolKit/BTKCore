@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -1187,6 +1187,17 @@ namespace btk
       // -= DATA =-
       if (!templateFile)
       {
+        // Check the values for cameras' masks and be sure to have a compatible format
+        bool invalidMaskValue = false;
+        double maxMaskValue = 0.0;
+        for (Acquisition::PointConstIterator itPoint = input->BeginPoint() ; itPoint != input->EndPoint() ; ++itPoint)
+          maxMaskValue = std::max(maxMaskValue, (*itPoint)->GetMasks().maxCoeff());
+        if (maxMaskValue > 128) // max camera mask value
+        {
+          invalidMaskValue = true;
+          btkErrorMacro("Cameras' masks don't fit the format used in the C3D format. Mask for visible marker is replaced by 0 and -1 when occluded.");
+        }
+        
         obfs->SeekWrite(512 * (dS - 1), BinaryFileStream::Begin);
         if (this->m_StorageFormat == Integer) // integer
         {
@@ -1212,7 +1223,7 @@ namespace btk
                             point->GetValues().data()[frame + frameNumber],
                             point->GetValues().data()[frame + 2*frameNumber],
                             point->GetResiduals().data()[frame], 
-                            point->GetMasks().data()[frame],
+                            invalidMaskValue ? ((point->GetMasks().data()[frame] >= 0.0) ? 0.0 : -1.0) : point->GetMasks().data()[frame],
                             this->m_PointScale);
             ++itM;
           }

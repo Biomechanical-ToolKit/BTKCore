@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -152,7 +152,7 @@ private:
   QIcon* mp_NextEventIcon;
   QIcon* mp_NextEventActiveIcon;
   QTimer* mp_Timer;
-  int m_PlaybackStep;
+  double m_PlaybackStep;
   int m_PlaybackDelay;
   bool m_OpenEditorWhenInserting;
 };

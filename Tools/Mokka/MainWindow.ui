@@ -100,6 +100,8 @@
       <property name="title">
        <string>BTS Bioengineering</string>
       </property>
+      <addaction name="actionImportTDF"/>
+      <addaction name="separator"/>
       <addaction name="actionImportRIC"/>
       <addaction name="actionImportRIF"/>
       <addaction name="actionImportRAH"/>
@@ -115,7 +117,10 @@
      <addaction name="actionImportC3D"/>
      <addaction name="menuMotion_Analysis_Corp_2"/>
      <addaction name="menuBTS_Bioengineering"/>
+     <addaction name="actionImportAMTI"/>
      <addaction name="actionImportEMF"/>
+     <addaction name="separator"/>
+     <addaction name="actionImportVideo"/>
     </widget>
     <widget class="QMenu" name="menuExport">
      <property name="title">
@@ -469,6 +474,21 @@
   <action name="actionImportRIF">
    <property name="text">
     <string>RIF file...</string>
+   </property>
+  </action>
+  <action name="actionImportTDF">
+   <property name="text">
+    <string>TDF file...</string>
+   </property>
+  </action>
+  <action name="actionImportVideo">
+   <property name="text">
+    <string>Video files...</string>
+   </property>
+  </action>
+  <action name="actionImportAMTI">
+   <property name="text">
+    <string>AMTI forceplate file...</string>
    </property>
   </action>
  </widget>

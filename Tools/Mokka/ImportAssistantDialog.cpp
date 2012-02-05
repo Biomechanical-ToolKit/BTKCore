@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
 #include <QButtonGroup>
 
 ImportAssistantDialog::ImportAssistantDialog(QWidget* parent)
-: QDialog(parent), m_Directory("")
+: QDialog(parent), m_Directory(""), mp_AMTIFileIOCache()
 {
   this->setupUi(this);
   QButtonGroup* acquisitonRadioButtonGroup = new QButtonGroup(this);
@@ -66,15 +66,24 @@ ImportAssistantDialog::ImportAssistantDialog(QWidget* parent)
   connect(this->eliteAngleButton, SIGNAL(clicked()), this, SLOT(openEliteAngleFileDialog()));
   connect(this->eliteMomentButton, SIGNAL(clicked()), this, SLOT(openEliteMomentFileDialog()));
   connect(this->elitePowerButton, SIGNAL(clicked()), this, SLOT(openElitePowerFileDialog()));
+  connect(this->amtiForceMomentButton, SIGNAL(clicked()), this, SLOT(openAmtiFileDialog()));
+  connect(this->amtiInformationsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setAmtiInformationUsed(int)));
 };
 
 void ImportAssistantDialog::clear(const QString& dir)
 {
   this->m_Directory = dir;
-  this->newAcquisitionRadioButton->setChecked(true);
+  
+  this->acquisitionSystemComboBox->setEnabled(true);
+  this->newAcquisitionRadioButton->setEnabled(true);
+  this->appendAcquisitionRadioButton->setEnabled(true);
+  this->keepAllFrameRadioButton->setEnabled(true);
+  this->keepHighestFirstFrameRadioButton->setEnabled(true);
+
   this->acquisitionSystemComboBox->setCurrentIndex(-1);
+  this->newAcquisitionRadioButton->setChecked(true);
   this->keepAllFrameRadioButton->setChecked(true);
-  this->stackedWidget->setCurrentIndex(0);
+  
   this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
   // Motion page
   this->motionTrajectoryLineEdit->clear();
@@ -88,6 +97,9 @@ void ImportAssistantDialog::clear(const QString& dir)
   this->eliteAngleLineEdit->clear();
   this->eliteMomentLineEdit->clear();
   this->elitePowerLineEdit->clear();
+  // AMTI page
+  this->amtiForceMomentLineEdit->clear();
+  this->amtiForceMomentLineEdit->setReadOnly(false);
 };
 
 QStringList ImportAssistantDialog::filenames() const
@@ -100,7 +112,7 @@ QStringList ImportAssistantDialog::filenames() const
           << this->motionForcePlatformLineEdit->text().split(",", QString::SkipEmptyParts)
           << this->motionOrthoTrakLineEdit->text().split(",", QString::SkipEmptyParts);
   }
-  else // Elite
+  else if (acquisitionSystemComboBox->currentIndex() == 1) // Elite
   {
     files << this->eliteTrajectoryLineEdit->text().split(",", QString::SkipEmptyParts)
           << this->eliteForcePlatformLineEdit->text().split(",", QString::SkipEmptyParts)
@@ -109,13 +121,119 @@ QStringList ImportAssistantDialog::filenames() const
           << this->eliteMomentLineEdit->text().split(",", QString::SkipEmptyParts)
           << this->elitePowerLineEdit->text().split(",", QString::SkipEmptyParts);
   }
+  else // AMTI
+  {
+    files << this->amtiForceMomentLineEdit->text().split(",", QString::SkipEmptyParts);
+  }
   return files;
+};
+
+QList<QVariant> ImportAssistantDialog::amtiDimensions()
+{
+  QList< QVariant> dims;
+  dims << this->amtiWidthSpinBox->value()
+       << this->amtiLengthSpinBox->value()
+       << this->amtiHeightSpinBox->value();
+  return dims;
+};
+
+void ImportAssistantDialog::setAmtiDimensions(const QList<QVariant>& dims)
+{
+  if (dims.isEmpty())
+  {
+    btk::AMTIForcePlatformFileIO::Pointer io = this->amtiFileIOCache();
+    this->amtiWidthSpinBox->setValue(io->GetDimensions()[0]);
+    this->amtiLengthSpinBox->setValue(io->GetDimensions()[1]);
+    this->amtiHeightSpinBox->setValue(io->GetDimensions()[2]);
+  }
+  else
+  {
+    this->amtiWidthSpinBox->setValue(dims[0].toFloat());
+    this->amtiLengthSpinBox->setValue(dims[1].toFloat());
+    this->amtiHeightSpinBox->setValue(dims[2].toFloat());
+  }
+};
+
+QList<QVariant> ImportAssistantDialog::amtiOrigin()
+{
+  QList<QVariant> origin;
+  origin << this->amtiOriginX->value()
+         << this->amtiOriginY->value()
+         << this->amtiOriginZ->value();
+  return origin;
+};
+
+QList<QVariant> ImportAssistantDialog::amtiCorners()
+{
+  QList<QVariant> corners;
+  corners << this->amtiC1X->value()
+          << this->amtiC1Y->value()
+          << this->amtiC1Z->value()
+          << this->amtiC2X->value()
+          << this->amtiC2Y->value()
+          << this->amtiC2Z->value()
+          << this->amtiC3X->value()
+          << this->amtiC3Y->value()
+          << this->amtiC3Z->value()
+          << this->amtiC4X->value()
+          << this->amtiC4Y->value()
+          << this->amtiC4Z->value();
+  return corners;
+};
+
+void ImportAssistantDialog::setAmtiGeometry(const QList<QVariant>& corners, const QList<QVariant>& origin)
+{
+  if (corners.isEmpty())
+  {
+    btk::AMTIForcePlatformFileIO::Pointer io = this->amtiFileIOCache();
+    this->amtiC1X->setValue(io->GetCorners()[0]);
+    this->amtiC1Y->setValue(io->GetCorners()[1]);
+    this->amtiC1Z->setValue(io->GetCorners()[2]);
+    this->amtiC2X->setValue(io->GetCorners()[3]);
+    this->amtiC2Y->setValue(io->GetCorners()[4]);
+    this->amtiC2Z->setValue(io->GetCorners()[5]);
+    this->amtiC3X->setValue(io->GetCorners()[6]);
+    this->amtiC3Y->setValue(io->GetCorners()[7]);
+    this->amtiC3Z->setValue(io->GetCorners()[8]);
+    this->amtiC4X->setValue(io->GetCorners()[9]);
+    this->amtiC4Y->setValue(io->GetCorners()[10]);
+    this->amtiC4Z->setValue(io->GetCorners()[11]);
+  }
+  else
+  {
+    this->amtiC1X->setValue(corners[0].toFloat());
+    this->amtiC1Y->setValue(corners[1].toFloat());
+    this->amtiC1Z->setValue(corners[2].toFloat());
+    this->amtiC2X->setValue(corners[3].toFloat());
+    this->amtiC2Y->setValue(corners[4].toFloat());
+    this->amtiC2Z->setValue(corners[5].toFloat());
+    this->amtiC3X->setValue(corners[6].toFloat());
+    this->amtiC3Y->setValue(corners[7].toFloat());
+    this->amtiC3Z->setValue(corners[8].toFloat());
+    this->amtiC4X->setValue(corners[9].toFloat());
+    this->amtiC4Y->setValue(corners[10].toFloat());
+    this->amtiC4Z->setValue(corners[11].toFloat());
+  }
+  
+  if (origin.isEmpty())
+  {
+    btk::AMTIForcePlatformFileIO::Pointer io = this->amtiFileIOCache();
+    this->amtiOriginX->setValue(io->GetOrigin()[0]);
+    this->amtiOriginY->setValue(io->GetOrigin()[1]);
+    this->amtiOriginZ->setValue(io->GetOrigin()[2]);
+  }
+  else
+  {
+    this->amtiOriginX->setValue(origin[0].toFloat());
+    this->amtiOriginY->setValue(origin[1].toFloat());
+    this->amtiOriginZ->setValue(origin[2].toFloat());
+  }
 };
 
 void ImportAssistantDialog::setAcquisitionSystem(int index)
 {
   this->stackedWidget->setCurrentIndex(index+1);
-  this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+  this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled((index == -1) ? false : true);
 };
 
 void ImportAssistantDialog::openMotionTrajectoryFileDialog()
@@ -175,6 +293,16 @@ void ImportAssistantDialog::openElitePowerFileDialog()
   this->openFileDialog(tr("Joint Power Files (*.pwr)"), this->elitePowerLineEdit);
 };
 
+void ImportAssistantDialog::openAmtiFileDialog()
+{
+  this->openFileDialog(tr("AMTI Force & Moment Files (*.asc)"), this->amtiForceMomentLineEdit);
+};
+
+void ImportAssistantDialog::setAmtiInformationUsed(int index)
+{
+  this->amtiStackedWidget->setCurrentIndex(index);
+};
+
 void ImportAssistantDialog::openFileDialog(const QString& filter, QLineEdit* lineEdit)
 {
   QString filename = QFileDialog::getOpenFileName(this, "",
@@ -185,4 +313,11 @@ void ImportAssistantDialog::openFileDialog(const QString& filter, QLineEdit* lin
     this->m_Directory = QFileInfo(filename).absolutePath();
     lineEdit->setText(filename);
   }
+};
+
+btk::AMTIForcePlatformFileIO::Pointer ImportAssistantDialog::amtiFileIOCache()
+{
+  if (!this->mp_AMTIFileIOCache)
+    this->mp_AMTIFileIOCache = btk::AMTIForcePlatformFileIO::New();
+  return this->mp_AMTIFileIOCache;
 };

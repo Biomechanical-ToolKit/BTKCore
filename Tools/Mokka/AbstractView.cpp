@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,7 @@ AbstractView::AbstractView(QWidget* parent)
   this->separatorFuncButtons->setMinimumHeight(26); 
   this->separatorFuncButtons->setMaximumHeight(26); 
 #endif
+  this->viewCombo->installEventFilter(this);
   
   // Connections
   connect(this->hSplitButton, SIGNAL(clicked()), this, SLOT(splitHorizontally()));
@@ -71,6 +72,15 @@ void AbstractView::setCurrentIndex(int idx)
     this->viewStack->currentWidget()->setFocus(Qt::OtherFocusReason);
     this->finalizeView(idx);
   }
+};
+
+bool AbstractView::eventFilter(QObject *obj, QEvent *event)
+{
+  // Eat the scroll event from the mouse wheel
+  if (event->type() == QEvent::Wheel)
+    return true;
+  else
+    return QObject::eventFilter(obj, event);
 };
 
 void AbstractView::close()

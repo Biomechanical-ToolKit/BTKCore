@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -142,12 +142,8 @@ void AbstractMultiView::split(AbstractView* sender, int direction)
 
 QSplitter* AbstractMultiView::split(AbstractView* sender, int direction, AbstractView** splittedViews)
 {
-  this->setUpdatesEnabled(false);
   AbstractView* sv = this->createView(sender);
-  //sv->viewCombo->blockSignals(true);
   sv->viewCombo->setCurrentIndex(sender->viewCombo->currentIndex());
-  //sv->viewCombo->blockSignals(false);
-  //sv->setFocus(Qt::OtherFocusReason);
   this->m_Views.append(sv);
   
   QSplitter* splitter = 0;
@@ -184,7 +180,6 @@ QSplitter* AbstractMultiView::split(AbstractView* sender, int direction, Abstrac
     static_cast<QSplitter*>(senderParent)->insertWidget(indexOfSender, splitter);
     static_cast<QSplitter*>(senderParent)->setSizes(parentSizes);
   }
-  this->setUpdatesEnabled(true);
   // Focus for the sender
   sender->setFocus(Qt::OtherFocusReason);
   
@@ -193,6 +188,7 @@ QSplitter* AbstractMultiView::split(AbstractView* sender, int direction, Abstrac
     splittedViews[0] = sender;
     splittedViews[1] = sv;
   }
+  
   return splitter;
 };
 

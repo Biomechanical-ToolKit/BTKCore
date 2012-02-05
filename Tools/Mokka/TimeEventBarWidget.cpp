@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -385,7 +385,6 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
     }
     else if (this->m_Mode == MoveEvent)
     {
-      oldEventFrame = this->m_EventItems[this->m_MovingEventIndex].ptr->frame;
       if (event->modifiers() & Qt::ShiftModifier) 
         frame = this->m_EventItems[this->m_MovingEventIndex].ptr->frame + fineShift;
       if (frame < this->m_LeftBoundPos)
@@ -397,8 +396,11 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
       emit eventPositionChanged(frame);
       this->repaint();
     }
-    else if ((this->m_Mode == Rubber) && (event->modifiers() & Qt::ShiftModifier))
-      this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, event->pos()).normalized());
+    else if (this->m_Mode == Rubber)
+    { 
+      if (event->modifiers() & Qt::ShiftModifier)
+        this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, event->pos()).normalized());
+    }
     oldMouseX = event->pos().x();
   }
 };
@@ -420,8 +422,10 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
           this->m_Mode = MoveEvent;
           emit eventAboutToBeMoved(this->m_EventItems[i].ptr->frame);
           this->m_MovingEventIndex = i;
+          oldEventFrame = this->m_EventItems[this->m_MovingEventIndex].ptr->frame;
           this->m_EventItems[i].color = MoveBrushColor;
           this->update();
+          emit sliderPositionChanged(this->m_SliderPos); // To update some widgets which can display event
           break;
         }
       }
@@ -455,12 +459,21 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
     this->m_RubberOrigin = event->pos();
     this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, QSize(1,1)));
     if (!(event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier)))
-    {
       this->m_SelectedEvents.clear();
-      this->updateEventSelection();
-    }
-    if (event->modifiers() & Qt::ShiftModifier)
+    else if (event->modifiers() & Qt::ShiftModifier)
       this->mp_Rubber->show();
+    QList<int> currentSelection = this->m_SelectedEvents;
+    QList<int> selectedEvents = this->extractSelectedEvents();
+    for (int i = 0 ; i < selectedEvents.count() ; ++i)
+    {
+      int idx = currentSelection.indexOf(selectedEvents[i]);
+      if (idx == -1)
+        currentSelection.append(selectedEvents[i]);
+      else
+        currentSelection.removeAt(idx);
+    }
+    this->updateEventSelection(currentSelection);
+    emit sliderPositionChanged(this->m_SliderPos); // To update some widgets which can display event
   }
   else
     this->m_Mode = None;
@@ -474,29 +487,25 @@ void TimeEventBarWidget::mouseReleaseEvent(QMouseEvent* event)
     this->m_EventItems[this->m_MovingEventIndex].ptr->frame = oldEventFrame;
     emit eventMotionFinished(this->m_EventItems[this->m_MovingEventIndex].id, newEventFrame);
     this->m_MovingEventIndex = -1;
-    this->updateEventSelection();
+    this->updateEventSelection(this->m_SelectedEvents);
   }
   else if (this->m_Mode == Rubber)
   {
-    // Point or rectlangle selection?
-    QRectF rubberRect;
-    if (this->mp_Rubber->isVisible())
-      rubberRect = QRectF(this->mp_Rubber->x(), this->mp_Rubber->y(), this->mp_Rubber->rect().width(), this->mp_Rubber->rect().height());
-    else
-      rubberRect = QRectF(event->pos().x(), event->pos().y(), this->mp_Rubber->rect().width(), this->mp_Rubber->rect().height());
-      
-    for (int i = 0 ; i <  this->m_EventItems.count() ; ++i)
+    if (!this->mp_Rubber->isVisible())
     {
-      if (rubberRect.intersects(this->m_EventItems[i].boundingRect))
-      {
-        int idx = this->m_SelectedEvents.indexOf(this->m_EventItems[i].id);
-        if (idx == -1)
-          this->m_SelectedEvents.append(this->m_EventItems[i].id);
-        else
-          this->m_SelectedEvents.removeAt(idx);
-      }
+      this->m_RubberOrigin = event->pos();
+      this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, QSize(1,1)));
     }
-    this->updateEventSelection();
+    QList<int> selectedEvents = this->extractSelectedEvents();
+    for (int i = 0 ; i < selectedEvents.count() ; ++i)
+    {
+      int idx = this->m_SelectedEvents.indexOf(selectedEvents[i]);
+      if (idx == -1)
+        this->m_SelectedEvents.append(selectedEvents[i]);
+      else
+        this->m_SelectedEvents.removeAt(idx);
+    }
+    this->updateEventSelection(this->m_SelectedEvents);
     this->mp_Rubber->hide();
   }
   
@@ -706,11 +715,11 @@ void TimeEventBarWidget::updateEventGeometry(int idx)
   this->m_EventItems[idx].boundingRect.setRect(xPos, yPos, EventSymbolSize, EventRelativePosY);
 };
 
-void TimeEventBarWidget::updateEventSelection()
+void TimeEventBarWidget::updateEventSelection(const QList<int>& selection)
 {
   for (int i = 0 ; i < this->m_EventItems.count() ; ++i)
   {
-    if (this->m_SelectedEvents.contains(this->m_EventItems[i].id))
+    if (selection.contains(this->m_EventItems[i].id))
     {
       if (this->m_EventItems[i].contextId == 0) // Right
         this->m_EventItems[i].color = Qt::green;
@@ -730,5 +739,23 @@ void TimeEventBarWidget::updateEventSelection()
     }
   }
   this->update();
-  emit eventSelectionChanged(this->m_SelectedEvents);
+  emit eventSelectionChanged(selection);
+};
+
+QList<int> TimeEventBarWidget::extractSelectedEvents() const
+{
+  QList<int> selection;
+  QRectF rubberRect;
+  rubberRect = QRectF(this->mp_Rubber->x(), this->mp_Rubber->y(), this->mp_Rubber->rect().width(), this->mp_Rubber->rect().height());
+  for (int i = 0 ; i <  this->m_EventItems.count() ; ++i)
+  {
+    if (rubberRect.intersects(this->m_EventItems[i].boundingRect))
+    {
+      selection.append(this->m_EventItems[i].id);
+      // Point or rectangle selection?
+      if (!this->mp_Rubber->isVisible())
+        break;
+    }
+  }
+  return selection;
 };

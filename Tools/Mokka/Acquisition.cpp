@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,6 @@
 #include "Acquisition.h"
 #include "LoggerMessage.h"
 
-#include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileWriter.h>
 #include <btkMetaDataUtils.h>
 #include <btkMergeAcquisitionFilter.h>
@@ -45,6 +44,8 @@
 #include <QFileInfo>
 #include <QDateTime>
 #include <QVariant>
+#include <QFileInfo>
+#include <QDir>
 
 Acquisition::Acquisition(QObject* parent)
 : QObject(parent), mp_BTKAcquisition(), m_BTKProcesses(), m_Filename(),
@@ -55,6 +56,7 @@ Acquisition::Acquisition(QObject* parent)
   this->mp_ROI[0] = this->m_FirstFrame;
   this->mp_ROI[1] = this->m_LastFrame;
   this->m_LastEventId = -1;
+  this->m_LastVideoId = -1;
   this->m_DefaultMarkerRadius = 8.0; // mm
   
   // BTK PIPELINE
@@ -102,8 +104,8 @@ bool Acquisition::load(const QString& filename)
   }
   this->clear();
   this->mp_BTKAcquisition = reader->GetOutput();
-  this->loadAcquisition();
   this->m_Filename = filename;
+  this->loadAcquisition();
   this->emitGeneratedInformations(reader->GetAcquisitionIO());
   return true;
 };
@@ -148,6 +150,11 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
     LOG_CRITICAL("Unknown error.");
     return false;
   }
+  return this->importFrom(readers, allFramesKept);
+};
+
+bool Acquisition::importFrom(const QList<btk::AcquisitionFileReader::Pointer>& readers, bool allFramesKept)
+{
   // Check if the original acquisition need to be cropped
   if (this->mp_BTKAcquisition)
   {
@@ -181,10 +188,60 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
   QVector<QString> infos(16,"N/A"); infos[0] = "N/A                         ";
   emit informationsChanged(infos);
   return true;
+}
+
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions)
+{
+  btk::AMTIForcePlatformFileIO::Pointer io = btk::AMTIForcePlatformFileIO::New();
+  io->SetDimensions(dimensions[0].toFloat(), dimensions[1].toFloat(), dimensions[2].toFloat());
+  return this->importFromAMTI(filename, allFramesKept, io);
+};
+
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin)
+{
+  std::vector<float> c(12), o(3);
+  for (int i = 0 ; i < 12 ; ++i)
+    c[i] = corners[i].toFloat();
+  for (int i = 0 ; i < 3 ; ++i)
+    o[i] = origin[i].toFloat();
+  btk::AMTIForcePlatformFileIO::Pointer io = btk::AMTIForcePlatformFileIO::New();
+  io->SetGeometry(c,o);
+  return this->importFromAMTI(filename, allFramesKept, io);
+};
+
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io)
+{
+  // Try to read the given file
+  QList<btk::AcquisitionFileReader::Pointer> readers;
+  try
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetAcquisitionIO(io);
+    reader->SetFilename(filename.toStdString());
+    reader->Update();
+    readers << reader;
+  }
+  catch (btk::Exception& e)
+  {
+    LOG_CRITICAL(e.what());
+    return false;
+  }
+  catch (std::exception& e)
+  {
+    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    return false;
+  }
+  catch (...)
+  {
+    LOG_CRITICAL("Unknown error.");
+    return false;
+  }
+  return this->importFrom(readers, allFramesKept);
 };
 
 void Acquisition::clear()
 {
+  this->m_Filename = "";
   for (QMap<int,Point*>::iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
     delete *it;
   this->m_Points.clear();
@@ -194,7 +251,11 @@ void Acquisition::clear()
   for (QMap<int,Event*>::iterator it = this->m_Events.begin() ; it != this->m_Events.end() ; ++it)
     delete *it;
   this->m_Events.clear();
+  for (QMap<int,Video*>::iterator it = this->m_Videos.begin() ; it != this->m_Videos.end() ; ++it)
+    delete *it;
+  this->m_Videos.clear();
   this->m_LastEventId = -1;
+  this->m_LastVideoId = -1;
   this->mp_BTKAcquisition = btk::Acquisition::Pointer(); // NULL
 }
 
@@ -207,6 +268,8 @@ void Acquisition::setFirstFrame(int ff)
   this->mp_ROI[1] -= diff;
   for (QMap<int,Event*>::iterator it = this->m_Events.begin() ; it != this->m_Events.end() ; ++it)
     (*it)->frame -= diff;
+  for (QMap<int,Video*>::iterator it = this->m_Videos.begin() ; it != this->m_Videos.end() ; ++it)
+    (*it)->delay -= static_cast<qint64>(static_cast<double>(diff) / this->pointFrequency() * 1000.0);
   emit firstFrameChanged(ff);
 };
 
@@ -655,6 +718,69 @@ void Acquisition::emitGeneratedInformations(btk::AcquisitionFileIO::Pointer io)
   emit informationsChanged(infos);
 };
 
+void Acquisition::setVideoDelay(const QVector<int>& ids, const QVector<qint64>& delays)
+{
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    QMap<int,Video*>::iterator it = this->m_Videos.find(ids[i]);
+    if (it != this->m_Videos.end())
+      (*it)->delay = delays[i];
+  }
+  emit videosDelayChanged(ids, delays);
+};
+
+QList<Video*> Acquisition::takeVideos(const QList<int>& ids)
+{
+  QList<Video*> videos;
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    QMap<int,Video*>::iterator it = this->m_Videos.find(ids[i]);
+    if (it != this->m_Videos.end())
+    {
+      videos.push_back(*it);
+      this->m_Videos.erase(it);
+    }
+  }
+  emit videosRemoved(ids, videos);
+  return videos;
+};
+
+
+void Acquisition::insertVideos(const QList<int>& ids, const QList<Video*> videos)
+{
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    QMap<int,Video*>::iterator it = this->m_Videos.find(ids[i]);
+    if (it == this->m_Videos.end())
+      this->m_Videos.insert(ids[i], videos[i]);
+    else
+      qDebug("A video with the given ID already exists");
+  }
+  emit videosInserted(ids, videos);
+};
+
+void Acquisition::importVideos(const QStringList& paths)
+{
+  QList<int> ids;
+  QList<Video*> videos;
+  for (QStringList::const_iterator it = paths.begin() ; it != paths.end() ; ++it)
+  {
+    QFileInfo fI = QFileInfo(*it);
+    Video* v = new Video();
+    v->label = fI.completeBaseName();
+    v->filename = fI.fileName();
+    v->path = fI.canonicalPath();
+    v->delay = 0; // ms.
+    v->error = false;
+    int id = ++this->m_LastVideoId;
+    this->m_Videos.insert(id, v);
+    ids << this->m_LastVideoId;
+    videos << v;
+    LOG_INFO(tr("Importing video from file: ") + v->filename);
+  }
+  emit videosImported(ids, videos);
+};
+
 bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb, bool updateInfo)
 {
   btk::Acquisition::Pointer source = this->mp_BTKAcquisition;
@@ -663,6 +789,7 @@ bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
   target->SetFirstFrame(lb);
   target->SetPointFrequency(source->GetPointFrequency());
   target->SetAnalogResolution(source->GetAnalogResolution());
+  target->SetPointUnits(source->GetPointUnits());
   // Event
   btk::EventCollection::Pointer targetEvents = target->GetEvents();
   for (QMap<int,Event*>::const_iterator it = this->m_Events.begin() ; it != this->m_Events.end() ; ++it)
@@ -697,12 +824,47 @@ bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
   strProp = "+X";
   if ((itProp = properties.find(xScreen)) != properties.end())
     strProp = itProp.value().toString();
-  btk::MetaDataCreateChild(point,"X_SCREEN", strProp.toStdString());
+  btk::MetaDataCreateChild(point, "X_SCREEN", strProp.toStdString());
   // - POINT:Y_SCREEN
   strProp = "+Z";
   if ((itProp = properties.find(yScreen)) != properties.end())
     strProp = itProp.value().toString();
-  btk::MetaDataCreateChild(point,"Y_SCREEN", strProp.toStdString());
+  btk::MetaDataCreateChild(point, "Y_SCREEN", strProp.toStdString());
+  // Video
+  std::vector<std::string> movieFilename(this->m_Videos.size());
+  std::vector<std::string> movieId(this->m_Videos.size());
+  std::vector<float> movieDelay(this->m_Videos.size());
+  bool videoCompatibleVicon = true;
+  int inc = 0;
+  QString fileBaseName = QFileInfo(filename).baseName();
+  for (QMap<int,Video*>::const_iterator it = this->m_Videos.begin() ; it != this->m_Videos.end() ; ++it)
+  {
+    Video* v = it.value();
+    movieFilename[inc] = v->filename.toStdString();
+    movieDelay[inc] = v->delay / 1000.0f;
+    if (videoCompatibleVicon)
+    {
+      if (v->filename.startsWith(fileBaseName + "." + v->label))
+        movieId[inc] = v->label.toStdString();
+      else 
+        videoCompatibleVicon = false;
+    }
+    ++inc;
+  }
+  // - POINT:MOVIE_DELAY
+  btk::MetaDataCreateChild(point, "MOVIE_DELAY", movieDelay);
+  // Try first to be compatible with VICON using the metadata POINT:MOVIE_ID...
+  if (videoCompatibleVicon)
+  {
+    btk::MetaDataCreateChild(point, "MOVIE_ID", movieId);
+    point->RemoveChild("MOVIE_FILENAME");
+  }
+  // ... Or if it is not possible, then create the metadata POINT:MOVIE_FILENAME
+  else
+  {
+    btk::MetaDataCreateChild(point, "MOVIE_FILENAME", movieFilename);
+    point->RemoveChild("MOVIE_ID");
+  }
   // Point
   int numFramePoint = rb - lb + 1;
   int numPoints = 0;
@@ -943,4 +1105,103 @@ void Acquisition::loadAcquisition()
     this->m_Events.insert(inc, e);
   }
   this->m_LastEventId = inc;
+  // Video
+  inc = -1;
+  btk::Acquisition::MetaDataConstIterator point, pointMovieId;
+  if ((point = this->mp_BTKAcquisition->GetMetaData()->FindChild("POINT")) != this->mp_BTKAcquisition->EndMetaData())
+  {
+    btk::MetaDataInfo::Pointer pointMovieFilename = (*point)->ExtractChildInfo("MOVIE_FILENAME", btk::MetaDataInfo::Char, 2);
+    btk::MetaDataInfo::Pointer pointMovieDelay = (*point)->ExtractChildInfo("MOVIE_DELAY", btk::MetaDataInfo::Real, 1);
+    btk::MetaDataInfo::Pointer pointMovieId = (*point)->ExtractChildInfo("MOVIE_ID", btk::MetaDataInfo::Char, 2);
+    std::vector<double> movieDelay;
+    if (pointMovieDelay && pointMovieDelay->HasValues())
+      movieDelay = pointMovieDelay->ToDouble();
+    // - Using the camera ID  (not standard - used by Vicon)
+    if (pointMovieId && pointMovieId->HasValues())
+    {
+      std::vector<std::string> movieId = pointMovieId->ToString();
+      if (pointMovieDelay && pointMovieDelay->HasValues())
+        movieDelay = pointMovieDelay->ToDouble();
+      movieDelay.resize(movieId.size(), 0.0);
+      for (std::vector<std::string>::const_iterator it = movieId.begin() ; it != movieId.end() ; ++it)
+      {
+        ++inc;
+        QString str = QString::fromStdString(*it);
+        str = str.trimmed();
+        // Look if the video file exists
+        QFileInfo fI = QFileInfo(this->m_Filename);
+        QString filenamePart = fI.baseName() + "." +  str + ".*";
+        QDir dir = QDir(fI.canonicalPath());
+        QStringList videoList = dir.entryList(QStringList() << filenamePart, QDir::Files | QDir::Readable);
+        QString filename, path;
+        bool error = false;
+        if (videoList.isEmpty())
+        {
+          LOG_WARNING("No video file found with the ID " +  str + ".");
+          filename = fI.baseName() + "." +  str + ".avi"; // Generic filename based on the ID
+          error = true;
+        }
+        else
+        {
+          if (videoList.size() > 1)
+            LOG_WARNING("More than one file was found with this video ID. Only the first one is loaded.");
+          filename = videoList.at(0);
+          path = fI.canonicalPath();
+        }
+        // Set the new video
+        Video* m = new Video();
+        m->label = str;
+        m->filename = filename;
+        m->path = path;
+        m->delay = static_cast<qint64>(movieDelay[inc] * 1000); // ms.
+        m->error = error;
+        this->m_Videos.insert(inc, m);
+      }
+    }
+    // Using the video filename (not standard - proposed by Mokka)
+    else if (pointMovieFilename)
+    {
+      std::vector<std::string> movieFilename = pointMovieFilename->ToString();
+      movieDelay.resize(movieFilename.size(), 0.0);
+      for (std::vector<std::string>::const_iterator it = movieFilename.begin() ; it != movieFilename.end() ; ++it)
+      {
+        ++inc;
+        QString str = QString::fromStdString(*it);
+        str = str.trimmed();
+        // Look if the video file exists
+        QFileInfo fI = QFileInfo(this->m_Filename);
+        QDir dir = QDir(fI.canonicalPath());
+        QStringList videoList = dir.entryList(QStringList() << str, QDir::Files | QDir::Readable);
+        QString filename, path;
+        bool error = false;
+        if (videoList.isEmpty())
+        {
+          LOG_WARNING("No video file found with the name " +  str + ". You need to put the video files in the same folder than the acquisition.");
+          filename = str;
+          error = true;
+        }
+        else
+        {
+          if (videoList.size() > 1)
+            LOG_WARNING("More than one file was found with this video name. Only the first one is loaded.");
+          filename = videoList.at(0);
+          path = fI.canonicalPath();
+        }
+        // Set the new video
+        Video* m = new Video();
+        // - Check if the label comes from a camera ID as set by Vicon. If yes, only set the ID as label.
+        QString label = QFileInfo(filename).completeBaseName();
+        QString fileBaseName = fI.baseName() + "."; // Because the format used by Vicon is <acquisition_basename>.<camera_id>.<video_ext>
+        if (label.startsWith(fileBaseName))
+          label = label.right(label.size() - fileBaseName.size());
+        m->label = label;
+        m->filename = filename;
+        m->path = path;
+        m->delay = static_cast<qint64>(movieDelay[inc] * 1000); // ms.
+        m->error = error;
+        this->m_Videos.insert(inc, m);
+      }
+    }
+  }
+  this->m_LastVideoId = inc;
 };

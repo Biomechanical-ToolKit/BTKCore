@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,8 @@
 #include "btkTRBFileIO.h"
 #include "btkTRCFileIO.h"
 #include "btkXLSOrthoTrakFileIO.h"
+// BTS IO
+#include "btkTDFFileIO.h"
 // Elite IOs
 #include "btkANGFileIO.h"
 #include "btkEMxFileIO.h"
@@ -54,6 +56,7 @@
 #include "btkGRxFileIO.h"
 // Others
 #include "btkEMFFileIO.h"
+#include "btkAMTIForcePlatformFileIO.h"
 
 namespace btk
 {
@@ -104,6 +107,9 @@ namespace btk
       if (io->CanReadFile(filename)) return io;
       io = XLSOrthoTrakFileIO::New();
       if (io->CanReadFile(filename)) return io;
+      // BTS
+      io = TDFFileIO::New();
+      if (io->CanReadFile(filename)) return io;
       // Elite
       io = RAxFileIO::New();
       if (io->CanReadFile(filename)) return io;
@@ -118,6 +124,9 @@ namespace btk
       io = GRxFileIO::New();
       if (io->CanReadFile(filename)) return io;
       io = EMxFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      // AMTI Force platform
+      io = AMTIForcePlatformFileIO::New();
       if (io->CanReadFile(filename)) return io;
       // Others
       io = EMFFileIO::New();

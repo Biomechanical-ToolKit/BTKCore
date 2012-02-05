@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -89,6 +89,7 @@ public slots:
   void importANB();
   void importForcePlatformCAL();
   void importOrthoTrakXLS();
+  void importTDF();
   void importRAH();
   void importRAW();
   void importRIC();
@@ -98,7 +99,9 @@ public slots:
   void importEMG();
   void importMOM();
   void importPWR();
+  void importAMTI();
   void importEMF();
+  void importVideos();
   void exportC3D();
   void exportTRC();
   void exportANB();
@@ -132,6 +135,8 @@ public slots:
   void setSegmentLinks(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
   void removeSegments(const QList<int>& ids);
   void insertSegment(Segment* seg);
+  void setVideosDelay(const QVector<int>& ids, qint64 delay);
+  void removeVideos(const QList<int>& ids);
   // Time event
   void setRegionOfInterest(int lf,int ff);
   void setEventFrame(int id, int frame);
@@ -155,6 +160,7 @@ public slots:
   void setPreferenceAutomaticCheckUpdate(bool isChecked);
   // Others
   void updateSelectedMarkersRadius(double r);
+  void updateSelectedVideosDelay(double d);
   void selectPickedMarker(int id);
   void togglePickedMarker(int id);
   void selectSelectedMarkers(const QList<int>& ids);
@@ -177,7 +183,9 @@ private:
   void saveFile(const QString& filename);
   void exportAcquisition(const QString& filter);
   void importAcquisition(const QString& filter);
-  void importAcquisitions(const QStringList& filenames, bool allFramesKept = true);
+  bool importAcquisitions(const QStringList& filenames, bool allFramesKept = true);
+  void importAssistant(int systemIndex, bool systemLocked = false, bool allFramesKeptOnly = false);
+  bool importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept);
   void reset();
   void setAcquisitionProperties(QMap<int, QVariant>& properties);
   void readSettings(); 

@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -143,6 +143,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ActionSeparatorRecentFiles = this->menuOpen_Recent->addSeparator();
   this->menuOpen_Recent->addAction(this->actionClear_Menu);
   connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
+  this->actionImportVideo->setEnabled(false); // Only enabled when an acquisition is opened or imported.
   this->mp_ActionSeparatorUserLayouts = this->menuLayouts->addSeparator();
   QActionGroup* layoutActionGroup = new QActionGroup(this);
   layoutActionGroup->addAction(this->actionLayout3DOnly);
@@ -233,14 +234,19 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionImportANC, SIGNAL(triggered()), this, SLOT(importANC()));
   connect(this->actionImportCAL, SIGNAL(triggered()), this, SLOT(importForcePlatformCAL()));
   connect(this->actionImportOrthoTrakXLS, SIGNAL(triggered()), this, SLOT(importOrthoTrakXLS()));
+  connect(this->actionImportTDF, SIGNAL(triggered()), this, SLOT(importTDF()));
   connect(this->actionImportRIC, SIGNAL(triggered()), this, SLOT(importRIC()));
   connect(this->actionImportRIF, SIGNAL(triggered()), this, SLOT(importRIF()));
   connect(this->actionImportRAH, SIGNAL(triggered()), this, SLOT(importRAH()));
   connect(this->actionImportRAW, SIGNAL(triggered()), this, SLOT(importRAW()));
   connect(this->actionImportANG, SIGNAL(triggered()), this, SLOT(importANG()));
+  connect(this->actionImportEMG, SIGNAL(triggered()), this, SLOT(importEMG()));
   connect(this->actionImportMOM, SIGNAL(triggered()), this, SLOT(importMOM()));
   connect(this->actionImportPWR, SIGNAL(triggered()), this, SLOT(importPWR()));
   connect(this->actionImportGR, SIGNAL(triggered()), this, SLOT(importGRx()));
+  connect(this->actionImportEMF, SIGNAL(triggered()), this, SLOT(importEMF()));
+  connect(this->actionImportAMTI, SIGNAL(triggered()), this, SLOT(importAMTI()));
+  connect(this->actionImportVideo, SIGNAL(triggered()), this, SLOT(importVideos()));
   connect(this->actionExportC3D, SIGNAL(triggered()), this, SLOT(exportC3D()));
   connect(this->actionExportTRC, SIGNAL(triggered()), this, SLOT(exportTRC()));
   connect(this->actionExportANB, SIGNAL(triggered()), this, SLOT(exportANB()));
@@ -292,6 +298,9 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_ModelDock, SIGNAL(segmentsRemoved(QList<int>)), this, SLOT(removeSegments(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(segmentCreated(Segment*)), this, SLOT(insertSegment(Segment*)));
   connect(this->mp_ModelDock, SIGNAL(segmentHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenSegments(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(videosRemoved(QList<int>)), this, SLOT(removeVideos(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(videosDelayChanged(QVector<int>, qint64)), this, SLOT(setVideosDelay(QVector<int>, qint64)));
+  connect(this->mp_ModelDock->videoDelaySpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateSelectedVideosDelay(double)));
   // Time Event
   connect(this->timeEventControler, SIGNAL(currentFrameChanged(int)), this->multiView, SLOT(updateDisplay(int)));
   connect(this->timeEventControler, SIGNAL(regionOfInterestChanged(int,int)), this, SLOT(setRegionOfInterest(int,int)));
@@ -333,6 +342,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock->analogScaleSpinBox->installEventFilter(this);
   this->mp_ModelDock->analogOffsetSpinBox->installEventFilter(this);
   this->mp_ModelDock->analogDescEdit->installEventFilter(this);
+  this->mp_ModelDock->videoDelaySpinBox->installEventFilter(this);
   
   // Settings
   QCoreApplication::setOrganizationName("BTK");
@@ -414,6 +424,11 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
       this->mp_UndoStack->undo();
     if (keyEvent->matches(QKeySequence::Redo))
       this->mp_UndoStack->redo();
+    else if (keyEvent->key() == Qt::Key_Space)
+    {
+      this->timeEventControler->togglePlayback();
+      return true;
+    }
     return false;
   }
   else if ((event->type() == QEvent::KeyPress) && this->timeEventControler->isEnabled())
@@ -735,7 +750,8 @@ void MainWindow::openFile()
   {
     QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
-                         tr("Acquisition Files (*.anb *.anc *.ang *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *rif *.trb *.trc);;"
+                         tr("Acquisition Files (*.anb *.anc *.ang *.asc *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *rif *tdf *.trb *.trc *.xls);;"
+                            "AMTI Files (*.asc);;"
                             "ANB Files (*.anb);;"
                             "ANC Files (*.anc);;"
                             "ANG Files (*.ang);;"
@@ -749,6 +765,7 @@ void MainWindow::openFile()
                             "RAW Files (*.raw);;"
                             "RIC Files (*.ric);;"
                             "RIF Files (*.rif);;"
+                            "TDF Files (*.tdf);;"
                             "TRB Files (*.trb);;"
                             "TRC Files (*.trc);;"
                             "XLS OrthoTrak Files (*.xls)"));
@@ -766,11 +783,39 @@ void MainWindow::openFileDropped(const QString& filename)
 void MainWindow::openFile(const QString& filename)
 {
   QFileInfo fI(filename);
+  bool specialCaseAMTI = false;
+  
+  // Special case for AMTI file
+  if (fI.suffix().toUpper().compare("ASC") == 0)
+  {
+    specialCaseAMTI = true;
+    this->mp_ModelDock->setEnabled(false);
+    this->mp_ImportAssistant->acquisitionSystemComboBox->setCurrentIndex(this->mp_ImportAssistant->stackedWidget->indexOf(this->mp_ImportAssistant->amtiPage)-1);
+    this->mp_ImportAssistant->acquisitionSystemComboBox->setEnabled(false);
+    this->mp_ImportAssistant->newAcquisitionRadioButton->setChecked(true);
+    this->mp_ImportAssistant->appendAcquisitionRadioButton->setEnabled(false);
+    this->mp_ImportAssistant->keepAllFrameRadioButton->setChecked(true);
+    this->mp_ImportAssistant->keepHighestFirstFrameRadioButton->setEnabled(false);
+    this->mp_ImportAssistant->amtiForceMomentLineEdit->setText(filename);
+    this->mp_ImportAssistant->amtiForceMomentLineEdit->setReadOnly(true);
+    bool accepted = this->mp_ImportAssistant->exec();
+    this->mp_ModelDock->setEnabled(true); // If the dock is not enabled before the import, then its signals are not emited.
+    if (!accepted)
+      return;
+  }
+  
   LOG_INFO(tr("Loading acquisition from file: ") + fI.fileName());
   ProgressWidget pw(this);
   pw.show();
   pw.setProgressValue(10);
-  bool noOpenError = this->mp_Acquisition->load(filename);
+  bool noOpenError = false;
+  if (specialCaseAMTI)
+  {
+    this->mp_Acquisition->clear();
+    noOpenError = this->importAssistantAMTI(filename, this->mp_ImportAssistant->amtiInformationsComboBox->currentIndex(), true);
+  }
+  else
+    noOpenError = this->mp_Acquisition->load(filename);
   this->loadAcquisition(noOpenError, &pw);
   if (noOpenError)
   {
@@ -825,19 +870,32 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionClose->setEnabled(true);
   this->actionViewMetadata->setEnabled(true);
   this->actionSave_As->setEnabled(true);
+  this->actionImportVideo->setEnabled(true);
   this->menuExport->menuAction()->setEnabled(true);
 };
 
 void MainWindow::saveFile()
 {
-  this->saveFile(this->m_RecentFiles.first());
+  if (!this->mp_Acquisition->fileName().isEmpty())
+    this->saveFile(this->m_RecentFiles.first());
+  else
+    this->saveAsFile();
 };
 
 void MainWindow::saveAsFile()
 {
-  QString file = this->m_RecentFiles.first();
-  QString suffix = QFileInfo(file).suffix();
-  QString selectedFilter = suffix.toUpper() + " Files (*." + suffix.toLower() + ")";
+  QString file;
+  if (this->mp_Acquisition->fileName().isEmpty())
+    file = this->m_LastDirectory + "/untitled.c3d";
+  else
+    file = this->m_RecentFiles.first();
+  QString suffix = QFileInfo(file).suffix().toUpper();
+  if ((suffix.compare("C3D") != 0) && (suffix.compare("ANB") != 0) && (suffix.compare("ANC") != 0) && (suffix.compare("TRC") != 0))
+  {
+    file += ".c3d";
+    suffix = "C3D";
+  }
+  QString selectedFilter = suffix + " Files (*." + suffix.toLower() + ")";
   QString filename = QFileDialog::getSaveFileName(this, "",
                        file,
                        tr("ANB Files (*.anb);;"
@@ -846,15 +904,13 @@ void MainWindow::saveAsFile()
                           "TRC Files (*.trc)"),
                        &selectedFilter);
   if (!filename.isEmpty())
-  {
-    this->m_LastDirectory = QFileInfo(filename).absolutePath();
     this->saveFile(filename);
-  }
 };
 
 void MainWindow::saveFile(const QString& filename)
 {
-  LOG_INFO(tr("Saving acquisition to file: ") + QFileInfo(filename).fileName());
+  QFileInfo fI(filename);
+  LOG_INFO(tr("Saving acquisition to file: ") + fI.fileName());
   
   QApplication::setOverrideCursor(Qt::WaitCursor);
   
@@ -876,6 +932,7 @@ void MainWindow::saveFile(const QString& filename)
   this->setCurrentFile(filename);
   QApplication::restoreOverrideCursor();
   this->setWindowModified(false);
+  this->m_LastDirectory = fI.absolutePath();
 };
 
 void MainWindow::closeFile()
@@ -892,17 +949,87 @@ void MainWindow::closeFile()
 
 void MainWindow::importAssistant()
 {
+  this->importAssistant(this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
+}
+
+void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFramesKeptOnly)
+{
   this->mp_ModelDock->setEnabled(false);
   this->mp_ImportAssistant->clear(this->m_LastDirectory);
+  this->mp_ImportAssistant->acquisitionSystemComboBox->setCurrentIndex(systemIndex);
+  this->mp_ImportAssistant->acquisitionSystemComboBox->setEnabled(systemLocked ? false : true);
   this->mp_ImportAssistant->appendAcquisitionRadioButton->setEnabled(this->actionClose->isEnabled());
+  this->mp_ImportAssistant->keepHighestFirstFrameRadioButton->setEnabled(allFramesKeptOnly ? false : true);
   bool accepted = this->mp_ImportAssistant->exec();
   this->mp_ModelDock->setEnabled(true); // If the dock is not enabled before the import, then its signals are not emited.
   if (accepted)
   {
     if (this->mp_ImportAssistant->newAcquisitionRadioButton->isChecked())
       this->mp_Acquisition->clear();
-    this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked());
+    if (this->mp_ImportAssistant->stackedWidget->currentWidget() != this->mp_ImportAssistant->amtiPage)
+    {
+      if (this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked()))
+      {
+        QSettings settings;
+        settings.setValue("ImportAssistant/lastAcquisitionSystem", this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
+      }
+    }
+    else
+    {
+      QStringList filenames = this->mp_ImportAssistant->filenames();
+      if (!filenames.isEmpty())
+      {
+        LOG_INFO(tr("Importing acquisition."));
+        QSettings settings;
+        QString title = this->windowTitle();
+        ProgressWidget pw(this);
+        pw.show();
+        pw.setProgressValue(10);
+        
+        bool allFramesKept = this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked();
+        int infoIndex = this->mp_ImportAssistant->amtiInformationsComboBox->currentIndex();
+        LOG_INFO(tr("Loading acquisition for importation from file: ") + QFileInfo(filenames[0]).fileName());
+        bool noImportError = this->importAssistantAMTI(filenames[0], infoIndex, allFramesKept);
+        
+        this->loadAcquisition(noImportError, &pw);
+        this->setWindowTitle(title);
+        pw.hide();
+        if (!noImportError)
+          return;
+        settings.setValue("ImportAssistant/lastAcquisitionSystem", this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
+        this->setWindowModified(true);
+        this->actionSave->setEnabled(true);
+        this->m_LastDirectory = QFileInfo(filenames.last()).absolutePath();
+      }
+    }
   }
+};
+
+bool MainWindow::importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept)
+{
+  QSettings settings;
+  bool noImportError = false;
+  if (infoIndex == 0)
+  {
+    QList<QVariant> dims = this->mp_ImportAssistant->amtiDimensions();
+    noImportError = this->mp_Acquisition->importFromAMTI(filename, allFramesKept, dims);
+    if (noImportError)
+      settings.setValue("ImportAssistant/AMTIDimensions", dims);
+  }
+  else
+  {
+    QList<QVariant> corners = this->mp_ImportAssistant->amtiCorners();
+    QList<QVariant> origin = this->mp_ImportAssistant->amtiOrigin();
+    noImportError = this->mp_Acquisition->importFromAMTI(filename, allFramesKept, corners, origin);
+    if (noImportError)
+    {
+      settings.setValue("ImportAssistant/AMTICorners", corners);
+      settings.setValue("ImportAssistant/AMTIOrigin", origin);
+    }
+  }
+  if (noImportError)
+    settings.setValue("ImportAssistant/AMTILastInfoUsed", infoIndex);
+  return noImportError;
 };
 
 void MainWindow::importC3D()
@@ -938,6 +1065,11 @@ void MainWindow::importForcePlatformCAL()
 void MainWindow::importOrthoTrakXLS()
 {
   this->importAcquisition(tr("OrthoTrak XLS Files (*.xls)"));
+};
+
+void MainWindow::importTDF()
+{
+  this->importAcquisition(tr("TDF Files (*.tdf)"));
 };
 
 void MainWindow::importRAH()
@@ -992,6 +1124,11 @@ void MainWindow::importPWR()
   this->importAcquisition(tr("PWR Files (*.pwr)"));
 };
 
+void MainWindow::importAMTI()
+{
+  this->importAssistant(this->mp_ImportAssistant->stackedWidget->indexOf(this->mp_ImportAssistant->amtiPage)-1, true, true);
+};
+
 void MainWindow::importEMF()
 {
   this->importAcquisition(tr("EMF Ascension Files (*.emf)"));
@@ -1006,24 +1143,47 @@ void MainWindow::importAcquisition(const QString& filter)
     this->importAcquisitions(QStringList(filename));
 };
 
-void MainWindow::importAcquisitions(const QStringList& filenames, bool allFramesKept)
+bool MainWindow::importAcquisitions(const QStringList& filenames, bool allFramesKept)
 {
-  LOG_INFO(tr("Importing acquisition(s)."));
+  bool noImportError = false;
   if (!filenames.isEmpty())
   {
+    LOG_INFO(tr("Importing acquisition(s)."));
     QString title = this->windowTitle();
     ProgressWidget pw(this);
     pw.show();
     pw.setProgressValue(10);
-    bool noImportError = this->mp_Acquisition->importFrom(filenames, allFramesKept);
+    noImportError = this->mp_Acquisition->importFrom(filenames, allFramesKept);
     this->loadAcquisition(noImportError, &pw);
     this->setWindowTitle(title);
     pw.hide();
-    if (!noImportError)
-      return;
+    if (noImportError)
+    {
+      this->setWindowModified(true);
+      this->actionSave->setEnabled(true);
+      this->m_LastDirectory = QFileInfo(filenames.last()).absolutePath();
+    }
+  }
+  return noImportError;
+}
+
+void MainWindow::importVideos()
+{
+  QStringList filenames = QFileDialog::getOpenFileNames(this, "",
+                            this->m_LastDirectory,
+                            tr("Video Files (*.avi *.mov *.mpeg *.mpg *.ogg *.wmv);;"
+                               "All Files (*);;"
+                               "AVI Files (*.avi);;"
+                               "MOV Files (*.mov);;"
+                               "MPEG Files (*.mpeg *.mpg);;"
+                               "OGG Files (*.ogg);;"
+                               "WMV Files (*.wmv)"));
+  if (!filenames.isEmpty())
+  {
+    this->mp_Acquisition->importVideos(filenames);
     this->setWindowModified(true);
   }
-}
+};
 
 void MainWindow::exportC3D()
 {
@@ -1079,7 +1239,7 @@ void MainWindow::selectAll()
 {
   QWidget* w = QApplication::focusWidget();
   LoggerWidget* logger = qobject_cast<LoggerWidget*>(w);
-  if (w != 0)
+  if (logger != 0)
     logger->selectAll();
 };
 
@@ -1087,7 +1247,7 @@ void MainWindow::copy()
 {
   QWidget* w = QApplication::focusWidget();
   LoggerWidget* logger = qobject_cast<LoggerWidget*>(w);
-  if (w != 0)
+  if (logger != 0)
     logger->copySelectedItemsToClipboard();
 };
 
@@ -1114,6 +1274,7 @@ void MainWindow::exportAcquisition(const QString& filter)
       error.exec();
       return;
     }
+    this->m_LastDirectory = QFileInfo(filename).absolutePath();
     QApplication::restoreOverrideCursor();
   }
 };
@@ -1124,8 +1285,9 @@ void MainWindow::reset()
   this->mp_MarkerConfigurationUndoStack->clear();
   this->actionClose->setEnabled(false);
   this->actionViewMetadata->setEnabled(false);
-  this->actionSave->setEnabled(false); 
+  this->actionSave->setEnabled(false);
   this->actionSave_As->setEnabled(false);
+  this->actionImportVideo->setEnabled(false);
   this->menuExport->menuAction()->setEnabled(false);
   this->setCurrentFile("");
   // Time & Event Controler
@@ -1144,6 +1306,14 @@ void MainWindow::updateSelectedMarkersRadius(double r)
   QList<int> ids = this->mp_ModelDock->selectedMarkers();
   for (int i = 0 ; i < ids.count() ; ++i)
     this->multiView->setMarkerRadius(ids[i], r);
+  this->multiView->updateDisplay();
+};
+
+void MainWindow::updateSelectedVideosDelay(double d)
+{
+  QList<int> ids = this->mp_ModelDock->selectedVideos();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    this->multiView->setVideoDelay(ids[i], d);
   this->multiView->updateDisplay();
 };
 
@@ -1312,6 +1482,16 @@ void MainWindow::removeSegments(const QList<int>& ids)
 void MainWindow::insertSegment(Segment* seg)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new InsertSegment(this->mp_Model, seg)));
+};
+
+void MainWindow::setVideosDelay(const QVector<int>& ids, qint64 delay)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditVideosDelay(this->mp_Acquisition, ids, delay)));
+};
+
+void MainWindow::removeVideos(const QList<int>& ids)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new RemoveVideos(this->mp_Acquisition, ids)));
 };
 
 void MainWindow::setEventFrame(int id, int frame)
@@ -1675,6 +1855,15 @@ void MainWindow::readSettings()
   this->multiView->showForcePlatformIndex(showForcePlatformIndex == 0);
   this->multiView->setForcePlatformColor(defaultForcePlateColor);
   this->multiView->setForceVectorColor(defaultForceVectorColor);
+  
+  // Import assistant
+  settings.beginGroup("ImportAssistant");
+  this->mp_ImportAssistant->acquisitionSystemComboBox->setCurrentIndex(settings.value("lastAcquisitionSystem", -1).toInt());
+  this->mp_ImportAssistant->amtiInformationsComboBox->setCurrentIndex(settings.value("AMTILastInfoUsed", 0).toInt());
+  this->mp_ImportAssistant->setAmtiDimensions(settings.value("AMTIDimensions", QList<QVariant>()).toList());
+  this->mp_ImportAssistant->setAmtiGeometry(settings.value("AMTICorners", QList<QVariant>()).toList(),
+                                            settings.value("AMTIOrigin", QList<QVariant>()).toList());
+  settings.endGroup();
 };
 
 void MainWindow::writeSettings()

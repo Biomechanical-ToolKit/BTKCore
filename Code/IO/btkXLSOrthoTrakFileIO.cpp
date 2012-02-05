@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,7 @@ namespace btk
    *
    * The XLSOrthoTrak file format is created by Motion Analysis Corp.
    *
-   * @warning The events stocked in XLS files are only set by their frame. It is not possible to determine the time associated with it due to the lack of information. You should use the filter btk::GenerateTimeEvent to determine the time of the events.
+   * @warning The events stocked in XLS files are only set by their frame. It is not possible to determine the time associated with it due to the lack of information.
    *
    * @ingroup BTKIO
    */
@@ -145,7 +145,7 @@ namespace btk
       std::string buf;
       std::getline(iss, buf, '\t'); // Starting Frame
       iss >> buf; 
-      output->SetFirstFrame(FromString<int>(buf));
+      output->SetFirstFrame(FromString<int>(buf)+1);
       
       // SPATIOTEMP metadata
       MetaData::Pointer spatiotemp = MetaDataCreateChild(output->GetMetaData(), "SPATIOTEMP");
@@ -438,7 +438,7 @@ namespace btk
     do
     {
       *iss >> frame;
-      output->AppendEvent(Event::New(label, static_cast<int>(frame) + output->GetFirstFrame() - 1, context, Event::Unknown, "", "", id));
+      output->AppendEvent(Event::New(label, static_cast<int>(frame) + output->GetFirstFrame(), context, Event::Unknown, "", "", id));
     }
     while(!iss->eof());
   };
@@ -457,7 +457,7 @@ namespace btk
       {
         if (((*it)->GetLabel().compare(label) == 0) 
             && ((*it)->GetContext().compare(context) == 0)
-            && ((*it)->GetFrame() == static_cast<int>(frame + output->GetFirstFrame() - 1)))
+            && ((*it)->GetFrame() == static_cast<int>(frame) + output->GetFirstFrame()))
         {
           (*it)->SetDetectionFlags(Event::FromForcePlatform);
           break;

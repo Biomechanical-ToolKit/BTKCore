@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -242,7 +242,7 @@ namespace btk
    */
   char BinaryFileStream::ReadChar()
   {
-    char byteptr[1];
+    char byteptr[1] = {0};
     this->mp_Stream->read(byteptr, 1);
     return *byteptr;
   };
@@ -266,7 +266,7 @@ namespace btk
    */
   int8_t BinaryFileStream::ReadI8()
   {
-    char byteptr[1];
+    char byteptr[1] = {0};
     this->mp_Stream->read(byteptr, 1);
     return *byteptr;
   };
@@ -290,7 +290,7 @@ namespace btk
    */
   uint8_t BinaryFileStream::ReadU8()
   {
-    char byteptr[1];
+    char byteptr[1] = {0};
     this->mp_Stream->read(byteptr, 1);
     return *byteptr;
   };
@@ -345,6 +345,44 @@ namespace btk
       vU16Fs[inc++] = this->ReadU16();
     }
     return vU16Fs;
+  };
+  
+  /** 
+   * @fn int32_t BinaryFileStream::ReadI32() = 0
+   * Extracts one signed 32-bit integer.
+   */
+  
+  /** 
+   * Extracts @a nb signed 32-bit integers and return them as a vector.
+   */
+  const std::vector<int32_t> BinaryFileStream::ReadI32(size_t nb)
+  {
+    size_t inc = 0;
+    std::vector<int32_t> vI32Fs = std::vector<int32_t>(nb,0);
+    while (inc < nb)
+    {
+      vI32Fs[inc++] = this->ReadI32();
+    }
+    return vI32Fs;
+  };
+  
+  /** 
+   * @fn uint32_t BinaryFileStream::ReadU32() = 0
+   * Extracts one unsigned 32-bit integer.
+   */
+  
+  /** 
+   * Extracts @a nb unsigned 32-bit integers and return them as a vector.
+   */
+  const std::vector<uint32_t> BinaryFileStream::ReadU32(size_t nb)
+  {
+    size_t inc = 0;
+    std::vector<uint32_t> vU32Fs = std::vector<uint32_t>(nb,0);
+    while (inc < nb)
+    {
+      vU32Fs[inc++] = this->ReadU32();
+    }
+    return vU32Fs;
   };
   
   /** 
@@ -604,7 +642,7 @@ namespace btk
    */
   int16_t VAXLittleEndianBinaryFileStream::ReadI16()
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
@@ -619,7 +657,7 @@ namespace btk
    */
   uint16_t VAXLittleEndianBinaryFileStream::ReadU16()
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
@@ -630,11 +668,47 @@ namespace btk
   };
   
   /** 
+   * Extracts one signed 32-bit integer.
+   */
+  int32_t VAXLittleEndianBinaryFileStream::ReadI32()
+  {
+    char byteptr[4] = {0};
+    this->mp_Stream->read(byteptr, 4);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[4] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2]};
+    return *reinterpret_cast<int32_t const*>(foo);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    return *reinterpret_cast<int32_t const*>(byteptr);
+#else
+    char foo[4] = {byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    return *reinterpret_cast<int32_t const*>(foo);
+#endif
+  };
+
+  /** 
+   * Extracts one unsigned 32-bit integer.
+   */
+  uint32_t VAXLittleEndianBinaryFileStream::ReadU32()
+  {
+    char byteptr[4] = {0};
+    this->mp_Stream->read(byteptr, 4);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[4] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2]};
+    return *reinterpret_cast<uint32_t const*>(foo);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    return *reinterpret_cast<uint32_t const*>(byteptr);
+#else
+    char foo[4] = {byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    return *reinterpret_cast<uint32_t const*>(foo);
+#endif
+  };
+  
+  /** 
    * Extracts one float.
    */
   float VAXLittleEndianBinaryFileStream::ReadFloat()
   {
-    char byteptr[4];
+    char byteptr[4] = {0};
     this->mp_Stream->read(byteptr, 4);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[4] = {byteptr[1] - 1 * (byteptr[1] == 0 ? 0 : 1), byteptr[0], byteptr[3], byteptr[2]};
@@ -652,7 +726,7 @@ namespace btk
    */
   double VAXLittleEndianBinaryFileStream::ReadDouble()
   {
-    char byteptr[8];
+    char byteptr[8] = {0};
     this->mp_Stream->read(byteptr, 8);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[8] = {byteptr[1] - 1 * (byteptr[1] == 0 ? 0 : 1), byteptr[0], byteptr[3], byteptr[2], byteptr[5], byteptr[4], byteptr[7], byteptr[6]};
@@ -670,7 +744,7 @@ namespace btk
    */
   size_t VAXLittleEndianBinaryFileStream::Write(int16_t i16)
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     memcpy(&byteptr, &i16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
@@ -686,7 +760,7 @@ namespace btk
    */
   size_t VAXLittleEndianBinaryFileStream::Write(uint16_t u16)
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     memcpy(&byteptr, &u16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
@@ -702,7 +776,7 @@ namespace btk
    */
   size_t VAXLittleEndianBinaryFileStream::Write(float f)
   {
-    char byteptr[4];
+    char byteptr[4] = {0};
     memcpy(&byteptr, &f, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[4] = {byteptr[1], byteptr[0] + 1 * (byteptr[0] == 0 ? 0 : 1),  byteptr[3], byteptr[2]};
@@ -742,7 +816,7 @@ namespace btk
    */
   int16_t IEEEBigEndianBinaryFileStream::ReadI16()
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     return *reinterpret_cast<int16_t const*>(byteptr);
@@ -757,7 +831,7 @@ namespace btk
    */
   uint16_t IEEEBigEndianBinaryFileStream::ReadU16()
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     return *reinterpret_cast<uint16_t const*>(byteptr);
@@ -768,11 +842,47 @@ namespace btk
   };
   
   /** 
+   * Extracts one signed 32-bit integer.
+   */
+  int32_t IEEEBigEndianBinaryFileStream::ReadI32()
+  {
+    char byteptr[4] = {0};
+    this->mp_Stream->read(byteptr, 4);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    return *reinterpret_cast<int32_t const*>(byteptr);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    char foo[4] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2]};
+    return *reinterpret_cast<int32_t const*>(foo);
+#else
+    char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<int32_t const*>(foo);
+#endif
+  };
+  
+  /** 
+   * Extracts one unsigned 32-bit integer.
+   */
+  uint32_t IEEEBigEndianBinaryFileStream::ReadU32()
+  {
+    char byteptr[4] = {0};
+    this->mp_Stream->read(byteptr, 4);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    return *reinterpret_cast<uint32_t const*>(byteptr);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    char foo[4] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2]};
+    return *reinterpret_cast<uint32_t const*>(foo);
+#else
+    char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<uint32_t const*>(foo);
+#endif
+  };
+  
+  /** 
    * Extracts one float.
    */
   float IEEEBigEndianBinaryFileStream::ReadFloat()
   {
-    char byteptr[4];
+    char byteptr[4] = {0};
     this->mp_Stream->read(byteptr, 4);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     return *reinterpret_cast<float const*>(byteptr);
@@ -790,7 +900,7 @@ namespace btk
    */
   double IEEEBigEndianBinaryFileStream::ReadDouble()
   {
-    char byteptr[8];
+    char byteptr[8] = {0};
     this->mp_Stream->read(byteptr, 8);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     return *reinterpret_cast<double const*>(byteptr);
@@ -808,7 +918,7 @@ namespace btk
    */
   size_t IEEEBigEndianBinaryFileStream::Write(int16_t i16)
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     memcpy(&byteptr, &i16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     this->mp_Stream->write(byteptr, 2); 
@@ -824,7 +934,7 @@ namespace btk
    */
   size_t IEEEBigEndianBinaryFileStream::Write(uint16_t u16)
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     memcpy(&byteptr, &u16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     this->mp_Stream->write(byteptr, 2); 
@@ -840,7 +950,7 @@ namespace btk
    */
   size_t IEEEBigEndianBinaryFileStream::Write(float f)
   {
-    char byteptr[4];
+    char byteptr[4] = {0};
     memcpy(&byteptr, &f, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     this->mp_Stream->write(byteptr, 4);
@@ -880,7 +990,7 @@ namespace btk
    */
   int16_t IEEELittleEndianBinaryFileStream::ReadI16()
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
@@ -895,7 +1005,7 @@ namespace btk
    */
   uint16_t IEEELittleEndianBinaryFileStream::ReadU16()
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     this->mp_Stream->read(byteptr, 2);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
@@ -906,11 +1016,49 @@ namespace btk
   };
   
   /** 
+   * Extracts one signed 32-bit integer.
+   */
+  int32_t IEEELittleEndianBinaryFileStream::ReadI32()
+  {
+    char byteptr[4] = {0};
+    this->mp_Stream->read(byteptr, 4);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<int32_t const*>(foo);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */ 
+    char foo[4] = {byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    return *reinterpret_cast<int32_t const*>(foo);
+#else
+    return *reinterpret_cast<int32_t const*>(byteptr);
+#endif
+  };
+
+
+  /** 
+   * Extracts one unsigned 32-bit integer.
+   */
+  uint32_t IEEELittleEndianBinaryFileStream::ReadU32()
+  {
+    char byteptr[4] = {0};
+    this->mp_Stream->read(byteptr, 4);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<uint32_t const*>(foo);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */ 
+    char foo[4] = {byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    return *reinterpret_cast<uint32_t const*>(foo);
+#else
+    return *reinterpret_cast<uint32_t const*>(byteptr);
+#endif
+  };
+
+
+  /** 
    * Extracts one float.
    */
   float IEEELittleEndianBinaryFileStream::ReadFloat()
   {
-    char byteptr[4];
+    char byteptr[4] = {0};
     this->mp_Stream->read(byteptr, 4);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
@@ -928,7 +1076,7 @@ namespace btk
    */
   double IEEELittleEndianBinaryFileStream::ReadDouble()
   {
-    char byteptr[8];
+    char byteptr[8] = {0};
     this->mp_Stream->read(byteptr, 8);
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[8] = {byteptr[7], byteptr[6], byteptr[5], byteptr[4], byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
@@ -946,7 +1094,7 @@ namespace btk
    */
   size_t IEEELittleEndianBinaryFileStream::Write(int16_t i16)
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     memcpy(&byteptr, &i16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
@@ -962,7 +1110,7 @@ namespace btk
    */
   size_t IEEELittleEndianBinaryFileStream::Write(uint16_t u16)
   {
-    char byteptr[2];
+    char byteptr[2] = {0};
     memcpy(&byteptr, &u16, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[2] = {byteptr[1], byteptr[0]};
@@ -979,7 +1127,7 @@ namespace btk
    */
   size_t IEEELittleEndianBinaryFileStream::Write(float f)
   {
-    char byteptr[4];
+    char byteptr[4] = {0};
     memcpy(&byteptr, &f, sizeof(byteptr));
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
     char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};

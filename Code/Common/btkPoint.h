@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -56,6 +56,8 @@ namespace btk
     
     virtual ~Point() {};
     
+    void SetFrame(int frame, double x, double y, double z, double res = 0.0, double mask = 0.0);
+    
     Residuals& GetResiduals() {return this->m_Residuals;};
     const Residuals& GetResiduals() const {return this->m_Residuals;};
     BTK_COMMON_EXPORT void SetResiduals(const Residuals& r);
@@ -78,6 +80,15 @@ namespace btk
     Residuals m_Residuals;
     Masks m_Masks;
     Type m_Type;
+  };
+  
+  inline void Point::SetFrame(int frame, double x, double y, double z, double res, double mask)
+  {
+    this->m_Values.coeffRef(frame,0) = x;
+    this->m_Values.coeffRef(frame,1) = y;
+    this->m_Values.coeffRef(frame,2) = z; 
+    this->m_Residuals.coeffRef(frame) = res;
+    this->m_Masks.coeffRef(frame) = mask;
   };
 };
 
