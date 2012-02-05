@@ -5,6 +5,7 @@ SET(BTKIO_SRCS
   btkAcquisitionFileWriter.cpp
   btkBinaryFileStream.cpp
   # File formats
+  btkAMTIForcePlatformFileIO.cpp
   btkANBFileIO.cpp
   btkANCFileIO.cpp
   btkANGFileIO.cpp

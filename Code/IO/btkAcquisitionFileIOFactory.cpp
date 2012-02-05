@@ -56,6 +56,7 @@
 #include "btkGRxFileIO.h"
 // Others
 #include "btkEMFFileIO.h"
+#include "btkAMTIForcePlatformFileIO.h"
 
 namespace btk
 {
@@ -123,6 +124,9 @@ namespace btk
       io = GRxFileIO::New();
       if (io->CanReadFile(filename)) return io;
       io = EMxFileIO::New();
+      if (io->CanReadFile(filename)) return io;
+      // AMTI Force platform
+      io = AMTIForcePlatformFileIO::New();
       if (io->CanReadFile(filename)) return io;
       // Others
       io = EMFFileIO::New();
