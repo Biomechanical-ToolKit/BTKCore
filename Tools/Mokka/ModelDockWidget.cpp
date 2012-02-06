@@ -517,7 +517,9 @@ void ModelDockWidget::load()
 void ModelDockWidget::reset()
 {
   // Clean the tree
+  this->modelTree->blockSignals(true);
   this->modelTree->clearSelection();
+  this->modelTree->blockSignals(false);
   for (int i = 0 ; i < this->modelTree->topLevelItemCount() ; ++i)
   {
     if (i == ModelOutputsItem)

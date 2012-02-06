@@ -1295,15 +1295,15 @@ void MainWindow::reset()
   this->actionImportVideo->setEnabled(false);
   this->menuExport->menuAction()->setEnabled(false);
   this->setCurrentFile("");
-  // Time & Event Controler
-  this->timeEventControler->reset();
-  this->timeEventControler->setEnabled(false);
   // Model dock
   this->mp_ModelDock->reset();
   // Metadata
   this->mp_MetadataDlg->reset();
   // Multivew
   this->multiView->clear();
+  // Time & Event Controler
+  this->timeEventControler->reset();
+  this->timeEventControler->setEnabled(false);
 };
 
 void MainWindow::updateSelectedMarkersRadius(double r)

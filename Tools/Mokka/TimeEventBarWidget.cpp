@@ -203,12 +203,11 @@ void TimeEventBarWidget::setSliderValue(int frame)
   this->m_SliderPos = frame;
   this->updateSliderPostion();
   emit sliderPositionChanged(this->m_SliderPos);
-  this->update();
+  this->repaint();
 };
 
 void TimeEventBarWidget::paintEvent(QPaintEvent* event)
 {
-
   QPainter painter(this);
   
   // --------------------- Timeline ---------------------
@@ -240,7 +239,7 @@ void TimeEventBarWidget::paintEvent(QPaintEvent* event)
     int tickInc = 1;
     while (incST < numFrames)
     {
-      if (abs(this->m_Ticks[tickInc] - incST) <= dd / 2) // Final adjustment for the ticks
+      if ((tickInc < this->m_Ticks.size()) && (abs(this->m_Ticks[tickInc] - incST) <= dd / 2)) // Final adjustment for the ticks
       {
         painter.drawLine(LeftMargin + incST * this->m_UnitStep, tStep, LeftMargin + incST * this->m_UnitStep, tStep - 6);
         ++tickInc;
