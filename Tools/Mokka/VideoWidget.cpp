@@ -44,6 +44,7 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QApplication>
+#include <QDir>
 
 VideoWidget::VideoWidget(QWidget* parent)
 : QWidget(parent), mp_CurrentFrameFunctor()
@@ -93,8 +94,8 @@ void VideoWidget::show(bool s)
 {
   if (!s) // Hidden
   {
-    this->mp_MediaPlayer->setMedia(QMediaContent()); // Remove the current media
     this->mp_VideoWidget->setVisible(false);
+    this->mp_MediaPlayer->setMedia(QMediaContent()); // Remove the current media
   }
 };
 
@@ -142,7 +143,12 @@ void VideoWidget::dropEvent(QDropEvent* event)
   QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(event->source());
   QTreeWidgetItem* video = treeWidget->selectedItems().at(0);
   int id = video->data(0,VideoId).toInt();
+#ifdef Q_OS_WIN
+  // The use of the strings "file://" and QDir::toNativeSeparators(...) is required under Windows to generate valid UNC path (e.g. //server/test/video.avi)
+  QUrl videoFileUrl = QUrl::fromLocalFile("file://" + QDir::toNativeSeparators(this->mp_Acquisition->videoPath(id) + "/" + this->mp_Acquisition->videoFilename(id)));
+#else
   QUrl videoFileUrl = QUrl::fromLocalFile(this->mp_Acquisition->videoPath(id) + "/" + this->mp_Acquisition->videoFilename(id));
+#endif
   if (this->mp_MediaPlayer->media().canonicalUrl() == videoFileUrl) // same file?
   {
     this->mp_VideoWidget->setVisible(true);
