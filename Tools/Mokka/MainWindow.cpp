@@ -798,6 +798,9 @@ void MainWindow::openFile(const QString& filename)
     this->mp_ImportAssistant->keepHighestFirstFrameRadioButton->setEnabled(false);
     this->mp_ImportAssistant->amtiForceMomentLineEdit->setText(filename);
     this->mp_ImportAssistant->amtiForceMomentLineEdit->setReadOnly(true);
+    this->mp_ImportAssistant->amtiForceMomentButton->setEnabled(false);
+    this->mp_ImportAssistant->importOptionFrame->setVisible(false);
+    this->mp_ImportAssistant->setWindowTitle("");
     bool accepted = this->mp_ImportAssistant->exec();
     this->mp_ModelDock->setEnabled(true); // If the dock is not enabled before the import, then its signals are not emited.
     if (!accepted)
@@ -949,13 +952,13 @@ void MainWindow::closeFile()
 
 void MainWindow::importAssistant()
 {
+  this->mp_ImportAssistant->clear(this->m_LastDirectory);
   this->importAssistant(this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
 }
 
 void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFramesKeptOnly)
 {
   this->mp_ModelDock->setEnabled(false);
-  this->mp_ImportAssistant->clear(this->m_LastDirectory);
   this->mp_ImportAssistant->acquisitionSystemComboBox->setCurrentIndex(systemIndex);
   this->mp_ImportAssistant->acquisitionSystemComboBox->setEnabled(systemLocked ? false : true);
   this->mp_ImportAssistant->appendAcquisitionRadioButton->setEnabled(this->actionClose->isEnabled());
@@ -1126,6 +1129,8 @@ void MainWindow::importPWR()
 
 void MainWindow::importAMTI()
 {
+  this->mp_ImportAssistant->clear(this->m_LastDirectory);
+  this->mp_ImportAssistant->importOptionFrame->setVisible(false);
   this->importAssistant(this->mp_ImportAssistant->stackedWidget->indexOf(this->mp_ImportAssistant->amtiPage)-1, true, true);
 };
 

@@ -74,6 +74,8 @@ void ImportAssistantDialog::clear(const QString& dir)
 {
   this->m_Directory = dir;
   
+  this->setWindowTitle(tr("Assistant"));
+  
   this->acquisitionSystemComboBox->setEnabled(true);
   this->newAcquisitionRadioButton->setEnabled(true);
   this->appendAcquisitionRadioButton->setEnabled(true);
@@ -83,6 +85,8 @@ void ImportAssistantDialog::clear(const QString& dir)
   this->acquisitionSystemComboBox->setCurrentIndex(-1);
   this->newAcquisitionRadioButton->setChecked(true);
   this->keepAllFrameRadioButton->setChecked(true);
+  
+  this->importOptionFrame->setVisible(true);
   
   this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
   // Motion page
@@ -100,6 +104,7 @@ void ImportAssistantDialog::clear(const QString& dir)
   // AMTI page
   this->amtiForceMomentLineEdit->clear();
   this->amtiForceMomentLineEdit->setReadOnly(false);
+  this->amtiForceMomentButton->setEnabled(true);
 };
 
 QStringList ImportAssistantDialog::filenames() const
