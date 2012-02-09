@@ -48,7 +48,7 @@
 //                             AcquisitionFileIO                             //
 // ------------------------------------------------------------------------- //
 
-%include "btkIOSwig_AcquisitionFile.h"
+%include "IO/btkIOSwig_AcquisitionFile.h"
 
 BTK_SWIG_DECLARE_IMPL_CLASS(AcquisitionFileIO)
 {

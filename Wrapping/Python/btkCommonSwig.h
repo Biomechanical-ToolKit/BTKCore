@@ -55,12 +55,12 @@
 #include <btkMetaDataUtils.h>
 #include <btkAcquisition.h>
 
-#include "btkCommonSwig_Event.h"
-#include "btkCommonSwig_Analog.h"
-#include "btkCommonSwig_Point.h"
-#include "btkCommonSwig_ForcePlatform.h"
-#include "btkCommonSwig_Collection.h"
-#include "btkCommonSwig_MetaData.h"
-#include "btkCommonSwig_Acquisition.h"
+#include "Common/btkCommonSwig_Event.h"
+#include "Common/btkCommonSwig_Analog.h"
+#include "Common/btkCommonSwig_Point.h"
+#include "Common/btkCommonSwig_ForcePlatform.h"
+#include "Common/btkCommonSwig_Collection.h"
+#include "Common/btkCommonSwig_MetaData.h"
+#include "Common/btkCommonSwig_Acquisition.h"
 
 #endif // btkCommonSwig_h

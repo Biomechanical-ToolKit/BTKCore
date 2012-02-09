@@ -65,6 +65,6 @@
 // - Others
 #include "btkEMFFileIO.h"
 
-#include "btkIOSwig_AcquisitionFile.h"
+#include "IO/btkIOSwig_AcquisitionFile.h"
 
 #endif // btkIOSwig_h

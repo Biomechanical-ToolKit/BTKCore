@@ -52,7 +52,7 @@
 //                                    Event                                  //
 // ------------------------------------------------------------------------- //
 
-%include "btkCommonSwig_Event.h"
+%include "Common/btkCommonSwig_Event.h"
 
 BTK_SWIG_DECLARE_IMPL_CLASS(Event)
 {
@@ -77,7 +77,7 @@ protected:
 
 %eigen_typemaps(btk::Analog::Values)
 
-%include "btkCommonSwig_Analog.h"
+%include "Common/btkCommonSwig_Analog.h"
 
 BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Analog, Value);
 BTK_SWIG_DECLARE_IMPL_CLASS(Analog)
@@ -104,7 +104,7 @@ protected:
 %eigen_typemaps(btk::Point::Residuals)
 %eigen_typemaps(btk::Point::Masks)
 
-%include "btkCommonSwig_Point.h"
+%include "Common/btkCommonSwig_Point.h"
 
 BTK_SWIG_EXTEND_CLASS_GETSET_MATRIX(Point, Value);
 BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Point, Residual);
@@ -133,7 +133,7 @@ protected:
 %eigen_typemaps(btk::ForcePlatform::Origin)
 %eigen_typemaps(btk::ForcePlatform::CalMatrix)
 
-%include "btkCommonSwig_ForcePlatform.h"
+%include "Common/btkCommonSwig_ForcePlatform.h"
 
 BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatform)
 {
@@ -180,7 +180,7 @@ BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType6) : public btkForcePlatform_impl
 //                                  Collection                               //
 // ------------------------------------------------------------------------- //
 
-%include "btkCommonSwig_Collection.h"
+%include "Common/btkCommonSwig_Collection.h"
 
 BTK_SWIG_DECLARE_IMPL_COLLECTION(Event);
 BTK_SWIG_DECLARE_IMPL_COLLECTION(Analog);
@@ -211,7 +211,7 @@ namespace std
 %warnfilter(509) btkMetaDataInfo::SetValues;
 %warnfilter(509) btkMetaData::btkMetaData;
 
-%include "btkCommonSwig_MetaData.h"
+%include "Common/btkCommonSwig_MetaData.h"
 
 %extend btkMetaDataInfo
 {
@@ -344,7 +344,7 @@ protected:
 //                                  Acquisition                              //
 // ------------------------------------------------------------------------- //
 
-%include "btkCommonSwig_Acquisition.h"
+%include "Common/btkCommonSwig_Acquisition.h"
 
 BTK_SWIG_DECLARE_IMPL_CLASS(Acquisition)
 {
