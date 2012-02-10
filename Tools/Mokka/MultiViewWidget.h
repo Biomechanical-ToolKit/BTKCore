@@ -129,8 +129,8 @@ public slots:
   void updateDisplay(int frame);
   void showAllMarkers();
   void hideAllMarkers();
-  void forceRubberBandDrawingOn();
-  void forceRubberBandDrawingOff();
+  void adaptViewsForPlaybackOn();
+  void adaptViewsForPlaybackOff();
   void restoreLayout3DOnly();
   void restoreLayout3DVerbose();
   void restoreLayout3DCharts();

@@ -308,8 +308,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->timeEventControler, SIGNAL(eventsModified(QList<int>, QList<Event*>)), this, SLOT(setEvents(QList<int>, QList<Event*>)));
   connect(this->timeEventControler, SIGNAL(eventsRemoved(QList<int>)), this, SLOT(removeEvents(QList<int>)));
   connect(this->timeEventControler, SIGNAL(eventInserted(Event*)), this, SLOT(insertEvent(Event*)));
-  connect(this->timeEventControler, SIGNAL(playbackStarted()), this->multiView, SLOT(forceRubberBandDrawingOff()));
-  connect(this->timeEventControler, SIGNAL(playbackStopped()), this->multiView, SLOT(forceRubberBandDrawingOn()));
+  connect(this->timeEventControler, SIGNAL(playbackStarted()), this->multiView, SLOT(adaptViewsForPlaybackOn()));
+  connect(this->timeEventControler, SIGNAL(playbackStopped()), this->multiView, SLOT(adaptViewsForPlaybackOff()));
   connect(this->timeEventControler, SIGNAL(acquisitionReframed(int)), this, SLOT(reframeAcquisition(int)));
   
   // Functors to link the TimeEventWidget object with the VTK charts.
