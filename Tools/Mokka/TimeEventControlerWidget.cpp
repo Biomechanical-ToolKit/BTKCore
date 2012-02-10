@@ -74,7 +74,6 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_4);
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_5);
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_10);
-  playbackSpeedActionGroup->addAction(this->actionPlaybackSpeedFullFrames);
   QMenu* displayOptionsMenu = new QMenu(this);
   this->mp_PlaybackSpeedMenu = new QMenu(tr("Playback speed"),this);
   actionPlaybackSpeedRealtime->setChecked(true);
@@ -83,7 +82,6 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_4);
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_5);
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_10);
-  this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeedFullFrames);
   displayOptionsMenu->addMenu(this->mp_PlaybackSpeedMenu);
   displayOptionsMenu->addSeparator();
   displayOptionsMenu->addAction(this->actionReframeFromOne);
@@ -690,7 +688,7 @@ void TimeEventControlerWidget::changePlaybackParameters()
   double freq = this->mp_Acquisition->pointFrequency();
   this->m_PlaybackDelay = 40; // 25 Hz
   // Compute playback step and delay
-  if ((freq == 0.0) || (this->actionPlaybackSpeedFullFrames->isChecked()))
+  if (freq == 0.0)
   {
     this->m_PlaybackStep = 1.0;
   }

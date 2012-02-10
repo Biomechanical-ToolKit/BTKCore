@@ -408,14 +408,6 @@ QPushButton::menu-indicator {
     <string>1/10</string>
    </property>
   </action>
-  <action name="actionPlaybackSpeedFullFrames">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Full frames</string>
-   </property>
-  </action>
   <action name="actionRemoveSelectedEvents">
    <property name="text">
     <string>Remove selected events</string>
