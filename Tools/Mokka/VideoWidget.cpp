@@ -144,10 +144,10 @@ void VideoWidget::copy(VideoWidget* source)
 
 void VideoWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-  this->setVideoVisible(false);
   event->ignore();
   if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
   {
+    this->setVideoVisible(false);
     QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(event->source());
     if (treeWidget)
     {
@@ -173,12 +173,6 @@ void VideoWidget::dragLeaveEvent(QDragLeaveEvent* event)
 
 void VideoWidget::dropEvent(QDropEvent* event)
 {
-  QMessageBox error(QMessageBox::Warning, "Video player", "Error when loading the video.", QMessageBox::Ok , this);
-#ifdef Q_OS_MAC
-    error.setWindowFlags(Qt::Sheet);
-    error.setWindowModality(Qt::WindowModal);
-#endif
-
   event->setDropAction(Qt::IgnoreAction); // Only to know which Video IDs were dropped.
   event->accept();
   QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(event->source());
@@ -190,6 +184,11 @@ void VideoWidget::dropEvent(QDropEvent* event)
   else if (this->mp_Acquisition->videoPath(id).isEmpty())
   {
     LOG_CRITICAL("Error when loading the video file: File not found.");
+    QMessageBox error(QMessageBox::Warning, "Video player", "Error when loading the video.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+    error.setWindowFlags(Qt::Sheet);
+    error.setWindowModality(Qt::WindowModal);
+#endif
     error.setInformativeText("<nobr>Video(s) must be in the same folder than the acquisition.</nobr>");
     error.exec();
   }
