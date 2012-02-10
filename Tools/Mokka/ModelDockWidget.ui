@@ -29,7 +29,7 @@
    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
   </property>
   <property name="windowTitle">
-   <string>Model</string>
+   <string>Acquisition explorer</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout_4">
