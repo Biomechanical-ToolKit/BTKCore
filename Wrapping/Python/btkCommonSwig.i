@@ -177,6 +177,24 @@ BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType6) : public btkForcePlatform_impl
 {};
 
 // ------------------------------------------------------------------------- //
+//                                    Wrench                                 //
+// ------------------------------------------------------------------------- //
+
+%include "Common/btkCommonSwig_Wrench.h"
+
+BTK_SWIG_DECLARE_IMPL_CLASS(Wrench)
+{
+public:
+  BTK_SWIG_DECLARE_IMPL_GETSET(Position, btkPoint );
+  BTK_SWIG_DECLARE_IMPL_GETSET(Force, btkPoint );
+  BTK_SWIG_DECLARE_IMPL_GETSET(Moment, btkPoint );
+  btkPoint GetComponent(int );
+  void SetFrameNumber(int );
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(Wrench);
+};
+
+// ------------------------------------------------------------------------- //
 //                                  Collection                               //
 // ------------------------------------------------------------------------- //
 
@@ -186,6 +204,7 @@ BTK_SWIG_DECLARE_IMPL_COLLECTION(Event);
 BTK_SWIG_DECLARE_IMPL_COLLECTION(Analog);
 BTK_SWIG_DECLARE_IMPL_COLLECTION(Point);
 BTK_SWIG_DECLARE_IMPL_COLLECTION(ForcePlatform);
+BTK_SWIG_DECLARE_IMPL_COLLECTION(Wrench);
 
 // ------------------------------------------------------------------------- //
 //                                     MetaData                              //

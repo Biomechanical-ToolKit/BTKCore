@@ -9,6 +9,7 @@ import PointCollectionTest
 import MetaDataInfoTest
 import MetaDataTest
 import AcquisitionTest
+import WrenchTest
 
 def suite():
     suite = unittest.TestSuite()
@@ -21,4 +22,5 @@ def suite():
     suite.addTest(unittest.makeSuite(MetaDataInfoTest.MetaDataInfoTest))
     suite.addTest(unittest.makeSuite(MetaDataTest.MetaDataTest))
     suite.addTest(unittest.makeSuite(AcquisitionTest.AcquisitionTest))
+    suite.addTest(unittest.makeSuite(WrenchTest.WrenchTest))
     return suite

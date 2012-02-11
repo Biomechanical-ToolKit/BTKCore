@@ -40,7 +40,12 @@ namespace btk
 {
   /**
    * @class Wrench btkWrench.h
-   * @brief Represents a wrench has position, force and moment.
+   * @brief Represents a wrench as position, force and moment varying during the time.
+   *
+   * This class is mainly used to have a compact way to store forces and moment acting (or reacting) at a given position.
+   * The moment should be expressed at the position as it is defined in general mechanics.
+   *
+   * By default, the label used for the forces and the moments corresponds to the given label to the constructor and followed by the suffix ".F" and ".M" respectively.
    *
    * @ingroup BTKCommon
    */

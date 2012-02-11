@@ -70,6 +70,7 @@ BTK_SWIG_AUTODOC_IMPL(Event, SetSubject, "SetSubject(self, string)");
 BTK_SWIG_AUTODOC_IMPL(Event, SetTime, "SetTime(self, double)");
 BTK_SWIG_AUTODOC_IMPL(Event, SetFrame, "SetFrame(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Event, SetDetectionFlags, "SetDetectionFlags(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Event, HasDetectionFlag, "HasDetectionFlag(self, DetectionFlag) -> bool");
 BTK_SWIG_AUTODOC_IMPL(Event, SetId, "SetId(self, int)");
 
 BTK_SWIG_DOCSTRING(Event, Clone, "Deep copy of the object");
@@ -307,6 +308,36 @@ Force platform composed of 12 channels and a 12 columns by 12 rows calibration m
  - FZ4: Vertical forces measured by the sensor on the corner 4."
  
 // ------------------------------------------------------------------------- //
+//                                    Wrench                                 //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkWrench "
+Represents a wrench as position, force and moment varying during the time.
+
+This class is mainly used to have a compact way to store forces and moment acting (or reacting) at a given position.
+The moment should be expressed at the position as it is defined in general mechanics.
+
+By default, the label used for the forces and the moments corresponds to the given label followed by the suffix '.F' and '.M' respectively.
+
+Warning: The call of the constructor btkWrench(label) must be followed by the use of the method btkWrench::SetFrameNumber as it creates a null matrix for the values."
+
+BTK_SWIG_AUTODOC_IMPL(Wrench, SetPosition, "SetPosition(self, btkPoint)");
+BTK_SWIG_AUTODOC_IMPL(Wrench, SetForce, "SetForce(self, btkPoint)");
+BTK_SWIG_AUTODOC_IMPL(Wrench, SetMoment, "SetMoment(self, btkPoint)");
+BTK_SWIG_AUTODOC_IMPL(Wrench, GetComponent, "GetComponent(self, int) -> btkPoint)");
+BTK_SWIG_AUTODOC_IMPL(Wrench, SetFrameNumber, "SetFrameNumber(self, int)");
+
+BTK_SWIG_DOCSTRING_IMPL(Wrench, GetPosition, "Returns the wrench's position");
+BTK_SWIG_DOCSTRING_IMPL(Wrench, SetPosition, "Sets the wrench's position");
+BTK_SWIG_DOCSTRING_IMPL(Wrench, GetForce, "Returns the wrench's force");
+BTK_SWIG_DOCSTRING_IMPL(Wrench, SetForce, "Sets the wrench's force");
+BTK_SWIG_DOCSTRING_IMPL(Wrench, GetMoment, "Returns the wrench's moment");
+BTK_SWIG_DOCSTRING_IMPL(Wrench, SetForce, "Sets the wrench's moment");
+BTK_SWIG_DOCSTRING_IMPL(Wrench, GetComponent, "Returns the component with the given index. The possible value for the index are: 0: Returns the position, 1: Returns the force, 2: Returns the moment. Any other value will trigger an exception.");
+BTK_SWIG_DOCSTRING_IMPL(Wrench, SetFrameNumber, "Set the number of frames in the wrenches. The given number of frames must be greater than 0.");
+BTK_SWIG_DOCSTRING(btkWrench, Clone, "Deep copy of the object");
+
+// ------------------------------------------------------------------------- //
 //                              EventCollection                              //
 // ------------------------------------------------------------------------- //
 
@@ -377,41 +408,6 @@ BTK_SWIG_DOCSTRING_IMPL(AnalogCollection, Clear, "Clear the contents of the coll
 BTK_SWIG_DOCSTRING(AnalogCollection, Clone, "Deep copy of the object");
 
 // ------------------------------------------------------------------------- //
-//                           ForcePlatformCollection                         //
-// ------------------------------------------------------------------------- //
-
-%feature("docstring") btkForcePlatformCollection "
-Collection of force platform stored in a list."
-
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, Begin, "Begin(self) -> btkForcePlatformIterator");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, End, "End(self) -> btkForcePlatformIterator");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, GetIndexOf, "GetIndexOf(self, int) -> btkForcePlatform");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, GetItem, "GetItem(self, int) -> btkForcePlatform");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, InsertItem(Iterator , ItemPointer ), "InsertItem(self, btkForcePlatformIterator, btkForcePlatform) -> bool");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, InsertItem(int , ItemPointer ), "InsertItem(self, int, btkForcePlatform) -> bool");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, InsertItem(ItemPointer ), "InsertItem(self, btkForcePlatform) -> bool");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, RemoveItem(Iterator ), "RemoveItem(self, btkForcePlatformIterator) -> btkForcePlatformIterator");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, RemoveItem(int ), "RemoveItem(self, int)");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, TakeItem(Iterator ), "TakeItem(self, btkForcePlatformIterator) -> btkForcePlatform");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, TakeItem(int ), "TakeItem(self, int) -> btkForcePlatform");
-BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, SetItem, "SetItem(self, int) -> btkForcePlatform");
-
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, Begin, "Returns an iterator to the beginning of the list of items.");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, End, "Returns an iterator just past the last item.");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, GetIndexOf, "Returns the index of the given item.");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, GetItemNumber, "Returns the number of force platforms");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, SetItemNumber, "Sets the number of force platforms");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, GetItem, "Returns the force platform for the given index.");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, SetItem, "Sets the force platform for the given index");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, InsertItem, "Inserts a force platform in the list.");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, IsEmpty, "Returns true if the collection is empty.");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, RemoveItem, "Removes a force platform.");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, SetItem, "Sets a force platform.");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, TakeItem, "Removes a force platform and return it.");
-BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, Clear, "Clear the contents of the collection.");
-BTK_SWIG_DOCSTRING(ForcePlatformCollection, Clone, "Deep copy of the object");
-
-// ------------------------------------------------------------------------- //
 //                               PointCollection                             //
 // ------------------------------------------------------------------------- //
 
@@ -445,6 +441,77 @@ BTK_SWIG_DOCSTRING_IMPL(PointCollection, SetItem, "Sets a point.");
 BTK_SWIG_DOCSTRING_IMPL(PointCollection, TakeItem, "Removes a point and return it.");
 BTK_SWIG_DOCSTRING_IMPL(PointCollection, Clear, "Clear the contents of the collection.");
 BTK_SWIG_DOCSTRING(PointCollection, Clone, "Deep copy of the object");
+
+
+// ------------------------------------------------------------------------- //
+//                           ForcePlatformCollection                         //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkForcePlatformCollection "
+Collection of force platforms stored in a list."
+
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, Begin, "Begin(self) -> btkForcePlatformIterator");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, End, "End(self) -> btkForcePlatformIterator");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, GetIndexOf, "GetIndexOf(self, int) -> btkForcePlatform");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, GetItem, "GetItem(self, int) -> btkForcePlatform");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, InsertItem(Iterator , ItemPointer ), "InsertItem(self, btkForcePlatformIterator, btkForcePlatform) -> bool");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, InsertItem(int , ItemPointer ), "InsertItem(self, int, btkForcePlatform) -> bool");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, InsertItem(ItemPointer ), "InsertItem(self, btkForcePlatform) -> bool");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, RemoveItem(Iterator ), "RemoveItem(self, btkForcePlatformIterator) -> btkForcePlatformIterator");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, RemoveItem(int ), "RemoveItem(self, int)");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, TakeItem(Iterator ), "TakeItem(self, btkForcePlatformIterator) -> btkForcePlatform");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, TakeItem(int ), "TakeItem(self, int) -> btkForcePlatform");
+BTK_SWIG_AUTODOC_IMPL(ForcePlatformCollection, SetItem, "SetItem(self, int) -> btkForcePlatform");
+
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, Begin, "Returns an iterator to the beginning of the list of items.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, End, "Returns an iterator just past the last item.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, GetIndexOf, "Returns the index of the given item.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, GetItemNumber, "Returns the number of force platforms");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, SetItemNumber, "Sets the number of force platforms");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, GetItem, "Returns the force platform for the given index.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, SetItem, "Sets the force platform for the given index");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, InsertItem, "Inserts a force platform in the list.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, IsEmpty, "Returns true if the collection is empty.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, RemoveItem, "Removes a force platform.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, SetItem, "Sets a force platform.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, TakeItem, "Removes a force platform and return it.");
+BTK_SWIG_DOCSTRING_IMPL(ForcePlatformCollection, Clear, "Clear the contents of the collection.");
+BTK_SWIG_DOCSTRING(ForcePlatformCollection, Clone, "Deep copy of the object");
+
+// ------------------------------------------------------------------------- //
+//                               WrenchCollection                            //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkWrenchCollection "
+Collection of wrenchs stored in a list."
+
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, Begin, "Begin(self) -> btkWrenchIterator");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, End, "End(self) -> btkWrenchIterator");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, GetIndexOf, "GetIndexOf(self, int) -> btkWrench");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, GetItem, "GetItem(self, int) -> btkWrench");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, InsertItem(Iterator , ItemPointer ), "InsertItem(self, btkWrenchIterator, btkWrench) -> bool");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, InsertItem(int , ItemPointer ), "InsertItem(self, int, btkWrench) -> bool");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, InsertItem(ItemPointer ), "InsertItem(self, btkWrench) -> bool");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, RemoveItem(Iterator ), "RemoveItem(self, btkWrenchIterator) -> btkWrenchIterator");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, RemoveItem(int ), "RemoveItem(self, int)");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, TakeItem(Iterator ), "TakeItem(self, btkWrenchIterator) -> btkWrench");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, TakeItem(int ), "TakeItem(self, int) -> btkWrench");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollection, SetItem, "SetItem(self, int) -> btkWrench");
+
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, Begin, "Returns an iterator to the beginning of the list of items.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, End, "Returns an iterator just past the last item.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, GetIndexOf, "Returns the index of the given item.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, GetItemNumber, "Returns the number of wrenches");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, SetItemNumber, "Sets the number of wrenches");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, GetItem, "Returns the wrench for the given index.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, SetItem, "Sets the wrench for the given index");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, InsertItem, "Inserts a wrench in the list.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, IsEmpty, "Returns true if the collection is empty.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, RemoveItem, "Removes a wrench.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, SetItem, "Sets a wrench.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, TakeItem, "Removes a wrench and return it.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollection, Clear, "Clear the contents of the collection.");
+BTK_SWIG_DOCSTRING(WrenchCollection, Clone, "Deep copy of the object");
 
 // ------------------------------------------------------------------------- //
 //                                     MetaData                              //

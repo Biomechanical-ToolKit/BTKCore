@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud BarrÃ©
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,37 +33,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef btkCommonSwig_h
-#define btkCommonSwig_h
-
-#define BTK_SWIG_HEADER_DECLARATION
-
-#include "btkSwigUtils.h"
-#include "btkSwigMacros.h"
-
-#include <btkEvent.h>
-#include <btkAnalog.h>
-#include <btkPoint.h>
-#include <btkForcePlatform.h>
-#include <btkForcePlatformTypes.h>
-#include <btkWrench.h>
-#include <btkEventCollection.h>
-#include <btkAnalogCollection.h>
-#include <btkPointCollection.h>
-#include <btkForcePlatformCollection.h>
-#include <btkWrenchCollection.h>
-#include <btkMetaDataInfo.h>
-#include <btkMetaData.h>
-#include <btkMetaDataUtils.h>
-#include <btkAcquisition.h>
-
-#include "Common/btkCommonSwig_Event.h"
-#include "Common/btkCommonSwig_Analog.h"
-#include "Common/btkCommonSwig_Point.h"
-#include "Common/btkCommonSwig_ForcePlatform.h"
-#include "Common/btkCommonSwig_Wrench.h"
-#include "Common/btkCommonSwig_Collection.h"
-#include "Common/btkCommonSwig_MetaData.h"
-#include "Common/btkCommonSwig_Acquisition.h"
-
-#endif // btkCommonSwig_h
+BTK_SWIG_DECLARE_CLASS(Wrench)
+{
+public:
+  btkWrench(const std::string& label = "");
+  btkWrench(int frameNumber);
+  btkWrench(const std::string& label, int frameNumber);
+  BTK_SWIG_DECLARE_CLONE(Wrench);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(Wrench);
+};

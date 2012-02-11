@@ -107,6 +107,24 @@ BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType5, ForcePlatform);
 BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType6, ForcePlatform);
 
 // ------------------------------------------------------------------------- //
+//                                    Wrench                                 //
+// ------------------------------------------------------------------------- //
+
+BTK_SWIG_DEFINE_CLONE(Wrench);
+
+btkWrench::btkWrench(const std::string& label)
+: btkWrench_shared(btk::Wrench::New(label))
+{};
+
+btkWrench::btkWrench(int frameNumber)
+: btkWrench_shared(btk::Wrench::New(frameNumber))
+{};
+
+btkWrench::btkWrench(const std::string& label, int frameNumber)
+: btkWrench_shared(btk::Wrench::New(label, frameNumber))
+{};
+
+// ------------------------------------------------------------------------- //
 //                                Collection                                 //
 // ------------------------------------------------------------------------- //
 // - EventCollection
@@ -121,6 +139,9 @@ BTK_SWIG_DEFINE_CLONE(PointCollection);
 // - ForcePlatformCollection
 BTK_SWIG_DEFINE_DEFAULT_CTOR(ForcePlatformCollection);
 BTK_SWIG_DEFINE_CLONE(ForcePlatformCollection);
+// - WrenchCollection
+BTK_SWIG_DEFINE_DEFAULT_CTOR(WrenchCollection);
+BTK_SWIG_DEFINE_CLONE(WrenchCollection);
 
 // ------------------------------------------------------------------------- //
 //                               MetaDataInfo                                //
