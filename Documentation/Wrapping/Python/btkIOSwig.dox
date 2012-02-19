@@ -1,0 +1,166 @@
+namespace btk
+{
+  /**
+   * @class btkAcquisitionFileIO
+   * @brief Interface to read/write acquisition's files.
+   */
+  /**
+   * @var btkAcquisitionFileIO::TypeNotApplicable
+   * Enum value used to indicate the type of the file is not yet known.
+   */
+  /**
+   * @var btkAcquisitionFileIO::ASCII
+   * Enum value for ASCII file.
+   */
+  /**
+   * @var btkAcquisitionFileIO::Binary
+   * Enum value for binary file.
+   */
+  /**
+   * @var btkAcquisitionFileIO::OrderNotApplicable
+   * Enum value used to indicate the byte order is not yet known.
+   */
+  /**
+   * @var btkAcquisitionFileIO::IEEE_LittleEndian
+   * Enum value for a byte order in little endian with a IEEE float representation.
+   */
+  /**
+   * @var btkAcquisitionFileIO::VAX_LittleEndian
+   * Enum value for a byte order in little endian with a VAX float representation.
+   */
+  /**
+   * @var btkAcquisitionFileIO::IEEE_BigEndian
+   * Enum value for a byte order in big endian with a IEEE float representation.
+   */
+  /**
+   * @var btkAcquisitionFileIO::StorageNotApplicable
+   * Acquisition's data have no storage format.
+   */
+  /**
+   * @var btkAcquisitionFileIO::Float
+   * Acquisition's data are stored as float values.
+   */
+  /**
+   * @var btkAcquisitionFileIO::Integer
+   * Acquisition's data are stored as integer values.
+   */
+   
+  /**
+   * @class btkAcquisitionFileReader
+   * @brief Reader for files which contain acquisition data (C3D, TRC, ...).
+   */ 
+   
+  /**
+   * @class btkAcquisitionFileWriter
+   * @brief Writer for files which contain acquisition data (C3D, TRC, ...).
+   */
+    
+  /**
+   * @class btkANBFileIO
+   * @brief Class to read/write ANB files.
+   */
+    
+  /**
+   * @class btkANCFileIO
+   * @brief Class to read/write ANC files.
+   */
+   
+  /**
+   * @class btkANGFileIO
+   * @brief Class to read/write ANG files. 
+   */
+   
+  /**
+   * @class btkC3DFileIO
+   * @brief Class to read/write C3D files. 
+   */
+  /**
+   * @var btkC3DFileIO::Signed
+   * Analog's data are stored as signed integer values.
+   */
+  /**
+   * @var btkC3DFileIO::Unsigned
+   * Analog's data are stored as unsigned integer values.
+   */
+  /**
+   * @var btkC3DFileIO::None_
+   * Should be used only to erase activated flags.
+   */
+  /**
+   * @var btkC3DFileIO::ScalesFromDataUpdate
+   * Updates the scaling factor (point and analog) from the acquisition's data.
+   */
+  /**
+   * @var btkC3DFileIO::ScalesFromMetaDataUpdate
+   * Updates the scaling factor (point and analog) from the acquisition's metadata.
+   */
+  /**
+   * @var btkC3DFileIO::MetaDataFromDataUpdate
+   * Updates (or synchronize) the acquisition's metadata from the data (by default).
+   */
+  /**
+   * @var btkC3DFileIO::CompatibleVicon
+   * Checks and updates (if necessary) acquisitions parameter which can crash Vicon's 
+   * product (Polygon, Workstation, Nexus).
+   */
+   
+  /**
+   * @class btkCALForcePlateFileIO
+   * @brief Class to read/write force plate CAL files. 
+   */
+   
+  /**
+   * @class btkEMFFileIO
+   * @brief Class to read/write EMF files.
+   */
+   
+  /**
+   * @class btkEMxFileIO
+   * @brief Class to read/write EMG files.
+   */
+   
+  /**
+   * @class btkGRxFileIO
+   * @brief Class to read/write GR* files.
+   */
+   
+  /**
+   * @class btkMOMFileIO
+   * @brief Class to read/write MOM files. 
+   */
+   
+  /**
+   * @class btkPWRFileIO
+   * @brief Class to read/write PWR files. 
+   */
+   
+  /**
+   * @class btkRAxFileIO
+   * @brief Class to read/write RAH, RAW files. 
+   */
+
+  /**
+   * @class btkRICFileIO
+   * @brief Class to read/write RIC files. 
+   */
+   
+  /**
+   * @class btkTDFFileIO
+   * @brief Class to read/write TDF files. 
+   */
+
+  /**
+   * @class btkTRBFileIO
+   * @brief Class to read/write TRB files. 
+   */
+   
+  /**
+   * @class btkTRCFileIO
+   * @brief Class to read/write TRC files. 
+   */
+   
+  /**
+   * @class btkXLSOrthoTrakFileIO
+   * @brief Class to read/write XLS (Orthotrak) files. 
+   */
+}

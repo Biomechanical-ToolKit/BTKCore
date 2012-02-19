@@ -137,3 +137,9 @@ BTK_SWIG_DEFINE_DEFAULT_IO_CTOR(TRCFileIO);
 // ------------------------------------------------------------------------- //
 
 BTK_SWIG_DEFINE_DEFAULT_IO_CTOR(XLSOrthoTrakFileIO);
+
+// ------------------------------------------------------------------------- //
+//                                 TDFFileIO                                 //
+// ------------------------------------------------------------------------- //
+
+BTK_SWIG_DEFINE_DEFAULT_IO_CTOR(TDFFileIO);

@@ -59,7 +59,7 @@ namespace btk
    * @class AcquisitionFileWriter
    * @brief Writer of acquisition data into acquisition file (C3D, TRC, ...).
    *
-   * @note The detection of the btk::AcquisitionFileIO to used create a new object (inheriting of btk::AcquisitionFileIO). Then, if a previous or empty btk::AcquisitionFileIO pointer was given to another filter, it doesn't correspond to the newly detected btk::AcquisitionFileIO. For example:
+   * @note The detection of the helper class to use creates a new object (inheriting of btk::AcquisitionFileIO). Then, if a previous or empty btk::AcquisitionFileIO pointer was given to another filter, it doesn't correspond to the newly detected btk::AcquisitionFileIO. For example:
    * @code
    * btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
    * reader->SetFilename("...");
@@ -125,11 +125,11 @@ namespace btk
   
   /**
    * @fn const std::string& AcquisitionFileWriter::GetFilename() const
-   * Gets the filename of the file to read.
+   * Gets the filename of the file to write.
    */
   
   /**
-   * Specifies the file to read. This is forwarded to the IO instance.
+   * Specifies the file to write. This is forwarded to the IO instance.
    */
   void AcquisitionFileWriter::SetFilename(const std::string& filename)
   {
@@ -152,9 +152,9 @@ namespace btk
   
   /**
    * Set the AcquisitionIO helper class. This method forces the AcquisitionIO
-   * to be used to read a particular file. The AcquisitionIO is oftenly created 
-   * via the objectfactory mechanism that determines whether a particular 
-   * AcquisitionIO can read a certain file (see AcquisitionFileIOFactory). 
+   * to be used to write a particular file. The AcquisitionIO is oftenly created 
+   * via the object factory mechanism that determines whether a particular 
+   * AcquisitionIO can write a certain file (see AcquisitionFileIOFactory). 
    */
   void AcquisitionFileWriter::SetAcquisitionIO(AcquisitionFileIO::Pointer io)
   {

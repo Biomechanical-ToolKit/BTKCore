@@ -46,7 +46,7 @@
 
 #include "btkSwigMacros.h"
 
-%include "btkCommonSwig_Docstring.i"
+%include "btkCommonSwig_docstring.i"
 
 // ------------------------------------------------------------------------- //
 //                                    Event                                  //
@@ -298,15 +298,15 @@ public:
   bool HasMetaDataAsParent() const;
   //void SetParent(DataObject* parent = 0);
   //void SetParent(MetaData* parent = 0);
-  btkMetaDataIterator Begin();
+  Iterator Begin();
   //MetaData::ConstIterator Begin() const;
-  btkMetaDataIterator End();
+  Iterator End();
   //MetaData::ConstIterator End() const;
   btkMetaData GetChild(int );
   //btkMetaData GetChild(int ) const;
   btkMetaData GetChild(const std::string& );
   //btkMetaData GetChild(const std::string& ) const;
-  bool AppendChild(btkMetaData entry);
+  bool AppendChild(btkMetaData );
   bool InsertChild(Iterator , btkMetaData );
   bool InsertChild(int , btkMetaData );
   void SetChild(int , btkMetaData );

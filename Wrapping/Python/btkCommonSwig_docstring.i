@@ -518,4 +518,217 @@ BTK_SWIG_DOCSTRING(WrenchCollection, Clone, "Deep copy of the object");
 // ------------------------------------------------------------------------- //
 
 %feature("docstring") btkMetaData "
-Store data which cannot be embedded within timeseries (calibration matrix, subject informations, ...)."
+Store data which cannot be embedded within timeseries data (calibration matrix, subject informations, ...).
+
+Each object can store children metadata. Theoretically, the number of sub-level is infinite. However, the main common use of the metadata is to use 2 levels. This use was introduced in the C3D format.
+The values in a metadata are stored in a MetaDataInfo object and are accessible using the method GetInfo().
+
+The unlock member accessible using the methods GetUnlock() and SetUnlock() doesn't affect the setting of the values, but is used only to inform the user/developer."
+
+BTK_SWIG_AUTODOC_IMPL(MetaData, ExtractChildInfo, "ExtractChildInfo(self, label, format, numdims, noPossibleEmptyValue = True) -> btkMetaDataInfo");
+BTK_SWIG_AUTODOC_IMPL(MetaData, FindChild, "FindChild(self, label) -> btkMetaDataIterator");
+BTK_SWIG_AUTODOC_IMPL(MetaData, GetChild, "GetChild(self, index) -> btkMetaData");
+BTK_SWIG_AUTODOC_IMPL(MetaData, InsertChild(Iterator , btkMetaData ), "InsertChild(self, btkMetaDataIterator, btkMetaData) -> bool");
+BTK_SWIG_AUTODOC_IMPL(MetaData, InsertChild(int , btkMetaData ), "InsertChild(self, int, btkMetaData) -> bool");
+BTK_SWIG_AUTODOC_IMPL(MetaData, RemoveChild(Iterator ), "RemoveChild(self, btkMetaDataIterator) -> btkMetaDataIterator");
+BTK_SWIG_AUTODOC_IMPL(MetaData, RemoveChild(int ), "RemoveChild(self, int)");
+BTK_SWIG_AUTODOC_IMPL(MetaData, RemoveChild(const string& ), "RemoveChild(self, string)");
+BTK_SWIG_AUTODOC_IMPL(MetaData, SetChild, "SetChild(self, int, btkMetaData)");
+BTK_SWIG_AUTODOC_IMPL(MetaData, SetLabel, "SetLabel(self, string)");
+BTK_SWIG_AUTODOC_IMPL(MetaData, SetDescription, "SetDescription(self, string)");
+BTK_SWIG_AUTODOC_IMPL(MetaData, TakeChild(Iterator ), "TakeChild(self, btkMetaDataIterator) -> btkMetaData");
+BTK_SWIG_AUTODOC_IMPL(MetaData, TakeChild(int ), "TakeChild(self, int) -> btkMetaData");
+BTK_SWIG_AUTODOC_IMPL(MetaData, TakeChild(const std::string& ), "TakeChild(self, string) -> btkMetaData");
+
+BTK_SWIG_DOCSTRING_IMPL(MetaData, SetLabel, "Sets the label of the entry. If label already exist in the parent's list, then an exception is thrown.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, GetUnlockState, "Gets the unlock state of the entry.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, SetUnlockState, "Sets the unlock state of the entry.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, GetInfo, "Gets the btkMetaDataInfo associated to the entry.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, SetInfo, "Sets the btkMetaDataInfo associated to the entry.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, HasInfo, "Checks if a btkMetaDataInfo is associated with the entry.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, ExtractChildInfo, "Check if a child exists with the given label and correspond to the given format plus the number of dimensions with or without values (noPossibleEmptyValue). The informations of the metadata are extracted if all the checks are ok. Otherwise, the methods return an empty pointer.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, HasMetaDataAsParent, "Checks if this object has a MetaData object as parents.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, Begin, "Returns an iterator to the beginning of the list of children.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, End, "Returns an iterator just past the last child.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, GetChild, "Gets the entry for the given index or label. An exception is thrown is the given input doesn't correspond to any entry.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, AppendChild, "Append the child entry. If entry has a label which already exists in the parent's list, then it is not inserted. Returns True if child has been inserted or False.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, InsertChild, "Insert the child entry for the given location. If the entry has a label which already exists in the parent's list, then it is not inserted. Returns True if child has been inserted or False.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, SetChild, "Sets the child entry for the given index");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, TakeChild, "Removes the child entry which has the given index, label or corresponding iterator. If there is no child with the specified label, then an empty pointer is returned.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, RemoveChild, "Removes the child entry which has the given index, label or corresponding iterator.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, ClearChildren, "Removes every children.");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, HasChildren, "Checks if the entry has children ");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, GetChildNumber, "Returns the number of children ");
+BTK_SWIG_DOCSTRING_IMPL(MetaData, FindChild, "Finds the children which has the given label and return it as an iterator.");
+BTK_SWIG_DOCSTRING(MetaData, Clone, "Deep copy of the object");
+
+%feature("docstring") btkMetaDataInfo "
+Container class to store data of a MetaData object.
+
+You can store integer value(s), real or string. This class has also methods to convert the native type into other, like integer into string.
+
+Even if the data extracted are set as native Python type, the internal type are different and set as:
+ - btk.btkMetaDataInfo.Char: Type for the string;
+ - btk.btkMetaDataInfo.Byte: Signed integer type stored only on 8 bit. Possible values between -127 and 128;
+ - btk.btkMetaDataInfo.Integer: Signed integer type stored only on 16 bit. Possible values between -32767 and 32768;
+ - btk.btkMetaDataInfo.Real: Float type. Precision limited to 1e-5.
+ 
+Note: The format btk.btkMetaDataInfo.Byte cannot be set using the method SetValues() do the impossibility to differentiate an integer. You need to use explicitly the method SetFormat()."
+
+BTK_SWIG_AUTODOC_IMPL(MetaDataInfo, SetFormat, "SetFormat(self, btk.btkMetaDataInfo.Format)");
+
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, GetDimension, "Returns the dimension for the specified index or 0 if the index is out of range.");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, SetDimension, "Sets the given value as the new dimension for the specified index or do nothing if the index is out of range. This method modify the values' structure and set default values ('0' or a string with white spaces).");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, GetDimensions, "Returns the dimensions associated with the values.");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, SetDimensions, "Sets the given array as the new dimensions and adapt the values and their structure. This method can add default values ('0' or a string with white spaces).");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, GetValueNumber, "Returns the number of values.");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, SetValue, "Sets the given value for the given index. This method does nothing if the index is out of range.");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, GetFormat, "Returns the internal format of the values.");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, GetFormatAsString, "Returns the format of the values as a string.");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, SetFormat, "Sets the format of the values and adapt the values. This method erases the values and set default values ('0' or a string with white spaces).");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, GetDimensionsProduct, "Compute the product of the dimensions from the given start index.");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, ResizeDimensions, "Resize the dimensions and adapt the values and their structure. If the number of dimensions is greater, then the new dimensions are equal to 1. If the number of dimensions is lower, then the value are shrunken.");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, ToString, "Convert stored value(s) into string(s).");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, ToInt, "Convert stored value(s) into integer(s).");
+BTK_SWIG_DOCSTRING_IMPL(MetaDataInfo, ToDouble, "Convert stored value(s) into double(s).");
+BTK_SWIG_DOCSTRING(MetaDataInfo, Clone, "Deep copy of the object");
+
+// ------------------------------------------------------------------------- //
+//                                  Acquisition                              //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkAcquisition "
+Contains the data related to a biomechanical acquisition.
+
+A biomechanical acquisition can contains:
+  - 3D data (makers, points, forces, moments, ...) ;
+  - analog channels (force platform, emg, ...) ;
+  - events
+  - acquisition's setup ;
+  - subject's informations.
+  
+By default, the first frame is set to 1, the analog resolution is set to 12-bit, the maximum interpolation gap to 10 frames and the units are:
+ - Marker: millimeters ;
+ - Angle: degrees ;
+ - Force: newtons ;
+ - Moment: millimeter-newtons ;
+ - Power: watts ;
+ - Scalar: millimeters ;
+ - Reaction: (nothing).
+ 
+After the creation of the acquisition, you should use the Init() method to populate the acquisition. 
+ 
+The member used for the maximum interpolation gap is only for information and is not used in the acquisition. It could be used later in a filter to fill gap.
+
+The analog resolution can be set to the following values:
+ - btk.btkAcquisition.Bit8 ;
+ - btk.btkAcquisition.Bit12 ;
+ - btk.btkAcquisition.Bit14 ;
+ - btk.btkAcquisition.Bit16."
+  
+BTK_SWIG_AUTODOC_IMPL(Acquisition, AppendAnalog, "AppendAnalog(self, btkAnalog)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, AppendEvent, "AppendEvent(self, btkEvent)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, AppendPoint, "AppendPoint(self, btkPoint)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, FindAnalog, "FindAnalog(self, string) -> btkAnalogIterator");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, FindEvent, "FindEvent(self, string) -> btkEventIterator");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, FindPoint, "FindPoint(self, string) -> btkPointIterator");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, GetAnalog(int ), "GetAnalog(self, int) -> btkAnalog");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, GetAnalog(const std::string& ), "GetAnalog(self, string) -> btkAnalog");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, GetEvent, "GetEvent(self, int) -> btkEvent");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, GetPoint(int ), "GetPoint(self, int) -> btkPoint");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, GetPoint(const std::string& ), "GetPoint(self, string) -> btkPoint");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, GetPointUnit(Point::Type ), "GetPointUnit(self, btk.btkPoint.Type) -> string");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, RemoveAnalog(AnalogIterator ), "RemoveAnalog(self, btkAnalogCollectionIterator) -> btkAnalogCollectionIterator");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, RemoveAnalog(int ), "RemoveAnalog(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, RemoveAnalog(const std::string& ), "RemoveAnalog(self, string)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, RemoveEvent(EventIterator ), "RemoveEvent(self, btkEventCollectionIterator) -> btkEventCollectionIterator");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, RemoveEvent(int ), "RemoveAnalog(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, RemovePoint(PointIterator ), "RemovePoint(self, btkPointCollectionIterator) -> btkPointCollectionIterator");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, RemovePoint(int ), "RemovePoint(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, RemovePoint(const std::string& ), "RemovePoint(self, string)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, ResizeAnalogNumber, "ResizeAnalogNumber(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, ResizeFrameNumber, "ResizeFrameNumber(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, ResizeFrameNumberFromEnd, "ResizeFrameNumber(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, ResizePointNumber, "ResizeFrameNumber(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetAnalog, "SetAnalog(self, int, btkAnalog)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetAnalogNumber, "SetAnalogNumber(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetAnalogResolution, "SetAnalogResolution(self, btk.btkAcquisition.AnalogResolution)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetAnalogs, "SetAnalogs(self, btkAnalogCollection)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetEvent, "SetEvent(self, int, btkEvent)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetEventNumber, "SetEventNumber(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetEvents, "SetEvents(self, btkEventCollection)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetFirstFrame, "SetFirstFrame(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetMaxInterpolationGap, "SetMaxInterpolationGap(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetMetaData, "SetMetaData(self, btkMetaData)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPoint, "SetPoint(self, int, btkPoint)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPointFrequency, "SetPointFrequency(self, double)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPointNumber, "SetPointNumber(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPoints, "SetPoints(self, btkPointCollection)");
+
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, BeginMetaData, "Returns an iterator to the beginning of the list of metadata.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, EndMetaData, "Returns an iterator just past the last metadata.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetMetaData, "Returns the metadata.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetMetaData, "Sets the metadata of the acquisition.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, BeginEvent, "Returns an iterator to the beginning of the list of events.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, EndEvent, "Returns a const iterator just past the last event.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetEvent, "Gets the event at the given index.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetEvent, "Sets the content of event at the given index.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetEvents, "Returns the collection of events.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetEvents, "Sets events for this acquisition.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, IsEmptyEvent, "Checks if the events' list is empty.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetEventNumber, "Returns the number of events.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetEventNumber, "Sets the number of events.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, ClearEvents, "Clear events.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, FindEvent, "Finds the event with the proposed label and returns the iterator associated with it. If no event has the given label, an iterator pointing to the end of the collection is returned.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, AppendEvent, "Appends the given event in the acquisition.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, RemoveEvent, "Removes the event associated with the given index or the given iterator.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, BeginPoint, "Returns an iterator to the beginning of the list of points.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, EndPoint, "Returns an iterator just past the last point.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetPoint, "Gets the point at the given index or label. If no Point exists, then an exception is thrown.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetPoint, "Sets the content of a point at the given index.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetPoints, "Returns the collection of points.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetPoints, "Sets points for this acquisition.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, IsEmptyPoint, "Checks if the points' list is empty.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetPointNumber, "Returns the number of points.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetPointNumber, "Sets the number of points.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, ClearPoints, "Clear points.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, FindPoint, "Finds the point with the proposed label and returns the iterator associated with it. If no point has the given label, an iterator pointing to the end of the collection is returned.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, AppendPoint, "Convenient method to append a point in the acquisition. This method also resizes the frame number of the inserted point if necessary.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, RemovePoint, "Convenient method to delete a point from the acquisition.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, BeginAnalog, "Returns an iterator to the beginning of the list of analog channels.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, EndAnalog, "Returns an iterator just past the last analog channel.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, IsEmptyAnalog, "Checks if the analogs' list is empty.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetAnalogNumber, "Returns the number of analog channels.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetAnalogNumber, "Sets the number of analog channels.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetAnalog, "Gets the analog channel at the given index or label. If no Analog exists, then an exception is thrown.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetAnalog, "Sets the analog channel at the given index by the content of the given analog channel.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetAnalogs, "Returns the collection of analog channels.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetAnalogs, "Sets analog channels for this acquisition.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, ClearAnalogs, "Clear analogs channels.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, FindAnalog, "Finds the analog channel with the proposed label and returns the iterator associated with it. If no analog channel has the given label, an iterator pointing to the end of the collection is returned.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, AppendAnalog, "Append the analog channel ac in the acquisition This method also resizes the frame number of the inserted analog channel if necessary.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, RemoveAnalog, "Convenient method to delete an analog channel from the acquisition.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, Init, "Initialize the acquisition with the given number of point which have each the given number of frames. you can set also the number of analog channels and their number of frames corresponds to the given integer factor multiplied by the number of frames for the points. * This method label added points and analog channels using the string 'uname*' concatenated with the index of the channel.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, Resize, "Resize the acquisition. Same as the method Init(), but does not label added points and analog channels");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, ResizePointNumber, "Resize the number of points.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, ResizeAnalogNumber, "Resize the number of analog channels.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, ResizeFrameNumber, "Resize the number of frames.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, ResizeFrameNumberFromEnd, "Resize the number of frames by adding the new frames at the beginning of the acquisition and set automatically the new first frame index.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, Reset, "Resets the acquisition as an empty acquisition. To re-populate this acquisition, you need to re-use the Init() method to set the point and analog number and their frame number.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetDuration, "Returns the duration of the acquisition. The duration is computed as the multiplication of the points' frequency with the points frame number.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetFirstFrame, "Return the first frame index of the acquisition.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetFirstFrame, "Sets the first frame index.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetLastFrame, "Returns the last frame index of the acquisition base on the first frame index and the frame number.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetPointUnit, "Returns the unit for points which have the given type.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetPointUnit, "Sets the point's unit for the given point's type. The type btk.btkPoint.Reaction cannot have any unit. You cannot set it.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetPointFrameNumber, "Returns the number of frames for the points.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetPointFrequency, "Returns the point's frequency.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetPointFrequency, "Sets the points sample rate.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetAnalogFrameNumber, "Returns the number of frames for the analog channels.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetNumberAnalogSamplePerFrame, "Returns the number of analog sample (acquired by each channel) per point frame.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetAnalogFrequency, "Returns the analogs sample rate.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetAnalogResolution, "Returns the analog resolution.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetAnalogResolution, "Sets the analog resolution.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetMaxInterpolationGap, "Gets the maximum gap length that any interpolation method would fill for the 3D point data. Warning: Only for information. Could be use later by a filter to fill gap 3D trajectories.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetMaxInterpolationGap, "Sets the maximum gap length that any interpolation method would fill for the 3D point data. Warning: Only for information. Could be use later by a filter to fill gap 3D trajectories.");
+BTK_SWIG_DOCSTRING(Acquisition, Clone, "Deep copy of the object");

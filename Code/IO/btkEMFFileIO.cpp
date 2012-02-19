@@ -67,7 +67,6 @@ namespace btk
    * @brief Interface to read/write EMF files.
    *
    * The EMF file format is used in the software FusionCore from Ascension Technology Corporation.
-   * The exported acquisition contain force platform data expressed in the platform axes.
    *
    * @ingroup BTKIO
    */

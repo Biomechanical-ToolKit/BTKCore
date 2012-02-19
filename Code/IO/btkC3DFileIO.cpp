@@ -78,7 +78,7 @@ namespace btk
    * Analog's data are stored as signed integer values (by default).
    */
   /**
-   * @var C3DFileIO::AnalogIntegerFormat C3DFileIO::Signed
+   * @var C3DFileIO::AnalogIntegerFormat C3DFileIO::Unsigned
    * Analog's data are stored as unsigned integer values.
    */
 
@@ -136,7 +136,7 @@ namespace btk
 
   /**
    * @fn AnalogIntegerFormat C3DFileIO::GetAnalogIntegerFormat() const
-   * Return the integer format (signed/unsigned) 
+   * Return the integer format (signed/unsigned).
    */
 
   /**
@@ -146,7 +146,7 @@ namespace btk
 
   /**
    * @fn std::vector<double>& C3DFileIO::GetAnalogChannelScale()
-   * Returns the vector of scales used for the analog channels' scaling.
+   * Returns the vector of scales used for the analog channels' scaling (parameter ANALOG:SCALE).
    */
 
   /**
@@ -161,7 +161,7 @@ namespace btk
 
   /**
    * @fn std::vector<int>& C3DFileIO::GetAnalogZeroOffset()
-   * Returns the vector of offsets used for the analog channels' scaling.
+   * Returns the vector of offsets used for the analog channels' scaling (parameter ANALOG:OFFSET).
    */
 
   /**
@@ -176,7 +176,7 @@ namespace btk
 
   /**
    * @fn double C3DFileIO::GetAnalogUniversalScale() const
-   * Returns the universal scale factor used to scale analog channels.
+   * Returns the universal scale factor used to scale analog channels (parameter ANALOG:GEN_SCALE).
    */
 
   /**

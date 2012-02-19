@@ -81,6 +81,22 @@ namespace btk
    * @var Analog::Gain Analog::PlusMinus1
    * +/- 1 volts.
    */
+  /**
+   * @var Analog::Gain Analog::PlusMinus0Dot5
+   * +/- 0.5 volts.
+   */
+  /**
+   * @var Analog::Gain Analog::PlusMinus0Dot25
+   * +/- 0.25 volts.
+   */
+  /**
+   * @var Analog::Gain Analog::PlusMinus0Dot1
+   * +/- 0.1 volts.
+   */
+  /**
+   * @var Analog::Gain Analog::PlusMinus0Dot05
+   * +/- 0.05 volts.
+   */
 
   /**
    * @typedef Analog::Pointer

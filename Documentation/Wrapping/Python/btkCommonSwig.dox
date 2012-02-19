@@ -135,15 +135,13 @@ namespace btk
  */
  
 /**
+ * @class btkWrench
+ * @brief Represents a wrench as position, force and moment varying during the time.
+ */
+ 
+/**
  * @class btkAcquisition
- * @brief Contains the data related to a biomechanical acquisition
- *
- * A biomechanical acquisition can contains:
- *   - 3D data (makers, points, forces, moments, ...) ;
- *   - analog channels (force platform, emg, ...) ;
- *   - events ;
- *   - acquisition's setup ;
- *   - subject's informations.
+ * @brief Contains the data related to a biomechanical acquisition.
  */
 /**
  * @var btkAcquisition::Bit8
@@ -179,6 +177,15 @@ namespace btk
  * @class btkAnalogCollectionIterator
  * @brief Iterator to pass trough the collection of analog channels.
  */
+ 
+/**
+ * @class btkPointCollection
+ * @brief Collection of points stored in a list.
+ */
+/**
+ * @class btkPointCollectionIterator
+ * @brief Iterator to pass trough the collection of points.
+ */
    
 /**
  * @class btkForcePlatformCollection
@@ -190,17 +197,21 @@ namespace btk
  */
   
 /**
- * @class btkPointCollection
- * @brief Collection of points stored in a list.
+ * @class btkWrenchCollection
+ * @brief Collection of wrenches stored in a list.
  */
 /**
- * @class btkPointCollectionIterator
- * @brief Iterator to pass trough the collection of points.
+ * @class btkWrenchCollectionIterator
+ * @brief Iterator to pass trough the collection of wrenches.
  */
 
 /**
  * @class btkMetaData
  * @brief Store data which cannot be embedded within timeseries (calibration matrix, subject informations, ...).
+ */
+/**
+ * @class btkMetaDataIterator
+ * @brief Iterator to pass trough a level of metadata.
  */
 /**
  * @class btkMetaDataInfo
@@ -221,5 +232,20 @@ namespace btk
 /**
  * @var btkMetaDataInfo::Real
  * Enum value which represents the floats.
+ */
+ 
+/**
+ * @class btkDoubleArray
+ * @brief Array of doubles stored in a btkMetaDataInfo object.
+ */
+ 
+/**
+ * @class btkIntArray
+ * @brief Array of integers stored in a btkMetaDataInfo object.
+ */
+ 
+/**
+ * @class btkStringArray
+ * @brief Array of strings stored in a btkMetaDataInfo object.
  */
 }

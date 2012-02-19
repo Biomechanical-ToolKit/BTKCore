@@ -44,6 +44,8 @@
 
 #include "btkSwigMacros.h"
 
+%include "btkIOSwig_docstring.i"
+
 // ------------------------------------------------------------------------- //
 //                             AcquisitionFileIO                             //
 // ------------------------------------------------------------------------- //
@@ -157,10 +159,6 @@ BTK_SWIG_DECLARE_IMPL_CLASS(ANCFileIO) : public btkAcquisitionFileIO_impl
 public:
   int GetFileGeneration() const;
   void SetFileGeneration(int gen);
-  virtual bool CanReadFile(const std::string& filename);
-  virtual bool CanWriteFile(const std::string& filename);
-  virtual void Read(const std::string& filename, btkAcquisition output);
-  virtual void Write(const std::string& filename, btkAcquisition input);
 };
 
 // ------------------------------------------------------------------------- //
@@ -230,8 +228,13 @@ BTK_SWIG_DECLARE_IMPL_CLASS_IO(TRBFileIO);
 BTK_SWIG_DECLARE_IMPL_CLASS_IO(TRCFileIO);
 
 // ------------------------------------------------------------------------- //
+//                                  TDFFileIO                                //
+// ------------------------------------------------------------------------- //
+
+BTK_SWIG_DECLARE_IMPL_CLASS_IO(TDFFileIO);
+
+// ------------------------------------------------------------------------- //
 //                             XLSOrthoTrakFileIO                            //
 // ------------------------------------------------------------------------- //
 
 BTK_SWIG_DECLARE_IMPL_CLASS_IO(XLSOrthoTrakFileIO);
-

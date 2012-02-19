@@ -54,6 +54,8 @@
 #include "btkTRBFileIO.h"
 #include "btkTRCFileIO.h"
 #include "btkXLSOrthoTrakFileIO.h"
+// - BTS Bioengineering
+#include "btkTDFFileIO.h" 
 // - Elite IOs
 #include "btkANGFileIO.h"
 #include "btkEMxFileIO.h"

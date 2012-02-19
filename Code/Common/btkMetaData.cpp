@@ -43,10 +43,17 @@ namespace btk
 {
   /**
    * @class MetaData btkMetaData.h
-   * @brief Store data which cannot be embedded within timeseries
+   * @brief Store data which cannot be embedded within timeseries data 
    * (calibration matrix, subject informations, ...).
    *
-   * @sa MetaDataCollapseChildrenValues, MetaDataCreateChild (located in btkMetaDataUtils.h) to create or collapse Metadata objects. 
+   * Each object can store children metadata. Theoretically, the number of sub-level is infinite. However, the main common use of the metadata is to 
+   *  use 2 levels. This use was introduced in the C3D format.
+   *
+   * The values in a metadata are stored in a MetaDataInfo object and are accessible using the method GetInfo().
+   *
+   * The unlock member accessible using the methods GetUnlock() and SetUnlock() doesn't affect the setting of the values, but is used only to inform the user/developer.
+   *
+   * @sa MetaDataCollapseChildrenValues(), MetaDataCreateChild() (located in btkMetaDataUtils.h) to create or collapse Metadata objects. 
    *
    * @ingroup BTKCommon
    */
@@ -220,7 +227,7 @@ namespace btk
   
   /**
    * @fn bool MetaData::HasMetaDataAsParent() const
-   * Checks if this object has MetaData object as parents.
+   * Checks if this object has a MetaData object as parents.
    */
   
   /**
@@ -254,7 +261,7 @@ namespace btk
    */
   
   /**
-   * Gets the entry at the specified @a idx or throw an exception if the index is out of range.
+   * Gets the entry for the given @a idx or throw an exception if the index is out of range.
    */
   MetaData::Pointer MetaData::GetChild(int idx)
   {
@@ -266,7 +273,7 @@ namespace btk
   };
   
   /**
-   * Gets the entry at the specified @a idx or throw an exception if the index is out of range.
+   * Gets the entry for the given @a idx or throw an exception if the index is out of range.
    */
   MetaData::ConstPointer MetaData::GetChild(int idx) const
   {
@@ -311,7 +318,7 @@ namespace btk
   };
   
   /**
-   * Insert the child @a entry at the specified location given by the iterator @a loc.
+   * Insert the child @a entry for the given location given by the iterator @a loc.
    * If @a entry has a label which already exists in the parent's list, then it is not inserted.
    * @return True if child has been inserted or false.
    */
@@ -334,7 +341,7 @@ namespace btk
   }
   
   /**
-   * Insert the child @a entry at the specified @a idx
+   * Insert the child @a entry for the given @a idx
    */
   bool MetaData::InsertChild(int idx, MetaData::Pointer entry)
   {
@@ -350,7 +357,7 @@ namespace btk
   };
   
   /**
-   * Sets the child @a entry at the specified @a idx. 
+   * Sets the child @a entry for the given @a idx. 
    */
   void MetaData::SetChild(int idx, MetaData::Pointer entry)
   {

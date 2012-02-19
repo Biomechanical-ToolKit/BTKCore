@@ -44,6 +44,14 @@ namespace btk
    * @class MetaDataInfo btkMetaDataInfo.h
    * @brief Container class to store data of a MetaData object.
    *
+   * You can store integer value(s), real or string. This class has also methods to convert the native type into other, like integer into string.
+   *
+   * Only four types can be stored into a MetaDataInfo object:
+   * - btk::MetaDataInfo::Char: Type for the string;
+   * - btk::MetaDataInfo::Byte: Signed integer type stored only on 8 bit. Possible values between -127 and 128;
+   * - btk::MetaDataInfo::Integer: Signed integer type stored only on 16 bit. Possible values between -32767 and 32768;
+   * - btk::MetaDataInfo::Real: Float type. Precision limited to 1e-5.
+   *
    * @ingroup BTKCommon
    */
   
@@ -196,7 +204,7 @@ namespace btk
   };
 
   /**
-   * Returns the dimension at the specified @a idx or 0 if @a idx is out of range.
+   * Returns the dimension for the given @a idx or 0 if @a idx is out of range.
    */
   uint8_t MetaDataInfo::GetDimension(int idx) const
   {
@@ -207,7 +215,7 @@ namespace btk
   };
 
   /**
-   * Sets @a val as the new dimension at the specified @a idx or do nothing if @a idx is out of range.
+   * Sets @a val as the new dimension for the given @a idx or do nothing if @a idx is out of range.
    * This method alterates the values' structure and set default values ("0" or a string with white spaces).
    */
   void MetaDataInfo::SetDimension(int idx, uint8_t val)
@@ -321,7 +329,7 @@ namespace btk
   /**
    * Resize the dimensions and adapt the values and their structure.
    * If the number of dimensions is greater, then the new dimensions are equal to 1.
-   * If the number of dimensions is lower, then the value are shrinked.
+   * If the number of dimensions is lower, then the values are shrunken.
    */
   void MetaDataInfo::ResizeDimensions(int nb)
   {
@@ -343,7 +351,7 @@ namespace btk
   };
 
   /**
-   * Returns the value at the specified @a idx or 0 if @a idx is out of range.
+   * Returns the value for the given @a idx or 0 if @a idx is out of range.
    */
   void* MetaDataInfo::GetValue(int idx) const
   {
@@ -357,9 +365,9 @@ namespace btk
   };
 
   /**
-   * Sets @a val as the value at the specified index @a idx.
+   * Sets @a val as the value for the given index @a idx.
    *
-   * @warning This method doesn't do anything if the idx is out of range.
+   * @warning This method does nothing if the idx is out of range.
    */
   void MetaDataInfo::SetValue(int idx, int8_t val)
   {
@@ -374,9 +382,9 @@ namespace btk
   };
 
   /**
-   * Sets @a val as the value (if necessary, adapt it to fit the format) at the specified index @a idx.
+   * Sets @a val as the value (if necessary, adapt it to fit the format) for the given index @a idx.
    *
-   * @warning This method doesn't do anything if the idx is out of range.
+   * @warning This method does nothing if the idx is out of range.
    */
   void MetaDataInfo::SetValue(int idx, int16_t val)
   {
@@ -391,9 +399,9 @@ namespace btk
   };
 
   /**
-   * Sets @a val as the value (if necessary, adapt it to fit the format) at the specified index @a idx.
+   * Sets @a val as the value (if necessary, adapt it to fit the format) for the given index @a idx.
    *
-   * @warning This method doesn't do anything if the idx is out of range.
+   * @warning This method does nothing if the idx is out of range.
    */
   void MetaDataInfo::SetValue(int idx, float val)
   {
@@ -408,10 +416,10 @@ namespace btk
   };
 
   /**
-   * Sets @a val as the value (if necessary, adapt it to fit the format) at the specified index @a idx.
+   * Sets @a val as the value (if necessary, adapt it to fit the format) for the given index @a idx.
    * Dimensions are updated if necessary.
    *
-   * @warning This method doesn't do anything if the idx is out of range.
+   * @warning This method does nothing if the idx is out of range.
    */
   void MetaDataInfo::SetValue(int idx, const std::string& val)
   {
@@ -435,9 +443,9 @@ namespace btk
   };
   
   /**
-   * Sets @a val as the value (if necessary, adapt it to fit the format) at the specified index @a idx.
+   * Sets @a val as the value (if necessary, adapt it to fit the format) for the given index @a idx.
    * 
-   * @warning This method doesn't do anything if the idx is out of range.
+   * @warning This method does nothing if the idx is out of range.
    */
   void MetaDataInfo::SetValue(int idx, int val)
   {
@@ -451,9 +459,9 @@ namespace btk
   };
   
   /**
-   * Sets @a val as the value (if necessary, adapt it to fit the format) at the specified index @a idx.
+   * Sets @a val as the value (if necessary, adapt it to fit the format) for the given index @a idx.
    *
-   * @warning This method doesn't do anything if the idx is out of range.
+   * @warning This method does nothing if the idx is out of range.
    */
   void MetaDataInfo::SetValue(int idx, double val)
   {

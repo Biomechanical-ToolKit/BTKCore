@@ -389,6 +389,6 @@ namespace btk
   
   /**
    * @fn virtual DataObject::Pointer ProcessObject::MakeOutput(int idx) = 0
-   * Creates and returns a DataObject::Pointer at the specified index @a idx.
+   * Creates and returns a DataObject::Pointer for the given index @a idx.
    */
 };
