@@ -302,11 +302,12 @@ res = char(btkC3DserverHandles(idx).modified);
 
 
 function res = btkC3DserverSaveFile(id, filename, fileType)
-h = btkC3DserverExtractHandle_p(id);
+global btkC3DserverHandles;
+[h, idx] = btkC3DserverExtractHandle_p(id);
 if (isempty(filename))
     filename = btkC3DserverHandles(idx).file;
 end
-if (isempty(fileType))
+if (fileType == -1)
     fileType = btkC3DserverHandles(idx).fileType;
 end
 if ((fileType < 1) || (fileType > 3))
@@ -315,7 +316,7 @@ end
 byteorder = {'IEEE_LittleEndian', 'VAX_LittleEndian', 'IEEE_BigEndian'};
 storageformat = {'Integer', 'Float'};
 try
-    btkWriteAcquisition(h, filename, 'ByteOrder', byteorder{fileType}, 'StorageFormat', storageformat{dataType});
+    btkWriteAcquisition(h, filename, 'ByteOrder', byteorder{fileType}, 'StorageFormat', storageformat{btkC3DserverHandles(idx).dataType});
     res = 1; % File wrote
 catch
     err = lasterror();
