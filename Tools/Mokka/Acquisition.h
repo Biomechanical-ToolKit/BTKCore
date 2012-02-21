@@ -112,8 +112,8 @@ public:
   bool save(const QString& filename, const QMap<int, QVariant>& properties);
   bool exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb);
   bool importFrom(const QStringList& filenames, bool allFramesKept = true);
-  bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions);
-  bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin);
+  bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions, bool fromOpenAction = false);
+  bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin, bool fromOpenAction = false);
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
@@ -243,7 +243,7 @@ private:
   void loadAcquisition();
   void extractVideos(const std::vector<std::string>& filename, std::vector<double>& delays, bool completeFilename = true);
   bool importFrom(const QList<btk::AcquisitionFileReader::Pointer>& readers, bool allFramesKept);
-  bool importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io);
+  bool importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io, bool fromOpenAction);
   
   enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
   

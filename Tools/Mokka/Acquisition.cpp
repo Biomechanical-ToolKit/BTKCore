@@ -190,14 +190,14 @@ bool Acquisition::importFrom(const QList<btk::AcquisitionFileReader::Pointer>& r
   return true;
 }
 
-bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions)
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions, bool fromOpenAction)
 {
   btk::AMTIForcePlatformFileIO::Pointer io = btk::AMTIForcePlatformFileIO::New();
   io->SetDimensions(dimensions[0].toFloat(), dimensions[1].toFloat(), dimensions[2].toFloat());
-  return this->importFromAMTI(filename, allFramesKept, io);
+  return this->importFromAMTI(filename, allFramesKept, io, fromOpenAction);
 };
 
-bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin)
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin, bool fromOpenAction)
 {
   std::vector<float> c(12), o(3);
   for (int i = 0 ; i < 12 ; ++i)
@@ -206,10 +206,10 @@ bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, co
     o[i] = origin[i].toFloat();
   btk::AMTIForcePlatformFileIO::Pointer io = btk::AMTIForcePlatformFileIO::New();
   io->SetGeometry(c,o);
-  return this->importFromAMTI(filename, allFramesKept, io);
+  return this->importFromAMTI(filename, allFramesKept, io, fromOpenAction);
 };
 
-bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io)
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io, bool fromOpenAction)
 {
   // Try to read the given file
   QList<btk::AcquisitionFileReader::Pointer> readers;
@@ -236,7 +236,13 @@ bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, bt
     LOG_CRITICAL("Unknown error.");
     return false;
   }
-  return this->importFrom(readers, allFramesKept);
+  bool res = this->importFrom(readers, allFramesKept);
+  if (fromOpenAction)
+  {
+    this->m_Filename = filename;
+    this->emitGeneratedInformations(readers[0]->GetAcquisitionIO());
+  }
+  return res;
 };
 
 void Acquisition::clear()

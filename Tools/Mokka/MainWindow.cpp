@@ -820,7 +820,7 @@ void MainWindow::openFile(const QString& filename)
   if (specialCaseAMTI)
   {
     this->mp_Acquisition->clear();
-    noOpenError = this->importAssistantAMTI(filename, this->mp_ImportAssistant->amtiInformationsComboBox->currentIndex(), true);
+    noOpenError = this->importAssistantAMTI(filename, this->mp_ImportAssistant->amtiInformationsComboBox->currentIndex(), true, true);
   }
   else
     noOpenError = this->mp_Acquisition->load(filename);
@@ -1014,14 +1014,14 @@ void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFra
   }
 };
 
-bool MainWindow::importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept)
+bool MainWindow::importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept, bool fromOpenAction)
 {
   QSettings settings;
   bool noImportError = false;
   if (infoIndex == 0)
   {
     QList<QVariant> dims = this->mp_ImportAssistant->amtiDimensions();
-    noImportError = this->mp_Acquisition->importFromAMTI(filename, allFramesKept, dims);
+    noImportError = this->mp_Acquisition->importFromAMTI(filename, allFramesKept, dims, fromOpenAction);
     if (noImportError)
       settings.setValue("ImportAssistant/AMTIDimensions", dims);
   }
@@ -1029,7 +1029,7 @@ bool MainWindow::importAssistantAMTI(const QString& filename, int infoIndex, boo
   {
     QList<QVariant> corners = this->mp_ImportAssistant->amtiCorners();
     QList<QVariant> origin = this->mp_ImportAssistant->amtiOrigin();
-    noImportError = this->mp_Acquisition->importFromAMTI(filename, allFramesKept, corners, origin);
+    noImportError = this->mp_Acquisition->importFromAMTI(filename, allFramesKept, corners, origin, fromOpenAction);
     if (noImportError)
     {
       settings.setValue("ImportAssistant/AMTICorners", corners);

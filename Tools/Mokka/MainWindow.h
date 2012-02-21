@@ -186,7 +186,7 @@ private:
   void importAcquisition(const QString& filter);
   bool importAcquisitions(const QStringList& filenames, bool allFramesKept = true);
   void importAssistant(int systemIndex, bool systemLocked = false, bool allFramesKeptOnly = false);
-  bool importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept);
+  bool importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept, bool fromOpenAction = false);
   void reset();
   void setAcquisitionProperties(QMap<int, QVariant>& properties);
   void readSettings(); 
