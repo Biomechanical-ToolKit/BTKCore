@@ -122,7 +122,7 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationPlaneZX);
   
   this->mp_MarkerTrajectoryLengthMenu = new QMenu(tr("Marker Trajectory Length"),this);
-  this->mp_ActionMarkerTrajectoryFull = new QAction(tr("All Frames"),this);;
+  this->mp_ActionMarkerTrajectoryFull = new QAction(tr("All Frames"),this);
   this->mp_ActionMarkerTrajectoryFull->setCheckable(true);
   this->mp_ActionMarkerTrajectory25 = new QAction(tr("25 Frames"),this);
   this->mp_ActionMarkerTrajectory25->setCheckable(true);
@@ -144,9 +144,12 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectory50);
   this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectory100);
   this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectory200);
+  this->mp_ForceButterflyActivationAction = new QAction(tr("Toggle GRF Butterfly"),this);
+  this->mp_ForceButterflyActivationAction->setEnabled(false);
   
   connect(groundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
   connect(trajectoryLengthActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeMarkerTrajectoryLength()));
+  connect(this->mp_ForceButterflyActivationAction, SIGNAL(triggered(bool)), this, SLOT(changeForceButterflyActivation()));
   
   this->setViewPrototype(ViewFactory<CompositeView>);
 };
@@ -476,6 +479,8 @@ void MultiViewWidget::load()
   // Active the content of each view
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
     static_cast<CompositeView*>(*it)->show(true);
+  
+  this->mp_ForceButterflyActivationAction->setEnabled(!this->mp_Acquisition->btkForcePlatforms()->IsEmpty());
 };
 
 void MultiViewWidget::setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor)
@@ -1112,6 +1117,12 @@ void MultiViewWidget::setForceVectorColor(const QColor& color)
   this->updateViews();
 };
 
+void MultiViewWidget::setGRFButterflyActivation(bool activated)
+{
+  btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS])->SetButterflyActivation(activated);
+  this->updateDisplay();
+};
+
 void MultiViewWidget::setVideoDelay(int id, double d)
 {
   this->m_VideoDelays[id] = static_cast<qint64>(d * 1000.0);
@@ -1140,6 +1151,7 @@ void MultiViewWidget::clear()
 {
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
     static_cast<CompositeView*>(*it)->show(false);
+  this->mp_ForceButterflyActivationAction->setEnabled(false);
 };
 
 void MultiViewWidget::circleSelectedMarkers(const QList<int>& ids)
@@ -1177,6 +1189,8 @@ void MultiViewWidget::updateDisplay()
   btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
   // Same thing for the segments
   btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
+  // And also the GRFs
+  btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
   // Update
   this->mp_Mappers->InitTraversal();
   vtkMapper* mapper;
@@ -1191,6 +1205,8 @@ void MultiViewWidget::updateDisplay(int frame)
   btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
   // Same thing for the segments
   btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
+  // And also the GRFs
+  btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
   // Update
   double t = static_cast<double>(frame - this->mp_Acquisition->firstFrame());
   for (vtkStreamingDemandDrivenPipelineCollection::iterator it = this->mp_Syncro->begin() ; it != this->mp_Syncro->end() ; ++it)
@@ -1310,7 +1326,14 @@ void MultiViewWidget::changeMarkerTrajectoryLength()
     markers->SetTrajectoryLength(200);
     
   this->updateMarkersDisplay();
-}
+};
+
+void MultiViewWidget::changeForceButterflyActivation()
+{
+  btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
+  GRFs->SetButterflyActivation(!GRFs->GetButterflyActivation());
+  this->updateDisplay();
+};
 
 void MultiViewWidget::updateCameras()
 {

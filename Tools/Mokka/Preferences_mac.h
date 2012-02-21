@@ -77,6 +77,7 @@ public slots:
   void showForcePlatformIndex(int index);
   void setDefaultForcePlateColor();
   void setDefaultForceVectorColor();
+  void setDefaultGRFButterflyActivation(int index);
   void setAutomaticCheckUpdate(bool isChecked);
   
   virtual void setVisible(bool visible);
@@ -94,6 +95,7 @@ signals:
   void showForcePlatformIndexChanged(int index);
   void defaultForcePlateColorChanged(const QColor& color);
   void defaultForceVectorColorChanged(const QColor& color);
+  void defaultGRFButterflyActivationChanged(int index);
   void automaticCheckUpdateStateChanged(bool isChecked);
   void userLayoutRemoved(int index);
   void userLayoutLabelChanged(int index, const QString& label);

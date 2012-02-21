@@ -86,6 +86,7 @@ public:
   QMenu* groundOrientationMenu() const {return this->mp_GroupOrientationMenu;};
   const QString groundNormalAsString() const;
   QMenu* markerTrajectoryLengthMenu() const {return this->mp_MarkerTrajectoryLengthMenu;};
+  QAction* forceButterflyActivationAction() const {return this->mp_ForceButterflyActivationAction;};
   
   void setDefaultGroundOrientation(int index);
   void setDefaultSegmentColor(const QColor& color);
@@ -97,6 +98,7 @@ public:
   void showForcePlatformIndex(bool isShown);
   void setForcePlatformColor(const QColor& color);
   void setForceVectorColor(const QColor& color);
+  void setGRFButterflyActivation(bool activated);
   
   void setVideoDelay(int id, double d);
   
@@ -158,6 +160,7 @@ private slots:
   // Qt
   void changeGroundOrientation();
   void changeMarkerTrajectoryLength();
+  void changeForceButterflyActivation();
   
 private:
   void updateCameras();
@@ -188,6 +191,7 @@ private:
   QAction* mp_ActionMarkerTrajectory50;
   QAction* mp_ActionMarkerTrajectory100;
   QAction* mp_ActionMarkerTrajectory200;
+  QAction* mp_ForceButterflyActivationAction;
   QList<QAction*> m_View3dActions;
   QList<QAction*> m_ViewChartActions;
 };

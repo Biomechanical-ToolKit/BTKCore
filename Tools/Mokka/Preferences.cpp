@@ -64,6 +64,7 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[ForcePlatformIndexDisplay] = -1;
   this->m_Data[DefaultForcePlateColor] = QColor();
   this->m_Data[DefaultForceVectorColor] = QColor();
+  this->m_Data[DefaultGRFButterflyActivation] = -1;
   this->m_Data[UserLayoutIndex] = -1;
   this->m_Data[UserLayouts] = QList<QVariant>();
   this->m_Data[AutomaticCheckUpdateUse] = false;
@@ -162,6 +163,13 @@ void Preferences::saveSettings()
     emit defaultForceVectorColorChanged(color);
   }
   
+  index = this->defaultGRFButterflyActivationComboBox->currentIndex();
+  if (this->m_Data[DefaultGRFButterflyActivation].toInt() != index)
+  {
+    this->m_Data[DefaultGRFButterflyActivation] = index;
+    emit defaultGRFButterflyActivationChanged(index);
+  }
+  
   QList<QVariant> vList = this->m_Data[UserLayouts].toList();
   if (vList != *(this->layoutTable->userLayouts()))
   {
@@ -188,6 +196,7 @@ void Preferences::resetSettings()
   this->defaultMarkerTrajectoryLengthComboBox->setCurrentIndex(this->m_Data[DefaultTrajectoryLength].toInt());
   this->showForcePlatformAxesComboBox->setCurrentIndex(this->m_Data[ForcePlatformAxesDisplay].toInt());
   this->showForcePlatformIndexComboBox->setCurrentIndex(this->m_Data[ForcePlatformIndexDisplay].toInt());
+  this->defaultGRFButterflyActivationComboBox->setCurrentIndex(this->m_Data[DefaultGRFButterflyActivation].toInt());
   colorizeButton(this->defaultForcePlateColorButton, this->m_Data[DefaultForcePlateColor].value<QColor>());
   colorizeButton(this->defaultForceVectorColorButton, this->m_Data[DefaultForceVectorColor].value<QColor>());
   this->layoutTable->refresh(); this->m_Data[UserLayouts] = *(this->layoutTable->userLayouts());

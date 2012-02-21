@@ -157,6 +157,7 @@ public slots:
   void setPreferenceShowForcePlatformIndex(int index);
   void setPreferenceDefaultForcePlateColor(const QColor& color);
   void setPreferenceDefaultForceVectorColor(const QColor& color);
+  void setPreferenceDefaultGRFButterflyActivation(int index);
   void setPreferenceAutomaticCheckUpdate(bool isChecked);
   // Others
   void updateSelectedMarkersRadius(double r);

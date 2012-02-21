@@ -164,6 +164,7 @@ MainWindow::MainWindow(QWidget* parent)
   }
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->timeEventControler->playbackSpeedMenu()->menuAction(), this->multiView->groundOrientationMenu());
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->multiView->groundOrientationMenu()->menuAction(), this->multiView->markerTrajectoryLengthMenu());
+  this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertAction(this->timeEventControler->actionReframeFromOne, this->multiView->forceButterflyActivationAction());
   this->multiView->initialize();
   // Contextual menu for the 3D views
   QList<QAction*> actions3d;
@@ -178,6 +179,9 @@ MainWindow::MainWindow(QWidget* parent)
   actions3d.push_back(this->mp_ModelDock->deleteSelectedMarkersAction());
   QAction* sep2 = new QAction(this); sep2->setSeparator(true);
   actions3d.push_back(sep2);
+  actions3d.push_back(this->multiView->forceButterflyActivationAction());
+  QAction* sep2b = new QAction(this); sep2b->setSeparator(true);
+  actions3d.push_back(sep2b);
   actions3d.push_back(this->timeEventControler->insertEventMenu()->menuAction());
   actions3d.push_back(this->timeEventControler->playbackSpeedMenu()->menuAction());
   this->multiView->setView3dActions(actions3d);
@@ -364,6 +368,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(showForcePlatformIndexChanged(int)), this, SLOT(setPreferenceShowForcePlatformIndex(int)));
   connect(this->mp_Preferences, SIGNAL(defaultForcePlateColorChanged(QColor)), this, SLOT(setPreferenceDefaultForcePlateColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultForceVectorColorChanged(QColor)), this, SLOT(setPreferenceDefaultForceVectorColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(defaultGRFButterflyActivationChanged(int)), this, SLOT(setPreferenceDefaultGRFButterflyActivation(int)));
   connect(this->mp_Preferences, SIGNAL(automaticCheckUpdateStateChanged(bool)), this, SLOT(setPreferenceAutomaticCheckUpdate(bool)));
 #ifdef Q_OS_MAC
   connect(this->mp_Preferences, SIGNAL(userLayoutRemoved(int)), this, SLOT(removeUserLayout(int)));
@@ -847,6 +852,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   
   pw->setProgressValue(40);
   
+  // this->multiView->setGRFButterflyActivation(this->mp_Preferences->defaultGRFButterflyActivationComboBox->currentIndex() == 0);
   this->multiView->load();
   
   pw->setProgressValue(90);
@@ -1646,6 +1652,13 @@ void MainWindow::setPreferenceDefaultForceVectorColor(const QColor& color)
   this->multiView->setForceVectorColor(color);
 };
 
+void MainWindow::setPreferenceDefaultGRFButterflyActivation(int index)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultButterflyActivation", index);
+  this->multiView->setGRFButterflyActivation(index == 0); // 0: ON ; 1: OFF
+};
+
 void MainWindow::setPreferenceAutomaticCheckUpdate(bool isChecked)
 {
   QSettings settings;
@@ -1813,6 +1826,7 @@ void MainWindow::readSettings()
   int showForcePlatformIndex = settings.value("showForcePlatformIndex", 0).toInt();
   QColor defaultForcePlateColor = settings.value("defaultForcePlateColor", QColor(255,255,0)).value<QColor>();
   QColor defaultForceVectorColor = settings.value("defaultForceVectorColor", QColor(255,255,0)).value<QColor>();
+  int defaultButterflyActivation = settings.value("defaultButterflyActivation", 1).toInt();
   bool checkUpdateStartup = settings.value("checkUpdateStartup", true).toBool();
   settings.endGroup();
   this->mp_Preferences->lastDirectory = this->m_LastDirectory;
@@ -1828,6 +1842,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->showForcePlatformIndexComboBox->setCurrentIndex(showForcePlatformIndex);
   colorizeButton(this->mp_Preferences->defaultForcePlateColorButton, defaultForcePlateColor);
   colorizeButton(this->mp_Preferences->defaultForceVectorColorButton, defaultForceVectorColor);
+  this->mp_Preferences->defaultGRFButterflyActivationComboBox->setCurrentIndex(defaultButterflyActivation);
   this->mp_Preferences->automaticCheckUpdateCheckBox->setChecked(checkUpdateStartup);
 
 #ifdef Q_OS_WIN
@@ -1843,6 +1858,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::ForcePlatformIndexDisplay, showForcePlatformIndex);
   this->mp_Preferences->setPreference(Preferences::DefaultForcePlateColor, defaultForcePlateColor);
   this->mp_Preferences->setPreference(Preferences::DefaultForceVectorColor, defaultForceVectorColor);
+  this->mp_Preferences->setPreference(Preferences::DefaultGRFButterflyActivation, defaultButterflyActivation);
   this->mp_Preferences->setPreference(Preferences::UserLayoutIndex, layoutIndex);
   this->mp_Preferences->setPreference(Preferences::UserLayouts, this->m_UserLayouts);
   this->mp_Preferences->setPreference(Preferences::AutomaticCheckUpdateUse, checkUpdateStartup);
@@ -1860,6 +1876,7 @@ void MainWindow::readSettings()
   this->multiView->showForcePlatformIndex(showForcePlatformIndex == 0);
   this->multiView->setForcePlatformColor(defaultForcePlateColor);
   this->multiView->setForceVectorColor(defaultForceVectorColor);
+  this->multiView->setGRFButterflyActivation(defaultButterflyActivation == 0);
   
   // Import assistant
   settings.beginGroup("ImportAssistant");

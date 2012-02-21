@@ -50,7 +50,8 @@
   public:
     enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, 
           DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
-          ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse};
+          ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse,
+          DefaultGRFButterflyActivation};
   
     Preferences(QWidget* parent = 0);
     // ~Preferences(); // Implicit
@@ -92,6 +93,7 @@
     void defaultForceVectorColorChanged(const QColor& color);
     void automaticCheckUpdateStateChanged(bool isChecked);
     void userLayoutsChanged(const QList<QVariant>& layouts, int index);
+    void defaultGRFButterflyActivationChanged(int index)
     
   private slots:
     void removeUserLayout(int index);

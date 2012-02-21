@@ -96,6 +96,7 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->showForcePlatformIndexComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(showForcePlatformIndex(int)));
   connect(this->defaultForcePlateColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForcePlateColor()));
   connect(this->defaultForceVectorColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForceVectorColor()));
+  connect(this->defaultGRFButterflyActivationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultGRFButterflyActivation(int)));
   connect(this->automaticCheckUpdateCheckBox, SIGNAL(toggled(bool)), this, SLOT(setAutomaticCheckUpdate(bool)));
   connect(this->layoutTable, SIGNAL(userLayoutRemoved(int)), this, SIGNAL(userLayoutRemoved(int)));
   connect(this->layoutTable, SIGNAL(userLayoutLabelChanged(int, QString)), this, SIGNAL(userLayoutLabelChanged(int, QString)));
@@ -243,6 +244,11 @@ void Preferences::setDefaultForceVectorColor()
     colorizeButton(this->defaultForceVectorColorButton, color);
     emit defaultForceVectorColorChanged(color);
   }
+};
+
+void Preferences::setDefaultGRFButterflyActivation(int index)
+{
+  emit defaultGRFButterflyActivationChanged(index);
 };
 
 void Preferences::setAutomaticCheckUpdate(bool isChecked)

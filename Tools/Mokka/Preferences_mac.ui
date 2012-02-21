@@ -35,7 +35,7 @@
       <x>12</x>
       <y>0</y>
       <width>456</width>
-      <height>388</height>
+      <height>441</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -51,7 +51,7 @@
      </size>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="generalPage">
      <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -905,6 +905,33 @@ QPushButton:pressed {
              <widget class="QLabel" name="label_15">
               <property name="text">
                <string>Show index:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QComboBox" name="defaultGRFButterflyActivationComboBox">
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>Yes</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>No</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="defaultGRFButterflyActivationLabel">
+              <property name="toolTip">
+               <string>Display ground reaction forces (GRF) butterfly diagram</string>
+              </property>
+              <property name="text">
+               <string>GRF Butterfly diagram:</string>
               </property>
              </widget>
             </item>
