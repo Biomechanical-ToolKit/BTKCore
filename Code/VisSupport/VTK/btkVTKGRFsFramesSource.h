@@ -55,6 +55,11 @@ namespace btk
     double GetScaleUnit() {return this->m_Scale;};
     void SetScaleUnit(double s) {this->m_Scale = s;};
     
+    bool GetButterflyActivation() const {return this->m_ButterflyActivated;};
+    void SetButterflyActivation(bool activated) {this->m_ButterflyActivated = activated;};
+    void ButterflyActivationOn() {this->SetButterflyActivation(true);};
+    void ButterflyActivationOff() {this->SetButterflyActivation(false);};
+    
   protected:
     VTKGRFsFramesSource();
     ~VTKGRFsFramesSource();
@@ -71,6 +76,9 @@ namespace btk
 
     VTKGRFsComponents* mp_GRFsComponents;
     double m_Scale;
+    vtkPolyData* mp_ButterflyCache;
+    int m_LastCachedFrame;
+    bool m_ButterflyActivated;
   };
 };
 #endif // __btkVTKGRFsFramesSource_h
