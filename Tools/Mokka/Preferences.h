@@ -93,7 +93,7 @@
     void defaultForceVectorColorChanged(const QColor& color);
     void automaticCheckUpdateStateChanged(bool isChecked);
     void userLayoutsChanged(const QList<QVariant>& layouts, int index);
-    void defaultGRFButterflyActivationChanged(int index)
+    void defaultGRFButterflyActivationChanged(int index);
     
   private slots:
     void removeUserLayout(int index);
