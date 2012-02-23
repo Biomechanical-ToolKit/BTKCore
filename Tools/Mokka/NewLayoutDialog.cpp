@@ -39,9 +39,7 @@ NewLayoutDialog::NewLayoutDialog(const QList<QVariant>* configs, QWidget* parent
 : NewItemTemplateDialog<QVariant>(configs, parent)
 {
   this->setWindowTitle(tr("New Layout"));
-  this->label->setText(tr("New View's Layout"));
-  
-  connect(this->lineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateButton(QString)));
+  this->label->setText(tr("Create a view's layout from an existing one or a new one"));
 };
 
 bool NewLayoutDialog::itemAlreadyExists(const QString& name)
@@ -52,9 +50,4 @@ bool NewLayoutDialog::itemAlreadyExists(const QString& name)
       return true;
   }
   return false;
-};
-
-void NewLayoutDialog::updateButton(const QString& name)
-{
-  this->updateButtonState(name);
 };

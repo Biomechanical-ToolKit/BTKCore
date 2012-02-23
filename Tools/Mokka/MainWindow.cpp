@@ -719,24 +719,31 @@ void MainWindow::saveCurrentLayout()
     NewLayoutDialog nld(&(this->m_UserLayouts), this);
     if (nld.exec())
     {
-      this->m_UserLayouts.push_back(nld.layoutName());
-      this->m_UserLayouts.push_back(this->multiView->saveLayout());
+      int layoutIndex; 
+      QString layoutName = nld.layoutName(&layoutIndex);
+      if (layoutIndex == -1) // New
+      {
+        this->m_UserLayouts.push_back(layoutName);
+        this->m_UserLayouts.push_back(this->multiView->saveLayout());
+        layoutIndex = this->m_UserLayouts.count() / 2 - 1;
+      }
+      else
+        this->m_UserLayouts[layoutIndex*2+1] = this->multiView->saveLayout();
       this->updateUserLayoutActions();
-      int index = this->m_UserLayouts.count() / 2 - 1;
-      this->mp_ActionUserLayouts[index]->setChecked(true);
+      this->mp_ActionUserLayouts[layoutIndex]->setChecked(true);
       QSettings settings;
       settings.setValue("MainWindow/userLayouts", this->m_UserLayouts);
-      settings.setValue("MainWindow/currentLayout", index+3);
+      settings.setValue("MainWindow/currentLayout", layoutIndex+3);
       this->mp_Preferences->refreshUserLayouts();
-      LOG_INFO(tr("Saving the new user's layout: ") + nld.layoutName());
+      LOG_INFO(tr("Saving the new user's layout: ") + layoutName);
     }
   }
 };
 
 void MainWindow::manageUserLayouts()
 {
-  this->mp_Preferences->showLayoutsPreferences();
   this->showPreferences();
+  this->mp_Preferences->showLayoutsPreferences();
 };
 
 void MainWindow::play()

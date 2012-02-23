@@ -40,19 +40,23 @@
 
 class NewLayoutDialog : public NewItemTemplateDialog<QVariant>
 {
-  Q_OBJECT
-  
 public:
   NewLayoutDialog(const QList<QVariant>* configs, QWidget* parent = 0);
   // ~NewLayoutDialog(); // Implicit
   
-  QString layoutName() const {return this->lineEdit->text();};
+  QString layoutName(int* itemIndex) const {return this->createdItemText(itemIndex);};
   
 protected:
   virtual bool itemAlreadyExists(const QString& name);
-  
-private slots:
-  void updateButton(const QString& name);
 };
+
+template<>
+inline void NewItemTemplateDialog<QVariant>::fillExistingItems()
+{
+  this->existingComboBox->clear();
+  for (int i = 0 ; i < this->mp_Items->count() ; i+=2)
+    this->existingComboBox->addItem(this->mp_Items->operator[](i).toString());
+  this->existingComboBox->setCurrentIndex(-1);
+}
 
 #endif // NewLayoutDialog_h

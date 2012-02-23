@@ -33,29 +33,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef NewItemTemplateDialog_h
-#define NewItemTemplateDialog_h
+#ifndef NewItemDialog_h
+#define NewItemDialog_h
 
-#include "NewItemDialog.h"
+#include "ui_NewItemDialog.h"
 
-template <class T>
-class NewItemTemplateDialog : public NewItemDialog
+#include <QDialog>
+#include <QPushButton>
+
+class NewItemDialog : public QDialog, public Ui::NewItemDialog
 {
+  Q_OBJECT
+
 public:
-  NewItemTemplateDialog(const QList<T>* items, QWidget* parent = 0);
-  // ~NewItemTemplateDialog(); // Implicit
-
+  NewItemDialog(QWidget* parent = 0);
+  // ~NewItemDialog(); // Implicit
+  
+  QString createdItemText(int* itemIndex) const;
+  
 protected:
-  virtual void fillExistingItems() {}; // THIS METHOD MUST BE SPECIALIZED
-  const QList<T>* mp_Items;
+  virtual bool itemAlreadyExists(const QString& /* name */) {return false;};
+
+private slots:
+  void toggleExistingItem(bool toggled);
+  void toggleNewItem(bool toggled);
+  void updateButtonState(int index);
+  void updateButtonState(const QString& name);
 };
 
-template <class T>
-NewItemTemplateDialog<T>::NewItemTemplateDialog(const QList<T>* configs, QWidget* parent)
-: NewItemDialog(parent)
-{
-  this->mp_Items = configs;
-  this->fillExistingItems();
-};
-
-#endif // NewItemTemplateDialog_h
+#endif // NewItemDialog_h

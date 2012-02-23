@@ -982,15 +982,26 @@ void ModelDockWidget::newConfiguration()
   this->modelConfigurationComboBox->blockSignals(true);
   if (nmd.exec())
   {
-    ConfigurationItem config;
-    config.name = nmd.configurationName();
-    config.filename = "";
-    config.isNew = true;
-    config.isModified = true;
-    this->m_ConfigurationItems.push_back(config);
-    
-    this->modelConfigurationComboBox->addItem("*" + config.name);
-    this->setCurrentConfiguration(this->m_ConfigurationItems.count()-1);
+    int modelIndex;
+    QString name = nmd.configurationName(&modelIndex);
+    if (modelIndex == -1) // new
+    {
+      ConfigurationItem config;
+      config.name = name;
+      config.isNew = true;
+      config.filename = "";
+      config.isModified = true;
+      this->m_ConfigurationItems.push_back(config);
+      modelIndex = this->m_ConfigurationItems.count()-1;
+      this->modelConfigurationComboBox->addItem("*" + name);
+    }
+    else
+    {
+      ConfigurationItem* config = &(this->m_ConfigurationItems[modelIndex]);
+      config->isModified = true;
+      this->modelConfigurationComboBox->setItemText(modelIndex, "*" + name);
+    }
+    this->setCurrentConfiguration(modelIndex);
     
     this->mp_SaveConfiguration->setEnabled(true);
     this->mp_RemoveConfiguration->setEnabled(true);
