@@ -101,6 +101,8 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuSettings->addMenu(this->multiView->groundOrientationMenu());
   this->menuSettings->addMenu(this->multiView->markerTrajectoryLengthMenu());
   this->menuSettings->addMenu(this->timeEventControler->playbackSpeedMenu());
+  this->menuSettings->addSeparator();
+  this->menuSettings->addAction(this->multiView->forceButterflyActivationAction());
   QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
   actionInformationsDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I));
   this->menuView->addAction(actionInformationsDockView);
