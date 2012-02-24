@@ -37,6 +37,7 @@ SET(Mokka_CPP
   ModelTreeWidget.cpp
   MultiViewWidget.cpp
   NewEventDialog.cpp
+  NewItemDialog.cpp
   NewLayoutDialog.cpp
   NewModelDialog.cpp
   NewSegmentDialog.cpp
@@ -72,8 +73,7 @@ SET(Mokka_H
   ModelTreeWidget.h
   MultiViewWidget.h
   NewEventDialog.h
-  NewLayoutDialog.h
-  NewModelDialog.h
+  NewItemDialog.h
   NewSegmentDialog.h
   Preferences_Layouts.h
   ProgressWidget.h

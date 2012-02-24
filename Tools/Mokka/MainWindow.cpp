@@ -294,6 +294,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_ModelDock, SIGNAL(markerSelectionChanged(QList<int>)), this->multiView, SLOT(circleSelectedMarkers(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(markerHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenMarkers(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(markerTrajectorySelectionChanged(QList<int>)), this->multiView, SLOT(updateTrackedMarkers(QList<int>)));
+  connect(this->mp_ModelDock, SIGNAL(wrenchPositionSelectionChanged(QList<int>)), this->multiView, SLOT(updateTrackedGRFPaths(QList<int>)));
   connect(this->mp_ModelDock->markerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateSelectedMarkersRadius(double)));
   connect(this->mp_ModelDock, SIGNAL(segmentLabelChanged(int, QString)), this, SLOT(setSegmentLabel(int, QString)));
   connect(this->mp_ModelDock, SIGNAL(segmentsColorChanged(QVector<int>, QColor)), this, SLOT(setSegmentsColor(QVector<int>, QColor)));

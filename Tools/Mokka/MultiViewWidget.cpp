@@ -85,7 +85,7 @@ class vtkProcessMap : public vtkstd::map<int, vtkObjectBase*>
 
 MultiViewWidget::MultiViewWidget(QWidget* parent)
 : AbstractMultiView(parent), m_VideoDelays(),
-  m_ForcePlatformColor(255, 255, 0), m_ForceVectorColor(255, 255, 0),
+  m_ForcePlatformColor(127, 127, 127), m_ForceVectorColor(255, 255, 0),
   m_View3dActions(), m_ViewChartActions()
 {
   this->mp_EventFilterObject = 0;
@@ -99,6 +99,7 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_AnalogChartFrames = vtkDoubleArray::New();
   this->mp_AnalogChartFrames->SetName("Frame");
   this->mp_ForcePlatformActor = 0;
+  this->mp_GRFsTrajectoryActor = 0;
   this->mp_ForceVectorActor = 0;
   this->mp_Mappers = vtkMapperCollection::New();
   this->mp_GroupOrientationMenu = new QMenu(tr("Ground Orientation"),this);
@@ -164,8 +165,9 @@ MultiViewWidget::~MultiViewWidget()
   this->mp_PointChartFrames->Delete();
   this->mp_AnalogChartFrames->Delete();
   this->mp_Mappers->Delete();
-  if (this->mp_ForcePlatformActor != 0) this->mp_ForcePlatformActor->Delete();
-  if (this->mp_ForceVectorActor != 0) this->mp_ForceVectorActor->Delete();
+  this->mp_ForcePlatformActor->Delete();
+  this->mp_GRFsTrajectoryActor->Delete();
+  this->mp_ForceVectorActor->Delete();
   vtkAlgorithm::SetDefaultExecutivePrototype(0);
 };
 
@@ -319,7 +321,7 @@ void MultiViewWidget::initialize()
   btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::New();
   //GRFs->SetInput(GRWsDownsampler->GetOutput());
   mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(GRFs->GetOutputPort());
+  mapper->SetInputConnection(GRFs->GetOutputPort(0));
   this->mp_Mappers->AddItem(mapper);
   prop = vtkProperty::New();
   prop->SetColor(this->m_ForceVectorColor.redF(), this->m_ForceVectorColor.greenF(), this->m_ForceVectorColor.blueF());
@@ -335,7 +337,24 @@ void MultiViewWidget::initialize()
   this->mp_ForceVectorActor = actor;
   // Cleanup for GRFs.
   mapper->Delete();
-  //actor->Delete();
+  prop->Delete();
+  // - Display GRF's PWA trajectory
+  mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(GRFs->GetOutputPort(1));
+  this->mp_Mappers->AddItem(mapper);
+  prop = vtkProperty::New();
+  prop->SetColor(this->m_ForcePlatformColor.redF(), this->m_ForcePlatformColor.greenF(), this->m_ForcePlatformColor.blueF());
+  prop->SetPointSize(2.0);
+  actor = vtkActor::New();
+  actor->SetMapper(mapper);
+  actor->SetScale(0.005);
+  actor->SetProperty(prop);
+  actor->PickableOff();
+  actor->UseBoundsOff();
+  renderer->AddActor(actor);
+  this->mp_GRFsTrajectoryActor = actor;
+  // Cleanup for GRFs trajectory.
+  mapper->Delete();
   prop->Delete();
   // Synchro between dynamic data
   this->mp_Syncro->push_back(vtkStreamingDemandDrivenPipeline::SafeDownCast(markers->GetExecutive()));
@@ -954,6 +973,20 @@ void MultiViewWidget::updateTrackedMarkers(const QList<int>& ids)
   this->updateMarkersDisplay();
 };
 
+void MultiViewWidget::updateTrackedGRFPaths(const QList<int>& ids)
+{
+  btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
+  GRFs->HidePaths();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    GRFs->ShowPath(ids[i]);
+  GRFs->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
+  this->mp_Mappers->InitTraversal();
+  vtkMapper* mapper;
+  while ((mapper = this->mp_Mappers->GetNextItem()) != NULL)
+    mapper->Modified();
+  this->updateViews();
+};
+
 double MultiViewWidget::markerRadius(int id)
 {
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
@@ -1102,17 +1135,14 @@ void MultiViewWidget::showForcePlatformIndex(bool isShown)
 void MultiViewWidget::setForcePlatformColor(const QColor& color)
 {
   this->m_ForcePlatformColor = color;
-  if (!this->mp_ForcePlatformActor)
-    return;
   this->mp_ForcePlatformActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+  this->mp_GRFsTrajectoryActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
   this->updateViews();
 };
 
 void MultiViewWidget::setForceVectorColor(const QColor& color)
 {
   this->m_ForceVectorColor = color;
-  if (!this->mp_ForceVectorActor)
-    return;
   this->mp_ForceVectorActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
   this->updateViews();
 };

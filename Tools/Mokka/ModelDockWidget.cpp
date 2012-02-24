@@ -480,6 +480,7 @@ void ModelDockWidget::load()
     QTreeWidgetItem* forcePlatePositionItem = new QTreeWidgetItem(QStringList("Position"), ForcePlateType);
     forcePlatePositionItem->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
     forcePlatePositionItem->setData(0, ForcePlateId, 65535+i*3+0);
+    forcePlatePositionItem->setCheckState(TrajectoryHeader, Qt::Unchecked);
     forcePlateItem->addChild(forcePlatePositionItem);
   }
   // - Videos
@@ -1862,6 +1863,19 @@ void ModelDockWidget::sendTrackedMarkers()
   emit markerTrajectorySelectionChanged(ids);
 };
 
+void ModelDockWidget::sendTrackedGRFPaths()
+{
+  QList<int> ids;
+  QTreeWidgetItem* forcePlatesRoot = this->modelTree->topLevelItem(ForcePlatesItem);
+  for (int i = 0 ; i < forcePlatesRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* item = forcePlatesRoot->child(i)->child(2); // Position
+    if (item->checkState(TrajectoryHeader) == Qt::Checked)
+      ids << (item->data(0,ForcePlateId).toInt() - 65535) / 3; // 65535: because force platform ID starts from 65535 ; 3: because each component of the wrench has also a unique ID.
+  }
+  emit wrenchPositionSelectionChanged(ids);
+};
+
 void ModelDockWidget::sendModifiedMarkersState(QTreeWidgetItem* item, int column)
 {
   Q_UNUSED(item);
@@ -1873,7 +1887,10 @@ void ModelDockWidget::sendModifiedMarkersState(QTreeWidgetItem* item, int column
       this->sendHiddenMarkers();
   }
   else if (column == TrajectoryHeader)
+  {
     this->sendTrackedMarkers();
+    this->sendTrackedGRFPaths();
+  }
 };
 
 void ModelDockWidget::editMarkerLabel()

@@ -192,6 +192,7 @@ signals:
   void markerSelectionChanged(const QList<int>& ids);
   void markerHiddenSelectionChanged(const QList<int>& ids);
   void markerTrajectorySelectionChanged(const QList<int>& ids);
+  void wrenchPositionSelectionChanged(const QList<int>& ids);
   void markerLabelChanged(int id, const QString& label);
   void markersRadiusChanged(const QVector<int>& ids, double radius);
   void markersColorChanged(const QVector<int>& ids, const QColor& colors);
@@ -225,6 +226,7 @@ private:
   void sendHiddenSegments();
   void sendHiddenMarkers();
   void sendTrackedMarkers();
+  void sendTrackedGRFPaths();
   QTreeWidgetItem* createSegmentItem(const QString& label, int id);
   QTreeWidgetItem* createMarkerItem(const QString& label, int id, bool checked = true);
   QTreeWidgetItem* createAnalogItem(const QString& label, int id);

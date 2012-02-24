@@ -123,6 +123,7 @@ public slots:
   void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
   void updateHiddenMarkers(const QList<int>& ids);
   void updateTrackedMarkers(const QList<int>& ids);
+  void updateTrackedGRFPaths(const QList<int>& ids);
   void clear();
   void circleSelectedMarkers(const QList<int>& ids);
   void updateSegmentsDisplay();
@@ -178,6 +179,7 @@ private:
   vtkDoubleArray* mp_AnalogChartFrames; // Values for the X axis shared by each analog chart.
   QColor m_ForcePlatformColor;
   vtkActor* mp_ForcePlatformActor;
+  vtkActor* mp_GRFsTrajectoryActor;
   QColor m_ForceVectorColor;
   vtkActor* mp_ForceVectorActor;
   QMenu* mp_GroupOrientationMenu;
