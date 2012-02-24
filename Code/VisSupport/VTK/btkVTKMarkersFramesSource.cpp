@@ -555,7 +555,7 @@ namespace btk
         this->mp_TrajectoryColors->SetNumberOfValues(pointNumber * frameNumber);
         for (size_t i = 0 ; i < this->mp_TrajectoryIds->size() ; ++i)
           this->mp_TrajectoryIds->operator[](i)->Delete();
-        this->mp_TrajectoryIds->resize(pointNumber);  
+        this->mp_TrajectoryIds->resize(pointNumber);
         for (size_t i = 0 ; i < pointNumber ; ++i)
         {
           this->mp_MarkersRadius->SetValue(i, this->m_DefaultMarkerRadius);

@@ -55,6 +55,13 @@ namespace btk
   class VTKGRFsComponents : public vtkstd::vector<vtkCellArray*>
   {};
   
+  /**
+   * @class VTKGRFsPathPath btkVTKGRFsFramesSource.h
+   * @brief List of ids representing ground reaction forces' path.
+   */
+  class VTKGRFsPathPath : public vtkstd::vector<vtkIdList*>
+  {};
+  
   /** 
    * @class VTKGRFsFramesSource
    * @brief Display ground reaction forces (GRF).
@@ -144,6 +151,48 @@ namespace btk
    *
    * Usefull when visualized acquistion date are set in meter, millimeter, inch, etc.
    */
+   
+  /**
+   * Sets visibility of GRF position's trajectory
+   */
+  void VTKGRFsFramesSource::SetPathVisibility(int idx, bool visible)
+  {
+    this->mp_GRFsPathActivated->SetValue(idx, visible ? 1 : 0);
+  };
+  
+  /**
+   * Convenient method to show GRF position's trajectory.
+   */
+  void VTKGRFsFramesSource::ShowPath(int idx)
+  {
+    this->SetPathVisibility(idx, true);
+  };
+  
+  /**
+   * Convenient method to show all GRF positions' trajectory.
+   */
+  void VTKGRFsFramesSource::ShowPaths()
+  {
+    for (int i = 0 ; i < this->mp_GRFsPathActivated->GetNumberOfTuples() ; ++i)
+      this->mp_GRFsPathActivated->SetValue(i, 1);
+  };
+  
+  /**
+   * Convenient method to hide GRF position's trajectory.
+   */
+  void VTKGRFsFramesSource::HidePath(int idx)
+  {
+    this->SetPathVisibility(idx, false);
+  };
+  
+  /**
+   * Convenient method to hide all GRF positions' trajectory.
+   */
+  void VTKGRFsFramesSource::HidePaths()
+  {
+    for (int i = 0 ; i < this->mp_GRFsPathActivated->GetNumberOfTuples() ; ++i)
+      this->mp_GRFsPathActivated->SetValue(i, 0);
+  };
   
   /**
    * Constructor.
@@ -153,7 +202,11 @@ namespace btk
   VTKGRFsFramesSource::VTKGRFsFramesSource()
   : vtkPolyDataAlgorithm()
   {
+    this->SetNumberOfOutputPorts(2);
+    
     this->mp_GRFsComponents = new VTKGRFsComponents();
+    this->mp_GRFsPathIds = new VTKGRFsComponents();
+    this->mp_GRFsPathActivated = vtkIntArray::New();
     this->m_Scale = 1.0;
     this->mp_ButterflyCache = vtkPolyData::New();
     this->m_LastCachedFrame = -1;
@@ -168,6 +221,10 @@ namespace btk
     for (size_t i = 0 ; i < this->mp_GRFsComponents->size() ; ++i)
       this->mp_GRFsComponents->operator[](i)->Delete();
     delete this->mp_GRFsComponents;
+    for (size_t i = 0 ; i < this->mp_GRFsPathIds->size() ; ++i)
+      this->mp_GRFsPathIds->operator[](i)->Delete();
+    delete this->mp_GRFsPathIds;
+    this->mp_GRFsPathActivated->Delete();
     this->mp_ButterflyCache->Delete();
   };
   
@@ -215,6 +272,8 @@ namespace btk
     for (size_t i = 0 ; i < this->mp_GRFsComponents->size() ; ++i)
       this->mp_GRFsComponents->operator[](i)->Delete();
     this->mp_GRFsComponents->clear();
+    for (size_t i = 0 ; i < this->mp_GRFsPathIds->size() ; ++i)
+      this->mp_GRFsPathIds->operator[](i)->Delete();
     this->mp_ButterflyCache->Initialize();
     this->m_LastCachedFrame = -1;
     // Compute the force vectors geometry
@@ -224,25 +283,39 @@ namespace btk
     {
       frameNumber = input->GetItem(0)->GetPosition()->GetFrameNumber();
       vtkPoints* points = vtkPoints::New(); points->SetNumberOfPoints(2*frameNumber*wrenchNumber); // 2 points by wrench
+      VTKGRFsPathPath trajectoryPaths = VTKGRFsPathPath();
+      trajectoryPaths.resize(wrenchNumber, 0);
+      this->mp_GRFsPathIds->resize(wrenchNumber);
+      this->mp_GRFsPathActivated->SetNumberOfValues(wrenchNumber);
+      for (int i = 0 ; i < wrenchNumber ; ++i)
+      {
+        this->mp_GRFsPathIds->operator[](i) = vtkCellArray::New();
+        trajectoryPaths[i] = vtkIdList::New();
+        this->mp_GRFsPathActivated->SetValue(i, 0);
+      }
       this->mp_GRFsComponents->resize(frameNumber);
       vtkIdType ptId = 0;
       for (int i = 0 ; i < frameNumber ; ++i)
       {
+        int ptIdx = 0;
         vtkCellArray* GRFs = vtkCellArray::New();
         WrenchCollection::ConstIterator it = input->Begin();
         while (it != input->End())
         {
-          if ((*it)->GetPosition()->GetResiduals().coeff(i) != -1.0)
+          if ((*it)->GetPosition()->GetResiduals().coeff(i) >= 0.0)
           {
             double* positions = (*it)->GetPosition()->GetValues().data();
             double* forces = (*it)->GetForce()->GetValues().data();
             
             vtkIdType pt1Id = ptId++;
             vtkIdType pt2Id = ptId++;
+            // The point on the force platform is slightly shifted for visibilty reason.
+            // Otherwise the trajectory is not visible if the force platform geometry is shown (using the filter btk::VTKForcePlatformsSource).
+            // This shift is done on all the coordinates to be independant of the orientation of the force platform.
             points->SetPoint(pt1Id,
-                             positions[i] * this->m_Scale,
-                             positions[i + frameNumber] * this->m_Scale,
-                             positions[i + 2 * frameNumber] * this->m_Scale);
+                             positions[i] * this->m_Scale + 0.1,
+                             positions[i + frameNumber] * this->m_Scale + 0.1,
+                             positions[i + 2 * frameNumber] * this->m_Scale + 0.1);
             points->SetPoint(pt2Id,
                              positions[i] * this->m_Scale + forces[i], 
                              positions[i + frameNumber] * this->m_Scale + forces[i + frameNumber], 
@@ -250,11 +323,19 @@ namespace btk
             GRFs->InsertNextCell(2);
             GRFs->InsertCellPoint(pt1Id);
             GRFs->InsertCellPoint(pt2Id);
+            
+            trajectoryPaths[ptIdx]->InsertNextId(pt1Id);
           }
+          ++ptIdx;
           ++it;
         }
         points->SetNumberOfPoints(ptId); // Resize to the final number of points
         this->mp_GRFsComponents->operator[](i) = GRFs;
+      }
+      for (size_t i = 0 ; i < this->mp_GRFsPathIds->size() ; ++i)
+      {
+        this->mp_GRFsPathIds->operator[](i)->InsertNextCell(trajectoryPaths[i]);
+        trajectoryPaths[i]->Delete();
       }
       
       this->mp_ButterflyCache->SetPoints(points);
@@ -290,8 +371,12 @@ namespace btk
   {
     btkNotUsed(request);
     btkNotUsed(inputVector);
+    // Force vectors
     vtkInformation* outInfo = outputVector->GetInformationObject(0);    
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+    // Paths
+    vtkInformation* outInfo2 = outputVector->GetInformationObject(1);
+    vtkPolyData* output2 = vtkPolyData::SafeDownCast(outInfo2->Get(vtkDataObject::DATA_OBJECT()));
     
     if (this->mp_GRFsComponents->size() != 0)
     {
@@ -330,10 +415,28 @@ namespace btk
         this->mp_ButterflyCache->GetLines()->DeepCopy(GRFs);
       }
       output->ShallowCopy(this->mp_ButterflyCache);
+      
+      // Path generation
+      vtkCellArray* trajectoryIds = vtkCellArray::New();
+      for (int i = 0 ; i < this->mp_GRFsPathActivated->GetNumberOfTuples() ; ++i)
+      {
+        if (this->mp_GRFsPathActivated->GetValue(i) == 0)
+          continue;
+        vtkIdType npts;
+        vtkIdType* pts;
+        this->mp_GRFsPathIds->operator[](i)->InitTraversal();
+        while (this->mp_GRFsPathIds->operator[](i)->GetNextCell(npts, pts))
+          trajectoryIds->InsertNextCell(npts, pts);
+      }
+      output2->SetPoints(this->mp_ButterflyCache->GetPoints());
+      output2->SetVerts(trajectoryIds);
+      trajectoryIds->Delete();
     }
     else
+    {
       output->Initialize();
-
+      output2->Initialize();
+    }
     return 1;
   };
 
