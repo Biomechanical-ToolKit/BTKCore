@@ -35,7 +35,7 @@
       <x>12</x>
       <y>0</y>
       <width>456</width>
-      <height>441</height>
+      <height>471</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -800,6 +800,9 @@ QPushButton:pressed {
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <item>
            <layout class="QFormLayout" name="formLayout_2">
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+            </property>
             <property name="horizontalSpacing">
              <number>12</number>
             </property>
@@ -809,6 +812,51 @@ QPushButton:pressed {
             <property name="topMargin">
              <number>9</number>
             </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>Show axes:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="showForcePlatformAxesComboBox">
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToContents</enum>
+              </property>
+              <item>
+               <property name="text">
+                <string>Yes</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>No</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Show index:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="showForcePlatformIndexComboBox">
+              <item>
+               <property name="text">
+                <string>Yes</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>No</string>
+               </property>
+              </item>
+             </widget>
+            </item>
             <item row="2" column="0">
              <widget class="QLabel" name="label_10">
               <property name="text">
@@ -863,48 +911,13 @@ QPushButton:pressed {
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="showForcePlatformAxesComboBox">
-              <property name="sizeAdjustPolicy">
-               <enum>QComboBox::AdjustToContents</enum>
+            <item row="4" column="0">
+             <widget class="QLabel" name="defaultGRFButterflyActivationLabel">
+              <property name="toolTip">
+               <string>Display ground reaction forces (GRF) butterfly diagram</string>
               </property>
-              <item>
-               <property name="text">
-                <string>Yes</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>No</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_14">
               <property name="text">
-               <string>Show axes:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="showForcePlatformIndexComboBox">
-              <item>
-               <property name="text">
-                <string>Yes</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>No</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_15">
-              <property name="text">
-               <string>Show index:</string>
+               <string>Butterfly diagram:</string>
               </property>
              </widget>
             </item>
@@ -925,14 +938,28 @@ QPushButton:pressed {
               </item>
              </widget>
             </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="defaultGRFButterflyActivationLabel">
-              <property name="toolTip">
-               <string>Display ground reaction forces (GRF) butterfly diagram</string>
-              </property>
+            <item row="5" column="0">
+             <widget class="QLabel" name="showForcePathLabel">
               <property name="text">
-               <string>GRF Butterfly diagram:</string>
+               <string>Show force path:</string>
               </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QComboBox" name="showForcePathComboBox">
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>Yes</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>No</string>
+               </property>
+              </item>
              </widget>
             </item>
            </layout>

@@ -2404,6 +2404,31 @@ void ModelDockWidget::insertAnalogs(const QList<int>& ids, const QList<Analog*>&
   this->refresh();
 };
 
+void ModelDockWidget::showGroundRectionForcePaths()
+{
+  this->setGroundRectionForcePathsVisibility(true);
+};
+
+void ModelDockWidget::hideGroundRectionForcePaths()
+{
+  this->setGroundRectionForcePathsVisibility(false);
+};
+
+void ModelDockWidget::setGroundRectionForcePathsVisibility(bool visible)
+{
+  QList<int> ids;
+  QTreeWidgetItem* forcePlatesRoot = this->modelTree->topLevelItem(ForcePlatesItem);
+  this->modelTree->blockSignals(true);
+  for (int i = 0 ; i < forcePlatesRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* item = forcePlatesRoot->child(i)->child(2); // Position
+    item->setCheckState(TrajectoryHeader, visible ? Qt::Checked : Qt::Unchecked);
+    ids << (item->data(0,ForcePlateId).toInt() - 65535) / 3; // 65535: because force platform ID starts from 65535 ; 3: because each component of the wrench has also a unique ID.
+  }
+  this->modelTree->blockSignals(false);
+  emit wrenchPositionSelectionChanged(ids);
+};
+
 void ModelDockWidget::editVideosDelay()
 {
   QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();

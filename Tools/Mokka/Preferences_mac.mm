@@ -251,6 +251,11 @@ void Preferences::setDefaultGRFButterflyActivation(int index)
   emit defaultGRFButterflyActivationChanged(index);
 };
 
+void Preferences::showForcePath(int index)
+{
+  emit showForcePathChanged(index);
+};
+
 void Preferences::setAutomaticCheckUpdate(bool isChecked)
 {
   emit automaticCheckUpdateStateChanged(isChecked);

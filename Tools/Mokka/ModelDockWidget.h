@@ -169,6 +169,10 @@ public slots:
   void setAnalogsDescription(const QVector<int>& ids, const QVector<QString>& descs);
   void removeAnalogs(const QList<int>& ids, const QList<Analog*>& analogs);
   void insertAnalogs(const QList<int>& ids, const QList<Analog*>& analogs);
+  // Force platforms
+  void showGroundRectionForcePaths();
+  void hideGroundRectionForcePaths();
+  void setGroundRectionForcePathsVisibility(bool visible);
   // Videos
   void editVideosDelay();
   void setVideosDelay(const QVector<int>& ids, const QVector<qint64>& delay);

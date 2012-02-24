@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>545</width>
-    <height>517</height>
+    <width>541</width>
+    <height>557</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -431,12 +431,36 @@ QPushButton:pressed {
              <string>Display ground reaction forces (GRF) butterfly diagram</string>
             </property>
             <property name="text">
-             <string>GRF Butterfly diagram:</string>
+             <string>Butterfly diagram:</string>
             </property>
            </widget>
           </item>
           <item row="4" column="1">
            <widget class="QComboBox" name="defaultGRFButterflyActivationComboBox">
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <item>
+             <property name="text">
+              <string>Yes</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>No</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="showForcePathLabel">
+            <property name="text">
+             <string>Force path:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QComboBox" name="showForcePathComboBox">
             <property name="currentIndex">
              <number>1</number>
             </property>

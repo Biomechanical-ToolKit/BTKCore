@@ -372,6 +372,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(defaultForcePlateColorChanged(QColor)), this, SLOT(setPreferenceDefaultForcePlateColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultForceVectorColorChanged(QColor)), this, SLOT(setPreferenceDefaultForceVectorColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultGRFButterflyActivationChanged(int)), this, SLOT(setPreferenceDefaultGRFButterflyActivation(int)));
+  connect(this->mp_Preferences, SIGNAL(showForcePathChanged(int)), this, SLOT(setPreferenceShowForcePath(int)));
   connect(this->mp_Preferences, SIGNAL(automaticCheckUpdateStateChanged(bool)), this, SLOT(setPreferenceAutomaticCheckUpdate(bool)));
 #ifdef Q_OS_MAC
   connect(this->mp_Preferences, SIGNAL(userLayoutRemoved(int)), this, SLOT(removeUserLayout(int)));
@@ -880,6 +881,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
     if (defaultConfigurationUsed && !defaultConfigurationPath.isEmpty())
       this->mp_ModelDock->loadConfiguration(defaultConfigurationPath);
   }
+  this->mp_ModelDock->setGroundRectionForcePathsVisibility(this->mp_Preferences->showForcePathComboBox->currentIndex() == 0);
   
   pw->setProgressValue(100);
 
@@ -1669,6 +1671,13 @@ void MainWindow::setPreferenceDefaultGRFButterflyActivation(int index)
   this->multiView->setGRFButterflyActivation(index == 0); // 0: ON ; 1: OFF
 };
 
+void MainWindow::setPreferenceShowForcePath(int index)
+{
+  QSettings settings;
+  settings.setValue("Preferences/showForcePath", index);
+  this->mp_ModelDock->setGroundRectionForcePathsVisibility(index == 0);
+};
+
 void MainWindow::setPreferenceAutomaticCheckUpdate(bool isChecked)
 {
   QSettings settings;
@@ -1837,6 +1846,7 @@ void MainWindow::readSettings()
   QColor defaultForcePlateColor = settings.value("defaultForcePlateColor", QColor(255,255,0)).value<QColor>();
   QColor defaultForceVectorColor = settings.value("defaultForceVectorColor", QColor(255,255,0)).value<QColor>();
   int defaultButterflyActivation = settings.value("defaultButterflyActivation", 1).toInt();
+  int showForcePath = settings.value("showForcePath", 1).toInt();
   bool checkUpdateStartup = settings.value("checkUpdateStartup", true).toBool();
   settings.endGroup();
   this->mp_Preferences->lastDirectory = this->m_LastDirectory;
@@ -1853,6 +1863,7 @@ void MainWindow::readSettings()
   colorizeButton(this->mp_Preferences->defaultForcePlateColorButton, defaultForcePlateColor);
   colorizeButton(this->mp_Preferences->defaultForceVectorColorButton, defaultForceVectorColor);
   this->mp_Preferences->defaultGRFButterflyActivationComboBox->setCurrentIndex(defaultButterflyActivation);
+  this->mp_Preferences->showForcePathComboBox->setCurrentIndex(showForcePath);
   this->mp_Preferences->automaticCheckUpdateCheckBox->setChecked(checkUpdateStartup);
 
 #ifdef Q_OS_WIN
@@ -1869,6 +1880,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::DefaultForcePlateColor, defaultForcePlateColor);
   this->mp_Preferences->setPreference(Preferences::DefaultForceVectorColor, defaultForceVectorColor);
   this->mp_Preferences->setPreference(Preferences::DefaultGRFButterflyActivation, defaultButterflyActivation);
+  this->mp_Preferences->setPreference(Preferences::ForcePathDisplay, showForcePath);
   this->mp_Preferences->setPreference(Preferences::UserLayoutIndex, layoutIndex);
   this->mp_Preferences->setPreference(Preferences::UserLayouts, this->m_UserLayouts);
   this->mp_Preferences->setPreference(Preferences::AutomaticCheckUpdateUse, checkUpdateStartup);
