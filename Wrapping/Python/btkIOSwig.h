@@ -33,12 +33,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef btkIOSwig_h
-#define btkIOSwig_h
+#ifndef __btkIOSwig_h
+#define __btkIOSwig_h
 
 #define BTK_SWIG_HEADER_DECLARATION
 
-#include "btkSwigUtils.h"
 #include "btkSwigMacros.h"
 
 #include <btkAcquisitionFileIO.h>
@@ -46,27 +45,27 @@
 #include <btkAcquisitionFileWriter.h>
 // File IOs
 // - C3D File IO
-#include "btkC3DFileIO.h"
+#include <btkC3DFileIO.h>
 // - Motion Analysis Corp IOs
-#include "btkANBFileIO.h"
-#include "btkANCFileIO.h"
-#include "btkCALForcePlateFileIO.h"
-#include "btkTRBFileIO.h"
-#include "btkTRCFileIO.h"
-#include "btkXLSOrthoTrakFileIO.h"
+#include <btkANBFileIO.h>
+#include <btkANCFileIO.h>
+#include <btkCALForcePlateFileIO.h>
+#include <btkTRBFileIO.h>
+#include <btkTRCFileIO.h>
+#include <btkXLSOrthoTrakFileIO.h>
 // - BTS Bioengineering
-#include "btkTDFFileIO.h" 
+#include <btkTDFFileIO.h> 
 // - Elite IOs
-#include "btkANGFileIO.h"
-#include "btkEMxFileIO.h"
-#include "btkMOMFileIO.h"
-#include "btkRAxFileIO.h"
-#include "btkRICFileIO.h"
-#include "btkPWRFileIO.h"
-#include "btkGRxFileIO.h"
+#include <btkANGFileIO.h>
+#include <btkEMxFileIO.h>
+#include <btkMOMFileIO.h>
+#include <btkRAxFileIO.h>
+#include <btkRICFileIO.h>
+#include <btkPWRFileIO.h>
+#include <btkGRxFileIO.h>
 // - Others
-#include "btkEMFFileIO.h"
+#include <btkEMFFileIO.h>
 
 #include "IO/btkIOSwig_AcquisitionFile.h"
 
-#endif // btkIOSwig_h
+#endif // __btkIOSwig_h

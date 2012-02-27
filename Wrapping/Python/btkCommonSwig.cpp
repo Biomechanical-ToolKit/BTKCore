@@ -235,3 +235,8 @@ btkMetaData::btkMetaData(const std::string& label, const std::vector<int>& dim, 
 // ------------------------------------------------------------------------- //
 BTK_SWIG_DEFINE_DEFAULT_CTOR(Acquisition);
 BTK_SWIG_DEFINE_CLONE(Acquisition);
+
+// ------------------------------------------------------------------------- //
+//                               ProcessObject                               //
+// ------------------------------------------------------------------------- //
+/* Nothing to do */

@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
  
-#ifndef btkSwigMacro_h
-#define btkSwigMacro_h
+#ifndef __btkSwigMacro_h
+#define __btkSwigMacro_h
 
 // ------------------------------------------------------------------------- //
 //                        Macros for btk<class>                              //
@@ -217,6 +217,9 @@
 #define BTK_SWIG_DECLARE_IMPL_CLASS_IO(classname) \
   BTK_SWIG_DECLARE_IMPL_CLASS(classname) : public btkAcquisitionFileIO_impl \
   {};
+  
+#define BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(classname) \
+  BTK_SWIG_DECLARE_IMPL_CLASS(classname) : public btkProcessObject_impl
 
 // ------------------------------------------------------------------------- //
 //                  Macros for btk<class>Collection_impl                     //
@@ -280,4 +283,4 @@
 #define BTK_SWIG_DOCSTRING_IMPL(classname, method, text); \
   %feature("docstring")  btk##classname##_impl::method text;
 
-#endif // btkSwigMacro_h
+#endif // __btkSwigMacro_h

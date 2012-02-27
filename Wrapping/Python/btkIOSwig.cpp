@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
  
- #include "btkIOSwig.h"
+#include "btkIOSwig.h"
 
 // ------------------------------------------------------------------------- //
 //                             AcquisitionFileIO                             //

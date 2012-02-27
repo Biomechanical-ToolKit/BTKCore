@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef btkCommonSwig_h
-#define btkCommonSwig_h
+#ifndef __btkCommonSwig_h
+#define __btkCommonSwig_h
 
 #define BTK_SWIG_HEADER_DECLARATION
 
@@ -56,6 +56,7 @@
 #include <btkMetaData.h>
 #include <btkMetaDataUtils.h>
 #include <btkAcquisition.h>
+#include <btkProcessObject.h>
 
 #include "Common/btkCommonSwig_Event.h"
 #include "Common/btkCommonSwig_Analog.h"
@@ -65,5 +66,6 @@
 #include "Common/btkCommonSwig_Collection.h"
 #include "Common/btkCommonSwig_MetaData.h"
 #include "Common/btkCommonSwig_Acquisition.h"
+typedef btk::ProcessObject btkProcessObject_impl;
 
-#endif // btkCommonSwig_h
+#endif // __btkCommonSwig_h

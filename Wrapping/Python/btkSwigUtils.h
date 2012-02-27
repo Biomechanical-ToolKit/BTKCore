@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
  
-#ifndef btkSwigUtils_h
-#define btkSwigUtils_h
+#ifndef __btkSwigUtils_h
+#define __btkSwigUtils_h
 
 #include <vector>
 
@@ -47,4 +47,4 @@ inline std::vector<T> btkSwigConvert(const std::vector<S>& source)
   return target;
 };
 
-#endif // btkSwigUtils_h
+#endif // __btkSwigUtils_h
