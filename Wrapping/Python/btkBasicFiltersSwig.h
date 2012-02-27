@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2011, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud BarrÃ©
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,32 +33,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-%define DOCSTRING
-"Biomechanical ToolKit (BTK) for Python
-High level classes and functions to open, edit and modify biomechanical acquisitions."
-%enddef
+#ifndef __btkBasicFiltersSwig_h
+#define __btkBasicFiltersSwig_h
 
-%module(docstring=DOCSTRING) btk
-%{
-#include "btkException.h"
-%}
-%include <exception.i>
+#define BTK_SWIG_HEADER_DECLARATION
 
-// Handle exceptions from BTK
-%exception
-{
-  try {
-      $action
-  } catch(btk::Exception& e) {
-      SWIG_exception(SWIG_RuntimeError, e.what());
-  } catch(...) {
-      SWIG_exception(SWIG_RuntimeError,"Unknown exception");
-  }
-}
+#include "btkSwigMacros.h"
 
-%feature("autodoc", "0");
+#include <btkAcquisitionUnitConverter.h>
+#include <btkForcePlatformsExtractor.h>
+#include <btkForcePlatformWrenchFilter.h>
+#include <btkGroundReactionWrenchFilter.h>
+#include <btkMergeAcquisitionFilter.h>
+#include <btkSeparateKnownVirtualMarkersFilter.h>
+#include <btkSpecializedPointsExtractor.h>
 
-// One file to govern the others.
-%include "btkCommonSwig.i"
-%include "btkIOSwig.i"
-%include "btkBasicFiltersSwig.i"
+#include "BasicFilters/btkBasicFiltersSwig_Filter.h"
+
+#endif // __btkBasicFiltersSwig_h

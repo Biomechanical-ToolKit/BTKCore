@@ -11,12 +11,14 @@ TDD_SILENT_CERR = 1
 
 import _TDDCommon
 import _TDDIO
+import _TDDBasicFilters
 
 if __name__ == '__main__':
     if TDD_SILENT_CERR:
         MuteCerr.On()
     unittest.TextTestRunner().run(_TDDCommon.suite())
     unittest.TextTestRunner().run(_TDDIO.suite())
+    unittest.TextTestRunner().run(_TDDBasicFilters.suite())
     if TDD_SILENT_CERR:
         MuteCerr.Off()
     

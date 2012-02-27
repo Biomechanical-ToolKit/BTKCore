@@ -1,0 +1,183 @@
+/* 
+ * The Biomechanical ToolKit
+ * Copyright (c) 2009-2012, Arnaud Barré
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 
+ *     * Redistributions of source code must retain the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer.
+ *     * Redistributions in binary form must reproduce the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ *     * Neither the name(s) of the copyright holders nor the names
+ *       of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written
+ *       permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+%module btkBasicFilters
+%{
+#include "btkCommonSwig.h"
+#include "btkBasicFiltersSwig.h"
+%}
+%include <std_string.i>
+
+#undef BTK_SWIG_HEADER_DECLARATION
+
+#include "btkSwigMacros.h"
+
+%include "btkBasicFiltersSwig_docstring.i"
+
+%include "BasicFilters/btkBasicFiltersSwig_Filter.h"
+
+// ------------------------------------------------------------------------- //
+//                          AcquisitionUnitConverter                         //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(AcquisitionUnitConverter)
+{
+public:
+  typedef enum {Length = btk::AcquisitionUnitConverter::Length, Angle = btk::AcquisitionUnitConverter::Angle, Force = btk::AcquisitionUnitConverter::Force, Moment = btk::AcquisitionUnitConverter::Moment, Power = btk::AcquisitionUnitConverter::Power} Unit;
+  
+  btkAcquisition GetInput();
+  void SetInput(btkAcquisition );
+  btkAcquisition GetOutput();
+  
+  void SetUnit(Unit , const std::string& );
+  const std::string& GetUnit(Unit );
+  
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(AcquisitionUnitConverter);
+};
+
+// ------------------------------------------------------------------------- //
+//                               DownsampleFilter                            //
+// ------------------------------------------------------------------------- //
+// Check SWIG with C++ template
+
+// ------------------------------------------------------------------------- //
+//                           ForcePlatformsExtractor                         //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(ForcePlatformsExtractor)
+{
+public:
+  btkAcquisition GetInput();
+  void SetInput(btkAcquisition );
+  btkForcePlatformCollection GetOutput();
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(ForcePlatformsExtractor);
+};
+
+// ------------------------------------------------------------------------- //
+//                          ForcePlatformWrenchFilter                         //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(ForcePlatformWrenchFilter)
+{
+public:
+  btkForcePlatformCollection GetInput();
+  void SetInput(btkForcePlatform );
+  void SetInput(btkForcePlatformCollection );
+  btkWrenchCollection GetOutput();
+
+  void SetTransformToGlobalFrame(bool activation = false);
+  bool GetTransformToGlobalFrame() const;
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(ForcePlatformWrenchFilter);
+};
+
+// ------------------------------------------------------------------------- //
+//                         GroundReactionWrenchFilter                        //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(GroundReactionWrenchFilter)
+{
+public:
+  btkForcePlatformCollection GetInput();
+  void SetInput(btkForcePlatform );
+  void SetInput(btkForcePlatformCollection );
+  btkWrenchCollection GetOutput();
+
+  void SetTransformToGlobalFrame(bool activation = false);
+  bool GetTransformToGlobalFrame() const;
+  
+  bool GetThresholdState() const;
+  void SetThresholdState(bool activated = false);
+  double GetThresholdValue() const;
+  void SetThresholdValue(double );
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(GroundReactionWrenchFilter);
+};
+
+// ------------------------------------------------------------------------- //
+//                            MeasureFrameExtractor                          //
+// ------------------------------------------------------------------------- //
+// Check SWIG with C++ template
+
+// ------------------------------------------------------------------------- //
+//                           MergeAcquisitionFilter                          //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(MergeAcquisitionFilter)
+{
+public:
+  enum {KeepAllFrames = btk::MergeAcquisitionFilter::KeepAllFrames, KeepFromHighestFirstFrame = btk::MergeAcquisitionFilter::KeepFromHighestFirstFrame};
+  int GetFirstFrameRule() const;
+  void SetFirstFrameRule(int );
+
+  btkAcquisition GetInput(int idx);
+  void SetInput(int , btkAcquisition );
+  btkAcquisition GetOutput();
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(MergeAcquisitionFilter);
+};
+
+// ------------------------------------------------------------------------- //
+//                    SeparateKnownVirtualMarkersFilter                      //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(SeparateKnownVirtualMarkersFilter)
+{
+public:
+  btkPointCollection GetInput();
+  void SetInput(btkPointCollection );
+  btkPointCollection GetOutput(int );
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(SeparateKnownVirtualMarkersFilter);
+};
+
+// ------------------------------------------------------------------------- //
+//                         SpecializedPointsExtractor                        //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(SpecializedPointsExtractor)
+{
+public:
+  btkAcquisition GetInput();
+  void SetInput(btkAcquisition input);
+  btkPointCollection GetOutput();
+
+  btkPoint_impl::Type GetPointType();
+  void SetPointType(btkPoint_impl::Type );
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(SpecializedPointsExtractor);
+};
+
