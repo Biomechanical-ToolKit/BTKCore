@@ -603,6 +603,9 @@ namespace btk
               case 8:
                 output->SetAnalogResolution(Acquisition::Bit8);
                 break;
+              case 10:
+                output->SetAnalogResolution(Acquisition::Bit10);
+                break;
               case 12:
                 output->SetAnalogResolution(Acquisition::Bit12);
                 break;
