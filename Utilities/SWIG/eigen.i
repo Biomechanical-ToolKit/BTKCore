@@ -158,11 +158,16 @@
   PyErr_SetString(PyExc_ValueError, "The input typemap for non-const pointer is not yet implemented. Please report this problem to the developer.");
 }
 
+// Out: const
+%typemap(out, fragment="Eigen_Fragments") CLASS const
+{
+  ConvertFromEigenToNumPyMatrix<CLASS>(&$result, &$1);
+}
 // Out: const&
 %typemap(out, fragment="Eigen_Fragments") CLASS const&
-%{
+{
   ConvertFromEigenToNumPyMatrix<CLASS>(&$result, $1);
-%}
+}
 // Out: & (not yet implemented)
 %typemap(out, fragment="Eigen_Fragments") CLASS &
 {
