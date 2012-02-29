@@ -58,6 +58,8 @@
 #include <btkAcquisition.h>
 #include <btkProcessObject.h>
 
+typedef btk::DataObject btkDataObject_impl;
+typedef btk::ProcessObject btkProcessObject_impl;
 #include "Common/btkCommonSwig_Event.h"
 #include "Common/btkCommonSwig_Analog.h"
 #include "Common/btkCommonSwig_Point.h"
@@ -66,6 +68,5 @@
 #include "Common/btkCommonSwig_Collection.h"
 #include "Common/btkCommonSwig_MetaData.h"
 #include "Common/btkCommonSwig_Acquisition.h"
-typedef btk::ProcessObject btkProcessObject_impl;
 
 #endif // __btkCommonSwig_h

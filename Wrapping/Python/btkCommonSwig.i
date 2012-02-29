@@ -49,12 +49,25 @@
 %include "btkCommonSwig_docstring.i"
 
 // ------------------------------------------------------------------------- //
+//                                 DataObject                                //
+// ------------------------------------------------------------------------- //
+
+BTK_SWIG_DECLARE_IMPL_CLASS(DataObject)
+{
+public:
+  void Update();
+  unsigned long int GetTimestamp() const;
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(DataObject);
+};
+
+// ------------------------------------------------------------------------- //
 //                                    Event                                  //
 // ------------------------------------------------------------------------- //
 
 %include "Common/btkCommonSwig_Event.h"
 
-BTK_SWIG_DECLARE_IMPL_CLASS(Event)
+BTK_SWIG_DECLARE_IMPL_CLASS_DATA(Event)
 {
 public:
   typedef enum {Unknown = btk::Event::Unknown, Manual = btk::Event::Manual, Automatic = btk::Event::Automatic, FromForcePlatform = btk::Event::FromForcePlatform} DetectionFlag;
@@ -80,7 +93,7 @@ protected:
 %include "Common/btkCommonSwig_Analog.h"
 
 BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Analog, Value);
-BTK_SWIG_DECLARE_IMPL_CLASS(Analog)
+BTK_SWIG_DECLARE_IMPL_CLASS_DATA(Analog)
 {
 public:
   typedef enum {Unknown = btk::Analog::Unknown, PlusMinus10 = btk::Analog::PlusMinus10, PlusMinus5 = btk::Analog::PlusMinus5, PlusMinus2Dot5 = btk::Analog::PlusMinus2Dot5, PlusMinus1Dot25 = btk::Analog::PlusMinus1Dot25, PlusMinus1 = btk::Analog::PlusMinus1, PlusMinus0Dot5 = btk::Analog::PlusMinus0Dot5, PlusMinus0Dot25 = btk::Analog::PlusMinus0Dot25, PlusMinus0Dot1 = btk::Analog::PlusMinus0Dot1, PlusMinus0Dot05 = btk::Analog::PlusMinus0Dot05} Gain;
@@ -109,7 +122,7 @@ protected:
 BTK_SWIG_EXTEND_CLASS_GETSET_MATRIX(Point, Value);
 BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Point, Residual);
 BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Point, Mask);
-BTK_SWIG_DECLARE_IMPL_CLASS(Point)
+BTK_SWIG_DECLARE_IMPL_CLASS_DATA(Point)
 {
 public:
   typedef enum {Marker = btk::Point::Marker, Angle = btk::Point::Angle, Force = btk::Point::Force, Moment = btk::Point::Moment, Power = btk::Point::Power, Scalar = btk::Point::Scalar, Reaction = btk::Point::Reaction} Type;
@@ -135,7 +148,7 @@ protected:
 
 %include "Common/btkCommonSwig_ForcePlatform.h"
 
-BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatform)
+BTK_SWIG_DECLARE_IMPL_CLASS_DATA(ForcePlatform)
 {
 public:
   typedef btkAnalogIterator Iterator; // Defined by the macro BTK_SWIG_DECLARE_IMPL_COLLECTION(Analog);
@@ -182,7 +195,7 @@ BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType6) : public btkForcePlatform_impl
 
 %include "Common/btkCommonSwig_Wrench.h"
 
-BTK_SWIG_DECLARE_IMPL_CLASS(Wrench)
+BTK_SWIG_DECLARE_IMPL_CLASS_DATA(Wrench)
 {
 public:
   BTK_SWIG_DECLARE_IMPL_GETSET(Position, btkPoint );
@@ -285,7 +298,7 @@ protected:
   bool operator!=(const btkMetaData& rRHS) {return *(*$self) != *rRHS;};
 }
 
-BTK_SWIG_DECLARE_IMPL_CLASS(MetaData)
+BTK_SWIG_DECLARE_IMPL_CLASS_DATA(MetaData)
 {
 public:
   typedef btkMetaDataIterator Iterator;
@@ -365,7 +378,7 @@ protected:
 
 %include "Common/btkCommonSwig_Acquisition.h"
 
-BTK_SWIG_DECLARE_IMPL_CLASS(Acquisition)
+BTK_SWIG_DECLARE_IMPL_CLASS_DATA(Acquisition)
 {
 public:
   typedef enum {Bit8 = btk::Acquisition::Bit8, Bit12 = btk::Acquisition::Bit12, Bit14 = btk::Acquisition::Bit14, Bit16 = btk::Acquisition::Bit16}  AnalogResolution;
@@ -467,8 +480,9 @@ public:
   int GetInputNumber() const;
   int GetValidInputNumber() const;
   int GetOutputNumber() const;
-  void Update();
   void ResetState();
+  void Update();
+  unsigned long int GetTimestamp() const;
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(ProcessObject);
 };

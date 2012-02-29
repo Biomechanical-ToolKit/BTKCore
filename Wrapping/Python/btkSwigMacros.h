@@ -218,7 +218,10 @@
   BTK_SWIG_DECLARE_IMPL_CLASS(classname) : public btkAcquisitionFileIO_impl \
   {};
   
-#define BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(classname) \
+#define BTK_SWIG_DECLARE_IMPL_CLASS_DATA(classname) \
+  BTK_SWIG_DECLARE_IMPL_CLASS(classname) : public btkDataObject_impl
+  
+#define BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(classname) \
   BTK_SWIG_DECLARE_IMPL_CLASS(classname) : public btkProcessObject_impl
 
 // ------------------------------------------------------------------------- //
@@ -226,7 +229,7 @@
 // ------------------------------------------------------------------------- //
 
 #define BTK_SWIG_DECLARE_IMPL_COLLECTION(elt) \
-  BTK_SWIG_DECLARE_IMPL_CLASS(elt##Collection) \
+  BTK_SWIG_DECLARE_IMPL_CLASS_DATA(elt##Collection) \
   { \
   public: \
     typedef btk##elt ItemPointer; \
@@ -250,23 +253,6 @@
   protected: \
     BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(elt##Collection); \
   };
-  
-#define BTK_SWIG_DECLARE_IMPL_COLLECTION2(elt) \
-  BTK_SWIG_DECLARE_IMPL_CLASS(elt##Collection) \
-  { \
-  public: \
-    typedef btk##elt ItemPointer; \
-    bool IsEmpty() const; \
-    int GetItemNumber() const; \
-    void SetItemNumber(int ); \
-    int GetIndexOf(ItemPointer ) const; \
-    ItemPointer GetItem(int ); \
-    bool SetItem(int , ItemPointer ); \
-    void Clear(); \
-  protected: \
-    BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(elt##Collection); \
-  };
-  
   
 // ------------------------------------------------------------------------- //
 //                  Macros for extra documentation

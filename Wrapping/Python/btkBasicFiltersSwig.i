@@ -51,7 +51,7 @@
 // ------------------------------------------------------------------------- //
 //                          AcquisitionUnitConverter                         //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(AcquisitionUnitConverter)
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(AcquisitionUnitConverter)
 {
 public:
   typedef enum {Length = btk::AcquisitionUnitConverter::Length, Angle = btk::AcquisitionUnitConverter::Angle, Force = btk::AcquisitionUnitConverter::Force, Moment = btk::AcquisitionUnitConverter::Moment, Power = btk::AcquisitionUnitConverter::Power} Unit;
@@ -75,7 +75,7 @@ protected:
 // ------------------------------------------------------------------------- //
 //                           ForcePlatformsExtractor                         //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(ForcePlatformsExtractor)
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(ForcePlatformsExtractor)
 {
 public:
   btkAcquisition GetInput();
@@ -89,7 +89,7 @@ protected:
 // ------------------------------------------------------------------------- //
 //                          ForcePlatformWrenchFilter                         //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(ForcePlatformWrenchFilter)
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(ForcePlatformWrenchFilter)
 {
 public:
   btkForcePlatformCollection GetInput();
@@ -107,7 +107,7 @@ protected:
 // ------------------------------------------------------------------------- //
 //                         GroundReactionWrenchFilter                        //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(GroundReactionWrenchFilter)
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(GroundReactionWrenchFilter)
 {
 public:
   btkForcePlatformCollection GetInput();
@@ -135,7 +135,7 @@ protected:
 // ------------------------------------------------------------------------- //
 //                           MergeAcquisitionFilter                          //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(MergeAcquisitionFilter)
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(MergeAcquisitionFilter)
 {
 public:
   enum {KeepAllFrames = btk::MergeAcquisitionFilter::KeepAllFrames, KeepFromHighestFirstFrame = btk::MergeAcquisitionFilter::KeepFromHighestFirstFrame};
@@ -153,7 +153,7 @@ protected:
 // ------------------------------------------------------------------------- //
 //                    SeparateKnownVirtualMarkersFilter                      //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(SeparateKnownVirtualMarkersFilter)
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(SeparateKnownVirtualMarkersFilter)
 {
 public:
   btkPointCollection GetInput();
@@ -167,7 +167,7 @@ protected:
 // ------------------------------------------------------------------------- //
 //                         SpecializedPointsExtractor                        //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(SpecializedPointsExtractor)
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(SpecializedPointsExtractor)
 {
 public:
   btkAcquisition GetInput();

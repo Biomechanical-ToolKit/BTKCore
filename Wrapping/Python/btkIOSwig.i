@@ -84,7 +84,7 @@ protected:
   btkAcquisitionFileIO GetAcquisitionIO() {return btkAcquisitionFileIO((*$self)->btkAcquisitionFileReader_impl::GetAcquisitionIO());};
 };
 
-BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(AcquisitionFileReader)
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(AcquisitionFileReader)
 {
 public:
   btkAcquisition GetOutput();
@@ -106,7 +106,7 @@ protected:
   btkAcquisitionFileIO GetAcquisitionIO() {return btkAcquisitionFileIO((*$self)->btkAcquisitionFileWriter_impl::GetAcquisitionIO());};
 };
 
-BTK_SWIG_DECLARE_IMPL_CLASS_FILTER(AcquisitionFileWriter)
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(AcquisitionFileWriter)
 {
 public:
   btkAcquisition GetInput();
