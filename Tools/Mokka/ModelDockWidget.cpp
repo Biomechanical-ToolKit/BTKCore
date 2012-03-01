@@ -2423,7 +2423,8 @@ void ModelDockWidget::setGroundRectionForcePathsVisibility(bool visible)
   {
     QTreeWidgetItem* item = forcePlatesRoot->child(i)->child(2); // Position
     item->setCheckState(TrajectoryHeader, visible ? Qt::Checked : Qt::Unchecked);
-    ids << (item->data(0,ForcePlateId).toInt() - 65535) / 3; // 65535: because force platform ID starts from 65535 ; 3: because each component of the wrench has also a unique ID.
+    if (visible)
+      ids << (item->data(0,ForcePlateId).toInt() - 65535) / 3; // 65535: because force platform ID starts from 65535 ; 3: because each component of the wrench has also a unique ID.
   }
   this->modelTree->blockSignals(false);
   emit wrenchPositionSelectionChanged(ids);

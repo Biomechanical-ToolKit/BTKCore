@@ -171,7 +171,6 @@ void Preferences::saveSettings()
     emit defaultGRFButterflyActivationChanged(index);
   }
   
-  
   index = this->showForcePathComboBox->currentIndex();
   if (this->m_Data[ForcePathDisplay].toInt() != index)
   {
