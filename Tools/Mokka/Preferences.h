@@ -51,7 +51,7 @@
     enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, 
           DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
           ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse,
-          DefaultGRFButterflyActivation, ForcePathDisplay};
+          DefaultGRFButterflyActivation, ForcePathDisplay, DefaultPlotLineWidth, ChartEventDisplay, chartUnitAxisX};
   
     Preferences(QWidget* parent = 0);
     // ~Preferences(); // Implicit
@@ -63,6 +63,7 @@
     
     void showGeneralPreferences() {this->tabWidget->setCurrentWidget(this->generalTab);};
     void showVisualisationPreferences() {this->tabWidget->setCurrentWidget(this->visualisationTab);};
+    void showChartPreferences() {this->tabWidget->setCurrentWidget(this->chartTab);};
     void showLayoutsPreferences() {this->tabWidget->setCurrentWidget(this->layoutsTab);};
     void showAdvancedPreferences() {this->tabWidget->setCurrentWidget(this->advancedTab);};
     
@@ -95,6 +96,9 @@
     void userLayoutsChanged(const QList<QVariant>& layouts, int index);
     void defaultGRFButterflyActivationChanged(int index);
     void showForcePathChanged(int index);
+    void defaultPlotLineWidthChanged(double width);
+    void showChartEventChanged(int index);
+    void chartUnitAxisXChanged(int index);
     
   private slots:
     void removeUserLayout(int index);

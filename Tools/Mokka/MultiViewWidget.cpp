@@ -95,9 +95,9 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_VTKProc = new vtkProcessMap();
   this->mp_Syncro = new vtkStreamingDemandDrivenPipelineCollection();
   this->mp_PointChartFrames = vtkDoubleArray::New();
-  this->mp_PointChartFrames->SetName("Frame");
+  this->mp_PointChartFrames->SetName("BottomAxis");
   this->mp_AnalogChartFrames = vtkDoubleArray::New();
-  this->mp_AnalogChartFrames->SetName("Frame");
+  this->mp_AnalogChartFrames->SetName("BottomAxis");
   this->mp_ForcePlatformActor = 0;
   this->mp_GRFsTrajectoryActor = 0;
   this->mp_ForceVectorActor = 0;
@@ -148,9 +148,22 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_ForceButterflyActivationAction = new QAction(tr("Toggle GRF Butterfly"),this);
   this->mp_ForceButterflyActivationAction->setEnabled(false);
   
+  this->mp_ChartBottomAxisDisplayMenu = new QMenu(tr("Chart Unit: X Axis"),this);
+  this->mp_ActionChartAxisFrame = new QAction(tr("Frame"),this);
+  this->mp_ActionChartAxisFrame->setCheckable(true);
+  this->mp_ActionChartAxisTime = new QAction(tr("Time"),this);
+  this->mp_ActionChartAxisTime->setCheckable(true);
+  QActionGroup* chartBottomAxisDisplay = new QActionGroup(this);
+  chartBottomAxisDisplay->addAction(this->mp_ActionChartAxisFrame);
+  chartBottomAxisDisplay->addAction(this->mp_ActionChartAxisTime);
+  this->mp_ActionChartAxisFrame->setChecked(true);
+  this->mp_ChartBottomAxisDisplayMenu->addAction(this->mp_ActionChartAxisFrame);
+  this->mp_ChartBottomAxisDisplayMenu->addAction(this->mp_ActionChartAxisTime);
+  
   connect(groundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
   connect(trajectoryLengthActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeMarkerTrajectoryLength()));
   connect(this->mp_ForceButterflyActivationAction, SIGNAL(triggered(bool)), this, SLOT(changeForceButterflyActivation()));
+  connect(chartBottomAxisDisplay, SIGNAL(triggered(QAction*)), this, SLOT(updateChartUnitAxisX()));
   
   this->setViewPrototype(ViewFactory<CompositeView>);
 };
@@ -476,15 +489,16 @@ void MultiViewWidget::load()
   double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
   for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
   {
+    double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
     // Point
-    this->mp_PointChartFrames->SetValue(i, this->mp_Acquisition->firstFrame() + i);
+    this->mp_PointChartFrames->SetValue(i, val);
     // Analog
     int inc = i * this->mp_Acquisition->analogSamplePerPointFrame();
-    double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
     this->mp_AnalogChartFrames->SetValue(inc, val);
     for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
       this->mp_AnalogChartFrames->SetValue(inc + j, val + j * sub);
   }
+  this->updateChartUnitAxisX();
   
   // Update video delays
   this->m_VideoDelays.clear();
@@ -1278,6 +1292,61 @@ void MultiViewWidget::adaptViewsForPlaybackOff()
   // Stop the video playback
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
     static_cast<VideoWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::MediaVideo))->stop();
+};
+
+void MultiViewWidget::updateChartUnitAxisX()
+{
+  if (this->mp_ActionChartAxisFrame->isChecked())
+    this->displayChartBottomAxisAsFrame();
+  else if (this->mp_ActionChartAxisTime->isChecked())
+    this->displayChartBottomAxisAsTime();
+};
+
+void MultiViewWidget::setFrameAsChartUnitAxisX()
+{
+  this->mp_ActionChartAxisFrame->trigger();
+};
+
+void MultiViewWidget::setTimeAsChartUnitAxisX()
+{
+  this->mp_ActionChartAxisTime->trigger();
+};
+
+void MultiViewWidget::displayChartBottomAxisAsFrame()
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
+    w->setUnitAxisX("Frame", 1.0, 0.0);
+  }
+}
+
+void MultiViewWidget::displayChartBottomAxisAsTime()
+{
+  double f = this->mp_Acquisition->btkAcquisition() ? this->mp_Acquisition->pointFrequency() : 1.0;
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
+    w->setUnitAxisX("Time (s)", 1.0 / f, -1.0);
+  }
+}
+
+void MultiViewWidget::showChartEvent(bool visible)
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
+    w->setEventDisplay(visible);
+  }
+};
+
+void MultiViewWidget::setDefaultPlotLineWidth(double width)
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
+    w->setDefaultLineWidth(width);
+  }
 };
 
 void MultiViewWidget::dragEnterEvent(QDragEnterEvent *event)

@@ -159,6 +159,9 @@ public slots:
   void setPreferenceDefaultForceVectorColor(const QColor& color);
   void setPreferenceDefaultGRFButterflyActivation(int index);
   void setPreferenceShowForcePath(int index);
+  void setPreferencePlotLineWidth(double width);
+  void setPreferenceShowChartEvent(int index);
+  void setPreferenceChartUnitAxisX(int index);
   void setPreferenceAutomaticCheckUpdate(bool isChecked);
   // Others
   void updateSelectedMarkersRadius(double r);

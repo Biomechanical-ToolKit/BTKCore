@@ -66,6 +66,8 @@
   #include <windows.h>
 #endif
 
+double ChartWidget::DefaultLineWidth = 1.0;
+
 class PointChartData : public AbstractChartData
 {
 public:
@@ -226,6 +228,8 @@ void ChartWidget::copy(ChartWidget* source)
   
   // Copy the current chart (to activate the specific options)
   this->m_CurrentChartType = source->m_CurrentChartType;
+  
+  this->mp_ChartAxisXLabel->setText(source->mp_ChartAxisXLabel->text());
 };
 
 void ChartWidget::setAcquisition(Acquisition* acq)
@@ -282,6 +286,22 @@ void ChartWidget::updateAxisX()
         chart->GetPlot(i)->Modified(); // To update the frames index
     }
   }
+};
+
+void ChartWidget::setUnitAxisX(const QString& str, double scale, double offset)
+{
+  for (int i = 0 ; i < this->m_ChartData.size() ; ++i)
+  {
+    for (int j = 0 ; j < static_cast<int>(this->m_ChartData[i]->charts()->size()) ; ++j)
+    {
+      btk::VTKAxis* axisX = static_cast<btk::VTKAxis*>(this->m_ChartData[i]->chart(j)->GetAxis(vtkAxis::BOTTOM));
+      axisX->SetTitle(qPrintable(str));
+      axisX->SetTickScale(scale);
+      axisX->SetTickOffset(offset);
+    }
+  }
+  this->mp_ChartAxisXLabel->setText(str);
+  this->render();
 };
 
 void ChartWidget::displayChart(int chartType)
@@ -458,6 +478,20 @@ void ChartWidget::removeAllPlot()
   this->m_ChartData[this->m_CurrentChartType]->show(this->mp_Acquisition, true, &layoutModified); // Easy way to reset the chart.
   if (layoutModified)
     this->mp_ChartContentWidget->resizeCharts();
+  this->render();
+};
+
+// Show/hide event for every (sub) chart.
+void ChartWidget::setEventDisplay(bool visible)
+{
+  for (int j = 0 ; j < 2 ; ++j)
+  {
+    for (int i = 0 ; i < static_cast<int>(this->m_ChartData[j]->charts()->size()) ; ++i)
+    {
+      btk::VTKChartTimeSeries* chart = this->m_ChartData[j]->chart(i);
+      chart->SetDisplayEvents(visible ? 1 : 0);
+    }
+  }
   this->render();
 };
 
@@ -819,7 +853,11 @@ void AbstractChartData::copy(AbstractChartData* source)
     btk::VTKChartTimeSeries* sourceChart = source->mp_Charts->operator[](i);
     btk::VTKChartTimeSeries* targetChart = this->mp_Charts->operator[](i);
     targetChart->SetBounds(sourceChart->GetBounds()[0], sourceChart->GetBounds()[1], 0.0, 0.0);
-    targetChart->GetAxis(vtkAxis::BOTTOM)->SetLabelsVisible(sourceChart->GetAxis(vtkAxis::BOTTOM)->GetLabelsVisible());
+    btk::VTKAxis* targetAxisX = static_cast<btk::VTKAxis*>(targetChart->GetAxis(vtkAxis::BOTTOM));
+    btk::VTKAxis* sourceAxisX = static_cast<btk::VTKAxis*>(sourceChart->GetAxis(vtkAxis::BOTTOM));
+    targetAxisX->SetLabelsVisible(sourceAxisX->GetLabelsVisible());
+    targetAxisX->SetTickOffset(sourceAxisX->GetTickOffset());
+    targetAxisX->SetTickScale(sourceAxisX->GetTickScale());
     targetChart->GetAxis(vtkAxis::LEFT)->SetLabelsVisible(sourceChart->GetAxis(vtkAxis::LEFT)->GetLabelsVisible());
     targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
     targetChart->SetRegionOfInterestFunctor(sourceChart->GetRegionOfInterestFunctor());
@@ -1036,7 +1074,6 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
   tableZ->AddColumn(arrValZ);
 
   double color[3];
-  const double lineWidth = 1.0;
   vtkPlotLine* plot = 0;
   this->generateColor(colorGenerator, color);
   // X axis 
@@ -1044,21 +1081,21 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
   this->chart(0)->AddPlot(plot);
   plot->GetPen()->SetColorF(color);
   plot->SetInput(tableX,0,1);
-  plot->SetWidth(lineWidth);
+  plot->SetWidth(ChartWidget::DefaultLineWidth);
   plot->Delete();
   // Y axis
   plot = vtkPlotLine::New();
   this->chart(1)->AddPlot(plot);
   plot->GetPen()->SetColorF(color);
   plot->SetInput(tableY,0,1);
-  plot->SetWidth(lineWidth);
+  plot->SetWidth(ChartWidget::DefaultLineWidth);
   plot->Delete();
   // Z axis
   plot = vtkPlotLine::New();
   this->chart(2)->AddPlot(plot);
   plot->GetPen()->SetColorF(color);
   plot->SetInput(tableZ,0,1);
-  plot->SetWidth(lineWidth);
+  plot->SetWidth(ChartWidget::DefaultLineWidth);
   plot->Delete();
 
   arrValX->Delete();
@@ -1068,7 +1105,7 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
   tableY->Delete();
   tableZ->Delete();
   
-  this->appendPlotProperties(label, id, QColor(static_cast<int>(color[0]*255.0), static_cast<int>(color[1]*255.0), static_cast<int>(color[2]*255.0)), lineWidth);
+  this->appendPlotProperties(label, id, QColor(static_cast<int>(color[0]*255.0), static_cast<int>(color[1]*255.0), static_cast<int>(color[2]*255.0)), ChartWidget::DefaultLineWidth);
 
   return true;
 };
@@ -1154,7 +1191,7 @@ bool AnalogChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries
   }
   plot->GetPen()->SetColorF(color);
   plot->SetInput(table,0,1);
-  plot->SetWidth(1.0);
+  plot->SetWidth(ChartWidget::DefaultLineWidth);
 
   arrVal->Delete();
   table->Delete();
@@ -1311,6 +1348,7 @@ void AnalogChartData::setExpandable(bool expandable)
 btk::VTKChartTimeSeries* AnalogChartData::createChart(btk::VTKChartTimeSeries* sourceChart)
 {
   btk::VTKChartTimeSeries* targetChart = btk::VTKChartTimeSeries::New();
+  targetChart->GetAxis(vtkAxis::BOTTOM)->SetTitle(sourceChart->GetAxis(vtkAxis::BOTTOM)->GetTitle());
   static_cast<btk::VTKAxis*>(targetChart->GetAxis(vtkAxis::BOTTOM))->SetTitleVisible(false); // Frames // X axis
   targetChart->SetBounds(sourceChart->GetBounds()[0], sourceChart->GetBounds()[1], 0.0, 0.0);
   targetChart->SetBoundsEnabled(true);
@@ -1353,11 +1391,13 @@ bool VTKChartWidget::event(QEvent* event)
       chart->GetPlotsTransform()->InverseTransformPoints(pt,pt,1);
       vtkVector2f pos(pt[0], pt[1]), coord, tolerance(2.0 / chart->GetPlotsTransform()->GetMatrix()->GetElement(0,0), 7.5 / chart->GetPlotsTransform()->GetMatrix()->GetElement(1,1));
 
+      btk::VTKAxis* axisX = static_cast<btk::VTKAxis*>(chart->GetAxis(vtkAxis::BOTTOM));
       for (int i = 0 ; i < chart->GetNumberOfPlots() ; ++i)
       {
         vtkPlot* plot = chart->GetPlot(i);
         if (plot->GetVisible() && plot->GetNearestPoint(pos, tolerance, &coord))
         {
+          double coordX = (coord.X() + axisX->GetTickOffset()) * axisX->GetTickScale();
           QString valueStr;
           if (coord.Y() == 0.0)
             valueStr = "0";
@@ -1371,7 +1411,7 @@ bool VTKChartWidget::event(QEvent* event)
             valueStr = QString::number(coord.Y(), 'f', 4);
           else
             valueStr = QString::number(coord.Y(), 'f', 5);
-          QString str = "Frame: " + QString::number(coord.X()) + "<br/><nobr>" + QString::fromUtf8(plot->GetLabel()) + ": " + valueStr + "</nobr>";
+          QString str = "<nobr>" + QString::fromUtf8(chart->GetAxis(vtkAxis::BOTTOM)->GetTitle()) + ": " + QString::number(coordX) + "</nobr><br/><nobr>" + QString::fromUtf8(plot->GetLabel()) + ": " + valueStr + "</nobr>";
           QToolTip::showText(helpEvent->globalPos(), str);
           return true;
         }

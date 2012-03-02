@@ -69,7 +69,10 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[UserLayoutIndex] = -1;
   this->m_Data[UserLayouts] = QList<QVariant>();
   this->m_Data[AutomaticCheckUpdateUse] = false;
-  
+  this->m_Data[DefaultPlotLineWidth] = -1;
+  this->m_Data[ChartEventDisplay] = -1;
+  this->m_Data[chartUnitAxisX] = -1;
+
   // Force the General tab to be the current.
   this->tabWidget->setCurrentIndex(0);
 };
@@ -178,6 +181,27 @@ void Preferences::saveSettings()
     emit showForcePathChanged(index);
   }
   
+  double value = this->defaultPlotLineWidthSpinBox->value();
+  if (this->m_Data[DefaultPlotLineWidth].toDouble() != value)
+  {
+    this->m_Data[DefaultPlotLineWidth] = value;
+    emit defaultPlotLineWidthChanged(value);
+  }
+  
+  index = this->defaultChartEventDisplayComboBox->currentIndex();
+  if (this->m_Data[ChartEventDisplay].toInt() != index)
+  {
+    this->m_Data[ChartEventDisplay] = index;
+    emit showChartEventChanged(index);
+  }
+  
+  index = this->defaultChartUnitAxisXComboBox->currentIndex();
+  if (this->m_Data[chartUnitAxisX].toInt() != index)
+  {
+    this->m_Data[chartUnitAxisX] = index;
+    emit chartUnitAxisXChanged(index);
+  }
+  
   QList<QVariant> vList = this->m_Data[UserLayouts].toList();
   if (vList != *(this->layoutTable->userLayouts()))
   {
@@ -204,10 +228,13 @@ void Preferences::resetSettings()
   this->defaultMarkerTrajectoryLengthComboBox->setCurrentIndex(this->m_Data[DefaultTrajectoryLength].toInt());
   this->showForcePlatformAxesComboBox->setCurrentIndex(this->m_Data[ForcePlatformAxesDisplay].toInt());
   this->showForcePlatformIndexComboBox->setCurrentIndex(this->m_Data[ForcePlatformIndexDisplay].toInt());
-  this->defaultGRFButterflyActivationComboBox->setCurrentIndex(this->m_Data[DefaultGRFButterflyActivation].toInt());
-  this->showForcePathComboBox->setCurrentIndex(this->m_Data[ForcePathDisplay].toInt());
   colorizeButton(this->defaultForcePlateColorButton, this->m_Data[DefaultForcePlateColor].value<QColor>());
   colorizeButton(this->defaultForceVectorColorButton, this->m_Data[DefaultForceVectorColor].value<QColor>());
+  this->defaultGRFButterflyActivationComboBox->setCurrentIndex(this->m_Data[DefaultGRFButterflyActivation].toInt());
+  this->showForcePathComboBox->setCurrentIndex(this->m_Data[ForcePathDisplay].toInt());
+  this->defaultPlotLineWidthSpinBox->setValue(this->m_Data[DefaultPlotLineWidth].toDouble());
+  this->defaultChartEventDisplayComboBox->setCurrentIndex(this->m_Data[ChartEventDisplay].toInt());
+  this->defaultChartUnitAxisXComboBox->setCurrentIndex(this->m_Data[chartUnitAxisX].toInt());
   this->layoutTable->refresh(); this->m_Data[UserLayouts] = *(this->layoutTable->userLayouts());
   this->automaticCheckUpdateCheckBox->setChecked(this->m_Data[AutomaticCheckUpdateUse].toBool());
   

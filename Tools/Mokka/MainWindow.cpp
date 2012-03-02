@@ -98,11 +98,13 @@ MainWindow::MainWindow(QWidget* parent)
   actionModelDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_M));
 #endif
   this->menuView->addAction(actionModelDockView);
-  this->menuSettings->addMenu(this->multiView->groundOrientationMenu());
-  this->menuSettings->addMenu(this->multiView->markerTrajectoryLengthMenu());
   this->menuSettings->addMenu(this->timeEventControler->playbackSpeedMenu());
   this->menuSettings->addSeparator();
+  this->menuSettings->addMenu(this->multiView->groundOrientationMenu());
+  this->menuSettings->addMenu(this->multiView->markerTrajectoryLengthMenu());
   this->menuSettings->addAction(this->multiView->forceButterflyActivationAction());
+  this->menuSettings->addSeparator();
+  this->menuSettings->addMenu(this->multiView->chartBottomAxisDisplayMenu());
   QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
   actionInformationsDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I));
   this->menuView->addAction(actionInformationsDockView);
@@ -373,6 +375,9 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(defaultForceVectorColorChanged(QColor)), this, SLOT(setPreferenceDefaultForceVectorColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultGRFButterflyActivationChanged(int)), this, SLOT(setPreferenceDefaultGRFButterflyActivation(int)));
   connect(this->mp_Preferences, SIGNAL(showForcePathChanged(int)), this, SLOT(setPreferenceShowForcePath(int)));
+  connect(this->mp_Preferences, SIGNAL(defaultPlotLineWidthChanged(double)), this, SLOT(setPreferencePlotLineWidth(double)));
+  connect(this->mp_Preferences, SIGNAL(showChartEventChanged(int)), this, SLOT(setPreferenceShowChartEvent(int)));
+  connect(this->mp_Preferences, SIGNAL(chartUnitAxisXChanged(int)), this, SLOT(setPreferenceChartUnitAxisX(int)));
   connect(this->mp_Preferences, SIGNAL(automaticCheckUpdateStateChanged(bool)), this, SLOT(setPreferenceAutomaticCheckUpdate(bool)));
 #ifdef Q_OS_MAC
   connect(this->mp_Preferences, SIGNAL(userLayoutRemoved(int)), this, SLOT(removeUserLayout(int)));
@@ -1678,6 +1683,30 @@ void MainWindow::setPreferenceShowForcePath(int index)
   this->mp_ModelDock->setGroundRectionForcePathsVisibility(index == 0);
 };
 
+void MainWindow::setPreferencePlotLineWidth(double width)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultPlotLineWidth", width);
+  this->multiView->setDefaultPlotLineWidth(width);
+};
+
+void MainWindow::setPreferenceShowChartEvent(int index)
+{
+  QSettings settings;
+  settings.setValue("Preferences/showChartEvent", index);
+  this->multiView->showChartEvent(index == 0);
+};
+
+void MainWindow::setPreferenceChartUnitAxisX(int index)
+{
+  QSettings settings;
+  settings.setValue("Preferences/chartUnitAxisX", index);
+  if (index == 0)
+    this->multiView->setFrameAsChartUnitAxisX();
+  else
+    this->multiView->setTimeAsChartUnitAxisX();
+};
+
 void MainWindow::setPreferenceAutomaticCheckUpdate(bool isChecked)
 {
   QSettings settings;
@@ -1847,6 +1876,9 @@ void MainWindow::readSettings()
   QColor defaultForceVectorColor = settings.value("defaultForceVectorColor", QColor(255,255,0)).value<QColor>();
   int defaultButterflyActivation = settings.value("defaultButterflyActivation", 1).toInt();
   int showForcePath = settings.value("showForcePath", 1).toInt();
+  double defaultPlotLineWidth = settings.value("defaultPlotLineWidth", 1.0).toDouble();
+  int showChartEvent = settings.value("showChartEvent", 0).toInt();
+  int chartUnitAxisX = settings.value("chartUnitAxisX", 0).toInt();
   bool checkUpdateStartup = settings.value("checkUpdateStartup", true).toBool();
   settings.endGroup();
   this->mp_Preferences->lastDirectory = this->m_LastDirectory;
@@ -1864,6 +1896,9 @@ void MainWindow::readSettings()
   colorizeButton(this->mp_Preferences->defaultForceVectorColorButton, defaultForceVectorColor);
   this->mp_Preferences->defaultGRFButterflyActivationComboBox->setCurrentIndex(defaultButterflyActivation);
   this->mp_Preferences->showForcePathComboBox->setCurrentIndex(showForcePath);
+  this->mp_Preferences->defaultPlotLineWidthSpinBox->setValue(defaultPlotLineWidth);
+  this->mp_Preferences->defaultChartEventDisplayComboBox->setCurrentIndex(showChartEvent);
+  this->mp_Preferences->defaultChartUnitAxisXComboBox->setCurrentIndex(chartUnitAxisX);
   this->mp_Preferences->automaticCheckUpdateCheckBox->setChecked(checkUpdateStartup);
 
 #ifdef Q_OS_WIN
@@ -1881,6 +1916,9 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::DefaultForceVectorColor, defaultForceVectorColor);
   this->mp_Preferences->setPreference(Preferences::DefaultGRFButterflyActivation, defaultButterflyActivation);
   this->mp_Preferences->setPreference(Preferences::ForcePathDisplay, showForcePath);
+  this->mp_Preferences->setPreference(Preferences::DefaultPlotLineWidth, defaultPlotLineWidth);
+  this->mp_Preferences->setPreference(Preferences::ChartEventDisplay, showChartEvent);
+  this->mp_Preferences->setPreference(Preferences::chartUnitAxisX, chartUnitAxisX);
   this->mp_Preferences->setPreference(Preferences::UserLayoutIndex, layoutIndex);
   this->mp_Preferences->setPreference(Preferences::UserLayouts, this->m_UserLayouts);
   this->mp_Preferences->setPreference(Preferences::AutomaticCheckUpdateUse, checkUpdateStartup);
@@ -1899,6 +1937,12 @@ void MainWindow::readSettings()
   this->multiView->setForcePlatformColor(defaultForcePlateColor);
   this->multiView->setForceVectorColor(defaultForceVectorColor);
   this->multiView->setGRFButterflyActivation(defaultButterflyActivation == 0);
+  this->multiView->setDefaultPlotLineWidth(defaultPlotLineWidth);
+  this->multiView->showChartEvent(showChartEvent == 0);
+  if (chartUnitAxisX == 0)
+    this->multiView->setFrameAsChartUnitAxisX();
+  else
+    this->multiView->setTimeAsChartUnitAxisX();
   
   // Import assistant
   settings.beginGroup("ImportAssistant");

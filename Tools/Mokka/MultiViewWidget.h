@@ -87,6 +87,7 @@ public:
   const QString groundNormalAsString() const;
   QMenu* markerTrajectoryLengthMenu() const {return this->mp_MarkerTrajectoryLengthMenu;};
   QAction* forceButterflyActivationAction() const {return this->mp_ForceButterflyActivationAction;};
+  QMenu* chartBottomAxisDisplayMenu() const {return this->mp_ChartBottomAxisDisplayMenu;};
   
   void setDefaultGroundOrientation(int index);
   void setDefaultSegmentColor(const QColor& color);
@@ -138,6 +139,11 @@ public slots:
   void restoreLayout3DVerbose();
   void restoreLayout3DCharts();
   void setVideoDelays(QVector<int> ids, QVector<qint64> delays);
+  void updateChartUnitAxisX();
+  void setFrameAsChartUnitAxisX();
+  void setTimeAsChartUnitAxisX();
+  void showChartEvent(bool visible);
+  void setDefaultPlotLineWidth(double width);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
@@ -164,6 +170,8 @@ private slots:
   void changeForceButterflyActivation();
   
 private:
+  void displayChartBottomAxisAsFrame();
+  void displayChartBottomAxisAsTime();
   void updateCameras();
   void updateViews();
   
@@ -196,6 +204,9 @@ private:
   QAction* mp_ForceButterflyActivationAction;
   QList<QAction*> m_View3dActions;
   QList<QAction*> m_ViewChartActions;
+  QMenu* mp_ChartBottomAxisDisplayMenu;
+  QAction* mp_ActionChartAxisFrame;
+  QAction* mp_ActionChartAxisTime;
 };
 
 #endif // MultiViewWidget_h

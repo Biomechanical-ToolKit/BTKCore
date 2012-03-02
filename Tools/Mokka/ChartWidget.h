@@ -92,6 +92,9 @@ public:
   void setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor);
   void setEventsFunctor(btk::VTKEventsFunctor::Pointer functor);
   
+  double defaultLineWidth() {return ChartWidget::DefaultLineWidth;};
+  void setDefaultLineWidth(double width) {ChartWidget::DefaultLineWidth = width;};
+  
   void render(bool optionsShown = false);
   void show(bool s);
   
@@ -99,6 +102,9 @@ public:
   void displayAnalogChart() {this->displayChart(AnalogChart);};
   
   void updateAxisX();
+  void setUnitAxisX(const QString& str, double scale, double offset);
+  
+  static double DefaultLineWidth;
   
 public slots:
   void removePlot(int index);
@@ -108,6 +114,7 @@ public slots:
   void resetZoom();
   void exportToImage();
   void removeAllPlot();
+  void setEventDisplay(bool visible);
   void toggleEventDisplay();
   // Point specific
   void updatePointPlotLabel(int itemId);
