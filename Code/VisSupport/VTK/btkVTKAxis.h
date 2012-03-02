@@ -73,8 +73,14 @@ namespace btk
     virtual bool Paint(vtkContext2D *painter);
     virtual void RecalculateTickSpacing();
     
+    double GetTickScale() const {return this->m_TickScale;};
+    BTK_VTK_EXPORT void SetTickScale(double scale);
+    double GetTickOffset() const {return this->m_TickOffset;};
+    BTK_VTK_EXPORT void SetTickOffset(double offset);
+    
   protected:
     BTK_VTK_EXPORT VTKAxis();
+    BTK_VTK_EXPORT void GenerateTickLabels(double min, double max);
     BTK_VTK_EXPORT double CalculateNiceMinMax(double& min, double& max);
     
     bool m_TitleVisible;
@@ -83,6 +89,8 @@ namespace btk
     float m_MinimumTickSpacing;
     float m_TitleMargin;
     float m_LabelMargin;
+    double m_TickScale;
+    double m_TickOffset;
     
   private:
     VTKAxis(const VTKAxis& ); // Not implemented.
