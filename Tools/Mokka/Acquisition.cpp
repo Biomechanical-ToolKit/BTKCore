@@ -39,6 +39,7 @@
 #include <btkAcquisitionFileWriter.h>
 #include <btkMetaDataUtils.h>
 #include <btkMergeAcquisitionFilter.h>
+#include <btkAcquisitionFileIOFactory.h>
 
 #include <Qt>
 #include <QFileInfo>
@@ -114,6 +115,12 @@ bool Acquisition::save(const QString& filename, const QMap<int, QVariant>& prope
 {
   return this->write(filename, properties, this->mp_ROI[0], this->mp_ROI[1], true);
 }
+
+bool Acquisition::canBeSaved(const QString& filename)
+{
+  btk::AcquisitionFileIO::Pointer io = btk::AcquisitionFileIOFactory::CreateAcquisitionIO(qPrintable(filename), btk::AcquisitionFileIOFactory::WriteMode);
+  return (io ? true : false);
+};
 
 bool Acquisition::exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb)
 {
