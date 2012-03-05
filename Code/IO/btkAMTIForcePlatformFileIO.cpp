@@ -306,6 +306,11 @@ namespace btk
     btkErrorMacro("Method not yet implemented.");
     return;
   };
+  
+  /**
+   * @fn const std::vector<float>& AMTIForcePlatformFileIO::GetDimensions() const
+   * Returns the dimensions of the force platform.
+   */
 
   /**
    * Set the dimensions of the force platform which will be used for the next readings.
@@ -318,6 +323,16 @@ namespace btk
     this->m_Dimensions[2] = height;
     this->m_UseDimensions = true;
   };
+  
+  /**
+   * @fn void const std::vector<float>& AMTIForcePlatformFileIO::GetCorners() const
+   * Returns the position of the corners as a vector of 12x1 elements. The first three elements represent the coordinate of the first corner, etc.
+   */
+  
+  /**
+   * @fn const std::vector<float>& AMTIForcePlatformFileIO::GetOrigin() const
+   * Returns the coordinates of the origin of the force platform.
+   */
   
   /**
    * Set the geometry (corners and origin) of the force platform which will be used for the next readings.
