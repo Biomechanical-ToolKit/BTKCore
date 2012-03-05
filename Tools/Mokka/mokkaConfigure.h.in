@@ -43,4 +43,8 @@
 #define MOKKA_VERSION_PATCH @MOKKA_VERSION_PATCH@
 #define MOKKA_VERSION_STRING @MOKKA_VERSION_STRING@
 
+#ifdef Q_OS_LINUX
+  #define MOKKA_LINUX_SHARE_PATH "@CMAKE_INSTALL_PREFIX@/share"
+#endif
+
 #endif // mokkaConfigure_h

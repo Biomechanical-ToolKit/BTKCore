@@ -498,7 +498,7 @@ void MainWindow::help()
 #elif defined(Q_OS_WIN)
   QDesktopServices::openUrl(QUrl("file:///" + QCoreApplication::applicationDirPath() + "/MokkaHelp/index.html", QUrl::TolerantMode));
 #elif defined(Q_OS_LINUX)
-  QMessageBox::information(this, "Mokka", "The help in not yet integrated with Linux. Need more informations about application's deployment under Linux.");
+  QDesktopServices::openUrl(QUrl("file:///" + QString(MOKKA_LINUX_SHARE_PATH) + "/doc/btk/mokka/index.html", QUrl::TolerantMode));
 #endif
 };
 

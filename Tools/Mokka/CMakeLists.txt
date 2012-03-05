@@ -168,11 +168,11 @@ ELSEIF(APPLE)
 ENDIF(WIN32)
 
 ADD_CUSTOM_COMMAND(TARGET Mokka PRE_LINK
-                  COMMAND ${CMAKE_COMMAND} -E copy_directory "${BTK_BINARY_DIR}/Documentation/MokkaHelp" "${MOKKA_HELP_DIR}")
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${BTK_BINARY_DIR}/Documentation/MokkaHelp" "${MOKKA_HELP_DIR}")
 
 # Installation
 IF(NOT BTK_INSTALL_NO_RUNTIME)
-  IF(APPLE)
+  IF(APPLE) # MacOS
     MakeOSXBundleApp(Mokka ${EXECUTABLE_OUTPUT_PATH} "/Applications")
   ELSE(APPLE)
     INSTALL(TARGETS Mokka RUNTIME DESTINATION ${BTK_INSTALL_BIN_DIR_CM24} COMPONENT RuntimeLibraries)
@@ -181,7 +181,7 @@ IF(NOT BTK_INSTALL_NO_RUNTIME)
         INSTALL(DIRECTORY "${BTK_BINARY_DIR}/Documentation/MokkaHelp" DESTINATION "${BTK_INSTALL_BIN_DIR_CM24}")
       ENDIF(EXISTS "${BTK_BINARY_DIR}/Documentation/MokkaHelp")
     ELSE(WIN32) # Linux
-      MESSAGE(STATUS "Where to install the Mokka documentation under linux? Contact the developers if you have any hint.")
+      INSTALL(DIRECTORY "${BTK_BINARY_DIR}/Documentation/MokkaHelp" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/doc/btk/mokka")
     ENDIF(WIN32)
   ENDIF(APPLE)
 ENDIF(NOT BTK_INSTALL_NO_RUNTIME)
