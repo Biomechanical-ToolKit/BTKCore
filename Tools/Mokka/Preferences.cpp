@@ -82,6 +82,7 @@ void Preferences::saveSettings()
   bool checked = false;
   int index = -1;
   QColor color;
+  double value = 0.0;
   
   checked = this->defaultConfigurationCheckBox->checkState() == Qt::Checked;
   if (this->m_Data[DefaultConfigurationUse].toBool() != checked)
@@ -125,7 +126,7 @@ void Preferences::saveSettings()
     emit defaultMarkerColorChanged(color);
   }
   
-  double value = this->defaultMarkerRadiusSpinBox->value();
+  value = this->defaultMarkerRadiusSpinBox->value();
   if (this->m_Data[DefaultMarkerRadius].toDouble() != value)
   {
     this->m_Data[DefaultMarkerRadius] = value;
@@ -181,7 +182,7 @@ void Preferences::saveSettings()
     emit showForcePathChanged(index);
   }
   
-  double value = this->defaultPlotLineWidthSpinBox->value();
+  value = this->defaultPlotLineWidthSpinBox->value();
   if (this->m_Data[DefaultPlotLineWidth].toDouble() != value)
   {
     this->m_Data[DefaultPlotLineWidth] = value;
