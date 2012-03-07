@@ -287,15 +287,6 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   modelOutputsRoot->addChildren(items);
   // Strech
   this->splitter->setStretchFactor(0, 10);
-  // Resize the splitter's items
-  /*
-  this->toggleProperties();
-  QList<int> sizes = this->splitter->sizes();
-  sizes[0] = sizes[0] + sizes[1] - 16;
-  sizes[1] = 16;
-  this->splitter->setSizes(sizes);
-  this->toggleProperties();
-  */
   
   // Connections
   connect(this->modelConfigurationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectConfiguration(int)));
@@ -1576,15 +1567,30 @@ void ModelDockWidget::removeSelectedItems()
 
 void ModelDockWidget::toggleProperties()
 {
+  // The use of a static variable is ok as the properties are expanded during the UI init.
+  static int propertiesExpandedSize;
+  if (this->propertiesGroup->isVisible())
+    propertiesExpandedSize = this->splitter->sizes()[1];
+  
   if (!this->propertiesGroup->isVisible())
   {
     this->propertiesGroup->setVisible(true);
     this->propertiesButton->setIcon(*this->mp_DownArrowIcon);
+    // Force to have the same size than the previous expanding.
+    QList<int> sizes = this->splitter->sizes();
+    sizes[0] = sizes[0] + sizes[1] - propertiesExpandedSize;
+    sizes[1] = propertiesExpandedSize;
+    this->splitter->setSizes(sizes);
   }
   else
   {
     this->propertiesGroup->setVisible(false);
     this->propertiesButton->setIcon(*this->mp_RightArrowIcon);
+    // Force the properties button to move down
+    QList<int> sizes = this->splitter->sizes();
+    sizes[0] = sizes[0] + sizes[1] - 16;
+    sizes[1] = 16;
+    this->splitter->setSizes(sizes);
   }
 };
 
