@@ -155,7 +155,7 @@ void VideoWidget::dragEnterEvent(QDragEnterEvent* event)
       for (QList<QTreeWidgetItem*>::const_iterator it = selectedItems.begin() ; it != selectedItems.end() ; ++it)
       {
         if ((*it)->type() != VideoType)
-          break;
+          return;
       }
       event->setDropAction(Qt::CopyAction); // To have the cross (+) symbol
       event->accept();
