@@ -40,6 +40,9 @@
 #include <QMenu>
 #include <QKeyEvent>
 
+#define Mokka_UnzoomRegionOfInterest_Text "Unzoom Region of Interest"
+#define Mokka_ZoomRegionOfInterest_Text "Zoom Region of Interest"
+
 TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
 : QWidget(parent)
 {
@@ -167,10 +170,10 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(updateROIAction(int)));
+  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(updateROIAction()));
   connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
   connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(updateROIAction(int)));
+  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(updateROIAction()));
   connect(this->timeEventBar, SIGNAL(boundSelected(int)), this->lcdNumber, SLOT(display(int)));
   connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this->lcdNumber, SLOT(display(int)));
@@ -354,29 +357,37 @@ void TimeEventControlerWidget::reframeAcquisition(int ff)
 void TimeEventControlerWidget::toggleZoomRegionOfInterest()
 {
   // Zoom mode
-  if ((this->timeEventBar->m_FirstFrame == this->timeEventBar->m_ROIFirstFrame) && (this->timeEventBar->m_LastFrame == this->timeEventBar->m_ROILastFrame))
+  if ((this->timeEventBar->m_LeftBoundPos != this->timeEventBar->m_ROIFirstFrame) || (this->timeEventBar->m_RightBoundPos != this->timeEventBar->m_ROILastFrame))
   {
-    this->setRegionOfInterest(this->timeEventBar->m_LeftBoundPos, this->timeEventBar->m_RightBoundPos);
-    this->actionZoomUnzoomRegionOfInterest->setText(tr("Unzoom Region of Interest"));
+    this->setRegionOfInterest(this->timeEventBar->m_LeftBoundPos, this->timeEventBar->m_RightBoundPos, false);
+    this->actionZoomUnzoomRegionOfInterest->setText(tr(Mokka_UnzoomRegionOfInterest_Text));
   }
   else
   {
-    this->setRegionOfInterest(this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame);
-    this->actionZoomUnzoomRegionOfInterest->setText(tr("Zoom Region of Interest"));
+    int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
+    this->setRegionOfInterest(roi[0], roi[1], false);
+    this->actionZoomUnzoomRegionOfInterest->setText(tr(Mokka_ZoomRegionOfInterest_Text));
   }
 };
 
 void TimeEventControlerWidget::cropRegionOfInterest()
 {
   emit regionOfInterestChanged(this->timeEventBar->m_LeftBoundPos, this->timeEventBar->m_RightBoundPos);
+  this->actionZoomUnzoomRegionOfInterest->setText(tr(Mokka_ZoomRegionOfInterest_Text));
 };
 
 void TimeEventControlerWidget::setRegionOfInterest(int lb, int rb)
+{
+  this->setRegionOfInterest(lb,rb,true);
+}
+
+void TimeEventControlerWidget::setRegionOfInterest(int lb, int rb, bool updateActions)
 {
   this->timeEventBar->m_ROIFirstFrame = lb;
   this->timeEventBar->m_ROILastFrame = rb;
   this->timeEventBar->updateInternals();
   this->timeEventBar->update();
+  if (updateActions) this->updateROIAction();
 };
 
 void TimeEventControlerWidget::previousEvent()
@@ -806,11 +817,8 @@ void TimeEventControlerWidget::insertEvent(const QString& label, int context, in
     this->setCurrentFrame(oldFrame);
 };
 
-void TimeEventControlerWidget::updateROIAction(int frame)
+void TimeEventControlerWidget::updateROIAction()
 {
-  Q_UNUSED(frame);
-  //if ((this->timeEventBar->m_ROIFirstFrame != this->mp_Acquisition->firstFrame()) || (this->timeEventBar->m_ROILastFrame != this->mp_Acquisition->lastFrame()))
-  //if ((this->timeEventBar->m_ROIFirstFrame != this->timeEventBar->m_FirstFrame) || (this->timeEventBar->m_ROILastFrame != this->timeEventBar->m_LastFrame))
   if ((this->timeEventBar->m_LeftBoundPos != this->timeEventBar->m_ROIFirstFrame) || (this->timeEventBar->m_RightBoundPos != this->timeEventBar->m_ROILastFrame))
   {
     this->actionCropRegionOfInterest->setEnabled(true);
