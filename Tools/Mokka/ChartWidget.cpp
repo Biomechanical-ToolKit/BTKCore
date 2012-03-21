@@ -240,6 +240,8 @@ void ChartWidget::setAcquisition(Acquisition* acq)
     disconnect(this->mp_Acquisition, 0, this, 0);
   
   this->mp_Acquisition = acq;
+  // General
+  connect(this->mp_Acquisition, SIGNAL(regionOfInterestChanged(int, int)), this, SLOT(updateAxisX(int,int)));
   // Point
   connect(this->mp_Acquisition, SIGNAL(pointLabelChanged(int, QString)), this, SLOT(updatePointPlotLabel(int)));
   connect(this->mp_Acquisition, SIGNAL(pointsRemoved(QList<int>, QList<Point*>)), this, SLOT(hidePointPlots(QList<int>)));
@@ -273,19 +275,43 @@ void ChartWidget::updateAxisX()
     for (int j = 0 ; j < static_cast<int>(this->m_ChartData[i]->charts()->size()) ; ++j)
     {
       btk::VTKChartTimeSeries* chart = static_cast<btk::VTKChartTimeSeries*>(this->m_ChartData[i]->chart(j));
-      vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
-      vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
       double* bounds = chart->GetBounds();
       double diff = (double)this->mp_Acquisition->firstFrame() - bounds[0];
-      double rangeX[2] = {axisX->GetMinimum() + diff, axisX->GetMaximum() + diff};
-      double rangeY[2] = {axisY->GetMinimum(), axisY->GetMaximum()};
-      chart->SetBounds(bounds[0] + diff, bounds[1] + diff, bounds[2], bounds[3]);
-      axisX->SetRange(rangeX[0], rangeX[1]);
-      axisY->SetRange(rangeY[0], rangeY[1]);
-      for (int k = 0 ; k < chart->GetNumberOfPlots() ; ++k)
-        chart->GetPlot(i)->Modified(); // To update the frames index
+      this->updateAxisX(chart, diff, diff, diff, diff);
     }
   }
+};
+
+void ChartWidget::updateAxisX(int ff, int lf)
+{
+  for (int i = 0 ; i < this->m_ChartData.size() ; ++i)
+  {
+    for (int j = 0 ; j < static_cast<int>(this->m_ChartData[i]->charts()->size()) ; ++j)
+    {
+      btk::VTKChartTimeSeries* chart = static_cast<btk::VTKChartTimeSeries*>(this->m_ChartData[i]->chart(j));
+      double* bounds = chart->GetBounds();
+      double dlb = (double)ff - bounds[0];
+      double dub = (double)lf - bounds[1];
+      vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
+      double dlx = (double)ff - axisX->GetMinimum();
+      double dux = (double)lf - axisX->GetMaximum();
+      this->updateAxisX(chart, dlb, dub, dlx, dux);
+    }
+  }
+};
+
+void ChartWidget::updateAxisX(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux)
+{
+  vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
+  vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
+  double* bounds = chart->GetBounds();
+  double rangeX[2] = {axisX->GetMinimum() + dlx, axisX->GetMaximum() + dux};
+  double rangeY[2] = {axisY->GetMinimum(), axisY->GetMaximum()};
+  chart->SetBounds(bounds[0] + dlb, bounds[1] + dub, bounds[2], bounds[3]);
+  axisX->SetRange(rangeX[0], rangeX[1]);
+  axisY->SetRange(rangeY[0], rangeY[1]);
+  for (int k = 0 ; k < chart->GetNumberOfPlots() ; ++k)
+    chart->GetPlot(k)->Modified(); // To update the frames index
 };
 
 void ChartWidget::setUnitAxisX(const QString& str, double scale, double offset)

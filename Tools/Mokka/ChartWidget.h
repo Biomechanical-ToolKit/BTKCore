@@ -135,6 +135,7 @@ signals:
   
 private slots:
   void setLastContextMenuPosition(const QPoint& globalPos);
+  void updateAxisX(int ff, int lf);
   
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
@@ -146,6 +147,7 @@ protected:
   void updatePlotLabel(int chartType, int itemId);
   void displayPointComponent(int idx, int state);
   void displayChart(int chartType);
+  void updateAxisX(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux);
   
   int m_CurrentChartType;
   QVector<AbstractChartData*> m_ChartData;
