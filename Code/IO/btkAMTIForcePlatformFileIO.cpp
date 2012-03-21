@@ -396,17 +396,17 @@ namespace btk
     // Corners expressed in the global frame.
     // The global frame is set here as: axis X going forward, axis Y on the left and axis Z going upward.
     // The corners are set to have the corner #1 on the bottom left side, #2 on the top left side, #3 on the top right side and #4 on the bottom right side.
-    c[0] = -cx;
-    c[1] = cy;
+    c[0] = cx;
+    c[1] = -cy;
     c[2] = 0.0f;
-    c[3] = cx;
-    c[4] = cy;
+    c[3] = -cx;
+    c[4] = -cy;
     c[5] = 0.0f;
-    c[6] = cx;
-    c[7] = -cy;
+    c[6] = -cx;
+    c[7] = cy;
     c[8] = 0.0f;
-    c[9] = -cx;
-    c[10] = -cy;
+    c[9] = cx;
+    c[10] = cy;
     c[11] = 0.0f;
     // - Origin (expressed in the global frame) and centered above the origin of the global frame
     o[0] = 0.0f;
