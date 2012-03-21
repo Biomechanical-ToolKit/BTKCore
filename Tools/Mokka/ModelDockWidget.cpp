@@ -794,9 +794,14 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
       }
     }
     // Vicon model configuration
-    else if ((xmlReader.name() == "KinematicModel") && xmlReader.attributes().hasAttribute("MODEL"))
+    else if ((xmlReader.name() == "KinematicModel"))
     {
       configName = xmlReader.attributes().value("MODEL").toString();
+      if (configName.isEmpty())
+      {
+        LOG_WARNING("No name for the configuration. It will use its filename as name.");
+        configName = QFileInfo(filename).baseName();
+      }
       while (xmlReader.readNextStartElement())
       {
         if (xmlReader.name() == "Skeleton")
@@ -889,13 +894,17 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   file.close();
   if (xmlReader.hasError())
   {
-    messageBox.setText("Failed to parse file: " + filename + "\n" + xmlReader.errorString());
+    QString errMsg = "Failed to parse file: " + filename + "\n" + xmlReader.errorString();
+    LOG_CRITICAL(errMsg);
+    messageBox.setText(errMsg);
     messageBox.exec();
     return;
   }
   else if (file.error() != QFile::NoError)
   {
-    messageBox.setText("Cannot read file: " + filename + "\n" + file.errorString());
+    QString errMsg = "Cannot read file: " + filename + "\n" + file.errorString();
+    LOG_CRITICAL(errMsg);
+    messageBox.setText(errMsg);
     messageBox.exec();
     return;
   }
