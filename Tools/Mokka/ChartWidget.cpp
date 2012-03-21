@@ -289,15 +289,20 @@ void ChartWidget::updateAxisX(int ff, int lf)
     for (int j = 0 ; j < static_cast<int>(this->m_ChartData[i]->charts()->size()) ; ++j)
     {
       btk::VTKChartTimeSeries* chart = static_cast<btk::VTKChartTimeSeries*>(this->m_ChartData[i]->chart(j));
-      double* bounds = chart->GetBounds();
-      double dlb = (double)ff - bounds[0];
-      double dub = (double)lf - bounds[1];
-      vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
-      double dlx = (double)ff - axisX->GetMinimum();
-      double dux = (double)lf - axisX->GetMaximum();
-      this->updateAxisX(chart, dlb, dub, dlx, dux);
+      this->updateAxisX(chart, ff, lf);
     }
   }
+};
+
+void ChartWidget::updateAxisX(btk::VTKChartTimeSeries* chart, int ff, int lf)
+{
+  double* bounds = chart->GetBounds();
+  double dlb = (double)ff - bounds[0];
+  double dub = (double)lf - bounds[1];
+  vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
+  double dlx = (double)ff - axisX->GetMinimum();
+  double dux = (double)lf - axisX->GetMaximum();
+  this->updateAxisX(chart, dlb, dub, dlx, dux);
 };
 
 void ChartWidget::updateAxisX(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux)
@@ -703,6 +708,8 @@ void ChartWidget::dropEvent(QDropEvent* event)
       btk::VTKChartTimeSeries* chart = this->m_ChartData[this->m_CurrentChartType]->chart(i);
       chart->SetInteractionEnabled(true);
       chart->RecalculateBounds();
+      int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
+      this->updateAxisX(chart, roi[0], roi[1]);
     }
   }
   this->render();

@@ -147,6 +147,7 @@ protected:
   void updatePlotLabel(int chartType, int itemId);
   void displayPointComponent(int idx, int state);
   void displayChart(int chartType);
+  void updateAxisX(btk::VTKChartTimeSeries* chart, int ff, int lf);
   void updateAxisX(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux);
   
   int m_CurrentChartType;
