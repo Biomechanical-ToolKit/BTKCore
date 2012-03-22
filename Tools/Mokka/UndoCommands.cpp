@@ -92,9 +92,9 @@ ReframeAcquisition::ReframeAcquisition(Acquisition* acq, int ff, QUndoCommand* p
 
 void ReframeAcquisition::action()
 {
-  int temp = this->mp_Acquisition->firstFrame();
+  int temp[2]; this->mp_Acquisition->regionOfInterest(temp[0], temp[1]);
   this->mp_Acquisition->setFirstFrame(this->m_FirstFrame);
-  this->m_FirstFrame = temp;
+  this->m_FirstFrame = temp[0];
 };
 
 // ----------------------------------------------- //

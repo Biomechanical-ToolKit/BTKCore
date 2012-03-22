@@ -69,14 +69,12 @@ TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
   m_Fm(this->font()), m_EventItems(), m_EventSymbols(8), m_SelectedEvents(),
   m_RubberOrigin()
 {
-  this->m_FirstFrame = 0;
-  this->m_LastFrame = 0;
-  this->m_ROIFirstFrame = this->m_FirstFrame;
-  this->m_ROILastFrame = this->m_LastFrame;
+  this->m_ROIFirstFrame = 0;
+  this->m_ROILastFrame = 0;
   this->m_EventContexts << "Right" << "Left" << "General";
-  this->m_SliderPos = this->m_FirstFrame;
-  this->m_LeftBoundPos = this->m_FirstFrame;
-  this->m_RightBoundPos = this->m_LastFrame;
+  this->m_SliderPos = 0;
+  this->m_LeftBoundPos = 0;
+  this->m_RightBoundPos = 0;
   this->m_UnitStep = 1.0;
   this->m_TickDivider = 1;
 #ifdef Q_OS_MAC
@@ -104,27 +102,24 @@ void TimeEventBarWidget::load(Acquisition* acq)
   this->m_SelectedEvents.clear();
   if (acq->pointFrameNumber() == 0)
   {
-    this->m_FirstFrame = 0;
-    this->m_LastFrame = 0;
+    this->m_ROIFirstFrame = 0;
+    this->m_ROILastFrame = 0;
   }
   else
   {
-    this->m_FirstFrame = acq->firstFrame();
-    this->m_LastFrame = acq->lastFrame();
+    acq->regionOfInterest(this->m_ROIFirstFrame, this->m_ROILastFrame);
   }
-    
-  this->m_ROIFirstFrame = this->m_FirstFrame;
-  this->m_ROILastFrame = this->m_LastFrame;
-  this->m_SliderPos = this->m_FirstFrame;
-  this->m_LeftBoundPos = this->m_FirstFrame;
-  this->m_RightBoundPos = this->m_LastFrame;
+  
+  this->m_SliderPos = this->m_ROIFirstFrame;
+  this->m_LeftBoundPos = this->m_ROIFirstFrame;
+  this->m_RightBoundPos = this->m_ROILastFrame;
   
   this->m_EventItems.resize(acq->eventCount());
   int inc = 0;
   for (QMap<int,Event*>::const_iterator it = acq->events().begin() ; it != acq->events().end() ; ++it)
     this->setEventItem(this->m_EventItems[inc++], it.key(), it.value());
   
-  this->setSliderValue(this->m_FirstFrame);
+  this->setSliderValue(this->m_ROIFirstFrame);
   this->updateInternals();
   this->update();
 };
@@ -133,13 +128,11 @@ void TimeEventBarWidget::reset()
 {
   this->m_SelectedEvents.clear();
   this->m_EventItems.clear();
-  this->m_FirstFrame = 0;
-  this->m_LastFrame = 0;
-  this->m_ROIFirstFrame = this->m_FirstFrame;
-  this->m_ROILastFrame = this->m_LastFrame;
-  this->m_SliderPos = this->m_FirstFrame;
-  this->m_LeftBoundPos = this->m_FirstFrame;
-  this->m_RightBoundPos = this->m_LastFrame;
+  this->m_ROIFirstFrame = 0;
+  this->m_ROILastFrame = 0;
+  this->m_SliderPos = 0;
+  this->m_LeftBoundPos = 0;
+  this->m_RightBoundPos = 0;
   this->updateInternals();
   this->update();
 };

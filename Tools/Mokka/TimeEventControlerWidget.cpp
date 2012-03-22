@@ -247,6 +247,7 @@ void TimeEventControlerWidget::load()
   this->actionZoomUnzoomRegionOfInterest->setEnabled(false);
   this->actionNextEvent->setEnabled(this->timeEventBar->m_EventItems.isEmpty() ? false : true);
   this->actionPreviousEvent->setEnabled(this->timeEventBar->m_EventItems.isEmpty() ? false : true);
+  this->actionReframeFromOne->setEnabled(this->timeEventBar->m_ROIFirstFrame == 1 ? false : true);
 };
 
 void TimeEventControlerWidget::reset()
@@ -341,7 +342,7 @@ void TimeEventControlerWidget::previousFrame()
 
 void TimeEventControlerWidget::reframeAcquisition(int ff)
 {
-  int diff = this->timeEventBar->m_FirstFrame - ff;
+  int diff = this->timeEventBar->m_ROIFirstFrame - ff;
   this->timeEventBar->m_FirstFrame = this->mp_Acquisition->firstFrame();
   this->timeEventBar->m_LastFrame = this->mp_Acquisition->lastFrame();
   this->timeEventBar->m_ROIFirstFrame -= diff;
@@ -352,6 +353,7 @@ void TimeEventControlerWidget::reframeAcquisition(int ff)
   this->timeEventBar->updateInternals();
   this->timeEventBar->update();
   this->lcdNumber->display(this->timeEventBar->m_SliderPos);
+  this->actionReframeFromOne->setEnabled(!this->actionReframeFromOne->isEnabled());
 };
 
 void TimeEventControlerWidget::toggleZoomRegionOfInterest()
@@ -387,7 +389,11 @@ void TimeEventControlerWidget::setRegionOfInterest(int lb, int rb, bool updateAc
   this->timeEventBar->m_ROILastFrame = rb;
   this->timeEventBar->updateInternals();
   this->timeEventBar->update();
-  if (updateActions) this->updateROIAction();
+  if (updateActions)
+  {
+    this->updateROIAction();
+    this->actionReframeFromOne->setEnabled(lb == 1 ? false : true);
+  }
 };
 
 void TimeEventControlerWidget::previousEvent()

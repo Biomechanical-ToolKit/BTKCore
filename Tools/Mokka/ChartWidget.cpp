@@ -276,7 +276,8 @@ void ChartWidget::updateAxisX()
     {
       btk::VTKChartTimeSeries* chart = static_cast<btk::VTKChartTimeSeries*>(this->m_ChartData[i]->chart(j));
       double* bounds = chart->GetBounds();
-      double diff = (double)this->mp_Acquisition->firstFrame() - bounds[0];
+      int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
+      double diff = (double)roi[0] - bounds[0];
       this->updateAxisX(chart, diff, diff, diff, diff);
     }
   }

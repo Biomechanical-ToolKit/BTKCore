@@ -274,7 +274,7 @@ void Acquisition::clear()
 
 void Acquisition::setFirstFrame(int ff)
 {
-  int diff = this->m_FirstFrame - ff;
+  int diff = this->mp_ROI[0] - ff;
   this->m_FirstFrame -= diff;
   this->m_LastFrame -= diff;
   this->mp_ROI[0] -= diff;
