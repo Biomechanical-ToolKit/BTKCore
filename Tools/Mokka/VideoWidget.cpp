@@ -112,12 +112,19 @@ void VideoWidget::render()
     if (pos >= 0)
     {
 #ifdef Q_OS_WIN
-      this->mp_MediaObject->play();
-      this->mp_MediaObject->seek(pos);
-      // Because some videos are not able to start correctly the frame by frame rendering and are like frozen
-      if (!this->m_PlaybackStarted || (this->m_PlaybackFrameCounter > 3))
-        this->mp_MediaObject->pause();
-      ++this->m_PlaybackFrameCounter;
+      if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
+      {
+        this->mp_MediaObject->play();
+        this->mp_MediaObject->seek(pos);
+        // Because some videos are not able to start correctly the frame by frame rendering and are like frozen
+        if (!this->m_PlaybackStarted || (this->m_PlaybackFrameCounter > 3))
+          this->mp_MediaObject->pause();
+        ++this->m_PlaybackFrameCounter;
+      }
+      else
+      {
+        this->mp_MediaObject->seek(pos);
+      }
 #else
       this->mp_MediaObject->seek(pos);
 #endif
@@ -257,6 +264,10 @@ void VideoWidget::checkMediaStatus(Phonon::State newState, Phonon::State oldStat
     if (this->mp_MediaObject->currentSource().type() != Phonon::MediaSource::Empty)
     {
       this->setVideoVisible(true);
+#ifdef Q_OS_WIN
+      if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7)
+        this->mp_MediaObject->pause();
+#endif
       this->render();
     }
     break;
