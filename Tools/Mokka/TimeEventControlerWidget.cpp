@@ -166,22 +166,22 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   connect(this->nextEventButton, SIGNAL(released()), this, SLOT(releaseNextEventButton()));
   connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(nextStep()));
   // Time Event Bar
-  connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(updateROIAction()));
-  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(updateROIAction()));
-  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(eventSelectionChanged(QList<int>)), this, SLOT(toggleEventSelection(QList<int>)));
-  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(eventMotionFinished(int, int)), this, SLOT(checkEventFrameModification(int, int)));
   // Actions
@@ -258,6 +258,14 @@ void TimeEventControlerWidget::reset()
   this->lcdNumber->display(0);
 };
 
+void TimeEventControlerWidget::setTimeEventTicksDisplay(int index)
+{
+  this->timeEventBar->m_TimeDisplay = (index == 1);
+  this->timeEventBar->updateInternals();
+  this->timeEventBar->update();
+  this->lcdDisplay(this->currentFrame());
+};
+
 bool TimeEventControlerWidget::eventItemData(int index, int& typeId, int& frame, double rgb[3])
 {
   if (index >= this->timeEventBar->m_EventItems.count())
@@ -284,17 +292,17 @@ void TimeEventControlerWidget::togglePlayback()
 
 void TimeEventControlerWidget::startPlayback()
 {
-  disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  disconnect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  disconnect(this->timeEventBar, SIGNAL(boundSelected(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SIGNAL(currentFrameChanged(int)));
-  disconnect(this->timeEventBar, SIGNAL(boundDeselected(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SIGNAL(currentFrameChanged(int)));
-  disconnect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
-  disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   this->playButton->setIcon(*this->mp_PauseIcon);
   this->mp_Timer->start(this->m_PlaybackDelay);
@@ -305,20 +313,28 @@ void TimeEventControlerWidget::stopPlayback()
 {
   this->mp_Timer->stop();
   this->playButton->setIcon(*this->mp_PlayIcon);
-  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   emit playbackStopped();
 }
+
+void TimeEventControlerWidget::lcdDisplay(int frame)
+{
+  if (!this->timeEventBar->m_TimeDisplay)
+    this->lcdNumber->display(frame);
+  else
+    this->lcdNumber->display(static_cast<double>(frame-1)*this->timeEventBar->m_TimeScale);
+};
 
 void TimeEventControlerWidget::setCurrentFrame(int frame)
 {

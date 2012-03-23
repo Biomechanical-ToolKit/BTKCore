@@ -48,7 +48,7 @@
     Q_OBJECT
 
   public:
-    enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, 
+    enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, DefaultTimeBarEventDisplay,
           DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
           ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse,
           DefaultGRFButterflyActivation, ForcePathDisplay, DefaultPlotLineWidth, ChartEventDisplay, chartUnitAxisX};
@@ -83,6 +83,7 @@
     void useDefaultConfigurationStateChanged(bool isUsed);
     void defaultConfigurationPathChanged(const QString& path);
     void defaultGroundOrientationChanged(int index);
+    void defaultTimeBarEventDisplayChanged(int index);
     void useEventEditorWhenInsertingStateChanged(bool isChecked);
     void defaultSegmentColorChanged(const QColor& color);
     void defaultMarkerColorChanged(const QColor& color);

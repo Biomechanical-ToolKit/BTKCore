@@ -56,6 +56,7 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[DefaultConfigurationPath] = "";
   this->m_Data[EventEditorWhenInserting] = false;
   this->m_Data[DefaultGroundOrientation] = -1;
+  this->m_Data[DefaultTimeBarEventDisplay] = -1;
   this->m_Data[DefaultSegmentColor] = QColor();
   this->m_Data[DefaultMarkerColor] = QColor();
   this->m_Data[DefaultMarkerRadius] = -1;
@@ -110,6 +111,13 @@ void Preferences::saveSettings()
   {
     this->m_Data[DefaultGroundOrientation] = index;
     emit defaultGroundOrientationChanged(index);
+  }
+  
+  index = this->defaultTimeBarEventDisplayComboBox->currentIndex();
+  if (this->m_Data[DefaultTimeBarEventDisplay].toInt() != index)
+  {
+    this->m_Data[DefaultTimeBarEventDisplay] = index;
+    emit defaultTimeBarEventDisplayChanged(index);
   }
   
   color = this->defaultSegmentColorButton->property("backgroundColor").value<QColor>();
@@ -223,6 +231,7 @@ void Preferences::resetSettings()
   this->defaultConfigurationLineEdit->setText(this->m_Data[DefaultConfigurationPath].toString());
   this->openEventEditorCheckBox->setChecked(this->m_Data[EventEditorWhenInserting].toBool());
   this->defaultPlaneOrientationComboBox->setCurrentIndex(this->m_Data[DefaultGroundOrientation].toInt());
+  this->defaultTimeBarEventDisplayComboBox->setCurrentIndex(this->m_Data[DefaultTimeBarEventDisplay].toInt());
   colorizeButton(this->defaultSegmentColorButton, this->m_Data[DefaultSegmentColor].value<QColor>());
   colorizeButton(this->defaultMarkerColorButton, this->m_Data[DefaultMarkerColor].value<QColor>() );
   this->defaultMarkerRadiusSpinBox->setValue(this->m_Data[DefaultMarkerRadius].toDouble());

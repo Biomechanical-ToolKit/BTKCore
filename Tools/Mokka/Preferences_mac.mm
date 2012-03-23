@@ -87,8 +87,9 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->defaultConfigurationButton, SIGNAL(clicked()), this, SLOT(setDefaultConfiguration()));
   connect(this->defaultConfigurationCheckBox, SIGNAL(toggled(bool)), this, SLOT(useDefaultConfiguration(bool)));
   connect(this->defaultConfigurationLineEdit, SIGNAL(editingFinished()), this, SLOT(setDefaultConfigurationPath()));
-  connect(this->openEventEditorCheckBox, SIGNAL(toggled(bool)), this, SLOT(useEventEditorWhenInserting(bool)));
+  connect(this->openEventEditorCheckBox, SIGNAL(toggled(bool)), this, SLOT(useEventEditorWhenInserting(bool)));  
   connect(this->defaultPlaneOrientationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultOrientation(int)));
+  connect(this->defaultTimeBarEventDisplayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultTimeBarEventDisplay(int)));
   connect(this->defaultSegmentColorButton, SIGNAL(clicked()), this, SLOT(setDefaultSegmentColor()));
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultMarkerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setDefaultMarkerRadius(double)));
@@ -129,7 +130,7 @@ void Preferences::showGeneralPreferences()
   this->setCurrentIndex(General);
   this->setWindowTitle(tr("General"));
   
-  this->animateHeight(this->groundLayout->geometry());
+  this->animateHeight(this->timeEventBarLayout->geometry());
 };
 
 void Preferences::showVisualisationPreferences()
@@ -196,6 +197,12 @@ void Preferences::useEventEditorWhenInserting(bool isUsed)
 void Preferences::setDefaultOrientation(int index)
 {
   emit defaultGroundOrientationChanged(index);
+};
+
+void Preferences::setDefaultTimeBarEventDisplay(int index)
+{
+  this->defaultChartUnitAxisXComboBox->setCurrentIndex(index);
+  emit defaultTimeBarEventDisplayChanged(index);
 };
 
 void Preferences::setDefaultSegmentColor()

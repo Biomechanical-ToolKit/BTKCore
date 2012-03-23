@@ -70,6 +70,7 @@ public slots:
   void setDefaultConfigurationPath();
   void useEventEditorWhenInserting(bool isUsed);
   void setDefaultOrientation(int index);
+  void setDefaultTimeBarEventDisplay(int index);
   void setDefaultSegmentColor();
   void setDefaultMarkerColor();
   void setDefaultMarkerRadius(double radius);
@@ -91,6 +92,7 @@ signals:
   void useDefaultConfigurationStateChanged(bool isUsed);
   void defaultConfigurationPathChanged(const QString& path);
   void defaultGroundOrientationChanged(int index);
+  void defaultTimeBarEventDisplayChanged(int index);
   void useEventEditorWhenInsertingStateChanged(bool isChecked);
   void defaultSegmentColorChanged(const QColor& color);
   void defaultMarkerColorChanged(const QColor& color);

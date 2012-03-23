@@ -67,9 +67,13 @@ public:
   bool openEditorWhenInsertingEventFlag() const {return this->m_OpenEditorWhenInserting;};
   void setOpenEditorWhenInsertingEventFlag(bool isUsed) {this->m_OpenEditorWhenInserting = isUsed;};
   
+  int timeEventTicksDisplay() const {return this->timeEventBar->m_TimeDisplay ? 1 : 0;};
+  void setTimeEventTicksDisplay(int index);
+  
   bool eventItemData(int index, int& typeId, int& frame, double rgb[3]);
   
 public slots:
+  void lcdDisplay(int frame);
   void togglePlayback();
   void stopPlayback();
   void startPlayback();

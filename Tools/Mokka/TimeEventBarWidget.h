@@ -130,6 +130,8 @@ private:
   int m_MovingEventIndex;
   QRubberBand* mp_Rubber;
   QPoint m_RubberOrigin;
+  bool m_TimeDisplay;
+  double m_TimeScale;
 };
 
 #endif // TimeEventBarWidget_h

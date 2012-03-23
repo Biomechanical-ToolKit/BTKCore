@@ -364,6 +364,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(useDefaultConfigurationStateChanged(bool)), this, SLOT(setPreferenceUseDefaultConfiguration(bool)));
   connect(this->mp_Preferences, SIGNAL(defaultConfigurationPathChanged(QString)), this, SLOT(setPreferenceDefaultConfigurationPath(QString)));
   connect(this->mp_Preferences, SIGNAL(defaultGroundOrientationChanged(int)), this, SLOT(setPreferenceDefaultOrientation(int)));
+  connect(this->mp_Preferences, SIGNAL(defaultTimeBarEventDisplayChanged(int)), this, SLOT(setPreferenceDefaultTimeBarEventDisplay(int)));
   connect(this->mp_Preferences, SIGNAL(useEventEditorWhenInsertingStateChanged(bool)), this, SLOT(setPreferenceUseEventEditorWhenInserting(bool)));
   connect(this->mp_Preferences, SIGNAL(defaultSegmentColorChanged(QColor)), this, SLOT(setPreferenceDefaultSegmentColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultMarkerColorChanged(QColor)), this, SLOT(setPreferenceDefaultMarkerColor(QColor)));
@@ -1585,6 +1586,13 @@ void MainWindow::setPreferenceDefaultOrientation(int index)
   this->multiView->setDefaultGroundOrientation(index);
 };
 
+void MainWindow::setPreferenceDefaultTimeBarEventDisplay(int index)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultTimeBarEventDisplay", index);
+  this->timeEventControler->setTimeEventTicksDisplay(index);
+};
+
 void MainWindow::setPreferenceDefaultSegmentColor(const QColor& color)
 {
   QSettings settings;
@@ -1866,6 +1874,7 @@ void MainWindow::readSettings()
   QString defaultConfigurationPath = settings.value("defaultConfigurationPath", "").toString();
   bool openEventEditorWhenInserting = settings.value("openEventEditorWhenInserting", true).toBool();
   int defaultPlaneOrientation = settings.value("defaultPlaneOrientation", 0).toInt();
+  int defaultTimeBarEventDisplay = settings.value("defaultTimeBarEventDisplay", 0).toInt();
   QColor defaultSegmentColor = settings.value("defaultSegmentColor", QColor(255,255,255)).value<QColor>();
   QColor defaultMarkerColor = settings.value("defaultMarkerColor", QColor(255,255,255)).value<QColor>();
   double defaultMarkerRadius = settings.value("defaultMarkerRadius", 8.0).toDouble();
@@ -1906,6 +1915,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::DefaultConfigurationPath, defaultConfigurationPath);
   this->mp_Preferences->setPreference(Preferences::EventEditorWhenInserting, openEventEditorWhenInserting);
   this->mp_Preferences->setPreference(Preferences::DefaultGroundOrientation, defaultPlaneOrientation);
+  this->mp_Preferences->setPreference(Preferences::DefaultTimeBarEventDisplay, defaultTimeBarEventDisplay);
   this->mp_Preferences->setPreference(Preferences::DefaultSegmentColor, defaultSegmentColor);
   this->mp_Preferences->setPreference(Preferences::DefaultMarkerColor, defaultMarkerColor);
   this->mp_Preferences->setPreference(Preferences::DefaultMarkerRadius, defaultMarkerRadius);
@@ -1928,6 +1938,7 @@ void MainWindow::readSettings()
     this->mp_ModelDock->loadConfiguration(defaultConfigurationPath);
   this->timeEventControler->setOpenEditorWhenInsertingEventFlag(openEventEditorWhenInserting);
   this->multiView->setDefaultGroundOrientation(defaultPlaneOrientation);
+  this->timeEventControler->setTimeEventTicksDisplay(defaultTimeBarEventDisplay);
   this->multiView->setDefaultSegmentColor(defaultSegmentColor);
   this->multiView->setDefaultMarkerColor(defaultMarkerColor);
   this->multiView->setDefaultMarkerRadius(defaultMarkerRadius);
