@@ -2,10 +2,11 @@ SET(BTKBasicFilters_SRCS
   btkAcquisitionUnitConverter.cpp
   btkForcePlatformsExtractor.cpp
   btkForcePlatformWrenchFilter.cpp
+  btkGroundReactionWrenchFilter.cpp
   btkMergeAcquisitionFilter.cpp
   btkSeparateKnownVirtualMarkersFilter.cpp
   btkSpecializedPointsExtractor.cpp
-  btkGroundReactionWrenchFilter.cpp
+  btkWrenchDirectionAngleFilter.cpp
 )
 
 ADD_LIBRARY(BTKBasicFilters ${BTK_LIBS_BUILD_TYPE} ${BTKBasicFilters_SRCS})
