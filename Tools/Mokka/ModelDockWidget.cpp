@@ -450,6 +450,7 @@ void ModelDockWidget::load()
   // - Force platforms
   QTreeWidgetItem* forcePlatesRoot = this->modelTree->topLevelItem(ForcePlatesItem);
   int numFP = this->mp_Acquisition->btkForcePlatforms()->GetItemNumber();
+  const int ncfp = 4; // Number of components per forceplate
   for (int i = 0 ; i < numFP ; ++i)
   {
     QTreeWidgetItem* forcePlateItem = new QTreeWidgetItem(QStringList("Force platform #" + QString::number(i+1)), ForcePlateType);
@@ -460,19 +461,24 @@ void ModelDockWidget::load()
     // Force
     QTreeWidgetItem* forcePlateForceItem = new QTreeWidgetItem(QStringList("Force"), ForcePlateType);
     forcePlateForceItem->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
-    forcePlateForceItem->setData(0, ForcePlateId, 65535+i*3+1); // 65535 (to have a unique ID) + FP index * 3 + component index
+    forcePlateForceItem->setData(0, ForcePlateId, 65535+i*ncfp+1); // 65535 (to have a unique ID) + FP index * 3 + component index
     forcePlateItem->addChild(forcePlateForceItem);
     // Moment
     QTreeWidgetItem* forcePlateMomentItem = new QTreeWidgetItem(QStringList("Moment"), ForcePlateType);
     forcePlateMomentItem->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
-    forcePlateMomentItem->setData(0, ForcePlateId, 65535+i*3+2);
+    forcePlateMomentItem->setData(0, ForcePlateId, 65535+i*ncfp+2);
     forcePlateItem->addChild(forcePlateMomentItem);
     // Position
     QTreeWidgetItem* forcePlatePositionItem = new QTreeWidgetItem(QStringList("Position"), ForcePlateType);
     forcePlatePositionItem->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
-    forcePlatePositionItem->setData(0, ForcePlateId, 65535+i*3+0);
+    forcePlatePositionItem->setData(0, ForcePlateId, 65535+i*ncfp+0);
     forcePlatePositionItem->setCheckState(TrajectoryHeader, Qt::Unchecked);
     forcePlateItem->addChild(forcePlatePositionItem);
+    // Direction angle
+    QTreeWidgetItem* forcePlateDirectionAngleItem = new QTreeWidgetItem(QStringList("Direction angle"), ForcePlateType);
+    forcePlateDirectionAngleItem->setIcon(LabelHeader, *this->mp_ModelOutputsIcon);
+    forcePlateDirectionAngleItem->setData(0, ForcePlateId, 65535+i*ncfp+3);
+    forcePlateItem->addChild(forcePlateDirectionAngleItem);
   }
   // - Videos
   QTreeWidgetItem* videosRoot = this->modelTree->topLevelItem(VideosItem);

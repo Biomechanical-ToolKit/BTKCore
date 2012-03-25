@@ -48,6 +48,7 @@
 #include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileIO.h>
 #include <btkAMTIForcePlatformFileIO.h> // Special case for AMTI files
+#include <btkWrenchDirectionAngleFilter.h>
 
 #include <QObject>
 #include <QString>
@@ -124,6 +125,7 @@ public:
   btk::PointCollection::Pointer btkOtherPoints() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(3);};
   btk::ForcePlatformCollection::Pointer btkForcePlatforms() const {return static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProcesses[BTK_FORCE_PLATFORMS])->GetOutput();};
   btk::WrenchCollection::Pointer btkGroundReactionWrenches() const {return static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED])->GetOutput();};
+  btk::PointCollection::Pointer btkWrenchDirectionAngles() const {return static_pointer_cast<btk::WrenchDirectionAngleFilter>(this->m_BTKProcesses[BTK_DIRECTION_ANGLES])->GetOutput();};
   
   int firstFrame() const {return this->m_FirstFrame;};
   void setFirstFrame(int ff);
@@ -246,7 +248,7 @@ private:
   bool importFrom(const QList<btk::AcquisitionFileReader::Pointer>& readers, bool allFramesKept);
   bool importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io, bool fromOpenAction);
   
-  enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
+  enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED, BTK_DIRECTION_ANGLES};
   
   btk::Acquisition::Pointer mp_BTKAcquisition;
   QMap<int, btk::ProcessObject::Pointer> m_BTKProcesses;

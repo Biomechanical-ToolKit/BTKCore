@@ -1050,22 +1050,25 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
   else if (item->type() == ForcePlateType)
   {
     id = item->data(0, ForcePlateId).toInt();
-    int idxFp = (id - 65535) / 3;
-    int idxCpt = (id - 65535) % 3; 
+    int idxFp = (id - 65535) / 4;
+    int idxCpt = (id - 65535) % 4; 
     if (idxFp >= acq->btkGroundReactionWrenches()->GetItemNumber())
     {
-      qDebug("Force platform ID greater than the number of plateforms.");
+      qDebug("Force platform ID greater than the number of platforms.");
       return false;
     }
-    if (idxCpt > 3)
+    if (idxCpt >= 4)
     {
       qDebug("Force platform component ID greater than the number of components.");
       return false;
     }
     else if (this->isAlreadyPlotted(id))
       return false;
-      
-    point = acq->btkGroundReactionWrenches()->GetItem(idxFp)->GetComponent(idxCpt);
+    
+    if (idxCpt < 3)
+      point = acq->btkGroundReactionWrenches()->GetItem(idxFp)->GetComponent(idxCpt);
+    else
+      point = acq->btkWrenchDirectionAngles()->GetItem(idxFp);
     
     label = "Platform #" + QString::number(idxFp+1) + " - ";
     switch(idxCpt)
@@ -1078,6 +1081,9 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
       break;
     case 2:
       label += "Moment reaction (" + acq->pointUnit(Point::Moment) + ")";
+      break;
+    case 3:
+      label += "Direction angle (degree)";
       break;
     }
   }

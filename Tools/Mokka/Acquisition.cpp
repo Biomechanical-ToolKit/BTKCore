@@ -69,10 +69,13 @@ Acquisition::Acquisition(QObject* parent)
   GRWsFilter->SetInput(forcePlatformsExtractor->GetOutput());
   btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = btk::DownsampleFilter<btk::WrenchCollection>::New();
   GRWsDownsampler->SetInput(GRWsFilter->GetOutput());
+  btk::WrenchDirectionAngleFilter::Pointer wrenchDirectionAngleFilter = btk::WrenchDirectionAngleFilter::New();
+  wrenchDirectionAngleFilter->SetInput(GRWsDownsampler->GetOutput());
   this->m_BTKProcesses[BTK_SORTED_POINTS] = virtualMarkersSeparator;
   this->m_BTKProcesses[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
   this->m_BTKProcesses[BTK_GRWS] = GRWsFilter;
   this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
+  this->m_BTKProcesses[BTK_DIRECTION_ANGLES] = wrenchDirectionAngleFilter;
 };
 
 Acquisition::~Acquisition()

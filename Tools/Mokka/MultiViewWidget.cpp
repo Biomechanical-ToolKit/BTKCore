@@ -510,6 +510,8 @@ void MultiViewWidget::load()
   // Force the update for the generation of the force platforms and their forces (In case there is no 3D view, they are not updated).
   forcePlaforms->Update();
   GRFs->Update();
+  // Force the computation of the direction angle
+  this->mp_Acquisition->btkWrenchDirectionAngles()->Update();
   
   // Active the content of each view
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
