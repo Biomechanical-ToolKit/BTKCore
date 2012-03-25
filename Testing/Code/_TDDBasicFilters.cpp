@@ -8,3 +8,4 @@
 #include "MergeAcquisitionFilterTest.h"
 #include "SeparateKnownVirtualMarkersFilterTest.h"
 #include "SpecializedPointsExtractorTest.h"
+#include "WrenchDirectionAngleFilterTest.h"
