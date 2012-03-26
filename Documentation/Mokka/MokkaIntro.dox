@@ -1,7 +1,5 @@
 /**
-@mokkahelpheader
 @page MokkaIntro Introduction
-@section MokkaIntroSection Introduction
 
 <b>Welcome to Mokka</b>
 - Mokka is an open-source motion analyzer software that can read, edit, write and visualize motion capture data (trajectories, model outputs, events, analog, force-plates). 
@@ -19,7 +17,7 @@
     - ANG file format
     - EMG file format
     - GR* file format
-    - MoM file format
+    - MOM file format
     - PWR file format
     - RAH file format 
     - RAW file format

@@ -1,9 +1,7 @@
 /**
-@mokkaworkingheader
 @page MokkaPreferences Preferences / Options
-@section MokkaPreferencesSection Preferences / Options
 
-@subsection MokkaPreferencesGeneral General
+@section MokkaPreferencesGeneral General
 @htmlonly
 <ul class=twocolumns>
 <li>
@@ -23,7 +21,7 @@
 </ul>
 @endhtmlonly
 
-@subsection MokkaPreferencesVisualisation Visualisation
+@section MokkaPreferencesVisualisation Visualisation
 
 @htmlonly
 <ul class=twocolumns>
@@ -44,7 +42,7 @@
 </ul>
 @endhtmlonly
 
-@subsection MokkaPreferencesLayouts Layouts
+@section MokkaPreferencesLayouts Layouts
 
 @htmlonly
 <ul class=twocolumns>
@@ -61,7 +59,7 @@
 </ul>
 @endhtmlonly
     
-@subsection MokkaPreferencesAdvanced Advanced
+@section MokkaPreferencesAdvanced Advanced
 
 @htmlonly
 <ul class=twocolumns>

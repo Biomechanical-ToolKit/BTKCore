@@ -16,7 +16,7 @@
     <li class="help_box">
       <div class="help_box_section">
       @endhtmlonly
-      @ref MokkaIntro
+      @subpage MokkaIntro
       @htmlonly
       </div>
       <div class="help_box_description">
@@ -26,7 +26,7 @@
     <li class="help_box">
       <div class="help_box_section">
       @endhtmlonly
-      @ref MokkaTutorial
+      @subpage MokkaTutorial
       @htmlonly
       </div>
       <div class="help_box_description">
@@ -36,7 +36,7 @@
     <li class="help_box">
       <div class="help_box_section">
       @endhtmlonly
-      @ref MokkaWorking
+      @subpage MokkaWorking
       @htmlonly
       </div>
       <div class="help_box_description">
@@ -46,7 +46,7 @@
     <li class="help_box">
       <div class="help_box_section">
       @endhtmlonly
-      @ref MokkaCmdLine
+      @subpage MokkaCmdLine
       @htmlonly
       </div>
       <div class="help_box_description">
@@ -56,7 +56,7 @@
     <li class="help_box">
       <div class="help_box_section">
       @endhtmlonly
-      @ref MokkaShortcut
+      @subpage MokkaShortcut
       @htmlonly
       </div>
       <div class="help_box_description">
@@ -66,7 +66,7 @@
     <li class="help_box">
       <div class="help_box_section">
       @endhtmlonly
-      @ref MokkaReleaseNote
+      @subpage MokkaReleaseNote
       @htmlonly
       </div>
       <div class="help_box_description">

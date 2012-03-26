@@ -1,7 +1,5 @@
 /**
-@mokkahelpheader
 @page MokkaCmdLine Command line options
-@section MokkaCmdLineSection Command line options
 
 The options can be summarized as the following (generated from the @c --help option):
 @verbatim

@@ -189,9 +189,7 @@ TAB_SIZE               = 2
 # will result in a user-defined paragraph with heading "Side Effects:". 
 # You can put \n's in the value part of an alias to insert newlines.
 
-ALIASES                = "mokkahelpheader = @htmlonly<div class=\"home\"><img class=\"home\" src=\"Mokka_128.png\" height=\"32px\" width=\"32px\"/>Mokka Help<a href=\"index.html\">Home</a></div>@endhtmlonly" \
-                         "mokkaworkingheader = @htmlonly<div class=\"home\"><img class=\"home\" src=\"Mokka_128.png\" height=\"32px\" width=\"32px\"/>Mokka Help<a href=\"index.html\">Home</a><a href=\"_mokka_working.html\">Working with Mokka</a></div>@endhtmlonly" \
-                         "mokkatutorialheader = @htmlonly<div class=\"home\"><img class=\"home\" src=\"Mokka_128.png\" height=\"32px\" width=\"32px\"/>Mokka Help<a href=\"index.html\">Home</a><a href=\"_mokka_tutorial.html\">Getting Started</a></div>@endhtmlonly"
+ALIASES                = 
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
@@ -1047,7 +1045,7 @@ ECLIPSE_DOC_ID         = org.doxygen.Project
 # top of each HTML page. The value NO (the default) enables the index and 
 # the value YES disables it.
 
-DISABLE_INDEX          = NO
+DISABLE_INDEX          = YES
 
 # This tag can be used to set the number of enum values (range [1..20]) 
 # that doxygen will group on one line in the generated HTML documentation.
@@ -1062,7 +1060,7 @@ ENUM_VALUES_PER_LINE   = 4
 # JavaScript, DHTML, CSS and frames is required (i.e. any modern browser). 
 # Windows users are probably better off using the HTML help feature.
 
-GENERATE_TREEVIEW      = NO
+GENERATE_TREEVIEW      = YES
 
 # By enabling USE_INLINE_TREES, doxygen will generate the Groups, Directories, 
 # and Class Hierarchy pages using a tree view instead of an ordered list.

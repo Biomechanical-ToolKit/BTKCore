@@ -1,7 +1,5 @@
 /**
-@mokkatutorialheader
 @page MokkaTutorial_ChangeColorMarker Change color of marker
-@section MokkaTutorial_ChangeColorMarkerSection Change color of marker
 
 To change the color of markers you can proceed this way:
 - Use the Left click to select the marker you want to modify the color

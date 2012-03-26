@@ -1,12 +1,11 @@
 /**
-@mokkaworkingheader
 @page MokkaView Views
-@section MokkaViewSection Views
-@subsection MokkaViewGeneral General use
+
+@section MokkaViewGeneral General use
 - The main window can be split in horizontal and/or vertical way using the double-arrow in the right top menu. Each successive window can be split again.
 - Each window can be used as a 3D Viewer or a Chart viewer or a Console logger.
 
-@subsection Mokka3DViewer 3D Viewer
+@section Mokka3DViewer 3D Viewer
 - The view can be changed between perspective or orthogonal from the left top menu.
 - Select marker using the left click. Ctrl + left click can be use to select more than one marker. Shift + left click create a selection box and toggle marker selection (selection markers if not selection, or remove them of the selection if selected).
 - To display a marker trajectory, click on the a marker by using the combination Shift + Ctrl + Left mouse button.
@@ -15,34 +14,34 @@
 
 @b Note: For MacOS X user, the Ctrl is replaced by the command key. 
 
-@subsubsection Mokka3DPerspectiveView How to navigate in the 3D perspective view
+@subsection Mokka3DPerspectiveView How to navigate in the 3D perspective view
 - Use the left click to rotate.
 - Press on the wheel mouse or use Alt+left click to move up, down, left or right.  
 - Use the wheel mouse forward and backward to zoom in and out
 
-@subsubsection Mokka3DPOrthogonalView How to navigate in the 3D orthogonal view
+@subsection Mokka3DPOrthogonalView How to navigate in the 3D orthogonal view
 - The view can be change for top, bottom, left, right, back or front from the newly displayed drop-down menu
 - Press on the wheel mouse or use Alt+left click to move up, down, left or right.  
 - Use the wheel mouse forward and backward to zoom in and out.
 
-@subsection MokkaChartViewer Chart Viewer
+@section MokkaChartViewer Chart Viewer
 - The Chart viewer allows the visualization of point and analog data. Points have 3 dimensions and analog channel have 1 dimension.
 - A point can correspond to the coordinates of a marker, or the component of a model output (angles force, moment, power, etc.). 
 - An analog channel can be the raw data of force-plates or electromyographic signal (EMG).
 
 @image html chart_analog_collapsed_expanded.png Views with the same analog channels collapsed (left) and expanded (right)
 
-@subsubsection MokkaChartViewerPoint How to display point
+@subsection MokkaChartViewerPoint How to display point
 - At the top left of the Main Display Windows, a menu permits to select Point from Chart menu
 - A window with 3 charts (X, Y, Z axis) appears. To display markers coordinates or model output, use the drag and drop. A multiple selection is possible (Ctrl or Shift).
 - Alternatively, you can use the <tt>Window</tt> menu and choose a predefined layout configuration or use short key (e.g. Ctrl + 3).
 
-@subsubsection MokkaChartViewerAnalog How to display analog channel
+@subsection MokkaChartViewerAnalog How to display analog channel
 - At the top left of the Main Display Windows and/or in each new created window a menu permits to select Analog from Chart. 
 - An empty analog window appears. To display analog signal, use the drag and drop. A multiple selection is possible (Ctrl or Shift).
 - Alternatively, you can use the <tt>Window</tt> menu and choose a predefined layout configuration or use short key (Ctrl + 3). 
 
-@subsubsection MokkaChartViewerOptions How to modify chart appearances
+@subsection MokkaChartViewerOptions How to modify chart appearances
 - Use the chart icon option (orange) to: 
   - Add a chart Title : just write it at the top of this window and the title will be displayed at the top of the chart
   - Remove a plot : click on the red cross
@@ -64,7 +63,7 @@
   - Collapse puts all the analog signals in the same graph.
   - Expanded creates separate graphs for each analog signals (very useful for EMG data).
 
-@subsubsection MokkaChartViewerExport How to export chart
+@subsection MokkaChartViewerExport How to export chart
 
 - Use the contextual menu (Right click) and select ìExport to imageî. You can choose different options for exporting via 4 option blocks  
   - Image size and resolution
@@ -87,6 +86,6 @@
 
 @b Note: For the moment, the Export function works only axis by axis. A next release will introduce the possibility to export a complete graph
 
-@subsection MokkaConsoleLogger Console logger
+@section MokkaConsoleLogger Console logger
 - The logger allows you to view each action that was performed, as well as error or warning.  By using the right click you can copy, copy all or clear all the action. 
 */

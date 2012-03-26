@@ -1,7 +1,5 @@
 /**
-@mokkaworkingheader
 @page MokkaModelPane Model Pane
-@section MokkaModelPaneSection Model Pane
 
 This pane contains functions to enhance the visualization and edition of the data. Markers in the 3D pane can be displayed with different colors and sizes. The trajectory of markers can be displayed. The options of this pane permit to save the configuration of visualization of the markers in the 3D pane.
 This panel permits also to change the label of the markers, the properties of the analog channels and the label of model outputs, as well as other properties.
@@ -10,7 +8,7 @@ The file formats supported by Mokka to configure a model are the following:
 - MVC: Mokka Visualization Configuration files.
 - VSK/VST: Vicon Skeleton (Template) files.
 
-@subsection MokkaModelResources Configuration menu
+@section MokkaModelResources Configuration menu
 The button @htmlonly <img src="process.png"/> @endhtmlonly returns a menu with the following actions:
 - Visual configuration
   - <tt>New configuration</tt>: Create a new configuration
@@ -20,8 +18,8 @@ The button @htmlonly <img src="process.png"/> @endhtmlonly returns a menu with t
   - <tt>Deselect configuration</tt>: Deselect the active configuration
   - <tt>Clear configurations</tt>: Clear the list of known visual configurations
 
-@subsection MokkaModelProperties Ressources' list
-@subsubsection MokkaModelSegmentProperties Segments
+@section MokkaModelProperties Ressources' list
+@subsection MokkaModelSegmentProperties Segments
 @htmlonly
 <ul class=twocolumns>
 <li>
@@ -44,7 +42,7 @@ There are also options in the contextual menu for the segment (right click onto 
 </ul>
 @endhtmlonly
 
-@subsubsection MokkaModelMarkerProperties Markers
+@subsection MokkaModelMarkerProperties Markers
 @htmlonly
 <ul class=twocolumns>
 <li>
@@ -68,7 +66,7 @@ There are also options in the contextual menu for the markers (right click onto 
 </li>
 </ul>
 @endhtmlonly
-@subsubsection MokkaModelAnalogProperties Analogs
+@subsection MokkaModelAnalogProperties Analogs
 @htmlonly
 <ul class=twocolumns>
 <li>
@@ -92,7 +90,7 @@ There are also options in the contextual menu for the analog channels (right cli
 </ul>
 @endhtmlonly
 
-@subsubsection MokkaModelForcePlatformProperties Force platform reactions
+@subsection MokkaModelForcePlatformProperties Force platform reactions
 @htmlonly
 <ul class=twocolumns>
 <li>
@@ -100,7 +98,7 @@ The component of each force platform can be plotted in chart. Drag the selected 
 </ul>
 @endhtmlonly
 
-@subsubsection MokkaModelOutputsProperties Model outputs
+@subsection MokkaModelOutputsProperties Model outputs
 @htmlonly
 <ul class=twocolumns>
 <li>

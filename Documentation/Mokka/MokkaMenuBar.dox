@@ -1,9 +1,7 @@
 /**
-@mokkaworkingheader
 @page MokkaMenuBar Menu Bar
-@section MokkaMenuBarSection Menu Bar
 
-@subsection File
+@section MokkaMenuBarFile File
 The menu @c File contains the actions to interact with acquisition.
 - <tt>Open</tt>: Selection of the acquisitions to load
 - <tt>Open Recent</tt>: Menu with the 10 last acquisitions opened
@@ -11,7 +9,7 @@ The menu @c File contains the actions to interact with acquisition.
 - <tt>Save</tt>: Save the modified acquisition
 - <tt>Save As</tt>: Save the acquisition as a new one
 - <tt>Import</tt>: Menu to insert an acquistion or a part of it (EMG, force platform data, ...)
-  - <tt>Assistant</tt>: Generate an acquisition using all files used by known acquisition system. More details on this @ref MokkaImportAssistant "page".
+  - <tt>Assistant</tt>: Generate an acquisition using all files used by known acquisition system. More details on this @subpage MokkaImportAssistant "page".
   - <tt>C3D file...</tt>: Import and merge a C3D file to the existing acquisition
   - <tt>Motion Analysis Corp.</tt>
     - <tt>TRB file...</tt>: Import and merge a TRB file to the existing acquisition
@@ -42,7 +40,7 @@ The menu @c File contains the actions to interact with acquisition.
 
 @b Note: For more information about the rules to merge or concatenate acquisitions together, check this @ref MokkaImportAssistantRules "page".
 
-@subsection Edit
+@section MokkaMenuBarEdit Edit
 - <tt>Undo</tt>: Undo the modifications done previously
 - <tt>Redo</tt>: Redo the last modifications
 - <tt>Cut</tt>: Cut the selected text and put it in the clipboard
@@ -50,7 +48,7 @@ The menu @c File contains the actions to interact with acquisition.
 - <tt>Select All</tt>: Select all the text in the focused widget
 - <tt>Options</tt>: Edit the preferences of Mokka by changing the general, the visualization or the layout options. (Replaced under MacOS X by <tt>Preferences</tt> in the application menu).
 
-@subsection View 
+@section MokkaMenuView View 
 The menu View contains the actions to toggle dock windows related to the data into the loaded acquisition
 - <tt>Model</tt>: Show/Hide model pane
 - <tt>Information</tt>: Show/Hide file information
@@ -58,7 +56,7 @@ The menu View contains the actions to toggle dock windows related to the data in
 
 @image html view.png Information view, Metadata view and model pane displayed
 
-@subsection Settings 
+@section MokkaMenuBarSettings Settings 
 The menu Settings contains actions related to the 3D view
 - <tt>Visual Configuration</tt>
   - <tt>Deselect configuration</tt>: 
@@ -68,7 +66,7 @@ Deselect the current visual configuration and reset the configuration of the mar
 - <tt>Marker Trajectory Length</tt>: Select the length of the markers' trajectory (see @ref MokkaTimeBarMarkerTrajectory)
 - <tt>Playback speed</tt>: Select the playback speed (see @ref MokkaTimeBarPlaybackSpeed)
 
-@subsection Window
+@section MokkaMenuBarWindow Window
 In the window section you have the possibility to change the actual layout and / or save the current configuration. The first three layouts are predefined in the sotware. 
 You can switch easily between layout using the key Ctrl (Command for MacOS X) and the index of the layout. Only the ten first layouts have a shortcut.
 - <tt>Layouts</tt>: 
@@ -79,7 +77,7 @@ You can switch easily between layout using the key Ctrl (Command for MacOS X) an
     - <em>All other layouts saved by the user</em>
 - <tt>Save Current Layout</tt>: Save the current layout for your next use. 
 
-@subsection Help
+@section MokkaMenuHelp Help
 - <tt>About</tt>: Dialog box with the release number of Mokka
 - <tt>Mokka Help</tt>: This current help
 - <tt>Visit BTK website</tt>: Please visit the <a href="http://b-tk.googlecode.com">BTK website</a> to have the last

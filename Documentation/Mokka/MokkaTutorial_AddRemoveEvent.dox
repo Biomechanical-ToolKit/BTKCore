@@ -1,13 +1,11 @@
 /**
-@mokkatutorialheader
 @page MokkaTutorial_AddRemoveEvent Add/Remove an event
-@section MokkaTutorial_AddRemoveEventSection Add/Remove an event
 
 @b Note: Only the C3D format supports events.@n
 @b Note: For MacOS X user, the Ctrl is replaced by the command key.@n
 @b Note: You can finely select a frame by clicking on Shift when moving the slider in the time bar. The slider will move frame by frame.@n
 
-@subsection MokkaTutorial_AddEventSubSection Add event
+@section MokkaTutorial_AddEventSubSection Add event
 To add a new event on your loaded acquisition you can proceed in 2 different ways:
 -# Use the right click on the time bar
   - Right click on the time bar and you will see the <tt>Insert event</tt> option. 
@@ -28,7 +26,7 @@ To add a new event on your loaded acquisition you can proceed in 2 different way
 
 New or current event can be edited (Label / Context / Frame / Subject / Description) by using the Event editor window. See the tutorial to @ref MokkaTutorial_EditEvent "edit event".
 
-@subsection MokkaTutorial_RemoveEventSubSection Remove event
+@section MokkaTutorial_RemoveEventSubSection Remove event
 
 To remove one or many events on your loaded acquisition you can proceed in 3 different ways:
 -# Left click on the event
