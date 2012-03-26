@@ -137,7 +137,7 @@ The following subsections explain how to format the syntax of the files for the 
  - Use explicitly parentheses into conditional statement or other logical expression
  - Private function/class finishes by the suffix @c _p ;
  - Use explicit names rather than short names ;
- - Use the <a href="http://en.wikipedia.org/wiki/Allman_style#Allman_style_.28bsd_in_Emacs.29">Allman style</a> to indent the code ;
+ - Use the <a href="https://en.wikipedia.org/wiki/Allman_style#Allman_style">Allman style</a> to indent the code ;
  - Comments have to be written in english as it is the language that nearly all programmers in all countries can read.
 
 @subsection DoxygenDocumentation Doxygen documentation
@@ -240,8 +240,7 @@ For the moment, it exists one mailing list where users and developers
 can write to each other. If necessary this mailing list could be
 splitted to separate user and developer discussions.
 
-Check the mailing list <a
-href="http://groups.google.com/group/btk-users">BTK Users</a> to
+Check the mailing list <a href="http://groups.google.com/group/btk-users">BTK Users</a> to
 subscribe or access to the archives
 
  */

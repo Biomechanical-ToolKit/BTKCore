@@ -26,9 +26,9 @@ You have to set the PATH environment variable to include the minGW compiler.
 
 @b WARNING: You have to be careful! You need to append the path, not to replace the content of the variable!
 
-For this, right-click on the "Computer" icon, select "Properties", then select the tab "Advanced" and click on the button "Environment Variables". In the system section, scroll to find the variable "PATH", edit it (double click on the value) and APPEND the path of MinGW which is located in <tt>OCTAVE_PATH\\mingw32\\bin</tt>. (don't forget the semicolon before to add the path of MinGW). Click on the button "OK", and apply the modification by clicking on the button "Apply"
+For this, right-click on the "Computer" icon, select "Properties", then select the tab "Advanced" and click on the button "Environment Variables". In the system section, scroll to find the variable "PATH", edit it (double click on the value) and APPEND the path of MinGW which is located in <tt>OCTAVE_PATH&#92;mingw32&#92;bin</tt>. (don't forget the semicolon before to add the path of MinGW). Click on the button "OK", and apply the modification by clicking on the button "Apply"
 
-These instructions can be summarized as the following: Set the PATH Environment Variable to include the minGW compiler Computer --> Properties --> Advanced ... -> Environment Variables. System section: PATH: append: <tt>; PUT_OCTAVE_PATH_HERE\\mingw32\\bin</tt>.
+These instructions can be summarized as the following: Set the PATH Environment Variable to include the minGW compiler Computer --> Properties --> Advanced ... -> Environment Variables. System section: PATH: append: <tt>; PUT_OCTAVE_PATH_HERE&#92;mingw32&#92;bin</tt>.
 
 @section octave_config_cmake Configuring CMake
 
@@ -48,7 +48,7 @@ Under Windows, select "MinGW Makefiles" and select the second radio button ("Spe
 
 You need here to set the path for the C/C++/Fortran compiler. Each of these paths must be exact as CMake test the binaries to be sure they are valid compilers.
 
-Depending of the version of Octave installed, the release number of the compilers change, but they follow the same syntax each time. For example if you have Octave 3.2.4 compiled with GCC 4.4.0 in <tt>C:\\Octave</tt>, then the subfolder will be <tt>3.2.4_gcc-4.4.0</tt>. These last numbers are also used by MinGW. For each field, click on the "..." button and go to the path of Octave and look for the subfolder <tt>mingw32/bin</tt>. Then you will find some programs starting by <tt>mingw32-</tt>. For the C compiler, select the program starting by <tt>mingw32-gcc-</tt>. For the C++ compiler, select the program starting by <tt>mingw32-g++-</tt>. And for the Fortran compiler, select the program starting by <tt>mingw32-gfortran-</tt>. In the given example (Octave 3.2.4 compiled with GCC 4.4.0), the binaries to give to CMake are:
+Depending of the version of Octave installed, the release number of the compilers change, but they follow the same syntax each time. For example if you have Octave 3.2.4 compiled with GCC 4.4.0 in <tt>C:&#92;Octave</tt>, then the subfolder will be <tt>3.2.4_gcc-4.4.0</tt>. These last numbers are also used by MinGW. For each field, click on the "..." button and go to the path of Octave and look for the subfolder <tt>mingw32/bin</tt>. Then you will find some programs starting by <tt>mingw32-</tt>. For the C compiler, select the program starting by <tt>mingw32-gcc-</tt>. For the C++ compiler, select the program starting by <tt>mingw32-g++-</tt>. And for the Fortran compiler, select the program starting by <tt>mingw32-gfortran-</tt>. In the given example (Octave 3.2.4 compiled with GCC 4.4.0), the binaries to give to CMake are:
 
  - C compiler: <tt>C:/Octave/3.2.4_gcc-4.4.0/mingw32/bin/mingw32-gcc-4.4.0-dw2.exe</tt>
  - C++ compiler: <tt>C:/Octave/3.2.4_gcc-4.4.0/mingw32/bin/mingw32-g++-4.4.0-dw2.exe</tt>
@@ -60,9 +60,9 @@ You can now click on the "Done" button.
 
 CMake detects the C++ compiler and its available options. At the end, some red lines are displayed. They contains the possible configuration of BTK. For all of these options, you can check the general documentation of BTK. For Octave, the most important is to select the option BTK_WRAP_OCTAVE and be sure that the option CMAKE_BUILD_TYPE is set to Release (and not Debug), otherwise, you have to type it.
 
-Click on the "Configure" button and Octave should be found automatically. If it is not the case, you have to set manually the path into the new variable named OCTAVE_ROOT (in red). The given path must correspond to the root of Octave where you can find the folder bin (for example <tt>C:/Octave/3.2.4_gcc-4.4.0</tt> or it could be also <tt>C:\\Octave\\Octave3.4.3_gcc4.5.2\\Octave3.4.3_gcc4.5.2</tt>).
+Click on the "Configure" button and Octave should be found automatically. If it is not the case, you have to set manually the path into the new variable named OCTAVE_ROOT (in red). The given path must correspond to the root of Octave where you can find the folder bin (for example <tt>C:/Octave/3.2.4_gcc-4.4.0</tt> or it could be also <tt>C:&#92;Octave&#92;Octave3.4.3_gcc4.5.2&#92;Octave3.4.3_gcc4.5.2</tt>).
 
-By default, BTK is installed in the folder <tt>/usr/local/(share|include|lib)</tt> for Linux and MacOS X and under <tt>C:\\Program files</tt> or <tt>C:\\Program files (x86)</tt> for Windows. If you prefer to install BTK elsewhere, you have to modifiy the content of the variable CMAKE_INSTALL_PREFIX
+By default, BTK is installed in the folder <tt>/usr/local/(share|include|lib)</tt> for Linux and MacOS X and under <tt>C:&#92;Program files</tt> or <tt>C:&#92;Program files (x86)</tt> for Windows. If you prefer to install BTK elsewhere, you have to modifiy the content of the variable CMAKE_INSTALL_PREFIX
 
 You have to click again on the button "Configure" to create the final configuration (no more red lines). Finally, click on the button "Generate" to generate the Makefiles.
 
@@ -87,7 +87,7 @@ That's it!
 
 @section octave_extras Extras
 
-To add the path of the btk toolbox into Octave, you can launch Octave and type the command <tt>addpath('C:\\Program Files\\BTK\\share\\btk-0.1\\Wrapping\\Octave\\btk')</tt>. The given path must be the path containing the functions and the documentation.
+To add the path of the btk toolbox into Octave, you can launch Octave and type the command <tt>addpath('C:&#92;Program Files&#92;BTK&#92;share&#92;btk-0.1&#92;Wrapping&#92;Octave&#92;btk')</tt>. The given path must be the path containing the functions and the documentation.
 
 More specific to Octave and tested only under Windows 7, you can use these commands in Octave when you load it for the first time:
 @code
@@ -99,7 +99,7 @@ They will update octave_packages database with your installation tree and auto-l
 
 Note: Explanation found in the Octave-help mailing list in the thread <a href="http://octave.1599824.n4.nabble.com/how-to-instal-or-upgrade-the-latest-octave-version-on-windows-7-td4165440.html">how to instal, or upgrade, the latest octave version on windows 7</a>
 
-Finally, you can create and edit the .octaverc file(s), e.g.: <tt>C:\\Users\\Peter\\.octaverc, C:\\Octave\\Octave3.4.3_gcc4.5.2\\Octave3.4.3_gcc4.5.2\\share\\octave\\site\\m\\startup\\octaverc</tt> and add inside startup functions - e.g. MATLAB startup script, cd to preferred folder, etc.
+Finally, you can create and edit the .octaverc file(s), e.g.: <tt>C:&#92;Users&#92;Peter&#92;.octaverc, C:&#92;Octave&#92;Octave3.4.3_gcc4.5.2&#92;Octave3.4.3_gcc4.5.2&#92;share&#92;octave&#92;site&#92;m&#92;startup&#92;octaverc</tt> and add inside startup functions - e.g. MATLAB startup script, cd to preferred folder, etc.
 
 @section octave_acknowledgments Acknowledgments
 
