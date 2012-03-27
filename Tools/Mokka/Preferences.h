@@ -105,6 +105,7 @@
     void removeUserLayout(int index);
     void relabelUserLayout(int index, const QString& label);
     void updateDroppedUserLayouts(int newRow, int oldRow);
+    void forceChartUnitAxisX(int index);
   
   private:
     QMap<int, QVariant> m_Data;

@@ -1895,6 +1895,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->defaultConfigurationLineEdit->setText(defaultConfigurationPath);
   this->mp_Preferences->openEventEditorCheckBox->setChecked(openEventEditorWhenInserting);
   this->mp_Preferences->defaultPlaneOrientationComboBox->setCurrentIndex(defaultPlaneOrientation);
+  this->mp_Preferences->defaultTimeBarEventDisplayComboBox->setCurrentIndex(defaultTimeBarEventDisplay);
   colorizeButton(this->mp_Preferences->defaultSegmentColorButton, defaultSegmentColor);
   colorizeButton(this->mp_Preferences->defaultMarkerColorButton, defaultMarkerColor);
   this->mp_Preferences->defaultMarkerRadiusSpinBox->setValue(defaultMarkerRadius);

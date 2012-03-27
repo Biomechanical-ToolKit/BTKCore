@@ -51,6 +51,7 @@ Preferences::Preferences(QWidget* parent)
   connect(this->layoutTable, SIGNAL(userLayoutRemoved(int)), this, SLOT(removeUserLayout(int)));
   connect(this->layoutTable, SIGNAL(userLayoutLabelChanged(int, QString)), this, SLOT(relabelUserLayout(int, QString)));
   connect(this->layoutTable, SIGNAL(userLayoutDropped(int, int)), this, SLOT(updateDroppedUserLayouts(int, int)));
+  connect(this->defaultTimeBarEventDisplayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(forceChartUnitAxisX(int)));
   
   this->m_Data[DefaultConfigurationUse] = false;
   this->m_Data[DefaultConfigurationPath] = "";
@@ -335,4 +336,9 @@ void Preferences::updateDroppedUserLayouts(int newRow, int oldRow)
   
   this->m_Data[UserLayoutIndex] = userLayoutIndex;
   this->m_Data[UserLayouts] = userLayouts;
+};
+
+void Preferences::forceChartUnitAxisX(int index)
+{
+  this->defaultChartUnitAxisXComboBox->setCurrentIndex(index);
 };
