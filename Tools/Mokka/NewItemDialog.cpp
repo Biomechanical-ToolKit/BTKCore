@@ -39,9 +39,11 @@ NewItemDialog::NewItemDialog(QWidget* parent)
 : QDialog(parent)
 {
   this->setupUi(this);
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC)
   this->setWindowFlags(Qt::Sheet);
   this->setWindowModality(Qt::WindowModal);
+#elif defined(Q_OS_WIN)
+  this->resize(330, 170);
 #endif
   QPushButton* ok = this->buttonBox->button(QDialogButtonBox::Ok);
   ok->setDefault(true);

@@ -38,8 +38,8 @@
 NewModelDialog::NewModelDialog(const QList<ConfigurationItem>* configs, QWidget* parent)
 : NewItemTemplateDialog<ConfigurationItem>(configs, parent)
 {
-  this->setWindowTitle(tr("New Model"));
-  this->label->setText(tr("Create a model from an existing one or a new one"));
+  this->setWindowTitle(tr("New Visual Configuration"));
+  this->label->setText(tr("Create a configuration from an existing one or a new one"));
 };
 
 void NewModelDialog::setConfigurationName(const QString& name)
