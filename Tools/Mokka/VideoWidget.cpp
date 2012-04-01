@@ -207,13 +207,6 @@ void VideoWidget::dropEvent(QDropEvent* event)
     this->mp_MediaObject->setCurrentSource(videoFilePath);
     QApplication::restoreOverrideCursor();
     this->m_VideoId = id;
-#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
-    // WARNING: Never tried under Linux
-    // Under windows, the mechanism is different and use the status of the media
-    // Force the loading and sync the video with the curent 3D frame
-    this->mp_MediaObject->play();
-    this->mp_MediaObject->pause();
-#endif
   }
   this->QWidget::dropEvent(event);
 };
@@ -267,6 +260,8 @@ void VideoWidget::checkMediaStatus(Phonon::State newState, Phonon::State oldStat
 #ifdef Q_OS_WIN
       if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7)
         this->mp_MediaObject->pause();
+#else
+      this->mp_MediaObject->pause();
 #endif
       this->render();
     }
