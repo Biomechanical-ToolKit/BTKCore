@@ -26,21 +26,21 @@
     <li class="help_box">
       <div class="help_box_section">
       @endhtmlonly
-      @subpage MokkaTutorial
-      @htmlonly
-      </div>
-      <div class="help_box_description">
-      A set of short tutorials on how to get started with Mokka
-      </div>
-    </li>
-    <li class="help_box">
-      <div class="help_box_section">
-      @endhtmlonly
       @subpage MokkaWorking
       @htmlonly
       </div>
       <div class="help_box_description">
       All the information you need to use the application's features effectively
+      </div>
+    </li>
+    <li class="help_box">
+      <div class="help_box_section">
+      @endhtmlonly
+      @subpage MokkaTutorial
+      @htmlonly
+      </div>
+      <div class="help_box_description">
+      A set of short tutorials on how to get started with Mokka
       </div>
     </li>
     <li class="help_box">
@@ -79,7 +79,7 @@
 <div class="footer">
   &copy; Arnaud Barré 2009-2012
   <br/>
-  <a href="http://b-tk.googlecode.com">BTK: Biomechanical ToolKit</a>
+  <a href="http://b-tk.googlecode.com" onclick="window.open('http://b-tk.googlecode.com', '_blank'); return false;">BTK: Biomechanical ToolKit</a>
 </div>
 @endhtmlonly
  */

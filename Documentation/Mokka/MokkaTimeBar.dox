@@ -7,7 +7,7 @@
   <li>Use <img src="play.png" height="16px" width="16px"> and <img src="pause.png" height="16px" width="16px"> from the time bar to start and stop the to animation.</li>
   <li>Use <img src="skip_forward.png" height="16px" width="16px"> and <img src="skip_backward.png" height="16px" width="16px"> to move from an event to the next or previous one.</li>
   <li>Use <img src="event_right.png"> and <img src="event_left.png"> and <img src="event_general.png"> to quickly add or remove events.</li>
-  <li>Use <img src="acquisition_options.png"> to change marker trajectory length, ground orientation, playback speed and other options related to acquisition.</li>
+  <li>Use <img src="acquisition_options.png"> to change marker trajectory length, ground orientation, playback speed, view GRF butterfly and other options related to acquisition.</li>
   <li>Use <img src="event_options.png"> to edit, remove or clear events.</li>
 </ul>
 @endhtmlonly
@@ -31,15 +31,19 @@ Menu to choose the speed of the playback.
 @section MokkaTimeBarMarkerTrajectory Marker Trajectory Length
 Menu to choose the length of the markers' trajectory.
 - By defaut the length is set to 100 frames.
-- The length can be set to Full, 25, 50, 100 or 200 frames by using￼tip from the drop-down menu.
+- The length can be set to Full, 25, 50, 100 or 200 frames by using  tip from the drop-down menu.
 - Trajectory length will all frames: Draw the whole trajectory.
 - Trajectory length of 25 frames: Draw a total of 25 frames including holes.
 - Trajectory length of 50 frames: Draw a total of 50 frames including holes.
 - Trajectory length of 100 frames: Draw a total of 100 frames including holes (default).
 - Trajectory length of 200 frames: Draw a total of 200 frames including holes.
 
-@section MokkaTimeBarReframe Reframe from One
-By defaut, the acquisition starts at the frame 1 or at the first frame of the selected region of interest. By choosing the Reframe one option you can reset your acquisition frame and set the first frame to 1. You can always undo the action.
+@section MokkaTimeBarButterlfy Toggle GRF Butterfly
+- Show/hide ground reaction forces butterfly.
+- The color of the GRF vector can be modify in the @ref MokkaPreferencesVisualisation "visualization preference options".
+
+@section MokkaTimeBarReframe Reframe From One
+By default, the acquisition starts at the frame 1 or at the first frame of the selected region of interest. By choosing the <tt>Reframe From One</tt> option you can reset your acquisition frame and set the first frame to 1. You can always undo the action.
 
 @htmlonly
 <div class="twocolumns">
@@ -61,7 +65,7 @@ By defaut, the acquisition starts at the frame 1 or at the first frame of the se
 @image html insert_event.png Event editor in insert mode
 @htmlonly
 </div>
-<div style="clear:both;"></div>
+<div class=resetcolumn></div>
 @endhtmlonly
 
 @section MokkaTimeBarRemoveSelectedEvents Remove selected events

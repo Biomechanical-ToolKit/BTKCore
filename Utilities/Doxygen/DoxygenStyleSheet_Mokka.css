@@ -126,6 +126,12 @@ div.home a {
 /* Help box (main page) */
 
 div.help_box {
+  width: 900px;
+  margin-top: 2em;
+  margin-bottom: 4px;
+  margin-left:auto;
+  margin-right:auto;
+  
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
   -khtml-border-radius: 10px;
@@ -139,7 +145,6 @@ div.help_box {
   border: 1px solid #DBDBDB;
   background-color: #F9F9F9;
   padding: 4px 6px;
-  margin: 2em 8px 4px 8px;
 }
 
 ul.help_box {
@@ -190,6 +195,10 @@ div.rightcolumn {
   width: 50%;
 }
 
+div.resetcolumn {
+  clear:both;
+}
+
 ul.twocolumns {
   list-style-type: none;
   padding: 0px;
@@ -206,8 +215,6 @@ ul.twocolumns li {
   margin: 0;
 }
 
-/* Others */
-
 ul.default {
   float: none;
   width: 100%;
@@ -220,6 +227,8 @@ ul.default li {
   float: none;
   width: 90%;
 }
+
+/* Others */
 
 .image
 {
@@ -377,7 +386,7 @@ div.footer {
   display:block;
   position: absolute;
   left: 0px;
-  width: 300px;
+  width: 250px;
 }
 
 .ui-resizable .ui-resizable-handle {

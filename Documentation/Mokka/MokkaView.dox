@@ -64,7 +64,6 @@
   - Expanded creates separate graphs for each analog signals (very useful for EMG data).
 
 @subsection MokkaChartViewerExport How to export chart
-
 - Use the contextual menu (Right click) and select ìExport to imageî. You can choose different options for exporting via 4 option blocks  
   - Image size and resolution
     - Define width, height (in cm or inch).
@@ -86,6 +85,16 @@
 
 @b Note: For the moment, the Export function works only axis by axis. A next release will introduce the possibility to export a complete graph
 
+@section MokkaMediaVideo Video
+- To display a video from an acquisition:
+  - Choose the <tt>Video</tt> view from the views' list.
+  - At the bottom of the acquisition explorer section, you can select the video and drop it into the “Drop video from an acquisition explorer” window
+  - The possible delay between the acquisition and the video can also be adjusted by using the @ref MokkaModelVideo "delay property".
+
+@image html video_in_action.png Views containing 3D data and synchronized video
+
 @section MokkaConsoleLogger Console logger
 - The logger allows you to view each action that was performed, as well as error or warning.  By using the right click you can copy, copy all or clear all the action. 
+
+@image html logger.png View containing all the messages printed by BTK, Mokka and external libraries used.
 */

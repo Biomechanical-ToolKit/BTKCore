@@ -1,6 +1,10 @@
 /**
 @page MokkaPreferences Preferences / Options
 
+To access to the the Preferences / Options, you only have to go in the following menu:
+- Menu <tt>Edit > Options</tt> under Windows and Linux ; 
+- Menu <tt>Mokka > Preferences</tt> under MacOS X.
+
 @section MokkaPreferencesGeneral General
 @htmlonly
 <ul class=twocolumns>
@@ -11,6 +15,8 @@
 <li><tt>Event</tt>: Option to open (or not) the event editor when inserting an event</li>
 <br/>
 <li><tt>Ground Orientation</tt>: To choose the default orientation for the automatic detection (Plane XY, Plane YZ, Plane ZX)</li>
+<br/>
+<li><tt>Time Bar Event</tt>: To choose the default display for the time event bar (frame or time). Note: this also affect the display of the X axis of the chart. You can still modify the display of the X axis in the @endhtmlonly @ref MokkaPreferencesChart "chart options" @htmlonly</li>
 </ul>
 </li>
 <li>
@@ -19,6 +25,7 @@
 @htmlonly
 </li>
 </ul>
+<div class=resetcolumn></div>
 @endhtmlonly
 
 @section MokkaPreferencesVisualisation Visualisation
@@ -31,7 +38,7 @@
 <br/>
 <li><tt>Marker</tt>: Selection of the default color, radius and trajectory's length to display for the visualization of markers in the 3D view</li>
 <br/>
-<li><tt>Force platform</tt>: Options to show (or not) the axes and the index of the platforms in the 3D view as well as the selection of the colors for the platform and the force vector</li>
+<li><tt>Force platform</tt>: Options to show (or not) the axes and the index of the platforms in the 3D view as well as the selection of the colors for the platform and the force vector. Ground reaction butterfly diagram and force path can be activate or not</li>
 </ul>
 </li>
 <li>
@@ -40,6 +47,27 @@
 @htmlonly
 </li>
 </ul>
+<div class=resetcolumn></div>
+@endhtmlonly
+
+@section MokkaPreferencesChart Chart
+
+@htmlonly
+<ul class=twocolumns>
+<li>
+<ul class=default>
+<li><tt>Plot</tt>: Option to define the plot default line width</li>
+<br/>
+<li><tt>Graph</tt>: Options to display by default the events and to choose the unit of the X axis (frame or time)</li>
+</ul>
+</li>
+<li>
+@endhtmlonly
+@image html preferences_chart.png Chart options/preferences
+@htmlonly
+</li>
+</ul>
+<div class=resetcolumn></div>
 @endhtmlonly
 
 @section MokkaPreferencesLayouts Layouts
@@ -57,6 +85,7 @@
 @htmlonly
 </li>
 </ul>
+<div class=resetcolumn></div>
 @endhtmlonly
     
 @section MokkaPreferencesAdvanced Advanced
@@ -74,5 +103,6 @@
 @htmlonly
 </li>
 </ul>
+<div class=resetcolumn></div>
 @endhtmlonly
 */
