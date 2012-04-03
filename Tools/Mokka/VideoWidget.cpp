@@ -203,10 +203,10 @@ void VideoWidget::dropEvent(QDropEvent* event)
   {
     LOG_INFO("Loading video from file: " + this->mp_Acquisition->videoFilename(id));
     this->mp_MediaObject->clear(); // Reset the internal state of the player
+    this->m_VideoId = id; // Must be set before the loading of the video (at least under MacOS X as the reading is asynchronous (multithreaded?) and the rendering is done when calling the method Phonon::MediaObject::setCurrentSource())
     QApplication::setOverrideCursor(Qt::WaitCursor);
     this->mp_MediaObject->setCurrentSource(videoFilePath);
     QApplication::restoreOverrideCursor();
-    this->m_VideoId = id;
   }
   this->QWidget::dropEvent(event);
 };
@@ -250,17 +250,17 @@ void VideoWidget::setVideoVisible(bool v)
 
 void VideoWidget::checkMediaStatus(Phonon::State newState, Phonon::State oldState)
 {
-  Q_UNUSED(oldState)
   switch(newState)
   {
   case Phonon::StoppedState:
-    if (this->mp_MediaObject->currentSource().type() != Phonon::MediaSource::Empty)
+    if ((oldState == Phonon::LoadingState) && (this->mp_MediaObject->currentSource().type() != Phonon::MediaSource::Empty))
     {
       this->setVideoVisible(true);
 #ifdef Q_OS_WIN
       if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7)
         this->mp_MediaObject->pause();
 #else
+      this->mp_MediaObject->play(); // At least under MacOS X, give the seek capability (otherwise, the video stays freezed).
       this->mp_MediaObject->pause();
 #endif
       this->render();
