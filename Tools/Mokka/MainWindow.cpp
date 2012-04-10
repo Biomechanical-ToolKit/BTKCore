@@ -227,6 +227,7 @@ MainWindow::MainWindow(QWidget* parent)
   // Menu
   connect(this->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
   connect(this->actionVisit_BTK_website, SIGNAL(triggered()), this, SLOT(visitBTKWebsite()));
+  connect(this->actionVisit_Mokka_website, SIGNAL(triggered()), this, SLOT(visitMokkaWebsite()));  
   connect(this->actionHelp, SIGNAL(triggered()), this, SLOT(help()));
   connect(this->actionViewMetadata, SIGNAL(triggered()), this, SLOT(viewMetadata()));
   connect(this->action_FileOpen, SIGNAL(triggered()), this, SLOT(openFile()));
@@ -506,6 +507,11 @@ void MainWindow::help()
 void MainWindow::visitBTKWebsite()
 {
   QDesktopServices::openUrl(QUrl("http://b-tk.googlecode.com", QUrl::TolerantMode));
+};
+
+void MainWindow::visitMokkaWebsite()
+{
+  QDesktopServices::openUrl(QUrl("http://b-tk.googlecode.com/svn/web/mokka/index.html", QUrl::TolerantMode));
 };
 
 void MainWindow::setAcquisitionModified(int modified)

@@ -68,7 +68,7 @@
      <x>0</x>
      <y>0</y>
      <width>928</width>
-     <height>22</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -172,6 +172,7 @@
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionHelp"/>
+    <addaction name="actionVisit_Mokka_website"/>
     <addaction name="actionVisit_BTK_website"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
@@ -489,6 +490,11 @@
   <action name="actionImportAMTI">
    <property name="text">
     <string>AMTI forceplate file...</string>
+   </property>
+  </action>
+  <action name="actionVisit_Mokka_website">
+   <property name="text">
+    <string>Visit Mokka website</string>
    </property>
   </action>
  </widget>

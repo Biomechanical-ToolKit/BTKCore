@@ -73,6 +73,7 @@ public slots:
   void about();
   void help();
   void visitBTKWebsite();
+  void visitMokkaWebsite();
   void setAcquisitionModified(int modified);
   void viewMetadata();
   void clearRecentFiles();
