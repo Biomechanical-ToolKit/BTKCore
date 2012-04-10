@@ -79,6 +79,8 @@
 <div class="footer">
   &copy; Arnaud Barré 2009-2012
   <br/>
+  <a href="http://b-tk.googlecode.com/svn/web/mokka/index.html" onclick="window.open('http://b-tk.googlecode.com/svn/web/mokka/index.html', '_blank'); return false;">Mokka: Motion Kinematic &amp; Kinetic Analyzer</a>
+  <br/>
   <a href="http://b-tk.googlecode.com" onclick="window.open('http://b-tk.googlecode.com', '_blank'); return false;">BTK: Biomechanical ToolKit</a>
 </div>
 @endhtmlonly

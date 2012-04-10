@@ -88,7 +88,7 @@ You can switch easily between layout using the key Ctrl (Command for MacOS X) an
 @section MokkaMenuHelp Help
 - <tt>About</tt>: Dialog box with the release number of Mokka
 - <tt>Mokka Help</tt>: This current help
-- <tt>Visit BTK website</tt>: Please visit the <a href="http://b-tk.googlecode.com">BTK website</a> to have the last
- developments
+- <tt>Visit Mokka website</tt>: Visit the <a href="http://b-tk.googlecode.com/svn/web/mokka/index.html">Mokka website</a> to see details, related news and more
+- <tt>Visit BTK website</tt>: Visit the main website (<a href="http://b-tk.googlecode.com">BTK</a>) of the project to see the latest developments
 - <tt>Check for Updates...</tt>: Check on the web server if a new version was released.
  */
