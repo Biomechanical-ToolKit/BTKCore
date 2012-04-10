@@ -6,6 +6,8 @@
 /**
 @mainpage BTK Documentation
 
+<div id="revnumber">@projectnumber</div>
+
 <div class="btkmenu">\b  Overview
 | \ref BuildInstructions "Building instructions"
 | \ref GettingStarted "Getting started"

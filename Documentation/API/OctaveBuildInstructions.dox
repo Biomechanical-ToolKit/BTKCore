@@ -2,7 +2,7 @@
 @page compile_octave_windows How to build the wrapping of BTK for Octave
 
 <div class="btkmenu">\ref index "Overview"
-| \b Building \b instructions
+| \ref BuildInstructions "Build instructions"
 | \ref GettingStarted "Getting started"
 | \ref AdvancedTutorial "Advanced tutorial"
 | \ref Developer "Developer's guide"
