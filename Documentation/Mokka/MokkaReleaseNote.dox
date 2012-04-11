@@ -3,8 +3,8 @@
 
 - <b>12/11/04: Mokka 0.5</b> released
   - Enhancements:
-    - Watch any video<a href="#video-foonote">*</a> joined to an acquisition.
-    - Import video<a href="#video-foonote">*</a> files (AVI, MOV, MPEG, OGG, WMV)
+    - Watch any video joined to an acquisition.
+    - Import video files (AVI, MOV, MPEG, OGG, WMV)
     - New readable TDF file format (BTS Bioengineering).
     - New readable AMTI forceplate file format (ASC - FxFyFzMxMyMz file).
     - View ground reaction force butterfly (as proposed by <a href="http://www.ncbi.nlm.nih.gov/pubmed/3361599">Khodadadeh</a>, 1998).
