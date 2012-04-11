@@ -1,6 +1,43 @@
 /**
 @page MokkaReleaseNote Release Notes
 
+- <b>12/11/04: Mokka 0.5</b> released
+  - Enhancements:
+    - Watch any video<a href="#video-foonote">*</a> joined to an acquisition.
+    - Import video<a href="#video-foonote">*</a> files (AVI, MOV, MPEG, OGG, WMV)
+    - New readable TDF file format (BTS Bioengineering).
+    - New readable AMTI forceplate file format (ASC - FxFyFzMxMyMz file).
+    - View ground reaction force butterfly (as proposed by <a href="http://www.ncbi.nlm.nih.gov/pubmed/3361599">Khodadadeh</a>, 1998).
+    - View ground reaction force path.
+    - New computed angle for the force platform: Direction angle of the force vector.
+  - Updates:
+    - Time bar event can display <em>frame</em> (default) or <em>time</em>. Default setting available in the preferences.
+    - Unit for the horizontal axis of the charts can be set to <em>frame</em> (default) or <em>time</em>.
+    - New preferences for the charts.
+    - New preferences to display ground reaction force butterfly and path.
+    - New dialog box to save a layout (create a new one or save it on an existing one).
+    - New dialog box for the visual configuration saving option.
+    - Importing acquisitions enabled now the save action (not only the "save as").
+    - Improving the way to save an acquisition. Especially if there is no filename or the current file extension is not supported.
+    - The collapse of the properties in the acquisition explorer reduces also their size to go down.
+    - Model pane renamed Acquisition explorer.
+  - Fixes:
+    - Re-saving causes change in units in Mokka (issue <a href="http://code.google.com/p/b-tk/issues/detail?id=22">22</a>).
+    - Perspective view loses content upon rotation (issue <a href="http://code.google.com/p/b-tk/issues/detail?id=21">21</a>).
+    - Cropping the region of interest in the time bar doesn't crop the charts.
+    - Cropping an acquisition and dropping an item into a chart reset the bounds of its X axis.
+    - Zooming and cropping an acquisition doesn't reset the zoom action.
+    - VSK/VST file without any model name cannot be loaded.
+    - VSK/VST file with an empty model name append an empty row in the combobox.
+    - Cropping and reframing an acquisition several time doesn't work.
+    - Moving an event and trying to undo this action doesn't reset correctly the event's frame.
+    - The XLS extension is not in the filter used for the "Open" action.
+    - Trying to import an EMG file from the Import assistant doesn't open the dialog box to select a file.
+    - Clicking on an event in the timebar highlights the line representing it in the visible charts only for the first time.
+    - Clicking on the action "Import > EMF files..." does nothing.
+    - Trying to write a file with an extension not supported leads to an error. Now open a "Save as" dialog.
+    - The action "Reframe from one" is enabled even if the first frame is equal to 1.
+  
 - <b>11/30/11: Mokka 0.4</b> released
   - Enhancements:
     - Chart viewer to display analog signals and components of points (markers, angles, forces, etc.) into 2D plots.
@@ -21,7 +58,7 @@
     - (MacOS X only) The preferences window under MacOS X seems native (animation for height, zoom button disabled, no toolbar button, no resize indicator).
     - (Windows only): Windows VersionInfo are now set for Mokka.
     - Use BTK 0.1.9.
-  - Fixes
+  - Fixes:
     - List of markers stated as visible into the model pane is wrong under Windows 7 64-bit (issue 14)
     - If the unit for the markers is set to meter in the first loaded acquisition, then the coordinates are not correctly scaled.
     - In some case in the 3D perspective view, the camera is translated instead of rotated when switching from another application (using the key sequence Alt + Tab).
@@ -42,7 +79,7 @@
     - Camera configuration saved and reloaded when switching between perspective and orthogonal projection.
     - Icon for the markers in the model pane rotated.
     - Use BTK 0.1.8.
-  - Fixes
+  - Fixes:
     - The visual configuration unselected is still loaded when opening another acquisition.
     - In some case, a subtick appears close to each stick in the time event bar.
     - Wrong orthogonal planes when the global up vector is not Z.
