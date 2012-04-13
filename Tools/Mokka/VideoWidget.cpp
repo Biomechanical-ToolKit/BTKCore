@@ -154,7 +154,6 @@ void VideoWidget::dragEnterEvent(QDragEnterEvent* event)
   event->ignore();
   if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
   {
-    this->setVideoVisible(false);
     QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(event->source());
     if (treeWidget)
     {
@@ -164,6 +163,7 @@ void VideoWidget::dragEnterEvent(QDragEnterEvent* event)
         if ((*it)->type() != VideoType)
           return;
       }
+      this->setVideoVisible(false);
       event->setDropAction(Qt::CopyAction); // To have the cross (+) symbol
       event->accept();
     }
