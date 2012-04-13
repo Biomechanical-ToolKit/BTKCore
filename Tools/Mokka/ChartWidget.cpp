@@ -599,6 +599,13 @@ void ChartWidget::setExpandableAnalog(int expandable)
   AnalogChartData* analogChartData = static_cast<AnalogChartData*>(this->m_ChartData[AnalogChart]);
   analogChartData->setExpandable(expandable == 1);
   this->mp_ChartContentWidget->resizeCharts();
+  for (int i = 0 ; i < static_cast<int>(analogChartData->charts()->size()) ; ++i)
+  {
+    btk::VTKChartTimeSeries* chart = analogChartData->chart(i);
+    chart->RecalculateBounds();
+    int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
+    this->updateAxisX(chart, roi[0], roi[1]);
+  }
   this->render();
   
   this->setFocus();
@@ -1007,7 +1014,8 @@ void AbstractChartData::show(Acquisition* acq, bool s, bool* layoutModified)
     }
     else // Load
     {
-      chart->SetBounds((double)acq->firstFrame(), (double)acq->lastFrame(), 0.0, 0.0);
+      int roi[2]; acq->regionOfInterest(roi[0], roi[1]);
+      chart->SetBounds((double)roi[0], (double)roi[1], 0.0, 0.0);
       chart->GetAxis(vtkAxis::BOTTOM)->SetLabelsVisible(true);
       chart->GetAxis(vtkAxis::LEFT)->SetLabelsVisible(true);
     }
