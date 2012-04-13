@@ -83,11 +83,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     size_t strlen_ = (mxGetM(data) * mxGetN(data) * sizeof(mxChar)) + 1;
     char* d = (char*)mxMalloc(strlen_);
     mxGetString(data, d, strlen_);
-    (*it)->GetInfo()->SetValue(index, d);
+    (*it)->GetInfo()->SetValue(static_cast<int>(index), d);
     mxFree(d);
   }
   else
-    (*it)->GetInfo()->SetValue(index, mxGetScalar(data));
+    (*it)->GetInfo()->SetValue(static_cast<int>(index), mxGetScalar(data));
   
   if (nlhs > 0)
     plhs[0] = btkMXCreateMetaDataStructure(acq->GetMetaData());
