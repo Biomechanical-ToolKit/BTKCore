@@ -359,8 +359,6 @@ void TimeEventControlerWidget::previousFrame()
 void TimeEventControlerWidget::reframeAcquisition(int ff)
 {
   int diff = this->timeEventBar->m_ROIFirstFrame - ff;
-  this->timeEventBar->m_FirstFrame = this->mp_Acquisition->firstFrame();
-  this->timeEventBar->m_LastFrame = this->mp_Acquisition->lastFrame();
   this->timeEventBar->m_ROIFirstFrame -= diff;
   this->timeEventBar->m_ROILastFrame -= diff;
   this->timeEventBar->m_SliderPos -= diff;
@@ -487,7 +485,7 @@ void TimeEventControlerWidget::editSelectedEvents()
     }
     int oldFrame = this->currentFrame();
     NewEventDialog ned(NewEventDialog::Edit, this);
-    int  frameAndROI[3] = {frame, this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame};
+    int  frameAndROI[3] = {frame, this->timeEventBar->m_ROIFirstFrame, this->timeEventBar->m_ROILastFrame};
     ned.setInformations(label, ned.contextComboBox->findText(context), frameAndROI, subject, description);
     ned.move(this->eventDialogGlobaPos(&ned));
     if (!this->mp_Timer->isActive())
@@ -816,7 +814,7 @@ void TimeEventControlerWidget::insertEvent(const QString& label, int context, in
 {
   int oldFrame = this->currentFrame();
   NewEventDialog ned(NewEventDialog::New, this);
-  int  frameAndROI[3] = {frame, this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame};
+  int  frameAndROI[3] = {frame, this->timeEventBar->m_ROIFirstFrame, this->timeEventBar->m_ROILastFrame};
   ned.setInformations(label, context, frameAndROI, "", "");
   ned.move(this->eventDialogGlobaPos(&ned));
   if (!this->mp_Timer->isActive())

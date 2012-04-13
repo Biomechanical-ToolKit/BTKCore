@@ -107,8 +107,6 @@ private:
   void updateEventSelection(const QList<int>& selection);
   QList<int> extractSelectedEvents() const;
   
-  int m_FirstFrame;
-  int m_LastFrame;
   int m_ROIFirstFrame;
   int m_ROILastFrame;
   QStringList m_EventContexts;
