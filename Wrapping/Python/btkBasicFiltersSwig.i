@@ -153,9 +153,48 @@ protected:
 // ------------------------------------------------------------------------- //
 //                    SeparateKnownVirtualMarkersFilter                      //
 // ------------------------------------------------------------------------- //
+
+// Redefine nested class in global scope in order for SWIG to generate a proxy class.
+struct btkStringAxes
+{
+  btkStringAxes(const std::string& o, const std::string& a1, const std::string& a2, const std::string& a3)
+  : Origin(o), Axis1(a1), Axis2(a2), Axis3(a3)
+  {};
+  std::string Origin;
+  std::string Axis1;
+  std::string Axis2;
+  std::string Axis3;
+};
+
+%nestedworkaround SeparateKnownVirtualMarkersFilter::StringAxes;
+
+%{
+  typedef btkSeparateKnownVirtualMarkersFilter_impl::StringAxes btkStringAxes;
+%}
+
+namespace std
+{
+  %template(btkStringAxesList) list<btkStringAxes>;
+  %template(btkStringList) list<std::string>;
+}
+
 BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(SeparateKnownVirtualMarkersFilter)
 {
 public:
+  void AppendKnownVirtualMarkerLabelForAxes(const std::string& , const std::string& , const std::string& , const std::string& );
+  void AppendKnownVirtualMarkerLabelForAxes(const btkStringAxes& );
+  void AppendKnownVirtualMarkerLabelsForAxes(const std::list<btkStringAxes>& );
+  void SetKnownVirtualMarkerLabelsForAxes(const std::list<btkStringAxes>& );
+  const std::list<btkStringAxes>& GetKnownVirtualMarkerLabelsForAxes() const;
+  
+  void AppendKnownVirtualMarkerLabelForOthers(const std::string& );
+  void AppendKnownVirtualMarkerLabelsForOthers(const std::list<std::string>& );
+  void SetKnownVirtualMarkerLabelsForOthers(const std::list<std::string>& );
+  const std::list<std::string>& GetKnownVirtualMarkerLabelsForOthers() const;
+  
+  void SetLabelPrefix(const std::string& );
+  const std::string& GetLabelPrefix() const;
+  
   btkPointCollection GetInput();
   void SetInput(btkPointCollection );
   btkPointCollection GetOutput(int );

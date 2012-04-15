@@ -46,7 +46,7 @@ namespace btk
   public:
     struct StringAxes
     {
-      StringAxes(const std::string& o, const std::string& a1, const std::string& a2, const std::string& a3)
+      StringAxes(const std::string& o = "", const std::string& a1 = "", const std::string& a2 = "", const std::string& a3 = "")
       : Origin(o), Axis1(a1), Axis2(a2), Axis3(a3)
       {};
       
