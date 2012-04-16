@@ -173,7 +173,7 @@ ADD_CUSTOM_COMMAND(TARGET Mokka PRE_LINK
 # Installation
 IF(NOT BTK_INSTALL_NO_RUNTIME)
   IF(APPLE) # MacOS
-    # MakeOSXBundleApp(Mokka ${EXECUTABLE_OUTPUT_PATH} "/Applications")
+    MakeOSXBundleApp(Mokka ${EXECUTABLE_OUTPUT_PATH} "/Applications")
     SET(CMAKE_INSTALL_PREFIX "/Applications")
     INCLUDE(DeployQt4)
     INSTALL_QT4_EXECUTABLE("Mokka.app" "phonon_qt7")    
