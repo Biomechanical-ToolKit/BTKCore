@@ -1,6 +1,14 @@
 /**
 @page MokkaReleaseNote Release Notes
 
+- <b>12/16/04: Mokka 0.5.1</b> released
+  - Fixes:
+    - Dragging any kind of item (except video) over the video view hides the current displayed video.
+    - Clearing a chart for a cropped acquisition reset the zoom.
+    - Switching between collapsed and expanded analog chart with a cropped acquisition reset the bounds of the chart.
+    - Mokka 0.5 introduced a bug where it is no more possible to modify the frame of the edited event(s).
+    - Packaging Mokka under MacOS X doesn't install the phonon backend for quicktime (issue <a href="http://code.google.com/p/b-tk/issues/detail?id=29">29</a>).
+    
 - <b>12/11/04: Mokka 0.5</b> released
   - Enhancements:
     - Watch any video joined to an acquisition.
