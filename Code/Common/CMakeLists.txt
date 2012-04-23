@@ -10,6 +10,7 @@ SET(BTKCommon_SRCS
   btkMetaDataUtils.cpp 
   btkObject.cpp
   btkProcessObject.cpp
+  btkTriangleMesh.cpp
   btkWrench.cpp
 )
 
