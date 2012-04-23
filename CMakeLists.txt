@@ -4,14 +4,11 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6.2)
 # BTK: Biomechanical ToolKit
 PROJECT(BTK)
 
-# BTK version number. An even minor number corresponds to releases.
+# BTK version number.
 SET(BTK_VERSION_MAJOR 0)
 SET(BTK_VERSION_MINOR 1)
 SET(BTK_VERSION_PATCH 10)
-
-# Version string should not include patch level.  The major.minor is
-# enough to distinguish available features of the toolkit.
-SET(BTK_VERSION_STRING "${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}")
+SET(BTK_VERSION_STRING "${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}.${BTK_VERSION_PATCH}")
 
 # ------------------------------------------------------------------------
 # COMPILATION INSTRUCTIONS
