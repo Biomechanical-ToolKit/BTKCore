@@ -548,7 +548,7 @@ namespace btk
   };
 
   /** 
-   * @fn void BinaryFileStream::Write(int16_t i16) = 0
+   * @fn size_t BinaryFileStream::Write(int16_t i16) = 0
    * Extracts one signed 16-bit integer.
    */
   
@@ -564,7 +564,7 @@ namespace btk
   };
 
   /** 
-   * @fn void BinaryFileStream::Write(uint16_t u16) = 0
+   * @fn size_t BinaryFileStream::Write(uint16_t u16) = 0
    * Extracts one unsigned 16-bit integer.
    */
 
@@ -578,10 +578,42 @@ namespace btk
       this->Write(rVectorU16[inc++]);
     return rVectorU16.size() * 2;
   };
+  
+  /** 
+   * @fn size_t BinaryFileStream::Write(int32_t i32) = 0;
+   * Write one 32-bit signed integer 
+   */
+  
+  /**
+   * Writes the vector of signed 32-bit integers @a rVectorI32 in the stream an return its size.
+   */
+  size_t BinaryFileStream::Write(const std::vector<int32_t>& rVectorI32)
+  {
+    size_t inc = 0;
+    while (inc < rVectorI32.size())
+      this->Write(rVectorI32[inc++]);
+    return rVectorI32.size() * 2;
+  };
+  
+  /** 
+   * @fn size_t BinaryFileStream::Write(uint32_t u32) = 0;
+   * Write one 32-bit unsigned integer 
+   */
+  
+  /**
+   * Writes the vector of unsigned 32-bit integers @a rVectorU32 in the stream an return its size.
+   */
+  size_t BinaryFileStream::Write(const std::vector<uint32_t>& rVectorU32)
+  {
+    size_t inc = 0;
+    while (inc < rVectorU32.size())
+      this->Write(rVectorU32[inc++]);
+    return rVectorU32.size() * 2;
+  };
 
   /** 
-   * @fn void BinaryFileStream::Write(float f) = 0
-   * Extracts one float.
+   * @fn size_t BinaryFileStream::Write(float f) = 0
+   * Write one float.
    */
   
   /** 
@@ -770,6 +802,44 @@ namespace btk
 #endif
     return 2;
   };
+  
+  /** 
+   * Write the 32-bit signed integer @a i32 and return its size.
+   */
+  size_t VAXLittleEndianBinaryFileStream::Write(int32_t i32)
+  {
+    char byteptr[4] = {0};
+    memcpy(&byteptr, &i32, sizeof(byteptr));
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[4] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2]};
+    this->mp_Stream->write(foo, 4);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    this->mp_Stream->write(byteptr, 4);
+#else
+    char foo[4] = {byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    this->mp_Stream->write(foo, 4);
+#endif
+    return 4;
+  };
+  
+  /** 
+   * Write the 32-bit unsigned integer @a u32 and return its size
+   */
+  size_t VAXLittleEndianBinaryFileStream::Write(uint32_t u32)
+  {
+    char byteptr[4] = {0};
+    memcpy(&byteptr, &u32, sizeof(byteptr));
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[4] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2]};
+    this->mp_Stream->write(foo, 4);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    this->mp_Stream->write(byteptr, 4);
+#else
+    char foo[4] = {byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    this->mp_Stream->write(foo, 4);
+#endif
+    return 4;
+  };
 
   /**
    * Writes the float @a f in the stream an return its size.
@@ -943,6 +1013,44 @@ namespace btk
     this->mp_Stream->write(foo, 2);
 #endif
     return 2;
+  };
+  
+  /** 
+   * Write the 32-bit signed integer @a i32 and return its size.
+   */
+  size_t IEEEBigEndianBinaryFileStream::Write(int32_t i32)
+  {
+    char byteptr[4] = {0};
+    memcpy(&byteptr, &i32, sizeof(byteptr));
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    this->mp_Stream->write(byteptr, 4);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    char foo[4] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2]};
+    this->mp_Stream->write(foo, 4);
+#else
+    char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    this->mp_Stream->write(foo, 4);
+#endif
+    return 4;
+  };
+  
+  /** 
+   * Write the 32-bit unsigned integer @a u32 and return its size
+   */
+  size_t IEEEBigEndianBinaryFileStream::Write(uint32_t u32)
+  {
+    char byteptr[4] = {0};
+    memcpy(&byteptr, &u32, sizeof(byteptr));
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    this->mp_Stream->write(byteptr, 4);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    char foo[4] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2]};
+    this->mp_Stream->write(foo, 4);
+#else
+    char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    this->mp_Stream->write(foo, 4);
+#endif
+    return 4;
   };
 
   /**
@@ -1120,6 +1228,44 @@ namespace btk
 #endif
     return 2;
 
+  };
+
+  /** 
+   * Write the 32-bit signed integer @a i32 and return its size.
+   */
+  size_t IEEELittleEndianBinaryFileStream::Write(int32_t i32)
+  {
+    char byteptr[4] = {0};
+    memcpy(&byteptr, &i32, sizeof(byteptr));
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    this->mp_Stream->write(foo, 4);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */ 
+    char foo[4] = {byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    this->mp_Stream->write(foo, 4);
+#else
+    this->mp_Stream->write(byteptr, 4);
+#endif
+    return 4;
+  };
+  
+  /** 
+   * Write the 32-bit unsigned integer @a u32 and return its size
+   */
+  size_t IEEELittleEndianBinaryFileStream::Write(uint32_t u32)
+  {
+    char byteptr[4] = {0};
+    memcpy(&byteptr, &u32, sizeof(byteptr));
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[4] = {byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    this->mp_Stream->write(foo, 4);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */ 
+    char foo[4] = {byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    this->mp_Stream->write(foo, 4);
+#else
+    this->mp_Stream->write(byteptr, 4);
+#endif
+    return 4;
   };
 
   /**

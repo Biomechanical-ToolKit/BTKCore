@@ -179,6 +179,10 @@ namespace btk
     size_t Write(const std::vector<int16_t>& rVectorI16);
     virtual size_t Write(uint16_t u16) = 0;
     size_t Write(const std::vector<uint16_t>& rVectorU16);
+    virtual size_t Write(int32_t i32) = 0;
+    size_t Write(const std::vector<int32_t>& rVectorI32);
+    virtual size_t Write(uint32_t u32) = 0;
+    size_t Write(const std::vector<uint32_t>& rVectorU32);
     virtual size_t Write(float f) = 0;
     size_t Write(const std::vector<float>& rVectorFloat);
     size_t Write(const std::string& rString);
@@ -215,6 +219,8 @@ namespace btk
     using BinaryFileStream::ReadDouble;
     virtual size_t Write(int16_t i16);
     virtual size_t Write(uint16_t u16);
+    virtual size_t Write(int32_t i32);
+    virtual size_t Write(uint32_t u32);
     virtual size_t Write(float f);
     using BinaryFileStream::Write;
   
@@ -243,6 +249,8 @@ namespace btk
     using BinaryFileStream::ReadDouble;
     virtual size_t Write(int16_t i16);
     virtual size_t Write(uint16_t u16);
+    virtual size_t Write(int32_t i32);
+    virtual size_t Write(uint32_t u32);
     virtual size_t Write(float f);
     using BinaryFileStream::Write;
   
@@ -271,6 +279,8 @@ namespace btk
     using BinaryFileStream::ReadDouble;
     virtual size_t Write(int16_t i16);
     virtual size_t Write(uint16_t u16);
+    virtual size_t Write(int32_t i32);
+    virtual size_t Write(uint32_t u32);
     virtual size_t Write(float f);
     using BinaryFileStream::Write;
   

@@ -42,3 +42,5 @@
 #include "TRCFileWriterTest.h"
 #include "XLSOrthoTrakFileIOTest.h"
 #include "XLSOrthoTrakFileReaderTest.h"
+
+#include "MultiSTLFileWriterTest.h"

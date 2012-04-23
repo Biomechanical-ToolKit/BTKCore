@@ -39,5 +39,7 @@
 #define EMFFilePathOUT std::string(TDD_FilePathOUT) + "EMFSamples/"
 #define TDFFilePathIN std::string(TDD_FilePathIN) + "TDFSamples/"
 #define TDFFilePathOUT std::string(TDD_FilePathOUT) + "TDFSamples/"
+#define STLFilePathIN std::string(TDD_FilePathIN) + "STLSamples/"
+#define STLFilePathOUT std::string(TDD_FilePathOUT) + "STLSamples/"
 
 #endif // _TDDConfigure_h
