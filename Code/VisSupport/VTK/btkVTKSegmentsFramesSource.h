@@ -37,6 +37,7 @@
 #define __btkVTKSegmentsFramesSource_h
 
 #include "btkPointCollection.h"
+#include "btkTriangleMesh.h"
 
 #include <vtkPolyDataAlgorithm.h>
 #include <vtkDoubleArray.h>
@@ -51,7 +52,7 @@ namespace btk
   class VTKSegmentsFramesSource : public vtkPolyDataAlgorithm
   {
   public:
-    typedef std::pair<int,int> Link;
+    typedef TriangleMesh::VertexLink Link;
     
     BTK_VTK_EXPORT static VTKSegmentsFramesSource* New();
     vtkExportedTypeRevisionMacro(VTKSegmentsFramesSource, vtkPolyDataAlgorithm, BTK_VTK_EXPORT);
@@ -59,12 +60,17 @@ namespace btk
 
     BTK_VTK_EXPORT void SetInput(PointCollection::Pointer input);
     
-    BTK_VTK_EXPORT void AppendDefinition(const std::vector<int>& markerIds, const std::vector<Link>& links);
+    BTK_VTK_EXPORT void AppendDefinition(const std::vector<int>& markerIds, const std::vector<Link>& links, bool surfaceVisible = false);
+    BTK_VTK_EXPORT void AppendDefinition(TriangleMesh::Pointer mesh, bool surfaceVisible = false);
     BTK_VTK_EXPORT void SetDefinition(vtkIdType id, const std::vector<int>& markerIds, const std::vector<Link>& links);
+    BTK_VTK_EXPORT void SetDefinition(vtkIdType id, TriangleMesh::Pointer mesh);
+    BTK_VTK_EXPORT TriangleMesh::Pointer GetDefinition(vtkIdType id);
     BTK_VTK_EXPORT void ClearDefinitions();
 
     BTK_VTK_EXPORT bool GetSegmentVisibility(vtkIdType id);
     BTK_VTK_EXPORT void SetSegmentVisibility(vtkIdType id, bool visible);
+    BTK_VTK_EXPORT bool GetSegmentSurfaceVisibility(vtkIdType id);
+    BTK_VTK_EXPORT void SetSegmentSurfaceVisibility(vtkIdType id, bool visible);
     BTK_VTK_EXPORT double* GetSegmentColor(vtkIdType id);
     BTK_VTK_EXPORT void SetSegmentsColor(vtkIdTypeArray* ids, double r, double g, double b);
     BTK_VTK_EXPORT vtkIdType GetSegmentColorIndex(vtkIdType id);
@@ -97,9 +103,10 @@ namespace btk
     
     struct SegmentDefinition
     {
-      SegmentDefinition(const std::vector<int>& m, const std::vector<Link>& l) : markerIds(m), links(l) {}; 
-      std::vector<int> markerIds;
-      std::vector<Link> links;
+      SegmentDefinition(const TriangleMesh::Pointer m, bool visible); 
+      SegmentDefinition(const std::vector<int>& m, const std::vector<Link>& l, bool visible); 
+      TriangleMesh::Pointer mesh;
+      bool surfaceEnabled;
     };
     
     std::list<SegmentDefinition> m_Definitions;
