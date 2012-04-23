@@ -37,7 +37,6 @@
 #include "MainWindow.h"
 #include "About.h"
 #include "Acquisition.h"
-#include "Model.h"
 #include "FileInfoDockWidget.h"
 #include "ImportAssistantDialog.h"
 #include "LoggerMessage.h"
@@ -48,9 +47,12 @@
 #include "UndoCommands.h"
 #include "UpdateChecker.h"
 #include "Preferences.h"
+#include "ExportSTLDialog.h"
 #include "TimeEventFunctors.h"
 #include "NewLayoutDialog.h"
 #include "UserDefined.h"
+
+#include <btkMultiSTLFileWriter.h>
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -71,7 +73,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock = new ModelDockWidget(this);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
   this->mp_ImportAssistant = new ImportAssistantDialog(this);
-  this->mp_UpdateChecker = new UpdateChecker(btkStringifyMacro(MOKKA_VERSION_STRING), 
+  this->mp_UpdateChecker = new UpdateChecker(MOKKA_VERSION_STRING, 
                                               "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
                                               ":/Resources/Images/Mokka_128.png", this);
 #ifdef Q_OS_MAC
@@ -261,6 +263,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionExportANB, SIGNAL(triggered()), this, SLOT(exportANB()));
   connect(this->actionExportANC, SIGNAL(triggered()), this, SLOT(exportANC()));
   connect(this->actionExportCAL, SIGNAL(triggered()), this, SLOT(exportCAL()));
+  connect(this->actionExportSTL, SIGNAL(triggered()), this, SLOT(exportSTL()));
   connect(this->actionPreferences, SIGNAL(triggered()), this, SLOT(showPreferences()));
   connect(this->actionSelect_All, SIGNAL(triggered()), this, SLOT(selectAll()));
   connect(this->actionCopy, SIGNAL(triggered()), this, SLOT(copy()));
@@ -304,7 +307,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_ModelDock, SIGNAL(segmentLabelChanged(int, QString)), this, SLOT(setSegmentLabel(int, QString)));
   connect(this->mp_ModelDock, SIGNAL(segmentsColorChanged(QVector<int>, QColor)), this, SLOT(setSegmentsColor(QVector<int>, QColor)));
   connect(this->mp_ModelDock, SIGNAL(segmentsDescriptionChanged(QVector<int>, QString)), this, SLOT(setSegmentsDescription(QVector<int>, QString)));
-  connect(this->mp_ModelDock, SIGNAL(segmentLinksChanged(int, QVector<int>, QVector< QPair<int,int> >)), this, SLOT(setSegmentLinks(int, QVector<int>, QVector< QPair<int,int> >)));
+  connect(this->mp_ModelDock, SIGNAL(segmentLinksChanged(int, QVector<int>, QVector<Pair>)), this, SLOT(setSegmentLinks(int, QVector<int>, QVector<Pair>)));
+  connect(this->mp_ModelDock, SIGNAL(segmentsSurfaceVisibilityChanged(QVector<int>, bool)), this, SLOT(setSegmentsSurfaceVisibility(QVector<int>, bool)));
   connect(this->mp_ModelDock, SIGNAL(segmentsRemoved(QList<int>)), this, SLOT(removeSegments(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(segmentCreated(Segment*)), this, SLOT(insertSegment(Segment*)));
   connect(this->mp_ModelDock, SIGNAL(segmentHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenSegments(QList<int>)));
@@ -1245,6 +1249,47 @@ void MainWindow::exportCAL()
   this->exportAcquisition(tr("CAL Files (*.cal)"));
 };
 
+void MainWindow::exportSTL()
+{
+  QString dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"), this->m_LastDirectory);
+  if (!dir.isEmpty())
+  {
+    ExportSTLDialog exporterDlg(this);
+    exporterDlg.pathLineEdit->setText(dir);
+    for (QMap<int, Segment*>::const_iterator it = this->mp_Model->segments().begin() ; it != this->mp_Model->segments().end() ; ++it)
+      exporterDlg.segmentListWidget->addItem(it.value()->label);
+    if (exporterDlg.exec() == QDialog::Accepted)
+    {
+      QString filePrefix = exporterDlg.pathLineEdit->text() + "/" + exporterDlg.filePrefixLineEdit->text();
+      LOG_INFO("Exporting segment '" + exporterDlg.segmentListWidget->currentItem()->text() + "' to STL files: " + filePrefix + "*.stl");
+      try
+      {
+        btk::MultiSTLFileWriter::Pointer exporter = btk::MultiSTLFileWriter::New();
+        exporter->SetInputAcquisition(this->mp_Acquisition->btkAcquisition());
+        exporter->SetInputMesh(this->mp_Model->segments().value(exporterDlg.segmentListWidget->currentRow())->mesh);
+        exporter->SetFilePrefix(qPrintable(filePrefix));
+        if (exporterDlg.foiRadioButton->isChecked())
+          exporter->SetFramesOfInterest(this->timeEventControler->leftBound(), this->timeEventControler->rightBound());
+        else if (exporterDlg.currentFrameRadioButton->isChecked())
+          exporter->SetFramesOfInterest(this->timeEventControler->currentFrame(), this->timeEventControler->currentFrame());
+        exporter->Update();
+      }
+      catch (btk::Exception& e)
+      {
+        LOG_CRITICAL(e.what());
+      }
+      catch (std::exception& e)
+      {
+        LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+      }
+      catch (...)
+      {
+        LOG_CRITICAL("Unknown error.");
+      }
+    }
+  }
+};
+
 void MainWindow::showPreferences()
 {
 #ifdef Q_OS_MAC
@@ -1504,9 +1549,14 @@ void MainWindow::setSegmentsDescription(const QVector<int>& ids, QString desc)
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentsDescription(this->mp_Model, ids, desc)));
 };
 
-void MainWindow::setSegmentLinks(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links)
+void MainWindow::setSegmentLinks(int id, const QVector<int>& markerIds, const QVector<Pair>& links)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentLinks(this->mp_Model, id, markerIds, links)));
+};
+
+void MainWindow::setSegmentsSurfaceVisibility(const QVector<int>& ids, bool visible)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentsSurfaceVisibility(this->mp_Model, ids, visible)));
 };
 
 void MainWindow::removeSegments(const QList<int>& ids)

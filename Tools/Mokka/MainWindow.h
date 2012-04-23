@@ -38,10 +38,11 @@
 
 #include "ui_MainWindow.h"
 
+#include "Model.h" // Pair
+
 class Preferences;
 class Acquisition;
 struct Event;
-class Model;
 struct Segment;
 class ImportAssistantDialog;
 class FileInfoDockWidget;
@@ -108,6 +109,7 @@ public slots:
   void exportANB();
   void exportANC();
   void exportCAL();
+  void exportSTL();
   void showPreferences();
   void selectAll();
   void copy();
@@ -133,7 +135,8 @@ public slots:
   void setSegmentLabel(int id, const QString& label);
   void setSegmentsColor(const QVector<int>& ids, const QColor& color);
   void setSegmentsDescription(const QVector<int>& ids, QString desc);
-  void setSegmentLinks(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void setSegmentLinks(int id, const QVector<int>& markerIds, const QVector<Pair>& links);
+  void setSegmentsSurfaceVisibility(const QVector<int>& ids, bool visible);
   void removeSegments(const QList<int>& ids);
   void insertSegment(Segment* seg);
   void setVideosDelay(const QVector<int>& ids, qint64 delay);

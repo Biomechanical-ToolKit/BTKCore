@@ -471,7 +471,7 @@ void EditSegmentsColor::action()
 };
 
 // --------------- EditSegmentLinks ---------------
-EditSegmentLinks::EditSegmentLinks(Model* m, int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links, QUndoCommand* parent)
+EditSegmentLinks::EditSegmentLinks(Model* m, int id, const QVector<int>& markerIds, const QVector<Pair>& links, QUndoCommand* parent)
 : ConfigurationUndoCommand(parent), m_MarkerIds(markerIds), m_Links(links)
 {
   this->mp_Model = m;
@@ -481,10 +481,28 @@ EditSegmentLinks::EditSegmentLinks(Model* m, int id, const QVector<int>& markerI
 void EditSegmentLinks::action()
 {
   QVector<int> tempMarkerIds = this->mp_Model->segmentMarkerIds(this->m_Id);
-  QVector< QPair<int,int> > tempLinks = this->mp_Model->segmentLinks(this->m_Id);
+  QVector<Pair> tempLinks = this->mp_Model->segmentLinks(this->m_Id);
   this->mp_Model->setSegmentLinks(this->m_Id, this->m_MarkerIds, this->m_Links);
   this->m_MarkerIds = tempMarkerIds;
   this->m_Links = tempLinks;
+};
+
+// --------------- EditSegmentsSurfaceVisibility ---------------
+EditSegmentsSurfaceVisibility::EditSegmentsSurfaceVisibility(Model* m, const QVector<int>& ids, bool visible, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
+{
+  this->mp_Model = m;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Visibles[i] = visible;
+};
+
+void EditSegmentsSurfaceVisibility::action()
+{
+  QVector<bool> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Model->segmentSurfaceVisible(this->m_Ids[i]);
+  this->mp_Model->setSegmentsSurfaceVisible(this->m_Ids, this->m_Visibles);
+  this->m_Visibles = temp;
 };
 
 // --------------- RemoveSegments ---------------

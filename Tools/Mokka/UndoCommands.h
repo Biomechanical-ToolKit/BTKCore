@@ -454,7 +454,7 @@ private:
 class EditSegmentLinks : public ConfigurationUndoCommand
 {
 public:
-  EditSegmentLinks(Model* m, int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links, QUndoCommand* parent = 0);
+  EditSegmentLinks(Model* m, int id, const QVector<int>& markerIds, const QVector<Pair>& links, QUndoCommand* parent = 0);
   virtual void undo() {this->action();};
   virtual void redo() {this->action();};
   
@@ -462,7 +462,23 @@ private:
   Model* mp_Model;
   int m_Id;
   QVector<int> m_MarkerIds;
-  QVector< QPair<int,int> > m_Links;
+  QVector<Pair> m_Links;
+  
+  void action();
+};
+
+// --------------- EditSegmentsSurfaceVisibility ---------------
+class EditSegmentsSurfaceVisibility : public ConfigurationUndoCommand
+{
+public:
+  EditSegmentsSurfaceVisibility(Model* m, const QVector<int>& ids, bool visible, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Model* mp_Model;
+  QVector<int> m_Ids;
+  QVector<bool> m_Visibles;
   
   void action();
 };

@@ -68,7 +68,7 @@
      <x>0</x>
      <y>0</y>
      <width>928</width>
-     <height>18</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -137,6 +137,8 @@
      </widget>
      <addaction name="actionExportC3D"/>
      <addaction name="menuMotion_Analysis_Corp"/>
+     <addaction name="separator"/>
+     <addaction name="actionExportSTL"/>
     </widget>
     <addaction name="action_FileOpen"/>
     <addaction name="menuOpen_Recent"/>
@@ -495,6 +497,11 @@
   <action name="actionVisit_Mokka_website">
    <property name="text">
     <string>Visit Mokka website</string>
+   </property>
+  </action>
+  <action name="actionExportSTL">
+   <property name="text">
+    <string>STL files...</string>
    </property>
   </action>
  </widget>

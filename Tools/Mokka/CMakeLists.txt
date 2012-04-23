@@ -43,6 +43,7 @@ SET(Mokka_CPP
   NewSegmentDialog.cpp
   Preferences_Layouts.cpp
   ProgressWidget.cpp
+  ExportSTLDialog.cpp
   TimeEventBarWidget.cpp
   TimeEventControlerWidget.cpp
   TimeEventFunctors.cpp
@@ -77,6 +78,7 @@ SET(Mokka_H
   NewSegmentDialog.h
   Preferences_Layouts.h
   ProgressWidget.h
+  ExportSTLDialog.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
   UpdateChecker.h
@@ -98,6 +100,7 @@ SET(Mokka_UI
   NewItemDialog.ui
   NewSegmentDialog.ui
   ProgressWidget.ui
+  ExportSTLDialog.ui
   TimeEventControlerWidget.ui
   UpdateChecker.ui)
 

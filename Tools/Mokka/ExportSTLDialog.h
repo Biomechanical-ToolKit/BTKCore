@@ -33,20 +33,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef mokkaConfigure_h
-#define mokkaConfigure_h
+#ifndef ExportSTLDialog_h
+#define ExportSTLDialog_h
 
-#include "btkMacro.h"
+#include "ui_ExportSTLDialog.h"
 
-#include <QtCore>
+class ExportSTLDialog : public QDialog, public Ui::ExportSTLDialog
+{
+  Q_OBJECT
+  
+public:
+  ExportSTLDialog(QWidget* parent = 0);
+  
+private slots:
+  void setExportPath();
+  void validExportInfo();
+};
 
-#define MOKKA_VERSION_MAJOR @MOKKA_VERSION_MAJOR@
-#define MOKKA_VERSION_MINOR @MOKKA_VERSION_MINOR@
-#define MOKKA_VERSION_PATCH @MOKKA_VERSION_PATCH@
-#define MOKKA_VERSION_STRING "@MOKKA_VERSION_STRING@"
-
-#ifdef Q_OS_LINUX
-  #define MOKKA_LINUX_SHARE_PATH "@CMAKE_INSTALL_PREFIX@/share"
-#endif
-
-#endif // mokkaConfigure_h
+#endif // ExportSTLDialog_h

@@ -32,21 +32,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+#include "ExportSTLDialog.h"
 
-#ifndef mokkaConfigure_h
-#define mokkaConfigure_h
+#include <QFileDialog>
 
-#include "btkMacro.h"
-
-#include <QtCore>
-
-#define MOKKA_VERSION_MAJOR @MOKKA_VERSION_MAJOR@
-#define MOKKA_VERSION_MINOR @MOKKA_VERSION_MINOR@
-#define MOKKA_VERSION_PATCH @MOKKA_VERSION_PATCH@
-#define MOKKA_VERSION_STRING "@MOKKA_VERSION_STRING@"
-
-#ifdef Q_OS_LINUX
-  #define MOKKA_LINUX_SHARE_PATH "@CMAKE_INSTALL_PREFIX@/share"
+ExportSTLDialog::ExportSTLDialog(QWidget* parent)
+: QDialog(parent)
+{
+  this->setupUi(this);
+#ifdef Q_OS_MAC
+  this->setWindowFlags(Qt::Sheet);
+  this->setWindowModality(Qt::WindowModal);
+  this->resize(this->width(), this->height()-1); // FIXME: Only the way to remove the size grip under MacOS X?
 #endif
+  
+  connect(this->pathButton, SIGNAL(clicked()), this, SLOT(setExportPath()));
+  connect(this->pathLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validExportInfo()));
+  connect(this->filePrefixLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validExportInfo()));
+  
+  this->validExportInfo();
+};
+  
+void ExportSTLDialog::setExportPath()
+{
+  QString dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"), this->pathLineEdit->text());
+  if (!dir.isEmpty())
+    this->pathLineEdit->setText(dir);
+};
 
-#endif // mokkaConfigure_h
+void ExportSTLDialog::validExportInfo()
+{
+  bool valid = false;
+  if (!this->pathLineEdit->text().isEmpty() && !this->filePrefixLineEdit->text().isEmpty() && (this->segmentListWidget->currentRow() != -1))
+    valid = true;
+  this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(valid);
+};

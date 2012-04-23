@@ -100,14 +100,16 @@ public slots:
   void newSegment();
   void setSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void setSegmentLabel(int id, const QString& label);
-  void setSegmentLink(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void setSegmentLink(int id, const QVector<int>& markerIds, const QVector<Pair>& links);
   void setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors);
   void setSegmentsDescription(const QVector<int>& ids, const QVector<QString>& descs);
+  void setSegmentsSurfaceVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
   void removeSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void insertSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void editSegmentLabel();
   void editSegmentsDescription();
   void editSegmentLinks();
+  void editSegmentSurfaceVisibility();
   // Markers & Points
   void updateDisplayedMarkers(const QVector<int>& ids);
   void setTrackedMarkers(const QList<int>& ids);
@@ -188,7 +190,8 @@ signals:
   void segmentLabelChanged(int id, const QString& label);
   void segmentsColorChanged(const QVector<int>& ids, const QColor& color);
   void segmentsDescriptionChanged(const QVector<int>& ids, QString desc);
-  void segmentLinksChanged(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void segmentLinksChanged(int id, const QVector<int>& markerIds, const QVector<Pair>& links);
+  void segmentsSurfaceVisibilityChanged(const QVector<int>& ids, bool visible);
   void segmentsRemoved(const QList<int>& ids);
   void segmentsCleared();
   void newSegmentsInserted(const QList<int>& ids, const QList<Segment*>& segments);

@@ -37,6 +37,7 @@
 #define MultiViewWidget_h
 
 #include "AbstractMultiView.h"
+#include "Model.h" // Pair
 
 #include <btkVTKChartTimeSeries.h>
 
@@ -50,7 +51,6 @@ class AbstractView;
 class CompositeView;
 class Acquisition;
 struct Segment;
-class Model;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
 class vtkDoubleArray;
@@ -118,7 +118,8 @@ public slots:
   void appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void clearSegments();
   void setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors);
-  void setSegmentLink(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void setSegmentLink(int id, const QVector<int>& markerIds, const QVector<Pair>& links);
+  void setSegmentsSurfaceVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
   void updateHiddenSegments(const QList<int>& ids);
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
   void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);

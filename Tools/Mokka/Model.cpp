@@ -114,15 +114,37 @@ void Model::setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& col
   emit segmentsColorChanged(ids, colors);
 };
 
-void Model::setSegmentLinks(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links)
+void Model::setSegmentLinks(int id, const QVector<int>& markerIds, const QVector<Pair>& links)
 {
   QMap<int,Segment*>::iterator it = this->m_Segments.find(id);
   if (it != this->m_Segments.end())
   {
     (*it)->markerIds = markerIds;
     (*it)->links = links;
+    (*it)->mesh = btk::TriangleMesh::New(markerIds.toStdVector(),links.toStdVector());
     emit segmentLinksChanged(id, markerIds, links);
   }
+};
+
+void Model::setSegmentSurfaceVisible(int id, bool visible)
+{
+  QMap<int,Segment*>::iterator it = this->m_Segments.find(id);
+  if (it != this->m_Segments.end())
+  {
+    (*it)->surfaceVisible = visible;
+    emit segmentSurfaceVisibilityChanged(id, visible);
+  }
+};
+
+void Model::setSegmentsSurfaceVisible(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    QMap<int,Segment*>::iterator it = this->m_Segments.find(ids[i]);
+    if (it != this->m_Segments.end())
+      (*it)->surfaceVisible = visibles[i];
+  }
+  emit segmentsSurfaceVisibilityChanged(ids, visibles);
 };
 
 QList<Segment*> Model::takeSegments(const QList<int>& ids)

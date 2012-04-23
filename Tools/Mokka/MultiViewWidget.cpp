@@ -35,7 +35,6 @@
 
 #include "MultiViewWidget.h"
 #include "Acquisition.h"
-#include "Model.h"
 #include "CompositeView.h"
 #include "ChartWidget.h"
 #include "LoggerVTKOutput.h"
@@ -315,8 +314,9 @@ void MultiViewWidget::initialize()
   renderer->AddActor(actor);
   mapper->Delete();
   actor->Delete();
-  // Pipeline for segments (links)
+  // Pipeline for segments
   btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::New();
+  // - Links
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(segments->GetOutputPort(0));
   mapper->SetLookupTable(segments->GetSegmentColorLUT());
@@ -327,6 +327,22 @@ void MultiViewWidget::initialize()
   actor = vtkActor::New();
   actor->SetMapper(mapper);
   actor->GetProperty()->SetLineWidth(2);
+  actor->SetScale(0.005);
+  actor->UseBoundsOff();
+  renderer->AddActor(actor);
+  mapper->Delete();
+  actor->Delete();
+  // - Faces
+  mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(segments->GetOutputPort(1));
+  mapper->SetLookupTable(segments->GetSegmentColorLUT());
+  mapper->SetScalarModeToUseCellData();
+  mapper->UseLookupTableScalarRangeOn();
+  mapper->SelectColorArray("Colors");
+  this->mp_Mappers->AddItem(mapper);
+  actor = vtkActor::New();
+  actor->GetProperty()->SetOpacity(0.5);
+  actor->SetMapper(mapper);
   actor->SetScale(0.005);
   actor->UseBoundsOff();
   renderer->AddActor(actor);
@@ -434,7 +450,8 @@ void MultiViewWidget::setModel(Model* m)
   this->mp_Model = m;
   // Object connection
   connect(this->mp_Model, SIGNAL(segmentsColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setSegmentsColor(QVector<int>, QVector<QColor>)));
-  connect(this->mp_Model, SIGNAL(segmentLinksChanged(int, QVector<int>, QVector< QPair<int,int> >)), this, SLOT(setSegmentLink(int, QVector<int>, QVector< QPair<int,int> >)));
+  connect(this->mp_Model, SIGNAL(segmentLinksChanged(int, QVector<int>, QVector<Pair>)), this, SLOT(setSegmentLink(int, QVector<int>, QVector<Pair>)));
+  connect(this->mp_Model, SIGNAL(segmentsSurfaceVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setSegmentsSurfaceVisibility(QVector<int>, QVector<bool>)));
 }
 
 void MultiViewWidget::setView3dActions(QList<QAction*> actions)
@@ -831,36 +848,17 @@ void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segme
   for (QList<Segment*>::const_iterator it = segments.begin() ; it != segments.end() ; ++it)
   {
     colors[inc++] = (*it)->color;
-    std::vector<int> btkPointIds((*it)->markerIds.size());
-    std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks((*it)->links.size());
-    for (int i = 0 ; i < (*it)->markerIds.size() ; ++i)
-      btkPointIds[i] = (*it)->markerIds[i];
-    for (int i = 0 ; i < (*it)->links.size() ; ++i)
-    {
-      btkLinks[i].first = (*it)->links[i].first;
-      btkLinks[i].second = (*it)->links[i].second;
-    }
-    segmentsFramesSource->AppendDefinition(btkPointIds, btkLinks);
+    // std::vector<int> btkPointIds((*it)->markerIds.size());
+    // std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks((*it)->links.size());
+    // for (int i = 0 ; i < (*it)->markerIds.size() ; ++i)
+    //   btkPointIds[i] = (*it)->markerIds[i];
+    // for (int i = 0 ; i < (*it)->links.size() ; ++i)
+    //   btkLinks[i].SetIds((*it)->links[i].first, (*it)->links[i].second);
+    // segmentsFramesSource->AppendDefinition(btkPointIds, btkLinks);
+    segmentsFramesSource->AppendDefinition((*it)->mesh, (*it)->surfaceVisible);
   }
   this->setSegmentsColor(ids.toVector(), colors);
 };
-
-/*
-void MultiViewWidget::appendNewSegment(const QVector<int>& markerIds, const QVector< QPair<int,int> >& links)
-{
-  std::vector<int> btkPointIds(markerIds.size());
-  std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks(links.size());
-  for (int i = 0 ; i < markerIds.size() ; ++i)
-    btkPointIds[i] = markerIds[i];
-  for (int i = 0 ; i < links.size() ; ++i)
-  {
-    btkLinks[i].first = links[i].first;
-    btkLinks[i].second = links[i].second;
-  }
-  btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
-  segmentsFramesSource->AppendDefinition(btkPointIds, btkLinks);
-};
-*/
 
 void MultiViewWidget::clearSegments()
 {
@@ -898,19 +896,28 @@ void MultiViewWidget::setSegmentsColor(const QVector<int>& ids, const QVector<QC
   this->updateSegmentsDisplay();
 };
 
-void MultiViewWidget::setSegmentLink(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links)
+void MultiViewWidget::setSegmentLink(int id, const QVector<int>& markerIds, const QVector<Pair>& links)
 {
-  std::vector<int> btkPointIds(markerIds.size());
-  std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks(links.size());
-  for (int i = 0 ; i < markerIds.size() ; ++i)
-    btkPointIds[i] = markerIds[i];
-  for (int i = 0 ; i < links.size() ; ++i)
-  {
-    btkLinks[i].first = links[i].first;
-    btkLinks[i].second = links[i].second;
-  }
+  Q_UNUSED(markerIds);
+  Q_UNUSED(links);
+  // std::vector<int> btkPointIds(markerIds.size());
+  // std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks(links.size());
+  // for (int i = 0 ; i < markerIds.size() ; ++i)
+  //   btkPointIds[i] = markerIds[i];
+  // for (int i = 0 ; i < links.size() ; ++i)
+  //   btkLinks[i].SetIds(links[i].first, links[i].second);
+  // btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
+  // segments->SetDefinition(id, btkPointIds, btkLinks);
   btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
-  segments->SetDefinition(id, btkPointIds, btkLinks);
+  segments->SetDefinition(id, this->mp_Model->segments().value(id)->mesh);
+  this->updateSegmentsDisplay();
+};
+
+void MultiViewWidget::setSegmentsSurfaceVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    segmentsFramesSource->SetSegmentSurfaceVisibility(ids[i], visibles[i] ? 1 : 0);
   this->updateSegmentsDisplay();
 };
 
