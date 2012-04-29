@@ -131,7 +131,7 @@ namespace btk
       for (WrenchCollection::ConstIterator it = input->Begin() ; it != input->End() ; ++it)
       {
         int numFrames = (*it)->GetForce()->GetFrameNumber();
-        Point::Pointer dirAngle = Point::New("", numFrames, Point::Angle);
+        Point::Pointer dirAngle = Point::New((*it)->GetPosition()->GetLabel() + ".DA", numFrames, Point::Angle);
         for (int i = 0 ; i < numFrames ; ++i)
         {
           if ((*it)->GetPosition()->GetResiduals().coeff(i) >= 0)

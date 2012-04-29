@@ -78,6 +78,7 @@ namespace btk
     BTK_BASICFILTERS_EXPORT virtual void GenerateData();
     
   private:
+    virtual std::string GetWrenchPrefix() const {return "FPW";};
     virtual void FinishTypeI(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
     virtual void FinishAMTI(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
     virtual void FinishKistler(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);

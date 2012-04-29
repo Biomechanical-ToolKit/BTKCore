@@ -147,7 +147,7 @@ namespace btk
           continue;
         }
         int frameNumber = (*it)->GetChannel(0)->GetFrameNumber();
-        Wrench::Pointer wrh = Wrench::New("FPW" + ToString(inc), frameNumber);
+        Wrench::Pointer wrh = Wrench::New(this->GetWrenchPrefix() + ToString(inc), frameNumber);
         output->InsertItem(wrh);
         // Residuals & masks
         wrh->GetPosition()->GetMasks().setZero(frameNumber);
