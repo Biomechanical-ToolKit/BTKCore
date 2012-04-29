@@ -3,6 +3,7 @@ SET(BTKIO_SRCS
   btkAcquisitionFileIOFactory.cpp
   btkAcquisitionFileReader.cpp
   btkAcquisitionFileWriter.cpp
+  btkASCIIFileWriter.cpp
   btkBinaryFileStream.cpp
   btkMultiSTLFileWriter.cpp
   # File formats
