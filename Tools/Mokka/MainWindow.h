@@ -109,6 +109,7 @@ public slots:
   void exportANB();
   void exportANC();
   void exportCAL();
+  void exportASCII();
   void exportSTL();
   void showPreferences();
   void selectAll();

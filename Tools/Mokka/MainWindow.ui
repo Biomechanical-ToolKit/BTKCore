@@ -138,6 +138,7 @@
      <addaction name="actionExportC3D"/>
      <addaction name="menuMotion_Analysis_Corp"/>
      <addaction name="separator"/>
+     <addaction name="actionExportASCII"/>
      <addaction name="actionExportSTL"/>
     </widget>
     <addaction name="action_FileOpen"/>
@@ -502,6 +503,11 @@
   <action name="actionExportSTL">
    <property name="text">
     <string>STL files...</string>
+   </property>
+  </action>
+  <action name="actionExportASCII">
+   <property name="text">
+    <string>ASCII/Text file...</string>
    </property>
   </action>
  </widget>

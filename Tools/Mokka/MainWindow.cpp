@@ -37,6 +37,8 @@
 #include "MainWindow.h"
 #include "About.h"
 #include "Acquisition.h"
+#include "ExportASCIIDialog.h"
+#include "ExportSTLDialog.h"
 #include "FileInfoDockWidget.h"
 #include "ImportAssistantDialog.h"
 #include "LoggerMessage.h"
@@ -47,12 +49,13 @@
 #include "UndoCommands.h"
 #include "UpdateChecker.h"
 #include "Preferences.h"
-#include "ExportSTLDialog.h"
 #include "TimeEventFunctors.h"
 #include "NewLayoutDialog.h"
 #include "UserDefined.h"
 
+#include <btkASCIIFileWriter.h>
 #include <btkMultiSTLFileWriter.h>
+#include <btkMetaDataUtils.h>
 
 #include <QFileDialog>
 #include <QFileInfo>
@@ -264,6 +267,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionExportANC, SIGNAL(triggered()), this, SLOT(exportANC()));
   connect(this->actionExportCAL, SIGNAL(triggered()), this, SLOT(exportCAL()));
   connect(this->actionExportSTL, SIGNAL(triggered()), this, SLOT(exportSTL()));
+  connect(this->actionExportASCII, SIGNAL(triggered()), this, SLOT(exportASCII()));
   connect(this->actionPreferences, SIGNAL(triggered()), this, SLOT(showPreferences()));
   connect(this->actionSelect_All, SIGNAL(triggered()), this, SLOT(selectAll()));
   connect(this->actionCopy, SIGNAL(triggered()), this, SLOT(copy()));
@@ -1289,6 +1293,165 @@ void MainWindow::exportSTL()
     }
   }
 };
+
+void MainWindow::exportASCII()
+{
+  ExportASCIIDialog exporterDlg(this);
+  exporterDlg.fillPoints(this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::MarkersItem), this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::ModelOutputsItem));
+  exporterDlg.fillForcePlates(this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::ForcePlatesItem));
+  exporterDlg.fillAnalogs(this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::AnalogsItem));
+  if (exporterDlg.exec() == QDialog::Accepted)
+  {
+    QString ext = "." + exporterDlg.suggestedExtension();
+    QString file;
+    if (this->mp_Acquisition->fileName().isEmpty())
+      file = this->m_LastDirectory + "/untitled" + ext;
+    else
+      file = this->m_LastDirectory + "/ " + QFileInfo(this->m_RecentFiles.first()).baseName() + ext;
+    QString filename = QFileDialog::getSaveFileName(this, "", file, "All Files (*)");
+    if (!filename.isEmpty())
+    {
+      bool noExportError = false;
+      
+      LOG_INFO("Exporting data to ASCII/Text file " + filename);
+      try
+      {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+        
+        int lb, rb;
+        if (exporterDlg.allFramesRadioButton->isChecked())
+        {
+          lb = this->mp_Acquisition->firstFrame();
+          rb = this->mp_Acquisition->lastFrame();
+        } 
+        else if (exporterDlg.selectedFramesRadioButton->isChecked())
+        {
+          lb = this->timeEventControler->leftBound();
+          rb = this->timeEventControler->rightBound();
+        }
+        else
+        {
+          lb = rb = this->timeEventControler->currentFrame();
+        }
+        
+        btk::Acquisition::Pointer acquisition = btk::Acquisition::New();
+        acquisition->SetFirstFrame(this->mp_Acquisition->firstFrame());
+        acquisition->SetPointFrequency(this->mp_Acquisition->pointFrequency());
+        acquisition->SetPointUnits(this->mp_Acquisition->btkAcquisition()->GetPointUnits());
+        btk::PointCollection::Pointer points = acquisition->GetPoints();
+        btk::AnalogCollection::Pointer analogs = acquisition->GetAnalogs();
+        btk::EventCollection::Pointer events = acquisition->GetEvents();
+        std::vector<int16_t> forcePlatePointsIndices;
+        // Append the data
+        if (exporterDlg.pointsTreeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked)
+        {
+          // Title: Markers, Angles, Moments, etc.
+          for (int i = 0 ; i < exporterDlg.pointsTreeWidget->topLevelItem(0)->childCount() ; ++i)
+          {
+            QTreeWidgetItem* item = exporterDlg.pointsTreeWidget->topLevelItem(0)->child(i);
+            if (item->checkState(0) != Qt::Unchecked)
+            {
+              for (int j = 0 ; j < item->childCount() ; ++j)
+              {
+                QTreeWidgetItem* child = item->child(j);
+                if ((child->checkState(0) == Qt::Checked) && !child->isHidden())
+                  points->InsertItem(this->mp_Acquisition->btkAcquisition()->GetPoint(this->mp_Acquisition->points().value(child->data(0,PointId).toInt())->btkidx));
+              }
+            }
+          }
+        }
+        if (exporterDlg.forcePlatesTreeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked)
+        {
+          int numPoints = points->GetItemNumber();
+          // Title: Force platfom reaction #i.
+          for (int i = 0 ; i < exporterDlg.forcePlatesTreeWidget->topLevelItem(0)->childCount() ; ++i)
+          {
+            QTreeWidgetItem* item = exporterDlg.forcePlatesTreeWidget->topLevelItem(0)->child(i);
+            if (item->checkState(0) != Qt::Unchecked)
+            {
+              // Only 4 child is possible
+              Q_ASSERT(item->childCount() == 4);
+              for (int j = 0 ; j < 4 ; ++j)
+              {
+                QTreeWidgetItem* child = item->child(j);
+                if ((child->checkState(0) == Qt::Checked) && !child->isHidden())
+                {
+                  int id = child->data(0, ForcePlateId).toInt();
+                  int idxFp = (id - 65535) / 4;
+                  int idxCpt = (id - 65535) % 4; 
+                  if (idxCpt < 3)
+                    points->InsertItem(this->mp_Acquisition->btkGroundReactionWrenches()->GetItem(idxFp)->GetComponent(idxCpt));
+                  else
+                    points->InsertItem(this->mp_Acquisition->btkWrenchDirectionAngles()->GetItem(idxFp));
+                  forcePlatePointsIndices.push_back(numPoints++);
+                }
+              }
+            }
+          }
+        }
+        if (exporterDlg.analogsTreeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked)
+        {
+          for (int i = 0 ; i < exporterDlg.analogsTreeWidget->topLevelItem(0)->childCount() ; ++i)
+          {
+            QTreeWidgetItem* item = exporterDlg.analogsTreeWidget->topLevelItem(0)->child(i);
+            if ((item->checkState(0) == Qt::Checked) && !item->isHidden())
+              analogs->InsertItem(this->mp_Acquisition->btkAcquisition()->GetAnalog(item->data(0,AnalogId).toInt()));
+          }
+        }
+        if (exporterDlg.writeEventsCheckBox->checkState() == Qt::Checked)
+        {
+          for (QMap<int,Event*>::const_iterator it = this->mp_Acquisition->events().begin() ; it != this->mp_Acquisition->events().end() ; ++it)
+          {
+            Event* e = it.value();
+            if ((e->frame >= lb) && (e->frame <= rb))
+            {
+              events->InsertItem(btk::Event::New(e->label.toStdString(), e->time, e->frame, e->context.toStdString(), btk::Event::Unknown,
+                                                 e->subject.toStdString(), e->description.toStdString(), e->iconId));
+            }
+          }
+        }
+        btk::MetaData::Pointer exportOptions = MetaDataCreateChild(acquisition->GetMetaData(), "BTK_ASCII_EXPORT_OPTIONS");
+        btk::MetaDataCreateChild(exportOptions, "FORCEPLATE_POINTS_SEPARATELY", forcePlatePointsIndices);
+        if (exporterDlg.writeHeaderCheckBox->checkState() == Qt::Unchecked)
+          btk::MetaDataCreateChild(exportOptions, "NO_HEADER", (int8_t)1);
+        acquisition->Resize(points->GetItemNumber(), this->mp_Acquisition->btkAcquisition()->GetPointFrameNumber(), analogs->GetItemNumber(), this->mp_Acquisition->btkAcquisition()->GetNumberAnalogSamplePerFrame());
+        
+        btk::ASCIIFileWriter::Pointer exporter = btk::ASCIIFileWriter::New();
+        exporter->SetInput(acquisition);
+        exporter->SetFilename(filename.toStdString());
+        exporter->SetSeparator(exporterDlg.choosedSeparator().toStdString());
+        exporter->SetFramesOfInterest(lb,rb);
+        exporter->Update();
+        QApplication::restoreOverrideCursor();
+        noExportError = true;
+      }
+      catch (btk::Exception& e)
+      {
+        LOG_CRITICAL(e.what());
+      }
+      catch (std::exception& e)
+      {
+        LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+      }
+      catch (...)
+      {
+        LOG_CRITICAL("Unknown error.");
+      }
+      
+      if (!noExportError)
+      {
+        QApplication::restoreOverrideCursor();
+        QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file exporting.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+        error.setWindowFlags(Qt::Sheet);
+        error.setWindowModality(Qt::WindowModal);
+#endif
+        error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
+        error.exec();
+      }
+    }
+  }
+}
 
 void MainWindow::showPreferences()
 {

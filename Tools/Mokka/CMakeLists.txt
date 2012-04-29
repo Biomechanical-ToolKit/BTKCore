@@ -25,6 +25,8 @@ SET(Mokka_CPP
   ChartImagePreview.cpp
   ChartWidget.cpp
   CompositeView.cpp
+  ExportASCIIDialog.cpp
+  ExportSTLDialog.cpp
   FileInfoDockWidget.cpp
   ImportAssistantDialog.cpp
   LoggerWidget.cpp
@@ -43,7 +45,6 @@ SET(Mokka_CPP
   NewSegmentDialog.cpp
   Preferences_Layouts.cpp
   ProgressWidget.cpp
-  ExportSTLDialog.cpp
   TimeEventBarWidget.cpp
   TimeEventControlerWidget.cpp
   TimeEventFunctors.cpp
@@ -63,6 +64,8 @@ SET(Mokka_H
   ChartImagePreview.h
   ChartWidget.h
   CompositeView.h
+  ExportASCIIDialog.h
+  ExportSTLDialog.h
   FileInfoDockWidget.h
   ImportAssistantDialog.h
   LoggerWidget.h
@@ -78,7 +81,6 @@ SET(Mokka_H
   NewSegmentDialog.h
   Preferences_Layouts.h
   ProgressWidget.h
-  ExportSTLDialog.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
   UpdateChecker.h
@@ -91,6 +93,8 @@ SET(Mokka_UI
   AbstractView.ui
   ChartExportDialog.ui
   ChartOptionsWidget.ui
+  ExportASCIIDialog.ui
+  ExportSTLDialog.ui
   FileInfoDockWidget.ui
   ImportAssistantDialog.ui
   MainWindow.ui
@@ -100,9 +104,9 @@ SET(Mokka_UI
   NewItemDialog.ui
   NewSegmentDialog.ui
   ProgressWidget.ui
-  ExportSTLDialog.ui
   TimeEventControlerWidget.ui
-  UpdateChecker.ui)
+  UpdateChecker.ui
+  )
 
 SET(Mokka_QRC
   images.qrc)
