@@ -36,6 +36,7 @@
 #include "Acquisition.h"
 #include "LoggerMessage.h"
 
+#include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileWriter.h>
 #include <btkMetaDataUtils.h>
 #include <btkMergeAcquisitionFilter.h>
@@ -133,7 +134,7 @@ bool Acquisition::exportTo(const QString& filename, const QMap<int, QVariant>& p
 bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
 {
   // Try to read the given file
-  QList<btk::AcquisitionFileReader::Pointer> readers;
+  QList<btk::Acquisition::Pointer> acquisitions;
   try
   {
     for (int i = 0 ; i < filenames.count() ; ++i)
@@ -142,7 +143,7 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
       btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
       reader->SetFilename(filenames[i].toStdString());
       reader->Update();
-      readers << reader;
+      acquisitions << reader->GetOutput();
     }
   }
   catch (btk::Exception& e)
@@ -160,10 +161,10 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
     LOG_CRITICAL("Unknown error.");
     return false;
   }
-  return this->importFrom(readers, allFramesKept);
+  return this->importFrom(acquisitions, allFramesKept);
 };
 
-bool Acquisition::importFrom(const QList<btk::AcquisitionFileReader::Pointer>& readers, bool allFramesKept)
+bool Acquisition::importFrom(const QList<btk::Acquisition::Pointer>& acquisitions, bool allFramesKept)
 {
   // Check if the original acquisition need to be cropped
   if (this->mp_BTKAcquisition)
@@ -189,8 +190,8 @@ bool Acquisition::importFrom(const QList<btk::AcquisitionFileReader::Pointer>& r
   btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
   merger->SetFirstFrameRule(allFramesKept ? btk::MergeAcquisitionFilter::KeepAllFrames : btk::MergeAcquisitionFilter::KeepFromHighestFirstFrame);
   merger->SetInput(0, this->mp_BTKAcquisition);
-  for (int i = 0 ; i < readers.count() ; ++i)
-    merger->SetInput(i+shift, readers[i]->GetOutput());
+  for (int i = 0 ; i < acquisitions.count() ; ++i)
+    merger->SetInput(i+shift, acquisitions[i]);
   merger->Update();
   this->clear();
   this->mp_BTKAcquisition = merger->GetOutput();
@@ -222,14 +223,15 @@ bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, co
 bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io, bool fromOpenAction)
 {
   // Try to read the given file
-  QList<btk::AcquisitionFileReader::Pointer> readers;
+  QList<btk::Acquisition::Pointer> acquisitions;
+  btk::AcquisitionFileReader::Pointer reader;
   try
   {
-    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader = btk::AcquisitionFileReader::New();
     reader->SetAcquisitionIO(io);
     reader->SetFilename(filename.toStdString());
     reader->Update();
-    readers << reader;
+    acquisitions << reader->GetOutput();
   }
   catch (btk::Exception& e)
   {
@@ -246,13 +248,31 @@ bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, bt
     LOG_CRITICAL("Unknown error.");
     return false;
   }
-  bool res = this->importFrom(readers, allFramesKept);
+  bool res = this->importFrom(acquisitions, allFramesKept);
   if (fromOpenAction)
   {
     this->m_Filename = filename;
-    this->emitGeneratedInformations(readers[0]->GetAcquisitionIO());
+    this->emitGeneratedInformations(reader->GetAcquisitionIO());
   }
   return res;
+};
+
+bool Acquisition::importFromVideos(const QStringList& paths, bool allFramesKept, int ff, double freq, double duration)
+{
+  btk::Acquisition::Pointer acq = btk::Acquisition::New();
+  acq->Init(0,static_cast<int>(freq * duration));
+  acq->SetFirstFrame(ff);
+  acq->SetPointFrequency(freq);
+  btk::MetaData::Pointer point = btk::MetaDataCreateChild(acq->GetMetaData(), "POINT");
+  std::vector<std::string> moveFilenames(paths.size());
+  for (int i = 0 ; i < static_cast<int>(paths.size()) ; ++i)
+    moveFilenames[i] = paths[i].toStdString();
+  btk::MetaDataCreateChild(point, "MOVIE_FILENAME", moveFilenames);
+  
+  QList<btk::Acquisition::Pointer> acquisitions;
+  acquisitions << acq;
+  
+  return this->importFrom(acquisitions, allFramesKept);
 };
 
 void Acquisition::clear()
@@ -1185,23 +1205,36 @@ void Acquisition::loadAcquisition()
         QString str = QString::fromStdString(*it);
         str = str.trimmed();
         // Look if the video file exists
-        QFileInfo fI = QFileInfo(this->m_Filename);
-        QDir dir = QDir(fI.canonicalPath());
-        QStringList videoList = dir.entryList(QStringList() << str, QDir::Files | QDir::Readable);
         QString filename, path;
-        bool error = false;
-        if (videoList.isEmpty())
+        bool videoFileFound = false;
+        QFileInfo fI = QFileInfo(this->m_Filename);
+        // - Global path
+        QFileInfo fIg = QFileInfo(str);
+        if (fIg.exists())
         {
-          LOG_WARNING("No video file found with the name " +  str + ". You need to put the video files in the same folder than the acquisition.");
-          filename = str;
-          error = true;
+          filename = fIg.fileName();
+          path = fIg.path();
+          videoFileFound = true;
         }
-        else
+        // - Relative path
+        if (!videoFileFound)
         {
-          if (videoList.size() > 1)
-            LOG_WARNING("More than one file was found with this video name. Only the first one is loaded.");
-          filename = videoList.at(0);
-          path = fI.canonicalPath();
+          QDir dir = QDir(fI.canonicalPath());
+          QStringList videoList = dir.entryList(QStringList() << str, QDir::Files | QDir::Readable);
+          
+          if (videoList.isEmpty())
+          {
+            LOG_WARNING("No video file found with the name " +  str + ". You need to put the video files in the same folder than the acquisition.");
+            filename = str;
+          }
+          else
+          {
+            if (videoList.size() > 1)
+              LOG_WARNING("More than one file was found with this video name. Only the first one is loaded.");
+            filename = videoList.at(0);
+            path = fI.canonicalPath();
+            videoFileFound = true;
+          }
         }
         // Set the new video
         Video* m = new Video();
@@ -1214,7 +1247,7 @@ void Acquisition::loadAcquisition()
         m->filename = filename;
         m->path = path;
         m->delay = static_cast<qint64>(movieDelay[inc] * 1000); // ms.
-        m->error = error;
+        m->error = !videoFileFound;
         this->m_Videos.insert(inc, m);
       }
     }

@@ -152,7 +152,6 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ActionSeparatorRecentFiles = this->menuOpen_Recent->addSeparator();
   this->menuOpen_Recent->addAction(this->actionClear_Menu);
   connect(this->actionClear_Menu, SIGNAL(triggered()), this, SLOT(clearRecentFiles()));
-  this->actionImportVideo->setEnabled(false); // Only enabled when an acquisition is opened or imported.
   this->mp_ActionSeparatorUserLayouts = this->menuLayouts->addSeparator();
   QActionGroup* layoutActionGroup = new QActionGroup(this);
   layoutActionGroup->addAction(this->actionLayout3DOnly);
@@ -891,7 +890,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->timeEventControler->load();
   this->mp_MetadataDlg->load(this->mp_Acquisition->btkAcquisition()->GetMetaData());
   this->mp_ModelDock->load();
-  if (this->mp_Acquisition->hasPoints() || this->mp_Acquisition->hasAnalogs())
+  if (this->mp_Acquisition->hasPoints() || this->mp_Acquisition->hasAnalogs() || this->mp_Acquisition->hasVideos())
     this->mp_ModelDock->setVisible(true);
   if (this->mp_ModelDock->currentConfigurationIndex() == -1) // No configuration loaded
   {
@@ -911,7 +910,6 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionClose->setEnabled(true);
   this->actionViewMetadata->setEnabled(true);
   this->actionSave_As->setEnabled(true);
-  this->actionImportVideo->setEnabled(true);
   this->menuExport->menuAction()->setEnabled(true);
 };
 
@@ -1007,15 +1005,7 @@ void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFra
   {
     if (this->mp_ImportAssistant->newAcquisitionRadioButton->isChecked())
       this->mp_Acquisition->clear();
-    if (this->mp_ImportAssistant->stackedWidget->currentWidget() != this->mp_ImportAssistant->amtiPage)
-    {
-      if (this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked()))
-      {
-        QSettings settings;
-        settings.setValue("ImportAssistant/lastAcquisitionSystem", this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
-      }
-    }
-    else
+    if (this->mp_ImportAssistant->stackedWidget->currentWidget() == this->mp_ImportAssistant->amtiPage)
     {
       QStringList filenames = this->mp_ImportAssistant->filenames();
       if (!filenames.isEmpty())
@@ -1041,6 +1031,43 @@ void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFra
         this->setWindowModified(true);
         this->actionSave->setEnabled(true);
         this->m_LastDirectory = QFileInfo(filenames.last()).absolutePath();
+      }
+    }
+    else if (this->mp_ImportAssistant->stackedWidget->currentWidget() == this->mp_ImportAssistant->videoPage)
+    {
+      QStringList filenames = this->mp_ImportAssistant->filenames();
+      if (!filenames.isEmpty())
+      {
+        LOG_INFO(tr("Importing videos."));
+        QSettings settings;
+        QString title = this->windowTitle();
+        ProgressWidget pw(this);
+        pw.show();
+        pw.setProgressValue(10);
+        
+        bool allFramesKept = this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked();
+        int ff = this->mp_ImportAssistant->videoFirstFrameSpinBox->value();
+        double freq = static_cast<double>(this->mp_ImportAssistant->videoFrequencySpinBox->value());
+        double duration = this->mp_ImportAssistant->videoDurationDoubleSpinBox->value();
+        bool noImportError = this->mp_Acquisition->importFromVideos(filenames, allFramesKept, ff, freq, duration);
+        
+        this->loadAcquisition(noImportError, &pw);
+        this->setWindowTitle(title);
+        pw.hide();
+        if (!noImportError)
+          return;
+        settings.setValue("ImportAssistant/lastAcquisitionSystem", this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
+        this->setWindowModified(true);
+        this->actionSave->setEnabled(true);
+        this->m_LastDirectory = QFileInfo(filenames.last()).absolutePath();
+      }
+    }
+    else
+    {
+      if (this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked()))
+      {
+        QSettings settings;
+        settings.setValue("ImportAssistant/lastAcquisitionSystem", this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
       }
     }
   }
@@ -1212,19 +1239,30 @@ bool MainWindow::importAcquisitions(const QStringList& filenames, bool allFrames
 
 void MainWindow::importVideos()
 {
-  QStringList filenames = QFileDialog::getOpenFileNames(this, "",
-                            this->m_LastDirectory,
-                            tr("Video Files (*.avi *.mov *.mpeg *.mpg *.ogg *.wmv);;"
-                               "All Files (*);;"
-                               "AVI Files (*.avi);;"
-                               "MOV Files (*.mov);;"
-                               "MPEG Files (*.mpeg *.mpg);;"
-                               "OGG Files (*.ogg);;"
-                               "WMV Files (*.wmv)"));
-  if (!filenames.isEmpty())
+  if (!this->mp_Acquisition->btkAcquisition())
   {
-    this->mp_Acquisition->importVideos(filenames);
-    this->setWindowModified(true);
+    this->mp_ImportAssistant->clear(this->m_LastDirectory);
+    this->mp_ImportAssistant->newAcquisitionRadioButton->setChecked(true);
+    this->mp_ImportAssistant->keepAllFrameRadioButton->setChecked(true);
+    this->mp_ImportAssistant->importOptionFrame->setVisible(false);
+    this->importAssistant(this->mp_ImportAssistant->stackedWidget->indexOf(this->mp_ImportAssistant->videoPage)-1, true, true);
+  }
+  else
+  {  
+    QStringList filenames = QFileDialog::getOpenFileNames(this, "",
+                              this->m_LastDirectory,
+                              tr("Video Files (*.avi *.mov *.mpeg *.mpg *.ogg *.wmv);;"
+                                 "All Files (*);;"
+                                 "AVI Files (*.avi);;"
+                                 "MOV Files (*.mov);;"
+                                 "MPEG Files (*.mpeg *.mpg);;"
+                                 "OGG Files (*.ogg);;"
+                                 "WMV Files (*.wmv)"));
+    if (!filenames.isEmpty())
+    {
+      this->mp_Acquisition->importVideos(filenames);
+      this->setWindowModified(true);
+    }
   }
 };
 
@@ -1530,7 +1568,6 @@ void MainWindow::reset()
   this->actionViewMetadata->setEnabled(false);
   this->actionSave->setEnabled(false);
   this->actionSave_As->setEnabled(false);
-  this->actionImportVideo->setEnabled(false);
   this->menuExport->menuAction()->setEnabled(false);
   this->setCurrentFile("");
   // Model dock

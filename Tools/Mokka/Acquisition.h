@@ -45,7 +45,6 @@
 #include <btkPointCollection.h>
 #include <btkForcePlatformCollection.h>
 #include <btkWrenchCollection.h>
-#include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileIO.h>
 #include <btkAMTIForcePlatformFileIO.h> // Special case for AMTI files
 #include <btkWrenchDirectionAngleFilter.h>
@@ -116,6 +115,7 @@ public:
   bool importFrom(const QStringList& filenames, bool allFramesKept = true);
   bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions, bool fromOpenAction = false);
   bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin, bool fromOpenAction = false);
+  bool importFromVideos(const QStringList& paths, bool allFramesKept, int ff, double freq, double duration);
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
@@ -198,6 +198,8 @@ public:
   void insertEvents(const QList<int>& ids, const QList<Event*> events);
   int generateNewEventId();
   
+  bool hasVideos() const {return !this->m_Videos.empty();};
+  int videosCount() const {return this->m_Videos.count();};
   const QMap<int, Video*>& videos() const {return this->m_Videos;};
   const QString& videoLabel(int id) const {return this->m_Videos[id]->label;};
   const QString& videoFilename(int id) const {return this->m_Videos[id]->filename;};
@@ -245,7 +247,7 @@ private:
   bool write(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb, bool updateInfo = false);
   void loadAcquisition();
   void extractVideos(const std::vector<std::string>& filename, std::vector<double>& delays, bool completeFilename = true);
-  bool importFrom(const QList<btk::AcquisitionFileReader::Pointer>& readers, bool allFramesKept);
+  bool importFrom(const QList<btk::Acquisition::Pointer>& readers, bool allFramesKept);
   bool importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io, bool fromOpenAction);
   
   enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED, BTK_DIRECTION_ANGLES};
