@@ -429,9 +429,9 @@ CXXTEST_SUITE(C3DFileWriterTest)
     reader->SetFilename(C3DFilePathOUT + "sample01_Eb015vr_clearAll.c3d");
     reader->Update();
     acq = reader->GetOutput();
-    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 0);
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 50.0);
     TS_ASSERT_EQUALS(acq->GetPointNumber(), 0);
-    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 0);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 200.0);
     TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 0);
     TS_ASSERT_EQUALS(acq->GetEventNumber(), 0);
 
