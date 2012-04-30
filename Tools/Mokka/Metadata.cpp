@@ -42,6 +42,8 @@ Metadata::Metadata(QWidget* parent)
 {
   this->setupUi(this);
 #ifdef Q_OS_MAC
+  this->layout()->setContentsMargins(12,12,12,9);
+  this->layout()->setSpacing(9);
   this->treeView->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
   this->warningIconLabel->setVisible(false);
