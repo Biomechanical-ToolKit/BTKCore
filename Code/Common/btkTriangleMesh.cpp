@@ -85,9 +85,14 @@ namespace btk
     
   /**
    * @fn TriangleMesh::Pointer TriangleMesh::New(const std::list<int>& m, const std::list<TriangleMesh::VertexLink>& l)
-   * Creates a smart pointer from the TriangleMesh(const std::list<int>& m, const std::list<TriangleMesh::VertexLink>& l) constructor.
+   * Creates a smart pointer to a TriangleMesh object.
    */
    
+  /**
+   * @fn TriangleMesh::Pointer TriangleMesh::New(const std::list<int>& m, const std::list<TriangleMesh::VertexLink>& l, const std::list<TriangleMesh::VertexFace>& f)
+   * Creates a smart pointer to a TriangleMesh object.
+   */
+    
   /**
    * @fn TriangleMesh::VertexIterator TriangleMesh::BeginVertex()
    * Returns an iterator to the beginning of the list of vertices.
@@ -225,60 +230,18 @@ namespace btk
    */
   
   /**
-   * Constructor. Build the vertices, edges and faces, from the set of IDs @a m and the set of link @a l.
+   * Constructor. Build the vertices, edges and faces, from the set of IDs @a m and the set of links @a l.
    * If one of the given link contains a wrong ID (out of range), then, it is not added to the list of edges.
+   *
+   * @warning This method can create non-manifold mesh!
    */
   TriangleMesh::TriangleMesh(const std::vector<int>& m, const std::vector<VertexLink>& l)
   : m_Vertices(m.size()), m_Edges(l.size()), m_Faces(), mp_Points()
   {
     this->m_CurrentFrame = -1;
     
-    // Build vertices
-    for (size_t i = 0 ; i < this->m_Vertices.size() ; ++i)
-    {
-      this->m_Vertices[i].m_Id = m[i];
-      this->m_Vertices[i].m_RelativeId = static_cast<int>(i);
-      this->m_Vertices[i].mp_CurrentFrame = &(this->m_CurrentFrame);
-    }
-    // Build edges
-    int validEdge = 0;
-    for (size_t i = 0 ; i < l.size() ; ++i)
-    {
-      int id1 = -1;
-      for (size_t j = 0 ; j < m.size() ; ++j)
-      {
-        if (l[i].GetIds()[0] == m[j])
-        {
-          id1 = (int)j;
-          break;
-        }
-      }
-      if (id1 == -1)
-      {
-        btkErrorMacro("The link #" + ToString(i+1) + " uses a first point which is not listed (unknown ID). The link is removed.");
-        continue;
-      }
-      int id2 = -1;
-      for (size_t j = 0 ; j < m.size() ; ++j)
-      {
-        if (l[i].GetIds()[1] == m[j])
-        {
-          id2 = (int)j;
-          break;
-        }
-      }
-      if (id2 == -1)
-      {
-        btkErrorMacro("The link #" + ToString(i+1) + " uses a second point which is not listed (unknown ID). The link is removed.");
-        continue;
-      }
-      Edge edge;
-      edge.mp_Vertices[0] = &this->m_Vertices[id1];
-      edge.mp_Vertices[1] = &this->m_Vertices[id2];
-      this->m_Edges[validEdge] = edge;
-      ++validEdge;
-    }
-    this->m_Edges.resize(validEdge);
+    this->SetGeometryPartially(m,l);
+    
     // Build faces
     // - List the connectivity of each vertex
     std::vector< std::list<int> > connectivity(this->m_Vertices.size());
@@ -323,6 +286,98 @@ namespace btk
     }
   };
   
+  /**
+   * Constructor. Build the vertices, edges and faces, from the set of IDs @a m, the set of links @a l and the set of faces @a f.
+   * If one of the given link or face contains a wrong ID (out of range), then, it is not added.
+   */
+  TriangleMesh::TriangleMesh(const std::vector<int>& m, const std::vector<VertexLink>& l, const std::vector<VertexFace>& f)
+  : m_Vertices(m.size()), m_Edges(l.size()), m_Faces(f.size()), mp_Points()
+  {
+    this->m_CurrentFrame = -1;
+    
+    this->SetGeometryPartially(m,l);
+    
+    // Build faces
+    int validFace = 0;
+    for (size_t i = 0 ; i < f.size() ; ++i)
+    {
+      int pos1 = this->FindVertex(f[i].GetIds()[0]);
+      if (pos1 == -1)
+      {
+        btkErrorMacro("The face #" + ToString(i+1) + " uses a first point which is not listed (unknown ID). The face is removed.");
+        continue;
+      }
+      int pos2 = this->FindVertex(f[i].GetIds()[1]);
+      if (pos2 == -1)
+      {
+        btkErrorMacro("The face #" + ToString(i+1) + " uses a second point which is not listed (unknown ID). The face is removed.");
+        continue;
+      }
+      int pos3 = this->FindVertex(f[i].GetIds()[2]);
+      if (pos3 == -1)
+      {
+        btkErrorMacro("The face #" + ToString(i+1) + " uses a third point which is not listed (unknown ID). The face is removed.");
+        continue;
+      }
+      Face face;
+      face.mp_Vertices[0] = &this->m_Vertices[pos1];
+      face.mp_Vertices[1] = &this->m_Vertices[pos2];
+      face.mp_Vertices[2] = &this->m_Vertices[pos3];
+      this->m_Faces[validFace] = face;
+      ++validFace;
+    }
+    this->m_Faces.resize(validFace);
+  }
+  
+  void TriangleMesh::SetGeometryPartially(const std::vector<int>& m, const std::vector<VertexLink>& l)
+  {
+    // Build vertices
+    for (size_t i = 0 ; i < this->m_Vertices.size() ; ++i)
+    {
+      this->m_Vertices[i].m_Id = m[i];
+      this->m_Vertices[i].m_RelativeId = static_cast<int>(i);
+      this->m_Vertices[i].mp_CurrentFrame = &(this->m_CurrentFrame);
+    }
+    
+    // Build edges
+    int validEdge = 0;
+    for (size_t i = 0 ; i < l.size() ; ++i)
+    {
+      int pos1 = this->FindVertex(l[i].GetIds()[0]);
+      if (pos1 == -1)
+      {
+        btkErrorMacro("The link #" + ToString(i+1) + " uses a first point which is not listed (unknown ID). The link is removed.");
+        continue;
+      }
+      int pos2 = this->FindVertex(l[i].GetIds()[1]);
+      if (pos2 == -1)
+      {
+        btkErrorMacro("The link #" + ToString(i+1) + " uses a second point which is not listed (unknown ID). The link is removed.");
+        continue;
+      }
+      Edge edge;
+      edge.mp_Vertices[0] = &this->m_Vertices[pos1];
+      edge.mp_Vertices[1] = &this->m_Vertices[pos2];
+      this->m_Edges[validEdge] = edge;
+      ++validEdge;
+    }
+    this->m_Edges.resize(validEdge);
+  };
+  
+  int TriangleMesh::FindVertex(int vid)
+  {
+    int pos = -1;
+    for (size_t i = 0 ; i < this->m_Vertices.size() ; ++i)
+    {
+      if (vid == this->m_Vertices[i].m_Id)
+      {
+        pos = this->m_Vertices[i].m_RelativeId;
+        break;
+      }
+    }
+    return pos;
+  };
+  
   // ----------------------------- VertexLink ------------------------------ //
   
   /**
@@ -337,7 +392,7 @@ namespace btk
   
   /**
    * @fn const int* TriangleMesh::VertexLink::GetIds() const
-   * Returns the IDs as an array of two integer.
+   * Returns the IDs as an array of two integers.
    */
   
   /**
@@ -345,6 +400,28 @@ namespace btk
    * Sets the IDs.
    */
   
+  // ----------------------------- VertexFace ------------------------------ //
+  
+  /**
+   * @class TriangleMesh::VertexFace btkTriangleMesh.h
+   * Store three marker's IDs to create a face.
+   */
+  
+  /**
+   * @fn TriangleMesh::VertexFace::VertexFace(int id1 = -1, int id2 = -1, int id3 = -1)
+   * Constructor. The given IDs correspond to markers' IDs which will be used as vertices.
+   */
+  
+  /**
+   * @fn const int* TriangleMesh::VertexFace::GetIds() const
+   * Returns the IDs as an array of three integers.
+   */
+  
+  /**
+   * @fn void TriangleMesh::VertexFace::SetIds(int id1, int id2, int id3)
+   * Sets the IDs.
+   */
+   
   // ------------------------------- Vertex -------------------------------- //
   
   /**

@@ -61,6 +61,17 @@ namespace btk
       int m_Ids[2];
     };
     
+    class VertexFace
+    {
+    public:
+      VertexFace(int id1 = -1, int id2 = -1, int id3 = -1) {this->m_Ids[0] = id1; this->m_Ids[1] = id2; this->m_Ids[2] = id3;};
+      const int* GetIds() const {return this->m_Ids;};
+      void SetIds(int id1, int id2, int id3) {this->m_Ids[0] = id1; this->m_Ids[1] = id2; this->m_Ids[2] = id3;};
+      friend bool operator== (const VertexFace& lhs, const VertexFace& rhs) {return (lhs.m_Ids[0] == rhs.m_Ids[0]) && (lhs.m_Ids[1] == rhs.m_Ids[1]) && (lhs.m_Ids[2] == rhs.m_Ids[2]);};
+    private:
+      int m_Ids[3];
+    };
+    
     class Vertex
     {
     public:
@@ -112,6 +123,7 @@ namespace btk
     typedef std::vector<Face>::const_iterator FaceConstIterator;
     
     static Pointer New(const std::vector<int>& m, const std::vector<VertexLink>& l) {return Pointer(new TriangleMesh(m,l));};
+    static Pointer New(const std::vector<int>& m, const std::vector<VertexLink>& l, const std::vector<VertexFace>& f) {return Pointer(new TriangleMesh(m,l,f));};
     
     // ~TriangleMesh(); // Implicit.
     
@@ -142,8 +154,12 @@ namespace btk
     
   protected:
     BTK_COMMON_EXPORT TriangleMesh(const std::vector<int>& m, const std::vector<VertexLink>& l);
+    BTK_COMMON_EXPORT TriangleMesh(const std::vector<int>& m, const std::vector<VertexLink>& l, const std::vector<VertexFace>& f);
     
   private:
+    void SetGeometryPartially(const std::vector<int>& m, const std::vector<VertexLink>& l);
+    int FindVertex(int vid);
+    
     TriangleMesh(const TriangleMesh& ); // Not implemented.
     TriangleMesh& operator=(const TriangleMesh& ); // Not implemented.
     
