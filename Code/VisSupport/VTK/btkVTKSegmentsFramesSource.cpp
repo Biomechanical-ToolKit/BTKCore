@@ -136,28 +136,54 @@ namespace btk
     this->m_Definitions.clear();
     this->mp_VisibleSegments->Initialize(); // Freed the allocated memory
     this->mp_SegmentsColorIndex->Initialize(); // Freed the allocated memory
-    //this->Modified();
   };
   
   /**
-   * Create a new segment and append it to the list.
+   * Create a new segment, append it to the list and returns its ID.
    */
-  void VTKSegmentsFramesSource::AppendDefinition(const std::vector<int>& markerIds, const std::vector<Link>& links, bool surfaceVisible)
+  int VTKSegmentsFramesSource::AppendDefinition(const std::vector<int>& markerIds, const std::vector<Link>& links,  const std::vector<Face>& faces, bool surfaceVisible)
+  {
+    this->m_Definitions.push_back(SegmentDefinition(markerIds, links, faces, surfaceVisible));
+    this->mp_VisibleSegments->InsertNextValue(1); // Set as visible
+    this->mp_SegmentsColorIndex->InsertNextValue(0); // Insert default color
+    return this->mp_VisibleSegments->GetNumberOfTuples()-1;
+  };
+  
+  /**
+   * Create a new segment (only from vertices and links, faces are created automatically), append it to the list and returns its ID.
+   */
+  int VTKSegmentsFramesSource::AppendDefinition(const std::vector<int>& markerIds, const std::vector<Link>& links, bool surfaceVisible)
   {
     this->m_Definitions.push_back(SegmentDefinition(markerIds, links, surfaceVisible));
     this->mp_VisibleSegments->InsertNextValue(1); // Set as visible
     this->mp_SegmentsColorIndex->InsertNextValue(0); // Insert default color
-    //this->Modified();
+    return this->mp_VisibleSegments->GetNumberOfTuples()-1;
   };
   
   /**
-   * Create a new segment using an already existing mesh and append it to the list.
+   * Create a new segment using an already existing mesh, append it to the list and returns its ID.
    */
-  void VTKSegmentsFramesSource::AppendDefinition(TriangleMesh::Pointer mesh, bool surfaceVisible)
+  int VTKSegmentsFramesSource::AppendDefinition(TriangleMesh::Pointer mesh, bool surfaceVisible)
   {
     this->m_Definitions.push_back(SegmentDefinition(mesh, surfaceVisible));
     this->mp_VisibleSegments->InsertNextValue(1); // Set as visible
     this->mp_SegmentsColorIndex->InsertNextValue(0); // Insert default color
+    return this->mp_VisibleSegments->GetNumberOfTuples()-1;
+  };
+  
+  /**
+   * Sets the definition (markers + links + faces) for the segment with the index @a id. The segment must already exists.
+   */
+  void VTKSegmentsFramesSource::SetDefinition(vtkIdType id, const std::vector<int>& markerIds, const std::vector<Link>& links, const std::vector<Face>& faces)
+  {
+    if (id >= this->mp_VisibleSegments->GetNumberOfTuples())
+    {
+      vtkErrorMacro("Out of range.");
+      return;
+    }
+    std::list<SegmentDefinition>::iterator it = this->m_Definitions.begin();
+    std::advance(it, id);
+    it->mesh->SetDefinition(markerIds, links, faces);
   };
   
   /**
@@ -172,8 +198,7 @@ namespace btk
     }
     std::list<SegmentDefinition>::iterator it = this->m_Definitions.begin();
     std::advance(it, id);
-    *it = SegmentDefinition(markerIds, links, it->surfaceEnabled);
-    //this->Modified();
+    it->mesh->SetDefinition(markerIds, links);
   };
   
   /**
@@ -188,7 +213,7 @@ namespace btk
     }
     std::list<SegmentDefinition>::iterator it = this->m_Definitions.begin();
     std::advance(it, id);
-    *it = SegmentDefinition(mesh, it->surfaceEnabled);
+    it->mesh = mesh;
   };
   
   /**
@@ -515,7 +540,7 @@ namespace btk
         ++segmentIndex;
         continue;
       }
-      itS->mesh->SetCurrentFrame(frameIndex);
+      itS->mesh->SetCurrentFrameIndex(frameIndex);
       int markerIndex = 0;
       // Set points
       std::vector<int> idPts = std::vector<int>(itS->mesh->GetVertexNumber(), 0);
@@ -611,6 +636,12 @@ namespace btk
   {
     this->surfaceEnabled = visible;
   }; 
+  
+  VTKSegmentsFramesSource::SegmentDefinition::SegmentDefinition(const std::vector<int>& m, const std::vector<Link>& l, const std::vector<Face>& f, bool visible)
+  : mesh(TriangleMesh::New(m,l,f))
+  {
+    this->surfaceEnabled = visible;
+  };
   
   VTKSegmentsFramesSource::SegmentDefinition::SegmentDefinition(const std::vector<int>& m, const std::vector<Link>& l, bool visible)
   : mesh(TriangleMesh::New(m,l))
