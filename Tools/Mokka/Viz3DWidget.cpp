@@ -307,6 +307,11 @@ void Viz3DWidget::setOrthogonalView(int view)
   this->GetRenderWindow()->Render();
 }
 
+void Viz3DWidget::setGlobalFrameVisible(bool visible)
+{
+  this->mp_AxesWidget->SetEnabled(visible ? 1 : 0);
+};
+
 void Viz3DWidget::copy(Viz3DWidget* source)
 {
   // Clean the 3D view
@@ -364,7 +369,8 @@ void Viz3DWidget::toggleTrajectoryMarker(vtkObject* /* caller */, unsigned long 
 
 void Viz3DWidget::render()
 {
-  this->GetRenderWindow()->Render();
+  if (this->updatesEnabled())
+    this->GetRenderWindow()->Render();
 };
 
 void Viz3DWidget::show(bool s)

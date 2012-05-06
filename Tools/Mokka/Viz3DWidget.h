@@ -45,8 +45,6 @@
 #include <QList>
 
 class Acquisition;
-class vtkStreamingDemandDrivenPipelineCollection;
-class vtkProcessMap;
 
 class Viz3DWidget : public QVTKWidget
 {
@@ -65,6 +63,8 @@ public:
   void saveProjectionCameraConfiguration();
   void copyProjectionCameraConfiguration(Viz3DWidget* source);
   void setOrthogonalView(int view);
+  
+  void setGlobalFrameVisible(bool visible);
   
   void copy(Viz3DWidget* source);
   
