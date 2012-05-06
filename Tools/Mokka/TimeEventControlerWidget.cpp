@@ -292,6 +292,8 @@ void TimeEventControlerWidget::togglePlayback()
 
 void TimeEventControlerWidget::startPlayback()
 {
+  if (this->mp_Timer->isActive())
+    return;
   disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   disconnect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
@@ -311,6 +313,8 @@ void TimeEventControlerWidget::startPlayback()
 
 void TimeEventControlerWidget::stopPlayback()
 {
+  if (!this->mp_Timer->isActive())
+    return;
   this->mp_Timer->stop();
   this->playButton->setIcon(*this->mp_PlayIcon);
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
