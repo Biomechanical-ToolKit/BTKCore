@@ -274,6 +274,7 @@ namespace btk
     this->mp_GRFsComponents->clear();
     for (size_t i = 0 ; i < this->mp_GRFsPathIds->size() ; ++i)
       this->mp_GRFsPathIds->operator[](i)->Delete();
+    this->mp_GRFsPathIds->clear();
     this->mp_ButterflyCache->Initialize();
     this->m_LastCachedFrame = -1;
     // Compute the force vectors geometry

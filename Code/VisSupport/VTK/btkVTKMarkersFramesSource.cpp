@@ -509,9 +509,9 @@ namespace btk
     for (int i = 0 ; i < this->GetNumberOfInputPorts() ; ++i)
     {
       vtkInformation* inInfo = inputVector[i]->GetInformationObject(0);
-      VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-      if (!inObject)
+      if (!inInfo)
         continue;
+      VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
       if (inObject->GetMTime() > this->GetMTime())
         needUpdate = true;
       PointCollection::Pointer in = static_pointer_cast<PointCollection>(inObject->GetBTKDataObject());
