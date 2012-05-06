@@ -108,6 +108,8 @@ public:
   Acquisition(QObject* parent = 0);
   ~Acquisition();
   
+  void supportedReadFileFormats(QStringList& formats);
+  void supportedWrittenFileFormats(QStringList& formats);
   bool load(const QString& filename);
   bool save(const QString& filename, const QMap<int, QVariant>& properties);
   bool canBeSaved(const QString& filename);

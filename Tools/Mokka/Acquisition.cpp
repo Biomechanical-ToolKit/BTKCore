@@ -84,6 +84,30 @@ Acquisition::~Acquisition()
   this->clear();
 };
 
+void Acquisition::supportedReadFileFormats(QStringList& formats)
+{
+  btk::AcquisitionFileIO::Extensions exts = btk::AcquisitionFileIOFactory::GetSupportedReadExtensions();
+  for(btk::AcquisitionFileIO::Extensions::ConstIterator it = exts.Begin() ; it != exts.End() ; ++it)
+  {
+    QString qstr = QString::fromStdString(it->name);
+    if (!it->desc.empty())
+      qstr += " " + QString::fromStdString(it->desc);
+    formats.append(qstr);
+  }
+};
+
+void Acquisition::supportedWrittenFileFormats(QStringList& formats)
+{
+  btk::AcquisitionFileIO::Extensions exts = btk::AcquisitionFileIOFactory::GetSupportedWrittenExtensions();
+  for(btk::AcquisitionFileIO::Extensions::ConstIterator it = exts.Begin() ; it != exts.End() ; ++it)
+  {
+    QString qstr = QString::fromStdString(it->name);
+    if (!it->desc.empty())
+      qstr += " " + QString::fromStdString(it->desc);
+    formats.append(qstr);
+  }
+};
+
 bool Acquisition::load(const QString& filename)
 {
   btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();

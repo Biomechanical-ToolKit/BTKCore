@@ -787,27 +787,20 @@ void MainWindow::openFile()
 {
   if (this->isOkToContinue())
   {
+    QStringList formats;
+    this->mp_Acquisition->supportedReadFileFormats(formats);
+    QString allFormat, byFormat;
+    foreach(const QString& str, formats)
+    {
+      QString ext = "*." + str.split(" ")[0].toLower();
+      allFormat +=  (!allFormat.isEmpty() ? " " : "") + ext;
+      byFormat += (!byFormat.isEmpty() ? ";;" : "") + str + " (" + ext + ")";
+    }
+    allFormat = "Acquisition Files (" + allFormat + ");;";
+    
     QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
-                         tr("Acquisition Files (*.anb *.anc *.ang *.asc *.c3d *.emf *.gr* *.mom *.pwr *.rah *.raw *.ric *rif *tdf *.trb *.trc *.xls);;"
-                            "AMTI Files (*.asc);;"
-                            "ANB Files (*.anb);;"
-                            "ANC Files (*.anc);;"
-                            "ANG Files (*.ang);;"
-                            "C3D Files (*.c3d);;"
-                            "EMF Ascension Files (*.emf);;"
-                            "EMG Files (*.emg);;"
-                            "GR* Files (*.gr*);;"
-                            "MOM Files (*.mom);;"
-                            "PWR Files (*.pwr);;"
-                            "RAH Files (*.rah);;"
-                            "RAW Files (*.raw);;"
-                            "RIC Files (*.ric);;"
-                            "RIF Files (*.rif);;"
-                            "TDF Files (*.tdf);;"
-                            "TRB Files (*.trb);;"
-                            "TRC Files (*.trc);;"
-                            "XLS OrthoTrak Files (*.xls)"));
+                         allFormat + byFormat);
     if (!filename.isEmpty())
       this->openFile(filename);
   }
@@ -927,6 +920,7 @@ void MainWindow::saveFile()
 
 void MainWindow::saveAsFile()
 {
+  // Generate the filename and the selected filter
   QString file;
   if (this->mp_Acquisition->fileName().isEmpty())
     file = this->m_LastDirectory + "/untitled.c3d";
@@ -939,12 +933,20 @@ void MainWindow::saveAsFile()
     suffix = "C3D";
   }
   QString selectedFilter = suffix + " Files (*." + suffix.toLower() + ")";
+  // Generate all the filters
+  QStringList formats;
+  this->mp_Acquisition->supportedWrittenFileFormats(formats);
+  QString byFormat;
+  foreach(const QString& str, formats)
+  {
+    QString ext = "*." + str.split(" ")[0].toLower();
+    byFormat += (!byFormat.isEmpty() ? ";;" : "") + str + " (" + ext + ")";
+  }
+  
+  // Dialog box
   QString filename = QFileDialog::getSaveFileName(this, "",
                        file,
-                       tr("ANB Files (*.anb);;"
-                          "ANC Files (*.anc);;"
-                          "C3D Files (*.c3d);;"
-                          "TRC Files (*.trc)"),
+                       byFormat,
                        &selectedFilter);
   if (!filename.isEmpty())
     this->saveFile(filename);
