@@ -46,8 +46,8 @@ namespace btk
    * and incrementing (for example: LABELS, LABELS2, LABELS3). The entries'
    * values are stored in @a target.
    *
-   * The input @a targetFinalSize can be used to fox the number of values 
-   * to collpase (by default: -1). The input @a blankReplacement can be used
+   * The input @a targetFinalSize can be used to fix the number of values 
+   * to collapse (by default: -1). The input @a blankReplacement can be used
    * to fill the @a target' values which have no corresponding in the @a parent (By default: default object constructor).
    *
    * @ingroup BTKCommon

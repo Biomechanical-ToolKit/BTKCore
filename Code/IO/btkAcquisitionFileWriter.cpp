@@ -125,11 +125,11 @@ namespace btk
   
   /**
    * @fn const std::string& AcquisitionFileWriter::GetFilename() const
-   * Gets the filename of the file to read.
+   * Gets the filename of the file to write.
    */
   
   /**
-   * Specifies the file to read. This is forwarded to the IO instance.
+   * Specifies the file to write. This is forwarded to the IO instance.
    */
   void AcquisitionFileWriter::SetFilename(const std::string& filename)
   {
@@ -166,7 +166,7 @@ namespace btk
   };
   
   /**
-   * Constructor. Sets the number of outputs equal to one. No input.
+   * Constructor. Sets the number of input equal to one. No output.
    */
   AcquisitionFileWriter::AcquisitionFileWriter()
   : m_AcquisitionIO(), m_Filename()
@@ -180,7 +180,7 @@ namespace btk
    */
   
   /**
-   * Whatever the specified index, this method creates an Acquisition object
+   * Whatever the specified index, this method generates a runtime exception.
    */
   DataObject::Pointer AcquisitionFileWriter::MakeOutput(int idx)
   {
