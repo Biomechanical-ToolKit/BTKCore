@@ -450,11 +450,11 @@ private:
   void action();
 };
 
-// --------------- EditSegmentLinks ---------------
-class EditSegmentLinks : public ConfigurationUndoCommand
+// --------------- EditSegmentDefinition ---------------
+class EditSegmentDefinition : public ConfigurationUndoCommand
 {
 public:
-  EditSegmentLinks(Model* m, int id, const QVector<int>& markerIds, const QVector<Pair>& links, QUndoCommand* parent = 0);
+  EditSegmentDefinition(Model* m, int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces, QUndoCommand* parent = 0);
   virtual void undo() {this->action();};
   virtual void redo() {this->action();};
   
@@ -463,6 +463,7 @@ private:
   int m_Id;
   QVector<int> m_MarkerIds;
   QVector<Pair> m_Links;
+  QVector<Triad> m_Faces;
   
   void action();
 };

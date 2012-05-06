@@ -450,7 +450,7 @@ void MultiViewWidget::setModel(Model* m)
   this->mp_Model = m;
   // Object connection
   connect(this->mp_Model, SIGNAL(segmentsColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setSegmentsColor(QVector<int>, QVector<QColor>)));
-  connect(this->mp_Model, SIGNAL(segmentLinksChanged(int, QVector<int>, QVector<Pair>)), this, SLOT(setSegmentLink(int, QVector<int>, QVector<Pair>)));
+  connect(this->mp_Model, SIGNAL(segmentDefinitionChanged(int)), this, SLOT(updateSegmentDefinition(int)));
   connect(this->mp_Model, SIGNAL(segmentsSurfaceVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setSegmentsSurfaceVisibility(QVector<int>, QVector<bool>)));
 }
 
@@ -840,7 +840,6 @@ void MultiViewWidget::updateFramesIndex(int ff)
 
 void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments)
 {
-  Q_UNUSED(ids);
   btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
   QVector<QColor> colors(segments.size());
   // Assume new segments are appended at the end. No use of the IDs
@@ -896,18 +895,15 @@ void MultiViewWidget::setSegmentsColor(const QVector<int>& ids, const QVector<QC
   this->updateSegmentsDisplay();
 };
 
-void MultiViewWidget::setSegmentLink(int id, const QVector<int>& markerIds, const QVector<Pair>& links)
+void MultiViewWidget::setSegmentDefinition(int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces)
 {
-  Q_UNUSED(markerIds);
-  Q_UNUSED(links);
-  // std::vector<int> btkPointIds(markerIds.size());
-  // std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks(links.size());
-  // for (int i = 0 ; i < markerIds.size() ; ++i)
-  //   btkPointIds[i] = markerIds[i];
-  // for (int i = 0 ; i < links.size() ; ++i)
-  //   btkLinks[i].SetIds(links[i].first, links[i].second);
-  // btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
-  // segments->SetDefinition(id, btkPointIds, btkLinks);
+  btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
+  segments->SetDefinition(id, markerIds.toStdVector(), links.toStdVector(), faces.toStdVector());
+  this->updateSegmentsDisplay();
+};
+
+void MultiViewWidget::updateSegmentDefinition(int id)
+{
   btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
   segments->SetDefinition(id, this->mp_Model->segments().value(id)->mesh);
   this->updateSegmentsDisplay();
@@ -928,6 +924,15 @@ void MultiViewWidget::updateHiddenSegments(const QList<int>& ids)
   for (int i = 0 ; i < ids.count() ; ++i)
     segmentsFramesSource->HideSegment(ids[i]);
   this->updateSegmentsDisplay();
+};
+
+int MultiViewWidget::appendNewSegment(Segment* s)
+{
+  btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
+  QVector<QColor> colors(1, s->color);
+  int id = segments->AppendDefinition(s->mesh, s->surfaceVisible);
+  this->setSegmentsColor(QVector<int>(1,id), colors);
+  return id;
 };
 
 int MultiViewWidget::segmentColorIndex(int id)

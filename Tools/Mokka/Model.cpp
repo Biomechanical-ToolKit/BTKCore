@@ -114,15 +114,16 @@ void Model::setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& col
   emit segmentsColorChanged(ids, colors);
 };
 
-void Model::setSegmentLinks(int id, const QVector<int>& markerIds, const QVector<Pair>& links)
+void Model::setSegmentDefinition(int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces)
 {
   QMap<int,Segment*>::iterator it = this->m_Segments.find(id);
   if (it != this->m_Segments.end())
   {
     (*it)->markerIds = markerIds;
     (*it)->links = links;
-    (*it)->mesh = btk::TriangleMesh::New(markerIds.toStdVector(),links.toStdVector());
-    emit segmentLinksChanged(id, markerIds, links);
+    (*it)->faces = faces;
+    (*it)->mesh = btk::TriangleMesh::New(markerIds.toStdVector(),links.toStdVector(),faces.toStdVector());
+    emit segmentDefinitionChanged(id);
   }
 };
 

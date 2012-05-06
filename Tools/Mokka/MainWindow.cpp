@@ -37,6 +37,7 @@
 #include "MainWindow.h"
 #include "About.h"
 #include "Acquisition.h"
+#include "CompositeView.h"
 #include "ExportASCIIDialog.h"
 #include "ExportSTLDialog.h"
 #include "FileInfoDockWidget.h"
@@ -51,7 +52,9 @@
 #include "Preferences.h"
 #include "TimeEventFunctors.h"
 #include "NewLayoutDialog.h"
+#include "NewSegmentDialog.h"
 #include "UserDefined.h"
+#include "Viz3DWidget.h"
 
 #include <btkASCIIFileWriter.h>
 #include <btkMultiSTLFileWriter.h>
@@ -310,10 +313,11 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_ModelDock, SIGNAL(segmentLabelChanged(int, QString)), this, SLOT(setSegmentLabel(int, QString)));
   connect(this->mp_ModelDock, SIGNAL(segmentsColorChanged(QVector<int>, QColor)), this, SLOT(setSegmentsColor(QVector<int>, QColor)));
   connect(this->mp_ModelDock, SIGNAL(segmentsDescriptionChanged(QVector<int>, QString)), this, SLOT(setSegmentsDescription(QVector<int>, QString)));
-  connect(this->mp_ModelDock, SIGNAL(segmentLinksChanged(int, QVector<int>, QVector<Pair>)), this, SLOT(setSegmentLinks(int, QVector<int>, QVector<Pair>)));
   connect(this->mp_ModelDock, SIGNAL(segmentsSurfaceVisibilityChanged(QVector<int>, bool)), this, SLOT(setSegmentsSurfaceVisibility(QVector<int>, bool)));
   connect(this->mp_ModelDock, SIGNAL(segmentsRemoved(QList<int>)), this, SLOT(removeSegments(QList<int>)));
-  connect(this->mp_ModelDock, SIGNAL(segmentCreated(Segment*)), this, SLOT(insertSegment(Segment*)));
+  connect(this->mp_ModelDock, SIGNAL(segmentCreationRequested()), this, SLOT(createSegment()));
+  connect(this->mp_ModelDock, SIGNAL(segmentEditionRequested()), this, SLOT(editSegment()));
+  
   connect(this->mp_ModelDock, SIGNAL(segmentHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenSegments(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(videosRemoved(QList<int>)), this, SLOT(removeVideos(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(videosDelayChanged(QVector<int>, qint64)), this, SLOT(setVideosDelay(QVector<int>, qint64)));
@@ -1293,41 +1297,71 @@ void MainWindow::exportCAL()
 
 void MainWindow::exportSTL()
 {
-  QString dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"), this->m_LastDirectory);
-  if (!dir.isEmpty())
+  ExportSTLDialog exporterDlg(this);
+  exporterDlg.filePrefixLineEdit->setText(QFileInfo(this->mp_Acquisition->fileName()).baseName());
+  for (QMap<int, Segment*>::const_iterator it = this->mp_Model->segments().begin() ; it != this->mp_Model->segments().end() ; ++it)
+    exporterDlg.segmentListWidget->addItem(it.value()->label);
+  if (exporterDlg.segmentListWidget->count() == 1)
+    exporterDlg.segmentListWidget->setCurrentRow(0);
+  if (exporterDlg.exec() == QDialog::Accepted)
   {
-    ExportSTLDialog exporterDlg(this);
-    exporterDlg.pathLineEdit->setText(dir);
-    for (QMap<int, Segment*>::const_iterator it = this->mp_Model->segments().begin() ; it != this->mp_Model->segments().end() ; ++it)
-      exporterDlg.segmentListWidget->addItem(it.value()->label);
-    if (exporterDlg.exec() == QDialog::Accepted)
+    QString filePrefix = exporterDlg.pathLineEdit->text() + "/" + exporterDlg.filePrefixLineEdit->text();
+    
+    int lb, rb;
+    if (exporterDlg.allFramesRadioButton->isChecked())
     {
-      QString filePrefix = exporterDlg.pathLineEdit->text() + "/" + exporterDlg.filePrefixLineEdit->text();
-      LOG_INFO("Exporting segment '" + exporterDlg.segmentListWidget->currentItem()->text() + "' to STL files: " + filePrefix + "*.stl");
-      try
-      {
-        btk::MultiSTLFileWriter::Pointer exporter = btk::MultiSTLFileWriter::New();
-        exporter->SetInputAcquisition(this->mp_Acquisition->btkAcquisition());
-        exporter->SetInputMesh(this->mp_Model->segments().value(exporterDlg.segmentListWidget->currentRow())->mesh);
-        exporter->SetFilePrefix(qPrintable(filePrefix));
-        if (exporterDlg.foiRadioButton->isChecked())
-          exporter->SetFramesOfInterest(this->timeEventControler->leftBound(), this->timeEventControler->rightBound());
-        else if (exporterDlg.currentFrameRadioButton->isChecked())
-          exporter->SetFramesOfInterest(this->timeEventControler->currentFrame(), this->timeEventControler->currentFrame());
-        exporter->Update();
-      }
-      catch (btk::Exception& e)
-      {
-        LOG_CRITICAL(e.what());
-      }
-      catch (std::exception& e)
-      {
-        LOG_CRITICAL("Unexpected error: " + QString(e.what()));
-      }
-      catch (...)
-      {
-        LOG_CRITICAL("Unknown error.");
-      }
+      lb = this->mp_Acquisition->firstFrame();
+      rb = this->mp_Acquisition->lastFrame();
+    } 
+    else if (exporterDlg.selectedFramesRadioButton->isChecked())
+    {
+      lb = this->timeEventControler->leftBound();
+      rb = this->timeEventControler->rightBound();
+    }
+    else
+    {
+      lb = rb = this->timeEventControler->currentFrame();
+    }
+    
+    LOG_INFO("Exporting segment '" + exporterDlg.segmentListWidget->currentItem()->text() + "' to STL files: " + filePrefix + "*.stl");
+    bool noExportError = false;
+    try
+    {
+      QApplication::setOverrideCursor(Qt::WaitCursor);
+      
+      btk::MultiSTLFileWriter::Pointer exporter = btk::MultiSTLFileWriter::New();
+      exporter->SetInputAcquisition(this->mp_Acquisition->btkAcquisition());
+      exporter->SetInputMesh(this->mp_Model->segments().value(exporterDlg.segmentListWidget->currentRow())->mesh);
+      exporter->SetFilePrefix(qPrintable(filePrefix));
+      exporter->SetFramesOfInterest(lb,rb);
+      exporter->Update();
+      
+      QApplication::restoreOverrideCursor();
+      noExportError = true;
+    }
+    catch (btk::Exception& e)
+    {
+      LOG_CRITICAL(e.what());
+    }
+    catch (std::exception& e)
+    {
+      LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    }
+    catch (...)
+    {
+      LOG_CRITICAL("Unknown error.");
+    }
+    
+    if (!noExportError)
+    {
+      QApplication::restoreOverrideCursor();
+      QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the file exporting.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
+      error.exec();
     }
   }
 };
@@ -1749,11 +1783,6 @@ void MainWindow::setSegmentsDescription(const QVector<int>& ids, QString desc)
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentsDescription(this->mp_Model, ids, desc)));
 };
 
-void MainWindow::setSegmentLinks(int id, const QVector<int>& markerIds, const QVector<Pair>& links)
-{
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentLinks(this->mp_Model, id, markerIds, links)));
-};
-
 void MainWindow::setSegmentsSurfaceVisibility(const QVector<int>& ids, bool visible)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentsSurfaceVisibility(this->mp_Model, ids, visible)));
@@ -1764,9 +1793,203 @@ void MainWindow::removeSegments(const QList<int>& ids)
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new RemoveSegments(this->mp_Model, ids)));
 };
 
-void MainWindow::insertSegment(Segment* seg)
+void MainWindow::createSegment()
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new InsertSegment(this->mp_Model, seg)));
+  this->editSegment(true);
+};
+
+void MainWindow::editSegment()
+{
+  this->editSegment(false);
+};
+
+void MainWindow::editSegment(bool isNew)
+{
+  // Keep only the selected segment
+  int segmentId = -1;
+  QList<int> segmentIds, unvisibleSegmentIds;
+  QTreeWidgetItem* segmentsRoot = this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::SegmentsItem);
+  for (int i = 0 ; i < segmentsRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* item = segmentsRoot->child(i);
+    int id = item->data(0,SegmentId).toInt();
+    if ((item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked) || item->isHidden())
+      unvisibleSegmentIds << id;
+    else if ((item->isSelected()) && !isNew)
+      segmentId = id;
+    else
+      segmentIds << id;
+  }
+  
+  Segment* seg = 0;
+  QList<int> selectedMarkerIds, unselectedMarkerIds, unvisibleMarkerIds;
+  QTreeWidgetItem* markersRoot = this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::MarkersItem);
+  if (isNew)
+  {
+    // Create a fake segment
+    seg = new Segment("", "", this->mp_Model->defaultSegmentColor(), selectedMarkerIds.toVector(), QVector<Pair>(), QVector<Triad>());
+    seg->surfaceVisible = true;
+    segmentId = this->multiView->appendNewSegment(seg);
+    // Keep only the selected markers
+    for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+    {
+      QTreeWidgetItem* item = markersRoot->child(i);
+      int id = item->data(0,PointId).toInt();
+      if ((item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked) || item->isHidden())
+        unvisibleMarkerIds << id;
+      else if (!item->isSelected())
+        unselectedMarkerIds << id;
+      else 
+        selectedMarkerIds << id; 
+    }
+  }
+  else if (segmentId != -1)
+  {
+    // Extract the selected segment
+    seg = this->mp_Model->segments().value(segmentId);
+    // Force the visibility of the surface
+    this->multiView->setSegmentsSurfaceVisibility(QVector<int>(1,segmentId), QVector<bool>(1,true));
+    // Keep only the markers used by the segment
+    for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+    {
+      QTreeWidgetItem* item = markersRoot->child(i);
+      int id = item->data(0,PointId).toInt();
+      if ((item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked) || item->isHidden())
+        unvisibleMarkerIds << id;
+      else if (seg->markerIds.indexOf(id) == -1)
+        unselectedMarkerIds << id;
+      else 
+        selectedMarkerIds << id;
+    }
+  }
+  else
+  {
+    qDebug("No segment selected. Impossible to edit its definition.");
+    return;
+  }
+  
+  if (seg != 0)
+  {
+    bool hasPlayback = this->timeEventControler->playbackStatus();
+    this->timeEventControler->stopPlayback();
+
+    // To avoid the update of the 3D views during the building of the segment.
+    for (QList<AbstractView*>::const_iterator it = this->multiView->views().begin() ; it != this->multiView->views().end() ; ++it)
+      static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D)->setUpdatesEnabled(false);
+
+    this->multiView->updateHiddenMarkers(unselectedMarkerIds);
+    this->multiView->circleSelectedMarkers(QList<int>());
+    this->multiView->updateHiddenSegments(segmentIds);
+    
+    NewSegmentDialog nsd(seg, segmentId, markersRoot, !isNew, this);
+    nsd.viz3D->setGlobalFrameVisible(false);
+    nsd.viz3D->copy(static_cast<Viz3DWidget*>(static_cast<CompositeView*>(this->multiView->views()[0])->view(CompositeView::Viz3D)));
+    // Show only markers and segments
+    // WARNING: THIS METHOD IS SENSITIVE TO THE ORDER OF THE VTK OBJECT CONSTRUCTION IN THE MUTLIVIEW.
+    vtkActorCollection* actors = nsd.viz3D->renderer()->GetActors();
+    actors->InitTraversal();
+    vtkActor* actor = actors->GetNextItem();
+    int inc = 0;
+    while (actor)
+    {
+      // 4: Marker coordinates
+      // 6: Segment links
+      // 7: Segment face
+      if (inc == 4)
+        actor->UseBoundsOn(); // To be centered around the markers
+      else if ((inc != 4) && (inc != 6) && (inc != 7))
+        actor->SetVisibility(0);
+      actor = actors->GetNextItem();
+      ++inc;
+    }
+    nsd.viz3D->renderer()->ResetCamera();
+  
+    // Connections
+    connect(&nsd, SIGNAL(markerSelectionChanged(QList<int>)), this->multiView, SLOT(circleSelectedMarkers(QList<int>)));
+    connect(&nsd, SIGNAL(markerHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenMarkers(QList<int>)));
+    connect(&nsd, SIGNAL(segmentDefinitionChanged(int, QVector<int>, QVector<Pair>, QVector<Triad>)), this->multiView, SLOT(setSegmentDefinition(int, QVector<int>, QVector<Pair>, QVector<Triad>)));
+  
+    bool canceled = false;
+    if (isNew)
+    {
+      if (nsd.exec() == QDialog::Accepted)
+      {
+        seg->label = nsd.segmentLabelLabel->text();
+        seg->description = nsd.segmentDescriptionLabel->text();
+        this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new InsertSegment(this->mp_Model, seg)));
+      }
+      else
+      {
+        this->multiView->updateHiddenSegments(QList<int>() << segmentId);
+        delete seg;
+        canceled = true;
+      }
+    }
+    else
+    {
+      // Copy the current definition of the mesh
+      QVector<int> oldMarkerIds = seg->markerIds;
+      QVector<Pair> oldLinks = seg->links;
+      QVector<Triad> oldFaces = seg->faces;
+      bool oldSurfaceVisible = seg->surfaceVisible;
+      if (nsd.exec() == QDialog::Accepted)
+      {
+        if ((seg->markerIds != oldMarkerIds) || (seg->links != oldLinks) || (seg->faces != oldFaces))
+        {
+          QVector<int> markerIds = seg->markerIds;
+          QVector<Pair> links = seg->links;
+          QVector<Triad> faces = seg->faces;
+          bool surfaceVisible = faces.isEmpty() ? seg->surfaceVisible : true;
+          // Need to reset the mesh informations to be able to use the undo/redo actions.
+          seg->markerIds = oldMarkerIds;
+          seg->links = oldLinks;
+          seg->faces = oldFaces;
+          seg->surfaceVisible = oldSurfaceVisible;
+          QUndoCommand* cmd = new QUndoCommand;
+          new EditSegmentDefinition(this->mp_Model, segmentId, markerIds, links, faces, cmd);
+          new EditSegmentsSurfaceVisibility(this->mp_Model, QVector<int>(1,segmentId), surfaceVisible, cmd);
+          this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, cmd));
+        }
+      }
+      else
+      {
+        // Force the segment defintion to be as before the edition
+        seg->markerIds = oldMarkerIds;
+        seg->links = oldLinks;
+        seg->faces = oldFaces;
+        seg->surfaceVisible = oldSurfaceVisible;
+        this->multiView->setSegmentsSurfaceVisibility(QVector<int>(1,segmentId), QVector<bool>(1,oldSurfaceVisible));
+        this->multiView->updateSegmentDefinition(segmentId);
+      }
+    }
+    
+    // Reset the markers visibility and selection
+    this->multiView->updateHiddenMarkers(unvisibleMarkerIds);
+    if (isNew && canceled)
+      this->multiView->circleSelectedMarkers(selectedMarkerIds);
+    else
+      this->multiView->circleSelectedMarkers(QList<int>());
+    this->multiView->updateHiddenSegments(unvisibleSegmentIds);
+    // Reset 3D view (as the actors are shared between all the 3D views)
+    actors = nsd.viz3D->renderer()->GetActors();
+    actors->InitTraversal();
+    actor = actors->GetNextItem();
+    inc = 0;
+    while (actor)
+    {
+      if (inc == 4)
+        actor->UseBoundsOff();
+      actor->SetVisibility(1);
+      actor = actors->GetNextItem();
+      ++inc;
+    }  
+    // Enable the update
+    for (QList<AbstractView*>::const_iterator it = this->multiView->views().begin() ; it != this->multiView->views().end() ; ++it)
+      static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D)->setUpdatesEnabled(true);
+    // Restart the playback (if necessary)
+    if (hasPlayback)
+      this->timeEventControler->startPlayback();
+  }
 };
 
 void MainWindow::setVideosDelay(const QVector<int>& ids, qint64 delay)

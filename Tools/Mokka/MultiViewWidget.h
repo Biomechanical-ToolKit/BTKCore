@@ -73,6 +73,7 @@ public:
   void setModel(Model* m);
   void load();
   
+  int appendNewSegment(Segment* s);
   int segmentColorIndex(int id);
   
   void setMarkerRadius(int id, double r);
@@ -118,7 +119,8 @@ public slots:
   void appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void clearSegments();
   void setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors);
-  void setSegmentLink(int id, const QVector<int>& markerIds, const QVector<Pair>& links);
+  void setSegmentDefinition(int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces);
+  void updateSegmentDefinition(int id);
   void setSegmentsSurfaceVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
   void updateHiddenSegments(const QList<int>& ids);
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);

@@ -298,7 +298,7 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   connect(this->mp_RemoveConfiguration, SIGNAL(triggered()), this, SLOT(removeConfiguration()));
   connect(this->mp_DeselectConfiguration, SIGNAL(triggered()), this, SLOT(deselectConfiguration()));
   connect(this->mp_ClearConfigurations, SIGNAL(triggered()), this, SLOT(clearConfigurations()));
-  connect(this->mp_NewSegment, SIGNAL(triggered()), this, SLOT(newSegment()));
+  connect(this->mp_NewSegment, SIGNAL(triggered()), this, SIGNAL(segmentCreationRequested()));
   connect(this->mp_HideSelectedSegments, SIGNAL(triggered()), this, SLOT(hideSelectedSegments()));
   connect(this->mp_UnhideSelectedSegments, SIGNAL(triggered()), this, SLOT(unhideSelectedSegments()));
   connect(this->mp_SelectAllMarkers, SIGNAL(triggered()), this, SLOT(selectAllMarkers()));
@@ -321,7 +321,7 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   connect(this->modelTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(sendModifiedMarkersState(QTreeWidgetItem*, int)));
   connect(this->segmentLabelEdit, SIGNAL(editingFinished()), this, SLOT(editSegmentLabel()));
   connect(this->segmentDescEdit, SIGNAL(editingFinished()), this, SLOT(editSegmentsDescription()));
-  connect(this->segmentEditLinksButton, SIGNAL(clicked()), this, SLOT(editSegmentLinks()));
+  connect(this->segmentEditLinksButton, SIGNAL(clicked()), this, SIGNAL(segmentEditionRequested()));
   connect(this->segmentSurfaceVisibilityCheckBox, SIGNAL(stateChanged(int)), this, SLOT(editSegmentSurfaceVisibility()));
   connect(this->markerLabelEdit, SIGNAL(editingFinished()), this, SLOT(editMarkerLabel()));
   connect(this->markerDescEdit, SIGNAL(editingFinished()), this, SLOT(editMarkersDescription()));
@@ -404,7 +404,6 @@ void ModelDockWidget::setModel(Model* m)
   this->mp_Model = m;
   connect(this->mp_Model, SIGNAL(segmentsChanged(QList<int>, QList<Segment*>)), this, SLOT(setSegments(QList<int>, QList<Segment*>)));
   connect(this->mp_Model, SIGNAL(segmentLabelChanged(int, QString)), this, SLOT(setSegmentLabel(int, QString)));
-  connect(this->mp_Model, SIGNAL(segmentLinksChanged(int, QVector<int>, QVector<Pair>)), this, SLOT(setSegmentLink(int, QVector<int>, QVector<Pair>)));
   connect(this->mp_Model, SIGNAL(segmentsColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setSegmentsColor(QVector<int>, QVector<QColor>)));
   connect(this->mp_Model, SIGNAL(segmentsDescriptionChanged(QVector<int>, QVector<QString>)), this, SLOT(setSegmentsDescription(QVector<int>, QVector<QString>)));
   connect(this->mp_Model, SIGNAL(segmentsSurfaceVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setSegmentsSurfaceVisibility(QVector<int>, QVector<bool>)));
@@ -773,6 +772,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
                                        (int)(att.value("colorB").toString().toDouble() * 255));
               QVector<int> markerIds;
               QVector<Pair> links;
+              QVector<Triad> faces;
               while (xmlReader.readNextStartElement())
               {
                 if (xmlReader.name() == "Point")
@@ -789,11 +789,20 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
                   if ((idPt1 != -1) && (idPt2 != -1))
                     links << Pair(idPt1, idPt2);
                 }
+                else if (xmlReader.name() == "Face")
+                {
+                  QXmlStreamAttributes attLink = xmlReader.attributes();
+                  int idPt1 = this->mp_Acquisition->findMarkerIdFromLabel(attLink.value("pt1").toString());
+                  int idPt2 = this->mp_Acquisition->findMarkerIdFromLabel(attLink.value("pt2").toString());
+                  int idPt3 = this->mp_Acquisition->findMarkerIdFromLabel(attLink.value("pt3").toString());
+                  if ((idPt1 != -1) && (idPt2 != -1) && (idPt3 != -1))
+                    faces << Triad(idPt1, idPt2, idPt3);
+                }
                 else
                   xmlReader.skipCurrentElement();
                 xmlReader.readNext();
               }
-              segments << Segment(segLabel, segDesc, segColor, markerIds, links, segSurfaceVisible);
+              segments << Segment(segLabel, segDesc, segColor, markerIds, links, faces, segSurfaceVisible);
             }
             else
               xmlReader.skipCurrentElement();
@@ -970,7 +979,7 @@ void ModelDockWidget::appendSegments(QXmlStreamReader& xmlReader, QList<Segment>
       }
       else
         segColor = QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
-      segments << Segment(segLabel, "", segColor, QVector<int>(), QVector<Pair>());
+      segments << Segment(segLabel, "", segColor, QVector<int>(), QVector<Pair>(), QVector<Triad>());
       
       this->appendSegments(xmlReader, segments);
     }
@@ -1096,55 +1105,6 @@ void ModelDockWidget::unhideSelectedSegments()
   this->sendHiddenSegments();
 };
 
-void ModelDockWidget::newSegment()
-{
-  NewSegmentDialog nsd(this->parentWidget());
-  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
-  QVector<int> markerIds(items.size());
-  int numMaxLink = 1;
-  for (int i = 2 ; i < markerIds.size() ; ++i)
-    numMaxLink += i;
-  QVector<Pair> linksI = QVector<Pair>(numMaxLink);
-  QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
-  int idxMkr1 = 0;
-  int idxLink = 0;
-  for (QList<QTreeWidgetItem*>::const_iterator it1 = items.begin() ; it1 != items.end() ; ++it1)
-  {
-    markerIds[idxMkr1] = markersRoot->indexOfChild(*it1);
-    int idxMkr2 = idxMkr1 + 1;
-    for (QList<QTreeWidgetItem*>::const_iterator it2 = it1+1 ; it2 != items.end() ; ++it2)
-    {
-      int rowIdx = nsd.linksTable->rowCount();
-      nsd.linksTable->insertRow(rowIdx);
-      QTableWidgetItem* check = new QTableWidgetItem; check->setCheckState(Qt::Checked);
-      QTableWidgetItem* mkr1 = new QTableWidgetItem((*it1)->text(0));
-      QTableWidgetItem* mkr2 = new QTableWidgetItem((*it2)->text(0));
-      nsd.linksTable->setItem(rowIdx, 0, check);
-      nsd.linksTable->setItem(rowIdx, 1, mkr1);
-      nsd.linksTable->setItem(rowIdx, 2, mkr2);
-      linksI[idxLink].SetIds(markerIds[idxMkr1], idxMkr2);
-      ++idxMkr2;
-      ++idxLink;
-    }
-    ++idxMkr1;
-  }
-  for (QVector<Pair>::iterator it = linksI.begin() ; it != linksI.end() ; ++it)
-    it->SetIds(it->GetIds()[0], markerIds[it->GetIds()[1]]);
-  QVector<Pair> links;
-  if (nsd.exec())
-  {
-    for (int i = 0 ; i < nsd.linksTable->rowCount() ; ++i)
-    {
-      if (nsd.linksTable->item(i,0)->checkState() == Qt::Checked)
-        links.push_back(linksI[i]);
-    }
-    
-    Segment* seg = new Segment(nsd.segmentLabelEdit->text(), nsd.segmentDescriptionEdit->text(), 
-                               this->mp_Model->defaultSegmentColor(), markerIds, links);
-    emit segmentCreated(seg);
-  }
-};
-
 void ModelDockWidget::setSegments(const QList<int>& ids, const QList<Segment*>& segments)
 {
   QTreeWidgetItem* segmentsRoot = this->modelTree->topLevelItem(SegmentsItem);
@@ -1167,13 +1127,6 @@ void ModelDockWidget::setSegmentLabel(int id, const QString& label)
     }
   }
   this->displayProperties();
-};
-
-void ModelDockWidget::setSegmentLink(int id, const QVector<int>& markerIds, const QVector<Pair>& links)
-{
-  Q_UNUSED(id);
-  Q_UNUSED(markerIds);
-  Q_UNUSED(links);
 };
 
 void ModelDockWidget::setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors)
@@ -1290,57 +1243,6 @@ void ModelDockWidget::editSegmentsDescription()
   }
   if (descModified)
     emit segmentsDescriptionChanged(ids, desc);
-};
-
-void ModelDockWidget::editSegmentLinks()
-{
-  NewSegmentDialog nsd(this->parentWidget());
-  nsd.setEditLinksMode();
-  int id = this->modelTree->currentItem()->data(0, SegmentId).toInt();
-  QVector<int> markerIds = this->mp_Model->segmentMarkerIds(id);
-  QVector<Pair> currentLinks = this->mp_Model->segmentLinks(id);
-  int numMaxLink = 1;
-  for (int i = 2 ; i < markerIds.size() ; ++i)
-    numMaxLink += i;
-  QVector<Pair> linksI = QVector<Pair>(numMaxLink);
-  // Recreate all combinations
-  int idxLink = 0;
-  for (int i = 0 ; i < markerIds.size() ; ++i)
-  {
-    for (int j = i+1 ; j < markerIds.size() ; ++j)
-    {
-      int rowIdx = nsd.linksTable->rowCount();
-      nsd.linksTable->insertRow(rowIdx);
-      QTableWidgetItem* check = new QTableWidgetItem; check->setCheckState(Qt::Unchecked);
-      QTableWidgetItem* mkr1 = new QTableWidgetItem(this->mp_Acquisition->pointLabel(markerIds[i]));
-      QTableWidgetItem* mkr2 = new QTableWidgetItem(this->mp_Acquisition->pointLabel(markerIds[j]));
-      nsd.linksTable->setItem(rowIdx, 0, check);
-      nsd.linksTable->setItem(rowIdx, 1, mkr1);
-      nsd.linksTable->setItem(rowIdx, 2, mkr2);
-      linksI[idxLink].SetIds(markerIds[i],markerIds[j]);
-      for (int k = 0 ; k < currentLinks.size() ; ++k)
-      {
-        if ((currentLinks[k].GetIds()[0] == linksI[idxLink].GetIds()[0])
-            && (currentLinks[k].GetIds()[1] == linksI[idxLink].GetIds()[1]))
-        {
-          check->setCheckState(Qt::Checked);
-          break;
-        }
-      }
-      ++idxLink;
-    }
-  }
-  if (nsd.exec())
-  {
-    QVector<Pair> links;
-    for (int i = 0 ; i < nsd.linksTable->rowCount() ; ++i)
-    {
-      if (nsd.linksTable->item(i,0)->checkState() == Qt::Checked)
-        links.push_back(linksI[i]);
-    }
-    if (links != currentLinks)
-      emit segmentLinksChanged(id, markerIds, links);
-  }
 };
 
 void ModelDockWidget::editSegmentSurfaceVisibility()
@@ -2712,6 +2614,15 @@ bool ModelDockWidget::saveConfiguration(int idx)
         xmlWriter.writeStartElement("Link");
         xmlWriter.writeAttribute("pt1", this->mp_Acquisition->pointLabel(links[j].GetIds()[0]));
         xmlWriter.writeAttribute("pt2", this->mp_Acquisition->pointLabel(links[j].GetIds()[1]));
+        xmlWriter.writeEndElement();
+      }
+      QVector<Triad> faces = this->mp_Model->segmentFaces(id);
+      for (int j = 0 ; j < faces.size() ; ++j)
+      {
+        xmlWriter.writeStartElement("Face");
+        xmlWriter.writeAttribute("pt1", this->mp_Acquisition->pointLabel(faces[j].GetIds()[0]));
+        xmlWriter.writeAttribute("pt2", this->mp_Acquisition->pointLabel(faces[j].GetIds()[1]));
+        xmlWriter.writeAttribute("pt3", this->mp_Acquisition->pointLabel(faces[j].GetIds()[2]));
         xmlWriter.writeEndElement();
       }
       xmlWriter.writeEndElement(); // End Segment

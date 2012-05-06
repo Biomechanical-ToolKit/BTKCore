@@ -136,10 +136,10 @@ public slots:
   void setSegmentLabel(int id, const QString& label);
   void setSegmentsColor(const QVector<int>& ids, const QColor& color);
   void setSegmentsDescription(const QVector<int>& ids, QString desc);
-  void setSegmentLinks(int id, const QVector<int>& markerIds, const QVector<Pair>& links);
   void setSegmentsSurfaceVisibility(const QVector<int>& ids, bool visible);
   void removeSegments(const QList<int>& ids);
-  void insertSegment(Segment* seg);
+  void createSegment();
+  void editSegment();
   void setVideosDelay(const QVector<int>& ids, qint64 delay);
   void removeVideos(const QList<int>& ids);
   // Time event
@@ -205,6 +205,7 @@ private:
   void setCurrentFile(const QString& rFilename);
   bool isOkToContinue();
   void updateUserLayoutActions();
+  void editSegment(bool isNew);
   
   Acquisition* mp_Acquisition;
   Model* mp_Model;

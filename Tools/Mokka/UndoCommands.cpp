@@ -470,21 +470,23 @@ void EditSegmentsColor::action()
   this->m_Colors = temp;
 };
 
-// --------------- EditSegmentLinks ---------------
-EditSegmentLinks::EditSegmentLinks(Model* m, int id, const QVector<int>& markerIds, const QVector<Pair>& links, QUndoCommand* parent)
-: ConfigurationUndoCommand(parent), m_MarkerIds(markerIds), m_Links(links)
+// --------------- EditSegmentDefinition ---------------
+EditSegmentDefinition::EditSegmentDefinition(Model* m, int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_MarkerIds(markerIds), m_Links(links), m_Faces(faces)
 {
   this->mp_Model = m;
   this->m_Id = id;
 };
 
-void EditSegmentLinks::action()
+void EditSegmentDefinition::action()
 {
   QVector<int> tempMarkerIds = this->mp_Model->segmentMarkerIds(this->m_Id);
   QVector<Pair> tempLinks = this->mp_Model->segmentLinks(this->m_Id);
-  this->mp_Model->setSegmentLinks(this->m_Id, this->m_MarkerIds, this->m_Links);
+  QVector<Triad> tempFaces = this->mp_Model->segmentFaces(this->m_Id);
+  this->mp_Model->setSegmentDefinition(this->m_Id, this->m_MarkerIds, this->m_Links, this->m_Faces);
   this->m_MarkerIds = tempMarkerIds;
   this->m_Links = tempLinks;
+  this->m_Faces = tempFaces;
 };
 
 // --------------- EditSegmentsSurfaceVisibility ---------------
