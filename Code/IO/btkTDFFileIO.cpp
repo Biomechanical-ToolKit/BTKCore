@@ -97,20 +97,6 @@ namespace btk
   };
   
   /**
-   * Checks if the suffix of @a filename is ANG.
-   */
-  bool TDFFileIO::CanWriteFile(const std::string& filename)
-  {
-    std::string lowercase = filename;
-    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type TDFPos = lowercase.rfind(".tdf");
-    if ((TDFPos != std::string::npos) && (TDFPos == lowercase.length() - 4))
-      return true;
-    else
-      return false;
-  };
-  
-  /**
    * Read the file designated by @a filename and fill @a output.
    */
   void TDFFileIO::Read(const std::string& filename, Acquisition::Pointer output)
@@ -776,7 +762,7 @@ namespace btk
           throw(TDFFileIOException("Unknown format for the EMG block"));
       }
     }
-    catch (BinaryFileStreamException& )
+    catch (BinaryFileStreamFailure& )
     {
       std::string excmsg; 
       if (bifs.EndFile())
@@ -808,24 +794,6 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close();
       throw(TDFFileIOException("Unknown exception"));
     }
-  };
-  
-  /**
-   * Write the file designated by @a filename with the content of @a input.
-   */
-  void TDFFileIO::Write(const std::string& filename, Acquisition::Pointer input)
-  {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    /*
-    if (input.get() == 0)
-    {
-      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
-      return;
-    }
-    */
-    btkErrorMacro("Method not yet implemented.");
-    return;
   };
   
   /**

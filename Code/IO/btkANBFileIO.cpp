@@ -236,7 +236,7 @@ namespace btk
         }
       }
     }
-    catch (BinaryFileStreamException& )
+    catch (BinaryFileStreamFailure& )
     {
       std::string excmsg; 
       if (bifs.EndFile())

@@ -104,20 +104,6 @@ namespace btk
   };
   
   /**
-   * Checks if the suffix of @a filename is GRx.
-   */
-  bool GRxFileIO::CanWriteFile(const std::string& filename)
-  {
-    std::string lowercase = filename;
-    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type GRxPos = lowercase.substr(0,lowercase.length()-1).rfind(".gr");
-    if ((GRxPos != std::string::npos) && (GRxPos == lowercase.length() - 4) && (*(lowercase.rbegin()) >= 0x31) && (*(lowercase.rbegin()) <= 0x39))
-      return true;
-    else
-      return false;
-  };
-  
-  /**
    * Read the file designated by @a filename and fill @a output.
    */
   void GRxFileIO::Read(const std::string& filename, Acquisition::Pointer output)
@@ -198,7 +184,7 @@ namespace btk
       output->GetAnalog(4)->SetLabel("Py" + str);
       output->GetAnalog(5)->SetLabel("Mz" + str);
     }
-    catch (BinaryFileStreamException& )
+    catch (BinaryFileStreamFailure& )
     {
       std::string excmsg; 
       if (bifs.EndFile())
@@ -230,24 +216,6 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close(); 
       throw(GRxFileIOException("Unknown exception"));
     }
-  };
-  
-  /**
-   * Write the file designated by @a filename with the content of @a input.
-   */
-  void GRxFileIO::Write(const std::string& filename, Acquisition::Pointer input)
-  {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    /*
-    if (input.get() == 0)
-    {
-      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
-      return;
-    }
-    */
-    btkErrorMacro("Method not yet implemented.");
-    return;
   };
   
   /**

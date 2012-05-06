@@ -86,7 +86,7 @@ namespace btk
    * @ingroup BTKIO
    */
   /**
-   * @typedef BinaryFileStreamException
+   * @typedef BinaryFileStreamFailure
    * Exception for the BinaryFileStream class and inherited classes.
    */
   /**

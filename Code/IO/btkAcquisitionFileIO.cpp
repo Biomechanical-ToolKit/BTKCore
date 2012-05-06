@@ -55,7 +55,6 @@ namespace btk
    * @var AcquisitionFileIO::m_StorageFormat
    * Storage format.
    */
-
   
   /**
    * @typedef AcquisitionFileIO::Pointer
@@ -215,7 +214,7 @@ namespace btk
    * @fn virtual void AcquisitionFileIO::Write(const std::string& filename, Acquisition::Pointer input) = 0
    * Write the file designated by @a filename with the content of @a input.
    */
-  
+   
   /**
    * Constructor.
    */

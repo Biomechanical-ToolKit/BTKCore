@@ -132,21 +132,7 @@ namespace btk
     ifs.close();
     return isReadable;
   };
-  
-  /**
-   * Checks if the suffix of @a filename is AMTIForcePlatform.
-   */
-  bool AMTIForcePlatformFileIO::CanWriteFile(const std::string& filename)
-  {
-    std::string lowercase = filename;
-    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type AMTIForcePlatformPos = lowercase.rfind(".asc");
-    if ((AMTIForcePlatformPos != std::string::npos) && (AMTIForcePlatformPos == lowercase.length() - 4))
-      return true;
-    else
-      return false;
-  };
-  
+
   /**
    * Read the file designated by @a filename and fill @a output.
    */
@@ -287,24 +273,6 @@ namespace btk
       if (ifs.is_open()) ifs.close(); 
       throw(AMTIForcePlatformFileIOException("Unknown exception"));
     }
-  };
-  
-  /**
-   * Write the file designated by @a filename with the content of @a input.
-   */
-  void AMTIForcePlatformFileIO::Write(const std::string& filename, Acquisition::Pointer input)
-  {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    /*
-    if (input.get() == 0)
-    {
-      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
-      return;
-    }
-    */
-    btkErrorMacro("Method not yet implemented.");
-    return;
   };
   
   /**

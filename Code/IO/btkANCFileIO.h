@@ -53,6 +53,8 @@ namespace btk
   
   class ANCFileIO : public AcquisitionFileIO
   {
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS("ANC")
+    
   public:
     typedef SharedPtr<ANCFileIO> Pointer;
     typedef SharedPtr<const ANCFileIO> ConstPointer;

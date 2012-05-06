@@ -96,7 +96,7 @@
 
 namespace btk
 {
-  typedef RawFileStream::failure BinaryFileStreamException;
+  typedef RawFileStream::failure BinaryFileStreamFailure;
   
   class BinaryFileStream
   {

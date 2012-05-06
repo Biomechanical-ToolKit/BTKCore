@@ -101,20 +101,6 @@ namespace btk
   };
   
   /**
-   * Checks if the suffix of @a filename is PWR.
-   */
-  bool PWRFileIO::CanWriteFile(const std::string& filename)
-  {
-    std::string lowercase = filename;
-    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type PWRPos = lowercase.rfind(".pwr");
-    if ((PWRPos != std::string::npos) && (PWRPos == lowercase.length() - 4))
-      return true;
-    else
-      return false;
-  };
-  
-  /**
    * Read the file designated by @a filename and fill @a output.
    */
   void PWRFileIO::Read(const std::string& filename, Acquisition::Pointer output)
@@ -160,7 +146,7 @@ namespace btk
         }
       }
     }
-    catch (BinaryFileStreamException& )
+    catch (BinaryFileStreamFailure& )
     {
       std::string excmsg; 
       if (bifs.EndFile())
@@ -192,24 +178,6 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close(); 
       throw(PWRFileIOException("Unknown exception"));
     }
-  };
-  
-  /**
-   * Write the file designated by @a filename with the content of @a input.
-   */
-  void PWRFileIO::Write(const std::string& filename, Acquisition::Pointer input)
-  {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    /*
-    if (input.get() == 0)
-    {
-      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
-      return;
-    }
-    */
-    btkErrorMacro("Method not yet implemented.");
-    return;
   };
   
   /**

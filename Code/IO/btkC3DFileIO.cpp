@@ -812,7 +812,7 @@ namespace btk
             }
           }
         }
-        catch (BinaryFileStreamException& )
+        catch (BinaryFileStreamFailure& )
         {
           // Let's try to continue even if the file is corrupted
           if (ibfs->EndFile())
@@ -980,7 +980,7 @@ namespace btk
         output->SetPointFrequency(pointFrameRate);
       }  
     }
-    catch (BinaryFileStreamException& )
+    catch (BinaryFileStreamFailure& )
     {
       std::string excmsg; 
       if (!ibfs->IsOpen())

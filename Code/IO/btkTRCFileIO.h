@@ -53,6 +53,8 @@ namespace btk
   
   class TRCFileIO : public AcquisitionFileIO
   {
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS("TRC")
+    
   public:
     typedef SharedPtr<TRCFileIO> Pointer;
     typedef SharedPtr<const TRCFileIO> ConstPointer;

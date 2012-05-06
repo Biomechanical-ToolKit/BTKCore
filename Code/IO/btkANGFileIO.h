@@ -53,6 +53,9 @@ namespace btk
   
   class ANGFileIO : public AcquisitionFileIO
   {
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS("ANG")
+    BTK_IO_FILE_ONLY_READ_OPERATION
+    
   public:
     typedef SharedPtr<ANGFileIO> Pointer;
     typedef SharedPtr<const ANGFileIO> ConstPointer;
@@ -62,9 +65,7 @@ namespace btk
     // ~ANGFileIO(); // Implicit.
     
     BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
-    BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename);
     BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output);
-    BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input);
     
   protected:
     BTK_IO_EXPORT ANGFileIO();

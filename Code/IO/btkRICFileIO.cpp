@@ -100,20 +100,6 @@ namespace btk
   };
   
   /**
-   * Checks if the suffix of @a filename is RIC.
-   */
-  bool RICFileIO::CanWriteFile(const std::string& filename)
-  {
-    std::string lowercase = filename;
-    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type RIxPos = lowercase.substr(0,lowercase.length()-1).rfind(".ri");
-    if ((RIxPos != std::string::npos) && (RIxPos == lowercase.length() - 4) && ((*(lowercase.rbegin()) == 'c') || (*(lowercase.rbegin()) == 'f')))
-      return true;
-    else
-      return false;
-  };
-  
-  /**
    * Read the file designated by @a filename and fill @a output.
    */
   void RICFileIO::Read(const std::string& filename, Acquisition::Pointer output)
@@ -139,7 +125,7 @@ namespace btk
         btkIOErrorMacro(filename, "There is no section containing the labels of the markers.");
       }
     }
-    catch (BinaryFileStreamException& )
+    catch (BinaryFileStreamFailure& )
     {
       std::string excmsg; 
       if (bifs.EndFile())
@@ -171,24 +157,6 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close(); 
       throw(RICFileIOException("Unknown exception"));
     }
-  };
-  
-  /**
-   * Write the file designated by @a filename with the content of @a input.
-   */
-  void RICFileIO::Write(const std::string& filename, Acquisition::Pointer input)
-  {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    /*
-    if (input.get() == 0)
-    {
-      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
-      return;
-    }
-    */
-    btkErrorMacro("Method not yet implemented.");
-    return;
   };
   
   /**

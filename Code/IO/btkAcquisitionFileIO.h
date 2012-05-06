@@ -45,12 +45,16 @@ namespace btk
   class AcquisitionFileIO
   {
   public:
+    class Extensions;
+    
     typedef SharedPtr<AcquisitionFileIO> Pointer;
     typedef SharedPtr<const AcquisitionFileIO> ConstPointer;
     
     typedef enum {TypeNotApplicable, ASCII, Binary} FileType;
     typedef enum {OrderNotApplicable = 0, IEEE_LittleEndian, VAX_LittleEndian, IEEE_BigEndian} ByteOrder;
     typedef enum {StorageNotApplicable = 0, Float = -1, Integer = 1} StorageFormat;
+
+    virtual const Extensions& GetSupportedExtensions() const = 0;
 
     FileType GetFileType() const {return this->m_FileType;};
     ByteOrder GetByteOrder() const {return this->m_ByteOrder;};
@@ -60,10 +64,37 @@ namespace btk
     BTK_IO_EXPORT std::string GetStorageFormatAsString() const;
     void SetStorageFormat(StorageFormat s) {this->m_StorageFormat = s;};
 
-    BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename) = 0;
-    BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename) = 0;
-    BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output) = 0;
-    BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input) = 0;
+    virtual bool CanReadFile(const std::string& filename) = 0;
+    virtual bool CanWriteFile(const std::string& filename) = 0;
+    virtual void Read(const std::string& filename, Acquisition::Pointer output) = 0;
+    virtual void Write(const std::string& filename, Acquisition::Pointer input) = 0;
+    
+    struct Extension
+    {
+      Extension(const std::string& n) : name(n) {};
+      Extension(const std::string& n, const std::string& d) : name(n), desc(d) {};
+      std::string name;
+      std::string desc;
+    };
+    
+    class Extensions
+    {
+    public:
+      typedef std::list<Extension>::iterator Iterator;
+      typedef std::list<Extension>::const_iterator ConstIterator;
+      Extensions() : m_Items() {};
+      Iterator Begin() {return this->m_Items.begin();};
+      ConstIterator Begin() const {return this->m_Items.begin();};
+      Iterator End() {return this->m_Items.end();};
+      ConstIterator End() const {return this->m_Items.end();};
+      void Append(const Extensions& items) {this->m_Items.insert(this->End(), items.Begin(), items.End());};
+      int GetSize() const {return static_cast<int>(this->m_Items.size());};
+      Extensions& operator<< (const std::string& name) {this->m_Items.push_back(Extension(name)); return *this;};
+      Extensions& operator<< (const Extension& item) {this->m_Items.push_back(item); return *this;};
+      Extensions& operator| (const Extension& item) {this->m_Items.push_back(item); return *this;};
+    private:
+      std::list<Extension> m_Items;
+    };
     
   protected:
     BTK_IO_EXPORT AcquisitionFileIO();
@@ -80,5 +111,19 @@ namespace btk
     AcquisitionFileIO& operator=(const AcquisitionFileIO& ); // Not implemented.
   };
 };
-
+  
+#define BTK_IO_FILE_ONLY_READ_OPERATION \
+  public: \
+    virtual bool CanWriteFile(const std::string& ) {btkErrorMacro("Writing operations not supported. Wrong macro?");return false;}; \
+    virtual void Write(const std::string& , btk::Acquisition::Pointer ) {btkErrorMacro("Writing operations not supported. Wrong macro?");};
+  
+#define BTK_IO_FILE_ONLY_WRITE_OPERATION \
+  public: \
+    virtual bool CanReadFile(const std::string& ) {btkErrorMacro("Reading operations not supported. Wrong macro?");return false;}; \
+    virtual void Read(const std::string& , btk::Acquisition::Pointer ) {btkErrorMacro("Reading operations not supported. Wrong macro?");};
+  
+#define BTK_IO_FILE_SUPPORTED_EXTENSIONS(ext) \
+   public: \
+    virtual const btk::AcquisitionFileIO::Extensions& GetSupportedExtensions() const {static const btk::AcquisitionFileIO::Extensions SupportedExtensions(btk::AcquisitionFileIO::Extensions() << ext); return SupportedExtensions;};
+  
 #endif // __btkAcquisitionFileIO_h

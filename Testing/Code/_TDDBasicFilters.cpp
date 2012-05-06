@@ -4,6 +4,7 @@
 #include "ForcePlatformsExtractorTest.h"
 #include "ForcePlatformWrenchFilterTest.h"
 #include "GroundReactionWrenchFilterTest.h"
+#include "IMUsExtractorTest.h"
 #include "MeasureFrameExtractorTest.h"
 #include "MergeAcquisitionFilterTest.h"
 #include "SeparateKnownVirtualMarkersFilterTest.h"

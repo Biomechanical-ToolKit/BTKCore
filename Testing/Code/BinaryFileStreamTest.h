@@ -44,7 +44,7 @@ CXXTEST_SUITE(BinaryFileStreamTest)
   {
     btk::NativeBinaryFileStream bfs;
     bfs.SetExceptions(btk::BinaryFileStream::EndFileBit | btk::BinaryFileStream::FailBit | btk::BinaryFileStream::BadBit);
-    TS_ASSERT_THROWS(bfs.Close(), btk::BinaryFileStreamException);
+    TS_ASSERT_THROWS(bfs.Close(), btk::BinaryFileStreamFailure);
     TS_ASSERT_EQUALS(bfs.IsOpen(), false);
     TS_ASSERT_EQUALS(bfs.Good(), false);
     TS_ASSERT_EQUALS(bfs.EndFile(), false);
@@ -391,7 +391,7 @@ CXXTEST_SUITE(BinaryFileStreamTest)
     bfs.SeekRead(406526, btk::BinaryFileStream::Begin);
     TS_ASSERT_EQUALS(bfs.ReadI8(), 0x15);
     TS_ASSERT_EQUALS(bfs.ReadI8(), 0x00);
-    TS_ASSERT_THROWS(bfs.ReadI8(), btk::BinaryFileStreamException);
+    TS_ASSERT_THROWS(bfs.ReadI8(), btk::BinaryFileStreamFailure);
   };
   
   CXXTEST_TEST(Write)

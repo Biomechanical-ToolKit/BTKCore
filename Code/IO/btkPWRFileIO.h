@@ -53,6 +53,9 @@ namespace btk
   
   class PWRFileIO : public AcquisitionFileIO
   {
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS("PWR")
+    BTK_IO_FILE_ONLY_READ_OPERATION
+    
   public:
     typedef SharedPtr<PWRFileIO> Pointer;
     typedef SharedPtr<const PWRFileIO> ConstPointer;
@@ -62,9 +65,7 @@ namespace btk
     // ~PWRFileIO(); // Implicit.
     
     BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
-    BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename);
     BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output);
-    BTK_IO_EXPORT virtual void Write(const std::string& filename, Acquisition::Pointer input);
     
   protected:
     BTK_IO_EXPORT PWRFileIO();
