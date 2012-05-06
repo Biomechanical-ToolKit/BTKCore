@@ -36,7 +36,7 @@
 #ifndef __btkSharedPtr_h
 #define __btkSharedPtr_h
 
-#include <btkConfigure.h>
+#include "btkConfigure.h"
 
 namespace btk // For documentation purpose
 {
