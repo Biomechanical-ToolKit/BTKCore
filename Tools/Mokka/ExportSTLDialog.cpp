@@ -42,6 +42,7 @@ ExportSTLDialog::ExportSTLDialog(QWidget* parent)
 {
   this->setupUi(this);
 #ifdef Q_OS_MAC
+  this->layout()->setContentsMargins(12,12,12,12);
   this->setWindowFlags(Qt::Sheet);
   this->setWindowModality(Qt::WindowModal);
   this->resize(this->width(), this->height()-1); // FIXME: Only the way to remove the size grip under MacOS X?
@@ -50,6 +51,9 @@ ExportSTLDialog::ExportSTLDialog(QWidget* parent)
   connect(this->pathButton, SIGNAL(clicked()), this, SLOT(setExportPath()));
   connect(this->pathLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validExportInfo()));
   connect(this->filePrefixLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validExportInfo()));
+  connect(this->segmentListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(validExportInfo()));
+  
+  this->segmentListWidget->setFocus();
   
   this->validExportInfo();
 };
