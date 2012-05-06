@@ -220,25 +220,25 @@ namespace btk
   };
   
   /**
-   * @fn int TriangleMesh::GetCurrentFrame() const
-   * Returns the current frame used by the vertices to get their coordinates.
+   * @fn int TriangleMesh::GetCurrentFrameIndex() const
+   * Returns the index of the current frame used by the vertices to get their coordinates. The index starts from 0.
    */
    
   /**
-   * @fn void TriangleMesh::SetCurrentFrame(int frame)
-   * Sets the current frame used by the vertices to get their coordinates.
+   * @fn void TriangleMesh::SetCurrentFrameIndex(int frame)
+   * Sets the index of the current frame used by the vertices to get their coordinates. The index for the first frame is 0.
    */
   
   /**
-   * Constructor. Build the vertices, edges and faces, from the set of IDs @a m and the set of links @a l.
+   * Set the mesh based only on the given marker's id @a m and the links between them @a l.
    * If one of the given link contains a wrong ID (out of range), then, it is not added to the list of edges.
-   *
    * @warning This method can create non-manifold mesh!
    */
-  TriangleMesh::TriangleMesh(const std::vector<int>& m, const std::vector<VertexLink>& l)
-  : m_Vertices(m.size()), m_Edges(l.size()), m_Faces(), mp_Points()
+  void TriangleMesh::SetDefinition(const std::vector<int>& m, const std::vector<VertexLink>& l)
   {
-    this->m_CurrentFrame = -1;
+    this->m_Vertices.resize(m.size());
+    this->m_Edges.resize(l.size());
+    this->m_Faces.clear();
     
     this->SetGeometryPartially(m,l);
     
@@ -285,15 +285,16 @@ namespace btk
       }
     }
   };
-  
+   
   /**
-   * Constructor. Build the vertices, edges and faces, from the set of IDs @a m, the set of links @a l and the set of faces @a f.
-   * If one of the given link or face contains a wrong ID (out of range), then, it is not added.
+   * Set the mesh based on the given marker's id @a m, the links between them (@a l) and the faces defined as a set of three markers. (@a f).
+   * If one of the given link/face contains a wrong ID (out of range), then, it is not added to the list of edges/faces.
    */
-  TriangleMesh::TriangleMesh(const std::vector<int>& m, const std::vector<VertexLink>& l, const std::vector<VertexFace>& f)
-  : m_Vertices(m.size()), m_Edges(l.size()), m_Faces(f.size()), mp_Points()
+  void TriangleMesh::SetDefinition(const std::vector<int>& m, const std::vector<VertexLink>& l, const std::vector<VertexFace>& f)
   {
-    this->m_CurrentFrame = -1;
+    this->m_Vertices.resize(m.size());
+    this->m_Edges.resize(l.size());
+    this->m_Faces.resize(f.size());
     
     this->SetGeometryPartially(m,l);
     
@@ -327,6 +328,30 @@ namespace btk
       ++validFace;
     }
     this->m_Faces.resize(validFace);
+  };
+   
+  /**
+   * Constructor. Build the vertices, edges and faces, from the set of IDs @a m and the set of links @a l.
+   * If one of the given link contains a wrong ID (out of range), then, it is not added to the list of edges.
+   *
+   * @warning This method can create non-manifold mesh!
+   */
+  TriangleMesh::TriangleMesh(const std::vector<int>& m, const std::vector<VertexLink>& l)
+  : m_Vertices(m.size()), m_Edges(l.size()), m_Faces(), mp_Points()
+  {
+    this->m_CurrentFrame = -1;
+    this->SetDefinition(m,l);
+  };
+  
+  /**
+   * Constructor. Build the vertices, edges and faces, from the set of IDs @a m, the set of links @a l and the set of faces @a f.
+   * If one of the given link or face contains a wrong ID (out of range), then, it is not added.
+   */
+  TriangleMesh::TriangleMesh(const std::vector<int>& m, const std::vector<VertexLink>& l, const std::vector<VertexFace>& f)
+  : m_Vertices(m.size()), m_Edges(l.size()), m_Faces(f.size()), mp_Points()
+  {
+    this->m_CurrentFrame = -1;
+    this->SetDefinition(m,l,f);
   }
   
   void TriangleMesh::SetGeometryPartially(const std::vector<int>& m, const std::vector<VertexLink>& l)

@@ -149,8 +149,11 @@ namespace btk
     
     BTK_COMMON_EXPORT bool ConnectPoints(PointCollection::Pointer points);
     
-    int GetCurrentFrame() const {return this->m_CurrentFrame;};
-    void SetCurrentFrame(int frame) {this->m_CurrentFrame = frame;};
+    int GetCurrentFrameIndex() const {return this->m_CurrentFrame;};
+    void SetCurrentFrameIndex(int frame) {this->m_CurrentFrame = frame;};
+    
+    void SetDefinition(const std::vector<int>& m, const std::vector<VertexLink>& l);
+    void SetDefinition(const std::vector<int>& m, const std::vector<VertexLink>& l, const std::vector<VertexFace>& f);
     
   protected:
     BTK_COMMON_EXPORT TriangleMesh(const std::vector<int>& m, const std::vector<VertexLink>& l);

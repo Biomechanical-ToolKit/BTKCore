@@ -135,7 +135,7 @@ CXXTEST_SUITE(TriangleMeshTestTest)
     TS_ASSERT_EQUALS(mesh->GetEdgeNumber(),5);
     TS_ASSERT_EQUALS(mesh->GetFaceNumber(),2);
     TS_ASSERT(mesh->ConnectPoints(points));
-    mesh->SetCurrentFrame(0);
+    mesh->SetCurrentFrameIndex(0);
     for (btk::TriangleMesh::VertexConstIterator it = mesh->BeginVertex() ; it != mesh->EndVertex() ; ++it)
     {
       TS_ASSERT(it->IsValid());

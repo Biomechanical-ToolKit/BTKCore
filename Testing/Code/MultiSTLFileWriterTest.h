@@ -57,7 +57,9 @@ CXXTEST_SUITE(MultiSTLFileWriterTest)
     std::ifstream ifs(filename.c_str());
     TS_ASSERT(ifs.is_open());
     ifs.close();
-    // std::remove(filename.c_str());
+    TS_WARN("Improve this test by with a binary file stream and check its content.");
+    
+    std::remove(filename.c_str());
   };
 };
 
