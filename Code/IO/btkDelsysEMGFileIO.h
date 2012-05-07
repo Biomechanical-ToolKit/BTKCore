@@ -33,47 +33,52 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkEMxFileIO_h
-#define __btkEMxFileIO_h
+#ifndef __btkDelsysEMGFileIO_h
+#define __btkDelsysEMGFileIO_h
 
 #include "btkAcquisitionFileIO.h"
 #include "btkException.h"
 
 namespace btk
 {
-  class EMxFileIOException : public Exception
+  class DelsysEMGFileIOException : public Exception
   {
   public:
-    explicit EMxFileIOException(const std::string& msg)
+    explicit DelsysEMGFileIOException(const std::string& msg)
     : Exception(msg)
     {};
       
-    virtual ~EMxFileIOException() throw() {};
+    virtual ~DelsysEMGFileIOException() throw() {};
   };
   
-  class EMxFileIO : public AcquisitionFileIO
+  class DelsysEMGFileIO : public AcquisitionFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("EMG", "BTS Bioengineering"))
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("EMG", "Delsys"))
     BTK_IO_FILE_ONLY_READ_OPERATION
     
   public:
-    typedef SharedPtr<EMxFileIO> Pointer;
-    typedef SharedPtr<const EMxFileIO> ConstPointer;
+    typedef SharedPtr<DelsysEMGFileIO> Pointer;
+    typedef SharedPtr<const DelsysEMGFileIO> ConstPointer;
     
-    static Pointer New() {return Pointer(new EMxFileIO());};
+    static Pointer New() {return Pointer(new DelsysEMGFileIO());};
     
-    // ~EMxFileIO(); // Implicit.
+    // ~DelsysEMGFileIO(); // Implicit.
     
     BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
     BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output);
     
+    int GetFileVersion() const {return this->m_Version;};
+    
   protected:
-    BTK_IO_EXPORT EMxFileIO();
+    BTK_IO_EXPORT DelsysEMGFileIO();
     
   private:
-    EMxFileIO(const EMxFileIO& ); // Not implemented.
-    EMxFileIO& operator=(const EMxFileIO& ); // Not implemented. 
+    
+    DelsysEMGFileIO(const DelsysEMGFileIO& ); // Not implemented.
+    DelsysEMGFileIO& operator=(const DelsysEMGFileIO& ); // Not implemented. 
+    
+    int m_Version;
    };
 };
 
-#endif // __btkEMxFileIO_h
+#endif // __btkDelsysEMGFileIO_h

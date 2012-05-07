@@ -53,6 +53,8 @@
 #include "btkXLSOrthoTrakFileIO.h"
 // BTS IO
 #include "btkTDFFileIO.h"
+// Delsys IO
+#include "btkDelsysEMGFileIO.h"
 // Elite IOs
 #include "btkANGFileIO.h"
 #include "btkEMxFileIO.h"
@@ -83,6 +85,8 @@ namespace btk
     BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(XLSOrthoTrakFileIO)
     
     BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(TDFFileIO)
+    
+    BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(DelsysEMGFileIO) // MUST BE BEFORE btkEMxFileIO.cpp
     
     BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(ANGFileIO)
     BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(EMxFileIO)

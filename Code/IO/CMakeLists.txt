@@ -13,6 +13,7 @@ SET(BTKIO_SRCS
   btkANGFileIO.cpp
   btkC3DFileIO.cpp
   btkCALForcePlateFileIO.cpp
+  btkDelsysEMGFileIO.cpp
   btkEMFFileIO.cpp
   btkEMxFileIO.cpp
   btkGRxFileIO.cpp
