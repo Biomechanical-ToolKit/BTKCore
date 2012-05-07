@@ -122,7 +122,7 @@ void Model::setSegmentDefinition(int id, const QVector<int>& markerIds, const QV
     (*it)->markerIds = markerIds;
     (*it)->links = links;
     (*it)->faces = faces;
-    (*it)->mesh = btk::TriangleMesh::New(markerIds.toStdVector(),links.toStdVector(),faces.toStdVector());
+    (*it)->mesh->SetDefinition(markerIds.toStdVector(),links.toStdVector(),faces.toStdVector());
     emit segmentDefinitionChanged(id);
   }
 };

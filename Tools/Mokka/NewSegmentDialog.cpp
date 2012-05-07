@@ -166,6 +166,7 @@ NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, QTreeWidgetItem*
   // To edit an existing segment
   else
   {
+    this->segmentLabelEdit->setText("Edition Mode"); // For the validate() method
     int markerRowIdx = 0, checkedMarkers = 0;
     for (int i = 0 ; i != markersRoot->childCount() ; ++i)
     {
@@ -512,15 +513,21 @@ void NewSegmentDialog::keyPressEvent(QKeyEvent* e)
   }
   else if (e->key() == Qt::Key_E)
   {
+    if (this->markersTable->selectedItems().count()/2 < 2)
+      return;
     this->buildEdges();
     this->updateSegmentDefinition();
     this->viz3D->render();
+    this->validate();
   }
   else if (e->key() == Qt::Key_F)
   {
+    if (this->markersTable->selectedItems().count()/2 < 3)
+      return;
     this->buildFaces();
     this->updateSegmentDefinition();
     this->viz3D->render();
+    this->validate();
   }
   else
     QDialog::keyPressEvent(e);
@@ -629,30 +636,27 @@ void NewSegmentDialog::buildEdges(QList<QTableWidgetItem*>* markers, QList<QTabl
     m.push_back(*it);
   }
   
-  if (pointIds.size() >= 2)
-  {
-    qSort(pointIds.begin(), pointIds.end());
+  qSort(pointIds.begin(), pointIds.end());
   
-    this->linksTable->blockSignals(true);
-    for (int i = 0 ; i < pointIds.size() ; ++i)
+  this->linksTable->blockSignals(true);
+  for (int i = 0 ; i < pointIds.size() ; ++i)
+  {
+    for (int j = i+1 ; j < pointIds.size() ; ++j)
     {
-      for (int j = i+1 ; j < pointIds.size() ; ++j)
+      for (int k = 0 ; k < this->linksTable->rowCount() ; ++k)
       {
-        for (int k = 0 ; k < this->linksTable->rowCount() ; ++k)
+        int id1 = this->linksTable->item(k,1)->data(PointId).toInt();
+        int id2 = this->linksTable->item(k,2)->data(PointId).toInt();
+        if ((pointIds[i] == id1) && (pointIds[j] == id2))
         {
-          int id1 = this->linksTable->item(k,1)->data(PointId).toInt();
-          int id2 = this->linksTable->item(k,2)->data(PointId).toInt();
-          if ((pointIds[i] == id1) && (pointIds[j] == id2))
-          {
-            e.push_back(this->linksTable->item(k,0));
-            this->linksTable->item(k,0)->setCheckState(Qt::Checked);
-            break;
-          }
+          e.push_back(this->linksTable->item(k,0));
+          this->linksTable->item(k,0)->setCheckState(Qt::Checked);
+          break;
         }
       }
     }
-    this->linksTable->blockSignals(false);
   }
+  this->linksTable->blockSignals(false);
   
   if (markers != 0)
     *markers = m;

@@ -1916,8 +1916,8 @@ void MainWindow::editSegment(bool isNew)
     {
       if (nsd.exec() == QDialog::Accepted)
       {
-        seg->label = nsd.segmentLabelLabel->text();
-        seg->description = nsd.segmentDescriptionLabel->text();
+        seg->label = nsd.segmentLabelEdit->text();
+        seg->description = nsd.segmentDescriptionEdit->text();
         this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new InsertSegment(this->mp_Model, seg)));
       }
       else
@@ -1956,10 +1956,8 @@ void MainWindow::editSegment(bool isNew)
       else
       {
         // Force the segment defintion to be as before the edition
-        seg->markerIds = oldMarkerIds;
-        seg->links = oldLinks;
-        seg->faces = oldFaces;
         seg->surfaceVisible = oldSurfaceVisible;
+        this->mp_Model->setSegmentDefinition(segmentId, oldMarkerIds, oldLinks, oldFaces);
         this->multiView->setSegmentsSurfaceVisibility(QVector<int>(1,segmentId), QVector<bool>(1,oldSurfaceVisible));
         this->multiView->updateSegmentDefinition(segmentId);
       }
