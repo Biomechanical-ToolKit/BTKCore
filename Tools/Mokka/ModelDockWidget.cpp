@@ -907,6 +907,9 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
         else
           xmlReader.skipCurrentElement();
       }
+      // Synchronize the segment's infos and the corresponding mesh.
+      for (int i = 0 ; i < segments.size() ; ++i)
+        segments[i].mesh->SetDefinition(segments[i].markerIds.toStdVector(), segments[i].links.toStdVector(), segments[i].faces.toStdVector());
     }
     else
       xmlReader.raiseError(QObject::tr("The file is not a Mokka Model Visual Configuration file."));
