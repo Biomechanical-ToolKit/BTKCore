@@ -4,6 +4,7 @@
 #include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileWriter.h>
 #include <btkC3DFileIO.h>
+#include <btkConvert.h>
 
 CXXTEST_SUITE(C3DFileWriterTest)
 {
@@ -1196,6 +1197,40 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(output->GetLastFrame(), frameIndex);
     TS_ASSERT_EQUALS(output->GetLastFrame(), 100000);
   }
+  
+  CXXTEST_TEST(convertDelsysEMG2C3D)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(DelsysEMGFilePathIN + "Set1[Rep2]_v3.emg");
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(reader->GetOutput());
+    writer->SetFilename(C3DFilePathOUT + "Set1[Rep2]_v3_rewritedInC3D.c3d");
+    writer->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "Set1[Rep2]_v3_rewritedInC3D.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+
+    for(int i = 0 ; i < 8 ; ++i)
+    {
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel(), acq2->GetAnalog(i)->GetLabel());
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetUnit(), acq2->GetAnalog(i)->GetUnit());
+      TS_ASSERT_DELTA(acq->GetAnalog(i)->GetScale(), acq2->GetAnalog(i)->GetScale(), 5e-15);
+      for(int j = 0 ; j < 60000 ; j+=100)
+      {
+        TSM_ASSERT_DELTA("Channel #" + btk::ToString(i) + " - Sample " + btk::ToString(j), acq->GetAnalog(i)->GetValues()(j), acq2->GetAnalog(i)->GetValues()(j), 5e-11);
+      }
+    }
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileWriterTest)
@@ -1228,4 +1263,5 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, emptyAcquisition_Template)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertTRC2C3D)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, noInputModification)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, acq100000)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertDelsysEMG2C3D)
 #endif

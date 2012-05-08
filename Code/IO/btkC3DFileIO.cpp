@@ -1470,14 +1470,23 @@ namespace btk
     size_t inc = 0;
     this->m_AnalogChannelScale.resize(analogNumber, 1.0);
     this->m_AnalogZeroOffset.resize(analogNumber, 0);
+    double minAnalogscale = 1.0;
     for (Acquisition::AnalogConstIterator itAnalog = input->BeginAnalog() ; itAnalog != input->EndAnalog() ; ++itAnalog)
     {
       this->m_AnalogChannelScale[inc] = (*itAnalog)->GetScale();
       this->m_AnalogZeroOffset[inc] = (*itAnalog)->GetOffset();
+      if ((*itAnalog)->GetScale() < minAnalogscale)
+        minAnalogscale = (*itAnalog)->GetScale();
       ++inc;
     }
     // ANALOG:GEN_SCALE
     this->m_AnalogUniversalScale = 1.0;
+    if (minAnalogscale < 1.0e-5)
+    {
+      this->m_AnalogUniversalScale = minAnalogscale / (minAnalogscale * 1.0e5);
+      for (size_t i = 0 ; i < this->m_AnalogChannelScale.size() ; ++i)
+        this->m_AnalogChannelScale[i] /= this->m_AnalogUniversalScale;
+    }
     // ANALOG:FORMAT
     this->m_AnalogIntegerFormat = Signed;
     MetaData::ConstIterator itAnalog = input->GetMetaData()->FindChild("ANALOG");
