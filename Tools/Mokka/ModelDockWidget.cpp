@@ -1738,6 +1738,9 @@ void ModelDockWidget::displayProperties()
     this->analogGainComboBox->blockSignals(true);
     this->analogGainComboBox->setCurrentIndex(uniqueGain ? g : 0);
     this->analogGainComboBox->blockSignals(false);
+    this->analogScaleSpinBox->setDecimals(5);
+    if (uniqueScale && (s < 1.0e5))
+      this->analogScaleSpinBox->setDecimals(15);
     this->analogScaleSpinBox->setValue(uniqueScale ? s : 0.0); if (!uniqueOffset) this->analogScaleSpinBox->clear();
     this->analogOffsetSpinBox->setValue(uniqueOffset ? o : 0); if (!uniqueOffset) this->analogOffsetSpinBox->clear();
     this->propertiesStack->setCurrentWidget(this->analogPage);

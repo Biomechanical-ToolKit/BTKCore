@@ -847,13 +847,6 @@ void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segme
   for (QList<Segment*>::const_iterator it = segments.begin() ; it != segments.end() ; ++it)
   {
     colors[inc++] = (*it)->color;
-    // std::vector<int> btkPointIds((*it)->markerIds.size());
-    // std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks((*it)->links.size());
-    // for (int i = 0 ; i < (*it)->markerIds.size() ; ++i)
-    //   btkPointIds[i] = (*it)->markerIds[i];
-    // for (int i = 0 ; i < (*it)->links.size() ; ++i)
-    //   btkLinks[i].SetIds((*it)->links[i].first, (*it)->links[i].second);
-    // segmentsFramesSource->AppendDefinition(btkPointIds, btkLinks);
     segmentsFramesSource->AppendDefinition((*it)->mesh, (*it)->surfaceVisible);
   }
   this->setSegmentsColor(ids.toVector(), colors);

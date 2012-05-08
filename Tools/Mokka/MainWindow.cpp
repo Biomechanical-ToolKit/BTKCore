@@ -262,6 +262,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionImportGR, SIGNAL(triggered()), this, SLOT(importGRx()));
   connect(this->actionImportEMF, SIGNAL(triggered()), this, SLOT(importEMF()));
   connect(this->actionImportAMTI, SIGNAL(triggered()), this, SLOT(importAMTI()));
+  connect(this->actionImportDelsysEMG, SIGNAL(triggered()), this, SLOT(importDelsysEMG()));
   connect(this->actionImportVideo, SIGNAL(triggered()), this, SLOT(importVideos()));
   connect(this->actionExportC3D, SIGNAL(triggered()), this, SLOT(exportC3D()));
   connect(this->actionExportTRC, SIGNAL(triggered()), this, SLOT(exportTRC()));
@@ -789,14 +790,16 @@ void MainWindow::openFile()
   {
     QStringList formats;
     this->mp_Acquisition->supportedReadFileFormats(formats);
-    QString allFormat, byFormat;
+    QStringList allFormats;
+    QString byFormat;
     foreach(const QString& str, formats)
     {
       QString ext = "*." + str.split(" ")[0].toLower();
-      allFormat +=  (!allFormat.isEmpty() ? " " : "") + ext;
+      if (allFormats.indexOf(ext) == -1)
+        allFormats.append(ext);
       byFormat += (!byFormat.isEmpty() ? ";;" : "") + str + " (" + ext + ")";
     }
-    allFormat = "Acquisition Files (" + allFormat + ");;";
+    QString allFormat = "Acquisition Files (" + allFormats.join(" ") + ");;";
     
     QString filename = QFileDialog::getOpenFileName(this, "",
                          this->m_LastDirectory,
@@ -1208,6 +1211,11 @@ void MainWindow::importAMTI()
 void MainWindow::importEMF()
 {
   this->importAcquisition(tr("EMF Ascension Files (*.emf)"));
+};
+
+void MainWindow::importDelsysEMG()
+{
+  this->importAcquisition(tr("EMG Files (*.emg)"));
 };
 
 void MainWindow::importAcquisition(const QString& filter)

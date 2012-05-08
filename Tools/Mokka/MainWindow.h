@@ -103,6 +103,7 @@ public slots:
   void importPWR();
   void importAMTI();
   void importEMF();
+  void importDelsysEMG();
   void importVideos();
   void exportC3D();
   void exportTRC();

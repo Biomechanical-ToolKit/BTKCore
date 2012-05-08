@@ -118,6 +118,7 @@
      <addaction name="menuMotion_Analysis_Corp_2"/>
      <addaction name="menuBTS_Bioengineering"/>
      <addaction name="actionImportAMTI"/>
+     <addaction name="actionImportDelsysEMG"/>
      <addaction name="actionImportEMF"/>
      <addaction name="separator"/>
      <addaction name="actionImportVideo"/>
@@ -508,6 +509,11 @@
   <action name="actionExportASCII">
    <property name="text">
     <string>ASCII/Text file...</string>
+   </property>
+  </action>
+  <action name="actionImportDelsysEMG">
+   <property name="text">
+    <string>Delsys EMG file..</string>
    </property>
   </action>
  </widget>
