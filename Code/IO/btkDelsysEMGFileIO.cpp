@@ -263,9 +263,9 @@ namespace btk
           bifs.SeekRead(16, BinaryFileStream::Current); //  High Pass & Low Pass cutoff frequency
           if (this->m_Version == 4)
           {
-            // Sample frequency
-            // Start offset
-            bifs.SeekRead(16, BinaryFileStream::Current);
+            // Sample frequency: double
+            // Start offset: float32
+            bifs.SeekRead(12, BinaryFileStream::Current);
           }
           (*it)->SetScale(resolutions[inc] / gains[inc]);
           (*it)->SetOffset(static_cast<int>(offsets[inc] / gains[inc]));
