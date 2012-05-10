@@ -3,6 +3,7 @@ SET(BTKBasicFilters_SRCS
   btkForcePlatformsExtractor.cpp
   btkForcePlatformWrenchFilter.cpp
   btkGroundReactionWrenchFilter.cpp
+  btkIMUsExtractor.cpp
   btkMergeAcquisitionFilter.cpp
   btkSeparateKnownVirtualMarkersFilter.cpp
   btkSpecializedPointsExtractor.cpp
