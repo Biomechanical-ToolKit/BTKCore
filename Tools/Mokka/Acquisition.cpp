@@ -327,7 +327,10 @@ void Acquisition::setFirstFrame(int ff)
   this->mp_ROI[0] -= diff;
   this->mp_ROI[1] -= diff;
   for (QMap<int,Event*>::iterator it = this->m_Events.begin() ; it != this->m_Events.end() ; ++it)
+  {
     (*it)->frame -= diff;
+    (*it)->time = static_cast<double>((*it)->frame - 1) / this->pointFrequency();
+  }
   for (QMap<int,Video*>::iterator it = this->m_Videos.begin() ; it != this->m_Videos.end() ; ++it)
     (*it)->delay -= static_cast<qint64>(static_cast<double>(diff) / this->pointFrequency() * 1000.0);
   emit firstFrameChanged(ff);
