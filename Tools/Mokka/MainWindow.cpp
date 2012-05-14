@@ -1824,7 +1824,10 @@ void MainWindow::editSegment(bool isNew)
     QTreeWidgetItem* item = segmentsRoot->child(i);
     int id = item->data(0,SegmentId).toInt();
     if ((item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked) || item->isHidden())
+    {
       unvisibleSegmentIds << id;
+      segmentIds << id;
+    }
     else if ((item->isSelected()) && !isNew)
       segmentId = id;
     else
@@ -1846,7 +1849,10 @@ void MainWindow::editSegment(bool isNew)
       QTreeWidgetItem* item = markersRoot->child(i);
       int id = item->data(0,PointId).toInt();
       if ((item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked) || item->isHidden())
+      {
         unvisibleMarkerIds << id;
+        unselectedMarkerIds << id;
+      }
       else if (!item->isSelected())
         unselectedMarkerIds << id;
       else 
@@ -1930,7 +1936,12 @@ void MainWindow::editSegment(bool isNew)
       }
       else
       {
-        this->multiView->updateHiddenSegments(QList<int>() << segmentId);
+        // To know that a canceled segment exist in VTK
+        QTreeWidgetItem* segmentItem = new QTreeWidgetItem(QStringList("Canceled segment"));
+        segmentItem->setData(0, SegmentId, segmentId);
+        segmentItem->setHidden(true);
+        segmentsRoot->addChild(segmentItem);
+        unvisibleSegmentIds << segmentId;
         delete seg;
         canceled = true;
       }
