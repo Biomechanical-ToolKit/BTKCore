@@ -46,10 +46,12 @@ ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
   this->setupUi(this);
   
   this->setAttribute(Qt::WA_TranslucentBackground);
-  this->resize(190,250);
+  this->resize(215,250);
   
   QHeaderView* header = this->plotTable->horizontalHeader();
   header->setMovable(false);
+  header->resizeSection(2, 25);
+  header->setResizeMode(2, QHeaderView::Fixed);
   header->resizeSection(1, 25);
   header->setResizeMode(1, QHeaderView::Fixed);
   header->setResizeMode(0, QHeaderView::Stretch);
@@ -97,13 +99,20 @@ void ChartOptionsWidget::setPlot(int rowIdx, const QString& label, const QColor&
   QTableWidgetItem* item = new QTableWidgetItem(this->createLineIcon(color, width), label);
   item->setData(LineColor, color);
   item->setData(LineWidth, width);
+  item->setData(ItemEnabled, true);
+  item->setForeground(Qt::black);
   this->plotTable->setItem(rowIdx, 0, item);
-  QPushButton* button = new QPushButton("", this);
+  QPushButton* button = 0;
+  button = new QPushButton("", this);
+  button->setFlat(true);
+  button->setStyleSheet("QPushButton {image: url(:/Resources/Images/eye2.png);} QPushButton:pressed {image: url(:/Resources/Images/eye.png);} QPushButton:flat {border: none;}");
+  this->plotTable->setCellWidget(rowIdx, 1, button);
+  connect(button, SIGNAL(clicked()), this, SLOT(togglePlotVisibility()));
+  button = new QPushButton("", this);
   button->setFlat(true);
   button->setStyleSheet("QPushButton {image: url(:/Resources/Images/plot_delete.png);} QPushButton:pressed {image: url(:/Resources/Images/plot_delete-down.png);} QPushButton:flat {border: none;}");
-  this->plotTable->setCellWidget(rowIdx, 1, button);
+  this->plotTable->setCellWidget(rowIdx, 2, button);
   this->plotTable->setRowHidden(rowIdx, !visible);
-  
   connect(button, SIGNAL(clicked()), this, SLOT(removePlot()));
 };
 
@@ -207,7 +216,7 @@ void ChartOptionsWidget::removePlot()
   QObject* obj = sender();
   for (int i = 0 ; i < this->plotTable->rowCount() ; ++i)
   {
-    if (this->plotTable->cellWidget(i,1) == obj)
+    if (this->plotTable->cellWidget(i,2) == obj)
     {
       this->plotTable->removeRow(i);
       emit plotRemoved(i);
@@ -268,6 +277,35 @@ void ChartOptionsWidget::setLineWidth(double value)
     }
   }
   emit lineWidthChanged(indices, value);
+};
+
+void ChartOptionsWidget::togglePlotVisibility()
+{
+  QObject* obj = sender();
+  for (int i = 0 ; i < this->plotTable->rowCount() ; ++i)
+  {
+    if (this->plotTable->cellWidget(i,1) == obj)
+    {
+      QTableWidgetItem* item = this->plotTable->item(i,0);
+      bool isEnabled = item->data(ItemEnabled).toBool();
+      if (!isEnabled)
+      {
+        static_cast<QPushButton*>(obj)->setStyleSheet("QPushButton {image: url(:/Resources/Images/eye2.png);} QPushButton:pressed {image: url(:/Resources/Images/eye.png);} QPushButton:flat {border: none;}");
+        item->setData(ItemEnabled, true);
+        item->setForeground(Qt::black);
+      }
+      else
+      {
+        static_cast<QPushButton*>(obj)->setStyleSheet("QPushButton {image: url(:/Resources/Images/eye-blind2.png);} QPushButton:pressed {image: url(:/Resources/Images/eye-blind.png);} QPushButton:flat {border: none;}");
+        item->setData(ItemEnabled, false);
+        item->setForeground(Qt::darkGray);
+      }
+      emit plotHidden(i,isEnabled);
+      break;
+    }
+  }
+  if (this->plotTable->rowCount() == 0)
+    this->setPlotOptionEnabled(false);
 };
 
 bool ChartOptionsWidget::event(QEvent* event)

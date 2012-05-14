@@ -108,6 +108,7 @@ public:
   
 public slots:
   void removePlot(int index);
+  void hidePlot(int index, bool isHidden);
   void setPlotLineColor(const QList<int>& indices, const QColor& color);
   void setPlotLineWidth(const QList<int>& indices, double value);
   void setChartTitle(const QString& title);
@@ -190,6 +191,7 @@ public:
   QList<PlotProperties>& plotsProperties() {return this->m_PlotsProperties;};
   const QList<PlotProperties>& plotsProperties() const {return this->m_PlotsProperties;};
   virtual void removePlot(int index, bool* layoutModified);
+  virtual void hidePlot(int index, bool isHidden, bool* layoutModified);
   void setFrameArray(vtkDoubleArray* array);
   virtual void setPlotVisible(int index, bool show, bool* layoutModified);
   virtual void show(Acquisition* acq, bool s, bool* layoutModified);

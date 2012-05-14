@@ -163,6 +163,7 @@ ChartWidget::ChartWidget(QWidget* parent)
   connect(this->mp_ChartOptions, SIGNAL(lineColorChanged(QList<int>, QColor)), this, SLOT(setPlotLineColor(QList<int>, QColor)));
   connect(this->mp_ChartOptions, SIGNAL(lineWidthChanged(QList<int>, double)), this, SLOT(setPlotLineWidth(QList<int>, double)));
   connect(this->mp_ChartOptions, SIGNAL(plotRemoved(int)), this, SLOT(removePlot(int)));
+  connect(this->mp_ChartOptions, SIGNAL(plotHidden(int, bool)), this, SLOT(hidePlot(int, bool)));
   connect(this->mp_ChartOptions, SIGNAL(chartTitleChanged(QString)), this, SLOT(setChartTitle(QString)));
   connect(resetZoomAction, SIGNAL(triggered()), this, SLOT(resetZoom()));
   connect(toggleEventDisplayAction, SIGNAL(triggered()), this, SLOT(toggleEventDisplay()));
@@ -390,6 +391,16 @@ void ChartWidget::removePlot(int index)
 {
   bool layoutModified;
   this->m_ChartData[this->m_CurrentChartType]->removePlot(index, &layoutModified);
+  if (layoutModified)
+    this->mp_ChartContentWidget->resizeCharts();
+  this->checkResetAxes(); // If no more plot or all of them are hidden, then the axes are reset.
+  this->render(true); // Options are shown
+};
+
+void ChartWidget::hidePlot(int index, bool isHidden)
+{
+  bool layoutModified;
+  this->m_ChartData[this->m_CurrentChartType]->hidePlot(index, isHidden, &layoutModified);
   if (layoutModified)
     this->mp_ChartContentWidget->resizeCharts();
   this->checkResetAxes(); // If no more plot or all of them are hidden, then the axes are reset.
@@ -976,6 +987,14 @@ void AbstractChartData::removePlot(int index, bool* layoutModified)
   for (size_t i = 0 ; i < this->mp_Charts->size() ; ++i)
     this->mp_Charts->operator[](i)->RemovePlot(index);
   this->m_PlotsProperties.removeAt(index);
+};
+
+void AbstractChartData::hidePlot(int index, bool isHidden, bool* layoutModified)
+{
+  *layoutModified = false;
+  for (size_t i = 0 ; i < this->mp_Charts->size() ; ++i)
+    this->mp_Charts->operator[](i)->HidePlot(index, isHidden);
+  this->m_PlotsProperties[index].visible = !isHidden;
 };
 
 void AbstractChartData::setFrameArray(vtkDoubleArray* array)

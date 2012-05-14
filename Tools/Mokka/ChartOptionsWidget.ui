@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>210</width>
+    <width>230</width>
     <height>307</height>
    </rect>
   </property>
@@ -55,7 +55,7 @@
       <bool>false</bool>
      </property>
      <property name="columnCount">
-      <number>2</number>
+      <number>3</number>
      </property>
      <attribute name="horizontalHeaderVisible">
       <bool>false</bool>
@@ -63,6 +63,7 @@
      <attribute name="verticalHeaderVisible">
       <bool>false</bool>
      </attribute>
+     <column/>
      <column/>
      <column/>
     </widget>

@@ -47,7 +47,7 @@ class ChartOptionsWidget : public QWidget, public Ui::ChartOptionsWidget
   Q_OBJECT
   
 public:
-  enum {LineColor = Qt::UserRole + 1, LineWidth, ItemId};
+  enum {LineColor = Qt::UserRole + 1, LineWidth, ItemId, ItemEnabled};
   
   ChartOptionsWidget(QWidget* parent = 0);
   
@@ -62,13 +62,15 @@ public slots:
   void removePlot();
   void setLineColor();
   void setLineWidth(double value);
+  void togglePlotVisibility();
   
 signals:
   void lineColorChanged(const QList<int>& indices, const QColor& color);
   void lineWidthChanged(const QList<int>& indices, double value);
-  void plotRemoved(int);
+  void plotRemoved(int id);
   void chartTitleChanged(const QString& title);
   void pausePlaybackRequested(bool paused);
+  void plotHidden(int id, bool isHidden);
   
 protected:
   virtual bool event(QEvent* event);
