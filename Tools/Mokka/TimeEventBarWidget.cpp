@@ -340,7 +340,6 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
       else if (frame > this->m_RightBoundPos)
         frame = this->m_RightBoundPos;
       this->setSliderValue(frame);
-      this->repaint();
     }
     else if (this->m_Mode == MoveLeftBound)
     {
@@ -450,6 +449,7 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
       return;
     }
     // Selection (point or rectangle)
+    bool noPreviousEventSelection = this->m_SelectedEvents.isEmpty();
     this->m_Mode = Rubber;
     this->m_RubberOrigin = event->pos();
     this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, QSize(1,1)));
@@ -469,6 +469,14 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
     }
     this->updateEventSelection(currentSelection);
     emit sliderPositionChanged(this->m_SliderPos); // To update some widgets which can display event
+    // If there was not some events selected, then we move the slider to the position
+    if (noPreviousEventSelection && selectedEvents.isEmpty() && ((event->modifiers() & Qt::ShiftModifier) != Qt::ShiftModifier))
+    {
+      this->m_Mode = MoveSlider;
+      int frame = (int)((qreal)(event->pos().x() - LeftMargin) / this->m_UnitStep) + this->m_ROIFirstFrame;
+      if ((frame >= this->m_LeftBoundPos) && (frame <= this->m_RightBoundPos))
+        this->setSliderValue(frame);
+    }
   }
   else
     this->m_Mode = None;
