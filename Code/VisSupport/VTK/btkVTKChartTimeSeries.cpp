@@ -522,7 +522,26 @@ namespace btk
    * @fn void VTKChartTimeSeries::DisplayZoomBoxOff()
    * Disable the displaying of zoom box.
    */
-   
+  
+  /**
+   * Show/Hide the plot for the given @a index.
+   */
+  void VTKChartTimeSeries::HidePlot(int index, bool isHidden)
+  {
+    if (static_cast<vtkIdType>(this->mp_Plots->size()) > index)
+    {
+      vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
+      vtkstd::advance(it, index);
+      if ((*it)->GetVisible() == !isHidden)
+        return;
+      (*it)->SetVisible(!isHidden);
+      // Ensure that the bounds of the chart are updated to fit well the plots
+      this->m_ChartBoundsValid = false;
+      // Mark the scene as dirty
+      if (this->Scene != NULL) this->Scene->SetDirty(true);
+    }
+  };
+  
   /**
    * Update the content of the chart which is not graphical. This function is called by the method Paint().
    */

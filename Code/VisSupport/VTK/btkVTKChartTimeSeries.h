@@ -155,6 +155,8 @@ namespace btk
     void DisplayZoomBoxOn() {this->SetDisplayZoomBox(1);};
     void DisplayZoomBoxOff() {this->SetDisplayZoomBox(0);};
     
+    BTK_VTK_EXPORT virtual void HidePlot(int index, bool isHidden);
+    
     BTK_VTK_EXPORT virtual void Update();
     BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
     BTK_VTK_EXPORT virtual vtkPlot* AddPlot(int type);
