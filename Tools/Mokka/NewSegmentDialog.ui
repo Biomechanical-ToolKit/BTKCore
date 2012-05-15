@@ -247,11 +247,6 @@
       </property>
       <item>
        <widget class="QLabel" name="noteLabel">
-        <property name="font">
-         <font>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
         <property name="text">
          <string>- Only 3 markers can be selected at the same time.
 - Key 'e' : create only edges.
