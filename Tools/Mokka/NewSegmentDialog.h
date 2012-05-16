@@ -49,7 +49,15 @@ class NewSegmentDialog : public QDialog, public Ui::NewSegmentDialog
   Q_OBJECT
 
 public:
-  NewSegmentDialog(Segment* seg, int segmentId, QTreeWidgetItem* markersRoot, bool editMode = false, QWidget* parent = 0);
+  struct MarkerInfo
+  {
+    MarkerInfo(int i, const QString& l, bool isSelected) : label(l) {this->id = i; this->selected = isSelected;};
+    int id;
+    QString label;
+    bool selected;
+  };
+  
+  NewSegmentDialog(Segment* seg, int segmentId, const QList<MarkerInfo>& markersInfo, bool editMode = false, QWidget* parent = 0);
   // ~NewSegmentDialog();
   
 public slots:
@@ -67,7 +75,7 @@ private slots:
 
 signals:
   void markerSelectionChanged(const QList<int>& ids);
-  void markerHiddenSelectionChanged(const QList<int>& ids);
+  void markerVisibleSelectionChanged(const QList<int>& ids);
   void segmentDefinitionChanged(int id, const QVector<int>& markerIds, const QVector<Pair>& links);
   void segmentDefinitionChanged(int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces);
   

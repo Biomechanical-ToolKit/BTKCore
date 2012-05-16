@@ -61,6 +61,7 @@
     <file>Resources/Images/skip_backward_active.png</file>
     <file>Resources/Images/skip_forward.png</file>
     <file>Resources/Images/skip_forward_active.png</file>
+    <file>Resources/Images/surface-visibility.png</file>
     <file>Resources/Images/pause.png</file>
     <file>Resources/Images/pause_active.png</file>
     <file>Resources/Images/play.png</file>
@@ -74,6 +75,7 @@
     <file>Resources/Images/Mokka_128.png</file>
     <file>Resources/Images/video.png</file>
     <file>Resources/Images/video_error.png</file>
+    <file>Resources/Images/virtual-markers.png</file>
     <file>Resources/Images/warning.png</file>
   </qresource>
 </RCC>

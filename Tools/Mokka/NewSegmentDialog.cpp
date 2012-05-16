@@ -47,7 +47,7 @@ const int FaceId = Qt::UserRole + 100;
 const int FaceList = Qt::UserRole + 101;
 const int LinkList = Qt::UserRole + 102;
  
-NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, QTreeWidgetItem* markersRoot, bool editMode, QWidget* parent)
+NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, const QList<MarkerInfo>& markersInfo, bool editMode, QWidget* parent)
 : QDialog(parent)
 {
   this->mp_Segment = seg;
@@ -113,19 +113,16 @@ NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, QTreeWidgetItem*
   if (!editMode)
   {
     int markerRowIdx = 0;
-    for (int i = 0 ; i != markersRoot->childCount() ; ++i)
+    for (QList<MarkerInfo>::const_iterator it = markersInfo.begin() ; it != markersInfo.end() ; ++it)
     {
       // Markers
-      QTreeWidgetItem* item = markersRoot->child(i);
-      if (item->isHidden() || (item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked))
-        continue;
       this->markersTable->insertRow(markerRowIdx);
       QTableWidgetItem* check = new QTableWidgetItem;
       this->markersTable->setItem(markerRowIdx, 0, check);
-      QTableWidgetItem* label = new QTableWidgetItem(item->text(ModelDockWidget::LabelHeader));
-      label->setData(PointId, item->data(ModelDockWidget::LabelHeader, PointId).toInt());
+      QTableWidgetItem* label = new QTableWidgetItem(it->label);
+      label->setData(PointId, it->id);
       this->markersTable->setItem(markerRowIdx, 1, label);
-      if (item->isSelected())
+      if (it->selected)
       {
         check->setCheckState(Qt::Checked);
         check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -139,26 +136,26 @@ NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, QTreeWidgetItem*
         label->setFlags(Qt::NoItemFlags);
       }
       ++markerRowIdx;
-    
+      
       // Links
       int linkRowIdx = this->linksTable->rowCount();
-      for (int j = i+1 ; j != markersRoot->childCount() ; ++j)
+      QList<MarkerInfo>::const_iterator it2 = it; ++it2;
+      for ( ; it2 != markersInfo.end() ; ++it2)
       {
-        QTreeWidgetItem* item2 = markersRoot->child(j);
         this->linksTable->insertRow(linkRowIdx);
         QTableWidgetItem* check = new QTableWidgetItem;
         check->setCheckState(Qt::Unchecked);
         check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        QTableWidgetItem* mkr1 = new QTableWidgetItem(item->text(0));
+        QTableWidgetItem* mkr1 = new QTableWidgetItem(it->label);
         mkr1->setFlags(Qt::ItemIsEnabled);
-        mkr1->setData(PointId, item->data(ModelDockWidget::LabelHeader, PointId).toInt());
-        QTableWidgetItem* mkr2 = new QTableWidgetItem(item2->text(0));
+        mkr1->setData(PointId, it->id);
+        QTableWidgetItem* mkr2 = new QTableWidgetItem(it2->label);
         mkr2->setFlags(Qt::ItemIsEnabled);
-        mkr2->setData(PointId, item2->data(ModelDockWidget::LabelHeader, PointId).toInt());
+        mkr2->setData(PointId, it2->id);
         this->linksTable->setItem(linkRowIdx, 0, check);
         this->linksTable->setItem(linkRowIdx, 1, mkr1);
         this->linksTable->setItem(linkRowIdx, 2, mkr2);
-        if (!item->isSelected() || !item2->isSelected())
+        if (!it->selected || !it2->selected)
           this->linksTable->setRowHidden(linkRowIdx, true);
         ++linkRowIdx;
       }
@@ -169,20 +166,16 @@ NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, QTreeWidgetItem*
   {
     this->segmentLabelEdit->setText("Edition Mode"); // For the validate() method
     int markerRowIdx = 0, checkedMarkers = 0;
-    for (int i = 0 ; i != markersRoot->childCount() ; ++i)
+    for (QList<MarkerInfo>::const_iterator it = markersInfo.begin() ; it != markersInfo.end() ; ++it)
     {
       // Markers
-      QTreeWidgetItem* item = markersRoot->child(i);
-      if (item->isHidden() || (item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked))
-        continue;
       this->markersTable->insertRow(markerRowIdx);
       QTableWidgetItem* check = new QTableWidgetItem;
       this->markersTable->setItem(markerRowIdx, 0, check);
-      QTableWidgetItem* label = new QTableWidgetItem(item->text(ModelDockWidget::LabelHeader));
-      int id = item->data(ModelDockWidget::LabelHeader, PointId).toInt();
-      label->setData(PointId, id);
+      QTableWidgetItem* label = new QTableWidgetItem(it->label);
+      label->setData(PointId, it->id);
       this->markersTable->setItem(markerRowIdx, 1, label);
-      if (seg->markerIds.indexOf(id) != -1)
+      if (seg->markerIds.indexOf(it->id) != -1)
       {
         check->setCheckState(Qt::Checked);
         check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
@@ -200,31 +193,30 @@ NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, QTreeWidgetItem*
       
       // Links
       int linkRowIdx = this->linksTable->rowCount();
-      for (int j = i+1 ; j != markersRoot->childCount() ; ++j)
+      QList<MarkerInfo>::const_iterator it2 = it; ++it2;
+      for ( ; it2 != markersInfo.end() ; ++it2)
       {
-        QTreeWidgetItem* item2 = markersRoot->child(j);
-        int id1 = item->data(ModelDockWidget::LabelHeader, PointId).toInt();
-        int id2 = item2->data(ModelDockWidget::LabelHeader, PointId).toInt();
         this->linksTable->insertRow(linkRowIdx);
         QTableWidgetItem* check = new QTableWidgetItem;
         check->setCheckState(Qt::Unchecked);
         check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        QTableWidgetItem* mkr1 = new QTableWidgetItem(item->text(0));
+        QTableWidgetItem* mkr1 = new QTableWidgetItem(it->label);
         mkr1->setFlags(Qt::ItemIsEnabled);
-        mkr1->setData(PointId, id1);
-        QTableWidgetItem* mkr2 = new QTableWidgetItem(item2->text(0));
+        mkr1->setData(PointId, it->id);
+        QTableWidgetItem* mkr2 = new QTableWidgetItem(it2->label);
         mkr2->setFlags(Qt::ItemIsEnabled);
-        mkr2->setData(PointId, id2);
+        mkr2->setData(PointId, it2->id);
         this->linksTable->setItem(linkRowIdx, 0, check);
         this->linksTable->setItem(linkRowIdx, 1, mkr1);
         this->linksTable->setItem(linkRowIdx, 2, mkr2);
-        if ((this->mp_Segment->markerIds.indexOf(id1) == -1) || (this->mp_Segment->markerIds.indexOf(id2) == -1))
+        if ((this->mp_Segment->markerIds.indexOf(it->id) == -1) || (this->mp_Segment->markerIds.indexOf(it2->id) == -1))
           this->linksTable->setRowHidden(linkRowIdx, true);
         else
         {
           for (int k = 0 ; k < this->mp_Segment->links.size() ; ++k)
           {
-            if ((id1 == this->mp_Segment->links[k].GetIds()[0]) && (id2 == this->mp_Segment->links[k].GetIds()[1]))
+            if ((it->id == this->mp_Segment->links[k].GetIds()[0]) && (it2->id == this->mp_Segment->links[k].GetIds()[1])
+              || (it->id == this->mp_Segment->links[k].GetIds()[1]) && (it2->id == this->mp_Segment->links[k].GetIds()[0]))
             {
               check->setCheckState(Qt::Checked);
               break;
@@ -235,7 +227,7 @@ NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, QTreeWidgetItem*
       }
     }
     if (checkedMarkers != this->mp_Segment->markerIds.size())
-      LOG_WARNING("At least one marker is missing Missing at least one ");
+      LOG_WARNING("At least one marker of the definition of the segment is missing.");
     
     // Existing faces
     for (int i = 0 ; i != this->mp_Segment->faces.size() ; ++i)
@@ -369,7 +361,7 @@ void NewSegmentDialog::updateMarkersUsed(QTableWidgetItem* item)
   QList<int> ids;
   for (int i = 0 ; i < this->markersTable->rowCount() ; ++i)
   {
-    if (this->markersTable->item(i,0)->checkState() == Qt::Unchecked)
+    if (this->markersTable->item(i,0)->checkState() == Qt::Checked)
       ids.push_back(this->markersTable->item(i,1)->data(PointId).toInt());
   }
   
@@ -429,7 +421,7 @@ void NewSegmentDialog::updateMarkersUsed(QTableWidgetItem* item)
   this->markersTable->blockSignals(false);
   
   this->updateSegmentDefinition();
-  emit markerHiddenSelectionChanged(ids);
+  emit markerVisibleSelectionChanged(ids);
   this->viz3D->renderer()->ResetCamera(); // To center the camera around the visible markers.
   this->viz3D->render();
 };

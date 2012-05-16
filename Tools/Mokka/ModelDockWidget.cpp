@@ -56,8 +56,9 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->mp_Model = 0;
   this->mp_DownArrowIcon = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallDownBlack.png"));
   this->mp_RightArrowIcon = new QIcon(QString::fromUtf8(":/Resources/Images/disclosureTriangleSmallRightBlack.png"));
-  this->mp_SegmentsIcon  = new QIcon(QString::fromUtf8(":/Resources/Images/link2.png"));
-  this->mp_MarkersIcon  = new QIcon(QString::fromUtf8(":/Resources/Images/markers.png"));
+  this->mp_SegmentsIcon = new QIcon(QString::fromUtf8(":/Resources/Images/link2.png"));
+  this->mp_MarkersIcon = new QIcon(QString::fromUtf8(":/Resources/Images/markers.png"));
+  this->mp_VirtualMarkersIcon = new QIcon(QString::fromUtf8(":/Resources/Images/virtual-markers.png"));
   this->mp_AnalogsIcon = new QIcon(QString::fromUtf8(":/Resources/Images/chart_line.png"));
   this->mp_ModelOutputsIcon = new QIcon(QString::fromUtf8(":/Resources/Images/chart_curve.png"));
   this->mp_ForcePlatesIcon = new QIcon(QString::fromUtf8(":/Resources/Images/forceplate-16.png"));
@@ -91,8 +92,7 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->segmentDescEdit->setFont(f);
   this->segmentLinkLabel->setFont(f);
   this->segmentEditLinksButton->setFont(f);
-  this->segmentSurfaceLabel->setFont(f);
-  this->segmentSurfaceVisibilityCheckBox->setFont(f);
+  this->segmentOptionsLabel->setFont(f);
   //  - Marker page
   static_cast<QGridLayout*>(this->markerPage->layout())->setVerticalSpacing(3);
   this->markerLabelLabel->setFont(f);
@@ -104,6 +104,7 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   this->markerColorLabel->setFont(f);
   this->markerDescLabel->setFont(f);
   this->markerDescEdit->setFont(f);
+  this->markerOptionsLabel->setFont(f);
   // - Point page
   static_cast<QGridLayout*>(this->pointPage->layout())->setVerticalSpacing(3);
   this->pointLabelLabel->setFont(f);
@@ -228,6 +229,12 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   markersRoot->setIcon(LabelHeader, *this->mp_MarkersIcon);
   markersRoot->setFlags(markersRoot->flags() & ~Qt::ItemIsSelectable);
   items.append(markersRoot);
+  // Markers
+  QTreeWidgetItem* virtualMarkersRoot = new QTreeWidgetItem(QStringList(QString("Virtual markers")));
+  virtualMarkersRoot->setFont(LabelHeader, f);
+  virtualMarkersRoot->setIcon(LabelHeader, *this->mp_VirtualMarkersIcon);
+  virtualMarkersRoot->setFlags(virtualMarkersRoot->flags() & ~Qt::ItemIsSelectable);
+  items.append(virtualMarkersRoot);
   // Analog channels
   QTreeWidgetItem* analogsRoot = new QTreeWidgetItem(QStringList(QString("Analog channels")));
   analogsRoot->setFont(LabelHeader, f);
@@ -322,7 +329,8 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   connect(this->segmentLabelEdit, SIGNAL(editingFinished()), this, SLOT(editSegmentLabel()));
   connect(this->segmentDescEdit, SIGNAL(editingFinished()), this, SLOT(editSegmentsDescription()));
   connect(this->segmentEditLinksButton, SIGNAL(clicked()), this, SIGNAL(segmentEditionRequested()));
-  connect(this->segmentSurfaceVisibilityCheckBox, SIGNAL(stateChanged(int)), this, SLOT(editSegmentSurfaceVisibility()));
+  connect(this->segmentVisibilityCheckBox, SIGNAL(stateChanged(int)), this, SLOT(editSegmentsVisibility()));
+  connect(this->segmentSurfaceVisibilityCheckBox, SIGNAL(stateChanged(int)), this, SLOT(editSegmentsSurfaceVisibility()));
   connect(this->markerLabelEdit, SIGNAL(editingFinished()), this, SLOT(editMarkerLabel()));
   connect(this->markerDescEdit, SIGNAL(editingFinished()), this, SLOT(editMarkersDescription()));
   connect(this->markerRadiusSlider, SIGNAL(valueChanged(int)), this, SLOT(updateMarkerRadiusSpinBox(int)));
@@ -341,6 +349,8 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
   connect(this->mp_SetMarkerColorInHistory3, SIGNAL(triggered()), this, SLOT(setMarkerRecentColor3()));
   connect(this->mp_SetMarkerColorInHistory4, SIGNAL(triggered()), this, SLOT(setMarkerRecentColor4()));
   connect(this->mp_SetMarkerColorInHistory5, SIGNAL(triggered()), this, SLOT(setMarkerRecentColor5()));
+  connect(this->markerVisibilityCheckBox, SIGNAL(stateChanged(int)), this, SLOT(editMarkersVisibility()));
+  connect(this->markerTrajectoryVisibilityCheckBox, SIGNAL(stateChanged(int)), this, SLOT(editMarkersTrajectoryVisibility()));
   connect(this->pointLabelEdit, SIGNAL(editingFinished()), this, SLOT(editPointLabel()));
   connect(this->pointDescEdit, SIGNAL(editingFinished()), this, SLOT(editPointsDescription()));
   connect(this->analogLabelEdit, SIGNAL(editingFinished()), this, SLOT(editAnalogLabel()));
@@ -364,6 +374,7 @@ ModelDockWidget::~ModelDockWidget()
   delete this->mp_RightArrowIcon;
   delete this->mp_SegmentsIcon;
   delete this->mp_MarkersIcon;
+  delete this->mp_VirtualMarkersIcon;
   delete this->mp_AnalogsIcon;
   delete this->mp_ModelOutputsIcon;
   delete this->mp_ForcePlatesIcon;
@@ -379,6 +390,9 @@ void ModelDockWidget::setAcquisition(Acquisition* acq)
   connect(this->mp_Acquisition, SIGNAL(pointLabelChanged(int, QString)), this, SLOT(setPointLabel(int, QString)));
   connect(this->mp_Acquisition, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
   connect(this->mp_Acquisition, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
+  connect(this->mp_Acquisition, SIGNAL(markersVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setMarkersVisibility(QVector<int>, QVector<bool>)));
+  connect(this->mp_Acquisition, SIGNAL(markersTrajectoryVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setMarkersTrajectoryVisibility(QVector<int>, QVector<bool>)));
+  connect(this->mp_Acquisition, SIGNAL(markersConfigurationReset(QList<int>, QList<bool>, QList<bool>, QList<double>, QList<QColor>)), this, SLOT(setMarkersConfiguration(QList<int>, QList<bool>, QList<bool>, QList<double>, QList<QColor>)));
   connect(this->mp_Acquisition, SIGNAL(pointsDescriptionChanged(QVector<int>, QVector<QString>)), this, SLOT(setPointsDescription(QVector<int>, QVector<QString>)));
   connect(this->mp_Acquisition, SIGNAL(pointsRemoved(QList<int>, QList<Point*>)), this, SLOT(removePoints(QList<int>, QList<Point*>)));
   connect(this->mp_Acquisition, SIGNAL(pointsInserted(QList<int>, QList<Point*>)), this, SLOT(insertPoints(QList<int>, QList<Point*>)));
@@ -406,6 +420,7 @@ void ModelDockWidget::setModel(Model* m)
   connect(this->mp_Model, SIGNAL(segmentLabelChanged(int, QString)), this, SLOT(setSegmentLabel(int, QString)));
   connect(this->mp_Model, SIGNAL(segmentsColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setSegmentsColor(QVector<int>, QVector<QColor>)));
   connect(this->mp_Model, SIGNAL(segmentsDescriptionChanged(QVector<int>, QVector<QString>)), this, SLOT(setSegmentsDescription(QVector<int>, QVector<QString>)));
+  connect(this->mp_Model, SIGNAL(segmentsVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setSegmentsVisibility(QVector<int>, QVector<bool>)));
   connect(this->mp_Model, SIGNAL(segmentsSurfaceVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setSegmentsSurfaceVisibility(QVector<int>, QVector<bool>)));
   connect(this->mp_Model, SIGNAL(segmentsRemoved(QList<int>, QList<Segment*>)), this, SLOT(removeSegments(QList<int>, QList<Segment*>)));
   connect(this->mp_Model, SIGNAL(segmentsInserted(QList<int>, QList<Segment*>)), this, SLOT(insertSegments(QList<int>, QList<Segment*>)));
@@ -421,6 +436,7 @@ void ModelDockWidget::load()
     
   // Create the tree
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
+  QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
   QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(ModelOutputsItem);
   QTreeWidgetItem* modelOutputAngles = modelOutputsRoot->child(0);
   QTreeWidgetItem* modelOutputForces = modelOutputsRoot->child(1);
@@ -432,8 +448,8 @@ void ModelDockWidget::load()
   {
     if (it.value()->type == Point::Marker)
       markersRoot->addChild(this->createMarkerItem(it.value()->label, it.key()));
-    else if (it.value()->type == Point::VirtualMarker)
-      markersRoot->addChild(this->createMarkerItem(it.value()->label, it.key(), false));
+    else if ((it.value()->type == Point::VirtualMarker) || (it.value()->type == Point::VirtualMarkerForFrame))
+      virtualMarkersRoot->addChild(this->createMarkerItem(it.value()->label, it.key(), false));
     else if (it.value()->type == Point::Angle)
       modelOutputAngles->addChild(this->createModelOutputItem(it.value()->label, it.key()));
     else if (it.value()->type == Point::Force)
@@ -586,6 +602,13 @@ QList<int> ModelDockWidget::selectedMarkers() const
     if (item->isSelected())
       ids << item->data(0, PointId).toInt();
   }
+  QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (int i = 0 ; i < virtualMarkersRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* item = virtualMarkersRoot->child(i);
+    if (item->isSelected())
+      ids << item->data(0, PointId).toInt();
+  }
   return ids;
 };
 
@@ -596,6 +619,13 @@ QList<int> ModelDockWidget::tailedMarkers() const
   for (int i = 0 ; i < markersRoot->childCount() ; ++i)
   {
     QTreeWidgetItem* item = markersRoot->child(i);
+    if (item->checkState(TrajectoryHeader) == Qt::Checked)
+      ids << item->data(0, PointId).toInt();
+  }
+  QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (int i = 0 ; i < virtualMarkersRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* item = virtualMarkersRoot->child(i);
     if (item->checkState(TrajectoryHeader) == Qt::Checked)
       ids << item->data(0, PointId).toInt();
   }
@@ -723,6 +753,8 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   QList<int> ids;
   QList<double> radii;
   QList<QColor> colors;
+  QList<bool> markersVisibility;
+  QList<bool> markersTrajectoryVisibility;
   QList<Segment> segments;
   QXmlStreamReader xmlReader(&file);
   bool isMokkaModelConfig = false;
@@ -750,6 +782,9 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
                 colors << QColor((int)(att.value("colorR").toString().toDouble() * 255),
                                  (int)(att.value("colorG").toString().toDouble() * 255),
                                  (int)(att.value("colorB").toString().toDouble() * 255));
+                QString str = att.value("visible").toString();
+                markersVisibility << (str.isEmpty() ? true : (str.compare("1") == 0));
+                markersTrajectoryVisibility << (att.value("trajectory").toString().compare("1") == 0);
               }
             }
             else
@@ -766,6 +801,8 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
               QXmlStreamAttributes att = xmlReader.attributes();
               QString segLabel = att.value("label").toString();
               QString segDesc = att.value("description").toString();
+              QString str = att.value("visible").toString();
+              bool segVisible = str.isEmpty() ? true : (str.compare("1") == 0);
               bool segSurfaceVisible = att.value("surface").toString().compare("1") == 0;
               QColor segColor = QColor((int)(att.value("colorR").toString().toDouble() * 255),
                                        (int)(att.value("colorG").toString().toDouble() * 255),
@@ -802,7 +839,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
                   xmlReader.skipCurrentElement();
                 xmlReader.readNext();
               }
-              segments << Segment(segLabel, segDesc, segColor, markerIds, links, faces, segSurfaceVisible);
+              segments << Segment(segLabel, segDesc, segColor, markerIds, links, faces, segVisible, segSurfaceVisible);
             }
             else
               xmlReader.skipCurrentElement();
@@ -853,6 +890,8 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
                     }
                     else
                       colors << QColor(rgb[0].toInt(), rgb[1].toInt(), rgb[2].toInt());
+                    markersVisibility << true;
+                    markersTrajectoryVisibility << false;
                     segmentsLabel << att.value("SEGMENT").toString();
                   }
                   xmlReader.skipCurrentElement();
@@ -953,15 +992,14 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
     this->modelConfigurationComboBox->addItem(configName);
     id = this->m_ConfigurationItems.count()-1;
   }
-  this->m_ConfigurationItems[id].isNew = (isMokkaModelConfig ? false : true); // Force the flag to note save over other file format than MVC.
+  this->m_ConfigurationItems[id].isNew = (isMokkaModelConfig ? false : true); // Force the flag to not save over other file format than MVC.
   this->setCurrentConfiguration(id);
   this->mp_SaveConfiguration->setEnabled(false);
   this->mp_RemoveConfiguration->setEnabled(true);
   this->mp_DeselectConfiguration->setEnabled(true);
   this->modelConfigurationComboBox->blockSignals(false);
   
-  this->mp_Acquisition->resetMarkersRadius(ids.toVector(), radii.toVector());
-  this->mp_Acquisition->resetMarkersColor(ids.toVector(), colors.toVector());
+  this->mp_Acquisition->resetMarkersConfiguration(ids, markersVisibility, markersTrajectoryVisibility, radii, colors);
   this->mp_Model->setSegments(segments);
 };
 
@@ -1157,6 +1195,26 @@ void ModelDockWidget::setSegmentsDescription(const QVector<int>& ids, const QVec
   this->displayProperties();
 };
 
+void ModelDockWidget::setSegmentsVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  this->modelTree->blockSignals(true);
+  QTreeWidgetItem* segmentsRoot = this->modelTree->topLevelItem(SegmentsItem);
+  for (int i = 0 ; i < ids.size() ; ++i)
+  {
+    for (int j = 0 ; j < segmentsRoot->childCount() ; ++j)
+    {
+      QTreeWidgetItem* item = segmentsRoot->child(j);
+      if (item->data(0, SegmentId).toInt() == ids[i])
+      {
+        item->setCheckState(VisibleHeader, visibles[i] ? Qt::Checked : Qt::Unchecked);
+        break;
+      }
+    }
+  }
+  this->modelTree->blockSignals(false);
+  this->displayProperties();
+};
+
 void ModelDockWidget::setSegmentsSurfaceVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
 {
   Q_UNUSED(ids);
@@ -1205,7 +1263,7 @@ void ModelDockWidget::insertSegments(const QList<int>& ids, const QList<Segment*
   {
     if (segments[i]->isNew)
     {
-      QTreeWidgetItem* item = this->createSegmentItem(segments[i]->label, ids[i]);
+      QTreeWidgetItem* item = this->createSegmentItem(segments[i]->label, ids[i], segments[i]->visible);
       segmentsRoot->addChild(item);
       this->modelTree->setCurrentItem(item); 
       segments[i]->isNew = false;
@@ -1248,7 +1306,28 @@ void ModelDockWidget::editSegmentsDescription()
     emit segmentsDescriptionChanged(ids, desc);
 };
 
-void ModelDockWidget::editSegmentSurfaceVisibility()
+void ModelDockWidget::editSegmentsVisibility()
+{
+  this->modelTree->blockSignals(true);
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  QVector<int> ids = QVector<int>(items.count());
+  int inc = 0;
+  bool checked = this->segmentVisibilityCheckBox->checkState() == Qt::Checked;
+  bool visibilityModified = false;
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    (*it)->setCheckState(VisibleHeader, checked ? Qt::Checked : Qt::Unchecked);
+    ids[inc] = (*it)->data(0, SegmentId).toInt();
+    if (this->mp_Model->segmentVisible(ids[inc]) != checked)
+      visibilityModified = true;
+    ++inc;
+  }
+  this->modelTree->blockSignals(false);
+  if (visibilityModified)
+    emit segmentsVisibilityChanged(ids, checked);
+};
+
+void ModelDockWidget::editSegmentsSurfaceVisibility()
 {
   QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
   QVector<int> ids = QVector<int>(items.count());
@@ -1269,15 +1348,20 @@ void ModelDockWidget::editSegmentSurfaceVisibility()
 void ModelDockWidget::updateDisplayedMarkers(const QVector<int>& ids)
 {
   this->modelTree->blockSignals(true);
-  QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
-  for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+  QList<QTreeWidgetItem*> roots;
+  roots << this->modelTree->topLevelItem(MarkersItem);
+  roots << this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
   {
-    QTreeWidgetItem* item = markersRoot->child(i);
-    int id = item->data(0,PointId).toInt();
-    if ((id < ids.count()) && ids[id] && (item->checkState(VisibleHeader) == Qt::Checked))
-      item->setForeground(0,displayLabelColor);
-    else
-      item->setForeground(0,defaultLabelColor);
+    for (int j = 0 ; j < (*itR)->childCount() ; ++j)
+    {
+      QTreeWidgetItem* item = (*itR)->child(j);
+      int id = item->data(0,PointId).toInt();
+      if ((id < ids.count()) && ids[id] && (item->checkState(VisibleHeader) == Qt::Checked))
+        item->setForeground(0,displayLabelColor);
+      else
+        item->setForeground(0,defaultLabelColor);
+    }
   }
   this->modelTree->blockSignals(false);
 };
@@ -1285,16 +1369,19 @@ void ModelDockWidget::updateDisplayedMarkers(const QVector<int>& ids)
 void ModelDockWidget::setTrackedMarkers(const QList<int>& ids)
 {
   this->modelTree->blockSignals(true);
-  QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
-  for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+  QList<QTreeWidgetItem*> roots;
+  roots << this->modelTree->topLevelItem(MarkersItem);
+  roots << this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
   {
-    QTreeWidgetItem* item = markersRoot->child(i);
-    //bool selected = item->isSelected();
-    if (ids.contains(item->data(0,PointId).toInt()))
-      item->setCheckState(TrajectoryHeader, Qt::Checked);
-    else
-      item->setCheckState(TrajectoryHeader, Qt::Unchecked);
-    //item->setSelected(selected);
+    for (int j = 0 ; j < (*itR)->childCount() ; ++j)
+    {
+      QTreeWidgetItem* item = (*itR)->child(j);
+      if (ids.contains(item->data(0,PointId).toInt()))
+        item->setCheckState(TrajectoryHeader, Qt::Checked);
+      else
+        item->setCheckState(TrajectoryHeader, Qt::Unchecked);
+    }
   }
   this->modelTree->blockSignals(false);
   emit markerTrajectorySelectionChanged(ids);
@@ -1304,16 +1391,27 @@ void ModelDockWidget::selectMarkers(QList<int> ids)
 {
   this->modelTree->blockSignals(true);
   this->modelTree->clearSelection();
-  QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
-  markersRoot->setExpanded(true);
-  this->modelTree->scrollToItem(markersRoot, QAbstractItemView::PositionAtTop);
-  for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+  
+  QList<QTreeWidgetItem*> roots;
+  roots << this->modelTree->topLevelItem(MarkersItem);
+  roots << this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (int i = 0 ; i < ids.size() ; ++i)
   {
-    QTreeWidgetItem* item = markersRoot->child(i);
-    if (ids.contains(item->data(0,PointId).toInt()))
+    for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
     {
-      item->setSelected(true);
-      this->modelTree->scrollToItem(item);
+      bool found = false;
+      for (int j = 0 ; j < (*itR)->childCount() ; ++j)
+      {
+        QTreeWidgetItem* item = (*itR)->child(j);
+        if (item->data(0, PointId).toInt() == ids[i])
+        {
+          item->setSelected(true);
+          this->modelTree->scrollToItem(item);
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
     }
   }
   this->modelTree->blockSignals(false);
@@ -1578,6 +1676,7 @@ void ModelDockWidget::displayProperties()
   {
   case SegmentType:
     {
+    this->segmentVisibilityCheckBox->blockSignals(true);
     this->segmentSurfaceVisibilityCheckBox->blockSignals(true);
     this->mp_HideSelectedSegments->setEnabled(true);
     this->mp_UnhideSelectedSegments->setEnabled(true);
@@ -1596,13 +1695,17 @@ void ModelDockWidget::displayProperties()
       QColor c = this->mp_Model->segmentColor(id);
       this->markerColorButton->setProperty("markerColor", c);
       this->markerColorButton->setIcon(this->createMarkerIcon(c, true));
-      this->segmentSurfaceVisibilityCheckBox->setChecked(this->mp_Model->segmentSurfaceVisible(id) ? Qt::Checked : Qt::Unchecked);
+      this->segmentVisibilityCheckBox->setCheckState(this->mp_Model->segmentVisible(id) ? Qt::Checked : Qt::Unchecked);
+      this->segmentSurfaceVisibilityCheckBox->setCheckState(this->mp_Model->segmentSurfaceVisible(id) ? Qt::Checked : Qt::Unchecked);
     }
     else
     {
       bool uniqueColor = true;
       QColor c = this->mp_Model->segmentColor(id);
-      bool allFaceVisible = this->mp_Model->segmentSurfaceVisible(id);
+      bool visibleChecked = this->mp_Model->segmentVisible(id);
+      Qt::CheckState visible = visibleChecked ? Qt::Checked : Qt::Unchecked;
+      bool surfaceVisibleChecked = this->mp_Model->segmentSurfaceVisible(id);
+      Qt::CheckState surfaceVisible = surfaceVisibleChecked ? Qt::Checked : Qt::Unchecked;
       QList<QTreeWidgetItem*>::const_iterator it = items.begin();
       ++it;
       while (it != items.end())
@@ -1610,8 +1713,10 @@ void ModelDockWidget::displayProperties()
         id = (*it)->data(0,SegmentId).toInt();
         if (this->mp_Model->segmentColor(id) != c)
           uniqueColor = false;
-        if (this->mp_Model->segmentSurfaceVisible(id) != allFaceVisible)
-          allFaceVisible = false;
+        if (this->mp_Model->segmentVisible(id) != visibleChecked)
+          visible = Qt::PartiallyChecked;
+        if (this->mp_Model->segmentSurfaceVisible(id) != surfaceVisibleChecked)
+          surfaceVisible = Qt::PartiallyChecked;
         ++it;
       }
       this->markerColorButton->setProperty("markerColor", uniqueColor ? c : QColor::Invalid);
@@ -1621,8 +1726,10 @@ void ModelDockWidget::displayProperties()
       this->mp_SetMarkerColorInHistory3->setEnabled(uniqueColor ? true : false);
       this->mp_SetMarkerColorInHistory4->setEnabled(uniqueColor ? true : false);
       this->mp_SetMarkerColorInHistory5->setEnabled(uniqueColor ? true : false);
-      this->segmentSurfaceVisibilityCheckBox->setChecked(allFaceVisible);
+      this->segmentVisibilityCheckBox->setCheckState(visible);
+      this->segmentSurfaceVisibilityCheckBox->setCheckState(surfaceVisible);
     }
+    this->segmentVisibilityCheckBox->blockSignals(false);
     this->segmentSurfaceVisibilityCheckBox->blockSignals(false);
     static_cast<QGridLayout*>(this->segmentPage->layout())->addWidget(this->frame,1,1);
     this->propertiesStack->setCurrentWidget(this->segmentPage);
@@ -1631,6 +1738,8 @@ void ModelDockWidget::displayProperties()
   case MarkerType:
     {
     this->markerRadiusSpinBox->blockSignals(true);
+    this->markerVisibilityCheckBox->blockSignals(true);
+    this->markerTrajectoryVisibilityCheckBox->blockSignals(true);
     this->mp_HideSelectedMarkers->setEnabled(true);
     this->mp_TrackSelectedMarkers->setEnabled(true);
     this->mp_UntrackSelectedMarkers->setEnabled(true);
@@ -1654,6 +1763,8 @@ void ModelDockWidget::displayProperties()
       QColor c = this->mp_Acquisition->markerColor(id);
       this->markerColorButton->setProperty("markerColor", c);
       this->markerColorButton->setIcon(this->createMarkerIcon(c, true));
+      this->markerVisibilityCheckBox->setCheckState(this->mp_Acquisition->markerVisible(id) ? Qt::Checked : Qt::Unchecked);
+      this->markerTrajectoryVisibilityCheckBox->setCheckState(this->mp_Acquisition->markerTrajectoryVisible(id) ? Qt::Checked : Qt::Unchecked);
     }
     else
     {
@@ -1662,6 +1773,10 @@ void ModelDockWidget::displayProperties()
       bool uniqueColor = true;
       double r = this->mp_Acquisition->markerRadius(id);
       QColor c = this->mp_Acquisition->markerColor(id);
+      bool visibleChecked = this->mp_Acquisition->markerVisible(id);
+      Qt::CheckState visible = visibleChecked ? Qt::Checked : Qt::Unchecked;
+      bool trajectoryVisibleChecked = this->mp_Acquisition->markerTrajectoryVisible(id);
+      Qt::CheckState trajectoryVisible = trajectoryVisibleChecked ? Qt::Checked : Qt::Unchecked;
       QList<QTreeWidgetItem*>::const_iterator it = items.begin();
       ++it;
       while (it != items.end())
@@ -1671,6 +1786,10 @@ void ModelDockWidget::displayProperties()
           uniqueRadius = false;
         if (this->mp_Acquisition->markerColor(id) != c)
           uniqueColor = false;
+        if (this->mp_Acquisition->markerVisible(id) != visibleChecked)
+          visible = Qt::PartiallyChecked;
+        if (this->mp_Acquisition->markerTrajectoryVisible(id) != trajectoryVisibleChecked)
+          trajectoryVisible = Qt::PartiallyChecked;
         ++it;
       }
       if (uniqueRadius)
@@ -1686,7 +1805,7 @@ void ModelDockWidget::displayProperties()
         this->markerRadiusSpinBox->clear();
         //this->markerRadiusSlider->setValue(0);
         this->updateMarkerRadius(0.0); // slider
-      } 
+      }
       this->markerColorButton->setProperty("markerColor", uniqueColor ? c : QColor::Invalid);
       this->markerColorButton->setIcon(this->createMarkerIcon(uniqueColor ? c : Qt::transparent, true, uniqueColor ? true : false));
       this->mp_SetMarkerColorInHistory1->setEnabled(uniqueColor ? true : false);
@@ -1694,7 +1813,11 @@ void ModelDockWidget::displayProperties()
       this->mp_SetMarkerColorInHistory3->setEnabled(uniqueColor ? true : false);
       this->mp_SetMarkerColorInHistory4->setEnabled(uniqueColor ? true : false);
       this->mp_SetMarkerColorInHistory5->setEnabled(uniqueColor ? true : false);
+      this->markerVisibilityCheckBox->setCheckState(visible);
+      this->markerTrajectoryVisibilityCheckBox->setCheckState(trajectoryVisible);
     }
+    this->markerVisibilityCheckBox->blockSignals(false);
+    this->markerTrajectoryVisibilityCheckBox->blockSignals(false);
     this->markerRadiusSpinBox->blockSignals(false);
     static_cast<QGridLayout*>(this->markerPage->layout())->addWidget(this->frame,2,1);
     this->propertiesStack->setCurrentWidget(this->markerPage);
@@ -1808,6 +1931,13 @@ void ModelDockWidget::sendHiddenMarkers()
     if ((item->checkState(VisibleHeader) == Qt::Unchecked) || item->isHidden())
       ids << item->data(0,PointId).toInt();
   }
+  QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (int i = 0 ; i < virtualMarkersRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* item = virtualMarkersRoot->child(i);
+    if ((item->checkState(VisibleHeader) == Qt::Unchecked) || item->isHidden())
+      ids << item->data(0,PointId).toInt();
+  }
   emit markerHiddenSelectionChanged(ids);
 };
 
@@ -1818,6 +1948,13 @@ void ModelDockWidget::sendTrackedMarkers()
   for (int i = 0 ; i < markersRoot->childCount() ; ++i)
   {
     QTreeWidgetItem* item = markersRoot->child(i);
+    if (item->checkState(TrajectoryHeader) == Qt::Checked)
+      ids << item->data(0,PointId).toInt();
+  }
+  QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (int i = 0 ; i < virtualMarkersRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* item = virtualMarkersRoot->child(i);
     if (item->checkState(TrajectoryHeader) == Qt::Checked)
       ids << item->data(0,PointId).toInt();
   }
@@ -1917,6 +2054,136 @@ void ModelDockWidget::setMarkersRadius(const QVector<int>& ids, const QVector<do
   this->displayProperties();
 };
 
+void ModelDockWidget::editMarkersVisibility()
+{
+  this->modelTree->blockSignals(true);
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  QVector<int> ids = QVector<int>(items.count());
+  int inc = 0;
+  bool checked = this->markerVisibilityCheckBox->checkState() == Qt::Checked;
+  bool visibilityModified = false;
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    (*it)->setCheckState(VisibleHeader, checked ? Qt::Checked : Qt::Unchecked);
+    ids[inc] = (*it)->data(0, PointId).toInt();
+    if (this->mp_Acquisition->markerVisible(ids[inc]) != checked)
+      visibilityModified = true;
+    ++inc;
+  }
+  this->modelTree->blockSignals(false);
+  if (visibilityModified)
+    emit markersVisibilityChanged(ids, checked);
+};
+
+void ModelDockWidget::setMarkersVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  this->modelTree->blockSignals(true);
+  QList<QTreeWidgetItem*> roots;
+  roots << this->modelTree->topLevelItem(MarkersItem);
+  roots << this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (int i = 0 ; i < ids.size() ; ++i)
+  {
+    for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
+    {
+      bool found = false;
+      for (int j = 0 ; j < (*itR)->childCount() ; ++j)
+      {
+        QTreeWidgetItem* item = (*itR)->child(j);
+        if (item->data(0, PointId).toInt() == ids[i])
+        {
+          item->setCheckState(VisibleHeader, visibles[i] ? Qt::Checked : Qt::Unchecked);
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
+    }
+  }
+  this->modelTree->blockSignals(false);
+  this->displayProperties();
+};
+
+void ModelDockWidget::editMarkersTrajectoryVisibility()
+{
+  this->modelTree->blockSignals(true);
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  QVector<int> ids = QVector<int>(items.count());
+  int inc = 0;
+  bool checked = this->markerTrajectoryVisibilityCheckBox->checkState() == Qt::Checked;
+  bool visibilityModified = false;
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    (*it)->setCheckState(TrajectoryHeader, checked ? Qt::Checked : Qt::Unchecked);
+    ids[inc] = (*it)->data(0, PointId).toInt();
+    if (this->mp_Acquisition->markerTrajectoryVisible(ids[inc]) != checked)
+      visibilityModified = true;
+    ++inc;
+  }
+  this->modelTree->blockSignals(false);
+  if (visibilityModified)
+    emit markersTrajectoryVisibilityChanged(ids, checked);
+};
+
+void ModelDockWidget::setMarkersTrajectoryVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  this->modelTree->blockSignals(true);
+  QList<QTreeWidgetItem*> roots;
+  roots << this->modelTree->topLevelItem(MarkersItem);
+  roots << this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (int i = 0 ; i < ids.size() ; ++i)
+  {
+    for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
+    {
+      bool found = false;
+      for (int j = 0 ; j < (*itR)->childCount() ; ++j)
+      {
+        QTreeWidgetItem* item = (*itR)->child(j);
+        if (item->data(0, PointId).toInt() == ids[i])
+        {
+          item->setCheckState(TrajectoryHeader, visibles[i] ? Qt::Checked : Qt::Unchecked);
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
+    }
+  }
+  this->modelTree->blockSignals(false);
+  this->displayProperties();
+};
+
+void ModelDockWidget::setMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors)
+{
+  Q_UNUSED(radii);
+  
+  this->modelTree->blockSignals(true);
+  QList<QTreeWidgetItem*> roots;
+  roots << this->modelTree->topLevelItem(MarkersItem);
+  roots << this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (int i = 0 ; i < ids.size() ; ++i)
+  {
+    for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
+    {
+      bool found = false;
+      for (int j = 0 ; j < (*itR)->childCount() ; ++j)
+      {
+        QTreeWidgetItem* item = (*itR)->child(j);
+        if (item->data(0, PointId).toInt() == ids[i])
+        {
+          item->setIcon(0, this->createMarkerIcon(colors[i]));
+          item->setCheckState(VisibleHeader, visibles[i] ? Qt::Checked : Qt::Unchecked);
+          item->setCheckState(TrajectoryHeader, trajectories[i] ? Qt::Checked : Qt::Unchecked);
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
+    }
+  }
+  this->modelTree->blockSignals(false);
+  this->displayProperties();
+};
+
 void ModelDockWidget::editMarkersColor()
 {
   QColor color = QColorDialog::getColor(Qt::white, this);
@@ -2002,6 +2269,17 @@ void ModelDockWidget::setPointLabel(int id, const QString& label)
       return;
     }
   }
+  // Virtual markers
+  QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (int i = 0 ; i < virtualMarkersRoot->childCount() ; ++i)
+  {
+    if (virtualMarkersRoot->child(i)->data(0, PointId).toInt() == id)
+    {
+      virtualMarkersRoot->child(i)->setText(0, label);
+      this->displayProperties();
+      return;
+    }
+  }
   // Other points
   QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(this->modelTree->topLevelItemCount() - 1);
   for (int i = 0 ; i < modelOutputsRoot->childCount() ; ++i)
@@ -2049,6 +2327,7 @@ void ModelDockWidget::removePoints(const QList<int>& ids, const QList<Point*>& p
   this->modelTree->blockSignals(true);
   bool itemUnselected = false;
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
+  QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
   QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(ModelOutputsItem);
   QTreeWidgetItem* modelOutputAngles = modelOutputsRoot->child(0);
   QTreeWidgetItem* modelOutputForces = modelOutputsRoot->child(1);
@@ -2061,8 +2340,11 @@ void ModelDockWidget::removePoints(const QList<int>& ids, const QList<Point*>& p
     switch (points[i]->type)
     {
     case Point::Marker:
-    case Point::VirtualMarker:
       item = this->treePointChild(markersRoot, ids[i]);
+      break;
+    case Point::VirtualMarker:
+    case Point::VirtualMarkerForFrame:
+      item = this->treePointChild(virtualMarkersRoot, ids[i]);
       break;
     case Point::Angle:
       item = this->treePointChild(modelOutputAngles, ids[i]);
@@ -2118,6 +2400,7 @@ void ModelDockWidget::insertPoints(const QList<int>& ids, const QList<Point*>& p
 {
   Q_UNUSED(points);
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
+  QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
   QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(ModelOutputsItem);
   QTreeWidgetItem* modelOutputAngles = modelOutputsRoot->child(0);
   QTreeWidgetItem* modelOutputForces = modelOutputsRoot->child(1);
@@ -2129,8 +2412,11 @@ void ModelDockWidget::insertPoints(const QList<int>& ids, const QList<Point*>& p
     switch (points[i]->type)
     {
     case Point::Marker:
-    case Point::VirtualMarker:
       this->treePointChild(markersRoot, ids[i])->setHidden(false);
+      break;
+    case Point::VirtualMarker:
+    case Point::VirtualMarkerForFrame:
+      this->treePointChild(virtualMarkersRoot, ids[i])->setHidden(false);
       break;
     case Point::Angle:
       this->treePointChild(modelOutputAngles, ids[i])->setHidden(false);
@@ -2565,7 +2851,9 @@ bool ModelDockWidget::saveConfiguration(int idx)
     return false;
   }
   
-  QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
+  QList<QTreeWidgetItem*> roots;
+  roots << this->modelTree->topLevelItem(MarkersItem);
+  roots << this->modelTree->topLevelItem(VirtualMarkersItem);
   QTreeWidgetItem* segmentsRoot = this->modelTree->topLevelItem(SegmentsItem);
   
   QXmlStreamWriter xmlWriter(&file);
@@ -2575,20 +2863,25 @@ bool ModelDockWidget::saveConfiguration(int idx)
   xmlWriter.writeAttribute("name", this->m_ConfigurationItems[idx].name);
   xmlWriter.writeAttribute("version", "1.0");
   xmlWriter.writeStartElement("MarkersList");
-  for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+  for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
   {
-    QTreeWidgetItem* item = markersRoot->child(i);
-    if (!item->isHidden())
+    for (int i = 0 ; i < (*itR)->childCount() ; ++i)
     {
-      int id = item->data(0,PointId).toInt();
-      xmlWriter.writeStartElement("Marker");
-      xmlWriter.writeAttribute("label", item->text(0));
-      xmlWriter.writeAttribute("radius", QString::number(this->mp_Acquisition->markerRadius(id)));
-      QColor c = this->mp_Acquisition->markerColor(id);
-      xmlWriter.writeAttribute("colorR", QString::number(c.redF()));
-      xmlWriter.writeAttribute("colorG", QString::number(c.greenF()));
-      xmlWriter.writeAttribute("colorB", QString::number(c.blueF()));
-      xmlWriter.writeEndElement(); // End Marker
+      QTreeWidgetItem* item = (*itR)->child(i);
+      if (!item->isHidden())
+      {
+        int id = item->data(0,PointId).toInt();
+        xmlWriter.writeStartElement("Marker");
+        xmlWriter.writeAttribute("label", item->text(0));
+        xmlWriter.writeAttribute("radius", QString::number(this->mp_Acquisition->markerRadius(id)));
+        QColor c = this->mp_Acquisition->markerColor(id);
+        xmlWriter.writeAttribute("colorR", QString::number(c.redF()));
+        xmlWriter.writeAttribute("colorG", QString::number(c.greenF()));
+        xmlWriter.writeAttribute("colorB", QString::number(c.blueF()));
+        xmlWriter.writeAttribute("visible", this->mp_Acquisition->markerVisible(id) ? "1" : "0");
+        xmlWriter.writeAttribute("trajectory", this->mp_Acquisition->markerTrajectoryVisible(id) ? "1" : "0");
+        xmlWriter.writeEndElement(); // End Marker
+      }
     }
   }
   xmlWriter.writeEndElement(); // End MarkersList
@@ -2605,6 +2898,7 @@ bool ModelDockWidget::saveConfiguration(int idx)
       xmlWriter.writeAttribute("colorR", QString::number(c.redF()));
       xmlWriter.writeAttribute("colorG", QString::number(c.greenF()));
       xmlWriter.writeAttribute("colorB", QString::number(c.blueF()));
+      xmlWriter.writeAttribute("visible", this->mp_Model->segmentVisible(id) ? "1" : "0");
       xmlWriter.writeAttribute("surface", this->mp_Model->segmentSurfaceVisible(id) ? "1" : "0");
       xmlWriter.writeAttribute("description", this->mp_Model->segmentDescription(id));
       QVector<int> markerIds = this->mp_Model->segmentMarkerIds(id);
@@ -2673,12 +2967,11 @@ void ModelDockWidget::setConfigurationModified(int idx, bool modified)
   this->mp_SaveConfiguration->setEnabled(modified ? false : true);
 };
 
-QTreeWidgetItem* ModelDockWidget::createSegmentItem(const QString& label, int id)
+QTreeWidgetItem* ModelDockWidget::createSegmentItem(const QString& label, int id, bool checked)
 {
   QTreeWidgetItem* segmentItem = new QTreeWidgetItem(QStringList(label), SegmentType);
   segmentItem->setIcon(LabelHeader, this->createSegmentIcon(this->mp_Model->segmentColor(id)));
-  segmentItem->setCheckState(VisibleHeader, Qt::Checked);
-  //segmentItem->setCheckState(TrajectoryHeader, Qt::Unchecked);
+  segmentItem->setCheckState(VisibleHeader, checked ? Qt::Checked : Qt::Unchecked);
   segmentItem->setData(0, SegmentId, id);
   return segmentItem;
 };
@@ -2808,19 +3101,29 @@ void ModelDockWidget::editMarkersColor(const QColor& color)
 
 void ModelDockWidget::setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors)
 {
-  // Upate the tree
-  QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
-  for (int i = 0 ; i < ids.count() ; ++i)
+  this->modelTree->blockSignals(true);
+  QList<QTreeWidgetItem*> roots;
+  roots << this->modelTree->topLevelItem(MarkersItem);
+  roots << this->modelTree->topLevelItem(VirtualMarkersItem);
+  for (int i = 0 ; i < ids.size() ; ++i)
   {
-    for (int j = 0 ; j < markersRoot->childCount() ; ++j)
+    for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
     {
-      if (markersRoot->child(j)->data(0, PointId).toInt() == ids[i])
+      bool found = false;
+      for (int j = 0 ; j < (*itR)->childCount() ; ++j)
       {
-        markersRoot->child(j)->setIcon(0, this->createMarkerIcon(colors[i]));
-        break;
+        QTreeWidgetItem* item = (*itR)->child(j);
+        if (item->data(0, PointId).toInt() == ids[i])
+        {
+          item->setIcon(0, this->createMarkerIcon(colors[i]));
+          found = true;
+          break;
+        }
       }
+      if (found) break;
     }
   }
+  this->modelTree->blockSignals(false);
   this->displayProperties();
 };
 
@@ -2896,6 +3199,7 @@ void ModelDockWidget::refresh()
     
   QTreeWidgetItem* segmentsRoot = this->modelTree->topLevelItem(SegmentsItem);
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
+  QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
   QTreeWidgetItem* analogsRoot = this->modelTree->topLevelItem(AnalogsItem);
   QTreeWidgetItem* forcePlatesRoot = this->modelTree->topLevelItem(ForcePlatesItem);
   QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(ModelOutputsItem);
@@ -2908,6 +3212,7 @@ void ModelDockWidget::refresh()
   
   segmentsRoot->setHidden(true);
   markersRoot->setHidden(true);
+  virtualMarkersRoot->setHidden(true);
   analogsRoot->setHidden(true);
   forcePlatesRoot->setHidden(true);
   modelOutputsRoot->setHidden(true);
@@ -2926,6 +3231,11 @@ void ModelDockWidget::refresh()
   {
     this->mp_SelectAllMarkers->setEnabled(true);
     markersRoot->setHidden(false);
+  }
+  if ((virtualMarkersRoot->childCount() != 0) && this->hasChildVisible(virtualMarkersRoot))
+  {
+    this->mp_SelectAllMarkers->setEnabled(true);
+    virtualMarkersRoot->setHidden(false);
   }
   if ((analogsRoot->childCount() != 0) && this->hasChildVisible(analogsRoot))
   {

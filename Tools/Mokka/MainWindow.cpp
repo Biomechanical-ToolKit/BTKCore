@@ -293,6 +293,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_ModelDock, SIGNAL(markersRadiusChanged(QVector<int>, double)), this, SLOT(setMarkersRadius(QVector<int>, double)));
   connect(this->mp_ModelDock, SIGNAL(markersColorChanged(QVector<int>, QColor)), this, SLOT(setMarkersColor(QVector<int>, QColor)));
   connect(this->mp_ModelDock, SIGNAL(markersDescriptionChanged(QVector<int>, QString)), this, SLOT(setPointsDescription(QVector<int>, QString)));
+  connect(this->mp_ModelDock, SIGNAL(markersVisibilityChanged(QVector<int>, bool)), this, SLOT(setMarkersVisibility(QVector<int>, bool)));
+  connect(this->mp_ModelDock, SIGNAL(markersTrajectoryVisibilityChanged(QVector<int>, bool)), this, SLOT(setMarkersTrajectoryVisibility(QVector<int>, bool)));
   connect(this->mp_ModelDock, SIGNAL(pointLabelChanged(int, QString)), this, SLOT(setPointLabel(int, QString)));
   connect(this->mp_ModelDock, SIGNAL(pointsDescriptionChanged(QVector<int>, QString)), this, SLOT(setPointsDescription(QVector<int>, QString)));
   connect(this->mp_ModelDock, SIGNAL(pointsRemoved(QList<int>)), this, SLOT(removePoints(QList<int>)));
@@ -314,11 +316,11 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_ModelDock, SIGNAL(segmentLabelChanged(int, QString)), this, SLOT(setSegmentLabel(int, QString)));
   connect(this->mp_ModelDock, SIGNAL(segmentsColorChanged(QVector<int>, QColor)), this, SLOT(setSegmentsColor(QVector<int>, QColor)));
   connect(this->mp_ModelDock, SIGNAL(segmentsDescriptionChanged(QVector<int>, QString)), this, SLOT(setSegmentsDescription(QVector<int>, QString)));
+  connect(this->mp_ModelDock, SIGNAL(segmentsVisibilityChanged(QVector<int>, bool)), this, SLOT(setSegmentsVisibility(QVector<int>, bool)));
   connect(this->mp_ModelDock, SIGNAL(segmentsSurfaceVisibilityChanged(QVector<int>, bool)), this, SLOT(setSegmentsSurfaceVisibility(QVector<int>, bool)));
   connect(this->mp_ModelDock, SIGNAL(segmentsRemoved(QList<int>)), this, SLOT(removeSegments(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(segmentCreationRequested()), this, SLOT(createSegment()));
   connect(this->mp_ModelDock, SIGNAL(segmentEditionRequested()), this, SLOT(editSegment()));
-  
   connect(this->mp_ModelDock, SIGNAL(segmentHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenSegments(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(videosRemoved(QList<int>)), this, SLOT(removeVideos(QList<int>)));
   connect(this->mp_ModelDock, SIGNAL(videosDelayChanged(QVector<int>, qint64)), this, SLOT(setVideosDelay(QVector<int>, qint64)));
@@ -1733,6 +1735,16 @@ void MainWindow::setMarkersColor(const QVector<int>& ids, const QColor& color)
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditMarkersColor(this->mp_Acquisition, ids, color)));
 };
 
+void MainWindow::setMarkersVisibility(const QVector<int>& ids, bool visible)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditMarkersVisibility(this->mp_Acquisition, ids, visible)));
+};
+
+void MainWindow::setMarkersTrajectoryVisibility(const QVector<int>& ids, bool visible)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditMarkersTrajectoryVisibility(this->mp_Acquisition, ids, visible)));
+};
+
 void MainWindow::setPointsDescription(const QVector<int>& ids, const QString& desc)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new EditPointDescription(this->mp_Acquisition, ids, desc)));
@@ -1793,6 +1805,11 @@ void MainWindow::setSegmentsDescription(const QVector<int>& ids, QString desc)
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentsDescription(this->mp_Model, ids, desc)));
 };
 
+void MainWindow::setSegmentsVisibility(const QVector<int>& ids, bool visible)
+{
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentsVisibility(this->mp_Model, ids, visible)));
+};
+
 void MainWindow::setSegmentsSurfaceVisibility(const QVector<int>& ids, bool visible)
 {
   this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new EditSegmentsSurfaceVisibility(this->mp_Model, ids, visible)));
@@ -1836,27 +1853,53 @@ void MainWindow::editSegment(bool isNew)
   
   Segment* seg = 0;
   QList<int> selectedMarkerIds, unselectedMarkerIds, unvisibleMarkerIds;
-  QTreeWidgetItem* markersRoot = this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::MarkersItem);
+  QList<NewSegmentDialog::MarkerInfo> markersInfo;
+  QList<QTreeWidgetItem*> roots;
+  roots << this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::MarkersItem);
+  roots << this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::VirtualMarkersItem);
   if (isNew)
   {
     // Create a fake segment
     seg = new Segment("", "", this->mp_Model->defaultSegmentColor(), selectedMarkerIds.toVector(), QVector<Pair>(), QVector<Triad>());
     seg->surfaceVisible = true;
-    segmentId = this->multiView->appendNewSegment(seg);
-    // Keep only the selected markers
-    for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+    // Check if a previous fake segment already exists but was canceled
+    if (segmentsRoot->childCount() != 0)
     {
-      QTreeWidgetItem* item = markersRoot->child(i);
-      int id = item->data(0,PointId).toInt();
-      if ((item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked) || item->isHidden())
+      QTreeWidgetItem* segmentItem = segmentsRoot->child(segmentsRoot->childCount()-1);
+      if (segmentItem->text(0).compare("MOKKA_CANCELED_SEGMENT") == 0)
       {
-        unvisibleMarkerIds << id;
-        unselectedMarkerIds << id;
+        segmentId = segmentItem->data(0,SegmentId).toInt();
+        QList<int> idList; idList << segmentId;
+        QList<Segment*> segList; segList << seg;
+        this->multiView->appendNewSegments(idList, segList);
+        segmentsRoot->removeChild(segmentItem);
+        delete segmentItem;
+        unvisibleSegmentIds.pop_back();
+        segmentIds.pop_back();
       }
-      else if (!item->isSelected())
-        unselectedMarkerIds << id;
-      else 
-        selectedMarkerIds << id; 
+    }
+    // Not found
+    if (segmentId == -1)
+      segmentId = this->multiView->appendNewSegment(seg);
+    // Keep only the selected markers
+    for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
+    {
+      for (int i = 0 ; i < (*itR)->childCount() ; ++i)
+      {
+        QTreeWidgetItem* item = (*itR)->child(i);
+        int id = item->data(0,PointId).toInt();
+        if ((item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked) || item->isHidden())
+        {
+          unvisibleMarkerIds << id;
+          unselectedMarkerIds << id;
+          continue;
+        }
+        else if (!item->isSelected())
+          unselectedMarkerIds << id;
+        else 
+          selectedMarkerIds << id;
+        markersInfo.push_back(NewSegmentDialog::MarkerInfo(id, item->text(ModelDockWidget::LabelHeader), item->isSelected()));
+      }
     }
   }
   else if (segmentId != -1)
@@ -1866,16 +1909,28 @@ void MainWindow::editSegment(bool isNew)
     // Force the visibility of the surface
     this->multiView->setSegmentsSurfaceVisibility(QVector<int>(1,segmentId), QVector<bool>(1,true));
     // Keep only the markers used by the segment
-    for (int i = 0 ; i < markersRoot->childCount() ; ++i)
+    for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
     {
-      QTreeWidgetItem* item = markersRoot->child(i);
-      int id = item->data(0,PointId).toInt();
-      if ((item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked) || item->isHidden())
-        unvisibleMarkerIds << id;
-      else if (seg->markerIds.indexOf(id) == -1)
-        unselectedMarkerIds << id;
-      else 
-        selectedMarkerIds << id;
+      for (int i = 0 ; i < (*itR)->childCount() ; ++i)
+      {
+        QTreeWidgetItem* item = (*itR)->child(i);
+        int id = item->data(0,PointId).toInt();
+        if ((item->checkState(ModelDockWidget::VisibleHeader) == Qt::Unchecked) || item->isHidden())
+        {
+          unvisibleMarkerIds << id;
+          unselectedMarkerIds << id;
+        }
+        else if (seg->markerIds.indexOf(id) == -1)
+        {
+          unselectedMarkerIds << id;
+          markersInfo.push_back(NewSegmentDialog::MarkerInfo(id, item->text(ModelDockWidget::LabelHeader), false));
+        }
+        else 
+        {
+          selectedMarkerIds << id;
+          markersInfo.push_back(NewSegmentDialog::MarkerInfo(id, item->text(ModelDockWidget::LabelHeader), true));
+        }
+      }
     }
   }
   else
@@ -1897,7 +1952,7 @@ void MainWindow::editSegment(bool isNew)
     this->multiView->circleSelectedMarkers(QList<int>());
     this->multiView->updateHiddenSegments(segmentIds);
     
-    NewSegmentDialog nsd(seg, segmentId, markersRoot, !isNew, this);
+    NewSegmentDialog nsd(seg, segmentId, markersInfo, !isNew, this);
     nsd.viz3D->setGlobalFrameVisible(false);
     nsd.viz3D->copy(static_cast<Viz3DWidget*>(static_cast<CompositeView*>(this->multiView->views()[0])->view(CompositeView::Viz3D)));
     // Show only markers and segments
@@ -1922,7 +1977,7 @@ void MainWindow::editSegment(bool isNew)
   
     // Connections
     connect(&nsd, SIGNAL(markerSelectionChanged(QList<int>)), this->multiView, SLOT(circleSelectedMarkers(QList<int>)));
-    connect(&nsd, SIGNAL(markerHiddenSelectionChanged(QList<int>)), this->multiView, SLOT(updateHiddenMarkers(QList<int>)));
+    connect(&nsd, SIGNAL(markerVisibleSelectionChanged(QList<int>)), this->multiView, SLOT(updateVisibleMarkers(QList<int>)));
     connect(&nsd, SIGNAL(segmentDefinitionChanged(int, QVector<int>, QVector<Pair>, QVector<Triad>)), this->multiView, SLOT(setSegmentDefinition(int, QVector<int>, QVector<Pair>, QVector<Triad>)));
   
     bool canceled = false;
@@ -1932,15 +1987,16 @@ void MainWindow::editSegment(bool isNew)
       {
         seg->label = nsd.segmentLabelEdit->text();
         seg->description = nsd.segmentDescriptionEdit->text();
+        seg->surfaceVisible = !seg->faces.isEmpty();
         this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new InsertSegment(this->mp_Model, seg)));
       }
       else
       {
         // To know that a canceled segment exist in VTK
-        QTreeWidgetItem* segmentItem = new QTreeWidgetItem(QStringList("Canceled segment"));
+        QTreeWidgetItem* segmentItem = new QTreeWidgetItem(QStringList("MOKKA_CANCELED_SEGMENT"));
         segmentItem->setData(0, SegmentId, segmentId);
-        segmentItem->setHidden(true);
         segmentsRoot->addChild(segmentItem);
+        segmentItem->setHidden(true);
         unvisibleSegmentIds << segmentId;
         delete seg;
         canceled = true;
@@ -1976,9 +2032,8 @@ void MainWindow::editSegment(bool isNew)
       {
         // Force the segment defintion to be as before the edition
         seg->surfaceVisible = oldSurfaceVisible;
-        this->mp_Model->setSegmentDefinition(segmentId, oldMarkerIds, oldLinks, oldFaces);
         this->multiView->setSegmentsSurfaceVisibility(QVector<int>(1,segmentId), QVector<bool>(1,oldSurfaceVisible));
-        this->multiView->updateSegmentDefinition(segmentId);
+        this->mp_Model->setSegmentDefinition(segmentId, oldMarkerIds, oldLinks, oldFaces);
       }
     }
     

@@ -48,6 +48,7 @@
 #include <btkAcquisitionFileIO.h>
 #include <btkAMTIForcePlatformFileIO.h> // Special case for AMTI files
 #include <btkWrenchDirectionAngleFilter.h>
+#include <btkCollectionAssembly.h>
 
 #include <QObject>
 #include <QString>
@@ -60,6 +61,8 @@ struct Point
   typedef enum {Marker, VirtualMarker, VirtualMarkerForFrame, Angle, Force, Moment, Power, Scalar} Type;
   QString label;
   QString description;
+  bool visible;
+  bool trajectoryVisible;
   double radius;
   QColor color;
   Type type;
@@ -122,8 +125,10 @@ public:
   
   const QString& fileName() const {return this->m_Filename;};
   btk::Acquisition::Pointer btkAcquisition() const {return this->mp_BTKAcquisition;};
+  btk::PointCollection::Pointer btkAllMarkers() const {return static_pointer_cast< btk::CollectionAssembly<btk::Point> >(this->m_BTKProcesses[BTK_GROUPED_POINTS])->GetOutput();};
   btk::PointCollection::Pointer btkMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(0);};
   btk::PointCollection::Pointer btkVirtualMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(2);};
+  btk::PointCollection::Pointer btkVirtualMarkersForFrame() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(1);};
   btk::PointCollection::Pointer btkOtherPoints() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(3);};
   btk::ForcePlatformCollection::Pointer btkForcePlatforms() const {return static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProcesses[BTK_FORCE_PLATFORMS])->GetOutput();};
   btk::WrenchCollection::Pointer btkGroundReactionWrenches() const {return static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED])->GetOutput();};
@@ -150,17 +155,19 @@ public:
   int findMarkerIdFromLabel(const QString& label) const;
   double markerRadius(int id) const {return this->m_Points[id]->radius;};
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
-  void resetMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
   const QColor& markerColor(int id) const {return this->m_Points[id]->color;};
-  void setMarkerColor(int id, const QColor& color);
   void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
-  void resetMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
   QList<Point*> takePoints(const QList<int>& ids);
   void insertPoints(const QList<int>& ids, const QList<Point*> points);
   int findPointIdFromLabel(const QString& label) const;
   const QColor& defaultMarkerColor() const {return this->m_DefaultMarkerColor;};
   void setDefaultMarkerColor(const QColor& color) {this->m_DefaultMarkerColor = color;};
   void setDefaultMarkerRadius(double r) {this->m_DefaultMarkerRadius = r;};
+  bool markerVisible(int id) const {return this->m_Points[id]->visible;};
+  void setMarkersVisible(const QVector<int>& ids, const QVector<bool>& visibles);
+  bool markerTrajectoryVisible(int id) const {return this->m_Points[id]->trajectoryVisible;};
+  void setMarkersTrajectoryVisible(const QVector<int>& ids, const QVector<bool>& visibles);
+  void resetMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors);
   
   int analogFrameNumber() const {return this->mp_BTKAcquisition->GetAnalogFrameNumber();}
   int analogSamplePerPointFrame() const {return this->mp_BTKAcquisition->GetNumberAnalogSamplePerFrame();};
@@ -223,8 +230,10 @@ signals:
   void pointsDescriptionChanged(const QVector<int>& ids, const QVector<QString>& descs);
   void pointTypeChanged(int id, Point::Type p);
   void markersRadiusChanged(const QVector<int>& ids, const QVector<double>& radii);
-  void markerColorChanged(int id, const QColor& color);
   void markersColorChanged(const QVector<int>& ids, const QVector<QColor>& colors);
+  void markersVisibilityChanged(const QVector<int>& ids, const QVector<bool>& visibles);
+  void markersTrajectoryVisibilityChanged(const QVector<int>& ids, const QVector<bool>& visibles);
+  void markersConfigurationReset(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors);
   void pointsRemoved(const QList<int>& ids, const QList<Point*>& points);
   void pointsInserted(const QList<int>& ids, const QList<Point*>& points);
   void analogLabelChanged(int id, const QString& label);
@@ -252,7 +261,7 @@ private:
   bool importFrom(const QList<btk::Acquisition::Pointer>& readers, bool allFramesKept);
   bool importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io, bool fromOpenAction);
   
-  enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED, BTK_DIRECTION_ANGLES};
+  enum {BTK_SORTED_POINTS, BTK_GROUPED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED, BTK_DIRECTION_ANGLES};
   
   btk::Acquisition::Pointer mp_BTKAcquisition;
   QMap<int, btk::ProcessObject::Pointer> m_BTKProcesses;

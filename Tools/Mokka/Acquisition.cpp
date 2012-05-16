@@ -63,6 +63,10 @@ Acquisition::Acquisition(QObject* parent)
   
   // BTK PIPELINE
   btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
+  btk::CollectionAssembly<btk::Point>::Pointer virtualMarkersAssembly = btk::CollectionAssembly<btk::Point>::New();
+  virtualMarkersAssembly->SetInput(0, virtualMarkersSeparator->GetOutput(0)); // Markers
+  virtualMarkersAssembly->SetInput(1, virtualMarkersSeparator->GetOutput(2)); // Virtual markers
+  virtualMarkersAssembly->SetInput(2, virtualMarkersSeparator->GetOutput(1)); // Virtual markers used by frames
   btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = btk::ForcePlatformsExtractor::New();
   btk::GroundReactionWrenchFilter::Pointer GRWsFilter = btk::GroundReactionWrenchFilter::New();
   GRWsFilter->SetThresholdValue(5.0); // PWA are not computed from vertical forces lower than 5 newtons.
@@ -73,6 +77,7 @@ Acquisition::Acquisition(QObject* parent)
   btk::WrenchDirectionAngleFilter::Pointer wrenchDirectionAngleFilter = btk::WrenchDirectionAngleFilter::New();
   wrenchDirectionAngleFilter->SetInput(GRWsDownsampler->GetOutput());
   this->m_BTKProcesses[BTK_SORTED_POINTS] = virtualMarkersSeparator;
+  this->m_BTKProcesses[BTK_GROUPED_POINTS] = virtualMarkersAssembly;
   this->m_BTKProcesses[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
   this->m_BTKProcesses[BTK_GRWS] = GRWsFilter;
   this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
@@ -223,7 +228,7 @@ bool Acquisition::importFrom(const QList<btk::Acquisition::Pointer>& acquisition
   QVector<QString> infos(16,"N/A"); infos[0] = "N/A                         ";
   emit informationsChanged(infos);
   return true;
-}
+};
 
 bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions, bool fromOpenAction)
 {
@@ -406,7 +411,7 @@ int Acquisition::findMarkerIdFromLabel(const QString& label) const
 {
   for (QMap<int,Point*>::const_iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
   {
-    if ((it.value()->label.compare(label) == 0) && ((it.value()->type == Point::Marker) || (it.value()->type == Point::VirtualMarker)))
+    if ((it.value()->label.compare(label) == 0) && ((it.value()->type == Point::Marker) || (it.value()->type == Point::VirtualMarker) || (it.value()->type == Point::VirtualMarkerForFrame)))
       return it.key();
   }
   return -1;
@@ -423,38 +428,40 @@ void Acquisition::setMarkersRadius(const QVector<int>& ids, const QVector<double
   emit markersRadiusChanged(ids, radii);
 };
 
-void Acquisition::resetMarkersRadius(const QVector<int>& ids, const QVector<double>& radii)
+void Acquisition::resetMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors)
 {
   QList<int> ids_;
   QList<double> radii_;
+  QList<QColor> colors_;
+  QList<bool> visibles_;
+  QList<bool> trajectories_;
   for (QMap<int,Point*>::iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
   {
-    if (((*it)->type != Point::Marker) && ((*it)->type != Point::VirtualMarker))
+    if (((*it)->type != Point::Marker) && ((*it)->type != Point::VirtualMarker) && ((*it)->type != Point::VirtualMarkerForFrame))
       continue;
     ids_ << it.key();
     int idx = ids.indexOf(it.key());
     if (idx != -1)
     {
-      (*it)->radius = radii[idx];
-      radii_ << radii[idx];
+      (*it)->radius = radii[idx]; 
+      (*it)->color = colors[idx];
+      (*it)->visible = visibles[idx];
+      (*it)->trajectoryVisible = trajectories[idx];
     }
     else
     {
+      qDebug("Point '%s' set as unknown", qPrintable((*it)->label));
       (*it)->radius = this->m_DefaultMarkerRadius;
-      radii_ << this->m_DefaultMarkerRadius;
+      (*it)->color = this->m_DefaultMarkerColor;
+      (*it)->visible = (((*it)->type == Point::Marker) ? true : false);
+      (*it)->trajectoryVisible = false;
     }
+    radii_ << (*it)->radius;
+    colors_ << (*it)->color;
+    visibles_ << (*it)->visible;
+    trajectories_ << (*it)->trajectoryVisible;
   }
-  emit markersRadiusChanged(ids_.toVector(), radii_.toVector());
-};
-
-void Acquisition::setMarkerColor(int id, const QColor& color)
-{
-  QMap<int,Point*>::iterator it = this->m_Points.find(id);
-  if (it != this->m_Points.end())
-  {
-    (*it)->color = color;
-    emit markerColorChanged(id, color);
-  }
+  emit markersConfigurationReset(ids_, visibles_, trajectories_, radii_, colors_);
 };
 
 void Acquisition::setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors)
@@ -466,30 +473,6 @@ void Acquisition::setMarkersColor(const QVector<int>& ids, const QVector<QColor>
       (*it)->color = colors[i];
   }
   emit markersColorChanged(ids, colors);
-};
-
-void Acquisition::resetMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors)
-{
-  QList<int> ids_;
-  QList<QColor> colors_;
-  for (QMap<int,Point*>::iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
-  {
-    if (((*it)->type != Point::Marker) && ((*it)->type != Point::VirtualMarker))
-      continue;
-    ids_ << it.key();
-    int idx = ids.indexOf(it.key());
-    if (idx != -1)
-    {
-      (*it)->color = colors[idx];
-      colors_ << colors[idx];
-    }
-    else
-    {
-      (*it)->color = this->m_DefaultMarkerColor;
-      colors_ << this->m_DefaultMarkerColor;
-    }
-  }
-  emit markersColorChanged(ids_.toVector(), colors_.toVector());
 };
 
 QList<Point*> Acquisition::takePoints(const QList<int>& ids)
@@ -529,6 +512,28 @@ int Acquisition::findPointIdFromLabel(const QString& label) const
       return it.key();
   }
   return -1;
+};
+
+void Acquisition::setMarkersVisible(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    QMap<int,Point*>::iterator it = this->m_Points.find(ids[i]);
+    if (it != this->m_Points.end())
+      (*it)->visible = visibles[i];
+  }
+  emit markersVisibilityChanged(ids, visibles);
+};
+
+void Acquisition::setMarkersTrajectoryVisible(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    QMap<int,Point*>::iterator it = this->m_Points.find(ids[i]);
+    if (it != this->m_Points.end())
+      (*it)->trajectoryVisible = visibles[i];
+  }
+  emit markersTrajectoryVisibilityChanged(ids, visibles);
 };
 
 void Acquisition::setAnalogLabel(int id, const QString& label)
@@ -1054,6 +1059,8 @@ void Acquisition::loadAcquisition()
     p->label = QString::fromStdString((*it)->GetLabel());
     p->description = QString::fromStdString((*it)->GetDescription());
     p->type = Point::Marker;
+    p->visible = true;
+    p->trajectoryVisible = false;
     p->radius = this->m_DefaultMarkerRadius;
     p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
@@ -1067,6 +1074,8 @@ void Acquisition::loadAcquisition()
     p->label = QString::fromStdString((*it)->GetLabel());
     p->description = QString::fromStdString((*it)->GetDescription());
     p->type = Point::VirtualMarker;
+    p->visible = false;
+    p->trajectoryVisible = false;
     p->radius = this->m_DefaultMarkerRadius;
     p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
@@ -1080,8 +1089,10 @@ void Acquisition::loadAcquisition()
     p->label = QString::fromStdString((*it)->GetLabel());
     p->description = QString::fromStdString((*it)->GetDescription());
     p->type = Point::VirtualMarkerForFrame;
-    p->radius = -1.0;
-    p->color = QColor::Invalid;
+    p->visible = false;
+    p->trajectoryVisible = false;
+    p->radius = this->m_DefaultMarkerRadius;
+    p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
     this->m_Points.insert(inc++, p);
   }
@@ -1102,6 +1113,8 @@ void Acquisition::loadAcquisition()
       p->type = Point::Power;
     else if ((*it)->GetType() == btk::Point::Scalar)
       p->type = Point::Scalar;
+    p->visible = false;
+    p->trajectoryVisible = false;
     p->radius = -1.0;
     p->color = QColor::Invalid;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);

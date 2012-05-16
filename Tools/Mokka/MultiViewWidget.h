@@ -74,6 +74,7 @@ public:
   void load();
   
   int appendNewSegment(Segment* s);
+  void setSegment(int id, Segment* s);
   int segmentColorIndex(int id);
   
   void setMarkerRadius(int id, double r);
@@ -121,13 +122,18 @@ public slots:
   void setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors);
   void setSegmentDefinition(int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces);
   void updateSegmentDefinition(int id);
+  void setSegmentsVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
   void setSegmentsSurfaceVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
   void updateHiddenSegments(const QList<int>& ids);
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
   void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
+  void updateVisibleMarkers(const QList<int>& ids);
   void updateHiddenMarkers(const QList<int>& ids);
   void updateTrackedMarkers(const QList<int>& ids);
   void updateTrackedGRFPaths(const QList<int>& ids);
+  void setMarkersVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
+  void setMarkersTrajectoryVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
+  void setMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors);
   void clear();
   void circleSelectedMarkers(const QList<int>& ids);
   void updateSegmentsDisplay();

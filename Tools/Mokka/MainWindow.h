@@ -125,6 +125,8 @@ public slots:
   void setPointLabel(int id, const QString& label);
   void setMarkersRadius(const QVector<int>& ids, double radius);
   void setMarkersColor(const QVector<int>& ids, const QColor& color);
+  void setMarkersVisibility(const QVector<int>& ids, bool visible);
+  void setMarkersTrajectoryVisibility(const QVector<int>& ids, bool visible);
   void setPointsDescription(const QVector<int>& ids, const QString& desc);
   void removePoints(const QList<int>& ids);
   void setAnalogLabel(int id, const QString& label);
@@ -137,6 +139,7 @@ public slots:
   void setSegmentLabel(int id, const QString& label);
   void setSegmentsColor(const QVector<int>& ids, const QColor& color);
   void setSegmentsDescription(const QVector<int>& ids, QString desc);
+  void setSegmentsVisibility(const QVector<int>& ids, bool visible);
   void setSegmentsSurfaceVisibility(const QVector<int>& ids, bool visible);
   void removeSegments(const QList<int>& ids);
   void createSegment();

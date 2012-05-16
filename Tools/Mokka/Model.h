@@ -49,12 +49,12 @@ typedef btk::TriangleMesh::VertexFace Triad;
 
 struct Segment
 {
-  Segment(const QString& l, const QString& d, const QColor& c, const QVector<int>& m, const QVector<Pair>& k, const QVector<Triad>& f, bool sv = false)
+  Segment(const QString& l, const QString& d, const QColor& c, const QVector<int>& m, const QVector<Pair>& k, const QVector<Triad>& f, bool v = true, bool sv = false)
   : label(l), description(d), color(c), markerIds(m), links(k), faces(f), mesh(btk::TriangleMesh::New(m.toStdVector(), k.toStdVector(), f.toStdVector()))
-  {this->surfaceVisible = sv; this->isNew = true;};
+  {this->visible = v, this->surfaceVisible = sv; this->isNew = true;};
   Segment(const Segment& toCopy)
   : label(toCopy.label), description(toCopy.description), color(toCopy.color), markerIds(toCopy.markerIds), links(toCopy.links), faces(toCopy.faces), mesh(toCopy.mesh)
-  {this->surfaceVisible = toCopy.surfaceVisible; this->isNew = toCopy.isNew;};
+  {this->visible = toCopy.visible; this->surfaceVisible = toCopy.surfaceVisible; this->isNew = toCopy.isNew;};
   QString label;
   QString description;
   QColor color;
@@ -62,6 +62,7 @@ struct Segment
   QVector<Pair> links;
   QVector<Triad> faces;
   btk::TriangleMesh::Pointer mesh;
+  bool visible;
   bool surfaceVisible;
   bool isNew;
 };
@@ -90,8 +91,9 @@ public:
   const QVector<Pair>& segmentLinks(int id) const {return this->m_Segments[id]->links;};
   const QVector<Triad>& segmentFaces(int id) const {return this->m_Segments[id]->faces;};
   void setSegmentDefinition(int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces);
+  bool segmentVisible(int id) const {return this->m_Segments[id]->visible;};
+  void setSegmentsVisible(const QVector<int>& ids, const QVector<bool>& visibles);
   bool segmentSurfaceVisible(int id) const {return this->m_Segments[id]->surfaceVisible;};
-  void setSegmentSurfaceVisible(int id, bool visible);
   void setSegmentsSurfaceVisible(const QVector<int>& ids, const QVector<bool>& visibles);
   QList<Segment*> takeSegments(const QList<int>& ids);
   void insertSegments(const QList<int>& ids, const QList<Segment*> segments);
@@ -107,7 +109,7 @@ signals:
   void segmentColorChanged(int id, const QColor& color);
   void segmentsColorChanged(const QVector<int>& ids, const QVector<QColor>& colors);
   void segmentDefinitionChanged(int id);
-  void segmentSurfaceVisibilityChanged(int id, bool visible);
+  void segmentsVisibilityChanged(const QVector<int>& ids, const QVector<bool>& visibles);
   void segmentsSurfaceVisibilityChanged(const QVector<int>& ids, const QVector<bool>& visibles);
   void segmentsRemoved(const QList<int>& ids, const QList<Segment*>& segments);
   void segmentsInserted(const QList<int>& ids, const QList<Segment*>& segments);

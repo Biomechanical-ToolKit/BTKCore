@@ -127,14 +127,15 @@ void Model::setSegmentDefinition(int id, const QVector<int>& markerIds, const QV
   }
 };
 
-void Model::setSegmentSurfaceVisible(int id, bool visible)
+void Model::setSegmentsVisible(const QVector<int>& ids, const QVector<bool>& visibles)
 {
-  QMap<int,Segment*>::iterator it = this->m_Segments.find(id);
-  if (it != this->m_Segments.end())
+  for (int i = 0 ; i < ids.count() ; ++i)
   {
-    (*it)->surfaceVisible = visible;
-    emit segmentSurfaceVisibilityChanged(id, visible);
+    QMap<int,Segment*>::iterator it = this->m_Segments.find(ids[i]);
+    if (it != this->m_Segments.end())
+      (*it)->visible = visibles[i];
   }
+  emit segmentsVisibilityChanged(ids, visibles);
 };
 
 void Model::setSegmentsSurfaceVisible(const QVector<int>& ids, const QVector<bool>& visibles)

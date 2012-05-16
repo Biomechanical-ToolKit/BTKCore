@@ -303,6 +303,42 @@ void EditAnalogsScale::action()
   this->m_Scales = temp;
 };
 
+// --------------- EditMarkersVisibility ---------------
+EditMarkersVisibility::EditMarkersVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
+{
+  this->mp_Acquisition = acq;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Visibles[i] = visible;
+};
+
+void EditMarkersVisibility::action()
+{
+  QVector<bool> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Acquisition->markerVisible(this->m_Ids[i]);
+  this->mp_Acquisition->setMarkersVisible(this->m_Ids, this->m_Visibles);
+  this->m_Visibles = temp;
+};
+
+// --------------- EditMarkersTrajectoryVisibility ---------------
+EditMarkersTrajectoryVisibility::EditMarkersTrajectoryVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
+{
+  this->mp_Acquisition = acq;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Visibles[i] = visible;
+};
+
+void EditMarkersTrajectoryVisibility::action()
+{
+  QVector<bool> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Acquisition->markerTrajectoryVisible(this->m_Ids[i]);
+  this->mp_Acquisition->setMarkersTrajectoryVisible(this->m_Ids, this->m_Visibles);
+  this->m_Visibles = temp;
+};
+
 // --------------- RemoveAnalogs ---------------
 RemoveAnalogs::RemoveAnalogs(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Ids(ids), m_Analogs()
@@ -487,6 +523,24 @@ void EditSegmentDefinition::action()
   this->m_MarkerIds = tempMarkerIds;
   this->m_Links = tempLinks;
   this->m_Faces = tempFaces;
+};
+
+// --------------- EditSegmentsVisibility ---------------
+EditSegmentsVisibility::EditSegmentsVisibility(Model* m, const QVector<int>& ids, bool visible, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
+{
+  this->mp_Model = m;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Visibles[i] = visible;
+};
+
+void EditSegmentsVisibility::action()
+{
+  QVector<bool> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Model->segmentVisible(this->m_Ids[i]);
+  this->mp_Model->setSegmentsVisible(this->m_Ids, this->m_Visibles);
+  this->m_Visibles = temp;
 };
 
 // --------------- EditSegmentsSurfaceVisibility ---------------

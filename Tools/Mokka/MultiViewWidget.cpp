@@ -223,7 +223,6 @@ void MultiViewWidget::initialize()
   // Dynamic data
   // Pipeline for force plaforms (plane)
   btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::New();
-  //forcePlaforms->SetInput(forcePlatformsExtractor->GetOutput());
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(forcePlaforms->GetOutputPort(0));
   prop = vtkProperty::New();
@@ -281,8 +280,6 @@ void MultiViewWidget::initialize()
   prototype->Delete();
   // Pipeline for markers
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::New();
-  //markers->SetInput(0, virtualMarkersSeparator->GetOutput(0));
-  //markers->SetInput(1, virtualMarkersSeparator->GetOutput(2));
   // - Display marker's position
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(markers->GetOutputPort(0));
@@ -350,7 +347,6 @@ void MultiViewWidget::initialize()
   actor->Delete();
   // Pipeline for GRFs
   btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::New();
-  //GRFs->SetInput(GRWsDownsampler->GetOutput());
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(GRFs->GetOutputPort(0));
   this->mp_Mappers->AddItem(mapper);
@@ -428,17 +424,19 @@ void MultiViewWidget::setAcquisition(Acquisition* acq)
     static_cast<CompositeView*>(*it)->setAcquisition(this->mp_Acquisition);
   // BTK->VTK connection
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markers->SetInput(0, this->mp_Acquisition->btkMarkers());
-  markers->SetInput(1, this->mp_Acquisition->btkVirtualMarkers());
+  markers->SetInput(0, this->mp_Acquisition->btkAllMarkers());
   btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
   GRFs->SetInput(this->mp_Acquisition->btkGroundReactionWrenches());
   btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::SafeDownCast((*this->mp_VTKProc)[VTK_FORCE_PLATFORMS]);
   forcePlaforms->SetInput(this->mp_Acquisition->btkForcePlatforms());
   btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
-  segments->SetInput(this->mp_Acquisition->btkMarkers());
+  segments->SetInput(this->mp_Acquisition->btkAllMarkers());
   // Object connection
   connect(this->mp_Acquisition, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
   connect(this->mp_Acquisition, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
+  connect(this->mp_Acquisition, SIGNAL(markersVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setMarkersVisibility(QVector<int>, QVector<bool>)));
+  connect(this->mp_Acquisition, SIGNAL(markersTrajectoryVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setMarkersTrajectoryVisibility(QVector<int>, QVector<bool>)));
+  connect(this->mp_Acquisition, SIGNAL(markersConfigurationReset(QList<int>, QList<bool>, QList<bool>, QList<double>, QList<QColor>)), this, SLOT(setMarkersConfiguration(QList<int>, QList<bool>, QList<bool>, QList<double>, QList<QColor>)));
   connect(this->mp_Acquisition, SIGNAL(firstFrameChanged(int)), this, SLOT(updateFramesIndex(int)));
   connect(this->mp_Acquisition, SIGNAL(videosDelayChanged(QVector<int>, QVector<qint64>)), this, SLOT(setVideoDelays(QVector<int>, QVector<qint64>)));
 }
@@ -451,6 +449,7 @@ void MultiViewWidget::setModel(Model* m)
   // Object connection
   connect(this->mp_Model, SIGNAL(segmentsColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setSegmentsColor(QVector<int>, QVector<QColor>)));
   connect(this->mp_Model, SIGNAL(segmentDefinitionChanged(int)), this, SLOT(updateSegmentDefinition(int)));
+  connect(this->mp_Model, SIGNAL(segmentsVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setSegmentsVisibility(QVector<int>, QVector<bool>)));
   connect(this->mp_Model, SIGNAL(segmentsSurfaceVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setSegmentsSurfaceVisibility(QVector<int>, QVector<bool>)));
 }
 
@@ -842,12 +841,19 @@ void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segme
 {
   btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
   QVector<QColor> colors(segments.size());
-  // Assume new segments are appended at the end. No use of the IDs
   int inc = 0;
   for (QList<Segment*>::const_iterator it = segments.begin() ; it != segments.end() ; ++it)
   {
-    colors[inc++] = (*it)->color;
-    segmentsFramesSource->AppendDefinition((*it)->mesh, (*it)->surfaceVisible);
+    colors[inc] = (*it)->color;
+    if (ids[inc] >= segmentsFramesSource->GetNumberOfDefinitions())
+      segmentsFramesSource->AppendDefinition((*it)->mesh, (*it)->surfaceVisible);
+    else
+    {
+      segmentsFramesSource->SetDefinition(ids[inc], (*it)->mesh);
+      segmentsFramesSource->SetSegmentVisibility(ids[inc], (*it)->visible ? 1 : 0);
+      segmentsFramesSource->SetSegmentSurfaceVisibility(ids[inc], (*it)->surfaceVisible ? 1 : 0);
+    }
+    ++inc;
   }
   this->setSegmentsColor(ids.toVector(), colors);
 };
@@ -899,6 +905,14 @@ void MultiViewWidget::updateSegmentDefinition(int id)
 {
   btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
   segments->SetDefinition(id, this->mp_Model->segments().value(id)->mesh);
+  this->updateSegmentsDisplay();
+};
+
+void MultiViewWidget::setSegmentsVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    segmentsFramesSource->SetSegmentVisibility(ids[i], visibles[i] ? 1 : 0);
   this->updateSegmentsDisplay();
 };
 
@@ -978,6 +992,15 @@ void MultiViewWidget::setMarkersColor(const QVector<int>& ids, const QVector<QCo
   this->updateMarkersDisplay();
 };
 
+void MultiViewWidget::updateVisibleMarkers(const QList<int>& ids)
+{
+  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markersFramesSource->HideMarkers();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markersFramesSource->ShowMarker(ids[i]);
+  this->updateMarkersDisplay();
+};
+
 void MultiViewWidget::updateHiddenMarkers(const QList<int>& ids)
 {
   btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
@@ -1008,6 +1031,34 @@ void MultiViewWidget::updateTrackedGRFPaths(const QList<int>& ids)
   while ((mapper = this->mp_Mappers->GetNextItem()) != NULL)
     mapper->Modified();
   this->updateViews();
+};
+
+void MultiViewWidget::setMarkersVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markersFramesSource->SetMarkerVisibility(ids[i], visibles[i] ? 1 : 0);
+  this->updateMarkersDisplay();
+};
+
+void MultiViewWidget::setMarkersTrajectoryVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markersFramesSource->SetTrajectoryVisibility(ids[i], visibles[i] ? 1 : 0);
+  this->updateMarkersDisplay();
+};
+
+void MultiViewWidget::setMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    markers->SetMarkerVisibility(ids[i], visibles[i] ? 1 : 0);
+    markers->SetTrajectoryVisibility(ids[i], trajectories[i] ? 1 : 0);
+    markers->SetMarkerRadius(ids[i], radii[i]);
+  }
+  this->setMarkersColor(ids.toVector(), colors.toVector()); // Will update the display
 };
 
 double MultiViewWidget::markerRadius(int id)
