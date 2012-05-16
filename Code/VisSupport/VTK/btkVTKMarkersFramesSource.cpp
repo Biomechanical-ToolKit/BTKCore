@@ -107,6 +107,23 @@ namespace btk
    * // ...
    * @endcode
    * 
+   * If you want to display several collection of markers using the same btk::VTKMarkersFramesSource object, you can group them together using a btk::CollectionAssembly. For example:
+   * @code
+   * // BTK
+   * // ...
+   * btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
+   * virtualMarkersSeparator->SetInput(reader->GetOutput());
+   * btk::CollectionAssembly<btk::Point>::Pointer virtualMarkersAssembly = btk::CollectionAssembly<btk::Point>::New();
+   * virtualMarkersAssembly->SetInput(0, virtualMarkersSeparator->GetOutput(0)); // Markers
+   * virtualMarkersAssembly->SetInput(1, virtualMarkersSeparator->GetOutput(2)); // Virtual markers
+   * virtualMarkersAssembly->SetInput(2, virtualMarkersSeparator->GetOutput(1)); // Virtual markers used by frames
+   * // VTK
+   * vtkRenderer* renderer = vtkRenderer::New()
+   * btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::New();
+   * markers->SetInput(virtualMarkersAssembly->GetOutput());
+   * // ...
+   * @endcode
+   * 
    * @ingroup BTKVTK
    */
   
@@ -430,12 +447,12 @@ namespace btk
    * - Radius of 8 millimeters;
    * - White color;
    * - Trajectory's length of 100 frames.
-   * These parameters can be modified by the appriopriate method.
+   * These parameters can be modified by the appriopriate methods.
    */
   VTKMarkersFramesSource::VTKMarkersFramesSource()
   : vtkPolyDataAlgorithm()
   {
-    this->SetNumberOfInputPorts(2);
+    this->SetNumberOfInputPorts(1);
     this->SetNumberOfOutputPorts(2);
     
     this->mp_MarkersCoordinates = new VTKMarkersCoordinates();
@@ -781,9 +798,8 @@ namespace btk
    */
   int VTKMarkersFramesSource::FillInputPortInformation(int port, vtkInformation* info)
   {
+    btkNotUsed(port);
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "VTKDataObjectAdapter");
-    if (port != 0)
-      info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     return 1;
   }
 };

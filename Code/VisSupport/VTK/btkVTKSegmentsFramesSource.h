@@ -67,6 +67,7 @@ namespace btk
     BTK_VTK_EXPORT void SetDefinition(vtkIdType id, const std::vector<int>& markerIds, const std::vector<Link>& links);
     BTK_VTK_EXPORT void SetDefinition(vtkIdType id, const std::vector<int>& markerIds, const std::vector<Link>& links, const std::vector<Face>& faces);
     BTK_VTK_EXPORT void SetDefinition(vtkIdType id, TriangleMesh::Pointer mesh);
+    int GetNumberOfDefinitions() const {return this->mp_VisibleSegments->GetNumberOfTuples();};
     BTK_VTK_EXPORT TriangleMesh::Pointer GetDefinition(vtkIdType id);
     BTK_VTK_EXPORT void ClearDefinitions();
 
