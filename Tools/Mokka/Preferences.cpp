@@ -44,6 +44,8 @@ Preferences::Preferences(QWidget* parent)
   this->setupUi(this);
   
   connect(this->defaultConfigurationButton, SIGNAL(clicked()), this, SLOT(setDefaultConfiguration()));
+  connect(this->defaultBackgroundColorButton, SIGNAL(clicked()), this, SLOT(setDefaultBackgroundColor()));
+  connect(this->defaultGridColorButton, SIGNAL(clicked()), this, SLOT(setDefaultGridColor()));
   connect(this->defaultSegmentColorButton, SIGNAL(clicked()), this, SLOT(setDefaultSegmentColor()));
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultForcePlateColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForcePlateColor()));
@@ -58,6 +60,8 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[EventEditorWhenInserting] = false;
   this->m_Data[DefaultGroundOrientation] = -1;
   this->m_Data[DefaultTimeBarEventDisplay] = -1;
+  this->m_Data[DefautlBackgroundColor] = QColor();
+  this->m_Data[DefautGridColor] = QColor();
   this->m_Data[DefaultSegmentColor] = QColor();
   this->m_Data[DefaultMarkerColor] = QColor();
   this->m_Data[DefaultMarkerRadius] = -1;
@@ -119,6 +123,20 @@ void Preferences::saveSettings()
   {
     this->m_Data[DefaultTimeBarEventDisplay] = index;
     emit defaultTimeBarEventDisplayChanged(index);
+  }
+  
+  color = this->defaultBackgroundColorButton->property("backgroundColor").value<QColor>();
+  if (this->m_Data[DefautlBackgroundColor].value<QColor>() != color)
+  {
+    this->m_Data[DefautlBackgroundColor] = color;
+    emit defaultBackgroundColorChanged(color);
+  }
+  
+  color = this->defaultGridColorButton->property("backgroundColor").value<QColor>();
+  if (this->m_Data[DefautGridColor].value<QColor>() != color)
+  {
+    this->m_Data[DefautGridColor] = color;
+    emit defaultGridColorChanged(color);
   }
   
   color = this->defaultSegmentColorButton->property("backgroundColor").value<QColor>();
@@ -233,8 +251,10 @@ void Preferences::resetSettings()
   this->openEventEditorCheckBox->setChecked(this->m_Data[EventEditorWhenInserting].toBool());
   this->defaultPlaneOrientationComboBox->setCurrentIndex(this->m_Data[DefaultGroundOrientation].toInt());
   this->defaultTimeBarEventDisplayComboBox->setCurrentIndex(this->m_Data[DefaultTimeBarEventDisplay].toInt());
+  colorizeButton(this->defaultBackgroundColorButton, this->m_Data[DefautlBackgroundColor].value<QColor>());
+  colorizeButton(this->defaultGridColorButton, this->m_Data[DefautGridColor].value<QColor>());
   colorizeButton(this->defaultSegmentColorButton, this->m_Data[DefaultSegmentColor].value<QColor>());
-  colorizeButton(this->defaultMarkerColorButton, this->m_Data[DefaultMarkerColor].value<QColor>() );
+  colorizeButton(this->defaultMarkerColorButton, this->m_Data[DefaultMarkerColor].value<QColor>());
   this->defaultMarkerRadiusSpinBox->setValue(this->m_Data[DefaultMarkerRadius].toDouble());
   this->defaultMarkerTrajectoryLengthComboBox->setCurrentIndex(this->m_Data[DefaultTrajectoryLength].toInt());
   this->showForcePlatformAxesComboBox->setCurrentIndex(this->m_Data[ForcePlatformAxesDisplay].toInt());
@@ -263,6 +283,20 @@ void Preferences::setDefaultConfiguration()
        "Vicon Model Configuration Files (*.vsk *.vst)"));
   if (!filename.isEmpty())
     this->defaultConfigurationLineEdit->setText(filename);
+};
+
+void Preferences::setDefaultBackgroundColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultBackgroundColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+    colorizeButton(this->defaultBackgroundColorButton, color);
+};
+
+void Preferences::setDefaultGridColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultGridColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+    colorizeButton(this->defaultGridColorButton, color);
 };
 
 void Preferences::setDefaultSegmentColor()

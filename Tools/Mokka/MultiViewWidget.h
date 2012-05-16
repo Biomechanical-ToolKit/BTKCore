@@ -53,6 +53,7 @@ class Acquisition;
 struct Segment;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
+class vtkActorMap;
 class vtkDoubleArray;
 
 class MultiViewWidget : public AbstractMultiView
@@ -92,6 +93,8 @@ public:
   QMenu* chartBottomAxisDisplayMenu() const {return this->mp_ChartBottomAxisDisplayMenu;};
   
   void setDefaultGroundOrientation(int index);
+  void setDefaultBackgroundColor(const QColor& color);
+  void setDefaultGridColor(const QColor& color);
   void setDefaultSegmentColor(const QColor& color);
   void setDefaultMarkerColor(const QColor& color);
   void setDefaultMarkerRadius(double r);
@@ -190,15 +193,13 @@ private:
   QMap<int, qint64> m_VideoDelays;
   vtkEventQtSlotConnect* mp_EventQtSlotConnections;
   vtkProcessMap* mp_VTKProc;
+  vtkActorMap* mp_VTKActor;
   vtkMapperCollection* mp_Mappers;
   vtkStreamingDemandDrivenPipelineCollection* mp_Syncro;
   vtkDoubleArray* mp_PointChartFrames; // Values for the X axis shared by each point chart.
   vtkDoubleArray* mp_AnalogChartFrames; // Values for the X axis shared by each analog chart.
   QColor m_ForcePlatformColor;
-  vtkActor* mp_ForcePlatformActor;
-  vtkActor* mp_GRFsTrajectoryActor;
   QColor m_ForceVectorColor;
-  vtkActor* mp_ForceVectorActor;
   QMenu* mp_GroupOrientationMenu;
   QAction* mp_ActionGroundOrientationAutomatic;
   QAction* mp_ActionGroundOrientationPlaneXY;

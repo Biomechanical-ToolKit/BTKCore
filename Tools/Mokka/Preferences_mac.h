@@ -64,13 +64,15 @@ public slots:
   void showChartPreferences();
   void showLayoutsPreferences();
   void showAdvancedPreferences();
-
+  
   void setDefaultConfiguration();
   void useDefaultConfiguration(bool isUsed);
   void setDefaultConfigurationPath();
   void useEventEditorWhenInserting(bool isUsed);
   void setDefaultOrientation(int index);
   void setDefaultTimeBarEventDisplay(int index);
+  void setDefaultBackgroundColor();
+  void setDefaultGridColor();
   void setDefaultSegmentColor();
   void setDefaultMarkerColor();
   void setDefaultMarkerRadius(double radius);
@@ -94,6 +96,8 @@ signals:
   void defaultGroundOrientationChanged(int index);
   void defaultTimeBarEventDisplayChanged(int index);
   void useEventEditorWhenInsertingStateChanged(bool isChecked);
+  void defaultBackgroundColorChanged(const QColor& color);
+  void defaultGridColorChanged(const QColor& color);
   void defaultSegmentColorChanged(const QColor& color);
   void defaultMarkerColorChanged(const QColor& color);
   void defaultMarkerRadiusChanged(double radius);

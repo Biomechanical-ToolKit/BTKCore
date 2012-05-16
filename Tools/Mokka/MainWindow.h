@@ -159,6 +159,8 @@ public slots:
   void setPreferenceUseEventEditorWhenInserting(bool isUsed);
   void setPreferenceDefaultOrientation(int index);
   void setPreferenceDefaultTimeBarEventDisplay(int index);
+  void setPreferenceDefaultBackgroundColor(const QColor& color);
+  void setPreferenceDefaultGridColor(const QColor& color);
   void setPreferenceDefaultSegmentColor(const QColor& color);
   void setPreferenceDefaultMarkerColor(const QColor& color);
   void setPreferenceDefaultMarkerRadius(double radius);

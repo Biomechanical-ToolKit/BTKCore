@@ -90,6 +90,8 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->openEventEditorCheckBox, SIGNAL(toggled(bool)), this, SLOT(useEventEditorWhenInserting(bool)));  
   connect(this->defaultPlaneOrientationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultOrientation(int)));
   connect(this->defaultTimeBarEventDisplayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultTimeBarEventDisplay(int)));
+  connect(this->defaultBackgroundColorButton, SIGNAL(clicked()), this, SLOT(setDefaultBackgroundColor()));
+  connect(this->defaultGridColorButton, SIGNAL(clicked()), this, SLOT(setDefaultGridColor()));
   connect(this->defaultSegmentColorButton, SIGNAL(clicked()), this, SLOT(setDefaultSegmentColor()));
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultMarkerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setDefaultMarkerRadius(double)));
@@ -203,6 +205,26 @@ void Preferences::setDefaultTimeBarEventDisplay(int index)
 {
   this->defaultChartUnitAxisXComboBox->setCurrentIndex(index);
   emit defaultTimeBarEventDisplayChanged(index);
+};
+
+void Preferences::setDefaultBackgroundColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultBackgroundColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+  {
+    colorizeButton(this->defaultBackgroundColorButton, color);
+    emit defaultBackgroundColorChanged(color);
+  }
+};
+
+void Preferences::setDefaultGridColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultGridColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+  {
+    colorizeButton(this->defaultGridColorButton, color);
+    emit defaultGridColorChanged(color);
+  }
 };
 
 void Preferences::setDefaultSegmentColor()

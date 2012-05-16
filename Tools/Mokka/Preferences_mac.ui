@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>370</height>
+    <height>400</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -32,10 +32,10 @@
    <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
-      <x>12</x>
-      <y>0</y>
+      <x>10</x>
+      <y>1</y>
       <width>456</width>
-      <height>452</height>
+      <height>561</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -51,7 +51,7 @@
      </size>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="generalPage">
      <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -608,6 +608,162 @@
     <widget class="QWidget" name="visualisationPage">
      <layout class="QVBoxLayout" name="verticalLayout_13">
       <item>
+       <layout class="QVBoxLayout" name="backgroundLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_20">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_20">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer_24">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>6</width>
+                <height>1</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_30">
+              <property name="font">
+               <font>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Background</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="Line" name="line_12">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(173,173,173);</string>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_21">
+          <item>
+           <layout class="QFormLayout" name="formLayout_6">
+            <property name="horizontalSpacing">
+             <number>12</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>12</number>
+            </property>
+            <property name="topMargin">
+             <number>9</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_31">
+              <property name="text">
+               <string>Background color</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QPushButton" name="defaultBackgroundColorButton">
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
+  border: 1px solid darkgray;
+  background: rgb(0,0,0);
+}
+
+QPushButton:pressed {
+  border: 1px solid rgb(100,100,100);
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_32">
+              <property name="text">
+               <string>Grid color:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QPushButton" name="defaultGridColorButton">
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
+  border: 1px solid darkgray;
+  background: rgb(204,204,204);
+}
+
+QPushButton:pressed {
+  border: 1px solid rgb(100,100,100);
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_25">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>51</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QVBoxLayout" name="segmentLayout">
         <property name="spacing">
          <number>0</number>
@@ -1155,7 +1311,7 @@ QPushButton:pressed {
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>20</width>
+              <width>21</width>
               <height>20</height>
              </size>
             </property>

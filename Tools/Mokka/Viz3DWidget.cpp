@@ -328,6 +328,7 @@ void Viz3DWidget::copy(Viz3DWidget* source)
     this->mp_Renderer->AddViewProp(static_cast<vtkProp*>(it->GetCurrentObject()));
     it->GoToNextItem();
   }
+  this->mp_Renderer->SetBackground(sourceRenderer->GetBackground());
   // Copy camera orientation
   vtkCamera* sourceCamera = sourceRenderer->GetActiveCamera();
   vtkCamera* targetCamera = this->mp_Renderer->GetActiveCamera();

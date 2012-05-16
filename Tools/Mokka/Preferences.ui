@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>541</width>
-    <height>557</height>
+    <height>645</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -248,6 +248,69 @@
        <string>Visualisation</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QGroupBox" name="groupBox_12">
+         <property name="title">
+          <string>Background</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_6">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_31">
+            <property name="text">
+             <string>Background color</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="defaultBackgroundColorButton">
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+  border: 1px solid darkgray;
+  background: rgb(0,0,0);
+}
+
+QPushButton:pressed {
+  border: 1px solid rgb(100,100,100);
+}</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_32">
+            <property name="text">
+             <string>Grid color:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="defaultGridColorButton">
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+  border: 1px solid darkgray;
+  background: rgb(204,204,204);
+}
+
+QPushButton:pressed {
+  border: 1px solid rgb(100,100,100);
+}</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item>
         <widget class="QGroupBox" name="groupBox_7">
          <property name="title">
