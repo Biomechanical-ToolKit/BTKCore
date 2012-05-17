@@ -76,7 +76,7 @@ ExportASCIIDialog::ExportASCIIDialog(QWidget* parent)
   this->validExportInfo();
 };
 
-void ExportASCIIDialog::fillPoints(QTreeWidgetItem* markersRoot, QTreeWidgetItem* modelOutputsRoot)
+void ExportASCIIDialog::fillPoints(QTreeWidgetItem* markersRoot, QTreeWidgetItem* virtualMarkersRoot, QTreeWidgetItem* modelOutputsRoot)
 {
   this->pointsTreeWidget->blockSignals(true);
   QTreeWidgetItem* points = new QTreeWidgetItem(QStringList() << "Points");
@@ -85,41 +85,31 @@ void ExportASCIIDialog::fillPoints(QTreeWidgetItem* markersRoot, QTreeWidgetItem
   points->setCheckState(0, Qt::Checked);
   this->pointsTreeWidget->addTopLevelItem(points);
   points->setExpanded(true);
-  // Markers
-  if (!markersRoot->isHidden())
-  {
-    QTreeWidgetItem* markers = markersRoot->clone();
-    markers->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsTristate);
-    markers->setCheckState(0, Qt::Checked);
-    points->addChild(markers);
-    markers->setExpanded(true);
-    for (int i = 0 ; i < markers->childCount() ; ++i)
-    {
-      markers->child(i)->setHidden(markersRoot->child(i)->isHidden());
-      markers->child(i)->setCheckState(0, Qt::Checked);
-      markers->child(i)->setForeground(0, Qt::black);
-      markers->child(i)->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-    }
-  }
-  // Models Outputs
+  
+  QList<QTreeWidgetItem*> roots;
+  roots << markersRoot;
+  roots << virtualMarkersRoot;
   if (!modelOutputsRoot->isHidden())
   {
     for (int i = 0 ; i < modelOutputsRoot->childCount() ; ++i)
+      roots << modelOutputsRoot->child(i);
+  }
+  
+  for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
+  {
+    if (!(*itR)->isHidden())
     {
-      QTreeWidgetItem* subRoot = modelOutputsRoot->child(i);
-      if (!subRoot->isHidden())
+      QTreeWidgetItem* items = (*itR)->clone();
+      items->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsTristate);
+      items->setCheckState(0, Qt::Checked);
+      points->addChild(items);
+      items->setExpanded(true);
+      for (int i = 0 ; i < items->childCount() ; ++i)
       {
-        QTreeWidgetItem* sub = subRoot->clone();
-        sub->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsTristate);
-        sub->setCheckState(0, Qt::Checked);
-        points->addChild(sub);
-        sub->setExpanded(true);
-        for (int j = 0 ; j < sub->childCount() ; ++j)
-        {
-          sub->child(j)->setHidden(modelOutputsRoot->child(i)->child(j)->isHidden());
-          sub->child(j)->setCheckState(0, Qt::Checked);
-          sub->child(j)->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        }
+        items->child(i)->setHidden(items->child(i)->isHidden());
+        items->child(i)->setCheckState(0, Qt::Checked);
+        items->child(i)->setForeground(0, Qt::black);
+        items->child(i)->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
       }
     }
   }

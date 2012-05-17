@@ -45,7 +45,7 @@ class ExportASCIIDialog : public QDialog, public Ui::ExportASCIIDialog
 public:
   ExportASCIIDialog(QWidget* parent = 0);
   
-  void fillPoints(QTreeWidgetItem* markersRoot, QTreeWidgetItem* modelOutputsRoot);
+  void fillPoints(QTreeWidgetItem* markersRoot, QTreeWidgetItem* virtualMarkersRoot, QTreeWidgetItem* modelOutputsRoot);
   void fillForcePlates(QTreeWidgetItem* forcePlatesRoot);
   void fillAnalogs(QTreeWidgetItem* analogsRoot);
   

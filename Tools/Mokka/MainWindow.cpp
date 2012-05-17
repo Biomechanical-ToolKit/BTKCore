@@ -1397,7 +1397,7 @@ void MainWindow::exportSTL()
 void MainWindow::exportASCII()
 {
   ExportASCIIDialog exporterDlg(this);
-  exporterDlg.fillPoints(this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::MarkersItem), this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::ModelOutputsItem));
+  exporterDlg.fillPoints(this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::MarkersItem), this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::VirtualMarkersItem), this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::ModelOutputsItem));
   exporterDlg.fillForcePlates(this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::ForcePlatesItem));
   exporterDlg.fillAnalogs(this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::AnalogsItem));
   if (exporterDlg.exec() == QDialog::Accepted)
@@ -1407,7 +1407,7 @@ void MainWindow::exportASCII()
     if (this->mp_Acquisition->fileName().isEmpty())
       file = this->m_LastDirectory + "/untitled" + ext;
     else
-      file = this->m_LastDirectory + "/ " + QFileInfo(this->m_RecentFiles.first()).baseName() + ext;
+      file = this->m_LastDirectory + "/" + QFileInfo(this->m_RecentFiles.first()).baseName() + ext;
     QString filename = QFileDialog::getSaveFileName(this, "", file, "All Files (*)");
     if (!filename.isEmpty())
     {
