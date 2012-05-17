@@ -96,16 +96,24 @@ MainWindow::MainWindow(QWidget* parent)
   this->addDockWidget(Qt::RightDockWidgetArea, this->mp_ModelDock); 
   this->mp_ModelDock->setVisible(false);
   this->setupUi(this);
-  this->menuExport->menuAction()->setEnabled(false);
-  this->menuVisual_Configuration->addAction(this->mp_ModelDock->deselectConfigurationAction());
-  this->menuVisual_Configuration->addAction(this->mp_ModelDock->clearConfigurationsAction());
   QAction* actionModelDockView = this->mp_ModelDock->toggleViewAction();
 #ifdef Q_OS_MAC
   actionModelDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::ShiftModifier + Qt::Key_M));
 #else
   actionModelDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_M));
 #endif
+  QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
+  actionInformationsDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I));
+  this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
+  // Menu File
+  this->menuExport->menuAction()->setEnabled(false);
+  // Menu View
   this->menuView->addAction(actionModelDockView);
+  this->menuView->addAction(actionInformationsDockView);
+  this->menuView->addAction(this->actionViewMetadata);
+  // Menu Settings
+  this->menuVisual_Configuration->addAction(this->mp_ModelDock->deselectConfigurationAction());
+  this->menuVisual_Configuration->addAction(this->mp_ModelDock->clearConfigurationsAction());
   this->menuSettings->addMenu(this->timeEventControler->playbackSpeedMenu());
   this->menuSettings->addSeparator();
   this->menuSettings->addMenu(this->multiView->groundOrientationMenu());
@@ -113,11 +121,17 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuSettings->addAction(this->multiView->forceButterflyActivationAction());
   this->menuSettings->addSeparator();
   this->menuSettings->addMenu(this->multiView->chartBottomAxisDisplayMenu());
-  QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
-  actionInformationsDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I));
-  this->menuView->addAction(actionInformationsDockView);
-  this->menuView->addAction(this->actionViewMetadata);
-  this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
+  // Menu Tools
+  this->menuModel->addAction(this->mp_ModelDock->newSegmentAction());
+  this->menuAcquisition->addAction(this->timeEventControler->actionZoomUnzoomRegionOfInterest);
+  this->menuAcquisition->addAction(this->timeEventControler->actionCropRegionOfInterest);
+  this->menuAcquisition->addSeparator();
+  this->menuAcquisition->addAction(this->timeEventControler->actionReframeFromOne);
+  this->menuEvent->addMenu(this->timeEventControler->insertEventMenu());
+  this->menuEvent->addSeparator();
+  this->menuEvent->addAction(this->timeEventControler->actionEditSelectedEvents);
+  this->menuEvent->addAction(this->timeEventControler->actionRemoveSelectedEvents);
+  this->menuEvent->addAction(this->timeEventControler->actionClearEvents);
 #ifdef Q_OS_MAC
   QFont f = this->font();
   f.setPointSize(10);

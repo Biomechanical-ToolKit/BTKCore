@@ -533,6 +533,7 @@ void ModelDockWidget::load()
 
 void ModelDockWidget::reset()
 {
+  this->mp_NewSegment->setEnabled(false);
   // Clean the tree
   this->modelTree->blockSignals(true);
   this->modelTree->clearSelection();

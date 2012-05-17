@@ -415,7 +415,7 @@ QPushButton::menu-indicator {
   </action>
   <action name="actionCropRegionOfInterest">
    <property name="text">
-    <string>Crop Region of Interest</string>
+    <string>Crop Frames of Interest</string>
    </property>
   </action>
   <action name="actionClearEvents">
@@ -505,7 +505,7 @@ QPushButton::menu-indicator {
   </action>
   <action name="actionZoomUnzoomRegionOfInterest">
    <property name="text">
-    <string>Zoom Region of Interest</string>
+    <string>Zoom Frames of Interest</string>
    </property>
   </action>
   <action name="actionNextEvent">

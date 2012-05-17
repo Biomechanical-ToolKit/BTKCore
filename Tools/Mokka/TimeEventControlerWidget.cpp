@@ -40,8 +40,8 @@
 #include <QMenu>
 #include <QKeyEvent>
 
-#define Mokka_UnzoomRegionOfInterest_Text "Unzoom Region of Interest"
-#define Mokka_ZoomRegionOfInterest_Text "Zoom Region of Interest"
+#define Mokka_UnzoomRegionOfInterest_Text "Unzoom Frames of Interest"
+#define Mokka_ZoomRegionOfInterest_Text "Zoom Frames of Interest"
 
 TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
 : QWidget(parent)
@@ -65,6 +65,10 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->prevEventButton->setIcon(*this->mp_PrevEventIcon);
   this->playButton->setIcon(*this->mp_PlayIcon);
   this->nextEventButton->setIcon(*this->mp_NextEventIcon);
+  this->actionReframeFromOne->setEnabled(false);
+  this->actionClearEvents->setEnabled(false);
+  this->actionCropRegionOfInterest->setEnabled(false);
+  this->actionZoomUnzoomRegionOfInterest->setEnabled(false);
   // Shortcuts
   this->actionEditSelectedEvents->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_E));
   this->actionRemoveSelectedEvents->setShortcut(QKeySequence::Delete);
@@ -256,6 +260,10 @@ void TimeEventControlerWidget::reset()
     this->stopPlayback();
   this->timeEventBar->reset();
   this->lcdNumber->display(0);
+  this->actionReframeFromOne->setEnabled(false);
+  this->actionClearEvents->setEnabled(false);
+  this->actionCropRegionOfInterest->setEnabled(false);
+  this->actionZoomUnzoomRegionOfInterest->setEnabled(false);
 };
 
 void TimeEventControlerWidget::setTimeEventTicksDisplay(int index)
