@@ -40,6 +40,15 @@
 #pragma once
 #endif
 
+/* 
+ * 2012-05-12: Modified by A. Barré to fix a bug with MSVC 2010
+ * - see msinttypes issue 10: http://code.google.com/p/msinttypes/issues/detail?id=10
+ * - see BTK issue 30: http://code.google.com/p/b-tk/issues/detail?id=30
+ */
+#if _MSC_VER >= 1600
+  #include <stdint.h>
+#else
+
 #include <limits.h>
 
 // For Visual Studio 6 in C++ mode wrap <wchar.h> include with 'extern "C++" {}'
