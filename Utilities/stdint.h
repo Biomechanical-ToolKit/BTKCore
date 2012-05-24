@@ -47,7 +47,7 @@
  */
 #if _MSC_VER >= 1600
   #include <stdint.h>
-#else
+#endif
 
 #include <limits.h>
 
