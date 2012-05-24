@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>541</width>
-    <height>645</height>
+    <height>506</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -254,10 +254,20 @@
           <string>Background</string>
          </property>
          <layout class="QFormLayout" name="formLayout_6">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+          </property>
           <item row="0" column="0">
            <widget class="QLabel" name="label_31">
             <property name="text">
-             <string>Background color</string>
+             <string>Background color              </string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_32">
+            <property name="text">
+             <string>Grid color:</string>
             </property>
            </widget>
           </item>
@@ -278,13 +288,6 @@ QPushButton:pressed {
             </property>
             <property name="flat">
              <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_32">
-            <property name="text">
-             <string>Grid color:</string>
             </property>
            </widget>
           </item>
@@ -323,7 +326,7 @@ QPushButton:pressed {
           <item row="0" column="0">
            <widget class="QLabel" name="defaultSegmentColorLabel">
             <property name="text">
-             <string>Default color:                   </string>
+             <string>Default color:                    </string>
             </property>
            </widget>
           </item>

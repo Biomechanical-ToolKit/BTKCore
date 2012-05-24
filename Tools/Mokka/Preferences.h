@@ -49,7 +49,7 @@
 
   public:
     enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, DefaultTimeBarEventDisplay,
-          DefautlBackgroundColor, DefautGridColor, DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
+          DefaultBackgroundColor, DefaultGridColor, DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
           ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse,
           DefaultGRFButterflyActivation, ForcePathDisplay, DefaultPlotLineWidth, ChartEventDisplay, chartUnitAxisX};
   

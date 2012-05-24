@@ -60,8 +60,8 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[EventEditorWhenInserting] = false;
   this->m_Data[DefaultGroundOrientation] = -1;
   this->m_Data[DefaultTimeBarEventDisplay] = -1;
-  this->m_Data[DefautlBackgroundColor] = QColor();
-  this->m_Data[DefautGridColor] = QColor();
+  this->m_Data[DefaultBackgroundColor] = QColor();
+  this->m_Data[DefaultGridColor] = QColor();
   this->m_Data[DefaultSegmentColor] = QColor();
   this->m_Data[DefaultMarkerColor] = QColor();
   this->m_Data[DefaultMarkerRadius] = -1;
@@ -126,16 +126,16 @@ void Preferences::saveSettings()
   }
   
   color = this->defaultBackgroundColorButton->property("backgroundColor").value<QColor>();
-  if (this->m_Data[DefautlBackgroundColor].value<QColor>() != color)
+  if (this->m_Data[DefaultBackgroundColor].value<QColor>() != color)
   {
-    this->m_Data[DefautlBackgroundColor] = color;
+    this->m_Data[DefaultBackgroundColor] = color;
     emit defaultBackgroundColorChanged(color);
   }
   
   color = this->defaultGridColorButton->property("backgroundColor").value<QColor>();
-  if (this->m_Data[DefautGridColor].value<QColor>() != color)
+  if (this->m_Data[DefaultGridColor].value<QColor>() != color)
   {
-    this->m_Data[DefautGridColor] = color;
+    this->m_Data[DefaultGridColor] = color;
     emit defaultGridColorChanged(color);
   }
   
@@ -251,8 +251,8 @@ void Preferences::resetSettings()
   this->openEventEditorCheckBox->setChecked(this->m_Data[EventEditorWhenInserting].toBool());
   this->defaultPlaneOrientationComboBox->setCurrentIndex(this->m_Data[DefaultGroundOrientation].toInt());
   this->defaultTimeBarEventDisplayComboBox->setCurrentIndex(this->m_Data[DefaultTimeBarEventDisplay].toInt());
-  colorizeButton(this->defaultBackgroundColorButton, this->m_Data[DefautlBackgroundColor].value<QColor>());
-  colorizeButton(this->defaultGridColorButton, this->m_Data[DefautGridColor].value<QColor>());
+  colorizeButton(this->defaultBackgroundColorButton, this->m_Data[DefaultBackgroundColor].value<QColor>());
+  colorizeButton(this->defaultGridColorButton, this->m_Data[DefaultGridColor].value<QColor>());
   colorizeButton(this->defaultSegmentColorButton, this->m_Data[DefaultSegmentColor].value<QColor>());
   colorizeButton(this->defaultMarkerColorButton, this->m_Data[DefaultMarkerColor].value<QColor>());
   this->defaultMarkerRadiusSpinBox->setValue(this->m_Data[DefaultMarkerRadius].toDouble());
