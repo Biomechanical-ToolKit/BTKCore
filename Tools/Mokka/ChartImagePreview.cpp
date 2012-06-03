@@ -78,8 +78,6 @@ void ChartImagePreview::initialize()
   
   this->mp_Chart = btk::VTKChartTimeSeries::New();
   this->mp_Chart->SetInteractionEnabled(false);
-  vtkChartLegend* legend = btk::VTKChartLegend::New();
-  this->mp_Chart->SetLegend(legend);
   this->mp_Chart->SetShowLegend(true);
   
   vtkContextScene* scene = vtkContextScene::New();
@@ -89,7 +87,6 @@ void ChartImagePreview::initialize()
   this->mp_Renderer->AddActor(actor);
   scene->SetRenderer(this->mp_Renderer);
   
-  legend->Delete();
   actor->Delete();
   scene->Delete();
 };
