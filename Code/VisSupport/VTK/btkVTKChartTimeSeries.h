@@ -37,72 +37,46 @@
 #define __btkVTKChartTimeSeries_h
 
 #include "btkConfigure.h"
-#include "btkSharedPtr.h"
 #include "btkVTKAxis.h"
+#include "btkVTKChartExtraAcquisition.h"
 
 #include <vtkChart.h>
 #include <vtkVector.h> // vtkRectf
-#include <vtkContextScene.h> // vtkContextMouseEvent
+#include <vtkColorSeries.h>
+#include <vtkContextClip.h>
+#include <vtkContextTransform.h>
+#include <vtkChartLegend.h>
 
 class vtkChartLegend;
 class vtkColorSeries;
-class vtkPlotGrid;
 
 namespace btk
 {
   class VTKPlots;
   
-  class VTKCurrentFrameFunctor
+  /**
+   * FROM VTK 5.10: Small struct used by InvokeEvent to send some information about the point
+   * that was clicked on. This is an experimental part of the API, subject to
+   * change.
+   */
+  struct VTKChartPlotData
   {
-  public:
-    typedef SharedPtr<VTKCurrentFrameFunctor> Pointer;
-    virtual ~VTKCurrentFrameFunctor() {};
-    virtual int operator()() = 0;
-  protected:
-    VTKCurrentFrameFunctor() {};
-  private:
-    VTKCurrentFrameFunctor(const VTKCurrentFrameFunctor& ); // Not implemented.
-    VTKCurrentFrameFunctor& operator=(const VTKCurrentFrameFunctor& ); // Not implemented.
-  };
-  
-  class VTKRegionOfInterestFunctor
-  {
-  public:
-    typedef SharedPtr<VTKRegionOfInterestFunctor> Pointer;
-    virtual ~VTKRegionOfInterestFunctor() {};
-    virtual void operator()(int& left, int& right) = 0;
-  protected:
-    VTKRegionOfInterestFunctor() {};
-  private:
-    VTKRegionOfInterestFunctor(const VTKRegionOfInterestFunctor& ); // Not implemented.
-    VTKRegionOfInterestFunctor& operator=(const VTKRegionOfInterestFunctor& ); // Not implemented.
-  };
-  
-  class VTKEventsFunctor
-  {
-  public:
-    typedef SharedPtr<VTKEventsFunctor> Pointer;
-    virtual ~VTKEventsFunctor() {};
-    virtual bool operator()(int index, int& typeId, int& frame, double rgb[3]) = 0;
-  protected:
-    VTKEventsFunctor() {};
-  private:
-    VTKEventsFunctor(const VTKEventsFunctor& ); // Not implemented.
-    VTKEventsFunctor& operator=(const VTKEventsFunctor& ); // Not implemented.
+    vtkStdString SeriesName;
+    vtkVector2f Position;
+    vtkVector2i ScreenPosition;
+    int Index;
   };
   
   class VTKChartTimeSeries : public vtkChart
   {
   public:
+    vtkTypeMacro(VTKChartTimeSeries, vtkChart);
+    
     enum {HORIZONTAL, VERTICAL, BOTH}; // Zoom mode
     
     BTK_VTK_EXPORT static VTKChartTimeSeries* New();
-    vtkExportedTypeRevisionMacro(VTKChartTimeSeries, vtkChart, BTK_VTK_EXPORT);
     
     virtual ~VTKChartTimeSeries();
-    
-    bool GetClippingEnabled() const {return this->m_ClippingEnabled;};
-    void SetClippingEnabled(bool enabled) {this->m_ClippingEnabled = enabled;};
     
     bool GetInteractionEnabled() const {return this->m_InteractionEnabled;};
     void SetInteractionEnabled(bool enabled) {this->m_InteractionEnabled = enabled;};
@@ -110,55 +84,56 @@ namespace btk
     int GetZoomMode() const {return this->m_ZoomMode;};
     void SetZoomMode(int mode) {this->m_ZoomMode = mode;};
     
-    bool GetBoundsEnabled() {return this->m_BoundsEnabled;};
-    void SetBoundsEnabled(bool enabled) {this->m_BoundsEnabled = enabled;};
-    double* GetBounds() {return this->mp_Bounds;};
+    // bool GetBoundsEnabled() {return this->m_BoundsEnabled;};
+    //             void SetBoundsEnabled(bool enabled) {this->m_BoundsEnabled = enabled;};
+    //             double* GetBounds() {return this->mp_Bounds;};
     void SetBounds(double xMin, double xMax, double yMin, double yMax) {double bounds[4] = {xMin, xMax, yMin, yMax}; this->SetBounds(bounds);};
     BTK_VTK_EXPORT void SetBounds(double bounds[4]);
     BTK_VTK_EXPORT virtual void RecalculateBounds();
+    BTK_VTK_EXPORT void SetGeometry(const vtkRectf& rect);
     
-    BTK_VTK_EXPORT void SetLegend(vtkChartLegend* legend);
+    
+    BTK_VTK_EXPORT void SetLegend(vtkSmartPointer<vtkChartLegend> legend);
     vtkChartLegend* GetLegend() {return this->mp_Legend;};
     
-    BTK_VTK_EXPORT void SetColorSeries(vtkColorSeries* colors);
+    BTK_VTK_EXPORT void SetColorSeries(vtkSmartPointer<vtkColorSeries> colors);
     vtkColorSeries* GetColorSeries() {return this->mp_Colors;};
     
-    int GetTitleMargin() const {return this->m_TitleMargin;};
-    BTK_VTK_EXPORT void SetTitleMargin(int margin);
+    // int GetTitleMargin() const {return this->m_TitleMargin;};
+    //     BTK_VTK_EXPORT void SetTitleMargin(int margin);
     
     const int* GetBorders() const {return this->mp_Borders;};
     BTK_VTK_EXPORT void SetBorders(int left, int bottom, int right, int top);
     
-    VTKCurrentFrameFunctor::Pointer GetCurrentFrameFunctor() const {return this->mp_CurrentFrameFunctor;};
-    BTK_VTK_EXPORT void SetCurrentFrameFunctor(VTKCurrentFrameFunctor::Pointer functor);
-    VTKRegionOfInterestFunctor::Pointer GetRegionOfInterestFunctor() const {return this->mp_RegionOfInterestFunctor;};
-    BTK_VTK_EXPORT void SetRegionOfInterestFunctor(VTKRegionOfInterestFunctor::Pointer functor);
-    VTKEventsFunctor::Pointer GetEventsFunctor() const {return this->mp_EventsFunctor;};
-    BTK_VTK_EXPORT void SetEventsFunctor(VTKEventsFunctor::Pointer functor);
+    VTKCurrentFrameFunctor::Pointer GetCurrentFrameFunctor() const {return this->mp_ExtraAcquisition->GetCurrentFrameFunctor();};
+    void SetCurrentFrameFunctor(VTKCurrentFrameFunctor::Pointer functor) {this->mp_ExtraAcquisition->SetCurrentFrameFunctor(functor);};
+    VTKRegionOfInterestFunctor::Pointer GetRegionOfInterestFunctor() const {return this->mp_ExtraAcquisition->GetRegionOfInterestFunctor();};
+    void SetRegionOfInterestFunctor(VTKRegionOfInterestFunctor::Pointer functor) {this->mp_ExtraAcquisition->SetRegionOfInterestFunctor(functor);};
+    VTKEventsFunctor::Pointer GetEventsFunctor() const {return this->mp_ExtraAcquisition->GetEventsFunctor();};
+    void SetEventsFunctor(VTKEventsFunctor::Pointer functor) {this->mp_ExtraAcquisition->SetEventsFunctor(functor);};
     
-    int GetDisplayEvents() const {return this->m_DisplayEvents;};
-    BTK_VTK_EXPORT void SetDisplayEvents(int enabled);
+    int GetDisplayEvents() const {return this->mp_ExtraAcquisition->GetDisplayEvents();};
+    void SetDisplayEvents(int enabled) {return this->mp_ExtraAcquisition->SetDisplayEvents(enabled);};
     void DisplayEventsOn() {this->SetDisplayEvents(1);};
     void DisplayEventsOff() {this->SetDisplayEvents(0);};
     
-    float GetEventLineWidth() const {return this->m_EventLineWidth;};
-    void SetEventLineWidth(float width);
+    float GetEventLineWidth() const {return this->mp_ExtraAcquisition->GetEventLineWidth();};
+    void SetEventLineWidth(float width) {return this->mp_ExtraAcquisition->SetEventLineWidth(width);};
     
-    int GetEventLineTypeFactor() const {return this->m_EventLineTypeFactor;};
-    void SetEventLineTypeFactor(int factor);
+    int GetEventLineTypeFactor() const {return this->mp_ExtraAcquisition->GetEventLineTypeFactor();};
+    void SetEventLineTypeFactor(int factor) {return this->mp_ExtraAcquisition->SetEventLineTypeFactor(factor);};
     
-    BTK_VTK_EXPORT void ResetZoom();
-    BTK_VTK_EXPORT void ApplyZoom(const vtkRectf& box);
-    const vtkRectf& GetZoomBox() const {return this->m_ZoomBox;};
-    int GetDisplayZoomBox() const {return this->m_ZoomBoxDisplayed;};
-    BTK_VTK_EXPORT void SetDisplayZoomBox(int enabled);
-    void DisplayZoomBoxOn() {this->SetDisplayZoomBox(1);};
-    void DisplayZoomBoxOff() {this->SetDisplayZoomBox(0);};
-    
-    BTK_VTK_EXPORT virtual void HidePlot(int index, bool isHidden);
+    // BTK_VTK_EXPORT void ResetZoom();
+    // BTK_VTK_EXPORT void ApplyZoom(const vtkRectf& box);
+    // const vtkRectf& GetZoomBox() const {return this->m_ZoomBox;};
+    // int GetDisplayZoomBox() const {return this->m_ZoomBoxDisplayed;};
+    // BTK_VTK_EXPORT void SetDisplayZoomBox(int enabled);
+    // void DisplayZoomBoxOn() {this->SetDisplayZoomBox(1);};
+    // void DisplayZoomBoxOff() {this->SetDisplayZoomBox(0);};
     
     BTK_VTK_EXPORT virtual void Update();
     BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
+    
     BTK_VTK_EXPORT virtual vtkPlot* AddPlot(int type);
     BTK_VTK_EXPORT virtual vtkIdType AddPlot(vtkPlot* plot);
     BTK_VTK_EXPORT virtual bool RemovePlot(vtkIdType index);
@@ -168,53 +143,47 @@ namespace btk
     BTK_VTK_EXPORT virtual vtkIdType GetNumberOfPlots();
     BTK_VTK_EXPORT virtual vtkAxis* GetAxis(int axisIndex);
     BTK_VTK_EXPORT virtual vtkIdType GetNumberOfAxes();
+    BTK_VTK_EXPORT virtual void HidePlot(int index, bool isHidden);
+    BTK_VTK_EXPORT virtual bool LocatePointInPlots(const vtkContextMouseEvent& mouse, VTKChartPlotData& plotIndex);
     
-    vtkTransform2D* GetPlotsTransform() const {return this->mp_PlotsTransform;};
-    
-    bool Hit(const vtkContextMouseEvent& mouse) {return this->Hit(mouse.ScreenPos[0], mouse.ScreenPos[1]);};
-    BTK_VTK_EXPORT bool Hit(int x, int y);
-    BTK_VTK_EXPORT bool Hit2(int x, int y);
+    BTK_VTK_EXPORT bool Hit(const vtkContextMouseEvent& mouse);
+    BTK_VTK_EXPORT bool Hit2(const vtkContextMouseEvent& mouse);
+    BTK_VTK_EXPORT virtual bool MouseEnterEvent(const vtkContextMouseEvent& mouse);
+    BTK_VTK_EXPORT virtual bool MouseLeaveEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseButtonPressEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseMoveEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta);
+    BTK_VTK_EXPORT virtual bool KeyPressEvent(const vtkContextKeyEvent& key);
+    
+    BTK_VTK_EXPORT void RecalculatePlotTransform();
     
   protected:
     BTK_VTK_EXPORT VTKChartTimeSeries();
-
-    BTK_VTK_EXPORT void RecalculatePlotsTransform();
     
   private:
     VTKChartTimeSeries(const VTKChartTimeSeries& ); // Not implemented.
     void operator=(const VTKChartTimeSeries& );   // Not implemented.
     
-    bool m_ClippingEnabled;
+    VTKChartExtraAcquisition* mp_ExtraAcquisition;
+    
     bool m_InteractionEnabled;
     int m_ZoomMode;
-    bool m_BoundsEnabled;
-    double mp_Bounds[4]; // xMin, xMax, yMin, yMax
-    int mp_Borders[4]; // left, bottom, right, top
-    bool m_BordersChanged;
     vtkRectf m_ZoomBox;
-    int m_ZoomBoxDisplayed;
+    bool m_ZoomBoxDisplayed;
+    int mp_Borders[4]; // left, bottom, right, top
     
-    vtkChartLegend* mp_Legend;
-    vtkColorSeries* mp_Colors;
+    vtkSmartPointer<vtkChartLegend> mp_Legend;
+    vtkSmartPointer<vtkColorSeries> mp_Colors;
+    vtkSmartPointer<vtkContextClip> mp_Clip;
+    vtkSmartPointer<vtkContextTransform> mp_PlotTransform;
     VTKAxis* mp_AxisX;
     VTKAxis* mp_AxisY;
-    vtkPlotGrid* mp_Grid;
     VTKPlots* mp_Plots;
-    vtkTransform2D* mp_PlotsTransform;
+    bool m_GeometryChanged;
     bool m_ChartBoundsValid;
     bool m_PlotsTransformValid;
-    int m_TitleMargin;
-    
-    VTKCurrentFrameFunctor::Pointer mp_CurrentFrameFunctor;
-    VTKRegionOfInterestFunctor::Pointer mp_RegionOfInterestFunctor;
-    VTKEventsFunctor::Pointer mp_EventsFunctor;
-    int m_DisplayEvents;
-    float m_EventLineWidth;
-    int m_EventLineTypeFactor;
+    // int m_TitleMargin;
   };
 };
 

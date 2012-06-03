@@ -45,6 +45,11 @@
 #include <vtkBrush.h>
 #include <vtkStdString.h>
 #include <vtkTransform2D.h>
+#include <vtkWeakPointer.h>
+
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 8) || (VTK_MAJOR_VERSION >= 6))
+  #include <vtkStringArray.h>
+#endif
 
 #include <vtkstd/vector>
 
@@ -53,7 +58,7 @@
 class vtkChartLegend::Private
 {
  public:
-   Private() {};
+   Private() : Point(0, 0) {};
    ~Private() {};
    
    vtkVector2f Point;
@@ -70,14 +75,12 @@ namespace btk
    *
    * This inherited class is necessary as in VTK 5.6 the anchor is not taken into account for the location of the legend.
    * Moreover, this class take into account the transformation given to the object to paint correctly the legend into the scene (only the scale and translation are supported).
+   *
+   * @warning The member Padding introduced in VTK 5.8 or greater has no effect on this class as another member named PaddingGeometry was introduced in VTKChartLegend.
    */
   /**
-   * @var VTKChartLegend::mp_Padding
+   * @var VTKChartLegend::mp_PaddingGeometry
    * Padding around the content of the legend.
-   */
-  /**
-   * @var VTKChartLegend::m_SymbolWidth
-   * Width of the symbol used for each plot.
    */
   
   /**
@@ -94,28 +97,34 @@ namespace btk
   {};
   
   /**
-   * @fn float* VTKChartLegend::GetPadding() const
+   * @fn float* VTKChartLegend::GetPaddingGeometry() const
    * Returns the padding's values as an array of 4 elements in the order: left, bottom, right, top.
    */
    
   /**
-   * @fn void VTKChartLegend::SetPadding(float left, float bottom, float right, float top)
+   * @fn void VTKChartLegend::SetPaddingGeometry(float left, float bottom, float right, float top)
    * Convenient method to set the padding.
    */
    
   /**
    * Sets the padding. The order is left, bottom, right, top.
    */
-  void VTKChartLegend::SetPadding(float padding[4])
+  void VTKChartLegend::SetPaddingGeometry(float padding[4])
   {
-    if ((this->mp_Padding[0] == padding[0]) && (this->mp_Padding[1] == padding[1]) && (this->mp_Padding[2] == padding[2]) && (this->mp_Padding[3] == padding[3]))
+    if ((this->mp_PaddingGeometry[0] == padding[0]) && (this->mp_PaddingGeometry[1] == padding[1]) && (this->mp_PaddingGeometry[2] == padding[2]) && (this->mp_PaddingGeometry[3] == padding[3]))
       return;
-    this->mp_Padding[0] = padding[0]; // Left
-    this->mp_Padding[1] = padding[1]; // Bottom
-    this->mp_Padding[2] = padding[2]; // Right
-    this->mp_Padding[3] = padding[3]; // Top
+    this->mp_PaddingGeometry[0] = padding[0]; // Left
+    this->mp_PaddingGeometry[1] = padding[1]; // Bottom
+    this->mp_PaddingGeometry[2] = padding[2]; // Right
+    this->mp_PaddingGeometry[3] = padding[3]; // Top
     this->Modified();
   };
+   
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 8))
+  /**
+   * @var VTKChartLegend::SymbolWidth
+   * Width of the symbol used for each plot.
+   */
    
   /**
    * @fn float VTKChartLegend::GetSymbolWidth() const
@@ -125,19 +134,68 @@ namespace btk
   /**
    * Sets the width of the symbol used for the plots.
    */
-  void VTKChartLegend::SetSymbolWidth(float width)
+  void VTKChartLegend::SetSymbolWidth(int width)
   {
-    if (this->m_SymbolWidth == width)
+    if (this->SymbolWidth == width)
       return;
-    this->m_SymbolWidth = width;
+    this->SymbolWidth = width;
     this->Modified();
   };
+#endif
   
   /**
    * Method to draw the legend into the scene.
    */
   bool VTKChartLegend::Paint(vtkContext2D *painter)
   {
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 8) || (VTK_MAJOR_VERSION >= 6))
+    if (!this->Visible || this->Storage->ActivePlots.size() == 0)
+      return true;
+
+    this->GetBoundingRect(painter);
+
+    // Now draw a box for the legend.
+    painter->ApplyPen(this->Pen.GetPointer());
+    painter->ApplyBrush(this->Brush.GetPointer());
+    painter->DrawRect(this->Rect.X(), this->Rect.Y(), this->Rect.Width(), this->Rect.Height());
+
+    painter->ApplyTextProp(this->LabelProperties.GetPointer());
+
+    vtkVector2f stringBounds[2];
+    painter->ComputeStringBounds("Tgyf", stringBounds->GetData());
+    float height = stringBounds[1].GetY();
+    painter->ComputeStringBounds("The", stringBounds->GetData());
+    float baseHeight = stringBounds[1].GetY();
+
+    vtkVector2f pos(this->Rect.X() + this->Padding + this->SymbolWidth,
+                    this->Rect.Y() + this->Rect.Height() - this->Padding - floor(height));
+    vtkRectf rect(this->Rect.X() + this->Padding, pos.Y(),
+                  this->SymbolWidth-3, ceil(height));
+
+    // Draw all of the legend labels and marks
+    for(size_t i = 0; i < this->Storage->ActivePlots.size(); ++i)
+    {
+      vtkStringArray *labels = this->Storage->ActivePlots[i]->GetLabels();
+      for (vtkIdType l = 0; labels && (l < labels->GetNumberOfValues()); ++l)
+      {
+        // This is fairly hackish, but gets the text looking reasonable...
+        // Calculate a height for a "normal" string, then if this height is greater
+        // that offset is used to move it down. Effectively hacking in a text
+        // base line until better support is in the text rendering code...
+        // There are still several one pixel glitches, but it looks better than
+        // using the default vertical alignment. FIXME!
+        vtkStdString testString = labels->GetValue(l);
+        testString += "T";
+        painter->ComputeStringBounds(testString, stringBounds->GetData());
+        painter->DrawString(pos.X(), rect.Y() + (baseHeight-stringBounds[1].Y()),
+                            labels->GetValue(l));
+
+        // Paint the legend mark and increment out y value.
+        this->Storage->ActivePlots[i]->PaintLegend(painter, rect, l);
+        rect.SetY(rect.Y() - height - this->Padding);
+      }
+    }
+#else
     painter->GetPen()->SetWidth(0.5);
     vtkTextProperty *prop = painter->GetTextProp();
     prop->SetFontSize(this->LabelSize);
@@ -161,18 +219,18 @@ namespace btk
     painter->ComputeStringBounds("Typo", stringBounds->GetData()); // String containing ascender and descender glyphs.
     sizeText[1] = stringBounds[1].Y();
     
-    if (this->GetTransform() != NULL)
-    {
-      sizeText[0] /= this->GetTransform()->GetMatrix()->GetElement(0,0);
-      sizeText[1] /= this->GetTransform()->GetMatrix()->GetElement(1,1);
-    }
+    // if (this->GetTransform() != NULL)
+    // {
+    //   sizeText[0] /= this->GetTransform()->GetMatrix()->GetElement(0,0);
+    //   sizeText[1] /= this->GetTransform()->GetMatrix()->GetElement(1,1);
+    // }
     
-    float spacing[2] = {(this->mp_Padding[0] + this->mp_Padding[2]) * 0.5f, (this->mp_Padding[1] + this->mp_Padding[3]) * 0.5f};
+    float spacing[2] = {(this->mp_PaddingGeometry[0] + this->mp_PaddingGeometry[2]) * 0.5f, (this->mp_PaddingGeometry[1] + this->mp_PaddingGeometry[3]) * 0.5f};
     
     // Figure out the size of the legend box and store locally.
     vtkRectf box(this->Storage->Point.X(), this->Storage->Point.Y(), // LEFT BOTTOM by default
-                 sizeText[0] + this->mp_Padding[0] + this->mp_Padding[2] + spacing[0] + this->m_SymbolWidth,
-                 this->Storage->ActivePlots.size() * sizeText[1] + (this->Storage->ActivePlots.size() - 1) * spacing[1] + this->mp_Padding[1] + this->mp_Padding[3]);
+                 sizeText[0] + this->mp_PaddingGeometry[0] + this->mp_PaddingGeometry[2] + spacing[0] + static_cast<float>(this->SymbolWidth),
+                 this->Storage->ActivePlots.size() * sizeText[1] + (this->Storage->ActivePlots.size() - 1) * spacing[1] + this->mp_PaddingGeometry[1] + this->mp_PaddingGeometry[3]);
     // Adapt the corner to be the left bottom point independantly of the anchor
     // - Horizontal
     if (this->HorizontalAlignment == vtkChartLegend::RIGHT)
@@ -189,8 +247,8 @@ namespace btk
     painter->GetBrush()->SetColor(255, 255, 255, 255);
     painter->DrawRect(box[0], box[1], box[2], box[3]);
 
-    float pos[2] = {box[0] + this->mp_Padding[0] + this->m_SymbolWidth + spacing[0], box[1] + box[3] - this->mp_Padding[3] - sizeText[1]};
-    float rectSymbol[4] = {box[0] + this->mp_Padding[0], pos[1], this->m_SymbolWidth, sizeText[1]};
+    float pos[2] = {box[0] + this->mp_PaddingGeometry[0] + static_cast<float>(this->SymbolWidth) + spacing[0], box[1] + box[3] - this->mp_PaddingGeometry[3] - sizeText[1]};
+    float rectSymbol[4] = {box[0] + this->mp_PaddingGeometry[0], pos[1], static_cast<float>(this->SymbolWidth), sizeText[1]};
 
     // Draw all of the legend labels and marks
     painter->ComputeStringBounds("ascT", stringBounds->GetData()); // String without descender glyph.
@@ -201,8 +259,8 @@ namespace btk
       {
         // painter->DrawRect(pos[0], pos[1], sizeText[0], sizeText[1]);
         float pt[2] = {pos[0], pos[1]};
-        if (this->GetTransform() != NULL)
-          this->GetTransform()->TransformPoints(pt, pt, 1);
+        // if (this->GetTransform() != NULL)
+        //   this->GetTransform()->TransformPoints(pt, pt, 1);
         // Only tested with the vtkQtLabelRenderStrategy class to render text
         // Seems to work for any font (arial, courrir, times)
         if (this->LabelSize < 20)
@@ -219,7 +277,7 @@ namespace btk
         rectSymbol[1] = pos[1];
       }
     }
-
+#endif
     return true;
   };
   
@@ -229,10 +287,10 @@ namespace btk
   VTKChartLegend::VTKChartLegend()
   : vtkChartLegend()
   {
-    this->mp_Padding[0] = 5;
-    this->mp_Padding[1] = 5;
-    this->mp_Padding[2] = 5;
-    this->mp_Padding[3] = 5;
-    this->m_SymbolWidth = 15;
+    this->mp_PaddingGeometry[0] = 5.0f;
+    this->mp_PaddingGeometry[1] = 5.0f;
+    this->mp_PaddingGeometry[2] = 5.0f;
+    this->mp_PaddingGeometry[3] = 5.0f;
+    this->SymbolWidth = 15;
   };
 };

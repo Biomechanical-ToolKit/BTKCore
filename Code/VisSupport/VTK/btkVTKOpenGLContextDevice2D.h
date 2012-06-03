@@ -33,46 +33,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKChartLegend_h
-#define __btkVTKChartLegend_h
+#ifndef __btkVTKOpenGLContextDevice2D_h
+#define __btkVTKOpenGLContextDevice2D_h
 
-#include "btkConfigure.h"
-
-#include <vtkChartLegend.h>
+#include <vtkOpenGLContextDevice2D.h>
 
 namespace btk
 {
-  class VTKChartLegend : public vtkChartLegend
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 8)) || (VTK_MAJOR_VERSION >= 6))
+  class VTKOpenGLContextDevice2D : public vtkOpenGLContextDevice2D
   {
   public:
-    BTK_VTK_EXPORT static VTKChartLegend* New();
-    vtkExportedTypeRevisionMacro(VTKChartLegend, vtkChartLegend, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKOpenGLContextDevice2D, vtkOpenGLContextDevice2D);
     
-    virtual ~VTKChartLegend();
+    static VTKOpenGLContextDevice2D* New();
     
-    const float* GetPaddingGeometry() const {return this->mp_PaddingGeometry;};
-    void SetPaddingGeometry(float left, float bottom, float right, float top) {float padding[4] = {left, bottom, right, top}; this->SetPaddingGeometry(padding);};
-    BTK_VTK_EXPORT void SetPaddingGeometry(float padding[4]);
-
-#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 8))
-    int GetSymbolWidth() const {return this->SymbolWidth;};
-    BTK_VTK_EXPORT void SetSymbolWidth(int width);
-  protected:
-    int SymbolWidth;
-  public:
-#endif
+    // ~VTKOpenGLContextDevice2D(); // Implicit.
     
-    BTK_VTK_EXPORT virtual bool Paint(vtkContext2D* painter);
+    using vtkOpenGLContextDevice2D::DrawString;
+    virtual void DrawString(float *point, const vtkStdString& string);
     
   protected:
-    BTK_VTK_EXPORT VTKChartLegend();
-    
-    float mp_PaddingGeometry[4]; // left, bottom, right, top
+    VTKOpenGLContextDevice2D();
     
   private:
-     VTKChartLegend(const VTKChartLegend& ); // Not implemented.
-     void operator=(const VTKChartLegend& );   // Not implemented.
+    void AlignText(double orientation, float width, float height, float *p);
+    
+    VTKOpenGLContextDevice2D(const VTKOpenGLContextDevice2D& ); // Not implemented.
+    void operator=(const VTKOpenGLContextDevice2D& ); // Not implemented.
   };
+#else
+  typedef vtkOpenGLContextDevice2D VTKOpenGLContextDevice2D;
+#endif
 };
 
-#endif // __btkVTKChartLegend_h
+#endif // __btkVTKOpenGLContextDevice2D_h

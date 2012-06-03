@@ -33,41 +33,61 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKContextScene_h
-#define __btkVTKContextScene_h
+#ifndef __btkVTKChartLayout_h
+#define __btkVTKChartLayout_h
 
-#include "btkConfigure.h"
-
-#include <vtkContextScene.h>
+#include "vtkAbstractContextItem.h"
+#include "vtkVector.h" // For ivars
 
 namespace btk
 {
-#if (VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 8)
-  class VTKContextScene : public vtkContextScene
+  class VTKChartTimeSeries;
+
+  class VTKChartLayout : public vtkAbstractContextItem
   {
   public:
-    BTK_VTK_EXPORT static VTKContextScene* New();
-    vtkExportedTypeRevisionMacro(VTKContextScene, vtkContextScene, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKChartLayout, vtkAbstractContextItem);
     
-    virtual ~VTKContextScene() {};
-    
-    bool RemoveItem(vtkContextItem* item);
-    bool RemoveItem(unsigned int index);
-    void Clear();
-    
-  protected:
-    BTK_VTK_EXPORT VTKContextScene();
-    
-  private:
-     VTKContextScene(const VTKContextScene& ); // Not implemented.
-     void operator=(const VTKContextScene& );   // Not implemented.
-  };
-#else
-  /**
-   * Convenient typedef to be compatible with VTK 5.6 and the lack of methods to remove items from a scene.
-   */
-  typedef vtkContextScene VTKContextScene;
-#endif
-};
+    static VTKChartLayout* New();
 
-#endif // __btkVTKContextScene_h
+    virtual bool Paint(vtkContext2D *painter);
+    
+    virtual void SetSize(const vtkVector2i& size);
+    virtual vtkVector2i GetSize() const {return this->Size;}
+
+    virtual void SetGutter(const vtkVector2f& gutter);
+    virtual vtkVector2f GetGutter() const {return this->Gutter;}
+
+    virtual void SetBorders(int left, int bottom, int right, int top);
+    virtual void GetBorders(int borders[4]);
+
+    virtual bool SetChart(const vtkVector2i& position, VTKChartTimeSeries* chart);
+    virtual VTKChartTimeSeries* GetChart(const vtkVector2i& position);
+    
+    virtual bool SetChartSpan(const vtkVector2i& position, const vtkVector2i& span);
+    virtual vtkVector2i GetChartSpan(const vtkVector2i& position);
+    
+    virtual void UpdateLayout();
+    
+    virtual void PrintSelf(ostream& os, vtkIndent indent);
+
+  protected:
+    VTKChartLayout();
+    ~VTKChartLayout();
+
+    class PIMPL;
+    PIMPL *Private;
+
+    // The number of charts in x and y.
+    vtkVector2i Size;
+    // The gutter between each chart.
+    vtkVector2f Gutter;
+    int Borders[4];
+    bool LayoutIsDirty;
+
+  private:
+    VTKChartLayout(const VTKChartLayout &); // Not implemented.
+    void operator=(const VTKChartLayout &); // Not implemented.
+  };
+};
+#endif //__btkVTKChartLayout_h

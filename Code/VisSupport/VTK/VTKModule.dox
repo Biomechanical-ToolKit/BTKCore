@@ -2,7 +2,7 @@
 
 /** 
  * @defgroup BTKVTK VTK Support
- * @brief To display BTK data in VTK 5.2 or greater.
+ * @brief To display BTK data in VTK 5.10 or greater.
  * 
  * This modules corresponds to the library BTKVTK.
  *

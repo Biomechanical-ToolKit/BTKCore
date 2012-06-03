@@ -33,46 +33,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKChartLegend_h
-#define __btkVTKChartLegend_h
+#ifndef __btkVTKContextActor_h
+#define __btkVTKContextActor_h
 
-#include "btkConfigure.h"
+#include <vtkProp.h>
 
-#include <vtkChartLegend.h>
+ class vtkContext2D;
+ class vtkContextScene;
 
 namespace btk
 {
-  class VTKChartLegend : public vtkChartLegend
+  class VTKContextActor : public vtkProp
   {
   public:
-    BTK_VTK_EXPORT static VTKChartLegend* New();
-    vtkExportedTypeRevisionMacro(VTKChartLegend, vtkChartLegend, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKContextActor, vtkProp);
     
-    virtual ~VTKChartLegend();
+    static VTKContextActor* New();
     
-    const float* GetPaddingGeometry() const {return this->mp_PaddingGeometry;};
-    void SetPaddingGeometry(float left, float bottom, float right, float top) {float padding[4] = {left, bottom, right, top}; this->SetPaddingGeometry(padding);};
-    BTK_VTK_EXPORT void SetPaddingGeometry(float padding[4]);
+    virtual ~VTKContextActor();
+    
+    virtual int RenderOverlay(vtkViewport* viewport);
+    virtual void SetContext(vtkContext2D* context);
+    vtkGetObjectMacro(Context, vtkContext2D);
+    vtkGetObjectMacro(Scene, vtkContextScene);
+    virtual void SetScene(vtkContextScene* scene);
+    virtual void ReleaseGraphicsResources(vtkWindow* window);
+    
+    void PrintSelf(ostream& os, vtkIndent indent);
+    
+  protected:
+    VTKContextActor();
 
-#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 8))
-    int GetSymbolWidth() const {return this->SymbolWidth;};
-    BTK_VTK_EXPORT void SetSymbolWidth(int width);
-  protected:
-    int SymbolWidth;
-  public:
-#endif
+    virtual void Initialize(vtkViewport* viewport);
     
-    BTK_VTK_EXPORT virtual bool Paint(vtkContext2D* painter);
-    
-  protected:
-    BTK_VTK_EXPORT VTKChartLegend();
-    
-    float mp_PaddingGeometry[4]; // left, bottom, right, top
+    vtkContextScene* Scene;
+    vtkContext2D* Context;
+    bool Initialized;
     
   private:
-     VTKChartLegend(const VTKChartLegend& ); // Not implemented.
-     void operator=(const VTKChartLegend& );   // Not implemented.
+    VTKContextActor(const VTKContextActor& );  // Not implemented.
+    void operator=(const VTKContextActor& );  // Not implemented.
   };
-};
+}
 
-#endif // __btkVTKChartLegend_h
+
+#endif  __btkVTKContextActor_h

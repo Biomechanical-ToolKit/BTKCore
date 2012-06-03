@@ -33,46 +33,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKChartLegend_h
-#define __btkVTKChartLegend_h
+#ifndef __btkVTKQtStringToImage_h
+#define __btkVTKQtStringToImage_h
 
-#include "btkConfigure.h"
-
-#include <vtkChartLegend.h>
+#include <vtkQtStringToImage.h>
 
 namespace btk
 {
-  class VTKChartLegend : public vtkChartLegend
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 8)) || (VTK_MAJOR_VERSION >= 6))
+  class VTKQtStringToImage : public vtkQtStringToImage
   {
   public:
-    BTK_VTK_EXPORT static VTKChartLegend* New();
-    vtkExportedTypeRevisionMacro(VTKChartLegend, vtkChartLegend, BTK_VTK_EXPORT);
-    
-    virtual ~VTKChartLegend();
-    
-    const float* GetPaddingGeometry() const {return this->mp_PaddingGeometry;};
-    void SetPaddingGeometry(float left, float bottom, float right, float top) {float padding[4] = {left, bottom, right, top}; this->SetPaddingGeometry(padding);};
-    BTK_VTK_EXPORT void SetPaddingGeometry(float padding[4]);
+    vtkTypeMacro(VTKQtStringToImage, vtkQtStringToImage);
 
-#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 8))
-    int GetSymbolWidth() const {return this->SymbolWidth;};
-    BTK_VTK_EXPORT void SetSymbolWidth(int width);
+    static VTKQtStringToImage* New();
+    // ~VTKQtStringToImage(); // Implicit
+
+    virtual vtkVector2i GetBounds(vtkTextProperty* property, const vtkUnicodeString& string);
+    virtual vtkVector2i GetBounds(vtkTextProperty* property, const vtkStdString& string);
+
+    using vtkQtStringToImage::RenderString;
+    virtual int RenderString(vtkTextProperty *property, const vtkUnicodeString& string, vtkImageData *data);
+
   protected:
-    int SymbolWidth;
-  public:
-#endif
-    
-    BTK_VTK_EXPORT virtual bool Paint(vtkContext2D* painter);
-    
-  protected:
-    BTK_VTK_EXPORT VTKChartLegend();
-    
-    float mp_PaddingGeometry[4]; // left, bottom, right, top
-    
+    VTKQtStringToImage();
+
   private:
-     VTKChartLegend(const VTKChartLegend& ); // Not implemented.
-     void operator=(const VTKChartLegend& );   // Not implemented.
+    VTKQtStringToImage(const VTKQtStringToImage& );  // Not implemented.
+    void operator=(const VTKQtStringToImage& );  // Not implemented.
   };
+#else
+  typedef vtkQtStringToImage VTKQtStringToImage;
+#endif
 };
-
-#endif // __btkVTKChartLegend_h
+#endif

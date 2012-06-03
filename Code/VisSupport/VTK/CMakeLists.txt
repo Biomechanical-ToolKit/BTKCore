@@ -1,9 +1,11 @@
 SET(BTKVTK_SRCS
   btkVTKAxesWidget.cpp
   btkVTKAxis.cpp
-  btkVTKChartTimeSeries.cpp
+  btkVTKChartExtraAcquisition.cpp
+  btkVTKChartLayout.cpp
   btkVTKChartLegend.cpp
-  btkVTKContextScene.cpp
+  btkVTKChartTimeSeries.cpp
+  btkVTKContextActor.cpp
   btkVTKDataObjectAdapter.cpp
   btkVTKForcePlatformsSource.cpp
   btkVTKFrustumFromTwoPoints.cpp
@@ -12,12 +14,27 @@ SET(BTKVTK_SRCS
   btkVTKInteractorStyleTrackballFixedUpCamera.cpp
   btkVTKMarkersSource.cpp
   btkVTKMarkersFramesSource.cpp
+  btkVTKOpenGLContextDevice2D.cpp
+  btkVTKOpenGL2ContextDevice2D.cpp
   btkVTKSegmentsFramesSource.cpp
   )
+  
+IF(VTK_USE_QT)
+  SET(BTKVTK_SRCS ${BTKVTK_SRCS} btkVTKQtStringToImage.cpp)
+  SET(QT_QMAKE_EXECUTABLE ${VTK_QT_QMAKE_EXECUTABLE} CACHE FILEPATH "")
+  SET(QT_MOC_EXECUTABLE ${VTK_QT_MOC_EXECUTABLE} CACHE FILEPATH "")
+  SET(QT_UIC_EXECUTABLE ${VTK_QT_UIC_EXECUTABLE} CACHE FILEPATH "")
+  FIND_PACKAGE(Qt4 REQUIRED)
+  SET(QT_DONT_USE_QTGUI)
+  INCLUDE(${QT_USE_FILE})
+ENDIF(VTK_USE_QT)
 
 ADD_LIBRARY(BTKVTK ${BTK_LIBS_BUILD_TYPE} ${BTKVTK_SRCS})
 
-TARGET_LINK_LIBRARIES(BTKVTK BTKCommon vtkCommon vtkFiltering vtkGraphics vtkRendering vtkHybrid vtkCharts)
+TARGET_LINK_LIBRARIES(BTKVTK
+                      BTKCommon
+                      vtkCommon vtkFiltering vtkGraphics vtkRendering vtkHybrid vtkCharts
+                      ${QT_LIBRARIES})
 
 IF(BTK_LIBRARY_PROPERTIES)
   SET_TARGET_PROPERTIES(BTKVTK PROPERTIES ${BTK_LIBRARY_PROPERTIES})
