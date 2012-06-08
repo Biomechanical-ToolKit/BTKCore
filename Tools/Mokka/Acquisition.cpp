@@ -450,7 +450,6 @@ void Acquisition::resetMarkersConfiguration(const QList<int>& ids, const QList<b
     }
     else
     {
-      qDebug("Point '%s' set as unknown", qPrintable((*it)->label));
       (*it)->radius = this->m_DefaultMarkerRadius;
       (*it)->color = this->m_DefaultMarkerColor;
       (*it)->visible = (((*it)->type == Point::Marker) ? true : false);

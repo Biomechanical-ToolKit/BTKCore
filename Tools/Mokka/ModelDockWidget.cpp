@@ -2282,11 +2282,11 @@ void ModelDockWidget::setPointLabel(int id, const QString& label)
     }
   }
   // Other points
-  QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(this->modelTree->topLevelItemCount() - 1);
+  QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(ModelOutputsItem);
   for (int i = 0 ; i < modelOutputsRoot->childCount() ; ++i)
   {
     QTreeWidgetItem* child = modelOutputsRoot->child(i);
-    for (int j = 0 ; j < modelOutputsRoot->childCount() ; ++j)
+    for (int j = 0 ; j < child->childCount() ; ++j)
     {
       if (child->child(j)->data(0, PointId).toInt() == id)
       {
