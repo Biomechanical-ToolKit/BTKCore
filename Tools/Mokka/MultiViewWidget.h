@@ -163,6 +163,8 @@ protected:
   AbstractView* createView(AbstractView* fromAnother = 0);
   bool saveLayout(QDataStream& stream, QWidget* w) const;
   bool restoreLayout(QDataStream& stream, CompositeView* view, const QSize& size);
+  bool restoreLayout2(QDataStream& stream, CompositeView* view, const QSize& size);
+  bool restoreLayoutView(QDataStream& stream, CompositeView* view, const QSize& size, QSplitter** splitter, AbstractView* views[2], QSize viewsSize[2], QList<int>& sizes);
 
 signals:
   void fileDropped(const QString& filename);

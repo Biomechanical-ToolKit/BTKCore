@@ -566,7 +566,8 @@ void MultiViewWidget::setEventFilterObject(QObject* filter)
 };
 
 static const int MultiViewWidgetMagic = 0x0abc;
-static const int MultiViewWidgetVersion = 0x0100; // 1.0 
+static const int MultiViewWidgetVersion1 = 0x0100; // 1.0 
+static const int MultiViewWidgetVersion2 = 0x0200; // 2.0 
 static const int MultiViewWidgetViewId = 0x0001;
 static const int MultiViewWidgetSplitterId = 0x0002;
 
@@ -577,7 +578,7 @@ QByteArray MultiViewWidget::saveLayout() const
   stream.setVersion(QDataStream::Qt_4_6);
   
   stream << qint32(MultiViewWidgetMagic);
-  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetVersion2);
   
   if (!this->saveLayout(stream, static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget()))
     return QByteArray();
@@ -620,6 +621,18 @@ bool MultiViewWidget::saveLayout(QDataStream& stream, QWidget* w) const
     // View options
     switch(index)
     {
+    case CompositeView::Viz3DProjection:
+      {
+      double focalPoint[3], position[3], viewUp[3];
+      static_cast<Viz3DWidget*>(view->view(CompositeView::Viz3D))->projectionCamera(focalPoint, position, viewUp);
+      for (int i = 0 ; i < 3 ; ++i)
+        stream << focalPoint[i];
+      for (int i = 0 ; i < 3 ; ++i)
+        stream << position[i];
+      for (int i = 0 ; i < 3 ; ++i)
+        stream << viewUp[i];
+      break;
+      }
     case CompositeView::Viz3DOrthogonal:
       stream << qint32(static_cast<QComboBox*>(view->optionStack->currentWidget())->currentIndex());
       break;
@@ -658,6 +671,13 @@ bool MultiViewWidget::restoreLayout(const QByteArray& state)
     CompositeView* view = static_cast<CompositeView*>(static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget());
     return this->restoreLayout(stream, view, this->size());
   }
+  else if (version == 0x0200)
+  {
+    stream.setVersion(QDataStream::Qt_4_6);
+    this->closeAll();
+    CompositeView* view = static_cast<CompositeView*>(static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget());
+    return this->restoreLayout2(stream, view, this->size());
+  }
   else
     qCritical("Unknown version number for serialized data containing the layout of the views. You may have used a new version containing some major changes in the data format.");
   return false;
@@ -671,39 +691,14 @@ bool MultiViewWidget::restoreLayout(QDataStream& stream, CompositeView* view, co
   {
     AbstractView* views[2];
     QSize viewsSize[2];
-    int orientation;
-    float ratio;
-    int wol; //width or length
-    stream >> orientation;
-    stream >> ratio;
+    QList<int> sizes;
+    QSplitter* splitter = 0;
     
-    QSplitter* splitter = this->split(view, orientation, views);
-    if (orientation == Qt::Horizontal)
-    {
-      wol = size.width() - splitter->handleWidth();
-      viewsSize[0].setWidth(ratio * wol);
-      viewsSize[1].setWidth((1.0 - ratio) * wol);
-      viewsSize[0].setHeight(size.height());
-      viewsSize[1].setHeight(size.height());
-    }
-    else if (orientation == Qt::Vertical)
-    {
-      wol = size.height() - splitter->handleWidth();
-      viewsSize[0].setWidth(size.width());
-      viewsSize[1].setWidth(size.width());
-      viewsSize[0].setHeight(ratio * wol);
-      viewsSize[1].setHeight((1.0 - ratio) * wol);
-    }
-    else
-    {
-      qCritical("Unknown orientation when extracting data to set the layout of the views.");
-      return false;
-    }
-    
-    if (!this->restoreLayout(stream, static_cast<CompositeView*>(views[0]), viewsSize[0]) || !this->restoreLayout(stream, static_cast<CompositeView*>(views[1]), viewsSize[1]))
+    if (!this->restoreLayoutView(stream, view, size, &splitter, views, viewsSize, sizes)
+        || !this->restoreLayout(stream, static_cast<CompositeView*>(views[0]), viewsSize[0])
+        || !this->restoreLayout(stream, static_cast<CompositeView*>(views[1]), viewsSize[1]))
       return false;
     
-    QList<int> sizes; sizes << ratio * wol << (1.0 - ratio) * wol;
     splitter->setSizes(sizes);
   }
   else if (id == MultiViewWidgetViewId)
@@ -714,14 +709,14 @@ bool MultiViewWidget::restoreLayout(QDataStream& stream, CompositeView* view, co
     int optionIndex = view->optionStackIndexFromViewComboIndex(index);
     switch(index)
     {
-    case 2: // Orthogonal 3D view
+    case CompositeView::Viz3DOrthogonal:
       {
       int index2;
       stream >> index2;
       static_cast<QComboBox*>(view->optionStack->widget(optionIndex))->setCurrentIndex(index2);
       break;
       }
-    case 4: // Point chart
+    case CompositeView::ChartPoint:
       {
       int checked;
       stream >> checked;
@@ -732,7 +727,7 @@ bool MultiViewWidget::restoreLayout(QDataStream& stream, CompositeView* view, co
       static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(4)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
       break;
       }
-    case 5: // Analog chart
+    case CompositeView::ChartAnalog:
       {
       int index2;
       stream >> index2;
@@ -749,6 +744,115 @@ bool MultiViewWidget::restoreLayout(QDataStream& stream, CompositeView* view, co
   return true;
 };
 
+bool MultiViewWidget::restoreLayout2(QDataStream& stream, CompositeView* view, const QSize& size)
+{
+  int id;
+  stream >> id;
+  if (id == MultiViewWidgetSplitterId)
+  {
+    AbstractView* views[2];
+    QSize viewsSize[2];
+    QList<int> sizes; 
+    QSplitter* splitter = 0;
+    
+    if (!this->restoreLayoutView(stream, view, size, &splitter, views, viewsSize, sizes)
+        || !this->restoreLayout2(stream, static_cast<CompositeView*>(views[0]), viewsSize[0])
+        || !this->restoreLayout2(stream, static_cast<CompositeView*>(views[1]), viewsSize[1]))
+      return false;
+    
+    splitter->setSizes(sizes);
+  }
+  else if (id == MultiViewWidgetViewId)
+  {
+    int index;
+    stream >> index;
+    view->viewCombo->setCurrentIndex(view->convertEnumIndexToComboIndex(index));
+    int optionIndex = view->optionStackIndexFromViewComboIndex(index);
+    switch(index)
+    {
+    case CompositeView::Viz3DProjection:
+      {
+      double focalPoint[3], position[3], viewUp[3];
+      for (int i = 0 ; i < 3 ; ++i)
+        stream >> focalPoint[i];
+      for (int i = 0 ; i < 3 ; ++i)
+        stream >> position[i];
+      for (int i = 0 ; i < 3 ; ++i)
+        stream >> viewUp[i];
+      static_cast<Viz3DWidget*>(view->view(CompositeView::Viz3D))->setProjectionCamera(focalPoint, position, viewUp);
+      break;
+      }
+    case CompositeView::Viz3DOrthogonal:
+      {
+      // this->restoreLayoutViewViz3DCamera(stream, static_cast<CompositeView*>(view));
+      int index2;
+      stream >> index2;
+      static_cast<QComboBox*>(view->optionStack->widget(optionIndex))->setCurrentIndex(index2);
+      break;
+      }
+    case CompositeView::ChartPoint:
+      {
+      int checked;
+      stream >> checked;
+      static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(0)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
+      stream >> checked;
+      static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(2)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
+      stream >> checked;
+      static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(4)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
+      break;
+      }
+    case CompositeView::ChartAnalog:
+      {
+      int index2;
+      stream >> index2;
+      static_cast<QComboBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(0)->widget())->setCurrentIndex(index2);
+      break;
+      }
+    }
+  }
+  else
+  {
+    qCritical("Unknown ID when extracting data to set the layout of the views.");
+    return false;
+  }
+  return true;
+};
+
+bool MultiViewWidget::restoreLayoutView(QDataStream& stream, CompositeView* view, const QSize& size, QSplitter** splitter, AbstractView* views[2], QSize viewsSize[2], QList<int>& sizes)
+{
+  int orientation;
+  float ratio;
+  int wol; //width or length
+  stream >> orientation;
+  stream >> ratio;
+  
+  *splitter = this->split(view, orientation, views);
+  if (orientation == Qt::Horizontal)
+  {
+    wol = size.width() - (*splitter)->handleWidth();
+    viewsSize[0].setWidth(ratio * wol);
+    viewsSize[1].setWidth((1.0 - ratio) * wol);
+    viewsSize[0].setHeight(size.height());
+    viewsSize[1].setHeight(size.height());
+  }
+  else if (orientation == Qt::Vertical)
+  {
+    wol = size.height() - (*splitter)->handleWidth();
+    viewsSize[0].setWidth(size.width());
+    viewsSize[1].setWidth(size.width());
+    viewsSize[0].setHeight(ratio * wol);
+    viewsSize[1].setHeight((1.0 - ratio) * wol);
+  }
+  else
+  {
+    qCritical("Unknown orientation when extracting data to set the layout of the views.");
+    return false;
+  }
+  sizes << ratio * wol << (1.0 - ratio) * wol;
+  
+  return true;
+}
+
 void MultiViewWidget::restoreLayout3DOnly()
 {
   QByteArray data;
@@ -756,7 +860,7 @@ void MultiViewWidget::restoreLayout3DOnly()
   stream.setVersion(QDataStream::Qt_4_6);
   
   stream << qint32(MultiViewWidgetMagic);
-  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetVersion1);
   stream << qint32(MultiViewWidgetViewId);
   stream << qint32(1); // 1: Perspective 3D
   
@@ -770,7 +874,7 @@ void MultiViewWidget::restoreLayout3DVerbose()
   stream.setVersion(QDataStream::Qt_4_6);
   
   stream << qint32(MultiViewWidgetMagic);
-  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetVersion1);
   stream << qint32(MultiViewWidgetSplitterId);
   stream << qint32(Qt::Vertical);
   stream << 0.8f;
@@ -789,7 +893,7 @@ void MultiViewWidget::restoreLayout3DCharts()
   stream.setVersion(QDataStream::Qt_4_6);
   
   stream << qint32(MultiViewWidgetMagic);
-  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetVersion1);
   stream << qint32(MultiViewWidgetSplitterId);
   stream << qint32(Qt::Horizontal);
   stream << 0.5f;
