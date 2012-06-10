@@ -954,8 +954,8 @@ void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segme
     else
     {
       segmentsFramesSource->SetDefinition(ids[inc], (*it)->mesh);
-      segmentsFramesSource->SetSegmentVisibility(ids[inc], (*it)->visible ? 1 : 0);
-      segmentsFramesSource->SetSegmentSurfaceVisibility(ids[inc], (*it)->surfaceVisible ? 1 : 0);
+      segmentsFramesSource->SetSegmentVisibility(ids[inc], (*it)->visible);
+      segmentsFramesSource->SetSegmentSurfaceVisibility(ids[inc], (*it)->surfaceVisible);
     }
     ++inc;
   }
@@ -1016,7 +1016,7 @@ void MultiViewWidget::setSegmentsVisibility(const QVector<int>& ids, const QVect
 {
   btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
   for (int i = 0 ; i < ids.count() ; ++i)
-    segmentsFramesSource->SetSegmentVisibility(ids[i], visibles[i] ? 1 : 0);
+    segmentsFramesSource->SetSegmentVisibility(ids[i], visibles[i]);
   this->updateSegmentsDisplay();
 };
 
@@ -1024,7 +1024,7 @@ void MultiViewWidget::setSegmentsSurfaceVisibility(const QVector<int>& ids, cons
 {
   btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
   for (int i = 0 ; i < ids.count() ; ++i)
-    segmentsFramesSource->SetSegmentSurfaceVisibility(ids[i], visibles[i] ? 1 : 0);
+    segmentsFramesSource->SetSegmentSurfaceVisibility(ids[i], visibles[i]);
   this->updateSegmentsDisplay();
 };
 
@@ -1141,7 +1141,7 @@ void MultiViewWidget::setMarkersVisibility(const QVector<int>& ids, const QVecto
 {
   btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   for (int i = 0 ; i < ids.count() ; ++i)
-    markersFramesSource->SetMarkerVisibility(ids[i], visibles[i] ? 1 : 0);
+    markersFramesSource->SetMarkerVisibility(ids[i], visibles[i]);
   this->updateMarkersDisplay();
 };
 
@@ -1149,8 +1149,22 @@ void MultiViewWidget::setMarkersTrajectoryVisibility(const QVector<int>& ids, co
 {
   btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   for (int i = 0 ; i < ids.count() ; ++i)
-    markersFramesSource->SetTrajectoryVisibility(ids[i], visibles[i] ? 1 : 0);
+    markersFramesSource->SetTrajectoryVisibility(ids[i], visibles[i]);
   this->updateMarkersDisplay();
+};
+
+void MultiViewWidget::markersConfiguration(const QList<int>& ids, QList<bool>& visibles, QList<bool>& trajectories, QList<double>& radii, QList<QColor>& colors)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    int id = ids[i];
+    visibles << markers->GetMarkerVisibility(id);
+    trajectories << markers->GetTrajectoryVisibility(id);
+    radii << markers->GetMarkerRadius(id);
+    double* c = markers->GetMarkerColor(id);
+    colors << QColor(static_cast<int>(c[0]*255.0), static_cast<int>(c[1]*255.0), static_cast<int>(c[2]*255.0));
+  };
 };
 
 void MultiViewWidget::setMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors)
@@ -1158,9 +1172,10 @@ void MultiViewWidget::setMarkersConfiguration(const QList<int>& ids, const QList
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
   for (int i = 0 ; i < ids.count() ; ++i)
   {
-    markers->SetMarkerVisibility(ids[i], visibles[i] ? 1 : 0);
-    markers->SetTrajectoryVisibility(ids[i], trajectories[i] ? 1 : 0);
-    markers->SetMarkerRadius(ids[i], radii[i]);
+    int id = ids[i];
+    markers->SetMarkerVisibility(id, visibles[i]);
+    markers->SetTrajectoryVisibility(id, trajectories[i]);
+    markers->SetMarkerRadius(id, radii[i]);
   }
   this->setMarkersColor(ids.toVector(), colors.toVector()); // Will update the display
 };

@@ -120,6 +120,7 @@ public slots:
   void restoreLayout3DOnly();
   void restoreLayout3DVerbose();
   void restoreLayout3DCharts();
+  void createMarkerFromMarkersSelection();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
@@ -212,6 +213,7 @@ private:
   bool isOkToContinue();
   void updateUserLayoutActions();
   void editSegment(bool isNew);
+  bool extractSelectedMarkers(QList<int>& selectedMarkers);
   
   Acquisition* mp_Acquisition;
   Model* mp_Model;

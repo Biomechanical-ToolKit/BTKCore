@@ -132,6 +132,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuEvent->addAction(this->timeEventControler->actionEditSelectedEvents);
   this->menuEvent->addAction(this->timeEventControler->actionRemoveSelectedEvents);
   this->menuEvent->addAction(this->timeEventControler->actionClearEvents);
+  this->actionToolCreateMarker->setEnabled(false);
 #ifdef Q_OS_MAC
   QFont f = this->font();
   f.setPointSize(10);
@@ -293,6 +294,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionLayout3DOnly, SIGNAL(triggered()), this, SLOT(restoreLayout3DOnly()));
   connect(this->actionLayout3DVerbose, SIGNAL(triggered()), this, SLOT(restoreLayout3DVerbose()));
   connect(this->actionLayout3DCharts, SIGNAL(triggered()), this, SLOT(restoreLayout3DCharts()));
+  connect(this->actionToolCreateMarker, SIGNAL(triggered()), this, SLOT(createMarkerFromMarkersSelection()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -792,6 +794,78 @@ void MainWindow::manageUserLayouts()
   this->mp_Preferences->showLayoutsPreferences();
 };
 
+void MainWindow::createMarkerFromMarkersSelection()
+{
+  QList<int> selectedMarkers;
+  if (this->extractSelectedMarkers(selectedMarkers))
+  {
+    if (selectedMarkers.size() < 2)
+    {
+      QMessageBox error(QMessageBox::Warning, "Tools", "A minimum of two markers is required to create an averaged marker.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.exec();
+    }
+    else
+    {
+      QList<int> ids;
+      QList<bool> visibles, trajectories;
+      QList<double> radii;
+      QList<QColor> colors;
+      // Extract All the IDs used by the markers and virtual markers
+      QList<QTreeWidgetItem*> roots;
+      roots << this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::MarkersItem);
+      roots << this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::VirtualMarkersItem);
+      for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
+      {
+        for (int j = 0 ; j < (*itR)->childCount() ; ++j)
+          ids << (*itR)->child(j)->data(0, PointId).toInt();
+      }
+      // Create the new marker and reapply the configuration (reset in the VTK pipeline)
+      for (QList<AbstractView*>::const_iterator it = this->multiView->views().begin() ; it != this->multiView->views().end() ; ++it)
+        static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D)->setUpdatesEnabled(false);
+      QApplication::setOverrideCursor(Qt::WaitCursor);
+      this->multiView->markersConfiguration(ids, visibles, trajectories, radii, colors);
+      this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new CreateAveragedMarker(this->mp_Acquisition, selectedMarkers)));
+      this->multiView->setMarkersConfiguration(ids, visibles, trajectories, radii, colors);
+      QApplication::restoreOverrideCursor();
+      for (QList<AbstractView*>::const_iterator it = this->multiView->views().begin() ; it != this->multiView->views().end() ; ++it)
+        static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D)->setUpdatesEnabled(true);
+    }
+  }
+};
+
+bool MainWindow::extractSelectedMarkers(QList<int>& selectedMarkers)
+{
+  selectedMarkers.clear();
+  bool mixedSelection = false;
+  QList<QTreeWidgetItem*> items = this->mp_ModelDock->modelTree->selectedItems();
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    if ((*it)->type() != MarkerType)
+    {
+      mixedSelection = true;
+      break;
+    }
+    else
+      selectedMarkers.push_back((*it)->data(0,PointId).toInt());
+  }
+  
+  if (mixedSelection)
+  {
+    QMessageBox error(QMessageBox::Warning, "Tools", "The selection is not only composed of markers.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+    error.setWindowFlags(Qt::Sheet);
+    error.setWindowModality(Qt::WindowModal);
+#endif
+    error.exec();
+    return false;
+  }
+  return true;
+}
+
 void MainWindow::play()
 {
   this->timeEventControler->togglePlayback();
@@ -900,7 +974,6 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   
   pw->setProgressValue(40);
   
-  // this->multiView->setGRFButterflyActivation(this->mp_Preferences->defaultGRFButterflyActivationComboBox->currentIndex() == 0);
   this->multiView->load();
   
   pw->setProgressValue(90);
@@ -929,6 +1002,8 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionViewMetadata->setEnabled(true);
   this->actionSave_As->setEnabled(true);
   this->menuExport->menuAction()->setEnabled(true);
+  // Tools Menu
+  this->actionToolCreateMarker->setEnabled(true);
 };
 
 void MainWindow::saveFile()
@@ -1632,6 +1707,8 @@ void MainWindow::reset()
   this->actionSave_As->setEnabled(false);
   this->menuExport->menuAction()->setEnabled(false);
   this->setCurrentFile("");
+  // Tools Menu
+  this->actionToolCreateMarker->setEnabled(false);
   // Model dock
   this->mp_ModelDock->reset();
   // Metadata

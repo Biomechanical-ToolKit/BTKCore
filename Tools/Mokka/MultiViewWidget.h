@@ -136,6 +136,7 @@ public slots:
   void updateTrackedGRFPaths(const QList<int>& ids);
   void setMarkersVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
   void setMarkersTrajectoryVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
+  void markersConfiguration(const QList<int>& ids, QList<bool>& visibles, QList<bool>& trajectories, QList<double>& radii, QList<QColor>& colors);
   void setMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors);
   void clear();
   void circleSelectedMarkers(const QList<int>& ids);

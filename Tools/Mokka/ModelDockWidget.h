@@ -252,7 +252,7 @@ private:
   void pushRecentColor(const QColor& color);
   void drawRecentColors();
   void refresh();
-  QTreeWidgetItem* treePointChild(QTreeWidgetItem* parent, int id) const;
+  QTreeWidgetItem* treePointChild(QTreeWidgetItem* parent, int id);
   bool hasChildVisible(QTreeWidgetItem* parent) const;
   bool isOkToModifyAnalog();
   

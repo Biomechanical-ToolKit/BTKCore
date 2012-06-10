@@ -101,6 +101,37 @@ void ReframeAcquisition::action()
 //               POINT/MARKER EDITION              //
 // ----------------------------------------------- //
 
+//  --------------- CreateAveragedMarker  ---------------
+CreateAveragedMarker::CreateAveragedMarker(Acquisition* acq, const QList<int>& markers, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent)
+{
+  this->mp_Acquisition = acq;
+  this->m_Id = this->mp_Acquisition->createAveragedMarker(markers);
+  this->mp_Marker = 0;
+};
+
+CreateAveragedMarker::~CreateAveragedMarker()
+{
+  if (this->mp_Marker != 0)
+    delete this->mp_Marker;
+};
+
+void CreateAveragedMarker::undo()
+{
+  if (this->m_Id != -1)
+    this->mp_Marker = this->mp_Acquisition->takePoints(QList<int>() << this->m_Id).first();
+};
+
+void CreateAveragedMarker::redo()
+{
+  // Second condition is to avoid the inserting of the marker a second time during the initial redo
+  if ((this->m_Id != -1) && (this->mp_Marker != 0))
+  {
+    this->mp_Acquisition->insertPoints(QList<int>() << this->m_Id , QList<Point*>() << this->mp_Marker);
+    this->mp_Marker = 0;
+  }
+};
+
 // --------------- EditPointLabel ---------------
 EditPointLabel::EditPointLabel(Acquisition* acq, int id, const QString& label, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Label(label)

@@ -48,7 +48,6 @@
 #include <btkAcquisitionFileIO.h>
 #include <btkAMTIForcePlatformFileIO.h> // Special case for AMTI files
 #include <btkWrenchDirectionAngleFilter.h>
-#include <btkCollectionAssembly.h>
 
 #include <QObject>
 #include <QString>
@@ -125,7 +124,7 @@ public:
   
   const QString& fileName() const {return this->m_Filename;};
   btk::Acquisition::Pointer btkAcquisition() const {return this->mp_BTKAcquisition;};
-  btk::PointCollection::Pointer btkAllMarkers() const {return static_pointer_cast< btk::CollectionAssembly<btk::Point> >(this->m_BTKProcesses[BTK_GROUPED_POINTS])->GetOutput();};
+  btk::PointCollection::Pointer btkAllMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(4);};
   btk::PointCollection::Pointer btkMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(0);};
   btk::PointCollection::Pointer btkVirtualMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(2);};
   btk::PointCollection::Pointer btkVirtualMarkersForFrame() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(1);};
@@ -168,6 +167,7 @@ public:
   bool markerTrajectoryVisible(int id) const {return this->m_Points[id]->trajectoryVisible;};
   void setMarkersTrajectoryVisible(const QVector<int>& ids, const QVector<bool>& visibles);
   void resetMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors);
+  int createAveragedMarker(const QList<int>& markerIds);
   
   int analogFrameNumber() const {return this->mp_BTKAcquisition->GetAnalogFrameNumber();}
   int analogSamplePerPointFrame() const {return this->mp_BTKAcquisition->GetNumberAnalogSamplePerFrame();};
@@ -261,7 +261,7 @@ private:
   bool importFrom(const QList<btk::Acquisition::Pointer>& readers, bool allFramesKept);
   bool importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io, bool fromOpenAction);
   
-  enum {BTK_SORTED_POINTS, BTK_GROUPED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED, BTK_DIRECTION_ANGLES};
+  enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED, BTK_DIRECTION_ANGLES};
   
   btk::Acquisition::Pointer mp_BTKAcquisition;
   QMap<int, btk::ProcessObject::Pointer> m_BTKProcesses;
@@ -270,6 +270,7 @@ private:
   int m_LastFrame;
   int mp_ROI[2];
   QMap<int,Point*> m_Points;
+  int m_LastPointId;
   QMap<int,Analog*> m_Analogs;
   QMap<int,Event*> m_Events;
   int m_LastEventId;

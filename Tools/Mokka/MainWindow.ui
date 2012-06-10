@@ -226,10 +226,17 @@
       <string>Event</string>
      </property>
     </widget>
+    <widget class="QMenu" name="menuMarker">
+     <property name="title">
+      <string>Marker</string>
+     </property>
+     <addaction name="actionToolCreateMarker"/>
+    </widget>
     <addaction name="menuModel"/>
     <addaction name="separator"/>
     <addaction name="menuAcquisition"/>
     <addaction name="menuEvent"/>
+    <addaction name="menuMarker"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -529,6 +536,11 @@
   <action name="actionImportDelsysEMG">
    <property name="text">
     <string>Delsys EMG file..</string>
+   </property>
+  </action>
+  <action name="actionToolCreateMarker">
+   <property name="text">
+    <string>Create Marker</string>
    </property>
   </action>
  </widget>

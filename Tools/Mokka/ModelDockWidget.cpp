@@ -2378,6 +2378,7 @@ void ModelDockWidget::removePoints(const QList<int>& ids, const QList<Point*>& p
     }
   }
   this->modelTree->blockSignals(false);
+  this->sendSelectedMarkers();
   this->sendHiddenMarkers();
   this->refresh();
   if (itemUnselected)
@@ -2396,7 +2397,6 @@ void ModelDockWidget::removePoints(const QList<int>& ids, const QList<Point*>& p
   }
 };
 
-// TODO: Think about the case where points are created instead of hidden!
 void ModelDockWidget::insertPoints(const QList<int>& ids, const QList<Point*>& points)
 {
   Q_UNUSED(points);
@@ -3288,14 +3288,28 @@ void ModelDockWidget::refresh()
   }
 };
 
-QTreeWidgetItem* ModelDockWidget::treePointChild(QTreeWidgetItem* parent, int id) const
+QTreeWidgetItem* ModelDockWidget::treePointChild(QTreeWidgetItem* parent, int id)
 {
+  // Existing child
   for (int i = 0 ; i < parent->childCount() ; ++i)
   {
     QTreeWidgetItem* child = parent->child(i);
     if (child->data(0, PointId).toInt() == id)
       return child;
   }
+  // New marker
+  QMap<int, Point*>::const_iterator it = this->mp_Acquisition->points().find(id);
+  if ((parent == this->modelTree->topLevelItem(MarkersItem)) && (it != this->mp_Acquisition->points().end()))
+  {
+    this->modelTree->clearSelection();
+    QTreeWidgetItem* item = this->createMarkerItem(it.value()->label, it.key());
+    parent->addChild(item);
+    item->setSelected(true);
+    this->modelTree->scrollToItem(item);
+    this->sendSelectedMarkers();
+    return item;
+  }
+  // Unknown
   return 0;
 };
 
