@@ -78,6 +78,7 @@ namespace btk
     BTK_VTK_EXPORT void ShowMarker(vtkIdType id);
     BTK_VTK_EXPORT void ShowMarkers();
 
+    BTK_VTK_EXPORT bool GetTrajectoryVisibility(int idx);
     BTK_VTK_EXPORT void SetTrajectoryVisibility(int idx, bool visible);
     BTK_VTK_EXPORT void ShowTrajectory(int idx);
     BTK_VTK_EXPORT void ShowTrajectories();

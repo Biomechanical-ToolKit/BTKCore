@@ -363,6 +363,14 @@ namespace btk
   };
   
   /**
+   * Returns if the trajectory of a marker is displayed or not.
+   */
+  bool VTKMarkersFramesSource::GetTrajectoryVisibility(int idx)
+  {
+    return (this->mp_TrajectoryMarkers->GetValue(idx) == 1);
+  };
+  
+  /**
    * Sets visibility of marker's trajectory
    */
   void VTKMarkersFramesSource::SetTrajectoryVisibility(int idx, bool visible)
