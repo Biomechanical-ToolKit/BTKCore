@@ -76,6 +76,7 @@ public:
   virtual bool appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries* colorGenerator, QTreeWidgetItem* item, bool* layoutModified);
   virtual QString createPlotLabel(Acquisition* acq, int id);
   virtual void initialize(vtkColorSeries* colorGenerator);
+  void addPointPlot(int id, Acquisition* acq, vtkColorSeries* colorGenerator, btk::Point::Pointer point, const QString& label);
 };
 
 class AnalogChartData : public AbstractChartData
@@ -335,6 +336,25 @@ void ChartWidget::setUnitAxisX(const QString& str, double scale, double offset)
   }
   this->mp_ChartAxisXLabel->setText(str);
   this->render();
+};
+
+void ChartWidget::addPointPlot(btk::Point::Pointer pt, const QString& label)
+{
+  static_cast<PointChartData*>(this->m_ChartData[PointChart])->addPointPlot(-1, this->mp_Acquisition, this->mp_ColorGenerator, pt, label);
+  for (int i = 0 ; i < static_cast<int>(this->m_ChartData[this->m_CurrentChartType]->charts()->size()) ; ++i)
+  {
+    btk::VTKChartTimeSeries* chart = this->m_ChartData[this->m_CurrentChartType]->chart(i);
+    chart->SetInteractionEnabled(true);
+    chart->RecalculateBounds();
+  }
+};
+
+void ChartWidget::setPointUnitAxisY(const QString& strX, const QString& strY, const QString& strZ)
+{
+  PointChartData* pcd = static_cast<PointChartData*>(this->m_ChartData[PointChart]);
+  pcd->chart(0)->GetAxis(vtkAxis::LEFT)->SetTitle(strX.toUtf8().constData());
+  pcd->chart(1)->GetAxis(vtkAxis::LEFT)->SetTitle(strY.toUtf8().constData());
+  pcd->chart(2)->GetAxis(vtkAxis::LEFT)->SetTitle(strZ.toUtf8().constData());
 };
 
 void ChartWidget::displayChart(int chartType)
@@ -1115,6 +1135,13 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
     }
   }
   
+  this->addPointPlot(id, acq, colorGenerator, point, label);
+
+  return true;
+};
+
+void PointChartData::addPointPlot(int id, Acquisition* acq, vtkColorSeries* colorGenerator, btk::Point::Pointer point, const QString& label)
+{
   int numFrames = acq->pointFrameNumber();
   // Need to create 3 table instead of 1 with 4 columns as VTK doesn't recognize the 2 last columns (due to the use of the same data?) 
   vtkTable* tableX = vtkTable::New();
@@ -1129,9 +1156,10 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
   vtkDoubleArray* arrValX = vtkDoubleArray::New();
   vtkDoubleArray* arrValY = vtkDoubleArray::New();
   vtkDoubleArray* arrValZ = vtkDoubleArray::New();
-  arrValX->SetName(label.toUtf8().constData());
-  arrValY->SetName(label.toUtf8().constData());
-  arrValZ->SetName(label.toUtf8().constData());
+  const char* str = label.toUtf8().constData();
+  arrValX->SetName(str);
+  arrValY->SetName(str);
+  arrValZ->SetName(str);
   // FIXME: Conflict into VTK 5.6.1 between the documentation and the code to save or not the data. Need to check with VTK 5.8
   arrValX->SetArray(point->GetValues().data(), numFrames, 1); // Would be 0?
   arrValY->SetArray(point->GetValues().data() + numFrames, numFrames, 1); // Would be 0?
@@ -1140,8 +1168,8 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
   tableY->AddColumn(arrValY);
   tableZ->AddColumn(arrValZ);
 
-  double color[3];
   vtkPlotLine* plot = 0;
+  double color[3];
   this->generateColor(colorGenerator, color);
   // X axis 
   plot = vtkPlotLine::New();
@@ -1173,9 +1201,7 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries*
   tableZ->Delete();
   
   this->appendPlotProperties(label, id, QColor(static_cast<int>(color[0]*255.0), static_cast<int>(color[1]*255.0), static_cast<int>(color[2]*255.0)), ChartWidget::DefaultLineWidth);
-
-  return true;
-};
+}
 
 QString PointChartData::createPlotLabel(Acquisition* acq, int id)
 {

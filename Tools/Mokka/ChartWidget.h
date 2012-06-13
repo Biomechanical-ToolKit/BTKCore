@@ -37,6 +37,7 @@
 #define ChartWidget_h
 
 #include <btkVTKChartTimeSeries.h>
+#include <btkPoint.h>
 
 #include <QVTKWidget.h>
 #include <vtkDoubleArray.h>
@@ -103,6 +104,11 @@ public:
   
   void updateAxisX();
   void setUnitAxisX(const QString& str, double scale, double offset);
+  
+  void addPointPlot(btk::Point::Pointer pt, const QString& label);
+  void setPointUnitAxisY(const QString& strX, const QString& strY, const QString& strZ);
+  
+  VTKChartWidget* chartContent() const {return this->mp_ChartContentWidget;};
   
   static double DefaultLineWidth;
   

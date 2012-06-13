@@ -560,6 +560,12 @@ int Acquisition::createAveragedMarker(const QList<int>& markerIds)
   return p->btkidx;
 };
 
+int Acquisition::generateNewPointId()
+{
+  this->m_LastPointId += 1;
+  return this->m_LastPointId;
+};
+
 QList<Point*> Acquisition::takePoints(const QList<int>& ids)
 {
   QList<Point*> points;

@@ -168,6 +168,7 @@ public:
   void setMarkersTrajectoryVisible(const QVector<int>& ids, const QVector<bool>& visibles);
   void resetMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors);
   int createAveragedMarker(const QList<int>& markerIds);
+  int generateNewPointId();
   
   int analogFrameNumber() const {return this->mp_BTKAcquisition->GetAnalogFrameNumber();}
   int analogSamplePerPointFrame() const {return this->mp_BTKAcquisition->GetNumberAnalogSamplePerFrame();};

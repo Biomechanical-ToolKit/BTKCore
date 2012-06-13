@@ -597,18 +597,12 @@ QList<int> ModelDockWidget::selectedMarkers() const
 {
   QList<int> ids;
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
-  for (int i = 0 ; i < markersRoot->childCount() ; ++i)
-  {
-    QTreeWidgetItem* item = markersRoot->child(i);
-    if (item->isSelected())
-      ids << item->data(0, PointId).toInt();
-  }
   QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
-  for (int i = 0 ; i < virtualMarkersRoot->childCount() ; ++i)
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    QTreeWidgetItem* item = virtualMarkersRoot->child(i);
-    if (item->isSelected())
-      ids << item->data(0, PointId).toInt();
+    if (((*it)->parent() == markersRoot) || ((*it)->parent() == virtualMarkersRoot))
+      ids << (*it)->data(0, PointId).toInt();
   }
   return ids;
 };
@@ -1391,7 +1385,13 @@ void ModelDockWidget::setTrackedMarkers(const QList<int>& ids)
 void ModelDockWidget::selectMarkers(QList<int> ids)
 {
   this->modelTree->blockSignals(true);
-  this->modelTree->clearSelection();
+  
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  for (QList<QTreeWidgetItem*>::iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    if (ids.indexOf((*it)->data(0, PointId).toInt()) == -1)
+      (*it)->setSelected(false);
+  }
   
   QList<QTreeWidgetItem*> roots;
   roots << this->modelTree->topLevelItem(MarkersItem);
