@@ -55,6 +55,7 @@ class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
 class vtkActorMap;
 class vtkDoubleArray;
+class ChartDialog;
 
 class MultiViewWidget : public AbstractMultiView
 {
@@ -117,6 +118,8 @@ public:
   
   QByteArray saveLayout() const;
   bool restoreLayout(const QByteArray& state);
+  
+  ChartDialog* createChartDialog(QWidget* parent = 0);
   
 public slots:
   void updateFramesIndex(int ff);

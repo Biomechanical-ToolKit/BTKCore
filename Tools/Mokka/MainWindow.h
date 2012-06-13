@@ -51,6 +51,7 @@ class ModelDockWidget;
 class ProgressWidget;
 class UpdateChecker;
 class QUndoStack;
+class ChartDialog;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -121,6 +122,9 @@ public slots:
   void restoreLayout3DVerbose();
   void restoreLayout3DCharts();
   void createMarkerFromMarkersSelection();
+  void computeDistanceFromMarkersSelection();
+  void computeAngleFromMarkersSelection();
+  void computeAngleFromMarkersSelection2();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
@@ -213,6 +217,7 @@ private:
   bool isOkToContinue();
   void updateUserLayoutActions();
   void editSegment(bool isNew);
+  void showChartTool(ChartDialog* chartDialog, bool computed);
   bool extractSelectedMarkers(QList<int>& selectedMarkers);
   
   Acquisition* mp_Acquisition;
@@ -237,5 +242,7 @@ private:
   QUndoStack* mp_UndoStack;
   QUndoStack* mp_AcquisitionUndoStack;
   QUndoStack* mp_MarkerConfigurationUndoStack;
+  
+  QList<ChartDialog*> m_ToolCharts;
 };
 #endif // MainWindow_h

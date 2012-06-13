@@ -37,6 +37,7 @@
 #include "Acquisition.h"
 #include "CompositeView.h"
 #include "ChartWidget.h"
+#include "ChartDialog.h"
 #include "LoggerVTKOutput.h"
 #include "Viz3DWidget.h"
 #include "VideoWidget.h"
@@ -912,6 +913,18 @@ void MultiViewWidget::restoreLayout3DCharts()
   stream << qint32(0); // Collapsed mode
   
   this->restoreLayout(data);
+};
+
+ChartDialog* MultiViewWidget::createChartDialog(QWidget* parent)
+{
+  ChartDialog* dlg = new ChartDialog(parent);
+  dlg->chart->copy(static_cast<ChartWidget*>(static_cast<CompositeView*>(this->m_Views.first())->view(CompositeView::Chart)));
+  QList<QAction*> actions = dlg->chart->chartContent()->actions();
+  dlg->chart->chartContent()->removeAction(actions[1]);
+  dlg->chart->chartContent()->removeAction(actions[4]);
+  // dlg->chart->addActions(this->m_ViewChartActions);
+  dlg->chart->setAcceptDrops(false);
+  return dlg;
 };
 
 void MultiViewWidget::updateFramesIndex(int ff)

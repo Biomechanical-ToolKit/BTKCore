@@ -37,6 +37,7 @@
 #include "MainWindow.h"
 #include "About.h"
 #include "Acquisition.h"
+#include "ChartDialog.h"
 #include "CompositeView.h"
 #include "ExportASCIIDialog.h"
 #include "ExportSTLDialog.h"
@@ -70,7 +71,7 @@
 #include <QUndoStack>
 
 MainWindow::MainWindow(QWidget* parent)
-:QMainWindow(parent), m_LastDirectory("."), m_RecentFiles(), m_UserLayouts()
+:QMainWindow(parent), m_LastDirectory("."), m_RecentFiles(), m_UserLayouts(), m_ToolCharts()
 {
   // Members
   this->mp_Acquisition = new Acquisition(this);
@@ -133,6 +134,9 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuEvent->addAction(this->timeEventControler->actionRemoveSelectedEvents);
   this->menuEvent->addAction(this->timeEventControler->actionClearEvents);
   this->actionToolCreateMarker->setEnabled(false);
+  this->actionToolComputeMarkerDistance->setEnabled(false);
+  this->actionToolComputeMarkerAngle->setEnabled(false);
+  this->actionToolComputeVectorAngle->setEnabled(false);
 #ifdef Q_OS_MAC
   QFont f = this->font();
   f.setPointSize(10);
@@ -295,6 +299,9 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionLayout3DVerbose, SIGNAL(triggered()), this, SLOT(restoreLayout3DVerbose()));
   connect(this->actionLayout3DCharts, SIGNAL(triggered()), this, SLOT(restoreLayout3DCharts()));
   connect(this->actionToolCreateMarker, SIGNAL(triggered()), this, SLOT(createMarkerFromMarkersSelection()));
+  connect(this->actionToolComputeMarkerDistance, SIGNAL(triggered()), this, SLOT(computeDistanceFromMarkersSelection()));
+  connect(this->actionToolComputeMarkerAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection()));
+  connect(this->actionToolComputeVectorAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection2()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -837,6 +844,72 @@ void MainWindow::createMarkerFromMarkersSelection()
   }
 };
 
+void MainWindow::computeDistanceFromMarkersSelection()
+{
+  QList<int> selectedMarkers;
+  if (this->extractSelectedMarkers(selectedMarkers))
+  {
+    if (selectedMarkers.size() != 2)
+    {
+      QMessageBox error(QMessageBox::Warning, "Tools", "Only two markers must be selected to compute the distance between them.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.exec();
+    }
+    else
+    {
+      ChartDialog* chartDialog = this->multiView->createChartDialog(this);
+      this->showChartTool(chartDialog, chartDialog->computeDistance(selectedMarkers[0], selectedMarkers[1]));
+    }
+  }
+};
+
+void MainWindow::computeAngleFromMarkersSelection()
+{
+  QList<int> selectedMarkers;
+  if (this->extractSelectedMarkers(selectedMarkers))
+  {
+    if (selectedMarkers.size() != 3)
+    {
+      QMessageBox error(QMessageBox::Warning, "Tools", "Only three markers must be selected to compute the angle between them.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.exec();
+    }
+    else
+    {
+      ChartDialog* chartDialog = this->multiView->createChartDialog(this);
+      this->showChartTool(chartDialog, chartDialog->computeAngleFromMarkers(selectedMarkers[0], selectedMarkers[1], selectedMarkers[2]));
+    }
+  }
+};
+
+void MainWindow::computeAngleFromMarkersSelection2()
+{
+  QList<int> selectedMarkers;
+  if (this->extractSelectedMarkers(selectedMarkers))
+  {
+    if ((selectedMarkers.size() != 3) && (selectedMarkers.size() != 4))
+    {
+      QMessageBox error(QMessageBox::Warning, "Tools", "Three of four markers must be selected to compute the angle between the two constructed vectors.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.exec();
+    }
+    else
+    {
+      ChartDialog* chartDialog = this->multiView->createChartDialog(this);
+      this->showChartTool(chartDialog, chartDialog->computeAngleFromVectors(selectedMarkers));
+    }
+  }
+};
+
 bool MainWindow::extractSelectedMarkers(QList<int>& selectedMarkers)
 {
   selectedMarkers.clear();
@@ -865,6 +938,34 @@ bool MainWindow::extractSelectedMarkers(QList<int>& selectedMarkers)
   }
   return true;
 }
+
+void MainWindow::showChartTool(ChartDialog* chartDialog, bool computed)
+{
+  // Clean current hidden tool charts
+  QList<ChartDialog*>::iterator it = this->m_ToolCharts.begin();
+  while (it != this->m_ToolCharts.end())
+  {
+    if (!(*it)->isVisible())
+    {
+      (*it)->deleteLater();
+      it = this->m_ToolCharts.erase(it);
+    }
+    else
+      ++it;
+  }
+  // Modeless dialog
+  if (computed)
+  {
+    this->m_ToolCharts << chartDialog;
+    chartDialog->installEventFilter(this);
+    connect(this->timeEventControler, SIGNAL(currentFrameChanged(int)), chartDialog, SLOT(updateChartRendering()));
+    chartDialog->show();
+    chartDialog->raise();
+    chartDialog->activateWindow();
+  }
+  else
+    chartDialog->deleteLater();
+};
 
 void MainWindow::play()
 {
@@ -1004,6 +1105,9 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->menuExport->menuAction()->setEnabled(true);
   // Tools Menu
   this->actionToolCreateMarker->setEnabled(true);
+  this->actionToolComputeMarkerDistance->setEnabled(true);
+  this->actionToolComputeMarkerAngle->setEnabled(true);
+  this->actionToolComputeVectorAngle->setEnabled(true);
 };
 
 void MainWindow::saveFile()
@@ -1078,6 +1182,18 @@ void MainWindow::saveFile(const QString& filename)
 
 void MainWindow::closeFile()
 {
+  // Special case for the tools (Chart dialog, etc.)
+  for (QList<ChartDialog*>::iterator it = this->m_ToolCharts.begin() ; it != this->m_ToolCharts.end() ; ++it)
+  {
+    if (QApplication::activeWindow() == *it)
+    {
+      (*it)->setVisible(false);
+      (*it)->deleteLater();
+      this->m_ToolCharts.erase(it);
+      return;
+    }
+  }
+  // General behavior
   if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
   {
     LOG_INFO(tr("Closing acquisition."));
@@ -1709,6 +1825,17 @@ void MainWindow::reset()
   this->setCurrentFile("");
   // Tools Menu
   this->actionToolCreateMarker->setEnabled(false);
+  this->actionToolComputeMarkerDistance->setEnabled(false);
+  this->actionToolComputeMarkerAngle->setEnabled(false);
+  this->actionToolComputeVectorAngle->setEnabled(false);
+  // Tools modeless window
+  QList<ChartDialog*>::iterator it = this->m_ToolCharts.begin();
+  while (it != this->m_ToolCharts.end())
+  {
+    (*it)->setVisible(false);
+    (*it)->deleteLater();
+    it = this->m_ToolCharts.erase(it);
+  }
   // Model dock
   this->mp_ModelDock->reset();
   // Metadata

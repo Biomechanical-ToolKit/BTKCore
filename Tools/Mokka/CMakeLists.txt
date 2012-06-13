@@ -20,6 +20,7 @@ SET(Mokka_CPP
   About.cpp
   AbstractMultiView.cpp
   AbstractView.cpp
+  ChartDialog.cpp
   ChartExportDialog.cpp
   ChartOptionsWidget.cpp
   ChartImagePreview.cpp
@@ -59,6 +60,7 @@ SET(Mokka_H
   Acquisition.h
   AbstractMultiView.h
   AbstractView.h
+  ChartDialog.h
   ChartExportDialog.h
   ChartOptionsWidget.h
   ChartImagePreview.h

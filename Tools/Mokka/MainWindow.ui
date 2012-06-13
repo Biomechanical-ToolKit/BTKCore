@@ -231,6 +231,10 @@
       <string>Marker</string>
      </property>
      <addaction name="actionToolCreateMarker"/>
+     <addaction name="separator"/>
+     <addaction name="actionToolComputeMarkerDistance"/>
+     <addaction name="actionToolComputeMarkerAngle"/>
+     <addaction name="actionToolComputeVectorAngle"/>
     </widget>
     <addaction name="menuModel"/>
     <addaction name="separator"/>
@@ -540,7 +544,22 @@
   </action>
   <action name="actionToolCreateMarker">
    <property name="text">
-    <string>Create Marker</string>
+    <string>Create Average Marker</string>
+   </property>
+  </action>
+  <action name="actionToolComputeMarkerAngle">
+   <property name="text">
+    <string>Compute Angle between 3 Markers</string>
+   </property>
+  </action>
+  <action name="actionToolComputeMarkerDistance">
+   <property name="text">
+    <string>Compute Distance between 2 Markers</string>
+   </property>
+  </action>
+  <action name="actionToolComputeVectorAngle">
+   <property name="text">
+    <string>Compute Angle between 2 Vectors</string>
    </property>
   </action>
  </widget>
