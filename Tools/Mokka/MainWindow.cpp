@@ -195,6 +195,11 @@ MainWindow::MainWindow(QWidget* parent)
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->timeEventControler->playbackSpeedMenu()->menuAction(), this->multiView->groundOrientationMenu());
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->multiView->groundOrientationMenu()->menuAction(), this->multiView->markerTrajectoryLengthMenu());
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertAction(this->timeEventControler->actionReframeFromOne, this->multiView->forceButterflyActivationAction());
+  this->timeEventControler->insertEventMenu()->actions()[0]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_1)); // Right Foot Strike
+  this->timeEventControler->insertEventMenu()->actions()[1]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_2)); // Right Toe Off
+  this->timeEventControler->insertEventMenu()->actions()[4]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_3)); // Left Foot Strike
+  this->timeEventControler->insertEventMenu()->actions()[5]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_4)); // Left Toe Off
+  
   this->multiView->initialize();
   // Contextual menu for the 3D views
   QList<QAction*> actions3d;
@@ -489,6 +494,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
   else if ((event->type() == QEvent::KeyPress) && this->timeEventControler->isEnabled())
   {
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+    // Frame by frame
     if (keyEvent->matches(QKeySequence::MoveToPreviousChar))
     {
       this->timeEventControler->previousFrame();
@@ -499,11 +505,24 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
       this->timeEventControler->nextFrame();
       return true;
     }
+    // 10 frames by 10 frames
+    else if (((keyEvent->modifiers() & Qt::AltModifier) == Qt::AltModifier) && (keyEvent->key() == Qt::Key_Left))
+    {
+      this->timeEventControler->previousFrame(10);
+      return true;
+    }
+    else if (((keyEvent->modifiers() & Qt::AltModifier) == Qt::AltModifier) && (keyEvent->key() == Qt::Key_Right))
+    {
+      this->timeEventControler->nextFrame(10);
+      return true;
+    }
+    // Playback
     else if (keyEvent->key() == Qt::Key_Space)
     {
       this->timeEventControler->togglePlayback();
       return true;
     }
+    // Marker(s) deselection
     else if (keyEvent->key() == Qt::Key_Escape)
     {
       this->mp_ModelDock->modelTree->clearSelection();

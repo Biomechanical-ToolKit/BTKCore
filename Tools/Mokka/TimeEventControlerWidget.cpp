@@ -358,14 +358,25 @@ void TimeEventControlerWidget::nextStep()
   this->setFrame(this->timeEventBar->m_SliderPos + static_cast<int>(this->m_PlaybackStep));
 };
 
+void TimeEventControlerWidget::nextFrame(int inc)
+{
+  this->setFrame(this->timeEventBar->m_SliderPos + static_cast<double>(inc));
+};
+
 void TimeEventControlerWidget::nextFrame()
 {
-  this->setFrame(this->timeEventBar->m_SliderPos + 1.0);
+  this->nextFrame(1);
+};
+
+
+void TimeEventControlerWidget::previousFrame(int dcr)
+{
+  this->setFrame(this->timeEventBar->m_SliderPos - static_cast<double>(dcr));
 };
 
 void TimeEventControlerWidget::previousFrame()
 {
-  this->setFrame(this->timeEventBar->m_SliderPos - 1.0);
+  this->previousFrame(1);
 };
 
 void TimeEventControlerWidget::reframeAcquisition(int ff)
