@@ -1994,7 +1994,8 @@ void ModelDockWidget::sendModifiedMarkersState(QTreeWidgetItem* item, int column
 
 void ModelDockWidget::editMarkerLabel()
 {
-  int id = this->modelTree->currentItem()->data(0, PointId).toInt();
+  // With Qt 4.7.3, the use of QTreeWidget::currentItem() returns a corrupted item if this one was selected programmatically (from VTK).
+  int id = this->modelTree->selectedItems()[0]->data(0, PointId).toInt();
   QString label = this->markerLabelEdit->text();
   if (label.compare(this->mp_Acquisition->pointLabel(id)) != 0)
     emit markerLabelChanged(id, label);
