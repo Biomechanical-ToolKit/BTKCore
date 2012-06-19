@@ -42,7 +42,7 @@ ExportSTLDialog::ExportSTLDialog(QWidget* parent)
 {
   this->setupUi(this);
 #ifdef Q_OS_MAC
-  this->layout()->setContentsMargins(12,12,12,12);
+  this->layout()->setContentsMargins(12,18,12,12);
   this->setWindowFlags(Qt::Sheet);
   this->setWindowModality(Qt::WindowModal);
   this->resize(this->width(), this->height()-1); // FIXME: Only the way to remove the size grip under MacOS X?

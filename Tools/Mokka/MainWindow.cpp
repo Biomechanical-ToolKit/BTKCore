@@ -1539,8 +1539,8 @@ void MainWindow::exportSTL()
   exporterDlg.filePrefixLineEdit->setText(QFileInfo(this->mp_Acquisition->fileName()).baseName());
   for (QMap<int, Segment*>::const_iterator it = this->mp_Model->segments().begin() ; it != this->mp_Model->segments().end() ; ++it)
     exporterDlg.segmentListWidget->addItem(it.value()->label);
-  if (exporterDlg.segmentListWidget->count() == 1)
-    exporterDlg.segmentListWidget->setCurrentRow(0);
+  // FIXME: Adding items seems to select the first one but doesn't highlight it. Moreoever, it seems impossible to unselect it, so its selection is forced. 
+  exporterDlg.segmentListWidget->setCurrentRow(0);
   if (exporterDlg.exec() == QDialog::Accepted)
   {
     QString filePrefix = exporterDlg.pathLineEdit->text() + "/" + exporterDlg.filePrefixLineEdit->text();
