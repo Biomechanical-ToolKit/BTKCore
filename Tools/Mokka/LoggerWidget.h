@@ -44,6 +44,7 @@
 #include <QItemDelegate>
 
 #include <iostream>
+#include <cstdio> // Required under Linux
 
 enum {LoggerMsgType = Qt::UserRole + 1, LoggerMsgDateTime, LoggerMsgDetail, LoggerMsgError};
 
