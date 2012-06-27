@@ -195,10 +195,15 @@ MainWindow::MainWindow(QWidget* parent)
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->timeEventControler->playbackSpeedMenu()->menuAction(), this->multiView->groundOrientationMenu());
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->multiView->groundOrientationMenu()->menuAction(), this->multiView->markerTrajectoryLengthMenu());
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertAction(this->timeEventControler->actionReframeFromOne, this->multiView->forceButterflyActivationAction());
-  this->timeEventControler->insertEventMenu()->actions()[0]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_1)); // Right Foot Strike
-  this->timeEventControler->insertEventMenu()->actions()[1]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_2)); // Right Toe Off
-  this->timeEventControler->insertEventMenu()->actions()[4]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_3)); // Left Foot Strike
-  this->timeEventControler->insertEventMenu()->actions()[5]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_4)); // Left Toe Off
+  this->timeEventControler->insertEventMenu()->actions()[0]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_7));  // Right Foot Strike
+  this->timeEventControler->insertEventMenu()->actions()[1]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_8));  // Right Toe Off
+  this->timeEventControler->insertEventMenu()->actions()[2]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_9));  // Right Other (unlabled)
+  this->timeEventControler->insertEventMenu()->actions()[4]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_4));  // Left Foot Strike
+  this->timeEventControler->insertEventMenu()->actions()[5]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_5));  // Left Toe Off
+  this->timeEventControler->insertEventMenu()->actions()[6]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_6));  // Left Other (unlabled)
+  this->timeEventControler->insertEventMenu()->actions()[8]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_1));  // General Foot Strike
+  this->timeEventControler->insertEventMenu()->actions()[9]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_2));  // General Toe Off
+  this->timeEventControler->insertEventMenu()->actions()[10]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_3)); // General Other (unlabled)
   
   this->multiView->initialize();
   // Contextual menu for the 3D views

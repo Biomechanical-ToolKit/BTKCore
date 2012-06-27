@@ -835,6 +835,8 @@ QList<int> TimeEventControlerWidget::removeEvent(const QString& context, const Q
 
 void TimeEventControlerWidget::insertEvent(const QString& label, int context, int frame)
 {
+  if (this->mp_Acquisition->fileName().isEmpty())
+    return;
   int oldFrame = this->currentFrame();
   NewEventDialog ned(NewEventDialog::New, this);
   int  frameAndROI[3] = {frame, this->timeEventBar->m_ROIFirstFrame, this->timeEventBar->m_ROILastFrame};
