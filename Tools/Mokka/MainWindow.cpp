@@ -79,6 +79,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock = new ModelDockWidget(this);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
   this->mp_ImportAssistant = new ImportAssistantDialog(this);
+  this->mp_SegmentEditor = 0;
   this->mp_UpdateChecker = new UpdateChecker(MOKKA_VERSION_STRING, 
                                               "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
                                               ":/Resources/Images/Mokka_128.png", this);
@@ -1968,12 +1969,20 @@ void MainWindow::editSegment(bool isNew)
     this->multiView->circleSelectedMarkers(QList<int>());
     this->multiView->updateHiddenSegments(segmentIds);
     
-    NewSegmentDialog nsd(seg, segmentId, markersInfo, !isNew, this);
-    nsd.viz3D->setGlobalFrameVisible(false);
-    nsd.viz3D->copy(static_cast<Viz3DWidget*>(static_cast<CompositeView*>(this->multiView->views()[0])->view(CompositeView::Viz3D)));
+    if (this->mp_SegmentEditor == 0)
+    {
+      this->mp_SegmentEditor = new NewSegmentDialog(this);
+      this->mp_SegmentEditor->viz3D->setGlobalFrameVisible(false);
+      this->mp_SegmentEditor->viz3D->copy(static_cast<Viz3DWidget*>(static_cast<CompositeView*>(this->multiView->views()[0])->view(CompositeView::Viz3D)));
+      // Connections
+      connect(this->mp_SegmentEditor, SIGNAL(markerSelectionChanged(QList<int>)), this->multiView, SLOT(circleSelectedMarkers(QList<int>)));
+      connect(this->mp_SegmentEditor, SIGNAL(markerVisibleSelectionChanged(QList<int>)), this->multiView, SLOT(updateVisibleMarkers(QList<int>)));
+      connect(this->mp_SegmentEditor, SIGNAL(segmentDefinitionChanged(int, QVector<int>, QVector<Pair>, QVector<Triad>)), this->multiView, SLOT(setSegmentDefinition(int, QVector<int>, QVector<Pair>, QVector<Triad>)));
+    }
+    this->mp_SegmentEditor->initialize(seg, segmentId, markersInfo, !isNew);
     // Show only markers and segments
     // WARNING: THIS METHOD IS SENSITIVE TO THE ORDER OF THE VTK OBJECT CONSTRUCTION IN THE MUTLIVIEW.
-    vtkActorCollection* actors = nsd.viz3D->renderer()->GetActors();
+    vtkActorCollection* actors = this->mp_SegmentEditor->viz3D->renderer()->GetActors();
     actors->InitTraversal();
     vtkActor* actor = actors->GetNextItem();
     int inc = 0;
@@ -1989,20 +1998,15 @@ void MainWindow::editSegment(bool isNew)
       actor = actors->GetNextItem();
       ++inc;
     }
-    nsd.viz3D->renderer()->ResetCamera();
-  
-    // Connections
-    connect(&nsd, SIGNAL(markerSelectionChanged(QList<int>)), this->multiView, SLOT(circleSelectedMarkers(QList<int>)));
-    connect(&nsd, SIGNAL(markerVisibleSelectionChanged(QList<int>)), this->multiView, SLOT(updateVisibleMarkers(QList<int>)));
-    connect(&nsd, SIGNAL(segmentDefinitionChanged(int, QVector<int>, QVector<Pair>, QVector<Triad>)), this->multiView, SLOT(setSegmentDefinition(int, QVector<int>, QVector<Pair>, QVector<Triad>)));
+    this->mp_SegmentEditor->viz3D->renderer()->ResetCamera();
   
     bool canceled = false;
     if (isNew)
     {
-      if (nsd.exec() == QDialog::Accepted)
+      if (this->mp_SegmentEditor->exec() == QDialog::Accepted)
       {
-        seg->label = nsd.segmentLabelEdit->text();
-        seg->description = nsd.segmentDescriptionEdit->text();
+        seg->label = this->mp_SegmentEditor->segmentLabelEdit->text();
+        seg->description = this->mp_SegmentEditor->segmentDescriptionEdit->text();
         seg->surfaceVisible = !seg->faces.isEmpty();
         this->mp_UndoStack->push(new MasterUndoCommand(this->mp_MarkerConfigurationUndoStack, new InsertSegment(this->mp_Model, seg)));
       }
@@ -2025,7 +2029,7 @@ void MainWindow::editSegment(bool isNew)
       QVector<Pair> oldLinks = seg->links;
       QVector<Triad> oldFaces = seg->faces;
       bool oldSurfaceVisible = seg->surfaceVisible;
-      if (nsd.exec() == QDialog::Accepted)
+      if (this->mp_SegmentEditor->exec() == QDialog::Accepted)
       {
         if ((seg->markerIds != oldMarkerIds) || (seg->links != oldLinks) || (seg->faces != oldFaces))
         {
@@ -2061,7 +2065,7 @@ void MainWindow::editSegment(bool isNew)
       this->multiView->circleSelectedMarkers(QList<int>());
     this->multiView->updateHiddenSegments(unvisibleSegmentIds);
     // Reset 3D view (as the actors are shared between all the 3D views)
-    actors = nsd.viz3D->renderer()->GetActors();
+    actors = this->mp_SegmentEditor->viz3D->renderer()->GetActors();
     actors->InitTraversal();
     actor = actors->GetNextItem();
     inc = 0;

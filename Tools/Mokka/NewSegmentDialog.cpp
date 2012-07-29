@@ -47,11 +47,11 @@ const int FaceId = Qt::UserRole + 100;
 const int FaceList = Qt::UserRole + 101;
 const int LinkList = Qt::UserRole + 102;
  
-NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, const QList<MarkerInfo>& markersInfo, bool editMode, QWidget* parent)
+NewSegmentDialog::NewSegmentDialog(QWidget* parent)
 : QDialog(parent)
 {
-  this->mp_Segment = seg;
-  this->m_SegmentId = segmentId;
+  this->mp_Segment = 0;
+  this->m_SegmentId = 0;
   
   this->setupUi(this);
   this->tabWidget->setCurrentWidget(this->linkTab);
@@ -98,6 +98,28 @@ NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, const QList<Mark
   this->facesTable->installEventFilter(this);
   this->viz3D->installEventFilter(this);
   
+  // Connections
+  connect(this->segmentLabelEdit, SIGNAL(textEdited(QString)), this, SLOT(validate()));
+  connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(circleSelectedMarkers()));
+  connect(this->markersTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateMarkersUsed(QTableWidgetItem*)));
+  connect(this->linksTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(removeEdge(QTableWidgetItem*)));
+  connect(this->linksTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(validate()));
+  connect(this->facesTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(removeFace(QTableWidgetItem*)));
+  connect(this->viz3D, SIGNAL(pickedMarkerChanged(int)), this, SLOT(pickMarker(int)));
+  connect(this->viz3D, SIGNAL(pickedMarkerToggled(int)), this, SLOT(togglePickedMarker(int)));
+  connect(this->viz3D, SIGNAL(selectedMarkersToggled(QList<int>)), this, SLOT(pickSelectedMarkers(QList<int>)));
+};
+
+void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<MarkerInfo>& markersInfo, bool editMode)
+{
+  this->segmentLabelEdit->blockSignals(true);
+  this->markersTable->blockSignals(true);
+  this->linksTable->blockSignals(true);
+  this->facesTable->blockSignals(true);
+  
+  this->mp_Segment = seg;
+  this->m_SegmentId = segmentId;
+  
   if (editMode)
   {
     this->segmentLabelLabel->setVisible(false);
@@ -108,6 +130,9 @@ NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, const QList<Mark
     this->buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
   }
   
+  this->markersTable->setRowCount(0);
+  this->linksTable->setRowCount(0);
+  this->facesTable->setRowCount(0);
   // Fill the tables
   // - To create a new segment
   if (!editMode)
@@ -297,17 +322,10 @@ NewSegmentDialog::NewSegmentDialog(Segment* seg, int segmentId, const QList<Mark
     }
   }
   
-  // Connections
-  if (!editMode)
-    connect(this->segmentLabelEdit, SIGNAL(textEdited(QString)), this, SLOT(validate()));
-  connect(this->markersTable, SIGNAL(itemSelectionChanged()), this, SLOT(circleSelectedMarkers()));
-  connect(this->markersTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateMarkersUsed(QTableWidgetItem*)));
-  connect(this->linksTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(removeEdge(QTableWidgetItem*)));
-  connect(this->linksTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(validate()));
-  connect(this->facesTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(removeFace(QTableWidgetItem*)));
-  connect(this->viz3D, SIGNAL(pickedMarkerChanged(int)), this, SLOT(pickMarker(int)));
-  connect(this->viz3D, SIGNAL(pickedMarkerToggled(int)), this, SLOT(togglePickedMarker(int)));
-  connect(this->viz3D, SIGNAL(selectedMarkersToggled(QList<int>)), this, SLOT(pickSelectedMarkers(QList<int>)));
+  this->segmentLabelEdit->blockSignals(false);
+  this->markersTable->blockSignals(false);
+  this->linksTable->blockSignals(false);
+  this->facesTable->blockSignals(false);
 };
 
 void NewSegmentDialog::validate()

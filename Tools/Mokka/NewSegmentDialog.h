@@ -57,8 +57,10 @@ public:
     bool selected;
   };
   
-  NewSegmentDialog(Segment* seg, int segmentId, const QList<MarkerInfo>& markersInfo, bool editMode = false, QWidget* parent = 0);
+  NewSegmentDialog(QWidget* parent = 0);
   // ~NewSegmentDialog();
+  
+  void initialize(Segment* seg, int segmentId, const QList<MarkerInfo>& markersInfo, bool editMode = false);
   
 public slots:
   void validate();
