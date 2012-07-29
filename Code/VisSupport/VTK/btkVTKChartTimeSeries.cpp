@@ -463,7 +463,10 @@ namespace btk
   void VTKChartTimeSeries::ClearPlots()
   {
     for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+    {
+      this->mp_PlotTransform->RemoveItem(*it);
       (*it)->Delete();
+    }
     this->mp_Plots->clear();
     this->m_ChartBoundsValid = false;
     if (this->Scene != NULL) this->Scene->SetDirty(true);
@@ -531,9 +534,9 @@ namespace btk
       vtkVector2f plotPos, position((float)pos.X(), (float)pos.Y());
       vtkTransform2D* transform = this->mp_PlotTransform->GetTransform();
       transform->InverseTransformPoints(position.GetData(), position.GetData(), 1);
-      // Use a tolerance of +/- 5 pixels
-      vtkVector2f tolerance((5.0/transform->GetMatrix()->GetElement(0, 0)),
-                            (5.0/transform->GetMatrix()->GetElement(1, 1)));
+      // Use a tolerance of +/- 2.5 and +/- 5 pixels for the X and Y direction respectively
+      vtkVector2f tolerance((2.5/transform->GetMatrix()->GetElement(0,0)),
+                            (5.0/transform->GetMatrix()->GetElement(1,1)));
                             
       // Iterate through the visible plots and return on the first hit
       for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
