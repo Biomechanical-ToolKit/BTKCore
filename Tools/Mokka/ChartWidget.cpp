@@ -93,6 +93,7 @@ public:
   virtual QString createPlotLabel(Acquisition* acq, int id);
   virtual void initialize(vtkSmartPointer<vtkColorSeries> colorGenerator);
   virtual void removePlot(int index, bool* layoutModified);
+  virtual void hidePlot(int index, bool isHidden, bool* layoutModified);
   virtual void setPlotVisible(int index, bool show, bool* layoutModified);
   virtual void show(Acquisition* acq, bool s, bool* layoutModified);
   void setExpandable(bool expandable);
@@ -214,30 +215,6 @@ void ChartWidget::initialize()
   renwin->GetInteractor()->SetInteractorStyle(style);
   style->Delete();
   
-  /*
-  vtkRenderer* ren = vtkRenderer::New();
-  ren->SetBackground(1.0,1.0,1.0);
-  vtkRenderWindow* renwin = this->mp_ChartContentWidget->GetRenderWindow();
-  renwin->AddRenderer(ren);
-  
-  for (int i = 0 ; i < this->m_ChartData.size() ; ++i)
-    this->m_ChartData[i]->initialize(this->mp_ColorGenerator);
-  
-  vtkContextActor* actor = vtkContextActor::New();
-  actor->SetScene(this->mp_Scene);
-  ren->AddActor(actor);
-  this->mp_Scene->SetRenderer(ren);
-
-  // // FIXME: Good interactor to set?
-  // vtkContextInteractorStyle* style = vtkContextInteractorStyle::New();
-  // style->SetScene(this->mp_Scene);
-  // renwin->GetInteractor()->SetInteractorStyle(style);
-  // style->Delete();
-
-  actor->Delete();
-  ren->Delete();
-  */
-  
   this->show(false); // Reset the charts
 };
 
@@ -339,37 +316,11 @@ void ChartWidget::updateAxisX(btk::VTKChartTimeSeries* chart, int ff, int lf)
 
 void ChartWidget::updateAxisX(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux)
 {
-  /*
-  std::cout << "ChartWidget::updateAxisX: " << " - Bounds: " << dlb << " ; " << dub << " - Range: " << dlx << " ; " << dux << std::endl;
-  vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
-  if (dlb < 0)
-  {
-    axisX->SetMinimumLimit(axisX->GetMinimumLimit() + dlb);
-    axisX->SetMinimum(axisX->GetMinimum() + dlx);
-  }
-  else
-  {
-    axisX->SetMinimum(axisX->GetMinimum() + dlx);
-    axisX->SetMinimumLimit(axisX->GetMinimumLimit() + dlb);
-  }
-  if (dub < 0)
-  {
-    axisX->SetMaximum(axisX->GetMaximum() + dux);
-    axisX->SetMaximumLimit(axisX->GetMaximumLimit() + dub);
-  }
-  else
-  {
-    axisX->SetMaximumLimit(axisX->GetMaximumLimit() + dub);
-    axisX->SetMaximum(axisX->GetMaximum() + dux);
-  }
-  chart->RecalculatePlotTransform();
-  */
   vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
   vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
   chart->SetBounds(axisX->GetMinimumLimit() + dlb, axisX->GetMaximumLimit() + dub, axisY->GetMinimumLimit(), axisY->GetMaximumLimit());
-  
-  // for (int k = 0 ; k < chart->GetNumberOfPlots() ; ++k)
-  //   chart->GetPlot(k)->Modified(); // To update the frames index
+  for (int k = 0 ; k < chart->GetNumberOfPlots() ; ++k)
+    chart->GetPlot(k)->Modified(); // To update the frames index
 };
 
 void ChartWidget::setUnitAxisX(const QString& str, double scale, double offset)
@@ -871,7 +822,10 @@ void ChartWidget::checkResetAxes()
     chart->SetInteractionEnabled(plotVisible);
     // Force the chart to draw ticks for the X axis.
     if (!plotVisible)
+    {
+      chart->RecalculateBounds(); // Needed as the flag to recompute the bounds was activated (and force the limits to 0.0)
       chart->SetBounds((double)this->mp_Acquisition->firstFrame(), (double)this->mp_Acquisition->lastFrame(), 0.0, 0.0);
+    }
   }
 };
 
@@ -924,7 +878,7 @@ AbstractChartData::AbstractChartData(int num)
 {
   this->mp_ChartLayout = btk::VTKChartLayout::New();
   this->mp_ChartLayout->SetSize(vtkVector2i(1,num));
-  this->mp_ChartLayout->SetBorders(20,0,20,10);
+  this->mp_ChartLayout->SetBorders(0,0,20,0);
   this->mp_ChartLayout->SetGutter(vtkVector2f(0.0f,0.0f));
   this->mp_Frames = NULL;
 };
@@ -955,7 +909,7 @@ int AbstractChartData::chartNumber() const
 
 btk::VTKChartTimeSeries* AbstractChartData::chart(int i)
 {
-  return btk::VTKChartTimeSeries::SafeDownCast(this->mp_ChartLayout->GetChart(vtkVector2i(0,this->chartNumber()-i-1)));
+  return btk::VTKChartTimeSeries::SafeDownCast(this->mp_ChartLayout->GetChart(vtkVector2i(0,i)));//this->chartNumber()-i-1
 };
 
 void AbstractChartData::copy(AbstractChartData* source)
@@ -973,6 +927,7 @@ void AbstractChartData::copy(AbstractChartData* source)
     targetAxisX->SetLabelsVisible(sourceAxisX->GetLabelsVisible());
     targetAxisX->SetTickOffset(sourceAxisX->GetTickOffset());
     targetAxisX->SetTickScale(sourceAxisX->GetTickScale());
+    targetAxisX->SetDisplayMinimumLimit(sourceAxisX->GetDisplayMinimumLimit());
     targetChart->GetAxis(vtkAxis::LEFT)->SetLabelsVisible(sourceChart->GetAxis(vtkAxis::LEFT)->GetLabelsVisible());
     targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
     targetChart->SetRegionOfInterestFunctor(sourceChart->GetRegionOfInterestFunctor());
@@ -1028,6 +983,7 @@ void AbstractChartData::initialize(vtkSmartPointer<vtkColorSeries> colorGenerato
     btk::VTKAxis* axisX = static_cast<btk::VTKAxis*>(chart->GetAxis(vtkAxis::BOTTOM));
     btk::VTKAxis* axisY = static_cast<btk::VTKAxis*>(chart->GetAxis(vtkAxis::LEFT));
     axisX->SetTitleVisible(false);
+    axisX->SetDisplayMinimumLimit(true);
     axisX->SetBehavior(vtkAxis::FIXED);
     axisY->SetBehavior(vtkAxis::FIXED);
     
@@ -1038,6 +994,7 @@ void AbstractChartData::initialize(vtkSmartPointer<vtkColorSeries> colorGenerato
     chart->SetColorSeries(colorGenerator);
     chart->SetBorders(60,20,0,5);
     this->mp_ChartLayout->SetChart(vtkVector2i(0,i), chart);
+    chart->Delete();
   }
 };
 
@@ -1394,20 +1351,54 @@ void AnalogChartData::removePlot(int index, bool* layoutModified)
   else
   {
     this->m_PlotsProperties.removeAt(index);
-    btk::VTKChartTimeSeries* chartZero = this->chart(0);
     if (!this->m_PlotsProperties.isEmpty())
     {
       for (int i = index+1 ; i < this->chartNumber() ; ++i)
-        this->mp_ChartLayout->SetChart(vtkVector2i(0,i-1), this->mp_ChartLayout->GetChart(vtkVector2i(0,i)));
-      
+      {
+        btk::VTKChartTimeSeries* chart = this->mp_ChartLayout->TakeChart(vtkVector2i(0,i));
+        this->mp_ChartLayout->SetChart(vtkVector2i(0,i-1), chart);
+        chart->Delete();
+      }
+      this->mp_ChartLayout->SetSize(vtkVector2i(1,this->chartNumber()-1));
       *layoutModified = true;
     }
     else
     {
+      btk::VTKChartTimeSeries* chartZero = this->chart(0);
       chartZero->RemovePlot(0);
       chartZero->GetAxis(vtkAxis::LEFT)->SetTitle("Values");
       *layoutModified = false;
     }
+  }
+};
+
+void AnalogChartData::hidePlot(int index, bool isHidden, bool* layoutModified)
+{
+  if (!this->m_Expanded)
+    this->AbstractChartData::hidePlot(index, isHidden, layoutModified);
+  else
+  {
+    btk::VTKChartTimeSeries* chart = this->chart(index);
+    chart->SetVisible(!isHidden);
+    chart->GetPlot(0)->SetVisible(!isHidden);
+    
+    bool anyChartVisible = false;
+    for (int i = 0 ; i < this->chartNumber() ; ++i)
+    {
+      if (this->chart(i)->GetVisible())
+      {
+        anyChartVisible = true;
+        break;
+      }
+    }
+    if (!anyChartVisible) // Create a fake chart
+    {
+      btk::VTKChartTimeSeries* fakeChart = this->createChart(this->chart(0));
+      fakeChart->GetAxis(vtkAxis::LEFT)->SetTitle("Values");
+    }
+    else if (this->chart(this->chartNumber()-1)->GetNumberOfPlots() == 0)
+      this->mp_ChartLayout->SetSize(vtkVector2i(1,this->chartNumber()-1));
+    *layoutModified = true;
   }
 };
 
@@ -1436,8 +1427,8 @@ void AnalogChartData::setExpandable(bool expandable)
   if (this->m_PlotsProperties.isEmpty())
     return;
   
+  // Expand or collapse the chart
   btk::VTKChartTimeSeries* chartZero = this->chart(0);
-  // Expand of collapose the chart
   if (this->m_Expanded)
   {
     int numPlots = chartZero->GetNumberOfPlots();
@@ -1447,8 +1438,10 @@ void AnalogChartData::setExpandable(bool expandable)
       vtkPlot* plot = chartZero->TakePlot(1);
       chart->AddPlot(plot);
       chart->GetAxis(vtkAxis::LEFT)->SetTitle(plot->GetLabel());
+      chart->SetVisible(plot->GetVisible());
       plot->Delete();
     }
+    chartZero->SetVisible(chartZero->GetPlot(0)->GetVisible());
     chartZero->GetAxis(vtkAxis::LEFT)->SetTitle(chartZero->GetPlot(0)->GetLabel());
   }
   else
@@ -1468,17 +1461,21 @@ btk::VTKChartTimeSeries* AnalogChartData::createChart(btk::VTKChartTimeSeries* s
   btk::VTKAxis* sourceAxisX = static_cast<btk::VTKAxis*>(sourceChart->GetAxis(vtkAxis::BOTTOM));
   targetAxisX->SetTitle(sourceAxisX->GetTitle());
   targetAxisX->SetTitleVisible(false); // Frames // X axis
+  targetAxisX->SetDisplayMinimumLimit(sourceAxisX->GetDisplayMinimumLimit());
   targetAxisX->SetMinimumLimit(sourceAxisX->GetMinimumLimit());
   targetAxisX->SetMaximumLimit(sourceAxisX->GetMaximumLimit());
+  const int* sourceBorders = sourceChart->GetBorders(); targetChart->SetBorders(sourceBorders[0], sourceBorders[1], sourceBorders[2], sourceBorders[3]);
   targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
   targetChart->SetRegionOfInterestFunctor(sourceChart->GetRegionOfInterestFunctor());
   targetChart->SetEventsFunctor(sourceChart->GetEventsFunctor());
   targetChart->DisplayEventsOn();
   targetChart->SetColorSeries(sourceChart->GetColorSeries());
-  sourceChart->GetScene()->AddItem(targetChart);
-  int idx = this->mp_ChartLayout->GetSize().X();
+  targetChart->RecalculateBounds(); // Because the flag to compute the bounds is activated by default and erase the given values.
+  targetChart->SetBounds(sourceAxisX->GetMinimumLimit(), sourceAxisX->GetMaximumLimit(), 0.0, 0.0);
+  int idx = this->chartNumber();
   this->mp_ChartLayout->SetSize(vtkVector2i(1,idx+1));
   this->mp_ChartLayout->SetChart(vtkVector2i(0,idx), targetChart);
+  targetChart->Delete(); // Because the layout owns the chart 
   return targetChart;
 };
 
@@ -1554,100 +1551,6 @@ void VTKChartWidget::keyReleaseEvent(QKeyEvent* event)
   this->QWidget::keyReleaseEvent(event);
 };
 
-// // To not propagate the middle and right click to the charts
-// void VTKChartWidget::mousePressEvent(QMouseEvent* event)
-// {
-//   vtkRenderWindowInteractor* iren = NULL;
-//   if(this->mRenWin)
-//     iren = this->mRenWin->GetInteractor();
-//   if(!iren || !iren->GetEnabled())
-//     return;
-//   
-//   // give vtk event information (without modifiers informations: always set to 0)
-//   iren->SetEventInformationFlipY(event->x(), event->y(), 0, 0, 0, (event->type() == QEvent::MouseButtonDblClick ? 1 : 0));
-//   
-//   // invoke appropriate vtk event only for the left button
-//   if(event->button() == Qt::LeftButton)
-//   {
-//     // btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
-//     // if (chart != 0)
-//     //   chart->SetDisplayZoomBox((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? 1 : 0);
-//     iren->InvokeEvent(vtkCommand::LeftButtonPressEvent, event);
-//   }
-// };
-// 
-// // To not propagate the middle and right click to the charts
-// void VTKChartWidget::mouseReleaseEvent(QMouseEvent* event)
-// {
-//   vtkRenderWindowInteractor* iren = NULL;
-//   if(this->mRenWin)
-//     iren = this->mRenWin->GetInteractor();
-//   if(!iren || !iren->GetEnabled())
-//     return;
-//     
-//   // // To fix a possible conflict between Qt and VTK when you use a contextual menu event.
-//   // // VTK or the scene doesn't receive the event vtkCommand::LeftButtonReleaseEvent
-//   // // In our case, the zoom box is not applied after using the reset zoom action
-//   // btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
-//   // if (chart && (chart->GetDisplayZoomBox() == 1))
-//   // {
-//   //   chart->ApplyZoom(chart->GetZoomBox());
-//   //   this->mRenWin->Render();
-//   // }
-//   
-//   // give vtk event information (without modifiers informations: always set to 0)
-//   iren->SetEventInformationFlipY(event->x(), event->y(), 0, 0);
-//   
-//   // invoke appropriate vtk event only for the left button
-//   if(event->button() == Qt::LeftButton)
-//     iren->InvokeEvent(vtkCommand::LeftButtonReleaseEvent, event);
-// };
-// 
-// // To not propagate the middle and right click to the charts
-// void VTKChartWidget::mouseMoveEvent(QMouseEvent* event)
-// {
-//   vtkRenderWindowInteractor* iren = NULL;
-//   if(this->mRenWin)
-//     iren = this->mRenWin->GetInteractor();
-//   if(!iren || !iren->GetEnabled())
-//     return;
-//   
-//   // give interactor the event information (without modifiers informations: always set to 0)
-//   iren->SetEventInformationFlipY(event->x(), event->y(), 0, 0);
-//   
-//   // invoke vtk event only if the left button is activated
-//   if ((event->buttons() & Qt::LeftButton) == Qt::LeftButton)
-//     iren->InvokeEvent(vtkCommand::MouseMoveEvent, event);
-// };
-// 
-// void VTKChartWidget::resizeEvent(QResizeEvent* event)
-// {
-//   this->QVTKWidget::resizeEvent(event);
-//   // this->resizeCharts();
-// };
-// 
-// void VTKChartWidget::wheelEvent(QWheelEvent* event)
-// {
-//   vtkRenderWindowInteractor* iren = NULL;
-//   if(this->mRenWin)
-//     iren = this->mRenWin->GetInteractor();
-//   if(!iren || !iren->GetEnabled())
-//     return;
-//   
-//   // btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
-//   // if (chart != 0)
-//   //   chart->SetZoomMode((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? btk::VTKChartTimeSeries::HORIZONTAL : btk::VTKChartTimeSeries::BOTH);
-//   
-//   // give vtk event information (without modifiers informations: always set to 0)
-//   iren->SetEventInformationFlipY(event->x(), event->y(), 0, 0);
-// 
-//   // invoke vtk event: if delta is positive, it is a forward wheel event
-//   if(event->delta() > 0)
-//     iren->InvokeEvent(vtkCommand::MouseWheelForwardEvent, event);
-//   else
-//     iren->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, event);
-// };
-
 btk::VTKChartTimeSeries* VTKChartWidget::focusedChart(const QPoint& pos) const
 {
   btk::VTKChartTimeSeries* chart = 0;
@@ -1664,7 +1567,6 @@ btk::VTKChartTimeSeries* VTKChartWidget::focusedChart(const QPoint& pos) const
     }
   }
   return chart;
-  
 };
 
 btk::VTKChartTimeSeries* VTKChartWidget::focusedPlotArea(const QPoint& pos) const
@@ -1683,48 +1585,4 @@ btk::VTKChartTimeSeries* VTKChartWidget::focusedPlotArea(const QPoint& pos) cons
     }
   }
   return chart;
-}
-/*
-void VTKChartWidget::resizeCharts()
-{
-  if (this->mp_Charts == NULL)
-    return;
-  
-  const float tickLength = 5.0f;
-  // const float minimumTickSpacing = 50.0f;
-  const float titleMargin = 10.0f;
-  const float labelMargin = 5.0f;
-  
-  int num = 0 ;
-  for (size_t i = 0 ; i < this->mp_Charts->size() ; ++i)
-  {
-    if (this->mp_Charts->operator[](i)->GetVisible())
-      ++num;
-  }
-  if (num == 0)
-    return;
-  
-  float heightF = static_cast<float>(this->height());
-  float heightPerChart = heightF / static_cast<float>(num);
-  float scaleY = heightPerChart / heightF;
-  
-  int inc = 1;
-  for (size_t i = 0 ; i < this->mp_Charts->size() ; ++i)
-  {
-    if (!this->mp_Charts->operator[](i)->GetVisible())
-      continue;
-      
-    this->mp_Charts->operator[](i)->SetBorders(60, static_cast<int>(20.0f / scaleY), 20, static_cast<int>(10.0 / scaleY));
-    
-    btk::VTKAxis* axisX = static_cast<btk::VTKAxis*>(this->mp_Charts->operator[](i)->GetAxis(vtkAxis::BOTTOM));
-    axisX->SetTickLength(tickLength / scaleY);
-    axisX->SetTitleMargin(titleMargin / scaleY);
-    axisX->SetLabelMargin(labelMargin / scaleY);
-    btk::VTKAxis* axisY = static_cast<btk::VTKAxis*>(this->mp_Charts->operator[](i)->GetAxis(vtkAxis::LEFT));
-    // axisY->SetMinimumTickSpacing(minimumTickSpacing / scaleY);
-
-    ++inc;
-  }
 };
-
-*/
