@@ -345,6 +345,7 @@ void ChartWidget::addPointPlot(btk::Point::Pointer pt, const QString& label)
   for (int i = 0 ; i < static_cast<int>(this->m_ChartData[this->m_CurrentChartType]->chartNumber()) ; ++i)
   {
     btk::VTKChartTimeSeries* chart = this->m_ChartData[this->m_CurrentChartType]->chart(i);
+    chart->Update();
     chart->SetInteractionEnabled(true);
     chart->RecalculateBounds();
   }
