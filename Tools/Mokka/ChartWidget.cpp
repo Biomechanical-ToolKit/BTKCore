@@ -922,8 +922,6 @@ void AbstractChartData::copy(AbstractChartData* source)
     btk::VTKChartTimeSeries* targetChart = this->chart(i);
     btk::VTKAxis* targetAxisX = static_cast<btk::VTKAxis*>(targetChart->GetAxis(vtkAxis::BOTTOM));
     btk::VTKAxis* sourceAxisX = static_cast<btk::VTKAxis*>(sourceChart->GetAxis(vtkAxis::BOTTOM));
-    targetAxisX->SetMinimumLimit(sourceAxisX->GetMinimumLimit());
-    targetAxisX->SetMaximumLimit(sourceAxisX->GetMaximumLimit());
     targetAxisX->SetLabelsVisible(sourceAxisX->GetLabelsVisible());
     targetAxisX->SetTickOffset(sourceAxisX->GetTickOffset());
     targetAxisX->SetTickScale(sourceAxisX->GetTickScale());
@@ -932,6 +930,8 @@ void AbstractChartData::copy(AbstractChartData* source)
     targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
     targetChart->SetRegionOfInterestFunctor(sourceChart->GetRegionOfInterestFunctor());
     targetChart->SetEventsFunctor(sourceChart->GetEventsFunctor());
+    targetChart->RecalculateBounds(); // Because the flag to compute the bounds is activated by default and erase the given values.
+    targetChart->SetBounds(sourceAxisX->GetMinimumLimit(), sourceAxisX->GetMaximumLimit(), 0.0, 0.0);
   }
 }
 
@@ -1462,8 +1462,6 @@ btk::VTKChartTimeSeries* AnalogChartData::createChart(btk::VTKChartTimeSeries* s
   targetAxisX->SetTitle(sourceAxisX->GetTitle());
   targetAxisX->SetTitleVisible(false); // Frames // X axis
   targetAxisX->SetDisplayMinimumLimit(sourceAxisX->GetDisplayMinimumLimit());
-  targetAxisX->SetMinimumLimit(sourceAxisX->GetMinimumLimit());
-  targetAxisX->SetMaximumLimit(sourceAxisX->GetMaximumLimit());
   const int* sourceBorders = sourceChart->GetBorders(); targetChart->SetBorders(sourceBorders[0], sourceBorders[1], sourceBorders[2], sourceBorders[3]);
   targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
   targetChart->SetRegionOfInterestFunctor(sourceChart->GetRegionOfInterestFunctor());
