@@ -41,7 +41,6 @@
 #include <btkVTKRubberRenderInteractionCallback.h>
 #include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
 
-#include <vtkRenderWindow.h>
 #include <vtkCellPicker.h>
 #include <vtkCallbackCommand.h>
 #include <vtkAxesActor.h>
@@ -51,12 +50,13 @@
 #include <vtkCaptionActor2D.h>
 #include <vtkTextProperty.h>
 #include <vtkTextActor.h>
+#include <vtkGenericOpenGLRenderWindow.h>
 
 #include <QKeyEvent>
 #include <QToolTip>
 
 Viz3DWidget::Viz3DWidget(QWidget* parent)
-: QVTKWidget(parent)
+: QVTKWidget2(parent)
 {
   // Member
   this->mp_Acquisition = 0;
@@ -83,7 +83,7 @@ void Viz3DWidget::initialize()
 {
   // VTK UI
   //this->mp_Renderer->TwoSidedLightingOn();
-  vtkRenderWindow* renwin = vtkRenderWindow::New();
+  vtkGenericOpenGLRenderWindow* renwin = vtkGenericOpenGLRenderWindow::New();
   renwin->AddRenderer(this->mp_Renderer);
   renwin->LineSmoothingOn();
 #if 0
@@ -304,7 +304,7 @@ void Viz3DWidget::setOrthogonalView(int view)
     qDebug("Unsupported global up vector.");
   this->mp_Renderer->ResetCamera();
   cam->Zoom(1.6);
-  this->GetRenderWindow()->Render();
+  this->render();
 }
 
 void Viz3DWidget::setGlobalFrameVisible(bool visible)
@@ -371,8 +371,9 @@ void Viz3DWidget::toggleTrajectoryMarker(vtkObject* /* caller */, unsigned long 
 
 void Viz3DWidget::render()
 {
-  if (this->updatesEnabled())
-    this->GetRenderWindow()->Render();
+  this->update();
+  // if (this->updatesEnabled())
+  //   this->GetRenderWindow()->Render();
 };
 
 void Viz3DWidget::show(bool s)
@@ -387,7 +388,7 @@ void Viz3DWidget::show(bool s)
     actor = actors->GetNextItem();
   }
   if (this->isVisible())
-    this->GetRenderWindow()->Render();
+    this->render();
 };
 
 bool Viz3DWidget::event(QEvent* event)
@@ -421,7 +422,7 @@ bool Viz3DWidget::event(QEvent* event)
     event->ignore();
     return true;
   }
-  return QWidget::event(event);
+  return QVTKWidget2::event(event);
 };
 
 void Viz3DWidget::keyPressEvent(QKeyEvent* event)
@@ -439,12 +440,12 @@ void Viz3DWidget::keyReleaseEvent(QKeyEvent* event)
 void Viz3DWidget::mousePressEvent(QMouseEvent* event)
 {
   this->GetRenderWindow()->GetInteractor()->SetAltKey(event->modifiers() == Qt::AltModifier ? 1 : 0);
-  this->QVTKWidget::mousePressEvent(event);
+  this->QVTKWidget2::mousePressEvent(event);
 };
 
 void Viz3DWidget::resizeEvent(QResizeEvent* event)
 {
-  this->QVTKWidget::resizeEvent(event);
+  this->QVTKWidget2::resizeEvent(event);
   QSize size = event->size();
   const double l = 100.0;
   double width = l / static_cast<double>(size.width());

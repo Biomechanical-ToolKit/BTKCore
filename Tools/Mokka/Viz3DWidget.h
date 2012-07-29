@@ -38,7 +38,7 @@
 
 #include <btkVTKAxesWidget.h>
 
-#include <QVTKWidget.h>
+#include <QVTKWidget2.h>
 #include <vtkRenderer.h>
 #include <vtkEventQtSlotConnect.h>
 
@@ -46,7 +46,7 @@
 
 class Acquisition;
 
-class Viz3DWidget : public QVTKWidget
+class Viz3DWidget : public QVTKWidget2
 {
   Q_OBJECT
   

@@ -44,8 +44,7 @@
 #include <btkVTKChartLayout.h>
 
 #include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
+#include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkContextScene.h>
 #include <vtkColorSeries.h>
 #include <vtkPen.h>
@@ -162,7 +161,7 @@ ChartWidget::ChartWidget(QWidget* parent)
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->addWidget(this->mp_ChartTitleLabel);
-  layout->addWidget(this->mp_ChartContentWidget);
+  layout->addWidget(this->mp_ChartContentWidget,1); // 1: strech the charts
   layout->addWidget(this->mp_ChartAxisXLabel);
   layout->setContentsMargins(0,5,0,5);
   layout->setSpacing(0);
@@ -385,7 +384,7 @@ void ChartWidget::render(bool optionsShown)
 #endif
   }
   else if (this->mp_ChartContentWidget->isVisible())
-    this->mp_ChartContentWidget->GetRenderWindow()->Render();
+    this->update();
 };
 
 void ChartWidget::removePlot(int index)
@@ -1480,7 +1479,7 @@ btk::VTKChartTimeSeries* AnalogChartData::createChart(btk::VTKChartTimeSeries* s
 // -----------------------------------------------------------------------------
 
 VTKChartWidget::VTKChartWidget(QWidget* parent, Qt::WindowFlags f)
-: QVTKWidget(parent, f)
+: QVTKWidget2(parent, 0, f)
 {
   this->mp_CurrentChartData = 0;
   this->setMouseTracking(false);
@@ -1534,7 +1533,7 @@ bool VTKChartWidget::event(QEvent* event)
     QContextMenuEvent* contextMenuEvent = static_cast<QContextMenuEvent*>(event);
     emit contextMenuRequested(contextMenuEvent->globalPos());
   }
-  return QVTKWidget::event(event);
+  return QVTKWidget2::event(event);
 };
 
 void VTKChartWidget::keyPressEvent(QKeyEvent* event)

@@ -36,7 +36,7 @@
 #ifndef ChartWidget_h
 #define ChartWidget_h
 
-#include <QVTKWidget.h>
+#include <QVTKWidget2.h>
 #include <vtkDoubleArray.h>
 #include <vtkstd/vector>
 
@@ -215,7 +215,7 @@ protected:
   QList<int> m_OptionSelection;
 };
 
-class VTKChartWidget : public QVTKWidget
+class VTKChartWidget : public QVTKWidget2
 {
   Q_OBJECT
   
