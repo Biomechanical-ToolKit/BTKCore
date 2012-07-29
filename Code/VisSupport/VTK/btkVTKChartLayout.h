@@ -63,6 +63,7 @@ namespace btk
 
     virtual bool SetChart(const vtkVector2i& position, VTKChartTimeSeries* chart);
     virtual VTKChartTimeSeries* GetChart(const vtkVector2i& position);
+    virtual VTKChartTimeSeries* TakeChart(const vtkVector2i &position);
     
     virtual bool SetChartSpan(const vtkVector2i& position, const vtkVector2i& span);
     virtual vtkVector2i GetChartSpan(const vtkVector2i& position);
@@ -75,9 +76,6 @@ namespace btk
     VTKChartLayout();
     ~VTKChartLayout();
 
-    class PIMPL;
-    PIMPL *Private;
-
     // The number of charts in x and y.
     vtkVector2i Size;
     // The gutter between each chart.
@@ -86,6 +84,9 @@ namespace btk
     bool LayoutIsDirty;
 
   private:
+    class PIMPL;
+    PIMPL *Private;
+    
     VTKChartLayout(const VTKChartLayout &); // Not implemented.
     void operator=(const VTKChartLayout &); // Not implemented.
   };
