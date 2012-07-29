@@ -72,7 +72,10 @@ ModelDockWidget::ModelDockWidget(QWidget* parent)
 #ifdef Q_OS_MAC
   // TODO: What about the widget's attributes Qt::WA_MacNormalSize, Qt::WA_MacSmallSize	 and Qt::WA_MacMiniSize for mac?
   // TODO: Think to use this dockwidget as a drawer: // this->setWindowFlags(Qt::Drawer); // Need to check the bug http://bugreports.qt.nokia.com/browse/QTBUG-15897
-  this->setStyleSheet("QDockWidget {color: white;} QDockWidget::title {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(0, 0, 0, 255), stop:0.95 rgba(64, 64, 64, 255), stop:1 rgba(200, 200, 200, 255)); text-align: center; padding-left: -25px;}");
+  this->setStyleSheet("QDockWidget {color: white;} \
+                       QDockWidget::title {background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(128, 128, 128, 255), stop:0.5 rgba(0, 0, 0, 255), stop:0.95 rgba(64, 64, 64, 255), stop:1 rgba(200, 200, 200, 255)); text-align: center; padding-left: -25px;} \
+                       QDockWidget::close-button {subcontrol-position: top right; subcontrol-origin: margin; position: absolute; top: -1px; left: 0px; bottom: 0px; right: 0px; width: 24px;} \
+                       QDockWidget::float-button {subcontrol-position: top right; subcontrol-origin: margin; position: absolute; top: -1px; left: 0px; bottom: 0px; right: 20px; width: 24px;}");
   this->modelTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
   
   // A white background looks better when the tree is disabled
