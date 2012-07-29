@@ -70,7 +70,9 @@ namespace btk
     float GetLabelMargin() const {return this->m_LabelMargin;}
     BTK_VTK_EXPORT void SetLabelMargin(float margin);
     
-    // BTK_VTK_EXPORT virtual void Update();
+    BTK_VTK_EXPORT virtual void AutoScale();
+    BTK_VTK_EXPORT virtual void RecalculateTickSpacing();
+    BTK_VTK_EXPORT virtual void Update();
     BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
     
     double GetTickScale() const {return this->m_TickScale;};
@@ -78,10 +80,13 @@ namespace btk
     double GetTickOffset() const {return this->m_TickOffset;};
     BTK_VTK_EXPORT void SetTickOffset(double offset);
     
+    bool GetDisplayMinimumLimit() const {return this->m_DisplayMinimumLimit;};
+    BTK_VTK_EXPORT void SetDisplayMinimumLimit(bool displayed);
+    
   protected:
     BTK_VTK_EXPORT VTKAxis();
-    BTK_VTK_EXPORT void GenerateTickLabels(double min, double max);
-    BTK_VTK_EXPORT void GenerateTickLabels();
+    BTK_VTK_EXPORT void GenerateTickLabels2(double min, double max);
+    BTK_VTK_EXPORT void GenerateTickLabels2();
     
     bool m_TitleVisible;
     float m_TickLength;
@@ -91,6 +96,7 @@ namespace btk
     float m_LabelMargin;
     double m_TickScale;
     double m_TickOffset;
+    bool m_DisplayMinimumLimit;
     
   private:
     VTKAxis(const VTKAxis& ); // Not implemented.
