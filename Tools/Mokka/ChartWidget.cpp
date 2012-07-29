@@ -1111,7 +1111,7 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointer
   if ((item->type() == MarkerType) || (item->type() == PointType))
   {
     id = item->data(0, PointId).toInt();
-    if (id >= acq->pointCount())
+    if (acq->points().find(id) == acq->points().end())
     {
       qDebug("Point ID greater or equal to the number of points.");
       return false;
