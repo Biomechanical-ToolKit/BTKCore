@@ -352,6 +352,7 @@ namespace btk
     transform->Delete();
     pose->Delete();
     axesColors->Delete();
+    indexGenerator->Delete();
     indexScale->Delete();
     indexTransform->Delete();
 
@@ -359,12 +360,10 @@ namespace btk
     {
       append1->Update();
       output1->ShallowCopy(append1->GetOutput());
-      append1->Delete();
       if (this->m_ShowAxes)
       {
         append2->Update();
         output2->ShallowCopy(append2->GetOutput());
-        append2->Delete();
       }
       else 
         output2->Initialize();
@@ -372,7 +371,6 @@ namespace btk
       {
         append3->Update();
         output3->ShallowCopy(append3->GetOutput());
-        append3->Delete();
       }
       else
         output3->Initialize();
@@ -383,6 +381,9 @@ namespace btk
       output2->Initialize();
       output3->Initialize();
     }
+    append1->Delete();
+    append2->Delete();
+    append3->Delete();
     
     return 1;
   };
