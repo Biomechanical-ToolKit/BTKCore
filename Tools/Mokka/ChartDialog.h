@@ -32,43 +32,29 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#include "ExportSTLDialog.h"
 
-#include <QFileDialog>
+#ifndef ChartDialog_h
+#define ChartDialog_h
 
-ExportSTLDialog::ExportSTLDialog(QWidget* parent)
-: QDialog(parent)
+#include <QDialog>
+
+class ChartWidget;
+
+class ChartDialog : public QDialog
 {
-  this->setupUi(this);
-#ifdef Q_OS_MAC
-  this->layout()->setContentsMargins(12,18,12,12);
-  this->setWindowFlags(Qt::Sheet);
-  this->setWindowModality(Qt::WindowModal);
-  this->resize(this->width(), this->height()-1); // FIXME: Only the way to remove the size grip under MacOS X?
-#endif
+  Q_OBJECT
   
-  connect(this->pathButton, SIGNAL(clicked()), this, SLOT(setExportPath()));
-  connect(this->pathLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validExportInfo()));
-  connect(this->filePrefixLineEdit, SIGNAL(textChanged(QString)), this, SLOT(validExportInfo()));
-  connect(this->segmentListWidget, SIGNAL(currentRowChanged(int)), this, SLOT(validExportInfo()));
+public:
+  ChartDialog(QWidget* parent = 0);
   
-  this->segmentListWidget->setFocus();
+  bool computeDistance(int id1, int id2);
+  bool computeAngleFromMarkers(int id1, int id2, int id3);
+  bool computeAngleFromVectors(const QList<int>& ids);
   
-  this->validExportInfo();
-};
+  ChartWidget* chart;
   
-void ExportSTLDialog::setExportPath()
-{
-  QString dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"), this->pathLineEdit->text());
-  if (!dir.isEmpty())
-    this->pathLineEdit->setText(dir);
+public slots:
+  void updateChartRendering();
 };
 
-void ExportSTLDialog::validExportInfo()
-{
-  bool valid = false;
-  if (!this->pathLineEdit->text().isEmpty() && !this->filePrefixLineEdit->text().isEmpty() && (this->segmentListWidget->currentRow() != -1))
-    valid = true;
-  this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(valid);
-};
+#endif // ChartDialog_h

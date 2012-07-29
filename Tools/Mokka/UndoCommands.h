@@ -136,6 +136,21 @@ private:
 //               POINT/MARKER EDITION              //
 // ----------------------------------------------- //
 
+//  --------------- CreateAveragedMarker  ---------------
+class CreateAveragedMarker : public AcquisitionUndoCommand
+{
+public:
+  CreateAveragedMarker(Acquisition* acq, const QList<int>& markers, QUndoCommand* parent = 0);
+  ~CreateAveragedMarker();
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  Acquisition* mp_Acquisition;
+  int m_Id;
+  Point* mp_Marker;
+};
+
 // --------------- EditPointLabel ---------------
 class EditPointLabel : public AcquisitionUndoCommand
 {

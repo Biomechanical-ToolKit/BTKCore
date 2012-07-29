@@ -35,8 +35,6 @@ IF(NOT BTK_DIR)
     SET(BTK_DIR_SEARCH ${BTK_DIR_SEARCH} ${dir}/../share/CMake)
   ENDFOREACH(dir)
   
-  MESSAGE(STATUS "${BTK_DIR_SEARCH}")
-
   #
   # Look for an installation or build tree.
   #

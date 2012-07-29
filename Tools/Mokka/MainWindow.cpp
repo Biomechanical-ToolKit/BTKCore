@@ -37,6 +37,7 @@
 #include "MainWindow.h"
 #include "About.h"
 #include "Acquisition.h"
+#include "ChartDialog.h"
 #include "CompositeView.h"
 #include "ExportASCIIDialog.h"
 #include "ExportSTLDialog.h"
@@ -70,7 +71,7 @@
 #include <QUndoStack>
 
 MainWindow::MainWindow(QWidget* parent)
-:QMainWindow(parent), m_LastDirectory("."), m_RecentFiles(), m_UserLayouts()
+:QMainWindow(parent), m_LastDirectory("."), m_RecentFiles(), m_UserLayouts(), m_ToolCharts()
 {
   // Members
   this->mp_Acquisition = new Acquisition(this);
@@ -133,6 +134,10 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuEvent->addAction(this->timeEventControler->actionEditSelectedEvents);
   this->menuEvent->addAction(this->timeEventControler->actionRemoveSelectedEvents);
   this->menuEvent->addAction(this->timeEventControler->actionClearEvents);
+  this->actionToolCreateMarker->setEnabled(false);
+  this->actionToolComputeMarkerDistance->setEnabled(false);
+  this->actionToolComputeMarkerAngle->setEnabled(false);
+  this->actionToolComputeVectorAngle->setEnabled(false);
 #ifdef Q_OS_MAC
   QFont f = this->font();
   f.setPointSize(10);
@@ -191,6 +196,16 @@ MainWindow::MainWindow(QWidget* parent)
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->timeEventControler->playbackSpeedMenu()->menuAction(), this->multiView->groundOrientationMenu());
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertMenu(this->multiView->groundOrientationMenu()->menuAction(), this->multiView->markerTrajectoryLengthMenu());
   this->timeEventControler->acquisitionOptionsButtonMenu->menu()->insertAction(this->timeEventControler->actionReframeFromOne, this->multiView->forceButterflyActivationAction());
+  this->timeEventControler->insertEventMenu()->actions()[0]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_7));  // Right Foot Strike
+  this->timeEventControler->insertEventMenu()->actions()[1]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_8));  // Right Toe Off
+  this->timeEventControler->insertEventMenu()->actions()[2]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_9));  // Right Other (unlabled)
+  this->timeEventControler->insertEventMenu()->actions()[4]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_4));  // Left Foot Strike
+  this->timeEventControler->insertEventMenu()->actions()[5]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_5));  // Left Toe Off
+  this->timeEventControler->insertEventMenu()->actions()[6]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_6));  // Left Other (unlabled)
+  this->timeEventControler->insertEventMenu()->actions()[8]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_1));  // General Foot Strike
+  this->timeEventControler->insertEventMenu()->actions()[9]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_2));  // General Toe Off
+  this->timeEventControler->insertEventMenu()->actions()[10]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_3)); // General Other (unlabled)
+  
   this->multiView->initialize();
   // Contextual menu for the 3D views
   QList<QAction*> actions3d;
@@ -294,6 +309,10 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionLayout3DOnly, SIGNAL(triggered()), this, SLOT(restoreLayout3DOnly()));
   connect(this->actionLayout3DVerbose, SIGNAL(triggered()), this, SLOT(restoreLayout3DVerbose()));
   connect(this->actionLayout3DCharts, SIGNAL(triggered()), this, SLOT(restoreLayout3DCharts()));
+  connect(this->actionToolCreateMarker, SIGNAL(triggered()), this, SLOT(createMarkerFromMarkersSelection()));
+  connect(this->actionToolComputeMarkerDistance, SIGNAL(triggered()), this, SLOT(computeDistanceFromMarkersSelection()));
+  connect(this->actionToolComputeMarkerAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection()));
+  connect(this->actionToolComputeVectorAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection2()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -481,6 +500,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
   else if ((event->type() == QEvent::KeyPress) && this->timeEventControler->isEnabled())
   {
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+    // Frame by frame
     if (keyEvent->matches(QKeySequence::MoveToPreviousChar))
     {
       this->timeEventControler->previousFrame();
@@ -491,11 +511,24 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
       this->timeEventControler->nextFrame();
       return true;
     }
+    // 10 frames by 10 frames
+    else if (((keyEvent->modifiers() & Qt::AltModifier) == Qt::AltModifier) && (keyEvent->key() == Qt::Key_Left))
+    {
+      this->timeEventControler->previousFrame(10);
+      return true;
+    }
+    else if (((keyEvent->modifiers() & Qt::AltModifier) == Qt::AltModifier) && (keyEvent->key() == Qt::Key_Right))
+    {
+      this->timeEventControler->nextFrame(10);
+      return true;
+    }
+    // Playback
     else if (keyEvent->key() == Qt::Key_Space)
     {
       this->timeEventControler->togglePlayback();
       return true;
     }
+    // Marker(s) deselection
     else if (keyEvent->key() == Qt::Key_Escape)
     {
       this->mp_ModelDock->modelTree->clearSelection();
@@ -793,6 +826,172 @@ void MainWindow::manageUserLayouts()
   this->mp_Preferences->showLayoutsPreferences();
 };
 
+void MainWindow::createMarkerFromMarkersSelection()
+{
+  QList<int> selectedMarkers;
+  if (this->extractSelectedMarkers(selectedMarkers))
+  {
+    if (selectedMarkers.size() < 2)
+    {
+      QMessageBox error(QMessageBox::Warning, "Tools", "A minimum of two markers is required to create an averaged marker.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.exec();
+    }
+    else
+    {
+      QList<int> ids;
+      QList<bool> visibles, trajectories;
+      QList<double> radii;
+      QList<QColor> colors;
+      // Extract All the IDs used by the markers and virtual markers
+      QList<QTreeWidgetItem*> roots;
+      roots << this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::MarkersItem);
+      roots << this->mp_ModelDock->modelTree->topLevelItem(ModelDockWidget::VirtualMarkersItem);
+      for (QList<QTreeWidgetItem*>::iterator itR = roots.begin() ; itR != roots.end() ; ++itR)
+      {
+        for (int j = 0 ; j < (*itR)->childCount() ; ++j)
+          ids << (*itR)->child(j)->data(0, PointId).toInt();
+      }
+      // Create the new marker and reapply the configuration (reset in the VTK pipeline)
+      for (QList<AbstractView*>::const_iterator it = this->multiView->views().begin() ; it != this->multiView->views().end() ; ++it)
+        static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D)->setUpdatesEnabled(false);
+      QApplication::setOverrideCursor(Qt::WaitCursor);
+      this->multiView->markersConfiguration(ids, visibles, trajectories, radii, colors);
+      this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new CreateAveragedMarker(this->mp_Acquisition, selectedMarkers)));
+      this->multiView->setMarkersConfiguration(ids, visibles, trajectories, radii, colors);
+      QApplication::restoreOverrideCursor();
+      for (QList<AbstractView*>::const_iterator it = this->multiView->views().begin() ; it != this->multiView->views().end() ; ++it)
+        static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D)->setUpdatesEnabled(true);
+    }
+  }
+};
+
+void MainWindow::computeDistanceFromMarkersSelection()
+{
+  QList<int> selectedMarkers;
+  if (this->extractSelectedMarkers(selectedMarkers))
+  {
+    if (selectedMarkers.size() != 2)
+    {
+      QMessageBox error(QMessageBox::Warning, "Tools", "Only two markers must be selected to compute the distance between them.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.exec();
+    }
+    else
+    {
+      ChartDialog* chartDialog = this->multiView->createChartDialog(this);
+      this->showChartTool(chartDialog, chartDialog->computeDistance(selectedMarkers[0], selectedMarkers[1]));
+    }
+  }
+};
+
+void MainWindow::computeAngleFromMarkersSelection()
+{
+  QList<int> selectedMarkers;
+  if (this->extractSelectedMarkers(selectedMarkers))
+  {
+    if (selectedMarkers.size() != 3)
+    {
+      QMessageBox error(QMessageBox::Warning, "Tools", "Only three markers must be selected to compute the angle between them.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.exec();
+    }
+    else
+    {
+      ChartDialog* chartDialog = this->multiView->createChartDialog(this);
+      this->showChartTool(chartDialog, chartDialog->computeAngleFromMarkers(selectedMarkers[0], selectedMarkers[1], selectedMarkers[2]));
+    }
+  }
+};
+
+void MainWindow::computeAngleFromMarkersSelection2()
+{
+  QList<int> selectedMarkers;
+  if (this->extractSelectedMarkers(selectedMarkers))
+  {
+    if ((selectedMarkers.size() != 3) && (selectedMarkers.size() != 4))
+    {
+      QMessageBox error(QMessageBox::Warning, "Tools", "Three of four markers must be selected to compute the angle between the two constructed vectors.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.exec();
+    }
+    else
+    {
+      ChartDialog* chartDialog = this->multiView->createChartDialog(this);
+      this->showChartTool(chartDialog, chartDialog->computeAngleFromVectors(selectedMarkers));
+    }
+  }
+};
+
+bool MainWindow::extractSelectedMarkers(QList<int>& selectedMarkers)
+{
+  selectedMarkers.clear();
+  bool mixedSelection = false;
+  QList<QTreeWidgetItem*> items = this->mp_ModelDock->modelTree->selectedItems();
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    if ((*it)->type() != MarkerType)
+    {
+      mixedSelection = true;
+      break;
+    }
+    else
+      selectedMarkers.push_back((*it)->data(0,PointId).toInt());
+  }
+  
+  if (mixedSelection)
+  {
+    QMessageBox error(QMessageBox::Warning, "Tools", "The selection is not only composed of markers.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+    error.setWindowFlags(Qt::Sheet);
+    error.setWindowModality(Qt::WindowModal);
+#endif
+    error.exec();
+    return false;
+  }
+  return true;
+}
+
+void MainWindow::showChartTool(ChartDialog* chartDialog, bool computed)
+{
+  // Clean current hidden tool charts
+  QList<ChartDialog*>::iterator it = this->m_ToolCharts.begin();
+  while (it != this->m_ToolCharts.end())
+  {
+    if (!(*it)->isVisible())
+    {
+      (*it)->deleteLater();
+      it = this->m_ToolCharts.erase(it);
+    }
+    else
+      ++it;
+  }
+  // Modeless dialog
+  if (computed)
+  {
+    this->m_ToolCharts << chartDialog;
+    chartDialog->installEventFilter(this);
+    connect(this->timeEventControler, SIGNAL(currentFrameChanged(int)), chartDialog, SLOT(updateChartRendering()));
+    chartDialog->show();
+    chartDialog->raise();
+    chartDialog->activateWindow();
+  }
+  else
+    chartDialog->deleteLater();
+};
+
 void MainWindow::play()
 {
   this->timeEventControler->togglePlayback();
@@ -901,7 +1100,6 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   
   pw->setProgressValue(40);
   
-  // this->multiView->setGRFButterflyActivation(this->mp_Preferences->defaultGRFButterflyActivationComboBox->currentIndex() == 0);
   this->multiView->load();
   
   pw->setProgressValue(90);
@@ -930,6 +1128,11 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionViewMetadata->setEnabled(true);
   this->actionSave_As->setEnabled(true);
   this->menuExport->menuAction()->setEnabled(true);
+  // Tools Menu
+  this->actionToolCreateMarker->setEnabled(true);
+  this->actionToolComputeMarkerDistance->setEnabled(true);
+  this->actionToolComputeMarkerAngle->setEnabled(true);
+  this->actionToolComputeVectorAngle->setEnabled(true);
 };
 
 void MainWindow::saveFile()
@@ -1004,6 +1207,18 @@ void MainWindow::saveFile(const QString& filename)
 
 void MainWindow::closeFile()
 {
+  // Special case for the tools (Chart dialog, etc.)
+  for (QList<ChartDialog*>::iterator it = this->m_ToolCharts.begin() ; it != this->m_ToolCharts.end() ; ++it)
+  {
+    if (QApplication::activeWindow() == *it)
+    {
+      (*it)->setVisible(false);
+      (*it)->deleteLater();
+      this->m_ToolCharts.erase(it);
+      return;
+    }
+  }
+  // General behavior
   if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
   {
     LOG_INFO(tr("Closing acquisition."));
@@ -1330,8 +1545,8 @@ void MainWindow::exportSTL()
   exporterDlg.filePrefixLineEdit->setText(QFileInfo(this->mp_Acquisition->fileName()).baseName());
   for (QMap<int, Segment*>::const_iterator it = this->mp_Model->segments().begin() ; it != this->mp_Model->segments().end() ; ++it)
     exporterDlg.segmentListWidget->addItem(it.value()->label);
-  if (exporterDlg.segmentListWidget->count() == 1)
-    exporterDlg.segmentListWidget->setCurrentRow(0);
+  // FIXME: Adding items seems to select the first one but doesn't highlight it. Moreoever, it seems impossible to unselect it, so its selection is forced. 
+  exporterDlg.segmentListWidget->setCurrentRow(0);
   if (exporterDlg.exec() == QDialog::Accepted)
   {
     QString filePrefix = exporterDlg.pathLineEdit->text() + "/" + exporterDlg.filePrefixLineEdit->text();
@@ -1633,6 +1848,19 @@ void MainWindow::reset()
   this->actionSave_As->setEnabled(false);
   this->menuExport->menuAction()->setEnabled(false);
   this->setCurrentFile("");
+  // Tools Menu
+  this->actionToolCreateMarker->setEnabled(false);
+  this->actionToolComputeMarkerDistance->setEnabled(false);
+  this->actionToolComputeMarkerAngle->setEnabled(false);
+  this->actionToolComputeVectorAngle->setEnabled(false);
+  // Tools modeless window
+  QList<ChartDialog*>::iterator it = this->m_ToolCharts.begin();
+  while (it != this->m_ToolCharts.end())
+  {
+    (*it)->setVisible(false);
+    (*it)->deleteLater();
+    it = this->m_ToolCharts.erase(it);
+  }
   // Model dock
   this->mp_ModelDock->reset();
   // Metadata

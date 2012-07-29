@@ -4,8 +4,8 @@ SET(QT_USE_PHONON TRUE)
 INCLUDE(${QT_USE_FILE})
 
 SET(MOKKA_VERSION_MAJOR 0)
-SET(MOKKA_VERSION_MINOR 5)
-SET(MOKKA_VERSION_PATCH 1)
+SET(MOKKA_VERSION_MINOR 6a1)
+SET(MOKKA_VERSION_PATCH 0)
 IF (MOKKA_VERSION_PATCH EQUAL 0)
   SET(MOKKA_VERSION_STRING "${MOKKA_VERSION_MAJOR}.${MOKKA_VERSION_MINOR}")
 ELSE (MOKKA_VERSION_PATCH EQUAL 0)
@@ -20,6 +20,7 @@ SET(Mokka_CPP
   About.cpp
   AbstractMultiView.cpp
   AbstractView.cpp
+  ChartDialog.cpp
   ChartExportDialog.cpp
   ChartOptionsWidget.cpp
   ChartImagePreview.cpp
@@ -59,6 +60,7 @@ SET(Mokka_H
   Acquisition.h
   AbstractMultiView.h
   AbstractView.h
+  ChartDialog.h
   ChartExportDialog.h
   ChartOptionsWidget.h
   ChartImagePreview.h
@@ -191,7 +193,9 @@ IF(NOT BTK_INSTALL_NO_RUNTIME)
         INSTALL(DIRECTORY "${BTK_BINARY_DIR}/Documentation/MokkaHelp" DESTINATION "${BTK_INSTALL_BIN_DIR_CM24}")
       ENDIF(EXISTS "${BTK_BINARY_DIR}/Documentation/MokkaHelp")
     ELSE(WIN32) # Linux
-      INSTALL(DIRECTORY "${BTK_BINARY_DIR}/Documentation/MokkaHelp" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/doc/btk/mokka")
+      IF(EXISTS "${BTK_BINARY_DIR}/Documentation/MokkaHelp")
+        INSTALL(DIRECTORY "${BTK_BINARY_DIR}/Documentation/MokkaHelp" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/doc/btk/mokka")
+      ENDIF(EXISTS "${BTK_BINARY_DIR}/Documentation/MokkaHelp")
     ENDIF(WIN32)
   ENDIF(APPLE)
 ENDIF(NOT BTK_INSTALL_NO_RUNTIME)

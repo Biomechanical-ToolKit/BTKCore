@@ -226,10 +226,21 @@
       <string>Event</string>
      </property>
     </widget>
+    <widget class="QMenu" name="menuMarker">
+     <property name="title">
+      <string>Marker</string>
+     </property>
+     <addaction name="actionToolCreateMarker"/>
+     <addaction name="separator"/>
+     <addaction name="actionToolComputeMarkerDistance"/>
+     <addaction name="actionToolComputeMarkerAngle"/>
+     <addaction name="actionToolComputeVectorAngle"/>
+    </widget>
     <addaction name="menuModel"/>
     <addaction name="separator"/>
     <addaction name="menuAcquisition"/>
     <addaction name="menuEvent"/>
+    <addaction name="menuMarker"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -529,6 +540,26 @@
   <action name="actionImportDelsysEMG">
    <property name="text">
     <string>Delsys EMG file..</string>
+   </property>
+  </action>
+  <action name="actionToolCreateMarker">
+   <property name="text">
+    <string>Create Average Marker</string>
+   </property>
+  </action>
+  <action name="actionToolComputeMarkerAngle">
+   <property name="text">
+    <string>Compute Angle between 3 Markers</string>
+   </property>
+  </action>
+  <action name="actionToolComputeMarkerDistance">
+   <property name="text">
+    <string>Compute Distance between 2 Markers</string>
+   </property>
+  </action>
+  <action name="actionToolComputeVectorAngle">
+   <property name="text">
+    <string>Compute Angle between 2 Vectors</string>
    </property>
   </action>
  </widget>

@@ -45,9 +45,9 @@
  * - see msinttypes issue 10: http://code.google.com/p/msinttypes/issues/detail?id=10
  * - see BTK issue 30: http://code.google.com/p/b-tk/issues/detail?id=30
  */
-#if _MSC_VER >= 1600
+#if _MSC_VER >= 1600 // [
   #include <stdint.h>
-#endif
+#else
 
 #include <limits.h>
 
@@ -237,5 +237,6 @@ typedef uint64_t  uintmax_t;
 
 #endif // __STDC_CONSTANT_MACROS ]
 
+#endif // _MSC_VER_1600 ]
 
 #endif // _MSC_STDINT_H_ ]

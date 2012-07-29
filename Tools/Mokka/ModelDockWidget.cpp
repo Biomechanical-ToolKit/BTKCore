@@ -600,18 +600,12 @@ QList<int> ModelDockWidget::selectedMarkers() const
 {
   QList<int> ids;
   QTreeWidgetItem* markersRoot = this->modelTree->topLevelItem(MarkersItem);
-  for (int i = 0 ; i < markersRoot->childCount() ; ++i)
-  {
-    QTreeWidgetItem* item = markersRoot->child(i);
-    if (item->isSelected())
-      ids << item->data(0, PointId).toInt();
-  }
   QTreeWidgetItem* virtualMarkersRoot = this->modelTree->topLevelItem(VirtualMarkersItem);
-  for (int i = 0 ; i < virtualMarkersRoot->childCount() ; ++i)
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
-    QTreeWidgetItem* item = virtualMarkersRoot->child(i);
-    if (item->isSelected())
-      ids << item->data(0, PointId).toInt();
+    if (((*it)->parent() == markersRoot) || ((*it)->parent() == virtualMarkersRoot))
+      ids << (*it)->data(0, PointId).toInt();
   }
   return ids;
 };
@@ -1394,7 +1388,13 @@ void ModelDockWidget::setTrackedMarkers(const QList<int>& ids)
 void ModelDockWidget::selectMarkers(QList<int> ids)
 {
   this->modelTree->blockSignals(true);
-  this->modelTree->clearSelection();
+  
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  for (QList<QTreeWidgetItem*>::iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    if (ids.indexOf((*it)->data(0, PointId).toInt()) == -1)
+      (*it)->setSelected(false);
+  }
   
   QList<QTreeWidgetItem*> roots;
   roots << this->modelTree->topLevelItem(MarkersItem);
@@ -1997,7 +1997,8 @@ void ModelDockWidget::sendModifiedMarkersState(QTreeWidgetItem* item, int column
 
 void ModelDockWidget::editMarkerLabel()
 {
-  int id = this->modelTree->currentItem()->data(0, PointId).toInt();
+  // With Qt 4.7.3, the use of QTreeWidget::currentItem() returns a corrupted item if this one was selected programmatically (from VTK).
+  int id = this->modelTree->selectedItems()[0]->data(0, PointId).toInt();
   QString label = this->markerLabelEdit->text();
   if (label.compare(this->mp_Acquisition->pointLabel(id)) != 0)
     emit markerLabelChanged(id, label);
@@ -2285,11 +2286,11 @@ void ModelDockWidget::setPointLabel(int id, const QString& label)
     }
   }
   // Other points
-  QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(this->modelTree->topLevelItemCount() - 1);
+  QTreeWidgetItem* modelOutputsRoot = this->modelTree->topLevelItem(ModelOutputsItem);
   for (int i = 0 ; i < modelOutputsRoot->childCount() ; ++i)
   {
     QTreeWidgetItem* child = modelOutputsRoot->child(i);
-    for (int j = 0 ; j < modelOutputsRoot->childCount() ; ++j)
+    for (int j = 0 ; j < child->childCount() ; ++j)
     {
       if (child->child(j)->data(0, PointId).toInt() == id)
       {
@@ -2381,6 +2382,7 @@ void ModelDockWidget::removePoints(const QList<int>& ids, const QList<Point*>& p
     }
   }
   this->modelTree->blockSignals(false);
+  this->sendSelectedMarkers();
   this->sendHiddenMarkers();
   this->refresh();
   if (itemUnselected)
@@ -2399,7 +2401,6 @@ void ModelDockWidget::removePoints(const QList<int>& ids, const QList<Point*>& p
   }
 };
 
-// TODO: Think about the case where points are created instead of hidden!
 void ModelDockWidget::insertPoints(const QList<int>& ids, const QList<Point*>& points)
 {
   Q_UNUSED(points);
@@ -3291,14 +3292,28 @@ void ModelDockWidget::refresh()
   }
 };
 
-QTreeWidgetItem* ModelDockWidget::treePointChild(QTreeWidgetItem* parent, int id) const
+QTreeWidgetItem* ModelDockWidget::treePointChild(QTreeWidgetItem* parent, int id)
 {
+  // Existing child
   for (int i = 0 ; i < parent->childCount() ; ++i)
   {
     QTreeWidgetItem* child = parent->child(i);
     if (child->data(0, PointId).toInt() == id)
       return child;
   }
+  // New marker
+  QMap<int, Point*>::const_iterator it = this->mp_Acquisition->points().find(id);
+  if ((parent == this->modelTree->topLevelItem(MarkersItem)) && (it != this->mp_Acquisition->points().end()))
+  {
+    this->modelTree->clearSelection();
+    QTreeWidgetItem* item = this->createMarkerItem(it.value()->label, it.key());
+    parent->addChild(item);
+    item->setSelected(true);
+    this->modelTree->scrollToItem(item);
+    this->sendSelectedMarkers();
+    return item;
+  }
+  // Unknown
   return 0;
 };
 

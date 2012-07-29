@@ -72,6 +72,9 @@ public:
   
   bool eventItemData(int index, int& typeId, int& frame, double rgb[3]);
   
+  void nextFrame(int inc);
+  void previousFrame(int dcr);
+  
 public slots:
   void lcdDisplay(int frame);
   void togglePlayback();

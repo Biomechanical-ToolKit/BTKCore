@@ -41,6 +41,7 @@
 #include <btkMetaDataUtils.h>
 #include <btkMergeAcquisitionFilter.h>
 #include <btkAcquisitionFileIOFactory.h>
+#include <btkConvert.h>
 
 #include <Qt>
 #include <QFileInfo>
@@ -57,16 +58,13 @@ Acquisition::Acquisition(QObject* parent)
   this->m_LastFrame = 0;
   this->mp_ROI[0] = this->m_FirstFrame;
   this->mp_ROI[1] = this->m_LastFrame;
+  this->m_LastPointId = -1;
   this->m_LastEventId = -1;
   this->m_LastVideoId = -1;
   this->m_DefaultMarkerRadius = 8.0; // mm
   
   // BTK PIPELINE
   btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
-  btk::CollectionAssembly<btk::Point>::Pointer virtualMarkersAssembly = btk::CollectionAssembly<btk::Point>::New();
-  virtualMarkersAssembly->SetInput(0, virtualMarkersSeparator->GetOutput(0)); // Markers
-  virtualMarkersAssembly->SetInput(1, virtualMarkersSeparator->GetOutput(2)); // Virtual markers
-  virtualMarkersAssembly->SetInput(2, virtualMarkersSeparator->GetOutput(1)); // Virtual markers used by frames
   btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = btk::ForcePlatformsExtractor::New();
   btk::GroundReactionWrenchFilter::Pointer GRWsFilter = btk::GroundReactionWrenchFilter::New();
   GRWsFilter->SetThresholdValue(5.0); // PWA are not computed from vertical forces lower than 5 newtons.
@@ -77,7 +75,6 @@ Acquisition::Acquisition(QObject* parent)
   btk::WrenchDirectionAngleFilter::Pointer wrenchDirectionAngleFilter = btk::WrenchDirectionAngleFilter::New();
   wrenchDirectionAngleFilter->SetInput(GRWsDownsampler->GetOutput());
   this->m_BTKProcesses[BTK_SORTED_POINTS] = virtualMarkersSeparator;
-  this->m_BTKProcesses[BTK_GROUPED_POINTS] = virtualMarkersAssembly;
   this->m_BTKProcesses[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
   this->m_BTKProcesses[BTK_GRWS] = GRWsFilter;
   this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
@@ -319,6 +316,7 @@ void Acquisition::clear()
   for (QMap<int,Video*>::iterator it = this->m_Videos.begin() ; it != this->m_Videos.end() ; ++it)
     delete *it;
   this->m_Videos.clear();
+  this->m_LastPointId = -1;
   this->m_LastEventId = -1;
   this->m_LastVideoId = -1;
   this->mp_BTKAcquisition = btk::Acquisition::Pointer(); // NULL
@@ -450,7 +448,6 @@ void Acquisition::resetMarkersConfiguration(const QList<int>& ids, const QList<b
     }
     else
     {
-      qDebug("Point '%s' set as unknown", qPrintable((*it)->label));
       (*it)->radius = this->m_DefaultMarkerRadius;
       (*it)->color = this->m_DefaultMarkerColor;
       (*it)->visible = (((*it)->type == Point::Marker) ? true : false);
@@ -464,6 +461,7 @@ void Acquisition::resetMarkersConfiguration(const QList<int>& ids, const QList<b
   emit markersConfigurationReset(ids_, visibles_, trajectories_, radii_, colors_);
 };
 
+
 void Acquisition::setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors)
 {
   for (int i = 0 ; i < ids.count() ; ++i)
@@ -473,6 +471,99 @@ void Acquisition::setMarkersColor(const QVector<int>& ids, const QVector<QColor>
       (*it)->color = colors[i];
   }
   emit markersColorChanged(ids, colors);
+};
+
+int Acquisition::createAveragedMarker(const QList<int>& markerIds)
+{
+  btk::PointCollection::Pointer markers = btk::PointCollection::New();
+  std::string desc = "Average between the markers ";
+  for (int i = 0 ; i < markerIds.count() ; ++i)
+  {
+    QMap<int,Point*>::iterator it = this->m_Points.find(markerIds[i]);
+    if (it != this->m_Points.end())
+    {
+      if ((*it)->btkidx < this->mp_BTKAcquisition->GetPoints()->GetItemNumber())
+      {
+        btk::Point::Pointer pt = this->mp_BTKAcquisition->GetPoints()->GetItem((*it)->btkidx);
+        if (i != 0)
+        {
+          if (i == (markerIds.count()-1))
+            desc += " and ";
+          else
+            desc += ", ";
+        }
+        desc += pt->GetLabel();
+        markers->InsertItem(pt);
+      }
+      else
+      {
+        qWarning("No marker found in the BTK acquisition with the index %i", (*it)->btkidx);
+        return -1;
+      }
+    }
+    else
+    {
+      qDebug("The marker with the index %i was not found!", markerIds[i]);
+      return -1;
+    }
+  }
+  int numMarkers = markers->GetItemNumber();
+  if (numMarkers < 2)
+  {
+    qDebug("At least two markers are required to create an averaged marker!");
+    return -1;
+  }
+  
+  btk::Point::Pointer average = btk::Point::New("Uname*" + btk::ToString(this->m_LastPointId+1), this->pointFrameNumber(), btk::Point::Marker, desc);
+  for (int i = 0  ; i < this->pointFrameNumber() ; ++i)
+  {
+    bool valid = true;
+    for (btk::PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
+    {
+      if ((*it)->GetResiduals().coeff(i) < 0.0)
+      {
+        valid = false;
+        break;
+      }
+    }
+    if (valid)
+    {
+      double x = 0.0, y = 0.0, z = 0.0;
+      for (btk::PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
+      {
+        x += (*it)->GetValues().coeff(i,0);
+        y += (*it)->GetValues().coeff(i,1);
+        z += (*it)->GetValues().coeff(i,2);
+      }
+      average->SetFrame(i, x / static_cast<double>(numMarkers),
+                           y / static_cast<double>(numMarkers),
+                           z / static_cast<double>(numMarkers));
+    }
+    else
+      average->SetFrame(i, 0.0, 0.0, 0.0, -1.0, -1.0);
+  }
+  this->mp_BTKAcquisition->GetPoints()->InsertItem(average);
+  
+  Point* p = new Point();
+  p->label = QString::fromStdString(average->GetLabel());
+  p->description = QString::fromStdString(average->GetDescription());
+  p->type = Point::Marker;
+  p->visible = true;
+  p->trajectoryVisible = false;
+  p->radius = this->m_DefaultMarkerRadius;
+  p->color = this->m_DefaultMarkerColor;
+  p->btkidx = this->m_LastPointId;
+  this->insertPoints(QList<int>() << this->m_LastPointId, QList<Point*>() << p);
+
+  LOG_INFO("Marker " + p->label + " created. " + p->description);
+  this->m_LastPointId++;
+  return p->btkidx;
+};
+
+int Acquisition::generateNewPointId()
+{
+  this->m_LastPointId += 1;
+  return this->m_LastPointId;
 };
 
 QList<Point*> Acquisition::takePoints(const QList<int>& ids)
@@ -499,7 +590,7 @@ void Acquisition::insertPoints(const QList<int>& ids, const QList<Point*> points
     if (it == this->m_Points.end())
       this->m_Points.insert(ids[i], points[i]);
     else
-      qDebug("A point with the given ID already exists");
+      qDebug("A point with the given ID already exists: %s", qPrintable((*it)->label));
   }
   emit pointsInserted(ids, points);
 };
@@ -1064,7 +1155,7 @@ void Acquisition::loadAcquisition()
     p->radius = this->m_DefaultMarkerRadius;
     p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
+    this->m_Points.insert(virtualMarkersSeparator->GetOutput(4)->GetIndexOf(*it), p);
   }
   // Virtual markers (CoM, CoG, ...)
   points = virtualMarkersSeparator->GetOutput(2);
@@ -1079,7 +1170,7 @@ void Acquisition::loadAcquisition()
     p->radius = this->m_DefaultMarkerRadius;
     p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
+    this->m_Points.insert(virtualMarkersSeparator->GetOutput(4)->GetIndexOf(*it), p);
   }
   // Virtual markers used to define frames
   points = virtualMarkersSeparator->GetOutput(1);
@@ -1094,8 +1185,9 @@ void Acquisition::loadAcquisition()
     p->radius = this->m_DefaultMarkerRadius;
     p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
+    this->m_Points.insert(virtualMarkersSeparator->GetOutput(4)->GetIndexOf(*it), p);
   }
+  this->m_LastPointId = this->m_Points.size();
   // Other points
   points = virtualMarkersSeparator->GetOutput(3);
   for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
@@ -1118,7 +1210,7 @@ void Acquisition::loadAcquisition()
     p->radius = -1.0;
     p->color = QColor::Invalid;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
+    this->m_Points.insert(65535 + inc++, p); // 65535: To distinct clearly the markers from the others points.
   }
   // Analog
   inc = 0;
