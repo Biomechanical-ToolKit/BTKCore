@@ -221,10 +221,28 @@ namespace btk
   };
   
   /**
-   * Finish the computation of the wrench for the force platform type I (nothing to do).
+   * Finish the computation of the wrench for the force platform type I.
+   * Because, it is force platform Type I, the position is not set to the origin, but measured to the COP. The moment must be corrected!
    */
-  void ForcePlatformWrenchFilter::FinishTypeI(Wrench::Pointer /* wrh */, ForcePlatform::Pointer /* fp */, int /* index */)
-  {};
+  void ForcePlatformWrenchFilter::FinishTypeI(Wrench::Pointer wrh , ForcePlatform::Pointer /* fp */, int /* index */)
+  {
+    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Component;
+    Component Fx = wrh->GetForce()->GetValues().col(0);
+    Component Fy = wrh->GetForce()->GetValues().col(1);
+    Component Fz = wrh->GetForce()->GetValues().col(2);
+    Component Mx = wrh->GetMoment()->GetValues().col(0);
+    Component My = wrh->GetMoment()->GetValues().col(1);
+    Component Mz = wrh->GetMoment()->GetValues().col(2);
+    Component Px = wrh->GetPosition()->GetValues().col(0);
+    Component Py = wrh->GetPosition()->GetValues().col(1);
+    Component Pz = wrh->GetPosition()->GetValues().col(2);    
+    Mx -= Fy.cwise() * Pz - Py.cwise() * Fz;
+    My -= Fz.cwise() * Px - Pz.cwise() * Fx;
+    Mz -= Fx.cwise() * Py - Px.cwise() * Fy;
+    wrh->GetMoment()->GetValues().col(0) = Mx;
+    wrh->GetMoment()->GetValues().col(1) = My;
+    wrh->GetMoment()->GetValues().col(2) = Mz;
+  };
   
   /**
    * Finish the computation of the wrench for the AMTI force platform (nothing to do).
