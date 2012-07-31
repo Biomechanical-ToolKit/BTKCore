@@ -621,16 +621,18 @@ namespace btk
       {
         int32_t numPFsBis = bifs.ReadI32();
         if (numPFsBis != numPFs)
-          throw(TDFFileIOException("The number of force platforms in the configuration is not the same than the number used in the data."));
+        {
+          btkErrorMacro("The number of force platforms in the configuration is not the same than in the data block.");
+        }
         
         bifs.SeekRead(4, BinaryFileStream::Current);
-        bifs.SeekRead(numPFs*2, BinaryFileStream::Current);
+        bifs.SeekRead(numPFsBis*2, BinaryFileStream::Current);
         
-        // Need to test 'numPlatforms' ? Should not be physicaly to have more than 256 force platforms...
-        const int8_t numPlatforms = FPDoubleFormat ? numPFs * 2 : numPFs;
+        // Need to test 'numPlatforms' ? Should not be physicaly more than 256 force platforms...
+        const int8_t numPlatforms = FPDoubleFormat ? numPFsBis * 2 : numPFsBis;
         
         std::vector<float> cornersData;
-        for (int i = 0 ; i < numPFs ; ++i)
+        for (int i = 0 ; i < numPFsBis ; ++i)
         {
           bifs.SeekRead(256, BinaryFileStream::Current); // Label
           bifs.SeekRead(8, BinaryFileStream::Current); // Size
@@ -651,7 +653,7 @@ namespace btk
         {
           std::vector<float> cornersDataTemp = cornersData;
           cornersData.resize(cornersData.size() * 2);
-          for (int i = 0 ; i < numPFs ; ++i)
+          for (int i = 0 ; i < numPFsBis ; ++i)
           {
             for (int j = 0 ; j < 12 ; ++j)
             {
