@@ -38,10 +38,11 @@
 
 #include "ui_MainWindow.h"
 
+#include "Model.h" // Pair
+
 class Preferences;
 class Acquisition;
 struct Event;
-class Model;
 struct Segment;
 class ImportAssistantDialog;
 class FileInfoDockWidget;
@@ -50,6 +51,7 @@ class ModelDockWidget;
 class ProgressWidget;
 class UpdateChecker;
 class QUndoStack;
+class ChartDialog;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -73,6 +75,7 @@ public slots:
   void about();
   void help();
   void visitBTKWebsite();
+  void visitMokkaWebsite();
   void setAcquisitionModified(int modified);
   void viewMetadata();
   void clearRecentFiles();
@@ -101,12 +104,15 @@ public slots:
   void importPWR();
   void importAMTI();
   void importEMF();
+  void importDelsysEMG();
   void importVideos();
   void exportC3D();
   void exportTRC();
   void exportANB();
   void exportANC();
   void exportCAL();
+  void exportASCII();
+  void exportSTL();
   void showPreferences();
   void selectAll();
   void copy();
@@ -115,11 +121,17 @@ public slots:
   void restoreLayout3DOnly();
   void restoreLayout3DVerbose();
   void restoreLayout3DCharts();
+  void createMarkerFromMarkersSelection();
+  void computeDistanceFromMarkersSelection();
+  void computeAngleFromMarkersSelection();
+  void computeAngleFromMarkersSelection2();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
   void setMarkersRadius(const QVector<int>& ids, double radius);
   void setMarkersColor(const QVector<int>& ids, const QColor& color);
+  void setMarkersVisibility(const QVector<int>& ids, bool visible);
+  void setMarkersTrajectoryVisibility(const QVector<int>& ids, bool visible);
   void setPointsDescription(const QVector<int>& ids, const QString& desc);
   void removePoints(const QList<int>& ids);
   void setAnalogLabel(int id, const QString& label);
@@ -132,9 +144,11 @@ public slots:
   void setSegmentLabel(int id, const QString& label);
   void setSegmentsColor(const QVector<int>& ids, const QColor& color);
   void setSegmentsDescription(const QVector<int>& ids, QString desc);
-  void setSegmentLinks(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void setSegmentsVisibility(const QVector<int>& ids, bool visible);
+  void setSegmentsSurfaceVisibility(const QVector<int>& ids, bool visible);
   void removeSegments(const QList<int>& ids);
-  void insertSegment(Segment* seg);
+  void createSegment();
+  void editSegment();
   void setVideosDelay(const QVector<int>& ids, qint64 delay);
   void removeVideos(const QList<int>& ids);
   // Time event
@@ -149,6 +163,9 @@ public slots:
   void setPreferenceDefaultConfigurationPath(const QString& path);
   void setPreferenceUseEventEditorWhenInserting(bool isUsed);
   void setPreferenceDefaultOrientation(int index);
+  void setPreferenceDefaultTimeBarEventDisplay(int index);
+  void setPreferenceDefaultBackgroundColor(const QColor& color);
+  void setPreferenceDefaultGridColor(const QColor& color);
   void setPreferenceDefaultSegmentColor(const QColor& color);
   void setPreferenceDefaultMarkerColor(const QColor& color);
   void setPreferenceDefaultMarkerRadius(double radius);
@@ -157,6 +174,11 @@ public slots:
   void setPreferenceShowForcePlatformIndex(int index);
   void setPreferenceDefaultForcePlateColor(const QColor& color);
   void setPreferenceDefaultForceVectorColor(const QColor& color);
+  void setPreferenceDefaultGRFButterflyActivation(int index);
+  void setPreferenceShowForcePath(int index);
+  void setPreferencePlotLineWidth(double width);
+  void setPreferenceShowChartEvent(int index);
+  void setPreferenceChartUnitAxisX(int index);
   void setPreferenceAutomaticCheckUpdate(bool isChecked);
   // Others
   void updateSelectedMarkersRadius(double r);
@@ -185,7 +207,7 @@ private:
   void importAcquisition(const QString& filter);
   bool importAcquisitions(const QStringList& filenames, bool allFramesKept = true);
   void importAssistant(int systemIndex, bool systemLocked = false, bool allFramesKeptOnly = false);
-  bool importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept);
+  bool importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept, bool fromOpenAction = false);
   void reset();
   void setAcquisitionProperties(QMap<int, QVariant>& properties);
   void readSettings(); 
@@ -194,6 +216,9 @@ private:
   void setCurrentFile(const QString& rFilename);
   bool isOkToContinue();
   void updateUserLayoutActions();
+  void editSegment(bool isNew);
+  void showChartTool(ChartDialog* chartDialog, bool computed);
+  bool extractSelectedMarkers(QList<int>& selectedMarkers);
   
   Acquisition* mp_Acquisition;
   Model* mp_Model;
@@ -217,5 +242,7 @@ private:
   QUndoStack* mp_UndoStack;
   QUndoStack* mp_AcquisitionUndoStack;
   QUndoStack* mp_MarkerConfigurationUndoStack;
+  
+  QList<ChartDialog*> m_ToolCharts;
 };
 #endif // MainWindow_h

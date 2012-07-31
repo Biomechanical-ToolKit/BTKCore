@@ -1,7 +1,5 @@
 /**
-@htmlonly<div class="home"><img class="home" src="Mokka_128.png" height="32px" width="32px"/>Mokka Help<a href="index.html">Home</a><a href="_mokka_working.html">Working with Mokka</a><a href="_mokka_menu_bar.html">Menu Bar</a></div>@endhtmlonly
 @page MokkaImportAssistant Import Assistant
-@section MokkaImportAssistantSection Import Assistant
 
 The assistant will help you to import files categorized by acquisition system. For example, if you have a Motion Analysis system, this one generates 3 files (one for the markers: file TRB/TRC, one for the analog channels: ANB/ANC, one for the configuration of the force platforms: CA). Using the assistant you can easily merge them to create an acquisition with all the data. Then, you can save it in a C3D file by using the menu <tt>File > Save As</tt> or <tt>File > Export > C3D file...</tt>
 

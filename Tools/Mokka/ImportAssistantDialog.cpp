@@ -50,7 +50,17 @@ ImportAssistantDialog::ImportAssistantDialog(QWidget* parent)
   firstFrameRadioButtonGroup->addButton(this->keepAllFrameRadioButton);
   firstFrameRadioButtonGroup->addButton(this->keepHighestFirstFrameRadioButton);
   
+  this->videoFileTableWidget->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+  this->videoFileTableWidget->horizontalHeader()->setResizeMode(1, QHeaderView::Fixed);
+  this->videoFileTableWidget->horizontalHeader()->resizeSection(1, 24);
+  this->videoFileTableWidget->horizontalHeader()->setResizeMode(2, QHeaderView::Fixed);
+  this->videoFileTableWidget->horizontalHeader()->resizeSection(2, 24);
+  
+  this->m_OpenFileIcon = QIcon(QString::fromUtf8(":/Resources/Images/folder.png"));
+  this->m_DeleteFileIcon = QIcon(QString::fromUtf8(":/Resources/Images/plot_delete.png"));
+  
 #ifdef Q_OS_MAC
+  this->layout()->setContentsMargins(12,12,12,12);
   this->setWindowFlags(Qt::Sheet);
   this->setWindowModality(Qt::WindowModal);
   this->resize(this->width(), this->height()-1); // FIXME: Only the way to remove the size grip under MacOS X?
@@ -68,11 +78,14 @@ ImportAssistantDialog::ImportAssistantDialog(QWidget* parent)
   connect(this->elitePowerButton, SIGNAL(clicked()), this, SLOT(openElitePowerFileDialog()));
   connect(this->amtiForceMomentButton, SIGNAL(clicked()), this, SLOT(openAmtiFileDialog()));
   connect(this->amtiInformationsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setAmtiInformationUsed(int)));
+  connect(this->videoFileTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(editVideoFileTable(int, int)));
 };
 
 void ImportAssistantDialog::clear(const QString& dir)
 {
   this->m_Directory = dir;
+  
+  this->setWindowTitle(tr("Assistant"));
   
   this->acquisitionSystemComboBox->setEnabled(true);
   this->newAcquisitionRadioButton->setEnabled(true);
@@ -83,6 +96,8 @@ void ImportAssistantDialog::clear(const QString& dir)
   this->acquisitionSystemComboBox->setCurrentIndex(-1);
   this->newAcquisitionRadioButton->setChecked(true);
   this->keepAllFrameRadioButton->setChecked(true);
+  
+  this->importOptionFrame->setVisible(true);
   
   this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
   // Motion page
@@ -100,6 +115,11 @@ void ImportAssistantDialog::clear(const QString& dir)
   // AMTI page
   this->amtiForceMomentLineEdit->clear();
   this->amtiForceMomentLineEdit->setReadOnly(false);
+  this->amtiForceMomentButton->setEnabled(true);
+  // Video page
+  this->videoFileTableWidget->clearContents();
+  this->videoFileTableWidget->setRowCount(0);
+  this->addVideoFile("");
 };
 
 QStringList ImportAssistantDialog::filenames() const
@@ -121,9 +141,14 @@ QStringList ImportAssistantDialog::filenames() const
           << this->eliteMomentLineEdit->text().split(",", QString::SkipEmptyParts)
           << this->elitePowerLineEdit->text().split(",", QString::SkipEmptyParts);
   }
-  else // AMTI
+  else if (acquisitionSystemComboBox->currentIndex() == 2) // AMTI
   {
     files << this->amtiForceMomentLineEdit->text().split(",", QString::SkipEmptyParts);
+  }
+  else
+  {
+    for (int i = 0 ; i < this->videoFileTableWidget->rowCount()-1 ; ++i)
+      files << this->videoFileTableWidget->item(i,0)->text();
   }
   return files;
 };
@@ -320,4 +345,79 @@ btk::AMTIForcePlatformFileIO::Pointer ImportAssistantDialog::amtiFileIOCache()
   if (!this->mp_AMTIFileIOCache)
     this->mp_AMTIFileIOCache = btk::AMTIForcePlatformFileIO::New();
   return this->mp_AMTIFileIOCache;
+};
+
+void ImportAssistantDialog::editVideoFileTable(int row, int column)
+{
+  if (column == 0)
+    return;
+  this->videoFileTableWidget->blockSignals(true);
+  if (column == 1) // Open dialog
+  {
+    if (row != this->videoFileTableWidget->rowCount() - 1) // Set file
+    {
+      QString filename = QFileDialog::getOpenFileName(this, "",
+                                  this->videoFileTableWidget->item(row,0)->text(),
+                                  tr("All Files (*)"));
+      if (!filename.isEmpty())
+      {
+        this->m_Directory = QFileInfo(filename).absolutePath();
+        this->videoFileTableWidget->item(row,0)->setText(filename);
+      }
+    }
+    else
+    {
+      QStringList filenames = QFileDialog::getOpenFileNames(this, "",
+                                this->m_Directory,
+                                tr("All Files (*)"));
+      if (!filenames.isEmpty())
+      {
+        this->m_Directory = QFileInfo(filenames[0]).absolutePath();
+        for (QStringList::const_iterator it = filenames.begin() ; it != filenames.end() ; ++it)
+          this->addVideoFile(*it);
+        this->videoFileTableWidget->removeRow(row); // Empty
+        this->addVideoFile("");
+      }
+    }
+  }
+  else if (column == 2) // Remove row
+  {
+    QTableWidgetItem* item = this->videoFileTableWidget->item(row, 2);
+    if ((item->flags() & Qt::ItemIsEnabled) == Qt::ItemIsEnabled)
+    {
+      if (this->videoFileTableWidget->rowCount() != 1)
+        this->videoFileTableWidget->removeRow(row);
+      else
+      {
+        this->videoFileTableWidget->item(row, 0)->setText("");
+        item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
+      }
+    }
+  }
+  this->videoFileTableWidget->blockSignals(false);
+};
+
+void ImportAssistantDialog::addVideoFile(const QString& filename)
+{
+  QTableWidgetItem* item;
+  int index = this->videoFileTableWidget->rowCount();
+  this->videoFileTableWidget->insertRow(index);
+  item = new QTableWidgetItem; this->videoFileTableWidget->setItem(index,1,item);
+  item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+  item->setIcon(this->m_OpenFileIcon);
+  item = new QTableWidgetItem; this->videoFileTableWidget->setItem(index,2,item);
+  item->setFlags(item->flags() & ~Qt::ItemIsEditable);
+  item->setIcon(this->m_DeleteFileIcon);
+  if (filename.isEmpty())
+  {
+    item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
+    item = new QTableWidgetItem("Click on the folder icon to append video files.");
+    item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
+    QFont f = item->font();
+    f.setItalic(true);
+    item->setFont(f);
+  }
+  else
+    item = new QTableWidgetItem(filename);
+  this->videoFileTableWidget->setItem(index,0,item);
 };

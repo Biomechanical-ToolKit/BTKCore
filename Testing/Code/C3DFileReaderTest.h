@@ -62,7 +62,7 @@ CXXTEST_SUITE(C3DFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetEvent(2)->GetLabel(), "RTO");
     TS_ASSERT_DELTA(acq->GetEvent(2)->GetTime(), 7.32, 0.0001);
 
-    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());    
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
     TS_ASSERT_DELTA(io->GetPointScale(), 0.08333, 0.0001);
     
   };

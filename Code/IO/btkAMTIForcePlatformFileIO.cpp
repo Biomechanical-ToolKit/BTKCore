@@ -132,21 +132,7 @@ namespace btk
     ifs.close();
     return isReadable;
   };
-  
-  /**
-   * Checks if the suffix of @a filename is AMTIForcePlatform.
-   */
-  bool AMTIForcePlatformFileIO::CanWriteFile(const std::string& filename)
-  {
-    std::string lowercase = filename;
-    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type AMTIForcePlatformPos = lowercase.rfind(".asc");
-    if ((AMTIForcePlatformPos != std::string::npos) && (AMTIForcePlatformPos == lowercase.length() - 4))
-      return true;
-    else
-      return false;
-  };
-  
+
   /**
    * Read the file designated by @a filename and fill @a output.
    */
@@ -290,22 +276,9 @@ namespace btk
   };
   
   /**
-   * Write the file designated by @a filename with the content of @a input.
+   * @fn const std::vector<float>& AMTIForcePlatformFileIO::GetDimensions() const
+   * Returns the dimensions of the force platform.
    */
-  void AMTIForcePlatformFileIO::Write(const std::string& filename, Acquisition::Pointer input)
-  {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    /*
-    if (input.get() == 0)
-    {
-      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
-      return;
-    }
-    */
-    btkErrorMacro("Method not yet implemented.");
-    return;
-  };
 
   /**
    * Set the dimensions of the force platform which will be used for the next readings.
@@ -318,6 +291,16 @@ namespace btk
     this->m_Dimensions[2] = height;
     this->m_UseDimensions = true;
   };
+  
+  /**
+   * @fn void const std::vector<float>& AMTIForcePlatformFileIO::GetCorners() const
+   * Returns the position of the corners as a vector of 12x1 elements. The first three elements represent the coordinate of the first corner, etc.
+   */
+  
+  /**
+   * @fn const std::vector<float>& AMTIForcePlatformFileIO::GetOrigin() const
+   * Returns the coordinates of the origin of the force platform.
+   */
   
   /**
    * Set the geometry (corners and origin) of the force platform which will be used for the next readings.
@@ -381,17 +364,17 @@ namespace btk
     // Corners expressed in the global frame.
     // The global frame is set here as: axis X going forward, axis Y on the left and axis Z going upward.
     // The corners are set to have the corner #1 on the bottom left side, #2 on the top left side, #3 on the top right side and #4 on the bottom right side.
-    c[0] = -cx;
-    c[1] = cy;
+    c[0] = cx;
+    c[1] = -cy;
     c[2] = 0.0f;
-    c[3] = cx;
-    c[4] = cy;
+    c[3] = -cx;
+    c[4] = -cy;
     c[5] = 0.0f;
-    c[6] = cx;
-    c[7] = -cy;
+    c[6] = -cx;
+    c[7] = cy;
     c[8] = 0.0f;
-    c[9] = -cx;
-    c[10] = -cy;
+    c[9] = cx;
+    c[10] = cy;
     c[11] = 0.0f;
     // - Origin (expressed in the global frame) and centered above the origin of the global frame
     o[0] = 0.0f;

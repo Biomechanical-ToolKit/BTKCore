@@ -55,6 +55,8 @@
 #include <QKeyEvent>
 #include <QToolTip>
 
+static const double CameraZoom = 1.6;
+
 Viz3DWidget::Viz3DWidget(QWidget* parent)
 : QVTKWidget(parent)
 {
@@ -165,10 +167,9 @@ void Viz3DWidget::restoreProjectionCameraConfiguration()
     return;
   vtkCamera* cam = this->mp_Renderer->GetActiveCamera();
   cam->SetPosition(this->mp_CamPosition);
-  cam->SetViewUp(this->mp_CamViewUp);
   cam->SetFocalPoint(this->mp_CamFocalPoint);
-  this->mp_Renderer->ResetCamera();
-  cam->Zoom(1.6);
+  cam->SetViewUp(this->mp_CamViewUp);
+  this->mp_Renderer->ResetCameraClippingRange();
   this->m_CameraConfigurationSaved = false;
 };
 
@@ -185,15 +186,27 @@ void Viz3DWidget::saveProjectionCameraConfiguration()
 
 void Viz3DWidget::copyProjectionCameraConfiguration(Viz3DWidget* source)
 {
-  this->mp_CamPosition[0] = source->mp_CamPosition[0];
-  this->mp_CamPosition[1] = source->mp_CamPosition[1];
-  this->mp_CamPosition[2] = source->mp_CamPosition[2];
-  this->mp_CamViewUp[0] = source->mp_CamViewUp[0];
-  this->mp_CamViewUp[1] = source->mp_CamViewUp[1];
-  this->mp_CamViewUp[2] = source->mp_CamViewUp[2];
-  this->mp_CamFocalPoint[0] = source->mp_CamFocalPoint[0];
-  this->mp_CamFocalPoint[1] = source->mp_CamFocalPoint[1];
-  this->mp_CamFocalPoint[2] = source->mp_CamFocalPoint[2];
+  this->m_CameraConfigurationSaved = source->m_CameraConfigurationSaved;
+  memcpy(this->mp_CamPosition, source->mp_CamPosition, 3*sizeof(double));
+  memcpy(this->mp_CamViewUp, source->mp_CamViewUp, 3*sizeof(double));
+  memcpy(this->mp_CamFocalPoint, source->mp_CamFocalPoint, 3*sizeof(double));
+};
+
+void Viz3DWidget::projectionCamera(double focalPoint[3], double position[3], double viewUp[3])
+{
+  vtkCamera* cam = this->mp_Renderer->GetActiveCamera();
+  cam->GetPosition(position);
+  cam->GetViewUp(viewUp);
+  cam->GetFocalPoint(focalPoint);
+};
+
+void Viz3DWidget::setProjectionCamera(double focalPoint[3], double position[3], double viewUp[3])
+{
+  vtkCamera* cam = this->mp_Renderer->GetActiveCamera();
+  cam->SetPosition(position);
+  cam->SetViewUp(viewUp);
+  cam->SetFocalPoint(focalPoint);
+  this->mp_Renderer->ResetCameraClippingRange();
 };
 
 void Viz3DWidget::setOrthogonalView(int view)
@@ -303,9 +316,14 @@ void Viz3DWidget::setOrthogonalView(int view)
   else
     qDebug("Unsupported global up vector.");
   this->mp_Renderer->ResetCamera();
-  cam->Zoom(1.6);
+  cam->Zoom(CameraZoom);
   this->GetRenderWindow()->Render();
 }
+
+void Viz3DWidget::setGlobalFrameVisible(bool visible)
+{
+  this->mp_AxesWidget->SetEnabled(visible ? 1 : 0);
+};
 
 void Viz3DWidget::copy(Viz3DWidget* source)
 {
@@ -323,16 +341,16 @@ void Viz3DWidget::copy(Viz3DWidget* source)
     this->mp_Renderer->AddViewProp(static_cast<vtkProp*>(it->GetCurrentObject()));
     it->GoToNextItem();
   }
+  this->mp_Renderer->SetBackground(sourceRenderer->GetBackground());
+  this->copyProjectionCameraConfiguration(source);
   // Copy camera orientation
   vtkCamera* sourceCamera = sourceRenderer->GetActiveCamera();
   vtkCamera* targetCamera = this->mp_Renderer->GetActiveCamera();
   targetCamera->SetPosition(sourceCamera->GetPosition()); 
   targetCamera->SetFocalPoint(sourceCamera->GetFocalPoint()); 
   targetCamera->SetViewUp(sourceCamera->GetViewUp());
-  targetCamera->SetViewAngle(sourceCamera->GetViewAngle());
-  this->mp_Renderer->ResetCamera();
-  // FIXME: Add a zoom member or static variable in Viz3DWidget.h
-  targetCamera->Zoom(1.6);
+  this->mp_Renderer->ResetCameraClippingRange();
+  targetCamera->Zoom(CameraZoom);
 };
 
 void Viz3DWidget::selectPickedMarker(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
@@ -364,7 +382,8 @@ void Viz3DWidget::toggleTrajectoryMarker(vtkObject* /* caller */, unsigned long 
 
 void Viz3DWidget::render()
 {
-  this->GetRenderWindow()->Render();
+  if (this->updatesEnabled())
+    this->GetRenderWindow()->Render();
 };
 
 void Viz3DWidget::show(bool s)

@@ -7,3 +7,4 @@
 #include "MetaDataInfoTest.h"
 #include "MetaDataTest.h"
 #include "PipelineTest.h"
+#include "TriangleMeshTest.h"

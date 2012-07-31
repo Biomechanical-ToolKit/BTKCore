@@ -1,10 +1,10 @@
 FIND_PACKAGE(Qt4 REQUIRED)
-FIND_PACKAGE(QtMobility COMPONENTS MultimediaKit REQUIRED)
 SET(QT_USE_QTNETWORK TRUE)
+SET(QT_USE_PHONON TRUE)
 INCLUDE(${QT_USE_FILE})
 
 SET(MOKKA_VERSION_MAJOR 0)
-SET(MOKKA_VERSION_MINOR 4)
+SET(MOKKA_VERSION_MINOR 6a1)
 SET(MOKKA_VERSION_PATCH 0)
 IF (MOKKA_VERSION_PATCH EQUAL 0)
   SET(MOKKA_VERSION_STRING "${MOKKA_VERSION_MAJOR}.${MOKKA_VERSION_MINOR}")
@@ -20,11 +20,14 @@ SET(Mokka_CPP
   About.cpp
   AbstractMultiView.cpp
   AbstractView.cpp
+  ChartDialog.cpp
   ChartExportDialog.cpp
   ChartOptionsWidget.cpp
   ChartImagePreview.cpp
   ChartWidget.cpp
   CompositeView.cpp
+  ExportASCIIDialog.cpp
+  ExportSTLDialog.cpp
   FileInfoDockWidget.cpp
   ImportAssistantDialog.cpp
   LoggerWidget.cpp
@@ -37,6 +40,7 @@ SET(Mokka_CPP
   ModelTreeWidget.cpp
   MultiViewWidget.cpp
   NewEventDialog.cpp
+  NewItemDialog.cpp
   NewLayoutDialog.cpp
   NewModelDialog.cpp
   NewSegmentDialog.cpp
@@ -56,11 +60,14 @@ SET(Mokka_H
   Acquisition.h
   AbstractMultiView.h
   AbstractView.h
+  ChartDialog.h
   ChartExportDialog.h
   ChartOptionsWidget.h
   ChartImagePreview.h
   ChartWidget.h
   CompositeView.h
+  ExportASCIIDialog.h
+  ExportSTLDialog.h
   FileInfoDockWidget.h
   ImportAssistantDialog.h
   LoggerWidget.h
@@ -72,8 +79,7 @@ SET(Mokka_H
   ModelTreeWidget.h
   MultiViewWidget.h
   NewEventDialog.h
-  NewLayoutDialog.h
-  NewModelDialog.h
+  NewItemDialog.h
   NewSegmentDialog.h
   Preferences_Layouts.h
   ProgressWidget.h
@@ -89,6 +95,8 @@ SET(Mokka_UI
   AbstractView.ui
   ChartExportDialog.ui
   ChartOptionsWidget.ui
+  ExportASCIIDialog.ui
+  ExportSTLDialog.ui
   FileInfoDockWidget.ui
   ImportAssistantDialog.ui
   MainWindow.ui
@@ -99,7 +107,8 @@ SET(Mokka_UI
   NewSegmentDialog.ui
   ProgressWidget.ui
   TimeEventControlerWidget.ui
-  UpdateChecker.ui)
+  UpdateChecker.ui
+  )
 
 SET(Mokka_QRC
   images.qrc)
@@ -113,9 +122,6 @@ ELSE(APPLE)
   SET(Mokka_H ${Mokka_H} Preferences.h)
   SET(Mokka_CPP ${Mokka_CPP} Preferences.cpp)
 ENDIF(APPLE)
-
-SET (QT_INCLUDE_DIR "${QT_INCLUDE_DIR};${QTMOBILITY_INCLUDE_DIR};${QTMOBILITY_MULTIMEDIAKIT_INCLUDE_DIR}")
-SET (QT_LIBRARIES "${QT_LIBRARIES};${QTMOBILITY_MULTIMEDIAKIT_LIBRARY}")
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}
                     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -171,12 +177,15 @@ ELSEIF(APPLE)
 ENDIF(WIN32)
 
 ADD_CUSTOM_COMMAND(TARGET Mokka PRE_LINK
-                  COMMAND ${CMAKE_COMMAND} -E copy_directory "${BTK_BINARY_DIR}/Documentation/MokkaHelp" "${MOKKA_HELP_DIR}")
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${BTK_BINARY_DIR}/Documentation/MokkaHelp" "${MOKKA_HELP_DIR}")
 
 # Installation
 IF(NOT BTK_INSTALL_NO_RUNTIME)
-  IF(APPLE)
+  IF(APPLE) # MacOS
     MakeOSXBundleApp(Mokka ${EXECUTABLE_OUTPUT_PATH} "/Applications")
+    SET(CMAKE_INSTALL_PREFIX "/Applications")
+    INCLUDE(DeployQt4)
+    INSTALL_QT4_EXECUTABLE("Mokka.app" "phonon_qt7")    
   ELSE(APPLE)
     INSTALL(TARGETS Mokka RUNTIME DESTINATION ${BTK_INSTALL_BIN_DIR_CM24} COMPONENT RuntimeLibraries)
     IF(WIN32) # Windows
@@ -184,7 +193,9 @@ IF(NOT BTK_INSTALL_NO_RUNTIME)
         INSTALL(DIRECTORY "${BTK_BINARY_DIR}/Documentation/MokkaHelp" DESTINATION "${BTK_INSTALL_BIN_DIR_CM24}")
       ENDIF(EXISTS "${BTK_BINARY_DIR}/Documentation/MokkaHelp")
     ELSE(WIN32) # Linux
-      MESSAGE(STATUS "Where to install the Mokka documentation under linux? Contact the developers if you have any hint.")
+      IF(EXISTS "${BTK_BINARY_DIR}/Documentation/MokkaHelp")
+        INSTALL(DIRECTORY "${BTK_BINARY_DIR}/Documentation/MokkaHelp" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/doc/btk/mokka")
+      ENDIF(EXISTS "${BTK_BINARY_DIR}/Documentation/MokkaHelp")
     ENDIF(WIN32)
   ENDIF(APPLE)
 ENDIF(NOT BTK_INSTALL_NO_RUNTIME)

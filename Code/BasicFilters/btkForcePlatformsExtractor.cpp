@@ -402,16 +402,15 @@ namespace btk
   bool ForcePlatformsExtractor::CheckAnalogIndicesForForcePlatform(std::vector<int> channelsIndex, int alreadyExtracted, int numberOfChannelToExtract, int numberOfChannels) const
   {
     // Test on the number of analog channels
-    if ((numberOfChannelToExtract + alreadyExtracted) > numberOfChannels)
-      return false;
-    else if ((numberOfChannelToExtract + alreadyExtracted) > static_cast<int>(channelsIndex.size()))
+    if ((numberOfChannelToExtract + alreadyExtracted) > static_cast<int>(channelsIndex.size()))
       return false;
     else
     {
       // Index check
       for (int i = 0 ; i < numberOfChannelToExtract ; ++i)
       {
-        if (channelsIndex[i + alreadyExtracted] > numberOfChannels)
+        int index = channelsIndex[i + alreadyExtracted];
+        if ((index < 1) || (index > numberOfChannels))
           return false;
       }
     }

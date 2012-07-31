@@ -37,23 +37,60 @@
 #define NewSegmentDialog_h
 
 #include "ui_NewSegmentDialog.h"
+#include "Model.h" // Pair
 
 #include <QDialog>
+
+
+class QTreeWidgetItem;
 
 class NewSegmentDialog : public QDialog, public Ui::NewSegmentDialog
 {
   Q_OBJECT
 
 public:
-  NewSegmentDialog(QWidget* parent = 0);
-  // ~NewSegmentDialog(); // Implicit
-
-  void setEditLinksMode();
+  struct MarkerInfo
+  {
+    MarkerInfo(int i, const QString& l, bool isSelected) : label(l) {this->id = i; this->selected = isSelected;};
+    int id;
+    QString label;
+    bool selected;
+  };
+  
+  NewSegmentDialog(Segment* seg, int segmentId, const QList<MarkerInfo>& markersInfo, bool editMode = false, QWidget* parent = 0);
+  // ~NewSegmentDialog();
+  
 public slots:
   void validate();
   
-private:
+private slots:
+  void circleSelectedMarkers();
+  void updateMarkersUsed(QTableWidgetItem* item);
+  void pickMarker(int id);
+  void togglePickedMarker(int id);
+  void pickSelectedMarkers(const QList<int>& ids);
+  void removeEdge(QTableWidgetItem* item);
+  void removeFace(QTableWidgetItem* item);
+  void updateSegmentDefinition();
 
+signals:
+  void markerSelectionChanged(const QList<int>& ids);
+  void markerVisibleSelectionChanged(const QList<int>& ids);
+  void segmentDefinitionChanged(int id, const QVector<int>& markerIds, const QVector<Pair>& links);
+  void segmentDefinitionChanged(int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces);
+  
+protected:
+  bool eventFilter(QObject* obj, QEvent* event);
+  void keyPressEvent(QKeyEvent* e);
+  
+private:
+  void updateMarkersSelection(const QList<int>& rows, const QList<int>& ids);
+  void eraseEdge(QTableWidgetItem* item);
+  void buildEdges(QList<QTableWidgetItem*>* markers = 0, QList<QTableWidgetItem*>* edges = 0);
+  void buildFaces();
+  
+  Segment* mp_Segment;
+  int m_SegmentId;
 };
 
 #endif // NewSegmentDialog_h

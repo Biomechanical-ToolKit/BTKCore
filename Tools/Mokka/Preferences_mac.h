@@ -61,14 +61,18 @@ public slots:
   void setCurrentIndex(int index);
   void showGeneralPreferences();
   void showVisualisationPreferences();
+  void showChartPreferences();
   void showLayoutsPreferences();
   void showAdvancedPreferences();
-
+  
   void setDefaultConfiguration();
   void useDefaultConfiguration(bool isUsed);
   void setDefaultConfigurationPath();
   void useEventEditorWhenInserting(bool isUsed);
   void setDefaultOrientation(int index);
+  void setDefaultTimeBarEventDisplay(int index);
+  void setDefaultBackgroundColor();
+  void setDefaultGridColor();
   void setDefaultSegmentColor();
   void setDefaultMarkerColor();
   void setDefaultMarkerRadius(double radius);
@@ -77,6 +81,11 @@ public slots:
   void showForcePlatformIndex(int index);
   void setDefaultForcePlateColor();
   void setDefaultForceVectorColor();
+  void setDefaultGRFButterflyActivation(int index);
+  void showForcePath(int index);
+  void setDefaultPlotLineWidth(double width);
+  void showChartEvent(int index);
+  void setChartUnitAxisX(int index);
   void setAutomaticCheckUpdate(bool isChecked);
   
   virtual void setVisible(bool visible);
@@ -85,7 +94,10 @@ signals:
   void useDefaultConfigurationStateChanged(bool isUsed);
   void defaultConfigurationPathChanged(const QString& path);
   void defaultGroundOrientationChanged(int index);
+  void defaultTimeBarEventDisplayChanged(int index);
   void useEventEditorWhenInsertingStateChanged(bool isChecked);
+  void defaultBackgroundColorChanged(const QColor& color);
+  void defaultGridColorChanged(const QColor& color);
   void defaultSegmentColorChanged(const QColor& color);
   void defaultMarkerColorChanged(const QColor& color);
   void defaultMarkerRadiusChanged(double radius);
@@ -94,6 +106,11 @@ signals:
   void showForcePlatformIndexChanged(int index);
   void defaultForcePlateColorChanged(const QColor& color);
   void defaultForceVectorColorChanged(const QColor& color);
+  void defaultGRFButterflyActivationChanged(int index);
+  void showForcePathChanged(int index);
+  void defaultPlotLineWidthChanged(double width);
+  void showChartEventChanged(int index);
+  void chartUnitAxisXChanged(int index);
   void automaticCheckUpdateStateChanged(bool isChecked);
   void userLayoutRemoved(int index);
   void userLayoutLabelChanged(int index, const QString& label);
@@ -108,7 +125,7 @@ private slots:
   void finalizeAnimation();
 
 private:
-  enum {General = 0, Visualisation, Layouts, Advanced};
+  enum {General = 0, Visualisation, Chart, Layouts, Advanced};
 
   void stylizeFocusedCurrentAction();
   void unstylizeFocusedCurrentAction();

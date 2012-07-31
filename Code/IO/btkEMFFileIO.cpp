@@ -101,20 +101,6 @@ namespace btk
   };
   
   /**
-   * Checks if the suffix of @a filename is EMF.
-   */
-  bool EMFFileIO::CanWriteFile(const std::string& filename)
-  {
-    std::string lowercase = filename;
-    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type EMFPos = lowercase.rfind(".emf");
-    if ((EMFPos != std::string::npos) && (EMFPos == lowercase.length() - 4))
-      return true;
-    else
-      return false;
-  };
-  
-  /**
    * Read the file designated by @a filename and fill @a output.
    */
   void EMFFileIO::Read(const std::string& filename, Acquisition::Pointer output)
@@ -271,17 +257,6 @@ namespace btk
       if (ifs.is_open()) ifs.close(); 
       throw(EMFFileIOException("Unknown exception"));
     }
-  };
-  
-  /**
-   * Write the file designated by @a filename with the content of @a input.
-   */
-  void EMFFileIO::Write(const std::string& filename, Acquisition::Pointer input)
-  {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    btkErrorMacro("Method not yet implemented.");
-    return;
   };
   
   /**

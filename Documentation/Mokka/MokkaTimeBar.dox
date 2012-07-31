@@ -1,25 +1,23 @@
 /**
-@mokkaworkingheader
 @page MokkaTimeBar Time Bar
-@section MokkaTimeBarSection Time Bar
 
-@subsection MokkaTimeBarGeneral General information
+@section MokkaTimeBarGeneral General information
 @htmlonly
 <ul>
   <li>Use <img src="play.png" height="16px" width="16px"> and <img src="pause.png" height="16px" width="16px"> from the time bar to start and stop the to animation.</li>
   <li>Use <img src="skip_forward.png" height="16px" width="16px"> and <img src="skip_backward.png" height="16px" width="16px"> to move from an event to the next or previous one.</li>
   <li>Use <img src="event_right.png"> and <img src="event_left.png"> and <img src="event_general.png"> to quickly add or remove events.</li>
-  <li>Use <img src="acquisition_options.png"> to change marker trajectory length, ground orientation, playback speed and other options related to acquisition.</li>
+  <li>Use <img src="acquisition_options.png"> to change marker trajectory length, ground orientation, playback speed, view GRF butterfly and other options related to acquisition.</li>
   <li>Use <img src="event_options.png"> to edit, remove or clear events.</li>
 </ul>
 @endhtmlonly
 
-@subsection MokkaTimeBarGroundOrientation Ground orientation
+@section MokkaTimeBarGroundOrientation Ground orientation
 Menu to choose the ground orientation
 - By defaut the visual ground orientation is Plane XY.
 - Ground orientation can be modified to Plane YZ or Plane ZX using @htmlonly <img src="acquisition_options.png"> @endhtmlonly tip from the drop-down menu.
 
-@subsection MokkaTimeBarPlaybackSpeed Playback speed
+@section MokkaTimeBarPlaybackSpeed Playback speed
 Menu to choose the speed of the playback.
 - By defaut the playback speed corresponds to the RealTime.
 - The playback speed can be modified to 1/2,  1/4, 1/5, 1/10 or Full frames by using @htmlonly <img src="acquisition_options.png"> @endhtmlonly tip from the drop-down menu.
@@ -30,31 +28,36 @@ Menu to choose the speed of the playback.
 - Playback Speed at 1/10: Play the acquisition at 10% of its frame rate.
 - Playback Speed at Full Frames: Play all frames.
 
-@subsection MokkaTimeBarMarkerTrajectory Marker Trajectory Length
+@section MokkaTimeBarMarkerTrajectory Marker Trajectory Length
 Menu to choose the length of the markers' trajectory.
 - By defaut the length is set to 100 frames.
-- The length can be set to Full, 25, 50, 100 or 200 frames by using￼tip from the drop-down menu.
+- The length can be set to Full, 25, 50, 100 or 200 frames by using  tip from the drop-down menu.
 - Trajectory length will all frames: Draw the whole trajectory.
 - Trajectory length of 25 frames: Draw a total of 25 frames including holes.
 - Trajectory length of 50 frames: Draw a total of 50 frames including holes.
 - Trajectory length of 100 frames: Draw a total of 100 frames including holes (default).
 - Trajectory length of 200 frames: Draw a total of 200 frames including holes.
 
-@subsection MokkaTimeBarReframe Reframe from One
-By defaut, the acquisition starts at the frame 1 or at the first frame of the selected region of interest. By choosing the Reframe one option you can reset your acquisition frame and set the first frame to 1. You can always undo the action.
+@section MokkaTimeBarButterlfy Toggle GRF Butterfly
+- Show/hide ground reaction forces butterfly.
+- The color of the GRF vector can be modify in the @ref MokkaPreferencesVisualisation "visualization preference options".
+
+@section MokkaTimeBarReframe Reframe From One
+By default, the acquisition starts at the frame 1 or at the first frame of the selected region of interest. By choosing the <tt>Reframe From One</tt> option you can reset your acquisition frame and set the first frame to 1. You can always undo the action.
 
 @htmlonly
 <div class="twocolumns">
 <div class="leftcolumn">
 @endhtmlonly
-@subsection MokkaTimeBarInsertEvent Insert event
+@section MokkaTimeBarInsertEvent Insert event
 - Right click on the time bar to insert event (Foot off / Foot Strike / General) and choose the Insert Event option from the drop-down menu.
 - New or current event can be edited (Label / Context / Frame / Subject / Description) by using the Event editor window.
 @n
-@subsection MokkaTimeBarEditSelectedEvents Edit selected events 
+@section MokkaTimeBarEditSelectedEvents Edit selected events 
 - Right click on the event. To selected more than one event, use Shift or Ctrl.
 - Left click on the event options button @htmlonly <img src="event_options.png"> @endhtmlonly to see the drop-down menu and choose Edit selected events or use Ctrl + e.
 - New or current event can be edited (Label / Context / Frame / Subject / Description) by using the Event editor window.
+@n
 @htmlonly
 </div>
 <div class="rightcolumn">
@@ -62,34 +65,35 @@ By defaut, the acquisition starts at the frame 1 or at the first frame of the se
 @image html insert_event.png Event editor in insert mode
 @htmlonly
 </div>
+<div class=resetcolumn></div>
 @endhtmlonly
 
-@subsection MokkaTimeBarRemoveSelectedEvents Remove selected events
+@section MokkaTimeBarRemoveSelectedEvents Remove selected events
 - Left click on the event or use Shift or Ctrl key to selected more than one event.
 - Right click on the Time bar and choose Removed selected events form the drop-down menu or use the delete key (backspace) to remove selected events.
 - Action can be reversed by using undo/redo.
 
-@subsection MokkaTimeBarRemoveSelectedEvents Clear events
-- Use @htmlonly <img src="event_options.png"> @endhtmlonly￼and choose Clear events form the drop-down menu to clear all events.
+@section MokkaTimeBarClearEvents Clear events
+- Use @htmlonly <img src="event_options.png"> @endhtmlonly  and choose "Clear events" form the drop-down menu to clear all events.
 - Or right click on the time bar and selected Clear events from the drop-down menu. All the events will be removed from the time bar.
 
-@subsection MokkaTimeBarRemoveNextEvent Next event
+@section MokkaTimeBarRemoveNextEvent Next event
 - Right click on the time bar and selected Next event form the drop-down menu to go to the next event. The forward tip @htmlonly <img src="skip_forward.png" height="16px" width="16px"> @endhtmlonly on the time bar can also be use to move from one event to the next one.
 
-@subsection MokkaTimeBarRemovePreviousEvent Previous event
+@section MokkaTimeBarRemovePreviousEvent Previous event
 - Right click on the time bar and selected Previous event form the drop-down menu to go to the previous event. The backward tip @htmlonly <img src="skip_backward.png" height="16px" width="16px"> @endhtmlonly on the time bar can also be use to move from one event to the previous one.
 
-@subsection MokkaTimeBarInteractiveEditEventFrame Interactively edit event's frame
+@section MokkaTimeBarInteractiveEditEventFrame Interactively edit event's frame
 - Move the mouse over an event and use the combination Alt + Left click (without release the mouse button). You are in an interactive mode to move the selected event (the event's color is blue). You have just to move the mouse and select the new frame. To be accurate, you can use the combination Shift + Alt + Left click which will move the event only frame by frame. To leave this mode, you only have to release the mouse button. 
 
 @b Note: Moving an event when the playback is active don't show the associated frame.
 
-@subsection MokkaTimeBarZoomROI Zoom Region of Interest
+@section MokkaTimeBarZoomROI Zoom Region of Interest
 - Move the left and right bounds from the time bar using the left click. Right click on the selected region and choose Zoom Region on Interest from the drop-down menu. Action can be reversed by using Unzoom Region of Interest from the same menu.
 - You can also use the acquisition options button @htmlonly <img src="acquisition_options.png"> @endhtmlonly and choose Zoom Region of Interest. Action can be reversed by using Unzoom Region of Interest from the same menu.
 
 @b Note: Moving a bounding bar when the playback is active don't show the associated frame.
 
-@subsection MokkaTimeBarCropROI Crop Region of Interest
+@section MokkaTimeBarCropROI Crop Region of Interest
 - As with the actions to zoom/unzoom an region of interest, you can crop it and save only the selected part. Use the undo action to come back to the previous region of interest.
 */

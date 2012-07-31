@@ -85,6 +85,8 @@ function itf = btkEmulateC3Dserver()
 %    - Check for the btkGetMomentData (remove offset, in the global frame)
 
 %  HISTORY:
+%    - 04/11/2012: btkEmulateC3Dserver 1.0 beta 2 released with BTK 0.1.10
+%        - Implementation errors in the function SaveFile for the C3Dserver emulation.
 %    - 06/28/2011: Initial public beta
 
 % Construct the emulated COM object by using function handles.
@@ -92,7 +94,7 @@ id = btkC3DserverRequestNewHandle_p();
 itf.GetRegistrationMode = 2; % Register mode (full speed)
 itf.GetRegUserName = 'Free Emulation Copy';
 itf.GetRegUserOrganization = 'Biomechanical ToolKit (BTK)';
-itf.GetVersion = sprintf('C3D Server Emulator 1.0 (beta 1) - BTK version %s, compatible C3Dserver 1.144.0', btkGetVersion());
+itf.GetVersion = sprintf('C3D Server Emulator 1.0 (beta 2) - BTK version %s, compatible C3Dserver 1.144.0', btkGetVersion());
 itf.GetHandle = @()btkC3DserverGetHandle(id);
 itf.Open = @(filename,mode)btkC3DserverOpen(id,filename,mode);
 itf.Close = @()btkC3DserverClose(id);
@@ -302,11 +304,12 @@ res = char(btkC3DserverHandles(idx).modified);
 
 
 function res = btkC3DserverSaveFile(id, filename, fileType)
-h = btkC3DserverExtractHandle_p(id);
+global btkC3DserverHandles;
+[h, idx] = btkC3DserverExtractHandle_p(id);
 if (isempty(filename))
     filename = btkC3DserverHandles(idx).file;
 end
-if (isempty(fileType))
+if (fileType == -1)
     fileType = btkC3DserverHandles(idx).fileType;
 end
 if ((fileType < 1) || (fileType > 3))
@@ -315,7 +318,7 @@ end
 byteorder = {'IEEE_LittleEndian', 'VAX_LittleEndian', 'IEEE_BigEndian'};
 storageformat = {'Integer', 'Float'};
 try
-    btkWriteAcquisition(h, filename, 'ByteOrder', byteorder{fileType}, 'StorageFormat', storageformat{dataType});
+    btkWriteAcquisition(h, filename, 'ByteOrder', byteorder{fileType}, 'StorageFormat', storageformat{btkC3DserverHandles(idx).dataType});
     res = 1; % File wrote
 catch
     err = lasterror();

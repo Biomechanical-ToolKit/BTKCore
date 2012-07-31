@@ -38,12 +38,14 @@
 
 #include "TimeEventFunctors.h"
 
-#include <QMediaPlayer>
-#include <QVideoWidget>
+#include <Phonon/VideoWidget>
+#include <Phonon/MediaObject>
 
 class Acquisition;
 
 typedef QMap<int, qint64> VideoDelays;
+
+class VideoOverlayWidget;
 
 class VideoWidget : public QWidget
 {
@@ -59,6 +61,8 @@ public:
   void setDelays(VideoDelays* delays) {this->mp_Delays = delays;};
   void setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor) {this->mp_CurrentFrameFunctor = functor;};
   
+  void start();
+  void stop();
   void render();
   void show(bool s);
   
@@ -71,19 +75,31 @@ protected:
   void paintEvent(QPaintEvent* event);
   
 private slots:
-  void checkMediaStatus(QMediaPlayer::MediaStatus status);
-  void finalizeVideoLoading(qint64 pos);
+  void checkMediaStatus(Phonon::State newState, Phonon::State oldState);
   
 private:
-  qint64 referencePosition() const;
+  void setVideoVisible(bool v);
   
   Acquisition* mp_Acquisition;
   VideoDelays* mp_Delays;
   int m_VideoId;
-  QMediaPlayer* mp_MediaPlayer;
-  QVideoWidget* mp_VideoWidget;
+  Phonon::MediaObject* mp_MediaObject;
+  Phonon::VideoWidget* mp_Video;
+  VideoOverlayWidget* mp_Overlay;
   btk::VTKCurrentFrameFunctor::Pointer mp_CurrentFrameFunctor;
-  bool m_VideoLoading;
+#ifdef Q_OS_WIN
+  bool m_PlaybackStarted;
+  int m_PlaybackFrameCounter;
+#endif
 };
 
+// Required to be able to drag and drop over the Phonon::VideoWidget widget
+class VideoOverlayWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+  VideoOverlayWidget(QWidget* parent = 0);
+  // ~VideoOverlayWidget(); // Implicit.
+};
 #endif // VideoWidget_h

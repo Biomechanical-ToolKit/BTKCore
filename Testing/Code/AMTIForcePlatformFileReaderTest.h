@@ -39,17 +39,17 @@ CXXTEST_SUITE(AMTIForcePlatformFileReaderTest)
     btk::MetaDataInfo::Pointer corners = forcePlatform->GetChild("CORNERS")->GetInfo();
     btk::MetaDataInfo::Pointer origin = forcePlatform->GetChild("ORIGIN")->GetInfo();
     float fpDims[3] = {463.6f/1000.0f, 508.0f/1000.0f, 82.6f/1000.0f}; // Dimensions in meters
-    TS_ASSERT_DELTA(corners->ToFloat(0), -fpDims[0]/2.0f, 1e-5);
-    TS_ASSERT_DELTA(corners->ToFloat(1), fpDims[1]/2.0f, 1e-5);
+    TS_ASSERT_DELTA(corners->ToFloat(0), fpDims[0]/2.0f, 1e-5);
+    TS_ASSERT_DELTA(corners->ToFloat(1), -fpDims[1]/2.0f, 1e-5);
     TS_ASSERT_DELTA(corners->ToFloat(2), 0.0f, 1e-5);
-    TS_ASSERT_DELTA(corners->ToFloat(3), fpDims[0]/2.0f, 1e-5);
-    TS_ASSERT_DELTA(corners->ToFloat(4), fpDims[1]/2.0f, 1e-5);
+    TS_ASSERT_DELTA(corners->ToFloat(3), -fpDims[0]/2.0f, 1e-5);
+    TS_ASSERT_DELTA(corners->ToFloat(4), -fpDims[1]/2.0f, 1e-5);
     TS_ASSERT_DELTA(corners->ToFloat(5), 0.0f, 1e-5);
-    TS_ASSERT_DELTA(corners->ToFloat(6), fpDims[0]/2.0f, 1e-5);
-    TS_ASSERT_DELTA(corners->ToFloat(7), -fpDims[1]/2.0f, 1e-5);
+    TS_ASSERT_DELTA(corners->ToFloat(6), -fpDims[0]/2.0f, 1e-5);
+    TS_ASSERT_DELTA(corners->ToFloat(7), fpDims[1]/2.0f, 1e-5);
     TS_ASSERT_DELTA(corners->ToFloat(8), 0.0f, 1e-5);
-    TS_ASSERT_DELTA(corners->ToFloat(9), -fpDims[0]/2.0f, 1e-5);
-    TS_ASSERT_DELTA(corners->ToFloat(10), -fpDims[1]/2.0f, 1e-5);
+    TS_ASSERT_DELTA(corners->ToFloat(9), fpDims[0]/2.0f, 1e-5);
+    TS_ASSERT_DELTA(corners->ToFloat(10), fpDims[1]/2.0f, 1e-5);
     TS_ASSERT_DELTA(corners->ToFloat(11), 0.0f, 1e-5);
     TS_ASSERT_DELTA(origin->ToFloat(0), 0.0f, 1e-5);
     TS_ASSERT_DELTA(origin->ToFloat(1), 0.0f, 1e-5);

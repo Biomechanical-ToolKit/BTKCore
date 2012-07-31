@@ -3,7 +3,9 @@ SET(BTKIO_SRCS
   btkAcquisitionFileIOFactory.cpp
   btkAcquisitionFileReader.cpp
   btkAcquisitionFileWriter.cpp
+  btkASCIIFileWriter.cpp
   btkBinaryFileStream.cpp
+  btkMultiSTLFileWriter.cpp
   # File formats
   btkAMTIForcePlatformFileIO.cpp
   btkANBFileIO.cpp
@@ -11,6 +13,7 @@ SET(BTKIO_SRCS
   btkANGFileIO.cpp
   btkC3DFileIO.cpp
   btkCALForcePlateFileIO.cpp
+  btkDelsysEMGFileIO.cpp
   btkEMFFileIO.cpp
   btkEMxFileIO.cpp
   btkGRxFileIO.cpp
@@ -22,7 +25,7 @@ SET(BTKIO_SRCS
   btkTRBFileIO.cpp
   btkTRCFileIO.cpp
   btkXLSOrthoTrakFileIO.cpp
-  # Private methods
+  # Private methods for file formats
   btkMotionAnalysisFileIOUtils_p.cpp
   btkEliteFileIOUtils_p.cpp
 )

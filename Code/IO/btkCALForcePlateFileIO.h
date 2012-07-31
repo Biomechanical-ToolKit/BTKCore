@@ -56,6 +56,8 @@ namespace btk
   
   class CALForcePlateFileIO : public AcquisitionFileIO
   {
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS("CAL")
+    
   public:
     typedef SharedPtr<CALForcePlateFileIO> Pointer;
     typedef SharedPtr<const CALForcePlateFileIO> ConstPointer;

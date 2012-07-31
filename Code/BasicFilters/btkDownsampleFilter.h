@@ -243,7 +243,7 @@ namespace btk
     while (itIn != input->End())
     {
       if (!itOut->get())
-        *itOut = Wrench::New();
+        *itOut = Wrench::New((*itIn)->GetPosition()->GetLabel());
       DownsampleData<Wrench>(ratio, *itIn, *itOut);
       ++itIn;
       ++itOut;

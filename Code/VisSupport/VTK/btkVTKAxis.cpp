@@ -43,6 +43,11 @@
 #include <vtkStringArray.h>
 #include <vtkPen.h>
 #include <vtkTransform2D.h>
+#include <vtkDoubleArray.h>
+#include <vtkStringArray.h>
+#include <vtkStdString.h>
+
+#include <vtksys/ios/sstream>
 
 namespace btk
 {
@@ -52,6 +57,9 @@ namespace btk
    *
    * The direction of the ticks can be set with the method SetTickDirection().
    * This class take into account the transformation given to the object to paint correctly the legend into the scene (only the scale and translation are supported).
+   *
+   * The value for the ticks' label can be influenced by an offset and a scale using the following operation: tick_label = (real_value + offset) * scale.
+   * To set the scale and the offset, you have to use the methods SetTickScale() and SetTickOffset() respectively
    */
   /**
    * @var VTKAxis::m_TitleVisible
@@ -76,6 +84,14 @@ namespace btk
   /**
    * @var VTKAxis::m_LabelMargin
    * Size of the margin (in pixels) between the axis and the labels.
+   */
+  /**
+   * @var VTKAxis::m_TickScale
+   * Value used to modify the ticks' label. Set to 1.0 by default.
+   */
+  /**
+   * @var VTKAxis::m_TickOffset
+   * Value used to modify the ticks' label. Set to 0.0 by default.
    */
 
   /**
@@ -348,11 +364,11 @@ namespace btk
   };
   
   /**
-   * Same method than vtkAxis::RecalculateTickSpacing but fix an infinite loop with VTK 5.6
+   * Calculate the tick spacing and generate the ticks label taking into account the offset and scale.
    */
+  // TODO: Check the method used with VTK 5.8.
   void VTKAxis::RecalculateTickSpacing()
   {
-#if (VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 8)
     if (this->Behavior < 2)
     {
       double min = this->Minimum;
@@ -371,9 +387,46 @@ namespace btk
         this->GenerateTickLabels(min, max);
       }
     }
-#else
-    this->vtkAxis::RecalculateTickSpacing();
-#endif
+  };
+  
+  /**
+   * @fn double VTKAxis::GetTickScale() const
+   * Returns the scale used by the ticks.
+   */
+  
+  /**
+   * Sets the scale used by the ticks.
+   *
+   * Combine with the offset, you can adapt the value of the tick using the formula (value + offset) * scale.
+   * This can be useful if you want to switch easily between units without generating new plots.
+   */
+  void VTKAxis::SetTickScale(double scale)
+  {
+    if (this->m_TickScale == scale)
+      return;
+    this->m_TickScale = scale;
+    this->TickMarksDirty = true;
+    this->Modified();
+  };
+  
+  /**
+   * @fn double VTKAxis::GetTickOffset() const
+   * Returns the offset used by the ticks.
+   */
+  
+  /**
+   * Sets the offset used by the ticks.
+   *
+   * Combine with the scale, you can adapt the value of the tick using the formula (value + offset) * scale.
+   * This can be useful if you want to switch easily between units without generating new plots.
+   */
+  void VTKAxis::SetTickOffset(double offset)
+  {
+    if (this->m_TickOffset == offset)
+      return;
+    this->m_TickOffset = offset;
+    this->TickMarksDirty = true;
+    this->Modified();
   };
   
   /**
@@ -390,6 +443,48 @@ namespace btk
     this->m_MinimumTickSpacing = 50.0f;
     this->m_TitleMargin = 10.0f;
     this->m_LabelMargin = 5.0f;
+    this->m_TickScale = 1.0;
+    this->m_TickOffset = 0.0;
+  };
+  
+  /**
+   * Generate the position of the ticks and their label.
+   *
+   * The value for the label can be influenced by an offset and a scale using the following operation: tick_label = (real_value + offset) * scale.
+   * To set the scale and the offset, you have to use the methods SetTickScale() and SetTickOffset() respectively
+   */
+  void VTKAxis::GenerateTickLabels(double min, double max)
+  {
+    this->TickPositions->SetNumberOfTuples(0);
+    this->TickLabels->SetNumberOfTuples(0);
+    int n = static_cast<int>((max - min) / this->TickInterval);
+    for (int i = 0; i <= n && i < 200; ++i)
+    {
+      double value = min + double(i) * this->TickInterval - this->m_TickOffset;
+      this->TickPositions->InsertNextValue(value);
+      // Make a tick mark label for the tick
+      if (this->LogScale)
+        value = pow(double(10.0), double(value));
+
+      // Now create a label for the tick position
+      vtksys_ios::ostringstream ostr;
+      ostr.imbue(vtkstd::locale::classic());
+      if (this->Notation > 0)
+        ostr.precision(this->Precision);
+      if (this->Notation == 1)
+      {
+        // Scientific notation
+        ostr.setf(vtksys_ios::ios::scientific, vtksys_ios::ios::floatfield);
+      }
+      else if (this->Notation == 2)
+      {
+        ostr.setf(ios::fixed, ios::floatfield);
+      }
+      ostr << (value + this->m_TickOffset) * this->m_TickScale;
+
+      this->TickLabels->InsertNextValue(ostr.str());
+    }
+    this->TickMarksDirty = false;
   };
   
   /**

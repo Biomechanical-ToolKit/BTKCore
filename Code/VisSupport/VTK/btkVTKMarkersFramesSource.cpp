@@ -107,6 +107,23 @@ namespace btk
    * // ...
    * @endcode
    * 
+   * If you want to display several collection of markers using the same btk::VTKMarkersFramesSource object, you can group them together using a btk::CollectionAssembly. For example:
+   * @code
+   * // BTK
+   * // ...
+   * btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = btk::SeparateKnownVirtualMarkersFilter::New();
+   * virtualMarkersSeparator->SetInput(reader->GetOutput());
+   * btk::CollectionAssembly<btk::Point>::Pointer virtualMarkersAssembly = btk::CollectionAssembly<btk::Point>::New();
+   * virtualMarkersAssembly->SetInput(0, virtualMarkersSeparator->GetOutput(0)); // Markers
+   * virtualMarkersAssembly->SetInput(1, virtualMarkersSeparator->GetOutput(2)); // Virtual markers
+   * virtualMarkersAssembly->SetInput(2, virtualMarkersSeparator->GetOutput(1)); // Virtual markers used by frames
+   * // VTK
+   * vtkRenderer* renderer = vtkRenderer::New()
+   * btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::New();
+   * markers->SetInput(virtualMarkersAssembly->GetOutput());
+   * // ...
+   * @endcode
+   * 
    * @ingroup BTKVTK
    */
   
@@ -346,6 +363,14 @@ namespace btk
   };
   
   /**
+   * Returns if the trajectory of a marker is displayed or not.
+   */
+  bool VTKMarkersFramesSource::GetTrajectoryVisibility(int idx)
+  {
+    return (this->mp_TrajectoryMarkers->GetValue(idx) == 1);
+  };
+  
+  /**
    * Sets visibility of marker's trajectory
    */
   void VTKMarkersFramesSource::SetTrajectoryVisibility(int idx, bool visible)
@@ -430,12 +455,12 @@ namespace btk
    * - Radius of 8 millimeters;
    * - White color;
    * - Trajectory's length of 100 frames.
-   * These parameters can be modified by the appriopriate method.
+   * These parameters can be modified by the appriopriate methods.
    */
   VTKMarkersFramesSource::VTKMarkersFramesSource()
   : vtkPolyDataAlgorithm()
   {
-    this->SetNumberOfInputPorts(2);
+    this->SetNumberOfInputPorts(1);
     this->SetNumberOfOutputPorts(2);
     
     this->mp_MarkersCoordinates = new VTKMarkersCoordinates();
@@ -509,9 +534,9 @@ namespace btk
     for (int i = 0 ; i < this->GetNumberOfInputPorts() ; ++i)
     {
       vtkInformation* inInfo = inputVector[i]->GetInformationObject(0);
-      VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
-      if (!inObject)
+      if (!inInfo)
         continue;
+      VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
       if (inObject->GetMTime() > this->GetMTime())
         needUpdate = true;
       PointCollection::Pointer in = static_pointer_cast<PointCollection>(inObject->GetBTKDataObject());
@@ -555,7 +580,7 @@ namespace btk
         this->mp_TrajectoryColors->SetNumberOfValues(pointNumber * frameNumber);
         for (size_t i = 0 ; i < this->mp_TrajectoryIds->size() ; ++i)
           this->mp_TrajectoryIds->operator[](i)->Delete();
-        this->mp_TrajectoryIds->resize(pointNumber);  
+        this->mp_TrajectoryIds->resize(pointNumber);
         for (size_t i = 0 ; i < pointNumber ; ++i)
         {
           this->mp_MarkersRadius->SetValue(i, this->m_DefaultMarkerRadius);
@@ -781,9 +806,8 @@ namespace btk
    */
   int VTKMarkersFramesSource::FillInputPortInformation(int port, vtkInformation* info)
   {
+    btkNotUsed(port);
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "VTKDataObjectAdapter");
-    if (port != 0)
-      info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
     return 1;
   }
 };

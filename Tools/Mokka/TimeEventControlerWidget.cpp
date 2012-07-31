@@ -40,6 +40,9 @@
 #include <QMenu>
 #include <QKeyEvent>
 
+#define Mokka_UnzoomRegionOfInterest_Text "Unzoom Frames of Interest"
+#define Mokka_ZoomRegionOfInterest_Text "Zoom Frames of Interest"
+
 TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
 : QWidget(parent)
 {
@@ -62,6 +65,10 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->prevEventButton->setIcon(*this->mp_PrevEventIcon);
   this->playButton->setIcon(*this->mp_PlayIcon);
   this->nextEventButton->setIcon(*this->mp_NextEventIcon);
+  this->actionReframeFromOne->setEnabled(false);
+  this->actionClearEvents->setEnabled(false);
+  this->actionCropRegionOfInterest->setEnabled(false);
+  this->actionZoomUnzoomRegionOfInterest->setEnabled(false);
   // Shortcuts
   this->actionEditSelectedEvents->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_E));
   this->actionRemoveSelectedEvents->setShortcut(QKeySequence::Delete);
@@ -74,7 +81,6 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_4);
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_5);
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_10);
-  playbackSpeedActionGroup->addAction(this->actionPlaybackSpeedFullFrames);
   QMenu* displayOptionsMenu = new QMenu(this);
   this->mp_PlaybackSpeedMenu = new QMenu(tr("Playback speed"),this);
   actionPlaybackSpeedRealtime->setChecked(true);
@@ -83,7 +89,6 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_4);
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_5);
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_10);
-  this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeedFullFrames);
   displayOptionsMenu->addMenu(this->mp_PlaybackSpeedMenu);
   displayOptionsMenu->addSeparator();
   displayOptionsMenu->addAction(this->actionReframeFromOne);
@@ -165,22 +170,22 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   connect(this->nextEventButton, SIGNAL(released()), this, SLOT(releaseNextEventButton()));
   connect(this->mp_Timer, SIGNAL(timeout()), this, SLOT(nextStep()));
   // Time Event Bar
-  connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(sliderPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(updateROIAction(int)));
-  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(updateROIAction()));
+  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(updateROIAction(int)));
-  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(updateROIAction()));
+  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(eventSelectionChanged(QList<int>)), this, SLOT(toggleEventSelection(QList<int>)));
-  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   connect(this->timeEventBar, SIGNAL(eventMotionFinished(int, int)), this, SLOT(checkEventFrameModification(int, int)));
   // Actions
@@ -246,6 +251,7 @@ void TimeEventControlerWidget::load()
   this->actionZoomUnzoomRegionOfInterest->setEnabled(false);
   this->actionNextEvent->setEnabled(this->timeEventBar->m_EventItems.isEmpty() ? false : true);
   this->actionPreviousEvent->setEnabled(this->timeEventBar->m_EventItems.isEmpty() ? false : true);
+  this->actionReframeFromOne->setEnabled(this->timeEventBar->m_ROIFirstFrame == 1 ? false : true);
 };
 
 void TimeEventControlerWidget::reset()
@@ -254,6 +260,18 @@ void TimeEventControlerWidget::reset()
     this->stopPlayback();
   this->timeEventBar->reset();
   this->lcdNumber->display(0);
+  this->actionReframeFromOne->setEnabled(false);
+  this->actionClearEvents->setEnabled(false);
+  this->actionCropRegionOfInterest->setEnabled(false);
+  this->actionZoomUnzoomRegionOfInterest->setEnabled(false);
+};
+
+void TimeEventControlerWidget::setTimeEventTicksDisplay(int index)
+{
+  this->timeEventBar->m_TimeDisplay = (index == 1);
+  this->timeEventBar->updateInternals();
+  this->timeEventBar->update();
+  this->lcdDisplay(this->currentFrame());
 };
 
 bool TimeEventControlerWidget::eventItemData(int index, int& typeId, int& frame, double rgb[3])
@@ -282,17 +300,19 @@ void TimeEventControlerWidget::togglePlayback()
 
 void TimeEventControlerWidget::startPlayback()
 {
-  disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  if (this->mp_Timer->isActive())
+    return;
+  disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  disconnect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  disconnect(this->timeEventBar, SIGNAL(boundSelected(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SIGNAL(currentFrameChanged(int)));
-  disconnect(this->timeEventBar, SIGNAL(boundDeselected(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SIGNAL(currentFrameChanged(int)));
-  disconnect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
-  disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   disconnect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   this->playButton->setIcon(*this->mp_PauseIcon);
   this->mp_Timer->start(this->m_PlaybackDelay);
@@ -301,22 +321,32 @@ void TimeEventControlerWidget::startPlayback()
 
 void TimeEventControlerWidget::stopPlayback()
 {
+  if (!this->mp_Timer->isActive())
+    return;
   this->mp_Timer->stop();
   this->playButton->setIcon(*this->mp_PlayIcon);
-  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(leftBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(rightBoundPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(boundSelected(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(boundDeselected(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(eventAboutToBeMoved(int)), this, SIGNAL(currentFrameChanged(int)));
-  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this->lcdNumber, SLOT(display(int)));
+  connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SLOT(lcdDisplay(int)));
   connect(this->timeEventBar, SIGNAL(eventPositionChanged(int)), this, SIGNAL(currentFrameChanged(int)));
   emit playbackStopped();
 }
+
+void TimeEventControlerWidget::lcdDisplay(int frame)
+{
+  if (!this->timeEventBar->m_TimeDisplay)
+    this->lcdNumber->display(frame);
+  else
+    this->lcdNumber->display(static_cast<double>(frame-1)*this->timeEventBar->m_TimeScale);
+};
 
 void TimeEventControlerWidget::setCurrentFrame(int frame)
 {
@@ -328,21 +358,30 @@ void TimeEventControlerWidget::nextStep()
   this->setFrame(this->timeEventBar->m_SliderPos + static_cast<int>(this->m_PlaybackStep));
 };
 
+void TimeEventControlerWidget::nextFrame(int inc)
+{
+  this->setFrame(this->timeEventBar->m_SliderPos + static_cast<double>(inc));
+};
+
 void TimeEventControlerWidget::nextFrame()
 {
-  this->setFrame(this->timeEventBar->m_SliderPos + 1.0);
+  this->nextFrame(1);
+};
+
+
+void TimeEventControlerWidget::previousFrame(int dcr)
+{
+  this->setFrame(this->timeEventBar->m_SliderPos - static_cast<double>(dcr));
 };
 
 void TimeEventControlerWidget::previousFrame()
 {
-  this->setFrame(this->timeEventBar->m_SliderPos - 1.0);
+  this->previousFrame(1);
 };
 
 void TimeEventControlerWidget::reframeAcquisition(int ff)
 {
-  int diff = this->timeEventBar->m_FirstFrame - ff;
-  this->timeEventBar->m_FirstFrame = this->mp_Acquisition->firstFrame();
-  this->timeEventBar->m_LastFrame = this->mp_Acquisition->lastFrame();
+  int diff = this->timeEventBar->m_ROIFirstFrame - ff;
   this->timeEventBar->m_ROIFirstFrame -= diff;
   this->timeEventBar->m_ROILastFrame -= diff;
   this->timeEventBar->m_SliderPos -= diff;
@@ -351,34 +390,47 @@ void TimeEventControlerWidget::reframeAcquisition(int ff)
   this->timeEventBar->updateInternals();
   this->timeEventBar->update();
   this->lcdNumber->display(this->timeEventBar->m_SliderPos);
+  this->actionReframeFromOne->setEnabled(!this->actionReframeFromOne->isEnabled());
 };
 
 void TimeEventControlerWidget::toggleZoomRegionOfInterest()
 {
   // Zoom mode
-  if ((this->timeEventBar->m_FirstFrame == this->timeEventBar->m_ROIFirstFrame) && (this->timeEventBar->m_LastFrame == this->timeEventBar->m_ROILastFrame))
+  if ((this->timeEventBar->m_LeftBoundPos != this->timeEventBar->m_ROIFirstFrame) || (this->timeEventBar->m_RightBoundPos != this->timeEventBar->m_ROILastFrame))
   {
-    this->setRegionOfInterest(this->timeEventBar->m_LeftBoundPos, this->timeEventBar->m_RightBoundPos);
-    this->actionZoomUnzoomRegionOfInterest->setText(tr("Unzoom Region of Interest"));
+    this->setRegionOfInterest(this->timeEventBar->m_LeftBoundPos, this->timeEventBar->m_RightBoundPos, false);
+    this->actionZoomUnzoomRegionOfInterest->setText(tr(Mokka_UnzoomRegionOfInterest_Text));
   }
   else
   {
-    this->setRegionOfInterest(this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame);
-    this->actionZoomUnzoomRegionOfInterest->setText(tr("Zoom Region of Interest"));
+    int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
+    this->setRegionOfInterest(roi[0], roi[1], false);
+    this->actionZoomUnzoomRegionOfInterest->setText(tr(Mokka_ZoomRegionOfInterest_Text));
   }
 };
 
 void TimeEventControlerWidget::cropRegionOfInterest()
 {
   emit regionOfInterestChanged(this->timeEventBar->m_LeftBoundPos, this->timeEventBar->m_RightBoundPos);
+  this->actionZoomUnzoomRegionOfInterest->setText(tr(Mokka_ZoomRegionOfInterest_Text));
 };
 
 void TimeEventControlerWidget::setRegionOfInterest(int lb, int rb)
+{
+  this->setRegionOfInterest(lb,rb,true);
+}
+
+void TimeEventControlerWidget::setRegionOfInterest(int lb, int rb, bool updateActions)
 {
   this->timeEventBar->m_ROIFirstFrame = lb;
   this->timeEventBar->m_ROILastFrame = rb;
   this->timeEventBar->updateInternals();
   this->timeEventBar->update();
+  if (updateActions)
+  {
+    this->updateROIAction();
+    this->actionReframeFromOne->setEnabled(lb == 1 ? false : true);
+  }
 };
 
 void TimeEventControlerWidget::previousEvent()
@@ -456,7 +508,7 @@ void TimeEventControlerWidget::editSelectedEvents()
     }
     int oldFrame = this->currentFrame();
     NewEventDialog ned(NewEventDialog::Edit, this);
-    int  frameAndROI[3] = {frame, this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame};
+    int  frameAndROI[3] = {frame, this->timeEventBar->m_ROIFirstFrame, this->timeEventBar->m_ROILastFrame};
     ned.setInformations(label, ned.contextComboBox->findText(context), frameAndROI, subject, description);
     ned.move(this->eventDialogGlobaPos(&ned));
     if (!this->mp_Timer->isActive())
@@ -690,7 +742,7 @@ void TimeEventControlerWidget::changePlaybackParameters()
   double freq = this->mp_Acquisition->pointFrequency();
   this->m_PlaybackDelay = 40; // 25 Hz
   // Compute playback step and delay
-  if ((freq == 0.0) || (this->actionPlaybackSpeedFullFrames->isChecked()))
+  if (freq == 0.0)
   {
     this->m_PlaybackStep = 1.0;
   }
@@ -783,9 +835,11 @@ QList<int> TimeEventControlerWidget::removeEvent(const QString& context, const Q
 
 void TimeEventControlerWidget::insertEvent(const QString& label, int context, int frame)
 {
+  if (this->mp_Acquisition->fileName().isEmpty())
+    return;
   int oldFrame = this->currentFrame();
   NewEventDialog ned(NewEventDialog::New, this);
-  int  frameAndROI[3] = {frame, this->timeEventBar->m_FirstFrame, this->timeEventBar->m_LastFrame};
+  int  frameAndROI[3] = {frame, this->timeEventBar->m_ROIFirstFrame, this->timeEventBar->m_ROILastFrame};
   ned.setInformations(label, context, frameAndROI, "", "");
   ned.move(this->eventDialogGlobaPos(&ned));
   if (!this->mp_Timer->isActive())
@@ -808,11 +862,8 @@ void TimeEventControlerWidget::insertEvent(const QString& label, int context, in
     this->setCurrentFrame(oldFrame);
 };
 
-void TimeEventControlerWidget::updateROIAction(int frame)
+void TimeEventControlerWidget::updateROIAction()
 {
-  Q_UNUSED(frame);
-  //if ((this->timeEventBar->m_ROIFirstFrame != this->mp_Acquisition->firstFrame()) || (this->timeEventBar->m_ROILastFrame != this->mp_Acquisition->lastFrame()))
-  //if ((this->timeEventBar->m_ROIFirstFrame != this->timeEventBar->m_FirstFrame) || (this->timeEventBar->m_ROILastFrame != this->timeEventBar->m_LastFrame))
   if ((this->timeEventBar->m_LeftBoundPos != this->timeEventBar->m_ROIFirstFrame) || (this->timeEventBar->m_RightBoundPos != this->timeEventBar->m_ROILastFrame))
   {
     this->actionCropRegionOfInterest->setEnabled(true);

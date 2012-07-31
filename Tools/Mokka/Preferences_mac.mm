@@ -79,6 +79,7 @@ Preferences::Preferences(QMainWindow* parent)
   
   connect(this->actionGeneral, SIGNAL(triggered()), this, SLOT(showGeneralPreferences()));
   connect(this->actionVisualisation, SIGNAL(triggered()), this, SLOT(showVisualisationPreferences()));
+  connect(this->actionChart, SIGNAL(triggered()), this, SLOT(showChartPreferences()));
   connect(this->actionLayouts, SIGNAL(triggered()), this, SLOT(showLayoutsPreferences()));
   connect(this->actionAdvanced, SIGNAL(triggered()), this, SLOT(showAdvancedPreferences()));
   connect(this->mp_GeometryAnimation, SIGNAL(finished()), this, SLOT(finalizeAnimation()));
@@ -86,8 +87,11 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->defaultConfigurationButton, SIGNAL(clicked()), this, SLOT(setDefaultConfiguration()));
   connect(this->defaultConfigurationCheckBox, SIGNAL(toggled(bool)), this, SLOT(useDefaultConfiguration(bool)));
   connect(this->defaultConfigurationLineEdit, SIGNAL(editingFinished()), this, SLOT(setDefaultConfigurationPath()));
-  connect(this->openEventEditorCheckBox, SIGNAL(toggled(bool)), this, SLOT(useEventEditorWhenInserting(bool)));
+  connect(this->openEventEditorCheckBox, SIGNAL(toggled(bool)), this, SLOT(useEventEditorWhenInserting(bool)));  
   connect(this->defaultPlaneOrientationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultOrientation(int)));
+  connect(this->defaultTimeBarEventDisplayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultTimeBarEventDisplay(int)));
+  connect(this->defaultBackgroundColorButton, SIGNAL(clicked()), this, SLOT(setDefaultBackgroundColor()));
+  connect(this->defaultGridColorButton, SIGNAL(clicked()), this, SLOT(setDefaultGridColor()));
   connect(this->defaultSegmentColorButton, SIGNAL(clicked()), this, SLOT(setDefaultSegmentColor()));
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultMarkerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setDefaultMarkerRadius(double)));
@@ -96,6 +100,10 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->showForcePlatformIndexComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(showForcePlatformIndex(int)));
   connect(this->defaultForcePlateColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForcePlateColor()));
   connect(this->defaultForceVectorColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForceVectorColor()));
+  connect(this->defaultGRFButterflyActivationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultGRFButterflyActivation(int)));
+  connect(this->defaultPlotLineWidthSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setDefaultPlotLineWidth(double)));
+  connect(this->defaultChartEventDisplayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(showChartEvent(int)));
+  connect(this->defaultChartUnitAxisXComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setChartUnitAxisX(int)));
   connect(this->automaticCheckUpdateCheckBox, SIGNAL(toggled(bool)), this, SLOT(setAutomaticCheckUpdate(bool)));
   connect(this->layoutTable, SIGNAL(userLayoutRemoved(int)), this, SIGNAL(userLayoutRemoved(int)));
   connect(this->layoutTable, SIGNAL(userLayoutLabelChanged(int, QString)), this, SIGNAL(userLayoutLabelChanged(int, QString)));
@@ -124,7 +132,7 @@ void Preferences::showGeneralPreferences()
   this->setCurrentIndex(General);
   this->setWindowTitle(tr("General"));
   
-  this->animateHeight(this->groundLayout->geometry());
+  this->animateHeight(this->timeEventBarLayout->geometry());
 };
 
 void Preferences::showVisualisationPreferences()
@@ -133,6 +141,14 @@ void Preferences::showVisualisationPreferences()
   this->setWindowTitle(tr("Visualisation"));
   
   this->animateHeight(this->platformLayout->geometry());
+};
+
+void Preferences::showChartPreferences()
+{
+  this->setCurrentIndex(Chart);
+  this->setWindowTitle(tr("Chart"));
+  
+  this->animateHeight(this->graphLayout->geometry());
 };
 
 void Preferences::showLayoutsPreferences()
@@ -183,6 +199,32 @@ void Preferences::useEventEditorWhenInserting(bool isUsed)
 void Preferences::setDefaultOrientation(int index)
 {
   emit defaultGroundOrientationChanged(index);
+};
+
+void Preferences::setDefaultTimeBarEventDisplay(int index)
+{
+  this->defaultChartUnitAxisXComboBox->setCurrentIndex(index);
+  emit defaultTimeBarEventDisplayChanged(index);
+};
+
+void Preferences::setDefaultBackgroundColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultBackgroundColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+  {
+    colorizeButton(this->defaultBackgroundColorButton, color);
+    emit defaultBackgroundColorChanged(color);
+  }
+};
+
+void Preferences::setDefaultGridColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultGridColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+  {
+    colorizeButton(this->defaultGridColorButton, color);
+    emit defaultGridColorChanged(color);
+  }
 };
 
 void Preferences::setDefaultSegmentColor()
@@ -243,6 +285,31 @@ void Preferences::setDefaultForceVectorColor()
     colorizeButton(this->defaultForceVectorColorButton, color);
     emit defaultForceVectorColorChanged(color);
   }
+};
+
+void Preferences::setDefaultGRFButterflyActivation(int index)
+{
+  emit defaultGRFButterflyActivationChanged(index);
+};
+
+void Preferences::showForcePath(int index)
+{
+  emit showForcePathChanged(index);
+};
+
+void Preferences::setDefaultPlotLineWidth(double width)
+{
+  emit defaultPlotLineWidthChanged(width);
+};
+
+void Preferences::showChartEvent(int index)
+{
+  emit showChartEventChanged(index);
+};
+
+void Preferences::setChartUnitAxisX(int index)
+{
+  emit chartUnitAxisXChanged(index);
 };
 
 void Preferences::setAutomaticCheckUpdate(bool isChecked)

@@ -35,7 +35,6 @@
 
 #include "btkVTKSegmentsFramesSource.h"
 #include "btkVTKDataObjectAdapter.h"
-#include "btkConvert.h"
 
 #include <vtkPolyData.h>
 #include <vtkInformation.h>
@@ -55,7 +54,9 @@ namespace btk
    * The creation of segments requires first the trajectory of markers (given by the input) and 
    * second the definition of segments
    * A segment is composed of markers' ID and the links between markers' ID. A link is a pair of 
-   * IDs and will be used to draw a line between markers.
+   * IDs and will be used to draw a line between markers. From the links a mesh is created but not displayed.
+   * To display it, you have to use the method SetSegmentSurfaceVisibility().
+   * The links are are available on the outport port 0 of the filter, while the meshes are on the port 1.
    * @code
    * // BTK
    * btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
@@ -135,20 +136,54 @@ namespace btk
     this->m_Definitions.clear();
     this->mp_VisibleSegments->Initialize(); // Freed the allocated memory
     this->mp_SegmentsColorIndex->Initialize(); // Freed the allocated memory
-    //this->Modified();
   };
   
   /**
-   * Create a new segment and append it to the list.
+   * Create a new segment, append it to the list and returns its ID.
    */
-  void VTKSegmentsFramesSource::AppendDefinition(const std::vector<int>& markerIds, const std::vector<Link>& links)
+  int VTKSegmentsFramesSource::AppendDefinition(const std::vector<int>& markerIds, const std::vector<Link>& links,  const std::vector<Face>& faces, bool surfaceVisible)
   {
-    std::vector<Link> relLinks;
-    this->constructLinksWithRelativeMarkersId(relLinks, markerIds, links);
-    this->m_Definitions.push_back(SegmentDefinition(markerIds, relLinks));
+    this->m_Definitions.push_back(SegmentDefinition(markerIds, links, faces, surfaceVisible));
     this->mp_VisibleSegments->InsertNextValue(1); // Set as visible
     this->mp_SegmentsColorIndex->InsertNextValue(0); // Insert default color
-    //this->Modified();
+    return this->mp_VisibleSegments->GetNumberOfTuples()-1;
+  };
+  
+  /**
+   * Create a new segment (only from vertices and links, faces are created automatically), append it to the list and returns its ID.
+   */
+  int VTKSegmentsFramesSource::AppendDefinition(const std::vector<int>& markerIds, const std::vector<Link>& links, bool surfaceVisible)
+  {
+    this->m_Definitions.push_back(SegmentDefinition(markerIds, links, surfaceVisible));
+    this->mp_VisibleSegments->InsertNextValue(1); // Set as visible
+    this->mp_SegmentsColorIndex->InsertNextValue(0); // Insert default color
+    return this->mp_VisibleSegments->GetNumberOfTuples()-1;
+  };
+  
+  /**
+   * Create a new segment using an already existing mesh, append it to the list and returns its ID.
+   */
+  int VTKSegmentsFramesSource::AppendDefinition(TriangleMesh::Pointer mesh, bool surfaceVisible)
+  {
+    this->m_Definitions.push_back(SegmentDefinition(mesh, surfaceVisible));
+    this->mp_VisibleSegments->InsertNextValue(1); // Set as visible
+    this->mp_SegmentsColorIndex->InsertNextValue(0); // Insert default color
+    return this->mp_VisibleSegments->GetNumberOfTuples()-1;
+  };
+  
+  /**
+   * Sets the definition (markers + links + faces) for the segment with the index @a id. The segment must already exists.
+   */
+  void VTKSegmentsFramesSource::SetDefinition(vtkIdType id, const std::vector<int>& markerIds, const std::vector<Link>& links, const std::vector<Face>& faces)
+  {
+    if (id >= this->mp_VisibleSegments->GetNumberOfTuples())
+    {
+      vtkErrorMacro("Out of range.");
+      return;
+    }
+    std::list<SegmentDefinition>::iterator it = this->m_Definitions.begin();
+    std::advance(it, id);
+    it->mesh->SetDefinition(markerIds, links, faces);
   };
   
   /**
@@ -161,12 +196,39 @@ namespace btk
       vtkErrorMacro("Out of range.");
       return;
     }
-    std::vector<Link> relLinks;
-    this->constructLinksWithRelativeMarkersId(relLinks, markerIds, links);
     std::list<SegmentDefinition>::iterator it = this->m_Definitions.begin();
     std::advance(it, id);
-    *it = SegmentDefinition(markerIds, relLinks);
-    //this->Modified();
+    it->mesh->SetDefinition(markerIds, links);
+  };
+  
+  /**
+   * Sets the definition for the segment with the index @a id. The segment must already exists.
+   */
+  void VTKSegmentsFramesSource::SetDefinition(vtkIdType id, TriangleMesh::Pointer mesh)
+  {
+    if (id >= this->mp_VisibleSegments->GetNumberOfTuples())
+    {
+      vtkErrorMacro("Out of range.");
+      return;
+    }
+    std::list<SegmentDefinition>::iterator it = this->m_Definitions.begin();
+    std::advance(it, id);
+    it->mesh = mesh;
+  };
+  
+  /**
+   * Returns the mesh defining the segment corresponding to the index @a id.
+   */
+  TriangleMesh::Pointer VTKSegmentsFramesSource::GetDefinition(vtkIdType id)
+  {
+    if (id >= this->mp_VisibleSegments->GetNumberOfTuples())
+    {
+      vtkErrorMacro("Out of range.");
+      return TriangleMesh::Pointer();
+    }
+    std::list<SegmentDefinition>::const_iterator it = this->m_Definitions.begin();
+    std::advance(it, id);
+    return it->mesh;
   };
 
   /**
@@ -196,6 +258,36 @@ namespace btk
       this->mp_VisibleSegments->SetValue(id, 1);
     else
       this->mp_VisibleSegments->SetValue(id, 0);
+  };
+  
+  /**
+   * Returns the visibility of the surface created for the segment with index @a id.
+   */
+  bool VTKSegmentsFramesSource::GetSegmentSurfaceVisibility(vtkIdType id)
+  {
+    if (id >= this->mp_VisibleSegments->GetNumberOfTuples())
+    {
+      vtkErrorMacro("Out of range.");
+      return false;
+    }
+    std::list<SegmentDefinition>::iterator it = this->m_Definitions.begin();
+    std::advance(it, id);
+    return it->surfaceEnabled;
+  };
+  
+  /**
+   * Sets the visibility of the surface created for segment with index @a id.
+   */
+  void VTKSegmentsFramesSource::SetSegmentSurfaceVisibility(vtkIdType id, bool visible)
+  {
+    if (id >= this->mp_VisibleSegments->GetNumberOfTuples())
+    {
+      vtkErrorMacro("Out of range.");
+      return;
+    }
+    std::list<SegmentDefinition>::iterator it = this->m_Definitions.begin();
+    std::advance(it, id);
+    it->surfaceEnabled = visible;
   };
 
   /**
@@ -328,7 +420,7 @@ namespace btk
   : vtkPolyDataAlgorithm(), m_Definitions()
   {
     this->SetNumberOfInputPorts(1);
-    this->SetNumberOfOutputPorts(1);
+    this->SetNumberOfOutputPorts(2);
     
     this->mp_VisibleSegments = vtkIntArray::New();
     this->mp_SegmentsColorIndex = vtkIdTypeArray::New();
@@ -401,25 +493,40 @@ namespace btk
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
     
+    vtkInformation* outInfoBis = outputVector->GetInformationObject(1);
+    vtkPolyData* outputBis = vtkPolyData::SafeDownCast(outInfoBis->Get(vtkDataObject::DATA_OBJECT()));
+    
     int frameIndex = 0;
     if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
       frameIndex = static_cast<int>(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0]);
-    
+      
     int markerNumber = 0;
     int linkNumber = 0;
+    int faceNumber = 0;
+    int inc = 0;
     for (std::list<SegmentDefinition>::const_iterator itS = this->m_Definitions.begin() ; itS != this->m_Definitions.end() ; ++itS)
     {
-      markerNumber += static_cast<int>(itS->markerIds.size());
-      linkNumber += static_cast<int>(itS->links.size());
+      if (this->mp_VisibleSegments->GetValue(inc++) == 1)
+      {
+        markerNumber += static_cast<int>(itS->mesh->GetVertexNumber());
+        linkNumber += static_cast<int>(itS->mesh->GetEdgeNumber());
+        if (itS->surfaceEnabled)
+          faceNumber += static_cast<int>(itS->mesh->GetFaceNumber());
+      }
     }
     
-    vtkIntArray* colors = vtkIntArray::New(); colors->SetName("Colors"); colors->SetNumberOfValues(linkNumber);
+    vtkIntArray* edgeColors = vtkIntArray::New(); edgeColors->SetName("Colors"); edgeColors->SetNumberOfValues(linkNumber);
+    vtkIntArray* faceColors = vtkIntArray::New(); faceColors->SetName("Colors"); faceColors->SetNumberOfValues(faceNumber);
     vtkPoints* points = vtkPoints::New(); points->SetNumberOfPoints(markerNumber);
     vtkCellArray* lines = vtkCellArray::New(); lines->Allocate(lines->EstimateSize(linkNumber,2));
+    vtkCellArray* polys = vtkCellArray::New(); polys->Allocate(lines->EstimateSize(faceNumber,3));
     int segmentIndex = 0;
-    int linkIndex = 0; 
+    int lineIndex = 0; 
+    int faceIndex = 0; 
     int pointId = 0;
     output->Initialize();
+    outputBis->Initialize();
+    
     for (std::list<SegmentDefinition>::const_iterator itS = this->m_Definitions.begin() ; itS != this->m_Definitions.end() ; ++itS)
     {
       if (this->mp_VisibleSegments->GetValue(segmentIndex) == 0)
@@ -427,44 +534,68 @@ namespace btk
         ++segmentIndex;
         continue;
       }
+      else if (!itS->mesh->ConnectPoints(input))
+      {
+        btkErrorMacro("Impossible to link the segment with the markers' data.");
+        ++segmentIndex;
+        continue;
+      }
+      itS->mesh->SetCurrentFrameIndex(frameIndex);
       int markerIndex = 0;
       // Set points
-      std::vector<bool> validPts = std::vector<bool>(itS->markerIds.size(), false);
-      std::vector<int> idPts = std::vector<int>(itS->markerIds.size(), 0);
-      for (std::vector<int>::const_iterator itM = itS->markerIds.begin() ; itM != itS->markerIds.end() ; ++itM)
+      std::vector<int> idPts = std::vector<int>(itS->mesh->GetVertexNumber(), 0);
+      for (TriangleMesh::VertexConstIterator itM = itS->mesh->BeginVertex() ; itM != itS->mesh->EndVertex() ; ++itM)
       {
-        Point::Pointer marker = input->GetItem(*itM);
-        if (marker->GetResiduals().coeff(frameIndex) >= 0.0)
+        if (itM->IsValid())
         {
           idPts[markerIndex] = pointId;
-          validPts[markerIndex] = true;
           points->SetPoint(pointId,
-                           marker->GetValues().coeff(frameIndex,0) * this->m_Scale,
-                           marker->GetValues().coeff(frameIndex,1) * this->m_Scale,
-                           marker->GetValues().coeff(frameIndex,2) * this->m_Scale);
+                           itM->GetCoordinateX() * this->m_Scale,
+                           itM->GetCoordinateY() * this->m_Scale,
+                           itM->GetCoordinateZ() * this->m_Scale);
           ++pointId;
         }
         ++markerIndex;
       }
       // Set lines
-      for (std::vector<Link>::const_iterator itL = itS->links.begin() ; itL != itS->links.end() ; ++itL)
+      for (TriangleMesh::EdgeConstIterator itL = itS->mesh->BeginEdge() ; itL != itS->mesh->EndEdge() ; ++itL)
       {
-        if (validPts[itL->first] && validPts[itL->second])
+        if (itL->IsValid())
         {
-          lines->InsertNextCell(2);
-          lines->InsertCellPoint(idPts[itL->first]);
-          lines->InsertCellPoint(idPts[itL->second]);
-          colors->SetValue(linkIndex++, this->mp_SegmentsColorIndex->GetValue(segmentIndex));
+          const vtkIdType pts[2]	= {idPts[itL->GetVertex1()->GetRelativeId()], idPts[itL->GetVertex2()->GetRelativeId()]};
+          lines->InsertNextCell(2, pts);
+          edgeColors->SetValue(lineIndex++, this->mp_SegmentsColorIndex->GetValue(segmentIndex));
+        }
+      }
+      // Set polys
+      if (itS->surfaceEnabled)
+      {
+        for (TriangleMesh::FaceConstIterator itF = itS->mesh->BeginFace() ; itF != itS->mesh->EndFace() ; ++itF)
+        {
+          if (itF->IsValid())
+          {
+            const vtkIdType pts[3]	= {idPts[itF->GetVertex1()->GetRelativeId()], idPts[itF->GetVertex2()->GetRelativeId()], idPts[itF->GetVertex3()->GetRelativeId()]};
+            polys->InsertNextCell(3, pts);
+            faceColors->SetValue(faceIndex++, this->mp_SegmentsColorIndex->GetValue(segmentIndex));
+          }
         }
       }
       ++segmentIndex;
     }
+    // Edges output
     output->SetPoints(points);
-    points->Delete();
     output->SetLines(lines);
+    output->GetCellData()->SetScalars(edgeColors);
+    // Faces output
+    outputBis->SetPoints(points);
+    outputBis->SetPolys(polys);
+    outputBis->GetCellData()->SetScalars(faceColors);
+    // Cleanup
+    points->Delete();
     lines->Delete();
-    output->GetCellData()->SetScalars(colors);
-    colors->Delete();
+    polys->Delete();
+    edgeColors->Delete();
+    faceColors->Delete();
     
     return 1;
   };
@@ -498,44 +629,24 @@ namespace btk
     return 1;
   }
   
-  void VTKSegmentsFramesSource::constructLinksWithRelativeMarkersId(std::vector<Link>& relLinks,
-                                                                    const std::vector<int>& markerIds, 
-                                                                    const std::vector<Link>& links)
+  // ----------------------------- SegmentDefinition --------------------------
+  
+  VTKSegmentsFramesSource::SegmentDefinition::SegmentDefinition(const TriangleMesh::Pointer m, bool visible)
+  : mesh(m)
   {
-    relLinks = std::vector<Link>(links.size());
-    for (size_t i = 0 ; i < links.size() ; ++i)
-    {
-      int id1 = -1;
-      for (size_t j = 0 ; j < markerIds.size() ; ++j)
-      {
-        if (links[i].first == markerIds[j])
-        {
-          id1 = (int)j;
-          break;
-        }
-      }
-      if (id1 == -1)
-      {
-        btkErrorMacro("The link #" + ToString(i+1) + " uses a first point which is not listed (unknown ID). The link is removed.");
-        continue;
-      }
-      int id2 = -1;
-      for (size_t j = 0 ; j < markerIds.size() ; ++j)
-      {
-        if (links[i].second == markerIds[j])
-        {
-          id2 = (int)j;
-          break;
-        }
-      }
-      if (id2 == -1)
-      {
-        btkErrorMacro("The link #" + ToString(i+1) + " uses a second point which is not listed (unknown ID). The link is removed.");
-        continue;
-      }
-      relLinks[i].first  = id1;
-      relLinks[i].second  = id2;
-    }
+    this->surfaceEnabled = visible;
+  }; 
+  
+  VTKSegmentsFramesSource::SegmentDefinition::SegmentDefinition(const std::vector<int>& m, const std::vector<Link>& l, const std::vector<Face>& f, bool visible)
+  : mesh(TriangleMesh::New(m,l,f))
+  {
+    this->surfaceEnabled = visible;
+  };
+  
+  VTKSegmentsFramesSource::SegmentDefinition::SegmentDefinition(const std::vector<int>& m, const std::vector<Link>& l, bool visible)
+  : mesh(TriangleMesh::New(m,l))
+  {
+    this->surfaceEnabled = visible;
   };
 };
 

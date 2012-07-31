@@ -38,10 +38,8 @@
 NewModelDialog::NewModelDialog(const QList<ConfigurationItem>* configs, QWidget* parent)
 : NewItemTemplateDialog<ConfigurationItem>(configs, parent)
 {
-  this->setWindowTitle(tr("New Model"));
-  this->label->setText(tr("New Model Configuration"));
-  
-  connect(this->lineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateButton(QString)));
+  this->setWindowTitle(tr("New Visual Configuration"));
+  this->label->setText(tr("Create a configuration from an existing one or a new one"));
 };
 
 void NewModelDialog::setConfigurationName(const QString& name)
@@ -59,8 +57,9 @@ void NewModelDialog::setConfigurationName(const QString& name)
     else
       ++i;
   }
-  this->lineEdit->setText(n);
-  this->lineEdit->selectAll();
+  this->newLineEdit->setText(n);
+  this->newLineEdit->selectAll();
+  this->newRadioButton->setChecked(true);
 };
 
 bool NewModelDialog::itemAlreadyExists(const QString& name)
@@ -71,9 +70,4 @@ bool NewModelDialog::itemAlreadyExists(const QString& name)
       return true;
   }
   return false;
-};
-
-void NewModelDialog::updateButton(const QString& name)
-{
-  this->updateButtonState(name);
 };

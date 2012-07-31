@@ -67,9 +67,16 @@ public:
   bool openEditorWhenInsertingEventFlag() const {return this->m_OpenEditorWhenInserting;};
   void setOpenEditorWhenInsertingEventFlag(bool isUsed) {this->m_OpenEditorWhenInserting = isUsed;};
   
+  int timeEventTicksDisplay() const {return this->timeEventBar->m_TimeDisplay ? 1 : 0;};
+  void setTimeEventTicksDisplay(int index);
+  
   bool eventItemData(int index, int& typeId, int& frame, double rgb[3]);
   
+  void nextFrame(int inc);
+  void previousFrame(int dcr);
+  
 public slots:
+  void lcdDisplay(int frame);
   void togglePlayback();
   void stopPlayback();
   void startPlayback();
@@ -126,12 +133,13 @@ private slots:
   void releaseNextEventButton();
   void changePlaybackParameters();
   void toggleEventSelection(const QList<int>& selectedIndices);
-  void updateROIAction(int frame);
+  void updateROIAction();
   void checkEventFrameModification(int id, int frame);
   void setEventFrame(int id, int frame);
   
 private:
   void setFrame(int f);
+  void setRegionOfInterest(int lb, int rb, bool updateActions);
   void setROI(int ff, int lf);
   void updateEventActions();
   QList<int> removeEvent(const QString& context, const QString& label);

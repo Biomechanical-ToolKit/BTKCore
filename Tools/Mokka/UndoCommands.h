@@ -136,6 +136,21 @@ private:
 //               POINT/MARKER EDITION              //
 // ----------------------------------------------- //
 
+//  --------------- CreateAveragedMarker  ---------------
+class CreateAveragedMarker : public AcquisitionUndoCommand
+{
+public:
+  CreateAveragedMarker(Acquisition* acq, const QList<int>& markers, QUndoCommand* parent = 0);
+  ~CreateAveragedMarker();
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  Acquisition* mp_Acquisition;
+  int m_Id;
+  Point* mp_Marker;
+};
+
 // --------------- EditPointLabel ---------------
 class EditPointLabel : public AcquisitionUndoCommand
 {
@@ -197,6 +212,38 @@ private:
   Acquisition* mp_Acquisition;
   QVector<int> m_Ids;
   QVector<QColor> m_Colors;
+  
+  void action();
+};
+
+// --------------- EditMarkersVisibility ---------------
+class EditMarkersVisibility : public ConfigurationUndoCommand
+{
+public:
+  EditMarkersVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<bool> m_Visibles;
+  
+  void action();
+};
+
+// --------------- EditMarkersTrajectoryVisibility ---------------
+class EditMarkersTrajectoryVisibility : public ConfigurationUndoCommand
+{
+public:
+  EditMarkersTrajectoryVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<bool> m_Visibles;
   
   void action();
 };
@@ -450,11 +497,11 @@ private:
   void action();
 };
 
-// --------------- EditSegmentLinks ---------------
-class EditSegmentLinks : public ConfigurationUndoCommand
+// --------------- EditSegmentDefinition ---------------
+class EditSegmentDefinition : public ConfigurationUndoCommand
 {
 public:
-  EditSegmentLinks(Model* m, int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links, QUndoCommand* parent = 0);
+  EditSegmentDefinition(Model* m, int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces, QUndoCommand* parent = 0);
   virtual void undo() {this->action();};
   virtual void redo() {this->action();};
   
@@ -462,7 +509,40 @@ private:
   Model* mp_Model;
   int m_Id;
   QVector<int> m_MarkerIds;
-  QVector< QPair<int,int> > m_Links;
+  QVector<Pair> m_Links;
+  QVector<Triad> m_Faces;
+  
+  void action();
+};
+
+// --------------- EditSegmentsVisibility ---------------
+class EditSegmentsVisibility : public ConfigurationUndoCommand
+{
+public:
+  EditSegmentsVisibility(Model* m, const QVector<int>& ids, bool visible, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Model* mp_Model;
+  QVector<int> m_Ids;
+  QVector<bool> m_Visibles;
+  
+  void action();
+};
+
+// --------------- EditSegmentsSurfaceVisibility ---------------
+class EditSegmentsSurfaceVisibility : public ConfigurationUndoCommand
+{
+public:
+  EditSegmentsSurfaceVisibility(Model* m, const QVector<int>& ids, bool visible, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Model* mp_Model;
+  QVector<int> m_Ids;
+  QVector<bool> m_Visibles;
   
   void action();
 };
@@ -517,7 +597,7 @@ private:
   void action();
 };
 
-// --------------- RemoveSegments ---------------
+// --------------- RemoveVideos ---------------
 class RemoveVideos : public AcquisitionUndoCommand
 {
 public:

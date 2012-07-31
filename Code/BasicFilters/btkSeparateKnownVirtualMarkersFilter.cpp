@@ -39,13 +39,17 @@ namespace btk
 {
  /**
    * @class SeparateKnownVirtualMarkersFilter btkSeparateKnownVirtualMarkersFilter.h
-   * @brief Separate a collection of points in fours categories to be able to distinguish real markers from the others.
+   * @brief Separate a collection of points in five categories to be able to distinguish real markers from the others.
    *
    * These categories are:
+   *  -# all kind of markers (real and virtual) as stored in the acquisition
    *  -# markers
-   *  -# virtual markers used for frame virtuals
+   *  -# virtual markers used for frame
    *  -# other virtual markers (CenterOfMass, ...)
    *  -# other points (angle, force, moment, power, ...)
+   *
+   * To select the output corresponding to the choosen category, you can use the method GetOutput() 
+   * with one of these enum values: AllMarkers, Markers, VirtualMarkersForFrame, VirtualMarkersOther, OtherPoints.
    *
    * By default, the list of labels known as virtual markers used for frame virtuals is:
    *  - HED(O|A|L|P): HEDO, HEDA, HEDL, HELP
@@ -77,6 +81,26 @@ namespace btk
    * This filter only copies the pointer associated which each point instead of using a deep copy of it.
    *
    * @ingroup BTKBasicFilters
+   */
+  /**
+   * @var SeparateKnownVirtualMarkersFilter::AllMarkers
+   * Contains all kind of markers (real and virtual) as stored in the acquisition
+   */
+  /**
+   * @var SeparateKnownVirtualMarkersFilter::Markers
+   * Contains only real markers.
+   */
+  /**
+   * @var SeparateKnownVirtualMarkersFilter::VirtualMarkersForFrame
+   * Contains only virtual markers used to create frames
+   */
+  /**
+   * @var SeparateKnownVirtualMarkersFilter::VirtualMarkersOther
+   * Contains only virtual markers no used for frames (e.g center of mass)
+   */
+  /**
+   * @var SeparateKnownVirtualMarkersFilter::OtherPoints
+   * Contains all the other points (i.e angle, force, moment, power, etc.)
    */
    
   /**
@@ -258,13 +282,13 @@ namespace btk
    */
   
   /**
-   * Constructor. Sets the number of inputs to 1 and outputs to 4.
+   * Constructor. Sets the number of inputs to 1 and outputs to 5.
    */
   SeparateKnownVirtualMarkersFilter::SeparateKnownVirtualMarkersFilter()
   : ProcessObject(), m_VirtualMarkerLabelsAxes(), m_VirtualMarkerLabelsOthers(), m_Prefix()
   {
     this->SetInputNumber(1);
-    this->SetOutputNumber(4);
+    this->SetOutputNumber(5);
     
     // virtual markers for frame virtuals
     const char* labels[] = {"HED", "LCL", "LFE", "LFO", "LHN", "LHU", "LRA", "LTI", "LTO", "PEL", "RCL", "RFE", "RFO", "RHN", "RHU", "RRA", "RTI", "RTO", "TRX"};
@@ -298,38 +322,39 @@ namespace btk
    */
   void SeparateKnownVirtualMarkersFilter::GenerateData()
   {
-    PointCollection::Pointer output[4];
-    output[0] = this->GetOutput(0); // markers
-    output[1] = this->GetOutput(1); // virtual markers used for frames virtuals.
-    output[2] = this->GetOutput(2); // other virtual markers
-    output[3] = this->GetOutput(3); // other points
+    PointCollection::Pointer output[5];
+    output[0] = this->GetOutput(4); // all kind of markers
+    output[1] = this->GetOutput(0); // markers
+    output[2] = this->GetOutput(1); // virtual markers used for frames.
+    output[3] = this->GetOutput(2); // other virtual markers
+    output[4] = this->GetOutput(3); // other points
     output[0]->Clear();
     output[1]->Clear();
     output[2]->Clear();
     output[3]->Clear();
+    output[4]->Clear();
     
     PointCollection::Pointer input = this->GetInput();
     if (input.get() != 0)
     {
-      PointCollection::Pointer markers = PointCollection::New();
       PointCollection::Pointer virtuals = PointCollection::New();
       // Separate points which are not markers
       for(PointCollection::Iterator it = input->Begin() ; it != input->End() ; ++it)
       {
         if ((*it)->GetType() != Point::Marker)
-          output[3]->InsertItem(*it);
+          output[4]->InsertItem(*it);
         else
-          markers->InsertItem(*it);
+          output[0]->InsertItem(*it);
       }
       // Separate points representing frame virtuals
       for (std::list<StringAxes>::const_iterator it = this->m_VirtualMarkerLabelsAxes.begin() ; it != this->m_VirtualMarkerLabelsAxes.end() ; ++it)
       {
-        PointCollection::ConstIterator it0 = this->FindLabel(markers.get(), this->m_Prefix + it->Origin, false);
-        PointCollection::ConstIterator it1 = this->FindLabel(markers.get(), this->m_Prefix + it->Axis1, false);
-        PointCollection::ConstIterator it2 = this->FindLabel(markers.get(), this->m_Prefix + it->Axis2, false);
-        PointCollection::ConstIterator it3 = this->FindLabel(markers.get(), this->m_Prefix + it->Axis3, false);
+        PointCollection::ConstIterator it0 = this->FindLabel(output[0].get(), this->m_Prefix + it->Origin, false);
+        PointCollection::ConstIterator it1 = this->FindLabel(output[0].get(), this->m_Prefix + it->Axis1, false);
+        PointCollection::ConstIterator it2 = this->FindLabel(output[0].get(), this->m_Prefix + it->Axis2, false);
+        PointCollection::ConstIterator it3 = this->FindLabel(output[0].get(), this->m_Prefix + it->Axis3, false);
         
-        if ((it0 != markers->End()) && (it1 != markers->End()) && (it2 != markers->End()) && (it3 != markers->End()))
+        if ((it0 != output[0]->End()) && (it1 != output[0]->End()) && (it2 != output[0]->End()) && (it3 != output[0]->End()))
         {
           virtuals->InsertItem(*it0);
           virtuals->InsertItem(*it1);
@@ -341,7 +366,7 @@ namespace btk
       for (PointCollection::ConstIterator it = virtuals->Begin() ; it != virtuals->End() ; ++it)
       {
         bool found = false;
-        for (PointCollection::ConstIterator itF = output[1]->Begin() ; itF != output[1]->End() ; ++itF)
+        for (PointCollection::ConstIterator itF = output[2]->Begin() ; itF != output[2]->End() ; ++itF)
         {
           if ((*it)->GetLabel().compare((*itF)->GetLabel()) == 0)
           {
@@ -350,26 +375,26 @@ namespace btk
           }
         }
         if (!found)
-          output[1]->InsertItem(*it);
+          output[2]->InsertItem(*it);
       }
       // Copy the known points for axes
       virtuals->Clear();
-      for (PointCollection::ConstIterator it = output[1]->Begin() ; it != output[1]->End() ; ++it)
+      for (PointCollection::ConstIterator it = output[2]->Begin() ; it != output[2]->End() ; ++it)
         virtuals->InsertItem(*it);
       // Known virtual markers' label used in other context.
-      for (PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
+      for (PointCollection::ConstIterator it = output[0]->Begin() ; it != output[0]->End() ; ++it)
       {
         if (this->FindLabel(&this->m_VirtualMarkerLabelsOthers, (*it)->GetLabel(), true))
         {
-          output[2]->InsertItem(*it);
+          output[3]->InsertItem(*it);
           virtuals->InsertItem(*it);
         }
       }
       // Append the points known as markers
-      for (PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
+      for (PointCollection::ConstIterator it = output[0]->Begin() ; it != output[0]->End() ; ++it)
       {
         if (this->FindLabel(virtuals.get(), (*it)->GetLabel(), false) == virtuals->End())
-          output[0]->InsertItem(*it);
+          output[1]->InsertItem(*it);
       }
     }
   };

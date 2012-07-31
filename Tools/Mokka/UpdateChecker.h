@@ -99,9 +99,11 @@ signals:
   void parsingFinished();
   
 private:
-  bool isGreaterRelease(const QStringList& max, const QStringList& rel) const;
-  bool isGreaterRelease(const QString& max, const QString& rel) const;
-  bool isNewRelease(const QStringList& rel) const {return !this->isGreaterRelease(this->m_CurrentVersion, rel);};
+  bool isNewRelease(const QStringList& rel) const {return (this->compareRelease(this->m_CurrentVersion, rel) < 0);};
+  bool isGreaterRelease(const QStringList& max, const QStringList& rel) const {return (this->compareRelease(max, rel) > 0);};
+  int compareRelease(const QStringList& max, const QStringList& rel) const;
+  int compareRelease(const QString& max, const QString& rel) const;
+  int extractReleaseNumber(const QString& str, QString& suffix) const;
 
   QNetworkAccessManager* mp_Manager;
   QStringList m_CurrentVersion;

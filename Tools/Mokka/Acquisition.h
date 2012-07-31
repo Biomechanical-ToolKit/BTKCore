@@ -45,9 +45,9 @@
 #include <btkPointCollection.h>
 #include <btkForcePlatformCollection.h>
 #include <btkWrenchCollection.h>
-#include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileIO.h>
 #include <btkAMTIForcePlatformFileIO.h> // Special case for AMTI files
+#include <btkWrenchDirectionAngleFilter.h>
 
 #include <QObject>
 #include <QString>
@@ -60,6 +60,8 @@ struct Point
   typedef enum {Marker, VirtualMarker, VirtualMarkerForFrame, Angle, Force, Moment, Power, Scalar} Type;
   QString label;
   QString description;
+  bool visible;
+  bool trajectoryVisible;
   double radius;
   QColor color;
   Type type;
@@ -108,21 +110,28 @@ public:
   Acquisition(QObject* parent = 0);
   ~Acquisition();
   
+  void supportedReadFileFormats(QStringList& formats);
+  void supportedWrittenFileFormats(QStringList& formats);
   bool load(const QString& filename);
   bool save(const QString& filename, const QMap<int, QVariant>& properties);
+  bool canBeSaved(const QString& filename);
   bool exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb);
   bool importFrom(const QStringList& filenames, bool allFramesKept = true);
-  bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions);
-  bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin);
+  bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions, bool fromOpenAction = false);
+  bool importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin, bool fromOpenAction = false);
+  bool importFromVideos(const QStringList& paths, bool allFramesKept, int ff, double freq, double duration);
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
   btk::Acquisition::Pointer btkAcquisition() const {return this->mp_BTKAcquisition;};
+  btk::PointCollection::Pointer btkAllMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(4);};
   btk::PointCollection::Pointer btkMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(0);};
   btk::PointCollection::Pointer btkVirtualMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(2);};
+  btk::PointCollection::Pointer btkVirtualMarkersForFrame() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(1);};
   btk::PointCollection::Pointer btkOtherPoints() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(3);};
   btk::ForcePlatformCollection::Pointer btkForcePlatforms() const {return static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProcesses[BTK_FORCE_PLATFORMS])->GetOutput();};
   btk::WrenchCollection::Pointer btkGroundReactionWrenches() const {return static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED])->GetOutput();};
+  btk::PointCollection::Pointer btkWrenchDirectionAngles() const {return static_pointer_cast<btk::WrenchDirectionAngleFilter>(this->m_BTKProcesses[BTK_DIRECTION_ANGLES])->GetOutput();};
   
   int firstFrame() const {return this->m_FirstFrame;};
   void setFirstFrame(int ff);
@@ -145,17 +154,21 @@ public:
   int findMarkerIdFromLabel(const QString& label) const;
   double markerRadius(int id) const {return this->m_Points[id]->radius;};
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
-  void resetMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
   const QColor& markerColor(int id) const {return this->m_Points[id]->color;};
-  void setMarkerColor(int id, const QColor& color);
   void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
-  void resetMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
   QList<Point*> takePoints(const QList<int>& ids);
   void insertPoints(const QList<int>& ids, const QList<Point*> points);
   int findPointIdFromLabel(const QString& label) const;
   const QColor& defaultMarkerColor() const {return this->m_DefaultMarkerColor;};
   void setDefaultMarkerColor(const QColor& color) {this->m_DefaultMarkerColor = color;};
   void setDefaultMarkerRadius(double r) {this->m_DefaultMarkerRadius = r;};
+  bool markerVisible(int id) const {return this->m_Points[id]->visible;};
+  void setMarkersVisible(const QVector<int>& ids, const QVector<bool>& visibles);
+  bool markerTrajectoryVisible(int id) const {return this->m_Points[id]->trajectoryVisible;};
+  void setMarkersTrajectoryVisible(const QVector<int>& ids, const QVector<bool>& visibles);
+  void resetMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors);
+  int createAveragedMarker(const QList<int>& markerIds);
+  int generateNewPointId();
   
   int analogFrameNumber() const {return this->mp_BTKAcquisition->GetAnalogFrameNumber();}
   int analogSamplePerPointFrame() const {return this->mp_BTKAcquisition->GetNumberAnalogSamplePerFrame();};
@@ -195,6 +208,8 @@ public:
   void insertEvents(const QList<int>& ids, const QList<Event*> events);
   int generateNewEventId();
   
+  bool hasVideos() const {return !this->m_Videos.empty();};
+  int videosCount() const {return this->m_Videos.count();};
   const QMap<int, Video*>& videos() const {return this->m_Videos;};
   const QString& videoLabel(int id) const {return this->m_Videos[id]->label;};
   const QString& videoFilename(int id) const {return this->m_Videos[id]->filename;};
@@ -216,8 +231,10 @@ signals:
   void pointsDescriptionChanged(const QVector<int>& ids, const QVector<QString>& descs);
   void pointTypeChanged(int id, Point::Type p);
   void markersRadiusChanged(const QVector<int>& ids, const QVector<double>& radii);
-  void markerColorChanged(int id, const QColor& color);
   void markersColorChanged(const QVector<int>& ids, const QVector<QColor>& colors);
+  void markersVisibilityChanged(const QVector<int>& ids, const QVector<bool>& visibles);
+  void markersTrajectoryVisibilityChanged(const QVector<int>& ids, const QVector<bool>& visibles);
+  void markersConfigurationReset(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors);
   void pointsRemoved(const QList<int>& ids, const QList<Point*>& points);
   void pointsInserted(const QList<int>& ids, const QList<Point*>& points);
   void analogLabelChanged(int id, const QString& label);
@@ -242,10 +259,10 @@ private:
   bool write(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb, bool updateInfo = false);
   void loadAcquisition();
   void extractVideos(const std::vector<std::string>& filename, std::vector<double>& delays, bool completeFilename = true);
-  bool importFrom(const QList<btk::AcquisitionFileReader::Pointer>& readers, bool allFramesKept);
-  bool importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io);
+  bool importFrom(const QList<btk::Acquisition::Pointer>& readers, bool allFramesKept);
+  bool importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io, bool fromOpenAction);
   
-  enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED};
+  enum {BTK_SORTED_POINTS, BTK_FORCE_PLATFORMS, BTK_GRWS, BTK_GRWS_DOWNSAMPLED, BTK_DIRECTION_ANGLES};
   
   btk::Acquisition::Pointer mp_BTKAcquisition;
   QMap<int, btk::ProcessObject::Pointer> m_BTKProcesses;
@@ -254,6 +271,7 @@ private:
   int m_LastFrame;
   int mp_ROI[2];
   QMap<int,Point*> m_Points;
+  int m_LastPointId;
   QMap<int,Analog*> m_Analogs;
   QMap<int,Event*> m_Events;
   int m_LastEventId;

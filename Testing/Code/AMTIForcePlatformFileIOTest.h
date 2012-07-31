@@ -23,6 +23,7 @@ CXXTEST_SUITE(AMTIForcePlatformFileIOTest)
     TS_ASSERT_EQUALS(pt->CanReadFile(AMTIForcePlatformFilePathIN + "Trial1-FxFyFzMxMyMz.asc"), true);
   };
   
+  /*
   CXXTEST_TEST(CanWriteFileEmpty)
   {
     btk::AMTIForcePlatformFileIO::Pointer pt = btk::AMTIForcePlatformFileIO::New();
@@ -40,13 +41,14 @@ CXXTEST_SUITE(AMTIForcePlatformFileIOTest)
     btk::AMTIForcePlatformFileIO::Pointer pt = btk::AMTIForcePlatformFileIO::New();
     TS_ASSERT_EQUALS(pt->CanWriteFile("test.asc"), true);
   };
+  */
 };
 
 CXXTEST_SUITE_REGISTRATION(AMTIForcePlatformFileIOTest)
 CXXTEST_TEST_REGISTRATION(AMTIForcePlatformFileIOTest, CanReadFileEmpty)
 CXXTEST_TEST_REGISTRATION(AMTIForcePlatformFileIOTest, CanReadFileEmptyFile)
 CXXTEST_TEST_REGISTRATION(AMTIForcePlatformFileIOTest, CanReadFileOk)
-CXXTEST_TEST_REGISTRATION(AMTIForcePlatformFileIOTest, CanWriteFileEmpty)
-CXXTEST_TEST_REGISTRATION(AMTIForcePlatformFileIOTest, CanWriteFileFail)
-CXXTEST_TEST_REGISTRATION(AMTIForcePlatformFileIOTest, CanWriteFileOk)
+//CXXTEST_TEST_REGISTRATION(AMTIForcePlatformFileIOTest, CanWriteFileEmpty)
+//CXXTEST_TEST_REGISTRATION(AMTIForcePlatformFileIOTest, CanWriteFileFail)
+//CXXTEST_TEST_REGISTRATION(AMTIForcePlatformFileIOTest, CanWriteFileOk)
 #endif

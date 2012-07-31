@@ -44,6 +44,8 @@ namespace btk
   class SeparateKnownVirtualMarkersFilter : public ProcessObject
   {
   public:
+    enum {AllMarkers = 4, Markers = 0, VirtualMarkersForFrame = 1, VirtualMarkersOther = 2, OtherPoints = 3};
+    
     struct StringAxes
     {
       StringAxes(const std::string& o = "", const std::string& a1 = "", const std::string& a2 = "", const std::string& a3 = "")

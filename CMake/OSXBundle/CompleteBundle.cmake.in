@@ -79,7 +79,3 @@ if ("@QT_MAC_USE_COCOA@")
    file(MAKE_DIRECTORY "@install_dir@/@target@.app/Contents/Resources/qt_menu.nib")
    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory  "@QT_LIBRARY_DIR@/QtGui.framework/Resources/qt_menu.nib"  "@install_dir@/@target@.app/Contents/Resources/qt_menu.nib")
 endif()
-
-# -- Run the BundleUtilities cmake code
-include(BundleUtilities)
-fixup_bundle("@install_dir@/@target@.app" "${PluginList}" "Plugins")

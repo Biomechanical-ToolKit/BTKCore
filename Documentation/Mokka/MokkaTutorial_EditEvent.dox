@@ -1,7 +1,5 @@
 /**
-@mokkatutorialheader
 @page MokkaTutorial_EditEvent Edit an event
-@section MokkaTutorial_EditEventSection Edit an event
 
 @b Note: Only the C3D format supports events.@n
 @b Note: For MacOS X user, the Ctrl is replaced by the command key.

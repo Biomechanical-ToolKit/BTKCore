@@ -37,6 +37,7 @@
 #define ChartWidget_h
 
 #include <btkVTKChartTimeSeries.h>
+#include <btkPoint.h>
 
 #include <QVTKWidget.h>
 #include <vtkDoubleArray.h>
@@ -92,6 +93,9 @@ public:
   void setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor);
   void setEventsFunctor(btk::VTKEventsFunctor::Pointer functor);
   
+  double defaultLineWidth() {return ChartWidget::DefaultLineWidth;};
+  void setDefaultLineWidth(double width) {ChartWidget::DefaultLineWidth = width;};
+  
   void render(bool optionsShown = false);
   void show(bool s);
   
@@ -99,15 +103,25 @@ public:
   void displayAnalogChart() {this->displayChart(AnalogChart);};
   
   void updateAxisX();
+  void setUnitAxisX(const QString& str, double scale, double offset);
+  
+  void addPointPlot(btk::Point::Pointer pt, const QString& label);
+  void setPointUnitAxisY(const QString& strX, const QString& strY, const QString& strZ);
+  
+  VTKChartWidget* chartContent() const {return this->mp_ChartContentWidget;};
+  
+  static double DefaultLineWidth;
   
 public slots:
   void removePlot(int index);
+  void hidePlot(int index, bool isHidden);
   void setPlotLineColor(const QList<int>& indices, const QColor& color);
   void setPlotLineWidth(const QList<int>& indices, double value);
   void setChartTitle(const QString& title);
   void resetZoom();
   void exportToImage();
   void removeAllPlot();
+  void setEventDisplay(bool visible);
   void toggleEventDisplay();
   // Point specific
   void updatePointPlotLabel(int itemId);
@@ -128,6 +142,7 @@ signals:
   
 private slots:
   void setLastContextMenuPosition(const QPoint& globalPos);
+  void updateAxisX(int ff, int lf);
   
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
@@ -139,6 +154,8 @@ protected:
   void updatePlotLabel(int chartType, int itemId);
   void displayPointComponent(int idx, int state);
   void displayChart(int chartType);
+  void updateAxisX(btk::VTKChartTimeSeries* chart, int ff, int lf);
+  void updateAxisX(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux);
   
   int m_CurrentChartType;
   QVector<AbstractChartData*> m_ChartData;
@@ -180,6 +197,7 @@ public:
   QList<PlotProperties>& plotsProperties() {return this->m_PlotsProperties;};
   const QList<PlotProperties>& plotsProperties() const {return this->m_PlotsProperties;};
   virtual void removePlot(int index, bool* layoutModified);
+  virtual void hidePlot(int index, bool isHidden, bool* layoutModified);
   void setFrameArray(vtkDoubleArray* array);
   virtual void setPlotVisible(int index, bool show, bool* layoutModified);
   virtual void show(Acquisition* acq, bool s, bool* layoutModified);

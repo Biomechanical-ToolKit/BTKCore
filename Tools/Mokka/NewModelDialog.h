@@ -48,20 +48,24 @@ struct ConfigurationItem
 
 class NewModelDialog : public NewItemTemplateDialog<ConfigurationItem>
 {
-  Q_OBJECT
-  
 public:
   NewModelDialog(const QList<ConfigurationItem>* configs, QWidget* parent = 0);
   // ~NewModelDialog(); // Implicit
   
   void setConfigurationName(const QString& name);
-  QString configurationName() const {return this->lineEdit->text();};
+  QString configurationName(int* itemIndex) const {return this->createdItemText(itemIndex);};
   
 protected:
   virtual bool itemAlreadyExists(const QString& name);
-  
-private slots:
-  void updateButton(const QString& name);
+};
+
+template<>
+inline void NewItemTemplateDialog<ConfigurationItem>::fillExistingItems()
+{
+  this->existingComboBox->clear();
+  for (int i = 0 ; i < this->mp_Items->count() ; ++i)
+    this->existingComboBox->addItem(this->mp_Items->operator[](i).name);
+  this->existingComboBox->setCurrentIndex(-1);
 };
 
 #endif // NewModelDialog_h

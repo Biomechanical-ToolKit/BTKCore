@@ -106,20 +106,6 @@ namespace btk
   };
   
   /**
-   * Checks if the suffix of @a filename is XLSOrthoTrak.
-   */
-  bool XLSOrthoTrakFileIO::CanWriteFile(const std::string& filename)
-  {
-    std::string lowercase = filename;
-    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type XLSOrthoTrakPos = lowercase.rfind(".xls");
-    if ((XLSOrthoTrakPos != std::string::npos) && (XLSOrthoTrakPos == lowercase.length() - 4))
-      return true;
-    else
-      return false;
-  };
-  
-  /**
    * Read the file designated by @a filename and fill @a output.
    */
   void XLSOrthoTrakFileIO::Read(const std::string& filename, Acquisition::Pointer output)
@@ -407,17 +393,6 @@ namespace btk
       if (values) delete[] values;
       throw(XLSOrthoTrakFileIOException("Unknown exception"));
     }
-  };
-  
-  /**
-   * Write the file designated by @a filename with the content of @a input.
-   */
-  void XLSOrthoTrakFileIO::Write(const std::string& filename, Acquisition::Pointer input)
-  {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    btkErrorMacro("Method not yet implemented.");
-    return;
   };
   
   /**

@@ -69,14 +69,12 @@ TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
   m_Fm(this->font()), m_EventItems(), m_EventSymbols(8), m_SelectedEvents(),
   m_RubberOrigin()
 {
-  this->m_FirstFrame = 0;
-  this->m_LastFrame = 0;
-  this->m_ROIFirstFrame = this->m_FirstFrame;
-  this->m_ROILastFrame = this->m_LastFrame;
+  this->m_ROIFirstFrame = 0;
+  this->m_ROILastFrame = 0;
   this->m_EventContexts << "Right" << "Left" << "General";
-  this->m_SliderPos = this->m_FirstFrame;
-  this->m_LeftBoundPos = this->m_FirstFrame;
-  this->m_RightBoundPos = this->m_LastFrame;
+  this->m_SliderPos = 0;
+  this->m_LeftBoundPos = 0;
+  this->m_RightBoundPos = 0;
   this->m_UnitStep = 1.0;
   this->m_TickDivider = 1;
 #ifdef Q_OS_MAC
@@ -87,6 +85,8 @@ TimeEventBarWidget::TimeEventBarWidget(QWidget* parent)
   this->m_Mode = None;
   this->m_MovingEventIndex = -1;
   this->mp_Rubber = new QRubberBand(QRubberBand::Rectangle, this);
+  this->m_TimeDisplay = false;
+  this->m_TimeScale = 1.0;
   
   ushort s;
   s = 0x25C9; this->m_EventSymbols[0].setUtf16(&s,1); // General: Fisheye
@@ -104,27 +104,25 @@ void TimeEventBarWidget::load(Acquisition* acq)
   this->m_SelectedEvents.clear();
   if (acq->pointFrameNumber() == 0)
   {
-    this->m_FirstFrame = 0;
-    this->m_LastFrame = 0;
+    this->m_ROIFirstFrame = 0;
+    this->m_ROILastFrame = 0;
   }
   else
   {
-    this->m_FirstFrame = acq->firstFrame();
-    this->m_LastFrame = acq->lastFrame();
+    acq->regionOfInterest(this->m_ROIFirstFrame, this->m_ROILastFrame);
   }
-    
-  this->m_ROIFirstFrame = this->m_FirstFrame;
-  this->m_ROILastFrame = this->m_LastFrame;
-  this->m_SliderPos = this->m_FirstFrame;
-  this->m_LeftBoundPos = this->m_FirstFrame;
-  this->m_RightBoundPos = this->m_LastFrame;
+  
+  this->m_SliderPos = this->m_ROIFirstFrame;
+  this->m_LeftBoundPos = this->m_ROIFirstFrame;
+  this->m_RightBoundPos = this->m_ROILastFrame;
+  this->m_TimeScale = 1.0 / acq->pointFrequency();
   
   this->m_EventItems.resize(acq->eventCount());
   int inc = 0;
   for (QMap<int,Event*>::const_iterator it = acq->events().begin() ; it != acq->events().end() ; ++it)
     this->setEventItem(this->m_EventItems[inc++], it.key(), it.value());
   
-  this->setSliderValue(this->m_FirstFrame);
+  this->setSliderValue(this->m_ROIFirstFrame);
   this->updateInternals();
   this->update();
 };
@@ -133,13 +131,11 @@ void TimeEventBarWidget::reset()
 {
   this->m_SelectedEvents.clear();
   this->m_EventItems.clear();
-  this->m_FirstFrame = 0;
-  this->m_LastFrame = 0;
-  this->m_ROIFirstFrame = this->m_FirstFrame;
-  this->m_ROILastFrame = this->m_LastFrame;
-  this->m_SliderPos = this->m_FirstFrame;
-  this->m_LeftBoundPos = this->m_FirstFrame;
-  this->m_RightBoundPos = this->m_LastFrame;
+  this->m_ROIFirstFrame = 0;
+  this->m_ROILastFrame = 0;
+  this->m_SliderPos = 0;
+  this->m_LeftBoundPos = 0;
+  this->m_RightBoundPos = 0;
   this->updateInternals();
   this->update();
 };
@@ -203,12 +199,11 @@ void TimeEventBarWidget::setSliderValue(int frame)
   this->m_SliderPos = frame;
   this->updateSliderPostion();
   emit sliderPositionChanged(this->m_SliderPos);
-  this->update();
+  this->repaint();
 };
 
 void TimeEventBarWidget::paintEvent(QPaintEvent* event)
 {
-
   QPainter painter(this);
   
   // --------------------- Timeline ---------------------
@@ -236,11 +231,11 @@ void TimeEventBarWidget::paintEvent(QPaintEvent* event)
     painter.drawLine(LeftMargin, tStep, LeftMargin, tStep - 9);
     painter.drawLine(xMax, tStep, xMax, tStep - 9);
     // Ticks & SubTicks
-    int incST = subTicksStart;
+    int incST = subTicksStart + (this->m_TimeDisplay ? 1 : 0);
     int tickInc = 1;
     while (incST < numFrames)
     {
-      if (abs(this->m_Ticks[tickInc] - incST) <= dd / 2) // Final adjustment for the ticks
+      if ((tickInc < this->m_Ticks.size()) && (abs(this->m_Ticks[tickInc] - incST) <= dd / 2)) // Final adjustment for the ticks
       {
         painter.drawLine(LeftMargin + incST * this->m_UnitStep, tStep, LeftMargin + incST * this->m_UnitStep, tStep - 6);
         ++tickInc;
@@ -345,7 +340,6 @@ void TimeEventBarWidget::mouseMoveEvent(QMouseEvent* event)
       else if (frame > this->m_RightBoundPos)
         frame = this->m_RightBoundPos;
       this->setSliderValue(frame);
-      this->repaint();
     }
     else if (this->m_Mode == MoveLeftBound)
     {
@@ -455,6 +449,7 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
       return;
     }
     // Selection (point or rectangle)
+    bool noPreviousEventSelection = this->m_SelectedEvents.isEmpty();
     this->m_Mode = Rubber;
     this->m_RubberOrigin = event->pos();
     this->mp_Rubber->setGeometry(QRect(this->m_RubberOrigin, QSize(1,1)));
@@ -474,6 +469,14 @@ void TimeEventBarWidget::mousePressEvent(QMouseEvent* event)
     }
     this->updateEventSelection(currentSelection);
     emit sliderPositionChanged(this->m_SliderPos); // To update some widgets which can display event
+    // If there was not some events selected, then we move the slider to the position
+    if (noPreviousEventSelection && selectedEvents.isEmpty() && ((event->modifiers() & Qt::ShiftModifier) != Qt::ShiftModifier))
+    {
+      this->m_Mode = MoveSlider;
+      int frame = (int)((qreal)(event->pos().x() - LeftMargin) / this->m_UnitStep) + this->m_ROIFirstFrame;
+      if ((frame >= this->m_LeftBoundPos) && (frame <= this->m_RightBoundPos))
+        this->setSliderValue(frame);
+    }
   }
   else
     this->m_Mode = None;
@@ -589,12 +592,27 @@ void TimeEventBarWidget::updateInternals()
     numTicks -= 1;
   numTicks += 2;
   this->m_Ticks.resize(numTicks); this->m_TicksLabel.resize(numTicks);
-  this->m_Ticks[0] = 0; this->m_TicksLabel[0] = QString::number(this->m_ROIFirstFrame);
-  this->m_Ticks[numTicks - 1] = numFrames-1; this->m_TicksLabel[numTicks - 1] = QString::number(this->m_ROILastFrame);
-  for (int i = 1 ; i < numTicks - 1 ; ++i)
+  
+  if (this->m_TimeDisplay)
   {
-    this->m_Ticks[i] = off + i * this->m_TickDivider - this->m_ROIFirstFrame;
-    this->m_TicksLabel[i] = QString::number(this->m_Ticks[i] + this->m_ROIFirstFrame);
+    int ff = (this->m_ROIFirstFrame == 0) ? 1 : this->m_ROIFirstFrame; // special case if there is no loaded acquisition
+    this->m_Ticks[0] = 0; this->m_TicksLabel[0] = QString::number((ff - 1) * this->m_TimeScale);
+    this->m_Ticks[numTicks - 1] = numFrames-1; this->m_TicksLabel[numTicks - 1] = QString::number((this->m_ROILastFrame - 1) * this->m_TimeScale);
+    for (int i = 1 ; i < numTicks - 1 ; ++i)
+    {
+      this->m_Ticks[i] = off + i * this->m_TickDivider - this->m_ROIFirstFrame + 1;
+      this->m_TicksLabel[i] = QString::number(static_cast<double>(this->m_Ticks[i] + this->m_ROIFirstFrame - 1) * this->m_TimeScale);
+    }
+  }
+  else
+  {
+    this->m_Ticks[0] = 0; this->m_TicksLabel[0] = QString::number(this->m_ROIFirstFrame);
+    this->m_Ticks[numTicks - 1] = numFrames-1; this->m_TicksLabel[numTicks - 1] = QString::number(this->m_ROILastFrame);
+    for (int i = 1 ; i < numTicks - 1 ; ++i)
+    {
+      this->m_Ticks[i] = off + i * this->m_TickDivider - this->m_ROIFirstFrame;
+      this->m_TicksLabel[i] = QString::number(this->m_Ticks[i] + this->m_ROIFirstFrame);
+    }
   }
   
   int wTextFrame = this->m_Fm.width(m_TicksLabel[0]);

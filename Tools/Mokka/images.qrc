@@ -5,6 +5,7 @@
     <file>Resources/Images/advanced_preferences.png</file>
     <file>Resources/Images/chart_curve.png</file>
     <file>Resources/Images/chart_line.png</file>
+    <file>Resources/Images/chart_preferences.png</file>
     <file>Resources/Images/checkbox_checked-13.png</file>
     <file>Resources/Images/checkbox_checked-hover-13.png</file>
     <file>Resources/Images/checkbox_checked-pressed-13.png</file>
@@ -21,6 +22,9 @@
     <file>Resources/Images/editdelete-down.png</file>
     <file>Resources/Images/error.png</file>
     <file>Resources/Images/eye.png</file>
+    <file>Resources/Images/eye2.png</file>
+    <file>Resources/Images/eye-blind.png</file>
+    <file>Resources/Images/eye-blind2.png</file>
     <file>Resources/Images/folder.png</file>
     <file>Resources/Images/forceplate-16.png</file>
     <file>Resources/Images/filenew.png</file>
@@ -57,6 +61,7 @@
     <file>Resources/Images/skip_backward_active.png</file>
     <file>Resources/Images/skip_forward.png</file>
     <file>Resources/Images/skip_forward_active.png</file>
+    <file>Resources/Images/surface-visibility.png</file>
     <file>Resources/Images/pause.png</file>
     <file>Resources/Images/pause_active.png</file>
     <file>Resources/Images/play.png</file>
@@ -70,6 +75,7 @@
     <file>Resources/Images/Mokka_128.png</file>
     <file>Resources/Images/video.png</file>
     <file>Resources/Images/video_error.png</file>
+    <file>Resources/Images/virtual-markers.png</file>
     <file>Resources/Images/warning.png</file>
   </qresource>
 </RCC>

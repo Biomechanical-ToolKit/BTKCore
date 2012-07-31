@@ -65,7 +65,7 @@
  If you load a C3D file already processed which contains kinematics or inverse dynamic (for example, by using PluginGait for the Vicon users), it is very simple to extract angles, forces, moments, powers, etc. You only have to use the corresponding function. All these functions return a structure where each field correspond to the label of the requested points.
 
 @code
- angles = btkGetMoments(acq);
+ angles = btkGetAngles(acq);
  forces = btkGetForces(acq);
  moments = btkGetMoments(acq);
  powers = btkGetPowers(acq);

@@ -36,9 +36,12 @@
 #include "Acquisition.h"
 #include "LoggerMessage.h"
 
+#include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileWriter.h>
 #include <btkMetaDataUtils.h>
 #include <btkMergeAcquisitionFilter.h>
+#include <btkAcquisitionFileIOFactory.h>
+#include <btkConvert.h>
 
 #include <Qt>
 #include <QFileInfo>
@@ -55,6 +58,7 @@ Acquisition::Acquisition(QObject* parent)
   this->m_LastFrame = 0;
   this->mp_ROI[0] = this->m_FirstFrame;
   this->mp_ROI[1] = this->m_LastFrame;
+  this->m_LastPointId = -1;
   this->m_LastEventId = -1;
   this->m_LastVideoId = -1;
   this->m_DefaultMarkerRadius = 8.0; // mm
@@ -68,15 +72,42 @@ Acquisition::Acquisition(QObject* parent)
   GRWsFilter->SetInput(forcePlatformsExtractor->GetOutput());
   btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = btk::DownsampleFilter<btk::WrenchCollection>::New();
   GRWsDownsampler->SetInput(GRWsFilter->GetOutput());
+  btk::WrenchDirectionAngleFilter::Pointer wrenchDirectionAngleFilter = btk::WrenchDirectionAngleFilter::New();
+  wrenchDirectionAngleFilter->SetInput(GRWsDownsampler->GetOutput());
   this->m_BTKProcesses[BTK_SORTED_POINTS] = virtualMarkersSeparator;
   this->m_BTKProcesses[BTK_FORCE_PLATFORMS] = forcePlatformsExtractor;
   this->m_BTKProcesses[BTK_GRWS] = GRWsFilter;
   this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED] = GRWsDownsampler;
+  this->m_BTKProcesses[BTK_DIRECTION_ANGLES] = wrenchDirectionAngleFilter;
 };
 
 Acquisition::~Acquisition()
 {
   this->clear();
+};
+
+void Acquisition::supportedReadFileFormats(QStringList& formats)
+{
+  btk::AcquisitionFileIO::Extensions exts = btk::AcquisitionFileIOFactory::GetSupportedReadExtensions();
+  for(btk::AcquisitionFileIO::Extensions::ConstIterator it = exts.Begin() ; it != exts.End() ; ++it)
+  {
+    QString qstr = QString::fromStdString(it->name);
+    if (!it->desc.empty())
+      qstr += " " + QString::fromStdString(it->desc);
+    formats.append(qstr);
+  }
+};
+
+void Acquisition::supportedWrittenFileFormats(QStringList& formats)
+{
+  btk::AcquisitionFileIO::Extensions exts = btk::AcquisitionFileIOFactory::GetSupportedWrittenExtensions();
+  for(btk::AcquisitionFileIO::Extensions::ConstIterator it = exts.Begin() ; it != exts.End() ; ++it)
+  {
+    QString qstr = QString::fromStdString(it->name);
+    if (!it->desc.empty())
+      qstr += " " + QString::fromStdString(it->desc);
+    formats.append(qstr);
+  }
 };
 
 bool Acquisition::load(const QString& filename)
@@ -115,6 +146,12 @@ bool Acquisition::save(const QString& filename, const QMap<int, QVariant>& prope
   return this->write(filename, properties, this->mp_ROI[0], this->mp_ROI[1], true);
 }
 
+bool Acquisition::canBeSaved(const QString& filename)
+{
+  btk::AcquisitionFileIO::Pointer io = btk::AcquisitionFileIOFactory::CreateAcquisitionIO(qPrintable(filename), btk::AcquisitionFileIOFactory::WriteMode);
+  return (io ? true : false);
+};
+
 bool Acquisition::exportTo(const QString& filename, const QMap<int, QVariant>& properties, int lb, int rb)
 {
   return this->write(filename, properties, lb, rb);
@@ -123,7 +160,7 @@ bool Acquisition::exportTo(const QString& filename, const QMap<int, QVariant>& p
 bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
 {
   // Try to read the given file
-  QList<btk::AcquisitionFileReader::Pointer> readers;
+  QList<btk::Acquisition::Pointer> acquisitions;
   try
   {
     for (int i = 0 ; i < filenames.count() ; ++i)
@@ -132,7 +169,7 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
       btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
       reader->SetFilename(filenames[i].toStdString());
       reader->Update();
-      readers << reader;
+      acquisitions << reader->GetOutput();
     }
   }
   catch (btk::Exception& e)
@@ -150,10 +187,10 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
     LOG_CRITICAL("Unknown error.");
     return false;
   }
-  return this->importFrom(readers, allFramesKept);
+  return this->importFrom(acquisitions, allFramesKept);
 };
 
-bool Acquisition::importFrom(const QList<btk::AcquisitionFileReader::Pointer>& readers, bool allFramesKept)
+bool Acquisition::importFrom(const QList<btk::Acquisition::Pointer>& acquisitions, bool allFramesKept)
 {
   // Check if the original acquisition need to be cropped
   if (this->mp_BTKAcquisition)
@@ -179,8 +216,8 @@ bool Acquisition::importFrom(const QList<btk::AcquisitionFileReader::Pointer>& r
   btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
   merger->SetFirstFrameRule(allFramesKept ? btk::MergeAcquisitionFilter::KeepAllFrames : btk::MergeAcquisitionFilter::KeepFromHighestFirstFrame);
   merger->SetInput(0, this->mp_BTKAcquisition);
-  for (int i = 0 ; i < readers.count() ; ++i)
-    merger->SetInput(i+shift, readers[i]->GetOutput());
+  for (int i = 0 ; i < acquisitions.count() ; ++i)
+    merger->SetInput(i+shift, acquisitions[i]);
   merger->Update();
   this->clear();
   this->mp_BTKAcquisition = merger->GetOutput();
@@ -188,16 +225,16 @@ bool Acquisition::importFrom(const QList<btk::AcquisitionFileReader::Pointer>& r
   QVector<QString> infos(16,"N/A"); infos[0] = "N/A                         ";
   emit informationsChanged(infos);
   return true;
-}
+};
 
-bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions)
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& dimensions, bool fromOpenAction)
 {
   btk::AMTIForcePlatformFileIO::Pointer io = btk::AMTIForcePlatformFileIO::New();
   io->SetDimensions(dimensions[0].toFloat(), dimensions[1].toFloat(), dimensions[2].toFloat());
-  return this->importFromAMTI(filename, allFramesKept, io);
+  return this->importFromAMTI(filename, allFramesKept, io, fromOpenAction);
 };
 
-bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin)
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, const QList<QVariant>& corners, const QList<QVariant>& origin, bool fromOpenAction)
 {
   std::vector<float> c(12), o(3);
   for (int i = 0 ; i < 12 ; ++i)
@@ -206,20 +243,21 @@ bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, co
     o[i] = origin[i].toFloat();
   btk::AMTIForcePlatformFileIO::Pointer io = btk::AMTIForcePlatformFileIO::New();
   io->SetGeometry(c,o);
-  return this->importFromAMTI(filename, allFramesKept, io);
+  return this->importFromAMTI(filename, allFramesKept, io, fromOpenAction);
 };
 
-bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io)
+bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, btk::AMTIForcePlatformFileIO::Pointer io, bool fromOpenAction)
 {
   // Try to read the given file
-  QList<btk::AcquisitionFileReader::Pointer> readers;
+  QList<btk::Acquisition::Pointer> acquisitions;
+  btk::AcquisitionFileReader::Pointer reader;
   try
   {
-    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader = btk::AcquisitionFileReader::New();
     reader->SetAcquisitionIO(io);
     reader->SetFilename(filename.toStdString());
     reader->Update();
-    readers << reader;
+    acquisitions << reader->GetOutput();
   }
   catch (btk::Exception& e)
   {
@@ -236,7 +274,31 @@ bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, bt
     LOG_CRITICAL("Unknown error.");
     return false;
   }
-  return this->importFrom(readers, allFramesKept);
+  bool res = this->importFrom(acquisitions, allFramesKept);
+  if (fromOpenAction)
+  {
+    this->m_Filename = filename;
+    this->emitGeneratedInformations(reader->GetAcquisitionIO());
+  }
+  return res;
+};
+
+bool Acquisition::importFromVideos(const QStringList& paths, bool allFramesKept, int ff, double freq, double duration)
+{
+  btk::Acquisition::Pointer acq = btk::Acquisition::New();
+  acq->Init(0,static_cast<int>(freq * duration));
+  acq->SetFirstFrame(ff);
+  acq->SetPointFrequency(freq);
+  btk::MetaData::Pointer point = btk::MetaDataCreateChild(acq->GetMetaData(), "POINT");
+  std::vector<std::string> moveFilenames(paths.size());
+  for (int i = 0 ; i < static_cast<int>(paths.size()) ; ++i)
+    moveFilenames[i] = paths[i].toStdString();
+  btk::MetaDataCreateChild(point, "MOVIE_FILENAME", moveFilenames);
+  
+  QList<btk::Acquisition::Pointer> acquisitions;
+  acquisitions << acq;
+  
+  return this->importFrom(acquisitions, allFramesKept);
 };
 
 void Acquisition::clear()
@@ -254,6 +316,7 @@ void Acquisition::clear()
   for (QMap<int,Video*>::iterator it = this->m_Videos.begin() ; it != this->m_Videos.end() ; ++it)
     delete *it;
   this->m_Videos.clear();
+  this->m_LastPointId = -1;
   this->m_LastEventId = -1;
   this->m_LastVideoId = -1;
   this->mp_BTKAcquisition = btk::Acquisition::Pointer(); // NULL
@@ -261,13 +324,16 @@ void Acquisition::clear()
 
 void Acquisition::setFirstFrame(int ff)
 {
-  int diff = this->m_FirstFrame - ff;
+  int diff = this->mp_ROI[0] - ff;
   this->m_FirstFrame -= diff;
   this->m_LastFrame -= diff;
   this->mp_ROI[0] -= diff;
   this->mp_ROI[1] -= diff;
   for (QMap<int,Event*>::iterator it = this->m_Events.begin() ; it != this->m_Events.end() ; ++it)
+  {
     (*it)->frame -= diff;
+    (*it)->time = static_cast<double>((*it)->frame - 1) / this->pointFrequency();
+  }
   for (QMap<int,Video*>::iterator it = this->m_Videos.begin() ; it != this->m_Videos.end() ; ++it)
     (*it)->delay -= static_cast<qint64>(static_cast<double>(diff) / this->pointFrequency() * 1000.0);
   emit firstFrameChanged(ff);
@@ -343,7 +409,7 @@ int Acquisition::findMarkerIdFromLabel(const QString& label) const
 {
   for (QMap<int,Point*>::const_iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
   {
-    if ((it.value()->label.compare(label) == 0) && ((it.value()->type == Point::Marker) || (it.value()->type == Point::VirtualMarker)))
+    if ((it.value()->label.compare(label) == 0) && ((it.value()->type == Point::Marker) || (it.value()->type == Point::VirtualMarker) || (it.value()->type == Point::VirtualMarkerForFrame)))
       return it.key();
   }
   return -1;
@@ -360,39 +426,41 @@ void Acquisition::setMarkersRadius(const QVector<int>& ids, const QVector<double
   emit markersRadiusChanged(ids, radii);
 };
 
-void Acquisition::resetMarkersRadius(const QVector<int>& ids, const QVector<double>& radii)
+void Acquisition::resetMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors)
 {
   QList<int> ids_;
   QList<double> radii_;
+  QList<QColor> colors_;
+  QList<bool> visibles_;
+  QList<bool> trajectories_;
   for (QMap<int,Point*>::iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
   {
-    if (((*it)->type != Point::Marker) && ((*it)->type != Point::VirtualMarker))
+    if (((*it)->type != Point::Marker) && ((*it)->type != Point::VirtualMarker) && ((*it)->type != Point::VirtualMarkerForFrame))
       continue;
     ids_ << it.key();
     int idx = ids.indexOf(it.key());
     if (idx != -1)
     {
-      (*it)->radius = radii[idx];
-      radii_ << radii[idx];
+      (*it)->radius = radii[idx]; 
+      (*it)->color = colors[idx];
+      (*it)->visible = visibles[idx];
+      (*it)->trajectoryVisible = trajectories[idx];
     }
     else
     {
       (*it)->radius = this->m_DefaultMarkerRadius;
-      radii_ << this->m_DefaultMarkerRadius;
+      (*it)->color = this->m_DefaultMarkerColor;
+      (*it)->visible = (((*it)->type == Point::Marker) ? true : false);
+      (*it)->trajectoryVisible = false;
     }
+    radii_ << (*it)->radius;
+    colors_ << (*it)->color;
+    visibles_ << (*it)->visible;
+    trajectories_ << (*it)->trajectoryVisible;
   }
-  emit markersRadiusChanged(ids_.toVector(), radii_.toVector());
+  emit markersConfigurationReset(ids_, visibles_, trajectories_, radii_, colors_);
 };
 
-void Acquisition::setMarkerColor(int id, const QColor& color)
-{
-  QMap<int,Point*>::iterator it = this->m_Points.find(id);
-  if (it != this->m_Points.end())
-  {
-    (*it)->color = color;
-    emit markerColorChanged(id, color);
-  }
-};
 
 void Acquisition::setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors)
 {
@@ -405,28 +473,97 @@ void Acquisition::setMarkersColor(const QVector<int>& ids, const QVector<QColor>
   emit markersColorChanged(ids, colors);
 };
 
-void Acquisition::resetMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors)
+int Acquisition::createAveragedMarker(const QList<int>& markerIds)
 {
-  QList<int> ids_;
-  QList<QColor> colors_;
-  for (QMap<int,Point*>::iterator it = this->m_Points.begin() ; it != this->m_Points.end() ; ++it)
+  btk::PointCollection::Pointer markers = btk::PointCollection::New();
+  std::string desc = "Average between the markers ";
+  for (int i = 0 ; i < markerIds.count() ; ++i)
   {
-    if (((*it)->type != Point::Marker) && ((*it)->type != Point::VirtualMarker))
-      continue;
-    ids_ << it.key();
-    int idx = ids.indexOf(it.key());
-    if (idx != -1)
+    QMap<int,Point*>::iterator it = this->m_Points.find(markerIds[i]);
+    if (it != this->m_Points.end())
     {
-      (*it)->color = colors[idx];
-      colors_ << colors[idx];
+      if ((*it)->btkidx < this->mp_BTKAcquisition->GetPoints()->GetItemNumber())
+      {
+        btk::Point::Pointer pt = this->mp_BTKAcquisition->GetPoints()->GetItem((*it)->btkidx);
+        if (i != 0)
+        {
+          if (i == (markerIds.count()-1))
+            desc += " and ";
+          else
+            desc += ", ";
+        }
+        desc += pt->GetLabel();
+        markers->InsertItem(pt);
+      }
+      else
+      {
+        qWarning("No marker found in the BTK acquisition with the index %i", (*it)->btkidx);
+        return -1;
+      }
     }
     else
     {
-      (*it)->color = this->m_DefaultMarkerColor;
-      colors_ << this->m_DefaultMarkerColor;
+      qDebug("The marker with the index %i was not found!", markerIds[i]);
+      return -1;
     }
   }
-  emit markersColorChanged(ids_.toVector(), colors_.toVector());
+  int numMarkers = markers->GetItemNumber();
+  if (numMarkers < 2)
+  {
+    qDebug("At least two markers are required to create an averaged marker!");
+    return -1;
+  }
+  
+  btk::Point::Pointer average = btk::Point::New("Uname*" + btk::ToString(this->m_LastPointId+1), this->pointFrameNumber(), btk::Point::Marker, desc);
+  for (int i = 0  ; i < this->pointFrameNumber() ; ++i)
+  {
+    bool valid = true;
+    for (btk::PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
+    {
+      if ((*it)->GetResiduals().coeff(i) < 0.0)
+      {
+        valid = false;
+        break;
+      }
+    }
+    if (valid)
+    {
+      double x = 0.0, y = 0.0, z = 0.0;
+      for (btk::PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
+      {
+        x += (*it)->GetValues().coeff(i,0);
+        y += (*it)->GetValues().coeff(i,1);
+        z += (*it)->GetValues().coeff(i,2);
+      }
+      average->SetFrame(i, x / static_cast<double>(numMarkers),
+                           y / static_cast<double>(numMarkers),
+                           z / static_cast<double>(numMarkers));
+    }
+    else
+      average->SetFrame(i, 0.0, 0.0, 0.0, -1.0, -1.0);
+  }
+  this->mp_BTKAcquisition->GetPoints()->InsertItem(average);
+  
+  Point* p = new Point();
+  p->label = QString::fromStdString(average->GetLabel());
+  p->description = QString::fromStdString(average->GetDescription());
+  p->type = Point::Marker;
+  p->visible = true;
+  p->trajectoryVisible = false;
+  p->radius = this->m_DefaultMarkerRadius;
+  p->color = this->m_DefaultMarkerColor;
+  p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetItemNumber()-1;
+  this->insertPoints(QList<int>() << this->m_LastPointId, QList<Point*>() << p);
+
+  LOG_INFO("Marker " + p->label + " created. " + p->description);
+  this->m_LastPointId++;
+  return p->btkidx;
+};
+
+int Acquisition::generateNewPointId()
+{
+  this->m_LastPointId += 1;
+  return this->m_LastPointId;
 };
 
 QList<Point*> Acquisition::takePoints(const QList<int>& ids)
@@ -453,7 +590,7 @@ void Acquisition::insertPoints(const QList<int>& ids, const QList<Point*> points
     if (it == this->m_Points.end())
       this->m_Points.insert(ids[i], points[i]);
     else
-      qDebug("A point with the given ID already exists");
+      qDebug("A point with the given ID already exists: %s", qPrintable((*it)->label));
   }
   emit pointsInserted(ids, points);
 };
@@ -466,6 +603,28 @@ int Acquisition::findPointIdFromLabel(const QString& label) const
       return it.key();
   }
   return -1;
+};
+
+void Acquisition::setMarkersVisible(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    QMap<int,Point*>::iterator it = this->m_Points.find(ids[i]);
+    if (it != this->m_Points.end())
+      (*it)->visible = visibles[i];
+  }
+  emit markersVisibilityChanged(ids, visibles);
+};
+
+void Acquisition::setMarkersTrajectoryVisible(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    QMap<int,Point*>::iterator it = this->m_Points.find(ids[i]);
+    if (it != this->m_Points.end())
+      (*it)->trajectoryVisible = visibles[i];
+  }
+  emit markersTrajectoryVisibilityChanged(ids, visibles);
 };
 
 void Acquisition::setAnalogLabel(int id, const QString& label)
@@ -983,6 +1142,7 @@ void Acquisition::loadAcquisition()
   this->mp_ROI[1] = this->m_LastFrame;
   int inc = 0;
   // The orders for the points are important as their ID follows the same rule than in the class btk::VTKMarkersFramesSource
+  // FIXME: The current solution is not the best if there is more than 65535 markers as the first ID of the model ouputs starts from this value. Maybe a map between the marker's ID and the corresponding index in the VTKMarkersFramesSource should fix definitively this problem
   // Markers
   btk::PointCollection::Pointer points = virtualMarkersSeparator->GetOutput(0);
   for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
@@ -991,10 +1151,12 @@ void Acquisition::loadAcquisition()
     p->label = QString::fromStdString((*it)->GetLabel());
     p->description = QString::fromStdString((*it)->GetDescription());
     p->type = Point::Marker;
+    p->visible = true;
+    p->trajectoryVisible = false;
     p->radius = this->m_DefaultMarkerRadius;
     p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
+    this->m_Points.insert(virtualMarkersSeparator->GetOutput(4)->GetIndexOf(*it), p);
   }
   // Virtual markers (CoM, CoG, ...)
   points = virtualMarkersSeparator->GetOutput(2);
@@ -1004,10 +1166,12 @@ void Acquisition::loadAcquisition()
     p->label = QString::fromStdString((*it)->GetLabel());
     p->description = QString::fromStdString((*it)->GetDescription());
     p->type = Point::VirtualMarker;
+    p->visible = false;
+    p->trajectoryVisible = false;
     p->radius = this->m_DefaultMarkerRadius;
     p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
+    this->m_Points.insert(virtualMarkersSeparator->GetOutput(4)->GetIndexOf(*it), p);
   }
   // Virtual markers used to define frames
   points = virtualMarkersSeparator->GetOutput(1);
@@ -1017,11 +1181,14 @@ void Acquisition::loadAcquisition()
     p->label = QString::fromStdString((*it)->GetLabel());
     p->description = QString::fromStdString((*it)->GetDescription());
     p->type = Point::VirtualMarkerForFrame;
-    p->radius = -1.0;
-    p->color = QColor::Invalid;
+    p->visible = false;
+    p->trajectoryVisible = false;
+    p->radius = this->m_DefaultMarkerRadius;
+    p->color = this->m_DefaultMarkerColor;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
+    this->m_Points.insert(virtualMarkersSeparator->GetOutput(4)->GetIndexOf(*it), p);
   }
+  this->m_LastPointId = this->m_Points.size();
   // Other points
   points = virtualMarkersSeparator->GetOutput(3);
   for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
@@ -1039,10 +1206,12 @@ void Acquisition::loadAcquisition()
       p->type = Point::Power;
     else if ((*it)->GetType() == btk::Point::Scalar)
       p->type = Point::Scalar;
+    p->visible = false;
+    p->trajectoryVisible = false;
     p->radius = -1.0;
     p->color = QColor::Invalid;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(inc++, p);
+    this->m_Points.insert(65535 + inc++, p); // 65535: To distinct clearly the markers from the others points.
   }
   // Analog
   inc = 0;
@@ -1169,23 +1338,36 @@ void Acquisition::loadAcquisition()
         QString str = QString::fromStdString(*it);
         str = str.trimmed();
         // Look if the video file exists
-        QFileInfo fI = QFileInfo(this->m_Filename);
-        QDir dir = QDir(fI.canonicalPath());
-        QStringList videoList = dir.entryList(QStringList() << str, QDir::Files | QDir::Readable);
         QString filename, path;
-        bool error = false;
-        if (videoList.isEmpty())
+        bool videoFileFound = false;
+        QFileInfo fI = QFileInfo(this->m_Filename);
+        // - Global path
+        QFileInfo fIg = QFileInfo(str);
+        if (fIg.exists())
         {
-          LOG_WARNING("No video file found with the name " +  str + ". You need to put the video files in the same folder than the acquisition.");
-          filename = str;
-          error = true;
+          filename = fIg.fileName();
+          path = fIg.path();
+          videoFileFound = true;
         }
-        else
+        // - Relative path
+        if (!videoFileFound)
         {
-          if (videoList.size() > 1)
-            LOG_WARNING("More than one file was found with this video name. Only the first one is loaded.");
-          filename = videoList.at(0);
-          path = fI.canonicalPath();
+          QDir dir = QDir(fI.canonicalPath());
+          QStringList videoList = dir.entryList(QStringList() << str, QDir::Files | QDir::Readable);
+          
+          if (videoList.isEmpty())
+          {
+            LOG_WARNING("No video file found with the name " +  str + ". You need to put the video files in the same folder than the acquisition.");
+            filename = str;
+          }
+          else
+          {
+            if (videoList.size() > 1)
+              LOG_WARNING("More than one file was found with this video name. Only the first one is loaded.");
+            filename = videoList.at(0);
+            path = fI.canonicalPath();
+            videoFileFound = true;
+          }
         }
         // Set the new video
         Video* m = new Video();
@@ -1198,7 +1380,7 @@ void Acquisition::loadAcquisition()
         m->filename = filename;
         m->path = path;
         m->delay = static_cast<qint64>(movieDelay[inc] * 1000); // ms.
-        m->error = error;
+        m->error = !videoFileFound;
         this->m_Videos.insert(inc, m);
       }
     }

@@ -44,6 +44,8 @@ Preferences::Preferences(QWidget* parent)
   this->setupUi(this);
   
   connect(this->defaultConfigurationButton, SIGNAL(clicked()), this, SLOT(setDefaultConfiguration()));
+  connect(this->defaultBackgroundColorButton, SIGNAL(clicked()), this, SLOT(setDefaultBackgroundColor()));
+  connect(this->defaultGridColorButton, SIGNAL(clicked()), this, SLOT(setDefaultGridColor()));
   connect(this->defaultSegmentColorButton, SIGNAL(clicked()), this, SLOT(setDefaultSegmentColor()));
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultForcePlateColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForcePlateColor()));
@@ -51,11 +53,15 @@ Preferences::Preferences(QWidget* parent)
   connect(this->layoutTable, SIGNAL(userLayoutRemoved(int)), this, SLOT(removeUserLayout(int)));
   connect(this->layoutTable, SIGNAL(userLayoutLabelChanged(int, QString)), this, SLOT(relabelUserLayout(int, QString)));
   connect(this->layoutTable, SIGNAL(userLayoutDropped(int, int)), this, SLOT(updateDroppedUserLayouts(int, int)));
+  connect(this->defaultTimeBarEventDisplayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(forceChartUnitAxisX(int)));
   
   this->m_Data[DefaultConfigurationUse] = false;
   this->m_Data[DefaultConfigurationPath] = "";
   this->m_Data[EventEditorWhenInserting] = false;
   this->m_Data[DefaultGroundOrientation] = -1;
+  this->m_Data[DefaultTimeBarEventDisplay] = -1;
+  this->m_Data[DefaultBackgroundColor] = QColor();
+  this->m_Data[DefaultGridColor] = QColor();
   this->m_Data[DefaultSegmentColor] = QColor();
   this->m_Data[DefaultMarkerColor] = QColor();
   this->m_Data[DefaultMarkerRadius] = -1;
@@ -64,10 +70,15 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[ForcePlatformIndexDisplay] = -1;
   this->m_Data[DefaultForcePlateColor] = QColor();
   this->m_Data[DefaultForceVectorColor] = QColor();
+  this->m_Data[DefaultGRFButterflyActivation] = -1;
+  this->m_Data[ForcePathDisplay] = -1;
   this->m_Data[UserLayoutIndex] = -1;
   this->m_Data[UserLayouts] = QList<QVariant>();
   this->m_Data[AutomaticCheckUpdateUse] = false;
-  
+  this->m_Data[DefaultPlotLineWidth] = -1;
+  this->m_Data[ChartEventDisplay] = -1;
+  this->m_Data[chartUnitAxisX] = -1;
+
   // Force the General tab to be the current.
   this->tabWidget->setCurrentIndex(0);
 };
@@ -77,6 +88,7 @@ void Preferences::saveSettings()
   bool checked = false;
   int index = -1;
   QColor color;
+  double value = 0.0;
   
   checked = this->defaultConfigurationCheckBox->checkState() == Qt::Checked;
   if (this->m_Data[DefaultConfigurationUse].toBool() != checked)
@@ -106,6 +118,27 @@ void Preferences::saveSettings()
     emit defaultGroundOrientationChanged(index);
   }
   
+  index = this->defaultTimeBarEventDisplayComboBox->currentIndex();
+  if (this->m_Data[DefaultTimeBarEventDisplay].toInt() != index)
+  {
+    this->m_Data[DefaultTimeBarEventDisplay] = index;
+    emit defaultTimeBarEventDisplayChanged(index);
+  }
+  
+  color = this->defaultBackgroundColorButton->property("backgroundColor").value<QColor>();
+  if (this->m_Data[DefaultBackgroundColor].value<QColor>() != color)
+  {
+    this->m_Data[DefaultBackgroundColor] = color;
+    emit defaultBackgroundColorChanged(color);
+  }
+  
+  color = this->defaultGridColorButton->property("backgroundColor").value<QColor>();
+  if (this->m_Data[DefaultGridColor].value<QColor>() != color)
+  {
+    this->m_Data[DefaultGridColor] = color;
+    emit defaultGridColorChanged(color);
+  }
+  
   color = this->defaultSegmentColorButton->property("backgroundColor").value<QColor>();
   if (this->m_Data[DefaultSegmentColor].value<QColor>() != color)
   {
@@ -120,7 +153,7 @@ void Preferences::saveSettings()
     emit defaultMarkerColorChanged(color);
   }
   
-  double value = this->defaultMarkerRadiusSpinBox->value();
+  value = this->defaultMarkerRadiusSpinBox->value();
   if (this->m_Data[DefaultMarkerRadius].toDouble() != value)
   {
     this->m_Data[DefaultMarkerRadius] = value;
@@ -162,6 +195,41 @@ void Preferences::saveSettings()
     emit defaultForceVectorColorChanged(color);
   }
   
+  index = this->defaultGRFButterflyActivationComboBox->currentIndex();
+  if (this->m_Data[DefaultGRFButterflyActivation].toInt() != index)
+  {
+    this->m_Data[DefaultGRFButterflyActivation] = index;
+    emit defaultGRFButterflyActivationChanged(index);
+  }
+  
+  index = this->showForcePathComboBox->currentIndex();
+  if (this->m_Data[ForcePathDisplay].toInt() != index)
+  {
+    this->m_Data[ForcePathDisplay] = index;
+    emit showForcePathChanged(index);
+  }
+  
+  value = this->defaultPlotLineWidthSpinBox->value();
+  if (this->m_Data[DefaultPlotLineWidth].toDouble() != value)
+  {
+    this->m_Data[DefaultPlotLineWidth] = value;
+    emit defaultPlotLineWidthChanged(value);
+  }
+  
+  index = this->defaultChartEventDisplayComboBox->currentIndex();
+  if (this->m_Data[ChartEventDisplay].toInt() != index)
+  {
+    this->m_Data[ChartEventDisplay] = index;
+    emit showChartEventChanged(index);
+  }
+  
+  index = this->defaultChartUnitAxisXComboBox->currentIndex();
+  if (this->m_Data[chartUnitAxisX].toInt() != index)
+  {
+    this->m_Data[chartUnitAxisX] = index;
+    emit chartUnitAxisXChanged(index);
+  }
+  
   QList<QVariant> vList = this->m_Data[UserLayouts].toList();
   if (vList != *(this->layoutTable->userLayouts()))
   {
@@ -182,14 +250,22 @@ void Preferences::resetSettings()
   this->defaultConfigurationLineEdit->setText(this->m_Data[DefaultConfigurationPath].toString());
   this->openEventEditorCheckBox->setChecked(this->m_Data[EventEditorWhenInserting].toBool());
   this->defaultPlaneOrientationComboBox->setCurrentIndex(this->m_Data[DefaultGroundOrientation].toInt());
+  this->defaultTimeBarEventDisplayComboBox->setCurrentIndex(this->m_Data[DefaultTimeBarEventDisplay].toInt());
+  colorizeButton(this->defaultBackgroundColorButton, this->m_Data[DefaultBackgroundColor].value<QColor>());
+  colorizeButton(this->defaultGridColorButton, this->m_Data[DefaultGridColor].value<QColor>());
   colorizeButton(this->defaultSegmentColorButton, this->m_Data[DefaultSegmentColor].value<QColor>());
-  colorizeButton(this->defaultMarkerColorButton, this->m_Data[DefaultMarkerColor].value<QColor>() );
+  colorizeButton(this->defaultMarkerColorButton, this->m_Data[DefaultMarkerColor].value<QColor>());
   this->defaultMarkerRadiusSpinBox->setValue(this->m_Data[DefaultMarkerRadius].toDouble());
   this->defaultMarkerTrajectoryLengthComboBox->setCurrentIndex(this->m_Data[DefaultTrajectoryLength].toInt());
   this->showForcePlatformAxesComboBox->setCurrentIndex(this->m_Data[ForcePlatformAxesDisplay].toInt());
   this->showForcePlatformIndexComboBox->setCurrentIndex(this->m_Data[ForcePlatformIndexDisplay].toInt());
   colorizeButton(this->defaultForcePlateColorButton, this->m_Data[DefaultForcePlateColor].value<QColor>());
   colorizeButton(this->defaultForceVectorColorButton, this->m_Data[DefaultForceVectorColor].value<QColor>());
+  this->defaultGRFButterflyActivationComboBox->setCurrentIndex(this->m_Data[DefaultGRFButterflyActivation].toInt());
+  this->showForcePathComboBox->setCurrentIndex(this->m_Data[ForcePathDisplay].toInt());
+  this->defaultPlotLineWidthSpinBox->setValue(this->m_Data[DefaultPlotLineWidth].toDouble());
+  this->defaultChartEventDisplayComboBox->setCurrentIndex(this->m_Data[ChartEventDisplay].toInt());
+  this->defaultChartUnitAxisXComboBox->setCurrentIndex(this->m_Data[chartUnitAxisX].toInt());
   this->layoutTable->refresh(); this->m_Data[UserLayouts] = *(this->layoutTable->userLayouts());
   this->automaticCheckUpdateCheckBox->setChecked(this->m_Data[AutomaticCheckUpdateUse].toBool());
   
@@ -207,6 +283,20 @@ void Preferences::setDefaultConfiguration()
        "Vicon Model Configuration Files (*.vsk *.vst)"));
   if (!filename.isEmpty())
     this->defaultConfigurationLineEdit->setText(filename);
+};
+
+void Preferences::setDefaultBackgroundColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultBackgroundColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+    colorizeButton(this->defaultBackgroundColorButton, color);
+};
+
+void Preferences::setDefaultGridColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultGridColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+    colorizeButton(this->defaultGridColorButton, color);
 };
 
 void Preferences::setDefaultSegmentColor()
@@ -280,4 +370,9 @@ void Preferences::updateDroppedUserLayouts(int newRow, int oldRow)
   
   this->m_Data[UserLayoutIndex] = userLayoutIndex;
   this->m_Data[UserLayouts] = userLayouts;
+};
+
+void Preferences::forceChartUnitAxisX(int index)
+{
+  this->defaultChartUnitAxisXComboBox->setCurrentIndex(index);
 };

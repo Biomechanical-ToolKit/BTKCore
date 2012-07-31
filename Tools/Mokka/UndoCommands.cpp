@@ -92,14 +92,45 @@ ReframeAcquisition::ReframeAcquisition(Acquisition* acq, int ff, QUndoCommand* p
 
 void ReframeAcquisition::action()
 {
-  int temp = this->mp_Acquisition->firstFrame();
+  int temp[2]; this->mp_Acquisition->regionOfInterest(temp[0], temp[1]);
   this->mp_Acquisition->setFirstFrame(this->m_FirstFrame);
-  this->m_FirstFrame = temp;
+  this->m_FirstFrame = temp[0];
 };
 
 // ----------------------------------------------- //
 //               POINT/MARKER EDITION              //
 // ----------------------------------------------- //
+
+//  --------------- CreateAveragedMarker  ---------------
+CreateAveragedMarker::CreateAveragedMarker(Acquisition* acq, const QList<int>& markers, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent)
+{
+  this->mp_Acquisition = acq;
+  this->m_Id = this->mp_Acquisition->createAveragedMarker(markers);
+  this->mp_Marker = 0;
+};
+
+CreateAveragedMarker::~CreateAveragedMarker()
+{
+  if (this->mp_Marker != 0)
+    delete this->mp_Marker;
+};
+
+void CreateAveragedMarker::undo()
+{
+  if (this->m_Id != -1)
+    this->mp_Marker = this->mp_Acquisition->takePoints(QList<int>() << this->m_Id).first();
+};
+
+void CreateAveragedMarker::redo()
+{
+  // Second condition is to avoid the inserting of the marker a second time during the initial redo
+  if ((this->m_Id != -1) && (this->mp_Marker != 0))
+  {
+    this->mp_Acquisition->insertPoints(QList<int>() << this->m_Id , QList<Point*>() << this->mp_Marker);
+    this->mp_Marker = 0;
+  }
+};
 
 // --------------- EditPointLabel ---------------
 EditPointLabel::EditPointLabel(Acquisition* acq, int id, const QString& label, QUndoCommand* parent)
@@ -303,6 +334,42 @@ void EditAnalogsScale::action()
   this->m_Scales = temp;
 };
 
+// --------------- EditMarkersVisibility ---------------
+EditMarkersVisibility::EditMarkersVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
+{
+  this->mp_Acquisition = acq;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Visibles[i] = visible;
+};
+
+void EditMarkersVisibility::action()
+{
+  QVector<bool> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Acquisition->markerVisible(this->m_Ids[i]);
+  this->mp_Acquisition->setMarkersVisible(this->m_Ids, this->m_Visibles);
+  this->m_Visibles = temp;
+};
+
+// --------------- EditMarkersTrajectoryVisibility ---------------
+EditMarkersTrajectoryVisibility::EditMarkersTrajectoryVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
+{
+  this->mp_Acquisition = acq;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Visibles[i] = visible;
+};
+
+void EditMarkersTrajectoryVisibility::action()
+{
+  QVector<bool> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Acquisition->markerTrajectoryVisible(this->m_Ids[i]);
+  this->mp_Acquisition->setMarkersTrajectoryVisible(this->m_Ids, this->m_Visibles);
+  this->m_Visibles = temp;
+};
+
 // --------------- RemoveAnalogs ---------------
 RemoveAnalogs::RemoveAnalogs(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Ids(ids), m_Analogs()
@@ -470,21 +537,59 @@ void EditSegmentsColor::action()
   this->m_Colors = temp;
 };
 
-// --------------- EditSegmentLinks ---------------
-EditSegmentLinks::EditSegmentLinks(Model* m, int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links, QUndoCommand* parent)
-: ConfigurationUndoCommand(parent), m_MarkerIds(markerIds), m_Links(links)
+// --------------- EditSegmentDefinition ---------------
+EditSegmentDefinition::EditSegmentDefinition(Model* m, int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_MarkerIds(markerIds), m_Links(links), m_Faces(faces)
 {
   this->mp_Model = m;
   this->m_Id = id;
 };
 
-void EditSegmentLinks::action()
+void EditSegmentDefinition::action()
 {
   QVector<int> tempMarkerIds = this->mp_Model->segmentMarkerIds(this->m_Id);
-  QVector< QPair<int,int> > tempLinks = this->mp_Model->segmentLinks(this->m_Id);
-  this->mp_Model->setSegmentLinks(this->m_Id, this->m_MarkerIds, this->m_Links);
+  QVector<Pair> tempLinks = this->mp_Model->segmentLinks(this->m_Id);
+  QVector<Triad> tempFaces = this->mp_Model->segmentFaces(this->m_Id);
+  this->mp_Model->setSegmentDefinition(this->m_Id, this->m_MarkerIds, this->m_Links, this->m_Faces);
   this->m_MarkerIds = tempMarkerIds;
   this->m_Links = tempLinks;
+  this->m_Faces = tempFaces;
+};
+
+// --------------- EditSegmentsVisibility ---------------
+EditSegmentsVisibility::EditSegmentsVisibility(Model* m, const QVector<int>& ids, bool visible, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
+{
+  this->mp_Model = m;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Visibles[i] = visible;
+};
+
+void EditSegmentsVisibility::action()
+{
+  QVector<bool> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Model->segmentVisible(this->m_Ids[i]);
+  this->mp_Model->setSegmentsVisible(this->m_Ids, this->m_Visibles);
+  this->m_Visibles = temp;
+};
+
+// --------------- EditSegmentsSurfaceVisibility ---------------
+EditSegmentsSurfaceVisibility::EditSegmentsSurfaceVisibility(Model* m, const QVector<int>& ids, bool visible, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
+{
+  this->mp_Model = m;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Visibles[i] = visible;
+};
+
+void EditSegmentsSurfaceVisibility::action()
+{
+  QVector<bool> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Model->segmentSurfaceVisible(this->m_Ids[i]);
+  this->mp_Model->setSegmentsSurfaceVisible(this->m_Ids, this->m_Visibles);
+  this->m_Visibles = temp;
 };
 
 // --------------- RemoveSegments ---------------

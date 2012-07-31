@@ -105,20 +105,6 @@ namespace btk
   };
   
   /**
-   * Checks if the suffix of @a filename is MOM.
-   */
-  bool MOMFileIO::CanWriteFile(const std::string& filename)
-  {
-    std::string lowercase = filename;
-    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type MOMPos = lowercase.rfind(".mom");
-    if ((MOMPos != std::string::npos) && (MOMPos == lowercase.length() - 4))
-      return true;
-    else
-      return false;
-  };
-  
-  /**
    * Read the file designated by @a filename and fill @a output.
    */
   void MOMFileIO::Read(const std::string& filename, Acquisition::Pointer output)
@@ -178,7 +164,7 @@ namespace btk
         }
       }
     }
-    catch (BinaryFileStreamException& )
+    catch (BinaryFileStreamFailure& )
     {
       std::string excmsg; 
       if (bifs.EndFile())
@@ -210,24 +196,6 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close(); 
       throw(MOMFileIOException("Unknown exception"));
     }
-  };
-  
-  /**
-   * Write the file designated by @a filename with the content of @a input.
-   */
-  void MOMFileIO::Write(const std::string& filename, Acquisition::Pointer input)
-  {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    /*
-    if (input.get() == 0)
-    {
-      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
-      return;
-    }
-    */
-    btkErrorMacro("Method not yet implemented.");
-    return;
   };
   
   /**

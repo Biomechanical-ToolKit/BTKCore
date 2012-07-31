@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>544</width>
-    <height>478</height>
+    <width>541</width>
+    <height>506</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -174,6 +174,61 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox_11">
+         <property name="title">
+          <string>Time bar event</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="label_28">
+            <property name="text">
+             <string>Default display:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="defaultTimeBarEventDisplayComboBox">
+            <item>
+             <property name="text">
+              <string>Frame</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Time</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_23">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>7</width>
+              <height>13</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_29">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>(also affect the X axis of the chart)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -194,6 +249,72 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
+        <widget class="QGroupBox" name="groupBox_12">
+         <property name="title">
+          <string>Background</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_6">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_31">
+            <property name="text">
+             <string>Background color              </string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_32">
+            <property name="text">
+             <string>Grid color:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="defaultBackgroundColorButton">
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+  border: 1px solid darkgray;
+  background: rgb(0,0,0);
+}
+
+QPushButton:pressed {
+  border: 1px solid rgb(100,100,100);
+}</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="defaultGridColorButton">
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+  border: 1px solid darkgray;
+  background: rgb(204,204,204);
+}
+
+QPushButton:pressed {
+  border: 1px solid rgb(100,100,100);
+}</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox_7">
          <property name="title">
           <string>Segment</string>
@@ -205,7 +326,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="defaultSegmentColorLabel">
             <property name="text">
-             <string>Default color:                   </string>
+             <string>Default color:                    </string>
             </property>
            </widget>
           </item>
@@ -425,6 +546,57 @@ QPushButton:pressed {
             </property>
            </widget>
           </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="defaultGRFButterflyActivationLabel">
+            <property name="toolTip">
+             <string>Display ground reaction forces (GRF) butterfly diagram</string>
+            </property>
+            <property name="text">
+             <string>Butterfly diagram:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="defaultGRFButterflyActivationComboBox">
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <item>
+             <property name="text">
+              <string>Yes</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>No</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="showForcePathLabel">
+            <property name="text">
+             <string>Force path:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QComboBox" name="showForcePathComboBox">
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <item>
+             <property name="text">
+              <string>Yes</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>No</string>
+             </property>
+            </item>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -437,6 +609,106 @@ QPushButton:pressed {
           <size>
            <width>20</width>
            <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="chartTab">
+      <attribute name="title">
+       <string>Chart</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <widget class="QGroupBox" name="groupBox_9">
+         <property name="title">
+          <string>Plot</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_4">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_24">
+            <property name="text">
+             <string>Default line width:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QDoubleSpinBox" name="defaultPlotLineWidthSpinBox">
+            <property name="maximum">
+             <double>10.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_10">
+         <property name="title">
+          <string>Graph</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout_5">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+          </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_26">
+            <property name="text">
+             <string>Display events:    </string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="defaultChartEventDisplayComboBox">
+            <item>
+             <property name="text">
+              <string>Yes</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>No</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>Axis X unit:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="defaultChartUnitAxisXComboBox">
+            <item>
+             <property name="text">
+              <string>Frame</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Time</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>265</height>
           </size>
          </property>
         </spacer>

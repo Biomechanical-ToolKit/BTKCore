@@ -33,71 +33,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef NewItemDialog_h
-#define NewItemDialog_h
+#ifndef NewItemTemplateDialog_h
+#define NewItemTemplateDialog_h
 
-#include "ui_NewItemDialog.h"
-
-#include <QDialog>
-#include <QPushButton>
+#include "NewItemDialog.h"
 
 template <class T>
-class NewItemTemplateDialog : public QDialog, public Ui::NewItemDialog
+class NewItemTemplateDialog : public NewItemDialog
 {
 public:
   NewItemTemplateDialog(const QList<T>* items, QWidget* parent = 0);
   // ~NewItemTemplateDialog(); // Implicit
-  
-  void updateButtonState(const QString& name);
 
 protected:
-  virtual bool itemAlreadyExists(const QString& /* name */) {return false;};
-  
+  virtual void fillExistingItems() {}; // THIS METHOD MUST BE SPECIALIZED
   const QList<T>* mp_Items;
 };
 
 template <class T>
 NewItemTemplateDialog<T>::NewItemTemplateDialog(const QList<T>* configs, QWidget* parent)
-: QDialog(parent)
+: NewItemDialog(parent)
 {
   this->mp_Items = configs;
-  
-  this->setupUi(this);
-#ifdef Q_OS_MAC
-  this->setWindowFlags(Qt::Sheet);
-  this->setWindowModality(Qt::WindowModal);
-  this->setMinimumSize(350, this->sizeHint().height());
-#endif
-  QPushButton* ok = this->buttonBox->button(QDialogButtonBox::Ok);
-  ok->setDefault(true);
-  ok->setEnabled(false);
-  QPushButton* cancel = this->buttonBox->button(QDialogButtonBox::Cancel);
-  cancel->setAutoDefault(false);
-  this->errorIconLabel->setVisible(false);
-  this->errorMsgLabel->setVisible(false);
+  this->fillExistingItems();
 };
 
-template <class T>
-void NewItemTemplateDialog<T>::updateButtonState(const QString& name)
-{
-  if (name.isEmpty())
-  {
-    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    this->errorIconLabel->setVisible(false);
-    this->errorMsgLabel->setVisible(false);
-  }
-  else if (this->itemAlreadyExists(name))
-  {
-    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    this->errorIconLabel->setVisible(true);
-    this->errorMsgLabel->setVisible(true);
-  }
-  else
-  {
-    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
-    this->errorIconLabel->setVisible(false);
-    this->errorMsgLabel->setVisible(false);
-  }
-};
-
-#endif // NewItemDialog_h
+#endif // NewItemTemplateDialog_h

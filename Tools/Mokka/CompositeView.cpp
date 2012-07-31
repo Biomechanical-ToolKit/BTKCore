@@ -140,7 +140,6 @@ void CompositeView::copyOptions(CompositeView* from)
   {
   case Viz3DOrthogonal:
     static_cast<QComboBox*>(this->optionStack->currentWidget())->setCurrentIndex(static_cast<QComboBox*>(from->optionStack->currentWidget())->currentIndex());
-    static_cast<Viz3DWidget*>(this->view(Viz3D))->copyProjectionCameraConfiguration(static_cast<Viz3DWidget*>(from->view(Viz3D)));
     break;
   case ChartAnalog:
     static_cast<QComboBox*>(this->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->setCurrentIndex(static_cast<QComboBox*>(from->optionStack->currentWidget()->layout()->itemAt(0)->layout()->itemAt(0)->widget())->currentIndex());

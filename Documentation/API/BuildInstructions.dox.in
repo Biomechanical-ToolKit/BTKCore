@@ -22,6 +22,7 @@ This page is separated in the following sections and give you all the details to
     - @ref config_vissupport
       - @ref config_vtk
     - @ref config_matlab
+    - @ref config_octave
     - @ref config_scilab
     - @ref config_doc
     - @ref config_examples

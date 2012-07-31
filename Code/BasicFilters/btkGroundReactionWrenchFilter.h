@@ -65,6 +65,7 @@ namespace btk
     BTK_BASICFILTERS_EXPORT GroundReactionWrenchFilter();
     
   private:
+    virtual std::string GetWrenchPrefix() const {return "GRW";};
     virtual void FinishTypeI(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
     virtual void FinishAMTI(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);
     virtual void FinishKistler(Wrench::Pointer wrh, ForcePlatform::Pointer fp, int index);

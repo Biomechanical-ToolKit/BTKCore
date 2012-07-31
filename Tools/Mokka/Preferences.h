@@ -48,9 +48,10 @@
     Q_OBJECT
 
   public:
-    enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, 
-          DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
-          ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse};
+    enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, DefaultTimeBarEventDisplay,
+          DefaultBackgroundColor, DefaultGridColor, DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
+          ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse,
+          DefaultGRFButterflyActivation, ForcePathDisplay, DefaultPlotLineWidth, ChartEventDisplay, chartUnitAxisX};
   
     Preferences(QWidget* parent = 0);
     // ~Preferences(); // Implicit
@@ -62,6 +63,7 @@
     
     void showGeneralPreferences() {this->tabWidget->setCurrentWidget(this->generalTab);};
     void showVisualisationPreferences() {this->tabWidget->setCurrentWidget(this->visualisationTab);};
+    void showChartPreferences() {this->tabWidget->setCurrentWidget(this->chartTab);};
     void showLayoutsPreferences() {this->tabWidget->setCurrentWidget(this->layoutsTab);};
     void showAdvancedPreferences() {this->tabWidget->setCurrentWidget(this->advancedTab);};
     
@@ -72,6 +74,8 @@
   
   public slots:
     void setDefaultConfiguration();
+    void setDefaultBackgroundColor();
+    void setDefaultGridColor();
     void setDefaultSegmentColor();
     void setDefaultMarkerColor();
     void setDefaultForcePlateColor();
@@ -81,7 +85,10 @@
     void useDefaultConfigurationStateChanged(bool isUsed);
     void defaultConfigurationPathChanged(const QString& path);
     void defaultGroundOrientationChanged(int index);
+    void defaultTimeBarEventDisplayChanged(int index);
     void useEventEditorWhenInsertingStateChanged(bool isChecked);
+    void defaultBackgroundColorChanged(const QColor& color);
+    void defaultGridColorChanged(const QColor& color);
     void defaultSegmentColorChanged(const QColor& color);
     void defaultMarkerColorChanged(const QColor& color);
     void defaultMarkerRadiusChanged(double radius);
@@ -92,11 +99,17 @@
     void defaultForceVectorColorChanged(const QColor& color);
     void automaticCheckUpdateStateChanged(bool isChecked);
     void userLayoutsChanged(const QList<QVariant>& layouts, int index);
+    void defaultGRFButterflyActivationChanged(int index);
+    void showForcePathChanged(int index);
+    void defaultPlotLineWidthChanged(double width);
+    void showChartEventChanged(int index);
+    void chartUnitAxisXChanged(int index);
     
   private slots:
     void removeUserLayout(int index);
     void relabelUserLayout(int index, const QString& label);
     void updateDroppedUserLayouts(int newRow, int oldRow);
+    void forceChartUnitAxisX(int index);
   
   private:
     QMap<int, QVariant> m_Data;

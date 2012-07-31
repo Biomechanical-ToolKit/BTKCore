@@ -37,6 +37,7 @@
 #define MultiViewWidget_h
 
 #include "AbstractMultiView.h"
+#include "Model.h" // Pair
 
 #include <btkVTKChartTimeSeries.h>
 
@@ -50,10 +51,11 @@ class AbstractView;
 class CompositeView;
 class Acquisition;
 struct Segment;
-class Model;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
+class vtkActorMap;
 class vtkDoubleArray;
+class ChartDialog;
 
 class MultiViewWidget : public AbstractMultiView
 {
@@ -73,6 +75,8 @@ public:
   void setModel(Model* m);
   void load();
   
+  int appendNewSegment(Segment* s);
+  void setSegment(int id, Segment* s);
   int segmentColorIndex(int id);
   
   void setMarkerRadius(int id, double r);
@@ -86,8 +90,12 @@ public:
   QMenu* groundOrientationMenu() const {return this->mp_GroupOrientationMenu;};
   const QString groundNormalAsString() const;
   QMenu* markerTrajectoryLengthMenu() const {return this->mp_MarkerTrajectoryLengthMenu;};
+  QAction* forceButterflyActivationAction() const {return this->mp_ForceButterflyActivationAction;};
+  QMenu* chartBottomAxisDisplayMenu() const {return this->mp_ChartBottomAxisDisplayMenu;};
   
   void setDefaultGroundOrientation(int index);
+  void setDefaultBackgroundColor(const QColor& color);
+  void setDefaultGridColor(const QColor& color);
   void setDefaultSegmentColor(const QColor& color);
   void setDefaultMarkerColor(const QColor& color);
   void setDefaultMarkerRadius(double r);
@@ -97,6 +105,7 @@ public:
   void showForcePlatformIndex(bool isShown);
   void setForcePlatformColor(const QColor& color);
   void setForceVectorColor(const QColor& color);
+  void setGRFButterflyActivation(bool activated);
   
   void setVideoDelay(int id, double d);
   
@@ -110,17 +119,28 @@ public:
   QByteArray saveLayout() const;
   bool restoreLayout(const QByteArray& state);
   
+  ChartDialog* createChartDialog(QWidget* parent = 0);
+  
 public slots:
   void updateFramesIndex(int ff);
   void appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void clearSegments();
   void setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors);
-  void setSegmentLink(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void setSegmentDefinition(int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces);
+  void updateSegmentDefinition(int id);
+  void setSegmentsVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
+  void setSegmentsSurfaceVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
   void updateHiddenSegments(const QList<int>& ids);
   void setMarkersRadius(const QVector<int>& ids, const QVector<double>& radii);
   void setMarkersColor(const QVector<int>& ids, const QVector<QColor>& colors);
+  void updateVisibleMarkers(const QList<int>& ids);
   void updateHiddenMarkers(const QList<int>& ids);
   void updateTrackedMarkers(const QList<int>& ids);
+  void updateTrackedGRFPaths(const QList<int>& ids);
+  void setMarkersVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
+  void setMarkersTrajectoryVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
+  void markersConfiguration(const QList<int>& ids, QList<bool>& visibles, QList<bool>& trajectories, QList<double>& radii, QList<QColor>& colors);
+  void setMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors);
   void clear();
   void circleSelectedMarkers(const QList<int>& ids);
   void updateSegmentsDisplay();
@@ -129,12 +149,17 @@ public slots:
   void updateDisplay(int frame);
   void showAllMarkers();
   void hideAllMarkers();
-  void forceRubberBandDrawingOn();
-  void forceRubberBandDrawingOff();
+  void adaptViewsForPlaybackOn();
+  void adaptViewsForPlaybackOff();
   void restoreLayout3DOnly();
   void restoreLayout3DVerbose();
   void restoreLayout3DCharts();
   void setVideoDelays(QVector<int> ids, QVector<qint64> delays);
+  void updateChartUnitAxisX();
+  void setFrameAsChartUnitAxisX();
+  void setTimeAsChartUnitAxisX();
+  void showChartEvent(bool visible);
+  void setDefaultPlotLineWidth(double width);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
@@ -142,6 +167,8 @@ protected:
   AbstractView* createView(AbstractView* fromAnother = 0);
   bool saveLayout(QDataStream& stream, QWidget* w) const;
   bool restoreLayout(QDataStream& stream, CompositeView* view, const QSize& size);
+  bool restoreLayout2(QDataStream& stream, CompositeView* view, const QSize& size);
+  bool restoreLayoutView(QDataStream& stream, CompositeView* view, const QSize& size, QSplitter** splitter, AbstractView* views[2], QSize viewsSize[2], QList<int>& sizes);
 
 signals:
   void fileDropped(const QString& filename);
@@ -158,8 +185,11 @@ private slots:
   // Qt
   void changeGroundOrientation();
   void changeMarkerTrajectoryLength();
+  void changeForceButterflyActivation();
   
 private:
+  void displayChartBottomAxisAsFrame();
+  void displayChartBottomAxisAsTime();
   void updateCameras();
   void updateViews();
   
@@ -169,14 +199,13 @@ private:
   QMap<int, qint64> m_VideoDelays;
   vtkEventQtSlotConnect* mp_EventQtSlotConnections;
   vtkProcessMap* mp_VTKProc;
+  vtkActorMap* mp_VTKActor;
   vtkMapperCollection* mp_Mappers;
   vtkStreamingDemandDrivenPipelineCollection* mp_Syncro;
   vtkDoubleArray* mp_PointChartFrames; // Values for the X axis shared by each point chart.
   vtkDoubleArray* mp_AnalogChartFrames; // Values for the X axis shared by each analog chart.
   QColor m_ForcePlatformColor;
-  vtkActor* mp_ForcePlatformActor;
   QColor m_ForceVectorColor;
-  vtkActor* mp_ForceVectorActor;
   QMenu* mp_GroupOrientationMenu;
   QAction* mp_ActionGroundOrientationAutomatic;
   QAction* mp_ActionGroundOrientationPlaneXY;
@@ -188,8 +217,12 @@ private:
   QAction* mp_ActionMarkerTrajectory50;
   QAction* mp_ActionMarkerTrajectory100;
   QAction* mp_ActionMarkerTrajectory200;
+  QAction* mp_ForceButterflyActivationAction;
   QList<QAction*> m_View3dActions;
   QList<QAction*> m_ViewChartActions;
+  QMenu* mp_ChartBottomAxisDisplayMenu;
+  QAction* mp_ActionChartAxisFrame;
+  QAction* mp_ActionChartAxisTime;
 };
 
 #endif // MultiViewWidget_h

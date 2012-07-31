@@ -97,20 +97,6 @@ namespace btk
   };
   
   /**
-   * Checks if the suffix of @a filename is ANG.
-   */
-  bool TDFFileIO::CanWriteFile(const std::string& filename)
-  {
-    std::string lowercase = filename;
-    std::transform(lowercase.begin(), lowercase.end(), lowercase.begin(), tolower);
-    std::string::size_type TDFPos = lowercase.rfind(".tdf");
-    if ((TDFPos != std::string::npos) && (TDFPos == lowercase.length() - 4))
-      return true;
-    else
-      return false;
-  };
-  
-  /**
    * Read the file designated by @a filename and fill @a output.
    */
   void TDFFileIO::Read(const std::string& filename, Acquisition::Pointer output)
@@ -635,16 +621,18 @@ namespace btk
       {
         int32_t numPFsBis = bifs.ReadI32();
         if (numPFsBis != numPFs)
-          throw(TDFFileIOException("The number of force platforms in the configuration is not the same than the number used in the data."));
+        {
+          btkErrorMacro("The number of force platforms in the configuration is not the same than in the data block.");
+        }
         
         bifs.SeekRead(4, BinaryFileStream::Current);
-        bifs.SeekRead(numPFs*2, BinaryFileStream::Current);
+        bifs.SeekRead(numPFsBis*2, BinaryFileStream::Current);
         
-        // Need to test 'numPlatforms' ? Should not be physicaly to have more than 256 force platforms...
-        const int8_t numPlatforms = FPDoubleFormat ? numPFs * 2 : numPFs;
+        // Need to test 'numPlatforms' ? Should not be physicaly more than 256 force platforms...
+        const int8_t numPlatforms = FPDoubleFormat ? numPFsBis * 2 : numPFsBis;
         
         std::vector<float> cornersData;
-        for (int i = 0 ; i < numPFs ; ++i)
+        for (int i = 0 ; i < numPFsBis ; ++i)
         {
           bifs.SeekRead(256, BinaryFileStream::Current); // Label
           bifs.SeekRead(8, BinaryFileStream::Current); // Size
@@ -665,7 +653,7 @@ namespace btk
         {
           std::vector<float> cornersDataTemp = cornersData;
           cornersData.resize(cornersData.size() * 2);
-          for (int i = 0 ; i < numPFs ; ++i)
+          for (int i = 0 ; i < numPFsBis ; ++i)
           {
             for (int j = 0 ; j < 12 ; ++j)
             {
@@ -776,7 +764,7 @@ namespace btk
           throw(TDFFileIOException("Unknown format for the EMG block"));
       }
     }
-    catch (BinaryFileStreamException& )
+    catch (BinaryFileStreamFailure& )
     {
       std::string excmsg; 
       if (bifs.EndFile())
@@ -808,24 +796,6 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close();
       throw(TDFFileIOException("Unknown exception"));
     }
-  };
-  
-  /**
-   * Write the file designated by @a filename with the content of @a input.
-   */
-  void TDFFileIO::Write(const std::string& filename, Acquisition::Pointer input)
-  {
-    btkNotUsed(filename);
-    btkNotUsed(input);
-    /*
-    if (input.get() == 0)
-    {
-      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
-      return;
-    }
-    */
-    btkErrorMacro("Method not yet implemented.");
-    return;
   };
   
   /**

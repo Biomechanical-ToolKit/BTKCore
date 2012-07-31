@@ -35,29 +35,6 @@
 
 #include "btkAcquisitionFileIOFactory.h"
 
-// C3D File IO
-#include "btkC3DFileIO.h"
-// Motion Analysis Corp IOs
-#include "btkANBFileIO.h"
-#include "btkANCFileIO.h"
-#include "btkCALForcePlateFileIO.h"
-#include "btkTRBFileIO.h"
-#include "btkTRCFileIO.h"
-#include "btkXLSOrthoTrakFileIO.h"
-// BTS IO
-#include "btkTDFFileIO.h"
-// Elite IOs
-#include "btkANGFileIO.h"
-#include "btkEMxFileIO.h"
-#include "btkMOMFileIO.h"
-#include "btkRAxFileIO.h"
-#include "btkRICFileIO.h"
-#include "btkPWRFileIO.h"
-#include "btkGRxFileIO.h"
-// Others
-#include "btkEMFFileIO.h"
-#include "btkAMTIForcePlatformFileIO.h"
-
 namespace btk
 {
   /**
@@ -91,63 +68,83 @@ namespace btk
     AcquisitionFileIO::Pointer io;
     if (mode == ReadMode)
     {
-      // C3D
-      io = C3DFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      // Motion Analysis Inc
-      io = TRBFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = TRCFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = ANBFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = ANCFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = CALForcePlateFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = XLSOrthoTrakFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      // BTS
-      io = TDFFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      // Elite
-      io = RAxFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = RICFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = MOMFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = ANGFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = PWRFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = GRxFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      io = EMxFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      // AMTI Force platform
-      io = AMTIForcePlatformFileIO::New();
-      if (io->CanReadFile(filename)) return io;
-      // Others
-      io = EMFFileIO::New();
-      if (io->CanReadFile(filename)) return io;
+      for (AcquisitionFileIOInfos::ConstIterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+      {
+        if ((*it)->HasReadOperation() && (io = (*it)->GetFileIO())->CanReadFile(filename))
+          return io;
+      }
     }
     else
     {
-      // C3D
-      io = C3DFileIO::New();
-      if (io->CanWriteFile(filename)) return io;
-      // Motion Analysis Inc
-      io = TRCFileIO::New();
-      if (io->CanWriteFile(filename)) return io;
-      io = ANBFileIO::New();
-      if (io->CanWriteFile(filename)) return io;
-      io = ANCFileIO::New();
-      if (io->CanWriteFile(filename)) return io;
-      io = CALForcePlateFileIO::New();
-      if (io->CanWriteFile(filename)) return io;
+      for (AcquisitionFileIOInfos::ConstIterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+      {
+        if ((*it)->HasWriteOperation() && (io = (*it)->GetFileIO())->CanWriteFile(filename))
+          return io;
+      }
     }
     return AcquisitionFileIO::Pointer();
+  };
+  
+  /**
+   * Append a file IO if it is not already added.
+   *
+   * Should not be used by developers. Internal purpose.
+   */
+  bool AcquisitionFileIOFactory::AddFileIO(AcquisitionFileIOInfo::Pointer infoIO)
+  {
+    for (AcquisitionFileIOInfos::ConstIterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+    {
+      if ((*it)->GetFunctor() == infoIO->GetFunctor())
+        return false;
+    }
+    AcquisitionFileIOFactory::GetInfoIOs()->list.push_front(infoIO);
+    return true;
+  };
+  
+  /**
+   * Remove a file IO if found.
+   *
+   * Should not be used by developers. Internal purpose.
+   */
+  bool AcquisitionFileIOFactory::RemoveFileIO(AcquisitionFileIOInfo::Pointer infoIO)
+  {
+    for (AcquisitionFileIOInfos::Iterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+    {
+      if ((*it)->GetFunctor() == infoIO->GetFunctor())
+      {
+        AcquisitionFileIOFactory::GetInfoIOs()->list.erase(it);
+        return true;
+      }
+    }
+    return false;
+  };
+  
+  /**
+   *
+   */
+  AcquisitionFileIO::Extensions AcquisitionFileIOFactory::GetSupportedReadExtensions()
+  {
+    AcquisitionFileIO::Extensions exts;
+    for (AcquisitionFileIOInfos::Iterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+    {
+      if ((*it)->HasReadOperation())
+        exts.Append((*it)->GetFileIO()->GetSupportedExtensions());
+    }
+    return exts;
+  };
+  
+  /**
+   *
+   */
+  AcquisitionFileIO::Extensions AcquisitionFileIOFactory::GetSupportedWrittenExtensions()
+  {
+    AcquisitionFileIO::Extensions exts;
+    for (AcquisitionFileIOInfos::Iterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+    {
+      if ((*it)->HasWriteOperation())
+        exts.Append((*it)->GetFileIO()->GetSupportedExtensions());
+    }
+    return exts;
   };
   
   /** 
@@ -159,4 +156,10 @@ namespace btk
    * @fn virtual AcquisitionFileIOFactory::~AcquisitionFileIOFactory()
    * Empty destructor.
    */
+  
+  AcquisitionFileIOInfos* AcquisitionFileIOFactory::GetInfoIOs()
+  {
+    static AcquisitionFileIOInfos infoIOs;
+    return &infoIOs;
+  };
 };

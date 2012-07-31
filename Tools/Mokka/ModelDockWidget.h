@@ -53,7 +53,7 @@ class ModelDockWidget : public QDockWidget, public Ui::ModelDockWidget
 
 public:
   enum {LabelHeader = 0, VisibleHeader = 2, TrajectoryHeader = 1};
-  enum {SegmentsItem = 0, MarkersItem, AnalogsItem, ForcePlatesItem, ModelOutputsItem, VideosItem};
+  enum {SegmentsItem = 0, MarkersItem, VirtualMarkersItem, AnalogsItem, ForcePlatesItem, ModelOutputsItem, VideosItem};
   
   ModelDockWidget(QWidget* parent = 0);
   ~ModelDockWidget();
@@ -97,17 +97,18 @@ public slots:
   // Segments
   void hideSelectedSegments();
   void unhideSelectedSegments();
-  void newSegment();
   void setSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void setSegmentLabel(int id, const QString& label);
-  void setSegmentLink(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
   void setSegmentsColor(const QVector<int>& ids, const QVector<QColor>& colors);
   void setSegmentsDescription(const QVector<int>& ids, const QVector<QString>& descs);
+  void setSegmentsVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
+  void setSegmentsSurfaceVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
   void removeSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void insertSegments(const QList<int>& ids, const QList<Segment*>& segments);
   void editSegmentLabel();
   void editSegmentsDescription();
-  void editSegmentLinks();
+  void editSegmentsVisibility();
+  void editSegmentsSurfaceVisibility();
   // Markers & Points
   void updateDisplayedMarkers(const QVector<int>& ids);
   void setTrackedMarkers(const QList<int>& ids);
@@ -148,6 +149,11 @@ public slots:
   void setMarkerRecentColor3();
   void setMarkerRecentColor4();
   void setMarkerRecentColor5();
+  void editMarkersVisibility();
+  void setMarkersVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
+  void editMarkersTrajectoryVisibility();
+  void setMarkersTrajectoryVisibility(const QVector<int>& ids, const QVector<bool>& visibles);
+  void setMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors);
   void editPointLabel();
   void setPointLabel(int id, const QString& label);
   void editPointsDescription();
@@ -169,6 +175,10 @@ public slots:
   void setAnalogsDescription(const QVector<int>& ids, const QVector<QString>& descs);
   void removeAnalogs(const QList<int>& ids, const QList<Analog*>& analogs);
   void insertAnalogs(const QList<int>& ids, const QList<Analog*>& analogs);
+  // Force platforms
+  void showGroundRectionForcePaths();
+  void hideGroundRectionForcePaths();
+  void setGroundRectionForcePathsVisibility(bool visible);
   // Videos
   void editVideosDelay();
   void setVideosDelay(const QVector<int>& ids, const QVector<qint64>& delay);
@@ -180,11 +190,13 @@ public slots:
   
 signals:
   void configurationSaved();
-  void segmentCreated(Segment* seg);
+  void segmentCreationRequested();
+  void segmentEditionRequested();
   void segmentLabelChanged(int id, const QString& label);
   void segmentsColorChanged(const QVector<int>& ids, const QColor& color);
   void segmentsDescriptionChanged(const QVector<int>& ids, QString desc);
-  void segmentLinksChanged(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links);
+  void segmentsVisibilityChanged(const QVector<int>& ids, bool visible);
+  void segmentsSurfaceVisibilityChanged(const QVector<int>& ids, bool visible);
   void segmentsRemoved(const QList<int>& ids);
   void segmentsCleared();
   void newSegmentsInserted(const QList<int>& ids, const QList<Segment*>& segments);
@@ -192,10 +204,13 @@ signals:
   void markerSelectionChanged(const QList<int>& ids);
   void markerHiddenSelectionChanged(const QList<int>& ids);
   void markerTrajectorySelectionChanged(const QList<int>& ids);
+  void wrenchPositionSelectionChanged(const QList<int>& ids);
   void markerLabelChanged(int id, const QString& label);
   void markersRadiusChanged(const QVector<int>& ids, double radius);
   void markersColorChanged(const QVector<int>& ids, const QColor& colors);
   void markersDescriptionChanged(const QVector<int>& ids, const QString& desc);
+  void markersVisibilityChanged(const QVector<int>& ids, bool visible);
+  void markersTrajectoryVisibilityChanged(const QVector<int>& ids, bool visible);
   void pointLabelChanged(int id, const QString& label);
   void pointsDescriptionChanged(const QVector<int>& ids, const QString& desc);
   void pointsRemoved(const QList<int>& ids);
@@ -225,7 +240,8 @@ private:
   void sendHiddenSegments();
   void sendHiddenMarkers();
   void sendTrackedMarkers();
-  QTreeWidgetItem* createSegmentItem(const QString& label, int id);
+  void sendTrackedGRFPaths();
+  QTreeWidgetItem* createSegmentItem(const QString& label, int id, bool checked = true);
   QTreeWidgetItem* createMarkerItem(const QString& label, int id, bool checked = true);
   QTreeWidgetItem* createAnalogItem(const QString& label, int id);
   QTreeWidgetItem* createModelOutputItem(const QString& label, int id);
@@ -236,7 +252,7 @@ private:
   void pushRecentColor(const QColor& color);
   void drawRecentColors();
   void refresh();
-  QTreeWidgetItem* treePointChild(QTreeWidgetItem* parent, int id) const;
+  QTreeWidgetItem* treePointChild(QTreeWidgetItem* parent, int id);
   bool hasChildVisible(QTreeWidgetItem* parent) const;
   bool isOkToModifyAnalog();
   
@@ -250,6 +266,7 @@ private:
   QIcon* mp_RightArrowIcon;
   QIcon* mp_SegmentsIcon;
   QIcon* mp_MarkersIcon;
+  QIcon* mp_VirtualMarkersIcon;
   QIcon* mp_AnalogsIcon;
   QIcon* mp_ModelOutputsIcon;
   QIcon* mp_ForcePlatesIcon;

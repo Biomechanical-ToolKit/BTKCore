@@ -189,7 +189,7 @@ TAB_SIZE               = 2
 # will result in a user-defined paragraph with heading "Side Effects:". 
 # You can put \n's in the value part of an alias to insert newlines.
 
-ALIASES                = 
+ALIASES                = "projectnumber=${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}.${BTK_VERSION_PATCH}"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
@@ -458,7 +458,7 @@ GENERATE_DEPRECATEDLIST= YES
 # The ENABLED_SECTIONS tag can be used to enable conditional 
 # documentation sections, marked by \if sectionname ... \endif.
 
-ENABLED_SECTIONS       = 
+ENABLED_SECTIONS       = BTK_API_DOCUMENTATION
 
 # The MAX_INITIALIZER_LINES tag determines the maximum number of lines 
 # the initial value of a variable or define consists of for it to appear in 
@@ -1294,7 +1294,8 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = BTK_COMMON_EXPORT \
                          BTK_IO_EXPORT \
                          BTK_BASICFILTERS_EXPORT \
-                         BTK_VISSUPPORT_EXPORT
+                         BTK_VISSUPPORT_EXPORT \
+                         BTK_VTK_EXPORT
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

@@ -1,7 +1,5 @@
 /**
-@mokkahelpheader
 @page MokkaShortcut Shortcuts
-@section MokkaShortcutSection Shortcuts
 
 The principal shortcuts in Mokka are: 
 - left/right arrows: previous/next frame 
@@ -36,7 +34,7 @@ Some shortcut are dedicated to the chart view.
 - Shift + Left mouse button: Zoom rectangle.
 - Shift + Mouse wheel (forward / backward): Zoom (stretch) only the X axis.
 
-@section MokkaShortcutChartView Logger
+@section MokkaShortcutLogger Logger
 Some shortcut are dedicated to the logger.
 - Ctrl + A: Select all the logs.
 - Ctrl + C: Copy only the selected logs.

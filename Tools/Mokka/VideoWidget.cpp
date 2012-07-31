@@ -44,6 +44,8 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QApplication>
+#include <QDir>
+#include <QStackedLayout>
 
 VideoWidget::VideoWidget(QWidget* parent)
 : QWidget(parent), mp_CurrentFrameFunctor()
@@ -52,11 +54,13 @@ VideoWidget::VideoWidget(QWidget* parent)
   this->mp_Acquisition = 0;
   this->mp_Delays = 0;
   this->m_VideoId = -1;
-  this->mp_MediaPlayer = new QMediaPlayer(this);
-  this->mp_VideoWidget = new QVideoWidget(this);
-  this->mp_MediaPlayer->setVideoOutput(this->mp_VideoWidget);
-  this->mp_MediaPlayer->setMuted(true);
-  this->m_VideoLoading = false;
+  this->mp_MediaObject = new Phonon::MediaObject(this);
+  this->mp_Video = new Phonon::VideoWidget(this);
+  this->mp_Overlay = new VideoOverlayWidget(this);
+#ifdef Q_OS_WIN
+  this->m_PlaybackStarted = false;
+  this->m_PlaybackFrameCounter = 0;
+#endif
   // Drag and drop
   this->setAcceptDrops(true);
   
@@ -67,24 +71,63 @@ VideoWidget::VideoWidget(QWidget* parent)
   this->setAutoFillBackground(true);
   this->setPalette(p);
   // - Layout
+  QStackedLayout* videoStack = new QStackedLayout;
+  videoStack->addWidget(this->mp_Video);
+  videoStack->addWidget(this->mp_Overlay);
+  videoStack->setStackingMode(QStackedLayout::StackAll);
   QVBoxLayout* layout = new QVBoxLayout;
-  layout->addWidget(this->mp_VideoWidget);
   layout->setContentsMargins(0,0,0,0);
+  layout->addLayout(videoStack);
   this->setLayout(layout);
-  this->mp_VideoWidget->setVisible(false);
+  this->setVideoVisible(false);
   
-  connect(this->mp_MediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(checkMediaStatus(QMediaPlayer::MediaStatus)));
-  connect(this->mp_MediaPlayer, SIGNAL(positionChanged(qint64)), this, SLOT(finalizeVideoLoading(qint64)));
+  // Connect the media nodes
+  Phonon::createPath(this->mp_MediaObject, this->mp_Video);
+
+  connect(this->mp_MediaObject, SIGNAL(stateChanged(Phonon::State, Phonon::State)), this, SLOT(checkMediaStatus(Phonon::State, Phonon::State)));
+};
+
+void VideoWidget::start()
+{
+#ifdef Q_OS_WIN
+  this->m_PlaybackStarted = true;
+  this->m_PlaybackFrameCounter = 0;
+#endif
+};
+
+void VideoWidget::stop()
+{
+#ifdef Q_OS_WIN
+  this->mp_MediaObject->pause();
+  this->m_PlaybackStarted = false;
+  this->render();
+#endif
 };
 
 void VideoWidget::render()
 {
-  if (this->mp_VideoWidget->isVisible())
+  if (this->mp_Video->isVisible())
   {
-    qint64 pos = this->referencePosition();
+    qint64 pos = static_cast<qint64>(static_cast<double>((*this->mp_CurrentFrameFunctor)() - 1) / this->mp_Acquisition->pointFrequency() * 1000.0) - this->mp_Delays->operator[](this->m_VideoId);
     if (pos >= 0)
     {
-      this->mp_MediaPlayer->setPosition(pos);
+#ifdef Q_OS_WIN
+      if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
+      {
+        this->mp_MediaObject->play();
+        this->mp_MediaObject->seek(pos);
+        // Because some videos are not able to start correctly the frame by frame rendering and are like frozen
+        if (!this->m_PlaybackStarted || (this->m_PlaybackFrameCounter > 3))
+          this->mp_MediaObject->pause();
+        ++this->m_PlaybackFrameCounter;
+      }
+      else
+      {
+        this->mp_MediaObject->seek(pos);
+      }
+#else
+      this->mp_MediaObject->seek(pos);
+#endif
     }
   }
 };
@@ -93,8 +136,9 @@ void VideoWidget::show(bool s)
 {
   if (!s) // Hidden
   {
-    this->mp_MediaPlayer->setMedia(QMediaContent()); // Remove the current media
-    this->mp_VideoWidget->setVisible(false);
+    if (this->mp_MediaObject->currentSource().type() != Phonon::MediaSource::Empty)
+      this->mp_MediaObject->clear();
+    this->setVideoVisible(false);
   }
 };
 
@@ -107,7 +151,6 @@ void VideoWidget::copy(VideoWidget* source)
 
 void VideoWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-  this->mp_VideoWidget->setVisible(false);
   event->ignore();
   if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
   {
@@ -118,8 +161,9 @@ void VideoWidget::dragEnterEvent(QDragEnterEvent* event)
       for (QList<QTreeWidgetItem*>::const_iterator it = selectedItems.begin() ; it != selectedItems.end() ; ++it)
       {
         if ((*it)->type() != VideoType)
-          break;
+          return;
       }
+      this->setVideoVisible(false);
       event->setDropAction(Qt::CopyAction); // To have the cross (+) symbol
       event->accept();
     }
@@ -129,10 +173,9 @@ void VideoWidget::dragEnterEvent(QDragEnterEvent* event)
 
 void VideoWidget::dragLeaveEvent(QDragLeaveEvent* event)
 {
-  if (this->mp_MediaPlayer->mediaStatus() != QMediaPlayer::NoMedia)
-    this->mp_VideoWidget->setVisible(true);
+  if (this->mp_MediaObject->currentSource().type() != Phonon::MediaSource::Empty)
+    this->setVideoVisible(true);
   this->QWidget::dragLeaveEvent(event);
-  this->render(); // Force to update the content of the video widget as it was previously hidden
 }
 
 void VideoWidget::dropEvent(QDropEvent* event)
@@ -142,95 +185,104 @@ void VideoWidget::dropEvent(QDropEvent* event)
   QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(event->source());
   QTreeWidgetItem* video = treeWidget->selectedItems().at(0);
   int id = video->data(0,VideoId).toInt();
-  QUrl videoFileUrl = QUrl::fromLocalFile(this->mp_Acquisition->videoPath(id) + "/" + this->mp_Acquisition->videoFilename(id));
-  if (this->mp_MediaPlayer->media().canonicalUrl() == videoFileUrl) // same file?
-  {
-    this->mp_VideoWidget->setVisible(true);
-    this->render(); // Force to update the content of the video widget as it was previously hidden
-  }
+  QString videoFilePath = this->mp_Acquisition->videoPath(id) + "/" + this->mp_Acquisition->videoFilename(id);
+  if (this->mp_MediaObject->currentSource().fileName().compare(videoFilePath) == 0) // same file?
+    this->setVideoVisible(true);
   else if (this->mp_Acquisition->videoPath(id).isEmpty())
   {
-    QMessageBox error(QMessageBox::Warning, "Video player", "Video file not found.", QMessageBox::Ok , this);
+    LOG_CRITICAL("Error when loading the video file: File not found.");
+    QMessageBox error(QMessageBox::Warning, "Video player", "Error when loading the video.", QMessageBox::Ok , this);
 #ifdef Q_OS_MAC
     error.setWindowFlags(Qt::Sheet);
     error.setWindowModality(Qt::WindowModal);
 #endif
-    LOG_CRITICAL("Error when loading the video file: File not found.");
     error.setInformativeText("<nobr>Video(s) must be in the same folder than the acquisition.</nobr>");
     error.exec();
   }
   else
   {
     LOG_INFO("Loading video from file: " + this->mp_Acquisition->videoFilename(id));
+    this->mp_MediaObject->clear(); // Reset the internal state of the player
+    this->m_VideoId = id; // Must be set before the loading of the video (at least under MacOS X as the reading is asynchronous (multithreaded?) and the rendering is done when calling the method Phonon::MediaObject::setCurrentSource())
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    this->mp_MediaPlayer->setMedia(QMediaContent()); // Reset the internal states of the media: Required to be sure that the video will start at the current "3D" frame
-    this->m_VideoLoading = true;
-    this->mp_MediaPlayer->setMedia(videoFileUrl);
+    this->mp_MediaObject->setCurrentSource(videoFilePath);
     QApplication::restoreOverrideCursor();
-    this->m_VideoId = id;
-#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
-    // Never tried under Linux.
-    // Under windows, the mechanism is different and use the status of the media
-    this->mp_MediaPlayer->pause(); // Force the loading and sync the video with the curent 3D frame
-#endif
   }
   this->QWidget::dropEvent(event);
 };
 
 void VideoWidget::paintEvent(QPaintEvent* event)
 {
-  if (!this->mp_VideoWidget->isVisible())
+  if (!this->mp_Video->isVisible())
   {
-    QString str = "Drop a video";
+    // Title
+    QString str = "Drop video";
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(Qt::lightGray);
     QFont f = this->font();
     f.setPointSize(32);
     painter.setFont(f);
-    QFontMetrics fm = painter.fontMetrics();
-    QRect rect = fm.boundingRect(str);
+    QRect rect = painter.fontMetrics().boundingRect(str);
     QPoint center = this->geometry().center();
-    painter.drawText(center - rect.center(), str);
+    painter.drawText(center - rect.center() - QPoint(0, rect.height()/2), str);
+    // informative text
+    str = "from acquisition explorer";
+    f.setPointSize(14);
+    painter.setFont(f);
+    QRect rect2 = painter.fontMetrics().boundingRect(str);
+    painter.drawText(center - rect2.center() + QPoint(0, rect2.height()), str);
+    // Box
     painter.setPen(QPen(Qt::lightGray, 1.75, Qt::DashLine));
     qreal side = static_cast<qreal>(qMin(this->width() / 2, this->height() / 2));
     side = qMax(side, rect.width() + 30.0); // 15 px on each side
     painter.drawRoundedRect(QRectF(center - QPointF(side, side) / 2.0, QSizeF(side, side)), 25.0, 25.0);
   }
   else
-  {
-    this->render(); // Force the rendering of the current frame if previously hidden
     this->QWidget::paintEvent(event);
-  }
 };
 
-void VideoWidget::checkMediaStatus(QMediaPlayer::MediaStatus status)
+void VideoWidget::setVideoVisible(bool v)
 {
-  switch(status)
+  this->mp_Video->setVisible(v);
+  this->mp_Overlay->setVisible(v);
+};
+
+void VideoWidget::checkMediaStatus(Phonon::State newState, Phonon::State oldState)
+{
+  switch(newState)
   {
-  case QMediaPlayer::LoadedMedia:
-    this->mp_VideoWidget->setVisible(true);
-#ifdef Q_OS_WIN
-    this->mp_MediaPlayer->play(); // Force the buffering of the media (which will be paused when buffered).
-#endif
-    break;
-  case QMediaPlayer::BufferedMedia:
-    this->render();
-    break;
-  case QMediaPlayer::InvalidMedia:
+  case Phonon::StoppedState:
+    if ((oldState == Phonon::LoadingState) && (this->mp_MediaObject->currentSource().type() != Phonon::MediaSource::Empty))
     {
-    QMessageBox error(QMessageBox::Warning, "Video player", "Error when loading the video.", QMessageBox::Ok , this);
-#ifdef Q_OS_MAC
-    error.setWindowFlags(Qt::Sheet);
-    error.setWindowModality(Qt::WindowModal);
+      this->setVideoVisible(true);
+#ifdef Q_OS_WIN
+      if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7)
+        this->mp_MediaObject->pause();
+#else
+      this->mp_MediaObject->play(); // At least under MacOS X, give the seek capability (otherwise, the video stays freezed).
+      this->mp_MediaObject->pause();
 #endif
-    LOG_CRITICAL("Error when loading the video file: Have you the right video codec installed?");
-    error.setInformativeText("<nobr>Have you the right video codec installed?</nobr>");
-    error.exec();
-    this->m_VideoId = -1;
-    this->mp_MediaPlayer->setMedia(QMediaContent()); // Reset the player
-    this->mp_VideoWidget->setVisible(false);
-    this->update();
+      this->render();
+    }
+    break;
+  case Phonon::ErrorState:
+    {
+    if (this->mp_MediaObject->currentSource().type() != Phonon::MediaSource::Empty)
+    {
+      QMessageBox error(QMessageBox::Warning, "Video player", "Error when loading the video.", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      LOG_CRITICAL("Error when loading the video file: Have you the right video codec installed?");
+      error.setInformativeText("<nobr>Have you the right video codec installed?</nobr>");
+      error.exec();
+      this->m_VideoId = -1;
+      this->mp_MediaObject->clear(); // Reset the player
+      this->setVideoVisible(false);
+      this->update();
+      }
     }
     break;
   default:
@@ -238,24 +290,10 @@ void VideoWidget::checkMediaStatus(QMediaPlayer::MediaStatus status)
   }
 };
 
-void VideoWidget::finalizeVideoLoading(qint64 pos)
-{
-#ifdef Q_OS_WIN
-  if (this->m_VideoLoading)
-  {
-    if ((pos - this->referencePosition()) >= 0)
-    {
-      this->mp_MediaPlayer->pause();
-      this->m_VideoLoading = false;
-    }
-  }
-#else
-  Q_UNUSED(pos);
-  this->m_VideoLoading = false;
-#endif
-};
+// ----------------------------------------------------------------------------
 
-inline qint64 VideoWidget::referencePosition() const
+VideoOverlayWidget::VideoOverlayWidget(QWidget* parent)
+: QWidget(parent)
 {
-  return static_cast<qint64>(static_cast<double>((*this->mp_CurrentFrameFunctor)() - 1) / this->mp_Acquisition->pointFrequency() * 1000.0) - this->mp_Delays->operator[](this->m_VideoId);
+  this->setAttribute(Qt::WA_NoSystemBackground);
 };

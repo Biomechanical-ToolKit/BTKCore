@@ -35,9 +35,9 @@
 
 #include "MultiViewWidget.h"
 #include "Acquisition.h"
-#include "Model.h"
 #include "CompositeView.h"
 #include "ChartWidget.h"
+#include "ChartDialog.h"
 #include "LoggerVTKOutput.h"
 #include "Viz3DWidget.h"
 #include "VideoWidget.h"
@@ -75,7 +75,7 @@
 #include <vtkIdTypeArray.h>
 #include <vtkCamera.h>
 
-enum {VTK_GROUND, VTK_FORCE_PLATFORMS, VTK_MARKERS, VTK_GRFS, VTK_SEGMENTS};
+enum {VTK_GROUND, VTK_FORCE_PLATFORMS, VTK_MARKERS, VTK_GRFS, VTK_GRFS_VECTOR, VTK_GRFS_PWA, VTK_SEGMENTS};
 
 class vtkStreamingDemandDrivenPipelineCollection : public vtkstd::list<vtkStreamingDemandDrivenPipeline*>
 {};
@@ -83,9 +83,12 @@ class vtkStreamingDemandDrivenPipelineCollection : public vtkstd::list<vtkStream
 class vtkProcessMap : public vtkstd::map<int, vtkObjectBase*>
 {};
 
+class vtkActorMap : public vtkstd::map<int, vtkActor*>
+{};
+
 MultiViewWidget::MultiViewWidget(QWidget* parent)
 : AbstractMultiView(parent), m_VideoDelays(),
-  m_ForcePlatformColor(255, 255, 0), m_ForceVectorColor(255, 255, 0),
+  m_ForcePlatformColor(127, 127, 127), m_ForceVectorColor(255, 255, 0),
   m_View3dActions(), m_ViewChartActions()
 {
   this->mp_EventFilterObject = 0;
@@ -93,13 +96,12 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_Model = 0;
   this->mp_EventQtSlotConnections = vtkEventQtSlotConnect::New();
   this->mp_VTKProc = new vtkProcessMap();
+  this->mp_VTKActor = new vtkActorMap();
   this->mp_Syncro = new vtkStreamingDemandDrivenPipelineCollection();
   this->mp_PointChartFrames = vtkDoubleArray::New();
-  this->mp_PointChartFrames->SetName("Frame");
+  this->mp_PointChartFrames->SetName("BottomAxis");
   this->mp_AnalogChartFrames = vtkDoubleArray::New();
-  this->mp_AnalogChartFrames->SetName("Frame");
-  this->mp_ForcePlatformActor = 0;
-  this->mp_ForceVectorActor = 0;
+  this->mp_AnalogChartFrames->SetName("BottomAxis");
   this->mp_Mappers = vtkMapperCollection::New();
   this->mp_GroupOrientationMenu = new QMenu(tr("Ground Orientation"),this);
   this->mp_ActionGroundOrientationAutomatic = new QAction(tr("Automatic"),this);
@@ -122,7 +124,7 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_GroupOrientationMenu->addAction(this->mp_ActionGroundOrientationPlaneZX);
   
   this->mp_MarkerTrajectoryLengthMenu = new QMenu(tr("Marker Trajectory Length"),this);
-  this->mp_ActionMarkerTrajectoryFull = new QAction(tr("All Frames"),this);;
+  this->mp_ActionMarkerTrajectoryFull = new QAction(tr("All Frames"),this);
   this->mp_ActionMarkerTrajectoryFull->setCheckable(true);
   this->mp_ActionMarkerTrajectory25 = new QAction(tr("25 Frames"),this);
   this->mp_ActionMarkerTrajectory25->setCheckable(true);
@@ -144,9 +146,25 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectory50);
   this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectory100);
   this->mp_MarkerTrajectoryLengthMenu->addAction(this->mp_ActionMarkerTrajectory200);
+  this->mp_ForceButterflyActivationAction = new QAction(tr("Toggle GRF Butterfly"),this);
+  this->mp_ForceButterflyActivationAction->setEnabled(false);
+  
+  this->mp_ChartBottomAxisDisplayMenu = new QMenu(tr("Chart Unit: X Axis"),this);
+  this->mp_ActionChartAxisFrame = new QAction(tr("Frame"),this);
+  this->mp_ActionChartAxisFrame->setCheckable(true);
+  this->mp_ActionChartAxisTime = new QAction(tr("Time"),this);
+  this->mp_ActionChartAxisTime->setCheckable(true);
+  QActionGroup* chartBottomAxisDisplay = new QActionGroup(this);
+  chartBottomAxisDisplay->addAction(this->mp_ActionChartAxisFrame);
+  chartBottomAxisDisplay->addAction(this->mp_ActionChartAxisTime);
+  this->mp_ActionChartAxisFrame->setChecked(true);
+  this->mp_ChartBottomAxisDisplayMenu->addAction(this->mp_ActionChartAxisFrame);
+  this->mp_ChartBottomAxisDisplayMenu->addAction(this->mp_ActionChartAxisTime);
   
   connect(groundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
   connect(trajectoryLengthActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeMarkerTrajectoryLength()));
+  connect(this->mp_ForceButterflyActivationAction, SIGNAL(triggered(bool)), this, SLOT(changeForceButterflyActivation()));
+  connect(chartBottomAxisDisplay, SIGNAL(triggered(QAction*)), this, SLOT(updateChartUnitAxisX()));
   
   this->setViewPrototype(ViewFactory<CompositeView>);
 };
@@ -157,12 +175,13 @@ MultiViewWidget::~MultiViewWidget()
   for (vtkProcessMap::iterator it = this->mp_VTKProc->begin() ; it != this->mp_VTKProc->end() ; ++it)
     it->second->Delete();
   delete this->mp_VTKProc;
+  for (vtkActorMap::iterator it = this->mp_VTKActor->begin() ; it != this->mp_VTKActor->end() ; ++it)
+    it->second->Delete();
+  delete this->mp_VTKActor;
   delete this->mp_Syncro;
   this->mp_PointChartFrames->Delete();
   this->mp_AnalogChartFrames->Delete();
   this->mp_Mappers->Delete();
-  if (this->mp_ForcePlatformActor != 0) this->mp_ForcePlatformActor->Delete();
-  if (this->mp_ForceVectorActor != 0) this->mp_ForceVectorActor->Delete();
   vtkAlgorithm::SetDefaultExecutivePrototype(0);
 };
 
@@ -194,9 +213,9 @@ void MultiViewWidget::initialize()
   actor->SetProperty(prop);
   actor->PickableOff();
   renderer->AddViewProp(actor);
+  (*this->mp_VTKActor)[VTK_GROUND] = actor;
   // Cleanup for ground
   mapper->Delete();
-  actor->Delete();
   prop->Delete();
   // Camera
   renderer->GetActiveCamera()->Elevation(-60);
@@ -206,7 +225,6 @@ void MultiViewWidget::initialize()
   // Dynamic data
   // Pipeline for force plaforms (plane)
   btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::New();
-  //forcePlaforms->SetInput(forcePlatformsExtractor->GetOutput());
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(forcePlaforms->GetOutputPort(0));
   prop = vtkProperty::New();
@@ -221,10 +239,9 @@ void MultiViewWidget::initialize()
   actor->SetProperty(prop);
   actor->PickableOff();
   renderer->AddActor(actor);
-  this->mp_ForcePlatformActor = actor;
+  (*this->mp_VTKActor)[VTK_FORCE_PLATFORMS] = actor;
   // Cleanup for force platforms (plane)
   mapper->Delete();
-  //actor->Delete();
   prop->Delete();
   // Pipeline for force plaforms (axes)
   mapper = vtkPolyDataMapper::New();
@@ -264,8 +281,6 @@ void MultiViewWidget::initialize()
   prototype->Delete();
   // Pipeline for markers
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::New();
-  //markers->SetInput(0, virtualMarkersSeparator->GetOutput(0));
-  //markers->SetInput(1, virtualMarkersSeparator->GetOutput(2));
   // - Display marker's position
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(markers->GetOutputPort(0));
@@ -277,6 +292,7 @@ void MultiViewWidget::initialize()
   actor = vtkActor::New();
   actor->SetMapper(mapper);
   actor->SetScale(0.005);
+  actor->UseBoundsOff();
   renderer->AddActor(actor);
   mapper->Delete();
   actor->Delete();
@@ -296,8 +312,9 @@ void MultiViewWidget::initialize()
   renderer->AddActor(actor);
   mapper->Delete();
   actor->Delete();
-  // Pipeline for segments (links)
+  // Pipeline for segments
   btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::New();
+  // - Links
   mapper = vtkPolyDataMapper::New();
   mapper->SetInputConnection(segments->GetOutputPort(0));
   mapper->SetLookupTable(segments->GetSegmentColorLUT());
@@ -309,14 +326,30 @@ void MultiViewWidget::initialize()
   actor->SetMapper(mapper);
   actor->GetProperty()->SetLineWidth(2);
   actor->SetScale(0.005);
+  actor->UseBoundsOff();
+  renderer->AddActor(actor);
+  mapper->Delete();
+  actor->Delete();
+  // - Faces
+  mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(segments->GetOutputPort(1));
+  mapper->SetLookupTable(segments->GetSegmentColorLUT());
+  mapper->SetScalarModeToUseCellData();
+  mapper->UseLookupTableScalarRangeOn();
+  mapper->SelectColorArray("Colors");
+  this->mp_Mappers->AddItem(mapper);
+  actor = vtkActor::New();
+  actor->GetProperty()->SetOpacity(0.5);
+  actor->SetMapper(mapper);
+  actor->SetScale(0.005);
+  actor->UseBoundsOff();
   renderer->AddActor(actor);
   mapper->Delete();
   actor->Delete();
   // Pipeline for GRFs
   btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::New();
-  //GRFs->SetInput(GRWsDownsampler->GetOutput());
   mapper = vtkPolyDataMapper::New();
-  mapper->SetInputConnection(GRFs->GetOutputPort());
+  mapper->SetInputConnection(GRFs->GetOutputPort(0));
   this->mp_Mappers->AddItem(mapper);
   prop = vtkProperty::New();
   prop->SetColor(this->m_ForceVectorColor.redF(), this->m_ForceVectorColor.greenF(), this->m_ForceVectorColor.blueF());
@@ -329,10 +362,27 @@ void MultiViewWidget::initialize()
   actor->SetProperty(prop);
   actor->PickableOff();
   renderer->AddActor(actor);
-  this->mp_ForceVectorActor = actor;
+  (*this->mp_VTKActor)[VTK_GRFS_VECTOR] = actor;
   // Cleanup for GRFs.
   mapper->Delete();
-  //actor->Delete();
+  prop->Delete();
+  // - Display GRF's PWA trajectory
+  mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(GRFs->GetOutputPort(1));
+  this->mp_Mappers->AddItem(mapper);
+  prop = vtkProperty::New();
+  prop->SetColor(this->m_ForcePlatformColor.redF(), this->m_ForcePlatformColor.greenF(), this->m_ForcePlatformColor.blueF());
+  prop->SetPointSize(2.0);
+  actor = vtkActor::New();
+  actor->SetMapper(mapper);
+  actor->SetScale(0.005);
+  actor->SetProperty(prop);
+  actor->PickableOff();
+  actor->UseBoundsOff();
+  renderer->AddActor(actor);
+  (*this->mp_VTKActor)[VTK_GRFS_PWA] = actor;
+  // Cleanup for GRFs trajectory.
+  mapper->Delete();
   prop->Delete();
   // Synchro between dynamic data
   this->mp_Syncro->push_back(vtkStreamingDemandDrivenPipeline::SafeDownCast(markers->GetExecutive()));
@@ -375,17 +425,19 @@ void MultiViewWidget::setAcquisition(Acquisition* acq)
     static_cast<CompositeView*>(*it)->setAcquisition(this->mp_Acquisition);
   // BTK->VTK connection
   btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
-  markers->SetInput(0, this->mp_Acquisition->btkMarkers());
-  markers->SetInput(1, this->mp_Acquisition->btkVirtualMarkers());
+  markers->SetInput(0, this->mp_Acquisition->btkAllMarkers());
   btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
   GRFs->SetInput(this->mp_Acquisition->btkGroundReactionWrenches());
   btk::VTKForcePlatformsSource* forcePlaforms = btk::VTKForcePlatformsSource::SafeDownCast((*this->mp_VTKProc)[VTK_FORCE_PLATFORMS]);
   forcePlaforms->SetInput(this->mp_Acquisition->btkForcePlatforms());
   btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
-  segments->SetInput(this->mp_Acquisition->btkMarkers());
+  segments->SetInput(this->mp_Acquisition->btkAllMarkers());
   // Object connection
   connect(this->mp_Acquisition, SIGNAL(markersRadiusChanged(QVector<int>, QVector<double>)), this, SLOT(setMarkersRadius(QVector<int>, QVector<double>)));
   connect(this->mp_Acquisition, SIGNAL(markersColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setMarkersColor(QVector<int>, QVector<QColor>)));
+  connect(this->mp_Acquisition, SIGNAL(markersVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setMarkersVisibility(QVector<int>, QVector<bool>)));
+  connect(this->mp_Acquisition, SIGNAL(markersTrajectoryVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setMarkersTrajectoryVisibility(QVector<int>, QVector<bool>)));
+  connect(this->mp_Acquisition, SIGNAL(markersConfigurationReset(QList<int>, QList<bool>, QList<bool>, QList<double>, QList<QColor>)), this, SLOT(setMarkersConfiguration(QList<int>, QList<bool>, QList<bool>, QList<double>, QList<QColor>)));
   connect(this->mp_Acquisition, SIGNAL(firstFrameChanged(int)), this, SLOT(updateFramesIndex(int)));
   connect(this->mp_Acquisition, SIGNAL(videosDelayChanged(QVector<int>, QVector<qint64>)), this, SLOT(setVideoDelays(QVector<int>, QVector<qint64>)));
 }
@@ -397,7 +449,9 @@ void MultiViewWidget::setModel(Model* m)
   this->mp_Model = m;
   // Object connection
   connect(this->mp_Model, SIGNAL(segmentsColorChanged(QVector<int>, QVector<QColor>)), this, SLOT(setSegmentsColor(QVector<int>, QVector<QColor>)));
-  connect(this->mp_Model, SIGNAL(segmentLinksChanged(int, QVector<int>, QVector< QPair<int,int> >)), this, SLOT(setSegmentLink(int, QVector<int>, QVector< QPair<int,int> >)));
+  connect(this->mp_Model, SIGNAL(segmentDefinitionChanged(int)), this, SLOT(updateSegmentDefinition(int)));
+  connect(this->mp_Model, SIGNAL(segmentsVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setSegmentsVisibility(QVector<int>, QVector<bool>)));
+  connect(this->mp_Model, SIGNAL(segmentsSurfaceVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setSegmentsSurfaceVisibility(QVector<int>, QVector<bool>)));
 }
 
 void MultiViewWidget::setView3dActions(QList<QAction*> actions)
@@ -454,15 +508,16 @@ void MultiViewWidget::load()
   double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
   for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
   {
+    double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
     // Point
-    this->mp_PointChartFrames->SetValue(i, this->mp_Acquisition->firstFrame() + i);
+    this->mp_PointChartFrames->SetValue(i, val);
     // Analog
     int inc = i * this->mp_Acquisition->analogSamplePerPointFrame();
-    double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
     this->mp_AnalogChartFrames->SetValue(inc, val);
     for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
       this->mp_AnalogChartFrames->SetValue(inc + j, val + j * sub);
   }
+  this->updateChartUnitAxisX();
   
   // Update video delays
   this->m_VideoDelays.clear();
@@ -472,10 +527,14 @@ void MultiViewWidget::load()
   // Force the update for the generation of the force platforms and their forces (In case there is no 3D view, they are not updated).
   forcePlaforms->Update();
   GRFs->Update();
+  // Force the computation of the direction angle
+  this->mp_Acquisition->btkWrenchDirectionAngles()->Update();
   
   // Active the content of each view
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
     static_cast<CompositeView*>(*it)->show(true);
+  
+  this->mp_ForceButterflyActivationAction->setEnabled(!this->mp_Acquisition->btkForcePlatforms()->IsEmpty());
 };
 
 void MultiViewWidget::setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor)
@@ -508,7 +567,8 @@ void MultiViewWidget::setEventFilterObject(QObject* filter)
 };
 
 static const int MultiViewWidgetMagic = 0x0abc;
-static const int MultiViewWidgetVersion = 0x0100; // 1.0 
+static const int MultiViewWidgetVersion1 = 0x0100; // 1.0 
+static const int MultiViewWidgetVersion2 = 0x0200; // 2.0 
 static const int MultiViewWidgetViewId = 0x0001;
 static const int MultiViewWidgetSplitterId = 0x0002;
 
@@ -519,7 +579,7 @@ QByteArray MultiViewWidget::saveLayout() const
   stream.setVersion(QDataStream::Qt_4_6);
   
   stream << qint32(MultiViewWidgetMagic);
-  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetVersion2);
   
   if (!this->saveLayout(stream, static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget()))
     return QByteArray();
@@ -562,6 +622,18 @@ bool MultiViewWidget::saveLayout(QDataStream& stream, QWidget* w) const
     // View options
     switch(index)
     {
+    case CompositeView::Viz3DProjection:
+      {
+      double focalPoint[3], position[3], viewUp[3];
+      static_cast<Viz3DWidget*>(view->view(CompositeView::Viz3D))->projectionCamera(focalPoint, position, viewUp);
+      for (int i = 0 ; i < 3 ; ++i)
+        stream << focalPoint[i];
+      for (int i = 0 ; i < 3 ; ++i)
+        stream << position[i];
+      for (int i = 0 ; i < 3 ; ++i)
+        stream << viewUp[i];
+      break;
+      }
     case CompositeView::Viz3DOrthogonal:
       stream << qint32(static_cast<QComboBox*>(view->optionStack->currentWidget())->currentIndex());
       break;
@@ -600,6 +672,13 @@ bool MultiViewWidget::restoreLayout(const QByteArray& state)
     CompositeView* view = static_cast<CompositeView*>(static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget());
     return this->restoreLayout(stream, view, this->size());
   }
+  else if (version == 0x0200)
+  {
+    stream.setVersion(QDataStream::Qt_4_6);
+    this->closeAll();
+    CompositeView* view = static_cast<CompositeView*>(static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget());
+    return this->restoreLayout2(stream, view, this->size());
+  }
   else
     qCritical("Unknown version number for serialized data containing the layout of the views. You may have used a new version containing some major changes in the data format.");
   return false;
@@ -613,39 +692,14 @@ bool MultiViewWidget::restoreLayout(QDataStream& stream, CompositeView* view, co
   {
     AbstractView* views[2];
     QSize viewsSize[2];
-    int orientation;
-    float ratio;
-    int wol; //width or length
-    stream >> orientation;
-    stream >> ratio;
+    QList<int> sizes;
+    QSplitter* splitter = 0;
     
-    QSplitter* splitter = this->split(view, orientation, views);
-    if (orientation == Qt::Horizontal)
-    {
-      wol = size.width() - splitter->handleWidth();
-      viewsSize[0].setWidth(ratio * wol);
-      viewsSize[1].setWidth((1.0 - ratio) * wol);
-      viewsSize[0].setHeight(size.height());
-      viewsSize[1].setHeight(size.height());
-    }
-    else if (orientation == Qt::Vertical)
-    {
-      wol = size.height() - splitter->handleWidth();
-      viewsSize[0].setWidth(size.width());
-      viewsSize[1].setWidth(size.width());
-      viewsSize[0].setHeight(ratio * wol);
-      viewsSize[1].setHeight((1.0 - ratio) * wol);
-    }
-    else
-    {
-      qCritical("Unknown orientation when extracting data to set the layout of the views.");
-      return false;
-    }
-    
-    if (!this->restoreLayout(stream, static_cast<CompositeView*>(views[0]), viewsSize[0]) || !this->restoreLayout(stream, static_cast<CompositeView*>(views[1]), viewsSize[1]))
+    if (!this->restoreLayoutView(stream, view, size, &splitter, views, viewsSize, sizes)
+        || !this->restoreLayout(stream, static_cast<CompositeView*>(views[0]), viewsSize[0])
+        || !this->restoreLayout(stream, static_cast<CompositeView*>(views[1]), viewsSize[1]))
       return false;
     
-    QList<int> sizes; sizes << ratio * wol << (1.0 - ratio) * wol;
     splitter->setSizes(sizes);
   }
   else if (id == MultiViewWidgetViewId)
@@ -656,14 +710,14 @@ bool MultiViewWidget::restoreLayout(QDataStream& stream, CompositeView* view, co
     int optionIndex = view->optionStackIndexFromViewComboIndex(index);
     switch(index)
     {
-    case 2: // Orthogonal 3D view
+    case CompositeView::Viz3DOrthogonal:
       {
       int index2;
       stream >> index2;
       static_cast<QComboBox*>(view->optionStack->widget(optionIndex))->setCurrentIndex(index2);
       break;
       }
-    case 4: // Point chart
+    case CompositeView::ChartPoint:
       {
       int checked;
       stream >> checked;
@@ -674,7 +728,7 @@ bool MultiViewWidget::restoreLayout(QDataStream& stream, CompositeView* view, co
       static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(4)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
       break;
       }
-    case 5: // Analog chart
+    case CompositeView::ChartAnalog:
       {
       int index2;
       stream >> index2;
@@ -691,6 +745,115 @@ bool MultiViewWidget::restoreLayout(QDataStream& stream, CompositeView* view, co
   return true;
 };
 
+bool MultiViewWidget::restoreLayout2(QDataStream& stream, CompositeView* view, const QSize& size)
+{
+  int id;
+  stream >> id;
+  if (id == MultiViewWidgetSplitterId)
+  {
+    AbstractView* views[2];
+    QSize viewsSize[2];
+    QList<int> sizes; 
+    QSplitter* splitter = 0;
+    
+    if (!this->restoreLayoutView(stream, view, size, &splitter, views, viewsSize, sizes)
+        || !this->restoreLayout2(stream, static_cast<CompositeView*>(views[0]), viewsSize[0])
+        || !this->restoreLayout2(stream, static_cast<CompositeView*>(views[1]), viewsSize[1]))
+      return false;
+    
+    splitter->setSizes(sizes);
+  }
+  else if (id == MultiViewWidgetViewId)
+  {
+    int index;
+    stream >> index;
+    view->viewCombo->setCurrentIndex(view->convertEnumIndexToComboIndex(index));
+    int optionIndex = view->optionStackIndexFromViewComboIndex(index);
+    switch(index)
+    {
+    case CompositeView::Viz3DProjection:
+      {
+      double focalPoint[3], position[3], viewUp[3];
+      for (int i = 0 ; i < 3 ; ++i)
+        stream >> focalPoint[i];
+      for (int i = 0 ; i < 3 ; ++i)
+        stream >> position[i];
+      for (int i = 0 ; i < 3 ; ++i)
+        stream >> viewUp[i];
+      static_cast<Viz3DWidget*>(view->view(CompositeView::Viz3D))->setProjectionCamera(focalPoint, position, viewUp);
+      break;
+      }
+    case CompositeView::Viz3DOrthogonal:
+      {
+      // this->restoreLayoutViewViz3DCamera(stream, static_cast<CompositeView*>(view));
+      int index2;
+      stream >> index2;
+      static_cast<QComboBox*>(view->optionStack->widget(optionIndex))->setCurrentIndex(index2);
+      break;
+      }
+    case CompositeView::ChartPoint:
+      {
+      int checked;
+      stream >> checked;
+      static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(0)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
+      stream >> checked;
+      static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(2)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
+      stream >> checked;
+      static_cast<QCheckBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(4)->widget())->setCheckState(checked == 0 ? Qt::Unchecked : Qt::Checked);
+      break;
+      }
+    case CompositeView::ChartAnalog:
+      {
+      int index2;
+      stream >> index2;
+      static_cast<QComboBox*>(view->optionStack->widget(optionIndex)->layout()->itemAt(0)->layout()->itemAt(0)->widget())->setCurrentIndex(index2);
+      break;
+      }
+    }
+  }
+  else
+  {
+    qCritical("Unknown ID when extracting data to set the layout of the views.");
+    return false;
+  }
+  return true;
+};
+
+bool MultiViewWidget::restoreLayoutView(QDataStream& stream, CompositeView* view, const QSize& size, QSplitter** splitter, AbstractView* views[2], QSize viewsSize[2], QList<int>& sizes)
+{
+  int orientation;
+  float ratio;
+  int wol; //width or length
+  stream >> orientation;
+  stream >> ratio;
+  
+  *splitter = this->split(view, orientation, views);
+  if (orientation == Qt::Horizontal)
+  {
+    wol = size.width() - (*splitter)->handleWidth();
+    viewsSize[0].setWidth(ratio * wol);
+    viewsSize[1].setWidth((1.0 - ratio) * wol);
+    viewsSize[0].setHeight(size.height());
+    viewsSize[1].setHeight(size.height());
+  }
+  else if (orientation == Qt::Vertical)
+  {
+    wol = size.height() - (*splitter)->handleWidth();
+    viewsSize[0].setWidth(size.width());
+    viewsSize[1].setWidth(size.width());
+    viewsSize[0].setHeight(ratio * wol);
+    viewsSize[1].setHeight((1.0 - ratio) * wol);
+  }
+  else
+  {
+    qCritical("Unknown orientation when extracting data to set the layout of the views.");
+    return false;
+  }
+  sizes << ratio * wol << (1.0 - ratio) * wol;
+  
+  return true;
+}
+
 void MultiViewWidget::restoreLayout3DOnly()
 {
   QByteArray data;
@@ -698,7 +861,7 @@ void MultiViewWidget::restoreLayout3DOnly()
   stream.setVersion(QDataStream::Qt_4_6);
   
   stream << qint32(MultiViewWidgetMagic);
-  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetVersion1);
   stream << qint32(MultiViewWidgetViewId);
   stream << qint32(1); // 1: Perspective 3D
   
@@ -712,7 +875,7 @@ void MultiViewWidget::restoreLayout3DVerbose()
   stream.setVersion(QDataStream::Qt_4_6);
   
   stream << qint32(MultiViewWidgetMagic);
-  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetVersion1);
   stream << qint32(MultiViewWidgetSplitterId);
   stream << qint32(Qt::Vertical);
   stream << 0.8f;
@@ -731,7 +894,7 @@ void MultiViewWidget::restoreLayout3DCharts()
   stream.setVersion(QDataStream::Qt_4_6);
   
   stream << qint32(MultiViewWidgetMagic);
-  stream << qint32(MultiViewWidgetVersion);
+  stream << qint32(MultiViewWidgetVersion1);
   stream << qint32(MultiViewWidgetSplitterId);
   stream << qint32(Qt::Horizontal);
   stream << 0.5f;
@@ -750,6 +913,18 @@ void MultiViewWidget::restoreLayout3DCharts()
   stream << qint32(0); // Collapsed mode
   
   this->restoreLayout(data);
+};
+
+ChartDialog* MultiViewWidget::createChartDialog(QWidget* parent)
+{
+  ChartDialog* dlg = new ChartDialog(parent);
+  dlg->chart->copy(static_cast<ChartWidget*>(static_cast<CompositeView*>(this->m_Views.first())->view(CompositeView::Chart)));
+  QList<QAction*> actions = dlg->chart->chartContent()->actions();
+  dlg->chart->chartContent()->removeAction(actions[1]);
+  dlg->chart->chartContent()->removeAction(actions[4]);
+  // dlg->chart->addActions(this->m_ViewChartActions);
+  dlg->chart->setAcceptDrops(false);
+  return dlg;
 };
 
 void MultiViewWidget::updateFramesIndex(int ff)
@@ -781,44 +956,24 @@ void MultiViewWidget::updateFramesIndex(int ff)
 
 void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segment*>& segments)
 {
-  Q_UNUSED(ids);
   btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
   QVector<QColor> colors(segments.size());
-  // Assume new segments are appended at the end. No use of the IDs
   int inc = 0;
   for (QList<Segment*>::const_iterator it = segments.begin() ; it != segments.end() ; ++it)
   {
-    colors[inc++] = (*it)->color;
-    std::vector<int> btkPointIds((*it)->markerIds.size());
-    std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks((*it)->links.size());
-    for (int i = 0 ; i < (*it)->markerIds.size() ; ++i)
-      btkPointIds[i] = (*it)->markerIds[i];
-    for (int i = 0 ; i < (*it)->links.size() ; ++i)
+    colors[inc] = (*it)->color;
+    if (ids[inc] >= segmentsFramesSource->GetNumberOfDefinitions())
+      segmentsFramesSource->AppendDefinition((*it)->mesh, (*it)->surfaceVisible);
+    else
     {
-      btkLinks[i].first = (*it)->links[i].first;
-      btkLinks[i].second = (*it)->links[i].second;
+      segmentsFramesSource->SetDefinition(ids[inc], (*it)->mesh);
+      segmentsFramesSource->SetSegmentVisibility(ids[inc], (*it)->visible);
+      segmentsFramesSource->SetSegmentSurfaceVisibility(ids[inc], (*it)->surfaceVisible);
     }
-    segmentsFramesSource->AppendDefinition(btkPointIds, btkLinks);
+    ++inc;
   }
   this->setSegmentsColor(ids.toVector(), colors);
 };
-
-/*
-void MultiViewWidget::appendNewSegment(const QVector<int>& markerIds, const QVector< QPair<int,int> >& links)
-{
-  std::vector<int> btkPointIds(markerIds.size());
-  std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks(links.size());
-  for (int i = 0 ; i < markerIds.size() ; ++i)
-    btkPointIds[i] = markerIds[i];
-  for (int i = 0 ; i < links.size() ; ++i)
-  {
-    btkLinks[i].first = links[i].first;
-    btkLinks[i].second = links[i].second;
-  }
-  btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
-  segmentsFramesSource->AppendDefinition(btkPointIds, btkLinks);
-};
-*/
 
 void MultiViewWidget::clearSegments()
 {
@@ -856,19 +1011,33 @@ void MultiViewWidget::setSegmentsColor(const QVector<int>& ids, const QVector<QC
   this->updateSegmentsDisplay();
 };
 
-void MultiViewWidget::setSegmentLink(int id, const QVector<int>& markerIds, const QVector< QPair<int,int> >& links)
+void MultiViewWidget::setSegmentDefinition(int id, const QVector<int>& markerIds, const QVector<Pair>& links, const QVector<Triad>& faces)
 {
-  std::vector<int> btkPointIds(markerIds.size());
-  std::vector<btk::VTKSegmentsFramesSource::Link> btkLinks(links.size());
-  for (int i = 0 ; i < markerIds.size() ; ++i)
-    btkPointIds[i] = markerIds[i];
-  for (int i = 0 ; i < links.size() ; ++i)
-  {
-    btkLinks[i].first = links[i].first;
-    btkLinks[i].second = links[i].second;
-  }
   btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
-  segments->SetDefinition(id, btkPointIds, btkLinks);
+  segments->SetDefinition(id, markerIds.toStdVector(), links.toStdVector(), faces.toStdVector());
+  this->updateSegmentsDisplay();
+};
+
+void MultiViewWidget::updateSegmentDefinition(int id)
+{
+  btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
+  segments->SetDefinition(id, this->mp_Model->segments().value(id)->mesh);
+  this->updateSegmentsDisplay();
+};
+
+void MultiViewWidget::setSegmentsVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    segmentsFramesSource->SetSegmentVisibility(ids[i], visibles[i]);
+  this->updateSegmentsDisplay();
+};
+
+void MultiViewWidget::setSegmentsSurfaceVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  btk::VTKSegmentsFramesSource* segmentsFramesSource = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    segmentsFramesSource->SetSegmentSurfaceVisibility(ids[i], visibles[i]);
   this->updateSegmentsDisplay();
 };
 
@@ -879,6 +1048,15 @@ void MultiViewWidget::updateHiddenSegments(const QList<int>& ids)
   for (int i = 0 ; i < ids.count() ; ++i)
     segmentsFramesSource->HideSegment(ids[i]);
   this->updateSegmentsDisplay();
+};
+
+int MultiViewWidget::appendNewSegment(Segment* s)
+{
+  btk::VTKSegmentsFramesSource* segments = btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS]);
+  QVector<QColor> colors(1, s->color);
+  int id = segments->AppendDefinition(s->mesh, s->surfaceVisible);
+  this->setSegmentsColor(QVector<int>(1,id), colors);
+  return id;
 };
 
 int MultiViewWidget::segmentColorIndex(int id)
@@ -931,6 +1109,15 @@ void MultiViewWidget::setMarkersColor(const QVector<int>& ids, const QVector<QCo
   this->updateMarkersDisplay();
 };
 
+void MultiViewWidget::updateVisibleMarkers(const QList<int>& ids)
+{
+  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  markersFramesSource->HideMarkers();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markersFramesSource->ShowMarker(ids[i]);
+  this->updateMarkersDisplay();
+};
+
 void MultiViewWidget::updateHiddenMarkers(const QList<int>& ids)
 {
   btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
@@ -947,6 +1134,63 @@ void MultiViewWidget::updateTrackedMarkers(const QList<int>& ids)
   for (int i = 0 ; i < ids.count() ; ++i)
     markersFramesSource->ShowTrajectory(ids[i]);
   this->updateMarkersDisplay();
+};
+
+void MultiViewWidget::updateTrackedGRFPaths(const QList<int>& ids)
+{
+  btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
+  GRFs->HidePaths();
+  for (int i = 0 ; i < ids.count() ; ++i)
+    GRFs->ShowPath(ids[i]);
+  GRFs->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
+  this->mp_Mappers->InitTraversal();
+  vtkMapper* mapper;
+  while ((mapper = this->mp_Mappers->GetNextItem()) != NULL)
+    mapper->Modified();
+  this->updateViews();
+};
+
+void MultiViewWidget::setMarkersVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markersFramesSource->SetMarkerVisibility(ids[i], visibles[i]);
+  this->updateMarkersDisplay();
+};
+
+void MultiViewWidget::setMarkersTrajectoryVisibility(const QVector<int>& ids, const QVector<bool>& visibles)
+{
+  btk::VTKMarkersFramesSource* markersFramesSource = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+    markersFramesSource->SetTrajectoryVisibility(ids[i], visibles[i]);
+  this->updateMarkersDisplay();
+};
+
+void MultiViewWidget::markersConfiguration(const QList<int>& ids, QList<bool>& visibles, QList<bool>& trajectories, QList<double>& radii, QList<QColor>& colors)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    int id = ids[i];
+    visibles << markers->GetMarkerVisibility(id);
+    trajectories << markers->GetTrajectoryVisibility(id);
+    radii << markers->GetMarkerRadius(id);
+    double* c = markers->GetMarkerColor(id);
+    colors << QColor(static_cast<int>(c[0]*255.0), static_cast<int>(c[1]*255.0), static_cast<int>(c[2]*255.0));
+  };
+};
+
+void MultiViewWidget::setMarkersConfiguration(const QList<int>& ids, const QList<bool>& visibles, const QList<bool>& trajectories, const QList<double>& radii, const QList<QColor>& colors)
+{
+  btk::VTKMarkersFramesSource* markers = btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS]);
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    int id = ids[i];
+    markers->SetMarkerVisibility(id, visibles[i]);
+    markers->SetTrajectoryVisibility(id, trajectories[i]);
+    markers->SetMarkerRadius(id, radii[i]);
+  }
+  this->setMarkersColor(ids.toVector(), colors.toVector()); // Will update the display
 };
 
 double MultiViewWidget::markerRadius(int id)
@@ -1043,6 +1287,19 @@ void MultiViewWidget::setDefaultGroundOrientation(int index)
   }
 };
 
+void MultiViewWidget::setDefaultBackgroundColor(const QColor& color)
+{
+  for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
+    static_cast<Viz3DWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D))->renderer()->SetBackground(color.redF(), color.greenF(), color.blueF());
+  this->updateViews();
+};
+
+void MultiViewWidget::setDefaultGridColor(const QColor& color)
+{
+  (*this->mp_VTKActor)[VTK_GROUND]->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+  this->updateViews();
+};
+
 void MultiViewWidget::setDefaultSegmentColor(const QColor& color)
 {
   this->mp_Model->setDefaultSegmentColor(color);
@@ -1097,19 +1354,22 @@ void MultiViewWidget::showForcePlatformIndex(bool isShown)
 void MultiViewWidget::setForcePlatformColor(const QColor& color)
 {
   this->m_ForcePlatformColor = color;
-  if (!this->mp_ForcePlatformActor)
-    return;
-  this->mp_ForcePlatformActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+  (*this->mp_VTKActor)[VTK_FORCE_PLATFORMS]->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+  (*this->mp_VTKActor)[VTK_GRFS_PWA]->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
   this->updateViews();
 };
 
 void MultiViewWidget::setForceVectorColor(const QColor& color)
 {
   this->m_ForceVectorColor = color;
-  if (!this->mp_ForceVectorActor)
-    return;
-  this->mp_ForceVectorActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+  (*this->mp_VTKActor)[VTK_GRFS_VECTOR]->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
   this->updateViews();
+};
+
+void MultiViewWidget::setGRFButterflyActivation(bool activated)
+{
+  btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS])->SetButterflyActivation(activated);
+  this->updateDisplay();
 };
 
 void MultiViewWidget::setVideoDelay(int id, double d)
@@ -1140,6 +1400,7 @@ void MultiViewWidget::clear()
 {
   for (QList<AbstractView*>::const_iterator it = this->views().begin() ; it != this->views().end() ; ++it)
     static_cast<CompositeView*>(*it)->show(false);
+  this->mp_ForceButterflyActivationAction->setEnabled(false);
 };
 
 void MultiViewWidget::circleSelectedMarkers(const QList<int>& ids)
@@ -1177,6 +1438,8 @@ void MultiViewWidget::updateDisplay()
   btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
   // Same thing for the segments
   btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
+  // And also the GRFs
+  btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
   // Update
   this->mp_Mappers->InitTraversal();
   vtkMapper* mapper;
@@ -1191,6 +1454,8 @@ void MultiViewWidget::updateDisplay(int frame)
   btk::VTKMarkersFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_MARKERS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
   // Same thing for the segments
   btk::VTKSegmentsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_SEGMENTS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
+  // And also the GRFs
+  btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
   // Update
   double t = static_cast<double>(frame - this->mp_Acquisition->firstFrame());
   for (vtkStreamingDemandDrivenPipelineCollection::iterator it = this->mp_Syncro->begin() ; it != this->mp_Syncro->end() ; ++it)
@@ -1214,16 +1479,79 @@ void MultiViewWidget::hideAllMarkers()
   this->updateMarkersDisplay();
 };
 
-void MultiViewWidget::forceRubberBandDrawingOn()
+void MultiViewWidget::adaptViewsForPlaybackOn()
 {
-  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
-    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOn();
-};
-
-void MultiViewWidget::forceRubberBandDrawingOff()
-{
+  // Normal drawing of the rubber band in the 3D view
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
     static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOff();
+  // Start the video playback
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+    static_cast<VideoWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::MediaVideo))->start();
+};
+
+void MultiViewWidget::adaptViewsForPlaybackOff()
+{
+  // Force to draw the rubber band in the 3D view
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+    static_cast<btk::VTKInteractorStyleTrackballFixedUpCamera*>(static_cast<Viz3DWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Viz3D))->GetRenderWindow()->GetInteractor()->GetInteractorStyle())->ForceRubberBandDrawingOn();
+  // Stop the video playback
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+    static_cast<VideoWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::MediaVideo))->stop();
+};
+
+void MultiViewWidget::updateChartUnitAxisX()
+{
+  if (this->mp_ActionChartAxisFrame->isChecked())
+    this->displayChartBottomAxisAsFrame();
+  else if (this->mp_ActionChartAxisTime->isChecked())
+    this->displayChartBottomAxisAsTime();
+};
+
+void MultiViewWidget::setFrameAsChartUnitAxisX()
+{
+  this->mp_ActionChartAxisFrame->trigger();
+};
+
+void MultiViewWidget::setTimeAsChartUnitAxisX()
+{
+  this->mp_ActionChartAxisTime->trigger();
+};
+
+void MultiViewWidget::displayChartBottomAxisAsFrame()
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
+    w->setUnitAxisX("Frame", 1.0, 0.0);
+  }
+}
+
+void MultiViewWidget::displayChartBottomAxisAsTime()
+{
+  double f = this->mp_Acquisition->btkAcquisition() ? this->mp_Acquisition->pointFrequency() : 1.0;
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
+    w->setUnitAxisX("Time (s)", 1.0 / f, -1.0);
+  }
+}
+
+void MultiViewWidget::showChartEvent(bool visible)
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
+    w->setEventDisplay(visible);
+  }
+};
+
+void MultiViewWidget::setDefaultPlotLineWidth(double width)
+{
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
+    w->setDefaultLineWidth(width);
+  }
 };
 
 void MultiViewWidget::dragEnterEvent(QDragEnterEvent *event)
@@ -1302,7 +1630,14 @@ void MultiViewWidget::changeMarkerTrajectoryLength()
     markers->SetTrajectoryLength(200);
     
   this->updateMarkersDisplay();
-}
+};
+
+void MultiViewWidget::changeForceButterflyActivation()
+{
+  btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
+  GRFs->SetButterflyActivation(!GRFs->GetButterflyActivation());
+  this->updateDisplay();
+};
 
 void MultiViewWidget::updateCameras()
 {

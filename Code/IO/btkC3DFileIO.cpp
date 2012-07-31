@@ -286,8 +286,10 @@ namespace btk
                numberSamplesPerAnalogChannel = 0;
       int lastFrame = 0;
       float pointScaleFactor = 0.0, pointFrameRate = 0.0;
+      bool hasHeader = false;
       if (parameterFirstBlock != 1)
       {
+        hasHeader = true;
     // Header
         pointNumber = ibfs->ReadU16(); // (word 02)
         totalAnalogSamplesPer3dFrame = ibfs->ReadU16(); // (word 03)
@@ -561,6 +563,93 @@ namespace btk
           }
         }
       }
+    // Configure the acquisition based on some metadata
+      // ANALOG
+      MetaData::ConstIterator itAnalog = root->FindChild("ANALOG");
+      if (itAnalog != root->End())
+      {
+        // - ANALOG:BITS
+        MetaData::ConstIterator itAnalogBits = (*itAnalog)->FindChild("BITS");
+        int bits = 0;
+        if (itAnalogBits != (*itAnalog)->End())
+        {
+          bits = (*itAnalogBits)->GetInfo()->ToInt(0);
+          switch(bits)
+          {
+            case 8:
+              output->SetAnalogResolution(Acquisition::Bit8);
+              break;
+            case 10:
+              output->SetAnalogResolution(Acquisition::Bit10);
+              break;
+            case 12:
+              output->SetAnalogResolution(Acquisition::Bit12);
+              break;
+            case 14:
+              output->SetAnalogResolution(Acquisition::Bit14);
+              break;
+            case 16:
+              output->SetAnalogResolution(Acquisition::Bit16);
+              break;
+            default:
+              btkIOErrorMacro(filename, "Unknown analog resolution. Set by default to 12.");
+              output->SetAnalogResolution(Acquisition::Bit12);
+              break;
+          }
+        }
+        else
+          output->SetAnalogResolution(Acquisition::Bit12);
+      }
+      MetaData::ConstIterator itTrial = root->FindChild("TRIAL");
+      // TRIAL
+      if (itTrial != root->End())
+      {
+        // TRIAL:ACTUAL_START_FIELD
+        MetaData::ConstIterator itTrialStart = (*itTrial)->FindChild("ACTUAL_START_FIELD");
+        if (itTrialStart != (*itTrial)->End())
+        {
+          int lsb = (*itTrialStart)->GetInfo()->ToUInt16(0);
+          int hsb = (*itTrialStart)->GetInfo()->ToUInt16(1);
+          int start = hsb << 16 | lsb;
+          if (start != output->GetFirstFrame())
+          {
+            if ((output->GetFirstFrame() != 65535) && (hasHeader)) {btkIOErrorMacro(filename, "The first frame index wrote in the header is different than in the parameter TRIAL:ACTUAL_START_FIELD. The value in the parameter is kept.");}
+            output->SetFirstFrame(start);
+          }
+        }
+        // TRIAL:ACTUAL_END_FIELD
+        MetaData::ConstIterator itTrialEnd = (*itTrial)->FindChild("ACTUAL_END_FIELD");
+        if (itTrialEnd != (*itTrial)->End())
+        {
+          int lsb = (*itTrialEnd)->GetInfo()->ToUInt16(0);
+          int hsb = (*itTrialEnd)->GetInfo()->ToUInt16(1);
+          int end = hsb << 16 | lsb;
+          if (end != lastFrame)
+          {
+            if ((lastFrame != 65535) && hasHeader) {btkIOErrorMacro(filename, "The last frame index wrote in the header is different than in the parameter TRIAL:ACTUAL_END_FIELD. The number of frames is modified by keeping the value in the parameter.");}
+            lastFrame = end;
+          }
+        }
+      }
+      // POINT
+      const char* pointTypeNames[] = {"ANGLE", "FORCE", "MOMENT", "POWER", "SCALAR", "REACTION"}; 
+      const int numberOfPointTypeNames =  sizeof(pointTypeNames) / sizeof(char*);
+      MetaData::ConstIterator itPoint = root->FindChild("POINT");
+      if (itPoint != root->End())
+      {
+        // POINT:UNITS
+        MetaData::ConstIterator itPointUnits = (*itPoint)->FindChild("UNITS");
+        if (itPointUnits != (*itPoint)->End())
+          output->SetPointUnit((*itPointUnits)->GetInfo()->ToString(0));
+        // Point's unit for angles, forces, etc.
+        for(int i = 0 ; i < numberOfPointTypeNames ; ++i)
+        {
+          // unit
+          MetaData::ConstIterator itU = (*itPoint)->FindChild(std::string(pointTypeNames[i]) + "_UNITS");
+          if (itU != (*itPoint)->End())
+            output->SetPointUnit(static_cast<Point::Type>(i + 1), (*itU)->GetInfo()->ToString(0));
+        }
+      }
     // Data
       if (dataFirstBlock != 0)
       {
@@ -571,7 +660,6 @@ namespace btk
           numberSamplesPerAnalogChannel = 1;
         uint16_t analogNumber = totalAnalogSamplesPer3dFrame / numberSamplesPerAnalogChannel;
         // ANALOG
-        MetaData::ConstIterator itAnalog = root->FindChild("ANALOG");
         if (itAnalog != root->End())
         {
           MetaData::ConstIterator itAnalogUsed = (*itAnalog)->FindChild("USED");
@@ -592,38 +680,10 @@ namespace btk
 
         if ((analogNumber != 0) && (itAnalog != root->End()))
         {
-          // - ANALOG:BITS
-          MetaData::ConstIterator itAnalogBits = (*itAnalog)->FindChild("BITS");
-          int bits = 0;
-          if (itAnalogBits != (*itAnalog)->End())
-          {
-            bits = (*itAnalogBits)->GetInfo()->ToInt(0);
-            switch(bits)
-            {
-              case 8:
-                output->SetAnalogResolution(Acquisition::Bit8);
-                break;
-              case 12:
-                output->SetAnalogResolution(Acquisition::Bit12);
-                break;
-              case 14:
-                output->SetAnalogResolution(Acquisition::Bit14);
-                break;
-              case 16:
-                output->SetAnalogResolution(Acquisition::Bit16);
-                break;
-              default:
-                btkIOErrorMacro(filename, "Unknown analog resolution. Set by default to 12.");
-                output->SetAnalogResolution(Acquisition::Bit12);
-                break;
-            }
-          }
-          else
-            output->SetAnalogResolution(Acquisition::Bit12);
           // Check if values in ANALOG:OFFSET correspond to the informations in ANALOG:FORMAT and ANALOG:BITS
           std::vector<int16_t> analogZeroOffset_t;
           MetaDataCollapseChildrenValues<int16_t>(analogZeroOffset_t, *itAnalog, "OFFSET", analogNumber, 0);
-          bits = output->GetAnalogResolution();
+          int bits = output->GetAnalogResolution();
           for (unsigned inc = 0 ; inc < this->m_AnalogZeroOffset.size() ; ++inc)
           {
             if (fabs(static_cast<double>(analogZeroOffset_t[inc])) > pow(2.0, bits))
@@ -675,7 +735,6 @@ namespace btk
           }
         }
         // POINT
-        MetaData::ConstIterator itPoint = root->FindChild("POINT");
         if (itPoint != root->End())
         {
           // POINT:USED
@@ -699,37 +758,6 @@ namespace btk
             {
               btkIOErrorMacro(filename, "The point scaling factor written in the header and in the parameter POINT:SCALE are not the same. The first value is kept.");
               //pointScaleFactor = pointScale;
-            }
-          }
-        }
-        // TRIAL
-        MetaData::ConstIterator itTrial = root->FindChild("TRIAL");
-        if (itTrial != root->End())
-        {
-          // TRIAL:ACTUAL_START_FIELD
-          MetaData::ConstIterator itTrialStart = (*itTrial)->FindChild("ACTUAL_START_FIELD");
-          if (itTrialStart != (*itTrial)->End())
-          {
-            int lsb = (*itTrialStart)->GetInfo()->ToUInt16(0);
-            int hsb = (*itTrialStart)->GetInfo()->ToUInt16(1);
-            int start = hsb << 16 | lsb;
-            if (start != output->GetFirstFrame())
-            {
-              if (output->GetFirstFrame() != 65535) {btkIOErrorMacro(filename, "The first frame index wrote in the header is different than in the parameter TRIAL:ACTUAL_START_FIELD. The value in the parameter is kept.");}
-              output->SetFirstFrame(start);
-            }
-          }
-          // TRIAL:ACTUAL_END_FIELD
-          MetaData::ConstIterator itTrialEnd = (*itTrial)->FindChild("ACTUAL_END_FIELD");
-          if (itTrialEnd != (*itTrial)->End())
-          {
-            int lsb = (*itTrialEnd)->GetInfo()->ToUInt16(0);
-            int hsb = (*itTrialEnd)->GetInfo()->ToUInt16(1);
-            int end = hsb << 16 | lsb;
-            if (end != lastFrame)
-            {
-              if (lastFrame != 65535) {btkIOErrorMacro(filename, "The last frame index wrote in the header is different than in the parameter TRIAL:ACTUAL_END_FIELD. The number of frames is modified by keeping the value in the parameter.");}
-              lastFrame = end;
             }
           }
         }
@@ -784,7 +812,7 @@ namespace btk
             }
           }
         }
-        catch (BinaryFileStreamException& )
+        catch (BinaryFileStreamFailure& )
         {
           // Let's try to continue even if the file is corrupted
           if (ibfs->EndFile())
@@ -857,21 +885,11 @@ namespace btk
               }
             }
           }
-          // POINT:UNITS
-          MetaData::ConstIterator itPointUnits = (*itPoint)->FindChild("UNITS");
-          if (itPointUnits != (*itPoint)->End())
-            output->SetPointUnit((*itPointUnits)->GetInfo()->ToString(0));
-          // POINT type and special units
-          const char* names[] = {"ANGLE", "FORCE", "MOMENT", "POWER", "SCALAR", "REACTION"}; 
-          int numberOfNames =  sizeof(names) / sizeof(char*);
-          for(int i = 0 ; i < numberOfNames ; ++i)
+          // Point's type
+          for(int i = 0 ; i < numberOfPointTypeNames ; ++i)
           {
-            // unit
-            MetaData::ConstIterator itU = (*itPoint)->FindChild(std::string(names[i]) + "_UNITS");
-            if (itU != (*itPoint)->End())
-              output->SetPointUnit(static_cast<Point::Type>(i + 1), (*itU)->GetInfo()->ToString(0));
             // type
-            MetaDataCollapseChildrenValues(collapsed, *itPoint, std::string(names[i]) + "S");
+            MetaDataCollapseChildrenValues(collapsed, *itPoint, std::string(pointTypeNames[i]) + "S");
             for (int j = 0 ; j < static_cast<int>(collapsed.size()) ; ++j)
             {
               Acquisition::PointIterator itPt = output->FindPoint(collapsed[j]);
@@ -956,8 +974,13 @@ namespace btk
           }
         }
       }
+      else if (lastFrame != 0)
+      {
+        output->Init(0, lastFrame - output->GetFirstFrame() + 1);
+        output->SetPointFrequency(pointFrameRate);
+      }  
     }
-    catch (BinaryFileStreamException& )
+    catch (BinaryFileStreamFailure& )
     {
       std::string excmsg; 
       if (!ibfs->IsOpen())
@@ -1071,7 +1094,8 @@ namespace btk
       bool templateFile = true;
       size_t writtenBytes = 0;
       uint16_t numberSamplesPerAnalogChannel = 1;
-      if (!input->IsEmptyPoint() || !input->IsEmptyAnalog())
+      // If there is any point or analog channel or if at least the frequency was set, then it is not a template file.
+      if (!input->IsEmptyPoint() || !input->IsEmptyAnalog() || (input->GetPointFrequency() != 0.0))
       {
         templateFile = false;
       // -= HEADER =-
@@ -1446,14 +1470,23 @@ namespace btk
     size_t inc = 0;
     this->m_AnalogChannelScale.resize(analogNumber, 1.0);
     this->m_AnalogZeroOffset.resize(analogNumber, 0);
+    double minAnalogscale = 1.0;
     for (Acquisition::AnalogConstIterator itAnalog = input->BeginAnalog() ; itAnalog != input->EndAnalog() ; ++itAnalog)
     {
       this->m_AnalogChannelScale[inc] = (*itAnalog)->GetScale();
       this->m_AnalogZeroOffset[inc] = (*itAnalog)->GetOffset();
+      if ((*itAnalog)->GetScale() < minAnalogscale)
+        minAnalogscale = (*itAnalog)->GetScale();
       ++inc;
     }
     // ANALOG:GEN_SCALE
     this->m_AnalogUniversalScale = 1.0;
+    if (minAnalogscale < 1.0e-5)
+    {
+      this->m_AnalogUniversalScale = minAnalogscale / (minAnalogscale * 1.0e5);
+      for (size_t i = 0 ; i < this->m_AnalogChannelScale.size() ; ++i)
+        this->m_AnalogChannelScale[i] /= this->m_AnalogUniversalScale;
+    }
     // ANALOG:FORMAT
     this->m_AnalogIntegerFormat = Signed;
     MetaData::ConstIterator itAnalog = input->GetMetaData()->FindChild("ANALOG");

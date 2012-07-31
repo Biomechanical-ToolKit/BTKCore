@@ -40,8 +40,11 @@
 
 #include <QDialog>
 #include <QString>
+#include <QIcon>
 
 #include <btkAMTIForcePlatformFileIO.h>
+
+class QTableWidgetItem;
 
 class ImportAssistantDialog : public QDialog, public Ui::ImportAssistantDialog
 {
@@ -74,11 +77,15 @@ public slots:
 private slots:
   void setAcquisitionSystem(int index);
   void setAmtiInformationUsed(int index);
+  void editVideoFileTable(int row, int column);
   
 private:
   void openFileDialog(const QString& filter, QLineEdit* lineEdit);
   btk::AMTIForcePlatformFileIO::Pointer amtiFileIOCache();
+  void addVideoFile(const QString& filename);
   
+  QIcon m_OpenFileIcon;
+  QIcon m_DeleteFileIcon;
   QString m_Directory;
   btk::AMTIForcePlatformFileIO::Pointer mp_AMTIFileIOCache;
 };
