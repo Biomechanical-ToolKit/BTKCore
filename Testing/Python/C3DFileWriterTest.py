@@ -372,9 +372,9 @@ class C3DFileWriterTest(unittest.TestCase):
     reader.SetFilename(_TDDConfigure.C3DFilePathOUT + 'sample01_Eb015vr_clearAll.c3d')
     reader.Update()
     acq = reader.GetOutput()
-    self.assertEqual(acq.GetPointFrequency(), 0)
+    self.assertEqual(acq.GetPointFrequency(), 50)
     self.assertEqual(acq.GetPointNumber(), 0)
-    self.assertEqual(acq.GetAnalogFrequency(), 0)
+    self.assertEqual(acq.GetAnalogFrequency(), 200)
     self.assertEqual(acq.GetAnalogNumber(), 0)
     self.assertEqual(acq.GetEventNumber(), 0)
 
