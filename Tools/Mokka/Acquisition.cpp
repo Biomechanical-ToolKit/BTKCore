@@ -552,7 +552,7 @@ int Acquisition::createAveragedMarker(const QList<int>& markerIds)
   p->trajectoryVisible = false;
   p->radius = this->m_DefaultMarkerRadius;
   p->color = this->m_DefaultMarkerColor;
-  p->btkidx = this->m_LastPointId;
+  p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetItemNumber()-1;
   this->insertPoints(QList<int>() << this->m_LastPointId, QList<Point*>() << p);
 
   LOG_INFO("Marker " + p->label + " created. " + p->description);
@@ -1142,6 +1142,7 @@ void Acquisition::loadAcquisition()
   this->mp_ROI[1] = this->m_LastFrame;
   int inc = 0;
   // The orders for the points are important as their ID follows the same rule than in the class btk::VTKMarkersFramesSource
+  // FIXME: The current solution is not the best if there is more than 65535 markers as the first ID of the model ouputs starts from this value. Maybe a map between the marker's ID and the corresponding index in the VTKMarkersFramesSource should fix definitively this problem
   // Markers
   btk::PointCollection::Pointer points = virtualMarkersSeparator->GetOutput(0);
   for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
