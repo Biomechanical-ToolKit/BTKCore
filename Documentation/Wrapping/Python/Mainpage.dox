@@ -1,5 +1,7 @@
 /**
  * @mainpage BTK Documentation for the Python wrapping
+ *
+ * <div id="revnumber">@projectnumber</div>
  * 
  * <div class="btkmenu">\b  Overview
  * | \ref BuildInstructions "Building instructions"
@@ -17,10 +19,18 @@
  * <b>Usefull links:</b>
  * - BTK homepage: <a>http://code.google.com/p/b-tk/</a>
  * - BTK Users group: <a>http://groups.google.com/group/btk-users</a>
- * - Twitter: \@<a href="http://twitter.com/btkwww">btkwww</a>
+ * - Twitter: <a href="http://twitter.com/btkwww">\@btkwww</a>
  */
 
 /**
  * @package btk
  * @brief High level classes and functions to open, edit and modify biomechanical acquisition.
  */
+ 
+namespace btk
+{
+  /**
+   * @class _object
+   * @brief Abstract interface for the Python wrapping of BTK.
+   */
+};

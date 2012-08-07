@@ -67,7 +67,7 @@ namespace btk
    
   /**
    * @class btkANGFileIO
-   * @brief Class to read/write ANG files. 
+   * @brief Class to read ANG files. 
    */
    
   /**
@@ -110,43 +110,48 @@ namespace btk
    */
    
   /**
+   * @class btkDelsysEMGFileIO
+   * @brief Class to read Delsys EMG files. 
+   */
+  
+  /**
    * @class btkEMFFileIO
-   * @brief Class to read/write EMF files.
+   * @brief Class to read EMF files.
    */
    
   /**
    * @class btkEMxFileIO
-   * @brief Class to read/write EMG files.
+   * @brief Class to read EMG files.
    */
    
   /**
    * @class btkGRxFileIO
-   * @brief Class to read/write GR* files.
+   * @brief Class to read GR* files.
    */
    
   /**
    * @class btkMOMFileIO
-   * @brief Class to read/write MOM files. 
+   * @brief Class to read MOM files. 
    */
    
   /**
    * @class btkPWRFileIO
-   * @brief Class to read/write PWR files. 
+   * @brief Class to read PWR files. 
    */
    
   /**
    * @class btkRAxFileIO
-   * @brief Class to read/write RAH, RAW files. 
+   * @brief Class to read RAH, RAW files. 
    */
 
   /**
    * @class btkRICFileIO
-   * @brief Class to read/write RIC files. 
+   * @brief Class to read RIC files. 
    */
    
   /**
    * @class btkTDFFileIO
-   * @brief Class to read/write TDF files. 
+   * @brief Class to read TDF files. 
    */
 
   /**
@@ -161,6 +166,6 @@ namespace btk
    
   /**
    * @class btkXLSOrthoTrakFileIO
-   * @brief Class to read/write XLS (Orthotrak) files. 
+   * @brief Class to read XLS (Orthotrak) files. 
    */
 }

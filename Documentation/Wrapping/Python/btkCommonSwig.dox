@@ -140,12 +140,21 @@ namespace btk
  */
  
 /**
+ * @class btkIMU
+ * @brief Container of analog channels representing an inertial measurement unit (IMU).
+ */
+ 
+/**
  * @class btkAcquisition
  * @brief Contains the data related to a biomechanical acquisition.
  */
 /**
  * @var btkAcquisition::Bit8
  * 8-bit resolution for the analog to digital converter (ADC).
+ */
+/**
+ * @var btkAcquisition::Bit10
+ * 10-bit resolution for the analog to digital converter (ADC).
  */
 /**
  * @var btkAcquisition::Bit12
@@ -203,6 +212,15 @@ namespace btk
 /**
  * @class btkWrenchCollectionIterator
  * @brief Iterator to pass trough the collection of wrenches.
+ */
+
+/**
+ * @class btkIMUCollection
+ * @brief Collection of IMUs stored in a list.
+ */
+/**
+ * @class btkIMUCollectionIterator
+ * @brief Iterator to pass trough the collection of IMUs.
  */
 
 /**

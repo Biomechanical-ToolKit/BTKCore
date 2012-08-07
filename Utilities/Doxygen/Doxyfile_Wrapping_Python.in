@@ -189,7 +189,7 @@ TAB_SIZE               = 2
 # will result in a user-defined paragraph with heading "Side Effects:". 
 # You can put \n's in the value part of an alias to insert newlines.
 
-ALIASES                = 
+ALIASES                = "projectnumber=${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}.${BTK_VERSION_PATCH}"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
@@ -664,7 +664,8 @@ EXCLUDE_SYMBOLS        = __deref__ \
                          _btk \
                          _newclass \
                          __iter__ \
-                         __init__
+                         __init__ \
+                         btk::SwigPyIterator
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
@@ -793,7 +794,7 @@ COLS_IN_ALPHA_INDEX    = 3
 # The IGNORE_PREFIX tag can be used to specify one or more prefixes that 
 # should be ignored while generating the index headers.
 
-IGNORE_PREFIX          = 
+IGNORE_PREFIX          = btk
 
 #---------------------------------------------------------------------------
 # configuration options related to the HTML output
@@ -835,7 +836,32 @@ HTML_FOOTER            =
 # the style sheet file to the HTML output directory, so don't put your own 
 # stylesheet in the HTML output directory as well, or it will be erased!
 
-HTML_STYLESHEET        = "${BTK_SOURCE_DIR}/Utilities/Doxygen/DoxygenStyleSheet_API.css"
+HTML_STYLESHEET        = "${BTK_SOURCE_DIR}/Utilities/Doxygen/DoxygenStyleSheet_Python.css"
+
+# The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. 
+# Doxygen will adjust the colors in the stylesheet and background images 
+# according to this color. Hue is specified as an angle on a colorwheel, 
+# see http://en.wikipedia.org/wiki/Hue for more information. 
+# For instance the value 0 represents red, 60 is yellow, 120 is green, 
+# 180 is cyan, 240 is blue, 300 purple, and 360 is red again. 
+# The allowed range is 0 to 359.
+
+HTML_COLORSTYLE_HUE    = 198
+
+# The HTML_COLORSTYLE_SAT tag controls the purity (or saturation) of 
+# the colors in the HTML output. For a value of 0 the output will use 
+# grayscales only. A value of 255 will produce the most vivid colors.
+
+HTML_COLORSTYLE_SAT    = 100
+
+# The HTML_COLORSTYLE_GAMMA tag controls the gamma correction applied to 
+# the luminance component of the colors in the HTML output. Values below 
+# 100 gradually make the output lighter, whereas values above 100 make 
+# the output darker. The value divided by 100 is the actual gamma applied, 
+# so 80 represents a gamma of 0.8, The value 220 represents a gamma of 2.2, 
+# and 100 does not change the gamma.
+
+HTML_COLORSTYLE_GAMMA  = 100
 
 # If the HTML_ALIGN_MEMBERS tag is set to YES, the members of classes, 
 # files or namespaces will be aligned in HTML using tables. If set to 
