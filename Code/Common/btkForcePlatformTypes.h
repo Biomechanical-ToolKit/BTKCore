@@ -70,7 +70,6 @@ namespace btk
   typedef ForcePlatformType<5,8,6> ForcePlatformType5;
   /**
    * Represents Force platform Type-6 (12 channels: FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4] + calibration matrix 12 by 12)
-
    * @ingroup BTKCommon
    */
   typedef ForcePlatformType<6,12,12> ForcePlatformType6;

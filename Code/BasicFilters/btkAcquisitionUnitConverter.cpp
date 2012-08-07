@@ -67,7 +67,7 @@ namespace btk
    * SEG) are also converted. The metadata POINT:*UNITS are not updated as they are not
    * used in BTK (instead, you can use the methods btk::Acquisition::GetPointUnit()).
    *
-   * Use the method AcquisitionUnitConverter::SetUnit() to selected the wanted units.
+   * Use the method AcquisitionUnitConverter::SetUnit() to select the wanted units.
    *
    * By default, the data will be converted in millimeter, newton, newton by millimeter, 
    * degree and watt. Even if you could convert trajectories and moments with the desired 

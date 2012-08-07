@@ -37,11 +37,11 @@
 
 namespace btk
 {
- /**
+  /**
    * @class SpecializedPointsExtractor btkSpecializedPointsExtractor.h
    * @brief Extracts only the points corresponding to the given type (without cloning the extracted points).
    *
-   * The type is set by the SetType method. By default, if no type is set, this filter extract markers.
+   * The type is set by the SetPointType() method. By default, if no type is set, this filter extract markers.
    *
    * @ingroup BTKBasicFilters
    */

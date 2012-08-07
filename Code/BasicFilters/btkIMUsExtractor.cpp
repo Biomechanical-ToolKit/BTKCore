@@ -39,15 +39,25 @@
 namespace btk
 {
  /**
-   * @class IMUsExtractor btkIMUsExtractor.h
-   * @brief Extracts inertial measurement units (IMUs) from a btk::Acquisition object. 
-   *
-   * The choice of the channel to set correctly accelerometers and gyroscopes must be done using the methods SetSensorsChannelIndices() or AppendSensorChannelIndices().
-   * By default, it is assumed that the first 6 analog channels correspond to first IMU (and so on) and are ordered. The channels #1, #2 and #3 correspond the axis (X,Y,Z) of the 3D accelerometer, while the channels #4, #5 and #6 correspond the axis of the 3D gyroscope.
-   * If you don't use 3D sensors, then set the unused index to the value -1 (e.g. AppendSensorChannelIndices(0,-1,1,-1,2,-1). Only the axis X and Z of the accelerometer are extracted and the axis Y of the gyroscope.)
-   *
-   * @ingroup BTKBasicFilters
-   */
+  * @class IMUsExtractor btkIMUsExtractor.h
+  * @brief Extracts inertial measurement units (IMUs) from a btk::Acquisition object. 
+  *
+  * Based on the content of the metadata IMU and the analog channels stored in the given acquisition, this filter creates a collection of btk::IMU returned in the output.
+  *
+  * The metadata IMU must be structured as the following:
+  *  - IMU:USED: single integer storing the number of IMUs ;
+  *  - IMU:TYPE: 1D array of integer containing the type of IMU contained in the acquisition (see below for the supported types) ;
+  *  - IMU:CHANNEL: 2D array of integer containing of 1-based indices of the analog channels used ;
+  *  - IMU:LABELS: 1D array of strings containing the force plates' label ;
+  *  - IMU:DESCRIPTIONS: 1D array of strings containing the force plates' description ;
+  *
+  * The supported types are the following:
+  *  - Type 1: 6D IMU with a 3D accelerometer and 3D gyroscope.
+  *
+  * Note: This class is still experimental and could be modified in the next release.
+  *
+  * @ingroup BTKBasicFilters
+  */
   
   /**
    * @typedef IMUsExtractor::Pointer

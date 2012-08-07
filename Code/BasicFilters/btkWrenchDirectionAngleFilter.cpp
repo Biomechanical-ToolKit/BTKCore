@@ -41,15 +41,15 @@ namespace btk
 {
   /**
    * @class WrenchDirectionAngleFilter btkWrenchDirectionAngleFilter.h
-   * @brief Calcule the direction angle of the force vector for each wrench.
+   * @brief Calculate the direction angle of the force vector for each wrench.
    *
    * The direction angle is projected on each plane of the global frame in this order:
    *  - Angle yOz: set in the X component of the output ;
    *  - Angle xOz: set in the Y component of the output ;
    *  - Angle xOy: set in the Z component of the output.
    *
-   * The output angles are expressed in degrees and the range is between 0 and 360 degrees. 
-   * Then a shift from 360 to 0 is possible if the force turns around itself. 
+   * The output angles are expressed in degrees and the range is between 0 and 360 degrees.
+   * Then a shift from 360 to 0 is possible if the force turns around itself.
    * 
    * @ingroup BTKBasicFilters
    */

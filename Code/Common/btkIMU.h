@@ -56,11 +56,11 @@ namespace btk
     BTK_COMMON_EXPORT void SetChannels(Analog::Pointer accX, Analog::Pointer accY, Analog::Pointer accZ, 
                                        Analog::Pointer gyroX, Analog::Pointer gyroY, Analog::Pointer gyroZ);
     BTK_COMMON_EXPORT AnalogCollection::Pointer GetChannels();
-    BTK_COMMON_EXPORT void SetChannel(int idx, Analog::Pointer channel);
-    BTK_COMMON_EXPORT Analog::Pointer GetChannel(int idx);
-    BTK_COMMON_EXPORT Analog::ConstPointer GetChannel(int idx) const;
-    BTK_COMMON_EXPORT Analog::Pointer GetChannel(const std::string label);
-    BTK_COMMON_EXPORT Analog::ConstPointer GetChannel(const std::string label) const;
+    BTK_COMMON_EXPORT void SetChannel(int id, Analog::Pointer channel);
+    BTK_COMMON_EXPORT Analog::Pointer GetChannel(int id);
+    BTK_COMMON_EXPORT Analog::ConstPointer GetChannel(int id) const;
+    BTK_COMMON_EXPORT Analog::Pointer GetChannel(const std::string& label);
+    BTK_COMMON_EXPORT Analog::ConstPointer GetChannel(const std::string& label) const;
     
     int GetFrameNumber() const {return this->m_FrameNumber;};
     BTK_COMMON_EXPORT void SetFrameNumber(int fn);
@@ -75,7 +75,8 @@ namespace btk
     Analog::Pointer GetGyroscopeY() {return this->GetChannelMap(4);};
     Analog::Pointer GetGyroscopeZ() {return this->GetChannelMap(5);};
     
-    BTK_COMMON_EXPORT void Rotate(const Eigen::Matrix<double,3,3>& R);
+    typedef Eigen::Matrix<double,3,3> Rotation;
+    BTK_COMMON_EXPORT void Rotate(const Rotation& R);
     
     Pointer Clone() const {return Pointer(new IMU(*this));};
 
@@ -87,9 +88,9 @@ namespace btk
     typedef std::map<int,Analog::Pointer>::iterator MapIterator;
     typedef std::map<int,Analog::Pointer>::const_iterator MapConstIterator;
     
-    Analog::Pointer GetChannelMap(int idx)
+    Analog::Pointer GetChannelMap(int id)
     {
-      MapIterator it = this->m_Channels.find(idx);
+      MapIterator it = this->m_Channels.find(id);
       if (it != this->m_Channels.end())
         return it->second;
       return Analog::Pointer();

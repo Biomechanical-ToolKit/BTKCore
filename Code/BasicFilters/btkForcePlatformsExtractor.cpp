@@ -43,7 +43,34 @@ namespace btk
    * @class ForcePlatformsExtractor btkForcePlatformsExtractor.h
    * @brief Extracts force platform data from a btk::Acquisition object. 
    *
-   * Analog channels' data are transformed (if required) to express force and moment at the origin of the force platform in its frame.
+   * Based on the content of the metadata FORCE_PLATFORM and the analog channels stored in the given acquisition, this filter creates a collection of btk::ForcePlatform returned in the output.
+   *
+   * Depending of the type of the force platform, the analog channels' data are transformed to take into account a calibration matrix.
+   *
+   * The metadata FORCE_PLATFORM must be structured as the following:
+   *  - FORCE_PLATFORM:USED: single integer storing the number of force plates ;
+   *  - FORCE_PLATFORM:TYPE: 1D array of integer containing the type of force plates contained in the acquisition (see below for the supported types) ;
+   *  - FORCE_PLATFORM:CHANNEL: 2D array of integer containing of 1-based indices of the analog channels used ;
+   *  - FORCE_PLATFORM:LABELS: 1D array of strings containing the force plates' label ;
+   *  - FORCE_PLATFORM:DESCRIPTIONS: 1D array of strings containing the force plates' description ;
+   *  - FORCE_PLATFORM:ORIGIN: 2D array of reals (float) containing the coordinates of the origin of the surface of each force platform expressed in their frame ;
+   *  - FORCE_PLATFORM:CORNERS: 3D array of reals containing the coordinates of the corners. The third dimensions corresponds to the number of force platforms ;
+   *  - FORCE_PLATFORM:CAL_MATRIX: (could be optional, depend on the FP type). 3D array containing the calibration to transform the volts into forces and moments ;
+   * You can have more details on each metadata by following this link: http://www.c3d.org/HTML/theforceplatformgroup.htm
+   *
+   * This filter is able to manage the following force platform's type:
+   *  - Type 1: 6 channels with Forces X,Y,Z Position X,Y of the COP, and Moment Z around the COP
+   *  - Type 2: 6 channels (FX, FY, FZ, MX, MY, MZ);
+   *  - Type 3: 8 channels (FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23);
+   *  - Type 4: Same as Type-2 + calibration matrix 6 (columns) by 6 (rows);
+   *  - Type 5: Same as Type-3 + calibration matrix 6 (columns) by 8 (rows).
+   *
+   * However, some other types are not yet supported due to the lack of information and data on them:
+   *  - Type 6: 12 channels (FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4]) + calibration matrix 12 by 12;
+   *  - Type 7: 8 channels (FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23) + calibration matrix 8 by 8;
+   *  - Type 11: Kistler Split Belt Treadmill: 8 channels + calibration matrix 8X8 + polynomial correction matrix 2x6 + COP translation + COP rotation;
+   *  - Type 12: Gaitway treadmill: 8 channels (Fz11, Fz12, Fz13, Fz14, Fz21, Fz22, Fz23, and Fz24) + calibration matrix 8X8.
+   *  - Type 21: AMTI-Stairs: 2 force plates with 6 channels + a calibration matrix 6x6 + data to locate the corners of the 4 steps.
    *
    * @ingroup BTKBasicFilters
    */

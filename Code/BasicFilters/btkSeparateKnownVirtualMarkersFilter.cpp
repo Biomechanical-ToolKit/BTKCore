@@ -37,7 +37,7 @@
 
 namespace btk
 {
- /**
+  /**
    * @class SeparateKnownVirtualMarkersFilter btkSeparateKnownVirtualMarkersFilter.h
    * @brief Separate a collection of points in five categories to be able to distinguish real markers from the others.
    *
@@ -48,10 +48,10 @@ namespace btk
    *  -# other virtual markers (CenterOfMass, ...)
    *  -# other points (angle, force, moment, power, ...)
    *
-   * To select the output corresponding to the choosen category, you can use the method GetOutput() 
+   * To select the output corresponding to the chosen category, you can use the method GetOutput() 
    * with one of these enum values: AllMarkers, Markers, VirtualMarkersForFrame, VirtualMarkersOther, OtherPoints.
    *
-   * By default, the list of labels known as virtual markers used for frame virtuals is:
+   * By default, the list of labels known as virtual markers used for frame is:
    *  - HED(O|A|L|P): HEDO, HEDA, HEDL, HELP
    *  - LCL(O|A|L|P)
    *  - LFE(O|A|L|P)
@@ -76,7 +76,7 @@ namespace btk
    *  - CenterOfMass
    *  - CenterOfMassFloor
    *
-   * You can also add a prefix for the markers' label by using the method SetLabelPrefix. This prefix will be concated to the markers' label during the separation.
+   * You can also add a prefix for the markers' label by using the method SetLabelPrefix. This prefix will be concatenated to the markers' label during the separation.
    *
    * This filter only copies the pointer associated which each point instead of using a deep copy of it.
    *
@@ -207,7 +207,7 @@ namespace btk
   };
    
   /**
-   * Sets the list of labels for the virtual markers used for the frame virtuals.
+   * Sets the list of labels for the virtual markers used to create frames.
    */
    void SeparateKnownVirtualMarkersFilter::SetKnownVirtualMarkerLabelsForAxes(const std::list<StringAxes>& labels)
    {
@@ -219,7 +219,7 @@ namespace btk
    
   /**
    * @fn const std::list<std::string>& SeparateKnownVirtualMarkersFilter::GetKnownVirtualMarkerLabelsForAxes() const
-   * Returns the list of labels for the virtual markers used for the frame virtuals.
+   * Returns the list of labels for the virtual markers used to create frames.
    */
   
   /**
@@ -250,7 +250,7 @@ namespace btk
    
   /**
    * Sets the list of labels for the virtual markers used in another context than frame virtuals. Each label
-    * is checked before to be inserted to not have duplication.
+   * is checked before to be inserted to not have duplication.
    */
   void SeparateKnownVirtualMarkersFilter::SetKnownVirtualMarkerLabelsForOthers(const std::list<std::string>& labels)
   {
@@ -262,11 +262,11 @@ namespace btk
    
   /**
    * @fn const std::list<std::string>& SeparateKnownVirtualMarkersFilter::GetKnownVirtualMarkerLabelsForOthers() const
-   * Returns the list of labels for the virtual markers used in another context than frame virtuals
+   * Returns the list of labels for the virtual markers used in another context than virtual frames.
    */
    
   /**
-   * Sets the prefix which will be contated to the markers's label during the separation.
+   * Sets the prefix which will be concatenated to the markers' label during the separation.
    */
   void SeparateKnownVirtualMarkersFilter::SetLabelPrefix(const std::string& prefix)
   {
@@ -278,7 +278,7 @@ namespace btk
   
   /**
    * @fn const std::string& SeparateKnownVirtualMarkersFilter::GetLabelPrefix() const {return this->m_Prefix;}
-   * Returns the prefix which will be contated to the markers's label during the separation.
+   * Returns the prefix which will be concatenated to the markers' label during the separation.
    */
   
   /**
