@@ -41,6 +41,8 @@ public:
   BTK_SWIG_DECLARE_POINTER_OPERATOR(AcquisitionUnitConverter);
 };
 
+// btkCollectionAssembly: Check SWIG with C++ template
+
 // btkDownsampleFilter: Check SWIG with C++ template
 
 BTK_SWIG_DECLARE_CLASS(ForcePlatformsExtractor)
@@ -64,6 +66,13 @@ public:
   BTK_SWIG_DECLARE_POINTER_OPERATOR(GroundReactionWrenchFilter);
 };
 
+BTK_SWIG_DECLARE_CLASS(IMUsExtractor)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_CTOR(IMUsExtractor);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(IMUsExtractor);
+};
+
 // btkMeasureFrameExtractor: Check SWIG with C++ template
 
 BTK_SWIG_DECLARE_CLASS(MergeAcquisitionFilter)
@@ -77,6 +86,7 @@ public:
 BTK_SWIG_DECLARE_CLASS(SeparateKnownVirtualMarkersFilter)
 {
 public:
+  enum {AllMarkers = btk::SeparateKnownVirtualMarkersFilter::AllMarkers, Markers = btk::SeparateKnownVirtualMarkersFilter::Markers, VirtualMarkersForFrame = btk::SeparateKnownVirtualMarkersFilter::VirtualMarkersForFrame, VirtualMarkersOther = btk::SeparateKnownVirtualMarkersFilter::VirtualMarkersOther, OtherPoints = btk::SeparateKnownVirtualMarkersFilter::OtherPoints};
   BTK_SWIG_DECLARE_DEFAULT_CTOR(SeparateKnownVirtualMarkersFilter);
   BTK_SWIG_DECLARE_POINTER_OPERATOR(SeparateKnownVirtualMarkersFilter);
 };
@@ -86,4 +96,11 @@ BTK_SWIG_DECLARE_CLASS(SpecializedPointsExtractor)
 public:
   BTK_SWIG_DECLARE_DEFAULT_CTOR(SpecializedPointsExtractor);
   BTK_SWIG_DECLARE_POINTER_OPERATOR(SpecializedPointsExtractor);
+};
+
+BTK_SWIG_DECLARE_CLASS(WrenchDirectionAngleFilter)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_CTOR(WrenchDirectionAngleFilter);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(WrenchDirectionAngleFilter);
 };

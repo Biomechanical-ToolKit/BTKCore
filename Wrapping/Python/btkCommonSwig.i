@@ -208,6 +208,39 @@ protected:
 };
 
 // ------------------------------------------------------------------------- //
+//                                    IMU                                    //
+// ------------------------------------------------------------------------- //
+
+%include "Common/btkCommonSwig_IMU.h"
+
+%eigen_typemaps(btk::IMU::Rotation)
+
+BTK_SWIG_DECLARE_IMPL_CLASS_DATA(IMU)
+{
+public:
+  BTK_SWIG_DECLARE_IMPL_GETSET(Label, std::string&);
+  BTK_SWIG_DECLARE_IMPL_GETSET(Description, std::string&);
+  void SetChannels(btkAnalog , btkAnalog , btkAnalog , btkAnalog , btkAnalog , btkAnalog );
+  btkAnalogCollection GetChannels();
+  void SetChannel(int , btkAnalog );
+  btkAnalog GetChannel(int );
+  btkAnalog GetChannel(const std::string& );
+  int GetFrameNumber() const;
+  void SetFrameNumber(int fn);
+  double GetFrequency() const;
+  void SetFrequency(double f);
+  btkAnalog GetAccelerometerX();
+  btkAnalog GetAccelerometerY();
+  btkAnalog GetAccelerometerZ();
+  btkAnalog GetGyroscopeX();
+  btkAnalog GetGyroscopeY();
+  btkAnalog GetGyroscopeZ();
+  void Rotate(const btk::IMU::Rotation& );
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(IMU);
+};
+
+// ------------------------------------------------------------------------- //
 //                                  Collection                               //
 // ------------------------------------------------------------------------- //
 
@@ -218,6 +251,7 @@ BTK_SWIG_DECLARE_IMPL_COLLECTION(Analog);
 BTK_SWIG_DECLARE_IMPL_COLLECTION(Point);
 BTK_SWIG_DECLARE_IMPL_COLLECTION(ForcePlatform);
 BTK_SWIG_DECLARE_IMPL_COLLECTION(Wrench);
+BTK_SWIG_DECLARE_IMPL_COLLECTION(IMU);
 
 // ------------------------------------------------------------------------- //
 //                                     MetaData                              //
@@ -381,7 +415,7 @@ protected:
 BTK_SWIG_DECLARE_IMPL_CLASS_DATA(Acquisition)
 {
 public:
-  typedef enum {Bit8 = btk::Acquisition::Bit8, Bit12 = btk::Acquisition::Bit12, Bit14 = btk::Acquisition::Bit14, Bit16 = btk::Acquisition::Bit16}  AnalogResolution;
+  typedef enum {Bit8 = btk::Acquisition::Bit8, Bit10 = btk::Acquisition::Bit10, Bit12 = btk::Acquisition::Bit12, Bit14 = btk::Acquisition::Bit14, Bit16 = btk::Acquisition::Bit16}  AnalogResolution;
   typedef btkEventCollectionIterator EventIterator;
   typedef btkPointCollectionIterator PointIterator;
   typedef btkAnalogCollectionIterator AnalogIterator;

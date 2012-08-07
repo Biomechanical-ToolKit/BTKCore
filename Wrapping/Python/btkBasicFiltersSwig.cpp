@@ -41,6 +41,11 @@
 BTK_SWIG_DEFINE_DEFAULT_CTOR(AcquisitionUnitConverter);
 
 // ------------------------------------------------------------------------- //
+//                              CollectionAssembly                           //
+// ------------------------------------------------------------------------- //
+// Check SWIG with C++ template
+
+// ------------------------------------------------------------------------- //
 //                               DownsampleFilter                            //
 // ------------------------------------------------------------------------- //
 // Check SWIG with C++ template
@@ -61,6 +66,11 @@ BTK_SWIG_DEFINE_DEFAULT_CTOR(ForcePlatformWrenchFilter);
 BTK_SWIG_DEFINE_DEFAULT_CTOR(GroundReactionWrenchFilter);
 
 // ------------------------------------------------------------------------- //
+//                                IMUsExtractor                              //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DEFINE_DEFAULT_CTOR(IMUsExtractor);
+
+// ------------------------------------------------------------------------- //
 //                            MeasureFrameExtractor                          //
 // ------------------------------------------------------------------------- //
 // Check SWIG with C++ template
@@ -79,3 +89,8 @@ BTK_SWIG_DEFINE_DEFAULT_CTOR(SeparateKnownVirtualMarkersFilter);
 //                         SpecializedPointsExtractor                        //
 // ------------------------------------------------------------------------- //
 BTK_SWIG_DEFINE_DEFAULT_CTOR(SpecializedPointsExtractor);
+
+// ------------------------------------------------------------------------- //
+//                         WrenchDirectionAngleFilter                        //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DEFINE_DEFAULT_CTOR(WrenchDirectionAngleFilter);

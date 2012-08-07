@@ -47,11 +47,13 @@
 #include <btkForcePlatform.h>
 #include <btkForcePlatformTypes.h>
 #include <btkWrench.h>
+#include <btkIMU.h>
 #include <btkEventCollection.h>
 #include <btkAnalogCollection.h>
 #include <btkPointCollection.h>
 #include <btkForcePlatformCollection.h>
 #include <btkWrenchCollection.h>
+#include <btkIMUCollection.h>
 #include <btkMetaDataInfo.h>
 #include <btkMetaData.h>
 #include <btkMetaDataUtils.h>
@@ -65,6 +67,7 @@ typedef btk::ProcessObject btkProcessObject_impl;
 #include "Common/btkCommonSwig_Point.h"
 #include "Common/btkCommonSwig_ForcePlatform.h"
 #include "Common/btkCommonSwig_Wrench.h"
+#include "Common/btkCommonSwig_IMU.h"
 #include "Common/btkCommonSwig_Collection.h"
 #include "Common/btkCommonSwig_MetaData.h"
 #include "Common/btkCommonSwig_Acquisition.h"

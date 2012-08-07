@@ -68,6 +68,11 @@ protected:
 };
 
 // ------------------------------------------------------------------------- //
+//                              CollectionAssembly                           //
+// ------------------------------------------------------------------------- //
+// Check SWIG with C++ template
+
+// ------------------------------------------------------------------------- //
 //                               DownsampleFilter                            //
 // ------------------------------------------------------------------------- //
 // Check SWIG with C++ template
@@ -128,6 +133,23 @@ protected:
 };
 
 // ------------------------------------------------------------------------- //
+//                                IMUsExtractor                              //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(IMUsExtractor)
+{
+public:
+  btkAcquisition GetInput();
+  btkAcquisition GetInput(int );
+  void SetInput(btkAcquisition );
+  void SetInput(int, btkAcquisition );
+  btkIMUCollection GetOutput();
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(IMUsExtractor);
+};
+
+
+// ------------------------------------------------------------------------- //
 //                            MeasureFrameExtractor                          //
 // ------------------------------------------------------------------------- //
 // Check SWIG with C++ template
@@ -142,7 +164,7 @@ public:
   int GetFirstFrameRule() const;
   void SetFirstFrameRule(int );
 
-  btkAcquisition GetInput(int idx);
+  btkAcquisition GetInput(int );
   void SetInput(int , btkAcquisition );
   btkAcquisition GetOutput();
 
@@ -181,6 +203,8 @@ namespace std
 BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(SeparateKnownVirtualMarkersFilter)
 {
 public:
+  enum {AllMarkers = btk::SeparateKnownVirtualMarkersFilter::AllMarkers, Markers = btk::SeparateKnownVirtualMarkersFilter::Markers, VirtualMarkersForFrame = btk::SeparateKnownVirtualMarkersFilter::VirtualMarkersForFrame, VirtualMarkersOther = btk::SeparateKnownVirtualMarkersFilter::VirtualMarkersOther, OtherPoints = btk::SeparateKnownVirtualMarkersFilter::OtherPoints};
+  
   void AppendKnownVirtualMarkerLabelForAxes(const std::string& , const std::string& , const std::string& , const std::string& );
   void AppendKnownVirtualMarkerLabelForAxes(const btkStringAxes& );
   void AppendKnownVirtualMarkerLabelsForAxes(const std::list<btkStringAxes>& );
@@ -220,3 +244,16 @@ protected:
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(SpecializedPointsExtractor);
 };
 
+// ------------------------------------------------------------------------- //
+//                         WrenchDirectionAngleFilter                        //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(WrenchDirectionAngleFilter)
+{
+public:
+  btkWrenchCollection GetInput();
+  void SetInput(btkWrenchCollection input);
+  btkPointCollection GetOutput();
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(WrenchDirectionAngleFilter);
+};

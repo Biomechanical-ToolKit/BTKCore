@@ -125,6 +125,16 @@ btkWrench::btkWrench(const std::string& label, int frameNumber)
 {};
 
 // ------------------------------------------------------------------------- //
+//                                    IMU                                    //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DEFINE_CLONE(IMU);
+
+btkIMU::btkIMU(const std::string& label, const std::string& desc)
+: btkIMU_shared(btk::IMU::New(label, desc))
+{};
+
+
+// ------------------------------------------------------------------------- //
 //                                Collection                                 //
 // ------------------------------------------------------------------------- //
 // - EventCollection
@@ -142,6 +152,9 @@ BTK_SWIG_DEFINE_CLONE(ForcePlatformCollection);
 // - WrenchCollection
 BTK_SWIG_DEFINE_DEFAULT_CTOR(WrenchCollection);
 BTK_SWIG_DEFINE_CLONE(WrenchCollection);
+// - IMUCollection
+BTK_SWIG_DEFINE_DEFAULT_CTOR(IMUCollection);
+BTK_SWIG_DEFINE_CLONE(IMUCollection);
 
 // ------------------------------------------------------------------------- //
 //                               MetaDataInfo                                //

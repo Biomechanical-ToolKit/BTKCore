@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud BarrÃ©
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,41 +33,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkIOSwig_h
-#define __btkIOSwig_h
-
-#define BTK_SWIG_HEADER_DECLARATION
-
-#include "btkSwigMacros.h"
-
-#include <btkAcquisitionFileIO.h>
-#include <btkAcquisitionFileReader.h>
-#include <btkAcquisitionFileWriter.h>
-// File IOs
-// - C3D File IO
-#include <btkC3DFileIO.h>
-// - Motion Analysis Corp IOs
-#include <btkANBFileIO.h>
-#include <btkANCFileIO.h>
-#include <btkCALForcePlateFileIO.h>
-#include <btkTRBFileIO.h>
-#include <btkTRCFileIO.h>
-#include <btkXLSOrthoTrakFileIO.h>
-// - Delsys
-#include "btkDelsysEMGFileIO.h"
-// - BTS Bioengineering
-#include <btkTDFFileIO.h> 
-// - Elite IOs
-#include <btkANGFileIO.h>
-#include <btkEMxFileIO.h>
-#include <btkMOMFileIO.h>
-#include <btkRAxFileIO.h>
-#include <btkRICFileIO.h>
-#include <btkPWRFileIO.h>
-#include <btkGRxFileIO.h>
-// - Others
-#include <btkEMFFileIO.h>
-
-#include "IO/btkIOSwig_AcquisitionFile.h"
-
-#endif // __btkIOSwig_h
+BTK_SWIG_DECLARE_CLASS(IMU)
+{
+public:
+  btkIMU(const std::string& label = "IMU", const std::string& desc = "");
+  BTK_SWIG_DECLARE_CLONE(IMU);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(IMU);
+};

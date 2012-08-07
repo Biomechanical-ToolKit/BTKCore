@@ -44,9 +44,11 @@
 #include <btkForcePlatformsExtractor.h>
 #include <btkForcePlatformWrenchFilter.h>
 #include <btkGroundReactionWrenchFilter.h>
+#include <btkIMUsExtractor.h>
 #include <btkMergeAcquisitionFilter.h>
 #include <btkSeparateKnownVirtualMarkersFilter.h>
 #include <btkSpecializedPointsExtractor.h>
+#include <btkWrenchDirectionAngleFilter.h>
 
 #include "BasicFilters/btkBasicFiltersSwig_Filter.h"
 
