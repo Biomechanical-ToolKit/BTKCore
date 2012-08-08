@@ -415,7 +415,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(defaultTimeBarEventDisplayChanged(int)), this, SLOT(setPreferenceDefaultTimeBarEventDisplay(int)));
   connect(this->mp_Preferences, SIGNAL(useEventEditorWhenInsertingStateChanged(bool)), this, SLOT(setPreferenceUseEventEditorWhenInserting(bool)));
   connect(this->mp_Preferences, SIGNAL(defaultBackgroundColorChanged(QColor)), this, SLOT(setPreferenceDefaultBackgroundColor(QColor)));
-  connect(this->mp_Preferences, SIGNAL(defaultGridColorChanged(QColor)), this, SLOT(setPreferenceDefaultGridColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(defaultGridFrontColorChanged(QColor)), this, SLOT(setPreferenceDefaultGridFrontColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(defaultGridBackColorChanged(QColor)), this, SLOT(setPreferenceDefaultGridBackColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultSegmentColorChanged(QColor)), this, SLOT(setPreferenceDefaultSegmentColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultMarkerColorChanged(QColor)), this, SLOT(setPreferenceDefaultMarkerColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultMarkerRadiusChanged(double)), this, SLOT(setPreferenceDefaultMarkerRadius(double)));
@@ -2397,11 +2398,19 @@ void MainWindow::setPreferenceDefaultBackgroundColor(const QColor& color)
   this->multiView->setDefaultBackgroundColor(color);
 };
 
-void MainWindow::setPreferenceDefaultGridColor(const QColor& color)
+void MainWindow::setPreferenceDefaultGridFrontColor(const QColor& color)
 {
   QSettings settings;
+  // Keep the 'defaultGridColor' keyword to stay compatible with the previous settings
   settings.setValue("Preferences/defaultGridColor", color);
-  this->multiView->setDefaultGridColor(color);
+  this->multiView->setDefaultGridFrontColor(color);
+};
+
+void MainWindow::setPreferenceDefaultGridBackColor(const QColor& color)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultGridBackColor", color);
+  this->multiView->setDefaultGridBackColor(color);
 };
 
 void MainWindow::setPreferenceDefaultSegmentColor(const QColor& color)
@@ -2687,7 +2696,8 @@ void MainWindow::readSettings()
   int defaultPlaneOrientation = settings.value("defaultPlaneOrientation", 0).toInt();
   int defaultTimeBarEventDisplay = settings.value("defaultTimeBarEventDisplay", 0).toInt();
   QColor defaultBackgroundColor = settings.value("defaultBackgroundColor", QColor(0,0,0)).value<QColor>();
-  QColor defaultGridColor = settings.value("defaultGridColor", QColor(204,204,204)).value<QColor>();
+  QColor defaultGridFrontColor = settings.value("defaultGridColor", QColor(204,204,204)).value<QColor>(); // Keep the 'defaultGridColor' keyword to stay compatible with the previous settings
+  QColor defaultGridBackColor = settings.value("defaultGridBackColor", QColor(255,0,0)).value<QColor>();
   QColor defaultSegmentColor = settings.value("defaultSegmentColor", QColor(255,255,255)).value<QColor>();
   QColor defaultMarkerColor = settings.value("defaultMarkerColor", QColor(255,255,255)).value<QColor>();
   double defaultMarkerRadius = settings.value("defaultMarkerRadius", 8.0).toDouble();
@@ -2710,7 +2720,8 @@ void MainWindow::readSettings()
   this->mp_Preferences->defaultPlaneOrientationComboBox->setCurrentIndex(defaultPlaneOrientation);
   this->mp_Preferences->defaultTimeBarEventDisplayComboBox->setCurrentIndex(defaultTimeBarEventDisplay);
   colorizeButton(this->mp_Preferences->defaultBackgroundColorButton, defaultBackgroundColor);
-  colorizeButton(this->mp_Preferences->defaultGridColorButton, defaultGridColor);
+  colorizeButton(this->mp_Preferences->defaultGridFrontColorButton, defaultGridFrontColor);
+  colorizeButton(this->mp_Preferences->defaultGridBackColorButton, defaultGridBackColor);
   colorizeButton(this->mp_Preferences->defaultSegmentColorButton, defaultSegmentColor);
   colorizeButton(this->mp_Preferences->defaultMarkerColorButton, defaultMarkerColor);
   this->mp_Preferences->defaultMarkerRadiusSpinBox->setValue(defaultMarkerRadius);
@@ -2733,7 +2744,8 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::DefaultGroundOrientation, defaultPlaneOrientation);
   this->mp_Preferences->setPreference(Preferences::DefaultTimeBarEventDisplay, defaultTimeBarEventDisplay);
   this->mp_Preferences->setPreference(Preferences::DefaultBackgroundColor, defaultBackgroundColor);
-  this->mp_Preferences->setPreference(Preferences::DefaultGridColor, defaultGridColor);
+  this->mp_Preferences->setPreference(Preferences::DefaultGridFrontColor, defaultGridFrontColor);
+  this->mp_Preferences->setPreference(Preferences::DefaultGridBackColor, defaultGridBackColor);
   this->mp_Preferences->setPreference(Preferences::DefaultSegmentColor, defaultSegmentColor);
   this->mp_Preferences->setPreference(Preferences::DefaultMarkerColor, defaultMarkerColor);
   this->mp_Preferences->setPreference(Preferences::DefaultMarkerRadius, defaultMarkerRadius);
@@ -2758,7 +2770,8 @@ void MainWindow::readSettings()
   this->multiView->setDefaultGroundOrientation(defaultPlaneOrientation);
   this->timeEventControler->setTimeEventTicksDisplay(defaultTimeBarEventDisplay);
   this->multiView->setDefaultBackgroundColor(defaultBackgroundColor);
-  this->multiView->setDefaultGridColor(defaultGridColor);
+  this->multiView->setDefaultGridFrontColor(defaultGridFrontColor);
+  this->multiView->setDefaultGridBackColor(defaultGridBackColor);
   this->multiView->setDefaultSegmentColor(defaultSegmentColor);
   this->multiView->setDefaultMarkerColor(defaultMarkerColor);
   this->multiView->setDefaultMarkerRadius(defaultMarkerRadius);

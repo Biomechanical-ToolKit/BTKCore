@@ -49,7 +49,7 @@
 
   public:
     enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, DefaultTimeBarEventDisplay,
-          DefaultBackgroundColor, DefaultGridColor, DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
+          DefaultBackgroundColor, DefaultGridFrontColor, DefaultGridBackColor, DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
           ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse,
           DefaultGRFButterflyActivation, ForcePathDisplay, DefaultPlotLineWidth, ChartEventDisplay, chartUnitAxisX};
   
@@ -75,7 +75,8 @@
   public slots:
     void setDefaultConfiguration();
     void setDefaultBackgroundColor();
-    void setDefaultGridColor();
+    void setDefaultGridFrontColor();
+    void setDefaultGridBackColor();
     void setDefaultSegmentColor();
     void setDefaultMarkerColor();
     void setDefaultForcePlateColor();
@@ -88,7 +89,8 @@
     void defaultTimeBarEventDisplayChanged(int index);
     void useEventEditorWhenInsertingStateChanged(bool isChecked);
     void defaultBackgroundColorChanged(const QColor& color);
-    void defaultGridColorChanged(const QColor& color);
+    void defaultGridFrontColorChanged(const QColor& color);
+    void defaultGridBackColorChanged(const QColor& color);
     void defaultSegmentColorChanged(const QColor& color);
     void defaultMarkerColorChanged(const QColor& color);
     void defaultMarkerRadiusChanged(double radius);

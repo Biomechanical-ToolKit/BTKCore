@@ -72,7 +72,8 @@ public slots:
   void setDefaultOrientation(int index);
   void setDefaultTimeBarEventDisplay(int index);
   void setDefaultBackgroundColor();
-  void setDefaultGridColor();
+  void setDefaultGridFrontColor();
+  void setDefaultGridBackColor();
   void setDefaultSegmentColor();
   void setDefaultMarkerColor();
   void setDefaultMarkerRadius(double radius);
@@ -97,7 +98,8 @@ signals:
   void defaultTimeBarEventDisplayChanged(int index);
   void useEventEditorWhenInsertingStateChanged(bool isChecked);
   void defaultBackgroundColorChanged(const QColor& color);
-  void defaultGridColorChanged(const QColor& color);
+  void defaultGridFrontColorChanged(const QColor& color);
+  void defaultGridBackColorChanged(const QColor& color);
   void defaultSegmentColorChanged(const QColor& color);
   void defaultMarkerColorChanged(const QColor& color);
   void defaultMarkerRadiusChanged(double radius);

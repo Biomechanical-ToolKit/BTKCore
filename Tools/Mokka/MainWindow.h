@@ -165,7 +165,8 @@ public slots:
   void setPreferenceDefaultOrientation(int index);
   void setPreferenceDefaultTimeBarEventDisplay(int index);
   void setPreferenceDefaultBackgroundColor(const QColor& color);
-  void setPreferenceDefaultGridColor(const QColor& color);
+  void setPreferenceDefaultGridFrontColor(const QColor& color);
+  void setPreferenceDefaultGridBackColor(const QColor& color);
   void setPreferenceDefaultSegmentColor(const QColor& color);
   void setPreferenceDefaultMarkerColor(const QColor& color);
   void setPreferenceDefaultMarkerRadius(double radius);

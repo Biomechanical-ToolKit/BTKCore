@@ -35,7 +35,7 @@
       <x>10</x>
       <y>1</y>
       <width>456</width>
-      <height>561</height>
+      <height>523</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -672,6 +672,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout_21">
           <item>
            <layout class="QFormLayout" name="formLayout_6">
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+            </property>
             <property name="horizontalSpacing">
              <number>12</number>
             </property>
@@ -690,7 +693,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="label_31">
               <property name="text">
-               <string>Background color</string>
+               <string>Background color:</string>
               </property>
              </widget>
             </item>
@@ -717,14 +720,16 @@ QPushButton:pressed {
             <item row="1" column="0">
              <widget class="QLabel" name="label_32">
               <property name="text">
-               <string>Grid color:</string>
+               <string>Grid color (front &amp; back):</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QPushButton" name="defaultGridColorButton">
-              <property name="styleSheet">
-               <string notr="true">QPushButton {
+             <layout class="QHBoxLayout" name="horizontalLayout_22">
+              <item>
+               <widget class="QPushButton" name="defaultGridFrontColorButton">
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
   border: 1px solid darkgray;
   background: rgb(204,204,204);
 }
@@ -732,14 +737,36 @@ QPushButton:pressed {
 QPushButton:pressed {
   border: 1px solid rgb(100,100,100);
 }</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
-              </property>
-             </widget>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="defaultGridBackColorButton">
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
+  border: 1px solid darkgray;
+  background: rgb(255,0,0);
+}
+
+QPushButton:pressed {
+  border: 1px solid rgb(100,100,100);
+}</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>
