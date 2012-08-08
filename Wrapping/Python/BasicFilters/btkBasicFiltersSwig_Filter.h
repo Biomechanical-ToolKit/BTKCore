@@ -43,7 +43,21 @@ public:
 
 // btkCollectionAssembly: Check SWIG with C++ template
 
-// btkDownsampleFilter: Check SWIG with C++ template
+// btkDownsampleFilter: C++ template. Need specialization
+// - Wrench
+BTK_SWIG_DECLARE_CLASS_TEMPLATE(WrenchDownsampleFilter, DownsampleFilter, btk::Wrench)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_CTOR(WrenchDownsampleFilter);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(WrenchDownsampleFilter);
+};
+// - WrenchCollection
+BTK_SWIG_DECLARE_CLASS_TEMPLATE(WrenchCollectionDownsampleFilter, DownsampleFilter, btk::WrenchCollection)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_CTOR(WrenchCollectionDownsampleFilter);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(WrenchCollectionDownsampleFilter);
+};
 
 BTK_SWIG_DECLARE_CLASS(ForcePlatformsExtractor)
 {

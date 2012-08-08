@@ -24,7 +24,17 @@ namespace btk
    * @var btkAcquisitionUnitConverter::Power
    * Enum value which represent the power unit.
    */
+  
+  /**
+   * @class btkWrenchDownsampleFilter
+   * @brief Downsample data stored in a wrench
+   */ 
    
+  /**
+   * @class btkWrenchCollectionDownsampleFilter
+   * @brief Downsample a collection of wrench
+   */
+ 
   /**
    * @class btkForcePlatformsExtractor
    * @brief Extracts force platform data from a btk::Acquisition object. 

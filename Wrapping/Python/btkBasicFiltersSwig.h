@@ -41,6 +41,7 @@
 #include "btkSwigMacros.h"
 
 #include <btkAcquisitionUnitConverter.h>
+#include <btkDownsampleFilter.h>
 #include <btkForcePlatformsExtractor.h>
 #include <btkForcePlatformWrenchFilter.h>
 #include <btkGroundReactionWrenchFilter.h>

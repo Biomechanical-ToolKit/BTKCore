@@ -75,7 +75,36 @@ protected:
 // ------------------------------------------------------------------------- //
 //                               DownsampleFilter                            //
 // ------------------------------------------------------------------------- //
-// Check SWIG with C++ template
+
+// - Concrete implementation: Wrench
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(WrenchDownsampleFilter)
+{
+public:
+  btkWrench GetInput();
+  void SetInput(btkWrench );
+  btkWrench GetOutput();
+  
+  int GetUpDownRatio() const;
+  void SetUpDownRatio(int ratio);
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(WrenchDownsampleFilter);
+};
+
+// - Concrete implementation: WrenchCollection
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(WrenchCollectionDownsampleFilter)
+{
+public:
+  btkWrenchCollection GetInput();
+  void SetInput(btkWrenchCollection );
+  btkWrenchCollection GetOutput();
+  
+  int GetUpDownRatio() const;
+  void SetUpDownRatio(int ratio);
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(WrenchCollectionDownsampleFilter);
+};
 
 // ------------------------------------------------------------------------- //
 //                           ForcePlatformsExtractor                         //

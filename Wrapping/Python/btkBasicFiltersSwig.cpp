@@ -48,7 +48,11 @@ BTK_SWIG_DEFINE_DEFAULT_CTOR(AcquisitionUnitConverter);
 // ------------------------------------------------------------------------- //
 //                               DownsampleFilter                            //
 // ------------------------------------------------------------------------- //
-// Check SWIG with C++ template
+// Warning: C++ template. Need concrete implementation
+// - Wrench
+BTK_SWIG_DEFINE_DEFAULT_CTOR_TEMPLATE(WrenchDownsampleFilter, DownsampleFilter, btk::Wrench);
+// - WrenchCollection
+BTK_SWIG_DEFINE_DEFAULT_CTOR_TEMPLATE(WrenchCollectionDownsampleFilter, DownsampleFilter, btk::WrenchCollection);
 
 // ------------------------------------------------------------------------- //
 //                           ForcePlatformsExtractor                         //

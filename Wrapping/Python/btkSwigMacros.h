@@ -46,6 +46,11 @@
     typedef btk::classname::Pointer btk##classname##_shared; \
     class btk##classname : public btk##classname##_shared
     
+  #define BTK_SWIG_DECLARE_CLASS_TEMPLATE(classname, template, identifier) \
+    typedef btk::template< identifier > btk##classname##_impl; \
+    typedef btk::template< identifier >::Pointer btk##classname##_shared; \
+    class btk##classname : public btk##classname##_shared
+  
   #define BTK_SWIG_DECLARE_CLASS_INHERIT(classname, inheritname) \
     BTK_SWIG_DECLARE_CLASS(classname)
     
@@ -67,7 +72,10 @@
 #else
   #define BTK_SWIG_DECLARE_CLASS(classname) \
     class btk##classname
-    
+  
+  #define BTK_SWIG_DECLARE_CLASS_TEMPLATE(classname, template, identifier) \
+    BTK_SWIG_DECLARE_CLASS(classname)
+  
   #define BTK_SWIG_DECLARE_CLASS_INHERIT(classname, inheritname) \
     class btk##classname : public btk##inheritname
     
@@ -99,6 +107,11 @@
 #define BTK_SWIG_DEFINE_DEFAULT_CTOR(classname) \
   btk##classname::btk##classname() \
   : btk##classname##_shared(btk::classname::New()) \
+  {};
+
+#define BTK_SWIG_DEFINE_DEFAULT_CTOR_TEMPLATE(classname, template, identifier) \
+  btk##classname::btk##classname() \
+  : btk##classname##_shared(btk::template< identifier >::New()) \
   {};
   
 #define BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(classname, inheritname) \
@@ -204,11 +217,11 @@
 // ------------------------------------------------------------------------- //
 
 #define BTK_SWIG_DECLARE_IMPL_CLASS(classname) \
-    %ignore btk##classname##_impl; \
-    class btk##classname##_impl
+  %ignore btk##classname##_impl; \
+  class btk##classname##_impl
     
 #define BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(classname) \
-    btk##classname##_impl();
+  btk##classname##_impl();
 
 #define BTK_SWIG_DECLARE_IMPL_GETSET(member, type) \
   const type Get##member##() const; \

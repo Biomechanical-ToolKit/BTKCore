@@ -91,7 +91,41 @@ BTK_SWIG_DOCSTRING_IMPL(AcquisitionUnitConverter, GetUnit, "Returns the string c
 // ------------------------------------------------------------------------- //
 //                               DownsampleFilter                            //
 // ------------------------------------------------------------------------- //
-// Check SWIG with C++ template
+// Warning: C++ template. Need concrete implementation
+
+// - Wrench
+%feature("docstring") btkWrenchDownsampleFilter "
+Downsample data stored in a wrench
+
+To downsample data, you need to set the up/down sample ratio using the method SetUpDownRatio().
+The given value is an integer corresponding to the ratio used to extract only the value of interest.
+For example, if you have 200 frames and a ratio of 10, then 20 frames will be extracted (one frame each 10 frames)."
+
+BTK_SWIG_AUTODOC_IMPL(WrenchDownsampleFilter, SetInput(btkWrench ), "SetInput(self, btkWrench)");
+BTK_SWIG_AUTODOC_IMPL(WrenchDownsampleFilter, SetUpDownRatio(int ), "SetUpDownRatio(self, int)");
+
+BTK_SWIG_DOCSTRING_IMPL(WrenchDownsampleFilter, GetInput, "Gets the input registered with this process.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchDownsampleFilter, SetInput, "Sets the input required with this process.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchDownsampleFilter, GetOutput, "Returns the output created with this process.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchDownsampleFilter, SetUpDownRatio, "Sets the ratio used to downsample the data.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchDownsampleFilter, GetUpDownRatio, "Gets the ratio used to downsample the data.");
+
+// - WrenchCollection
+%feature("docstring") btkWrenchCollectionDownsampleFilter "
+Downsample data stored in a collection of wrenches
+
+To downsample data, you need to set the up/down sample ratio using the method SetUpDownRatio().
+The given value is an integer corresponding to the ratio used to extract only the value of interest.
+For example, if you have 200 frames and a ratio of 10, then 20 frames will be extracted (one frame each 10 frames)."
+
+BTK_SWIG_AUTODOC_IMPL(WrenchCollectionDownsampleFilter, SetInput(btkWrenchCollection ), "SetInput(self, btkWrenchCollection)");
+BTK_SWIG_AUTODOC_IMPL(WrenchCollectionDownsampleFilter, SetUpDownRatio(int ), "SetUpDownRatio(self, int)");
+
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollectionDownsampleFilter, GetInput, "Gets the input registered with this process.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollectionDownsampleFilter, SetInput, "Sets the input required with this process.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollectionDownsampleFilter, GetOutput, "Returns the output created with this process.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollectionDownsampleFilter, SetUpDownRatio, "Sets the ratio used to downsample the data.");
+BTK_SWIG_DOCSTRING_IMPL(WrenchCollectionDownsampleFilter, GetUpDownRatio, "Gets the ratio used to downsample the data.");
 
 // ------------------------------------------------------------------------- //
 //                           ForcePlatformsExtractor                         //
