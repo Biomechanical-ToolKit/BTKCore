@@ -18,6 +18,7 @@ h2 = btkReadAcquisition('myFileWithWarnings.c3d'); % Warning displayed.
  
  The following list gives you the ID used by BTK into Matlab:
  - @c btk:GetForcePlatforms
+ - @c btk:GetForcePlatformWrenches
  - @c btk:GetGroundReactionWrenches
  - @c btk:MergeAcquisitions
  - @c btk:ReadAcquisition
