@@ -49,7 +49,7 @@
 #include "ModelDockWidget.h"
 #include "ProgressWidget.h"
 #include "UndoCommands.h"
-#include "UpdateChecker.h"
+#include "UpdateManager.h"
 #include "Preferences.h"
 #include "TimeEventFunctors.h"
 #include "NewLayoutDialog.h"
@@ -80,9 +80,10 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_ModelDock = new ModelDockWidget(this);
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
   this->mp_ImportAssistant = new ImportAssistantDialog(this);
-  this->mp_UpdateChecker = new UpdateChecker(MOKKA_VERSION_STRING, 
-                                              "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
-                                              ":/Resources/Images/Mokka_128.png", this);
+  this->mp_Updater = new UpdateManager(MOKKA_VERSION_STRING,
+                                       "/Users/Alzathar/Code/BTK/doc/Mokka/latestMokka",
+                                       //"http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
+                                       ":/Resources/Images/Mokka_128.png", this);
 #ifdef Q_OS_MAC
   this->mp_MacMenuBar = 0;
   this->mp_Preferences = new Preferences(0); // No parent: to be independant of the main window
@@ -379,7 +380,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuHelp->addSeparator();
   QAction* actionCheckUpdate = this->menuHelp->addAction(tr("Check for Updates..."));
   actionCheckUpdate->setMenuRole(QAction::ApplicationSpecificRole);
-  connect(actionCheckUpdate, SIGNAL(triggered()), this->mp_UpdateChecker, SLOT(check()));
+  connect(actionCheckUpdate, SIGNAL(triggered()), this->mp_Updater, SLOT(checkUpdate()));
 #endif
 
   // Event filter
@@ -438,6 +439,8 @@ MainWindow::MainWindow(QWidget* parent)
 #else
   connect(this->mp_Preferences, SIGNAL(userLayoutsChanged(QList<QVariant>, int)), this, SLOT(updateUserLayouts(QList<QVariant>, int)));
 #endif
+
+  this->mp_Updater->finalizeUpdate();
 };
 
 MainWindow::~MainWindow()
@@ -546,7 +549,7 @@ void MainWindow::checkSoftwareUpdateStartup()
   #if defined(NDEBUG)
     QSettings settings;
     if (settings.value("Preferences/checkUpdateStartup", true).toBool())
-      this->mp_UpdateChecker->check(true);
+      this->mp_Updater->checkUpdate(true);
   #endif
 #endif
 };
@@ -1772,8 +1775,8 @@ void MainWindow::exportASCII()
 void MainWindow::showPreferences()
 {
 #ifdef Q_OS_MAC
-  this->mp_Preferences->hide(); // Force the preferences to go back to the top.
   this->mp_Preferences->show();
+  this->mp_Preferences->raise();
 #else
   // Update the data for the user layouts
   int userLayoutIndex = -1;

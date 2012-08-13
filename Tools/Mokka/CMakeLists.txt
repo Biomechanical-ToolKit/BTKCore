@@ -12,6 +12,8 @@ ELSE (MOKKA_VERSION_PATCH EQUAL 0)
   SET(MOKKA_VERSION_STRING "${MOKKA_VERSION_MAJOR}.${MOKKA_VERSION_MINOR}.${MOKKA_VERSION_PATCH}")
 ENDIF (MOKKA_VERSION_PATCH EQUAL 0)
 
+INCLUDE(${CMAKE_MODULE_PATH}/btkMinizipSources.cmake)
+
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/mokkaConfigure.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/mokkaConfigure.h @ONLY IMMEDIATE)
 
@@ -50,10 +52,14 @@ SET(Mokka_CPP
   TimeEventControlerWidget.cpp
   TimeEventFunctors.cpp
   UndoCommands.cpp
-  UpdateChecker.cpp
+  UpdateManager.cpp
+  UpdateManager_controller.cpp
+  UpdateManager_installer.cpp
+  UpdateManager_version.cpp
   Viz3DWidget.cpp
   VideoWidget.cpp
   main.cpp
+  ${BTK_MINIZIP_SRCS}
   )
 
 SET(Mokka_H
@@ -85,7 +91,8 @@ SET(Mokka_H
   ProgressWidget.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
-  UpdateChecker.h
+  UpdateManager.h
+  UpdateManager_p.h
   Viz3DWidget.h
   VideoWidget.h
   )
@@ -107,7 +114,8 @@ SET(Mokka_UI
   NewSegmentDialog.ui
   ProgressWidget.ui
   TimeEventControlerWidget.ui
-  UpdateChecker.ui
+  UpdateManagerNewVersionDialog.ui
+  UpdateManagerInstallerDialog.ui
   )
 
 SET(Mokka_QRC
@@ -126,7 +134,8 @@ ENDIF(APPLE)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}
                     ${CMAKE_CURRENT_SOURCE_DIR}
                     ${QT_INCLUDE_DIR}
-                    ${BTK_SOURCE_DIR}/Utilities/ParserCmdLine)
+                    ${BTK_SOURCE_DIR}/Utilities/ParserCmdLine
+                    ${BTK_MINIZIP_INCLUDE_DIR})
 
 QT4_WRAP_UI(Mokka_UI_H ${Mokka_UI})
 QT4_WRAP_CPP(Mokka_MOC ${Mokka_H})

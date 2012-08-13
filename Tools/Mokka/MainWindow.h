@@ -49,7 +49,7 @@ class FileInfoDockWidget;
 class Metadata;
 class ModelDockWidget;
 class ProgressWidget;
-class UpdateChecker;
+class UpdateManager;
 class QUndoStack;
 class ChartDialog;
 
@@ -227,7 +227,7 @@ private:
   FileInfoDockWidget* mp_FileInfoDock;
   ModelDockWidget* mp_ModelDock;
   ImportAssistantDialog* mp_ImportAssistant;
-  UpdateChecker* mp_UpdateChecker;
+  UpdateManager* mp_Updater;
   Preferences* mp_Preferences;
 #ifdef Q_OS_MAC
   QMenuBar* mp_MacMenuBar;
