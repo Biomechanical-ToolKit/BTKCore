@@ -307,7 +307,6 @@ namespace btk
   bool MetaData::AppendChild(MetaData::Pointer entry)
   {
     return this->InsertChild(this->End(), entry);
-    this->Modified();
   };
   
   /**
