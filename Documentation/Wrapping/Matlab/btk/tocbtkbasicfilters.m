@@ -3,6 +3,7 @@ function tocbtkbasicfilters
 % ----------------
 %
 % Acquisition
+%   <a href="matlab:help btkAppendForcePlatformType2">btkAppendForcePlatformType2</a>    - Append a force platfrom type 2 (Fx,Fy,Fz,Mx,My,Mz) to an acquisition
 %   <a href="matlab:help btkGetForcePlatformWrenches">btkGetForcePlatformWrenches</a>    - Compute force platform wrenches
 %   <a href="matlab:help btkGetGroundReactionWrenches">btkGetGroundReactionWrenches</a>   - Compute ground reaction wrenches (positions, forces and moments)
 %                                    between the ground and the subject from force platform's data.
