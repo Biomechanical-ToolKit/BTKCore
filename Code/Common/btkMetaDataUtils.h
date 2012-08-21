@@ -41,6 +41,28 @@
 
 namespace btk
 {
+  // --------- Template private methods ------------- //
+  // Must be declared here to fix a compile error with Clang
+
+  // MetaDataCollapseChildrenValues_p: From void* to T
+  template <typename T>
+  inline void MetaDataCollapseChildrenValues_p(
+      std::vector<T>& values,
+      MetaDataInfo::ConstPointer info)
+  {
+    btkErrorMacro("Error during metadata's value collapsing. Generic method used.");
+  };
+
+  // MetaDataCollapseChildrenValues_p: Blank replacement
+  template <typename T>
+  inline const T MetaDataCollapseChildrenValues_p(const T& blank, int idx)
+  {
+    btkNotUsed(idx);
+    return blank;
+  };
+  
+  // --------- Template public methods ------------- //
+
   /**
    * Collapse the @a parent children entries' values starting with the string @a baselabel
    * and incrementing (for example: LABELS, LABELS2, LABELS3). The entries'
@@ -232,16 +254,7 @@ namespace btk
       btkErrorMacro("No parent.");
   };
 
-  // --------- Private methods -------------
-  // MetaDataCollapseChildrenValues_p: From void* to T
-  template <typename T>
-  inline void MetaDataCollapseChildrenValues_p(
-      std::vector<T>& values,
-      MetaDataInfo::ConstPointer info)
-  {
-    btkErrorMacro("Error during metadata's value collapsing. Generic method used.");
-  };
-
+  // --------- Private template specializations ------------- //
   template <>
   inline void MetaDataCollapseChildrenValues_p<std::string>(
       std::vector<std::string>& values,
@@ -320,14 +333,6 @@ namespace btk
   {
     info->ToDouble(values);
   }
-
-  // MetaDataCollapseChildrenValues_p: Blank replacement
-  template <typename T>
-  inline const T MetaDataCollapseChildrenValues_p(const T& blank, int idx)
-  {
-    btkNotUsed(idx);
-    return blank;
-  };
 
   template <>
   inline const std::string MetaDataCollapseChildrenValues_p<std::string>(
