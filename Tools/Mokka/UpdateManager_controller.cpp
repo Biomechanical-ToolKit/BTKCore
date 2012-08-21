@@ -42,8 +42,14 @@
 #include <QBuffer>
 #include <QCryptographicHash>
 #include <QDir>
-#include <QTime>
 #include <QSettings>
+
+#ifdef _MSC_VER
+  #define WIN32_LEAN_AND_MEAN
+  #include <windows.h>
+#else
+ #include <sys/stat.h>
+#endif
 
 UpdateApplicationDownload::UpdateApplicationDownload()
 : url(), hash(), data(), buffer()
@@ -74,8 +80,17 @@ void UpdateController::setFeedUrl(const QString& url)
 
 void UpdateController::setApplicationDownloadUrl(const QString& url)
 {
-  // this->m_ApplicationDownloadUrl = url;
   this->m_Download.url = url;
+};
+
+void UpdateController::setInstallationPath(const QString& path)
+{
+  this->m_InstallationPath = path;
+};
+
+const QString& UpdateController::installationPath() const
+{
+  return this->m_InstallationPath;
 };
 
 void UpdateController::checkUpdate()
@@ -173,7 +188,7 @@ void UpdateController::parseFeed(QNetworkReply* reply)
   #endif
 #elif defined(Q_OS_WIN)
                       const int osVersion = static_cast<int>(QSysInfo::WindowsVersion);
-                      if (os.compare("win"))
+                      if (os.compare("win") == 0)
                       {
                         if (minver.compare("WinXP", Qt::CaseInsensitive) == 0)
                           osRequired = static_cast<int>(QSysInfo::WV_XP);
@@ -182,6 +197,7 @@ void UpdateController::parseFeed(QNetworkReply* reply)
                         else if (minver.compare("Win7", Qt::CaseInsensitive) == 0)
                           osRequired = static_cast<int>(QSysInfo::WV_WINDOWS7);
 #else
+                      const int osVersion = -1;
                       if (0)
                       {
 #endif
@@ -318,14 +334,24 @@ void UpdateController::checkDownload(QNetworkReply* reply)
 void UpdateController::installUpdate()
 {
   bool incompleteInstallation = true;
-  QString appPath = QCoreApplication::applicationDirPath();
+  QString installPath = this->m_InstallationPath;
+  if (installPath.isEmpty())
+    installPath = QCoreApplication::applicationDirPath();
+  else
+  {
+    QDir installDir;
+    if (!installDir.mkpath(installPath))
+    {
+      qDebug("Error when creating the temporary folder used for the installation.");
+      emit installationIncomplete();
+      return;
+    }
+  }
 #ifdef Q_OS_MAC
-  appPath += "/../.."; // Go back to the Application.app folder
+  installPath += "/../.."; // Go back to the Application.app folder
 #endif
-  appPath = "/Applications/Mokka.app/Contents/MacOS/../..";
-  QDir appDir(appPath);
-  QTime time = QTime::currentTime();
-  QString moveSuffix = "." + QString::number(time.second() * 1000 + time.msec());
+  QDir installDir(installPath);
+  QString moveSuffix = "." + QString::number(QCoreApplication::applicationPid());
   QStringList suffixToBeMoved;
 #if defined(Q_OS_MAC)
   suffixToBeMoved.append(""); // executable or framework
@@ -370,14 +396,17 @@ void UpdateController::installUpdate()
     if (idx == -1)
       relativeFilename = "";
     else
-      relativeFilename = relativeFilename.mid(idx);
-    QFileInfo fI(appPath + "/" + relativeFilename);
+      relativeFilename = relativeFilename.mid(idx+1);
+    QFileInfo fI(installPath + "/" + relativeFilename);
     QString absFilePath = fI.absoluteFilePath();
+#ifndef _MSC_VER // Cygwin should go in this case or not?
     unzFileIinfo.external_fa = unzFileIinfo.external_fa >> 16; // At least under MacOS X
-    printf("%s\n", qPrintable(absFilePath));
     if (!fI.exists() && S_ISDIR(unzFileIinfo.external_fa))
+#else
+    if (!fI.exists() && (unzFileIinfo.external_fa & FILE_ATTRIBUTE_DIRECTORY))
+#endif
     {
-      if (!appDir.mkpath(fI.absolutePath()))
+      if (!installDir.mkpath(absFilePath))
       {
         qDebug("Impossible to create at least one subdirectory during the update process.");
         break;
@@ -414,7 +443,7 @@ void UpdateController::installUpdate()
         }
         if (needToBeMoved)
         {
-          if (!appDir.rename(absFilePath, absFilePath + moveSuffix))
+          if (!installDir.rename(absFilePath, absFilePath + moveSuffix))
           {
             qDebug("Impossible to move at least one file during the update process.");
             break;
@@ -422,7 +451,6 @@ void UpdateController::installUpdate()
           else
           {
             filesMoved.append(absFilePath + moveSuffix);
-            printf(" -> Moved!\n");
           }
         }
       }
@@ -439,7 +467,6 @@ void UpdateController::installUpdate()
           bytes = unzReadCurrentFile(this->m_Download.unz, buffer, sizeof(buffer));
           if (bytes == 0)
           {
-            printf(" -> Updated!\n");
             unzipRead = true;
             break;
           }
@@ -465,7 +492,7 @@ void UpdateController::installUpdate()
         if (unzFileIinfo.external_fa & 0001) perms |= (QFile::ExeOther);
         if (!file.setPermissions(perms))
         {
-          qDebug("Impossible to set the permissions on one file during the update process: \n%i", file.error());
+          qDebug("Impossible to set the permissions on one file during the update process: %i", file.error());
           break;
         }
         unzCloseCurrentFile(this->m_Download.unz);
@@ -504,13 +531,30 @@ void UpdateController::installUpdate()
   emit installationIncomplete();
 };
 
+#ifdef Q_OS_WIN
+  extern Q_CORE_EXPORT int qt_ntfs_permission_lookup; // See QFile documentation for NTFS
+#else
+  static int qt_ntfs_permission_lookup = 0;
+#endif
+
 void UpdateController::finalizeUpdate()
 {
   QSettings settings;
   QStringList filesToRemove = settings.value("Updater/MovedFiles").toStringList();
+  bool allFilesRemoved = true;
+  qt_ntfs_permission_lookup++;
   for (QStringList::const_iterator itS = filesToRemove.begin() ; itS != filesToRemove.end() ; ++itS)
-    QFile::remove(*itS);
+  {
+    QFile file(*itS);
+    if (!file.setPermissions(QFile::WriteOther))
+      allFilesRemoved = false;
+    if (!file.remove())
+      allFilesRemoved = false;
+  }
+  if (!allFilesRemoved)
+    qDebug("At least one temporary file was not removed during the finalization of the update.");
   settings.setValue("Updater/MovedFiles", QStringList());
+  qt_ntfs_permission_lookup--;
   emit installationFinalized();
 };
 

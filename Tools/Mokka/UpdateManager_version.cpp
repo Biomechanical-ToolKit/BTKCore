@@ -38,7 +38,7 @@
 #include <QDialog>
 #include <QSettings>
 
-UpdateNewVersionDialog::UpdateNewVersionDialog(QWidget* parent)
+UpdateManagerNewVersionDialog::UpdateManagerNewVersionDialog(QWidget* parent)
 : QDialog(parent), appNewVer()
 {
   this->setupUi(this);
@@ -56,7 +56,7 @@ UpdateNewVersionDialog::UpdateNewVersionDialog(QWidget* parent)
   connect(this->skipButton, SIGNAL(clicked(bool)), this, SLOT(skip()));
 };
 
-void UpdateNewVersionDialog::setApplicationIcon(const QPixmap& icon)
+void UpdateManagerNewVersionDialog::setApplicationIcon(const QPixmap& icon)
 {
   if (!icon.isNull())
   {
@@ -67,7 +67,7 @@ void UpdateNewVersionDialog::setApplicationIcon(const QPixmap& icon)
     this->iconFrame->hide();
 };
 
-void UpdateNewVersionDialog::install()
+void UpdateManagerNewVersionDialog::install()
 {
   QSettings settings;
   settings.setValue("Updater/skippedVersion", "");
@@ -75,14 +75,14 @@ void UpdateNewVersionDialog::install()
   this->accept();
 };
 
-void UpdateNewVersionDialog::remind()
+void UpdateManagerNewVersionDialog::remind()
 {
   QSettings settings;
   settings.setValue("Updater/skippedVersion", "");
   this->reject();
 };
 
-void UpdateNewVersionDialog::skip()
+void UpdateManagerNewVersionDialog::skip()
 {
   QSettings settings;
   settings.setValue("Updater/skippedVersion", this->appNewVer);

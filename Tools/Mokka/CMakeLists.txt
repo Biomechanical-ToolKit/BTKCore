@@ -208,3 +208,16 @@ IF(NOT BTK_INSTALL_NO_RUNTIME)
     ENDIF(WIN32)
   ENDIF(APPLE)
 ENDIF(NOT BTK_INSTALL_NO_RUNTIME)
+
+# -----------------------------------------------------------------------------
+
+# Mokka Updater (for Windows Vista/7 only)
+IF(WIN32)
+  SET(MokkaUpdater_SRC
+      Updater/main.cpp
+      Updater/InfoVersion.rc
+      Updater/Icon.rc)
+  
+  ADD_EXECUTABLE(MokkaUpdater WIN32 ${MokkaUpdater_SRC})
+  TARGET_LINK_LIBRARIES(MokkaUpdater ${QT_LIBRARIES} ${QT_QTMAIN_LIBRARY})
+ENDIF(WIN32)

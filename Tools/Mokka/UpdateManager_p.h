@@ -69,6 +69,8 @@ public:
   
   void setFeedUrl(const QString& url);
   void setApplicationDownloadUrl(const QString& url);
+  void setInstallationPath(const QString& path);
+  const QString& installationPath() const;
   
 public slots:
   void checkUpdate();
@@ -107,6 +109,7 @@ private:
   QStringList m_CurrentVersion;
   QString m_FeedUrl;
   UpdateApplicationDownload m_Download;
+  QString m_InstallationPath;
   QNetworkAccessManager* mp_Manager;
   QNetworkReply* mp_DownloadReply;
 };
@@ -114,14 +117,14 @@ private:
 // ------------------------------------------------------------------------- //
 
 // Widget to show the update information
-#include "ui_UpdateChecker.h"
-class UpdateNewVersionDialog : public QDialog, public Ui::UpdateNewVersionDialog
+#include "ui_UpdateManagerNewVersionDialog.h"
+class UpdateManagerNewVersionDialog : public QDialog, public Ui::UpdateManagerNewVersionDialog
 {
   Q_OBJECT
 
 public:
-  UpdateNewVersionDialog(QWidget* parent = 0);
-  // ~UpdateNewVersionDialog(); // Implicit
+  UpdateManagerNewVersionDialog(QWidget* parent = 0);
+  // ~UpdateManagerNewVersionDialog(); // Implicit
   
   void setApplicationIcon(const QPixmap& icon);
   
@@ -139,14 +142,14 @@ signals:
 // ------------------------------------------------------------------------- //
 
 // Widget to interact with the download of the data and start the installation
-#include "ui_UpdateInstaller.h"
-class UpdateInstallerDialog : public QDialog, public Ui::UpdateInstallerDialog
+#include "ui_UpdateManagerInstallerDialog.h"
+class UpdateManagerInstallerDialog : public QDialog, public Ui::UpdateManagerInstallerDialog
 {
   Q_OBJECT
 
 public:
-  UpdateInstallerDialog(QWidget* parent = 0);
-  // ~UpdateInstallerDialog(); // Implicit
+  UpdateManagerInstallerDialog(QWidget* parent = 0);
+  // ~UpdateManagerInstallerDialog(); // Implicit
   
   void setApplicationIcon(const QPixmap& icon);
   
@@ -168,9 +171,10 @@ public:
   QThread* mp_Thread;
   QNetworkAccessManager* mp_Manager;
   UpdateController* mp_Controller;
-  UpdateNewVersionDialog* mp_NewVersionDialog;
-  UpdateInstallerDialog* mp_InstallerDialog;
+  UpdateManagerNewVersionDialog* mp_NewVersionDialog;
+  UpdateManagerInstallerDialog* mp_InstallerDialog;
   bool m_QuietNoUpdate;
+  bool m_SeparatedUpdaterWithPrivileges;
 };
 
 #endif // UpdateManager_p_h

@@ -41,6 +41,14 @@
 #include <QSettings>
 #include <QThread>
 #include <QProcess>
+#include <QDir>
+
+#ifdef Q_OS_WIN
+  // For the win32ShellExecute method
+  #include "qt_windows.h"
+  #include "qwindowdefs_win.h"
+  #include <shellapi.h>
+#endif
 
 UpdateManagerPrivate::UpdateManagerPrivate()
 : m_IconPath()
@@ -50,6 +58,7 @@ UpdateManagerPrivate::UpdateManagerPrivate()
   this->mp_Thread = NULL;
   this->mp_Controller = NULL;
   this->m_QuietNoUpdate = false;
+  this->m_SeparatedUpdaterWithPrivileges = false;
 }
 
 UpdateManagerPrivate::~UpdateManagerPrivate()
@@ -70,11 +79,15 @@ UpdateManager::UpdateManager(const QString& currentApplicationVersion, const QSt
 : QObject(parent), d_ptr(new UpdateManagerPrivate)
 {
   Q_D(UpdateManager);
-  d->mp_NewVersionDialog = new UpdateNewVersionDialog(parent);
-  d->mp_InstallerDialog = new UpdateInstallerDialog(parent);
+  d->mp_NewVersionDialog = new UpdateManagerNewVersionDialog(parent);
+  d->mp_InstallerDialog = new UpdateManagerInstallerDialog(parent);
   d->mp_Thread = new QThread;
   d->mp_Controller = new UpdateController(currentApplicationVersion, applicationUpdateURL);
   d->mp_Controller->moveToThread(d->mp_Thread);
+#ifdef Q_OS_WIN
+  if (QSysInfo::windowsVersion() >= QSysInfo::WV_VISTA)
+    d->m_SeparatedUpdaterWithPrivileges = true;
+#endif
   
   this->setIcon(iconPath);
   
@@ -92,7 +105,6 @@ UpdateManager::UpdateManager(const QString& currentApplicationVersion, const QSt
   connect(d->mp_NewVersionDialog, SIGNAL(installSoftwareButtonClicked()), this, SLOT(downloadUpdate()));
   connect(d->mp_InstallerDialog, SIGNAL(abortInstallButtonClicked()), this, SLOT(abortDownload()));
   connect(d->mp_InstallerDialog, SIGNAL(launchInstallButtonClicked()), this, SLOT(installUpdate()));
-  
 }
 
 UpdateManager::~UpdateManager()
@@ -171,6 +183,10 @@ void UpdateManager::installUpdate()
   disconnect(d->mp_Thread, SIGNAL(started()), d->mp_Controller, 0);
   connect(d->mp_Thread, SIGNAL(started()), d->mp_Controller, SLOT(installUpdate()));
   
+  if (d->m_SeparatedUpdaterWithPrivileges)
+  {
+    d->mp_Controller->setInstallationPath(QDir::tempPath() + "/" + QCoreApplication::applicationName() + "Updater." + QString::number(QCoreApplication::applicationPid()));
+  }
   d->mp_InstallerDialog->setWindowModality(Qt::ApplicationModal);
   d->mp_InstallerDialog->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
   d->mp_InstallerDialog->progressBar->setRange(0,0);
@@ -271,12 +287,48 @@ void UpdateManager::restartApplication()
   d->mp_InstallerDialog->accept();
   this->resetThread();
   QCoreApplication* app = QCoreApplication::instance();
-  QStringList args = app->arguments(); 
-  #warning Check under Windows if the first argument is the name of the application or not.
-  qDebug("Number of arguments before removing the possible first one: %i", args.count());
-  args.removeFirst(); // No need of the name of the application.
-  // QProcess::startDetached(app->applicationFilePath(), app->arguments());
-  // QCoreApplication::quit();
+  QStringList args = app->arguments();
+  if (!args.isEmpty() && args[0].replace("\\","/").compare(app->applicationFilePath()) == 0)
+    args.removeFirst(); // No need of the path of the application.
+  
+  // The UAC mechanism appears starting with with Windows Vista and then 
+  // need to launch another executable with admin privileges to copy the
+  // update in the final folder (especialy true is this folder is "Program files") 
+  if (d->m_SeparatedUpdaterWithPrivileges)
+  {
+    // Path for the external updater
+    QString execPath = app->applicationDirPath() + "/" + QCoreApplication::applicationName() + "Updater.exe";
+    if (!QFile::exists(execPath))
+    {
+      QMessageBox msg(QMessageBox::Critical, tr("Software Update"), tr("Install Error!"), QMessageBox::Ok, d->mp_InstallerDialog->parentWidget());
+      this->notifyMessage(&msg, tr("Impossible to find the external updater."), tr("You need to download and install this new release manually..."));
+      return;
+    }
+    // Parameters:
+    // 1. Source folder
+    // 2. Destination folder
+    // 3. Path of the executable to launch after the update
+    // 4. Arguments for the executable to launch after the update
+    // WARNING: Need to transform space into \" \" for the parameters (See comment "lpParameters and spaces" - http://msdn.microsoft.com/en-us/library/windows/desktop/bb759784%28v=vs.85%29.aspx)
+    QString sourceFolder = d->mp_Controller->installationPath(); sourceFolder = sourceFolder.replace(" ", "\" \"");
+    QString destinationFolder = QCoreApplication::applicationDirPath().replace(" ", "\" \"");
+    QString thirdPid = QString::number(QCoreApplication::applicationPid());
+    QString thirdExec = app->applicationFilePath().replace(" ", "\" \"");
+    QString thirdArgs = args.join(" ").replace(" ", "\" \"");
+    QString params = sourceFolder + " " + destinationFolder + " " + thirdPid + " " + thirdExec + " " + thirdArgs;
+    if (this->launchExternalUpdater(execPath, params) != 0)
+    {
+      QMessageBox msg(QMessageBox::Critical, tr("Software Update"), tr("Install Error!"), QMessageBox::Ok, d->mp_InstallerDialog->parentWidget());
+      this->notifyMessage(&msg, tr("An error occurred during the finalization of the update."), tr("You need to download and install this new release manually..."));
+    }
+    else
+      QCoreApplication::quit();
+  }
+  else
+  {
+    QProcess::startDetached(app->applicationFilePath(), args);
+    QCoreApplication::quit();
+  }
 };
 
 void UpdateManager::resetThread()
@@ -298,11 +350,36 @@ void UpdateManager::notifyMessage(QMessageBox* msg, const QString& detail1, cons
     text += "\n" + detail2;
   msg->setInformativeText(text);
 #else
-  QString text = msg.text() + "\n\n" + detail1;
+  QString text = msg->text() + "\n\n" + detail1;
   if (!detail2.isEmpty())
     text += "\n" + detail2;
+  text += "\n";
   msg->setText(text);
 #endif
   msg->exec();
 };
 
+int UpdateManager::launchExternalUpdater(const QString& execPath, const QString& params)
+{
+#ifdef Q_OS_WIN
+  // Without this copy, the LPCSTR (const char*) conversion is invalid (out of the scope) within the SHELLEXECUTEINFO structure
+  std::string f = execPath.toStdString();
+  std::string p = params.toStdString();
+
+  SHELLEXECUTEINFO execInfo;
+  memset(&execInfo, 0, sizeof(SHELLEXECUTEINFO));
+  execInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+  execInfo.fMask = SEE_MASK_NOASYNC;
+  execInfo.hwnd = NULL;
+  execInfo.lpFile = (!f.empty() ? f.c_str() : NULL);
+  execInfo.lpVerb = "runas";
+  execInfo.lpParameters = (!p.empty() ? p.c_str() : NULL);
+  execInfo.lpDirectory = NULL;
+  execInfo.nShow = SW_SHOW;
+  execInfo.hInstApp = NULL;
+
+  if (ShellExecuteEx(&execInfo) == FALSE)
+    return -1;
+#endif
+  return 0;
+};

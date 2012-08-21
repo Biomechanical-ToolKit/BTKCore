@@ -81,8 +81,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
   this->mp_ImportAssistant = new ImportAssistantDialog(this);
   this->mp_Updater = new UpdateManager(MOKKA_VERSION_STRING,
-                                       "/Users/Alzathar/Code/BTK/doc/Mokka/latestMokka",
-                                       //"http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
+                                       "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
                                        ":/Resources/Images/Mokka_128.png", this);
 #ifdef Q_OS_MAC
   this->mp_MacMenuBar = 0;

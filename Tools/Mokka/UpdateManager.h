@@ -82,6 +82,7 @@ protected:
   
 private:
   void notifyMessage(QMessageBox* msg, const QString& detail1, const QString& detail2 = "");
+  int launchExternalUpdater(const QString& execPath, const QString& params);
   
   Q_DISABLE_COPY(UpdateManager);
   Q_DECLARE_PRIVATE(UpdateManager);

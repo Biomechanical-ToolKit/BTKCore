@@ -37,7 +37,7 @@
 
 #include <QPushButton>
 
-UpdateInstallerDialog::UpdateInstallerDialog(QWidget* parent)
+UpdateManagerInstallerDialog::UpdateManagerInstallerDialog(QWidget* parent)
 : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint)
 {
   this->setupUi(this);
@@ -54,7 +54,7 @@ UpdateInstallerDialog::UpdateInstallerDialog(QWidget* parent)
   connect(this->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SIGNAL(abortInstallButtonClicked()));
 };
 
-void UpdateInstallerDialog::setApplicationIcon(const QPixmap& icon)
+void UpdateManagerInstallerDialog::setApplicationIcon(const QPixmap& icon)
 {
   if (!icon.isNull())
   {
