@@ -18,6 +18,14 @@ SET(BTKVTK_SRCS
   btkVTKOpenGL2ContextDevice2D.cpp
   btkVTKSegmentsFramesSource.cpp
   )
+
+# For btk::VTKOpenGLContextDevice2D and btk::VTKOpenGL2ContextDevice2D
+# The following hack is needed when the VTK library is not installed
+# but used directly from its build folder.
+LIST(LENGTH VTK_INCLUDE_DIRS VTK_INCLUDE_DIRS_LIST_LEN)
+IF(VTK_INCLUDE_DIRS_LIST_LEN EQUAL 1)
+  INCLUDE_DIRECTORIES("${VTK_INCLUDE_DIRS}/vtkfreetype/include")
+ENDIF(VTK_INCLUDE_DIRS_LIST_LEN EQUAL 1)
   
 IF(VTK_USE_QT)
   SET(BTKVTK_SRCS ${BTKVTK_SRCS} btkVTKQtStringToImage.cpp)

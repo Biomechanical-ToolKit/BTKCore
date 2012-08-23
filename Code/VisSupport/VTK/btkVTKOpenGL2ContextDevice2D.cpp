@@ -50,7 +50,7 @@
 
 #include <vtkgl.h>
 
-#include <vtkOpenGLContextDevice2DPrivate.h>
+#include "btkVTKOpenGLContextDevice2D_p.h"
 
 namespace btk
 {
