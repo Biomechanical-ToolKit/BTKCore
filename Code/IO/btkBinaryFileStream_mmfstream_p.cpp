@@ -67,27 +67,18 @@ namespace btk
 #if defined(HAVE_SYS_MMAP) // POSIX
     // Select the flags for the function open
     int flags = 0;
-    switch (mode_)
-    {
-    case std::ios_base::out:
-    case std::ios_base::out + std::ios_base::trunc:
+    if ((mode_ == std::ios_base::out) || (mode_ == std::ios_base::out + std::ios_base::trunc))
       flags = O_RDWR | O_CREAT | O_TRUNC;
-      break;
-    case std::ios_base::out + std::ios_base::app:
+    else if (mode_ == std::ios_base::out + std::ios_base::app)
       flags = O_WRONLY | O_CREAT | O_APPEND;
-      break;
-    case std::ios_base::in:
+    else if (mode_ == std::ios_base::in)
       flags = O_RDONLY;
-      break;
-    case std::ios_base::in + std::ios_base::out:
+    else if (mode_ == std::ios_base::in + std::ios_base::out)
       flags = O_RDWR;
-      break;
-    case std::ios_base::in + std::ios_base::out + std::ios_base::trunc:
+    else if (mode_ == std::ios_base::in + std::ios_base::out + std::ios_base::trunc)
       flags = O_RDWR | O_CREAT | O_TRUNC;
-      break;
-    default: // Other flags are not supported in the C++ standard
+    else // Other flags are not supported in the C++ standard
       return 0;
-    }
     // Open the file
     if ((this->m_File = ::open(s, flags, S_IRWXU)) == -1)
       return 0;
