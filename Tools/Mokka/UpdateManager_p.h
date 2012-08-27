@@ -105,9 +105,10 @@ private:
   void parseFeedItem(QXmlStreamReader& xmlReader, const QString& appName, QString& appLatestNewVer, QString& appNote, bool& updateAvailable);
   bool isNewRelease(const QStringList& rel) const {return (this->compareRelease(this->m_CurrentVersion, rel) < 0);};
   bool isGreaterRelease(const QStringList& max, const QStringList& rel) const {return (this->compareRelease(max, rel) > 0);};
-  int compareRelease(const QStringList& max, const QStringList& rel) const;
-  int compareRelease(const QString& max, const QString& rel) const;
+  int compareRelease(const QStringList& ver1, const QStringList& ver2) const;
+  int compareRelease(const QString& str1, const QString& str2) const;
   int extractReleaseNumber(const QString& str, QString& suffix) const;
+  QString extractReleaseLetters(const QString& str, QString& suffix) const;
 
   QStringList m_CurrentVersion;
   QString m_FeedUrl;

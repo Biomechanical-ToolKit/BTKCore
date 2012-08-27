@@ -285,7 +285,6 @@ const uLong maxFilenameLength = 1024;
 
 void UpdateController::checkDownload(QNetworkReply* reply)
 {
-  
   bool incompleteDownload = true;
   if ((reply->error() == QNetworkReply::NoError) && reply->isReadable())
   {
@@ -488,6 +487,7 @@ void UpdateController::installUpdate()
             break;
           }
         }
+#ifndef Q_OS_WIN
         // Set the permission of the file.
         QFile::Permissions perms;
         if (unzFileIinfo.external_fa & 0400) perms |= (QFile::ReadOwner);
@@ -507,6 +507,7 @@ void UpdateController::installUpdate()
           qDebug("Impossible to set the permissions on one file during the update process: %i", file.error());
           break;
         }
+#endif
         unzCloseCurrentFile(this->m_Download.unz);
         file.close();
       }
@@ -573,7 +574,7 @@ void UpdateController::finalizeUpdate()
 int UpdateController::compareRelease(const QStringList& ver1, const QStringList& ver2) const
 {
   // Inspired by http://stackoverflow.com/questions/198431/how-do-you-compare-two-version-strings-in-java
-  // More robust method than the previous one, but still some problems with the content of the suffix (e.g. 0.1a2 > 0.1a10...)
+  // But modified to take into account suffixes with a number after letters (e.g. 1.2a10 < 1.2a2)
   int i = 0;
   for (i = 0 ; i < ver1.count() ; ++i)
   {
@@ -593,29 +594,9 @@ int UpdateController::compareRelease(const QStringList& ver1, const QStringList&
       return 0;
     }
     
-    QString suffix1, suffix2;
-    int number1 = this->extractReleaseNumber(ver1[i], suffix1);
-    int number2 = this->extractReleaseNumber(ver2[i], suffix2);
-    
-     if (number1 < number2) {
-          // Number one is less than number two
-          return -1;
-      }
-      if (number1 > number2) {
-          // Number one is greater than number two
-          return 1;
-      }
-
-      bool empty1 = suffix1.length() == 0;
-      bool empty2 = suffix2.length() == 0;
-
-      if (empty1 && empty2) continue; // No suffixes
-      if (empty1) return 1; // First suffix is empty (1.2 > 1.2b)
-      if (empty2) return -1; // Second suffix is empty (1.2a < 1.2)
-
-      // Lexical comparison of suffixes
-      int result = suffix1.compare(suffix2);
-      if (result != 0) return result;
+    int result = this->compareRelease(ver1[i], ver2[i]);
+    if (result != 0)
+      return result;
   }
   if (i < ver2.count())
   {
@@ -623,7 +604,7 @@ int UpdateController::compareRelease(const QStringList& ver1, const QStringList&
     {
       QString suffix2;
       int number2 = this->extractReleaseNumber(ver2[j], suffix2);
-      if ((number2 != 0) || (suffix2.length() != 0))
+      if ((number2 != 0) || !suffix2.isEmpty())
       {
         // Version one is longer than version two, and non-zero
         return -1;
@@ -635,6 +616,45 @@ int UpdateController::compareRelease(const QStringList& ver1, const QStringList&
   
   return 0;
 }
+
+int UpdateController::compareRelease(const QString& str1, const QString& str2) const
+{
+  QString temp1 = str1, temp2 = str2;
+  while (1)
+  {
+    QString suffix1, suffix2;
+    int number1 = this->extractReleaseNumber(temp1, suffix1);
+    int number2 = this->extractReleaseNumber(temp2, suffix2);
+    
+    if (number1 < number2)
+      return -1; // Number one is less than number two
+    else if (number1 > number2)
+      return 1;  // Number one is greater than number two
+    
+    if ((number1 == -1) || (number2 == -1))
+    {
+      temp1 = suffix1;
+      temp2 = suffix2;
+      // No numbers
+      QString letters1 = this->extractReleaseLetters(temp1, suffix1);
+      QString letters2 = this->extractReleaseLetters(temp2, suffix2);
+      // Lexical comparison of letters (1.2a < 1.2b)
+      int result = letters1.compare(letters2);
+      if (result != 0)
+        return result;
+    }
+    
+    if (suffix1.isEmpty() && suffix2.isEmpty())
+      return 0; // No suffixes
+    else if (suffix1.isEmpty())
+      return 1; // First suffix is empty (1.2 > 1.2b)
+    else if (suffix2.isEmpty())
+      return -1; // Second suffix is empty (1.2a < 1.2)
+      
+    temp1 = suffix1;
+    temp2 = suffix2;
+  }
+};
 
 int UpdateController::extractReleaseNumber(const QString& str, QString& suffix) const
 {
@@ -649,6 +669,25 @@ int UpdateController::extractReleaseNumber(const QString& str, QString& suffix) 
       break;
     ++inc;
   }
-  suffix = str.mid(inc+1);
+  suffix = str.mid(inc);
+  if (suffix.compare(str) == 0)
+    num = -1;
   return num;
+};
+
+QString UpdateController::extractReleaseLetters(const QString& str, QString& suffix) const
+{
+  QString letters;
+  int inc = 0;
+  while (inc < str.length())
+  {
+    QChar c = str.at(inc);
+    if (!c.isDigit())    
+      letters += c;
+    else
+      break;
+    ++inc;
+  }
+  suffix = str.mid(inc);
+  return letters;
 };
