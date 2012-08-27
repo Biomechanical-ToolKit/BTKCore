@@ -181,6 +181,7 @@ public slots:
   void setPreferenceShowChartEvent(int index);
   void setPreferenceChartUnitAxisX(int index);
   void setPreferenceAutomaticCheckUpdate(bool isChecked);
+  void setPreferenceSubscribeDevelopmentChannel(bool isChecked);
   // Others
   void updateSelectedMarkersRadius(double r);
   void updateSelectedVideosDelay(double d);

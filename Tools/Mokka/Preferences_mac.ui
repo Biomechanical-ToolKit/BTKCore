@@ -1757,10 +1757,7 @@ QPushButton:pressed {
      </layout>
     </widget>
     <widget class="QWidget" name="advancedPage">
-     <layout class="QVBoxLayout" name="verticalLayout_19">
-      <property name="spacing">
-       <number>24</number>
-      </property>
+     <layout class="QVBoxLayout" name="verticalLayout_9">
       <item>
        <layout class="QVBoxLayout" name="updateLayout">
         <property name="spacing">
@@ -1847,6 +1844,36 @@ QPushButton:pressed {
            <widget class="QCheckBox" name="automaticCheckUpdateCheckBox">
             <property name="text">
              <string>Automatically check for update at startup</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_24">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item>
+           <spacer name="horizontalSpacer_33">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>6</width>
+              <height>1</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="subscribeDevelopmentChannelCheckBox">
+            <property name="text">
+             <string>Subscribe to the development channel</string>
             </property>
            </widget>
           </item>

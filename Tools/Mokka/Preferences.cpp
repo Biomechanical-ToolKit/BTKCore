@@ -77,6 +77,7 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[UserLayoutIndex] = -1;
   this->m_Data[UserLayouts] = QList<QVariant>();
   this->m_Data[AutomaticCheckUpdateUse] = false;
+  this->m_Data[DevelopmentChannelSubscriptionUsed] = false;
   this->m_Data[DefaultPlotLineWidth] = -1;
   this->m_Data[ChartEventDisplay] = -1;
   this->m_Data[chartUnitAxisX] = -1;
@@ -251,6 +252,13 @@ void Preferences::saveSettings()
     this->m_Data[AutomaticCheckUpdateUse] = checked;
     emit automaticCheckUpdateStateChanged(checked);
   }
+  
+  checked = this->subscribeDevelopmentChannelCheckBox->checkState() == Qt::Checked;
+  if (this->m_Data[DevelopmentChannelSubscriptionUsed].toBool() != checked)
+  {
+    this->m_Data[DevelopmentChannelSubscriptionUsed] = checked;
+    emit subscribeDevelopmentChannelStateChanged(checked);
+  }
 };
 
 void Preferences::resetSettings()
@@ -278,6 +286,7 @@ void Preferences::resetSettings()
   this->defaultChartUnitAxisXComboBox->setCurrentIndex(this->m_Data[chartUnitAxisX].toInt());
   this->layoutTable->refresh(); this->m_Data[UserLayouts] = *(this->layoutTable->userLayouts());
   this->automaticCheckUpdateCheckBox->setChecked(this->m_Data[AutomaticCheckUpdateUse].toBool());
+  this->subscribeDevelopmentChannelCheckBox->setChecked(this->m_Data[DevelopmentChannelSubscriptionUsed].toBool());
   
   this->tabWidget->setCurrentIndex(0);
 }

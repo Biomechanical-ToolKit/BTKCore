@@ -93,6 +93,11 @@ const QString& UpdateController::installationPath() const
   return this->m_InstallationPath;
 };
 
+void UpdateController::acceptDevelopmentUpdate(bool accepted)
+{
+  this->m_AcceptDevelopmentUpdate = accepted;
+};
+
 void UpdateController::checkUpdate()
 {
   this->mp_Manager = new QNetworkAccessManager(this);
@@ -102,8 +107,8 @@ void UpdateController::checkUpdate()
 
 void UpdateController::parseFeed(QNetworkReply* reply)
 {
-  bool updateAvailable = false, updateError = true, compatiblePackageFound = false;  
-  QString appName, appNewVer, appLatestNewVer, appNote, appPubDate;
+  bool updateAvailable = false, updateError = true;
+  QString appName, appLatestNewVer, appNote;
   if ((reply->error() == QNetworkReply::NoError) && reply->open(QIODevice::ReadOnly))
   {
     QXmlStreamReader xmlReader(reply);
@@ -117,123 +122,9 @@ void UpdateController::parseFeed(QNetworkReply* reply)
         while (xmlReader.readNextStartElement())
         {
           if (xmlReader.name() == "Release")
-          {
-            appPubDate = xmlReader.attributes().value("pubdate").toString();
-            appNewVer = xmlReader.attributes().value("version").toString();
-            if (this->isNewRelease(appNewVer.split(".")))
-            {
-              QString appNote_;
-              appNote_ += "<div style=\"margin-top:15px;\">";
-              appNote_ += "<div style=\"background-color:#A4DDED;\"><b>&nbsp;" + appPubDate + " - " + appName + " " + appNewVer + " released</b><div>";
-              appNote_ += "<div><ul style=\"margin:5 0 0 -25;\">";
-              while (xmlReader.readNextStartElement())
-              {
-                if (xmlReader.name() == "Enhancement")
-                {
-                  appNote_ += "<li><b>Enhancements</b></li><ul style=\"margin:5 0 5 -25;\">";
-                  while (xmlReader.readNextStartElement())
-                  {
-                    if (xmlReader.name() == "item")
-                      appNote_ += "<li>" + xmlReader.readElementText() + "</li>";
-                  }
-                  appNote_ += "</ul>";
-                }
-                else if (xmlReader.name() == "Update")
-                {
-                  appNote_ += "<li><b>Updates</b></li><ul style=\"margin:5 0 5 -25;\">";
-                  while (xmlReader.readNextStartElement())
-                  {
-                    if (xmlReader.name() == "item")
-                      appNote_ += "<li>" + xmlReader.readElementText() + "</li>";
-                  }
-                  appNote_ += "</ul>";
-                }
-                else if (xmlReader.name() == "Fix")
-                {
-                  appNote_ += "<li><b>Fixes</b></li><ul style=\"margin:5 0 5 -25;\">";
-                  while (xmlReader.readNextStartElement())
-                  {
-                    if (xmlReader.name() == "item")
-                      appNote_ += "<li>" + xmlReader.readElementText() + "</li>";
-                  }
-                  appNote_ += "</ul>";
-                }
-                else if (xmlReader.name() == "Binary")
-                {
-                  int latestCompatibleOS = -1;
-                  while (xmlReader.readNextStartElement())
-                  {
-                    if (xmlReader.name() == "item")
-                    {
-                      QString os = xmlReader.attributes().value("os").toString();
-                      QString minver = xmlReader.attributes().value("minver").toString();
-                      QString arch = xmlReader.attributes().value("arch").toString();
-                      QString url = xmlReader.attributes().value("url").toString();
-                      QString hash = xmlReader.attributes().value("hash").toString();
-                      int osRequired = 9999;
-#if defined(Q_OS_MAC)
-                      const int osVersion = static_cast<int>(QSysInfo::MacintoshVersion);
-                      if (os.compare("mac") == 0)
-                      {
-                        if (minver.compare("10.5", Qt::CaseInsensitive) == 0)
-                          osRequired = static_cast<int>(QSysInfo::MV_10_5);
-                        else if (minver.compare("10.6", Qt::CaseInsensitive) == 0)
-                          osRequired = static_cast<int>(QSysInfo::MV_10_6);
-  #if QT_VERSION >= 0x040800
-                        else if (minver.compare("10.7", Qt::CaseInsensitive) == 0)
-                          osRequired = static_cast<int>(QSysInfo::MV_10_7);
-  #elif QT_VERSION >= 0x050000
-                        else if (minver.compare("10.8", Qt::CaseInsensitive) == 0)
-                          osRequired = static_cast<int>(QSysInfo::MV_10_8);
-  #endif
-#elif defined(Q_OS_WIN)
-                      const int osVersion = static_cast<int>(QSysInfo::WindowsVersion);
-                      if (os.compare("win") == 0)
-                      {
-                        if (minver.compare("WinXP", Qt::CaseInsensitive) == 0)
-                          osRequired = static_cast<int>(QSysInfo::WV_XP);
-                        else if (minver.compare("WinVista", Qt::CaseInsensitive) == 0)
-                          osRequired = static_cast<int>(QSysInfo::WV_VISTA);
-                        else if (minver.compare("Win7", Qt::CaseInsensitive) == 0)
-                          osRequired = static_cast<int>(QSysInfo::WV_WINDOWS7);
-#else
-                      const int osVersion = -1;
-                      if (0)
-                      {
-#endif
-                        int archRequired = (arch.compare("x86",  Qt::CaseInsensitive) == 0 ? 32 : 64);
-                        if ((QSysInfo::WordSize == archRequired) && (osVersion >= osRequired))
-                        {
-                          compatiblePackageFound = true;
-                          if (osRequired > latestCompatibleOS)
-                          {
-                            latestCompatibleOS = osRequired;
-                            this->m_Download.url = url;
-                            this->m_Download.hash = hash;
-                          }
-                        }
-                      }
-                      xmlReader.readNext();
-                    }
-                  }
-                }
-                xmlReader.readNext();
-              }
-              appNote_ += "</ul></div>";
-              appNote_ += "</div>";
-              
-              // Check if this new release is supported or not by the current OS
-              if (compatiblePackageFound)
-              {
-                appNote += appNote_;
-                updateAvailable = true;
-                if (this->isGreaterRelease(appNewVer.split("."), appLatestNewVer.split(".")))
-                  appLatestNewVer = appNewVer;
-              }
-            }
-            else
-              xmlReader.skipCurrentElement();
-          }
+            this->parseFeedItem(xmlReader, appName, appLatestNewVer, appNote, updateAvailable);
+          else if (this->m_AcceptDevelopmentUpdate && (xmlReader.name() == "Development"))
+            this->parseFeedItem(xmlReader, appName, appLatestNewVer, appNote, updateAvailable);
           else
             xmlReader.skipCurrentElement();
         }
@@ -252,6 +143,127 @@ void UpdateController::parseFeed(QNetworkReply* reply)
   
   reply->deleteLater();
   reply->manager()->deleteLater();
+};
+
+void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString& appName, QString& appLatestNewVer, QString& appNote, bool& updateAvailable)
+{
+  bool compatiblePackageFound = false;
+  QString appNewVer, appPubDate;
+  appPubDate = xmlReader.attributes().value("pubdate").toString();
+  appNewVer = xmlReader.attributes().value("version").toString();
+  if (this->isNewRelease(appNewVer.split(".")))
+  {
+    QString appNote_;
+    appNote_ += "<div style=\"margin-top:15px;\">";
+    appNote_ += "<div style=\"background-color:#A4DDED;\"><b>&nbsp;" + appPubDate + " - " + appName + " " + appNewVer + " released</b><div>";
+    appNote_ += "<div><ul style=\"margin:5 0 0 -25;\">";
+    while (xmlReader.readNextStartElement())
+    {
+      if (xmlReader.name() == "Enhancement")
+      {
+        appNote_ += "<li><b>Enhancements</b></li><ul style=\"margin:5 0 5 -25;\">";
+        while (xmlReader.readNextStartElement())
+        {
+          if (xmlReader.name() == "item")
+            appNote_ += "<li>" + xmlReader.readElementText() + "</li>";
+        }
+        appNote_ += "</ul>";
+      }
+      else if (xmlReader.name() == "Update")
+      {
+        appNote_ += "<li><b>Updates</b></li><ul style=\"margin:5 0 5 -25;\">";
+        while (xmlReader.readNextStartElement())
+        {
+          if (xmlReader.name() == "item")
+            appNote_ += "<li>" + xmlReader.readElementText() + "</li>";
+        }
+        appNote_ += "</ul>";
+      }
+      else if (xmlReader.name() == "Fix")
+      {
+        appNote_ += "<li><b>Fixes</b></li><ul style=\"margin:5 0 5 -25;\">";
+        while (xmlReader.readNextStartElement())
+        {
+          if (xmlReader.name() == "item")
+            appNote_ += "<li>" + xmlReader.readElementText() + "</li>";
+        }
+        appNote_ += "</ul>";
+      }
+      else if (xmlReader.name() == "Binary")
+      {
+        int latestCompatibleOS = -1;
+        while (xmlReader.readNextStartElement())
+        {
+          if (xmlReader.name() == "item")
+          {
+            QString os = xmlReader.attributes().value("os").toString();
+            QString minver = xmlReader.attributes().value("minver").toString();
+            QString arch = xmlReader.attributes().value("arch").toString();
+            QString url = xmlReader.attributes().value("url").toString();
+            QString hash = xmlReader.attributes().value("hash").toString();
+            int osRequired = 9999;
+#if defined(Q_OS_MAC)
+            const int osVersion = static_cast<int>(QSysInfo::MacintoshVersion);
+            if (os.compare("mac") == 0)
+            {
+              if (minver.compare("10.5", Qt::CaseInsensitive) == 0)
+                osRequired = static_cast<int>(QSysInfo::MV_10_5);
+              else if (minver.compare("10.6", Qt::CaseInsensitive) == 0)
+                osRequired = static_cast<int>(QSysInfo::MV_10_6);
+#if QT_VERSION >= 0x040800
+              else if (minver.compare("10.7", Qt::CaseInsensitive) == 0)
+                osRequired = static_cast<int>(QSysInfo::MV_10_7);
+#elif QT_VERSION >= 0x050000
+              else if (minver.compare("10.8", Qt::CaseInsensitive) == 0)
+                osRequired = static_cast<int>(QSysInfo::MV_10_8);
+#endif
+#elif defined(Q_OS_WIN)
+            const int osVersion = static_cast<int>(QSysInfo::WindowsVersion);
+            if (os.compare("win") == 0)
+            {
+              if (minver.compare("WinXP", Qt::CaseInsensitive) == 0)
+                osRequired = static_cast<int>(QSysInfo::WV_XP);
+              else if (minver.compare("WinVista", Qt::CaseInsensitive) == 0)
+                osRequired = static_cast<int>(QSysInfo::WV_VISTA);
+              else if (minver.compare("Win7", Qt::CaseInsensitive) == 0)
+                osRequired = static_cast<int>(QSysInfo::WV_WINDOWS7);
+#else
+            const int osVersion = -1;
+            if (0)
+            {
+#endif
+              int archRequired = (arch.compare("x86",  Qt::CaseInsensitive) == 0 ? 32 : 64);
+              if ((QSysInfo::WordSize == archRequired) && (osVersion >= osRequired))
+              {
+                compatiblePackageFound = true;
+                if (osRequired > latestCompatibleOS)
+                {
+                  latestCompatibleOS = osRequired;
+                  this->m_Download.url = url;
+                  this->m_Download.hash = hash;
+                }
+              }
+            }
+            xmlReader.readNext();
+          }
+        }
+      }
+      xmlReader.readNext();
+    }
+    appNote_ += "</ul></div>";
+    appNote_ += "</div>";
+    
+    // Check if this new release is supported or not by the current OS
+    if (compatiblePackageFound)
+    {
+      appNote += appNote_;
+      updateAvailable = true;
+      if (this->isGreaterRelease(appNewVer.split("."), appLatestNewVer.split(".")))
+        appLatestNewVer = appNewVer;
+    }
+  }
+  else
+    xmlReader.skipCurrentElement();
 };
 
 void UpdateController::downloadUpdate()

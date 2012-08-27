@@ -798,11 +798,18 @@ QPushButton:pressed {
          <property name="title">
           <string>Update</string>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <layout class="QVBoxLayout" name="verticalLayout_10">
           <item>
            <widget class="QCheckBox" name="automaticCheckUpdateCheckBox">
             <property name="text">
              <string>Automatically check for update at startup</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="subscribeDevelopmentChannelCheckBox">
+            <property name="text">
+             <string>Subscribe to the development channel</string>
             </property>
            </widget>
           </item>

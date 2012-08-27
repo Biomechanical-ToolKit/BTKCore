@@ -50,7 +50,7 @@
   public:
     enum {DefaultConfigurationUse = 0, DefaultConfigurationPath, EventEditorWhenInserting, DefaultGroundOrientation, DefaultTimeBarEventDisplay,
           DefaultBackgroundColor, DefaultGridFrontColor, DefaultGridBackColor, DefaultSegmentColor, DefaultMarkerColor, DefaultMarkerRadius, DefaultTrajectoryLength, ForcePlatformAxesDisplay,
-          ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse,
+          ForcePlatformIndexDisplay, DefaultForcePlateColor, DefaultForceVectorColor, UserLayoutIndex, UserLayouts, AutomaticCheckUpdateUse, DevelopmentChannelSubscriptionUsed,
           DefaultGRFButterflyActivation, ForcePathDisplay, DefaultPlotLineWidth, ChartEventDisplay, chartUnitAxisX};
   
     Preferences(QWidget* parent = 0);
@@ -100,6 +100,7 @@
     void defaultForcePlateColorChanged(const QColor& color);
     void defaultForceVectorColorChanged(const QColor& color);
     void automaticCheckUpdateStateChanged(bool isChecked);
+    void subscribeDevelopmentChannelStateChanged(bool isChecked);
     void userLayoutsChanged(const QList<QVariant>& layouts, int index);
     void defaultGRFButterflyActivationChanged(int index);
     void showForcePathChanged(int index);

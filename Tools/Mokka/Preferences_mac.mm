@@ -106,6 +106,7 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->defaultChartEventDisplayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(showChartEvent(int)));
   connect(this->defaultChartUnitAxisXComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setChartUnitAxisX(int)));
   connect(this->automaticCheckUpdateCheckBox, SIGNAL(toggled(bool)), this, SLOT(setAutomaticCheckUpdate(bool)));
+  connect(this->subscribeDevelopmentChannelCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSubscribeDevelopmentChannel(bool)));
   connect(this->layoutTable, SIGNAL(userLayoutRemoved(int)), this, SIGNAL(userLayoutRemoved(int)));
   connect(this->layoutTable, SIGNAL(userLayoutLabelChanged(int, QString)), this, SIGNAL(userLayoutLabelChanged(int, QString)));
   connect(this->layoutTable, SIGNAL(userLayoutDropped(int, int)), this, SIGNAL(userLayoutDropped(int, int)));
@@ -326,6 +327,11 @@ void Preferences::setChartUnitAxisX(int index)
 void Preferences::setAutomaticCheckUpdate(bool isChecked)
 {
   emit automaticCheckUpdateStateChanged(isChecked);
+};
+
+void Preferences::setSubscribeDevelopmentChannel(bool isChecked)
+{
+  emit subscribeDevelopmentChannelStateChanged(isChecked);
 };
 
 void Preferences::setVisible(bool visible)

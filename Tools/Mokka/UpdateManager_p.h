@@ -40,6 +40,7 @@
 
 #include <QDialog>
 #include <QBuffer>
+#include <QXmlStreamReader>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -71,6 +72,7 @@ public:
   void setApplicationDownloadUrl(const QString& url);
   void setInstallationPath(const QString& path);
   const QString& installationPath() const;
+  void acceptDevelopmentUpdate(bool accepted);
   
 public slots:
   void checkUpdate();
@@ -100,6 +102,7 @@ signals:
   void installationFinalized();
   
 private:
+  void parseFeedItem(QXmlStreamReader& xmlReader, const QString& appName, QString& appLatestNewVer, QString& appNote, bool& updateAvailable);
   bool isNewRelease(const QStringList& rel) const {return (this->compareRelease(this->m_CurrentVersion, rel) < 0);};
   bool isGreaterRelease(const QStringList& max, const QStringList& rel) const {return (this->compareRelease(max, rel) > 0);};
   int compareRelease(const QStringList& max, const QStringList& rel) const;
@@ -110,6 +113,7 @@ private:
   QString m_FeedUrl;
   UpdateApplicationDownload m_Download;
   QString m_InstallationPath;
+  bool m_AcceptDevelopmentUpdate;
   QNetworkAccessManager* mp_Manager;
   QNetworkReply* mp_DownloadReply;
 };

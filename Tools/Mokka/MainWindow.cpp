@@ -431,6 +431,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(showChartEventChanged(int)), this, SLOT(setPreferenceShowChartEvent(int)));
   connect(this->mp_Preferences, SIGNAL(chartUnitAxisXChanged(int)), this, SLOT(setPreferenceChartUnitAxisX(int)));
   connect(this->mp_Preferences, SIGNAL(automaticCheckUpdateStateChanged(bool)), this, SLOT(setPreferenceAutomaticCheckUpdate(bool)));
+  connect(this->mp_Preferences, SIGNAL(subscribeDevelopmentChannelStateChanged(bool)), this, SLOT(setPreferenceSubscribeDevelopmentChannel(bool)));
 #ifdef Q_OS_MAC
   connect(this->mp_Preferences, SIGNAL(userLayoutRemoved(int)), this, SLOT(removeUserLayout(int)));
   connect(this->mp_Preferences, SIGNAL(userLayoutLabelChanged(int, QString)), this, SLOT(relabelUserLayout(int, QString)));
@@ -2543,6 +2544,13 @@ void MainWindow::setPreferenceAutomaticCheckUpdate(bool isChecked)
   settings.setValue("Preferences/checkUpdateStartup", isChecked);
 };
 
+void MainWindow::setPreferenceSubscribeDevelopmentChannel(bool isChecked)
+{
+  QSettings settings;
+  settings.setValue("Preferences/developmentChannelSubscription", isChecked);
+  this->mp_Updater->acceptDevelopmentUpdate(isChecked);
+};
+
 void MainWindow::removeUserLayout(int index)
 {
   this->m_UserLayouts.removeAt(index*2); // Name
@@ -2714,6 +2722,7 @@ void MainWindow::readSettings()
   int showChartEvent = settings.value("showChartEvent", 0).toInt();
   int chartUnitAxisX = settings.value("chartUnitAxisX", 0).toInt();
   bool checkUpdateStartup = settings.value("checkUpdateStartup", true).toBool();
+  bool developmentChannelSubscription = settings.value("developmentChannelSubscription", false).toBool();
   settings.endGroup();
   this->mp_Preferences->lastDirectory = this->m_LastDirectory;
   this->mp_Preferences->defaultConfigurationCheckBox->setChecked(defaultConfigurationUsed);
@@ -2738,6 +2747,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->defaultChartEventDisplayComboBox->setCurrentIndex(showChartEvent);
   this->mp_Preferences->defaultChartUnitAxisXComboBox->setCurrentIndex(chartUnitAxisX);
   this->mp_Preferences->automaticCheckUpdateCheckBox->setChecked(checkUpdateStartup);
+  this->mp_Preferences->subscribeDevelopmentChannelCheckBox->setChecked(developmentChannelSubscription);
 
 #ifdef Q_OS_WIN
   this->mp_Preferences->setPreference(Preferences::DefaultConfigurationUse, defaultConfigurationUsed);
@@ -2764,6 +2774,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::UserLayoutIndex, layoutIndex);
   this->mp_Preferences->setPreference(Preferences::UserLayouts, this->m_UserLayouts);
   this->mp_Preferences->setPreference(Preferences::AutomaticCheckUpdateUse, checkUpdateStartup);
+  this->mp_Preferences->setPreference(Preferences::DevelopmentChannelSubscriptionUsed, developmentChannelSubscription);
 #endif
   
   if (defaultConfigurationUsed && !defaultConfigurationPath.isEmpty())
@@ -2789,6 +2800,7 @@ void MainWindow::readSettings()
     this->multiView->setFrameAsChartUnitAxisX();
   else
     this->multiView->setTimeAsChartUnitAxisX();
+  this->mp_Updater->acceptDevelopmentUpdate(developmentChannelSubscription);
   
   // Import assistant
   settings.beginGroup("ImportAssistant");

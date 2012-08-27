@@ -58,6 +58,7 @@ public:
   
   void setIcon(const QString& path);
   void setFeedUrl(const QString& url);
+  void acceptDevelopmentUpdate(bool accepted);
   
 public slots:
   void checkUpdate(bool quietNoUpdate = false);

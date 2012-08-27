@@ -47,7 +47,7 @@ UpdateManagerNewVersionDialog::UpdateManagerNewVersionDialog(QWidget* parent)
   this->layout()->setContentsMargins(12,12,12,12);
   QFont f = this->textBrowser->font(); // Bold by default
   f = this->textBrowser->font();
-  f.setPointSize(12);
+  f.setPointSize(11);
   this->textBrowser->setFont(f);
 #endif
   

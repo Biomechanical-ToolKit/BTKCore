@@ -132,6 +132,12 @@ void UpdateManager::setFeedUrl(const QString& url)
   d->mp_Controller->setFeedUrl(url);
 };
 
+void UpdateManager::acceptDevelopmentUpdate(bool accepted)
+{
+  Q_D(UpdateManager);
+  d->mp_Controller->acceptDevelopmentUpdate(accepted);
+};
+
 void UpdateManager::checkUpdate(bool quietNoUpdate)
 {
   Q_D(UpdateManager);
@@ -361,7 +367,10 @@ void UpdateManager::notifyMessage(QMessageBox* msg, const QString& detail1, cons
 
 int UpdateManager::launchExternalUpdater(const QString& execPath, const QString& params)
 {
-#ifdef Q_OS_WIN
+#ifndef Q_OS_WIN
+  Q_UNUSED(execPath);
+  Q_UNUSED(params);
+#else
   // Without this copy, the LPCSTR (const char*) conversion is invalid (out of the scope) within the SHELLEXECUTEINFO structure
   std::string f = execPath.toStdString();
   std::string p = params.toStdString();

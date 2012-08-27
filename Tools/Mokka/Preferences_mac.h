@@ -88,6 +88,7 @@ public slots:
   void showChartEvent(int index);
   void setChartUnitAxisX(int index);
   void setAutomaticCheckUpdate(bool isChecked);
+  void setSubscribeDevelopmentChannel(bool isChecked);
   
   virtual void setVisible(bool visible);
 
@@ -114,6 +115,7 @@ signals:
   void showChartEventChanged(int index);
   void chartUnitAxisXChanged(int index);
   void automaticCheckUpdateStateChanged(bool isChecked);
+  void subscribeDevelopmentChannelStateChanged(bool isChecked);
   void userLayoutRemoved(int index);
   void userLayoutLabelChanged(int index, const QString& label);
   void userLayoutDropped(int newRow, int oldRow);
