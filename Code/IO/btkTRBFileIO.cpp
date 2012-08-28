@@ -170,7 +170,7 @@ namespace btk
       std::vector<std::string> labels;
       std::vector<int> indices;
       int numMarkers = -1;
-      uint16_t index, color;
+      uint16_t index; //, color;
       int offset;
       while (1)
       {
@@ -178,7 +178,8 @@ namespace btk
         {
           offset = bifs.ReadU16();
           index = bifs.ReadU16();
-          color = bifs.ReadU16();
+          //color = bifs.ReadU16();
+          bifs.SeekRead(2, BinaryFileStream::Current); // Color
           std::string label = bifs.ReadString((offset - 1) * 4);
           label = label.erase(label.find_last_not_of((char)0x20)+1);
           label = label.erase(label.find_last_not_of((char)0x00)+1);

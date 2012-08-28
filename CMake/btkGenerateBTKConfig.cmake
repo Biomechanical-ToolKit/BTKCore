@@ -36,7 +36,7 @@ SET(BTK_INCLUDE_DIRS_CONFIG
 
 #---------------------------------------------------------------------------
 # Configure BTKConfig.cmake for the build tree.
-CONFIGURE_FILE(${CMAKE_MODULE_PATH}/BTKConfig.cmake.in
+CONFIGURE_FILE(${BTK_CMAKE_MODULE_PATH}/BTKConfig.cmake.in
                ${BTK_BINARY_DIR}/BTKConfig.cmake @ONLY IMMEDIATE)
 
 #---------------------------------------------------------------------------
@@ -79,7 +79,7 @@ FOREACH(p ${BTK_INSTALL_SHARE_DIR_COUNT})
     )
 ENDFOREACH(p)
 
-CONFIGURE_FILE(${CMAKE_MODULE_PATH}/BTKConfig.cmake.in
+CONFIGURE_FILE(${BTK_CMAKE_MODULE_PATH}/BTKConfig.cmake.in
                ${BTK_BINARY_DIR}/Utilities/BTKConfig.cmake @ONLY IMMEDIATE)
                
 # Setup an install rule for the config file.

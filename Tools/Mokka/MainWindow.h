@@ -49,7 +49,7 @@ class FileInfoDockWidget;
 class Metadata;
 class ModelDockWidget;
 class ProgressWidget;
-class UpdateChecker;
+class UpdateManager;
 class QUndoStack;
 class ChartDialog;
 
@@ -165,7 +165,8 @@ public slots:
   void setPreferenceDefaultOrientation(int index);
   void setPreferenceDefaultTimeBarEventDisplay(int index);
   void setPreferenceDefaultBackgroundColor(const QColor& color);
-  void setPreferenceDefaultGridColor(const QColor& color);
+  void setPreferenceDefaultGridFrontColor(const QColor& color);
+  void setPreferenceDefaultGridBackColor(const QColor& color);
   void setPreferenceDefaultSegmentColor(const QColor& color);
   void setPreferenceDefaultMarkerColor(const QColor& color);
   void setPreferenceDefaultMarkerRadius(double radius);
@@ -180,6 +181,7 @@ public slots:
   void setPreferenceShowChartEvent(int index);
   void setPreferenceChartUnitAxisX(int index);
   void setPreferenceAutomaticCheckUpdate(bool isChecked);
+  void setPreferenceSubscribeDevelopmentChannel(bool isChecked);
   // Others
   void updateSelectedMarkersRadius(double r);
   void updateSelectedVideosDelay(double d);
@@ -226,7 +228,7 @@ private:
   FileInfoDockWidget* mp_FileInfoDock;
   ModelDockWidget* mp_ModelDock;
   ImportAssistantDialog* mp_ImportAssistant;
-  UpdateChecker* mp_UpdateChecker;
+  UpdateManager* mp_Updater;
   Preferences* mp_Preferences;
 #ifdef Q_OS_MAC
   QMenuBar* mp_MacMenuBar;

@@ -46,6 +46,8 @@
 
 #include <cstdio> // EOF under Linux
 
+const int num_max_log_messages = 250;
+
 void LoggerWidget::redirectCout(const QString& id)
 {
   static LoggerCoutRediction logCout(id);
@@ -94,11 +96,9 @@ void LoggerWidget::messageHandler(QtMsgType type, const char* msg)
   item->setData(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"), LoggerMsgDateTime);
   item->setData(msgDetail, LoggerMsgDetail);
   
-#if 1
   LoggerWidget::model()->insertRow(0, item); // Push front
-#else
-  LoggerWidget::model()->appendRow(item); // Push back
-#endif
+  if (LoggerWidget::model()->rowCount() > num_max_log_messages)
+    LoggerWidget::model()->setRowCount(num_max_log_messages);
 };
  
 const QIcon& LoggerWidget::infoIcon()

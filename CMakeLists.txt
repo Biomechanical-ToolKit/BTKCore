@@ -9,6 +9,10 @@ SET(BTK_VERSION_MAJOR 0)
 SET(BTK_VERSION_MINOR 1)
 SET(BTK_VERSION_PATCH 10)
 SET(BTK_VERSION_STRING "${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}.${BTK_VERSION_PATCH}")
+# The major.minor is enough to distinguish available features of the toolkit. Moreover, 
+# this variable is used to create lib/share/include folders where the patch number does 
+# not need to be included.
+SET(BTK_LIBRARY_VERSION_STRING "${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}")
 
 # ------------------------------------------------------------------------
 # COMPILATION INSTRUCTIONS
@@ -23,7 +27,7 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
 # the RPATH to be used when installing
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/btk-${BTK_VERSION_STRING}")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/btk-${BTK_LIBRARY_VERSION_STRING}")
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -105,10 +109,10 @@ IF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
   ENDIF(USE_INCLUDED_BOOST)
 ENDIF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
 
-INCLUDE(${CMAKE_MODULE_PATH}/btkExtraCompilerFlags.cmake)
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkExtraCompilerFlags.cmake)
 # The entire BTK tree should use the same include path
 # Create the list of include directories needed for BTK header files.
-INCLUDE(${CMAKE_MODULE_PATH}/btkIncludeDirectories.cmake)
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkIncludeDirectories.cmake)
 # This should be the only INCLUDE_DIRECTORIES command in the entire
 # tree, except for the Utilities and Wrapping directories.  We need to
 # do this in one place to make sure the order is correct.
@@ -170,15 +174,15 @@ IF(NOT BTK_INSTALL_BIN_DIR)
 ENDIF(NOT BTK_INSTALL_BIN_DIR)
 
 IF(NOT BTK_INSTALL_LIB_DIR)
-  SET(BTK_INSTALL_LIB_DIR "/lib/btk-${BTK_VERSION_STRING}")
+  SET(BTK_INSTALL_LIB_DIR "/lib/btk-${BTK_LIBRARY_VERSION_STRING}")
 ENDIF(NOT BTK_INSTALL_LIB_DIR)
 
 IF(NOT BTK_INSTALL_SHARE_DIR)
-  SET(BTK_INSTALL_SHARE_DIR "/share/btk-${BTK_VERSION_STRING}")
+  SET(BTK_INSTALL_SHARE_DIR "/share/btk-${BTK_LIBRARY_VERSION_STRING}")
 ENDIF(NOT BTK_INSTALL_SHARE_DIR)
 
 IF(NOT BTK_INSTALL_INCLUDE_DIR)
-  SET(BTK_INSTALL_INCLUDE_DIR "/include/btk-${BTK_VERSION_STRING}")
+  SET(BTK_INSTALL_INCLUDE_DIR "/include/btk-${BTK_LIBRARY_VERSION_STRING}")
 ENDIF(NOT BTK_INSTALL_INCLUDE_DIR)
 
 IF(NOT BTK_INSTALL_PACKAGE_DIR)
@@ -377,7 +381,7 @@ CMAKE_EXPORT_BUILD_SETTINGS(${BTK_BINARY_DIR}/BTKBuildSettings.cmake)
 EXPORT_LIBRARY_DEPENDENCIES(${BTK_BINARY_DIR}/BTKLibraryDepends.cmake)
 
 # Create the BTKConfig.cmake file containing the BTK configuration.
-INCLUDE (${CMAKE_MODULE_PATH}/btkGenerateBTKConfig.cmake)
+INCLUDE (${BTK_CMAKE_MODULE_PATH}/btkGenerateBTKConfig.cmake)
 
 IF(NOT BTK_INSTALL_NO_DEVELOPMENT)
   INSTALL(FILES

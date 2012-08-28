@@ -12,6 +12,8 @@ ELSE (MOKKA_VERSION_PATCH EQUAL 0)
   SET(MOKKA_VERSION_STRING "${MOKKA_VERSION_MAJOR}.${MOKKA_VERSION_MINOR}.${MOKKA_VERSION_PATCH}")
 ENDIF (MOKKA_VERSION_PATCH EQUAL 0)
 
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkMinizipSources.cmake)
+
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/mokkaConfigure.h.in
                ${CMAKE_CURRENT_BINARY_DIR}/mokkaConfigure.h @ONLY IMMEDIATE)
 
@@ -50,10 +52,14 @@ SET(Mokka_CPP
   TimeEventControlerWidget.cpp
   TimeEventFunctors.cpp
   UndoCommands.cpp
-  UpdateChecker.cpp
+  UpdateManager.cpp
+  UpdateManager_controller.cpp
+  UpdateManager_installer.cpp
+  UpdateManager_version.cpp
   Viz3DWidget.cpp
   VideoWidget.cpp
   main.cpp
+  ${BTK_MINIZIP_SRCS}
   )
 
 SET(Mokka_H
@@ -85,7 +91,8 @@ SET(Mokka_H
   ProgressWidget.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
-  UpdateChecker.h
+  UpdateManager.h
+  UpdateManager_p.h
   Viz3DWidget.h
   VideoWidget.h
   )
@@ -107,7 +114,8 @@ SET(Mokka_UI
   NewSegmentDialog.ui
   ProgressWidget.ui
   TimeEventControlerWidget.ui
-  UpdateChecker.ui
+  UpdateManagerNewVersionDialog.ui
+  UpdateManagerInstallerDialog.ui
   )
 
 SET(Mokka_QRC
@@ -126,7 +134,8 @@ ENDIF(APPLE)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}
                     ${CMAKE_CURRENT_SOURCE_DIR}
                     ${QT_INCLUDE_DIR}
-                    ${BTK_SOURCE_DIR}/Utilities/ParserCmdLine)
+                    ${BTK_SOURCE_DIR}/Utilities/ParserCmdLine
+                    ${BTK_MINIZIP_INCLUDE_DIR})
 
 QT4_WRAP_UI(Mokka_UI_H ${Mokka_UI})
 QT4_WRAP_CPP(Mokka_MOC ${Mokka_H})
@@ -158,8 +167,8 @@ ELSEIF(APPLE)
   FUNCTION(MakeOSXBundleApp target binary_dir install_dir)
     SET (OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/OSXBundle.sh")
     SET (OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/OSXBundle.cmake")
-    CONFIGURE_FILE("${CMAKE_MODULE_PATH}/OSXBundle/CompleteBundle.cmake.in" "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
-    CONFIGURE_FILE("${CMAKE_MODULE_PATH}/OSXBundle/CreateBundle.sh.in" "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
+    CONFIGURE_FILE("${BTK_CMAKE_MODULE_PATH}/OSXBundle/CompleteBundle.cmake.in" "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
+    CONFIGURE_FILE("${BTK_CMAKE_MODULE_PATH}/OSXBundle/CreateBundle.sh.in" "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
     INSTALL(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}")
   ENDFUNCTION(MakeOSXBundleApp)
 ENDIF(WIN32)
@@ -171,7 +180,7 @@ SET(MOKKA_HELP_DIR "${BTK_EXECUTABLE_PATH}/MokkaHelp")
 IF(WIN32)
   TARGET_LINK_LIBRARIES(Mokka ${QT_QTMAIN_LIBRARY})
 ELSEIF(APPLE)
-  CONFIGURE_FILE("${CMAKE_MODULE_PATH}/OSXBundle/ApplicationInfo.plist.in" "${CMAKE_CURRENT_BINARY_DIR}/MokkaInfo.plist")
+  CONFIGURE_FILE("${BTK_CMAKE_MODULE_PATH}/OSXBundle/ApplicationInfo.plist.in" "${CMAKE_CURRENT_BINARY_DIR}/MokkaInfo.plist")
   SET_TARGET_PROPERTIES(Mokka PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/MokkaInfo.plist")
   SET(MOKKA_HELP_DIR "${BTK_EXECUTABLE_PATH}/Mokka.app/Contents/Resources/MokkaHelp")
 ENDIF(WIN32)
@@ -199,3 +208,16 @@ IF(NOT BTK_INSTALL_NO_RUNTIME)
     ENDIF(WIN32)
   ENDIF(APPLE)
 ENDIF(NOT BTK_INSTALL_NO_RUNTIME)
+
+# -----------------------------------------------------------------------------
+
+# Mokka Updater (for Windows Vista/7 only)
+IF(WIN32)
+  SET(MokkaUpdater_SRC
+      Updater/main.cpp
+      Updater/InfoVersion.rc
+      Updater/Icon.rc)
+  
+  ADD_EXECUTABLE(MokkaUpdater WIN32 ${MokkaUpdater_SRC})
+  TARGET_LINK_LIBRARIES(MokkaUpdater ${QT_LIBRARIES} ${QT_QTMAIN_LIBRARY})
+ENDIF(WIN32)

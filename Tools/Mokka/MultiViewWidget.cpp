@@ -211,12 +211,17 @@ void MultiViewWidget::initialize()
   vtkActor* actor = vtkActor::New();
   actor->SetMapper(mapper);
   actor->SetProperty(prop);
+  vtkProperty* propBackface = vtkProperty::New();
+  propBackface->DeepCopy(prop);
+  propBackface->SetColor(1.0, 0.0, 0.0);
+  actor->SetBackfaceProperty(propBackface);
   actor->PickableOff();
   renderer->AddViewProp(actor);
   (*this->mp_VTKActor)[VTK_GROUND] = actor;
   // Cleanup for ground
   mapper->Delete();
   prop->Delete();
+  propBackface->Delete();
   // Camera
   renderer->GetActiveCamera()->Elevation(-60);
   renderer->ResetCamera();
@@ -1294,9 +1299,15 @@ void MultiViewWidget::setDefaultBackgroundColor(const QColor& color)
   this->updateViews();
 };
 
-void MultiViewWidget::setDefaultGridColor(const QColor& color)
+void MultiViewWidget::setDefaultGridFrontColor(const QColor& color)
 {
   (*this->mp_VTKActor)[VTK_GROUND]->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+  this->updateViews();
+};
+
+void MultiViewWidget::setDefaultGridBackColor(const QColor& color)
+{
+  (*this->mp_VTKActor)[VTK_GROUND]->GetBackfaceProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
   this->updateViews();
 };
 

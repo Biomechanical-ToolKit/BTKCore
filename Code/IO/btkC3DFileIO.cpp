@@ -1063,7 +1063,7 @@ namespace btk
         throw(C3DFileIOException("No File access"));
       
       // Update data in the acquisition
-      // Require to clone somee data from the input.
+      // Require to clone some data from the input.
       Acquisition::Pointer in = Acquisition::New();
       in->SetFirstFrame(input->GetFirstFrame());
       in->SetPointFrequency(input->GetPointFrequency());
