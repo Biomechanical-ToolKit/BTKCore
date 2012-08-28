@@ -36,14 +36,12 @@
 #ifndef ChartWidget_h
 #define ChartWidget_h
 
-#include <btkVTKChartTimeSeries.h>
+#include <btkVTKChartTimeSeries.h> // VTKCurrentFrameFunctor, VTKRegionOfInterestFunctor, VTKEventsFunctor
 #include <btkPoint.h>
 
 #include <QVTKWidget2.h>
 #include <vtkDoubleArray.h>
 #include <vtkstd/vector>
-
-#include <btkVTKChartTimeSeries.h> // VTKCurrentFrameFunctor, VTKRegionOfInterestFunctor, VTKEventsFunctor
 
 class Acquisition;
 class ChartOptionsWidget;
@@ -143,6 +141,7 @@ public slots:
   
 signals:
   void pausePlaybackRequested(bool paused);
+  void exportToImageRequested(btk::VTKChartTimeSeries* chart);
   
 private slots:
   void setLastContextMenuPosition(const QPoint& globalPos);
@@ -174,6 +173,7 @@ protected:
   ChartOptionsWidget* mp_ChartOptions;
   QList<QAction*> m_ViewActions;
   QPoint m_LastContextMenuPosition;
+  
 };
 
 class AbstractChartData

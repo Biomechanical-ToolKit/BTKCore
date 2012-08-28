@@ -50,7 +50,7 @@
 #include <vtkTextProperty.h>
 #include <vtkPlot.h>
 #include <vtkChartLegend.h>
-#include <vtkRenderWindow.h>
+#include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkContextScene.h>
 #include <vtkPen.h>

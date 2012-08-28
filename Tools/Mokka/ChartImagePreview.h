@@ -36,7 +36,7 @@
 #ifndef ChartImagePreview_h
 #define ChartImagePreview_h
 
-#include <QVTKWidget.h>
+#include <QVTKWidget2.h>
 
 #include <vtkStdString.h>
 
@@ -45,9 +45,7 @@ namespace btk
   class VTKChartTimeSeries;
 };
 
-class vtkRenderer;
-
-class ChartImagePreview : public QVTKWidget
+class ChartImagePreview : public QVTKWidget2
 {
   Q_OBJECT
   
@@ -58,7 +56,6 @@ public:
   void initialize();
   btk::VTKChartTimeSeries* chart() const {return this->mp_Chart;};
   void setChart(vtkstd::vector<vtkStdString>& units, btk::VTKChartTimeSeries* chart);
-  vtkRenderer* renderer() const {return this->mp_Renderer;};
   
 protected:
   void keyPressEvent(QKeyEvent* event);
@@ -66,7 +63,6 @@ protected:
   void mousePressEvent(QMouseEvent* event);
   
 private:
-  vtkRenderer* mp_Renderer;
   btk::VTKChartTimeSeries* mp_Chart;
 };
 

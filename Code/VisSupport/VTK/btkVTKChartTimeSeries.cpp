@@ -204,7 +204,7 @@ namespace btk
       return;
     this->mp_Legend = legend;
     this->mp_Legend->SetChart(this);
-    #warning Need to add the legend in the scene!
+    this->AddItem(this->mp_Legend);
   };
   
   /**

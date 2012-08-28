@@ -39,7 +39,7 @@
 #include "AbstractMultiView.h"
 #include "Model.h" // Pair
 
-#include <btkVTKChartTimeSeries.h>
+#include <btkVTKChartTimeSeries.h> // VTKCurrentFrameFunctor, VTKRegionOfInterestFunctor, VTKEventsFunctor
 
 #include <vtkEventQtSlotConnect.h>
 #include <vtkMapperCollection.h>
@@ -56,6 +56,7 @@ class vtkProcessMap;
 class vtkActorMap;
 class vtkDoubleArray;
 class ChartDialog;
+class ChartExportDialog;
 
 class MultiViewWidget : public AbstractMultiView
 {
@@ -160,6 +161,7 @@ public slots:
   void setTimeAsChartUnitAxisX();
   void showChartEvent(bool visible);
   void setDefaultPlotLineWidth(double width);
+  void exportChartToImage(btk::VTKChartTimeSeries* chart);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
@@ -223,6 +225,7 @@ private:
   QMenu* mp_ChartBottomAxisDisplayMenu;
   QAction* mp_ActionChartAxisFrame;
   QAction* mp_ActionChartAxisTime;
+  ChartExportDialog* mp_ChartExporter;
 };
 
 #endif // MultiViewWidget_h

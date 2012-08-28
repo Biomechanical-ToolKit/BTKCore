@@ -57,6 +57,7 @@
 #include <vtkFloatArray.h>
 #include <vtkContextInteractorStyle.h>
 #include <vtkContextMouseEvent.h>
+#include <vtkRenderWindowInteractor.h>
 
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -528,15 +529,8 @@ void ChartWidget::exportToImage()
 {
   btk::VTKChartTimeSeries* chart = this->mp_ChartContentWidget->focusedChart(this->m_LastContextMenuPosition);
   if (chart != 0)
-  {
-    emit pausePlaybackRequested(true);
-    ChartExportDialog exportDlg(this);
-    exportDlg.setChart(chart);
-    exportDlg.exec();
-    emit pausePlaybackRequested(false);
-  }
+    emit exportToImageRequested(chart);
 };
-
 void ChartWidget::removeAllPlot()
 {
   this->mp_ChartOptions->clear();
