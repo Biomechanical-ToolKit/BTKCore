@@ -41,7 +41,7 @@
 
 namespace btk
 {
- /**
+  /**
    * @class MergeAcquisitionFilter btkMergeAcquisitionFilter.h
    * @brief Merges or concatenates two or more btk::Acquisition objects into a single new one.
    *
@@ -79,11 +79,11 @@ namespace btk
    */
   /**
    * @var MergeAcquisitionFilter::KeepAllFrames
-   *
+   * Option to keep all the frames of the given acquisitions during the merging process
    */
   /**
    * @var MergeAcquisitionFilter::KeepFromHighestFirstFrame
-   *
+   * Option to keep only the frames starting from the highest first frame extracted from the given acquisitions.
    */
   
   /**

@@ -81,8 +81,16 @@ namespace btk
   
   /**
    * @class DownsampleFilter btkDownsampleFilter.h
-   * @brief Downsample dataExtracts a frame from a collection of btk::Measure objects
+   * @brief Downsample data stored in the given input
    * @tparam T Must be a class inheriting of btk::DataObject
+   *
+   * To downsample data, you need to set the up/down sample ratio using the method SetUpDownRatio().
+   * The given value is an integer corresponding to the ratio used to extract only the value of interest.
+   * For example, if you have 200 frames and a ratio of 10, then 20 frames will be extracted (one frame each 10 frames).
+   *
+   * Note: This class require specialization for each kind of class. At this moment, only the specialization of the following classes are implemented:
+   *         - btk::Wrench
+   *         - btk::WrenchCollection
    *
    * @ingroup BTKBasicFilters
    */
@@ -134,11 +142,11 @@ namespace btk
   
   /**
    * @fn template <class T> int DownsampleFilter<T>::GetUpDownRatio() const
-   * Gets the index of the frame to extract.
+   * Gets the ratio used to downsample the data.
    */
   
   /**
-   * Sets the index of the frame to extract.
+   * Sets the ratio used to downsample the data.
    */
   template <class T>
   void DownsampleFilter<T>::SetUpDownRatio(int ratio)

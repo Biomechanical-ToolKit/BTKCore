@@ -42,7 +42,10 @@ namespace btk
    * @class ForcePlatformWrenchFilter btkForcePlatformWrenchFilter.h
    * @brief Calcule the wrench of the center of the force platform data, expressed in the global frame (by default).
    *
-   * You can use the method 
+   * Based on the given collection of forceplate set in input, this filter transform the associated analog channels in forces and moments.
+   * This transformation take into account the type of each force platform.
+   *
+   * You can use the method SetTransformToGlobalFrame() to have the wrench expressed in the frame of the force platform.
    *
    * @ingroup BTKBasicFilters
    */

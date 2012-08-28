@@ -41,6 +41,15 @@ namespace btk
    * @class ForcePlatform btkForcePlatform.h
    * @brief Base class for all type of force platform.
    *
+   * This class is generic and doesn't know its type, nor the number of analog channels used.
+   * To use predefined force platform as proposed in the documentation of the C3D file format, check the following classes:
+   *  - btk::ForcePlatformType1: 6 channels (FX, FY, FZ, PX, PY, MZ);
+   *  - btk::ForcePlatformType2: 6 channels (FX, FY, FZ, MX, MY, MZ);
+   *  - btk::ForcePlatformType3: 8 channels (FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23);
+   *  - btk::ForcePlatformType4: Same as Type-2 + calibration matrix 6 (columns) by 6 (rows);
+   *  - btk::ForcePlatformType5: Same as Type-3 + calibration matrix 6 (columns) by 8 (rows);
+   *  - btk::ForcePlatformType6: 12 channels (FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4] + calibration matrix 12 by 12).
+   *
    * @ingroup BTKCommon 
    */
   /**
@@ -308,4 +317,11 @@ namespace btk
     this->m_Channels = AnalogCollection::New();
     this->m_Type = 0;
   };
-};  
+  
+  ForcePlatform::ForcePlatform(const ForcePlatform& toCopy)
+  : m_CalMatrix(toCopy.m_CalMatrix), m_Origin(toCopy.m_Origin), m_Corners(toCopy.m_Corners)
+  {
+    this->m_Channels = toCopy.m_Channels->Clone();
+    this->m_Type = toCopy.m_Type;
+  };
+};

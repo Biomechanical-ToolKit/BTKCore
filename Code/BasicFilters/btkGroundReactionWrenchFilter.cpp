@@ -43,7 +43,24 @@ namespace btk
    * @brief Transform force platform data into ground reaction wrenches.
    *
    * Theses wrenches are expressed in the global frame. The point of application (PWA)
-   * of each wrench is calculated from Shimba (1984),
+   * of each wrench is calculated from Shimba (1984).
+   * Compared to the center of pressure (COP), the PWA take into account all the forces
+   * and moments (and does not assume any null forces).
+   *
+   * Note: For gait analysis, the COP and PWA are very similar.
+   *
+   * Because the computation of the PWA (as the COP) is sensitive to small (vertical) forces, the methods 
+   * SetThresholdValue and SetThresholdState() are provided to not compute the PWA if the vertical forces is
+   * the threshold. You first need to set the value and then activate the threshold method.
+   * By default, this threshold is not activated and the values is set to 0.
+   * As for example:
+   * @code
+   * btk::GroundReactionWrenchFilter::Pointer grwf = btk::GroundReactionWrenchFilter::New()
+   * grwf->SetThresholdValue(5.0); // 5 newtons
+   * grwf->SetThresholdState(true);
+   * @endcode
+   *
+   * Finally, you can also use the method SetTransformToGlobalFrame() to have the wrench expressed in the frame of the force platform.
    *
    * @par Reference
    * Shimba T.@n

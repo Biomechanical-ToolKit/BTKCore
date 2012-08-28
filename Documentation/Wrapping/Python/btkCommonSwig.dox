@@ -1,0 +1,269 @@
+namespace btk
+{
+/**
+ * @class btkEvent
+ * @brief Label a specific time/frame during an acquisition.
+ */
+/**
+ * @var btkEvent::Unknown
+ * Unknown method used to detect the event.
+ */
+/**
+ * @var btkEvent::Manual
+ * Event detected manually.
+ */
+/**
+ * @var btkEvent::Automatic
+ * Automatic method used to detect the event.
+ */
+/**
+ * @var btkEvent::FromForcePlatform
+ * Method based on force platform data to detect the event.
+ */
+ 
+/** 
+ * @class btkAnalog
+ * @brief Analog channel data along the time.
+ */
+/**
+ * @var btkAnalog::Unknown
+ * Unknown gain.
+ */
+/**
+ * @var btkAnalog::PlusMinus10
+ * Gain for the range +/- 10 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus5
+ * Gain for the range +/- 5 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus2Dot5
+ * Gain for the range +/- 2.5 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus1Dot25
+ * Gain for the range +/- 1.25 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus1
+ * Gain for the range +/- 1 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus0Dot5
+ * Gain for the range +/- 0.5 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus0Dot25
+ * Gain for the range +/- 0.25 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus0Dot1
+ * Gain for the range +/- 0.1 volts.
+ */
+/**
+ * @var btkAnalog::PlusMinus0Dot05
+ * Gain for the range +/- 0.05 volts.
+ */
+ 
+/** 
+ * @class btkPoint
+ * @brief Coordinates of a point in a 3D space along the time.
+ */
+/**
+ * @var btkPoint::Marker
+ * Enum value which set the point object as a marker.
+ */
+/**
+ * @var btkPoint::Angle
+ * Enum value which set the point object as an angle.
+ */
+/**
+ * @var btkPoint::Force
+ * Enum value which set the point object as a force.
+ */
+/**
+ * @var btkPoint::Moment
+ * Enum value which set the point object as a moment.
+ */
+/**
+ * @var btkPoint::Power
+ * Enum value which set the point object as a power.
+ */
+/**
+ * @var btkPoint::Scalar
+ * Enum value which set the point object as a scalar.
+ */
+/**
+ * @var btkPoint::Reaction
+ * Special type to indicate the point corresponds to one part of a wrench (not really used);
+ */
+ 
+/**
+ * @class btkForcePlatform
+ * @brief Base class for all type of force platform.
+ */
+ 
+/**
+ * @class btkForcePlatformType1
+ * @brief Force platform Type-1 (6 channels: FX, FY, FZ, PX, PY, MZ).
+ */
+
+/**
+ * @class btkForcePlatformType2
+ * @brief Force platform Type-2 (6 channels: FX, FY, FZ, MX, MY, MZ).
+ */
+
+/**
+ * @class btkForcePlatformType3
+ * @brief Force platform Type-3 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23).
+ */
+ 
+/**
+ * @class btkForcePlatformType4
+ * @brief Force platform Type-4 (Same as Type-2 + calibration matrix 6 by 6).
+ */
+ 
+/**
+ * @class btkForcePlatformType5
+ * @brief Force platform Type-5 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23 + calibration matrix 6 (columns) by 8 (rows)).
+ */
+ 
+/**
+ * @class btkForcePlatformType6
+ * @brief Force platform Type-6 (12 channels: FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4] + calibration matrix 12 by 12).
+ */
+ 
+/**
+ * @class btkWrench
+ * @brief Represents a wrench as position, force and moment varying during the time.
+ */
+ 
+/**
+ * @class btkIMU
+ * @brief Container of analog channels representing an inertial measurement unit (IMU).
+ */
+ 
+/**
+ * @class btkAcquisition
+ * @brief Contains the data related to a biomechanical acquisition.
+ */
+/**
+ * @var btkAcquisition::Bit8
+ * 8-bit resolution for the analog to digital converter (ADC).
+ */
+/**
+ * @var btkAcquisition::Bit10
+ * 10-bit resolution for the analog to digital converter (ADC).
+ */
+/**
+ * @var btkAcquisition::Bit12
+ * 12-bit resolution for the analog to digital converter (ADC).
+ */
+/**
+ * @var btkAcquisition::Bit14
+ * 14-bit resolution for the analog to digital converter (ADC).
+ */
+/**
+ * @var btkAcquisition::Bit16
+ * 16-bit resolution for the analog to digital converter (ADC).
+ */
+  
+/**
+ * @class btkEventCollection
+ * @brief Collection of events stored in a list.
+ */
+/**
+ * @class btkEventCollectionIterator
+ * @brief Iterator to pass trough the collection of events.
+ */
+ 
+/**
+ * @class btkAnalogCollection
+ * @brief Collection of analog channels stored in a list.
+ */
+/**
+ * @class btkAnalogCollectionIterator
+ * @brief Iterator to pass trough the collection of analog channels.
+ */
+ 
+/**
+ * @class btkPointCollection
+ * @brief Collection of points stored in a list.
+ */
+/**
+ * @class btkPointCollectionIterator
+ * @brief Iterator to pass trough the collection of points.
+ */
+   
+/**
+ * @class btkForcePlatformCollection
+ * @brief Collection of force platform stored in a list.
+ */
+/**
+ * @class btkForcePlatformCollectionIterator
+ * @brief Iterator to pass trough the collection of force platform.
+ */
+  
+/**
+ * @class btkWrenchCollection
+ * @brief Collection of wrenches stored in a list.
+ */
+/**
+ * @class btkWrenchCollectionIterator
+ * @brief Iterator to pass trough the collection of wrenches.
+ */
+
+/**
+ * @class btkIMUCollection
+ * @brief Collection of IMUs stored in a list.
+ */
+/**
+ * @class btkIMUCollectionIterator
+ * @brief Iterator to pass trough the collection of IMUs.
+ */
+
+/**
+ * @class btkMetaData
+ * @brief Store data which cannot be embedded within timeseries (calibration matrix, subject informations, ...).
+ */
+/**
+ * @class btkMetaDataIterator
+ * @brief Iterator to pass trough a level of metadata.
+ */
+/**
+ * @class btkMetaDataInfo
+ * @brief Container class to store data of a btkMetaData object.
+ */
+/**
+ * @var btkMetaDataInfo::Char
+ * Enum value which represents the string.
+ */
+/**
+ * @var btkMetaDataInfo::Byte
+ * Enum value which represents the signed 8-bit integers.
+ */
+/**
+ * @var btkMetaDataInfo::Integer
+ * Enum value which represents the the signed 16-bit integers.
+ */
+/**
+ * @var btkMetaDataInfo::Real
+ * Enum value which represents the floats.
+ */
+ 
+/**
+ * @class btkDoubleArray
+ * @brief Array of doubles stored in a btkMetaDataInfo object.
+ */
+ 
+/**
+ * @class btkIntArray
+ * @brief Array of integers stored in a btkMetaDataInfo object.
+ */
+ 
+/**
+ * @class btkStringArray
+ * @brief Array of strings stored in a btkMetaDataInfo object.
+ */
+}

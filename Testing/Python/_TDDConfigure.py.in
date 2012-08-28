@@ -1,0 +1,7 @@
+TDD_FilePathIN = '${BTK_SOURCE_DIR}/Testing/Data/Input/'
+TDD_FilePathOUT = '${BTK_SOURCE_DIR}/Testing/Data/Output/'
+
+C3DFilePathIN = TDD_FilePathIN + 'C3DSamples/'
+C3DFilePathOUT = TDD_FilePathOUT + 'C3DSamples/'
+TRCFilePathIN = TDD_FilePathIN + 'TRCSamples/'
+TRCFilePathOUT = TDD_FilePathOUT + 'TRCSamples/'

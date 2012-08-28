@@ -1,0 +1,117 @@
+namespace btk
+{
+  /**
+   * @class btkAcquisitionUnitConverter
+   * @brief Convert the units of the given input for points and analog channels.
+   */
+  /**
+   * @var btkAcquisitionUnitConverter::Length
+   * Enum value which represent the length unit.
+   */
+  /**
+   * @var btkAcquisitionUnitConverter::Angle
+   * Enum value which represent the angle unit.
+   */
+  /**
+   * @var btkAcquisitionUnitConverter::Force
+   * Enum value which represent the force unit.
+   */
+  /**
+   * @var btkAcquisitionUnitConverter::Moment
+   * Enum value which represent the moment unit.
+   */
+  /**
+   * @var btkAcquisitionUnitConverter::Power
+   * Enum value which represent the power unit.
+   */
+  
+  /**
+   * @class btkWrenchDownsampleFilter
+   * @brief Downsample data stored in a wrench
+   */ 
+   
+  /**
+   * @class btkWrenchCollectionDownsampleFilter
+   * @brief Downsample a collection of wrench
+   */
+ 
+  /**
+   * @class btkForcePlatformsExtractor
+   * @brief Extracts force platform data from a btk::Acquisition object. 
+   */
+  
+  /**
+   * @class btkForcePlatformWrenchFilter
+   * @brief Calcule the wrench of the center of the force platform data, expressed in the global frame (by default).
+   */
+  
+  /**
+   * @class btkGroundReactionWrenchFilter
+   * @brief Transform force platform data into ground reaction wrenches.
+   */
+   
+  /**
+   * @class btkIMUsExtractor
+   * @brief Extracts inertial measurement units (IMUs) from a btkAcquisition object. 
+   */
+  
+  /**
+   * @class btkMergeAcquisitionFilter
+   * @brief Merges or concatenates two or more btk::Acquisition objects into a single new one.
+   */
+  /**
+   * @var btkMergeAcquisitionFilter::KeepAllFrames
+   * Option to keep all the frames of the given acquisitions during the merging process
+   */
+  /**
+   * @var btkMergeAcquisitionFilter::KeepFromHighestFirstFrame
+   * Option to keep only the frames starting from the highest first frame extracted from the given acquisitions.
+   */
+   
+  /**
+   * @class btkSeparateKnownVirtualMarkersFilter
+   * @brief Separate a collection of points in five categories to be able to distinguish real markers from the others.
+   */
+  /**
+   * @var btkSeparateKnownVirtualMarkersFilter::AllMarkers
+   * Contains all kind of markers (real and virtual) as stored in the acquisition
+   */
+  /**
+   * @var btkSeparateKnownVirtualMarkersFilter::Markers
+   * Contains only real markers.
+   */
+  /**
+   * @var btkSeparateKnownVirtualMarkersFilter::VirtualMarkersForFrame
+   * Contains only virtual markers used to create frames
+   */
+  /**
+   * @var btkSeparateKnownVirtualMarkersFilter::VirtualMarkersOther
+   * Contains only virtual markers no used for frames (e.g center of mass)
+   */
+  /**
+   * @var btkSeparateKnownVirtualMarkersFilter::OtherPoints
+   * Contains all the other points (i.e angle, force, moment, power, etc.)
+   */
+  /**
+   * @class btkStringAxes
+   * @brief Workaround to represent the C++ class btk::SeparateKnownVirtualMarkersFilter::StringAxes with SWIG.
+   */
+  /**
+   * @class btkStringAxesList
+   * @brief Convenient class to store a list of btkStringAxes object.
+   */
+  /**
+   * @class btkStringList
+   * @brief Convenient class to store a list of string
+   */
+   
+  /**
+   * @class btkSpecializedPointsExtractor
+   * @brief Extracts only the points corresponding to the given type (without cloning the extracted points).
+   */
+  
+  /**
+   * @class btkWrenchDirectionAngleFilter
+   * @brief Calcule the direction angle of the force vector for each wrench.
+   */
+}

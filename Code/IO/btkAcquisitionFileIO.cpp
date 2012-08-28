@@ -128,11 +128,11 @@ namespace btk
   
   /**
    * @fn ByteOrder AcquisitionFileIO::GetByteOrder() const
-   * Gets the byte order of the file.
+   * Gets the byte order of the file (only for binary file).
    */
 
   /**
-   * Gets the byte order as a string
+   * Gets the byte order as a string.
    */
   std::string AcquisitionFileIO::GetByteOrderAsString() const
   {
@@ -157,7 +157,7 @@ namespace btk
   
   
   /**
-   * Gets the storage format as a string
+   * Gets the storage format as a string.
    */
   std::string AcquisitionFileIO::GetStorageFormatAsString() const
   {

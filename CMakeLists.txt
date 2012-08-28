@@ -272,6 +272,11 @@ ADD_SUBDIRECTORY(Utilities)
 
 # Wrapping
 ADD_SUBDIRECTORY(Wrapping)
+# PYTHON wrapping
+OPTION(BTK_WRAP_PYTHON "Wrap BTK classes into Python (Require SWIG 2.x)." OFF)
+IF(BTK_WRAP_PYTHON)
+  ADD_SUBDIRECTORY(Wrapping/Python)
+ENDIF(BTK_WRAP_PYTHON)
 # Matlab wrapping
 OPTION(BTK_WRAP_MATLAB "Wrap BTK classes into Matlab functions." OFF)
 IF(BTK_WRAP_MATLAB)

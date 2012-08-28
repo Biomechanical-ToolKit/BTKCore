@@ -124,12 +124,12 @@ namespace btk
   
   /**
    * @fn AcquisitionFileIO::Pointer AcquisitionFileReader::GetAcquisitionIO()
-   * Returns a Pointer associated with the AcquisitionIO helper class
+   * Returns a Poiner associated with the AcquisitionIO helper class used to read the file.
    */
   
   /**
    * @fn AcquisitionFileIO::ConstPointer AcquisitionFileReader::GetAcquisitionIO() const
-   * Returns a ConstPointer associated with the AcquisitionIO helper class
+   * Returns a ConstPointer associated with the AcquisitionIO helper class used to read the file.
    */
   
   /**
