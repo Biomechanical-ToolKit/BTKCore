@@ -36,9 +36,10 @@
 #ifndef Viz3DWidget_h
 #define Viz3DWidget_h
 
+#include "VizRendererWidget.h"
+
 #include <btkVTKAxesWidget.h>
 
-#include <QVTKWidget2.h>
 #include <vtkRenderer.h>
 #include <vtkEventQtSlotConnect.h>
 
@@ -46,7 +47,7 @@
 
 class Acquisition;
 
-class Viz3DWidget : public QVTKWidget2
+class Viz3DWidget : public VizRendererWidget
 {
   Q_OBJECT
   

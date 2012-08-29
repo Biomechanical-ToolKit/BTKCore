@@ -47,7 +47,9 @@
 #include <vtkStringArray.h>
 #include <vtkStdString.h>
 #include <vtkNew.h>
-#include <vtkAxisExtended.h>
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+  #include <vtkAxisExtended.h>
+#endif
 
 #include <vtksys/ios/sstream>
 
@@ -229,7 +231,7 @@ namespace btk
   void VTKAxis::AutoScale()
   {
     // Calculate the min and max, set the number of ticks and the tick spacing
-    if (this->TickLabelAlgorithm == vtkAxis::TICK_SIMPLE)
+    if (this->TickLabelAlgorithm == VTKAxis::TICK_SIMPLE)
     {
       double min = this->Minimum;
       double max = this->Maximum;
@@ -251,7 +253,7 @@ namespace btk
     {
       double min = this->Minimum;
       double max = this->Maximum;
-      if (this->TickLabelAlgorithm == vtkAxis::TICK_SIMPLE)
+      if (this->TickLabelAlgorithm == VTKAxis::TICK_SIMPLE)
         this->TickInterval = this->CalculateNiceMinMax(min, max);
 
       if (this->UsingNiceMinMax)
@@ -536,6 +538,36 @@ namespace btk
     this->TickMarksDirty = true;
     this->Modified();
   };
+
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
+  // Fix: "Typo in vtkAxis::setMaximumLimit()"
+  // http://vtk.org/gitweb?p=VTK.git;a=commit;h=3bf89d787af5a6a3e54b266b8cc2545f019608e3
+  /**
+   * Set the logical lowest possible value for @a Minimum, in plot coordinates.
+   */
+  void VTKAxis::SetMinimumLimit(double lowest)
+  {
+    if (this->MinimumLimit == lowest)
+      return;
+    this->MinimumLimit = lowest;
+    if (this->Minimum < lowest)
+      this->SetMinimum(lowest);
+  };
+  
+  // Fix: "Typo in vtkAxis::setMaximumLimit()"
+  // http://vtk.org/gitweb?p=VTK.git;a=commit;h=3bf89d787af5a6a3e54b266b8cc2545f019608e3
+  /**
+   * Set the logical highest possible value for @a Maximum, in plot coordinates.
+   */
+  void VTKAxis::SetMaximumLimit(double highest)
+  {
+    if (this->MaximumLimit == highest)
+      return;
+    this->MaximumLimit = highest;
+    if (this->Maximum > highest)
+      this->SetMaximum(highest);
+  };
+#endif
   
   /**
    * Default constructor
@@ -544,10 +576,12 @@ namespace btk
   : vtkAxis()
   {
     this->Margins[0] = 20;
+    this->Margins[1] = 5;
     this->m_TitleVisible = true;
     this->Pen->SetWidth(0.5);
     this->GridPen->SetWidth(0.5);
     this->m_TickLength = 5.0f;
+    this->TickLabelAlgorithm = VTKAxis::TICK_SIMPLE;
     this->m_TickDirection = VTKAxis::INSIDE;
     // this->m_MinimumTickSpacing = 50.0f;
     // this->m_TitleMargin = 10.0f;
@@ -614,7 +648,8 @@ namespace btk
     }
     else
     {
-      if (this->TickLabelAlgorithm == vtkAxis::TICK_WILKINSON_EXTENDED)
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+      if (this->TickLabelAlgorithm == VTKAxis::TICK_WILKINSON_EXTENDED)
       {
         // Now calculate the tick labels, and positions within the axis range
         //This gets the tick interval and max, min of labeling from the Extended
@@ -668,7 +703,7 @@ namespace btk
           this->LabelProperties->SetOrientation(90);
         }
       }
-
+#endif
       double mult = max > min ? 1.0 : -1.0;
       double range = 0.0;
       int n = 0;
@@ -733,7 +768,7 @@ namespace btk
         if (this->LogScale)
           value = pow(double(10.0), double(value));
         // Now create a label for the tick position
-        if (this->TickLabelAlgorithm == vtkAxis::TICK_SIMPLE)
+        if (this->TickLabelAlgorithm == VTKAxis::TICK_SIMPLE)
         {
           vtksys_ios::ostringstream ostr;
           ostr.imbue(std::locale::classic());
@@ -748,8 +783,10 @@ namespace btk
 
           this->TickLabels->InsertNextValue(ostr.str());
         }
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
         else
           this->GenerateLabelFormat(this->Notation, value);
+#endif
       }
     }
     this->TickMarksDirty = false;
@@ -775,12 +812,13 @@ namespace btk
       ostr.imbue(std::locale::classic());
       if (this->Notation > 0)
         ostr.precision(this->Precision);
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
       if (this->Notation == SCIENTIFIC_NOTATION)
         ostr.setf(vtksys_ios::ios::scientific, vtksys_ios::ios::floatfield);
       else if (this->Notation == FIXED_NOTATION)
         ostr.setf(ios::fixed, ios::floatfield);
+#endif
       ostr << value;
-
       this->TickLabels->InsertNextValue(ostr.str());
     }
   };

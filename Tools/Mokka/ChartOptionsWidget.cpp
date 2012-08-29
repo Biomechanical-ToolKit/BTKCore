@@ -242,7 +242,10 @@ void ChartOptionsWidget::setLineColor()
       break;
     }
   }
-    
+   
+  #ifdef Q_OS_WIN
+    this->m_FixUpdateWindowsXP = true;
+  #endif 
   QColor color = QColorDialog::getColor(c, this);
   QList<int> indices;
   if (color.isValid())
@@ -257,10 +260,16 @@ void ChartOptionsWidget::setLineColor()
       }
     }
     this->setLineColorButtonColor(color);
-    emit lineColorChanged(indices, color);
   }
+  emit lineColorChanged(indices, color);
   // Force the widget to be shown as it disappear when the color dialog is shown
+#ifdef Q_OS_WIN
+  // Fix for Windows XP (and vista?) which doesn't redraw correctly the options.
+  if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7)
+    this->setVisible(true);
+#else
   this->setVisible(true);
+#endif
 };
 
 void ChartOptionsWidget::setLineWidth(double value)

@@ -90,6 +90,7 @@ namespace btk
     void SetBounds(double xMin, double xMax, double yMin, double yMax) {double bounds[4] = {xMin, xMax, yMin, yMax}; this->SetBounds(bounds);};
     BTK_VTK_EXPORT void SetBounds(double bounds[4]);
     BTK_VTK_EXPORT virtual void RecalculateBounds();
+    void ForceBoundsValid() {this->m_ChartBoundsValid = true;};
     BTK_VTK_EXPORT void SetGeometry(const vtkRectf& rect);
     
     
@@ -126,8 +127,8 @@ namespace btk
     // BTK_VTK_EXPORT void ResetZoom();
     // BTK_VTK_EXPORT void ApplyZoom(const vtkRectf& box);
     // const vtkRectf& GetZoomBox() const {return this->m_ZoomBox;};
-    // int GetDisplayZoomBox() const {return this->m_ZoomBoxDisplayed;};
-    // BTK_VTK_EXPORT void SetDisplayZoomBox(int enabled);
+    bool GetDisplayZoomBox() const {return this->m_ZoomBoxDisplayed;};
+    BTK_VTK_EXPORT void SetDisplayZoomBox(bool enabled);
     // void DisplayZoomBoxOn() {this->SetDisplayZoomBox(1);};
     // void DisplayZoomBoxOff() {this->SetDisplayZoomBox(0);};
     
@@ -154,9 +155,22 @@ namespace btk
     BTK_VTK_EXPORT virtual bool MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseMoveEvent(const vtkContextMouseEvent& mouse);
     BTK_VTK_EXPORT virtual bool MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta);
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
     BTK_VTK_EXPORT virtual bool KeyPressEvent(const vtkContextKeyEvent& key);
+#endif
     
     BTK_VTK_EXPORT void RecalculatePlotTransform();
+    
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
+    enum {FILL_SCENE = 0, FILL_RECT, AXES_TO_RECT};
+    vtkSetMacro(LayoutStrategy, int);
+    vtkGetMacro(LayoutStrategy, int);
+    void SetBackgroundBrush(vtkBrush *brush);
+    vtkBrush* GetBackgroundBrush();
+  protected:
+    int LayoutStrategy;
+    vtkSmartPointer<vtkBrush> BackgroundBrush;
+#endif
     
   protected:
     BTK_VTK_EXPORT VTKChartTimeSeries();

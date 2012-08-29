@@ -45,8 +45,6 @@
 #include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
 
 #include <vtkCamera.h>
-#include <vtkGenericOpenGLRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
 
 #include <QListWidget>
 #include <QMouseEvent>

@@ -50,6 +50,8 @@
 #include <list>
 #include <utility>
 
+#include <assert.h> // Arnaud Barré - For MSVC 2008
+
 // .NAME vtkTextureImageCache - store vtkTexture and vtkImageData identified by
 // a unique key.
 // .SECTION Description
@@ -183,6 +185,7 @@ struct TextPropertyKey
   TextPropertyKey(vtkTextProperty* textProperty, const vtkStdString& text)
   {
     this->TextPropertyId = GetIdFromTextProperty(textProperty);
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
     this->FontSize = textProperty->GetFontSize();
     double color[3];
     textProperty->GetColor(color);
@@ -190,6 +193,7 @@ struct TextPropertyKey
                     static_cast<unsigned char>(color[1] * 255),
                     static_cast<unsigned char>(color[2] * 255),
                     static_cast<unsigned char>(textProperty->GetOpacity() * 255));
+#endif
     this->Text = text;
   }
 
@@ -199,16 +203,21 @@ struct TextPropertyKey
   bool operator==(const TextPropertyKey& other)const
   {
     return this->TextPropertyId == other.TextPropertyId &&
+      this->Text == other.Text
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+      &&
       this->FontSize == other.FontSize &&
-      this->Text == other.Text &&
       this->Color[0] == other.Color[0] &&
       this->Color[1] == other.Color[1] &&
       this->Color[2] == other.Color[2] &&
-      this->Color[3] == other.Color[3];
+      this->Color[3] == other.Color[3]
+#endif
+      ;
   }
-
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
   unsigned short FontSize;
   vtkColor4ub Color;
+#endif
   // States in the function not to use more than 32 bits - int works fine here.
   unsigned int TextPropertyId;
   vtkStdString Text;

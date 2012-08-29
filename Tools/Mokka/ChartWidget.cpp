@@ -44,7 +44,6 @@
 #include <btkVTKChartLayout.h>
 
 #include <vtkRenderer.h>
-#include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkContextScene.h>
 #include <vtkColorSeries.h>
 #include <vtkPen.h>
@@ -64,6 +63,7 @@
 #include <QMimeData>
 #include <QTreeWidget>
 #include <QToolTip>
+#include <QTimer>
 
 #ifdef Q_OS_WIN
   #ifndef WIN32_LEAN_AND_MEAN
@@ -136,9 +136,9 @@ ChartWidget::ChartWidget(QWidget* parent)
   this->mp_ChartContentWidget->addActions(this->m_ViewActions);
   this->mp_ChartContentWidget->setContextMenuPolicy(Qt::ActionsContextMenu);
   this->mp_ChartContentWidget->setMouseTracking(false); // No need to send mouse events to VTK when a mouse button isn't down
-  // this->mp_ChartContentWidget->GetRenderWindow()->SwapBuffersOff();
-  // this->mp_ChartContentWidget->GetRenderWindow()->DoubleBufferOff();
-  // this->mp_ChartContentWidget->GetRenderWindow()->SetMultiSamples(0);
+  this->mp_ChartContentWidget->GetRenderWindow()->SetMultiSamples(0); // For anti-aliasing (smooth plot)
+  this->m_ChartData[PointChart] = new PointChartData();
+  this->m_ChartData[AnalogChart] = new AnalogChartData();
   
   connect(this->mp_ChartContentWidget, SIGNAL(contextMenuRequested(QPoint)), this, SLOT(setLastContextMenuPosition(QPoint)));
   connect(this->mp_ChartOptions, SIGNAL(pausePlaybackRequested(bool)), this, SIGNAL(pausePlaybackRequested(bool)));
@@ -192,9 +192,6 @@ ChartWidget::~ChartWidget()
 
 void ChartWidget::initialize()
 {
-  this->m_ChartData[PointChart] = new PointChartData();
-  this->m_ChartData[AnalogChart] = new AnalogChartData();
-  
   for (int i = 0 ; i < this->m_ChartData.size() ; ++i)
     this->m_ChartData[i]->initialize(this->mp_ColorGenerator);
   
@@ -380,7 +377,7 @@ void ChartWidget::displayChart(int chartType)
   this->mp_ChartOptions->setFocus(); // Remove the focus of its children.
 };
 
-void ChartWidget::render(bool optionsShown)
+void ChartWidget::render(bool optionsShown, int delayShowOptionWinXP)
 {
   if (optionsShown)
   {
@@ -390,13 +387,9 @@ void ChartWidget::render(bool optionsShown)
     if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
     {
       this->mp_ChartOptions->m_FixUpdateWindowsXP = true;
-      this->mp_ChartOptions->setFocus();
-      QApplication::processEvents(); // For the text placeholder
       this->mp_ChartOptions->hide();
       this->render();
-      ::Sleep(20); // 20 ms
-      QApplication::processEvents();
-      this->mp_ChartOptions->show();
+      QTimer::singleShot(delayShowOptionWinXP, this->mp_ChartOptions, SLOT(show()));
       this->mp_ChartOptions->m_FixUpdateWindowsXP = false;
     }
     else
@@ -406,7 +399,12 @@ void ChartWidget::render(bool optionsShown)
 #endif
   }
   else if (this->mp_ChartContentWidget->isVisible())
-    this->update();
+  {
+    // FIXME: A simple ChartWidget::update() is enough under MacOS X but not Windows XP...
+    //        The use of the method vtkRenderWindow:::Render could slowdown the display...
+    //        Should we need a special case for Windows XP? Same for Windows 7?
+    this->mp_ChartContentWidget->GetRenderWindow()->Render();
+  }
 };
 
 void ChartWidget::removePlot(int index)
@@ -478,7 +476,7 @@ void ChartWidget::setPlotLineWidth(const QList<int>& indices, double value)
       this->m_ChartData[this->m_CurrentChartType]->plotsProperties()[*it].lineWidth = value;
     }
   }
-  this->render(true); // Options are shown
+  this->render(true,20); // Options are shown
 };
 
 void ChartWidget::setChartTitle(const QString& title)
@@ -497,14 +495,7 @@ void ChartWidget::setChartTitle(const QString& title)
   // The side effect is a possible blinking of the options but it's better than to see nothing.
   if (QSysInfo::windowsVersion() < QSysInfo::WV_WINDOWS7)
   {
-    this->mp_ChartOptions->m_FixUpdateWindowsXP = true;
-    QApplication::processEvents(); // For the text placeholder
-    this->mp_ChartOptions->hide();
-    this->update();
-    QApplication::processEvents();
-    ::Sleep(20);
-    this->mp_ChartOptions->show();
-    this->mp_ChartOptions->m_FixUpdateWindowsXP = false;
+    this->render(true,50);
   }
   else
     this->update();
@@ -743,9 +734,11 @@ void ChartWidget::dropEvent(QDropEvent* event)
     {
       btk::VTKChartTimeSeries* chart = this->m_ChartData[this->m_CurrentChartType]->chart(i);
       chart->SetInteractionEnabled(true);
-      // chart->RecalculateBounds();
       int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
       this->updateAxisX(chart, roi[0], roi[1]);
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
+      chart->RecalculateBounds();
+#endif
     }
   }
   this->render();
@@ -1500,7 +1493,7 @@ btk::VTKChartTimeSeries* AnalogChartData::createChart(btk::VTKChartTimeSeries* s
 // -----------------------------------------------------------------------------
 
 VTKChartWidget::VTKChartWidget(QWidget* parent, Qt::WindowFlags f)
-: QVTKWidget2(parent, 0, f)
+: VizRendererWidget(parent, 0, f)
 {
   this->mp_CurrentChartData = 0;
   this->setMouseTracking(false);
@@ -1520,7 +1513,7 @@ bool VTKChartWidget::event(QEvent* event)
     
     btk::VTKChartTimeSeries* chart = this->focusedPlotArea(helpEvent->pos());
     vtkContextMouseEvent mouse;
-    mouse.SetScreenPos(vtkVector2i(helpEvent->pos().x(), this->height() - helpEvent->pos().y()));
+    mouse.ScreenPos = vtkVector2i(helpEvent->pos().x(), this->height() - helpEvent->pos().y());
     btk::VTKChartPlotData plotIndex;
     if ((chart != 0) && (chart->LocatePointInPlots(mouse, plotIndex)))
     {
@@ -1554,7 +1547,7 @@ bool VTKChartWidget::event(QEvent* event)
     QContextMenuEvent* contextMenuEvent = static_cast<QContextMenuEvent*>(event);
     emit contextMenuRequested(contextMenuEvent->globalPos());
   }
-  return QVTKWidget2::event(event);
+  return this->VizRendererWidget::event(event);
 };
 
 void VTKChartWidget::keyPressEvent(QKeyEvent* event)
@@ -1569,14 +1562,40 @@ void VTKChartWidget::keyReleaseEvent(QKeyEvent* event)
   this->QWidget::keyReleaseEvent(event);
 };
 
+// FIX for VTK 5.8
+void VTKChartWidget::mousePressEvent(QMouseEvent* event)
+{
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
+  // invoke appropriate vtk event only for the left button
+  if(event->button() == Qt::LeftButton)
+  {
+    btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
+    if (chart != 0)
+      chart->SetDisplayZoomBox((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? 1 : 0);
+  }
+#endif
+  this->VizRendererWidget::mousePressEvent(event);
+};
+
+// FIX for VTK 5.8
+void VTKChartWidget::wheelEvent(QWheelEvent* event)
+{
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
+  btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
+  if (chart != 0)
+    chart->SetZoomMode((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? btk::VTKChartTimeSeries::HORIZONTAL : btk::VTKChartTimeSeries::BOTH);
+#endif
+  this->VizRendererWidget::wheelEvent(event);
+};
+
 btk::VTKChartTimeSeries* VTKChartWidget::focusedChart(const QPoint& pos) const
 {
   btk::VTKChartTimeSeries* chart = 0;
   if (this->mp_CurrentChartData != NULL)
   {
     vtkContextMouseEvent mouse;
-    mouse.SetScreenPos(vtkVector2i(pos.x(), this->height() - pos.y()));
-    for (size_t i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
+    mouse.ScreenPos = vtkVector2i(pos.x(), this->height() - pos.y());
+    for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
     {
       chart = this->mp_CurrentChartData->chart(i);
       if (chart->Hit2(mouse))
@@ -1593,8 +1612,8 @@ btk::VTKChartTimeSeries* VTKChartWidget::focusedPlotArea(const QPoint& pos) cons
   if (this->mp_CurrentChartData != NULL)
   {
     vtkContextMouseEvent mouse;
-    mouse.SetScreenPos(vtkVector2i(pos.x(), this->height() - pos.y()));
-    for (int i = 0 ; i < static_cast<int>(this->mp_CurrentChartData->chartNumber()) ; ++i)
+    mouse.ScreenPos = vtkVector2i(pos.x(), this->height() - pos.y());
+    for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
     {
       chart = this->mp_CurrentChartData->chart(i);
       if (chart->Hit(mouse))

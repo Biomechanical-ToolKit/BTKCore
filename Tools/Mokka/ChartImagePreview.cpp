@@ -42,7 +42,6 @@
 #include <btkVTKChartLegend.h>
 #include <btkVTKContextActor.h>
 
-#include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkAxis.h>
 #include <vtkPlot.h>
@@ -51,10 +50,9 @@
 #include <vtkContextInteractorStyle.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkTextProperty.h>
-#include <vtkRenderWindowInteractor.h>
 
 ChartImagePreview::ChartImagePreview(QWidget* parent)
-: QVTKWidget2(parent, 0)
+: VizRendererWidget(parent, 0)
 {
   // Member
   this->mp_Chart = 0;
@@ -127,17 +125,14 @@ void ChartImagePreview::setChart(vtkstd::vector<vtkStdString>& units, btk::VTKCh
 void ChartImagePreview::keyPressEvent(QKeyEvent* event)
 {
   event->accept(); // Keyboard events are not sent to VTK
-  // this->QVTKWidget::keyPressEvent(event);
 };
 
 void ChartImagePreview::keyReleaseEvent(QKeyEvent* event)
 {
   event->accept(); // Keyboard events are not sent to VTK
-  // this->QVTKWidget::keyReleaseEvent(event);
 };
 
 void ChartImagePreview::mousePressEvent(QMouseEvent* event)
 {
   event->accept(); // Keyboard events are not sent to VTK
-  // this->QVTKWidget::mousePressEvent(event);
 };

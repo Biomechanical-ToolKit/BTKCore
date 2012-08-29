@@ -50,7 +50,6 @@
 #include <vtkTextProperty.h>
 #include <vtkPlot.h>
 #include <vtkChartLegend.h>
-#include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkContextScene.h>
 #include <vtkPen.h>
@@ -308,7 +307,10 @@ void ChartExportDialog::updateChartTile(const QString& title, int value)
 {
   vtkAxis* axis = this->mp_Chart->GetAxis(vtkAxis::LEFT);
   int margin = 10;
-  int maxLen = std::max(QString::number(static_cast<int>(axis->GetMinimum())).length(), QString::number(static_cast<int>(axis->GetMaximum())).length());
+  int maxLen = std::max(
+    QString::number(static_cast<int>(axis->GetMinimum())).length(), 
+    QString::number(static_cast<int>(axis->GetMaximum())).length()
+  );
   int left = margin + value + margin + maxLen * static_cast<int>((float)value * 2.0f/3.0f);
   int bottom = margin + value + margin + value;
   if (title.isEmpty())

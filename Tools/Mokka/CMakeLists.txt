@@ -53,6 +53,7 @@ SET(Mokka_CPP
   UpdateChecker.cpp
   Viz3DWidget.cpp
   VideoWidget.cpp
+  VizRendererWidget.cpp
   main.cpp
   )
 

@@ -57,11 +57,16 @@
 #include <vtkDoubleArray.h>
 #include <vtkMath.h>
 #include <vtkContextMouseEvent.h>
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+  #include <vtkContextKeyEvent.h>
+#endif
 
 #include <vtkstd/list>
 #include <vtkgl.h>
 
 #include <limits>
+
+#include "btkConvert.h"
 
 namespace btk
 {
@@ -264,6 +269,22 @@ namespace btk
   };
   
   /**
+   * @fn int VTKChartTimeSeries::GetDisplayZoomBox() const
+   * Get the status of the zoom box display.
+   */
+   
+  /**
+   * Enable/Disable the zoom box.
+   */
+  void VTKChartTimeSeries::SetDisplayZoomBox(bool enabled)
+  {
+    if (this->m_ZoomBoxDisplayed == enabled)
+      return;
+    this->m_ZoomBoxDisplayed = enabled;
+    this->Modified();
+  };
+  
+  /**
    * Show/Hide the plot for the given @a index.
    */
   void VTKChartTimeSeries::HidePlot(int index, bool isHidden)
@@ -301,7 +322,7 @@ namespace btk
     if (!this->Visible)
       return false;
     vtkVector2i geometry(0, 0);
-    if (this->LayoutStrategy == vtkChart::FILL_SCENE)
+    if (this->LayoutStrategy == VTKChartTimeSeries::FILL_SCENE)
     {
       geometry = vtkVector2i(this->GetScene()->GetSceneWidth(), this->GetScene()->GetSceneHeight());
       if (geometry.X() != this->Geometry[0] || geometry.Y() != this->Geometry[1])
@@ -528,7 +549,7 @@ namespace btk
   {
     if (this->mp_Plots->empty())
       return false;
-    vtkVector2i pos(mouse.GetScreenPos());
+    vtkVector2i pos(mouse.ScreenPos);
     if ((pos[0] > this->Point1[0]) && (pos[0] < this->Point2[0]) && (pos[1] > this->Point1[1]) && (pos[1] < this->Point2[1]))
     {
       vtkVector2f plotPos, position((float)pos.X(), (float)pos.Y());
@@ -549,7 +570,7 @@ namespace btk
           {
             plotIndex.SeriesName = plot->GetLabel();
             plotIndex.Position = plotPos;
-            plotIndex.ScreenPosition = mouse.GetScreenPos();
+            plotIndex.ScreenPosition = mouse.ScreenPos;
             plotIndex.Index = seriesIndex;
             return true;
           }
@@ -564,7 +585,7 @@ namespace btk
    */
   bool VTKChartTimeSeries::Hit(const vtkContextMouseEvent &mouse)
   {
-    vtkVector2i pos(mouse.GetScreenPos());
+    vtkVector2i pos(mouse.ScreenPos);
     if (pos[0] > this->Point1[0] &&
         pos[0] < this->Point2[0] &&
         pos[1] > this->Point1[1] &&
@@ -584,7 +605,7 @@ namespace btk
   bool VTKChartTimeSeries::Hit2(const vtkContextMouseEvent& mouse)
   {
     vtkRectf size = this->GetSize();
-    vtkVector2i pos(mouse.GetScreenPos());
+    vtkVector2i pos(mouse.ScreenPos);
     if ((pos[0] > size.GetX()) && (pos[1] > size.GetY()) &&
         (pos[0] < (size.GetX() + size.GetWidth())) && (pos[1] < (size.GetY() + size.GetHeight())))
     {
@@ -610,15 +631,17 @@ namespace btk
   {
     if (!this->m_InteractionEnabled)
       return false;
-    if (mouse.GetButton() == vtkContextMouseEvent::LEFT_BUTTON)
+    if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
     {
-      this->m_ZoomBox.Set(mouse.GetPos().X(), mouse.GetPos().Y(), 0.0, 0.0);
+      this->m_ZoomBox.Set(mouse.Pos.X(), mouse.Pos.Y(), 0.0, 0.0);
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
       // Zoom box
       if ((mouse.GetModifiers() & vtkContextMouseEvent::SHIFT_MODIFIER) == vtkContextMouseEvent::SHIFT_MODIFIER)
         this->m_ZoomBoxDisplayed = true;
       // Pan
       else
         this->m_ZoomBoxDisplayed = false;
+#endif
       return true;
     }
     return false;
@@ -629,14 +652,14 @@ namespace btk
     if (!this->m_InteractionEnabled)
       return true;
     
-    if (mouse.GetButton() == vtkContextMouseEvent::LEFT_BUTTON)
+    if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
     {
       // Pan
       if (!this->m_ZoomBoxDisplayed)
       {
         // Figure out how much the mouse has moved by in plot coordinates - pan
-        vtkVector2d screenPos(mouse.GetScreenPos().Cast<double>().GetData());
-        vtkVector2d lastScreenPos(mouse.GetLastScreenPos().Cast<double>().GetData());
+        vtkVector2d screenPos(mouse.ScreenPos.Cast<double>().GetData());
+        vtkVector2d lastScreenPos(mouse.LastScreenPos.Cast<double>().GetData());
         vtkVector2d pos(0.0, 0.0);
         vtkVector2d last(0.0, 0.0);
 
@@ -669,7 +692,7 @@ namespace btk
         pts[2] = this->mp_AxisX->GetPoint2()[0];
         pts[3] = this->mp_AxisY->GetPoint2()[1];
         
-        float mouseX = mouse.GetPos().X();
+        float mouseX = mouse.Pos.X();
         if ((mouseX < pts[0]) || (mouseX > pts[2]))
         {
           if (this->m_ZoomBox.GetWidth() < 0.0f)
@@ -678,7 +701,7 @@ namespace btk
             mouseX = pts[2] - 1.0f; // Border
         }
         
-        float mouseY = mouse.GetPos().Y();
+        float mouseY = mouse.Pos.Y();
         if ((mouseY < pts[1]) || (mouseY > pts[3]))
         {
           if (this->m_ZoomBox.GetHeight() < 0.0f)
@@ -692,7 +715,7 @@ namespace btk
         this->Scene->SetDirty(true);
       }
     }
-    else if (mouse.GetButton() == vtkContextMouseEvent::NO_BUTTON)
+    else if (mouse.Button == vtkContextMouseEvent::NO_BUTTON)
     {
       this->Scene->SetDirty(true);
     }
@@ -704,15 +727,15 @@ namespace btk
     if (!this->m_InteractionEnabled)
       return false;
     
-    if (mouse.GetButton() == vtkContextMouseEvent::LEFT_BUTTON)
+    if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
     {
       // Zoom
-      this->m_ZoomBox.SetWidth(mouse.GetPos().X() - this->m_ZoomBox.X());
-      this->m_ZoomBox.SetHeight(mouse.GetPos().Y() - this->m_ZoomBox.Y());
+      this->m_ZoomBox.SetWidth(mouse.Pos.X() - this->m_ZoomBox.X());
+      this->m_ZoomBox.SetHeight(mouse.Pos.Y() - this->m_ZoomBox.Y());
       if (this->m_ZoomBoxDisplayed && fabs(this->m_ZoomBox.Width()) > 0.5f && fabs(this->m_ZoomBox.Height()) > 0.5f)
       {
         // Zoom into the chart by the specified amount, and recalculate the bounds
-        vtkVector2f point2(mouse.GetPos());
+        vtkVector2f point2(mouse.Pos);
         
         float pixelMin[2], pixelMax[2];
         pixelMin[0] = this->m_ZoomBox[0] + (this->m_ZoomBox[2] > 0 ? 0 : this->m_ZoomBox[2]);
@@ -742,11 +765,14 @@ namespace btk
       return true;
     
     bool horizontalZoomModeOnly = false;
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
     if ((mouse.GetModifiers() & vtkContextMouseEvent::SHIFT_MODIFIER) == vtkContextMouseEvent::SHIFT_MODIFIER)
       horizontalZoomModeOnly = true;
+#endif
+    horizontalZoomModeOnly |= (this->m_ZoomMode == HORIZONTAL);
     
     float pt[2];
-    this->mp_PlotTransform->GetTransform()->InverseTransformPoints(mouse.GetPos().GetData(), pt, 1);
+    this->mp_PlotTransform->GetTransform()->InverseTransformPoints(mouse.Pos.GetData(), pt, 1);
     // Get the bounds of each plot.
     for (int i = 0; i < 2; ++i)
     {
@@ -775,12 +801,14 @@ namespace btk
 
     return true;
   };
-  
+
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
   bool VTKChartTimeSeries::KeyPressEvent(const vtkContextKeyEvent& key)
   {
     btkNotUsed(key);
     return true;
   }
+#endif
   
   VTKChartTimeSeries::VTKChartTimeSeries()
   : vtkChart(), m_ZoomBox()
@@ -831,7 +859,7 @@ namespace btk
     // Interaction and bounds
     // this->m_ClippingEnabled = true;
     this->m_InteractionEnabled = true;
-    this->m_ZoomMode = 0;
+    this->m_ZoomMode = BOTH;
     // this->m_BoundsEnabled = false;
     //     this->mp_Bounds[0] = 0.0;
     //     this->mp_Bounds[1] = 0.0;

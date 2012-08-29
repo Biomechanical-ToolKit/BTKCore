@@ -50,7 +50,6 @@
 #include <vtkCaptionActor2D.h>
 #include <vtkTextProperty.h>
 #include <vtkTextActor.h>
-#include <vtkGenericOpenGLRenderWindow.h>
 
 #include <QKeyEvent>
 #include <QToolTip>
@@ -58,7 +57,7 @@
 static const double CameraZoom = 1.6;
 
 Viz3DWidget::Viz3DWidget(QWidget* parent)
-: QVTKWidget2(parent)
+: VizRendererWidget(parent)
 {
   // Member
   this->mp_Acquisition = 0;
@@ -85,7 +84,7 @@ void Viz3DWidget::initialize()
 {
   // VTK UI
   //this->mp_Renderer->TwoSidedLightingOn();
-  vtkGenericOpenGLRenderWindow* renwin = vtkGenericOpenGLRenderWindow::New();
+  VizRendererWindow* renwin = VizRendererWindow::New();
   renwin->AddRenderer(this->mp_Renderer);
   renwin->LineSmoothingOn();
 #if 0
@@ -383,9 +382,11 @@ void Viz3DWidget::toggleTrajectoryMarker(vtkObject* /* caller */, unsigned long 
 
 void Viz3DWidget::render()
 {
-  this->update();
-  // if (this->updatesEnabled())
-  //   this->GetRenderWindow()->Render();
+  // FIXME: A simple ChartWidget::update() is enough under MacOS X but not Windows XP...
+  //        The use of the method vtkRenderWindow:::Render could slowdown the display...
+  //        Should we need a special case for Windows XP? Same for Windows 7?
+  if (this->updatesEnabled())
+    this->GetRenderWindow()->Render();
 };
 
 void Viz3DWidget::show(bool s)
@@ -434,7 +435,7 @@ bool Viz3DWidget::event(QEvent* event)
     event->ignore();
     return true;
   }
-  return QVTKWidget2::event(event);
+  return this->VizRendererWidget::event(event);
 };
 
 void Viz3DWidget::keyPressEvent(QKeyEvent* event)
@@ -452,12 +453,12 @@ void Viz3DWidget::keyReleaseEvent(QKeyEvent* event)
 void Viz3DWidget::mousePressEvent(QMouseEvent* event)
 {
   this->GetRenderWindow()->GetInteractor()->SetAltKey(event->modifiers() == Qt::AltModifier ? 1 : 0);
-  this->QVTKWidget2::mousePressEvent(event);
+  this->VizRendererWidget::mousePressEvent(event);
 };
 
 void Viz3DWidget::resizeEvent(QResizeEvent* event)
 {
-  this->QVTKWidget2::resizeEvent(event);
+  this->VizRendererWidget::resizeEvent(event);
   QSize size = event->size();
   const double l = 100.0;
   double width = l / static_cast<double>(size.width());

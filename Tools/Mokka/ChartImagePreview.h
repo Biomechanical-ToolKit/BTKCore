@@ -36,7 +36,7 @@
 #ifndef ChartImagePreview_h
 #define ChartImagePreview_h
 
-#include <QVTKWidget2.h>
+#include "VizRendererWidget.h"
 
 #include <vtkStdString.h>
 
@@ -45,7 +45,7 @@ namespace btk
   class VTKChartTimeSeries;
 };
 
-class ChartImagePreview : public QVTKWidget2
+class ChartImagePreview : public VizRendererWidget
 {
   Q_OBJECT
   

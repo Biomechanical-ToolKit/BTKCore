@@ -61,8 +61,6 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkActor.h>
-#include <vtkGenericOpenGLRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
 #include <vtkCompositeDataPipeline.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>

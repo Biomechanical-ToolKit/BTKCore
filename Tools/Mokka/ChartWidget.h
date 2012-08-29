@@ -36,10 +36,11 @@
 #ifndef ChartWidget_h
 #define ChartWidget_h
 
-#include <btkVTKChartTimeSeries.h> // VTKCurrentFrameFunctor, VTKRegionOfInterestFunctor, VTKEventsFunctor
-#include <btkPoint.h>
+#include "VizRendererWidget.h"
 
-#include <QVTKWidget2.h>
+#include <btkPoint.h>
+#include <btkVTKChartTimeSeries.h> // VTKCurrentFrameFunctor, VTKRegionOfInterestFunctor, VTKEventsFunctor
+
 #include <vtkDoubleArray.h>
 #include <vtkstd/vector>
 
@@ -98,7 +99,7 @@ public:
   double defaultLineWidth() {return ChartWidget::DefaultLineWidth;};
   void setDefaultLineWidth(double width) {ChartWidget::DefaultLineWidth = width;};
   
-  void render(bool optionsShown = false);
+  void render(bool optionsShown = false, int delayShowOptionWinXP = 75);
   void show(bool s);
   
   void displayPointChart() {this->displayChart(PointChart);};
@@ -223,7 +224,7 @@ protected:
   QList<int> m_OptionSelection;
 };
 
-class VTKChartWidget : public QVTKWidget2
+class VTKChartWidget : public VizRendererWidget
 {
   Q_OBJECT
   
@@ -241,6 +242,8 @@ protected:
   virtual bool event(QEvent* event);
   virtual void keyPressEvent(QKeyEvent* event);
   virtual void keyReleaseEvent(QKeyEvent* event);
+  virtual void mousePressEvent(QMouseEvent* event);
+  virtual void wheelEvent(QWheelEvent* event);
   
 private:
   AbstractChartData* mp_CurrentChartData;

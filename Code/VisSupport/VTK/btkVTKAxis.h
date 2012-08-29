@@ -82,7 +82,18 @@ namespace btk
     
     bool GetDisplayMinimumLimit() const {return this->m_DisplayMinimumLimit;};
     BTK_VTK_EXPORT void SetDisplayMinimumLimit(bool displayed);
-    
+  
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
+    virtual void SetMinimumLimit(double lowest);
+    virtual void SetMaximumLimit(double highest);
+
+    enum {TICK_SIMPLE = 0};
+    vtkSetMacro(TickLabelAlgorithm, int)
+    vtkGetMacro(TickLabelAlgorithm, int)
+  protected:
+    int TickLabelAlgorithm;
+    int Margins[2]; // Horizontal/vertical margins for the axis
+#endif
   protected:
     BTK_VTK_EXPORT VTKAxis();
     BTK_VTK_EXPORT void GenerateTickLabels2(double min, double max);

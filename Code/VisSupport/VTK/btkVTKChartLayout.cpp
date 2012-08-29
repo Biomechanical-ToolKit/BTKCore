@@ -197,7 +197,7 @@ namespace btk
         this->RemoveItem(this->Private->Charts[index]);
       this->Private->Charts[index] = chart;
       this->AddItem(chart);
-      chart->SetLayoutStrategy(vtkChart::AXES_TO_RECT);
+      chart->SetLayoutStrategy(VTKChartTimeSeries::AXES_TO_RECT);
       return true;
     }
     else
@@ -219,7 +219,7 @@ namespace btk
         vtkNew<VTKChartTimeSeries> chart;
         this->Private->Charts[index] = chart.GetPointer();
         this->AddItem(chart.GetPointer());
-        chart->SetLayoutStrategy(vtkChart::AXES_TO_RECT);
+        chart->SetLayoutStrategy(VTKChartTimeSeries::AXES_TO_RECT);
       }
       return this->Private->Charts[index];
     }

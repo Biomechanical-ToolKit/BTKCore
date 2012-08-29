@@ -37,6 +37,7 @@
 #define NewSegmentDialog_h
 
 #include "ui_NewSegmentDialog.h"
+
 #include "Model.h" // Pair
 
 #include <QDialog>
