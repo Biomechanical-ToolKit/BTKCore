@@ -105,10 +105,10 @@ IF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
   ENDIF(USE_INCLUDED_BOOST)
 ENDIF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
 
-INCLUDE(${CMAKE_MODULE_PATH}/btkExtraCompilerFlags.cmake)
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkExtraCompilerFlags.cmake)
 # The entire BTK tree should use the same include path
 # Create the list of include directories needed for BTK header files.
-INCLUDE(${CMAKE_MODULE_PATH}/btkIncludeDirectories.cmake)
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkIncludeDirectories.cmake)
 # This should be the only INCLUDE_DIRECTORIES command in the entire
 # tree, except for the Utilities and Wrapping directories.  We need to
 # do this in one place to make sure the order is correct.
@@ -372,7 +372,7 @@ CMAKE_EXPORT_BUILD_SETTINGS(${BTK_BINARY_DIR}/BTKBuildSettings.cmake)
 EXPORT_LIBRARY_DEPENDENCIES(${BTK_BINARY_DIR}/BTKLibraryDepends.cmake)
 
 # Create the BTKConfig.cmake file containing the BTK configuration.
-INCLUDE (${CMAKE_MODULE_PATH}/btkGenerateBTKConfig.cmake)
+INCLUDE (${BTK_CMAKE_MODULE_PATH}/btkGenerateBTKConfig.cmake)
 
 IF(NOT BTK_INSTALL_NO_DEVELOPMENT)
   INSTALL(FILES
