@@ -83,7 +83,7 @@ IF (!ARCH! NEQ "") (
   IF "%options.5:~2,15%"=="BTK_WRAP_MATLAB" SET MATLAB_WRAPPING_ENABLED=1
   IF !MATLAB_WRAPPING_ENABLED! == 1 (
     !CMAKE!\bin\cmake.exe -P .\testWin64Matlab32.cmake
-    IF EXIST %CD%\testWin64Matlab32_TRUE.txt (
+    IF EXIST "%CD%\testWin64Matlab32_TRUE.txt" (
       SET ARCH=
       DEL .\testWin64Matlab32_TRUE.txt
     )
