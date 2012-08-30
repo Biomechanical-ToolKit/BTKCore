@@ -66,7 +66,6 @@
 @MEX_CREATE_MACRO@(btkSetPoint @MEX_PATH_PREFIX@btkSetPoint.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetPointDescription @MEX_PATH_PREFIX@btkSetPointDescription.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetPointLabel @MEX_PATH_PREFIX@btkSetPointLabel.cpp BTKCommon)
-@MEX_CREATE_MACRO@(btkSetPointMasks @MEX_PATH_PREFIX@btkSetPointMasks.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetPointNumber @MEX_PATH_PREFIX@btkSetPointNumber.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetPointResiduals @MEX_PATH_PREFIX@btkSetPointResiduals.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetPointType @MEX_PATH_PREFIX@btkSetPointType.cpp BTKCommon)

@@ -1,9 +1,0 @@
-/**
- * @class btkConvertBinaryMasks2Decimals
- * @brief  Convert binary values into decimals using the inverse order than @c bin2dec.
- * @syntax{d = btkConvertBinaryMasks2Decimals(b)}
- * @param b Cell of string with the binary masks.
- * @retval d Vector of decimal values. * 
- * @sa btkGetPoint, btkSetPoint
- * @ingroup BTKMatlabAcquisitionAccessor
- */

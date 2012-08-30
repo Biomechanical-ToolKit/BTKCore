@@ -6,14 +6,9 @@ function btkGetPoint(h, idx_or_label) %#ok
 %
 %  [VALUES, RESIDUALS] = BTKGETPOINT(H, INDEX) returns the point's residuals in a matrix (N,1) 
 %
-%  [VALUES, RESIDUALS, MASKS] = BTKGETPOINT(H, INDEX) returns the point's maks in a cell (N,1)
-%  Each row corresponds to 7 characters composed only by '1' and '0' to indicate which cameras
-%  were used to reconstruct the point.
-%
 %  You can get the point's data by using its LABEL instead of its index.
 %  VALUES = BTKGETPOINT(H, LABEL)
 %  [VALUES, RESIDUALS] = BTKGETPOINT(H, LABEL)
-%  [VALUES, RESIDUALS, MASKS] = BTKGETPOINT(H, LABEL)
 %
 %  The acquisition is represented by the handle H.  This handle is obtained
 %  by the use of a btk* function.

@@ -10,7 +10,6 @@ class PointTest(unittest.TestCase):
         self.assertEqual(test.GetValues().shape[0], 200)
         self.assertEqual(test.GetValues().shape[1], 3)
         self.assertEqual(test.GetResiduals().shape[0], 200)
-        self.assertEqual(test.GetMasks().shape[0], 200)
         self.assertEqual(test.GetType(), btk.btkPoint.Marker)
     
     def test_FrameNumber(self):
@@ -18,8 +17,7 @@ class PointTest(unittest.TestCase):
         test.SetFrameNumber(225)
         self.assertEqual(test.GetValues().shape[0], 225)
         self.assertEqual(test.GetResiduals().shape[0], 225)
-        self.assertEqual(test.GetMasks().shape[0], 225)
-        
+                
     def test_SetValues(self):
         p = btk.btkPoint("HEEL_R", 4)
         values = numpy.array([[1.,2.,3.],[4.,5.,6.],[7.,8.,9.],[10.,11.,12.]])

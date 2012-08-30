@@ -79,7 +79,7 @@ end
 % Transfer the coordinates Y and Z of the forceplates' geometry
 % And suppress the analog channels used by the forceplates
 analogLabels = fieldnames(btkGetAnalogs(acq));
- for i = 1:length(fp)
+for i = 1:length(fp)
     fp(i).corners([2,3],:) = fp(i).corners([3,2],:);
     fp(i).corners(2,:) = -1*fp(i).corners(2,:);
     fp(i).origin([2,3]) = fp(i).origin([3,2]);

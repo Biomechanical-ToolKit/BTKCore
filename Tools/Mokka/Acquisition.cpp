@@ -540,7 +540,7 @@ int Acquisition::createAveragedMarker(const QList<int>& markerIds)
                            z / static_cast<double>(numMarkers));
     }
     else
-      average->SetFrame(i, 0.0, 0.0, 0.0, -1.0, -1.0);
+      average->SetFrame(i, 0.0, 0.0, 0.0, -1.0);
   }
   this->mp_BTKAcquisition->GetPoints()->InsertItem(average);
   
@@ -1047,7 +1047,6 @@ bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
     btk::Point::Pointer targetP = btk::Point::New(p->label.toStdString(), numFramePoint, type, p->description.toStdString());
     targetP->SetValues(sourceP->GetValues().block(lb-this->m_FirstFrame,0,numFramePoint,3));
     targetP->SetResiduals(sourceP->GetResiduals().block(lb-this->m_FirstFrame,0,numFramePoint,1));
-    targetP->SetMasks(sourceP->GetMasks().block(lb-this->m_FirstFrame,0,numFramePoint,1));
     targetPoints->InsertItem(targetP);
     ++numPoints;
   }

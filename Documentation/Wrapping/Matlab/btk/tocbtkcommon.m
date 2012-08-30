@@ -40,7 +40,6 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetPointNumber">btkSetPointNumber</a>                 - Point's number modifier
 %
 % Point accessor
-%   <a href="matlab:help btkConvertBinaryMasks2Decimals">btkConvertBinaryMasks2Decimals</a>    - Convert binary values into decimals
 %   <a href="matlab:help btkGetPoint">btkGetPoint</a>                       - Point extraction
 %   <a href="matlab:help btkGetAngles">btkGetAngles</a>                      - Angles extraction
 %   <a href="matlab:help btkGetAnglesValues">btkGetAnglesValues</a>                - Extracts angles as a simple matrix 
@@ -60,10 +59,9 @@ function tocbtkcommon
 %   <a href="matlab:help btkAppendPoint">btkAppendPoint</a>                    - Append a point into an acquisition
 %   <a href="matlab:help btkClearPoints">btkClearPoints</a>                    - Remove all points from an acquisition
 %   <a href="matlab:help btkRemovePoint">btkRemovePoint</a>                    - Delete a point from an acquisition
-%   <a href="matlab:help btkSetPoint">btkSetPoint</a>                       - Point's data modifier (values, residuals, masks)
+%   <a href="matlab:help btkSetPoint">btkSetPoint</a>                       - Point's data modifier (values, residuals)
 %   <a href="matlab:help btkSetPointDescription">btkSetPointDescription</a>            - Point's description modifier
 %   <a href="matlab:help btkSetPointLabel">btkSetPointLabel</a>                  - Point's label modifier
-%   <a href="matlab:help btkSetPointMasks">btkSetPointMasks</a>                  - Point's masks modifier
 %   <a href="matlab:help btkSetPointResiduals">btkSetPointResiduals</a>              - Point's residuals modifier
 %   <a href="matlab:help btkSetPointType">btkSetPointType</a>                   - Point's type modifier
 %   <a href="matlab:help btkSetPointUnit">btkSetPointUnit</a>                   - Set unit for a type of point

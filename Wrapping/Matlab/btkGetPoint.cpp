@@ -42,7 +42,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs != 2)
     mexErrMsgTxt("Two inputs required.");
-  if (nlhs > 3)
+  if (nlhs > 2)
     mexErrMsgTxt("Too many output arguments.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
@@ -57,7 +57,4 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     plhs[1] = mxCreateDoubleMatrix(acq->GetPointFrameNumber(), 1, mxREAL);
     memcpy(mxGetPr(plhs[1]), point->GetResiduals().data(), mxGetNumberOfElements(plhs[1]) * sizeof(double));
   }
-  // Masks
-  if (nlhs > 2)
-    plhs[2] = btkMXCreatePointBinaryMask(point);
 };

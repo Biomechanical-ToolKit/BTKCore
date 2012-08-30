@@ -128,7 +128,6 @@ then the scale and offset are important."
 
 BTK_SWIG_AUTODOC_IMPL(Analog, SetLabel, "SetLabel(self, string)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetDescription, "SetDescription(self, string)");
-BTK_SWIG_AUTODOC(Analog, SetValue, "SetValue(self, int, double)");
 BTK_SWIG_AUTODOC_IMPL(Analog, GetValues, "GetValues(self) -> array (NumPy)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetValues, "SetValues(self, array)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetFrameNumber, "SetFrameNumber(self, int)");
@@ -140,8 +139,6 @@ BTK_SWIG_DOCSTRING_IMPL(Analog, GetLabel, "Returns the analog's label.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetLabel, "Sets the analog's label.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetDescription, "Returns the analog's description.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetDescription, "Sets the analog's description.");
-BTK_SWIG_DOCSTRING(Analog, GetValue, "Returns only one sample.");
-BTK_SWIG_DOCSTRING(Analog, SetValue, "Sets only one sample.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetValues, "Returns the analog's samples.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetValues, "Sets the analog's samples.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetFrameNumber, "Returns the number of frames.");
@@ -150,6 +147,7 @@ BTK_SWIG_DOCSTRING_IMPL(Analog, GetUnit, "Returns the analog's unit.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetUnit, "Sets the analog's unit.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetGain, "Returns the analog's gain.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetGain, "Sets the analog's gain.");
+BTK_SWIG_DOCSTRING_IMPL(Point, SetFrame, "Convenient method to set easily the given value with the given frame.\nWARNING: This function is not safe. There is no checking to determine if the frame is out of range or not. It has the advantage to be faster.");
 
 // ------------------------------------------------------------------------- //
 //                                    Point                                  //
@@ -157,10 +155,8 @@ BTK_SWIG_DOCSTRING_IMPL(Analog, SetGain, "Sets the analog's gain.");
 
 %feature("docstring") btkPoint "
 The coordinates of the point are generally measured by an acquisition system. For each frame, the
-3D value has a residual and mask. They can provide informations on the quality of these 3D data 
-(residual associated with the reconstruction of the marker by camera) as well as the part(s) of 
-the system which measured the coordinates (the masks is used mainly to know which camera detect 
-the markers). 
+3D value has a residual. It can provide informations on the quality of these 3D data 
+(residual associated with the reconstruction of the marker). 
 
 This class is also used to represent angles, forces, moments, powers and scalars. 
 To know/set the type of the point, you can use the methods GetType() and SetType(). 
@@ -175,23 +171,18 @@ The type has a limited range of possible values and are listed in the following 
  - btk.btkPoint.Reaction: Special type to indicate the point corresponds to one part of a wrench (not really used);
 
 Note: In some case the values at specific frames are invalid (mainly due to marker's occlusion).
-To detect if the frame is invalid, you can check the residual as well as the mask which will be 
+To detect if the frame is invalid, you can check the residual which will be 
 set to the value -1. It is the same thing if you want to set the frame as invalid. You can set
-the values of the frames to 0 and the associated residual and mask to -1.
+the values of the frames to 0 and the associated residual to -1.
 
 Note: A residual with a value equal to 0 means that this frame has been post-processed (interpolation, filtering, etc.)."
 
 BTK_SWIG_AUTODOC_IMPL(Point, SetLabel, "SetLabel(self, string)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetDescription, "SetDescription(self, string)");
-BTK_SWIG_AUTODOC(Point, SetValue, "SetValue(self, int, double)");
 BTK_SWIG_AUTODOC_IMPL(Point, GetValues, "GetValues(self) -> array (NumPy)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetValues, "SetValues(self, array)");
-BTK_SWIG_AUTODOC(Point, SetResidual, "SetResidual(self, int, double)");
 BTK_SWIG_AUTODOC_IMPL(Point, GetResiduals, "GetResiduals(self) -> array (NumPy)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetResiduals, "SetResiduals(self, array)");
-BTK_SWIG_AUTODOC(Point, SetMask, "SetResidual(self, int, double)");
-BTK_SWIG_AUTODOC_IMPL(Point, GetMasks, "GetMasks(self) -> array (NumPy)");
-BTK_SWIG_AUTODOC_IMPL(Point, SetMasks, "SetResiduals(self, array)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetFrameNumber, "SetFrameNumber(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetType, "SetUnit(self, int)");
 
@@ -200,22 +191,15 @@ BTK_SWIG_DOCSTRING_IMPL(Point, GetLabel, "Returns the point's label.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetLabel, "Sets the point's label.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetDescription, "Returns the point's description.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetDescription, "Sets the point's description.");
-BTK_SWIG_DOCSTRING(Point, GetValue, "Returns only one value for the given component and frame.");
-BTK_SWIG_DOCSTRING(Point, SetValue, "Sets only one value for the given component and frame.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetValues, "Returns the point's values.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetValues, "Sets the point's values.");
-BTK_SWIG_DOCSTRING(Point, GetResidual, "Returns only one residual for the given frame.");
-BTK_SWIG_DOCSTRING(Point, SetResidual, "Sets only one residual for the given frame.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetResiduals, "Returns the point's residuals.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetResiduals, "Sets the point's residuals.");
-BTK_SWIG_DOCSTRING(Point, GetMask, "Returns only one mask for the given frame.");
-BTK_SWIG_DOCSTRING(Point, SetMask, "Sets only one mask for the given frame.");
-BTK_SWIG_DOCSTRING_IMPL(Point, GetMasks, "Returns the point's masks.");
-BTK_SWIG_DOCSTRING_IMPL(Point, SetMasks, "Sets the point's masks.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetFrameNumber, "Returns the number of frames.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetFrameNumber, "Sets the number of frames.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetType, "Returns the point's type.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetType, "Sets the point's type.");
+BTK_SWIG_DOCSTRING_IMPL(Point, SetFrame, "Convenient method to easily set the coordinates x,y,z and the residual for the given frame.\nWARNING: This function is not safe. There is no checking to determine if the frame is out of range or not. It has the advantage to be faster.");
 
 // ------------------------------------------------------------------------- //
 //                                 ForcePlatform                             //

@@ -885,7 +885,6 @@ class C3DFileWriterTest(unittest.TestCase):
         self.assertAlmostEqual(acq.GetPoint(j).GetValues()[i,1], acq2.GetPoint(j).GetValues()[i,1], 4)
         self.assertAlmostEqual(acq.GetPoint(j).GetValues()[i,2], acq2.GetPoint(j).GetValues()[i,2], 4)
         self.assertAlmostEqual(acq.GetPoint(j).GetResiduals()[i], acq2.GetPoint(j).GetResiduals()[i], 4)
-        self.assertAlmostEqual(acq.GetPoint(j).GetMasks()[i], acq2.GetPoint(j).GetMasks()[i], 4)
       for j in range(0,acq.GetAnalogNumber()):
         self.assertAlmostEqual(acq.GetAnalog(j).GetValues()[i], acq2.GetAnalog(j).GetValues()[i], 4)
     

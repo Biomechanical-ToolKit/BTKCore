@@ -74,6 +74,11 @@ function itf = btkEmulateC3Dserver()
 %    - An AV ratio equal to 0 in BTK is automatically converted to 1. The 
 %      number of analog frames is at least equal to the number of video
 %      frames.
+%    - Starting with BTK 0.2, the camera mask is no longer supported. Trying
+%      to extract or set a mask will display a warning. The returned masks
+%      from the functions GetPointMask and GetPointMaskEx are fake masks and
+%      always set to '0000000'. To remove the warning, you have to add
+%      the command: 'warning('OFF','btk:C3Dserver:FakeMask')'.
 %
 %  Author: A. Barré
 %  Copyright 2009-2012 Biomechanical ToolKit (BTK).
@@ -85,16 +90,19 @@ function itf = btkEmulateC3Dserver()
 %    - Check for the btkGetMomentData (remove offset, in the global frame)
 
 %  HISTORY:
-%    - 04/11/2012: btkEmulateC3Dserver 1.0 beta 2 released with BTK 0.1.10
+%    - 12/08/30: btkEmulateC3Dserver 1.0 beta 3 released with BTK 0.2
+%        - Code updated to remove all the BTK functions related to the camera mask
+%          as this information was removed from BTK 0.2.
+%    - 12/04/11: btkEmulateC3Dserver 1.0 beta 2 released with BTK 0.1.10
 %        - Implementation errors in the function SaveFile for the C3Dserver emulation.
-%    - 06/28/2011: Initial public beta
+%    - 11/06/28: Initial public beta
 
 % Construct the emulated COM object by using function handles.
 id = btkC3DserverRequestNewHandle_p();
 itf.GetRegistrationMode = 2; % Register mode (full speed)
 itf.GetRegUserName = 'Free Emulation Copy';
 itf.GetRegUserOrganization = 'Biomechanical ToolKit (BTK)';
-itf.GetVersion = sprintf('C3D Server Emulator 1.0 (beta 2) - BTK version %s, compatible C3Dserver 1.144.0', btkGetVersion());
+itf.GetVersion = sprintf('C3D Server Emulator 1.0 (beta 3) - BTK version %s, compatible C3Dserver 1.144.0', btkGetVersion());
 itf.GetHandle = @()btkC3DserverGetHandle(id);
 itf.Open = @(filename,mode)btkC3DserverOpen(id,filename,mode);
 itf.Close = @()btkC3DserverClose(id);
@@ -1339,9 +1347,6 @@ elseif ((subFrame < 1) || (subFrame > btkGetAnalogSampleNumberPerFrame(h)))
     error('btk:C3Dserver','Invalid subframe number.');
 end
 frame_ = (frame - btkGetFirstFrame(h)) * btkGetAnalogSampleNumberPerFrame(h) + subFrame;
-% [analogs analogsInfo] = btkGetAnalogs(h);
-% labels = fieldnames(analogs);
-% data = analogs.(labels{channel+1});
 [data, info] = btkGetAnalog(h, channel+1);
 data = data(frame_);
 % Unscale the data
@@ -1376,9 +1381,6 @@ end
 sF = (startFrame - btkGetFirstFrame(h)) * btkGetAnalogSampleNumberPerFrame(h) + 1;
 eF = (endFrame - btkGetFirstFrame(h) + 1) * btkGetAnalogSampleNumberPerFrame(h);
 frames_ = sF:eF;
-% [analogs analogsInfo] = btkGetAnalogs(h);
-% labels = fieldnames(analogs);
-% data_ = analogs.(labels{channel+1});
 [data_, info] = btkGetAnalog(h, channel+1);
 data_ = data_(frames_);
 % Unscale the data
@@ -1419,9 +1421,6 @@ elseif ((subFrame < 1) || (subFrame > btkGetAnalogSampleNumberPerFrame(h)))
     error('btk:C3Dserver','Invalid subframe number.');
 end
 frame_ = (frame - btkGetFirstFrame(h)) * btkGetAnalogSampleNumberPerFrame(h) + subFrame;
-% [analogs analogsInfo] = btkGetAnalogs(h);
-% labels = fieldnames(analogs);
-% data_ = analogs.(labels{channel+1});
 [data_, info] = btkGetAnalog(h, channel+1);
 offset_ = info.offset;
 scale_ = info.scale;
@@ -1449,9 +1448,6 @@ if ((sF + length(data)) <= eF)
 else
     frames_ = sF:eF;
 end
-% [analogs analogsInfo] = btkGetAnalogs(h);
-% labels = fieldnames(analogs);
-% d = analogs.(labels{channel+1});
 [d, info] = btkGetAnalog(h, channel+1);
 offset_ = info.offset;
 scale_ = info.scale;
@@ -1659,9 +1655,6 @@ elseif ((cord < 0) || (cord > 2))
     error('btk:C3Dserver','Invalid Index has been used.');
 end
 frame = frame - btkGetFirstFrame(h) + 1;
-% points = btkGetPoints(h);
-% labels = fieldnames(points);
-% data = points.(labels{channel+1});
 data = btkGetPoint(h, channel+1);
 data = data(frame,cord+1);
 % Unscale the data (if necessary)
@@ -1687,9 +1680,6 @@ elseif ((cord < 0) || (cord > 2))
 end
 start_ = startFrame - btkGetFirstFrame(h) + 1;
 end_ = endFrame - btkGetFirstFrame(h) + 1;
-% points = btkGetPoints(h);
-% labels = fieldnames(points);
-% data_ = points.(labels{channel+1});
 data_ = btkGetPoint(h, channel+1);
 frames = start_:end_;
 data_ = data_(frames,cord+1);
@@ -1720,9 +1710,6 @@ end
 start_ = startFrame - btkGetFirstFrame(h) + 1;
 end_ = endFrame - btkGetFirstFrame(h) + 1;
 frames = start_:end_;
-% [points pointsInfo] = btkGetPoints(h);
-% labels = fieldnames(pointsInfo.residuals);
-% data_ = pointsInfo.residuals.(labels{channel+1});
 [values, data_] = btkGetPoint(h, channel+1);
 data_ = data_(frames);
 data = cell(length(frames),1);
@@ -1739,9 +1726,6 @@ elseif ((frame < btkGetFirstFrame(h)) || (frame > btkGetLastFrame(h)))
     error('btk:C3Dserver','Invalid frame number.');
 end
 frame = frame - btkGetFirstFrame(h) + 1;
-% [points pointsInfo] = btkGetPoints(h);
-% labels = fieldnames(pointsInfo.residuals);
-% data = pointsInfo.residuals.(labels{channel+1});
 [values, data] = btkGetPoint(h, channel+1);
 data = data(frame);
 
@@ -1753,13 +1737,8 @@ if ((channel < 0) || (channel >= btkGetPointNumber(h)))
 elseif ((frame < btkGetFirstFrame(h)) || (frame > btkGetLastFrame(h)))
     error('btk:C3Dserver','Invalid frame number.');
 end
-frame = frame - btkGetFirstFrame(h) + 1;
-% [points pointsInfo] = btkGetPoints(h);
-% labels = fieldnames(pointsInfo.masks);
-% data = pointsInfo.masks.(labels{channel+1});
-[values, residuals, data] = btkGetPoint(h, channel+1);
-data = data{frame};
-
+warning('btk:C3Dserver:FakeMask', 'The library BTK doesn''t support anymore the camera mask. Nothing is set. If you access to the mask, all the returned values are set to ''0000000''.');
+data = '0000000';
 
 function data = btkC3DserverGetPointMaskEx(id, channel, startFrame, endFrame)
 h = btkC3DserverExtractHandle_p(id);
@@ -1772,14 +1751,8 @@ elseif ((startFrame < btkGetFirstFrame(h)) || (startFrame > btkGetLastFrame(h)))
 elseif ((endFrame < btkGetFirstFrame(h)) || (endFrame > btkGetLastFrame(h)))
     error('btk:C3Dserver','Invalid end frame number.');
 end
-start_ = startFrame - btkGetFirstFrame(h) + 1;
-end_ = endFrame - btkGetFirstFrame(h) + 1;
-% [points pointsInfo] = btkGetPoints(h);
-% labels = fieldnames(pointsInfo.masks);
-% data = pointsInfo.masks.(labels{channel+1});
-[values, residuals, data] = btkGetPoint(h, channel+1);
-frames = start_:end_;
-data = data(frames);
+warning('btk:C3Dserver:FakeMask', 'The library BTK doesn''t support anymore the camera mask. Nothing is set. If you access to the mask, all the returned values are set to ''0000000''.');
+data = repmat({'0000000'},endFrame-startFrame+1,1);
 
 
 function res = btkC3DserverSetPointData(id, channel, cord, frame, data)
@@ -1799,9 +1772,6 @@ if (isstruct(md) && isstruct(md.info))
     scale = abs(md.info.values(1));
 end
 if (cord <= 2)
-%     points = btkGetPoints(h);
-%     labels = fieldnames(points);
-%     data_ = points.(labels{channel+1});
 	data_ = btkGetPoint(h, channel+1);
     data = double(data);
     if (btkC3DserverHandles(idx).dataType == 1) % Integer
@@ -1810,20 +1780,11 @@ if (cord <= 2)
     data_(frame_,cord+1) = data;
     btkSetPointValues(h, channel+1, data_);
 elseif (cord == 3)
-%     [points, pointsInfo] = btkGetPoints(h);
-%     labels = fieldnames(pointsInfo.residuals);
-%     data_ = pointsInfo.residuals.(labels{channel+1});
     [values, data_] = btkGetPoint(h, channel+1);
     data_(frame_) = floor(double(data) / scale) * scale;
     btkSetPointResiduals(h, channel+1, data_);
 elseif (cord == 4)
-%     [points, pointsInfo] = btkGetPoints(h);
-%     labels = fieldnames(pointsInfo.masks);
-%     data_ = btkConvertBinaryMasks2Decimals(pointsInfo.masks.(labels{channel+1}));
-    [values, residuals, data_] = btkGetPoint(h, channel+1);
-    data_ = btkConvertBinaryMasks2Decimals(data_);
-    data_(frame_) = btkConvertBinaryMasks2Decimals(data);
-    btkSetPointMasks(h, channel+1, data_);
+    warning('btk:C3Dserver:FakeMask', 'The library BTK doesn''t support anymore the camera mask. Nothing is set. If you access to the mask, all the returned values are set to ''0000000''.');
 end
 btkC3DserverSetModified_p(idx,1);
 res = 1;
@@ -1855,9 +1816,6 @@ if (isstruct(md) && isstruct(md.info))
     scale = abs(md.info.values(1));
 end
 if (cord <= 2)
-%     points = btkGetPoints(h);
-%     labels = fieldnames(points);
-%     data_ = points.(labels{channel+1});
     data_ = btkGetPoint(h, channel+1);
     data = double(data);
     if (btkC3DserverHandles(idx).dataType == 1) % Integer
@@ -1866,23 +1824,11 @@ if (cord <= 2)
     data_(frames,cord+1) = data;
     btkSetPointValues(h, channel+1, data_);
 elseif (cord == 3)
-%     [points, pointsInfo] = btkGetPoints(h);
-%     labels = fieldnames(pointsInfo.residuals);
-%     data_ = pointsInfo.residuals.(labels{channel+1});
     [values, data_] = btkGetPoint(h, channel+1);
     data_(frames) = floor(double(data) / scale) * scale;
     btkSetPointResiduals(h, channel+1, data_);
 elseif (cord == 4)
-%     [points, pointsInfo] = btkGetPoints(h);
-%     labels = fieldnames(pointsInfo.masks);
-%     data_ = btkConvertBinaryMasks2Decimals(pointsInfo.masks.(labels{channel+1}));
-    [values, residuals, data_] = btkGetPoint(h, channel+1);
-    data_ = btkConvertBinaryMasks2Decimals(data_);
-    data_(frames) = btkConvertBinaryMasks2Decimals(data);
-%     for i = 1:length(frames)
-%         data_(frames(i)) = btkConvertBinaryMasks2Decimals(data(i,7:-1:1));
-%     end
-    btkSetPointMasks(h, channel+1, data_);
+    warning('btk:C3Dserver:FakeMask', 'The library BTK doesn''t support anymore the camera mask. Nothing is set. If you access to the mask, all the returned values are set to ''0000000''.');
 end
 btkC3DserverSetModified_p(idx,1);
 res = 1;
@@ -1968,16 +1914,9 @@ pv(pidx,:) = zeros(length(pidx), 3 * btkGetPointNumber(h));
 rv = struct2array(pointsInfo.residuals);
 rv(newDataIdx,:) = rv(oldDataIdx,:);
 rv(pidx,:) = zeros(length(pidx), btkGetPointNumber(h));
-% - masks
-mv = struct2array(pointsInfo.masks);
-mv(newDataIdx,:) = mv(oldDataIdx,:);
-nullMask = '0000000';
 % - storing modifications
 for i = 1:size(pv,2) / 3
-    for j = pidx 
-        mv{j,i} = nullMask;
-    end
-    btkSetPoint(h, i, pv(:,(i-1)*3+1:i*3), rv(:,i), btkConvertBinaryMasks2Decimals(mv(:,i)));
+    btkSetPoint(h, i, pv(:,(i-1)*3+1:i*3), rv(:,i));
 end
 % Modifying analog channels
 aidx = (insertAt-1)*snpf+1:(insertAt+frames-1)*snpf;
@@ -2011,8 +1950,6 @@ pv = struct2array(points);
 pv = pv(pidx,:);
 rv = struct2array(pointsInfo.residuals);
 rv = rv(pidx,:);
-mv = struct2array(pointsInfo.masks);
-mv = mv(pidx,:);
 % - Analog
 aidx = setdiff(ff:lf*snpf, ((startAt-1)*snpf)+ff:(startAt+frames-1)*snpf)-ff+1;
 av = btkGetAnalogsValues(h);
@@ -2022,7 +1959,7 @@ num = btkGetPointFrameNumber(h) - frames;
 btkSetFrameNumber(h, num);
 % Storing modifications
 for i = 1:size(pv,2) / 3
-    btkSetPoint(h, i, pv(:,(i-1)*3+1:i*3), rv(:,i), btkConvertBinaryMasks2Decimals(mv(:,i)));
+    btkSetPoint(h, i, pv(:,(i-1)*3+1:i*3), rv(:,i));
 end
 btkSetAnalogsValues(h, av);
 % Update the parameter POINT:FRAMES
@@ -2244,10 +2181,3 @@ end
 sF = (startFrame - btkGetFirstFrame(h)) * btkGetAnalogSampleNumberPerFrame(h) + 1;
 eF = (endFrame - btkGetFirstFrame(h) + 1) * btkGetAnalogSampleNumberPerFrame(h);
 frames = sF:eF;
-
-function d = btkConvertBinaryMasks2Decimals(b)
-s = char(b);
-[m,n] = size(s);
-v = s - '0'; 
-twos = pow2(0:1:n-1);
-d = sum(v .* twos(ones(m,1),:),2);

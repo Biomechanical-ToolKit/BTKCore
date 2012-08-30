@@ -16,8 +16,6 @@ CXXTEST_SUITE(PointTest)
     TS_ASSERT_EQUALS(test->GetValues().cols(), 3);
     TS_ASSERT_EQUALS(test->GetResiduals().rows(), 200);
     TS_ASSERT_EQUALS(test->GetResiduals().cols(), 1);
-    TS_ASSERT_EQUALS(test->GetMasks().rows(), 200);
-    TS_ASSERT_EQUALS(test->GetMasks().cols(), 1);
     TS_ASSERT_EQUALS(test->GetType(), btk::Point::Marker);
   };
   
@@ -28,7 +26,6 @@ CXXTEST_SUITE(PointTest)
     test->SetFrameNumber(225);
     TS_ASSERT_EQUALS(test->GetValues().rows(), 225);
     TS_ASSERT_EQUALS(test->GetResiduals().rows(), 225);
-    TS_ASSERT_EQUALS(test->GetMasks().rows(), 225);
     TS_ASSERT(t1 != test->GetTimestamp());
   };
   

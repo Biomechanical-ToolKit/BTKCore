@@ -143,7 +143,6 @@ namespace btk
           else
           {
             dirAngle->GetResiduals().coeffRef(i) = -1.0;
-            dirAngle->GetMasks().coeffRef(i) = -1.0;
           }
         }
         output->InsertItem(dirAngle);

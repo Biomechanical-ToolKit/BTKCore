@@ -77,6 +77,11 @@
  * - An AV ratio equal to 0 in BTK is automatically converted to 1. The 
  *   number of analog frames is at least equal to the number of video
  *   frames.
+ * - Starting with BTK 0.2, the camera mask is no longer supported. Trying
+ *   to extract or set a mask will display a warning. The returned masks
+ *   from the functions GetPointMask and GetPointMaskEx are fake masks and
+ *   always set to '0000000'. To remove the warning, you have to add
+ *   the command: 'warning('OFF','btk:C3Dserver:FakeMask')'.
  *
  * @ingroup BTKMatlabGeneral
  */

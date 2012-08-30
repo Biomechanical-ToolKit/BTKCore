@@ -152,12 +152,9 @@ namespace btk
         int frameNumber = (*it)->GetChannel(0)->GetFrameNumber();
         Wrench::Pointer wrh = Wrench::New(this->GetWrenchPrefix() + ToString(inc), frameNumber);
         output->InsertItem(wrh);
-        // Residuals & masks
-        wrh->GetPosition()->GetMasks().setZero(frameNumber);
+        // Residuals
         wrh->GetPosition()->GetResiduals().setZero(frameNumber);        
-        wrh->GetForce()->GetMasks().setZero(frameNumber);
         wrh->GetForce()->GetResiduals().setZero(frameNumber);
-        wrh->GetMoment()->GetMasks().setZero(frameNumber);
         wrh->GetMoment()->GetResiduals().setZero(frameNumber);
         // Values
         switch((*it)->GetType())

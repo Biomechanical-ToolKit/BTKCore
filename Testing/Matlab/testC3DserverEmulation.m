@@ -3414,7 +3414,8 @@ c3dsrv.Close;
 btksrv.Close();
 end
 
-function testGetPointMaskEx_Integer(d)
+% Removed as the support of the camera mask was removed from BTK
+function xtestGetPointMaskEx_Integer(d)
 c3dsrv = actxserver('C3Dserver.C3D');
 btksrv = btkEmulateC3Dserver();
 c3dsrv.Open(d.filename2,3);
@@ -3491,7 +3492,8 @@ c3dsrv.Close;
 btksrv.Close();
 end
 
-function testGetPointMask_IntegerFormat(d)
+% Removed as the support of the camera mask was removed from BTK
+function xtestGetPointMask_IntegerFormat(d)
 c3dsrv = actxserver('C3Dserver.C3D');
 btksrv = btkEmulateC3Dserver();
 c3dsrv.Open(d.filename,3);
@@ -3513,7 +3515,8 @@ c3dsrv.Close;
 btksrv.Close();
 end
 
-function testGetPointMask_FloatFormat(d)
+% Removed as the support of the camera mask was removed from BTK
+function xtestGetPointMask_FloatFormat(d)
 c3dsrv = actxserver('C3Dserver.C3D');
 btksrv = btkEmulateC3Dserver();
 c3dsrv.Open(d.filename2,3);
@@ -3573,8 +3576,9 @@ for i=1:numel(frames)
                         c3dsrv.GetPointResidual(channels(k),frames(i)), ...
                         btksrv.GetPointResidual(channels(k),frames(i)),...
                         'absolute', 1e-5);
-            assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
-                        btksrv.GetPointMask(channels(k),frames(i)));
+% Removed as the support of the camera mask was removed from BTK
+%            assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
+%                        btksrv.GetPointMask(channels(k),frames(i)));
         end
     end
 end
@@ -3621,8 +3625,9 @@ for i=1:numel(frames)
                         c3dsrv.GetPointResidual(channels(k),frames(i)), ...
                         btksrv.GetPointResidual(channels(k),frames(i)),...
                         'absolute', 1e-5);
-            assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
-                        btksrv.GetPointMask(channels(k),frames(i)));
+% Removed as the support of the camera mask was removed from BTK
+%            assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
+%                        btksrv.GetPointMask(channels(k),frames(i)));
         end
     end
 end
@@ -3671,14 +3676,16 @@ for i=1:numel(frames)
             d2Z = btksrv.GetPointDataEx(channels(k),2,btksrv.GetVideoFrame(0),btksrv.GetVideoFrame(1),char(0));
             d1R = c3dsrv.GetPointResidualEx(channels(k),c3dsrv.GetVideoFrame(0),c3dsrv.GetVideoFrame(1));
             d2R = btksrv.GetPointResidualEx(channels(k),btksrv.GetVideoFrame(0),btksrv.GetVideoFrame(1));
-            d1M = c3dsrv.GetPointMaskEx(channels(k),c3dsrv.GetVideoFrame(0),c3dsrv.GetVideoFrame(1));
-            d2M = btksrv.GetPointMaskEx(channels(k),btksrv.GetVideoFrame(0),btksrv.GetVideoFrame(1));
+% Removed as the support of the camera mask was removed from BTK
+%            d1M = c3dsrv.GetPointMaskEx(channels(k),c3dsrv.GetVideoFrame(0),c3dsrv.GetVideoFrame(1));
+%            d2M = btksrv.GetPointMaskEx(channels(k),btksrv.GetVideoFrame(0),btksrv.GetVideoFrame(1));
             for l = 1:length(d1X)
                 assertEqual(d1X{l}, d2X{l});
                 assertEqual(d1Y{l}, d2Y{l});
                 assertEqual(d1Z{l}, d2Z{l});
                 assertElementsAlmostEqual(d1R{l}, d2R{l}, 'absolute', 1e-5);
-                assertEqual(d1M{l}, d2M{l});
+% Removed as the support of the camera mask was removed from BTK
+%                assertEqual(d1M{l}, d2M{l});
             end
         end
     end
@@ -3728,14 +3735,16 @@ for i=1:numel(frames)
             d2Z = btksrv.GetPointDataEx(channels(k),2,btksrv.GetVideoFrame(0),btksrv.GetVideoFrame(1),char(0));
             d1R = c3dsrv.GetPointResidualEx(channels(k),c3dsrv.GetVideoFrame(0),c3dsrv.GetVideoFrame(1));
             d2R = btksrv.GetPointResidualEx(channels(k),btksrv.GetVideoFrame(0),btksrv.GetVideoFrame(1));
-            d1M = c3dsrv.GetPointMaskEx(channels(k),c3dsrv.GetVideoFrame(0),c3dsrv.GetVideoFrame(1));
-            d2M = btksrv.GetPointMaskEx(channels(k),btksrv.GetVideoFrame(0),btksrv.GetVideoFrame(1));
+% Removed as the support of the camera mask was removed from BTK
+%            d1M = c3dsrv.GetPointMaskEx(channels(k),c3dsrv.GetVideoFrame(0),c3dsrv.GetVideoFrame(1));
+%            d2M = btksrv.GetPointMaskEx(channels(k),btksrv.GetVideoFrame(0),btksrv.GetVideoFrame(1));
             for l = 1:length(d1X)
                 assertEqual(d1X{l}, d2X{l});
                 assertEqual(d1Y{l}, d2Y{l});
                 assertEqual(d1Z{l}, d2Z{l});
                 assertElementsAlmostEqual(d1R{l}, d2R{l}, 'absolute', 1e-5);
-                assertEqual(d1M{l}, d2M{l});
+% Removed as the support of the camera mask was removed from BTK
+%                assertEqual(d1M{l}, d2M{l});
             end
         end
     end
@@ -3784,8 +3793,9 @@ for i=1:numel(frames)
                     c3dsrv.GetPointResidual(channels(k),frames(i)), ...
                     btksrv.GetPointResidual(channels(k),frames(i)),...
                     'absolute', 1e-5);
-            assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
-                    btksrv.GetPointMask(channels(k),frames(i)));
+% Removed as the support of the camera mask was removed from BTK
+%            assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
+%                    btksrv.GetPointMask(channels(k),frames(i)));
     end
 end
 btkidx = btksrv.GetParameterIndex('POINT','USED'); c3didx = c3dsrv.GetParameterIndex('POINT','USED');
@@ -3837,8 +3847,9 @@ for i=1:numel(frames)
                     c3dsrv.GetPointResidual(channels(k),frames(i)), ...
                     btksrv.GetPointResidual(channels(k),frames(i)),...
                     'absolute', 1e-5);
-            assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
-                    btksrv.GetPointMask(channels(k),frames(i)));
+% Removed as the support of the camera mask was removed from BTK
+%            assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
+%                    btksrv.GetPointMask(channels(k),frames(i)));
     end
 end
 btkidx = btksrv.GetParameterIndex('POINT','USED'); c3didx = c3dsrv.GetParameterIndex('POINT','USED');
@@ -3969,8 +3980,9 @@ for i=1:numel(frames)
                 c3dsrv.GetPointResidual(channels(k),frames(i)), ...
                 btksrv.GetPointResidual(channels(k),frames(i)),...
                 'absolute', 1e-5);
-        assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
-                btksrv.GetPointMask(channels(k),frames(i)));
+% Removed as the support of the camera mask was removed from BTK
+%        assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
+%                btksrv.GetPointMask(channels(k),frames(i)));
     end
 end
 channels = floor(rand(1,num) * btkGetAnalogNumber(btksrv.GetHandle()));
@@ -4014,8 +4026,9 @@ for i=1:numel(frames)
                 c3dsrv.GetPointResidual(channels(k),frames(i)), ...
                 btksrv.GetPointResidual(channels(k),frames(i)),...
                 'absolute', 1e-5);
-        assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
-                btksrv.GetPointMask(channels(k),frames(i)));
+% Removed as the support of the camera mask was removed from BTK
+%        assertEqual(c3dsrv.GetPointMask(channels(k),frames(i)), ...
+%                btksrv.GetPointMask(channels(k),frames(i)));
     end
 end
 channels = floor(rand(1,num) * btkGetAnalogNumber(btksrv.GetHandle()));

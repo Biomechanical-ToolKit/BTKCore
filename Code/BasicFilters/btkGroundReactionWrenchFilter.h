@@ -115,7 +115,6 @@ namespace btk
         Py.coeffRef(i) = 0.0;
         // Pz.coeffRef(i) = 0.0; // Already set to 0
         grw->GetPosition()->GetResiduals().coeffRef(i) = -1.0;
-        grw->GetPosition()->GetMasks().coeffRef(i) = -1.0;
       }
     }
     // M_pwa = M_s + F_s x PWA

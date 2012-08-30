@@ -277,9 +277,8 @@ namespace btk
           Point::Residuals res = Point::Residuals::Constant(numFrames,1,-1.0);
           for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
           {
-            // All the residuals and masks are set to -1 by default
+            // All the residuals are set to -1 by default
             (*it)->SetResiduals(res);
-            (*it)->SetMasks(res);
             // Extract label
             std::string label = bifs.ReadString(256);
             (*it)->SetLabel(this->CleanLabel(label));
@@ -296,7 +295,7 @@ namespace btk
                 double x = bifs.ReadFloat();
                 double y = bifs.ReadFloat();
                 double z = bifs.ReadFloat();
-                (*it)->SetFrame(j + shift, x, y, z); // Res and mask are set to 0 by default.
+                (*it)->SetFrame(j + shift, x, y, z); // Residual is set to 0 by default.
               }
             }
           }
@@ -320,7 +319,7 @@ namespace btk
               double y = bifs.ReadFloat();
               double z = bifs.ReadFloat();
               if ((x == 0.0) && (y == 0.0) && (z == 0.0))
-                (*it)->SetFrame(idx, x, y, z, -1.0, -1.0);
+                (*it)->SetFrame(idx, x, y, z, -1.0);
               else
                 (*it)->SetFrame(idx, x, y, z);
             }

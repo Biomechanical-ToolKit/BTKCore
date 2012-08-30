@@ -225,7 +225,6 @@ namespace btk
               (*it)->GetValues().coeffRef(i, 1) = 0.0;
               (*it)->GetValues().coeffRef(i, 2) = 0.0;
               (*it)->GetResiduals().coeffRef(i) = -1.0;
-              (*it)->GetMasks().coeffRef(i) = -1.0;
             }
             else
             {
@@ -233,7 +232,6 @@ namespace btk
               FromString(y, (*it)->GetValues().coeffRef(i, 1));
               FromString(z, (*it)->GetValues().coeffRef(i, 2));
               (*it)->GetResiduals().coeffRef(i) = 0.0;
-              (*it)->GetMasks().coeffRef(i) = 0.0;
             }
           }
         }

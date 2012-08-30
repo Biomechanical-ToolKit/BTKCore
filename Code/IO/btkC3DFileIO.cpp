@@ -792,8 +792,7 @@ namespace btk
               fdf->ReadPoint(&(point->GetValues().data()[frame]),
                              &(point->GetValues().data()[frame + frameNumber]),
                              &(point->GetValues().data()[frame + 2*frameNumber]),
-                             &(point->GetResiduals().data()[frame]), 
-                             &(point->GetMasks().data()[frame]),
+                             &(point->GetResiduals().data()[frame]),
                              this->m_PointScale);
               ++itM;
             }
@@ -865,13 +864,12 @@ namespace btk
             MetaDataCollapseChildrenValues<std::string>(collapsed, *itPoint, "DESCRIPTIONS", pointNumber, "uname*");
             inc = 0; for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
               (*it)->SetLabel(collapsed[inc++]);
-            // Set correctly coordinates, residuals and masks for occluded markers
+            // Set correctly coordinates and residuals for occluded markers
             for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
             {
               Point::Values& coords = (*it)->GetValues();
               Eigen::Matrix<double, Eigen::Dynamic, 1> diff = (coords.rowwise().sum() / 3.0).cwise() - 9999999.0;
               Point::Residuals& res = (*it)->GetResiduals();
-              Point::Masks& masks = (*it)->GetMasks();
               for (int k = 0 ; k < (*it)->GetFrameNumber() ; ++k)
               {
                 if (fabs(diff.coeff(k)) < std::numeric_limits<float>::epsilon())
@@ -880,7 +878,6 @@ namespace btk
                   coords.coeffRef(k,1) = 0.0;
                   coords.coeffRef(k,2) = 0.0;
                   res.coeffRef(k) = -1.0;
-                  masks.coeffRef(k) = -1.0;
                 }
               }
             }
@@ -1211,17 +1208,6 @@ namespace btk
       // -= DATA =-
       if (!templateFile)
       {
-        // Check the values for cameras' masks and be sure to have a compatible format
-        bool invalidMaskValue = false;
-        double maxMaskValue = 0.0;
-        for (Acquisition::PointConstIterator itPoint = input->BeginPoint() ; itPoint != input->EndPoint() ; ++itPoint)
-          maxMaskValue = std::max(maxMaskValue, (*itPoint)->GetMasks().maxCoeff());
-        if (maxMaskValue > 128) // max camera mask value
-        {
-          invalidMaskValue = true;
-          btkErrorMacro("Cameras' masks don't fit the format used in the C3D format. Mask for visible marker is replaced by 0 and -1 when occluded.");
-        }
-        
         obfs->SeekWrite(512 * (dS - 1), BinaryFileStream::Begin);
         if (this->m_StorageFormat == Integer) // integer
         {
@@ -1246,8 +1232,7 @@ namespace btk
             fdf->WritePoint(point->GetValues().data()[frame],
                             point->GetValues().data()[frame + frameNumber],
                             point->GetValues().data()[frame + 2*frameNumber],
-                            point->GetResiduals().data()[frame], 
-                            invalidMaskValue ? ((point->GetMasks().data()[frame] >= 0.0) ? 0.0 : -1.0) : point->GetMasks().data()[frame],
+                            point->GetResiduals().data()[frame],
                             this->m_PointScale);
             ++itM;
           }

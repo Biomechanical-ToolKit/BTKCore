@@ -92,7 +92,6 @@ protected:
 
 %include "Common/btkCommonSwig_Analog.h"
 
-BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Analog, Value);
 BTK_SWIG_DECLARE_IMPL_CLASS_DATA(Analog)
 {
 public:
@@ -105,6 +104,7 @@ public:
   BTK_SWIG_DECLARE_IMPL_GETSET(Gain, Gain);
   BTK_SWIG_DECLARE_IMPL_GETSET(Offset, int);
   BTK_SWIG_DECLARE_IMPL_GETSET(Scale, double);
+  void SetFrame(int , double );
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(Analog);
 };
@@ -115,13 +115,9 @@ protected:
 
 %eigen_typemaps(btk::Point::Values)
 %eigen_typemaps(btk::Point::Residuals)
-%eigen_typemaps(btk::Point::Masks)
 
 %include "Common/btkCommonSwig_Point.h"
 
-BTK_SWIG_EXTEND_CLASS_GETSET_MATRIX(Point, Value);
-BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Point, Residual);
-BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Point, Mask);
 BTK_SWIG_DECLARE_IMPL_CLASS_DATA(Point)
 {
 public:
@@ -130,9 +126,9 @@ public:
   BTK_SWIG_DECLARE_IMPL_GETSET(Description, std::string&);
   BTK_SWIG_DECLARE_IMPL_GETSET(Values, btk::Point::Values&);
   BTK_SWIG_DECLARE_IMPL_GETSET(Residuals, btk::Point::Residuals&);
-  BTK_SWIG_DECLARE_IMPL_GETSET(Masks, btk::Point::Masks&);
   BTK_SWIG_DECLARE_IMPL_GETSET(FrameNumber, int);
   BTK_SWIG_DECLARE_IMPL_GETSET(Type, Type);
+  void SetFrame(int , double , double , double , double res = 0.0);
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(Point);
 };

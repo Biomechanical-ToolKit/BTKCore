@@ -955,8 +955,6 @@ namespace btk
         (*it)->SetValues(v);
         Point::Residuals r = (*it)->GetResiduals().block(startRow,0,frameNumber,1);
         (*it)->SetResiduals(r);
-        Point::Masks m = (*it)->GetMasks().block(startRow,0,frameNumber,1);
-        (*it)->SetMasks(m);
       }
       for (AnalogIterator it = this->BeginAnalog() ; it != this->EndAnalog() ; ++it)
       {
@@ -978,10 +976,6 @@ namespace btk
         Point::Residuals r = Point::Residuals::Zero(frameNumber, 1);
         r.block(startRow,0,actualFrameNumber,1) = (*it)->GetResiduals();
         (*it)->SetResiduals(r);
-
-        Point::Masks m = Point::Masks::Zero(frameNumber, 1);
-        m.block(startRow,0,actualFrameNumber,1) = (*it)->GetMasks();
-        (*it)->SetMasks(m);
       }
       for (AnalogIterator it = this->BeginAnalog() ; it != this->EndAnalog() ; ++it)
       {

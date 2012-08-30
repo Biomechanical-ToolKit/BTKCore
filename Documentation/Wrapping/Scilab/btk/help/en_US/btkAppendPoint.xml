@@ -15,9 +15,9 @@
   </refnamediv>
   <refsynopsisdiv>
     <title>Calling Sequence</title>
-    <synopsis>btkAppendPoint(h, type, label, values, [residuals, [masks, [description]]])
-points = btkAppendPoint(h, type, label, values, [residuals, [masks, [description]]])
-[points, pointsInfo] = btkAppendPoint(h, type, label, values, [residuals, [masks, [description]]])</synopsis>
+    <synopsis>btkAppendPoint(h, type, label, values, [residuals, [description]])
+points = btkAppendPoint(h, type, label, values, [residuals, [description]])
+[points, pointsInfo] = btkAppendPoint(h, type, label, values, [residuals, [description]])</synopsis>
   </refsynopsisdiv>
   <refsection>
     <title>Parameters</title>
@@ -41,10 +41,6 @@ points = btkAppendPoint(h, type, label, values, [residuals, [masks, [description
       <varlistentry>
         <term>residuals</term>
         <listitem><para>A matrix (<literal>n</literal>,1) corresponding to the residuals of the 3D reconstruction of the marker. Note: This parameter is an informational parameter and is not used in some commercial softwares.</para></listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>masks</term>
-        <listitem><para>A matrix (<literal>n</literal>,1) corresponding to the list of cameras used to reconstruct markers' positions. This list is represented as an integer corresponding to a conversion of a binary number. For example, the value 14 correspond to the mask 0b0001110 meaning that cameras #2, #3 and #4 was used to reconstruct the point. Note: This parameter is an informational parameter and is not used in some commercial software</para></listitem>
       </varlistentry>
       <varlistentry>
         <term>description</term>
