@@ -54,6 +54,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     case 8:
       res = btk::Acquisition::Bit8;
       break;
+    case 10:
+      res = btk::Acquisition::Bit10;
+      break;
     case 12:
       break;
     case 14:
