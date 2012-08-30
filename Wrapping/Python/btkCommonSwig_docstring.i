@@ -128,6 +128,7 @@ then the scale and offset are important."
 
 BTK_SWIG_AUTODOC_IMPL(Analog, SetLabel, "SetLabel(self, string)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetDescription, "SetDescription(self, string)");
+ 	BTK_SWIG_AUTODOC(Analog, SetValue, "SetValue(self, int, double)");
 BTK_SWIG_AUTODOC_IMPL(Analog, GetValues, "GetValues(self) -> array (NumPy)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetValues, "SetValues(self, array)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetFrameNumber, "SetFrameNumber(self, int)");
@@ -139,6 +140,8 @@ BTK_SWIG_DOCSTRING_IMPL(Analog, GetLabel, "Returns the analog's label.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetLabel, "Sets the analog's label.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetDescription, "Returns the analog's description.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetDescription, "Sets the analog's description.");
+BTK_SWIG_DOCSTRING(Analog, GetValue, "Returns only one sample.");
+BTK_SWIG_DOCSTRING(Analog, SetValue, "Sets only one sample.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetValues, "Returns the analog's samples.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetValues, "Sets the analog's samples.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetFrameNumber, "Returns the number of frames.");
@@ -179,8 +182,10 @@ Note: A residual with a value equal to 0 means that this frame has been post-pro
 
 BTK_SWIG_AUTODOC_IMPL(Point, SetLabel, "SetLabel(self, string)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetDescription, "SetDescription(self, string)");
+BTK_SWIG_AUTODOC(Point, SetValue, "SetValue(self, int, double)");
 BTK_SWIG_AUTODOC_IMPL(Point, GetValues, "GetValues(self) -> array (NumPy)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetValues, "SetValues(self, array)");
+BTK_SWIG_AUTODOC(Point, SetResidual, "SetResidual(self, int, double)");
 BTK_SWIG_AUTODOC_IMPL(Point, GetResiduals, "GetResiduals(self) -> array (NumPy)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetResiduals, "SetResiduals(self, array)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetFrameNumber, "SetFrameNumber(self, int)");
@@ -191,8 +196,12 @@ BTK_SWIG_DOCSTRING_IMPL(Point, GetLabel, "Returns the point's label.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetLabel, "Sets the point's label.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetDescription, "Returns the point's description.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetDescription, "Sets the point's description.");
+BTK_SWIG_DOCSTRING(Point, GetValue, "Returns only one value for the given component and frame.");
+BTK_SWIG_DOCSTRING(Point, SetValue, "Sets only one value for the given component and frame.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetValues, "Returns the point's values.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetValues, "Sets the point's values.");
+BTK_SWIG_DOCSTRING(Point, GetResidual, "Returns only one residual for the given frame.");
+BTK_SWIG_DOCSTRING(Point, SetResidual, "Sets only one residual for the given frame.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetResiduals, "Returns the point's residuals.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetResiduals, "Sets the point's residuals.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetFrameNumber, "Returns the number of frames.");

@@ -92,6 +92,7 @@ protected:
 
 %include "Common/btkCommonSwig_Analog.h"
 
+BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Analog, Value);
 BTK_SWIG_DECLARE_IMPL_CLASS_DATA(Analog)
 {
 public:
@@ -118,6 +119,8 @@ protected:
 
 %include "Common/btkCommonSwig_Point.h"
 
+BTK_SWIG_EXTEND_CLASS_GETSET_MATRIX(Point, Value);
+BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(Point, Residual);
 BTK_SWIG_DECLARE_IMPL_CLASS_DATA(Point)
 {
 public:
