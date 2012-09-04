@@ -81,6 +81,7 @@ public slots:
   void clearRecentFiles();
   void openFile();
   void openFileDropped(const QString& filename);
+  void reloadFile();
   void saveFile();
   void saveAsFile();
   void closeFile();
@@ -207,7 +208,7 @@ private:
   void saveFile(const QString& filename);
   void exportAcquisition(const QString& filter);
   void importAcquisition(const QString& filter);
-  bool importAcquisitions(const QStringList& filenames, bool allFramesKept = true);
+  bool importAcquisitions(const QStringList& filenames, bool allFramesKept = true, bool keepWindowTitle = true);
   void importAssistant(int systemIndex, bool systemLocked = false, bool allFramesKeptOnly = false);
   bool importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept, bool fromOpenAction = false);
   void reset();

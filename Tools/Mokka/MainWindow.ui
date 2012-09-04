@@ -144,6 +144,7 @@
     </widget>
     <addaction name="action_FileOpen"/>
     <addaction name="menuOpen_Recent"/>
+    <addaction name="actionReloadFile"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
@@ -237,7 +238,6 @@
      <addaction name="actionToolComputeVectorAngle"/>
     </widget>
     <addaction name="menuModel"/>
-    <addaction name="separator"/>
     <addaction name="menuAcquisition"/>
     <addaction name="menuEvent"/>
     <addaction name="menuMarker"/>
@@ -331,7 +331,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Save As</string>
+    <string>Save As...</string>
    </property>
   </action>
   <action name="actionViewMetadata">
@@ -560,6 +560,19 @@
   <action name="actionToolComputeVectorAngle">
    <property name="text">
     <string>Compute Angle between 2 Vectors</string>
+   </property>
+  </action>
+  <action name="actionReloadFile">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Reload</string>
+   </property>
+  </action>
+  <action name="actionGaitEventAssistant">
+   <property name="text">
+    <string>Gait Event Detection</string>
    </property>
   </action>
  </widget>

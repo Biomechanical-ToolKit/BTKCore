@@ -153,6 +153,7 @@ MainWindow::MainWindow(QWidget* parent)
 #endif
   this->mp_FileInfoDock->reset(); // Force to update geometry
   this->action_FileOpen->setShortcut(QKeySequence::Open);
+  this->actionReloadFile->setShortcut(QKeySequence::Refresh);
   this->actionClose->setShortcut(QKeySequence::Close);
   this->actionSave->setShortcut(QKeySequence::Save);
   this->actionSave_As->setShortcut(QKeySequence::SaveAs);
@@ -267,6 +268,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionHelp, SIGNAL(triggered()), this, SLOT(help()));
   connect(this->actionViewMetadata, SIGNAL(triggered()), this, SLOT(viewMetadata()));
   connect(this->action_FileOpen, SIGNAL(triggered()), this, SLOT(openFile()));
+  connect(this->actionReloadFile, SIGNAL(triggered()), this, SLOT(reloadFile()));
   connect(this->actionSave, SIGNAL(triggered()), this, SLOT(saveFile()));
   connect(this->actionSave_As, SIGNAL(triggered()), this, SLOT(saveAsFile()));
   connect(this->actionClose, SIGNAL(triggered()), this, SLOT(closeFile()));
@@ -1030,6 +1032,12 @@ void MainWindow::openFile()
   }
 };
 
+void MainWindow::reloadFile()
+{
+  if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
+    this->openFile(this->m_RecentFiles[0]); // Don't use 'this->mp_Acquisition->fileName()' as it cleared during the loading.
+};
+
 void MainWindow::openFileDropped(const QString& filename)
 {
   if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
@@ -1056,7 +1064,6 @@ void MainWindow::openFile(const QString& filename)
     this->mp_ImportAssistant->amtiForceMomentLineEdit->setReadOnly(true);
     this->mp_ImportAssistant->amtiForceMomentButton->setEnabled(false);
     this->mp_ImportAssistant->importOptionFrame->setVisible(false);
-    this->mp_ImportAssistant->setWindowTitle("");
     bool accepted = this->mp_ImportAssistant->exec();
     this->mp_ModelDock->setEnabled(true); // If the dock is not enabled before the import, then its signals are not emited.
     if (!accepted)
@@ -1131,6 +1138,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionViewMetadata->setEnabled(true);
   this->actionSave_As->setEnabled(true);
   this->menuExport->menuAction()->setEnabled(true);
+  this->actionReloadFile->setEnabled(true);
   // Tools Menu
   this->actionToolCreateMarker->setEnabled(true);
   this->actionToolComputeMarkerDistance->setEnabled(true);
@@ -1236,6 +1244,7 @@ void MainWindow::importAssistant()
 {
   this->mp_ImportAssistant->clear(this->m_LastDirectory);
   this->importAssistant(this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
+  this->actionReloadFile->setEnabled(false); // Because the imported file(s) from the assistant cannot be reloaded
 }
 
 void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFramesKeptOnly)
@@ -1310,7 +1319,7 @@ void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFra
     }
     else
     {
-      if (this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked()))
+      if (this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked(), false))
       {
         QSettings settings;
         settings.setValue("ImportAssistant/lastAcquisitionSystem", this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
@@ -1461,22 +1470,29 @@ void MainWindow::importAcquisition(const QString& filter)
                        this->m_LastDirectory,
                        filter);
   if (!filename.isEmpty())
+  {
+    QString f = this->mp_Acquisition->fileName();
     this->importAcquisitions(QStringList(filename));
+    this->mp_Acquisition->setFileName(f);
+  }
 };
 
-bool MainWindow::importAcquisitions(const QStringList& filenames, bool allFramesKept)
+bool MainWindow::importAcquisitions(const QStringList& filenames, bool allFramesKept, bool keepWindowTitle)
 {
   bool noImportError = false;
   if (!filenames.isEmpty())
   {
     LOG_INFO(tr("Importing acquisition(s)."));
     QString title = this->windowTitle();
+    bool reloadStatus = this->actionReloadFile->isEnabled();
     ProgressWidget pw(this);
     pw.show();
     pw.setProgressValue(10);
     noImportError = this->mp_Acquisition->importFrom(filenames, allFramesKept);
     this->loadAcquisition(noImportError, &pw);
-    this->setWindowTitle(title);
+    if (keepWindowTitle)
+      this->setWindowTitle(title);
+    this->actionReloadFile->setEnabled(reloadStatus);
     pw.hide();
     if (noImportError)
     {
@@ -1845,6 +1861,7 @@ void MainWindow::reset()
 {
   this->mp_AcquisitionUndoStack->clear();
   this->mp_MarkerConfigurationUndoStack->clear();
+  this->actionReloadFile->setEnabled(false);
   this->actionClose->setEnabled(false);
   this->actionViewMetadata->setEnabled(false);
   this->actionSave->setEnabled(false);

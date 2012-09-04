@@ -123,6 +123,7 @@ public:
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
+  void setFileName(const QString& filename) {this->m_Filename = filename;};
   btk::Acquisition::Pointer btkAcquisition() const {return this->mp_BTKAcquisition;};
   btk::PointCollection::Pointer btkAllMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(4);};
   btk::PointCollection::Pointer btkMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(0);};
