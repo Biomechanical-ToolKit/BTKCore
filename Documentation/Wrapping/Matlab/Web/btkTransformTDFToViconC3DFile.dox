@@ -1,7 +1,7 @@
 /**
  * @class btkTransformTDFToViconC3DFile
  * @brief Transforms a TDF file (BTS Bioengineering) to a compatible Vicon C3D file
- * @syntax{btkTransformTDFToViconC3DFile(TDF_INPUT)\nbtkTransformTDFToViconC3DFile(TDF_INPUT\, C3D_OUTPUT)}
+ * @syntax{btkTransformTDFToViconC3DFile(TDF_INPUT)\n btkTransformTDFToViconC3DFile(TDF_INPUT\, C3D_OUTPUT)}
  * @param TDF_INPUT Full path of the input TDF file.
  * @param C3D_OUTPUT FULL path for the output C3D file.
  *
