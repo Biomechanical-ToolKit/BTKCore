@@ -226,6 +226,7 @@
      <property name="title">
       <string>Event</string>
      </property>
+     <addaction name="actionGaitEventAssistant"/>
     </widget>
     <widget class="QMenu" name="menuMarker">
      <property name="title">

@@ -31,6 +31,7 @@ SET(Mokka_CPP
   ExportASCIIDialog.cpp
   ExportSTLDialog.cpp
   FileInfoDockWidget.cpp
+  GaitEventAssistantDialog.cpp
   ImportAssistantDialog.cpp
   LoggerWidget.cpp
   LoggerVTKOutput.cpp
@@ -75,6 +76,7 @@ SET(Mokka_H
   ExportASCIIDialog.h
   ExportSTLDialog.h
   FileInfoDockWidget.h
+  GaitEventAssistantDialog.h
   ImportAssistantDialog.h
   LoggerWidget.h
   MainWindow.h
@@ -105,6 +107,7 @@ SET(Mokka_UI
   ExportASCIIDialog.ui
   ExportSTLDialog.ui
   FileInfoDockWidget.ui
+  GaitEventAssistantDialog.ui
   ImportAssistantDialog.ui
   MainWindow.ui
   Metadata.ui

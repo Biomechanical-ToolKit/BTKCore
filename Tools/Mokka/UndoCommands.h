@@ -430,12 +430,13 @@ private:
   QList<Event*> m_Events;
 };
 
-// --------------- InsertEvent ---------------
-class InsertEvent : public AcquisitionUndoCommand
+// --------------- InsertEvents ---------------
+class InsertEvents : public AcquisitionUndoCommand
 {
 public:
-  InsertEvent(Acquisition* acq, Event* e, QUndoCommand* parent = 0);
-  ~InsertEvent();
+  InsertEvents(Acquisition* acq, Event* e, QUndoCommand* parent = 0);
+  InsertEvents(Acquisition* acq, const QList<int>& ids, const QList<Event*>& events, QUndoCommand* parent = 0);
+  ~InsertEvents();
   virtual void undo();
   virtual void redo();
   

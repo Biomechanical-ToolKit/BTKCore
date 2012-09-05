@@ -207,6 +207,7 @@ public:
   void setEvents(const QList<int>& ids, const QList<Event*> events);
   QList<Event*> takeEvents(const QList<int>& ids);
   void insertEvents(const QList<int>& ids, const QList<Event*> events);
+  QList<int> eventIds() const {return this->m_Events.keys();};
   int generateNewEventId();
   
   bool hasVideos() const {return !this->m_Videos.empty();};

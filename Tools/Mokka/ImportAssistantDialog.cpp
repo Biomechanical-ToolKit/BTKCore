@@ -85,8 +85,6 @@ void ImportAssistantDialog::clear(const QString& dir)
 {
   this->m_Directory = dir;
   
-  this->setWindowTitle(tr("Assistant"));
-  
   this->acquisitionSystemComboBox->setEnabled(true);
   this->newAcquisitionRadioButton->setEnabled(true);
   this->appendAcquisitionRadioButton->setEnabled(true);

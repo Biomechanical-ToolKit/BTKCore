@@ -42,6 +42,7 @@
 #include "ExportASCIIDialog.h"
 #include "ExportSTLDialog.h"
 #include "FileInfoDockWidget.h"
+#include "GaitEventAssistantDialog.h"
 #include "ImportAssistantDialog.h"
 #include "LoggerMessage.h"
 #include "LoggerWidget.h"
@@ -128,6 +129,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuAcquisition->addAction(this->timeEventControler->actionCropRegionOfInterest);
   this->menuAcquisition->addSeparator();
   this->menuAcquisition->addAction(this->timeEventControler->actionReframeFromOne);
+  this->menuEvent->addSeparator();
   this->menuEvent->addMenu(this->timeEventControler->insertEventMenu());
   this->menuEvent->addSeparator();
   this->menuEvent->addAction(this->timeEventControler->actionEditSelectedEvents);
@@ -137,6 +139,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->actionToolComputeMarkerDistance->setEnabled(false);
   this->actionToolComputeMarkerAngle->setEnabled(false);
   this->actionToolComputeVectorAngle->setEnabled(false);
+  this->actionGaitEventAssistant->setEnabled(false);
 #ifdef Q_OS_MAC
   QFont f = this->font();
   f.setPointSize(10);
@@ -314,6 +317,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionToolComputeMarkerDistance, SIGNAL(triggered()), this, SLOT(computeDistanceFromMarkersSelection()));
   connect(this->actionToolComputeMarkerAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection()));
   connect(this->actionToolComputeVectorAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection2()));
+  connect(this->actionGaitEventAssistant, SIGNAL(triggered()), this, SLOT(detectGaitEvents()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -940,6 +944,20 @@ void MainWindow::computeAngleFromMarkersSelection2()
   }
 };
 
+void MainWindow::detectGaitEvents()
+{
+  GaitEventAssistantDialog assistant(this);
+  assistant.initialize(this->mp_Acquisition);
+  if (assistant.exec() == QDialog::Accepted)
+  {
+    QUndoCommand* acquisitionCommand = new QUndoCommand;
+    if (assistant.run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
+      this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
+    if (acquisitionCommand->childCount() == 0) // The undo command was not used.
+      delete acquisitionCommand;
+  }
+};
+
 bool MainWindow::extractSelectedMarkers(QList<int>& selectedMarkers)
 {
   selectedMarkers.clear();
@@ -1144,6 +1162,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionToolComputeMarkerDistance->setEnabled(true);
   this->actionToolComputeMarkerAngle->setEnabled(true);
   this->actionToolComputeVectorAngle->setEnabled(true);
+  this->actionGaitEventAssistant->setEnabled(true);
 };
 
 void MainWindow::saveFile()
@@ -1873,6 +1892,7 @@ void MainWindow::reset()
   this->actionToolComputeMarkerDistance->setEnabled(false);
   this->actionToolComputeMarkerAngle->setEnabled(false);
   this->actionToolComputeVectorAngle->setEnabled(false);
+  this->actionGaitEventAssistant->setEnabled(false);
   // Tools modeless window
   QList<ChartDialog*>::iterator it = this->m_ToolCharts.begin();
   while (it != this->m_ToolCharts.end())
@@ -2363,7 +2383,7 @@ void MainWindow::setRegionOfInterest(int lf,int ff)
 
 void MainWindow::insertEvent(Event* e)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvent(this->mp_Acquisition, e)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvents(this->mp_Acquisition, e)));
 };
 
 void MainWindow::reframeAcquisition(int ff)

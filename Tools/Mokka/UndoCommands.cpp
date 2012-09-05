@@ -460,8 +460,8 @@ void RemoveEvents::redo()
   this->m_Events = this->mp_Acquisition->takeEvents(this->m_Ids);
 };
 
-// --------------- InsertEvent  ---------------
-InsertEvent::InsertEvent(Acquisition* acq, Event* e, QUndoCommand* parent)
+// --------------- InsertEvents  ---------------
+InsertEvents::InsertEvents(Acquisition* acq, Event* e, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Ids(), m_Events()
 {
   this->mp_Acquisition = acq;
@@ -469,18 +469,24 @@ InsertEvent::InsertEvent(Acquisition* acq, Event* e, QUndoCommand* parent)
   this->m_Events.push_back(e);
 };
 
-InsertEvent::~InsertEvent()
+InsertEvents::InsertEvents(Acquisition* acq, const QList<int>& ids, const QList<Event*>& events, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent), m_Ids(ids), m_Events(events)
+{
+  this->mp_Acquisition = acq;
+};
+
+InsertEvents::~InsertEvents()
 {
   for (int i = 0 ; i < this->m_Events.count() ; ++i)
     delete this->m_Events[i];
 };
 
-void InsertEvent::undo()
+void InsertEvents::undo()
 {
   this->m_Events = this->mp_Acquisition->takeEvents(this->m_Ids);
 };
 
-void InsertEvent::redo()
+void InsertEvents::redo()
 {
   this->mp_Acquisition->insertEvents(this->m_Ids, this->m_Events);
   this->m_Events.clear();
