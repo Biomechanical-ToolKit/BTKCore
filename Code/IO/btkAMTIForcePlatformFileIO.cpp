@@ -104,7 +104,7 @@ namespace btk
    */
   
   /**
-   * Checks if the first word in the file corresponds to "PathFileType".
+   * Checks if the first line contains 7 numbers.
    */
   bool AMTIForcePlatformFileIO::CanReadFile(const std::string& filename)
   {
