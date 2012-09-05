@@ -38,7 +38,6 @@
 
 #include <btkAcquisition.h>
 #include <btkAnalog.h>
-#include <btkConvert.h>
 
 // btkSetAnalogLabel(h, i, newLabel)
 // btkSetAnalogLabel(h, label, newLabel)

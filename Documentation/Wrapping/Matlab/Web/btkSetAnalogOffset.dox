@@ -13,6 +13,6 @@
  * <tt>btkSetAnalogOffset(h, idx, newoffset)</tt> modifies the offset of the analog channel specified by the index @c idx.
  * <tt>btkSetAnalogOffset(h, label, newoffset)</tt> modifies the offset of the analog channel specified by the label @c label.
  * 
- * @sa btkGetAnalog, btkSetAnalogDescription, btkSetAnalogGain, btkSetAnalogLabel, btkSetAnalogScale, btkSetAnalogValues
+ * @sa btkGetAnalog, btkSetAnalogDescription, btkSetAnalogGain, btkSetAnalogLabel, btkSetAnalogScale, btkSetAnalogUnit, btkSetAnalogValues
  * @ingroup BTKMatlabAnalogModifier
  */

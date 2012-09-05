@@ -34,27 +34,33 @@
  */
 
 #include "btkMXObjectHandle.h"
+#include "btkMXAnalog.h"
 
 #include <btkAcquisition.h>
+#include <btkAnalog.h>
 
+// btkSetAnalogUnit(h, i, newUnit)
+// btkSetAnalogUnit(h, label, newUnit)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs < 2)
-    mexErrMsgTxt("At least two inputs are required.");
+  if(nrhs < 3)
+    mexErrMsgTxt("Three inputs required.");
+  if (nlhs > 2)
+    mexErrMsgTxt("Too many output arguments.");
 
-  btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
+  if (!mxIsChar(prhs[2]))
+    mexErrMsgTxt("Analog's unit must be set with a string.");
 
-  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
-    mexErrMsgTxt("The first frame must be set by one integer.");
-    
-  int adaptEventsOption = 0;
-  if (nrhs >= 3)
-  {
-    if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
-      mexErrMsgTxt("The option to adapt events' frame/time must be set by one integer.");
-    adaptEventsOption = static_cast<int>(mxGetScalar(prhs[1]));
-  }
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+  btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);
 
-  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]); 
-  acq->SetFirstFrame(static_cast<int>(mxGetScalar(prhs[1])), adaptEventsOption != 0);
+  size_t strlen_ = (mxGetM(prhs[2]) * mxGetN(prhs[2]) * sizeof(mxChar)) + 1;
+  char* newUnit = (char*)mxMalloc(strlen_);
+  mxGetString(prhs[2], newUnit, strlen_);
+  analog->SetUnit(newUnit);
+  mxFree(newUnit);
+
+  // Return updated analog channels
+  btkMXCreateAnalogsStructure(acq, nlhs, plhs);
 };
+

@@ -23,6 +23,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkClearMetadata">btkClearMetadata</a>                  - Clear metadata in the acquisition
 %   <a href="matlab:help btkCloneAcquisition">btkCloneAcquisition</a>               - Clone an acquisition
 %   <a href="matlab:help btkClearAnalysis">btkClearAnalysis</a>                  - Clear the metadata ANALYSIS
+%   <a href="matlab:help btkCutAcquisition">btkCutAcquisition</a>                 - Cut the acquistion and adapt the events' frame/time.
 %   <a href="matlab:help btkDeleteAcquisition">btkDeleteAcquisition</a>              - Delete an acquisition and free the used memory
 %   <a href="matlab:help btkNewAcquisition">btkNewAcquisition</a>                 - Create an empty acquisition
 %   <a href="matlab:help btkRemoveAnalysisParameter">btkRemoveAnalysisParameter</a>        - Erase a paremeter from the analysis
@@ -91,6 +92,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetAnalogScale">btkSetAnalogScale</a>                 - Set analog's scale factor
 %   <a href="matlab:help btkSetAnalogsResolution">btkSetAnalogsResolution</a>           - Set ADC resolution (8, 12, 14 or 16 bits)
 %   <a href="matlab:help btkSetAnalogSampleNumberPerFrame">btkSetAnalogSampleNumberPerFrame</a>  - Set analog sample per 3D frame
+%   <a href="matlab:help btkSetAnalogUnit">btkSetAnalogUnit</a>                  - Set analog's unit
 %   <a href="matlab:help btkSetAnalogsValues">btkSetAnalogValues</a>                - Set analog's values from a vector
 %   <a href="matlab:help btkSetAnalogsValues">btkSetAnalogsValues</a>               - Set analogs' values from a matrix 
 %

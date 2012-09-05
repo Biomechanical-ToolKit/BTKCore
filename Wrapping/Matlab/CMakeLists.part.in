@@ -44,6 +44,7 @@
 @MEX_CREATE_MACRO@(btkSetAnalogNumber @MEX_PATH_PREFIX@btkSetAnalogNumber.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetAnalogScale @MEX_PATH_PREFIX@btkSetAnalogScale.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetAnalogOffset @MEX_PATH_PREFIX@btkSetAnalogOffset.cpp BTKCommon)
+@MEX_CREATE_MACRO@(btkSetAnalogUnit @MEX_PATH_PREFIX@btkSetAnalogUnit.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetAnalogResolution @MEX_PATH_PREFIX@btkSetAnalogResolution.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetAnalogSampleNumberPerFrame @MEX_PATH_PREFIX@btkSetAnalogSampleNumberPerFrame.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetAnalogValues @MEX_PATH_PREFIX@btkSetAnalogValues.cpp BTKCommon)

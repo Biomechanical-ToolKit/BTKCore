@@ -1,9 +1,17 @@
 /**
  * @class btkSetFirstFrame
- * @brief Set acquisition's first frame index.
- * @syntax{btkSetFirstFrame(h\, ff)}
+ * @brief Set acquisition's first frame index (and optionally adapt events' frame/time).
+ * @syntax{btkSetFirstFrame(h\, ff)\n btkSetFirstFrame(h\, ff\n, adaptEvents)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param ff Integer with the index of the new first frame.
+ * @param adaptEvents Integer used as an option to adapt the events' frame/time.
+ *
+ * @par Detailed description:
+ * <tt>btkSetFirstFrame(h, ff)</tt> Set acquisition's first frame index.\n
+ * <tt>btkSetFirstFrame(h, ff, adaptEvents)</tt> Adapt also event's frame/time if the option @c adaptEvents is set to a non-null value.
+ * The event's frame is shifted by the difference between the new first frame and the old one.
+ * The event's time is recomputed using the new frame and the current point's frequency.\n
+ *
  * @sa btkSetAnalogNumber, btkSetAnalogResolution, btkSetAnalogSampleNumberPerFrame, btkSetFrameNumber, btkSetFrequency, btkSetMaxInterpolationGap, btkSetPointNumber
  * @ingroup BTKMatlabAcquisitionModifier
  */
