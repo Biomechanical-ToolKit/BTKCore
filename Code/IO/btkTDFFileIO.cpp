@@ -355,12 +355,12 @@ namespace btk
             Acquisition::AnalogIterator it = output->BeginAnalog();
             std::advance(it, p*6);
             std::string strIdx = ToString(p+1);
-            (*it)->SetLabel("PX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("PY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FZ" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("MZ" + strIdx); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PX" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PY" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FX" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FY" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FZ" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("MZ" + strIdx); (*it)->SetUnit("Nm"); analogMap.push_back(*it); ++it;
             // Extract data
             int32_t numSegments = bifs.ReadI32();
             bifs.SeekRead(4, BinaryFileStream::Current);
@@ -394,6 +394,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PX" + ToString(p+1));
+            (*it)->SetUnit("m"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -401,6 +402,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PY" + ToString(p+1));
+            (*it)->SetUnit("m"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -408,6 +410,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FX" + ToString(p+1));
+            (*it)->SetUnit("N"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -415,6 +418,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FY" + ToString(p+1));
+            (*it)->SetUnit("N"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -422,6 +426,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FZ" + ToString(p+1));
+            (*it)->SetUnit("N"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -429,6 +434,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("MZ" + ToString(p+1));
+            (*it)->SetUnit("Nm"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -458,19 +464,19 @@ namespace btk
             Acquisition::AnalogIterator it = output->BeginAnalog();
             std::advance(it, p*12);
             std::string strIdx = ToString(p*2+1) + "a";
-            (*it)->SetLabel("PX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("PY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FZ" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("MZ" + strIdx); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PX" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PY" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FX" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FY" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FZ" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("MZ" + strIdx); (*it)->SetUnit("Nm"); analogMap.push_back(*it); ++it;
             strIdx[strIdx.length()-1] = 'b';
-            (*it)->SetLabel("PX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("PY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FZ" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("MZ" + strIdx); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PX" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PY" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FX" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FY" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FZ" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("MZ" + strIdx); (*it)->SetUnit("Nm"); analogMap.push_back(*it); ++it;
             // Extract data
             int32_t numSegments = bifs.ReadI32();
             bifs.SeekRead(4, BinaryFileStream::Current);
@@ -506,6 +512,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PX" + ToString(p+1) + "a");
+            (*it)->SetUnit("m");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -513,6 +520,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PY" + ToString(p+1) + "a");
+            (*it)->SetUnit("m");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -520,6 +528,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FX" + ToString(p+1) + "a");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -527,6 +536,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FY" + ToString(p+1) + "a");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -534,6 +544,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FZ" + ToString(p+1) + "a");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -541,6 +552,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("MZ" + ToString(p+1) + "a");
+            (*it)->SetUnit("Nm");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -548,6 +560,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PX" + ToString(p+1) + "b");
+            (*it)->SetUnit("m");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -555,6 +568,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PY" + ToString(p+1) + "b");
+            (*it)->SetUnit("m");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -562,6 +576,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FX" + ToString(p+1) + "b");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -569,6 +584,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FY" + ToString(p+1) + "b");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -576,6 +592,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FZ" + ToString(p+1) + "b");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -583,6 +600,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("MZ" + ToString(p+1) + "b");
+            (*it)->SetUnit("Nm");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
