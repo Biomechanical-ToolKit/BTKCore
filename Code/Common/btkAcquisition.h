@@ -155,7 +155,7 @@ namespace btk
     BTK_COMMON_EXPORT void Reset();
     double GetDuration() const {return ((this->m_PointFrequency == 0) ? 0 : 1 / this->m_PointFrequency * this->m_PointFrameNumber);};
     int GetFirstFrame() const {return this->m_FirstFrame;};
-    BTK_COMMON_EXPORT void SetFirstFrame(int num);
+    BTK_COMMON_EXPORT void SetFirstFrame(int num, bool adaptEvents=false);
     int GetLastFrame() const {return (this->m_FirstFrame + this->GetPointFrameNumber() - 1);};
     const std::string GetPointUnit() const {return this->m_Units[Point::Marker];};
     void SetPointUnit(const std::string& unit = "mm") {this->SetPointUnit(Point::Marker, unit);};

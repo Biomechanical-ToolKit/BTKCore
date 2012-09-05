@@ -1045,9 +1045,13 @@ namespace btk
    */
   
   /**
-   * Sets the first frame index.
+   * Sets the first frame index (and optionally adapt events' frame/time, false by default).
+   *
+   * To adapt the events' frame/time, you have to set the option @a adaptEvents to true.
+   * The event's frame is shifted by the difference between the new first frame and the old one.
+   * The event's time is recomputed using the new frame and the current point's frequency.
    */
-  void Acquisition::SetFirstFrame(int num)
+  void Acquisition::SetFirstFrame(int num, bool adaptEvents)
   {
     if (num <= 0)
     {
@@ -1056,8 +1060,20 @@ namespace btk
     }
     else if (this->m_FirstFrame == num)
       return;
+    int shift = num - this->m_FirstFrame;
     this->m_FirstFrame = num;
     this->Modified();
+    
+    
+    if (adaptEvents && (shift != 0) && (this->m_PointFrequency != 0.0))
+    {
+      double t = 1.0 / this->m_PointFrequency;
+      for (EventIterator it = this->BeginEvent() ; it != this->EndEvent() ; ++it)
+      {
+        (*it)->SetFrame((*it)->GetFrame()+shift);
+        (*it)->SetTime((*it)->GetFrame()*t);
+      }
+    }
   };
   
   /**
