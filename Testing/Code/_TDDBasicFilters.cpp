@@ -9,4 +9,5 @@
 #include "MergeAcquisitionFilterTest.h"
 #include "SeparateKnownVirtualMarkersFilterTest.h"
 #include "SpecializedPointsExtractorTest.h"
+#include "VerticalGroundReactionForceGaitEventDetectorTest.h"
 #include "WrenchDirectionAngleFilterTest.h"

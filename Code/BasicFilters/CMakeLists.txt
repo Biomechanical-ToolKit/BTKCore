@@ -7,6 +7,7 @@ SET(BTKBasicFilters_SRCS
   btkMergeAcquisitionFilter.cpp
   btkSeparateKnownVirtualMarkersFilter.cpp
   btkSpecializedPointsExtractor.cpp
+  btkVerticalGroundReactionForceGaitEventDetector.cpp
   btkWrenchDirectionAngleFilter.cpp
 )
 
