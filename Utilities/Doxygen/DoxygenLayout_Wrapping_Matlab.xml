@@ -9,7 +9,7 @@
       <tab type="namespacemembers" visible="yes" title=""/>
     </tab>
     <tab type="classes" visible="yes" title="Functions">
-      <tab type="classes" visible="yes" title="Function List"/>
+      <tab type="classlist" visible="yes" title="Function List"/>
       <tab type="classindex" visible="$ALPHABETICAL_INDEX" title="Function Index"/> 
       <tab type="hierarchy" visible="no" title=""/>
       <tab type="classmembers" visible="no" title=""/>
@@ -18,7 +18,6 @@
       <tab type="files" visible="yes" title=""/>
       <tab type="globals" visible="yes" title=""/>
     </tab>
-    <tab type="dirs" visible="yes" title=""/>
     <tab type="examples" visible="yes" title=""/>  
   </navindex>
 
