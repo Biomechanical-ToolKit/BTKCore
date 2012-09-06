@@ -56,8 +56,9 @@
 
 namespace btk
 {
-  struct AcquisitionFileIOHandles
+  class AcquisitionFileIOHandles
   {
+  public:
     typedef std::list<AcquisitionFileIOHandle::Pointer>::iterator Iterator;
     typedef std::list<AcquisitionFileIOHandle::Pointer>::const_iterator ConstIterator;
     AcquisitionFileIOHandles();

@@ -199,7 +199,7 @@ namespace btk
         t = 1.0 / this->m_FrameRate;
       int r = 0, c = 0, num = ub-lb;
       Eigen::Matrix<double,Eigen::Dynamic,1> fz = (*it)->GetForce()->GetValues().col(2).block(lb,0,num+1,1);
-      if (fz.maxCoeff(&r, &c) > this->m_Threshold);
+      if (fz.maxCoeff(&r, &c) > this->m_Threshold)
       {
         int incr = r;
         // Heel Strike

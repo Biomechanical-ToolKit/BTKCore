@@ -36,6 +36,9 @@
 #include "btkMotionAnalysisFileIOUtils_p.h"
 #include "btkMetaDataUtils.h"
 
+#include <algorithm>
+#include <cctype>
+
 namespace btk
 {  
   /**
