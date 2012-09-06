@@ -53,8 +53,8 @@ namespace btk
   
   class DelsysEMGFileIO : public AcquisitionFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("EMG", "Delsys"))
-    BTK_IO_FILE_ONLY_READ_OPERATION
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("EMG", "Delsys"));
+    BTK_IO_FILE_ONLY_READ_OPERATION;
     
   public:
     typedef SharedPtr<DelsysEMGFileIO> Pointer;

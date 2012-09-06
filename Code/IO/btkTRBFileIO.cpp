@@ -288,6 +288,11 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close(); 
       throw;
     }
+    catch (MotionAnalysisBinaryFileIOException& e)
+    {
+      if (bifs.IsOpen()) bifs.Close();
+      throw(MotionAnalysisBinaryFileIOException(e.what()));
+    }
     catch (std::exception& e)
     {
       if (bifs.IsOpen()) bifs.Close(); 

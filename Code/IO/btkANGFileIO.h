@@ -53,8 +53,8 @@ namespace btk
   
   class ANGFileIO : public AcquisitionFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS("ANG")
-    BTK_IO_FILE_ONLY_READ_OPERATION
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS("ANG");
+    BTK_IO_FILE_ONLY_READ_OPERATION;
     
   public:
     typedef SharedPtr<ANGFileIO> Pointer;

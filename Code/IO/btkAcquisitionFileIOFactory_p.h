@@ -33,10 +33,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkAcquisitionFileIOFactory_info_h
-#define __btkAcquisitionFileIOFactory_info_h
+#ifndef __btkAcquisitionFileIOFactory_p_h
+#define __btkAcquisitionFileIOFactory_p_h
 
-#include "btkAcquisitionFileIO.h"
+#include "btkAcquisitionFileIOHandle.h"
 
 #define BTK_IO_REGISTER_ACQUISITION_FILE_RDRW(classname) \
   BTK_IO_REGISTER_ACQUISITION_FILE(classname, true, true)
@@ -48,62 +48,34 @@
   BTK_IO_REGISTER_ACQUISITION_FILE(classname, false, true)
 
 #define BTK_IO_REGISTER_ACQUISITION_FILE(classname, read, write) \
-  this->list.push_back(AcquisitionFileIOInfo::New(btk::AcquisitionFileIOConverter<classname>::New(), read, write));
+  this->list.push_back(AcquisitionFileIOHandle::New(btk::AcquisitionFileIOHandleFunctorConverter<classname>::New(), read, write));
    
 #define BTK_IO_ACQUISITON_FILE_FACTORY_INIT \
-   AcquisitionFileIOInfos::AcquisitionFileIOInfos() \
+   AcquisitionFileIOHandles::AcquisitionFileIOHandles() \
    : list()
 
 namespace btk
 {
-  class AcquisitionFileIOFuncPtr
+  struct AcquisitionFileIOHandles
   {
-  public:
-    typedef SharedPtr<AcquisitionFileIOFuncPtr> Pointer;
-    virtual ~AcquisitionFileIOFuncPtr() {};
-    virtual AcquisitionFileIO::Pointer GetFileIO() const = 0;
-  };
-  
-  class AcquisitionFileIOInfo
-  {
-  public:
-    typedef SharedPtr<AcquisitionFileIOInfo> Pointer;
-    static Pointer New(AcquisitionFileIOFuncPtr::Pointer f, bool r, bool w) {return Pointer(new AcquisitionFileIOInfo(f,r,w));};
-    // ~AcquisitionFileIOInfo(); // Implicit
-    AcquisitionFileIO::Pointer GetFileIO() {return this->mp_Functor->GetFileIO();};
-    const AcquisitionFileIOFuncPtr::Pointer GetFunctor() const {return this->mp_Functor;};
-    bool HasReadOperation() const {return this->m_ReadOp;};
-    bool HasWriteOperation() const {return this->m_WriteOp;};
-  protected:
-    AcquisitionFileIOInfo(AcquisitionFileIOFuncPtr::Pointer f, bool r, bool w) : mp_Functor(f) {this->m_ReadOp = r; this->m_WriteOp = w;};
-    AcquisitionFileIOFuncPtr::Pointer mp_Functor;
-    bool m_ReadOp;
-    bool m_WriteOp;
-  private:
-    AcquisitionFileIOInfo(const AcquisitionFileIOInfo& ); // Not implemented.
-    AcquisitionFileIOInfo& operator=(const AcquisitionFileIOInfo& ); // Not implemented.
-  };
-  
-  struct AcquisitionFileIOInfos
-  {
-    typedef std::list<AcquisitionFileIOInfo::Pointer>::iterator Iterator;
-    typedef std::list<AcquisitionFileIOInfo::Pointer>::const_iterator ConstIterator;
-    inline AcquisitionFileIOInfos();
-    std::list<AcquisitionFileIOInfo::Pointer> list;
+    typedef std::list<AcquisitionFileIOHandle::Pointer>::iterator Iterator;
+    typedef std::list<AcquisitionFileIOHandle::Pointer>::const_iterator ConstIterator;
+    AcquisitionFileIOHandles();
+    std::list<AcquisitionFileIOHandle::Pointer> list;
   };
   
   template <class T>
-  class AcquisitionFileIOConverter : public AcquisitionFileIOFuncPtr
+  class AcquisitionFileIOHandleFunctorConverter : public AcquisitionFileIOHandle::Functor
   {
   public:
-    typedef SharedPtr<AcquisitionFileIOConverter> Pointer;
-    static Pointer New() {return Pointer(new AcquisitionFileIOConverter<T>());};
+    typedef SharedPtr<AcquisitionFileIOHandleFunctorConverter> Pointer;
+    static Pointer New() {return Pointer(new AcquisitionFileIOHandleFunctorConverter<T>());};
     virtual AcquisitionFileIO::Pointer GetFileIO() const {return T::New();};
   private:
-    AcquisitionFileIOConverter() : AcquisitionFileIOFuncPtr() {};
-    AcquisitionFileIOConverter(const AcquisitionFileIOConverter& ); // Not implemented.
-    AcquisitionFileIOConverter& operator=(const AcquisitionFileIOConverter& ); // Not implemented.
+    AcquisitionFileIOHandleFunctorConverter() : AcquisitionFileIOHandle::Functor() {};
+    AcquisitionFileIOHandleFunctorConverter(const AcquisitionFileIOHandleFunctorConverter& ); // Not implemented.
+    AcquisitionFileIOHandleFunctorConverter& operator=(const AcquisitionFileIOHandleFunctorConverter& ); // Not implemented.
   };
 }
 
-#endif // __btkAcquisitionFileIOFactory_info_h
+#endif // __btkAcquisitionFileIOFactory_p_h

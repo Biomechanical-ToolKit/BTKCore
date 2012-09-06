@@ -65,7 +65,7 @@
 
 // Check if we can use the memory mapped filestream system
 #if defined HAVE_SYS_MMAP || defined _MSC_VER
-  #include "btkBinaryFileStream_mmfstream_p.h"
+  #include "btkBinaryFileStream_mmfstream.h"
   namespace btk {typedef btk::mmfstream RawFileStream;};
 #else
   #define BTK_NO_MEMORY_MAPPED_FILESTREAM

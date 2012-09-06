@@ -36,7 +36,7 @@
 #ifndef __btkAcquisitionFileIOFactory_registration_h
 #define __btkAcquisitionFileIOFactory_registration_h
 
-#include "btkAcquisitionFileIOFactory_info.h"
+#include "btkAcquisitionFileIOFactory_p.h"
 
 // ----------------------------------------------------------------------------
 //                  STEP 1: ADD ALL ACQUISITION FILES IO HERE

@@ -53,8 +53,8 @@ namespace btk
   
   class RAxFileIO : public AcquisitionFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("RAH") | Extension("RAW"))
-    BTK_IO_FILE_ONLY_READ_OPERATION
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("RAH") | Extension("RAW"));
+    BTK_IO_FILE_ONLY_READ_OPERATION;
     
   public:
     typedef SharedPtr<RAxFileIO> Pointer;

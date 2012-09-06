@@ -258,6 +258,11 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close();
       throw;
     }
+    catch (MotionAnalysisBinaryFileIOException& e)
+    {
+      if (bifs.IsOpen()) bifs.Close();
+      throw(MotionAnalysisBinaryFileIOException(e.what()));
+    }
     catch (ANxFileIOException& e)
     {
       if (bifs.IsOpen()) bifs.Close();

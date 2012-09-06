@@ -488,8 +488,8 @@ namespace btk
             else
             {
               Analog::Pointer analog = input->GetAnalog(idxChannel);
-              uint16_t range = AnxFileIOExtractAnalogRangeFromGain(idxChannel, analog->GetGain(), analog->GetScale(), input->GetAnalogResolution());
-              double scale = ANxFileIOComputeScaleFactor(range, input->GetAnalogResolution());
+              uint16_t range = AnxFileIOExtractAnalogRangeFromGain_p(idxChannel, analog->GetGain(), analog->GetScale(), input->GetAnalogResolution());
+              double scale = ANxFileIOComputeScaleFactor_p(range, input->GetAnalogResolution());
               if (fabs(analog->GetScale()) != fabs(scale))
               {
                 cal.col(j) *= -1.0 * analog->GetScale() / scale;

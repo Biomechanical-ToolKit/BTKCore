@@ -33,47 +33,40 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMOMFileIO_h
-#define __btkMOMFileIO_h
+#ifndef __btkAcquisitionFileIOHandle_h
+#define __btkAcquisitionFileIOHandle_h
 
 #include "btkAcquisitionFileIO.h"
-#include "btkException.h"
 
 namespace btk
 {
-  class MOMFileIOException : public Exception
+  class AcquisitionFileIOHandle
   {
   public:
-    explicit MOMFileIOException(const std::string& msg)
-    : Exception(msg)
-    {};
-      
-    virtual ~MOMFileIOException() throw() {};
-  };
-  
-  class MOMFileIO : public AcquisitionFileIO
-  {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS("MOM");
-    BTK_IO_FILE_ONLY_READ_OPERATION;
+    class Functor
+    {
+    public:
+      typedef SharedPtr<AcquisitionFileIOHandle::Functor> Pointer;
+      virtual ~Functor() {};
+      virtual AcquisitionFileIO::Pointer GetFileIO() const = 0;
+    };
     
-  public:
-    typedef SharedPtr<MOMFileIO> Pointer;
-    typedef SharedPtr<const MOMFileIO> ConstPointer;
-    
-    static Pointer New() {return Pointer(new MOMFileIO());};
-    
-    // ~MOMFileIO(); // Implicit.
-    
-    BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
-    BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output);
-    
+    typedef SharedPtr<AcquisitionFileIOHandle> Pointer;
+    static Pointer New(AcquisitionFileIOHandle::Functor::Pointer f, bool r, bool w) {return Pointer(new AcquisitionFileIOHandle(f,r,w));};
+    // ~AcquisitionFileIOHandle(); // Implicit
+    AcquisitionFileIO::Pointer GetFileIO() {return this->mp_Functor->GetFileIO();};
+    const AcquisitionFileIOHandle::Functor::Pointer GetFunctor() const {return this->mp_Functor;};
+    bool HasReadOperation() const {return this->m_ReadOp;};
+    bool HasWriteOperation() const {return this->m_WriteOp;};
   protected:
-    BTK_IO_EXPORT MOMFileIO();
-    
+    AcquisitionFileIOHandle(AcquisitionFileIOHandle::Functor::Pointer f, bool r, bool w) : mp_Functor(f) {this->m_ReadOp = r; this->m_WriteOp = w;};
+    AcquisitionFileIOHandle::Functor::Pointer mp_Functor;
+    bool m_ReadOp;
+    bool m_WriteOp;
   private:
-    MOMFileIO(const MOMFileIO& ); // Not implemented.
-    MOMFileIO& operator=(const MOMFileIO& ); // Not implemented. 
-   };
-};
+    AcquisitionFileIOHandle(const AcquisitionFileIOHandle& ); // Not implemented.
+    AcquisitionFileIOHandle& operator=(const AcquisitionFileIOHandle& ); // Not implemented.
+  };
+}
 
-#endif // __btkMOMFileIO_h
+#endif // __btkAcquisitionFileIOHandle_h

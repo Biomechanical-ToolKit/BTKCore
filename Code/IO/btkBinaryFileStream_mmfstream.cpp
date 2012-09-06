@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkBinaryFileStream_mmfstream_p.h"
+#include "btkBinaryFileStream_mmfstream.h"
 #include "btkMacro.h"
 
 #if defined(HAVE_SYS_MMAP)

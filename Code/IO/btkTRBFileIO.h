@@ -36,7 +36,7 @@
 #ifndef __btkTRBFileIO_h
 #define __btkTRBFileIO_h
 
-#include "btkMotionAnalysisFileIOUtils_p.h"
+#include "btkMotionAnalysisFileIOUtils.h"
 #include "btkException.h"
 
 namespace btk
@@ -53,8 +53,8 @@ namespace btk
   
   class TRBFileIO : public MotionAnalysisBinaryFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS("TRB")
-    BTK_IO_FILE_ONLY_READ_OPERATION
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS("TRB");
+    BTK_IO_FILE_ONLY_READ_OPERATION;
     
   public:
     typedef SharedPtr<TRBFileIO> Pointer;
