@@ -1,6 +1,5 @@
 # - Find a BTK installation or build tree.
-# The following variables are set if BTK is found.  If BTK is not
-# found, BTK_FOUND is set to false.
+# The following variables are set if BTK is found. If BTK is not found, BTK_FOUND is set to false.
 #  BTK_FOUND         - Set to true when BTK is found.
 #  BTK_USE_FILE      - CMake file to use BTK.
 #  BTK_VERSION_MAJOR - The BTK major version number.
@@ -8,12 +7,12 @@
 #  BTK_VERSION_PATCH - The BTK patch level.
 #  BTK_INCLUDE_DIRS  - Include directories for BTK
 #  BTK_LIBRARY_DIRS  - Link directories for BTK libraries
+#  BTK_LIBRARIES     - All the modules compiled inside this release (BTKCommon, BTKIO, etc.).
 # The following cache entries must be set by the user to locate BTK:
 #  BTK_DIR  - The directory containing BTKConfig.cmake.  
 #             This is either the root of the build tree,
 #             or the lib/btk directory.  This is the 
 #             only cache entry.
-#
 
 # Construct consitent error messages for use below.
 SET(BTK_DIR_DESCRIPTION "directory containing BTKConfig.cmake.  This is either the root of the build tree, or PREFIX/share/btk for an installation.")

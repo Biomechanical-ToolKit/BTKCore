@@ -1,6 +1,7 @@
 SET(BTKIO_SRCS
   btkAcquisitionFileIO.cpp
   btkAcquisitionFileIOFactory.cpp
+  btkAcquisitionFileIOFactory_registration.cpp
   btkAcquisitionFileReader.cpp
   btkAcquisitionFileWriter.cpp
   btkASCIIFileWriter.cpp
@@ -25,12 +26,14 @@ SET(BTKIO_SRCS
   btkTRBFileIO.cpp
   btkTRCFileIO.cpp
   btkXLSOrthoTrakFileIO.cpp
-  # Private methods for file formats
+  # Utils & Others
+  btkMotionAnalysisFileIOUtils.cpp
   btkMotionAnalysisFileIOUtils_p.cpp
   btkEliteFileIOUtils_p.cpp
 )
 
 ADD_LIBRARY(BTKIO ${BTK_LIBS_BUILD_TYPE} ${BTKIO_SRCS})
+SET(BTK_LIBRARIES "${BTK_LIBRARIES} BTKIO" CACHE INTERNAL "BTK modules compiled")
 
 TARGET_LINK_LIBRARIES(BTKIO BTKCommon)
 
@@ -47,6 +50,10 @@ ENDIF(NOT BTK_INSTALL_NO_LIBRARIES)
 
 IF(NOT BTK_INSTALL_NO_DEVELOPMENT)
   FILE(GLOB __files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+  FILE(GLOB __private "${CMAKE_CURRENT_SOURCE_DIR}/*_p.h")
+  IF (__private) 
+    LIST(REMOVE_ITEM __files ${__private})
+  ENDIF (__private)
   INSTALL(FILES ${__files}
     DESTINATION ${BTK_INSTALL_INCLUDE_DIR_CM24}/IO
     COMPONENT Development)

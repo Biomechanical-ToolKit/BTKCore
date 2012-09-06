@@ -257,6 +257,9 @@ SET(BTK_DIR "${CMAKE_BINARY_DIR}" CACHE INTERNAL "BTK dir to be used by subproje
 # PROJECT'S SUBDIRECTORIES
 # ------------------------------------------------------------------------
 
+
+SET(BTK_LIBRARIES "" CACHE INTERNAL "BTK modules compiled" FORCE)
+
 # Code
 ADD_SUBDIRECTORY(Code)
 
