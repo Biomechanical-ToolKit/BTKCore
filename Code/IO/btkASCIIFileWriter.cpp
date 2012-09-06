@@ -421,7 +421,7 @@ namespace btk
           this->WritePoints(&ofs, ff, lf, input, forceplates);
       }
       
-      if (writeAnalog)
+      if (writeAnalog && !input->IsEmptyAnalog())
       {
         ofs << "Time";
         // Label
