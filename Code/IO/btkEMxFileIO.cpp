@@ -226,8 +226,8 @@ namespace btk
   EMxFileIO::EMxFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::Binary);
-    this->SetByteOrder(AcquisitionFileIO::IEEE_LittleEndian);
-    this->SetStorageFormat(AcquisitionFileIO::Integer);
+    this->m_FileType = AcquisitionFileIO::Binary;
+    this->m_ByteOrder = AcquisitionFileIO::IEEE_LittleEndian;
+    this->m_StorageFormat = AcquisitionFileIO::Integer;
   };
 };

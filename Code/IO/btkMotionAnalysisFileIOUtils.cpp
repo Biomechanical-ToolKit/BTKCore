@@ -53,18 +53,31 @@ namespace btk
    * Empty destructor.
    */
 
+  /**
+   * @class MotionAnalysisBinaryFileIO::MotionAnalysisBinaryFileIO
+   * @brief Acquisition IO abstract class used for the Motion Analysis ANB/TRB file format.
+   */
+
   // -------------------------------------------------------------------- // 
   //                         ANB/TRB util methods                         //
   // -------------------------------------------------------------------- // 
 
+  /**
+   * Constructor.
+   *
+   * Set the type to a binary format, with the IEEE little endian byte order
+   * with the integer storage format.
+   */
   MotionAnalysisBinaryFileIO::MotionAnalysisBinaryFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::Binary);
-    this->SetByteOrder(AcquisitionFileIO::IEEE_LittleEndian);
-    this->SetStorageFormat(AcquisitionFileIO::Integer);
+    this->m_FileType = AcquisitionFileIO::Binary;
+    this->m_ByteOrder = AcquisitionFileIO::IEEE_LittleEndian;
   };
 
+  /**
+   * Read the given key and store the result in an unsigned 8-bit integer.
+   */
   size_t MotionAnalysisBinaryFileIO::ReadKeyValueU8(uint8_t* val, IEEELittleEndianBinaryFileStream* bifs, int key)
   {
     this->ReadKey(bifs, key);
@@ -75,6 +88,9 @@ namespace btk
     return 2;
   };
 
+  /**
+   * Read the given key and store the result in a vector of unsigned 8-bit integers.
+   */
   size_t MotionAnalysisBinaryFileIO::ReadKeyValueU8(std::vector<uint8_t>& val, IEEELittleEndianBinaryFileStream* bifs, int key)
   {  
     this->ReadKey(bifs, key);
@@ -85,6 +101,9 @@ namespace btk
     return 1 + size;
   };
 
+  /**
+   * Read the given key and store the result in an unsigned 16-bit integer.
+   */
   size_t MotionAnalysisBinaryFileIO::ReadKeyValueU16(uint16_t* val, IEEELittleEndianBinaryFileStream* bifs, int key)
   {
     this->ReadKey(bifs, key);
@@ -93,6 +112,9 @@ namespace btk
     return 2;
   };
 
+  /**
+   * Read the given key and store the result in a vector of unsigned 16-bit integers.
+   */
   size_t MotionAnalysisBinaryFileIO::ReadKeyValueU16(std::vector<uint16_t>& val, IEEELittleEndianBinaryFileStream* bifs, int key)
   {
     this->ReadKey(bifs, key);
@@ -103,6 +125,9 @@ namespace btk
     return 1 + size;
   };
 
+  /**
+   * Read the given key and store the result in an unsigned 32-bit integer.
+   */
   size_t MotionAnalysisBinaryFileIO::ReadKeyValueU32(uint32_t* val, IEEELittleEndianBinaryFileStream* bifs, int key)
   {
     this->ReadKey(bifs, key);
@@ -113,6 +138,9 @@ namespace btk
     return 2;
   };
 
+  /**
+   * Read the given key and store the result in a float.
+   */
   size_t MotionAnalysisBinaryFileIO::ReadKeyValueFloat(float* val, IEEELittleEndianBinaryFileStream* bifs, int key)
   {
     this->ReadKey(bifs, key);
@@ -121,6 +149,9 @@ namespace btk
     return 2;
   };
 
+  /**
+   * Read the given key and store the result in string.
+   */
   size_t MotionAnalysisBinaryFileIO::ReadKeyValueString(std::string& val, IEEELittleEndianBinaryFileStream* bifs, int key)
   {
     this->ReadKey(bifs, key);
@@ -131,6 +162,9 @@ namespace btk
     return 1 + size;
   };
 
+  /**
+   * Read a value (16-bit integer) and check if it corresponds to the given key
+   */
   void MotionAnalysisBinaryFileIO::ReadKey(IEEELittleEndianBinaryFileStream* bifs, int key) const
   {
     uint16_t readKey = bifs->ReadU16();
@@ -138,6 +172,9 @@ namespace btk
       throw(MotionAnalysisBinaryFileIOException("Keys mismatch: " + ToString(readKey) + " vs " + ToString(key)));
   };
 
+  /*
+   * Check if the size for the current extracted value is equal to one.
+   */
   void MotionAnalysisBinaryFileIO::CheckSizeForSingleValue(IEEELittleEndianBinaryFileStream* bifs) const
   {
     int16_t size = bifs->ReadU16();
@@ -145,6 +182,9 @@ namespace btk
       throw(MotionAnalysisBinaryFileIOException("Wrong value size."));
   };
 
+  /**
+   * Write the given key followed by the given vector of values
+   */
   size_t MotionAnalysisBinaryFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint8_t>& val)
   {
     bofs->Write(key); bofs->Write(static_cast<uint16_t>(val.size() / 4));
@@ -156,6 +196,9 @@ namespace btk
     return 4 + size * 4;
   };
 
+  /**
+   * Write the given key followed by the given vector of values
+   */
   size_t MotionAnalysisBinaryFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint16_t>& val)
   {
     bofs->Write(key); bofs->Write(static_cast<uint16_t>(val.size() / 2));
@@ -167,6 +210,9 @@ namespace btk
     return 4 + size * 4;
   };
 
+  /**
+   * Write the given key followed by the given vector of values
+   */
   size_t MotionAnalysisBinaryFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, uint32_t val)
   {
     bofs->Write(key); bofs->Write((uint16_t)0x0001);
@@ -176,6 +222,9 @@ namespace btk
     return 4 + 4;
   };
 
+  /**
+   * Write the given key followed by the given vector of values
+   */
   size_t MotionAnalysisBinaryFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, float val)
   {
     bofs->Write(key); bofs->Write((uint16_t)0x0001);
@@ -191,6 +240,9 @@ namespace btk
     return 4 + 4;
   };
 
+  /**
+   * Write the given key followed by the given vector of values
+   */
   size_t MotionAnalysisBinaryFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::string& val, bool spacing)
   {
     size_t size = val.size() / 4;

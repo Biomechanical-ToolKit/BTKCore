@@ -263,6 +263,6 @@ namespace btk
   EMFFileIO::EMFFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::ASCII);
+    this->m_FileType = AcquisitionFileIO::ASCII;
   };
 };

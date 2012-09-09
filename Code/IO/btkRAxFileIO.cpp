@@ -155,8 +155,8 @@ namespace btk
   RAxFileIO::RAxFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::Binary);
-    this->SetByteOrder(AcquisitionFileIO::IEEE_LittleEndian);
-    this->SetStorageFormat(AcquisitionFileIO::Float);
+    this->m_FileType = AcquisitionFileIO::Binary;
+    this->m_ByteOrder = AcquisitionFileIO::IEEE_LittleEndian;
+    this->m_StorageFormat = AcquisitionFileIO::Float;
   };
 };

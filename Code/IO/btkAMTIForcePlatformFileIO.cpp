@@ -340,7 +340,7 @@ namespace btk
     // - Geometry
     this->computeGeometryFromDimensions(this->m_Dimensions, this->m_Corners, this->m_Origin);
     
-    this->SetFileType(AcquisitionFileIO::ASCII);
+    this->m_FileType = AcquisitionFileIO::ASCII;
   };
   
   inline void AMTIForcePlatformFileIO::ExtractLineData(std::ifstream* pifs, double* d)

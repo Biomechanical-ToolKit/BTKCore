@@ -352,6 +352,6 @@ namespace btk
   TRCFileIO::TRCFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::ASCII);
+    this->m_FileType = AcquisitionFileIO::ASCII;
   };
 };

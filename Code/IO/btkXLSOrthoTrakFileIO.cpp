@@ -401,7 +401,7 @@ namespace btk
   XLSOrthoTrakFileIO::XLSOrthoTrakFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::ASCII);
+    this->m_FileType = AcquisitionFileIO::ASCII;
   };
   
   void XLSOrthoTrakFileIO::AppendEvent(Acquisition::Pointer output, std::istringstream* iss, const std::string& label, const std::string& context, int id)

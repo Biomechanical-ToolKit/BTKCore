@@ -362,7 +362,7 @@ namespace btk
   ANCFileIO::ANCFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::ASCII);
+    this->m_FileType = AcquisitionFileIO::ASCII;
     this->m_Generation = 2;
   };
 

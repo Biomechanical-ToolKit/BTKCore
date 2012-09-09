@@ -67,6 +67,25 @@ namespace btk
     AcquisitionFileIOHandle(const AcquisitionFileIOHandle& ); // Not implemented.
     AcquisitionFileIOHandle& operator=(const AcquisitionFileIOHandle& ); // Not implemented.
   };
+  
+  /**
+   * @class AcquisitionFileIOHandle 
+   * @brief 
+   */
+  /**
+   * @var AcquisitionFileIOFactory::m_ReadOp
+   * 
+   */
+  /**
+   * @var AcquisitionFileIOFactory::m_WriteOp
+   * 
+   */
+   
+  /**
+   * @class AcquisitionFileIOHandle::Functor 
+   * @brief Abstract class 
+   */
+  
 }
 
 #endif // __btkAcquisitionFileIOHandle_h

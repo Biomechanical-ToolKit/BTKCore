@@ -43,10 +43,8 @@ Interface to read/write acquisition's files, cannot be instanced."
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, GetFileType, "Gets the type of the file.");
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, GetByteOrder, "Gets the byte order of the file (only for binary file).");
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, GetByteOrderAsString, "Gets the byte order as a string.");
-BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, SetByteOrder, "Sets the byte order of the file.");
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, GetStorageFormat, "Return the format used to store points and analog channels.");
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, GetStorageFormatAsString, "Gets the storage format as a string.");
-BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, SetStorageFormat, "Set the format used to store points and analog channels.");
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, CanReadFile, "Checks if the given filename can be read by this AcquisitionFileIO. This methods should try to read the file header instead to check the file's suffix.");
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, CanWriteFile, "Checks if the given filename can be write by this AcquisitionFileIO. \nThis method should try to determine if the file's suffix corresponds to one of the supported file's suffixes by this btkAcquisitionFileIO.");
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, Read, "Read the file designated by the given filename and fill the given btkAcquisition");
@@ -93,6 +91,8 @@ BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileWriter, Update, "Update the writer (i.e. 
 %feature("docstring") btkC3DFileIO "
 Interface to read/write C3D files."
 
+BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, SetByteOrder, "Sets the byte order of the file.");
+BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, SetStorageFormat, "Set the format used to store points and analog channels.");
 BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, GetPointScale, "Returns the scale for the points obtains from the POINT:SCALE parameter or from its determination for a created acquisition.");
 BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, SetPointScale, "Sets the scale for the points.");
 BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, GetAnalogIntegerFormat, "Return the integer format (signed/unsigned).");
@@ -143,6 +143,8 @@ Interface to read/write force platform calibration CAL files (Motion Analysis Co
 // ------------------------------------------------------------------------- //
 %feature("docstring") btkDelsysEMGFileIO"
 Interface to read EMG file (Delsys Inc.)."
+
+BTK_SWIG_DOCSTRING_IMPL(DelsysEMGFileIO, SetStorageFormat, "Set the format used to store analog channels.");
 
 // ------------------------------------------------------------------------- //
 //                                  EMFFileIO                                //

@@ -62,10 +62,8 @@ public:
   FileType GetFileType() const;
   ByteOrder GetByteOrder() const;
   std::string GetByteOrderAsString() const;
-  void SetByteOrder(ByteOrder b);
   StorageFormat GetStorageFormat() const;
   std::string GetStorageFormatAsString() const;
-  void SetStorageFormat(StorageFormat s);
 
   virtual bool CanReadFile(const std::string& filename) = 0;
   virtual bool CanWriteFile(const std::string& filename) = 0;
@@ -127,6 +125,8 @@ BTK_SWIG_DECLARE_IMPL_CLASS(C3DFileIO) : public btkAcquisitionFileIO_impl
 public:
   typedef enum {Signed, Unsigned} AnalogIntegerFormat;
   typedef enum {None_ = 1, ScalesFromDataUpdate = 2, ScalesFromMetaDataUpdate = 4, MetaDataFromDataUpdate = 8, CompatibleVicon = 16} WritingFlag; // None replaced by None_ because it is a keyword under python
+  void SetByteOrder(ByteOrder b);
+  void SetStorageFormat(StorageFormat s);
   double GetPointScale() const;
   void SetPointScale(double s);
   AnalogIntegerFormat GetAnalogIntegerFormat();

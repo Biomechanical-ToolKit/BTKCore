@@ -55,6 +55,7 @@ namespace btk
   {
     BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("EMG", "Delsys"));
     BTK_IO_FILE_ONLY_READ_OPERATION;
+    BTK_IO_ENABLE_STORAGEFORMAT_MUTATOR;
     
   public:
     typedef SharedPtr<DelsysEMGFileIO> Pointer;

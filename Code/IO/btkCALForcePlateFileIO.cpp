@@ -541,7 +541,7 @@ namespace btk
   CALForcePlateFileIO::CALForcePlateFileIO()
   : AcquisitionFileIO()
   {
-    this->SetFileType(AcquisitionFileIO::ASCII);
+    this->m_FileType = AcquisitionFileIO::ASCII;
   };
 
   bool CALForcePlateFileIO::ExtractValues(double* values, int num, std::ifstream* ifs)
