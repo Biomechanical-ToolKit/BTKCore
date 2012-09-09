@@ -56,6 +56,15 @@ High level classes and functions to open, edit and modify biomechanical acquisit
   }
 }
 
+// Extra python code in the btk namespace
+%pythoncode %{
+def Iterate(c):
+	i = c.Begin()
+	while i != c.End():
+		yield i.value()
+		i.incr()
+%}
+
 %feature("autodoc", "0");
 
 // One file to govern the others.
