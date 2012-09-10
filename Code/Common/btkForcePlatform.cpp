@@ -305,7 +305,7 @@ namespace btk
    * Constructor.
    */
   ForcePlatform::ForcePlatform()
-  : m_Channels(), m_CalMatrix()
+  : DataObject(), m_Channels(), m_CalMatrix()
   { 
     this->m_Origin << 0.0, 0.0, 0.0;
     // By default the force platform is square with a side length of 500mm.
@@ -319,7 +319,7 @@ namespace btk
   };
   
   ForcePlatform::ForcePlatform(const ForcePlatform& toCopy)
-  : m_CalMatrix(toCopy.m_CalMatrix), m_Origin(toCopy.m_Origin), m_Corners(toCopy.m_Corners)
+  : DataObject(toCopy), m_CalMatrix(toCopy.m_CalMatrix), m_Origin(toCopy.m_Origin), m_Corners(toCopy.m_Corners)
   {
     this->m_Channels = toCopy.m_Channels->Clone();
     this->m_Type = toCopy.m_Type;
