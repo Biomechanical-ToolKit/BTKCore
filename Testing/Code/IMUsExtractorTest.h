@@ -33,7 +33,7 @@ CXXTEST_SUITE(IMUsExtractorTest)
     btk::MetaDataCreateChild(imu, "DESCRIPTIONS", std::vector<std::string>(1,"BAR"));
     btk::MetaDataCreateChild(imu, "TYPE", std::vector<int16_t>(1,1));
     std::vector<int16_t> channels(6); channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6;
-    btk::MetaDataCreateChild2D(imu, "CHANNEL", channels, 6);
+    btk::MetaDataCreateChild(imu, "CHANNEL", channels, 6);
     
     btk::IMUsExtractor::Pointer imuse = btk::IMUsExtractor::New();
     imuse->SetInput(acq);
@@ -59,7 +59,7 @@ CXXTEST_SUITE(IMUsExtractorTest)
     btk::MetaDataCreateChild(imu, "LABELS", std::vector<std::string>(1,"Foo"));
     btk::MetaDataCreateChild(imu, "TYPE", std::vector<int16_t>(1,1));
     std::vector<int16_t> channels(6); channels[0] = 6; channels[1] = 5; channels[2] = 4; channels[3] = 3; channels[4] = 2; channels[5] = 1;
-    btk::MetaDataCreateChild2D(imu, "CHANNEL", channels, 6);
+    btk::MetaDataCreateChild(imu, "CHANNEL", channels, 6);
     
     btk::IMUsExtractor::Pointer imuse = btk::IMUsExtractor::New();
     imuse->SetInput(acq);
@@ -84,7 +84,7 @@ CXXTEST_SUITE(IMUsExtractorTest)
     btk::MetaDataCreateChild(imu, "USED", (int16_t)1);
     btk::MetaDataCreateChild(imu, "TYPE", std::vector<int16_t>(1,1));
     std::vector<int16_t> channels(6); channels[0] = 6; channels[1] = 5; channels[2] = 4; channels[3] = 3; channels[4] = 2; channels[5] = 1;
-    btk::MetaDataCreateChild2D(imu, "CHANNEL", channels, 6);
+    btk::MetaDataCreateChild(imu, "CHANNEL", channels, 6);
     
     btk::IMUsExtractor::Pointer imuse = btk::IMUsExtractor::New();
     imuse->SetInput(acq);
@@ -109,7 +109,7 @@ CXXTEST_SUITE(IMUsExtractorTest)
     btk::MetaDataCreateChild(imu, "USED", (int16_t)1);
     btk::MetaDataCreateChild(imu, "TYPE", std::vector<int16_t>(1,1));
     std::vector<int16_t> channels(6); channels[0] = 6; channels[1] = 5; channels[2] = -1; channels[3] = -1; channels[4] = 2; channels[5] = 1;
-    btk::MetaDataCreateChild2D(imu, "CHANNEL", channels, 6);
+    btk::MetaDataCreateChild(imu, "CHANNEL", channels, 6);
     
     btk::IMUsExtractor::Pointer imuse = btk::IMUsExtractor::New();
     imuse->SetInput(acq);
@@ -137,7 +137,7 @@ CXXTEST_SUITE(IMUsExtractorTest)
     std::vector<int16_t> channels(18); 
     channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6; channels[6] = -1; channels[7] = -1; channels[8] = -1;
     channels[9] = 7; channels[10] = 8; channels[11] = 9; channels[12] = 10; channels[13] = 11; channels[14] = 12; channels[15] = 13; channels[16] = 14; channels[17] = 15;
-    btk::MetaDataCreateChild2D(imu, "CHANNEL", channels, 9);
+    btk::MetaDataCreateChild(imu, "CHANNEL", channels, 9);
     
     btk::IMUsExtractor::Pointer imuse = btk::IMUsExtractor::New();
     imuse->SetInput(acq);
@@ -178,7 +178,7 @@ CXXTEST_SUITE(IMUsExtractorTest)
     btk::MetaDataCreateChild(imu, "DESCRIPTIONS", std::vector<std::string>(1,"BAR"));
     btk::MetaDataCreateChild(imu, "TYPE", std::vector<int16_t>(1,1));
     std::vector<int16_t> channels(6); channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6;
-    btk::MetaDataCreateChild2D(imu, "CHANNEL", channels, 6);
+    btk::MetaDataCreateChild(imu, "CHANNEL", channels, 6);
     
     // Acquisition #2 (two sensors)
     btk::Acquisition::Pointer acq2 = btk::Acquisition::New();
@@ -190,7 +190,7 @@ CXXTEST_SUITE(IMUsExtractorTest)
     channels.resize(18); 
     channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6; channels[6] = -1; channels[7] = -1; channels[8] = -1;
     channels[9] = 7; channels[10] = 8; channels[11] = 9; channels[12] = 10; channels[13] = 11; channels[14] = 12; channels[15] = 13; channels[16] = 14; channels[17] = 15;
-    btk::MetaDataCreateChild2D(imu, "CHANNEL", channels, 9);
+    btk::MetaDataCreateChild(imu, "CHANNEL", channels, 9);
     
     btk::IMUsExtractor::Pointer imuse = btk::IMUsExtractor::New();
     imuse->SetInput(0, acq1);

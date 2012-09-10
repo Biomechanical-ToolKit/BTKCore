@@ -644,7 +644,7 @@ BTK_SWIG_DOCSTRING_IMPL(MetaData, FindChild, "Finds the children which has the g
 BTK_SWIG_DOCSTRING(MetaData, Clone, "Deep copy of the object");
 
 %feature("docstring") btkMetaDataCreateChild "Function to create/set easily a metadata (with or without value) from a given label into a given parent.";
-%feature("docstring") btkMetaDataCreateChild2D "Function to create/set easily a metadata containing a 2D array as value, from a given label into a given parent.";
+%feature("docstring") btkMetaDataCreateChild "Function to create/set easily a metadata containing a 2D array as value, from a given label into a given parent.";
 %feature("docstring") btkMetaDataCollapseChildrenValuesDouble "Convenient method to extract the values of a metadata as an array of doubles.\nCollapse the parent children entries' values starting with the string 'baselabel' and incrementing (for example: LABELS, LABELS2, LABELS3).";
 %feature("docstring") btkMetaDataCollapseChildrenValuesInt "Convenient method to extract the values of a metadata as an array of integers.\nCollapse the parent children entries' values starting with the string 'baselabel' and incrementing (for example: LABELS, LABELS2, LABELS3).";
 %feature("docstring") btkMetaDataCollapseChildrenValuesString "Convenient method to extract the values of a metadata as an array of strings.\nCollapse the parent children entries' values starting with the string 'baselabel' and incrementing (for example: LABELS, LABELS2, LABELS3).";
@@ -655,15 +655,9 @@ BTK_SWIG_DOCSTRING(MetaData, Clone, "Deep copy of the object");
 %feature("autodoc", "btkMetaDataCreateChild(parent , label , btkIntArray)") btkMetaDataCreateChild(btkMetaData , const std::string& , const std::vector<int>&);
 %feature("autodoc", "btkMetaDataCreateChild(parent , label , btkDoubleArray)") btkMetaDataCreateChild(btkMetaData , const std::string& , const std::vector<double>&);
 %feature("autodoc", "btkMetaDataCreateChild(parent , label , btkStringArray)") btkMetaDataCreateChild(btkMetaData , const std::string& , const std::vector<std::string>&);
-%feature("autodoc", "btkMetaDataCreateChild(parent , label , btkIntArray , inc = 1)") btkMetaDataCreateChild(btkMetaData , const std::string& , const std::vector<int>& , int );
-%feature("autodoc", "btkMetaDataCreateChild(parent , label , btkDoubleArray , inc = 1)") btkMetaDataCreateChild(btkMetaData , const std::string& , const std::vector<double>& , int );
-%feature("autodoc", "btkMetaDataCreateChild(parent , label , btkStringArray , inc = 1)") btkMetaDataCreateChild(btkMetaData , const std::string& , const std::vector<std::string>& , int );
-%feature("autodoc", "btkMetaDataCreateChild2D(parent , label , btkIntArray , numCol)") btkMetaDataCreateChild2D(btkMetaData , const std::string& , const std::vector<int>& , int numCol);
-%feature("autodoc", "btkMetaDataCreateChild2D(parent , label , btkDoubleArray , numCol)") btkMetaDataCreateChild2D(btkMetaData , const std::string& , const std::vector<double>& , int numCol);
-%feature("autodoc", "btkMetaDataCreateChild2D(parent , label , btkStringArray , numCol)") btkMetaDataCreateChild2D(btkMetaData , const std::string& , const std::vector<std::string>& , int numCol);
-%feature("autodoc", "btkMetaDataCreateChild2D(parent , label , btkIntArray , numCol, inc = 1)") btkMetaDataCreateChild2D(btkMetaData , const std::string& , const std::vector<int>& , int numCol, int );
-%feature("autodoc", "btkMetaDataCreateChild2D(parent , label , btkDoubleArray , numCol, inc = 1)") btkMetaDataCreateChild2D(btkMetaData , const std::string& , const std::vector<double>& , int numCol, int );
-%feature("autodoc", "btkMetaDataCreateChild2D(parent , label , btkStringArray , numCol, inc = 1)") btkMetaDataCreateChild2D(btkMetaData , const std::string& , const std::vector<std::string>& , int numCol, int );
+%feature("autodoc", "btkMetaDataCreateChild(parent , label , btkIntArray , numCol)") btkMetaDataCreateChild(btkMetaData , const std::string& , const std::vector<int>& , int numCol);
+%feature("autodoc", "btkMetaDataCreateChild(parent , label , btkDoubleArray , numCol)") btkMetaDataCreateChild(btkMetaData , const std::string& , const std::vector<double>& , int numCol);
+%feature("autodoc", "btkMetaDataCreateChild(parent , label , btkStringArray , numCol)") btkMetaDataCreateChild(btkMetaData , const std::string& , const std::vector<std::string>& , int numCol);
 
 %feature("docstring") btkMetaDataInfo "
 Container class to store data of a MetaData object.

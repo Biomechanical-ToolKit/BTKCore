@@ -1835,7 +1835,7 @@ namespace btk
       MetaDataCreateChild(event, "CONTEXTS", contexts);
       MetaDataCreateChild(event, "LABELS", labels);
       MetaDataCreateChild(event, "DESCRIPTIONS", descs);
-      MetaDataCreateChild2D(event, "TIMES", times, 2);
+      MetaDataCreateChild(event, "TIMES", times, 2);
       MetaDataCreateChild(event, "SUBJECTS", subjects);
       MetaDataCreateChild(event, "GENERIC_FLAGS", genericFlags);
       MetaDataCreateChild(event, "ICON_IDS", iconIds);

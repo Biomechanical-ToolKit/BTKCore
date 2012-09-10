@@ -25,7 +25,7 @@ class IMUsExtractorTest(unittest.TestCase):
     btk.btkMetaDataCreateChild(imu, 'DESCRIPTIONS', btk.btkStringArray(1,'BAR'))
     btk.btkMetaDataCreateChild(imu, 'TYPE', btk.btkIntArray(1,1))
     channels = btk.btkIntArray(6); channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6
-    btk.btkMetaDataCreateChild2D(imu, 'CHANNEL', channels, 6)
+    btk.btkMetaDataCreateChild(imu, 'CHANNEL', channels, 6)
     imuse = btk.btkIMUsExtractor()
     imuse.SetInput(acq)
     output = imuse.GetOutput()
@@ -48,7 +48,7 @@ class IMUsExtractorTest(unittest.TestCase):
     btk.btkMetaDataCreateChild(imu, 'LABELS', btk.btkStringArray(1,'Foo'))
     btk.btkMetaDataCreateChild(imu, 'TYPE', btk.btkIntArray(1,1))
     channels = btk.btkIntArray(6); channels[0] = 6; channels[1] = 5; channels[2] = 4; channels[3] = 3; channels[4] = 2; channels[5] = 1
-    btk.btkMetaDataCreateChild2D(imu, 'CHANNEL', channels, 6)
+    btk.btkMetaDataCreateChild(imu, 'CHANNEL', channels, 6)
     imuse = btk.btkIMUsExtractor()
     imuse.SetInput(acq)
     output = imuse.GetOutput()
@@ -70,7 +70,7 @@ class IMUsExtractorTest(unittest.TestCase):
     btk.btkMetaDataCreateChild(imu, 'USED', 1)
     btk.btkMetaDataCreateChild(imu, 'TYPE', btk.btkIntArray(1,1))
     channels = btk.btkIntArray(6); channels[0] = 6; channels[1] = 5; channels[2] = 4; channels[3] = 3; channels[4] = 2; channels[5] = 1
-    btk.btkMetaDataCreateChild2D(imu, 'CHANNEL', channels, 6)
+    btk.btkMetaDataCreateChild(imu, 'CHANNEL', channels, 6)
     imuse = btk.btkIMUsExtractor()
     imuse.SetInput(acq)
     output = imuse.GetOutput()
@@ -92,7 +92,7 @@ class IMUsExtractorTest(unittest.TestCase):
     btk.btkMetaDataCreateChild(imu, 'USED', 1)
     btk.btkMetaDataCreateChild(imu, 'TYPE', btk.btkIntArray(1,1))
     channels = btk.btkIntArray(6); channels[0] = 6; channels[1] = 5; channels[2] = -1; channels[3] = -1; channels[4] = 2; channels[5] = 1
-    btk.btkMetaDataCreateChild2D(imu, 'CHANNEL', channels, 6)
+    btk.btkMetaDataCreateChild(imu, 'CHANNEL', channels, 6)
     imuse = btk.btkIMUsExtractor()
     imuse.SetInput(acq)
     output = imuse.GetOutput()
@@ -117,7 +117,7 @@ class IMUsExtractorTest(unittest.TestCase):
     channels = btk.btkIntArray(18);
     channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6; channels[6] = -1; channels[7] = -1; channels[8] = -1
     channels[9] = 7; channels[10] = 8; channels[11] = 9; channels[12] = 10; channels[13] = 11; channels[14] = 12; channels[15] = 13; channels[16] = 14; channels[17] = 15
-    btk.btkMetaDataCreateChild2D(imu, 'CHANNEL', channels, 9)
+    btk.btkMetaDataCreateChild(imu, 'CHANNEL', channels, 9)
     imuse = btk.btkIMUsExtractor()
     imuse.SetInput(acq)
     output = imuse.GetOutput()
@@ -152,7 +152,7 @@ class IMUsExtractorTest(unittest.TestCase):
     btk.btkMetaDataCreateChild(imu, 'DESCRIPTIONS', btk.btkStringArray(1,'BAR'))
     btk.btkMetaDataCreateChild(imu, 'TYPE', btk.btkIntArray(1,1))
     channels = btk.btkIntArray(6); channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6
-    btk.btkMetaDataCreateChild2D(imu, 'CHANNEL', channels, 6)
+    btk.btkMetaDataCreateChild(imu, 'CHANNEL', channels, 6)
     # Acquisition #2 (two sensors)
     acq2 = btk.btkAcquisition()
     acq2.Init(0,200,15)
@@ -163,7 +163,7 @@ class IMUsExtractorTest(unittest.TestCase):
     channels.resize(18) 
     channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6; channels[6] = -1; channels[7] = -1; channels[8] = -1
     channels[9] = 7; channels[10] = 8; channels[11] = 9; channels[12] = 10; channels[13] = 11; channels[14] = 12; channels[15] = 13; channels[16] = 14; channels[17] = 15
-    btk.btkMetaDataCreateChild2D(imu, 'CHANNEL', channels, 9)
+    btk.btkMetaDataCreateChild(imu, 'CHANNEL', channels, 9)
     imuse = btk.btkIMUsExtractor()
     imuse.SetInput(0, acq1)
     imuse.SetInput(1, acq2)

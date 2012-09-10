@@ -372,19 +372,18 @@ protected:
 };
 
 %warnfilter(509) btkMetaDataCreateChild;
-%warnfilter(509) btkMetaDataCreateChild2D;
 %inline
 {
   btkMetaData btkMetaDataCreateChild(btkMetaData parent, const std::string& label) {return btk::MetaDataCreateChild(parent, label);};
   void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, int val) {btk::MetaDataCreateChild(parent, label, static_cast<int16_t>(val));};
   void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, double val) {btk::MetaDataCreateChild(parent, label, static_cast<float>(val));};
   void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, const std::string& val) {btk::MetaDataCreateChild(parent, label, val);};
-  void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, const std::vector<int>& val, int inc = 1) {btk::MetaDataCreateChild(parent, label, btkSwigConvert<int16_t>(val), inc);};
-  void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, const std::vector<double>& val, int inc = 1) {btk::MetaDataCreateChild(parent, label, btkSwigConvert<float>(val), inc);};
-  void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, const std::vector<std::string>& val, int inc = 1) {btk::MetaDataCreateChild(parent, label, val, inc);};
-  void btkMetaDataCreateChild2D(btkMetaData parent, const std::string& label, const std::vector<int>& val, int numCol, int inc = 1) {btk::MetaDataCreateChild2D(parent, label, btkSwigConvert<int16_t>(val), numCol, inc);};
-  void btkMetaDataCreateChild2D(btkMetaData parent, const std::string& label, const std::vector<double>& val, int numCol, int inc = 1) {btk::MetaDataCreateChild2D(parent, label, btkSwigConvert<float>(val), numCol, inc);};
-  void btkMetaDataCreateChild2D(btkMetaData parent, const std::string& label, const std::vector<std::string>& val, int numCol, int inc = 1) {btk::MetaDataCreateChild2D(parent, label, val, numCol, inc);};
+  void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, const std::vector<int>& val) {btk::MetaDataCreateChild(parent, label, btkSwigConvert<int16_t>(val));};
+  void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, const std::vector<double>& val) {btk::MetaDataCreateChild(parent, label, btkSwigConvert<float>(val));};
+  void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, const std::vector<std::string>& val) {btk::MetaDataCreateChild(parent, label, val);};
+  void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, const std::vector<int>& val, int numCol) {btk::MetaDataCreateChild(parent, label, btkSwigConvert<int16_t>(val), numCol);};
+  void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, const std::vector<double>& val, int numCol) {btk::MetaDataCreateChild(parent, label, btkSwigConvert<float>(val), numCol);};
+  void btkMetaDataCreateChild(btkMetaData parent, const std::string& label, const std::vector<std::string>& val, int numCol) {btk::MetaDataCreateChild(parent, label, val, numCol);};
   std::vector<int> btkMetaDataCollapseChildrenValuesInt(btkMetaData parent, const std::string& baselabel, int targetFinalSize = -1, int blankReplacement = 0)
   {
     std::vector<int16_t> target;
