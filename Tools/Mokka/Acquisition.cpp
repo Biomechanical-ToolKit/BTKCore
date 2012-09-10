@@ -1141,7 +1141,7 @@ void Acquisition::loadAcquisition()
   this->mp_ROI[1] = this->m_LastFrame;
   int inc = 0;
   // The orders for the points are important as their ID follows the same rule than in the class btk::VTKMarkersFramesSource
-  // FIXME: The current solution is not the best if there is more than 65535 markers as the first ID of the model ouputs starts from this value. Maybe a map between the marker's ID and the corresponding index in the VTKMarkersFramesSource should fix definitively this problem
+  // FIXME: The current solution is not the best if there is more than 32768 markers as the first ID of the model ouputs starts from this value. Maybe a map between the marker's ID and the corresponding index in the VTKMarkersFramesSource should fix definitively this problem
   // Markers
   btk::PointCollection::Pointer points = virtualMarkersSeparator->GetOutput(0);
   for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
@@ -1210,7 +1210,7 @@ void Acquisition::loadAcquisition()
     p->radius = -1.0;
     p->color = QColor::Invalid;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(65535 + inc++, p); // 65535: To distinct clearly the markers from the others points.
+    this->m_Points.insert(32767 + inc++, p); // 32767: To distinct clearly the markers from the others points.
   }
   // Analog
   inc = 0;
