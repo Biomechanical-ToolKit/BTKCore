@@ -1305,7 +1305,7 @@ p, li { white-space: pre-wrap; }
               </sizepolicy>
              </property>
              <property name="text">
-              <string>All the provided data must be given in millimeters and expressed in the global frame. The corners must follow the order +x+y, -x+y, -x-y, +x-y, where x and y correspond to the direction of the force platform axis X and Y.</string>
+              <string>All the provided data must be given in millimeters and expressed in the global frame. The origin must contain the location of the origin regarding to the surface's center. The corners must follow the order +x+y, -x+y, -x-y, +x-y, where x and y correspond to the direction of the force platform axis X and Y.</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignJustify|Qt::AlignTop</set>
@@ -1322,7 +1322,7 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="videoPage">
-      <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0,0,0,1" columnstretch="0,0,1">
+      <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0,0,0,1,0" columnstretch="0,0,1">
        <property name="bottomMargin">
         <number>0</number>
        </property>
@@ -1512,6 +1512,19 @@ p, li { white-space: pre-wrap; }
           </property>
          </column>
         </widget>
+       </item>
+       <item row="6" column="1">
+        <spacer name="verticalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
