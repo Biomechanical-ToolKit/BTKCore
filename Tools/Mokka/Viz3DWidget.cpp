@@ -158,7 +158,7 @@ void Viz3DWidget::initialize()
       this, 
       SLOT(toggleTrajectoryMarker(vtkObject*, unsigned long, void*, void*)));
       
-  // this->saveProjectionCameraConfiguration();
+  this->mp_Renderer->GetActiveCamera()->SetClippingRange(1.0,1000.0);
 };
 
 void Viz3DWidget::restoreProjectionCameraConfiguration()
