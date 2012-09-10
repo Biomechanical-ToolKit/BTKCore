@@ -65,15 +65,11 @@ namespace btk
   /**
    * Constructor.
    *
-   * Set the type to a binary format, with the IEEE little endian byte order
-   * with the integer storage format.
+   * Set the type to a binary format, with the IEEE little endian byte order.
    */
-  MotionAnalysisBinaryFileIO::MotionAnalysisBinaryFileIO()
-  : AcquisitionFileIO()
-  {
-    this->m_FileType = AcquisitionFileIO::Binary;
-    this->m_ByteOrder = AcquisitionFileIO::IEEE_LittleEndian;
-  };
+  MotionAnalysisBinaryFileIO::MotionAnalysisBinaryFileIO(StorageFormat s)
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, s)
+  {};
 
   /**
    * Read the given key and store the result in an unsigned 8-bit integer.

@@ -360,9 +360,8 @@ namespace btk
    * Constructor.
    */
   ANCFileIO::ANCFileIO()
-  : AcquisitionFileIO()
+  : AcquisitionFileIO(AcquisitionFileIO::ASCII)
   {
-    this->m_FileType = AcquisitionFileIO::ASCII;
     this->m_Generation = 2;
   };
 

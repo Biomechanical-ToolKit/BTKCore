@@ -95,7 +95,7 @@ namespace btk
     };
     
   protected:
-    BTK_IO_EXPORT AcquisitionFileIO();
+    BTK_IO_EXPORT AcquisitionFileIO(FileType f = TypeNotApplicable, ByteOrder b = OrderNotApplicable, StorageFormat s = StorageNotApplicable);
     virtual ~AcquisitionFileIO() {};
     
     void SetFileType(FileType f) {this->m_FileType = f;};

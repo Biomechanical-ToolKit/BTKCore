@@ -218,11 +218,11 @@ namespace btk
   /**
    * Constructor.
    */
-  AcquisitionFileIO::AcquisitionFileIO()
+  AcquisitionFileIO::AcquisitionFileIO(FileType f, ByteOrder b, StorageFormat s)
   {
-    this->m_FileType = TypeNotApplicable;
-    this->m_ByteOrder = OrderNotApplicable;
-    this->m_StorageFormat = StorageNotApplicable;
+    this->m_FileType = f;
+    this->m_ByteOrder = b;
+    this->m_StorageFormat = s;
   };
   
   /**

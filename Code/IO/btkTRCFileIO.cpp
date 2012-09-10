@@ -350,8 +350,6 @@ namespace btk
    * Constructor.
    */
   TRCFileIO::TRCFileIO()
-  : AcquisitionFileIO()
-  {
-    this->m_FileType = AcquisitionFileIO::ASCII;
-  };
+  : AcquisitionFileIO(AcquisitionFileIO::ASCII)
+  {};
 };

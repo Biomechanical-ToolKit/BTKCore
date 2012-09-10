@@ -309,8 +309,6 @@ namespace btk
    * Constructor.
    */
   TRBFileIO::TRBFileIO()
-  : MotionAnalysisBinaryFileIO()
-  {
-    this->m_StorageFormat = AcquisitionFileIO::Float;
-  };
+  : MotionAnalysisBinaryFileIO(AcquisitionFileIO::Float)
+  {};
 };

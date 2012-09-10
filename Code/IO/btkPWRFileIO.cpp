@@ -184,10 +184,6 @@ namespace btk
    * Constructor.
    */
   PWRFileIO::PWRFileIO()
-  : AcquisitionFileIO()
-  {
-    this->m_FileType = AcquisitionFileIO::Binary;
-    this->m_ByteOrder = AcquisitionFileIO::IEEE_LittleEndian;
-    this->m_StorageFormat = AcquisitionFileIO::Float;
-  };
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Float)
+  {};
 };

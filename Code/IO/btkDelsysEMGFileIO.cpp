@@ -328,9 +328,6 @@ namespace btk
    * Constructor.
    */
   DelsysEMGFileIO::DelsysEMGFileIO()
-  : AcquisitionFileIO()
-  {
-    this->m_FileType = AcquisitionFileIO::Binary;
-    this->m_ByteOrder = AcquisitionFileIO::IEEE_LittleEndian;
-  };
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian)
+  {};
 };

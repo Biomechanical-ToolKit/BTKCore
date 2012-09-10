@@ -1283,22 +1283,19 @@ namespace btk
    * Constructor.
    */
   C3DFileIO::C3DFileIO()
-  : AcquisitionFileIO(), 
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_BigEndian, AcquisitionFileIO::Float),
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::VAX_LittleEndian, AcquisitionFileIO::Float),
+#else
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Float),
+#endif  
     m_AnalogChannelScale(),
     m_AnalogZeroOffset()
   {
     this->m_PointScale = 0.1;
     this->m_AnalogUniversalScale = 1.0;
-    this->m_StorageFormat = Float;
     this->m_AnalogIntegerFormat = Signed;
-    this->SetFileType(AcquisitionFileIO::Binary);
-#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-    this->SetByteOrder(btk::C3DFileIO::IEEE_BigEndian);
-#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
-    this->SetByteOrder(btk::C3DFileIO::VAX_LittleEndian);
-#else
-    this->SetByteOrder(btk::C3DFileIO::IEEE_LittleEndian);
-#endif
     this->m_WritingFlags = ScalesFromDataUpdate | MetaDataFromDataUpdate | CompatibleVicon;  
   };
 

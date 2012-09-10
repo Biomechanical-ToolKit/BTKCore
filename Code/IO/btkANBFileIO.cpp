@@ -423,10 +423,8 @@ namespace btk
    * Constructor.
    */
   ANBFileIO::ANBFileIO()
-  : MotionAnalysisBinaryFileIO()
-  {
-    this->m_StorageFormat = AcquisitionFileIO::Integer;
-  };
+  : MotionAnalysisBinaryFileIO(AcquisitionFileIO::Integer)
+  {};
   
   size_t ANBFileIO::ReadKeyValueFloatFromTwoU16(float* val, IEEELittleEndianBinaryFileStream* bifs, int key)
   {

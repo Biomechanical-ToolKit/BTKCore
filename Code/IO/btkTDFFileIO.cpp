@@ -819,12 +819,8 @@ namespace btk
    * Constructor.
    */
   TDFFileIO::TDFFileIO()
-  : AcquisitionFileIO()
-  {
-    this->m_FileType = AcquisitionFileIO::Binary;
-    this->m_ByteOrder = AcquisitionFileIO::IEEE_LittleEndian;
-    this->m_StorageFormat = AcquisitionFileIO::Float;
-  };
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Float)
+  {};
   
   const TDFFileIO::BlockEntry* TDFFileIO::SeekToBlock(IEEELittleEndianBinaryFileStream* bifs, const std::list<BlockEntry>* blockEntries, unsigned int id) const
   {

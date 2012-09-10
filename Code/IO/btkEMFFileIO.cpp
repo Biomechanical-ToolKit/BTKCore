@@ -261,8 +261,6 @@ namespace btk
    * Constructor.
    */
   EMFFileIO::EMFFileIO()
-  : AcquisitionFileIO()
-  {
-    this->m_FileType = AcquisitionFileIO::ASCII;
-  };
+  : AcquisitionFileIO(AcquisitionFileIO::ASCII)
+  {};
 };

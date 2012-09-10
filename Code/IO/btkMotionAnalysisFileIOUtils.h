@@ -62,7 +62,7 @@ namespace btk
   class MotionAnalysisBinaryFileIO : public AcquisitionFileIO
   {
   protected:
-    BTK_IO_EXPORT MotionAnalysisBinaryFileIO();
+    BTK_IO_EXPORT MotionAnalysisBinaryFileIO(StorageFormat s = StorageNotApplicable);
 
     size_t ReadKeyValueU8(uint8_t* val, IEEELittleEndianBinaryFileStream* bifs, int key);
     size_t ReadKeyValueU8(std::vector<uint8_t>& val, IEEELittleEndianBinaryFileStream* bifs, int key);
