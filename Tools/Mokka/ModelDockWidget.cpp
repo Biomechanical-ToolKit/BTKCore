@@ -730,7 +730,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   QFile file(filename);
   if (!file.open(QFile::ReadOnly | QFile::Text))
   {
-    LOG_CRITICAL("Error when reading the file: " + filename + ": " + file.errorString());
+    LOG_ERROR("Error when reading the file: " + filename + ": " + file.errorString());
     messageBox.setText(messageBox.text());
     messageBox.setInformativeText("<nobr>" + filename + ": " + file.errorString() + "</nobr>\n\nThis configuration is removed from the list");
     messageBox.exec();
@@ -953,7 +953,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   if (xmlReader.hasError())
   {
     QString errMsg = "Failed to parse file: " + filename + "\n" + xmlReader.errorString();
-    LOG_CRITICAL(errMsg);
+    LOG_ERROR(errMsg);
     messageBox.setText(errMsg);
     messageBox.exec();
     return;
@@ -961,7 +961,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   else if (file.error() != QFile::NoError)
   {
     QString errMsg = "Cannot read file: " + filename + "\n" + file.errorString();
-    LOG_CRITICAL(errMsg);
+    LOG_ERROR(errMsg);
     messageBox.setText(errMsg);
     messageBox.exec();
     return;
@@ -2847,7 +2847,7 @@ bool ModelDockWidget::saveConfiguration(int idx)
   QFile file(filename);
   if (!file.open(QFile::WriteOnly | QFile::Text))
   {
-    LOG_CRITICAL("Error when writing the file: " + filename + ":" + file.errorString());
+    LOG_ERROR("Error when writing the file: " + filename + ":" + file.errorString());
     messageBox.setText(messageBox.text() + filename);
     messageBox.setInformativeText(file.errorString());
     messageBox.exec();

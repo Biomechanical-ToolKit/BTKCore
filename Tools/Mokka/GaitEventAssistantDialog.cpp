@@ -156,15 +156,15 @@ bool GaitEventAssistantDialog::run(QUndoCommand* acquisitionCommand, Acquisition
   }
   catch (btk::Exception& e)
   {
-    LOG_CRITICAL(e.what());
+    LOG_ERROR(e.what());
   }
   catch (std::exception& e)
   {
-    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    LOG_ERROR("Unexpected error: " + QString(e.what()));
   }
   catch (...)
   {
-    LOG_CRITICAL("Unknown error.");
+    LOG_ERROR("Unknown error.");
   }
   
   if (!error)

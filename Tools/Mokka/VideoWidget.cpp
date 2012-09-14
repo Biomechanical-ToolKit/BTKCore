@@ -190,7 +190,7 @@ void VideoWidget::dropEvent(QDropEvent* event)
     this->setVideoVisible(true);
   else if (this->mp_Acquisition->videoPath(id).isEmpty())
   {
-    LOG_CRITICAL("Error when loading the video file: File not found.");
+    LOG_ERROR("Error when loading the video file: File not found.");
     QMessageBox error(QMessageBox::Warning, "Video player", "Error when loading the video.", QMessageBox::Ok , this);
 #ifdef Q_OS_MAC
     error.setWindowFlags(Qt::Sheet);
@@ -275,7 +275,7 @@ void VideoWidget::checkMediaStatus(Phonon::State newState, Phonon::State oldStat
       error.setWindowFlags(Qt::Sheet);
       error.setWindowModality(Qt::WindowModal);
 #endif
-      LOG_CRITICAL("Error when loading the video file: Have you the right video codec installed?");
+      LOG_ERROR("Error when loading the video file: Have you the right video codec installed?");
       error.setInformativeText("<nobr>Have you the right video codec installed?</nobr>");
       error.exec();
       this->m_VideoId = -1;

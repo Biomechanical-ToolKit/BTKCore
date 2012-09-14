@@ -68,7 +68,7 @@ void LoggerVTKOutput::DisplayText(const char* str)
 
 void LoggerVTKOutput::DisplayErrorText(const char* str)
 {
-  LOGGER_VTK_OUTPUT(LOG_CRITICAL, str);
+  LOGGER_VTK_OUTPUT(LOG_ERROR, str);
 };
 
 void LoggerVTKOutput::DisplayWarningText(const char* str)
@@ -78,11 +78,11 @@ void LoggerVTKOutput::DisplayWarningText(const char* str)
 
 void LoggerVTKOutput::DisplayGenericWarningText(const char* str)
 {
-  size_t len = strlen(str) - 2; \
-  char* msg = (char*)malloc(len+1); \
-  strncpy(msg, str, len); \
-  msg[len] = '\0'; \
-  LOG_INFO(msg); \
+  size_t len = strlen(str) - 2;
+  char* msg = (char*)malloc(len+1);
+  strncpy(msg, str, len);
+  msg[len] = '\0';
+  LOG_INFO(msg);
   free(msg);
 };
 

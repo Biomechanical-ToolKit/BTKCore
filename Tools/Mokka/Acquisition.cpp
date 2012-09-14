@@ -120,17 +120,17 @@ bool Acquisition::load(const QString& filename)
   }
   catch (btk::Exception& e)
   {
-    LOG_CRITICAL(e.what());
+    LOG_ERROR(e.what());
     return false;
   }
   catch (std::exception& e)
   {
-    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    LOG_ERROR("Unexpected error: " + QString(e.what()));
     return false;
   }
   catch (...)
   {
-    LOG_CRITICAL("Unknown error.");
+    LOG_ERROR("Unknown error.");
     return false;
   }
   this->clear();
@@ -174,17 +174,17 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
   }
   catch (btk::Exception& e)
   {
-    LOG_CRITICAL(e.what());
+    LOG_ERROR(e.what());
     return false;
   }
   catch (std::exception& e)
   {
-    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    LOG_ERROR("Unexpected error: " + QString(e.what()));
     return false;
   }
   catch (...)
   {
-    LOG_CRITICAL("Unknown error.");
+    LOG_ERROR("Unknown error.");
     return false;
   }
   return this->importFrom(acquisitions, allFramesKept);
@@ -261,17 +261,17 @@ bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, bt
   }
   catch (btk::Exception& e)
   {
-    LOG_CRITICAL(e.what());
+    LOG_ERROR(e.what());
     return false;
   }
   catch (std::exception& e)
   {
-    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    LOG_ERROR("Unexpected error: " + QString(e.what()));
     return false;
   }
   catch (...)
   {
-    LOG_CRITICAL("Unknown error.");
+    LOG_ERROR("Unknown error.");
     return false;
   }
   bool res = this->importFrom(acquisitions, allFramesKept);
@@ -1092,17 +1092,17 @@ bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
   }
   catch (btk::Exception& e)
   {
-    LOG_CRITICAL(e.what());
+    LOG_ERROR(e.what());
     return false;
   }
   catch (std::exception& e)
   {
-    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    LOG_ERROR("Unexpected error: " + QString(e.what()));
     return false;
   }
   catch (...)
   {
-    LOG_CRITICAL("Unknown error.");
+    LOG_ERROR("Unknown error.");
     return false;
   }
   if (updateInfo)
