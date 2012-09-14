@@ -68,7 +68,7 @@
      <x>0</x>
      <y>0</y>
      <width>928</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -226,7 +226,7 @@
      <property name="title">
       <string>Event</string>
      </property>
-     <addaction name="actionGaitEventAssistant"/>
+     <addaction name="actionToolGaitEventDetection"/>
     </widget>
     <widget class="QMenu" name="menuMarker">
      <property name="title">
@@ -238,10 +238,24 @@
      <addaction name="actionToolComputeMarkerAngle"/>
      <addaction name="actionToolComputeVectorAngle"/>
     </widget>
+    <widget class="QMenu" name="menuAnalog">
+     <property name="title">
+      <string>Analog</string>
+     </property>
+     <widget class="QMenu" name="menuAnalogRemoveOffset">
+      <property name="title">
+       <string>Remove Offset</string>
+      </property>
+      <addaction name="actionToolRemoveAnalogOffsetFromReferenceFile"/>
+      <addaction name="actionToolRemoveAnalogOffsetFromSelectedFrames"/>
+     </widget>
+     <addaction name="menuAnalogRemoveOffset"/>
+    </widget>
     <addaction name="menuModel"/>
     <addaction name="menuAcquisition"/>
     <addaction name="menuEvent"/>
     <addaction name="menuMarker"/>
+    <addaction name="menuAnalog"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -571,9 +585,19 @@
     <string>Reload</string>
    </property>
   </action>
-  <action name="actionGaitEventAssistant">
+  <action name="actionToolGaitEventDetection">
    <property name="text">
     <string>Gait Event Detection</string>
+   </property>
+  </action>
+  <action name="actionToolRemoveAnalogOffsetFromReferenceFile">
+   <property name="text">
+    <string>From Reference File</string>
+   </property>
+  </action>
+  <action name="actionToolRemoveAnalogOffsetFromSelectedFrames">
+   <property name="text">
+    <string>From Selected Frames</string>
    </property>
   </action>
  </widget>

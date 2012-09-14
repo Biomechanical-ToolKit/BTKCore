@@ -721,6 +721,24 @@ void Acquisition::insertAnalogs(const QList<int>& ids, const QList<Analog*> anal
   emit analogsInserted(ids, analogs);
 };
 
+void Acquisition::shiftAnalogsValues(const QVector<int>& ids, const QVector<double>& offsets)
+{
+  int numAnalogs = this->mp_BTKAcquisition->GetAnalogNumber();
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    if (ids[i] < numAnalogs)
+    {
+      btk::AnalogCollection::Iterator it = this->mp_BTKAcquisition->BeginAnalog();
+      std::advance(it,ids[i]);
+      (*it)->GetValues().cwise() += offsets[i];
+      (*it)->Modified();
+    }
+  }
+  this->btkGroundReactionWrenches()->Update();
+  this->btkWrenchDirectionAngles()->Update();
+  emit analogsValuesChanged(ids);
+};
+
 const Event* Acquisition::eventAt(int id) const
 {
   QMap<int,Event*>::const_iterator it = this->m_Events.find(id);

@@ -58,6 +58,7 @@
 #include "Viz3DWidget.h"
 
 #include "Tools/GaitEventDetection.h"
+#include "Tools/RemoveAnalogOffset.h"
 
 #include <btkASCIIFileWriter.h>
 #include <btkMultiSTLFileWriter.h>
@@ -320,7 +321,9 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionToolComputeMarkerDistance, SIGNAL(triggered()), this, SLOT(computeDistanceFromMarkersSelection()));
   connect(this->actionToolComputeMarkerAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection()));
   connect(this->actionToolComputeVectorAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection2()));
-  connect(this->actionGaitEventAssistant, SIGNAL(triggered()), this, SLOT(detectGaitEvents()));
+  connect(this->actionToolGaitEventDetection, SIGNAL(triggered()), this, SLOT(detectGaitEvents()));
+  connect(this->actionToolRemoveAnalogOffsetFromReferenceFile, SIGNAL(triggered()), this, SLOT(removeAnalogOffsetFromReferenceFile()));
+  connect(this->actionToolRemoveAnalogOffsetFromSelectedFrames, SIGNAL(triggered()), this, SLOT(removeAnalogOffsetFromSelectedFrames()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -974,6 +977,34 @@ void MainWindow::detectGaitEvents()
   */
 };
 
+void MainWindow::removeAnalogOffsetFromReferenceFile()
+{
+  RemoveAnalogOffset tool(RemoveAnalogOffset::FromReferenceFile, this);
+  this->runAcquisitionTool(&tool);
+  /*
+  RemoveAnalogOffset tool(RemoveAnalogOffset::FromReferenceFile, this);
+  QUndoCommand* acquisitionCommand = new QUndoCommand;
+  if (tool.run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
+    this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
+  if (acquisitionCommand->childCount() == 0) // The undo command was not used.
+    delete acquisitionCommand;
+  */
+};
+
+void MainWindow::removeAnalogOffsetFromSelectedFrames()
+{
+  RemoveAnalogOffset tool(RemoveAnalogOffset::FromSelectedFrames, this);
+  this->runAcquisitionTool(&tool);
+  /*
+  RemoveAnalogOffset tool(RemoveAnalogOffset::FromSelectedFrames, this);
+  QUndoCommand* acquisitionCommand = new QUndoCommand;
+  if (tool.run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
+    this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
+  if (acquisitionCommand->childCount() == 0) // The undo command was not used.
+    delete acquisitionCommand;
+  */
+};
+
 bool MainWindow::extractSelectedMarkers(QList<int>& selectedMarkers)
 {
   selectedMarkers.clear();
@@ -1178,7 +1209,9 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionToolComputeMarkerDistance->setEnabled(true);
   this->actionToolComputeMarkerAngle->setEnabled(true);
   this->actionToolComputeVectorAngle->setEnabled(true);
-  this->actionGaitEventAssistant->setEnabled(true);
+  this->actionToolGaitEventDetection->setEnabled(true);
+  this->actionToolRemoveAnalogOffsetFromReferenceFile->setEnabled(true);
+  this->actionToolRemoveAnalogOffsetFromSelectedFrames->setEnabled(true);
 };
 
 void MainWindow::saveFile()
@@ -1908,7 +1941,9 @@ void MainWindow::reset()
   this->actionToolComputeMarkerDistance->setEnabled(false);
   this->actionToolComputeMarkerAngle->setEnabled(false);
   this->actionToolComputeVectorAngle->setEnabled(false);
-  this->actionGaitEventAssistant->setEnabled(false);
+  this->actionToolGaitEventDetection->setEnabled(false);
+  this->actionToolRemoveAnalogOffsetFromReferenceFile->setEnabled(false);
+  this->actionToolRemoveAnalogOffsetFromSelectedFrames->setEnabled(false);
   // Tools modeless window
   QList<ChartDialog*>::iterator it = this->m_ToolCharts.begin();
   while (it != this->m_ToolCharts.end())

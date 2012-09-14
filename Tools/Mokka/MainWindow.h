@@ -128,6 +128,8 @@ public slots:
   void computeAngleFromMarkersSelection();
   void computeAngleFromMarkersSelection2();
   void detectGaitEvents();
+  void removeAnalogOffsetFromReferenceFile();
+  void removeAnalogOffsetFromSelectedFrames();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);

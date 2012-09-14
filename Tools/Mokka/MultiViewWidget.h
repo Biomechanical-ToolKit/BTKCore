@@ -187,6 +187,7 @@ private slots:
   void changeGroundOrientation();
   void changeMarkerTrajectoryLength();
   void changeForceButterflyActivation();
+  void updateAnalogValuesModification(const QVector<int>& ids);
   
 private:
   void displayChartBottomAxisAsFrame();

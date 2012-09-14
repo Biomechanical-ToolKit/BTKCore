@@ -191,6 +191,7 @@ public:
   void setAnalogsScale(const QVector<int>& ids, const QVector<double>& scales);
   QList<Analog*> takeAnalogs(const QList<int>& ids);
   void insertAnalogs(const QList<int>& ids, const QList<Analog*> analogs);
+  void shiftAnalogsValues(const QVector<int>& ids, const QVector<double>& offsets);
   
   bool hasEvents() const {return !this->m_Events.empty();};
   int eventCount() const {return this->m_Events.count();};
@@ -247,6 +248,7 @@ signals:
   void analogsScaleChanged(const QVector<int>& ids, const QVector<double>& scales);
   void analogsRemoved(const QList<int>& ids, const QList<Analog*>& analogs);
   void analogsInserted(const QList<int>& ids, const QList<Analog*>& analogs);
+  void analogsValuesChanged(const QVector<int>& ids);
   void eventFrameChanged(int id, int frame);
   void eventsModified(const QList<int>& ids, const QList<Event*>& events);
   void eventsRemoved(const QList<int>& ids, const QList<Event*>& events);

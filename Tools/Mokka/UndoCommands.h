@@ -378,6 +378,22 @@ private:
   QList<Analog*> m_Analogs;
 };
 
+// --------------- ShiftAnalogsValues ---------------
+class ShiftAnalogsValues : public AcquisitionUndoCommand
+{
+public:
+  ShiftAnalogsValues(Acquisition* acq, const QVector<int>& ids, const QVector<double>& offsets, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<double> m_Offsets;
+  
+  void action();
+};
+
 // ----------------------------------------------- //
 //                   EVENT EDITION                 //
 // ----------------------------------------------- //

@@ -445,6 +445,7 @@ void MultiViewWidget::setAcquisition(Acquisition* acq)
   connect(this->mp_Acquisition, SIGNAL(markersConfigurationReset(QList<int>, QList<bool>, QList<bool>, QList<double>, QList<QColor>)), this, SLOT(setMarkersConfiguration(QList<int>, QList<bool>, QList<bool>, QList<double>, QList<QColor>)));
   connect(this->mp_Acquisition, SIGNAL(firstFrameChanged(int)), this, SLOT(updateFramesIndex(int)));
   connect(this->mp_Acquisition, SIGNAL(videosDelayChanged(QVector<int>, QVector<qint64>)), this, SLOT(setVideoDelays(QVector<int>, QVector<qint64>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsValuesChanged(QVector<int>)), this, SLOT(updateAnalogValuesModification(QVector<int>)));
 }
 
 void MultiViewWidget::setModel(Model* m)
@@ -1648,6 +1649,26 @@ void MultiViewWidget::changeForceButterflyActivation()
   btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
   GRFs->SetButterflyActivation(!GRFs->GetButterflyActivation());
   this->updateDisplay();
+};
+
+void MultiViewWidget::updateAnalogValuesModification(const QVector<int>& ids)
+{
+  Q_UNUSED(ids);
+  
+  QVector<bool> paths(this->mp_Acquisition->btkGroundReactionWrenches()->GetItemNumber());
+  btk::VTKGRFsFramesSource* GRFs = btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS]);
+  for (int i = 0 ; i < paths.count() ; ++i )
+    paths[i] = GRFs->GetPathVisibility(i);
+  GRFs->Update();
+  for (int i = 0 ; i < paths.count() ; ++i )
+    GRFs->SetPathVisibility(i, paths[i]);
+  btk::VTKGRFsFramesSource::SafeDownCast((*this->mp_VTKProc)[VTK_GRFS])->GetOutput()->GetInformation()->Remove(vtkDataObject::DATA_TIME_STEPS());
+  
+  for (QList<AbstractView*>::const_iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->refreshPlots();
+    static_cast<CompositeView*>(*it)->render();
+  }
 };
 
 void MultiViewWidget::updateCameras()

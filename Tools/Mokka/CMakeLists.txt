@@ -52,6 +52,7 @@ SET(Mokka_CPP
   TimeEventControlerWidget.cpp
   TimeEventFunctors.cpp
   Tools/GaitEventDetection.cpp
+  Tools/RemoveAnalogOffset.cpp
   UndoCommands.cpp
   UpdateManager.cpp
   UpdateManager_controller.cpp
@@ -93,6 +94,7 @@ SET(Mokka_H
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
   Tools/GaitEventDetectionDialog.h
+  Tools/RemoveAnalogOffsetDialog.h
   UpdateManager.h
   UpdateManager_p.h
   Viz3DWidget.h
@@ -117,6 +119,7 @@ SET(Mokka_UI
   ProgressWidget.ui
   TimeEventControlerWidget.ui
   Tools/GaitEventDetectionDialog.ui
+  Tools/RemoveAnalogOffsetDialog.ui
   UpdateManagerNewVersionDialog.ui
   UpdateManagerInstallerDialog.ui
   )

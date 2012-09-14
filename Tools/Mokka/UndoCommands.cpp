@@ -334,6 +334,22 @@ void EditAnalogsScale::action()
   this->m_Scales = temp;
 };
 
+// --------------- ShiftAnalogsValues ---------------
+ShiftAnalogsValues::ShiftAnalogsValues(Acquisition* acq, const QVector<int>& ids, const QVector<double>& offsets, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent), m_Ids(ids), m_Offsets(offsets)
+{
+  this->mp_Acquisition = acq;
+};
+
+void ShiftAnalogsValues::action()
+{
+  QVector<double> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = -1.0 * this->m_Offsets[i];
+  this->mp_Acquisition->shiftAnalogsValues(this->m_Ids, this->m_Offsets);
+  this->m_Offsets = temp;
+};
+
 // --------------- EditMarkersVisibility ---------------
 EditMarkersVisibility::EditMarkersVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent)
 : ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
