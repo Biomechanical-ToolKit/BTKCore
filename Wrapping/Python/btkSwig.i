@@ -59,10 +59,18 @@ High level classes and functions to open, edit and modify biomechanical acquisit
 // Extra python code in the btk namespace
 %pythoncode %{
 def Iterate(c):
-	i = c.Begin()
-	while i != c.End():
-		yield i.value()
-		i.incr()
+    """
+    Python generator to iterate through a collection of BTK objects (Points, Analogs, Events and Metadata).
+    
+    For example:
+  
+    for i in btk.Iterate(acq.GetPoints()):
+        print i.GetLabel()
+    """
+    i = c.Begin()
+    while i != c.End():
+        yield i.value()
+        i.incr()
 %}
 
 %feature("autodoc", "0");
