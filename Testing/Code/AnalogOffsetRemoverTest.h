@@ -166,6 +166,5 @@ CXXTEST_TEST_REGISTRATION(AnalogOffsetRemoverTest, Test3Over4)
 CXXTEST_TEST_REGISTRATION(AnalogOffsetRemoverTest, Test4Over3)
 CXXTEST_TEST_REGISTRATION(AnalogOffsetRemoverTest, TestNoCommonLabel)
 CXXTEST_TEST_REGISTRATION(AnalogOffsetRemoverTest, TestOneCommonLabel)
-CXXTEST_TEST_REGISTRATION(AnalogOffsetRemoverTest, TestFromFile)
 
 #endif // AnalogOffsetRemoverTest_h
