@@ -1,71 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>GaitEventAssistantDialog</class>
- <widget class="QDialog" name="GaitEventAssistantDialog">
+ <class>GaitEventDetectionDialog</class>
+ <widget class="QDialog" name="GaitEventDetectionDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>475</height>
+    <width>350</width>
+    <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Gait Event Assistant</string>
+   <string>Gait Event Detection</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,1,0">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="overwriteRadioButton">
-       <property name="text">
-        <string>Overwrite existing events</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="appendRadioButton">
-       <property name="text">
-        <string>Append to existing events</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
+    <widget class="QGroupBox" name="groupBox_3">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="overwriteRadioButton">
+        <property name="text">
+         <string>Overwrite existing events</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="appendRadioButton">
+        <property name="text">
+         <string>Append to existing events</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -133,7 +128,7 @@ QPushButton::flat
              <string>Options</string>
             </property>
             <property name="icon">
-             <iconset resource="images.qrc">
+             <iconset resource="../images.qrc">
               <normaloff>:/Resources/Images/disclosureTriangleSmallDownBlack.png</normaloff>:/Resources/Images/disclosureTriangleSmallDownBlack.png</iconset>
             </property>
             <property name="iconSize">
@@ -388,13 +383,13 @@ QPushButton::flat
   </layout>
  </widget>
  <resources>
-  <include location="images.qrc"/>
+  <include location="../images.qrc"/>
  </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>GaitEventAssistantDialog</receiver>
+   <receiver>GaitEventDetectionDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -410,7 +405,7 @@ QPushButton::flat
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>GaitEventAssistantDialog</receiver>
+   <receiver>GaitEventDetectionDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

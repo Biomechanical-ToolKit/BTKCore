@@ -52,6 +52,7 @@ class ProgressWidget;
 class UpdateManager;
 class QUndoStack;
 class ChartDialog;
+class AcquisitionTool;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -223,6 +224,7 @@ private:
   void editSegment(bool isNew);
   void showChartTool(ChartDialog* chartDialog, bool computed);
   bool extractSelectedMarkers(QList<int>& selectedMarkers);
+  void runAcquisitionTool(AcquisitionTool* tool);
   
   Acquisition* mp_Acquisition;
   Model* mp_Model;

@@ -33,42 +33,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GaitEventAssistantDialog_h
-#define GaitEventAssistantDialog_h
+#ifndef GaitEventDetection_h
+#define GaitEventDetection_h
 
-#include "ui_GaitEventAssistantDialog.h"
+#include "AcquisitionTool.h"
 
-#include <QDialog>
-
-class QUndoCommand;
-class QPropertyAnimation;
-class Acquisition;
-struct Event;
-
-class GaitEventAssistantDialog : public QDialog, public Ui::GaitEventAssistantDialog
+class GaitEventDetection : public AcquisitionTool
 {
-  Q_OBJECT
-  
 public:
-  GaitEventAssistantDialog(QWidget* parent = 0);
-  
-  void initialize(Acquisition* const acq);
-  bool run(QUndoCommand* cmd, Acquisition* const acq);
-  
-public slots:
-  void setMappingMethod(int index);
-  void setDetectionMethod(int index);
-  void startToggleDetectionOptions();
-  
-private slots:
-  void endToggleDetectionOptions();
-  void checkManualMapping();
+  GaitEventDetection(QWidget* parent = 0);  
+  virtual bool run(QUndoCommand* acquisitionParentCmd, Acquisition* const acq);
   
 private:
   enum {ManualMapping = 0};
   enum {VerticalGroundReactionForceDetection = 0};
-  
-  QPropertyAnimation* mp_ResizeDetectionOptionAnimation;
 };
 
-#endif // GaitEventAssistantDialog_h
+#endif // GaitEventDetection_h

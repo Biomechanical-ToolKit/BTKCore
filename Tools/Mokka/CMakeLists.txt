@@ -31,7 +31,6 @@ SET(Mokka_CPP
   ExportASCIIDialog.cpp
   ExportSTLDialog.cpp
   FileInfoDockWidget.cpp
-  GaitEventAssistantDialog.cpp
   ImportAssistantDialog.cpp
   LoggerWidget.cpp
   LoggerVTKOutput.cpp
@@ -52,6 +51,7 @@ SET(Mokka_CPP
   TimeEventBarWidget.cpp
   TimeEventControlerWidget.cpp
   TimeEventFunctors.cpp
+  Tools/GaitEventDetection.cpp
   UndoCommands.cpp
   UpdateManager.cpp
   UpdateManager_controller.cpp
@@ -76,7 +76,6 @@ SET(Mokka_H
   ExportASCIIDialog.h
   ExportSTLDialog.h
   FileInfoDockWidget.h
-  GaitEventAssistantDialog.h
   ImportAssistantDialog.h
   LoggerWidget.h
   MainWindow.h
@@ -93,6 +92,7 @@ SET(Mokka_H
   ProgressWidget.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
+  Tools/GaitEventDetectionDialog.h
   UpdateManager.h
   UpdateManager_p.h
   Viz3DWidget.h
@@ -107,7 +107,6 @@ SET(Mokka_UI
   ExportASCIIDialog.ui
   ExportSTLDialog.ui
   FileInfoDockWidget.ui
-  GaitEventAssistantDialog.ui
   ImportAssistantDialog.ui
   MainWindow.ui
   Metadata.ui
@@ -117,6 +116,7 @@ SET(Mokka_UI
   NewSegmentDialog.ui
   ProgressWidget.ui
   TimeEventControlerWidget.ui
+  Tools/GaitEventDetectionDialog.ui
   UpdateManagerNewVersionDialog.ui
   UpdateManagerInstallerDialog.ui
   )

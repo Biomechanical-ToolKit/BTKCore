@@ -42,7 +42,6 @@
 #include "ExportASCIIDialog.h"
 #include "ExportSTLDialog.h"
 #include "FileInfoDockWidget.h"
-#include "GaitEventAssistantDialog.h"
 #include "ImportAssistantDialog.h"
 #include "LoggerMessage.h"
 #include "LoggerWidget.h"
@@ -57,6 +56,8 @@
 #include "NewSegmentDialog.h"
 #include "UserDefined.h"
 #include "Viz3DWidget.h"
+
+#include "Tools/GaitEventDetection.h"
 
 #include <btkASCIIFileWriter.h>
 #include <btkMultiSTLFileWriter.h>
@@ -139,7 +140,9 @@ MainWindow::MainWindow(QWidget* parent)
   this->actionToolComputeMarkerDistance->setEnabled(false);
   this->actionToolComputeMarkerAngle->setEnabled(false);
   this->actionToolComputeVectorAngle->setEnabled(false);
-  this->actionGaitEventAssistant->setEnabled(false);
+  this->actionToolGaitEventDetection->setEnabled(false);
+  this->actionToolRemoveAnalogOffsetFromReferenceFile->setEnabled(false);
+  this->actionToolRemoveAnalogOffsetFromSelectedFrames->setEnabled(false);
 #ifdef Q_OS_MAC
   QFont f = this->font();
   f.setPointSize(10);
@@ -944,8 +947,20 @@ void MainWindow::computeAngleFromMarkersSelection2()
   }
 };
 
+void MainWindow::runAcquisitionTool(AcquisitionTool* tool)
+{
+  QUndoCommand* acquisitionCommand = new QUndoCommand;
+  if (tool->run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
+    this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
+  if (acquisitionCommand->childCount() == 0) // The undo command was not used.
+    delete acquisitionCommand;
+}
+
 void MainWindow::detectGaitEvents()
 {
+  GaitEventDetection tool(this);
+  this->runAcquisitionTool(&tool);
+  /*
   GaitEventAssistantDialog assistant(this);
   assistant.initialize(this->mp_Acquisition);
   if (assistant.exec() == QDialog::Accepted)
@@ -956,6 +971,7 @@ void MainWindow::detectGaitEvents()
     if (acquisitionCommand->childCount() == 0) // The undo command was not used.
       delete acquisitionCommand;
   }
+  */
 };
 
 bool MainWindow::extractSelectedMarkers(QList<int>& selectedMarkers)
