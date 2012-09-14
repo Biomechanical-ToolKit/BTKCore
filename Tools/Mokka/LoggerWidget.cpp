@@ -130,6 +130,7 @@ LoggerWidget::LoggerWidget(QWidget* parent)
   this->setResizeMode(QListView::Adjust);
   this->setSelectionMode(QListView::ExtendedSelection);
   this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  this->setVerticalScrollMode(QListView::ScrollPerPixel);
   
 #ifdef Q_OS_MAC
   QFont f = this->font();
@@ -139,9 +140,9 @@ LoggerWidget::LoggerWidget(QWidget* parent)
 #endif
 
   QList<QAction*> actions;
-  QAction* copyAction = new QAction(tr("Copy"), this); actions.push_back(copyAction);
-  copyAction->setShortcut(QKeySequence::Copy);
-  copyAction->setShortcutContext(Qt::WidgetShortcut); // To not be in conflict with a possible copy action set with the same shortcut in the main menu.
+  this->mp_CopyAction = new QAction(tr("Copy"), this); actions.push_back(this->mp_CopyAction);
+  this->mp_CopyAction->setShortcut(QKeySequence::Copy);
+  this->mp_CopyAction->setShortcutContext(Qt::WidgetShortcut); // To not be in conflict with a possible copy action set with the same shortcut in the main menu.
   QAction* separator = new QAction(this); separator->setSeparator(true); actions.push_back(separator);
   QAction* selectAllAction = new QAction(tr("Select All"), this); actions.push_back(selectAllAction);
   selectAllAction->setShortcut(QKeySequence::SelectAll);
@@ -160,7 +161,7 @@ LoggerWidget::LoggerWidget(QWidget* parent)
   this->addActions(actions); 
   this->setContextMenuPolicy(Qt::ActionsContextMenu);
   
-  connect(copyAction, SIGNAL(triggered()), this, SLOT(copySelectedItemsToClipboard()));
+  connect(this->mp_CopyAction, SIGNAL(triggered()), this, SLOT(copySelectedItemsToClipboard()));
   connect(selectAllAction, SIGNAL(triggered()), this, SLOT(selectAll()));
   connect(clearAllAction, SIGNAL(triggered()), this, SLOT(clear()));
 };
@@ -181,12 +182,27 @@ void LoggerWidget::clear()
   LoggerWidget::model()->clear();
 };
 
+void LoggerWidget::mousePressEvent(QMouseEvent* event)
+{
+  if (event->button() == Qt::RightButton)
+  {
+    if (this->selectedIndexes().isEmpty())
+      this->mp_CopyAction->setEnabled(false);
+    else
+      this->mp_CopyAction->setEnabled(true);
+    return;
+  }
+  this->QListView::mousePressEvent(event);
+};
+
 void LoggerWidget::resizeEvent(QResizeEvent* event)
 {
    if ((event->size() - event->oldSize()).isNull())
      return;
   this->scheduleDelayedItemsLayout();
 };
+
+
 
 // ----------------------------------------------------------------------------
 
