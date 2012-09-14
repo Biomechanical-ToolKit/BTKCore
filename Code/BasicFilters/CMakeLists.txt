@@ -1,5 +1,6 @@
 SET(BTKBasicFilters_SRCS
   btkAcquisitionUnitConverter.cpp
+  btkAnalogOffsetRemover.cpp
   btkForcePlatformsExtractor.cpp
   btkForcePlatformWrenchFilter.cpp
   btkGroundReactionWrenchFilter.cpp
@@ -7,6 +8,7 @@ SET(BTKBasicFilters_SRCS
   btkMergeAcquisitionFilter.cpp
   btkSeparateKnownVirtualMarkersFilter.cpp
   btkSpecializedPointsExtractor.cpp
+  btkSubAcquisitionFilter.cpp
   btkVerticalGroundReactionForceGaitEventDetector.cpp
   btkWrenchDirectionAngleFilter.cpp
 )
