@@ -49,6 +49,7 @@
 enum {LoggerMsgType = Qt::UserRole + 1, LoggerMsgDateTime, LoggerMsgDetail, LoggerMsgError};
 
 class QStandardItemModel;
+class QAction;
 
 class LoggerWidget : public QListView
 {
@@ -70,7 +71,11 @@ public slots:
   void copySelectedItemsToClipboard();
   
 protected:
+  virtual void mousePressEvent(QMouseEvent* event);
   virtual void resizeEvent(QResizeEvent* event);
+  
+private:
+  QAction* mp_CopyAction;
 };
 
 // ----------------------------------------------------------------------------
