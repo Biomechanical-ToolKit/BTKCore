@@ -105,8 +105,20 @@ void ReframeAcquisition::action()
 CreateAveragedMarker::CreateAveragedMarker(Acquisition* acq, const QList<int>& markers, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent)
 {
+  this->m_Id = -1;
   this->mp_Acquisition = acq;
-  this->m_Id = this->mp_Acquisition->createAveragedMarker(markers);
+  int btkidx = this->mp_Acquisition->createAveragedMarker(markers);
+  for (QMap<int,Point*>::const_iterator it = acq->points().begin() ; it != acq->points().end() ; ++it)
+  {
+    if ((*it)->btkidx == btkidx)
+    {
+      this->m_Id = it.key();
+      break;
+    }
+  }
+  if (this->m_Id == -1)
+    qDebug("Impossible to retrieve the created markers: ID not found.");
+  
   this->mp_Marker = 0;
 };
 
