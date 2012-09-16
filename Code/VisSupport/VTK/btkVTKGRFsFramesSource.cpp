@@ -151,9 +151,17 @@ namespace btk
    *
    * Usefull when visualized acquistion date are set in meter, millimeter, inch, etc.
    */
+  
+  /**
+   * Returns visibility state of GRF position's trajectory
+   */
+  bool VTKGRFsFramesSource::GetPathVisibility(int idx)
+  {
+    return (this->mp_GRFsPathActivated->GetValue(idx) == 1);
+  };
    
   /**
-   * Sets visibility of GRF position's trajectory
+   * Sets visibility state of GRF position's trajectory
    */
   void VTKGRFsFramesSource::SetPathVisibility(int idx, bool visible)
   {

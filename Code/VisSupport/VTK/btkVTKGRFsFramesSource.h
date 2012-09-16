@@ -60,6 +60,7 @@ namespace btk
     void ButterflyActivationOn() {this->SetButterflyActivation(true);};
     void ButterflyActivationOff() {this->SetButterflyActivation(false);};
     
+    BTK_VTK_EXPORT bool GetPathVisibility(int idx);
     BTK_VTK_EXPORT void SetPathVisibility(int idx, bool visible);
     BTK_VTK_EXPORT void ShowPath(int idx);
     BTK_VTK_EXPORT void ShowPaths();
