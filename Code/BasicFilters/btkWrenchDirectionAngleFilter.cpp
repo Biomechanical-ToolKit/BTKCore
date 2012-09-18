@@ -75,8 +75,8 @@ namespace btk
    */
 
   /**
-   * @fn void WrenchDirectionAngleFilter::SetInput(WrenchCollection::Pointer input)
-   * Sets the input required with this process. This input is transformed in a collection a force platform with a single force platform.
+   * @fn void WrenchDirectionAngleFilter::SetInput(Wrench::Pointer input)
+   * Sets the input required with this process. This input is transformed in a collection of wrenches with a single force platform.
    */
   
   /**

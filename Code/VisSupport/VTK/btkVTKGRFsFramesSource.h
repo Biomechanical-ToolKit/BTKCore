@@ -42,7 +42,6 @@
 
 namespace btk
 {
-  class VTKGRFsComponents;
   class VTKGRFsFramesSource : public vtkPolyDataAlgorithm
   {
   public:
@@ -78,6 +77,9 @@ namespace btk
     BTK_VTK_EXPORT virtual int FillInputPortInformation(int port, vtkInformation* info);
     
   private:
+    class VTKGRFsComponents;
+    class VTKGRFsPathPath;
+    
     VTKGRFsFramesSource(const VTKGRFsFramesSource& );  // Not implemented.
     VTKGRFsFramesSource& operator=(const VTKGRFsFramesSource& );  // Not implemented.
 

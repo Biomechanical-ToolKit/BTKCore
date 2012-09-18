@@ -1,7 +1,7 @@
 /**
  @mainpage BTK Matlab Wrapper Documentation
  
- <div id="revnumber">@projectnumber</div>
+ <div id="revnumber">BTK @projectnumber</div>
  
  This is the documentation to use BTK in Matlab.
  

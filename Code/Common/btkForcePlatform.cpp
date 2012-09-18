@@ -302,6 +302,11 @@ namespace btk
    */
 
   /**
+   * @fn Pointer ForcePlatform::Clone() const
+   * Clones the object and return it as new smart pointer.
+   */
+  
+  /**
    * Constructor.
    */
   ForcePlatform::ForcePlatform()

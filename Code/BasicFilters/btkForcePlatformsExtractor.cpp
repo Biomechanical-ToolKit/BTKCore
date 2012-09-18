@@ -39,7 +39,7 @@
 
 namespace btk
 {
- /**
+  /**
    * @class ForcePlatformsExtractor btkForcePlatformsExtractor.h
    * @brief Extracts force platform data from a btk::Acquisition object. 
    *
@@ -126,7 +126,7 @@ namespace btk
    */
   
   /**
-   * Creates a PointCollection:Pointer object and return it as a DataObject::Pointer.
+   * Creates a ForcePlatformCollection:Pointer object and return it as a DataObject::Pointer.
    */
   DataObject::Pointer ForcePlatformsExtractor::MakeOutput(int /* idx */)
   {

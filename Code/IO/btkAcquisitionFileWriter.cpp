@@ -120,7 +120,7 @@ namespace btk
 
   /**
    * @fn void AcquisitionFileWriter::SetInput(Acquisition::Pointer input)
-   * Sets the Acquisition to write by a AcquisitionIO helper class
+   * Sets the Acquisition to write by a AcquisitionIO helper class.
    */
   
   /**

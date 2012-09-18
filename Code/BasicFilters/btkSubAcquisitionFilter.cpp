@@ -39,6 +39,133 @@
 namespace btk
 {
   /**
+   * @class SubAcquisitionFilter btkSubAcquisitionFilter.h
+   * @brief Extract a subpart of the acquisition.
+   *
+   * By using the methods SetExtractionOption, you can specify if only the points, the analogs channels, or the events have to 
+   * be extracted. In the case of the points and the analog channels, you can also specify the ids to extract.
+   *
+   * To extract a subpart of the acquisition, you have to use the method SetFramesIndex() and give the indice to extract. The index
+   * starts from 0 and correspond to the first frame of the acquisition. By default, all the frames are extracted.
+   *
+   * Finally, the rest of the acquisition is everytime extracted. Thus, the metata are only shallow copied, and the first frame,
+   * acquisition's frequencies, etc. remain the same.
+   *
+   * @ingroup BTKBasicFilters
+   */
+  /**
+   * @var SubAcquisitionFilter::ExtractionOption
+   * Option for the part of the acquisition to extract.
+   */
+  /**
+   * @var SubAcquisitionFilter::ExtractionOption SubAcquisitionFilter::All
+   * Extract all the content of the acquisiton (points, analog, events)
+   */
+  /**
+   * @var SubAcquisitionFilter::ExtractionOption SubAcquisitionFilter::PointsOnly
+   * Extract only data in the points.
+   */
+  /**
+   * @var SubAcquisitionFilter::ExtractionOption SubAcquisitionFilter::AnalogsOnly
+   * Extract only data in the analog channels.
+   */
+  /**
+   * @var SubAcquisitionFilter::ExtractionOption SubAcquisitionFilter::EventsOnly
+   * Extract only data int the events.
+   */
+  
+  /**
+   * @typedef SubAcquisitionFilter::Pointer
+   * Smart pointer associated with a SubAcquisitionFilter object.
+   */
+   
+  /**
+   * @typedef SubAcquisitionFilter::ConstPointer
+   * Smart pointer associated with a SubAcquisitionFilter object.
+   */
+  
+  /**
+   * @fn static Pointer SubAcquisitionFilter::New();
+   * Creates a smart pointer associated with a SubAcquisitionFilter object.
+   */
+
+  /**
+   * @fn WrenchCollection::Pointer SubAcquisitionFilter::GetInput()
+   * Gets the input registered with this process.
+   */
+
+  /**
+   * @fn void SubAcquisitionFilter::SetInput(Acquisition::Pointer input)
+   * Sets the input required with this process.
+   */
+  
+  /**
+   * @fn Acquisition::Pointer SubAcquisitionFilter::GetOutput()
+   * Gets the output created with this process.
+   */
+  
+  /**
+   * @fn const int* SubAcquisitionFilter::GetFramesIndex() const
+   * Returns the index of the frames to extract. The returned array contains two values, where the first one is the low bound while the second value is the high bound.
+   *
+   *  The index starts from 0 and correspond to the first frame of the acquisition. By default, all the frames are extracted and boundaries are set to -1.
+   */
+  
+  /**
+   * Set the boudaries of the frames to extract. The default values (-1) reset the extraction to take all the frames.
+   */ 
+  void SubAcquisitionFilter::SetFramesIndex(int lb, int ub)
+  {
+    if ((lb == this->mp_FramesIndex[0]) && (ub == this->mp_FramesIndex[1]))
+      return;
+    this->mp_FramesIndex[0] = lb;
+    this->mp_FramesIndex[1] = ub;
+    this->Modified();
+  };
+  
+  /**
+   * @fn ExtractionOption SubAcquisitionFilter::GetExtractionOption() const
+   * Returns the content of the given acquisition to extract.
+   */
+  
+  /**
+   * Sets the content in the given acquisition to extract.
+   */
+  void SubAcquisitionFilter::SetExtractionOption(ExtractionOption option)
+  {
+    if (option == this->m_ExtractionOption)
+      return;
+    this->m_ExtractionOption = option;
+    this->m_Ids.clear();
+    this->Modified();
+  };
+  
+  /**
+   * @fn ExtractionOption SubAcquisitionFilter::GetExtractionOption(std::list<int>& ids) const
+   * Returns the content of the given acquisition to extract, but also the given IDs.
+   */
+  
+  /**
+   * Set the content to extract by specifying the items' ID.
+   *
+   * Only the options PointsOnly and AnalogsOnly are accepted.
+   * If the option All or EventsOnly is given to this method, then a warning is displayed and the command is not taken into account.
+   */
+  void SubAcquisitionFilter::SetExtractionOption(ExtractionOption option, const std::list<int>& ids)
+  {
+    if ((option != PointsOnly) && (option != AnalogsOnly))
+    {
+      btkErrorMacro("Unsupported extraction option.");
+      return;
+    }
+    if ((option == this->m_ExtractionOption) && (ids == this->m_Ids))
+      return;
+    this->m_ExtractionOption = option;
+    this->m_Ids = ids;
+    this->Modified();
+  };
+  
+  /**
    * Constructor.
    * By default, the points, the analog channels and the events are extracted all along the acquisition.
    * The metadata are also added in the result.
@@ -52,6 +179,16 @@ namespace btk
     this->SetInputNumber(1);
     this->SetOutputNumber(1);
   };
+  
+  /**
+   * @fn Acquisition::Pointer SubAcquisitionFilter::GetInput(int idx)
+   * Returns the input at the index @a idx.
+   */
+  
+  /**
+   * @fn Acquisition::Pointer SubAcquisitionFilter::GetOutput(int idx)
+   * Returns the output at the index @a idx.
+   */
 
   /**
    * Creates an Acquisition:Pointer object and return it as a DataObject::Pointer.
@@ -126,42 +263,6 @@ namespace btk
     output->SetPointUnits(input->GetPointUnits());
     output->SetMetaData(input->GetMetaData());
     output->Resize(output->GetPointNumber(), ub-lb+1, output->GetAnalogNumber(), input->GetNumberAnalogSamplePerFrame());
-  };
-  
-  void SubAcquisitionFilter::SetFramesIndex(int lb, int ub)
-  {
-    if ((lb == this->mp_FramesIndex[0]) && (ub == this->mp_FramesIndex[1]))
-      return;
-    this->mp_FramesIndex[0] = lb;
-    this->mp_FramesIndex[1] = ub;
-    this->Modified();
-  };
-  
-  void SubAcquisitionFilter::SetExtractionOption(ExtractionOption option)
-  {
-    if (option == this->m_ExtractionOption)
-      return;
-    this->m_ExtractionOption = option;
-    this->m_Ids.clear();
-    this->Modified();
-  };
-  
-  /**
-   * Only accept option PointsOnly, AnalogsOnly
-   * If the option All is given to this method, then a warning is displayed and the command is not taken into account.
-   */
-  void SubAcquisitionFilter::SetExtractionOption(ExtractionOption option, const std::list<int>& ids)
-  {
-    if ((option != PointsOnly) && (option != AnalogsOnly))
-    {
-      btkErrorMacro("Unsupported extraction option.");
-      return;
-    }
-    if ((option == this->m_ExtractionOption) && (ids == this->m_Ids))
-      return;
-    this->m_ExtractionOption = option;
-    this->m_Ids = ids;
-    this->Modified();
   };
   
   void SubAcquisitionFilter::SubPoints(Acquisition::Pointer out, Acquisition::Pointer in, int bounds[2])

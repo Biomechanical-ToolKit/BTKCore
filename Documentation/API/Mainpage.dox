@@ -6,15 +6,15 @@
 /**
 @mainpage BTK Documentation
 
-<div id="revnumber">@projectnumber</div>
-
 <div class="btkmenu">\b  Overview
 | \ref BuildInstructions "Building instructions"
 | \ref GettingStarted "Getting started"
 | \ref AdvancedTutorial "Advanced tutorial"
 | \ref Developer "Developer's guide"
 | \ref License
- </div>\n
+ </div>
+
+<div id="revnumber">BTK @projectnumber</div>
 
 This is the API documentation for Biomechanical ToolKit (BTK), a cross-platform C++ library with high level functions to open, edit and modify biomechanical acquisition.
 

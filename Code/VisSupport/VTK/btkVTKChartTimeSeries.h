@@ -50,8 +50,6 @@ class vtkPlotGrid;
 
 namespace btk
 {
-  class VTKPlots;
-  
   class VTKCurrentFrameFunctor
   {
   public:
@@ -185,6 +183,8 @@ namespace btk
     BTK_VTK_EXPORT void RecalculatePlotsTransform();
     
   private:
+    class VTKPlots;
+    
     VTKChartTimeSeries(const VTKChartTimeSeries& ); // Not implemented.
     void operator=(const VTKChartTimeSeries& );   // Not implemented.
     

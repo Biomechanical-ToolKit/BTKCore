@@ -325,6 +325,11 @@ namespace btk
   };
   
   /**
+   * @fn int DelsysEMGFileIO::GetFileVersion() const 
+   * Returns the file format version of the read file.
+   */
+  
+  /**
    * Constructor.
    */
   DelsysEMGFileIO::DelsysEMGFileIO()

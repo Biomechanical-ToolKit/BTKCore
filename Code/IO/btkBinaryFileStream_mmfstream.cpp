@@ -53,6 +53,30 @@ namespace btk
   // ------------------------------------------------------------ //
   //                 Memory Mapped File Buffer                    //
   // ------------------------------------------------------------ //
+  
+  /**
+   * @class mmfilebuf btkBinaryFileStream_mmfstream.h
+   * @brief File buffer using the the memory mapped mechanism
+   *
+   * This class is a low level class used by the class BinaryFileStream when possible (if the OS supports it).
+   * It is not advised to use this class directly even if the direct access to the buffer can speed the reading of a file (compared to the use of the class BinaryFileStream).
+   */
+  
+  /**
+   * @fn mmfilebuf::mmfilebuf();
+   * Constructor.
+   */
+   
+   
+  /**
+   * @fn mmfilebuf::~mmfilebuf()
+   * Destructor. Try to close the file if opened.
+   */
+  
+  /**
+   * Open the file with the given filename @a s and the options @a mode.
+   * From the given options, the option binary is everytime append as this buffer is only for binary file.
+   */
   mmfilebuf* mmfilebuf::open(const char* s, std::ios_base::openmode mode)
   {
     if (this->is_open())
@@ -160,6 +184,15 @@ namespace btk
     return this;
   };
   
+  /**
+   * @fn bool mmfilebuf::is_open() const
+   * Return true if the file is opened.
+   */
+   
+  /**
+   * Close the file.
+   * @return Return 0 is an error happened during the closing.
+   */ 
   mmfilebuf* mmfilebuf::close()
   {
     if (!this->is_open())
@@ -202,6 +235,43 @@ namespace btk
     return this;
   };
   
+  /**
+   * @fn bool mmfilebuf::is_eob() const
+   * Check if the position of the pointer on the data is at the end of the buffer.
+   */
+  
+  /**
+   * @fn bool mmfilebuf::writemode() const
+   * Check if this file buffer is in write mode or not.
+   */
+    
+
+  /**
+   * @fn std::streamsize mmfilebuf::size() const
+   * Returns the size of the buffer.
+   */
+  
+  /**
+   * @fn const char* mmfilebuf::data() const
+   * Returns directly the content of the buffer.
+   */
+  
+  /**
+   * @fn std::streampos mmfilebuf::pubseekoff(std::streamoff off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out)
+   * Sets internal position pointer to relative position.
+   * @return The new position value of the modified position pointer. 
+   */
+  
+  /**
+   * @fn std::streampos mmfilebuf::pubseekpos(std::streampos pos, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out)
+   * Sets internal position pointer to absolute position
+   * @return The new position value of the modified position pointer. 
+   */
+    
+  /**
+   * Sets internal position pointer to relative position.
+   * @return The new position value of the modified position pointer. Errors are expected to be signaled by an invalid position value, like -1.
+   */
   std::streampos mmfilebuf::seekoff(std::streamoff off, std::ios_base::seekdir way, std::ios_base::openmode which)
   {
     btkNotUsed(which);
@@ -228,6 +298,10 @@ namespace btk
     return this->m_Position;
   };
   
+  /**
+   * Sets internal position pointer to absolute position
+   * @return The new position value of the modified position pointer. In case of error, the value returned shall be an invalid position, like -1.
+   */
   std::streampos mmfilebuf::seekpos(std::streampos pos, std::ios_base::openmode which)
   {
     btkNotUsed(which);
@@ -238,6 +312,10 @@ namespace btk
     return this->m_Position;
   };
   
+  /**
+   * Get sequence of characters
+   * @return The number of characters gotten, returned as a value of type streamsize.
+   */
   std::streamsize mmfilebuf::sgetn(char* s, std::streamsize n)
   {
     std::streamoff n_ = (((this->m_Position + n)  == 0) || ((this->m_Position + n) > this->m_BufferSize)) ? ((this->m_BufferSize - this->m_Position - 1) > 0 ? this->m_BufferSize - this->m_Position - 1 : 0) : n;
@@ -247,6 +325,10 @@ namespace btk
     return n_;
   };
   
+  /**
+   * Write a sequence of characters
+   * @return The number of characters written, returned as a value of type streamsize.
+   */
   std::streamsize mmfilebuf::sputn(const char* s, std::streamsize n)
   {
     while ((this->m_Position + n) >= this->m_BufferSize) 
@@ -264,6 +346,10 @@ namespace btk
     return n;
   };
   
+  /**
+   * Try to map the file into the memory.
+   * @return Returns 0 if an error occured.
+   */
   mmfilebuf* mmfilebuf::mapfile()
   {
 #if defined(HAVE_SYS_MMAP)
@@ -287,6 +373,10 @@ namespace btk
     return err ? 0 : this;
   };
   
+  /**
+   * Try to resize the map to be able to extract more data from the file.
+   * @return Returns 0 if an error occured.
+   */
   mmfilebuf* mmfilebuf::resizemap()
   {
     if (!this->is_open() || !this->m_Writing)
@@ -311,6 +401,9 @@ namespace btk
     return this->mapfile();
   };
   
+  /**
+   * Return the size of block of memory.
+   */
   int mmfilebuf::granularity()
   {
 #if defined(_MSC_VER)
@@ -326,6 +419,97 @@ namespace btk
   //                 Memory Mapped File Stream                    //
   // ------------------------------------------------------------ //
   
+  /**
+   * @class mmfstream btkBinaryFileStream_mmfstream.h
+   * @brief Provides an interface to read/write data from files as input/output streams.
+   *
+   * This class is a low level class used by the class BinaryFileStream when possible (if the OS supports it).
+   * It is not advised to use this class directly even if the direct access to the buffer can speed the reading of a file (compared to the use of the class BinaryFileStream).
+   */
+   
+  /**
+   * @typedef mmfstream::failure
+   * Exception thrown by the class mmfstream.
+   */
+  
+  /**
+   * @fn mmfstream::mmfstream();
+   * Simple constructor which must use the method open() after.
+   */
+  
+  /**
+   * @fn mmfstream::mmfstream(const char* s, std::ios_base::openmode mode);
+   * Constructor which opens the given filename @a s and options @a mode.
+   */
+  
+  /**
+   * @fn const mmfilebuf* mmfstream::rdbuf() const
+   * Gets the associated file buffer object.
+   */
+  
+  /**
+   * @fn void mmfstream::open(const char* s, std::ios_base::openmode mode);
+   * Open file.
+   */
+  
+  /**
+   * @fn bool mmfstream::is_open() const
+   * Check if a file is open.
+   */
+  
+  /**
+   * @fn void mmfstream::close();
+   * Close file.
+   */
+  
+  /**
+   * @fn std::ios_base::iostate mmfstream::rdstate() const
+   * Returns the current internal error state flags of the stream.
+   */
+  
+  /**
+   * @fn bool mmfstream::good() const
+   * Checks if the state of the stream is good for i/o operations
+   */
+  
+  /**
+   * @fn bool mmfstream::eof() const
+   * Checks if eofbit is set
+   */
+  
+  /**
+   * @fn bool mmfstream::fail() const
+   * Checks if either failbit or badbit is set
+   */
+  
+  /**
+   * @fn bool mmfstream::bad() const
+   * Checks if badbit is set
+   */
+  
+  /**
+   * @fn std::ios_base::iostate mmfstream::exceptions() const
+   * Returns the exception mask
+   */
+  
+  /**
+   * @fn void mmfstream::exceptions(std::ios_base::iostate except);
+   * Sets the exception mask
+   */
+  
+  /**
+   * @fn void mmfstream::clear(std::ios_base::iostate state = std::ios_base::goodbit);
+   * Sets a new value for the error control state.
+   */
+  
+  /**
+   * @fn void mmfstream::setstate(std::ios_base::iostate state)
+   * Sets error state flag
+   */
+   
+  /**
+   * Reads a block of data
+   */
   mmfstream& mmfstream::read(char* s, std::streamsize n)
   {
     if (this->m_Filebuf.sgetn(s,n) != n)
@@ -335,6 +519,24 @@ namespace btk
     return *this;
   };
   
+  /**
+   * @fn std::streampos mmfstream::tellg()
+   * Gets position of the get pointer.
+   */
+  
+  /**
+   * @fn mmfstream& mmfstream::seekg(std::streampos pos);
+   * Sets position of the get pointer
+   */
+  
+  /**
+   * @fn mmfstream& mmfstream::seekg(std::streamoff off, std::ios_base::seekdir dir);
+   * Sets position of the get pointer
+   */
+  
+  /**
+   * Writes a block of data
+   */
   mmfstream& mmfstream::write(const char* s, std::streamsize n)
   {
     if (!this->m_Filebuf.writemode()) // Read-only?
@@ -343,4 +545,14 @@ namespace btk
       this->setstate(std::ios_base::failbit);
     return *this;
   };
-}
+  
+  /**
+   * @fn mmfstream& mmfstream::seekp(std::streampos pos);
+   * Sets position of put pointer
+   */
+  
+  /**
+   * @fn mmfstream& mmfstream::seekp(std::streamoff off, std::ios_base::seekdir dir);
+   * Sets position of put pointer
+   */
+};

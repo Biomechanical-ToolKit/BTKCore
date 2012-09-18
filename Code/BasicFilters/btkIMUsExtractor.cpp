@@ -80,8 +80,18 @@ namespace btk
    */
   
   /**
+   * @fn Acquisition::Pointer IMUsExtractor::GetInput(int idx)
+   * Gets the input registered with this process at the index @a idx.
+   */
+   
+  /**
    * @fn void IMUsExtractor::SetInput(Acquisition::Pointer input)
    * Sets the input required with this process.
+   */
+  
+  /**
+   * @fn void IMUsExtractor::SetInput(int idx, Acquisition::Pointer input)
+   * Sets the input required with this process at the index @a idx.
    */
   
   /**
@@ -98,11 +108,6 @@ namespace btk
     this->SetInputNumber(1);
     this->SetOutputNumber(1);
   };
-
-  /**
-   * @fn Acquisition::Pointer IMUsExtractor::GetInput(int idx)
-   * Gets the input registered with this process at the index @a idx.
-   */
 
   /**
    * @fn PointCollection::Pointer IMUsExtractor::GetOutput(int idx)

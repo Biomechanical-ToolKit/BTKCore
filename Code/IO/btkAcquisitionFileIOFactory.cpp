@@ -121,7 +121,9 @@ namespace btk
   };
   
   /**
+   * Returns the list of the file extensions than the factory could read.
    *
+   * Note: This list is directly created by the acquisition file IO registered with this factory.
    */
   AcquisitionFileIO::Extensions AcquisitionFileIOFactory::GetSupportedReadExtensions()
   {
@@ -135,7 +137,9 @@ namespace btk
   };
   
   /**
+   * Returns the list of the file extensions than the factory could write.
    *
+   * Note: This list is directly created by the acquisition file IO registered with this factory.
    */
   AcquisitionFileIO::Extensions AcquisitionFileIOFactory::GetSupportedWrittenExtensions()
   {

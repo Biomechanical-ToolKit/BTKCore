@@ -54,7 +54,7 @@ namespace btk
     typedef SharedPtr<AcquisitionFileIOHandle> Pointer;
     static Pointer New(AcquisitionFileIOHandle::Functor::Pointer f, bool r, bool w) {return Pointer(new AcquisitionFileIOHandle(f,r,w));};
     // ~AcquisitionFileIOHandle(); // Implicit
-    AcquisitionFileIO::Pointer GetFileIO() {return this->mp_Functor->GetFileIO();};
+    AcquisitionFileIO::Pointer GetFileIO() const {return this->mp_Functor->GetFileIO();};
     const AcquisitionFileIOHandle::Functor::Pointer GetFunctor() const {return this->mp_Functor;};
     bool HasReadOperation() const {return this->m_ReadOp;};
     bool HasWriteOperation() const {return this->m_WriteOp;};
@@ -70,22 +70,81 @@ namespace btk
   
   /**
    * @class AcquisitionFileIOHandle 
-   * @brief 
+   * @brief Store read/write properties on a acquisition file IO.
+   *
+   * This class would not be used directly by a developer. If a developer want to add a file format dynamically to the factory, it cas use the method btk::btkAcquisitionFileIOFactory::AddFileIO().
    */
   /**
-   * @var AcquisitionFileIOFactory::m_ReadOp
-   * 
+   * @var AcquisitionFileIOHandle::mp_Functor
+   * Functor pointing to a static method able to create an object inherting from the class btk::AcquisitionFileIO
    */
   /**
-   * @var AcquisitionFileIOFactory::m_WriteOp
-   * 
+   * @var AcquisitionFileIOHandle::m_ReadOp
+   * Boolean value to know if the given acquisition file IO (represented by the given functor) can read file
+   */
+  /**
+   * @var AcquisitionFileIOHandle::m_WriteOp
+   * Boolean value to know if the given acquisition file IO (represented by the given functor) can write file
    */
    
   /**
-   * @class AcquisitionFileIOHandle::Functor 
-   * @brief Abstract class 
+   * @typedef AcquisitionFileIOHandle::Pointer
+   * Smart pointer associated with an AcquisitionFileIOHandle object.
+   */
+   
+  /**
+   * @fn AcquisitionFileIOHandle::Pointer AcquisitionFileIOHandle::New(AcquisitionFileIOHandle::Functor::Pointer f, bool r, bool w)
+   * Create a AcquisitionFileIOHandle object and return it as a smart pointer to it.
+   *
+   * This static method requires a functor pointing to a static method able to create an object inherting from the class btk::AcquisitionFileIO. It also need to know if the given functor can read and/or write some file format.
+   */
+   
+  /**
+   * @fn AcquisitionFileIO::Pointer AcquisitionFileIOHandle::GetFileIO() const
+   * Creates an acquisition File IO based on the given functor.
+   */
+   
+  /**
+   * @fn const AcquisitionFileIOHandle::Functor::Pointer AcquisitionFileIOHandle::GetFunctor() const
+   * Returns the functor used with this handle.
    */
   
+  /**
+   * @fn bool AcquisitionFileIOHandle::HasReadOperation() const
+   * Check if this acquisition file IO can read file.
+   */
+  
+  /**
+   * @fn bool AcquisitionFileIOHandle::HasWriteOperation() const
+   * heck if this acquisition file IO can write file.
+   */
+  
+  /**
+   * @fn AcquisitionFileIOHandle::AcquisitionFileIOHandle(AcquisitionFileIOHandle::Functor::Pointer f, bool r, bool w)
+   * Constructor
+   */
+
+  /**
+   * @class AcquisitionFileIOHandle::Functor 
+   * @brief Abstract class used to store a pointer to the method New() of a class inheriting from btk::AcquisitionFileIO.
+   *
+   * This class would not be used directly by a developer. If a developer want to add a file format dynamically to the factory, it cas use the method btk::btkAcquisitionFileIOFactory::AddFileIO().
+   */
+   
+  /**
+   * @typedef AcquisitionFileIOHandle::Functor::Pointer
+   * Smart pointer associated with an AcquisitionFileIOHandle::Functor object.
+   */
+ 
+  /**
+   * @fn virtual AcquisitionFileIOHandle::Functor::~Functor
+   * Destructor. Do nothing.
+   */
+   
+  /**
+   * @fn virtual AcquisitionFileIO::Pointer AcquisitionFileIOHandle::Functor::GetFileIO() const = 0
+   * Create an acquisition File IO based on the given pointer to the New() method.
+   */
 }
 
 #endif // __btkAcquisitionFileIOHandle_h

@@ -75,6 +75,10 @@ namespace btk
    * 8 bits ADC.
    */
   /**
+   * @var Acquisition::AnalogResolution Acquisition::Bit10
+   * 10 bits ADC.
+   */
+  /**
    * @var Acquisition::AnalogResolution Acquisition::Bit12
    * 12 bits ADC.
    */

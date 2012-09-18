@@ -92,6 +92,11 @@ namespace btk
    *         - btk::Wrench
    *         - btk::WrenchCollection
    *
+   *
+   * @note: The design of this class is not perfect as it cannot be used in a pipeline without 
+   * to update the part before to know some information (up/down ratio).
+   * This class (or the pipeline mechanism) could be modified in a future version of BTK to make up this problem.
+   *
    * @ingroup BTKBasicFilters
    */
   

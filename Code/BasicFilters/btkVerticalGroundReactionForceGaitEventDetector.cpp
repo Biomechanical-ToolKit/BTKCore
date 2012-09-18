@@ -41,13 +41,63 @@ namespace btk
    * @class VerticalGroundReactionForceGaitEventDetector
    * @brief Detect heel strike and toe-off events during gait from vertical ground reaction wrench.
    *
-   * Options
+   * To fill exactly the detected events, you need to give some extra information to this filter:
+   *  - The value of the first frame of the acquisition where the force platfeform data were extracted (to be added to the detected frames' index).
+   *  - The acquisition's frequency used by the force platform data (to calculate the time related to the event's frame).
+   *  - The subject's label (optional).
+   * All these informations have to be given to the method SetAcquisitionInformation().
+   *
+   * To detect the heel strike and toe-off events you can set some options:
+   *  - The treshold value used to known when an event occured (see SetThresholdValue()).
+   *  - The mapping between the force plates and the side (left, right, general)  of the events detected (see SetForceplateContextMapping()).
+   *  - The region of interest where to detect the events (see SetRegionOfInterest()).
+   *
+   * The algorithm works as following: Based on the region of interest, the maxium is searched. If the maximum is higher than the theshold set, then the frame of the value on the left side of this maximum lower than the threshold is used to create a heel strike event. On the other hand, the value on the right side of the maximum lower than the threshold is used to create a toe-off event.
+   *
+   * @note: The design of this class is not perfect as it cannot be used in a pipeline without 
+   * to update the part before to know some acquisition's information (first frame, sample frequency, subject's name).
+   * This class (or the pipeline mechanism) could be modified in a future version of BTK to make up this problem.
    *
    * @ingroup BTKBasicFilters
    */
   
   /**
-   *
+   * @typedef VerticalGroundReactionForceGaitEventDetector::Pointer
+   * Smart pointer associated with a VerticalGroundReactionForceGaitEventDetector object.
+   */
+  
+  /**
+   * @typedef VerticalGroundReactionForceGaitEventDetector::ConstPointer
+   * Smart pointer associated with a const VerticalGroundReactionForceGaitEventDetector object.
+   */
+    
+  /**
+   * @fn static Pointer VerticalGroundReactionForceGaitEventDetector::New();
+   * Creates a smart pointer associated with a VerticalGroundReactionForceGaitEventDetector object.
+   */
+
+  /**
+   * @fn EventCollection::Pointer VerticalGroundReactionForceGaitEventDetector::GetInput()
+   * Gets the input registered with this process.
+   */
+
+  /**
+   * @fn void VerticalGroundReactionForceGaitEventDetector::SetInput(Wrench::Pointer input)
+   * Sets the input required with this process. This input is transformed in a collection wrenches with a single force platform.
+   */
+  
+  /**
+   * @fn void VerticalGroundReactionForceGaitEventDetector::SetInput(WrenchCollection::Pointer input)
+   * Sets the input required with this process.
+   */
+  
+  /**
+   * @fn EventCollection::Pointer VerticalGroundReactionForceGaitEventDetector::GetOutput()
+   * Gets the output created with this process.
+   */
+  
+  /**
+   * Sets the treshold used to detect gait events.
    */
   void VerticalGroundReactionForceGaitEventDetector::SetThresholdValue(int threshold)
   {
@@ -59,11 +109,11 @@ namespace btk
   
   /**
    * @fn int VerticalGroundReactionForceGaitEventDetector::GetThresholdValue() const
-   *
+   * Returns the treshold used to detect gait events.
    */
   
   /**
-   *
+   * Sets the mapping between the given wrenches and the side of the detected events. If no mapping is given, then all the detected events will be set as "General" events.
    */
   void VerticalGroundReactionForceGaitEventDetector::SetForceplateContextMapping(const std::vector<std::string>& mapping)
   {
@@ -75,10 +125,11 @@ namespace btk
   
   /**
    * @fn const std::vector<std::string>& VerticalGroundReactionForceGaitEventDetector::GetForceplateContextMapping() const
-   *
+   * Returns the mapping between the wrenches in the input and the gait events to detect.
    */
   
   /**
+   * Sets the region of interest to use to detect gait events.
    * @warning The boundaries must be set using zero-based indices.
    */
   void VerticalGroundReactionForceGaitEventDetector::SetRegionOfInterest(int lb, int ub)
@@ -92,11 +143,11 @@ namespace btk
   
   /**
    * @fn const int* VerticalGroundReactionForceGaitEventDetector::GetRegionOfInterest() const;
-   *
+   * Returns the region of interest to use to detect gait events.
    */
   
   /**
-   *
+   * Set the informations required to set correctly the detected events.
    */
   void VerticalGroundReactionForceGaitEventDetector::SetAcquisitionInformation(int firstFrame, double freq, const std::string& subjectName)
   {
@@ -109,7 +160,7 @@ namespace btk
   };
   
   /**
-   *
+   * Returns the informations required to set correctly the detected events
    */
   void VerticalGroundReactionForceGaitEventDetector::GetAcquisitionInformation(int& firstFrame, double& freq, std::string& subjectName)
   {
@@ -118,6 +169,10 @@ namespace btk
     subjectName = this->m_SubjectName;
   };
   
+  /**
+   * Constructor.
+   * By default, the treshold is set to 10 newtons and the algoritm search events on all the frames.
+   */
   VerticalGroundReactionForceGaitEventDetector::VerticalGroundReactionForceGaitEventDetector()
   : ProcessObject(), m_ContextMapping()
   {
@@ -129,12 +184,28 @@ namespace btk
     this->m_FrameRate = 0.0; // Hz
     this->m_SubjectName = "";
   };
+  
+  /**
+   * @fn Acquisition::Pointer VerticalGroundReactionForceGaitEventDetector::GetInput(int idx)
+   * Returns the input at the index @a idx.
+   */
+  
+  /**
+   * @fn Acquisition::Pointer VerticalGroundReactionForceGaitEventDetector::GetOutput(int idx)
+   * Returns the output at the index @a idx.
+   */
 
+  /**
+   * Generate the output used by this filter.
+   */
   DataObject::Pointer VerticalGroundReactionForceGaitEventDetector::MakeOutput(int /* idx */)
   {
     return EventCollection::New();
   };
   
+  /**
+   * Algorithm used to detect events during the gait.
+   */
   void VerticalGroundReactionForceGaitEventDetector::GenerateData()
   {
     WrenchCollection::Pointer input = this->GetInput();

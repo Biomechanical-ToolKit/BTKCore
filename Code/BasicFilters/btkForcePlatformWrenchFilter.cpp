@@ -72,7 +72,7 @@ namespace btk
 
   /**
    * @fn void ForcePlatformWrenchFilter::SetInput(ForcePlatform::Pointer input)
-   * Sets the input required with this process. This input is transformed in a collection a force platform with a single force platform.
+   * Sets the input required with this process. This input is transformed in a collection force platforms with a single force platform.
    */
   
   /**

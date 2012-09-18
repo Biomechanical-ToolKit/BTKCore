@@ -70,7 +70,7 @@ namespace btk
     const char* data() const {return this->mp_Buffer;};
     
     std::streampos pubseekoff(std::streamoff off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) {return this->seekoff(off, way, which);};
-    std::streampos pubseekpos(std::streampos pos, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out ) {return this->seekpos(pos, which);};
+    std::streampos pubseekpos(std::streampos pos, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) {return this->seekpos(pos, which);};
     std::streamsize sgetn(char* s, std::streamsize n);
     std::streamsize sputn(const char* s, std::streamsize n);
     
@@ -79,7 +79,6 @@ namespace btk
     std::streampos seekpos(std::streampos pos, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out );
     
     mmfilebuf* mapfile();
-    mmfilebuf* unmapfile();
     mmfilebuf* resizemap();
     
     static int granularity();
@@ -133,7 +132,7 @@ namespace btk
     // Write
     mmfstream& write(const char* s, std::streamsize n);
     inline mmfstream& seekp(std::streampos pos);
-    inline mmfstream& seekp(std::streamoff off, std::ios_base::seekdir dir);    
+    inline mmfstream& seekp(std::streamoff off, std::ios_base::seekdir dir);
     
   private:    
     mmfstream(const mmfstream& ); // Not implemented.

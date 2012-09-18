@@ -103,15 +103,14 @@ namespace btk
    */
   
   /**
-   * @fn Acquisition::Pointer ASCIIFileWriter::GetInputAcquisition()
+   * @fn Acquisition::Pointer ASCIIFileWriter::GetInput()
    * Returns the Acquisition used to create the text files.
    */
 
   /**
-   * @fn void ASCIIFileWriter::SetInputAcquisition(Acquisition::Pointer input)
+   * @fn void ASCIIFileWriter::SetInput(Acquisition::Pointer input)
    * Sets the Acquisition used to create the text files.
    */
-  
     
   /**
    * @fn const std::string& ASCIIFileWriter::GetFilename() const
@@ -129,6 +128,16 @@ namespace btk
       this->Modified();
     }
   };
+  
+  /**
+   * @fn Acquisition::Pointer ASCIIFileWriter::GetInput()
+   * Returns the Acquisition to export to an ASCII file.
+   */
+
+  /**
+   * @fn void ASCIIFileWriter::SetInput(Acquisition::Pointer input)
+   * Sets the Acquisition to export to an ASCII file.
+   */
   
   /**
    * @fn const std::string& ASCIIFileWriter::GetSeparator() const

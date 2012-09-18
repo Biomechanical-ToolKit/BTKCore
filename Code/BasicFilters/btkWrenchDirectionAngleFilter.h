@@ -53,6 +53,12 @@ namespace btk
     // ~WrenchDirectionAngleFilter(); // Implicit
     
     WrenchCollection::Pointer GetInput() {return this->GetInput(0);};
+    void SetInput(Wrench::Pointer input)
+    {
+      WrenchCollection::Pointer col = WrenchCollection::New();
+      col->InsertItem(input);
+      this->SetNthInput(0, col);
+    };
     void SetInput(WrenchCollection::Pointer input) {this->SetNthInput(0, input);};
     PointCollection::Pointer GetOutput() {return this->GetOutput(0);};
     

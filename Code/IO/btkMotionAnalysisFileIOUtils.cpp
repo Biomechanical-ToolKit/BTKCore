@@ -39,7 +39,7 @@
 namespace btk
 {  
   /**
-   * @class MotionAnalysisBinaryFileIOException
+   * @class MotionAnalysisBinaryFileIOException btkMotionAnalysisFileIOUtils.h
    * @brief Exception class for the MotionAnalysisBinaryFileIO class.
    */
 
@@ -54,7 +54,7 @@ namespace btk
    */
 
   /**
-   * @class MotionAnalysisBinaryFileIO::MotionAnalysisBinaryFileIO
+   * @class MotionAnalysisBinaryFileIO btkMotionAnalysisFileIOUtils.h
    * @brief Acquisition IO abstract class used for the Motion Analysis ANB/TRB file format.
    */
 
@@ -168,7 +168,7 @@ namespace btk
       throw(MotionAnalysisBinaryFileIOException("Keys mismatch: " + ToString(readKey) + " vs " + ToString(key)));
   };
 
-  /*
+  /**
    * Check if the size for the current extracted value is equal to one.
    */
   void MotionAnalysisBinaryFileIO::CheckSizeForSingleValue(IEEELittleEndianBinaryFileStream* bifs) const

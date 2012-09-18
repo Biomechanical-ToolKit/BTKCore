@@ -67,8 +67,9 @@ namespace btk
     virtual void Read(const std::string& filename, Acquisition::Pointer output) = 0;
     virtual void Write(const std::string& filename, Acquisition::Pointer input) = 0;
     
-    struct Extension
+    class Extension
     {
+    public:
       Extension(const std::string& n) : name(n) {};
       Extension(const std::string& n, const std::string& d) : name(n), desc(d) {};
       std::string name;

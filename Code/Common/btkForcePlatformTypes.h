@@ -40,8 +40,26 @@
 
 namespace btk
 {
-  // Forward declaration
-  template <int t, int r, int c> class ForcePlatformType;
+  template <int t, int r, int c>
+  class ForcePlatformType : public ForcePlatform
+  {
+  public:
+    typedef SharedPtr<ForcePlatformType> Pointer;
+    typedef SharedPtr<const ForcePlatformType> ConstPointer;
+
+    static Pointer New() {return Pointer(new ForcePlatformType());};
+
+    ~ForcePlatformType() {};
+
+  protected:
+    ForcePlatformType();
+    
+  private:
+    ForcePlatformType(const ForcePlatformType& ); // Not implemeted.
+    ForcePlatformType& operator=(const ForcePlatformType& ); // Not implemented 
+  };
+  
+  // ----------------------------------------------------------------------- //
   
   /**
    * Represents Force platform Type-1 (6 channels: FX, FY, FZ, PX, PY, MZ)
@@ -80,28 +98,9 @@ namespace btk
   // btkForcePlatformType21
   
   // ----------------------------------------------------------------------- //
-  
-  template <int t, int r, int c>
-  class ForcePlatformType : public ForcePlatform
-  {
-  public:
-    typedef SharedPtr<ForcePlatformType> Pointer;
-    typedef SharedPtr<const ForcePlatformType> ConstPointer;
-
-    static Pointer New() {return Pointer(new ForcePlatformType());};
-
-    ~ForcePlatformType() {};
-
-  protected:
-    ForcePlatformType();
-    
-  private:
-    ForcePlatformType(const ForcePlatformType& ); // Not implemeted.
-    ForcePlatformType& operator=(const ForcePlatformType& ); // Not implemented 
-  };
 
   /**
-   * @class ForcePlatformType btkForcePlatformType.h
+   * @class ForcePlatformType btkForcePlatformTypes.h
    * @brief Represents a concrete force platform
    *
    * @tparam t Force platform type

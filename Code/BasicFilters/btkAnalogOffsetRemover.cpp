@@ -40,8 +40,59 @@
 namespace btk
 {
   /**
+   * @class AnalogOffsetRemover btkAnalogOffsetRemover.h
+   * @brief Remove a possible analog offset to the selected analog channels.
+   *
+   * Based on the given offset input (@see the method SetOffsetInput()), each analog signals are averaged and 
+   * removed from the raw input (@see the method SetRawInput()). The analog signals set in the raw input which
+   * are not given to the offset input are not processed but will be available in the output.
+   *
+   * @ingroup BTKBasicFilters
+   */
+   
+   /**
+    * @typedef AnalogOffsetRemover::Pointer
+    * Smart pointer associated with a AnalogOffsetRemover object.
+    */
+
+   /**
+    * @typedef AnalogOffsetRemover::ConstPointer
+    * Smart pointer associated with a const AnalogOffsetRemover object.
+    */
+
+   /**
+    * @fn static Pointer AnalogOffsetRemover::New();
+    * Creates a smart pointer associated with a AnalogOffsetRemover object.
+    */
+
+   /**
+    * @fn Acquisition::Pointer AnalogOffsetRemover::GetRawInput()
+    * Gets the input registered with this process which is used as the input to process.
+    */
+
+   /**
+    * @fn void AnalogOffsetRemover::SetRawInput(Acquisition::Pointer input)
+    * Sets the input required with this process which is used as the input to process.
+    */
+
+   /**
+     * @fn Acquisition::Pointer AnalogOffsetRemover::GetOffsetInput()
+     * Gets the input registered with this process which corresponds to the offsets to remove.
+     */
+
+    /**
+     * @fn void AnalogOffsetRemover::SetOffsetInput(Acquisition::Pointer input)
+     * Sets the input required with this process which corresponds to the offsets to remove.
+     */
+
+   /**
+    * @fn PointCollection::Pointer AnalogOffsetRemover::GetOutput()
+    * Gets the output created with this process.
+    */
+  
+  /**
    * Constructor. 
-   * Sets the number of inputs to 2 (raw and offset signal) and outputs to 1.
+   * Sets the number of inputs to 2 (raw and offset acquisition) and outputs to 1.
    */
   AnalogOffsetRemover::AnalogOffsetRemover()
   : ProcessObject()
@@ -50,6 +101,16 @@ namespace btk
     this->SetOutputNumber(1);
   };
 
+  /**
+   * @fn Acquisition::Pointer AnalogOffsetRemover::GetInput(int idx)
+   * Returns the input at the index @a idx.
+   */
+  
+  /**
+   * @fn Acquisition::Pointer AnalogOffsetRemover::GetOutput(int idx)
+   * Returns the output at the index @a idx.
+   */
+  
   /**
    * Creates an Acquisition:Pointer object and return it as a DataObject::Pointer.
    */
