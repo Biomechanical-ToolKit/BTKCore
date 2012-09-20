@@ -33,37 +33,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ChartImagePreview_h
-#define ChartImagePreview_h
+#ifndef __btkVTKChartExtraAcquisitionFunctor_h
+#define __btkVTKChartExtraAcquisitionFunctor_h
 
-#include "VizRendererWidget.h"
-
-#include <vtkStdString.h>
+#include "btkSharedPtr.h"
 
 namespace btk
 {
-  class VTKChartTimeSeries;
+  class VTKCurrentFrameFunctor
+  {
+  public:
+    typedef SharedPtr<VTKCurrentFrameFunctor> Pointer;
+    virtual ~VTKCurrentFrameFunctor() {};
+    virtual int operator()() = 0;
+  protected:
+    VTKCurrentFrameFunctor() {};
+  private:
+    VTKCurrentFrameFunctor(const VTKCurrentFrameFunctor& ); // Not implemented.
+    VTKCurrentFrameFunctor& operator=(const VTKCurrentFrameFunctor& ); // Not implemented.
+  };
+
+  class VTKRegionOfInterestFunctor
+  {
+  public:
+    typedef SharedPtr<VTKRegionOfInterestFunctor> Pointer;
+    virtual ~VTKRegionOfInterestFunctor() {};
+    virtual void operator()(int& left, int& right) = 0;
+  protected:
+    VTKRegionOfInterestFunctor() {};
+  private:
+    VTKRegionOfInterestFunctor(const VTKRegionOfInterestFunctor& ); // Not implemented.
+    VTKRegionOfInterestFunctor& operator=(const VTKRegionOfInterestFunctor& ); // Not implemented.
+  };
+
+  class VTKEventsFunctor
+  {
+  public:
+    typedef SharedPtr<VTKEventsFunctor> Pointer;
+    virtual ~VTKEventsFunctor() {};
+    virtual bool operator()(int index, int& typeId, int& frame, double rgb[3]) = 0;
+  protected:
+    VTKEventsFunctor() {};
+  private:
+    VTKEventsFunctor(const VTKEventsFunctor& ); // Not implemented.
+    VTKEventsFunctor& operator=(const VTKEventsFunctor& ); // Not implemented.
+  };
 };
 
-class ChartImagePreview : public VizRendererWidget
-{
-  Q_OBJECT
-  
-public:
-  ChartImagePreview(QWidget* parent = 0);
-  ~ChartImagePreview();
-  
-  void initialize();
-  btk::VTKChartTimeSeries* chart() const {return this->mp_Chart;};
-  void setChart(vtkstd::vector<vtkStdString>& units, btk::VTKChartTimeSeries* chart);
-  
-protected:
-  void keyPressEvent(QKeyEvent* event);
-  void keyReleaseEvent(QKeyEvent* event);
-  void mousePressEvent(QMouseEvent* event);
-  
-private:
-  btk::VTKChartTimeSeries* mp_Chart;
-};
-
-#endif // ChartImagePreview_h
+#endif // __btkVTKChartExtraAcquisitionFunctor_h

@@ -56,58 +56,20 @@
 #include <vtkTable.h>
 #include <vtkDoubleArray.h>
 #include <vtkMath.h>
+#include <vtkContextMouseEvent.h>
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+  #include <vtkContextKeyEvent.h>
+#endif
 
 #include <vtkstd/list>
 #include <vtkgl.h>
 
 #include <limits>
 
+#include "btkConvert.h"
+
 namespace btk
 {
-  /**
-   * @class VTKCurrentFrameFunctor btkVTKChartTimeSeries.h
-   * @brief Functor to get easily to this chart the current frame displayed.
-   *
-   * This is usefull when combined with a timer or other view, like a 3D view.
-   */
-  /**
-   * @typedef VTKCurrentFrameFunctor::Pointer
-   * Smart pointer associated with a VTKCurrentFrameFunctor object.
-   */
-  /**
-   * @fn virtual int VTKCurrentFrameFunctor::operator()() = 0;
-   * Operator used to return the current frame displayed.
-   */
-   
-  /**
-   * @class VTKRegionOfInterestFunctor btkVTKChartTimeSeries.h
-   * @brief Functor to get easily to this chart the region of interest of the time series.
-   */
-  /**
-   * @typedef VTKRegionOfInterestFunctor::Pointer
-   * Smart pointer associated with a VTKCurrentFrameFunctor object.
-   */
-  /**
-   * @fn virtual void VTKRegionOfInterestFunctor::operator()(int& left, int& right) = 0;
-   * Operator used to get the left and right bounds of the region of interest.
-   */
-   
-  /**
-   * @class VTKEventsFunctor btkVTKChartTimeSeries.h
-   * @brief Functor to get easily to this chart the events as types, frames and colors.
-   *
-   * The types are represented by integer where the values 0, 1 and 2 are for 
-   * "General", "Foot strike" and "Foot off" respectively. All of the ohers values have no specific meanings.
-   */
-  /**
-   * @typedef VTKEventsFunctor::Pointer
-   * Smart pointer associated with a VTKCurrentFrameFunctor object.
-   */
-  /**
-   * @fn virtual bool VTKEventsFunctor::operator()(int index, int& typeId, int& frame, double rgb[3]) = 0;
-   * Operator used to extract each event. Asking for an event out of range returns false.
-   */
-  
   /**
    * @class VTKChartTimeSeries::VTKPlots btkVTKChartTimeSeries.h
    * @brief List of pointer to vtkPlot objects.
@@ -122,7 +84,7 @@ namespace btk
    * This chart has several interaction to constraint pan and zoom
    *  - Select only a horizontal or vertical zoom;
    *  - Pan the chart only into boundaries;
-   *  - Zoom box activated by the method SetDisplayZoomBox().
+   *  - Zoom box activated by the key SHIFT.
    *
    * You can also enable/disable the interactions .
    *
@@ -131,10 +93,6 @@ namespace btk
    * VTKRegionOfInterestFunctor and VTKEventsFunctor. Then set the functor by using the methods SetCurrentFrameFunctor(), SetRegionOfInterestFunctor() and SetEventsFunctor.
    *
    * The events are optional and hidden by default (and there is no functor). To display them, and after setting the functor, you have to use the function DisplayEventsOn().
-   *
-   * This class take into account the transformation given to the object to paint correctly the legend into the scene (only the scale and translation are supported).
-   *
-   * NOTE: The vtkAnnotationLink object is not taken into account during the painting.
    * 
    * @ingroup BTKVTK
    */
@@ -144,18 +102,7 @@ namespace btk
    * Constructs a VTKChartTimeSeries object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKChartTimeSeries);
-  vtkCxxRevisionMacro(VTKChartTimeSeries, "$Revision: 0.1 $");
   
-  /**
-   * @fn bool VTKChartTimeSeries::GetClippingEnabled() const
-   * Returns the status of the clippling for the plots (cannot be drawn outside of the axis.)
-   */
-   
-  /**
-   * @fn void VTKChartTimeSeries::SetClippingEnabled(bool enabled)
-   * Sets the status of the clippling for the plots (cannot be drawn outside of the axis.)
-   */
-    
   /**
    * @fn bool VTKChartTimeSeries::GetInteractionEnabled() const
    * Get the status of the user interactions (move & zoom).
@@ -175,48 +122,16 @@ namespace btk
    * @fn void VTKChartTimeSeries::SetZoomMode(int mode)
    * Sets the zoom mode (Both directions (BOTH): 0, only horizontal (HORIZONTAL): 1, only vertical (VERTICAL): 2)
    */
-  
-  /**
-   * @fn bool VTKChartTimeSeries::GetBoundsEnabled()
-   * Get the status for the use of the bounds on the chart's axes.
-   */
-
-  /**
-   * @fn void VTKChartTimeSeries::SetBoundsEnabled(bool enabled)
-   * Enable / disable the use of the bounds on the chart's axes.
-   */
-  
-  /**
-   * @fn double* VTKChartTimeSeries::GetBounds()
-   * Returns the boundaries set for the charts as xMin, xMax, yMin, yMax.
-   *
-   * If this is enabled (see the method SetBoundsEnabled()), then the zoom interaction will be limited by these bounds. 
-   */
-  
-  /**
-   * @fn void VTKChartTimeSeries::SetBounds(double xMin, double xMax, double yMin, double yMax)
-   * Convenient method to set the chart's bounds.
-   */
-  
-  /**
-   * Sets the boundaries for the charts.
-   * The input format is xMin, xMax, yMin, yMax.
-   * Need to be enabled (see the method SetBoundsEnabled()) to constraint the interactions on the chart.
-   */
+   
+  // Method to set the min/max limit of each axis.
   void VTKChartTimeSeries::SetBounds(double bounds[4])
   {
-    if ((bounds[0] == this->mp_Bounds[0]) && (bounds[1] == this->mp_Bounds[1]) && (bounds[2] == this->mp_Bounds[2]) && (bounds[3] == this->mp_Bounds[3]))
-      return;
-    
-    this->mp_Bounds[0] = bounds[0];
-    this->mp_Bounds[1] = bounds[1];
-    this->mp_Bounds[2] = bounds[2];
-    this->mp_Bounds[3] = bounds[3];
-    
-    this->mp_AxisX->SetRange(bounds[0], bounds[1]);
-    this->mp_AxisY->SetRange(bounds[2], bounds[3]);
-    
-    this->m_ChartBoundsValid = true;
+    this->mp_AxisX->SetMinimumLimit(bounds[0]);
+    this->mp_AxisX->SetMaximumLimit(bounds[1]);
+    this->mp_AxisY->SetMinimumLimit(bounds[2]);
+    this->mp_AxisY->SetMaximumLimit(bounds[3]);
+    this->mp_AxisX->SetRange(this->mp_AxisX->GetMinimumLimit(), this->mp_AxisX->GetMaximumLimit());
+    this->mp_AxisY->SetRange(this->mp_AxisY->GetMinimumLimit(), this->mp_AxisY->GetMaximumLimit());
     this->m_PlotsTransformValid = false;
     if (this->Scene != NULL) this->Scene->SetDirty(true);
   };
@@ -226,9 +141,7 @@ namespace btk
    */
   void VTKChartTimeSeries::RecalculateBounds()
   {
-    this->Update();
-    
-    double x[2] = {std::numeric_limits<double>::max(), std::numeric_limits<double>::min()};
+    double x[2] = {std::numeric_limits<double>::max(), -1.0*std::numeric_limits<double>::max()};
     double y[2] = {x[0], x[1]};
     double bounds[4] = { 0.0, 0.0, 0.0, 0.0 };
     bool validBounds = false;
@@ -237,6 +150,8 @@ namespace btk
       if (!(*it)->GetVisible())
         continue;
       (*it)->GetBounds(bounds);
+      if (bounds[1]-bounds[0] < 0.0) // Skip uninitialized bounds.
+        continue;
       x[0] = std::min(x[0], bounds[0]);
       x[1] = std::max(x[1], bounds[1]);
       y[0] = std::min(y[0], bounds[2]);
@@ -245,7 +160,7 @@ namespace btk
       if (vtkMath::IsInf(y[0]) || vtkMath::IsInf(y[1]))
       {
         y[0] = std::numeric_limits<double>::max();
-        y[1] = std::numeric_limits<double>::min();
+        y[1] = -1.0*y[0];
         vtkDoubleArray* array = static_cast<vtkDoubleArray*>((*it)->GetInput()->GetColumn(1));
         double* data = array->GetPointer(0);
         for (int i = 0 ; i < array->GetNumberOfTuples() ; ++i)
@@ -274,20 +189,27 @@ namespace btk
     y[0] -= r; y[1] += r;
     
     this->SetBounds(x[0], x[1], y[0], y[1]);
+    
+    this->m_PlotsTransformValid = false;
+    this->m_ChartBoundsValid = true;
+  };
+  
+  void VTKChartTimeSeries::SetGeometry(const vtkRectf& rect)
+  {
+    this->vtkChart::SetSize(rect);
+    this->m_GeometryChanged = true;
   };
   
   /**
    * Sets the legend
    */
-  void VTKChartTimeSeries::SetLegend(vtkChartLegend* legend)
+  void VTKChartTimeSeries::SetLegend(vtkSmartPointer<vtkChartLegend> legend)
   {
     if (this->mp_Legend == legend)
       return;
-    else if (this->mp_Legend != 0)
-      this->mp_Legend->Delete();
     this->mp_Legend = legend;
     this->mp_Legend->SetChart(this);
-    this->mp_Legend->Register(this);
+    this->AddItem(this->mp_Legend);
   };
   
   /**
@@ -298,14 +220,11 @@ namespace btk
   /**
    *  Sets the generator of colors.
    */
-  void VTKChartTimeSeries::SetColorSeries(vtkColorSeries* colors)
+  void VTKChartTimeSeries::SetColorSeries(vtkSmartPointer<vtkColorSeries> colors)
   {
     if (this->mp_Colors == colors)
       return;
-    else if (this->mp_Colors != 0)
-      this->mp_Colors->Delete();
     this->mp_Colors = colors;
-    this->mp_Colors->Register(this);
   };
   
   /**
@@ -321,182 +240,34 @@ namespace btk
   /**
    * Sets the margin between the border and the title.
    */ 
-  void VTKChartTimeSeries::SetTitleMargin(int margin)
-  {
-    if (this->m_TitleMargin == margin)
-      return;
-    this->m_TitleMargin = margin;
-    if (this->Scene != NULL) this->Scene->SetDirty(true);
-  };
+  // void VTKChartTimeSeries::SetTitleMargin(int margin)
+  // {
+  //   if (this->m_TitleMargin == margin)
+  //     return;
+  //   this->m_TitleMargin = margin;
+  //   if (this->Scene != NULL) this->Scene->SetDirty(true);
+  // };
   
-  /**
-   * @fn const int* VTKChartTimeSeries::GetBorders() const
-   * Returns the borders as an array of 4 elements. The order is left, bottom. right, top.
-   */
   
   /**
    * Modify the size of the borders. This method doesn't request to repaint the chart.
    */
   void VTKChartTimeSeries::SetBorders(int left, int bottom, int right, int top)
   {
-    if ((this->mp_Borders[0] == left) && (this->mp_Borders[1] == bottom) && (this->mp_Borders[2] == right) && (this->mp_Borders[3] == top))
-      return;
     this->vtkChart::SetBorders(left, bottom, right, top);
     // Set the borders value after as the method SetBorders(), check the given value and modify them if necessary
-    this->mp_Borders[0] = this->Point1[0]; // Left
-    this->mp_Borders[1] = this->Point1[1]; // Bottom
-    this->mp_Borders[2] = this->Geometry[0] - this->Point2[0]; // Right
-    this->mp_Borders[3] = this->Geometry[1] - this->Point2[1]; // Top
-    this->mp_AxisX->SetPoint1(this->mp_Borders[0], this->mp_Borders[1]);
-    this->mp_AxisY->SetPoint1(this->mp_Borders[0], this->mp_Borders[1]);
-    this->mp_AxisX->SetPoint2(this->mp_Borders[2], this->mp_Borders[1]);
-    this->mp_AxisY->SetPoint2(this->mp_Borders[0], this->mp_Borders[3]);
-    this->m_BordersChanged = true;
-  };
-  
-  /**
-   * @fn VTKCurrentFrameFunctor::Pointer VTKChartTimeSeries::GetCurrentFrameFunctor() const
-   * Returns the functor used to know the current frame to display.
-   */
-  
-  /**
-   * Sets the functor used to know the current frame to display.
-   */
-  void VTKChartTimeSeries::SetCurrentFrameFunctor(VTKCurrentFrameFunctor::Pointer functor)
-  {
-    this->mp_CurrentFrameFunctor = functor;
-  };
-  
-  /**
-   * @fn VTKRegionOfInterestFunctor::Pointer VTKChartTimeSeries::GetRegionOfInterestFunctor() const
-   * Returns the functor used to know the region of interest to display.
-   */
-  
-  /**
-   * Sets the functor used to know the region of interest to display.
-   */
-  void VTKChartTimeSeries::SetRegionOfInterestFunctor(VTKRegionOfInterestFunctor::Pointer functor)
-  {
-    this->mp_RegionOfInterestFunctor = functor;
-  };
-  
-  /**
-   * @fn VTKEventsFunctor::Pointer VTKChartTimeSeries::GetEventsFunctor() const
-   * Returns the functor used to know events' informations.
-   */
-  
-  /**
-   * Sets the functor used to know events' informations.
-   */
-  void VTKChartTimeSeries::SetEventsFunctor(VTKEventsFunctor::Pointer functor)
-  {
-    this->mp_EventsFunctor = functor;
-  };
-  
-  /**
-   * @fn float VTKChartTimeSeries::GetEventLineWidth() const
-   * Returns the width of the vertical line used to display the events.
-   */
-  
-  /**
-   * Sets the width of the vertical line used to display the events.
-   */
-  void VTKChartTimeSeries::SetEventLineWidth(float width)
-  {
-    if (this->m_EventLineWidth == width)
-      return;
-    this->m_EventLineWidth = width;
-    if (this->Scene != NULL) this->Scene->SetDirty(true);
-  };
-  
-  /**
-   * @fn int VTKChartTimeSeries::GetEventLineTypeFactor() const
-   * Returns the factor used in the spacing of the elements in the pattern to draw non-solid line.
-   *
-   * By default the dash, dot line, etc has a space of few pixels, but this function can scale this spacing.
-   */
-  
-  /**
-   * Sets the factor used in the spacing of the elements in the pattern to draw non-solid line.
-   *
-   * By default the dash, dot line, etc has a space of few pixels, but this function can scale this spacing.
-   */
-  void VTKChartTimeSeries::SetEventLineTypeFactor(int factor)
-  {
-    if (this->m_EventLineTypeFactor == factor)
-      return;
-    this->m_EventLineTypeFactor = factor;
-    if (this->Scene != NULL) this->Scene->SetDirty(true);
-  };
-  
-  /**
-   * Set the axes' range to the chart's bounds. Available only if the bounds are enabled.
-   */
-  void VTKChartTimeSeries::ResetZoom()
-  {
-    this->mp_AxisX->SetRange(this->mp_Bounds[0], this->mp_Bounds[1]);
-    this->mp_AxisY->SetRange(this->mp_Bounds[2], this->mp_Bounds[3]);
-    
+    this->mp_Borders[0] = left;
+    this->mp_Borders[1] = bottom;
+    this->mp_Borders[2] = right;
+    this->mp_Borders[3] = top;
+    this->mp_AxisX->SetPoint1(this->Point1[0], this->Point1[1]);
+    this->mp_AxisX->SetPoint2(this->Point2[0], this->Point1[1]);
+    this->mp_AxisY->SetPoint1(this->Point1[0], this->Point1[1]);
+    this->mp_AxisY->SetPoint2(this->Point1[0], this->Point2[1]);
+    this->m_GeometryChanged = false;
     this->m_PlotsTransformValid = false;
-    if (this->Scene != NULL) this->Scene->SetDirty(true);
   };
   
-  /**
-   * Apply a zoom box on the plots. Update the axis.
-   */
-  void VTKChartTimeSeries::ApplyZoom(const vtkRectf& box)
-  {
-    // Minimum size for a valid zoom box: 0.5 x 0.5
-    if (fabs(box[2]) > 0.5f && fabs(box[3]) > 0.5f)
-    {
-      float pixelMin[2], pixelMax[2];
-      pixelMin[0] = box[0] + (box[2] > 0 ? 0 : box[2]);
-      pixelMin[1] = box[1] + (box[3] > 0 ? 0 : box[3]);
-      pixelMax[0] = pixelMin[0] + fabs(box[2]);
-      pixelMax[1] = pixelMin[1] + fabs(box[3]);
-      float sceneMin[2], sceneMax[2];
-      this->mp_PlotsTransform->InverseTransformPoints(pixelMin, sceneMin, 1);
-      this->mp_PlotsTransform->InverseTransformPoints(pixelMax, sceneMax, 1);
-      this->mp_AxisX->SetRange(sceneMin[0], sceneMax[0]);
-      this->mp_AxisY->SetRange(sceneMin[1], sceneMax[1]);
-      
-      this->m_PlotsTransformValid = false;
-      if (this->Scene != NULL) this->Scene->SetDirty(true);
-    }
-    this->m_ZoomBoxDisplayed = 0;
-  };
-  
-  /**
-   * @fn const vtkRectf& VTKChartTimeSeries::GetZoomBox() const
-   * Returns the last box used to zoom on the plots.
-   */
-  
-  /**
-   * @fn int VTKChartTimeSeries::GetDisplayEvents() const
-   * Get the status of the events display.
-   */
-   
-  /**
-   * Enable/Disable the displaying of the events as vertical lines into the chart
-   */
-  void VTKChartTimeSeries::SetDisplayEvents(int enabled)
-  {
-    if (this->m_DisplayEvents == enabled)
-      return;
-    this->m_DisplayEvents = enabled;
-    this->Modified();
-  };
-  
-  /**
-   * @fn void VTKChartTimeSeries::DisplayEventsOn()
-   * Enable the displaying of the events as vertical lines into the chart
-   */
-  
-  /**
-   * @fn void VTKChartTimeSeries::DisplayEventsOff()
-   * Disable the displaying of the events as vertical lines into the chart
-   */
-   
   /**
    * @fn int VTKChartTimeSeries::GetDisplayZoomBox() const
    * Get the status of the zoom box display.
@@ -505,23 +276,13 @@ namespace btk
   /**
    * Enable/Disable the zoom box.
    */
-  void VTKChartTimeSeries::SetDisplayZoomBox(int enabled)
+  void VTKChartTimeSeries::SetDisplayZoomBox(bool enabled)
   {
     if (this->m_ZoomBoxDisplayed == enabled)
       return;
     this->m_ZoomBoxDisplayed = enabled;
     this->Modified();
   };
-  
-  /**
-   * @fn void VTKChartTimeSeries::DisplayZoomBoxOn()
-   * Enable the displaying of zoom box.
-   */
-  
-  /**
-   * @fn void VTKChartTimeSeries::DisplayZoomBoxOff()
-   * Disable the displaying of zoom box.
-   */
   
   /**
    * Show/Hide the plot for the given @a index.
@@ -558,241 +319,68 @@ namespace btk
    */
   bool VTKChartTimeSeries::Paint(vtkContext2D *painter)
   {
-    if (!this->GetVisible())
+    if (!this->Visible)
       return false;
-    
-    int geometry[] = {this->GetScene()->GetSceneWidth(), this->GetScene()->GetSceneHeight()};
-    // Do we have a scene with a valid geometry?
-    if ((geometry[0] == 0) || (geometry[1] == 0))
-      return false;
-    
-    // Update the content of the plots, legend, etc. 
-    this->Update();
-    
-    // Update the chart's geometry if necessary
-    if ((geometry[0] != this->Geometry[0]) || (geometry[1] != this->Geometry[1]) || this->m_BordersChanged)
+    vtkVector2i geometry(0, 0);
+    if (this->LayoutStrategy == VTKChartTimeSeries::FILL_SCENE)
     {
-      this->SetGeometry(geometry);
-      this->vtkChart::SetBorders(this->mp_Borders[0], this->mp_Borders[1], this->mp_Borders[2], this->mp_Borders[3]);
-      // But also the axis length
-      this->mp_AxisX->SetPoint1(this->Point1[0], this->Point1[1]);
-      this->mp_AxisX->SetPoint2(this->Point2[0], this->Point1[1]);
-      this->mp_AxisY->SetPoint1(this->Point1[0], this->Point1[1]);
-      this->mp_AxisY->SetPoint2(this->Point1[0], this->Point2[1]);
-      // And the legend (reset to the right top corner)
-      if (this->mp_Legend != 0)
+      geometry = vtkVector2i(this->GetScene()->GetSceneWidth(), this->GetScene()->GetSceneHeight());
+      if (geometry.X() != this->Geometry[0] || geometry.Y() != this->Geometry[1])
       {
-        this->mp_Legend->SetHorizontalAlignment(vtkChartLegend::RIGHT);
-        this->mp_Legend->SetVerticalAlignment(vtkChartLegend::TOP);
-        this->mp_Legend->SetPoint(this->Point2[0], this->Point2[1]);
+        this->SetSize(vtkRectf(0.0, 0.0, geometry.X(), geometry.Y()));
+        this->m_GeometryChanged = true;
       }
-      this->m_BordersChanged = false;
-      this->m_PlotsTransformValid = false;
     }
-    
+
+    if (this->m_GeometryChanged)
+    {
+      this->SetBorders(this->mp_Borders[0], this->mp_Borders[1], this->mp_Borders[2], this->mp_Borders[3]);
+    }
+
+    this->Update();
+
     // Update the axes
-    if (!this->m_ChartBoundsValid)
+    if (!this->m_ChartBoundsValid && !this->mp_Plots->empty())
       this->RecalculateBounds();
+
     if (!this->m_PlotsTransformValid)
-      this->RecalculatePlotsTransform();
+      this->RecalculatePlotTransform();
+    
     this->mp_AxisX->Update();
     this->mp_AxisY->Update();
     
-    // Draw the items used in the chart. The order is important.
-    // 0. Init (values used later)
-    float pt1X[2]; this->mp_AxisX->GetPoint1(pt1X);
-    float pt2X[2]; this->mp_AxisX->GetPoint2(pt2X);
-    float pt2Y[2]; this->mp_AxisY->GetPoint2(pt2Y);
-    float scaleX = (pt2X[0] - pt1X[0]) / static_cast<float>(this->mp_AxisX->GetMaximum() - this->mp_AxisX->GetMinimum());
-    // 1. The grid is in the back
-    this->mp_Grid->Paint(painter);
-    // 2. Clip the painting area between the axes
-    if (this->m_ClippingEnabled)
-    {
-      float pts[4] = {this->Point1[0], this->Point1[1], this->Point2[0], this->Point2[1]};
-      // 2.1 Check if the scene has a transform and use it
-      if (this->GetTransform() != 0)
-        this->GetTransform()->TransformPoints(pts, pts, 2);
-      // 2.2 Check if the scene has a transform and use it
-      float clipF[4] = {pts[0], pts[1], pts[2]-pts[0], pts[3]-pts[1]};
-      if (this->Scene->HasTransform())
-        this->Scene->GetTransform()->InverseTransformPoints(clipF, clipF, 2);
-      int clip[4] = {(int)clipF[0], (int)clipF[1], (int)clipF[2], (int)clipF[3]};
-      painter->GetDevice()->SetClipping(clip);
-    }
-    // 3. Paint the plots
-#if 1
-    painter->PushMatrix();
-    painter->AppendTransform(this->mp_PlotsTransform);
-    for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
-      (*it)->Paint(painter);
-#else
-    bool markerDisplayed = (scaleX > 30.0f); // 30 pixels by unit. FIXME: NOT ENOUGH FOR ANALOG DATA WITH BIGGER SAMPLE RATE
-    painter->PushMatrix();
-    painter->AppendTransform(this->mp_PlotsTransform);
-    for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
-    {
-      vtkPlotPoints* points = vtkPlotPoints::SafeDownCast(*it);
-      if (points != 0)
-        points->SetMarkerStyle(markerDisplayed ? vtkPlotPoints::CIRCLE : vtkPlotPoints::NONE);
-      (*it)->Paint(painter);
-    }
-#endif
-    painter->PopMatrix();
-    // 4. Disable cliping
-    painter->GetDevice()->DisableClipping();
-    // 5. Paint the events
-    if ((this->mp_EventsFunctor != NULL) && (this->m_DisplayEvents != 0))
-    {
-      int inc = 0, typeId = -1, idx = 0;
-      double color[3] = {0.0, 0.0, 0.0};
-      while ((*this->mp_EventsFunctor)(inc++, typeId, idx, color))
-      {
-        int lineType = vtkPen::NO_PEN;
-        switch (typeId)
-        {
-        case 0: // General
-          lineType = vtkPen::DASH_DOT_DOT_LINE;
-          break;
-        case 1: // Foot Strike
-          lineType = vtkPen::DASH_LINE;
-          break;
-        case 2: // Foot Off
-          lineType = vtkPen::DASH_DOT_LINE;
-          break;
-        default:
-          lineType = vtkPen::DOT_LINE;
-        }
-        float frameIndex = static_cast<float>(idx);
-        if ((frameIndex >= this->mp_AxisX->GetMinimum()) && (frameIndex <= this->mp_AxisX->GetMaximum()))
-        {
-#ifdef VTK_USE_QT
-          const double opacityEvent = 0.75;
-          double maxColor = std::max(std::max(color[0], color[1]), color[2]);
-          double scaleColor = (maxColor > opacityEvent) ? opacityEvent / maxColor : 1.0;
-          unsigned char rgb[3] = {static_cast<unsigned char>(color[0] * scaleColor * 255.0), static_cast<unsigned char>(color[1] * scaleColor * 255.0), static_cast<unsigned char>(color[2] * scaleColor * 255.0)};
-#else
-          unsigned char rgb[3] = {static_cast<unsigned char>(color[0] * 255.0), static_cast<unsigned char>(color[1] * 255.0), static_cast<unsigned char>(color[2] * 255.0)};
-#endif
-          painter->GetPen()->SetLineType(lineType);
-          painter->GetPen()->SetColor(rgb);
-          painter->GetPen()->SetOpacity(191);
-          painter->GetPen()->SetWidth(this->m_EventLineWidth);
-          float valX = pt1X[0] + (frameIndex - this->mp_AxisX->GetMinimum()) * scaleX;
-          // Because VTK 5.6 doesn't give the possibilty to set the line factor given by OpenGL, it is 
-          // necessary to modify the OpenGL device directly.
-          vtkOpenGLContextDevice2D* device = vtkOpenGLContextDevice2D::SafeDownCast(painter->GetDevice());
-          if (device != NULL)
-          {
-            float x[4] = {valX, pt1X[1], valX, pt2Y[1]};
-            device->SetColor4(painter->GetPen()->GetColor());
-            device->SetLineWidth(painter->GetPen()->GetWidth());
-            device->SetPointSize(painter->GetPen()->GetWidth());
-            // Code adapted to set the line type factor
-            if (painter->GetPen()->GetLineType() == vtkPen::SOLID_LINE)
-              glDisable(GL_LINE_STIPPLE);
-            else
-              glEnable(GL_LINE_STIPPLE);
-            GLushort pattern = 0x0000;
-            switch (painter->GetPen()->GetLineType())
-            {
-            case vtkPen::NO_PEN:
-              pattern = 0x0000;
-              break;
-            case vtkPen::DASH_LINE:
-              pattern = 0x00FF;
-              break;
-            case vtkPen::DOT_LINE:
-              pattern = 0x0101;
-              break;
-            case vtkPen::DASH_DOT_LINE:
-              pattern = 0x0C0F;
-              break;
-            case vtkPen::DASH_DOT_DOT_LINE:
-              pattern = 0x1C47;
-              break;
-            default:
-              pattern = 0x0000;
-            }
-            glLineStipple(this->m_EventLineTypeFactor, pattern);
-            // Draw the line
-            device->DrawPoly(&x[0], 2);
-          }
-          else
-            painter->DrawLine(valX, pt1X[1], valX, pt2Y[1]);
-        }
-      }
-      // The line stipple must be disabled. Otherwise, under Windows XP, the next drawn line will use it (even if another pen is given).
-      glDisable(GL_LINE_STIPPLE);
-      glLineStipple(1, 0x0000);
-    }
-    // 6. Paint the frame line and its bounds
-    // 6.1 Bounds
-    if (this->mp_RegionOfInterestFunctor != NULL)
+    // Update the clipping if necessary
+    this->mp_Clip->SetClip(this->Point1[0], this->Point1[1], this->Point2[0]-this->Point1[0], this->Point2[1]-this->Point1[1]);
+
+    // draw background
+    if(this->BackgroundBrush)
     {
       painter->GetPen()->SetLineType(vtkPen::NO_PEN);
-#ifdef VTK_USE_QT
-      // For the record: If you compile VTK with the support of Qt, then VTK will use
-      // the vtkQtLabelRenderStrategy class to render the text in the scene. However, 
-      // to do this, they use an image cache mechanism based on images using the format 
-      // Qt::Format_ARGB32_Premultiplied. As written in the Qt documentation, using this 
-      // format implies that the RGB values cannot be greater than the alpha value, 
-      // otherwise, the behavior is unknown. In this case, we have to normalized the RGB 
-      // value by the alpha value.
-      painter->GetBrush()->SetColor(0, 32, 64, 64);
-#else
-      painter->GetBrush()->SetColor(0, 127, 255, 64);
-#endif
-      int lbi = 0, rbi = 0;
-      (*this->mp_RegionOfInterestFunctor)(lbi, rbi);
-      float left = static_cast<float>(lbi) - this->mp_AxisX->GetMinimum();
-      float right = this->mp_AxisX->GetMaximum() - static_cast<float>(rbi);
-      if ((left > 0.0f) && (lbi > 0))
-        painter->DrawRect(pt1X[0],pt1X[1],left*scaleX,pt2Y[1]-pt1X[1]);
-      if ((right > 1.0f) && (rbi > 0))
-        painter->DrawRect(pt2X[0]-right*scaleX,pt2X[1],right*scaleX,pt2Y[1]-pt1X[1]);
+      painter->ApplyBrush(this->BackgroundBrush);
+      painter->DrawRect(this->Point1[0], this->Point1[1], this->Geometry[0], this->Geometry[1]);
     }
-    // 6.2 Frame line
-    if (this->mp_CurrentFrameFunctor != NULL)
-    {    
-      float frameIndex = static_cast<float>((*this->mp_CurrentFrameFunctor)());
-      if ((frameIndex >= this->mp_AxisX->GetMinimum()) && (frameIndex <= this->mp_AxisX->GetMaximum()))
-      {
-        painter->GetPen()->SetLineType(vtkPen::SOLID_LINE);
-#ifdef VTK_USE_QT
-        painter->GetPen()->SetColor(0, 95, 191, 191); // Normalized
-#else
-        painter->GetPen()->SetColor(0, 127, 255, 191);
-#endif
-        painter->GetPen()->SetWidth(3.0);
-        float valX = pt1X[0] + (frameIndex - this->mp_AxisX->GetMinimum()) * scaleX;
-        painter->DrawLine(valX, pt1X[1], valX, pt2Y[1]);
-      }
-    }
-    // 7. The axes
-    this->mp_AxisX->Paint(painter);
-    this->mp_AxisY->Paint(painter);
-    // 8. The legend
-    if (this->mp_Legend && this->ShowLegend)
-      this->mp_Legend->Paint(painter);
-    // 9. The zoom box
+
+    // Use the scene to render most of the chart.
+    this->PaintChildren(painter);
+
     // Draw the selection box if necessary
-    if (this->m_ZoomBoxDisplayed != 0)
+    if (this->m_ZoomBoxDisplayed)
     {
       painter->GetPen()->SetLineType(vtkPen::DASH_LINE);
       painter->GetBrush()->SetColor(255, 255, 255, 0);
       painter->GetPen()->SetColor(0, 0, 0, 255);
       painter->GetPen()->SetWidth(1.0);
-      painter->DrawRect(this->m_ZoomBox[0], this->m_ZoomBox[1], this->m_ZoomBox[2], this->m_ZoomBox[3]);
+      painter->DrawRect(this->m_ZoomBox.X(), this->m_ZoomBox.Y(), this->m_ZoomBox.Width(), this->m_ZoomBox.Height());
     }
-    // 10. The title
+
     if (this->Title)
     {
+      vtkPoints2D *rect = vtkPoints2D::New();
+      rect->InsertNextPoint(this->Point1[0], this->Point2[1]);
+      rect->InsertNextPoint(this->Point2[0]-this->Point1[0], 10);
       painter->ApplyTextProp(this->TitleProperties);
-      float pt[2] = {(this->Point2[0]+this->mp_Borders[2]) / 2, this->Point2[1] + this->mp_Borders[3] - this->m_TitleMargin};
-      if (this->GetTransform() != NULL)
-        this->GetTransform()->TransformPoints(pt, pt, 1);
-      painter->DrawString(pt[0], pt[1], this->Title);
+      painter->DrawStringRect(rect, this->Title);
+      rect->Delete();
     }
     
     return true;
@@ -821,7 +409,11 @@ namespace btk
     default:
       btkErrorMacro("Only the plot type LINE is supported by this chart");
     }
-    this->AddPlot(plot);
+    if (plot != NULL)
+    {
+      this->AddPlot(plot);
+      plot->Delete();
+    }
     return plot;
   };
   
@@ -837,6 +429,7 @@ namespace btk
      plot->Register(this);
      this->mp_Plots->push_back(plot);
      vtkIdType plotIndex = this->mp_Plots->size() - 1;
+     this->mp_PlotTransform->AddItem(plot);
      // Ensure that the bounds of the chart are updated to contain the new plot
      this->m_ChartBoundsValid = false;
      // Mark the scene as dirty to update it.
@@ -853,6 +446,7 @@ namespace btk
     {
       vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
       vtkstd::advance(it, index);
+      this->mp_PlotTransform->RemoveItem(*it);
       (*it)->Delete();
       this->mp_Plots->erase(it);
       // Ensure that the bounds of the chart are updated to fit well the plots
@@ -876,6 +470,7 @@ namespace btk
       vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
       vtkstd::advance(it, index);
       plot = *it;
+      this->mp_PlotTransform->RemoveItem(*it);
       this->mp_Plots->erase(it);
       this->m_ChartBoundsValid = false;
       if (this->Scene != NULL) this->Scene->SetDirty(true);
@@ -889,7 +484,10 @@ namespace btk
   void VTKChartTimeSeries::ClearPlots()
   {
     for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+    {
+      this->mp_PlotTransform->RemoveItem(*it);
       (*it)->Delete();
+    }
     this->mp_Plots->clear();
     this->m_ChartBoundsValid = false;
     if (this->Scene != NULL) this->Scene->SetDirty(true);
@@ -947,264 +545,328 @@ namespace btk
     return 2;
   };
   
-  /**
-   * @fn vtkTransform2D* VTKChartTimeSeries::GetPlotsTransform() const
-   * Returns the 2D transformation used to fit the plots in the chart area.
-   */
-  
-  /**
-   * @fn bool VTKChartTimeSeries::Hit(const vtkContextMouseEvent &mouse)
-   * Return true if the supplied mouse event is inside the item.
-   * Required for the MouseWheelEvent() method.
-   */
-  
-  /**
-   * Return true if the supplied x, y coordinate is inside the area reserved for the plots.
-   */
-  bool VTKChartTimeSeries::Hit(int x, int y)
+  bool VTKChartTimeSeries::LocatePointInPlots(const vtkContextMouseEvent& mouse, VTKChartPlotData& plotIndex)
   {
-    if (!this->Visible)
+    if (this->mp_Plots->empty())
       return false;
-    
-    float pt1[2] = {this->Point1[0], this->Point1[1]};
-    float pt2[2] = {this->Point2[0], this->Point2[1]};
-    if (this->GetTransform() != NULL)
+    vtkVector2i pos(mouse.ScreenPos);
+    if ((pos[0] > this->Point1[0]) && (pos[0] < this->Point2[0]) && (pos[1] > this->Point1[1]) && (pos[1] < this->Point2[1]))
     {
-      this->GetTransform()->TransformPoints(pt1, pt1, 1);
-      this->GetTransform()->TransformPoints(pt2, pt2, 1);
+      vtkVector2f plotPos, position((float)pos.X(), (float)pos.Y());
+      vtkTransform2D* transform = this->mp_PlotTransform->GetTransform();
+      transform->InverseTransformPoints(position.GetData(), position.GetData(), 1);
+      // Use a tolerance of +/- 2.5 and +/- 5 pixels for the X and Y direction respectively
+      vtkVector2f tolerance((2.5/transform->GetMatrix()->GetElement(0,0)),
+                            (5.0/transform->GetMatrix()->GetElement(1,1)));
+                            
+      // Iterate through the visible plots and return on the first hit
+      for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+      {
+        vtkPlot* plot = *it;
+        if (plot && plot->GetVisible())
+        {
+          int seriesIndex = plot->GetNearestPoint(position, tolerance, &plotPos);
+          if (seriesIndex >= 0)
+          {
+            plotIndex.SeriesName = plot->GetLabel();
+            plotIndex.Position = plotPos;
+            plotIndex.ScreenPosition = mouse.ScreenPos;
+            plotIndex.Index = seriesIndex;
+            return true;
+          }
+        }
+      }
     }
-      
-    if ((x > pt1[0]) && (x < pt2[0]) && (y > pt1[1]) && (y < pt2[1]))
-      return true;
-    else
-      return false;
+    return false;
   };
   
+  /**
+   * Return true if the supplied x, y coordinate is inside the plot area.
+   */
+  bool VTKChartTimeSeries::Hit(const vtkContextMouseEvent &mouse)
+  {
+    vtkVector2i pos(mouse.ScreenPos);
+    if (pos[0] > this->Point1[0] &&
+        pos[0] < this->Point2[0] &&
+        pos[1] > this->Point1[1] &&
+        pos[1] < this->Point2[1])
+      {
+      return true;
+      }
+    else
+      {
+      return false;
+      }
+  }
+
   /**
    * Return true if the supplied x, y coordinate is inside the item.
    */
-  bool VTKChartTimeSeries::Hit2(int x, int y)
+  bool VTKChartTimeSeries::Hit2(const vtkContextMouseEvent& mouse)
   {
-    if (!this->Visible)
-      return false;
-    
-    float pt1[2] = {0.0f, 0.0f};
-    float pt2[2] = {this->Point2[0] + this->mp_Borders[2], this->Point2[1] + this->mp_Borders[3]};
-    if (this->GetTransform() != NULL)
+    vtkRectf size = this->GetSize();
+    vtkVector2i pos(mouse.ScreenPos);
+    if ((pos[0] > size.GetX()) && (pos[1] > size.GetY()) &&
+        (pos[0] < (size.GetX() + size.GetWidth())) && (pos[1] < (size.GetY() + size.GetHeight())))
     {
-      this->GetTransform()->TransformPoints(pt1, pt1, 1);
-      this->GetTransform()->TransformPoints(pt2, pt2, 1);
-    }
-      
-    if ((x > pt1[0]) && (x < pt2[0]) && (y > pt1[1]) && (y < pt2[1]))
       return true;
+    }
     else
+    {
       return false;
+    }
   };
   
-  /**
-   * Overloaded method used for the zoom box only if the user interactions are enabled.
-   */
+  bool VTKChartTimeSeries::MouseEnterEvent(const vtkContextMouseEvent& )
+  {
+    return true;
+  };
+  
+  bool VTKChartTimeSeries::MouseLeaveEvent(const vtkContextMouseEvent& )
+  {
+    return true;
+  };
+  
   bool VTKChartTimeSeries::MouseButtonPressEvent(const vtkContextMouseEvent& mouse)
   {
+    if (!this->m_InteractionEnabled)
+      return false;
     if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
     {
-      // Pan or zoom box action?
-      if (this->m_ZoomBoxDisplayed != 0)
-      {
-        this->m_ZoomBox[0] = mouse.Pos[0];
-        this->m_ZoomBox[1] = mouse.Pos[1];
-        this->m_ZoomBox[2] = this->m_ZoomBox[3] = 0.0f;
-      }
+      this->m_ZoomBox.Set(mouse.Pos.X(), mouse.Pos.Y(), 0.0, 0.0);
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+      // Zoom box
+      if ((mouse.GetModifiers() & vtkContextMouseEvent::SHIFT_MODIFIER) == vtkContextMouseEvent::SHIFT_MODIFIER)
+        this->m_ZoomBoxDisplayed = true;
+      // Pan
+      else
+        this->m_ZoomBoxDisplayed = false;
+#endif
       return true;
     }
     return false;
   };
-  
-  /**
-   * Overloaded method used for the zoom box only if the user interactions are enabled.
-   */
-  bool VTKChartTimeSeries::MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse)
-  {
-    if ((this->m_InteractionEnabled) && (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON))
-    {
-      if (this->m_ZoomBoxDisplayed != 0)
-      {
-        // this->m_ZoomBox[2] = mouse.Pos[0] - this->m_ZoomBox[0];
-        // this->m_ZoomBox[3] = mouse.Pos[1] - this->m_ZoomBox[1];
-        this->ApplyZoom(this->m_ZoomBox);
-      }
-      return true;
-    }
-    return false;
-  };
-  
-  /**
-   * Overloaded method to move the chart only if the user interaction are enabled. Also used for the zoom box
-   */
+
   bool VTKChartTimeSeries::MouseMoveEvent(const vtkContextMouseEvent& mouse)
   {
-    if ((this->m_InteractionEnabled) && (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON))
+    if (!this->m_InteractionEnabled)
+      return true;
+    
+    if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
     {
-      if (this->m_ZoomBoxDisplayed != 0)
+      // Pan
+      if (!this->m_ZoomBoxDisplayed)
       {
-        float pixel[2] = {1.0f, 1.0f}; // Shift to not have the box over the axes' lines.
-        if (this->GetTransform() != NULL)
-        {
-          pixel[0] /= this->GetTransform()->GetMatrix()->GetElement(0,0);
-          pixel[1] /= this->GetTransform()->GetMatrix()->GetElement(1,1);
-        }
+        // Figure out how much the mouse has moved by in plot coordinates - pan
+        vtkVector2d screenPos(mouse.ScreenPos.Cast<double>().GetData());
+        vtkVector2d lastScreenPos(mouse.LastScreenPos.Cast<double>().GetData());
+        vtkVector2d pos(0.0, 0.0);
+        vtkVector2d last(0.0, 0.0);
+
+        // Go from screen to scene coordinates to work out the delta
+        vtkTransform2D *transform = this->mp_PlotTransform->GetTransform();
+        transform->InverseTransformPoints(screenPos.GetData(), pos.GetData(), 1);
+        transform->InverseTransformPoints(lastScreenPos.GetData(), last.GetData(), 1);
+        vtkVector2d delta(last[0]-pos[0],last[1]-pos[1]);
+
+        // Now move the axes and recalculate the transform
+        delta[0] = delta[0] > 0 ?
+          std::min(delta[0], this->mp_AxisX->GetMaximumLimit() - this->mp_AxisX->GetMaximum()) :
+          std::max(delta[0], this->mp_AxisX->GetMinimumLimit() - this->mp_AxisX->GetMinimum());
+        delta[1] = delta[1] > 0 ?
+          std::min(delta[1], this->mp_AxisY->GetMaximumLimit() - this->mp_AxisY->GetMaximum()) :
+          std::max(delta[1], this->mp_AxisY->GetMinimumLimit() - this->mp_AxisY->GetMinimum());
+        this->mp_AxisX->SetMinimum(this->mp_AxisX->GetMinimum() + delta[0]);
+        this->mp_AxisX->SetMaximum(this->mp_AxisX->GetMaximum() + delta[0]);
+        this->mp_AxisY->SetMinimum(this->mp_AxisY->GetMinimum() + delta[1]);
+        this->mp_AxisY->SetMaximum(this->mp_AxisY->GetMaximum() + delta[1]);
+
+        this->RecalculatePlotTransform();
+        this->Scene->SetDirty(true);
+      }
+      // Zoom
+      else
+      {
         float pts[4];
         this->mp_AxisX->GetPoint1(pts);
         pts[2] = this->mp_AxisX->GetPoint2()[0];
         pts[3] = this->mp_AxisY->GetPoint2()[1];
-        // Check if the mouse is in the plots area.
-        if ((mouse.Pos[0] > pts[0]) && (mouse.Pos[0] < pts[2]))
-          this->m_ZoomBox[2] = mouse.Pos[0] - this->m_ZoomBox[0];
-        else
+        
+        float mouseX = mouse.Pos.X();
+        if ((mouseX < pts[0]) || (mouseX > pts[2]))
         {
-          if (this->m_ZoomBox[2] < 0)
-            this->m_ZoomBox[2] = pts[0] - this->m_ZoomBox[0] + pixel[0];
+          if (this->m_ZoomBox.GetWidth() < 0.0f)
+            mouseX = pts[0] + 1.0f; // Border
           else
-            this->m_ZoomBox[2] = pts[2] - this->m_ZoomBox[0] - pixel[0];
+            mouseX = pts[2] - 1.0f; // Border
         }
-        if ((mouse.Pos[1] > pts[1]) && (mouse.Pos[1] < pts[3]))
-          this->m_ZoomBox[3] = mouse.Pos[1] - this->m_ZoomBox[1];
-        else
+        
+        float mouseY = mouse.Pos.Y();
+        if ((mouseY < pts[1]) || (mouseY > pts[3]))
         {
-          if (this->m_ZoomBox[3] < 0)
-            this->m_ZoomBox[3] = pts[1] - this->m_ZoomBox[1] + pixel[1];
+          if (this->m_ZoomBox.GetHeight() < 0.0f)
+            mouseY = pts[1] + 1.0f; // Border
           else
-            this->m_ZoomBox[3] = pts[3] - this->m_ZoomBox[1] - pixel[1];
+            mouseY = pts[3] - 1.0f; // Border
         }
+        
+        this->m_ZoomBox.SetWidth(mouseX - this->m_ZoomBox.X());
+        this->m_ZoomBox.SetHeight(mouseY - this->m_ZoomBox.Y());
+        this->Scene->SetDirty(true);
       }
-      else
+    }
+    else if (mouse.Button == vtkContextMouseEvent::NO_BUTTON)
+    {
+      this->Scene->SetDirty(true);
+    }
+    return true;
+  };
+
+  bool VTKChartTimeSeries::MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse)
+  {
+    if (!this->m_InteractionEnabled)
+      return false;
+    
+    if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
+    {
+      // Zoom
+      this->m_ZoomBox.SetWidth(mouse.Pos.X() - this->m_ZoomBox.X());
+      this->m_ZoomBox.SetHeight(mouse.Pos.Y() - this->m_ZoomBox.Y());
+      if (this->m_ZoomBoxDisplayed && fabs(this->m_ZoomBox.Width()) > 0.5f && fabs(this->m_ZoomBox.Height()) > 0.5f)
       {
-        for (int i = 0 ; i < 2 ; ++i)
-        {
-          int mai = 1-i; // Map between the axis and the corresponding index in the array
-          vtkAxis* axis = this->GetAxis(mai);
-          float pt1[2]; axis->GetPoint1(pt1);
-          float pt2[2]; axis->GetPoint2(pt2);
-          double min = axis->GetMinimum(); double max = axis->GetMaximum();
-          double scale = (max - min) / (double)(pt2[i] - pt1[i]);
-          double delta = (mouse.LastScreenPos[i] - mouse.ScreenPos[i]) * scale;
-      
-          min = axis->GetMinimum() + delta;
-          max = axis->GetMaximum() + delta;
-          if (this->m_BoundsEnabled && (min < this->mp_Bounds[i*2]))
-          {
-            min = this->mp_Bounds[i*2];
-            max = axis->GetMaximum();
-          }
-          else if (this->m_BoundsEnabled && (max > this->mp_Bounds[i*2+1]))
-          {
-            min = axis->GetMinimum();
-            max = this->mp_Bounds[i*2+1];
-          }
-          axis->SetRange(min, max);
-          // Because we forces the opposite axes to have the same range it is not necessary to recompute the delta.
-          // this->GetAxis(mai+2)->SetRange(min, max);
-        }
-        // this->RecalculatePlotsTransform();
+        // Zoom into the chart by the specified amount, and recalculate the bounds
+        vtkVector2f point2(mouse.Pos);
+        
+        float pixelMin[2], pixelMax[2];
+        pixelMin[0] = this->m_ZoomBox[0] + (this->m_ZoomBox[2] > 0 ? 0 : this->m_ZoomBox[2]);
+        pixelMin[1] = this->m_ZoomBox[1] + (this->m_ZoomBox[3] > 0 ? 0 : this->m_ZoomBox[3]);
+        pixelMax[0] = pixelMin[0] + fabs(this->m_ZoomBox[2]);
+        pixelMax[1] = pixelMin[1] + fabs(this->m_ZoomBox[3]);
+        float sceneMin[2], sceneMax[2];
+        this->mp_PlotTransform->GetTransform()->InverseTransformPoints(pixelMin, sceneMin, 1);
+        this->mp_PlotTransform->GetTransform()->InverseTransformPoints(pixelMax, sceneMax, 1);
+        this->mp_AxisX->SetRange(sceneMin[0], sceneMax[0]);
+        this->mp_AxisY->SetRange(sceneMin[1], sceneMax[1]);
+
         this->m_PlotsTransformValid = false;
+        // Mark the scene as dirty
+        this->Scene->SetDirty(true);
+        
       }
-      
-      if (this->Scene != NULL) this->Scene->SetDirty(true);
-      
+      this->m_ZoomBoxDisplayed = false;
       return true;
     }
     return false;
   };
-  
-  /**
-   * Overloaded method to zoom in/out on the axis(es) specified by the zoom mode.
-   */
+
   bool VTKChartTimeSeries::MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta)
   {
-    if ((this->m_InteractionEnabled) && (this->m_ZoomBoxDisplayed == 0))
+    if (!this->m_InteractionEnabled)
+      return true;
+    
+    bool horizontalZoomModeOnly = false;
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+    if ((mouse.GetModifiers() & vtkContextMouseEvent::SHIFT_MODIFIER) == vtkContextMouseEvent::SHIFT_MODIFIER)
+      horizontalZoomModeOnly = true;
+#endif
+    horizontalZoomModeOnly |= (this->m_ZoomMode == HORIZONTAL);
+    
+    float pt[2];
+    this->mp_PlotTransform->GetTransform()->InverseTransformPoints(mouse.Pos.GetData(), pt, 1);
+    // Get the bounds of each plot.
+    for (int i = 0; i < 2; ++i)
     {
-      for (int i = 0 ; i < 2 ; ++i)
-      {
-        int mai = 1-i; // Map between the axis and the corresponding index in the array
-        if ((this->m_ZoomMode == i) || (this->m_ZoomMode == BOTH)) // i=0: Horizontal, i=1: Vertical.
-        {
-          vtkAxis* axis = this->GetAxis(mai);
-          float pt[2];
-          this->mp_PlotsTransform->InverseTransformPoints(mouse.Pos.GetData(), pt, 1);
-          double oldRange = axis->GetMaximum() - axis->GetMinimum();
-          double offsetCenter = (pt[i] - axis->GetMinimum()) - oldRange * 0.5;
-          double min = axis->GetMinimum();
-          double max = axis->GetMaximum();
-          double frac = (max - min) * 0.05;
-          min += delta*frac;
-          max -= delta*frac;
-          double shift = offsetCenter * oldRange / (max - min) - offsetCenter; // scale = oldRange / newRange; newRange = (max - min);
-          min += shift;
-          max += shift;
-          if (this->m_BoundsEnabled)
-          {
-            if (min < this->mp_Bounds[i*2])
-              min = this->mp_Bounds[i*2];
-            if (max > this->mp_Bounds[i*2+1])
-              max = this->mp_Bounds[i*2+1];
-          }
-          axis->SetRange(min,max);
-          // vtkAxis* axis2 = this->GetAxis(mai+2);
-          // axis2->SetRange(min,max);
-          axis->RecalculateTickSpacing();
-          // axis2->RecalculateTickSpacing();
-        }
-      }      
-      // this->RecalculatePlotsTransform();
-      this->m_PlotsTransformValid = false;
-      if (this->Scene != NULL) this->Scene->SetDirty(true);
+      if (horizontalZoomModeOnly && (i == 0))
+        continue;
+      vtkAxis* axis = this->GetAxis(i);
+      double oldRange = axis->GetMaximum() - axis->GetMinimum();
+      double offsetCenter = (pt[1-i] - axis->GetMinimum()) - oldRange * 0.5;
+      double min = axis->GetMinimum();
+      double max = axis->GetMaximum();
+      double frac = (max - min) * 0.05;
+      min += delta*frac;
+      max -= delta*frac;
+      double shift = offsetCenter * oldRange / (max - min) - offsetCenter;
+      min += shift;
+      max += shift;
+      axis->SetMinimum(min);
+      axis->SetMaximum(max);
+      axis->RecalculateTickSpacing();
     }
+
+    this->RecalculatePlotTransform();
+
+    // Mark the scene as dirty
+    this->Scene->SetDirty(true);
+
     return true;
   };
+
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+  bool VTKChartTimeSeries::KeyPressEvent(const vtkContextKeyEvent& key)
+  {
+    btkNotUsed(key);
+    return true;
+  }
+#endif
   
   VTKChartTimeSeries::VTKChartTimeSeries()
-  : vtkChart(), m_ZoomBox(),
-    mp_CurrentFrameFunctor(), mp_RegionOfInterestFunctor(), mp_EventsFunctor()
+  : vtkChart(), m_ZoomBox()
   {
     // No legend by defaut.
-    this->mp_Legend = 0;
-    
     // No generator of color by default
-    this->mp_Colors = 0;
+    
+    // Grid using the defined axes
+    vtkPlotGrid* grid = vtkPlotGrid::New();
+    this->AddItem(grid);
+    grid->Delete();
+    
+    // The plots are drawn on top of the grid, in a clipped, transformed area.
+    this->mp_Clip = vtkSmartPointer<vtkContextClip>::New();
+    this->AddItem(this->mp_Clip);
+    
+    this->mp_PlotTransform = vtkSmartPointer<vtkContextTransform>::New();
+    this->mp_Clip->AddItem(this->mp_PlotTransform); // Child list maintains ownership.
     
     // Only two axes (bottom: X axis, left: Y axis)
+    // - X axis
     this->mp_AxisX = VTKAxis::New();
     this->mp_AxisX->SetPosition(vtkAxis::BOTTOM);
     this->mp_AxisX->SetTitle("X Axis");
     this->mp_AxisX->SetLabelMargin(7.0f);
     this->mp_AxisX->SetVisible(true);
+    // - Y axis
     this->mp_AxisY = VTKAxis::New();
     this->mp_AxisY->SetPosition(vtkAxis::LEFT);
     this->mp_AxisY->SetTitle("Y Axis");
     this->mp_AxisY->SetVisible(true);
     // By default, they will be displayed with a null range and their behavior is fixed
-    this->mp_AxisX->SetBehavior(1); // Fixed
+    this->mp_AxisX->SetBehavior(vtkAxis::FIXED); // Fixed
     this->mp_AxisX->SetRange(0.0, 0.0);
-    this->mp_AxisY->SetBehavior(1); // Fixed
+    this->mp_AxisY->SetBehavior(vtkAxis::FIXED); // Fixed
     this->mp_AxisY->SetRange(0.0, 0.0);
     
-    // Grid using the defined axes
-    this->mp_Grid = vtkPlotGrid::New();
-    this->mp_Grid->SetXAxis(this->mp_AxisX);
-    this->mp_Grid->SetYAxis(this->mp_AxisY);
+    this->mp_ExtraAcquisition = VTKChartExtraAcquisition::New();
+    this->mp_ExtraAcquisition->SetAxes(this->mp_AxisX, this->mp_AxisY);
+    this->AddItem(this->mp_ExtraAcquisition);
+    
+    this->AddItem(this->mp_AxisX);
+    this->AddItem(this->mp_AxisY);
+    
+    grid->SetXAxis(this->mp_AxisX);
+    grid->SetYAxis(this->mp_AxisY);
     
     // Interaction and bounds
-    this->m_ClippingEnabled = true;
+    // this->m_ClippingEnabled = true;
     this->m_InteractionEnabled = true;
-    this->m_ZoomMode = 0;
-    this->m_BoundsEnabled = false;
-    this->mp_Bounds[0] = 0.0;
-    this->mp_Bounds[1] = 0.0;
-    this->mp_Bounds[2] = 0.0;
-    this->mp_Bounds[3] = 0.0;
+    this->m_ZoomMode = BOTH;
+    // this->m_BoundsEnabled = false;
+    //     this->mp_Bounds[0] = 0.0;
+    //     this->mp_Bounds[1] = 0.0;
+    //     this->mp_Bounds[2] = 0.0;
+    //     this->mp_Bounds[3] = 0.0;
     this->m_ChartBoundsValid = true;
-    this->m_ZoomBoxDisplayed = 0;
+    this->m_ZoomBoxDisplayed = false;
     
     // Borders
     this->mp_Borders[0] = 0;
@@ -1215,22 +877,13 @@ namespace btk
     // Plots
     this->mp_Plots = new VTKPlots();
     
-    // Display events disabled by defaut (no functor)
-    this->m_DisplayEvents = 0;
-    this->m_EventLineWidth = 0.5f;
-    this->m_EventLineTypeFactor = 1;
-    
-    // Linear transformation to scale and translate the plots
-    this->mp_PlotsTransform = vtkTransform2D::New();
-    this->m_PlotsTransformValid = true;
-    
     // Title
-    this->TitleProperties->SetVerticalJustificationToTop();
-    this->m_TitleMargin = 10;
+    // this->TitleProperties->SetVerticalJustificationToTop();
+    // this->m_TitleMargin = 10;
     
     // Defaut borders for the chart
-    this->m_BordersChanged = false;
-    this->SetBorders(60, 50, 20, 20); 
+    this->m_GeometryChanged = false;
+    this->SetBorders(60, 20, 20, 20);
   };
   
   VTKChartTimeSeries::~VTKChartTimeSeries()
@@ -1238,21 +891,17 @@ namespace btk
     for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
       (*it)->Delete();
     delete this->mp_Plots;
-    if (this->mp_Legend)
-      this->mp_Legend->Delete();
-    if (this->mp_Colors)
-      this->mp_Colors->Delete();
     this->mp_AxisX->Delete();
     this->mp_AxisY->Delete();
-    this->mp_Grid->Delete();
-    this->mp_PlotsTransform->Delete();
+    this->mp_ExtraAcquisition->Delete();
   };
   
   /**
    * Update the size of the plot into the dimensions of the scene.
    */
-  void VTKChartTimeSeries::RecalculatePlotsTransform()
+  void VTKChartTimeSeries::RecalculatePlotTransform()
   {
+    // this->CalculatePlotTransform(this->mp_AxisX, this->mp_AxisY, this->mp_PlotTransform->GetTransform());
     // Compute the scales for the plot area to fit the plot inside
     float min[2], max[2];
     // Axis X
@@ -1268,10 +917,10 @@ namespace btk
     this->mp_AxisY->GetPoint2(max);
     double scaleY = static_cast<double>(max[1] - min[1]) / (this->mp_AxisY->GetMaximum() - this->mp_AxisY->GetMinimum());
 
-    this->mp_PlotsTransform->Identity();
-    this->mp_PlotsTransform->Translate(this->Point1[0], this->Point1[1]);
-    this->mp_PlotsTransform->Scale(scaleX, scaleY);
-    this->mp_PlotsTransform->Translate(-this->mp_AxisX->GetMinimum(), -this->mp_AxisY->GetMinimum());
+    this->mp_PlotTransform->GetTransform()->Identity();
+    this->mp_PlotTransform->GetTransform()->Translate(this->Point1[0], this->Point1[1]);
+    this->mp_PlotTransform->GetTransform()->Scale(scaleX, scaleY);
+    this->mp_PlotTransform->GetTransform()->Translate(-this->mp_AxisX->GetMinimum(), -this->mp_AxisY->GetMinimum());
     
     this->m_PlotsTransformValid = true;
   };

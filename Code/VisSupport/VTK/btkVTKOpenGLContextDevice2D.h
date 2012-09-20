@@ -33,37 +33,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ChartImagePreview_h
-#define ChartImagePreview_h
+#ifndef __btkVTKOpenGLContextDevice2D_h
+#define __btkVTKOpenGLContextDevice2D_h
 
-#include "VizRendererWidget.h"
-
-#include <vtkStdString.h>
+#include <vtkOpenGLContextDevice2D.h>
 
 namespace btk
 {
-  class VTKChartTimeSeries;
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 8)) || (VTK_MAJOR_VERSION >= 6))
+  class VTKOpenGLContextDevice2D : public vtkOpenGLContextDevice2D
+  {
+  public:
+    vtkTypeMacro(VTKOpenGLContextDevice2D, vtkOpenGLContextDevice2D);
+    
+    static VTKOpenGLContextDevice2D* New();
+    
+    // ~VTKOpenGLContextDevice2D(); // Implicit.
+    
+    using vtkOpenGLContextDevice2D::DrawString;
+    virtual void DrawString(float *point, const vtkStdString& string);
+    
+  protected:
+    VTKOpenGLContextDevice2D();
+    
+  private:
+    void AlignText(double orientation, float width, float height, float *p);
+    
+    VTKOpenGLContextDevice2D(const VTKOpenGLContextDevice2D& ); // Not implemented.
+    void operator=(const VTKOpenGLContextDevice2D& ); // Not implemented.
+  };
+#else
+  typedef vtkOpenGLContextDevice2D VTKOpenGLContextDevice2D;
+#endif
 };
 
-class ChartImagePreview : public VizRendererWidget
-{
-  Q_OBJECT
-  
-public:
-  ChartImagePreview(QWidget* parent = 0);
-  ~ChartImagePreview();
-  
-  void initialize();
-  btk::VTKChartTimeSeries* chart() const {return this->mp_Chart;};
-  void setChart(vtkstd::vector<vtkStdString>& units, btk::VTKChartTimeSeries* chart);
-  
-protected:
-  void keyPressEvent(QKeyEvent* event);
-  void keyReleaseEvent(QKeyEvent* event);
-  void mousePressEvent(QMouseEvent* event);
-  
-private:
-  btk::VTKChartTimeSeries* mp_Chart;
-};
-
-#endif // ChartImagePreview_h
+#endif // __btkVTKOpenGLContextDevice2D_h

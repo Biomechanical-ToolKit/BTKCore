@@ -45,7 +45,6 @@
 #include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
 
 #include <vtkCamera.h>
-#include <vtkRenderWindow.h>
 
 #include <QListWidget>
 #include <QMouseEvent>
@@ -455,17 +454,14 @@ HeaderOptionComboBox::HeaderOptionComboBox(QWidget* parent)
      background: white; \
    } \
    QComboBox:!editable, QComboBox::drop-down:editable { \
-     color: black; \
+     color: white; \
      background: transparent; \
      selection-background-color: lightgray; \
    } \
-   /* QComboBox gets the \"on\" state when the popup is open */ \
    QComboBox:!editable:on, QComboBox::drop-down:editable:on { \
      color: black; \
    } \
-   QComboBox:on { /* shift the text when the popup opens */ \
-     /* padding-top: 3px; \
-     padding-left: 4px; */ \
+   QComboBox:on { \
    } \
    QComboBox::drop-down { \
      subcontrol-origin: padding; \
@@ -478,8 +474,7 @@ HeaderOptionComboBox::HeaderOptionComboBox(QWidget* parent)
    QComboBox::down-arrow { \
      image: url(:/Resources/Images/treeDownTriangleWhite.png); \
    } \
-   QComboBox::down-arrow:on { /* shift the arrow when popup is open */ \
-    /* top: 1px; */ \
+   QComboBox::down-arrow:on { \
    }");
 }
 

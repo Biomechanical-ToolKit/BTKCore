@@ -36,10 +36,11 @@
 #ifndef ChartWidget_h
 #define ChartWidget_h
 
-#include <btkVTKChartTimeSeries.h>
-#include <btkPoint.h>
+#include "VizRendererWidget.h"
 
-#include <QVTKWidget.h>
+#include <btkPoint.h>
+#include <btkVTKChartTimeSeries.h> // VTKCurrentFrameFunctor, VTKRegionOfInterestFunctor, VTKEventsFunctor
+
 #include <vtkDoubleArray.h>
 #include <vtkstd/vector>
 
@@ -56,14 +57,16 @@ class vtkPlot;
 class vtkLine;
 class vtkAxis;
 class vtkColorSeries;
-
-namespace btk {class VTKContextScene;};
-
-class VTKCharts : public vtkstd::vector<btk::VTKChartTimeSeries*>
-{};
+class vtkContextScene;
+class vtkContextView;
 
 class VTKChartWidget;
 class AbstractChartData;
+
+namespace btk
+{
+  class VTKChartLayout;
+}
 
 class ChartWidget : public QWidget
 {
@@ -96,7 +99,7 @@ public:
   double defaultLineWidth() {return ChartWidget::DefaultLineWidth;};
   void setDefaultLineWidth(double width) {ChartWidget::DefaultLineWidth = width;};
   
-  void render(bool optionsShown = false);
+  void render(bool optionsShown = false, int delayShowOptionWinXP = 75);
   void show(bool s);
   
   void displayPointChart() {this->displayChart(PointChart);};
@@ -140,6 +143,7 @@ public slots:
   
 signals:
   void pausePlaybackRequested(bool paused);
+  void exportToImageRequested(btk::VTKChartTimeSeries* chart);
   
 private slots:
   void setLastContextMenuPosition(const QPoint& globalPos);
@@ -166,11 +170,12 @@ protected:
   QLabel* mp_ChartAxisXLabel;
   
   Acquisition* mp_Acquisition;
-  btk::VTKContextScene* mp_Scene;
-  vtkColorSeries* mp_ColorGenerator;
+  vtkContextScene* mp_Scene;
+  vtkSmartPointer<vtkColorSeries> mp_ColorGenerator;
   ChartOptionsWidget* mp_ChartOptions;
   QList<QAction*> m_ViewActions;
   QPoint m_LastContextMenuPosition;
+  
 };
 
 class AbstractChartData
@@ -188,12 +193,13 @@ public:
   AbstractChartData(int num);
   virtual ~AbstractChartData();
   void appendPlotProperties(const QString& label, int id, const QColor& color, double lineWidth);
-  btk::VTKChartTimeSeries* chart(int i) {return this->mp_Charts->operator[](i);};
-  VTKCharts* charts() {return this->mp_Charts;};
+  int chartNumber() const;
+  btk::VTKChartTimeSeries* chart(int i);
+  btk::VTKChartLayout* layout() {return this->mp_ChartLayout;};
   void clear();
   void copy(AbstractChartData* source);
-  void generateColor(vtkColorSeries* colorGenerator, double color[3]);
-  virtual void initialize(vtkColorSeries* colorGenerator);
+  void generateColor(vtkSmartPointer<vtkColorSeries> colorGenerator, double color[3]);
+  virtual void initialize(vtkSmartPointer<vtkColorSeries> colorGenerator);
   bool isAlreadyPlotted(int id);
   QList<PlotProperties>& plotsProperties() {return this->m_PlotsProperties;};
   const QList<PlotProperties>& plotsProperties() const {return this->m_PlotsProperties;};
@@ -208,27 +214,26 @@ public:
   void setOptionSelection(const QList<int>& selection) {this->m_OptionSelection = selection;};
   
   virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* item) = 0;
-  virtual bool appendPlotFromDroppedItem(Acquisition* acq, vtkColorSeries* colorGenerator, QTreeWidgetItem* item, bool* layoutModified) = 0;
+  virtual bool appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointer<vtkColorSeries> colorGenerator, QTreeWidgetItem* item, bool* layoutModified) = 0;
   virtual QString createPlotLabel(Acquisition* acq, int id) = 0;
   
 protected:
   QString m_Title;
-  VTKCharts* mp_Charts;
+  btk::VTKChartLayout* mp_ChartLayout;
   vtkDoubleArray* mp_Frames;
   QList<PlotProperties> m_PlotsProperties;
   QList<int> m_OptionSelection;
 };
 
-class VTKChartWidget : public QVTKWidget
+class VTKChartWidget : public VizRendererWidget
 {
   Q_OBJECT
   
 public:
   VTKChartWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  void setCharts(VTKCharts* charts) {this->mp_Charts = charts;};
   btk::VTKChartTimeSeries* focusedChart(const QPoint& pos) const;
   btk::VTKChartTimeSeries* focusedPlotArea(const QPoint& pos) const;
-  void resizeCharts();
+  void setChartData(AbstractChartData* data) {this->mp_CurrentChartData = data;};
   
 signals:
   void contextMenuRequested(const QPoint& pos);
@@ -239,12 +244,10 @@ protected:
   virtual void keyPressEvent(QKeyEvent* event);
   virtual void keyReleaseEvent(QKeyEvent* event);
   virtual void mousePressEvent(QMouseEvent* event);
-  virtual void mouseReleaseEvent(QMouseEvent* event);
-  virtual void mouseMoveEvent(QMouseEvent* event);
-  virtual void resizeEvent(QResizeEvent* event);
   virtual void wheelEvent(QWheelEvent* event);
   
-  VTKCharts* mp_Charts;
+private:
+  AbstractChartData* mp_CurrentChartData;
 };
 
 // -----------------------------------------------------------------------------

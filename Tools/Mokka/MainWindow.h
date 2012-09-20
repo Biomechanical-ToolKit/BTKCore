@@ -48,6 +48,7 @@ class ImportAssistantDialog;
 class FileInfoDockWidget;
 class Metadata;
 class ModelDockWidget;
+class NewSegmentDialog;
 class ProgressWidget;
 class UpdateManager;
 class QUndoStack;
@@ -233,6 +234,7 @@ private:
   Metadata* mp_MetadataDlg;
   FileInfoDockWidget* mp_FileInfoDock;
   ModelDockWidget* mp_ModelDock;
+  NewSegmentDialog* mp_SegmentEditor;
   ImportAssistantDialog* mp_ImportAssistant;
   UpdateManager* mp_Updater;
   Preferences* mp_Preferences;

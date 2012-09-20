@@ -33,41 +33,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKContextScene_h
-#define __btkVTKContextScene_h
+#ifndef __btkVTKQtStringToImage_h
+#define __btkVTKQtStringToImage_h
 
-#include "btkConfigure.h"
-
-#include <vtkContextScene.h>
+#include <vtkQtStringToImage.h>
 
 namespace btk
 {
-#if (VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 8)
-  class VTKContextScene : public vtkContextScene
+#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 8)) || (VTK_MAJOR_VERSION >= 6))
+  class VTKQtStringToImage : public vtkQtStringToImage
   {
   public:
-    BTK_VTK_EXPORT static VTKContextScene* New();
-    vtkExportedTypeRevisionMacro(VTKContextScene, vtkContextScene, BTK_VTK_EXPORT);
-    
-    virtual ~VTKContextScene() {};
-    
-    bool RemoveItem(vtkContextItem* item);
-    bool RemoveItem(unsigned int index);
-    void Clear();
-    
+    vtkTypeMacro(VTKQtStringToImage, vtkQtStringToImage);
+
+    static VTKQtStringToImage* New();
+    // ~VTKQtStringToImage(); // Implicit
+
+    virtual vtkVector2i GetBounds(vtkTextProperty* property, const vtkUnicodeString& string);
+    virtual vtkVector2i GetBounds(vtkTextProperty* property, const vtkStdString& string);
+
+    using vtkQtStringToImage::RenderString;
+    virtual int RenderString(vtkTextProperty *property, const vtkUnicodeString& string, vtkImageData *data);
+
   protected:
-    BTK_VTK_EXPORT VTKContextScene();
-    
+    VTKQtStringToImage();
+
   private:
-     VTKContextScene(const VTKContextScene& ); // Not implemented.
-     void operator=(const VTKContextScene& );   // Not implemented.
+    VTKQtStringToImage(const VTKQtStringToImage& );  // Not implemented.
+    void operator=(const VTKQtStringToImage& );  // Not implemented.
   };
 #else
-  /**
-   * Convenient typedef to be compatible with VTK 5.6 and the lack of methods to remove items from a scene.
-   */
-  typedef vtkContextScene VTKContextScene;
+  typedef vtkQtStringToImage VTKQtStringToImage;
 #endif
 };
-
-#endif // __btkVTKContextScene_h
+#endif

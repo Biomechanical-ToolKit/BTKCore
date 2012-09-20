@@ -39,7 +39,6 @@
 #include "btkConfigure.h"
 
 #include <vtkGlyph3D.h>
-#include <vtkSphereSource.h>
 
 namespace btk
 {
@@ -63,7 +62,6 @@ namespace btk
     VTKMarkersSource(const VTKMarkersSource& );  // Not implemented.
     VTKMarkersSource& operator=(const VTKMarkersSource& );  // Not implemented.
 
-    vtkSphereSource* mp_Source;
     vtkIntArray* mp_ExistingMarkers;
     vtkIntArray* mp_VisibleMarkers;
   };

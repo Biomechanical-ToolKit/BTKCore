@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud BarrÃ©
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,46 +33,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkVTKChartLegend_h
-#define __btkVTKChartLegend_h
+#ifndef VizRendererWidget_h
+#define VizRendererWidget_h
 
-#include "btkConfigure.h"
+// To resolve some issues with the min/max function and Windows.
+#define NOMINMAX
 
-#include <vtkChartLegend.h>
+//#define MOKKA_USE_QVTKWIDGET2
 
-namespace btk
-{
-  class VTKChartLegend : public vtkChartLegend
+#ifdef MOKKA_USE_QVTKWIDGET2
+  #include <QVTKWidget2.h>
+  #include <vtkGenericOpenGLRenderWindow.h>
+  #include <vtkRenderWindowInteractor.h>
+  typedef QVTKWidget2 QVTKWidgetX;
+  typedef vtkGenericOpenGLRenderWindow VizRendererWindow;
+#else 
+  #include <QVTKWidget.h>
+  
+  #include <vtkRenderWindow.h>
+  typedef QVTKWidget QVTKWidgetX;
+  typedef vtkRenderWindow VizRendererWindow;
+#endif
+
+#ifdef MOKKA_USE_QVTKWIDGET2
+  class VizRendererWidget : public QVTKWidgetX
   {
   public:
-    BTK_VTK_EXPORT static VTKChartLegend* New();
-    vtkExportedTypeRevisionMacro(VTKChartLegend, vtkChartLegend, BTK_VTK_EXPORT);
-    
-    virtual ~VTKChartLegend();
-    
-    const float* GetPaddingGeometry() const {return this->mp_PaddingGeometry;};
-    void SetPaddingGeometry(float left, float bottom, float right, float top) {float padding[4] = {left, bottom, right, top}; this->SetPaddingGeometry(padding);};
-    BTK_VTK_EXPORT void SetPaddingGeometry(float padding[4]);
-
-#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 8))
-    int GetSymbolWidth() const {return this->SymbolWidth;};
-    BTK_VTK_EXPORT void SetSymbolWidth(int width);
+    VizRendererWidget(QWidget* parent = NULL, const QGLWidget* shareWidget=0, Qt::WindowFlags f = 0);
+    VizRendererWidget(QGLContext* ctx, QWidget* parent = NULL, const QGLWidget* shareWidget=0, Qt::WindowFlags f = 0);
+    VizRendererWidget(const QGLFormat& fmt, QWidget* parent = NULL, const QGLWidget* shareWidget=0, Qt::WindowFlags f = 0);
+  #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
+  /* This is to fix the bugs between VTK 5.8 and VTK 5.10 for the class QVTKWidget2 */
+    virtual void SetRenderWindow(vtkGenericOpenGLRenderWindow* w);  
   protected:
-    int SymbolWidth;
-  public:
-#endif
-    
-    BTK_VTK_EXPORT virtual bool Paint(vtkContext2D* painter);
-    
-  protected:
-    BTK_VTK_EXPORT VTKChartLegend();
-    
-    float mp_PaddingGeometry[4]; // left, bottom, right, top
-    
-  private:
-     VTKChartLegend(const VTKChartLegend& ); // Not implemented.
-     void operator=(const VTKChartLegend& );   // Not implemented.
+    virtual bool focusNextPrevChild(bool );
+  #endif
   };
-};
+#else
+  class VizRendererWidget : public QVTKWidgetX
+  {
+  public:
+    VizRendererWidget(QWidget* parent = NULL, void* onlyforCompatibility=0, Qt::WindowFlags f = 0);
+  #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 10))
+  protected:
+    #if defined(Q_WS_WIN)
+      bool winEvent(MSG* msg, long* result);
+    #endif
+  #endif
+  };
+#endif
 
-#endif // __btkVTKChartLegend_h
+#endif // VizRendererWidget_h

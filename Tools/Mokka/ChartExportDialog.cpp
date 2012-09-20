@@ -43,13 +43,13 @@
 #include <QMessageBox>
 
 #include <btkVTKChartTimeSeries.h>
+#include <btkVTKAxis.h>
 #include <btkVTKChartLegend.h>
 
 #include <vtkAxis.h>
 #include <vtkTextProperty.h>
 #include <vtkPlot.h>
 #include <vtkChartLegend.h>
-#include <vtkRenderWindow.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkContextScene.h>
 #include <vtkPen.h>
@@ -159,7 +159,7 @@ void ChartExportDialog::accept()
     axisX->GetTitleProperties()->SetFontSize(scaleFont);
     axisX->GetLabelProperties()->SetFontSize(scaleFont);
     axisX->SetTickLength(axisX->GetTickLength() * scaleF / scaleY);
-    axisX->SetTitleMargin(axisX->GetTitleMargin() * scaleF2 / scaleY);
+    // axisX->SetTitleMargin(axisX->GetTitleMargin() * scaleF2 / scaleY);
     axisX->SetLabelMargin(axisX->GetLabelMargin() * scaleF2 / scaleY);
     pen = axisX->GetPen();
     pen->SetWidth(pen->GetWidth() * scaleF);
@@ -170,7 +170,7 @@ void ChartExportDialog::accept()
     axisY->GetTitleProperties()->SetFontSize(scaleFont);
     axisY->GetLabelProperties()->SetFontSize(scaleFont);
     axisY->SetTickLength(axisY->GetTickLength() * scaleF / scaleX);
-    axisY->SetTitleMargin(axisY->GetTitleMargin() * scaleF2 / scaleX);
+    // axisY->SetTitleMargin(axisY->GetTitleMargin() * scaleF2 / scaleX);
     axisY->SetLabelMargin(axisY->GetLabelMargin() * scaleF2 / scaleX);
     pen = axisY->GetPen();
     pen->SetWidth(pen->GetWidth() * scaleF);
@@ -179,15 +179,17 @@ void ChartExportDialog::accept()
     // - Legend
     btk::VTKChartLegend* legend = btk::VTKChartLegend::SafeDownCast(this->mp_Chart->GetLegend());
     legend->SetLabelSize(static_cast<int>((double)scaleFont * 0.8));
-    legend->SetSymbolWidth(legend->GetSymbolWidth() * scaleF2 / scaleX);
-    const float* padding = legend->GetPadding();
-    legend->SetPadding(padding[0] * scaleF2 / scaleX, padding[1] * scaleF2 / scaleY, padding[2] * scaleF2 / scaleX, padding[3] * scaleF2 / scaleY);
+    legend->SetSymbolWidth(static_cast<int>(static_cast<float>(legend->GetSymbolWidth()) * scaleF2 / scaleX));
+    const float* padding = legend->GetPaddingGeometry();
+    legend->SetPaddingGeometry(padding[0] * scaleF2 / scaleX, padding[1] * scaleF2 / scaleY, padding[2] * scaleF2 / scaleX, padding[3] * scaleF2 / scaleY);
     // - Chart
     this->mp_Chart->GetTitleProperties()->SetFontSize(scaleFont);
-    this->mp_Chart->SetTitleMargin(static_cast<int>(static_cast<float>(this->mp_Chart->GetTitleMargin()) * scaleF2 / scaleY));
+    // this->mp_Chart->SetTitleMargin(static_cast<int>(static_cast<float>(this->mp_Chart->GetTitleMargin()) * scaleF2 / scaleY));
     this->mp_Chart->SetEventLineWidth(this->mp_Chart->GetEventLineWidth() * scaleF);
     this->mp_Chart->SetEventLineTypeFactor(this->mp_Chart->GetEventLineTypeFactor() * scale);
+#if 0
     this->mp_Chart->SetClippingEnabled(false);
+#endif
     for (int i = 0 ; i < this->mp_Chart->GetNumberOfPlots() ; ++i)
     {
       vtkPlot* plot = this->mp_Chart->GetPlot(i);
@@ -199,17 +201,26 @@ void ChartExportDialog::accept()
     // - Bottom
     titleRect = this->computeStringBounds(this->axisXTitle->text(), axisX->GetTitleProperties());
     labelRect = this->computeStringBounds("0", axisX->GetLabelProperties()); // No need of the true text as only the height will be used.
+#if 0
     int bottom = static_cast<int>(ceil(axisX->GetTitleMargin() + (titleRect.height() + 10.0 * scaleF2 + labelRect.height()) / scaleY + axisX->GetLabelMargin()));
+#else
+    int bottom = static_cast<int>(ceil((titleRect.height() + 10.0 * scaleF2 + labelRect.height()) / scaleY + axisX->GetLabelMargin()));
+#endif
     // - Left
     titleRect = this->computeStringBounds(this->axisYTitle->text(), axisY->GetTitleProperties());
     vtkStdString label = axisY->GetTickLabels()->GetValue(axisY->GetTickLabels()->GetNumberOfValues() - 1);
     if (label.length() < axisY->GetTickLabels()->GetValue(0).length())
       label = axisY->GetTickLabels()->GetValue(0);
     labelRect = this->computeStringBounds(QString::fromStdString(label), axisY->GetLabelProperties());
+#if 0
     int left = static_cast<int>(ceil(axisX->GetTitleMargin() + (titleRect.height() + 12.5 * scaleF2 + labelRect.width()) / scaleX + axisY->GetLabelMargin()));
+#else
+    int left = static_cast<int>(ceil((titleRect.height() + 12.5 * scaleF2 + labelRect.width()) / scaleX + axisY->GetLabelMargin()));
+#endif
     // - Right
     int right = static_cast<int>(ceil(static_cast<float>(borders[2]) * scaleF2 / scaleX));
     // - Top
+#if 0
     int top = this->mp_Chart->GetTitleMargin();
     if (!this->chartTitle->text().isEmpty())
     {
@@ -218,6 +229,7 @@ void ChartExportDialog::accept()
     }
     // - Set new borders.
     this->mp_Chart->SetBorders(left, bottom, right, top);
+#endif
     // - Force the legend's location as it will be reseted by the next rendering.
     this->imagePreview->GetRenderWindow()->Render();
     this->updateLegendLocation(this->legendLocationComboBox->currentIndex());
@@ -245,10 +257,10 @@ void ChartExportDialog::accept()
         vtkTransform2D* transform = vtkTransform2D::New();
         transform->Translate(-offsetX, -offsetY);
         transform->Scale(scaleX, scaleY);
-        this->imagePreview->chart()->SetTransform(transform);
-        axisX->SetTransform(transform);
-        axisY->SetTransform(transform);
-        this->imagePreview->chart()->GetLegend()->SetTransform(transform);
+        // this->imagePreview->chart()->SetTransform(transform);
+        // axisX->SetTransform(transform);
+        // axisY->SetTransform(transform);
+        // btk::VTKChartLegend::SafeDownCast(this->imagePreview->chart()->GetLegend())->SetTransform(transform);
         transform->Delete();
         
         QImage buffer(w1, h1, QImage::Format_RGB32);
@@ -295,13 +307,16 @@ void ChartExportDialog::updateChartTile(const QString& title, int value)
 {
   vtkAxis* axis = this->mp_Chart->GetAxis(vtkAxis::LEFT);
   int margin = 10;
-  int maxLen = std::max(QString::number(static_cast<int>(axis->GetMinimum())).length(), QString::number(static_cast<int>(axis->GetMaximum())).length());
+  int maxLen = std::max(
+    QString::number(static_cast<int>(axis->GetMinimum())).length(), 
+    QString::number(static_cast<int>(axis->GetMaximum())).length()
+  );
   int left = margin + value + margin + maxLen * static_cast<int>((float)value * 2.0f/3.0f);
   int bottom = margin + value + margin + value;
   if (title.isEmpty())
   {
     this->mp_Chart->SetBorders(left, bottom, margin, margin);
-    this->mp_Chart->SetTitle(NULL);
+    this->mp_Chart->SetTitle("");
   }
   else
   {

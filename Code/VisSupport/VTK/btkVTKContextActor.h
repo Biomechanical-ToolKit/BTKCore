@@ -33,37 +33,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ChartImagePreview_h
-#define ChartImagePreview_h
+#ifndef __btkVTKContextActor_h
+#define __btkVTKContextActor_h
 
-#include "VizRendererWidget.h"
+#include <vtkProp.h>
 
-#include <vtkStdString.h>
+ class vtkContext2D;
+ class vtkContextScene;
 
 namespace btk
 {
-  class VTKChartTimeSeries;
-};
+  class VTKContextActor : public vtkProp
+  {
+  public:
+    vtkTypeMacro(VTKContextActor, vtkProp);
+    
+    static VTKContextActor* New();
+    
+    virtual ~VTKContextActor();
+    
+    virtual int RenderOverlay(vtkViewport* viewport);
+    virtual void SetContext(vtkContext2D* context);
+    vtkGetObjectMacro(Context, vtkContext2D);
+    vtkGetObjectMacro(Scene, vtkContextScene);
+    virtual void SetScene(vtkContextScene* scene);
+    virtual void ReleaseGraphicsResources(vtkWindow* window);
+    
+    void PrintSelf(ostream& os, vtkIndent indent);
+    
+  protected:
+    VTKContextActor();
 
-class ChartImagePreview : public VizRendererWidget
-{
-  Q_OBJECT
-  
-public:
-  ChartImagePreview(QWidget* parent = 0);
-  ~ChartImagePreview();
-  
-  void initialize();
-  btk::VTKChartTimeSeries* chart() const {return this->mp_Chart;};
-  void setChart(vtkstd::vector<vtkStdString>& units, btk::VTKChartTimeSeries* chart);
-  
-protected:
-  void keyPressEvent(QKeyEvent* event);
-  void keyReleaseEvent(QKeyEvent* event);
-  void mousePressEvent(QMouseEvent* event);
-  
-private:
-  btk::VTKChartTimeSeries* mp_Chart;
-};
+    virtual void Initialize(vtkViewport* viewport);
+    
+    vtkContextScene* Scene;
+    vtkContext2D* Context;
+    bool Initialized;
+    
+  private:
+    VTKContextActor(const VTKContextActor& );  // Not implemented.
+    void operator=(const VTKContextActor& );  // Not implemented.
+  };
+}
 
-#endif // ChartImagePreview_h
+
+#endif  __btkVTKContextActor_h

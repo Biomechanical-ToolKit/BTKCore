@@ -50,7 +50,7 @@ namespace btk
     BTK_VTK_EXPORT static VTKAxis* New();
     vtkExportedTypeRevisionMacro(VTKAxis, vtkAxis, BTK_VTK_EXPORT);
     
-    virtual ~VTKAxis() {};
+    virtual ~VTKAxis();
     
     bool GetTitleVisible() const {return this->m_TitleVisible;};
     BTK_VTK_EXPORT void SetTitleVisible(bool visible);
@@ -61,36 +61,53 @@ namespace btk
     int GetTickDirection() const {return this->m_TickDirection;};
     BTK_VTK_EXPORT void SetTickDirection(int dir);
     
-    float GetMinimumTickSpacing() const {return this->m_MinimumTickSpacing;};
-    BTK_VTK_EXPORT void SetMinimumTickSpacing(float min);
+    // float GetMinimumTickSpacing() const {return this->m_MinimumTickSpacing;};
+    // BTK_VTK_EXPORT void SetMinimumTickSpacing(float min);
     
-    float GetTitleMargin() const {return this->m_TitleMargin;};
-    BTK_VTK_EXPORT void SetTitleMargin(float margin);
+    // float GetTitleMargin() const {return this->m_TitleMargin;};
+    // BTK_VTK_EXPORT void SetTitleMargin(float margin);
     
     float GetLabelMargin() const {return this->m_LabelMargin;}
     BTK_VTK_EXPORT void SetLabelMargin(float margin);
     
-    virtual bool Paint(vtkContext2D *painter);
-    virtual void RecalculateTickSpacing();
+    BTK_VTK_EXPORT virtual void AutoScale();
+    BTK_VTK_EXPORT virtual void RecalculateTickSpacing();
+    BTK_VTK_EXPORT virtual void Update();
+    BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
     
     double GetTickScale() const {return this->m_TickScale;};
     BTK_VTK_EXPORT void SetTickScale(double scale);
     double GetTickOffset() const {return this->m_TickOffset;};
     BTK_VTK_EXPORT void SetTickOffset(double offset);
     
+    bool GetDisplayMinimumLimit() const {return this->m_DisplayMinimumLimit;};
+    BTK_VTK_EXPORT void SetDisplayMinimumLimit(bool displayed);
+  
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
+    virtual void SetMinimumLimit(double lowest);
+    virtual void SetMaximumLimit(double highest);
+
+    enum {TICK_SIMPLE = 0};
+    vtkSetMacro(TickLabelAlgorithm, int)
+    vtkGetMacro(TickLabelAlgorithm, int)
+  protected:
+    int TickLabelAlgorithm;
+    int Margins[2]; // Horizontal/vertical margins for the axis
+#endif
   protected:
     BTK_VTK_EXPORT VTKAxis();
-    BTK_VTK_EXPORT void GenerateTickLabels(double min, double max);
-    BTK_VTK_EXPORT double CalculateNiceMinMax(double& min, double& max);
+    BTK_VTK_EXPORT void GenerateTickLabels2(double min, double max);
+    BTK_VTK_EXPORT void GenerateTickLabels2();
     
     bool m_TitleVisible;
     float m_TickLength;
     int m_TickDirection;
-    float m_MinimumTickSpacing;
-    float m_TitleMargin;
+    // float m_MinimumTickSpacing;
+    // float m_TitleMargin;
     float m_LabelMargin;
     double m_TickScale;
     double m_TickOffset;
+    bool m_DisplayMinimumLimit;
     
   private:
     VTKAxis(const VTKAxis& ); // Not implemented.

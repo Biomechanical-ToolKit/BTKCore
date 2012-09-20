@@ -39,7 +39,6 @@
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkObjectFactory.h>
-#include <vtkAppendPolyData.h>
 #include <vtkPlaneSource.h>
 
 namespace btk

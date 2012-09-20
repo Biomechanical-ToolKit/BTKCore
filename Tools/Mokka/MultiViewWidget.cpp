@@ -38,6 +38,7 @@
 #include "CompositeView.h"
 #include "ChartWidget.h"
 #include "ChartDialog.h"
+#include "ChartExportDialog.h"
 #include "LoggerVTKOutput.h"
 #include "Viz3DWidget.h"
 #include "VideoWidget.h"
@@ -60,7 +61,6 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkActor.h>
-#include <vtkRenderWindow.h>
 #include <vtkCompositeDataPipeline.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
@@ -1566,6 +1566,16 @@ void MultiViewWidget::setDefaultPlotLineWidth(double width)
   }
 };
 
+void MultiViewWidget::exportChartToImage(btk::VTKChartTimeSeries* chart)
+{
+  emit pausePlaybackRequested(true);
+  if (this->mp_ChartExporter == 0)
+    this->mp_ChartExporter = new ChartExportDialog(this);
+  this->mp_ChartExporter->setChart(chart);
+  this->mp_ChartExporter->exec();
+  emit pausePlaybackRequested(false);
+};
+
 void MultiViewWidget::dragEnterEvent(QDragEnterEvent *event)
 {
   if (event->mimeData()->hasFormat("text/uri-list"))
@@ -1602,6 +1612,7 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   ChartWidget* chart2D = static_cast<ChartWidget*>(sv->view(CompositeView::Chart));
   chart2D->addActions(this->m_ViewChartActions);
   connect(chart2D, SIGNAL(pausePlaybackRequested(bool)), this, SIGNAL(pausePlaybackRequested(bool)));
+  connect(chart2D, SIGNAL(exportToImageRequested(btk::VTKChartTimeSeries*)), this, SLOT(exportChartToImage(btk::VTKChartTimeSeries*)));
   // Event filter
   if (this->mp_EventFilterObject)
   {

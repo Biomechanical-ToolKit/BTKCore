@@ -40,23 +40,21 @@
 
 #include <btkVTKChartTimeSeries.h>
 #include <btkVTKChartLegend.h>
+#include <btkVTKContextActor.h>
 
-#include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkAxis.h>
 #include <vtkPlot.h>
 #include <vtkPlotLine.h>
-#include <vtkContextActor.h>
 #include <vtkContextScene.h>
+#include <vtkContextInteractorStyle.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkTextProperty.h>
 
 ChartImagePreview::ChartImagePreview(QWidget* parent)
-: QVTKWidget(parent)
+: VizRendererWidget(parent, 0)
 {
   // Member
-  this->mp_Renderer = vtkRenderer::New();
-  this->mp_Renderer->SetBackground(1.0,1.0,1.0);
   this->mp_Chart = 0;
   
   // No need to send mouse events to VTK when a mouse button isn't down
@@ -66,32 +64,31 @@ ChartImagePreview::ChartImagePreview(QWidget* parent)
 ChartImagePreview::~ChartImagePreview()
 {
   this->mp_Chart->Delete();
-  this->mp_Renderer->Delete();
 };
 
 void ChartImagePreview::initialize()
 {
-  vtkRenderWindow* renwin = vtkRenderWindow::New();
-  renwin->AddRenderer(this->mp_Renderer);
-  this->SetRenderWindow(renwin);
-  renwin->Delete();
-  
   this->mp_Chart = btk::VTKChartTimeSeries::New();
   this->mp_Chart->SetInteractionEnabled(false);
   vtkChartLegend* legend = btk::VTKChartLegend::New();
   this->mp_Chart->SetLegend(legend);
   this->mp_Chart->SetShowLegend(true);
-  
-  vtkContextScene* scene = vtkContextScene::New();
-  vtkContextActor* actor = vtkContextActor::New();
-  scene->AddItem(this->mp_Chart);
-  actor->SetScene(scene);
-  this->mp_Renderer->AddActor(actor);
-  scene->SetRenderer(this->mp_Renderer);
-  
   legend->Delete();
+  
+  // Set up the view
+  vtkRenderer* ren = vtkRenderer::New();
+  ren->SetBackground(1.0,1.0,1.0);
+  vtkRenderWindow* renwin = this->GetRenderWindow();
+  renwin->AddRenderer(ren);
+  btk::VTKContextActor* actor = btk::VTKContextActor::New();
+  actor->GetScene()->AddItem(this->mp_Chart);
+  ren->AddActor(actor);
+  vtkContextInteractorStyle* style = vtkContextInteractorStyle::New();
+  style->SetScene(actor->GetScene());
+  renwin->GetInteractor()->SetInteractorStyle(style);
+  ren->Delete();
   actor->Delete();
-  scene->Delete();
+  style->Delete();
 };
 
 void ChartImagePreview::setChart(vtkstd::vector<vtkStdString>& units, btk::VTKChartTimeSeries* chart)
@@ -111,6 +108,7 @@ void ChartImagePreview::setChart(vtkstd::vector<vtkStdString>& units, btk::VTKCh
     this->mp_Chart->AddPlot(targetLine);
     vtkStdString title = chart->GetPlot(i)->GetLabel();
     units[i] = title.substr(title.find(" ("));
+    targetLine->Delete();
   }
   
   vtkAxis* sourceAxisX = chart->GetAxis(vtkAxis::BOTTOM);
@@ -127,17 +125,14 @@ void ChartImagePreview::setChart(vtkstd::vector<vtkStdString>& units, btk::VTKCh
 void ChartImagePreview::keyPressEvent(QKeyEvent* event)
 {
   event->accept(); // Keyboard events are not sent to VTK
-  // this->QVTKWidget::keyPressEvent(event);
 };
 
 void ChartImagePreview::keyReleaseEvent(QKeyEvent* event)
 {
   event->accept(); // Keyboard events are not sent to VTK
-  // this->QVTKWidget::keyReleaseEvent(event);
 };
 
 void ChartImagePreview::mousePressEvent(QMouseEvent* event)
 {
   event->accept(); // Keyboard events are not sent to VTK
-  // this->QVTKWidget::mousePressEvent(event);
 };

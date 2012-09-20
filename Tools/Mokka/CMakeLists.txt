@@ -60,6 +60,7 @@ SET(Mokka_CPP
   UpdateManager_version.cpp
   Viz3DWidget.cpp
   VideoWidget.cpp
+  VizRendererWidget.cpp
   main.cpp
   ${BTK_MINIZIP_SRCS}
   )

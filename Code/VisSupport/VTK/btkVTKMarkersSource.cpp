@@ -36,6 +36,7 @@
 #include "btkVTKMarkersSource.h"
 
 #include <vtkObjectFactory.h>
+#include <vtkSphereSource.h>
 
 namespace btk
 {
@@ -54,7 +55,7 @@ namespace btk
    * Creates a VTKMarkersSource object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKMarkersSource);
-  vtkCxxRevisionMacro(VTKMarkersSource, "$Revision: 0.1 $");
+  vtkCxxRevisionMacro(VTKMarkersSource, "$Revision: 0.2 $");
   
   /**
    * Print Superclass informations.
@@ -72,18 +73,17 @@ namespace btk
   {
     this->mp_ExistingMarkers = 0;
     this->mp_VisibleMarkers = 0;
-    this->mp_Source = vtkSphereSource::New();
-    this->mp_Source->SetRadius(1.0);
-    this->SetSourceConnection(this->mp_Source->GetOutputPort());
+    vtkSphereSource* source = vtkSphereSource::New();
+    source->SetRadius(1.0);
+    this->SetSourceConnection(source->GetOutputPort());
+    source->Delete();
   };
 
   /**
    * Destructor.
    */
   VTKMarkersSource::~VTKMarkersSource()
-  {
-    this->mp_Source->Delete();
-  };
+  {};
 
   /** 
    * Overloaded method to check visibility of each markers.

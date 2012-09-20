@@ -659,7 +659,6 @@ namespace btk
           this->mp_TrajectoryIds->operator[](i)->InsertNextCell(trajectoryPaths[i]);
           trajectoryPaths[i]->Delete();
         }
-        
       }
       // Update output informations
       vtkInformation* outInfo = outputVector->GetInformationObject(0);

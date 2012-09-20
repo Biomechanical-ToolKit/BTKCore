@@ -33,37 +33,62 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ChartImagePreview_h
-#define ChartImagePreview_h
+#ifndef __btkVTKChartLayout_h
+#define __btkVTKChartLayout_h
 
-#include "VizRendererWidget.h"
-
-#include <vtkStdString.h>
+#include "vtkAbstractContextItem.h"
+#include "vtkVector.h" // For ivars
 
 namespace btk
 {
   class VTKChartTimeSeries;
-};
 
-class ChartImagePreview : public VizRendererWidget
-{
-  Q_OBJECT
-  
-public:
-  ChartImagePreview(QWidget* parent = 0);
-  ~ChartImagePreview();
-  
-  void initialize();
-  btk::VTKChartTimeSeries* chart() const {return this->mp_Chart;};
-  void setChart(vtkstd::vector<vtkStdString>& units, btk::VTKChartTimeSeries* chart);
-  
-protected:
-  void keyPressEvent(QKeyEvent* event);
-  void keyReleaseEvent(QKeyEvent* event);
-  void mousePressEvent(QMouseEvent* event);
-  
-private:
-  btk::VTKChartTimeSeries* mp_Chart;
-};
+  class VTKChartLayout : public vtkAbstractContextItem
+  {
+  public:
+    vtkTypeMacro(VTKChartLayout, vtkAbstractContextItem);
+    
+    static VTKChartLayout* New();
 
-#endif // ChartImagePreview_h
+    virtual bool Paint(vtkContext2D *painter);
+    
+    virtual void SetSize(const vtkVector2i& size);
+    virtual vtkVector2i GetSize() const {return this->Size;}
+
+    virtual void SetGutter(const vtkVector2f& gutter);
+    virtual vtkVector2f GetGutter() const {return this->Gutter;}
+
+    virtual void SetBorders(int left, int bottom, int right, int top);
+    virtual void GetBorders(int borders[4]);
+
+    virtual bool SetChart(const vtkVector2i& position, VTKChartTimeSeries* chart);
+    virtual VTKChartTimeSeries* GetChart(const vtkVector2i& position);
+    virtual VTKChartTimeSeries* TakeChart(const vtkVector2i &position);
+    
+    virtual bool SetChartSpan(const vtkVector2i& position, const vtkVector2i& span);
+    virtual vtkVector2i GetChartSpan(const vtkVector2i& position);
+    
+    virtual void UpdateLayout();
+    
+    virtual void PrintSelf(ostream& os, vtkIndent indent);
+
+  protected:
+    VTKChartLayout();
+    ~VTKChartLayout();
+
+    // The number of charts in x and y.
+    vtkVector2i Size;
+    // The gutter between each chart.
+    vtkVector2f Gutter;
+    int Borders[4];
+    bool LayoutIsDirty;
+
+  private:
+    class PIMPL;
+    PIMPL *Private;
+    
+    VTKChartLayout(const VTKChartLayout &); // Not implemented.
+    void operator=(const VTKChartLayout &); // Not implemented.
+  };
+};
+#endif //__btkVTKChartLayout_h
