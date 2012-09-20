@@ -42,7 +42,6 @@
 
 namespace btk
 {
-  class VTKGRFsComponents;
   class VTKGRFsFramesSource : public vtkPolyDataAlgorithm
   {
   public:
@@ -60,6 +59,7 @@ namespace btk
     void ButterflyActivationOn() {this->SetButterflyActivation(true);};
     void ButterflyActivationOff() {this->SetButterflyActivation(false);};
     
+    BTK_VTK_EXPORT bool GetPathVisibility(int idx);
     BTK_VTK_EXPORT void SetPathVisibility(int idx, bool visible);
     BTK_VTK_EXPORT void ShowPath(int idx);
     BTK_VTK_EXPORT void ShowPaths();
@@ -77,6 +77,9 @@ namespace btk
     BTK_VTK_EXPORT virtual int FillInputPortInformation(int port, vtkInformation* info);
     
   private:
+    class VTKGRFsComponents;
+    class VTKGRFsPathPath;
+    
     VTKGRFsFramesSource(const VTKGRFsFramesSource& );  // Not implemented.
     VTKGRFsFramesSource& operator=(const VTKGRFsFramesSource& );  // Not implemented.
 

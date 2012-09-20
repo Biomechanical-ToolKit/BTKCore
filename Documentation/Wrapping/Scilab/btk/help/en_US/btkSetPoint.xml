@@ -15,12 +15,12 @@
   </refnamediv>
   <refsynopsisdiv>
     <title>Calling Sequence</title>
-    <synopsis>btkSetPoint(h, index, values, [residuals, [masks, [residual]]])
-btkSetPoint(h, label, values, [residuals, [masks, [residual]]])
-points = btkSetPoint(h, index, values, [residuals, [masks, [residual]]])
-points = btkSetPoint(h, label, values, [residuals, [masks, [residual]]])
-[points, pointsInfo] = btkSetPoint(h, index, values, [residuals, [masks, [residual]]])
-[points, pointsInfo] = btkSetPoint(h, label, values, [residuals, [masks, [residual]]])</synopsis>
+    <synopsis>btkSetPoint(h, index, values, [residuals, [description]])
+btkSetPoint(h, label, values, [residuals, [description]])
+points = btkSetPoint(h, index, values, [residuals, [description]])
+points = btkSetPoint(h, label, values, [residuals, [description]])
+[points, pointsInfo] = btkSetPoint(h, index, values, [residuals, [description]])
+[points, pointsInfo] = btkSetPoint(h, label, values, [residuals, [description]])</synopsis>
   </refsynopsisdiv>
   <refsection>
     <title>Parameters</title>
@@ -46,8 +46,8 @@ points = btkSetPoint(h, label, values, [residuals, [masks, [residual]]])
         <listitem><para>Residuals of the 3D reconstruction of markers containing in a matrix <literal>(n,1)</literal>. Note: This parameter is an informational parameter and seems not used in some commercial softwares.</para></listitem>
       </varlistentry>
       <varlistentry>
-        <term>mask</term>
-        <listitem><para>Masks of the camera used to reconstruct markers' positions. <literal>mask</literal> is a matrix <literal>(n,1)</literal> of integer corresponding to a conversion of a binary number. For example, the value 14 correspond to the mask 0b0001110 meaning that cameras #2, #3 and #4 was used to reconstruct the point. Note: This parameter is an informational parameter and seems not used in some commercial softwares.</para></listitem>
+        <term>description</term>
+        <listitem><para>A string containing the description of the point.</para></listitem>
       </varlistentry>
     </variablelist>
   </refsection>

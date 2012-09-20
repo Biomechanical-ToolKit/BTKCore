@@ -136,7 +136,6 @@ namespace btk
       {
         // Invalid coordinates
         (*it)->GetResiduals().coeffRef(inc) = -1.0;
-        (*it)->GetMasks().coeffRef(inc) = -1.0;
       }
       else
       {

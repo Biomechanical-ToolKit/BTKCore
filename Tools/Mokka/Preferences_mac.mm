@@ -91,7 +91,8 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->defaultPlaneOrientationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultOrientation(int)));
   connect(this->defaultTimeBarEventDisplayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultTimeBarEventDisplay(int)));
   connect(this->defaultBackgroundColorButton, SIGNAL(clicked()), this, SLOT(setDefaultBackgroundColor()));
-  connect(this->defaultGridColorButton, SIGNAL(clicked()), this, SLOT(setDefaultGridColor()));
+  connect(this->defaultGridFrontColorButton, SIGNAL(clicked()), this, SLOT(setDefaultGridFrontColor()));
+  connect(this->defaultGridBackColorButton, SIGNAL(clicked()), this, SLOT(setDefaultGridBackColor()));
   connect(this->defaultSegmentColorButton, SIGNAL(clicked()), this, SLOT(setDefaultSegmentColor()));
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultMarkerRadiusSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setDefaultMarkerRadius(double)));
@@ -105,6 +106,7 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->defaultChartEventDisplayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(showChartEvent(int)));
   connect(this->defaultChartUnitAxisXComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setChartUnitAxisX(int)));
   connect(this->automaticCheckUpdateCheckBox, SIGNAL(toggled(bool)), this, SLOT(setAutomaticCheckUpdate(bool)));
+  connect(this->subscribeDevelopmentChannelCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSubscribeDevelopmentChannel(bool)));
   connect(this->layoutTable, SIGNAL(userLayoutRemoved(int)), this, SIGNAL(userLayoutRemoved(int)));
   connect(this->layoutTable, SIGNAL(userLayoutLabelChanged(int, QString)), this, SIGNAL(userLayoutLabelChanged(int, QString)));
   connect(this->layoutTable, SIGNAL(userLayoutDropped(int, int)), this, SIGNAL(userLayoutDropped(int, int)));
@@ -217,13 +219,23 @@ void Preferences::setDefaultBackgroundColor()
   }
 };
 
-void Preferences::setDefaultGridColor()
+void Preferences::setDefaultGridFrontColor()
 {
-  QColor color = QColorDialog::getColor(this->defaultGridColorButton->property("backgroundColor").value<QColor>(), this);
+  QColor color = QColorDialog::getColor(this->defaultGridFrontColorButton->property("backgroundColor").value<QColor>(), this);
   if (color.isValid())
   {
-    colorizeButton(this->defaultGridColorButton, color);
-    emit defaultGridColorChanged(color);
+    colorizeButton(this->defaultGridFrontColorButton, color);
+    emit defaultGridFrontColorChanged(color);
+  }
+};
+
+void Preferences::setDefaultGridBackColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultGridBackColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+  {
+    colorizeButton(this->defaultGridBackColorButton, color);
+    emit defaultGridBackColorChanged(color);
   }
 };
 
@@ -315,6 +327,11 @@ void Preferences::setChartUnitAxisX(int index)
 void Preferences::setAutomaticCheckUpdate(bool isChecked)
 {
   emit automaticCheckUpdateStateChanged(isChecked);
+};
+
+void Preferences::setSubscribeDevelopmentChannel(bool isChecked)
+{
+  emit subscribeDevelopmentChannelStateChanged(isChecked);
 };
 
 void Preferences::setVisible(bool visible)

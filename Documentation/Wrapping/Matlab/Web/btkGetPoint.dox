@@ -1,13 +1,12 @@
 /**
  * @class btkGetPoint
  * @brief Extract one point from the given acquisition based on an index or a string.
- * @syntax{[values\, residuals\, masks] = btkGetPoint(h\, idx)\n [values\, residuals\, masks] = btkGetPoint(h\, label)}
+ * @syntax{[values\, residuals] = btkGetPoint(h\, idx)\n [values\, residuals] = btkGetPoint(h\, label)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param idx Integer containing the index of the point to extract.
  * @param label String containing the label of the point to extract.
  * @retval values Matrix of reals (n,3) with X,Y,Z components.
  * @retval residuals Vector of reals with the residuals.
- * @retval masks Cell of strings with the binary masks.
  * 
  * @sa btkSetPoint, btkGetAnalog
  * @ingroup BTKMatlabAcquisitionAccessor

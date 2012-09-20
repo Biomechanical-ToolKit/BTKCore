@@ -182,7 +182,7 @@ The method ProcessObject::GenerateData is the core of the filter as it is in thi
 void DummyFilter::GenerateData();
 {
   // Check input(s)
-  btk::Acquisition::Pointer out = this->GetOutput();
+  btk::Acquisition::Pointer in = this->GetInput();
   if (!in) // No valid input, pointer is null
     return
   // Reset output(s)

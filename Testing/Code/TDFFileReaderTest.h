@@ -40,6 +40,25 @@ CXXTEST_SUITE(TDFFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), 1686);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 1000.0);
     TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 18);
+    
+    TS_ASSERT_EQUALS(acq->GetAnalog(0)->GetUnit(), "m");
+    TS_ASSERT_EQUALS(acq->GetAnalog(1)->GetUnit(), "m");
+    TS_ASSERT_EQUALS(acq->GetAnalog(2)->GetUnit(), "N");
+    TS_ASSERT_EQUALS(acq->GetAnalog(3)->GetUnit(), "N");
+    TS_ASSERT_EQUALS(acq->GetAnalog(4)->GetUnit(), "N");
+    TS_ASSERT_EQUALS(acq->GetAnalog(5)->GetUnit(), "Nm");
+    TS_ASSERT_EQUALS(acq->GetAnalog(6)->GetUnit(), "m");
+    TS_ASSERT_EQUALS(acq->GetAnalog(7)->GetUnit(), "m");
+    TS_ASSERT_EQUALS(acq->GetAnalog(8)->GetUnit(), "N");
+    TS_ASSERT_EQUALS(acq->GetAnalog(9)->GetUnit(), "N");
+    TS_ASSERT_EQUALS(acq->GetAnalog(10)->GetUnit(), "N");
+    TS_ASSERT_EQUALS(acq->GetAnalog(11)->GetUnit(), "Nm");
+    TS_ASSERT_EQUALS(acq->GetAnalog(12)->GetUnit(), "V");
+    TS_ASSERT_EQUALS(acq->GetAnalog(13)->GetUnit(), "V");
+    TS_ASSERT_EQUALS(acq->GetAnalog(14)->GetUnit(), "V");
+    TS_ASSERT_EQUALS(acq->GetAnalog(15)->GetUnit(), "V");
+    TS_ASSERT_EQUALS(acq->GetAnalog(16)->GetUnit(), "V");
+    TS_ASSERT_EQUALS(acq->GetAnalog(17)->GetUnit(), "V");
   };
 };
 

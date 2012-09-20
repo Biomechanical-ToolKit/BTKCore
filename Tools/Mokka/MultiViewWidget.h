@@ -96,7 +96,8 @@ public:
   
   void setDefaultGroundOrientation(int index);
   void setDefaultBackgroundColor(const QColor& color);
-  void setDefaultGridColor(const QColor& color);
+  void setDefaultGridFrontColor(const QColor& color);
+  void setDefaultGridBackColor(const QColor& color);
   void setDefaultSegmentColor(const QColor& color);
   void setDefaultMarkerColor(const QColor& color);
   void setDefaultMarkerRadius(double r);
@@ -188,6 +189,7 @@ private slots:
   void changeGroundOrientation();
   void changeMarkerTrajectoryLength();
   void changeForceButterflyActivation();
+  void updateAnalogValuesModification(const QVector<int>& ids);
   
 private:
   void displayChartBottomAxisAsFrame();

@@ -71,10 +71,10 @@
 namespace btk
 {
   /**
-   * @class VTKPlots btkVTKChartTimeSeries.h
+   * @class VTKChartTimeSeries::VTKPlots btkVTKChartTimeSeries.h
    * @brief List of pointer to vtkPlot objects.
    */
-  class VTKPlots: public vtkstd::list<vtkPlot*>
+  class VTKChartTimeSeries::VTKPlots: public vtkstd::list<vtkPlot*>
   {};
   
   /**

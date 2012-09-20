@@ -276,6 +276,19 @@ void ChartWidget::show(bool s)
   }
 };
 
+void ChartWidget::refreshPlots()
+{
+  for (int i = 0 ; i < this->m_ChartData.size() ; ++i)
+  {
+    for (int j = 0 ; j < static_cast<int>(this->m_ChartData[i]->chartNumber()) ; ++j)
+    {
+      btk::VTKChartTimeSeries* chart = static_cast<btk::VTKChartTimeSeries*>(this->m_ChartData[i]->chart(j));
+      for (int k = 0 ; k < chart->GetNumberOfPlots() ; ++k)
+        chart->GetPlot(k)->Modified();
+    }
+  }
+};
+
 void ChartWidget::updateAxisX()
 {
   for (int i = 0 ; i < this->m_ChartData.size() ; ++i)

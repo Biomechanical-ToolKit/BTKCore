@@ -104,7 +104,7 @@ namespace btk
    */
   
   /**
-   * Checks if the first word in the file corresponds to "PathFileType".
+   * Checks if the first line contains 7 numbers.
    */
   bool AMTIForcePlatformFileIO::CanReadFile(const std::string& filename)
   {
@@ -328,7 +328,8 @@ namespace btk
    * Constructor.
    */
   AMTIForcePlatformFileIO::AMTIForcePlatformFileIO()
-  : AcquisitionFileIO(), m_Dimensions(3), m_Corners(12), m_Origin(3)
+  : AcquisitionFileIO(AcquisitionFileIO::ASCII),
+    m_Dimensions(3), m_Corners(12), m_Origin(3)
   {
     // Members
     this->m_UseDimensions = true;
@@ -339,8 +340,6 @@ namespace btk
     this->m_Dimensions[2] = 82.6f;  // height
     // - Geometry
     this->computeGeometryFromDimensions(this->m_Dimensions, this->m_Corners, this->m_Origin);
-    
-    this->SetFileType(AcquisitionFileIO::ASCII);
   };
   
   inline void AMTIForcePlatformFileIO::ExtractLineData(std::ifstream* pifs, double* d)

@@ -56,8 +56,8 @@ namespace btk
   
   class AMTIForcePlatformFileIO : public AcquisitionFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("ASC","AMTI forceplate"))
-    BTK_IO_FILE_ONLY_READ_OPERATION
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("ASC","AMTI forceplate"));
+    BTK_IO_FILE_ONLY_READ_OPERATION;
     
   public:
     typedef SharedPtr<AMTIForcePlatformFileIO> Pointer;
@@ -71,11 +71,11 @@ namespace btk
     BTK_IO_EXPORT virtual void Read(const std::string& filename, Acquisition::Pointer output);
     
     const std::vector<float>& GetDimensions() const {return this->m_Dimensions;};
-    void SetDimensions(float width, float length, float height);
+    BTK_IO_EXPORT void SetDimensions(float width, float length, float height);
     
     const std::vector<float>& GetCorners() const {return this->m_Corners;};
     const std::vector<float>& GetOrigin() const {return this->m_Origin;};
-    void SetGeometry(const std::vector<float>& corners, const std::vector<float>& origin);
+    BTK_IO_EXPORT void SetGeometry(const std::vector<float>& corners, const std::vector<float>& origin);
     
   protected:
     BTK_IO_EXPORT AMTIForcePlatformFileIO();

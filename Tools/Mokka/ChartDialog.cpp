@@ -85,7 +85,7 @@ bool ChartDialog::computeDistance(int id1, int id2)
   for (int i = 0  ; i < acq->pointFrameNumber() ; ++i)
   {
     if ((pt1->GetResiduals().coeff(i) < 0.0) || (pt2->GetResiduals().coeff(i) < 0.0))
-      diff->SetFrame(i, 0.0, 0.0, 0.0, -1.0, -1.0);
+      diff->SetFrame(i, 0.0, 0.0, 0.0, -1.0);
     else
     {
       diff->SetFrame(i, pt2->GetValues().coeff(i,0) - pt1->GetValues().coeff(i,0),
@@ -145,7 +145,7 @@ bool ChartDialog::computeAngleFromMarkers(int id1, int id2, int id3)
   for (int i = 0  ; i < acq->pointFrameNumber() ; ++i)
   {
     if ((pt1->GetResiduals().coeff(i) < 0.0) || (pt2->GetResiduals().coeff(i) < 0.0) || (pt3->GetResiduals().coeff(i) < 0.0))
-      ang->SetFrame(i, 0.0, 0.0, 0.0, -1.0, -1.0);
+      ang->SetFrame(i, 0.0, 0.0, 0.0, -1.0);
     else
     {
       Eigen::Matrix<double,3,1> a, b;
@@ -215,7 +215,7 @@ bool ChartDialog::computeAngleFromVectors(const QList<int>& ids)
   {
     if ((pt1->GetResiduals().coeff(i) < 0.0) || (pt2->GetResiduals().coeff(i) < 0.0)
         || (pt3->GetResiduals().coeff(i) < 0.0) || (pt4->GetResiduals().coeff(i) < 0.0))
-      ang->SetFrame(i, 0.0, 0.0, 0.0, -1.0, -1.0);
+      ang->SetFrame(i, 0.0, 0.0, 0.0, -1.0);
     else
     {
       Eigen::Matrix<double,3,1> a, b;

@@ -47,9 +47,6 @@
 
 namespace btk
 {
-  class VTKMarkersCoordinates;
-  class VTKMarkersIds;
-  class VTKTrajectoryIds;
   class VTKMarkersFramesSource : public vtkPolyDataAlgorithm
   {
   public:
@@ -104,6 +101,11 @@ namespace btk
     BTK_VTK_EXPORT virtual int FillInputPortInformation(int port, vtkInformation* info);
     
   private:
+    class VTKMarkersCoordinates;
+    class VTKMarkersIds;
+    class VTKTrajectoryIds;
+    class VTKTrajectoryPath;
+    
     VTKMarkersFramesSource(const VTKMarkersFramesSource& );  // Not implemented.
     VTKMarkersFramesSource& operator=(const VTKMarkersFramesSource& );  // Not implemented.
 

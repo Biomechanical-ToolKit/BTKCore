@@ -399,10 +399,8 @@ namespace btk
    * Constructor.
    */
   XLSOrthoTrakFileIO::XLSOrthoTrakFileIO()
-  : AcquisitionFileIO()
-  {
-    this->SetFileType(AcquisitionFileIO::ASCII);
-  };
+  : AcquisitionFileIO(AcquisitionFileIO::ASCII)
+  {};
   
   void XLSOrthoTrakFileIO::AppendEvent(Acquisition::Pointer output, std::istringstream* iss, const std::string& label, const std::string& context, int id)
   {

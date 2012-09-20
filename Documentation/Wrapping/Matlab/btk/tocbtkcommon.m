@@ -23,6 +23,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkClearMetadata">btkClearMetadata</a>                  - Clear metadata in the acquisition
 %   <a href="matlab:help btkCloneAcquisition">btkCloneAcquisition</a>               - Clone an acquisition
 %   <a href="matlab:help btkClearAnalysis">btkClearAnalysis</a>                  - Clear the metadata ANALYSIS
+%   <a href="matlab:help btkCutAcquisition">btkCutAcquisition</a>                 - Cut the acquistion and adapt the events' frame/time.
 %   <a href="matlab:help btkDeleteAcquisition">btkDeleteAcquisition</a>              - Delete an acquisition and free the used memory
 %   <a href="matlab:help btkNewAcquisition">btkNewAcquisition</a>                 - Create an empty acquisition
 %   <a href="matlab:help btkRemoveAnalysisParameter">btkRemoveAnalysisParameter</a>        - Erase a paremeter from the analysis
@@ -40,7 +41,6 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetPointNumber">btkSetPointNumber</a>                 - Point's number modifier
 %
 % Point accessor
-%   <a href="matlab:help btkConvertBinaryMasks2Decimals">btkConvertBinaryMasks2Decimals</a>    - Convert binary values into decimals
 %   <a href="matlab:help btkGetPoint">btkGetPoint</a>                       - Point extraction
 %   <a href="matlab:help btkGetAngles">btkGetAngles</a>                      - Angles extraction
 %   <a href="matlab:help btkGetAnglesValues">btkGetAnglesValues</a>                - Extracts angles as a simple matrix 
@@ -60,10 +60,9 @@ function tocbtkcommon
 %   <a href="matlab:help btkAppendPoint">btkAppendPoint</a>                    - Append a point into an acquisition
 %   <a href="matlab:help btkClearPoints">btkClearPoints</a>                    - Remove all points from an acquisition
 %   <a href="matlab:help btkRemovePoint">btkRemovePoint</a>                    - Delete a point from an acquisition
-%   <a href="matlab:help btkSetPoint">btkSetPoint</a>                       - Point's data modifier (values, residuals, masks)
+%   <a href="matlab:help btkSetPoint">btkSetPoint</a>                       - Point's data modifier (values, residuals)
 %   <a href="matlab:help btkSetPointDescription">btkSetPointDescription</a>            - Point's description modifier
 %   <a href="matlab:help btkSetPointLabel">btkSetPointLabel</a>                  - Point's label modifier
-%   <a href="matlab:help btkSetPointMasks">btkSetPointMasks</a>                  - Point's masks modifier
 %   <a href="matlab:help btkSetPointResiduals">btkSetPointResiduals</a>              - Point's residuals modifier
 %   <a href="matlab:help btkSetPointType">btkSetPointType</a>                   - Point's type modifier
 %   <a href="matlab:help btkSetPointUnit">btkSetPointUnit</a>                   - Set unit for a type of point
@@ -93,6 +92,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetAnalogScale">btkSetAnalogScale</a>                 - Set analog's scale factor
 %   <a href="matlab:help btkSetAnalogsResolution">btkSetAnalogsResolution</a>           - Set ADC resolution (8, 12, 14 or 16 bits)
 %   <a href="matlab:help btkSetAnalogSampleNumberPerFrame">btkSetAnalogSampleNumberPerFrame</a>  - Set analog sample per 3D frame
+%   <a href="matlab:help btkSetAnalogUnit">btkSetAnalogUnit</a>                  - Set analog's unit
 %   <a href="matlab:help btkSetAnalogsValues">btkSetAnalogValues</a>                - Set analog's values from a vector
 %   <a href="matlab:help btkSetAnalogsValues">btkSetAnalogsValues</a>               - Set analogs' values from a matrix 
 %

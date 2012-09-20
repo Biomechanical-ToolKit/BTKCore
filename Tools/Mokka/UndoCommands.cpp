@@ -105,8 +105,20 @@ void ReframeAcquisition::action()
 CreateAveragedMarker::CreateAveragedMarker(Acquisition* acq, const QList<int>& markers, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent)
 {
+  this->m_Id = -1;
   this->mp_Acquisition = acq;
-  this->m_Id = this->mp_Acquisition->createAveragedMarker(markers);
+  int btkidx = this->mp_Acquisition->createAveragedMarker(markers);
+  for (QMap<int,Point*>::const_iterator it = acq->points().begin() ; it != acq->points().end() ; ++it)
+  {
+    if ((*it)->btkidx == btkidx)
+    {
+      this->m_Id = it.key();
+      break;
+    }
+  }
+  if (this->m_Id == -1)
+    qDebug("Impossible to retrieve the created markers: ID not found.");
+  
   this->mp_Marker = 0;
 };
 
@@ -334,6 +346,22 @@ void EditAnalogsScale::action()
   this->m_Scales = temp;
 };
 
+// --------------- ShiftAnalogsValues ---------------
+ShiftAnalogsValues::ShiftAnalogsValues(Acquisition* acq, const QVector<int>& ids, const QVector<double>& offsets, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent), m_Ids(ids), m_Offsets(offsets)
+{
+  this->mp_Acquisition = acq;
+};
+
+void ShiftAnalogsValues::action()
+{
+  QVector<double> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = -1.0 * this->m_Offsets[i];
+  this->mp_Acquisition->shiftAnalogsValues(this->m_Ids, this->m_Offsets);
+  this->m_Offsets = temp;
+};
+
 // --------------- EditMarkersVisibility ---------------
 EditMarkersVisibility::EditMarkersVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent)
 : ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
@@ -460,8 +488,8 @@ void RemoveEvents::redo()
   this->m_Events = this->mp_Acquisition->takeEvents(this->m_Ids);
 };
 
-// --------------- InsertEvent  ---------------
-InsertEvent::InsertEvent(Acquisition* acq, Event* e, QUndoCommand* parent)
+// --------------- InsertEvents  ---------------
+InsertEvents::InsertEvents(Acquisition* acq, Event* e, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Ids(), m_Events()
 {
   this->mp_Acquisition = acq;
@@ -469,18 +497,24 @@ InsertEvent::InsertEvent(Acquisition* acq, Event* e, QUndoCommand* parent)
   this->m_Events.push_back(e);
 };
 
-InsertEvent::~InsertEvent()
+InsertEvents::InsertEvents(Acquisition* acq, const QList<int>& ids, const QList<Event*>& events, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent), m_Ids(ids), m_Events(events)
+{
+  this->mp_Acquisition = acq;
+};
+
+InsertEvents::~InsertEvents()
 {
   for (int i = 0 ; i < this->m_Events.count() ; ++i)
     delete this->m_Events[i];
 };
 
-void InsertEvent::undo()
+void InsertEvents::undo()
 {
   this->m_Events = this->mp_Acquisition->takeEvents(this->m_Ids);
 };
 
-void InsertEvent::redo()
+void InsertEvents::redo()
 {
   this->mp_Acquisition->insertEvents(this->m_Ids, this->m_Events);
   this->m_Events.clear();

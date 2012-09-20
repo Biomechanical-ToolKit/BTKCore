@@ -49,17 +49,17 @@
 namespace btk
 {
   /**
-   * @class VTKGRFsComponents btkVTKGRFsFramesSource.h
+   * @class VTKGRFsFramesSource::VTKGRFsComponents btkVTKGRFsFramesSource.h
    * @brief Store ground reaction forces vector as vector of vtkPolyData
    */
-  class VTKGRFsComponents : public vtkstd::vector<vtkCellArray*>
+  class VTKGRFsFramesSource::VTKGRFsComponents : public vtkstd::vector<vtkCellArray*>
   {};
   
   /**
-   * @class VTKGRFsPathPath btkVTKGRFsFramesSource.h
+   * @class VTKGRFsFramesSource::VTKGRFsPathPath btkVTKGRFsFramesSource.h
    * @brief List of ids representing ground reaction forces' path.
    */
-  class VTKGRFsPathPath : public vtkstd::vector<vtkIdList*>
+  class VTKGRFsFramesSource::VTKGRFsPathPath : public vtkstd::vector<vtkIdList*>
   {};
   
   /** 
@@ -151,9 +151,17 @@ namespace btk
    *
    * Usefull when visualized acquistion date are set in meter, millimeter, inch, etc.
    */
+  
+  /**
+   * Returns visibility state of GRF position's trajectory
+   */
+  bool VTKGRFsFramesSource::GetPathVisibility(int idx)
+  {
+    return (this->mp_GRFsPathActivated->GetValue(idx) == 1);
+  };
    
   /**
-   * Sets visibility of GRF position's trajectory
+   * Sets visibility state of GRF position's trajectory
    */
   void VTKGRFsFramesSource::SetPathVisibility(int idx, bool visible)
   {

@@ -224,10 +224,6 @@ namespace btk
    * Constructor.
    */
   EMxFileIO::EMxFileIO()
-  : AcquisitionFileIO()
-  {
-    this->SetFileType(AcquisitionFileIO::Binary);
-    this->SetByteOrder(AcquisitionFileIO::IEEE_LittleEndian);
-    this->SetStorageFormat(AcquisitionFileIO::Integer);
-  };
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Integer)
+  {};
 };

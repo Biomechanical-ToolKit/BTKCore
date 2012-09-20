@@ -253,10 +253,6 @@ namespace btk
    * Constructor.
    */
   ANGFileIO::ANGFileIO()
-  : AcquisitionFileIO()
-  {
-    this->SetFileType(AcquisitionFileIO::Binary);
-    this->SetByteOrder(AcquisitionFileIO::IEEE_LittleEndian);
-    this->SetStorageFormat(AcquisitionFileIO::Float);
-  };
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Float)
+  {};
 };

@@ -97,7 +97,12 @@ namespace btk
    
   /**
    * @typedef VTKSegmentsFramesSource::Link
-   * Simple pair of index respresenting the id of two markers used to create the link.
+   * Simple pair of indices respresenting the id of two markers used to create the link.
+   */
+  
+  /**
+   * @typedef VTKSegmentsFramesSource::Face
+   * Simple triad of indices respresenting the id of three markers used to create the face.
    */
   
   /**
@@ -215,6 +220,11 @@ namespace btk
     std::advance(it, id);
     it->mesh = mesh;
   };
+  
+  /**
+   * @fn int VTKSegmentsFramesSource::GetNumberOfDefinitions() const
+   * Returns the number of definition set for this source.
+   */
   
   /**
    * Returns the mesh defining the segment corresponding to the index @a id.

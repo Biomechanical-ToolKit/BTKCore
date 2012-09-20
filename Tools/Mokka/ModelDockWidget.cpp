@@ -48,6 +48,8 @@
 static const QBrush defaultLabelColor = QBrush(QColor(Qt::gray));
 static const QBrush displayLabelColor = QBrush(QColor(Qt::black));
 
+const int ncfp = 4; // Number of components per forceplate
+
 ModelDockWidget::ModelDockWidget(QWidget* parent)
 : QDockWidget(parent), m_ConfigurationItems(), m_DisplayedIds(), m_RecentColors(5)
 {
@@ -472,7 +474,6 @@ void ModelDockWidget::load()
   // - Force platforms
   QTreeWidgetItem* forcePlatesRoot = this->modelTree->topLevelItem(ForcePlatesItem);
   int numFP = this->mp_Acquisition->btkForcePlatforms()->GetItemNumber();
-  const int ncfp = 4; // Number of components per forceplate
   for (int i = 0 ; i < numFP ; ++i)
   {
     QTreeWidgetItem* forcePlateItem = new QTreeWidgetItem(QStringList("Force platform #" + QString::number(i+1)), ForcePlateType);
@@ -732,7 +733,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   QFile file(filename);
   if (!file.open(QFile::ReadOnly | QFile::Text))
   {
-    LOG_CRITICAL("Error when reading the file: " + filename + ": " + file.errorString());
+    LOG_ERROR("Error when reading the file: " + filename + ": " + file.errorString());
     messageBox.setText(messageBox.text());
     messageBox.setInformativeText("<nobr>" + filename + ": " + file.errorString() + "</nobr>\n\nThis configuration is removed from the list");
     messageBox.exec();
@@ -955,7 +956,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   if (xmlReader.hasError())
   {
     QString errMsg = "Failed to parse file: " + filename + "\n" + xmlReader.errorString();
-    LOG_CRITICAL(errMsg);
+    LOG_ERROR(errMsg);
     messageBox.setText(errMsg);
     messageBox.exec();
     return;
@@ -963,7 +964,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
   else if (file.error() != QFile::NoError)
   {
     QString errMsg = "Cannot read file: " + filename + "\n" + file.errorString();
-    LOG_CRITICAL(errMsg);
+    LOG_ERROR(errMsg);
     messageBox.setText(errMsg);
     messageBox.exec();
     return;
@@ -1973,7 +1974,7 @@ void ModelDockWidget::sendTrackedGRFPaths()
   {
     QTreeWidgetItem* item = forcePlatesRoot->child(i)->child(2); // Position
     if (item->checkState(TrajectoryHeader) == Qt::Checked)
-      ids << (item->data(0,ForcePlateId).toInt() - 65535) / 3; // 65535: because force platform ID starts from 65535 ; 3: because each component of the wrench has also a unique ID.
+      ids << (item->data(0,ForcePlateId).toInt() - 65535) / ncfp; // 65535: because force platform ID starts from 65535 ; 4: because each component of the wrench has also a unique ID.
   }
   emit wrenchPositionSelectionChanged(ids);
 };
@@ -2849,7 +2850,7 @@ bool ModelDockWidget::saveConfiguration(int idx)
   QFile file(filename);
   if (!file.open(QFile::WriteOnly | QFile::Text))
   {
-    LOG_CRITICAL("Error when writing the file: " + filename + ":" + file.errorString());
+    LOG_ERROR("Error when writing the file: " + filename + ":" + file.errorString());
     messageBox.setText(messageBox.text() + filename);
     messageBox.setInformativeText(file.errorString());
     messageBox.exec();

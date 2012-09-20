@@ -67,7 +67,6 @@ namespace btk
    * @brief Interface to read/write EMF files.
    *
    * The EMF file format is used in the software FusionCore from Ascension Technology Corporation.
-   * The exported acquisition contain force platform data expressed in the platform axes.
    *
    * @ingroup BTKIO
    */
@@ -212,15 +211,13 @@ namespace btk
             (*it)->GetValues().coeffRef(i, 1) = 0.0;
             (*it)->GetValues().coeffRef(i, 2) = 0.0;
             (*it)->GetResiduals().coeffRef(i) = -1.0;
-            (*it)->GetMasks().coeffRef(i) = -1.0;
           }
           else
           {
             (*it)->GetValues().coeffRef(i, 0) = x;
             (*it)->GetValues().coeffRef(i, 1) = y;
             (*it)->GetValues().coeffRef(i, 2) = z;
-            (*it)->GetResiduals().coeffRef(i) = 0.0;
-            (*it)->GetMasks().coeffRef(i) = 0.0;
+            // (*it)->GetResiduals().coeffRef(i) = 0.0; // Set to 0 by default
           }
         }
         std::getline(ifs, line); // CR
@@ -264,8 +261,6 @@ namespace btk
    * Constructor.
    */
   EMFFileIO::EMFFileIO()
-  : AcquisitionFileIO()
-  {
-    this->SetFileType(AcquisitionFileIO::ASCII);
-  };
+  : AcquisitionFileIO(AcquisitionFileIO::ASCII)
+  {};
 };

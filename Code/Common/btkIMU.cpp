@@ -38,6 +38,39 @@
 namespace btk
 {
   /**
+   * @class IMU btkIMU.h
+   * @brief Container of analog channels representing an inertial measurement unit (IMU).
+   *
+   * This class proposes to store any number of analog channels but the 6 first channels could be 
+   * used for 3 accelerometers and 3 gyroscopes as some convenient methods are proposed in this way
+   * (see SetChannels(), GetAccelerometerX(), GetAccelerometerY(), GetAccelerometerZ(), GetGyroscopeX(), GetGyroscopeY(), GetGyroscopeZ()).
+   * 
+   * The storage of the channel is done using an ID and not an array index. You can then use the same ID for some kind of sensor even if other are missing (i.e. IMU with accelerometers disabled or configured with 1 acc, and 2 gyros., etc.).
+   *
+   * Note: This class is still experimental and could be modified in the next release.
+   *
+   * @ingroup BTKCommon
+   */
+  
+  /**
+   * @typedef IMU::Pointer
+   * Smart pointer associated with a IMU object.
+   */
+  
+  /**
+   * @typedef IMU::ConstPointer
+   * Smart pointer associated with a const IMU object.
+   */
+    
+  /**
+   * @fn static Pointer IMU::New(const std::string& label = "IMU", const std::string& desc = "");
+   * Creates a smart pointer associated with a IMU object.
+   * @warning If you want to use the default created channels, you need to use the command SetFrameNumber as no memory is allocated for the data.
+   */
+  
+  /**
+   * Sets the 6 first channels of the IMUs with the analog channels @a accX, @a accY, @a accZ, @a gyroX, @a gyroY, @a gyroZ.
+   *
    * @warning: This function assumes that the number of frames corresponds to the number of frames set in the IMU. You can set afterward the number of frames by using the method SetFrameNumber().
    */
   void IMU::SetChannels(Analog::Pointer accX, Analog::Pointer accY, Analog::Pointer accZ, 
@@ -56,6 +89,9 @@ namespace btk
     this->Modified();
   };
   
+  /**
+   * Returns the analog channels of the IMU in a collection. The analog channels are pushed in the collection by using their ID.
+   */
   AnalogCollection::Pointer IMU::GetChannels()
   {
     AnalogCollection::Pointer analogs = AnalogCollection::New();
@@ -65,34 +101,45 @@ namespace btk
   }
 
   /**
+   * Sets an analog channel to the given ID. If an analog channel is already set to this ID, then it is replaced.
+   *
    * @warning: This function assumes that the number of frames corresponds to the number of frames set in the IMU. You can set afterward the number of frames by using the method SetFrameNumber().
    */
-  void IMU::SetChannel(int idx, Analog::Pointer channel)
+  void IMU::SetChannel(int id, Analog::Pointer channel)
   {
-    if (channel == this->GetChannelMap(idx))
+    if (channel == this->GetChannelMap(id))
       return;
-    this->m_Channels[idx] = channel;
+    this->m_Channels[id] = channel;
     // Set as modified
     this->Modified();
   };
   
-  Analog::Pointer IMU::GetChannel(int idx)
+  /**
+   * Returns the analog channel with the given ID. If there is no analog channel with the given ID, then an exception is thrown.
+   */
+  Analog::Pointer IMU::GetChannel(int id)
   {
-    MapIterator it = this->m_Channels.find(idx);
+    MapIterator it = this->m_Channels.find(id);
     if ( it == this->m_Channels.end())
       throw(OutOfRangeException("IMU::GetChannel(int)"));
     return it->second;
   };
   
-  Analog::ConstPointer IMU::GetChannel(int idx) const
+  /**
+   * Returns the analog channel with the given ID. If there is no analog channel with the given ID, then an exception is thrown.
+   */
+  Analog::ConstPointer IMU::GetChannel(int id) const
   {
-    MapConstIterator it = this->m_Channels.find(idx);
+    MapConstIterator it = this->m_Channels.find(id);
     if ( it == this->m_Channels.end())
       throw(OutOfRangeException("IMU::GetChannel(int) const"));
     return it->second;
   };
   
-  Analog::Pointer IMU::GetChannel(const std::string label)
+  /**
+   * Returns the analog channel with the given @a label. If there is no analog channel with the given @a label, then an exception is thrown.
+   */
+  Analog::Pointer IMU::GetChannel(const std::string& label)
   {
     MapIterator it = this->m_Channels.begin();
     while (it != this->m_Channels.end())
@@ -106,7 +153,10 @@ namespace btk
     return it->second;
   };
   
-  Analog::ConstPointer IMU::GetChannel(const std::string label) const
+  /**
+   * Returns the analog channel with the given @a label. If there is no analog channel with the given @a label, then an exception is thrown.
+   */
+  Analog::ConstPointer IMU::GetChannel(const std::string& label) const
   {
     MapConstIterator it = this->m_Channels.begin();
     while (it != this->m_Channels.end())
@@ -120,6 +170,14 @@ namespace btk
     return it->second;
   };
   
+  /**
+   * @fn int IMU::GetFrameNumber() const
+   * Returns the number of frames set in this IMU.
+   */
+   
+  /**
+   * Set the number of frames for the IMU and modify also the number of frames for the channels.
+   */
   void IMU::SetFrameNumber(int fn)
   {
     if (this->m_FrameNumber == fn)
@@ -133,6 +191,14 @@ namespace btk
     this->Modified();
   };
   
+  /**
+   * @fn double IMU::GetFrequency() const
+   * Returns the frequency set to the IMU. (by default it is 0 Hz).
+   */
+  
+  /**
+   * Sets the acquisition sample rate associated to the IMU.
+   */
   void IMU::SetFrequency(double f)
   {
     if (this->m_Frequency == f)
@@ -140,8 +206,46 @@ namespace btk
     this->m_Frequency = f;
     this->Modified();
   };
+  
+  /**
+   * @fn Analog::Pointer IMU::GetAccelerometerX()
+   * Convenient method to return the analog channel with the ID 0 (which should correspond to an accelerometer measuring data on the X axis of the IMU).
+   */
+   
+  /**
+   * @fn Analog::Pointer IMU::GetAccelerometerY()
+   * Convenient method to return the analog channel with the ID 1 (which should correspond to an accelerometer measuring data on the Y axis of the IMU).
+   */
+   
+  /**
+   * @fn Analog::Pointer IMU::GetAccelerometerZ()
+   * Convenient method to return the analog channel with the ID 2 (which should correspond to an accelerometer measuring data on the Z axis of the IMU).
+   */
+   
+  /**
+   * @fn Analog::Pointer IMU::GetGyroscopeX()
+   * Convenient method to return the analog channel with the ID 3 (which should correspond to a gyroscope measuring data on the X axis of the IMU).
+   */
+   
+  /**
+   * @fn Analog::Pointer IMU::GetGyroscopeY()
+   * Convenient method to return the analog channel with the ID 4 (which should correspond to a gyroscope measuring data on the Y axis of the IMU).
+   */
+   
+  /**
+   * @fn Analog::Pointer IMU::GetGyroscopeZ()
+   * Convenient method to return the analog channel with the ID 5 (which should correspond to a gyroscope measuring data on the Z axis of the IMU).
+   */
 
-  void IMU::Rotate(const Eigen::Matrix<double,3,3>& R)
+  /**
+   * @typedef IMU::Rotation
+   * Type definition for Eigen 3x3 rotation matrix (of double).
+   */
+
+  /**
+   * Convenient method to rotate the analog channels with the IDs 0-5. This method handles the case where some of these analog channels are missing. 
+   */
+  void IMU::Rotate(const Rotation& R)
   {
     // Better way to do this?
     // Because the size of the data can be huge, it is preferred
@@ -177,6 +281,14 @@ namespace btk
     this->Modified();
   };
   
+  /**
+   * @fn Pointer IMU::Clone() const
+   * Deep copy of the current object.
+   */
+  
+  /**
+   * Constructor
+   */
   IMU::IMU(int type, const std::string& label, const std::string& desc)
   : DataObjectLabeled(label, desc), m_Channels()
   {
@@ -191,6 +303,9 @@ namespace btk
     this->m_Channels.insert(std::make_pair(5,Analog::New("Gyro Z")));
   };
   
+  /**
+   * Constructor of copy
+   */
   IMU::IMU(const IMU& toCopy)
   : DataObjectLabeled(toCopy), m_Channels()
   {

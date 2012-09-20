@@ -31,7 +31,6 @@ CXXTEST_SUITE(WrenchDirectionAngleFilterTest)
     w->GetForce()->GetValues()(4,2) = -40.0;
     
     w->GetPosition()->GetResiduals()(5,0) = -1.0;
-    w->GetPosition()->GetMasks()(5,0) = -1.0;
     
     btk::WrenchCollection::Pointer input = btk::WrenchCollection::New();
     input->InsertItem(w);

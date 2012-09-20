@@ -277,9 +277,8 @@ namespace btk
           Point::Residuals res = Point::Residuals::Constant(numFrames,1,-1.0);
           for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
           {
-            // All the residuals and masks are set to -1 by default
+            // All the residuals are set to -1 by default
             (*it)->SetResiduals(res);
-            (*it)->SetMasks(res);
             // Extract label
             std::string label = bifs.ReadString(256);
             (*it)->SetLabel(this->CleanLabel(label));
@@ -296,7 +295,7 @@ namespace btk
                 double x = bifs.ReadFloat();
                 double y = bifs.ReadFloat();
                 double z = bifs.ReadFloat();
-                (*it)->SetFrame(j + shift, x, y, z); // Res and mask are set to 0 by default.
+                (*it)->SetFrame(j + shift, x, y, z); // Residual is set to 0 by default.
               }
             }
           }
@@ -320,7 +319,7 @@ namespace btk
               double y = bifs.ReadFloat();
               double z = bifs.ReadFloat();
               if ((x == 0.0) && (y == 0.0) && (z == 0.0))
-                (*it)->SetFrame(idx, x, y, z, -1.0, -1.0);
+                (*it)->SetFrame(idx, x, y, z, -1.0);
               else
                 (*it)->SetFrame(idx, x, y, z);
             }
@@ -356,12 +355,12 @@ namespace btk
             Acquisition::AnalogIterator it = output->BeginAnalog();
             std::advance(it, p*6);
             std::string strIdx = ToString(p+1);
-            (*it)->SetLabel("PX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("PY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FZ" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("MZ" + strIdx); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PX" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PY" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FX" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FY" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FZ" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("MZ" + strIdx); (*it)->SetUnit("Nm"); analogMap.push_back(*it); ++it;
             // Extract data
             int32_t numSegments = bifs.ReadI32();
             bifs.SeekRead(4, BinaryFileStream::Current);
@@ -395,6 +394,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PX" + ToString(p+1));
+            (*it)->SetUnit("m"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -402,6 +402,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PY" + ToString(p+1));
+            (*it)->SetUnit("m"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -409,6 +410,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FX" + ToString(p+1));
+            (*it)->SetUnit("N"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -416,6 +418,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FY" + ToString(p+1));
+            (*it)->SetUnit("N"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -423,6 +426,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FZ" + ToString(p+1));
+            (*it)->SetUnit("N"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -430,6 +434,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("MZ" + ToString(p+1));
+            (*it)->SetUnit("Nm"); 
             analogMap.push_back(*it);
             std::advance(it, 6);
           }
@@ -459,19 +464,19 @@ namespace btk
             Acquisition::AnalogIterator it = output->BeginAnalog();
             std::advance(it, p*12);
             std::string strIdx = ToString(p*2+1) + "a";
-            (*it)->SetLabel("PX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("PY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FZ" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("MZ" + strIdx); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PX" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PY" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FX" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FY" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FZ" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("MZ" + strIdx); (*it)->SetUnit("Nm"); analogMap.push_back(*it); ++it;
             strIdx[strIdx.length()-1] = 'b';
-            (*it)->SetLabel("PX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("PY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FX" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FY" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("FZ" + strIdx); analogMap.push_back(*it); ++it;
-            (*it)->SetLabel("MZ" + strIdx); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PX" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("PY" + strIdx); (*it)->SetUnit("m"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FX" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FY" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("FZ" + strIdx); (*it)->SetUnit("N"); analogMap.push_back(*it); ++it;
+            (*it)->SetLabel("MZ" + strIdx); (*it)->SetUnit("Nm"); analogMap.push_back(*it); ++it;
             // Extract data
             int32_t numSegments = bifs.ReadI32();
             bifs.SeekRead(4, BinaryFileStream::Current);
@@ -507,6 +512,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PX" + ToString(p+1) + "a");
+            (*it)->SetUnit("m");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -514,6 +520,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PY" + ToString(p+1) + "a");
+            (*it)->SetUnit("m");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -521,6 +528,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FX" + ToString(p+1) + "a");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -528,6 +536,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FY" + ToString(p+1) + "a");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -535,6 +544,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FZ" + ToString(p+1) + "a");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -542,6 +552,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("MZ" + ToString(p+1) + "a");
+            (*it)->SetUnit("Nm");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -549,6 +560,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PX" + ToString(p+1) + "b");
+            (*it)->SetUnit("m");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -556,6 +568,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("PY" + ToString(p+1) + "b");
+            (*it)->SetUnit("m");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -563,6 +576,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FX" + ToString(p+1) + "b");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -570,6 +584,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FY" + ToString(p+1) + "b");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -577,6 +592,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("FZ" + ToString(p+1) + "b");
+            (*it)->SetUnit("N");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -584,6 +600,7 @@ namespace btk
           for (int p = 0 ; p < numPFs ; ++p)
           {
             (*it)->SetLabel("MZ" + ToString(p+1) + "b");
+            (*it)->SetUnit("Nm");
             analogMap.push_back(*it);
             std::advance(it, 12);
           }
@@ -621,16 +638,18 @@ namespace btk
       {
         int32_t numPFsBis = bifs.ReadI32();
         if (numPFsBis != numPFs)
-          throw(TDFFileIOException("The number of force platforms in the configuration is not the same than the number used in the data."));
+        {
+          btkErrorMacro("The number of force platforms in the configuration is not the same than in the data block.");
+        }
         
         bifs.SeekRead(4, BinaryFileStream::Current);
-        bifs.SeekRead(numPFs*2, BinaryFileStream::Current);
+        bifs.SeekRead(numPFsBis*2, BinaryFileStream::Current);
         
-        // Need to test 'numPlatforms' ? Should not be physicaly to have more than 256 force platforms...
-        const int8_t numPlatforms = FPDoubleFormat ? numPFs * 2 : numPFs;
+        // Need to test 'numPlatforms' ? Should not be physicaly more than 256 force platforms...
+        const int8_t numPlatforms = FPDoubleFormat ? numPFsBis * 2 : numPFsBis;
         
         std::vector<float> cornersData;
-        for (int i = 0 ; i < numPFs ; ++i)
+        for (int i = 0 ; i < numPFsBis ; ++i)
         {
           bifs.SeekRead(256, BinaryFileStream::Current); // Label
           bifs.SeekRead(8, BinaryFileStream::Current); // Size
@@ -651,7 +670,7 @@ namespace btk
         {
           std::vector<float> cornersDataTemp = cornersData;
           cornersData.resize(cornersData.size() * 2);
-          for (int i = 0 ; i < numPFs ; ++i)
+          for (int i = 0 ; i < numPFsBis ; ++i)
           {
             for (int j = 0 ; j < 12 ; ++j)
             {
@@ -800,12 +819,8 @@ namespace btk
    * Constructor.
    */
   TDFFileIO::TDFFileIO()
-  : AcquisitionFileIO()
-  {
-    this->SetFileType(AcquisitionFileIO::Binary);
-    this->SetByteOrder(AcquisitionFileIO::IEEE_LittleEndian);
-    this->SetStorageFormat(AcquisitionFileIO::Float);
-  };
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Float)
+  {};
   
   const TDFFileIO::BlockEntry* TDFFileIO::SeekToBlock(IEEELittleEndianBinaryFileStream* bifs, const std::list<BlockEntry>* blockEntries, unsigned int id) const
   {

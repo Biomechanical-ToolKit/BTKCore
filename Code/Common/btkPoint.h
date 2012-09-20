@@ -44,7 +44,6 @@ namespace btk
   {
   public:
     typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Residuals;
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Masks;
     typedef enum {Marker = 0, Angle, Force, Moment, Power, Scalar, Reaction} Type;
     
     typedef SharedPtr<Point> Pointer;
@@ -56,14 +55,11 @@ namespace btk
     
     virtual ~Point() {};
     
-    void SetFrame(int frame, double x, double y, double z, double res = 0.0, double mask = 0.0);
+    void SetFrame(int frame, double x, double y, double z, double res = 0.0);
     
     Residuals& GetResiduals() {return this->m_Residuals;};
     const Residuals& GetResiduals() const {return this->m_Residuals;};
     BTK_COMMON_EXPORT void SetResiduals(const Residuals& r);
-    Masks& GetMasks() {return this->m_Masks;};
-    const Masks& GetMasks() const {return this->m_Masks;};
-    BTK_COMMON_EXPORT void SetMasks(const Masks& m);
     BTK_COMMON_EXPORT void SetFrameNumber(int frameNumber);
     Type GetType() const {return this->m_Type;};
     BTK_COMMON_EXPORT void SetType(Point::Type t);
@@ -78,17 +74,15 @@ namespace btk
     Point& operator=(const Point& ); // Not implemented.
     
     Residuals m_Residuals;
-    Masks m_Masks;
     Type m_Type;
   };
   
-  inline void Point::SetFrame(int frame, double x, double y, double z, double res, double mask)
+  inline void Point::SetFrame(int frame, double x, double y, double z, double res)
   {
     this->m_Values.coeffRef(frame,0) = x;
     this->m_Values.coeffRef(frame,1) = y;
     this->m_Values.coeffRef(frame,2) = z; 
     this->m_Residuals.coeffRef(frame) = res;
-    this->m_Masks.coeffRef(frame) = mask;
   };
 };
 

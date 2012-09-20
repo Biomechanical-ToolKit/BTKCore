@@ -104,6 +104,7 @@ public:
   
   void displayPointChart() {this->displayChart(PointChart);};
   void displayAnalogChart() {this->displayChart(AnalogChart);};
+  void refreshPlots();
   
   void updateAxisX();
   void setUnitAxisX(const QString& str, double scale, double offset);

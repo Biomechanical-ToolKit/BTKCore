@@ -49,31 +49,31 @@
 namespace btk
 {
   /**
-   * @class VTKMarkersCoordinates btkVTKMarkersFramesSource.h
+   * @class VTKMarkersFramesSource::VTKMarkersCoordinates btkVTKMarkersFramesSource.h
    * @brief Store markers' frames as a vector of vtkPolyData.
    */
-  class VTKMarkersCoordinates : public vtkstd::vector<vtkPolyData*>
+  class VTKMarkersFramesSource::VTKMarkersCoordinates : public vtkstd::vector<vtkPolyData*>
   {};
 
   /**
-   * @class VTKMarkersIds btkVTKMarkersFramesSource.h
+   * @class VTKMarkersFramesSource::VTKMarkersIds btkVTKMarkersFramesSource.h
    * @brief Store markers' visibility for each frame.
    */
-  class VTKMarkersIds : public vtkstd::vector<vtkIntArray*>
+  class VTKMarkersFramesSource::VTKMarkersIds : public vtkstd::vector<vtkIntArray*>
   {};
   
   /**
-   * @class VTKTrajectoryIds btkVTKMarkersFramesSource.h
+   * @class VTKMarkersFramesSource::VTKTrajectoryIds btkVTKMarkersFramesSource.h
    * @brief Store markers' visibility for each frame.
    */
-  class VTKTrajectoryIds : public vtkstd::vector<vtkCellArray*>
+  class VTKMarkersFramesSource::VTKTrajectoryIds : public vtkstd::vector<vtkCellArray*>
   {};
   
   /**
-   * @class VTKTrajectoryPath btkVTKMarkersFramesSource.h
+   * @class VTKMarkersFramesSource::VTKTrajectoryPath btkVTKMarkersFramesSource.h
    * @brief List of ids representing markers' path.
    */
-  class VTKTrajectoryPath : public vtkstd::vector<vtkIdList*>
+  class VTKMarkersFramesSource::VTKTrajectoryPath : public vtkstd::vector<vtkIdList*>
   {};
   
   /** 

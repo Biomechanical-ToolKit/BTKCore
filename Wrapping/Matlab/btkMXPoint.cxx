@@ -70,30 +70,6 @@ btk::Point::Pointer btkMXGetPoint(btk::Acquisition::Pointer acq, int nrhs, const
   return point;
 };
 
-mxArray* btkMXCreatePointBinaryMask(btk::Point::Pointer point)
-{
-  int num = point->GetFrameNumber();
-  mxArray* masks = mxCreateCellMatrix(num, 1);
-  char mask[8]; mask[7] = '\0';
-  for (int i = 0 ; i < num ; ++i)
-  {
-    int inc2 = 1;
-    int incMask = 0;
-    int maskInt = static_cast<int>(point->GetMasks().coeff(i));
-    while (inc2 < 127)
-    {
-        if ((maskInt & inc2) && (maskInt != -1))
-            mask[incMask] = '1';
-        else
-            mask[incMask] = '0';
-        ++incMask;
-        inc2 *= 2;
-    }
-    mxSetCell(masks, (mwIndex)i, mxCreateString(mask));
-  }
-  return masks;
-}
-
 void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[])
 { 
   if (nlhs == 0)
@@ -113,7 +89,7 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
   }
   else
   {
-    const char* info[] = {"firstFrame", "frequency", "units", "residuals", "masks"};
+    const char* info[] = {"firstFrame", "frequency", "units", "residuals"};
     int numberOfFields =  sizeof(info) / sizeof(char*);
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     // First frame
@@ -122,11 +98,10 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
     // Frequency
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
     *mxGetPr(frequency) = acq->GetPointFrequency();
-    // Units, residuals & masks
+    // Units & residuals
     int inc = 0;
     mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
     mxArray* residualsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
-    mxArray* masksStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
     for(btk::PointCollection::ConstIterator itPt = points->Begin() ; itPt != points->End() ; ++itPt)
     {
       int num = (*itPt)->GetFrameNumber();
@@ -139,8 +114,6 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
       mxArray* residuals = mxCreateDoubleMatrix(num, 1, mxREAL);
       memcpy(mxGetPr(residuals), (*itPt)->GetResiduals().data(), mxGetNumberOfElements(residuals) * sizeof(double));
       mxSetFieldByNumber(residualsStruct, 0, inc, residuals);
-      // Masks
-      mxSetFieldByNumber(masksStruct, 0, inc, btkMXCreatePointBinaryMask(*itPt));
       // Cleanup
       delete[] fieldnames[inc];
       ++inc;
@@ -151,6 +124,5 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
     mxSetFieldByNumber(plhs[1], 0, 1, frequency);
     mxSetFieldByNumber(plhs[1], 0, 2, unitsStruct);
     mxSetFieldByNumber(plhs[1], 0, 3, residualsStruct);
-    mxSetFieldByNumber(plhs[1], 0, 4, masksStruct);
   }
 }; 

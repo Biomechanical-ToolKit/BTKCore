@@ -123,6 +123,7 @@ public:
   void clear();
   
   const QString& fileName() const {return this->m_Filename;};
+  void setFileName(const QString& filename) {this->m_Filename = filename;};
   btk::Acquisition::Pointer btkAcquisition() const {return this->mp_BTKAcquisition;};
   btk::PointCollection::Pointer btkAllMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(4);};
   btk::PointCollection::Pointer btkMarkers() const {return static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS])->GetOutput(0);};
@@ -190,6 +191,7 @@ public:
   void setAnalogsScale(const QVector<int>& ids, const QVector<double>& scales);
   QList<Analog*> takeAnalogs(const QList<int>& ids);
   void insertAnalogs(const QList<int>& ids, const QList<Analog*> analogs);
+  void shiftAnalogsValues(const QVector<int>& ids, const QVector<double>& offsets);
   
   bool hasEvents() const {return !this->m_Events.empty();};
   int eventCount() const {return this->m_Events.count();};
@@ -206,6 +208,7 @@ public:
   void setEvents(const QList<int>& ids, const QList<Event*> events);
   QList<Event*> takeEvents(const QList<int>& ids);
   void insertEvents(const QList<int>& ids, const QList<Event*> events);
+  QList<int> eventIds() const {return this->m_Events.keys();};
   int generateNewEventId();
   
   bool hasVideos() const {return !this->m_Videos.empty();};
@@ -245,6 +248,7 @@ signals:
   void analogsScaleChanged(const QVector<int>& ids, const QVector<double>& scales);
   void analogsRemoved(const QList<int>& ids, const QList<Analog*>& analogs);
   void analogsInserted(const QList<int>& ids, const QList<Analog*>& analogs);
+  void analogsValuesChanged(const QVector<int>& ids);
   void eventFrameChanged(int id, int frame);
   void eventsModified(const QList<int>& ids, const QList<Event*>& events);
   void eventsRemoved(const QList<int>& ids, const QList<Event*>& events);

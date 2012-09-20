@@ -21,6 +21,6 @@
  * - 4 : +/- 1.25 volts
  * - 5 : +/- 1 volt
  * 
- * @sa btkGetAnalog, btkSetAnalogDescription, btkSetAnalogLabel, btkSetAnalogOffset, btkSetAnalogScale, btkSetAnalogValues
+ * @sa btkGetAnalog, btkSetAnalogDescription, btkSetAnalogLabel, btkSetAnalogOffset, btkSetAnalogScale, btkSetAnalogUnit, btkSetAnalogValues
  * @ingroup BTKMatlabAnalogModifier
  */

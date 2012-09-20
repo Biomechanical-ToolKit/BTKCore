@@ -53,8 +53,8 @@ namespace btk
   
   class MOMFileIO : public AcquisitionFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS("MOM")
-    BTK_IO_FILE_ONLY_READ_OPERATION
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS("MOM");
+    BTK_IO_FILE_ONLY_READ_OPERATION;
     
   public:
     typedef SharedPtr<MOMFileIO> Pointer;

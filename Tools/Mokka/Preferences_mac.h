@@ -72,7 +72,8 @@ public slots:
   void setDefaultOrientation(int index);
   void setDefaultTimeBarEventDisplay(int index);
   void setDefaultBackgroundColor();
-  void setDefaultGridColor();
+  void setDefaultGridFrontColor();
+  void setDefaultGridBackColor();
   void setDefaultSegmentColor();
   void setDefaultMarkerColor();
   void setDefaultMarkerRadius(double radius);
@@ -87,6 +88,7 @@ public slots:
   void showChartEvent(int index);
   void setChartUnitAxisX(int index);
   void setAutomaticCheckUpdate(bool isChecked);
+  void setSubscribeDevelopmentChannel(bool isChecked);
   
   virtual void setVisible(bool visible);
 
@@ -97,7 +99,8 @@ signals:
   void defaultTimeBarEventDisplayChanged(int index);
   void useEventEditorWhenInsertingStateChanged(bool isChecked);
   void defaultBackgroundColorChanged(const QColor& color);
-  void defaultGridColorChanged(const QColor& color);
+  void defaultGridFrontColorChanged(const QColor& color);
+  void defaultGridBackColorChanged(const QColor& color);
   void defaultSegmentColorChanged(const QColor& color);
   void defaultMarkerColorChanged(const QColor& color);
   void defaultMarkerRadiusChanged(double radius);
@@ -112,6 +115,7 @@ signals:
   void showChartEventChanged(int index);
   void chartUnitAxisXChanged(int index);
   void automaticCheckUpdateStateChanged(bool isChecked);
+  void subscribeDevelopmentChannelStateChanged(bool isChecked);
   void userLayoutRemoved(int index);
   void userLayoutLabelChanged(int index, const QString& label);
   void userLayoutDropped(int newRow, int oldRow);

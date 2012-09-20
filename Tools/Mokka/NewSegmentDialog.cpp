@@ -70,6 +70,9 @@ NewSegmentDialog::NewSegmentDialog(QWidget* parent)
   this->setWindowModality(Qt::WindowModal);
   this->setMinimumSize(QSize(this->width(), this->height()));
   this->setMaximumSize(QSize(this->width(), this->height()));
+  QFont f = this->groupBox->font();
+  f.setPointSize(10);
+  this->groupBox->setFont(f);
 #endif
   QHeaderView* tableHeader = this->markersTable->horizontalHeader();
   tableHeader->setDefaultSectionSize(26);

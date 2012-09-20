@@ -41,7 +41,7 @@
 // If it is possible to use the memory file mapping mechanism, 
 // then its code is compiled here 
 #if !defined BTK_NO_MEMORY_MAPPED_FILESTREAM
-  #include "btkBinaryFileStream_mmfstream_p.cpp"
+  #include "btkBinaryFileStream_mmfstream.cpp"
 #endif
 
 namespace btk
@@ -52,6 +52,10 @@ namespace btk
    * your configuration, this raw stream will correspond to btk::mmfstream
    * (default) or std::fstream. The class btk::mmfstream uses the memory 
    * mapped file mechanism.
+   *
+   * @warning It is not adviced to used this class directly. Even if you can 
+   * potentially speedup data's reading by accessing directly to the buffer,
+   * it is also a large source of error and crash (buffer overlfow, etc.)
    */
   
   /** 

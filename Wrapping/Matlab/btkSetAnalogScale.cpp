@@ -39,8 +39,8 @@
 #include <btkAcquisition.h>
 #include <btkAnalog.h>
 
-// btkSetAnalogLabel(h, i, newLabel)
-// btkSetAnalogLabel(h, label, newLabel)
+// btkSetAnalogScale(h, i, newLabel)
+// btkSetAnalogScale(h, label, newLabel)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs < 3)

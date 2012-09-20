@@ -969,11 +969,10 @@ CXXTEST_SUITE(C3DFileWriterTest)
         TS_ASSERT_DELTA(acq->GetPoint(j)->GetValues()(i,1), acq2->GetPoint(j)->GetValues()(i,1), 0.00001);
         TS_ASSERT_DELTA(acq->GetPoint(j)->GetValues()(i,2), acq2->GetPoint(j)->GetValues()(i,2), 0.00001);
         TS_ASSERT_DELTA(acq->GetPoint(j)->GetResiduals()(i), acq2->GetPoint(j)->GetResiduals()(i), 0.00001);
-        TS_ASSERT_DELTA(acq->GetPoint(j)->GetMasks()(i), acq2->GetPoint(j)->GetMasks()(i), 0.00001);
       }
       for (int j = 0 ; j < acq->GetAnalogNumber() ; ++j)
       {
-        TS_ASSERT_DELTA(acq->GetAnalog(j)->GetValues()(i), acq2->GetAnalog(j)->GetValues()(i), 0.00001);
+        TS_ASSERT_DELTA(acq->GetAnalog(j)->GetValues()(i), acq2->GetAnalog(j)->GetValues()(i), 0.00005); // 5e-5 instead of 1e-5 due to the use of the general scale factor
       }
     }
     

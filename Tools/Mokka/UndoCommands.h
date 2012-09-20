@@ -7,17 +7,17 @@
  * modification, are permitted provided that the following conditions
  * are met:
  * 
- *   * Redistributions of source code must retain the above
- *     copyright notice, this list of conditions and the following
- *     disclaimer.
- *   * Redistributions in binary form must reproduce the above
- *     copyright notice, this list of conditions and the following
- *     disclaimer in the documentation and/or other materials
- *     provided with the distribution.
- *   * Neither the name(s) of the copyright holders nor the names
- *     of its contributors may be used to endorse or promote products
- *     derived from this software without specific prior written
- *     permission.
+ *     * Redistributions of source code must retain the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer.
+ *     * Redistributions in binary form must reproduce the above
+ *       copyright notice, this list of conditions and the following
+ *       disclaimer in the documentation and/or other materials
+ *       provided with the distribution.
+ *     * Neither the name(s) of the copyright holders nor the names
+ *       of its contributors may be used to endorse or promote products
+ *       derived from this software without specific prior written
+ *       permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -378,6 +378,22 @@ private:
   QList<Analog*> m_Analogs;
 };
 
+// --------------- ShiftAnalogsValues ---------------
+class ShiftAnalogsValues : public AcquisitionUndoCommand
+{
+public:
+  ShiftAnalogsValues(Acquisition* acq, const QVector<int>& ids, const QVector<double>& offsets, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<double> m_Offsets;
+  
+  void action();
+};
+
 // ----------------------------------------------- //
 //                   EVENT EDITION                 //
 // ----------------------------------------------- //
@@ -430,12 +446,13 @@ private:
   QList<Event*> m_Events;
 };
 
-// --------------- InsertEvent ---------------
-class InsertEvent : public AcquisitionUndoCommand
+// --------------- InsertEvents ---------------
+class InsertEvents : public AcquisitionUndoCommand
 {
 public:
-  InsertEvent(Acquisition* acq, Event* e, QUndoCommand* parent = 0);
-  ~InsertEvent();
+  InsertEvents(Acquisition* acq, Event* e, QUndoCommand* parent = 0);
+  InsertEvents(Acquisition* acq, const QList<int>& ids, const QList<Event*>& events, QUndoCommand* parent = 0);
+  ~InsertEvents();
   virtual void undo();
   virtual void redo();
   

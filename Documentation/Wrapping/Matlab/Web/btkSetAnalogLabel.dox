@@ -13,6 +13,6 @@
  * <tt>btkSetAnalogLabel(h, idx, newlabel)</tt> modifies the label of the analog channel specified by the index @c idx.
  * <tt>btkSetAnalogLabel(h, label, newlabel)</tt> modifies the label of the analog channel specified by the label @c label.
  * 
- * @sa btkGetAnalog, btkSetAnalogDescription, btkSetAnalogGain, btkSetAnalogOffset, btkSetAnalogScale, btkSetAnalogValues
+ * @sa btkGetAnalog, btkSetAnalogDescription, btkSetAnalogGain, btkSetAnalogOffset, btkSetAnalogScale, btkSetAnalogUnit, btkSetAnalogValues
  * @ingroup BTKMatlabAnalogModifier
  */

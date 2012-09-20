@@ -1,6 +1,7 @@
 #include "_TDDConfigure.h"
 
 #include "AcquisitionUnitConverterTest.h"
+#include "AnalogOffsetRemoverTest.h"
 #include "ForcePlatformsExtractorTest.h"
 #include "ForcePlatformWrenchFilterTest.h"
 #include "GroundReactionWrenchFilterTest.h"
@@ -9,4 +10,6 @@
 #include "MergeAcquisitionFilterTest.h"
 #include "SeparateKnownVirtualMarkersFilterTest.h"
 #include "SpecializedPointsExtractorTest.h"
+#include "SubAcquisitionFilterTest.h"
+#include "VerticalGroundReactionForceGaitEventDetectorTest.h"
 #include "WrenchDirectionAngleFilterTest.h"

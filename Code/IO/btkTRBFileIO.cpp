@@ -170,7 +170,7 @@ namespace btk
       std::vector<std::string> labels;
       std::vector<int> indices;
       int numMarkers = -1;
-      uint16_t index, color;
+      uint16_t index; //, color;
       int offset;
       while (1)
       {
@@ -178,7 +178,8 @@ namespace btk
         {
           offset = bifs.ReadU16();
           index = bifs.ReadU16();
-          color = bifs.ReadU16();
+          //color = bifs.ReadU16();
+          bifs.SeekRead(2, BinaryFileStream::Current); // Color
           std::string label = bifs.ReadString((offset - 1) * 4);
           label = label.erase(label.find_last_not_of((char)0x20)+1);
           label = label.erase(label.find_last_not_of((char)0x00)+1);
@@ -226,7 +227,7 @@ namespace btk
       bifs.SeekRead(dataAddress, BinaryFileStream::Begin);
       // Construct a vector of indices to facilitate the coordinates' extraction
       // And set the markers' label
-      // All the residuals and masks are set to -1 by default
+      // All the residuals are set to -1 by default
       std::vector<int> markerIndex = std::vector<int>(numMarkers, -1);
       Point::Residuals res = Point::Residuals::Constant(numFrames,1,-1.0);
       for (int i = 0 ; i < static_cast<int>(indices.size()) ; ++i)
@@ -234,7 +235,6 @@ namespace btk
         Point::Pointer pt = output->GetPoint(i);
         pt->SetLabel(labels[i]);
         pt->SetResiduals(res);
-        pt->SetMasks(res);
         markerIndex[indices[i]] = i;
       }
       //  Extract coordinates
@@ -256,8 +256,7 @@ namespace btk
             point->GetValues().coeffRef(index,1) = bifs.ReadFloat(); // Y
             point->GetValues().coeffRef(index,2) = bifs.ReadFloat(); // Z
             point->GetResiduals().coeffRef(index) = bifs.ReadFloat(); // Residual
-            point->GetMasks().coeffRef(index) = static_cast<double>(bifs.ReadU16() | bifs.ReadU16() << 16); // Mask
-            
+            bifs.SeekRead(4, BinaryFileStream::Current); // Mask (no more used in BTK)
             offset -= 24;
             if (offset <= 0)
               break;
@@ -289,6 +288,11 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close(); 
       throw;
     }
+    catch (MotionAnalysisBinaryFileIOException& e)
+    {
+      if (bifs.IsOpen()) bifs.Close();
+      throw(MotionAnalysisBinaryFileIOException(e.what()));
+    }
     catch (std::exception& e)
     {
       if (bifs.IsOpen()) bifs.Close(); 
@@ -305,6 +309,6 @@ namespace btk
    * Constructor.
    */
   TRBFileIO::TRBFileIO()
-  : MotionAnalysisBinaryFileIO()
+  : MotionAnalysisBinaryFileIO(AcquisitionFileIO::Float)
   {};
 };

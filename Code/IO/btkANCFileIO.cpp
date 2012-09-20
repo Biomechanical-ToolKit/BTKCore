@@ -323,11 +323,11 @@ namespace btk
     int i = 0;
     for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
     {
-      uint16_t range = AnxFileIOExtractAnalogRangeFromGain(i, (*it)->GetGain(), (*it)->GetScale(), input->GetAnalogResolution());
+      uint16_t range = AnxFileIOExtractAnalogRangeFromGain_p(i, (*it)->GetGain(), (*it)->GetScale(), input->GetAnalogResolution());
       ofs << range;
       ofs << static_cast<std::string>("\t");
       ++i;
-      if (fabs((*it)->GetScale()) != fabs(ANxFileIOComputeScaleFactor(range, input->GetAnalogResolution())))
+      if (fabs((*it)->GetScale()) != fabs(ANxFileIOComputeScaleFactor_p(range, input->GetAnalogResolution())))
         scaleWarning = true;
     }
     if (scaleWarning && (input->GetAnalogResolution() == Acquisition::Bit16))
@@ -360,9 +360,8 @@ namespace btk
    * Constructor.
    */
   ANCFileIO::ANCFileIO()
-  : AcquisitionFileIO()
+  : AcquisitionFileIO(AcquisitionFileIO::ASCII)
   {
-    this->SetFileType(AcquisitionFileIO::ASCII);
     this->m_Generation = 2;
   };
 

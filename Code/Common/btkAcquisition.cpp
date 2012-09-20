@@ -50,6 +50,19 @@ namespace btk
    *  - acquisition's setup ;
    *  - subject's informations.
    *
+   * By default, the first frame is set to 1, the analog resolution is set to 12-bit, the maximum interpolation gap to 10 frames and the units are:
+   *  - Marker: millimeters ;
+   *  - Angle: degrees ;
+   *  - Force: newtons ;
+   *  - Moment: millimeter-newtons ;
+   *  - Power: watts ;
+   *  - Scalar: millimeters ;
+   *  - Reaction: (nothing).
+   *
+   * After the creation of the acquisition, you should use the Init() method to populate the acquisition.
+   *
+   * The member used for the maximum interpolation gap is only for information and is not used in the acquisition. It could be used later in a filter to fill gap.
+   *
    * @ingroup BTKCommon
    */
   
@@ -60,6 +73,10 @@ namespace btk
   /**
    * @var Acquisition::AnalogResolution Acquisition::Bit8
    * 8 bits ADC.
+   */
+  /**
+   * @var Acquisition::AnalogResolution Acquisition::Bit10
+   * 10 bits ADC.
    */
   /**
    * @var Acquisition::AnalogResolution Acquisition::Bit12
@@ -280,7 +297,7 @@ namespace btk
    */
 
   /**
-   * Finds the event with the proposed @a label and returns the iterator associed
+   * Finds the event with the proposed @a label and returns the iterator associated
    * with it. If no event has @a label as label, an iterator pointing to the 
    * end of the collection is returned.
    */
@@ -297,7 +314,7 @@ namespace btk
   };
   
   /**
-   * Finds the event with the proposed @a label and returns the const iterator associed
+   * Finds the event with the proposed @a label and returns the const iterator associated
    * with it. If no event has @a label as label, a const iterator pointing to the 
    * end of the collection is returned.
    */
@@ -314,7 +331,7 @@ namespace btk
   };
   
   /**
-   * Append the event @a e in the acquisition
+   * Append the event @a e in the acquisition.
    */
   void Acquisition::AppendEvent(Event::Pointer e)
   {
@@ -323,7 +340,7 @@ namespace btk
   };
    
   /**
-   * Remove the event associated with the index @a idx
+   * Remove the event associated with the index @a idx.
    */
   void Acquisition::RemoveEvent(int idx)
   {
@@ -335,7 +352,7 @@ namespace btk
   };
   
   /**
-   * Remove the event associated with the iterator @a loc
+   * Remove the event associated with the iterator @a loc.
    */
   Acquisition::EventIterator Acquisition::RemoveEvent(Acquisition::EventIterator loc)
   {
@@ -373,6 +390,8 @@ namespace btk
 
   /**
    * Gets the point at the index @a idx as a smart pointer.
+   *
+   * If no Point exists, then a btk::OutOfRangeException exception is thrown.
    */
   Point::Pointer Acquisition::GetPoint(int idx)
   {
@@ -385,6 +404,8 @@ namespace btk
   
   /**
    * Gets the point at the index @a idx as a const smart pointer.
+   *
+   * If no Point exists, then a btk::OutOfRangeException exception is thrown.
    */
   Point::ConstPointer Acquisition::GetPoint(int idx) const
   {
@@ -397,6 +418,8 @@ namespace btk
   
   /**
    * Gets the point with the label @a label as a smart pointer.
+   *
+   * If no Point exists, then a btk::OutOfRangeException exception is thrown.
    */
   Point::Pointer Acquisition::GetPoint(const std::string& label)
   {
@@ -408,6 +431,8 @@ namespace btk
   
   /**
    * Gets the point with the label @a label as a const smart pointer.
+   *
+   * If no Point exists, then a btk::OutOfRangeException exception is thrown.
    */
   Point::ConstPointer Acquisition::GetPoint(const std::string& label) const
   {
@@ -493,7 +518,7 @@ namespace btk
    */
 
   /**
-   * Finds the point with the proposed @a label and returns the iterator associed
+   * Finds the point with the proposed @a label and returns the iterator associated
    * with it. If no point has @a label as label, an iterator pointing to the 
    * end of the collection is returned.
    */
@@ -510,7 +535,7 @@ namespace btk
   };
   
   /**
-   * Finds the point with the proposed @a label and returns the const iterator associed
+   * Finds the point with the proposed @a label and returns the const iterator associated
    * with it. If no point has @a label as label, a const iterator pointing to the 
    * end of the collection is returned.
    */
@@ -637,6 +662,8 @@ namespace btk
 
   /**
    * Gets the analog channel at the index @a idx as a smart pointer.
+   *
+   * If no Analog exists, then an exception is thrown.
    */
   Analog::Pointer Acquisition::GetAnalog(int idx)
   {
@@ -725,7 +752,7 @@ namespace btk
 
   /**
    * Finds the analog channel with the proposed @a label and returns the iterator 
-   * associated with it. If no point has @a label as label, an iterator pointing to the 
+   * associated with it. If no analog channel has @a label as label, an iterator pointing to the 
    * end of the collection is returned.
    */
   Acquisition::AnalogIterator Acquisition::FindAnalog(const std::string& label)
@@ -759,7 +786,7 @@ namespace btk
   
   /**
    * Append the analog channel @a ac in the acquisition
-   * This method also resizes the frame number of the inserted point if necessary.
+   * This method also resizes the frame number of the inserted analog channel if necessary.
    */
   void Acquisition::AppendAnalog(Analog::Pointer ac)
   {
@@ -818,6 +845,8 @@ namespace btk
    * Initialize the acquisition with @a pointNumber which have @a frameNumber
    * frame. The analog part has @a analogNumber analog channels and their number of frames
    * corresponds to the integer factor @a analogSampleNumberPerPointFrame multiplied by @a frameNumber.
+   *
+   * This method label added points and analog channels using the string "uname*" concatenated with the index of the channel.
    */
   void Acquisition::Init(int pointNumber, int frameNumber, int analogNumber, int analogSampleNumberPerPointFrame)
   {
@@ -835,6 +864,8 @@ namespace btk
    * Resize the acquisition with @a pointNumber which have @a frameNumber
    * frame. The analog part has @a analogNumber analog channels and their number of frames
    * corresponds to the integer factor @a analogSampleNumberPerPointFrame multiplied by @a frameNumber.
+   *
+   * This method has the same behavior than the method Init(), but does not label added points and analog channels
    */
   void Acquisition::Resize(int pointNumber, int frameNumber,
                            int analogNumber, int analogSampleNumberPerPointFrame)
@@ -912,7 +943,7 @@ namespace btk
   
   /**
    * Resize the number of frames by adding the new frames at the beginning of the acquisition and 
-   * set automaticaly the new first frame index.
+   * set automatically the new first frame index.
    */
   void Acquisition::ResizeFrameNumberFromEnd(int frameNumber)
   {
@@ -928,8 +959,6 @@ namespace btk
         (*it)->SetValues(v);
         Point::Residuals r = (*it)->GetResiduals().block(startRow,0,frameNumber,1);
         (*it)->SetResiduals(r);
-        Point::Masks m = (*it)->GetMasks().block(startRow,0,frameNumber,1);
-        (*it)->SetMasks(m);
       }
       for (AnalogIterator it = this->BeginAnalog() ; it != this->EndAnalog() ; ++it)
       {
@@ -951,10 +980,6 @@ namespace btk
         Point::Residuals r = Point::Residuals::Zero(frameNumber, 1);
         r.block(startRow,0,actualFrameNumber,1) = (*it)->GetResiduals();
         (*it)->SetResiduals(r);
-
-        Point::Masks m = Point::Masks::Zero(frameNumber, 1);
-        m.block(startRow,0,actualFrameNumber,1) = (*it)->GetMasks();
-        (*it)->SetMasks(m);
       }
       for (AnalogIterator it = this->BeginAnalog() ; it != this->EndAnalog() ; ++it)
       {
@@ -983,6 +1008,7 @@ namespace btk
    * - Empty metadata ;
    * - Analog resolution: 12 bits ;
    * - Default units.
+   *
    * To re-populate this acquisition, you need to re-use the Init() method 
    * to set the point and analog number and their frame number.
    */
@@ -1012,8 +1038,9 @@ namespace btk
 
   /**
    * @fn double Acquisition::GetDuration() const
-   * Returns the duration of the thisuistion. The duration is computed as the 
-   * multiplication of the points' frequency with the points frame number.
+   * Returns the duration of the acquisition.
+   * 
+   * The duration is computed as the multiplication of the points' frequency with the points frame number.
    */
   
   /**
@@ -1022,9 +1049,13 @@ namespace btk
    */
   
   /**
-   * Sets the first frame index.
+   * Sets the first frame index (and optionally adapt events' frame/time, false by default).
+   *
+   * To adapt the events' frame/time, you have to set the option @a adaptEvents to true.
+   * The event's frame is shifted by the difference between the new first frame and the old one.
+   * The event's time is recomputed using the new frame and the current point's frequency.
    */
-  void Acquisition::SetFirstFrame(int num)
+  void Acquisition::SetFirstFrame(int num, bool adaptEvents)
   {
     if (num <= 0)
     {
@@ -1033,8 +1064,20 @@ namespace btk
     }
     else if (this->m_FirstFrame == num)
       return;
+    int shift = num - this->m_FirstFrame;
     this->m_FirstFrame = num;
     this->Modified();
+    
+    
+    if (adaptEvents && (shift != 0) && (this->m_PointFrequency != 0.0))
+    {
+      double t = 1.0 / this->m_PointFrequency;
+      for (EventIterator it = this->BeginEvent() ; it != this->EndEvent() ; ++it)
+      {
+        (*it)->SetFrame((*it)->GetFrame()+shift);
+        (*it)->SetTime((*it)->GetFrame()*t);
+      }
+    }
   };
   
   /**
@@ -1137,7 +1180,7 @@ namespace btk
 
   /**
    * @fn double Acquisition::GetAnalogFrequency() const
-   * Returns the points sample rate.
+   * Returns the analogs sample rate.
    */
 
   /**
@@ -1159,10 +1202,14 @@ namespace btk
   /**
    * @fn int Acquisition::GetMaxInterpolationGap() const
    * Gets the maximum gap length that any interpolation method would fill for the 3D point data.
+   *
+   * @warning Only for information. Could be use later by a filter to fill gap 3D trajectories.
    */
    
   /**
    * Sets the maximum gap length that any interpolation method would fill for the 3D point data.
+   *
+   * @warning Only for information. Could be use later by a filter to fill gap 3D trajectories.
    */
   void Acquisition::SetMaxInterpolationGap(int gap)
   {

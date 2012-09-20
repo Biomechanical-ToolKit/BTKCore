@@ -124,6 +124,23 @@ CXXTEST_SUITE(AcquisitionTest)
     test->RemovePoint("uname*1");
     TS_ASSERT_EQUALS(test->GetPointNumber(), 0);
   }
+  
+  CXXTEST_TEST(SetFirstFrameAdaptEvent)
+  {
+    btk::Acquisition::Pointer test = btk::Acquisition::New();
+    test->SetPointFrequency(100);
+    test->AppendEvent(btk::Event::New("FOO", 102, "Right", btk::Event::Manual, "", "", 1));
+    test->AppendEvent(btk::Event::New("BAR", 219, "Left", btk::Event::Manual, "", "", 2));
+    test->AppendEvent(btk::Event::New("FOO", 305, "General", btk::Event::Manual, "", "", 1));
+    test->SetFirstFrame(10, true);
+    TS_ASSERT_EQUALS(test->GetFirstFrame(), 10);
+    TS_ASSERT_EQUALS(test->GetEvent(0)->GetFrame(), 111);
+    TS_ASSERT_DELTA(test->GetEvent(0)->GetTime(), 1.11, 1e-11);
+    TS_ASSERT_EQUALS(test->GetEvent(1)->GetFrame(), 228);
+    TS_ASSERT_DELTA(test->GetEvent(1)->GetTime(), 2.28, 1e-11);
+    TS_ASSERT_EQUALS(test->GetEvent(2)->GetFrame(), 314);
+    TS_ASSERT_DELTA(test->GetEvent(2)->GetTime(), 3.14, 1e-11);
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(AcquisitionTest)
@@ -136,4 +153,5 @@ CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitPointOnly)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitAnalogOnly)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, ResizeFromEnd)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, RemoveLastPoint)
+CXXTEST_TEST_REGISTRATION(AcquisitionTest, SetFirstFrameAdaptEvent)
 #endif

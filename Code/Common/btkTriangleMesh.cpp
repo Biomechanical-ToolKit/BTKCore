@@ -84,12 +84,12 @@ namespace btk
     */
     
   /**
-   * @fn TriangleMesh::Pointer TriangleMesh::New(const std::list<int>& m, const std::list<TriangleMesh::VertexLink>& l)
+   * @fn Pointer TriangleMesh::New(const std::vector< int > &m, const std::vector< VertexLink > &l)
    * Creates a smart pointer to a TriangleMesh object.
    */
    
   /**
-   * @fn TriangleMesh::Pointer TriangleMesh::New(const std::list<int>& m, const std::list<TriangleMesh::VertexLink>& l, const std::list<TriangleMesh::VertexFace>& f)
+   * @fn Pointer TriangleMesh::New(const std::vector< int > &m, const std::vector< VertexLink > &l, const std::vector< VertexFace > &f)
    * Creates a smart pointer to a TriangleMesh object.
    */
     
@@ -425,6 +425,11 @@ namespace btk
    * Sets the IDs.
    */
   
+  /**
+   * @fn friend bool TriangleMesh::VertexLink::operator== (const VertexLink& lhs, const VertexLink& rhs)
+   * Equal operator.
+   */
+  
   // ----------------------------- VertexFace ------------------------------ //
   
   /**
@@ -446,7 +451,12 @@ namespace btk
    * @fn void TriangleMesh::VertexFace::SetIds(int id1, int id2, int id3)
    * Sets the IDs.
    */
-   
+  
+  /**
+   * @fn friend bool TriangleMesh::VertexFace::operator== (const VertexFace& lhs, const VertexFace& rhs)
+   * Equal operator.
+   */
+  
   // ------------------------------- Vertex -------------------------------- //
   
   /**

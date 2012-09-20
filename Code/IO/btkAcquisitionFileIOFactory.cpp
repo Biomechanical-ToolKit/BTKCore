@@ -34,6 +34,7 @@
  */
 
 #include "btkAcquisitionFileIOFactory.h"
+#include "btkAcquisitionFileIOFactory_p.h"
 
 namespace btk
 {
@@ -68,7 +69,7 @@ namespace btk
     AcquisitionFileIO::Pointer io;
     if (mode == ReadMode)
     {
-      for (AcquisitionFileIOInfos::ConstIterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+      for (AcquisitionFileIOHandles::ConstIterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
       {
         if ((*it)->HasReadOperation() && (io = (*it)->GetFileIO())->CanReadFile(filename))
           return io;
@@ -76,7 +77,7 @@ namespace btk
     }
     else
     {
-      for (AcquisitionFileIOInfos::ConstIterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+      for (AcquisitionFileIOHandles::ConstIterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
       {
         if ((*it)->HasWriteOperation() && (io = (*it)->GetFileIO())->CanWriteFile(filename))
           return io;
@@ -90,9 +91,9 @@ namespace btk
    *
    * Should not be used by developers. Internal purpose.
    */
-  bool AcquisitionFileIOFactory::AddFileIO(AcquisitionFileIOInfo::Pointer infoIO)
+  bool AcquisitionFileIOFactory::AddFileIO(AcquisitionFileIOHandle::Pointer infoIO)
   {
-    for (AcquisitionFileIOInfos::ConstIterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+    for (AcquisitionFileIOHandles::ConstIterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
     {
       if ((*it)->GetFunctor() == infoIO->GetFunctor())
         return false;
@@ -106,9 +107,9 @@ namespace btk
    *
    * Should not be used by developers. Internal purpose.
    */
-  bool AcquisitionFileIOFactory::RemoveFileIO(AcquisitionFileIOInfo::Pointer infoIO)
+  bool AcquisitionFileIOFactory::RemoveFileIO(AcquisitionFileIOHandle::Pointer infoIO)
   {
-    for (AcquisitionFileIOInfos::Iterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+    for (AcquisitionFileIOHandles::Iterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
     {
       if ((*it)->GetFunctor() == infoIO->GetFunctor())
       {
@@ -120,12 +121,14 @@ namespace btk
   };
   
   /**
+   * Returns the list of the file extensions than the factory could read.
    *
+   * Note: This list is directly created by the acquisition file IO registered with this factory.
    */
   AcquisitionFileIO::Extensions AcquisitionFileIOFactory::GetSupportedReadExtensions()
   {
     AcquisitionFileIO::Extensions exts;
-    for (AcquisitionFileIOInfos::Iterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+    for (AcquisitionFileIOHandles::Iterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
     {
       if ((*it)->HasReadOperation())
         exts.Append((*it)->GetFileIO()->GetSupportedExtensions());
@@ -134,12 +137,14 @@ namespace btk
   };
   
   /**
+   * Returns the list of the file extensions than the factory could write.
    *
+   * Note: This list is directly created by the acquisition file IO registered with this factory.
    */
   AcquisitionFileIO::Extensions AcquisitionFileIOFactory::GetSupportedWrittenExtensions()
   {
     AcquisitionFileIO::Extensions exts;
-    for (AcquisitionFileIOInfos::Iterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
+    for (AcquisitionFileIOHandles::Iterator it = AcquisitionFileIOFactory::GetInfoIOs()->list.begin() ; it != AcquisitionFileIOFactory::GetInfoIOs()->list.end() ; ++it)
     {
       if ((*it)->HasWriteOperation())
         exts.Append((*it)->GetFileIO()->GetSupportedExtensions());
@@ -157,9 +162,9 @@ namespace btk
    * Empty destructor.
    */
   
-  AcquisitionFileIOInfos* AcquisitionFileIOFactory::GetInfoIOs()
+  AcquisitionFileIOHandles* AcquisitionFileIOFactory::GetInfoIOs()
   {
-    static AcquisitionFileIOInfos infoIOs;
+    static AcquisitionFileIOHandles infoIOs;
     return &infoIOs;
   };
 };

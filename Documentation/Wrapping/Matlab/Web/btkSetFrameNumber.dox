@@ -10,6 +10,6 @@
  * <tt>btkSetFrameNumber(h, num)</tt> resizes the number of frames. The analog's frame number will correspond to @c num multiplied by the ratio set in the acquisition.
  * <tt>btkSetFrameNumber(h, num, r)</tt> resizes the number of frames where the analog's frame number will correspond to the product @c num by @c r.
  * 
- * @sa btkSetAnalogResolution, btkSetAnalogSampleNumberPerFrame, btkSetFirstFrame, btkSetFrequency, btkSetMaxInterpolationGap, btkSetPointNumber
+ * @sa btkCutAcquisition, btkSetAnalogResolution, btkSetAnalogSampleNumberPerFrame, btkSetFirstFrame, btkSetFrequency, btkSetMaxInterpolationGap, btkSetPointNumber
  * @ingroup BTKMatlabAcquisitionModifier
  */

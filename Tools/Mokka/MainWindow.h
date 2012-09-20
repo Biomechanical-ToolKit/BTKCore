@@ -50,9 +50,10 @@ class Metadata;
 class ModelDockWidget;
 class NewSegmentDialog;
 class ProgressWidget;
-class UpdateChecker;
+class UpdateManager;
 class QUndoStack;
 class ChartDialog;
+class AcquisitionTool;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -82,6 +83,7 @@ public slots:
   void clearRecentFiles();
   void openFile();
   void openFileDropped(const QString& filename);
+  void reloadFile();
   void saveFile();
   void saveAsFile();
   void closeFile();
@@ -126,6 +128,9 @@ public slots:
   void computeDistanceFromMarkersSelection();
   void computeAngleFromMarkersSelection();
   void computeAngleFromMarkersSelection2();
+  void detectGaitEvents();
+  void removeAnalogOffsetFromReferenceFile();
+  void removeAnalogOffsetFromSelectedFrames();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
@@ -166,7 +171,8 @@ public slots:
   void setPreferenceDefaultOrientation(int index);
   void setPreferenceDefaultTimeBarEventDisplay(int index);
   void setPreferenceDefaultBackgroundColor(const QColor& color);
-  void setPreferenceDefaultGridColor(const QColor& color);
+  void setPreferenceDefaultGridFrontColor(const QColor& color);
+  void setPreferenceDefaultGridBackColor(const QColor& color);
   void setPreferenceDefaultSegmentColor(const QColor& color);
   void setPreferenceDefaultMarkerColor(const QColor& color);
   void setPreferenceDefaultMarkerRadius(double radius);
@@ -181,6 +187,7 @@ public slots:
   void setPreferenceShowChartEvent(int index);
   void setPreferenceChartUnitAxisX(int index);
   void setPreferenceAutomaticCheckUpdate(bool isChecked);
+  void setPreferenceSubscribeDevelopmentChannel(bool isChecked);
   // Others
   void updateSelectedMarkersRadius(double r);
   void updateSelectedVideosDelay(double d);
@@ -206,7 +213,7 @@ private:
   void saveFile(const QString& filename);
   void exportAcquisition(const QString& filter);
   void importAcquisition(const QString& filter);
-  bool importAcquisitions(const QStringList& filenames, bool allFramesKept = true);
+  bool importAcquisitions(const QStringList& filenames, bool allFramesKept = true, bool keepWindowTitle = true);
   void importAssistant(int systemIndex, bool systemLocked = false, bool allFramesKeptOnly = false);
   bool importAssistantAMTI(const QString& filename, int infoIndex, bool allFramesKept, bool fromOpenAction = false);
   void reset();
@@ -220,6 +227,7 @@ private:
   void editSegment(bool isNew);
   void showChartTool(ChartDialog* chartDialog, bool computed);
   bool extractSelectedMarkers(QList<int>& selectedMarkers);
+  void runAcquisitionTool(AcquisitionTool* tool);
   
   Acquisition* mp_Acquisition;
   Model* mp_Model;
@@ -228,7 +236,7 @@ private:
   ModelDockWidget* mp_ModelDock;
   NewSegmentDialog* mp_SegmentEditor;
   ImportAssistantDialog* mp_ImportAssistant;
-  UpdateChecker* mp_UpdateChecker;
+  UpdateManager* mp_Updater;
   Preferences* mp_Preferences;
 #ifdef Q_OS_MAC
   QMenuBar* mp_MacMenuBar;

@@ -1,21 +1,18 @@
 /**
  * @class btkSetPoint
  * @brief Modify point's data and return updated points.
- * @syntax{[points\, pointsInfo] = btkSetPoint(h\, idx\, values)\n [points\, pointsInfo] = btkSetPoint(h\, idx\, values\, residuals)\n [points\, pointsInfo] = btkSetPoint(h\, idx\, values\, residuals\, masks)\n [points\, pointsInfo] = btkSetPoint(h\, idx\, values\, residuals\, masks\, desc)\n [points\, pointsInfo] = btkSetPoint(h\, label\, values)\n [points\, pointsInfo] = btkSetPoint(h\, label\, values\, residuals)\n [points\, pointsInfo] = btkSetPoint(h\, label\, values\, residuals\, masks)\n [points\, pointsInfo] = btkSetPoint(h\, label\, values\, residuals\, masks\, desc)}
+ * @syntax{[points\, pointsInfo] = btkSetPoint(h\, idx\, values)\n [points\, pointsInfo] = btkSetPoint(h\, idx\, values\, residuals)\n [points\, pointsInfo] = btkSetPoint(h\, idx\, values\, residuals\, desc)\n [points\, pointsInfo] = btkSetPoint(h\, label\, values)\n [points\, pointsInfo] = btkSetPoint(h\, label\, values\, residuals)\n [points\, pointsInfo] = btkSetPoint(h\, label\, values\, residuals\, desc)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param idx Integer containing the index of the point to modify.
  * @param label String containing the label of the point to modify.
  * @param values Matrix of reals (n,3) with the new components.
  * @param residuals Vector of reals with the new residuals.
- * @param masks Vector of integers with the new masks (see note #1).
  * @param description String with the new description.
  * @retval points Updated list of points. Its format is the same than using the function btkGetPoints.
  * @retval pointsInfo Updated informations related to the points. Its format is the same than using the function btkGetPoints.
  *
  * @par Detailed description:
- * <b>Remark:</b> The residuals and the masks are informational parameters and seems to not be used in commercial softwares.
- * \n\n
- * <b>Note #1:</b> The masks corresponds to conversions from binary number to integer. For example, the value 14 correspond to the mask 0b0001110, meaning that cameras #2, #3 and #4 was used to reconstruct the point. You can use the function btkConvertBinaryMasks2Decimals to convert the binary masks into decimal values.
+ * <b>Remark:</b> The residual is an informational parameter and is not available in every file format.
  * 
  * @ingroup BTKMatlabPointModifier
  */

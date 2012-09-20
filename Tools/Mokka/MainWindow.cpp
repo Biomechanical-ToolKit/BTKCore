@@ -49,13 +49,16 @@
 #include "ModelDockWidget.h"
 #include "ProgressWidget.h"
 #include "UndoCommands.h"
-#include "UpdateChecker.h"
+#include "UpdateManager.h"
 #include "Preferences.h"
 #include "TimeEventFunctors.h"
 #include "NewLayoutDialog.h"
 #include "NewSegmentDialog.h"
 #include "UserDefined.h"
 #include "Viz3DWidget.h"
+
+#include "Tools/GaitEventDetection.h"
+#include "Tools/RemoveAnalogOffset.h"
 
 #include <btkASCIIFileWriter.h>
 #include <btkMultiSTLFileWriter.h>
@@ -81,9 +84,9 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_FileInfoDock = new FileInfoDockWidget(this);
   this->mp_ImportAssistant = new ImportAssistantDialog(this);
   this->mp_SegmentEditor = 0;
-  this->mp_UpdateChecker = new UpdateChecker(MOKKA_VERSION_STRING, 
-                                              "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
-                                              ":/Resources/Images/Mokka_128.png", this);
+  this->mp_Updater = new UpdateManager(MOKKA_VERSION_STRING,
+                                       "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
+                                       ":/Resources/Images/Mokka_128.png", this);
 #ifdef Q_OS_MAC
   this->mp_MacMenuBar = 0;
   this->mp_Preferences = new Preferences(0); // No parent: to be independant of the main window
@@ -129,6 +132,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuAcquisition->addAction(this->timeEventControler->actionCropRegionOfInterest);
   this->menuAcquisition->addSeparator();
   this->menuAcquisition->addAction(this->timeEventControler->actionReframeFromOne);
+  this->menuEvent->addSeparator();
   this->menuEvent->addMenu(this->timeEventControler->insertEventMenu());
   this->menuEvent->addSeparator();
   this->menuEvent->addAction(this->timeEventControler->actionEditSelectedEvents);
@@ -138,6 +142,9 @@ MainWindow::MainWindow(QWidget* parent)
   this->actionToolComputeMarkerDistance->setEnabled(false);
   this->actionToolComputeMarkerAngle->setEnabled(false);
   this->actionToolComputeVectorAngle->setEnabled(false);
+  this->actionToolGaitEventDetection->setEnabled(false);
+  this->actionToolRemoveAnalogOffsetFromReferenceFile->setEnabled(false);
+  this->actionToolRemoveAnalogOffsetFromSelectedFrames->setEnabled(false);
 #ifdef Q_OS_MAC
   QFont f = this->font();
   f.setPointSize(10);
@@ -154,6 +161,7 @@ MainWindow::MainWindow(QWidget* parent)
 #endif
   this->mp_FileInfoDock->reset(); // Force to update geometry
   this->action_FileOpen->setShortcut(QKeySequence::Open);
+  this->actionReloadFile->setShortcut(QKeySequence::Refresh);
   this->actionClose->setShortcut(QKeySequence::Close);
   this->actionSave->setShortcut(QKeySequence::Save);
   this->actionSave_As->setShortcut(QKeySequence::SaveAs);
@@ -268,6 +276,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionHelp, SIGNAL(triggered()), this, SLOT(help()));
   connect(this->actionViewMetadata, SIGNAL(triggered()), this, SLOT(viewMetadata()));
   connect(this->action_FileOpen, SIGNAL(triggered()), this, SLOT(openFile()));
+  connect(this->actionReloadFile, SIGNAL(triggered()), this, SLOT(reloadFile()));
   connect(this->actionSave, SIGNAL(triggered()), this, SLOT(saveFile()));
   connect(this->actionSave_As, SIGNAL(triggered()), this, SLOT(saveAsFile()));
   connect(this->actionClose, SIGNAL(triggered()), this, SLOT(closeFile()));
@@ -313,6 +322,9 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionToolComputeMarkerDistance, SIGNAL(triggered()), this, SLOT(computeDistanceFromMarkersSelection()));
   connect(this->actionToolComputeMarkerAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection()));
   connect(this->actionToolComputeVectorAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection2()));
+  connect(this->actionToolGaitEventDetection, SIGNAL(triggered()), this, SLOT(detectGaitEvents()));
+  connect(this->actionToolRemoveAnalogOffsetFromReferenceFile, SIGNAL(triggered()), this, SLOT(removeAnalogOffsetFromReferenceFile()));
+  connect(this->actionToolRemoveAnalogOffsetFromSelectedFrames, SIGNAL(triggered()), this, SLOT(removeAnalogOffsetFromSelectedFrames()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -380,7 +392,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuHelp->addSeparator();
   QAction* actionCheckUpdate = this->menuHelp->addAction(tr("Check for Updates..."));
   actionCheckUpdate->setMenuRole(QAction::ApplicationSpecificRole);
-  connect(actionCheckUpdate, SIGNAL(triggered()), this->mp_UpdateChecker, SLOT(check()));
+  connect(actionCheckUpdate, SIGNAL(triggered()), this->mp_Updater, SLOT(checkUpdate()));
 #endif
 
   // Event filter
@@ -416,7 +428,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(defaultTimeBarEventDisplayChanged(int)), this, SLOT(setPreferenceDefaultTimeBarEventDisplay(int)));
   connect(this->mp_Preferences, SIGNAL(useEventEditorWhenInsertingStateChanged(bool)), this, SLOT(setPreferenceUseEventEditorWhenInserting(bool)));
   connect(this->mp_Preferences, SIGNAL(defaultBackgroundColorChanged(QColor)), this, SLOT(setPreferenceDefaultBackgroundColor(QColor)));
-  connect(this->mp_Preferences, SIGNAL(defaultGridColorChanged(QColor)), this, SLOT(setPreferenceDefaultGridColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(defaultGridFrontColorChanged(QColor)), this, SLOT(setPreferenceDefaultGridFrontColor(QColor)));
+  connect(this->mp_Preferences, SIGNAL(defaultGridBackColorChanged(QColor)), this, SLOT(setPreferenceDefaultGridBackColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultSegmentColorChanged(QColor)), this, SLOT(setPreferenceDefaultSegmentColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultMarkerColorChanged(QColor)), this, SLOT(setPreferenceDefaultMarkerColor(QColor)));
   connect(this->mp_Preferences, SIGNAL(defaultMarkerRadiusChanged(double)), this, SLOT(setPreferenceDefaultMarkerRadius(double)));
@@ -431,6 +444,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(showChartEventChanged(int)), this, SLOT(setPreferenceShowChartEvent(int)));
   connect(this->mp_Preferences, SIGNAL(chartUnitAxisXChanged(int)), this, SLOT(setPreferenceChartUnitAxisX(int)));
   connect(this->mp_Preferences, SIGNAL(automaticCheckUpdateStateChanged(bool)), this, SLOT(setPreferenceAutomaticCheckUpdate(bool)));
+  connect(this->mp_Preferences, SIGNAL(subscribeDevelopmentChannelStateChanged(bool)), this, SLOT(setPreferenceSubscribeDevelopmentChannel(bool)));
 #ifdef Q_OS_MAC
   connect(this->mp_Preferences, SIGNAL(userLayoutRemoved(int)), this, SLOT(removeUserLayout(int)));
   connect(this->mp_Preferences, SIGNAL(userLayoutLabelChanged(int, QString)), this, SLOT(relabelUserLayout(int, QString)));
@@ -438,6 +452,8 @@ MainWindow::MainWindow(QWidget* parent)
 #else
   connect(this->mp_Preferences, SIGNAL(userLayoutsChanged(QList<QVariant>, int)), this, SLOT(updateUserLayouts(QList<QVariant>, int)));
 #endif
+
+  this->mp_Updater->finalizeUpdate();
 };
 
 MainWindow::~MainWindow()
@@ -546,7 +562,7 @@ void MainWindow::checkSoftwareUpdateStartup()
   #if defined(NDEBUG)
     QSettings settings;
     if (settings.value("Preferences/checkUpdateStartup", true).toBool())
-      this->mp_UpdateChecker->check(true);
+      this->mp_Updater->checkUpdate(true);
   #endif
 #endif
 };
@@ -935,6 +951,61 @@ void MainWindow::computeAngleFromMarkersSelection2()
   }
 };
 
+void MainWindow::runAcquisitionTool(AcquisitionTool* tool)
+{
+  QUndoCommand* acquisitionCommand = new QUndoCommand;
+  if (tool->run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
+    this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
+  if (acquisitionCommand->childCount() == 0) // The undo command was not used.
+    delete acquisitionCommand;
+}
+
+void MainWindow::detectGaitEvents()
+{
+  GaitEventDetection tool(this);
+  this->runAcquisitionTool(&tool);
+  /*
+  GaitEventAssistantDialog assistant(this);
+  assistant.initialize(this->mp_Acquisition);
+  if (assistant.exec() == QDialog::Accepted)
+  {
+    QUndoCommand* acquisitionCommand = new QUndoCommand;
+    if (assistant.run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
+      this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
+    if (acquisitionCommand->childCount() == 0) // The undo command was not used.
+      delete acquisitionCommand;
+  }
+  */
+};
+
+void MainWindow::removeAnalogOffsetFromReferenceFile()
+{
+  RemoveAnalogOffset tool(RemoveAnalogOffset::FromReferenceFile, this);
+  this->runAcquisitionTool(&tool);
+  /*
+  RemoveAnalogOffset tool(RemoveAnalogOffset::FromReferenceFile, this);
+  QUndoCommand* acquisitionCommand = new QUndoCommand;
+  if (tool.run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
+    this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
+  if (acquisitionCommand->childCount() == 0) // The undo command was not used.
+    delete acquisitionCommand;
+  */
+};
+
+void MainWindow::removeAnalogOffsetFromSelectedFrames()
+{
+  RemoveAnalogOffset tool(RemoveAnalogOffset::FromSelectedFrames, this);
+  this->runAcquisitionTool(&tool);
+  /*
+  RemoveAnalogOffset tool(RemoveAnalogOffset::FromSelectedFrames, this);
+  QUndoCommand* acquisitionCommand = new QUndoCommand;
+  if (tool.run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
+    this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
+  if (acquisitionCommand->childCount() == 0) // The undo command was not used.
+    delete acquisitionCommand;
+  */
+};
+
 bool MainWindow::extractSelectedMarkers(QList<int>& selectedMarkers)
 {
   selectedMarkers.clear();
@@ -1027,6 +1098,12 @@ void MainWindow::openFile()
   }
 };
 
+void MainWindow::reloadFile()
+{
+  if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
+    this->openFile(this->m_RecentFiles[0]); // Don't use 'this->mp_Acquisition->fileName()' as it cleared during the loading.
+};
+
 void MainWindow::openFileDropped(const QString& filename)
 {
   if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
@@ -1053,7 +1130,6 @@ void MainWindow::openFile(const QString& filename)
     this->mp_ImportAssistant->amtiForceMomentLineEdit->setReadOnly(true);
     this->mp_ImportAssistant->amtiForceMomentButton->setEnabled(false);
     this->mp_ImportAssistant->importOptionFrame->setVisible(false);
-    this->mp_ImportAssistant->setWindowTitle("");
     bool accepted = this->mp_ImportAssistant->exec();
     this->mp_ModelDock->setEnabled(true); // If the dock is not enabled before the import, then its signals are not emited.
     if (!accepted)
@@ -1128,11 +1204,15 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionViewMetadata->setEnabled(true);
   this->actionSave_As->setEnabled(true);
   this->menuExport->menuAction()->setEnabled(true);
+  this->actionReloadFile->setEnabled(true);
   // Tools Menu
   this->actionToolCreateMarker->setEnabled(true);
   this->actionToolComputeMarkerDistance->setEnabled(true);
   this->actionToolComputeMarkerAngle->setEnabled(true);
   this->actionToolComputeVectorAngle->setEnabled(true);
+  this->actionToolGaitEventDetection->setEnabled(true);
+  this->actionToolRemoveAnalogOffsetFromReferenceFile->setEnabled(true);
+  this->actionToolRemoveAnalogOffsetFromSelectedFrames->setEnabled(true);
 };
 
 void MainWindow::saveFile()
@@ -1233,6 +1313,7 @@ void MainWindow::importAssistant()
 {
   this->mp_ImportAssistant->clear(this->m_LastDirectory);
   this->importAssistant(this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
+  this->actionReloadFile->setEnabled(false); // Because the imported file(s) from the assistant cannot be reloaded
 }
 
 void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFramesKeptOnly)
@@ -1307,7 +1388,7 @@ void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFra
     }
     else
     {
-      if (this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked()))
+      if (this->importAcquisitions(this->mp_ImportAssistant->filenames(), this->mp_ImportAssistant->keepAllFrameRadioButton->isChecked(), false))
       {
         QSettings settings;
         settings.setValue("ImportAssistant/lastAcquisitionSystem", this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
@@ -1458,22 +1539,29 @@ void MainWindow::importAcquisition(const QString& filter)
                        this->m_LastDirectory,
                        filter);
   if (!filename.isEmpty())
+  {
+    QString f = this->mp_Acquisition->fileName();
     this->importAcquisitions(QStringList(filename));
+    this->mp_Acquisition->setFileName(f);
+  }
 };
 
-bool MainWindow::importAcquisitions(const QStringList& filenames, bool allFramesKept)
+bool MainWindow::importAcquisitions(const QStringList& filenames, bool allFramesKept, bool keepWindowTitle)
 {
   bool noImportError = false;
   if (!filenames.isEmpty())
   {
     LOG_INFO(tr("Importing acquisition(s)."));
     QString title = this->windowTitle();
+    bool reloadStatus = this->actionReloadFile->isEnabled();
     ProgressWidget pw(this);
     pw.show();
     pw.setProgressValue(10);
     noImportError = this->mp_Acquisition->importFrom(filenames, allFramesKept);
     this->loadAcquisition(noImportError, &pw);
-    this->setWindowTitle(title);
+    if (keepWindowTitle)
+      this->setWindowTitle(title);
+    this->actionReloadFile->setEnabled(reloadStatus);
     pw.hide();
     if (noImportError)
     {
@@ -1585,15 +1673,15 @@ void MainWindow::exportSTL()
     }
     catch (btk::Exception& e)
     {
-      LOG_CRITICAL(e.what());
+      LOG_ERROR(e.what());
     }
     catch (std::exception& e)
     {
-      LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+      LOG_ERROR("Unexpected error: " + QString(e.what()));
     }
     catch (...)
     {
-      LOG_CRITICAL("Unknown error.");
+      LOG_ERROR("Unknown error.");
     }
     
     if (!noExportError)
@@ -1743,15 +1831,15 @@ void MainWindow::exportASCII()
       }
       catch (btk::Exception& e)
       {
-        LOG_CRITICAL(e.what());
+        LOG_ERROR(e.what());
       }
       catch (std::exception& e)
       {
-        LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+        LOG_ERROR("Unexpected error: " + QString(e.what()));
       }
       catch (...)
       {
-        LOG_CRITICAL("Unknown error.");
+        LOG_ERROR("Unknown error.");
       }
       
       if (!noExportError)
@@ -1772,8 +1860,8 @@ void MainWindow::exportASCII()
 void MainWindow::showPreferences()
 {
 #ifdef Q_OS_MAC
-  this->mp_Preferences->hide(); // Force the preferences to go back to the top.
   this->mp_Preferences->show();
+  this->mp_Preferences->raise();
 #else
   // Update the data for the user layouts
   int userLayoutIndex = -1;
@@ -1842,6 +1930,7 @@ void MainWindow::reset()
 {
   this->mp_AcquisitionUndoStack->clear();
   this->mp_MarkerConfigurationUndoStack->clear();
+  this->actionReloadFile->setEnabled(false);
   this->actionClose->setEnabled(false);
   this->actionViewMetadata->setEnabled(false);
   this->actionSave->setEnabled(false);
@@ -1853,6 +1942,9 @@ void MainWindow::reset()
   this->actionToolComputeMarkerDistance->setEnabled(false);
   this->actionToolComputeMarkerAngle->setEnabled(false);
   this->actionToolComputeVectorAngle->setEnabled(false);
+  this->actionToolGaitEventDetection->setEnabled(false);
+  this->actionToolRemoveAnalogOffsetFromReferenceFile->setEnabled(false);
+  this->actionToolRemoveAnalogOffsetFromSelectedFrames->setEnabled(false);
   // Tools modeless window
   QList<ChartDialog*>::iterator it = this->m_ToolCharts.begin();
   while (it != this->m_ToolCharts.end())
@@ -2346,7 +2438,7 @@ void MainWindow::setRegionOfInterest(int lf,int ff)
 
 void MainWindow::insertEvent(Event* e)
 {
-  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvent(this->mp_Acquisition, e)));
+  this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, new InsertEvents(this->mp_Acquisition, e)));
 };
 
 void MainWindow::reframeAcquisition(int ff)
@@ -2401,11 +2493,19 @@ void MainWindow::setPreferenceDefaultBackgroundColor(const QColor& color)
   this->multiView->setDefaultBackgroundColor(color);
 };
 
-void MainWindow::setPreferenceDefaultGridColor(const QColor& color)
+void MainWindow::setPreferenceDefaultGridFrontColor(const QColor& color)
 {
   QSettings settings;
+  // Keep the 'defaultGridColor' keyword to stay compatible with the previous settings
   settings.setValue("Preferences/defaultGridColor", color);
-  this->multiView->setDefaultGridColor(color);
+  this->multiView->setDefaultGridFrontColor(color);
+};
+
+void MainWindow::setPreferenceDefaultGridBackColor(const QColor& color)
+{
+  QSettings settings;
+  settings.setValue("Preferences/defaultGridBackColor", color);
+  this->multiView->setDefaultGridBackColor(color);
 };
 
 void MainWindow::setPreferenceDefaultSegmentColor(const QColor& color)
@@ -2534,6 +2634,13 @@ void MainWindow::setPreferenceAutomaticCheckUpdate(bool isChecked)
 {
   QSettings settings;
   settings.setValue("Preferences/checkUpdateStartup", isChecked);
+};
+
+void MainWindow::setPreferenceSubscribeDevelopmentChannel(bool isChecked)
+{
+  QSettings settings;
+  settings.setValue("Preferences/developmentChannelSubscription", isChecked);
+  this->mp_Updater->acceptDevelopmentUpdate(isChecked);
 };
 
 void MainWindow::removeUserLayout(int index)
@@ -2691,7 +2798,8 @@ void MainWindow::readSettings()
   int defaultPlaneOrientation = settings.value("defaultPlaneOrientation", 0).toInt();
   int defaultTimeBarEventDisplay = settings.value("defaultTimeBarEventDisplay", 0).toInt();
   QColor defaultBackgroundColor = settings.value("defaultBackgroundColor", QColor(0,0,0)).value<QColor>();
-  QColor defaultGridColor = settings.value("defaultGridColor", QColor(204,204,204)).value<QColor>();
+  QColor defaultGridFrontColor = settings.value("defaultGridColor", QColor(204,204,204)).value<QColor>(); // Keep the 'defaultGridColor' keyword to stay compatible with the previous settings
+  QColor defaultGridBackColor = settings.value("defaultGridBackColor", QColor(255,0,0)).value<QColor>();
   QColor defaultSegmentColor = settings.value("defaultSegmentColor", QColor(255,255,255)).value<QColor>();
   QColor defaultMarkerColor = settings.value("defaultMarkerColor", QColor(255,255,255)).value<QColor>();
   double defaultMarkerRadius = settings.value("defaultMarkerRadius", 8.0).toDouble();
@@ -2706,6 +2814,7 @@ void MainWindow::readSettings()
   int showChartEvent = settings.value("showChartEvent", 0).toInt();
   int chartUnitAxisX = settings.value("chartUnitAxisX", 0).toInt();
   bool checkUpdateStartup = settings.value("checkUpdateStartup", true).toBool();
+  bool developmentChannelSubscription = settings.value("developmentChannelSubscription", false).toBool();
   settings.endGroup();
   this->mp_Preferences->lastDirectory = this->m_LastDirectory;
   this->mp_Preferences->defaultConfigurationCheckBox->setChecked(defaultConfigurationUsed);
@@ -2714,7 +2823,8 @@ void MainWindow::readSettings()
   this->mp_Preferences->defaultPlaneOrientationComboBox->setCurrentIndex(defaultPlaneOrientation);
   this->mp_Preferences->defaultTimeBarEventDisplayComboBox->setCurrentIndex(defaultTimeBarEventDisplay);
   colorizeButton(this->mp_Preferences->defaultBackgroundColorButton, defaultBackgroundColor);
-  colorizeButton(this->mp_Preferences->defaultGridColorButton, defaultGridColor);
+  colorizeButton(this->mp_Preferences->defaultGridFrontColorButton, defaultGridFrontColor);
+  colorizeButton(this->mp_Preferences->defaultGridBackColorButton, defaultGridBackColor);
   colorizeButton(this->mp_Preferences->defaultSegmentColorButton, defaultSegmentColor);
   colorizeButton(this->mp_Preferences->defaultMarkerColorButton, defaultMarkerColor);
   this->mp_Preferences->defaultMarkerRadiusSpinBox->setValue(defaultMarkerRadius);
@@ -2729,6 +2839,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->defaultChartEventDisplayComboBox->setCurrentIndex(showChartEvent);
   this->mp_Preferences->defaultChartUnitAxisXComboBox->setCurrentIndex(chartUnitAxisX);
   this->mp_Preferences->automaticCheckUpdateCheckBox->setChecked(checkUpdateStartup);
+  this->mp_Preferences->subscribeDevelopmentChannelCheckBox->setChecked(developmentChannelSubscription);
 
 #ifdef Q_OS_WIN
   this->mp_Preferences->setPreference(Preferences::DefaultConfigurationUse, defaultConfigurationUsed);
@@ -2737,7 +2848,8 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::DefaultGroundOrientation, defaultPlaneOrientation);
   this->mp_Preferences->setPreference(Preferences::DefaultTimeBarEventDisplay, defaultTimeBarEventDisplay);
   this->mp_Preferences->setPreference(Preferences::DefaultBackgroundColor, defaultBackgroundColor);
-  this->mp_Preferences->setPreference(Preferences::DefaultGridColor, defaultGridColor);
+  this->mp_Preferences->setPreference(Preferences::DefaultGridFrontColor, defaultGridFrontColor);
+  this->mp_Preferences->setPreference(Preferences::DefaultGridBackColor, defaultGridBackColor);
   this->mp_Preferences->setPreference(Preferences::DefaultSegmentColor, defaultSegmentColor);
   this->mp_Preferences->setPreference(Preferences::DefaultMarkerColor, defaultMarkerColor);
   this->mp_Preferences->setPreference(Preferences::DefaultMarkerRadius, defaultMarkerRadius);
@@ -2754,6 +2866,7 @@ void MainWindow::readSettings()
   this->mp_Preferences->setPreference(Preferences::UserLayoutIndex, layoutIndex);
   this->mp_Preferences->setPreference(Preferences::UserLayouts, this->m_UserLayouts);
   this->mp_Preferences->setPreference(Preferences::AutomaticCheckUpdateUse, checkUpdateStartup);
+  this->mp_Preferences->setPreference(Preferences::DevelopmentChannelSubscriptionUsed, developmentChannelSubscription);
 #endif
   
   if (defaultConfigurationUsed && !defaultConfigurationPath.isEmpty())
@@ -2762,7 +2875,8 @@ void MainWindow::readSettings()
   this->multiView->setDefaultGroundOrientation(defaultPlaneOrientation);
   this->timeEventControler->setTimeEventTicksDisplay(defaultTimeBarEventDisplay);
   this->multiView->setDefaultBackgroundColor(defaultBackgroundColor);
-  this->multiView->setDefaultGridColor(defaultGridColor);
+  this->multiView->setDefaultGridFrontColor(defaultGridFrontColor);
+  this->multiView->setDefaultGridBackColor(defaultGridBackColor);
   this->multiView->setDefaultSegmentColor(defaultSegmentColor);
   this->multiView->setDefaultMarkerColor(defaultMarkerColor);
   this->multiView->setDefaultMarkerRadius(defaultMarkerRadius);
@@ -2778,6 +2892,7 @@ void MainWindow::readSettings()
     this->multiView->setFrameAsChartUnitAxisX();
   else
     this->multiView->setTimeAsChartUnitAxisX();
+  this->mp_Updater->acceptDevelopmentUpdate(developmentChannelSubscription);
   
   // Import assistant
   settings.beginGroup("ImportAssistant");

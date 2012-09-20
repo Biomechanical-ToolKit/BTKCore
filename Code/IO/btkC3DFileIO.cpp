@@ -78,7 +78,7 @@ namespace btk
    * Analog's data are stored as signed integer values (by default).
    */
   /**
-   * @var C3DFileIO::AnalogIntegerFormat C3DFileIO::Signed
+   * @var C3DFileIO::AnalogIntegerFormat C3DFileIO::Unsigned
    * Analog's data are stored as unsigned integer values.
    */
 
@@ -136,7 +136,7 @@ namespace btk
 
   /**
    * @fn AnalogIntegerFormat C3DFileIO::GetAnalogIntegerFormat() const
-   * Return the integer format (signed/unsigned) 
+   * Return the integer format (signed/unsigned).
    */
 
   /**
@@ -146,7 +146,7 @@ namespace btk
 
   /**
    * @fn std::vector<double>& C3DFileIO::GetAnalogChannelScale()
-   * Returns the vector of scales used for the analog channels' scaling.
+   * Returns the vector of scales used for the analog channels' scaling (parameter ANALOG:SCALE).
    */
 
   /**
@@ -161,7 +161,7 @@ namespace btk
 
   /**
    * @fn std::vector<int>& C3DFileIO::GetAnalogZeroOffset()
-   * Returns the vector of offsets used for the analog channels' scaling.
+   * Returns the vector of offsets used for the analog channels' scaling (parameter ANALOG:OFFSET).
    */
 
   /**
@@ -176,7 +176,7 @@ namespace btk
 
   /**
    * @fn double C3DFileIO::GetAnalogUniversalScale() const
-   * Returns the universal scale factor used to scale analog channels.
+   * Returns the universal scale factor used to scale analog channels (parameter ANALOG:GEN_SCALE).
    */
 
   /**
@@ -792,8 +792,7 @@ namespace btk
               fdf->ReadPoint(&(point->GetValues().data()[frame]),
                              &(point->GetValues().data()[frame + frameNumber]),
                              &(point->GetValues().data()[frame + 2*frameNumber]),
-                             &(point->GetResiduals().data()[frame]), 
-                             &(point->GetMasks().data()[frame]),
+                             &(point->GetResiduals().data()[frame]),
                              this->m_PointScale);
               ++itM;
             }
@@ -865,13 +864,12 @@ namespace btk
             MetaDataCollapseChildrenValues<std::string>(collapsed, *itPoint, "DESCRIPTIONS", pointNumber, "uname*");
             inc = 0; for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
               (*it)->SetLabel(collapsed[inc++]);
-            // Set correctly coordinates, residuals and masks for occluded markers
+            // Set correctly coordinates and residuals for occluded markers
             for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
             {
               Point::Values& coords = (*it)->GetValues();
               Eigen::Matrix<double, Eigen::Dynamic, 1> diff = (coords.rowwise().sum() / 3.0).cwise() - 9999999.0;
               Point::Residuals& res = (*it)->GetResiduals();
-              Point::Masks& masks = (*it)->GetMasks();
               for (int k = 0 ; k < (*it)->GetFrameNumber() ; ++k)
               {
                 if (fabs(diff.coeff(k)) < std::numeric_limits<float>::epsilon())
@@ -880,7 +878,6 @@ namespace btk
                   coords.coeffRef(k,1) = 0.0;
                   coords.coeffRef(k,2) = 0.0;
                   res.coeffRef(k) = -1.0;
-                  masks.coeffRef(k) = -1.0;
                 }
               }
             }
@@ -1063,7 +1060,7 @@ namespace btk
         throw(C3DFileIOException("No File access"));
       
       // Update data in the acquisition
-      // Require to clone somee data from the input.
+      // Require to clone some data from the input.
       Acquisition::Pointer in = Acquisition::New();
       in->SetFirstFrame(input->GetFirstFrame());
       in->SetPointFrequency(input->GetPointFrequency());
@@ -1211,17 +1208,6 @@ namespace btk
       // -= DATA =-
       if (!templateFile)
       {
-        // Check the values for cameras' masks and be sure to have a compatible format
-        bool invalidMaskValue = false;
-        double maxMaskValue = 0.0;
-        for (Acquisition::PointConstIterator itPoint = input->BeginPoint() ; itPoint != input->EndPoint() ; ++itPoint)
-          maxMaskValue = std::max(maxMaskValue, (*itPoint)->GetMasks().maxCoeff());
-        if (maxMaskValue > 128) // max camera mask value
-        {
-          invalidMaskValue = true;
-          btkErrorMacro("Cameras' masks don't fit the format used in the C3D format. Mask for visible marker is replaced by 0 and -1 when occluded.");
-        }
-        
         obfs->SeekWrite(512 * (dS - 1), BinaryFileStream::Begin);
         if (this->m_StorageFormat == Integer) // integer
         {
@@ -1246,8 +1232,7 @@ namespace btk
             fdf->WritePoint(point->GetValues().data()[frame],
                             point->GetValues().data()[frame + frameNumber],
                             point->GetValues().data()[frame + 2*frameNumber],
-                            point->GetResiduals().data()[frame], 
-                            invalidMaskValue ? ((point->GetMasks().data()[frame] >= 0.0) ? 0.0 : -1.0) : point->GetMasks().data()[frame],
+                            point->GetResiduals().data()[frame],
                             this->m_PointScale);
             ++itM;
           }
@@ -1298,22 +1283,19 @@ namespace btk
    * Constructor.
    */
   C3DFileIO::C3DFileIO()
-  : AcquisitionFileIO(), 
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_BigEndian, AcquisitionFileIO::Float),
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::VAX_LittleEndian, AcquisitionFileIO::Float),
+#else
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Float),
+#endif  
     m_AnalogChannelScale(),
     m_AnalogZeroOffset()
   {
     this->m_PointScale = 0.1;
     this->m_AnalogUniversalScale = 1.0;
-    this->m_StorageFormat = Float;
     this->m_AnalogIntegerFormat = Signed;
-    this->SetFileType(AcquisitionFileIO::Binary);
-#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-    this->SetByteOrder(btk::C3DFileIO::IEEE_BigEndian);
-#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
-    this->SetByteOrder(btk::C3DFileIO::VAX_LittleEndian);
-#else
-    this->SetByteOrder(btk::C3DFileIO::IEEE_LittleEndian);
-#endif
     this->m_WritingFlags = ScalesFromDataUpdate | MetaDataFromDataUpdate | CompatibleVicon;  
   };
 
@@ -1853,7 +1835,7 @@ namespace btk
       MetaDataCreateChild(event, "CONTEXTS", contexts);
       MetaDataCreateChild(event, "LABELS", labels);
       MetaDataCreateChild(event, "DESCRIPTIONS", descs);
-      MetaDataCreateChild2D(event, "TIMES", times, 2);
+      MetaDataCreateChild(event, "TIMES", times, 2);
       MetaDataCreateChild(event, "SUBJECTS", subjects);
       MetaDataCreateChild(event, "GENERIC_FLAGS", genericFlags);
       MetaDataCreateChild(event, "ICON_IDS", iconIds);

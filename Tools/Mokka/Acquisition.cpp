@@ -120,17 +120,17 @@ bool Acquisition::load(const QString& filename)
   }
   catch (btk::Exception& e)
   {
-    LOG_CRITICAL(e.what());
+    LOG_ERROR(e.what());
     return false;
   }
   catch (std::exception& e)
   {
-    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    LOG_ERROR("Unexpected error: " + QString(e.what()));
     return false;
   }
   catch (...)
   {
-    LOG_CRITICAL("Unknown error.");
+    LOG_ERROR("Unknown error.");
     return false;
   }
   this->clear();
@@ -174,17 +174,17 @@ bool Acquisition::importFrom(const QStringList& filenames, bool allFramesKept)
   }
   catch (btk::Exception& e)
   {
-    LOG_CRITICAL(e.what());
+    LOG_ERROR(e.what());
     return false;
   }
   catch (std::exception& e)
   {
-    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    LOG_ERROR("Unexpected error: " + QString(e.what()));
     return false;
   }
   catch (...)
   {
-    LOG_CRITICAL("Unknown error.");
+    LOG_ERROR("Unknown error.");
     return false;
   }
   return this->importFrom(acquisitions, allFramesKept);
@@ -261,17 +261,17 @@ bool Acquisition::importFromAMTI(const QString& filename, bool allFramesKept, bt
   }
   catch (btk::Exception& e)
   {
-    LOG_CRITICAL(e.what());
+    LOG_ERROR(e.what());
     return false;
   }
   catch (std::exception& e)
   {
-    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    LOG_ERROR("Unexpected error: " + QString(e.what()));
     return false;
   }
   catch (...)
   {
-    LOG_CRITICAL("Unknown error.");
+    LOG_ERROR("Unknown error.");
     return false;
   }
   bool res = this->importFrom(acquisitions, allFramesKept);
@@ -540,7 +540,7 @@ int Acquisition::createAveragedMarker(const QList<int>& markerIds)
                            z / static_cast<double>(numMarkers));
     }
     else
-      average->SetFrame(i, 0.0, 0.0, 0.0, -1.0, -1.0);
+      average->SetFrame(i, 0.0, 0.0, 0.0, -1.0);
   }
   this->mp_BTKAcquisition->GetPoints()->InsertItem(average);
   
@@ -552,7 +552,7 @@ int Acquisition::createAveragedMarker(const QList<int>& markerIds)
   p->trajectoryVisible = false;
   p->radius = this->m_DefaultMarkerRadius;
   p->color = this->m_DefaultMarkerColor;
-  p->btkidx = this->m_LastPointId;
+  p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetItemNumber()-1;
   this->insertPoints(QList<int>() << this->m_LastPointId, QList<Point*>() << p);
 
   LOG_INFO("Marker " + p->label + " created. " + p->description);
@@ -719,6 +719,24 @@ void Acquisition::insertAnalogs(const QList<int>& ids, const QList<Analog*> anal
       qDebug("An analog channel with the given ID already exists");
   }
   emit analogsInserted(ids, analogs);
+};
+
+void Acquisition::shiftAnalogsValues(const QVector<int>& ids, const QVector<double>& offsets)
+{
+  int numAnalogs = this->mp_BTKAcquisition->GetAnalogNumber();
+  for (int i = 0 ; i < ids.count() ; ++i)
+  {
+    if (ids[i] < numAnalogs)
+    {
+      btk::AnalogCollection::Iterator it = this->mp_BTKAcquisition->BeginAnalog();
+      std::advance(it,ids[i]);
+      (*it)->GetValues().cwise() += offsets[i];
+      (*it)->Modified();
+    }
+  }
+  this->btkGroundReactionWrenches()->Update();
+  this->btkWrenchDirectionAngles()->Update();
+  emit analogsValuesChanged(ids);
 };
 
 const Event* Acquisition::eventAt(int id) const
@@ -1047,7 +1065,6 @@ bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
     btk::Point::Pointer targetP = btk::Point::New(p->label.toStdString(), numFramePoint, type, p->description.toStdString());
     targetP->SetValues(sourceP->GetValues().block(lb-this->m_FirstFrame,0,numFramePoint,3));
     targetP->SetResiduals(sourceP->GetResiduals().block(lb-this->m_FirstFrame,0,numFramePoint,1));
-    targetP->SetMasks(sourceP->GetMasks().block(lb-this->m_FirstFrame,0,numFramePoint,1));
     targetPoints->InsertItem(targetP);
     ++numPoints;
   }
@@ -1093,17 +1110,17 @@ bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
   }
   catch (btk::Exception& e)
   {
-    LOG_CRITICAL(e.what());
+    LOG_ERROR(e.what());
     return false;
   }
   catch (std::exception& e)
   {
-    LOG_CRITICAL("Unexpected error: " + QString(e.what()));
+    LOG_ERROR("Unexpected error: " + QString(e.what()));
     return false;
   }
   catch (...)
   {
-    LOG_CRITICAL("Unknown error.");
+    LOG_ERROR("Unknown error.");
     return false;
   }
   if (updateInfo)
@@ -1142,6 +1159,7 @@ void Acquisition::loadAcquisition()
   this->mp_ROI[1] = this->m_LastFrame;
   int inc = 0;
   // The orders for the points are important as their ID follows the same rule than in the class btk::VTKMarkersFramesSource
+  // FIXME: The current solution is not the best if there is more than 32768 markers as the first ID of the model ouputs starts from this value. Maybe a map between the marker's ID and the corresponding index in the VTKMarkersFramesSource should fix definitively this problem
   // Markers
   btk::PointCollection::Pointer points = virtualMarkersSeparator->GetOutput(0);
   for (btk::PointCollection::ConstIterator it = points->Begin() ; it != points->End() ; ++it)
@@ -1210,7 +1228,7 @@ void Acquisition::loadAcquisition()
     p->radius = -1.0;
     p->color = QColor::Invalid;
     p->btkidx = this->mp_BTKAcquisition->GetPoints()->GetIndexOf(*it);
-    this->m_Points.insert(65535 + inc++, p); // 65535: To distinct clearly the markers from the others points.
+    this->m_Points.insert(32767 + inc++, p); // 32767: To distinct clearly the markers from the others points.
   }
   // Analog
   inc = 0;

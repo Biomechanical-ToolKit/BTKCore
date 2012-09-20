@@ -22,7 +22,8 @@ ENDFOREACH(f)
 # Class List -> Function List
 FILE(READ "${BTK_BINARY_DIR}/Documentation/Wrapping/Matlab/annotated.html" IN)
 STRING(REPLACE "<h1>Class List</h1>" "<h1>Function List</h1>" OUT "${IN}")
-STRING(REPLACE "Here are the classes, structs, unions and interfaces with brief descriptions:" "" OUT "${OUT}")
+STRING(REPLACE "Here are the classes, structs, unions and interfaces with brief descriptions:" "Here are the function with brief descriptions:" OUT "${OUT}")
+STRING(REPLACE "<img src=\"ftv2cl.png\" alt=\"C\" width=\"24\" height=\"22\" />" "" OUT "${OUT}")
 FILE(WRITE "${BTK_BINARY_DIR}/Documentation/Wrapping/Matlab/annotated.html" "${OUT}")
 
 # Class Index -> Function Index

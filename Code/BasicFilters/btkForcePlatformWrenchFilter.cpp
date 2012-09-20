@@ -42,7 +42,10 @@ namespace btk
    * @class ForcePlatformWrenchFilter btkForcePlatformWrenchFilter.h
    * @brief Calcule the wrench of the center of the force platform data, expressed in the global frame (by default).
    *
-   * You can use the method 
+   * Based on the given collection of forceplate set in input, this filter transform the associated analog channels in forces and moments.
+   * This transformation take into account the type of each force platform.
+   *
+   * You can use the method SetTransformToGlobalFrame() to have the wrench expressed in the frame of the force platform.
    *
    * @ingroup BTKBasicFilters
    */
@@ -69,7 +72,7 @@ namespace btk
 
   /**
    * @fn void ForcePlatformWrenchFilter::SetInput(ForcePlatform::Pointer input)
-   * Sets the input required with this process. This input is transformed in a collection a force platform with a single force platform.
+   * Sets the input required with this process. This input is transformed in a collection force platforms with a single force platform.
    */
   
   /**
@@ -149,12 +152,9 @@ namespace btk
         int frameNumber = (*it)->GetChannel(0)->GetFrameNumber();
         Wrench::Pointer wrh = Wrench::New(this->GetWrenchPrefix() + ToString(inc), frameNumber);
         output->InsertItem(wrh);
-        // Residuals & masks
-        wrh->GetPosition()->GetMasks().setZero(frameNumber);
+        // Residuals
         wrh->GetPosition()->GetResiduals().setZero(frameNumber);        
-        wrh->GetForce()->GetMasks().setZero(frameNumber);
         wrh->GetForce()->GetResiduals().setZero(frameNumber);
-        wrh->GetMoment()->GetMasks().setZero(frameNumber);
         wrh->GetMoment()->GetResiduals().setZero(frameNumber);
         // Values
         switch((*it)->GetType())
@@ -221,10 +221,28 @@ namespace btk
   };
   
   /**
-   * Finish the computation of the wrench for the force platform type I (nothing to do).
+   * Finish the computation of the wrench for the force platform type I.
+   * Because, it is force platform Type I, the position is not set to the origin, but measured to the COP. The moment must be corrected!
    */
-  void ForcePlatformWrenchFilter::FinishTypeI(Wrench::Pointer /* wrh */, ForcePlatform::Pointer /* fp */, int /* index */)
-  {};
+  void ForcePlatformWrenchFilter::FinishTypeI(Wrench::Pointer wrh , ForcePlatform::Pointer /* fp */, int /* index */)
+  {
+    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Component;
+    Component Fx = wrh->GetForce()->GetValues().col(0);
+    Component Fy = wrh->GetForce()->GetValues().col(1);
+    Component Fz = wrh->GetForce()->GetValues().col(2);
+    Component Mx = wrh->GetMoment()->GetValues().col(0);
+    Component My = wrh->GetMoment()->GetValues().col(1);
+    Component Mz = wrh->GetMoment()->GetValues().col(2);
+    Component Px = wrh->GetPosition()->GetValues().col(0);
+    Component Py = wrh->GetPosition()->GetValues().col(1);
+    Component Pz = wrh->GetPosition()->GetValues().col(2);    
+    Mx -= Fy.cwise() * Pz - Py.cwise() * Fz;
+    My -= Fz.cwise() * Px - Pz.cwise() * Fx;
+    Mz -= Fx.cwise() * Py - Px.cwise() * Fy;
+    wrh->GetMoment()->GetValues().col(0) = Mx;
+    wrh->GetMoment()->GetValues().col(1) = My;
+    wrh->GetMoment()->GetValues().col(2) = Mz;
+  };
   
   /**
    * Finish the computation of the wrench for the AMTI force platform (nothing to do).

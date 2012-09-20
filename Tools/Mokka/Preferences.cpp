@@ -45,7 +45,8 @@ Preferences::Preferences(QWidget* parent)
   
   connect(this->defaultConfigurationButton, SIGNAL(clicked()), this, SLOT(setDefaultConfiguration()));
   connect(this->defaultBackgroundColorButton, SIGNAL(clicked()), this, SLOT(setDefaultBackgroundColor()));
-  connect(this->defaultGridColorButton, SIGNAL(clicked()), this, SLOT(setDefaultGridColor()));
+  connect(this->defaultGridFrontColorButton, SIGNAL(clicked()), this, SLOT(setDefaultGridFrontColor()));
+  connect(this->defaultGridBackColorButton, SIGNAL(clicked()), this, SLOT(setDefaultGridBackColor()));
   connect(this->defaultSegmentColorButton, SIGNAL(clicked()), this, SLOT(setDefaultSegmentColor()));
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultForcePlateColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForcePlateColor()));
@@ -61,7 +62,8 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[DefaultGroundOrientation] = -1;
   this->m_Data[DefaultTimeBarEventDisplay] = -1;
   this->m_Data[DefaultBackgroundColor] = QColor();
-  this->m_Data[DefaultGridColor] = QColor();
+  this->m_Data[DefaultGridBackColor] = QColor();
+  this->m_Data[DefaultGridFrontColor] = QColor();
   this->m_Data[DefaultSegmentColor] = QColor();
   this->m_Data[DefaultMarkerColor] = QColor();
   this->m_Data[DefaultMarkerRadius] = -1;
@@ -75,6 +77,7 @@ Preferences::Preferences(QWidget* parent)
   this->m_Data[UserLayoutIndex] = -1;
   this->m_Data[UserLayouts] = QList<QVariant>();
   this->m_Data[AutomaticCheckUpdateUse] = false;
+  this->m_Data[DevelopmentChannelSubscriptionUsed] = false;
   this->m_Data[DefaultPlotLineWidth] = -1;
   this->m_Data[ChartEventDisplay] = -1;
   this->m_Data[chartUnitAxisX] = -1;
@@ -132,11 +135,18 @@ void Preferences::saveSettings()
     emit defaultBackgroundColorChanged(color);
   }
   
-  color = this->defaultGridColorButton->property("backgroundColor").value<QColor>();
-  if (this->m_Data[DefaultGridColor].value<QColor>() != color)
+  color = this->defaultGridFrontColorButton->property("backgroundColor").value<QColor>();
+  if (this->m_Data[DefaultGridFrontColor].value<QColor>() != color)
   {
-    this->m_Data[DefaultGridColor] = color;
-    emit defaultGridColorChanged(color);
+    this->m_Data[DefaultGridFrontColor] = color;
+    emit defaultGridFrontColorChanged(color);
+  }
+  
+  color = this->defaultGridBackColorButton->property("backgroundColor").value<QColor>();
+  if (this->m_Data[DefaultGridBackColor].value<QColor>() != color)
+  {
+    this->m_Data[DefaultGridBackColor] = color;
+    emit defaultGridBackColorChanged(color);
   }
   
   color = this->defaultSegmentColorButton->property("backgroundColor").value<QColor>();
@@ -242,6 +252,13 @@ void Preferences::saveSettings()
     this->m_Data[AutomaticCheckUpdateUse] = checked;
     emit automaticCheckUpdateStateChanged(checked);
   }
+  
+  checked = this->subscribeDevelopmentChannelCheckBox->checkState() == Qt::Checked;
+  if (this->m_Data[DevelopmentChannelSubscriptionUsed].toBool() != checked)
+  {
+    this->m_Data[DevelopmentChannelSubscriptionUsed] = checked;
+    emit subscribeDevelopmentChannelStateChanged(checked);
+  }
 };
 
 void Preferences::resetSettings()
@@ -252,7 +269,8 @@ void Preferences::resetSettings()
   this->defaultPlaneOrientationComboBox->setCurrentIndex(this->m_Data[DefaultGroundOrientation].toInt());
   this->defaultTimeBarEventDisplayComboBox->setCurrentIndex(this->m_Data[DefaultTimeBarEventDisplay].toInt());
   colorizeButton(this->defaultBackgroundColorButton, this->m_Data[DefaultBackgroundColor].value<QColor>());
-  colorizeButton(this->defaultGridColorButton, this->m_Data[DefaultGridColor].value<QColor>());
+  colorizeButton(this->defaultGridFrontColorButton, this->m_Data[DefaultGridFrontColor].value<QColor>());
+  colorizeButton(this->defaultGridBackColorButton, this->m_Data[DefaultGridBackColor].value<QColor>());
   colorizeButton(this->defaultSegmentColorButton, this->m_Data[DefaultSegmentColor].value<QColor>());
   colorizeButton(this->defaultMarkerColorButton, this->m_Data[DefaultMarkerColor].value<QColor>());
   this->defaultMarkerRadiusSpinBox->setValue(this->m_Data[DefaultMarkerRadius].toDouble());
@@ -268,6 +286,7 @@ void Preferences::resetSettings()
   this->defaultChartUnitAxisXComboBox->setCurrentIndex(this->m_Data[chartUnitAxisX].toInt());
   this->layoutTable->refresh(); this->m_Data[UserLayouts] = *(this->layoutTable->userLayouts());
   this->automaticCheckUpdateCheckBox->setChecked(this->m_Data[AutomaticCheckUpdateUse].toBool());
+  this->subscribeDevelopmentChannelCheckBox->setChecked(this->m_Data[DevelopmentChannelSubscriptionUsed].toBool());
   
   this->tabWidget->setCurrentIndex(0);
 }
@@ -292,11 +311,18 @@ void Preferences::setDefaultBackgroundColor()
     colorizeButton(this->defaultBackgroundColorButton, color);
 };
 
-void Preferences::setDefaultGridColor()
+void Preferences::setDefaultGridFrontColor()
 {
-  QColor color = QColorDialog::getColor(this->defaultGridColorButton->property("backgroundColor").value<QColor>(), this);
+  QColor color = QColorDialog::getColor(this->defaultGridFrontColorButton->property("backgroundColor").value<QColor>(), this);
   if (color.isValid())
-    colorizeButton(this->defaultGridColorButton, color);
+    colorizeButton(this->defaultGridFrontColorButton, color);
+};
+
+void Preferences::setDefaultGridBackColor()
+{
+  QColor color = QColorDialog::getColor(this->defaultGridBackColorButton->property("backgroundColor").value<QColor>(), this);
+  if (color.isValid())
+    colorizeButton(this->defaultGridBackColorButton, color);
 };
 
 void Preferences::setDefaultSegmentColor()

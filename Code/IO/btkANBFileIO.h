@@ -36,7 +36,7 @@
 #ifndef __btkANBFileIO_h
 #define __btkANBFileIO_h
 
-#include "btkMotionAnalysisFileIOUtils_p.h"
+#include "btkMotionAnalysisFileIOUtils.h"
 #include "btkException.h"
 
 namespace btk
@@ -53,7 +53,7 @@ namespace btk
   
   class ANBFileIO : public MotionAnalysisBinaryFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS("ANB")
+    BTK_IO_FILE_SUPPORTED_EXTENSIONS("ANB");
     
   public:
     typedef SharedPtr<ANBFileIO> Pointer;

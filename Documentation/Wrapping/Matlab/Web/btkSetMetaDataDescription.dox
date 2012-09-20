@@ -12,13 +12,13 @@
  * @retval md Structure with the same format than the function btkGetMetaData.
  *
  * @par Detailed description:
- * <tt>btkSetMetaDataDescription(h, idx, newdesc)</tt> sets the description of the metadata with the index @c idx contained in the root.
- * <tt>btkSetMetaDataDescription(h, idx, subidx, newdesc)</tt> sets the description of the metadata with the index @c subidx contained in the metadata with the index @c idx.
- * <tt>%btkSetMetaDataDescription(h, idx, subidx, ..., newdesc)</tt> sets the description of any metadata specified by the gives indices.
- * <tt>btkSetMetaDataDescription(h, label, newdesc)</tt> sets the description of the metadata with the label @c label contained in the root.
- * <tt>btkSetMetaDataDescription(h, label, sublabel, newdesc)</tt>  sets the description of the metadata with the label @c sublabel contained in the metadata with the label @c label.
- * <tt>%btkSetMetaDataDescription(h, label, sublabel, ..., newdesc)</tt> sets the description of any metadata specified by the given labels.
- * \n\n
+ * <tt>btkSetMetaDataDescription(h, idx, newdesc)</tt> sets the description of the metadata with the index @c idx contained in the root.\n
+ * <tt>btkSetMetaDataDescription(h, idx, subidx, newdesc)</tt> sets the description of the metadata with the index @c subidx contained in the metadata with the index @c idx.\n
+ * <tt>%btkSetMetaDataDescription(h, idx, subidx, ..., newdesc)</tt> sets the description of any metadata specified by the gives indices.\n
+ * <tt>btkSetMetaDataDescription(h, label, newdesc)</tt> sets the description of the metadata with the label @c label contained in the root\n.
+ * <tt>btkSetMetaDataDescription(h, label, sublabel, newdesc)</tt>  sets the description of the metadata with the label @c sublabel contained in the metadata with the label @c label.\n
+ * <tt>%btkSetMetaDataDescription(h, label, sublabel, ..., newdesc)</tt> sets the description of any metadata specified by the given labels.\n
+ * \n
  * You can mix label and index to set the description of a metadata entry.
  * \n\n
  * The number of sub-level is infinite. However, the main common use of the metadata is to use 2 levels. This use was introduced in the C3D format.

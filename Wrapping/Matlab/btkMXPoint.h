@@ -41,7 +41,6 @@
 #include <btkAcquisition.h>
 
 btk::Point::Pointer btkMXGetPoint(btk::Acquisition::Pointer acq, int nrhs, const mxArray* prhs[]);
-mxArray* btkMXCreatePointBinaryMask(btk::Point::Pointer point);
 void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray *plhs[]);
 
 #if !defined(SCI_MEX)

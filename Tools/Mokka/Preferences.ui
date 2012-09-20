@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>541</width>
-    <height>506</height>
+    <height>508</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="generalTab">
       <attribute name="title">
@@ -260,14 +260,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_31">
             <property name="text">
-             <string>Background color              </string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_32">
-            <property name="text">
-             <string>Grid color:</string>
+             <string>Background color:             </string>
             </property>
            </widget>
           </item>
@@ -291,10 +284,19 @@ QPushButton:pressed {
             </property>
            </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_32">
+            <property name="text">
+             <string>Grid color (front &amp; back):</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="1">
-           <widget class="QPushButton" name="defaultGridColorButton">
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QPushButton" name="defaultGridFrontColorButton">
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
   border: 1px solid darkgray;
   background: rgb(204,204,204);
 }
@@ -302,14 +304,36 @@ QPushButton:pressed {
 QPushButton:pressed {
   border: 1px solid rgb(100,100,100);
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="defaultGridBackColorButton">
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
+  border: 1px solid darkgray;
+  background: rgb(255,0,0);
+}
+
+QPushButton:pressed {
+  border: 1px solid rgb(100,100,100);
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -774,11 +798,18 @@ QPushButton:pressed {
          <property name="title">
           <string>Update</string>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <layout class="QVBoxLayout" name="verticalLayout_10">
           <item>
            <widget class="QCheckBox" name="automaticCheckUpdateCheckBox">
             <property name="text">
              <string>Automatically check for update at startup</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="subscribeDevelopmentChannelCheckBox">
+            <property name="text">
+             <string>Subscribe to the development channel</string>
             </property>
            </widget>
           </item>

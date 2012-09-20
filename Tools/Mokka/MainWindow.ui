@@ -68,7 +68,7 @@
      <x>0</x>
      <y>0</y>
      <width>928</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -144,6 +144,7 @@
     </widget>
     <addaction name="action_FileOpen"/>
     <addaction name="menuOpen_Recent"/>
+    <addaction name="actionReloadFile"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
@@ -225,6 +226,7 @@
      <property name="title">
       <string>Event</string>
      </property>
+     <addaction name="actionToolGaitEventDetection"/>
     </widget>
     <widget class="QMenu" name="menuMarker">
      <property name="title">
@@ -236,11 +238,24 @@
      <addaction name="actionToolComputeMarkerAngle"/>
      <addaction name="actionToolComputeVectorAngle"/>
     </widget>
+    <widget class="QMenu" name="menuAnalog">
+     <property name="title">
+      <string>Analog</string>
+     </property>
+     <widget class="QMenu" name="menuAnalogRemoveOffset">
+      <property name="title">
+       <string>Remove Offset</string>
+      </property>
+      <addaction name="actionToolRemoveAnalogOffsetFromReferenceFile"/>
+      <addaction name="actionToolRemoveAnalogOffsetFromSelectedFrames"/>
+     </widget>
+     <addaction name="menuAnalogRemoveOffset"/>
+    </widget>
     <addaction name="menuModel"/>
-    <addaction name="separator"/>
     <addaction name="menuAcquisition"/>
     <addaction name="menuEvent"/>
     <addaction name="menuMarker"/>
+    <addaction name="menuAnalog"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -331,7 +346,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Save As</string>
+    <string>Save As...</string>
    </property>
   </action>
   <action name="actionViewMetadata">
@@ -560,6 +575,29 @@
   <action name="actionToolComputeVectorAngle">
    <property name="text">
     <string>Compute Angle between 2 Vectors</string>
+   </property>
+  </action>
+  <action name="actionReloadFile">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Reload</string>
+   </property>
+  </action>
+  <action name="actionToolGaitEventDetection">
+   <property name="text">
+    <string>Gait Event Detection</string>
+   </property>
+  </action>
+  <action name="actionToolRemoveAnalogOffsetFromReferenceFile">
+   <property name="text">
+    <string>From Reference File</string>
+   </property>
+  </action>
+  <action name="actionToolRemoveAnalogOffsetFromSelectedFrames">
+   <property name="text">
+    <string>From Selected Frames</string>
    </property>
   </action>
  </widget>

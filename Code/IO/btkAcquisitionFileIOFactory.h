@@ -36,20 +36,23 @@
 #ifndef __btkAcquisitionFileIOFactory_h
 #define __btkAcquisitionFileIOFactory_h
 
-#include "btkAcquisitionFileIOFactory_registration.h"
+#include "btkConfigure.h"
+#include "btkAcquisitionFileIOHandle.h"
 
 #include <string>
 
 namespace btk
 {
+  class AcquisitionFileIOHandles;
+  
   class AcquisitionFileIOFactory
   {
   public:
     typedef enum {ReadMode, WriteMode} OpenMode;
     BTK_IO_EXPORT static AcquisitionFileIO::Pointer CreateAcquisitionIO(const std::string& filename, OpenMode mode);
     
-    BTK_IO_EXPORT static bool AddFileIO(AcquisitionFileIOInfo::Pointer infoIO);
-    BTK_IO_EXPORT static bool RemoveFileIO(AcquisitionFileIOInfo::Pointer infoIO);
+    BTK_IO_EXPORT static bool AddFileIO(AcquisitionFileIOHandle::Pointer infoIO);
+    BTK_IO_EXPORT static bool RemoveFileIO(AcquisitionFileIOHandle::Pointer infoIO);
     
     BTK_IO_EXPORT static AcquisitionFileIO::Extensions GetSupportedReadExtensions();
     BTK_IO_EXPORT static AcquisitionFileIO::Extensions GetSupportedWrittenExtensions();
@@ -59,7 +62,7 @@ namespace btk
     virtual ~AcquisitionFileIOFactory() {};
     
   private:
-    static AcquisitionFileIOInfos* GetInfoIOs();
+    static AcquisitionFileIOHandles* GetInfoIOs();
     
     AcquisitionFileIOFactory(const AcquisitionFileIOFactory& ); // Not implemented.
     AcquisitionFileIOFactory& operator=(const AcquisitionFileIOFactory& ); // Not implemented.

@@ -1,13 +1,12 @@
 /**
  * @class btkAppendPoint
  * @brief Append a new point into the given acquisition and (optionally) return an updated list of points.
- * @syntax{[points\, pointsInfo] = btkAppendPoint(h\, type\, label\, values)\n [points\, pointsInfo] = btkAppendPoint(h\, type\, label\, values\, residuals)\n [points\, pointsInfo] = btkAppendPoint(h\, type\, label\, values\, residuals\, masks)\n [points\, pointsInfo] = btkAppendPoint(h\, type\, label\, values\, residuals\, masks\, desc)}
+ * @syntax{[points\, pointsInfo] = btkAppendPoint(h\, type\, label\, values)\n [points\, pointsInfo] = btkAppendPoint(h\, type\, label\, values\, residuals)\n [points\, pointsInfo] = btkAppendPoint(h\, type\, label\, values\, residuals\,  desc)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param type String with the point's type (see note #1).
  * @param label String containing the label of the inserted point.
  * @param values Matrix (@c n,3) of reals where @c n is the number of frames. 
  * @param residuals Matrix (@c n,1) of reals where @c n is the number of frames (see note #2).
- * @param masks Matrix (@c n,1) of integers where @c n is the number of frames (see note #3).
  * @param desc String continaing the description of the inserted point.
  * @retval points Updated list of points. Its format is the same than using the function btkGetPoints.
  * @retval pointsInfo Updated informations related to the points. Its format is the same than using the function btkGetPoints.
@@ -23,9 +22,6 @@
  *   - reaction.
  *   .
  * <b>Note #2:</b> The residual is an informational parameter and is not used in some commercial softwares.\n
- * <b>Note #3:</b> The mask correspond to a conversion of a binary number. For example, the value 14 
- * correspond to the mask @c 0b0001110 meaning that cameras #2, #3 and #4 was used to reconstruct the point.
- * Moreover, this parameter is an informational parameter and is not used in some commercial softwares.\n
  * 
  * @sa btkClearPoints, btkGetPoints, btkRemovePoint
  * @ingroup BTKMatlabPointModifier

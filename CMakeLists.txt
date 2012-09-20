@@ -9,6 +9,10 @@ SET(BTK_VERSION_MAJOR 0)
 SET(BTK_VERSION_MINOR 1)
 SET(BTK_VERSION_PATCH 10)
 SET(BTK_VERSION_STRING "${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}.${BTK_VERSION_PATCH}")
+# The major.minor is enough to distinguish available features of the toolkit. Moreover, 
+# this variable is used to create lib/share/include folders where the patch number does 
+# not need to be included.
+SET(BTK_LIBRARY_VERSION_STRING "${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}")
 
 # ------------------------------------------------------------------------
 # COMPILATION INSTRUCTIONS
@@ -23,7 +27,7 @@ SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
 # the RPATH to be used when installing
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/btk-${BTK_VERSION_STRING}")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/btk-${BTK_LIBRARY_VERSION_STRING}")
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -173,15 +177,15 @@ IF(NOT BTK_INSTALL_BIN_DIR)
 ENDIF(NOT BTK_INSTALL_BIN_DIR)
 
 IF(NOT BTK_INSTALL_LIB_DIR)
-  SET(BTK_INSTALL_LIB_DIR "/lib/btk-${BTK_VERSION_STRING}")
+  SET(BTK_INSTALL_LIB_DIR "/lib/btk-${BTK_LIBRARY_VERSION_STRING}")
 ENDIF(NOT BTK_INSTALL_LIB_DIR)
 
 IF(NOT BTK_INSTALL_SHARE_DIR)
-  SET(BTK_INSTALL_SHARE_DIR "/share/btk-${BTK_VERSION_STRING}")
+  SET(BTK_INSTALL_SHARE_DIR "/share/btk-${BTK_LIBRARY_VERSION_STRING}")
 ENDIF(NOT BTK_INSTALL_SHARE_DIR)
 
 IF(NOT BTK_INSTALL_INCLUDE_DIR)
-  SET(BTK_INSTALL_INCLUDE_DIR "/include/btk-${BTK_VERSION_STRING}")
+  SET(BTK_INSTALL_INCLUDE_DIR "/include/btk-${BTK_LIBRARY_VERSION_STRING}")
 ENDIF(NOT BTK_INSTALL_INCLUDE_DIR)
 
 IF(NOT BTK_INSTALL_PACKAGE_DIR)
@@ -256,6 +260,9 @@ SET(BTK_DIR "${CMAKE_BINARY_DIR}" CACHE INTERNAL "BTK dir to be used by subproje
 # PROJECT'S SUBDIRECTORIES
 # ------------------------------------------------------------------------
 
+
+SET(BTK_LIBRARIES "" CACHE INTERNAL "BTK modules compiled" FORCE)
+
 # Code
 ADD_SUBDIRECTORY(Code)
 
@@ -271,6 +278,11 @@ ADD_SUBDIRECTORY(Utilities)
 
 # Wrapping
 ADD_SUBDIRECTORY(Wrapping)
+# PYTHON wrapping
+OPTION(BTK_WRAP_PYTHON "Wrap BTK classes into Python (Require SWIG 2.x)." OFF)
+IF(BTK_WRAP_PYTHON)
+  ADD_SUBDIRECTORY(Wrapping/Python)
+ENDIF(BTK_WRAP_PYTHON)
 # Matlab wrapping
 OPTION(BTK_WRAP_MATLAB "Wrap BTK classes into Matlab functions." OFF)
 IF(BTK_WRAP_MATLAB)

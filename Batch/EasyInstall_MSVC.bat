@@ -9,7 +9,7 @@ IF NOT ERRORLEVEL 1 SET REQUIRE_PRIVILEGES=1
 VER | FIND /I "6.1" >NUL
 IF NOT ERRORLEVEL 1 SET REQUIRE_PRIVILEGES=1
 
-:: 32 or 64 bits?
+:: 32-bit or 64-bit?
 :: Force PROGFILES to be set to "C:\Program Files" instead of using "C:\Program Files (x86)"
 :: under Windows 64-bit. CMake is compiled in 32-bit and then due to the Windows-on-Windows
 :: 64-bit redirection, %ProgramFiles% is set to "C:\Program Files (x86)".
@@ -42,6 +42,7 @@ IF (%2) == () (
     :: Create a temporary file to list the known Windows SDK directories
     > %TEMP%.\BTK-WINSDK.txt ECHO Known Windows SDK directories
     >> %TEMP%.\BTK-WINSDK.txt ECHO "!PROGFILES!\Microsoft SDKs\Windows\v7.0
+    >> %TEMP%.\BTK-WINSDK.txt ECHO "!PROGFILES!\Microsoft SDKs\Windows\v7.1
     :: Look for Windows SDK
     FOR	/F "eol=;delims=" %%i IN (%TEMP%.\BTK-WINSDK.txt) DO IF EXIST %%i\Bin\SetEnv.Cmd SET MSVS=%%i
     DEL %TEMP%.\BTK-WINSDK.txt
@@ -71,10 +72,22 @@ IF (%3) == () (
   IF NOT EXIST !CMAKE!\bin\cmake.exe GOTO missing_CMAKE
 )
 
-:: MSVC EE doesn't contains a 64 bits compiler. 
-:: Trying to use Windows SDK for Windows 7 64 bits ...
-IF NOT EXIST !setEnvCmd! (
-  SET setEnvCmd="!PROGFILES!\Microsoft SDKs\Windows\v7.0\Bin\SetEnv.Cmd"
+:: Special case if BTK is compiled with Matlab wrapper on a 64-bit OS
+:: but Matlab is a 32-bit binary => Must activate the 32-bit compiler
+IF (!ARCH! NEQ "") (
+  SET MATLAB_WRAPPING_ENABLED=0
+  IF "%options.1:~2,15%"=="BTK_WRAP_MATLAB" SET MATLAB_WRAPPING_ENABLED=1
+  IF "%options.2:~2,15%"=="BTK_WRAP_MATLAB" SET MATLAB_WRAPPING_ENABLED=1
+  IF "%options.3:~2,15%"=="BTK_WRAP_MATLAB" SET MATLAB_WRAPPING_ENABLED=1
+  IF "%options.4:~2,15%"=="BTK_WRAP_MATLAB" SET MATLAB_WRAPPING_ENABLED=1
+  IF "%options.5:~2,15%"=="BTK_WRAP_MATLAB" SET MATLAB_WRAPPING_ENABLED=1
+  IF !MATLAB_WRAPPING_ENABLED! == 1 (
+    !CMAKE!\bin\cmake.exe -P .\testWin64Matlab32.cmake
+    IF EXIST "%CD%\testWin64Matlab32_TRUE.txt" (
+      SET ARCH=
+      DEL .\testWin64Matlab32_TRUE.txt
+    )
+  )
 )
 
 CD ..

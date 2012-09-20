@@ -258,6 +258,11 @@ namespace btk
       if (bifs.IsOpen()) bifs.Close();
       throw;
     }
+    catch (MotionAnalysisBinaryFileIOException& e)
+    {
+      if (bifs.IsOpen()) bifs.Close();
+      throw(MotionAnalysisBinaryFileIOException(e.what()));
+    }
     catch (ANxFileIOException& e)
     {
       if (bifs.IsOpen()) bifs.Close();
@@ -418,7 +423,7 @@ namespace btk
    * Constructor.
    */
   ANBFileIO::ANBFileIO()
-  : MotionAnalysisBinaryFileIO()
+  : MotionAnalysisBinaryFileIO(AcquisitionFileIO::Integer)
   {};
   
   size_t ANBFileIO::ReadKeyValueFloatFromTwoU16(float* val, IEEELittleEndianBinaryFileStream* bifs, int key)

@@ -59,18 +59,17 @@ namespace btk
     FileType GetFileType() const {return this->m_FileType;};
     ByteOrder GetByteOrder() const {return this->m_ByteOrder;};
     BTK_IO_EXPORT std::string GetByteOrderAsString() const;
-    void SetByteOrder(ByteOrder b) {this->m_ByteOrder = b;};
     StorageFormat GetStorageFormat() const {return this->m_StorageFormat;};
     BTK_IO_EXPORT std::string GetStorageFormatAsString() const;
-    void SetStorageFormat(StorageFormat s) {this->m_StorageFormat = s;};
 
     virtual bool CanReadFile(const std::string& filename) = 0;
     virtual bool CanWriteFile(const std::string& filename) = 0;
     virtual void Read(const std::string& filename, Acquisition::Pointer output) = 0;
     virtual void Write(const std::string& filename, Acquisition::Pointer input) = 0;
     
-    struct Extension
+    class Extension
     {
+    public:
       Extension(const std::string& n) : name(n) {};
       Extension(const std::string& n, const std::string& d) : name(n), desc(d) {};
       std::string name;
@@ -97,7 +96,7 @@ namespace btk
     };
     
   protected:
-    BTK_IO_EXPORT AcquisitionFileIO();
+    BTK_IO_EXPORT AcquisitionFileIO(FileType f = TypeNotApplicable, ByteOrder b = OrderNotApplicable, StorageFormat s = StorageNotApplicable);
     virtual ~AcquisitionFileIO() {};
     
     void SetFileType(FileType f) {this->m_FileType = f;};
@@ -111,6 +110,14 @@ namespace btk
     AcquisitionFileIO& operator=(const AcquisitionFileIO& ); // Not implemented.
   };
 };
+
+#define BTK_IO_ENABLE_BYTEORDER_MUTATOR \
+  public: \
+    void SetByteOrder(ByteOrder b) {this->m_ByteOrder = b;};
+  
+#define BTK_IO_ENABLE_STORAGEFORMAT_MUTATOR \
+  public: \
+    void SetStorageFormat(StorageFormat s) {this->m_StorageFormat = s;};
   
 #define BTK_IO_FILE_ONLY_READ_OPERATION \
   public: \

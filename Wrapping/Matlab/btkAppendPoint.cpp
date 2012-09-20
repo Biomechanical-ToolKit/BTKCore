@@ -43,7 +43,7 @@
 #include <algorithm>
 #include <cctype>
 
-// btkAppendPoint(h, type, label, values, residual, mask, description)
+// btkAppendPoint(h, type, label, values, residual, description)
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs < 4)
@@ -51,7 +51,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 2)
     mexErrMsgTxt("Too many output arguments.");
 
-  int vn = 0, mn = 0, rn = 0;
+  int vn = 0, rn = 0;
 
   if (!mxIsChar(prhs[1]) || mxIsEmpty(prhs[1]))
     mexErrMsgTxt("Point's type must be a non-empty string.");
@@ -66,17 +66,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("Point's residual must have a second dimension equals to 1.");
     rn = static_cast<int>(mxGetM(prhs[4]));
   }
+  if ((rn != vn) && (rn != 0))
+    mexErrMsgTxt("Point's data have not the same number of frames.");
   if (nrhs >= 6)
   {
-     if (!mxIsNumeric(prhs[5]) || mxIsEmpty(prhs[5]) || mxIsComplex(prhs[5]) || (mxGetN(prhs[5]) != 1))
-    mexErrMsgTxt("Point's mask must have a second dimension equals to 1.");
-    mn = static_cast<int>(mxGetM(prhs[5]));
-  }
-  if (((rn != vn) && (rn != 0)) || ((mn != vn) && (mn != 0)))
-    mexErrMsgTxt("Point's data have not the same number of frames.");
-  if (nrhs >= 7)
-  {
-    if (!mxIsChar(prhs[6]))
+    if (!mxIsChar(prhs[5]))
       mexErrMsgTxt("Point's description must be a string");
   }
   
@@ -131,12 +125,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nrhs >= 5)
     memcpy(point->GetResiduals().data(), mxGetPr(prhs[4]) , mxGetNumberOfElements(prhs[4]) * sizeof(double)); 
   if (nrhs >= 6)
-    memcpy(point->GetMasks().data(), mxGetPr(prhs[5]) , mxGetNumberOfElements(prhs[5]) * sizeof(double));
-  if (nrhs >= 7)
   {
-    size_t strlen_ = (mxGetM(prhs[6]) * mxGetN(prhs[6]) * sizeof(mxChar)) + 1;
+    size_t strlen_ = (mxGetM(prhs[5]) * mxGetN(prhs[5]) * sizeof(mxChar)) + 1;
     char* desc = (char*)mxMalloc(strlen_);
-    mxGetString(prhs[6], desc, strlen_);
+    mxGetString(prhs[5], desc, strlen_);
     point->SetDescription(desc);
     mxFree(desc);
   }

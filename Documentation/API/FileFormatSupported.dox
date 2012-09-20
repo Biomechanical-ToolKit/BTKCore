@@ -34,7 +34,7 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::ANGFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing (joint) angles<br>(<strong>Experimental</strong>: Need more files/informations to implement the writer)</td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing (joint) angles</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> ASC<sup>2</sup> </td>
@@ -68,8 +68,15 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> EMG </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::DelsysEMGFileIO @htmlonly</p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>Delsys Inc.</i> binary file format containing EMG data</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #aaa; padding: 5px;"> EMG </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::EMxFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing EMG data<br>(<strong>Experimental</strong>: Need more files/informations to implement the writer)</td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing EMG data</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> GR<tt>*</tt><sup>3</sup> </td>
@@ -83,42 +90,42 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::MOMFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing joints&#x27; moments <br>(<strong>Experimental</strong>: Need more files/informations to implement the writer)</td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing joints&#x27; moments</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> PWR </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::PWRFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing joints&#x27; powers <br>(<strong>Experimental</strong>: Need more files/informations to implement the writer)</td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing joints&#x27; powers</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> RAH </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::RAxFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing joints&#x27; powers <br>(<strong>Experimental</strong>: Need more files/informations to implement the writer)</td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing joints&#x27; powers</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> RAW </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::RAxFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing 3D trajectories <br>(<strong>Experimental</strong>: Need more files/informations to implement the writer)</td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing 3D trajectories</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> RIC </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::RICFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing 3D trajectories <br>(<strong>Experimental</strong>: Need more files/informations to implement the writer)</td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing 3D trajectories</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> RIF </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::RICFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing 3D trajectories <br>(<strong>Experimental</strong>: Need more files/informations to implement the writer)</td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing 3D trajectories</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> TDF </td>

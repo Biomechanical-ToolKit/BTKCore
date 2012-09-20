@@ -57,10 +57,7 @@ inline void sengLogMessage(void (*sender)(const char * str, ...), const char* ms
 #define LOG_WARNING(msg) \
   sengLogMessage(&qWarning, msg)
   
-#define LOG_CRITICAL(msg) \
+#define LOG_ERROR(msg) \
   sengLogMessage(&qCritical, msg)
-
-#define LOG_FATAL(msg) \
-  sengLogMessage(&qFatal, msg)
 
 #endif // LoggerMessage_h

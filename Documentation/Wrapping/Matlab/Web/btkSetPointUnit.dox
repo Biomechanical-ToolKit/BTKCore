@@ -24,6 +24,6 @@
  * - power: watt (W) ;
  * - scalar: @e empty.
  * 
- * @sa btkSetPointDescription, btkSetPointLabel, btkSetPointMasks, btkSetPointResiduals, btkSetPointType
+ * @sa btkSetPointDescription, btkSetPointLabel, btkSetPointResiduals, btkSetPointType
  * @ingroup BTKMatlabPointModifier
  */

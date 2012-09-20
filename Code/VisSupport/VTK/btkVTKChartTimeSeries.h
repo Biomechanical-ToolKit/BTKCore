@@ -52,8 +52,6 @@ class vtkColorSeries;
 
 namespace btk
 {
-  class VTKPlots;
-  
   /**
    * FROM VTK 5.10: Small struct used by InvokeEvent to send some information about the point
    * that was clicked on. This is an experimental part of the API, subject to
@@ -176,6 +174,8 @@ namespace btk
     BTK_VTK_EXPORT VTKChartTimeSeries();
     
   private:
+    class VTKPlots;
+    
     VTKChartTimeSeries(const VTKChartTimeSeries& ); // Not implemented.
     void operator=(const VTKChartTimeSeries& );   // Not implemented.
     

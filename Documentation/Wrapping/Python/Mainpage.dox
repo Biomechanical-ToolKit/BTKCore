@@ -1,0 +1,37 @@
+/**
+ * @mainpage BTK Documentation for the Python wrapping
+ *
+ * <div class="btkmenu">\b  Overview
+ * | \ref BuildInstructions "Building instructions"
+ * | \ref GettingStarted "Getting started"
+ * </div>
+ *
+ * <div id="revnumber">BTK @projectnumber</div>
+ * 
+ * This is the API documentation for Biomechanical ToolKit (BTK), an open-source and cross-platform C++ library wrapped as a Python package with high level functions to open, edit and modify biomechanical acquisition without any manufacturer restriction (file formats, models, etc).
+ *
+ * To wrap the C++ code, BTK uses heavily <a href="http://www.swig.org">SWIG</a>. All of the matrix used in the C++ code are transformed transparently in <a href="http://numpy.scipy.org/">NumPy</a> arrays.\n
+ * To build this Python module from scratch, check the \ref BuildInstructions "building instructions".\n
+ *
+ * The simplest way to use BTK in Python is to take a look in this \ref GettingStarted "tutorial".
+ *
+ * The Biomechanical ToolKit library uses the generous open-source New BSD License (<a href="http://www.opensource.org/licenses/BSD-3-Clause">The BSD 3-Clause License</a>).
+ *
+ * <b>Usefull links:</b>
+ * - BTK homepage: <a>http://code.google.com/p/b-tk/</a>
+ * - BTK Users group: <a>http://groups.google.com/group/btk-users</a>
+ * - Twitter: <a href="http://twitter.com/btkwww">\@btkwww</a>
+ */
+
+/**
+ * @package btk
+ * @brief High level classes and functions to open, edit and modify biomechanical acquisition.
+ */
+ 
+namespace btk
+{
+  /**
+   * @class _object
+   * @brief Abstract interface for the Python wrapping of BTK.
+   */
+};
