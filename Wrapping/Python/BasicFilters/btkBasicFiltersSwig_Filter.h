@@ -41,6 +41,13 @@ public:
   BTK_SWIG_DECLARE_POINTER_OPERATOR(AcquisitionUnitConverter);
 };
 
+BTK_SWIG_DECLARE_CLASS(AnalogOffsetRemover)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_CTOR(AnalogOffsetRemover);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(AnalogOffsetRemover);
+};
+
 // btkCollectionAssembly: Check SWIG with C++ template
 
 // btkDownsampleFilter: C++ template. Need specialization
@@ -110,6 +117,21 @@ BTK_SWIG_DECLARE_CLASS(SpecializedPointsExtractor)
 public:
   BTK_SWIG_DECLARE_DEFAULT_CTOR(SpecializedPointsExtractor);
   BTK_SWIG_DECLARE_POINTER_OPERATOR(SpecializedPointsExtractor);
+};
+
+BTK_SWIG_DECLARE_CLASS(SubAcquisitionFilter)
+{
+public:
+  typedef enum {All = btk::SubAcquisitionFilter::All, PointsOnly = btk::SubAcquisitionFilter::PointsOnly, AnalogsOnly = btk::SubAcquisitionFilter::AnalogsOnly, EventsOnly = btk::SubAcquisitionFilter::EventsOnly} ExtractionOption;
+  BTK_SWIG_DECLARE_DEFAULT_CTOR(SubAcquisitionFilter);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(SubAcquisitionFilter);
+};
+
+BTK_SWIG_DECLARE_CLASS(VerticalGroundReactionForceGaitEventDetector)
+{
+public:
+  BTK_SWIG_DECLARE_DEFAULT_CTOR(VerticalGroundReactionForceGaitEventDetector);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(VerticalGroundReactionForceGaitEventDetector);
 };
 
 BTK_SWIG_DECLARE_CLASS(WrenchDirectionAngleFilter)

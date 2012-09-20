@@ -41,6 +41,11 @@
 BTK_SWIG_DEFINE_DEFAULT_CTOR(AcquisitionUnitConverter);
 
 // ------------------------------------------------------------------------- //
+//                             AnalogOffsetRemover                           //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DEFINE_DEFAULT_CTOR(AnalogOffsetRemover);
+
+// ------------------------------------------------------------------------- //
 //                              CollectionAssembly                           //
 // ------------------------------------------------------------------------- //
 // Check SWIG with C++ template
@@ -93,6 +98,16 @@ BTK_SWIG_DEFINE_DEFAULT_CTOR(SeparateKnownVirtualMarkersFilter);
 //                         SpecializedPointsExtractor                        //
 // ------------------------------------------------------------------------- //
 BTK_SWIG_DEFINE_DEFAULT_CTOR(SpecializedPointsExtractor);
+
+// ------------------------------------------------------------------------- //
+//                            SubAcquisitionFilter                           //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DEFINE_DEFAULT_CTOR(SubAcquisitionFilter);
+
+// ------------------------------------------------------------------------- //
+//                VerticalGroundReactionForceGaitEventDetector               //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DEFINE_DEFAULT_CTOR(VerticalGroundReactionForceGaitEventDetector)
 
 // ------------------------------------------------------------------------- //
 //                         WrenchDirectionAngleFilter                        //

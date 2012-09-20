@@ -541,9 +541,10 @@ class MetaDataInfoTest(unittest.TestCase):
         self.assertEqual(test.ToString(4), 'DATE                    ')
     
     def test_SetFormatChar2Integer(self):
-        dim = btk.btkIntArray(2, 5)
-        val = btk.btkStringArray(4, 'test')
-        test = btk.btkMetaDataInfo(dim, val)
+        # dim = btk.btkIntArray(2, 5)
+        # val = btk.btkStringArray(4, 'test')
+        # test = btk.btkMetaDataInfo(dim, val)
+        test = btk.btkMetaDataInfo([5,5], ['test','test','test','test'])
         self.assertEqual(test.GetFormat(), btk.btkMetaDataInfo.Char)
         test.SetFormat(btk.btkMetaDataInfo.Integer)
         self.assertEqual(test.GetFormat(), btk.btkMetaDataInfo.Integer)

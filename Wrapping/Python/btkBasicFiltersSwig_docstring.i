@@ -84,6 +84,25 @@ BTK_SWIG_DOCSTRING_IMPL(AcquisitionUnitConverter, SetUnit, "Set the given unit w
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionUnitConverter, GetUnit, "Returns the string corresponding to the given unit");
 
 // ------------------------------------------------------------------------- //
+//                             AnalogOffsetRemover                           //
+// ------------------------------------------------------------------------- //
+%feature("docstring") btkAnalogOffsetRemover "
+Remove a possible analog offset to the selected analog channels
+
+Based on the given offset input (see the method SetOffsetInput()), each analog signals
+are averaged and removed from the raw input (see the method SetRawInput()). The analog signals set in the raw input which
+are not given to the offset input are not processed but will be available in the output."
+
+BTK_SWIG_AUTODOC_IMPL(AnalogOffsetRemover, SetRawInput, "SetRawInput(self, btkAcquisition)");
+BTK_SWIG_AUTODOC_IMPL(AnalogOffsetRemover, SetOffsetInput, "SetOffsetInput(self, btkAcquisition)");
+
+BTK_SWIG_DOCSTRING_IMPL(AnalogOffsetRemover, GetRawInput, "Gets the input registered with this process which is used as the input to process.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogOffsetRemover, SetRawInput, "Sets the input required with this process which is used as the input to process.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogOffsetRemover, GetOffsetInput, "Gets the input registered with this process which corresponds to the offsets to remove.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogOffsetRemover, SetOffsetInput, "Sets the input required with this process which corresponds to the offsets to remove.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogOffsetRemover, GetOutput, "Returns the output created with this process.");
+
+// ------------------------------------------------------------------------- //
 //                              CollectionAssembly                           //
 // ------------------------------------------------------------------------- //
 // Check SWIG with C++ template
@@ -112,7 +131,7 @@ BTK_SWIG_DOCSTRING_IMPL(WrenchDownsampleFilter, GetUpDownRatio, "Gets the ratio 
 
 // - WrenchCollection
 %feature("docstring") btkWrenchCollectionDownsampleFilter "
-Downsample data stored in a collection of wrenches
+Downsample data stored in a collection of wrenches.
 
 To downsample data, you need to set the up/down sample ratio using the method SetUpDownRatio().
 The given value is an integer corresponding to the ratio used to extract only the value of interest.
@@ -400,6 +419,84 @@ BTK_SWIG_DOCSTRING_IMPL(SpecializedPointsExtractor, SetInput, "Sets the input re
 BTK_SWIG_DOCSTRING_IMPL(SpecializedPointsExtractor, GetOutput, "Returns the output created with this process.");
 BTK_SWIG_DOCSTRING_IMPL(SpecializedPointsExtractor, GetPointType, "Returns the type of points to extract.");
 BTK_SWIG_DOCSTRING_IMPL(SpecializedPointsExtractor, SetPointType, "Sets the type of points to extract.");
+
+// ------------------------------------------------------------------------- //
+//                            SubAcquisitionFilter                           //
+// ------------------------------------------------------------------------- //
+%feature("docstring") btkSubAcquisitionFilter "
+Extract a subpart of the acquisition.
+
+By using the methods SetExtractionOption, you can specify if only the points, the analogs channels, or the events have to 
+be extracted. In the case of the points and the analog channels, you can also specify the ids to extract.
+The extract options are the following:
+ - btk.btkSubAcquisitionFilter.All ;
+ - btk.btkSubAcquisitionFilter.PointsOnly ;
+ - btk.btkSubAcquisitionFilter.AnalogsOnly ;
+ - btk.btkSubAcquisitionFilter.EventsOnly.
+
+To extract a subpart of the acquisition, you have to use the method SetFramesIndex() and give the indices to extract. The index
+starts from 0 and correspond to the first frame of the acquisition. By default, all the frames are extracted.
+
+Finally, the rest of the acquisition is every time extracted. Thus, the metadata are only shallow copied, and the first frame,
+acquisition's frequencies, etc. remain the same."
+
+BTK_SWIG_AUTODOC_IMPL(SubAcquisitionFilter, SetInput, "SetInput(self, btkAcquisition)");
+BTK_SWIG_AUTODOC_IMPL(SubAcquisitionFilter, GetExtractionOption(), "GetExtractionOption(self, ids) -> btk.btkSubAcquisitionFilter.ExtractionOption");
+BTK_SWIG_AUTODOC_IMPL(SubAcquisitionFilter, GetExtractionOption(std::vector<int>& ), "GetExtractionOption(self, ids) -> btk.btkSubAcquisitionFilter.ExtractionOption");
+BTK_SWIG_AUTODOC_IMPL(SubAcquisitionFilter, SetExtractionOption(SubAcquisitionFilter::ExtractionOption), "SetExtractionOption(self, btk.btkSubAcquisitionFilter.ExtractionOption)");
+BTK_SWIG_AUTODOC_IMPL(SubAcquisitionFilter, SetExtractionOption(SubAcquisitionFilter::ExtractionOption , const std::vector<int>& ), "SetExtractionOption(self, btk.btkSubAcquisitionFilter.ExtractionOption)");
+
+BTK_SWIG_DOCSTRING_IMPL(SubAcquisitionFilter, GetInput, "Gets the input registered with this process.");
+BTK_SWIG_DOCSTRING_IMPL(SubAcquisitionFilter, SetInput, "Sets the input required with this process.");
+BTK_SWIG_DOCSTRING_IMPL(SubAcquisitionFilter, GetOutput, "Returns the output created with this process.");
+BTK_SWIG_DOCSTRING_IMPL(SubAcquisitionFilter, GetFramesIndex, "Returns the index of the frames to extract. The returned array contains two values, where the first one is the low bound while the second value is the high bound.\nThe index starts from 0 and correspond to the first frame of the acquisition. By default, all the frames are extracted and boundaries are set to -1.");
+BTK_SWIG_DOCSTRING_IMPL(SubAcquisitionFilter, SetFramesIndex, "Set the boundaries of the frames to extract. The default values (-1) reset the extraction to take all the frames.");
+BTK_SWIG_DOCSTRING_IMPL(SubAcquisitionFilter, GetExtractionOption, "Returns the content of the given acquisition to extract. If a list of integers is given as input, and some IDs was set for the extraction, then the list will be filled with them.");
+BTK_SWIG_DOCSTRING_IMPL(SubAcquisitionFilter, SetExtractionOption, "Set the content to extract. If a second input is given with a list of items' ID, then only these will be extracted.\nWarning: Only the options PointsOnly and AnalogsOnly are accepted for this second case. If the option All or EventsOnly is given to this method, then a warning is displayed and the command is not taken into account.");
+
+// ------------------------------------------------------------------------- //
+//                VerticalGroundReactionForceGaitEventDetector               //
+// ------------------------------------------------------------------------- //
+%feature("docstring") btkSubAcquisitionFilter "
+Detect heel strike and toe-off events during gait from vertical ground reaction wrench.
+
+To fill exactly the detected events, you need to give some extra information to this filter:
+ - The value of the first frame of the acquisition where the force platform data were extracted (to be added to the detected frames' index).
+ - The acquisition's frequency used by the force platform data (to calculate the time related to the event's frame).
+ - The subject's label (optional).
+All these informations have to be given to the method SetAcquisitionInformation().
+
+To detect the heel strike and toe-off events you can set some options:
+ - The threshold value used to known when an event occurred (see SetThresholdValue()).
+ - The mapping between the force plates and the side (left, right, general)  of the events detected (see SetForceplateContextMapping()).
+ - The region of interest where to detect the events (see SetRegionOfInterest()).
+
+The algorithm works as following: Based on the region of interest, the maximum is searched. 
+If the maximum is higher than the threshold set, then the frame of the value on the left side of 
+this maximum lower than the threshold is used to create a heel strike event. On the other hand, 
+the value on the right side of the maximum lower than the threshold is used to create a toe-off event.
+
+Note: The design of this class is not perfect as it cannot be used in a pipeline without 
+to update the part before to know some acquisition's information (first frame, sample frequency, subject's name).
+This class (or the pipeline mechanism) could be modified in a future version of BTK to make up this problem."
+
+BTK_SWIG_AUTODOC_IMPL(VerticalGroundReactionForceGaitEventDetector, GetAcquisitionInformation, "GetAcquisitionInformation(int& ff, double& sampleRate, string& subjectLabel)");
+BTK_SWIG_AUTODOC_IMPL(VerticalGroundReactionForceGaitEventDetector, SetAcquisitionInformation, "SetAcquisitionInformation(int& ff, double& sampleRate, string& subjectLabel)");
+BTK_SWIG_AUTODOC_IMPL(SubAcquisitionFilter, SetInput(btk::Wrench::Pointer), "SetInput(self, btkWrench)");
+BTK_SWIG_AUTODOC_IMPL(SubAcquisitionFilter, SetInput(btk::WrenchCollection::Pointer), "SetInput(self, btkWrenchCollection)");
+BTK_SWIG_AUTODOC_IMPL(SubAcquisitionFilter, SetThresholdValue, "SetThresholdValue(self, int)");
+
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, GetInput, "Gets the input registered with this process.");
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, SetInput, "Sets the input required with this process.");
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, GetOutput, "Gets the output created with this process.");
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, SetThresholdValue, "Sets the threshold used to detect gait events.");
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, GetThresholdValue, "Returns the threshold used to detect gait events.");
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, SetForceplateContextMapping, "Sets the mapping between the given wrenches and the side of the detected events. If no mapping is given, then all the detected events will be set as 'General' events.");
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, GetForceplateContextMapping, "Returns the mapping between the wrenches in the input and the gait events to detect.");
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, SetRegionOfInterest, "Sets the region of interest to use to detect gait events.\nWARNING: The boundaries must be set using zero-based indices.");
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, GetRegionOfInterest, "Returns the region of interest to use to detect gait events.");
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, SetAcquisitionInformation, "Set the informations required to set correctly the detected events.");
+BTK_SWIG_DOCSTRING_IMPL(VerticalGroundReactionForceGaitEventDetector, GetAcquisitionInformation, "Returns the informations required to set correctly the detected events.");
 
 // ------------------------------------------------------------------------- //
 //                         WrenchDirectionAngleFilter                        //

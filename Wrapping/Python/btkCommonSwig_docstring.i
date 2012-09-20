@@ -142,7 +142,7 @@ BTK_SWIG_DOCSTRING_IMPL(Analog, GetDescription, "Returns the analog's descriptio
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetDescription, "Sets the analog's description.");
 BTK_SWIG_DOCSTRING(Analog, GetValue, "Returns only one sample.");
 BTK_SWIG_DOCSTRING(Analog, SetValue, "Sets only one sample.");
-BTK_SWIG_DOCSTRING_IMPL(Analog, GetValues, "Returns the analog's samples.");
+BTK_SWIG_DOCSTRING_IMPL(Analog, GetValues, "Returns the analog's samples.\nWARNING:You cannot set values using this method. Use the methods SetValues of SetValue for that.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetValues, "Sets the analog's samples.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetFrameNumber, "Returns the number of frames.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetFrameNumber, "Sets the number of frames.");
@@ -198,7 +198,7 @@ BTK_SWIG_DOCSTRING_IMPL(Point, GetDescription, "Returns the point's description.
 BTK_SWIG_DOCSTRING_IMPL(Point, SetDescription, "Sets the point's description.");
 BTK_SWIG_DOCSTRING(Point, GetValue, "Returns only one value for the given component and frame.");
 BTK_SWIG_DOCSTRING(Point, SetValue, "Sets only one value for the given component and frame.");
-BTK_SWIG_DOCSTRING_IMPL(Point, GetValues, "Returns the point's values.");
+BTK_SWIG_DOCSTRING_IMPL(Point, GetValues, "Returns the point's values.\nWARNING:You cannot set values using this method. Use the methods SetValues of SetValue for that.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetValues, "Sets the point's values.");
 BTK_SWIG_DOCSTRING(Point, GetResidual, "Returns only one residual for the given frame.");
 BTK_SWIG_DOCSTRING(Point, SetResidual, "Sets only one residual for the given frame.");
@@ -732,6 +732,7 @@ BTK_SWIG_AUTODOC_IMPL(Acquisition, FindEvent, "FindEvent(self, string) -> btkEve
 BTK_SWIG_AUTODOC_IMPL(Acquisition, FindPoint, "FindPoint(self, string) -> btkPointIterator");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, GetAnalog(int ), "GetAnalog(self, int) -> btkAnalog");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, GetAnalog(const std::string& ), "GetAnalog(self, string) -> btkAnalog");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, GetAnalogResolution, "GetAnalogResolution(self) -> btk.btkAcquisition.AnalogResolution");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, GetEvent, "GetEvent(self, int) -> btkEvent");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, GetPoint(int ), "GetPoint(self, int) -> btkPoint");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, GetPoint(const std::string& ), "GetPoint(self, string) -> btkPoint");
@@ -768,6 +769,7 @@ BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPoint, "SetPoint(self, int, btkPoint)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPointFrequency, "SetPointFrequency(self, double)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPointNumber, "SetPointNumber(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPoints, "SetPoints(self, btkPointCollection)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, GetPointUnit(Point::Type), "GetPointUnit(self, btk.btkPoint.Type) -> std::string const");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPointUnit(Point::Type , std::string), "SetPointUnit(self, btk.btkPoint.Type, string)");
 
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, BeginMetaData, "Returns an iterator to the beginning of the list of metadata.");

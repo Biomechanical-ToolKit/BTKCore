@@ -38,6 +38,7 @@
 #include "btkCommonSwig.h"
 #include "btkBasicFiltersSwig.h"
 %}
+%include <std_list.i>
 %include <std_string.i>
 
 #undef BTK_SWIG_HEADER_DECLARATION
@@ -65,6 +66,22 @@ public:
   
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(AcquisitionUnitConverter);
+};
+
+// ------------------------------------------------------------------------- //
+//                             AnalogOffsetRemover                           //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(AnalogOffsetRemover)
+{
+public:
+  void SetRawInput(btkAcquisition );
+  btkAcquisition GetRawInput();
+  void SetOffsetInput(btkAcquisition );
+  btkAcquisition GetOffsetInput();
+  btkAcquisition GetOutput();
+  
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(AnalogOffsetRemover);
 };
 
 // ------------------------------------------------------------------------- //
@@ -177,7 +194,6 @@ protected:
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(IMUsExtractor);
 };
 
-
 // ------------------------------------------------------------------------- //
 //                            MeasureFrameExtractor                          //
 // ------------------------------------------------------------------------- //
@@ -271,6 +287,79 @@ public:
 
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(SpecializedPointsExtractor);
+};
+
+// ------------------------------------------------------------------------- //
+//                            SubAcquisitionFilter                           //
+// ------------------------------------------------------------------------- //
+
+%extend btkSubAcquisitionFilter
+{
+  btkSubAcquisitionFilter::ExtractionOption GetExtractionOption() const {return static_cast<btkSubAcquisitionFilter::ExtractionOption>((*$self)->GetExtractionOption());};  
+  void SetExtractionOption(btkSubAcquisitionFilter::ExtractionOption option) {(*$self)->SetExtractionOption(static_cast<btk::SubAcquisitionFilter::ExtractionOption>(option));};
+  
+  btkSubAcquisitionFilter::ExtractionOption GetExtractionOption(std::vector<int>& ids) const
+  {
+    std::list<int> ids_;
+    btk::SubAcquisitionFilter::ExtractionOption option = (*$self)->GetExtractionOption(ids_);
+    ids.resize(ids_.size());
+    int inc = 0;
+    for (std::list<int>::const_iterator it = ids_.begin() ; it != ids_.end() ; ++it)
+      ids[inc++] = *it;
+    return static_cast<btkSubAcquisitionFilter::ExtractionOption>(option);
+  };
+  
+  void SetExtractionOption(btkSubAcquisitionFilter::ExtractionOption option, const std::vector<int>& ids)
+  {
+    std::list<int> ids_;
+    for (int i = 0 ; i < ids.size() ; ++i)
+      ids_.push_back(ids[i]);
+    (*$self)->SetExtractionOption(static_cast<btk::SubAcquisitionFilter::ExtractionOption>(option), ids_);
+  };
+}
+
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(SubAcquisitionFilter)
+{
+public:
+  typedef enum {All = btk::SubAcquisitionFilter::All, PointsOnly = btk::SubAcquisitionFilter::PointsOnly, AnalogsOnly = btk::SubAcquisitionFilter::AnalogsOnly, EventsOnly = btk::SubAcquisitionFilter::EventsOnly} ExtractionOption;
+  
+  void SetInput(btkAcquisition );
+  btkAcquisition GetInput();
+  btkAcquisition GetOutput();
+  
+  const int* GetFramesIndex() const;
+  void SetFramesIndex(int lb = -1, int ub = -1);
+  // ExtractionOption GetExtractionOption() const;
+  // void SetExtractionOption(ExtractionOption );
+  // ExtractionOption GetExtractionOption(std::list<int>& ) const;
+  // void SetExtractionOption(ExtractionOption , const std::list<int>& );
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(SubAcquisitionFilter);
+};
+
+// ------------------------------------------------------------------------- //
+//                VerticalGroundReactionForceGaitEventDetector               //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(VerticalGroundReactionForceGaitEventDetector)
+{
+public:
+  btkWrenchCollection GetInput();
+  void SetInput(btkWrench);
+  void SetInput(btkWrenchCollection);
+  btkEventCollection GetOutput();
+  
+  void SetThresholdValue(int );
+  int GetThresholdValue() const;
+  void SetForceplateContextMapping(const std::vector<std::string>& );
+  const std::vector<std::string>& GetForceplateContextMapping() const;
+  void SetRegionOfInterest(int lb = -1, int ub = -1);
+  const int* GetRegionOfInterest() const;
+  void SetAcquisitionInformation(int , double , const std::string& );
+  void GetAcquisitionInformation(int& , double& , std::string& );
+
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(VerticalGroundReactionForceGaitEventDetector);
 };
 
 // ------------------------------------------------------------------------- //

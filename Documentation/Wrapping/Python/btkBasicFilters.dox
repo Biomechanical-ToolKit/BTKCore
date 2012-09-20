@@ -26,13 +26,18 @@ namespace btk
    */
   
   /**
+   * @class btkAnalogOffsetRemover
+   * @brief Remove a possible analog offset to the selected analog channels.
+   */
+  
+  /**
    * @class btkWrenchDownsampleFilter
-   * @brief Downsample data stored in a wrench
+   * @brief Downsample data stored in a wrench.
    */ 
    
   /**
    * @class btkWrenchCollectionDownsampleFilter
-   * @brief Downsample a collection of wrench
+   * @brief Downsample a collection of wrenches.
    */
  
   /**
@@ -108,6 +113,32 @@ namespace btk
   /**
    * @class btkSpecializedPointsExtractor
    * @brief Extracts only the points corresponding to the given type (without cloning the extracted points).
+   */
+  
+  /**
+   * @class btkSubAcquisitionFilter
+   * @brief Extract a subpart of the acquisition.
+   */
+  /**
+   * @var btkSubAcquisitionFilter::All
+   * Extract all the content of the acquisiton (points, analog, events)
+   */
+  /**
+   * @var btkSubAcquisitionFilter::PointsOnly
+   * Extract only data in the points.
+   */
+  /**
+   * @var btkSubAcquisitionFilter::AnalogsOnly
+   * Extract only data in the analog channels.
+   */
+  /**
+   * @var btkSubAcquisitionFilter::EventsOnly
+   * Extract only data int the events.
+   */
+  
+  /**
+   * @class btkVerticalGroundReactionForceGaitEventDetector
+   * @brief Detect heel strike and toe-off events during gait from vertical ground reaction wrench.
    */
   
   /**

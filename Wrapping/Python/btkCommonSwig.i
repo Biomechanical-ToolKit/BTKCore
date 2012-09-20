@@ -38,7 +38,6 @@
 #include "btkCommonSwig.h"
 %}
 %include <std_string.i>
-%include <std_list.i>
 %include <std_vector.i>
 %include <eigen.i>
 

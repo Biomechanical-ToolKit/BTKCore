@@ -41,6 +41,7 @@
 #include "btkSwigMacros.h"
 
 #include <btkAcquisitionUnitConverter.h>
+#include <btkAnalogOffsetRemover.h>
 #include <btkDownsampleFilter.h>
 #include <btkForcePlatformsExtractor.h>
 #include <btkForcePlatformWrenchFilter.h>
@@ -49,6 +50,8 @@
 #include <btkMergeAcquisitionFilter.h>
 #include <btkSeparateKnownVirtualMarkersFilter.h>
 #include <btkSpecializedPointsExtractor.h>
+#include <btkSubAcquisitionFilter.h>
+#include <btkVerticalGroundReactionForceGaitEventDetector.h>
 #include <btkWrenchDirectionAngleFilter.h>
 
 #include "BasicFilters/btkBasicFiltersSwig_Filter.h"
