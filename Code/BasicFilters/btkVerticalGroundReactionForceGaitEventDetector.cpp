@@ -42,17 +42,17 @@ namespace btk
    * @brief Detect heel strike and toe-off events during gait from vertical ground reaction wrench.
    *
    * To fill exactly the detected events, you need to give some extra information to this filter:
-   *  - The value of the first frame of the acquisition where the force platfeform data were extracted (to be added to the detected frames' index).
+   *  - The value of the first frame of the acquisition where the force platform data were extracted (to be added to the detected frames' index).
    *  - The acquisition's frequency used by the force platform data (to calculate the time related to the event's frame).
    *  - The subject's label (optional).
    * All these informations have to be given to the method SetAcquisitionInformation().
    *
    * To detect the heel strike and toe-off events you can set some options:
-   *  - The treshold value used to known when an event occured (see SetThresholdValue()).
+   *  - The threshold value used to known when an event occurred (see SetThresholdValue()).
    *  - The mapping between the force plates and the side (left, right, general)  of the events detected (see SetForceplateContextMapping()).
    *  - The region of interest where to detect the events (see SetRegionOfInterest()).
    *
-   * The algorithm works as following: Based on the region of interest, the maxium is searched. If the maximum is higher than the theshold set, then the frame of the value on the left side of this maximum lower than the threshold is used to create a heel strike event. On the other hand, the value on the right side of the maximum lower than the threshold is used to create a toe-off event.
+   * The algorithm works as following: Based on the region of interest, the maximum is searched. If the maximum is higher than the threshold set, then the frame of the value on the left side of this maximum lower than the threshold is used to create a heel strike event. On the other hand, the value on the right side of the maximum lower than the threshold is used to create a toe-off event.
    *
    * @note: The design of this class is not perfect as it cannot be used in a pipeline without 
    * to update the part before to know some acquisition's information (first frame, sample frequency, subject's name).
@@ -97,7 +97,7 @@ namespace btk
    */
   
   /**
-   * Sets the treshold used to detect gait events.
+   * Sets the threshold used to detect gait events.
    */
   void VerticalGroundReactionForceGaitEventDetector::SetThresholdValue(int threshold)
   {
@@ -109,7 +109,7 @@ namespace btk
   
   /**
    * @fn int VerticalGroundReactionForceGaitEventDetector::GetThresholdValue() const
-   * Returns the treshold used to detect gait events.
+   * Returns the threshold used to detect gait events.
    */
   
   /**
@@ -160,7 +160,7 @@ namespace btk
   };
   
   /**
-   * Returns the informations required to set correctly the detected events
+   * Returns the informations required to set correctly the detected events.
    */
   void VerticalGroundReactionForceGaitEventDetector::GetAcquisitionInformation(int& firstFrame, double& freq, std::string& subjectName)
   {

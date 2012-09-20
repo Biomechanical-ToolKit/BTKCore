@@ -43,8 +43,8 @@ namespace btk
    * @class AnalogOffsetRemover btkAnalogOffsetRemover.h
    * @brief Remove a possible analog offset to the selected analog channels.
    *
-   * Based on the given offset input (@see the method SetOffsetInput()), each analog signals are averaged and 
-   * removed from the raw input (@see the method SetRawInput()). The analog signals set in the raw input which
+   * Based on the given offset input (see the method SetOffsetInput()), each analog signals are averaged and 
+   * removed from the raw input (see the method SetRawInput()). The analog signals set in the raw input which
    * are not given to the offset input are not processed but will be available in the output.
    *
    * @ingroup BTKBasicFilters

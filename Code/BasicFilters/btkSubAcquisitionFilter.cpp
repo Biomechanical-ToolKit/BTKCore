@@ -45,10 +45,10 @@ namespace btk
    * By using the methods SetExtractionOption, you can specify if only the points, the analogs channels, or the events have to 
    * be extracted. In the case of the points and the analog channels, you can also specify the ids to extract.
    *
-   * To extract a subpart of the acquisition, you have to use the method SetFramesIndex() and give the indice to extract. The index
+   * To extract a subpart of the acquisition, you have to use the method SetFramesIndex() and give the indices to extract. The index
    * starts from 0 and correspond to the first frame of the acquisition. By default, all the frames are extracted.
    *
-   * Finally, the rest of the acquisition is everytime extracted. Thus, the metata are only shallow copied, and the first frame,
+   * Finally, the rest of the acquisition is every time extracted. Thus, the metadata are only shallow copied, and the first frame,
    * acquisition's frequencies, etc. remain the same.
    *
    * @ingroup BTKBasicFilters
@@ -108,11 +108,11 @@ namespace btk
    * @fn const int* SubAcquisitionFilter::GetFramesIndex() const
    * Returns the index of the frames to extract. The returned array contains two values, where the first one is the low bound while the second value is the high bound.
    *
-   *  The index starts from 0 and correspond to the first frame of the acquisition. By default, all the frames are extracted and boundaries are set to -1.
+   * The index starts from 0 and correspond to the first frame of the acquisition. By default, all the frames are extracted and boundaries are set to -1.
    */
   
   /**
-   * Set the boudaries of the frames to extract. The default values (-1) reset the extraction to take all the frames.
+   * Set the boundaries of the frames to extract. The default values (-1) reset the extraction to take all the frames.
    */ 
   void SubAcquisitionFilter::SetFramesIndex(int lb, int ub)
   {
