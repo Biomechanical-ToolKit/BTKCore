@@ -55,9 +55,12 @@
 namespace btk
 {
 #if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 8)) || (VTK_MAJOR_VERSION >= 6))
+  //FIXME: Do we still need this patch for VTK 6?
+  
   /**
    * @class VTKOpenGLContextDevice2D btkVTKOpenGLContextDevice2D.h
    * @brief Copy of the class vtkOpenGLContextDevice2D but with a detection of the use of Qt
+   *
    * The detection of Qt gives the possibility to set the text renderer in consequence as it was proposed with VTK 5.6.1.
    * If Qt is not detected, then a FreeType text renderer is used.
    *

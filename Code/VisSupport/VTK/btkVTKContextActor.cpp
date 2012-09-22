@@ -58,6 +58,18 @@ namespace btk
    * 
    * Note: This is a copy of the class vtkContextActor but containing the fix for the issue #13199 (http://www.vtk.org/Bug/view.php?id=13199).
    */
+  /**
+   * @var VTKContextActor::Scene
+   * Scene to render
+   */
+  /**
+   * @var VTKContextActor::Context
+   * To draw 2D primitives to a graphical context.
+   */
+  /**
+   * @var VTKContextActor::Initialized
+   * Flag to know if this actor was initialized or not.
+   */
   
   /**
    * @fn static VTKContextActor* VTKContextActor::New() 
@@ -66,7 +78,7 @@ namespace btk
   vtkStandardNewMacro(VTKContextActor);
   
   /**
-   * virtual vtkContext2D* VTKContextActor::GetContext()
+   * @fn virtual vtkContext2D* VTKContextActor::GetContext()
    * Returns the context object used by this actor.
    */
    

@@ -132,6 +132,11 @@ namespace btk
   };
 
   /**
+   * @fn virtual vtkVector2i VTKChartLayout::GetSize() const
+   * Return the size of the layout.
+   */
+
+  /**
    * Set the number (rows and columns) of charts. This will cause an immediate
    * update of the layout. The default size is 0x0 (no charts). No chart
    * objects are created until GetChart() is called.
@@ -172,6 +177,11 @@ namespace btk
     for(int i= 0 ; i < 4 ; ++i)
       borders[i] = this->Borders[i];
   }
+
+  /**
+   * @fn virtual vtkVector2f VTKChartLayout::GetGutter() const
+   * Returns the gutter used between each chart
+   */
 
   /**
    * Sets the gutter used between each chart

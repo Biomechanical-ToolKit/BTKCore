@@ -40,7 +40,7 @@ namespace btk
 {
   /**
    * @class TriangleMesh btkTriangleMesh.h
-   * Read-only class representing a triangle mesh based on markers's IDs and links between them.
+   * @brief Read-only class representing a triangle mesh based on markers's IDs and links between them.
    */
     
   /**
@@ -407,7 +407,7 @@ namespace btk
   
   /**
    * @class TriangleMesh::VertexLink btkTriangleMesh.h
-   * Store two marker's IDs to create a link between them (Only to create mesh's edge).
+   * @brief Store two marker's IDs to create a link between them (Only to create mesh's edge).
    */
   
   /**
@@ -434,7 +434,7 @@ namespace btk
   
   /**
    * @class TriangleMesh::VertexFace btkTriangleMesh.h
-   * Store three marker's IDs to create a face.
+   * @brief Store three marker's IDs to create a face.
    */
   
   /**
@@ -461,7 +461,7 @@ namespace btk
   
   /**
    * @class TriangleMesh::Vertex btkTriangleMesh.h
-   * Read-only class used to bridge the content of a Point into a vertex.
+   * @brief Read-only class used to bridge the content of a Point into a vertex.
    *
    * The bridge is only effective when the method TriangleMesh::ConnectPoints is used an valided.
    *
@@ -520,7 +520,7 @@ namespace btk
   
   /**
    * @class TriangleMesh::Edge btkTriangleMesh.h
-   * Read-only class used to represent an edge as a set of two vertices.
+   * @brief Read-only class used to represent an edge as a set of two vertices.
    *
    * This class should be used only by using the method TriangleMesh::BeginEdge().
    */
@@ -550,7 +550,7 @@ namespace btk
   
   /**
    * @class TriangleMesh::Face btkTriangleMesh.h
-   * Read-only class used to represent a face as a set of three vertices.
+   * @brief Read-only class used to represent a face as a set of three vertices.
    *
    * This class should be used only by using the method TriangleMesh::BeginFace().
    */

@@ -61,12 +61,6 @@ namespace btk
     int GetTickDirection() const {return this->m_TickDirection;};
     BTK_VTK_EXPORT void SetTickDirection(int dir);
     
-    // float GetMinimumTickSpacing() const {return this->m_MinimumTickSpacing;};
-    // BTK_VTK_EXPORT void SetMinimumTickSpacing(float min);
-    
-    // float GetTitleMargin() const {return this->m_TitleMargin;};
-    // BTK_VTK_EXPORT void SetTitleMargin(float margin);
-    
     float GetLabelMargin() const {return this->m_LabelMargin;}
     BTK_VTK_EXPORT void SetLabelMargin(float margin);
     

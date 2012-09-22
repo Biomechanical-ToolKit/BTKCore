@@ -107,6 +107,14 @@ namespace btk
    * @tparam r Number of rows in the calibration matrix
    * @tparam c Number of columns in the calibration matrix. Set also the number of channels.
    *
+   * Several force platform types are already provided:
+   * - btk::ForcePlatformType1: Force platform Type-1 (6 channels: FX, FY, FZ, PX, PY, MZ)
+   * - btk::ForcePlatformType2: Force platform Type-2 (6 channels: FX, FY, FZ, MX, MY, MZ)
+   * - btk::ForcePlatformType3: Force platform Type-3 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23)
+   * - btk::ForcePlatformType4: Force platform Type-4 (Same as Type-2 + calibration matrix 6 by 6)
+   * - btk::ForcePlatformType5: Force platform Type-5 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23 + calibration matrix 6 (columns) by 8 (rows))
+   * - btk::ForcePlatformType6: Force platform Type-6 (12 channels: FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4] + calibration matrix 12 by 12)
+   *
    * @ingroup BTKCommon
    */
 

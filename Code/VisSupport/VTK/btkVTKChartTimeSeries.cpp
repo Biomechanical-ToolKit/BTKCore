@@ -71,6 +71,30 @@
 namespace btk
 {
   /**
+   * @struct VTKChartPlotData
+   * @brief Information used by InvokeEvent within VTK. 
+   *
+   * @note From VTK 5.10: Small struct used by InvokeEvent to send some information about the point
+   * that was clicked on. This is an experimental part of the API, subject to change.
+   */
+  /**
+   * @var VTKChartPlotData::SeriesName
+   * Name of the extracted serie (plot) ().
+   */
+  /**
+   * @var VTKChartPlotData::Position
+   * Coordinates in the chart coordinates system
+   */
+  /**
+   * @var VTKChartPlotData::ScreenPosition
+   * Coordinates in the screen coordinates system
+   */
+  /**
+   * @var VTKChartPlotData::Index
+   * Index of the serie (plot).
+   */
+
+  /**
    * @class VTKChartTimeSeries::VTKPlots btkVTKChartTimeSeries.h
    * @brief List of pointer to vtkPlot objects.
    */
@@ -122,8 +146,15 @@ namespace btk
    * @fn void VTKChartTimeSeries::SetZoomMode(int mode)
    * Sets the zoom mode (Both directions (BOTH): 0, only horizontal (HORIZONTAL): 1, only vertical (VERTICAL): 2)
    */
-   
-  // Method to set the min/max limit of each axis.
+  
+  /**
+   * @fn void VTKChartTimeSeries::SetBounds(double xMin, double xMax, double yMin, double yMax)
+   * Set the min/max limit of each axis.
+   */
+  
+  /**
+   * Method to set the min/max limit of each axis.
+   */
   void VTKChartTimeSeries::SetBounds(double bounds[4])
   {
     this->mp_AxisX->SetMinimumLimit(bounds[0]);
@@ -194,6 +225,12 @@ namespace btk
     this->m_ChartBoundsValid = true;
   };
   
+  /**
+   * Set the geometry (size) of the chart.
+   *
+   * Compared to the method vtkChart::SetSize, it also activates a flag
+   * to notify this modification.
+   */
   void VTKChartTimeSeries::SetGeometry(const vtkRectf& rect)
   {
     this->vtkChart::SetSize(rect);
@@ -233,21 +270,9 @@ namespace btk
    */
    
   /**
-   * @fn int VTKChartTimeSeries::GetTitleMargin() const
-   * Returns the margin between the border and the title.
-   */
-  
-  /**
-   * Sets the margin between the border and the title.
+   * @fn const int* VTKChartTimeSeries::GetBorders() const
+   * Returns the length of each border in an array (left, bottom, right, top).
    */ 
-  // void VTKChartTimeSeries::SetTitleMargin(int margin)
-  // {
-  //   if (this->m_TitleMargin == margin)
-  //     return;
-  //   this->m_TitleMargin = margin;
-  //   if (this->Scene != NULL) this->Scene->SetDirty(true);
-  // };
-  
   
   /**
    * Modify the size of the borders. This method doesn't request to repaint the chart.
@@ -269,10 +294,84 @@ namespace btk
   };
   
   /**
+   * @fn VTKCurrentFrameFunctor::Pointer VTKChartTimeSeries::GetCurrentFrameFunctor() const
+   * Returns the functor used to know the current frame to display.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::SetCurrentFrameFunctor(VTKCurrentFrameFunctor::Pointer functor)
+   * Sets the functor used to know the current frame to display.
+   */
+  
+  /**
+   * @fn VTKRegionOfInterestFunctor::Pointer VTKChartTimeSeries::GetRegionOfInterestFunctor() const
+   * Returns the functor used to know the region of interest to display.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::SetRegionOfInterestFunctor(VTKRegionOfInterestFunctor::Pointer functor)
+   * Sets the functor used to know the region of interest to display.
+   */
+  
+  /**
+   * @fn VTKEventsFunctor::Pointer VTKChartTimeSeries::GetEventsFunctor() const
+   * Returns the functor used to know events' informations.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::SetEventsFunctor(VTKEventsFunctor::Pointer functor)
+   * Sets the functor used to know events' informations.
+   */
+  
+  /**
    * @fn int VTKChartTimeSeries::GetDisplayZoomBox() const
    * Get the status of the zoom box display.
    */
+  
+  /**
+   * @fn float VTKChartTimeSeries::GetEventLineWidth() const
+   * Returns the width of the vertical line used to display the events.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::SetEventLineWidth(float width)
+   * Sets the width of the vertical line used to display the events.
+   */
+  
+  /**
+   * @fn int VTKChartTimeSeries::GetEventLineTypeFactor() const
+   * Returns the factor used in the spacing of the elements in the pattern to draw non-solid line.
+   *
+   * By default the dash, dot line, etc has a space of few pixels, but this function can scale this spacing.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::SetEventLineTypeFactor(int factor)
+   * Sets the factor used in the spacing of the elements in the pattern to draw non-solid line.
+   *
+   * By default the dash, dot line, etc has a space of few pixels, but this function can scale this spacing.
+   */
+  
+  /**
+   * @fn int VTKChartTimeSeries::GetDisplayEvents() const
+   * Get the status of the events display.
+   */
    
+  /**
+   * @fn void VTKChartTimeSeries::SetDisplayEvents(int enabled)
+   * Enable/Disable the displaying of the events as vertical lines into the chart
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::DisplayEventsOn()
+   * Convenient method to show events.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::DisplayEventsOff()
+   * Convenient method to hide events.
+   */
+  
   /**
    * Enable/Disable the zoom box.
    */
@@ -545,6 +644,9 @@ namespace btk
     return 2;
   };
   
+  /**
+   * Retrieve the closest point near the mouse location and set it in the @a plotIndex structure.
+   */
   bool VTKChartTimeSeries::LocatePointInPlots(const vtkContextMouseEvent& mouse, VTKChartPlotData& plotIndex)
   {
     if (this->mp_Plots->empty())
@@ -616,17 +718,27 @@ namespace btk
       return false;
     }
   };
-  
+
+  /**
+   * Do nothing
+   */
   bool VTKChartTimeSeries::MouseEnterEvent(const vtkContextMouseEvent& )
   {
     return true;
   };
   
+  /**
+   * Do nothing
+   */
   bool VTKChartTimeSeries::MouseLeaveEvent(const vtkContextMouseEvent& )
   {
     return true;
   };
   
+  /**
+   * Activate the zoom box if the mouse interactions are enabled and the shift key is activated.
+   * Otherwise, the pan action is activated
+   */
   bool VTKChartTimeSeries::MouseButtonPressEvent(const vtkContextMouseEvent& mouse)
   {
     if (!this->m_InteractionEnabled)
@@ -647,6 +759,9 @@ namespace btk
     return false;
   };
 
+  /**
+   * Pan or grow the zoom box depending of the action activated.
+   */
   bool VTKChartTimeSeries::MouseMoveEvent(const vtkContextMouseEvent& mouse)
   {
     if (!this->m_InteractionEnabled)
@@ -722,6 +837,9 @@ namespace btk
     return true;
   };
 
+  /**
+   * If the zoom box is activated, then this method finish the action and zoom in the selection.
+   */
   bool VTKChartTimeSeries::MouseButtonReleaseEvent(const vtkContextMouseEvent& mouse)
   {
     if (!this->m_InteractionEnabled)
@@ -759,6 +877,11 @@ namespace btk
     return false;
   };
 
+  /**
+   * Zoom/Unzoom hover the mouse pointer.
+   *
+   * If the Shift key if activated, then the zoom is only on the horizontal axis.
+   */
   bool VTKChartTimeSeries::MouseWheelEvent(const vtkContextMouseEvent& mouse, int delta)
   {
     if (!this->m_InteractionEnabled)
@@ -803,6 +926,9 @@ namespace btk
   };
 
 #if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+  /**
+   * Do nothing (Eat the event).
+   */
   bool VTKChartTimeSeries::KeyPressEvent(const vtkContextKeyEvent& key)
   {
     btkNotUsed(key);
@@ -810,6 +936,9 @@ namespace btk
   }
 #endif
   
+  /**
+   * Constructor
+   */
   VTKChartTimeSeries::VTKChartTimeSeries()
   : vtkChart(), m_ZoomBox()
   {
@@ -876,10 +1005,6 @@ namespace btk
     
     // Plots
     this->mp_Plots = new VTKPlots();
-    
-    // Title
-    // this->TitleProperties->SetVerticalJustificationToTop();
-    // this->m_TitleMargin = 10;
     
     // Defaut borders for the chart
     this->m_GeometryChanged = false;

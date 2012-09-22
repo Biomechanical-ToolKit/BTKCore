@@ -766,6 +766,8 @@ EXCLUDE_SYMBOLS        = vtkExportedTypeRevisionMacro \
                          vtkGetMacro \
                          vtkSetMacro \
                          vtkBooleanMacro \
+                         vtkTypeMacro \
+                         vtkCxxSetObjectMacro \
                          *_p
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or
@@ -1582,7 +1584,11 @@ PREDEFINED             = BTK_COMMON_EXPORT \
                          BTK_VISSUPPORT_EXPORT \
                          BTK_VTK_EXPORT \
                          BTK_IO_ACQUISITON_FILE_FACTORY_INIT \
-                         btkChooseNativeBinaryFileStream=BinaryFileStream
+                         btkChooseNativeBinaryFileStream=BinaryFileStream \
+                         HAVE_SYS_MMAP=1 \
+                         FIX_DOXYGEN_VTK_MISSING_MACRO_DEFINITIONS=1 \
+                         VTK_MAJOR_VERSION=5 \
+                         VTK_MINOR_VERSION=10
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.
@@ -1590,7 +1596,7 @@ PREDEFINED             = BTK_COMMON_EXPORT \
 # Use the PREDEFINED tag if you want to use a different macro definition that
 # overrules the definition found in the source code.
 
-EXPAND_AS_DEFINED      =
+EXPAND_AS_DEFINED      = vtkGetObjectMacro
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES (the default) then
 # doxygen's preprocessor will remove all references to function-like macros

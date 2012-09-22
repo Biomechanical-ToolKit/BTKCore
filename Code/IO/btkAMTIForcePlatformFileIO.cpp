@@ -71,12 +71,12 @@ namespace btk
    * It is important to not that the returned forces and moments are the reaction measured by the force 
    * platform and not the measure itself. This choice was done to fit with the format stored in a btk::Acquisition object.
    *
-   * @warning: The forces and the moments in the file are measured in the platfrom (local) 
-   * frame while a btk::Acquisition object store data in the global frame. To be able to express
+   * @warning The forces and the moments in the file are measured in the platfrom (local) 
+   * frame while a btk::Acquisition object store data in the global frame.\n To be able to express
    * the force, moments as well as the COP (computed by the filter btk::GroundReactionWrenchFilter),
-   * this reader assumes that the data come from an AMTI force plate OR6-7, and use then its dimensions (463.6 x 508 x 82.6 mm).
-   * All the dimensions must be given in millimeters. If your platform is not this one, then you have to modify the dimensions or the geometry.
-   * Moreover, from the dimensions, the coordinates of the 4 corners of the force plate are generated.
+   * this reader assumes that the data comes from an AMTI force plate OR6-7, and uses then its dimensions (463.6 x 508 x 82.6 mm).
+   * All the dimensions must be given in millimeters.If your platform is not this one, then you have to modify the dimensions or the geometry.
+   * \n From the dimensions, the coordinates of the 4 corners of the force plate are generated.
    * Compared to the frame embed with the force plate, the corners 1,2,3,4 must be defined as the corner in the
    * quadrant +x+y, -x+y, -x-y, and +x-y. The global frame is defined as the axis X going to the left, 
    * the Y axis is forward, and the Z axis goes up.

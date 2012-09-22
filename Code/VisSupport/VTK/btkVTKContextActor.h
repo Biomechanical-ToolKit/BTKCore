@@ -36,10 +36,15 @@
 #ifndef __btkVTKContextActor_h
 #define __btkVTKContextActor_h
 
+// Only used by Doxygen... Should not be able to put this in the Doxygen configuration file?
+#ifdef FIX_DOXYGEN_VTK_MISSING_MACRO_DEFINITIONS
+  #define vtkGetObjectMacro(name,type) type* Get##name();
+#endif
+
 #include <vtkProp.h>
 
- class vtkContext2D;
- class vtkContextScene;
+class vtkContext2D;
+class vtkContextScene;
 
 namespace btk
 {

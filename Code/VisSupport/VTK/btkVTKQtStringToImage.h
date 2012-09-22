@@ -63,6 +63,9 @@ namespace btk
     void operator=(const VTKQtStringToImage& );  // Not implemented.
   };
 #else
+  /**
+   * Use to fix the issue #13199 (http://www.vtk.org/Bug/view.php?id=13199).
+   */
   typedef vtkQtStringToImage VTKQtStringToImage;
 #endif
 };

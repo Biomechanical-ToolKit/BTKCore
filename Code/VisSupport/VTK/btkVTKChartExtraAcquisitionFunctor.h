@@ -78,6 +78,50 @@ namespace btk
     VTKEventsFunctor(const VTKEventsFunctor& ); // Not implemented.
     VTKEventsFunctor& operator=(const VTKEventsFunctor& ); // Not implemented.
   };
+  
+  /**
+   * @class VTKCurrentFrameFunctor btkVTKChartTimeSeries.h
+   * @brief Functor to get easily to this chart the current frame displayed.
+   *
+   * This is usefull when combined with a timer or other view, like a 3D view.
+   */
+  /**
+   * @typedef VTKCurrentFrameFunctor::Pointer
+   * Smart pointer associated with a VTKCurrentFrameFunctor object.
+   */
+  /**
+   * @fn virtual int VTKCurrentFrameFunctor::operator()() = 0;
+   * Operator used to return the current frame displayed.
+   */
+   
+  /**
+   * @class VTKRegionOfInterestFunctor btkVTKChartTimeSeries.h
+   * @brief Functor to get easily to this chart the region of interest of the time series.
+   */
+  /**
+   * @typedef VTKRegionOfInterestFunctor::Pointer
+   * Smart pointer associated with a VTKCurrentFrameFunctor object.
+   */
+  /**
+   * @fn virtual void VTKRegionOfInterestFunctor::operator()(int& left, int& right) = 0;
+   * Operator used to get the left and right bounds of the region of interest.
+   */
+   
+  /**
+   * @class VTKEventsFunctor btkVTKChartTimeSeries.h
+   * @brief Functor to get easily to this chart the events as types, frames and colors.
+   *
+   * The types are represented by integer where the values 0, 1 and 2 are for 
+   * "General", "Foot strike" and "Foot off" respectively. All of the ohers values have no specific meanings.
+   */
+  /**
+   * @typedef VTKEventsFunctor::Pointer
+   * Smart pointer associated with a VTKCurrentFrameFunctor object.
+   */
+  /**
+   * @fn virtual bool VTKEventsFunctor::operator()(int index, int& typeId, int& frame, double rgb[3]) = 0;
+   * Operator used to extract each event. Asking for an event out of range returns false.
+   */
 };
 
 #endif // __btkVTKChartExtraAcquisitionFunctor_h

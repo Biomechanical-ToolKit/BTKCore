@@ -63,6 +63,9 @@ namespace btk
     void operator=(const VTKOpenGL2ContextDevice2D& ); // Not implemented.
   };
 #else
+  /**
+   * Use to fix the issue #13199 (http://www.vtk.org/Bug/view.php?id=13199).
+   */
   typedef vtkOpenGL2ContextDevice2D VTKOpenGL2ContextDevice2D;
 #endif
 };

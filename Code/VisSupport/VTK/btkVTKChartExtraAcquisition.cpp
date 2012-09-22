@@ -46,11 +46,25 @@
 
 namespace btk
 {
+  /**
+   * @fn static VTKChartExtraAcquisition* VTKChartExtraAcquisition::New()
+   * Constructs a VTKChartExtraAcquisition object and return it as a pointer.
+   */
   vtkStandardNewMacro(VTKChartExtraAcquisition);
   
   vtkCxxSetObjectMacro(VTKChartExtraAcquisition, XAxis, vtkAxis);
   vtkCxxSetObjectMacro(VTKChartExtraAcquisition, YAxis, vtkAxis);
   
+  /**
+   * @class VTKChartExtraAcquisition btkVTKChartExtraAcquisition.h
+   * @brief Display extra information on the chart (events, timebar, region of interest)
+   *
+   * @ingroup BTKVTK
+   */
+  
+  /**
+   * Constructor
+   */
   VTKChartExtraAcquisition::VTKChartExtraAcquisition()
   : mp_CurrentFrameFunctor(), mp_RegionOfInterestFunctor(), mp_EventsFunctor()
   {
@@ -63,6 +77,9 @@ namespace btk
     this->YAxis = NULL;
   };
   
+  /**
+   * Destructor
+   */
   VTKChartExtraAcquisition::~VTKChartExtraAcquisition()
   {
     this->SetXAxis(NULL);
@@ -160,6 +177,9 @@ namespace btk
     this->Modified();
   };
   
+  /**
+   * Set the X,Y axis used to scale correctly the content of this context item.
+   */
   void VTKChartExtraAcquisition::SetAxes(vtkAxis* x, vtkAxis* y)
   {
     this->SetXAxis(x);

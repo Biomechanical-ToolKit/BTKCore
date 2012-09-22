@@ -78,14 +78,6 @@ namespace btk
    * Direction of the ticks. Can be set to be drawn inside or outside the chart.
    */
   /**
-   * @var VTKAxis::m_MinimumTickSpacing
-   * Minimum space between two ticks in pixels.
-   */
-  /**
-   * @var VTKAxis::m_TitleMargin
-   * Size of the margin (in pixels) between the border and the title.
-   */
-  /**
    * @var VTKAxis::m_LabelMargin
    * Size of the margin (in pixels) between the axis and the labels.
    */
@@ -96,6 +88,10 @@ namespace btk
   /**
    * @var VTKAxis::m_TickOffset
    * Value used to modify the ticks' label. Set to 0.0 by default.
+   */
+  /**
+   * @var VTKAxis::m_DisplayMinimumLimit
+   * Flag to display or not the minimum limit when the chart is standard state (no zoom).
    */
 
   /**
@@ -172,39 +168,6 @@ namespace btk
     this->TickMarksDirty = true;
     this->Modified();
   };
-  
-  /**
-   * @fn float VTKAxis::GetMinimumTickSpacing() const
-   * Returns the minimum spacing between two ticks. The spacing is in pixels.
-   */
-  
-  /**
-   * Sets the minimum spacing between two ticks. The spacing is in pixels. 
-   */
-  // void VTKAxis::SetMinimumTickSpacing(float min)
-  // {
-  //   if (this->m_MinimumTickSpacing == min)
-  //     return;
-  //   this->m_MinimumTickSpacing = min;
-  //   this->TickMarksDirty = true;
-  //   this->Modified();
-  // };
-  
-  /**
-   * @fn float VTKAxis::GetTitleMargin() const
-   * Returns the size of the margin between the border and the title. The size is in pixels.
-   */
-  
-  /**
-   * Sets the size of the margin between the border and the title. The size is in pixels.
-   */
-  // void VTKAxis::SetTitleMargin(float margin)
-  // {
-  //   if (this->m_TitleMargin == margin)
-  //     return;
-  //   this->m_TitleMargin = margin;
-  //   this->Modified();
-  // };
   
   /**
    * @fn float VTKAxis::GetLabelMargin() const

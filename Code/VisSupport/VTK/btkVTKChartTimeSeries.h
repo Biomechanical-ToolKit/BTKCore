@@ -82,24 +82,16 @@ namespace btk
     int GetZoomMode() const {return this->m_ZoomMode;};
     void SetZoomMode(int mode) {this->m_ZoomMode = mode;};
     
-    // bool GetBoundsEnabled() {return this->m_BoundsEnabled;};
-    //             void SetBoundsEnabled(bool enabled) {this->m_BoundsEnabled = enabled;};
-    //             double* GetBounds() {return this->mp_Bounds;};
     void SetBounds(double xMin, double xMax, double yMin, double yMax) {double bounds[4] = {xMin, xMax, yMin, yMax}; this->SetBounds(bounds);};
     BTK_VTK_EXPORT void SetBounds(double bounds[4]);
     BTK_VTK_EXPORT virtual void RecalculateBounds();
-    void ForceBoundsValid() {this->m_ChartBoundsValid = true;};
     BTK_VTK_EXPORT void SetGeometry(const vtkRectf& rect);
-    
     
     BTK_VTK_EXPORT void SetLegend(vtkSmartPointer<vtkChartLegend> legend);
     vtkChartLegend* GetLegend() {return this->mp_Legend;};
     
     BTK_VTK_EXPORT void SetColorSeries(vtkSmartPointer<vtkColorSeries> colors);
     vtkColorSeries* GetColorSeries() {return this->mp_Colors;};
-    
-    // int GetTitleMargin() const {return this->m_TitleMargin;};
-    //     BTK_VTK_EXPORT void SetTitleMargin(int margin);
     
     const int* GetBorders() const {return this->mp_Borders;};
     BTK_VTK_EXPORT void SetBorders(int left, int bottom, int right, int top);
@@ -122,13 +114,8 @@ namespace btk
     int GetEventLineTypeFactor() const {return this->mp_ExtraAcquisition->GetEventLineTypeFactor();};
     void SetEventLineTypeFactor(int factor) {return this->mp_ExtraAcquisition->SetEventLineTypeFactor(factor);};
     
-    // BTK_VTK_EXPORT void ResetZoom();
-    // BTK_VTK_EXPORT void ApplyZoom(const vtkRectf& box);
-    // const vtkRectf& GetZoomBox() const {return this->m_ZoomBox;};
     bool GetDisplayZoomBox() const {return this->m_ZoomBoxDisplayed;};
     BTK_VTK_EXPORT void SetDisplayZoomBox(bool enabled);
-    // void DisplayZoomBoxOn() {this->SetDisplayZoomBox(1);};
-    // void DisplayZoomBoxOff() {this->SetDisplayZoomBox(0);};
     
     BTK_VTK_EXPORT virtual void Update();
     BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
@@ -197,7 +184,6 @@ namespace btk
     bool m_GeometryChanged;
     bool m_ChartBoundsValid;
     bool m_PlotsTransformValid;
-    // int m_TitleMargin;
   };
 };
 

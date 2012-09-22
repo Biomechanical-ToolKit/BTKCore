@@ -222,7 +222,6 @@ namespace btk
   Measure<d>::Measure(const Measure& toCopy)
   : DataObjectLabeled(toCopy), m_Values(toCopy.m_Values)
   {};
-
 };
 
 #endif // __btkMeasure_h

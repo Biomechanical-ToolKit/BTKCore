@@ -52,6 +52,7 @@
 #include <QFontMetrics>
 
 // Required as this internal class is implemented in the CXX file in VTK
+//! @cond
 class vtkQtStringToImage::Internals
 {
 public:
@@ -73,6 +74,7 @@ public:
     return textColor;
   };
 };
+//! @endcond
 
 namespace btk
 {
@@ -92,6 +94,11 @@ namespace btk
    */
   vtkStandardNewMacro(VTKQtStringToImage);
 
+  /**
+   * Return the size of the string to display
+   *
+   * @warning This method takes time to compute the size of the string and is not adapted during a refresh (especially if you have lots of string to display).
+   */
   vtkVector2i VTKQtStringToImage::GetBounds(vtkTextProperty* property, const vtkUnicodeString& string)
   {
     vtkVector2i recti(0, 0);
@@ -128,6 +135,11 @@ namespace btk
     return recti;
   };
   
+  /**
+   * Return the size of the string to display
+   *
+   * @warning This method takes time to compute the size of the string and is not adapted during a refresh (especially if you have lots of string to display).
+   */
   vtkVector2i VTKQtStringToImage::GetBounds(vtkTextProperty* property, const vtkStdString& string)
   {
     return this->GetBounds(property, vtkUnicodeString::from_utf8(string));
