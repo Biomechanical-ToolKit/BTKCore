@@ -85,6 +85,7 @@ namespace btk
     void SetBounds(double xMin, double xMax, double yMin, double yMax) {double bounds[4] = {xMin, xMax, yMin, yMax}; this->SetBounds(bounds);};
     BTK_VTK_EXPORT void SetBounds(double bounds[4]);
     BTK_VTK_EXPORT virtual void RecalculateBounds();
+    using vtkChart::SetGeometry;
     BTK_VTK_EXPORT void SetGeometry(const vtkRectf& rect);
     
     BTK_VTK_EXPORT void SetLegend(vtkSmartPointer<vtkChartLegend> legend);

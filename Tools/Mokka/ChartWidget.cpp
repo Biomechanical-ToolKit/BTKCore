@@ -327,6 +327,8 @@ void ChartWidget::updateAxisX(btk::VTKChartTimeSeries* chart, int ff, int lf)
 
 void ChartWidget::updateAxisX(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux)
 {
+  Q_UNUSED(dlx);
+  Q_UNUSED(dux);
   vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
   vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
   chart->SetBounds(axisX->GetMinimumLimit() + dlb, axisX->GetMaximumLimit() + dub, axisY->GetMinimumLimit(), axisY->GetMaximumLimit());
@@ -408,6 +410,7 @@ void ChartWidget::render(bool optionsShown, int delayShowOptionWinXP)
     else
       this->render();
 #else
+    Q_UNUSED(delayShowOptionWinXP);
     this->render();
 #endif
   }
