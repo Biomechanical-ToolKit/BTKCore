@@ -613,6 +613,26 @@ CXXTEST_SUITE(C3DFileReaderTest)
     reader->SetFilename(C3DFilePathIN + "others/mocap36.c3d");
     reader->Update();
   };
+  
+  CXXTEST_TEST(BadParameterOffset)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/badParameterOffset.c3d");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetEventNumber(), 0);
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), 41);
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 0);
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), 1);
+    TS_ASSERT_EQUALS(acq->GetLastFrame(), 111);
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 250.0);
+    TS_ASSERT_EQUALS(acq->GetPoint(0)->GetLabel(), "Point    1");
+    TS_ASSERT_EQUALS(acq->GetPoint(40)->GetLabel(), "Point   41");
+    TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(0,0), 168.093002, 1e-5);
+    TS_ASSERT_DELTA(acq->GetPoint(29)->GetValues().coeff(10,1), 731.903015, 1e-5);
+    TS_ASSERT_DELTA(acq->GetPoint(40)->GetValues().coeff(110,2), 0.0, 1e-5);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileReaderTest)
@@ -649,4 +669,5 @@ CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_standing)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_type1)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, ParameterOverflow)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Mocap36)
+CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, BadParameterOffset)
 #endif

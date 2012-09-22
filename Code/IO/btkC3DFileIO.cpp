@@ -409,42 +409,67 @@ namespace btk
           int prod = 1;
           int8_t inc = 0 ; while (inc < nbDim) prod *= dataDim[inc++];
           int sizeData = static_cast<int>(prod * abs(type));
-          if ((sizeData > offset) && (!lastEntry))
-            throw(C3DFileIOException("Error in the number of elements in the parameter's data. The number is superior to the offset."));
           MetaData::Pointer entry;
-          switch (type)
+          bool unlocked = (nbCharLabel > 0 ? true : false);
+          if ((sizeData > offset) && (!lastEntry))
           {
-            case -1:
-              if (dataDim.size() >= 2)
-              {
-                int rows = 1; int8_t inc2 = 1 ; while (inc2 < nbDim) rows *= dataDim[inc2++];
-                entry = MetaData::New(label, dataDim, ibfs->ReadString(rows, dataDim[0]), "", (nbCharLabel > 0 ? true : false));
-              }
-              else
-                entry = MetaData::New(label, dataDim, ibfs->ReadString(1,prod), "", (nbCharLabel > 0 ? true : false));
-              break;
-            case 1:
-              entry = MetaData::New(label, dataDim, ibfs->ReadI8(prod), "", (nbCharLabel > 0 ? true : false));
-              break;
-            case 2:
-              entry = MetaData::New(label, dataDim, ibfs->ReadI16(prod), "", (nbCharLabel > 0 ? true : false));
-              break;
-            case 4:
-              entry = MetaData::New(label, dataDim, ibfs->ReadFloat(prod), "", (nbCharLabel > 0 ? true : false));
-              break;
-            default :
-              throw(C3DFileIOException("Data parameter type unknown for the entry: '" + label + "'"));
-              break;
-          }
-          offset -= sizeData;
-          if (offset != 0)
-          {
-            uint8_t nbCharDesc = ibfs->ReadU8(); offset -= 1;
-            entry->SetDescription(ibfs->ReadString(nbCharDesc)); 
-            offset -= nbCharDesc;
+            btkIOErrorMacro(filename, "The size of the data for the parameter '" + label + "' exceeds the space available before the next entry. Trying to continue...");
+            switch (type)
+            {
+              // Note: no need to give the number of elements to the vector as the metadata will resize the data automatically.
+              case -1:
+                entry = MetaData::New(label, dataDim, std::vector<std::string>(), "", unlocked);
+                break;
+              case 1:
+                entry = MetaData::New(label, dataDim, std::vector<int8_t>(), "", unlocked);
+                break;
+              case 2:
+                entry = MetaData::New(label, dataDim, std::vector<int16_t>(), "", unlocked);
+                break;
+              case 4:
+                entry = MetaData::New(label, dataDim, std::vector<float>(), "", unlocked);
+                break;
+              default :
+                throw(C3DFileIOException("Data parameter type unknown for the entry: '" + label + "'"));
+                break;
+            }
           }
           else
-            btkIOErrorMacro(filename, "Where is the byte to set the number of characters in the description of the parameter '" + label + "'? Trying to continue...");
+          {
+            switch (type)
+            {
+              case -1:
+                if (dataDim.size() >= 2)
+                {
+                  int rows = 1; int8_t inc2 = 1 ; while (inc2 < nbDim) rows *= dataDim[inc2++];
+                  entry = MetaData::New(label, dataDim, ibfs->ReadString(rows, dataDim[0]), "", unlocked);
+                }
+                else
+                  entry = MetaData::New(label, dataDim, ibfs->ReadString(1,prod), "", unlocked);
+                break;
+              case 1:
+                entry = MetaData::New(label, dataDim, ibfs->ReadI8(prod), "", unlocked);
+                break;
+              case 2:
+                entry = MetaData::New(label, dataDim, ibfs->ReadI16(prod), "", unlocked);
+                break;
+              case 4:
+                entry = MetaData::New(label, dataDim, ibfs->ReadFloat(prod), "", unlocked);
+                break;
+              default :
+                throw(C3DFileIOException("Data parameter type unknown for the entry: '" + label + "'"));
+                break;
+            }
+            offset -= sizeData;
+            if (offset != 0)
+            {
+              uint8_t nbCharDesc = ibfs->ReadU8(); offset -= 1;
+              entry->SetDescription(ibfs->ReadString(nbCharDesc)); 
+              offset -= nbCharDesc;
+            }
+            else
+              btkIOErrorMacro(filename, "Where is the byte to set the number of characters in the description of the parameter '" + label + "'? Trying to continue...");
+          }
           parameters.push_back(entry);
         }
         if (lastEntry)
