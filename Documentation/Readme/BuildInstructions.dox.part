@@ -56,7 +56,7 @@ Permits to use the <a href="http://eigen.tuxfamily.org/">Eigen</a> library insta
 To display BTK data in 2D/3D enviromments. This option activates sub-options to choose the environment(s) to used.
 
 @paragraph config_vtk BTK_USE_VTK
-Builds library BTKVTK to display BTK data in the <a href="http://www.vtk.org">VTK</a> environment. VTK 5.4 or above required. This option is only shown when @ref config_vissupport is activated.
+Builds library BTKVTK to display BTK data in the <a href="http://www.vtk.org">VTK</a> environment. VTK 5.8 or above required. This option is only shown when @ref config_vissupport is activated.
 
 @subsubsection config_matlab BTK_WRAP_MATLAB
 Enable/Disable generation of BTK bindings in the Matlab language. In order to build the Matlab-based BTK interpreter, the target computer needs to have Matlab 7.0.4 or above installed. To turn on Matlab wrapping, set BTK_WRAP_MATLAB to ON during the configuration process.
@@ -126,7 +126,7 @@ Each BTK class has unit tests and/or regression tests to verify their functionna
 
 @subsubsection config_tools BUILD_TOOLS
 Active the building of tools embedded in BTK. These tools are:
- - Mokka: Visualizer/editor of acquisition data. Requires <a href="http://www.vtk.org">VTK</a> 5.4 or above and <a href="http://www.qtsoftware.com">Qt</a> 4.5 or above. The option @ref config_vtk must be activated.
+ - Mokka: Visualizer/editor of acquisition data. Requires <a href="http://www.vtk.org">VTK</a> 5.8 or above and <a href="http://www.qtsoftware.com">Qt</a> 4.5 or above. The option @ref config_vtk must be activated.
 
 @htmlonly <hr> @endhtmlonly
 
