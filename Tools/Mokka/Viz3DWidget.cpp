@@ -71,6 +71,12 @@ Viz3DWidget::Viz3DWidget(QWidget* parent)
   
   // No need to send mouse events to VTK when a mouse button isn't down
   this->setMouseTracking(false);
+  
+#ifdef Q_OS_WIN
+  #pragma message("WARNING: It seems that Qt 4.8.3 introduced a bug under Windows for the drag'n drop action (don't check parent's attribute?). Need to check for later version.")
+  // Drag and drop
+  this->setAcceptDrops(true);
+#endif
 }
 
 Viz3DWidget::~Viz3DWidget()
