@@ -750,11 +750,10 @@ void ChartWidget::dropEvent(QDropEvent* event)
     {
       btk::VTKChartTimeSeries* chart = this->m_ChartData[this->m_CurrentChartType]->chart(i);
       chart->SetInteractionEnabled(true);
-      int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
-      this->updateAxisX(chart, roi[0], roi[1]);
-#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
+      chart->Update(); // Force the update to compute correctly the boundaries
       chart->RecalculateBounds();
-#endif
+      int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
+      this->updateAxisX(chart, roi[0], roi[1]); // Force the limit of the chart to be sure that for the analog chart the last frame is the last video frame and not the last analog frame
     }
   }
   this->render();
