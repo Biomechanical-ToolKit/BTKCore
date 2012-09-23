@@ -634,8 +634,11 @@ void MainWindow::updateRecentFileActions()
   QMutableStringListIterator i(this->m_RecentFiles); 
   while (i.hasNext())
   {
-    if (!QFile::exists(i.next())) 
-      i.remove(); 
+    if (!QFile::exists(i.next()))
+    {
+      LOG_WARNING("The file '" + i.value() + "' doesn't exist anymore and is removed from the list of the recent files.");
+      i.remove();
+    }
   }
   for (int i = 0 ; i < maxRecentFiles ; ++i)
   { 
