@@ -1866,9 +1866,7 @@ void ModelDockWidget::displayProperties()
     this->analogGainComboBox->blockSignals(true);
     this->analogGainComboBox->setCurrentIndex(uniqueGain ? g : 0);
     this->analogGainComboBox->blockSignals(false);
-    this->analogScaleSpinBox->setDecimals(5);
-    if (uniqueScale && (s < 1.0e5))
-      this->analogScaleSpinBox->setDecimals(15);
+    this->analogScaleSpinBox->setDecimals(15);
     this->analogScaleSpinBox->setValue(uniqueScale ? s : 0.0); if (!uniqueOffset) this->analogScaleSpinBox->clear();
     this->analogOffsetSpinBox->setValue(uniqueOffset ? o : 0); if (!uniqueOffset) this->analogOffsetSpinBox->clear();
     this->propertiesStack->setCurrentWidget(this->analogPage);
@@ -2561,7 +2559,7 @@ void ModelDockWidget::editAnalogsScale()
   for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
   {
     ids[inc] = (*it)->data(0, AnalogId).toInt();
-    if (fabs(this->mp_Acquisition->analogScale(ids[inc]) - scale) >= 5.0e-6)
+    if (fabs(this->mp_Acquisition->analogScale(ids[inc]) - scale) >= 5.0e-16)
       scaleModified = true;
     ++inc;
   }
