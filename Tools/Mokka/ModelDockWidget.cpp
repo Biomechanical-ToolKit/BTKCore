@@ -3227,6 +3227,9 @@ void ModelDockWidget::refresh()
   modelOutputScalars->setHidden(true);
   videosRoot->setHidden(true);
   
+  int uniqueVisibleRootNum = 0;
+  QTreeWidgetItem* uniqueVisibleRootItem = 0;
+  
   if ((segmentsRoot->childCount() != 0) && this->hasChildVisible(segmentsRoot))
   {
     segmentsRoot->setHidden(false);
@@ -3235,20 +3238,24 @@ void ModelDockWidget::refresh()
   {
     this->mp_SelectAllMarkers->setEnabled(true);
     markersRoot->setHidden(false);
+    ++uniqueVisibleRootNum; uniqueVisibleRootItem=markersRoot;
   }
   if ((virtualMarkersRoot->childCount() != 0) && this->hasChildVisible(virtualMarkersRoot))
   {
     this->mp_SelectAllMarkers->setEnabled(true);
     virtualMarkersRoot->setHidden(false);
+    ++uniqueVisibleRootNum; uniqueVisibleRootItem=virtualMarkersRoot;
   }
   if ((analogsRoot->childCount() != 0) && this->hasChildVisible(analogsRoot))
   {
     this->mp_SelectAllAnalogs->setEnabled(true);
     analogsRoot->setHidden(false);
+    ++uniqueVisibleRootNum; uniqueVisibleRootItem=analogsRoot;
   }
   if ((forcePlatesRoot->childCount() != 0) && this->hasChildVisible(forcePlatesRoot))
   {
     forcePlatesRoot->setHidden(false);
+    forcePlatesRoot->setExpanded(true);
   }
   if ((modelOutputAngles->childCount() != 0) && this->hasChildVisible(modelOutputAngles))
   {
@@ -3256,6 +3263,7 @@ void ModelDockWidget::refresh()
     this->mp_SelectAllModelOutputs->setEnabled(true);
     modelOutputAngles->setHidden(false);
     modelOutputsRoot->setHidden(false);
+    modelOutputsRoot->setExpanded(true);
   }
   if ((modelOutputForces->childCount() != 0) && this->hasChildVisible(modelOutputForces))
   {
@@ -3263,6 +3271,7 @@ void ModelDockWidget::refresh()
     this->mp_SelectAllModelOutputs->setEnabled(true);
     modelOutputForces->setHidden(false);
     modelOutputsRoot->setHidden(false);
+    modelOutputsRoot->setExpanded(true);
   }
   if ((modelOutputMoments->childCount() != 0) && this->hasChildVisible(modelOutputMoments))
   {
@@ -3270,6 +3279,7 @@ void ModelDockWidget::refresh()
     this->mp_SelectAllModelOutputs->setEnabled(true);
     modelOutputMoments->setHidden(false);
     modelOutputsRoot->setHidden(false);
+    modelOutputsRoot->setExpanded(true);
   }
   if ((modelOutputPowers->childCount() != 0) && this->hasChildVisible(modelOutputPowers))
   {
@@ -3277,6 +3287,7 @@ void ModelDockWidget::refresh()
     this->mp_SelectAllModelOutputs->setEnabled(true);
     modelOutputPowers->setHidden(false);
     modelOutputsRoot->setHidden(false);
+    modelOutputsRoot->setExpanded(true);
   }
   if ((modelOutputScalars->childCount() != 0) && this->hasChildVisible(modelOutputScalars))
   {
@@ -3284,11 +3295,16 @@ void ModelDockWidget::refresh()
     this->mp_SelectAllModelOutputs->setEnabled(true);
     modelOutputScalars->setHidden(false);
     modelOutputsRoot->setHidden(false);
+    modelOutputsRoot->setExpanded(true);
   }
   if ((videosRoot->childCount() != 0) && this->hasChildVisible(videosRoot))
   {
     videosRoot->setHidden(false);
+    ++uniqueVisibleRootNum; uniqueVisibleRootItem=videosRoot;
   }
+  
+  if (uniqueVisibleRootNum == 1)
+    uniqueVisibleRootItem->setExpanded(true);
 };
 
 QTreeWidgetItem* ModelDockWidget::treePointChild(QTreeWidgetItem* parent, int id)
