@@ -297,7 +297,6 @@ void MultiViewWidget::initialize()
   actor = vtkActor::New();
   actor->SetMapper(mapper);
   actor->SetScale(0.005);
-  actor->UseBoundsOff();
   renderer->AddActor(actor);
   mapper->Delete();
   actor->Delete();
