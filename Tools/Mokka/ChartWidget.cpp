@@ -1014,7 +1014,7 @@ void AbstractChartData::initialize(vtkSmartPointer<vtkColorSeries> colorGenerato
     // chart->SetHiddenAxisBorder(0);
     chart->DisplayEventsOn();
     chart->SetColorSeries(colorGenerator);
-    chart->SetBorders(60,20,0,5);
+    chart->SetBorders(80,20,10,5);
     this->mp_ChartLayout->SetChart(vtkVector2i(0,i), chart);
     chart->Delete();
   }
