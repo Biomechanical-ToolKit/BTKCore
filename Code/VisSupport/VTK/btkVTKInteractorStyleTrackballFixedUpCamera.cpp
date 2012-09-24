@@ -49,8 +49,6 @@
 
 namespace btk
 {
-  static const int framebufferIndex = 0; // 0: back buffer; 1: front buffer.
-  
   /**
    * @class VTKInteractorStyleTrackballFixedUpCamera btkVTKInteractorStyleTrackballFixedUpCamera.h
    * @brief Another implementation of a virtual trackball
@@ -111,6 +109,10 @@ namespace btk
    */
   void VTKInteractorStyleTrackballFixedUpCamera::Rotate()
   {
+#if 0
+    if (this->RotationEnabled)
+      this->Superclass::Rotate();
+#else
     if (this->CurrentRenderer == NULL)
       return;
 
@@ -129,6 +131,14 @@ namespace btk
     double angleUp = std::acos(cameraUp.dot(globalUp)) * 180.0/M_PI;
     if (angleUp + rx >= 90.0)
       rx = 89.0 - angleUp;
+    
+#if 0
+    std::cout << "Camera up: " << cameraUp.transpose() << std::endl;
+    std::cout << "Axis right: " << axisRight.transpose() << std::endl;
+    std::cout << "Angle Right inc: " << rx << std::endl;
+    std::cout << "Angle Right total: " << angleRightTotal << std::endl;
+    std::cout << "Angle Up: " << angleUp << std::endl;
+#endif
 
     double* fp = camera->GetFocalPoint();
     vtkTransform* Transform = vtkTransform::New(); 
@@ -149,6 +159,7 @@ namespace btk
       this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
 
     rwi->Render();
+#endif
   };
   
   /**
@@ -350,10 +361,10 @@ namespace btk
     vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
     int* size = renWin->GetSize();
     
-    renWin->SetPixelData(0, this->mp_RubberBandCorners[0][1], size[0]-1, this->mp_RubberBandCorners[0][1], this->mp_RubberBandHorizontalLinesBackground[0]->GetPointer(0), framebufferIndex);
-    renWin->SetPixelData(0, this->mp_RubberBandCorners[1][1], size[0]-1, this->mp_RubberBandCorners[1][1], this->mp_RubberBandHorizontalLinesBackground[1]->GetPointer(0), framebufferIndex);
-    renWin->SetPixelData(this->mp_RubberBandCorners[0][0], 0, this->mp_RubberBandCorners[0][0], size[1]-1, this->mp_RubberBandHorizontalLinesBackground[2]->GetPointer(0), framebufferIndex);
-    renWin->SetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, this->mp_RubberBandHorizontalLinesBackground[3]->GetPointer(0), framebufferIndex);
+    renWin->SetPixelData(0, this->mp_RubberBandCorners[0][1], size[0]-1, this->mp_RubberBandCorners[0][1], this->mp_RubberBandHorizontalLinesBackground[0]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->SetPixelData(0, this->mp_RubberBandCorners[1][1], size[0]-1, this->mp_RubberBandCorners[1][1], this->mp_RubberBandHorizontalLinesBackground[1]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->SetPixelData(this->mp_RubberBandCorners[0][0], 0, this->mp_RubberBandCorners[0][0], size[1]-1, this->mp_RubberBandHorizontalLinesBackground[2]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->SetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, this->mp_RubberBandHorizontalLinesBackground[3]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
     
     this->mp_RubberBandCorners[1][0] = this->Interactor->GetEventPosition()[0];
     this->mp_RubberBandCorners[1][1] = this->Interactor->GetEventPosition()[1];  
@@ -406,8 +417,8 @@ namespace btk
         pixels[1][3*j+2] = 255;
       }
     }
-    renWin->SetPixelData(0, this->mp_RubberBandCorners[0][1], size[0]-1, this->mp_RubberBandCorners[0][1], pixels[0], framebufferIndex);
-    renWin->SetPixelData(0, this->mp_RubberBandCorners[1][1], size[0]-1, this->mp_RubberBandCorners[1][1], pixels[1], framebufferIndex);
+    renWin->SetPixelData(0, this->mp_RubberBandCorners[0][1], size[0]-1, this->mp_RubberBandCorners[0][1], pixels[0], renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->SetPixelData(0, this->mp_RubberBandCorners[1][1], size[0]-1, this->mp_RubberBandCorners[1][1], pixels[1], renWin->GetDoubleBuffer() ? 0 : 1);
     // - Vertical line
     pixels[0] = this->mp_RubberBandHorizontalLinesForeground[2]->GetPointer(0);
     pixels[1] = this->mp_RubberBandHorizontalLinesForeground[3]->GetPointer(0);
@@ -423,8 +434,8 @@ namespace btk
         pixels[1][3*j+2] = 255;
       }
     }
-    renWin->SetPixelData(this->mp_RubberBandCorners[0][0], 0, this->mp_RubberBandCorners[0][0], size[1]-1, pixels[0], framebufferIndex);
-    renWin->SetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, pixels[1], framebufferIndex);
+    renWin->SetPixelData(this->mp_RubberBandCorners[0][0], 0, this->mp_RubberBandCorners[0][0], size[1]-1, pixels[0], renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->SetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, pixels[1], renWin->GetDoubleBuffer() ? 0 : 1);
     
     if (this->ForceRubberBandDrawing == 1)
       renWin->Frame();
@@ -437,10 +448,10 @@ namespace btk
   {
     vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
     int* size = renWin->GetSize();
-    renWin->SetPixelData(0, this->mp_RubberBandCorners[0][1], size[0]-1, this->mp_RubberBandCorners[0][1], this->mp_RubberBandHorizontalLinesForeground[0]->GetPointer(0), framebufferIndex);
-    renWin->SetPixelData(0, this->mp_RubberBandCorners[1][1], size[0]-1, this->mp_RubberBandCorners[1][1], this->mp_RubberBandHorizontalLinesForeground[1]->GetPointer(0), framebufferIndex);
-    renWin->SetPixelData(this->mp_RubberBandCorners[0][0], 0, this->mp_RubberBandCorners[0][0], size[1]-1, this->mp_RubberBandHorizontalLinesForeground[2]->GetPointer(0), framebufferIndex);
-    renWin->SetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, this->mp_RubberBandHorizontalLinesForeground[3]->GetPointer(0), framebufferIndex);
+    renWin->SetPixelData(0, this->mp_RubberBandCorners[0][1], size[0]-1, this->mp_RubberBandCorners[0][1], this->mp_RubberBandHorizontalLinesForeground[0]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->SetPixelData(0, this->mp_RubberBandCorners[1][1], size[0]-1, this->mp_RubberBandCorners[1][1], this->mp_RubberBandHorizontalLinesForeground[1]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->SetPixelData(this->mp_RubberBandCorners[0][0], 0, this->mp_RubberBandCorners[0][0], size[1]-1, this->mp_RubberBandHorizontalLinesForeground[2]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->SetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, this->mp_RubberBandHorizontalLinesForeground[3]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
   };
   
   /**
@@ -456,10 +467,10 @@ namespace btk
     this->mp_RubberBandHorizontalLinesBackground[2]->SetNumberOfTuples(size[1]);
     this->mp_RubberBandHorizontalLinesBackground[3]->SetNumberOfTuples(size[1]);
     
-    renWin->GetPixelData(0, this->mp_RubberBandCorners[0][1], size[0]-1, this->mp_RubberBandCorners[0][1], framebufferIndex, this->mp_RubberBandHorizontalLinesBackground[0]);
-    renWin->GetPixelData(0, this->mp_RubberBandCorners[1][1], size[0]-1, this->mp_RubberBandCorners[1][1], framebufferIndex, this->mp_RubberBandHorizontalLinesBackground[1]);
-    renWin->GetPixelData(this->mp_RubberBandCorners[0][0], 0, this->mp_RubberBandCorners[0][0], size[1]-1, framebufferIndex, this->mp_RubberBandHorizontalLinesBackground[2]);
-    renWin->GetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, framebufferIndex, this->mp_RubberBandHorizontalLinesBackground[3]);
+    renWin->GetPixelData(0, this->mp_RubberBandCorners[0][1], size[0]-1, this->mp_RubberBandCorners[0][1], renWin->GetDoubleBuffer() ? 0 : 1, this->mp_RubberBandHorizontalLinesBackground[0]);
+    renWin->GetPixelData(0, this->mp_RubberBandCorners[1][1], size[0]-1, this->mp_RubberBandCorners[1][1], renWin->GetDoubleBuffer() ? 0 : 1, this->mp_RubberBandHorizontalLinesBackground[1]);
+    renWin->GetPixelData(this->mp_RubberBandCorners[0][0], 0, this->mp_RubberBandCorners[0][0], size[1]-1, renWin->GetDoubleBuffer() ? 0 : 1, this->mp_RubberBandHorizontalLinesBackground[2]);
+    renWin->GetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, renWin->GetDoubleBuffer() ? 0 : 1, this->mp_RubberBandHorizontalLinesBackground[3]);
   };
   
   /**
@@ -494,6 +505,12 @@ namespace btk
     this->StopState();
     
     // Erase the rubber band
+    /*
+    vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
+    int* size = renWin->GetSize();
+    renWin->SetPixelData(0, 0, size[0]-1, size[1]-1, this->mp_PixelArray->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
+    renWin->Frame();
+    */
     this->Interactor->Render();
   };
 };
