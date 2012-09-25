@@ -43,6 +43,7 @@
 #define btk_VTKISTC_RUBBER 99
 
 class vtkUnsignedCharArray;
+class vtkRenderWindow;
 
 namespace btk
 {
@@ -96,11 +97,16 @@ namespace btk
     virtual void StartRubberBand();
     virtual void EndRubberBand();
     
+    void ActivateFixForRubberBandDrawing_MacOS1050(bool activated);
+    
   protected:
     BTK_VTK_EXPORT VTKInteractorStyleTrackballFixedUpCamera();
     ~VTKInteractorStyleTrackballFixedUpCamera();
     
   private:
+    static int GetForegroundFrameBufferIndex(vtkRenderWindow* renWin, int forceRubberBandDrawing);
+    static int GetForegroundFrameBufferIndex_FixMacOS1050(vtkRenderWindow* renWin, int forceRubberBandDrawing);
+    
     double mp_GlobalUp[3];
     int RotationEnabled;
     int SpinEnabled;

@@ -49,9 +49,16 @@
 
 namespace btk
 {
+  typedef int (*foregroundFrameBufferIndex)(vtkRenderWindow*, int);
+  static foregroundFrameBufferIndex _ForegroundFrameBufferIndex = NULL;
+  
   /**
    * @class VTKInteractorStyleTrackballFixedUpCamera btkVTKInteractorStyleTrackballFixedUpCamera.h
    * @brief Another implementation of a virtual trackball
+   *
+   * This class provide a rubber band selector. To use it, you have only to push on the shift key when you click on the left mouse button. Then, by moving the mouse, a selection rectangle appears.
+   *
+   * @warning Under MacOS 10.5 (Leopard), it seems that the front and face framebuffer doesn't work as for the other OS. To use correctly the rubber band under MacOS 10.5, you need first to activate the method VTKInteractorStyleTrackballFixedUpCamera::ActivateFixForRubberBandDrawing_MacOS1050().
    *
    * @warning This class is not yet finished. Some problems with the view-up vector.
    */
@@ -109,10 +116,6 @@ namespace btk
    */
   void VTKInteractorStyleTrackballFixedUpCamera::Rotate()
   {
-#if 0
-    if (this->RotationEnabled)
-      this->Superclass::Rotate();
-#else
     if (this->CurrentRenderer == NULL)
       return;
 
@@ -131,15 +134,7 @@ namespace btk
     double angleUp = std::acos(cameraUp.dot(globalUp)) * 180.0/M_PI;
     if (angleUp + rx >= 90.0)
       rx = 89.0 - angleUp;
-    
-#if 0
-    std::cout << "Camera up: " << cameraUp.transpose() << std::endl;
-    std::cout << "Axis right: " << axisRight.transpose() << std::endl;
-    std::cout << "Angle Right inc: " << rx << std::endl;
-    std::cout << "Angle Right total: " << angleRightTotal << std::endl;
-    std::cout << "Angle Up: " << angleUp << std::endl;
-#endif
-
+      
     double* fp = camera->GetFocalPoint();
     vtkTransform* Transform = vtkTransform::New(); 
     Transform->Identity();
@@ -159,7 +154,6 @@ namespace btk
       this->CurrentRenderer->UpdateLightsGeometryToFollowCamera();
 
     rwi->Render();
-#endif
   };
   
   /**
@@ -196,6 +190,8 @@ namespace btk
     this->mp_RubberBandHorizontalLinesBackground[1] = vtkUnsignedCharArray::New();
     this->mp_RubberBandHorizontalLinesBackground[2] = vtkUnsignedCharArray::New();
     this->mp_RubberBandHorizontalLinesBackground[3] = vtkUnsignedCharArray::New();
+    
+    _ForegroundFrameBufferIndex = &VTKInteractorStyleTrackballFixedUpCamera::GetForegroundFrameBufferIndex;
   };
   
   /**
@@ -361,10 +357,12 @@ namespace btk
     vtkRenderWindow* renWin = this->Interactor->GetRenderWindow();
     int* size = renWin->GetSize();
     
-    renWin->SetPixelData(0, this->mp_RubberBandCorners[0][1], size[0]-1, this->mp_RubberBandCorners[0][1], this->mp_RubberBandHorizontalLinesBackground[0]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
-    renWin->SetPixelData(0, this->mp_RubberBandCorners[1][1], size[0]-1, this->mp_RubberBandCorners[1][1], this->mp_RubberBandHorizontalLinesBackground[1]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
-    renWin->SetPixelData(this->mp_RubberBandCorners[0][0], 0, this->mp_RubberBandCorners[0][0], size[1]-1, this->mp_RubberBandHorizontalLinesBackground[2]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
-    renWin->SetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, this->mp_RubberBandHorizontalLinesBackground[3]->GetPointer(0), renWin->GetDoubleBuffer() ? 0 : 1);
+    const int frameBufferIndex = (*_ForegroundFrameBufferIndex)(renWin, this->ForceRubberBandDrawing);
+    
+    renWin->SetPixelData(0, this->mp_RubberBandCorners[0][1], size[0]-1, this->mp_RubberBandCorners[0][1], this->mp_RubberBandHorizontalLinesBackground[0]->GetPointer(0), frameBufferIndex);
+    renWin->SetPixelData(0, this->mp_RubberBandCorners[1][1], size[0]-1, this->mp_RubberBandCorners[1][1], this->mp_RubberBandHorizontalLinesBackground[1]->GetPointer(0), frameBufferIndex);
+    renWin->SetPixelData(this->mp_RubberBandCorners[0][0], 0, this->mp_RubberBandCorners[0][0], size[1]-1, this->mp_RubberBandHorizontalLinesBackground[2]->GetPointer(0), frameBufferIndex);
+    renWin->SetPixelData(this->mp_RubberBandCorners[1][0], 0, this->mp_RubberBandCorners[1][0], size[1]-1, this->mp_RubberBandHorizontalLinesBackground[3]->GetPointer(0), frameBufferIndex);
     
     this->mp_RubberBandCorners[1][0] = this->Interactor->GetEventPosition()[0];
     this->mp_RubberBandCorners[1][1] = this->Interactor->GetEventPosition()[1];  
@@ -512,5 +510,26 @@ namespace btk
     renWin->Frame();
     */
     this->Interactor->Render();
+  };
+  
+  /**
+   * Active a fix for MacOS 10.5 (Leopard) to select correctly the frame buffers used to draw the rubber band.
+   */
+  void VTKInteractorStyleTrackballFixedUpCamera::ActivateFixForRubberBandDrawing_MacOS1050(bool activated)
+  {
+    if (!activated)
+      _ForegroundFrameBufferIndex = &VTKInteractorStyleTrackballFixedUpCamera::GetForegroundFrameBufferIndex;
+    else
+      _ForegroundFrameBufferIndex = &VTKInteractorStyleTrackballFixedUpCamera::GetForegroundFrameBufferIndex_FixMacOS1050;
+  };
+  
+  int VTKInteractorStyleTrackballFixedUpCamera::GetForegroundFrameBufferIndex(vtkRenderWindow* renWin, int forceRubberBandDrawing)
+  {
+    return (forceRubberBandDrawing == 1 ? (renWin->GetDoubleBuffer() ? 1 : 0) : (renWin->GetDoubleBuffer() ? 0 : 1)); // 0: back, 1: front
+  };
+  
+  int VTKInteractorStyleTrackballFixedUpCamera::GetForegroundFrameBufferIndex_FixMacOS1050(vtkRenderWindow* renWin, int /*forceRubberBandDrawing*/)
+  {
+    return (renWin->GetDoubleBuffer() ? 0 : 1); // 0: back, 1: front
   };
 };

@@ -53,6 +53,7 @@
 
 #include <QKeyEvent>
 #include <QToolTip>
+#include <QSysInfo>
 
 static const double CameraZoom = 1.6;
 
@@ -114,6 +115,10 @@ void Viz3DWidget::initialize()
   style->AddObserver(vtkCommand::LeftButtonPressEvent, pickerMouseInteraction);
   style->AddObserver(vtkCommand::MouseMoveEvent, pickerMouseInteraction);
   style->AddObserver(vtkCommand::LeftButtonReleaseEvent, pickerMouseInteraction);
+#ifdef Q_OS_MAC
+  if (QSysInfo::MacintoshVersion == QSysInfo::MV_LEOPARD)
+    style->ActivateFixForRubberBandDrawing_MacOS1050(true);
+#endif
   this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
   pickerMouseInteraction->Delete();
   style->Delete();
