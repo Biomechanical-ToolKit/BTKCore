@@ -1,6 +1,7 @@
 #include "_TDDConfigure.h"
 
 #include "BinaryFileStreamTest.h" // Be the first to test the stream
+
 #include "AMTIForcePlatformFileIOTest.h"
 #include "AMTIForcePlatformFileReaderTest.h"
 #include "ANBFileIOTest.h"
@@ -14,6 +15,8 @@
 #include "CALForcePlateFileIOTest.h"
 #include "CALForcePlateFileReaderTest.h"
 #include "CALForcePlateFileWriterTest.h"
+#include "CLBFileIOTest.h"
+#include "CLBFileReaderTest.h"
 #include "C3DFileIOTest.h"
 #include "C3DFileReaderTest.h"
 #include "C3DFileWriterTest.h"

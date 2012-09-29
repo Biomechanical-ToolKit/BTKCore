@@ -66,6 +66,7 @@
 // Others
 #include "btkEMFFileIO.h"
 #include "btkAMTIForcePlatformFileIO.h"
+#include "btkCLBFileIO.h"
 
 namespace btk
 {
@@ -97,7 +98,8 @@ namespace btk
     BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(RICFileIO)
     
     BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(EMFFileIO)
-    BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(AMTIForcePlatformFileIO)  
+    BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(AMTIForcePlatformFileIO)
+    BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(CLBFileIO)
   };
 };
 

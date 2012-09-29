@@ -43,6 +43,8 @@
 #define STLFilePathOUT std::string(TDD_FilePathOUT) + "STLSamples/"
 #define DelsysEMGFilePathIN std::string(TDD_FilePathIN) + "DelsysEMGSamples/"
 #define DelsysEMGFilePathOUT std::string(TDD_FilePathOUT) + "DelsysEMGSamples/"
+#define CLBFilePathIN std::string(TDD_FilePathIN) + "CLBSamples/"
+#define CLBFilePathOUT std::string(TDD_FilePathOUT) + "CLBSamples/"
 
 
 #endif // _TDDConfigure_h
