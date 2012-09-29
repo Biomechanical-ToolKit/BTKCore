@@ -265,6 +265,9 @@ namespace btk
    */
   void VTKChartLayout::UpdateLayout()
   {
+    if (this->GetScene() == 0)
+      return;
+    
     // Update the chart element positions
     this->Private->Geometry.Set(this->GetScene()->GetSceneWidth(), this->GetScene()->GetSceneHeight());
     if ((this->Size.X() > 0) && (this->Size.Y() > 0))
