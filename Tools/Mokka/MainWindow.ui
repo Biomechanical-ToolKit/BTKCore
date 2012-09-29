@@ -118,8 +118,9 @@
      <addaction name="menuMotion_Analysis_Corp_"/>
      <addaction name="menuBTS_Bioengineering"/>
      <addaction name="actionImportAMTI"/>
-     <addaction name="actionImportDelsysEMG"/>
      <addaction name="actionImportEMF"/>
+     <addaction name="actionImportCLB"/>
+     <addaction name="actionImportDelsysEMG"/>
      <addaction name="separator"/>
      <addaction name="actionImportVideo"/>
     </widget>
@@ -467,7 +468,7 @@
   </action>
   <action name="actionImportEMF">
    <property name="text">
-    <string>EMF Ascension file...</string>
+    <string>Ascension EMF file...</string>
    </property>
   </action>
   <action name="actionPreferences">
@@ -554,7 +555,7 @@
   </action>
   <action name="actionImportDelsysEMG">
    <property name="text">
-    <string>Delsys EMG file..</string>
+    <string>Delsys EMG file...</string>
    </property>
   </action>
   <action name="actionToolCreateMarker">
@@ -598,6 +599,11 @@
   <action name="actionToolRemoveAnalogOffsetFromSelectedFrames">
    <property name="text">
     <string>From Selected Frames</string>
+   </property>
+  </action>
+  <action name="actionImportCLB">
+   <property name="text">
+    <string>Contec CLB file...</string>
    </property>
   </action>
  </widget>

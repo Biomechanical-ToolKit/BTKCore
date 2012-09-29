@@ -108,6 +108,7 @@ public slots:
   void importAMTI();
   void importEMF();
   void importDelsysEMG();
+  void importCLB();
   void importVideos();
   void exportC3D();
   void exportTRC();

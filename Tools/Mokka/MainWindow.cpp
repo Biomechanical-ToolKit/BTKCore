@@ -302,6 +302,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionImportEMF, SIGNAL(triggered()), this, SLOT(importEMF()));
   connect(this->actionImportAMTI, SIGNAL(triggered()), this, SLOT(importAMTI()));
   connect(this->actionImportDelsysEMG, SIGNAL(triggered()), this, SLOT(importDelsysEMG()));
+  connect(this->actionImportCLB, SIGNAL(triggered()), this, SLOT(importCLB()));
   connect(this->actionImportVideo, SIGNAL(triggered()), this, SLOT(importVideos()));
   connect(this->actionExportC3D, SIGNAL(triggered()), this, SLOT(exportC3D()));
   connect(this->actionExportTRC, SIGNAL(triggered()), this, SLOT(exportTRC()));
@@ -1459,7 +1460,7 @@ void MainWindow::importForcePlatformCAL()
 
 void MainWindow::importOrthoTrakXLS()
 {
-  this->importAcquisition(tr("OrthoTrak XLS Files (*.xls)"));
+  this->importAcquisition(tr("XLS OrthoTrak Files (*.xls)"));
 };
 
 void MainWindow::importTDF()
@@ -1506,7 +1507,7 @@ void MainWindow::importANG()
 
 void MainWindow::importEMG()
 {
-  this->importAcquisition(tr("EMG Files (*.emg)"));
+  this->importAcquisition(tr("EMG BTS Bioengineering Files (*.emg)"));
 };
 
 void MainWindow::importMOM()
@@ -1533,7 +1534,12 @@ void MainWindow::importEMF()
 
 void MainWindow::importDelsysEMG()
 {
-  this->importAcquisition(tr("EMG Files (*.emg)"));
+  this->importAcquisition(tr("EMG Delsys Files (*.emg)"));
+};
+
+void MainWindow::importCLB()
+{
+  this->importAcquisition(tr("CLB Files (*.clb)"));
 };
 
 void MainWindow::importAcquisition(const QString& filter)
