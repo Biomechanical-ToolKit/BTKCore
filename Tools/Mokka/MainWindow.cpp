@@ -1222,7 +1222,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
 void MainWindow::saveFile()
 {
   if (!this->mp_Acquisition->fileName().isEmpty() && this->mp_Acquisition->canBeSaved(this->mp_Acquisition->fileName()))
-    this->saveFile(this->m_RecentFiles.first());
+    this->saveFile(this->mp_Acquisition->fileName());
   else
     this->saveAsFile();
 };
