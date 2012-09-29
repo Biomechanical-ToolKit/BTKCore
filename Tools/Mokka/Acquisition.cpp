@@ -96,6 +96,7 @@ void Acquisition::supportedReadFileFormats(QStringList& formats)
       qstr += " " + QString::fromStdString(it->desc);
     formats.append(qstr);
   }
+  formats.sort();
 };
 
 void Acquisition::supportedWrittenFileFormats(QStringList& formats)
@@ -108,6 +109,7 @@ void Acquisition::supportedWrittenFileFormats(QStringList& formats)
       qstr += " " + QString::fromStdString(it->desc);
     formats.append(qstr);
   }
+  formats.sort();
 };
 
 bool Acquisition::load(const QString& filename)
