@@ -1090,7 +1090,7 @@ void MainWindow::openFile()
       QString ext = "*." + str.split(" ")[0].toLower();
       if (allFormats.indexOf(ext) == -1)
         allFormats.append(ext);
-      byFormat += (!byFormat.isEmpty() ? ";;" : "") + str + " (" + ext + ")";
+      byFormat += (!byFormat.isEmpty() ? ";;" : "") + str + " Files (" + ext + ")";
     }
     QString allFormat = "Acquisition Files (" + allFormats.join(" ") + ");;";
     
@@ -1236,20 +1236,29 @@ void MainWindow::saveAsFile()
   else
     file = this->m_RecentFiles.first();
   QString suffix = QFileInfo(file).suffix().toUpper();
-  if ((suffix.compare("C3D") != 0) && (suffix.compare("ANB") != 0) && (suffix.compare("ANC") != 0) && (suffix.compare("TRC") != 0))
+  QStringList formats;
+  this->mp_Acquisition->supportedWrittenFileFormats(formats);
+  bool compatibleSuffix = false;
+  for (QStringList::const_iterator it = formats.begin() ; it != formats.end() ; ++it)
+  {
+    if (suffix.compare(*it, Qt::CaseInsensitive) == 0)
+    {
+      compatibleSuffix = true;
+      break;
+    }
+  }
+  if (!compatibleSuffix)
   {
     file += ".c3d";
     suffix = "C3D";
   }
   QString selectedFilter = suffix + " Files (*." + suffix.toLower() + ")";
   // Generate all the filters
-  QStringList formats;
-  this->mp_Acquisition->supportedWrittenFileFormats(formats);
   QString byFormat;
   foreach(const QString& str, formats)
   {
     QString ext = "*." + str.split(" ")[0].toLower();
-    byFormat += (!byFormat.isEmpty() ? ";;" : "") + str + " (" + ext + ")";
+    byFormat += (!byFormat.isEmpty() ? ";;" : "") + str + " Files (" + ext + ")";
   }
   
   // Dialog box
