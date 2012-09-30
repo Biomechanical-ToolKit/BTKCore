@@ -381,6 +381,6 @@ namespace btk
    * Constructor.
    */
   CLBFileIO::CLBFileIO()
-  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Float)
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Integer)
   {};
 };
