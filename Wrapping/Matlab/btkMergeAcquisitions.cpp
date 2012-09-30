@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMXObjectHandle.h"
+#include "btkMEXObjectHandle.h"
 #include "btkMEXOutputRedirection.h"
 
 #include <btkMergeAcquisitionFilter.h>

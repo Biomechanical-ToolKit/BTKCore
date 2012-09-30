@@ -35,7 +35,7 @@
 
 #include <btkMetaDataUtils.h>  // First (Fix for MSVC LNK2019)
 
-#include "btkMXObjectHandle.h"
+#include "btkMEXObjectHandle.h"
 
 #include <btkAcquisition.h>
 

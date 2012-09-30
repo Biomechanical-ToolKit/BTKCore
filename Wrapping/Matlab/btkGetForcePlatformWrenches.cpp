@@ -35,7 +35,7 @@
 
 #include <btkForcePlatformWrenchFilter.h> // First (Fix for MSVC LNK2019)
 
-#include "btkMXObjectHandle.h"
+#include "btkMEXObjectHandle.h"
 #include "btkMXMeasure.h"
 #include "btkMEXOutputRedirection.h"
 

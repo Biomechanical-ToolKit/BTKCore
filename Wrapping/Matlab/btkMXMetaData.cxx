@@ -37,7 +37,7 @@
 #if defined(SCI_MEX)
   #include "btkMXMetaData.h"
 #endif
-#include "btkMXObjectHandle.h"
+#include "btkMEXObjectHandle.h"
 #include "btkASCIIConverter.h"
 
 #include <btkAcquisition.h>

@@ -38,7 +38,7 @@
   #include "btkMXSpecializedPoint.h"
 #endif
 #include "btkMXMeasure.h"
-#include "btkMXObjectHandle.h"
+#include "btkMEXObjectHandle.h"
 
 #include <btkSpecializedPointsExtractor.h>
 

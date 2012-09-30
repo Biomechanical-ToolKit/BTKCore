@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMXObjectHandle.h"
+#include "btkMEXObjectHandle.h"
 #include "btkMXAnalysis.h"
 
 #include <btkAcquisition.h>

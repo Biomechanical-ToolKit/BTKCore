@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "btkMXObjectHandle.h"
+#include "btkMEXObjectHandle.h"
 #include "btkMXPoint.h"
 
 // btkSetPointDescription(h, i, newDescription)

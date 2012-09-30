@@ -35,7 +35,7 @@
 
 #include <btkMetaData.h> // First (Fix for MSVC LNK2019)
 
-#include "btkMXObjectHandle.h"
+#include "btkMEXObjectHandle.h"
 #include "btkMXAnalysis.h"
 
 // btkAppendAnalysisParameter(h, name, context, unit, value, subject, description)
