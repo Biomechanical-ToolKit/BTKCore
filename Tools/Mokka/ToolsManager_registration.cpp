@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud BarrÃ©
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,23 +32,21 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+#include "Tools/RemoveAnalogOffset.h"
+#include "Tools/GaitEventDetection.h"
 
-#ifndef GaitEventDetection_h
-#define GaitEventDetection_h
-
-#include "../AbstractTool.h"
-
-class GaitEventDetection : public AbstractTool
+void ToolsManager::init()
 {
-public:
-  static void RegisterTool(ToolsManager* manager);
+  // MODEL
   
-  GaitEventDetection(QWidget* parent = 0);  
-  virtual bool run(ToolCommands* cmds, ToolsData* const data);
+  // ACQUISITION
   
-private:
-  enum {ManualMapping = 0};
-  enum {VerticalGroundReactionForceDetection = 0};
-};
-
-#endif // GaitEventDetection_h
+  // POINT 
+  
+  // ANALOG
+  RemoveAnalogOffset::RegisterTool(this);
+  
+  // EVENT
+  GaitEventDetection::RegisterTool(this);
+}

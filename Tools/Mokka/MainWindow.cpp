@@ -57,8 +57,8 @@
 #include "UserDefined.h"
 #include "Viz3DWidget.h"
 
-#include "Tools/GaitEventDetection.h"
-#include "Tools/RemoveAnalogOffset.h"
+#include "ToolsData.h"
+#include "ToolsManager.h"
 
 #include <btkASCIIFileWriter.h>
 #include <btkMultiSTLFileWriter.h>
@@ -127,24 +127,27 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuSettings->addSeparator();
   this->menuSettings->addMenu(this->multiView->chartBottomAxisDisplayMenu());
   // Menu Tools
-  this->menuModel->addAction(this->mp_ModelDock->newSegmentAction());
-  this->menuAcquisition->addAction(this->timeEventControler->actionZoomUnzoomRegionOfInterest);
-  this->menuAcquisition->addAction(this->timeEventControler->actionCropRegionOfInterest);
-  this->menuAcquisition->addSeparator();
-  this->menuAcquisition->addAction(this->timeEventControler->actionReframeFromOne);
-  this->menuEvent->addSeparator();
-  this->menuEvent->addMenu(this->timeEventControler->insertEventMenu());
-  this->menuEvent->addSeparator();
-  this->menuEvent->addAction(this->timeEventControler->actionEditSelectedEvents);
-  this->menuEvent->addAction(this->timeEventControler->actionRemoveSelectedEvents);
-  this->menuEvent->addAction(this->timeEventControler->actionClearEvents);
+  this->mp_ToolsManager = new ToolsManager(new ToolsData(this), this->menuTools, this);
+  this->mp_ToolsManager->menuModel()->addAction(this->mp_ModelDock->newSegmentAction());
+  this->mp_ToolsManager->menuAcquisition()->addAction(this->timeEventControler->actionZoomUnzoomRegionOfInterest);
+  this->mp_ToolsManager->menuAcquisition()->addAction(this->timeEventControler->actionCropRegionOfInterest);
+  this->mp_ToolsManager->menuAcquisition()->addSeparator();
+  this->mp_ToolsManager->menuAcquisition()->addAction(this->timeEventControler->actionReframeFromOne);
+  this->mp_ToolsManager->menuEvent()->addSeparator();
+  this->mp_ToolsManager->menuEvent()->addMenu(this->timeEventControler->insertEventMenu());
+  this->mp_ToolsManager->menuEvent()->addSeparator();
+  this->mp_ToolsManager->menuEvent()->addAction(this->timeEventControler->actionEditSelectedEvents);
+  this->mp_ToolsManager->menuEvent()->addAction(this->timeEventControler->actionRemoveSelectedEvents);
+  this->mp_ToolsManager->menuEvent()->addAction(this->timeEventControler->actionClearEvents);
+  this->mp_ToolsManager->menuMarker()->addAction(this->actionToolCreateMarker);
+  this->mp_ToolsManager->menuMarker()->addSeparator();
+  this->mp_ToolsManager->menuMarker()->addAction(this->actionToolComputeMarkerDistance);
+  this->mp_ToolsManager->menuMarker()->addAction(this->actionToolComputeMarkerAngle);
+  this->mp_ToolsManager->menuMarker()->addAction(this->actionToolComputeVectorAngle);
   this->actionToolCreateMarker->setEnabled(false);
   this->actionToolComputeMarkerDistance->setEnabled(false);
   this->actionToolComputeMarkerAngle->setEnabled(false);
   this->actionToolComputeVectorAngle->setEnabled(false);
-  this->actionToolGaitEventDetection->setEnabled(false);
-  this->actionToolRemoveAnalogOffsetFromReferenceFile->setEnabled(false);
-  this->actionToolRemoveAnalogOffsetFromSelectedFrames->setEnabled(false);
 #ifdef Q_OS_MAC
   QFont f = this->font();
   f.setPointSize(10);
@@ -323,9 +326,6 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionToolComputeMarkerDistance, SIGNAL(triggered()), this, SLOT(computeDistanceFromMarkersSelection()));
   connect(this->actionToolComputeMarkerAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection()));
   connect(this->actionToolComputeVectorAngle, SIGNAL(triggered()), this, SLOT(computeAngleFromMarkersSelection2()));
-  connect(this->actionToolGaitEventDetection, SIGNAL(triggered()), this, SLOT(detectGaitEvents()));
-  connect(this->actionToolRemoveAnalogOffsetFromReferenceFile, SIGNAL(triggered()), this, SLOT(removeAnalogOffsetFromReferenceFile()));
-  connect(this->actionToolRemoveAnalogOffsetFromSelectedFrames, SIGNAL(triggered()), this, SLOT(removeAnalogOffsetFromSelectedFrames()));
   // MultiView
   connect(this->multiView, SIGNAL(fileDropped(QString)), this, SLOT(openFileDropped(QString)));
   connect(this->multiView, SIGNAL(visibleMarkersChanged(QVector<int>)), this->mp_ModelDock, SLOT(updateDisplayedMarkers(QVector<int>)));
@@ -464,6 +464,27 @@ MainWindow::~MainWindow()
   delete this->mp_MacMenuBar;
   delete this->mp_Preferences;
 #endif
+};
+
+Acquisition* MainWindow::acquisition() const
+{
+  return this->mp_Acquisition;
+};
+
+void MainWindow::pushUndoCommand(QUndoCommand* cmd) const
+{
+  this->mp_UndoStack->push(cmd);
+};
+
+QUndoStack* MainWindow::undoStack(int i) const
+{
+  if (i == 0)
+    return this->mp_AcquisitionUndoStack;
+  else if (i == 1)
+    return this->mp_MarkerConfigurationUndoStack;
+  else
+    qDebug("Invalid index for the available undo stacks.");
+  return 0;
 };
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -955,61 +976,6 @@ void MainWindow::computeAngleFromMarkersSelection2()
   }
 };
 
-void MainWindow::runAcquisitionTool(AcquisitionTool* tool)
-{
-  QUndoCommand* acquisitionCommand = new QUndoCommand;
-  if (tool->run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
-    this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
-  if (acquisitionCommand->childCount() == 0) // The undo command was not used.
-    delete acquisitionCommand;
-}
-
-void MainWindow::detectGaitEvents()
-{
-  GaitEventDetection tool(this);
-  this->runAcquisitionTool(&tool);
-  /*
-  GaitEventAssistantDialog assistant(this);
-  assistant.initialize(this->mp_Acquisition);
-  if (assistant.exec() == QDialog::Accepted)
-  {
-    QUndoCommand* acquisitionCommand = new QUndoCommand;
-    if (assistant.run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
-      this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
-    if (acquisitionCommand->childCount() == 0) // The undo command was not used.
-      delete acquisitionCommand;
-  }
-  */
-};
-
-void MainWindow::removeAnalogOffsetFromReferenceFile()
-{
-  RemoveAnalogOffset tool(RemoveAnalogOffset::FromReferenceFile, this);
-  this->runAcquisitionTool(&tool);
-  /*
-  RemoveAnalogOffset tool(RemoveAnalogOffset::FromReferenceFile, this);
-  QUndoCommand* acquisitionCommand = new QUndoCommand;
-  if (tool.run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
-    this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
-  if (acquisitionCommand->childCount() == 0) // The undo command was not used.
-    delete acquisitionCommand;
-  */
-};
-
-void MainWindow::removeAnalogOffsetFromSelectedFrames()
-{
-  RemoveAnalogOffset tool(RemoveAnalogOffset::FromSelectedFrames, this);
-  this->runAcquisitionTool(&tool);
-  /*
-  RemoveAnalogOffset tool(RemoveAnalogOffset::FromSelectedFrames, this);
-  QUndoCommand* acquisitionCommand = new QUndoCommand;
-  if (tool.run(acquisitionCommand, this->mp_Acquisition) && (acquisitionCommand->childCount() != 0))
-    this->mp_UndoStack->push(new MasterUndoCommand(this->mp_AcquisitionUndoStack, acquisitionCommand));
-  if (acquisitionCommand->childCount() == 0) // The undo command was not used.
-    delete acquisitionCommand;
-  */
-};
-
 bool MainWindow::extractSelectedMarkers(QList<int>& selectedMarkers)
 {
   selectedMarkers.clear();
@@ -1214,9 +1180,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionToolComputeMarkerDistance->setEnabled(true);
   this->actionToolComputeMarkerAngle->setEnabled(true);
   this->actionToolComputeVectorAngle->setEnabled(true);
-  this->actionToolGaitEventDetection->setEnabled(true);
-  this->actionToolRemoveAnalogOffsetFromReferenceFile->setEnabled(true);
-  this->actionToolRemoveAnalogOffsetFromSelectedFrames->setEnabled(true);
+  this->mp_ToolsManager->setActionsEnabled(true);
 };
 
 void MainWindow::saveFile()
@@ -1960,9 +1924,7 @@ void MainWindow::reset()
   this->actionToolComputeMarkerDistance->setEnabled(false);
   this->actionToolComputeMarkerAngle->setEnabled(false);
   this->actionToolComputeVectorAngle->setEnabled(false);
-  this->actionToolGaitEventDetection->setEnabled(false);
-  this->actionToolRemoveAnalogOffsetFromReferenceFile->setEnabled(false);
-  this->actionToolRemoveAnalogOffsetFromSelectedFrames->setEnabled(false);
+  this->mp_ToolsManager->setActionsEnabled(false);
   // Tools modeless window
   QList<ChartDialog*>::iterator it = this->m_ToolCharts.begin();
   while (it != this->m_ToolCharts.end())

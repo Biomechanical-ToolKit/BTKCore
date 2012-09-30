@@ -36,17 +36,33 @@
 #ifndef RemoveAnalogOffset_h
 #define RemoveAnalogOffset_h
 
-#include "AcquisitionTool.h"
+#include "../AbstractTool.h"
 
-class RemoveAnalogOffset : public AcquisitionTool
+class RemoveAnalogOffset : public AbstractTool
 {
 public:
+  static void RegisterTool(ToolsManager* manager);
+  
+  virtual bool run(ToolCommands* cmds, ToolsData* const data);
+  
+protected:
   typedef enum {FromReferenceFile = 0, FromSelectedFrames} Method;
-  RemoveAnalogOffset(Method m, QWidget* parent = 0);  
-  virtual bool run(QUndoCommand* acquisitionParentCmd, Acquisition* const acq);
+  RemoveAnalogOffset(Method m, QWidget* parent = 0);
   
 private:
   Method m_Method;
+};
+
+class RemoveAnalogOffsetFromReferenceFile : public RemoveAnalogOffset
+{
+public:
+  RemoveAnalogOffsetFromReferenceFile(QWidget* parent = 0) : RemoveAnalogOffset(FromReferenceFile, parent) {};
+};
+
+class RemoveAnalogOffsetFromSelectedFrames : public RemoveAnalogOffset
+{
+public:
+  RemoveAnalogOffsetFromSelectedFrames(QWidget* parent = 0) : RemoveAnalogOffset(FromSelectedFrames, parent) {};
 };
 
 #endif // RemoveAnalogOffset_h

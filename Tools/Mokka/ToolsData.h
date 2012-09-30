@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud BarrÃ©
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,22 +33,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GaitEventDetection_h
-#define GaitEventDetection_h
+#ifndef ToolsData_h
+#define ToolsData_h
 
-#include "../AbstractTool.h"
+#include <QVector>
 
-class GaitEventDetection : public AbstractTool
+class MainWindow;
+class Acquisition;
+class ToolCommands;
+
+class QUndoCommand;
+
+class ToolsData
 {
 public:
-  static void RegisterTool(ToolsManager* manager);
+  ToolsData(MainWindow* resources);
+  ~ToolsData();
   
-  GaitEventDetection(QWidget* parent = 0);  
-  virtual bool run(ToolCommands* cmds, ToolsData* const data);
+  Acquisition* const acquisition() const;
+  ToolCommands* commands() const;
   
 private:
-  enum {ManualMapping = 0};
-  enum {VerticalGroundReactionForceDetection = 0};
+  MainWindow* mp_MainWindow;
+  ToolCommands* mp_Commands;
 };
 
-#endif // GaitEventDetection_h
+class ToolCommands
+{
+public:
+  ToolCommands();
+  
+  QUndoCommand* acquisitionCommand();
+  QUndoCommand* visualConfigurationCommand();
+  
+  void push();
+  
+private:
+  friend class ToolsData;
+  
+  QUndoCommand* generateCommand(int idx);
+  
+  MainWindow* mp_MainWindow;
+  QVector<QUndoCommand*> m_ToolCmds;
+};
+
+#endif // ToolsData_h

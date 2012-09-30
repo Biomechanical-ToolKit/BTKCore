@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud BarrÃ©
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,37 +33,79 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef AcquisitionTool_h
-#define AcquisitionTool_h
+#include "ToolsData.h"
+#include "MainWindow.h"
+#include "Acquisition.h"
+#include "UndoCommands.h"
 
-#include "LoggerMessage.h"
-
-#include <QObject>
-#include <QWidget>
-
-class QUndoCommand;
-class Acquisition;
-
-class AcquisitionTool : public QObject
+ToolsData::ToolsData(MainWindow* mw)
 {
-public:
-  AcquisitionTool(const QString& name, QWidget* parent = 0) : QObject(parent), m_Name(name) {};
-  virtual bool run(QUndoCommand* acquisitionParentCmd, Acquisition* const acq) = 0;
-  
-  const QString& name() {return this->m_Name;};
-  QWidget* parentWidget() const {return static_cast<QWidget*>(this->parent());};
-  
-private:
-  QString m_Name;
+  this->mp_MainWindow = mw;
+  this->mp_Commands = new ToolCommands;
+  this->mp_Commands->mp_MainWindow = mw;
 };
 
-#define TOOL_LOG_INFO(msg) \
-  LOG_INFO("[" + this->name() + " Tool] " + QString(msg))
- 
-#define TOOL_LOG_WARNING(msg) \
-  LOG_WARNING("[" + this->name() + "Tool] " + QString(msg))
-  
-#define TOOL_LOG_ERROR(msg) \
-  LOG_ERROR("[" + this->name() + "Tool] " + QString(msg))
+ToolsData::~ToolsData()
+{
+  delete this->mp_Commands;
+};
 
-#endif // AcquisitionTool_h
+Acquisition* const ToolsData::acquisition() const
+{
+  return this->mp_MainWindow->acquisition();
+}
+
+ToolCommands* ToolsData::commands() const
+{
+  return this->mp_Commands;
+}
+
+// ------------------------------------------------------------------------- //
+
+ToolCommands::ToolCommands()
+: m_ToolCmds(2,NULL)
+{
+  this->mp_MainWindow = 0;
+};
+
+QUndoCommand* ToolCommands::acquisitionCommand()
+{
+  return this->generateCommand(0);
+};
+
+QUndoCommand* ToolCommands::visualConfigurationCommand()
+{
+  return this->generateCommand(1);
+};
+
+void ToolCommands::push()
+{
+  QUndoCommand* cmd = new QUndoCommand;
+  for (int i = 0 ; i < this->m_ToolCmds.size() ; ++i)
+  {
+    if (this->m_ToolCmds[i] != NULL)
+    {
+      if (this->m_ToolCmds[i]->childCount() != 0)
+      {
+        new MasterUndoCommand(this->mp_MainWindow->undoStack(i), this->m_ToolCmds[i], cmd);
+        this->m_ToolCmds[i] = NULL;
+      }
+      else
+      {
+        delete this->m_ToolCmds[i];
+        this->m_ToolCmds[i] = NULL;
+      }
+    }
+  }
+  if (cmd->childCount() != 0)
+    this->mp_MainWindow->pushUndoCommand(cmd);
+  else
+    delete cmd;
+};
+
+QUndoCommand* ToolCommands::generateCommand(int idx)
+{
+  if (this->m_ToolCmds[idx] == NULL)
+    this->m_ToolCmds[idx] = new QUndoCommand;
+  return this->m_ToolCmds[idx];
+};

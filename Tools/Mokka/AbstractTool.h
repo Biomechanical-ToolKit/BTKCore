@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud BarrÃ©
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,22 +33,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef GaitEventDetection_h
-#define GaitEventDetection_h
+#ifndef AbstractTool_h
+#define AbstractTool_h
 
-#include "../AbstractTool.h"
+#include "LoggerMessage.h"
 
-class GaitEventDetection : public AbstractTool
+#include <QObject>
+#include <QWidget>
+
+#include "ToolsManager.h"
+#include "ToolsData.h"
+
+class AbstractTool : public QObject
 {
 public:
-  static void RegisterTool(ToolsManager* manager);
+  static void RegisterTool(ToolsManager* ) {qDebug("To register a tool, you need to overload the static method AbstractTool::RegisterTool.");};
   
-  GaitEventDetection(QWidget* parent = 0);  
-  virtual bool run(ToolCommands* cmds, ToolsData* const data);
+  AbstractTool(const QString& name, QWidget* parent = 0) : QObject(parent), m_Name(name) {};
+  virtual bool run(ToolCommands* cmds, ToolsData* const data) = 0;
+  
+  const QString& name() {return this->m_Name;};
+  QWidget* parentWidget() const {return static_cast<QWidget*>(this->parent());};
   
 private:
-  enum {ManualMapping = 0};
-  enum {VerticalGroundReactionForceDetection = 0};
+  QString m_Name;
 };
 
-#endif // GaitEventDetection_h
+#define TOOL_LOG_INFO(msg) \
+  LOG_INFO("[" + this->name() + " Tool] " + QString(msg))
+ 
+#define TOOL_LOG_WARNING(msg) \
+  LOG_WARNING("[" + this->name() + "Tool] " + QString(msg))
+  
+#define TOOL_LOG_ERROR(msg) \
+  LOG_ERROR("[" + this->name() + "Tool] " + QString(msg))
+
+#endif // AbstractTool_h

@@ -35,7 +35,6 @@
 
 #include "RemoveAnalogOffset.h"
 #include "RemoveAnalogOffsetDialog.h"
-#include "AcquisitionTool.h"
 #include "UndoCommands.h"
 
 #include <btkAnalogOffsetRemover.h>
@@ -44,13 +43,21 @@
 
 #include <QFileDialog>
 
+void RemoveAnalogOffset::RegisterTool(ToolsManager* manager)
+{
+  QMenu* menuAnalogRemoveOffset = new QMenu("Remove Offset", manager->parentWidget());
+  manager->menuAnalog()->addMenu(menuAnalogRemoveOffset);
+  manager->addTool(menuAnalogRemoveOffset, tr("From Reference File"), ToolFactory<RemoveAnalogOffsetFromReferenceFile>);
+  manager->addTool(menuAnalogRemoveOffset, tr("From Selected Frames"), ToolFactory<RemoveAnalogOffsetFromSelectedFrames>);
+};
+
 RemoveAnalogOffset::RemoveAnalogOffset(Method m, QWidget* parent)
-: AcquisitionTool("Remove Analog Offset", parent)
+: AbstractTool("Remove Analog Offset", parent)
 {
   this->m_Method = m;
 };
   
-bool RemoveAnalogOffset::run(QUndoCommand* acquisitionParentCmd, Acquisition* const acq)
+bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
 {
   bool res = false;
   QVector<int> ids;
@@ -59,7 +66,7 @@ bool RemoveAnalogOffset::run(QUndoCommand* acquisitionParentCmd, Acquisition* co
   if (this->m_Method == FromReferenceFile)
   {
     QStringList formats;
-    acq->supportedReadFileFormats(formats);
+    data->acquisition()->supportedReadFileFormats(formats);
     QStringList allFormats;
     QString byFormat;
     foreach(const QString& str, formats)
@@ -70,7 +77,7 @@ bool RemoveAnalogOffset::run(QUndoCommand* acquisitionParentCmd, Acquisition* co
       byFormat += (!byFormat.isEmpty() ? ";;" : "") + str + " (" + ext + ")";
     }
     QString allFormat = "Acquisition Files (" + allFormats.join(" ") + ");;";
-    QString filename = QFileDialog::getOpenFileName(this->parentWidget(), "", QFileInfo(acq->fileName()).absolutePath(), allFormat + byFormat);
+    QString filename = QFileDialog::getOpenFileName(this->parentWidget(), "", QFileInfo(data->acquisition()->fileName()).absolutePath(), allFormat + byFormat);
     if (!filename.isEmpty())
     {
       QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the reading of the reference file.", QMessageBox::Ok, this->parentWidget());
@@ -84,7 +91,7 @@ bool RemoveAnalogOffset::run(QUndoCommand* acquisitionParentCmd, Acquisition* co
         reader->Update();
         analogs = btk::AnalogCollection::New();
         int id = 0;
-        for (btk::AnalogCollection::ConstIterator it = acq->btkAcquisition()->BeginAnalog() ; it != acq->btkAcquisition()->EndAnalog() ; ++it)
+        for (btk::AnalogCollection::ConstIterator it = data->acquisition()->btkAcquisition()->BeginAnalog() ; it != data->acquisition()->btkAcquisition()->EndAnalog() ; ++it)
         {
           if (reader->GetOutput()->FindAnalog((*it)->GetLabel()) != reader->GetOutput()->EndAnalog())
           {
@@ -118,7 +125,7 @@ bool RemoveAnalogOffset::run(QUndoCommand* acquisitionParentCmd, Acquisition* co
   else if (this->m_Method == FromSelectedFrames)
   {
     RemoveAnalogOffsetDialog dialog(this->parentWidget());
-    dialog.initialize(acq);
+    dialog.initialize(data->acquisition());
     if (dialog.exec() == QDialog::Accepted)
     {
       QSettings settings;
@@ -151,14 +158,14 @@ bool RemoveAnalogOffset::run(QUndoCommand* acquisitionParentCmd, Acquisition* co
         lastReferenceFrames = 1;
         int numberOfFrames = dialog.lastFramesSpinBox->value();
         settings.setValue("Tools/RemoveAnalogOffset/lastFramesNumber", numberOfFrames);
-        framesIndex[0] = acq->lastFrame() - numberOfFrames + 1 - acq->firstFrame();
-        framesIndex[1] = acq->lastFrame() - acq->firstFrame();
+        framesIndex[0] = data->acquisition()->lastFrame() - numberOfFrames + 1 - data->acquisition()->firstFrame();
+        framesIndex[1] = data->acquisition()->lastFrame() - data->acquisition()->firstFrame();
       }
       settings.setValue("Tools/RemoveAnalogOffset/lastChannelsSelection", lastChannelsSelection);
       settings.setValue("Tools/RemoveAnalogOffset/lastReferenceFrames", lastReferenceFrames);
       
       btk::SubAcquisitionFilter::Pointer subAnalogs = btk::SubAcquisitionFilter::New();
-      subAnalogs->SetInput(acq->btkAcquisition());
+      subAnalogs->SetInput(data->acquisition()->btkAcquisition());
       subAnalogs->SetFramesIndex(framesIndex[0], framesIndex[1]);
       subAnalogs->SetExtractionOption(btk::SubAcquisitionFilter::AnalogsOnly, channelsIds.toStdList());
       subAnalogs->Update();
@@ -188,7 +195,7 @@ bool RemoveAnalogOffset::run(QUndoCommand* acquisitionParentCmd, Acquisition* co
       log += "\n\t- " + QString::fromStdString((*it)->GetLabel()) + ": " + QString::number(dc) + " " + QString::fromStdString((*it)->GetUnit());
       ++inc;
     }
-    new ShiftAnalogsValues(acq, ids, offsets, acquisitionParentCmd);
+    new ShiftAnalogsValues(data->acquisition(), ids, offsets, cmds->acquisitionCommand());
     res = true;
     TOOL_LOG_INFO(log);
   }

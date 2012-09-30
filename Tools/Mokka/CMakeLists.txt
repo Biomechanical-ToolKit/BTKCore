@@ -51,6 +51,8 @@ SET(Mokka_CPP
   TimeEventBarWidget.cpp
   TimeEventControlerWidget.cpp
   TimeEventFunctors.cpp
+  ToolsData.cpp
+  ToolsManager.cpp
   Tools/GaitEventDetection.cpp
   Tools/RemoveAnalogOffset.cpp
   UndoCommands.cpp
@@ -94,6 +96,7 @@ SET(Mokka_H
   ProgressWidget.h
   TimeEventBarWidget.h
   TimeEventControlerWidget.h
+  ToolsManager.h
   Tools/GaitEventDetectionDialog.h
   Tools/RemoveAnalogOffsetDialog.h
   UpdateManager.h

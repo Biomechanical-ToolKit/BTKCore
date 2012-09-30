@@ -51,9 +51,12 @@ class ModelDockWidget;
 class NewSegmentDialog;
 class ProgressWidget;
 class UpdateManager;
-class QUndoStack;
 class ChartDialog;
 class AcquisitionTool;
+class ToolsManager;
+
+class QUndoStack;
+class QUndoCommand;
 
 class MainWindow : public QMainWindow, public Ui::MainWindow
 {
@@ -66,6 +69,10 @@ public:
   void play();
   void loadConfiguration(const QString& filename);
   void openFile(const QString& filename);
+  
+  Acquisition* acquisition() const;
+  void pushUndoCommand(QUndoCommand* cmd) const;
+  QUndoStack* undoStack(int i) const;
 
 protected:
   void closeEvent(QCloseEvent* event);
@@ -129,9 +136,6 @@ public slots:
   void computeDistanceFromMarkersSelection();
   void computeAngleFromMarkersSelection();
   void computeAngleFromMarkersSelection2();
-  void detectGaitEvents();
-  void removeAnalogOffsetFromReferenceFile();
-  void removeAnalogOffsetFromSelectedFrames();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
@@ -228,7 +232,6 @@ private:
   void editSegment(bool isNew);
   void showChartTool(ChartDialog* chartDialog, bool computed);
   bool extractSelectedMarkers(QList<int>& selectedMarkers);
-  void runAcquisitionTool(AcquisitionTool* tool);
   
   Acquisition* mp_Acquisition;
   Model* mp_Model;
@@ -239,6 +242,7 @@ private:
   ImportAssistantDialog* mp_ImportAssistant;
   UpdateManager* mp_Updater;
   Preferences* mp_Preferences;
+  ToolsManager* mp_ToolsManager;
 #ifdef Q_OS_MAC
   QMenuBar* mp_MacMenuBar;
 #endif

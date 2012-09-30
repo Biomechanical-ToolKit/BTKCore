@@ -35,22 +35,26 @@
 
 #include "GaitEventDetection.h"
 #include "GaitEventDetectionDialog.h"
-#include "AcquisitionTool.h"
 #include "UndoCommands.h"
 
 #include <btkVerticalGroundReactionForceGaitEventDetector.h>
 
 #include <QSettings>
 #include <QPropertyAnimation>
+
+void GaitEventDetection::RegisterTool(ToolsManager* manager)
+{
+  manager->addEventTool(tr("Gait Event Detection"), ToolFactory<GaitEventDetection>);
+};
   
 GaitEventDetection::GaitEventDetection(QWidget* parent)
-: AcquisitionTool("Gait Event Detection", parent)
+: AbstractTool("Gait Event Detection", parent)
 {};
   
-bool GaitEventDetection::run(QUndoCommand* acquisitionParentCmd, Acquisition* const acq)
+bool GaitEventDetection::run(ToolCommands* cmds, ToolsData* const data)
 {
   GaitEventDetectionDialog dialog(this->parentWidget());
-  dialog.initialize(acq);
+  dialog.initialize(data->acquisition());
   if (dialog.exec() != QDialog::Accepted)
   {
     return false;
@@ -83,7 +87,7 @@ bool GaitEventDetection::run(QUndoCommand* acquisitionParentCmd, Acquisition* co
             lastManualMapping.append(cb->currentIndex());
             if (cb->currentIndex() == 0)
               continue;
-            forceplates->InsertItem(acq->btkGroundReactionWrenches()->GetItem(i));
+            forceplates->InsertItem(data->acquisition()->btkGroundReactionWrenches()->GetItem(i));
             mapping[i] = cb->currentText().toStdString();
           }
           settings.setValue("Tools/GaitEventDetection/lastManualMapping", lastManualMapping);
@@ -95,9 +99,9 @@ bool GaitEventDetection::run(QUndoCommand* acquisitionParentCmd, Acquisition* co
         vgrfged->SetForceplateContextMapping(mapping);
         // FIXME: The region of interest should correspond to the visual boundaries.
         //        Need to modify the class Acquisition
-        int bounds[2]; acq->regionOfInterest(bounds[0],bounds[1]);
-        vgrfged->SetRegionOfInterest(bounds[0]-acq->firstFrame(),bounds[1]-acq->firstFrame());
-        vgrfged->SetAcquisitionInformation(acq->firstFrame(), acq->pointFrequency(), "");
+        int bounds[2]; data->acquisition()->regionOfInterest(bounds[0],bounds[1]);
+        vgrfged->SetRegionOfInterest(bounds[0]-data->acquisition()->firstFrame(),bounds[1]-data->acquisition()->firstFrame());
+        vgrfged->SetAcquisitionInformation(data->acquisition()->firstFrame(), data->acquisition()->pointFrequency(), "");
         output = vgrfged->GetOutput();
         output->Update();
 
@@ -132,12 +136,12 @@ bool GaitEventDetection::run(QUndoCommand* acquisitionParentCmd, Acquisition* co
         e->frame = (*it)->GetFrame();
         e->iconId = (*it)->GetId();
         gaitEvents.append(e);
-        gaitEventIds.append(acq->generateNewEventId());
+        gaitEventIds.append(data->acquisition()->generateNewEventId());
       }
       
       if (dialog.overwriteRadioButton->isChecked())
-        new RemoveEvents(acq, acq->eventIds(), acquisitionParentCmd);
-      new InsertEvents(acq, gaitEventIds, gaitEvents, acquisitionParentCmd);
+        new RemoveEvents(data->acquisition(), data->acquisition()->eventIds(), cmds->acquisitionCommand());
+      new InsertEvents(data->acquisition(), gaitEventIds, gaitEvents, cmds->acquisitionCommand());
       int count = gaitEvents.count();
       if (count <= 1)
         TOOL_LOG_INFO(tr("A total of ") + QString::number(count) + tr(" event was detected."));
@@ -219,6 +223,7 @@ void GaitEventDetectionDialog::initialize(const Acquisition* const acq)
   {
     this->manualMappingTable->setItem(i,1, new QTableWidgetItem("Force platform #"+QString::number(i+1)));
     QComboBox* cb = new QComboBox(this);
+    cb->addItems(mappingText);
     if (lastManualMapping.count() > i)
       cb->setCurrentIndex(lastManualMapping[i].toInt());
 #ifndef Q_OS_MAC
@@ -228,7 +233,6 @@ void GaitEventDetectionDialog::initialize(const Acquisition* const acq)
     layout->setAlignment(Qt::AlignVCenter);
     layout->setMargin(0);
     cb->setMaximumHeight(20);
-    cb->addItems(mappingText);
     this->manualMappingTable->setCellWidget(i,2, wdg);
 #else
     this->manualMappingTable->setCellWidget(i,2, cb);

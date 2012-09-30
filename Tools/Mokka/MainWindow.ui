@@ -213,50 +213,6 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <widget class="QMenu" name="menuAcquisition">
-     <property name="title">
-      <string>Acquisition</string>
-     </property>
-    </widget>
-    <widget class="QMenu" name="menuModel">
-     <property name="title">
-      <string>Model</string>
-     </property>
-    </widget>
-    <widget class="QMenu" name="menuEvent">
-     <property name="title">
-      <string>Event</string>
-     </property>
-     <addaction name="actionToolGaitEventDetection"/>
-    </widget>
-    <widget class="QMenu" name="menuMarker">
-     <property name="title">
-      <string>Marker</string>
-     </property>
-     <addaction name="actionToolCreateMarker"/>
-     <addaction name="separator"/>
-     <addaction name="actionToolComputeMarkerDistance"/>
-     <addaction name="actionToolComputeMarkerAngle"/>
-     <addaction name="actionToolComputeVectorAngle"/>
-    </widget>
-    <widget class="QMenu" name="menuAnalog">
-     <property name="title">
-      <string>Analog</string>
-     </property>
-     <widget class="QMenu" name="menuAnalogRemoveOffset">
-      <property name="title">
-       <string>Remove Offset</string>
-      </property>
-      <addaction name="actionToolRemoveAnalogOffsetFromReferenceFile"/>
-      <addaction name="actionToolRemoveAnalogOffsetFromSelectedFrames"/>
-     </widget>
-     <addaction name="menuAnalogRemoveOffset"/>
-    </widget>
-    <addaction name="menuModel"/>
-    <addaction name="menuAcquisition"/>
-    <addaction name="menuEvent"/>
-    <addaction name="menuMarker"/>
-    <addaction name="menuAnalog"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -584,21 +540,6 @@
    </property>
    <property name="text">
     <string>Reload</string>
-   </property>
-  </action>
-  <action name="actionToolGaitEventDetection">
-   <property name="text">
-    <string>Gait Event Detection</string>
-   </property>
-  </action>
-  <action name="actionToolRemoveAnalogOffsetFromReferenceFile">
-   <property name="text">
-    <string>From Reference File</string>
-   </property>
-  </action>
-  <action name="actionToolRemoveAnalogOffsetFromSelectedFrames">
-   <property name="text">
-    <string>From Selected Frames</string>
    </property>
   </action>
   <action name="actionImportCLB">
