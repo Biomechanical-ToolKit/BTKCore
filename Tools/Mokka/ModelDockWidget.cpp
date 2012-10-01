@@ -644,6 +644,37 @@ QList<int> ModelDockWidget::selectedVideos() const
   return ids;
 };
 
+QList<int> ModelDockWidget::selectedItems(ModelItemTypes type) const
+{
+  // TODO: Need a better method to find the UserRole associated with the type
+  int itemId = -1;
+  if (type == SegmentType)
+    itemId = SegmentId;
+  else if (type == MarkerType)
+    itemId = PointId;
+  else if (type == PointType)
+    itemId = PointId;
+  else if (type == AnalogType)
+    itemId = AnalogId;
+  else if (type == ForcePlateType)
+    itemId = ForcePlateId;
+  else if (type == VideoType)
+    itemId = VideoId;
+  else
+  {
+    qDebug("Unknown item's type. Impossible to extract the associated user role. Empty selection returned.");
+    return QList<int>();
+  }
+  QList<int> ids;
+  QList<QTreeWidgetItem*> items = this->modelTree->selectedItems();
+  for (QList<QTreeWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+  {
+    if ((*it)->type() == type)
+      ids << (*it)->data(0, itemId).toInt();
+  }
+  return ids;
+};
+
 bool ModelDockWidget::isOkToContinue()
 {
   int idx = this->m_CurrentConfigurationIndex;//this->modelConfigurationComboBox->currentIndex();

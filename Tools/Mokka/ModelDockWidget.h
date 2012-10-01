@@ -40,6 +40,7 @@
 #include "NewModelDialog.h" // ConfigurationItem
 #include "Acquisition.h" // Point, Analog, ...
 #include "Model.h" // Segment
+#include "UserDefined.h"
 
 #include <QDockWidget>
 #include <QMenu>
@@ -69,6 +70,7 @@ public:
   QList<int> selectedMarkers() const;
   QList<int> tailedMarkers() const;
   QList<int> selectedVideos() const;
+  QList<int> selectedItems(ModelItemTypes type) const;
   
   QAction* deselectConfigurationAction() const {return this->mp_DeselectConfiguration;};
   QAction* clearConfigurationsAction() const {return this->mp_ClearConfigurations;};

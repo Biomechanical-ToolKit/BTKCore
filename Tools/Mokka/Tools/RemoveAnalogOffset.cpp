@@ -125,7 +125,7 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
   else if (this->m_Method == FromSelectedFrames)
   {
     RemoveAnalogOffsetDialog dialog(this->parentWidget());
-    dialog.initialize(data->acquisition());
+    dialog.initialize(data->explorerSelectedItems(AnalogType), data->acquisition());
     if (dialog.exec() == QDialog::Accepted)
     {
       QSettings settings;
@@ -172,6 +172,8 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
       analogs = subAnalogs->GetOutput()->GetAnalogs();
       ids = channelsIds.toVector();
     }
+    else
+      return false;
   }
   else
   {
@@ -230,7 +232,7 @@ RemoveAnalogOffsetDialog::RemoveAnalogOffsetDialog(QWidget* parent)
   connect(this->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem* , int)), this, SLOT(checkAnalogSelection()));
 };
 
-void RemoveAnalogOffsetDialog::initialize(const Acquisition* const acq)
+void RemoveAnalogOffsetDialog::initialize(const QList<int>& selectedAnalogIds, const Acquisition* const acq)
 {
   QSettings settings;
   QStringList lastChannelsSelection = settings.value("Tools/RemoveAnalogOffset/lastChannelsSelection").toStringList();
@@ -250,7 +252,10 @@ void RemoveAnalogOffsetDialog::initialize(const Acquisition* const acq)
     QTreeWidgetItem* analogItem = new QTreeWidgetItem(QStringList(it.value()->label));
     analogItem->setIcon(0, analogIcon);
     analogItem->setData(0, Qt::UserRole, it.key());
-    analogItem->setCheckState(0, lastChannelsSelection.indexOf(it.value()->label) != -1 ? Qt::Checked : Qt::Unchecked);
+    if (selectedAnalogIds.isEmpty())
+      analogItem->setCheckState(0, lastChannelsSelection.indexOf(it.value()->label) != -1 ? Qt::Checked : Qt::Unchecked);
+    else
+      analogItem->setCheckState(0, selectedAnalogIds.indexOf(it.key()) != -1 ? Qt::Checked : Qt::Unchecked);
     analogItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
     analogsRoot->addChild(analogItem);
   }

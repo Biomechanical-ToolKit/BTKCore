@@ -36,7 +36,10 @@
 #ifndef ToolsData_h
 #define ToolsData_h
 
+#include "UserDefined.h"
+
 #include <QVector>
+#include <QList>
 
 class MainWindow;
 class Acquisition;
@@ -47,10 +50,13 @@ class QUndoCommand;
 class ToolsData
 {
 public:
+  
+  
   ToolsData(MainWindow* resources);
   ~ToolsData();
   
   Acquisition* const acquisition() const;
+  QList<int> explorerSelectedItems(ModelItemTypes type) const;
   ToolCommands* commands() const;
   
 private:

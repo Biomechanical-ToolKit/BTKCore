@@ -471,6 +471,11 @@ Acquisition* MainWindow::acquisition() const
   return this->mp_Acquisition;
 };
 
+QList<int> MainWindow::explorerSelectedItems(ModelItemTypes type) const
+{
+  return this->mp_ModelDock->selectedItems(type);
+};
+
 void MainWindow::pushUndoCommand(QUndoCommand* cmd) const
 {
   this->mp_UndoStack->push(cmd);

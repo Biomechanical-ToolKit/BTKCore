@@ -48,7 +48,7 @@ class RemoveAnalogOffsetDialog : public QDialog, public Ui::RemoveAnalogOffsetDi
   
 public:
   RemoveAnalogOffsetDialog(QWidget* parent = 0);
-  void initialize(const Acquisition* const acq);
+  void initialize(const QList<int>& selectedAnalogIds, const Acquisition* const acq);
   
 private slots:
   void checkAnalogSelection();

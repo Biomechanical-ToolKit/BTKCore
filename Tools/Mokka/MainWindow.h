@@ -39,6 +39,7 @@
 #include "ui_MainWindow.h"
 
 #include "Model.h" // Pair
+#include "UserDefined.h"
 
 class Preferences;
 class Acquisition;
@@ -71,6 +72,7 @@ public:
   void openFile(const QString& filename);
   
   Acquisition* acquisition() const;
+  QList<int> explorerSelectedItems(ModelItemTypes type) const;
   void pushUndoCommand(QUndoCommand* cmd) const;
   QUndoStack* undoStack(int i) const;
 

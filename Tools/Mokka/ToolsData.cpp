@@ -55,6 +55,11 @@ Acquisition* const ToolsData::acquisition() const
   return this->mp_MainWindow->acquisition();
 }
 
+QList<int> ToolsData::explorerSelectedItems(ModelItemTypes type) const
+{
+  return this->mp_MainWindow->explorerSelectedItems(type);
+};
+
 ToolCommands* ToolsData::commands() const
 {
   return this->mp_Commands;
