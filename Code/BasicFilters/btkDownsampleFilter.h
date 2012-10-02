@@ -200,6 +200,7 @@ namespace btk
   void DownsampleFilter<T>::GenerateData()
   {
     DownsampleData(this->m_Ratio, this->GetInput(), this->GetOutput());
+    this->GetOutput()->Modified();
   };
 
   /**
