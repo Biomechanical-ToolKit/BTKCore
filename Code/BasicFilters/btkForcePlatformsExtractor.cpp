@@ -139,9 +139,10 @@ namespace btk
   void ForcePlatformsExtractor::GenerateData()
   {
     ForcePlatformCollection::Pointer output = this->GetOutput();
-    output->Clear(); 
     Acquisition::Pointer input = this->GetInput();
-    if (input.get() != 0)
+    if (!input)
+      output->Clear(); 
+    else
     {
       MetaData::Iterator itForcePlatformGr = input->GetMetaData()->FindChild("FORCE_PLATFORM");
       if (itForcePlatformGr != input->GetMetaData()->End())
@@ -179,8 +180,6 @@ namespace btk
           return;
         }
 
-        output->SetItemNumber(static_cast<int>(numberOfForcePlatforms));
-
         MetaData::Pointer pOrigin;
         MetaData::Iterator itOrigin = (*itForcePlatformGr)->FindChild("ORIGIN");
         if (itOrigin == (*itForcePlatformGr)->End())
@@ -217,11 +216,35 @@ namespace btk
           pCalMatrix = (*itCalMatrix);
           calMatrixStep = pCalMatrix->GetInfo()->GetDimension(0) * pCalMatrix->GetInfo()->GetDimension(1);
         }
-
-        ForcePlatformCollection::Iterator itFP = output->Begin();
+        
         AnalogCollection::Pointer analogs = input->GetAnalogs();
         std::vector<int> channelsIndex;
         (*itChannels)->GetInfo()->ToInt(channelsIndex);
+        
+        // Check if the content of the input used by this filter changed since the last update
+        if (static_cast<int>(numberOfForcePlatforms) == output->GetItemNumber())
+        {
+          int numAnalogs = analogs->GetItemNumber();
+          bool dataModified = false;
+          for (size_t i = 0 ; i < channelsIndex.size() ; ++i)
+          {
+            if ((channelsIndex[i] < 1) || (channelsIndex[i] > numAnalogs))
+              continue;
+            AnalogCollection::ConstIterator it = analogs->Begin();
+            std::advance(it, channelsIndex[i]-1);
+            if ((*it)->GetTimestamp() >= this->GetTimestamp())
+            {
+              dataModified = true;
+              break;
+            }
+          }
+          if (!dataModified && ((*itForcePlatformGr)->GetTimestamp() < this->GetTimestamp()))
+            return;
+        }
+        
+        output->Clear();
+        output->SetItemNumber(static_cast<int>(numberOfForcePlatforms));
+        ForcePlatformCollection::Iterator itFP = output->Begin();
         int channelStep = (*itChannels)->GetInfo()->GetDimension(0);
         int channelNumberAlreadyExtracted = 0;
         int calMatrixCoefficentNumberAleadyExtracted = 0;
