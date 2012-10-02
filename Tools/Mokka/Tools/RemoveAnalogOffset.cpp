@@ -143,7 +143,7 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
         }
       }
       
-      int lastReferenceFrames = -1;
+      int lastReferenceFrames = 2;
       int framesIndex[2] = {-1,-1};
       if (dialog.firstFramesButton->isChecked())
       {
