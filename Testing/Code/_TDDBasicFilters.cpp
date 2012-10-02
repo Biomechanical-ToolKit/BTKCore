@@ -2,6 +2,7 @@
 
 #include "AcquisitionUnitConverterTest.h"
 #include "AnalogOffsetRemoverTest.h"
+#include "DownsampleFilterTest.h"
 #include "ForcePlatformsExtractorTest.h"
 #include "ForcePlatformWrenchFilterTest.h"
 #include "GroundReactionWrenchFilterTest.h"

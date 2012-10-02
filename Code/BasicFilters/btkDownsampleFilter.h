@@ -217,10 +217,21 @@ namespace btk
   template <>
   inline void DownsampleData<Wrench>(int ratio, Wrench::Pointer input, Wrench::Pointer output)
   {
+    if (ratio == 1)
+    {
+      output->SetPosition(input->GetPosition());
+      output->SetForce(input->GetForce());
+      output->SetMoment(input->GetMoment());
+      return;
+    }
+    
     int inFrameNumber = input->GetPosition()->GetFrameNumber();
     int outFrameNumber = inFrameNumber / ratio;
+    output->GetPosition()->SetLabel(input->GetPosition()->GetLabel());
     output->GetPosition()->SetFrameNumber(outFrameNumber);
+    output->GetForce()->SetLabel(input->GetForce()->GetLabel());
     output->GetForce()->SetFrameNumber(outFrameNumber);
+    output->GetMoment()->SetLabel(input->GetMoment()->GetLabel());
     output->GetMoment()->SetFrameNumber(outFrameNumber);
     double* inPosition = input->GetPosition()->GetValues().data();
     double* inForce = input->GetForce()->GetValues().data();
@@ -249,17 +260,25 @@ namespace btk
   template <>
   inline void DownsampleData<WrenchCollection>(int ratio, WrenchCollection::Pointer input, WrenchCollection::Pointer output)
   {
-    WrenchCollection::Iterator itIn = input->Begin();
-    output->SetItemNumber(input->GetItemNumber());
-    WrenchCollection::Iterator itOut = output->Begin();
-    
-    while (itIn != input->End())
+    if (ratio == 1)
     {
-      if (!itOut->get())
-        *itOut = Wrench::New((*itIn)->GetPosition()->GetLabel());
-      DownsampleData<Wrench>(ratio, *itIn, *itOut);
-      ++itIn;
-      ++itOut;
+      output->Clear();
+      for (WrenchCollection::Iterator itIn = input->Begin() ; itIn != input->End() ; ++itIn)
+        output->InsertItem(*itIn);
+    }
+    else
+    {
+      output->SetItemNumber(input->GetItemNumber());
+      WrenchCollection::Iterator itIn = input->Begin();
+      WrenchCollection::Iterator itOut = output->Begin();
+      while (itIn != input->End())
+      {
+        if (!itOut->get())
+          *itOut = Wrench::New((*itIn)->GetPosition()->GetLabel());
+        DownsampleData<Wrench>(ratio, *itIn, *itOut);
+        ++itIn;
+        ++itOut;
+      }
     }
   };
 
