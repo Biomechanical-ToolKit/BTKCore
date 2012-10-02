@@ -274,7 +274,7 @@ namespace btk
     if (!inObject)
       return 0;
     if (inObject->GetMTime() < this->GetMTime())
-      return 0;
+      return 1;
     WrenchCollection::Pointer input = static_pointer_cast<WrenchCollection>(inObject->GetBTKDataObject());
     // Reset
     for (size_t i = 0 ; i < this->mp_GRFsComponents->size() ; ++i)

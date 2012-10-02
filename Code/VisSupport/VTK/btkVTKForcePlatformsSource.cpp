@@ -169,10 +169,10 @@ namespace btk
     if (!inObject)
       return 0;
     if ((inObject->GetMTime() < this->GetMTime()) && !this->m_PropertiesModified)
-      return 0;
-      
+      return 1;
+    
     this->m_PropertiesModified = false;
-
+    
     ForcePlatformCollection::Pointer input = static_pointer_cast<ForcePlatformCollection>(inObject->GetBTKDataObject());
     vtkInformation* outInfo1 = outputVector->GetInformationObject(0);    
     vtkPolyData* output1 = vtkPolyData::SafeDownCast(outInfo1->Get(vtkDataObject::DATA_OBJECT()));
@@ -180,7 +180,7 @@ namespace btk
     vtkPolyData* output2 = vtkPolyData::SafeDownCast(outInfo2->Get(vtkDataObject::DATA_OBJECT()));
     vtkInformation* outInfo3 = outputVector->GetInformationObject(2);    
     vtkPolyData* output3 = vtkPolyData::SafeDownCast(outInfo3->Get(vtkDataObject::DATA_OBJECT()));
-
+    
     vtkAppendPolyData* append1 = vtkAppendPolyData::New();
     vtkAppendPolyData* append2 = vtkAppendPolyData::New();
     vtkAppendPolyData* append3 = vtkAppendPolyData::New();
@@ -391,11 +391,9 @@ namespace btk
   /**
    * Sets the type of object required for the input.
    */
-  int VTKForcePlatformsSource::FillInputPortInformation(int /* port */, 
-                                                      vtkInformation* info)
+  int VTKForcePlatformsSource::FillInputPortInformation(int /* port */, vtkInformation* info)
   {
     info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "VTKDataObjectAdapter");
     return 1;
   }
-
 };
