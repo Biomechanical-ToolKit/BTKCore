@@ -109,7 +109,6 @@ digraph processUpdate
     generate_data [ shape=rect, label="Generate output(s)\n(btk::ProcessObject::GenerateData())" ];
     modify_process2 [ shape=rect, label="Update process' timestamp\nbtk::Object::Modified()"];
     unmodify_process [ shape=rect, label="Set process tag as unmodified"];
-    modify_outputs [ shape=rect, label="Update outputs' timestamp\nbtk::Object::Modified()"];
     label = "Update process";
   }
   setUpdatingFalse [ shape=rectangle, label="Set updating flag to false" ]
@@ -129,9 +128,8 @@ digraph processUpdate
   modified_process -> generate_data [label="yes", headport = "n", tailport = "s"];
   generate_data -> modify_process2 [headport = "n", tailport = "s"];
   modify_process2 -> unmodify_process [headport = "n", tailport = "s"];
-  unmodify_process -> modify_outputs [headport = "n", tailport = "s"];
+  unmodify_process -> setUpdatingFalse [headport = "n", tailport = "s"];
   modified_process -> end [label="no" headport = "n", tailport = "e"];
-  modify_outputs -> setUpdatingFalse [headport = "n", tailport = "s"];
   setUpdatingFalse -> end [headport = "n", tailport = "s"];
   label = "Workflow of the method btk::ProcessObject::Update()"; 
 }

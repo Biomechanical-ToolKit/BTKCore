@@ -169,11 +169,6 @@ namespace btk
         this->m_Inputs[inc]->Update();
         if (this->m_Inputs[inc]->m_Timestamp >= this->m_Timestamp)
           this->m_Modified = true;
-        if (this->m_Inputs[inc]->mp_Source)
-        {
-          if (this->m_Inputs[inc]->mp_Source->m_Timestamp >= this->m_Timestamp)
-            this->m_Modified = true;
-        }
       }
     }
     if (this->m_Modified)
@@ -181,8 +176,6 @@ namespace btk
       this->GenerateData();
       this->Object::Modified();
       this->m_Modified = false;
-      for (std::vector<DataObject::Pointer>::iterator it = this->m_Outputs.begin() ; it != this->m_Outputs.end() ; ++it)
-        (*it)->Modified();
     }
     this->m_Updating = false;
   };
