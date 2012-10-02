@@ -65,8 +65,8 @@ namespace btk
   };
   
   /**
-   * Method overloaded to use the BTK pipeline update mecanism inside the VTK 
-   * update mecanism.
+   * Method overloaded to use the BTK pipeline update mechanism inside the VTK 
+   * update mechanism.
    */
   unsigned long int VTKDataObjectAdapter::GetMTime()
   {
@@ -81,7 +81,8 @@ namespace btk
       {
         unsigned long int result = this->mp_Data->GetTimestamp();
         this->mp_Data->Update();
-        if (result != this->mp_Data->GetTimestamp())
+        this->m_LastKnownTimestamp = this->mp_Data->GetTimestamp();
+        if (result != this->m_LastKnownTimestamp)
           this->Modified();
       }
     }
@@ -102,7 +103,7 @@ namespace btk
       return;
     this->mp_Data = data;
     this->m_LastKnownTimestamp = data->GetTimestamp();
-    this->Modified(); 
+    this->Modified();
   };
   
   /**
