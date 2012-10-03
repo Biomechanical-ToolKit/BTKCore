@@ -50,7 +50,7 @@ namespace btk
     BTK_VTK_EXPORT static VTKAxis* New();
     vtkExportedTypeRevisionMacro(VTKAxis, vtkAxis, BTK_VTK_EXPORT);
     
-    virtual ~VTKAxis();
+    BTK_VTK_EXPORT virtual ~VTKAxis();
     
     bool GetTitleVisible() const {return this->m_TitleVisible;};
     BTK_VTK_EXPORT void SetTitleVisible(bool visible);
@@ -78,8 +78,8 @@ namespace btk
     BTK_VTK_EXPORT void SetDisplayMinimumLimit(bool displayed);
   
 #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
-    virtual void SetMinimumLimit(double lowest);
-    virtual void SetMaximumLimit(double highest);
+    BTK_VTK_EXPORT virtual void SetMinimumLimit(double lowest);
+    BTK_VTK_EXPORT virtual void SetMaximumLimit(double highest);
 
     enum {TICK_SIMPLE = 0};
     vtkSetMacro(TickLabelAlgorithm, int)

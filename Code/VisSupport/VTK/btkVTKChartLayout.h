@@ -36,6 +36,8 @@
 #ifndef __btkVTKChartLayout_h
 #define __btkVTKChartLayout_h
 
+#include "btkConfigure.h"
+
 #include "vtkAbstractContextItem.h"
 #include "vtkVector.h" // For ivars
 
@@ -48,33 +50,33 @@ namespace btk
   public:
     vtkTypeMacro(VTKChartLayout, vtkAbstractContextItem);
     
-    static VTKChartLayout* New();
+    BTK_VTK_EXPORT static VTKChartLayout* New();
 
-    virtual bool Paint(vtkContext2D *painter);
+    BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
     
-    virtual void SetSize(const vtkVector2i& size);
-    virtual vtkVector2i GetSize() const {return this->Size;}
+    BTK_VTK_EXPORT virtual void SetSize(const vtkVector2i& size);
+    BTK_VTK_EXPORT virtual vtkVector2i GetSize() const {return this->Size;}
 
-    virtual void SetGutter(const vtkVector2f& gutter);
-    virtual vtkVector2f GetGutter() const {return this->Gutter;}
+    BTK_VTK_EXPORT virtual void SetGutter(const vtkVector2f& gutter);
+    BTK_VTK_EXPORT virtual vtkVector2f GetGutter() const {return this->Gutter;}
 
-    virtual void SetBorders(int left, int bottom, int right, int top);
-    virtual void GetBorders(int borders[4]);
+    BTK_VTK_EXPORT virtual void SetBorders(int left, int bottom, int right, int top);
+    BTK_VTK_EXPORT virtual void GetBorders(int borders[4]);
 
-    virtual bool SetChart(const vtkVector2i& position, VTKChartTimeSeries* chart);
-    virtual VTKChartTimeSeries* GetChart(const vtkVector2i& position);
-    virtual VTKChartTimeSeries* TakeChart(const vtkVector2i &position);
+    BTK_VTK_EXPORT virtual bool SetChart(const vtkVector2i& position, VTKChartTimeSeries* chart);
+    BTK_VTK_EXPORT virtual VTKChartTimeSeries* GetChart(const vtkVector2i& position);
+    BTK_VTK_EXPORT virtual VTKChartTimeSeries* TakeChart(const vtkVector2i &position);
     
-    virtual bool SetChartSpan(const vtkVector2i& position, const vtkVector2i& span);
-    virtual vtkVector2i GetChartSpan(const vtkVector2i& position);
+    BTK_VTK_EXPORT virtual bool SetChartSpan(const vtkVector2i& position, const vtkVector2i& span);
+    BTK_VTK_EXPORT virtual vtkVector2i GetChartSpan(const vtkVector2i& position);
     
-    virtual void UpdateLayout();
+    BTK_VTK_EXPORT virtual void UpdateLayout();
     
-    virtual void PrintSelf(ostream& os, vtkIndent indent);
+    BTK_VTK_EXPORT virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   protected:
-    VTKChartLayout();
-    ~VTKChartLayout();
+    BTK_VTK_EXPORT VTKChartLayout();
+    BTK_VTK_EXPORT ~VTKChartLayout();
 
     // The number of charts in x and y.
     vtkVector2i Size;
