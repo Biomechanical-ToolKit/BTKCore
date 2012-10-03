@@ -125,9 +125,11 @@ ChartWidget::ChartWidget(QWidget* parent)
   
   this->setFocusPolicy(Qt::StrongFocus);
   
+  QAction* resetAllZoomsAction = new QAction(tr("Reset All Zooms"), this); this->m_ViewActions.push_back(resetAllZoomsAction);
+  QAction* separator = new QAction(this); separator->setSeparator(true); this->m_ViewActions.push_back(separator);
   QAction* resetZoomAction = new QAction(tr("Reset Zoom"), this); this->m_ViewActions.push_back(resetZoomAction);
   QAction* exportToAction = new QAction(tr("Export to Image"), this); this->m_ViewActions.push_back(exportToAction);
-  QAction* separator = new QAction(this); separator->setSeparator(true); this->m_ViewActions.push_back(separator);
+  QAction* separator2 = new QAction(this); separator2->setSeparator(true); this->m_ViewActions.push_back(separator2);
   QAction* toggleEventDisplayAction = new QAction(tr("Toggle Events Display"), this); this->m_ViewActions.push_back(toggleEventDisplayAction);
   QAction* removeAllPlotAction = new QAction(tr("Clear Chart"), this); this->m_ViewActions.push_back(removeAllPlotAction);
   
@@ -173,6 +175,7 @@ ChartWidget::ChartWidget(QWidget* parent)
   connect(this->mp_ChartOptions, SIGNAL(plotRemoved(int)), this, SLOT(removePlot(int)));
   connect(this->mp_ChartOptions, SIGNAL(plotHidden(int, bool)), this, SLOT(hidePlot(int, bool)));
   connect(this->mp_ChartOptions, SIGNAL(chartTitleChanged(QString)), this, SLOT(setChartTitle(QString)));
+  connect(resetAllZoomsAction, SIGNAL(triggered()), this, SLOT(resetAllZooms()));
   connect(resetZoomAction, SIGNAL(triggered()), this, SLOT(resetZoom()));
   connect(toggleEventDisplayAction, SIGNAL(triggered()), this, SLOT(toggleEventDisplay()));
   connect(removeAllPlotAction, SIGNAL(triggered()), this, SLOT(removeAllPlot()));
@@ -532,6 +535,18 @@ void ChartWidget::setChartTitle(const QString& title)
 #else
   this->update();
 #endif
+};
+
+void ChartWidget::resetAllZooms()
+{
+  for (int i = 0 ; i < static_cast<int>(this->m_ChartData[this->m_CurrentChartType]->chartNumber()) ; ++i)
+  {
+    btk::VTKChartTimeSeries* chart = this->m_ChartData[this->m_CurrentChartType]->chart(i);
+    vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
+    vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
+    chart->SetBounds(axisX->GetMinimumLimit(), axisX->GetMaximumLimit(),axisY->GetMinimumLimit(), axisY->GetMaximumLimit()); // Force the update of the layout and the plot transform
+  }
+  this->render();
 };
 
 void ChartWidget::resetZoom()

@@ -122,6 +122,7 @@ public slots:
   void setPlotLineColor(const QList<int>& indices, const QColor& color);
   void setPlotLineWidth(const QList<int>& indices, double value);
   void setChartTitle(const QString& title);
+  void resetAllZooms();
   void resetZoom();
   void exportToImage();
   void removeAllPlot();
