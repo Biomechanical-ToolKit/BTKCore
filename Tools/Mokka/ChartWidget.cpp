@@ -285,6 +285,20 @@ void ChartWidget::refreshPlots()
       btk::VTKChartTimeSeries* chart = static_cast<btk::VTKChartTimeSeries*>(this->m_ChartData[i]->chart(j));
       for (int k = 0 ; k < chart->GetNumberOfPlots() ; ++k)
         chart->GetPlot(k)->Modified();
+      double rangeX[2] = {0}, rangeY[2] = {0};
+      vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
+      int xLimits[2] = {0};
+      vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
+      xLimits[0] = axisX->GetMinimumLimit();
+      xLimits[1] = axisX->GetMaximumLimit();
+      axisX->GetRange(rangeX);
+      axisY->GetRange(rangeY);
+      chart->Update();
+      chart->RecalculateBounds();
+      axisX->SetMinimumLimit(xLimits[0]);
+      axisX->SetMaximumLimit(xLimits[1]);
+      axisX->SetRange(rangeX);
+      axisY->SetRange(rangeY);
     }
   }
 };
