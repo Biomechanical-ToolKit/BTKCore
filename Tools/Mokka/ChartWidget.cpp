@@ -666,7 +666,7 @@ void ChartWidget::setExpandableAnalog(int expandable)
   for (int i = 0 ; i < static_cast<int>(analogChartData->chartNumber()) ; ++i)
   {
     btk::VTKChartTimeSeries* chart = analogChartData->chart(i);
-    // chart->RecalculateBounds();
+    chart->RecalculateBounds();
     int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
     this->updateAxisX(chart, roi[0], roi[1]);
   }
