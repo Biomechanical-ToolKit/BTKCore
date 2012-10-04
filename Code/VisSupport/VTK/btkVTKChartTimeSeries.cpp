@@ -749,10 +749,10 @@ namespace btk
 #if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
       // Zoom box
       if ((mouse.GetModifiers() & vtkContextMouseEvent::SHIFT_MODIFIER) == vtkContextMouseEvent::SHIFT_MODIFIER)
-        this->m_ZoomBoxDisplayed = true;
+        this->m_ZoomBoxDisplayed |= true;
       // Pan
       else
-        this->m_ZoomBoxDisplayed = false;
+        this->m_ZoomBoxDisplayed |= false;
 #endif
       return true;
     }
@@ -914,7 +914,7 @@ namespace btk
       max += shift;
       axis->SetMinimum(min);
       axis->SetMaximum(max);
-      axis->RecalculateTickSpacing();
+      // axis->RecalculateTickSpacing();
     }
 
     this->RecalculatePlotTransform();
