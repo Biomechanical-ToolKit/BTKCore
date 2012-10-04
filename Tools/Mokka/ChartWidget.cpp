@@ -1537,9 +1537,10 @@ btk::VTKChartTimeSeries* AnalogChartData::createChart(btk::VTKChartTimeSeries* s
 // -----------------------------------------------------------------------------
 
 VTKChartWidget::VTKChartWidget(QWidget* parent, Qt::WindowFlags f)
-: VizRendererWidget(parent, 0, f)
+: VizRendererWidget(parent, 0, f), m_OldMousePosition()
 {
   this->mp_CurrentChartData = 0;
+  this->m_AlternateMouseEvent = false;
   this->setMouseTracking(false);
 #ifdef Q_OS_WIN
   #pragma message("WARNING: It seems that Qt 4.8.3 introduced a bug under Windows for the drag'n drop action (don't check parent's attribute?). Need to check for later version.")
@@ -1562,7 +1563,7 @@ bool VTKChartWidget::event(QEvent* event)
     
     btk::VTKChartTimeSeries* chart = this->focusedPlotArea(helpEvent->pos());
     vtkContextMouseEvent mouse;
-    mouse.ScreenPos = vtkVector2i(helpEvent->pos().x(), this->height() - helpEvent->pos().y());
+    mouse.ScreenPos = vtkVector2i(helpEvent->pos().x(), this->height() - helpEvent->pos().y() - 1);
     btk::VTKChartPlotData plotIndex;
     if ((chart != 0) && (chart->LocatePointInPlots(mouse, plotIndex)))
     {
@@ -1611,30 +1612,176 @@ void VTKChartWidget::keyReleaseEvent(QKeyEvent* event)
   this->QWidget::keyReleaseEvent(event);
 };
 
-// FIX for VTK 5.8
-void VTKChartWidget::mousePressEvent(QMouseEvent* event)
+void VTKChartWidget::computeRatio(float ratio[2], int screenPos[2], btk::VTKChartTimeSeries* chart)
 {
-#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
-  // invoke appropriate vtk event only for the left button
-  if(event->button() == Qt::LeftButton)
-  {
-    btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
-    if (chart != 0)
-      chart->SetDisplayZoomBox((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? 1 : 0);
-  }
-#endif
-  this->VizRendererWidget::mousePressEvent(event);
+  float min[2], max[2];
+  vtkAxis* axis = 0;
+  axis = chart->GetAxis(vtkAxis::BOTTOM);
+  axis->GetPoint1(min); axis->GetPoint2(max);
+  ratio[0] = (static_cast<float>(screenPos[0]) - min[0]) / (max[0] - min[0]);
+  axis = chart->GetAxis(vtkAxis::LEFT);
+  axis->GetPoint1(min); axis->GetPoint2(max);
+  ratio[1] = (static_cast<float>(screenPos[1]) - min[1]) / (max[1] - min[1]);
 };
 
-// FIX for VTK 5.8
+void VTKChartWidget::applyRatio(float pos[2], float ratio[2], btk::VTKChartTimeSeries* chart)
+{
+  float min[2], max[2];
+  vtkAxis* axis = 0;
+  axis = chart->GetAxis(vtkAxis::BOTTOM);
+  axis->GetPoint1(min); axis->GetPoint2(max);
+  pos[0] = ratio[0] * (max[0] - min[0]) + min[0];
+  axis = chart->GetAxis(vtkAxis::LEFT);
+  axis->GetPoint1(min); axis->GetPoint2(max);
+  pos[1] = ratio[1] * (max[1] - min[1]) + min[1];
+};
+
+void VTKChartWidget::mousePressEvent(QMouseEvent* event)
+{
+  if ((event->button() == Qt::LeftButton) && (this->mp_CurrentChartData != NULL) && (this->mp_CurrentChartData->chartNumber() > 1) && ((event->modifiers() & Qt::AltModifier) == Qt::AltModifier))
+  {
+    btk::VTKChartTimeSeries* chart = 0;
+    if ((chart = this->focusedPlotArea(event->pos())) == NULL)
+      return;
+    
+    int screenPos[2] = {event->pos().x(), this->height() - event->pos().y() - 1};
+    float ratio[2] = {0};
+    this->computeRatio(ratio, screenPos, chart);
+    vtkContextMouseEvent mouse;
+    mouse.Button = vtkContextMouseEvent::LEFT_BUTTON;
+    mouse.SetInteractor(0); // Because the constructor doesn't set the interactor member to NULL.
+    for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
+    {
+      chart = this->mp_CurrentChartData->chart(i);
+      float pos[2] = {0.0f, 0.0f};
+      this->applyRatio(pos, ratio, chart);
+      mouse.Pos = vtkVector2f(pos[0], pos[1]);
+      chart->SetDisplayZoomBox((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? 1 : 0);
+      chart->MouseButtonPressEvent(mouse);
+    }
+    this->m_OldMousePosition = event->pos();
+    this->m_AlternateMouseEvent = true;
+    this->QWidget::mousePressEvent(event);
+  }
+  else
+  {
+    // FIX for VTK 5.8
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
+    // invoke appropriate vtk event only for the left button
+    if(event->button() == Qt::LeftButton)
+    {
+      btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
+      if (chart != 0)
+        chart->SetDisplayZoomBox((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? 1 : 0);
+    }
+#endif
+    this->VizRendererWidget::mousePressEvent(event);
+  }
+};
+
+void VTKChartWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+  if (this->m_AlternateMouseEvent)
+  {
+    btk::VTKChartTimeSeries* chart = 0;
+    if ((chart = this->focusedPlotArea(event->pos())) == NULL)
+      return;
+    
+    int screenPos[2] = {event->pos().x(), this->height() - event->pos().y() - 1};
+    float ratio[2] = {0};
+    this->computeRatio(ratio, screenPos, chart);
+    vtkContextMouseEvent mouse;
+    mouse.Button = vtkContextMouseEvent::LEFT_BUTTON;
+    mouse.SetInteractor(0); // Because the constructor doesn't set the interactor member to NULL.
+    for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
+    {
+      chart = this->mp_CurrentChartData->chart(i);
+      float pos[2] = {0.0f, 0.0f};
+      this->applyRatio(pos, ratio, chart);
+      mouse.Pos = vtkVector2f(pos[0], pos[1]);
+      chart->MouseButtonReleaseEvent(mouse);
+    }
+    this->m_AlternateMouseEvent = false;
+    this->QWidget::mouseReleaseEvent(event);
+  }
+  else
+    this->VizRendererWidget::mouseReleaseEvent(event);
+};
+
+void VTKChartWidget::mouseMoveEvent(QMouseEvent* event)
+{
+  // Shunt the standard behavior of VTK is the Alt modifier is pressed
+  if (this->m_AlternateMouseEvent)
+  {
+    btk::VTKChartTimeSeries* chart = 0;
+    if ((chart = this->focusedPlotArea(event->pos())) == NULL)
+      return;
+    int screenPos[2] = {event->pos().x(), this->height() - event->pos().y() - 1};
+    float ratio[2] = {0};
+    this->computeRatio(ratio, screenPos, chart);
+    float min_[2];
+    chart->GetAxis(vtkAxis::BOTTOM)->GetPoint1(min_);
+    int min[2] = {static_cast<int>(min_[0]), static_cast<int>(min_[2])};
+    int offsetMousePos[2] = {screenPos[0] - min[0], screenPos[1] - min[0]};
+    int offsetMouseLastPos[2] = {this->m_OldMousePosition.x() - min[0], this->height() - this->m_OldMousePosition.y() - 1 - min[0]};
+    vtkContextMouseEvent mouse;
+    mouse.SetInteractor(0); // Because the constructor doesn't set the interactor member to NULL.
+    mouse.Button = vtkContextMouseEvent::LEFT_BUTTON;
+    for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
+    {
+      chart = this->mp_CurrentChartData->chart(i);
+      float pos[2] = {0.0f, 0.0f};
+      this->applyRatio(pos, ratio, chart);
+      mouse.Pos = vtkVector2f(pos[0], pos[1]);
+      chart->GetAxis(vtkAxis::BOTTOM)->GetPoint1(min_);
+      min[0] = static_cast<int>(min_[0]); min[1] = static_cast<int>(min_[2]);
+      mouse.ScreenPos = vtkVector2i(min[0]+offsetMousePos[0], min[1]+offsetMousePos[1]);
+      mouse.LastScreenPos = vtkVector2i(min[0]+offsetMouseLastPos[0], min[1]+offsetMouseLastPos[1]);
+      chart->MouseMoveEvent(mouse);
+    }
+    this->m_OldMousePosition = event->pos();
+    this->QWidget::mouseMoveEvent(event);
+  }
+  else
+    this->VizRendererWidget::mouseMoveEvent(event);
+};
+
 void VTKChartWidget::wheelEvent(QWheelEvent* event)
 {
+  // Shunt the standard behavior of VTK is the Alt modifier is pressed
+  // This is done here and not in the VTK classes as (at least with VTK 5.10 under MacOS 10.5 with a MBP),
+  // the Alt modifier is not propagated. Morever, it will complexify the behavior 
+  // of the VTK classes for a simple key...
+  if ((this->mp_CurrentChartData != NULL) && (this->mp_CurrentChartData->chartNumber() > 1) && ((event->modifiers() & Qt::AltModifier) == Qt::AltModifier))
+  {
+    btk::VTKChartTimeSeries* chart = 0;
+    if ((chart = this->focusedPlotArea(event->pos())) == NULL)
+      return;
+    int screenPos[2] = {event->pos().x(), this->height() - event->pos().y() - 1};
+    float ratio[2] = {0};
+    this->computeRatio(ratio, screenPos, chart);
+    vtkContextMouseEvent mouse;
+    mouse.SetInteractor(0); // Because the constructor doesn't set the interactor member to NULL.
+    for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
+    {
+      chart = this->mp_CurrentChartData->chart(i);
+      float pos[2] = {0.0f, 0.0f};
+      this->applyRatio(pos, ratio, chart);
+      mouse.Pos = vtkVector2f(pos[0], pos[1]);
+      chart->SetZoomMode((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? btk::VTKChartTimeSeries::HORIZONTAL : btk::VTKChartTimeSeries::BOTH);
+      chart->MouseWheelEvent(mouse, (event->delta() > 0) ? 1 : -1); // Because default deltas used by VTK are (-1,1). The use of Qt values (-2,2) can break the zoom mode
+    }
+  }
+  else
+  {
+    // FIX for VTK 5.8
 #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
-  btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
-  if (chart != 0)
-    chart->SetZoomMode((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? btk::VTKChartTimeSeries::HORIZONTAL : btk::VTKChartTimeSeries::BOTH);
+    btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
+    if (chart != 0)
+      chart->SetZoomMode((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? btk::VTKChartTimeSeries::HORIZONTAL : btk::VTKChartTimeSeries::BOTH);
 #endif
-  this->VizRendererWidget::wheelEvent(event);
+    this->VizRendererWidget::wheelEvent(event);
+  }
 };
 
 btk::VTKChartTimeSeries* VTKChartWidget::focusedChart(const QPoint& pos) const
@@ -1661,7 +1808,7 @@ btk::VTKChartTimeSeries* VTKChartWidget::focusedPlotArea(const QPoint& pos) cons
   if (this->mp_CurrentChartData != NULL)
   {
     vtkContextMouseEvent mouse;
-    mouse.ScreenPos = vtkVector2i(pos.x(), this->height() - pos.y());
+    mouse.ScreenPos = vtkVector2i(pos.x(), this->height() - pos.y() - 1);
     for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
     {
       chart = this->mp_CurrentChartData->chart(i);
