@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud Barré
+ * Copyright (c) 2009-2012, Arnaud BarrÃ©
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,29 +33,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RemoveAnalogOffsetDialog_h
-#define RemoveAnalogOffsetDialog_h
+#ifndef AnalogToolOptionDialog_h
+#define AnalogToolOptionDialog_h
 
-#include "AnalogToolOptionDialog.h"
+#include "ui_AnalogToolOptionDialog.h"
 
-class QSpinBox;
+#include <QDialog>
 
-class RemoveAnalogOffsetDialog : public AnalogToolOptionDialog
+class Acquisition; 
+
+class QToolBox;
+
+class AnalogToolOptionDialog : public QDialog, public Ui::AnalogToolOptionDialog
 {
   Q_OBJECT
   
 public:
-  RemoveAnalogOffsetDialog(QWidget* parent = 0);
+  AnalogToolOptionDialog(const QString& toolName, QWidget* parent = 0);
+  void initialize(const QList<int>& selectedAnalogIds, const Acquisition* const acq);
   
-  QRadioButton* firstFramesButton;
-  QSpinBox* firstFramesSpinBox;
-  QRadioButton* lastFramesButton;
-  QSpinBox* lastFramesSpinBox;
-  QRadioButton* allFramesButton;
-
+  const QString& toolName() {return this->m_ToolName;};
+  const QString& toolSettingsPath() {return this->m_ToolSettingsPath;};
+  
+  void addOption(const QString& title, QWidget* content);
+  
 protected:
-  virtual void initializeOptions(const Acquisition* const acq);
-  virtual void saveOptionsSettings();
+  void setDataProcessingVisible(bool visible);
+  virtual void initializeOptions(const Acquisition* const /* acq */) {};
+  virtual void saveOptionsSettings() {};
+  
+private slots:
+  void checkAnalogSelection();
+  void saveSettings();
+  
+private:
+  QString m_ToolName;
+  QString m_ToolSettingsPath;
+  QToolBox* mp_OptionsToolBox;
 };
 
-#endif // RemoveAnalogOffsetDialog_h
+#endif // AnalogToolOptionDialog_h

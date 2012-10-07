@@ -128,41 +128,28 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
     dialog.initialize(data->explorerSelectedItems(AnalogType), data->acquisition());
     if (dialog.exec() == QDialog::Accepted)
     {
-      QSettings settings;
-      QStringList lastChannelsSelection;
-      
       QList<int> channelsIds;
       QTreeWidgetItem* analogsRoot = dialog.treeWidget->topLevelItem(0);
       for (int i = 0 ; i < analogsRoot->childCount() ; ++i)
       {
         QTreeWidgetItem* analogItem = analogsRoot->child(i);
         if (analogItem->checkState(0) == Qt::Checked)
-        {
           channelsIds.push_back(analogItem->data(0, Qt::UserRole).toInt());
-          lastChannelsSelection.push_back(analogItem->text(0));
-        }
       }
       
-      int lastReferenceFrames = 2;
       int framesIndex[2] = {-1,-1};
       if (dialog.firstFramesButton->isChecked())
       {
-        lastReferenceFrames = 0;
         int numberOfFrames = dialog.firstFramesSpinBox->value();
-        settings.setValue("Tools/RemoveAnalogOffset/firstFramesNumber", numberOfFrames);
         framesIndex[0] = 0;
         framesIndex[1] = numberOfFrames - 1;
       }
       else if (dialog.lastFramesButton->isChecked())
       {
-        lastReferenceFrames = 1;
         int numberOfFrames = dialog.lastFramesSpinBox->value();
-        settings.setValue("Tools/RemoveAnalogOffset/lastFramesNumber", numberOfFrames);
         framesIndex[0] = data->acquisition()->lastFrame() - numberOfFrames + 1 - data->acquisition()->firstFrame();
         framesIndex[1] = data->acquisition()->lastFrame() - data->acquisition()->firstFrame();
       }
-      settings.setValue("Tools/RemoveAnalogOffset/lastChannelsSelection", lastChannelsSelection);
-      settings.setValue("Tools/RemoveAnalogOffset/lastReferenceFrames", lastReferenceFrames);
       
       btk::SubAcquisitionFilter::Pointer subAnalogs = btk::SubAcquisitionFilter::New();
       subAnalogs->SetInput(data->acquisition()->btkAcquisition());
@@ -210,14 +197,36 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
 // ------------------------------------------------------------------------- //
 
 RemoveAnalogOffsetDialog::RemoveAnalogOffsetDialog(QWidget* parent)
-: QDialog(parent)
+: AnalogToolOptionDialog("Remove Analog Offset", parent)
 {
-  this->setupUi(this);
-#ifdef Q_OS_MAC
-  this->layout()->setContentsMargins(12,12,12,12);
+  QWidget* referenceFrames = new QWidget(this);
+  this->firstFramesButton = new QRadioButton(this);
+  this->firstFramesButton->setChecked(true);
+  this->firstFramesSpinBox = new QSpinBox(this);
+  this->firstFramesSpinBox->setMinimum(1);
+  this->firstFramesSpinBox->setMaximum(9999);
+  this->firstFramesSpinBox->setValue(10);
+  this->lastFramesButton = new QRadioButton(this);
+  this->lastFramesSpinBox = new QSpinBox(this);
+  this->lastFramesSpinBox->setMinimum(1);
+  this->lastFramesSpinBox->setMaximum(9999);
+  this->lastFramesSpinBox->setValue(10);
+  this->allFramesButton = new QRadioButton(this);
+  this->firstFramesButton->setText(tr("First frames:"));
+  this->lastFramesButton->setText(tr("Last frames:"));
+  this->allFramesButton->setText(tr("All frames"));
+  
+  QGridLayout* gridLayout = new QGridLayout(referenceFrames);
+  gridLayout->addWidget(this->firstFramesButton, 0, 0, 1, 1);
+  gridLayout->addWidget(this->firstFramesSpinBox, 0, 1, 1, 1);
+  gridLayout->addWidget(this->lastFramesButton, 1, 0, 1, 1);
+  gridLayout->addWidget(this->lastFramesSpinBox, 1, 1, 1, 1);
+  gridLayout->addWidget(this->allFramesButton, 2, 0, 1, 1);
+  QSpacerItem* horizontalSpacer = new QSpacerItem(40, 10, QSizePolicy::Expanding, QSizePolicy::Minimum);
+  gridLayout->addItem(horizontalSpacer, 0, 2, 1, 1);
+  
+#ifndef Q_OS_WIN
   QFont f = this->font();
-  f.setPointSize(10);
-  this->treeWidget->setFont(f);
   f.setPointSize(11);
   this->firstFramesButton->setFont(f);
   this->lastFramesButton->setFont(f);
@@ -225,53 +234,21 @@ RemoveAnalogOffsetDialog::RemoveAnalogOffsetDialog(QWidget* parent)
   this->firstFramesSpinBox->setStyleSheet("QSpinBox {font-size: 12px;};");
   this->lastFramesSpinBox->setStyleSheet("QSpinBox {font-size: 12px;};");
   this->allFramesButton->setMinimumHeight(30);
-  this->referenceFramesGroupBox->layout()->setSpacing(6);
-  this->referenceFramesGroupBox->layout()->setContentsMargins(12,9,12,9);
+  referenceFrames->layout()->setSpacing(0);
 #endif
-  
-  connect(this->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem* , int)), this, SLOT(checkAnalogSelection()));
+
+  this->setDataProcessingVisible(false);
+  this->addOption("Reference Frames", referenceFrames);
 };
 
-void RemoveAnalogOffsetDialog::initialize(const QList<int>& selectedAnalogIds, const Acquisition* const acq)
+void RemoveAnalogOffsetDialog::initializeOptions(const Acquisition* const acq)
 {
   QSettings settings;
-  QStringList lastChannelsSelection = settings.value("Tools/RemoveAnalogOffset/lastChannelsSelection").toStringList();
-  int lastReferenceFrames =  settings.value("Tools/RemoveAnalogOffset/lastReferenceFrames", 0).toInt();
-  QIcon analogIcon(QString::fromUtf8(":/Resources/Images/chart_line.png"));
-  
-  QFont f = this->treeWidget->font();
-  f.setBold(true);
-
-  QTreeWidgetItem* analogsRoot = new QTreeWidgetItem(QStringList(QString("Analog channels")));
-  analogsRoot->setFont(0, f);
-  analogsRoot->setIcon(0, analogIcon);
-  analogsRoot->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsTristate);
-  this->treeWidget->addTopLevelItem(analogsRoot);
-  for (QMap<int, Analog*>::const_iterator it = acq->analogs().begin() ; it != acq->analogs().end() ; ++it)
-  {
-    QTreeWidgetItem* analogItem = new QTreeWidgetItem(QStringList(it.value()->label));
-    analogItem->setIcon(0, analogIcon);
-    analogItem->setData(0, Qt::UserRole, it.key());
-    if (selectedAnalogIds.isEmpty())
-      analogItem->setCheckState(0, lastChannelsSelection.indexOf(it.value()->label) != -1 ? Qt::Checked : Qt::Unchecked);
-    else
-      analogItem->setCheckState(0, selectedAnalogIds.indexOf(it.key()) != -1 ? Qt::Checked : Qt::Unchecked);
-    analogItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-    analogsRoot->addChild(analogItem);
-  }
-  analogsRoot->setExpanded(true);
-  
-  if (analogsRoot->checkState(0) == Qt::Unchecked) // No analog channel founds
-    analogsRoot->setCheckState(0, Qt::Checked);
-  
-  if (acq->analogs().count() > 12)
-    this->resize(this->width(),640);
-  
   this->firstFramesSpinBox->setMaximum(acq->pointFrameNumber());
   this->lastFramesSpinBox->setMaximum(acq->pointFrameNumber());
-  this->firstFramesSpinBox->setValue(settings.value("Tools/RemoveAnalogOffset/firstFramesNumber", 10).toInt());
-  this->lastFramesSpinBox->setValue(settings.value("Tools/RemoveAnalogOffset/lastFramesNumber", 10).toInt());
-  
+  this->firstFramesSpinBox->setValue(settings.value(this->toolSettingsPath() + "firstFramesNumber", 10).toInt());
+  this->lastFramesSpinBox->setValue(settings.value(this->toolSettingsPath() + "lastFramesNumber", 10).toInt());
+  int lastReferenceFrames =  settings.value(this->toolSettingsPath() + "lastReferenceFrames", 0).toInt();
   if (lastReferenceFrames == 1)
     this->lastFramesButton->setChecked(true);
   else if (lastReferenceFrames == 2)
@@ -280,7 +257,21 @@ void RemoveAnalogOffsetDialog::initialize(const QList<int>& selectedAnalogIds, c
     this->firstFramesButton->setChecked(true);
 };
 
-void RemoveAnalogOffsetDialog::checkAnalogSelection()
+void RemoveAnalogOffsetDialog::saveOptionsSettings()
 {
-  this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(this->treeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked);
+  QSettings settings;
+  int lastReferenceFrames = 2;
+  if (this->firstFramesButton->isChecked())
+  {
+    lastReferenceFrames = 0;
+    int numberOfFrames = this->firstFramesSpinBox->value();
+    settings.setValue(this->toolSettingsPath() + "firstFramesNumber", numberOfFrames);
+  }
+  else if (this->lastFramesButton->isChecked())
+  {
+    lastReferenceFrames = 1;
+    int numberOfFrames = this->lastFramesSpinBox->value();
+    settings.setValue(this->toolSettingsPath() + "lastFramesNumber", numberOfFrames);
+  }
+  settings.setValue(this->toolSettingsPath() + "lastReferenceFrames", lastReferenceFrames);
 };
