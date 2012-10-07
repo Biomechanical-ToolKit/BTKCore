@@ -2989,6 +2989,7 @@ void ModelDockWidget::removeConfiguration(int idx)
   this->modelConfigurationComboBox->blockSignals(true);
   this->modelConfigurationComboBox->removeItem(idx);
   this->modelConfigurationComboBox->setCurrentIndex(-1);
+  this->m_CurrentConfigurationIndex = -1;
   this->mp_SaveConfiguration->setEnabled(false);
   this->mp_RemoveConfiguration->setEnabled(false);
   this->mp_DeselectConfiguration->setEnabled(false);
