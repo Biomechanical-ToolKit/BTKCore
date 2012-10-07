@@ -13,18 +13,8 @@
   <property name="windowTitle">
    <string>Segment Definition</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1">
-   <item row="0" column="0">
-    <widget class="QLabel" name="segmentLabelLabel">
-     <property name="text">
-      <string>Label</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="segmentLabelEdit"/>
-   </item>
-   <item row="0" column="2" rowspan="4">
+  <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1,0,0">
+   <item row="0" column="1" rowspan="3">
     <widget class="Viz3DWidget" name="viz3D" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -35,19 +25,9 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="segmentDescriptionLabel">
-     <property name="text">
-      <string>Description</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="segmentDescriptionEdit"/>
-   </item>
-   <item row="2" column="0" colspan="2">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="markerTab">
       <attribute name="title">
@@ -231,7 +211,7 @@
      </widget>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Note</string>
@@ -255,7 +235,7 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="2">
+   <item row="3" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -263,6 +243,38 @@
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="segmentInfoGroupBox">
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="margin">
+       <number>12</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="segmentLabelLabel">
+        <property name="text">
+         <string>Label</string>
+        </property>
+        <property name="buddy">
+         <cstring>segmentInfoGroupBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="segmentLabelEdit"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="segmentDescriptionLabel">
+        <property name="text">
+         <string>Description</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="segmentDescriptionEdit"/>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

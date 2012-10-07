@@ -56,6 +56,9 @@ NewSegmentDialog::NewSegmentDialog(QWidget* parent)
   this->setupUi(this);
   this->tabWidget->setCurrentWidget(this->linkTab);
 #ifdef Q_OS_MAC
+  this->layout()->setContentsMargins(12,12,12,12);
+  this->layout()->setSpacing(12);
+
   this->markerInfoLabel->setAttribute(Qt::WA_MacSmallSize);
   this->linkInfoLabel->setAttribute(Qt::WA_MacSmallSize);
   this->faceInfoLabel->setAttribute(Qt::WA_MacSmallSize);
@@ -92,7 +95,6 @@ NewSegmentDialog::NewSegmentDialog(QWidget* parent)
   tableHeader->setResizeMode(2, QHeaderView::Stretch);
   tableHeader->setResizeMode(3, QHeaderView::Stretch);
   this->facesTable->verticalHeader()->setDefaultSectionSize(20);
-  this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
   
   this->viz3D->initialize();
   
@@ -123,16 +125,6 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
   this->mp_Segment = seg;
   this->m_SegmentId = segmentId;
   
-  if (editMode)
-  {
-    this->segmentLabelLabel->setVisible(false);
-    this->segmentLabelEdit->setVisible(false);
-    this->segmentDescriptionLabel->setVisible(false);
-    this->segmentDescriptionEdit->setVisible(false);
-    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
-    this->buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
-  }
-  
   this->markersTable->setRowCount(0);
   this->linksTable->setRowCount(0);
   this->facesTable->setRowCount(0);
@@ -140,6 +132,18 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
   // - To create a new segment
   if (!editMode)
   {
+#ifdef Q_OS_MAC
+    this->segmentInfoGroupBox->setVisible(true);
+#else
+    if (static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget() != this->segmentInfoGroupBox)
+    {
+      static_cast<QGridLayout*>(this->layout())->addItem(this->layout()->takeAt(this->layout()->indexOf(this->tabWidget)), 1, 0, 1, 1);
+      static_cast<QGridLayout*>(this->layout())->addWidget(this->segmentInfoGroupBox, 0, 0);
+      this->segmentInfoGroupBox->setVisible(true);
+    }
+#endif
+    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    this->segmentLabelEdit->setText("");
     int markerRowIdx = 0;
     for (QList<MarkerInfo>::const_iterator it = markersInfo.begin() ; it != markersInfo.end() ; ++it)
     {
@@ -192,6 +196,18 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
   // To edit an existing segment
   else
   {
+#ifdef Q_OS_MAC
+    this->segmentInfoGroupBox->setVisible(false);
+#else
+    if (static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0)->widget() == this->segmentInfoGroupBox)
+    {
+      this->segmentInfoGroupBox->setVisible(false);
+      this->layout()->removeItem(static_cast<QGridLayout*>(this->layout())->itemAtPosition(0,0));
+      static_cast<QGridLayout*>(this->layout())->addItem(this->layout()->takeAt(this->layout()->indexOf(this->tabWidget)), 0, 0, 2, 1);
+    }
+#endif
+    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    this->buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
     this->segmentLabelEdit->setText("Edition Mode"); // For the validate() method
     int markerRowIdx = 0, checkedMarkers = 0;
     for (QList<MarkerInfo>::const_iterator it = markersInfo.begin() ; it != markersInfo.end() ; ++it)
