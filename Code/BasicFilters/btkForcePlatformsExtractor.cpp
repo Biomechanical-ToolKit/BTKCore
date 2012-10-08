@@ -140,205 +140,205 @@ namespace btk
   {
     ForcePlatformCollection::Pointer output = this->GetOutput();
     Acquisition::Pointer input = this->GetInput();
-    if (!input)
+    MetaData::Iterator itForcePlatformGr;
+    if ((!input) || ((itForcePlatformGr = input->GetMetaData()->FindChild("FORCE_PLATFORM")) == input->GetMetaData()->End()))
       output->Clear(); 
     else
     {
-      MetaData::Iterator itForcePlatformGr = input->GetMetaData()->FindChild("FORCE_PLATFORM");
-      if (itForcePlatformGr != input->GetMetaData()->End())
+      MetaData::Iterator itUsed = (*itForcePlatformGr)->FindChild("USED");
+      size_t numberOfForcePlatforms = 0;
+      if (itUsed != (*itForcePlatformGr)->End())
+        numberOfForcePlatforms = (*itUsed)->GetInfo()->ToInt(0);
+
+      MetaData::Iterator itType = (*itForcePlatformGr)->FindChild("TYPE");
+      std::vector<int> types = std::vector<int>(numberOfForcePlatforms, 1);
+      if (itType != (*itForcePlatformGr)->End())
       {
-        MetaData::Iterator itUsed = (*itForcePlatformGr)->FindChild("USED");
-        size_t numberOfForcePlatforms = 0;
-        if (itUsed != (*itForcePlatformGr)->End())
-          numberOfForcePlatforms = (*itUsed)->GetInfo()->ToInt(0);
+        (*itType)->GetInfo()->ToInt(types);
+        if (types.size() < numberOfForcePlatforms)
+        {
+          btkErrorMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE don't indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:TYPE");
+          numberOfForcePlatforms = types.size();
+        }
+        else if (types.size() > numberOfForcePlatforms)
+        {
+          btkErrorMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE don't indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:USED");
+        }
+      }
 
-        MetaData::Iterator itType = (*itForcePlatformGr)->FindChild("TYPE");
-        std::vector<int> types = std::vector<int>(numberOfForcePlatforms, 1);
-        if (itType != (*itForcePlatformGr)->End())
-        {
-          (*itType)->GetInfo()->ToInt(types);
-          if (types.size() < numberOfForcePlatforms)
-          {
-            btkErrorMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE don't indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:TYPE");
-            numberOfForcePlatforms = types.size();
-          }
-          else if (types.size() > numberOfForcePlatforms)
-          {
-            btkErrorMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE don't indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:USED");
-          }
-        }
-
-        MetaData::Iterator itChannels = (*itForcePlatformGr)->FindChild("CHANNEL");
-        if (itChannels == (*itForcePlatformGr)->End())
-        {
-          btkErrorMacro("No FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
-          return;
-        }
-        else if (!(*itChannels)->HasInfo() || (*itChannels)->GetInfo()->GetDimensions().size() != 2)
-        {
-          btkErrorMacro("Wrong format for the FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
-          return;
-        }
-
-        MetaData::Pointer pOrigin;
-        MetaData::Iterator itOrigin = (*itForcePlatformGr)->FindChild("ORIGIN");
-        if (itOrigin == (*itForcePlatformGr)->End())
-        {
-          btkErrorMacro("No FORCE_PLATFORM::ORIGIN entry. Default values are used.");
-        }
-        else
-          pOrigin = (*itOrigin);
-        
-        MetaData::Pointer pCorners;
-        MetaData::Iterator itCorners = (*itForcePlatformGr)->FindChild("CORNERS");
-        if (itCorners == (*itForcePlatformGr)->End())
-        {
-          btkErrorMacro("No FORCE_PLATFORM::CORNERS entry. Default values are used.");
-        }
-        else
-          pCorners = (*itCorners);
-        MetaData::Pointer pCalMatrix;
-        MetaData::Iterator itCalMatrix = (*itForcePlatformGr)->FindChild("CAL_MATRIX");
-        int calMatrixStep = 0;
-        if (itCalMatrix == (*itForcePlatformGr)->End())
-        {
-          for(size_t i = 0 ; i < numberOfForcePlatforms ; ++i)
-          {
-            if (types[i] > 3)
-            {
-              btkErrorMacro("No FORCE_PLATFORM::CAL_MATRIX entry. Force platform which requires a calibration matrix to convert volts in newtons won't be scaled.");
-              break;
-            }
-          }
-        }
-        else
-        {
-          pCalMatrix = (*itCalMatrix);
-          calMatrixStep = pCalMatrix->GetInfo()->GetDimension(0) * pCalMatrix->GetInfo()->GetDimension(1);
-        }
-        
-        AnalogCollection::Pointer analogs = input->GetAnalogs();
-        std::vector<int> channelsIndex;
+      std::vector<int> channelsIndex;
+      int channelStep = 0;
+      MetaData::Iterator itChannels = (*itForcePlatformGr)->FindChild("CHANNEL");
+      if (itChannels == (*itForcePlatformGr)->End())
+      {
+        btkErrorMacro("No FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
+        numberOfForcePlatforms = 0;
+      }
+      else if (!(*itChannels)->HasInfo() || (*itChannels)->GetInfo()->GetDimensions().size() != 2)
+      {
+        btkErrorMacro("Wrong format for the FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
+        numberOfForcePlatforms = 0;
+      }
+      else
+      {
         (*itChannels)->GetInfo()->ToInt(channelsIndex);
-        
-        // Check if the content of the input used by this filter changed since the last update
-        if (static_cast<int>(numberOfForcePlatforms) == output->GetItemNumber())
-        {
-          int numAnalogs = analogs->GetItemNumber();
-          bool dataModified = false;
-          for (size_t i = 0 ; i < channelsIndex.size() ; ++i)
-          {
-            if ((channelsIndex[i] < 1) || (channelsIndex[i] > numAnalogs))
-              continue;
-            AnalogCollection::ConstIterator it = analogs->Begin();
-            std::advance(it, channelsIndex[i]-1);
-            if ((*it)->GetTimestamp() >= this->GetTimestamp())
-            {
-              dataModified = true;
-              break;
-            }
-          }
-          if (!dataModified && ((*itForcePlatformGr)->GetTimestamp() < this->GetTimestamp()))
-            return;
-        }
-        
-        output->Clear();
-        output->SetItemNumber(static_cast<int>(numberOfForcePlatforms));
-        ForcePlatformCollection::Iterator itFP = output->Begin();
-        int channelStep = (*itChannels)->GetInfo()->GetDimension(0);
-        int channelNumberAlreadyExtracted = 0;
-        int calMatrixCoefficentNumberAleadyExtracted = 0;
-        bool noError = true;
-
+        channelStep = (*itChannels)->GetInfo()->GetDimension(0);
+      }
+      
+      MetaData::Pointer pOrigin;
+      MetaData::Iterator itOrigin = (*itForcePlatformGr)->FindChild("ORIGIN");
+      if (itOrigin == (*itForcePlatformGr)->End())
+      {
+        btkErrorMacro("No FORCE_PLATFORM::ORIGIN entry. Default values are used.");
+      }
+      else
+        pOrigin = (*itOrigin);
+      
+      MetaData::Pointer pCorners;
+      MetaData::Iterator itCorners = (*itForcePlatformGr)->FindChild("CORNERS");
+      if (itCorners == (*itForcePlatformGr)->End())
+      {
+        btkErrorMacro("No FORCE_PLATFORM::CORNERS entry. Default values are used.");
+      }
+      else
+        pCorners = (*itCorners);
+      MetaData::Pointer pCalMatrix;
+      MetaData::Iterator itCalMatrix = (*itForcePlatformGr)->FindChild("CAL_MATRIX");
+      int calMatrixStep = 0;
+      if (itCalMatrix == (*itForcePlatformGr)->End())
+      {
         for(size_t i = 0 ; i < numberOfForcePlatforms ; ++i)
         {
-          switch(types[i])
+          if (types[i] > 3)
           {
-          case 1:
-            (*itFP) = ForcePlatformType1::New();
-            this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            noError = this->ExtractForcePlatformData((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
-            break;
-          case 2:
-            (*itFP) = ForcePlatformType2::New();
-            this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            noError = this->ExtractForcePlatformData((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
-            break;
-          case 3:
-            (*itFP) = ForcePlatformType3::New();
-            this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            noError = this->ExtractForcePlatformData((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
-            break;
-          case 4:
-            (*itFP) = ForcePlatformType4::New();
-            this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
-            break;
-          case 5:
-            (*itFP) = ForcePlatformType5::New();
-            this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
-            noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
-            break;
-          case 6:
-            {
-            btkErrorMacro("Force Platform type 6 is not yet supported. Please, report this to the developers");
-            //ForcePlatformType6::Pointer fp6 = ForcePlatformType6::New();
-            //this->ExtractForcePlatformData(fp6, analogs, (*itForcePlatformGr));
-            //(*itFP) = fp6;
-            }
-            break;
-          case 7:
-            {
-            btkErrorMacro("Force Platform type 7 is not yet supported. Please, report this to the developers");
-            //ForcePlatformType7::Pointer fp7 = ForcePlatformType7::New();
-            //this->ExtractForcePlatformData(fp7, analogs, (*itForcePlatformGr));
-            //(*itFP) = fp7;
-            }
-            break;
-          case 11:
-            {
-            btkErrorMacro("Force Platform type 11 is not yet supported. Please, report this to the developers");
-            //ForcePlatformType11::Pointer fp11 = ForcePlatformType11::New();
-            //this->ExtractForcePlatformData(fp11, analogs, (*itForcePlatformGr));
-            //(*itFP) = fp11;
-            }
-            break;
-          case 12:
-            {
-            btkErrorMacro("Force Platform type 12 is not yet supported. Please, report this to the developers");
-            //ForcePlatformType12::Pointer fp12 = ForcePlatformType12::New();
-            //this->ExtractForcePlatformData(fp12, analogs, (*itForcePlatformGr));
-            //(*itFP) = fp12;
-            }
-            break;
-          case 21:
-            {
-            btkErrorMacro("Force Platform type 21 is not yet supported. Please, report this to the developers");
-            //ForcePlatformType21::Pointer fp21 = ForcePlatformType21::New();
-            //this->ExtractForcePlatformData(fp21, analogs, (*itForcePlatformGr));
-            //(*itFP) = fp21;
-            }
-            break;
-          default:
-            btkErrorMacro("Unsupported force platform type. Impossible to extract corresponding data");
+            btkErrorMacro("No FORCE_PLATFORM::CAL_MATRIX entry. Force platform which requires a calibration matrix to convert volts in newtons won't be scaled.");
             break;
           }
-          // Fill empty force platform channel if necessary
-          if (!noError)
-          {
-            btkErrorMacro("Error(s) occurred during channel extraction for force platform #" + ToString(i + 1) + ". Replacement by vector of zeros.")
-            int inc = 0;
-            for (ForcePlatform::Iterator it = (*itFP)->Begin() ; it != (*itFP)->End() ; ++it )
-            {
-              (*it) = Analog::New("FP" + ToString(i + 1) + "C" + ToString(inc + 1), input->GetAnalogFrameNumber());
-              ++inc;
-            } 
-
-          }
-          ++itFP;
-          calMatrixCoefficentNumberAleadyExtracted += calMatrixStep;
-          channelNumberAlreadyExtracted += channelStep;
         }
+      }
+      else
+      {
+        pCalMatrix = (*itCalMatrix);
+        calMatrixStep = pCalMatrix->GetInfo()->GetDimension(0) * pCalMatrix->GetInfo()->GetDimension(1);
+      }
+      
+      AnalogCollection::Pointer analogs = input->GetAnalogs();
+      // Check if the content of the input used by this filter changed since the last update
+      if (static_cast<int>(numberOfForcePlatforms) == output->GetItemNumber())
+      {
+        int numAnalogs = analogs->GetItemNumber();
+        bool dataModified = false;
+        for (size_t i = 0 ; i < channelsIndex.size() ; ++i)
+        {
+          if ((channelsIndex[i] < 1) || (channelsIndex[i] > numAnalogs))
+            continue;
+          AnalogCollection::ConstIterator it = analogs->Begin();
+          std::advance(it, channelsIndex[i]-1);
+          if ((*it)->GetTimestamp() >= this->GetTimestamp())
+          {
+            dataModified = true;
+            break;
+          }
+        }
+        if (!dataModified && ((*itForcePlatformGr)->GetTimestamp() < this->GetTimestamp()))
+          return;
+      }
+      
+      output->Clear();
+      output->SetItemNumber(static_cast<int>(numberOfForcePlatforms));
+      ForcePlatformCollection::Iterator itFP = output->Begin();
+      int channelNumberAlreadyExtracted = 0;
+      int calMatrixCoefficentNumberAleadyExtracted = 0;
+      bool noError = true;
+
+      for(size_t i = 0 ; i < numberOfForcePlatforms ; ++i)
+      {
+        switch(types[i])
+        {
+        case 1:
+          (*itFP) = ForcePlatformType1::New();
+          this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+          noError = this->ExtractForcePlatformData((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
+          break;
+        case 2:
+          (*itFP) = ForcePlatformType2::New();
+          this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+          noError = this->ExtractForcePlatformData((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
+          break;
+        case 3:
+          (*itFP) = ForcePlatformType3::New();
+          this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+          noError = this->ExtractForcePlatformData((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
+          break;
+        case 4:
+          (*itFP) = ForcePlatformType4::New();
+          this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+          noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
+          break;
+        case 5:
+          (*itFP) = ForcePlatformType5::New();
+          this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+          noError = this->ExtractForcePlatformDataWithCalibrationMatrix((*itFP), analogs, channelNumberAlreadyExtracted, channelsIndex);
+          break;
+        case 6:
+          {
+          btkErrorMacro("Force Platform type 6 is not yet supported. Please, report this to the developers");
+          //ForcePlatformType6::Pointer fp6 = ForcePlatformType6::New();
+          //this->ExtractForcePlatformData(fp6, analogs, (*itForcePlatformGr));
+          //(*itFP) = fp6;
+          }
+          break;
+        case 7:
+          {
+          btkErrorMacro("Force Platform type 7 is not yet supported. Please, report this to the developers");
+          //ForcePlatformType7::Pointer fp7 = ForcePlatformType7::New();
+          //this->ExtractForcePlatformData(fp7, analogs, (*itForcePlatformGr));
+          //(*itFP) = fp7;
+          }
+          break;
+        case 11:
+          {
+          btkErrorMacro("Force Platform type 11 is not yet supported. Please, report this to the developers");
+          //ForcePlatformType11::Pointer fp11 = ForcePlatformType11::New();
+          //this->ExtractForcePlatformData(fp11, analogs, (*itForcePlatformGr));
+          //(*itFP) = fp11;
+          }
+          break;
+        case 12:
+          {
+          btkErrorMacro("Force Platform type 12 is not yet supported. Please, report this to the developers");
+          //ForcePlatformType12::Pointer fp12 = ForcePlatformType12::New();
+          //this->ExtractForcePlatformData(fp12, analogs, (*itForcePlatformGr));
+          //(*itFP) = fp12;
+          }
+          break;
+        case 21:
+          {
+          btkErrorMacro("Force Platform type 21 is not yet supported. Please, report this to the developers");
+          //ForcePlatformType21::Pointer fp21 = ForcePlatformType21::New();
+          //this->ExtractForcePlatformData(fp21, analogs, (*itForcePlatformGr));
+          //(*itFP) = fp21;
+          }
+          break;
+        default:
+          btkErrorMacro("Unsupported force platform type. Impossible to extract corresponding data");
+          break;
+        }
+        // Fill empty force platform channel if necessary
+        if (!noError)
+        {
+          btkErrorMacro("Error(s) occurred during channel extraction for force platform #" + ToString(i + 1) + ". Replacement by vector of zeros.")
+          int inc = 0;
+          for (ForcePlatform::Iterator it = (*itFP)->Begin() ; it != (*itFP)->End() ; ++it )
+          {
+            (*it) = Analog::New("FP" + ToString(i + 1) + "C" + ToString(inc + 1), input->GetAnalogFrameNumber());
+            ++inc;
+          } 
+
+        }
+        ++itFP;
+        calMatrixCoefficentNumberAleadyExtracted += calMatrixStep;
+        channelNumberAlreadyExtracted += channelStep;
       }
     }
   };

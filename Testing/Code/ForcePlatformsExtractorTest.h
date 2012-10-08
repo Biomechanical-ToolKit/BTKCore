@@ -149,6 +149,45 @@ CXXTEST_SUITE(ForcePlatformsExtractorTest)
 
     TS_ASSERT_DELTA(pf1->GetChannel(3)->GetValues()(561), 0.0, 0.00001);
   };
+  
+  CXXTEST_TEST(FPAnalogModified)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "sample09/PluginC3D.c3d");
+    btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    pfe->SetInput(acq);
+    btk::ForcePlatformCollection::Pointer pfc = pfe->GetOutput();
+    pfe->Update();
+    TS_ASSERT_EQUALS(pfc->GetItemNumber(), 2);
+    unsigned long int ts = pfc->GetTimestamp();
+    reader.reset(); // Destroy the parent Filter
+    acq->Modified();
+    acq->GetAnalog(0)->Modified();
+    pfc->Update();
+    TS_ASSERT_EQUALS(pfc->GetItemNumber(), 2);
+    TS_ASSERT(ts != pfc->GetTimestamp());
+  };
+  
+  CXXTEST_TEST(FPAnalogNotModified)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "sample09/PluginC3D.c3d");
+    btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    pfe->SetInput(acq);
+    btk::ForcePlatformCollection::Pointer pfc = pfe->GetOutput();
+    pfe->Update();
+    TS_ASSERT_EQUALS(pfc->GetItemNumber(), 2);
+    unsigned long int ts = pfc->GetTimestamp();
+    reader.reset(); // Destroy the parent Filter
+    unsigned long int ts_ = acq->GetAnalogs()->GetTimestamp();
+    acq->Modified();
+    TS_ASSERT(ts_ == acq->GetAnalogs()->GetTimestamp());
+    pfc->Update();
+    TS_ASSERT_EQUALS(pfc->GetItemNumber(), 2);
+    TS_ASSERT(ts == pfc->GetTimestamp());
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(ForcePlatformsExtractorTest)
@@ -156,5 +195,7 @@ CXXTEST_TEST_REGISTRATION(ForcePlatformsExtractorTest, FileSample01Eb015pi)
 CXXTEST_TEST_REGISTRATION(ForcePlatformsExtractorTest, FileSample10Type2)
 CXXTEST_TEST_REGISTRATION(ForcePlatformsExtractorTest, FileSample10Type4)
 CXXTEST_TEST_REGISTRATION(ForcePlatformsExtractorTest, FileSample19Sample19)
+CXXTEST_TEST_REGISTRATION(ForcePlatformsExtractorTest, FPAnalogModified)
+CXXTEST_TEST_REGISTRATION(ForcePlatformsExtractorTest, FPAnalogNotModified)
 
 #endif
