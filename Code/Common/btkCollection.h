@@ -81,7 +81,7 @@ namespace btk
     void RemoveItem(int idx);
     ItemPointer TakeItem(Iterator loc);
     ItemPointer TakeItem(int idx);
-    void Clear() {this->m_Items.clear();};
+    void Clear();
     Pointer Clone() const;
     
   protected:
@@ -363,9 +363,17 @@ namespace btk
   };
   
   /**
-   * @fn template <class T> void Collection<T>::Clear()
    * Clear the contents of the list.
    */
+  template <class T> 
+  void Collection<T>::Clear()
+  {
+    if (!this->m_Items.empty())
+    {
+      this->m_Items.clear();
+      this->Modified();
+    }
+  };
    
   /**
    * Deep copy.
