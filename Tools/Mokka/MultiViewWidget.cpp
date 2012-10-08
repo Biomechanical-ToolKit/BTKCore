@@ -201,7 +201,7 @@ void MultiViewWidget::initialize()
   // Simple ground grid
   btk::VTKGroundSource* ground = btk::VTKGroundSource::New();
   vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(ground->GetOutput());
+  mapper->SetInputConnection(ground->GetOutputPort(0));
   vtkProperty* prop = vtkProperty::New();
   prop->SetRepresentation(VTK_WIREFRAME);
   prop->SetColor(0.8, 0.8, 0.8);
