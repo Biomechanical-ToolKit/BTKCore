@@ -2,6 +2,8 @@
 #define DelsysEMGFileReaderTest_h
 
 #include <btkAcquisitionFileReader.h>
+#include <btkDelsysEMGFileIO.h>
+#include <btkConvert.h>
 
 CXXTEST_SUITE(DelsysEMGFileReaderTest)
 {
@@ -27,7 +29,16 @@ CXXTEST_SUITE(DelsysEMGFileReaderTest)
 
     btk::DelsysEMGFileIO::Pointer io = static_pointer_cast<btk::DelsysEMGFileIO>(reader->GetAcquisitionIO());
     TS_ASSERT_EQUALS(io->GetFileVersion(),3);
-    TS_WARN("Need more tests to validate the content of the acquisition.");
+    
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(),8);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(),60000);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(),2000);
+    for (int i = 0 ; i < 8; ++i)
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel(), "EMG Ch" + btk::ToString(i+1));
+    TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues().coeff(0), 1.6327e-5, 1e-9);
+    TS_ASSERT_DELTA(acq->GetAnalog(2)->GetValues().coeff(29999), 3.4180e-5, 1e-9);
+    TS_ASSERT_DELTA(acq->GetAnalog(5)->GetValues().coeff(12000), 3.4180e-5, 1e-9)
+    TS_ASSERT_DELTA(acq->GetAnalog(7)->GetValues().coeff(59999), 4.3945e-5, 1e-9);
   };
 };
 
