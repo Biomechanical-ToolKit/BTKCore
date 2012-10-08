@@ -173,8 +173,14 @@ namespace btk
     }
     if (this->m_Modified)
     {
+      unsigned long int ts = this->GetTimestamp();
       this->GenerateData();
       this->Object::Modified();
+      for (size_t inc = 0 ; inc < this->m_Outputs.size() ; ++inc)
+      {
+        if ((this->m_Outputs[inc].get() != 0) && (this->m_Outputs[inc]->GetTimestamp() > ts))
+          this->m_Outputs[inc]->m_Timestamp = this->m_Timestamp;
+      }
       this->m_Modified = false;
     }
     this->m_Updating = false;
@@ -367,7 +373,7 @@ namespace btk
   void ProcessObject::Modified()
   {
     this->m_Modified = true;
-    this->Object::Modified();
+    // this->Object::Modified();
   };
   
   /**
