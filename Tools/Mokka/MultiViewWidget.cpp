@@ -968,7 +968,13 @@ void MultiViewWidget::appendNewSegments(const QList<int>& ids, const QList<Segme
   {
     colors[inc] = (*it)->color;
     if (ids[inc] >= segmentsFramesSource->GetNumberOfDefinitions())
-      segmentsFramesSource->AppendDefinition((*it)->mesh, (*it)->surfaceVisible);
+    {
+      int id = segmentsFramesSource->AppendDefinition((*it)->mesh, (*it)->surfaceVisible);
+      if (id != ids[inc])
+        qDebug("The generated segment's ID in VTK is not the same than in Qt...");
+      else
+        segmentsFramesSource->SetSegmentVisibility(id, (*it)->visible);
+    }
     else
     {
       segmentsFramesSource->SetDefinition(ids[inc], (*it)->mesh);
