@@ -126,7 +126,6 @@ SET(Mokka_UI
   TimeEventControlerWidget.ui
   Tools/AnalogToolOptionDialog.ui
   Tools/GaitEventDetectionDialog.ui
-  Tools/RemoveAnalogOffsetDialog.ui
   UpdateManagerNewVersionDialog.ui
   UpdateManagerInstallerDialog.ui
   )
