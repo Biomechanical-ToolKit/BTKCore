@@ -81,6 +81,7 @@ AnalogToolOptionDialog::AnalogToolOptionDialog(const QString& toolName, QWidget*
 void AnalogToolOptionDialog::initialize(const QList<int>& selectedAnalogIds, const Acquisition* const acq)
 {
   QSettings settings;
+  int lastProcessing = settings.value(this->m_ToolSettingsPath + "lastProcessing").toInt();
   QStringList lastChannelsSelection = settings.value(this->m_ToolSettingsPath + "lastChannelsSelection").toStringList();
   QIcon analogIcon(QString::fromUtf8(":/Resources/Images/chart_line.png"));
   
@@ -111,7 +112,12 @@ void AnalogToolOptionDialog::initialize(const QList<int>& selectedAnalogIds, con
   
   if (acq->analogs().count() > 18)
     this->resize(this->width(),640);
-    
+  
+  if (lastProcessing == 0)
+    this->overwriteAnalogsButton->setChecked(true);
+  else
+    this->createAnalogsButton->setChecked(true);
+  
   this->initializeOptions(acq);
 };
 

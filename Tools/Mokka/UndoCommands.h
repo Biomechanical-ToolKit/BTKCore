@@ -394,6 +394,22 @@ private:
   void action();
 };
 
+// --------------- CreateAnalogs ---------------
+class CreateAnalogs : public AcquisitionUndoCommand
+{
+public:
+  CreateAnalogs(Acquisition* acq, const QList<int>& ids, btk::AnalogCollection::Pointer analogs, QUndoCommand* parent = 0);
+  ~CreateAnalogs();
+  virtual void undo();
+  virtual void redo();
+  
+private:
+  Acquisition* mp_Acquisition;
+  QList<int> m_Ids;
+  QList<Analog*> m_Analogs;
+  btk::AnalogCollection::Pointer mp_BTKAnalogs;
+};
+
 // ----------------------------------------------- //
 //                   EVENT EDITION                 //
 // ----------------------------------------------- //

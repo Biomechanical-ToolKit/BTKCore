@@ -213,6 +213,42 @@ void EditMarkersColor::action()
   this->m_Colors = temp;
 };
 
+// --------------- EditMarkersVisibility ---------------
+EditMarkersVisibility::EditMarkersVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
+{
+  this->mp_Acquisition = acq;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Visibles[i] = visible;
+};
+
+void EditMarkersVisibility::action()
+{
+  QVector<bool> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Acquisition->markerVisible(this->m_Ids[i]);
+  this->mp_Acquisition->setMarkersVisible(this->m_Ids, this->m_Visibles);
+  this->m_Visibles = temp;
+};
+
+// --------------- EditMarkersTrajectoryVisibility ---------------
+EditMarkersTrajectoryVisibility::EditMarkersTrajectoryVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent)
+: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
+{
+  this->mp_Acquisition = acq;
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    this->m_Visibles[i] = visible;
+};
+
+void EditMarkersTrajectoryVisibility::action()
+{
+  QVector<bool> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = this->mp_Acquisition->markerTrajectoryVisible(this->m_Ids[i]);
+  this->mp_Acquisition->setMarkersTrajectoryVisible(this->m_Ids, this->m_Visibles);
+  this->m_Visibles = temp;
+};
+
 // --------------- RemovePoints ---------------
 RemovePoints::RemovePoints(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Ids(ids), m_Points()
@@ -362,42 +398,6 @@ void ShiftAnalogsValues::action()
   this->m_Offsets = temp;
 };
 
-// --------------- EditMarkersVisibility ---------------
-EditMarkersVisibility::EditMarkersVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent)
-: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
-{
-  this->mp_Acquisition = acq;
-  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
-    this->m_Visibles[i] = visible;
-};
-
-void EditMarkersVisibility::action()
-{
-  QVector<bool> temp(this->m_Ids.count());
-  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
-    temp[i] = this->mp_Acquisition->markerVisible(this->m_Ids[i]);
-  this->mp_Acquisition->setMarkersVisible(this->m_Ids, this->m_Visibles);
-  this->m_Visibles = temp;
-};
-
-// --------------- EditMarkersTrajectoryVisibility ---------------
-EditMarkersTrajectoryVisibility::EditMarkersTrajectoryVisibility(Acquisition* acq, const QVector<int>& ids, bool visible, QUndoCommand* parent)
-: ConfigurationUndoCommand(parent), m_Ids(ids), m_Visibles(ids.count())
-{
-  this->mp_Acquisition = acq;
-  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
-    this->m_Visibles[i] = visible;
-};
-
-void EditMarkersTrajectoryVisibility::action()
-{
-  QVector<bool> temp(this->m_Ids.count());
-  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
-    temp[i] = this->mp_Acquisition->markerTrajectoryVisible(this->m_Ids[i]);
-  this->mp_Acquisition->setMarkersTrajectoryVisible(this->m_Ids, this->m_Visibles);
-  this->m_Visibles = temp;
-};
-
 // --------------- RemoveAnalogs ---------------
 RemoveAnalogs::RemoveAnalogs(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Ids(ids), m_Analogs()
@@ -420,6 +420,45 @@ void RemoveAnalogs::undo()
 void RemoveAnalogs::redo()
 {
   this->m_Analogs = this->mp_Acquisition->takeAnalogs(this->m_Ids);
+};
+
+// --------------- CreateAnalogs  ---------------
+CreateAnalogs::CreateAnalogs(Acquisition* acq, const QList<int>& ids, btk::AnalogCollection::Pointer analogs, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent), m_Ids(ids), m_Analogs(), mp_BTKAnalogs(analogs)
+{
+  this->mp_Acquisition = acq;
+  int num = acq->btkAcquisition()->GetAnalogs()->GetItemNumber();
+  for (btk::AnalogCollection::Iterator it = this->mp_BTKAnalogs->Begin() ; it != this->mp_BTKAnalogs->End() ; ++it)
+  {
+    Analog* a = Analog::fromBtkAnalog(*it);
+    a->btkidx = num++;
+    this->m_Analogs.push_back(a);
+  }
+};
+
+CreateAnalogs::~CreateAnalogs()
+{
+  for (int i = 0 ; i < this->m_Analogs.count() ; ++i)
+    delete this->m_Analogs[i];
+};
+
+void CreateAnalogs::undo()
+{
+  for (btk::AnalogCollection::Iterator it = this->mp_BTKAnalogs->Begin() ; it != this->mp_BTKAnalogs->End() ; ++it)
+  {
+    int idx = this->mp_Acquisition->btkAcquisition()->GetAnalogs()->GetIndexOf(*it);
+    if (idx != -1)
+      this->mp_Acquisition->btkAcquisition()->GetAnalogs()->RemoveItem(idx);
+  }
+  this->m_Analogs = this->mp_Acquisition->takeAnalogs(this->m_Ids);
+};
+
+void CreateAnalogs::redo()
+{
+  for (btk::AnalogCollection::Iterator it = this->mp_BTKAnalogs->Begin() ; it != this->mp_BTKAnalogs->End() ; ++it)
+    this->mp_Acquisition->btkAcquisition()->GetAnalogs()->InsertItem(*it);
+  this->mp_Acquisition->insertAnalogs(this->m_Ids, this->m_Analogs);
+  this->m_Analogs.clear();
 };
 
 // ----------------------------------------------- //
