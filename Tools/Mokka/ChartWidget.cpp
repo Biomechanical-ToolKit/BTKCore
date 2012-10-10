@@ -1303,14 +1303,14 @@ bool AnalogChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointe
 {
   *layoutModified = false;
   int id = item->data(0, AnalogId).toInt();
-  if (id >= acq->analogCount())
+  if (acq->analogs().find(id) == acq->analogs().end())
   {
     qDebug("Analog ID greater than the number of analog channels.");
     return false;
   }
   else if (this->isAlreadyPlotted(id))
     return false;
-  btk::Analog::Pointer analog = acq->btkAcquisition()->GetAnalog(id);
+  btk::Analog::Pointer analog = acq->btkAcquisition()->GetAnalog(acq->analogs().value(id)->btkidx);
   vtkTable* table = vtkTable::New();
   table->SetNumberOfRows(acq->analogFrameNumber()); // Must be set before adding column
   table->AddColumn(this->mp_Frames);

@@ -1786,7 +1786,7 @@ void MainWindow::exportASCII()
           {
             QTreeWidgetItem* item = exporterDlg.analogsTreeWidget->topLevelItem(0)->child(i);
             if ((item->checkState(0) == Qt::Checked) && !item->isHidden())
-              analogs->InsertItem(this->mp_Acquisition->btkAcquisition()->GetAnalog(item->data(0,AnalogId).toInt()));
+              analogs->InsertItem(this->mp_Acquisition->btkAcquisition()->GetAnalog(this->mp_Acquisition->analogs().value(item->data(0,AnalogId).toInt())->btkidx));
           }
         }
         if (exporterDlg.writeEventsCheckBox->checkState() == Qt::Checked)

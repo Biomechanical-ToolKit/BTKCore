@@ -57,6 +57,7 @@
 
 struct Point
 {
+  // TODO: static Point* fromBtkPoint(btk::Point::Pointer point)
   typedef enum {Marker, VirtualMarker, VirtualMarkerForFrame, Angle, Force, Moment, Power, Scalar} Type;
   QString label;
   QString description;
@@ -70,6 +71,7 @@ struct Point
 
 struct Analog
 {
+  static Analog* fromBtkAnalog(btk::Analog::Pointer analog);
   typedef enum {Unknown = 0, PlusMinus10 = 1, PlusMinus5 = 2, PlusMinus2Dot5 = 3, PlusMinus1Dot25 = 4, 
                 PlusMinus1 = 5, PlusMinus0Dot5 = 6, PlusMinus0Dot25 = 7, PlusMinus0Dot1 = 8, PlusMinus0Dot05 = 9} Gain;
   QString label;
@@ -78,10 +80,12 @@ struct Analog
   Gain gain;
   int offset;
   double scale;
+  int btkidx;
 };
 
 struct Event
 {
+  // TODO: static Event* fromBtkPoint(btk::Event::Pointer event)
   QString label;
   QString description;
   QString context;
@@ -192,6 +196,7 @@ public:
   QList<Analog*> takeAnalogs(const QList<int>& ids);
   void insertAnalogs(const QList<int>& ids, const QList<Analog*> analogs);
   void shiftAnalogsValues(const QVector<int>& ids, const QVector<double>& offsets);
+  int generateNewAnalogId();
   
   bool hasEvents() const {return !this->m_Events.empty();};
   int eventCount() const {return this->m_Events.count();};
@@ -277,6 +282,7 @@ private:
   QMap<int,Point*> m_Points;
   int m_LastPointId;
   QMap<int,Analog*> m_Analogs;
+  int m_LastAnalogId;
   QMap<int,Event*> m_Events;
   int m_LastEventId;
   QMap<int,Video*> m_Videos;

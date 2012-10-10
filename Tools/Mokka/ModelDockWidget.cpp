@@ -2676,13 +2676,30 @@ void ModelDockWidget::removeAnalogs(const QList<int>& ids, const QList<Analog*>&
   }
 };
 
-// TODO: Think about the case where analog channels are created instead of hidden!
 void ModelDockWidget::insertAnalogs(const QList<int>& ids, const QList<Analog*>& analogs)
 {
-  Q_UNUSED(analogs);
   QTreeWidgetItem* analogsRoot = this->modelTree->topLevelItem(AnalogsItem);
+  int childCount = analogsRoot->childCount();
+  bool selectionCleared = false;
   for (int i = 0 ; i < ids.count() ; ++i)
-    analogsRoot->child(ids[i])->setHidden(false);
+  {
+    // New
+    if (ids[i] >= childCount)
+    {
+      QTreeWidgetItem* analog = this->createAnalogItem(analogs[i]->label, ids[i]);
+      analogsRoot->addChild(analog);
+      if (!selectionCleared)
+      {
+        this->modelTree->clearSelection();
+        selectionCleared = true;
+      }
+      analog->setSelected(true);
+      this->modelTree->scrollToItem(analog);
+    }
+    // Hidden
+    else
+      analogsRoot->child(ids[i])->setHidden(false);
+  }
   this->refresh();
 };
 

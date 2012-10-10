@@ -50,6 +50,52 @@
 #include <QFileInfo>
 #include <QDir>
 
+Analog* Analog::fromBtkAnalog(btk::Analog::Pointer analog)
+{
+  Analog* a = new Analog;
+  a->label = QString::fromStdString(analog->GetLabel());
+  a->description = QString::fromStdString(analog->GetDescription());
+  a->unit = QString::fromStdString(analog->GetUnit());
+  switch(analog->GetGain())
+  {
+  case btk::Analog::Unknown:
+    a->gain = Analog::Unknown;
+    break;
+  case btk::Analog::PlusMinus10:
+    a->gain = Analog::PlusMinus10;
+    break;
+  case btk::Analog::PlusMinus5:
+    a->gain = Analog::PlusMinus5;
+    break;
+  case btk::Analog::PlusMinus2Dot5:
+    a->gain = Analog::PlusMinus2Dot5;
+    break;
+  case btk::Analog::PlusMinus1Dot25:
+    a->gain = Analog::PlusMinus1Dot25;
+    break;
+  case btk::Analog::PlusMinus1:
+    a->gain = Analog::PlusMinus1;
+    break;
+  case btk::Analog::PlusMinus0Dot5:
+    a->gain = Analog::PlusMinus0Dot5;
+    break;
+  case btk::Analog::PlusMinus0Dot25:
+    a->gain = Analog::PlusMinus0Dot25;
+    break;
+  case btk::Analog::PlusMinus0Dot1:
+    a->gain = Analog::PlusMinus0Dot1;
+    break;
+  case btk::Analog::PlusMinus0Dot05:
+    a->gain = Analog::PlusMinus0Dot05;
+    break;
+  }
+  a->offset = analog->GetOffset();
+  a->scale = analog->GetScale();
+  return a;
+};
+
+// ------------------------------------------------------------------------- //
+
 Acquisition::Acquisition(QObject* parent)
 : QObject(parent), mp_BTKAcquisition(), m_BTKProcesses(), m_Filename(),
   m_Points(), m_Analogs(), m_Events(), m_DefaultMarkerColor(Qt::white)
@@ -59,6 +105,7 @@ Acquisition::Acquisition(QObject* parent)
   this->mp_ROI[0] = this->m_FirstFrame;
   this->mp_ROI[1] = this->m_LastFrame;
   this->m_LastPointId = -1;
+  this->m_LastAnalogId = -1;
   this->m_LastEventId = -1;
   this->m_LastVideoId = -1;
   this->m_DefaultMarkerRadius = 8.0; // mm
@@ -319,6 +366,7 @@ void Acquisition::clear()
     delete *it;
   this->m_Videos.clear();
   this->m_LastPointId = -1;
+  this->m_LastAnalogId = -1;
   this->m_LastEventId = -1;
   this->m_LastVideoId = -1;
   this->mp_BTKAcquisition = btk::Acquisition::Pointer(); // NULL
@@ -741,6 +789,12 @@ void Acquisition::shiftAnalogsValues(const QVector<int>& ids, const QVector<doub
   emit analogsValuesChanged(ids);
 };
 
+int Acquisition::generateNewAnalogId()
+{
+  this->m_LastAnalogId += 1;
+  return this->m_LastAnalogId;
+};
+
 const Event* Acquisition::eventAt(int id) const
 {
   QMap<int,Event*>::const_iterator it = this->m_Events.find(id);
@@ -1089,7 +1143,7 @@ bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
       gain = btk::Analog::PlusMinus1Dot25;
     else if (a->gain == Analog::PlusMinus1)
       gain = btk::Analog::PlusMinus1;
-    btk::Analog::Pointer sourceA = sourceAnalogs->GetItem(it.key());
+    btk::Analog::Pointer sourceA = sourceAnalogs->GetItem(a->btkidx);
     btk::Analog::Pointer targetA = btk::Analog::New(a->label.toStdString(), numFrameAnalog);
     targetA->SetUnit(a->unit.toStdString());
     targetA->SetGain(gain);
@@ -1233,50 +1287,15 @@ void Acquisition::loadAcquisition()
     this->m_Points.insert(32767 + inc++, p); // 32767: To distinct clearly the markers from the others points.
   }
   // Analog
-  inc = 0;
+  inc = -1;
   for (btk::Acquisition::AnalogIterator it = this->mp_BTKAcquisition->BeginAnalog() ; it != this->mp_BTKAcquisition->EndAnalog() ; ++it)
   {
-    Analog* a = new Analog();
-    a->label = QString::fromStdString((*it)->GetLabel());
-    a->description = QString::fromStdString((*it)->GetDescription());
-    a->unit = QString::fromStdString((*it)->GetUnit());
-    switch((*it)->GetGain())
-    {
-    case btk::Analog::Unknown:
-      a->gain = Analog::Unknown;
-      break;
-    case btk::Analog::PlusMinus10:
-      a->gain = Analog::PlusMinus10;
-      break;
-    case btk::Analog::PlusMinus5:
-      a->gain = Analog::PlusMinus5;
-      break;
-    case btk::Analog::PlusMinus2Dot5:
-      a->gain = Analog::PlusMinus2Dot5;
-      break;
-    case btk::Analog::PlusMinus1Dot25:
-      a->gain = Analog::PlusMinus1Dot25;
-      break;
-    case btk::Analog::PlusMinus1:
-      a->gain = Analog::PlusMinus1;
-      break;
-    case btk::Analog::PlusMinus0Dot5:
-      a->gain = Analog::PlusMinus0Dot5;
-      break;
-    case btk::Analog::PlusMinus0Dot25:
-      a->gain = Analog::PlusMinus0Dot25;
-      break;
-    case btk::Analog::PlusMinus0Dot1:
-      a->gain = Analog::PlusMinus0Dot1;
-      break;
-    case btk::Analog::PlusMinus0Dot05:
-      a->gain = Analog::PlusMinus0Dot05;
-      break;
-    }
-    a->offset = (*it)->GetOffset();
-    a->scale = (*it)->GetScale();
-    this->m_Analogs.insert(inc++, a);
+    ++inc;
+    Analog* a = Analog::fromBtkAnalog(*it);
+    a->btkidx = inc;
+    this->m_Analogs.insert(inc, a);
   }
+  this->m_LastAnalogId = inc;
   // Event
   inc = -1;
   for (btk::Acquisition::EventIterator it = this->mp_BTKAcquisition->BeginEvent() ; it != this->mp_BTKAcquisition->EndEvent() ; ++it)
