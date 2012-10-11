@@ -800,7 +800,7 @@ bool ChartWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item)
 
 void ChartWidget::discardPlots(int chartType, const QList<int>& itemIds, bool discarded)
 {
-  QList<AbstractChartData::PlotProperties>::const_iterator itProp = this->m_ChartData[chartType]->plotsProperties().begin();
+  QList<AbstractChartData::PlotProperties>::iterator itProp = this->m_ChartData[chartType]->plotsProperties().begin();
   QList<int>::const_iterator itId = itemIds.begin();
   int index = 0;
   bool regenerateChartsLayout = false;
@@ -810,9 +810,8 @@ void ChartWidget::discardPlots(int chartType, const QList<int>& itemIds, bool di
     if (itProp->id == *itId)
     {
       bool layoutModified = false;
-      AbstractChartData::PlotProperties* prop = &(this->m_ChartData[chartType]->plotsProperties()[index]);
-      this->m_ChartData[chartType]->setPlotVisible(index, (discarded ? false : prop->visible), &layoutModified);
-      prop->discarded = discarded;
+      this->m_ChartData[chartType]->setPlotVisible(index, (discarded ? false : itProp->visible), &layoutModified);
+      itProp->discarded = discarded;
       regenerateChartsLayout |= layoutModified;
       found = true;
     }
@@ -833,9 +832,10 @@ void ChartWidget::discardPlots(int chartType, const QList<int>& itemIds, bool di
   if (this->m_CurrentChartType == chartType)
   {
     if (regenerateChartsLayout)
+    {
       this->m_ChartData[this->m_CurrentChartType]->layout()->UpdateLayout();
-    else
-      this->checkResetAxes();
+    }
+    this->checkResetAxes();
     this->updateOptions();
     this->render();
   }
@@ -1074,7 +1074,6 @@ void AbstractChartData::setFrameArray(vtkDoubleArray* array)
 void AbstractChartData::setPlotVisible(int index, bool show, bool* layoutModified)
 {
   *layoutModified = false;
-  this->m_PlotsProperties[index].discarded = !show;
   for (int i = 0 ; i < this->chartNumber() ; ++i)
     this->chart(i)->GetPlot(index)->SetVisible(show);
 };
@@ -1359,7 +1358,6 @@ void AnalogChartData::setPlotVisible(int index, bool show, bool* layoutModified)
   else
   {
     *layoutModified = true;
-    this->m_PlotsProperties[index].visible = show;
     this->chart(index)->GetPlot(0)->SetVisible(show);
     this->chart(index)->SetVisible(show);
  
@@ -1424,6 +1422,7 @@ void AnalogChartData::hidePlot(int index, bool isHidden, bool* layoutModified)
     btk::VTKChartTimeSeries* chart = this->chart(index);
     chart->SetVisible(!isHidden);
     chart->GetPlot(0)->SetVisible(!isHidden);
+    this->m_PlotsProperties[index].visible = !isHidden;
     
     bool anyChartVisible = false;
     for (int i = 0 ; i < this->chartNumber() ; ++i)
