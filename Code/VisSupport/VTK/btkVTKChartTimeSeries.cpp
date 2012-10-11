@@ -687,18 +687,20 @@ namespace btk
    */
   bool VTKChartTimeSeries::Hit(const vtkContextMouseEvent &mouse)
   {
+    
     vtkVector2i pos(mouse.ScreenPos);
-    if (pos[0] > this->Point1[0] &&
-        pos[0] < this->Point2[0] &&
-        pos[1] > this->Point1[1] &&
-        pos[1] < this->Point2[1])
-      {
+    if (this->GetVisible() &&
+        (pos[0] > this->Point1[0]) &&
+        (pos[0] < this->Point2[0]) &&
+        (pos[1] > this->Point1[1]) &&
+        (pos[1] < this->Point2[1]))
+    {
       return true;
-      }
+    }
     else
-      {
+    {
       return false;
-      }
+    }
   }
 
   /**
@@ -708,7 +710,8 @@ namespace btk
   {
     vtkRectf size = this->GetSize();
     vtkVector2i pos(mouse.ScreenPos);
-    if ((pos[0] > size.GetX()) && (pos[1] > size.GetY()) &&
+    if (this->GetVisible() &&
+        (pos[0] > size.GetX()) && (pos[1] > size.GetY()) &&
         (pos[0] < (size.GetX() + size.GetWidth())) && (pos[1] < (size.GetY() + size.GetHeight())))
     {
       return true;
