@@ -164,6 +164,7 @@ namespace btk
     this->mp_AxisX->SetRange(this->mp_AxisX->GetMinimumLimit(), this->mp_AxisX->GetMaximumLimit());
     this->mp_AxisY->SetRange(this->mp_AxisY->GetMinimumLimit(), this->mp_AxisY->GetMaximumLimit());
     this->m_PlotsTransformValid = false;
+    this->m_ChartBoundsValid = true;
     if (this->Scene != NULL) this->Scene->SetDirty(true);
   };
   
