@@ -858,10 +858,7 @@ void ChartWidget::checkResetAxes()
     chart->SetInteractionEnabled(plotVisible);
     // Force the chart to draw ticks for the X axis.
     if (!plotVisible)
-    {
-      chart->RecalculateBounds(); // Needed as the flag to recompute the bounds was activated (and force the limits to 0.0)
       chart->SetBounds((double)this->mp_Acquisition->firstFrame(), (double)this->mp_Acquisition->lastFrame(), 0.0, 0.0);
-    }
   }
 };
 
@@ -967,7 +964,6 @@ void AbstractChartData::copy(AbstractChartData* source)
     targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
     targetChart->SetRegionOfInterestFunctor(sourceChart->GetRegionOfInterestFunctor());
     targetChart->SetEventsFunctor(sourceChart->GetEventsFunctor());
-    targetChart->RecalculateBounds(); // Because the flag to compute the bounds is activated by default and erase the given values.
     targetChart->SetBounds(sourceAxisX->GetMinimumLimit(), sourceAxisX->GetMaximumLimit(), 0.0, 0.0);
   }
 }
@@ -1510,7 +1506,6 @@ btk::VTKChartTimeSeries* AnalogChartData::createChart(btk::VTKChartTimeSeries* s
   targetChart->SetEventsFunctor(sourceChart->GetEventsFunctor());
   targetChart->DisplayEventsOn();
   targetChart->SetColorSeries(sourceChart->GetColorSeries());
-  targetChart->RecalculateBounds(); // Because the flag to compute the bounds is activated by default and erase the given values.
   targetChart->SetBounds(sourceAxisX->GetMinimumLimit(), sourceAxisX->GetMaximumLimit(), 0.0, 0.0);
   int idx = this->chartNumber();
   this->mp_ChartLayout->SetSize(vtkVector2i(1,idx+1));
