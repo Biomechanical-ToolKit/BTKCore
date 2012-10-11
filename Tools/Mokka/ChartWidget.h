@@ -130,16 +130,16 @@ public slots:
   void toggleEventDisplay();
   // Point specific
   void updatePointPlotLabel(int itemId);
-  void hidePointPlots(const QList<int>& itemIds);
-  void showPointPlots(const QList<int>& itemIds);
+  void discardPointPlots(const QList<int>& itemIds);
+  void undiscardPointPlots(const QList<int>& itemIds);
   void displayPointComponentX(int state);
   void displayPointComponentY(int state);
   void displayPointComponentZ(int state);
   // Analog specific
   void updateAnalogPlotLabel(int itemId);
   void updateAnalogPlotsLabel(const QVector<int>& itemIds);
-  void hideAnalogPlots(const QList<int>& itemIds);
-  void showAnalogPlots(const QList<int>& itemIds);
+  void discardAnalogPlots(const QList<int>& itemIds);
+  void undiscardAnalogPlots(const QList<int>& itemIds);
   void setExpandableAnalog(int expandable);
   
 signals:
@@ -155,7 +155,7 @@ protected:
   void dropEvent(QDropEvent* event);
   
   bool appendPlotFromDroppedItem(QTreeWidgetItem* item);
-  void setPlotsVisible(int chartType, const QList<int>& itemIds, bool show);
+  void discardPlots(int chartType, const QList<int>& itemIds, bool discarded);
   void checkResetAxes();
   void updatePlotLabel(int chartType, int itemId);
   void displayPointComponent(int idx, int state);
@@ -189,6 +189,7 @@ public:
     double lineWidth;
     int id;
     bool visible;
+    bool discarded;
   };
   
   AbstractChartData(int num);

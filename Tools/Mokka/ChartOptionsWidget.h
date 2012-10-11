@@ -51,7 +51,7 @@ public:
   
   ChartOptionsWidget(QWidget* parent = 0);
   
-  void setPlot(int rowIdx, const QString& label, const QColor& color, double width, bool visible);
+  void setPlot(int rowIdx, const QString& label, const QColor& color, double width, bool visible, bool discarded);
   void clear();
   void setPlotOptionEnabled(bool enabled);
   QList<int> selectedPlots() const;

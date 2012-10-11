@@ -255,13 +255,13 @@ void ChartWidget::setAcquisition(Acquisition* acq)
   connect(this->mp_Acquisition, SIGNAL(regionOfInterestChanged(int, int)), this, SLOT(updateAxisX(int,int)));
   // Point
   connect(this->mp_Acquisition, SIGNAL(pointLabelChanged(int, QString)), this, SLOT(updatePointPlotLabel(int)));
-  connect(this->mp_Acquisition, SIGNAL(pointsRemoved(QList<int>, QList<Point*>)), this, SLOT(hidePointPlots(QList<int>)));
-  connect(this->mp_Acquisition, SIGNAL(pointsInserted(QList<int>, QList<Point*>)), this, SLOT(showPointPlots(QList<int>)));
+  connect(this->mp_Acquisition, SIGNAL(pointsRemoved(QList<int>, QList<Point*>)), this, SLOT(discardPointPlots(QList<int>)));
+  connect(this->mp_Acquisition, SIGNAL(pointsInserted(QList<int>, QList<Point*>)), this, SLOT(undiscardPointPlots(QList<int>)));
   // Analog
   connect(this->mp_Acquisition, SIGNAL(analogLabelChanged(int, QString)), this, SLOT(updateAnalogPlotLabel(int)));
   connect(this->mp_Acquisition, SIGNAL(analogsUnitChanged(QVector<int>, QVector<QString>)), this, SLOT(updateAnalogPlotsLabel(QVector<int>)));
-  connect(this->mp_Acquisition, SIGNAL(analogsRemoved(QList<int>, QList<Analog*>)), this, SLOT(hideAnalogPlots(QList<int>)));
-  connect(this->mp_Acquisition, SIGNAL(analogsInserted(QList<int>, QList<Analog*>)), this, SLOT(showAnalogPlots(QList<int>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsRemoved(QList<int>, QList<Analog*>)), this, SLOT(discardAnalogPlots(QList<int>)));
+  connect(this->mp_Acquisition, SIGNAL(analogsInserted(QList<int>, QList<Analog*>)), this, SLOT(undiscardAnalogPlots(QList<int>)));
 };
 
 void ChartWidget::show(bool s)
@@ -606,14 +606,14 @@ void ChartWidget::updatePointPlotLabel(int itemId)
   this->updatePlotLabel(PointChart, itemId);
 };
 
-void ChartWidget::hidePointPlots(const QList<int>& itemIds)
+void ChartWidget::discardPointPlots(const QList<int>& itemIds)
 {
-  this->setPlotsVisible(PointChart, itemIds, false);
+  this->discardPlots(PointChart, itemIds, true);
 };
 
-void ChartWidget::showPointPlots(const QList<int>& itemIds)
+void ChartWidget::undiscardPointPlots(const QList<int>& itemIds)
 {
-  this->setPlotsVisible(PointChart, itemIds, true);
+  this->discardPlots(PointChart, itemIds, false);
 };
 
 void ChartWidget::displayPointComponentX(int state)
@@ -642,14 +642,14 @@ void ChartWidget::updateAnalogPlotsLabel(const QVector<int>& itemIds)
     this->updateAnalogPlotLabel(itemIds[i]);
 };
 
-void ChartWidget::hideAnalogPlots(const QList<int>& itemIds)
+void ChartWidget::discardAnalogPlots(const QList<int>& itemIds)
 {
-  this->setPlotsVisible(AnalogChart, itemIds, false);
+  this->discardPlots(AnalogChart, itemIds, true);
 };
 
-void ChartWidget::showAnalogPlots(const QList<int>& itemIds)
+void ChartWidget::undiscardAnalogPlots(const QList<int>& itemIds)
 {
-  this->setPlotsVisible(AnalogChart, itemIds, true);
+  this->discardPlots(AnalogChart, itemIds, false);
 };
 
 void ChartWidget::setExpandableAnalog(int expandable)
@@ -734,7 +734,7 @@ void ChartWidget::updateOptions()
   for (int i = 0 ; i < props->size(); ++i)
   {
     AbstractChartData::PlotProperties* prop = &(props->operator[](i));
-    this->mp_ChartOptions->setPlot(i, prop->label, prop->color, prop->lineWidth, prop->visible);
+    this->mp_ChartOptions->setPlot(i, prop->label, prop->color, prop->lineWidth, prop->visible, prop->discarded);
   }
 };
 
@@ -798,7 +798,7 @@ bool ChartWidget::appendPlotFromDroppedItem(QTreeWidgetItem* item)
 };
 
 
-void ChartWidget::setPlotsVisible(int chartType, const QList<int>& itemIds, bool show)
+void ChartWidget::discardPlots(int chartType, const QList<int>& itemIds, bool discarded)
 {
   QList<AbstractChartData::PlotProperties>::const_iterator itProp = this->m_ChartData[chartType]->plotsProperties().begin();
   QList<int>::const_iterator itId = itemIds.begin();
@@ -810,7 +810,9 @@ void ChartWidget::setPlotsVisible(int chartType, const QList<int>& itemIds, bool
     if (itProp->id == *itId)
     {
       bool layoutModified = false;
-      this->m_ChartData[chartType]->setPlotVisible(index, show, &layoutModified);
+      AbstractChartData::PlotProperties* prop = &(this->m_ChartData[chartType]->plotsProperties()[index]);
+      this->m_ChartData[chartType]->setPlotVisible(index, (discarded ? false : prop->visible), &layoutModified);
+      prop->discarded = discarded;
       regenerateChartsLayout |= layoutModified;
       found = true;
     }
@@ -828,23 +830,6 @@ void ChartWidget::setPlotsVisible(int chartType, const QList<int>& itemIds, bool
     if (itId == itemIds.end())
       break;
   }
-  // Update the boundaries
-  // for (int i = 0 ; i < static_cast<int>(this->m_ChartData[chartType]->chartNumber()) ; ++i)
-  // {
-  //   btk::VTKChartTimeSeries* chart = this->m_ChartData[chartType]->chart(i);
-  //   vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
-  //   vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
-  //   double rangeX[2] = {axisX->GetMinimum(), axisX->GetMaximum()};
-  //   double rangeY[2] = {axisY->GetMinimum(), axisY->GetMaximum()};
-  //   chart->RecalculateBounds();
-  //   double* bounds = chart->GetBounds();
-  //   axisX->SetRange(rangeX[0], rangeX[1]);
-  //   if (!show)
-  //     axisY->SetRange(std::max(rangeY[0], bounds[2]), std::min(rangeY[1], bounds[3]));
-  //   else
-  //     axisY->SetRange(std::min(rangeY[0], bounds[2]), std::max(rangeY[1], bounds[3]));
-  // }
-  // 
   if (this->m_CurrentChartType == chartType)
   {
     if (regenerateChartsLayout)
@@ -950,6 +935,7 @@ void AbstractChartData::appendPlotProperties(const QString& label, int id, const
   prop.color = color;
   prop.lineWidth = lineWidth;
   prop.visible = true;
+  prop.discarded = false;
   this->m_PlotsProperties.push_back(prop);
 };
 
@@ -1088,7 +1074,7 @@ void AbstractChartData::setFrameArray(vtkDoubleArray* array)
 void AbstractChartData::setPlotVisible(int index, bool show, bool* layoutModified)
 {
   *layoutModified = false;
-  this->m_PlotsProperties[index].visible = show;
+  this->m_PlotsProperties[index].discarded = !show;
   for (int i = 0 ; i < this->chartNumber() ; ++i)
     this->chart(i)->GetPlot(index)->SetVisible(show);
 };

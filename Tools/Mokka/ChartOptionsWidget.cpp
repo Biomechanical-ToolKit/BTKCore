@@ -94,25 +94,33 @@ ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
 #endif
 };
 
-void ChartOptionsWidget::setPlot(int rowIdx, const QString& label, const QColor& color, double width, bool visible)
+void ChartOptionsWidget::setPlot(int rowIdx, const QString& label, const QColor& color, double width, bool visible, bool discarded)
 {
   QTableWidgetItem* item = new QTableWidgetItem(this->createLineIcon(color, width), label);
   item->setData(LineColor, color);
   item->setData(LineWidth, width);
-  item->setData(ItemEnabled, true);
   item->setForeground(Qt::black);
   this->plotTable->setItem(rowIdx, 0, item);
   QPushButton* button = 0;
   button = new QPushButton("", this);
   button->setFlat(true);
-  button->setStyleSheet("QPushButton {image: url(:/Resources/Images/eye2.png);} QPushButton:pressed {image: url(:/Resources/Images/eye.png);} QPushButton:flat {border: none;}");
+  if (visible)
+  {
+    button->setStyleSheet("QPushButton {image: url(:/Resources/Images/eye2.png);} QPushButton:pressed {image: url(:/Resources/Images/eye.png);} QPushButton:flat {border: none;}");
+    item->setData(ItemEnabled, true);
+  }
+  else
+  {
+    button->setStyleSheet("QPushButton {image: url(:/Resources/Images/eye-blind2.png);} QPushButton:pressed {image: url(:/Resources/Images/eye-blind.png);} QPushButton:flat {border: none;}");
+    item->setData(ItemEnabled, false);
+  }
   this->plotTable->setCellWidget(rowIdx, 1, button);
   connect(button, SIGNAL(clicked()), this, SLOT(togglePlotVisibility()));
   button = new QPushButton("", this);
   button->setFlat(true);
   button->setStyleSheet("QPushButton {image: url(:/Resources/Images/plot_delete.png);} QPushButton:pressed {image: url(:/Resources/Images/plot_delete-down.png);} QPushButton:flat {border: none;}");
   this->plotTable->setCellWidget(rowIdx, 2, button);
-  this->plotTable->setRowHidden(rowIdx, !visible);
+  this->plotTable->setRowHidden(rowIdx, discarded);
   connect(button, SIGNAL(clicked()), this, SLOT(removePlot()));
 };
 
