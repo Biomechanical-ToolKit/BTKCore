@@ -55,6 +55,7 @@ SET(Mokka_CPP
   ToolsManager.cpp
   Tools/AnalogToolOptionDialog.cpp
   Tools/GaitEventDetection.cpp
+  Tools/RectifyAnalog.cpp
   Tools/RemoveAnalogOffset.cpp
   UndoCommands.cpp
   UpdateManager.cpp

@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud BarrÃ©
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,23 +32,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#include "Tools/RemoveAnalogOffset.h"
-#include "Tools/RectifyAnalog.h"
-#include "Tools/GaitEventDetection.h"
 
-void ToolsManager::init()
+#ifndef RectifyAnalog_h
+#define RectifyAnalog_h
+
+#include "../AbstractTool.h"
+
+class RectifyAnalog : public AbstractTool
 {
-  // MODEL
-  
-  // ACQUISITION
-  
-  // POINT 
-  
-  // ANALOG
-  RemoveAnalogOffset::RegisterTool(this);
-  RectifyAnalog::RegisterTool(this);
-  
-  // EVENT
-  GaitEventDetection::RegisterTool(this);
-}
+public:
+  static void RegisterTool(ToolsManager* manager);
+  RectifyAnalog(QWidget* parent = 0);
+  virtual bool run(ToolCommands* cmds, ToolsData* const data);
+};
+
+#endif // RectifyAnalog_h

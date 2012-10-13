@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud BarrÃ©
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,23 +32,53 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#include "Tools/RemoveAnalogOffset.h"
-#include "Tools/RectifyAnalog.h"
-#include "Tools/GaitEventDetection.h"
 
-void ToolsManager::init()
+#include "RectifyAnalog.h"
+#include "AnalogToolOptionDialog.h"
+#include "UndoCommands.h"
+
+void RectifyAnalog::RegisterTool(ToolsManager* manager)
 {
-  // MODEL
+  manager->addAnalogTool(tr("Rectification"), ToolFactory<RectifyAnalog>);
+};
+
+RectifyAnalog::RectifyAnalog(QWidget* parent)
+: AbstractTool("Rectify Analog", parent)
+{};
   
-  // ACQUISITION
-  
-  // POINT 
-  
-  // ANALOG
-  RemoveAnalogOffset::RegisterTool(this);
-  RectifyAnalog::RegisterTool(this);
-  
-  // EVENT
-  GaitEventDetection::RegisterTool(this);
-}
+bool RectifyAnalog::run(ToolCommands* cmds, ToolsData* const data)
+{
+  AnalogToolOptionDialog dialog("Rectify Analog", this->parentWidget());
+  dialog.initialize(data);
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    btk::AnalogCollection::Pointer analogs = btk::AnalogCollection::New();
+    QList<int> ids = dialog.extractSelectedAnalogChannels(analogs, "_Rfied", "Rectified", data, cmds); // Rfied: Rectified
+    
+    QString log;
+    QString log_;
+    if (ids.count() == 1)
+    {
+      log = "The channel ";
+      log_ = " was rectified.";
+    }
+    else
+    {
+      log = "The channels ";
+      log_ = " were rectified.";
+    }
+    int inc = 0;
+    QSharedPointer< QList<btk::Analog::Values> > values(new QList<btk::Analog::Values>());
+    for (btk::AnalogCollection::ConstIterator it = analogs->Begin() ; it != analogs->End() ; ++it)
+    {
+      values->push_back((*it)->GetValues().cwise().abs());
+      log += (inc != 0 ? ", " : "") + QString::fromStdString((*it)->GetLabel());
+      ++inc;
+    }
+    new SetAnalogsValues(data->acquisition(), ids, values, cmds->acquisitionCommand());
+    TOOL_LOG_INFO(log + log_);
+    return true;
+  }
+
+  return false;
+};
