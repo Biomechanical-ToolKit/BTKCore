@@ -38,9 +38,13 @@
 
 #include "ui_AnalogToolOptionDialog.h"
 
+#include <btkAnalogCollection.h>
+
 #include <QDialog>
 
-class Acquisition; 
+class ToolsData;
+class ToolCommands;
+class Acquisition;
 
 class QToolBox;
 
@@ -50,10 +54,15 @@ class AnalogToolOptionDialog : public QDialog, public Ui::AnalogToolOptionDialog
   
 public:
   AnalogToolOptionDialog(const QString& toolName, QWidget* parent = 0);
-  void initialize(const QList<int>& selectedAnalogIds, const Acquisition* const acq);
+  void initialize(ToolsData* data);
   
   const QString& toolName() {return this->m_ToolName;};
   const QString& toolSettingsPath() {return this->m_ToolSettingsPath;};
+  
+  QList<int> selectedAnalogIds() const;
+  QList<int> createAnalogChannels(const QString& labelSuffix, const QString& toolDetail, const QList<int>& ids, ToolsData* const data, ToolCommands* cmds) const;
+  QList<int> createAnalogChannels(btk::AnalogCollection::Pointer analogs, const QString& labelSuffix, const QString& toolDetail, const QList<int>& ids, ToolsData* const data, ToolCommands* cmds) const;
+  QList<int> extractSelectedAnalogChannels(btk::AnalogCollection::Pointer analogs, const QString& labelSuffix, const QString& toolDetail, ToolsData* const data, ToolCommands* cmds) const;
   
   void addOption(const QString& title, QWidget* content);
   

@@ -195,7 +195,7 @@ public:
   void setAnalogsScale(const QVector<int>& ids, const QVector<double>& scales);
   QList<Analog*> takeAnalogs(const QList<int>& ids);
   void insertAnalogs(const QList<int>& ids, const QList<Analog*> analogs);
-  void shiftAnalogsValues(const QVector<int>& ids, const QVector<double>& offsets);
+  void emitAnalogsValuesChanged(const QVector<int>& ids);
   int generateNewAnalogId();
   
   bool hasEvents() const {return !this->m_Events.empty();};

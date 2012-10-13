@@ -35,6 +35,8 @@
  
 #include "AnalogToolOptionDialog.h"
 #include "Acquisition.h"
+#include "../AbstractTool.h"
+#include "../UndoCommands.h"
 
 #include <QSettings>
 #include <QPushButton>
@@ -78,22 +80,25 @@ AnalogToolOptionDialog::AnalogToolOptionDialog(const QString& toolName, QWidget*
   connect(this, SIGNAL(accepted()), this, SLOT(saveSettings()));
 };
 
-void AnalogToolOptionDialog::initialize(const QList<int>& selectedAnalogIds, const Acquisition* const acq)
+void AnalogToolOptionDialog::initialize(ToolsData* data)
 {
   QSettings settings;
   int lastProcessing = settings.value(this->m_ToolSettingsPath + "lastProcessing").toInt();
   QStringList lastChannelsSelection = settings.value(this->m_ToolSettingsPath + "lastChannelsSelection").toStringList();
   QIcon analogIcon(QString::fromUtf8(":/Resources/Images/chart_line.png"));
   
+  QList<int> selectedAnalogIds = data->explorerSelectedItems(AnalogType);
+  Acquisition* acq = data->acquisition();
+  
   QFont f = this->treeWidget->font();
   f.setBold(true);
-
   QTreeWidgetItem* analogsRoot = new QTreeWidgetItem(QStringList(QString("Analog channels")));
   analogsRoot->setFont(0, f);
   analogsRoot->setIcon(0, analogIcon);
   analogsRoot->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsTristate);
   this->treeWidget->addTopLevelItem(analogsRoot);
-  for (QMap<int, Analog*>::const_iterator it = acq->analogs().begin() ; it != acq->analogs().end() ; ++it)
+  QTreeWidgetItem* visibleItem;
+  for (QMap<int, Analog*>::const_iterator it = data->acquisition()->analogs().begin() ; it != acq->analogs().end() ; ++it)
   {
     QTreeWidgetItem* analogItem = new QTreeWidgetItem(QStringList(it.value()->label));
     analogItem->setIcon(0, analogIcon);
@@ -104,11 +109,15 @@ void AnalogToolOptionDialog::initialize(const QList<int>& selectedAnalogIds, con
       analogItem->setCheckState(0, selectedAnalogIds.indexOf(it.key()) != -1 ? Qt::Checked : Qt::Unchecked);
     analogItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
     analogsRoot->addChild(analogItem);
+    if (analogItem->checkState(0) == Qt::Checked)
+      visibleItem = analogItem;
   }
   analogsRoot->setExpanded(true);
   
   if (analogsRoot->checkState(0) == Qt::Unchecked) // No analog channel founds
     analogsRoot->setCheckState(0, Qt::Checked);
+  else
+    this->treeWidget->scrollToItem(visibleItem);
   
   if (acq->analogs().count() > 18)
     this->resize(this->width(),640);
@@ -120,6 +129,84 @@ void AnalogToolOptionDialog::initialize(const QList<int>& selectedAnalogIds, con
   
   this->initializeOptions(acq);
 };
+
+QList<int> AnalogToolOptionDialog::selectedAnalogIds() const
+{
+  QList<int> ids;
+  QTreeWidgetItem* analogsRoot = this->treeWidget->topLevelItem(0);
+  for (int i = 0 ; i < analogsRoot->childCount() ; ++i)
+  {
+    QTreeWidgetItem* analogItem = analogsRoot->child(i);
+    if (analogItem->checkState(0) == Qt::Checked)
+      ids.push_back(analogItem->data(0, Qt::UserRole).toInt());
+  }
+  return ids;
+};
+
+QList<int> AnalogToolOptionDialog::createAnalogChannels(const QString& labelSuffix, const QString& toolDetail, const QList<int>& ids, ToolsData* const data, ToolCommands* cmds) const
+{
+  btk::AnalogCollection::Pointer temp; // NULL pointer to no get the created channels
+  return this->createAnalogChannels(temp, labelSuffix, toolDetail, ids, data, cmds);
+};
+
+QList<int> AnalogToolOptionDialog::createAnalogChannels(btk::AnalogCollection::Pointer analogs, const QString& labelSuffix, const QString& toolDetail, const QList<int>& ids, ToolsData* const data, ToolCommands* cmds) const
+{
+  QList<int> newIds;
+  if (this->createAnalogsButton->isChecked())
+  {
+    int analogNumber = data->acquisition()->btkAcquisition()->GetAnalogNumber();
+    btk::AnalogCollection::Pointer generatedAnalogs = btk::AnalogCollection::New();
+    std::string stdLabelSuffix = labelSuffix.toStdString();
+    std::string stdToolDetail = toolDetail.toStdString();
+    for (QList<int>::const_iterator itIdx = ids.begin() ; itIdx != ids.end() ; ++itIdx)
+    {
+      if (*itIdx >= analogNumber)
+      {
+        qDebug("Invalid analog ID. Impossible to use it to create new analog channel.");
+        continue;
+      }
+      btk::AnalogCollection::ConstIterator itA = data->acquisition()->btkAcquisition()->BeginAnalog();
+      std::advance(itA, *itIdx);
+      btk::Analog::Pointer analog = (*itA)->Clone();
+      std::string desc = "Generated from channel " + analog->GetLabel() + (stdToolDetail.empty() ? "" : " - " + stdToolDetail); 
+      analog->SetDescription(desc);
+      analog->SetLabel(analog->GetLabel() + stdLabelSuffix);
+      generatedAnalogs->InsertItem(analog);
+      if (analogs.get() != 0)
+        analogs->InsertItem(analog);
+      newIds.push_back(data->acquisition()->generateNewAnalogId());
+    }
+    if (!newIds.isEmpty())
+      new CreateAnalogs(data->acquisition(), newIds, generatedAnalogs, cmds->acquisitionCommand());
+  }
+  else
+  {
+    qDebug("Invalid command! The user didn't select the option to create analog channels.");
+  }
+  return newIds;
+};
+
+QList<int> AnalogToolOptionDialog::extractSelectedAnalogChannels(btk::AnalogCollection::Pointer analogs, const QString& labelSuffix, const QString& toolDetail, ToolsData* const data, ToolCommands* cmds) const
+{
+  QList<int> ids = this->selectedAnalogIds();
+  if (this->createAnalogsButton->isChecked())
+    ids = this->createAnalogChannels(analogs, labelSuffix, toolDetail, ids, data, cmds);
+  else
+  {
+    int numAnalogs = data->acquisition()->btkAcquisition()->GetAnalogNumber();
+    for (int i = 0 ; i < ids.count() ; ++i)
+    {
+      if (ids[i] < numAnalogs)
+      {
+        btk::AnalogCollection::Iterator it = data->acquisition()->btkAcquisition()->BeginAnalog();
+        std::advance(it, ids[i]);
+        analogs->InsertItem(*it);
+      }
+    }
+  }
+  return ids;
+};
+
 
 void AnalogToolOptionDialog::addOption(const QString& title, QWidget* content)
 {

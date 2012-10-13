@@ -382,7 +382,7 @@ private:
 class ShiftAnalogsValues : public AcquisitionUndoCommand
 {
 public:
-  ShiftAnalogsValues(Acquisition* acq, const QVector<int>& ids, const QVector<double>& offsets, QUndoCommand* parent = 0);
+  ShiftAnalogsValues(Acquisition* acq, const QList<int>& ids, const QList<double>& offsets, QUndoCommand* parent = 0);
   virtual void undo() {this->action();};
   virtual void redo() {this->action();};
   
@@ -390,6 +390,22 @@ private:
   Acquisition* mp_Acquisition;
   QVector<int> m_Ids;
   QVector<double> m_Offsets;
+  
+  void action();
+};
+
+// --------------- SetAnalogsValues ---------------
+class SetAnalogsValues : public AcquisitionUndoCommand
+{
+public:
+  SetAnalogsValues(Acquisition* acq, const QList<int>& ids, QSharedPointer< QList<btk::Analog::Values> > values, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QSharedPointer< QList<btk::Analog::Values> > mp_Values;
   
   void action();
 };

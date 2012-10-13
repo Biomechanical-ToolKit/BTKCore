@@ -60,7 +60,7 @@ RemoveAnalogOffset::RemoveAnalogOffset(Method m, QWidget* parent)
 bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
 {
   bool res = false;
-  QVector<int> ids;
+  QList<int> ids;
   btk::AnalogCollection::Pointer analogs;
   
   if (this->m_Method == FromReferenceFile)
@@ -83,7 +83,6 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
       QMessageBox error(QMessageBox::Warning, "File error", "Error occurred during the reading of the reference file.", QMessageBox::Ok, this->parentWidget());
       error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
       
-      QList<int> channelsIds;
       btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
       reader->SetFilename(filename.toStdString());
       try
@@ -96,7 +95,7 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
           if (reader->GetOutput()->FindAnalog((*it)->GetLabel()) != reader->GetOutput()->EndAnalog())
           {
             analogs->InsertItem(*it);
-            channelsIds.push_back(id);
+            ids.push_back(id);
           }
           ++id;
         }
@@ -119,24 +118,14 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
         error.exec();
         return false;
       }
-      ids = channelsIds.toVector();
     }
   }
   else if (this->m_Method == FromSelectedFrames)
   {
     RemoveAnalogOffsetDialog dialog(this->parentWidget());
-    dialog.initialize(data->explorerSelectedItems(AnalogType), data->acquisition());
+    dialog.initialize(data);
     if (dialog.exec() == QDialog::Accepted)
     {
-      QList<int> channelsIds;
-      QTreeWidgetItem* analogsRoot = dialog.treeWidget->topLevelItem(0);
-      for (int i = 0 ; i < analogsRoot->childCount() ; ++i)
-      {
-        QTreeWidgetItem* analogItem = analogsRoot->child(i);
-        if (analogItem->checkState(0) == Qt::Checked)
-          channelsIds.push_back(analogItem->data(0, Qt::UserRole).toInt());
-      }
-      
       QString descFrames = "all frames";
       int framesIndex[2] = {-1,-1};
       if (dialog.firstFramesButton->isChecked())
@@ -154,32 +143,21 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
         descFrames = "the " + QString::number(numberOfFrames) + " last frames";
       }
       
+      ids = dialog.selectedAnalogIds();
+      
       btk::SubAcquisitionFilter::Pointer subAnalogs = btk::SubAcquisitionFilter::New();
       subAnalogs->SetInput(data->acquisition()->btkAcquisition());
       subAnalogs->SetFramesIndex(framesIndex[0], framesIndex[1]);
-      subAnalogs->SetExtractionOption(btk::SubAcquisitionFilter::AnalogsOnly, channelsIds.toStdList());
+      subAnalogs->SetExtractionOption(btk::SubAcquisitionFilter::AnalogsOnly, ids.toStdList());
       subAnalogs->Update();
       analogs = subAnalogs->GetOutput()->GetAnalogs();
       
+      // Don't put this code before the sub acquisition filter, as the generated analog channels are not yet inserted in the acquisition. 
       if (dialog.createAnalogsButton->isChecked())
       {
-        btk::AnalogCollection::Pointer generatedAnalogs = btk::AnalogCollection::New();
-        ids.resize(channelsIds.size());
-        int inc = 0;
-        for (QList<int>::const_iterator itIdx = channelsIds.begin() ; itIdx != channelsIds.end() ; ++itIdx)
-        {
-          btk::AnalogCollection::ConstIterator itA = data->acquisition()->btkAcquisition()->BeginAnalog();
-          std::advance(itA, *itIdx);
-          btk::Analog::Pointer analog = (*itA)->Clone();
-          analog->SetDescription("Generated from channel " + analog->GetLabel() + " - Offset removed using " + descFrames.toStdString());
-          analog->SetLabel(analog->GetLabel() + "_OR");
-          generatedAnalogs->InsertItem(analog);
-          ids[inc++] = data->acquisition()->generateNewAnalogId();
-        }
-        new CreateAnalogs(data->acquisition(), ids.toList(), generatedAnalogs, cmds->acquisitionCommand());
+        QString toolDetail = "Offset removed using " + descFrames;
+        ids = dialog.createAnalogChannels("_OR", toolDetail, ids, data, cmds); // OR: Offset Removal
       }
-      else
-        ids = channelsIds.toVector();
     }
     else
       return false;
@@ -197,14 +175,12 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
       log = "A total of " + QString::number(ids.count()) + " offset was removed for the following channel:";
     else
       log = "A total of " + QString::number(ids.count()) + " offsets were removed for the following channels:";
-    QVector<double> offsets(ids.count());
-    int inc = 0;
+    QList<double> offsets;
     for (btk::AnalogCollection::ConstIterator it = analogs->Begin() ; it != analogs->End() ; ++it)
     {
       double dc = (*it)->GetValues().sum() / (*it)->GetValues().rows();
-      offsets[inc] = -1.0 * dc; // Because the undo command makes only a positive shift
+      offsets.push_back(-1.0 * dc); // Because the undo command makes only a positive shift
       log += "\n\t- " + QString::fromStdString((*it)->GetLabel()) + ": " + QString::number(dc) + " " + QString::fromStdString((*it)->GetUnit());
-      ++inc;
     }
     new ShiftAnalogsValues(data->acquisition(), ids, offsets, cmds->acquisitionCommand());
     res = true;

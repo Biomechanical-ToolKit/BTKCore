@@ -383,8 +383,8 @@ void EditAnalogsScale::action()
 };
 
 // --------------- ShiftAnalogsValues ---------------
-ShiftAnalogsValues::ShiftAnalogsValues(Acquisition* acq, const QVector<int>& ids, const QVector<double>& offsets, QUndoCommand* parent)
-: AcquisitionUndoCommand(parent), m_Ids(ids), m_Offsets(offsets)
+ShiftAnalogsValues::ShiftAnalogsValues(Acquisition* acq, const QList<int>& ids, const QList<double>& offsets, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent), m_Ids(ids.toVector()), m_Offsets(offsets.toVector())
 {
   this->mp_Acquisition = acq;
 };
@@ -394,9 +394,44 @@ void ShiftAnalogsValues::action()
   QVector<double> temp(this->m_Ids.count());
   for (int i = 0 ; i < this->m_Ids.count() ; ++i)
     temp[i] = -1.0 * this->m_Offsets[i];
-  this->mp_Acquisition->shiftAnalogsValues(this->m_Ids, this->m_Offsets);
+  int numAnalogs = this->mp_Acquisition->btkAcquisition()->GetAnalogNumber();
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+  {
+    if (this->m_Ids[i] < numAnalogs)
+    {
+      btk::AnalogCollection::Iterator it = this->mp_Acquisition->btkAcquisition()->BeginAnalog();
+      std::advance(it, this->m_Ids[i]);
+      (*it)->GetValues().cwise() += this->m_Offsets[i];
+      (*it)->Modified();
+    }
+  }  
   this->m_Offsets = temp;
+  this->mp_Acquisition->emitAnalogsValuesChanged(this->m_Ids);
 };
+
+// --------------- SetAnalogsValues ---------------
+
+SetAnalogsValues::SetAnalogsValues(Acquisition* acq, const QList<int>& ids, QSharedPointer< QList<btk::Analog::Values> > values, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent), m_Ids(ids.toVector()), mp_Values(values)
+{
+  this->mp_Acquisition = acq;
+};
+
+void SetAnalogsValues::action()
+{
+  int numAnalogs = this->mp_Acquisition->btkAcquisition()->GetAnalogNumber();
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+  {
+    if (this->m_Ids[i] < numAnalogs)
+    {
+      btk::AnalogCollection::Iterator it = this->mp_Acquisition->btkAcquisition()->BeginAnalog();
+      std::advance(it, this->m_Ids[i]);
+      qSwap((*it)->GetValues(), this->mp_Values->operator[](i));
+      (*it)->Modified();
+    }
+  }
+  this->mp_Acquisition->emitAnalogsValuesChanged(this->m_Ids);
+}
 
 // --------------- RemoveAnalogs ---------------
 RemoveAnalogs::RemoveAnalogs(Acquisition* acq, const QList<int>& ids, QUndoCommand* parent)
