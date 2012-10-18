@@ -394,23 +394,30 @@ void ShiftAnalogsValues::action()
   QVector<double> temp(this->m_Ids.count());
   for (int i = 0 ; i < this->m_Ids.count() ; ++i)
     temp[i] = -1.0 * this->m_Offsets[i];
-  int numAnalogs = this->mp_Acquisition->btkAcquisition()->GetAnalogNumber();
+  int numAnalogs = this->mp_Acquisition->analogCount();
   for (int i = 0 ; i < this->m_Ids.count() ; ++i)
   {
-    if (this->m_Ids[i] < numAnalogs)
+    QMap<int, Analog*>::const_iterator it = this->mp_Acquisition->analogs().find(this->m_Ids[i]);
+    if (it != this->mp_Acquisition->analogs().end())
     {
-      btk::AnalogCollection::Iterator it = this->mp_Acquisition->btkAcquisition()->BeginAnalog();
-      std::advance(it, this->m_Ids[i]);
-      (*it)->GetValues().cwise() += this->m_Offsets[i];
-      (*it)->Modified();
+      if ((*it)->btkidx < numAnalogs)
+      {
+        btk::AnalogCollection::Iterator itA = this->mp_Acquisition->btkAcquisition()->BeginAnalog();
+        std::advance(itA, (*it)->btkidx);
+        (*itA)->GetValues().cwise() += this->m_Offsets[i];
+        (*itA)->Modified();
+      }
+      else
+        qDebug("Invalid BTK analog index. Impossible to set analog's values.");
     }
+    else
+      qDebug("Invalid analog ID. Impossible to shift analog's values.");
   }  
   this->m_Offsets = temp;
   this->mp_Acquisition->emitAnalogsValuesChanged(this->m_Ids);
 };
 
 // --------------- SetAnalogsValues ---------------
-
 SetAnalogsValues::SetAnalogsValues(Acquisition* acq, const QList<int>& ids, QSharedPointer< QList<btk::Analog::Values> > values, QUndoCommand* parent)
 : AcquisitionUndoCommand(parent), m_Ids(ids.toVector()), mp_Values(values)
 {
@@ -419,16 +426,24 @@ SetAnalogsValues::SetAnalogsValues(Acquisition* acq, const QList<int>& ids, QSha
 
 void SetAnalogsValues::action()
 {
-  int numAnalogs = this->mp_Acquisition->btkAcquisition()->GetAnalogNumber();
+  int numAnalogs = this->mp_Acquisition->analogCount();
   for (int i = 0 ; i < this->m_Ids.count() ; ++i)
   {
-    if (this->m_Ids[i] < numAnalogs)
+    QMap<int, Analog*>::const_iterator it = this->mp_Acquisition->analogs().find(this->m_Ids[i]);
+    if (it != this->mp_Acquisition->analogs().end())
     {
-      btk::AnalogCollection::Iterator it = this->mp_Acquisition->btkAcquisition()->BeginAnalog();
-      std::advance(it, this->m_Ids[i]);
-      qSwap((*it)->GetValues(), this->mp_Values->operator[](i));
-      (*it)->Modified();
+      if ((*it)->btkidx < numAnalogs)
+      {
+        btk::AnalogCollection::Iterator itA = this->mp_Acquisition->btkAcquisition()->BeginAnalog();
+        std::advance(itA, (*it)->btkidx);
+        qSwap((*itA)->GetValues(), this->mp_Values->operator[](i));
+        (*itA)->Modified();
+      }
+      else
+        qDebug("Invalid BTK analog index. Impossible to set analog's values.");
     }
+    else
+      qDebug("Invalid analog ID. Impossible to set analog's values.");
   }
   this->mp_Acquisition->emitAnalogsValuesChanged(this->m_Ids);
 }
