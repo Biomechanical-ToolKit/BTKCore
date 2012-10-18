@@ -32,25 +32,44 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#include "Tools/RemoveAnalogOffset.h"
-#include "Tools/RectifyAnalog.h"
-#include "Tools/SmoothAnalog.h"
-#include "Tools/GaitEventDetection.h"
 
-void ToolsManager::init()
+#ifndef SmoothAnalogDialog_h
+#define SmoothAnalogDialog_h
+
+#include "AnalogToolOptionDialog.h"
+
+class QDoubleSpinBox;
+class QComboBox;
+
+class SmoothAnalogDialog : public AnalogToolOptionDialog
 {
-  // MODEL
+  Q_OBJECT
   
-  // ACQUISITION
+public:
+  SmoothAnalogDialog(QWidget* parent = 0);
+  int rmsWindowWidth() const;
+  int movagWindowWidth() const;
   
-  // POINT 
+  QRadioButton* rmsMethodButton;
+  QDoubleSpinBox* rmsWindowWidthSpinBox;
+  QComboBox* rmsUnitComboBox;
+  QRadioButton* movagMethodButton;
+  QDoubleSpinBox* movagWindowWidthSpinBox;
+  QComboBox* movagUnitComboBox;
+
+protected:
+  virtual void initializeOptions(const Acquisition* const acq);
+  virtual void saveOptionsSettings();
   
-  // ANALOG
-  RemoveAnalogOffset::RegisterTool(this);
-  RectifyAnalog::RegisterTool(this);
-  SmoothAnalog::RegisterTool(this);
+private slots:
+  void adaptRmsWindowWidthRange(int index);
+  void adaptMovagWindowWidthRange(int index);
+
+private:
+  int xWindowWidth(int value, int unit) const;
   
-  // EVENT
-  GaitEventDetection::RegisterTool(this);
-}
+  int m_AnalogNumFrames;
+  int m_AnalogSampleTime;
+};
+
+#endif // SmoothAnalogDialog_h

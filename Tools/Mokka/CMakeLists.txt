@@ -57,6 +57,7 @@ SET(Mokka_CPP
   Tools/GaitEventDetection.cpp
   Tools/RectifyAnalog.cpp
   Tools/RemoveAnalogOffset.cpp
+  Tools/SmoothAnalog.cpp
   UndoCommands.cpp
   UpdateManager.cpp
   UpdateManager_controller.cpp
@@ -102,6 +103,7 @@ SET(Mokka_H
   Tools/AnalogToolOptionDialog.h
   Tools/GaitEventDetectionDialog.h
   Tools/RemoveAnalogOffsetDialog.h
+  Tools/SmoothAnalogDialog.h
   UpdateManager.h
   UpdateManager_p.h
   Viz3DWidget.h
