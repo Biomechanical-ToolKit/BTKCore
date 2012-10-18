@@ -65,14 +65,17 @@ public:
   QList<int> extractSelectedAnalogChannels(btk::AnalogCollection::Pointer analogs, const QString& labelSuffix, const QString& toolDetail, ToolsData* const data, ToolCommands* cmds) const;
   
   void addOption(const QString& title, QWidget* content);
-  
+
+protected slots:
+  void testAcceptButton();
+
 protected:
   void setDataProcessingVisible(bool visible);
   virtual void initializeOptions(const Acquisition* const /* acq */) {};
   virtual void saveOptionsSettings() {};
+  virtual bool testOptionsValidity() {return true;};
   
 private slots:
-  void checkAnalogSelection();
   void saveSettings();
   
 private:

@@ -38,6 +38,8 @@
 #include "../AbstractTool.h"
 #include "../UndoCommands.h"
 
+#include <btkConvert.h>
+
 #include <QSettings>
 #include <QPushButton>
 #include <QToolBox>
@@ -46,13 +48,13 @@
 AnalogToolOptionDialog::AnalogToolOptionDialog(const QString& toolName, QWidget* parent)
 : QDialog(parent), m_ToolName(toolName), m_ToolSettingsPath()
 {
-  this->setWindowTitle(toolName);
   if (!this->m_ToolName.isEmpty())
   {
     this->m_ToolSettingsPath = "Tools/" + toolName + "/";
     this->m_ToolSettingsPath.remove(" ");
   }
   this->setupUi(this);
+  this->setWindowTitle(toolName);
   this->mp_OptionsToolBox = new QToolBox(this);
   this->mp_OptionsToolBox->setObjectName("optionsToolBox");
   this->mp_OptionsToolBox->layout()->setSpacing(3);
@@ -62,8 +64,6 @@ AnalogToolOptionDialog::AnalogToolOptionDialog(const QString& toolName, QWidget*
   
 #ifndef Q_OS_WIN
   this->layout()->setContentsMargins(12,12,12,12);
-  // static_cast<QGridLayout*>(this->layout())->setHorizontalSpacing(12);
-  //   static_cast<QGridLayout*>(this->layout())->setVerticalSpacing(12);
   this->layout()->setSpacing(12);
   this->processingGroupBox->layout()->setSpacing(12);
   QFont f = this->font();
@@ -72,11 +72,12 @@ AnalogToolOptionDialog::AnalogToolOptionDialog(const QString& toolName, QWidget*
   f.setPointSize(11);
   this->overwriteAnalogsButton->setFont(f);
   this->createAnalogsButton->setFont(f);
-  this->resize(480, this->height());
+  this->resize(505, this->height());
+  this->setMinimumWidth(this->width());
   this->analogsGroupBox->setMaximumWidth(219);
 #endif
   
-  connect(this->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem* , int)), this, SLOT(checkAnalogSelection()));
+  connect(this->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem* , int)), this, SLOT(testAcceptButton()));
   connect(this, SIGNAL(accepted()), this, SLOT(saveSettings()));
 };
 
@@ -96,8 +97,9 @@ void AnalogToolOptionDialog::initialize(ToolsData* data)
   analogsRoot->setFont(0, f);
   analogsRoot->setIcon(0, analogIcon);
   analogsRoot->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsTristate);
+  this->treeWidget->blockSignals(true);
   this->treeWidget->addTopLevelItem(analogsRoot);
-  QTreeWidgetItem* visibleItem;
+  QTreeWidgetItem* visibleItem = 0;
   for (QMap<int, Analog*>::const_iterator it = data->acquisition()->analogs().begin() ; it != acq->analogs().end() ; ++it)
   {
     QTreeWidgetItem* analogItem = new QTreeWidgetItem(QStringList(it.value()->label));
@@ -109,15 +111,15 @@ void AnalogToolOptionDialog::initialize(ToolsData* data)
       analogItem->setCheckState(0, selectedAnalogIds.indexOf(it.key()) != -1 ? Qt::Checked : Qt::Unchecked);
     analogItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
     analogsRoot->addChild(analogItem);
-    if (analogItem->checkState(0) == Qt::Checked)
+    if ((visibleItem == 0) && (analogItem->checkState(0) == Qt::Checked))
       visibleItem = analogItem;
   }
   analogsRoot->setExpanded(true);
-  
   if (analogsRoot->checkState(0) == Qt::Unchecked) // No analog channel founds
     analogsRoot->setCheckState(0, Qt::Checked);
-  else
+  else if (analogsRoot->checkState(0) == Qt::PartiallyChecked)
     this->treeWidget->scrollToItem(visibleItem);
+  this->treeWidget->blockSignals(false);
   
   if (acq->analogs().count() > 18)
     this->resize(this->width(),640);
@@ -128,6 +130,7 @@ void AnalogToolOptionDialog::initialize(ToolsData* data)
     this->createAnalogsButton->setChecked(true);
   
   this->initializeOptions(acq);
+  this->testAcceptButton();
 };
 
 QList<int> AnalogToolOptionDialog::selectedAnalogIds() const
@@ -154,13 +157,12 @@ QList<int> AnalogToolOptionDialog::createAnalogChannels(btk::AnalogCollection::P
   QList<int> newIds;
   if (this->createAnalogsButton->isChecked())
   {
-    int analogNumber = data->acquisition()->btkAcquisition()->GetAnalogNumber();
     btk::AnalogCollection::Pointer generatedAnalogs = btk::AnalogCollection::New();
     std::string stdLabelSuffix = labelSuffix.toStdString();
     std::string stdToolDetail = toolDetail.toStdString();
     for (QList<int>::const_iterator itIdx = ids.begin() ; itIdx != ids.end() ; ++itIdx)
     {
-      if (*itIdx >= analogNumber)
+      if (data->acquisition()->analogs().find(*itIdx) == data->acquisition()->analogs().end())
       {
         qDebug("Invalid analog ID. Impossible to use it to create new analog channel.");
         continue;
@@ -169,8 +171,13 @@ QList<int> AnalogToolOptionDialog::createAnalogChannels(btk::AnalogCollection::P
       std::advance(itA, *itIdx);
       btk::Analog::Pointer analog = (*itA)->Clone();
       std::string desc = "Generated from channel " + analog->GetLabel() + (stdToolDetail.empty() ? "" : " - " + stdToolDetail); 
+      std::string label = analog->GetLabel() + stdLabelSuffix;
+      std::string label_ = label;
+      int inc = 1;
+      while (data->acquisition()->btkAcquisition()->FindAnalog(label) != data->acquisition()->btkAcquisition()->EndAnalog())
+        label = label_ + btk::ToString(++inc);
       analog->SetDescription(desc);
-      analog->SetLabel(analog->GetLabel() + stdLabelSuffix);
+      analog->SetLabel(label);
       generatedAnalogs->InsertItem(analog);
       if (analogs.get() != 0)
         analogs->InsertItem(analog);
@@ -207,7 +214,6 @@ QList<int> AnalogToolOptionDialog::extractSelectedAnalogChannels(btk::AnalogColl
   return ids;
 };
 
-
 void AnalogToolOptionDialog::addOption(const QString& title, QWidget* content)
 {
   content->layout()->setContentsMargins(content->layout()->contentsMargins().left(),0,0,0);
@@ -228,9 +234,12 @@ void AnalogToolOptionDialog::setDataProcessingVisible(bool visible)
   }
 };
 
-void AnalogToolOptionDialog::checkAnalogSelection()
+void AnalogToolOptionDialog::testAcceptButton()
 {
-  this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(this->treeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked);
+  if (this->testOptionsValidity() && (this->treeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked))
+    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+  else
+    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 };
 
 void AnalogToolOptionDialog::saveSettings()
