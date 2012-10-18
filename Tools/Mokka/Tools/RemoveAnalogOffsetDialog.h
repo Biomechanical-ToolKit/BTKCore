@@ -51,11 +51,15 @@ public:
   QSpinBox* firstFramesSpinBox;
   QRadioButton* lastFramesButton;
   QSpinBox* lastFramesSpinBox;
+  QRadioButton* rangeButton;
+  QSpinBox* rangeStartSpinBox;
+  QSpinBox* rangeStopSpinBox;
   QRadioButton* allFramesButton;
 
 protected:
   virtual void initializeOptions(const Acquisition* const acq);
   virtual void saveOptionsSettings();
+  virtual bool testOptionsValidity();
 };
 
 #endif // RemoveAnalogOffsetDialog_h

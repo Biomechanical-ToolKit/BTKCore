@@ -72,7 +72,7 @@ bool RectifyAnalog::run(ToolCommands* cmds, ToolsData* const data)
     for (btk::AnalogCollection::ConstIterator it = analogs->Begin() ; it != analogs->End() ; ++it)
     {
       values->push_back((*it)->GetValues().cwise().abs());
-      log += (inc != 0 ? ", " : "") + QString::fromStdString((*it)->GetLabel());
+      log += (inc != 0 ? ", '" : "'") + QString::fromStdString((*it)->GetLabel()) + "'";
       ++inc;
     }
     new SetAnalogsValues(data->acquisition(), ids, values, cmds->acquisitionCommand());

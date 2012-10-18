@@ -62,7 +62,7 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
   bool res = false;
   QList<int> ids;
   btk::AnalogCollection::Pointer analogs;
-  
+  QString descFrames;
   if (this->m_Method == FromReferenceFile)
   {
     QStringList formats;
@@ -102,19 +102,19 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
       }
       catch (btk::Exception& e)
       {
-        LOG_ERROR(e.what());
+        TOOL_LOG_ERROR(e.what());
         error.exec();
         return false;
       }
       catch (std::exception& e)
       {
-        LOG_ERROR("Unexpected error: " + QString(e.what()));
+        TOOL_LOG_ERROR("Unexpected error: " + QString(e.what()));
         error.exec();
         return false;
       }
       catch (...)
       {
-        LOG_ERROR("Unknown error.");
+        TOOL_LOG_ERROR("Unknown error.");
         error.exec();
         return false;
       }
@@ -126,7 +126,7 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
     dialog.initialize(data);
     if (dialog.exec() == QDialog::Accepted)
     {
-      QString descFrames = "all frames";
+      descFrames = "all frames";
       int framesIndex[2] = {-1,-1};
       if (dialog.firstFramesButton->isChecked())
       {
@@ -141,6 +141,19 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
         framesIndex[0] = data->acquisition()->lastFrame() - numberOfFrames + 1 - data->acquisition()->firstFrame();
         framesIndex[1] = data->acquisition()->lastFrame() - data->acquisition()->firstFrame();
         descFrames = "the " + QString::number(numberOfFrames) + " last frames";
+      }
+      else if (dialog.rangeButton->isChecked())
+      {
+        int rangeStartFrame = dialog.rangeStartSpinBox->value();
+        int rangeStopFrame = dialog.rangeStopSpinBox->value();
+        if (rangeStopFrame < rangeStartFrame)
+        {
+          TOOL_LOG_ERROR("Invalid range of frames. Processing aborted.");
+          return false;
+        }
+        framesIndex[0] = rangeStartFrame - data->acquisition()->firstFrame();
+        framesIndex[1] = rangeStopFrame - data->acquisition()->firstFrame();
+        descFrames = "the range of frames [ " + QString::number(rangeStartFrame) + " ; " + QString::number(rangeStopFrame) + " ]";
       }
       
       ids = dialog.selectedAnalogIds();
@@ -158,6 +171,7 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
         QString toolDetail = "Offset removed using " + descFrames;
         ids = dialog.createAnalogChannels("_OR", toolDetail, ids, data, cmds); // OR: Offset Removal
       }
+      descFrames = " using " + descFrames;
     }
     else
       return false;
@@ -172,9 +186,9 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
   {
     QString log;
     if (ids.count() == 1)
-      log = "A total of " + QString::number(ids.count()) + " offset was removed for the following channel:";
+      log = "A total of " + QString::number(ids.count()) + " offset was removed for the following channel" + descFrames + ":";
     else
-      log = "A total of " + QString::number(ids.count()) + " offsets were removed for the following channels:";
+      log = "A total of " + QString::number(ids.count()) + " offsets were removed for the following channels" + descFrames + ":";
     QList<double> offsets;
     for (btk::AnalogCollection::ConstIterator it = analogs->Begin() ; it != analogs->End() ; ++it)
     {
@@ -209,9 +223,13 @@ RemoveAnalogOffsetDialog::RemoveAnalogOffsetDialog(QWidget* parent)
   this->lastFramesSpinBox->setMinimum(1);
   this->lastFramesSpinBox->setMaximum(9999);
   this->lastFramesSpinBox->setValue(10);
+  this->rangeButton = new QRadioButton(this);
+  this->rangeStartSpinBox = new QSpinBox(this);
+  this->rangeStopSpinBox = new QSpinBox(this);
   this->allFramesButton = new QRadioButton(this);
   this->firstFramesButton->setText(tr("First frames:"));
   this->lastFramesButton->setText(tr("Last frames:"));
+  this->rangeButton->setText(tr("Range:"));
   this->allFramesButton->setText(tr("All frames"));
   
   QGridLayout* gridLayout = new QGridLayout(referenceFrames);
@@ -219,23 +237,35 @@ RemoveAnalogOffsetDialog::RemoveAnalogOffsetDialog(QWidget* parent)
   gridLayout->addWidget(this->firstFramesSpinBox, 0, 1, 1, 1);
   gridLayout->addWidget(this->lastFramesButton, 1, 0, 1, 1);
   gridLayout->addWidget(this->lastFramesSpinBox, 1, 1, 1, 1);
-  gridLayout->addWidget(this->allFramesButton, 2, 0, 1, 1);
+  gridLayout->addWidget(this->rangeButton, 2, 0, 1, 1);
+  gridLayout->addWidget(this->rangeStartSpinBox, 2, 1, 1, 1);
+  gridLayout->addWidget(this->rangeStopSpinBox, 2, 3, 1, 1);
+  QSpacerItem* rangeSpaceFixup = new QSpacerItem(6, 10, QSizePolicy::Fixed, QSizePolicy::Minimum);
+  gridLayout->addItem(rangeSpaceFixup, 2, 2, 1, 1);
+  gridLayout->addWidget(this->allFramesButton, 3, 0, 1, 1);
   QSpacerItem* horizontalSpacer = new QSpacerItem(40, 10, QSizePolicy::Expanding, QSizePolicy::Minimum);
-  gridLayout->addItem(horizontalSpacer, 0, 2, 1, 1);
+  gridLayout->addItem(horizontalSpacer, 2, 4, 1, 1);
   
 #ifndef Q_OS_WIN
   QFont f = this->font();
   f.setPointSize(11);
   this->firstFramesButton->setFont(f);
   this->lastFramesButton->setFont(f);
+  this->rangeButton->setFont(f);
   this->allFramesButton->setFont(f);
   this->firstFramesSpinBox->setStyleSheet("QSpinBox {font-size: 12px;};");
   this->lastFramesSpinBox->setStyleSheet("QSpinBox {font-size: 12px;};");
+  this->rangeStartSpinBox->setStyleSheet("QSpinBox {font-size: 12px;};");
+  this->rangeStopSpinBox->setStyleSheet("QSpinBox {font-size: 12px;};");
   this->allFramesButton->setMinimumHeight(30);
-  referenceFrames->layout()->setSpacing(0);
+  gridLayout->setSpacing(0);
 #endif
 
-  this->addOption("Reference Frames", referenceFrames);
+  this->addOption(tr("Reference Frames"), referenceFrames);
+  
+  connect(this->rangeButton, SIGNAL(toggled(bool)), this, SLOT(testAcceptButton()));
+  connect(this->rangeStartSpinBox, SIGNAL(valueChanged(int)), this, SLOT(testAcceptButton()));
+  connect(this->rangeStopSpinBox, SIGNAL(valueChanged(int)), this, SLOT(testAcceptButton()));
 };
 
 void RemoveAnalogOffsetDialog::initializeOptions(const Acquisition* const acq)
@@ -243,12 +273,19 @@ void RemoveAnalogOffsetDialog::initializeOptions(const Acquisition* const acq)
   QSettings settings;
   this->firstFramesSpinBox->setMaximum(acq->pointFrameNumber());
   this->lastFramesSpinBox->setMaximum(acq->pointFrameNumber());
+  this->rangeStartSpinBox->setRange(acq->firstFrame(), acq->lastFrame());
+  this->rangeStopSpinBox->setRange(acq->firstFrame(), acq->lastFrame());
   this->firstFramesSpinBox->setValue(settings.value(this->toolSettingsPath() + "firstFramesNumber", 10).toInt());
   this->lastFramesSpinBox->setValue(settings.value(this->toolSettingsPath() + "lastFramesNumber", 10).toInt());
+  this->rangeStartSpinBox->clear();
+  this->rangeStopSpinBox->clear();
+  
   int lastReferenceFrames =  settings.value(this->toolSettingsPath() + "lastReferenceFrames", 0).toInt();
   if (lastReferenceFrames == 1)
     this->lastFramesButton->setChecked(true);
   else if (lastReferenceFrames == 2)
+    this->rangeButton->setChecked(true);
+  else if (lastReferenceFrames == 3)
     this->allFramesButton->setChecked(true);
   else
     this->firstFramesButton->setChecked(true);
@@ -257,18 +294,28 @@ void RemoveAnalogOffsetDialog::initializeOptions(const Acquisition* const acq)
 void RemoveAnalogOffsetDialog::saveOptionsSettings()
 {
   QSettings settings;
-  int lastReferenceFrames = 2;
+  int lastReferenceFrames = 3;
   if (this->firstFramesButton->isChecked())
   {
     lastReferenceFrames = 0;
-    int numberOfFrames = this->firstFramesSpinBox->value();
-    settings.setValue(this->toolSettingsPath() + "firstFramesNumber", numberOfFrames);
+    settings.setValue(this->toolSettingsPath() + "firstFramesNumber", this->firstFramesSpinBox->value());
   }
   else if (this->lastFramesButton->isChecked())
   {
     lastReferenceFrames = 1;
-    int numberOfFrames = this->lastFramesSpinBox->value();
-    settings.setValue(this->toolSettingsPath() + "lastFramesNumber", numberOfFrames);
+    settings.setValue(this->toolSettingsPath() + "lastFramesNumber", this->lastFramesSpinBox->value());
+  }
+  else if (this->rangeButton->isChecked())
+  {
+    lastReferenceFrames = 2;
   }
   settings.setValue(this->toolSettingsPath() + "lastReferenceFrames", lastReferenceFrames);
+};
+
+
+bool RemoveAnalogOffsetDialog::testOptionsValidity()
+{
+  if (this->rangeButton->isChecked() && (!this->rangeStartSpinBox->hasAcceptableInput() || !this->rangeStopSpinBox->hasAcceptableInput()))
+    return false;
+  return true;
 };
