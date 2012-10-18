@@ -851,7 +851,8 @@ void ChartWidget::checkResetAxes()
       plotVisible = true;
       break;
     }
-  }  
+  }
+  int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
   for (int i = 0 ; i < static_cast<int>(this->m_ChartData[this->m_CurrentChartType]->chartNumber()) ; ++i)
   {
     btk::VTKChartTimeSeries* chart = this->m_ChartData[this->m_CurrentChartType]->chart(i);
@@ -859,6 +860,8 @@ void ChartWidget::checkResetAxes()
     // Force the chart to draw ticks for the X axis.
     if (!plotVisible)
       chart->SetBounds((double)this->mp_Acquisition->firstFrame(), (double)this->mp_Acquisition->lastFrame(), 0.0, 0.0);
+    else
+      this->updateAxisX(chart, roi[0], roi[1]);
   }
 };
 
