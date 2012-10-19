@@ -780,6 +780,15 @@ namespace btk
         else
           throw(TDFFileIOException("Unknown format for the EMG block"));
       }
+      // The orientation of the vertical and horizontal axis are force as it seems
+      // that all the TDF files have the Y axis as the vertical axis and the Z axis 
+      // for the horizontal axis.
+      // - POINT
+      btk::MetaData::Pointer point = btk::MetaDataCreateChild(output->GetMetaData(), "POINT");
+      // - POINT:X_SCREEN
+      btk::MetaDataCreateChild(point, "X_SCREEN", "+Z");
+      // - POINT:Y_SCREEN
+      btk::MetaDataCreateChild(point, "Y_SCREEN", "+Y");
     }
     catch (BinaryFileStreamFailure& )
     {
