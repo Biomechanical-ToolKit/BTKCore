@@ -408,12 +408,48 @@ void ShiftAnalogsValues::action()
         (*itA)->Modified();
       }
       else
-        qDebug("Invalid BTK analog index. Impossible to set analog's values.");
+        qDebug("Invalid BTK analog index. Impossible to shift analog's values.");
     }
     else
       qDebug("Invalid analog ID. Impossible to shift analog's values.");
   }  
   this->m_Offsets = temp;
+  this->mp_Acquisition->emitAnalogsValuesChanged(this->m_Ids);
+};
+
+// --------------- ScaleAnalogsValues ---------------
+ScaleAnalogsValues::ScaleAnalogsValues(Acquisition* acq, const QList<int>& ids, const QList<double>& scales, QUndoCommand* parent)
+: AcquisitionUndoCommand(parent), m_Ids(ids.toVector()), m_Scales(scales.toVector())
+{
+  this->mp_Acquisition = acq;
+};
+
+void ScaleAnalogsValues::action()
+{
+  // WARNING: All the scales are assumed to be not null!
+  QVector<double> temp(this->m_Ids.count());
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+    temp[i] = 1.0 / this->m_Scales[i];
+  int numAnalogs = this->mp_Acquisition->analogCount();
+  for (int i = 0 ; i < this->m_Ids.count() ; ++i)
+  {
+    QMap<int, Analog*>::const_iterator it = this->mp_Acquisition->analogs().find(this->m_Ids[i]);
+    if (it != this->mp_Acquisition->analogs().end())
+    {
+      if ((*it)->btkidx < numAnalogs)
+      {
+        btk::AnalogCollection::Iterator itA = this->mp_Acquisition->btkAcquisition()->BeginAnalog();
+        std::advance(itA, (*it)->btkidx);
+        (*itA)->GetValues() *= this->m_Scales[i];
+        (*itA)->Modified();
+      }
+      else
+        qDebug("Invalid BTK analog index. Impossible to scale analog's values.");
+    }
+    else
+      qDebug("Invalid analog ID. Impossible to scale analog's values.");
+  }  
+  this->m_Scales = temp;
   this->mp_Acquisition->emitAnalogsValuesChanged(this->m_Ids);
 };
 

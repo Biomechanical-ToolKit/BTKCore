@@ -394,6 +394,22 @@ private:
   void action();
 };
 
+// --------------- ScaleAnalogsValues ---------------
+class ScaleAnalogsValues : public AcquisitionUndoCommand
+{
+public:
+  ScaleAnalogsValues(Acquisition* acq, const QList<int>& ids, const QList<double>& scales, QUndoCommand* parent = 0);
+  virtual void undo() {this->action();};
+  virtual void redo() {this->action();};
+  
+private:
+  Acquisition* mp_Acquisition;
+  QVector<int> m_Ids;
+  QVector<double> m_Scales;
+  
+  void action();
+};
+
 // --------------- SetAnalogsValues ---------------
 class SetAnalogsValues : public AcquisitionUndoCommand
 {

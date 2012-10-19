@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud BarrÃ©
+ * Copyright (c) 2009-2012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -32,27 +32,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#include "Tools/RemoveAnalogOffset.h"
-#include "Tools/RectifyAnalog.h"
-#include "Tools/ScaleAnalog.h"
-#include "Tools/SmoothAnalog.h"
-#include "Tools/GaitEventDetection.h"
 
-void ToolsManager::init()
+#ifndef ScaleAnalogDialog_h
+#define ScaleAnalogDialog_h
+
+#include "AnalogToolOptionDialog.h"
+
+class QDoubleSpinBox;
+
+class ScaleAnalogDialog : public AnalogToolOptionDialog
 {
-  // MODEL
+  Q_OBJECT
   
-  // ACQUISITION
+public:
+  ScaleAnalogDialog(QWidget* parent = 0);
   
-  // POINT 
-  
-  // ANALOG
-  RemoveAnalogOffset::RegisterTool(this);
-  RectifyAnalog::RegisterTool(this);
-  ScaleAnalog::RegisterTool(this);
-  SmoothAnalog::RegisterTool(this);
-  
-  // EVENT
-  GaitEventDetection::RegisterTool(this);
-}
+  QRadioButton* normalizeButton;
+  QRadioButton* scaleButton;
+  QDoubleSpinBox* scaleFactorSpinBox;
+
+protected:
+  virtual void initializeOptions(const Acquisition* const acq);
+  virtual void saveOptionsSettings();
+};
+
+#endif // ScaleAnalogDialog_h
