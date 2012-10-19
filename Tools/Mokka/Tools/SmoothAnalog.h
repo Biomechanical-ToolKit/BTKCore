@@ -43,7 +43,7 @@ class SmoothAnalog : public AbstractTool
 public:
   static void RegisterTool(ToolsManager* manager);
   SmoothAnalog(QWidget* parent = 0);
-  virtual bool run(ToolCommands* cmds, ToolsData* const data);
+  virtual RunState run(ToolCommands* cmds, ToolsData* const data);
 };
 
 #endif // SmoothAnalog_h

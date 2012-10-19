@@ -46,7 +46,7 @@ RectifyAnalog::RectifyAnalog(QWidget* parent)
 : AbstractTool("Rectify Analog", parent)
 {};
   
-bool RectifyAnalog::run(ToolCommands* cmds, ToolsData* const data)
+AbstractTool::RunState RectifyAnalog::run(ToolCommands* cmds, ToolsData* const data)
 {
   AnalogToolOptionDialog dialog("Rectify Analog", this->parentWidget());
   dialog.initialize(data);
@@ -77,8 +77,8 @@ bool RectifyAnalog::run(ToolCommands* cmds, ToolsData* const data)
     }
     new SetAnalogsValues(data->acquisition(), ids, values, cmds->acquisitionCommand());
     TOOL_LOG_INFO(log + log_);
-    return true;
+    return Success;
   }
 
-  return false;
+  return Cancel;
 };

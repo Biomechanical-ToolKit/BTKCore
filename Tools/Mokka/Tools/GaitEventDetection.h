@@ -44,7 +44,7 @@ public:
   static void RegisterTool(ToolsManager* manager);
   
   GaitEventDetection(QWidget* parent = 0);  
-  virtual bool run(ToolCommands* cmds, ToolsData* const data);
+  virtual RunState run(ToolCommands* cmds, ToolsData* const data);
   
 private:
   enum {ManualMapping = 0};

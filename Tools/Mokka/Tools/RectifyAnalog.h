@@ -43,7 +43,7 @@ class RectifyAnalog : public AbstractTool
 public:
   static void RegisterTool(ToolsManager* manager);
   RectifyAnalog(QWidget* parent = 0);
-  virtual bool run(ToolCommands* cmds, ToolsData* const data);
+  virtual RunState run(ToolCommands* cmds, ToolsData* const data);
 };
 
 #endif // RectifyAnalog_h

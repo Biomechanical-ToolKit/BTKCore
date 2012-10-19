@@ -59,7 +59,7 @@ static double movagSmooth(btk::Analog::Values* val, int start, int length)
   return val->segment(start,length).sum() / static_cast<double>(length);
 };
 
-bool SmoothAnalog::run(ToolCommands* cmds, ToolsData* const data)
+AbstractTool::RunState SmoothAnalog::run(ToolCommands* cmds, ToolsData* const data)
 {
   SmoothAnalogDialog dialog(this->parentWidget());
   dialog.initialize(data);
@@ -85,12 +85,12 @@ bool SmoothAnalog::run(ToolCommands* cmds, ToolsData* const data)
     if (windowWidth < 3)
     {
       TOOL_LOG_ERROR("The with of the window is lower than the possible minimum (3). Data processing aborted.");
-      return false;
+      return Error;
     }
     else if (windowWidth >= data->acquisition()->analogFrameNumber() / 2)
     {
       TOOL_LOG_ERROR("The with of the window is greater or equal than half of the signal's length. Data processing aborted.");
-      return false;
+      return Error;
     }
     btk::AnalogCollection::Pointer analogs = btk::AnalogCollection::New();
     QList<int> ids = dialog.extractSelectedAnalogChannels(analogs, labelSuffix, toolDetail, data, cmds);
@@ -138,10 +138,10 @@ bool SmoothAnalog::run(ToolCommands* cmds, ToolsData* const data)
     }
     new SetAnalogsValues(data->acquisition(), ids, values, cmds->acquisitionCommand());
     TOOL_LOG_INFO(log + log_);
-    return true;
+    return Success;
   }
 
-  return false;
+  return Cancel;
 };
 
 // ------------------------------------------------------------------------- //

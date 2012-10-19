@@ -49,7 +49,7 @@ ScaleAnalog::ScaleAnalog(QWidget* parent)
 : AbstractTool("Scale Analog", parent)
 {};
   
-bool ScaleAnalog::run(ToolCommands* cmds, ToolsData* const data)
+AbstractTool::RunState ScaleAnalog::run(ToolCommands* cmds, ToolsData* const data)
 {
   ScaleAnalogDialog dialog(this->parentWidget());
   dialog.initialize(data);
@@ -97,10 +97,10 @@ bool ScaleAnalog::run(ToolCommands* cmds, ToolsData* const data)
 
     new ScaleAnalogsValues(data->acquisition(), ids, scales, cmds->acquisitionCommand());
     TOOL_LOG_INFO(log + log_);
-    return true;
+    return Success;
   }
 
-  return false;
+  return Cancel;
 };
 
 // ------------------------------------------------------------------------- //

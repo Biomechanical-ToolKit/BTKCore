@@ -47,10 +47,12 @@
 class AbstractTool : public QObject
 {
 public:
+  typedef enum {Success = 0, Cancel, Error} RunState;
+  
   static void RegisterTool(ToolsManager* ) {qDebug("To register a tool, you need to overload the static method AbstractTool::RegisterTool.");};
   
   AbstractTool(const QString& name, QWidget* parent = 0) : QObject(parent), m_Name(name) {};
-  virtual bool run(ToolCommands* cmds, ToolsData* const data) = 0;
+  virtual RunState run(ToolCommands* cmds, ToolsData* const data) = 0;
   
   const QString& name() {return this->m_Name;};
   QWidget* parentWidget() const {return static_cast<QWidget*>(this->parent());};

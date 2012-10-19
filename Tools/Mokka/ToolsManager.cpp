@@ -38,6 +38,7 @@
 #include "ToolsData.h"
 
 #include <QMenu>
+#include <QMessageBox>
 
 #include "ToolsManager_registration.cpp"
 
@@ -104,8 +105,15 @@ void ToolsManager::runTool()
     if (it.key() == sender)
     {
       AbstractTool* tool = (*it)(this->parentWidget());
-      if (tool->run(this->mp_ToolsData->commands(), this->mp_ToolsData))
+      AbstractTool::RunState res = tool->run(this->mp_ToolsData->commands(), this->mp_ToolsData);
+      if (res == AbstractTool::Success)
         this->mp_ToolsData->commands()->push();
+      else if (res == AbstractTool::Error)
+      {
+        QMessageBox error(QMessageBox::Warning, "Tool error", "Error occurred during the run of a tool.", QMessageBox::Ok);
+        error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
+        error.exec();
+      }
     }
   }
 };

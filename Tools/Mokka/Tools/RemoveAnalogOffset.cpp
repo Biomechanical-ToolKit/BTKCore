@@ -57,7 +57,7 @@ RemoveAnalogOffset::RemoveAnalogOffset(Method m, QWidget* parent)
   this->m_Method = m;
 };
   
-bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
+AbstractTool::RunState RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
 {
   bool res = false;
   QList<int> ids;
@@ -104,19 +104,19 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
       {
         TOOL_LOG_ERROR(e.what());
         error.exec();
-        return false;
+        return Error;
       }
       catch (std::exception& e)
       {
         TOOL_LOG_ERROR("Unexpected error: " + QString(e.what()));
         error.exec();
-        return false;
+        return Error;
       }
       catch (...)
       {
         TOOL_LOG_ERROR("Unknown error.");
         error.exec();
-        return false;
+        return Error;
       }
     }
   }
@@ -149,7 +149,7 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
         if (rangeStopFrame < rangeStartFrame)
         {
           TOOL_LOG_ERROR("Invalid range of frames. Processing aborted.");
-          return false;
+          return Error;
         }
         framesIndex[0] = rangeStartFrame - data->acquisition()->firstFrame();
         framesIndex[1] = rangeStopFrame - data->acquisition()->firstFrame();
@@ -174,12 +174,12 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
       descFrames = " using " + descFrames;
     }
     else
-      return false;
+      return Cancel;
   }
   else
   {
     TOOL_LOG_ERROR("Unknown method.");
-    return false;
+    return Error;
   }
   
   if (ids.count() == analogs->GetItemNumber())
@@ -203,7 +203,7 @@ bool RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* const data)
   else
     TOOL_LOG_ERROR("Unexpected error: The number of IDs is not equal to the number of offsets. Please contact the developers.");
 
-  return res;
+  return (res ? Success : Error);
 };
 
 // ------------------------------------------------------------------------- //

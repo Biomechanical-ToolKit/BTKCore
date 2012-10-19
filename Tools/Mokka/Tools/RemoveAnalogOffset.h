@@ -43,7 +43,7 @@ class RemoveAnalogOffset : public AbstractTool
 public:
   static void RegisterTool(ToolsManager* manager);
   
-  virtual bool run(ToolCommands* cmds, ToolsData* const data);
+  virtual RunState run(ToolCommands* cmds, ToolsData* const data);
   
 protected:
   typedef enum {FromReferenceFile = 0, FromSelectedFrames} Method;

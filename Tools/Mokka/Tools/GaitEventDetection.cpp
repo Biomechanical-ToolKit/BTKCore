@@ -51,13 +51,13 @@ GaitEventDetection::GaitEventDetection(QWidget* parent)
 : AbstractTool("Gait Event Detection", parent)
 {};
   
-bool GaitEventDetection::run(ToolCommands* cmds, ToolsData* const data)
+AbstractTool::RunState GaitEventDetection::run(ToolCommands* cmds, ToolsData* const data)
 {
   GaitEventDetectionDialog dialog(this->parentWidget());
   dialog.initialize(data->acquisition());
   if (dialog.exec() != QDialog::Accepted)
   {
-    return false;
+    return Cancel;
   }
   else
   {    
@@ -158,7 +158,7 @@ bool GaitEventDetection::run(ToolCommands* cmds, ToolsData* const data)
       error.exec();
     }
     
-    return !error;
+    return (!error ? Success : Error);
   }
 };
 
