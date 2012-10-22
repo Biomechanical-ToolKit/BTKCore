@@ -233,9 +233,9 @@ int SmoothAnalogDialog::xWindowWidth(int value, int unit) const
 {
   int windowWidth = 0;
   if (unit == 0) // ms
-    windowWidth = static_cast<int>(std::floor(value / this->m_AnalogSampleTime));
+    windowWidth = static_cast<int>(std::floor(static_cast<double>(value) / this->m_AnalogSampleTime));
   else
-    windowWidth = static_cast<int>(value);
+    windowWidth = value;
   // Be sure to have a window with an odd number of coefficient
 #if 1
   windowWidth = windowWidth / 2;

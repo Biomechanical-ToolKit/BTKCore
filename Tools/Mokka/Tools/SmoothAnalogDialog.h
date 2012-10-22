@@ -69,7 +69,7 @@ private:
   int xWindowWidth(int value, int unit) const;
   
   int m_AnalogNumFrames;
-  int m_AnalogSampleTime;
+  double m_AnalogSampleTime;
 };
 
 #endif // SmoothAnalogDialog_h
