@@ -119,6 +119,8 @@ AbstractTool::RunState RemoveAnalogOffset::run(ToolCommands* cmds, ToolsData* co
         return Error;
       }
     }
+    else
+      return Cancel;
   }
   else if (this->m_Method == FromSelectedFrames)
   {
