@@ -146,7 +146,7 @@
     Q_UNUSED(onlyforCompatibility);
   };
   
-  #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 10))
+  #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     // Fix: "Fix QVTKWidget problem on Windows with Aero off."
     // http://vtk.org/gitweb?p=VTK.git;a=commit;h=c5d4f4c2b904821247729bfa67e1cab8c74e5d36
     #if defined(Q_WS_WIN)

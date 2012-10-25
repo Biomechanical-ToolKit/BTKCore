@@ -74,7 +74,9 @@
   {
   public:
     VizRendererWidget(QWidget* parent = NULL, void* onlyforCompatibility=0, Qt::WindowFlags f = 0);
-  #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 10))
+  #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
+  /* This is to Fix QVTKWidget problem on Windows with Aero off. */
+  /* The patch is only for VTK 5.8 as VTK 5.10.1 resolves this problem. */
   protected:
     #if defined(Q_WS_WIN)
       bool winEvent(MSG* msg, long* result);
