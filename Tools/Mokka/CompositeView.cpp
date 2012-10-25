@@ -459,7 +459,8 @@ HeaderOptionComboBox::HeaderOptionComboBox(QWidget* parent)
      selection-background-color: lightgray; \
    } \
    QComboBox:!editable:on, QComboBox::drop-down:editable:on { \
-     color: black; \
+     color: white; \
+     selection-color: black; \
    } \
    QComboBox:on { \
    } \
