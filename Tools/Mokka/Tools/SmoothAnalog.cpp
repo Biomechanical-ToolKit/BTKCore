@@ -173,7 +173,7 @@ SmoothAnalogDialog::SmoothAnalogDialog(QWidget* parent)
   this->movagUnitComboBox->addItems(QStringList() << tr("ms") << tr("frames"));
   this->movagUnitComboBox->setCurrentIndex(0);
   QLabel* informations = new QLabel(this);
-  informations->setText(tr("\nThe time in milliseconds (ms) is approximative and adapted to a number of frames. The number of frames must be odd or it will be adapted. Check the logger for the exact value."));
+  informations->setText(tr("The time in milliseconds (ms) is approximative and adapted to a number of frames. The number of frames must be odd or it will be adapted. Check the logger for the exact value."));
   informations->setWordWrap(true);
   informations->setAlignment(Qt::AlignJustify | Qt::AlignTop);
   
@@ -200,6 +200,7 @@ SmoothAnalogDialog::SmoothAnalogDialog(QWidget* parent)
   gridLayout->setVerticalSpacing(0);
   f.setItalic(true);
   informations->setFont(f);
+  informations->setText("\n" + informations->text());
 #else
   QFont f = this->font();
   f.setItalic(true);
@@ -211,12 +212,14 @@ SmoothAnalogDialog::SmoothAnalogDialog(QWidget* parent)
 
   this->addOption(tr("Smoothing methods"), smoothingMethods);
   
-#ifndef Q_OS_WIN
-  // The spacer item takes too much width ...
-  int width = this->sizeHint().width() - 100;
+  // FIXME: Why the dialog box is not able to resize it automatically when using a toolbox?
+#ifdef Q_OS_WIN
+  int width = 540;
+#else
+  int width = this->sizeHint().width() - 100; // The spacer item takes too much width ...
+#endif
   this->resize(width, this->height());
   this->setMinimumWidth(width);
-#endif
 };
 
 int SmoothAnalogDialog::rmsWindowWidth() const

@@ -127,7 +127,7 @@ ScaleAnalogDialog::ScaleAnalogDialog(QWidget* parent)
   gridLayout->addItem(horizontalSpacer, 1, 2, 1, 1);
   QLabel* informations = new QLabel(this);
   informations->setWordWrap(true);
-  informations->setText(tr("\nScaling your data with a factor below 1 can reduce their accuracy if they are already very small."));
+  informations->setText(tr("Scaling your data with a factor below 1 can reduce their accuracy if they are already very small."));
   informations->setMaximumWidth(300);
   gridLayout->addWidget(informations, 2, 0, 1, -1);
   
@@ -139,6 +139,11 @@ ScaleAnalogDialog::ScaleAnalogDialog(QWidget* parent)
   this->scaleFactorSpinBox->setStyleSheet("QDoubleSpinBox {font-size: 12px;};");
   this->normalizeButton->setMinimumHeight(30);
   scaleFactor->layout()->setSpacing(0);
+  f.setItalic(true);
+  informations->setFont(f);
+  informations->setText("\n" + informations->text());
+#else
+  QFont f = this->font();
   f.setItalic(true);
   informations->setFont(f);
 #endif
