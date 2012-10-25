@@ -40,7 +40,6 @@
 #include <btkVerticalGroundReactionForceGaitEventDetector.h>
 
 #include <QSettings>
-#include <QPropertyAnimation>
 
 void GaitEventDetection::RegisterTool(ToolsManager* manager)
 {
@@ -167,8 +166,6 @@ AbstractTool::RunState GaitEventDetection::run(ToolCommands* cmds, ToolsData* co
 GaitEventDetectionDialog::GaitEventDetectionDialog(QWidget* parent)
 : QDialog(parent)
 {
-  this->mp_ResizeDetectionOptionAnimation = new QPropertyAnimation(this, "size");
-  this->mp_ResizeDetectionOptionAnimation->setDuration(150);
   this->setupUi(this);
 #ifdef Q_OS_MAC
   this->layout()->setContentsMargins(12,12,12,12);
@@ -196,17 +193,16 @@ GaitEventDetectionDialog::GaitEventDetectionDialog(QWidget* parent)
   header->setResizeMode(2, QHeaderView::Stretch);
   header->setResizeMode(1, QHeaderView::Stretch);
   
-  connect(this->mp_ResizeDetectionOptionAnimation, SIGNAL(finished()), this, SLOT(endToggleDetectionOptions()));
   connect(this->mappingMethodComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setMappingMethod(int)));
   connect(this->detectionMethodComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDetectionMethod(int)));
-  connect(this->detectionOptionsButton, SIGNAL(clicked()), this, SLOT(startToggleDetectionOptions()));
+  connect(this->detectionOptionsButton, SIGNAL(clicked()), this, SLOT(toggleDetectionOptions()));
   
   QSettings settings;
   this->mappingMethodComboBox->setCurrentIndex(settings.value("Tools/GaitEventDetection/lastMappingMethod", 0).toInt());
   this->detectionMethodComboBox->setCurrentIndex(settings.value("Tools/GaitEventDetection/lastDetectionMethod", 0).toInt());
   this->verticalForceThresholdSpinBox->setValue(settings.value("Tools/GaitEventDetection/verticalForceThresholdValue", 10).toInt());
   
-  this->endToggleDetectionOptions();
+  this->toggleDetectionOptions();
   
   // FIXME: The region of interest should correspond to the visual boundaries.
   //        Need to modify the class Acquisition
@@ -254,25 +250,9 @@ void GaitEventDetectionDialog::setDetectionMethod(int index)
   this->detectionOptionsStack->setCurrentIndex(index+1);
 };
 
-void GaitEventDetectionDialog::startToggleDetectionOptions()
+void GaitEventDetectionDialog::toggleDetectionOptions()
 {
-  if (this->detectionOptionsStack->currentIndex() == 0)
-  {
-    
-    this->mp_ResizeDetectionOptionAnimation->setStartValue(QSize(this->width(), this->height()));
-    this->mp_ResizeDetectionOptionAnimation->setEndValue(QSize(this->width(), this->height()+this->detectionOptionsStack->height()));
-  }
-  else
-  {
-    this->mp_ResizeDetectionOptionAnimation->setStartValue(QSize(this->width(), this->height()));
-    this->mp_ResizeDetectionOptionAnimation->setEndValue(QSize(this->width(), this->height()-this->detectionOptionsStack->height()));
-  }
-  this->mp_ResizeDetectionOptionAnimation->start();
-};
-
-void GaitEventDetectionDialog::endToggleDetectionOptions()
-{
-  if (this->detectionOptionsStack->currentIndex() == 0)
+if (this->detectionOptionsStack->currentIndex() == 0)
   {
     this->detectionOptionsStack->setVisible(true);
     this->detectionOptionsStack->setCurrentIndex(this->detectionOptionsStack->currentIndex()+1);
@@ -291,7 +271,12 @@ void GaitEventDetectionDialog::checkManualMapping()
   bool hasMapping = false;
   for (int i = 0 ; i < this->manualMappingTable->rowCount() ; ++i)
   {
-    if (static_cast<QComboBox*>(this->manualMappingTable->cellWidget(i,2))->currentIndex() != 0)
+#ifndef Q_OS_MAC
+    QComboBox* cb = static_cast<QComboBox*>(this->manualMappingTable->cellWidget(i,2)->layout()->itemAt(0)->widget());
+#else
+    QComboBox* cb = static_cast<QComboBox*>(this->manualMappingTable->cellWidget(i,2));
+#endif
+    if (cb->currentIndex() != 0)
     {
       hasMapping = true;
       break;

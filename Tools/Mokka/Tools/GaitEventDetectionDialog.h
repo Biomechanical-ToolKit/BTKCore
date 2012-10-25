@@ -41,7 +41,6 @@
 #include <QDialog>
 
 class Acquisition;
-class QPropertyAnimation;
 
 class GaitEventDetectionDialog : public QDialog, public Ui::GaitEventDetectionDialog
 {
@@ -54,14 +53,10 @@ public:
 public slots:
   void setMappingMethod(int index);
   void setDetectionMethod(int index);
-  void startToggleDetectionOptions();
+  void toggleDetectionOptions();
   
 private slots:
-  void endToggleDetectionOptions();
   void checkManualMapping();
-  
-private: 
-  QPropertyAnimation* mp_ResizeDetectionOptionAnimation;
 };
 
 
