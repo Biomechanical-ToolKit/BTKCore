@@ -42,7 +42,6 @@
 namespace btk
 {
   // --------- Template private methods ------------- //
-  // Must be declared here to fix a compile error with Clang
 
   // MetaDataCollapseChildrenValues_p: From void* to T
   template <typename T>
@@ -60,140 +59,6 @@ namespace btk
     btkNotUsed(idx);
     return blank;
   };
-  
-  // --------- Template public methods ------------- //
-
-  /**
-   * Collapse the @a parent children entries' values starting with the string @a baselabel
-   * and incrementing (for example: LABELS, LABELS2, LABELS3). The entries'
-   * values are stored in @a target.
-   *
-   * The input @a targetFinalSize can be used to fix the number of values 
-   * to collapse (by default: -1). The input @a blankReplacement can be used
-   * to fill the @a target' values which have no corresponding in the @a parent (By default: default object constructor).
-   *
-   * @ingroup BTKCommon
-   */
-  template <typename T>
-  void MetaDataCollapseChildrenValues(std::vector<T>& target,
-                                      MetaData::ConstPointer parent,
-                                      const std::string& baselabel,
-                                      int targetFinalSize = -1,
-                                      const T& blankReplacement = T())
-  {
-    target.clear();
-    int collapsedNumber = 0, inc = 2;
-    std::string label = baselabel;
-    if (parent.get() != 0)
-    {
-      while (1)
-      {
-        MetaData::ConstIterator it = parent->FindChild(label);
-        if (it == parent->End())
-          break;
-        std::vector<T> values;
-        MetaDataCollapseChildrenValues_p(values, (*it)->GetInfo());
-        typename std::vector<T>::iterator itVal = values.begin();
-        size_t num = target.size() + values.size();
-        if (values.size() != 0)
-        {
-          if ((static_cast<int>(num) >= targetFinalSize) && (targetFinalSize != -1))
-            std::advance(itVal, targetFinalSize - target.size());
-          else
-            itVal = values.end();
-          target.insert(target.end(), values.begin(), itVal);
-          collapsedNumber = static_cast<int>(target.size());
-        }
-        if (collapsedNumber == targetFinalSize)
-          break;
-        label = baselabel + ToString(inc);
-        ++inc;
-      }
-    }
-    if (collapsedNumber < targetFinalSize)
-    {
-      target.resize(targetFinalSize);
-      for (int inc = collapsedNumber ; inc < targetFinalSize ; ++inc)
-        target[inc] = MetaDataCollapseChildrenValues_p(blankReplacement, inc + 1);
-    }
-  };
-
-  // Strange parsing error with Doxygen... The commented lines are required
-  //! @cond
-  BTK_COMMON_EXPORT MetaData::Pointer MetaDataCreateChild(MetaData::Pointer parent, const std::string &label);
-  //! @endcond
-
-  /**
-   * Creates an new MetaData or replaces its data if it already exists.
-   *
-   * This method constructs a MetaData with a single value @a val, with the label @a label, an empty description and is unlocked.
-   *
-   * @ingroup BTKCommon
-   */
-  template <typename T>
-  void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const T& val)
-  {
-    if (parent.get() != 0)
-    {
-      MetaData::Iterator it = parent->FindChild(label);
-      if (it != parent->End())
-      {
-        (*it)->SetDescription("");
-        if ((*it)->HasInfo())
-          (*it)->GetInfo()->SetValues(val);
-        else
-          (*it)->SetInfo(MetaDataInfo::New(val));
-        (*it)->SetUnlockState(true);
-      }
-      else
-        parent->AppendChild(MetaData::New(label, val, "", true));
-    }
-    else
-      btkErrorMacro("No parent.");
-  };
-
-  /**
-   * Creates an new MetaData or replaces its data if it already exists.
-   *
-   * This method constructs a MetaData with a 1D vector @a val as values, with the label @a label, an empty description and is unlocked.
-   * This method gives also the possibility to create more than one entry if the vector's length is greater or equal to 256. The other entries containing the extra 256 items
-   * use the same mechanism as proposed for MetaDataCollapseChildrenValues (e.g.: LABELS, LABELS2, LABELS3).
-   *
-   * @ingroup BTKCommon
-   */
-  template <typename T>
-  void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val)
-  {
-    if (parent != 0)
-    {
-      MetaDataCreateChild_p(parent, label, val, 1);
-    }
-    else
-      btkErrorMacro("No parent.");
-  };
-  
-  /**
-   * Creates an new MetaData or replaces its data if it already exists.
-   *
-   * This method constructs an unlocked MetaData with a 2D vector @a val as values, an integer @a numCol for the number of column, a string @a label for the label and an empty description.
-   * This method is a recursive method which give the possibility to create more than one entry if the vector's length is greater or equal to 256 * @a numCol.
-   * The number of column must be lower than 256. The number of columns is written in the first dimension.
-   * The other entries containing the extra 256 items use the same mechanism as proposed for MetaDataCollapseChildrenValues (e.g.: LABELS, LABELS2, LABELS3).
-   *
-   * @ingroup BTKCommon
-   */
-  template <typename T>
-  void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val, int numCol)
-  {
-    if (parent.get() != 0)
-    {
-      MetaDataCreateChild_p(parent, label, val, numCol, 1);
-    }
-    else
-      btkErrorMacro("No parent.");
-  };
-
-  // --------- Private template functions ------------- //
   
   template <typename T>
   void MetaDataCreateChild_p(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val, int inc)
@@ -354,6 +219,138 @@ namespace btk
       const std::string& blank, int idx)
   {
     return blank + ToString(idx);
+  };
+  
+  // --------- Template public methods ------------- //
+
+  /**
+   * Collapse the @a parent children entries' values starting with the string @a baselabel
+   * and incrementing (for example: LABELS, LABELS2, LABELS3). The entries'
+   * values are stored in @a target.
+   *
+   * The input @a targetFinalSize can be used to fix the number of values 
+   * to collapse (by default: -1). The input @a blankReplacement can be used
+   * to fill the @a target' values which have no corresponding in the @a parent (By default: default object constructor).
+   *
+   * @ingroup BTKCommon
+   */
+  template <typename T>
+  void MetaDataCollapseChildrenValues(std::vector<T>& target,
+                                      MetaData::ConstPointer parent,
+                                      const std::string& baselabel,
+                                      int targetFinalSize = -1,
+                                      const T& blankReplacement = T())
+  {
+    target.clear();
+    int collapsedNumber = 0, inc = 2;
+    std::string label = baselabel;
+    if (parent.get() != 0)
+    {
+      while (1)
+      {
+        MetaData::ConstIterator it = parent->FindChild(label);
+        if (it == parent->End())
+          break;
+        std::vector<T> values;
+        MetaDataCollapseChildrenValues_p(values, (*it)->GetInfo());
+        typename std::vector<T>::iterator itVal = values.begin();
+        size_t num = target.size() + values.size();
+        if (values.size() != 0)
+        {
+          if ((static_cast<int>(num) >= targetFinalSize) && (targetFinalSize != -1))
+            std::advance(itVal, targetFinalSize - target.size());
+          else
+            itVal = values.end();
+          target.insert(target.end(), values.begin(), itVal);
+          collapsedNumber = static_cast<int>(target.size());
+        }
+        if (collapsedNumber == targetFinalSize)
+          break;
+        label = baselabel + ToString(inc);
+        ++inc;
+      }
+    }
+    if (collapsedNumber < targetFinalSize)
+    {
+      target.resize(targetFinalSize);
+      for (int inc = collapsedNumber ; inc < targetFinalSize ; ++inc)
+        target[inc] = MetaDataCollapseChildrenValues_p(blankReplacement, inc + 1);
+    }
+  };
+
+  // Strange parsing error with Doxygen... The commented lines are required
+  //! @cond
+  BTK_COMMON_EXPORT MetaData::Pointer MetaDataCreateChild(MetaData::Pointer parent, const std::string &label);
+  //! @endcond
+
+  /**
+   * Creates an new MetaData or replaces its data if it already exists.
+   *
+   * This method constructs a MetaData with a single value @a val, with the label @a label, an empty description and is unlocked.
+   *
+   * @ingroup BTKCommon
+   */
+  template <typename T>
+  void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const T& val)
+  {
+    if (parent.get() != 0)
+    {
+      MetaData::Iterator it = parent->FindChild(label);
+      if (it != parent->End())
+      {
+        (*it)->SetDescription("");
+        if ((*it)->HasInfo())
+          (*it)->GetInfo()->SetValues(val);
+        else
+          (*it)->SetInfo(MetaDataInfo::New(val));
+        (*it)->SetUnlockState(true);
+      }
+      else
+        parent->AppendChild(MetaData::New(label, val, "", true));
+    }
+    else
+      btkErrorMacro("No parent.");
+  };
+
+  /**
+   * Creates an new MetaData or replaces its data if it already exists.
+   *
+   * This method constructs a MetaData with a 1D vector @a val as values, with the label @a label, an empty description and is unlocked.
+   * This method gives also the possibility to create more than one entry if the vector's length is greater or equal to 256. The other entries containing the extra 256 items
+   * use the same mechanism as proposed for MetaDataCollapseChildrenValues (e.g.: LABELS, LABELS2, LABELS3).
+   *
+   * @ingroup BTKCommon
+   */
+  template <typename T>
+  void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val)
+  {
+    if (parent != 0)
+    {
+      MetaDataCreateChild_p(parent, label, val, 1);
+    }
+    else
+      btkErrorMacro("No parent.");
+  };
+  
+  /**
+   * Creates an new MetaData or replaces its data if it already exists.
+   *
+   * This method constructs an unlocked MetaData with a 2D vector @a val as values, an integer @a numCol for the number of column, a string @a label for the label and an empty description.
+   * This method is a recursive method which give the possibility to create more than one entry if the vector's length is greater or equal to 256 * @a numCol.
+   * The number of column must be lower than 256. The number of columns is written in the first dimension.
+   * The other entries containing the extra 256 items use the same mechanism as proposed for MetaDataCollapseChildrenValues (e.g.: LABELS, LABELS2, LABELS3).
+   *
+   * @ingroup BTKCommon
+   */
+  template <typename T>
+  void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val, int numCol)
+  {
+    if (parent.get() != 0)
+    {
+      MetaDataCreateChild_p(parent, label, val, numCol, 1);
+    }
+    else
+      btkErrorMacro("No parent.");
   };
 };
 
