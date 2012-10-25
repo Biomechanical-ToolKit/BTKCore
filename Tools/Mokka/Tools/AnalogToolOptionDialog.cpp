@@ -59,10 +59,10 @@ AnalogToolOptionDialog::AnalogToolOptionDialog(const QString& toolName, QWidget*
   this->mp_OptionsToolBox->setObjectName("optionsToolBox");
   this->mp_OptionsToolBox->layout()->setSpacing(3);
   this->optionsGroupBox->layout()->addWidget(this->mp_OptionsToolBox);
-  this->optionsGroupBox->layout()->setContentsMargins(12,3,12,3);
   this->optionsGroupBox->setVisible(false);
   
 #ifndef Q_OS_WIN
+  this->optionsGroupBox->layout()->setContentsMargins(12,3,12,3);
   this->layout()->setContentsMargins(12,12,12,12);
   this->layout()->setSpacing(12);
   this->processingGroupBox->layout()->setSpacing(12);
@@ -72,10 +72,15 @@ AnalogToolOptionDialog::AnalogToolOptionDialog(const QString& toolName, QWidget*
   f.setPointSize(11);
   this->overwriteAnalogsButton->setFont(f);
   this->createAnalogsButton->setFont(f);
+#else
+  QMargins margins = this->optionsGroupBox->layout()->contentsMargins();
+  margins.setTop(3);
+  this->optionsGroupBox->layout()->setContentsMargins(margins);
+#endif
+
   this->resize(505, this->height());
   this->setMinimumWidth(this->width());
   this->analogsGroupBox->setMaximumWidth(219);
-#endif
   
   connect(this->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem* , int)), this, SLOT(testAcceptButton()));
   connect(this, SIGNAL(accepted()), this, SLOT(saveSettings()));
