@@ -46,6 +46,7 @@
   #include <sys/mman.h> // mmap, munmap
   #include <sys/stat.h> // fstat
   #include <fcntl.h> // open, close
+  #include <unistd.h> // ftruncate
 #endif
 
 namespace btk
