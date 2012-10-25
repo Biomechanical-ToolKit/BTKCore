@@ -301,7 +301,8 @@ void ChartWidget::refreshPlots()
       axisX->SetMinimumLimit(xLimits[0]);
       axisX->SetMaximumLimit(xLimits[1]);
       axisX->SetRange(rangeX);
-      axisY->SetRange(rangeY);
+      if (rangeY[0] > rangeY[1])
+        axisY->SetRange(rangeY);
     }
   }
 };
@@ -1492,6 +1493,7 @@ void AnalogChartData::setExpandable(bool expandable)
       chartZero->AddPlot(this->chart(i)->GetPlot(0));
     this->mp_ChartLayout->SetSize(vtkVector2i(1,1));
     chartZero->GetAxis(vtkAxis::LEFT)->SetTitle("Values");
+    chartZero->SetVisible(true);
   };
 }
 
