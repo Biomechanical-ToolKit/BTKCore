@@ -4,8 +4,11 @@ body, table, div, p, dl {
 }
 
 h1 {
+  font-size: 175%;
+}
+
+.centered {
   text-align: center;
-  /* font-size: 150%; */
 }
 
 .title {
@@ -411,6 +414,12 @@ div.footer {
 
 #nav-tree-contents {
   margin: 3px 0px 0px 0px;
+}
+
+div#nav-sync.sync
+{
+  display:none;
+  visibility:hidden;
 }
 
 /* ------------------------------------------------------------------------- */
