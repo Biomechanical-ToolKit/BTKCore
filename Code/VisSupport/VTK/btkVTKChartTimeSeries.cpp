@@ -452,13 +452,27 @@ namespace btk
     // Update the clipping if necessary
     this->mp_Clip->SetClip(this->Point1[0], this->Point1[1], this->Point2[0]-this->Point1[0], this->Point2[1]-this->Point1[1]);
 
-    // draw background
+    // Draw background
     if(this->BackgroundBrush)
     {
       painter->GetPen()->SetLineType(vtkPen::NO_PEN);
       painter->ApplyBrush(this->BackgroundBrush);
       painter->DrawRect(this->Point1[0], this->Point1[1], this->Geometry[0], this->Geometry[1]);
     }
+    
+    // Enable/Disable markers on each plot in function of the density of points
+    float scale = static_cast<float>(this->mp_AxisX->GetMaximum() - this->mp_AxisX->GetMinimum()) / static_cast<float>(this->mp_AxisX->GetMaximumLimit() - this->mp_AxisX->GetMinimumLimit());
+    for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+    {
+      vtkPlotPoints* points = vtkPlotPoints::SafeDownCast(*it);
+      if (points != 0)
+      {
+        float numPts = scale * static_cast<float>((*it)->GetInput()->GetNumberOfRows());
+        // Note: The value used below for the threshold is an abitrary value and could be modified later
+        points->SetMarkerStyle((numPts < 40.0f) ? vtkPlotPoints::CIRCLE : vtkPlotPoints::NONE);
+      }
+    }
+    
 
     // Use the scene to render most of the chart.
     this->PaintChildren(painter);
