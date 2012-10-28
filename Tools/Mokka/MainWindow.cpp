@@ -280,6 +280,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionViewMetadata, SIGNAL(triggered()), this, SLOT(viewMetadata()));
   connect(this->action_FileOpen, SIGNAL(triggered()), this, SLOT(openFile()));
   connect(this->actionReloadFile, SIGNAL(triggered()), this, SLOT(reloadFile()));
+  connect(this->actionOpenFileLocation, SIGNAL(triggered()), this, SLOT(openFileLocation()));
   connect(this->actionSave, SIGNAL(triggered()), this, SLOT(saveFile()));
   connect(this->actionSave_As, SIGNAL(triggered()), this, SLOT(saveAsFile()));
   connect(this->actionClose, SIGNAL(triggered()), this, SLOT(closeFile()));
@@ -1079,6 +1080,16 @@ void MainWindow::reloadFile()
     this->openFile(this->m_RecentFiles[0]); // Don't use 'this->mp_Acquisition->fileName()' as it cleared during the loading.
 };
 
+void MainWindow::openFileLocation()
+{
+  if (this->mp_Acquisition->fileName().isEmpty())
+  {
+    qDebug("Empty filename. Impossible to open a file explorer.");
+    return;
+  }
+  QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(this->mp_Acquisition->fileName()).canonicalPath()));
+};
+
 void MainWindow::openFileDropped(const QString& filename)
 {
   if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
@@ -1180,6 +1191,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionSave_As->setEnabled(true);
   this->menuExport->menuAction()->setEnabled(true);
   this->actionReloadFile->setEnabled(true);
+  this->actionOpenFileLocation->setEnabled(true);
   // Tools Menu
   this->actionToolCreateMarker->setEnabled(true);
   this->actionToolComputeMarkerDistance->setEnabled(true);
@@ -1296,6 +1308,7 @@ void MainWindow::importAssistant()
   this->mp_ImportAssistant->clear(this->m_LastDirectory);
   this->importAssistant(this->mp_ImportAssistant->acquisitionSystemComboBox->currentIndex());
   this->actionReloadFile->setEnabled(false); // Because the imported file(s) from the assistant cannot be reloaded
+  this->actionOpenFileLocation->setEnabled(false);
 }
 
 void MainWindow::importAssistant(int systemIndex, bool systemLocked, bool allFramesKeptOnly)
@@ -1541,6 +1554,7 @@ bool MainWindow::importAcquisitions(const QStringList& filenames, bool allFrames
     LOG_INFO(tr("Importing acquisition(s)."));
     QString title = this->windowTitle();
     bool reloadStatus = this->actionReloadFile->isEnabled();
+    bool openFileLocationStatus = this->actionOpenFileLocation->isEnabled();
     ProgressWidget pw(this);
     pw.show();
     pw.setProgressValue(10);
@@ -1549,6 +1563,7 @@ bool MainWindow::importAcquisitions(const QStringList& filenames, bool allFrames
     if (keepWindowTitle)
       this->setWindowTitle(title);
     this->actionReloadFile->setEnabled(reloadStatus);
+    this->actionOpenFileLocation->setEnabled(openFileLocationStatus);
     pw.hide();
     if (noImportError)
     {
@@ -1918,6 +1933,7 @@ void MainWindow::reset()
   this->mp_AcquisitionUndoStack->clear();
   this->mp_MarkerConfigurationUndoStack->clear();
   this->actionReloadFile->setEnabled(false);
+  this->actionOpenFileLocation->setEnabled(false);
   this->actionClose->setEnabled(false);
   this->actionViewMetadata->setEnabled(false);
   this->actionSave->setEnabled(false);

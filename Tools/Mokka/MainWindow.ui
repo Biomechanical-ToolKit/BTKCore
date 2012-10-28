@@ -68,7 +68,7 @@
      <x>0</x>
      <y>0</y>
      <width>928</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -145,7 +145,9 @@
     </widget>
     <addaction name="action_FileOpen"/>
     <addaction name="menuOpen_Recent"/>
+    <addaction name="separator"/>
     <addaction name="actionReloadFile"/>
+    <addaction name="actionOpenFileLocation"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
@@ -545,6 +547,14 @@
   <action name="actionImportCLB">
    <property name="text">
     <string>Contec CLB file...</string>
+   </property>
+  </action>
+  <action name="actionOpenFileLocation">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Open File Location</string>
    </property>
   </action>
  </widget>

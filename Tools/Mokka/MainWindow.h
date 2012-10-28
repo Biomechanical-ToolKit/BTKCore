@@ -93,6 +93,7 @@ public slots:
   void openFile();
   void openFileDropped(const QString& filename);
   void reloadFile();
+  void openFileLocation();
   void saveFile();
   void saveAsFile();
   void closeFile();
