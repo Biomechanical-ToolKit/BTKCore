@@ -109,6 +109,16 @@ namespace btk
     void DisplayEventsOn() {this->SetDisplayEvents(1);};
     void DisplayEventsOff() {this->SetDisplayEvents(0);};
     
+    int GetDisplayCurrentFrame() const {return this->mp_ExtraAcquisition->GetDisplayCurrentFrame();};
+    void SetDisplayCurrentFrame(int enabled) {return this->mp_ExtraAcquisition->SetDisplayCurrentFrame(enabled);};
+    void DisplayCurrentFrameOn() {this->SetDisplayCurrentFrame(1);};
+    void DisplayCurrentFrameOff() {this->SetDisplayCurrentFrame(0);};
+    
+    int GetDisplayRegionOfInterest() const {return this->mp_ExtraAcquisition->GetDisplayRegionOfInterest();};
+    void SetDisplayRegionOfInterest(int enabled) {return this->mp_ExtraAcquisition->SetDisplayRegionOfInterest(enabled);};
+    void DisplayRegionOfInterestOn() {this->SetDisplayRegionOfInterest(1);};
+    void DisplayRegionOfInterestOff() {this->SetDisplayRegionOfInterest(0);};
+    
     float GetEventLineWidth() const {return this->mp_ExtraAcquisition->GetEventLineWidth();};
     void SetEventLineWidth(float width) {return this->mp_ExtraAcquisition->SetEventLineWidth(width);};
     

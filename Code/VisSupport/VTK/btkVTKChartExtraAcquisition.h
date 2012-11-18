@@ -62,6 +62,10 @@ namespace btk
     
     int GetDisplayEvents() const {return this->m_DisplayEvents;};
     BTK_VTK_EXPORT void SetDisplayEvents(int enabled);
+    int GetDisplayCurrentFrame() const {return this->m_DisplayEvents;};
+    BTK_VTK_EXPORT void SetDisplayCurrentFrame(int enabled);
+    int GetDisplayRegionOfInterest() const {return this->m_DisplayEvents;};
+    BTK_VTK_EXPORT void SetDisplayRegionOfInterest(int enabled);
     float GetEventLineWidth() const {return this->m_EventLineWidth;};
     void SetEventLineWidth(float width);
     int GetEventLineTypeFactor() const {return this->m_EventLineTypeFactor;};
@@ -82,6 +86,8 @@ namespace btk
     VTKRegionOfInterestFunctor::Pointer mp_RegionOfInterestFunctor;
     VTKEventsFunctor::Pointer mp_EventsFunctor;
     int m_DisplayEvents;
+    int m_DisplayCurrentFrame;
+    int m_DisplayRegionOfInterest;
     float m_EventLineWidth;
     int m_EventLineTypeFactor;
     

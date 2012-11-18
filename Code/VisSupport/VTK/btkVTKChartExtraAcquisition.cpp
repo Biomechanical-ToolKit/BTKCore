@@ -68,8 +68,10 @@ namespace btk
   VTKChartExtraAcquisition::VTKChartExtraAcquisition()
   : mp_CurrentFrameFunctor(), mp_RegionOfInterestFunctor(), mp_EventsFunctor()
   {
-    // Display events disabled by defaut (no functor)
+    // All the display are disabled by default (no functors)
     this->m_DisplayEvents = 0;
+    this->m_DisplayCurrentFrame = 0;
+    this->m_DisplayRegionOfInterest = 0;
     this->m_EventLineWidth = 0.5f;
     this->m_EventLineTypeFactor = 1;
     
@@ -178,6 +180,38 @@ namespace btk
   };
   
   /**
+   * @fn int VTKChartExtraAcquisition::GetDisplayCurrentFrame() const
+   * Get the status of the current frame display.
+   */
+   
+  /**
+   * Enable/Disable the displaying of the current frame as a vertical line into the chart
+   */
+  void VTKChartExtraAcquisition::SetDisplayCurrentFrame(int enabled)
+  {
+    if (this->m_DisplayCurrentFrame == enabled)
+      return;
+    this->m_DisplayCurrentFrame = enabled;
+    this->Modified();
+  };
+  
+  /**
+   * @fn int VTKChartExtraAcquisition::GetDisplayRegionOfInterest() const
+   * Get the status of the ROI display.
+   */
+   
+  /**
+   * Enable/Disable the displaying of the ROI as rectangles on each side.
+   */
+  void VTKChartExtraAcquisition::SetDisplayRegionOfInterest(int enabled)
+  {
+    if (this->m_DisplayRegionOfInterest == enabled)
+      return;
+    this->m_DisplayRegionOfInterest = enabled;
+    this->Modified();
+  };
+  
+  /**
    * Set the X,Y axis used to scale correctly the content of this context item.
    */
   void VTKChartExtraAcquisition::SetAxes(vtkAxis* x, vtkAxis* y)
@@ -203,9 +237,10 @@ namespace btk
     // 5. Paint the events
     if ((this->mp_EventsFunctor != NULL) && (this->m_DisplayEvents != 0))
     {
-      int inc = 0, typeId = -1, idx = 0;
+      int inc = 0, typeId = -1;
+      float frameIndex = 0.0f;
       double color[3] = {0.0, 0.0, 0.0};
-      while ((*this->mp_EventsFunctor)(inc++, typeId, idx, color))
+      while ((*this->mp_EventsFunctor)(inc++, typeId, frameIndex, color))
       {
         int lineType = vtkPen::NO_PEN;
         switch (typeId)
@@ -222,7 +257,6 @@ namespace btk
         default:
           lineType = vtkPen::DOT_LINE;
         }
-        float frameIndex = static_cast<float>(idx);
         if ((frameIndex >= this->XAxis->GetMinimum()) && (frameIndex <= this->XAxis->GetMaximum()))
         {
 #ifdef VTK_USE_QT
@@ -287,7 +321,7 @@ namespace btk
     }
     // 6. Paint the frame line and its bounds
     // 6.1 Bounds
-    if (this->mp_RegionOfInterestFunctor != NULL)
+    if ((this->mp_RegionOfInterestFunctor != NULL) && (this->m_DisplayRegionOfInterest != 0))
     {
       painter->GetPen()->SetLineType(vtkPen::NO_PEN);
       painter->GetBrush()->SetColor(0, 127, 255, 64);
@@ -306,7 +340,7 @@ namespace btk
         painter->DrawRect(pt2X[0]-right,pt2X[1],right,pt2Y[1]-pt1X[1]);
     }
     // 6.2 Frame line
-    if (this->mp_CurrentFrameFunctor != NULL)
+    if ((this->mp_CurrentFrameFunctor != NULL) && (this->m_DisplayCurrentFrame != 0))
     {
       float frameIndex = static_cast<float>((*this->mp_CurrentFrameFunctor)());
       if ((frameIndex >= this->XAxis->GetMinimum()) && (frameIndex <= this->XAxis->GetMaximum()))

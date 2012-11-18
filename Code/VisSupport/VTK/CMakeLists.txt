@@ -16,6 +16,7 @@ SET(BTKVTK_SRCS
   btkVTKMarkersFramesSource.cpp
   btkVTKOpenGLContextDevice2D.cpp
   btkVTKOpenGL2ContextDevice2D.cpp
+  btkVTKPlotCycle.cpp
   btkVTKSegmentsFramesSource.cpp
   )
 
