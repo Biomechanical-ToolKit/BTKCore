@@ -502,7 +502,25 @@ namespace btk
     this->Modified();
   };
 
-#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
+  /**
+   * Set the logical range of the axis, in plot coordinates.
+   */
+  void VTKAxis::SetRange(double range[2])
+  {
+    this->SetMinimum(range[0]);
+    this->SetMaximum(range[1]);
+  };
+
+  /**
+   * Get the logical range of the axis, in plot coordinates.
+   */
+  void VTKAxis::GetRange(double* range)
+  {
+    range[0] = this->Minimum;
+    range[1] = this->Maximum;
+  };
+
   // Fix: "Typo in vtkAxis::setMaximumLimit()"
   // http://vtk.org/gitweb?p=VTK.git;a=commit;h=3bf89d787af5a6a3e54b266b8cc2545f019608e3
   /**

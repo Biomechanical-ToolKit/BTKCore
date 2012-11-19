@@ -78,6 +78,10 @@ namespace btk
     BTK_VTK_EXPORT void SetDisplayMinimumLimit(bool displayed);
   
 #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
+    using vtkAxis::SetRange;
+    virtual void SetRange(double range[2]);
+    virtual void GetRange(double *range);
+
     BTK_VTK_EXPORT virtual void SetMinimumLimit(double lowest);
     BTK_VTK_EXPORT virtual void SetMaximumLimit(double highest);
 

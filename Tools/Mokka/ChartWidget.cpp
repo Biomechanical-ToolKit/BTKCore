@@ -302,9 +302,9 @@ void ChartWidget::refreshPlots()
       for (int k = 0 ; k < chart->GetNumberOfPlots() ; ++k)
         chart->GetPlot(k)->Modified();
       double rangeX[2] = {0}, rangeY[2] = {0};
-      vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
+      btk::VTKAxis* axisX = btk::VTKAxis::SafeDownCast(chart->GetAxis(vtkAxis::BOTTOM));
       int xLimits[2] = {0};
-      vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
+      btk::VTKAxis* axisY = btk::VTKAxis::SafeDownCast(chart->GetAxis(vtkAxis::LEFT));
       xLimits[0] = axisX->GetMinimumLimit();
       xLimits[1] = axisX->GetMaximumLimit();
       axisX->GetRange(rangeX);
@@ -372,6 +372,7 @@ void ChartWidget::updateHorizontalAxis(btk::VTKChartTimeSeries* chart, double dl
 
 void ChartWidget::setHorizontalAxisUnit(const QString& str, double scale, double offset, bool cycleMode)
 {
+  #warning Check if the serie's name is updated when the data's label is modified
   if (cycleMode && (this->mp_DataCycleMatchingRules == 0))
   {
     qDebug("Impossible to display data by cycle as no rule was set to match data with cycle.");
