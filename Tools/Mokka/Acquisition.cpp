@@ -1175,6 +1175,8 @@ bool Acquisition::write(const QString& filename, const QMap<int, QVariant>& prop
 
 void Acquisition::loadAcquisition()
 {
+  btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS]);
+  // Label prefix
   std::string labelPrefix = "";
   btk::MetaData::ConstIterator itSubjects = this->mp_BTKAcquisition->GetMetaData()->FindChild("SUBJECTS");
   if (itSubjects != this->mp_BTKAcquisition->GetMetaData()->End())
@@ -1187,15 +1189,48 @@ void Acquisition::loadAcquisition()
       labelPrefix = labelPrefix.erase(0, labelPrefix.find_first_not_of(' '));
     }
   }
+  virtualMarkersSeparator->SetLabelPrefix(labelPrefix);
+  // Virtual markers and virtual frames
+  virtualMarkersSeparator->ResetDefinitions();
+  btk::MetaData::ConstIterator itVirtual = this->mp_BTKAcquisition->GetMetaData()->FindChild("VIRTUAL");
+  if (itVirtual != this->mp_BTKAcquisition->GetMetaData()->End())
+  {
+    btk::MetaDataInfo::Pointer virtualMarkersInfo = (*itVirtual)->ExtractChildInfo("MARKERS", btk::MetaDataInfo::Char, 2, false);
+    if (virtualMarkersInfo)
+    {
+      int num = virtualMarkersInfo->GetDimension(1);
+      for (int i = 0 ; i < num ; ++i)
+      {
+        std::string str = virtualMarkersInfo->ToString(i);
+        str = str.erase(str.find_last_not_of(' ') + 1);
+        str = str.erase(0, str.find_first_not_of(' '));
+        virtualMarkersSeparator->AppendVirtualMarker(str);
+      }
+    }
+    btk::MetaDataInfo::Pointer virtualFramesInfo = (*itVirtual)->ExtractChildInfo("REFERENCE_FRAMES", btk::MetaDataInfo::Char, 3, false);
+    if (virtualFramesInfo)
+    {
+      int num = virtualMarkersInfo->GetDimension(2);
+      for (int i = 0 ; i < num ; ++i)
+      {
+        std::string axes[4];
+        for (int j = 0 ; j < 4 ; ++j)
+        {
+          axes[j] = virtualMarkersInfo->ToString(i*4+j);
+          axes[j] = axes[j].erase(axes[j].find_last_not_of(' ') + 1);
+          axes[j] = axes[j].erase(0, axes[j].find_first_not_of(' '));
+        }
+        virtualMarkersSeparator->AppendVirtualReferenceFrame(axes[0], axes[1], axes[2],axes[3]);
+      }
+    }
+  }
   
-  btk::SeparateKnownVirtualMarkersFilter::Pointer virtualMarkersSeparator = static_pointer_cast<btk::SeparateKnownVirtualMarkersFilter>(this->m_BTKProcesses[BTK_SORTED_POINTS]);
   btk::ForcePlatformsExtractor::Pointer forcePlatformsExtractor = static_pointer_cast<btk::ForcePlatformsExtractor>(this->m_BTKProcesses[BTK_FORCE_PLATFORMS]);
   btk::DownsampleFilter<btk::WrenchCollection>::Pointer GRWsDownsampler = static_pointer_cast< btk::DownsampleFilter<btk::WrenchCollection> >(this->m_BTKProcesses[BTK_GRWS_DOWNSAMPLED]);
   virtualMarkersSeparator->SetInput(this->mp_BTKAcquisition->GetPoints());
   forcePlatformsExtractor->SetInput(this->mp_BTKAcquisition);
   GRWsDownsampler->SetUpDownRatio(this->mp_BTKAcquisition->GetNumberAnalogSamplePerFrame());
   // Need to update the separator right now.
-  virtualMarkersSeparator->SetLabelPrefix(labelPrefix);
   virtualMarkersSeparator->Update();
   
   this->m_FirstFrame = this->mp_BTKAcquisition->GetFirstFrame();
