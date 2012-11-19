@@ -372,7 +372,6 @@ void ChartWidget::updateHorizontalAxis(btk::VTKChartTimeSeries* chart, double dl
 
 void ChartWidget::setHorizontalAxisUnit(const QString& str, double scale, double offset, bool cycleMode)
 {
-  #warning Check if the serie's name is updated when the data's label is modified
   if (cycleMode && (this->mp_DataCycleMatchingRules == 0))
   {
     qDebug("Impossible to display data by cycle as no rule was set to match data with cycle.");
