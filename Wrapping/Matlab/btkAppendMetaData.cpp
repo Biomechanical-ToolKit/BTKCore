@@ -44,7 +44,7 @@
 #include <cctype>
  
 // btkAppendMetaData(h, label)
-// btkAppendMetaData(h, label, sublabel, ..., btkMetaDataInfo((CHAR|BYTE|INTEGER|REAL), values))
+// btkAppendMetaData(h, label, sublabel, ..., btkMetaDataInfo((CHAR|BYTE|INTEGER|REAL), values, numdims))
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if (nrhs < 2)
@@ -104,7 +104,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexErrMsgTxt("Number of dimensions exceeds the maximum number (7) available for each metadata.");
       const mwSize* dimsValues = mxGetDimensions(mxValues);
       std::vector<uint8_t> _dims;
-      for (int i = dimsSize - 1 ; i >= 0 ; --i)
+      for (int i = static_cast<int>(dimsSize - 1) ; i >= 0 ; --i)
       {
         int dim = static_cast<int>(dimsValues[i]);
         if (dim > 255)
@@ -119,6 +119,21 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     }
     else
       mexErrMsgTxt("The structure doesn't contain the field 'values'.");
+      
+    // Check for the field 'numdims'
+    if ((temp = mxGetField(prhs[nrhs-1], 0, "numdims")) != NULL)
+    {
+      if (!mxIsNumeric(temp) || mxIsEmpty(temp) || mxIsComplex(temp) || (mxGetNumberOfElements(temp) != 1))
+        mexErrMsgTxt("The field 'numdims' must be set by a single integer value.");
+      int numDims = static_cast<int>(mxGetScalar(temp));
+      if (numDims < dims.size())
+        mexErrMsgTxt("The given number of dimensions is lower than the number of dimensions for the given values.");
+      else if (numDims > maxDimSize)
+        mexErrMsgTxt("The given number of dimensions exceeds the maximum number (7) available for each metadata.");
+      dims.resize(numDims, 1);
+    }
+    else
+      mexErrMsgTxt("The structure doesn't contain the field 'numdims'.");
     
     level -= 1;
   }
