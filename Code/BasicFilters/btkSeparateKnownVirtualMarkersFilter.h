@@ -44,7 +44,7 @@ namespace btk
   class SeparateKnownVirtualMarkersFilter : public ProcessObject
   {
   public:
-    enum {AllMarkers = 4, Markers = 0, VirtualMarkersForFrame = 1, VirtualMarkersOther = 2, OtherPoints = 3};
+    enum {AllMarkers = 4, Markers = 0, VirtualReferenceFrames = 1, VirtualMarkers = 2, OtherPoints = 3};
     
     struct StringAxes
     {
@@ -79,16 +79,18 @@ namespace btk
     void SetInput(PointCollection::Pointer input) {this->SetNthInput(0, input);};
     PointCollection::Pointer GetOutput(int idx) {return static_pointer_cast<PointCollection>(this->GetNthOutput(idx));};
     
-    void AppendKnownVirtualMarkerLabelForAxes(const std::string& o, const std::string& a1, const std::string& a2, const std::string& a3) {this->AppendKnownVirtualMarkerLabelForAxes(StringAxes(o,a1,a2,a3));};
-    BTK_BASICFILTERS_EXPORT void AppendKnownVirtualMarkerLabelForAxes(const StringAxes& label);
-    BTK_BASICFILTERS_EXPORT void AppendKnownVirtualMarkerLabelsForAxes(const std::list<StringAxes>& labels);
-    BTK_BASICFILTERS_EXPORT void SetKnownVirtualMarkerLabelsForAxes(const std::list<StringAxes>& labels);
-    const std::list<StringAxes>& GetKnownVirtualMarkerLabelsForAxes() const {return this->m_VirtualMarkerLabelsAxes;};
+    void AppendVirtualReferenceFrame(const std::string& o, const std::string& a1, const std::string& a2, const std::string& a3) {this->AppendVirtualReferenceFrame(StringAxes(o,a1,a2,a3));};
+    BTK_BASICFILTERS_EXPORT void AppendVirtualReferenceFrame(const StringAxes& label);
+    BTK_BASICFILTERS_EXPORT void AppendVirtualReferenceFrames(const std::list<StringAxes>& labels);
+    BTK_BASICFILTERS_EXPORT void SetVirtualReferenceFrames(const std::list<StringAxes>& labels);
+    const std::list<StringAxes>& GetVirtualReferenceFrames() const {return this->m_VirtualReferenceFrames;};
     
-    BTK_BASICFILTERS_EXPORT void AppendKnownVirtualMarkerLabelForOthers(const std::string& label);
-    BTK_BASICFILTERS_EXPORT void AppendKnownVirtualMarkerLabelsForOthers(const std::list<std::string>& labels);
-    BTK_BASICFILTERS_EXPORT void SetKnownVirtualMarkerLabelsForOthers(const std::list<std::string>& labels);
-    const std::list<std::string>& GetKnownVirtualMarkerLabelsForOthers() const {return this->m_VirtualMarkerLabelsOthers;};
+    BTK_BASICFILTERS_EXPORT void AppendVirtualMarker(const std::string& label);
+    BTK_BASICFILTERS_EXPORT void AppendVirtualMarkers(const std::list<std::string>& labels);
+    BTK_BASICFILTERS_EXPORT void SetVirtualMarkers(const std::list<std::string>& labels);
+    const std::list<std::string>& GetVirtualMarkers() const {return this->m_VirtualMarkers;};
+    
+    BTK_BASICFILTERS_EXPORT void ResetDefinitions();
     
     BTK_BASICFILTERS_EXPORT void SetLabelPrefix(const std::string& prefix);
     const std::string& GetLabelPrefix() const {return this->m_Prefix;};
@@ -107,8 +109,8 @@ namespace btk
     SeparateKnownVirtualMarkersFilter(const SeparateKnownVirtualMarkersFilter& ); // Not implemented.
     SeparateKnownVirtualMarkersFilter& operator=(const SeparateKnownVirtualMarkersFilter& ); // Not implemented.
     
-    std::list<StringAxes> m_VirtualMarkerLabelsAxes;
-    std::list<std::string> m_VirtualMarkerLabelsOthers;
+    std::list<StringAxes> m_VirtualReferenceFrames;
+    std::list<std::string> m_VirtualMarkers;
     std::string m_Prefix;
   };
 };

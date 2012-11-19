@@ -44,12 +44,12 @@ namespace btk
    * These categories are:
    *  -# all kind of markers (real and virtual) as stored in the acquisition
    *  -# markers
-   *  -# virtual markers used for frame
-   *  -# other virtual markers (CenterOfMass, ...)
+   *  -# virtual reference frames (origin and 3 axes)
+   *  -# virtual markers (CenterOfMass, ...)
    *  -# other points (angle, force, moment, power, ...)
    *
    * To select the output corresponding to the chosen category, you can use the method GetOutput() 
-   * with one of these enum values: AllMarkers, Markers, VirtualMarkersForFrame, VirtualMarkersOther, OtherPoints.
+   * with one of these enum values: AllMarkers, Markers, VirtualReferenceFrames, VirtualMarkers, OtherPoints.
    *
    * By default, the list of labels known as virtual markers used for frame is:
    *  - HED(O|A|L|P): HEDO, HEDA, HEDL, HELP
@@ -91,12 +91,12 @@ namespace btk
    * Contains only real markers.
    */
   /**
-   * @var SeparateKnownVirtualMarkersFilter::VirtualMarkersForFrame
-   * Contains only virtual markers used to create frames
+   * @var SeparateKnownVirtualMarkersFilter::VirtualReferenceFrames
+   * Contains markers used to create virutal frames
    */
   /**
-   * @var SeparateKnownVirtualMarkersFilter::VirtualMarkersOther
-   * Contains only virtual markers no used for frames (e.g center of mass)
+   * @var SeparateKnownVirtualMarkersFilter::VirtualMarkers
+   * Contains markers used to define compute 3D position along the time (e.g center of mass)
    */
   /**
    * @var SeparateKnownVirtualMarkersFilter::OtherPoints
@@ -105,7 +105,7 @@ namespace btk
    
   /**
    * @struct SeparateKnownVirtualMarkersFilter::StringAxes
-   * @brief Structure to store the four labels used for a frame axes.
+   * @brief Structure to store the four labels used for a refrence frame.
    */
   /**
    * @var std::string SeparateKnownVirtualMarkersFilter::StringAxes::Origin
@@ -163,41 +163,41 @@ namespace btk
    */
   
   /**
-   * @fn void SeparateKnownVirtualMarkersFilter::AppendKnownVirtualMarkerLabelForAxes(const std::string& o, const std::string& a1, const std::string& a2, const std::string& a3)
-   * Convenient method to append labels used for a frame to the list of virtual markers used for the virtuals.
+   * @fn void SeparateKnownVirtualMarkersFilter::AppendVirtualReferenceFrame(const std::string& o, const std::string& a1, const std::string& a2, const std::string& a3)
+   * Convenient method to append labels used for a frame to the list of virtual frames.
    */
   
   /**
-   * Appends labels used for a frame to the list of virtual markers used for the virtuals.
+   * Appends labels used for a frame to the list of virtual frames.
    */
-  void SeparateKnownVirtualMarkersFilter::AppendKnownVirtualMarkerLabelForAxes(const StringAxes& label)
+  void SeparateKnownVirtualMarkersFilter::AppendVirtualReferenceFrame(const StringAxes& label)
   {
-    for (std::list<StringAxes>::const_iterator it = this->m_VirtualMarkerLabelsAxes.begin() ; it != this->m_VirtualMarkerLabelsAxes.end() ; ++it)
+    for (std::list<StringAxes>::const_iterator it = this->m_VirtualReferenceFrames.begin() ; it != this->m_VirtualReferenceFrames.end() ; ++it)
     {
       if (*it == label)
         return;
     }
-    this->m_VirtualMarkerLabelsAxes.push_back(label);
+    this->m_VirtualReferenceFrames.push_back(label);
     this->Modified();
   };
   
   /**
-   * Appends a list of labels to the list of virtual markers used for the frame virtuals. Each label
+   * Appends a list of labels to the list of virtual markers used for the virtual frames. Each label
    * is checked before to be inserted to not have duplication.
    */
-  void SeparateKnownVirtualMarkersFilter::AppendKnownVirtualMarkerLabelsForAxes(const std::list<StringAxes>& labels)
+  void SeparateKnownVirtualMarkersFilter::AppendVirtualReferenceFrames(const std::list<StringAxes>& labels)
   {
-    if (this->m_VirtualMarkerLabelsAxes == labels)
+    if (this->m_VirtualReferenceFrames == labels)
       return;
     std::list<StringAxes> labels_ = labels;
     std::list<StringAxes>::iterator itL = labels_.begin();
     while (itL != labels_.end())
     {
-      for (std::list<StringAxes>::const_iterator it = this->m_VirtualMarkerLabelsAxes.begin() ; it != this->m_VirtualMarkerLabelsAxes.end() ; ++it)
+      for (std::list<StringAxes>::const_iterator it = this->m_VirtualReferenceFrames.begin() ; it != this->m_VirtualReferenceFrames.end() ; ++it)
       {
         if (*it == *itL)
         {
-          this->m_VirtualMarkerLabelsAxes.push_back(*itL);
+          this->m_VirtualReferenceFrames.push_back(*itL);
           itL = labels_.erase(itL);
           break;
         };
@@ -207,64 +207,109 @@ namespace btk
   };
    
   /**
-   * Sets the list of labels for the virtual markers used to create frames.
+   * Sets the list of labels for the virtual markers used to create virtual frames.
    */
-   void SeparateKnownVirtualMarkersFilter::SetKnownVirtualMarkerLabelsForAxes(const std::list<StringAxes>& labels)
+   void SeparateKnownVirtualMarkersFilter::SetVirtualReferenceFrames(const std::list<StringAxes>& labels)
    {
-     if (this->m_VirtualMarkerLabelsAxes == labels)
+     if (this->m_VirtualReferenceFrames == labels)
        return;
-     this->m_VirtualMarkerLabelsAxes = labels;
+     this->m_VirtualReferenceFrames = labels;
      this->Modified();
    };
    
   /**
-   * @fn const std::list<std::string>& SeparateKnownVirtualMarkersFilter::GetKnownVirtualMarkerLabelsForAxes() const
-   * Returns the list of labels for the virtual markers used to create frames.
+   * @fn const std::list<std::string>& SeparateKnownVirtualMarkersFilter::GetVirtualFrames() const
+   * Returns the list of labels for the virtual markers used to create virtual frames.
    */
   
   /**
-   * Append a label to the list of virtual markers used in another context than frame virtuals.
+   * Append a label to the list of virtual markers used in another context than virtual frames.
    */
-  void SeparateKnownVirtualMarkersFilter::AppendKnownVirtualMarkerLabelForOthers(const std::string& label)
+  void SeparateKnownVirtualMarkersFilter::AppendVirtualMarker(const std::string& label)
   {
-    if (this->FindLabel(&this->m_VirtualMarkerLabelsOthers, label, false))
+    if (this->FindLabel(&this->m_VirtualMarkers, label, false))
       return;
-    this->m_VirtualMarkerLabelsOthers.push_back(label);
+    this->m_VirtualMarkers.push_back(label);
     this->Modified();
   };
    
   /**
-   * Append a list of labels to the list of virtual markers used in another context than frame virtuals.
+   * Append a list of labels to the list of virtual markers used in another context than virtual frames.
    */
-  void SeparateKnownVirtualMarkersFilter::AppendKnownVirtualMarkerLabelsForOthers(const std::list<std::string>& labels)
+  void SeparateKnownVirtualMarkersFilter::AppendVirtualMarkers(const std::list<std::string>& labels)
   {
-    if (this->m_VirtualMarkerLabelsOthers == labels)
+    if (this->m_VirtualMarkers == labels)
       return;
     for (std::list<std::string>::const_iterator it = labels.begin() ; it != labels.end() ; ++it)
     {
-      if (!this->FindLabel(&this->m_VirtualMarkerLabelsOthers, *it, false))
-        this->m_VirtualMarkerLabelsOthers.push_back(*it);
+      if (!this->FindLabel(&this->m_VirtualMarkers, *it, false))
+        this->m_VirtualMarkers.push_back(*it);
     }
     this->Modified();
   };
    
   /**
-   * Sets the list of labels for the virtual markers used in another context than frame virtuals. Each label
+   * Sets the list of labels for the virtual markers used in another context than virtual frames. Each label
    * is checked before to be inserted to not have duplication.
    */
-  void SeparateKnownVirtualMarkersFilter::SetKnownVirtualMarkerLabelsForOthers(const std::list<std::string>& labels)
+  void SeparateKnownVirtualMarkersFilter::SetVirtualMarkers(const std::list<std::string>& labels)
   {
-    if (this->m_VirtualMarkerLabelsOthers == labels)
+    if (this->m_VirtualMarkers == labels)
       return;
-    this->m_VirtualMarkerLabelsOthers = labels;
+    this->m_VirtualMarkers = labels;
     this->Modified();
   };
    
   /**
-   * @fn const std::list<std::string>& SeparateKnownVirtualMarkersFilter::GetKnownVirtualMarkerLabelsForOthers() const
+   * @fn const std::list<std::string>& SeparateKnownVirtualMarkersFilter::GetVirtualMarkers() const
    * Returns the list of labels for the virtual markers used in another context than virtual frames.
    */
-   
+  
+  /**
+   * Reset the list of labels used to define virtual markers and virtual frames to their default value.
+   *
+   * By default, the list of labels used for virtual frames is:
+   *  - HED(O|A|L|P): HEDO, HEDA, HEDL, HELP
+   *  - LCL(O|A|L|P)
+   *  - LFE(O|A|L|P)
+   *  - LFO(O|A|L|P)
+   *  - LHN(O|A|L|P)
+   *  - LHU(O|A|L|P)
+   *  - LRA(O|A|L|P)
+   *  - LTI(O|A|L|P)
+   *  - LTO(O|A|L|P)
+   *  - PEL(O|A|L|P)
+   *  - RCL(O|A|L|P)
+   *  - RFE(O|A|L|P)
+   *  - RFO(O|A|L|P)
+   *  - RHN(O|A|L|P)
+   *  - RHU(O|A|L|P)
+   *  - RRA(O|A|L|P)
+   *  - RTI(O|A|L|P)
+   *  - RTO(O|A|L|P)
+   *  - TRX(O|A|L|P)
+   *
+   * By default, the list of labels for virtual markers is:
+   *  - CenterOfMass
+   *  - CenterOfMassFloor
+   */
+  void SeparateKnownVirtualMarkersFilter::ResetDefinitions()
+  {
+    // Virtual frames
+    this->m_VirtualReferenceFrames.clear();
+    const char* labels[] = {"HED", "LCL", "LFE", "LFO", "LHN", "LHU", "LRA", "LTI", "LTO", "PEL", "RCL", "RFE", "RFO", "RHN", "RHU", "RRA", "RTI", "RTO", "TRX"};
+    size_t ln = sizeof(labels) / sizeof(char*);
+    for (size_t i = 0 ; i < ln ; ++i)
+    {
+      std::string label(labels[i]);
+      this->m_VirtualReferenceFrames.push_back(StringAxes(label + "O", label + "A", label + "L", label + "P"));
+    }
+    // Virtual markers
+    this->m_VirtualMarkers.clear();
+    this->m_VirtualMarkers.push_back("CentreOfMass");
+    this->m_VirtualMarkers.push_back("CentreOfMassFloor");
+  };
+  
   /**
    * Sets the prefix which will be concatenated to the markers' label during the separation.
    */
@@ -285,23 +330,11 @@ namespace btk
    * Constructor. Sets the number of inputs to 1 and outputs to 5.
    */
   SeparateKnownVirtualMarkersFilter::SeparateKnownVirtualMarkersFilter()
-  : ProcessObject(), m_VirtualMarkerLabelsAxes(), m_VirtualMarkerLabelsOthers(), m_Prefix()
+  : ProcessObject(), m_VirtualReferenceFrames(), m_VirtualMarkers(), m_Prefix()
   {
     this->SetInputNumber(1);
     this->SetOutputNumber(5);
-    
-    // virtual markers for frame virtuals
-    const char* labels[] = {"HED", "LCL", "LFE", "LFO", "LHN", "LHU", "LRA", "LTI", "LTO", "PEL", "RCL", "RFE", "RFO", "RHN", "RHU", "RRA", "RTI", "RTO", "TRX"};
-    size_t ln = sizeof(labels) / sizeof(char*);
-    for (size_t i = 0 ; i < ln ; ++i)
-    {
-      std::string label(labels[i]);
-      this->m_VirtualMarkerLabelsAxes.push_back(StringAxes(label + "O", label + "A", label + "L", label + "P"));
-    }
-    
-    // others virtual markers
-    this->m_VirtualMarkerLabelsOthers.push_back("CentreOfMass");
-    this->m_VirtualMarkerLabelsOthers.push_back("CentreOfMassFloor");
+    this->ResetDefinitions();
   };
 
   /**
@@ -346,8 +379,8 @@ namespace btk
         else
           output[0]->InsertItem(*it);
       }
-      // Separate points representing frame virtuals
-      for (std::list<StringAxes>::const_iterator it = this->m_VirtualMarkerLabelsAxes.begin() ; it != this->m_VirtualMarkerLabelsAxes.end() ; ++it)
+      // Separate points representing virtual frames
+      for (std::list<StringAxes>::const_iterator it = this->m_VirtualReferenceFrames.begin() ; it != this->m_VirtualReferenceFrames.end() ; ++it)
       {
         PointCollection::ConstIterator it0 = this->FindLabel(output[0].get(), this->m_Prefix + it->Origin, false);
         PointCollection::ConstIterator it1 = this->FindLabel(output[0].get(), this->m_Prefix + it->Axis1, false);
@@ -384,7 +417,7 @@ namespace btk
       // Known virtual markers' label used in other context.
       for (PointCollection::ConstIterator it = output[0]->Begin() ; it != output[0]->End() ; ++it)
       {
-        if (this->FindLabel(&this->m_VirtualMarkerLabelsOthers, (*it)->GetLabel(), true))
+        if (this->FindLabel(&this->m_VirtualMarkers, (*it)->GetLabel(), true))
         {
           output[3]->InsertItem(*it);
           virtuals->InsertItem(*it);
