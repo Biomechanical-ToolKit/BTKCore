@@ -34,12 +34,15 @@
  */
  
 #include "Preferences_mac.h"
+#include "ChartCycleSettingsManager.h"
+#include "ChartCycleSettingDialog.h"
 
 #include <QMenuBar>
 #include <QFocusEvent>
 #include <QToolTip>
 #include <QFileDialog>
 #include <QColorDialog>
+#include <QMessageBox>
 
 Preferences::Preferences(QMainWindow* parent)
 : QMainWindow(parent), lastDirectory("."), m_Buttons()
@@ -51,6 +54,9 @@ Preferences::Preferences(QMainWindow* parent)
   this->setFocusPolicy(Qt::StrongFocus);
 
   this->m_Buttons = this->findChildren<QToolButton*>();
+  this->m_Buttons.removeOne(this->addChartCycleButton);
+  this->m_Buttons.removeOne(this->removeChartCycleButton);
+  this->m_Buttons.removeOne(this->editChartCycleButton);
   // Remove qt_toolbar_ext_button
   for (QList<QToolButton*>::iterator it = this->m_Buttons.begin() ; it != this->m_Buttons.end() ; ++it)
   {
@@ -104,7 +110,11 @@ Preferences::Preferences(QMainWindow* parent)
   connect(this->defaultGRFButterflyActivationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setDefaultGRFButterflyActivation(int)));
   connect(this->defaultPlotLineWidthSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setDefaultPlotLineWidth(double)));
   connect(this->defaultChartEventDisplayComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(showChartEvent(int)));
-  connect(this->defaultChartUnitAxisXComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setChartUnitAxisX(int)));
+  connect(this->defaultChartUnitAxisXComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setChartHorizontalAxisUnit(int)));
+  connect(this->chartCycleSettingsList, SIGNAL(currentRowChanged(int)), this, SLOT(enableChartCycleButtons(int)));
+  connect(this->addChartCycleButton, SIGNAL(clicked()), this, SLOT(addChartCycleSetting()));
+  connect(this->removeChartCycleButton, SIGNAL(clicked()), this, SLOT(removeChartCycleSetting()));
+  connect(this->editChartCycleButton, SIGNAL(clicked()), this, SLOT(editChartCycleSetting()));
   connect(this->automaticCheckUpdateCheckBox, SIGNAL(toggled(bool)), this, SLOT(setAutomaticCheckUpdate(bool)));
   connect(this->subscribeDevelopmentChannelCheckBox, SIGNAL(toggled(bool)), this, SLOT(setSubscribeDevelopmentChannel(bool)));
   connect(this->layoutTable, SIGNAL(userLayoutRemoved(int)), this, SIGNAL(userLayoutRemoved(int)));
@@ -113,6 +123,17 @@ Preferences::Preferences(QMainWindow* parent)
   
   this->setCurrentIndex(General);
   this->setFocus();
+};
+
+void Preferences::setChartCycleSettingsManager(ChartCycleSettingsManager* manager)
+{
+  this->mp_ChartCycleSettingsManager = manager;
+  for (int i = 0 ; i < manager->count() ; ++i)
+  {
+    QString settingName = manager->setting(i).name;
+    this->chartCycleSettingsList->addItem(settingName);
+    this->defaultChartUnitAxisXComboBox->addItem(settingName);
+  }
 };
 
 void Preferences::setCurrentIndex(int index)
@@ -150,7 +171,7 @@ void Preferences::showChartPreferences()
   this->setCurrentIndex(Chart);
   this->setWindowTitle(tr("Chart"));
   
-  this->animateHeight(this->graphLayout->geometry());
+  this->animateHeight(this->cycleSettingsLayout->geometry());
 };
 
 void Preferences::showLayoutsPreferences()
@@ -319,9 +340,123 @@ void Preferences::showChartEvent(int index)
   emit showChartEventChanged(index);
 };
 
-void Preferences::setChartUnitAxisX(int index)
+void Preferences::setChartHorizontalAxisUnit(int index)
 {
-  emit chartUnitAxisXChanged(index);
+  emit chartHorizontalAxisUnitChanged(index);
+};
+
+void Preferences::enableChartCycleButtons(int index)
+{
+  if (index == -1)
+  {
+    this->removeChartCycleButton->setEnabled(false);
+    this->editChartCycleButton->setEnabled(false);
+  }
+  else
+  {
+    this->removeChartCycleButton->setEnabled(true);
+    this->editChartCycleButton->setEnabled(true);
+  }
+};
+
+void Preferences::addChartCycleSetting()
+{
+  if (this->chartCycleSettingsList->count() >= 10)
+  {
+    QMessageBox::warning(this, tr("Mokka"), tr("You reached the maximum number of settings. You can edit current settings or remove some of them."));
+    return;
+  }
+  
+  ChartCycleSettingDialog dialog(this);
+  dialog.init(this->mp_ChartCycleSettingsManager->eventsLabel());
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    ChartCycleSetting setting;
+    setting.name = dialog.settingNameLineEdit->text();
+    setting.horizontalAxisTitle = dialog.horizontalAxisTitleLineEdit->text();
+    setting.calculationMethod = dialog.calculationMethodComboBox->currentIndex();
+    setting.calculationMethodOption = NULL; // TODO: ADD OPTIONS FOR THE CALCULATION METHOD
+    setting.rightEvents[0] = dialog.fromRightEventComboBox->currentText();
+    setting.rightEvents[1] = dialog.toRightEventComboBox->currentText();
+    setting.leftEvents[0] = dialog.fromLeftEventComboBox->currentText();
+    setting.leftEvents[1] = dialog.toLeftEventComboBox->currentText();
+    setting.generalEvents[0] = dialog.fromGeneralEventComboBox->currentText();
+    setting.generalEvents[1] = dialog.toGeneralEventComboBox->currentText();
+    setting.rightLabelRule = dialog.rightLabelRuleComboBox->currentIndex();
+    setting.rightLabelRuleText = dialog.rightLabelRuleLineEdit->text();
+    setting.leftLabelRule = dialog.leftLabelRuleComboBox->currentIndex();
+    setting.leftLabelRuleText = dialog.leftLabelRuleLineEdit->text();
+    this->mp_ChartCycleSettingsManager->addSetting(setting);
+    this->chartCycleSettingsList->addItem(setting.name);
+    this->chartCycleSettingsList->setCurrentRow(this->chartCycleSettingsList->count()-1);
+    this->defaultChartUnitAxisXComboBox->addItem(setting.name);
+  }
+};
+
+void Preferences::removeChartCycleSetting()
+{
+  int index = this->chartCycleSettingsList->currentRow();
+  if (index == -1)
+    return;
+  QString settingName = this->mp_ChartCycleSettingsManager->setting(index).name;
+  int indexSetting = this->defaultChartUnitAxisXComboBox->findText(settingName);
+  int currentIndex = this->defaultChartUnitAxisXComboBox->currentIndex();
+  this->defaultChartUnitAxisXComboBox->blockSignals(true);
+  this->defaultChartUnitAxisXComboBox->removeItem(indexSetting);
+  this->defaultChartUnitAxisXComboBox->blockSignals(false);
+  if (currentIndex == indexSetting)
+    this->defaultChartUnitAxisXComboBox->setCurrentIndex(0); // Frames
+  delete this->chartCycleSettingsList->takeItem(index);
+  this->mp_ChartCycleSettingsManager->removeSetting(index);
+};
+
+void Preferences::editChartCycleSetting()
+{
+  int index = this->chartCycleSettingsList->currentRow();
+  if (index == -1)
+    return;
+  ChartCycleSetting setting = this->mp_ChartCycleSettingsManager->setting(index);
+  ChartCycleSettingDialog dialog(this);
+  dialog.init(this->mp_ChartCycleSettingsManager->eventsLabel());
+  dialog.settingNameLineEdit->setText(setting.name);
+  dialog.horizontalAxisTitleLineEdit->setText(setting.horizontalAxisTitle);
+  dialog.calculationMethodComboBox->setCurrentIndex(setting.calculationMethod);
+  // TODO: ADD OPTIONS FOR THE CALCULATION METHOD
+  dialog.fromRightEventComboBox->setCurrentIndex(dialog.fromRightEventComboBox->findText(setting.rightEvents[0]));
+  dialog.toRightEventComboBox->setCurrentIndex(dialog.toRightEventComboBox->findText(setting.rightEvents[1]));
+  dialog.fromLeftEventComboBox->setCurrentIndex(dialog.fromLeftEventComboBox->findText(setting.leftEvents[0]));
+  dialog.toLeftEventComboBox->setCurrentIndex(dialog.toLeftEventComboBox->findText(setting.leftEvents[1]));
+  dialog.fromGeneralEventComboBox->setCurrentIndex(dialog.fromGeneralEventComboBox->findText(setting.generalEvents[0]));
+  dialog.toGeneralEventComboBox->setCurrentIndex(dialog.toGeneralEventComboBox->findText(setting.generalEvents[1]));
+  dialog.rightLabelRuleComboBox->setCurrentIndex(setting.rightLabelRule);
+  dialog.rightLabelRuleLineEdit->setText(setting.rightLabelRuleText);
+  dialog.leftLabelRuleComboBox->setCurrentIndex(setting.leftLabelRule);
+  dialog.leftLabelRuleLineEdit->setText(setting.leftLabelRuleText);
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    QString settingName = dialog.settingNameLineEdit->text();
+    if (settingName != setting.name)
+    {
+      this->chartCycleSettingsList->item(index)->setText(settingName);
+      if (this->defaultChartUnitAxisXComboBox->currentText() == setting.name)
+        this->defaultChartUnitAxisXComboBox->setItemText(this->defaultChartUnitAxisXComboBox->currentIndex(), settingName);
+    }
+    setting.name = settingName;
+    setting.horizontalAxisTitle = dialog.horizontalAxisTitleLineEdit->text();
+    setting.calculationMethod = dialog.calculationMethodComboBox->currentIndex();
+    setting.calculationMethodOption = NULL; // TODO: ADD OPTIONS FOR THE CALCULATION METHOD
+    setting.rightEvents[0] = dialog.fromRightEventComboBox->currentText();
+    setting.rightEvents[1] = dialog.toRightEventComboBox->currentText();
+    setting.leftEvents[0] = dialog.fromLeftEventComboBox->currentText();
+    setting.leftEvents[1] = dialog.toLeftEventComboBox->currentText();
+    setting.generalEvents[0] = dialog.fromGeneralEventComboBox->currentText();
+    setting.generalEvents[1] = dialog.toGeneralEventComboBox->currentText();
+    setting.rightLabelRule = dialog.rightLabelRuleComboBox->currentIndex();
+    setting.rightLabelRuleText = dialog.rightLabelRuleLineEdit->text();
+    setting.leftLabelRule = dialog.leftLabelRuleComboBox->currentIndex();
+    setting.leftLabelRuleText = dialog.leftLabelRuleLineEdit->text();
+    this->mp_ChartCycleSettingsManager->setSetting(index, setting);
+  }
 };
 
 void Preferences::setAutomaticCheckUpdate(bool isChecked)

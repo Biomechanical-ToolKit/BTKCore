@@ -33,62 +33,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ChartOptionsWidget_h
-#define ChartOptionsWidget_h
+#ifndef ChartCycleSettingsManager_h
+#define ChartCycleSettingsManager_h
 
-#include "ui_ChartOptionsWidget.h"
+#include "ui_About.h"
 
-#include <QWidget>
+struct ChartCycleCalculationMethodOption
+{};
 
-class ChartWidget;
+struct ChartCycleSetting
+{
+  QString name;
+  QString horizontalAxisTitle;
+  int calculationMethod;
+  ChartCycleCalculationMethodOption* calculationMethodOption;
+  QString leftEvents[2];
+  QString rightEvents[2];
+  QString generalEvents[2];
+  int rightLabelRule;
+  QString rightLabelRuleText;
+  int leftLabelRule;
+  QString leftLabelRuleText;
+};
 
-class ChartOptionsWidget : public QWidget, public Ui::ChartOptionsWidget
+class ChartCycleSettingsManager : public QObject
 {
   Q_OBJECT
   
 public:
-  enum {LineColor = Qt::UserRole + 1, LineWidth, ItemId, ItemEnabled};
+  enum {maxCycleSettings = 10};
   
-  ChartOptionsWidget(QWidget* parent = 0);
+  ChartCycleSettingsManager(QObject* parent = 0);
   
-  void setPlot(int rowIdx, const QString& label, const QColor& color, double width, bool visible, bool discarded, bool disabled);
-  void clear();
-  void setPlotOptionEnabled(bool enabled);
-  QList<int> selectedPlots() const;
-  void setSelectedPlots(const QList<int>& indices);
+  int count() {return this->m_Settings.count();};
+  const ChartCycleSetting& setting(int index) const;
+  void addSetting(const ChartCycleSetting& setting);
+  void removeSetting(int index);
+  void setSetting(int index, const ChartCycleSetting& setting);
   
-public slots:
-  void displayPlotOption();
-  void removePlot();
-  void setLineColor();
-  void setLineWidth(double value);
-  void togglePlotVisibility();
+  const QStringList& eventsLabel() const {return this->m_EventsLabel;};
+  void setEventsLabel(const QStringList& list) {this->m_EventsLabel = list;};
   
 signals:
-  void lineColorChanged(const QList<int>& indices, const QColor& color);
-  void lineWidthChanged(const QList<int>& indices, double value);
-  void plotRemoved(int id);
-  void chartTitleChanged(const QString& title);
-  void pausePlaybackRequested(bool paused);
-  void plotHidden(int id, bool isHidden);
-  
-protected:
-  virtual bool event(QEvent* event);
-  virtual bool eventFilter(QObject* object, QEvent* event);
-  virtual void paintEvent(QPaintEvent* event);
-  
-private slots:
-  void emitChartTitleChanged();
-  
+  void settingAdded();
+  void settingModified(int index);
+  void settingRemoved(int index);
+
 private:
-  friend class ChartWidget;
-
-  QPixmap createLineIcon(const QColor& color, double width);
-  void setLineColorButtonColor(const QColor& color);
-  
-#ifdef Q_OS_WIN
-  bool m_FixUpdateWindowsXP;
-#endif
+  QStringList m_EventsLabel;
+  QList<ChartCycleSetting> m_Settings;
 };
-
-#endif // ChartOptionsWidget_h
+#endif // ChartCycleSettingsManager_h

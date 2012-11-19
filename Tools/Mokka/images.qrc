@@ -3,6 +3,7 @@
     <file>Resources/Images/1downarrow.png</file>
     <file>Resources/Images/1uparrow.png</file>
     <file>Resources/Images/advanced_preferences.png</file>
+    <file>Resources/Images/add.png</file>
     <file>Resources/Images/chart_curve.png</file>
     <file>Resources/Images/chart_line.png</file>
     <file>Resources/Images/chart_preferences.png</file>
@@ -14,9 +15,11 @@
     <file>Resources/Images/checkbox_unchecked-pressed-13.png</file>
     <file>Resources/Images/closedock-16.png</file>
     <file>Resources/Images/closedock-down-16.png</file>
+    <file>Resources/Images/delete.png</file>
     <file>Resources/Images/disclosureTriangleSmallDownBlack.png</file>
     <file>Resources/Images/disclosureTriangleSmallRightBlack.png</file>
     <file>Resources/Images/edit.png</file>
+    <file>Resources/Images/edit-bw.png</file>
     <file>Resources/Images/edit-down.png</file>
     <file>Resources/Images/editdelete.png</file>
     <file>Resources/Images/editdelete-down.png</file>
@@ -25,6 +28,7 @@
     <file>Resources/Images/eye2.png</file>
     <file>Resources/Images/eye-blind.png</file>
     <file>Resources/Images/eye-blind2.png</file>
+    <file>Resources/Images/eye-blind2-bw.png</file>
     <file>Resources/Images/folder.png</file>
     <file>Resources/Images/forceplate-16.png</file>
     <file>Resources/Images/filenew.png</file>

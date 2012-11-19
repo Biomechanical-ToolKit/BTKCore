@@ -42,6 +42,8 @@
 #include <QMainWindow>
 #include <QPropertyAnimation>
 
+class ChartCycleSettingsManager;
+
 class QFocusEvent;
 
 class Preferences : public QMainWindow, public Ui::Preferences
@@ -52,6 +54,7 @@ public:
   Preferences(QMainWindow* parent = 0);
   // ~Preferences(); // Implicit
 
+  void setChartCycleSettingsManager(ChartCycleSettingsManager* manager);
   void setUserLayouts(QList<QVariant>* layouts) {this->layoutTable->setUserLayouts(layouts);};
   void refreshUserLayouts() {this->layoutTable->refresh();};
 
@@ -86,7 +89,11 @@ public slots:
   void showForcePath(int index);
   void setDefaultPlotLineWidth(double width);
   void showChartEvent(int index);
-  void setChartUnitAxisX(int index);
+  void setChartHorizontalAxisUnit(int index);
+  void enableChartCycleButtons(int index);
+  void addChartCycleSetting();
+  void removeChartCycleSetting();
+  void editChartCycleSetting();
   void setAutomaticCheckUpdate(bool isChecked);
   void setSubscribeDevelopmentChannel(bool isChecked);
   
@@ -113,7 +120,7 @@ signals:
   void showForcePathChanged(int index);
   void defaultPlotLineWidthChanged(double width);
   void showChartEventChanged(int index);
-  void chartUnitAxisXChanged(int index);
+  void chartHorizontalAxisUnitChanged(int index);
   void automaticCheckUpdateStateChanged(bool isChecked);
   void subscribeDevelopmentChannelStateChanged(bool isChecked);
   void userLayoutRemoved(int index);
@@ -140,6 +147,7 @@ private:
   int m_CurrentIndex;
   QList<QToolButton*> m_Buttons;
   QPropertyAnimation* mp_GeometryAnimation;
+  ChartCycleSettingsManager* mp_ChartCycleSettingsManager;
 };
 
 inline void Preferences::stylizeFocusedCurrentAction()

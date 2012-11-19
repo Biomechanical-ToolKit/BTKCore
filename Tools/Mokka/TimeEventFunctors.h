@@ -87,7 +87,7 @@ public:
   
   virtual ~EventsFunctor() {};
   
-  virtual bool operator()(int index, int& typeId, int& frame, double rgb[3]);
+  virtual bool operator()(int index, int& typeId, float& x, double rgb[3]);
   
 protected:
   EventsFunctor(TimeEventControlerWidget* w);

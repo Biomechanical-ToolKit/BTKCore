@@ -22,6 +22,8 @@ SET(Mokka_CPP
   About.cpp
   AbstractMultiView.cpp
   AbstractView.cpp
+  ChartCycleSettingDialog.cpp
+  ChartCycleSettingsManager.cpp
   ChartDialog.cpp
   ChartExportDialog.cpp
   ChartOptionsWidget.cpp
@@ -75,6 +77,8 @@ SET(Mokka_H
   Acquisition.h
   AbstractMultiView.h
   AbstractView.h
+  ChartCycleSettingDialog.h
+  ChartCycleSettingsManager.h
   ChartDialog.h
   ChartExportDialog.h
   ChartOptionsWidget.h
@@ -115,6 +119,7 @@ SET(Mokka_H
 SET(Mokka_UI
   About.ui
   AbstractView.ui
+  ChartCycleSettingDialog.ui
   ChartExportDialog.ui
   ChartOptionsWidget.ui
   ExportASCIIDialog.ui

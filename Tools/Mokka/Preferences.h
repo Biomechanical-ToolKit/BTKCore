@@ -106,7 +106,7 @@
     void showForcePathChanged(int index);
     void defaultPlotLineWidthChanged(double width);
     void showChartEventChanged(int index);
-    void chartUnitAxisXChanged(int index);
+    void chartHorizontalAxisUnitChanged(int index);
     
   private slots:
     void removeUserLayout(int index);

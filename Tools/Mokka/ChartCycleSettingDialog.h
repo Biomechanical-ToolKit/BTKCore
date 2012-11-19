@@ -33,62 +33,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ChartOptionsWidget_h
-#define ChartOptionsWidget_h
+#ifndef ChartCycleSettingsDialog_h
+#define ChartCycleSettingsDialog_h
 
-#include "ui_ChartOptionsWidget.h"
+#include "ui_ChartCycleSettingDialog.h"
 
-#include <QWidget>
+#include <QDialog>
 
-class ChartWidget;
-
-class ChartOptionsWidget : public QWidget, public Ui::ChartOptionsWidget
+class ChartCycleSettingDialog : public QDialog, public Ui::ChartCycleSettingDialog
 {
   Q_OBJECT
   
 public:
-  enum {LineColor = Qt::UserRole + 1, LineWidth, ItemId, ItemEnabled};
-  
-  ChartOptionsWidget(QWidget* parent = 0);
-  
-  void setPlot(int rowIdx, const QString& label, const QColor& color, double width, bool visible, bool discarded, bool disabled);
-  void clear();
-  void setPlotOptionEnabled(bool enabled);
-  QList<int> selectedPlots() const;
-  void setSelectedPlots(const QList<int>& indices);
-  
-public slots:
-  void displayPlotOption();
-  void removePlot();
-  void setLineColor();
-  void setLineWidth(double value);
-  void togglePlotVisibility();
-  
-signals:
-  void lineColorChanged(const QList<int>& indices, const QColor& color);
-  void lineWidthChanged(const QList<int>& indices, double value);
-  void plotRemoved(int id);
-  void chartTitleChanged(const QString& title);
-  void pausePlaybackRequested(bool paused);
-  void plotHidden(int id, bool isHidden);
-  
-protected:
-  virtual bool event(QEvent* event);
-  virtual bool eventFilter(QObject* object, QEvent* event);
-  virtual void paintEvent(QPaintEvent* event);
+  ChartCycleSettingDialog(QWidget* parent = 0);
+  void init(const QStringList& events);
   
 private slots:
-  void emitChartTitleChanged();
-  
-private:
-  friend class ChartWidget;
-
-  QPixmap createLineIcon(const QColor& color, double width);
-  void setLineColorButtonColor(const QColor& color);
-  
-#ifdef Q_OS_WIN
-  bool m_FixUpdateWindowsXP;
-#endif
+  void enableCalculationMethodOptions(int index);
+  void validateSettings();
 };
-
-#endif // ChartOptionsWidget_h
+#endif // ChartCycleSettingsDialog_h

@@ -703,7 +703,7 @@ QPushButton:pressed {
           <item row="1" column="0">
            <widget class="QLabel" name="label_27">
             <property name="text">
-             <string>Axis X unit:</string>
+             <string>Horizontal axis unit:</string>
             </property>
            </widget>
           </item>

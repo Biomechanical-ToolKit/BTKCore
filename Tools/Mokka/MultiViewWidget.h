@@ -38,6 +38,7 @@
 
 #include "AbstractMultiView.h"
 #include "Model.h" // Pair
+#include "ChartCycleSettingsManager.h"
 
 #include <btkVTKChartTimeSeries.h> // VTKCurrentFrameFunctor, VTKRegionOfInterestFunctor, VTKEventsFunctor
 
@@ -54,9 +55,29 @@ struct Segment;
 class vtkStreamingDemandDrivenPipelineCollection;
 class vtkProcessMap;
 class vtkActorMap;
-class vtkDoubleArray;
+class vtkFloatArray;
 class ChartDialog;
 class ChartExportDialog;
+
+class EventsFrameMapperFunctor : public btk::VTKEventsFrameMapperFunctor
+{
+public:
+  typedef SharedPtr<EventsFrameMapperFunctor> Pointer;
+  static EventsFrameMapperFunctor::Pointer New(vtkFloatArray* (*abscissa)[4], vtkFloatArray* (*boundaries)[3]) {return Pointer(new EventsFrameMapperFunctor(abscissa, boundaries));};
+  virtual ~EventsFrameMapperFunctor() {};
+  virtual float operator()(int index, int side, int shift);
+  bool GetActivated() {return this->m_Activated;};
+  void SetActivated(bool activated) {this->m_Activated = activated;};
+protected:
+  EventsFrameMapperFunctor(vtkFloatArray* (*abscissa)[4], vtkFloatArray* (*boundaries)[3]);
+private:
+  float extractCyclePercent(int side, int idx);
+  EventsFrameMapperFunctor(const EventsFrameMapperFunctor& ); // Not implemented.
+  EventsFrameMapperFunctor& operator=(const EventsFrameMapperFunctor& ); // Not implemented.  
+  vtkFloatArray* (*mp_HorizontalAbscissa)[4];
+  vtkFloatArray* (*mp_CyclesBoundaries)[3];
+  bool m_Activated;
+};
 
 class MultiViewWidget : public AbstractMultiView
 {
@@ -71,9 +92,10 @@ public:
   void initialize();
   void setView3dActions(QList<QAction*> actions);
   void setViewChartActions(QList<QAction*> actions);
-  
+    
   void setAcquisition(Acquisition* acq);
   void setModel(Model* m);
+  void setChartCycleSettingsManager(ChartCycleSettingsManager* manager);
   void load();
   
   int appendNewSegment(Segment* s);
@@ -92,7 +114,8 @@ public:
   const QString groundNormalAsString() const;
   QMenu* markerTrajectoryLengthMenu() const {return this->mp_MarkerTrajectoryLengthMenu;};
   QAction* forceButterflyActivationAction() const {return this->mp_ForceButterflyActivationAction;};
-  QMenu* chartBottomAxisDisplayMenu() const {return this->mp_ChartBottomAxisDisplayMenu;};
+  QMenu* chartHorizontalAxisUnitMenu() const {return this->mp_ChartHorizontalAxisUnitMenu;};
+  QAction* manageChartCycleSettingsAction() const {return this->mp_ManageChartCycleSettings;};
   
   void setDefaultGroundOrientation(int index);
   void setDefaultBackgroundColor(const QColor& color);
@@ -157,9 +180,11 @@ public slots:
   void restoreLayout3DVerbose();
   void restoreLayout3DCharts();
   void setVideoDelays(QVector<int> ids, QVector<qint64> delays);
-  void updateChartUnitAxisX();
-  void setFrameAsChartUnitAxisX();
-  void setTimeAsChartUnitAxisX();
+  void updateChartHorizontalAxisUnit();
+  void setChartHorizontalAxisUnit(int index);
+  void setChartHorizontalAxisUnitToFrame();
+  void setChartHorizontalAxisUnitToTime();
+  void setChartHorizontalAxisUnitToCycle(int index);
   void showChartEvent(bool visible);
   void setDefaultPlotLineWidth(double width);
   void exportChartToImage(btk::VTKChartTimeSeries* chart);
@@ -190,12 +215,17 @@ private slots:
   void changeMarkerTrajectoryLength();
   void changeForceButterflyActivation();
   void updateAnalogValuesModification(const QVector<int>& ids);
+  void addChartCycleSettingAction();
+  void updateChartCycleSettingAction(int index);
+  void removeChartCycleSettingAction(int index);
   
 private:
-  void displayChartBottomAxisAsFrame();
-  void displayChartBottomAxisAsTime();
+  void displayChartHorizontalAxisAsFrame();
+  void displayChartHorizontalAxisAsTime();
+  void displayChartHorizontalAxisAsCycle(int index);
   void updateCameras();
   void updateViews();
+  void createCyclesFromEventsFrame(int ctx, const QList<int>& begin, const QList<int>& end);
   
   QObject* mp_EventFilterObject;
   Acquisition* mp_Acquisition;
@@ -206,8 +236,10 @@ private:
   vtkActorMap* mp_VTKActor;
   vtkMapperCollection* mp_Mappers;
   vtkStreamingDemandDrivenPipelineCollection* mp_Syncro;
-  vtkDoubleArray* mp_PointChartFrames; // Values for the X axis shared by each point chart.
-  vtkDoubleArray* mp_AnalogChartFrames; // Values for the X axis shared by each analog chart.
+  vtkFloatArray* mp_PointChartAbscissa[4]; // Values for the X axis shared by each point chart.
+  vtkFloatArray* mp_PointChartCycleBoundaries[3];
+  vtkFloatArray* mp_AnalogChartAbscissa[4]; // Values for the X axis shared by each analog chart.
+  vtkFloatArray* mp_AnalogChartCycleBoundaries[3];
   QColor m_ForcePlatformColor;
   QColor m_ForceVectorColor;
   QMenu* mp_GroupOrientationMenu;
@@ -224,10 +256,14 @@ private:
   QAction* mp_ForceButterflyActivationAction;
   QList<QAction*> m_View3dActions;
   QList<QAction*> m_ViewChartActions;
-  QMenu* mp_ChartBottomAxisDisplayMenu;
+  QMenu* mp_ChartHorizontalAxisUnitMenu;
   QAction* mp_ActionChartAxisFrame;
   QAction* mp_ActionChartAxisTime;
   ChartExportDialog* mp_ChartExporter;
+  ChartCycleSettingsManager* mp_ChartCycleSettingsManager;
+  QAction* mp_ActionCycleSettings[ChartCycleSettingsManager::maxCycleSettings];
+  QAction* mp_ManageChartCycleSettings;
+  EventsFrameMapperFunctor::Pointer mp_EventsFrameMapperFunctor;
 };
 
 #endif // MultiViewWidget_h

@@ -55,6 +55,7 @@ public:
   
   bool playbackStatus() const {return this->mp_Timer->isActive();};
   
+  Acquisition* acquisition() const;
   void setAcquisition(Acquisition* acq);
   void load();
   void reset();
@@ -70,7 +71,7 @@ public:
   int timeEventTicksDisplay() const {return this->timeEventBar->m_TimeDisplay ? 1 : 0;};
   void setTimeEventTicksDisplay(int index);
   
-  bool eventItemData(int index, int& typeId, int& frame, double rgb[3]);
+  bool eventItemData(int index, int& typeId, int& frame, int& side, double rgb[3]);
   
   void nextFrame(int inc);
   void previousFrame(int dcr);

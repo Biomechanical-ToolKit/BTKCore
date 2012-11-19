@@ -94,12 +94,12 @@ ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
 #endif
 };
 
-void ChartOptionsWidget::setPlot(int rowIdx, const QString& label, const QColor& color, double width, bool visible, bool discarded)
+void ChartOptionsWidget::setPlot(int rowIdx, const QString& label, const QColor& color, double width, bool visible, bool discarded, bool disabled)
 {
   QTableWidgetItem* item = new QTableWidgetItem(this->createLineIcon(color, width), label);
   item->setData(LineColor, color);
   item->setData(LineWidth, width);
-  item->setForeground(Qt::black);
+  item->setForeground(disabled ? Qt::gray : Qt::black);
   this->plotTable->setItem(rowIdx, 0, item);
   QPushButton* button = 0;
   button = new QPushButton("", this);
@@ -113,6 +113,13 @@ void ChartOptionsWidget::setPlot(int rowIdx, const QString& label, const QColor&
   {
     button->setStyleSheet("QPushButton {image: url(:/Resources/Images/eye-blind2.png);} QPushButton:pressed {image: url(:/Resources/Images/eye-blind.png);} QPushButton:flat {border: none;}");
     item->setData(ItemEnabled, false);
+  }
+  if (disabled)
+  {
+    item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
+    item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
+    button->setEnabled(false);
+    button->setStyleSheet("QPushButton {image: url(:/Resources/Images/eye-blind2-bw.png);} QPushButton:flat {border: none;}");
   }
   this->plotTable->setCellWidget(rowIdx, 1, button);
   connect(button, SIGNAL(clicked()), this, SLOT(togglePlotVisibility()));

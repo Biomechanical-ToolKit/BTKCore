@@ -73,6 +73,7 @@
 #include <vtkPlaneSource.h>
 #include <vtkObjectBase.h>
 #include <vtkIdTypeArray.h>
+#include <vtkFloatArray.h>
 #include <vtkCamera.h>
 
 enum {VTK_GROUND, VTK_FORCE_PLATFORMS, VTK_MARKERS, VTK_GRFS, VTK_GRFS_VECTOR, VTK_GRFS_PWA, VTK_SEGMENTS};
@@ -86,10 +87,52 @@ class vtkProcessMap : public vtkstd::map<int, vtkObjectBase*>
 class vtkActorMap : public vtkstd::map<int, vtkActor*>
 {};
 
+float EventsFrameMapperFunctor::operator()(int index, int side, int shift)
+{
+  float x = -1.0f;
+  if (this->m_Activated)
+  {
+    int idx = index - shift;
+    if (side == 0) // Right
+      x = this->extractCyclePercent(0, idx);
+    else if (side == 1)
+      x = this->extractCyclePercent(1, idx);
+    else
+      x = this->extractCyclePercent(2, idx);
+  }
+  else
+    x = static_cast<float>(index);
+  return x;
+};
+
+float EventsFrameMapperFunctor::extractCyclePercent(int side, int idx)
+{
+  float x = -1.0f;
+  int numCycles = (*this->mp_CyclesBoundaries)[side]->GetNumberOfTuples() / 4;
+  float* boundaries = (*this->mp_CyclesBoundaries)[side]->GetPointer(0);
+  for (int idxCycle = 0 ; idxCycle < numCycles ; ++idxCycle)
+  {
+    // Do not include events at 0% and 100%
+    if ((static_cast<int>(boundaries[4*idxCycle]) < idx) && (static_cast<int>(boundaries[4*idxCycle+2]) > idx))
+    {
+      x = (*this->mp_HorizontalAbscissa)[side+1]->GetPointer(0)[idx];
+      break;
+    }
+  }
+  return x;
+};
+
+EventsFrameMapperFunctor::EventsFrameMapperFunctor(vtkFloatArray* (*abscissa)[4], vtkFloatArray* (*boundaries)[3])
+{
+  this->mp_HorizontalAbscissa = abscissa;
+  this->mp_CyclesBoundaries = boundaries;
+  this->m_Activated = false;
+};
+
 MultiViewWidget::MultiViewWidget(QWidget* parent)
 : AbstractMultiView(parent), m_VideoDelays(),
   m_ForcePlatformColor(127, 127, 127), m_ForceVectorColor(255, 255, 0),
-  m_View3dActions(), m_ViewChartActions()
+  m_View3dActions(), m_ViewChartActions(), mp_EventsFrameMapperFunctor()
 {
   this->mp_EventFilterObject = 0;
   this->mp_Acquisition = 0;
@@ -98,10 +141,31 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_VTKProc = new vtkProcessMap();
   this->mp_VTKActor = new vtkActorMap();
   this->mp_Syncro = new vtkStreamingDemandDrivenPipelineCollection();
-  this->mp_PointChartFrames = vtkDoubleArray::New();
-  this->mp_PointChartFrames->SetName("BottomAxis");
-  this->mp_AnalogChartFrames = vtkDoubleArray::New();
-  this->mp_AnalogChartFrames->SetName("BottomAxis");
+  for (int i = 0 ; i < 4 ; ++i)
+  {
+    this->mp_PointChartAbscissa[i] = vtkFloatArray::New();
+    this->mp_AnalogChartAbscissa[i] = vtkFloatArray::New();
+  }
+  this->mp_PointChartAbscissa[0]->SetName("HorizontalAxis_Point_Frame");
+  this->mp_AnalogChartAbscissa[0]->SetName("HorizontalAxis_Analog_Frame");
+  this->mp_PointChartAbscissa[1]->SetName("HorizontalAxis_Point_RightCycle");
+  this->mp_AnalogChartAbscissa[1]->SetName("HorizontalAxis_Analog_RightCycle");
+  this->mp_PointChartAbscissa[2]->SetName("HorizontalAxis_Point_LeftCycle");
+  this->mp_AnalogChartAbscissa[2]->SetName("HorizontalAxis_Analog_LeftCycle");
+  this->mp_PointChartAbscissa[3]->SetName("HorizontalAxis_Point_GeneralCycle");
+  this->mp_AnalogChartAbscissa[3]->SetName("HorizontalAxis_Analog_GeneralCycle");
+  for (int i = 0 ; i < 3 ; ++i)
+  {
+    this->mp_PointChartCycleBoundaries[i] = vtkFloatArray::New();
+    this->mp_AnalogChartCycleBoundaries[i] = vtkFloatArray::New();
+  }
+  this->mp_PointChartCycleBoundaries[0]->SetName("PointRightCycleBoundaries");
+  this->mp_AnalogChartCycleBoundaries[0]->SetName("AnalogRightCycleBoundaries");
+  this->mp_PointChartCycleBoundaries[1]->SetName("PointLeftCycleBoundaries");
+  this->mp_AnalogChartCycleBoundaries[1]->SetName("AnalogLeftCycleBoundaries");
+  this->mp_PointChartCycleBoundaries[2]->SetName("PointGeneralCycleBoundaries");
+  this->mp_AnalogChartCycleBoundaries[2]->SetName("AnalogGeneralCycleBoundaries");
+  this->mp_EventsFrameMapperFunctor = EventsFrameMapperFunctor::New(&(this->mp_PointChartAbscissa), &(this->mp_PointChartCycleBoundaries));
   this->mp_Mappers = vtkMapperCollection::New();
   this->mp_GroupOrientationMenu = new QMenu(tr("Ground Orientation"),this);
   this->mp_ActionGroundOrientationAutomatic = new QAction(tr("Automatic"),this);
@@ -149,22 +213,35 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_ForceButterflyActivationAction = new QAction(tr("Toggle GRF Butterfly"),this);
   this->mp_ForceButterflyActivationAction->setEnabled(false);
   
-  this->mp_ChartBottomAxisDisplayMenu = new QMenu(tr("Chart Unit: X Axis"),this);
+  this->mp_ChartHorizontalAxisUnitMenu = new QMenu(tr("Horizontal Axis Unit"),this);
   this->mp_ActionChartAxisFrame = new QAction(tr("Frame"),this);
   this->mp_ActionChartAxisFrame->setCheckable(true);
   this->mp_ActionChartAxisTime = new QAction(tr("Time"),this);
   this->mp_ActionChartAxisTime->setCheckable(true);
+  QMenu* menuCycle = new QMenu(tr("Cycle"),this);
   QActionGroup* chartBottomAxisDisplay = new QActionGroup(this);
   chartBottomAxisDisplay->addAction(this->mp_ActionChartAxisFrame);
   chartBottomAxisDisplay->addAction(this->mp_ActionChartAxisTime);
   this->mp_ActionChartAxisFrame->setChecked(true);
-  this->mp_ChartBottomAxisDisplayMenu->addAction(this->mp_ActionChartAxisFrame);
-  this->mp_ChartBottomAxisDisplayMenu->addAction(this->mp_ActionChartAxisTime);
+  this->mp_ChartHorizontalAxisUnitMenu->addAction(this->mp_ActionChartAxisFrame);
+  this->mp_ChartHorizontalAxisUnitMenu->addAction(this->mp_ActionChartAxisTime);
+  this->mp_ChartHorizontalAxisUnitMenu->addAction(menuCycle->menuAction());
+  for (int i = 0 ; i < ChartCycleSettingsManager::maxCycleSettings ; ++i)
+  {
+    this->mp_ActionCycleSettings[i] = new QAction(chartBottomAxisDisplay);
+    this->mp_ActionCycleSettings[i]->setCheckable(true);
+    this->mp_ActionCycleSettings[i]->setVisible(false);
+    menuCycle->addAction(this->mp_ActionCycleSettings[i]);
+  }
+  menuCycle->addSeparator();
+  this->mp_ManageChartCycleSettings = new QAction(tr("Manage Cycle Settings"),this);
+  menuCycle->addAction(this->mp_ManageChartCycleSettings);
+  this->mp_ChartCycleSettingsManager = 0;
   
   connect(groundOrientationActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeGroundOrientation()));
   connect(trajectoryLengthActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(changeMarkerTrajectoryLength()));
   connect(this->mp_ForceButterflyActivationAction, SIGNAL(triggered(bool)), this, SLOT(changeForceButterflyActivation()));
-  connect(chartBottomAxisDisplay, SIGNAL(triggered(QAction*)), this, SLOT(updateChartUnitAxisX()));
+  connect(chartBottomAxisDisplay, SIGNAL(triggered(QAction*)), this, SLOT(updateChartHorizontalAxisUnit()));
   
   this->setViewPrototype(ViewFactory<CompositeView>);
 };
@@ -179,8 +256,16 @@ MultiViewWidget::~MultiViewWidget()
     it->second->Delete();
   delete this->mp_VTKActor;
   delete this->mp_Syncro;
-  this->mp_PointChartFrames->Delete();
-  this->mp_AnalogChartFrames->Delete();
+  for (int i = 0 ; i < 4 ; ++i)
+  {
+    this->mp_PointChartAbscissa[i]->Delete();
+    this->mp_AnalogChartAbscissa[i]->Delete();
+  }
+  for (int i = 0 ; i < 3 ; ++i)
+  {
+    this->mp_PointChartCycleBoundaries[i]->Delete();
+    this->mp_AnalogChartCycleBoundaries[i]->Delete();
+  }
   this->mp_Mappers->Delete();
   vtkAlgorithm::SetDefaultExecutivePrototype(0);
 };
@@ -407,8 +492,8 @@ void MultiViewWidget::initialize()
       SLOT(updateDisplayedMarkersList(vtkObject*, unsigned long, void*, void*)));
       
   // Initialize the charts
-  chart->setPointFrameArray(this->mp_PointChartFrames);
-  chart->setAnalogFrameArray(this->mp_AnalogChartFrames);
+  chart->setPointHorizontalData(&(this->mp_PointChartAbscissa), &(this->mp_PointChartCycleBoundaries));
+  chart->setAnalogHorizontalData(&(this->mp_AnalogChartAbscissa), &(this->mp_AnalogChartCycleBoundaries));
   
   // Initialize the video delays
   video->setDelays(&this->m_VideoDelays);
@@ -459,6 +544,33 @@ void MultiViewWidget::setModel(Model* m)
   connect(this->mp_Model, SIGNAL(segmentsSurfaceVisibilityChanged(QVector<int>, QVector<bool>)), this, SLOT(setSegmentsSurfaceVisibility(QVector<int>, QVector<bool>)));
 }
 
+void MultiViewWidget::setChartCycleSettingsManager(ChartCycleSettingsManager* manager)
+{
+  if (this->mp_ChartCycleSettingsManager != 0)
+    this->mp_ChartCycleSettingsManager->disconnect(this);
+  this->mp_ChartCycleSettingsManager = manager;
+
+  int numNewSettings = 0;
+  if (this->mp_ChartCycleSettingsManager != 0)
+  {
+    numNewSettings = this->mp_ChartCycleSettingsManager->count();
+    connect(this->mp_ChartCycleSettingsManager, SIGNAL(settingAdded()), this, SLOT(addChartCycleSettingAction()));
+    connect(this->mp_ChartCycleSettingsManager, SIGNAL(settingModified(int)), this, SLOT(updateChartCycleSettingAction(int)));
+    connect(this->mp_ChartCycleSettingsManager, SIGNAL(settingRemoved(int)), this, SLOT(removeChartCycleSettingAction(int)));
+  }
+  
+  for (int i = 0 ; i < numNewSettings ; ++i)
+  {
+    this->mp_ActionCycleSettings[i]->setText(this->mp_ChartCycleSettingsManager->setting(i).name);
+    this->mp_ActionCycleSettings[i]->setVisible(true);
+  }
+  for (int i = numNewSettings ; i < ChartCycleSettingsManager::maxCycleSettings ; ++i)
+  {
+    this->mp_ActionCycleSettings[i]->setText("");
+    this->mp_ActionCycleSettings[i]->setVisible(false);
+  }
+};
+
 void MultiViewWidget::setView3dActions(QList<QAction*> actions)
 {
   this->m_View3dActions = actions;
@@ -506,23 +618,22 @@ void MultiViewWidget::load()
   this->updateDisplay(this->mp_Acquisition->firstFrame());
   
   // Update the X axis values for the charts
-  this->mp_PointChartFrames->Initialize(); // Reset
-  this->mp_PointChartFrames->SetNumberOfValues(this->mp_Acquisition->pointFrameNumber());
-  this->mp_AnalogChartFrames->Initialize(); // Reset
-  this->mp_AnalogChartFrames->SetNumberOfValues(this->mp_Acquisition->analogFrameNumber());
+  this->mp_PointChartAbscissa[0]->Initialize(); // Reset
+  this->mp_PointChartAbscissa[0]->SetNumberOfValues(this->mp_Acquisition->pointFrameNumber());
+  this->mp_AnalogChartAbscissa[0]->Initialize(); // Reset
+  this->mp_AnalogChartAbscissa[0]->SetNumberOfValues(this->mp_Acquisition->analogFrameNumber());
   double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
   for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
   {
     double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
     // Point
-    this->mp_PointChartFrames->SetValue(i, val);
+    this->mp_PointChartAbscissa[0]->SetValue(i, val);
     // Analog
     int inc = i * this->mp_Acquisition->analogSamplePerPointFrame();
-    this->mp_AnalogChartFrames->SetValue(inc, val);
-    for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
-      this->mp_AnalogChartFrames->SetValue(inc + j, val + j * sub);
+    for (int j = 0 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
+      this->mp_AnalogChartAbscissa[0]->SetValue(inc + j, val + static_cast<double>(j) * sub);
   }
-  this->updateChartUnitAxisX();
+  this->updateChartHorizontalAxisUnit();
   
   // Update video delays
   this->m_VideoDelays.clear();
@@ -559,6 +670,7 @@ void MultiViewWidget::setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor
 
 void MultiViewWidget::setEventsFunctor(btk::VTKEventsFunctor::Pointer functor)
 {
+  functor->SetFrameMapper(this->mp_EventsFrameMapperFunctor);
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
     static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->setEventsFunctor(functor);
 };
@@ -939,14 +1051,13 @@ void MultiViewWidget::updateFramesIndex(int ff)
   double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
   for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
   {
+    double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i); 
     // Point
-    this->mp_PointChartFrames->SetValue(i, this->mp_Acquisition->firstFrame() + i);
+    this->mp_PointChartAbscissa[0]->SetValue(i, val);
     // Analog
     int inc = i * this->mp_Acquisition->analogSamplePerPointFrame();
-    double val = static_cast<double>(this->mp_Acquisition->firstFrame() + i);
-    this->mp_AnalogChartFrames->SetValue(inc, val);
-    for (int j = 1 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
-      this->mp_AnalogChartFrames->SetValue(inc + j, val + j * sub);
+    for (int j = 0 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
+      this->mp_AnalogChartAbscissa[0]->SetValue(inc + j, val + static_cast<double>(j) * sub);
   }
   // Video
   for (QMap<int, Video*>::const_iterator it = this->mp_Acquisition->videos().begin() ; it != this->mp_Acquisition->videos().end() ; ++it)
@@ -954,7 +1065,7 @@ void MultiViewWidget::updateFramesIndex(int ff)
   // Display
   for (QList<AbstractView*>::const_iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
   {
-    static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->updateAxisX();
+    static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->updateHorizontalAxis();
     static_cast<CompositeView*>(*it)->render();
   }
 };
@@ -1517,42 +1628,205 @@ void MultiViewWidget::adaptViewsForPlaybackOff()
     static_cast<VideoWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::MediaVideo))->stop();
 };
 
-void MultiViewWidget::updateChartUnitAxisX()
+void MultiViewWidget::updateChartHorizontalAxisUnit()
 {
   if (this->mp_ActionChartAxisFrame->isChecked())
-    this->displayChartBottomAxisAsFrame();
+    this->displayChartHorizontalAxisAsFrame();
   else if (this->mp_ActionChartAxisTime->isChecked())
-    this->displayChartBottomAxisAsTime();
+    this->displayChartHorizontalAxisAsTime();
+  else
+  {
+    for (int i = 0 ; i < ChartCycleSettingsManager::maxCycleSettings ; ++i)
+    {
+      if (this->mp_ActionCycleSettings[i]->isChecked())
+      {
+        this->displayChartHorizontalAxisAsCycle(i);
+        break;
+      }
+    }
+  }
 };
 
-void MultiViewWidget::setFrameAsChartUnitAxisX()
+void MultiViewWidget::setChartHorizontalAxisUnit(int index)
+{
+  if (index == 0)
+    this->setChartHorizontalAxisUnitToFrame();
+  else if (index == 1)
+    this->setChartHorizontalAxisUnitToTime();
+  else
+    this->setChartHorizontalAxisUnitToCycle(2-index);
+};
+
+void MultiViewWidget::setChartHorizontalAxisUnitToFrame()
 {
   this->mp_ActionChartAxisFrame->trigger();
 };
 
-void MultiViewWidget::setTimeAsChartUnitAxisX()
+void MultiViewWidget::setChartHorizontalAxisUnitToTime()
 {
   this->mp_ActionChartAxisTime->trigger();
 };
 
-void MultiViewWidget::displayChartBottomAxisAsFrame()
+void MultiViewWidget::setChartHorizontalAxisUnitToCycle(int index)
+{
+  if (index < ChartCycleSettingsManager::maxCycleSettings)
+    this->mp_ActionCycleSettings[index]->trigger();
+};
+
+void MultiViewWidget::displayChartHorizontalAxisAsFrame()
 {
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
   {
     ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
-    w->setUnitAxisX("Frame", 1.0, 0.0);
+    if (w->horizontalDisplayMode() == ChartWidget::CyclicDisplay)
+      w->setHorizontalAxisRange(this->mp_Acquisition->firstFrame(), this->mp_Acquisition->lastFrame());
+    w->setHorizontalAxisUnit(tr("Frame"), 1.0, 0.0);
   }
-}
+  this->mp_EventsFrameMapperFunctor->SetActivated(false);
+};
 
-void MultiViewWidget::displayChartBottomAxisAsTime()
+void MultiViewWidget::displayChartHorizontalAxisAsTime()
 {
   double f = this->mp_Acquisition->btkAcquisition() ? this->mp_Acquisition->pointFrequency() : 1.0;
   for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
   {
     ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
-    w->setUnitAxisX("Time (s)", 1.0 / f, -1.0);
+    if (w->horizontalDisplayMode() == ChartWidget::CyclicDisplay)
+      w->setHorizontalAxisRange(this->mp_Acquisition->firstFrame(), this->mp_Acquisition->lastFrame());
+    w->setHorizontalAxisUnit(tr("Time (s)"), 1.0 / f, -1.0);
   }
-}
+  this->mp_EventsFrameMapperFunctor->SetActivated(false);
+};
+
+void MultiViewWidget::displayChartHorizontalAxisAsCycle(int index)
+{
+  ChartCycleSetting setting = this->mp_ChartCycleSettingsManager->setting(index);
+  if (this->mp_Acquisition->btkAcquisition() != NULL)
+  {
+    QList<int> rightBegin, rightEnd, leftBegin, leftEnd, generalBegin, generalEnd;
+    // Extract the events use for the right/left/general cycles
+    for (QMap<int,Event*>::const_iterator it = this->mp_Acquisition->events().begin() ; it != this->mp_Acquisition->events().end() ; ++it)
+    {
+      Event* e = it.value();
+      if (e->context.compare("Right", Qt::CaseInsensitive) == 0)
+      {
+        if (e->label.compare(setting.rightEvents[0], Qt::CaseInsensitive) == 0)
+          rightBegin.push_back(e->frame);
+        if (e->label.compare(setting.rightEvents[1], Qt::CaseInsensitive) == 0)
+          rightEnd.push_back(e->frame);
+      }
+      else if (e->context.compare("Left", Qt::CaseInsensitive) == 0)
+      {
+        if (e->label.compare(setting.leftEvents[0], Qt::CaseInsensitive) == 0)
+          leftBegin.push_back(e->frame);
+        if (e->label.compare(setting.leftEvents[1], Qt::CaseInsensitive) == 0)
+          leftEnd.push_back(e->frame);
+      }
+      else
+      {
+        if (e->label.compare(setting.generalEvents[0], Qt::CaseInsensitive) == 0)
+          generalBegin.push_back(e->frame);
+        if (e->label.compare(setting.generalEvents[1], Qt::CaseInsensitive) == 0)
+          generalEnd.push_back(e->frame);
+      }
+    }
+    // Sort them, create array with the definition of the cycles and fill abscissa for the cycles
+    qSort(rightBegin); qSort(rightEnd); qSort(leftBegin); qSort(leftEnd); qSort(generalBegin); qSort(generalEnd);
+    QList<int> rightCycles, leftCycles, generalCycles;
+    this->createCyclesFromEventsFrame(1, rightBegin, rightEnd);
+    this->createCyclesFromEventsFrame(2, leftBegin, leftEnd);
+    this->createCyclesFromEventsFrame(3, generalBegin, generalEnd);
+  }
+  this->mp_EventsFrameMapperFunctor->SetActivated(true);
+  
+  for (QList<AbstractView*>::iterator it = this->m_Views.begin() ; it != this->m_Views.end() ; ++it)
+  {
+    ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
+    w->setDataToCycleMatchingRules(setting.rightLabelRule, setting.rightLabelRuleText, setting.leftLabelRule, setting.leftLabelRuleText);
+    w->setHorizontalAxisUnit(setting.horizontalAxisTitle, 1.0, 0.0, true);
+    w->setHorizontalAxisRange(0.0, 100.0);
+  }
+  
+  this->updateViews();
+};
+
+// ctx (context) - 1: Right, 2: Left, 3: General
+void MultiViewWidget::createCyclesFromEventsFrame(int ctx, const QList<int>& begin, const QList<int>& end)
+{
+  this->mp_PointChartAbscissa[ctx]->Initialize(); // Reset
+  this->mp_PointChartAbscissa[ctx]->SetNumberOfValues(this->mp_Acquisition->pointFrameNumber());
+  this->mp_AnalogChartAbscissa[ctx]->Initialize(); // Reset
+  this->mp_AnalogChartAbscissa[ctx]->SetNumberOfValues(this->mp_Acquisition->analogFrameNumber());
+  this->mp_PointChartCycleBoundaries[ctx-1]->Initialize();
+  this->mp_AnalogChartCycleBoundaries[ctx-1]->Initialize();
+  double sub = 1.0 / (double)this->mp_Acquisition->analogSamplePerPointFrame();
+  for (int i = 0 ; i < this->mp_Acquisition->pointFrameNumber() ; ++i)
+  {
+    // Point
+    this->mp_PointChartAbscissa[ctx]->SetValue(i, 0.0);
+    // Analog
+    int inc = i * this->mp_Acquisition->analogSamplePerPointFrame();
+    for (int j = 0 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
+      this->mp_AnalogChartAbscissa[ctx]->SetValue(inc + j, 0.0);
+  }
+  
+  if (!begin.isEmpty() && !end.isEmpty())
+  {
+    QList<int>::const_iterator itBegin = begin.begin();
+    for (QList<int>::const_iterator itEnd = end.begin(); itEnd != end.end() ; ++itEnd)
+    {
+      if (*itEnd > *itBegin)
+      {
+        // To use the closest "begin" event with the current "end" event
+        QList<int>::const_iterator itNextBegin = itBegin; ++itNextBegin;
+        while (itNextBegin != begin.end())
+        {
+          if (*itNextBegin < *itEnd)
+            ++itBegin;
+          else
+            break;
+          ++itNextBegin;
+        };
+        
+        this->mp_PointChartCycleBoundaries[ctx-1]->InsertNextValue(*itBegin - this->mp_Acquisition->firstFrame());
+        this->mp_PointChartCycleBoundaries[ctx-1]->InsertNextValue(0.0f);
+        this->mp_PointChartCycleBoundaries[ctx-1]->InsertNextValue(*itEnd - this->mp_Acquisition->firstFrame());
+        this->mp_PointChartCycleBoundaries[ctx-1]->InsertNextValue(100.0f);
+        this->mp_AnalogChartCycleBoundaries[ctx-1]->InsertNextValue((*itBegin - this->mp_Acquisition->firstFrame()) * this->mp_Acquisition->analogSamplePerPointFrame());
+        this->mp_AnalogChartCycleBoundaries[ctx-1]->InsertNextValue(0.0f);
+        this->mp_AnalogChartCycleBoundaries[ctx-1]->InsertNextValue((*itEnd - this->mp_Acquisition->firstFrame()) * this->mp_Acquisition->analogSamplePerPointFrame());
+        this->mp_AnalogChartCycleBoundaries[ctx-1]->InsertNextValue(100.0f);
+        double scale = 100.0 / static_cast<double>(*itEnd - *itBegin);
+        for (int i = *itBegin ; i <= *itEnd ; ++i)
+        {
+          int idx = i - this->mp_Acquisition->firstFrame();
+          double val = static_cast<double>(i - *itBegin) * scale;
+          // Point
+          this->mp_PointChartAbscissa[ctx]->SetValue(idx, val);
+          // Analog
+          int inc = idx * this->mp_Acquisition->analogSamplePerPointFrame(); 
+          for (int j = 0 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
+            this->mp_AnalogChartAbscissa[ctx]->SetValue(inc + j, val + j * sub);
+        }
+        // std::cout << "Cycle: Pts: " << btk::ToString(*itEnd - *itBegin + 1) << std::endl;
+        /*
+        std::cout << " * Point - Values: ";
+        for (int i = *itBegin ; i <= *itEnd ; ++i)
+          std::cout << this->mp_PointChartAbscissa[ctx]->GetValue(i - this->mp_Acquisition->firstFrame()) << ", ";
+        std::cout << std::endl;
+        std::cout << " * Analog - Values: ";
+        for (int i = *itBegin ; i <= *itEnd ; ++i)
+          for (int j = 0 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
+            std::cout << this->mp_AnalogChartAbscissa[ctx]->GetValue((i - this->mp_Acquisition->firstFrame()) * this->mp_Acquisition->analogSamplePerPointFrame() + j) << ", ";
+        std::cout << std::endl;
+        */
+        ++itBegin;
+        if (itBegin == begin.end())
+          break;
+      }
+    }
+  }
+};
 
 void MultiViewWidget::showChartEvent(bool visible)
 {
@@ -1685,6 +1959,34 @@ void MultiViewWidget::updateAnalogValuesModification(const QVector<int>& ids)
   {
     static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart))->refreshPlots();
     static_cast<CompositeView*>(*it)->render();
+  }
+};
+
+void MultiViewWidget::addChartCycleSettingAction()
+{
+  int index = -1;
+  if ((this->mp_ChartCycleSettingsManager != 0) && ((index = this->mp_ChartCycleSettingsManager->count()-1) >= 0))
+  {
+    this->mp_ActionCycleSettings[index]->setText(this->mp_ChartCycleSettingsManager->setting(index).name);
+    this->mp_ActionCycleSettings[index]->setVisible(true);
+  }
+};
+
+void MultiViewWidget::updateChartCycleSettingAction(int index)
+{
+  if ((this->mp_ChartCycleSettingsManager != 0) && (index < this->mp_ChartCycleSettingsManager->count()))
+  {
+    this->mp_ActionCycleSettings[index]->setText(this->mp_ChartCycleSettingsManager->setting(index).name);
+    this->mp_ActionCycleSettings[index]->setVisible(true);
+  }
+};
+
+void MultiViewWidget::removeChartCycleSettingAction(int index)
+{
+  if ((this->mp_ChartCycleSettingsManager != 0) && (index < this->mp_ChartCycleSettingsManager->count()))
+  {
+    this->mp_ActionCycleSettings[index]->setText("");
+    this->mp_ActionCycleSettings[index]->setVisible(false);
   }
 };
 

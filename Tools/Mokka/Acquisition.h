@@ -85,7 +85,7 @@ struct Analog
 
 struct Event
 {
-  // TODO: static Event* fromBtkPoint(btk::Event::Pointer event)
+  // TODO: static Event* fromBtkEvent(btk::Event::Pointer event)
   QString label;
   QString description;
   QString context;

@@ -60,7 +60,7 @@ public slots:
   void updateChartFontSize(int value);
   void updateChartFontBold(bool toggled);
   void updateChartFontItalic(bool toggled);
-  void updateAxisXTitle(const QString& title);
+  void updateHorizontalAxisTitle(const QString& title);
   void updateAxisYTitle(const QString& title);
   void updateLegendVisibility(int checked);
   void updateLegendUnitVisibility(int checked);

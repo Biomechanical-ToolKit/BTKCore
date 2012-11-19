@@ -75,16 +75,23 @@ RegionOfInterestFunctor::RegionOfInterestFunctor(TimeEventControlerWidget* w)
   this->mp_Object = w;
 };
 
-// ----------------------- RegionOfInterestFunctor ----------------------- //
+// ----------------------- EventsFunctor ----------------------- //
 
-bool EventsFunctor::operator()(int index, int& typeId, int& frame, double rgb[3])
+bool EventsFunctor::operator()(int index, int& typeId, float& x, double rgb[3])
 {
   typeId = -1;
-  frame = 0;
+  x = 0.0f;
   rgb[0] = 0.0; rgb[1] = 0.0; rgb[2] = 0.0;
   if (!this->mp_Object)
     return false;
-  return this->mp_Object->eventItemData(index, typeId, frame, rgb);
+  int frame = -1;
+  int side = -1;
+  bool res = this->mp_Object->eventItemData(index, typeId, frame, side, rgb);
+  if (this->mp_FrameMapper.get() != NULL)
+    x = (*this->mp_FrameMapper)(frame, side, this->mp_Object->acquisition()->firstFrame());
+  else
+    x = static_cast<float>(frame);
+  return res;
 };
 
 EventsFunctor::EventsFunctor(TimeEventControlerWidget* w)

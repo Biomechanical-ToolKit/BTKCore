@@ -37,6 +37,7 @@
 #include "MainWindow.h"
 #include "About.h"
 #include "Acquisition.h"
+#include "ChartCycleSettingsManager.h"
 #include "ChartDialog.h"
 #include "CompositeView.h"
 #include "ExportASCIIDialog.h"
@@ -87,6 +88,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->mp_Updater = new UpdateManager(MOKKA_VERSION_STRING,
                                        "http://b-tk.googlecode.com/svn/doc/Mokka/latestMokka",
                                        ":/Resources/Images/Mokka_128.png", this);
+  this->mp_ChartCycleSettingsManager = new ChartCycleSettingsManager(this);
 #ifdef Q_OS_MAC
   this->mp_MacMenuBar = 0;
   this->mp_Preferences = new Preferences(0); // No parent: to be independant of the main window
@@ -125,7 +127,7 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuSettings->addMenu(this->multiView->markerTrajectoryLengthMenu());
   this->menuSettings->addAction(this->multiView->forceButterflyActivationAction());
   this->menuSettings->addSeparator();
-  this->menuSettings->addMenu(this->multiView->chartBottomAxisDisplayMenu());
+  this->menuSettings->addMenu(this->multiView->chartHorizontalAxisUnitMenu());
   // Menu Tools
   this->mp_ToolsManager = new ToolsManager(new ToolsData(this), this->menuTools, this);
   this->mp_ToolsManager->menuModel()->addAction(this->mp_ModelDock->newSegmentAction());
@@ -256,6 +258,9 @@ MainWindow::MainWindow(QWidget* parent)
   // Setting the model
   this->mp_ModelDock->setModel(this->mp_Model);
   this->multiView->setModel(this->mp_Model);
+  // Setting the chart cycle manager
+  this->multiView->setChartCycleSettingsManager(this->mp_ChartCycleSettingsManager);
+  this->mp_Preferences->setChartCycleSettingsManager(this->mp_ChartCycleSettingsManager);
   
   // Qt UI: Undo/Redo
   this->mp_UndoStack = new QUndoStack(this); // One to command all.
@@ -335,7 +340,8 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->multiView, SIGNAL(selectedMarkersToggled(QList<int>)), this, SLOT(selectSelectedMarkers(QList<int>)));
   connect(this->multiView, SIGNAL(trajectoryMarkerToggled(int)), this, SLOT(toggleMarkerTrajectory(int)));
   connect(this->multiView, SIGNAL(pausePlaybackRequested(bool)), this, SLOT(playPausePlayback(bool)));
-  // Model dock
+  connect(this->multiView->manageChartCycleSettingsAction(), SIGNAL(triggered()), this, SLOT(manageChartCycleSettings()));
+  // // Model dock
   connect(this->mp_ModelDock, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), this, SLOT(modelDockLocationChanged(Qt::DockWidgetArea)));
   connect(this->mp_ModelDock, SIGNAL(markerLabelChanged(int, QString)), this, SLOT(setPointLabel(int, QString)));
   connect(this->mp_ModelDock, SIGNAL(markersRadiusChanged(QVector<int>, double)), this, SLOT(setMarkersRadius(QVector<int>, double)));
@@ -444,7 +450,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->mp_Preferences, SIGNAL(showForcePathChanged(int)), this, SLOT(setPreferenceShowForcePath(int)));
   connect(this->mp_Preferences, SIGNAL(defaultPlotLineWidthChanged(double)), this, SLOT(setPreferencePlotLineWidth(double)));
   connect(this->mp_Preferences, SIGNAL(showChartEventChanged(int)), this, SLOT(setPreferenceShowChartEvent(int)));
-  connect(this->mp_Preferences, SIGNAL(chartUnitAxisXChanged(int)), this, SLOT(setPreferenceChartUnitAxisX(int)));
+  connect(this->mp_Preferences, SIGNAL(chartHorizontalAxisUnitChanged(int)), this, SLOT(setPreferenceChartHorizontalAxisUnit(int)));
   connect(this->mp_Preferences, SIGNAL(automaticCheckUpdateStateChanged(bool)), this, SLOT(setPreferenceAutomaticCheckUpdate(bool)));
   connect(this->mp_Preferences, SIGNAL(subscribeDevelopmentChannelStateChanged(bool)), this, SLOT(setPreferenceSubscribeDevelopmentChannel(bool)));
 #ifdef Q_OS_MAC
@@ -871,6 +877,12 @@ void MainWindow::manageUserLayouts()
 {
   this->showPreferences();
   this->mp_Preferences->showLayoutsPreferences();
+};
+
+void MainWindow::manageChartCycleSettings()
+{
+  this->showPreferences();
+  this->mp_Preferences->showChartPreferences();
 };
 
 void MainWindow::createMarkerFromMarkersSelection()
@@ -2621,14 +2633,11 @@ void MainWindow::setPreferenceShowChartEvent(int index)
   this->multiView->showChartEvent(index == 0);
 };
 
-void MainWindow::setPreferenceChartUnitAxisX(int index)
+void MainWindow::setPreferenceChartHorizontalAxisUnit(int index)
 {
   QSettings settings;
   settings.setValue("Preferences/chartUnitAxisX", index);
-  if (index == 0)
-    this->multiView->setFrameAsChartUnitAxisX();
-  else
-    this->multiView->setTimeAsChartUnitAxisX();
+  this->multiView->setChartHorizontalAxisUnit(index);
 };
 
 void MainWindow::setPreferenceAutomaticCheckUpdate(bool isChecked)
@@ -2790,6 +2799,49 @@ void MainWindow::readSettings()
   this->mp_ModelDock->setRecentColor(3, settings.value("recentColor4", QColor()).value<QColor>());
   this->mp_ModelDock->setRecentColor(4, settings.value("recentColor5", QColor()).value<QColor>());
   settings.endGroup();
+  
+  // Chart cycle settings
+  settings.beginGroup("ChartCycleSettings");
+  QStringList eventsLabel = settings.value("eventsLabel").toStringList();
+  int numSettings = settings.value("settingsNumber", -1).toInt();
+  settings.endGroup();
+  if (eventsLabel.isEmpty())
+  {
+    eventsLabel.push_back("Foot Strike");
+    eventsLabel.push_back("Foot Off");
+  }
+  this->mp_ChartCycleSettingsManager->setEventsLabel(eventsLabel);
+  QList<ChartCycleSetting> cycleSettings;
+  if (numSettings == -1)
+  {
+    ChartCycleSetting ccs;
+    ccs.name = "Cycle: Full Gait";
+    ccs.horizontalAxisTitle = "Gait Cycle (%GC)";
+    ccs.calculationMethod = 0; // 0: Normalization
+    ccs.calculationMethodOption = NULL;
+    ccs.rightEvents[0] = "Foot Strike";
+    ccs.rightEvents[1] = "Foot Strike";
+    ccs.leftEvents[0] = "Foot Strike";
+    ccs.leftEvents[1] = "Foot Strike";
+    ccs.generalEvents[0] = "Foot Strike";
+    ccs.generalEvents[1] = "Foot Strike";
+    ccs.rightLabelRule = 0; // 0: Starts with
+    ccs.rightLabelRuleText = "R";
+    ccs.leftLabelRule = 0;
+    ccs.leftLabelRuleText = "L";
+    cycleSettings.append(ccs);
+  }
+  else
+  {
+    #warning Implement the missing parts to read and write settings related to the chart cycle settings.
+    #warning Need also to dynamically add event's labels in the list of known events. 
+  }
+  for (QList<ChartCycleSetting>::const_iterator it = cycleSettings.begin() ; it != cycleSettings.end() ; ++it)
+  {
+    this->mp_ChartCycleSettingsManager->addSetting(*it);
+    this->mp_Preferences->chartCycleSettingsList->addItem(it->name);
+    this->mp_Preferences->defaultChartUnitAxisXComboBox->addItem(it->name);
+  }
 
   // Preferences
   settings.beginGroup("Preferences");
@@ -2889,10 +2941,7 @@ void MainWindow::readSettings()
   this->multiView->setGRFButterflyActivation(defaultButterflyActivation == 0);
   this->multiView->setDefaultPlotLineWidth(defaultPlotLineWidth);
   this->multiView->showChartEvent(showChartEvent == 0);
-  if (chartUnitAxisX == 0)
-    this->multiView->setFrameAsChartUnitAxisX();
-  else
-    this->multiView->setTimeAsChartUnitAxisX();
+  this->multiView->setChartHorizontalAxisUnit(chartUnitAxisX);
   this->mp_Updater->acceptDevelopmentUpdate(developmentChannelSubscription);
   
   // Import assistant

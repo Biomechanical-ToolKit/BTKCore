@@ -55,6 +55,7 @@ class UpdateManager;
 class ChartDialog;
 class AcquisitionTool;
 class ToolsManager;
+class ChartCycleSettingsManager;
 
 class QUndoStack;
 class QUndoCommand;
@@ -135,6 +136,7 @@ public slots:
   void restoreLayout3DOnly();
   void restoreLayout3DVerbose();
   void restoreLayout3DCharts();
+  void manageChartCycleSettings();
   void createMarkerFromMarkersSelection();
   void computeDistanceFromMarkersSelection();
   void computeAngleFromMarkersSelection();
@@ -193,7 +195,7 @@ public slots:
   void setPreferenceShowForcePath(int index);
   void setPreferencePlotLineWidth(double width);
   void setPreferenceShowChartEvent(int index);
-  void setPreferenceChartUnitAxisX(int index);
+  void setPreferenceChartHorizontalAxisUnit(int index);
   void setPreferenceAutomaticCheckUpdate(bool isChecked);
   void setPreferenceSubscribeDevelopmentChannel(bool isChecked);
   // Others
@@ -260,7 +262,7 @@ private:
   QUndoStack* mp_UndoStack;
   QUndoStack* mp_AcquisitionUndoStack;
   QUndoStack* mp_MarkerConfigurationUndoStack;
-  
+  ChartCycleSettingsManager* mp_ChartCycleSettingsManager;
   QList<ChartDialog*> m_ToolCharts;
 };
 #endif // MainWindow_h

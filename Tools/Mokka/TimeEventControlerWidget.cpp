@@ -227,6 +227,11 @@ TimeEventControlerWidget::~TimeEventControlerWidget()
   delete this->mp_NextEventActiveIcon;
 };
 
+Acquisition* TimeEventControlerWidget::acquisition() const
+{
+  return this->mp_Acquisition;
+};
+
 void TimeEventControlerWidget::setAcquisition(Acquisition* acq)
 {
   if (this->mp_Acquisition)
@@ -274,7 +279,7 @@ void TimeEventControlerWidget::setTimeEventTicksDisplay(int index)
   this->lcdDisplay(this->currentFrame());
 };
 
-bool TimeEventControlerWidget::eventItemData(int index, int& typeId, int& frame, double rgb[3])
+bool TimeEventControlerWidget::eventItemData(int index, int& typeId, int& frame, int& side, double rgb[3])
 {
   if (index >= this->timeEventBar->m_EventItems.count())
     return false;
@@ -284,6 +289,7 @@ bool TimeEventControlerWidget::eventItemData(int index, int& typeId, int& frame,
   typeId = evt->iconId;
   frame = this->timeEventBar->m_EventItems[index].ptr->frame;
   this->timeEventBar->m_EventItems[index].color.getRgbF(&rgb[0], &rgb[1], &rgb[2]);
+  side = this->timeEventBar->m_EventItems[index].contextId;
   return true;
 };
 

@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ChartCycleSettingDialog</class>
+ <widget class="QDialog" name="ChartCycleSettingDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>415</width>
+    <height>509</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Chart Cycle Setting</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>General</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Setting's Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="settingNameLineEdit"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Horizontal Axis Title:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="horizontalAxisTitleLineEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Cycle calculation</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Method:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="calculationMethodComboBox">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>Normalization</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="calculationMethodOptionsButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton:flat {
+	border: none;
+}
+
+QPushButton:pressed  {
+     padding: 1px -1px -1px 1px;
+ }</string>
+        </property>
+        <property name="text">
+         <string>Options</string>
+        </property>
+        <property name="icon">
+         <iconset resource="images.qrc">
+          <normaloff>:/Resources/Images/edit.png</normaloff>:/Resources/Images/edit.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>48</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Cycles definition</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,1">
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>General:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="fromRightEventComboBox">
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="fromGeneralEventComboBox"/>
+      </item>
+      <item row="3" column="2">
+       <widget class="QComboBox" name="toGeneralEventComboBox"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>From event...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>To event...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Left:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="fromLeftEventComboBox"/>
+      </item>
+      <item row="2" column="2">
+       <widget class="QComboBox" name="toLeftEventComboBox"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Right:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QComboBox" name="toRightEventComboBox">
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Data label matching</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="1">
+       <widget class="QComboBox" name="rightLabelRuleComboBox">
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>starts with</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ends with</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>contains</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="3">
+       <widget class="QLabel" name="infoLabel">
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>To map data with a cycle otherwise it will not be displayed. The remaining data will be mapped with the General cyle.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Right label:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="leftLabelRuleComboBox">
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>starts with</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ends with</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>contains</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="leftLabelRuleLineEdit"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Left label:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="rightLabelRuleLineEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>settingNameLineEdit</tabstop>
+  <tabstop>horizontalAxisTitleLineEdit</tabstop>
+  <tabstop>calculationMethodComboBox</tabstop>
+  <tabstop>calculationMethodOptionsButton</tabstop>
+  <tabstop>fromRightEventComboBox</tabstop>
+  <tabstop>toRightEventComboBox</tabstop>
+  <tabstop>fromLeftEventComboBox</tabstop>
+  <tabstop>toLeftEventComboBox</tabstop>
+  <tabstop>fromGeneralEventComboBox</tabstop>
+  <tabstop>toGeneralEventComboBox</tabstop>
+  <tabstop>rightLabelRuleComboBox</tabstop>
+  <tabstop>rightLabelRuleLineEdit</tabstop>
+  <tabstop>leftLabelRuleComboBox</tabstop>
+  <tabstop>leftLabelRuleLineEdit</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>ChartCycleSettingDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>ChartCycleSettingDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

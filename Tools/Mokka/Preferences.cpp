@@ -237,7 +237,7 @@ void Preferences::saveSettings()
   if (this->m_Data[chartUnitAxisX].toInt() != index)
   {
     this->m_Data[chartUnitAxisX] = index;
-    emit chartUnitAxisXChanged(index);
+    emit chartHorizontalAxisUnitChanged(index);
   }
   
   QList<QVariant> vList = this->m_Data[UserLayouts].toList();

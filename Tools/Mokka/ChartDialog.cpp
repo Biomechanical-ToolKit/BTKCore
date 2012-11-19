@@ -101,8 +101,8 @@ bool ChartDialog::computeDistance(int id1, int id2)
   this->chart->displayPointComponentX(Qt::Checked);
   this->chart->displayPointComponentY(Qt::Unchecked);
   this->chart->displayPointComponentZ(Qt::Unchecked);
-  this->chart->setPointUnitAxisY("Distance (" + acq->pointUnit(Point::Marker) + ")", "", "");
-  this->chart->addPointPlot(diff, "Y");
+  this->chart->setPointVerticalAxisUnit("Distance (" + acq->pointUnit(Point::Marker) + ")", "", "");
+  this->chart->addPointPlot(diff, "Y", "", 0);
   this->setWindowTitle(QString::fromStdString(desc));
   
   return true;
@@ -160,8 +160,8 @@ bool ChartDialog::computeAngleFromMarkers(int id1, int id2, int id3)
   this->chart->displayPointComponentX(Qt::Checked);
   this->chart->displayPointComponentY(Qt::Unchecked);
   this->chart->displayPointComponentZ(Qt::Unchecked);
-  this->chart->setPointUnitAxisY("Angle (" + acq->pointUnit(Point::Angle) + ")", "", "");
-  this->chart->addPointPlot(ang, "Y");
+  this->chart->setPointVerticalAxisUnit("Angle (" + acq->pointUnit(Point::Angle) + ")", "", "");
+  this->chart->addPointPlot(ang, "Y", "", 0);
   this->setWindowTitle(QString::fromStdString(desc));
   
   return true;
@@ -230,8 +230,8 @@ bool ChartDialog::computeAngleFromVectors(const QList<int>& ids)
   this->chart->displayPointComponentX(Qt::Checked);
   this->chart->displayPointComponentY(Qt::Unchecked);
   this->chart->displayPointComponentZ(Qt::Unchecked);
-  this->chart->setPointUnitAxisY("Angle (" + acq->pointUnit(Point::Angle) + ")", "", "");
-  this->chart->addPointPlot(ang, "Y");
+  this->chart->setPointVerticalAxisUnit("Angle (" + acq->pointUnit(Point::Angle) + ")", "", "");
+  this->chart->addPointPlot(ang, "Y", "", 0);
   this->setWindowTitle(QString::fromStdString(desc));
   
   return true;

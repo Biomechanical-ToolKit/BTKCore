@@ -81,7 +81,7 @@ ChartExportDialog::ChartExportDialog(QWidget* parent)
   connect(this->chartFontSize, SIGNAL(valueChanged(int)), this, SLOT(updateChartFontSize(int)));
   connect(this->chartFontBold, SIGNAL(toggled(bool)), this, SLOT(updateChartFontBold(bool)));
   connect(this->chartFontItalic, SIGNAL(toggled(bool)), this, SLOT(updateChartFontItalic(bool)));
-  connect(this->axisXTitle, SIGNAL(textEdited(QString)), this, SLOT(updateAxisXTitle(QString)));
+  connect(this->axisXTitle, SIGNAL(textEdited(QString)), this, SLOT(updateHorizontalAxisTitle(QString)));
   connect(this->axisYTitle, SIGNAL(textEdited(QString)), this, SLOT(updateAxisYTitle(QString)));
   connect(this->legendVisibleCheckBox, SIGNAL(stateChanged(int)), this, SLOT(updateLegendVisibility(int)));
   connect(this->unitDisplayedCheckBox, SIGNAL(stateChanged(int)), this, SLOT(updateLegendUnitVisibility(int)));
@@ -394,7 +394,7 @@ void ChartExportDialog::updateChartFontItalic(bool toggled)
   this->render();
 };
 
-void ChartExportDialog::updateAxisXTitle(const QString& title)
+void ChartExportDialog::updateHorizontalAxisTitle(const QString& title)
 {
   this->mp_Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(title.toUtf8().constData());
   this->render();

@@ -42,7 +42,6 @@
 #include <btkVTKChartTimeSeries.h> // VTKCurrentFrameFunctor, VTKRegionOfInterestFunctor, VTKEventsFunctor
 
 #include <vtkDoubleArray.h>
-#include <vtkstd/vector>
 
 class Acquisition;
 class ChartOptionsWidget;
@@ -59,6 +58,7 @@ class vtkAxis;
 class vtkColorSeries;
 class vtkContextScene;
 class vtkContextView;
+class vtkFloatArray;
 
 class VTKChartWidget;
 class AbstractChartData;
@@ -68,12 +68,15 @@ namespace btk
   class VTKChartLayout;
 }
 
+struct DataCycleMatchingRules;
+
 class ChartWidget : public QWidget
 {
   Q_OBJECT
   
 public:
-  enum {PointChart = 0, AnalogChart}; // Used as index for the member m_ChartData
+  enum {NoDisplay = -1, TemporalDisplay = 0, CyclicDisplay}; // Used as index for the member AbstractChartData::mp_HorizontalAbscissa
+  enum {NoContext = -1, RightContext = 1, LeftContext, GeneralContext};
   
   ChartWidget(QWidget* parent = 0);
   virtual ~ChartWidget();
@@ -86,8 +89,8 @@ public:
   
   Acquisition* acquisition() {return this->mp_Acquisition;};
   void setAcquisition(Acquisition* acq);
-  void setPointFrameArray(vtkDoubleArray* array);
-  void setAnalogFrameArray(vtkDoubleArray* array);
+  void setPointHorizontalData(vtkFloatArray* (*horizontalAbscissa)[4], vtkFloatArray* (*cyclesBoundaries)[3]);
+  void setAnalogHorizontalData(vtkFloatArray* (*horizontalAbscissa)[4], vtkFloatArray* (*cyclesBoundaries)[3]);
   ChartOptionsWidget* options() {return mp_ChartOptions;};
   void toggleOptions(const QPoint& pos);
   void updateOptions();
@@ -106,12 +109,15 @@ public:
   void displayAnalogChart() {this->displayChart(AnalogChart);};
   void refreshPlots();
   
-  void updateAxisX();
-  void setUnitAxisX(const QString& str, double scale, double offset);
+  int horizontalDisplayMode() const {return this->m_HorizontalDisplayMode;};
+  void updateHorizontalAxis();
+  void setHorizontalAxisUnit(const QString& str, double scale, double offset, bool cycleMode = false);
+  void setHorizontalAxisRange(double min, double max);
+  void setDataToCycleMatchingRules(int rightLabelRule, const QString& rightLabelRuleText, int leftLabelRule, const QString& leftLabelRuleText);
   
-  void addPointPlot(btk::Point::Pointer pt, const QString& label);
-  void setPointUnitAxisY(const QString& strX, const QString& strY, const QString& strZ);
-  
+  void addPointPlot(btk::Point::Pointer pt, const QString& label, const QString& unit, int horizontalDataIndex);
+  void setPointVerticalAxisUnit(const QString& strX, const QString& strY, const QString& strZ);
+    
   VTKChartWidget* chartContent() const {return this->mp_ChartContentWidget;};
   
   static double DefaultLineWidth;
@@ -148,11 +154,14 @@ signals:
   
 private slots:
   void setLastContextMenuPosition(const QPoint& globalPos);
-  void updateAxisX(int ff, int lf);
+  void updateHorizontalAxis(int ff, int lf);
   
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
   void dropEvent(QDropEvent* event);
+  
+private:
+  enum {PointChart = 0, AnalogChart}; // Used as index for the member m_ChartData
   
   bool appendPlotFromDroppedItem(QTreeWidgetItem* item);
   void discardPlots(int chartType, const QList<int>& itemIds, bool discarded);
@@ -160,10 +169,12 @@ protected:
   void updatePlotLabel(int chartType, int itemId);
   void displayPointComponent(int idx, int state);
   void displayChart(int chartType);
-  void updateAxisX(btk::VTKChartTimeSeries* chart, int ff, int lf);
-  void updateAxisX(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux);
+  void updateHorizontalAxis(btk::VTKChartTimeSeries* chart, int ff, int lf);
+  void updateHorizontalAxis(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux);
+  int selectContextFromLabel(const QString& label);
   
   int m_CurrentChartType;
+  int m_HorizontalDisplayMode;
   QVector<AbstractChartData*> m_ChartData;
   
   QLabel* mp_ChartTitleLabel;
@@ -177,24 +188,33 @@ protected:
   QList<QAction*> m_ViewActions;
   QPoint m_LastContextMenuPosition;
   
+  DataCycleMatchingRules* mp_DataCycleMatchingRules;
 };
 
 class AbstractChartData
 {
 public:
+  enum {None = 0, Visible = 1, Discarded = 2, Disabled = 4};
+  
   struct PlotProperties
   {
     QString label;
+    QString unit;
     QColor color;
     double lineWidth;
     int id;
-    bool visible;
-    bool discarded;
+    int  options;
+    bool isVisible() const {return ((this->options & Visible) == Visible);};
+    void setVisible(bool v) {if (v) this->options |= Visible; else this->options &= ~Visible;};
+    bool isDiscarded() const {return ((this->options & Discarded) == Discarded);};
+    void setDiscarded(bool v) {if (v) this->options |= Discarded; else this->options &= ~Discarded;};
+    bool isDisabled() const {return ((this->options & Disabled) == Disabled);};
+    void setDisabled(bool v) {if (v) this->options |= Disabled; else this->options &= ~Disabled;};
   };
   
   AbstractChartData(int num);
   virtual ~AbstractChartData();
-  void appendPlotProperties(const QString& label, int id, const QColor& color, double lineWidth);
+  void appendPlotProperties(const QString& label, const QString& unit, int id, const QColor& color, double lineWidth, bool disabled = false);
   int chartNumber() const;
   btk::VTKChartTimeSeries* chart(int i);
   btk::VTKChartLayout* layout() {return this->mp_ChartLayout;};
@@ -202,12 +222,13 @@ public:
   void copy(AbstractChartData* source);
   void generateColor(vtkSmartPointer<vtkColorSeries> colorGenerator, double color[3]);
   virtual void initialize(vtkSmartPointer<vtkColorSeries> colorGenerator);
-  bool isAlreadyPlotted(int id);
+  bool isAlreadyPlotted(int id) const;
+  bool hasCycleBoundaries(int context) const;
   QList<PlotProperties>& plotsProperties() {return this->m_PlotsProperties;};
   const QList<PlotProperties>& plotsProperties() const {return this->m_PlotsProperties;};
   virtual void removePlot(int index, bool* layoutModified);
   virtual void hidePlot(int index, bool isHidden, bool* layoutModified);
-  void setFrameArray(vtkDoubleArray* array);
+  void setHorizontalData(vtkFloatArray* (*horizontalAbscissa)[4], vtkFloatArray* (*cyclesBoundaries)[3]);
   virtual void setPlotVisible(int index, bool show, bool* layoutModified);
   virtual void show(Acquisition* acq, bool s, bool* layoutModified);
   const QString& title() const {return this->m_Title;};
@@ -215,14 +236,18 @@ public:
   const QList<int>& optionSelection() const {return this->m_OptionSelection;};
   void setOptionSelection(const QList<int>& selection) {this->m_OptionSelection = selection;};
   
+  void adaptChartDisplay(const QString& titleX, double scaleX, double offsetX, int displayAction, DataCycleMatchingRules* rules);
+  int selectContextFromLabel(DataCycleMatchingRules* rules, const QString& label);
+  
   virtual bool acceptDroppedTreeWidgetItem(QTreeWidgetItem* item) = 0;
-  virtual bool appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointer<vtkColorSeries> colorGenerator, QTreeWidgetItem* item, bool* layoutModified) = 0;
-  virtual QString createPlotLabel(Acquisition* acq, int id) = 0;
+  virtual bool appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointer<vtkColorSeries> colorGenerator, QTreeWidgetItem* item, DataCycleMatchingRules* rules, bool* layoutModified) = 0;
+  virtual void extractPlotLabelUnit(QString& label, QString& unit, Acquisition* acq, int id) = 0;
   
 protected:
   QString m_Title;
   btk::VTKChartLayout* mp_ChartLayout;
-  vtkDoubleArray* mp_Frames;
+  vtkFloatArray* (*mp_HorizontalAbscissa)[4];
+  vtkFloatArray* (*mp_CyclesBoundaries)[3];
   QList<PlotProperties> m_PlotsProperties;
   QList<int> m_OptionSelection;
 };
@@ -271,14 +296,14 @@ inline void ChartWidget::addActions(const QList<QAction*>& actions)
   this->mp_ChartContentWidget->addActions(actions);
 };
 
-inline void ChartWidget::setPointFrameArray(vtkDoubleArray* array) 
+inline void ChartWidget::setPointHorizontalData(vtkFloatArray* (*horizontalAbscissa)[4], vtkFloatArray* (*cyclesBoundaries)[3]) 
 {
-  this->m_ChartData[PointChart]->setFrameArray(array);
+  this->m_ChartData[PointChart]->setHorizontalData(horizontalAbscissa, cyclesBoundaries);
 };
 
-inline void ChartWidget::setAnalogFrameArray(vtkDoubleArray* array)
+inline void ChartWidget::setAnalogHorizontalData(vtkFloatArray* (*horizontalAbscissa)[4], vtkFloatArray* (*cyclesBoundaries)[3])
 {
-  this->m_ChartData[AnalogChart]->setFrameArray(array);
+  this->m_ChartData[AnalogChart]->setHorizontalData(horizontalAbscissa, cyclesBoundaries);
 };
 
 #endif // ChartWidget_h
