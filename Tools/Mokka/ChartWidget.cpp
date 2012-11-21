@@ -379,7 +379,7 @@ void ChartWidget::setHorizontalAxisUnit(const QString& str, double scale, double
   }
   
   int displayAction = 0; // Do nothing
-  if ((this->m_HorizontalDisplayMode != CyclicDisplay) && cycleMode)
+  if (cycleMode)
     displayAction = 1; // Go to cyclic display
   else if ((this->m_HorizontalDisplayMode == CyclicDisplay) && !cycleMode)
     displayAction = -1; // Go back to temporal display
