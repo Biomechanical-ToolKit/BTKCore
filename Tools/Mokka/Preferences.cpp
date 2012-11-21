@@ -517,7 +517,6 @@ void Preferences::conditionalTemporaryCycleSettingsDataInit()
       this->m_TemporaryCycleSettings.append(this->mp_ChartCycleSettingsManager->setting(i));
     this->m_TemporaryCurrentCycleSetting = this->mp_ChartCycleSettingsManager->currentSetting();
   }
-  
 };
 
 void Preferences::resetTemporaryCycleSettingsData()

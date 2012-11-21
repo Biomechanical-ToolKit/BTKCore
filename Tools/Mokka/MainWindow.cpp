@@ -875,14 +875,25 @@ void MainWindow::saveCurrentLayout()
 
 void MainWindow::manageUserLayouts()
 {
+#ifndef Q_OS_MAC
+  this->mp_Preferences->showLayoutsPreferences();
+  this->showPreferences();
+#else
   this->showPreferences();
   this->mp_Preferences->showLayoutsPreferences();
+#endif
 };
 
 void MainWindow::manageChartCycleSettings()
 {
+#ifndef Q_OS_MAC
+  this->mp_Preferences->showChartPreferences();
+  this->showPreferences();
+#else
   this->showPreferences();
   this->mp_Preferences->showChartPreferences();
+#endif
+  
 };
 
 void MainWindow::createMarkerFromMarkersSelection()
