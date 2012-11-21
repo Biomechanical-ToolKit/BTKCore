@@ -295,7 +295,7 @@ void Preferences::resetSettings()
   this->defaultPlotLineWidthSpinBox->setValue(this->m_Data[DefaultPlotLineWidth].toDouble());
   this->defaultChartEventDisplayComboBox->setCurrentIndex(this->m_Data[ChartEventDisplay].toInt());
   this->defaultChartUnitAxisXComboBox->setCurrentIndex(this->m_Data[chartUnitAxisX].toInt());
-  this->resetTemporaryCycleSettingsData(); 
+  this->setChartCycleSettingsManager(this->mp_ChartCycleSettingsManager);
   this->layoutTable->refresh(); this->m_Data[UserLayouts] = *(this->layoutTable->userLayouts());
   this->automaticCheckUpdateCheckBox->setChecked(this->m_Data[AutomaticCheckUpdateUse].toBool());
   this->subscribeDevelopmentChannelCheckBox->setChecked(this->m_Data[DevelopmentChannelSubscriptionUsed].toBool());

@@ -775,7 +775,7 @@ void MainWindow::updateUserLayoutActions()
     inc += 2;
   } 
   this->mp_ActionSeparatorUserLayouts->setVisible(!this->m_UserLayouts.isEmpty());
-  this->actionManageUserLayouts->setEnabled(!this->m_UserLayouts.isEmpty());
+  // this->actionManageUserLayouts->setEnabled(!this->m_UserLayouts.isEmpty());
 };
 
 void MainWindow::restoreLayout()
@@ -1210,6 +1210,15 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->actionToolComputeMarkerAngle->setEnabled(true);
   this->actionToolComputeVectorAngle->setEnabled(true);
   this->mp_ToolsManager->setActionsEnabled(true);
+  
+  // Append new events' label to define cycle
+  QStringList eventsLabel = this->mp_ChartCycleSettingsManager->eventsLabel();
+  for (QMap<int, Event*>::const_iterator it = this->mp_Acquisition->events().begin() ; it != this->mp_Acquisition->events().end() ; ++it)
+  {
+    if (!eventsLabel.contains(it.value()->label))
+      eventsLabel.append(it.value()->label);
+  }
+  this->mp_ChartCycleSettingsManager->setEventsLabel(eventsLabel);
 };
 
 void MainWindow::saveFile()
@@ -2835,7 +2844,6 @@ void MainWindow::readSettings()
   {
 #ifndef Q_OS_WIN
     #warning Implement the missing parts to read and write settings related to the chart cycle settings.
-    #warning Need also to dynamically add event's labels in the list of known events. 
 #endif
   }
   
@@ -2994,5 +3002,10 @@ void MainWindow::writeSettings()
   settings.setValue("recentColor3", this->mp_ModelDock->recentColor(2));
   settings.setValue("recentColor4", this->mp_ModelDock->recentColor(3));
   settings.setValue("recentColor5", this->mp_ModelDock->recentColor(4));
+  settings.endGroup();
+  // Chart cycle settings
+  settings.beginGroup("ChartCycleSettings");
+  settings.setValue("eventsLabel", this->mp_ChartCycleSettingsManager->eventsLabel());
+  //int numSettings = settings.value("settingsNumber", -1).toInt();
   settings.endGroup();
 };
