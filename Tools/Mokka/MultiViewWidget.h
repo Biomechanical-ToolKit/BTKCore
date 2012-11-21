@@ -216,8 +216,10 @@ private slots:
   void changeForceButterflyActivation();
   void updateAnalogValuesModification(const QVector<int>& ids);
   void addChartCycleSettingAction();
+  void updateChartCycleSettingActions();
   void updateChartCycleSettingAction(int index);
   void removeChartCycleSettingAction(int index);
+  void updateCurrentChartCycleSettingAction(int index);
   
 private:
   void displayChartHorizontalAxisAsFrame();
@@ -226,6 +228,7 @@ private:
   void updateCameras();
   void updateViews();
   void createCyclesFromEventsFrame(int ctx, const QList<int>& begin, const QList<int>& end);
+  void updateChartCycleSettingActions(int startIndex);
   
   QObject* mp_EventFilterObject;
   Acquisition* mp_Acquisition;

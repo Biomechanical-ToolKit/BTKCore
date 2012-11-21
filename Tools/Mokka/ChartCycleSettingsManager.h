@@ -71,6 +71,10 @@ public:
   void removeSetting(int index);
   void setSetting(int index, const ChartCycleSetting& setting);
   
+  int currentSetting() const {return this->m_CurrentSetting;};
+  void setCurrentSetting(int index);
+  void setSettings(const QList<ChartCycleSetting>& settings);
+  
   const QStringList& eventsLabel() const {return this->m_EventsLabel;};
   void setEventsLabel(const QStringList& list) {this->m_EventsLabel = list;};
   
@@ -78,9 +82,14 @@ signals:
   void settingAdded();
   void settingModified(int index);
   void settingRemoved(int index);
+  void settingsUpdated();
+  void currentSettingChanged(int index);
 
 private:
+  bool compareSetting(const ChartCycleSetting& lhs, const ChartCycleSetting& rhs) const;
+
   QStringList m_EventsLabel;
   QList<ChartCycleSetting> m_Settings;
+  int m_CurrentSetting;
 };
 #endif // ChartCycleSettingsManager_h

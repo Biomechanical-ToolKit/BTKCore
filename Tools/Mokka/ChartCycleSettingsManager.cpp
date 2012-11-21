@@ -37,11 +37,13 @@
 
 ChartCycleSettingsManager::ChartCycleSettingsManager(QObject* parent)
 : QObject(parent), m_Settings()
-{};
+{
+  this->m_CurrentSetting = -1;
+};
 
 const ChartCycleSetting& ChartCycleSettingsManager::setting(int index) const
 {
-  Q_ASSERT((index >= 0) && index < this->m_Settings.size());
+  Q_ASSERT((index >= 0) && (index < this->m_Settings.size()));
   return this->m_Settings[index];
 };
 
@@ -56,29 +58,71 @@ void ChartCycleSettingsManager::removeSetting(int index)
   Q_ASSERT((index >= 0) && index < this->m_Settings.size());
   this->m_Settings.removeAt(index);
   emit settingRemoved(index);
+  if (this->m_CurrentSetting >= index)
+    this->setCurrentSetting(this->m_CurrentSetting-1);
+  
 };
 
 void ChartCycleSettingsManager::setSetting(int index, const ChartCycleSetting& setting)
 {
   Q_ASSERT((index >= 0) && index < this->m_Settings.size());
   ChartCycleSetting& current = this->m_Settings[index];
-  if (((setting.name != current.name)
-    || (setting.horizontalAxisTitle != current.horizontalAxisTitle)
-    || (setting.calculationMethod != current.calculationMethod)
-    // TODO: Improve the check for the options of the calculation method
-    // || (setting.ChartCycleCalculationMethodOption != current.ChartCycleCalculationMethodOption)
-    || (setting.rightEvents[0] != current.rightEvents[0])
-    || (setting.rightEvents[1] != current.rightEvents[1])
-    || (setting.leftEvents[0] != current.leftEvents[0])
-    || (setting.leftEvents[1] != current.leftEvents[1])
-    || (setting.generalEvents[0] != current.generalEvents[0])
-    || (setting.generalEvents[1] != current.generalEvents[1])
-    || (setting.rightLabelRule != current.rightLabelRule)
-    || (setting.rightLabelRuleText != current.rightLabelRuleText)
-    || (setting.leftLabelRule != current.leftLabelRule)
-    || (setting.leftLabelRuleText != current.leftLabelRuleText)))
+  if (this->compareSetting(setting,current))
   {
     this->m_Settings[index] = setting;
     emit settingModified(index);
   }
+};
+
+void ChartCycleSettingsManager::setSettings(const QList<ChartCycleSetting>& settings)
+{
+  bool isEqual = true;
+  if (this->m_Settings.count() != settings.count())
+    isEqual = false;
+  else
+  {
+    for (int i = 0 ; i < settings.count() ; ++i)
+    {
+      if (!this->compareSetting(settings[i], this->m_Settings[i]))
+      {
+        isEqual = false;
+        break;
+      }
+    }
+  }
+  if (!isEqual)
+  {
+    this->m_Settings = settings;
+    emit settingsUpdated();
+  }
+};
+
+void ChartCycleSettingsManager::setCurrentSetting(int index)
+{
+  if (this->m_CurrentSetting == index)
+    return;
+  this->m_CurrentSetting = index;
+  emit currentSettingChanged(index);
+};
+
+bool ChartCycleSettingsManager::compareSetting(const ChartCycleSetting& lhs, const ChartCycleSetting& rhs) const
+{
+  bool isEqual = true;
+  if ((rhs.name != lhs.name)
+    || (rhs.horizontalAxisTitle != lhs.horizontalAxisTitle)
+    || (rhs.calculationMethod != lhs.calculationMethod)
+    // TODO: Improve the check for the options of the calculation method
+    // || (rhs.ChartCycleCalculationMethodOption != lhs.ChartCycleCalculationMethodOption)
+    || (rhs.rightEvents[0] != lhs.rightEvents[0])
+    || (rhs.rightEvents[1] != lhs.rightEvents[1])
+    || (rhs.leftEvents[0] != lhs.leftEvents[0])
+    || (rhs.leftEvents[1] != lhs.leftEvents[1])
+    || (rhs.generalEvents[0] != lhs.generalEvents[0])
+    || (rhs.generalEvents[1] != lhs.generalEvents[1])
+    || (rhs.rightLabelRule != lhs.rightLabelRule)
+    || (rhs.rightLabelRuleText != lhs.rightLabelRuleText)
+    || (rhs.leftLabelRule != lhs.leftLabelRule)
+    || (rhs.leftLabelRuleText != lhs.leftLabelRuleText))
+    isEqual = false;
+  return isEqual;
 };

@@ -550,25 +550,15 @@ void MultiViewWidget::setChartCycleSettingsManager(ChartCycleSettingsManager* ma
     this->mp_ChartCycleSettingsManager->disconnect(this);
   this->mp_ChartCycleSettingsManager = manager;
 
-  int numNewSettings = 0;
   if (this->mp_ChartCycleSettingsManager != 0)
   {
-    numNewSettings = this->mp_ChartCycleSettingsManager->count();
     connect(this->mp_ChartCycleSettingsManager, SIGNAL(settingAdded()), this, SLOT(addChartCycleSettingAction()));
     connect(this->mp_ChartCycleSettingsManager, SIGNAL(settingModified(int)), this, SLOT(updateChartCycleSettingAction(int)));
     connect(this->mp_ChartCycleSettingsManager, SIGNAL(settingRemoved(int)), this, SLOT(removeChartCycleSettingAction(int)));
+    connect(this->mp_ChartCycleSettingsManager, SIGNAL(settingsUpdated()), this, SLOT(updateChartCycleSettingActions()));
+    connect(this->mp_ChartCycleSettingsManager, SIGNAL(currentSettingChanged(int)), this, SLOT(updateCurrentChartCycleSettingAction(int)));
   }
-  
-  for (int i = 0 ; i < numNewSettings ; ++i)
-  {
-    this->mp_ActionCycleSettings[i]->setText(this->mp_ChartCycleSettingsManager->setting(i).name);
-    this->mp_ActionCycleSettings[i]->setVisible(true);
-  }
-  for (int i = numNewSettings ; i < ChartCycleSettingsManager::maxCycleSettings ; ++i)
-  {
-    this->mp_ActionCycleSettings[i]->setText("");
-    this->mp_ActionCycleSettings[i]->setVisible(false);
-  }
+  this->updateChartCycleSettingActions();
 };
 
 void MultiViewWidget::setView3dActions(QList<QAction*> actions)
@@ -1683,6 +1673,10 @@ void MultiViewWidget::displayChartHorizontalAxisAsFrame()
     w->setHorizontalAxisUnit(tr("Frame"), 1.0, 0.0);
   }
   this->mp_EventsFrameMapperFunctor->SetActivated(false);
+  
+  this->mp_ChartCycleSettingsManager->blockSignals(true);
+  this->mp_ChartCycleSettingsManager->setCurrentSetting(-1);
+  this->mp_ChartCycleSettingsManager->blockSignals(false);
 };
 
 void MultiViewWidget::displayChartHorizontalAxisAsTime()
@@ -1696,6 +1690,10 @@ void MultiViewWidget::displayChartHorizontalAxisAsTime()
     w->setHorizontalAxisUnit(tr("Time (s)"), 1.0 / f, -1.0);
   }
   this->mp_EventsFrameMapperFunctor->SetActivated(false);
+  
+  this->mp_ChartCycleSettingsManager->blockSignals(true);
+  this->mp_ChartCycleSettingsManager->setCurrentSetting(-1);
+  this->mp_ChartCycleSettingsManager->blockSignals(false);
 };
 
 void MultiViewWidget::displayChartHorizontalAxisAsCycle(int index)
@@ -1746,6 +1744,10 @@ void MultiViewWidget::displayChartHorizontalAxisAsCycle(int index)
     w->setHorizontalAxisUnit(setting.horizontalAxisTitle, 1.0, 0.0, true);
     w->setHorizontalAxisRange(0.0, 100.0);
   }
+  
+  this->mp_ChartCycleSettingsManager->blockSignals(true);
+  this->mp_ChartCycleSettingsManager->setCurrentSetting(index);
+  this->mp_ChartCycleSettingsManager->blockSignals(false);
   
   this->updateViews();
 };
@@ -1808,18 +1810,6 @@ void MultiViewWidget::createCyclesFromEventsFrame(int ctx, const QList<int>& beg
           for (int j = 0 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
             this->mp_AnalogChartAbscissa[ctx]->SetValue(inc + j, val + j * sub);
         }
-        // std::cout << "Cycle: Pts: " << btk::ToString(*itEnd - *itBegin + 1) << std::endl;
-        /*
-        std::cout << " * Point - Values: ";
-        for (int i = *itBegin ; i <= *itEnd ; ++i)
-          std::cout << this->mp_PointChartAbscissa[ctx]->GetValue(i - this->mp_Acquisition->firstFrame()) << ", ";
-        std::cout << std::endl;
-        std::cout << " * Analog - Values: ";
-        for (int i = *itBegin ; i <= *itEnd ; ++i)
-          for (int j = 0 ; j < this->mp_Acquisition->analogSamplePerPointFrame() ; ++j)
-            std::cout << this->mp_AnalogChartAbscissa[ctx]->GetValue((i - this->mp_Acquisition->firstFrame()) * this->mp_Acquisition->analogSamplePerPointFrame() + j) << ", ";
-        std::cout << std::endl;
-        */
         ++itBegin;
         if (itBegin == begin.end())
           break;
@@ -1972,22 +1962,54 @@ void MultiViewWidget::addChartCycleSettingAction()
   }
 };
 
+void MultiViewWidget::updateChartCycleSettingActions()
+{
+  this->updateChartCycleSettingActions(0);
+};
+
+void MultiViewWidget::updateChartCycleSettingActions(int startIndex)
+{
+  int numSettings = 0;
+  if (this->mp_ChartCycleSettingsManager != 0)
+  {
+    numSettings = this->mp_ChartCycleSettingsManager->count();
+    for (int i = startIndex ; i < numSettings ; ++i)
+    {
+      this->mp_ActionCycleSettings[i]->setText(this->mp_ChartCycleSettingsManager->setting(i).name);
+      this->mp_ActionCycleSettings[i]->setVisible(true);
+      this->mp_ActionCycleSettings[i]->setChecked(false);
+    }
+  }
+  for (int i = numSettings ; i < ChartCycleSettingsManager::maxCycleSettings ; ++i)
+  {
+    this->mp_ActionCycleSettings[i]->setText("");
+    this->mp_ActionCycleSettings[i]->setVisible(false);
+    this->mp_ActionCycleSettings[i]->setChecked(false);
+  }
+};
+
 void MultiViewWidget::updateChartCycleSettingAction(int index)
 {
   if ((this->mp_ChartCycleSettingsManager != 0) && (index < this->mp_ChartCycleSettingsManager->count()))
   {
     this->mp_ActionCycleSettings[index]->setText(this->mp_ChartCycleSettingsManager->setting(index).name);
     this->mp_ActionCycleSettings[index]->setVisible(true);
+    if (this->mp_ChartCycleSettingsManager->currentSetting() == index)
+      this->displayChartHorizontalAxisAsCycle(index);
   }
 };
 
 void MultiViewWidget::removeChartCycleSettingAction(int index)
 {
-  if ((this->mp_ChartCycleSettingsManager != 0) && (index < this->mp_ChartCycleSettingsManager->count()))
-  {
-    this->mp_ActionCycleSettings[index]->setText("");
-    this->mp_ActionCycleSettings[index]->setVisible(false);
-  }
+  this->updateChartCycleSettingActions(index);
+};
+
+void MultiViewWidget::updateCurrentChartCycleSettingAction(int index)
+{
+  if (index >= 0)
+    this->mp_ActionCycleSettings[index]->trigger();
+  else
+    this->mp_ActionChartAxisFrame->trigger();
 };
 
 void MultiViewWidget::updateCameras()

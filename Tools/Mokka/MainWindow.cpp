@@ -2833,9 +2833,12 @@ void MainWindow::readSettings()
   }
   else
   {
+#ifndef Q_OS_WIN
     #warning Implement the missing parts to read and write settings related to the chart cycle settings.
     #warning Need also to dynamically add event's labels in the list of known events. 
+#endif
   }
+  
   for (QList<ChartCycleSetting>::const_iterator it = cycleSettings.begin() ; it != cycleSettings.end() ; ++it)
   {
     this->mp_ChartCycleSettingsManager->addSetting(*it);

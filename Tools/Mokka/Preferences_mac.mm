@@ -372,20 +372,7 @@ void Preferences::addChartCycleSetting()
   if (dialog.exec() == QDialog::Accepted)
   {
     ChartCycleSetting setting;
-    setting.name = dialog.settingNameLineEdit->text();
-    setting.horizontalAxisTitle = dialog.horizontalAxisTitleLineEdit->text();
-    setting.calculationMethod = dialog.calculationMethodComboBox->currentIndex();
-    setting.calculationMethodOption = NULL; // TODO: ADD OPTIONS FOR THE CALCULATION METHOD
-    setting.rightEvents[0] = dialog.fromRightEventComboBox->currentText();
-    setting.rightEvents[1] = dialog.toRightEventComboBox->currentText();
-    setting.leftEvents[0] = dialog.fromLeftEventComboBox->currentText();
-    setting.leftEvents[1] = dialog.toLeftEventComboBox->currentText();
-    setting.generalEvents[0] = dialog.fromGeneralEventComboBox->currentText();
-    setting.generalEvents[1] = dialog.toGeneralEventComboBox->currentText();
-    setting.rightLabelRule = dialog.rightLabelRuleComboBox->currentIndex();
-    setting.rightLabelRuleText = dialog.rightLabelRuleLineEdit->text();
-    setting.leftLabelRule = dialog.leftLabelRuleComboBox->currentIndex();
-    setting.leftLabelRuleText = dialog.leftLabelRuleLineEdit->text();
+    dialog.fillSetting(&setting);
     this->mp_ChartCycleSettingsManager->addSetting(setting);
     this->chartCycleSettingsList->addItem(setting.name);
     this->chartCycleSettingsList->setCurrentRow(this->chartCycleSettingsList->count()-1);
@@ -417,21 +404,7 @@ void Preferences::editChartCycleSetting()
     return;
   ChartCycleSetting setting = this->mp_ChartCycleSettingsManager->setting(index);
   ChartCycleSettingDialog dialog(this);
-  dialog.init(this->mp_ChartCycleSettingsManager->eventsLabel());
-  dialog.settingNameLineEdit->setText(setting.name);
-  dialog.horizontalAxisTitleLineEdit->setText(setting.horizontalAxisTitle);
-  dialog.calculationMethodComboBox->setCurrentIndex(setting.calculationMethod);
-  // TODO: ADD OPTIONS FOR THE CALCULATION METHOD
-  dialog.fromRightEventComboBox->setCurrentIndex(dialog.fromRightEventComboBox->findText(setting.rightEvents[0]));
-  dialog.toRightEventComboBox->setCurrentIndex(dialog.toRightEventComboBox->findText(setting.rightEvents[1]));
-  dialog.fromLeftEventComboBox->setCurrentIndex(dialog.fromLeftEventComboBox->findText(setting.leftEvents[0]));
-  dialog.toLeftEventComboBox->setCurrentIndex(dialog.toLeftEventComboBox->findText(setting.leftEvents[1]));
-  dialog.fromGeneralEventComboBox->setCurrentIndex(dialog.fromGeneralEventComboBox->findText(setting.generalEvents[0]));
-  dialog.toGeneralEventComboBox->setCurrentIndex(dialog.toGeneralEventComboBox->findText(setting.generalEvents[1]));
-  dialog.rightLabelRuleComboBox->setCurrentIndex(setting.rightLabelRule);
-  dialog.rightLabelRuleLineEdit->setText(setting.rightLabelRuleText);
-  dialog.leftLabelRuleComboBox->setCurrentIndex(setting.leftLabelRule);
-  dialog.leftLabelRuleLineEdit->setText(setting.leftLabelRuleText);
+  dialog.init(this->mp_ChartCycleSettingsManager->eventsLabel(), &setting);
   if (dialog.exec() == QDialog::Accepted)
   {
     QString settingName = dialog.settingNameLineEdit->text();
@@ -441,20 +414,7 @@ void Preferences::editChartCycleSetting()
       if (this->defaultChartUnitAxisXComboBox->currentText() == setting.name)
         this->defaultChartUnitAxisXComboBox->setItemText(this->defaultChartUnitAxisXComboBox->currentIndex(), settingName);
     }
-    setting.name = settingName;
-    setting.horizontalAxisTitle = dialog.horizontalAxisTitleLineEdit->text();
-    setting.calculationMethod = dialog.calculationMethodComboBox->currentIndex();
-    setting.calculationMethodOption = NULL; // TODO: ADD OPTIONS FOR THE CALCULATION METHOD
-    setting.rightEvents[0] = dialog.fromRightEventComboBox->currentText();
-    setting.rightEvents[1] = dialog.toRightEventComboBox->currentText();
-    setting.leftEvents[0] = dialog.fromLeftEventComboBox->currentText();
-    setting.leftEvents[1] = dialog.toLeftEventComboBox->currentText();
-    setting.generalEvents[0] = dialog.fromGeneralEventComboBox->currentText();
-    setting.generalEvents[1] = dialog.toGeneralEventComboBox->currentText();
-    setting.rightLabelRule = dialog.rightLabelRuleComboBox->currentIndex();
-    setting.rightLabelRuleText = dialog.rightLabelRuleLineEdit->text();
-    setting.leftLabelRule = dialog.leftLabelRuleComboBox->currentIndex();
-    setting.leftLabelRuleText = dialog.leftLabelRuleLineEdit->text();
+    dialog.fillSetting(&setting);
     this->mp_ChartCycleSettingsManager->setSetting(index, setting);
   }
 };

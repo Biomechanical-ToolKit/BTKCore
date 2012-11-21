@@ -34,13 +34,16 @@
  */
  
 #include "Preferences.h"
+#include "ChartCycleSettingDialog.h"
 
 #include <QFileDialog>
 #include <QColorDialog>
+#include <QMessageBox>
 
 Preferences::Preferences(QWidget* parent)
-: QDialog(parent), lastDirectory("."), m_Data()
+: QDialog(parent), lastDirectory("."), m_Data(), m_TemporaryCycleSettings()
 {
+  this->resetTemporaryCycleSettingsData();
   this->setupUi(this);
   
   connect(this->defaultConfigurationButton, SIGNAL(clicked()), this, SLOT(setDefaultConfiguration()));
@@ -51,6 +54,10 @@ Preferences::Preferences(QWidget* parent)
   connect(this->defaultMarkerColorButton, SIGNAL(clicked()), this, SLOT(setDefaultMarkerColor()));
   connect(this->defaultForcePlateColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForcePlateColor()));
   connect(this->defaultForceVectorColorButton, SIGNAL(clicked()), this, SLOT(setDefaultForceVectorColor()));
+  connect(this->chartCycleSettingsList, SIGNAL(currentRowChanged(int)), this, SLOT(enableChartCycleButtons(int)));
+  connect(this->addChartCycleButton, SIGNAL(clicked()), this, SLOT(addChartCycleSetting()));
+  connect(this->removeChartCycleButton, SIGNAL(clicked()), this, SLOT(removeChartCycleSetting()));
+  connect(this->editChartCycleButton, SIGNAL(clicked()), this, SLOT(editChartCycleSetting()));
   connect(this->layoutTable, SIGNAL(userLayoutRemoved(int)), this, SLOT(removeUserLayout(int)));
   connect(this->layoutTable, SIGNAL(userLayoutLabelChanged(int, QString)), this, SLOT(relabelUserLayout(int, QString)));
   connect(this->layoutTable, SIGNAL(userLayoutDropped(int, int)), this, SLOT(updateDroppedUserLayouts(int, int)));
@@ -240,6 +247,10 @@ void Preferences::saveSettings()
     emit chartHorizontalAxisUnitChanged(index);
   }
   
+  this->mp_ChartCycleSettingsManager->setSettings(this->m_TemporaryCycleSettings);
+  this->mp_ChartCycleSettingsManager->setCurrentSetting(this->m_TemporaryCurrentCycleSetting);
+  this->resetTemporaryCycleSettingsData();
+  
   QList<QVariant> vList = this->m_Data[UserLayouts].toList();
   if (vList != *(this->layoutTable->userLayouts()))
   {
@@ -284,12 +295,28 @@ void Preferences::resetSettings()
   this->defaultPlotLineWidthSpinBox->setValue(this->m_Data[DefaultPlotLineWidth].toDouble());
   this->defaultChartEventDisplayComboBox->setCurrentIndex(this->m_Data[ChartEventDisplay].toInt());
   this->defaultChartUnitAxisXComboBox->setCurrentIndex(this->m_Data[chartUnitAxisX].toInt());
+  this->resetTemporaryCycleSettingsData(); 
   this->layoutTable->refresh(); this->m_Data[UserLayouts] = *(this->layoutTable->userLayouts());
   this->automaticCheckUpdateCheckBox->setChecked(this->m_Data[AutomaticCheckUpdateUse].toBool());
   this->subscribeDevelopmentChannelCheckBox->setChecked(this->m_Data[DevelopmentChannelSubscriptionUsed].toBool());
   
   this->tabWidget->setCurrentIndex(0);
 }
+
+void Preferences::setChartCycleSettingsManager(ChartCycleSettingsManager* manager)
+{
+  this->mp_ChartCycleSettingsManager = manager;
+  this->resetTemporaryCycleSettingsData();
+  this->chartCycleSettingsList->clear();
+  this->defaultChartUnitAxisXComboBox->clear();
+  this->defaultChartUnitAxisXComboBox->addItems(QStringList() << tr("Frame") << tr("Time"));
+  for (int i = 0 ; i < manager->count() ; ++i)
+  {
+    const ChartCycleSetting* setting = &(manager->setting(i));
+    this->chartCycleSettingsList->addItem(setting->name);
+    this->defaultChartUnitAxisXComboBox->addItem(setting->name);
+  }
+};
 
 void Preferences::setDefaultConfiguration()
 {
@@ -353,6 +380,83 @@ void Preferences::setDefaultForceVectorColor()
     colorizeButton(this->defaultForceVectorColorButton, color);
 };
 
+void Preferences::enableChartCycleButtons(int index)
+{
+  if (index == -1)
+  {
+    this->removeChartCycleButton->setEnabled(false);
+    this->editChartCycleButton->setEnabled(false);
+  }
+  else
+  {
+    this->removeChartCycleButton->setEnabled(true);
+    this->editChartCycleButton->setEnabled(true);
+  }
+};
+
+void Preferences::addChartCycleSetting()
+{
+  if (this->chartCycleSettingsList->count() >= 10)
+  {
+    QMessageBox::warning(this, tr("Mokka"), tr("You reached the maximum number of settings. You can edit current settings or remove some of them."));
+    return;
+  }
+  
+  ChartCycleSettingDialog dialog(this);
+  dialog.init(this->mp_ChartCycleSettingsManager->eventsLabel());
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    this->conditionalTemporaryCycleSettingsDataInit();
+    ChartCycleSetting setting;
+    dialog.fillSetting(&setting);
+    this->m_TemporaryCycleSettings.append(setting);
+    this->chartCycleSettingsList->addItem(setting.name);
+    this->chartCycleSettingsList->setCurrentRow(this->chartCycleSettingsList->count()-1);
+    this->defaultChartUnitAxisXComboBox->addItem(setting.name);
+  }
+};
+
+void Preferences::removeChartCycleSetting()
+{
+  int index = this->chartCycleSettingsList->currentRow();
+  if (index == -1)
+    return;
+  this->conditionalTemporaryCycleSettingsDataInit();
+  QString settingName = this->m_TemporaryCycleSettings[index].name;
+  int indexSetting = this->defaultChartUnitAxisXComboBox->findText(settingName);
+  int currentIndex = this->defaultChartUnitAxisXComboBox->currentIndex();
+  this->defaultChartUnitAxisXComboBox->removeItem(indexSetting);
+  if (currentIndex == indexSetting)
+    this->defaultChartUnitAxisXComboBox->setCurrentIndex(0); // Frames
+  delete this->chartCycleSettingsList->takeItem(index);
+  this->m_TemporaryCycleSettings.removeAt(index);
+  if (this->m_TemporaryCurrentCycleSetting >= index)
+    this->m_TemporaryCurrentCycleSetting -= 1;
+};
+
+void Preferences::editChartCycleSetting()
+{
+  int index = this->chartCycleSettingsList->currentRow();
+  if (index == -1)
+    return;
+  this->conditionalTemporaryCycleSettingsDataInit();
+  ChartCycleSetting* setting = &(this->m_TemporaryCycleSettings[index]);
+  ChartCycleSettingDialog dialog(this);
+  dialog.init(this->mp_ChartCycleSettingsManager->eventsLabel(), setting);
+  if (dialog.exec() == QDialog::Accepted)
+  {
+    QString settingName = dialog.settingNameLineEdit->text();
+    if (settingName != setting->name)
+    {
+      this->chartCycleSettingsList->item(index)->setText(settingName);
+      if (this->defaultChartUnitAxisXComboBox->currentText() == setting->name)
+        this->defaultChartUnitAxisXComboBox->setItemText(this->defaultChartUnitAxisXComboBox->currentIndex(), settingName);
+    }
+    dialog.fillSetting(setting);
+    this->m_TemporaryCycleSettings[index] = *setting;
+  }
+};
+
 void Preferences::removeUserLayout(int index)
 {
   int userLayoutIndex = this->m_Data[UserLayoutIndex].toInt();
@@ -401,4 +505,23 @@ void Preferences::updateDroppedUserLayouts(int newRow, int oldRow)
 void Preferences::forceChartUnitAxisX(int index)
 {
   this->defaultChartUnitAxisXComboBox->setCurrentIndex(index);
+};
+
+void Preferences::conditionalTemporaryCycleSettingsDataInit()
+{
+  if (this->mp_ChartCycleSettingsManager == NULL)
+    return;
+  if (this->m_TemporaryCycleSettings.isEmpty() && (this->m_TemporaryCurrentCycleSetting == -99))
+  {
+    for (int i = 0 ; i < this->mp_ChartCycleSettingsManager->count() ; ++i)
+      this->m_TemporaryCycleSettings.append(this->mp_ChartCycleSettingsManager->setting(i));
+    this->m_TemporaryCurrentCycleSetting = this->mp_ChartCycleSettingsManager->currentSetting();
+  }
+  
+};
+
+void Preferences::resetTemporaryCycleSettingsData()
+{
+  this->m_TemporaryCycleSettings.clear();
+  this->m_TemporaryCurrentCycleSetting = -99; // Invalid
 };

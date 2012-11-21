@@ -34,6 +34,7 @@
  */
  
 #include "ChartCycleSettingDialog.h"
+#include "ChartCycleSettingsManager.h"
 
 ChartCycleSettingDialog::ChartCycleSettingDialog(QWidget* parent)
 : QDialog(parent)
@@ -45,6 +46,7 @@ ChartCycleSettingDialog::ChartCycleSettingDialog(QWidget* parent)
   QFont f = this->font();
   f.setPointSize(10);
   this->infoLabel->setFont(f);
+  this->resize(415, 509);
 #endif
   this->calculationMethodOptionsButton->setVisible(false); // Because it is not needed now
   
@@ -80,6 +82,43 @@ void ChartCycleSettingDialog::init(const QStringList& events)
   this->toGeneralEventComboBox->setCurrentIndex(-1);
   this->settingNameLineEdit->setText(tr("Cycle: "));
   this->settingNameLineEdit->setFocus();
+};
+
+void ChartCycleSettingDialog::init(const QStringList& events, const ChartCycleSetting* setting)
+{
+  this->init(events);
+  this->settingNameLineEdit->setText(setting->name);
+  this->horizontalAxisTitleLineEdit->setText(setting->horizontalAxisTitle);
+  this->calculationMethodComboBox->setCurrentIndex(setting->calculationMethod);
+  // TODO: ADD OPTIONS FOR THE CALCULATION METHOD
+  this->fromRightEventComboBox->setCurrentIndex(this->fromRightEventComboBox->findText(setting->rightEvents[0]));
+  this->toRightEventComboBox->setCurrentIndex(this->toRightEventComboBox->findText(setting->rightEvents[1]));
+  this->fromLeftEventComboBox->setCurrentIndex(this->fromLeftEventComboBox->findText(setting->leftEvents[0]));
+  this->toLeftEventComboBox->setCurrentIndex(this->toLeftEventComboBox->findText(setting->leftEvents[1]));
+  this->fromGeneralEventComboBox->setCurrentIndex(this->fromGeneralEventComboBox->findText(setting->generalEvents[0]));
+  this->toGeneralEventComboBox->setCurrentIndex(this->toGeneralEventComboBox->findText(setting->generalEvents[1]));
+  this->rightLabelRuleComboBox->setCurrentIndex(setting->rightLabelRule);
+  this->rightLabelRuleLineEdit->setText(setting->rightLabelRuleText);
+  this->leftLabelRuleComboBox->setCurrentIndex(setting->leftLabelRule);
+  this->leftLabelRuleLineEdit->setText(setting->leftLabelRuleText);
+};
+
+void ChartCycleSettingDialog::fillSetting(ChartCycleSetting* setting) const
+{
+  setting->name = this->settingNameLineEdit->text();
+  setting->horizontalAxisTitle = this->horizontalAxisTitleLineEdit->text();
+  setting->calculationMethod = this->calculationMethodComboBox->currentIndex();
+  setting->calculationMethodOption = NULL; // TODO: ADD OPTIONS FOR THE CALCULATION METHOD
+  setting->rightEvents[0] = this->fromRightEventComboBox->currentText();
+  setting->rightEvents[1] = this->toRightEventComboBox->currentText();
+  setting->leftEvents[0] = this->fromLeftEventComboBox->currentText();
+  setting->leftEvents[1] = this->toLeftEventComboBox->currentText();
+  setting->generalEvents[0] = this->fromGeneralEventComboBox->currentText();
+  setting->generalEvents[1] = this->toGeneralEventComboBox->currentText();
+  setting->rightLabelRule = this->rightLabelRuleComboBox->currentIndex();
+  setting->rightLabelRuleText = this->rightLabelRuleLineEdit->text();
+  setting->leftLabelRule = this->leftLabelRuleComboBox->currentIndex();
+  setting->leftLabelRuleText = this->leftLabelRuleLineEdit->text();
 };
 
 void ChartCycleSettingDialog::enableCalculationMethodOptions(int index)

@@ -39,6 +39,7 @@
 #if !defined(Q_OS_MAC)
 
   #include "ui_Preferences.h"
+  #include "ChartCycleSettingsManager.h"
 
   #include <QDialog>
   #include <QMap>
@@ -67,6 +68,7 @@
     void showLayoutsPreferences() {this->tabWidget->setCurrentWidget(this->layoutsTab);};
     void showAdvancedPreferences() {this->tabWidget->setCurrentWidget(this->advancedTab);};
     
+    void setChartCycleSettingsManager(ChartCycleSettingsManager* manager);
     void setUserLayouts(QList<QVariant>* layouts) {this->layoutTable->setUserLayouts(layouts);};
     void refreshUserLayouts() {this->layoutTable->refresh();};
   
@@ -81,6 +83,10 @@
     void setDefaultMarkerColor();
     void setDefaultForcePlateColor();
     void setDefaultForceVectorColor();
+    void enableChartCycleButtons(int index);
+    void addChartCycleSetting();
+    void removeChartCycleSetting();
+    void editChartCycleSetting();
   
   signals:
     void useDefaultConfigurationStateChanged(bool isUsed);
@@ -115,7 +121,13 @@
     void forceChartUnitAxisX(int index);
   
   private:
+    void conditionalTemporaryCycleSettingsDataInit();
+    void resetTemporaryCycleSettingsData();
+    
     QMap<int, QVariant> m_Data;
+    ChartCycleSettingsManager* mp_ChartCycleSettingsManager;
+    QList<ChartCycleSetting> m_TemporaryCycleSettings;
+    int m_TemporaryCurrentCycleSetting;
   };
 
   inline void colorizeButton(QPushButton* button, const QColor& color)

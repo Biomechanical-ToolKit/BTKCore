@@ -40,6 +40,8 @@
 
 #include <QDialog>
 
+struct ChartCycleSetting;
+
 class ChartCycleSettingDialog : public QDialog, public Ui::ChartCycleSettingDialog
 {
   Q_OBJECT
@@ -47,6 +49,9 @@ class ChartCycleSettingDialog : public QDialog, public Ui::ChartCycleSettingDial
 public:
   ChartCycleSettingDialog(QWidget* parent = 0);
   void init(const QStringList& events);
+  void init(const QStringList& events, const ChartCycleSetting* setting);
+  
+  void fillSetting(ChartCycleSetting* setting) const;
   
 private slots:
   void enableCalculationMethodOptions(int index);
