@@ -105,6 +105,91 @@ void ChartCycleSettingsManager::setCurrentSetting(int index)
   emit currentSettingChanged(index);
 };
 
+static const int ChartCycleSettingsManagerMagic = 0x0abc;
+static const int ChartCycleSettingsManagerVersion1 = 0x0100; // 1.0 
+
+void ChartCycleSettingsManager::importSettings(const QList<QVariant>& settings)
+{
+  QList<ChartCycleSetting> cycleSettings;
+  for (QList<QVariant>::const_iterator it = settings.begin() ; it != settings.end() ; ++it)
+  {
+    QByteArray sd = it->toByteArray();
+    QDataStream stream(&(sd), QIODevice::ReadOnly);
+    qint32 magic; stream >> magic;
+    qint32 version; stream >> version;
+    if (magic != ChartCycleSettingsManagerMagic)
+    {
+      qCritical("The data given to set a cycle setting are not recognized.");
+      return;
+    }
+    if (version == ChartCycleSettingsManagerVersion1)
+    {
+      stream.setVersion(QDataStream::Qt_4_6);
+      
+      ChartCycleSetting ccs;
+      stream >> ccs.name;
+      stream >> ccs.horizontalAxisTitle;
+      stream >> ccs.calculationMethod;
+      if (ccs.calculationMethod == 0)
+        ccs.calculationMethodOption = NULL;
+      else
+      {
+        qCritical("Unknown calculation method to normalize data into cycles. You may have used a new version containing some major changes in the data format.");
+        return;
+      }
+      stream >> ccs.rightEvents[0];
+      stream >> ccs.rightEvents[1];
+      stream >> ccs.leftEvents[0];
+      stream >> ccs.leftEvents[1];
+      stream >> ccs.generalEvents[0];
+      stream >> ccs.generalEvents[1];
+      stream >> ccs.rightLabelRule;
+      stream >> ccs.rightLabelRuleText;
+      stream >> ccs.leftLabelRule;
+      stream >> ccs.leftLabelRuleText;
+      cycleSettings.append(ccs);
+    }
+    else
+    {
+      qCritical("Unknown version number for serialized data containing a cycle setting. You may have used a new version containing some major changes in the data format.");
+      return;
+    }
+  }
+  this->setSettings(cycleSettings);
+};
+
+QList<QVariant> ChartCycleSettingsManager::exportSettings() const
+{
+  QList<QVariant> list;
+  for (QList<ChartCycleSetting>::const_iterator it = this->m_Settings.begin() ; it != this->m_Settings.end() ; ++it)
+  {
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+    stream.setVersion(QDataStream::Qt_4_6);
+    stream << qint32(ChartCycleSettingsManagerMagic);
+    stream << qint32(ChartCycleSettingsManagerVersion1);
+    stream << it->name;
+    stream << it->horizontalAxisTitle;
+    stream << qint32(it->calculationMethod);
+    if (it->calculationMethod != 0)
+    {
+      // For other methods
+    }
+    stream << it->rightEvents[0];
+    stream << it->rightEvents[1];
+    stream << it->leftEvents[0];
+    stream << it->leftEvents[1];
+    stream << it->generalEvents[0];
+    stream << it->generalEvents[1];
+    stream << qint32(it->rightLabelRule);
+    stream << it->rightLabelRuleText;
+    stream << qint32(it->leftLabelRule);
+    stream << it->leftLabelRuleText;
+    list.append(data);
+  }
+  return list;
+};
+
 bool ChartCycleSettingsManager::compareSetting(const ChartCycleSetting& lhs, const ChartCycleSetting& rhs) const
 {
   bool isEqual = true;

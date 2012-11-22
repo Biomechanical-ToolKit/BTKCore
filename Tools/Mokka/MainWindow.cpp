@@ -2824,6 +2824,7 @@ void MainWindow::readSettings()
   settings.beginGroup("ChartCycleSettings");
   QStringList eventsLabel = settings.value("eventsLabel").toStringList();
   int numSettings = settings.value("settingsNumber", -1).toInt();
+  QList<QVariant> byteCycleSettings = settings.value("settingsDefinition", -1).toList();
   settings.endGroup();
   if (eventsLabel.isEmpty())
   {
@@ -2831,7 +2832,6 @@ void MainWindow::readSettings()
     eventsLabel.push_back("Foot Off");
   }
   this->mp_ChartCycleSettingsManager->setEventsLabel(eventsLabel);
-  QList<ChartCycleSetting> cycleSettings;
   if (numSettings == -1)
   {
     ChartCycleSetting ccs;
@@ -2849,21 +2849,12 @@ void MainWindow::readSettings()
     ccs.rightLabelRuleText = "R";
     ccs.leftLabelRule = 0;
     ccs.leftLabelRuleText = "L";
-    cycleSettings.append(ccs);
+    this->mp_ChartCycleSettingsManager->addSetting(ccs);
   }
   else
-  {
-#ifndef Q_OS_WIN
-    #warning Implement the missing parts to read and write settings related to the chart cycle settings.
-#endif
-  }
-  
-  for (QList<ChartCycleSetting>::const_iterator it = cycleSettings.begin() ; it != cycleSettings.end() ; ++it)
-  {
-    this->mp_ChartCycleSettingsManager->addSetting(*it);
-    this->mp_Preferences->chartCycleSettingsList->addItem(it->name);
-    this->mp_Preferences->defaultChartUnitAxisXComboBox->addItem(it->name);
-  }
+    this->mp_ChartCycleSettingsManager->importSettings(byteCycleSettings);
+  // Force to update the content related to cycles into preferences
+  this->mp_Preferences->setChartCycleSettingsManager(this->mp_ChartCycleSettingsManager);
 
   // Preferences
   settings.beginGroup("Preferences");
@@ -3017,6 +3008,7 @@ void MainWindow::writeSettings()
   // Chart cycle settings
   settings.beginGroup("ChartCycleSettings");
   settings.setValue("eventsLabel", this->mp_ChartCycleSettingsManager->eventsLabel());
-  //int numSettings = settings.value("settingsNumber", -1).toInt();
+  settings.setValue("settingsNumber", this->mp_ChartCycleSettingsManager->count());
+  settings.setValue("settingsDefinition", this->mp_ChartCycleSettingsManager->exportSettings());
   settings.endGroup();
 };

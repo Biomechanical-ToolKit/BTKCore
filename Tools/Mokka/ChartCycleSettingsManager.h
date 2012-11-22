@@ -78,6 +78,9 @@ public:
   const QStringList& eventsLabel() const {return this->m_EventsLabel;};
   void setEventsLabel(const QStringList& list) {this->m_EventsLabel = list;};
   
+  void importSettings(const QList<QVariant>& settings);
+  QList<QVariant> exportSettings() const;
+  
 signals:
   void settingAdded();
   void settingModified(int index);
