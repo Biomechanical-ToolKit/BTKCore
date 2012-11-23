@@ -651,41 +651,32 @@ void MainWindow::viewMetadata()
 
 void MainWindow::setCurrentFile(const QString& filename) 
 { 
-  this->setWindowModified(false); 
+  this->setWindowModified(false);
   QString shownName = tr("No File"); 
   if (!filename.isEmpty())
   { 
-    shownName = QFileInfo(filename).fileName(); 
-    this->m_RecentFiles.removeAll(filename); 
-    this->m_RecentFiles.prepend(filename); 
+    shownName = QFileInfo(filename).fileName();
+    this->m_RecentFiles.removeAll(filename);
+    this->m_RecentFiles.prepend(filename);
+    while (this->m_RecentFiles.count() > maxRecentFiles)
+      this->m_RecentFiles.pop_back();
   } 
-  this->updateRecentFileActions(); 
-  this->setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("Mokka"))); 
+  this->updateRecentFileActions();
+  this->setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("Mokka")));
 };
 
 void MainWindow::updateRecentFileActions()
 {
-  QMutableStringListIterator i(this->m_RecentFiles); 
-  while (i.hasNext())
-  {
-    if (!QFile::exists(i.next()))
-    {
-      LOG_WARNING("The file '" + i.value() + "' doesn't exist anymore and is removed from the list of the recent files.");
-      i.remove();
-    }
-  }
-  for (int i = 0 ; i < maxRecentFiles ; ++i)
+  int num = qMin(this->m_RecentFiles.count(), (int)maxRecentFiles);
+  for (int i = 0 ; i < num ; ++i)
   { 
-    if (i < this->m_RecentFiles.count())
-    {
-      QString text = QFileInfo(this->m_RecentFiles[i]).fileName(); 
-      this->mp_ActionRecentFiles[i]->setText(text); 
-      this->mp_ActionRecentFiles[i]->setData(this->m_RecentFiles[i]); 
-      this->mp_ActionRecentFiles[i]->setVisible(true); 
-    } 
-    else
-      this->mp_ActionRecentFiles[i]->setVisible(false); 
-  } 
+    QString text = QFileInfo(this->m_RecentFiles[i]).fileName();
+    this->mp_ActionRecentFiles[i]->setText(text);
+    this->mp_ActionRecentFiles[i]->setData(this->m_RecentFiles[i]);
+    this->mp_ActionRecentFiles[i]->setVisible(true);
+  }
+  for (int i = num ; i < maxRecentFiles ; ++i)
+    this->mp_ActionRecentFiles[i]->setVisible(false); 
   this->actionClear_Menu->setEnabled(!this->m_RecentFiles.isEmpty());
   this->mp_ActionSeparatorRecentFiles->setVisible(!this->m_RecentFiles.isEmpty());
 };
@@ -696,7 +687,21 @@ void MainWindow::openRecentFile()
   { 
     QAction* pAction = qobject_cast<QAction*>(sender()); 
     if (pAction) 
-      this->openFile(pAction->data().toString()); 
+    {
+      QString filename = pAction->data().toString();
+      QMutableStringListIterator i(this->m_RecentFiles); 
+      while (i.hasNext())
+      {
+        if ((filename.compare(i.next()) == 0) && !QFile::exists(filename))
+        {
+          LOG_WARNING("The file '" + i.value() + "' doesn't exist anymore and is removed from the list of the recent files.");
+          i.remove();
+          this->updateRecentFileActions();
+          break;
+        }
+      }
+      this->openFile(filename);
+    }
   }
 }
 
@@ -710,42 +715,30 @@ bool MainWindow::isOkToContinue()
 { 
   if (this->isWindowModified())
   {    
-    // bool acquisitionModified = false;
-    // for (int i = 0 ; i < this->mp_AcquisitionUndoStack->index() ; ++i)
-    // {
-    //   if (static_cast<const UndoCommand*>(this->mp_AcquisitionUndoStack->command(i))->commandType() == UndoCommand::AcquisitionCmd)
-    //   {
-    //     acquisitionModified = true;
-    //     break;
-    //   }
-    // }
-    // if (acquisitionModified)
-    // {
-      QMessageBox messageBox(this);
-      messageBox.setIcon(QMessageBox::Information);
-      messageBox.setText(tr("The document has been modified."));
-      messageBox.setInformativeText(tr("Do you want to save your changes?"));
+    QMessageBox messageBox(this);
+    messageBox.setIcon(QMessageBox::Information);
+    messageBox.setText(tr("The document has been modified."));
+    messageBox.setInformativeText(tr("Do you want to save your changes?"));
 #ifdef Q_OS_MAC
-      messageBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-      messageBox.setWindowFlags(Qt::Sheet);
-      messageBox.setWindowModality(Qt::WindowModal);
-      messageBox.setDefaultButton(QMessageBox::Save);
+    messageBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+    messageBox.setWindowFlags(Qt::Sheet);
+    messageBox.setWindowModality(Qt::WindowModal);
+    messageBox.setDefaultButton(QMessageBox::Save);
 #else
-      messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-      messageBox.setDefaultButton(QMessageBox::Yes);
+    messageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    messageBox.setDefaultButton(QMessageBox::Yes);
 #endif
-      messageBox.setEscapeButton(QMessageBox::Cancel);
-      switch(messageBox.exec())
-      {
-          case QMessageBox::Yes:
-          case QMessageBox::Save:
-              this->saveFile();
-              break;
-          case QMessageBox::Cancel:
-              return false;
-              break;
-      }
-    // }
+    messageBox.setEscapeButton(QMessageBox::Cancel);
+    switch(messageBox.exec())
+    {
+        case QMessageBox::Yes:
+        case QMessageBox::Save:
+            this->saveFile();
+            break;
+        case QMessageBox::Cancel:
+            return false;
+            break;
+    }
   }
   return true; 
 };
@@ -1099,8 +1092,7 @@ void MainWindow::openFile()
 
 void MainWindow::reloadFile()
 {
-  if (this->isOkToContinue() && this->mp_ModelDock->isOkToContinue())
-    this->openFile(this->m_RecentFiles[0]); // Don't use 'this->mp_Acquisition->fileName()' as it cleared during the loading.
+  this->mp_ActionRecentFiles[0]->trigger();
 };
 
 void MainWindow::openFileLocation()
