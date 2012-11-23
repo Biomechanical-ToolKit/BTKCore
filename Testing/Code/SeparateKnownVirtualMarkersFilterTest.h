@@ -12,7 +12,7 @@ CXXTEST_SUITE(SeparateKnownVirtualMarkersFilterTest)
   CXXTEST_TEST(Constructor)
   {
     btk::SeparateKnownVirtualMarkersFilter::Pointer skvm = btk::SeparateKnownVirtualMarkersFilter::New();
-    std::list<btk::SeparateKnownVirtualMarkersFilter::StringAxes> labels = skvm->GetKnownVirtualMarkerLabelsForAxes();
+    std::list<btk::SeparateKnownVirtualMarkersFilter::StringAxes> labels = skvm->GetVirtualReferenceFrames();
     size_t num = 19;
     TS_ASSERT_EQUALS(labels.size(), num);
     std::list<btk::SeparateKnownVirtualMarkersFilter::StringAxes>::const_iterator it = labels.begin();
@@ -133,7 +133,7 @@ CXXTEST_SUITE(SeparateKnownVirtualMarkersFilterTest)
       TS_ASSERT_EQUALS(it->Axis3, std::string("TRXP"));
       ++it;
     }
-    std::list<std::string> labels2 = skvm->GetKnownVirtualMarkerLabelsForOthers();
+    std::list<std::string> labels2 = skvm->GetVirtualMarkers();
     num = 2;
     TS_ASSERT_EQUALS(labels2.size(), num);
     std::list<std::string>::const_iterator it2 = labels2.begin();
@@ -309,9 +309,9 @@ CXXTEST_SUITE(SeparateKnownVirtualMarkersFilterTest)
     btk::SeparateKnownVirtualMarkersFilter::Pointer skvm = btk::SeparateKnownVirtualMarkersFilter::New();
     skvm->SetInput(reader->GetOutput()->GetPoints());
     skvm->SetLabelPrefix("Matt:");
-    skvm->AppendKnownVirtualMarkerLabelForOthers("LKNE");
-    skvm->AppendKnownVirtualMarkerLabelForOthers("RKNE");
-    skvm->SetKnownVirtualMarkerLabelsForAxes(virtualMarkerLabelsAxes);
+    skvm->AppendVirtualMarker("LKNE");
+    skvm->AppendVirtualMarker("RKNE");
+    skvm->SetVirtualReferenceFrames(virtualMarkerLabelsAxes);
     skvm->Update();
     
     int inc;

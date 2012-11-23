@@ -284,7 +284,7 @@ namespace btk
   //! @endcond
 
   /**
-   * Creates an new MetaData or replaces its data if it already exists.
+   * Creates a new MetaData or replaces its data if it already exists.
    *
    * This method constructs a MetaData with a single value @a val, with the label @a label, an empty description and is unlocked.
    *
@@ -313,7 +313,7 @@ namespace btk
   };
 
   /**
-   * Creates an new MetaData or replaces its data if it already exists.
+   * Creates a new MetaData or replaces its data if it already exists.
    *
    * This method constructs a MetaData with a 1D vector @a val as values, with the label @a label, an empty description and is unlocked.
    * This method gives also the possibility to create more than one entry if the vector's length is greater or equal to 256. The other entries containing the extra 256 items
@@ -333,7 +333,7 @@ namespace btk
   };
   
   /**
-   * Creates an new MetaData or replaces its data if it already exists.
+   * Creates a new MetaData or replaces its data if it already exists.
    *
    * This method constructs an unlocked MetaData with a 2D vector @a val as values, an integer @a numCol for the number of column, a string @a label for the label and an empty description.
    * This method is a recursive method which give the possibility to create more than one entry if the vector's length is greater or equal to 256 * @a numCol.
