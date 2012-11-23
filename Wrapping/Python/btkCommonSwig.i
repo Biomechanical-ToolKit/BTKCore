@@ -104,7 +104,7 @@ public:
   BTK_SWIG_DECLARE_IMPL_GETSET(Gain, Gain);
   BTK_SWIG_DECLARE_IMPL_GETSET(Offset, int);
   BTK_SWIG_DECLARE_IMPL_GETSET(Scale, double);
-  void SetFrame(int , double );
+  void SetDataSlice(int , double );
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(Analog);
 };
@@ -130,7 +130,7 @@ public:
   BTK_SWIG_DECLARE_IMPL_GETSET(Residuals, btk::Point::Residuals&);
   BTK_SWIG_DECLARE_IMPL_GETSET(FrameNumber, int);
   BTK_SWIG_DECLARE_IMPL_GETSET(Type, Type);
-  void SetFrame(int , double , double , double , double res = 0.0);
+  void SetDataSlice(int , double , double , double , double res = 0.0);
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(Point);
 };

@@ -150,7 +150,7 @@ BTK_SWIG_DOCSTRING_IMPL(Analog, GetUnit, "Returns the analog's unit.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetUnit, "Sets the analog's unit.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetGain, "Returns the analog's gain.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetGain, "Sets the analog's gain.");
-BTK_SWIG_DOCSTRING_IMPL(Point, SetFrame, "Convenient method to set easily the given value with the given frame.\nWARNING: This function is not safe. There is no checking to determine if the frame is out of range or not. It has the advantage to be faster.");
+BTK_SWIG_DOCSTRING_IMPL(Point, SetDataSlice, "Convenient method to set easily the given value with the given frame.\nWARNING: This function is not safe. There is no checking to determine if the frame is out of range or not. It has the advantage to be faster.");
 
 // ------------------------------------------------------------------------- //
 //                                    Point                                  //
@@ -208,7 +208,7 @@ BTK_SWIG_DOCSTRING_IMPL(Point, GetFrameNumber, "Returns the number of frames.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetFrameNumber, "Sets the number of frames.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetType, "Returns the point's type.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetType, "Sets the point's type.");
-BTK_SWIG_DOCSTRING_IMPL(Point, SetFrame, "Convenient method to easily set the coordinates x,y,z and the residual for the given frame.\nWARNING: This function is not safe. There is no checking to determine if the frame is out of range or not. It has the advantage to be faster.");
+BTK_SWIG_DOCSTRING_IMPL(Point, SetDataSlice, "Convenient method to easily set the coordinates x,y,z and the residual for the given frame.\nWARNING: This function is not safe. There is no checking to determine if the frame is out of range or not. It has the advantage to be faster.");
 
 // ------------------------------------------------------------------------- //
 //                                 ForcePlatform                             //

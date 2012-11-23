@@ -295,7 +295,7 @@ namespace btk
                 double x = bifs.ReadFloat();
                 double y = bifs.ReadFloat();
                 double z = bifs.ReadFloat();
-                (*it)->SetFrame(j + shift, x, y, z); // Residual is set to 0 by default.
+                (*it)->SetDataSlice(j + shift, x, y, z); // Residual is set to 0 by default.
               }
             }
           }
@@ -319,9 +319,9 @@ namespace btk
               double y = bifs.ReadFloat();
               double z = bifs.ReadFloat();
               if ((x == 0.0) && (y == 0.0) && (z == 0.0))
-                (*it)->SetFrame(idx, x, y, z, -1.0);
+                (*it)->SetDataSlice(idx, x, y, z, -1.0);
               else
-                (*it)->SetFrame(idx, x, y, z);
+                (*it)->SetDataSlice(idx, x, y, z);
             }
           }
         }
@@ -374,7 +374,7 @@ namespace btk
                 {
                   int k = 0;
                   for (Acquisition::AnalogIterator it = analogMap.begin() ; it != analogMap.end() ; ++it)
-                    (*it)->SetFrame(j + shift, data[k++]);
+                    (*it)->SetDataSlice(j + shift, data[k++]);
                 }
               }
             }
@@ -445,7 +445,7 @@ namespace btk
           for (int i = 0 ; i < numPFFramesFinal ; ++i)
           {
             for (Acquisition::AnalogIterator it = analogMap.begin() ; it != analogMap.end() ; ++it)
-              (*it)->SetFrame(i + shift, bifs.ReadFloat());
+              (*it)->SetDataSlice(i + shift, bifs.ReadFloat());
           }
         }
         // Two force platforms - by analog channels
@@ -490,7 +490,7 @@ namespace btk
                 {
                   int k = 0;
                   for (Acquisition::AnalogIterator it = analogMap.begin() ; it != analogMap.end() ; ++it)
-                    (*it)->SetFrame(j + shift, data[k++]);
+                    (*it)->SetDataSlice(j + shift, data[k++]);
                 }
               }
             }
@@ -611,7 +611,7 @@ namespace btk
           for (int i = 0 ; i < numPFFramesFinal ; ++i)
           {
             for (Acquisition::AnalogIterator it = analogMap.begin() ; it != analogMap.end() ; ++it)
-              (*it)->SetFrame(i + shift, bifs.ReadFloat());
+              (*it)->SetDataSlice(i + shift, bifs.ReadFloat());
           }
         }
         // - Unknown
@@ -771,7 +771,7 @@ namespace btk
             std::advance(it, numPFChannels);
             while (it != output->EndAnalog())
             {
-              (*it)->SetFrame(i + shift, bifs.ReadFloat());
+              (*it)->SetDataSlice(i + shift, bifs.ReadFloat());
               ++it;
             }
           }

@@ -68,7 +68,7 @@ namespace btk
     BTK_COMMON_EXPORT void SetScale(double s);
     Pointer Clone() const {return Pointer(new Analog(*this));}
     
-    void SetFrame(int frame, double val);
+    void SetDataSlice(int frame, double val);
     
   protected:
     BTK_COMMON_EXPORT Analog(const std::string& label, const std::string& desc);
@@ -84,7 +84,7 @@ namespace btk
     double m_Scale;
   };
   
-  inline void Analog::SetFrame(int frame, double val)
+  inline void Analog::SetDataSlice(int frame, double val)
   {
     this->m_Values.coeffRef(frame, 0) = val;
   };

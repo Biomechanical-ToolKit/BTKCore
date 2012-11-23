@@ -585,12 +585,12 @@ int Acquisition::createAveragedMarker(const QList<int>& markerIds)
         y += (*it)->GetValues().coeff(i,1);
         z += (*it)->GetValues().coeff(i,2);
       }
-      average->SetFrame(i, x / static_cast<double>(numMarkers),
+      average->SetDataSlice(i, x / static_cast<double>(numMarkers),
                            y / static_cast<double>(numMarkers),
                            z / static_cast<double>(numMarkers));
     }
     else
-      average->SetFrame(i, 0.0, 0.0, 0.0, -1.0);
+      average->SetDataSlice(i, 0.0, 0.0, 0.0, -1.0);
   }
   this->mp_BTKAcquisition->GetPoints()->InsertItem(average);
   

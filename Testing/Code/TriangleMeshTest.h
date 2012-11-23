@@ -118,7 +118,7 @@ CXXTEST_SUITE(TriangleMeshTestTest)
     for (int i = 0 ; i < 5 ; ++i)
     {
       btk::Point::Pointer point = btk::Point::New(1);
-      point->SetFrame(0,1.0,1.0,1.0); // Valid point
+      point->SetDataSlice(0,1.0,1.0,1.0); // Valid point
       points->InsertItem(point);
     }
     std::vector<int> m(5);

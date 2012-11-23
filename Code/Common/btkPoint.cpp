@@ -246,8 +246,8 @@ namespace btk
   };
   
   /**
-   * @fn void Point::SetFrame(int frame, double x, double y, double z, double res = 0.0)
-   * Convenient method to easily set the coordinates @a x, @a y, @a z and the residual @a res for the given @a frame.
-   * @warning This function is not safe. There is no checking to determine if the frame is out of range or not. It has the advantage to be faster.
+   * @fn void Point::SetDataSlice(int idx, double x, double y, double z, double res = 0.0)
+   * Convenient method to easily set the coordinates @a x, @a y, @a z and the residual @a res for the given @a idx.
+   * @warning This function is not safe. There is no checking to determine if the index is out of range or not. It has the advantage to be faster.
    */
 }

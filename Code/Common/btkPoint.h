@@ -55,7 +55,7 @@ namespace btk
     
     virtual ~Point() {};
     
-    void SetFrame(int frame, double x, double y, double z, double res = 0.0);
+    void SetDataSlice(int idx, double x, double y, double z, double res = 0.0);
     
     Residuals& GetResiduals() {return this->m_Residuals;};
     const Residuals& GetResiduals() const {return this->m_Residuals;};
@@ -77,12 +77,12 @@ namespace btk
     Type m_Type;
   };
   
-  inline void Point::SetFrame(int frame, double x, double y, double z, double res)
+  inline void Point::SetDataSlice(int idx, double x, double y, double z, double res)
   {
-    this->m_Values.coeffRef(frame,0) = x;
-    this->m_Values.coeffRef(frame,1) = y;
-    this->m_Values.coeffRef(frame,2) = z; 
-    this->m_Residuals.coeffRef(frame) = res;
+    this->m_Values.coeffRef(idx,0) = x;
+    this->m_Values.coeffRef(idx,1) = y;
+    this->m_Values.coeffRef(idx,2) = z; 
+    this->m_Residuals.coeffRef(idx) = res;
   };
 };
 
