@@ -21,7 +21,7 @@ function info = btkMetaDataInfo(format, values, numdims)
 
 nd = numel(size(values));
 if (nargin < 3)
-    numdim = nd;
+    numdims = nd;
 elseif (numdims < nd)
     error('btk:MetaDataInfo', 'The given number of dimensions is lower than the number of dimensions for the given values.');
 end
