@@ -284,15 +284,19 @@ namespace btk
     std::ofstream ofs(filename.c_str());
     if (!ofs) 
       throw(TRCFileIOException("Invalid file path."));
-    int idx = 0;
+    PointCollection::Pointer markers = PointCollection::New();
     for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
     {
-      if ((*it)->GetFrameNumber() != input->GetPointFrameNumber())
+      Point::Pointer pt = *it;
+      if (pt->GetType() != Point::Marker)
+        continue;
+      else if (pt->GetFrameNumber() != input->GetPointFrameNumber())
       {
-        btkIOErrorMacro(filename, "Point #" + ToString(idx) + " frame number is resized to the general number of frames.");
-        (*it)->SetFrameNumber(input->GetPointFrameNumber());
-        ++idx;
+        btkIOErrorMacro(filename, "Marker '" + pt->GetLabel() + "' was cloned and its number of frames is resized to the general number of frames.");
+        pt = (*it)->Clone();
+        pt->SetFrameNumber(input->GetPointFrameNumber());
       }
+      markers->InsertItem(pt);
     }
     double freq = 100.0;
     if (input->GetPointFrequency() != 0)
@@ -307,17 +311,17 @@ namespace btk
     ofs << input->GetPointFrequency() /* DataRate */ << "\t"
         << input->GetPointFrequency() /* CameraRate */ << "\t"
         << input->GetPointFrameNumber() /* NumFrames */ << "\t"
-        << input->GetPointNumber() /* NumMarkers */ << "\t"
+        << markers->GetItemNumber() /* NumMarkers */ << "\t"
         << input->GetPointUnit() /* Units */ << "\t" 
         << freq /* OrigDataRate */ << "\t"
         << input->GetFirstFrame() /* OrigDataStartFrame */ << "\t"
         << input->GetPointFrameNumber() /* OrigNumFrames */<< "\t\n";
     ofs << "Frame#\tTime\t";
-    for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+    for (PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
       ofs << (*it)->GetLabel() << "\t\t\t";
     ofs << "\n\t\t";
-    idx = 1;
-    for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+    int idx = 1;
+    for (PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
     {
       ofs << "X" << idx << "\t" << "Y" << idx << "\t" << "Z" << idx << "\t";
       ++idx;
@@ -330,7 +334,7 @@ namespace btk
       ofs << std::endl << frame + 1 << "\t" << time;
       ofs.precision(5);
 
-      for (PointCollection::ConstIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
+      for (PointCollection::ConstIterator it = markers->Begin() ; it != markers->End() ; ++it)
       {
         if ((*it)->GetValues().row(frame).isZero() && ((*it)->GetResiduals().coeff(frame) == -1))
           ofs << "\t\t\t";
