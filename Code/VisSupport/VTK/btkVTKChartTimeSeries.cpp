@@ -213,12 +213,24 @@ namespace btk
       x[0] = 0.0; x[1] = 0.0;
       y[0] = 0.0; y[1] = 0.0;
     }
-    
-    // The X axis is set to fit exactly the time range
-    // The Y axis is larger to see correctly the minimum and maximum values.
-    // +/- 5% of the range is added.
-    double r = (y[1] - y[0]) / 20.0;
-    y[0] -= r; y[1] += r;
+    else
+    {
+      // The X axis is set to fit exactly the time range
+      // The Y axis is larger to see correctly the minimum and maximum values.
+      // +/- 5% of the range is added.
+      // If the Y range is zero, then the min/max are set to -0.01 and 0.01
+      double r = (y[1] - y[0]) / 20.0;
+      if (fabs(r) < std::numeric_limits<double>::epsilon())
+      {
+        y[0] = -0.01;
+        y[1] = 0.01;
+      }
+      else
+      {
+        y[0] -= r;
+        y[1] += r;
+      }
+    }
     
     this->SetBounds(x[0], x[1], y[0], y[1]);
     
