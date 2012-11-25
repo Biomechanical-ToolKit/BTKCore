@@ -1742,7 +1742,7 @@ void MultiViewWidget::displayChartHorizontalAxisAsCycle(int index)
     ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
     w->setDataToCycleMatchingRules(setting.rightLabelRule, setting.rightLabelRuleText, setting.leftLabelRule, setting.leftLabelRuleText);
     w->setHorizontalAxisUnit(setting.horizontalAxisTitle, 1.0, 0.0, true);
-    w->setHorizontalAxisRange(0.0, 100.0);
+    w->setHorizontalAxisRange(0.0, this->mp_Acquisition->btkAcquisition() ? 100.0 : 0.0);
   }
   
   this->mp_ChartCycleSettingsManager->blockSignals(true);

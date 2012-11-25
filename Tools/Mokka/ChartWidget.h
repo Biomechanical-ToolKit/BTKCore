@@ -230,7 +230,7 @@ public:
   virtual void hidePlot(int index, bool isHidden, bool* layoutModified);
   void setHorizontalData(vtkFloatArray* (*horizontalAbscissa)[4], vtkFloatArray* (*cyclesBoundaries)[3]);
   virtual void setPlotVisible(int index, bool show, bool* layoutModified);
-  virtual void show(Acquisition* acq, bool s, bool* layoutModified);
+  virtual void show(Acquisition* acq, int mode, bool* layoutModified);
   const QString& title() const {return this->m_Title;};
   void setTitle(const QString& title) {this->m_Title = title;};
   const QList<int>& optionSelection() const {return this->m_OptionSelection;};

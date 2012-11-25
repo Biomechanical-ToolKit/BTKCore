@@ -105,7 +105,7 @@ public:
   virtual void removePlot(int index, bool* layoutModified);
   virtual void hidePlot(int index, bool isHidden, bool* layoutModified);
   virtual void setPlotVisible(int index, bool show, bool* layoutModified);
-  virtual void show(Acquisition* acq, bool s, bool* layoutModified);
+  virtual void show(Acquisition* acq, int mode, bool* layoutModified);
   void setExpandable(bool expandable);
   bool isExpanded() const {return this->m_Expanded;};
 
@@ -286,7 +286,7 @@ void ChartWidget::show(bool s)
   for (int i = 0 ; i < this->m_ChartData.size() ; ++i)
   {
     bool layoutModified = false;
-    this->m_ChartData[i]->show(this->mp_Acquisition, s, &layoutModified);
+    this->m_ChartData[i]->show(this->mp_Acquisition, (s ? this->m_HorizontalDisplayMode : NoDisplay), &layoutModified);
     if (layoutModified && (this->m_CurrentChartType == i))
       this->m_ChartData[i]->layout()->UpdateLayout();
   }
@@ -1201,7 +1201,7 @@ void AbstractChartData::setPlotVisible(int index, bool show, bool* layoutModifie
     this->chart(i)->GetPlot(index)->SetVisible(show);
 };
 
-void AbstractChartData::show(Acquisition* acq, bool s, bool* layoutModified)
+void AbstractChartData::show(Acquisition* acq, int mode, bool* layoutModified)
 {
   *layoutModified = false;
   this->m_PlotsProperties.clear();
@@ -1213,7 +1213,7 @@ void AbstractChartData::show(Acquisition* acq, bool s, bool* layoutModified)
 
     vtkAxis* axisX = chart->GetAxis(vtkAxis::BOTTOM);
     vtkAxis* axisY = chart->GetAxis(vtkAxis::LEFT);
-    if (!s) // Reset
+    if (mode == ChartWidget::NoDisplay) // Reset
     {
       chart->SetBounds(0.0, 0.0, 0.0, 0.0);
       axisX->SetLabelsVisible(false);
@@ -1221,8 +1221,14 @@ void AbstractChartData::show(Acquisition* acq, bool s, bool* layoutModified)
     }
     else // Load
     {
-      int roi[2]; acq->regionOfInterest(roi[0], roi[1]);
-      chart->SetBounds((double)roi[0], (double)roi[1], 0.0, 0.0);
+      if (mode == ChartWidget::TemporalDisplay)
+      {
+        int roi[2]; acq->regionOfInterest(roi[0], roi[1]);
+        chart->SetBounds((double)roi[0], (double)roi[1], 0.0, 0.0);
+      }
+      else
+        chart->SetBounds(0.0, acq->btkAcquisition() ? 100.0 : 0.0, 0.0, 0.0);
+      
       axisX->SetLabelsVisible(true);
       axisY->SetLabelsVisible(true);
     }
@@ -1729,10 +1735,10 @@ void AnalogChartData::hidePlot(int index, bool isHidden, bool* layoutModified)
   }
 };
 
-void AnalogChartData::show(Acquisition* acq, bool s, bool* layoutModified)
+void AnalogChartData::show(Acquisition* acq, int mode, bool* layoutModified)
 {
   if (!this->m_Expanded)
-    this->AbstractChartData::show(acq, s, layoutModified);
+    this->AbstractChartData::show(acq, mode, layoutModified);
   else
   {
     btk::VTKChartTimeSeries* chartZero = this->chart(0);
@@ -1740,7 +1746,7 @@ void AnalogChartData::show(Acquisition* acq, bool s, bool* layoutModified)
       this->chart(i)->ClearPlots();
     this->mp_ChartLayout->SetSize(vtkVector2i(1,1));
     chartZero->GetAxis(vtkAxis::LEFT)->SetTitle("Values");
-    this->AbstractChartData::show(acq, s, layoutModified);
+    this->AbstractChartData::show(acq, mode, layoutModified);
     *layoutModified = true;
   }
 };
