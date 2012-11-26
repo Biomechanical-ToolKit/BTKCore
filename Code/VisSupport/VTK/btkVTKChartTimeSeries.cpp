@@ -477,7 +477,7 @@ namespace btk
     for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
     {
       vtkPlotPoints* points = vtkPlotPoints::SafeDownCast(*it);
-      if (points != 0)
+      if ((points != 0) && ((*it)->GetInput() != 0))
       {
         float numPts = scale * static_cast<float>((*it)->GetInput()->GetNumberOfRows());
         // Note: The value used below for the threshold is an abitrary value and could be modified later
