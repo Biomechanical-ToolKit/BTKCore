@@ -46,6 +46,7 @@ namespace btk
     typedef SharedPtr<VTKCurrentFrameFunctor> Pointer;
     virtual ~VTKCurrentFrameFunctor() {};
     virtual int operator()() = 0;
+    virtual VTKCurrentFrameFunctor::Pointer ResetedSuperClone() = 0;
   protected:
     VTKCurrentFrameFunctor() {};
   private:
@@ -59,6 +60,7 @@ namespace btk
     typedef SharedPtr<VTKRegionOfInterestFunctor> Pointer;
     virtual ~VTKRegionOfInterestFunctor() {};
     virtual void operator()(int& left, int& right) = 0;
+    virtual VTKRegionOfInterestFunctor::Pointer ResetedSuperClone() = 0;
   protected:
     VTKRegionOfInterestFunctor() {};
   private:
@@ -85,7 +87,7 @@ namespace btk
     typedef SharedPtr<VTKEventsFunctor> Pointer;
     virtual ~VTKEventsFunctor() {};
     virtual bool operator()(int index, int& typeId, float& x, double rgb[3]) = 0;
-    
+    virtual VTKEventsFunctor::Pointer ResetedSuperClone() = 0;
     VTKEventsFrameMapperFunctor::Pointer GetFrameMapper() const {return this->mp_FrameMapper;};
     void SetFrameMapper(VTKEventsFrameMapperFunctor::Pointer mapper) {this->mp_FrameMapper = mapper;};
   protected:
