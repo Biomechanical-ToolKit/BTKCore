@@ -6,7 +6,7 @@ import numpy
 class SeparateKnownVirtualMarkersFilterTest(unittest.TestCase):
     def test_Constructor(self):
         skvm = btk.btkSeparateKnownVirtualMarkersFilter()
-        labels = skvm.GetKnownVirtualMarkerLabelsForAxes()
+        labels = skvm.GetVirtualReferenceFrames()
         num = 19
         self.assertEqual(labels.size(), num)
         it = labels.begin()
@@ -125,7 +125,7 @@ class SeparateKnownVirtualMarkersFilterTest(unittest.TestCase):
             self.assertEqual(it.value().Axis2, 'TRXL')
             self.assertEqual(it.value().Axis3, 'TRXP')
             it.incr()
-        labels2 = skvm.GetKnownVirtualMarkerLabelsForOthers()
+        labels2 = skvm.GetVirtualMarkers()
         num = 2
         self.assertEqual(labels2.size(), num)
         it2 = labels2.begin()
@@ -282,9 +282,9 @@ class SeparateKnownVirtualMarkersFilterTest(unittest.TestCase):
         skvm = btk.btkSeparateKnownVirtualMarkersFilter()
         skvm.SetInput(reader.GetOutput().GetPoints())
         skvm.SetLabelPrefix('Matt:')
-        skvm.AppendKnownVirtualMarkerLabelForOthers('LKNE')
-        skvm.AppendKnownVirtualMarkerLabelForOthers('RKNE')
-        skvm.SetKnownVirtualMarkerLabelsForAxes(virtualMarkerLabelsAxes)
+        skvm.AppendVirtualMarker('LKNE')
+        skvm.AppendVirtualMarker('RKNE')
+        skvm.SetVirtualReferenceFrames(virtualMarkerLabelsAxes)
         skvm.Update()
         # markers
         points = skvm.GetOutput(0)

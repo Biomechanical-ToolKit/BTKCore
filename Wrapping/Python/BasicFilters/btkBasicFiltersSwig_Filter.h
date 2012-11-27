@@ -107,7 +107,7 @@ public:
 BTK_SWIG_DECLARE_CLASS(SeparateKnownVirtualMarkersFilter)
 {
 public:
-  enum {AllMarkers = btk::SeparateKnownVirtualMarkersFilter::AllMarkers, Markers = btk::SeparateKnownVirtualMarkersFilter::Markers, VirtualMarkersForFrame = btk::SeparateKnownVirtualMarkersFilter::VirtualMarkersForFrame, VirtualMarkersOther = btk::SeparateKnownVirtualMarkersFilter::VirtualMarkersOther, OtherPoints = btk::SeparateKnownVirtualMarkersFilter::OtherPoints};
+  enum {AllMarkers = btk::SeparateKnownVirtualMarkersFilter::AllMarkers, Markers = btk::SeparateKnownVirtualMarkersFilter::Markers, VirtualReferenceFrames = btk::SeparateKnownVirtualMarkersFilter::VirtualReferenceFrames, VirtualMarkers = btk::SeparateKnownVirtualMarkersFilter::VirtualMarkers, OtherPoints = btk::SeparateKnownVirtualMarkersFilter::OtherPoints};
   BTK_SWIG_DECLARE_DEFAULT_CTOR(SeparateKnownVirtualMarkersFilter);
   BTK_SWIG_DECLARE_POINTER_OPERATOR(SeparateKnownVirtualMarkersFilter);
 };

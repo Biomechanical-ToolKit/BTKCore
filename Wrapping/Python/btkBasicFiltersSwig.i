@@ -250,16 +250,16 @@ BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(SeparateKnownVirtualMarkersFilter)
 public:
   enum {AllMarkers = btk::SeparateKnownVirtualMarkersFilter::AllMarkers, Markers = btk::SeparateKnownVirtualMarkersFilter::Markers, VirtualMarkersForFrame = btk::SeparateKnownVirtualMarkersFilter::VirtualMarkersForFrame, VirtualMarkersOther = btk::SeparateKnownVirtualMarkersFilter::VirtualMarkersOther, OtherPoints = btk::SeparateKnownVirtualMarkersFilter::OtherPoints};
   
-  void AppendKnownVirtualMarkerLabelForAxes(const std::string& , const std::string& , const std::string& , const std::string& );
-  void AppendKnownVirtualMarkerLabelForAxes(const btkStringAxes& );
-  void AppendKnownVirtualMarkerLabelsForAxes(const std::list<btkStringAxes>& );
-  void SetKnownVirtualMarkerLabelsForAxes(const std::list<btkStringAxes>& );
-  const std::list<btkStringAxes>& GetKnownVirtualMarkerLabelsForAxes() const;
+  void AppendVirtualReferenceFrame(const std::string& , const std::string& , const std::string& , const std::string& );
+  void AppendVirtualReferenceFrame(const btkStringAxes& );
+  void AppendVirtualReferenceFrames(const std::list<btkStringAxes>& );
+  void SetVirtualReferenceFrames(const std::list<btkStringAxes>& );
+  const std::list<btkStringAxes>& GetVirtualReferenceFrames() const;
   
-  void AppendKnownVirtualMarkerLabelForOthers(const std::string& );
-  void AppendKnownVirtualMarkerLabelsForOthers(const std::list<std::string>& );
-  void SetKnownVirtualMarkerLabelsForOthers(const std::list<std::string>& );
-  const std::list<std::string>& GetKnownVirtualMarkerLabelsForOthers() const;
+  void AppendVirtualMarker(const std::string& );
+  void AppendVirtualMarkers(const std::list<std::string>& );
+  void SetVirtualMarkers(const std::list<std::string>& );
+  const std::list<std::string>& GetVirtualMarkers() const;
   
   void SetLabelPrefix(const std::string& );
   const std::string& GetLabelPrefix() const;

@@ -332,12 +332,12 @@ Separate a collection of points in five categories to be able to distinguish rea
 These categories are:
  - all kind of markers (real and virtual) as stored in the acquisition
  - markers
- - virtual markers used for frame
+ - virtual markers used to construct refence frames
  - other virtual markers (CenterOfMass, ...)
  - other points (angle, force, moment, power, ...)
 
 To select the output corresponding to the chosen category, you can use the method GetOutput() 
-with one of these enum values: AllMarkers, Markers, VirtualMarkersForFrame, VirtualMarkersOther, OtherPoints.
+with one of these enum values: AllMarkers, Markers, VirtualReferenceFrames, VirtualMarkers, OtherPoints.
 
 By default, the list of labels known as virtual markers used for frame is:
  - HED(O|A|L|P): HEDO, HEDA, HEDL, HELP
@@ -368,25 +368,26 @@ You can also add a prefix for the markers' label by using the method SetLabelPre
 
 This filter only copies the pointer associated which each point instead of using a deep copy of it."
 
-BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, AppendKnownVirtualMarkerLabelForAxes(const std::string& , const std::string& , const std::string& , const std::string&), "AppendKnownVirtualMarkerLabelForAxes(self, string, string, string, string)");
-BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, AppendKnownVirtualMarkerLabelForAxes(const btkStringAxes& ), "AppendKnownVirtualMarkerLabelForAxes(self, btkStringAxes)");
-BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, AppendKnownVirtualMarkerLabelsForAxes, "AppendKnownVirtualMarkerLabelForAxes(self, btkStringAxesList)");
-BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, AppendKnownVirtualMarkerLabelForOthers, "AppendKnownVirtualMarkerLabelForOthers(self, string)");
-BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, AppendKnownVirtualMarkerLabelsForOthers, "AppendKnownVirtualMarkerLabelForOthers(self, btkStringList)");
+BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, AppendVirtualReferenceFrame(const std::string& , const std::string& , const std::string& , const std::string&), "AppendVirtualReferenceFrame(self, string, string, string, string)");
+BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, AppendVirtualReferenceFrame(const btkStringAxes& ), "AppendVirtualReferenceFrame(self, btkStringAxes)");
+BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, AppendVirtualReferenceFrames, "AppendKnownVirtualMarkerLabelForAxes(self, btkStringAxesList)");
+BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, AppendVirtualMarker, "AppendVirtualMarker(self, string)");
+BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, AppendVirtualMarkers, "AppendVirtualMarkers(self, btkStringList)");
 BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, SetInput(btkPointCollection ), "SetInput(self, btkAcquisition)");
 BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, GetOutput(int ), "GetOutput(self, int) -> btkPointCollection");
-BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, SetKnownVirtualMarkerLabelsForAxes, "SetKnownVirtualMarkerLabelsForAxes(self, btkStringAxesList)");
-BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, SetKnownVirtualMarkerLabelsForOthers, "SetKnownVirtualMarkerLabelsForOthers(self, btkStringList)");
+BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, SetVirtualReferenceFrames, "SetKnownVirtualMarkerLabelsForAxes(self, btkStringAxesList)");
+BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, SetVirtualMarkers, "SetKnownVirtualMarkerLabelsForOthers(self, btkStringList)");
 BTK_SWIG_AUTODOC_IMPL(SeparateKnownVirtualMarkersFilter, SetLabelPrefix(const std::string& ), "SetLabelPrefix(self, string)");
 
-BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, AppendKnownVirtualMarkerLabelForAxes(const std::string& , const std::string& , const std::string& , const std::string&), "Append a new set of labels for a virtual frame. The labels correspond to the origin, the axis X, Y and Z respectively.");
-BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, AppendKnownVirtualMarkerLabelForAxes(const btkStringAxes& ), "Append a new set of labels for a virtual frame.");
-BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, AppendKnownVirtualMarkerLabelsForAxes, "Append a list of axes' definition in the category of the virtual markers used to defined frames.");
-BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, SetKnownVirtualMarkerLabelsForAxes, "Sets the list of labels for the virtual markers used to create frames.");
-BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, GetKnownVirtualMarkerLabelsForAxes, "Returns the list of labels for the virtual markers used to create frame.");
-BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, AppendKnownVirtualMarkerLabelsForOthers, "Append a list of labels in the category of the other virtual markers.");
-BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, SetKnownVirtualMarkerLabelsForOthers, "Sets the list of labels for the virtual markers used in another context than virtual frames. Each label is checked before to be inserted to not have duplication.");
-BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, GetKnownVirtualMarkerLabelsForOthers, "Returns the list of labels for the virtual markers used in another context than virtual frames");
+BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, AppendVirtualReferenceFrame(const std::string& , const std::string& , const std::string& , const std::string&), "Append a new set of labels for a virtual frame. The labels correspond to the origin, the axis X, Y and Z respectively.");
+BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, AppendVirtualReferenceFrame(const btkStringAxes& ), "Append a new set of labels for a virtual frame.");
+BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, AppendVirtualReferenceFrames, "Append a list of axes' definition in the category of the virtual markers used to defined frames.");
+BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, SetVirtualReferenceFrames, "Sets the list of labels for the virtual markers used to create frames.");
+BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, GetVirtualReferenceFrames, "Returns the list of labels for the virtual markers used to create frame.");
+BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, AppendVirtualMarker, "Append a label in the category of the other virtual markers.");
+BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, AppendVirtualMarkers, "Append a list of labels in the category of the other virtual markers.");
+BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, SetVirtualMarkers, "Sets the list of labels for the virtual markers used in another context than virtual frames. Each label is checked before to be inserted to not have duplication.");
+BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, GetVirtualMarkers, "Returns the list of labels for the virtual markers used in another context than virtual frames");
 BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, GetInput, "Gets the input registered with this process.");
 BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, SetInput, "Sets the input required with this process.");
 BTK_SWIG_DOCSTRING_IMPL(SeparateKnownVirtualMarkersFilter, GetOutput, "Returns the output created with this process.");
