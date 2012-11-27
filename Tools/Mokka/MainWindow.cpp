@@ -111,7 +111,6 @@ MainWindow::MainWindow(QWidget* parent)
 #endif
   QAction* actionInformationsDockView = this->mp_FileInfoDock->toggleViewAction();
   actionInformationsDockView->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I));
-  this->timeEventControler->playbackSpeedMenu()->menuAction()->setEnabled(true);
   // Menu File
   this->menuExport->menuAction()->setEnabled(false);
   // Menu View

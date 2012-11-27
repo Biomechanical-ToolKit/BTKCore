@@ -148,6 +148,7 @@ private:
   void setEventIconId(Event* e);
   void setEventTime(Event* e);
   QPoint eventDialogGlobaPos(const NewEventDialog* ned) const;
+  void setEnabledInsertEventActions(bool enabled);
   
   Acquisition* mp_Acquisition;
   QMenu* mp_PlaybackSpeedMenu;

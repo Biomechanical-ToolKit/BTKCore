@@ -69,6 +69,7 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   this->actionClearEvents->setEnabled(false);
   this->actionCropRegionOfInterest->setEnabled(false);
   this->actionZoomUnzoomRegionOfInterest->setEnabled(false);
+  this->setEnabledInsertEventActions(false);
   // Shortcuts
   this->actionEditSelectedEvents->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_E));
   this->actionRemoveSelectedEvents->setShortcut(QKeySequence::Delete);
@@ -82,7 +83,7 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_5);
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_10);
   QMenu* displayOptionsMenu = new QMenu(this);
-  this->mp_PlaybackSpeedMenu = new QMenu(tr("Playback speed"),this);
+  this->mp_PlaybackSpeedMenu = new QMenu(tr("Playback speed"));
   actionPlaybackSpeedRealtime->setChecked(true);
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeedRealtime);
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_2);
@@ -132,7 +133,7 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   eventGeneralOptionsMenu->addAction(this->actionRemoveAllGeneralFootOff);
   this->eventGeneralOptionsButtonMenu->setMenu(eventGeneralOptionsMenu);
   // Other extra menu
-  this->mp_InsertEventMenu = new QMenu(tr("Insert Event"), this);
+  this->mp_InsertEventMenu = new QMenu(tr("Insert Event"));
   this->mp_InsertEventMenu->addAction(this->actionInsertRightFootStrike);
   this->mp_InsertEventMenu->addAction(this->actionInsertRightFootOff);
   this->mp_InsertEventMenu->addAction(this->actionInsertRightOther);
@@ -225,6 +226,8 @@ TimeEventControlerWidget::~TimeEventControlerWidget()
   delete this->mp_PrevEventActiveIcon;
   delete this->mp_NextEventIcon;
   delete this->mp_NextEventActiveIcon;
+  delete this->mp_InsertEventMenu;
+  delete this->mp_PlaybackSpeedMenu;
 };
 
 Acquisition* TimeEventControlerWidget::acquisition() const
@@ -257,6 +260,7 @@ void TimeEventControlerWidget::load()
   this->actionNextEvent->setEnabled(this->timeEventBar->m_EventItems.isEmpty() ? false : true);
   this->actionPreviousEvent->setEnabled(this->timeEventBar->m_EventItems.isEmpty() ? false : true);
   this->actionReframeFromOne->setEnabled(this->timeEventBar->m_ROIFirstFrame == 1 ? false : true);
+  this->setEnabledInsertEventActions(true);
 };
 
 void TimeEventControlerWidget::reset()
@@ -269,6 +273,7 @@ void TimeEventControlerWidget::reset()
   this->actionClearEvents->setEnabled(false);
   this->actionCropRegionOfInterest->setEnabled(false);
   this->actionZoomUnzoomRegionOfInterest->setEnabled(false);
+  this->setEnabledInsertEventActions(false);
 };
 
 void TimeEventControlerWidget::setTimeEventTicksDisplay(int index)
@@ -742,7 +747,7 @@ void TimeEventControlerWidget::releaseNextEventButton()
 
 void TimeEventControlerWidget::changePlaybackParameters()
 {
-  if (!this->mp_Acquisition)
+  if (!this->mp_Acquisition || !this->mp_Acquisition->btkAcquisition())
     return;
   
   double freq = this->mp_Acquisition->pointFrequency();
@@ -955,3 +960,17 @@ QPoint TimeEventControlerWidget::eventDialogGlobaPos(const NewEventDialog* ned) 
   QPoint p = this->mapToGlobal(thisRect.topRight());
   return p - QPoint(nedRect.width() + 15, nedRect.height() + titleBarHeight + 15);
 };
+
+
+void TimeEventControlerWidget::setEnabledInsertEventActions(bool enabled)
+{
+  this->actionInsertRightFootStrike->setEnabled(enabled);
+  this->actionInsertRightFootOff->setEnabled(enabled);
+  this->actionInsertRightOther->setEnabled(enabled);
+  this->actionInsertLeftFootStrike->setEnabled(enabled);
+  this->actionInsertLeftFootOff->setEnabled(enabled);
+  this->actionInsertLeftOther->setEnabled(enabled);
+  this->actionInsertGeneralFootStrike->setEnabled(enabled);
+  this->actionInsertGeneralFootOff->setEnabled(enabled);
+  this->actionInsertGeneralOther->setEnabled(enabled);
+}
