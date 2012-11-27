@@ -98,6 +98,7 @@ public:
   void setCurrentFrameFunctor(btk::VTKCurrentFrameFunctor::Pointer functor);
   void setRegionOfInterestFunctor(btk::VTKRegionOfInterestFunctor::Pointer functor);
   void setEventsFunctor(btk::VTKEventsFunctor::Pointer functor);
+  void detachFunctors();
   
   double defaultLineWidth() {return ChartWidget::DefaultLineWidth;};
   void setDefaultLineWidth(double width) {ChartWidget::DefaultLineWidth = width;};
@@ -115,7 +116,7 @@ public:
   void setHorizontalAxisRange(double min, double max);
   void setDataToCycleMatchingRules(int rightLabelRule, const QString& rightLabelRuleText, int leftLabelRule, const QString& leftLabelRuleText);
   
-  void addPointPlot(btk::Point::Pointer pt, const QString& label, const QString& unit, int horizontalDataIndex);
+  void addPointPlot(btk::Point::Pointer pt, const QString& label, const QString& unit, int horizontalDataIndex, bool storeData = false);
   void setPointVerticalAxisUnit(const QString& strX, const QString& strY, const QString& strZ);
     
   VTKChartWidget* chartContent() const {return this->mp_ChartContentWidget;};
@@ -172,6 +173,7 @@ private:
   void updateHorizontalAxis(btk::VTKChartTimeSeries* chart, int ff, int lf);
   void updateHorizontalAxis(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux);
   int selectContextFromLabel(const QString& label);
+  void setDataToCycleMatchingRules(DataCycleMatchingRules* rules);
   
   int m_CurrentChartType;
   int m_HorizontalDisplayMode;

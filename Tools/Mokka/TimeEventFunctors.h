@@ -48,6 +48,7 @@ public:
   
   virtual ~CurrentFrameFunctor() {};
   virtual int operator()();
+  virtual btk::VTKCurrentFrameFunctor::Pointer ResetedSuperClone() {return Pointer(new CurrentFrameFunctor(this->mp_Object));};
   
 protected:
   CurrentFrameFunctor(TimeEventControlerWidget* w);
@@ -66,8 +67,8 @@ public:
   static RegionOfInterestFunctor::Pointer New(TimeEventControlerWidget* w) {return Pointer(new RegionOfInterestFunctor(w));};
   
   virtual ~RegionOfInterestFunctor() {};
-  
   virtual void operator()(int& left, int& right);
+  virtual btk::VTKRegionOfInterestFunctor::Pointer ResetedSuperClone() {return Pointer(new RegionOfInterestFunctor(this->mp_Object));};
   
 protected:
   RegionOfInterestFunctor(TimeEventControlerWidget* w);
@@ -86,8 +87,8 @@ public:
   static EventsFunctor::Pointer New(TimeEventControlerWidget* w) {return Pointer(new EventsFunctor(w));};
   
   virtual ~EventsFunctor() {};
-  
-  virtual bool operator()(int index, int& typeId, float& x, double rgb[3]);
+  virtual bool operator()(int index, int& typeId, float& x, double rgb[3]);  
+  virtual btk::VTKEventsFunctor::Pointer ResetedSuperClone() {return Pointer(new EventsFunctor(this->mp_Object));};
   
 protected:
   EventsFunctor(TimeEventControlerWidget* w);

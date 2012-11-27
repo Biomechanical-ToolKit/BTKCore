@@ -1025,11 +1025,18 @@ void MultiViewWidget::restoreLayout3DCharts()
 ChartDialog* MultiViewWidget::createChartDialog(QWidget* parent)
 {
   ChartDialog* dlg = new ChartDialog(parent);
-  dlg->chart->copy(static_cast<ChartWidget*>(static_cast<CompositeView*>(this->m_Views.first())->view(CompositeView::Chart)));
+  ChartWidget* source = static_cast<ChartWidget*>(static_cast<CompositeView*>(this->m_Views.first())->view(CompositeView::Chart));
+  dlg->chart->copy(source);
+  if (source->horizontalDisplayMode() == ChartWidget::CyclicDisplay)
+  {
+    dlg->chart->detachFunctors();
+    dlg->chart->setHorizontalAxisUnit(tr("Frames"), 1.0, 0.0, false);
+  }
   QList<QAction*> actions = dlg->chart->chartContent()->actions();
+  dlg->chart->chartContent()->removeAction(actions[0]);
   dlg->chart->chartContent()->removeAction(actions[1]);
-  dlg->chart->chartContent()->removeAction(actions[4]);
-  // dlg->chart->addActions(this->m_ViewChartActions);
+  dlg->chart->chartContent()->removeAction(actions[3]);
+  dlg->chart->chartContent()->removeAction(actions[6]);
   dlg->chart->setAcceptDrops(false);
   return dlg;
 };

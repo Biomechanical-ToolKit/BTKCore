@@ -91,7 +91,7 @@ public:
   virtual bool appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointer<vtkColorSeries> colorGenerator, QTreeWidgetItem* item, DataCycleMatchingRules* rules, bool* layoutModified);
   virtual void extractPlotLabelUnit(QString& label, QString& unit, Acquisition* acq, int id);
   virtual void initialize(vtkSmartPointer<vtkColorSeries> colorGenerator);
-  void addPointPlot(int id, Acquisition* acq, vtkColorSeries* colorGenerator, btk::Point::Pointer point, const QString& label, const QString& unit, int horizontalDataIndex);
+  void addPointPlot(int id, Acquisition* acq, vtkColorSeries* colorGenerator, btk::Point::Pointer point, const QString& label, const QString& unit, int horizontalDataIndex, bool storeData);
 };
 
 class AnalogChartData : public AbstractChartData
@@ -254,6 +254,9 @@ void ChartWidget::copy(ChartWidget* source)
   this->m_CurrentChartType = source->m_CurrentChartType;
   
   this->mp_ChartAxisXLabel->setText(source->mp_ChartAxisXLabel->text());
+  
+  this->m_HorizontalDisplayMode = source->m_HorizontalDisplayMode;
+  this->setDataToCycleMatchingRules(source->mp_DataCycleMatchingRules);
 };
 
 void ChartWidget::setAcquisition(Acquisition* acq)
@@ -428,10 +431,22 @@ void ChartWidget::setDataToCycleMatchingRules(int rightLabelRule, const QString&
   this->mp_DataCycleMatchingRules->leftLabelRuleText = leftLabelRuleText;
 };
 
-
-void ChartWidget::addPointPlot(btk::Point::Pointer pt, const QString& label, const QString& unit, int horizontalDataIndex)
+void ChartWidget::setDataToCycleMatchingRules(DataCycleMatchingRules* rules)
 {
-  static_cast<PointChartData*>(this->m_ChartData[PointChart])->addPointPlot(-1, this->mp_Acquisition, this->mp_ColorGenerator, pt, label, unit, horizontalDataIndex);
+  if (rules == 0)
+  {
+    if (this->mp_DataCycleMatchingRules != 0)
+      delete this->mp_DataCycleMatchingRules;
+    this->mp_DataCycleMatchingRules = rules;
+  }
+  else
+    this->setDataToCycleMatchingRules(rules->rightLabelRule, rules->rightLabelRuleText, rules->leftLabelRule, rules->leftLabelRuleText);
+};
+
+
+void ChartWidget::addPointPlot(btk::Point::Pointer pt, const QString& label, const QString& unit, int horizontalDataIndex, bool storeData)
+{
+  static_cast<PointChartData*>(this->m_ChartData[PointChart])->addPointPlot(-1, this->mp_Acquisition, this->mp_ColorGenerator, pt, label, unit, horizontalDataIndex, storeData);
   for (int i = 0 ; i < static_cast<int>(this->m_ChartData[this->m_CurrentChartType]->chartNumber()) ; ++i)
   {
     btk::VTKChartTimeSeries* chart = this->m_ChartData[this->m_CurrentChartType]->chart(i);
@@ -767,6 +782,14 @@ void ChartWidget::setEventsFunctor(btk::VTKEventsFunctor::Pointer functor)
   }
 };
 
+void ChartWidget::detachFunctors()
+{
+  btk::VTKChartTimeSeries* chart = this->m_ChartData[0]->chart(0);
+  this->setCurrentFrameFunctor(chart->GetCurrentFrameFunctor()->ResetedSuperClone());
+  this->setRegionOfInterestFunctor(chart->GetRegionOfInterestFunctor()->ResetedSuperClone());
+  this->setEventsFunctor(chart->GetEventsFunctor()->ResetedSuperClone());
+};
+
 void ChartWidget::toggleOptions(const QPoint& pos)
 {
   if (this->mp_ChartOptions->isVisible())
@@ -971,7 +994,8 @@ void ChartWidget::updatePlotLabel(int chartType, int itemId)
     for (int i = 0 ; i < static_cast<int>(this->m_ChartData[chartType]->chartNumber()) ; ++i)
     {
       vtkPlot* plot = this->m_ChartData[chartType]->chart(i)->GetPlot(index);
-      plot->SetLabel((it->label + it->unit).toUtf8().constData());
+      const QString legend = it->label + it->unit;
+      plot->SetLabel(legend.toUtf8().constData());
     }
     if (this->m_CurrentChartType == chartType)
       this->updateOptions();
@@ -1065,8 +1089,11 @@ void AbstractChartData::copy(AbstractChartData* source)
     targetAxisX->SetDisplayMinimumLimit(sourceAxisX->GetDisplayMinimumLimit());
     targetChart->GetAxis(vtkAxis::LEFT)->SetLabelsVisible(sourceChart->GetAxis(vtkAxis::LEFT)->GetLabelsVisible());
     targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
+    targetChart->SetDisplayCurrentFrame(sourceChart->GetDisplayCurrentFrame());
     targetChart->SetRegionOfInterestFunctor(sourceChart->GetRegionOfInterestFunctor());
+    targetChart->SetDisplayRegionOfInterest(sourceChart->GetDisplayRegionOfInterest());
     targetChart->SetEventsFunctor(sourceChart->GetEventsFunctor());
+    targetChart->SetDisplayEvents(sourceChart->GetDisplayEvents());
     targetChart->SetBounds(sourceAxisX->GetMinimumLimit(), sourceAxisX->GetMaximumLimit(), 0.0, 0.0);
   }
 }
@@ -1421,12 +1448,12 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointer
     }
   }
   
-  this->addPointPlot(id, acq, colorGenerator, point, label, unit, horizontalIndex);
+  this->addPointPlot(id, acq, colorGenerator, point, label, unit, horizontalIndex, false);
 
   return true;
 };
 
-void PointChartData::addPointPlot(int id, Acquisition* acq, vtkColorSeries* colorGenerator, btk::Point::Pointer point, const QString& label, const QString& unit, int horizontalDataIndex)
+void PointChartData::addPointPlot(int id, Acquisition* acq, vtkColorSeries* colorGenerator, btk::Point::Pointer point, const QString& label, const QString& unit, int horizontalDataIndex, bool storeData)
 {
   bool disabled = false;
   if (horizontalDataIndex < 0)
@@ -1449,14 +1476,31 @@ void PointChartData::addPointPlot(int id, Acquisition* acq, vtkColorSeries* colo
   vtkDoubleArray* arrValX = vtkDoubleArray::New();
   vtkDoubleArray* arrValY = vtkDoubleArray::New();
   vtkDoubleArray* arrValZ = vtkDoubleArray::New();
-  const char* str = (label+unit).toUtf8().constData();
+  const QString legend = label + unit;
+  const char* str = legend.toUtf8().constData();
   arrValX->SetName(str);
   arrValY->SetName(str);
   arrValZ->SetName(str);
-  // FIXME: Conflict into VTK 5.6.1 between the documentation and the code to save or not the data. Need to check with VTK 5.8
-  arrValX->SetArray(point->GetValues().data(), numFrames, 1); // Would be 0?
-  arrValY->SetArray(point->GetValues().data() + numFrames, numFrames, 1); // Would be 0?
-  arrValZ->SetArray(point->GetValues().data() + 2*numFrames, numFrames, 1); // Would be 0?
+  if (!storeData)
+  {
+    // FIXME: Conflict into VTK 5.6.1/5.8/5.10 between the documentation and the code to save or not the data.
+    arrValX->SetArray(point->GetValues().data(), numFrames, 1);
+    arrValY->SetArray(point->GetValues().data() + numFrames, numFrames, 1);
+    arrValZ->SetArray(point->GetValues().data() + 2*numFrames, numFrames, 1);
+  }
+  else
+  {
+    double* dataX = new double[numFrames];
+    double* dataY = new double[numFrames];
+    double* dataZ = new double[numFrames];
+    memcpy(dataX, point->GetValues().data(), numFrames * sizeof(double));
+    memcpy(dataY, point->GetValues().data() + numFrames, numFrames * sizeof(double));
+    memcpy(dataZ, point->GetValues().data() + 2*numFrames, numFrames * sizeof(double));
+    // FIXME: Conflict into VTK 5.6.1/5.8/5.10 between the documentation and the code to save or not the data.
+    arrValX->SetArray(dataX, numFrames, 0);
+    arrValY->SetArray(dataY, numFrames, 0);
+    arrValZ->SetArray(dataZ, numFrames, 0);
+  }
   tableX->AddColumn(arrValX);
   tableY->AddColumn(arrValY);
   tableZ->AddColumn(arrValZ);
@@ -1581,7 +1625,8 @@ bool AnalogChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointe
   vtkDoubleArray* arrVal = vtkDoubleArray::New();
   QString label, unit;
   this->extractPlotLabelUnit(label, unit, acq, id);
-  const char* str = (label+unit).toUtf8().constData();
+  const QString legend = label + unit;
+  const char* str = legend.toUtf8().constData();
   arrVal->SetName(str);
   // FIXME: Conflict into VTK 5.6.1 between the documentation and the code to save or not the data. Need to check with VTK 5.8
   arrVal->SetArray(analog->GetValues().data(), analog->GetFrameNumber(), 1); // Would be 0?

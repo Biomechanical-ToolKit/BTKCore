@@ -39,8 +39,29 @@
 
 #include <QBoxLayout>
 
+void buildDataStatTitle(btk::Point::Pointer values, ChartWidget* chart, const QString& unit)
+{
+  btk::Point::Residuals samples(values->GetFrameNumber());
+  int num = 0;
+  for (int i = 0  ; i < samples.rows() ; ++i)
+  {
+    if (values->GetResiduals().coeff(i) >= 0)
+      samples.coeffRef(num++) = values->GetValues().coeff(i,0);
+  }
+  double mean = 0.0, sd = 0.0;
+  if (num != 0)
+  {
+    samples = samples.block(0,0,num,1);
+    mean = samples.sum() / num;
+    sd = sqrt(1.0/static_cast<double>(num) * (samples.cwise() - mean).cwise().square().sum());
+  }
+  chart->setChartTitle(QString("mean: %1 %2 ; SD: %3 %4").arg(mean).arg(unit).arg(sd).arg(unit));
+};
+ 
+// ----------------------------------------------------------------------------
+
 ChartDialog::ChartDialog(QWidget* parent)
-: QDialog(parent)
+: QDialog(parent, Qt::WindowStaysOnTopHint)
 {
   this->chart = new ChartWidget(this);
   this->chart->initialize();
@@ -89,8 +110,8 @@ bool ChartDialog::computeDistance(int id1, int id2)
     else
     {
       diff->SetDataSlice(i, pt2->GetValues().coeff(i,0) - pt1->GetValues().coeff(i,0),
-                        pt2->GetValues().coeff(i,1) - pt1->GetValues().coeff(i,1),
-                        pt2->GetValues().coeff(i,2) - pt1->GetValues().coeff(i,2));
+                            pt2->GetValues().coeff(i,1) - pt1->GetValues().coeff(i,1),
+                            pt2->GetValues().coeff(i,2) - pt1->GetValues().coeff(i,2));
     } 
   }
   btk::Point::Residuals norm = diff->GetValues().rowwise().norm();
@@ -102,7 +123,8 @@ bool ChartDialog::computeDistance(int id1, int id2)
   this->chart->displayPointComponentY(Qt::Unchecked);
   this->chart->displayPointComponentZ(Qt::Unchecked);
   this->chart->setPointVerticalAxisUnit("Distance (" + acq->pointUnit(Point::Marker) + ")", "", "");
-  this->chart->addPointPlot(diff, "Y", "", 0);
+  this->chart->addPointPlot(diff, "Y", "", 0, true);
+  buildDataStatTitle(diff, this->chart, acq->pointUnit(Point::Marker));
   this->setWindowTitle(QString::fromStdString(desc));
   
   return true;
@@ -161,7 +183,8 @@ bool ChartDialog::computeAngleFromMarkers(int id1, int id2, int id3)
   this->chart->displayPointComponentY(Qt::Unchecked);
   this->chart->displayPointComponentZ(Qt::Unchecked);
   this->chart->setPointVerticalAxisUnit("Angle (" + acq->pointUnit(Point::Angle) + ")", "", "");
-  this->chart->addPointPlot(ang, "Y", "", 0);
+  this->chart->addPointPlot(ang, "Y", "", 0, true);
+  buildDataStatTitle(ang, this->chart, acq->pointUnit(Point::Angle));
   this->setWindowTitle(QString::fromStdString(desc));
   
   return true;
@@ -231,7 +254,8 @@ bool ChartDialog::computeAngleFromVectors(const QList<int>& ids)
   this->chart->displayPointComponentY(Qt::Unchecked);
   this->chart->displayPointComponentZ(Qt::Unchecked);
   this->chart->setPointVerticalAxisUnit("Angle (" + acq->pointUnit(Point::Angle) + ")", "", "");
-  this->chart->addPointPlot(ang, "Y", "", 0);
+  this->chart->addPointPlot(ang, "Y", "", 0, true);
+  buildDataStatTitle(ang, this->chart, acq->pointUnit(Point::Angle));
   this->setWindowTitle(QString::fromStdString(desc));
   
   return true;
