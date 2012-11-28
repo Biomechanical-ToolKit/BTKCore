@@ -312,7 +312,7 @@ protected:
   void SetExtractionOption(btkSubAcquisitionFilter::ExtractionOption option, const std::vector<int>& ids)
   {
     std::list<int> ids_;
-    for (int i = 0 ; i < ids.size() ; ++i)
+    for (size_t i = 0 ; i < ids.size() ; ++i)
       ids_.push_back(ids[i]);
     (*$self)->SetExtractionOption(static_cast<btk::SubAcquisitionFilter::ExtractionOption>(option), ids_);
   };

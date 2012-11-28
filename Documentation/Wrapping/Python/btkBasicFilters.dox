@@ -86,11 +86,11 @@ namespace btk
    * Contains only real markers.
    */
   /**
-   * @var btkSeparateKnownVirtualMarkersFilter::VirtualMarkersForFrame
+   * @var btkSeparateKnownVirtualMarkersFilter::VirtualReferenceFrames
    * Contains only virtual markers used to create frames
    */
   /**
-   * @var btkSeparateKnownVirtualMarkersFilter::VirtualMarkersOther
+   * @var btkSeparateKnownVirtualMarkersFilter::VirtualMarkers
    * Contains only virtual markers no used for frames (e.g center of mass)
    */
   /**
