@@ -44,7 +44,7 @@ namespace pcl
   class UnlabeledOpt : public ValueOpt<T>
   {
   public:
-    UnlabeledOpt(const std::string& desc, bool req);
+    UnlabeledOpt(const std::string& desc, bool req = true);
     // ~UnlabeledOpt(); // Implicit destructor used.
     
     virtual void SetValue(const std::string& val);
@@ -56,7 +56,7 @@ namespace pcl
   };
 
   template <typename T>
-  inline UnlabeledOpt<T>::UnlabeledOpt(const std::string& desc, bool req = true)
+  inline UnlabeledOpt<T>::UnlabeledOpt(const std::string& desc, bool req)
   : ValueOpt<T>("", "", desc, "", req)
   {
     this->m_Properties |= Opt::Unlabeled;

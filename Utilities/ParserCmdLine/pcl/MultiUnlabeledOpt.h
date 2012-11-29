@@ -44,7 +44,7 @@ namespace pcl
   class MultiUnlabeledOpt : public MultiValueOpt<T>
   {
   public:
-    MultiUnlabeledOpt(const std::string& desc, bool req);
+    MultiUnlabeledOpt(const std::string& desc, bool req = true);
     // ~MultiUnlabeledOpt(); // Implicit destructor used.
     
     virtual std::string PrintDescription(const std::string& indent) const {return "";};
@@ -55,7 +55,7 @@ namespace pcl
   };
 
   template <typename T>
-  inline MultiUnlabeledOpt<T>::MultiUnlabeledOpt(const std::string& desc, bool req = true)
+  inline MultiUnlabeledOpt<T>::MultiUnlabeledOpt(const std::string& desc, bool req)
   : MultiValueOpt<T>("", "", desc, "", req, true)
   {
     this->m_Properties |= (Opt::MultipleValues | Opt::Unlabeled);
