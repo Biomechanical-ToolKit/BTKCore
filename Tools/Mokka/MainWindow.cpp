@@ -1772,7 +1772,7 @@ void MainWindow::exportASCII()
         btk::EventCollection::Pointer events = acquisition->GetEvents();
         std::vector<int16_t> forcePlatePointsIndices;
         // Append the data
-        if (exporterDlg.pointsTreeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked)
+        if ((exporterDlg.pointsTreeWidget->topLevelItemCount() != 0) && (exporterDlg.pointsTreeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked))
         {
           // Title: Markers, Angles, Moments, etc.
           for (int i = 0 ; i < exporterDlg.pointsTreeWidget->topLevelItem(0)->childCount() ; ++i)
@@ -1789,7 +1789,7 @@ void MainWindow::exportASCII()
             }
           }
         }
-        if (exporterDlg.forcePlatesTreeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked)
+        if ((exporterDlg.forcePlatesTreeWidget->topLevelItemCount() != 0) && (exporterDlg.forcePlatesTreeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked))
         {
           int numPoints = points->GetItemNumber();
           // Title: Force platfom reaction #i.
@@ -1818,7 +1818,7 @@ void MainWindow::exportASCII()
             }
           }
         }
-        if (exporterDlg.analogsTreeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked)
+        if ((exporterDlg.analogsTreeWidget->topLevelItemCount() != 0) && (exporterDlg.analogsTreeWidget->topLevelItem(0)->checkState(0) != Qt::Unchecked))
         {
           for (int i = 0 ; i < exporterDlg.analogsTreeWidget->topLevelItem(0)->childCount() ; ++i)
           {
