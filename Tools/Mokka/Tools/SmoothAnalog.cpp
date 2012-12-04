@@ -200,7 +200,7 @@ SmoothAnalogDialog::SmoothAnalogDialog(QWidget* parent)
   gridLayout->setVerticalSpacing(0);
   f.setItalic(true);
   informations->setFont(f);
-  informations->setText("\n" + informations->text());
+  informations->setStyleSheet("margin-top: 3px;");
 #else
   QFont f = this->font();
   f.setItalic(true);

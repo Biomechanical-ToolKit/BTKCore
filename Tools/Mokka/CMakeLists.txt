@@ -56,6 +56,7 @@ SET(Mokka_CPP
   ToolsData.cpp
   ToolsManager.cpp
   Tools/AnalogToolOptionDialog.cpp
+  Tools/FilterAnalog.cpp
   Tools/GaitEventDetection.cpp
   Tools/RectifyAnalog.cpp
   Tools/RemoveAnalogOffset.cpp
@@ -106,6 +107,7 @@ SET(Mokka_H
   TimeEventControlerWidget.h
   ToolsManager.h
   Tools/AnalogToolOptionDialog.h
+  Tools/FilterAnalogDialog.h
   Tools/GaitEventDetectionDialog.h
   Tools/RemoveAnalogOffsetDialog.h
   Tools/ScaleAnalogDialog.h

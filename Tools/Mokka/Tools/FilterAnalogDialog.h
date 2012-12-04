@@ -32,29 +32,39 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#include "Tools/RemoveAnalogOffset.h"
-#include "Tools/FilterAnalog.h"
-#include "Tools/RectifyAnalog.h"
-#include "Tools/ScaleAnalog.h"
-#include "Tools/SmoothAnalog.h"
-#include "Tools/GaitEventDetection.h"
 
-void ToolsManager::init()
+#ifndef FilterAnalogDialog_h
+#define FilterAnalogDialog_h
+
+#include "AnalogToolOptionDialog.h"
+
+class QSpinBox;
+class QDoubleSpinBox;
+class QComboBox;
+class QLabel;
+
+class FilterAnalogDialog : public AnalogToolOptionDialog
 {
-  // MODEL
+  Q_OBJECT
   
-  // ACQUISITION
+public:
+  FilterAnalogDialog(QWidget* parent = 0);
+
+  QComboBox* typeComboBox;
+  QDoubleSpinBox* lowerCutOffSpinBox;
+  QLabel* lowerCutOffLabel;
+  QDoubleSpinBox* upperCutOffSpinBox;  
+  QLabel* upperCutOffLabel;
+  QSpinBox* orderSpinBox;
+  QComboBox* zeroLagComboBox;
+
+protected:
+  virtual void initializeOptions(const Acquisition* const acq);
+  virtual void saveOptionsSettings();
+  virtual bool testOptionsValidity();
   
-  // POINT 
-  
-  // ANALOG
-  RemoveAnalogOffset::RegisterTool(this);
-  FilterAnalog::RegisterTool(this);
-  RectifyAnalog::RegisterTool(this);
-  ScaleAnalog::RegisterTool(this);
-  SmoothAnalog::RegisterTool(this);
-  
-  // EVENT
-  GaitEventDetection::RegisterTool(this);
-}
+private slots:
+  void adaptCutoffDisplay(int index);
+};
+
+#endif // FilterAnalogDialog_h

@@ -32,29 +32,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#include "Tools/RemoveAnalogOffset.h"
-#include "Tools/FilterAnalog.h"
-#include "Tools/RectifyAnalog.h"
-#include "Tools/ScaleAnalog.h"
-#include "Tools/SmoothAnalog.h"
-#include "Tools/GaitEventDetection.h"
 
-void ToolsManager::init()
+#ifndef FilterAnalog_h
+#define FilterAnalog_h
+
+#include "../AbstractTool.h"
+
+class FilterAnalog : public AbstractTool
 {
-  // MODEL
-  
-  // ACQUISITION
-  
-  // POINT 
-  
-  // ANALOG
-  RemoveAnalogOffset::RegisterTool(this);
-  FilterAnalog::RegisterTool(this);
-  RectifyAnalog::RegisterTool(this);
-  ScaleAnalog::RegisterTool(this);
-  SmoothAnalog::RegisterTool(this);
-  
-  // EVENT
-  GaitEventDetection::RegisterTool(this);
-}
+public:
+  static void RegisterTool(ToolsManager* manager);
+  FilterAnalog(QWidget* parent = 0);
+  virtual RunState run(ToolCommands* cmds, ToolsData* const data);
+};
+
+#endif // FilterAnalog_h
