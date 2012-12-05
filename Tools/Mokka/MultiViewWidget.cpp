@@ -1713,6 +1713,8 @@ void MultiViewWidget::displayChartHorizontalAxisAsCycle(int index)
     for (QMap<int,Event*>::const_iterator it = this->mp_Acquisition->events().begin() ; it != this->mp_Acquisition->events().end() ; ++it)
     {
       Event* e = it.value();
+      if ((e->frame < this->mp_Acquisition->firstFrame()) || (e->frame > this->mp_Acquisition->lastFrame()))
+        continue;
       if (e->context.compare("Right", Qt::CaseInsensitive) == 0)
       {
         if (e->label.compare(setting.rightEvents[0], Qt::CaseInsensitive) == 0)
