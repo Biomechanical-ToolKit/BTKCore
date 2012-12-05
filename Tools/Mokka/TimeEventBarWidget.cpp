@@ -623,7 +623,7 @@ void TimeEventBarWidget::updateInternals()
   wTextFrameTemp = this->m_Fm.width(m_TicksLabel[numTicks-2]);
   wTextFrame = this->m_Fm.width(m_TicksLabel[numTicks-1]);
   xTemp = LeftMargin + this->m_Ticks[numTicks - 2] * this->m_UnitStep - wTextFrameTemp / 2;
-  if (xTemp + wTextFrameTemp >= (xMax - wTextFrame / 2 - 10))
+  if (xTemp + wTextFrameTemp >= (xMax - wTextFrame / 2 - 15))
     this->m_TicksLabel[numTicks-2] = "";
     
   this->updateSliderPostion();
