@@ -124,7 +124,7 @@
       <item>
        <widget class="QRadioButton" name="currentFrameRadioButton">
         <property name="text">
-         <string>Current  Frame</string>
+         <string>Current Frame</string>
         </property>
        </widget>
       </item>
