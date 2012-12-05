@@ -597,12 +597,12 @@ void TimeEventBarWidget::updateInternals()
   if (this->m_TimeDisplay)
   {
     int ff = (this->m_ROIFirstFrame == 0) ? 1 : this->m_ROIFirstFrame; // special case if there is no loaded acquisition
-    this->m_Ticks[0] = 0; this->m_TicksLabel[0] = QString::number((ff - 1) * this->m_TimeScale);
-    this->m_Ticks[numTicks - 1] = numFrames-1; this->m_TicksLabel[numTicks - 1] = QString::number((this->m_ROILastFrame - 1) * this->m_TimeScale);
+    this->m_Ticks[0] = 0; this->m_TicksLabel[0] = QString::number((ff - 1) * this->m_TimeScale, 'g', 3);
+    this->m_Ticks[numTicks - 1] = numFrames-1; this->m_TicksLabel[numTicks - 1] = QString::number((this->m_ROILastFrame - 1) * this->m_TimeScale, 'g', 3);
     for (int i = 1 ; i < numTicks - 1 ; ++i)
     {
       this->m_Ticks[i] = off + i * this->m_TickDivider - this->m_ROIFirstFrame + 1;
-      this->m_TicksLabel[i] = QString::number(static_cast<double>(this->m_Ticks[i] + this->m_ROIFirstFrame - 1) * this->m_TimeScale);
+      this->m_TicksLabel[i] = QString::number(static_cast<double>(this->m_Ticks[i] + this->m_ROIFirstFrame - 1) * this->m_TimeScale, 'g', 3);
     }
   }
   else
