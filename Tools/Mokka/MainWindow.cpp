@@ -1657,7 +1657,9 @@ void MainWindow::exportCAL()
 void MainWindow::exportSTL()
 {
   ExportSTLDialog exporterDlg(this);
-  exporterDlg.filePrefixLineEdit->setText(QFileInfo(this->mp_Acquisition->fileName()).baseName());
+  QFileInfo fI(this->mp_Acquisition->fileName());
+  exporterDlg.pathLineEdit->setText(fI.canonicalPath());
+  exporterDlg.filePrefixLineEdit->setText(fI.baseName());
   for (QMap<int, Segment*>::const_iterator it = this->mp_Model->segments().begin() ; it != this->mp_Model->segments().end() ; ++it)
     exporterDlg.segmentListWidget->addItem(it.value()->label);
   // FIXME: Adding items seems to select the first one but doesn't highlight it. Moreoever, it seems impossible to unselect it, so its selection is forced. 
