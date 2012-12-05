@@ -86,6 +86,7 @@ private:
   QPixmap createLineIcon(const QColor& color, double width);
   void setLineColorButtonColor(const QColor& color);
   
+  int shiftArrow;
 #ifdef Q_OS_WIN
   bool m_FixUpdateWindowsXP;
 #endif

@@ -43,6 +43,7 @@
 ChartOptionsWidget::ChartOptionsWidget(QWidget* parent)
 : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
 {
+  this->shiftArrow = 0;
   this->setupUi(this);
   
   this->setAttribute(Qt::WA_TranslucentBackground);
@@ -366,26 +367,20 @@ bool ChartOptionsWidget::eventFilter(QObject* object, QEvent* event)
 void ChartOptionsWidget::paintEvent(QPaintEvent* event)
 {
   Q_UNUSED(event)
-  
-  const double midX = (double)this->width()/2.0;
+  double midX = (double)this->width()/2.0 + (double)this->shiftArrow;
   const double penWidth = 0.5;
-  static const QPointF points[3] = {
-     QPointF(midX-12.0, 8.75),
+  QPointF points[3] = {
+     QPointF(midX - 12.0, 8.75),
      QPointF(midX, 0.0),
-     QPointF(midX+12.0, 8.75),
+     QPointF(midX + 12.0, 8.75),
   };
- 
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing);
   painter.setBrush(Qt::white);
-  
   painter.setPen(QPen(Qt::gray, penWidth));
-  //painter.drawRoundedRect(QRectF(0.0, 20.0, this->width(), this->height()-20), 10.0, 10.0);
   painter.drawRect(QRectF(0.0, 8.0, this->width(), this->height()-8.0));
-  
   painter.setPen(QPen(Qt::white, penWidth));
   painter.drawPolygon(points,3);
- 
   painter.setPen(QPen(Qt::gray, penWidth));
   painter.drawPolyline(points,3);
 };

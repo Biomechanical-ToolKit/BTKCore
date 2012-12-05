@@ -65,6 +65,7 @@
 #include <QTreeWidget>
 #include <QToolTip>
 #include <QTimer>
+#include <QDesktopWidget>
 
 #ifdef Q_OS_WIN
   #ifndef WIN32_LEAN_AND_MEAN
@@ -140,6 +141,9 @@ ChartWidget::ChartWidget(QWidget* parent)
   QAction* separator = new QAction(this); separator->setSeparator(true); this->m_ViewActions.push_back(separator);
   QAction* resetZoomAction = new QAction(tr("Reset Zoom"), this); this->m_ViewActions.push_back(resetZoomAction);
   QAction* exportToAction = new QAction(tr("Export to Image"), this); this->m_ViewActions.push_back(exportToAction);
+#if 1
+  exportToAction->setVisible(false); // The is feature is broken since the use of VTK 5.8/5.10. MUST BE REIMPLEMENTED
+#endif
   QAction* separator2 = new QAction(this); separator2->setSeparator(true); this->m_ViewActions.push_back(separator2);
   QAction* toggleEventDisplayAction = new QAction(tr("Toggle Events Display"), this); this->m_ViewActions.push_back(toggleEventDisplayAction);
   QAction* removeAllPlotAction = new QAction(tr("Clear Chart"), this); this->m_ViewActions.push_back(removeAllPlotAction);
@@ -805,7 +809,12 @@ void ChartWidget::toggleOptions(const QPoint& pos)
       ::Sleep(20);
     }
 #endif
-    this->mp_ChartOptions->move(pos - QPoint(this->mp_ChartOptions->width() / 2, 0));
+
+    int xPos = (pos.x() + this->mp_ChartOptions->width()/2) - QApplication::desktop()->screenGeometry().width();
+    this->mp_ChartOptions->shiftArrow = 0;
+    if (xPos >= 0)
+      this->mp_ChartOptions->shiftArrow = xPos + 5; // 5: to not be on the side of the screen
+    this->mp_ChartOptions->move(pos - QPoint(this->mp_ChartOptions->width()/2+this->mp_ChartOptions->shiftArrow, 0));
     this->mp_ChartOptions->setVisible(true);
   }
 };
