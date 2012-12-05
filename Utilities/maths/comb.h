@@ -51,6 +51,10 @@ T comb(T n, T k)
   return val;
 }
 
-template <> int comb<int>(int n, int k) {return static_cast<int>(round(comb(static_cast<float>(n), static_cast<float>(k))));};
+#if defined(_MSC_VER)
+  template <> int comb<int>(int n, int k) {return static_cast<int>(floor(comb(static_cast<float>(n), static_cast<float>(k))+0.5f));};
+#else
+  template <> int comb<int>(int n, int k) {return static_cast<int>(round(comb(static_cast<float>(n), static_cast<float>(k))));};
+#endif
 
 #endif // __comb_h
