@@ -511,7 +511,7 @@ void Preferences::conditionalTemporaryCycleSettingsDataInit()
 {
   if (this->mp_ChartCycleSettingsManager == NULL)
     return;
-  if (this->m_TemporaryCycleSettings.isEmpty() && (this->m_TemporaryCurrentCycleSetting == -99))
+  if (this->m_TemporaryCycleSettings.isEmpty() && (this->m_TemporaryCurrentCycleSetting == -1))
   {
     for (int i = 0 ; i < this->mp_ChartCycleSettingsManager->count() ; ++i)
       this->m_TemporaryCycleSettings.append(this->mp_ChartCycleSettingsManager->setting(i));
@@ -522,5 +522,5 @@ void Preferences::conditionalTemporaryCycleSettingsDataInit()
 void Preferences::resetTemporaryCycleSettingsData()
 {
   this->m_TemporaryCycleSettings.clear();
-  this->m_TemporaryCurrentCycleSetting = -99; // Invalid
+  this->m_TemporaryCurrentCycleSetting = -1; // Invalid
 };
