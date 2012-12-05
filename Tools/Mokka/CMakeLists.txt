@@ -32,6 +32,7 @@ SET(Mokka_CPP
   CompositeView.cpp
   ExportASCIIDialog.cpp
   ExportSTLDialog.cpp
+	ExportImageSeriesDialog.cpp
   FileInfoDockWidget.cpp
   ImportAssistantDialog.cpp
   LoggerWidget.cpp
@@ -88,6 +89,7 @@ SET(Mokka_H
   CompositeView.h
   ExportASCIIDialog.h
   ExportSTLDialog.h
+	ExportImageSeriesDialog.h
   FileInfoDockWidget.h
   ImportAssistantDialog.h
   LoggerWidget.h
@@ -126,6 +128,7 @@ SET(Mokka_UI
   ChartOptionsWidget.ui
   ExportASCIIDialog.ui
   ExportSTLDialog.ui
+	ExportImageSeriesDialog.ui
   FileInfoDockWidget.ui
   ImportAssistantDialog.ui
   MainWindow.ui

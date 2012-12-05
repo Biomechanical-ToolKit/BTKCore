@@ -70,7 +70,10 @@ public:
   void setGlobalFrameVisible(bool visible);
   
   void copy(Viz3DWidget* source);
-  
+  void renderToPng(const QString& filename);
+  void renderToJpeg(const QString& filename);
+  void renderToTiff(const QString& filename);
+ 
 public slots:
   // Qt / VTK
   void selectPickedMarker(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);

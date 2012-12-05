@@ -33,53 +33,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CompositeView_h
-#define CompositeView_h
+#ifndef ExportImageSeriesDialog_h
+#define ExportImageSeriesDialog_h
 
-#include "AbstractView.h"
+#include "ui_ExportImageSeriesDialog.h"
 
-class Acquisition;
+#include <QList>
 
-class CompositeView : public AbstractView
+class ExportImageSeriesDialog : public QDialog, public Ui::ExportImageSeriesDialog
 {
   Q_OBJECT
   
 public:
-  enum {Viz3D = 0, Viz3DProjection, Viz3DOrthogonal, 
-        Chart, ChartPoint, ChartAnalog,
-        Console, ConsoleLogger,
-        Media, MediaVideo};
+  ExportImageSeriesDialog(QWidget* parent = 0);
+  void setViewsInfo(const QList<QPixmap>* infos);
   
-  CompositeView(QWidget* parent = 0);
-  // ~CompositeView(); // Implicit
-  // CompositeView(const CompositeView&); // Implicit
-  // CompositeView& operator=(const CompositeView&); // Implicit.
-  
-  void setAcquisition(Acquisition* acq);
-  void render();
-  void show(bool s);
-  
-  QWidget* view(int viewEnumIndex) const {return this->viewStack->widget(this->viewStackIndexFromViewComboIndex(this->convertEnumIndexToComboIndex(viewEnumIndex)));};
-  QWidget* currentView() const {return this->viewStack->currentWidget();};
-  
-  virtual AbstractView* clone() const;
-  void copyOptions(CompositeView* from);
-  
-  virtual int optionStackIndexFromViewComboIndex(int idx) const;
-  virtual int viewStackIndexFromViewComboIndex(int idx) const;
-  int convertEnumIndexToComboIndex(int idx) const;
-  int convertComboIndexToEnumIndex(int idx) const;
-  
-public slots:
-  void setOrthogonalView(int view);
-  void toggleChartOptions();
-
-protected:
-  virtual void finalizeView(int idx);
-  virtual void adaptLayoutStrech(int idx);
+private slots:
+  void setExportPath();
+  void validExportInfo();
+  void updateViewlabel(int index);
   
 private:
-  void finalizeUi();
+  const QList<QPixmap>* mp_ViewInfos;
 };
 
-#endif // CompositeView_h
+#endif // ExportImageSeriesDialog_h

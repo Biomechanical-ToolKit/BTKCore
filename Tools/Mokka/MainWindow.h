@@ -128,6 +128,7 @@ public slots:
   void exportCAL();
   void exportASCII();
   void exportSTL();
+  void exportImageSeries();
   void showPreferences();
   void selectAll();
   void copy();

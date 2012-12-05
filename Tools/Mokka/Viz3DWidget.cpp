@@ -50,6 +50,11 @@
 #include <vtkCaptionActor2D.h>
 #include <vtkTextProperty.h>
 #include <vtkTextActor.h>
+#include <vtkSmartPointer.h>
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
+#include <vtkJPEGWriter.h>
+#include <vtkTIFFWriter.h>
 
 #include <QKeyEvent>
 #include <QToolTip>
@@ -363,6 +368,48 @@ void Viz3DWidget::copy(Viz3DWidget* source)
   this->mp_Renderer->ResetCameraClippingRange();
   targetCamera->Zoom(CameraZoom);
 };
+
+void Viz3DWidget::renderToPng(const QString& filename)
+{
+  vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilter = vtkSmartPointer<vtkWindowToImageFilter>::New();
+  windowToImageFilter->SetInput(this->GetRenderWindow());
+  windowToImageFilter->SetMagnification(1); 
+  // windowToImageFilter->SetInputBufferTypeToRGBA(); //also record the alpha (transparency) channel
+  windowToImageFilter->Update();
+  vtkSmartPointer<vtkPNGWriter> writer = vtkSmartPointer<vtkPNGWriter>::New();
+  writer->SetFileName(qPrintable(filename));
+  writer->SetInputConnection(windowToImageFilter->GetOutputPort());
+  writer->Write();
+}
+
+void Viz3DWidget::renderToJpeg(const QString& filename)
+{
+  vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilter = vtkSmartPointer<vtkWindowToImageFilter>::New();
+  windowToImageFilter->SetInput(this->GetRenderWindow());
+  windowToImageFilter->SetMagnification(1); 
+  // windowToImageFilter->SetInputBufferTypeToRGBA(); //also record the alpha (transparency) channel
+  windowToImageFilter->Update();
+  vtkSmartPointer<vtkJPEGWriter> writer = vtkSmartPointer<vtkJPEGWriter>::New();
+  writer->ProgressiveOn();
+  writer->SetQuality(95);
+  writer->SetFileName(qPrintable(filename));
+  writer->SetInputConnection(windowToImageFilter->GetOutputPort());
+  writer->Write();
+}
+
+void Viz3DWidget::renderToTiff(const QString& filename)
+{
+  vtkSmartPointer<vtkWindowToImageFilter> windowToImageFilter = vtkSmartPointer<vtkWindowToImageFilter>::New();
+  windowToImageFilter->SetInput(this->GetRenderWindow());
+  windowToImageFilter->SetMagnification(1); 
+  // windowToImageFilter->SetInputBufferTypeToRGBA(); //also record the alpha (transparency) channel
+  windowToImageFilter->Update();
+  vtkSmartPointer<vtkTIFFWriter> writer = vtkSmartPointer<vtkTIFFWriter>::New();
+  writer->SetCompressionToNoCompression();
+  writer->SetFileName(qPrintable(filename));
+  writer->SetInputConnection(windowToImageFilter->GetOutputPort());
+  writer->Write();
+}
 
 void Viz3DWidget::selectPickedMarker(vtkObject* /* caller */, unsigned long /* vtk_event */, void* /* client_data */, void* call_data)
 {

@@ -42,6 +42,7 @@
 #include "CompositeView.h"
 #include "ExportASCIIDialog.h"
 #include "ExportSTLDialog.h"
+#include "ExportImageSeriesDialog.h"
 #include "FileInfoDockWidget.h"
 #include "ImportAssistantDialog.h"
 #include "LoggerMessage.h"
@@ -319,6 +320,7 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionExportCAL, SIGNAL(triggered()), this, SLOT(exportCAL()));
   connect(this->actionExportSTL, SIGNAL(triggered()), this, SLOT(exportSTL()));
   connect(this->actionExportASCII, SIGNAL(triggered()), this, SLOT(exportASCII()));
+  connect(this->actionExportImageSeries, SIGNAL(triggered()), this, SLOT(exportImageSeries()));
   connect(this->actionPreferences, SIGNAL(triggered()), this, SLOT(showPreferences()));
   connect(this->actionSelect_All, SIGNAL(triggered()), this, SLOT(selectAll()));
   connect(this->actionCopy, SIGNAL(triggered()), this, SLOT(copy()));
@@ -1879,6 +1881,146 @@ void MainWindow::exportASCII()
         error.exec();
       }
     }
+  }
+}
+
+void MainWindow::exportImageSeries()
+{
+  QMessageBox error(QMessageBox::Warning, "Export Image Error", "", QMessageBox::Ok , this);
+#ifdef Q_OS_MAC
+  error.setWindowFlags(Qt::Sheet);
+  error.setWindowModality(Qt::WindowModal);
+#endif
+
+  QList<Viz3DWidget*> viz3ds;
+  QList<QPixmap> viewsInfo;
+  for (QList<AbstractView*>::const_iterator it = this->multiView->views().begin() ; it != this->multiView->views().end() ; ++it)
+  {
+    Viz3DWidget* viz3dwidget = qobject_cast<Viz3DWidget*>(static_cast<CompositeView*>(*it)->currentView());
+    if (viz3dwidget != 0)
+    {
+      const int size = 384;
+      viewsInfo.push_back(QPixmap::grabWidget(viz3dwidget, viz3dwidget->width()/2-size/2, viz3dwidget->height()/2-size/2 ,size, size));
+      viz3ds.push_back(viz3dwidget);
+    }
+  }
+  if (viz3ds.isEmpty())
+  {
+    error.setText("Impossible to export any image without a visible 3D view.");
+    error.exec();
+    return;
+  }
+  
+  ExportImageSeriesDialog exporterDlg(this);
+  QFileInfo fI(this->mp_Acquisition->fileName());
+  exporterDlg.pathLineEdit->setText(fI.canonicalPath());
+  exporterDlg.filePrefixLineEdit->setText(fI.baseName());
+  exporterDlg.setViewsInfo(&viewsInfo);
+  
+  if (exporterDlg.exec() != QDialog::Accepted)
+    return;
+    
+  if (!QDir().mkpath(exporterDlg.pathLineEdit->text()))
+  { 
+    error.setText("Impossible to create the destination folder.");
+    error.exec();
+    return;
+  }
+ 
+  int lb, rb;
+  if (exporterDlg.allFramesRadioButton->isChecked())
+  {
+    lb = this->mp_Acquisition->firstFrame();
+    rb = this->mp_Acquisition->lastFrame();
+  }
+  else if (exporterDlg.selectedFramesRadioButton->isChecked())
+  {
+    lb = this->timeEventControler->leftBound();
+    rb = this->timeEventControler->rightBound();
+  }
+  else
+  {
+    lb = rb = this->timeEventControler->currentFrame();
+  }
+  LOG_INFO("Exporting image series");
+  QString filename_base = exporterDlg.pathLineEdit->text() + "/" + exporterDlg.filePrefixLineEdit->text();
+  bool noExportError = false;
+  int num = (int)log10(std::fabs((float)rb))+1;
+  Viz3DWidget* viz3d = viz3ds[exporterDlg.viewComboBox->currentIndex()];
+  try
+  {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    // backup the current frame
+    int current_frame = this->timeEventControler->currentFrame();
+    // revert to the start
+    this->timeEventControler->setCurrentFrame(lb);
+    // Export!
+    int previousFrame = lb;
+    ProgressWidget pw(this);
+    pw.label->setText("Exporting images...");
+    pw.progressBar->setRange(lb,rb);
+    pw.setProgressValue(previousFrame);
+    pw.show();
+    if (exporterDlg.pngRadioButton->isChecked())
+    {
+      LOG_INFO("Exporting frames to images: " + filename_base + "*.png");
+      do
+      {
+        QString filename = filename_base + QString("%1.png").arg(QString::number(this->timeEventControler->currentFrame()), num, QChar('0'));
+        viz3d->renderToPng(filename);
+        previousFrame = this->timeEventControler->currentFrame();
+        this->timeEventControler->nextFrame();
+        pw.setProgressValue(previousFrame);
+      }
+      while (previousFrame != rb);
+    }
+    else if (exporterDlg.jpegRadioButton->isChecked())
+    {
+      LOG_INFO("Exporting frames to images: " + filename_base + "*.jpg");
+      do
+      {
+        QString filename = filename_base + QString("%1.jpg").arg(QString::number(this->timeEventControler->currentFrame()), num, QChar('0'));
+        viz3d->renderToJpeg(filename);
+        previousFrame = this->timeEventControler->currentFrame();
+        this->timeEventControler->nextFrame();
+        pw.setProgressValue(previousFrame);
+      }
+      while (previousFrame != rb);
+    }
+    else
+    {
+      LOG_INFO("Exporting frames to images: " + filename_base + "*.tif");
+      do
+      {
+        QString filename = filename_base + QString("%1.tif").arg(QString::number(this->timeEventControler->currentFrame()), num, QChar('0'));
+        viz3d->renderToTiff(filename);
+        previousFrame = this->timeEventControler->currentFrame();
+        this->timeEventControler->nextFrame();
+        pw.setProgressValue(previousFrame);
+      }
+      while (previousFrame != rb);
+    }
+    // restore the current frame
+    this->timeEventControler->setCurrentFrame(current_frame);
+    pw.hide();
+    QApplication::restoreOverrideCursor();
+    noExportError = true;
+  }
+  catch (std::exception& e)
+  {
+    LOG_ERROR("Unexpected error: " + QString(e.what()));
+  }
+  catch (...)
+  {
+    LOG_ERROR("Unknown error.");
+  }
+
+  if (!noExportError)
+  {
+    QApplication::restoreOverrideCursor();
+    error.setText("Error occurred during the file exporting.");
+    error.setInformativeText("<nobr>Check the logger for more informations.</nobr>");
+    error.exec();
   }
 }
 

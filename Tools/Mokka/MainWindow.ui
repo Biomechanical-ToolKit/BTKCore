@@ -142,6 +142,8 @@
      <addaction name="separator"/>
      <addaction name="actionExportASCII"/>
      <addaction name="actionExportSTL"/>
+     <addaction name="separator"/>
+     <addaction name="actionExportImageSeries"/>
     </widget>
     <addaction name="action_FileOpen"/>
     <addaction name="menuOpen_Recent"/>
@@ -552,6 +554,11 @@
    </property>
    <property name="text">
     <string>Open File Location</string>
+   </property>
+  </action>
+  <action name="actionExportImageSeries">
+   <property name="text">
+    <string>Image Series...</string>
    </property>
   </action>
  </widget>
