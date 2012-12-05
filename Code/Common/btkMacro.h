@@ -75,4 +75,10 @@
 #define btkIOErrorMacro(f, m) \
   std::cerr << btkStripPathMacro(__FILE__) << "(" << btkStringifyMacro(__LINE__) << "): '" << btkStripPathMacro(f.c_str()) << "' - " << m << std::endl;
 
+/**
+ * This macro returns the number of digits in the given integer
+ */
+#define btkNumberOfDigits(num) \
+  ((num==0)?1:(int)log10(std::fabs((float)num))+1)
+  
 #endif // __btkMacro_h

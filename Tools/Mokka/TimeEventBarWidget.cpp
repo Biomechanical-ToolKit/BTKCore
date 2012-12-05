@@ -35,12 +35,13 @@
 
 #include "TimeEventBarWidget.h"
 
+#include <btkMacro.h>
+
 #include <QtGui>
 #include <QLinearGradient>
 #include <QFontMetrics>
 
 #include <cmath>
-#define NUMLENGTH(num) ((num==0)?1:(int)log10(std::fabs((float)num))+1)
 
 static int oldMouseX = 0;
 static int oldEventFrame = 0;
@@ -575,7 +576,7 @@ void TimeEventBarWidget::updateInternals()
   else if (numFrames >= dTrig)
     this->m_TickDivider *= 100;
     
-  int n = NUMLENGTH(this->m_ROIFirstFrame);
+  int n = btkNumberOfDigits(this->m_ROIFirstFrame);
   int off = 0;
   if (n >= 3)
   {
