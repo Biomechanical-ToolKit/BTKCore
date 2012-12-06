@@ -1962,7 +1962,14 @@ void MainWindow::exportImageSeries()
     pw.label->setText("Exporting images...");
     pw.progressBar->setRange(lb,rb);
     pw.setProgressValue(previousFrame);
+#ifdef Q_OS_WIN
+    // The progress dialog is also saved in the exported images under Windows XP...
+    if (QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7)
+      pw.show();
+#else
     pw.show();
+#endif
+    
     if (exporterDlg.pngRadioButton->isChecked())
     {
       LOG_INFO("Exporting frames to images: " + filename_base + "*.png");
