@@ -141,6 +141,9 @@ ChartWidget::ChartWidget(QWidget* parent)
   QAction* separator = new QAction(this); separator->setSeparator(true); this->m_ViewActions.push_back(separator);
   QAction* resetZoomAction = new QAction(tr("Reset Zoom"), this); this->m_ViewActions.push_back(resetZoomAction);
   QAction* exportToAction = new QAction(tr("Export to Image"), this); this->m_ViewActions.push_back(exportToAction);
+#if 1
+  exportToAction->setVisible(false); // The is feature is broken since the use of VTK 5.8/5.10. MUST BE REIMPLEMENTED
+#endif
   QAction* separator2 = new QAction(this); separator2->setSeparator(true); this->m_ViewActions.push_back(separator2);
   QAction* toggleEventDisplayAction = new QAction(tr("Toggle Events Display"), this); this->m_ViewActions.push_back(toggleEventDisplayAction);
   QAction* removeAllPlotAction = new QAction(tr("Clear Chart"), this); this->m_ViewActions.push_back(removeAllPlotAction);
