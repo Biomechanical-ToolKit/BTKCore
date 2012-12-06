@@ -78,9 +78,8 @@ Viz3DWidget::Viz3DWidget(QWidget* parent)
   // No need to send mouse events to VTK when a mouse button isn't down
   this->setMouseTracking(false);
   
-#ifdef Q_OS_WIN
-  #pragma message("WARNING: It seems that Qt 4.8.3 introduced a bug under Windows for the drag'n drop action (don't check parent's attribute?). Need to check for later version.")
-  // Drag and drop
+#if defined(Q_OS_WIN) && (QT_VERSION == 0x040803)
+  // Drag and drop set manually for Qt 4.8.3 as it introduced a bug under Windows for the drag'n drop action.
   this->setAcceptDrops(true);
 #endif
 }
@@ -99,9 +98,6 @@ void Viz3DWidget::initialize()
   VizRendererWindow* renwin = VizRendererWindow::New();
   renwin->AddRenderer(this->mp_Renderer);
   renwin->LineSmoothingOn();
-#if 0
-  renwin->DoubleBufferOff(); // Required for Windows 7 (32-bit and 64-bit) when selecting markers with the rubber (no playback mode).
-#endif
   //renwin->PolygonSmoothingOn();
   this->SetRenderWindow(renwin);
   renwin->Delete();

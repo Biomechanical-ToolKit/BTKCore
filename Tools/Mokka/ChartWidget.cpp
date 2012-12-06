@@ -1872,9 +1872,8 @@ VTKChartWidget::VTKChartWidget(QWidget* parent, Qt::WindowFlags f)
   this->mp_CurrentChartData = 0;
   this->m_AlternateMouseEvent = false;
   this->setMouseTracking(false);
-#ifdef Q_OS_WIN
-  #pragma message("WARNING: It seems that Qt 4.8.3 introduced a bug under Windows for the drag'n drop action (don't check parent's attribute?). Need to check for later version.")
-  // Drag and drop
+#if defined(Q_OS_WIN) && (QT_VERSION == 0x040803)
+  // Drag and drop set manually for Qt 4.8.3 as it introduced a bug under Windows for the drag'n drop action.
   this->setAcceptDrops(true);
 #endif  
 };
