@@ -85,7 +85,7 @@ AbstractTool::RunState FilterAnalog::run(ToolCommands* cmds, ToolsData* const da
     }
     
     Eigen::Matrix<double,Eigen::Dynamic,1> a,b;
-    const double hfs = 2.0 * data->acquisition()->pointFrequency();
+    const double hfs = data->acquisition()->analogFrequency() / 2.0;
     int n = dialog.orderSpinBox->value();
     bool zeroLagFilter = (dialog.zeroLagComboBox->currentIndex() == 0);
     
@@ -247,8 +247,8 @@ void FilterAnalogDialog::initializeOptions(const Acquisition* const acq)
   this->orderSpinBox->setValue(settings.value(this->toolSettingsPath() + "lastOrder", 2).toInt());
   this->zeroLagComboBox->setCurrentIndex(settings.value(this->toolSettingsPath() + "lastZeroLag", 0).toInt()); // 0: Yes
   this->adaptCutoffDisplay(this->typeComboBox->currentIndex());
-  this->lowerCutOffSpinBox->setRange(0.01, acq->pointFrequency() / 2.0);
-  this->upperCutOffSpinBox->setRange(0.01, acq->pointFrequency() / 2.0);
+  this->lowerCutOffSpinBox->setRange(0.01, acq->analogFrequency() / 2.0);
+  this->upperCutOffSpinBox->setRange(0.01, acq->analogFrequency() / 2.0);
 };
 
 void FilterAnalogDialog::saveOptionsSettings()
