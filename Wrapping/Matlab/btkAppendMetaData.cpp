@@ -125,7 +125,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     {
       if (!mxIsNumeric(temp) || mxIsEmpty(temp) || mxIsComplex(temp) || (mxGetNumberOfElements(temp) != 1))
         mexErrMsgTxt("The field 'numdims' must be set by a single integer value.");
-      int numDims = static_cast<int>(mxGetScalar(temp));
+      size_t numDims = static_cast<size_t>(mxGetScalar(temp));
       if (numDims < dims.size())
         mexErrMsgTxt("The given number of dimensions is lower than the number of dimensions for the given values.");
       else if (numDims > maxDimSize)

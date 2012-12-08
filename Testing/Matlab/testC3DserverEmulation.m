@@ -3539,6 +3539,7 @@ btksrv.Close();
 end
 
 function testSetPointData_IntegerFormat(d)
+warning('OFF','btk:C3Dserver:FakeMask');
 c3dsrv = actxserver('C3Dserver.C3D');
 btksrv = btkEmulateC3Dserver();
 c3dsrv.Open(d.filename,3);
@@ -3585,9 +3586,11 @@ end
 assertEqual(double(c3dsrv.IsModified()), double(btksrv.IsModified()));
 c3dsrv.Close;
 btksrv.Close();
+warning('ON','btk:C3Dserver:FakeMask');
 end
 
 function testSetPointData_FloatFormat(d)
+warning('OFF','btk:C3Dserver:FakeMask');
 c3dsrv = actxserver('C3Dserver.C3D');
 btksrv = btkEmulateC3Dserver();
 c3dsrv.Open(d.filename2,3);
@@ -3634,9 +3637,11 @@ end
 assertEqual(double(c3dsrv.IsModified()), double(btksrv.IsModified()));
 c3dsrv.Close;
 btksrv.Close();
+warning('ON','btk:C3Dserver:FakeMask');
 end
 
 function testSetPointDataEx_Integer(d)
+warning('OFF','btk:C3Dserver:FakeMask');
 c3dsrv = actxserver('C3Dserver.C3D');
 btksrv = btkEmulateC3Dserver();
 c3dsrv.Open(d.filename,3);
@@ -3693,9 +3698,11 @@ end
 assertEqual(double(c3dsrv.IsModified()), double(btksrv.IsModified()));
 c3dsrv.Close;
 btksrv.Close();
+warning('ON','btk:C3Dserver:FakeMask');
 end
 
 function testSetPointDataEx_Float(d)
+warning('OFF','btk:C3Dserver:FakeMask');
 c3dsrv = actxserver('C3Dserver.C3D');
 btksrv = btkEmulateC3Dserver();
 c3dsrv.Open(d.filename2,3);
@@ -3752,6 +3759,7 @@ end
 assertEqual(double(c3dsrv.IsModified()), double(btksrv.IsModified()));
 c3dsrv.Close;
 btksrv.Close();
+warning('ON','btk:C3Dserver:FakeMask');
 end
 
 function testAddMarker(d)

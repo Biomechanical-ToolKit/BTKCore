@@ -70,7 +70,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
         if (it != (*itAnalysis)->End())
         {
           num = ((numberOfParameters > (*it)->GetInfo()->GetValues().size()) ? (*it)->GetInfo()->GetValues().size() : numberOfParameters);
-          for (int i = 0 ; i < num ; ++i)
+          for (size_t i = 0 ; i < num ; ++i)
           {
             std::string& str = entryValues[inc][i];
             str = (*it)->GetInfo()->ToString(i);
