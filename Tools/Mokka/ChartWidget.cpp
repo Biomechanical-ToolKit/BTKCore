@@ -1852,7 +1852,9 @@ btk::VTKChartTimeSeries* AnalogChartData::createChart(btk::VTKChartTimeSeries* s
   targetAxisX->SetDisplayMinimumLimit(sourceAxisX->GetDisplayMinimumLimit());
   const int* sourceBorders = sourceChart->GetBorders(); targetChart->SetBorders(sourceBorders[0], sourceBorders[1], sourceBorders[2], sourceBorders[3]);
   targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
+  targetChart->DisplayCurrentFrameOn();
   targetChart->SetRegionOfInterestFunctor(sourceChart->GetRegionOfInterestFunctor());
+  targetChart->DisplayRegionOfInterestOn();
   targetChart->SetEventsFunctor(sourceChart->GetEventsFunctor());
   targetChart->DisplayEventsOn();
   targetChart->SetColorSeries(sourceChart->GetColorSeries());
