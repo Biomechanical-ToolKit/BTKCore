@@ -1,3 +1,7 @@
+SET(USE_O3DM_NO_FILE_FORMAT_REGISTRATION 1)
+SET(USE_O3DM_MDF_FILE_FORMAT 1)
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkOpen3DMotionSources.cmake) # Open3DMotion
+
 SET(BTKIO_SRCS
   btkAcquisitionFileIO.cpp
   btkAcquisitionFileIOFactory.cpp
@@ -22,6 +26,7 @@ SET(BTKIO_SRCS
   btkPWRFileIO.cpp
   btkRAxFileIO.cpp
   btkRICFileIO.cpp
+  btkMDFFileIO.cpp
   btkMOMFileIO.cpp
   btkTDFFileIO.cpp
   btkTRBFileIO.cpp
@@ -31,7 +36,11 @@ SET(BTKIO_SRCS
   btkMotionAnalysisFileIOUtils.cpp
   btkMotionAnalysisFileIOUtils_p.cpp
   btkEliteFileIOUtils_p.cpp
+  # Needed for the Codamotion file formats
+  ${BTK_O3DM_SRCS}
 )
+
+INCLUDE_DIRECTORIES(${BTK_O3DM_INCLUDE_DIR})
 
 ADD_LIBRARY(BTKIO ${BTK_LIBS_BUILD_TYPE} ${BTKIO_SRCS})
 SET(BTK_LIBRARIES "${BTK_LIBRARIES} BTKIO" CACHE INTERNAL "BTK modules compiled")

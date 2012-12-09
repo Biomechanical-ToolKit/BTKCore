@@ -28,6 +28,8 @@
 #include "EMxFileReaderTest.h"
 #include "GRxFileIOTest.h"
 #include "GRxFileReaderTest.h"
+#include "MDFFileIOTest.h"
+#include "MDFFileReaderTest.h"
 #include "MOMFileIOTest.h"
 #include "MOMFileReaderTest.h"
 #include "PWRFileIOTest.h"
