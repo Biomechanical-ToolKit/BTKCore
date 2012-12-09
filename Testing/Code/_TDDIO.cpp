@@ -50,5 +50,7 @@
 #include "TRCFileWriterTest.h"
 #include "XLSOrthoTrakFileIOTest.h"
 #include "XLSOrthoTrakFileReaderTest.h"
+#include "XMOVEFileIOTest.h"
+#include "XMOVEFileReaderTest.h"
 
 #include "MultiSTLFileWriterTest.h"

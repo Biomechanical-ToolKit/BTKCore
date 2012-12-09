@@ -47,6 +47,7 @@
 #define CLBFilePathOUT std::string(TDD_FilePathOUT) + "CLBSamples/"
 #define MDFFilePathIN std::string(TDD_FilePathIN) + "MDFSamples/"
 #define MDFFilePathOUT std::string(TDD_FilePathOUT) + "MDFSamples/"
-
+#define XMOVEFilePathIN std::string(TDD_FilePathIN) + "XMOVESamples/"
+#define XMOVEFilePathOUT std::string(TDD_FilePathOUT) + "XMOVESamples/"
 
 #endif // _TDDConfigure_h

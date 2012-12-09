@@ -53,6 +53,7 @@
 #include "btkXLSOrthoTrakFileIO.h"
 // Codamotion
 #include "btkMDFFileIO.h"
+#include "btkXMOVEFileIO.h"
 // BTS IO
 #include "btkTDFFileIO.h"
 // Delsys IO
@@ -88,6 +89,7 @@ namespace btk
     BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(XLSOrthoTrakFileIO)
     
     BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(MDFFileIO)
+    BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(XMOVEFileIO)
     
     BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(TDFFileIO)
     
