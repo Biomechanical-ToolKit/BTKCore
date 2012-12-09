@@ -1,4 +1,5 @@
 #include "_TDDConfigure.h"
+#include "_TDDIO_Open3DMotion_Ressources.cpp"
 
 #include "BinaryFileStreamTest.h" // Be the first to test the stream
 
