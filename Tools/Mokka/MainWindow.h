@@ -120,6 +120,9 @@ public slots:
   void importEMF();
   void importDelsysEMG();
   void importCLB();
+  void importMDF();
+  void importMDR();
+  void importXMOVE();
   void importVideos();
   void exportC3D();
   void exportTRC();
