@@ -155,7 +155,7 @@ namespace btk
     for (size_t i = 0 ; i < o3dm_analogs.size() ; ++i)
     {
       int numFrames = std::min(numAnalogFrames, o3dm_analogs[i]->NumFrames());
-      btk::Analog::Pointer an = btk::Analog::New(o3dm_analogs[i]->Channel, o3dm_analogs[i]->NumFrames());
+      btk::Analog::Pointer an = btk::Analog::New(o3dm_analogs[i]->Channel, numAnalogFrames);
       an->SetOffset(static_cast<int>(o3dm_analogs[i]->Offset.Value()));
       an->SetScale(o3dm_analogs[i]->Scale.Value());
       an->SetUnit(o3dm_analogs[i]->Units.Value());
