@@ -6,6 +6,7 @@
 # There are some options to compile Open3DMotion:
 #  - USE_O3DM_NO_FILE_FORMAT_REGISTRATION: Special BTK option to remove the part of the code which register all the know file formats.
 #  - USE_O3DM_MDF_FILE_FORMAT: Include the MDF file format
+#  - USE_O3DM_XMOVE_FILE_FORMAT: Include the XMOVE file format
 
 SET(BTK_O3DM_ROOT "${BTK_SOURCE_DIR}/Utilities/Open3DMotion/src")
 SET(BTK_O3DM_INCLUDE_DIR "${BTK_O3DM_ROOT}")
@@ -117,7 +118,7 @@ SET(BTK_O3DM_OpenORM_IO_XML_SRCS
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/ReadWriteXMLInt32.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/ReadWriteXMLList.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/ReadWriteXMLString.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/XMLReadException.cpp"
+    # "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/XMLReadException.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/XMLReadingMachine.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/XMLReadWriteMachine.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/XMLWritingMachine.cpp")
@@ -157,4 +158,11 @@ IF(USE_O3DM_MDF_FILE_FORMAT)
       ${BTK_O3DM_SRCS}
       ${BTK_O3DM_MotionFile_FORMAT_MDF_SRCS})
 ENDIF(USE_O3DM_MDF_FILE_FORMAT)
+
+IF(USE_O3DM_XMOVE_FILE_FORMAT)
+  SET(BTK_O3DM_SRCS
+      ${BTK_O3DM_SRCS}
+      ${BTK_O3DM_MotionFile_FORMAT_XMOVE_SRCS}
+      ${BTK_O3DM_OpenORM_IO_XML_SRCS})
+ENDIF(USE_O3DM_XMOVE_FILE_FORMAT)
         

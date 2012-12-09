@@ -1,6 +1,8 @@
+# Open3DMotion settings for Codamotion file formats (MDF, XMOVE)
 SET(USE_O3DM_NO_FILE_FORMAT_REGISTRATION 1)
 SET(USE_O3DM_MDF_FILE_FORMAT 1)
-INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkOpen3DMotionSources.cmake) # Open3DMotion
+SET(USE_O3DM_XMOVE_FILE_FORMAT 1)
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkOpen3DMotionSources.cmake)
 
 SET(BTKIO_SRCS
   btkAcquisitionFileIO.cpp
@@ -32,15 +34,22 @@ SET(BTKIO_SRCS
   btkTRBFileIO.cpp
   btkTRCFileIO.cpp
   btkXLSOrthoTrakFileIO.cpp
+  btkXMOVEFileIO.cpp
   # Utils & Others
+  btkCodamotionFileIOUtils_p.cpp
+  btkEliteFileIOUtils_p.cpp
   btkMotionAnalysisFileIOUtils.cpp
   btkMotionAnalysisFileIOUtils_p.cpp
-  btkEliteFileIOUtils_p.cpp
-  # Needed for the Codamotion file formats
+  # Needed by Open3DMotion for the Codamotion file formats
   ${BTK_O3DM_SRCS}
+  "${BTK_SOURCE_DIR}/Utilities/pugixml/src/pugixml.cpp"
+  "${BTK_SOURCE_DIR}/Utilities/libb64/src/cdecode.c"
+  "${BTK_SOURCE_DIR}/Utilities/libb64/src/cencode.c"
 )
 
 INCLUDE_DIRECTORIES(${BTK_O3DM_INCLUDE_DIR})
+INCLUDE_DIRECTORIES("${BTK_SOURCE_DIR}/Utilities/pugixml/src")
+INCLUDE_DIRECTORIES("${BTK_SOURCE_DIR}/Utilities/libb64/include")
 
 ADD_LIBRARY(BTKIO ${BTK_LIBS_BUILD_TYPE} ${BTKIO_SRCS})
 SET(BTK_LIBRARIES "${BTK_LIBRARIES} BTKIO" CACHE INTERNAL "BTK modules compiled")
