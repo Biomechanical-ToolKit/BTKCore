@@ -14,7 +14,7 @@ SET(BTKBasicFilters_SRCS
 )
 
 ADD_LIBRARY(BTKBasicFilters ${BTK_LIBS_BUILD_TYPE} ${BTKBasicFilters_SRCS})
-SET(BTK_LIBRARIES "${BTK_LIBRARIES} BTKBasicFilters" CACHE INTERNAL "BTK modules compiled")
+SET(BTK_LIBRARIES ${BTK_LIBRARIES} "BTKBasicFilters" CACHE INTERNAL "BTK modules compiled")
 
 TARGET_LINK_LIBRARIES(BTKBasicFilters BTKCommon)
 
