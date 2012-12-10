@@ -33,9 +33,41 @@ CXXTEST_SUITE(EigenFilterTest)
     for (int i = 0 ; i < x.rows() ; ++i)
       TSM_ASSERT_DELTA("Sample #" + btk::ToString(i), y.coeff(i), result.coeff(i), 1e-15);
   };
+  
+  CXXTEST_TEST(FilterWindowAverage_NoInitState_FixedSize)
+  {
+    Eigen::Matrix<double, 16, 1> signal;
+    signal << 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0;
+    Eigen::Matrix<double, 5, 1> b = Eigen::Matrix<double, 5, 1>::Constant(0.2); // ones(5,1) / 5
+    Eigen::Matrix<double, 1, 1> a; a << 1.0;
+    signal = btkEigen::filter(b, a, signal);
+    Eigen::Matrix<double, 16, 1> ref;
+    ref << 0.20, 0.44, 0.72, 1.04, 1.40, 1.60, 1.80, 2.00, 2.20, 2.40, 2.60, 2.80, 3.00, 3.20, 3.40, 3.60;
+    for (int i = 0 ; i < signal.rows() ; ++i)
+    {
+      TSM_ASSERT_DELTA("Row #" + btk::ToString(i), signal(i), ref(i), 1e-15);
+    }
+  }
+  
+  CXXTEST_TEST(FilterOrder2_NoInitState_FixedSize)
+  {
+    Eigen::Matrix<double, 16, 1> signal;
+    signal << 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 4.0;
+    Eigen::Matrix<double, 2, 1> b; b << 1.0, -1.0;
+    Eigen::Matrix<double, 2, 1> a; a << 1.0, -0.995;
+    signal = btkEigen::filter(b, a, signal);
+    Eigen::Matrix<double, 16, 1> ref;
+    ref << 1.0, 1.1950, 1.3890250, 1.5820798750, 1.7741694756250, 1.965298628246875, 2.155472135105641, 2.344694774430113, 2.532971300557961, 2.720306444055171, 2.906704911834896, 3.092171387275721, 3.276710530339342, 3.460326977687646, 3.643025342799207, 3.824810216085212;
+    for (int i = 0 ; i < signal.rows() ; ++i)
+    {
+      TSM_ASSERT_DELTA("Row #" + btk::ToString(i), signal(i), ref(i), 1e-15);
+    }
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(EigenFilterTest)
 CXXTEST_TEST_REGISTRATION(EigenFilterTest, Butterworth_LowPass_2_0Dot5)
+CXXTEST_TEST_REGISTRATION(EigenFilterTest, FilterWindowAverage_NoInitState_FixedSize)
+CXXTEST_TEST_REGISTRATION(EigenFilterTest, FilterOrder2_NoInitState_FixedSize)
 
 #endif // EigenFilterTest_h
