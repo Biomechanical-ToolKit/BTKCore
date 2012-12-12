@@ -1099,6 +1099,7 @@ namespace btk
       {
         Analog::Pointer analog = Analog::New((*it)->GetLabel(), (*it)->GetDescription());
         analog->SetGain((*it)->GetGain());
+        analog->SetUnit((*it)->GetUnit());
         in->AppendAnalog(analog);
       }
       int frameNumber = input->GetPointFrameNumber();

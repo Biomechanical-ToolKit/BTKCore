@@ -1265,6 +1265,75 @@ CXXTEST_SUITE(C3DFileWriterTest)
       }
     }
   };
+  
+  CXXTEST_TEST(rewrite_analog_gain)
+  {
+    btk::Acquisition::Pointer acq = btk::Acquisition::New();
+    acq->Init(0,10,3,1);
+    acq->SetPointFrequency(200.0);
+    btk::Analog::Pointer analog0 = acq->GetAnalog(0);
+    analog0->SetLabel("Test#1");
+    analog0->SetDescription("It seems");
+    analog0->SetGain(btk::Analog::PlusMinus10);
+    analog0->SetOffset(123);
+    analog0->SetScale(1.2345);
+    analog0->SetUnit("N");
+    btk::Analog::Pointer analog1 = acq->GetAnalog(1);
+    analog1->SetLabel("Test#2");
+    analog1->SetDescription("that BTK doesn't");
+    analog1->SetGain(btk::Analog::PlusMinus5);
+    analog1->SetOffset(456);
+    analog1->SetScale(5.2341);
+    analog1->SetUnit("Nmm");
+    btk::Analog::Pointer analog2 = acq->GetAnalog(2);
+    analog2->SetLabel("Test#3");
+    analog2->SetDescription("write all properties");
+    analog2->SetGain(btk::Analog::PlusMinus2Dot5);
+    analog2->SetOffset(789);
+    analog2->SetScale(10.025);
+    analog2->SetUnit("Foo");
+    
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(acq);
+    writer->SetFilename(C3DFilePathOUT + "rewrite_analog_gain.c3d");
+    writer->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathOUT + "rewrite_analog_gain.c3d");
+    reader->Update();
+    btk::Acquisition::Pointer acq2 = reader->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    
+    btk::Analog::Pointer analog0_ = acq2->GetAnalog(0);
+    TS_ASSERT_EQUALS(analog0->GetLabel(), analog0_->GetLabel());
+    TS_ASSERT_EQUALS(analog0->GetDescription(), analog0_->GetDescription());
+    TS_ASSERT_EQUALS(analog0->GetGain(), analog0_->GetGain());
+    TS_ASSERT_EQUALS(analog0->GetOffset(), analog0_->GetOffset());
+    TS_ASSERT_DELTA(analog0->GetScale(), analog0_->GetScale(), 1e-5);
+    TS_ASSERT_EQUALS(analog0->GetUnit(), analog0_->GetUnit());
+    
+    btk::Analog::Pointer analog1_ = acq2->GetAnalog(1);
+    TS_ASSERT_EQUALS(analog1->GetLabel(), analog1_->GetLabel());
+    TS_ASSERT_EQUALS(analog1->GetDescription(), analog1_->GetDescription());
+    TS_ASSERT_EQUALS(analog1->GetGain(), analog1_->GetGain());
+    TS_ASSERT_EQUALS(analog1->GetOffset(), analog1_->GetOffset());
+    TS_ASSERT_DELTA(analog1->GetScale(), analog1_->GetScale(), 1e-5);
+    TS_ASSERT_EQUALS(analog1->GetUnit(), analog1_->GetUnit());
+    
+    btk::Analog::Pointer analog2_ = acq2->GetAnalog(2);
+    TS_ASSERT_EQUALS(analog2->GetLabel(), analog2_->GetLabel());
+    TS_ASSERT_EQUALS(analog2->GetDescription(), analog2_->GetDescription());
+    TS_ASSERT_EQUALS(analog2->GetGain(), analog2_->GetGain());
+    TS_ASSERT_EQUALS(analog2->GetOffset(), analog2_->GetOffset());
+    TS_ASSERT_DELTA(analog2->GetScale(), analog2_->GetScale(), 1e-5);
+    TS_ASSERT_EQUALS(analog2->GetUnit(), analog2_->GetUnit());
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileWriterTest)
@@ -1299,4 +1368,5 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, noInputModification)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, acq100000)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertDelsysEMG2C3D)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertCLB2C3D)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, rewrite_analog_gain)
 #endif
