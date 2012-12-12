@@ -164,10 +164,14 @@ ENDIF(BUILD_DOCUMENTATION_MATLAB_FOR_WEB)
 
 # PYTHON target
 IF(BUILD_DOCUMENTATION_PYTHON)
+  FILE(READ ${BTK_SOURCE_DIR}/Documentation/Readme/License.dox.part LICENSE_DOX_PART)
   CONFIGURE_FILE(
     ${BTK_SOURCE_DIR}/Utilities/Doxygen/Doxyfile_Wrapping_Python.in
     ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_Wrapping_Python)
-    
+  CONFIGURE_FILE(
+    ${BTK_SOURCE_DIR}/Documentation/Wrapping/Python/License.dox.in
+    ${BTK_BINARY_DIR}/Utilities/Doxygen/Wrapping/Python/License.dox)
+      
   ADD_CUSTOM_TARGET(Doxyfile_Wrapping_Python ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${BTK_BINARY_DIR}/Documentation/Wrapping/Python 
     COMMAND ${DOXYGEN_EXECUTABLE} ${BTK_BINARY_DIR}/Utilities/Doxygen/Doxyfile_Wrapping_Python

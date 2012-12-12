@@ -672,6 +672,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = "${BTK_SOURCE_DIR}/Documentation/Wrapping/Python" \
+                         "${BTK_BINARY_DIR}/Utilities/Doxygen/Wrapping/Python" \
                          "${LIBRARY_OUTPUT_PATH}/btk.py"
 
 # This tag can be used to specify the character encoding of the source files
@@ -792,7 +793,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             =
+IMAGE_PATH             = "${BTK_SOURCE_DIR}/Documentation/Wrapping/Python/images"
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
