@@ -6,8 +6,8 @@ PROJECT(BTK)
 
 # BTK version number.
 SET(BTK_VERSION_MAJOR 0)
-SET(BTK_VERSION_MINOR 1)
-SET(BTK_VERSION_PATCH 10)
+SET(BTK_VERSION_MINOR 2)
+SET(BTK_VERSION_PATCH 0)
 SET(BTK_VERSION_STRING "${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}.${BTK_VERSION_PATCH}")
 # The major.minor is enough to distinguish available features of the toolkit. Moreover, 
 # this variable is used to create lib/share/include folders where the patch number does 
