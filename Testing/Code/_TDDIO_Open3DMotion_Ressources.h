@@ -14,7 +14,6 @@ static const size_t o3dm_ADemo1_numframes_force = 511;
 static const size_t o3dm_ADemo1_numframes_EMG = 1023;
 static const double o3dm_ADemo1_forcetol = 0.05;
 extern const double o3dm_ADemo1_marker[o3dm_ADemo1_numframes_marker*o3dm_ADemo1_nummarkers*4];
-extern const double o3dm_ADemo1_force[o3dm_ADemo1_numframes_force*o3dm_ADemo1_numforceplates*8];
 extern const double o3dm_ADemo1_EMG[o3dm_ADemo1_numframes_EMG*o3dm_ADemo1_numEMG];
 extern const char* o3dm_ADemo1_markername[o3dm_ADemo1_nummarkers];
 extern const char* o3dm_ADemo1_EMGname[o3dm_ADemo1_nummarkers];

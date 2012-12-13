@@ -235,6 +235,8 @@ namespace btk
     int inc = 0;
     for (std::list<const Open3DMotion::ForcePlate*>::const_iterator it = forcePlates.begin() ; it != forcePlates.end() ; ++it)
     {
+      bool kfp = (typeData[inc] == 3);  // Is it a Kistler forceplate?
+      std::string suffix = (typeData.size() > 1) ? (kfp ? "_" : "") + ToString(inc+1) : ""; 
       // Corners
       for (int i = 0 ; i < 4 ; ++i)
       {
@@ -243,13 +245,13 @@ namespace btk
         cornersData[12*inc+3*((i+2)%4)+2] = static_cast<float>((*it)->Outline[i].Z.Value());
       }
       // Origin
-      if (typeData[inc] == 3) // Kistler
+      if (kfp) // Kistler
       {
         originData[3*inc+0] = static_cast<float>((*it)->SensorSeparation.Y.Value());
         originData[3*inc+1] = static_cast<float>((*it)->SensorSeparation.X.Value());
         originData[3*inc+2] = static_cast<float>(-(*it)->SensorSeparation.Z.Value());
       }
-      else if (typeData[inc] == 2 || typeData[inc] == 4) // AMTI
+      else // AMTI
       {
         originData[3*inc+0] = static_cast<float>(-(*it)->CentreOffset.X.Value());
         originData[3*inc+1] = static_cast<float>(-(*it)->CentreOffset.Y.Value());
@@ -266,6 +268,46 @@ namespace btk
           if (o3dm_analogs[analogindex_zerobased]->HardwareID.IsSet() && o3dm_analogs[analogindex_zerobased]->HardwareID == hardwareID)
           {
             channelData[inc*numChannelPerPlatform + i] = static_cast<int16_t>(analogindex_zerobased + 1);
+            Analog::Pointer ch = output->GetAnalog(analogindex_zerobased);
+             // Open3DMotion stores platform' forces and not their reactions.
+            ch->GetValues() *= -1.0;
+            // By default Open3DMotion set force's label to Force1, Force2, etc.
+            // They are rewritten to be compatible with other file formats available in BTK.
+            switch (i)
+            {
+            case 0:
+              ch->SetLabel((kfp ? "FX12" : "FX") + suffix);
+              ch->SetUnit("N");
+              break;
+            case 1:
+              ch->SetLabel((kfp ? "FX34" : "FY") + suffix);
+              ch->SetUnit("N");
+              break;
+            case 2:
+              ch->SetLabel((kfp ? "FY14" : "FZ") + suffix);
+              ch->SetUnit("N");
+              break;
+            case 3:
+              ch->SetLabel((kfp ? "FY23" : "MX") + suffix);
+              ch->SetUnit(kfp ? "N" : "N" + output->GetPointUnit());
+              break;
+            case 4:
+              ch->SetLabel((kfp ? "FZ1" : "MY") + suffix);
+              ch->SetUnit(kfp ? "N" : "N" + output->GetPointUnit());
+              break;
+            case 5:
+              ch->SetLabel((kfp ? "FZ2" : "MZ") + suffix);
+              ch->SetUnit(kfp ? "N" : "N" + output->GetPointUnit());
+              break;
+            case 6:
+              ch->SetLabel("FZ3" + suffix);
+              ch->SetUnit("N");
+              break;
+            case 7:
+              ch->SetLabel("FZ4" + suffix);
+              ch->SetUnit("N");
+              break;
+            }
             break;
           }
         }

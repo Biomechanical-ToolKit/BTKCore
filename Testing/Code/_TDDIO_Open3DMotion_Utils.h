@@ -49,19 +49,6 @@ void btk_o3dm_ADemo1_test(const std::string& filename)
       TS_ASSERT_DELTA(an->GetValues().coeff(j,0), val, 1e-4);
     }
   }
-  
-  TS_WARN("Analog channels used by force platforms are not yet validated.");
-  /*
-  for (int i = 0 ; i < 8 ; ++i)
-  {
-    btk::Analog::Pointer an = acq->GetAnalog(i+o3dm_ADemo1_numEMG);
-    for (int j = 0 ; j < o3dm_ADemo1_numframes_force ; ++j)
-    {
-      double val = o3dm_ADemo1_force[j * 8 + i];
-      TSM_ASSERT_DELTA("Channel #" + btk::ToString(i+8) + " - Frame #" + btk::ToString(j), an->GetValues().coeff(j*2,0), val, 1e-4);
-    }
-  }
-  */
 };
 
 #endif // _TDDIO_Open3DMotion_Utils_h
