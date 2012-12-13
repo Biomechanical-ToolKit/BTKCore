@@ -222,8 +222,8 @@ namespace btk
       double r = (y[1] - y[0]) / 20.0;
       if (fabs(r) < std::numeric_limits<double>::epsilon())
       {
-        y[0] = -0.01;
-        y[1] = 0.01;
+        y[0] += -0.01;
+        y[1] += 0.01;
       }
       else
       {
