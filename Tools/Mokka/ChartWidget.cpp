@@ -1738,20 +1738,29 @@ void AnalogChartData::removePlot(int index, bool* layoutModified)
     this->m_PlotsProperties.removeAt(index);
     if (!this->m_PlotsProperties.isEmpty())
     {
+      bool anyChartVisible = false;
       for (int i = index+1 ; i < this->chartNumber() ; ++i)
       {
         btk::VTKChartTimeSeries* chart = this->mp_ChartLayout->TakeChart(vtkVector2i(0,i));
         this->mp_ChartLayout->SetChart(vtkVector2i(0,i-1), chart);
         chart->Delete();
+        anyChartVisible |= chart->GetVisible();
       }
       this->mp_ChartLayout->SetSize(vtkVector2i(1,this->chartNumber()-1));
       *layoutModified = true;
+      if (!anyChartVisible) // Create a fake chart
+      {
+        btk::VTKChartTimeSeries* fakeChart = this->createChart(this->chart(0));
+        fakeChart->GetAxis(vtkAxis::LEFT)->SetTitle("Values");
+      }
     }
     else
     {
+      this->mp_ChartLayout->SetSize(vtkVector2i(1,1)); 
       btk::VTKChartTimeSeries* chartZero = this->chart(0);
       chartZero->RemovePlot(0);
       chartZero->GetAxis(vtkAxis::LEFT)->SetTitle("Values");
+      chartZero->SetVisible(true);
       *layoutModified = false;
     }
   }
@@ -1767,8 +1776,7 @@ void AnalogChartData::hidePlot(int index, bool isHidden, bool* layoutModified)
     chart->SetVisible(!isHidden);
     chart->GetPlot(0)->SetVisible(!isHidden);
     this->m_PlotsProperties[index].setVisible(!isHidden);
-    // this->m_PlotsProperties[index].visible = !isHidden;
-    
+        
     bool anyChartVisible = false;
     for (int i = 0 ; i < this->chartNumber() ; ++i)
     {
