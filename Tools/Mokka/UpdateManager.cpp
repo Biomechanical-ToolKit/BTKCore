@@ -314,7 +314,8 @@ void UpdateManager::restartApplication()
     // 1. Source folder
     // 2. Destination folder
     // 3. Path of the executable to launch after the update
-    // 4. Arguments for the executable to launch after the update
+    // 4. Application process ID (PID)
+    // 5. Arguments for the executable to launch after the update
     // WARNING: Need to transform space into \" \" for the parameters (See comment "lpParameters and spaces" - http://msdn.microsoft.com/en-us/library/windows/desktop/bb759784%28v=vs.85%29.aspx)
     QString sourceFolder = d->mp_Controller->installationPath(); sourceFolder = sourceFolder.replace(" ", "\" \"");
     QString destinationFolder = QCoreApplication::applicationDirPath().replace(" ", "\" \"");
