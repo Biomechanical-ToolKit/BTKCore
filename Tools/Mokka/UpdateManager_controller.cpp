@@ -153,7 +153,7 @@ void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString&
   appNewVer = xmlReader.attributes().value("version").toString();
   if (this->isNewRelease(appNewVer.split(".")))
   {
-    QString appNote_;
+    QString url, hash, appNote_;
     appNote_ += "<div style=\"margin-top:15px;\">";
     appNote_ += "<div style=\"background-color:#A4DDED;\"><b>&nbsp;" + appPubDate + " - " + appName + " " + appNewVer + " released</b><div>";
     appNote_ += "<div><ul style=\"margin:5 0 0 -25;\">";
@@ -199,8 +199,8 @@ void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString&
             QString os = xmlReader.attributes().value("os").toString();
             QString minver = xmlReader.attributes().value("minver").toString();
             QString arch = xmlReader.attributes().value("arch").toString();
-            QString url = xmlReader.attributes().value("url").toString();
-            QString hash = xmlReader.attributes().value("hash").toString();
+            url = xmlReader.attributes().value("url").toString();
+            hash = xmlReader.attributes().value("hash").toString();
             int osRequired = 9999;
 #if defined(Q_OS_MAC)
             const int osVersion = static_cast<int>(QSysInfo::MacintoshVersion);
@@ -237,11 +237,7 @@ void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString&
               {
                 compatiblePackageFound = true;
                 if (osRequired > latestCompatibleOS)
-                {
                   latestCompatibleOS = osRequired;
-                  this->m_Download.url = url;
-                  this->m_Download.hash = hash;
-                }
               }
             }
             xmlReader.readNext();
@@ -259,7 +255,11 @@ void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString&
       appNote += appNote_;
       updateAvailable = true;
       if (this->isGreaterRelease(appNewVer.split("."), appLatestNewVer.split(".")))
+      {
         appLatestNewVer = appNewVer;
+        this->m_Download.url = url;
+        this->m_Download.hash = hash;
+      }
     }
   }
   else
