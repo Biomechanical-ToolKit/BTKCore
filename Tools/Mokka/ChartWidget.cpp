@@ -1635,8 +1635,8 @@ bool AnalogChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointe
   QString label, unit;
   this->extractPlotLabelUnit(label, unit, acq, id);
   const QString legend = label + unit;
-  const char* str = legend.toUtf8().constData();
-  arrVal->SetName(str);
+  // const char* str = legend.toUtf8().constData(); // It is not possible to use this pointer to set the title of the vertical axis or it will be corrupted.
+  arrVal->SetName(legend.toUtf8().constData());
   // FIXME: Conflict into VTK 5.6.1 between the documentation and the code to save or not the data. Need to check with VTK 5.8
   arrVal->SetArray(analog->GetValues().data(), analog->GetFrameNumber(), 1); // Would be 0?
   table->AddColumn(arrVal);
@@ -1647,7 +1647,7 @@ bool AnalogChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointe
   {
     this->chart(0)->AddPlot(plot);
     if (this->m_Expanded)
-      this->chart(0)->GetAxis(vtkAxis::LEFT)->SetTitle(str);
+      this->chart(0)->GetAxis(vtkAxis::LEFT)->SetTitle(legend.toUtf8().constData());
   }
   else
   {
@@ -1658,7 +1658,7 @@ bool AnalogChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointe
       chart = this->createChart(this->chart(0));
       *layoutModified = true;
     }
-    chart->GetAxis(vtkAxis::LEFT)->SetTitle(str);
+    chart->GetAxis(vtkAxis::LEFT)->SetTitle(legend.toUtf8().constData());
     chart->AddPlot(plot);
   }
   plot->GetPen()->SetColorF(color);
