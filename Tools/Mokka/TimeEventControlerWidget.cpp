@@ -83,7 +83,7 @@ TimeEventControlerWidget::TimeEventControlerWidget(QWidget* parent)
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_5);
   playbackSpeedActionGroup->addAction(this->actionPlaybackSpeed1_10);
   QMenu* displayOptionsMenu = new QMenu(this);
-  this->mp_PlaybackSpeedMenu = new QMenu(tr("Playback speed"));
+  this->mp_PlaybackSpeedMenu = new QMenu(tr("Playback Speed"));
   actionPlaybackSpeedRealtime->setChecked(true);
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeedRealtime);
   this->mp_PlaybackSpeedMenu->addAction(this->actionPlaybackSpeed1_2);
