@@ -45,8 +45,7 @@ void btk_o3dm_ADemo1_test(const std::string& filename)
     btk::Analog::Pointer an = acq->GetAnalog(i);
     for (size_t j = 0 ; j < o3dm_ADemo1_numframes_EMG ; ++j)
     {
-      double val = o3dm_ADemo1_EMG[j * o3dm_ADemo1_numEMG + i] / an->GetScale() + static_cast<double>(an->GetOffset());
-      TS_ASSERT_DELTA(an->GetValues().coeff(j,0), val, 1e-4);
+      TS_ASSERT_DELTA(an->GetValues().coeff(j,0), o3dm_ADemo1_EMG[j * o3dm_ADemo1_numEMG + i], 1e-4);
     }
   }
 };

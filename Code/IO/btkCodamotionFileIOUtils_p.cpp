@@ -71,7 +71,7 @@ namespace btk
         throw(CodamotionFileIOException("The first frame of at least one marker is not the same than the other markers."));
       if (numPointFrames != o3dm_markers[i]->NumFrames())
       {
-        numPointFrames = std::max(numPointFrames, o3dm_markers[i]->NumFrames());
+        numPointFrames = numPointFrames > o3dm_markers[i]->NumFrames() ? numPointFrames : o3dm_markers[i]->NumFrames();
         mixedPointNumFrames = true;
       }
     }
@@ -154,10 +154,12 @@ namespace btk
     AnalogCollection::Pointer analogs = output->GetAnalogs();
     for (size_t i = 0 ; i < o3dm_analogs.size() ; ++i)
     {
-      int numFrames = std::min(numAnalogFrames, o3dm_analogs[i]->NumFrames());
+      int numFrames = numAnalogFrames < o3dm_analogs[i]->NumFrames() ? numAnalogFrames : o3dm_analogs[i]->NumFrames();
       btk::Analog::Pointer an = btk::Analog::New(o3dm_analogs[i]->Channel, numAnalogFrames);
-      an->SetOffset(static_cast<int>(o3dm_analogs[i]->Offset.Value()));
-      an->SetScale(o3dm_analogs[i]->Scale.Value());
+      double offset = o3dm_analogs[i]->Offset.Value();
+      double scale = o3dm_analogs[i]->Scale.Value();
+      an->SetOffset(static_cast<int>(offset));
+      an->SetScale(scale);
       an->SetUnit(o3dm_analogs[i]->Units.Value());
       // Get sequence & iterator (may throw exception if missing fields)
       const Open3DMotion::TimeSequence* ts = o3dm_analogs[i];
@@ -166,14 +168,14 @@ namespace btk
       if (analogs_subsample[i] == 1)
       {
          for (int j = 0 ; j < numFrames ; ++j, iter_ts.Next())
-           an->SetDataSlice(j, iter_ts.Value());
+           an->SetDataSlice(j, (iter_ts.Value() - offset) * scale);
       }
       else if (numFrames > 0)
       {
-        double val0 = iter_ts.Value(); an->SetDataSlice(0, val0); iter_ts.Next();
+        double val0 = (iter_ts.Value() - offset) * scale; an->SetDataSlice(0, val0); iter_ts.Next();
         for (int j = 1 ; j < numFrames ; ++j, iter_ts.Next())
         {
-          double val1 = iter_ts.Value();
+          double val1 = (iter_ts.Value() - offset) * scale;
           an->SetDataSlice(j * analogs_subsample[i], val1);
           // Linear interpolation
           for (int k = 1 ; k < analogs_subsample[i] ; ++k)
@@ -263,13 +265,13 @@ namespace btk
         // NOTE: The following code is inspired by Open3DMotion to be able to write a C3D file
         // Probably safe to use hardware ID here (assuming analog channels start at 1 and are sequential) but do full remapping just in case
         int hardwareID = (*it)->Channels[i];
-        for (size_t analogindex_zerobased = 0 ; analogindex_zerobased < o3dm_analogs.size() ; ++analogindex_zerobased)
+        for (int analogindex_zerobased = 0 ; analogindex_zerobased < static_cast<int>(o3dm_analogs.size()) ; ++analogindex_zerobased)
         {
           if (o3dm_analogs[analogindex_zerobased]->HardwareID.IsSet() && o3dm_analogs[analogindex_zerobased]->HardwareID == hardwareID)
           {
             channelData[inc*numChannelPerPlatform + i] = static_cast<int16_t>(analogindex_zerobased + 1);
             Analog::Pointer ch = output->GetAnalog(analogindex_zerobased);
-             // Open3DMotion stores platform' forces and not their reactions.
+            // Open3DMotion stores platform' forces and not their reactions.
             ch->GetValues() *= -1.0;
             // By default Open3DMotion set force's label to Force1, Force2, etc.
             // They are rewritten to be compatible with other file formats available in BTK.
@@ -321,9 +323,9 @@ namespace btk
       }
       ++inc;
     }
-    std::vector<uint8_t> cornersDims = std::vector<uint8_t>(3, 3); cornersDims[1] = 4; cornersDims[2] = numPlatforms;
-    std::vector<uint8_t> originDims = std::vector<uint8_t>(2, 3); originDims[1] = numPlatforms;
-    std::vector<uint8_t> channelDims = std::vector<uint8_t>(2, numChannelPerPlatform); channelDims[1] = numPlatforms;
+    std::vector<uint8_t> cornersDims = std::vector<uint8_t>(3, 3); cornersDims[1] = 4; cornersDims[2] = static_cast<uint8_t>(numPlatforms);
+    std::vector<uint8_t> originDims = std::vector<uint8_t>(2, 3); originDims[1] = static_cast<uint8_t>(numPlatforms);
+    std::vector<uint8_t> channelDims = std::vector<uint8_t>(2, numChannelPerPlatform); channelDims[1] = static_cast<uint8_t>(numPlatforms);
     MetaData::Pointer forcePlatform = MetaData::New("FORCE_PLATFORM");
     forcePlatform->AppendChild(MetaData::New("USED", numPlatforms));
     forcePlatform->AppendChild(MetaData::New("TYPE", typeData));
@@ -333,7 +335,7 @@ namespace btk
     forcePlatform->AppendChild(MetaData::New("CHANNEL", channelDims, channelData));
     if (hasCalibrationMatrix)
     {
-      std::vector<uint8_t> calmatrixDims = std::vector<uint8_t>(3, static_cast<int8_t>(numChannelPerPlatform)); calmatrixDims[2] = numPlatforms;
+      std::vector<uint8_t> calmatrixDims = std::vector<uint8_t>(3, static_cast<int8_t>(numChannelPerPlatform)); calmatrixDims[2] = static_cast<uint8_t>(numPlatforms);
       forcePlatform->AppendChild(MetaData::New("CAL_MATRIX", calmatrixDims, calmatrixData));
     }
     output->GetMetaData()->AppendChild(forcePlatform);
