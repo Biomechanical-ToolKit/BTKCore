@@ -220,6 +220,16 @@ MainWindow::MainWindow(QWidget* parent)
   this->timeEventControler->insertEventMenu()->actions()[10]->setShortcut(QKeySequence(Qt::AltModifier + Qt::Key_3)); // General Other (unlabled)
   
   this->multiView->initialize();
+  this->multiView->contextualChartHorizontalAxisUnitMenu()->actions()[0]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::AltModifier + Qt::Key_1));
+  this->multiView->contextualChartHorizontalAxisUnitMenu()->actions()[1]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::AltModifier + Qt::Key_2));
+  this->multiView->contextualChartHorizontalAxisUnitMenu()->actions()[2]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::AltModifier + Qt::Key_3));
+  this->multiView->contextualChartHorizontalAxisUnitMenu()->actions()[3]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::AltModifier + Qt::Key_4));
+  this->multiView->contextualChartHorizontalAxisUnitMenu()->actions()[4]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::AltModifier + Qt::Key_5));
+  this->multiView->contextualChartHorizontalAxisUnitMenu()->actions()[5]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::AltModifier + Qt::Key_6));
+  this->multiView->contextualChartHorizontalAxisUnitMenu()->actions()[6]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::AltModifier + Qt::Key_7));
+  this->multiView->contextualChartHorizontalAxisUnitMenu()->actions()[7]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::AltModifier + Qt::Key_8));
+  this->multiView->contextualChartHorizontalAxisUnitMenu()->actions()[8]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::AltModifier + Qt::Key_9));
+  this->multiView->contextualChartHorizontalAxisUnitMenu()->actions()[9]->setShortcut(QKeySequence(Qt::ControlModifier + Qt::AltModifier + Qt::Key_0));  
   // Contextual menu for the 3D views
   QList<QAction*> actions3d;
   actions3d.push_back(this->mp_ModelDock->newSegmentAction());
@@ -245,6 +255,7 @@ MainWindow::MainWindow(QWidget* parent)
   actionsChart.push_back(sep3);
   actionsChart.push_back(this->timeEventControler->insertEventMenu()->menuAction());
   actionsChart.push_back(this->timeEventControler->playbackSpeedMenu()->menuAction());
+  actionsChart.push_back(this->multiView->contextualChartHorizontalAxisUnitMenu()->menuAction());
   this->multiView->setViewChartActions(actionsChart);
   
   //this->mp_ImportAssistant->resize(this->mp_ImportAssistant->width(), this->mp_ImportAssistant->height());

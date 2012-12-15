@@ -214,6 +214,7 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_ForceButterflyActivationAction->setEnabled(false);
   
   this->mp_ChartHorizontalAxisUnitMenu = new QMenu(tr("Horizontal Axis Unit"),this);
+  this->mp_ContextualChartHorizontalAxisUnitMenu = new QMenu(tr("Horizontal Axis Unit"),this);
   this->mp_ActionChartAxisFrame = new QAction(tr("Frame"),this);
   this->mp_ActionChartAxisFrame->setCheckable(true);
   this->mp_ActionChartAxisTime = new QAction(tr("Time"),this);
@@ -226,12 +227,15 @@ MultiViewWidget::MultiViewWidget(QWidget* parent)
   this->mp_ChartHorizontalAxisUnitMenu->addAction(this->mp_ActionChartAxisFrame);
   this->mp_ChartHorizontalAxisUnitMenu->addAction(this->mp_ActionChartAxisTime);
   this->mp_ChartHorizontalAxisUnitMenu->addAction(menuCycle->menuAction());
+  this->mp_ContextualChartHorizontalAxisUnitMenu->addAction(this->mp_ActionChartAxisFrame);
+  this->mp_ContextualChartHorizontalAxisUnitMenu->addAction(this->mp_ActionChartAxisTime);
   for (int i = 0 ; i < ChartCycleSettingsManager::maxCycleSettings ; ++i)
   {
     this->mp_ActionCycleSettings[i] = new QAction(chartBottomAxisDisplay);
     this->mp_ActionCycleSettings[i]->setCheckable(true);
     this->mp_ActionCycleSettings[i]->setVisible(false);
     menuCycle->addAction(this->mp_ActionCycleSettings[i]);
+    this->mp_ContextualChartHorizontalAxisUnitMenu->addAction(this->mp_ActionCycleSettings[i]);
   }
   menuCycle->addSeparator();
   this->mp_ManageChartCycleSettings = new QAction(tr("Manage Cycle Settings"),this);

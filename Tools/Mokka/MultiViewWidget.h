@@ -116,6 +116,7 @@ public:
   QAction* forceButterflyActivationAction() const {return this->mp_ForceButterflyActivationAction;};
   QMenu* chartHorizontalAxisUnitMenu() const {return this->mp_ChartHorizontalAxisUnitMenu;};
   QAction* manageChartCycleSettingsAction() const {return this->mp_ManageChartCycleSettings;};
+  QMenu* contextualChartHorizontalAxisUnitMenu() const {return this->mp_ContextualChartHorizontalAxisUnitMenu;};
   
   void setDefaultGroundOrientation(int index);
   void setDefaultBackgroundColor(const QColor& color);
@@ -260,6 +261,7 @@ private:
   QList<QAction*> m_View3dActions;
   QList<QAction*> m_ViewChartActions;
   QMenu* mp_ChartHorizontalAxisUnitMenu;
+  QMenu* mp_ContextualChartHorizontalAxisUnitMenu;
   QAction* mp_ActionChartAxisFrame;
   QAction* mp_ActionChartAxisTime;
   ChartExportDialog* mp_ChartExporter;
