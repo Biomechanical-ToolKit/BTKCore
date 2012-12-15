@@ -965,7 +965,7 @@ void ChartWidget::checkResetAxes()
       break;
     }
   }
-  // int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
+  int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
   for (int i = 0 ; i < static_cast<int>(this->m_ChartData[this->m_CurrentChartType]->chartNumber()) ; ++i)
   {
     btk::VTKChartTimeSeries* chart = this->m_ChartData[this->m_CurrentChartType]->chart(i);
@@ -978,10 +978,11 @@ void ChartWidget::checkResetAxes()
       else
         chart->SetBounds(0.0, 100.0, 0.0, 0.0);
     }
-    /*
     else if (this->m_HorizontalDisplayMode == TemporalDisplay)
+    {
+      chart->RecalculateBounds(); // Otherwise the Y range is not updated
       this->updateHorizontalAxis(chart, roi[0], roi[1]);
-    */
+    }
   }
 };
 
@@ -1738,17 +1739,19 @@ void AnalogChartData::removePlot(int index, bool* layoutModified)
     this->m_PlotsProperties.removeAt(index);
     if (!this->m_PlotsProperties.isEmpty())
     {
-      bool anyChartVisible = false;
       for (int i = index+1 ; i < this->chartNumber() ; ++i)
       {
         btk::VTKChartTimeSeries* chart = this->mp_ChartLayout->TakeChart(vtkVector2i(0,i));
         this->mp_ChartLayout->SetChart(vtkVector2i(0,i-1), chart);
         chart->Delete();
-        anyChartVisible |= chart->GetVisible();
       }
       this->mp_ChartLayout->SetSize(vtkVector2i(1,this->chartNumber()-1));
       *layoutModified = true;
-      if (!anyChartVisible) // Create a fake chart
+       // Create a fake chart if necessary (In case all the other charts are hidden)
+      bool anyChartVisible = false;
+      for (int i = 0 ; i < this->chartNumber() ; ++i)
+        anyChartVisible |= this->chart(i)->GetVisible();
+      if (!anyChartVisible)
       {
         btk::VTKChartTimeSeries* fakeChart = this->createChart(this->chart(0));
         fakeChart->GetAxis(vtkAxis::LEFT)->SetTitle("Values");
@@ -1858,6 +1861,8 @@ btk::VTKChartTimeSeries* AnalogChartData::createChart(btk::VTKChartTimeSeries* s
   targetAxisX->SetTitle(sourceAxisX->GetTitle());
   targetAxisX->SetTitleVisible(false); // Frames // X axis
   targetAxisX->SetDisplayMinimumLimit(sourceAxisX->GetDisplayMinimumLimit());
+  targetAxisX->SetTickScale(sourceAxisX->GetTickScale());
+  targetAxisX->SetTickOffset(sourceAxisX->GetTickOffset());
   const int* sourceBorders = sourceChart->GetBorders(); targetChart->SetBorders(sourceBorders[0], sourceBorders[1], sourceBorders[2], sourceBorders[3]);
   targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
   targetChart->DisplayCurrentFrameOn();
