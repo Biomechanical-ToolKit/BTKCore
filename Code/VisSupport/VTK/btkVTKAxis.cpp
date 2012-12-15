@@ -710,12 +710,13 @@ namespace btk
         low = max;
       }
       vtkSmartPointer<vtkDoubleArray> values = vtkSmartPointer<vtkDoubleArray>::New();
-      if (this->m_DisplayMinimumLimit && (lower == lowest) && (lower < low) && (fabs(lower-low) > this->TickInterval / 2.0))
+      bool lowerLimitDisplayed = this->m_DisplayMinimumLimit && (lower == lowest) && (lower < low) && (fabs(lower-low) > this->TickInterval / 2.0);
+      if (lowerLimitDisplayed)
       {
         if (this->LogScale)
-          values->InsertNextValue(log10(pow(10.0, lowest)));
+          values->InsertNextValue(log10(pow(10.0, lowest) - this->m_TickOffset));
         else
-          values->InsertNextValue(lowest);
+          values->InsertNextValue(lowest - this->m_TickOffset);
       }
       
       for (vtkIdType i = 0 ; i <= n ; ++i)
@@ -745,6 +746,9 @@ namespace btk
         this->TickPositions->InsertNextValue(value);
         // Update the value for the label
         value = (value + this->m_TickOffset) * this->m_TickScale;
+        // Special case for the lower limit
+        if (lowerLimitDisplayed && (i == 0))
+          value += this->m_TickOffset * this->m_TickScale;
         // Make a tick mark label for the tick
         if (this->LogScale)
           value = pow(double(10.0), double(value));
