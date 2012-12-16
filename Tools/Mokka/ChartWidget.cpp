@@ -391,9 +391,22 @@ void ChartWidget::setHorizontalAxisUnit(const QString& str, double scale, double
   else if ((this->m_HorizontalDisplayMode == CyclicDisplay) && !cycleMode)
     displayAction = -1; // Go back to temporal display
   
+  int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
   for (int i = 0 ; i < this->m_ChartData.size() ; ++i)
+  {
     this->m_ChartData[i]->adaptChartDisplay(str, scale, offset, displayAction, this->mp_DataCycleMatchingRules);
-    
+    if (displayAction == -1)
+    {
+      for (int j = 0 ; j < this->m_ChartData[i]->chartNumber() ; ++j)
+      {
+        btk::VTKChartTimeSeries* chart = this->m_ChartData[i]->chart(j);
+        chart->Update(); // In case all the dropped plots were disabled
+        chart->RecalculateBounds();
+        this->updateHorizontalAxis(chart, roi[0], roi[1]);
+      }
+    }
+  }
+      
   if (displayAction != 0)
     this->updateOptions();
   
@@ -1336,9 +1349,6 @@ void AbstractChartData::adaptChartDisplay(const QString& titleX, double scaleX, 
         }
       }
     }
-    
-    btk::VTKAxis* axisY = static_cast<btk::VTKAxis*>(chart->GetAxis(vtkAxis::LEFT));
-    axisY->SetRange(axisY->GetMinimumLimit(), axisY->GetMaximumLimit());
   }
   
   // Extra steps to do only one time for all charts and plots
