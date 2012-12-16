@@ -460,6 +460,22 @@ void ChartWidget::setDataToCycleMatchingRules(DataCycleMatchingRules* rules)
     this->setDataToCycleMatchingRules(rules->rightLabelRule, rules->rightLabelRuleText, rules->leftLabelRule, rules->leftLabelRuleText);
 };
 
+void ChartWidget::updateHorizontalUnitAxisRange(btk::VTKChartTimeSeries* chart)
+{
+  // Force the limit of the chart to be sure that for the analog chart the last frame is the last video frame and not the last analog frame
+  if (this->m_HorizontalDisplayMode == TemporalDisplay)
+  {
+    int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
+    this->updateHorizontalAxis(chart, roi[0], roi[1]);
+  }
+  else
+  {
+    btk::VTKAxis* axisX = static_cast<btk::VTKAxis*>(chart->GetAxis(vtkAxis::BOTTOM));
+    axisX->SetMinimumLimit(0.0);
+    axisX->SetMaximumLimit(100.0);
+    axisX->SetRange(0.0, 100.0);
+  }
+};
 
 void ChartWidget::addPointPlot(btk::Point::Pointer pt, const QString& label, const QString& unit, int horizontalDataIndex, bool storeData)
 {
@@ -759,8 +775,7 @@ void ChartWidget::setExpandableAnalog(int expandable)
   {
     btk::VTKChartTimeSeries* chart = analogChartData->chart(i);
     chart->RecalculateBounds();
-    int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
-    this->updateHorizontalAxis(chart, roi[0], roi[1]);
+    this->updateHorizontalUnitAxisRange(chart);
   }
   this->render();
   
@@ -892,19 +907,7 @@ void ChartWidget::dropEvent(QDropEvent* event)
       chart->SetInteractionEnabled(true);
       chart->Update(); // Force the update to compute correctly the boundaries
       chart->RecalculateBounds();
-      // Force the limit of the chart to be sure that for the analog chart the last frame is the last video frame and not the last analog frame
-      if (this->m_HorizontalDisplayMode == TemporalDisplay)
-      {
-        int roi[2]; this->mp_Acquisition->regionOfInterest(roi[0], roi[1]);
-        this->updateHorizontalAxis(chart, roi[0], roi[1]);
-      }
-      else
-      {
-        btk::VTKAxis* axisX = static_cast<btk::VTKAxis*>(chart->GetAxis(vtkAxis::BOTTOM));
-        axisX->SetMinimumLimit(0.0);
-        axisX->SetMaximumLimit(100.0);
-        axisX->SetRange(0.0, 100.0);
-      }
+      this->updateHorizontalUnitAxisRange(chart);
     }
   }
   this->render();
@@ -1875,11 +1878,11 @@ btk::VTKChartTimeSeries* AnalogChartData::createChart(btk::VTKChartTimeSeries* s
   targetAxisX->SetTickOffset(sourceAxisX->GetTickOffset());
   const int* sourceBorders = sourceChart->GetBorders(); targetChart->SetBorders(sourceBorders[0], sourceBorders[1], sourceBorders[2], sourceBorders[3]);
   targetChart->SetCurrentFrameFunctor(sourceChart->GetCurrentFrameFunctor());
-  targetChart->DisplayCurrentFrameOn();
   targetChart->SetRegionOfInterestFunctor(sourceChart->GetRegionOfInterestFunctor());
-  targetChart->DisplayRegionOfInterestOn();
   targetChart->SetEventsFunctor(sourceChart->GetEventsFunctor());
-  targetChart->DisplayEventsOn();
+  targetChart->SetDisplayCurrentFrame(sourceChart->GetDisplayCurrentFrame());
+  targetChart->SetDisplayRegionOfInterest(sourceChart->GetDisplayRegionOfInterest());
+  targetChart->SetDisplayEvents(sourceChart->GetDisplayEvents());
   targetChart->SetColorSeries(sourceChart->GetColorSeries());
   targetChart->SetBounds(sourceAxisX->GetMinimumLimit(), sourceAxisX->GetMaximumLimit(), 0.0, 0.0);
   int idx = this->chartNumber();

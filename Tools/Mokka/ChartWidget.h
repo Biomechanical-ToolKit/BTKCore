@@ -174,6 +174,7 @@ private:
   void updateHorizontalAxis(btk::VTKChartTimeSeries* chart, double dlb, double dub, double dlx, double dux);
   int selectContextFromLabel(const QString& label);
   void setDataToCycleMatchingRules(DataCycleMatchingRules* rules);
+  void updateHorizontalUnitAxisRange(btk::VTKChartTimeSeries* chart);
   
   int m_CurrentChartType;
   int m_HorizontalDisplayMode;
