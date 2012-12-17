@@ -44,9 +44,9 @@ namespace Open3DMotion
 			return false;
 
 		// time headings must be first
-		if ((!group.empty()) && (group[0].compare("Time") != 0))
+		if (group.empty() || (group[0].compare("Time") != 0))
 			return false;
-		if ((!channel.empty()) && channel[0].compare("Time") != 0)
+		if (channel.empty() || (channel[0].compare("Time") != 0))
 			return false;
 
 		// copy to array

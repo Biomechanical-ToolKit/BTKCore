@@ -12,8 +12,6 @@
 #include "Open3DMotion/Biomechanics/Trial/TimeSequence.h"
 #include "Open3DMotion/Maths/RigidTransform3.h"
 
-class TestForceCalculator;
-
 namespace Open3DMotion
 {
 	class BinMemHandler;

@@ -12,7 +12,6 @@
 
 // forward declarations
 namespace pugi { class xml_node; }
-class TestMoXie;
 
 namespace Open3DMotion
 {
