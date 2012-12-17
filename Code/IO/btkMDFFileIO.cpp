@@ -39,13 +39,6 @@
 
 #include "Open3DMotion/MotionFile/Formats/MDF/FileFormatMDF.h"
 
-// Workaround to be able to construct a Open3DMotion::FileFormatMDF object.
-class FileFormatMDF_p : public Open3DMotion::FileFormatMDF
-{
-public:
-  FileFormatMDF_p() : Open3DMotion::FileFormatMDF() {};
-};
-
 namespace btk
 {
   /**
@@ -97,7 +90,7 @@ namespace btk
     Open3DMotion::MotionFileHandler handler("Biomechanical ToolKit", BTK_VERSION_STRING);
     Open3DMotion::TreeValue* readoptions = NULL;
     std::ifstream ifs(filename.c_str(), std::ios::binary);
-    FileFormatMDF_p ff;
+    Open3DMotion::FileFormatMDF ff;
     return (ifs.is_open() && ff.Probe(handler, readoptions, ifs));
   };
   
@@ -113,12 +106,9 @@ namespace btk
     {
       // Read data
       Open3DMotion::MotionFileHandler handler("Biomechanical ToolKit", BTK_VERSION_STRING);
-      Open3DMotion::BinMemFactoryDefault memfactory;
-      Open3DMotion::TreeValue* readoptions = NULL;
-      FileFormatMDF_p ff;
-      if(!ff.Probe(handler, readoptions, ifs))
-        throw(MDFFileIOException("The given file is not a valid MDF file."));
-      FillAcquisitionFromOpen3DMotion_p(output, filename, &ff, handler, ifs, memfactory, readoptions);
+      Open3DMotion::MotionFileFormatList reduced_list;
+      reduced_list.Register(new Open3DMotion::FileFormatMDF);
+      FillAcquisitionFromOpen3DMotion_p(output, filename, ifs, handler, reduced_list);
     }
     catch (std::ios::failure& )
     {

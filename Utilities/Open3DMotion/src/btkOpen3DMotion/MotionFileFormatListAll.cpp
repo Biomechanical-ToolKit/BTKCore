@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2012, Arnaud BarrÃ©
+ * Copyright (c) 20092012, Arnaud Barré
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,36 +33,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkCodamotionFileIOUtils_h
-#define __btkCodamotionFileIOUtils_h
+#include "Open3DMotion/MotionFile/MotionFileFormatListAll.h"
 
-#include "btkAcquisition.h"
-#include "btkException.h"
-#include "btkMetaDataUtils.h"
-
-#include "Open3DMotion/MotionFile/MotionFileFormat.h"
-#include "Open3DMotion/MotionFile/MotionFileFormatList.h"
-#include "Open3DMotion/MotionFile/MotionFileHandler.h"
-#include "Open3DMotion/OpenORM/TreeValue.h"
-#include "Open3DMotion/OpenORM/Mappings/RichBinary/BinMemFactoryDefault.h"
-#include "Open3DMotion/Biomechanics/Trial/TSFactory.h"
-
-#include <fstream>
-
-namespace btk
+namespace Open3DMotion
 {
-  class CodamotionFileIOException : public Exception
-  {
-  public:
-    explicit CodamotionFileIOException(const std::string& msg)
-    : Exception(msg)
-    {};
-
-    virtual ~CodamotionFileIOException() throw() {};
-  };
-  
-  void FillAcquisitionFromOpen3DMotion_p(Acquisition::Pointer output, const std::string& filename, std::ifstream& ifs,
-                                          Open3DMotion::MotionFileHandler& handler, const Open3DMotion::MotionFileFormatList& formatlist);
+  // Workaround to include the minimum required number of files
+   // in BTK to read/write the Codamotion file formats
+  MotionFileFormatListAll::MotionFileFormatListAll()
+  {};
 };
-
-#endif // __btkCodamotionFileIOUtils_h

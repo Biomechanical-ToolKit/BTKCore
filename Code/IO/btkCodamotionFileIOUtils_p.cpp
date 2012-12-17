@@ -37,13 +37,10 @@
 
 namespace btk
 {
-  void FillAcquisitionFromOpen3DMotion_p(Acquisition::Pointer output, const std::string& filename, 
-                                         Open3DMotion::MotionFileFormat* ff, const Open3DMotion::MotionFileHandler& handler, 
-                                         std::ifstream& ifs, Open3DMotion::BinMemFactory& memfactory, const Open3DMotion::TreeValue* readoptions)
+  void FillAcquisitionFromOpen3DMotion_p(Acquisition::Pointer output, const std::string& filename, std::ifstream& ifs,
+                                          Open3DMotion::MotionFileHandler& handler, const Open3DMotion::MotionFileFormatList& formatlist)
   {
-    ifs.clear();
-    ifs.seekg(0, std::ios::beg);
-    std::auto_ptr<Open3DMotion::TreeValue> trialcontents = std::auto_ptr<Open3DMotion::TreeValue>(ff->Read(handler, ifs, memfactory, readoptions));
+    std::auto_ptr<Open3DMotion::TreeValue> trialcontents(handler.Read(ifs, formatlist));
     // Build trial
     std::auto_ptr<Open3DMotion::Trial> trial(new Open3DMotion::Trial);
     trial->FromTree(trialcontents.get());

@@ -4,7 +4,7 @@
 # Note: The files commented are not included as they have no any symbol inside
 
 # There are some options to compile Open3DMotion:
-#  - USE_O3DM_NO_FILE_FORMAT_REGISTRATION: Special BTK option to remove the part of the code which register all the know file formats.
+#  - USE_O3DM_NO_FILE_FORMAT_REGISTRATION: Special BTK option to remove the part of the code which register all the known file formats.
 #  - USE_O3DM_MDF_FILE_FORMAT: Include the MDF file format
 #  - USE_O3DM_XMOVE_FILE_FORMAT: Include the XMOVE file format
 
@@ -70,16 +70,17 @@ SET(BTK_O3DM_MotionFile_CORE_SRCS
     "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/FileFormatOptions.cpp"
     # "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/MotionFileException.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/MotionFileFormat.cpp"
+    "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/MotionFileFormatList.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/MotionFileHandler.cpp")
     
 IF(USE_O3DM_NO_FILE_FORMAT_REGISTRATION)
   SET(BTK_O3DM_MotionFile_CORE_SRCS
       ${BTK_O3DM_MotionFile_CORE_SRCS}
-      "${BTK_O3DM_ROOT}/btkOpen3DMotion/MotionFileFormatList_Register.cpp")
+      "${BTK_O3DM_ROOT}/btkOpen3DMotion/MotionFileFormatListAll.cpp")
 ELSE(USE_O3DM_NO_FILE_FORMAT_REGISTRATION)
   SET(BTK_O3DM_MotionFile_CORE_SRCS
       ${BTK_O3DM_MotionFile_CORE_SRCS}
-      "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/Register.cpp")
+      "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/MotionFileFormatListAll.cpp")
 ENDIF(USE_O3DM_NO_FILE_FORMAT_REGISTRATION)
         
 # C3D File format
@@ -122,31 +123,9 @@ SET(BTK_O3DM_OpenORM_IO_XML_SRCS
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/XMLReadingMachine.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/XMLReadWriteMachine.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/XMLWritingMachine.cpp")
-    
-# MOBL File format (Motion Bundle)
-# --------------------------------
-SET(BTK_O3DM_MotionBundle_SRCS
-    "${BTK_O3DM_ROOT}/Open3DMotion/MotionBundle/MOBL.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/MotionBundle/MotionBundleHandler.cpp")
-    
-SET(BTK_O3DM_OpenORM_IO_BSON_SRCS
-    "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/BSON/BSONGZStreamReader.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/BSON/BSONObjectIdHolder.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/BSON/BSONReader.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/BSON/BSONReadException.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/BSON/BSONStreamReader.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/BSON/BSONTimestampHolder.cpp")
 
-# Maths
-# -----
-SET(BTK_O3DM_Maths_SRCS    
-    "${BTK_O3DM_ROOT}/Open3DMotion/Maths/LinearSolve3.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/Maths/MathsException.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/Maths/Matrix.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/Maths/Matrix3x3.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/Maths/RigidTransform3.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/Maths/Vector3.cpp")
-    
+# -----------------------------------------------------------------------------
+
 # Construction of the sources to compile
 SET(BTK_O3DM_SRCS
     ${BTK_O3DM_OpenORM_CORE_SRCS}

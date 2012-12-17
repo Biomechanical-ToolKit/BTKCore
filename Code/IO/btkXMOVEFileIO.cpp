@@ -39,13 +39,6 @@
 
 #include "Open3DMotion/MotionFile/Formats/XMOVE/FileFormatXMove.h"
 
-// Workaround to be able to construct a Open3DMotion::FileFormatXMOVE object.
-class FileFormatXMove_p : public Open3DMotion::FileFormatXMove
-{
-public:
-  FileFormatXMove_p() : Open3DMotion::FileFormatXMove() {};
-};
-
 namespace btk
 {
   /**
@@ -97,7 +90,7 @@ namespace btk
     Open3DMotion::MotionFileHandler handler("Biomechanical ToolKit", BTK_VERSION_STRING);
     Open3DMotion::TreeValue* readoptions = NULL;
     std::ifstream ifs(filename.c_str(), std::ios::binary);
-    FileFormatXMove_p ff;
+    Open3DMotion::FileFormatXMove ff;
     return (ifs.is_open() && ff.Probe(handler, readoptions, ifs));
   };
   
@@ -113,12 +106,9 @@ namespace btk
     {
       // Read data
       Open3DMotion::MotionFileHandler handler("Biomechanical ToolKit", BTK_VERSION_STRING);
-      Open3DMotion::BinMemFactoryDefault memfactory;
-      Open3DMotion::TreeValue* readoptions = NULL;
-      FileFormatXMove_p ff;
-      if(!ff.Probe(handler, readoptions, ifs))
-        throw(XMOVEFileIOException("The given file is not a valid XMOVE file."));
-      FillAcquisitionFromOpen3DMotion_p(output, filename, &ff, handler, ifs, memfactory, readoptions);
+      Open3DMotion::MotionFileFormatList reduced_list;
+      reduced_list.Register(new Open3DMotion::FileFormatXMove);
+      FillAcquisitionFromOpen3DMotion_p(output, filename, ifs, handler, reduced_list);
     }
     catch (std::ios::failure& )
     {
