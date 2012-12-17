@@ -66,6 +66,7 @@
 #include <QToolTip>
 #include <QTimer>
 #include <QDesktopWidget>
+#include <QMessageBox>
 
 #ifdef Q_OS_WIN
   #ifndef WIN32_LEAN_AND_MEAN
@@ -1406,7 +1407,19 @@ bool PointChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointer
 {
   int horizontalIndex = 0;
   if (rules != NULL)
+  {
     horizontalIndex = this->selectContextFromLabel(rules, item->text(0));
+    if (horizontalIndex == -1)
+    {
+      QMessageBox error(QMessageBox::Information, "Chart information", QString("No match between signal '%1' and cycles").arg(item->text(0)), QMessageBox::Ok);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.setInformativeText("<nobr>The dropped signal cannot be displayed as its label doesn't</nobr> match any rule used to set the horizontal cyclic data.");
+      error.exec();
+    }
+  }
   
   *layoutModified = false;
   int id = 0;
@@ -1624,7 +1637,19 @@ bool AnalogChartData::appendPlotFromDroppedItem(Acquisition* acq, vtkSmartPointe
 {
   int horizontalIndex = 0;
   if (rules != NULL)
+  {
     horizontalIndex = this->selectContextFromLabel(rules, item->text(0));
+    if (horizontalIndex == -1)
+    {
+      QMessageBox error(QMessageBox::Information, "Chart information", QString("No match between signal '%1' and cycles").arg(item->text(0)), QMessageBox::Ok);
+#ifdef Q_OS_MAC
+      error.setWindowFlags(Qt::Sheet);
+      error.setWindowModality(Qt::WindowModal);
+#endif
+      error.setInformativeText("<nobr>The dropped signal cannot be displayed as its label doesn't</nobr> match any rule used to set the horizontal cyclic data.");
+      error.exec();
+    }
+  }
   bool disabled = false;
   if (horizontalIndex < 0)
   {
