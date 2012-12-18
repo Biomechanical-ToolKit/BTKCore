@@ -744,33 +744,15 @@ namespace btk
             value = 0.0;
         }
         this->TickPositions->InsertNextValue(value);
-        // Update the value for the label
-        value = (value + this->m_TickOffset) * this->m_TickScale;
         // Special case for the lower limit
         if (lowerLimitDisplayed && (i == 0))
-          value += this->m_TickOffset * this->m_TickScale;
-        // Make a tick mark label for the tick
-        if (this->LogScale)
-          value = pow(double(10.0), double(value));
+          value += this->m_TickOffset;
         // Now create a label for the tick position
         if (this->TickLabelAlgorithm == VTKAxis::TICK_SIMPLE)
-        {
-          vtksys_ios::ostringstream ostr;
-          ostr.imbue(std::locale::classic());
-          if (this->Notation > 0)
-            ostr.precision(this->Precision);
-          if (this->Notation == 1)
-            // Scientific notation
-            ostr.setf(vtksys_ios::ios::scientific, vtksys_ios::ios::floatfield);
-          else if (this->Notation == 2)
-            ostr.setf(ios::fixed, ios::floatfield);
-          ostr << value;
-
-          this->TickLabels->InsertNextValue(ostr.str());
-        }
+          this->StringifyTickValue(this->ScaleTickValue(value));
 #if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
         else
-          this->GenerateLabelFormat(this->Notation, value);
+          this->GenerateLabelFormat(this->Notation, this->ScaleTickValue(value));
 #endif
       }
     }
@@ -787,24 +769,29 @@ namespace btk
   {
     this->TickLabels->SetNumberOfTuples(0);
     for (vtkIdType i = 0; i < this->TickPositions->GetNumberOfTuples(); ++i)
-    {
-      double value = (this->TickPositions->GetValue(i) + this->m_TickOffset) * this->m_TickScale;
-      // Make a tick mark label for the tick
-      if (this->LogScale)
-        value = pow(double(10.0), double(value));
-      // Now create a label for the tick position
-      vtksys_ios::ostringstream ostr;
-      ostr.imbue(std::locale::classic());
-      if (this->Notation > 0)
-        ostr.precision(this->Precision);
-#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
-      if (this->Notation == SCIENTIFIC_NOTATION)
-        ostr.setf(vtksys_ios::ios::scientific, vtksys_ios::ios::floatfield);
-      else if (this->Notation == FIXED_NOTATION)
-        ostr.setf(ios::fixed, ios::floatfield);
-#endif
-      ostr << value;
-      this->TickLabels->InsertNextValue(ostr.str());
-    }
+      this->StringifyTickValue(this->ScaleTickValue(this->TickPositions->GetValue(i)));
   };
+  
+  double VTKAxis::ScaleTickValue(double val) const
+  {
+    double value = (val + this->m_TickOffset) * this->m_TickScale;
+    if (this->LogScale)
+      value = pow(double(10.0), double(value));
+    return value;
+  }
+  
+  void VTKAxis::StringifyTickValue(double value)
+  {
+    vtksys_ios::ostringstream ostr;
+    ostr.imbue(std::locale::classic());
+    ostr.precision(4); // FIXME: Find a better way to limit the possible overlap due to the use of the ticks' scale
+    if (this->Notation > 0)
+      ostr.precision(this->Precision);
+    if (this->Notation == 1)
+      ostr.setf(vtksys_ios::ios::scientific, vtksys_ios::ios::floatfield);
+    else if (this->Notation == 2)
+      ostr.setf(ios::fixed, ios::floatfield);
+    ostr << value;
+    this->TickLabels->InsertNextValue(ostr.str());
+  }
 };

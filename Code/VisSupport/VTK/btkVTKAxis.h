@@ -94,9 +94,7 @@ namespace btk
 #endif
   protected:
     BTK_VTK_EXPORT VTKAxis();
-    BTK_VTK_EXPORT void GenerateTickLabels2(double min, double max);
-    BTK_VTK_EXPORT void GenerateTickLabels2();
-    
+        
     bool m_TitleVisible;
     float m_TickLength;
     int m_TickDirection;
@@ -108,6 +106,11 @@ namespace btk
     bool m_DisplayMinimumLimit;
     
   private:
+    void GenerateTickLabels2(double min, double max);
+    void GenerateTickLabels2();
+    double ScaleTickValue(double val) const;
+    void StringifyTickValue(double val);
+  
     VTKAxis(const VTKAxis& ); // Not implemented.
     void operator=(const VTKAxis& ); // Not implemented.
   };
