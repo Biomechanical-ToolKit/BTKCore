@@ -839,7 +839,8 @@ void ChartWidget::toggleOptions(const QPoint& pos)
     }
 #endif
 
-    int xPos = (pos.x() + this->mp_ChartOptions->width()/2) - QApplication::desktop()->screenGeometry().width();
+    QRect screen = QApplication::desktop()->screenGeometry(pos);
+    int xPos = (pos.x() + this->mp_ChartOptions->width()/2) - (screen.x() + screen.width());
     this->mp_ChartOptions->shiftArrow = 0;
     if (xPos >= 0)
       this->mp_ChartOptions->shiftArrow = xPos + 5; // 5: to not be on the side of the screen
