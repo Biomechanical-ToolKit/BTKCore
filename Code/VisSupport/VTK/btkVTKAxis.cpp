@@ -302,7 +302,7 @@ namespace btk
           last += this->TickInterval;
           if (last > this->Maximum)
           {
-            this->GenerateTickLabels2(first, last-this->TickInterval);
+            this->GenerateTickLabels2(first, last - this->TickInterval);
             break;
           }
         }
@@ -334,7 +334,7 @@ namespace btk
     this->TickScenePositions->SetNumberOfTuples(n);
     for (vtkIdType i = 0; i < n; ++i)
     {
-      int iPos = vtkContext2D::FloatToInt(origin + (this->TickPositions->GetValue(i) - this->Minimum) * scaling);
+      int iPos = vtkContext2D::FloatToInt(origin + (this->TickPositions->GetValue(i) - this->Minimum + this->m_TickOffset) * scaling);
       this->TickScenePositions->InsertValue(i, iPos);
     }
 
