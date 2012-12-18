@@ -1951,7 +1951,7 @@ bool VTKChartWidget::event(QEvent* event)
     {
       btk::VTKAxis* axisX = static_cast<btk::VTKAxis*>(chart->GetAxis(vtkAxis::BOTTOM));
       btk::VTKAxis* axisY = static_cast<btk::VTKAxis*>(chart->GetAxis(vtkAxis::LEFT));
-      double coordX = (plotIndex.Position.X() + axisX->GetTickOffset()) * axisX->GetTickScale();
+      double coordX = plotIndex.Position.X() * axisX->GetTickScale();
       double range = fabs(axisY->GetMaximum() - axisY->GetMinimum());
       QString valueStr;
       if (plotIndex.Position.Y() == 0.0)
