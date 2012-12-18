@@ -245,10 +245,13 @@ void LoggerItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
   
   painter->save();
   
+  QPalette::ColorGroup cg = QPalette::Normal;
+  QPalette::ColorRole cr = QPalette::Text;
   // Draw background
   if (option.showDecorationSelected && (option.state & QStyle::State_Selected))
   {
-    QPalette::ColorGroup cg = option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
+    cg = option.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
+    cr = QPalette::HighlightedText;
     if (cg == QPalette::Normal && !(option.state & QStyle::State_Active))
       cg = QPalette::Inactive;
     painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
@@ -286,10 +289,7 @@ void LoggerItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
   rect.setWidth(rect.width() - iconSize.width() - 2*padding);
   painter->setPen(option.palette.color(QPalette::Normal, QPalette::Text));
   // - Draw the date
-  if (option.state & QStyle::State_Selected)
-    painter->setPen(option.palette.color(QPalette::Normal, QPalette::HighlightedText));
-  else
-    painter->setPen(option.palette.color(QPalette::Normal, QPalette::Text));
+  painter->setPen(option.palette.color(cg,cr));
   QFont f = painter->font() ;
   f.setBold(true);
   painter->setFont(f);
@@ -306,10 +306,7 @@ void LoggerItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
     painter->translate(0, bounding.height()); rect.setHeight(rect.height() - bounding.height());
   }
   // Draw detailed message
-  if (option.state & QStyle::State_Selected)
-    painter->setPen(option.palette.color(QPalette::Normal, QPalette::HighlightedText));
-  else
-    painter->setPen(option.palette.color(QPalette::Normal, QPalette::Text));
+  painter->setPen(option.palette.color(cg,cr));
   f.setBold(false);
   painter->setFont(f);
   painter->drawText(rect, Qt::AlignLeft | Qt::TextWordWrap, msgDetail.toString());
