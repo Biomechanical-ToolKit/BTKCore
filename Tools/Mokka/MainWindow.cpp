@@ -172,8 +172,10 @@ MainWindow::MainWindow(QWidget* parent)
   this->actionSave_As->setShortcut(QKeySequence::SaveAs);
   this->actionCut->setShortcut(QKeySequence::Cut);
   this->actionCopy->setShortcut(QKeySequence::Copy);
+  this->actionCopy->setShortcutContext(Qt::WidgetShortcut);
   this->actionPaste->setShortcut(QKeySequence::Paste);
   this->actionSelect_All->setShortcut(QKeySequence::SelectAll);
+  this->actionSelect_All->setShortcutContext(Qt::WidgetShortcut);
   this->actionHelp->setShortcut(QKeySequence::HelpContents);
   this->actionLayout3DOnly->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_1));
   this->actionLayout3DVerbose->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_2));
