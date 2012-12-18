@@ -676,11 +676,12 @@ void ChartWidget::exportToImage()
   if (chart != 0)
     emit exportToImageRequested(chart);
 };
+
 void ChartWidget::removeAllPlot()
 {
   this->mp_ChartOptions->clear();
   bool layoutModified = false;
-  this->m_ChartData[this->m_CurrentChartType]->show(this->mp_Acquisition, true, &layoutModified); // Easy way to reset the chart.
+  this->m_ChartData[this->m_CurrentChartType]->show(this->mp_Acquisition, this->m_HorizontalDisplayMode, &layoutModified); // Easy way to reset the chart.
   if (layoutModified)
     this->m_ChartData[this->m_CurrentChartType]->layout()->UpdateLayout();
   this->render();
