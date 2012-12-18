@@ -325,6 +325,9 @@ MainWindow::MainWindow(QWidget* parent)
   connect(this->actionImportAMTI, SIGNAL(triggered()), this, SLOT(importAMTI()));
   connect(this->actionImportDelsysEMG, SIGNAL(triggered()), this, SLOT(importDelsysEMG()));
   connect(this->actionImportCLB, SIGNAL(triggered()), this, SLOT(importCLB()));
+  connect(this->actionImportMDF, SIGNAL(triggered()), this, SLOT(importMDF()));
+  connect(this->actionImportMDR, SIGNAL(triggered()), this, SLOT(importMDR()));
+  connect(this->actionImportXMOVE, SIGNAL(triggered()), this, SLOT(importXMOVE()));
   connect(this->actionImportVideo, SIGNAL(triggered()), this, SLOT(importVideos()));
   connect(this->actionExportC3D, SIGNAL(triggered()), this, SLOT(exportC3D()));
   connect(this->actionExportTRC, SIGNAL(triggered()), this, SLOT(exportTRC()));
@@ -1569,6 +1572,21 @@ void MainWindow::importDelsysEMG()
 void MainWindow::importCLB()
 {
   this->importAcquisition(tr("CLB Files (*.clb)"));
+};
+
+void MainWindow::importMDF()
+{
+  this->importAcquisition(tr("MDF Files (*.mdf)"));
+};
+
+void MainWindow::importMDR()
+{
+  this->importAcquisition(tr("MDR Files (*.mdr)"));
+};
+
+void MainWindow::importXMOVE()
+{
+  this->importAcquisition(tr("XMOVE Files (*.xmove)"));
 };
 
 void MainWindow::importAcquisition(const QString& filter)

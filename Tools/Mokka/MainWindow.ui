@@ -112,11 +112,20 @@
       <addaction name="actionImportPWR"/>
       <addaction name="actionImportGR"/>
      </widget>
+     <widget class="QMenu" name="menuCodamotion">
+      <property name="title">
+       <string>Codamotion</string>
+      </property>
+      <addaction name="actionImportMDF"/>
+      <addaction name="actionImportMDR"/>
+      <addaction name="actionImportXMOVE"/>
+     </widget>
      <addaction name="actionImportAssistant"/>
      <addaction name="separator"/>
      <addaction name="actionImportC3D"/>
      <addaction name="menuMotion_Analysis_Corp_"/>
      <addaction name="menuBTS_Bioengineering"/>
+     <addaction name="menuCodamotion"/>
      <addaction name="actionImportAMTI"/>
      <addaction name="actionImportEMF"/>
      <addaction name="actionImportCLB"/>
@@ -559,6 +568,21 @@
   <action name="actionExportImageSeries">
    <property name="text">
     <string>Image Series...</string>
+   </property>
+  </action>
+  <action name="actionImportMDF">
+   <property name="text">
+    <string>MDF file...</string>
+   </property>
+  </action>
+  <action name="actionImportXMOVE">
+   <property name="text">
+    <string>XMOVE file...</string>
+   </property>
+  </action>
+  <action name="actionImportMDR">
+   <property name="text">
+    <string>MDR file...</string>
    </property>
   </action>
  </widget>

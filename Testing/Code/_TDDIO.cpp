@@ -1,4 +1,5 @@
 #include "_TDDConfigure.h"
+#include "_TDDIO_Open3DMotion_Ressources.cpp"
 
 #include "BinaryFileStreamTest.h" // Be the first to test the stream
 
@@ -28,6 +29,8 @@
 #include "EMxFileReaderTest.h"
 #include "GRxFileIOTest.h"
 #include "GRxFileReaderTest.h"
+#include "MDFFileIOTest.h"
+#include "MDFFileReaderTest.h"
 #include "MOMFileIOTest.h"
 #include "MOMFileReaderTest.h"
 #include "PWRFileIOTest.h"
@@ -47,5 +50,7 @@
 #include "TRCFileWriterTest.h"
 #include "XLSOrthoTrakFileIOTest.h"
 #include "XLSOrthoTrakFileReaderTest.h"
+#include "XMOVEFileIOTest.h"
+#include "XMOVEFileReaderTest.h"
 
 #include "MultiSTLFileWriterTest.h"
