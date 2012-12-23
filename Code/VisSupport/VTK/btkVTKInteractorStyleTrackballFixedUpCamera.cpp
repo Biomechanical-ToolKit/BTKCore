@@ -49,8 +49,9 @@
 
 namespace btk
 {
-  typedef int (*foregroundFrameBufferIndex)(vtkRenderWindow*, int);
-  static foregroundFrameBufferIndex _ForegroundFrameBufferIndex = NULL;
+  
+  typedef int (*foregroundFrameBufferIndex_p)(vtkRenderWindow*, int);
+  static foregroundFrameBufferIndex_p _ForegroundFrameBufferIndex = NULL;
   
   /**
    * @class VTKInteractorStyleTrackballFixedUpCamera btkVTKInteractorStyleTrackballFixedUpCamera.h

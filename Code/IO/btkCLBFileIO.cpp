@@ -86,7 +86,7 @@ namespace btk
    *  - ??? (Option): 32-bit
    *  - Data block (number of frames x integer 16-bit) 
    * // ... Same format for the other analog channels
-   * @encode
+   * @endcode
    *
    * @note Some informations were also found in the documentation of the manufacturer on the web (especially for the channel information. See file C-LOGGER_UsersGuide_124e.pdf). However, it seems that there is no
    * license for this documentation but only on the software. So, I don't think there is any copyright infringement.

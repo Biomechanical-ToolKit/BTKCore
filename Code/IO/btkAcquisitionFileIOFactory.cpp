@@ -40,7 +40,14 @@ namespace btk
 {
   /**
    * @class AcquisitionFileIOFactory btkAcquisitionFileIOFactory.h
-   * @brief This class only implements the CreateAcquisitionIO method.
+   * @brief Manage all the acquisition file IOs and detect if a file is readable or writable.
+   *
+   * The goal of this factory is to return an AcquisitionFileIO object based on the given filename.
+   * For that, you need to call the method AcquisitionFileIOFactory::CreateAcquisitionIO. In this method,
+   * each AcquisitionFileIO object is tested to see if the file is supported or by file format managed.
+   *
+   * If you want to add a new file format to this factory, you can use the method AcquisitionFileIOFactory::AddFileIO.
+   * Or you if you work directly into the source-code of BTK, you can register direclty the new file format using the file btkAcquisitionFileIOFactory_registration.cpp
    *
    * @ingroup BTKIO
    */

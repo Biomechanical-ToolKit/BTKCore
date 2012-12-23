@@ -64,6 +64,25 @@ namespace btk
    * @class C3DFileIO btkC3DFileIO.h
    * @brief Interface to read/write C3D files.
    *
+   * All the informations related to the acquisition are stored in the output object.
+   * Few data, like the byte order, the points' scale, the analog universal scale, the integer analog storage format are 
+   * available as member of this class. These informations are extracted when a C3D file is read or can be 
+   * filled/modified to write a new C3D file. All these members can be acessed or modified using dedicated methods.
+   *
+   * Compared to the C3DServer API, all the data in BTK extracted from a C3D file are already scaled and available in the children of the output Acquisition.
+   * You don't need to access to the groups/parameters for that. However, if you have some custom parameters, then you can access them from the metadata stored in the output Acquisition using the method Acquisition::GetMetadata().
+   *
+   * Moreover, there are several options to create a C3D file from an acquisition:
+   *  - None ;
+   *  - ScalesFromDataUpdate ;
+   *  - ScalesFromMetaDataUpdate ;
+   *  - MetaDataFromDataUpdate ;
+   *  - CompatibleVicon.
+   * By default, the writer is set with the options ScalesFromDataUpdate, MetaDataFromDataUpdate and CompatibleVicon.
+   * These options give you the possibility to create a C3D file from any kind of acquisition (created from raw or extracted from another file format).
+   *
+   * To write a C3D file with a given processor architecture (called byte order in BTK), you have to use the method C3DFileIO::SetByteOrder().
+   *
    * For more informations on this file's format: http:://www.c3d.org
    *
    * @ingroup BTKIO
@@ -100,7 +119,7 @@ namespace btk
    */
   /**
    * @var C3DFileIO::WritingFlag C3DFileIO::MetaDataFromDataUpdate
-   * Updates (or synchronize) the acquisition's metadata from the data (by default).
+   * Updates (or synchronize) the acquisition's metadata from the data (by default). If necessary, the groups/parameters are generated to match the data in the given acquisition.
    */
   /**
    * @var C3DFileIO::WritingFlag C3DFileIO::CompatibleVicon
@@ -1322,7 +1341,7 @@ namespace btk
     this->m_PointScale = 0.1;
     this->m_AnalogUniversalScale = 1.0;
     this->m_AnalogIntegerFormat = Signed;
-    this->m_WritingFlags = ScalesFromDataUpdate | MetaDataFromDataUpdate | CompatibleVicon;  
+    this->m_WritingFlags = ScalesFromDataUpdate | MetaDataFromDataUpdate | CompatibleVicon;
   };
 
   /*

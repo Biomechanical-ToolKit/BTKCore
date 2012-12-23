@@ -218,7 +218,7 @@ namespace btk
    };
    
   /**
-   * @fn const std::list<std::string>& SeparateKnownVirtualMarkersFilter::GetVirtualFrames() const
+   * @fn const std::list<std::string>& SeparateKnownVirtualMarkersFilter::GetVirtualReferenceFrames() const
    * Returns the list of labels for the virtual markers used to create virtual frames.
    */
   

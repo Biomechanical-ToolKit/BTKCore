@@ -41,6 +41,43 @@ namespace btk
    * @class AcquisitionFileIO btkAcquisitionFileIO.h
    * @brief Interface to read/write acquisition's files.
    *
+   * A class inheriting from AcquisitionFileIO has to implement 4 methods:
+   *  - CanReadFile
+   *  - Read
+   *  - CanWriteFile
+   *  - Write
+   * It is also strongly adviced to give the default file extension(s) used by this file format. This last property is
+   * used by the IO factory in the methods AcquisitionFileIOFactory::GetSupportedReadExtensions and AcquisitionFileIOFactory::GetSupportedWriteExtensions
+   *
+   * To help developers, some macros were defined in case:
+   *  - the class reads only files and doesn't write them: BTK_FILE_IO_ONLY_READ_OPERATION ;
+   *  - the class write only files and doesn't read them: BTK_FILE_IO_ONLY_WRITE_OPERATION ;
+   *  - but also to set the file extension supported: BTK_FILE_IO_SUPPORTED_EXTENSIONS.
+   *
+   * These macros should be used at the top of the declaration of the new class. For example:
+   * @code
+   * class FooFileIO : public AcquisitionFileIO
+   * {
+   *   BTK_FILE_IO_ONLY_READ_OPERATION;
+   *   BTK_FILE_IO_SUPPORTED_EXTENSIONS("FOO");
+   * public:
+   *   // ...
+   *   virtual bool CanReadFile(const std::string& filename);
+   *   virtual void Read(const std::string& filename, Acquisition::Pointer output);
+   *   // ...
+   * };
+   * @endcode
+   *
+   * In this example, the FooFileIO class can only read files, and the default file extension known is "FOO".
+   * @note Check the class AcquisitionFileIO::Extension to add more than one default extension.
+   *
+   * After the implementation of the new IO, you can decide to add it to the factory (using the method AcquisitionFileIOFactory::AddFileIO). This will give the possibility to 
+   * select the new IO automatically based on the return value of the method CanReadFile() or CanWriteFile().
+   *
+   * @note The methods to set the file type, the byte order or the storage format are in 
+   * general not used as lots of file format doesn't have options for these properties.
+   * Only the C3D file format is known to have some options each time.
+   *
    * @ingroup BTKIO
    */
   /**
@@ -121,6 +158,18 @@ namespace btk
    * Acquisition's data are stored as integer values.
    */
   
+  /** 
+   * @fn static bool AcquisitionFileIO::HasReadOperation()
+   * Returns the property of this acquisition file IO to read data from a file and extract data.
+   *
+   * @note This method is set to true by default
+   */
+   
+   /** 
+    * @fn static bool AcquisitionFileIO::HasWriteOperation()
+    * Returns the property of this acquisition file IO to read data from a file and extract data.
+    */
+  
   /**
    * @fn virtual const Extensions& AcquisitionFileIO::GetSupportedExtensions() const = 0;
    * Return the suppored extensions by this file IO.
@@ -159,7 +208,6 @@ namespace btk
     }
     return str;
   };
-  
   
   /**
    * Gets the storage format as a string.
@@ -236,12 +284,29 @@ namespace btk
    * @class AcquisitionFileIO::Extension
    * @brief Native extension used with an acquisition file IO.
    *
-   * @note This class should be only used with the macro BTK_IO_FILE_SUPPORTED_EXTENSIONS during the declaration of a class inheriting from btk::AcquisitionFileIO if several file formats are supported.
+   * @note This class should be only used with the macro BTK_FILE_IO_SUPPORTED_EXTENSIONS during the declaration of a class inheriting from btk::AcquisitionFileIO if several file formats are supported.
    * For example:
    * @code
    * class FooFileIO : public AcquisitionFileIO
    * {
-   *   BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("FOO") | Extension("BAR"));
+   *   BTK_FILE_IO_SUPPORTED_EXTENSIONS(Extension("FOO") | Extension("BAR"));
+   * public:
+   * // ...
+   * };
+   * @endcode
+   * 
+   * You can also add a description to the file format. This description could be used to set the name of the company to distinguish two classes which use the same extension.
+   * For example, 
+   * @code
+   * class EMGEliteFileIO : public AcquisitionFileIO
+   * {
+   *   BTK_FILE_IO_SUPPORTED_EXTENSIONS(Extension("EMG","BTS Bioengineering"));
+   * public:
+   * // ...
+   * };
+   * class EMGDelsysFileIO : public AcquisitionFileIO
+   * {
+   *   BTK_FILE_IO_SUPPORTED_EXTENSIONS(Extension("EMG", "Delsys Inc."));
    * public:
    * // ...
    * };
@@ -253,7 +318,7 @@ namespace btk
    */
   /**
    * @var AcquisitionFileIO::Extension::desc
-   * Description associated with the file format.
+   * Description associated with the file format. This could be used to set the name of the company to distinguish two classes which use the same extension.
    */
   
   /**
@@ -269,13 +334,13 @@ namespace btk
   /**
     * @class AcquisitionFileIO::Extensions
     * @brief List of AcquisitionFileIO::Extension object.
-    * @note This class should not be used. The macro BTK_IO_FILE_SUPPORTED_EXTENSIONS embedded the construction of list of extensions.
+    * @note This class should not be used. The macro BTK_FILE_IO_SUPPORTED_EXTENSIONS embedded the construction of list of extensions.
     * To set several extensions for a same acquisition file IO, you can use the operator AcquisitionFileIO::Extensions::operator|()
     * For example:
     * @code
     * class FooFileIO : public AcquisitionFileIO
     * {
-    *   BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("FOO") | Extension("BAR"));
+    *   BTK_FILE_IO_SUPPORTED_EXTENSIONS(Extension("FOO") | Extension("BAR"));
     * public:
     * // ...
     * };

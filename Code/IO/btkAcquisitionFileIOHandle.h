@@ -72,7 +72,8 @@ namespace btk
    * @class AcquisitionFileIOHandle 
    * @brief Store read/write properties on a acquisition file IO.
    *
-   * This class would not be used directly by a developer. If a developer want to add a file format dynamically to the factory, it cas use the method btk::btkAcquisitionFileIOFactory::AddFileIO().
+   * This class is only intended to be able to add a file format dynamically in the file factory, by using the method btk::btkAcquisitionFileIOFactory::AddFileIO().
+   * However, it is needed to create a functor class inheriting from the class AcquisitionFileIOHandle::Functor able to create an acquisition file IO. 
    */
   /**
    * @var AcquisitionFileIOHandle::mp_Functor

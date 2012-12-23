@@ -59,6 +59,16 @@ namespace btk
    * @class AcquisitionFileReader
    * @brief Reader for files which contain acquisition data (C3D, TRC, ...).
    *
+   * This class uses an AcquisitionFileIO object to read the data from the file corresponding to the given filename.
+   * You have two ways to set this object.
+   * First, you can set it manually by using the method AcquisitionFileReader::SetAcquisitionIO(),
+   * Second, the correct object can be detected automatically, by checking in each registered AcquisitionFileIO if it can read or not the file.
+   *
+   * The use of the manual setting should be only used if you want to read a file with a selected file format.
+   * To go back to the automatic mode from the manual mode, you only have to use the method AcquisitionFileReader::SetAcquisitionIO() without any argument.
+   *
+   * Note: Internally, this class use the AcquisitionFileIOFactory class for the automatic mode.
+   *
    * @ingroup BTKIO 
    */
   /**

@@ -113,6 +113,10 @@ namespace btk
    * @fn virtual int VTKCurrentFrameFunctor::operator()() = 0;
    * Operator used to return the current frame displayed.
    */
+  /**
+   * @fn virtual VTKCurrentFrameFunctor::Pointer VTKCurrentFrameFunctor::ResetedSuperClone() = 0;
+   * Create a clone of the object and reset it.
+   */
    
   /**
    * @class VTKRegionOfInterestFunctor btkVTKChartExtraAcquisitionFunctor.h
@@ -126,6 +130,10 @@ namespace btk
    * @fn virtual void VTKRegionOfInterestFunctor::operator()(int& left, int& right) = 0;
    * Operator used to get the left and right bounds of the region of interest.
    */
+  /**
+   * @fn virtual VTKRegionOfInterestFunctor::Pointer VTKCurrentFrameFunctor::ResetedSuperClone() = 0;
+   * Create a clone of the object and reset it.
+   */
   
   /**
    * @class VTKEventsFrameMapperFunctor btkVTKChartExtraAcquisitionFunctor.h
@@ -138,6 +146,10 @@ namespace btk
   /**
    * @fn virtual float VTKEventsFrameMapperFunctor::operator()(int index, int side, int shift) = 0;
    * Return a value for the event @a index. The side and a frame's shift can be also used to compute the value.
+   */
+  /**
+   * @fn virtual VTKEventsFrameMapperFunctor::Pointer VTKCurrentFrameFunctor::ResetedSuperClone() = 0;
+   * Create a clone of the object and reset it.
    */
    
   /**
@@ -154,6 +166,10 @@ namespace btk
   /**
    * @fn virtual bool VTKEventsFunctor::operator()(int index, int& typeId, float& x, double rgb[3]) = 0;
    * Operator used to extract each event. Asking for an event out of range returns false.
+   */
+  /**
+   * @fn virtual VTKEventsFunctor::Pointer VTKCurrentFrameFunctor::ResetedSuperClone() = 0;
+   * Create a clone of the object and reset it.
    */
 };
 

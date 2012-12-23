@@ -384,7 +384,47 @@ namespace btk
    * @fn void VTKChartTimeSeries::DisplayEventsOff()
    * Convenient method to hide events.
    */
+
+  /**
+   * @fn int VTKChartTimeSeries::GetDisplayCurrentFrame() const
+   * Get the status of the current frame display.
+   */
   
+  /**
+   * @fn void VTKChartTimeSeries::SetDisplayCurrentFrame(int enabled)
+   * Enable/Disable the displaying of the current frame as large vertical lines into the chart
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::DisplayCurrentFrameOn()
+   * Convenient method to show the current frame.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::DisplayCurrentFrameOff()
+   * Convenient method to hide the current frame.
+   */
+  
+  /**
+   * @fn int VTKChartTimeSeries::GetDisplayRegionOfInterest() const
+   * Get the status of the display of the region of interest.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::SetDisplayRegionOfInterest(int enabled)
+   * Enable/Disable the displaying of the the region of interest as rectangle around the ROI.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::DisplayRegionOfInterestOn()
+   * Convenient method to show the region of interest.
+   */
+  
+  /**
+   * @fn void VTKChartTimeSeries::DisplayRegionOfInterestOff()
+   * Convenient method to hide the region of interest.
+   */
+
   /**
    * Enable/Disable the zoom box.
    */
