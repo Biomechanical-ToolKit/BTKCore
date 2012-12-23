@@ -162,12 +162,16 @@ namespace btk
    * @fn static bool AcquisitionFileIO::HasReadOperation()
    * Returns the property of this acquisition file IO to read data from a file and extract data.
    *
-   * @note This method is set to true by default
+   * @note This method is set to true by default and is automatically adapted in inherited class
+   * when the macro BTK_FILE_IO_ONLY_WRITE_OPERATION is used.
    */
    
    /** 
     * @fn static bool AcquisitionFileIO::HasWriteOperation()
     * Returns the property of this acquisition file IO to read data from a file and extract data.
+    *
+    * @note This method is set to true by default and is automatically adapted in inherited class
+    * when the macro BTK_FILE_IO_ONLY_READ_OPERATION is used.
     */
   
   /**
