@@ -5,6 +5,12 @@
 
 CXXTEST_SUITE(EMFFileIOTest)
 {
+  CXXTEST_TEST(AvailableOperations)
+  {
+    TS_ASSERT_EQUALS(btk::EMFFileIO::HasReadOperation(), true);
+    TS_ASSERT_EQUALS(btk::EMFFileIO::HasWriteOperation(), false);
+  };
+
   CXXTEST_TEST(CanReadFileEmpty)
   {
     btk::EMFFileIO::Pointer pt = btk::EMFFileIO::New();
@@ -43,6 +49,7 @@ CXXTEST_SUITE(EMFFileIOTest)
 };
 
 CXXTEST_SUITE_REGISTRATION(EMFFileIOTest)
+CXXTEST_TEST_REGISTRATION(EMFFileIOTest, AvailableOperations)
 CXXTEST_TEST_REGISTRATION(EMFFileIOTest, CanReadFileEmpty)
 CXXTEST_TEST_REGISTRATION(EMFFileIOTest, CanReadFileEmptyFile)
 CXXTEST_TEST_REGISTRATION(EMFFileIOTest, CanReadFileOk)

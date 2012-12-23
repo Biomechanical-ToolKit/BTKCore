@@ -54,7 +54,7 @@ namespace btk
   
   class C3DFileIO : public AcquisitionFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS("C3D");
+    BTK_FILE_IO_SUPPORTED_EXTENSIONS("C3D");
     
   public:
     typedef enum {Signed, Unsigned}  AnalogIntegerFormat;

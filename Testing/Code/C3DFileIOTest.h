@@ -5,6 +5,12 @@
 
 CXXTEST_SUITE(C3DFileIOTest)
 {
+  CXXTEST_TEST(AvailableOperations)
+  {
+    TS_ASSERT_EQUALS(btk::C3DFileIO::HasReadOperation(), true);
+    TS_ASSERT_EQUALS(btk::C3DFileIO::HasWriteOperation(), true);
+  };
+  
   CXXTEST_TEST(CanReadFileEmpty)
   {
     btk::C3DFileIO::Pointer pt = btk::C3DFileIO::New();
@@ -49,6 +55,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileIOTest)
+CXXTEST_TEST_REGISTRATION(C3DFileIOTest, AvailableOperations)
 CXXTEST_TEST_REGISTRATION(C3DFileIOTest, CanReadFileEmpty)
 CXXTEST_TEST_REGISTRATION(C3DFileIOTest, CanReadFileEmptyFile)
 CXXTEST_TEST_REGISTRATION(C3DFileIOTest, CanReadFileFail)

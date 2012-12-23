@@ -53,8 +53,8 @@ namespace btk
   
   class EMxFileIO : public AcquisitionFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("EMG", "BTS Bioengineering"));
-    BTK_IO_FILE_ONLY_READ_OPERATION;
+    BTK_FILE_IO_SUPPORTED_EXTENSIONS(Extension("EMG", "BTS Bioengineering"));
+    BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
     typedef SharedPtr<EMxFileIO> Pointer;

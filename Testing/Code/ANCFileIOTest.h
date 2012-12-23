@@ -5,6 +5,12 @@
 
 CXXTEST_SUITE(ANCFileIOTest)
 {
+  CXXTEST_TEST(AvailableOperations)
+  {
+    TS_ASSERT_EQUALS(btk::ANCFileIO::HasReadOperation(), true);
+    TS_ASSERT_EQUALS(btk::ANCFileIO::HasWriteOperation(), true);
+  };
+  
   CXXTEST_TEST(CanReadFileEmpty)
   {
     btk::ANCFileIO::Pointer pt = btk::ANCFileIO::New();
@@ -49,6 +55,7 @@ CXXTEST_SUITE(ANCFileIOTest)
 };
 
 CXXTEST_SUITE_REGISTRATION(ANCFileIOTest)
+CXXTEST_TEST_REGISTRATION(ANCFileIOTest, AvailableOperations)
 CXXTEST_TEST_REGISTRATION(ANCFileIOTest, CanReadFileEmpty)
 CXXTEST_TEST_REGISTRATION(ANCFileIOTest, CanReadFileEmptyFile)
 CXXTEST_TEST_REGISTRATION(ANCFileIOTest, CanReadFileFail)

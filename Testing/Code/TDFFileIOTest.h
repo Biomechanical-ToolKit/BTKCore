@@ -5,6 +5,12 @@
 
 CXXTEST_SUITE(TDFFileIOTest)
 {
+  CXXTEST_TEST(AvailableOperations)
+  {
+    TS_ASSERT_EQUALS(btk::TDFFileIO::HasReadOperation(), true);
+    TS_ASSERT_EQUALS(btk::TDFFileIO::HasWriteOperation(), false);
+  };
+  
   CXXTEST_TEST(CanReadFileEmpty)
   {
     btk::TDFFileIO::Pointer pt = btk::TDFFileIO::New();
@@ -49,6 +55,7 @@ CXXTEST_SUITE(TDFFileIOTest)
 };
 
 CXXTEST_SUITE_REGISTRATION(TDFFileIOTest)
+CXXTEST_TEST_REGISTRATION(TDFFileIOTest, AvailableOperations)
 CXXTEST_TEST_REGISTRATION(TDFFileIOTest, CanReadFileEmpty)
 CXXTEST_TEST_REGISTRATION(TDFFileIOTest, CanReadFileEmptyFile)
 CXXTEST_TEST_REGISTRATION(TDFFileIOTest, CanReadFileFail)

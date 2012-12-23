@@ -53,7 +53,7 @@ namespace btk
   
   class ANBFileIO : public MotionAnalysisBinaryFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS("ANB");
+    BTK_FILE_IO_SUPPORTED_EXTENSIONS("ANB");
     
   public:
     typedef SharedPtr<ANBFileIO> Pointer;

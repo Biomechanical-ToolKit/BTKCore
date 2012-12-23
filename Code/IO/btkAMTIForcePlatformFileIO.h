@@ -56,8 +56,8 @@ namespace btk
   
   class AMTIForcePlatformFileIO : public AcquisitionFileIO
   {
-    BTK_IO_FILE_SUPPORTED_EXTENSIONS(Extension("ASC","AMTI forceplate"));
-    BTK_IO_FILE_ONLY_READ_OPERATION;
+    BTK_FILE_IO_SUPPORTED_EXTENSIONS(Extension("ASC","AMTI forceplate"));
+    BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
     typedef SharedPtr<AMTIForcePlatformFileIO> Pointer;

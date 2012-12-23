@@ -47,13 +47,16 @@ namespace btk
   public:
     class Extensions;
     
+    static bool HasReadOperation() {return true;};
+    static bool HasWriteOperation() {return true;};
+    
     typedef SharedPtr<AcquisitionFileIO> Pointer;
     typedef SharedPtr<const AcquisitionFileIO> ConstPointer;
     
     typedef enum {TypeNotApplicable, ASCII, Binary} FileType;
     typedef enum {OrderNotApplicable = 0, IEEE_LittleEndian, VAX_LittleEndian, IEEE_BigEndian} ByteOrder;
     typedef enum {StorageNotApplicable = 0, Float = -1, Integer = 1} StorageFormat;
-
+    
     virtual const Extensions& GetSupportedExtensions() const = 0;
 
     FileType GetFileType() const {return this->m_FileType;};
@@ -108,22 +111,28 @@ namespace btk
     StorageFormat m_StorageFormat;
     
   private:
+    enum {ReadOp = 1, WriteOp = 1};
+    
     AcquisitionFileIO(const AcquisitionFileIO& ); // Not implemented.
     AcquisitionFileIO& operator=(const AcquisitionFileIO& ); // Not implemented.
   };
 };
   
-#define BTK_IO_FILE_ONLY_READ_OPERATION \
+#define BTK_FILE_IO_ONLY_READ_OPERATION \
   public: \
+    static bool HasReadOperation() {return true;}; \
+    static bool HasWriteOperation() {return false;}; \
     virtual bool CanWriteFile(const std::string& ) {btkErrorMacro("Writing operations not supported. Wrong macro?");return false;}; \
     virtual void Write(const std::string& , btk::Acquisition::Pointer ) {btkErrorMacro("Writing operations not supported. Wrong macro?");};
   
-#define BTK_IO_FILE_ONLY_WRITE_OPERATION \
+#define BTK_FILE_IO_ONLY_WRITE_OPERATION \
   public: \
+    static bool HasReadOperation() {return false;}; \
+    static bool HasWriteOperation() {return true;}; \
     virtual bool CanReadFile(const std::string& ) {btkErrorMacro("Reading operations not supported. Wrong macro?");return false;}; \
     virtual void Read(const std::string& , btk::Acquisition::Pointer ) {btkErrorMacro("Reading operations not supported. Wrong macro?");};
   
-#define BTK_IO_FILE_SUPPORTED_EXTENSIONS(ext) \
+#define BTK_FILE_IO_SUPPORTED_EXTENSIONS(ext) \
    public: \
     virtual const btk::AcquisitionFileIO::Extensions& GetSupportedExtensions() const {static const btk::AcquisitionFileIO::Extensions SupportedExtensions(btk::AcquisitionFileIO::Extensions() << ext); return SupportedExtensions;};
   

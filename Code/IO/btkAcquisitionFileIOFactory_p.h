@@ -38,19 +38,10 @@
 
 #include "btkAcquisitionFileIOHandle.h"
 
-#define BTK_IO_REGISTER_ACQUISITION_FILE_RDRW(classname) \
-  BTK_IO_REGISTER_ACQUISITION_FILE(classname, true, true)
-
-#define BTK_IO_REGISTER_ACQUISITION_FILE_RONLY(classname) \
-  BTK_IO_REGISTER_ACQUISITION_FILE(classname, true, false)
-
-#define BTK_IO_REGISTER_ACQUISITION_FILE_WONLY(classname) \
-  BTK_IO_REGISTER_ACQUISITION_FILE(classname, false, true)
-
-#define BTK_IO_REGISTER_ACQUISITION_FILE(classname, read, write) \
-  this->list.push_back(AcquisitionFileIOHandle::New(btk::AcquisitionFileIOHandleFunctorConverter<classname>::New(), read, write));
+#define BTK_REGISTER_ACQUISITION_FILE_IO(classname) \
+  this->list.push_back(AcquisitionFileIOHandle::New(btk::AcquisitionFileIOHandleFunctorConverter<classname>::New(), classname::HasReadOperation(), classname::HasWriteOperation()));
    
-#define BTK_IO_ACQUISITON_FILE_FACTORY_INIT \
+#define BTK_ACQUISITON_FILE_IO_FACTORY_INIT \
    AcquisitionFileIOHandles::AcquisitionFileIOHandles() \
    : list()
 
