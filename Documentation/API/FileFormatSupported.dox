@@ -25,21 +25,20 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> ANC </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::ANCFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>Motion Analysis</i> ASCII file format containing analog channel data</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> ANG<sup>1</sup> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::ANGFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing (joint) angles</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> ASC<sup>2</sup> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::AMTIForcePlatformFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>AMTI</i> ASCII file format containing FxFyFzMxMyMz data. No need of the COP file.</td>
   </tr>
@@ -58,44 +57,58 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>Motion Analysis</i> ASCII file format for force platform calibration</td>
   </tr>
   <tr>
+    <td style="border: 1px solid #aaa; padding: 5px;"> CLB </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::CLBFileIO @htmlonly</p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>Contec Inc.</i> binary file format containing analog channel data</td>
+  </tr>
+  <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> EMF </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::EMFFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>Ascension Technology Corporation </i> ASCII file format containing 3D trajectories</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> EMG </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::DelsysEMGFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>Delsys Inc.</i> binary file format containing EMG data</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> EMG </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::EMxFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing EMG data</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> GR<tt>*</tt><sup>3</sup> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::GRxFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing force platform data<br>(<strong>Experimental</strong>: Need more files/informations to implement the writer. Only support platforms of type I)</td>
   </tr>
   <tr>
+    <td style="border: 1px solid #aaa; padding: 5px;"> MDF </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::MDFFileIO @htmlonly</p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>Charnwood Dynamics Ltd (Codamotion)</i> binary file format containing 3D trajectories, analog data and force platform geometry</td>
+  </tr>
+  <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> MOM<sup>4</sup> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::MOMFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing joints&#x27; moments</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> PWR </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;">  </td></td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::PWRFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing joints&#x27; powers</td>
   </tr>
@@ -154,6 +167,13 @@
     <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::XLSOrthoTrakFileIO @htmlonly</p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>Motion Analysis</i> ASCII file format exported from the software <i>OrthoTrak</i> </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #aaa; padding: 5px;"> XMOVE </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::XMOVEFileIO @htmlonly</p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>Charnwood Dynamics Ltd (Codamotion)</i> XML file format containing 3D trajectories, analog data and force platform geometry</td>
   </tr>
 </table>
 <p>

@@ -194,9 +194,9 @@ void DummyFilter::GenerateData();
 @b Note: In the method GenerateData you cannot create a new input using the static method New. If you do this, the modification will be reflected only inside the method. This is due to the use of the pointer. Furthermore, trying to set a new pointer to the output by using the method ProcessObject::SetNthOutput has for effect to unlink the processes which use this output in their input. This is why you have to reset the output or assign some default values.
 
 @section NewFileFormat How to add a new file format
-As described in the @ref GettingStarted "first tutorial", an acquisition can be read or written by the filters btk::AcquisitionFileReader and btk::AcquisitionFileWriter respectively. But the code which extract the information from the file or put it inside is inherited from the class btk::AcquisitionFileIO. And when the reader/writer selects the file format related to the file's content or the file's extension, it use the class btk::AcquisitionFileIOFactory. Adding a new file format requires to create a new class and modify the method btk::AcquisitionFileIOFactory::CreateAcquisitionIO.
+As described in the @ref GettingStarted "first tutorial", an acquisition can be read or written by the filters btk::AcquisitionFileReader and btk::AcquisitionFileWriter respectively. But the code which extract the information from the file or put it inside is inherited from the class btk::AcquisitionFileIO. If no acquisition file IO is set, then the reader/writer asks to the AcquisitionFileIOFactory to return the corresponding file IO able to read/write the given acquisition. Adding a new file format requires to create a new class and register it in the factory. Internally, the registration is realized in the file @c btkAcquisitionFileIOFactory_registration.cpp (but externally the method AcquisitionFileIOFactory::AddFileIO can be also used to register dynamically a file format).
 
-Even if you can name you IO class a you want, BTK use the following syntax to recognize them:
+Even if you can name you IO class as you want, BTK use the following syntax to recognize them:
 btk<file_extension_in_capital>FileIO. If you want to use exceptions specific to this file IO, you can declare an exception class in the same file. For example:
 @code
 // Header file
@@ -212,6 +212,8 @@ public:
 
 class DummyFileIO : public AcquisitionFileIO
 {
+  BTK_FILE_IO_SUPPORTED_EXTENSIONS("DMY");
+
 public:
   typedef SharedPtr<DummyFileIO> Pointer;
   typedef SharedPtr<const DummyFileIO> ConstPointer;
@@ -265,44 +267,41 @@ bool DummyFileIO::CanWriteFile(const std::string& filename)
 };
 @endcode
 
-To include you new file format in the function btk::AcquisitionFileIOFactory::CreateAcquisitionIO, you have just to add these lines inside the function:
+If you want to implement only the read or write part of the acquisition file IO, then you can use the macro BTK_FILE_IO_ONLY_READ_OPERATION or BTK_FILE_IO_ONLY_WRITE_OPERATION. 
+These macros overload the methods CanReadFile/Read or CanWriteFile/Write respectively.
 
-<b>For the reader:</b>
+The macro BTK_FILE_IO_SUPPORTED_EXTENSIONS stores the supported extensions for the new IO. More informations are available in the documentation of the class AcquisitionFileIO.
+
+To include you new file format in the function btk::AcquisitionFileIOFactory::CreateAcquisitionIO, you have just to add one line inside the file @c btkAcquisitionFileIOFactory_registration.cpp using the macro BTK_REGISTER_ACQUISITION_FILE_IO:
+
 @code
-io = DummyFileIO::New();
-if (io->CanReadFile(filename)) return io;
-@endcode
-<b>For the writer</b>
-@code
-io = DummyFileIO::New();
-if (io->CanWriteFile(filename)) return io;
-@endcode
-<b>Inside the method</b>
-@code
-AcquisitionFileIO::Pointer AcquisitionFileIOFactory::CreateAcquisitionIO(const std::string& filename, OpenMode mode)
+// ----------------------------------------------------------------------------
+//                  STEP 1: ADD ALL ACQUISITION FILES IO HERE
+// ----------------------------------------------------------------------------
+
+// C3D File IO
+#include "btkC3DFileIO.h"
+...
+#include "btkDummyFileIO.h"
+
+namespace btk
 {
-  AcquisitionFileIO::Pointer io;
-  if (mode == ReadMode)
+  /**
+   * List of all the acquisition file IO supported in BTK.
+   */
+  BTK_ACQUISITON_FILE_IO_FACTORY_INIT
   {
-    // Dummy
-    io = DummyFileIO::New();
-    if (io->CanReadFile(filename)) return io;
-    // other file format
-    // ...
-  }
-  else
-  {
-    // Dummy
-    io = DummyFileIO::New();
-    if (io->CanWriteFile(filename)) return io;
-    // other file format
-    // ...
-  }
-  return AcquisitionFileIO::Pointer();
+    // ----------------------------------------------------------------------------
+    //                 STEP 2: REGISTER THE ACQUISTION FILES IO HERE
+    // ----------------------------------------------------------------------------
+    // Use the macro BTK_REGISTER_ACQUISITION_FILE_IO for this usage.
+    // This macro creates a handle for the given file IO and insert it into the factory.
+    BTK_REGISTER_ACQUISITION_FILE_IO(C3DFileIO)
+    ...
+    BTK_REGISTER_ACQUISITION_FILE_IO(DummyFileIO)
+  };
 };
 @endcode
-
-@b Note: If you don't implement the reader or the writer (i.e. the method @c Read or @c Write is defined but its content is empty), you have to comment this part in the method btk::AcquisitionFileIOFactory::CreateAcquisitionIO, otherwise it can be selected but nothing will happen later.
 
 Finally, the methods @c Read and @c Write contain the code to extract the data from the file to the acquisition or from the acquisition to the file respectively. The code will require to use a filestream. By default, BTK uses its own class for the binary file: btk::BinaryFileStream and the class std::fstream for the ASCII file. In the case of a binary file you can use this code:
 @code
@@ -385,7 +384,5 @@ void DummyFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   }
 };
 @endcode 
-
-
 
  */
