@@ -131,7 +131,7 @@ namespace btk
    * Operator used to get the left and right bounds of the region of interest.
    */
   /**
-   * @fn virtual VTKRegionOfInterestFunctor::Pointer VTKCurrentFrameFunctor::ResetedSuperClone() = 0;
+   * @fn virtual VTKRegionOfInterestFunctor::Pointer VTKRegionOfInterestFunctor::ResetedSuperClone() = 0;
    * Create a clone of the object and reset it.
    */
   
@@ -146,10 +146,6 @@ namespace btk
   /**
    * @fn virtual float VTKEventsFrameMapperFunctor::operator()(int index, int side, int shift) = 0;
    * Return a value for the event @a index. The side and a frame's shift can be also used to compute the value.
-   */
-  /**
-   * @fn virtual VTKEventsFrameMapperFunctor::Pointer VTKCurrentFrameFunctor::ResetedSuperClone() = 0;
-   * Create a clone of the object and reset it.
    */
    
   /**
@@ -168,8 +164,20 @@ namespace btk
    * Operator used to extract each event. Asking for an event out of range returns false.
    */
   /**
-   * @fn virtual VTKEventsFunctor::Pointer VTKCurrentFrameFunctor::ResetedSuperClone() = 0;
+   * @fn virtual VTKEventsFunctor::Pointer VTKEventsFunctor::ResetedSuperClone() = 0;
    * Create a clone of the object and reset it.
+   */
+  /**
+   * @fn VTKEventsFrameMapperFunctor::Pointer VTKEventsFunctor::GetFrameMapper() const
+   * Returns the mapper used to map a given frame to another value.
+   */
+  /**
+   * @fn void VTKEventsFunctor::SetFrameMapper(VTKEventsFrameMapperFunctor::Pointer mapper)
+   * Sets the mapper used to map a given frame to another value.
+   */
+  /**
+   * @var VTKEventsFunctor::mp_FrameMapper
+   * Mapper used to convert a given frame to another value.
    */
 };
 

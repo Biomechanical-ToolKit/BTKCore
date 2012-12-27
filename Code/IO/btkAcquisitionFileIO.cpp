@@ -190,6 +190,11 @@ namespace btk
    */
 
   /**
+   * @fn void AcquisitionFileIO::SetByteOrder(ByteOrder o)
+   * Sets the byte order of the file (only for binary file).
+   */
+  
+  /**
    * Gets the byte order as a string.
    */
   std::string AcquisitionFileIO::GetByteOrderAsString() const
@@ -235,8 +240,13 @@ namespace btk
   };
 
   /**
-   * @fn double AcquisitionFileIO::GetStorageFormat() const
-   * Return the format used to store points and analog channels.
+   * @fn StorageFormat AcquisitionFileIO::GetStorageFormat() const
+   * Returns the format used to store points and analog channels.
+   */
+
+  /**
+   * @fn void AcquisitionFileIO::SetStorageFormat(StorageFormat s)
+   * Sets the format used to store points and analog channels.
    */
 
   /**
