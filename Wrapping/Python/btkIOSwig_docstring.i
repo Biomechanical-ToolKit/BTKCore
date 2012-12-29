@@ -139,6 +139,13 @@ Interface to read ANG files (Elite - BTS Bioengineering)."
 Interface to read/write force platform calibration CAL files (Motion Analysis Corp.)."
 
 // ------------------------------------------------------------------------- //
+//                                  CLBFileIO                                //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkCLBFileIO"
+Interface to read CLB files (Contec Inc.)."
+
+// ------------------------------------------------------------------------- //
 //                               DelsysEMGFileIO                             //
 // ------------------------------------------------------------------------- //
 %feature("docstring") btkDelsysEMGFileIO"
@@ -164,6 +171,13 @@ Interface to read EMG files (Elite - BTS Bioengineering)."
 
 %feature("docstring") btkGRxFileIO"
 Interface to read GR* (GR1, GR2, ...) files (Elite - BTS Bioengineering)."
+
+// ------------------------------------------------------------------------- //
+//                                  MDFFileIO                                //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkMDFFileIO"
+Interface to read MDF files (Codamotion)."
 
 // ------------------------------------------------------------------------- //
 //                                  MOMFileIO                                //
@@ -220,3 +234,10 @@ Interface to read TDF files (BTS Bioengineering)."
 
 %feature("docstring") btkXLSOrthoTrakFileIO"
 Interface to read XLS OrthoTrak files (Motion Analysis Corp.)."
+
+// ------------------------------------------------------------------------- //
+//                                 XMOVEFileIO                               //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkXMOVEFileIO"
+Interface to read XMOVE files (Codamotion)."

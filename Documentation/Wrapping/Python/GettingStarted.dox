@@ -4,6 +4,7 @@
  <div class="btkmenu">\ref index "Overview"
  | \ref BuildInstructions "Building instructions"
  | \b Getting \b started
+ | \ref MoreTutorials "More Tutorials"
  | \ref License
  </div>
  
@@ -15,7 +16,7 @@
 
   @htmlonly <hr> @endhtmlonly
 
-  Note: A special thanks to Fabien Leboeuf who wrote the original version of this tutorial.
+  Note: A special thanks to Fabien Leboeuf (<a href="http://www.chu-nantes.fr/laboratoire-d-analyse-du-mouvement-26629.kjsp?RH=1201612496535">Laboratoire du Mouvement</a>, CHU Nantes) who wrote the original version of this tutorial.
 
   @section TutorialIntroPython Why a python implementation?
 
@@ -50,7 +51,7 @@
   The command <tt>import btk</tt> creates the namespace @c btk which have to be specified as a prefix if 
   you create a new BTK object. As an example, a new reader acquisition object will be built with:
   @code{.py}
-    reader = btk.btkAquisitionFileReader()
+    reader = btk.btkAcquisitionFileReader()
   @endcode
 
   @section TutorialAcquisitionExplained Enjoy with a c3d acquisition file
@@ -65,7 +66,7 @@
   @subsection TutorialPythonReadAcquisition Read an aquisition 
   Reading an acquisition is simple. 
   @code{.py}
-    reader = btk.btkAquisitionFileReader() # build a btk reader object 
+    reader = btk.btkAcquisitionFileReader() # build a btk reader object 
     reader.SetFilename("dynamic.c3d") # set a filename to the reader 
     reader.Update() 
     acq = reader.getOutput() # acq is the btk aquisition object 
@@ -86,15 +87,15 @@
   
   You can extract them from the aquisition object @c acq with these methods: 
   @code{.py}
-    point1=acq.GetPoint("LASI") 
-    point2=acq.GetPoint("LKneeAngles") 
+    point1 = acq.GetPoint("LASI") 
+    point2 = acq.GetPoint("LKneeAngles") 
     #if you rather prefer handle index instead of point name, you can use 
-    point1=acq.GetPoint(0) 
-    point2=acq.GetPoint(1) 
+    point1 = acq.GetPoint(0) 
+    point2 = acq.GetPoint(1) 
   @endcode
   Then @a point1 is the BTK-object characterizing the LASI marker. To access to its 3d-values:
   @code{.py}
-    values=point1.GetValues() # return a Numpy array of nrows, and 3 columns 
+    values = point1.GetValues() # return a Numpy array of nrows, and 3 columns 
     # for slicing the previous Numpy Array, you can use 
     point1.GetValues()[0,0] # return the value of the first row, first column. 
     point1.GetValues()[:,0] # extract the first column 
@@ -111,8 +112,8 @@
   Imagine that the c3d contains the muscular activities labeled: Emg1, Emg2, 
   Emg3,... The following code will explain how to extract their values:
   @code{.py}
-  analog1=acq.GetAnalog("Emg1") # attribute a btk-analog object to the measurement 
-  values=analog1.GetValues() # return a 1D Numpy array 
+  analog1 = acq.GetAnalog("Emg1") # attribute a btk-analog object to the measurement 
+  values = analog1.GetValues() # return a 1D Numpy array 
   @endcode
 
   @subsubsection TutorialPythonEvent Event 
@@ -139,8 +140,8 @@
 
   To extract the content of the metada @c POINT:MOVIE_DELAY, you can do it as following
   @code{.py}
-  metadata=acq.GetMetaData() 
-  delay = Metadata.FindChild("POINT").value().FindChild("MOVIE_DELAY").value().GetInfo().toDouble() 
+  metadata = acq.GetMetaData() 
+  delay = metadata.FindChild("POINT").value().FindChild("MOVIE_DELAY").value().GetInfo().toDouble() 
   # return a Tuple of double. 
   @endcode
 
@@ -202,7 +203,7 @@
   @subsubsection TutorialPythonModifyMetadata Modify metadata 
   To modify the value of the metadata MOVIE_DELAY:
   @code{.py}
-   metadata=acq.GetMetaData() 
+   metadata = acq.GetMetaData() 
    # access a sp´ecific element 
    MOVIE_DELAY = metadata.FindChild(’POINT’).value().FindChild(’MOVIE_DELAY’).value().GetInfo()
    MOVIE_DELAY.SetValue(0,2) #setting the first element with the value 2

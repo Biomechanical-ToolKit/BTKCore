@@ -1,0 +1,16 @@
+/** 
+ * @defgroup BTKCommon Common
+ * @brief Common is the base of BTK. It contains required classes by others modules. 
+ */
+
+/**
+ * @defgroup BTKIO IO
+ * @brief Reader/Writer classes for acquisitions files.
+ */
+
+/**
+ * @defgroup BTKBasicFilters BasicFilters
+ * @brief Basic filters (e.g. Extract ground reaction wrenches, merge acquisitions).
+ */
+
+

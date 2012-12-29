@@ -65,8 +65,12 @@
 #include <btkRICFileIO.h>
 #include <btkPWRFileIO.h>
 #include <btkGRxFileIO.h>
+// - Codamotion
+#include <btkMDFFileIO.h>
+#include <btkXMOVEFileIO.h>
 // - Others
 #include <btkEMFFileIO.h>
+#include <btkCLBFileIO.h>
 
 #include "IO/btkIOSwig_AcquisitionFile.h"
 

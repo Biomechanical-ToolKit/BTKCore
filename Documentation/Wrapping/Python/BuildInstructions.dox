@@ -4,6 +4,7 @@
  <div class="btkmenu">\ref index "Overview"
  | \b Building \b instructions
  | \ref GettingStarted "Getting started"
+ | \ref MoreTutorials "More Tutorials"
  | \ref License
  </div>
  

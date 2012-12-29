@@ -3,6 +3,7 @@ namespace btk
   /**
    * @class btkAcquisitionUnitConverter
    * @brief Convert the units of the given input for points and analog channels.
+   * @ingroup BTKBasicFilters
    */
   /**
    * @var btkAcquisitionUnitConverter::Length
@@ -28,41 +29,49 @@ namespace btk
   /**
    * @class btkAnalogOffsetRemover
    * @brief Remove a possible analog offset to the selected analog channels.
+   * @ingroup BTKBasicFilters
    */
   
   /**
    * @class btkWrenchDownsampleFilter
    * @brief Downsample data stored in a wrench.
+   * @ingroup BTKBasicFilters
    */ 
    
   /**
    * @class btkWrenchCollectionDownsampleFilter
    * @brief Downsample a collection of wrenches.
+   * @ingroup BTKBasicFilters
    */
  
   /**
    * @class btkForcePlatformsExtractor
    * @brief Extracts force platform data from a btk::Acquisition object. 
+   * @ingroup BTKBasicFilters
    */
   
   /**
    * @class btkForcePlatformWrenchFilter
    * @brief Calcule the wrench of the center of the force platform data, expressed in the global frame (by default).
+   * @ingroup BTKBasicFilters
    */
   
   /**
    * @class btkGroundReactionWrenchFilter
    * @brief Transform force platform data into ground reaction wrenches.
+   * @ingroup BTKBasicFilters
    */
    
   /**
    * @class btkIMUsExtractor
    * @brief Extracts inertial measurement units (IMUs) from a btkAcquisition object. 
+   * @ingroup BTKBasicFilters
    */
   
   /**
    * @class btkMergeAcquisitionFilter
    * @brief Merges or concatenates two or more btk::Acquisition objects into a single new one.
+   * @ingroup BTKBasicFilters
    */
   /**
    * @var btkMergeAcquisitionFilter::KeepAllFrames
@@ -76,6 +85,7 @@ namespace btk
   /**
    * @class btkSeparateKnownVirtualMarkersFilter
    * @brief Separate a collection of points in five categories to be able to distinguish real markers from the others.
+   * @ingroup BTKBasicFilters
    */
   /**
    * @var btkSeparateKnownVirtualMarkersFilter::AllMarkers
@@ -113,11 +123,13 @@ namespace btk
   /**
    * @class btkSpecializedPointsExtractor
    * @brief Extracts only the points corresponding to the given type (without cloning the extracted points).
+   * @ingroup BTKBasicFilters
    */
   
   /**
    * @class btkSubAcquisitionFilter
    * @brief Extract a subpart of the acquisition.
+   * @ingroup BTKBasicFilters
    */
   /**
    * @var btkSubAcquisitionFilter::All
@@ -139,10 +151,12 @@ namespace btk
   /**
    * @class btkVerticalGroundReactionForceGaitEventDetector
    * @brief Detect heel strike and toe-off events during gait from vertical ground reaction wrench.
+   * @ingroup BTKBasicFilters
    */
   
   /**
    * @class btkWrenchDirectionAngleFilter
    * @brief Calcule the direction angle of the force vector for each wrench.
+   * @ingroup BTKBasicFilters
    */
 }

@@ -3,6 +3,7 @@ namespace btk
 /**
  * @class btkEvent
  * @brief Label a specific time/frame during an acquisition.
+ * @ingroup BTKCommon
  */
 /**
  * @var btkEvent::Unknown
@@ -24,6 +25,7 @@ namespace btk
 /** 
  * @class btkAnalog
  * @brief Analog channel data along the time.
+ * @ingroup BTKCommon
  */
 /**
  * @var btkAnalog::Unknown
@@ -69,6 +71,7 @@ namespace btk
 /** 
  * @class btkPoint
  * @brief Coordinates of a point in a 3D space along the time.
+ * @ingroup BTKCommon
  */
 /**
  * @var btkPoint::Marker
@@ -102,51 +105,61 @@ namespace btk
 /**
  * @class btkForcePlatform
  * @brief Base class for all type of force platform.
+ * @ingroup BTKCommon
  */
  
 /**
  * @class btkForcePlatformType1
  * @brief Force platform Type-1 (6 channels: FX, FY, FZ, PX, PY, MZ).
+ * @ingroup BTKCommon
  */
 
 /**
  * @class btkForcePlatformType2
  * @brief Force platform Type-2 (6 channels: FX, FY, FZ, MX, MY, MZ).
+ * @ingroup BTKCommon
  */
 
 /**
  * @class btkForcePlatformType3
  * @brief Force platform Type-3 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23).
+ * @ingroup BTKCommon
  */
  
 /**
  * @class btkForcePlatformType4
  * @brief Force platform Type-4 (Same as Type-2 + calibration matrix 6 by 6).
+ * @ingroup BTKCommon
  */
  
 /**
  * @class btkForcePlatformType5
  * @brief Force platform Type-5 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23 + calibration matrix 6 (columns) by 8 (rows)).
+ * @ingroup BTKCommon
  */
  
 /**
  * @class btkForcePlatformType6
  * @brief Force platform Type-6 (12 channels: FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4] + calibration matrix 12 by 12).
+ * @ingroup BTKCommon
  */
  
 /**
  * @class btkWrench
  * @brief Represents a wrench as position, force and moment varying during the time.
+ * @ingroup BTKCommon
  */
  
 /**
  * @class btkIMU
  * @brief Container of analog channels representing an inertial measurement unit (IMU).
+ * @ingroup BTKCommon
  */
  
 /**
  * @class btkAcquisition
  * @brief Contains the data related to a biomechanical acquisition.
+ * @ingroup BTKCommon
  */
 /**
  * @var btkAcquisition::Bit8
@@ -172,6 +185,7 @@ namespace btk
 /**
  * @class btkEventCollection
  * @brief Collection of events stored in a list.
+ * @ingroup BTKCommon
  */
 /**
  * @class btkEventCollectionIterator
@@ -181,6 +195,7 @@ namespace btk
 /**
  * @class btkAnalogCollection
  * @brief Collection of analog channels stored in a list.
+ * @ingroup BTKCommon
  */
 /**
  * @class btkAnalogCollectionIterator
@@ -190,6 +205,7 @@ namespace btk
 /**
  * @class btkPointCollection
  * @brief Collection of points stored in a list.
+ * @ingroup BTKCommon
  */
 /**
  * @class btkPointCollectionIterator
@@ -199,6 +215,7 @@ namespace btk
 /**
  * @class btkForcePlatformCollection
  * @brief Collection of force platform stored in a list.
+ * @ingroup BTKCommon
  */
 /**
  * @class btkForcePlatformCollectionIterator
@@ -208,6 +225,7 @@ namespace btk
 /**
  * @class btkWrenchCollection
  * @brief Collection of wrenches stored in a list.
+ * @ingroup BTKCommon
  */
 /**
  * @class btkWrenchCollectionIterator
@@ -217,6 +235,7 @@ namespace btk
 /**
  * @class btkIMUCollection
  * @brief Collection of IMUs stored in a list.
+ * @ingroup BTKCommon
  */
 /**
  * @class btkIMUCollectionIterator
@@ -226,6 +245,7 @@ namespace btk
 /**
  * @class btkMetaData
  * @brief Store data which cannot be embedded within timeseries (calibration matrix, subject informations, ...).
+ * @ingroup BTKCommon
  */
 /**
  * @class btkMetaDataIterator
@@ -234,6 +254,7 @@ namespace btk
 /**
  * @class btkMetaDataInfo
  * @brief Container class to store data of a btkMetaData object.
+ * @ingroup BTKCommon
  */
 /**
  * @var btkMetaDataInfo::Char

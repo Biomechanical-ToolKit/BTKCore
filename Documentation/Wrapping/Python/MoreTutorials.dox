@@ -1,0 +1,110 @@
+/**
+ @page MoreTutorials More Tutorials
+ 
+ <div class="btkmenu">\ref index "Overview"
+ | \ref BuildInstructions "Building instructions"
+ | \ref GettingStarted "Getting started"
+ | \b More \b Tutorials
+ | \ref License
+ </div>
+ 
+ @section TutorialIteratePython Iterate through acquisition's content
+ 
+ To iterate through acquisition's content (points, analogs, events, metadata), it is possible to use a @a for loop with indices, a @a while loop with an iterator or a @a for loop with the generator @a btk.Iterate.
+ 
+ @code{.py}
+    reader = btk.btkAcquisitionFileReader()
+    reader.SetFilename("myfile.c3d")
+    acq = reader.GetOutput()
+    acq.Update()
+    # Indices
+    for i in range(0, acq.GetEvents().GetItemNumber()):
+        print acq.GetEvent(i).GetLabel()
+    # Iterator
+    i = acq.GetEvents().Begin()
+    while i != acq.GetEvents().End():
+      print i.value().GetLabel()
+      i.incr()
+    # btk.Iterate
+    for i in btk.Iterate(acq.GetEvents()):
+        print i.GetLabel()
+    # Other examples
+    for i in btk.Iterate(acq.GetPoints()):
+        print i.GetLabel()
+    for i in btk.Iterate(acq.GetAnalogs()):
+        print i.GetLabel()
+    for i in btk.Iterate(acq.GetMetaData()):
+        for j in btk.Iterate(i):
+            print i.GetLabel() + ":" + j.GetLabel()
+ @endcode
+ 
+ @section TutorialPipelinePython Pipeline design to process biomechanical data
+ 
+ More than extracting data from files, BTK gives you the possibility to process acquisition's data. 
+ To do that, you can access directly to the data or you can use some "filters" (or processing block) which process data for you.
+ 
+ For example, to compute ground reaction forces, moments and positions, you can use the following Python code.
+ 
+ @code{.py}
+    reader = btk.btkAcquisitionFileReader()
+    reader.SetFilename("myfile.c3d")
+    pfe = btk.btkForcePlatformsExtractor()
+    pfe.SetInput(reader.GetOutput())
+    grwf = btk.btkGroundReactionWrenchFilter()
+    grwf.SetInput(pfe.GetOutput())
+    grwc = grwf.GetOutput()
+    grwc.Update()
+ @endcode
+ 
+ With the code above, you read a C3D file, extract force platform object, the compute the ground reaction wrench(es) (i.e. force, moment and position). The idea is to plug the output of a block to the input of another block and automatically the data are processed when you update the pipeline.
+
+ Another example of a powerfull pipeline is when you want to convert a set of files (e.g. Motion Analysis, BTS Bioengineering) to a C3D file.
+ 
+ @code{.py}
+    # Readers
+    readerTRB = btk.btkAcquisitionFileReader()
+    readerTRB.SetFilename("myGait.trb")
+    readerANB = btk.btkAcquisitionFileReader()
+    readerANB.SetFilename("myGait.anb")
+    readerCAL = btk.btkAcquisitionFileReader()
+    readerCAL.SetFilename("forcepla.cal")
+    readerXLS = btk.btkAcquisitionFileReader()
+    readerXLS.SetFilename("myGait.xls")
+    # Merger
+    merger = btk.btkMergeAcquisitionFilter()
+    merger.SetInput(0, readerTRB.GetOutput())
+    merger.SetInput(1, readerANB.GetOutput())
+    merger.SetInput(2, readerCAL.GetOutput())
+    merger.SetInput(3, readerXLS.GetOutput())
+    # Writer
+    writer = btk.btkAcquisitionFileWriter()
+    writer.SetInput(merger.GetOutput())
+    writer.Update()
+ @endcode
+ 
+ You can imagine to use this code in a batch to convert automatically old acquisitions.
+ 
+ All the "filters" are currently listed in the module @ref BTKBasicFilters.
+ 
+ @section TutorialWrappingPython Technology behind BTK for Python
+ 
+ To write the Python package, it was decided to wrap the C++ code instead of writing from scratch all the code. This gives mainly the advantage to maintain only one code and to have the same functions in the C++ and the wrapping(s).
+ 
+ To do that, the software <a href="http://www.swig.org/">SWIG</a> was used as well as the Python package <a href="http://www.numpy.org/">NumPy</a>. The former is used to create the code to wrap C++ object to Python object, while the latter is used to convert native C++ matrices to native Python matrices.
+ If this design gives lots of benefits (e.g. one SWIG file to define wrapped C++ classes/methods), it has the main drawback to not be able to interact directly with some internal objects like the matrices. For example, trying to access to the coordiantes of a marker and modify one value for a specific frame is not possible. Instead of that, several methods are proposed in the Python wrapping.
+ 
+ @code{.py}
+    pt = acq.GetPoint(0)
+    # The following line doesn't work as the NumPy array is created when the method GetValues() is called
+    pt.GetValues()[0,0] = 1.5
+    # Special method to set the value.
+    pt.SetValue(0, 0, 1.5)
+    # Other possibiility but create a temporary NumPy array.
+    # This method should be used if you set lots of values or direclty set a NumPy array created elsewhere.
+    val = pt.GetValues();
+    val[0,0] = 1.5
+    pt.SetValues(val);
+ @endcode
+ 
+ */
+ 
