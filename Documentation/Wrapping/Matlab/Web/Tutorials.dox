@@ -54,27 +54,27 @@
 
  A point in BTK is a generic type which contains 3D data. Then markers, forces, moments, angles, powers are regrouped in this category. For example, to extract markers' trajectories you need to use the function btkGetMarkers like this:
 
-@code
+ @code
  acq = btkReadAcquisition('myAcquisitionFile.c3d');
  markers = btkGetMarkers(acq);
  % markers is a scructure containing the 3D trajectory of each markers.
  % For example, the movement of the center of the knee (KNEE) can be plotted by using:
  plot(markers.KNEE);
-@endcode
+ @endcode
 
  If you load a C3D file already processed which contains kinematics or inverse dynamic (for example, by using PluginGait for the Vicon users), it is very simple to extract angles, forces, moments, powers, etc. You only have to use the corresponding function. All these functions return a structure where each field correspond to the label of the requested points.
 
-@code
+ @code
  angles = btkGetAngles(acq);
  forces = btkGetForces(acq);
  moments = btkGetMoments(acq);
  powers = btkGetPowers(acq);
  % ...
-@endcode
+ @endcode
 
  You can also want to extract only few points from an acquisition and return then as a matrix. This can be realized by using a little script based on BTK functions.
 
-@code
+ @code
  %
  filename = 'myAcquisition.c3d';
  pointsLabel = {'C7', 'CLAV', 'CenterOfMass','KneeJointForce'};
@@ -86,7 +86,7 @@
  for i = 1:num
     extractedPoints(:, 1+(i-1)*3:i*3) = points.(pointsLabel{i});
  end
-@endcode
+ @endcode
 
  @b Note: With BTK, it is not necessary to use the metadata (named group and parameter in a C3D file) TRIAL:ACTUAL_START_FIELD and TRIAL:ACTUAL_END_FIELD to determine what is the index of the first frame and the last frame. There is already some functions for this. The function btkGetFirstFrame returns the index of the first frame. The last frame will be determined by the function btkGetLastFrame which use the formula: <tt>btkGetPointFrameNumber(handle) - btkGetFirstFrame(handle) + 1</tt>.
 
@@ -94,7 +94,7 @@
  
  If you can access to the data, you can also edit them and finally write them in a new acquisition file. It could be useful if you have your own algorithm to compute kinematic and inverse dynamic (or to compute the mean of each parameter over a gait cycle, or ...) and would like to save them in a C3D file to be used in another software like Polygon or Mokka.
 
-@code
+ @code
  % We can use a new acquisition for that
  acq = btkNewAcquisition(20, 2000); % 20 points and 2000 frames
  % Acquisition frequency was 200 Hz
@@ -105,37 +105,37 @@
      btkSetPoint(acq, i, values(i,:,:)): % values: array of 20 by 3 by 2000 
  end
  btkWriteAcquisition(acq, 'myNewAcquisitionFile.c3d');
-@endcode
+ @endcode
 
  The output is then a new C3D file containing the standard parameters required to be used in others softwares.
  
  @subsection AnalogChannels Analog channels
 
-The analog channels contains all the 1D measures. All the sensors measuring voltage, angular velocity, acceleration, etc., should be stored in analog channels. From the hardware point of view, it corresponds to the sensors plugged into the analog to digital converter (ADC) card.
+ The analog channels contains all the 1D measures. All the sensors measuring voltage, angular velocity, acceleration, etc., should be stored in analog channels. From the hardware point of view, it corresponds to the sensors plugged into the analog to digital converter (ADC) card.
+ 
+ To extract the data related to the analog channels, the simplest is the command btkGetAnalogs. As the function btkGetPoints, it returns a structure where each field correspond to a analog channel. If you use a analog sample rate greater than the video frequency, then the number of analog frames is greater than the number of point frames.
+ For example, using the functions btkGetPointFrequency and btkGetAnalogFrequency, you find that the video and analog frequencies are 100 Hz and 1000 Hz respectively. So it means that for 1 video frame you have 10 samples for each analog channels. This can be confirmed by the function btkGetAnalogSampleNumberPerFrame. So, for an acquisition of 10 seconds, you will have 1000 frames for the points and 10000 frames for the analog channels.
+ 
+ An easy way to extract the analog frame corresponding to the video frame can be realized with the following code:
+ @code
+ % acq = btkReadAcquisition ...
+ analogs = btkGetAnalogs(acq);
+ ratio = btkGetAnalogSampleNumberPerFrame(acq);
+ analogsDownsampled = [];
+ labels = fieldnames(analogs);
+ for i = 1:btkGetAnalogNumber(acq)
+   analogsDownsampled.(labels{i}) = analogs.(labels{i})(1:ratio:end);
+   % ...
+ end
+ @endcode
 
-To extract the data related to the analog channels, the simplest is the command btkGetAnalogs. As the function btkGetPoints, it returns a structure where each field correspond to a analog channel. If you use a analog sample rate greater than the video frequency, then the number of analog frames is greater than the number of point frames.
-For example, using the functions btkGetPointFrequency and btkGetAnalogFrequency, you find that the video and analog frequencies are 100 Hz and 1000 Hz respectively. So it means that for 1 video frame you have 10 samples for each analog channels. This can be confirmed by the function btkGetAnalogSampleNumberPerFrame. So, for an acquisition of 10 seconds, you will have 1000 frames for the points and 10000 frames for the analog channels.
-
-An easy way to extract the analog frame corresponding to the video frame can be realized with the following code:
-@code
-% acq = btkReadAcquisition ...
-analogs = btkGetAnalogs(acq);
-ratio = btkGetAnalogSampleNumberPerFrame(acq);
-analogsDownsampled = [];
-labels = fieldnames(analogs);
-for i = 1:btkGetAnalogNumber(acq)
-  analogsDownsampled.(labels{i}) = analogs.(labels{i})(1:ratio:end);
-  % ...
-end
-@endcode
-
-An analog channel contains also of a numerical offset and a scale factor used for the analog to digital conversion or vice-versa. You can find them in the second output of the function btkGetAnalogs. These parameters are important if you want to add analog channels in your acquisition and then save it in a file. These informations should be found in your hardware system or in the configuration of your acquisition software.
+ An analog channel contains also of a numerical offset and a scale factor used for the analog to digital conversion or vice-versa. You can find them in the second output of the function btkGetAnalogs. These parameters are important if you want to add analog channels in your acquisition and then save it in a file. These informations should be found in your hardware system or in the configuration of your acquisition software.
  
  @subsection Events
 
  To extract events, you only have to use the function btkGetEvents which sorts the events by label and by time.
 
-@verbatim
+ @verbatim
  events = btkGetEvents(acq)
 
  events = 
@@ -144,44 +144,49 @@ An analog channel contains also of a numerical offset and a scale factor used fo
      Right_Foot_Strike: [6.1600 7.3000 8.3000]
          Left_Foot_Off: [6.2500 7.4500]
         Right_Foot_Off: [6.9400 7.9800] 
-@endverbatim
+ @endverbatim
 
  @subsection Metadata
 
-A metadata is a generic container to store the acquisition configuration. Or said differently, a metadata contains every informations which cannot be set into markers' trajectories nor analog channels' measures, nor events. For example, if you want to include subject's informations (sex, weight, height, ...) or force platform's configuration (corner's coordinates, analog channel used, ...), then the metadata are the right place to do this. In the C3D file format, the metadata are known as groups and parameters.
-
-To access to the acquisition's metadata, you have to use the function btkGetMetaData which will all the content of the metadata from its root. The output of the function btkGetMetaData is a structure which gives you a tree with children and values.
-For example, if you want to access to the value of the metadata SUBJECTS:WEIGHT, you can use the following code:
-
-@code
-% acq = btkReadAcquisition ...
-md = btkGetMetaData(acq);
-weight = md.children.SUBJECTS.children.WEIGHT.info.values;
-@endcode
-
-If you are not sure that the metadata SUBJECTS:WEIGHT exists you can use the function btkFindMetaData.
-
-@code
-% acq = btkReadAcquisition ...
-md = btkFindMetaData(acq, 'SUBJECTS', 'WEIGHT');
-if (md ~= 0) % exists
-  weight = md.info.values; % the returned structure is directly the content of the metadata SUBJECTS:WEIGHT.
-end
-@endcode
+ A metadata is a generic container to store the acquisition configuration. Or said differently, a metadata contains every informations which cannot be set into markers' trajectories nor analog channels' measures, nor events. For example, if you want to include subject's informations (sex, weight, height, ...) or force platform's configuration (corner's coordinates, analog channel used, ...), then the metadata are the right place to do this. In the C3D file format, the metadata are known as groups and parameters.
+ 
+ To access to the acquisition's metadata, you have to use the function btkGetMetaData which will all the content of the metadata from its root. The output of the function btkGetMetaData is a structure which gives you a tree with children and values.
+ For example, if you want to access to the value of the metadata SUBJECTS:WEIGHT, you can use the following code:
+ 
+ @code
+ % acq = btkReadAcquisition ...
+ md = btkGetMetaData(acq);
+ weight = md.children.SUBJECTS.children.WEIGHT.info.values;
+ @endcode
+ 
+ If you are not sure that the metadata SUBJECTS:WEIGHT exists you can use the function btkFindMetaData.
+ 
+ @code
+ % acq = btkReadAcquisition ...
+ md = btkFindMetaData(acq, 'SUBJECTS', 'WEIGHT');
+ if (md ~= 0) % exists
+   weight = md.info.values; % the returned structure is directly the content of the metadata SUBJECTS:WEIGHT.
+ end
+ @endcode
 
  @section TutorialProcessingData Processing data
  
  One of the goal of BTK is also to give some tools to compute standard biomechanical parameters (kinematic, dynamic inverse, ...). All the existing tools are stored in the BasicFilters section in the help. For example, to determine the ground reaction forces (wrenches) from an acquisition containing a force platform, you only have to use the function btkGetGroundReactionWrenches. This function take into account the type of force platform (AMTI, Kistler, ...) and compute the group reaction wrench (force, moment and position). The point of application of each wrench is calculated from the formula of Shimba (1984) which also was described in Zatsiorsky (2002). Contrary to the center of pressure (COP) the point of wrench application (PWA) is calculated by using also the horizontal moments. The result is a structure with a number of elements equal to the number of force platforms.
 
-@code
+ @code
  % Import acquisition
  acq = btkReadAcquisition('myAcquisition.c3d');
  % Extract analogs values as a matrix.
  av = btkGetAnalogsValues(acq);
  % Filter data
- % The parameters must be multiplied due to the use of filtfilt
- % final order divided by 2 and cut-off frequency multiplied by 1.2465
- [b,a] = butter(4/2, 2 * 30 * 1.2465 / btkGetAnalogFrequency(acq)); 
+ % The parameters must be multiplied due to the use of filtfilt.
+ % The final order is divided by 2 and the cut-off frequency is multiplied by 1.5162
+ % These values are computed from the article:
+ % "Design and responses of Butterworth and critically damped digital filters", 
+ % Robertson & Dowling, Journal of Electromyography and Kinesiology, 2003.
+ % Warning: the factor 1.5162 is dependant of the filter's order and must be 
+ % adapted in consequence for other order using the formula given in the paper.
+ [b,a] = butter(4/2, 2 * 30 * 1.5162 / btkGetAnalogFrequency(acq)); 
  av = filtfilt(b,a, av);
  btkSetAnalogsValues(acq, av);
  % Compute ground reaction wrenches with a threshold of 3 newtons
@@ -195,13 +200,13 @@ end
  Even if BTK is well adapted to open hundred of acquisition files and process them, there is a limitation in the mechanism used to manage memory between the C++ objects and Matlab. If you open too many acquisitions without releasing the memory, Matlab can send you an "Out of Memory" error and may crash... (see @ref q3 "FAQ"). One way to correct this problem is to use the function btkDeleteAcquisition which will delete the C++ object and then freed the associated memory. You can see this function as a "Close" function.
  
  @code
-  % acquisitionsFilename: Large list of filenames
-  for 1:length(acquisitionsFilename)
-    acq = btkReadAcquistion(acquisitionsFilename{i});
-    % ... All of your code processing the acquisition's data
-    btkDeleteAcquisition(acq);
-  end
-  @endcode
+ % acquisitionsFilename: Large list of filenames
+ for 1:length(acquisitionsFilename)
+   acq = btkReadAcquistion(acquisitionsFilename{i});
+   % ... All of your code processing the acquisition's data
+   btkDeleteAcquisition(acq);
+ end
+ @endcode
  
  @section References References
 
