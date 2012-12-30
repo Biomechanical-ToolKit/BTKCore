@@ -63,7 +63,7 @@
   #error Development platform not supported
 #endif
 
-// Check if we can use the memory mapped filestream system
+// Check if we can use the memory mapped file stream system
 #if defined HAVE_SYS_MMAP || defined _MSC_VER
   #include "btkBinaryFileStream_mmfstream.h"
   namespace btk {typedef btk::mmfstream RawFileStream;};

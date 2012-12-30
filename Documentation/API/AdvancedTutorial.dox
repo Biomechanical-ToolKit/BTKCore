@@ -303,7 +303,7 @@ namespace btk
 };
 @endcode
 
-Finally, the methods @c Read and @c Write contain the code to extract the data from the file to the acquisition or from the acquisition to the file respectively. The code will require to use a filestream. By default, BTK uses its own class for the binary file: btk::BinaryFileStream and the class std::fstream for the ASCII file. In the case of a binary file you can use this code:
+Finally, the methods @c Read and @c Write contain the code to extract the data from the file to the acquisition or from the acquisition to the file respectively. The code will require to use a file stream. By default, BTK uses its own class for the binary file: btk::BinaryFileStream and the class std::fstream for the ASCII file. In the case of a binary file you can use this code:
 @code
 void DummyFileIO::Read(const std::string& filename, Acquisition::Pointer output)
 {
@@ -326,11 +326,11 @@ void DummyFileIO::Read(const std::string& filename, Acquisition::Pointer output)
     else if (!bifs.IsOpen())
       excmsg = "Invalid file path.";
     else if(bifs.Bad())
-      excmsg = "Loss of integrity of the filestream.";
+      excmsg = "Loss of integrity of the file stream.";
     else if(bifs.Fail())
       excmsg = "Internal logic operation error on the stream associated with the file.";
     else
-      excmsg = "Unknown error associated with the filestream.";
+      excmsg = "Unknown error associated with the file stream.";
     
     if (bifs.IsOpen()) bifs.Close(); 
     throw(DummyFileIOException(excmsg));

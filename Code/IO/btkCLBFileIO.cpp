@@ -351,11 +351,11 @@ namespace btk
       else if (!bifs.IsOpen())
         excmsg = "Invalid file path.";
       else if(bifs.Bad())
-        excmsg = "Loss of integrity of the filestream.";
+        excmsg = "Loss of integrity of the file stream.";
       else if(bifs.Fail())
         excmsg = "Internal logic operation error on the stream associated with the file.";
       else
-        excmsg = "Unknown error associated with the filestream.";
+        excmsg = "Unknown error associated with the file stream.";
       
       if (bifs.IsOpen()) bifs.Close();
       throw(CLBFileIOException(excmsg));

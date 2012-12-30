@@ -1029,11 +1029,11 @@ namespace btk
       else if (ibfs->EndFile())
         excmsg = "Unexpected end of file";
       else if(ibfs->Bad())
-        excmsg = "Loss of integrity of the filestream";
+        excmsg = "Loss of integrity of the file stream";
       else if(ibfs->Fail())
         excmsg = "Internal logic operation error on the stream associated with the file";
       else
-        excmsg = "Unknown error associated with the filestream";
+        excmsg = "Unknown error associated with the file stream";
       
       //if (ifs.is_open()) ifs.close();     
       if (ibfs) delete ibfs;

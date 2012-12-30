@@ -118,11 +118,11 @@ namespace btk
       else if (!ifs.is_open())
         excmsg = "Invalid file path.";
       else if(ifs.bad())
-        excmsg = "Loss of integrity of the filestream.";
+        excmsg = "Loss of integrity of the file stream.";
       else if(ifs.fail())
         excmsg = "Internal logic operation error on the stream associated with the file.";
       else
-        excmsg = "Unknown error associated with the filestream.";
+        excmsg = "Unknown error associated with the file stream.";
     
       if (ifs.is_open()) ifs.close(); 
       throw XMOVEFileIOException(excmsg);

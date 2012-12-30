@@ -48,7 +48,7 @@ namespace btk
 {
   /**
    * @typedef RawFileStream
-   * Raw filestream used by the btk::BinaryFileStream class. Depending
+   * Raw file stream used by the btk::BinaryFileStream class. Depending
    * your configuration, this raw stream will correspond to btk::mmfstream
    * (default) or std::fstream. The class btk::mmfstream uses the memory 
    * mapped file mechanism.
@@ -227,7 +227,7 @@ namespace btk
   
   /**
    * @fn const RawFileStream* BinaryFileStream::GetStream() const
-   * Return the raw stream associated with this binary filestream.
+   * Return the raw stream associated with this binary file stream.
    */
   
   /**
@@ -1294,12 +1294,12 @@ namespace btk
   
   /** 
    * @class NativeBinaryFileStream btkBinaryFileStream.h
-   * @brief Native binary filestream chosen by the used compiler.
+   * @brief Native binary file stream chosen by the used compiler.
    *
-   * Depending the processor, the native binary filestream will be:
-   *  - the VAX Little Endian filestream ()
-   *  - the IEEE Little Endian filestream
-   *  - the IEEE Big Endian filestream
+   * Depending the processor, the native binary file stream will be:
+   *  - the VAX Little Endian file stream ()
+   *  - the IEEE Little Endian file stream
+   *  - the IEEE Big Endian file stream
    *
    * @sa BinaryFileStream, VAXLittleEndianBinaryFileStream, IEEELittleEndianBinaryFileStream, IEEEBigEndianBinaryFileStream
    */
