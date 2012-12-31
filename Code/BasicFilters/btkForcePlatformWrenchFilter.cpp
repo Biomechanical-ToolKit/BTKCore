@@ -136,7 +136,6 @@ namespace btk
   void ForcePlatformWrenchFilter::GenerateData()
   {
     WrenchCollection::Pointer output = this->GetOutput();
-    output->Clear();
     ForcePlatformCollection::Pointer input = this->GetInput();
     if (input.get() != 0)
     {
@@ -146,12 +145,23 @@ namespace btk
         ++inc;
         if ((*it)->GetChannelNumber() == 0)
         {
-          btkErrorMacro("Unexpected number of analog channels (0) for force platfom #" + ToString(inc));
+          btkErrorMacro("Unexpected number of analog channels (0) for force platform #" + ToString(inc));
           continue;
         }
         int frameNumber = (*it)->GetChannel(0)->GetFrameNumber();
-        Wrench::Pointer wrh = Wrench::New(this->GetWrenchPrefix() + ToString(inc), frameNumber);
-        output->InsertItem(wrh);
+        Wrench::Pointer wrh;
+        if (inc <= output->GetItemNumber())
+        {
+          wrh = output->GetItem(inc-1);
+          wrh->SetFrameNumber(frameNumber);
+          output->Modified();
+        }
+        else
+        {
+          wrh = Wrench::New(this->GetWrenchPrefix() + ToString(inc), frameNumber);
+          output->InsertItem(wrh);
+        }
+        wrh->Modified();
         // Residuals
         wrh->GetPosition()->GetResiduals().setZero(frameNumber);        
         wrh->GetForce()->GetResiduals().setZero(frameNumber);
