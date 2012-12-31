@@ -141,6 +141,23 @@ CXXTEST_SUITE(AcquisitionTest)
     TS_ASSERT_EQUALS(test->GetEvent(2)->GetFrame(), 314);
     TS_ASSERT_DELTA(test->GetEvent(2)->GetTime(), 3.14, 1e-11);
   }
+  
+  CXXTEST_TEST(ResizeParent)
+  {
+    btk::Acquisition::Pointer test = btk::Acquisition::New();
+    test->GetPoints()->InsertItem(btk::Point::New());
+    test->GetPoints()->InsertItem(btk::Point::New());
+    test->GetPoints()->InsertItem(btk::Point::New());
+    test->Resize(3,5);
+    TS_ASSERT_EQUALS(test->GetPointNumber(), 3);
+    TS_ASSERT_EQUALS(test->GetPointFrameNumber(), 5);
+    TS_ASSERT_EQUALS(test->GetPoint(0)->GetFrameNumber(), 5);
+    TS_ASSERT_EQUALS(test->GetPoint(1)->GetFrameNumber(), 5);
+    TS_ASSERT_EQUALS(test->GetPoint(2)->GetFrameNumber(), 5);
+    TS_ASSERT_EQUALS(test->GetPoint(0)->GetParent(), test.get());
+    TS_ASSERT_EQUALS(test->GetPoint(1)->GetParent(), test.get());
+    TS_ASSERT_EQUALS(test->GetPoint(2)->GetParent(), test.get());
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(AcquisitionTest)
@@ -154,4 +171,5 @@ CXXTEST_TEST_REGISTRATION(AcquisitionTest, InitAnalogOnly)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, ResizeFromEnd)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, RemoveLastPoint)
 CXXTEST_TEST_REGISTRATION(AcquisitionTest, SetFirstFrameAdaptEvent)
+CXXTEST_TEST_REGISTRATION(AcquisitionTest, ResizeParent)
 #endif

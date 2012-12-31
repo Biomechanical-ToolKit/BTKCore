@@ -884,43 +884,49 @@ namespace btk
   
   /**
    * Resize the number of points.
+   * Using this method will set the object as modified even if the given number of points is the same than in the acquisition.
+   * This method forces the analog channels to have this object (the acquisition) as their parent.
    */
   void Acquisition::ResizePointNumber(int pointNumber)
   {
-    if (pointNumber == this->GetPointNumber())
-      return;
-    else if (pointNumber < this->GetPointNumber())
+    // Reduce the number of items if necessary
+    if (pointNumber < this->GetPointNumber())
       this->m_Points->SetItemNumber(pointNumber);
-    else
+    // Force the existing items to have this object as their parent
+    for (PointIterator it = this->BeginPoint() ; it != this->EndPoint() ; ++it)
+      (*it)->SetParent(this);
+    // Create new points if necessary
+    for (int inc = this->GetPointNumber() ; inc < pointNumber ; ++inc)
     {
-      for (int inc = this->GetPointNumber() ; inc < pointNumber ; ++inc)
-      {
-        Point::Pointer pt = Point::New(this->m_PointFrameNumber == 0 ? 1 : this->m_PointFrameNumber);
-        pt->SetParent(this);
-        this->m_Points->InsertItem(pt);
-      }
+      Point::Pointer pt = Point::New(this->m_PointFrameNumber == 0 ? 1 : this->m_PointFrameNumber);
+      pt->SetParent(this);
+      this->m_Points->InsertItem(pt);
     }
+    // Set the object as modified
     this->Modified();
   };
   
   /**
    * Resize the number of analog channels.
+   * Using this method will set the object as modified even if the given number of analog channels is the same than in the acquisition.
+   * This method forces the analog channels to have this object (the acquisition) as their parent.
    */
   void Acquisition::ResizeAnalogNumber(int analogNumber)
   {
-    if (analogNumber == this->GetAnalogNumber())
-      return;
-    else if (analogNumber < this->GetAnalogNumber())
+    // Reduce the number of items if necessary
+    if (analogNumber < this->GetAnalogNumber())
       this->m_Analogs->SetItemNumber(analogNumber);
-    else
+    // Force the existing items to have this object as their parent
+    for (AnalogIterator it = this->BeginAnalog() ; it != this->EndAnalog() ; ++it)
+      (*it)->SetParent(this);
+    // Create new analog channels if necessary
+    for (int inc = this->GetAnalogNumber() ; inc < analogNumber ; ++inc)
     {
-      for (int inc = this->GetAnalogNumber() ; inc < analogNumber ; ++inc)
-      {
-        Analog::Pointer pt = Analog::New((this->m_PointFrameNumber == 0 ? 1 : this->m_PointFrameNumber) * this->m_AnalogSampleNumberPerPointFrame);
-        pt->SetParent(this);
-        this->m_Analogs->InsertItem(pt);
-      }
+      Analog::Pointer pt = Analog::New((this->m_PointFrameNumber == 0 ? 1 : this->m_PointFrameNumber) * this->m_AnalogSampleNumberPerPointFrame);
+      pt->SetParent(this);
+      this->m_Analogs->InsertItem(pt);
     }
+    // Set the object as modified
     this->Modified();
   };
   
