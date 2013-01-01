@@ -9,6 +9,7 @@
 #include "XMLReadingMachine.h"
 #include "XMLWritingMachine.h"
 #include <iomanip>
+#include <cstdio>
 
 namespace Open3DMotion
 {

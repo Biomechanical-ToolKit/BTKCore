@@ -6,7 +6,7 @@
 --*/
 
 #include "Open3DMotion/OpenORM/TreeValue.h"
-#include <string>
+#include <cstring>
 
 namespace Open3DMotion
 {

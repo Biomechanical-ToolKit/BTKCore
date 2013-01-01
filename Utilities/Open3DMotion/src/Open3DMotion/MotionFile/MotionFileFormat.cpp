@@ -6,6 +6,7 @@
 --*/
 
 #include "MotionFileFormat.h"
+#include <cstring>
 
 namespace Open3DMotion
 {

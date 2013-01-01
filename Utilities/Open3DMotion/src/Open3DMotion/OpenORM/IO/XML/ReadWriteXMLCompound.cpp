@@ -10,6 +10,7 @@
 #include "XMLWritingMachine.h"
 #include <set>
 #include <pugixml.hpp>
+#include <memory>
 
 namespace Open3DMotion
 {

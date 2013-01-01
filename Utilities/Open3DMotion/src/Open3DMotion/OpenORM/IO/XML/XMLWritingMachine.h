@@ -11,6 +11,8 @@
 #include "XMLReadWriteMachine.h"
 #include "Open3DMotion/OpenORM/TreeValue.h"
 
+#include <ostream>
+
 namespace Open3DMotion
 {
 	class XMLWritingMachine : public XMLReadWriteMachine

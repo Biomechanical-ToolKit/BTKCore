@@ -10,6 +10,7 @@
 #include "XMLWritingMachine.h"
 #include "Open3DMotion/OpenORM/Leaves/MemoryHandlerBasic.h"
 #include <pugixml.hpp>
+#include <cstring>
 
 extern "C"
 {

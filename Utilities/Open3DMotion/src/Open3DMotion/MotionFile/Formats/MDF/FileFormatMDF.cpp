@@ -14,6 +14,8 @@
 #include "Open3DMotion/MotionFile/Formats/MDF/ForcePlateMDF.h"
 
 #include <sstream>
+#include <memory>
+#include <cstring>
 
 namespace Open3DMotion
 {

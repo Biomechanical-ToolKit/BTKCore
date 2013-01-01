@@ -9,6 +9,7 @@
 #include "XMLReadingMachine.h"
 #include "XMLWritingMachine.h"
 #include <pugixml.hpp>
+#include <memory>
 
 namespace Open3DMotion
 {
