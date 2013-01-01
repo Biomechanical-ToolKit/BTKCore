@@ -896,7 +896,8 @@ namespace btk
     for (PointIterator it = this->BeginPoint() ; it != this->EndPoint() ; ++it)
       (*it)->SetParent(this);
     // Create new points if necessary
-    for (int inc = this->GetPointNumber() ; inc < pointNumber ; ++inc)
+    const int numPoints = this->GetPointNumber();
+    for (int inc = numPoints ; inc < pointNumber ; ++inc)
     {
       Point::Pointer pt = Point::New(this->m_PointFrameNumber == 0 ? 1 : this->m_PointFrameNumber);
       pt->SetParent(this);
@@ -920,7 +921,8 @@ namespace btk
     for (AnalogIterator it = this->BeginAnalog() ; it != this->EndAnalog() ; ++it)
       (*it)->SetParent(this);
     // Create new analog channels if necessary
-    for (int inc = this->GetAnalogNumber() ; inc < analogNumber ; ++inc)
+    const int numAnalogs = this->GetAnalogNumber();
+    for (int inc = numAnalogs ; inc < analogNumber ; ++inc)
     {
       Analog::Pointer pt = Analog::New((this->m_PointFrameNumber == 0 ? 1 : this->m_PointFrameNumber) * this->m_AnalogSampleNumberPerPointFrame);
       pt->SetParent(this);

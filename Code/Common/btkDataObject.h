@@ -38,6 +38,7 @@
 
 #include "btkObject.h"
 
+#include <list>
 #include <string>
 
 namespace btk
@@ -59,23 +60,27 @@ namespace btk
     
   protected:
     DataObject()
-    : Object()
+    : Object(), m_Children()
     {
       this->mp_Parent = 0;
       this->mp_Source = 0;
     };
     DataObject(const DataObject& toCopy)
-    : Object(toCopy) 
+    : Object(toCopy), m_Children()
     {
       this->mp_Parent = 0;
       this->mp_Source = 0;
     };
-    virtual ~DataObject() {};
-    
+    virtual ~DataObject();
+        
   private:
+    void AddChild(DataObject* child);
+    void RemoveChild(DataObject* child);
+    
     DataObject& operator=(const DataObject& ); // Not implemented.
     
     DataObject* mp_Parent;
+    std::list<DataObject*> m_Children;
     ProcessObject* mp_Source;
     
     friend class ProcessObject;

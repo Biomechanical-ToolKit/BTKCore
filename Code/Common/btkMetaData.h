@@ -124,10 +124,10 @@ namespace btk
     bool HasMetaDataAsParent() const {return this->m_MetaDataParentAssigned;};
     void SetParent(DataObject* parent = 0) {this->m_MetaDataParentAssigned = false; this->DataObject::SetParent(parent);};
     void SetParent(MetaData* parent = 0) {this->m_MetaDataParentAssigned = true; this->DataObject::SetParent(parent);};
-    MetaData::Iterator Begin() {return this->m_Children.begin();};
-    MetaData::ConstIterator Begin() const {return this->m_Children.begin();};
-    MetaData::Iterator End() {return this->m_Children.end();};
-    MetaData::ConstIterator End() const {return this->m_Children.end();};
+    MetaData::Iterator Begin() {return this->m_Tree.begin();};
+    MetaData::ConstIterator Begin() const {return this->m_Tree.begin();};
+    MetaData::Iterator End() {return this->m_Tree.end();};
+    MetaData::ConstIterator End() const {return this->m_Tree.end();};
     BTK_COMMON_EXPORT MetaData::Pointer GetChild(int idx);
     BTK_COMMON_EXPORT MetaData::ConstPointer GetChild(int idx) const;
     BTK_COMMON_EXPORT MetaData::Pointer GetChild(const std::string& label);
@@ -143,8 +143,8 @@ namespace btk
     BTK_COMMON_EXPORT void RemoveChild(int idx);
     BTK_COMMON_EXPORT void RemoveChild(const std::string& label);
     BTK_COMMON_EXPORT void ClearChildren();
-    bool HasChildren() const {return (this->m_Children.size() != 0);};
-    int GetChildNumber() const {return static_cast<int>(this->m_Children.size());};
+    bool HasChildren() const {return (this->m_Tree.size() != 0);};
+    int GetChildNumber() const {return static_cast<int>(this->m_Tree.size());};
     BTK_COMMON_EXPORT Iterator FindChild(const std::string& label);
     BTK_COMMON_EXPORT ConstIterator FindChild(const std::string& label) const;
     BTK_COMMON_EXPORT Pointer Clone() const;
@@ -214,7 +214,7 @@ namespace btk
     bool m_Unlocked;
     MetaDataInfo::Pointer m_Info;
     bool m_MetaDataParentAssigned;
-    std::list<MetaData::Pointer> m_Children;
+    std::list<MetaData::Pointer> m_Tree;
     
     MetaData(const MetaData& ); // Not implemented.
     MetaData& operator=(const MetaData& ); // Not implemented.

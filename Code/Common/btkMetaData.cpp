@@ -265,7 +265,7 @@ namespace btk
    */
   MetaData::Pointer MetaData::GetChild(int idx)
   {
-    if (idx >= static_cast<int>(this->m_Children.size()))
+    if (idx >= static_cast<int>(this->m_Tree.size()))
       throw(OutOfRangeException("MetaData::GetChild"));
     MetaData::Iterator it = this->Begin();
     std::advance(it, idx);
@@ -277,7 +277,7 @@ namespace btk
    */
   MetaData::ConstPointer MetaData::GetChild(int idx) const
   {
-    if (idx >= static_cast<int>(this->m_Children.size()))
+    if (idx >= static_cast<int>(this->m_Tree.size()))
       throw(OutOfRangeException("MetaData::GetChild"));
     MetaData::ConstIterator it = this->Begin();
     std::advance(it, idx);
@@ -334,7 +334,7 @@ namespace btk
       return false;
     }
     entry->SetParent(this);
-    this->m_Children.insert(loc, entry);
+    this->m_Tree.insert(loc, entry);
     this->Modified();
     return true;
   }
@@ -345,7 +345,7 @@ namespace btk
   bool MetaData::InsertChild(int idx, MetaData::Pointer entry)
   {
     Iterator it = this->Begin();
-    if (idx > static_cast<int>(this->m_Children.size()))
+    if (idx > static_cast<int>(this->m_Tree.size()))
     {
       btkErrorMacro("Out of range, the entry is appended");
       it = this->End();
@@ -365,7 +365,7 @@ namespace btk
       btkErrorMacro("Impossible to set an empty entry");
       return;
     }
-    if (idx >= static_cast<int>(this->m_Children.size()))
+    if (idx >= static_cast<int>(this->m_Tree.size()))
     {
       btkErrorMacro("Out of range");
       return;
@@ -393,7 +393,7 @@ namespace btk
       return Pointer();
     }
     Pointer entry = *loc;
-    this->m_Children.erase(loc);
+    this->m_Tree.erase(loc);
     this->Modified();
     return entry;
   };
@@ -404,7 +404,7 @@ namespace btk
    */
   MetaData::Pointer MetaData::TakeChild(int idx)
   {
-    if (idx >= static_cast<int>(this->m_Children.size()))
+    if (idx >= static_cast<int>(this->m_Tree.size()))
     {
       btkErrorMacro("Out of range");
       return Pointer();
@@ -412,7 +412,7 @@ namespace btk
     Iterator it = this->Begin();
     std::advance(it, idx);
     Pointer entry = *it;
-    this->m_Children.erase(it);
+    this->m_Tree.erase(it);
     this->Modified();
     return entry;
   };
@@ -430,7 +430,7 @@ namespace btk
       return Pointer();
     }
     Pointer entry = *it;
-    this->m_Children.erase(it);
+    this->m_Tree.erase(it);
     this->Modified();
     return entry;
   };
@@ -442,7 +442,7 @@ namespace btk
   {
     if (loc == this->End())
       return this->End();
-    Iterator temp = this->m_Children.erase(loc);
+    Iterator temp = this->m_Tree.erase(loc);
     this->Modified();
     return temp;
   };
@@ -452,11 +452,11 @@ namespace btk
    */
   void MetaData::RemoveChild(int idx)
   {
-    if (idx >= static_cast<int>(this->m_Children.size()))
+    if (idx >= static_cast<int>(this->m_Tree.size()))
       return;
     Iterator it = this->Begin();
     std::advance(it, idx);
-    this->m_Children.erase(it);
+    this->m_Tree.erase(it);
     this->Modified();
   };
 
@@ -468,7 +468,7 @@ namespace btk
     Iterator it = this->FindChild(label);
     if (it == this->End())
       return;
-    this->m_Children.erase(it);
+    this->m_Tree.erase(it);
     this->Modified();
   };
   
@@ -477,9 +477,9 @@ namespace btk
    */ 
   void MetaData::ClearChildren()
   {
-    if (this->m_Children.empty())
+    if (this->m_Tree.empty())
       return;
-    this->m_Children.clear();
+    this->m_Tree.clear();
     this->Modified();
   };
   
@@ -582,7 +582,7 @@ namespace btk
                      const std::string& desc, bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::Pointer()),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -595,7 +595,7 @@ namespace btk
                      const std::string& desc, bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -608,7 +608,7 @@ namespace btk
                      const std::string& desc, bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -621,7 +621,7 @@ namespace btk
                      const std::string& desc, bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -634,7 +634,7 @@ namespace btk
                      const std::string& desc, bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -648,7 +648,7 @@ namespace btk
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -662,7 +662,7 @@ namespace btk
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -676,7 +676,7 @@ namespace btk
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -690,7 +690,7 @@ namespace btk
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -704,7 +704,7 @@ namespace btk
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(dim, val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -718,7 +718,7 @@ namespace btk
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(dim, val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -732,7 +732,7 @@ namespace btk
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(dim, val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;
@@ -746,7 +746,7 @@ namespace btk
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
   m_Info(MetaDataInfo::New(dim, val)),
-  m_Children(std::list<MetaData::Pointer>(0))
+  m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
     this->m_MetaDataParentAssigned = false;

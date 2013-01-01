@@ -76,7 +76,13 @@ namespace btk
   {
     if (parent == this->mp_Parent)
       return;
-    this->mp_Parent = parent;
+    else if (parent == this)
+    {
+      btkErrorMacro("Impossible to set itself as its parent.");
+      return;
+    }
+    if (this->mp_Parent != 0) this->mp_Parent->RemoveChild(this);
+    if (parent != 0) parent->AddChild(this);
     this->Modified();
   };
   
@@ -101,8 +107,16 @@ namespace btk
   
   /**
    * @fn DataObject::~DataObject()
-   * Destructor (do nothing).
+   * Destructor.
    */
+  DataObject::~DataObject()
+  {
+    if (this->mp_Parent != 0)
+      this->mp_Parent->RemoveChild(this);
+    for (std::list<DataObject*>::iterator it = this->m_Children.begin() ; it != this->m_Children.end() ; ++it)
+      (*it)->mp_Parent = 0;
+    this->m_Children.clear();
+  };
   
   /**
    * Tells to its parent that this DataObject has been modified.
@@ -111,8 +125,34 @@ namespace btk
   void DataObject::Modified()
   {
     this->Object::Modified();
-    if (this->mp_Parent)
+    if (this->mp_Parent != 0)
       this->mp_Parent->Modified();
+  };
+  
+  void DataObject::AddChild(DataObject* child)
+  {
+    for (std::list<DataObject*>::iterator it = this->m_Children.begin() ; it != this->m_Children.end() ; ++it)
+    {
+      if (*it == child)
+        return;
+    }
+    child->mp_Parent = this;
+    this->m_Children.push_back(child);
+    this->Modified();
+  };
+  
+  void DataObject::RemoveChild(DataObject* child)
+  {
+    for (std::list<DataObject*>::iterator it = this->m_Children.begin() ; it != this->m_Children.end() ; ++it)
+    {
+      if (*it == child)
+      {
+        child->mp_Parent = 0;
+        this->m_Children.erase(it);
+        this->Modified();
+        break;
+      }
+    }
   };
   
   /**
