@@ -15,4 +15,4 @@ void generateRawData(Eigen::Matrix<double, Eigen::Dynamic, 1>& data)
           0.126489024340900;
 };
 
-#endif EigenFilterUtil_h
+#endif // EigenFilterUtil_h

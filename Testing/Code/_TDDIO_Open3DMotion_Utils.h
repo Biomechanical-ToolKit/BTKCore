@@ -14,11 +14,11 @@ void btk_o3dm_ADemo1_test(const std::string& filename)
   btk::Acquisition::Pointer acq = reader->GetOutput();
   
   TS_ASSERT_EQUALS(acq->GetFirstFrame(), 1);
-  TS_ASSERT_EQUALS(acq->GetPointNumber(), o3dm_ADemo1_nummarkers);
-  TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), o3dm_ADemo1_numframes_marker);
+  TS_ASSERT_EQUALS(acq->GetPointNumber(), (int)o3dm_ADemo1_nummarkers);
+  TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), (int)o3dm_ADemo1_numframes_marker);
   TS_ASSERT_EQUALS(acq->GetPointFrequency(), o3dm_ADemo1_rateHz_marker);
-  TS_ASSERT_EQUALS(acq->GetAnalogNumber(), o3dm_ADemo1_numEMG + 8);
-  TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), o3dm_ADemo1_numframes_marker * 2);
+  TS_ASSERT_EQUALS(acq->GetAnalogNumber(), (int)o3dm_ADemo1_numEMG + 8);
+  TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), (int)o3dm_ADemo1_numframes_marker * 2);
   TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), o3dm_ADemo1_rateHz_EMG);
   TS_ASSERT_EQUALS(acq->GetNumberAnalogSamplePerFrame(), 2);
   

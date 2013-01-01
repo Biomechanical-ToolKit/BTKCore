@@ -48,7 +48,7 @@ namespace btkEigen
 
   // Note: The following code is largely inspired by the code in the Python module SciPy.signal.filter_design 
 
-  typedef enum {Butterworth = 1} FilterType;
+  typedef enum {Elliptic = 0, Butterworth, ChebyshevI, ChebyshevII, Bessel} FilterType;
   typedef enum {LowPass = 0, HighPass, BandPass, BandStop} BandType;
 
   bool iirfilter(Eigen::Matrix<double, Eigen::Dynamic, 1>* b, Eigen::Matrix<double, Eigen::Dynamic, 1>* a, int order, double Wn, double* rp = NULL, double* rs = NULL, BandType btype = LowPass, FilterType ftype = Butterworth);
@@ -361,12 +361,12 @@ namespace btkEigen
     double bw = 0.0;
     switch (btype)
     {
-    case 0: // lowpass
-    case 1: // highpass
+    case LowPass:
+    case HighPass:
       wo = warped[0];
       break;
-    case 2: // bandpass
-    case 3: // bandstop
+    case BandPass:
+    case BandStop:
       bw = warped[1] - warped[0];
       wo = sqrt(warped[0] * warped[1]);
       break;
@@ -380,40 +380,40 @@ namespace btkEigen
     double k = 0.0;
     switch (ftype)
     {
-    case 1: // Butterworth
+    case Butterworth:
       buttap(&z, &p, &k, order);
       break;
   
     /*
-    case 0: // elliptic
+    case Elliptic:
       if ((rp == NULL) || (rs == NULL))
       {
         btkErrorMacro("Both rp and rs must be provided to design an elliptic filter.");
         return false;
       }
       break;
-    case 2: // Chebyshev I
+    case ChebyshevI:
       if (rp == NULL)
       {
         btkErrorMacro("Passband ripple (rp) must be provided to design a Chebyshev I filter.");
         return false;
       }
       break;
-    case 3: // Chebyshev II
+    case ChebyshevII:
       if (rs == NULL)
       {
         btkErrorMacro("Stopband attenuation (rs) must be provided to design an Chebyshev II filter.");
         return false;
       }
       break;
-    case 4: // Bessel
+    case Bessel:
       break;
     */
   
-    case 0:
-    case 2:
-    case 3:
-    case 4:
+    case Elliptic:
+    case ChebyshevI:
+    case ChebyshevII:
+    case Bessel:
       btkErrorMacro("The chosen filter is not yet implemented. Please contact the developers for more informations.");
       return false;
       break;
