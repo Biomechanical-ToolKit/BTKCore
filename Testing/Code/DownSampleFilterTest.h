@@ -19,9 +19,18 @@ CXXTEST_SUITE(DownsampleFilterTest)
     ds->SetInput(w);
     ds->SetUpDownRatio(1);
     ds->Update();
-    TS_ASSERT_EQUALS(ds->GetOutput()->GetPosition(), w->GetPosition());
-    TS_ASSERT_EQUALS(ds->GetOutput()->GetForce(), w->GetForce());
-    TS_ASSERT_EQUALS(ds->GetOutput()->GetMoment(), w->GetMoment());
+    for (int i = 0 ; i < 10 ; ++i)
+    {
+      TS_ASSERT_EQUALS(ds->GetOutput()->GetPosition()->GetValues()(i,0), w->GetPosition()->GetValues()(i,0));
+      TS_ASSERT_EQUALS(ds->GetOutput()->GetPosition()->GetValues()(i,1), w->GetPosition()->GetValues()(i,1));
+      TS_ASSERT_EQUALS(ds->GetOutput()->GetPosition()->GetValues()(i,2), w->GetPosition()->GetValues()(i,2));
+      TS_ASSERT_EQUALS(ds->GetOutput()->GetForce()->GetValues()(i,0), w->GetForce()->GetValues()(i,0));
+      TS_ASSERT_EQUALS(ds->GetOutput()->GetForce()->GetValues()(i,1), w->GetForce()->GetValues()(i,1));
+      TS_ASSERT_EQUALS(ds->GetOutput()->GetForce()->GetValues()(i,2), w->GetForce()->GetValues()(i,2));
+      TS_ASSERT_EQUALS(ds->GetOutput()->GetMoment()->GetValues()(i,0), w->GetMoment()->GetValues()(i,0));
+      TS_ASSERT_EQUALS(ds->GetOutput()->GetMoment()->GetValues()(i,1), w->GetMoment()->GetValues()(i,1));
+      TS_ASSERT_EQUALS(ds->GetOutput()->GetMoment()->GetValues()(i,2), w->GetMoment()->GetValues()(i,2));
+    }
   };
   
   CXXTEST_TEST(WrenchRatioOneOverTwo)
@@ -67,8 +76,21 @@ CXXTEST_SUITE(DownsampleFilterTest)
     ds->SetUpDownRatio(1);
     ds->Update();
     TS_ASSERT_EQUALS(ds->GetOutput()->GetItemNumber(), 3);
-    for (int i = 0 ; i < 3 ; ++i)
-      TS_ASSERT_EQUALS(ds->GetOutput()->GetItem(i), wc->GetItem(i));
+    for (int j = 0 ; j < 3 ; ++j)
+    {
+      for (int i = 0 ; i < 10 ; ++i)
+      {
+        TS_ASSERT_EQUALS(ds->GetOutput()->GetItem(j)->GetPosition()->GetValues()(i,0), wc->GetItem(j)->GetPosition()->GetValues()(i,0));
+        TS_ASSERT_EQUALS(ds->GetOutput()->GetItem(j)->GetPosition()->GetValues()(i,1), wc->GetItem(j)->GetPosition()->GetValues()(i,1));
+        TS_ASSERT_EQUALS(ds->GetOutput()->GetItem(j)->GetPosition()->GetValues()(i,2), wc->GetItem(j)->GetPosition()->GetValues()(i,2));
+        TS_ASSERT_EQUALS(ds->GetOutput()->GetItem(j)->GetForce()->GetValues()(i,0), wc->GetItem(j)->GetForce()->GetValues()(i,0));
+        TS_ASSERT_EQUALS(ds->GetOutput()->GetItem(j)->GetForce()->GetValues()(i,1), wc->GetItem(j)->GetForce()->GetValues()(i,1));
+        TS_ASSERT_EQUALS(ds->GetOutput()->GetItem(j)->GetForce()->GetValues()(i,2), wc->GetItem(j)->GetForce()->GetValues()(i,2));
+        TS_ASSERT_EQUALS(ds->GetOutput()->GetItem(j)->GetMoment()->GetValues()(i,0), wc->GetItem(j)->GetMoment()->GetValues()(i,0));
+        TS_ASSERT_EQUALS(ds->GetOutput()->GetItem(j)->GetMoment()->GetValues()(i,1), wc->GetItem(j)->GetMoment()->GetValues()(i,1));
+        TS_ASSERT_EQUALS(ds->GetOutput()->GetItem(j)->GetMoment()->GetValues()(i,2), wc->GetItem(j)->GetMoment()->GetValues()(i,2));
+      }
+    }
   };
   
   CXXTEST_TEST(WrenchCollectionRatioOneOverTwo)
