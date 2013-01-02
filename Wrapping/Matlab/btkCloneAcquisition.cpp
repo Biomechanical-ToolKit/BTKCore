@@ -48,4 +48,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   
   plhs[0] = btk_MOH_create_handle(acq->Clone());
+  
+#if defined(BTK_BUILD_SHARED_LIBS) && defined(__unix__) && !defined(__APPLE__)
+  // It seems to be related only to Linux with shared libraries
+  // This fix was only tested with Matlab r2009a (7.8)
+  // FIXME: This solution clear all the acquisitions and not only the ones 
+  //        created from this function
+  mexAtExit(btk::MEXHandleCollector<btk::Acquisition>::ManualClear);
+#endif
 };

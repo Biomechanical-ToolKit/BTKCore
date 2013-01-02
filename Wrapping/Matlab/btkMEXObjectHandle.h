@@ -56,17 +56,17 @@ namespace btk
     MEXObjectHandle(SharedPtr<T> ptr)
     : m_Object(ptr)
     {
-      //mexPrintf("MEXObjectHandle::MEXObjectHandle\n");
+      // mexPrintf("MEXObjectHandle::MEXObjectHandle\n");
       this->m_ClassID = MEXClassID<T>();
       this->mp_Signature = this; 
       MEXHandleCollector<T>::RegisterHandle(this);
-    } 
+    };
 
     ~MEXObjectHandle()
-     {
-      //mexPrintf("MEXObjectHandle::~MEXObjectHandle\n");
+    {
+      // mexPrintf("MEXObjectHandle::~MEXObjectHandle\n");
       this->mp_Signature = 0;
-    } 
+    };
 
     mxArray* ToMEXHandle(); 
     SharedPtr<T> GetObject() const {return this->m_Object;};  
@@ -83,23 +83,39 @@ namespace btk
   class MEXHandleCollector
   {
   public:
+    static MEXHandleCollector& Singleton() 
+    {
+      static MEXHandleCollector<T> singleton;
+      return singleton;
+    };
+    
     static void RegisterHandle(MEXObjectHandle<T>* obj)
     {
-      static MEXHandleCollector singleton;
-      singleton.m_Objects.push_back(obj);
+      MEXHandleCollector::Singleton().m_Objects.push_back(obj);
     };
-
+    
+    static void ManualClear()
+    {
+      MEXHandleCollector& singleton = MEXHandleCollector::Singleton();
+      MEXHandleCollector::Clear(&singleton);
+    };
+    
     ~MEXHandleCollector()
     {
-      for(typename std::list<MEXObjectHandle<T>*>::iterator it = this->m_Objects.begin() ; it != this->m_Objects.end() ; ++it)
-       {
-        if ((*it)->mp_Signature == *it) // check for valid signature
-          delete *it;
-      }
-      this->m_Objects.clear();
+      MEXHandleCollector::Clear(this);
     };
 
   private:
+    static inline void Clear(MEXHandleCollector* c)
+    {
+      for(typename std::list<MEXObjectHandle<T>*>::iterator it = c->m_Objects.begin() ; it != c->m_Objects.end() ; ++it)
+      {
+        if ((*it)->mp_Signature == *it) // check for valid signature
+          delete *it;
+      }
+      c->m_Objects.clear();
+    };
+    
     MEXHandleCollector() : m_Objects() {};
     MEXHandleCollector(const MEXHandleCollector& ); // Not implemented;
 
