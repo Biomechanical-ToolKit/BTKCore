@@ -115,6 +115,17 @@ CXXTEST_SUITE(XLSOrthoTrakFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetPoint(49)->GetLabel(), "L JUM INT");
     TS_ASSERT_EQUALS(acq->GetPoint(50)->GetLabel(), "R JUM INT");
     
+    TS_ASSERT_EQUALS(acq->GetPoint(0)->GetType(), btk::Point::Angle); // "R_HIP_ANGLE"
+    TS_ASSERT_EQUALS(acq->GetPoint(1)->GetType(), btk::Point::Angle); // "R_KNEE_ANGLE"
+    TS_ASSERT_EQUALS(acq->GetPoint(14)->GetType(), btk::Point::Angle); // "L_Foot_ANGLE"
+    TS_ASSERT_EQUALS(acq->GetPoint(15)->GetType(), btk::Point::Force); // "R_HIP_FORCE"
+    TS_ASSERT_EQUALS(acq->GetPoint(16)->GetType(), btk::Point::Force); // "R_KNEE_FORCE"
+    TS_ASSERT_EQUALS(acq->GetPoint(17)->GetType(), btk::Point::Force); // "R_ANK_FORCE"
+    TS_ASSERT_EQUALS(acq->GetPoint(18)->GetType(), btk::Point::Force); // "R_GRF_FORCE"
+    TS_ASSERT_EQUALS(acq->GetPoint(25)->GetType(), btk::Point::Moment); // "R_ANK_MOMENT"
+    TS_ASSERT_EQUALS(acq->GetPoint(26)->GetType(), btk::Point::Moment); // "L_HIP_MOMENT"
+    TS_ASSERT_EQUALS(acq->GetPoint(44)->GetType(), btk::Point::Scalar); // "R BICEPS"
+    
     TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(1, 2), -0.558, 1e-4);
     // Last value
     TS_ASSERT_DELTA(acq->GetPoint(50)->GetValues().coeff(acq->GetPointFrameNumber()-1, 0), 25.751, 1e-4);

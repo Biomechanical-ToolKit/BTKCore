@@ -314,31 +314,66 @@ namespace btk
         {
           // Special case for some angles
           if (this->ExtractSpecialAngleLabel(label, "_Add_Ang"))
+          {
             axis = 1;
+            type = Point::Angle;
+          }
           else if (this->ExtractSpecialAngleLabel(label, "_Flex_Ang"))
+          {
             axis = 2;
+            type = Point::Angle;
+          }
           else if (this->ExtractSpecialAngleLabel(label, "_Ang"))
+          {
             axis = 0;
+            type = Point::Angle;
+          }
           else if (this->ExtractSpecialAngleLabel(label, "_Lat_Tilt"))
+          {
             axis = 0;
+            type = Point::Angle;
+          }
           else if (this->ExtractSpecialAngleLabel(label, "_Fwd_Tilt"))
+          {
             axis = 1;
+            type = Point::Angle;
+          }
           else if (this->ExtractSpecialAngleLabel(label, "_Rotation"))
+          {
             axis = 2;
+            type = Point::Angle;
+          }
           else if (this->ExtractSpecialAngleLabel(label, "_Orientation"))
+          {
             axis = 0;
+            type = Point::Angle;
+          }
           else if (this->ExtractSpecialAngleLabel(label, "_Elevation"))
+          {
             axis = 1;
+            type = Point::Angle;
+          }
           else if (this->ExtractSpecialAngleLabel(label, "_Null"))
+          {
             axis = 2;
-          
+            type = Point::Angle;
+          }
           // Special case for GRF
-          if (this->ExtractSpecialForceLabel(label, "_GRF_FWD"))
+          else if (this->ExtractSpecialForceLabel(label, "_GRF_FWD"))
+          {
             axis = 0;
+            type = Point::Force;
+          }
           else if (this->ExtractSpecialForceLabel(label, "_GRF_LAT"))
+          {
             axis = 1;
+            type = Point::Force;
+          }
           else if (this->ExtractSpecialForceLabel(label, "_GRF_VRT"))
+          {
             axis = 2;
+            type = Point::Force;
+          }
         }
         Acquisition::PointIterator it = output->FindPoint(label);
         Point::Pointer point;
