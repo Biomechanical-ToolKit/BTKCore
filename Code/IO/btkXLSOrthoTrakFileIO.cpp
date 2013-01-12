@@ -294,11 +294,11 @@ namespace btk
           if (pos != std::string::npos)
              straxis = label.substr(pos, std::string::npos);
           if (straxis.compare(" Rot") == 0)
-            axis = 0;
+            axis = 2;
           else if (straxis.compare(" Abd") == 0)
             axis = 1;
           else if (straxis.compare(" Flex") == 0)
-            axis = 2;
+            axis = 0;
           else
           {
             axis = 0;
@@ -320,7 +320,7 @@ namespace btk
           }
           else if (this->ExtractSpecialAngleLabel(label, "_Flex_Ang"))
           {
-            axis = 2;
+            axis = 0;
             type = Point::Angle;
           }
           else if (this->ExtractSpecialAngleLabel(label, "_Ang"))

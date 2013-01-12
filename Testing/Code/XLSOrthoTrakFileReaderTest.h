@@ -126,7 +126,7 @@ CXXTEST_SUITE(XLSOrthoTrakFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetPoint(26)->GetType(), btk::Point::Moment); // "L_HIP_MOMENT"
     TS_ASSERT_EQUALS(acq->GetPoint(44)->GetType(), btk::Point::Scalar); // "R BICEPS"
     
-    TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(1, 2), -0.558, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(1, 0), -0.558, 1e-4);
     // Last value
     TS_ASSERT_DELTA(acq->GetPoint(50)->GetValues().coeff(acq->GetPointFrameNumber()-1, 0), 25.751, 1e-4);
     
