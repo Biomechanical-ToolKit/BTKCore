@@ -37,7 +37,7 @@
 #include "btkCodamotionFileIOUtils_p.h"
 #include "btkConfigure.h"
 
-#include "Open3DMotion/MotionFile/Formats/XMOVE/FileFormatXMove.h"
+#include "Open3DMotion/MotionFile/Formats/XMove/FileFormatXMove.h"
 
 namespace btk
 {
