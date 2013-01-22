@@ -52,6 +52,7 @@ SET(BTK_O3DM_OpenORM_CORE_SRCS
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/Mappings/RichBinary/BinMemFactoryDefault.cpp"
     # "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/Mappings/RichBinary/NoSuchFieldException.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/Mappings/RichBinary/RichBinary.cpp"
+    "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/Mappings/RichBinary/RichBinaryConvertFloat.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/TreeValue.cpp")
     
 SET(BTK_O3DM_Biomechanics_SRCS
@@ -107,11 +108,14 @@ SET(BTK_O3DM_MotionFile_FORMAT_MDF_SRCS
 # XMOVE File format
 # -----------------
 SET(BTK_O3DM_MotionFile_FORMAT_XMOVE_SRCS
+    "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/Formats/XMove/FileFormatDescriptor.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/Formats/XMove/FileFormatOptionsXMove.cpp"
-    "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/Formats/XMove/FileFormatXMove.cpp")
+    "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/Formats/XMove/FileFormatXMove.cpp"
+    "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/Formats/XMove/XMLReadingMachineLegacy.cpp"
+    "${BTK_O3DM_ROOT}/Open3DMotion/MotionFile/Formats/XMove/XMLWritingMachineLegacy.cpp")
     
 SET(BTK_O3DM_OpenORM_IO_XML_SRCS
-    "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/ReadWriteXML.cpp"
+    # "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/ReadWriteXML.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/ReadWriteXMLBinary.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/ReadWriteXMLBool.cpp"
     "${BTK_O3DM_ROOT}/Open3DMotion/OpenORM/IO/XML/ReadWriteXMLCompound.cpp"
