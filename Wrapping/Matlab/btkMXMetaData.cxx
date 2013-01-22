@@ -263,9 +263,10 @@ btk::MetaData::Pointer btkMXExtractMetaDataIterator(btk::MetaData::Iterator* pit
     if (i == level)
     {
       *pit = it;
-      return md;
+      break;
     }
     else
       md = *it;
   }
+  return md;
 };

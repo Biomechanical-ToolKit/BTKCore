@@ -74,7 +74,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   acq->Init(pn, fn, an, r);
   plhs[0] = btk_MOH_create_handle(acq);
   
-#if defined(BTK_BUILD_SHARED_LIBS) && defined(__unix__) && !defined(__APPLE__)
+#if defined(__APPLE__) || (defined(BTK_BUILD_SHARED_LIBS) && defined(__unix__))
   // It seems to be related only to Linux with shared libraries
   // This fix was only tested with Matlab r2009a (7.8)
   // FIXME: This solution clear all the acquisitions and not only the ones 
