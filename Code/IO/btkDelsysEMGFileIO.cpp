@@ -56,9 +56,9 @@ namespace btk
   
   /**
    * @class DelsysEMGFileIO btkDelsysEMGFileIO.h
-   * @brief Interface to read DelsysEMG files.
+   * @brief Interface to read Delsys EMG files.
    *
-   * The DelsysEMG file format is used in Delsys systems and saved by the software EMGWorks.
+   * The Delsys EMG file format is used in Delsys systems and saved by the software EMGWorks.
    * All the known file format (1-4) are implemented.
    * The exported acquisition contains raw EMG signals.
    *
@@ -83,7 +83,7 @@ namespace btk
    */
   
   /**
-   * Only check if the file extension correspond to DelsysEMG.
+   * Check if the beginning of the file starts with the string "DEMG".
    */
   bool DelsysEMGFileIO::CanReadFile(const std::string& filename)
   {
