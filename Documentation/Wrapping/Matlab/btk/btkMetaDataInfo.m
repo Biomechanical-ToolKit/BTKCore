@@ -17,7 +17,7 @@ function info = btkMetaDataInfo(format, values, numdims)
 %                   Note: The maximum number of dimensions is set to 7.
 
 %  Author: A. Barré
-%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
 
 nd = numel(size(values));
 if (nargin < 3)

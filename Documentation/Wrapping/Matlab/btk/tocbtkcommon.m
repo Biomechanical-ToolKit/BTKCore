@@ -114,6 +114,6 @@ function tocbtkcommon
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>
 
 % Author(s): A. Barré
-% Copyright 2009-2012 Biomechanical ToolKit
+% Copyright 2009-2013 Biomechanical ToolKit
 
 % [EOF]

@@ -14,4 +14,4 @@
 %   <a href="matlab:help btkGetVersion">btkGetVersion</a>                        - Return the BTK release number
 %   <a href="matlab:help btkTransformTDFToViconC3DFile">btkTransformTDFToViconC3DFile</a>                        - Transform a TDF file to a C3D file compatible with Vicon
 
-%   Copyright 2009-2012 Biomechanical ToolKit
+%   Copyright 2009-2013 Biomechanical ToolKit

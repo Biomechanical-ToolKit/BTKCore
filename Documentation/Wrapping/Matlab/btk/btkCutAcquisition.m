@@ -8,8 +8,8 @@ function btkCutAcquisition(h, startAt, numFrames)
 %  BTKCUTACQUISITION(H, STARTAT, NUMFRAMES) keeps NUMFRAMES frames starting
 %  from the frame STARTAT.
 
-%  Author: A. Barré
-%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
+%  Author: A. BarrÃ©
+%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
 
 ff = btkGetFirstFrame(h);
 lf = btkGetLastFrame(h);

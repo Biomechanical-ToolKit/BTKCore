@@ -27,7 +27,7 @@ BEGIN
       VALUE "FileDescription",  "Motion Kinematics & Kinetics Analyzer"
       VALUE "FileVersion",      VER_FILEVERSION_STR
       VALUE "InternalName",     "Mokka"
-      VALUE "LegalCopyright",   "© 2009-2012 Arnaud Barré"
+      VALUE "LegalCopyright",   "Â© 2009-2013 Arnaud BarrÃ©"
       VALUE "OriginalFilename", "Mokka.exe"
       VALUE "ProductName",      "Mokka"
       VALUE "ProductVersion",   VER_PRODUCTVERSION_STR

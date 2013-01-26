@@ -29,8 +29,8 @@ function btkTransformTDFToViconC3DFile(TDF_INPUT, C3D_OUTPUT)
 %   - 2012/08/09: Check if the analog channels configured for each forceplates
 %                 exists really before trying to remove them.
 
-%  Author: A. Barré
-%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
+%  Author: A. BarrÃ©
+%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
 
 if (nargin < 2)
     C3D_OUTPUT = [TDF_INPUT,'.c3d'];

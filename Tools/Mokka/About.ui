@@ -118,7 +118,7 @@
      <item>
       <widget class="QLabel" name="copyright">
        <property name="text">
-        <string> Copyright © 2009-2012 Arnaud Barré.</string>
+        <string> Copyright © 2009-2013 Arnaud Barré.</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>

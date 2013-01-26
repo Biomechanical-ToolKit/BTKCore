@@ -42,8 +42,8 @@ function btkAppendForcePlatformType2(h, forces, moments, corners, origin, localF
 %   - 2012/08/14: Option 'quiet' removed an replaced by Matlab warning() function
 %                 combined with the btk:AppendForcePlatformType2 identifier
 
-%  Author: A. Barré
-%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
+%  Author: A. BarrÃ©
+%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
 
 if (nargin < 5)
     error('Missing input arguments');

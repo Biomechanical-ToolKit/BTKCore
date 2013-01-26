@@ -7,7 +7,7 @@ function btkSetAnalogsResolution(h, res)
 %  a btk* function.
 
 %  Author: A. Barré
-%  Copyright 2009-2012 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
 
 warning('This function is deprecated and will be removed in a next release. Use btkGetAnalogResolution instead.');
 btkSetAnalogResolution(h,res);
