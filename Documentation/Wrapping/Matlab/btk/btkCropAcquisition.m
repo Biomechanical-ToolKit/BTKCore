@@ -1,11 +1,11 @@
-function btkCutAcquisition(h, startAt, numFrames)
-%BTKCUTACQUISITION Cut the acquistion and adapt the events' frame/time.
+function btkCropAcquisition(h, startAt, numFrames)
+%BTKCROPACQUISITION Crop the acquisition and adapt the events' frame/time.
 % 
-%  BTKCUTACQUISITION(H, STARTAT) keeps all the frames from the frame STARTAT.
-%  The acquistion is represented by the handle H, obtained by the use of a 
+%  BTKCROPACQUISITION(H, STARTAT) keeps all the frames from the frame STARTAT.
+%  The acquisition is represented by the handle H, obtained by the use of a 
 %  btk* function.
 %
-%  BTKCUTACQUISITION(H, STARTAT, NUMFRAMES) keeps NUMFRAMES frames starting
+%  BTKCROPACQUISITION(H, STARTAT, NUMFRAMES) keeps NUMFRAMES frames starting
 %  from the frame STARTAT.
 
 %  Author: A. Barré
@@ -17,11 +17,11 @@ if (nargin == 2)
     numFrames = lf - ff + 1 - startAt;
 end
 if ((startAt < ff) || startAt > lf)
-    error('btk:CutAcquisiton','Invalid index.');
+    error('btk:CropAcquisiton','Invalid index.');
 elseif (numFrames > lf - startAt + 1)
-    error('btk:CutAcquisiton','Incorrect number of frames specified.')
+    error('btk:CropAcquisiton','Incorrect number of frames specified.')
 elseif (numFrames == 0) % Clear all
-    error('btk:CutAcquisiton','Due to the mechanism used in BTK, it is not possible to remove all the frames. Contact the developers if you really need it.')
+    error('btk:CropAcquisiton','Due to the mechanism used in BTK, it is not possible to remove all the frames. Contact the developers if you really need it.')
 end
 % Data to keep
 % - Point
