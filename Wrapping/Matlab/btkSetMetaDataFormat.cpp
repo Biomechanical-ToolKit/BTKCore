@@ -38,6 +38,9 @@
 
 #include <btkAcquisition.h>
 
+#include <algorithm>
+#include <cctype>
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs < 3)
