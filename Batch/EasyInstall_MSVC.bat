@@ -25,13 +25,16 @@ IF EXIST %SYSTEMROOT%\SysWOW64 (
 :: Detect MSVC. If MSVC is not present, the script looks for Windows SDK 7.0 (or greater)
 SET MSVS=""
 IF (%2) == () (
-  :: Create a temporary file to list the known Windows SDK directories
-  > %TEMP%.\BTK-WINSDK.txt ECHO Known Windows SDK directories
-  >> %TEMP%.\BTK-WINSDK.txt ECHO "!PROGFILES!\Microsoft SDKs\Windows\v7.0
-  >> %TEMP%.\BTK-WINSDK.txt ECHO "!PROGFILES!\Microsoft SDKs\Windows\v7.1
-  :: Look for Windows SDK
-  FOR	/F "eol=;delims=" %%i IN (%TEMP%.\BTK-WINSDK.txt) DO IF EXIST %%i\Bin\SetEnv.Cmd SET MSVS=%%i
-  DEL %TEMP%.\BTK-WINSDK.txt
+  :: Special case for the X68-64 compiler which is not available with MSVC EE (At least the case for the 2008 version)
+  IF !ARCH! == x64 (
+    :: Create a temporary file to list the known Windows SDK directories
+    > %TEMP%.\BTK-WINSDK.txt ECHO Known Windows SDK directories
+    >> %TEMP%.\BTK-WINSDK.txt ECHO "!PROGFILES!\Microsoft SDKs\Windows\v7.0
+    >> %TEMP%.\BTK-WINSDK.txt ECHO "!PROGFILES!\Microsoft SDKs\Windows\v7.1
+    :: Look for Windows SDK
+    FOR	/F "eol=;delims=" %%i IN (%TEMP%.\BTK-WINSDK.txt) DO IF EXIST %%i\Bin\SetEnv.Cmd SET MSVS=%%i
+    DEL %TEMP%.\BTK-WINSDK.txt
+  )
   IF !MSVS! == "" (
     :: Create a temporary file to list the known MSVC directories
     > %TEMP%.\BTK-MSVC.txt ECHO Known MSVC directories
