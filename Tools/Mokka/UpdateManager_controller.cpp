@@ -35,6 +35,7 @@
  
 #include "UpdateManager_p.h"
 #include "btk_ioapi_qiodevice.h"
+#include "btkConfigure.h" // HAVE_64_BIT
 
 #include <QXmlStreamReader>
 #include <QNetworkAccessManager>
@@ -210,13 +211,13 @@ void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString&
                 osRequired = static_cast<int>(QSysInfo::MV_10_5);
               else if (minver.compare("10.6", Qt::CaseInsensitive) == 0)
                 osRequired = static_cast<int>(QSysInfo::MV_10_6);
-#if QT_VERSION >= 0x040800
+  #if QT_VERSION >= 0x040800
               else if (minver.compare("10.7", Qt::CaseInsensitive) == 0)
                 osRequired = static_cast<int>(QSysInfo::MV_10_7);
-#elif QT_VERSION >= 0x050000
+  #elif QT_VERSION >= 0x050000
               else if (minver.compare("10.8", Qt::CaseInsensitive) == 0)
                 osRequired = static_cast<int>(QSysInfo::MV_10_8);
-#endif
+  #endif
 #elif defined(Q_OS_WIN)
             const int osVersion = static_cast<int>(QSysInfo::WindowsVersion);
             if (os.compare("win") == 0)
@@ -233,7 +234,15 @@ void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString&
             {
 #endif
               int archRequired = (arch.compare("x86",  Qt::CaseInsensitive) == 0 ? 32 : 64);
-              if ((QSysInfo::WordSize == archRequired) && (osVersion >= osRequired))
+#ifdef HAVE_64_BIT
+              int wordSize = 64;
+#else
+              int wordSize = 32;
+#endif
+              // The architecture required is tested with the compiled word size (and not the one of the computer).
+              // The goal is to keep the same version than the one installed.
+              // Then, you won't force the use of the version compiled for computer's architecture if it exists.
+              if ((wordSize == archRequired) && (osVersion >= osRequired))
               {
                 compatiblePackageFound = true;
                 if (osRequired > latestCompatibleOS)
