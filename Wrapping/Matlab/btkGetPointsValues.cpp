@@ -46,11 +46,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
-  int numberOfValuesPerPoint = acq->GetPointFrameNumber() * 3;
   int numberOfPoints = acq->GetPointNumber();
-  plhs[0] = mxCreateDoubleMatrix(numberOfValuesPerPoint, numberOfPoints, mxREAL);
+  plhs[0] = mxCreateDoubleMatrix(acq->GetPointFrameNumber(), numberOfPoints*3, mxREAL);
   double* values = mxGetPr(plhs[0]);
 
+  int numberOfValuesPerPoint = acq->GetPointFrameNumber() * 3;
   int i = 0;
   int j = numberOfValuesPerPoint;
   double* v = 0;

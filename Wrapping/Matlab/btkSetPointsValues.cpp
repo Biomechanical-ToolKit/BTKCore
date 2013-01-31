@@ -51,7 +51,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
   int numberOfValuesPerPoint = acq->GetPointFrameNumber() * 3;
-  int numberOfPoints = acq->GetAnalogNumber();
+  int numberOfPoints = acq->GetPointNumber();
 
   if (mxGetNumberOfElements(prhs[1]) != numberOfPoints*numberOfValuesPerPoint)
     mexErrMsgTxt("The second input doesn't have the same size than the number of points values.");
