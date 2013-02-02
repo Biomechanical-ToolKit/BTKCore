@@ -111,8 +111,8 @@ end
 ratio = btkGetAnalogSampleNumberPerFrame(h);
 if ((ratio ~= 1) && (size(forces,1) == numPointFrames))
     warning('btk:AppendForcePlatformType2', 'As the sample frequency of the analog channels is not the same than the cameras, the force and moments are interpolated by a linear method.');
-    forces = interp1(1:numFrames, forces, 1:1/ratio:numFrames, 'linear');
-    moments = interp1(1:numFrames, moments, 1:1/ratio:numFrames, 'linear');
+    forces = interp1(1:numPointFrames, forces, 1:1/ratio:numPointFrames, 'linear');
+    moments = interp1(1:numPointFrames, moments, 1:1/ratio:numPointFrames, 'linear');
     % The frames after the last video frame are filled with the value 0
     forces = [forces ; zeros(ratio-1,3)];
     moments = [moments ; zeros(ratio-1,3)];
@@ -125,7 +125,7 @@ zero = [0,0]; % No baseline by default
 md = btkFindMetaData(h, 'FORCE_PLATFORM');
 channel = numAnalogs + [1 2 3 4 5 6];
 numChannelsPerPF = 6;
-corners = corners'; % Coordinateds sorted by column order instead of row order.
+corners = corners'; % Coordinates sorted by column order instead of row order.
 if (isstruct(md))
     if (isfield(md.children, 'USED'))
         used = md.children.USED.info.values(1) + 1;
