@@ -41,6 +41,7 @@ function btkAppendForcePlatformType2(h, forces, moments, corners, origin, localF
 %                 number of the frame for the points or the analog channels
 %   - 2012/08/14: Option 'quiet' removed an replaced by Matlab warning() function
 %                 combined with the btk:AppendForcePlatformType2 identifier
+%   - 2013/02/03: Analog's unit added based on acquisition's configuration (btkGetPointUnit).
 
 %  Author: A. Barré
 %  Copyright 2009-2013 Biomechanical ToolKit (BTK).
@@ -180,12 +181,22 @@ end
 
 % Append the (fake) analog channels
 str = num2str(used);
+% - Forces
+unit = btkGetPointsUnit(h, 'Force');
 btkAppendAnalog(h, ['Fx',str], forces(:,1), 'Fake analog channel for virtual force platform component Fx');
+btkSetAnalogUnit(g, numAnalogs+1, unit);
 btkAppendAnalog(h, ['Fy',str], forces(:,2), 'Fake analog channel for virtual force platform component Fy');
+btkSetAnalogUnit(g, numAnalogs+2, unit);
 btkAppendAnalog(h, ['Fz',str], forces(:,3), 'Fake analog channel for virtual force platform component Fz');
+btkSetAnalogUnit(g, numAnalogs+3, unit);
+% - Moments
+unit = btkGetPointsUnit(h, 'Moment');
 btkAppendAnalog(h, ['Mx',str], moments(:,1), 'Fake analog channel for virtual force platform component Mx');
+btkSetAnalogUnit(g, numAnalogs+4, unit);
 btkAppendAnalog(h, ['My',str], moments(:,2), 'Fake analog channel for virtual force platform component My');
+btkSetAnalogUnit(g, numAnalogs+5, unit);
 btkAppendAnalog(h, ['Mz',str], moments(:,3), 'Fake analog channel for virtual force platform component Mz');
+btkSetAnalogUnit(g, numAnalogs+6, unit);
 % Update the metadata
 btkAppendMetaData(h, 'FORCE_PLATFORM', 'USED', btkMetaDataInfo('Integer', used));
 btkAppendMetaData(h, 'FORCE_PLATFORM', 'TYPE', btkMetaDataInfo('Integer', type));
