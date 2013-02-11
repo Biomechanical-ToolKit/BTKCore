@@ -41,6 +41,9 @@
 
 btk::Analog::Pointer btkMXGetAnalog(btk::Acquisition::Pointer acq, int nrhs, const mxArray* prhs[])
 {
+  if (nrhs < 2)
+    mexErrMsgTxt("Analog's index out of range.");
+  
   if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
     mexErrMsgTxt("Analog's index must be a non-empty string or an integer.");
   btk::Analog::Pointer analog;

@@ -100,7 +100,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       if ((f != btk::MetaDataInfo::Char) && (numberOfValues > 65535))
         mexErrMsgTxt("Number of values exceeds the maximum number (65535) available for each metadata.");
       mwSize dimsSize = mxGetNumberOfDimensions(mxValues);
-      if (dimsSize > maxDimSize)
+      if (static_cast<size_t>(dimsSize) > maxDimSize)
         mexErrMsgTxt("Number of dimensions exceeds the maximum number (7) available for each metadata.");
       const mwSize* dimsValues = mxGetDimensions(mxValues);
       std::vector<uint8_t> _dims;

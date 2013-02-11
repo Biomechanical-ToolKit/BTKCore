@@ -173,7 +173,7 @@ void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[
   int numberOfFrames = acq->GetPointFrameNumber();
   int numberOfPoints = points->GetItemNumber();
 
-  if (mxGetNumberOfElements(prhs[1]) != (numberOfFrames * numberOfPoints * 3))
+  if (mxGetNumberOfElements(prhs[1]) != static_cast<size_t>(numberOfFrames * numberOfPoints * 3))
     mexErrMsgTxt("The second input doesn't have the same size than extracted points' components.");
     
   if (numberOfPoints == 0)

@@ -89,22 +89,22 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
         std::string convertedLabel = std::string(originalLabel.length(), '_');
         // Check bad characters
         for(std::string::size_type j = 0 ; j < originalLabel.length() ; ++j)
-          convertedLabel[j] = btk::ASCIIConverter[originalLabel[j]];
+          convertedLabel[j] = btk::ASCIIConverter[static_cast<uint8_t>(originalLabel[j])];
         char c = convertedLabel[0];
         // Check first character
         if ((c == btk::ASCIIConverter[0x00]) // _
             || (c == btk::ASCIIConverter[0x30]) // 0
             || (c == btk::ASCIIConverter[0x31]) // 1
-              || (c == btk::ASCIIConverter[0x32]) // 2
+            || (c == btk::ASCIIConverter[0x32]) // 2
             || (c == btk::ASCIIConverter[0x33]) // 3
             || (c == btk::ASCIIConverter[0x34]) // 4
-             || (c == btk::ASCIIConverter[0x35]) // 5
+            || (c == btk::ASCIIConverter[0x35]) // 5
             || (c == btk::ASCIIConverter[0x36]) // 6
             || (c == btk::ASCIIConverter[0x37]) // 7
             || (c == btk::ASCIIConverter[0x38]) // 8
             || (c == btk::ASCIIConverter[0x39])) // 9
           convertedLabel.insert(convertedLabel.begin(), 'C');
-          // Check label's redundancy
+        // Check label's redundancy
         int id = 0;
         std::string doubleLabel = convertedLabel;
         for (size_t j = 0 ; j < i ; ++j)

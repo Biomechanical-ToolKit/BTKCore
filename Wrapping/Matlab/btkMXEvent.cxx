@@ -111,7 +111,7 @@ void btkMXCreateEventsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
      std::string convertedLabel = std::string(labels[i].length(), '_');
      // Check bad characters
      for(size_t j = 0 ; j < convertedLabel.length() ; ++j)
-       convertedLabel[j] = btk::ASCIIConverter[labels[i][j]];
+       convertedLabel[j] = btk::ASCIIConverter[static_cast<uint8_t>(labels[i][j])];
      char c = convertedLabel[0];
      // Check first character
      if ((c == btk::ASCIIConverter[0x00]) // _
