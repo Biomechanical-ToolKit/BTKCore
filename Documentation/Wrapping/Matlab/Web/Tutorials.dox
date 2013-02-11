@@ -6,6 +6,7 @@
  - @ref TutorialBuildMatlab
  - @ref TutorialGettingStarted
  - @ref TutorialAcquisitionExplained
+ - @ref TutorialAddForcePlatform
  - @ref TutorialProcessingData
  - @ref TutorialBatchProcessing
  
@@ -168,7 +169,33 @@
    weight = md.info.values; % the returned structure is directly the content of the metadata SUBJECTS:WEIGHT.
  end
  @endcode
-
+ 
+ @section TutorialAddForcePlatform Add force platform type 2 (AMTI or equivalent) into an acquisition
+ In some case, your acquisition setup cannot record all the data by the same system and then, you have several files for one trial. This section explain you how to add a force platform into an acquistion.
+  
+ A force platform is represented in BTK as a set of analog channels combined with a configuration stored in the metadata FORCE_PLATFORM and its children.
+ This configuration is the same than the one proposed in the C3D file format (http://www.c3d.org/HTML/theforceplatformgroup.htm). To easily integrate a force platfrom, it exists the Matlab function btkAppendForcePlatformType2.
+ This function appends an AMTI (or equivalent with FxFyFzMxMyMz measurements) force platform by adding required analog channels and the creation (or update) of its configuration.
+ 
+ @code
+ % Create with an acquisition with 19 markers, 1000 frames, no analog channel but sampled 10 times more than video frame.
+ acq = btkNewAcqusition(19,1000,0,10);
+ % Set the frequency: Markers: 100Hz, Analog channels: 1000Hz (due to the use of the factor 10 in the function btkNewAcquisition)
+ btkSetFrequency(100);
+ % Set 3D coordinates for markers
+ % - markersV is a matrix wit the dimensions (19*3,1000)
+ btkSetMarkersValues(acq, markersV); 
+ % Append a force platform type 2:
+ % - forcesV is a matrix (3,10000) with reaction forces ;
+ % - momentsV is a matrix (3,10000) with reaction moments ;
+ % - corners is a matrix (4,3) with the coordinates of the 4 corners expressed in the global (laboratory) frame ;
+ % - origin is a vector (1,3) containing the location of the sensor related to the center of the working surface and expressed in the global frame ;
+ % - 1 is a flag to say that the reaction forces and moments are measured in the force platform (local) frame.
+ btkAppendForcePlatformType2(acq, forcesV, momentsV, corners, origin, 1);
+ % Write the new acquisition
+ btkWriteAcquisition(acq, 'myAcquisitionWithFP.c3d');
+ @endcode
+ 
  @section TutorialProcessingData Processing data
  
  One of the goal of BTK is also to give some tools to compute standard biomechanical parameters (kinematic, dynamic inverse, ...). All the existing tools are stored in the BasicFilters section in the help. For example, to determine the ground reaction forces (wrenches) from an acquisition containing a force platform, you only have to use the function btkGetGroundReactionWrenches. This function take into account the type of force platform (AMTI, Kistler, ...) and compute the group reaction wrench (force, moment and position). The point of application of each wrench is calculated from the formula of Shimba (1984) which also was described in Zatsiorsky (2002). Contrary to the center of pressure (COP) the point of wrench application (PWA) is calculated by using also the horizontal moments. The result is a structure with a number of elements equal to the number of force platforms.
@@ -184,7 +211,7 @@
  % These values are computed from the article:
  % "Design and responses of Butterworth and critically damped digital filters", 
  % Robertson & Dowling, Journal of Electromyography and Kinesiology, 2003.
- % Warning: the factor 1.5162 is dependant of the filter's order and must be 
+ % Warning: the factor 1.5162 is dependant of the filter order and must be 
  % adapted in consequence for other order using the formula given in the paper.
  [b,a] = butter(4/2, 2 * 30 * 1.5162 / btkGetAnalogFrequency(acq)); 
  av = filtfilt(b,a, av);
@@ -203,7 +230,7 @@
  % acquisitionsFilename: Large list of filenames
  for 1:length(acquisitionsFilename)
    acq = btkReadAcquistion(acquisitionsFilename{i});
-   % ... All of your code processing the acquisition's data
+   % ... All of your code processing the acquisition data
    btkDeleteAcquisition(acq);
  end
  @endcode

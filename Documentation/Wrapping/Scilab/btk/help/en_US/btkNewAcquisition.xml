@@ -48,7 +48,7 @@ h = btkNewAcquisition(pn, fn, an, r)</synopsis>
       <itemizedlist>
         <listitem>First frame equals to 1: use <link linkend="btkSetFirstFrame">btkSetFirstFrame</link> to modify it ;</listitem>
         <listitem>Points' frequency equals to 0: use <link linkend="btkSetFrequency">btkSetFrequency</link> to modify it ;</listitem>
-        <listitem>Points' units set to "mm", "deg", "N", "Nmm", "W", "" for markers, angles, forces, moments, powers and scalars respectively. Use <link linkend="btkSetPointUnit">btkSetPointUnit</link> to modify them ;</listitem>
+        <listitem>Points' units set to "mm", "deg", "N", "Nmm", "W", "" for markers, angles, forces, moments, powers and scalars respectively. Use <link linkend="btkSetPointsUnit">btkSetPointsUnit</link> to modify them ;</listitem>
         <listitem>Analogs' frequency equals to 0. Updated when the points' frequency is ;</listitem>
         <listitem>Analog channel resolution sets to 12 bits: use <link linkend="btkSetAnalogResolution">btkSetAnalogResolution</link> to modify it.</listitem>
       </itemizedlist>

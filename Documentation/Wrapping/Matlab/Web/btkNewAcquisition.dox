@@ -16,7 +16,7 @@
  * The members of the acquisition are initialized to:
  *  - First frame equals to 1: use btkSetFirstFrame to modify it.
  *  - Points' frequency equals to 0: btkSetFrequency to modify it.
- *  - Points' units set to "mm", "deg", "N", "Nmm", "W", "" for markers, angles, forces, moments, powers and scalars respectively: use btkSetPointUnits to modify them.
+ *  - Points' units set to "mm", "deg", "N", "Nmm", "W", "" for markers, angles, forces, moments, powers and scalars respectively: use btkSetPointsUnit to modify them.
  *  - Analogs' frequency equals to 0. Updated when the points' frequency is. 
  *  - Analog channel resolution sets to 12 bits: use btkSetAnalogResolution to modify it.\n
  *  - Number of analog samples per video frame set to 1.

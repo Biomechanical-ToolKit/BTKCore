@@ -13,6 +13,6 @@
  * <tt>btkSetPointDescription(h, idx, newdesc)</tt> modifies the description of the point specified by the index @c idx.
  * <tt>btkSetPointDescription(h, label, newdesc)</tt> modifies the description of the point specified by the label @c label.
  * 
- * @sa btkSetPointLabel, btkSetPointResiduals, btkSetPointType, btkSetPointUnit
+ * @sa btkSetPointLabel, btkSetPointResiduals, btkSetPointType, btkSetPointsUnit
  * @ingroup BTKMatlabPointModifier
  */

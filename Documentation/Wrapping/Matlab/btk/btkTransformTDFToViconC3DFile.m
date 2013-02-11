@@ -57,7 +57,7 @@ end
 data = data(:,idxCoordNew);
 data(:,idxCoordOpp) = data(:,idxCoordOpp) * -1;
 btkSetMarkersValues(acq, data);
-btkSetPointUnit(acq, 'marker','mm');
+btkSetPointsUnit(acq, 'marker','mm');
 % Extract force platform data (channels and geometry)
 warning('OFF', 'btk:GetForcePlatforms');
 fp = btkGetForcePlatforms(acq);

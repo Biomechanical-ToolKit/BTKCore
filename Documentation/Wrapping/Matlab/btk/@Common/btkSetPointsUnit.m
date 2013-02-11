@@ -1,4 +1,4 @@
-function btkSetPointUnit(h, type, unit) %#ok
+function btkSetPointsUnit(h, type, unit) %#ok
 %BTKSETPOINTUNIT Modify point's unit.
 % 
 %  BTKSETPOINTUNIT(H, TYPE, UNIT) modifies point's unit by UNIT.
@@ -30,4 +30,4 @@ function btkSetPointUnit(h, type, unit) %#ok
 
 error(generatemsgid('NotSupported'),'MEX file for BTKSETPOINTUNIT not found');
 
-% [EOF] btkSetPointUnit.m
+% [EOF] btkSetPointsUnit.m

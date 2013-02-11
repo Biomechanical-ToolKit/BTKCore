@@ -1,10 +1,10 @@
 /**
- * @class btkSetPointUnit
- * @brief Modify point's unit.
- * @syntax{btkSetPointUnit(h\, type\, unit)}
+ * @class btkGetPointsUnit
+ * @brief Returns requested points' unit.
+ * @syntax{unit = btkGetPointsUnit(h\, type)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param type String with the type to modify (see the detailed description for the available types).
- * @param unit String with the new unit.
+ * @retval unit String containing the unit for the requested point's type.
  *
  * @par Detailed description:
  * The type must be a string corresponding to one of the available type:
@@ -15,7 +15,7 @@
  * - power ;
  * - scalar.
  * .
- * \n\n
+ * \n
  * By default an acquisition is set with these units:
  * - marker: millimeter (mm) ;
  * - angle: degres (deg) ;
@@ -24,6 +24,6 @@
  * - power: watt (W) ;
  * - scalar: @e empty.
  * 
- * @sa btkSetPointDescription, btkSetPointLabel, btkSetPointResiduals, btkSetPointType
- * @ingroup BTKMatlabPointModifier
+ * @sa btkSetPointsUnit
+ * @ingroup BTKMatlabPointAccessor
  */

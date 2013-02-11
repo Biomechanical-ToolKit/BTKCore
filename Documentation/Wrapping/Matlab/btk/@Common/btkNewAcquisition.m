@@ -9,7 +9,7 @@ function h = btkNewAcquisition(pn, fn, an, r) %#ok
 %  - First frame equals to 1: use <a href="matlab:help btkSetFirstFrame">btkSetFirstFrame</a> to modify it.
 %  - Points' frequency equals to 0: use <a href="matlab:help btkSetFrequency">btkSetFrequency</a> to modify it.
 %  - Points' units set to "mm", "deg", "N", "Nmm", "W", "" for markers, angles, forces, 
-%    moments, powers and scalars respectively: use <a href="matlab:help btkSetPointUnits">btkSetPointUnits</a> to modify them.
+%    moments, powers and scalars respectively: use <a href="matlab:help btkSetPointsUnit">btkSetPointsUnit</a> to modify them.
 %  - Analogs' frequency equals to 0. Updated when the points' frequency is. 
 %  - Analog channel resolution sets to 12 bits: use <a href="matlab:help btkSetAnalogResolution">btkSetAnalogResolution</a> to modify it.
 %

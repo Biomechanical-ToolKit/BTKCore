@@ -13,6 +13,6 @@
  * <tt>btkSetPointLabel(h, idx, newlabel)</tt> modifies the label of the point specified by the index @c idx.
  * <tt>btkSetPointLabel(h, label, newlabel)</tt> modifies the label of the point specified by the label @c label.
  * 
- * @sa btkSetPointDescription, btkSetPointResiduals, btkSetPointType, btkSetPointUnit
+ * @sa btkSetPointDescription, btkSetPointResiduals, btkSetPointType, btkSetPointsUnit
  * @ingroup BTKMatlabPointModifier
  */

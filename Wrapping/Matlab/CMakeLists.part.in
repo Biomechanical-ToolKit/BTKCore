@@ -19,6 +19,7 @@
 @MEX_CREATE_MACRO@(btkGetPointNumber @MEX_PATH_PREFIX@btkGetPointNumber.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkGetPoint @MEX_PATH_PREFIX@btkGetPoint.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkGetPoints @MEX_PATH_PREFIX@btkGetPoints.cpp BTKCommon)
+@MEX_CREATE_MACRO@(btkGetPointsUnit @MEX_PATH_PREFIX@btkGetPointsUnit.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkGetPointsValues @MEX_PATH_PREFIX@btkGetPointsValues.cpp BTKCommon)
 # Common: modifier
 @MEX_CREATE_MACRO@(btkAppendAnalysisParameter @MEX_PATH_PREFIX@btkAppendAnalysisParameter.cpp BTKCommon)
@@ -71,7 +72,7 @@
 @MEX_CREATE_MACRO@(btkSetPointNumber @MEX_PATH_PREFIX@btkSetPointNumber.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetPointResiduals @MEX_PATH_PREFIX@btkSetPointResiduals.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetPointType @MEX_PATH_PREFIX@btkSetPointType.cpp BTKCommon)
-@MEX_CREATE_MACRO@(btkSetPointUnit @MEX_PATH_PREFIX@btkSetPointUnit.cpp BTKCommon)
+@MEX_CREATE_MACRO@(btkSetPointsUnit @MEX_PATH_PREFIX@btkSetPointsUnit.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetPointValues @MEX_PATH_PREFIX@btkSetPointValues.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkSetPointsValues @MEX_PATH_PREFIX@btkSetPointsValues.cpp BTKCommon)
 # BTKBasicFilters

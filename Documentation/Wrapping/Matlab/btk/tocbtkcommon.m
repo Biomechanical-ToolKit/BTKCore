@@ -65,7 +65,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetPointLabel">btkSetPointLabel</a>                  - Point's label modifier
 %   <a href="matlab:help btkSetPointResiduals">btkSetPointResiduals</a>              - Point's residuals modifier
 %   <a href="matlab:help btkSetPointType">btkSetPointType</a>                   - Point's type modifier
-%   <a href="matlab:help btkSetPointUnit">btkSetPointUnit</a>                   - Set unit for a type of point
+%   <a href="matlab:help btkSetPointsUnit">btkSetPointsUnit</a>                   - Set unit for a type of point
 %   <a href="matlab:help btkSetPointValues">btkSetPointValues</a>                 - Point's values modifier
 %   <a href="matlab:help btkSetAnglesValues">btkSetAnglesValues</a>                - Set scalars's value from a matrix
 %   <a href="matlab:help btkSetForcesValues">btkSetForcesValues</a>                - Set forces's value from a matrix
