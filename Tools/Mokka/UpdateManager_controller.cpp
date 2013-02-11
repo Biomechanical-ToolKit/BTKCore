@@ -214,7 +214,7 @@ void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString&
   #if QT_VERSION >= 0x040800
               else if (minver.compare("10.7", Qt::CaseInsensitive) == 0)
                 osRequired = static_cast<int>(QSysInfo::MV_10_7);
-  #elif QT_VERSION >= 0x050000
+  #elif QT_VERSION >= 0x040803
               else if (minver.compare("10.8", Qt::CaseInsensitive) == 0)
                 osRequired = static_cast<int>(QSysInfo::MV_10_8);
   #endif
