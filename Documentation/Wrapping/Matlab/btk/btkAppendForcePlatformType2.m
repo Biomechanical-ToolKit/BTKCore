@@ -6,12 +6,15 @@ function btkAppendForcePlatformType2(h, forces, moments, corners, origin, localF
 %  expressed in the global frame. This function updates all the metadata in
 %  the group FORCE_PLATFORM and append 6 analog channels.
 %  NOTE: The moment must be expressed at the (surface) origin of the plate.
-%  The CORNERS are numbered from 1 to 4 and refer to the quadrant numbers 
-%  in the X-Y plane of the force platform coordinate system (not the 3D 
-%  point reference coordinate system).  These are +x +y, -x +y, -x -y, and 
-%  +x -y, with respect to the force plate coordinate system.  The ORIGIN of
-%  the platform is set by default to [0,0,0] meaning that it has no 
-%  thickness.
+%  The CORNERS is a matrix (4,3) which contains the coordinates of the corners
+%  expressed in the global frame.  They are are numbered from 1 to 4 and refer
+%  to the quadrant numbers in the X-Y plane of the force platform coordinate 
+%  system (not the 3D point reference coordinate system).  These are +x+y, 
+%  -x+y, -x-y, and +x-y, with respect to the force plate coordinate system.
+%  The ORIGIN of the platform is set by default to [0,0,0] meaning that it has
+%  no thickness.  If your forces and moments come from raw data recorded by a 
+%  force platform (and then recorded to the location of the sensor), it is
+%  strongly advised to use the sensor distances given in the data sheet.
 %  You can retrieve easily the data of the new force platform by using one
 %  of the following functions: 
 %  - BTKGETFORCEPLATFORMS
