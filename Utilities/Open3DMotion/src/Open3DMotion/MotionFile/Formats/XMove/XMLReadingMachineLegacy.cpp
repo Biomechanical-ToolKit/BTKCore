@@ -13,6 +13,7 @@
 #include "Open3DMotion/OpenORM/Branches/TreeList.h"
 #include "Open3DMotion/Biomechanics/Trial/EventGroup.h"
 #include <pugixml.hpp>
+#include <cstring>
 
 namespace Open3DMotion
 {

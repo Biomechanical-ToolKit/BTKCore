@@ -16,6 +16,7 @@
 #include "Open3DMotion/OpenORM/Mappings/RichBinary/RichBinaryConvertFloat.h"
 #include "Open3DMotion/OpenORM/Mappings/RichBinary/BinMemFactoryDefault.h"
 #include <pugixml.hpp>
+#include <memory>
 
 namespace Open3DMotion
 {	
