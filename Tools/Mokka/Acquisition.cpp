@@ -1210,13 +1210,13 @@ void Acquisition::loadAcquisition()
     btk::MetaDataInfo::Pointer virtualFramesInfo = (*itVirtual)->ExtractChildInfo("REFERENCE_FRAMES", btk::MetaDataInfo::Char, 3, false);
     if (virtualFramesInfo)
     {
-      int num = virtualMarkersInfo->GetDimension(2);
+      int num = virtualMarkersInfo->GetDimension(1);
       for (int i = 0 ; i < num ; ++i)
       {
         std::string axes[4];
         for (int j = 0 ; j < 4 ; ++j)
         {
-          axes[j] = virtualMarkersInfo->ToString(i*4+j);
+          axes[j] = virtualMarkersInfo->ToString(i+j*num);
           axes[j] = axes[j].erase(axes[j].find_last_not_of(' ') + 1);
           axes[j] = axes[j].erase(0, axes[j].find_first_not_of(' '));
         }
