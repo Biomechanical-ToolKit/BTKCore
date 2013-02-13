@@ -1,16 +1,16 @@
 FIND_PACKAGE(Matlab REQUIRED)
 
-CMAKE_DEPENDENT_OPTION(BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES
-                       "Compiler option to be able to redistribute BTK MEX files on machine without the same developper environment (builds BTK in Release mode and links libraries in static mode (if MSVC is the compiler)." OFF
+CMAKE_DEPENDENT_OPTION(BTK_WRAP_MATLAB_REDISTRIBUTABLE_MEX_FILES
+                       "Compiler option to be able to redistribute BTK MEX files on machine without the same developer environment (builds BTK in Release mode and links libraries in static mode (if MSVC is the compiler)." OFF
                        BTK_WRAP_MATLAB OFF)
 
-IF (BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
-  SET(CMAKE_BUILD_MRD 1 CACHE STRING "State of building BTK with the Matlab Wrapping in redistribuable mode" FORCE)
+IF (BTK_WRAP_MATLAB_REDISTRIBUTABLE_MEX_FILES)
+  SET(CMAKE_BUILD_MRD 1 CACHE STRING "State of building BTK with the Matlab Wrapping in redistributable mode" FORCE)
   SET(CMAKE_OLD_BUILD_TYPE 0 CACHE STRING "CMAKE_BUILD_TYPE old value")
   SET(CMAKE_OLD_CXX_FLAGS_RELEASE 0 CACHE STRING "CMAKE_CXX_FLAGS_RELEASE old value")
   MARK_AS_ADVANCED(CMAKE_BUILD_MRD CMAKE_OLD_BUILD_TYPE CMAKE_OLD_CXX_FLAGS_RELEASE)
   IF(BTK_BUILD_SHARED_LIBS AND MSVC)
-    MESSAGE(FATAL_ERROR "The use of options BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES and BUILD_SHARED_LIBS together are not compatible. The first wants to create a static library and the second a dynamic library. By using BUILD_SHARED_LIBS in Release mode, you can redistribute the MEX-Files, but the target machines need a \"Microsoft Visual C++ Redistributable Package\" corresponding to the used compiler.")
+    MESSAGE(FATAL_ERROR "The use of options BTK_WRAP_MATLAB_REDISTRIBUTABLE_MEX_FILES and BUILD_SHARED_LIBS together are not compatible. The first wants to create a static library and the second a dynamic library. By using BUILD_SHARED_LIBS in Release mode, you can redistribute the MEX-Files, but the target machines need a \"Microsoft Visual C++ Redistributable Package\" corresponding to the used compiler.")
   ENDIF(BTK_BUILD_SHARED_LIBS AND MSVC)
 
   IF(NOT CMAKE_OLD_BUILD_TYPE)
@@ -23,7 +23,7 @@ IF (BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
     SET(CMAKE_OLD_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} CACHE STRING "CMAKE_CXX_FLAGS_RELEASE old value" FORCE)
   ENDIF(NOT CMAKE_OLD_CXX_FLAGS_RELEASE)
 
-  SET(CMAKE_BUILD_TYPE Release CACHE STRING "The build type is fixed due to the activation of BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES, Uncheck it to go to previous options." FORCE)
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING "The build type is fixed due to the activation of BTK_WRAP_MATLAB_REDISTRIBUTABLE_MEX_FILES, Uncheck it to go to previous options." FORCE)
   IF (MSVC)
     IF (${CMAKE_SYSTEM_VERSION} LESS 6.1) # Windows XP, VISTA
       SET(CMAKE_C_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG" CACHE STRING "The C flags are fixed due to the activation of BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES, Uncheck it to go to previous flags." FORCE)
@@ -33,7 +33,7 @@ IF (BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
       MESSAGE(STATUS "WARNING: Due to a different mechanism introduced in Windows 7, the redistribution of the MEX files into Windows XP or Vista compiled from Windows 7 requires to install the 'Visual C++ Redistributable Package'.")
     ENDIF (${CMAKE_SYSTEM_VERSION} LESS 6.1)
   ENDIF(MSVC)  
-ENDIF(BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES)
+ENDIF(BTK_WRAP_MATLAB_REDISTRIBUTABLE_MEX_FILES)
 
 IF(MATLAB_MEXFILE_EXT STREQUAL mexa64)
   # Force to build library (Common, IO, ...) as shared objects for linux 64-bit.

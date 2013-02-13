@@ -135,7 +135,7 @@ ECHO Error in script usage. The correct usage is:
 ECHO     %0 [CMAKE options] [MSVS installation path] [CMAKE installation path]
 ECHO:
 ECHO For example:
-ECHO     %0 "-DBTK_WRAP_MATLAB:BOOL=1 -DBTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES:BOOL=1" "C:\Program Files\Microsoft Visual Studio 9.0" "C:\Program Files\CMake 2.6"
+ECHO     %0 "-DBTK_WRAP_MATLAB:BOOL=1 -DBTK_WRAP_MATLAB_REDISTRIBUTABLE_MEX_FILES:BOOL=1" "C:\Program Files\Microsoft Visual Studio 9.0" "C:\Program Files\CMake 2.6"
 GOTO wait
 
 :error_CMAKE

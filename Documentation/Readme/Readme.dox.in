@@ -13,7 +13,7 @@
     - @ref config_vissupport
       - @ref config_vtk
     - @ref config_matlab
-      - @ref config_matlab_redistribuable
+      - @ref config_matlab_redistributable
     - @ref config_octave
     - @ref config_python
     - @ref config_scilab

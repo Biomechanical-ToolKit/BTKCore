@@ -99,7 +99,7 @@
 </ul>
 </li>
 <li><a class="el" href="Readme.html#config_matlab">BTK_WRAP_MATLAB</a><ul>
-<li><a class="el" href="Readme.html#config_matlab_redistribuable">BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES</a></li>
+<li><a class="el" href="Readme.html#config_matlab_redistributable">BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES</a></li>
 </ul>
 </li>
 <li><a class="el" href="Readme.html#config_octave">BTK_WRAP_OCTAVE</a></li>
@@ -190,7 +190,7 @@ Compilation</h1>
 <p>Compiling BTK requires a complete BTK source tree. Running BTK regression tests (see option <a class="el" href="Readme.html#config_test">BUILD_TESTING</a> in <a class="el" href="Readme.html#config_sec">Configuration Options in CMake</a>) requires for the first an internet connection to download data files from <a href="ftp://ftp.c3d.org">ftp://ftp.c3d.org</a>.</p>
 <h2><a class="anchor" id="build_sec"></a>
 Building with CMake</h2>
-<div class="important"> <b>Note:</b> For the users which want to build BTK with the Matlab wrapping option on any OS, you can use the java utility "EasyInstallWithRedistribuableMatlabToolbox.jar" located in the root of BTK sources. It is a little utility which call scripts to configure/compile/install BTK with the options <a class="el" href="Readme.html#config_matlab">BTK_WRAP_MATLAB</a> and <a class="el" href="Readme.html#config_matlab_redistribuable">BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES</a>. </div><p>CMake must be run to generate a build system for BTK. The build system may be placed either in the BTK source tree (an in-source build) or in a separate binary tree (an out-of-source build). The use of out-of-source builds is strongly encouraged because they make it easy to have multiple builds with different configurations sharing the same source tree. Once a single in-source build has been created it is the only build tree that can be associated with that source tree. A source tree may not be used both for an in-source build and an out-of-source build, but any number of out-of-source builds may share a source tree that does not have an in-source build. Having multiple out-of-source builds is particularly useful for installing BTK on multiple architectures using a single source tree on a shared disk.</p>
+<div class="important"> <b>Note:</b> For the users which want to build BTK with the Matlab wrapping option on any OS, you can use the java utility "EasyInstallWithRedistribuableMatlabToolbox.jar" located in the root of BTK sources. It is a little utility which call scripts to configure/compile/install BTK with the options <a class="el" href="Readme.html#config_matlab">BTK_WRAP_MATLAB</a> and <a class="el" href="Readme.html#config_matlab_redistributable">BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES</a>. </div><p>CMake must be run to generate a build system for BTK. The build system may be placed either in the BTK source tree (an in-source build) or in a separate binary tree (an out-of-source build). The use of out-of-source builds is strongly encouraged because they make it easy to have multiple builds with different configurations sharing the same source tree. Once a single in-source build has been created it is the only build tree that can be associated with that source tree. A source tree may not be used both for an in-source build and an out-of-source build, but any number of out-of-source builds may share a source tree that does not have an in-source build. Having multiple out-of-source builds is particularly useful for installing BTK on multiple architectures using a single source tree on a shared disk.</p>
 <p>CMake provides both a command-line tool and interactive interfaces. Advanced users may wish to use the command-line tool but here only the CMake interactive interface is documented.</p>
 <dl class="section user"><dt>- Windows</dt><dd>Run the cmake-gui dialog to get started. It must be executed from an environment configured to run the compiler to be used. In the case of the Visual Studio IDE no special environment is needed and cmake-gui can be started from its icon. In the case of a Visual Studio NMake, Borland C++, or MinGW build the cmake-gui dialog should be executed from a command prompt with the appropriate environment set. <div class="example"> <b>Example:</b> Microsoft Visual C++ 2008 Express environment with NMake<br/>
  With Microsoft Visual C++ 2008 Express, use the shorcut in the Start menu: Programs &gt; Microsoft Visual C++ 2008 Express Edition &gt; Visual Studio Tools &gt; Visual Studio 2008 Command Prompt. Launch cmake-gui from the new command prompt "c:\Program Files\CMake 2.6\bin\cmake-gui.exe". </div> <br/>
@@ -221,7 +221,7 @@ BTK_USE_VTK</h4>
 <h3><a class="anchor" id="config_matlab"></a>
 BTK_WRAP_MATLAB</h3>
 <p>Enable/Disable generation of BTK bindings in the Matlab language. In order to build the Matlab-based BTK interpreter, the target computer needs to have Matlab 7.0.4 or above installed. To turn on Matlab wrapping, set BTK_WRAP_MATLAB to ON during the configuration process.</p>
-<h4><a class="anchor" id="config_matlab_redistribuable"></a>
+<h4><a class="anchor" id="config_matlab_redistributable"></a>
 BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES</h4>
 <p>This option is activated if BTK_WRAP_MATLAB was activated during the previous CMake configuration iteration. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is useful for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_MATLAB_REDISTRIBUABLE_MEX_FILES is not compatible with BUILD_SHARED_LIBS.</p>
 <div class="info"> <b>Note:</b> This options is only relevant for Windows XP/Vista. The other OS (Mac/Linux) and Windows 7 (or above) don't need this option to redistribute the Matlab toolbox. </div><h3><a class="anchor" id="config_octave"></a>
@@ -234,7 +234,7 @@ BTK_WRAP_PYTHON</h3>
 <h3><a class="anchor" id="config_scilab"></a>
 BTK_WRAP_SCILAB</h3>
 <div class="important"> <b>Warning:</b> Scilab wrapping is not updated since BTK 0.1.6 and its easy installer was removed due to a major <a href="http://bugzilla.scilab.org/show_bug.cgi?id=6886">bug</a> in their mexlib library. </div><p> Enable/Disable generation of BTK bindings in the Scilab language. In order to build the Scilab-based BTK interpreter, the target computer needs to have Scilab 5.1 or above installed. To turn on Scilab wrapping, set BTK_WRAP_SCILAB to ON during the configuration process.</p>
-<h4><a class="anchor" id="config_scilab_redistribuable"></a>
+<h4><a class="anchor" id="config_scilab_redistributable"></a>
 BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES</h4>
 <p>This option is activated if BTK_WRAP_SCILAB was activated during the previous CMake configuration iteration. BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES is useful for target machines without the same compiler environment. This option forces the build system to be in Release mode with generation of static BTK libraries. BTK_WRAP_SCILAB_REDISTRIBUABLE_FILES is not compatible with BUILD_SHARED_LIBS.</p>
 <h3><a class="anchor" id="config_doc"></a>
