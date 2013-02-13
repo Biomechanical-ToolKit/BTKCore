@@ -9,11 +9,20 @@ The principal shortcuts in Mokka are:
 - Ctrl + z: undo last modifications
 - Ctrl + Shift + z: redo last modifications (Unix and MacOS X)
 - Ctrl + y: redo last modifications (Unix and MacOS X)
-- Ctrl + i: show/hide file informations 
+- Ctrl + i: show/hide file information 
 - Ctrl + m: show/hide model pane 
 - Ctrl + o: open a dialog box to select the acquisition to load 
 - Ctrl + s: save the modified acquisition 
 - Shift + Ctrl + s: save the acquisition as a new one
+- Alt + 1: Insert foot strike
+- Alt + 2: Insert foot off
+- Alt + 3: Insert event
+- Alt + 4: Insert left foot strike
+- Alt + 5: Insert left foot off
+- Alt + 6: Insert left event
+- Alt + 7: Insert right foot strike
+- Alt + 8: Insert right foot off
+- Alt + 9: Insert right event
 
 Some shortcuts are dedicated to the switch between views' configurations.
 - Ctrl + 1: Update the view’s layout to have only a 3D view

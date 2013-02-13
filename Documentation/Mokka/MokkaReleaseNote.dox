@@ -1,7 +1,7 @@
 /**
 @page MokkaReleaseNote Release Notes
 
-- <b>12/16/04: Mokka 0.5.1</b> released
+- <b>04/16/2012: Mokka 0.5.1</b> released
   - Fixes:
     - Dragging any kind of item (except video) over the video view hides the current displayed video.
     - Clearing a chart for a cropped acquisition reset the zoom.
@@ -9,7 +9,7 @@
     - Mokka 0.5 introduced a bug where it is no more possible to modify the frame of the edited event(s).
     - Packaging Mokka under MacOS X doesn't install the phonon backend for quicktime (issue <a href="http://code.google.com/p/b-tk/issues/detail?id=29">29</a>).
     
-- <b>12/11/04: Mokka 0.5</b> released
+- <b>04/11/2012: Mokka 0.5</b> released
   - Enhancements:
     - Watch any video joined to an acquisition.
     - Import video files (AVI, MOV, MPEG, OGG, WMV)
@@ -46,7 +46,7 @@
     - Trying to write a file with an extension not supported leads to an error. Now open a "Save as" dialog.
     - The action "Reframe from one" is enabled even if the first frame is equal to 1.
   
-- <b>11/30/11: Mokka 0.4</b> released
+- <b>12/09/2011: Mokka 0.4</b> released
   - Enhancements:
     - Chart viewer to display analog signals and components of points (markers, angles, forces, etc.) into 2D plots.
     - Export plot to bitmap images.
@@ -74,7 +74,7 @@
     - (MacOS X only) Under MacOS X, the shortcut Command + M is used to minimize the application. The shortcut used to view the model panel is now set to Command + Shift + M (only under MacOS X).
     - Minor UI fixes
 
-- <b>06/16/11: Mokka 0.3</b> released
+- <b>06/16/2011: Mokka 0.3</b> released
   - Enhancements:
     - User preferences panel added.
     - Visualization of segments added. You can add/remove/edit segments' informations (links, label, descriptions, color). The segment definitions is saved in the Model Visualization Configuration (MVC) file. Undo/Redo support. Preferences for the default segment color added.
@@ -100,7 +100,7 @@
     - Loading a model configuration from another one doesn't reset radius and color for markers not specified in the new model.
     - Loading a dropped file doesn't check if the model configuration is modified or not.
 
-- <b>02/12/11: Mokka 0.2</b> released
+- <b>02/12/2011: Mokka 0.2</b> released
   - Enhancements:
     - Multiple views added.
     - Orthogonal projection added.
@@ -124,7 +124,7 @@
   - Fixes:
     - Several UI fixes.
 
-- <b>06/18/10: Mokka 0.1a4</b> released
+- <b>06/10/2010: Mokka 0.1a4</b> released
   - Enhancements:
     - Drag and drop support for Mokka.
     - New widget to show the loading progress of a file
@@ -140,7 +140,7 @@
     - Clicking in the markers' list when it is empty can crash Mokka.
     - On MacOS X, sometimes the loading of a file doesn't happen and keep the previous files (an crash in some case) 
 
-- <b>10/16/09: Mokka 0.1a3</b> released
+- <b>10/16/2009: Mokka 0.1a3</b> released
   - Updates:
     - Markers trajectory can be displayed (click on the icon at the left of the marker's label).
     - Modification of acquisition data (points and events) with undo/redo support.
@@ -149,7 +149,7 @@
     - Menu Options > Edit Metadata renamed Options > View Metadata as it is not possible to edit them.
     - Open/Save dialogs use native dialogs. 
 
-- <b>09/10/09: Mokka 0.1a2</b> released
+- <b>09/10/2009: Mokka 0.1a2</b> released
   - Enhancements:
     - ENH: FPS replaced by 3D global axes.
     - ENH: Metadata are diplayed in a modal window (see menu Options > Edit Metadata).
@@ -158,5 +158,5 @@
     - Executing Mokka on Windows opens a command prompt.
     - C3D data with POINTS:UNITS in meters drawn in millimeters ( Issue 1 ). 
 
-- <b>08/24/09: Mokka 0.1a1</b> initial alpha release
+- <b>08/24/2009: Mokka 0.1a1</b> initial alpha release
  */

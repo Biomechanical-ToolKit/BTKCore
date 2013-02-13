@@ -12,6 +12,17 @@
 </ul>
 @endhtmlonly
 
+Shortcuts associated with the creation of events:
+- Alt + 1: Insert foot strike
+- Alt + 2: Insert foot off
+- Alt + 3: Insert event
+- Alt + 4: Insert left foot strike
+- Alt + 5: Insert left foot off
+- Alt + 6: Insert left event
+- Alt + 7: Insert right foot strike
+- Alt + 8: Insert right foot off
+- Alt + 9: Insert right event
+
 @section MokkaTimeBarGroundOrientation Ground orientation
 Menu to choose the ground orientation
 - By defaut the visual ground orientation is Plane XY.
@@ -20,7 +31,7 @@ Menu to choose the ground orientation
 @section MokkaTimeBarPlaybackSpeed Playback speed
 Menu to choose the speed of the playback.
 - By defaut the playback speed corresponds to the RealTime.
-- The playback speed can be modified to 1/2,  1/4, 1/5, 1/10 or Full frames by using @htmlonly <img src="acquisition_options.png"> @endhtmlonly tip from the drop-down menu.
+- The playback speed can be modified to 1/2,  1/4, 1/5, 1/10 or RealTime by using @htmlonly <img src="acquisition_options.png"> @endhtmlonly tip from the drop-down menu.
 - Playback Speed at Real time: Play the acquisition at its frame rate (default).
 - Playback Speed at 1/2: Play the acquisition at 50% of its frame rate.
 - Playback Speed at 1/4: Play the acquisition at 25% of its frame rate.
@@ -31,8 +42,8 @@ Menu to choose the speed of the playback.
 @section MokkaTimeBarMarkerTrajectory Marker Trajectory Length
 Menu to choose the length of the markers' trajectory.
 - By defaut the length is set to 100 frames.
-- The length can be set to Full, 25, 50, 100 or 200 frames by using  tip from the drop-down menu.
-- Trajectory length will all frames: Draw the whole trajectory.
+- The length can be set to All Frames, 25, 50, 100 or 200 frames by using  tip from the drop-down menu.
+- Trajectory length will All Frames: Draw the whole trajectory.
 - Trajectory length of 25 frames: Draw a total of 25 frames including holes.
 - Trajectory length of 50 frames: Draw a total of 50 frames including holes.
 - Trajectory length of 100 frames: Draw a total of 100 frames including holes (default).

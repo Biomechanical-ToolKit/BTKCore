@@ -36,6 +36,16 @@
     <li class="help_box">
       <div class="help_box_section">
       @endhtmlonly
+      @subpage MokkaTools
+      @htmlonly
+      </div>
+      <div class="help_box_description">
+      Details on tools available in Mokka to modify acquisition's data
+      </div>
+    </li>
+    <li class="help_box">
+      <div class="help_box_section">
+      @endhtmlonly
       @subpage MokkaTutorial
       @htmlonly
       </div>

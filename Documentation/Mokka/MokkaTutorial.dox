@@ -2,6 +2,7 @@
 @page MokkaTutorial Getting Started
 
 The following tutorials will help you to:
+- @subpage MokkaTutorial_CreateCycleDefinition
 - @subpage MokkaTutorial_AddRemoveEvent
 - @subpage MokkaTutorial_EditEvent
 - @subpage MokkaTutorial_ChangeColorMarker

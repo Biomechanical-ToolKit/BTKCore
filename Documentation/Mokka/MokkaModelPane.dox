@@ -36,7 +36,7 @@ The button @htmlonly <img src="process.png"/> @endhtmlonly returns a menu with t
 @htmlonly
 <ul class=twocolumns>
 <li>
-The segments' list <img src="link2.png"/> in the acquistion explorer contains the option to visualize segments <img src="eye.png"/> in 3D views. This item is only visible if at least one segment is defined. The options to change the properties (located at the bottom of the panel) of the segments appears when one segment or a group of segments are selected.<br/>
+The segments' list <img src="link2.png"/> in the acquisition explorer contains the option to visualize segments <img src="eye.png"/> in 3D views. This item is only visible if at least one segment is defined. The options to change the properties (located at the bottom of the panel) of the segments or to edit the links of the segments appears when one segment or a group of segments are selected.<br/>
 <br/>
 To assign a color to the selected segments, you can click on the first circle which will open a dialog box where you will pick the desired color. This color is then saved in the color history (other circles). To reuse the color in the history, click only on it and the selected markers will be repainted.
 <br/><br/>
@@ -81,6 +81,17 @@ There are also options in the contextual menu for the markers (right click onto 
 </ul>
 <div class=resetcolumn></div>
 @endhtmlonly
+@subsection MokkaModelVirtualMarkerProperties Virtual markers
+@htmlonly
+<ul class=twocolumns>
+<li>
+As for markers, the virtual markers' list <img src="virtual_markers.png"/> in the acquisition explorer contains the options to visualize <img src="eye.png"/> and track <img src="trajectory_active.png" width="16px" height="16px"/> markers in the  @endhtmlonly @ref Mokka3DViewer @htmlonly. By default, virtual markers are hidden.
+<br/>
+To view or track permanently one or numerous virtual markers, the <img src="eye.png"/> and/or <img src="trajectory_active.png" width="16px" height="16px"/> box must be checked into the properties menu.
+</li>
+</ul>
+<div class=resetcolumn></div>
+@endhtmlonly
 @subsection MokkaModelAnalogProperties Analogs
 @htmlonly
 <ul class=twocolumns>
@@ -118,9 +129,9 @@ Some of the components can be detailed as following:
   <li><b>Position</b>: also visible in the 3D view as <em>force path</em> (click on the checkbox to enable it) ;</li>
   <li><b>Direction angle</b>: each component is defined as the angle between the force vector and the horizontal of the selected plane.
     <ul>
-      <li>Component X: projected in the yOz plane (as visible in the 3D right othogonal view) ;</li>
-      <li>Component Y: projected in the xOz plane (as visible in the 3D front othogonal view) ;</li>
-      <li>Component Z: projected in the yOz plane (as visible in the 3D top othogonal view)</li>
+      <li>Component X: projected in the yOz plane (as visible in the 3D right orthogonal view) ;</li>
+      <li>Component Y: projected in the xOz plane (as visible in the 3D front orthogonal view) ;</li>
+      <li>Component Z: projected in the yOz plane (as visible in the 3D top orthogonal view)</li>
     </ul>
   </li>
 </ul>
@@ -164,7 +175,7 @@ The video items <img src="video.png"/> corresponds to extra files appended autom
 <br/><br/>
 These items are used by the @endhtmlonly @ref MokkaMediaVideo "video" @htmlonly view. Drag the selected video inside to display it. The video is played frame by frame by taking into account the difference between the acquisition's frequency and the video's frequency.
 <br/><br/>
-The properties of video give you access to the filename of the video an most important, to a possible delay between the video and the acquisition. This property is very usefull if you have unsynchronized recorded videos. Having a negative delay means that the video started to be recorded <em>before</em> the beginning of the acquisition. The range of the delay is limited to -5.0 seconds to 5.0 seconds.
+The properties of video give you access to the filename of the video and most important, to a possible delay between the video and the acquisition. This property is very useful if you have unsynchronized recorded videos. Having a negative delay means that the video started to be recorded <em>before</em> the beginning of the acquisition. The range of the delay is limited to -5.0 seconds to 5.0 seconds.
 <br/><br/>
 <b>Note</b>: If a video file is not found when the acquisition is loaded, then a video icon with a warning is shown <img src="video_error.png"/>. Moreover, the text is in red to show that an error happend. To have more details on the error, you could check in the @endhtmlonly @ref MokkaConsoleLogger "logger" @htmlonly.
 </li>

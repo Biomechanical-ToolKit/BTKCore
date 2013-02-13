@@ -34,6 +34,8 @@ To access to the the Preferences / Options, you only have to go in the following
 <ul class=twocolumns>
 <li>
 <ul class=default>
+<li><tt>Background</tt>: Selection of the default color for the visualization of the background in the 3D view/li>
+<br/>
 <li><tt>Segment</tt>: Selection of the default color for the visualization of segments in the 3D view</li>
 <br/>
 <li><tt>Marker</tt>: Selection of the default color, radius and trajectory's length to display for the visualization of markers in the 3D view</li>
@@ -59,6 +61,8 @@ To access to the the Preferences / Options, you only have to go in the following
 <li><tt>Plot</tt>: Option to define the plot default line width</li>
 <br/>
 <li><tt>Graph</tt>: Options to display by default the events and to choose the unit of the X axis (frame or time)</li>
+<br/>
+<li><tt>Graph</tt>: Cycle Settings: Add, remove or edit cycle settings display. You will find more details in the tutorial: @endhtmlonly @ref MokkaTutorial_CreateCycleDefinition @htmlonly</li>
 </ul>
 </li>
 <li>

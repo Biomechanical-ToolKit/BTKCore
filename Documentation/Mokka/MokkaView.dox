@@ -3,7 +3,7 @@
 
 @section MokkaViewGeneral General use
 - The main window can be split in horizontal and/or vertical way using the double-arrow in the right top menu. Each successive window can be split again.
-- Each window can be used as a 3D Viewer or a Chart viewer or a Console logger.
+- Each window can be used as 3D, Chart or Media view or as a Console logger
 
 @section Mokka3DViewer 3D Viewer
 - The view can be changed between perspective or orthogonal from the left top menu.
@@ -54,7 +54,6 @@
   - Display a value from a graph. Let the pointer on the graph and the frame and the value appears.
 - Use the contextual menu (left click) to:
   - Reset zoom
-  - Export image (see How to export chart for the different options) 
   - Display events: the displayed events correspond to the event in the time bar. A cursor is display in the time bar and on the chart (not possible to remove). This cursor corresponds to the current frame.
   - Clear the chart. The active chart will be cleared.
   - Insert Event (see @ref MokkaTimeBarInsertEvent).
@@ -62,28 +61,6 @@
 - Use the collapsed/expanded (only for the analog chart)
   - Collapse puts all the analog signals in the same graph.
   - Expanded creates separate graphs for each analog signals (very useful for EMG data).
-
-@subsection MokkaChartViewerExport How to export chart
-- Use the contextual menu (Right click) and select ìExport to imageî. You can choose different options for exporting via 4 option blocks  
-  - Image size and resolution
-    - Define width, height (in cm or inch).
-    - Define resolution (in DPI).
-  - Chart
-    - Define a title at the top of the chart.
-    - Define the font of title, axis, legend.
-    - Define the size of the font.
-    - Define the italic , bold of title, axis, legend.
-  - Axis
-    - Define a title for the axis.
-  - Legend
-    - Define if the legend is visible or not.
-    - Define if the units in the legend are visible or not.
-    - Define the location of the legend.
-- Click on OK button to export the image. You can choose the location of the export and the image format (BMP, JPEG, TIFF, and PNG).
-
-@image html chart_export.png Dialog window to export the selected chart to a bitmap image
-
-@b Note: For the moment, the Export function works only axis by axis. A next release will introduce the possibility to export a complete graph
 
 @section MokkaMediaVideo Video
 - To display a video from an acquisition:

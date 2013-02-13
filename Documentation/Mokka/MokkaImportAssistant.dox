@@ -11,7 +11,7 @@ You have also an option to select which first frame will be used in the imported
 
 @section MokkaImportAssistantRules Rules to merge/concatenate acquisitions
 
-The difference between the merging or the concatenation depends of the acquisitions' informations.
+The difference between the merging or the concatenation depends of the acquisitions' information.
 
 If the acquisitions are exactly the same (same label for points and analog channels) and the first 
 frame of the n+1th acquisition corresponds to the last frame of the nth acquisition, then the 
