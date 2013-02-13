@@ -133,30 +133,32 @@
   #endif
   
 #else
-  #ifdef Q_OS_WIN
-    #ifndef WIN32_LEAN_AND_MEAN
-      #define WIN32_LEAN_AND_MEAN
-    #endif
-    #include <windows.h>
-  #endif
-
   VizRendererWidget::VizRendererWidget(QWidget* parent, void* onlyforCompatibility, Qt::WindowFlags f)
   : QVTKWidgetX(parent, f)
   {
     Q_UNUSED(onlyforCompatibility);
   };
   
-  #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
-    // Fix: "Fix QVTKWidget problem on Windows with Aero off."
-    // http://vtk.org/gitweb?p=VTK.git;a=commit;h=c5d4f4c2b904821247729bfa67e1cab8c74e5d36
-    #if defined(Q_WS_WIN)
-    bool VizRendererWidget::winEvent(MSG* msg, long*)
+  // Fix: "Fix QVTKWidget problem on Windows with Aero off."
+  // http://vtk.org/gitweb?p=VTK.git;a=commit;h=c5d4f4c2b904821247729bfa67e1cab8c74e5d36
+  // Combined with another patch "fixAeroIssueOnlyOnWindows7.patch" (even for VTK 5.10)
+  #if defined(Q_WS_WIN)
+  #ifdef Q_OS_WIN
+    #ifndef WIN32_LEAN_AND_MEAN
+      #define WIN32_LEAN_AND_MEAN
+    #endif
+    #include <windows.h>
+  #endif
+  #include <QSysInfo>
+  bool VizRendererWidget::winEvent(MSG* msg, long*)
+  {
+    if(QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) // Note: The fix was released only for Windows 7, but we assume it is the same for Windows 8.
     {
       if(msg->message == WM_PAINT)
         InvalidateRect(this->winId(), NULL, FALSE);
-      return false;
     }
-    #endif
+    return false;
+  }
   #endif
   
 #endif
