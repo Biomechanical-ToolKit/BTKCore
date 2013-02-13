@@ -26,11 +26,8 @@ end
 % Data to keep
 % - Point
 pidx = (startAt:startAt+numFrames-1)-ff+1;
-[points, pointsInfo] = btkGetPoints(h);
-pv = struct2array(points);
+pv = btkGetPointsValues(h);
 pv = pv(pidx,:);
-rv = struct2array(pointsInfo.residuals);
-rv = rv(pidx,:);
 % - Analog
 snpf = btkGetAnalogSampleNumberPerFrame(h);
 aidx = (((startAt-ff)*snpf):(startAt-ff+numFrames)*snpf-1)+1;
@@ -39,9 +36,7 @@ av = av(aidx,:);
 % Resizing
 btkSetFrameNumber(h, numFrames);
 % Storing modifications
-for i = 1:size(pv,2)/3
-    btkSetPoint(h, i, pv(:,(i-1)*3+1:i*3), rv(:,i));
-end
+btkSetPointsValues(h, pv);
 btkSetAnalogsValues(h, av);
 % Set the first frame.
 btkSetFirstFrame(h, startAt, 1); % 1: Modify also the events' frame/time
