@@ -519,7 +519,7 @@ class C3DFileReaderTest(unittest.TestCase):
     
     def test_ParameterOverflow(self):
         reader = btk.btkAcquisitionFileReader()
-        reader.SetFilename(_TDDConfigure.C3DFilePathIN + 'others/parameterOverflow.C3D')
+        reader.SetFilename(_TDDConfigure.C3DFilePathIN + 'others/parameterOverflow.c3d')
         reader.Update()
         
         acq = reader.GetOutput()

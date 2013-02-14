@@ -597,7 +597,7 @@ CXXTEST_SUITE(C3DFileReaderTest)
   CXXTEST_TEST(ParameterOverflow)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "others/parameterOverflow.C3D");
+    reader->SetFilename(C3DFilePathIN + "others/parameterOverflow.c3d");
     reader->Update();
     
     btk::Acquisition::Pointer acq = reader->GetOutput();

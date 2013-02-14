@@ -146,7 +146,7 @@ CXXTEST_SUITE(ANCFileWriterTest)
   CXXTEST_TEST(Shd01_from_c3d)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "others/Shd01.c3d");
+    reader->SetFilename(C3DFilePathIN + "others/shd01.c3d");
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(ANCFilePathOUT + "Shd01_from_c3d.anc");
