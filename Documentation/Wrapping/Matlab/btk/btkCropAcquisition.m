@@ -28,6 +28,8 @@ end
 pidx = (startAt:startAt+numFrames-1)-ff+1;
 pv = btkGetPointsValues(h);
 pv = pv(pidx,:);
+rv = btkGetPointsResiduals(h);
+rv = rv(pidx,:);
 % - Analog
 snpf = btkGetAnalogSampleNumberPerFrame(h);
 aidx = (((startAt-ff)*snpf):(startAt-ff+numFrames)*snpf-1)+1;
@@ -37,6 +39,7 @@ av = av(aidx,:);
 btkSetFrameNumber(h, numFrames);
 % Storing modifications
 btkSetPointsValues(h, pv);
+btkSetPointsResiduals(h, rv);
 btkSetAnalogsValues(h, av);
 % Set the first frame.
 btkSetFirstFrame(h, startAt, 1); % 1: Modify also the events' frame/time
