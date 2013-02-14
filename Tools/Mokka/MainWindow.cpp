@@ -1978,7 +1978,7 @@ void MainWindow::exportImageSeries()
   LOG_INFO("Exporting image series");
   QString filename_base = exporterDlg.pathLineEdit->text() + "/" + exporterDlg.filePrefixLineEdit->text();
   bool noExportError = false;
-  int num = (int)log10(std::fabs((float)rb))+1;
+  int num = btkNumberOfDigits(rb);
   Viz3DWidget* viz3d = viz3ds[exporterDlg.viewComboBox->currentIndex()];
   try
   {
