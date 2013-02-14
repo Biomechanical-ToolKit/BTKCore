@@ -1,22 +1,34 @@
-% Simple M-script file to launch unit tests for btkC3DserverEmulation
-% Due to the use of C3Dserver to compare the result, these tests works
-% only under Microsoft Windows 32-bit.
+% Simple M-script file to launch unit tests for BTK Matlab binding
 function TDD
-    % Check for the OS
-    if ~strcmp(computer, 'PCWIN')
-      error('btk:TDD', 'These unit tests are only available for Microsoft Windows 32-bit due to the use of C3Dserver');
-    end
-
-    % Test if C3DServer is installed.
-    try
-      actxserver('C3Dserver.C3D');
-    catch
-      error('btk:TDD', 'C3Dserver is not installed on you computer');
-    end
-
-    % We suppose the toolbox btk is already in the path.
-    % Let's add the path pour Matlab xUnit
+    clc
+    
+    % The toolbox btk is supposed to be already in the Matlab paths.
+    % Let's add the path for Matlab xUnit
     addpath('../../Utilities/matlab_xunit/xunit');
-
+    
     % Run the unit tests
-    runtests testC3DserverEmulation;
+    fprintf('\n===========================================================\n');
+    runtests testBTKCommon
+    fprintf('\n===========================================================\n');
+    runtests testBTKIO
+    fprintf('\n===========================================================\n');
+    runtests testBTKBasicFilters
+    
+    % Extra tests for the function btkC3DserverEmulation
+    % if the original C3DServer is intalled
+    % - Check for the OS
+    if strcmp(computer, 'PCWIN')
+        c3dserverDetected = true;
+        % - Test if C3DServer is installed.
+        try 
+          actxserver('C3Dserver.C3D');
+        catch
+            c3dserverDetected = false;
+        end
+        c3dserverDetected = false;
+        if (c3dserverDetected)
+            % - Run the unit tests
+            fprintf('\n===========================================================\n');
+            runtests testC3DserverEmulation;
+        end
+    end
