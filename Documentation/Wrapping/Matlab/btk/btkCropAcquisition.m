@@ -14,7 +14,7 @@ function btkCropAcquisition(h, startAt, numFrames)
 ff = btkGetFirstFrame(h);
 lf = btkGetLastFrame(h);
 if (nargin == 2)
-    numFrames = lf - ff + 1 - startAt;
+    numFrames = lf - ff + 1 - startAt + 1;
 end
 if ((startAt < ff) || startAt > lf)
     error('btk:CropAcquisiton','Invalid index.');
