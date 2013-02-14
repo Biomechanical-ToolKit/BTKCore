@@ -33,21 +33,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMXSpecializedPoint_h
-#define __btkMXSpecializedPoint_h
+#include "btkMEXObjectHandle.h"
 
-#include "btkMex.h"
+#include <btkAcquisition.h>
 
-#include <btkPoint.h>
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+  if (nrhs != 1)
+    mexErrMsgTxt("One input required.");
+  if (nlhs > 1)
+    mexErrMsgTxt("Too many output arguments.");
 
-void btkMXCreateSpecializedPointsStructure(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXGetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXGetSpecializedPointResiduals(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXSetSpecializedPointResiduals(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 
-#if !defined(SCI_MEX)
-  #include "btkMXSpecializedPoint.cxx"
-#endif
+  int numberOfPoints = acq->GetPointNumber();
+  plhs[0] = mxCreateDoubleMatrix(acq->GetPointFrameNumber(), numberOfPoints, mxREAL);
+  double* values = mxGetPr(plhs[0]);
 
-#endif // __btkMXSpecializedPoint_h 
+  int numberOfValuesPerPoint = acq->GetPointFrameNumber();
+  int i = 0;
+  int j = numberOfValuesPerPoint;
+  double* v = 0;
+  btk::Acquisition::PointConstIterator it = acq->BeginPoint();
+  while(i < (numberOfPoints * numberOfValuesPerPoint))
+  {
+    if (j >= numberOfValuesPerPoint)
+    {
+      v = (*it)->GetResiduals().data();
+      ++it;
+      j = 0;
+    }
+    values[i] = v[j];
+    i+=1; j+=1;
+  }
+};
+

@@ -33,21 +33,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMXSpecializedPoint_h
-#define __btkMXSpecializedPoint_h
+#include "btkMEXObjectHandle.h"
 
-#include "btkMex.h"
+#include <btkAcquisition.h>
 
-#include <btkPoint.h>
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+  if (nrhs != 2)
+    mexErrMsgTxt("Two inputs required.");
 
-void btkMXCreateSpecializedPointsStructure(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXGetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXGetSpecializedPointResiduals(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXSetSpecializedPointResiduals(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
+  btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 
-#if !defined(SCI_MEX)
-  #include "btkMXSpecializedPoint.cxx"
-#endif
+  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]))
+    mexErrMsgTxt("The second input must be a matrix of real values corresponding to points values."); 
 
-#endif // __btkMXSpecializedPoint_h 
+  // First output
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+
+  int numberOfValuesPerPoint = acq->GetPointFrameNumber();
+  int numberOfPoints = acq->GetPointNumber();
+
+  if (mxGetNumberOfElements(prhs[1]) != numberOfPoints*numberOfValuesPerPoint)
+    mexErrMsgTxt("The second input doesn't have the same size than the number of points values.");
+    
+  double* values = mxGetPr(prhs[1]);
+
+  int i = 0;
+  int j = numberOfValuesPerPoint;
+  double* v = 0;
+  btk::Acquisition::PointIterator it = acq->BeginPoint();
+  while (i < numberOfPoints * numberOfValuesPerPoint)
+  {
+    if (j >= numberOfValuesPerPoint)
+    {
+      v = (*it)->GetResiduals().data();
+      ++it;
+      j = 0;
+    }
+    v[j] = values[i];
+    i+=1; j+=1;
+  }
+};
+
+

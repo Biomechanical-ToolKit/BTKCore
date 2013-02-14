@@ -1,10 +1,9 @@
-function v = btkGetPointsValues(h) %#ok
-%BTKGETPOINTSVALUES Extract points' components and store them in a matrix
+function r = btkGetPointsResiduals(h) %#ok
+%BTKGETPOINTSRESIDUALS Extract points' residuals and store them in a matrix
 % 
-%  V = BTKGETPOINTSVALUES(H) returns a matrix of real.  The number of rows
+%  R = BTKGETPOINTSRESIDUALS(H) returns a matrix of real.  The number of rows
 %  of this matrix corresponds to the number of frames in the acquisition.
-%  The number of columns of this matrix corresponds to the number of 
-%  points multiplied by 3 (their components X,Y,Z).
+%  The number of columns of this matrix corresponds to the number of points.
 %  The biomechanical acquisition handle H is represented as a double
 %  and can be only used with the btk* functions.
 
@@ -15,6 +14,6 @@ function v = btkGetPointsValues(h) %#ok
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.
 %# mex
 
-error(generatemsgid('NotSupported'),'MEX file for BTKGETPOINTSVALUES not found');
+error(generatemsgid('NotSupported'),'MEX file for BTKGETPOINTSRESIDUALS not found');
 
-% [EOF] btkGetPointsValues.m
+% [EOF] btkGetPointsResiduals.m

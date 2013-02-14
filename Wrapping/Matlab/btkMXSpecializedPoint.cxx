@@ -196,4 +196,94 @@ void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[
     v[j] = values[i];
     ++i; ++j;
   }
-}; 
+};
+
+void btkMXGetSpecializedPointResiduals(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+  if (nrhs != 1)
+    mexErrMsgTxt("One input required.");
+  if (nlhs > 1)
+    mexErrMsgTxt("Too many output arguments.");
+
+  // First output
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+
+  btk::SpecializedPointsExtractor::Pointer specialPointExtractor = btk::SpecializedPointsExtractor::New();
+  specialPointExtractor->SetInput(acq);
+  specialPointExtractor->SetPointType(t);
+  btk::PointCollection::Pointer points = specialPointExtractor->GetOutput();
+  specialPointExtractor->Update();
+
+  int numberOfFrames = acq->GetPointFrameNumber();
+  int numberOfPoints = points->GetItemNumber();
+  if (numberOfPoints == 0)
+  {
+    plhs[0] = mxCreateDoubleMatrix(0, 0, mxREAL);
+    return;
+  }
+
+  plhs[0] = mxCreateDoubleMatrix(numberOfFrames, numberOfPoints, mxREAL);
+  double* values = mxGetPr(plhs[0]);
+
+  int i = 0;
+  int j = numberOfFrames;
+  double* v = 0;
+  btk::PointCollection::ConstIterator it = points->Begin();
+  while(i < (numberOfFrames * numberOfPoints))
+  {
+    if (j >= numberOfFrames)
+    {
+      v = (*it)->GetResiduals().data();
+      ++it;
+      j = 0;
+    }
+    values[i] = v[j];
+    ++i; ++j;
+  }
+};
+
+void btkMXSetSpecializedPointResiduals(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+  if (nrhs != 2)
+    mexErrMsgTxt("Two inputs required.");
+
+  btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
+
+  if (!mxIsNumeric(prhs[1]))
+    mexErrMsgTxt("The second input must be a matrix of real values corresponding to the same dimensions than extracted points' components.");
+
+  btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
+
+  btk::SpecializedPointsExtractor::Pointer specialPointExtractor = btk::SpecializedPointsExtractor::New();
+  specialPointExtractor->SetInput(acq);
+  specialPointExtractor->SetPointType(t);
+  btk::PointCollection::Pointer points = specialPointExtractor->GetOutput();
+  specialPointExtractor->Update();
+
+  int numberOfFrames = acq->GetPointFrameNumber();
+  int numberOfPoints = points->GetItemNumber();
+
+  if (mxGetNumberOfElements(prhs[1]) != static_cast<size_t>(numberOfFrames * numberOfPoints))
+    mexErrMsgTxt("The second input doesn't have the same size than extracted points' components.");
+    
+  if (numberOfPoints == 0)
+    return;
+    
+  double* values = mxGetPr(prhs[1]);
+
+  int i = 0;
+  int j = numberOfFrames;
+  double* v = 0;
+  btk::PointCollection::Iterator it = points->Begin();
+  while (i < (numberOfFrames * numberOfPoints))
+  {
+    if (j >= numberOfFrames)
+    {
+      v = (*it)->GetResiduals().data();
+      ++it;
+      j = 0;
+    }
+    v[j] = values[i];
+    ++i; ++j;
+  }
+};

@@ -23,7 +23,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkClearMetadata">btkClearMetadata</a>                  - Clear metadata in the acquisition
 %   <a href="matlab:help btkCloneAcquisition">btkCloneAcquisition</a>               - Clone an acquisition
 %   <a href="matlab:help btkClearAnalysis">btkClearAnalysis</a>                  - Clear the metadata ANALYSIS
-%   <a href="matlab:help btkCropAcquisition">btkCropAcquisition</a>                 - Cut the acquistion and adapt the events' frame/time.
+%   <a href="matlab:help btkCropAcquisition">btkCropAcquisition</a>                - Crop the acquistion and adapt the events' frame/time.
 %   <a href="matlab:help btkDeleteAcquisition">btkDeleteAcquisition</a>              - Delete an acquisition and free the used memory
 %   <a href="matlab:help btkNewAcquisition">btkNewAcquisition</a>                 - Create an empty acquisition
 %   <a href="matlab:help btkRemoveAnalysisParameter">btkRemoveAnalysisParameter</a>        - Erase a paremeter from the analysis
@@ -33,7 +33,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetFrequency">btkSetFrequency</a>                   - Set the main frequency
 %   <a href="matlab:help btkSetMaxInterpolationGap">btkSetMaxInterpolationGap</a>         - Acquisition's interpolation gap modifier
 %   <a href="matlab:help btkSetMetaDataDescription">btkSetMetaDataDescription</a>         - Metadata's description modifier
-%   <a href="matlab:help btkSetMetaDataDimensions">btkSetMetaDataDimensions</a>        - Metadata's dimensions modifier
+%   <a href="matlab:help btkSetMetaDataDimensions">btkSetMetaDataDimensions</a>          - Metadata's dimensions modifier
 %   <a href="matlab:help btkSetMetaDataFormat">btkSetMetaDataFormat</a>              - Metadata's format modifier
 %   <a href="matlab:help btkSetMetaDataLabel">btkSetMetaDataLabel</a>               - Metadata's label modifier
 %   <a href="matlab:help btkSetMetaDataUnlock">btkSetMetaDataUnlock</a>              - Metadata's unlock state modifier
@@ -42,12 +42,15 @@ function tocbtkcommon
 %
 % Point accessor
 %   <a href="matlab:help btkGetPoint">btkGetPoint</a>                       - Point extraction
+%   <a href="matlab:help btkGetPointsValues">btkGetPointsValues</a>                - Points' values accessor
+%   <a href="matlab:help btkGetPointsResiduals">btkGetPointsResiduals</a>             - Points' residuals accessor
 %   <a href="matlab:help btkGetAngles">btkGetAngles</a>                      - Angles extraction
 %   <a href="matlab:help btkGetAnglesValues">btkGetAnglesValues</a>                - Extracts angles as a simple matrix 
 %   <a href="matlab:help btkGetForces">btkGetForces</a>                      - Forces extraction
 %   <a href="matlab:help btkGetForcesValues">btkGetForcesValues</a>                - Extracts forces as a simple matrix 
 %   <a href="matlab:help btkGetMarkers">btkGetMarkers</a>                     - Markers extraction
 %   <a href="matlab:help btkGetMarkersValues">btkGetMarkersValues</a>               - Extracts markers as a simple matrix 
+%   <a href="matlab:help btkGetMarkersResiduals">btkGetMarkersResiduals</a>           - Extracts markers' residuals as a simple matrix 
 %   <a href="matlab:help btkGetMoments">btkGetMoments</a>                     - Moments extraction
 %   <a href="matlab:help btkGetMomentsValues">btkGetMomentsValues</a>               - Extracts moments as a simple matrix 
 %   <a href="matlab:help btkGetPoints">btkGetPoints</a>                      - Points extraction
@@ -65,17 +68,20 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetPointLabel">btkSetPointLabel</a>                  - Point's label modifier
 %   <a href="matlab:help btkSetPointResiduals">btkSetPointResiduals</a>              - Point's residuals modifier
 %   <a href="matlab:help btkSetPointType">btkSetPointType</a>                   - Point's type modifier
-%   <a href="matlab:help btkSetPointsUnit">btkSetPointsUnit</a>                   - Set unit for a type of point
+%   <a href="matlab:help btkSetPointsUnit">btkSetPointsUnit</a>                  - Set unit for a type of point
 %   <a href="matlab:help btkSetPointValues">btkSetPointValues</a>                 - Point's values modifier
-%   <a href="matlab:help btkSetAnglesValues">btkSetAnglesValues</a>                - Set scalars's value from a matrix
-%   <a href="matlab:help btkSetForcesValues">btkSetForcesValues</a>                - Set forces's value from a matrix
-%   <a href="matlab:help btkSetMomentsValues">btkSetMomentsValues</a>               - Set moments's value from a matrix
-%   <a href="matlab:help btkSetPowersValues">btkSetPowersValues</a>                - Set power's value from a matrix
-%   <a href="matlab:help btkSetMarkersValues">btkSetMarkersValues</a>               - Set markers's value from a matrix
-%   <a href="matlab:help btkSetScalarsValues">btkSetScalarsValues</a>               - Set scalars's value from a matrix
+%   <a href="matlab:help btkSetPointsValues">btkSetPointsValues</a>                - Set points's values from a matrix
+%   <a href="matlab:help btkSetPointsResiduals">btkSetPointsResiduals</a>             - Set points's residuals from a matrix
+%   <a href="matlab:help btkSetAnglesValues">btkSetAnglesValues</a>                - Set scalars's values from a matrix
+%   <a href="matlab:help btkSetForcesValues">btkSetForcesValues</a>                - Set forces's values from a matrix
+%   <a href="matlab:help btkSetMomentsValues">btkSetMomentsValues</a>               - Set moments's values from a matrix
+%   <a href="matlab:help btkSetPowersValues">btkSetPowersValues</a>                - Set power's values from a matrix
+%   <a href="matlab:help btkSetMarkersValues">btkSetMarkersValues</a>               - Set markers's values from a matrix
+%   <a href="matlab:help btkSetMarkersResiduals">btkSetMarkersResiduals</a>            - Set markers's residuals from a matrix
+%   <a href="matlab:help btkSetScalarsValues">btkSetScalarsValues</a>               - Set scalars's values from a matrix
 %
 % Analog accessor
-%   <a href="matlab:help btkGetAnalog">btkGetAnalog</a>                       - Analog channel extraction
+%   <a href="matlab:help btkGetAnalog">btkGetAnalog</a>                      - Analog channel extraction
 %   <a href="matlab:help btkGetAnalogs">btkGetAnalogs</a>                     - Analog channels extraction
 %   <a href="matlab:help btkGetAnalogsResolution">btkGetAnalogsResolution</a>           - Return ADC resolution
 %   <a href="matlab:help btkGetAnalogsValues">btkGetAnalogsValues</a>               - Extract analogs channels' values in a simple matrix 

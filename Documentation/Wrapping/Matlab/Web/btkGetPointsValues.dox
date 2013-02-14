@@ -4,6 +4,6 @@
  * @syntax{v = btkGetPointsValues(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval v Matrix of reals where the number of rows corresponds to the number of frames in the acquisition. The number of columns corresponds to the number of extracted points multiplied by 3 (their components X,Y,Z).
- * @sa btkGetPoints, btkSetPointsValues
+ * @sa btkGetPointsResiduals, btkGetPointsValues, btkGetPoints, btkSetPointsResiduals, 
  * @ingroup BTKMatlabPointAccessor
  */

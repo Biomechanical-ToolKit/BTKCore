@@ -17,6 +17,6 @@
  *   - btkGetPowersValues / btkSetPowersValues ;
  *   - btkGetScalarsValues / btkSetScalarsValues.
  *
- * @sa btkGetPoints, btkGetPointsValues.
+ * @sa btkGetPointsResiduals, btkGetPointsValues, btkGetPoints, btkSetPointsResiduals
  * @ingroup BTKMatlabPointModifier
  */

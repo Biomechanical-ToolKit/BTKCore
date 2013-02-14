@@ -33,21 +33,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMXSpecializedPoint_h
-#define __btkMXSpecializedPoint_h
+#include "btkMXSpecializedPoint.h"
 
-#include "btkMex.h"
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+{
+  btkMXGetSpecializedPointResiduals(btk::Point::Marker, nlhs, plhs, nrhs, prhs);
+};
 
-#include <btkPoint.h>
-
-void btkMXCreateSpecializedPointsStructure(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXGetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXSetSpecializedPointValues(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXGetSpecializedPointResiduals(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-void btkMXSetSpecializedPointResiduals(btk::Point::Type t, int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
-
-#if !defined(SCI_MEX)
-  #include "btkMXSpecializedPoint.cxx"
-#endif
-
-#endif // __btkMXSpecializedPoint_h 
