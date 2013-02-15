@@ -153,7 +153,7 @@ CXXTEST_SUITE(ForcePlatformsExtractorTest)
   CXXTEST_TEST(FPAnalogModified)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "sample09/PluginC3D.c3d");
+    reader->SetFilename(C3DFilePathIN + "sample09/PlugInC3D.c3d");
     btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
     btk::Acquisition::Pointer acq = reader->GetOutput();
     pfe->SetInput(acq);
@@ -172,7 +172,7 @@ CXXTEST_SUITE(ForcePlatformsExtractorTest)
   CXXTEST_TEST(FPAnalogNotModified)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "sample09/PluginC3D.c3d");
+    reader->SetFilename(C3DFilePathIN + "sample09/PlugInC3D.c3d");
     btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
     btk::Acquisition::Pointer acq = reader->GetOutput();
     pfe->SetInput(acq);

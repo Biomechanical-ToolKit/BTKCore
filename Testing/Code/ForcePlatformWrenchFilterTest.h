@@ -10,7 +10,7 @@ CXXTEST_SUITE(ForcePlatformWrenchFilterTest)
   CXXTEST_TEST(FileSample09PluginC3D)
   {
     btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
-    reader->SetFilename(C3DFilePathIN + "sample09/PluginC3D.c3d");
+    reader->SetFilename(C3DFilePathIN + "sample09/PlugInC3D.c3d");
     btk::ForcePlatformsExtractor::Pointer pfe = btk::ForcePlatformsExtractor::New();
     btk::ForcePlatformWrenchFilter::Pointer fpwf = btk::ForcePlatformWrenchFilter::New();
     pfe->SetInput(reader->GetOutput());

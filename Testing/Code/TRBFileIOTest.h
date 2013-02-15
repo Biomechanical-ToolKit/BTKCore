@@ -26,7 +26,7 @@ CXXTEST_SUITE(TRBFileIOTest)
   CXXTEST_TEST(CanReadFileOk)
   {
     btk::TRBFileIO::Pointer pt = btk::TRBFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanReadFile(TRBFilePathIN + "Gait.trb"), true);
+    TS_ASSERT_EQUALS(pt->CanReadFile(TRBFilePathIN + "gait.trb"), true);
   };
   
   CXXTEST_TEST(CanWriteFileEmpty)
