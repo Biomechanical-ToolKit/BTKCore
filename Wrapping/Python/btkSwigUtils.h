@@ -37,6 +37,7 @@
 #define __btkSwigUtils_h
 
 #include <vector>
+#include <stddef.h> // size_t
 
 template <typename T, typename S>
 inline std::vector<T> btkSwigConvert(const std::vector<S>& source)
