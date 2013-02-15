@@ -1,6 +1,68 @@
 /**
 @page MokkaReleaseNote Release Notes
 
+- <b>02/18/2013: Mokka 0.6</b> released
+  - Enhancements:
+    - New file format: XMOVE (Thanks to the company Codamotion)
+    - New file format: MDF (Thanks to the company Codamotion)
+    - New file format: Delsys EMG (Thanks to the company Delsys).
+    - New file format: CLB (Contec Inc.).
+    - New plot options to draw cyclic data into a chart.
+    - New update manager: you won't need to go on the net, close Mokka, download the new release, unzip it and copy it. Everything is automatic!
+    - New menu "Tools" to regroup all the editing actions (reframe, clear events, etc.).
+    - New tool to create an average marker from a selection of markers (real or virtual).
+    - New tool to detect heel strike and toe off events during gait.
+    - New tool "Filter Analog (Butterworth)"
+    - New tool to smooth analog signal using moving RMS windows and moving average window.
+    - New tool to rectify the content of analogs channels.
+    - New tool to remove analog offset.
+    - New category in the acquisition explorer to show "Virtual markers" (useful for Vicon C3D file).
+    - New static way to add markers in the category "Virtual markers".
+    - New function "Reset all Zooms" in the context menu of the charts views. Set all charts' axes to their original range.
+    - The list of filters (extensions) in the open/save dialog box box is now sorted.
+    - New preference to set the back color of the ground.
+    - New reload button as suggested on UserVoice.
+    - New shortcuts to insert events (Alt 1-9).
+    - Create an option in the import assistant for videos only.
+    - Move automatically the time cursor when you click on the time bar.
+    - Option to change the background color.
+    - Record the position (pose and zoom) of 3d windows.
+    - Display the angle between two vectors.
+    - Display the angle between three points.
+    - Display the distance between 2 markers.
+    - New assistant to create segment as a set of links and faces.
+    - Add an export assistant to save any data in an ASCII file.
+    - New exporter to create STL files from a selected segment.
+    - New function to export 3D view as series of images.
+    - New action (File > Open File Location) to open the folder which contains the current acquisition.
+  - Updates:
+    - Improvement of the C3D parser to be more flexible in the extraction of the parameters' data.
+    - The ground orientation for the TDF files is now automatically set (i.e Y axis vertical) as it seems to be the general behavior.
+    - The use of the Alt key in a chart view synchronize the mouse events (zoom, move) for all the charts inside!
+    - The menu to modify the playback speed is available even if no acquisition is loaded.
+    - The horizontal axis unit menu is also available in the contextual menu of each chart. Shortcuts were also added.
+    - The root for the model outputs and the force platform reactions in the acquisition explorer are now every time expanded if visible.
+    - The item's roots (Markers, Analogs, etc.) in the acquisition explorer are automatically expanded if only one is visible.
+    - If a plot has less than 40 points displayed, then a circle marker at each point is also displayed.
+    - The tests on files existence were moved from the loading of Mokka to potentially speedup the starting of the software.
+    - If the range of the Y axis in a chart is zero, then the range is increased by [-0.01:0.01].
+    - The maximum width of the acquisition explorer is increased under windows and linux. Under Mac this function is broken due to a bug.
+  - Fixes:
+    - Removing a visual configuration and creating a new one crashes Mokka.
+    - Analogs' unit is not saved in the C3D file format.
+    - Issue 13: The rubber band in the 3D view is not correctly redrawn.
+    - The implementation of the writer for the TRC file format exports every points and not only markers.
+    - The content of the logger is wrongly painted/styled when Mokka loses focus.
+    - With two screens and Mokka on the second one, plots' options are not correctly located or not visible.
+    - Loading first a file, and then using the assistant doesn't display "No File" in the window title bar.
+    - Fix segment's flickering when a configuration is loaded and some segments are hidden.
+    - Wrong path when saving a file for the second time.
+    - The menu to modify the playback speed and the menu to insert events are disabled.
+    - Impossible to see the delete buttons used to delete plots (in chart/plots options) if the acquisition explorer is in floating mode.
+    - In the time event bar, the labels' tick can overlap on the other when the unit is the time.
+    - Using the action "Manage User Layout" under Windows (and Linux?) doesn't show the chosen tab.
+    - Potential fix for a random bug in Mokka (GRFs are not reloaded and a buffer overflow happens if the new acquisition is longer).
+
 - <b>04/16/2012: Mokka 0.5.1</b> released
   - Fixes:
     - Dragging any kind of item (except video) over the video view hides the current displayed video.
