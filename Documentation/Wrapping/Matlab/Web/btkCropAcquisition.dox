@@ -1,6 +1,6 @@
 /**
  * @class btkCropAcquisition
- * @brief Cut the acquistion and adapt the events' frame/time.
+ * @brief Crop the acquistion and adapt the events' frame/time.
  * @syntax{btkCropAcquisition(h\, startAt)\n btkCropAcquisition(h\, startAt\, numFrames)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param startAt Integer containing the frame where the cut will start.

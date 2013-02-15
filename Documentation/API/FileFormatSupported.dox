@@ -89,7 +89,7 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::GRxFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing force platform data<br>(<strong>Experimental</strong>: Need more files/informations to implement the writer. Only support platforms of type I)</td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing force platform data. Supports only platforms of type I</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> MDF </td>
