@@ -62,7 +62,28 @@ assertEqual(res,res_);
 btkDeleteAcquisition(h);
 end
 
-function testCropAcquisition
+function testCropAcquisition_first50
+h = btkNewAcquisition(10,100,2,10);
+pv_ = rand(100,10*3);
+rv_ = rand(100,10);
+av_ = rand(1000,2);
+btkSetPointsValues(h, pv_);
+btkSetPointsResiduals(h, rv_);
+btkSetAnalogsValues(h, av_);
+btkCropAcquisition(h,1,50);
+assertEqual(btkGetFirstFrame(h), 1);
+assertEqual(btkGetLastFrame(h), 50);
+assertEqual(btkGetPointNumber(h), 10);
+assertEqual(btkGetPointFrameNumber(h), 50);
+assertEqual(btkGetAnalogNumber(h), 2);
+assertEqual(btkGetAnalogFrameNumber(h), 500);
+assertEqual(btkGetPointsValues(h), pv_(1:50,:));
+assertEqual(btkGetPointsResiduals(h), rv_(1:50,:));
+assertEqual(btkGetAnalogsValues(h), av_(1:500,:));
+btkDeleteAcquisition(h);
+end
+
+function testCropAcquisition_last51
 h = btkNewAcquisition(10,100,2,10);
 pv_ = rand(100,10*3);
 rv_ = rand(100,10);
