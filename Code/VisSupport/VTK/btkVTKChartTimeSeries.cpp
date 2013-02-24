@@ -57,6 +57,7 @@
 #include <vtkDoubleArray.h>
 #include <vtkMath.h>
 #include <vtkContextMouseEvent.h>
+#include <vtkRenderWindowInteractor.h>
 #if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
   #include <vtkContextKeyEvent.h>
 #endif
@@ -818,7 +819,7 @@ namespace btk
       this->m_ZoomBox.Set(mouse.Pos.X(), mouse.Pos.Y(), 0.0, 0.0);
 #if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
       // Zoom box
-      if ((mouse.GetModifiers() & vtkContextMouseEvent::SHIFT_MODIFIER) == vtkContextMouseEvent::SHIFT_MODIFIER)
+      if ((mouse.GetInteractor() != 0) && (mouse.GetInteractor()->GetShiftKey() > 0))
         this->m_ZoomBoxDisplayed |= true;
       // Pan
       else
@@ -959,7 +960,7 @@ namespace btk
     
     bool horizontalZoomModeOnly = false;
 #if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
-    if ((mouse.GetModifiers() & vtkContextMouseEvent::SHIFT_MODIFIER) == vtkContextMouseEvent::SHIFT_MODIFIER)
+    if ((mouse.GetInteractor() != 0) && (mouse.GetInteractor()->GetShiftKey() > 0))
       horizontalZoomModeOnly = true;
 #endif
     horizontalZoomModeOnly |= (this->m_ZoomMode == HORIZONTAL);
