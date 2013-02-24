@@ -16,21 +16,21 @@
  
  This section is only necessary if you downloaded the sources of BTK. If you use a binary version, go directly to the tutorial @ref TutorialGettingStarted "Getting Started". 
  
- To simplify the way to build the Matlab support, the tool @c EasyInstallWithRedistribuableMatlabToolbox.jar is proposed in the root of the sources.
+ To simplify the way to build the Matlab support, the tool @c EasyInstallWithRedistributableMatlabToolbox.jar is proposed in the root of the sources.
  
  To use this tool, we need to download the following software:
  - CMake 2.6.4 or later ;
  - A compiler compatible with Matlab:
    - GCC for Linux / MacOS X ;
    - Microsoft Visual Studio C++ (Express Edition) for Windows XP/Vista/7 ;
- - Java 1.5 or later (only for the tool @c EasyInstallWithRedistribuableMatlabToolbox.jar).
+ - Java 1.5 or later (only for the tool @c EasyInstallWithRedistributableMatlabToolbox.jar).
  
- When these software are installed, you only need to double click on the file @c EasyInstallWithRedistribuableMatlabToolbox.jar. This tool will configure the sources, compile them and install the toolbox @c btk for Matlab.
+ When these software are installed, you only need to double click on the file @c EasyInstallWithRedistributableMatlabToolbox.jar. This tool will configure the sources, compile them and install the toolbox @c btk for Matlab.
  
- @b Note: If your OS doesn't have Java installed (and you don't want or cannot install it), then you have again the possibility to use the tool @c EasyInstallWithRedistribuableMatlabToolbox. For that, you have to go in the folder @c Batch and double clic on the file corresponding to your OS:
-  - @c EasyInstallWithRedistribuableMatlabToolbox_GCC_Unix.sh for Linux ;
-  - @c EasyInstallWithRedistribuableMatlabToolbox_GCC_MacOSX.sh for MacOS X ;
-  - @c EasyInstallWithRedistribuableMatlabToolbox_MSVC.bat for Windows.
+ @b Note: If your OS doesn't have Java installed (and you don't want or cannot install it), then you have again the possibility to use the tool @c EasyInstallWithRedistributableMatlabToolbox. For that, you have to go in the folder @c Batch and double clic on the file corresponding to your OS:
+  - @c EasyInstallWithRedistributableMatlabToolbox_GCC_Unix.sh for Linux ;
+  - @c EasyInstallWithRedistributableMatlabToolbox_GCC_MacOSX.sh for MacOS X ;
+  - @c EasyInstallWithRedistributableMatlabToolbox_MSVC.bat for Windows.
  
  @section TutorialGettingStarted Getting Started
  

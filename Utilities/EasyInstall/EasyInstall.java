@@ -52,7 +52,7 @@ class EasyInstall
         out.write("@ECHO OFF\n"
                 + "cd \""+ currDir +"\\Batch\"\n"
                 + currDir.substring(0,2) + "\n"
-                + "call .\\EasyInstallWithRedistribuableMatlabToolbox_MSVC.bat\n"
+                + "call .\\EasyInstallWithRedistributableMatlabToolbox_MSVC.bat\n"
                 + "exit\n");
         out.close();
         String EasyInstall_MSVC_start_cmd = currDir + "\\Batch\\EasyInstall_MSVC_start.cmd";
@@ -74,7 +74,7 @@ class EasyInstall
                 + "<plist version=\"1.0\">\n"
                 + "<dict>\n"
                 + "\t<key>CommandString</key>\n"
-                + "\t<string>cd " + currDir + ";" + currDir + "/Batch/EasyInstallWithRedistribuableMatlabToolbox_GCC_MacOSX.sh;exit</string>\n"
+                + "\t<string>cd " + currDir + ";" + currDir + "/Batch/EasyInstallWithRedistributableMatlabToolbox_GCC_MacOSX.sh;exit</string>\n"
                 + "\t<key>RunCommandAsShell</key>\n"
                 + "\t<false/>\n"
                 + "\t<key>columnCount</key>\n"
@@ -98,7 +98,7 @@ class EasyInstall
         // Under linux, the command 'new File("").getAbsolutePath();' returns the home path 
         // The easy way to determine the path of the JAR file is to ask to the user
         // where it is ...
-        JOptionPane.showMessageDialog(null, "Unfortunately, Java under linux doesn't give the good current directory and it is not possible to active the batch.\nTo build BTK with Matlab under Linux, double click on the file 'EasyInstallWithRedistribuableMatlabToolbox_GCC_Unix.sh'\nin the subfolder Batch.");
+        JOptionPane.showMessageDialog(null, "Unfortunately, Java under linux doesn't give the good current directory and it is not possible to active the batch.\nTo build BTK with Matlab under Linux, double click on the file 'EasyInstallWithRedistributableMatlabToolbox_GCC_Unix.sh'\nin the subfolder Batch.");
       }
       else
         throw new Exception("Unsupported OS. Contact the developers.");

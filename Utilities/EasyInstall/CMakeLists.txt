@@ -17,6 +17,6 @@ ADD_LIBRARY(EasyInstall ${EASYINSTALL_SRC})
 MAKE_JAR_EXECUTABLE(EasyInstall "${EASYINSTALL_ENTRY}")
 
 ADD_CUSTOM_COMMAND(TARGET EasyInstall POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${BTK_BINARY_DIR}/bin/EasyInstall.jar ${BTK_SOURCE_DIR}/EasyInstallWithRedistribuableMatlabToolbox.jar
-  COMMENT "Copying to EasyInstallWithRedistribuableMatlabToolbox.jar in the root."
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${BTK_BINARY_DIR}/bin/EasyInstall.jar ${BTK_SOURCE_DIR}/EasyInstallWithRedistributableMatlabToolbox.jar
+  COMMENT "Copying to EasyInstallWithRedistributableMatlabToolbox.jar in the root."
   )
