@@ -36,6 +36,8 @@
 #ifndef __btkVTKContextActor_h
 #define __btkVTKContextActor_h
 
+#include "btkConfigure.h"
+
 // Only used by Doxygen... Should not be able to put this in the Doxygen configuration file?
 #ifdef FIX_DOXYGEN_VTK_MISSING_MACRO_DEFINITIONS
   #define vtkGetObjectMacro(name,type) type* Get##name();
@@ -53,23 +55,23 @@ namespace btk
   public:
     vtkTypeMacro(VTKContextActor, vtkProp);
     
-    static VTKContextActor* New();
+    BTK_VTK_EXPORT static VTKContextActor* New();
     
-    virtual ~VTKContextActor();
+    BTK_VTK_EXPORT virtual ~VTKContextActor();
     
-    virtual int RenderOverlay(vtkViewport* viewport);
-    virtual void SetContext(vtkContext2D* context);
+    BTK_VTK_EXPORT virtual int RenderOverlay(vtkViewport* viewport);
+    BTK_VTK_EXPORT virtual void SetContext(vtkContext2D* context);
     vtkGetObjectMacro(Context, vtkContext2D);
     vtkGetObjectMacro(Scene, vtkContextScene);
-    virtual void SetScene(vtkContextScene* scene);
-    virtual void ReleaseGraphicsResources(vtkWindow* window);
+    BTK_VTK_EXPORT virtual void SetScene(vtkContextScene* scene);
+    BTK_VTK_EXPORT virtual void ReleaseGraphicsResources(vtkWindow* window);
     
-    void PrintSelf(ostream& os, vtkIndent indent);
+    BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
   protected:
-    VTKContextActor();
+    BTK_VTK_EXPORT VTKContextActor();
 
-    virtual void Initialize(vtkViewport* viewport);
+    BTK_VTK_EXPORT virtual void Initialize(vtkViewport* viewport);
     
     vtkContextScene* Scene;
     vtkContext2D* Context;

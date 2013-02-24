@@ -67,16 +67,16 @@ namespace btk
     int GetDisplayRegionOfInterest() const {return this->m_DisplayRegionOfInterest;};
     BTK_VTK_EXPORT void SetDisplayRegionOfInterest(int enabled);
     float GetEventLineWidth() const {return this->m_EventLineWidth;};
-    void SetEventLineWidth(float width);
+    BTK_VTK_EXPORT void SetEventLineWidth(float width);
     int GetEventLineTypeFactor() const {return this->m_EventLineTypeFactor;};
-    void SetEventLineTypeFactor(int factor);
+    BTK_VTK_EXPORT void SetEventLineTypeFactor(int factor);
     
-    void SetAxes(vtkAxis* x, vtkAxis* y);
+    BTK_VTK_EXPORT void SetAxes(vtkAxis* x, vtkAxis* y);
     
-    virtual bool Paint(vtkContext2D *painter);
+    BTK_VTK_EXPORT virtual bool Paint(vtkContext2D *painter);
     
   protected:
-    VTKChartExtraAcquisition();
+    BTK_VTK_EXPORT VTKChartExtraAcquisition();
     
   private:
     void SetXAxis(vtkAxis* axis);
