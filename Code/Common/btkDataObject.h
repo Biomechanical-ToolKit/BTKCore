@@ -71,7 +71,7 @@ namespace btk
       this->mp_Parent = 0;
       this->mp_Source = 0;
     };
-    virtual ~DataObject();
+    BTK_COMMON_EXPORT virtual ~DataObject();
         
   private:
     void AddChild(DataObject* child);

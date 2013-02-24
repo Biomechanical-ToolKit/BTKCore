@@ -51,11 +51,11 @@ namespace btk
     public:
       BTK_VTK_EXPORT static VTKFrustumFromTwoPoints* New();
       vtkExportedTypeRevisionMacro(VTKFrustumFromTwoPoints, vtkObject, BTK_VTK_EXPORT);
-      vtkPlanes* Generate(double x0, double y0, double x1, double y1, vtkRenderer* renderer);
+      BTK_VTK_EXPORT vtkPlanes* Generate(double x0, double y0, double x1, double y1, vtkRenderer* renderer);
       
     protected:
-      VTKFrustumFromTwoPoints();
-      ~VTKFrustumFromTwoPoints();
+      BTK_VTK_EXPORT VTKFrustumFromTwoPoints();
+      BTK_VTK_EXPORT ~VTKFrustumFromTwoPoints();
       
     private:
        VTKFrustumFromTwoPoints(const VTKFrustumFromTwoPoints& );  // Not implemented.

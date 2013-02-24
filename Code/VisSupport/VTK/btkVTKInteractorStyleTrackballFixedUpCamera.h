@@ -54,8 +54,8 @@ namespace btk
     vtkExportedTypeRevisionMacro(VTKInteractorStyleTrackballFixedUpCamera, vtkInteractorStyleTrackballCamera, BTK_VTK_EXPORT);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
-    void GetGlobalUp(double n[3]) const {n[0] = this->mp_GlobalUp[0]; n[1] = this->mp_GlobalUp[1]; n[2] = this->mp_GlobalUp[2];};
-    void SetGlobalUp(const double n[3]);
+    BTK_VTK_EXPORT void GetGlobalUp(double n[3]) const {n[0] = this->mp_GlobalUp[0]; n[1] = this->mp_GlobalUp[1]; n[2] = this->mp_GlobalUp[2];};
+    BTK_VTK_EXPORT void SetGlobalUp(const double n[3]);
     
     BTK_VTK_EXPORT virtual void Rotate();
     
@@ -90,18 +90,18 @@ namespace btk
     vtkGetMacro(ForceRubberBandDrawing,int);
     vtkSetMacro(ForceRubberBandDrawing,int);
     vtkBooleanMacro(ForceRubberBandDrawing,int);
-    void GetRubberBandPoints(int pts[4]) const;
-    void Rubber();
-    void RedrawRubberBand();
-    void UpdateRubberBackground();
-    virtual void StartRubberBand();
-    virtual void EndRubberBand();
+    BTK_VTK_EXPORT void GetRubberBandPoints(int pts[4]) const;
+    BTK_VTK_EXPORT void Rubber();
+    BTK_VTK_EXPORT void RedrawRubberBand();
+    BTK_VTK_EXPORT void UpdateRubberBackground();
+    BTK_VTK_EXPORT virtual void StartRubberBand();
+    BTK_VTK_EXPORT virtual void EndRubberBand();
     
-    void ActivateFixForRubberBandDrawing_MacOS1050(bool activated);
+    BTK_VTK_EXPORT void ActivateFixForRubberBandDrawing_MacOS1050(bool activated);
     
   protected:
     BTK_VTK_EXPORT VTKInteractorStyleTrackballFixedUpCamera();
-    ~VTKInteractorStyleTrackballFixedUpCamera();
+    BTK_VTK_EXPORT ~VTKInteractorStyleTrackballFixedUpCamera();
     
   private:
     static int GetForegroundFrameBufferIndex(vtkRenderWindow* renWin, int forceRubberBandDrawing);

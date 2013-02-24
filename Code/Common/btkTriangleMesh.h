@@ -152,8 +152,8 @@ namespace btk
     int GetCurrentFrameIndex() const {return this->m_CurrentFrame;};
     void SetCurrentFrameIndex(int frame) {this->m_CurrentFrame = frame;};
     
-    void SetDefinition(const std::vector<int>& m, const std::vector<VertexLink>& l);
-    void SetDefinition(const std::vector<int>& m, const std::vector<VertexLink>& l, const std::vector<VertexFace>& f);
+    BTK_COMMON_EXPORT void SetDefinition(const std::vector<int>& m, const std::vector<VertexLink>& l);
+    BTK_COMMON_EXPORT void SetDefinition(const std::vector<int>& m, const std::vector<VertexLink>& l, const std::vector<VertexFace>& f);
     
   protected:
     BTK_COMMON_EXPORT TriangleMesh(const std::vector<int>& m, const std::vector<VertexLink>& l);
