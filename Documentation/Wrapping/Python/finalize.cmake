@@ -1,5 +1,6 @@
 # Adapt some part of the HTML files describing the classes.
-FILE(GLOB files "${BTK_BINARY_DIR}/Documentation/Wrapping/Python/classbtk*[^-members].html")
+FILE(GLOB files "${BTK_BINARY_DIR}/Documentation/Wrapping/Python/classbtk*.html")
+
 FOREACH(f ${files})
   # Read the file
   FILE(READ "${f}" IN)

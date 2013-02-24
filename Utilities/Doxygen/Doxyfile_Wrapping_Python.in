@@ -673,6 +673,7 @@ WARN_LOGFILE           =
 
 INPUT                  = "${BTK_SOURCE_DIR}/Documentation/Wrapping/Python" \
                          "${BTK_BINARY_DIR}/Utilities/Doxygen/Wrapping/Python" \
+                         "${BTK_SOURCE_DIR}/Documentation/API/FileFormatSupported.dox" \
                          "${LIBRARY_OUTPUT_PATH}/btk.py"
 
 # This tag can be used to specify the character encoding of the source files

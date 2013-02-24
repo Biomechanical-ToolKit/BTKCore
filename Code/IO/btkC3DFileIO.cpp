@@ -67,7 +67,7 @@ namespace btk
    * All the informations related to the acquisition are stored in the output object.
    * Few data, like the byte order, the points' scale, the analog universal scale, the integer analog storage format are 
    * available as member of this class. These informations are extracted when a C3D file is read or can be 
-   * filled/modified to write a new C3D file. All these members can be acessed or modified using dedicated methods.
+   * filled/modified to write a new C3D file. All these members can be accessed or modified using dedicated methods.
    *
    * Compared to the C3DServer API, all the data in BTK extracted from a C3D file are already scaled and available in the children of the output Acquisition.
    * You don't need to access to the groups/parameters for that. However, if you have some custom parameters, then you can access them from the metadata stored in the output Acquisition using the method Acquisition::GetMetadata().

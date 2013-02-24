@@ -57,7 +57,15 @@ BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, Write, "Write the file designated by 
 // ------------------------------------------------------------------------- //
 
 %feature("docstring") btkAcquisitionFileReader "
-Reader for files which contain acquisition data (C3D, TRC, ...)."
+Reader for files which contain acquisition data (C3D, TRC, ...).
+
+This class uses a btkAcquisitionFileIO object to read the data from the file corresponding to the given filename.
+You have two ways to set this object.
+First, you can set it manually by using the method btkAcquisitionFileReader::SetAcquisitionIO(),
+Second, the correct object can be detected automatically, by checking in each registered btkAcquisitionFileIO if it can read or not the file.
+
+The use of the manual setting should be only used if you want to read a file with a selected file format. To go back to the automatic mode 
+from the manual mode, you only have to use the method btkAcquisitionFileReader::SetAcquisitionIO() without any argument."
 
 BTK_SWIG_AUTODOC_IMPL(AcquisitionFileReader, SetFilename, "SetFilename(self, string)");
 BTK_SWIG_AUTODOC_IMPL(AcquisitionFileReader, SetDisableFilenameExceptionState, "SetDisableFilenameExceptionState(self, bool)");
@@ -91,7 +99,31 @@ BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileWriter, Update, "Update the writer (i.e. 
 // ------------------------------------------------------------------------- //
 
 %feature("docstring") btkC3DFileIO "
-Interface to read/write C3D files."
+Interface to read/write C3D files.
+
+All the informations related to the acquisition are stored in the output object.
+Few data, like the byte order, the points' scale, the analog universal scale, the integer analog storage format are 
+available as member of this class. These informations are extracted when a C3D file is read or can be 
+filled/modified to write a new C3D file. All these members can be accessed or modified using dedicated methods.
+
+Compared to the C3DServer API, all the data in BTK extracted from a C3D file are already scaled and available in the 
+children of the output Acquisition. You don't need to access to the groups/parameters for that. However, if you have 
+some custom parameters, then you can access them from the metadata stored in the output Acquisition using the method 
+btkAcquisition::GetMetadata().
+
+Moreover, there are several options to create a C3D file from an acquisition:
+ - None ;
+ - ScalesFromDataUpdate ;
+ - ScalesFromMetaDataUpdate ;
+ - MetaDataFromDataUpdate ;
+ - CompatibleVicon.
+ 
+By default, the writer is set with the options ScalesFromDataUpdate, MetaDataFromDataUpdate and CompatibleVicon.
+These options give you the possibility to create a C3D file from any kind of acquisition (created from raw or extracted from another file format).
+
+To write a C3D file with a given processor architecture (called byte order in BTK), you have to use the method btkC3DFileIO::SetByteOrder().
+
+For more informations on this file's format: http:://www.c3d.org"
 
 BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, GetPointScale, "Returns the scale for the points obtains from the POINT:SCALE parameter or from its determination for a created acquisition.");
 BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, SetPointScale, "Sets the scale for the points.");
