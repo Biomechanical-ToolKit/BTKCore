@@ -7,7 +7,7 @@ Compiling BTK requires a complete BTK source tree. Running BTK regression tests 
 @subsection build_sec Building with CMake
 
 <div class="important">
-@b Note: For the users which want to build BTK with the Matlab wrapping option on any OS, you can use the java utility "EasyInstallWithRedistribuableMatlabToolbox.jar" located in the root of BTK sources. It is a little utility which call scripts to configure/compile/install BTK with the options @ref config_matlab and @ref config_matlab_redistributable.
+@b Note: For the users which want to build BTK with the Matlab wrapping option on any OS, you can use the java utility "EasyInstallWithRedistributableMatlabToolbox.jar" located in the root of BTK sources. It is a little utility which call scripts to configure/compile/install BTK with the options @ref config_matlab and @ref config_matlab_redistributable.
 </div>
 
 CMake must be run to generate a build system for BTK. The build system may be placed either in the BTK source tree (an in-source build) or in a separate binary tree (an out-of-source build). The use of out-of-source builds is strongly encouraged because they make it easy to have multiple builds with different configurations sharing the same source tree. Once a single in-source build has been created it is the only build tree that can be associated with that source tree. A source tree may not be used both for an in-source build and an out-of-source build, but any number of out-of-source builds may share a source tree that does not have an in-source build. Having multiple out-of-source builds is particularly useful for installing BTK on multiple architectures using a single source tree on a shared disk.
