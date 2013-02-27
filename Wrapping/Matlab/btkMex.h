@@ -36,6 +36,8 @@
 #ifndef __btkMex_h
 #define __btkMex_h
 
+#include <btkConfigure.h>
+
 #if defined(_MSC_VER)
   // Disable unsafe warning (use of the function 'strcpy' instead of 
   // 'strcpy_s' for portability reasons;
@@ -43,8 +45,8 @@
   // Workaround for the char16_t type defined in Matlab and MSVC 2010
   #if (_MSC_VER >= 1600)
     #define __STDC_UTF_16__
-    // From Matlab R2010b the previous workaround is not enough
-    #ifndef CHAR16_T
+    // From Matlab R2010b the previous workaround is not enough (But seems fixed for Matlab R2011a)
+    #ifdef FIX_MATLAB_CHAR16_T_TYPE
       #if defined(_WIN32)
         #define CHAR16_T wchar_t
       #else

@@ -3,17 +3,18 @@
 #   a macro to help the build of MEX-functions.
 #
 # This module detects a Matlab's version between Matlab 7.0 (R14)
-# and Matlab 7.9 (r2009b).
+# and Matlab 8.0 (r2012b).
 #
 # This module defines: 
-#  MATLAB_ROOT: Matlab installation path
-#  MATLAB_INCLUDE_DIR: include path for mex.h, engine.h
-#  MATLAB_MEX_LIBRARY: path to libmex.lib
-#  MATLAB_MX_LIBRARY:  path to libmx.lib
-#  MATLAB_ENG_LIBRARY: path to libeng.lib
-#  MATLAB_LIBRARIES:   required libraries: libmex, libmx, libeng
-#  MATLAB_MEXFILE_EXT: MEX extension required for the current platform
-#  MATLAB_CREATE_MEX: macro to build a MEX-file
+#  MATLAB_ROOT:               Matlab installation path
+#  MATLAB_INCLUDE_DIR:        Include path for mex.h, engine.h
+#  MATLAB_MEX_LIBRARY:        Path to libmex.lib
+#  MATLAB_MX_LIBRARY:         Path to libmx.lib
+#  MATLAB_ENG_LIBRARY:        Path to libeng.lib
+#  MATLAB_LIBRARIES:          Required libraries: libmex, libmx, libeng
+#  MATLAB_MEXFILE_EXT:        MEX extension required for the current platform
+#  MATLAB_CREATE_MEX:         Macro to build a MEX-file
+#  MATLAB_MATLABR2010B_FOUND: Variable only available under Windows (used to fix compilation issue with MSVC 2010)
 #
 # The macro MATLAB_CREATE_MEX requires in this order:
 #  - function's name which will be called in Matlab;
@@ -49,19 +50,22 @@ IF(WIN32)
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.1;MATLABROOT]"
   )
   FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS} NO_DEFAULT_PATH)
-  IF (NOT MATLAB_ROOT)
+  IF(NOT MATLAB_ROOT)
     SET(MATLAB_PATHS 
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\7.0;MATLABROOT]"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.0;MATLABROOT]"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\6.5;MATLABROOT]"
     )
     FIND_PATH(MATLAB_ROOT "license.txt" ${MATLAB_PATHS} NO_DEFAULT_PATH)
-    IF (MATLAB_ROOT)
+    IF(MATLAB_ROOT)
       SET(MATLAB_OLD_WIN_MEXFILE_EXT 1 CACHE STRING "Old MEX extension for Windows")
-    ENDIF (MATLAB_ROOT)
-  ENDIF (NOT MATLAB_ROOT)
-  #MESSAGE(STATUS "MATLAB_ROOT: ${MATLAB_ROOT}")
-  #MESSAGE(STATUS "MATLAB_OLD_WIN_MEXFILE_EXT: ${MATLAB_OLD_WIN_MEXFILE_EXT}")
+    ENDIF(MATLAB_ROOT)
+  ENDIF(NOT MATLAB_ROOT)
+  
+  FIND_PATH(MATLABR2010B_TEMP "license.txt" "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\7.11;MATLABROOT]" NO_DEFAULT_PATH)
+  IF(MATLABR2010B_TEMP)
+    SET(MATLAB_MATLABR2010B_FOUND 1)
+  ENDIF(MATLABR2010B_TEMP)
   
   SET(MATLAB_LIBRARIES_PATHS
       "${MATLAB_ROOT}/extern/lib/win64/microsoft"
@@ -223,3 +227,7 @@ MARK_AS_ADVANCED(
   MATLAB_MEXFILE_EXT
   MATLAB_OLD_WIN_MEXFILE_EXT
 )
+
+IF(WIN32)
+  MARK_AS_ADVANCED(MATLAB_MATLABR2010B_FOUND)
+ENDIF(WIN32)

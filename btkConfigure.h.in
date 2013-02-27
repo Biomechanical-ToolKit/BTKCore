@@ -60,6 +60,13 @@
 #cmakedefine HAVE_BOOST_TR1_MEMORY_HPP
 #cmakedefine HAVE_BOOST_MEMORY_HPP
 
+// Special case for Matlab R2010b & MSVC2010
+#if defined(_MSC_VER)
+  #if (_MSC_VER >= 1600)
+    #cmakedefine FIX_MATLAB_CHAR16_T_TYPE
+  #endif
+#endif
+
 // For dll symbols in Windows
 #cmakedefine BTK_BUILD_SHARED_LIBS
 #if (defined(_MSC_VER) && defined(BTK_BUILD_SHARED_LIBS)) 
