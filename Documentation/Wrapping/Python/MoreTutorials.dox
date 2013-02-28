@@ -97,11 +97,11 @@
  In case there is no adapted filters to your processing, you can easily create your onw funtion
  to process your data. The next exemple propose in few lines to split an acquisition into severals
  by given some ranges of frames. This could be usefull if you want for example to keep only some cycles. Separate analyzed task, etc.
- Most of the functions to modify an acquisition are in the class btkAcquisition.
+ Most of the functions to modify an acquisition are in the class btk.btkAcquisition.
  
  @code{.py}
     import btk
-    # The variable 'eventsFrame' contains regions of interest (ROI) set as a first and last frame to keep
+    # The variable 'eventsFrame' contains regions of interest (ROI) set as sets of first and last frames
     # Note: If you use NumPy from another algorithm to create ROIs
     # be sure that the type is "int" or the same type than the architecture
     # of your OS (int32 for 32-bit OS, int64 for 64-bit OS).
