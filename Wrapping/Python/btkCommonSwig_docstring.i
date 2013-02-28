@@ -753,8 +753,8 @@ BTK_SWIG_AUTODOC_IMPL(Acquisition, Resize(int , int , int), "Resize(self, pointN
 BTK_SWIG_AUTODOC_IMPL(Acquisition, Resize(int , int , int, int), "Resize(self, pointNumber, frameNumber, analogNumber = 0, , analogSampleNumberPerPointFrame = 1)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, ResizeAnalogNumber, "ResizeAnalogNumber(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, ResizeFrameNumber, "ResizeFrameNumber(self, int)");
-BTK_SWIG_AUTODOC_IMPL(Acquisition, ResizeFrameNumberFromEnd, "ResizeFrameNumber(self, int)");
-BTK_SWIG_AUTODOC_IMPL(Acquisition, ResizePointNumber, "ResizeFrameNumber(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, ResizeFrameNumberFromEnd, "ResizeFrameNumberFromEnd(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, ResizePointNumber, "ResizePointNumber(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetAnalog, "SetAnalog(self, int, btkAnalog)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetAnalogNumber, "SetAnalogNumber(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetAnalogResolution, "SetAnalogResolution(self, btk.btkAcquisition.AnalogResolution)");
@@ -820,7 +820,7 @@ BTK_SWIG_DOCSTRING_IMPL(Acquisition, Resize, "Resize the acquisition. Same as th
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, ResizePointNumber, "Resize the number of points.");
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, ResizeAnalogNumber, "Resize the number of analog channels.");
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, ResizeFrameNumber, "Resize the number of frames.");
-BTK_SWIG_DOCSTRING_IMPL(Acquisition, ResizeFrameNumberFromEnd, "Resize the number of frames by adding the new frames at the beginning of the acquisition and set automatically the new first frame index.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, ResizeFrameNumberFromEnd, "Resize the number of frames by adding new (or removing) frames at the beginning of the acquisition and set automatically the new first frame index.");
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, Reset, "Resets the acquisition as an empty acquisition.\nTo re-populate this acquisition, you need to re-use the Init() method to set the point and analog number and their frame number.");
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetDuration, "Returns the duration of the acquisition. The duration is computed as the multiplication of the points' frequency with the points frame number.");
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetFirstFrame, "Return the first frame index of the acquisition.");
