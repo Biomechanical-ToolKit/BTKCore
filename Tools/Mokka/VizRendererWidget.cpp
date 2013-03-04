@@ -141,7 +141,7 @@
   
   // Fix: "Fix QVTKWidget problem on Windows with Aero off."
   // http://vtk.org/gitweb?p=VTK.git;a=commit;h=c5d4f4c2b904821247729bfa67e1cab8c74e5d36
-  // Combined with another patch "fixAeroIssueOnlyOnWindows7.patch" (even for VTK 5.10)
+  // Combined with another patch "fixAEROIssue_WindowsVistaAndAbove.patch" (even for VTK 5.10)
   #if defined(Q_WS_WIN)
   #ifdef Q_OS_WIN
     #ifndef WIN32_LEAN_AND_MEAN
@@ -152,11 +152,11 @@
   #include <QSysInfo>
   bool VizRendererWidget::winEvent(MSG* msg, long*)
   {
-    if(QSysInfo::windowsVersion() >= QSysInfo::WV_WINDOWS7) // Note: The fix was released only for Windows 7, but we assume it is the same for Windows 8.
-    {
-      if(msg->message == WM_PAINT)
-        InvalidateRect(this->winId(), NULL, FALSE);
-    }
+    // Starting with Windows Vista, Microsoft introduced WDDM.
+    // We need to call InvalidateRect() to work with WDDM correctly,
+    // especially when AERO is off.
+    if ((msg->message == WM_PAINT) && (QSysInfo::windowsVersion() >= QSysInfo::WV_VISTA))
+      InvalidateRect(this->winId(), NULL, FALSE);
     return false;
   }
   #endif
