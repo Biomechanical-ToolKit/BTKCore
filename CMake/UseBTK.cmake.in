@@ -23,44 +23,44 @@ INCLUDE_DIRECTORIES(BEFORE ${BTK_INCLUDE_DIRS})
 # Add link directories needed to use BTK.
 LINK_DIRECTORIES(${BTK_LIBRARY_DIRS})
 
-# Load settings from the system eigen2 with which BTK was built, if any.
-IF(BTK_USE_SYSTEM_EIGEN2)
-  # If eigen2 has already been found, make sure it is the one used to
+# Load settings from the system eigen3 with which BTK was built, if any.
+IF(BTK_USE_SYSTEM_EIGEN3)
+  # If eigen3 has already been found, make sure it is the one used to
   # build BTK.
   IF(WIN32 OR APPLE)
-    STRING(TOLOWER "${EIGEN2_INCLUDE_DIR}" BTK_CHECK_EIGEN2_INCLUDE_DIR)
-    STRING(TOLOWER "${BTK_EIGEN2_INCLUDE_DIR}" BTK_CHECK_BTK_EIGEN2_INCLUDE_DIR)
+    STRING(TOLOWER "${EIGEN3_INCLUDE_DIR}" BTK_CHECK_EIGEN3_INCLUDE_DIR)
+    STRING(TOLOWER "${BTK_EIGEN3_INCLUDE_DIR}" BTK_CHECK_BTK_EIGEN3_INCLUDE_DIR)
   ELSE(WIN32 OR APPLE)
-    SET(BTK_CHECK_EIGEN2_INCLUDE_DIR "${EIGEN2_INCLUDE_DIR}")
-    SET(BTK_CHECK_BTK_EIGEN2_INCLUDE_DIR "${BTK_EIGEN2_INCLUDE_DIR}")
+    SET(BTK_CHECK_EIGEN3_INCLUDE_DIR "${EIGEN3_INCLUDE_DIR}")
+    SET(BTK_CHECK_BTK_EIGEN3_INCLUDE_DIR "${BTK_EIGEN3_INCLUDE_DIR}")
   ENDIF(WIN32 OR APPLE)
-  STRING(COMPARE EQUAL "${BTK_CHECK_EIGEN2_INCLUDE_DIR}" "${BTK_CHECK_BTK_EIGEN2_INCLUDE_DIR}"
-         BTK_EIGEN2_INCLUDE_DIR_MATCH)
-  IF(EIGEN2_FOUND)
-    IF(NOT BTK_EIGEN2_INCLUDE_DIR_MATCH)
+  STRING(COMPARE EQUAL "${BTK_CHECK_EIGEN3_INCLUDE_DIR}" "${BTK_CHECK_BTK_EIGEN3_INCLUDE_DIR}"
+         BTK_EIGEN3_INCLUDE_DIR_MATCH)
+  IF(EIGEN3_FOUND)
+    IF(NOT BTK_EIGEN3_INCLUDE_DIR_MATCH)
       MESSAGE(FATAL_ERROR
-        "BTK was built with EIGEN2 from \"${BTK_EIGEN2_INCLUDE_DIR}\", "
-        "but this project is using EIGEN2 from \"${EIGEN2_INCLUDE_DIR}\".  "
-        "Please set EIGEN2_INCLUDE_DIR to match the one used to build BTK."
+        "BTK was built with EIGEN3 from \"${BTK_EIGEN3_INCLUDE_DIR}\", "
+        "but this project is using EIGEN3 from \"${EIGEN3_INCLUDE_DIR}\".  "
+        "Please set EIGEN3_INCLUDE_DIR to match the one used to build BTK."
         )
-    ENDIF(NOT BTK_EIGEN2_INCLUDE_DIR_MATCH)
-  ELSE(EIGEN2_FOUND)
-    IF(EIGEN2_INCLUDE_DIR)
-      IF(NOT BTK_EIGEN2_INCLUDE_DIR_MATCH)
+    ENDIF(NOT BTK_EIGEN3_INCLUDE_DIR_MATCH)
+  ELSE(EIGEN3_FOUND)
+    IF(EIGEN3_INCLUDE_DIR)
+      IF(NOT BTK_EIGEN3_INCLUDE_DIR_MATCH)
         MESSAGE(
-          "Warning: BTK was built with EIGEN2 from \"${BTK_EIGEN2_INCLUDE_DIR}\", "
-          "but this project has set EIGEN2_INCLUDE_DIR to \"${EIGEN2_INCLUDE_DIR}\".  "
-          "BTK is changing EIGEN2_INCLUDE_DIR to match the EIGEN2 with which it was built."
+          "Warning: BTK was built with EIGEN3 from \"${BTK_EIGEN3_INCLUDE_DIR}\", "
+          "but this project has set EIGEN3_INCLUDE_DIR to \"${EIGEN3_INCLUDE_DIR}\".  "
+          "BTK is changing EIGEN3_INCLUDE_DIR to match the EIGEN3 with which it was built."
           )
-      ENDIF(NOT BTK_EIGEN2_INCLUDE_DIR_MATCH)
-    ENDIF(EIGEN2_INCLUDE_DIR)
-    SET(EIGEN2_INCLUDE_DIR ${BTK_EIGEN2_INCLUDE_DIR})
-    FIND_PACKAGE(Eigen2)
-    IF(NOT EIGEN2_FOUND)
+      ENDIF(NOT BTK_EIGEN3_INCLUDE_DIR_MATCH)
+    ENDIF(EIGEN3_INCLUDE_DIR)
+    SET(EIGEN3_INCLUDE_DIR ${BTK_EIGEN3_INCLUDE_DIR})
+    FIND_PACKAGE(Eigen3)
+    IF(NOT EIGEN3_FOUND)
       MESSAGE(FATAL_ERROR
-        "UseBTK could not load EIGEN2 settings from \"${EIGEN2_INCLUDE_DIR}\" even through "
-        "BTK was built using EIGEN2 from this location."
+        "UseBTK could not load EIGEN3 settings from \"${EIGEN3_INCLUDE_DIR}\" even through "
+        "BTK was built using EIGEN3 from this location."
         )
-    ENDIF(NOT EIGEN2_FOUND)
-  ENDIF(EIGEN2_FOUND)
-ENDIF(BTK_USE_SYSTEM_EIGEN2)
+    ENDIF(NOT EIGEN3_FOUND)
+  ENDIF(EIGEN3_FOUND)
+ENDIF(BTK_USE_SYSTEM_EIGEN3)

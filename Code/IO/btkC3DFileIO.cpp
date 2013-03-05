@@ -41,8 +41,6 @@
 #include <cctype>
 #include <iostream>
 
-#include <Eigen/Array>
-
 namespace btk
 {
   /**
@@ -912,7 +910,7 @@ namespace btk
             for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
             {
               Point::Values& coords = (*it)->GetValues();
-              Eigen::Matrix<double, Eigen::Dynamic, 1> diff = (coords.rowwise().sum() / 3.0).cwise() - 9999999.0;
+              Eigen::Matrix<double, Eigen::Dynamic, 1> diff = (coords.rowwise().sum() / 3.0).array() - 9999999.0;
               Point::Residuals& res = (*it)->GetResiduals();
               for (int k = 0 ; k < (*it)->GetFrameNumber() ; ++k)
               {
@@ -1487,7 +1485,7 @@ namespace btk
     // POINT:SCALE
     double max = 0.0;
     for (Acquisition::PointConstIterator itPoint = input->BeginPoint() ; itPoint != input->EndPoint() ; ++itPoint)
-      max = std::max(max, (*itPoint)->GetValues().cwise().abs().maxCoeff());
+      max = std::max(max, (*itPoint)->GetValues().array().abs().maxCoeff());
     const int currentMax = static_cast<int>(this->m_PointScale * 32000);
     // Guess to compute a new point scaling factor.
     if (((max > currentMax) || (max <= (currentMax / 2))) && (max > std::numeric_limits<double>::epsilon()))

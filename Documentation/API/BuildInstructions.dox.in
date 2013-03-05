@@ -18,7 +18,7 @@ This page is separated in the following sections and give you all the details to
   - @ref build_sec
   - @ref config_sec 
     - @ref config_extra_warnings
-    - @ref config_sys_eigen2
+    - @ref config_sys_eigen3
     - @ref config_vissupport
       - @ref config_vtk
     - @ref config_matlab

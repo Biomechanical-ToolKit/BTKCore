@@ -38,7 +38,6 @@
 
 #include "Filter.h"
 
-#include <Eigen/Array>
 #include <Eigen/LU>
 
 #define BTKEIGEN_FILFILT_REVERSE_INPLACE(m) \
@@ -79,8 +78,8 @@ namespace btkEigen
     const int order = std::max(b.rows(), a.rows());
     const int elen = 3 * (order - 1); // Number of element used in the reflections
     
-    ei_assert((order > 1) && "The order of the filter must be greater than 1.");
-    ei_assert((slen > elen) && "The signal to filter must have a length 3 times greater than the order of the filter.");
+    eigen_assert((order > 1) && "The order of the filter must be greater than 1.");
+    eigen_assert((slen > elen) && "The signal to filter must have a length 3 times greater than the order of the filter.");
   
     // Copy the coefficients and pad them with zeros 
     BTKEIGEN_FILTER_PAD_COEFFICIENTS(MatrixType,bb,b,order)
@@ -98,19 +97,11 @@ namespace btkEigen
       FFMatrix temp(order-1,order-2);
       temp.block(0,0,order-2,order-2) = -FFMatrix::Identity(order-2,order-2);
       temp.block(order-2,0,1,order-2) = FFMatrix::Zero(1,order-2);
-      
       FFMatrix temp1(order-1,order-1);
       temp1 << aa.block(1,0,order-1,1), temp;
       temp1 += FFMatrix::Identity(order-1,order-1);
-      
       FFMatrix temp2 =  bb.block(1,0,order-1,1) - (bb.coeff(0) * aa.block(1,0,order-1,1));
-      
-      zi.resize(order-1,1);
-      if (!temp1.lu().solve(temp2, &zi))
-      {
-        btkErrorMacro("An error occurred when computing the initial state for the forward-backward filter. Initial state set to 0.");
-        zi.setZero(order-1,1);
-      }
+      zi = temp1.lu().solve(temp2);
     }
     
     MatrixType Y = X;
@@ -119,11 +110,11 @@ namespace btkEigen
       // Reflection at the beginning
       FFVector pre = -1.0 * Y.block(1,i,elen,1);
       BTKEIGEN_FILFILT_REVERSE_INPLACE(pre)
-      pre.cwise() += 2.0 * Y.coeff(0,i);
+      pre.array() += 2.0 * Y.coeff(0,i);
       // Reflection at the end
       FFVector post = -1.0 * Y.block(Y.rows()-elen-1,i,elen,1);
       BTKEIGEN_FILFILT_REVERSE_INPLACE(post)
-      post.cwise() += 2.0 * Y.coeff(Y.rows()-1,i);
+      post.array() += 2.0 * Y.coeff(Y.rows()-1,i);
       // Signal to filter
       FFVector y(Y.rows() + 2*elen,1);
       y << pre, Y.col(i), post;

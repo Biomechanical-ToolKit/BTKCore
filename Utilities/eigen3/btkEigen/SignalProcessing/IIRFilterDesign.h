@@ -93,8 +93,8 @@ namespace btkEigen
   void poly(ResultType* p, const MatrixType& r)
   {
     typedef typename MatrixType::Scalar Scalar;
-    ei_assert(r.cols() == 1);
-    ei_assert(p->cols() == 1);
+    eigen_assert(r.cols() == 1);
+    eigen_assert(p->cols() == 1);
   
     p->setZero(r.rows()+1);
     if (r.rows() == 0)
@@ -132,7 +132,7 @@ namespace btkEigen
     Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1> temp(n);
     for (int i = 0 ; i < n ; ++i)
       temp.data()[i] = (2.0 * static_cast<double>(i+1) - 1.0) * _1j;
-    *p = (temp / (2.0 * static_cast<double>(n)) * M_PI).cwise().exp() * _1j;
+    *p = (temp / (2.0 * static_cast<double>(n)) * M_PI).array().exp() * _1j;
     *k = 1.0;
   };
 
@@ -153,9 +153,9 @@ namespace btkEigen
     const int start1 = std::max(n-d,0);
     const int start2 = std::max(d-n,0);
     *b *= pwo.coeff(start1);
-    b->cwise() /= pwo.block(start2,0,pwo.rows()-start2,1).cast< std::complex<double> >();
+    *b = b->cwiseQuotient(pwo.block(start2,0,pwo.rows()-start2,1).cast< std::complex<double> >());
     *a *= pwo.coeff(start1);
-    a->cwise() /= pwo.block(start1,0,pwo.rows()-start1,1).cast< std::complex<double> >();
+    *a = a->cwiseQuotient(pwo.block(start1,0,pwo.rows()-start1,1).cast< std::complex<double> >());
     normalize(b,a);
   };
   
@@ -172,7 +172,7 @@ namespace btkEigen
     {
       for (int i = 0 ; i < m ; ++i)
         a->coeffRef(i) = a_.coeff(m-i-1);
-      a->cwise() *= pwo;
+      *a = a->cwiseProduct(pwo);
       *b = Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>::Zero(m);
       for (int i = 0 ; i < n ; ++i)
         b->coeffRef(i) = b_.coeff(n-i-1) * pwo.coeff(i);
@@ -181,7 +181,7 @@ namespace btkEigen
     {
       for (int i = 0 ; i < m ; ++i)
         b->coeffRef(i) = b_.coeff(m-i-1);
-      b->cwise() *= pwo;
+      *b = b->cwiseProduct(pwo);
       *a = Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>::Zero(m);
       for (int i = 0 ; i < d ; ++i)
         a->coeffRef(i) = a_.coeff(d-i-1) * pwo.coeff(i);

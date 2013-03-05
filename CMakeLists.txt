@@ -56,15 +56,15 @@ SET(CXX_TEST_PATH ${EXECUTABLE_OUTPUT_PATH})
 SET(BTK_CMAKE_MODULE_PATH "${BTK_SOURCE_DIR}/CMake")
 SET(CMAKE_MODULE_PATH "${BTK_CMAKE_MODULE_PATH}")
 
-# BTK_USE_SYSTEM_EIGEN2 is provided so that you can use an installed or 
-# external version of eigen2. If its on, you must specify the variables 
-OPTION(BTK_USE_SYSTEM_EIGEN2 "Use an outside build of Eigen2." OFF)
-IF(BTK_USE_SYSTEM_EIGEN2)
-  FIND_PACKAGE(Eigen2 REQUIRED)
-ELSE(BTK_USE_SYSTEM_EIGEN2)
-  SET(BTK_EIGEN2_LIBRARIES btkeigen2)
-  SET(EIGEN2_INCLUDE_DIR ${BTK_SOURCE_DIR}/Utilities/eigen2)
-ENDIF(BTK_USE_SYSTEM_EIGEN2)
+# BTK_USE_SYSTEM_EIGEN3 is provided so that you can use an installed or 
+# external version of eigen3. If its on, you must specify the variables 
+OPTION(BTK_USE_SYSTEM_EIGEN3 "Use an outside build of Eigen2." OFF)
+IF(BTK_USE_SYSTEM_EIGEN3)
+  FIND_PACKAGE(Eigen3 REQUIRED)
+ELSE(BTK_USE_SYSTEM_EIGEN3)
+  SET(BTK_EIGEN3_LIBRARIES btkeigen3)
+  SET(EIGEN3_INCLUDE_DIR ${BTK_SOURCE_DIR}/Utilities/eigen3)
+ENDIF(BTK_USE_SYSTEM_EIGEN3)
 
 # Determine Visulization support
 OPTION(BTK_USE_VISSUPPORT "Build BTK with visualization support." OFF)
@@ -272,7 +272,7 @@ IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING)
 
-# Utilities (boost/eigen2/...)
+# Utilities (boost/eigen3/...)
 ADD_SUBDIRECTORY(Utilities)
 
 # Wrapping

@@ -35,8 +35,6 @@
 
 #include "btkAnalogOffsetRemover.h"
 
-#include <Eigen/Array> // cwise
-
 namespace btk
 {
   /**
@@ -157,7 +155,7 @@ namespace btk
     for (std::list< std::pair<Analog::Pointer, Analog::Pointer> >::iterator it = signals.begin() ; it != signals.end() ; ++it)
     {
       double dc = it->second->GetValues().sum() / it->second->GetValues().rows();
-      it->first->GetValues().cwise() -= dc;
+      it->first->GetValues().array() -= dc;
     }
     
     Acquisition::Pointer output = this->GetOutput();

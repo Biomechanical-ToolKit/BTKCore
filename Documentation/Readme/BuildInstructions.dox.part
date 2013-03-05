@@ -49,8 +49,8 @@ The interactive CMake interface provides brief documentation for every option. S
 @subsubsection config_extra_warnings BTK_EXTRA_COMPILER_WARNINGS
 Add compiler flags in debug mode to be more verbose when the compiler find some warnings (available only for GCC).
 
-@subsubsection config_sys_eigen2 BTK_USE_SYSTEM_EIGEN2
-Permits to use the <a href="http://eigen.tuxfamily.org/">Eigen</a> library installed on your system instead of the version embedded in BTK. Eigen 2.0 or above required.
+@subsubsection config_sys_eigen3 BTK_USE_SYSTEM_EIGEN3
+Permits to use the <a href="http://eigen.tuxfamily.org/">Eigen</a> library installed on your system instead of the version embedded in BTK. Eigen 3.1 or above required.
 
 @subsubsection config_vissupport BTK_USE_VISSUPPORT
 To display BTK data in 2D/3D enviromments. This option activates sub-options to choose the environment(s) to used.

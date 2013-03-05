@@ -98,9 +98,9 @@ namespace Open3DMotion
 #else
 
 		// Map to Eigen objects
-		Eigen::Map< Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> > C(A, numrows, 3);
-    Eigen::Map< Eigen::Matrix<float, Eigen::Dynamic, 1, Eigen::RowMajor> > d(b, numrows, 1);
-    Eigen::Map< Eigen::Matrix<float, 3, 1, Eigen::RowMajor> > y(x, 3, 1);
+		Eigen::Map< const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> > C(A, numrows, 3);
+    Eigen::Map< const Eigen::Matrix<float, Eigen::Dynamic, 1> > d(b, numrows, 1);
+    Eigen::Map< Eigen::Matrix<float, 3, 1> > y(x, 3, 1);
 
 		// compute CTC ( = ATA )
 		Eigen::MatrixXf CT = C.transpose();
@@ -116,7 +116,11 @@ namespace Open3DMotion
 		Eigen::Vector3f CTd = CT * d;
 
 		// solve
-		CTC.ldlt().solve(CTd, &y);
+#if EIGEN_VERSION_AT_LEAST(3,0,0)
+		y = CTC.ldlt().solve(CTd);
+#else
+    CTC.ldlt().solve(CTd, &y);
+#endif
 
 		// compute rms error if requested
 		if (rms)

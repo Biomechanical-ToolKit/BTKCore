@@ -68,10 +68,10 @@ namespace btkEigen
     
     const int len = std::max(b.rows(), a.rows());
     
-    ei_assert(b.cols() == 1);
-    ei_assert(a.cols() == 1);
-    ei_assert(si.cols() == 1);
-    ei_assert(si.rows() == len-1);
+    eigen_assert(b.cols() == 1);
+    eigen_assert(a.cols() == 1);
+    eigen_assert(si.cols() == 1);
+    eigen_assert(si.rows() == len-1);
     
     VectorType Y = X;
     // Copy the coefficients and pad them with zeros
@@ -84,7 +84,7 @@ namespace btkEigen
       btkErrorMacro("Impossible to filter the signal, the first element of the denominator is equal to 0.");
       return Y;
     }
-    else if (ei_abs(norm - 1.0) > machine_epsilon<Scalar>())
+    else if (internal::abs(norm - 1.0) > NumTraits<Scalar>::epsilon())
     {
       bb /= norm;
       aa /= norm;

@@ -41,7 +41,6 @@
 #include "btkForcePlatformTypes.h"
 #include "btkWrenchCollection.h"
 
-#include <Eigen/Array>
 #include <Eigen/Geometry>
 
 namespace btk
@@ -106,9 +105,9 @@ namespace btk
     // Position rotation
     wrh->GetPosition()->GetValues() *= R.transpose();
     // Position translation
-    wrh->GetPosition()->GetValues().col(0).cwise() += t.x();
-    wrh->GetPosition()->GetValues().col(1).cwise() += t.y();
-    wrh->GetPosition()->GetValues().col(2).cwise() += t.z();
+    wrh->GetPosition()->GetValues().col(0).array() += t.x();
+    wrh->GetPosition()->GetValues().col(1).array() += t.y();
+    wrh->GetPosition()->GetValues().col(2).array() += t.z();
   };
 };
 
