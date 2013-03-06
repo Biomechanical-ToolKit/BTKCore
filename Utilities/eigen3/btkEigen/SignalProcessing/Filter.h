@@ -65,8 +65,9 @@ namespace btkEigen
     // TODO: Possibility to parrallelize the filter when there is several columns? OpenMP?
   
     typedef typename VectorType::Scalar Scalar;
+    typedef typename VectorType::Index Index;
     
-    const int len = std::max(b.rows(), a.rows());
+    const Index len = std::max(b.rows(), a.rows());
     
     eigen_assert(b.cols() == 1);
     eigen_assert(a.cols() == 1);
@@ -90,21 +91,21 @@ namespace btkEigen
       aa /= norm;
     }
     
-    int lci = len-1; // last index for the coefficients
-    int lsi = lci-1; // last index for the state vector
+    Index lci = len-1; // last index for the coefficients
+    Index lsi = lci-1; // last index for the state vector
     const Scalar* x = X.data();
     Scalar* y = Y.data();
     sf = si;
     // General method
     if (len > 2)
     {
-      for (int i = 0 ; i < Y.rows() ; ++i)
+      for (Index i = 0 ; i < Y.rows() ; ++i)
       {
         y[i] = sf.coeff(0) + bb.coeff(0) * x[i];
         // Update state vector
         // TODO: Benchmark the code to determine the fastest metod.
 #if 0
-        for (int j = 1; j < lci; ++j)
+        for (Index j = 1; j < lci; ++j)
           sf.coeffRef(j-1) = sf.coeff(j) + bb.coeff(j) * x[i] - aa.coeff(j) * y[i];
         sf.coeffRef(lsi) = bb.coeff(lci) * x[i] - aa.coeff(lci) * y[i];
 #else
@@ -116,7 +117,7 @@ namespace btkEigen
     // Specialization: if the order of the filter is less than 2
     else
     {
-      for (int i = 0 ; i < Y.rows() ; ++i)
+      for (Index i = 0 ; i < Y.rows() ; ++i)
       {
         y[i] = sf.coeff(0) + bb.coeff(0) * x[i];
         sf.coeffRef(0) = bb.coeff(lci) * x[i] - aa.coeff(lci) * y[i];

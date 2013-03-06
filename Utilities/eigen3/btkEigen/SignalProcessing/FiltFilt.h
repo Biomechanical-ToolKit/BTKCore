@@ -42,7 +42,7 @@
 
 #define BTKEIGEN_FILFILT_REVERSE_INPLACE(m) \
   { \
-    int dlen =  m.rows() * m.cols(); \
+    Index dlen =  m.rows() * m.cols(); \
     for (int k = 0 ; k < dlen / 2 ; ++k) \
     { \
       Scalar s = m.data()[k]; \
@@ -71,12 +71,13 @@ namespace btkEigen
   MatrixType filtfilt(const NumeratorFilterCoeff& b, const DenominatorFilterCoeff& a, const MatrixType& X)
   {
     typedef typename MatrixType::Scalar Scalar;
+    typedef typename MatrixType::Index Index;
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> FFMatrix;
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> FFVector;
   
-    const int slen = X.rows();
-    const int order = std::max(b.rows(), a.rows());
-    const int elen = 3 * (order - 1); // Number of element used in the reflections
+    const Index slen = X.rows();
+    const Index order = std::max(b.rows(), a.rows());
+    const Index elen = 3 * (order - 1); // Number of element used in the reflections
     
     eigen_assert((order > 1) && "The order of the filter must be greater than 1.");
     eigen_assert((slen > elen) && "The signal to filter must have a length 3 times greater than the order of the filter.");

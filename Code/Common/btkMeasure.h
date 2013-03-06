@@ -62,7 +62,7 @@ namespace btk
     Values& GetValues() {return this->m_Values;};
     const Values& GetValues() const {return this->m_Values;};
     void SetValues(const Values& v);
-    int GetFrameNumber() const {return this->m_Values.rows();};
+    int GetFrameNumber() const {return static_cast<int>(this->m_Values.rows());};
     void SetFrameNumber(int frameNumber);
     Pointer Clone() const {return Pointer(new Measure<d>(*this));};
     

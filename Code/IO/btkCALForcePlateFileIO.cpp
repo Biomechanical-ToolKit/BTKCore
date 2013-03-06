@@ -238,9 +238,9 @@ namespace btk
       for (std::list<ForcePlateInfo>::const_iterator it = forcePlates.begin() ; it != forcePlates.end() ; ++it)
       {
         if (it->calMatrix.cols() > chans)
-          chans = it->calMatrix.cols();
+          chans = static_cast<int>(it->calMatrix.cols());
         if (it->calMatrix.rows() > rows)
-          rows = it->calMatrix.rows();
+          rows = static_cast<int>(it->calMatrix.rows());
       }
       // Adapt dimensions of calibration matrices
       for (std::list<ForcePlateInfo>::iterator it = forcePlates.begin() ; it != forcePlates.end() ; ++it)
@@ -561,7 +561,7 @@ namespace btk
     {
       for (int i = 0 ; i < cal->cols() ; ++i)
         for (int j = 0 ; j < cal->rows() ; ++j)
-          cal->coeffRef(j,i) = data->ToDouble(j + i * cal->rows() + coefficientsAlreadyExtracted);
+          cal->coeffRef(j,i) = data->ToDouble(j + i * static_cast<int>(cal->rows()) + coefficientsAlreadyExtracted);
     }
     else
     {

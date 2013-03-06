@@ -22,14 +22,14 @@ void btk_o3dm_ADemo1_test(const std::string& filename)
   TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), o3dm_ADemo1_rateHz_EMG);
   TS_ASSERT_EQUALS(acq->GetNumberAnalogSamplePerFrame(), 2);
   
-  for (size_t i = 0 ; i < o3dm_ADemo1_nummarkers ; ++i)
+  for (int i = 0 ; i < (int)o3dm_ADemo1_nummarkers ; ++i)
     TS_ASSERT_EQUALS(acq->GetPoint(i)->GetLabel(), o3dm_ADemo1_markername[i]);
   
-  for (size_t i = 0 ; i < o3dm_ADemo1_nummarkers ; ++i)
+  for (int i = 0 ; i < o3dm_ADemo1_nummarkers ; ++i)
   {
-    for (size_t j = 0 ; j < o3dm_ADemo1_numframes_marker ; ++j)
+    for (int j = 0 ; j < (int)o3dm_ADemo1_numframes_marker ; ++j)
     {
-      size_t inc = (j * o3dm_ADemo1_nummarkers + i) * 4;
+      int inc = (j * o3dm_ADemo1_nummarkers + i) * 4;
       TS_ASSERT_DELTA(acq->GetPoint(i)->GetValues().coeff(j,0), o3dm_ADemo1_marker[inc], 1e-1);
       TS_ASSERT_DELTA(acq->GetPoint(i)->GetValues().coeff(j,1), o3dm_ADemo1_marker[inc + 1], 1e-1);
       TS_ASSERT_DELTA(acq->GetPoint(i)->GetValues().coeff(j,2), o3dm_ADemo1_marker[inc + 2], 1e-1);
@@ -37,13 +37,13 @@ void btk_o3dm_ADemo1_test(const std::string& filename)
     }
   }
   
-  for (size_t i = 0 ; i < o3dm_ADemo1_numEMG ; ++i)
+  for (int i = 0 ; i < (int)o3dm_ADemo1_numEMG ; ++i)
     TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel(), o3dm_ADemo1_EMGname[i]);
   
-  for (size_t i = 0 ; i < o3dm_ADemo1_numEMG ; ++i)
+  for (int i = 0 ; i < (int)o3dm_ADemo1_numEMG ; ++i)
   {
     btk::Analog::Pointer an = acq->GetAnalog(i);
-    for (size_t j = 0 ; j < o3dm_ADemo1_numframes_EMG ; ++j)
+    for (int j = 0 ; j < (int)o3dm_ADemo1_numframes_EMG ; ++j)
     {
       TS_ASSERT_DELTA(an->GetValues().coeff(j,0), o3dm_ADemo1_EMG[j * o3dm_ADemo1_numEMG + i], 1e-4);
     }

@@ -93,6 +93,7 @@ namespace btkEigen
   void poly(ResultType* p, const MatrixType& r)
   {
     typedef typename MatrixType::Scalar Scalar;
+    typedef typename MatrixType::Index Index;
     eigen_assert(r.cols() == 1);
     eigen_assert(p->cols() == 1);
   
@@ -102,12 +103,12 @@ namespace btkEigen
       p->coeffRef(0) = Scalar(1);
       return;
     }
-    const int end = p->rows()-1;
+    const Index end = p->rows()-1;
     p->coeffRef(end) = -r.coeff(0);
     p->coeffRef(end-1) = Scalar(1);
-    for (int i = end-1 ; i > 0 ; --i)
+    for (Index i = end-1 ; i > 0 ; --i)
     {
-      for (int j = i-1 ; j < end ; ++j)
+      for (Index j = i-1 ; j < end ; ++j)
         p->coeffRef(j) = p->coeff(j+1) - r.coeff(i) * p->coeff(j);
       p->coeffRef(end) = -r.coeff(i) * p->coeff(end);
     }
@@ -144,14 +145,15 @@ namespace btkEigen
 
   void lp2lp(Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>* b, Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>* a, double wo = 1.0)
   {
-    const int d = a->rows();
-    const int n = b->rows();
-    const int m = std::max(d,n);
+    typedef Matrix<double,-1,-1>::Index Index;
+    const Index d = a->rows();
+    const Index n = b->rows();
+    const Index m = std::max(d,n);
     Eigen::Matrix<double, Eigen::Dynamic, 1> pwo(m);
-    for (int i = 0 ; i < m ; ++i)
+    for (Index i = 0 ; i < m ; ++i)
       pwo.data()[i] = std::pow(wo, static_cast<double>(m-i-1));
-    const int start1 = std::max(n-d,0);
-    const int start2 = std::max(d-n,0);
+    const Index start1 = std::max(n-d,Index(0));
+    const Index start2 = std::max(d-n,Index(0));
     *b *= pwo.coeff(start1);
     *b = b->cwiseQuotient(pwo.block(start2,0,pwo.rows()-start2,1).cast< std::complex<double> >());
     *a *= pwo.coeff(start1);
@@ -161,29 +163,30 @@ namespace btkEigen
   
   void lp2hp(Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>* b, Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>* a, double wo = 1.0)
   {
+    typedef Matrix<double,-1,-1>::Index Index;
     Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1> a_ = *a, b_ = *b;
-    const int d = a->rows();
-    const int n = b->rows();
-    const int m = std::max(d,n);
+    const Index d = a->rows();
+    const Index n = b->rows();
+    const Index m = std::max(d,n);
     Eigen::Matrix<double, Eigen::Dynamic, 1> pwo(m);
-    for (int i = 0 ; i < m ; ++i)
+    for (Index i = 0 ; i < m ; ++i)
       pwo.data()[i] = std::pow(wo, static_cast<double>(i));
     if (d >= n)
     {
-      for (int i = 0 ; i < m ; ++i)
+      for (Index i = 0 ; i < m ; ++i)
         a->coeffRef(i) = a_.coeff(m-i-1);
       *a = a->cwiseProduct(pwo);
       *b = Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>::Zero(m);
-      for (int i = 0 ; i < n ; ++i)
+      for (Index i = 0 ; i < n ; ++i)
         b->coeffRef(i) = b_.coeff(n-i-1) * pwo.coeff(i);
     }
     else
     {
-      for (int i = 0 ; i < m ; ++i)
+      for (Index i = 0 ; i < m ; ++i)
         b->coeffRef(i) = b_.coeff(m-i-1);
       *b = b->cwiseProduct(pwo);
       *a = Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>::Zero(m);
-      for (int i = 0 ; i < d ; ++i)
+      for (Index i = 0 ; i < d ; ++i)
         a->coeffRef(i) = a_.coeff(d-i-1) * pwo.coeff(i);
     }
     normalize(b,a);
@@ -191,36 +194,37 @@ namespace btkEigen
   
   void lp2bp(Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>* b, Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>* a, double wo = 1.0, double bw = 1.0)
   {
-    const int d = a->rows() - 1;
-    const int n = b->rows() - 1;
-    const int m = std::max(d,n);
-    const int dp = d + m;
-    const int np = n + m;
+    typedef Matrix<double,-1,-1>::Index Index;
+    const Index d = a->rows() - 1;
+    const Index n = b->rows() - 1;
+    const Index m = std::max(d,n);
+    const Index dp = d + m;
+    const Index np = n + m;
     Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1> a_ = Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>::Zero(dp + 1);
     Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1> b_ = Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>::Zero(np + 1);
     double wosq = wo * wo;
-    for (int j = 0 ; j < (np + 1) ; ++j)
+    for (Index j = 0 ; j < (np + 1) ; ++j)
     {
       std::complex<double> val(0.0, 0.0);
-      for (int i = 0 ; i < (n + 1) ; ++i)
+      for (Index i = 0 ; i < (n + 1) ; ++i)
       {
-        for (int k = 0 ; k < i+1 ; ++k)
+        for (Index k = 0 ; k < i+1 ; ++k)
         {
           if ((m - i + 2 * k) == j)
-            val += comb(static_cast<double>(i), static_cast<double>(k)) * b->coeff(n-i) * std::pow(wosq, i-k) / std::pow(bw, i);
+            val += comb(static_cast<double>(i), static_cast<double>(k)) * b->coeff(n-i) * std::pow(wosq, int(i-k)) / std::pow(bw, int(i));
         }
       }
       b_.coeffRef(np-j) = val; 
     }
-    for (int j = 0 ; j < (dp + 1) ; ++j)
+    for (Index j = 0 ; j < (dp + 1) ; ++j)
     {
       std::complex<double> val(0.0, 0.0);
-      for (int i = 0 ; i < (d + 1) ; ++i)
+      for (Index i = 0 ; i < (d + 1) ; ++i)
       {
-        for (int k = 0 ; k < i+1 ; ++k)
+        for (Index k = 0 ; k < i+1 ; ++k)
         {
           if ((m - i + 2 * k) == j)
-            val += comb(static_cast<double>(i), static_cast<double>(k)) * a->coeff(d-i) * std::pow(wosq, i-k) / std::pow(bw, i);
+            val += comb(static_cast<double>(i), static_cast<double>(k)) * a->coeff(d-i) * std::pow(wosq, int(i-k)) / std::pow(bw, int(i));
         }
       }
       a_.coeffRef(dp-j) = val; 
@@ -231,36 +235,37 @@ namespace btkEigen
   
   void lp2bs(Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>* b, Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>* a, double wo = 1.0, double bw = 1.0)
   {
-    const int d = a->rows() - 1;
-    const int n = b->rows() - 1;
-    const int m = std::max(d,n);
-    const int dp = m + m;
-    const int np = m + m;
+    typedef Matrix<double,-1,-1>::Index Index;
+    const Index d = a->rows() - 1;
+    const Index n = b->rows() - 1;
+    const Index m = std::max(d,n);
+    const Index dp = m + m;
+    const Index np = m + m;
     Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1> a_ = Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>::Zero(dp + 1);
     Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1> b_ = Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>::Zero(np + 1);
     double wosq = wo * wo;
-    for (int j = 0 ; j < (np + 1) ; ++j)
+    for (Index j = 0 ; j < (np + 1) ; ++j)
     {
       std::complex<double> val(0.0, 0.0);
-      for (int i = 0 ; i < (n + 1) ; ++i)
+      for (Index i = 0 ; i < (n + 1) ; ++i)
       {
-        for (int k = 0 ; k < m-i+1 ; ++k)
+        for (Index k = 0 ; k < m-i+1 ; ++k)
         {
           if ((i + 2 * k) == j)
-            val += comb(static_cast<double>(m-i), static_cast<double>(k)) * b->coeff(n-i) * std::pow(wosq, m-i-k) * std::pow(bw, i);
+            val += comb(static_cast<double>(m-i), static_cast<double>(k)) * b->coeff(n-i) * std::pow(wosq, int(m-i-k)) * std::pow(bw, int(i));
         }
       }
       b_.coeffRef(np-j) = val; 
     }
-    for (int j = 0 ; j < (dp + 1) ; ++j)
+    for (Index j = 0 ; j < (dp + 1) ; ++j)
     {
       std::complex<double> val(0.0, 0.0);
-      for (int i = 0 ; i < (d + 1) ; ++i)
+      for (Index i = 0 ; i < (d + 1) ; ++i)
       {
-        for (int k = 0 ; k < m-i+1 ; ++k)
+        for (Index k = 0 ; k < m-i+1 ; ++k)
         {
           if ((i + 2 * k) == j)
-            val += comb(static_cast<double>(m-i), static_cast<double>(k)) * a->coeff(d-i) * std::pow(wosq, m-i-k) * std::pow(bw, i);
+            val += comb(static_cast<double>(m-i), static_cast<double>(k)) * a->coeff(d-i) * std::pow(wosq, int(m-i-k)) * std::pow(bw, int(i));
         }
       }
       a_.coeffRef(dp-j) = val; 
@@ -271,41 +276,42 @@ namespace btkEigen
 
   void bilinear(Eigen::Matrix<double, Eigen::Dynamic, 1>* b, Eigen::Matrix< double, Eigen::Dynamic, 1>* a, const Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>& b_, const Eigen::Matrix< std::complex<double>, Eigen::Dynamic, 1>& a_, double fs = 1.0)
   {
-    const int d = a_.rows() - 1;
-    const int n = b_.rows() - 1;
-    const int m = std::max(d,n) + 1;
+    typedef Matrix<double,-1,-1>::Index Index;
+    const Index d = a_.rows() - 1;
+    const Index n = b_.rows() - 1;
+    const Index m = std::max(d,n) + 1;
     *b = Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(m);
     *a = Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(m);
-    for (int j = 0 ; j < m ; ++j)
+    for (Index j = 0 ; j < m ; ++j)
     {
       double val = 0.0;
-      for (int i = 0 ; i < n+1 ; ++i)
+      for (Index i = 0 ; i < n+1 ; ++i)
       {
-        for (int k = 0 ; k < i+1 ; ++k)
+        for (Index k = 0 ; k < i+1 ; ++k)
         {
-          for (int l = 0 ; l < m-i ; ++l)
+          for (Index l = 0 ; l < m-i ; ++l)
           {
             if ((k+l) == j)
             {
-              val += (comb(static_cast<double>(i), static_cast<double>(k)) * comb(static_cast<double>(m - i - 1), static_cast<double>(l)) * b_.coeff(n - i).real() * std::pow(2.0*fs, i) * pow(-1.0,k));
+              val += (comb(static_cast<double>(i), static_cast<double>(k)) * comb(static_cast<double>(m - i - 1), static_cast<double>(l)) * b_.coeff(n - i).real() * std::pow(2.0*fs, int(i)) * pow(-1.0, int(k)));
             }
           }
         }
       }
       b->coeffRef(j) = val;
     }
-    for (int j = 0 ; j < m ; ++j)
+    for (Index j = 0 ; j < m ; ++j)
     {
       double val = 0.0;
-      for (int i = 0 ; i < d+1 ; ++i)
+      for (Index i = 0 ; i < d+1 ; ++i)
       {
-        for (int k = 0 ; k < i+1 ; ++k)
+        for (Index k = 0 ; k < i+1 ; ++k)
         {
-          for (int l = 0 ; l < m-i ; ++l)
+          for (Index l = 0 ; l < m-i ; ++l)
           {
             if ((k+l) == j)
             {
-              val += (comb(static_cast<double>(i), static_cast<double>(k)) * comb(static_cast<double>(m - i - 1), static_cast<double>(l)) * a_.coeff(d - i).real() * std::pow(2.0*fs, i) * pow(-1.0,k));
+              val += (comb(static_cast<double>(i), static_cast<double>(k)) * comb(static_cast<double>(m - i - 1), static_cast<double>(l)) * a_.coeff(d - i).real() * std::pow(2.0*fs, int(i)) * pow(-1.0, int(k)));
             }
           }
         }
