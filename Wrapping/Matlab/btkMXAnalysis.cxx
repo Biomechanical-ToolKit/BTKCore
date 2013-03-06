@@ -73,7 +73,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
           for (size_t i = 0 ; i < num ; ++i)
           {
             std::string& str = entryValues[inc][i];
-            str = (*it)->GetInfo()->ToString(i);
+            str = (*it)->GetInfo()->ToString((int)i);
             str = str.erase(str.find_last_not_of(' ') + 1);
             str = str.erase(0, str.find_first_not_of(' '));
           }
