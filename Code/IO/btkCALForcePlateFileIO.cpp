@@ -38,7 +38,6 @@
 #include "btkConvert.h"
 #include "btkMetaDataUtils.h"
 
-#include <Eigen/Array>
 #include <Eigen/Geometry>
 
 #include <algorithm>
@@ -282,9 +281,9 @@ namespace btk
         temp *= 10.0;
         temp = it->orientation * temp;
         //Eigen::Matrix<double, 3, 1> origin(it->position);
-        temp.row(0).cwise() += (it->position[0] * 10.0);
-        temp.row(1).cwise() += (it->position[1] * 10.0);
-        temp.row(2).cwise() += (it->position[2] * 10.0);
+        temp.row(0).array() += (it->position[0] * 10.0);
+        temp.row(1).array() += (it->position[1] * 10.0);
+        temp.row(2).array() += (it->position[2] * 10.0);
         double* c = temp.data();
         for (int i = 0 ; i < 12 ; ++i)
           corners[inc2 + i] = static_cast<float>(c[i]);

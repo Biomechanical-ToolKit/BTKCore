@@ -236,19 +236,19 @@ namespace btk
    */
   void ForcePlatformWrenchFilter::FinishTypeI(Wrench::Pointer wrh , ForcePlatform::Pointer /* fp */, int /* index */)
   {
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Component;
-    Component Fx = wrh->GetForce()->GetValues().col(0);
-    Component Fy = wrh->GetForce()->GetValues().col(1);
-    Component Fz = wrh->GetForce()->GetValues().col(2);
-    Component Mx = wrh->GetMoment()->GetValues().col(0);
-    Component My = wrh->GetMoment()->GetValues().col(1);
-    Component Mz = wrh->GetMoment()->GetValues().col(2);
-    Component Px = wrh->GetPosition()->GetValues().col(0);
-    Component Py = wrh->GetPosition()->GetValues().col(1);
-    Component Pz = wrh->GetPosition()->GetValues().col(2);    
-    Mx -= Fy.cwise() * Pz - Py.cwise() * Fz;
-    My -= Fz.cwise() * Px - Pz.cwise() * Fx;
-    Mz -= Fx.cwise() * Py - Px.cwise() * Fy;
+    typedef Eigen::Array<double, Eigen::Dynamic, 1> Component;
+    Component Fx = wrh->GetForce()->GetValues().col(0).array();
+    Component Fy = wrh->GetForce()->GetValues().col(1).array();
+    Component Fz = wrh->GetForce()->GetValues().col(2).array();
+    Component Mx = wrh->GetMoment()->GetValues().col(0).array();
+    Component My = wrh->GetMoment()->GetValues().col(1).array();
+    Component Mz = wrh->GetMoment()->GetValues().col(2).array();
+    Component Px = wrh->GetPosition()->GetValues().col(0).array();
+    Component Py = wrh->GetPosition()->GetValues().col(1).array();
+    Component Pz = wrh->GetPosition()->GetValues().col(2).array();
+    Mx -= Fy * Pz - Py * Fz;
+    My -= Fz * Px - Pz * Fx;
+    Mz -= Fx * Py - Px * Fy;
     wrh->GetMoment()->GetValues().col(0) = Mx;
     wrh->GetMoment()->GetValues().col(1) = My;
     wrh->GetMoment()->GetValues().col(2) = Mz;

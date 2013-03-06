@@ -214,7 +214,7 @@ CXXTEST_SUITE(AcquisitionUnitConverterTest)
     TS_ASSERT((pfe2->GetOutput()->GetItem(0)->GetChannel(5)->GetValues()-(pfe1->GetOutput()->GetItem(0)->GetChannel(5)->GetValues() * 0.001)).block(0,0,20,1).rowwise().norm().sum() < 1e-5);
     TS_ASSERT((grw2->GetPosition()->GetValues() - (grw1->GetPosition()->GetValues() * 0.001)).block(0,0,20,3).rowwise().norm().sum() < 1e-5);
     TS_ASSERT((grw2->GetMoment()->GetValues() - (grw1->GetMoment()->GetValues() * 0.001)).block(0,0,20,3).rowwise().norm().sum() < 1e-5);
-    TS_ASSERT(grw2->GetForce()->GetValues().isApprox(grw1->GetForce()->GetValues()));
+    TS_ASSERT(grw2->GetForce()->GetValues().isApprox(grw1->GetForce()->GetValues(),1e-11));
   };
   
   CXXTEST_TEST(ConversionFromFileCalMatrix_Type4a)

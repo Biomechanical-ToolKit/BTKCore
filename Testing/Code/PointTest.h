@@ -3,8 +3,6 @@
 
 #include <btkPoint.h>
 
-USING_PART_OF_NAMESPACE_EIGEN
-
 CXXTEST_SUITE(PointTest)
 {
   CXXTEST_TEST(Constructor)

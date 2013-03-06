@@ -9,7 +9,7 @@
   - @ref build_sec
   - @ref config_sec 
     - @ref config_extra_warnings
-    - @ref config_sys_eigen2
+    - @ref config_sys_eigen3
     - @ref config_vissupport
       - @ref config_vtk
     - @ref config_matlab

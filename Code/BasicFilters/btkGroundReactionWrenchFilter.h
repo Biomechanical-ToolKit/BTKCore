@@ -41,9 +41,6 @@
 #include "btkForcePlatformTypes.h"
 #include "btkWrenchCollection.h"
 
-#include <Eigen/Array>
-#include <Eigen/Geometry>
-
 namespace btk
 {
   class GroundReactionWrenchFilter : public ForcePlatformWrenchFilter
@@ -80,16 +77,16 @@ namespace btk
 
   inline void GroundReactionWrenchFilter::FinishGRWComputation(Wrench::Pointer grw, const ForcePlatform::Origin& o) const
   { 
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Component;
-    Component Fx = grw->GetForce()->GetValues().col(0);
-    Component Fy = grw->GetForce()->GetValues().col(1);
-    Component Fz = grw->GetForce()->GetValues().col(2);
-    Component Mx = grw->GetMoment()->GetValues().col(0);
-    Component My = grw->GetMoment()->GetValues().col(1);
-    Component Mz = grw->GetMoment()->GetValues().col(2);
-    Component Px = grw->GetPosition()->GetValues().col(0);
-    Component Py = grw->GetPosition()->GetValues().col(1);
-    Component Pz = grw->GetPosition()->GetValues().col(2);
+    typedef Eigen::Array<double, Eigen::Dynamic, 1> Component;
+    Component Fx = grw->GetForce()->GetValues().col(0).array();
+    Component Fy = grw->GetForce()->GetValues().col(1).array();
+    Component Fz = grw->GetForce()->GetValues().col(2).array();
+    Component Mx = grw->GetMoment()->GetValues().col(0).array();
+    Component My = grw->GetMoment()->GetValues().col(1).array();
+    Component Mz = grw->GetMoment()->GetValues().col(2).array();
+    Component Px = grw->GetPosition()->GetValues().col(0).array();
+    Component Py = grw->GetPosition()->GetValues().col(1).array();
+    Component Pz = grw->GetPosition()->GetValues().col(2).array();
 
     // Square norm of the forces.
     Component sNF =  grw->GetForce()->GetValues().rowwise().squaredNorm();
@@ -101,10 +98,8 @@ namespace btk
     // For explanations of the PWA calculation, see Shimba T. (1984), 
     // "An estimation of center of gravity from force platform data", 
     // Journal of Biomechanics 17(1), 53–60.
-    Px = (Fy.cwise() * Mz - Fz.cwise() * My).cwise() / sNF
-         - (Fx.cwise().square().cwise() * My - Fx.cwise() * (Fy.cwise() * Mx)).cwise() / (sNF.cwise() * Fz);
-    Py = (Fz.cwise() * Mx - Fx.cwise() * Mz).cwise() / sNF
-         - (Fx.cwise() * (Fy.cwise() * My) - Fy.cwise().square().cwise() * Mx).cwise() / (sNF.cwise() * Fz);
+    Px = (Fy * Mz - Fz * My) / sNF - (Fx.square() * My - Fx * (Fy * Mx)) / (sNF * Fz);
+    Py = (Fz * Mx - Fx * Mz) / sNF - (Fx * (Fy * My) - Fy.square() * Mx) / (sNF * Fz);
     Pz.setZero();
     // Suppress false PWA
     for (int i = 0 ; i < Fz.rows() ; ++i)
@@ -118,9 +113,9 @@ namespace btk
       }
     }
     // M_pwa = M_s + F_s x PWA
-    Mx += Fy.cwise() * Pz - Py.cwise() * Fz;
-    My += Fz.cwise() * Px - Pz.cwise() * Fx;
-    Mz += Fx.cwise() * Py - Px.cwise() * Fy;
+    Mx += Fy * Pz - Py * Fz;
+    My += Fz * Px - Pz * Fx;
+    Mz += Fx * Py - Px * Fy;
 
     grw->GetForce()->GetValues().col(0) = Fx;
     grw->GetForce()->GetValues().col(1) = Fy;

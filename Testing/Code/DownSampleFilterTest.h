@@ -4,8 +4,6 @@
 #include <btkDownsampleFilter.h>
 #include <btkConvert.h>
 
-#include <Eigen/Array> // Random
-
 CXXTEST_SUITE(DownsampleFilterTest)
 {
   CXXTEST_TEST(WrenchRatioOne)
