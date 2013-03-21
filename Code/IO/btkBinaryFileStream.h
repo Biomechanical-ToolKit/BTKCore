@@ -142,26 +142,46 @@ namespace btk
     void SwapStream(BinaryFileStream* toSwap);
     
     char ReadChar();
-    const std::vector<char> ReadChar(size_t nb);
+    void ReadChar(size_t nb, char* values);
+    void ReadChar(std::vector<char>& values) {if (values.empty()) return; this->ReadChar(values.size(), &(values[0]));};
+    std::vector<char> ReadChar(size_t nb) {std::vector<char> values(nb); this->ReadChar(values); return values;};
     int8_t ReadI8();
-    const std::vector<int8_t> ReadI8(size_t nb);
+    void ReadI8(size_t nb, int8_t* values);
+    void ReadI8(std::vector<int8_t>& values) {if (values.empty()) return; this->ReadI8(values.size(), &(values[0]));};
+    std::vector<int8_t> ReadI8(size_t nb) {std::vector<int8_t> values(nb); this->ReadI8(values); return values;};
     uint8_t ReadU8();
-    const std::vector<uint8_t> ReadU8(size_t nb);
+    void ReadU8(size_t nb, uint8_t* values);
+    void ReadU8(std::vector<uint8_t>& values) {if (values.empty()) return; this->ReadU8(values.size(), &(values[0]));};
+    std::vector<uint8_t> ReadU8(size_t nb) {std::vector<uint8_t> values(nb); this->ReadU8(values); return values;};
     virtual int16_t ReadI16() = 0;
-    const std::vector<int16_t> ReadI16(size_t nb);
+    void ReadI16(size_t nb, int16_t* values);
+    void ReadI16(std::vector<int16_t>& values) {if (values.empty()) return; this->ReadI16(values.size(), &(values[0]));};
+    std::vector<int16_t> ReadI16(size_t nb) {std::vector<int16_t> values(nb); this->ReadI16(values); return values;};
     virtual uint16_t ReadU16() = 0;
-    const std::vector<uint16_t> ReadU16(size_t nb);
+    void ReadU16(size_t nb, uint16_t* values);
+    void ReadU16(std::vector<uint16_t>& values) {if (values.empty()) return; this->ReadU16(values.size(), &(values[0]));};
+    std::vector<uint16_t> ReadU16(size_t nb) {std::vector<uint16_t> values(nb); this->ReadU16(values); return values;};
     virtual int32_t ReadI32() = 0;
-    const std::vector<int32_t> ReadI32(size_t nb);
+    void ReadI32(size_t nb, int32_t* values);
+    void ReadI32(std::vector<int32_t>& values) {if (values.empty()) return; this->ReadI32(values.size(), &(values[0]));};
+    std::vector<int32_t> ReadI32(size_t nb) {std::vector<int32_t> values(nb); this->ReadI32(values); return values;};
     virtual uint32_t ReadU32() = 0;
-    const std::vector<uint32_t> ReadU32(size_t nb);
-    
+    void ReadU32(size_t nb, uint32_t* values);
+    void ReadU32(std::vector<uint32_t>& values) {if (values.empty()) return; this->ReadU32(values.size(), &(values[0]));};
+    std::vector<uint32_t> ReadU32(size_t nb) {std::vector<uint32_t> values(nb); this->ReadU32(values); return values;};
     virtual float ReadFloat() = 0;
-    const std::vector<float> ReadFloat(size_t nb);
+    void ReadFloat(size_t nb, float* values);
+    void ReadFloat(std::vector<float>& values) {if (values.empty()) return; this->ReadFloat(values.size(), &(values[0]));};
+    std::vector<float> ReadFloat(size_t nb) {std::vector<float> values(nb); this->ReadFloat(values); return values;};
     virtual double ReadDouble() = 0;
-    const std::vector<double> ReadDouble(size_t nb);
-    const std::string ReadString(size_t nbChar);
-    const std::vector<std::string> ReadString(size_t nb, size_t nbChar);
+    void ReadDouble(size_t nb, double* values);
+    void ReadDouble(std::vector<double>& values) {if (values.empty()) return; this->ReadDouble(values.size(), &(values[0]));};
+    std::vector<double> ReadDouble(size_t nb) {std::vector<double> values(nb); this->ReadDouble(values); return values;};
+    std::string ReadString(size_t nbChar);
+    void ReadString(size_t nb, size_t nbChar, std::string* values);
+    void ReadString(size_t nbChar, std::vector<std::string>& values) {if (values.empty()) return; this->ReadString(values.size(), nbChar, &(values[0]));};
+    std::vector<std::string> ReadString(size_t nb, size_t nbChar) {std::vector<std::string> values(nb); this->ReadString(nbChar, values); return values;};
+    
     void SeekRead(StreamOffset offset, SeekDir dir) {this->mp_Stream->seekg(offset, dir);};
     StreamPosition TellRead() const {return this->mp_Stream->tellg();};
     
