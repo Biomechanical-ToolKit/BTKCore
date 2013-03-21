@@ -306,8 +306,7 @@ namespace btk
           }
           if (hasAxis)
             label = label.substr(0, label.length() - straxis.length());
-          label = label.erase(label.find_last_not_of(' ') + 1);
-          label = label.erase(0, label.find_first_not_of(' '));
+          btkTrimString(label);
           label += suffix;
         }
         else

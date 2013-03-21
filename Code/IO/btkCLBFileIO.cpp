@@ -110,7 +110,7 @@ namespace btk
    */
   
   /**
-   * Only check if the file extension correspond to ANG.
+   * Check if the beginning of the file starts with the string "CONTEC DATA LOGGER".
    */
   bool CLBFileIO::CanReadFile(const std::string& filename)
   {

@@ -353,10 +353,7 @@ namespace btk
           {
             while(it != events->End())
             {
-              std::string str = ibfs->ReadString(4);
-              str = str.erase(str.find_last_not_of(' ') + 1);
-              str = str.erase(0, str.find_first_not_of(' '));
-              (*it)->SetLabel(str);
+              (*it)->SetLabel(btkTrimString(ibfs->ReadString(4)));
               ++it;
             }
           }
@@ -364,10 +361,7 @@ namespace btk
           {
             while(it != events->End())
             {
-              std::string str = ibfs->ReadString(2);
-              str = str.erase(str.find_last_not_of(' ') + 1);
-              str = str.erase(0, str.find_first_not_of(' '));
-              (*it)->SetLabel(str);
+              (*it)->SetLabel(btkTrimString(ibfs->ReadString(2)));
               ++it;
             }
           }
@@ -1906,9 +1900,7 @@ namespace btk
           {
             bool toCollapse = true;
             
-            std::string s1 = uniqueEventsLabel[i];
-            s1 = s1.erase(s1.find_last_not_of(' ') + 1);
-            s1 = s1.erase(0, s1.find_first_not_of(' '));
+            std::string s1 = btkTrimString(uniqueEventsLabel[i]);
             std::string s2 = "";
             std::vector<std::string>::iterator it2;
             for (it2 = uniqueEvents.begin() ; it2 != uniqueEvents.end() ; ++it2)

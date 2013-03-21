@@ -159,13 +159,7 @@ namespace btk
   {
     for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
     {
-      std::string label = bifs->ReadString(8);
-      // Remove spaces
-      label = label.erase(label.find_last_not_of(' ') + 1);
-      label = label.erase(0, label.find_first_not_of(' '));
-      // Remove 0x00
-      label = label.erase(label.find_last_not_of(static_cast<char>(0x00)) + 1);
-      label = label.erase(0, label.find_first_not_of(static_cast<char>(0x00)));
+      std::string label = btkTrimString(btkTrimString(bifs->ReadString(8)), static_cast<char>(0x00));
       if (!label.empty())
         (*it)->SetLabel(label);
     }

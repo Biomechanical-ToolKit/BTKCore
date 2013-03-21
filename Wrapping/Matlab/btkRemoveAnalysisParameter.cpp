@@ -109,13 +109,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           mxFree(name);
           for (size_t i = 0 ; i < valNames.size() ; ++i)
           {
-            std::string strNameRef = valNames[i];
-            strNameRef = strNameRef.erase(strNameRef.find_last_not_of(' ') + 1);
-            strNameRef = strNameRef.erase(0, strNameRef.find_first_not_of(' '));
-            std::string strContextRef = valContexts[i];
-            strContextRef = strContextRef.erase(strContextRef.find_last_not_of(' ') + 1);
-            strContextRef = strContextRef.erase(0, strContextRef.find_first_not_of(' '));
-            if ((strNameRef.compare(strName) == 0) && (strContextRef.compare(strContext) == 0))
+            btkTrimString(valNames[i]);
+            btkTrimString(valContexts[i]);
+            if ((valNames[i].compare(strName) == 0) && (valContexts[i].compare(strContext) == 0))
             {
               idx = (int)i;
               break;

@@ -150,9 +150,7 @@ mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
         values = mxCreateCellArray(ndim, dims);
         for (int i = 0 ; i < rows ; ++i)
         {
-          std::string str = md->GetInfo()->ToString(i);
-          str = str.erase(str.find_last_not_of(' ') + 1);
-          str = str.erase(0, str.find_first_not_of(' '));
+          std::string str = btkTrimString(md->GetInfo()->ToString(i));
           mxSetCell(values, (mwIndex)i, mxCreateString(str.c_str()));
         }
         break;

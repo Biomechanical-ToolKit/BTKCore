@@ -132,13 +132,7 @@ namespace btk
       for (Acquisition::PointIterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
       {
         bifs.SeekRead(10, BinaryFileStream::Current);
-        std::string label = bifs.ReadString(6);
-        // Remove spaces
-        label = label.erase(label.find_last_not_of(' ') + 1);
-        label = label.erase(0, label.find_first_not_of(' '));
-        // Remove 0x00
-        label = label.erase(label.find_last_not_of(static_cast<char>(0x00)) + 1);
-        label = label.erase(0, label.find_first_not_of(static_cast<char>(0x00)));
+        std::string label = btkTrimString(btkTrimString(bifs.ReadString(6)), static_cast<char>(0x00));
         // Known case
         size_t j = 0;
         for (j = 0 ; j < labels.size() ; ++j)

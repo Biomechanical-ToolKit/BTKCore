@@ -173,23 +173,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           std::vector<std::string> valContexts;
           (*its[3])->GetInfo()->ToString(valContexts);
           // paremeter's context
-          std::string strContext = std::string(context);
-          strContext = strContext.erase(strContext.find_last_not_of(' ') + 1);
-          strContext = strContext.erase(0, strContext.find_first_not_of(' '));
+          std::string strContext = btkTrimString(std::string(context));
           // parameter's name
-          std::string strName = std::string(name);
-          strName = strName.erase(strName.find_last_not_of(' ') + 1);
-          strName = strName.erase(0, strName.find_first_not_of(' '));
+          std::string strName = btkTrimString(std::string(name));
           size_t i = 0;
           for (i = 0 ; i < valNames.size() ; ++i)
           {
-            std::string strNameRef = valNames[i];
-            strNameRef = strNameRef.erase(strNameRef.find_last_not_of(' ') + 1);
-            strNameRef = strNameRef.erase(0, strNameRef.find_first_not_of(' '));
-            std::string strContextRef = valContexts[i];
-            strContextRef = strContextRef.erase(strContextRef.find_last_not_of(' ') + 1);
-            strContextRef = strContextRef.erase(0, strContextRef.find_first_not_of(' '));
-            if ((strNameRef.compare(strName) == 0) && (strContextRef.compare(strContext) == 0))
+            btkTrimString(valNames[i]);
+            btkTrimString(valContexts[i]);
+            if ((valNames[i].compare(strName) == 0) && (valContexts[i].compare(strContext) == 0))
               break;
           }
           if (i >= valNames.size())

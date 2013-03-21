@@ -80,5 +80,28 @@
  */
 #define btkNumberOfDigits(num) \
   ((num==0)?1:(int)log10(std::fabs((float)num))+1)
-  
+
+/**
+ * This function removes the character @a c at the beginning and the end of the given string
+ * By default the character removed is the white space.
+ * @warning The input is directly modified and returned.
+ */
+inline std::string& btkTrimString(std::string& str, const char c = ' ')
+{
+  str = str.erase(str.find_last_not_of(c) + 1);
+  str = str.erase(0, str.find_first_not_of(c));
+  return str;
+};
+
+/**
+ * This function removes the character @a c at the beginning and the end of the given string
+ * By default the character removed is the white space.
+ */
+inline std::string btkTrimString(const std::string& str, const char c = ' ')
+{
+  std::string str_ = str;
+  btkTrimString(str_, c);
+  return str_;
+};
+
 #endif // __btkMacro_h

@@ -123,10 +123,7 @@ namespace btk
       // Labels (max: 32 labels)
       for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
       {
-        std::string label = bifs.ReadString(8);
-        // Remove spaces
-        label = label.erase(label.find_last_not_of(' ') + 1);
-        label = label.erase(0, label.find_first_not_of(' '));
+        std::string label = btkTrimString(bifs.ReadString(8));
         // Remove 0x00 and characters after.
         label = label.erase(0, label.find_first_not_of(static_cast<char>(0x00)));
         label = label.erase(label.find_first_of(static_cast<char>(0x00)));
@@ -140,10 +137,7 @@ namespace btk
       // Units
       for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
       {
-        std::string unit = bifs.ReadString(4);
-        // Remove spaces
-        unit = unit.erase(unit.find_last_not_of(' ') + 1);
-        unit = unit.erase(0, unit.find_first_not_of(' '));
+        std::string unit = btkTrimString(bifs.ReadString(4));
         // Remove 0x00 and characters after.
         unit = unit.erase(0, unit.find_first_not_of(static_cast<char>(0x00)));
         unit = unit.erase(unit.find_first_of(static_cast<char>(0x00)));

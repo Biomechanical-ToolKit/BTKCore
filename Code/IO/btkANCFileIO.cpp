@@ -403,9 +403,7 @@ namespace btk
     while (!iss.eof())
     {
       std::getline(iss, buf, '\t');
-      buf = buf.erase(buf.find_last_not_of(' ') + 1);
-      buf = buf.erase(0, buf.find_first_not_of(' '));
-      info.push_back(buf);
+      info.push_back(btkTrimString(buf));
     }
   };
 };

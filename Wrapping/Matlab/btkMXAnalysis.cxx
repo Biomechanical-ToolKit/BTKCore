@@ -71,12 +71,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
         {
           num = ((numberOfParameters > (*it)->GetInfo()->GetValues().size()) ? (*it)->GetInfo()->GetValues().size() : numberOfParameters);
           for (size_t i = 0 ; i < num ; ++i)
-          {
-            std::string& str = entryValues[inc][i];
-            str = (*it)->GetInfo()->ToString((int)i);
-            str = str.erase(str.find_last_not_of(' ') + 1);
-            str = str.erase(0, str.find_first_not_of(' '));
-          }
+            btkTrimString(entryValues[inc][i]);
         }
         for (size_t i = num ; i < numberOfParameters ; ++i)
           entryValues[inc][i] = "uname*" + btk::ToString(i);

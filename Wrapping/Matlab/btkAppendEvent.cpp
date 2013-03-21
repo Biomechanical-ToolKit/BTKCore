@@ -111,10 +111,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         {
           if ((*names)->GetInfo()->GetDimensionsProduct(1) != 0)
           {
-            std::string subject = (*names)->GetInfo()->ToString(0);
-            subject =subject.erase(subject.find_last_not_of(' ') + 1);
-            subject = subject.erase(0, subject.find_first_not_of(' '));
-            evt->SetSubject(subject);
+            evt->SetSubject(btkTrimString((*names)->GetInfo()->ToString(0)));
           }
         }
       }

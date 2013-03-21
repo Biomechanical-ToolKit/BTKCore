@@ -142,12 +142,7 @@ namespace btk
   {
     info->ToString(values);
     for (size_t i = 0 ; i < values.size() ; ++i)
-    {
-      std::string str = values[i];
-      str = str.erase(str.find_last_not_of(' ') + 1);
-      str = str.erase(0, str.find_first_not_of(' '));
-      values[i] = str;
-    }
+      values[i] = btkTrimString(values[i]);
   };
 
   template <>

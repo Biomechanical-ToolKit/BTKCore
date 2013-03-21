@@ -152,9 +152,7 @@ namespace btk
   {
     this->ReadKey(bifs, key);
     int16_t size = bifs->ReadU16();
-    val = bifs->ReadString(size * 4);
-    val = val.erase(val.find_last_not_of((char)0x00) + 1);
-    val = val.erase(0, val.find_first_not_of((char)0x00));
+    val = btkTrimString(bifs->ReadString(size * 4), static_cast<char>(0x00));
     return 1 + size;
   };
 
