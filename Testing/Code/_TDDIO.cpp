@@ -31,6 +31,8 @@
 #include "EMxFileReaderTest.h"
 #include "GRxFileIOTest.h"
 #include "GRxFileReaderTest.h"
+#include "KistlerDATFileIOTest.h"
+#include "KistlerDATFileReaderTest.h"
 #include "MDFFileIOTest.h"
 #include "MDFFileReaderTest.h"
 #include "MOMFileIOTest.h"

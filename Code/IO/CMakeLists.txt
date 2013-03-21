@@ -26,6 +26,7 @@ SET(BTKIO_SRCS
   btkEMFFileIO.cpp
   btkEMxFileIO.cpp
   btkGRxFileIO.cpp
+  btkKistlerDATFileIO.cpp
   btkPWRFileIO.cpp
   btkRAxFileIO.cpp
   btkRICFileIO.cpp

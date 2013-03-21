@@ -51,5 +51,7 @@
 #define XMOVEFilePathOUT std::string(TDD_FilePathOUT) + "XMOVESamples/"
 #define BSFFilePathIN std::string(TDD_FilePathIN) + "BSFSamples/"
 #define BSFFilePathOUT std::string(TDD_FilePathOUT) + "BSFSamples/"
+#define KistlerDATFilePathIN std::string(TDD_FilePathIN) + "KistlerDATSamples/"
+#define KistlerDATFilePathOUT std::string(TDD_FilePathOUT) + "KistlerDATSamples/"
 
 #endif // _TDDConfigure_h

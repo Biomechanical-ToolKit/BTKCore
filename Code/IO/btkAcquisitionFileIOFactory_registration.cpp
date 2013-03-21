@@ -68,6 +68,8 @@
 #include "btkRICFileIO.h"
 // AMTI
 #include "btkBSFFileIO.h"
+// Kistler
+#include "btkKistlerDATFileIO.h"
 // Others
 #include "btkEMFFileIO.h"
 #include "btkAMTIForcePlatformFileIO.h"
@@ -111,6 +113,8 @@ namespace btk
     BTK_REGISTER_ACQUISITION_FILE_IO(RICFileIO)
 
     BTK_REGISTER_ACQUISITION_FILE_IO(BSFFileIO)
+    
+    BTK_REGISTER_ACQUISITION_FILE_IO(KistlerDATFileIO)
 
     BTK_REGISTER_ACQUISITION_FILE_IO(EMFFileIO)
     BTK_REGISTER_ACQUISITION_FILE_IO(AMTIForcePlatformFileIO)
