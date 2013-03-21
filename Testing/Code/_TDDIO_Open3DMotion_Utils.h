@@ -25,7 +25,7 @@ void btk_o3dm_ADemo1_test(const std::string& filename)
   for (int i = 0 ; i < (int)o3dm_ADemo1_nummarkers ; ++i)
     TS_ASSERT_EQUALS(acq->GetPoint(i)->GetLabel(), o3dm_ADemo1_markername[i]);
   
-  for (int i = 0 ; i < o3dm_ADemo1_nummarkers ; ++i)
+  for (int i = 0 ; i < (int)o3dm_ADemo1_nummarkers ; ++i)
   {
     for (int j = 0 ; j < (int)o3dm_ADemo1_numframes_marker ; ++j)
     {
