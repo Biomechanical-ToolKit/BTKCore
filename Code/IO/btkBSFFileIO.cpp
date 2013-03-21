@@ -201,12 +201,15 @@ namespace btk
       
       // Init
       int totalNumberOfChannels = 0;
+      for (size_t i = 0 ; i < instrumentHeaders.size() ; ++i)
+        totalNumberOfChannels += instrumentHeaders[i].numberOfChannels;
       double* scale = new double[totalNumberOfChannels]; // array to transform ADC values to real values
+      size_t inc = 0;
       for (size_t i = 0 ; i < instrumentHeaders.size() ; ++i)
       {
         for (int j = 0 ; j < instrumentHeaders[i].numberOfChannels ; ++j)
-          scale[j+totalNumberOfChannels] = 1000000.0 / (instrumentHeaders[i].sensitivity[j] * instrumentHeaders[i].amplifierGain[j] * instrumentHeaders[i].excitationVoltage[j] * instrumentHeaders[i].acquisitionCardRange[j]);
-        totalNumberOfChannels += instrumentHeaders[i].numberOfChannels;
+          scale[j+inc] = 1000000.0 / (instrumentHeaders[i].sensitivity[j] * instrumentHeaders[i].amplifierGain[j] * instrumentHeaders[i].excitationVoltage[j] * instrumentHeaders[i].acquisitionCardRange[j]);
+        inc += instrumentHeaders[i].numberOfChannels;
       }
       output->Init(0, static_cast<int>(totaleTimeTrial * static_cast<double>(rate)), totalNumberOfChannels);
       output->SetPointFrequency(static_cast<double>(rate));
