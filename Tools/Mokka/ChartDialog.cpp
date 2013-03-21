@@ -53,7 +53,7 @@ void buildDataStatTitle(btk::Point::Pointer values, ChartWidget* chart, const QS
   {
     samples = samples.block(0,0,num,1);
     mean = samples.sum() / num;
-    sd = sqrt(1.0/static_cast<double>(num) * (samples.cwise() - mean).cwise().square().sum());
+    sd = sqrt(1.0/static_cast<double>(num) * (samples.array() - mean).square().sum());
   }
   chart->setChartTitle(QString("mean: %1 %2 ; SD: %3 %4").arg(mean).arg(unit).arg(sd).arg(unit));
 };

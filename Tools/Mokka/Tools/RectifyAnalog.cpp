@@ -71,7 +71,7 @@ AbstractTool::RunState RectifyAnalog::run(ToolCommands* cmds, ToolsData* const d
     QSharedPointer< QList<btk::Analog::Values> > values(new QList<btk::Analog::Values>());
     for (btk::AnalogCollection::ConstIterator it = analogs->Begin() ; it != analogs->End() ; ++it)
     {
-      values->push_back((*it)->GetValues().cwise().abs());
+      values->push_back((*it)->GetValues().array().abs());
       log += (inc != 0 ? ", '" : "'") + QString::fromStdString((*it)->GetLabel()) + "'";
       ++inc;
     }

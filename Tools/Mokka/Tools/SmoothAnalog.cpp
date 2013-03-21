@@ -51,7 +51,7 @@ SmoothAnalog::SmoothAnalog(QWidget* parent)
 
 static double rmsSmooth(btk::Analog::Values* val, int start, int length)
 {
-  return sqrt((val->segment(start,length).cwise().square().sum() / static_cast<double>(length)));
+  return sqrt((val->segment(start,length).array().square().sum() / static_cast<double>(length)));
 };
 
 static double movagSmooth(btk::Analog::Values* val, int start, int length)

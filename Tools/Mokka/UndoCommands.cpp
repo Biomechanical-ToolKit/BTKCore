@@ -404,7 +404,7 @@ void ShiftAnalogsValues::action()
       {
         btk::AnalogCollection::Iterator itA = this->mp_Acquisition->btkAcquisition()->BeginAnalog();
         std::advance(itA, (*it)->btkidx);
-        (*itA)->GetValues().cwise() += this->m_Offsets[i];
+        (*itA)->GetValues().array() += this->m_Offsets[i];
         (*itA)->Modified();
       }
       else

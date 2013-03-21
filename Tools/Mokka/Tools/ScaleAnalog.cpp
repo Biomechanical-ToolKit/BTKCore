@@ -84,7 +84,7 @@ AbstractTool::RunState ScaleAnalog::run(ToolCommands* cmds, ToolsData* const dat
       if (dialog.normalizeButton->isChecked())
       {
         double scale = 1.0;
-        double max = (*it)->GetValues().cwise().abs().maxCoeff();
+        double max = (*it)->GetValues().array().abs().maxCoeff();
         if (max > std::numeric_limits<double>::epsilon())
           scale = 1.0 / max;
         scales.push_back(scale);
