@@ -13,6 +13,8 @@
 #include "ANCFileWriterTest.h"
 #include "ANGFileIOTest.h"
 #include "ANGFileReaderTest.h"
+#include "BSFFileIOTest.h"
+#include "BSFFileReaderTest.h"
 #include "CALForcePlateFileIOTest.h"
 #include "CALForcePlateFileReaderTest.h"
 #include "CALForcePlateFileWriterTest.h"

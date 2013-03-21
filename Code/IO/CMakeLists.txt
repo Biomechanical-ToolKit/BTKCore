@@ -18,6 +18,7 @@ SET(BTKIO_SRCS
   btkANBFileIO.cpp
   btkANCFileIO.cpp
   btkANGFileIO.cpp
+  btkBSFFileIO.cpp
   btkC3DFileIO.cpp
   btkCALForcePlateFileIO.cpp
   btkCLBFileIO.cpp
