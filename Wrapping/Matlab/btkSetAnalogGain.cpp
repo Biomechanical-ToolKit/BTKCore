@@ -55,10 +55,31 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);
   
-  int gain = static_cast<int>(mxGetScalar(prhs[2]));
-  if ((gain < 0) || (gain > 5))
+  int g = static_cast<int>(mxGetScalar(prhs[2]));
+  btk::Analog::Gain gain = btk::Analog::Unknown;
+  switch (g)
+  {
+  case 0: // already assigned
+    break;
+  case 1:
+    gain = btk::Analog::PlusMinus10;
+    break;
+  case 2:
+    gain = btk::Analog::PlusMinus5;
+    break;
+  case 3:
+    gain = btk::Analog::PlusMinus2Dot5;
+    break;
+  case 4:
+    gain = btk::Analog::PlusMinus1Dot25;
+    break;
+  case 5:
+    gain = btk::Analog::PlusMinus1;
+    break;
+  default:
     mexErrMsgTxt("Unknown gain. Read the documentation of this fuction to know the possible values");
-  analog->SetGain(static_cast<btk::Analog::Gain>(gain));
+  }
+  analog->SetGain(gain);
 
   // Return updated analog channels
   btkMXCreateAnalogsStructure(acq, nlhs, plhs);
