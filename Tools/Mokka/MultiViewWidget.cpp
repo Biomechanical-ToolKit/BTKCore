@@ -40,6 +40,7 @@
 #include "ChartDialog.h"
 #include "ChartExportDialog.h"
 #include "LoggerVTKOutput.h"
+#include "LoggerMessage.h"
 #include "Viz3DWidget.h"
 #include "VideoWidget.h"
 
@@ -591,8 +592,15 @@ void MultiViewWidget::load()
   
   QString markerUnit = this->mp_Acquisition->pointUnit(Point::Marker);
   double scale = 1.0;
-  if (markerUnit.compare("m") == 0)
-    scale = 1000.0;
+  if (markerUnit.compare("mm") != 0)
+  {
+    if (markerUnit.compare("m") == 0)
+      scale = 1000.0;
+    else if (markerUnit.compare("in") == 0)
+      scale = 25.4;
+    else
+      LOG_WARNING("Unknown unit. Impossible to scale correctly the data in the 3D views");
+  }
   
   // Update the 3D view
   btk::VTKGroundSource* ground = btk::VTKGroundSource::SafeDownCast((*this->mp_VTKProc)[VTK_GROUND]);
