@@ -1494,15 +1494,20 @@ namespace btk
     {
       this->m_AnalogChannelScale[inc] = (*itAnalog)->GetScale();
       this->m_AnalogZeroOffset[inc] = (*itAnalog)->GetOffset();
-      if ((*itAnalog)->GetScale() < minAnalogscale)
-        minAnalogscale = (*itAnalog)->GetScale();
+      double absScale = fabs((*itAnalog)->GetScale());
+      if (absScale < minAnalogscale)
+        minAnalogscale = absScale;
       ++inc;
     }
     // ANALOG:GEN_SCALE
     this->m_AnalogUniversalScale = 1.0;
     if (minAnalogscale < 1.0e-5)
     {
-      this->m_AnalogUniversalScale = minAnalogscale / (minAnalogscale * 1.0e5);
+      while (minAnalogscale < 1.0e-3) // To keep some precision of the scale factor.
+      {
+        this->m_AnalogUniversalScale *= 0.1;
+        minAnalogscale *= 10.0;
+      }
       for (size_t i = 0 ; i < this->m_AnalogChannelScale.size() ; ++i)
         this->m_AnalogChannelScale[i] /= this->m_AnalogUniversalScale;
     }

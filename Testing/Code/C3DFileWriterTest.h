@@ -1334,6 +1334,92 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_DELTA(analog2->GetScale(), analog2_->GetScale(), 1e-5);
     TS_ASSERT_EQUALS(analog2->GetUnit(), analog2_->GetUnit());
   };
+  
+  CXXTEST_TEST(test_genscale_unmodified)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "sample09/PlugInC3D.c3d");
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    reader->Update();
+    writer->SetAcquisitionIO(reader->GetAcquisitionIO());
+    writer->SetInput(reader->GetOutput());
+    writer->SetFilename(C3DFilePathOUT + "sample09_PlugInC3D.c3d");
+    writer->Update();
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "sample09_PlugInC3D.c3d");
+    reader2->Update();
+
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+    
+    for (int i = 0 ; i < acq->GetAnalogNumber() ; ++i)
+    {
+      TS_ASSERT_DELTA(acq2->GetAnalog(i)->GetScale(), acq->GetAnalog(i)->GetScale(), 1e-11);
+      TS_ASSERT_EQUALS(acq2->GetAnalog(i)->GetOffset(), acq->GetAnalog(i)->GetOffset());
+    }
+    
+    double genscale1 = acq2->GetMetaData()->GetChild("ANALOG")->GetChild("GEN_SCALE")->GetInfo()->ToDouble(0);
+    double genscale2 = acq2->GetMetaData()->GetChild("ANALOG")->GetChild("GEN_SCALE")->GetInfo()->ToDouble(0);
+    std::vector<double> scale1 = acq2->GetMetaData()->GetChild("ANALOG")->GetChild("SCALE")->GetInfo()->ToDouble();
+    std::vector<double> scale2 = acq2->GetMetaData()->GetChild("ANALOG")->GetChild("SCALE")->GetInfo()->ToDouble();
+    
+    TS_ASSERT_EQUALS(scale1.size(), scale2.size());
+    TS_ASSERT_DELTA(genscale1, genscale2, 1e-5);
+    for (size_t i = 0 ; i < scale1.size() ; ++i)
+    {
+      TS_ASSERT_DELTA(scale1[i], scale2[i], 1e-5);
+      TS_ASSERT_DELTA(scale1[i]*genscale1, scale2[i]*genscale2, 1e-11);
+    }
+  }
+  
+  CXXTEST_TEST(test_genscale_modified)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "sample09/PlugInC3D.c3d");
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    acq->Update();
+    acq->GetAnalog(4)->SetScale(514.8e-10);
+    reader.reset();
+    writer->SetInput(acq);
+    writer->SetFilename(C3DFilePathOUT + "sample09_PlugInC3D.c3d");
+    writer->Update();
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "sample09_PlugInC3D.c3d");
+    reader2->Update();
+
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+    
+    for (int i = 0 ; i < acq->GetAnalogNumber() ; ++i)
+    {
+      TS_ASSERT_DELTA(acq2->GetAnalog(i)->GetScale(), acq->GetAnalog(i)->GetScale(), 1e-5);
+      TS_ASSERT_EQUALS(acq2->GetAnalog(i)->GetOffset(), acq->GetAnalog(i)->GetOffset());
+    }
+    
+    double genscale1 = acq2->GetMetaData()->GetChild("ANALOG")->GetChild("GEN_SCALE")->GetInfo()->ToDouble(0);
+    double genscale2 = acq2->GetMetaData()->GetChild("ANALOG")->GetChild("GEN_SCALE")->GetInfo()->ToDouble(0);
+    std::vector<double> scale1 = acq2->GetMetaData()->GetChild("ANALOG")->GetChild("SCALE")->GetInfo()->ToDouble();
+    std::vector<double> scale2 = acq2->GetMetaData()->GetChild("ANALOG")->GetChild("SCALE")->GetInfo()->ToDouble();
+    
+    TS_ASSERT_EQUALS(scale1.size(), scale2.size());
+    TS_ASSERT_DELTA(genscale2, 1e-5, 1e-6);
+    for (size_t i = 0 ; i < scale1.size() ; ++i)
+      TS_ASSERT_DELTA(scale1[i]*genscale1, scale2[i]*genscale2, 1e-11);
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileWriterTest)
@@ -1369,4 +1455,6 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, acq100000)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertDelsysEMG2C3D)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertCLB2C3D)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, rewrite_analog_gain)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, test_genscale_unmodified)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, test_genscale_modified)
 #endif
