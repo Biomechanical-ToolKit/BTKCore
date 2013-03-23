@@ -215,10 +215,9 @@ namespace btk
       output->SetPointFrequency(static_cast<double>(rate));
       if (units == 0) // english
       {
-        // WARNING: NEVER TESTED!
         output->SetPointUnit(Point::Marker, "in");
-        output->SetPointUnit(Point::Force, "lbf");
-        output->SetPointUnit(Point::Moment, "in-lbf");
+        output->SetPointUnit(Point::Force, "lb");
+        output->SetPointUnit(Point::Moment, "in-lb");
       }
       else
       {
@@ -229,6 +228,9 @@ namespace btk
            // Convert from inch to meter
           instrumentHeaders[i].length *= 0.0254f;
           instrumentHeaders[i].width *= 0.0254f;
+          instrumentHeaders[i].offset[0] *= 0.0254f;
+          instrumentHeaders[i].offset[1] *= 0.0254f;
+          instrumentHeaders[i].offset[2] *= 0.0254f;
         }
         // Same for the content of the measure. The BSF file format seems to save the data in pound and pound-inch
         for (int i = 0 ; i < numberOfActivePlatforms ; ++i)
@@ -250,6 +252,7 @@ namespace btk
       std::vector<int16_t> channel(6*numberOfActivePlatforms);
       std::string suffix = ((numberOfActivePlatforms == 1) ? "" : "1");
       float globalOrigin[3] = {0.0f, 0.0f, 0.0f};
+      int numToAdaptChannelIndex = 0;
       for (int i = 0 ; i < numberOfActivePlatforms ; ++i)
       {
         (*it)->SetLabel("Fx" + suffix);
@@ -276,10 +279,21 @@ namespace btk
         (*it)->SetUnit(output->GetPointUnit(Point::Moment));
         (*it)->SetScale(scale[i*6+5]);
         ++it;
-        globalOrigin[0] += instrumentHeaders[i].offset[0];
-        globalOrigin[1] += instrumentHeaders[i].offset[1];
-        globalOrigin[2] += instrumentHeaders[i].offset[2];
+        if (i > 0)
+        {
+          if ((instrumentHeaders[i].interDistance[0] == 0.0f) && (instrumentHeaders[i].interDistance[1] == 0.0f) && (instrumentHeaders[i].interDistance[2] == 0.0f))
+          {
+            btkErrorMacro("The distance with the previous force platform is set to 0. The platform is automatically shifted in the front of the previous.");
+            instrumentHeaders[i].interDistance[1] = (instrumentHeaders[i].length + instrumentHeaders[i-1].length) / 2.0;
+          }
+        }
+        globalOrigin[0] += instrumentHeaders[i].interDistance[0];
+        globalOrigin[1] += instrumentHeaders[i].interDistance[1];
+        globalOrigin[2] += instrumentHeaders[i].interDistance[2];
         this->extractConfiguration(&(instrumentHeaders[i]), globalOrigin, &(channel[i*6]), &(corners[i*12]), &(origin[i*3]));
+        for (int j = 0 ; j < 6 ; ++j)
+          channel[i*6+j] += numToAdaptChannelIndex;
+        numToAdaptChannelIndex += instrumentHeaders[i].numberOfChannels;
         suffix = ToString(i+2);
       }
       // Create the metadata FORCE_PLATFORM
@@ -395,6 +409,21 @@ namespace btk
     header->rate = bifs->ReadI32();
     header->triggerValue = bifs->ReadFloat();
     header->endValue = bifs->ReadFloat();
+    /*
+    std::cout << "Length x Width: " << ToString(header->length) << " x " << ToString(header->width) << "\n";
+    std::cout << "Offset: ";
+    for (size_t i = 0 ; i < 3 ; ++i)
+      std::cout << ToString(header->offset[i]) << ", ";
+    std::cout << "\n";
+    std::cout << "Interdistance: ";
+    for (size_t i = 0 ; i < 3 ; ++i)
+      std::cout << ToString(header->interDistance[i]) << ", ";
+    std::cout << "\n";
+    std::cout << "Transformation: ";
+    for (size_t i = 0 ; i < 16 ; ++i)
+      std::cout << ToString(header->transformation[i]) << ", ";
+    std::cout << std::endl;
+    */
   };
   
   void BSFFileIO::extractConfiguration(const InstrumentHeader* header, const float* go, int16_t* ci, float* c, float* o) const
