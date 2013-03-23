@@ -14,7 +14,7 @@ function md = btkFindMetaData(h,label,varargin)
 %
 %  By default, BTK, use two stages of metadata representing group and parameters.
 
-%  Author: A. Barré
+%  Author: A. BarrÃ©
 %  Copyright 2009-2013 Biomechanical ToolKit (BTK).
 
 if (nargin < 2)
@@ -27,10 +27,12 @@ end
 root = btkGetMetaData(h);
 if (isstruct(root.children))
     md = extractMetaData_p(root.children, label);
-    for i=1:length(varargin)
-        md = extractMetaData_p(md.children, varargin{i});
-        if (~isstruct(md))
-            break;
+    if (isstruct(md))
+        for i=1:length(varargin)
+            md = extractMetaData_p(md.children, varargin{i});
+            if (~isstruct(md))
+                break;
+            end
         end
     end
 else
