@@ -134,3 +134,48 @@ assertEqual(fpi(1).units.Mz1, 'Nm');
 assertEqual(fpi(1).cal_matrix, eye(6));
 btkDeleteAcquisition(h);
 end
+
+function testAppendForcePlatformType2_exportC3D
+warning('OFF','btk:ReadAcquisition');
+h = btkReadAcquisition('../Data/Input/C3DSamples/sample09/PluginC3D.c3d');
+warning('ON','btk:ReadAcquisition');
+frw = btkGetForcePlatformWrenches(h,0);
+corners = [-200,-200,0;200,-200,0;200,-400,0;-200,-400,0];
+btkAppendForcePlatformType2(h, frw(1).F, frw(1).M, corners, [0,0,0], 1)
+btkWriteAcquisition(h, '../Data/Output/C3DSamples/sample09_PluginC3D.c3d');
+h2 = btkReadAcquisition('../Data/Output/C3DSamples/sample09_PluginC3D.c3d');
+fp1 = btkGetForcePlatforms(h);
+fp2 = btkGetForcePlatforms(h2);
+assertEqual(length(fp1), 3);
+assertEqual(length(fp2), 3);
+assertElementsAlmostEqual(fp1(1).corners, fp2(1).corners);
+assertElementsAlmostEqual(fp1(1).channels.FX1, fp2(1).channels.FX1, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.FY1, fp2(1).channels.FY1, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.FZ1, fp2(1).channels.FZ1, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.MX1, fp2(1).channels.MX1, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.MY1, fp2(1).channels.MY1, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.MZ1, fp2(1).channels.MZ1, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(2).corners, fp2(2).corners, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(2).channels.FX2, fp2(2).channels.FX2, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(2).channels.FY2, fp2(2).channels.FY2, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(2).channels.FZ2, fp2(2).channels.FZ2, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(2).channels.MX2, fp2(2).channels.MX2, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(2).channels.MY2, fp2(2).channels.MY2, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(2).channels.MZ2, fp2(2).channels.MZ2, 'absolute', 1e-5);
+assertElementsAlmostEqual(corners', fp2(3).corners, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.FX1, fp2(3).channels.Fx3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.FY1, fp2(3).channels.Fy3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.FZ1, fp2(3).channels.Fz3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.MX1, fp2(3).channels.Mx3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.MY1, fp2(3).channels.My3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(1).channels.MZ1, fp2(3).channels.Mz3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(3).corners, fp2(3).corners, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(3).channels.Fx3, fp2(3).channels.Fx3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(3).channels.Fy3, fp2(3).channels.Fy3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(3).channels.Fz3, fp2(3).channels.Fz3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(3).channels.Mx3, fp2(3).channels.Mx3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(3).channels.My3, fp2(3).channels.My3, 'absolute', 1e-5);
+assertElementsAlmostEqual(fp1(3).channels.Mz3, fp2(3).channels.Mz3, 'absolute', 1e-5);
+btkDeleteAcquisition(h);
+btkDeleteAcquisition(h2);
+end

@@ -45,6 +45,9 @@ function btkAppendForcePlatformType2(h, forces, moments, corners, origin, localF
 %   - 2012/08/14: Option 'quiet' removed an replaced by Matlab warning() function
 %                 combined with the btk:AppendForcePlatformType2 identifier
 %   - 2013/02/03: Analog's unit added based on acquisition's configuration (btkGetPointUnit).
+%   - 2013/03/22: Computation of adapted scale factor and offset to reduce the problem of 
+%                 alisasing in some case. Fake Gain added (+/-10V).
+ 
 
 %  Author: A. Barré
 %  Copyright 2009-2013 Biomechanical ToolKit (BTK).
@@ -182,24 +185,79 @@ if (isstruct(md))
     % No need to update the CAL_MATRIX metadata
 end
 
+offset = 0;
+% Set the offset for the virtual analog channels
+md = btkFindMetaData(h, 'ANALOG', 'FORMAT');
+res = btkGetAnalogResolution(h);
+if (isstruct(md))
+    if (strcmpi(md.info.values,'SIGNED'))
+        offset = 2^(res-1);
+    elseif (strcmpi(md.info.values,'UNSIGNED') && (res == 16))
+        offset = 2^(res-1);
+    end
+else
+  % Assume this is a ADC signed 12-bit card
+  offset = 2^(res-1);
+end
+% Compute fake scale factors;
+scales = zeros(6,1);
+for i=1:3
+    v = forces(forces(:,i) ~= 0,i);
+    m = max([min(abs(v)), range(forces(:,i))/offset]);
+    if (any(v < 0))
+        m = -1 * m;
+    end
+    if (~isempty(m))
+        scales(i) = m;
+    end
+end
+for i=1:3
+    v = moments(moments(:,i) ~= 0,i);
+    m = max([min(abs(v)), range(moments(:,i))/offset]);
+    if (any(v < 0))
+        m = -1 * m;
+    end
+    if (~isempty(m))
+        scales(i+3) = m;
+    end
+end
+% The gain is also set to ID 1; +/- 10 volts
 % Append the (fake) analog channels
 str = num2str(used);
 % - Forces
 unit = btkGetPointsUnit(h, 'Force');
 btkAppendAnalog(h, ['Fx',str], forces(:,1), 'Fake analog channel for virtual force platform component Fx');
 btkSetAnalogUnit(h, numAnalogs+1, unit);
+btkSetAnalogOffset(h, numAnalogs+1, offset);
+btkSetAnalogGain(h, numAnalogs+1, 1);
+btkSetAnalogScale(h, numAnalogs+1, scales(1));
 btkAppendAnalog(h, ['Fy',str], forces(:,2), 'Fake analog channel for virtual force platform component Fy');
 btkSetAnalogUnit(h, numAnalogs+2, unit);
+btkSetAnalogOffset(h, numAnalogs+2, offset);
+btkSetAnalogGain(h, numAnalogs+2, 1);
+btkSetAnalogScale(h, numAnalogs+2, scales(2));
 btkAppendAnalog(h, ['Fz',str], forces(:,3), 'Fake analog channel for virtual force platform component Fz');
 btkSetAnalogUnit(h, numAnalogs+3, unit);
+btkSetAnalogOffset(h, numAnalogs+3, offset);
+btkSetAnalogGain(h, numAnalogs+3, 1);
+btkSetAnalogScale(h, numAnalogs+3, scales(3));
 % - Moments
 unit = btkGetPointsUnit(h, 'Moment');
 btkAppendAnalog(h, ['Mx',str], moments(:,1), 'Fake analog channel for virtual force platform component Mx');
 btkSetAnalogUnit(h, numAnalogs+4, unit);
+btkSetAnalogOffset(h, numAnalogs+4, offset);
+btkSetAnalogGain(h, numAnalogs+4, 1);
+btkSetAnalogScale(h, numAnalogs+4, scales(4));
 btkAppendAnalog(h, ['My',str], moments(:,2), 'Fake analog channel for virtual force platform component My');
 btkSetAnalogUnit(h, numAnalogs+5, unit);
+btkSetAnalogOffset(h, numAnalogs+5, offset);
+btkSetAnalogGain(h, numAnalogs+5, 1);
+btkSetAnalogScale(h, numAnalogs+5, scales(5));
 btkAppendAnalog(h, ['Mz',str], moments(:,3), 'Fake analog channel for virtual force platform component Mz');
 btkSetAnalogUnit(h, numAnalogs+6, unit);
+btkSetAnalogOffset(h, numAnalogs+6, offset);
+btkSetAnalogGain(h, numAnalogs+6, 1);
+btkSetAnalogScale(h, numAnalogs+6, scales(6));
 % Update the metadata
 btkAppendMetaData(h, 'FORCE_PLATFORM', 'USED', btkMetaDataInfo('Integer', used));
 btkAppendMetaData(h, 'FORCE_PLATFORM', 'TYPE', btkMetaDataInfo('Integer', type));
