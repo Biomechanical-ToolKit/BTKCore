@@ -33,7 +33,7 @@ CXXTEST_SUITE(KistlerDATFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 8);
     TS_ASSERT_EQUALS(acq->GetPointUnit(), "mm");
     
-    char* labels[8] = {"Fx12", "Fx34", "Fy14", "Fy23", "Fz1", "Fz2", "Fz3", "Fz4"};
+    const char* labels[8] = {"Fx12", "Fx34", "Fy14", "Fy23", "Fz1", "Fz2", "Fz3", "Fz4"};
     for (int i = 0 ; i < 8 ; ++i)
     {
       TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel().compare(labels[i]), 0);

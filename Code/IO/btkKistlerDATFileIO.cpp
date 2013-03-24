@@ -238,7 +238,7 @@ namespace btk
       // Then the real (float) measured values (Fx12, Fx34, Fy14, Fy23, Fz1, Fz2, Fz4) directly in newtons
       // WARNING: These values are stored by channels and not by samples
       int inc = 0;
-      char* labels[8] = {"Fx12", "Fx34", "Fy14", "Fy23", "Fz1", "Fz2", "Fz3", "Fz4"};
+      const char* labels[8] = {"Fx12", "Fx34", "Fy14", "Fy23", "Fz1", "Fz2", "Fz3", "Fz4"};
       for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
       {
         (*it)->SetLabel(labels[inc++]);
