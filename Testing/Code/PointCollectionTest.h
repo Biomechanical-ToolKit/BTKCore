@@ -3,16 +3,6 @@
 
 #include <btkPointCollection.h>
 
-// For Sleep (sleep under Un*x) function
-#ifdef _MSC_VER
-  #ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN
-  #endif
-  #include <windows.h>
-#else
-  #include <unistd.h>
-#endif
-
 CXXTEST_SUITE(PointCollectionTest)
 {
   CXXTEST_TEST(Constructor)
@@ -36,11 +26,6 @@ CXXTEST_SUITE(PointCollectionTest)
     btk::PointCollection::Pointer test = btk::PointCollection::New();
     test->InsertItem(0, btk::Point::New("HEEL_R", 10));
     unsigned long int t1 = test->GetTimestamp();
-#ifndef _MSC_VER
-    sleep(1); // Wait 1 msec ... Because the clear action can take less than 1 usec...
-#else
-    ::Sleep(1);
-#endif
     test->Clear();
     TS_ASSERT(test->GetTimestamp() != t1);
   };

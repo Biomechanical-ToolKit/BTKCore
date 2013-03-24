@@ -67,6 +67,13 @@
   #endif
 #endif
 
+// For atomic timestamp
+#cmakedefine HAVE_PTHREADS
+#cmakedefine HAVE_SPROC
+#cmakedefine HAVE_PTHREADS
+#cmakedefine HAVE_WIN32_THREADS
+#cmakedefine HAVE_ATOMIC_BUILTINS
+
 // For dll symbols in Windows
 #cmakedefine BTK_BUILD_SHARED_LIBS
 #if (defined(_MSC_VER) && defined(BTK_BUILD_SHARED_LIBS)) 

@@ -13,6 +13,7 @@ SET(BTKCommon_SRCS
   btkProcessObject.cpp
   btkTriangleMesh.cpp
   btkWrench.cpp
+  btkCriticalSection_p.cpp
 )
 
 ADD_LIBRARY(BTKCommon ${BTK_LIBS_BUILD_TYPE} ${BTKCommon_SRCS})

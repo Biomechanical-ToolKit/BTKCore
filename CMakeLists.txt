@@ -58,7 +58,7 @@ SET(CMAKE_MODULE_PATH "${BTK_CMAKE_MODULE_PATH}")
 
 # BTK_USE_SYSTEM_EIGEN3 is provided so that you can use an installed or 
 # external version of eigen3. If its on, you must specify the variables 
-OPTION(BTK_USE_SYSTEM_EIGEN3 "Use an outside build of Eigen2." OFF)
+OPTION(BTK_USE_SYSTEM_EIGEN3 "Use an existing installation of Eigen3." OFF)
 IF(BTK_USE_SYSTEM_EIGEN3)
   FIND_PACKAGE(Eigen3 REQUIRED)
 ELSE(BTK_USE_SYSTEM_EIGEN3)
@@ -111,6 +111,23 @@ IF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
   ENDIF(USE_INCLUDED_BOOST)
 ENDIF (NOT HAVE_BOOST_MEMORY_HPP AND NOT HAVE_BOOST_TR1_MEMORY_HPP)
 
+# Macro to detect if a CMake variable exist or not
+MACRO(CHECK_CMAKE_VARIABLE invar outvar)
+  IF(${invar})
+    SET(${outvar} 1)
+  ELSE(${invar})
+    SET(${outvar})
+  ENDIF(${invar})
+ENDMACRO(CHECK_CMAKE_VARIABLE)
+
+# Check for the atomic timestamp
+CHECK_CMAKE_VARIABLE(CMAKE_USE_PTHREADS HAVE_PTHREADS)
+CHECK_CMAKE_VARIABLE(CMAKE_USE_SPROC HAVE_SPROC)
+CHECK_CMAKE_VARIABLE(CMAKE_HP_PTHREADS HAVE_HP_PTHREADS)
+CHECK_CMAKE_VARIABLE(CMAKE_USE_WIN32_THREADS HAVE_WIN32_THREADS)
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkTestAtomicBuiltins.cmake) # HAVE_ATOMIC_BUILTINS
+
+# Extra compiler flags for the debug mode
 INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkExtraCompilerFlags.cmake)
 # The entire BTK tree should use the same include path
 # Create the list of include directories needed for BTK header files.

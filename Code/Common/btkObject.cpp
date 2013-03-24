@@ -34,11 +34,14 @@
  */
 
 #include "btkObject.h"
+#include "btkCriticalSection_p.h"
 
-#ifdef _MSC_VER
-  #include "Utilities/timeval.h"
-#else
-  #include <sys/time.h>
+// OSAtomic.h optimizations only used in 10.5 and later
+#if defined(__APPLE__)
+  #include <AvailabilityMacros.h>
+  #if MAC_OS_X_VERSION_MAX_ALLOWED >= 1050
+    #include <libkern/OSAtomic.h>
+  #endif
 #endif
 
 namespace btk
@@ -76,9 +79,36 @@ namespace btk
    */
   void Object::Modified()
   {
-    struct timeval t;
-    gettimeofday(&t, NULL);
-    this->m_Timestamp = t.tv_sec * 1000000 + t.tv_usec;
+#if defined(WIN32) || defined(_WIN32)
+    // Windows optimization
+    static LONG _atomic_time = 0;
+    this->m_Timestamp = (unsigned long)InterlockedIncrement(&_atomic_time);
+#elif defined(__APPLE__) && (MAC_OS_X_VERSION_MIN_REQUIRED >= 1050)
+    // Mac optimization
+  #if __LP64__
+    // NOTE: Comment from VTK library
+    // "m_Timestamp" is "unsigned long", a type that changes sizes
+    // depending on architecture.  The atomic increment is safe, since it
+    // operates on a variable of the exact type needed.  The cast does not
+    // change the size, but does change signedness, which is not ideal.
+    static volatile int64_t _atomic_time = 0;
+    this->m_Timestamp = (unsigned long)OSAtomicIncrement64Barrier(&_atomic_time);
+  #else
+    static volatile int32_t _atomic_time = 0;
+    this->m_Timestamp = (unsigned long)OSAtomicIncrement32Barrier(&_atomic_time);
+  #endif
+#elif defined(HAVE_ATOMIC_BUILTINS)
+    // GCC and CLANG intrinsics
+    static volatile unsigned long _atomic_time = 0;
+    this->m_Timestamp = __sync_add_and_fetch(&_atomic_time, 1);
+#else
+    // General case
+    static unsigned long _atomic_time = 0;
+    static btk_critical_section_p _critical_section;
+    _critical_section.Lock();
+    this->m_Timestamp = ++_atomic_time;
+    _critical_section.Unlock();
+#endif
   };
   
   /**
