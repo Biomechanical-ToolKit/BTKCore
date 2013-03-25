@@ -81,11 +81,16 @@ namespace btk
   {
 #if defined(WIN32) || defined(_WIN32)
     // Windows optimization
+  #if defined(HAVE_64_BIT) 
+    static LONGLONG _atomic_time = 0;
+    this->m_Timestamp = (unsigned long)InterlockedIncrement64(&_atomic_time);
+  #else
     static LONG _atomic_time = 0;
     this->m_Timestamp = (unsigned long)InterlockedIncrement(&_atomic_time);
+  #endif
 #elif defined(__APPLE__) && (MAC_OS_X_VERSION_MIN_REQUIRED >= 1050)
     // Mac optimization
-  #if __LP64__
+  #if defined(HAVE_64_BIT) 
     // NOTE: Comment from VTK library
     // "m_Timestamp" is "unsigned long", a type that changes sizes
     // depending on architecture.  The atomic increment is safe, since it
