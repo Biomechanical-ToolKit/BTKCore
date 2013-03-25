@@ -284,7 +284,7 @@ namespace btk
           if ((instrumentHeaders[i].interDistance[0] == 0.0f) && (instrumentHeaders[i].interDistance[1] == 0.0f) && (instrumentHeaders[i].interDistance[2] == 0.0f))
           {
             btkErrorMacro("The distance with the previous force platform is set to 0. The platform is automatically shifted in the front of the previous.");
-            instrumentHeaders[i].interDistance[1] = (instrumentHeaders[i].length + instrumentHeaders[i-1].length) / 2.0;
+            instrumentHeaders[i].interDistance[1] = static_cast<float>(instrumentHeaders[i].length + instrumentHeaders[i-1].length) / 2.0f;
           }
         }
         globalOrigin[0] += instrumentHeaders[i].interDistance[0];

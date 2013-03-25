@@ -126,7 +126,7 @@ namespace btk
       // 0x82: (int32) ADC resolution? Number of ADC channels on the board?
       int digitalResolution = bifs.ReadI32();
       // 0x86: (double) Sample frequency
-      int sampleFrequency = bifs.ReadDouble();
+      double sampleFrequency = bifs.ReadDouble();
       // 0x94: ??
       bifs.SeekRead(4, BinaryFileStream::Current);
       // 0x98: ??
@@ -269,9 +269,9 @@ namespace btk
       corners[10] = cy;
       corners[11] = 0.0f;
       // - Origin (expressed in the global frame) and centered above the origin of the global frame
-      origin[0] = a;
-      origin[1] = b;
-      origin[2] = az0;
+      origin[0] = (float)a;
+      origin[1] = (float)b;
+      origin[2] = (float)az0;
       
       // Create the metadata FORCE_PLATFORM
       btk::MetaData::Pointer forcePlatform = btk::MetaData::New("FORCE_PLATFORM");
