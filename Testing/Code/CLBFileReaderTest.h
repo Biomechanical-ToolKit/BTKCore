@@ -41,20 +41,20 @@ CXXTEST_SUITE(CLBFileReaderTest)
     {
       TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel().compare("Channel " + btk::ToString(i)), 0);
       TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetScale(), 20.0/65536.0);
-      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetOffset(), -32768);
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetOffset(), 32768);
     }
     
-    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(0)->GetValues()(0) / acq->GetAnalog(0)->GetScale()) - acq->GetAnalog(0)->GetOffset(), 32749);
-    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(0)->GetValues()(1) / acq->GetAnalog(0)->GetScale()) - acq->GetAnalog(0)->GetOffset(), 32746);
-    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(0)->GetValues()(2) / acq->GetAnalog(0)->GetScale()) - acq->GetAnalog(0)->GetOffset(), 32745);
+    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(0)->GetValues()(0) / acq->GetAnalog(0)->GetScale()) + acq->GetAnalog(0)->GetOffset(), 32749);
+    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(0)->GetValues()(1) / acq->GetAnalog(0)->GetScale()) + acq->GetAnalog(0)->GetOffset(), 32746);
+    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(0)->GetValues()(2) / acq->GetAnalog(0)->GetScale()) + acq->GetAnalog(0)->GetOffset(), 32745);
     
-    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(1)->GetValues()(0) / acq->GetAnalog(1)->GetScale()) - acq->GetAnalog(1)->GetOffset(), 32770);
-    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(1)->GetValues()(1) / acq->GetAnalog(1)->GetScale()) - acq->GetAnalog(1)->GetOffset(), 32771);
-    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(1)->GetValues()(2) / acq->GetAnalog(1)->GetScale()) - acq->GetAnalog(1)->GetOffset(), 32770);
+    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(1)->GetValues()(0) / acq->GetAnalog(1)->GetScale()) + acq->GetAnalog(1)->GetOffset(), 32770);
+    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(1)->GetValues()(1) / acq->GetAnalog(1)->GetScale()) + acq->GetAnalog(1)->GetOffset(), 32771);
+    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(1)->GetValues()(2) / acq->GetAnalog(1)->GetScale()) + acq->GetAnalog(1)->GetOffset(), 32770);
     
-    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(9)->GetValues()(0) / acq->GetAnalog(9)->GetScale()) - acq->GetAnalog(9)->GetOffset(), 32774);
-    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(9)->GetValues()(1) / acq->GetAnalog(9)->GetScale()) - acq->GetAnalog(9)->GetOffset(), 32771);
-    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(9)->GetValues()(2) / acq->GetAnalog(9)->GetScale()) - acq->GetAnalog(9)->GetOffset(), 32772);
+    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(9)->GetValues()(0) / acq->GetAnalog(9)->GetScale()) + acq->GetAnalog(9)->GetOffset(), 32774);
+    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(9)->GetValues()(1) / acq->GetAnalog(9)->GetScale()) + acq->GetAnalog(9)->GetOffset(), 32771);
+    TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(9)->GetValues()(2) / acq->GetAnalog(9)->GetScale()) + acq->GetAnalog(9)->GetOffset(), 32772);
   };
   
   CXXTEST_TEST(Truncated)

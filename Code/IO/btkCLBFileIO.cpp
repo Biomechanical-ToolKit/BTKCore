@@ -145,7 +145,6 @@ namespace btk
       bifs.SeekRead(8, BinaryFileStream::Current); // Time integer
       int frameNumber = bifs.ReadI32();
       
-      
       if (samplingClock == 0)
         throw CLBFileIOException("Invalid sampling clock.");
       
@@ -159,12 +158,12 @@ namespace btk
       case 12:
         output->SetAnalogResolution(Acquisition::Bit12);
         res = 4096.0;
-        offset = -2048;
+        offset = 2048;
         break;
       case 16:
         output->SetAnalogResolution(Acquisition::Bit16);
         res = 65536.0;
-        offset = -32768;
+        offset = 32768;
         break;
       default:
         throw CLBFileIOException("Invalid resolution used for the digital-to-analog conversion");

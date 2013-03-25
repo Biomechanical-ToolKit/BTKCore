@@ -1258,7 +1258,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
       TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel(), acq2->GetAnalog(i)->GetLabel());
       TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetUnit(), acq2->GetAnalog(i)->GetUnit());
       TS_ASSERT_DELTA(acq->GetAnalog(i)->GetScale(), acq2->GetAnalog(i)->GetScale(), 5e-15);
-      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetOffset(), -1*acq2->GetAnalog(i)->GetOffset());
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetOffset(), acq2->GetAnalog(i)->GetOffset());
       for(int j = 0 ; j < 500 ; j+=10)
       {
         TSM_ASSERT_DELTA("Channel #" + btk::ToString(i) + " - Sample " + btk::ToString(j), acq->GetAnalog(i)->GetValues()(j), acq2->GetAnalog(i)->GetValues()(j), 5e-11);
