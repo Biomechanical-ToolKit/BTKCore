@@ -172,12 +172,12 @@ namespace btk
       virtual double ReadAnalog() {return static_cast<float>(this->m_Bfs->ReadU16());};
       virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<uint16_t>(v));};
     };
-    // Float format + signed analog data
-    class FloatFormatSignedAnalog : public Format
+    // Float format + signed/unsigned analog data
+    class FloatFormat : public Format
     {
     public:
-      FloatFormatSignedAnalog(BinaryFileStream* bfs) : Format(bfs) {};
-      virtual ~FloatFormatSignedAnalog() {};
+      FloatFormat(BinaryFileStream* bfs) : Format(bfs) {};
+      virtual ~FloatFormat() {};
       virtual void ReadPoint(double* x, double* y, double* z, double* residual, double pointScaleFactor)
       {
         int8_t byteptr[2];
@@ -214,15 +214,6 @@ namespace btk
         this->m_Bfs->Write(static_cast<float>(residualAndMask));
       };
       virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<float>(v));};
-    };
-    // Float format + unsigned analog data
-    class FloatFormatUnsignedAnalog : public FloatFormatSignedAnalog
-    {
-    public:
-      FloatFormatUnsignedAnalog(BinaryFileStream* bfs) : FloatFormatSignedAnalog(bfs) {};
-      virtual ~FloatFormatUnsignedAnalog() {};
-      virtual double ReadAnalog() {return static_cast<uint16_t>(this->m_Bfs->ReadFloat());};
-      virtual void WriteAnalog(double v) {this->m_Bfs->Write(static_cast<float>(static_cast<uint16_t>(v)));};
     };
 
     double m_PointScale;

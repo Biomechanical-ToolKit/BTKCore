@@ -751,8 +751,8 @@ namespace btk
           // - ANALOG:OFFSET
           if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
           {
-           for (unsigned inc = 0 ; inc < this->m_AnalogZeroOffset.size() ; ++inc)
-             this->m_AnalogZeroOffset[inc] = static_cast<uint16_t>(analogZeroOffset_t[inc]);
+            for (unsigned inc = 0 ; inc < this->m_AnalogZeroOffset.size() ; ++inc)
+              this->m_AnalogZeroOffset[inc] = static_cast<uint16_t>(analogZeroOffset_t[inc]);
           }
           else // signed
             MetaDataCollapseChildrenValues<int>(this->m_AnalogZeroOffset, *itAnalog, "OFFSET", analogNumber, 0);
@@ -809,10 +809,7 @@ namespace btk
         else // float
         {
           this->m_StorageFormat = Float;
-          if (this->m_AnalogIntegerFormat == Unsigned)
-            fdf = new FloatFormatUnsignedAnalog(ibfs);
-          else
-            fdf = new FloatFormatSignedAnalog(ibfs);
+          fdf = new FloatFormat(ibfs);
         }
         int frameNumber = lastFrame - output->GetFirstFrame() + 1;
         output->Init(pointNumber, frameNumber, analogNumber, numberSamplesPerAnalogChannel);
@@ -1255,10 +1252,7 @@ namespace btk
         }
         else // float
         {
-          if (this->m_AnalogIntegerFormat == Unsigned)
-            fdf = new FloatFormatUnsignedAnalog(obfs);
-          else
-            fdf = new FloatFormatSignedAnalog(obfs);
+          fdf = new FloatFormat(obfs);
         }
         for (int frame = 0 ; frame < frameNumber ; ++frame)
         {
@@ -1577,11 +1571,11 @@ namespace btk
           {
             if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
             {
-              std::vector<int16_t> analogZeroOffset_t;
-              (*itAnalogOffset)->GetInfo()->ToInt16(analogZeroOffset_t);
+              std::vector<uint16_t> analogZeroOffset_t;
+              (*itAnalogOffset)->GetInfo()->ToUInt16(analogZeroOffset_t);
               size_t mini = ((analogZeroOffset_t.size() > this->m_AnalogZeroOffset.size()) ? this->m_AnalogZeroOffset.size() : analogZeroOffset_t.size());
               for (size_t inc = 0 ; inc < mini ; ++inc)
-                this->m_AnalogZeroOffset[inc] = static_cast<uint16_t>(analogZeroOffset_t[inc]);
+                this->m_AnalogZeroOffset[inc] = analogZeroOffset_t[inc];
             }
             else // signed
             {
