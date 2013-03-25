@@ -190,36 +190,24 @@ offset = 0;
 md = btkFindMetaData(h, 'ANALOG', 'FORMAT');
 res = btkGetAnalogResolution(h);
 if (isstruct(md))
-    if (strcmpi(md.info.values,'SIGNED'))
+    if (strcmpi(md.info.values{1},'SIGNED'))
+        offset = 0;
+    elseif (strcmpi(md.info.values{1},'UNSIGNED'))
         offset = 2^(res-1);
-    elseif (strcmpi(md.info.values,'UNSIGNED') && (res == 16))
-        offset = 2^(res-1);
+    else
+        error('btk:AppendForcePlatformType2', ['Unknown ADC format: ', md.info.values{1}]);
     end
 else
   % Assume this is a ADC signed 12-bit card
-  offset = 2^(res-1);
+  offset = 0;
 end
 % Compute fake scale factors;
 scales = zeros(6,1);
 for i=1:3
-    v = forces(forces(:,i) ~= 0,i);
-    m = max([min(abs(v)), range(forces(:,i))/offset]);
-    if (any(v < 0))
-        m = -1 * m;
-    end
-    if (~isempty(m))
-        scales(i) = m;
-    end
+    scales(i) = btkComputeScaleFactor_p(forces(:,i), res);
 end
 for i=1:3
-    v = moments(moments(:,i) ~= 0,i);
-    m = max([min(abs(v)), range(moments(:,i))/offset]);
-    if (any(v < 0))
-        m = -1 * m;
-    end
-    if (~isempty(m))
-        scales(i+3) = m;
-    end
+    scales(i+3) = btkComputeScaleFactor_p(moments(:,i), res);
 end
 % The gain is also set to ID 1; +/- 10 volts
 % Append the (fake) analog channels
@@ -265,3 +253,19 @@ btkAppendMetaData(h, 'FORCE_PLATFORM', 'ZERO', btkMetaDataInfo('Integer', zero))
 btkAppendMetaData(h, 'FORCE_PLATFORM', 'CORNERS', btkMetaDataInfo('Real', corners));
 btkAppendMetaData(h, 'FORCE_PLATFORM', 'ORIGIN', btkMetaDataInfo('Real', origin));
 btkAppendMetaData(h, 'FORCE_PLATFORM', 'CHANNEL', btkMetaDataInfo('Integer', channel));
+
+function s = btkComputeScaleFactor_p(v, res)
+  s = max(abs(v));
+  nd = ceil(log10(s));
+  if (nd == 0)
+      nd = 1;
+  end
+  if (s ~= 0)
+      s = 1.25 * ceil(s / 10^(nd-1)) * 10^(nd-1) / (2^(res-1));
+      % s = 10^nd / (2^(res-1));
+      if (any(v < 0))
+          s = -1 * s;
+      end
+  else
+      s = 1;
+  end
