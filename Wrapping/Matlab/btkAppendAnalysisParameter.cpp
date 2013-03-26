@@ -179,8 +179,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           size_t i = 0;
           for (i = 0 ; i < valNames.size() ; ++i)
           {
-            btkTrimString(valNames[i]);
-            btkTrimString(valContexts[i]);
+            btkTrimString(&(valNames[i]));
+            btkTrimString(&(valContexts[i]));
             if ((valNames[i].compare(strName) == 0) && (valContexts[i].compare(strContext) == 0))
               break;
           }

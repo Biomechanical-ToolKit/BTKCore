@@ -95,7 +95,7 @@ namespace btk
      size_t nullpos = label.find_first_of('\0');
      if (nullpos != std::string::npos)
        label = label.substr(0, nullpos);
-     btkTrimString(label);
+     btkTrimString(&label);
      return label;
    }
 };

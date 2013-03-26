@@ -142,7 +142,7 @@ namespace btk
   {
     info->ToString(values);
     for (size_t i = 0 ; i < values.size() ; ++i)
-      values[i] = btkTrimString(values[i]);
+      btkTrimString(&(values[i]));
   };
 
   template <>

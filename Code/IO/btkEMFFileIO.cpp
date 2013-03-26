@@ -158,7 +158,7 @@ namespace btk
       date[0] = FromString<int16_t>(values[6].substr(6,2)); // year
       MetaDataCreateChild(trial, "DATE", date);
       // - Nodes
-      btkTrimString(values[7]);
+      btkTrimString(&(values[7]));
       size_t pos = values[7].find(' ');
       size_t oldPos = 0;
       std::list<std::string> labels;

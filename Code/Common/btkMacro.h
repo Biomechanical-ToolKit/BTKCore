@@ -86,11 +86,10 @@
  * By default the character removed is the white space.
  * @warning The input is directly modified and returned.
  */
-inline std::string& btkTrimString(std::string& str, const char c = ' ')
+inline void btkTrimString(std::string* str, const char c = ' ')
 {
-  str = str.erase(str.find_last_not_of(c) + 1);
-  str = str.erase(0, str.find_first_not_of(c));
-  return str;
+  *str = str->erase(str->find_last_not_of(c) + 1);
+  *str = str->erase(0, str->find_first_not_of(c));
 };
 
 /**
@@ -100,7 +99,7 @@ inline std::string& btkTrimString(std::string& str, const char c = ' ')
 inline std::string btkTrimString(const std::string& str, const char c = ' ')
 {
   std::string str_ = str;
-  btkTrimString(str_, c);
+  btkTrimString(&str_, c);
   return str_;
 };
 

@@ -306,7 +306,7 @@ namespace btk
           }
           if (hasAxis)
             label = label.substr(0, label.length() - straxis.length());
-          btkTrimString(label);
+          btkTrimString(&label);
           label += suffix;
         }
         else

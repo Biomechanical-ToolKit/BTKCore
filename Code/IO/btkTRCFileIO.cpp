@@ -181,7 +181,7 @@ namespace btk
           std::getline(iss, buf, '\t');
           if (!buf.empty())
           {
-            btkTrimString(buf);
+            btkTrimString(&buf);
             labels.push_back(buf);
           }
         }
