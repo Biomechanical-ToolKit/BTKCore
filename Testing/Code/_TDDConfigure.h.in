@@ -1,7 +1,7 @@
 #ifndef _TDDConfigure_h
 #define _TDDConfigure_h
 
-#define TDD_FilePathIN "${BTK_SOURCE_DIR}/Testing/Data/Input/"
+#define TDD_FilePathIN "${BTK_TESTING_DATA_PATH}/Input/"
 #define TDD_FilePathOUT "${BTK_SOURCE_DIR}/Testing/Data/Output/"
 
 #ifndef CXXTEST_RUNNING

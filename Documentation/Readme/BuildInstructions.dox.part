@@ -49,6 +49,9 @@ The interactive CMake interface provides brief documentation for every option. S
 @subsubsection config_extra_warnings BTK_EXTRA_COMPILER_WARNINGS
 Add compiler flags in debug mode to be more verbose when the compiler find some warnings (available only for GCC).
 
+@subsubsection config_test_path BTK_TESTING_DATA_PATH
+Path containing the input data for the unit tests. Download <tt>BTKData-x.y.z.zip</tt> (where <tt>x.y.z</tt> corresponds to your version of BTK), unzip it (for example in the folder Testing), and set this variable to the installation path. You can also use the folder BTKData hosted on the svn server using <tt>svn checkout http://b-tk.googlecode.com/svn/BTKData</tt>. The script must find the folder "Input" otherwise most of the unit tests will fail.
+
 @subsubsection config_sys_eigen3 BTK_USE_SYSTEM_EIGEN3
 Permits to use the <a href="http://eigen.tuxfamily.org/">Eigen</a> library installed on your system instead of the version embedded in BTK. Eigen 3.1 or above required.
 
