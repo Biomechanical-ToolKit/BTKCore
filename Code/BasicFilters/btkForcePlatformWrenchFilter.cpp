@@ -227,6 +227,7 @@ namespace btk
         if (this->m_GlobalTransformationActivated)
           this->TransformToGlobal(wrh, (*it)->GetCorners());
       }
+      output->SetItemNumber(input->GetItemNumber());
     }
   };
   
