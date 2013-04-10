@@ -1284,12 +1284,15 @@ void MainWindow::saveAsFile()
   }
   
   // Dialog box
-  QString filename = QFileDialog::getSaveFileName(this, "",
+  QString filename = QFileDialog::getSaveFileName(this, tr("Save As File"),
                        file,
                        byFormat,
                        &selectedFilter);
   if (!filename.isEmpty())
+  {
     this->saveFile(filename);
+    this->mp_Acquisition->setFileName(filename);
+  }
 };
 
 void MainWindow::saveFile(const QString& filename)
