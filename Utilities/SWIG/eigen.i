@@ -136,7 +136,13 @@
 // ----------------------------------------------------------------------------
 %define %eigen_typemaps(CLASS)
 
-// Macro to create the typemap for the specific E
+// In: (nothing: no constness)
+%typemap(in, fragment="Eigen_Fragments") CLASS (CLASS temp)
+{
+  ConvertFromNumpyToEigenMatrix<CLASS>(&temp, $input);
+  $1 = temp;
+}
+// In: const&
 %typemap(in, fragment="Eigen_Fragments") CLASS const& (CLASS temp)
 {
   ConvertFromNumpyToEigenMatrix<CLASS>(&temp, $input);
@@ -158,6 +164,11 @@
   PyErr_SetString(PyExc_ValueError, "The input typemap for non-const pointer is not yet implemented. Please report this problem to the developer.");
 }
 
+// Out: (nothing: no constness)
+%typemap(out, fragment="Eigen_Fragments") CLASS
+{
+  ConvertFromEigenToNumPyMatrix<CLASS>(&$result, &$1);
+}
 // Out: const
 %typemap(out, fragment="Eigen_Fragments") CLASS const
 {
