@@ -181,13 +181,12 @@ namespace btk
    */
   size_t MotionAnalysisBinaryFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint8_t>& val)
   {
-    bofs->Write(key); bofs->Write(static_cast<uint16_t>(val.size() / 4));
+    uint16_t num = static_cast<uint16_t>(std::ceil(static_cast<float>(val.size()) / 4.0f));
+    bofs->Write(key); bofs->Write(num);
     for (size_t i = 0 ; i < val.size() ; ++i)
       bofs->Write(val[i]);
-    size_t size = val.size() / 4;
-    size += ((val.size() % 4) > 0 ? 1 : 0);
-    bofs->Fill(size * 4 - val.size());
-    return 4 + size * 4;
+    bofs->Fill(num * 4 - val.size());
+    return 4 + num * 4;
   };
 
   /**
@@ -195,13 +194,12 @@ namespace btk
    */
   size_t MotionAnalysisBinaryFileIO::WriteKeyValue(IEEELittleEndianBinaryFileStream* bofs, uint16_t key, const std::vector<uint16_t>& val)
   {
-    bofs->Write(key); bofs->Write(static_cast<uint16_t>(val.size() / 2));
+    uint16_t num = static_cast<uint16_t>(std::ceil(static_cast<float>(val.size()) / 2.0f));
+    bofs->Write(key); bofs->Write(num);
     for (size_t i = 0 ; i < val.size() ; ++i)
       bofs->Write(val[i]); 
-    size_t size = val.size() / 2;
-    size += ((val.size() % 2) > 0 ? 1 : 0);
-    bofs->Fill((size * 2 - val.size()) * 2);
-    return 4 + size * 4;
+    bofs->Fill((num * 2 - val.size()) * 2);
+    return 4 + num * 4;
   };
 
   /**

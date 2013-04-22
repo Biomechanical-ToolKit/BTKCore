@@ -195,44 +195,50 @@ namespace btk
         counter += this->ReadKeyValueString(channelLabel[i], &bifs, 0x0107);
       if (counter != headerSize)
         throw ANBFileIOException("The size of the header is not equal to the number of words read.");
+      // Resize for odd number of channels
+      channelRate.resize(channelNumber);
+      channelRange.resize(channelNumber);
       
       // Data
-      uint32_t dataSize;
-      if ((bifs.ReadI16() != 0) || (bifs.ReadI16() != 0))
-        throw ANBFileIOException("Invalid data part.");
-      this->ReadKeyValueU32(&dataSize, &bifs, 0x8100);
-      uint32_t frameNumber = (dataSize - 3) * 2 / channelNumber;
-      
-      ANxFileIOCheckHeader_p(preciseRate, channelNumber, channelRate, channelRange);
-      ANxFileIOStoreHeader_p(output, preciseRate, frameNumber, channelNumber, channelLabel, channelRate, channelRange, boardType, bitDepth);
-      output->SetFirstFrame(static_cast<int>(firstTime * preciseRate) + 1);
+      if (channelNumber != 0)
+      {
+        uint32_t dataSize;
+        if ((bifs.ReadI16() != 0) || (bifs.ReadI16() != 0))
+          throw ANBFileIOException("Invalid data part.");
+        this->ReadKeyValueU32(&dataSize, &bifs, 0x8100);
+        uint32_t frameNumber = (dataSize - 3) * 2 / channelNumber;
         
-      // Convert hexIndex to metadata ANALOG:INDEX
-      // FIXME: What is really the content of the key 0x0103? Its data are not stored in an acquisition
-      /*
-      MetaData::Pointer analog = MetaDataCreateChild(output->GetMetaData(), "ANALOG");
-      std::vector<int16_t> channelIndex = std::vector<int16_t>(channelNumber, 0);
-      int chan = 0, idx = 1;
-      for (int i = 0 ; i < hexIndex.size() ; ++i)
-      {
-        int inc = 1;
-        while (inc < 256)
+        ANxFileIOCheckHeader_p(preciseRate, channelNumber, channelRate, channelRange);
+        ANxFileIOStoreHeader_p(output, preciseRate, frameNumber, channelNumber, channelLabel, channelRate, channelRange, boardType, bitDepth);
+        output->SetFirstFrame(static_cast<int>(firstTime * preciseRate) + 1);
+          
+        // Convert hexIndex to metadata ANALOG:INDEX
+        // FIXME: What is really the content of the key 0x0103? Its data are not stored in an acquisition
+        /*
+        MetaData::Pointer analog = MetaDataCreateChild(output->GetMetaData(), "ANALOG");
+        std::vector<int16_t> channelIndex = std::vector<int16_t>(channelNumber, 0);
+        int chan = 0, idx = 1;
+        for (int i = 0 ; i < hexIndex.size() ; ++i)
         {
-            if (hexIndex[i] & inc)
-                channelIndex[chan++] = idx;
-            inc *= 2;
-            ++idx;
+          int inc = 1;
+          while (inc < 256)
+          {
+              if (hexIndex[i] & inc)
+                  channelIndex[chan++] = idx;
+              inc *= 2;
+              ++idx;
+          }
         }
-      }
-      MetaDataCreateChild(analog, "INDEX", channelIndex);
-      */
-      
-      // Read analog channel values
-      for(int i = 0 ; i < static_cast<int>(frameNumber) ; ++i)
-      {
-        for (AnalogCollection::Iterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
+        MetaDataCreateChild(analog, "INDEX", channelIndex);
+        */
+        
+        // Read analog channel values
+        for(int i = 0 ; i < static_cast<int>(frameNumber) ; ++i)
         {
-          (*it)->GetValues().coeffRef(i) = static_cast<double>(bifs.ReadI16()) * (*it)->GetScale();
+          for (AnalogCollection::Iterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
+          {
+            (*it)->GetValues().coeffRef(i) = static_cast<double>(bifs.ReadI16()) * (*it)->GetScale();
+          }
         }
       }
     }
@@ -321,7 +327,14 @@ namespace btk
       // Key 0x0109: Bit Depth
       counter += this->WriteKeyValue(&bofs, 0x0109, static_cast<uint32_t>(input->GetAnalogResolution()));
       // Key 0x010A: Precise Rate
-      counter += this->WriteKeyValue(&bofs, 0x010A, static_cast<float>(input->GetAnalogFrequency()));
+      float rate = static_cast<float>(input->GetAnalogFrequency());
+      if (rate == 0.0f)
+      {
+        btkErrorMacro("Acquisition frequency cannot be null and is set to 50 Hz.");
+        rate = 50.0f; // Hz
+        
+      }
+      counter += this->WriteKeyValue(&bofs, 0x010A, rate);
       // Key 0x0102: Channel Number
       counter += this->WriteKeyValue(&bofs, 0x0102, static_cast<uint32_t>(input->GetAnalogNumber()));
       // Key 0x0103: Channel Index
@@ -363,10 +376,10 @@ namespace btk
       */
       counter += this->WriteKeyValue(&bofs, 0x0103, hexIndex);
       // Key 0x0104: Channel Rate
-      counter += this->WriteKeyValue(&bofs, 0x0104, std::vector<uint16_t>(input->GetAnalogNumber(), static_cast<uint16_t>(input->GetAnalogFrequency())));
+      counter += this->WriteKeyValue(&bofs, 0x0104, std::vector<uint16_t>(input->GetAnalogNumber(), static_cast<uint16_t>(rate)));
       // Key 0x0105: First time?
       // FIXME: Not sure for the value of this key
-      counter += this->WriteKeyValue(&bofs, 0x0105, static_cast<float>((input->GetFirstFrame() - 1) / input->GetAnalogFrequency()));
+      counter += this->WriteKeyValue(&bofs, 0x0105, static_cast<float>((input->GetFirstFrame() - 1) / rate));
       // Key 0x0106: Channel Range
       std::vector<uint16_t> channelRange(input->GetAnalogNumber(), 10000);
       i = 0;
