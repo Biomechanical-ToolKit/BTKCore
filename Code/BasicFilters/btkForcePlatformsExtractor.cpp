@@ -372,9 +372,10 @@ namespace btk
       ForcePlatform::CalMatrix cal = fp->GetCalMatrix();
       if (static_cast<int>(pValue->GetValues().size()) >= (coefficientsAlreadyExtracted + cal.size()))
       {
-        for (int i = 0 ; i < cal.cols() ; ++i)
-          for (int j = 0 ; j < cal.rows() ; ++j)
-            cal.coeffRef(j,i) = pValue->ToDouble(j + i * cal.rows() + coefficientsAlreadyExtracted);
+        typedef ForcePlatform::CalMatrix::Index Index;
+        for (Index i = 0 ; i < cal.cols() ; ++i)
+          for (Index j = 0 ; j < cal.rows() ; ++j)
+            cal.coeffRef(j,i) = pValue->ToDouble(static_cast<int>(j + i * cal.rows()) + coefficientsAlreadyExtracted);
         fp->SetCalMatrix(cal);
       }
     }
