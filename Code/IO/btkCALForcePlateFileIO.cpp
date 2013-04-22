@@ -44,6 +44,17 @@
 #include <cctype>
 #include <sstream>
 
+// Temporary structure to store force platform configuration
+struct btk_CAL_force_plate_info
+{
+  int type;
+  double dimensions[3];
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> calMatrix;
+  double origin[3];
+  double position[3];
+  Eigen::Matrix<double, 3, 3> orientation;
+};
+
 namespace btk
 {
   /**
@@ -129,7 +140,7 @@ namespace btk
     {
       int inc = 1;
       int index = 0;
-      std::list<ForcePlateInfo> forcePlates;
+      std::list<btk_CAL_force_plate_info> forcePlates;
       std::string line;
       std::istringstream iss;
       ifs.open(filename.c_str());
@@ -151,7 +162,7 @@ namespace btk
           throw(CALForcePlateFileIOException("Too many values for the line which should contain the index of the force platform #"  + ToString(inc) + "."));
         
         fpConfigurationComplete = false;
-        ForcePlateInfo fp = ForcePlateInfo();
+        btk_CAL_force_plate_info fp = btk_CAL_force_plate_info();
         
         // Dimension (h x w x l)
         if (!this->ExtractValues(fp.dimensions, 3, &ifs))
@@ -235,7 +246,7 @@ namespace btk
       
       // Check for the maximum number of chanel;
       int chans = 0, rows = 0;
-      for (std::list<ForcePlateInfo>::const_iterator it = forcePlates.begin() ; it != forcePlates.end() ; ++it)
+      for (std::list<btk_CAL_force_plate_info>::const_iterator it = forcePlates.begin() ; it != forcePlates.end() ; ++it)
       {
         if (it->calMatrix.cols() > chans)
           chans = static_cast<int>(it->calMatrix.cols());
@@ -243,7 +254,7 @@ namespace btk
           rows = static_cast<int>(it->calMatrix.rows());
       }
       // Adapt dimensions of calibration matrices
-      for (std::list<ForcePlateInfo>::iterator it = forcePlates.begin() ; it != forcePlates.end() ; ++it)
+      for (std::list<btk_CAL_force_plate_info>::iterator it = forcePlates.begin() ; it != forcePlates.end() ; ++it)
       {
         Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cal = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(rows, chans);
         cal.block(0,0,it->calMatrix.rows(),it->calMatrix.cols()) = it->calMatrix;
@@ -256,7 +267,7 @@ namespace btk
       std::vector<float> corners(3 * 4 * used);
       std::vector<float> calMatrix(rows * chans * used);
       inc = 0; int inc1 = 0, inc2 = 0, inc3 = 0;
-      for (std::list<ForcePlateInfo>::iterator it = forcePlates.begin() ; it != forcePlates.end() ; ++it)
+      for (std::list<btk_CAL_force_plate_info>::iterator it = forcePlates.begin() ; it != forcePlates.end() ; ++it)
       {
         types[inc] = it->type;
         inc += 1;

@@ -39,7 +39,6 @@
 #include "btkAcquisitionFileIO.h"
 #include "btkException.h"
 
-#include <Eigen/Core>
 #include <fstream>
 
 namespace btk
@@ -80,16 +79,6 @@ namespace btk
     
     CALForcePlateFileIO(const CALForcePlateFileIO& ); // Not implemented.
     CALForcePlateFileIO& operator=(const CALForcePlateFileIO& ); // Not implemented. 
-    
-    struct ForcePlateInfo
-    {
-      int type;
-      double dimensions[3];
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> calMatrix;
-      double origin[3];
-      double position[3];
-      Eigen::Matrix<double, 3, 3> orientation;
-    };
   };
 };
 
