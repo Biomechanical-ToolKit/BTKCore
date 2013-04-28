@@ -3,7 +3,6 @@ SET(BTKVTK_SRCS
   btkVTKAxis.cpp
   btkVTKChartExtraAcquisition.cpp
   btkVTKChartLayout.cpp
-  btkVTKChartLegend.cpp
   btkVTKChartTimeSeries.cpp
   btkVTKContextActor.cpp
   btkVTKDataObjectAdapter.cpp
