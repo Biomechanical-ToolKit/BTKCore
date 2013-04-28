@@ -25,9 +25,7 @@ SET(Mokka_CPP
   ChartCycleSettingDialog.cpp
   ChartCycleSettingsManager.cpp
   ChartDialog.cpp
-  ChartExportDialog.cpp
   ChartOptionsWidget.cpp
-  ChartImagePreview.cpp
   ChartWidget.cpp
   CompositeView.cpp
   ExportASCIIDialog.cpp
