@@ -43,7 +43,6 @@
 #include <vtkObjectFactory.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkPointData.h>
-#include <vtkstd/vector>
 #include <vtkCellArray.h>
 
 namespace btk
@@ -52,28 +51,28 @@ namespace btk
    * @class VTKMarkersFramesSource::VTKMarkersCoordinates btkVTKMarkersFramesSource.h
    * @brief Store markers' frames as a vector of vtkPolyData.
    */
-  class VTKMarkersFramesSource::VTKMarkersCoordinates : public vtkstd::vector<vtkPolyData*>
+  class VTKMarkersFramesSource::VTKMarkersCoordinates : public std::vector<vtkPolyData*>
   {};
 
   /**
    * @class VTKMarkersFramesSource::VTKMarkersIds btkVTKMarkersFramesSource.h
    * @brief Store markers' visibility for each frame.
    */
-  class VTKMarkersFramesSource::VTKMarkersIds : public vtkstd::vector<vtkIntArray*>
+  class VTKMarkersFramesSource::VTKMarkersIds : public std::vector<vtkIntArray*>
   {};
   
   /**
    * @class VTKMarkersFramesSource::VTKTrajectoryIds btkVTKMarkersFramesSource.h
    * @brief Store markers' visibility for each frame.
    */
-  class VTKMarkersFramesSource::VTKTrajectoryIds : public vtkstd::vector<vtkCellArray*>
+  class VTKMarkersFramesSource::VTKTrajectoryIds : public std::vector<vtkCellArray*>
   {};
   
   /**
    * @class VTKMarkersFramesSource::VTKTrajectoryPath btkVTKMarkersFramesSource.h
    * @brief List of ids representing markers' path.
    */
-  class VTKMarkersFramesSource::VTKTrajectoryPath : public vtkstd::vector<vtkIdList*>
+  class VTKMarkersFramesSource::VTKTrajectoryPath : public std::vector<vtkIdList*>
   {};
   
   /** 

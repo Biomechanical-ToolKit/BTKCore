@@ -41,7 +41,6 @@
 #include <vtkInformationVector.h>
 #include <vtkObjectFactory.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
-#include <vtkstd/vector>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 

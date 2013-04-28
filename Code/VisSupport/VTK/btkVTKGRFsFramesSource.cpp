@@ -36,7 +36,6 @@
 #include "btkVTKGRFsFramesSource.h"
 #include "btkVTKDataObjectAdapter.h"
 
-#include <vtkstd/vector>
 #include <vtkPolyData.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
@@ -52,14 +51,14 @@ namespace btk
    * @class VTKGRFsFramesSource::VTKGRFsComponents btkVTKGRFsFramesSource.h
    * @brief Store ground reaction forces vector as vector of vtkPolyData
    */
-  class VTKGRFsFramesSource::VTKGRFsComponents : public vtkstd::vector<vtkCellArray*>
+  class VTKGRFsFramesSource::VTKGRFsComponents : public std::vector<vtkCellArray*>
   {};
   
   /**
    * @class VTKGRFsFramesSource::VTKGRFsPathPath btkVTKGRFsFramesSource.h
    * @brief List of ids representing ground reaction forces' path.
    */
-  class VTKGRFsFramesSource::VTKGRFsPathPath : public vtkstd::vector<vtkIdList*>
+  class VTKGRFsFramesSource::VTKGRFsPathPath : public std::vector<vtkIdList*>
   {};
   
   /** 

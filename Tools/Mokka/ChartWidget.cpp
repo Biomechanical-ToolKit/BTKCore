@@ -1946,7 +1946,11 @@ bool VTKChartWidget::event(QEvent* event)
     
     btk::VTKChartTimeSeries* chart = this->focusedPlotArea(helpEvent->pos());
     vtkContextMouseEvent mouse;
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     mouse.ScreenPos = vtkVector2i(helpEvent->pos().x(), this->height() - helpEvent->pos().y() - 1);
+#else
+    mouse.SetScreenPos(vtkVector2i(helpEvent->pos().x(), this->height() - helpEvent->pos().y() - 1));
+#endif
     btk::VTKChartPlotData plotIndex;
     if ((chart != 0) && (chart->LocatePointInPlots(mouse, plotIndex)))
     {
@@ -2031,8 +2035,10 @@ void VTKChartWidget::mousePressEvent(QMouseEvent* event)
     float ratio[2] = {0};
     this->computeRatio(ratio, screenPos, chart);
     vtkContextMouseEvent mouse;
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     mouse.Button = vtkContextMouseEvent::LEFT_BUTTON;
-#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+#else
+    mouse.SetButton(vtkContextMouseEvent::LEFT_BUTTON);
     mouse.SetInteractor(0); // Because the constructor doesn't set the interactor member to NULL.
 #endif
     for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
@@ -2040,7 +2046,11 @@ void VTKChartWidget::mousePressEvent(QMouseEvent* event)
       chart = this->mp_CurrentChartData->chart(i);
       float pos[2] = {0.0f, 0.0f};
       this->applyRatio(pos, ratio, chart);
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
       mouse.Pos = vtkVector2f(pos[0], pos[1]);
+#else
+      mouse.SetPos(vtkVector2f(pos[0], pos[1]));
+#endif
       chart->SetDisplayZoomBox((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? 1 : 0);
       chart->MouseButtonPressEvent(mouse);
     }
@@ -2051,7 +2061,7 @@ void VTKChartWidget::mousePressEvent(QMouseEvent* event)
   else
   {
     // FIX for VTK 5.8
-#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     // invoke appropriate vtk event only for the left button
     if(event->button() == Qt::LeftButton)
     {
@@ -2076,8 +2086,10 @@ void VTKChartWidget::mouseReleaseEvent(QMouseEvent* event)
     float ratio[2] = {0};
     this->computeRatio(ratio, screenPos, chart);
     vtkContextMouseEvent mouse;
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     mouse.Button = vtkContextMouseEvent::LEFT_BUTTON;
-#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+#else
+    mouse.SetButton(vtkContextMouseEvent::LEFT_BUTTON);
     mouse.SetInteractor(0); // Because the constructor doesn't set the interactor member to NULL.
 #endif
     for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
@@ -2085,7 +2097,11 @@ void VTKChartWidget::mouseReleaseEvent(QMouseEvent* event)
       chart = this->mp_CurrentChartData->chart(i);
       float pos[2] = {0.0f, 0.0f};
       this->applyRatio(pos, ratio, chart);
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
       mouse.Pos = vtkVector2f(pos[0], pos[1]);
+#else
+      mouse.SetPos(vtkVector2f(pos[0], pos[1]));
+#endif
       chart->MouseButtonReleaseEvent(mouse);
     }
     this->m_AlternateMouseEvent = false;
@@ -2112,20 +2128,28 @@ void VTKChartWidget::mouseMoveEvent(QMouseEvent* event)
     int offsetMousePos[2] = {screenPos[0] - min[0], screenPos[1] - min[0]};
     int offsetMouseLastPos[2] = {this->m_OldMousePosition.x() - min[0], this->height() - this->m_OldMousePosition.y() - 1 - min[0]};
     vtkContextMouseEvent mouse;
-#if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
+    mouse.Button = vtkContextMouseEvent::LEFT_BUTTON;
+#else
+    mouse.SetButton(vtkContextMouseEvent::LEFT_BUTTON);
     mouse.SetInteractor(0); // Because the constructor doesn't set the interactor member to NULL.
 #endif
-    mouse.Button = vtkContextMouseEvent::LEFT_BUTTON;
     for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
     {
       chart = this->mp_CurrentChartData->chart(i);
       float pos[2] = {0.0f, 0.0f};
       this->applyRatio(pos, ratio, chart);
-      mouse.Pos = vtkVector2f(pos[0], pos[1]);
       chart->GetAxis(vtkAxis::BOTTOM)->GetPoint1(min_);
       min[0] = static_cast<int>(min_[0]); min[1] = static_cast<int>(min_[2]);
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
+      mouse.Pos = vtkVector2f(pos[0], pos[1]);
       mouse.ScreenPos = vtkVector2i(min[0]+offsetMousePos[0], min[1]+offsetMousePos[1]);
       mouse.LastScreenPos = vtkVector2i(min[0]+offsetMouseLastPos[0], min[1]+offsetMouseLastPos[1]);
+#else
+      mouse.SetPos(vtkVector2f(pos[0], pos[1]));
+      mouse.SetScreenPos(vtkVector2i(min[0]+offsetMousePos[0], min[1]+offsetMousePos[1]));
+      mouse.SetLastScreenPos(vtkVector2i(min[0]+offsetMouseLastPos[0], min[1]+offsetMouseLastPos[1]));
+#endif
       chart->MouseMoveEvent(mouse);
     }
     this->m_OldMousePosition = event->pos();
@@ -2158,7 +2182,11 @@ void VTKChartWidget::wheelEvent(QWheelEvent* event)
       chart = this->mp_CurrentChartData->chart(i);
       float pos[2] = {0.0f, 0.0f};
       this->applyRatio(pos, ratio, chart);
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
       mouse.Pos = vtkVector2f(pos[0], pos[1]);
+#else
+      mouse.SetPos(vtkVector2f(pos[0], pos[1]));
+#endif
       chart->SetZoomMode((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? btk::VTKChartTimeSeries::HORIZONTAL : btk::VTKChartTimeSeries::BOTH);
       chart->MouseWheelEvent(mouse, (event->delta() > 0) ? 1 : -1); // Because default deltas used by VTK are (-1,1). The use of Qt values (-2,2) can break the zoom mode
     }
@@ -2166,7 +2194,7 @@ void VTKChartWidget::wheelEvent(QWheelEvent* event)
   else
   {
     // FIX for VTK 5.8
-#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION < 10))
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     btk::VTKChartTimeSeries* chart = this->focusedPlotArea(event->pos());
     if (chart != 0)
       chart->SetZoomMode((event->modifiers() & Qt::ShiftModifier) == Qt::ShiftModifier ? btk::VTKChartTimeSeries::HORIZONTAL : btk::VTKChartTimeSeries::BOTH);
@@ -2181,7 +2209,11 @@ btk::VTKChartTimeSeries* VTKChartWidget::focusedChart(const QPoint& pos) const
   if (this->mp_CurrentChartData != NULL)
   {
     vtkContextMouseEvent mouse;
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     mouse.ScreenPos = vtkVector2i(pos.x(), this->height() - pos.y());
+#else
+    mouse.SetScreenPos(vtkVector2i(pos.x(), this->height() - pos.y()));
+#endif
     for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
     {
       chart = this->mp_CurrentChartData->chart(i);
@@ -2199,7 +2231,11 @@ btk::VTKChartTimeSeries* VTKChartWidget::focusedPlotArea(const QPoint& pos) cons
   if (this->mp_CurrentChartData != NULL)
   {
     vtkContextMouseEvent mouse;
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     mouse.ScreenPos = vtkVector2i(pos.x(), this->height() - pos.y() - 1);
+#else
+    mouse.SetScreenPos(vtkVector2i(pos.x(), this->height() - pos.y() - 1));
+#endif
     for (int i = 0 ; i < this->mp_CurrentChartData->chartNumber() ; ++i)
     {
       chart = this->mp_CurrentChartData->chart(i);

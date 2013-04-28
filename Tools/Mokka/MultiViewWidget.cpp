@@ -64,8 +64,6 @@
 #include <vtkCompositeDataPipeline.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
-#include <vtkstd/list>
-#include <vtkstd/map>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkCellPicker.h>
 #include <vtkCallbackCommand.h>
@@ -78,13 +76,13 @@
 
 enum {VTK_GROUND, VTK_FORCE_PLATFORMS, VTK_MARKERS, VTK_GRFS, VTK_GRFS_VECTOR, VTK_GRFS_PWA, VTK_SEGMENTS};
 
-class vtkStreamingDemandDrivenPipelineCollection : public vtkstd::list<vtkStreamingDemandDrivenPipeline*>
+class vtkStreamingDemandDrivenPipelineCollection : public std::list<vtkStreamingDemandDrivenPipeline*>
 {};
 
-class vtkProcessMap : public vtkstd::map<int, vtkObjectBase*>
+class vtkProcessMap : public std::map<int, vtkObjectBase*>
 {};
 
-class vtkActorMap : public vtkstd::map<int, vtkActor*>
+class vtkActorMap : public std::map<int, vtkActor*>
 {};
 
 float EventsFrameMapperFunctor::operator()(int index, int side, int shift)

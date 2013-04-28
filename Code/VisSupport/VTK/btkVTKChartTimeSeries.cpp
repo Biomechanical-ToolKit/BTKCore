@@ -62,9 +62,9 @@
   #include <vtkContextKeyEvent.h>
 #endif
 
-#include <vtkstd/list>
 #include <vtkgl.h>
 
+#include <list>
 #include <limits>
 
 #include "btkConvert.h"
@@ -99,7 +99,7 @@ namespace btk
    * @class VTKChartTimeSeries::VTKPlots btkVTKChartTimeSeries.h
    * @brief List of pointer to vtkPlot objects.
    */
-  class VTKChartTimeSeries::VTKPlots: public vtkstd::list<vtkPlot*>
+  class VTKChartTimeSeries::VTKPlots: public std::list<vtkPlot*>
   {};
   
   /**
@@ -178,7 +178,7 @@ namespace btk
     double y[2] = {x[0], x[1]};
     double bounds[4] = { 0.0, 0.0, 0.0, 0.0 };
     bool validBounds = false;
-    for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+    for (std::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
     {
       if (!(*it)->GetVisible())
         continue;
@@ -444,8 +444,8 @@ namespace btk
   {
     if (static_cast<vtkIdType>(this->mp_Plots->size()) > index)
     {
-      vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
-      vtkstd::advance(it, index);
+      std::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
+      std::advance(it, index);
       if ((*it)->GetVisible() == !isHidden)
         return;
       (*it)->SetVisible(!isHidden);
@@ -461,7 +461,7 @@ namespace btk
    */
   void VTKChartTimeSeries::Update()
   {
-    for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+    for (std::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
       (*it)->Update();
     if (this->mp_Legend && this->ShowLegend)
       this->mp_Legend->Update();
@@ -515,7 +515,7 @@ namespace btk
     
     // Enable/Disable markers on each plot in function of the density of points
     float scale = static_cast<float>(this->mp_AxisX->GetMaximum() - this->mp_AxisX->GetMinimum()) / static_cast<float>(this->mp_AxisX->GetMaximumLimit() - this->mp_AxisX->GetMinimumLimit());
-    for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+    for (std::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
     {
       vtkPlotPoints* points = vtkPlotPoints::SafeDownCast(*it);
       if ((points != 0) && ((*it)->GetInput() != 0))
@@ -611,8 +611,8 @@ namespace btk
   {
     if (static_cast<vtkIdType>(this->mp_Plots->size()) > index)
     {
-      vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
-      vtkstd::advance(it, index);
+      std::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
+      std::advance(it, index);
       this->mp_PlotTransform->RemoveItem(*it);
       (*it)->Delete();
       this->mp_Plots->erase(it);
@@ -634,8 +634,8 @@ namespace btk
     vtkPlot* plot = NULL;
     if (static_cast<vtkIdType>(this->mp_Plots->size()) > index)
     {
-      vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
-      vtkstd::advance(it, index);
+      std::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
+      std::advance(it, index);
       plot = *it;
       this->mp_PlotTransform->RemoveItem(*it);
       this->mp_Plots->erase(it);
@@ -650,7 +650,7 @@ namespace btk
    */
   void VTKChartTimeSeries::ClearPlots()
   {
-    for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+    for (std::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
     {
       this->mp_PlotTransform->RemoveItem(*it);
       (*it)->Delete();
@@ -665,8 +665,8 @@ namespace btk
    */
   vtkPlot* VTKChartTimeSeries::GetPlot(vtkIdType index)
   {
-    vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
-    vtkstd::advance(it, index);
+    std::list<vtkPlot*>::iterator it = this->mp_Plots->begin();
+    std::advance(it, index);
     if (it == this->mp_Plots->end())
     {
       btkErrorMacro("The given index exceed the number of plots");
@@ -719,7 +719,11 @@ namespace btk
   {
     if (this->mp_Plots->empty())
       return false;
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     vtkVector2i pos(mouse.ScreenPos);
+#else
+    vtkVector2i pos(mouse.GetScreenPos());
+#endif
     if ((pos[0] > this->Point1[0]) && (pos[0] < this->Point2[0]) && (pos[1] > this->Point1[1]) && (pos[1] < this->Point2[1]))
     {
       vtkVector2f plotPos, position((float)pos.X(), (float)pos.Y());
@@ -730,7 +734,7 @@ namespace btk
                             (5.0/transform->GetMatrix()->GetElement(1,1)));
                             
       // Iterate through the visible plots and return on the first hit
-      for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+      for (std::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
       {
         vtkPlot* plot = *it;
         if (plot && plot->GetVisible())
@@ -740,7 +744,11 @@ namespace btk
           {
             plotIndex.SeriesName = plot->GetLabel();
             plotIndex.Position = plotPos;
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
             plotIndex.ScreenPosition = mouse.ScreenPos;
+#else
+            plotIndex.ScreenPosition = mouse.GetScreenPos();
+#endif
             plotIndex.Index = seriesIndex;
             return true;
           }
@@ -755,8 +763,12 @@ namespace btk
    */
   bool VTKChartTimeSeries::Hit(const vtkContextMouseEvent &mouse)
   {
-    
+
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     vtkVector2i pos(mouse.ScreenPos);
+#else
+    vtkVector2i pos(mouse.GetScreenPos());
+#endif
     if (this->GetVisible() &&
         (pos[0] > this->Point1[0]) &&
         (pos[0] < this->Point2[0]) &&
@@ -777,7 +789,11 @@ namespace btk
   bool VTKChartTimeSeries::Hit2(const vtkContextMouseEvent& mouse)
   {
     vtkRectf size = this->GetSize();
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     vtkVector2i pos(mouse.ScreenPos);
+#else
+    vtkVector2i pos(mouse.GetScreenPos());
+#endif
     if (this->GetVisible() &&
         (pos[0] > size.GetX()) && (pos[1] > size.GetY()) &&
         (pos[0] < (size.GetX() + size.GetWidth())) && (pos[1] < (size.GetY() + size.GetHeight())))
@@ -814,9 +830,15 @@ namespace btk
   {
     if (!this->m_InteractionEnabled)
       return false;
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
     {
       this->m_ZoomBox.Set(mouse.Pos.X(), mouse.Pos.Y(), 0.0, 0.0);
+#else
+    if (mouse.GetButton() == vtkContextMouseEvent::LEFT_BUTTON)
+    {
+      this->m_ZoomBox.Set(mouse.GetPos().X(), mouse.GetPos().Y(), 0.0, 0.0);
+#endif
 #if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
       // Zoom box
       if ((mouse.GetInteractor() != 0) && (mouse.GetInteractor()->GetShiftKey() > 0))
@@ -838,6 +860,7 @@ namespace btk
     if (!this->m_InteractionEnabled)
       return true;
     
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
     {
       // Pan
@@ -846,11 +869,21 @@ namespace btk
         // Figure out how much the mouse has moved by in plot coordinates - pan
         vtkVector2d screenPos(mouse.ScreenPos.Cast<double>().GetData());
         vtkVector2d lastScreenPos(mouse.LastScreenPos.Cast<double>().GetData());
+#else
+    if (mouse.GetButton() == vtkContextMouseEvent::LEFT_BUTTON)
+    {
+      // Pan
+      if (!this->m_ZoomBoxDisplayed)
+      {
+        // Figure out how much the mouse has moved by in plot coordinates - pan
+        vtkVector2d screenPos(mouse.GetScreenPos().Cast<double>().GetData());
+        vtkVector2d lastScreenPos(mouse.GetLastScreenPos().Cast<double>().GetData());
+#endif
         vtkVector2d pos(0.0, 0.0);
         vtkVector2d last(0.0, 0.0);
 
         // Go from screen to scene coordinates to work out the delta
-        vtkTransform2D *transform = this->mp_PlotTransform->GetTransform();
+        vtkTransform2D* transform = this->mp_PlotTransform->GetTransform();
         transform->InverseTransformPoints(screenPos.GetData(), pos.GetData(), 1);
         transform->InverseTransformPoints(lastScreenPos.GetData(), last.GetData(), 1);
         vtkVector2d delta(last[0]-pos[0],last[1]-pos[1]);
@@ -878,7 +911,14 @@ namespace btk
         pts[2] = this->mp_AxisX->GetPoint2()[0];
         pts[3] = this->mp_AxisY->GetPoint2()[1];
         
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
         float mouseX = mouse.Pos.X();
+        float mouseY = mouse.Pos.Y();
+#else
+        float mouseX = mouse.GetPos().X();
+        float mouseY = mouse.GetPos().Y();
+#endif
+        
         if ((mouseX < pts[0]) || (mouseX > pts[2]))
         {
           if (this->m_ZoomBox.GetWidth() < 0.0f)
@@ -887,7 +927,6 @@ namespace btk
             mouseX = pts[2] - 1.0f; // Border
         }
         
-        float mouseY = mouse.Pos.Y();
         if ((mouseY < pts[1]) || (mouseY > pts[3]))
         {
           if (this->m_ZoomBox.GetHeight() < 0.0f)
@@ -901,7 +940,11 @@ namespace btk
         this->Scene->SetDirty(true);
       }
     }
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     else if (mouse.Button == vtkContextMouseEvent::NO_BUTTON)
+#else
+    else if (mouse.GetButton() == vtkContextMouseEvent::NO_BUTTON)
+#endif
     {
       this->Scene->SetDirty(true);
     }
@@ -916,16 +959,24 @@ namespace btk
     if (!this->m_InteractionEnabled)
       return false;
     
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
     {
       // Zoom
       this->m_ZoomBox.SetWidth(mouse.Pos.X() - this->m_ZoomBox.X());
       this->m_ZoomBox.SetHeight(mouse.Pos.Y() - this->m_ZoomBox.Y());
+      vtkVector2f point2(mouse.Pos);
+#else
+    if (mouse.GetButton() == vtkContextMouseEvent::LEFT_BUTTON)
+    {
+      // Zoom
+      this->m_ZoomBox.SetWidth(mouse.GetPos().X() - this->m_ZoomBox.X());
+      this->m_ZoomBox.SetHeight(mouse.GetPos().Y() - this->m_ZoomBox.Y());
+      vtkVector2f point2(mouse.GetPos());
+#endif
       if (this->m_ZoomBoxDisplayed && fabs(this->m_ZoomBox.Width()) > 0.5f && fabs(this->m_ZoomBox.Height()) > 0.5f)
       {
         // Zoom into the chart by the specified amount, and recalculate the bounds
-        vtkVector2f point2(mouse.Pos);
-        
         float pixelMin[2], pixelMax[2];
         pixelMin[0] = this->m_ZoomBox[0] + (this->m_ZoomBox[2] > 0 ? 0 : this->m_ZoomBox[2]);
         pixelMin[1] = this->m_ZoomBox[1] + (this->m_ZoomBox[3] > 0 ? 0 : this->m_ZoomBox[3]);
@@ -966,7 +1017,11 @@ namespace btk
     horizontalZoomModeOnly |= (this->m_ZoomMode == HORIZONTAL);
     
     float pt[2];
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     this->mp_PlotTransform->GetTransform()->InverseTransformPoints(mouse.Pos.GetData(), pt, 1);
+#else
+    this->mp_PlotTransform->GetTransform()->InverseTransformPoints(mouse.GetPos().GetData(), pt, 1);
+#endif
     // Get the bounds of each plot.
     for (int i = 0; i < 2; ++i)
     {
@@ -1084,7 +1139,7 @@ namespace btk
   
   VTKChartTimeSeries::~VTKChartTimeSeries()
   {
-    for (vtkstd::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
+    for (std::list<vtkPlot*>::iterator it = this->mp_Plots->begin() ; it != this->mp_Plots->end() ; ++it)
       (*it)->Delete();
     delete this->mp_Plots;
     this->mp_AxisX->Delete();
