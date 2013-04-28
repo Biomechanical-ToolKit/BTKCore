@@ -80,9 +80,7 @@ SET(Mokka_H
   ChartCycleSettingDialog.h
   ChartCycleSettingsManager.h
   ChartDialog.h
-  ChartExportDialog.h
   ChartOptionsWidget.h
-  ChartImagePreview.h
   ChartWidget.h
   CompositeView.h
   ExportASCIIDialog.h
@@ -122,7 +120,6 @@ SET(Mokka_UI
   About.ui
   AbstractView.ui
   ChartCycleSettingDialog.ui
-  ChartExportDialog.ui
   ChartOptionsWidget.ui
   ExportASCIIDialog.ui
   ExportSTLDialog.ui
