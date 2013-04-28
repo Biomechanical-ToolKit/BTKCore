@@ -38,7 +38,6 @@
 #include "CompositeView.h"
 #include "ChartWidget.h"
 #include "ChartDialog.h"
-#include "ChartExportDialog.h"
 #include "LoggerVTKOutput.h"
 #include "LoggerMessage.h"
 #include "Viz3DWidget.h"
@@ -1855,16 +1854,6 @@ void MultiViewWidget::setDefaultPlotLineWidth(double width)
     ChartWidget* w = static_cast<ChartWidget*>(static_cast<CompositeView*>(*it)->view(CompositeView::Chart));
     w->setDefaultLineWidth(width);
   }
-};
-
-void MultiViewWidget::exportChartToImage(btk::VTKChartTimeSeries* chart)
-{
-  emit pausePlaybackRequested(true);
-  if (this->mp_ChartExporter == 0)
-    this->mp_ChartExporter = new ChartExportDialog(this);
-  this->mp_ChartExporter->setChart(chart);
-  this->mp_ChartExporter->exec();
-  emit pausePlaybackRequested(false);
 };
 
 void MultiViewWidget::dragEnterEvent(QDragEnterEvent *event)

@@ -36,7 +36,6 @@
 #include "ChartWidget.h"
 #include "Acquisition.h"
 #include "ChartOptionsWidget.h"
-#include "ChartExportDialog.h"
 #include "UserDefined.h"
 
 #include <btkVTKAxis.h>

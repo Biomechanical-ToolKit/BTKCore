@@ -188,7 +188,6 @@ public slots:
   void setChartHorizontalAxisUnitToCycle(int index);
   void showChartEvent(bool visible);
   void setDefaultPlotLineWidth(double width);
-  void exportChartToImage(btk::VTKChartTimeSeries* chart);
 
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
