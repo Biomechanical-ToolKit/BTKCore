@@ -84,4 +84,4 @@ namespace btk
 }
 
 
-#endif  __btkVTKContextActor_h
+#endif // __btkVTKContextActor_h

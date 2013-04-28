@@ -92,7 +92,7 @@ namespace btk
     this->FindPokedRenderer(0,0);
     
     if ((this->CurrentRenderer == NULL)
-      || (this->mp_GlobalUp[0] == n[0]) && (this->mp_GlobalUp[1] == n[1]) && (this->mp_GlobalUp[2] == n[2]))
+      || ((this->mp_GlobalUp[0] == n[0]) && (this->mp_GlobalUp[1] == n[1]) && (this->mp_GlobalUp[2] == n[2])))
       return;
       
     vtkCamera* camera = this->CurrentRenderer->GetActiveCamera();

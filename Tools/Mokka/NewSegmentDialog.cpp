@@ -259,8 +259,8 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
         {
           for (int k = 0 ; k < this->mp_Segment->links.size() ; ++k)
           {
-            if ((it->id == this->mp_Segment->links[k].GetIds()[0]) && (it2->id == this->mp_Segment->links[k].GetIds()[1])
-              || (it->id == this->mp_Segment->links[k].GetIds()[1]) && (it2->id == this->mp_Segment->links[k].GetIds()[0]))
+            if (((it->id == this->mp_Segment->links[k].GetIds()[0]) && (it2->id == this->mp_Segment->links[k].GetIds()[1]))
+              || ((it->id == this->mp_Segment->links[k].GetIds()[1]) && (it2->id == this->mp_Segment->links[k].GetIds()[0])))
             {
               check->setCheckState(Qt::Checked);
               break;
