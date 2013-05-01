@@ -43,10 +43,13 @@
 #include <QPushButton>
 #include <QKeyEvent>
 
+const int LinkId = Qt::UserRole + 99;
 const int FaceId = Qt::UserRole + 100;
-const int FaceList = Qt::UserRole + 101;
-const int LinkList = Qt::UserRole + 102;
- 
+const int LinkList = Qt::UserRole + 101;
+const int FaceList = Qt::UserRole + 102;
+static int nextLinkId = 0;
+static int nextFaceId = 0;
+
 NewSegmentDialog::NewSegmentDialog(QWidget* parent)
 : QDialog(parent)
 {
@@ -124,6 +127,8 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
   
   this->mp_Segment = seg;
   this->m_SegmentId = segmentId;
+  nextLinkId = 0;
+  nextFaceId = 0;
   
   this->markersTable->setRowCount(0);
   this->linksTable->setRowCount(0);
@@ -144,11 +149,11 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
 #endif
     this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     this->segmentLabelEdit->setText("");
+    this->markersTable->setRowCount(markersInfo.count());
     int markerRowIdx = 0;
     for (QList<MarkerInfo>::const_iterator it = markersInfo.begin() ; it != markersInfo.end() ; ++it)
     {
       // Markers
-      this->markersTable->insertRow(markerRowIdx);
       QTableWidgetItem* check = new QTableWidgetItem;
       this->markersTable->setItem(markerRowIdx, 0, check);
       QTableWidgetItem* label = new QTableWidgetItem(it->label);
@@ -168,29 +173,6 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
         label->setFlags(Qt::NoItemFlags);
       }
       ++markerRowIdx;
-      
-      // Links
-      int linkRowIdx = this->linksTable->rowCount();
-      QList<MarkerInfo>::const_iterator it2 = it; ++it2;
-      for ( ; it2 != markersInfo.end() ; ++it2)
-      {
-        this->linksTable->insertRow(linkRowIdx);
-        QTableWidgetItem* check = new QTableWidgetItem;
-        check->setCheckState(Qt::Unchecked);
-        check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        QTableWidgetItem* mkr1 = new QTableWidgetItem(it->label);
-        mkr1->setFlags(Qt::ItemIsEnabled);
-        mkr1->setData(PointId, it->id);
-        QTableWidgetItem* mkr2 = new QTableWidgetItem(it2->label);
-        mkr2->setFlags(Qt::ItemIsEnabled);
-        mkr2->setData(PointId, it2->id);
-        this->linksTable->setItem(linkRowIdx, 0, check);
-        this->linksTable->setItem(linkRowIdx, 1, mkr1);
-        this->linksTable->setItem(linkRowIdx, 2, mkr2);
-        if (!it->selected || !it2->selected)
-          this->linksTable->setRowHidden(linkRowIdx, true);
-        ++linkRowIdx;
-      }
     }
   }
   // To edit an existing segment
@@ -209,11 +191,11 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
     this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
     this->buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
     this->segmentLabelEdit->setText("Edition Mode"); // For the validate() method
+    this->markersTable->setRowCount(markersInfo.count());
     int markerRowIdx = 0, checkedMarkers = 0;
     for (QList<MarkerInfo>::const_iterator it = markersInfo.begin() ; it != markersInfo.end() ; ++it)
     {
       // Markers
-      this->markersTable->insertRow(markerRowIdx);
       QTableWidgetItem* check = new QTableWidgetItem;
       this->markersTable->setItem(markerRowIdx, 0, check);
       QTableWidgetItem* label = new QTableWidgetItem(it->label);
@@ -234,46 +216,53 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
         label->setFlags(Qt::NoItemFlags);
       }
       ++markerRowIdx;
-      
-      // Links
-      int linkRowIdx = this->linksTable->rowCount();
-      QList<MarkerInfo>::const_iterator it2 = it; ++it2;
-      for ( ; it2 != markersInfo.end() ; ++it2)
-      {
-        this->linksTable->insertRow(linkRowIdx);
-        QTableWidgetItem* check = new QTableWidgetItem;
-        check->setCheckState(Qt::Unchecked);
-        check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        QTableWidgetItem* mkr1 = new QTableWidgetItem(it->label);
-        mkr1->setFlags(Qt::ItemIsEnabled);
-        mkr1->setData(PointId, it->id);
-        QTableWidgetItem* mkr2 = new QTableWidgetItem(it2->label);
-        mkr2->setFlags(Qt::ItemIsEnabled);
-        mkr2->setData(PointId, it2->id);
-        this->linksTable->setItem(linkRowIdx, 0, check);
-        this->linksTable->setItem(linkRowIdx, 1, mkr1);
-        this->linksTable->setItem(linkRowIdx, 2, mkr2);
-        if ((this->mp_Segment->markerIds.indexOf(it->id) == -1) || (this->mp_Segment->markerIds.indexOf(it2->id) == -1))
-          this->linksTable->setRowHidden(linkRowIdx, true);
-        else
-        {
-          for (int k = 0 ; k < this->mp_Segment->links.size() ; ++k)
-          {
-            if (((it->id == this->mp_Segment->links[k].GetIds()[0]) && (it2->id == this->mp_Segment->links[k].GetIds()[1]))
-              || ((it->id == this->mp_Segment->links[k].GetIds()[1]) && (it2->id == this->mp_Segment->links[k].GetIds()[0])))
-            {
-              check->setCheckState(Qt::Checked);
-              break;
-            }
-          }
-        }
-        ++linkRowIdx;
-      }
     }
     if (checkedMarkers != this->mp_Segment->markerIds.size())
       LOG_WARNING("At least one marker of the definition of the segment is missing.");
     
+    // Existing links
+    int linkRowIdx = 0;
+    for (int i = 0 ; i != this->mp_Segment->links.size() ; ++i)
+    {
+      const int* ids = this->mp_Segment->links[i].GetIds();
+      QTableWidgetItem* markers[2] = {0,0};
+      for (int j = 0 ; j < 2 ; ++j)
+      {
+        for (int k = 0 ; k < this->markersTable->rowCount() ; ++k)
+        {
+          QTableWidgetItem* item = this->markersTable->item(k,1);
+          if (item->data(PointId).toInt() == ids[j])
+          {
+            markers[j] = item;
+            break;
+          }
+        }
+      }
+      // Missing markers
+      if ((markers[0] == 0) || (markers[1] == 0))
+        continue;
+      
+      this->linksTable->insertRow(linkRowIdx);
+      QTableWidgetItem* check = new QTableWidgetItem;
+      check->setCheckState(Qt::Checked);
+      check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+      check->setData(LinkId, linkRowIdx);
+      QTableWidgetItem* mkr1 = new QTableWidgetItem(markers[0]->text());
+      mkr1->setFlags(Qt::ItemIsEnabled);
+      mkr1->setData(PointId, ids[0]);
+      QTableWidgetItem* mkr2 = new QTableWidgetItem(markers[1]->text());
+      mkr2->setFlags(Qt::ItemIsEnabled);
+      mkr2->setData(PointId, ids[1]);
+      this->linksTable->setItem(linkRowIdx, 0, check);
+      this->linksTable->setItem(linkRowIdx, 1, mkr1);
+      this->linksTable->setItem(linkRowIdx, 2, mkr2);
+      
+      ++linkRowIdx;
+    }
+    nextLinkId = linkRowIdx;
+    
     // Existing faces
+    int faceRowIdx = 0;
     for (int i = 0 ; i != this->mp_Segment->faces.size() ; ++i)
     {
       const int* ids = this->mp_Segment->faces[i].GetIds();
@@ -291,10 +280,10 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
             break;
           }
         }
-        // Missing markers
-        if (markers[j] == 0)
-          continue;
       }
+      // Missing markers
+      if ((markers[0] == 0) || (markers[1] == 0) || (markers[2] == 0))
+        continue;
       
       qSort(markerIds.begin(),markerIds.end());
       QList<QVariant> linkList;
@@ -310,20 +299,20 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
             {
               QList<QVariant> faceList = this->linksTable->item(l,0)->data(FaceList).toList();
               if (faceList.indexOf(i) == -1)
-                faceList.push_back(i);
+                faceList.push_back(i); // Same than face Id.
               this->linksTable->item(l,0)->setData(FaceList, faceList);
-              linkList.push_back(l);
+              linkList.push_back(l); // l corresponds to LinkId
               break;
             }
           }
         }
       }
       
-      this->facesTable->insertRow(i);
+      this->facesTable->insertRow(faceRowIdx);
       QTableWidgetItem* check = new QTableWidgetItem;
       check->setCheckState(Qt::Checked);
       check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-      check->setData(FaceId, i);
+      check->setData(FaceId, faceRowIdx);
       check->setData(LinkList, linkList);
       QTableWidgetItem* mkr1 = new QTableWidgetItem(markers[0]->text());
       mkr1->setFlags(Qt::ItemIsEnabled);
@@ -334,11 +323,14 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
       QTableWidgetItem* mkr3 = new QTableWidgetItem(markers[2]->text());
       mkr3->setFlags(Qt::ItemIsEnabled);
       mkr3->setData(PointId, ids[2]);
-      this->facesTable->setItem(i, 0, check);
-      this->facesTable->setItem(i, 1, mkr1);
-      this->facesTable->setItem(i, 2, mkr2);
-      this->facesTable->setItem(i, 3, mkr3);
+      this->facesTable->setItem(faceRowIdx, 0, check);
+      this->facesTable->setItem(faceRowIdx, 1, mkr1);
+      this->facesTable->setItem(faceRowIdx, 2, mkr2);
+      this->facesTable->setItem(faceRowIdx, 3, mkr3);
+      
+      ++faceRowIdx;
     }
+    nextFaceId = faceRowIdx;
   }
   
   this->segmentLabelEdit->blockSignals(false);
@@ -349,26 +341,12 @@ void NewSegmentDialog::initialize(Segment* seg, int segmentId, const QList<Marke
 
 void NewSegmentDialog::validate()
 {
-  if (this->segmentLabelEdit->text().isEmpty())
+  if (this->segmentLabelEdit->text().isEmpty() || (this->linksTable->rowCount() == 0))
     this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
   else
   {
-    bool unchecked = true;
-    for (int i = 0 ; i < this->linksTable->rowCount() ; ++i)
-    {
-      if (this->linksTable->item(i,0)->checkState() == Qt::Checked)
-      {
-        unchecked = false;
-        break;
-      }
-    }
-    if (unchecked)
-      this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
-    else
-    {
-      this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
-      this->buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
-    }
+    this->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    this->buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
   }
 };
 
@@ -417,9 +395,8 @@ void NewSegmentDialog::updateMarkersUsed(QTableWidgetItem* item)
           || (this->linksTable->item(i,2)->data(PointId).toInt() == markerId))
       {
         QTableWidgetItem* edgeItem = this->linksTable->item(i,0);
-        edgeItem->setCheckState(Qt::Unchecked);
         this->eraseEdge(edgeItem);
-        this->linksTable->setRowHidden(i,true);
+        this->linksTable->removeRow(edgeItem->row());
       }
     }
   }
@@ -429,29 +406,6 @@ void NewSegmentDialog::updateMarkersUsed(QTableWidgetItem* item)
     QTableWidgetItem* label = this->markersTable->item(item->row(), 1);
     label->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     this->updateMarkersSelection(QList<int>() << markerId, QList<int>() << item->row());
-    
-    int markerId = this->markersTable->item(item->row(),1)->data(PointId).toInt();
-    for (int i = 0 ; i < this->linksTable->rowCount() ; ++i)
-    {
-      QTableWidgetItem* other = 0;
-      if (this->linksTable->item(i,1)->data(PointId).toInt() == markerId)
-        other = this->linksTable->item(i,2);
-      else if (this->linksTable->item(i,2)->data(PointId).toInt() == markerId)
-        other = this->linksTable->item(i,1);
-      if (other != 0)
-      {
-        int otherId = other->data(PointId).toInt();
-        for (int j = 0 ; j < this->markersTable->rowCount() ; ++j)
-        {
-          if (this->markersTable->item(j,1)->data(PointId).toInt() == otherId)
-          {
-            if (this->markersTable->item(j,0)->checkState() == Qt::Checked)
-              this->linksTable->setRowHidden(i,false);
-            break;
-          }
-        }
-      }
-    }
   }
   this->facesTable->blockSignals(false);
   this->linksTable->blockSignals(false);
@@ -468,6 +422,7 @@ void NewSegmentDialog::removeEdge(QTableWidgetItem* item)
   this->facesTable->blockSignals(true);
   this->linksTable->blockSignals(true);
   this->eraseEdge(item);
+  this->linksTable->removeRow(item->row());
   this->linksTable->blockSignals(false);
   this->facesTable->blockSignals(false);
   this->updateSegmentDefinition();
@@ -482,12 +437,23 @@ void NewSegmentDialog::removeFace(QTableWidgetItem* item)
   this->linksTable->blockSignals(true);
   for (int i = 0 ; i < links.size() ; ++i)
   {
-    int pos = links[i].toInt();
-    QList<QVariant> faces = this->linksTable->item(pos,0)->data(FaceList).toList();
+    int linkId = links[i].toInt();
+    QTableWidgetItem* linkItem = 0;
+    for (int j = 0 ; j < this->linksTable->rowCount() ; ++j)
+    {
+      if (this->linksTable->item(j,0)->data(LinkId).toInt() == linkId)
+      {
+        linkItem = this->linksTable->item(j,0);
+        break;
+      }
+    }
+    if (linkItem == 0)
+      continue;
+    QList<QVariant> faces = linkItem->data(FaceList).toList();
     faces.removeOne(faceId);
-    this->linksTable->item(pos,0)->setData(FaceList, faces);
+    linkItem->setData(FaceList, faces);
     if (faces.isEmpty())
-      this->linksTable->item(pos,0)->setCheckState(Qt::Unchecked);
+      this->linksTable->removeRow(linkItem->row());
   }
   this->linksTable->blockSignals(false);
   
@@ -507,11 +473,11 @@ void NewSegmentDialog::updateSegmentDefinition()
       markerIds.push_back(this->markersTable->item(i,1)->data(PointId).toInt());
   }
   
-  QList<Pair> links;
+  QVector<Pair> links(this->linksTable->rowCount());
   for (int i = 0 ; i < this->linksTable->rowCount() ; ++i)
   {
-    if ((this->linksTable->item(i,0)->checkState() == Qt::Checked) && (!this->linksTable->isRowHidden(i)))
-      links.push_back(Pair(this->linksTable->item(i,1)->data(PointId).toInt(), this->linksTable->item(i,2)->data(PointId).toInt()));
+    links[i].SetIds(this->linksTable->item(i,1)->data(PointId).toInt(),
+                    this->linksTable->item(i,2)->data(PointId).toInt());
   }
   
   QVector<Triad> faces(this->facesTable->rowCount());
@@ -523,7 +489,7 @@ void NewSegmentDialog::updateSegmentDefinition()
   }
   
   this->mp_Segment->markerIds = markerIds.toVector();
-  this->mp_Segment->links = links.toVector();
+  this->mp_Segment->links = links;
   this->mp_Segment->faces = faces;
   emit segmentDefinitionChanged(this->m_SegmentId, this->mp_Segment->markerIds, this->mp_Segment->links, this->mp_Segment->faces);
 };
@@ -661,19 +627,25 @@ void NewSegmentDialog::eraseEdge(QTableWidgetItem* item)
         faceItem = _item;
         break;
       }
-    } 
+    }
     if (faceItem == 0)
       continue;
     QList<QVariant> links = faceItem->data(LinkList).toList();
     for (int j = 0 ; j < links.size() ; ++j)
     {
-      QTableWidgetItem* edgeItem = this->linksTable->item(links[j].toInt(),0);
+      QTableWidgetItem* edgeItem = 0;
+      for (int k = 0 ; k < this->linksTable->rowCount() ; ++k)
+      {
+        if (this->linksTable->item(k,0)->data(LinkId).toInt() == links[j].toInt())
+        {
+          edgeItem = this->linksTable->item(k,0);
+          break;
+        }
+      }
       if (edgeItem == 0)
         continue;
       QList<QVariant> faces2 = edgeItem->data(FaceList).toList();
       faces2.removeOne(faceId);
-      if (faces2.indexOf(-1) != -1)
-        faces2.push_back(-1);
       edgeItem->setData(FaceList, faces2);
     }
     this->facesTable->removeRow(faceItem->row());
@@ -683,6 +655,7 @@ void NewSegmentDialog::eraseEdge(QTableWidgetItem* item)
 
 void NewSegmentDialog::buildEdges(QList<QTableWidgetItem*>* markers, QList<QTableWidgetItem*>* edges)
 {
+  QStringList pointLabels;
   QList<int> pointIds;
   QList<QTableWidgetItem*> m, e;
   QList<QTableWidgetItem*> items = this->markersTable->selectedItems();
@@ -690,17 +663,30 @@ void NewSegmentDialog::buildEdges(QList<QTableWidgetItem*>* markers, QList<QTabl
   {
     if ((*it)->column() != 1)
       continue;
-    pointIds.push_back((*it)->data(PointId).toInt());
-    m.push_back(*it);
+    pointLabels.push_back((*it)->text());
   }
   
-  qSort(pointIds.begin(), pointIds.end());
+  qSort(pointLabels.begin(), pointLabels.end());
   
+  for (QStringList::const_iterator itStr = pointLabels.begin() ; itStr != pointLabels.end() ; ++itStr)
+  {
+    for (QList<QTableWidgetItem*>::const_iterator it = items.begin() ; it != items.end() ; ++it)
+    {
+      if ((*it)->text() == *itStr)
+      {
+        m.push_back(*it);
+        pointIds.push_back((*it)->data(PointId).toInt());
+        break;
+      }
+    }
+  }
+
   this->linksTable->blockSignals(true);
   for (int i = 0 ; i < pointIds.size() ; ++i)
   {
     for (int j = i+1 ; j < pointIds.size() ; ++j)
     {
+      bool edgeFound = false;
       for (int k = 0 ; k < this->linksTable->rowCount() ; ++k)
       {
         int id1 = this->linksTable->item(k,1)->data(PointId).toInt();
@@ -708,12 +694,33 @@ void NewSegmentDialog::buildEdges(QList<QTableWidgetItem*>* markers, QList<QTabl
         if ((pointIds[i] == id1) && (pointIds[j] == id2))
         {
           e.push_back(this->linksTable->item(k,0));
-          this->linksTable->item(k,0)->setCheckState(Qt::Checked);
+          edgeFound = true;
           break;
         }
       }
+      if (!edgeFound)
+      {
+        int linkRowIdx = this->linksTable->rowCount();
+        this->linksTable->insertRow(linkRowIdx);
+        QTableWidgetItem* check = new QTableWidgetItem;
+        check->setCheckState(Qt::Checked);
+        check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        check->setData(LinkId, nextLinkId++);
+        QTableWidgetItem* mkr1 = new QTableWidgetItem(m[i]->text());
+        mkr1->setFlags(Qt::ItemIsEnabled);
+        mkr1->setData(PointId, pointIds[i]);
+        QTableWidgetItem* mkr2 = new QTableWidgetItem(m[j]->text());
+        mkr2->setFlags(Qt::ItemIsEnabled);
+        mkr2->setData(PointId, pointIds[j]);
+        this->linksTable->setItem(linkRowIdx, 0, check);
+        this->linksTable->setItem(linkRowIdx, 1, mkr1);
+        this->linksTable->setItem(linkRowIdx, 2, mkr2);
+        e.push_back(check);
+      }
     }
   }
+  
+  this->linksTable->sortItems(1);
   this->linksTable->blockSignals(false);
   
   if (markers != 0)
@@ -755,10 +762,9 @@ void NewSegmentDialog::buildFaces()
   for (int i = 0 ; i < edges.size() ; ++i)
   {
     QList<QVariant> faceList = edges[i]->data(FaceList).toList();
-    if (faceList.indexOf(faceRowIdx) == -1)
-      faceList.push_back(faceRowIdx);
+    faceList.push_back(nextFaceId);
     edges[i]->setData(FaceList, faceList);
-    linkList.push_back(edges[i]->row());
+    linkList.push_back(edges[i]->data(LinkId).toInt());
   }
   this->linksTable->blockSignals(false);
   
@@ -767,7 +773,7 @@ void NewSegmentDialog::buildFaces()
   QTableWidgetItem* check = new QTableWidgetItem;
   check->setCheckState(Qt::Checked);
   check->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-  check->setData(FaceId, faceRowIdx);
+  check->setData(FaceId, nextFaceId);
   check->setData(LinkList, linkList);
   QTableWidgetItem* mkr1 = new QTableWidgetItem(markers[0]->text());
   mkr1->setFlags(Qt::ItemIsEnabled);
@@ -783,4 +789,6 @@ void NewSegmentDialog::buildFaces()
   this->facesTable->setItem(faceRowIdx, 2, mkr2);
   this->facesTable->setItem(faceRowIdx, 3, mkr3);
   this->facesTable->blockSignals(false);
+  
+  ++nextFaceId;
 };
