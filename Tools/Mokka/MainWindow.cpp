@@ -290,6 +290,8 @@ MainWindow::MainWindow(QWidget* parent)
   this->menuEdit->insertSeparator(this->actionCut);
 
   // Qt Signal/Slot connection
+  // Acquisition
+  connect(this->mp_Acquisition, SIGNAL(eventsModified(QList<int>, QList<Event*>)), this, SLOT(updateCycleSettings()));
   // Menu
   connect(this->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
   connect(this->actionVisit_BTK_website, SIGNAL(triggered()), this, SLOT(visitBTKWebsite()));
@@ -1015,6 +1017,18 @@ void MainWindow::computeAngleFromMarkersSelection2()
   }
 };
 
+void MainWindow::updateCycleSettings()
+{
+  QStringList eventsLabel = this->mp_ChartCycleSettingsManager->eventsLabel();
+  for (QMap<int, Event*>::const_iterator it = this->mp_Acquisition->events().begin() ; it != this->mp_Acquisition->events().end() ; ++it)
+  {
+    if (!eventsLabel.contains(it.value()->label))
+      eventsLabel.append(it.value()->label);
+  }
+  qSort(eventsLabel.begin(), eventsLabel.end());
+  this->mp_ChartCycleSettingsManager->setEventsLabel(eventsLabel);
+};
+
 bool MainWindow::extractSelectedMarkers(QList<int>& selectedMarkers)
 {
   selectedMarkers.clear();
@@ -1232,13 +1246,7 @@ void MainWindow::loadAcquisition(bool noOpenError, ProgressWidget* pw)
   this->mp_ToolsManager->setActionsEnabled(true);
   
   // Append new events' label to define cycle
-  QStringList eventsLabel = this->mp_ChartCycleSettingsManager->eventsLabel();
-  for (QMap<int, Event*>::const_iterator it = this->mp_Acquisition->events().begin() ; it != this->mp_Acquisition->events().end() ; ++it)
-  {
-    if (!eventsLabel.contains(it.value()->label))
-      eventsLabel.append(it.value()->label);
-  }
-  this->mp_ChartCycleSettingsManager->setEventsLabel(eventsLabel);
+  this->updateCycleSettings();
 };
 
 void MainWindow::saveFile()

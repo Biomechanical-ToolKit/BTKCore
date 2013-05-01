@@ -145,6 +145,8 @@ public slots:
   void computeDistanceFromMarkersSelection();
   void computeAngleFromMarkersSelection();
   void computeAngleFromMarkersSelection2();
+  // Acquisition
+  void updateCycleSettings();
   // Model dock
   void modelDockLocationChanged(Qt::DockWidgetArea area);
   void setPointLabel(int id, const QString& label);
