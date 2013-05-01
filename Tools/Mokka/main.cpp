@@ -138,6 +138,7 @@ int main(int argc, char *argv[])
   qInstallMsgHandler(LoggerWidget::messageHandler);
   
   QApplication app(argc, argv);
+  QCoreApplication::setApplicationName("Mokka");
   LOG_INFO(QObject::tr("Starting Mokka.")); // The QApplication must be created before this line ("QPixmap: Must construct a QApplication before a QPaintDevice").
   MainWindow mw;
   QObject::connect(&app, SIGNAL(focusChanged(QWidget*, QWidget*)), &mw, SLOT(toggleEditActions(QWidget*, QWidget*)));
