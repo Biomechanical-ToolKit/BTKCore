@@ -1890,7 +1890,6 @@ AbstractView* MultiViewWidget::createView(AbstractView* fromAnother)
   ChartWidget* chart2D = static_cast<ChartWidget*>(sv->view(CompositeView::Chart));
   chart2D->addActions(this->m_ViewChartActions);
   connect(chart2D, SIGNAL(pausePlaybackRequested(bool)), this, SIGNAL(pausePlaybackRequested(bool)));
-  connect(chart2D, SIGNAL(exportToImageRequested(btk::VTKChartTimeSeries*)), this, SLOT(exportChartToImage(btk::VTKChartTimeSeries*)));
   // Event filter
   if (this->mp_EventFilterObject)
   {
