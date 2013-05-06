@@ -200,8 +200,6 @@ void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString&
             QString os = xmlReader.attributes().value("os").toString();
             QString minver = xmlReader.attributes().value("minver").toString();
             QString arch = xmlReader.attributes().value("arch").toString();
-            url = xmlReader.attributes().value("url").toString();
-            hash = xmlReader.attributes().value("hash").toString();
             int osRequired = 9999;
 #if defined(Q_OS_MAC)
             const int osVersion = static_cast<int>(QSysInfo::MacintoshVersion);
@@ -246,7 +244,11 @@ void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString&
               {
                 compatiblePackageFound = true;
                 if (osRequired > latestCompatibleOS)
+                {
                   latestCompatibleOS = osRequired;
+                  url = xmlReader.attributes().value("url").toString();
+                  hash = xmlReader.attributes().value("hash").toString();
+                }
               }
             }
             xmlReader.readNext();
