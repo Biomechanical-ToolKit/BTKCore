@@ -274,7 +274,6 @@ void UpdateManager::notifyReadyToInstall()
   d->mp_InstallerDialog->progressLabel->hide();
   d->mp_InstallerDialog->buttonBox->button(QDialogButtonBox::Ok)->show();
   d->mp_InstallerDialog->buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
-  d->mp_InstallerDialog->buttonBox->button(QDialogButtonBox::Cancel)->hide();
   d->mp_InstallerDialog->raise();
 };
 
