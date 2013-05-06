@@ -279,6 +279,12 @@ void UpdateController::parseFeedItem(QXmlStreamReader& xmlReader, const QString&
 
 void UpdateController::downloadUpdate()
 {
+  this->m_Download.buffer.close();
+  if (this->m_Download.unz != NULL)
+  {
+    unzClose(this->m_Download.unz);
+    this->m_Download.unz = NULL;
+  }
   this->mp_Manager = new QNetworkAccessManager(this);
   connect(this->mp_Manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(checkDownload(QNetworkReply*)));
   this->mp_DownloadReply = this->mp_Manager->get(QNetworkRequest(QUrl(this->m_Download.url)));
