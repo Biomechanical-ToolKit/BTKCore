@@ -263,7 +263,8 @@ void UpdateManager::notifyDownloadError()
   Q_D(UpdateManager);
   d->mp_InstallerDialog->hide();
   QMessageBox msg(QMessageBox::Critical, tr("Software Update"), tr("Download Error!"), QMessageBox::Ok, d->mp_InstallerDialog->parentWidget());
-  this->notifyMessage(&msg, tr("An error occurred during the verification of the download."), tr("You need to download and install this new release manually..."));
+  msg.setTextFormat(Qt::RichText);
+  this->notifyMessage(&msg, tr("<br/><br/>An error occurred during the verification of the download."), tr("You need to download and install this new release manually.<br/><br/><a href=\"http://b-tk.googlecode.com/svn/web/mokka/index.html\">Click here to download the latest release</a>"));
 };
 
 void UpdateManager::notifyReadyToInstall()
@@ -283,7 +284,8 @@ void UpdateManager::notifyInstallationError()
   d->mp_InstallerDialog->hide();
   this->resetThread();
   QMessageBox msg(QMessageBox::Critical, tr("Software Update"), tr("Install Error!"), QMessageBox::Ok, d->mp_InstallerDialog->parentWidget());
-  this->notifyMessage(&msg, tr("An error occurred during the installation of the update."), tr("You need to download and install this new release manually..."));
+  msg.setTextFormat(Qt::RichText);
+  this->notifyMessage(&msg, tr("<br/><br/>An error occurred during the installation of the update."), tr("You need to download and install this new release manually.<br/><br/><a href=\"http://b-tk.googlecode.com/svn/web/mokka/index.html\">Click here to download the latest release</a>"));
 };
 
 void UpdateManager::restartApplication()
@@ -306,7 +308,8 @@ void UpdateManager::restartApplication()
     if (!QFile::exists(execPath))
     {
       QMessageBox msg(QMessageBox::Critical, tr("Software Update"), tr("Install Error!"), QMessageBox::Ok, d->mp_InstallerDialog->parentWidget());
-      this->notifyMessage(&msg, tr("Impossible to find the external updater."), tr("You need to download and install this new release manually..."));
+      msg.setTextFormat(Qt::RichText);
+      this->notifyMessage(&msg, tr("<br/><br/>Impossible to find the external updater."), tr("You need to download and install this new release manually.<br/><br/><a href=\"http://b-tk.googlecode.com/svn/web/mokka/index.html\">Click here to download the latest release</a>"));
       return;
     }
     // Parameters:
@@ -325,7 +328,8 @@ void UpdateManager::restartApplication()
     if (this->launchExternalUpdater(execPath, params) != 0)
     {
       QMessageBox msg(QMessageBox::Critical, tr("Software Update"), tr("Install Error!"), QMessageBox::Ok, d->mp_InstallerDialog->parentWidget());
-      this->notifyMessage(&msg, tr("An error occurred during the finalization of the update."), tr("You need to download and install this new release manually..."));
+      msg.setTextFormat(Qt::RichText);
+      this->notifyMessage(&msg, tr("<br/><br/>An error occurred during the finalization of the update."), tr("You need to download and install this new release manually.<br/><br/><a href=\"http://b-tk.googlecode.com/svn/web/mokka/index.html\">Click here to download the latest release</a>"));
     }
     else
       QCoreApplication::quit();
