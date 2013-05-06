@@ -193,6 +193,7 @@ void UpdateManager::installUpdate()
   {
     d->mp_Controller->setInstallationPath(QDir::tempPath() + "/" + QCoreApplication::applicationName() + "Updater." + QString::number(QCoreApplication::applicationPid()));
   }
+  d->mp_InstallerDialog->titleLabel->setText(tr("Installing update..."));
   d->mp_InstallerDialog->setWindowModality(Qt::ApplicationModal);
   d->mp_InstallerDialog->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
   d->mp_InstallerDialog->progressBar->setRange(0,0);
@@ -217,6 +218,7 @@ void UpdateManager::notifyUpdate(const QString& appName, const QString& appCurVe
   d->mp_NewVersionDialog->textBrowser->verticalScrollBar()->setValue(0);
   
   d->mp_InstallerDialog->setWindowTitle("Updating " + appName);
+  d->mp_InstallerDialog->titleLabel->setText(tr("Downloading update..."));
   
   d->mp_NewVersionDialog->exec();
 };
@@ -270,6 +272,7 @@ void UpdateManager::notifyDownloadError()
 void UpdateManager::notifyReadyToInstall()
 {
   Q_D(UpdateManager);
+  d->mp_InstallerDialog->titleLabel->setText(tr("... update downloaded"));
   d->mp_InstallerDialog->progressBar->setRange(0,100);
   d->mp_InstallerDialog->progressBar->setValue(100);
   d->mp_InstallerDialog->progressLabel->hide();
