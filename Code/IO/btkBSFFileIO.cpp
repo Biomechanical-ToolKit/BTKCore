@@ -37,9 +37,11 @@
 #include "btkBinaryFileStream.h"
 #include "btkMetaDataUtils.h"
 
+// Number found in the documentation.
+const int _btk_bsf_maximum_channel_number = 32;
+
 namespace btk
 {
-  const int maximumChannelNumber = 32;
   // Internal structure used to store the configuration of each instrument (as proposed in the BSF file format documentation).
   struct BSFFileIO::InstrumentHeader
   {
@@ -55,19 +57,19 @@ namespace btk
     float length;
     float width;
     float offset[3];
-    float sensitivity[maximumChannelNumber];
-    int16_t channels[maximumChannelNumber];
+    float sensitivity[_btk_bsf_maximum_channel_number];
+    int16_t channels[_btk_bsf_maximum_channel_number];
     float transformation[16]; // 4x4 transformation matrix
     float interDistance[3];
-    float amplifierGain[maximumChannelNumber];
-    float excitationVoltage[maximumChannelNumber];
-    float acquisitionCardRange[maximumChannelNumber]; // bits/volt
+    float amplifierGain[_btk_bsf_maximum_channel_number];
+    float excitationVoltage[_btk_bsf_maximum_channel_number];
+    float acquisitionCardRange[_btk_bsf_maximum_channel_number]; // bits/volt
     float zeroPeriod;
     float latencyPeriod;
     float triggerTime;
     float endTime;
     float postTrigTime;
-    int32_t zero[maximumChannelNumber];
+    int32_t zero[_btk_bsf_maximum_channel_number];
     int32_t rate;
     float triggerValue;
     float endValue;
@@ -389,23 +391,23 @@ namespace btk
     header->length = bifs->ReadFloat();
     header->width = bifs->ReadFloat();
     bifs->ReadFloat(3, header->offset);
-    bifs->ReadFloat(maximumChannelNumber, header->sensitivity);
-    for (int i = 0 ; i < maximumChannelNumber ; ++i)
+    bifs->ReadFloat(_btk_bsf_maximum_channel_number, header->sensitivity);
+    for (int i = 0 ; i < _btk_bsf_maximum_channel_number ; ++i)
     {
       header->channels[i] = bifs->ReadI16();
       bifs->SeekRead(2, BinaryFileStream::Current);
     }
     bifs->ReadFloat(16, header->transformation);
     bifs->ReadFloat(3, header->interDistance);
-    bifs->ReadFloat(maximumChannelNumber, header->amplifierGain);
-    bifs->ReadFloat(maximumChannelNumber, header->excitationVoltage);
-    bifs->ReadFloat(maximumChannelNumber, header->acquisitionCardRange);
+    bifs->ReadFloat(_btk_bsf_maximum_channel_number, header->amplifierGain);
+    bifs->ReadFloat(_btk_bsf_maximum_channel_number, header->excitationVoltage);
+    bifs->ReadFloat(_btk_bsf_maximum_channel_number, header->acquisitionCardRange);
     header->zeroPeriod = bifs->ReadFloat();
     header->latencyPeriod = bifs->ReadFloat();
     header->triggerTime = bifs->ReadFloat();
     header->endTime = bifs->ReadFloat();
     header->postTrigTime = bifs->ReadFloat();
-    bifs->ReadI32(maximumChannelNumber, header->zero);
+    bifs->ReadI32(_btk_bsf_maximum_channel_number, header->zero);
     header->rate = bifs->ReadI32();
     header->triggerValue = bifs->ReadFloat();
     header->endValue = bifs->ReadFloat();
