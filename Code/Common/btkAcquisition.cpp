@@ -899,7 +899,7 @@ namespace btk
     const int numPoints = this->GetPointNumber();
     for (int inc = numPoints ; inc < pointNumber ; ++inc)
     {
-      Point::Pointer pt = Point::New(this->m_PointFrameNumber == 0 ? 1 : this->m_PointFrameNumber);
+      Point::Pointer pt = Point::New(this->m_PointFrameNumber);
       pt->SetParent(this);
       this->m_Points->InsertItem(pt);
     }
@@ -924,7 +924,7 @@ namespace btk
     const int numAnalogs = this->GetAnalogNumber();
     for (int inc = numAnalogs ; inc < analogNumber ; ++inc)
     {
-      Analog::Pointer pt = Analog::New((this->m_PointFrameNumber == 0 ? 1 : this->m_PointFrameNumber) * this->m_AnalogSampleNumberPerPointFrame);
+      Analog::Pointer pt = Analog::New(this->m_PointFrameNumber * this->m_AnalogSampleNumberPerPointFrame);
       pt->SetParent(this);
       this->m_Analogs->InsertItem(pt);
     }
