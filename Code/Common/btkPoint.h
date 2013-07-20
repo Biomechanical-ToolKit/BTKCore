@@ -40,10 +40,51 @@
 
 namespace btk
 {
-  class Point : public Measure<3>
+  class Point;
+  
+  template <>
+  struct MeasureTraits<Point>
+  {
+    typedef Eigen::Matrix<double, Eigen::Dynamic, 3> Values; ///< Point' values along the time with 3 components (3 columns).
+    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Residuals; ///< Vector of double representing the residuals associated with each frames (if applicable).
+    
+    /**
+     * @class Data
+     * @brief Class storing the measures for a point (3D values and residuals along the time).
+     */
+    class Data : public MeasureData<Point>
+    {
+    public:
+      typedef typename MeasureTraits<Point>::Residuals Residuals; ///< Vector of double representing the residuals associated with each frames (if applicable).
+      
+      typedef SharedPtr<Data> Pointer;
+      typedef SharedPtr<const Data> ConstPointer;
+      
+      static Pointer Null() {return Pointer();};
+      static Pointer New(int frameNumber) {return Pointer(new Data(frameNumber));};
+      
+      void Resize(int frameNumber);
+      
+      Residuals& GetResiduals() {return this->m_Residuals;};
+      const Residuals& GetResiduals() const {return this->m_Residuals;};
+      void SetResiduals(const Residuals& r) {this->m_Residuals = r; this->Modified();};
+      
+      Pointer Clone() const {return Pointer(new Data(*this));}
+      
+    private:
+      Data(int frameNumber) : MeasureData<Point>(frameNumber), m_Residuals(Residuals::Zero(frameNumber,MeasureTraits<Point>::Residuals::ColsAtCompileTime)) {};
+      Data(const Data& toCopy) : MeasureData<Point>(toCopy), m_Residuals(toCopy.m_Residuals) {};
+      Data& operator=(const Data& ); // Not implemented.
+      
+      Residuals m_Residuals;
+    };
+  };
+
+  class Point : public Measure<Point>
   {
   public:
-    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Residuals;
+    typedef MeasureTraits<Point>::Residuals Residuals;
+    
     typedef enum {Marker = 0, Angle, Force, Moment, Power, Scalar, Reaction} Type;
     
     typedef SharedPtr<Point> Pointer;
@@ -57,12 +98,13 @@ namespace btk
     
     void SetDataSlice(int idx, double x, double y, double z, double res = 0.0);
     
-    Residuals& GetResiduals() {return this->m_Residuals;};
-    const Residuals& GetResiduals() const {return this->m_Residuals;};
+    BTK_COMMON_EXPORT Residuals& GetResiduals();
+    BTK_COMMON_EXPORT const Residuals& GetResiduals() const;
     BTK_COMMON_EXPORT void SetResiduals(const Residuals& r);
-    BTK_COMMON_EXPORT void SetFrameNumber(int frameNumber);
+    
     Type GetType() const {return this->m_Type;};
     BTK_COMMON_EXPORT void SetType(Point::Type t);
+    
     Pointer Clone() const {return Pointer(new Point(*this));};
     
   protected:
@@ -73,16 +115,41 @@ namespace btk
     BTK_COMMON_EXPORT Point(const Point& toCopy);
     Point& operator=(const Point& ); // Not implemented.
     
-    Residuals m_Residuals;
     Type m_Type;
   };
   
   inline void Point::SetDataSlice(int idx, double x, double y, double z, double res)
   {
-    this->m_Values.coeffRef(idx,0) = x;
-    this->m_Values.coeffRef(idx,1) = y;
-    this->m_Values.coeffRef(idx,2) = z; 
-    this->m_Residuals.coeffRef(idx) = res;
+    this->GetValues().coeffRef(idx,0) = x;
+    this->GetValues().coeffRef(idx,1) = y;
+    this->GetValues().coeffRef(idx,2) = z; 
+    this->GetResiduals().coeffRef(idx) = res;
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
+  inline void MeasureTraits<Point>::Data::Resize(int frameNumber)
+  {
+    // Values
+    if (frameNumber > this->m_Values.rows())
+    {
+      Values v = Values::Zero(frameNumber,Values::ColsAtCompileTime);
+      if (this->m_Values.data() != 0)
+        v.block(0,0,this->m_Values.rows(),Values::ColsAtCompileTime) = this->m_Values;
+      this->m_Values = v;
+    }
+    else
+      this->m_Values = this->m_Values.block(0,0,frameNumber,Values::ColsAtCompileTime);
+    // Residuals
+    if (frameNumber > this->m_Residuals.rows())
+    {
+      Residuals r = Residuals::Zero(frameNumber, Residuals::ColsAtCompileTime);
+      if (this->m_Residuals.data() != 0)
+        r.block(0,0,this->m_Residuals.rows(),Residuals::ColsAtCompileTime) = this->m_Residuals;
+      this->m_Residuals = r;
+    }
+    else
+      this->m_Residuals = this->m_Residuals.block(0,0,frameNumber,Residuals::ColsAtCompileTime);
   };
 };
 

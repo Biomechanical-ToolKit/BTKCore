@@ -37,13 +37,45 @@
 #define __btkAnalog_h
 
 #include "btkMeasure.h"
-#include "btkMacro.h"
 
 namespace btk
 {
-  class Analog : public Measure<1>
+  class Analog;
+  
+  template <>
+  struct MeasureTraits<Analog>
+  {
+    typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Values; ///< Analog's  values along the time with 1 components (1 column).
+    
+   /**
+    * @class Data
+    * @brief Class storing the measures for an analog channel.
+    */
+   class Data : public MeasureData<Analog>
+    {
+    public:
+      typedef SharedPtr<Data> Pointer;
+      typedef SharedPtr<const Data> ConstPointer;
+      
+      static Pointer Null() {return Pointer();};
+      static Pointer New(int frameNumber) {return Pointer(new Data(frameNumber));};
+      
+      void Resize(int frameNumber);
+      
+      Pointer Clone() const {return Pointer(new Data(*this));}
+      
+    private:
+      Data(int frameNumber) : MeasureData<Analog>(frameNumber) {};
+      Data(const Data& toCopy) : MeasureData<Analog>(toCopy) {};
+      Data& operator=(const Data& ); // Not implemented.
+    };
+  };
+  
+  class Analog : public Measure<Analog>
   {
   public:
+    typedef MeasureTraits<Analog>::Values Values;
+    
     typedef enum {Unknown = 0, 
                   PlusMinus10 = 10000, PlusMinus5 = 5000, PlusMinus2Dot5 = 2500, 
                   PlusMinus1Dot25 = 1250, PlusMinus1 = 1000, PlusMinus0Dot5 = 500, 
@@ -66,16 +98,17 @@ namespace btk
     BTK_COMMON_EXPORT void SetOffset(int o);
     double GetScale() const {return this->m_Scale;};
     BTK_COMMON_EXPORT void SetScale(double s);
-    Pointer Clone() const {return Pointer(new Analog(*this));}
-    
+
     void SetDataSlice(int frame, double val);
+    
+    Pointer Clone() const {return Pointer(new Analog(*this));}
     
   protected:
     BTK_COMMON_EXPORT Analog(const std::string& label, const std::string& desc);
     BTK_COMMON_EXPORT Analog(const std::string& label, int frameNumber, Gain g = Unknown);
     
   private:
-    BTK_COMMON_EXPORT Analog(const Analog& toCopy);
+    Analog(const Analog& toCopy);
     Analog& operator=(const Analog& ); // Not implemented.
     
     std::string m_Unit;
@@ -86,7 +119,22 @@ namespace btk
   
   inline void Analog::SetDataSlice(int frame, double val)
   {
-    this->m_Values.coeffRef(frame, 0) = val;
+    this->GetValues().coeffRef(frame, 0) = val;
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
+  inline void MeasureTraits<Analog>::Data::Resize(int frameNumber)
+  {
+    if (frameNumber > this->m_Values.rows())
+    {
+      Values v = Values::Zero(frameNumber,Values::ColsAtCompileTime);
+      if (this->m_Values.data() != 0)
+        v.block(0,0,this->m_Values.rows(),Values::ColsAtCompileTime) = this->m_Values;
+      this->m_Values = v;
+    }
+    else
+      this->m_Values = this->m_Values.block(0,0,frameNumber,Values::ColsAtCompileTime);
   };
 };
 

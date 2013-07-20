@@ -54,6 +54,11 @@ namespace btk
    */
 
   /**
+   * @typedef Analog::Values
+   * Analog' values along the time with 1 component (1 column).
+   */
+  
+  /**
    * @enum Analog::Gain
    * Enums used to specify the analog gain.
    */
@@ -205,7 +210,7 @@ namespace btk
       return;
     this->m_Scale = s;
     this->Modified();
-  }
+  };
 
   /**
    * @fn Pointer Analog::Clone() const
@@ -218,7 +223,7 @@ namespace btk
    * as it creates a null matrix for the values.
    */
   Analog::Analog(const std::string& label, const std::string& desc)
-  : Measure<1>(label, desc), m_Unit("V")
+  : Measure<Analog>(label, desc), m_Unit("V")
   {
     this->m_Gain = Unknown;
     this->m_Offset = 0;
@@ -230,7 +235,7 @@ namespace btk
    * @warning The number of frames must be greater than 0.
    */
   Analog::Analog(const std::string& label, int frameNumber, Gain g)
-  : Measure<1>(label, frameNumber), m_Unit("V")
+  : Measure<Analog>(label, frameNumber), m_Unit("V")
   {
     this->m_Gain = g;
     this->m_Offset = 0;
@@ -241,18 +246,51 @@ namespace btk
    * Copy constructor
    */
   Analog::Analog(const Analog& toCopy)
-  : Measure<1>(toCopy), m_Unit(toCopy.m_Unit)
+  : Measure<Analog>(toCopy), m_Unit(toCopy.m_Unit)
   {
     this->m_Gain = toCopy.m_Gain;
     this->m_Offset = toCopy.m_Offset;
     this->m_Scale = toCopy.m_Scale;
-
   };
 
   /**
    * @fn void Analog::SetDataSlice(int idx, double val)
    * Convenient method to set easily the value @a val for the given frame index @a idx.
-   * @warning This function is not safe. There is no cheching to determine if the frame is out of range or not. It has the advantage to be faster.
+   * @warning This function is not safe. There is no cheching to determine if there is data or if the frame is out of range or not. It has the advantage to be faster.
+   */
+  
+  // ----------------------------------------------------------------------- //
+  
+  /**
+   * @typedef MeasureTraits<Analog>::Data::Pointer
+   * Smart pointer associated with a MeasureTraits<Analog>::Data object.
+   */
+  
+  /**
+   * @typedef MeasureTraits<Analog>::Data::ConstPointer
+   * Smart pointer associated with a const MeasureTraits<Analog>::Data object.
+   */
+   
+  /**
+   * @fn static Pointer MeasureTraits<Analog>::Data::Null()
+   * Convenient method tp create an empy smart pointer.
+   * This method is only for the sake of the traits and should not be used in other context.
+   */
+  
+  /**
+   * @fn static Pointer MeasureTraits<Analog>::Data::New(int frameNumber)
+   * Creates a smart pointer associated with a MeasureTraits<Analog>::Data object.
+   */
+  
+  /**
+   * @fn void MeasureTraits<Analog>::Data::Resize(int frameNumber);
+   * Resize the number of frames for the values.
+   * @warning The input @a frameNumber cannot be set to value lower or equal to 0. This method doesn't check for the given number of frames and will crash if the value is lower or equal to 0.
+   */
+  
+  /**
+   * @fn MeasureTraits<Analog>::Data::Pointer MeasureTraits<Analog>::Data::Clone() const
+   * Deep copy of the current object.
    */
 }
 

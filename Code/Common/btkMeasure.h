@@ -44,34 +44,107 @@
 
 namespace btk
 {
-  template <int d>
+  template <typename Derived>
+  struct MeasureTraits;
+  
+  template <typename Derived>
+  class MeasureData : public DataObject
+  {
+  public:
+    typedef typename MeasureTraits<Derived>::Values Values; ///< Measures' values along the time.
+    
+    /**
+     * Returns values of the measure. The exact output type depend of the Derived class
+     */
+    Values& GetValues() {return this->m_Values;};
+    /**
+     * Returns values of the measure. The exact output type depend of the Derived class
+     */
+    const Values& GetValues() const {return this->m_Values;};
+    /**
+     * Sets values for the measure. The exact input type depend of the Derived class
+     */
+    void SetValues(const Values& v);
+    
+  protected:
+    /**
+     * Constructor which initialize the data with a matrix of zero.
+     * The given @a frameNumber corresponds to the matrix's row. The number of colums is automatically determined based on the given template @a Derived.
+     */
+    MeasureData(int frameNumber);
+    /**
+     * Copy constructor
+     */
+    MeasureData(const MeasureData& toCopy);
+    /**
+     * Simply set the new values
+     */
+    MeasureData& operator=(const MeasureData& ); // Not implemented.
+    
+    typename MeasureData<Derived>::Values m_Values; ///< Values of the measure.
+  };
+  
+  template <class Derived>
   class Measure : public DataObjectLabeled
   {
   public:
-    typedef Eigen::Matrix<double, Eigen::Dynamic, d> Values;
+    typedef typename MeasureTraits<Derived>::Values Values; ///< Values of the measure.
+    typedef typename MeasureTraits<Derived>::Data Data; ///< Associated data with the measure
     
-    typedef SharedPtr<Measure> Pointer;
-    typedef SharedPtr<const Measure> ConstPointer;
+    // ~Measure(); // Implicit.
     
-    static Pointer New(const std::string& label = "") {return Pointer(new Measure(label));};
-    static Pointer New(int frameNumber) {return Pointer(new Measure("", frameNumber));};
-    static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Measure(label, frameNumber));};
-    
-    virtual ~Measure() {};
-    
-    Values& GetValues() {return this->m_Values;};
-    const Values& GetValues() const {return this->m_Values;};
+    /**
+     * Convenient method to return the values associated with measure's data.
+     * @warning This method tries to access directly to data's values even if no data has been set. Use this method carefully or use GetData() to access to measure's data. 
+     */
+    typename Measure<Derived>::Values& GetValues();
+    /**
+     * Convenient method to return the values associated with measure's data.
+     * @warning This method tries to access directly to data's values even if no data has been set. Use this method carefully or use GetData() to access to measure's data. 
+     */
+    const typename Measure<Derived>::Values& GetValues() const;
+    /**
+     * Convenient method to set the values of the measure's data.
+     * If no data exists for this object, then it is created and the values are assigned to it.
+     */
     void SetValues(const Values& v);
-    int GetFrameNumber() const {return static_cast<int>(this->m_Values.rows());};
+    
+    /**
+     * Returns the number of frames.
+     */
+    int GetFrameNumber() const;
+    /**
+     * Sets the number of frames.
+     * The input @a frameNumber must be greater than 0.
+     */
     void SetFrameNumber(int frameNumber);
-    Pointer Clone() const {return Pointer(new Measure<d>(*this));};
+    
+    /**
+     * Returns the data associated to this measure.
+     */
+    typename Measure<Derived>::Data::Pointer GetData() const {return this->mp_Data;};
+    /**
+     * Set the data for this object. By default, this object will take the parent of the data. Set @a 
+     */
+    void SetData(typename Measure<Derived>::Data::Pointer data, bool parenting = true);
     
   protected:
+    /**
+     * Constructor.
+     * @warning The use of this constructor must be followed by the use of the method Measure::SetFrameNumber
+     * as it creates a null matrix for the values.
+     */
     Measure(const std::string& label, const std::string& desc = "");
+    /**
+     * Constructor.
+     */
     Measure(const std::string& label, int frameNumber, const std::string& desc = "");
+    /**
+     * Copy constructor. Timestamp, source and parent are reset.
+     */
     Measure(const Measure& toCopy);
     
-    Values m_Values;
+    typename Measure<Derived>::Data::Pointer mp_Data; ///< Smart pointer associated with the data of this measurement.
     
   private: 
     Measure& operator=(const Measure& ); // Not implemented.
@@ -81,147 +154,136 @@ namespace btk
    * @class Measure btkMeasure.h
    * @brief Measure with @a d dimensions along the time.
    *
-   * The measures are stored in a matrix. The measures' dimensions correspond to the columns of the matrix. The frames correspond to the line.
+   * @tparam Derived Class representing a kind of measurement (Point, Analog, etc.)
    *
-   * @tparam d Number of dimensions.
+   * The measures are stored in a matrix. The measures' dimensions correspond to the columns of the matrix. The frames correspond to the line.
    *
    * @warning The number of dimensions @a d must be greater than 0.
    *
    * @ingroup BTKCommon
    */
-  /**
-   * @var Measure::m_Values
-   * Values of the measure.
-   */
 
-  /**
-   * @typedef Measure<d>::Values
-   * Measures' values along the time.
-   */
-
-  /**
-   * @typedef Measure<d>::Pointer
-   * Smart pointer associated with a Measure object.
-   */
+   template <class Derived>
+   typename Measure<Derived>::Values& Measure<Derived>::GetValues()
+   {
+     assert(this->mp_Data.get() != 0);
+     return this->mp_Data->GetValues();
+   }
+ 
+   template <class Derived>
+   const typename Measure<Derived>::Values& Measure<Derived>::GetValues() const
+   {
+     assert(this->mp_Data.get() != 0);
+     return this->mp_Data->m_Values;
+   };
   
-  /**
-   * @typedef Measure<d>::ConstPointer
-   * Smart pointer associated with a const Measure object.
-   */
-  
-  /**
-   * @fn template <int d> static Pointer Measure<d>::New(const std::string& label = "")
-   * @brief Creates a smart pointer associated with a Measure object.
-   *
-   * The measure created has no values.
-   * @warning The call of this function must be followed by the use of the method Measure::SetFrameNumber
-   * as it creates a null matrix for the values.
-   */ 
-   
-  /**
-   * @fn template <int d> static Pointer Measure<d>::New(int frameNumber)
-   * @brief Creates a smart pointer associated with a Measure object.
-   *
-   * The measure created has an empty label and a number of frames  equals to @a framenumber.
-   * @warning The number of frames must be greater than 0.
-   */ 
-
-  /**
-   * @fn template <int d> static Pointer Measure::New(const std::string& label, int frameNumber)
-   * @brief Creates a smart pointer associated with a Measure object.
-   *
-   * The measure created has a label and a number of frames  equals to @a label and @a framenumber respectively.
-   * @warning The number of frames must be greater than 0.
-   */
-
-  /**
-   * @fn template <int d> Values& Measure<d>::GetValues()
-   * Returns the measure's values.
-   *
-   * @warning If you modify the object's content with this function, don't forget to call the Modified() method.
-   */
-
-  /**
-   * @fn template <int d> const Values& Measure<d>::GetValues() const
-   * Returns the measure's values.
-   */
-  
-  /**
-   * Set the values of the measure.
-   * @warning The values' dimensions must be equal than the dimensions of the object.
-   */
-  template <int d>
-  void Measure<d>::SetValues(const Values& v)
+  template <class Derived>
+  void Measure<Derived>::SetValues(const typename Measure<Derived>::Values& v)
   {
-    this->m_Values = v;
+    if (!this->mp_Data)
+      this->SetData(Measure<Derived>::Data::New(static_cast<int>(v.rows())));
+    this->mp_Data->SetValues(v);
     this->Modified();
   };
   
-  /**
-   * @fn template <int d> int Measure<d>::GetFrameNumber() const 
-   * Returns the number of frames.
-   */
-
-  /**
-   * @fn template <int d> Pointer Measure<d>::Clone() const
-   * Clones the object.
-   */
-
-  /**
-   * Sets the number of frames.
-   * The input @a frameNumber must be greater than 0.
-   */
-  template <int d>
-  void Measure<d>::SetFrameNumber(int frameNumber)
+  template <class Derived>
+  int Measure<Derived>::GetFrameNumber() const 
   {
-    if (frameNumber <= 0)
+    if (!this->mp_Data)
+      return 0;
+    return static_cast<int>(this->mp_Data->GetValues().rows());
+  };
+ 
+  template <class Derived>
+  void Measure<Derived>::SetFrameNumber(int frameNumber)
+  {
+    if (frameNumber < 0)
     {
-      btkErrorMacro("Impossible to set a number of frames lower or equal to 0.");
+      btkErrorMacro("Impossible to set a number of frames lower than 0.");
       return;
     }
     if (frameNumber == this->GetFrameNumber())
       return;
-    else if (frameNumber > this->GetFrameNumber())
-    {
-      Values v = Values::Zero(frameNumber, d);
-      if (this->m_Values.data() != 0)
-        v.block(0,0,this->GetFrameNumber(),d) = this->m_Values;
-      this->m_Values = v;
-    }
-    else
-    {
-      Values v = this->m_Values.block(0,0,frameNumber,d);
-      this->m_Values = v;
-    }
+    else if (frameNumber == 0) // Remove the data
+      this->SetData(Measure<Derived>::Data::Null());
+    else if (!this->mp_Data)
+      this->SetData(Measure<Derived>::Data::New(frameNumber));
+    else 
+      this->GetData()->Resize(frameNumber);
     this->Modified();
   };
 
-   /**
-   * Constructor.
-   * @warning The use of this constructor must be followed by the use of the method Measure::SetFrameNumber
-   * as it creates a null matrix for the values.
-   */
-  template <int d>
-  Measure<d>::Measure(const std::string& label, const std::string& desc)
-  : DataObjectLabeled(label, desc), m_Values()
+  template <class Derived>
+  void Measure<Derived>::SetData(typename Measure<Derived>::Data::Pointer data, bool parenting)
+  {
+    if (this->mp_Data == data)
+      return;
+    if (this->mp_Data)
+      this->mp_Data->SetParent(NULL);
+    this->mp_Data = data;
+    if (this->mp_Data && parenting)
+      this->mp_Data->SetParent(this);
+    this->Modified();
+  };
+
+  template <class Derived>
+  Measure<Derived>::Measure(const std::string& label, const std::string& desc)
+  : DataObjectLabeled(label, desc), mp_Data()
   {};
 
-  /**
-   * Constructor.
-   */
-  template <int d>
-  Measure<d>::Measure(const std::string& label, int frameNumber, const std::string& desc)
-  : DataObjectLabeled(label, desc),
-    m_Values(Values::Zero(frameNumber, d))
-  {};
+  template <class Derived>
+  Measure<Derived>::Measure(const std::string& label, int frameNumber, const std::string& desc)
+  : DataObjectLabeled(label, desc), mp_Data()
+  {
+    if (frameNumber > 0)
+      this->SetData(Measure<Derived>::Data::New(frameNumber));
+  };
 
+  template <class Derived>
+  Measure<Derived>::Measure(const Measure& toCopy)
+  : DataObjectLabeled(toCopy), mp_Data()
+  {
+    this->SetData(toCopy.mp_Data->Clone());
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
   /**
-   * Copy constructor. Timestamp, source and parent are reset.
+   * @struct MeasureTraits btkMeasure.h
+   * @brief Trait used to determine the type of data and the number of components used for a measure.
+   *
+   * @tparam Derived Class representing a kind of measurement (Point, Analog, etc.)
    */
-  template <int d>
-  Measure<d>::Measure(const Measure& toCopy)
-  : DataObjectLabeled(toCopy), m_Values(toCopy.m_Values)
+
+  // ----------------------------------------------------------------------- //
+  
+  /**
+   * @class MeasureData btkMeasure.h
+   * @brief Template class to store data for any kind of measurement.
+   *
+   * @tparam Derived Class representing a kind of measurement (Point, Analog, etc.)
+   *
+   * Currently this class store a matrix defined by the given number of frames. The template @a Derived used by this class gives the number of columns (components) of the measure.
+   *
+   * To add a new type of data (for example for 2D pressure mat or insole), you have to inherit from this class and add the method Resize(int frameNumber). You can also add other informations in inherited classes, like btk::Point::Data which contains reconstruction residuals.
+   */
+  
+  template <class Derived>
+  MeasureData<Derived>::MeasureData(int frameNumber)
+  : DataObject(), m_Values(MeasureData::Values::Zero(frameNumber,Derived::Values::ColsAtCompileTime))
   {};
+  
+ template <class Derived>
+  MeasureData<Derived>::MeasureData(const MeasureData& toCopy)
+  : DataObject(toCopy), m_Values(toCopy.m_Values)
+  {};
+  
+  template <class Derived>
+  void MeasureData<Derived>::SetValues(const MeasureData::Values& v)
+  {
+    this->m_Values = v;
+    this->Modified();
+  };
 };
 
 #endif // __btkMeasure_h

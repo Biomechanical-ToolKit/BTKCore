@@ -58,7 +58,7 @@ namespace btk
    * @ingroup BTKCommon
    */
 
-   /**
+  /**
    * @typedef Point::Residuals
    * Vector of double representing the residuals associated with each frames (if applicable).
    */
@@ -145,49 +145,35 @@ namespace btk
    * @fn const Residuals& Point::GetResiduals() const
    * Gets the residuals.
    */
+  
+  /**
+   * Convenient method to return the residuals associated with measure's data.
+   * @warning This method tries to access directly to data's residuals even if no data has been set. Use this method carefully or use GetData() to access to point's data. 
+   */
+  Point::Residuals& Point::GetResiduals()
+  {
+    assert(this->mp_Data.get() != 0);
+    return this->mp_Data->GetResiduals();
+  }
+ 
+  /**
+   * Convenient method to return the residuals associated with measure's data.
+   * @warning This method tries to access directly to data's residuals even if no data has been set. Use this method carefully or use GetData() to access to point's data. 
+   */
+  const Point::Residuals& Point::GetResiduals() const
+  {
+    assert(this->mp_Data.get() != 0);
+    return this->mp_Data->GetResiduals();
+  };
 
   /**
    * Sets the residuals.
    */  
   void Point::SetResiduals(const Residuals& r)
   {
-    this->m_Residuals = r;
-    this->Modified();
-  };
-  
-  /**
-   * Resizes the number of frames of the measure as well as its residual.
-   * @warning The number of frames must be greater than 0.
-   */
-  void Point::SetFrameNumber(int frameNumber)
-  {
-    if (frameNumber <= 0)
-    {
-      btkErrorMacro("Impossible to set a number of frames lower or equal to 0.");
-      return;
-    }
-    int actualFrameNumber = this->GetFrameNumber();
-    if (frameNumber == actualFrameNumber)
-      return;
-    else if (frameNumber > actualFrameNumber)
-    {
-      Values v = Values::Zero(frameNumber, 3);
-      if (this->m_Values.data() != 0)
-        v.block(0,0,actualFrameNumber,3) = this->m_Values;
-      this->m_Values = v;
-      
-      Residuals r = Residuals::Zero(frameNumber, 1);
-      if (this->m_Residuals.data() != 0)
-        r.block(0,0,actualFrameNumber,1) = this->m_Residuals;
-      this->m_Residuals = r;
-    }
-    else
-    {
-      Values v = this->m_Values.block(0,0,frameNumber,3);
-      this->m_Values = v;
-      Residuals r = this->m_Residuals.block(0,0,frameNumber,1);
-      this->m_Residuals = r;
-    }
+    if (!this->mp_Data)
+      this->SetData(Point::Data::New(static_cast<int>(r.rows())));
+    this->mp_Data->SetResiduals(r);
     this->Modified();
   };
 
@@ -219,7 +205,7 @@ namespace btk
    * as it creates a null matrix for the values.
    */
   Point::Point(const std::string& label, Type t, const std::string& desc)
-  : Measure<3>(label, desc), m_Residuals()
+  : Measure<Point>(label, desc)
   {
     this->m_Type = t;
   };
@@ -229,8 +215,7 @@ namespace btk
    * @warning The number of frames must be greater than 0.
    */
   Point::Point(const std::string& label, int frameNumber, Type t, const std::string& desc)
-  : Measure<3>(label, frameNumber, desc),
-    m_Residuals(Residuals::Zero(frameNumber, 1))
+  : Measure<Point>(label, frameNumber, desc)
   {
     this->m_Type = t;
   };
@@ -239,8 +224,7 @@ namespace btk
    * Constructor of copy.
    */
   Point::Point(const Point& toCopy)
-  : Measure<3>(toCopy),
-    m_Residuals(toCopy.m_Residuals)
+  : Measure<Point>(toCopy)
   {
     this->m_Type = toCopy.m_Type;
   };
@@ -249,5 +233,59 @@ namespace btk
    * @fn void Point::SetDataSlice(int idx, double x, double y, double z, double res = 0.0)
    * Convenient method to easily set the coordinates @a x, @a y, @a z and the residual @a res for the given @a idx.
    * @warning This function is not safe. There is no checking to determine if the index is out of range or not. It has the advantage to be faster.
+   */
+ 
+  // ----------------------------------------------------------------------- //
+  
+  /**
+   * @typedef MeasureTraits<Point>::Residuals
+   * Vector of double representing the residuals associated with each frames (if applicable).
+   */
+   
+  /**
+   * @typedef MeasureTraits<Point>::Data::Pointer
+   * Smart pointer associated with a MeasureTraits<Point>::Data object.
+   */
+  
+  /**
+   * @typedef MeasureTraits<Point>::Data::ConstPointer
+   * Smart pointer associated with a const MeasureTraits<Point>::Data object.
+   */
+   
+  /**
+   * @fn static Pointer MeasureTraits<Point>::Data::Null()
+   * Convenient method tp create an empy smart pointer.
+   * This method is only for the sake of the traits and should not be used in other context.
+   */
+  
+  /**
+   * @fn static Pointer MeasureTraits<Point>::Data::New(int frameNumber)
+   * Creates a smart pointer associated with a MeasureTraits<Point>::Data object.
+   */
+  
+  /**
+   * @fn void MeasureTraits<Point>::Data::Resize(int frameNumber);
+   * Resize the number of frames for the values and the residuals.
+   * @warning The input @a frameNumber cannot be set to value lower or equal to 0. This method doesn't check for the given number of frames and will crash if the value is lower or equal to 0.
+   */
+  
+  /**
+   * @fn MeasureTraits<Point>::Data::Residuals& MeasureTraits<Point>::Data::GetResiduals()
+   * Returns the residuals for to this data.
+   */
+  
+  /**
+   * @fn const MeasureTraits<Point>::Data::Residuals& MeasureTraits<Point>::Data::GetResiduals() const
+   * Returns the residuals for to this data.
+   */
+  
+  /**
+   * @fn void MeasureTraits<Point>::Data::SetResiduals(const MeasureTraits<Point>::Data::Residuals& r)
+   * Sets the residuals for to this data.
+   */
+ 
+  /**
+   * @fn MeasureTraits<Point>::Data::Pointer MeasureTraits<Point>::Data::Clone() const
+   * Deep copy of the current object.
    */
 }
