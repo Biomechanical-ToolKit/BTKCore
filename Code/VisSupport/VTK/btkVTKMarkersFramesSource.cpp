@@ -153,7 +153,11 @@ namespace btk
   {
     VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::New();
     inObject->SetBTKDataObject(input);
+#if (VTK_MAJOR_VERSION >= 6)    
+    this->vtkPolyDataAlgorithm::SetInputData(port, inObject);
+#else
     this->vtkPolyDataAlgorithm::SetInput(port, inObject);
+#endif
     inObject->Delete();
   };
 
@@ -697,13 +701,22 @@ namespace btk
     if (this->mp_MarkersCoordinates->size() != 0)
     {
       int index = 0;
+#if (VTK_MAJOR_VERSION >= 6)
+      if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
+        index = static_cast<int>(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()));
+#else
       if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
         index = static_cast<int>(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0]);
+#endif
       vtkPolyData* markers = this->mp_MarkersCoordinates->operator[](index);
       vtkIntArray* existingMarkers = this->mp_ExistingMarkers->operator[](index);
 
       // Visible markers generation
+#if (VTK_MAJOR_VERSION >= 6)
+      this->mp_MarkersGenerator->SetInputData(markers);
+#else
       this->mp_MarkersGenerator->SetInput(markers);
+#endif
       this->mp_MarkersGenerator->Modified();
       this->mp_MarkersGenerator->SetExistingMarkers(existingMarkers);
       this->mp_MarkersGenerator->Update();

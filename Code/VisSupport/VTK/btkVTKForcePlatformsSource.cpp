@@ -84,7 +84,11 @@ namespace btk
   {
     VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::New();
     inObject->SetBTKDataObject(input);
+#if (VTK_MAJOR_VERSION >= 6)
+    this->vtkPolyDataAlgorithm::SetInputData(inObject);
+#else
     this->vtkPolyDataAlgorithm::SetInput(inObject);
+#endif
     inObject->Delete();
   };
   
@@ -189,7 +193,11 @@ namespace btk
     vtkMatrix4x4* pose = vtkMatrix4x4::New();
     vtkTransform* transform = vtkTransform::New();
     vtkTransformPolyDataFilter* axesTransform = vtkTransformPolyDataFilter::New();
+#if (VTK_MAJOR_VERSION >= 6)
+    axesTransform->SetInputData(axesGenerator->GetOutput());
+#else
     axesTransform->SetInput(axesGenerator->GetOutput());
+#endif
     axesTransform->SetTransform(transform);
     vtkUnsignedCharArray* axesColors = vtkUnsignedCharArray::New();
     axesColors->SetNumberOfComponents(3);
@@ -223,7 +231,11 @@ namespace btk
       pts->Delete();
       forcePlatform->SetPolys(polys);
       polys->Delete();
+#if (VTK_MAJOR_VERSION >= 6)
+      append1->AddInputData(forcePlatform);
+#else
       append1->AddInput(forcePlatform);
+#endif
       forcePlatform->Delete();
       // Output #1: Axes
       Eigen::Matrix<double, 3, 3> R;
@@ -282,7 +294,11 @@ namespace btk
       vtkPolyData* axes = vtkPolyData::New();
       axes->DeepCopy(axesTransform->GetOutput());
       axes->GetCellData()->SetScalars(axesColors);
+#if (VTK_MAJOR_VERSION >= 6)
+      append2->AddInputData(axes);
+#else
       append2->AddInput(axes);
+#endif
       axes->Delete();
       // Output #2: Index
       if (input->GetItemNumber() > 1)
@@ -313,7 +329,11 @@ namespace btk
         // Rotation
         vtkPolyData* index = vtkPolyData::New();
         index->DeepCopy(indexScale->GetOutput());
+#if (VTK_MAJOR_VERSION >= 6)
+        indexTransform->SetInputData(index);
+#else
         indexTransform->SetInput(index);
+#endif
         pose->Identity();
         R.col(2) *= -1.0; // Reorient Z axis as for force platforms it is always defined as negative.
         if (R.col(1).sum() <= 0)
@@ -333,7 +353,11 @@ namespace btk
         bbIndex.SetBounds(indexTransform->GetOutput()->GetBounds());
         double bbIndexCenter[3]; bbIndex.GetCenter(bbIndexCenter);
         double bbForcePlateCenter[3]; bbForcePlate.GetCenter(bbForcePlateCenter);
+#if (VTK_MAJOR_VERSION >= 6)
+        indexTransform->SetInputData(index);
+#else
         indexTransform->SetInput(index);
+#endif
         pose->Identity();
         for (int i = 0 ; i < 3 ; ++i)
           pose->SetElement(i, 3, (bbForcePlateCenter[i] - bbIndexCenter[i]));
@@ -343,7 +367,11 @@ namespace btk
         index = vtkPolyData::New();
         index->DeepCopy(indexTransform->GetOutput());
         // Append
+#if (VTK_MAJOR_VERSION >= 6)
+        append3->AddInputData(index);
+#else
         append3->AddInput(index);
+#endif
         index->Delete();
       }
     }

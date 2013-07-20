@@ -92,7 +92,11 @@ namespace btk
   {
     VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::New();
     inObject->SetBTKDataObject(input);
+#if (VTK_MAJOR_VERSION >= 6)
+    this->vtkPolyDataAlgorithm::SetInputData(inObject);
+#else
     this->vtkPolyDataAlgorithm::SetInput(inObject);
+#endif
     inObject->Delete();
   };
   

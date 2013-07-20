@@ -126,7 +126,11 @@ namespace btk
   {
     VTKDataObjectAdapter* inObject = VTKDataObjectAdapter::New();
     inObject->SetBTKDataObject(input);
+#if (VTK_MAJOR_VERSION >= 6)
+    this->vtkPolyDataAlgorithm::SetInputData(inObject);
+#else
     this->vtkPolyDataAlgorithm::SetInput(inObject);
+#endif
     inObject->Delete();
   };
   
@@ -506,8 +510,13 @@ namespace btk
     vtkPolyData* outputBis = vtkPolyData::SafeDownCast(outInfoBis->Get(vtkDataObject::DATA_OBJECT()));
     
     int frameIndex = 0;
+#if (VTK_MAJOR_VERSION >= 6)
+    if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
+      frameIndex = static_cast<int>(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()));
+#else
     if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
       frameIndex = static_cast<int>(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0]);
+#endif
       
     int markerNumber = 0;
     int linkNumber = 0;
