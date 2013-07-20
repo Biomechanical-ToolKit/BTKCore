@@ -225,6 +225,7 @@ namespace btk
         return; // if axis do not have a valid tickinterval - return
       else
       {
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 10))
         if (this->LogScale && !this->LogScaleReasonable)
         {
           // If logartihmic axis is enabled and log scale is not reasonable
@@ -248,6 +249,7 @@ namespace btk
           this->GenerateTickLabels2(min, max);
         }
         else
+#endif
         {
           // Calculated tickinterval may be 0. So calculation of new minimum and
           // maximum by incrementing/decrementing using tickinterval will fail.
@@ -285,6 +287,7 @@ namespace btk
     {
       // Regenerate the tick marks/positions if necessary
       // Calculate where the first tick mark should be drawn
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 10))
       if (this->LogScale && !this->LogScaleReasonable)
       {
         // Since the TickInterval may have changed due to moved axis we need to
@@ -292,6 +295,7 @@ namespace btk
         this->RecalculateTickSpacing();
       }
       else
+#endif
       {
         // FIXME: We need a specific resize event, to handle position change independently.
         //this->RecalculateTickSpacing();
@@ -586,6 +590,7 @@ namespace btk
     this->TickPositions->SetNumberOfTuples(0);
     this->TickLabels->SetNumberOfTuples(0);
 
+#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 10))
     // We generate a logarithmic scale when logarithmic axis is activated and the
     // order of magnitude of the axis is higher than 0.6.
     if (this->LogScale && this->LogScaleReasonable)
@@ -628,6 +633,7 @@ namespace btk
       }
     }
     else
+#endif
     {
 #if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
       if (this->TickLabelAlgorithm == VTKAxis::TICK_WILKINSON_EXTENDED)
