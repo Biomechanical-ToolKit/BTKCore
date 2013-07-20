@@ -367,7 +367,7 @@ namespace btk
    */
   
   /**
-   * @fn void BinaryFileStream::ReadU8(std::vector<int16_t>& values)
+   * @fn void BinaryFileStream::ReadI16(std::vector<int16_t>& values)
    * Extracts exactly the number of elements set in the vector @a values
    *
    * @note In case you want to assign only a part of the vector, you can use the method using an array.
@@ -466,7 +466,7 @@ namespace btk
    */
   
   /**
-   * @fn void BinaryFileStream::ReadU8(std::vector<uint32_t>& values)
+   * @fn void BinaryFileStream::ReadU32(std::vector<uint32_t>& values)
    * Extracts exactly the number of elements set in the vector @a values
    *
    * @note In case you want to assign only a part of the vector, you can use the method using an array.
@@ -580,7 +580,7 @@ namespace btk
    */
   
   /**
-   * @fn void BinaryFileStream::ReadU8(std::vector<uint8_t>& values)
+   * @fn void BinaryFileStream::ReadString(size_t nbChar, std::vector<std::string>& values)
    * Extracts exactly the number of elements set in the vector @a values
    *
    * @note In case you want to assign only a part of the vector, you can use the method using an array.
