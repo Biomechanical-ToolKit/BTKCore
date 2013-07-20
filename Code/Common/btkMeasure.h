@@ -124,7 +124,7 @@ namespace btk
      */
     typename Measure<Derived>::Data::Pointer GetData() const {return this->mp_Data;};
     /**
-     * Set the data for this object. By default, this object will take the parent of the data. Set @a 
+     * Set the data for this object. By default, this object will take the parent of the data. Setting @a parenting to false will unparent the old data, assign the new one, but doesn't set the point as its parent.
      */
     void SetData(typename Measure<Derived>::Data::Pointer data, bool parenting = true);
     

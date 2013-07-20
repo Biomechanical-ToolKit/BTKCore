@@ -49,7 +49,7 @@ namespace btk
     
    /**
     * @class Data
-    * @brief Class storing the measures for an analog channel.
+    * @brief Class storing the measures for one analog channel.
     */
    class Data : public MeasureData<Analog>
     {
