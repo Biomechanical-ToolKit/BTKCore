@@ -175,3 +175,30 @@ class AnalogTest(unittest.TestCase):
         a2.SetValue(1, 49.5);
         self.assertEqual(a1.GetValues()[1], 0.0)
         self.assertEqual(a2.GetValues()[1], 49.5)
+        
+    def test_data_get(self):
+        a = btk.btkAnalog(5)
+        a.SetValue(0, 150.0)
+        da = a.GetData()
+        v = da.GetValues();
+        self.assertEqual(v[0], 150.0)
+        
+    def test_data_set_with_parent(self):
+        a = btk.btkAnalog('Foo')
+        d = btk.btkAnalogData(5)
+        a.SetData(d)
+        d.SetValue(1, 0.123)
+        t1 = a.GetTimestamp()
+        t2 = d.GetTimestamp()
+        self.assertEqual(a.GetData().GetValues()[1], 0.123)
+        self.assertEqual(t1 > t2, True)
+        
+    def test_data_set_without_parent(self):
+        a = btk.btkAnalog('Foo')
+        d = btk.btkAnalogData(5)
+        a.SetData(d, False)
+        d.SetValue(4, 0.123)
+        t1 = a.GetTimestamp()
+        t2 = d.GetTimestamp()
+        self.assertEqual(a.GetData().GetValues()[4], 0.123)
+        self.assertEqual(t1 < t2, True)
