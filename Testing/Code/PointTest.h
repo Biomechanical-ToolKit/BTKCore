@@ -27,6 +27,34 @@ CXXTEST_SUITE(PointTest)
     TS_ASSERT(t1 != test->GetTimestamp());
   };
   
+  CXXTEST_TEST(DataWithParent)
+  {
+    btk::Point::Pointer point = btk::Point::New("HEEL_R");
+    btk::Point::Data::Pointer data = btk::Point::Data::New(5);
+    point->SetData(data);
+    TS_ASSERT(point->GetData() == data);
+    data->GetValues().coeffRef(0) = 0.123;
+    data->Modified();
+    unsigned long int t1 = point->GetTimestamp();
+    unsigned long int t2 = data->GetTimestamp();
+    TS_ASSERT_EQUALS(point->GetValues().coeff(0), 0.123);
+    TS_ASSERT(t1 > t2);
+  };
+  
+  CXXTEST_TEST(DataWithoutParent)
+  {
+    btk::Point::Pointer point = btk::Point::New("HEEL_R");
+    btk::Point::Data::Pointer data = btk::Point::Data::New(5);
+    point->SetData(data, false);
+    TS_ASSERT(point->GetData() == data);
+    data->GetValues().coeffRef(0) = 0.123;
+    data->Modified();
+    unsigned long int t1 = point->GetTimestamp();
+    unsigned long int t2 = data->GetTimestamp();
+    TS_ASSERT_EQUALS(point->GetValues().coeff(0), 0.123);
+    TS_ASSERT(t1 < t2);
+  };
+  
   CXXTEST_TEST(EigenDataFromMap)
   {
     double data[12] = {1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0};
@@ -75,10 +103,12 @@ CXXTEST_SUITE(PointTest)
 };
 
 CXXTEST_SUITE_REGISTRATION(PointTest)
-CXXTEST_TEST_REGISTRATION(PointTest, Constructor)
-CXXTEST_TEST_REGISTRATION(PointTest, FrameNumber)
-CXXTEST_TEST_REGISTRATION(PointTest, EigenDataFromMap)
-CXXTEST_TEST_REGISTRATION(PointTest, EigenDataMapCopied)
-CXXTEST_TEST_REGISTRATION(PointTest, EigenDataRowMajorFromMap)
-CXXTEST_TEST_REGISTRATION(PointTest, EigenDataRowMajorFromMapSwap)
+//CXXTEST_TEST_REGISTRATION(PointTest, Constructor)
+//CXXTEST_TEST_REGISTRATION(PointTest, FrameNumber)
+CXXTEST_TEST_REGISTRATION(PointTest, DataWithParent)
+CXXTEST_TEST_REGISTRATION(PointTest, DataWithoutParent)
+//CXXTEST_TEST_REGISTRATION(PointTest, EigenDataFromMap)
+//CXXTEST_TEST_REGISTRATION(PointTest, EigenDataMapCopied)
+//CXXTEST_TEST_REGISTRATION(PointTest, EigenDataRowMajorFromMap)
+//CXXTEST_TEST_REGISTRATION(PointTest, EigenDataRowMajorFromMapSwap)
 #endif
