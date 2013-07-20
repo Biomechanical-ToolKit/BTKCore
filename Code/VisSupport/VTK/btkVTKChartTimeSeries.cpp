@@ -478,9 +478,9 @@ namespace btk
     if (this->LayoutStrategy == VTKChartTimeSeries::FILL_SCENE)
     {
       geometry = vtkVector2i(this->GetScene()->GetSceneWidth(), this->GetScene()->GetSceneHeight());
-      if (geometry.X() != this->Geometry[0] || geometry.Y() != this->Geometry[1])
+      if (geometry.GetX() != this->Geometry[0] || geometry.GetY() != this->Geometry[1])
       {
-        this->SetSize(vtkRectf(0.0, 0.0, geometry.X(), geometry.Y()));
+        this->SetSize(vtkRectf(0.0, 0.0, geometry.GetX(), geometry.GetY()));
         this->m_GeometryChanged = true;
       }
     }
@@ -537,7 +537,7 @@ namespace btk
       painter->GetBrush()->SetColor(255, 255, 255, 0);
       painter->GetPen()->SetColor(0, 0, 0, 255);
       painter->GetPen()->SetWidth(1.0);
-      painter->DrawRect(this->m_ZoomBox.X(), this->m_ZoomBox.Y(), this->m_ZoomBox.Width(), this->m_ZoomBox.Height());
+      painter->DrawRect(this->m_ZoomBox.GetX(), this->m_ZoomBox.GetY(), this->m_ZoomBox.GetWidth(), this->m_ZoomBox.GetHeight());
     }
 
     if (this->Title)
@@ -726,7 +726,7 @@ namespace btk
 #endif
     if ((pos[0] > this->Point1[0]) && (pos[0] < this->Point2[0]) && (pos[1] > this->Point1[1]) && (pos[1] < this->Point2[1]))
     {
-      vtkVector2f plotPos, position((float)pos.X(), (float)pos.Y());
+      vtkVector2f plotPos, position((float)pos.GetX(), (float)pos.GetY());
       vtkTransform2D* transform = this->mp_PlotTransform->GetTransform();
       transform->InverseTransformPoints(position.GetData(), position.GetData(), 1);
       // Use a tolerance of +/- 2.5 and +/- 5 pixels for the X and Y direction respectively
@@ -833,11 +833,11 @@ namespace btk
 #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
     if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
     {
-      this->m_ZoomBox.Set(mouse.Pos.X(), mouse.Pos.Y(), 0.0, 0.0);
+      this->m_ZoomBox.Set(mouse.Pos.GetX(), mouse.Pos.GetY(), 0.0, 0.0);
 #else
     if (mouse.GetButton() == vtkContextMouseEvent::LEFT_BUTTON)
     {
-      this->m_ZoomBox.Set(mouse.GetPos().X(), mouse.GetPos().Y(), 0.0, 0.0);
+      this->m_ZoomBox.Set(mouse.GetPos().GetX(), mouse.GetPos().GetY(), 0.0, 0.0);
 #endif
 #if (((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION >= 10)) || (VTK_MAJOR_VERSION >= 6))
       // Zoom box
@@ -912,11 +912,11 @@ namespace btk
         pts[3] = this->mp_AxisY->GetPoint2()[1];
         
 #if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 8))
-        float mouseX = mouse.Pos.X();
-        float mouseY = mouse.Pos.Y();
+        float mouseX = mouse.Pos.GetX();
+        float mouseY = mouse.Pos.GetY();
 #else
-        float mouseX = mouse.GetPos().X();
-        float mouseY = mouse.GetPos().Y();
+        float mouseX = mouse.GetPos().GetX();
+        float mouseY = mouse.GetPos().GetY();
 #endif
         
         if ((mouseX < pts[0]) || (mouseX > pts[2]))
@@ -935,8 +935,8 @@ namespace btk
             mouseY = pts[3] - 1.0f; // Border
         }
         
-        this->m_ZoomBox.SetWidth(mouseX - this->m_ZoomBox.X());
-        this->m_ZoomBox.SetHeight(mouseY - this->m_ZoomBox.Y());
+        this->m_ZoomBox.SetWidth(mouseX - this->m_ZoomBox.GetX());
+        this->m_ZoomBox.SetHeight(mouseY - this->m_ZoomBox.GetY());
         this->Scene->SetDirty(true);
       }
     }
@@ -963,18 +963,18 @@ namespace btk
     if (mouse.Button == vtkContextMouseEvent::LEFT_BUTTON)
     {
       // Zoom
-      this->m_ZoomBox.SetWidth(mouse.Pos.X() - this->m_ZoomBox.X());
-      this->m_ZoomBox.SetHeight(mouse.Pos.Y() - this->m_ZoomBox.Y());
+      this->m_ZoomBox.SetWidth(mouse.Pos.GetX() - this->m_ZoomBox.GetX());
+      this->m_ZoomBox.SetHeight(mouse.Pos.GetY() - this->m_ZoomBox.GetY());
       vtkVector2f point2(mouse.Pos);
 #else
     if (mouse.GetButton() == vtkContextMouseEvent::LEFT_BUTTON)
     {
       // Zoom
-      this->m_ZoomBox.SetWidth(mouse.GetPos().X() - this->m_ZoomBox.X());
-      this->m_ZoomBox.SetHeight(mouse.GetPos().Y() - this->m_ZoomBox.Y());
+      this->m_ZoomBox.SetWidth(mouse.GetPos().GetX() - this->m_ZoomBox.GetX());
+      this->m_ZoomBox.SetHeight(mouse.GetPos().GetY() - this->m_ZoomBox.GetY());
       vtkVector2f point2(mouse.GetPos());
 #endif
-      if (this->m_ZoomBoxDisplayed && fabs(this->m_ZoomBox.Width()) > 0.5f && fabs(this->m_ZoomBox.Height()) > 0.5f)
+      if (this->m_ZoomBoxDisplayed && fabs(this->m_ZoomBox.GetWidth()) > 0.5f && fabs(this->m_ZoomBox.GetHeight()) > 0.5f)
       {
         // Zoom into the chart by the specified amount, and recalculate the bounds
         float pixelMin[2], pixelMax[2];
