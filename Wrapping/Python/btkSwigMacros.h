@@ -41,11 +41,17 @@
 // ------------------------------------------------------------------------- //
 
 #ifdef BTK_SWIG_HEADER_DECLARATION
-  #define BTK_SWIG_DECLARE_CLASS(classname) \
-    typedef btk::classname btk##classname##_impl; \
-    typedef btk::classname::Pointer btk##classname##_shared; \
+  #define _BTK_SWIG_DECLARE_CLASS_(classname, realclassname) \
+    typedef btk::realclassname btk##classname##_impl; \
+    typedef btk::realclassname::Pointer btk##classname##_shared; \
     class btk##classname : public btk##classname##_shared
-    
+
+  #define BTK_SWIG_DECLARE_CLASS(classname) \
+    _BTK_SWIG_DECLARE_CLASS_(classname, classname)
+  
+  #define BTK_SWIG_DECLARE_CLASS_NESTED(classname, realclassname) \
+    _BTK_SWIG_DECLARE_CLASS_(classname, realclassname)
+  
   #define BTK_SWIG_DECLARE_CLASS_TEMPLATE(classname, template, identifier) \
     typedef btk::template< identifier > btk##classname##_impl; \
     typedef btk::template< identifier >::Pointer btk##classname##_shared; \
@@ -71,6 +77,9 @@
   #define BTK_SWIG_DECLARE_POINTER_OPERATOR(classname)
 #else
   #define BTK_SWIG_DECLARE_CLASS(classname) \
+    class btk##classname
+  
+  #define BTK_SWIG_DECLARE_CLASS_NESTED(classname, realclassname) \
     class btk##classname
   
   #define BTK_SWIG_DECLARE_CLASS_TEMPLATE(classname, template, identifier) \
@@ -138,15 +147,16 @@
   { \
     double Get##method(int idx) const \
     { \
-      if ((idx < 0) || (idx >= (*$self)->GetFrameNumber())) \
+      if ((idx < 0) || (idx >= (*$self)->Get##method##s().rows())) \
         throw(btk::OutOfRangeException("Index out of bounds.")); \
       return (*$self)->Get##method##s().coeff(idx); \
     }; \
     void Set##method(int idx, double v) \
     { \
-      if ((idx < 0) || (idx >= (*$self)->GetFrameNumber())) \
+      if ((idx < 0) || (idx >= (*$self)->Get##method##s().rows())) \
         throw(btk::OutOfRangeException("Index out of bounds.")); \
       (*$self)->Get##method##s().coeffRef(idx) = v; \
+      (*$self)->Modified(); \
     }; \
   }
   
@@ -164,6 +174,7 @@
       if ((row < 0) || (row >= (*$self)->Get##method##s().rows()) || (col < 0) || (col >= (*$self)->Get##method##s().cols())) \
         throw(btk::OutOfRangeException("Index out of bounds.")); \
       (*$self)->Get##method##s().coeffRef(row, col) = v; \
+      (*$self)->Modified(); \
     }; \
   }
   

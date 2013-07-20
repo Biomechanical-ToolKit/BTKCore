@@ -43,3 +43,11 @@ public:
   BTK_SWIG_DECLARE_CLONE(Point);
   BTK_SWIG_DECLARE_POINTER_OPERATOR(Point);
 };
+
+BTK_SWIG_DECLARE_CLASS_NESTED(PointData, Point::Data)
+{
+public:
+  btkPointData(int frameNumber);
+  BTK_SWIG_DECLARE_CLONE(PointData);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(PointData);
+};

@@ -128,12 +128,14 @@ then the scale and offset are important."
 
 BTK_SWIG_AUTODOC_IMPL(Analog, SetLabel, "SetLabel(self, string)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetDescription, "SetDescription(self, string)");
- 	BTK_SWIG_AUTODOC(Analog, SetValue, "SetValue(self, int, double)");
+BTK_SWIG_AUTODOC(Analog, SetValue, "SetValue(self, int, double)");
 BTK_SWIG_AUTODOC_IMPL(Analog, GetValues, "GetValues(self) -> array (NumPy)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetValues, "SetValues(self, array)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetFrameNumber, "SetFrameNumber(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetUnit, "SetUnit(self, string)");
 BTK_SWIG_AUTODOC_IMPL(Analog, SetGain, "SetGain(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Analog, SetData, "SetData(self, btkAnalogData, parenting = true)");
+BTK_SWIG_AUTODOC_IMPL(Analog, GetData, "GetData(self) -> btkAnalogData");
 
 BTK_SWIG_DOCSTRING(Analog, Clone, "Deep copy of the object.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetLabel, "Returns the analog's label.");
@@ -150,7 +152,29 @@ BTK_SWIG_DOCSTRING_IMPL(Analog, GetUnit, "Returns the analog's unit.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetUnit, "Sets the analog's unit.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, GetGain, "Returns the analog's gain.");
 BTK_SWIG_DOCSTRING_IMPL(Analog, SetGain, "Sets the analog's gain.");
+BTK_SWIG_DOCSTRING_IMPL(Analog, SetData, "Sets the data of this analog channel. By default, this object will take the parent of the data. Setting 'parenting' to false will unparent the old data, assign the new one, but doesn't set the point as its parent.");
+BTK_SWIG_DOCSTRING_IMPL(Analog, GetData, "Return the data of this analog channel");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetDataSlice, "Convenient method to set easily the given value with the given frame.\nWARNING: This function is not safe. There is no checking to determine if the frame is out of range or not. It has the advantage to be faster.");
+
+// ------------------------------------------------------------------------- //
+//                                 Analog::Data                              //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkAnalogData "
+Class storing the measures for one analog channel.
+"
+
+BTK_SWIG_AUTODOC_IMPL(AnalogData, GetValues, "GetValues(self) -> array (NumPy)");
+BTK_SWIG_AUTODOC_IMPL(AnalogData, SetValues, "SetValues(self, array)");
+BTK_SWIG_AUTODOC(AnalogData, SetValue, "SetValue(self, int, double)");
+BTK_SWIG_AUTODOC_IMPL(AnalogData, Resize, "Resize(self, int)");
+
+BTK_SWIG_DOCSTRING(AnalogData, Clone, "Deep copy of the object.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogData, GetValues, "Returns the analog's values.\nWARNING:You cannot set values using this method.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogData, SetValues, "Sets the analog's values.");
+BTK_SWIG_DOCSTRING(AnalogData, GetValue, "Returns only one sample.");
+BTK_SWIG_DOCSTRING(AnalogData, SetValue, "Sets only one sample.");
+BTK_SWIG_DOCSTRING_IMPL(AnalogData, Resize, "Resize the data to the given number of frames.");
 
 // ------------------------------------------------------------------------- //
 //                                    Point                                  //
@@ -182,7 +206,7 @@ Note: A residual with a value equal to 0 means that this frame has been post-pro
 
 BTK_SWIG_AUTODOC_IMPL(Point, SetLabel, "SetLabel(self, string)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetDescription, "SetDescription(self, string)");
-BTK_SWIG_AUTODOC(Point, SetValue, "SetValue(self, int, double)");
+BTK_SWIG_AUTODOC(Point, SetValue, "SetValue(self, int, int, double)");
 BTK_SWIG_AUTODOC_IMPL(Point, GetValues, "GetValues(self) -> array (NumPy)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetValues, "SetValues(self, array)");
 BTK_SWIG_AUTODOC(Point, SetResidual, "SetResidual(self, int, double)");
@@ -190,6 +214,8 @@ BTK_SWIG_AUTODOC_IMPL(Point, GetResiduals, "GetResiduals(self) -> array (NumPy)"
 BTK_SWIG_AUTODOC_IMPL(Point, SetResiduals, "SetResiduals(self, array)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetFrameNumber, "SetFrameNumber(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Point, SetType, "SetUnit(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Point, SetData, "SetData(self, btkPointData, parenting = true)");
+BTK_SWIG_AUTODOC_IMPL(Point, GetData, "GetData(self) -> btkPointData");
 
 BTK_SWIG_DOCSTRING(Point, Clone, "Deep copy of the object.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetLabel, "Returns the point's label.");
@@ -208,7 +234,36 @@ BTK_SWIG_DOCSTRING_IMPL(Point, GetFrameNumber, "Returns the number of frames.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetFrameNumber, "Sets the number of frames.");
 BTK_SWIG_DOCSTRING_IMPL(Point, GetType, "Returns the point's type.");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetType, "Sets the point's type.");
+BTK_SWIG_DOCSTRING_IMPL(Point, SetData, "Sets the data of this point. By default, this object will take the parent of the data. Setting 'parenting' to false will unparent the old data, assign the new one, but doesn't set the point as its parent.");
+BTK_SWIG_DOCSTRING_IMPL(Point, GetData, "Return the data of this point");
 BTK_SWIG_DOCSTRING_IMPL(Point, SetDataSlice, "Convenient method to easily set the coordinates x,y,z and the residual for the given frame.\nWARNING: This function is not safe. There is no checking to determine if the frame is out of range or not. It has the advantage to be faster.");
+
+// ------------------------------------------------------------------------- //
+//                                 Point::Data                               //
+// ------------------------------------------------------------------------- //
+
+%feature("docstring") btkPointData "
+Class storing the measures for a point (3D values and residuals along the time).
+"
+
+BTK_SWIG_AUTODOC_IMPL(PointData, GetValues, "GetValues(self) -> array (NumPy)");
+BTK_SWIG_AUTODOC_IMPL(PointData, SetValues, "SetValues(self, array)");
+BTK_SWIG_AUTODOC(Point, SetValue, "SetValue(self, int, int, double)");
+BTK_SWIG_AUTODOC_IMPL(PointData, GetResiduals, "GetResiduals(self) -> array (NumPy)");
+BTK_SWIG_AUTODOC_IMPL(PointData, SetResiduals, "SetResiduals(self, array)");
+BTK_SWIG_AUTODOC(Point, SetResidual, "SetResidual(self, int, double)");
+BTK_SWIG_AUTODOC_IMPL(PointData, Resize, "Resize(self, int)");
+
+BTK_SWIG_DOCSTRING(PointData, Clone, "Deep copy of the object.");
+BTK_SWIG_DOCSTRING_IMPL(PointData, GetValues, "Returns the point's values.\nWARNING:You cannot set values using this method.");
+BTK_SWIG_DOCSTRING_IMPL(PointData, SetValues, "Sets the point's values.");
+BTK_SWIG_DOCSTRING(Point, GetValue, "Returns only one value for the given component and frame.");
+BTK_SWIG_DOCSTRING(Point, SetValue, "Sets only one value for the given component and frame.");
+BTK_SWIG_DOCSTRING_IMPL(PointData, GetResiduals, "Returns the point's residuals.");
+BTK_SWIG_DOCSTRING_IMPL(PointData, SetResiduals, "Sets the point's residuals.");
+BTK_SWIG_DOCSTRING(Point, GetResidual, "Returns only one residual for the given frame.");
+BTK_SWIG_DOCSTRING(Point, SetResidual, "Sets only one residual for the given frame.");
+BTK_SWIG_DOCSTRING_IMPL(PointData, Resize, "Resize the data to the given number of frames.");
 
 // ------------------------------------------------------------------------- //
 //                                 ForcePlatform                             //

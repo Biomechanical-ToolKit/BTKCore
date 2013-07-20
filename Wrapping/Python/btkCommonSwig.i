@@ -104,9 +104,25 @@ public:
   BTK_SWIG_DECLARE_IMPL_GETSET(Gain, Gain);
   BTK_SWIG_DECLARE_IMPL_GETSET(Offset, int);
   BTK_SWIG_DECLARE_IMPL_GETSET(Scale, double);
+  btkAnalogData GetData() const;
+  void SetData(btkAnalogData , bool parenting = true);
   void SetDataSlice(int , double );
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(Analog);
+};
+
+// ------------------------------------------------------------------------- //
+//                                 Analog::Data                              //
+// ------------------------------------------------------------------------- //
+
+BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(AnalogData, Value);
+BTK_SWIG_DECLARE_IMPL_CLASS_DATA(AnalogData)
+{
+public:
+  BTK_SWIG_DECLARE_IMPL_GETSET(Values, btk::Analog::Values&);
+  void Resize(int frameNumber);
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(AnalogData);
 };
 
 // ------------------------------------------------------------------------- //
@@ -130,9 +146,27 @@ public:
   BTK_SWIG_DECLARE_IMPL_GETSET(Residuals, btk::Point::Residuals&);
   BTK_SWIG_DECLARE_IMPL_GETSET(FrameNumber, int);
   BTK_SWIG_DECLARE_IMPL_GETSET(Type, Type);
+  btkPointData GetData() const;
+  void SetData(btkPointData , bool parenting = true);
   void SetDataSlice(int , double , double , double , double res = 0.0);
 protected:  
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(Point);
+};
+
+// ------------------------------------------------------------------------- //
+//                                 Point::Data                               //
+// ------------------------------------------------------------------------- //
+
+BTK_SWIG_EXTEND_CLASS_GETSET_MATRIX(PointData, Value);
+BTK_SWIG_EXTEND_CLASS_GETSET_VECTOR(PointData, Residual);
+BTK_SWIG_DECLARE_IMPL_CLASS_DATA(PointData)
+{
+public:
+  BTK_SWIG_DECLARE_IMPL_GETSET(Values, btk::Point::Values&);
+  BTK_SWIG_DECLARE_IMPL_GETSET(Residuals, btk::Point::Residuals&);
+  void Resize(int frameNumber);
+protected:  
+  BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(PointData);
 };
 
 // ------------------------------------------------------------------------- //

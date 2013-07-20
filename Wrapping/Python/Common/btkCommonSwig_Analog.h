@@ -43,3 +43,11 @@ public:
   BTK_SWIG_DECLARE_CLONE(Analog);
   BTK_SWIG_DECLARE_POINTER_OPERATOR(Analog);
 };
+
+BTK_SWIG_DECLARE_CLASS_NESTED(AnalogData, Analog::Data)
+{
+public:
+  btkAnalogData(int frameNumber);
+  BTK_SWIG_DECLARE_CLONE(AnalogData);
+  BTK_SWIG_DECLARE_POINTER_OPERATOR(AnalogData);
+};

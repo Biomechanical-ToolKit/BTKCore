@@ -71,6 +71,15 @@ btkAnalog::btkAnalog(const std::string& label, int frameNumber)
 {};
 
 // ------------------------------------------------------------------------- //
+//                                 Analog::Data                              //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DEFINE_CLONE(AnalogData);
+
+btkAnalogData::btkAnalogData(int frameNumber)
+: btkAnalogData_shared(btk::Analog::Data::New(frameNumber))
+{};
+
+// ------------------------------------------------------------------------- //
 //                                  Point                                    //
 // ------------------------------------------------------------------------- //
 BTK_SWIG_DEFINE_CLONE(Point);
@@ -86,6 +95,15 @@ btkPoint::btkPoint(int frameNumber)
 
 btkPoint::btkPoint(const std::string& label, int frameNumber, btkPoint_impl::Type t, const std::string& desc)
 : btkPoint_shared(btk::Point::New(label, frameNumber, t, desc))
+{};
+
+// ------------------------------------------------------------------------- //
+//                                 Point::Data                               //
+// ------------------------------------------------------------------------- //
+BTK_SWIG_DEFINE_CLONE(PointData);
+
+btkPointData::btkPointData(int frameNumber)
+: btkPointData_shared(btk::Point::Data::New(frameNumber))
 {};
 
 // ------------------------------------------------------------------------- //
@@ -109,7 +127,6 @@ BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType6, ForcePlatform);
 // ------------------------------------------------------------------------- //
 //                                    Wrench                                 //
 // ------------------------------------------------------------------------- //
-
 BTK_SWIG_DEFINE_CLONE(Wrench);
 
 btkWrench::btkWrench(const std::string& label)
