@@ -1,4 +1,4 @@
-TDD_FilePathIN = '${BTK_SOURCE_DIR}/Testing/Data/Input/'
+TDD_FilePathIN = '${BTK_TESTING_DATA_PATH}/Input/'
 TDD_FilePathOUT = '${BTK_SOURCE_DIR}/Testing/Data/Output/'
 
 C3DFilePathIN = TDD_FilePathIN + 'C3DSamples/'
