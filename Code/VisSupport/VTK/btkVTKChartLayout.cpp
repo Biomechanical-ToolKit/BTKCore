@@ -123,8 +123,8 @@ namespace btk
   bool VTKChartLayout::Paint(vtkContext2D *painter)
   {
     if (this->LayoutIsDirty ||
-        this->GetScene()->GetSceneWidth() != this->Private->Geometry.X() ||
-        this->GetScene()->GetSceneHeight() != this->Private->Geometry.Y())
+        this->GetScene()->GetSceneWidth() != this->Private->Geometry.GetX() ||
+        this->GetScene()->GetSceneHeight() != this->Private->Geometry.GetY())
     {
       this->UpdateLayout();
     }
@@ -143,16 +143,16 @@ namespace btk
    */
   void VTKChartLayout::SetSize(const vtkVector2i &size)
   {
-    if ((this->Size.X() != size.X()) || (this->Size.Y() != size.Y()))
+    if ((this->Size.GetX() != size.GetX()) || (this->Size.GetY() != size.GetY()))
     {
       this->Size = size;
-      if ((size.X() * size.Y()) < static_cast<int>(this->Private->Charts.size()))
+      if ((size.GetX() * size.GetY()) < static_cast<int>(this->Private->Charts.size()))
       {
-        for (int i = static_cast<int>(this->Private->Charts.size()-1); i >= size.X() * size.Y() ; --i)
+        for (int i = static_cast<int>(this->Private->Charts.size()-1); i >= size.GetX() * size.GetY() ; --i)
           this->RemoveItem(this->Private->Charts[i]);
       }
-      this->Private->Charts.resize(size.X() * size.Y());
-      this->Private->Spans.resize(size.X() * size.Y(), vtkVector2i(1, 1));
+      this->Private->Charts.resize(size.GetX() * size.GetY());
+      this->Private->Spans.resize(size.GetX() * size.GetY(), vtkVector2i(1, 1));
       this->LayoutIsDirty = true;
     }
   }
@@ -200,9 +200,9 @@ namespace btk
    */
   bool VTKChartLayout::SetChart(const vtkVector2i &position, VTKChartTimeSeries* chart)
   {
-    if ((position.X() < this->Size.X()) && (position.Y() < this->Size.Y()))
+    if ((position.GetX() < this->Size.GetX()) && (position.GetY() < this->Size.GetY()))
     {
-      size_t index = position.Y() * this->Size.X() + position.X();
+      size_t index = position.GetY() * this->Size.GetX() + position.GetX();
       if (this->Private->Charts[index])
         this->RemoveItem(this->Private->Charts[index]);
       this->Private->Charts[index] = chart;
@@ -221,9 +221,9 @@ namespace btk
    */
   VTKChartTimeSeries* VTKChartLayout::GetChart(const vtkVector2i &position)
   {
-    if ((position.X() < this->Size.X()) && (position.Y() < this->Size.Y()))
+    if ((position.GetX() < this->Size.GetX()) && (position.GetY() < this->Size.GetY()))
     {
-      size_t index = position.Y() * this->Size.X() + position.X();
+      size_t index = position.GetY() * this->Size.GetX() + position.GetX();
       if (this->Private->Charts[index] == NULL)
       {
         vtkNew<VTKChartTimeSeries> chart;
@@ -242,9 +242,9 @@ namespace btk
    */
   VTKChartTimeSeries* VTKChartLayout::TakeChart(const vtkVector2i &position)
   {
-    if ((position.X() < this->Size.X()) && (position.Y() < this->Size.Y()))
+    if ((position.GetX() < this->Size.GetX()) && (position.GetY() < this->Size.GetY()))
     {
-      size_t index = position.Y() * this->Size.X() + position.X();
+      size_t index = position.GetY() * this->Size.GetX() + position.GetX();
       VTKChartTimeSeries* chart = this->Private->Charts[index];
       if (this->Private->Charts[index] != NULL)
       {
@@ -270,12 +270,12 @@ namespace btk
     
     // Update the chart element positions
     this->Private->Geometry.Set(this->GetScene()->GetSceneWidth(), this->GetScene()->GetSceneHeight());
-    if ((this->Size.X() > 0) && (this->Size.Y() > 0))
+    if ((this->Size.GetX() > 0) && (this->Size.GetY() > 0))
     {
       int numPlotsY = 0;
-      for (int j = 0 ; j < this->Size.Y() ; ++j)
+      for (int j = 0 ; j < this->Size.GetY() ; ++j)
       {
-        size_t index = j * this->Size.X() + 0; // Only for the first column
+        size_t index = j * this->Size.GetX() + 0; // Only for the first column
         if (this->Private->Charts[index] && this->Private->Charts[index]->GetVisible())
           ++numPlotsY;
       }
@@ -283,29 +283,29 @@ namespace btk
       {
         // Calculate the increments without the gutters/borders that must be left
         vtkVector2f increments;
-        increments.SetX((this->Private->Geometry.X() - (this->Size.X() - 1) *
-                         this->Gutter.X() - this->Borders[vtkAxis::LEFT] -
-                         this->Borders[vtkAxis::RIGHT]) / this->Size.X());
-        increments.SetY((this->Private->Geometry.Y() - (numPlotsY - 1) * this->Gutter.Y()
+        increments.SetX((this->Private->Geometry.GetX() - (this->Size.GetX() - 1) *
+                         this->Gutter.GetX() - this->Borders[vtkAxis::LEFT] -
+                         this->Borders[vtkAxis::RIGHT]) / this->Size.GetX());
+        increments.SetY((this->Private->Geometry.GetY() - (numPlotsY - 1) * this->Gutter.GetY()
                          - this->Borders[vtkAxis::TOP] - this->Borders[vtkAxis::BOTTOM]) / numPlotsY);
         float x = this->Borders[vtkAxis::LEFT];
-        for (int i = 0; i < this->Size.X(); ++i)
+        for (int i = 0; i < this->Size.GetX(); ++i)
         {
-          float y = this->Private->Geometry.Y() - this->Borders[vtkAxis::TOP] - increments.Y();
-          for (int j = 0; j < this->Size.Y(); ++j)
+          float y = this->Private->Geometry.GetY() - this->Borders[vtkAxis::TOP] - increments.GetY();
+          for (int j = 0; j < this->Size.GetY(); ++j)
           {
-            size_t index = j * this->Size.X() + i;
+            size_t index = j * this->Size.GetX() + i;
             if (this->Private->Charts[index] && this->Private->Charts[index]->GetVisible())
             {
               VTKChartTimeSeries* chart = this->Private->Charts[index];
               vtkVector2i& span = this->Private->Spans[index];
               chart->SetGeometry(vtkRectf(x, y,
-                                     increments.X() * span.X() + (span.X() - 1) * this->Gutter.X(),
-                                     increments.Y() * span.Y() + (span.Y() - 1) * this->Gutter.Y()));
-              y -= increments.Y() - this->Gutter.Y();
+                                     increments.GetX() * span.GetX() + (span.GetX() - 1) * this->Gutter.GetX(),
+                                     increments.GetY() * span.GetY() + (span.GetY() - 1) * this->Gutter.GetY()));
+              y -= increments.GetY() - this->Gutter.GetY();
             }
           }
-          x += increments.X() + this->Gutter.X();
+          x += increments.GetX() + this->Gutter.GetX();
         }
       }
     }
@@ -320,11 +320,11 @@ namespace btk
   bool VTKChartLayout::SetChartSpan(const vtkVector2i& position,
                                     const vtkVector2i& span)
   {
-    if ((this->Size.X() - position.X() - span.X() < 0) || (this->Size.Y() - position.Y() - span.Y() < 0))
+    if ((this->Size.GetX() - position.GetX() - span.GetX() < 0) || (this->Size.GetY() - position.GetY() - span.GetY() < 0))
       return false;
     else
     {
-      this->Private->Spans[position.Y() * this->Size.X() + position.X()] = span;
+      this->Private->Spans[position.GetY() * this->Size.GetX() + position.GetX()] = span;
       this->LayoutIsDirty = true;
       return true;
     }
@@ -335,8 +335,8 @@ namespace btk
    */
   vtkVector2i VTKChartLayout::GetChartSpan(const vtkVector2i& position)
   {
-    size_t index = position.Y() * this->Size.X() + position.X();
-    if ((position.X() < this->Size.X()) && (position.Y() < this->Size.Y()))
+    size_t index = position.GetY() * this->Size.GetX() + position.GetX();
+    if ((position.GetX() < this->Size.GetX()) && (position.GetY() < this->Size.GetY()))
       return this->Private->Spans[index];
     else
       return vtkVector2i(0, 0);
