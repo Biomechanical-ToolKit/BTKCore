@@ -70,6 +70,11 @@ namespace btk
     int GetItemNumber() const {return static_cast<int>(this->m_Items.size());};
     void SetItemNumber(int num);
 
+    ItemPointer GetFrontItem() {return this->m_Items.front();};
+    ItemConstPointer GetFrontItem() const {return this->m_Items.front();};
+    ItemPointer GetBackItem() {return this->m_Items.back();};
+    ItemConstPointer GetBackItem() const {return this->m_Items.back();};
+
     int GetIndexOf(ItemPointer elt) const;
     ItemPointer GetItem(int idx);
     ItemConstPointer GetItem(int idx) const;
@@ -184,6 +189,26 @@ namespace btk
     this->m_Items.resize(num);
     this->Modified();
   };
+  
+  /**
+   * @fn template <class T> ItemPointer Collection<T>::GetFrontItem()
+   * Returns the item in front of the list.
+   */
+  
+  /**
+   * @fn template <class T> ItemConstPointer Collection<T>::GetFrontItem() const
+   * Returns the item in front of the list.
+   */
+   
+  /**
+   * @fn template <class T> ItemPointer Collection<T>::GetBackItem()
+   * Returns the item in back of the list.
+   */
+   
+  /**
+   * @fn template <class T> ItemConstPointer Collection<T>::GetBackItem() const
+   * Returns the item in back of the list.
+   */
   
   /**
    * Return the index associated with the item @c elt or -1 if not found
