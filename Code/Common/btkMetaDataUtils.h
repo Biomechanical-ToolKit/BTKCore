@@ -96,6 +96,11 @@ namespace btk
   template <typename T>
   void MetaDataCreateChild_p(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val, int numCol, int inc)
   {
+    if (numCol <= 0)
+    {
+      btkErrorMacro("Number of column is null or lower than zero.");
+      return;
+    }
     if (numCol >= 256)
     {
       btkErrorMacro("Number of column is greater or equal to 256.");
