@@ -36,10 +36,10 @@
 #ifndef __btkAcquisitionFileIOFactory_p_h
 #define __btkAcquisitionFileIOFactory_p_h
 
-#include "btkAcquisitionFileIOHandle.h"
+#include "btkAcquisitionFileIORegister.h"
 
 #define BTK_REGISTER_ACQUISITION_FILE_IO(classname) \
-  this->list.push_back(AcquisitionFileIOHandle::New(btk::AcquisitionFileIOHandleFunctorConverter<classname>::New(), classname::HasReadOperation(), classname::HasWriteOperation()));
+  this->list.push_back(btk::AcquisitionFileIORegister<classname>::New());
    
 #define BTK_ACQUISITON_FILE_IO_FACTORY_INIT \
    AcquisitionFileIOHandles::AcquisitionFileIOHandles() \
@@ -54,19 +54,6 @@ namespace btk
     typedef std::list<AcquisitionFileIOHandle::Pointer>::const_iterator ConstIterator;
     AcquisitionFileIOHandles();
     std::list<AcquisitionFileIOHandle::Pointer> list;
-  };
-  
-  template <class T>
-  class AcquisitionFileIOHandleFunctorConverter : public AcquisitionFileIOHandle::Functor
-  {
-  public:
-    typedef SharedPtr<AcquisitionFileIOHandleFunctorConverter> Pointer;
-    static Pointer New() {return Pointer(new AcquisitionFileIOHandleFunctorConverter<T>());};
-    virtual AcquisitionFileIO::Pointer GetFileIO() const {return T::New();};
-  private:
-    AcquisitionFileIOHandleFunctorConverter() : AcquisitionFileIOHandle::Functor() {};
-    AcquisitionFileIOHandleFunctorConverter(const AcquisitionFileIOHandleFunctorConverter& ); // Not implemented.
-    AcquisitionFileIOHandleFunctorConverter& operator=(const AcquisitionFileIOHandleFunctorConverter& ); // Not implemented.
   };
 }
 

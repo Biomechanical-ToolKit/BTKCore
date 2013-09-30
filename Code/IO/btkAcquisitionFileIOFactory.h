@@ -37,7 +37,7 @@
 #define __btkAcquisitionFileIOFactory_h
 
 #include "btkConfigure.h"
-#include "btkAcquisitionFileIOHandle.h"
+#include "btkAcquisitionFileIORegister.h"
 
 #include <string>
 
