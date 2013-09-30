@@ -7,6 +7,14 @@ IF(NOT BTK_INSTALL_NO_DEVELOPMENT)
           PATTERN ".DS_Store" EXCLUDE
           PATTERN "CMakeLists.txt" EXCLUDE
           PATTERN ".cpp" EXCLUDE)
+  # Eigen_unsupported
+  INSTALL(DIRECTORY ${BTK_SOURCE_DIR}/Utilities/eigen3/Eigen_unsupported
+          DESTINATION ${BTK_INSTALL_INCLUDE_DIR_CM24}/Utilities
+          COMPONENT Development
+          PATTERN ".svn" EXCLUDE
+          PATTERN ".DS_Store" EXCLUDE
+          PATTERN "CMakeLists.txt" EXCLUDE
+          PATTERN ".cpp" EXCLUDE)
   # btkEigen
   INSTALL(DIRECTORY ${BTK_SOURCE_DIR}/Utilities/eigen3/btkEigen
           DESTINATION ${BTK_INSTALL_INCLUDE_DIR_CM24}/Utilities
