@@ -341,6 +341,7 @@ namespace btk
   {
     this->m_Type = toCopy.m_Type;
     this->m_FrameNumber = toCopy.m_FrameNumber;
+    this->m_Frequency = toCopy.m_Frequency;
     for (MapConstIterator it = toCopy.m_Channels.begin() ; it != toCopy.m_Channels.end() ; ++it)
       this->m_Channels.insert(std::make_pair(it->first, it->second ? it->second->Clone() : Analog::Pointer()));
   };
