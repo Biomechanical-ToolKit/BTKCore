@@ -40,6 +40,9 @@ CXXTEST_SUITE(IMUsExtractorTest)
     btk::IMUCollection::Pointer output = imuse->GetOutput();
     output->Update();
     TS_ASSERT_EQUALS(output->GetItemNumber(), 1);
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetFrameNumber(), 200);
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetChannelNumber(), 6);
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetType(), 1);
     TS_ASSERT_EQUALS(output->GetItem(0)->GetLabel(), std::string("Foo"));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetDescription(), std::string("BAR"));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerX(), acq->GetAnalog(0));
@@ -68,6 +71,8 @@ CXXTEST_SUITE(IMUsExtractorTest)
     TS_ASSERT_EQUALS(output->GetItemNumber(), 1);
     TS_ASSERT_EQUALS(output->GetItem(0)->GetLabel(), std::string("Foo"));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetDescription(), std::string(""));
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetChannelNumber(), 6);
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetType(), 1);
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerX(), acq->GetAnalog(5));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerY(), acq->GetAnalog(4));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerZ(), acq->GetAnalog(3));
@@ -93,6 +98,8 @@ CXXTEST_SUITE(IMUsExtractorTest)
     TS_ASSERT_EQUALS(output->GetItemNumber(), 1);
     TS_ASSERT_EQUALS(output->GetItem(0)->GetLabel(), std::string("IMU #1"));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetDescription(), std::string(""));
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetChannelNumber(), 6);
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetType(), 1);
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerX(), acq->GetAnalog(5));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerY(), acq->GetAnalog(4));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerZ(), acq->GetAnalog(3));
@@ -118,6 +125,8 @@ CXXTEST_SUITE(IMUsExtractorTest)
     TS_ASSERT_EQUALS(output->GetItemNumber(), 1);
     TS_ASSERT_EQUALS(output->GetItem(0)->GetLabel(), std::string("IMU #1"));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetDescription(), std::string(""));
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetChannelNumber(), 4);
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetType(), 1);
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerX(), acq->GetAnalog(5));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerY(), acq->GetAnalog(4));
     TS_ASSERT(output->GetItem(0)->GetAccelerometerZ().get() == 0);
@@ -138,6 +147,9 @@ CXXTEST_SUITE(IMUsExtractorTest)
     channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6; channels[6] = -1; channels[7] = -1; channels[8] = -1;
     channels[9] = 7; channels[10] = 8; channels[11] = 9; channels[12] = 10; channels[13] = 11; channels[14] = 12; channels[15] = 13; channels[16] = 14; channels[17] = 15;
     btk::MetaDataCreateChild(imu, "CHANNEL", channels, 9);
+    std::vector<int16_t> extra(2);
+    extra[0] = 0; extra[1] = 3;
+    btk::MetaDataCreateChild(imu, "EXTRA", extra);
     
     btk::IMUsExtractor::Pointer imuse = btk::IMUsExtractor::New();
     imuse->SetInput(acq);
@@ -148,6 +160,8 @@ CXXTEST_SUITE(IMUsExtractorTest)
 
     TS_ASSERT_EQUALS(output->GetItem(0)->GetLabel(), std::string("Foo"));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetDescription(), std::string(""));
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetChannelNumber(), 6);
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetType(), 1);
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerX(), acq->GetAnalog(0));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerY(), acq->GetAnalog(1));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerZ(), acq->GetAnalog(2));
@@ -157,6 +171,8 @@ CXXTEST_SUITE(IMUsExtractorTest)
 
     TS_ASSERT_EQUALS(output->GetItem(1)->GetLabel(), std::string("Foo"));
     TS_ASSERT_EQUALS(output->GetItem(1)->GetDescription(), std::string(""));
+    TS_ASSERT_EQUALS(output->GetItem(1)->GetChannelNumber(), 9);
+    TS_ASSERT_EQUALS(output->GetItem(1)->GetType(), 1);
     TS_ASSERT_EQUALS(output->GetItem(1)->GetAccelerometerX(), acq->GetAnalog(6));
     TS_ASSERT_EQUALS(output->GetItem(1)->GetAccelerometerY(), acq->GetAnalog(7));
     TS_ASSERT_EQUALS(output->GetItem(1)->GetAccelerometerZ(), acq->GetAnalog(8));
@@ -191,6 +207,9 @@ CXXTEST_SUITE(IMUsExtractorTest)
     channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6; channels[6] = -1; channels[7] = -1; channels[8] = -1;
     channels[9] = 7; channels[10] = 8; channels[11] = 9; channels[12] = 10; channels[13] = 11; channels[14] = 12; channels[15] = 13; channels[16] = 14; channels[17] = 15;
     btk::MetaDataCreateChild(imu, "CHANNEL", channels, 9);
+    std::vector<int16_t> extra(2);
+    extra[0] = 0; extra[1] = 3;
+    btk::MetaDataCreateChild(imu, "EXTRA", extra);
     
     btk::IMUsExtractor::Pointer imuse = btk::IMUsExtractor::New();
     imuse->SetInput(0, acq1);
@@ -202,6 +221,8 @@ CXXTEST_SUITE(IMUsExtractorTest)
     
     TS_ASSERT_EQUALS(output->GetItem(0)->GetLabel(), std::string("IMU #1"));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetDescription(), std::string("BAR"));
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetChannelNumber(), 6);
+    TS_ASSERT_EQUALS(output->GetItem(0)->GetType(), 1);
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerX(), acq1->GetAnalog(0));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerY(), acq1->GetAnalog(1));
     TS_ASSERT_EQUALS(output->GetItem(0)->GetAccelerometerZ(), acq1->GetAnalog(2));
@@ -211,6 +232,8 @@ CXXTEST_SUITE(IMUsExtractorTest)
 
     TS_ASSERT_EQUALS(output->GetItem(1)->GetLabel(), std::string("Foo"));
     TS_ASSERT_EQUALS(output->GetItem(1)->GetDescription(), std::string(""));
+    TS_ASSERT_EQUALS(output->GetItem(1)->GetChannelNumber(), 6);
+    TS_ASSERT_EQUALS(output->GetItem(1)->GetType(), 1);
     TS_ASSERT_EQUALS(output->GetItem(1)->GetAccelerometerX(), acq2->GetAnalog(0));
     TS_ASSERT_EQUALS(output->GetItem(1)->GetAccelerometerY(), acq2->GetAnalog(1));
     TS_ASSERT_EQUALS(output->GetItem(1)->GetAccelerometerZ(), acq2->GetAnalog(2));
@@ -220,6 +243,8 @@ CXXTEST_SUITE(IMUsExtractorTest)
 
     TS_ASSERT_EQUALS(output->GetItem(2)->GetLabel(), std::string("Foo"));
     TS_ASSERT_EQUALS(output->GetItem(2)->GetDescription(), std::string(""));
+    TS_ASSERT_EQUALS(output->GetItem(2)->GetChannelNumber(), 9);
+    TS_ASSERT_EQUALS(output->GetItem(2)->GetType(), 1);
     TS_ASSERT_EQUALS(output->GetItem(2)->GetAccelerometerX(), acq2->GetAnalog(6));
     TS_ASSERT_EQUALS(output->GetItem(2)->GetAccelerometerY(), acq2->GetAnalog(7));
     TS_ASSERT_EQUALS(output->GetItem(2)->GetAccelerometerZ(), acq2->GetAnalog(8));

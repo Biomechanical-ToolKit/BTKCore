@@ -34,6 +34,7 @@
  */
 
 #include "btkIMUsExtractor.h"
+#include "btkIMUTypes.h"
 #include "btkConvert.h"
 
 namespace btk
@@ -47,14 +48,19 @@ namespace btk
   * The metadata IMU must be structured as the following:
   *  - IMU:USED: single integer storing the number of IMUs ;
   *  - IMU:TYPE: 1D array of integer containing the type of IMU contained in the acquisition (see below for the supported types) ;
-  *  - IMU:CHANNEL: 2D array of integer containing of 1-based indices of the analog channels used ;
+  *  - IMU:CHANNEL: 2D array of integer containing 1-based indices of the analog channels used ;
   *  - IMU:LABELS: 1D array of strings containing the force plates' label ;
   *  - IMU:DESCRIPTIONS: 1D array of strings containing the force plates' description ;
+  *  - IMU:CAL_MATRIX (optional): 2D array (max_num_channels x max_num_channels, num_imus) of float to construct matrices used to correct alignment between sensors
+  *  - IMU:EXTRA (optional): 1D array of integer containing the number of extra channels for each IMU (e.g. ECG, altimeter, etc) ;
   *
   * The supported types are the following:
   *  - Type 1: 6D IMU with a 3D accelerometer and 3D gyroscope.
+  *  - Type 2: 6D IMU + a calibration matrix to align sensors together.
   *
-  * Note: This class is still experimental and could be modified in the next release.
+  * Note: In case your inertial sensor contain only a subset of the proposed type (for example 1D accelerometer + 2D gyroscope), you don't need to add 3 channels with 0 values. Only the metadata IMU:CHANNEL and IMU:CAL_MATRIX must be adapted in consequence. For example the value of IMU:CHANNEL could be [0 0 1 2 3 0]  (Z accelerometer on channel #1, X and Y gyroscope on #2 and #3 respectively). The metadata IMU:CAL_MATRIX will be then a matrix with 3x3 value (e.g. [1 0 0 0 1 0 0 0 1]).
+  *
+  * @note This class is still experimental and could be modified in the next release.
   *
   * @ingroup BTKBasicFilters
   */
@@ -150,12 +156,12 @@ namespace btk
             (*itType)->GetInfo()->ToInt(types);
             if (types.size() < numUnits)
             {
-              btkErrorMacro("IMU:USED and IMU:TYPE don't indicate the same number of units. The lower is kept: IMU:TYPE");
+              btkErrorMacro("IMU:USED and IMU:TYPE do not indicate the same number of units. The lower is kept: IMU:TYPE");
               numUnits = types.size();
             }
             else if (types.size() > numUnits)
             {
-              btkErrorMacro("IMU:USED and IMU:TYPE don't indicate the same number of units. The lower is kept: IMU:USED");
+              btkErrorMacro("IMU:USED and IMU:TYPE do not indicate the same number of units. The lower is kept: IMU:USED");
             }
           }
 
@@ -168,6 +174,13 @@ namespace btk
           else if (!(*itChannels)->HasInfo() || (*itChannels)->GetInfo()->GetDimensions().size() != 2)
           {
             btkErrorMacro("Wrong format for the IMU::CHANNEL entry. Impossible to extract analog channels associated with the unit(s). IMUs' data are empty.");
+            return;
+          }
+          
+          MetaData::Iterator itCalMatrix = (*itIMU)->FindChild("CAL_MATRIX");
+          if ((itCalMatrix != (*itIMU)->End()) && (!(*itChannels)->HasInfo() || (*itChannels)->GetInfo()->GetDimensions().size() != 2))
+          {
+            btkErrorMacro("Wrong format for the IMU::CAL_MATRIX entry. Impossible to extract analog channels associated with the unit(s). IMUs' data are empty.");
             return;
           }
 
@@ -189,6 +202,12 @@ namespace btk
           if (info)
             info->ToString(descs);
           descs.resize(numUnits);
+          
+          std::vector<int> extra;
+          info = (*itIMU)->ExtractChildInfo("EXTRA", MetaDataInfo::Integer, 1);
+          if (info)
+            info->ToInt(extra);
+          extra.resize(numUnits,0);
 
           AnalogCollection::Pointer analogs = input->GetAnalogs();
           std::vector<int> channelsIndex;
@@ -196,34 +215,36 @@ namespace btk
           int channelStep = (*itChannels)->GetInfo()->GetDimension(0);
           int channelNumberAlreadyExtracted = 0;
           channelsIndex.resize(numUnits*channelStep,-1);
+          std::vector<double> calibration;
+          if (itCalMatrix != (*itIMU)->End())
+          {  
+            (*itCalMatrix)->GetInfo()->ToDouble(calibration);
+            calibration.resize(numUnits*channelStep*channelStep,0.0);
+          }
           IMU::Pointer imu;
 
           for(size_t i = 0 ; i < numUnits ; ++i)
           {
-            bool newIMU = true;
             switch(types[i])
             {
             case 1:
-              imu = IMU::New();
-              this->ExtractData(imu.get(), input->GetAnalogs(), labels[i], descs[i], channelsIndex, channelStep, channelNumberAlreadyExtracted);
+              imu = IMUType1::New(labels[i], descs[i], false);
+              this->ExtractData(imu.get(), input->GetAnalogs(), channelsIndex, 6+extra[i], channelNumberAlreadyExtracted);
               break;
-            /* TODO: Implement IMMU
             case 2:
-              imu = IMMU::New();
-              this->ExtractForcePlatformDataCommon((*itFP), i, calMatrixCoefficentNumberAleadyExtracted, pOrigin, pCorners, pCalMatrix);
+              imu = IMUType2::New(labels[i], descs[i], false);
+              this->ExtractDataWithCalibrationMatrix(imu.get(), input->GetAnalogs(), &(calibration[channelNumberAlreadyExtracted*channelNumberAlreadyExtracted]), channelsIndex, 6+extra[i], channelStep, channelNumberAlreadyExtracted);
               break;
-            */
+            // TODO: Implement IMMU
             default:
-              newIMU = false;
               btkErrorMacro("Unsupported IMU type. Impossible to extract corresponding data");
+              continue;
               break;
             }
             channelNumberAlreadyExtracted += channelStep;
-            if (newIMU)
-            {
-              imu->SetFrequency(input->GetAnalogFrequency());
-              output->InsertItem(imu);
-            }
+            imu->SetFrequency(input->GetAnalogFrequency());
+            imu->SetFrameNumber(input->GetAnalogFrameNumber());
+            output->InsertItem(imu);
           }
           numTotalUnits += numUnits;
         }
@@ -231,19 +252,49 @@ namespace btk
     }
   };
   
-  void IMUsExtractor::ExtractData(IMU* imu, AnalogCollection::Pointer channels, const std::string& label, const std::string desc, std::vector<int> channelsIndex, int numberOfChannelsToExtract, int alreadyExtracted)
+  void IMUsExtractor::ExtractData(IMU* imu, AnalogCollection::Pointer channels, std::vector<int> channelsIndex, int numberOfChannelsToExtract, int alreadyExtracted)
   {
     int numberOfChannels = channels->GetItemNumber();
-    imu->SetLabel(label);
-    imu->SetDescription(desc);
-    
     for (int i = 0 ; i < numberOfChannelsToExtract ; ++i)
     {
       int index = channelsIndex[i + alreadyExtracted];
       if ((index >= 1) && (index <= numberOfChannels))
         imu->SetChannel(i, channels->GetItem(index - 1));
-      else
-        imu->SetChannel(i, Analog::Pointer());
     }
-  }
+  };
+  
+  void IMUsExtractor::ExtractDataWithCalibrationMatrix(IMU* imu, AnalogCollection::Pointer channels, double* pCalib, std::vector<int> channelsIndex, int numberOfChannelsToExtract, int channelStep, int alreadyExtracted)
+  {
+    int numberOfChannels = channels->GetItemNumber();
+    int numChannelsExtracted = 0;
+    int numberOfFrames = channels->GetItem(0)->GetFrameNumber();
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> data = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>(numberOfFrames, numberOfChannelsToExtract);
+    for (int i = 0 ; i < numberOfChannelsToExtract ; ++i)
+    {
+      int index = channelsIndex[i + alreadyExtracted];
+      if ((index >= 1) && (index <= numberOfChannels))
+      {
+        Analog::Pointer channel = Analog::New();
+        Analog::Pointer channelToCopy = channels->GetItem(index - 1);
+        channel->SetLabel(channelToCopy->GetLabel());
+        channel->SetDescription(channelToCopy->GetDescription());
+        imu->SetChannel(i, channel);
+        data.col(numChannelsExtracted) = channelToCopy->GetValues();
+        ++numChannelsExtracted;
+      }
+    }
+    data.conservativeResize(numberOfFrames,numChannelsExtracted);
+    imu->SetCalMatrix(Eigen::Map< Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> >(pCalib, channelStep, channelStep).block(0,0,numChannelsExtracted,numChannelsExtracted));
+    data *= imu->GetCalMatrix().transpose();
+    numChannelsExtracted = 0;
+    for (int i = 0 ; i < numberOfChannelsToExtract ; ++i)
+    {
+      Analog::Pointer channel = imu->GetChannel(i);
+      if (channel != 0)
+      {
+        channel->SetValues(data.col(numChannelsExtracted));
+        ++numChannelsExtracted;
+      }
+    }
+  };
 };

@@ -66,7 +66,8 @@ namespace btk
     BTK_BASICFILTERS_EXPORT virtual void GenerateData();
     
   private:
-    void ExtractData(IMU* imu, AnalogCollection::Pointer channels, const std::string& label, const std::string desc, std::vector<int> channelsIndex, int numberOfChannelsToExtract, int alreadyExtracted);
+    void ExtractData(IMU* imu, AnalogCollection::Pointer channels, std::vector<int> channelsIndex, int numberOfChannelsToExtract, int alreadyExtracted);
+    void ExtractDataWithCalibrationMatrix(IMU* imu, AnalogCollection::Pointer channels, double* pCalib, std::vector<int> channelsIndex, int numberOfChannelsToExtract, int channelStep, int alreadyExtracted);
   
     IMUsExtractor(const IMUsExtractor& ); // Not implemented.
     IMUsExtractor& operator=(const IMUsExtractor& ); // Not implemented.
