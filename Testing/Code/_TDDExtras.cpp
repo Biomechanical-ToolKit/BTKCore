@@ -7,3 +7,6 @@
 #include "CombTest.h"
 #include "CumtrapzTest.h"
 #include "Interp1Test.h"
+#include "MedianTest.h"
+#include "StdTest.h"
+#include "PercentileTest.h"

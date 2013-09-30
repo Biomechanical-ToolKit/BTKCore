@@ -109,4 +109,12 @@
   #define BTK_VTK_EXPORT
 #endif
 
+// Addons for Eigen
+// Need to be defined before the inclusion of the Eigen headers
+#define EIGEN_DENSEBASE_PLUGIN <btkEigen/Plugin/DenseBaseAddons.h>
+#define EIGEN_VECTOROP_PLUGIN <btkEigen/Plugin/VectorOpAddons.h>
+#include "btkEigen/Plugin/ForwardDeclarations.h"
+#include <Eigen/Core>
+#include "btkEigen/Plugin/Functors.h"
+
 #endif // __btkConfigure_h
