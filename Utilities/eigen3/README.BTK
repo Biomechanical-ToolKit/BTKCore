@@ -1,0 +1,10 @@
+09.24.2013 (Arnaud Barré)
+=========================
+To be able to add plugin file support to Eigen::VectorOp it was necessary to modify the original source code (Eigen/src/Core/VectorOp.h).
+
+If the current code is replaced by an update of Eigen, the next lines must be added in the file VectorOp.h (line 585) to be able to use extra vector operations in the folder btkEigen/Plugin/VectorOpAddons.h. 
+
+    // allow to extend VectorOp outside Eigen
+    #ifdef EIGEN_VECTOROP_PLUGIN
+    #include EIGEN_VECTOROP_PLUGIN
+    #endif
