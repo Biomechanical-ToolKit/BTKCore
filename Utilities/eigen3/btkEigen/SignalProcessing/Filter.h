@@ -85,7 +85,7 @@ namespace btkEigen
       btkErrorMacro("Impossible to filter the signal, the first element of the denominator is equal to 0.");
       return Y;
     }
-    else if (internal::abs(norm - 1.0) > NumTraits<Scalar>::epsilon())
+    else if (std::abs(norm - 1.0) > NumTraits<Scalar>::epsilon())
     {
       bb /= norm;
       aa /= norm;
