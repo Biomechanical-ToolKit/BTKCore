@@ -51,6 +51,10 @@ namespace btk
    *
    * @ingroup BTKCommon
    */
+ /**
+  * @var IMU::m_Type
+  * Type of the IMU. Used to determine necessary data for a particular IMU sensor.
+  */
   
   /**
    * @typedef IMU::Pointer
@@ -63,9 +67,9 @@ namespace btk
    */
     
   /**
-   * @fn static Pointer IMU::New(const std::string& label = "IMU", const std::string& desc = "");
+   * @fn static Pointer IMU::New(const std::string& label = "IMU", const std::string& desc = "", bool init = true);
    * Creates a smart pointer associated with a IMU object.
-   * @warning If you want to use the default created channels, you need to use the command SetFrameNumber as no memory is allocated for the data.
+   * @warning If you want to use the default created channels (init = true), you need to use the method SetFrameNumber as no memory is allocated for the data. In case you do not initialize the channels (init = false), you need to set yourself the channels (see SetChannel and SetChannels) and their number of frames. The later will set the internal integer used for the number of frames as well as resize the number of frames of each channel if necessry.
    */
   
   /**
@@ -120,7 +124,7 @@ namespace btk
   Analog::Pointer IMU::GetChannel(int id)
   {
     MapIterator it = this->m_Channels.find(id);
-    if ( it == this->m_Channels.end())
+    if (it == this->m_Channels.end())
       throw(OutOfRangeException("IMU::GetChannel(int)"));
     return it->second;
   };
@@ -131,7 +135,7 @@ namespace btk
   Analog::ConstPointer IMU::GetChannel(int id) const
   {
     MapConstIterator it = this->m_Channels.find(id);
-    if ( it == this->m_Channels.end())
+    if (it == this->m_Channels.end())
       throw(OutOfRangeException("IMU::GetChannel(int) const"));
     return it->second;
   };
@@ -237,6 +241,29 @@ namespace btk
    * Convenient method to return the analog channel with the ID 5 (which should correspond to a gyroscope measuring data on the Z axis of the IMU).
    */
 
+ /**
+  * @fn CalMatrix& IMU::GetCalMatrix()
+  * Returns calibration marix.
+  *
+  * @warning If you modify the object's content with this function, don't forget to call the Modified() method.
+  */
+ 
+ /**
+  * @fn const CalMatrix& IMU::GetCalMatrix() const
+  * Returns the calibration matrix.
+  */
+
+ /**
+  * Set the calibration matrix
+  */  
+ void IMU::SetCalMatrix(const CalMatrix& cal)
+ {
+   if ((this->m_CalMatrix.data() != 0) && (this->m_CalMatrix.isApprox(cal)))
+     return;
+   this->m_CalMatrix = cal;
+   this->Modified();
+ };
+  
   /**
    * @typedef IMU::Rotation
    * Type definition for Eigen 3x3 rotation matrix (of double).
@@ -289,25 +316,28 @@ namespace btk
   /**
    * Constructor
    */
-  IMU::IMU(int type, const std::string& label, const std::string& desc)
+  IMU::IMU(const std::string& label, const std::string& desc, bool init)
   : DataObjectLabeled(label, desc), m_Channels()
   {
-    this->m_Type = type;
+    this->m_Type = -1;
     this->m_FrameNumber = 0;
     this->m_Frequency = 0.0;
-    this->m_Channels.insert(std::make_pair(0,Analog::New("Acc X")));
-    this->m_Channels.insert(std::make_pair(1,Analog::New("Acc Y")));
-    this->m_Channels.insert(std::make_pair(2,Analog::New("Acc Z")));
-    this->m_Channels.insert(std::make_pair(3,Analog::New("Gyro X")));
-    this->m_Channels.insert(std::make_pair(4,Analog::New("Gyro Y")));
-    this->m_Channels.insert(std::make_pair(5,Analog::New("Gyro Z")));
+    if (init)
+    {  
+      this->m_Channels.insert(std::make_pair(0,Analog::New("Acc X")));
+      this->m_Channels.insert(std::make_pair(1,Analog::New("Acc Y")));
+      this->m_Channels.insert(std::make_pair(2,Analog::New("Acc Z")));
+      this->m_Channels.insert(std::make_pair(3,Analog::New("Gyro X")));
+      this->m_Channels.insert(std::make_pair(4,Analog::New("Gyro Y")));
+      this->m_Channels.insert(std::make_pair(5,Analog::New("Gyro Z")));
+    }
   };
   
   /**
    * Constructor of copy
    */
   IMU::IMU(const IMU& toCopy)
-  : DataObjectLabeled(toCopy), m_Channels()
+  : DataObjectLabeled(toCopy), m_Channels(), m_CalMatrix()
   {
     this->m_Type = toCopy.m_Type;
     this->m_FrameNumber = toCopy.m_FrameNumber;

@@ -50,9 +50,10 @@ namespace btk
   public:
     typedef SharedPtr<IMU> Pointer;
     typedef SharedPtr<const IMU> ConstPointer;
-
-    static Pointer New(const std::string& label = "IMU", const std::string& desc = "") {return Pointer(new IMU(1, label, desc));};
     
+    typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> CalMatrix;
+    typedef Eigen::Matrix<double,3,3> Rotation;
+
     BTK_COMMON_EXPORT void SetChannels(Analog::Pointer accX, Analog::Pointer accY, Analog::Pointer accZ, 
                                        Analog::Pointer gyroX, Analog::Pointer gyroY, Analog::Pointer gyroZ);
     BTK_COMMON_EXPORT AnalogCollection::Pointer GetChannels();
@@ -78,14 +79,19 @@ namespace btk
     Analog::Pointer GetGyroscopeY() {return this->GetChannelMap(4);};
     Analog::Pointer GetGyroscopeZ() {return this->GetChannelMap(5);};
     
-    typedef Eigen::Matrix<double,3,3> Rotation;
+    CalMatrix& GetCalMatrix() {return this->m_CalMatrix;};
+    const CalMatrix& GetCalMatrix() const {return this->m_CalMatrix;};
+    BTK_COMMON_EXPORT void SetCalMatrix(const CalMatrix& cal);
+    
     BTK_COMMON_EXPORT void Rotate(const Rotation& R);
     
     Pointer Clone() const {return Pointer(new IMU(*this));};
 
   protected:
-    BTK_COMMON_EXPORT IMU(int type, const std::string& label, const std::string& desc);
+    BTK_COMMON_EXPORT IMU(const std::string& label, const std::string& desc, bool init);
     BTK_COMMON_EXPORT IMU(const IMU& toCopy);
+    
+    int m_Type;
 
   private:
     typedef std::map<int,Analog::Pointer>::iterator MapIterator;
@@ -124,17 +130,10 @@ namespace btk
   
     IMU& operator=(const IMU& ); // Not implemented.
   
-    int m_Type;
     int m_FrameNumber;
     double m_Frequency;
     std::map<int,Analog::Pointer> m_Channels;
+    CalMatrix m_CalMatrix;
   };
-  
-  // TODO: Create a class IMMU inheriting from IMU
-  // Type I: IMU
-  // Type II: IMMU
-  // Analog::Pointer GetMagnetometerX() {return this->GetChannel(6);};
-  // Analog::Pointer GetMagnetometerY() {return this->GetChannel(7);};
-  // Analog::Pointer GetMagnetometerZ() {return this->GetChannel(8);};
 };
 #endif
