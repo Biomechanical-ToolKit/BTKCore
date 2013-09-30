@@ -1,8 +1,6 @@
 #ifndef MedianTest_h
 #define MedianTest_h
 
-#include <btkConfigure.h>
-
 CXXTEST_SUITE(MedianTest)
 {
   CXXTEST_TEST(VectorXd)

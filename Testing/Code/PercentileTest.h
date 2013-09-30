@@ -1,8 +1,7 @@
 #ifndef PrecentileTest_h
 #define PrecentileTest_h
 
-#include <btkConfigure.h>
-#include <algorithm>
+#include <algorithm> // std::sort
 
 CXXTEST_SUITE(PrecentileTest)
 {

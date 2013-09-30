@@ -1,8 +1,6 @@
 #ifndef StdTest_h
 #define StdTest_h
 
-#include <btkConfigure.h>
-
 CXXTEST_SUITE(StdTest)
 {
   CXXTEST_TEST(VectorXd)

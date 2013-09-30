@@ -1,6 +1,8 @@
 #ifndef _TDDConfigure_h
 #define _TDDConfigure_h
 
+#include <btkConfigure.h>
+
 #define TDD_FilePathIN "${BTK_TESTING_DATA_PATH}/Input/"
 #define TDD_FilePathOUT "${BTK_SOURCE_DIR}/Testing/Data/Output/"
 
