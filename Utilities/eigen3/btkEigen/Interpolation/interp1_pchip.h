@@ -88,7 +88,6 @@ namespace btkEigen
       Scalar h01 = -c2*t*t*t + c3*t*t;
       Scalar h11 = t*t*t - t*t;
       double val = this->yy->coeff(klo)*h00 + h*this->dk.coeff(klo)*h10 + this->yy->coeff(khi)*h01 + h*this->dk.coeff(khi)*h11;
-      //std::cout << "x:" << x << " ; j:" << j << " ; val:" << val << std::endl;
       return val;
   	};
     
@@ -122,7 +121,6 @@ namespace btkEigen
         this->dk.coeffRef(num-1) = 0.0;
       else if ((sign(mk.coeff(num-2)) != sign(mk.coeff(num-3))) && (std::fabs(dk.coeff(num-1)) > std::fabs(3.0*mk.coeff(num-2))))
         this->dk.coeffRef(num-1) = 3.0*mk.coeff(num-2);
-      // std::cout << "\n" << dk << std::endl;
 #else
       // ScyPy method
       VectorType w1 = 2.0 * hk.segment(1,num-2) + hk.segment(0,num-2);
