@@ -79,7 +79,7 @@ namespace btkEigen
   {
     MatrixBase<OtherDerived>& out_ = const_cast< MatrixBase<OtherDerived>& >(out);
     out_.derived().setZero(in.rows(), in.cols());
-    cumsum(out_.block(1,0,out_.rows()-1,out_.cols()), (in.topRows(in.rows()-1) + in.bottomRows(in.rows()-1)) * 0.5);
+    cumsum(out_.middleRows(1,out_.rows()-1), (in.topRows(in.rows()-1) + in.bottomRows(in.rows()-1)) * 0.5);
   };
   
   /**
