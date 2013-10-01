@@ -339,8 +339,7 @@ Force platform composed of 8 channels:
  - FX12: Horizontal forces measured by the sensors 1 & 2;
  - FX34: Horizontal forces measured by the sensors 3 & 4;
  - FY14: Horizontal forces measured by the sensors 1 & 4;
- - FY23: Horizontal forces measured by the sensors 2 & 3.
-"
+ - FY23: Horizontal forces measured by the sensors 2 & 3."
 
 %feature("docstring") btkForcePlatformType4 "
 Force platform composed of 6 channels and a 6 columns by 6 rows calibration matrix. 

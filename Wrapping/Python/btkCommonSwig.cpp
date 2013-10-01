@@ -109,7 +109,6 @@ btkPointData::btkPointData(int frameNumber)
 // ------------------------------------------------------------------------- //
 //                                 ForcePlatform                             //
 // ------------------------------------------------------------------------- //
-BTK_SWIG_DEFINE_DEFAULT_CTOR(ForcePlatform);
 BTK_SWIG_DEFINE_CLONE(ForcePlatform);
 
 BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType1, ForcePlatform);

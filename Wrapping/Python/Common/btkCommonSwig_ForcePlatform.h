@@ -36,9 +36,10 @@
 BTK_SWIG_DECLARE_CLASS(ForcePlatform)
 {
 public:
-  BTK_SWIG_DECLARE_DEFAULT_CTOR(ForcePlatform);
   BTK_SWIG_DECLARE_CLONE(ForcePlatform);
   BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatform);
+private:
+  BTK_SWIG_DECLARE_DEFAULT_CTOR(ForcePlatform);
 };
 
 BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType1, ForcePlatform)

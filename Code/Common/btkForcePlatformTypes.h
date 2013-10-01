@@ -44,12 +44,7 @@ namespace btk
   class ForcePlatformType : public ForcePlatform
   {
   public:
-    typedef SharedPtr<ForcePlatformType> Pointer;
-    typedef SharedPtr<const ForcePlatformType> ConstPointer;
-
-    static Pointer New() {return Pointer(new ForcePlatformType());};
-
-    ~ForcePlatformType() {};
+    static ForcePlatform::Pointer New() {return ForcePlatform::Pointer(new ForcePlatformType());};
 
   protected:
     ForcePlatformType();
@@ -101,11 +96,13 @@ namespace btk
 
   /**
    * @class ForcePlatformType btkForcePlatformTypes.h
-   * @brief Represents a concrete force platform
+   * @brief Convenient class to represent a concrete force platform
    *
    * @tparam t Force platform type
    * @tparam r Number of rows in the calibration matrix
    * @tparam c Number of columns in the calibration matrix. Set also the number of channels.
+   * 
+   * This class helps to create a configured force platform (ForcePlatform::Pointer object) with required number of channels, calibration matrix, etc. The list of supported force platforms is presented below.
    *
    * Several force platform types are already provided:
    * - btk::ForcePlatformType1: Force platform Type-1 (6 channels: FX, FY, FZ, PX, PY, MZ)
@@ -114,6 +111,8 @@ namespace btk
    * - btk::ForcePlatformType4: Force platform Type-4 (Same as Type-2 + calibration matrix 6 by 6)
    * - btk::ForcePlatformType5: Force platform Type-5 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23 + calibration matrix 6 (columns) by 8 (rows))
    * - btk::ForcePlatformType6: Force platform Type-6 (12 channels: FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4] + calibration matrix 12 by 12)
+   *
+   * @warning The use of the New() static method will return a ForcePlatofrm::Pointer object.
    *
    * @ingroup BTKCommon
    */
@@ -147,7 +146,7 @@ namespace btk
   {
     this->m_Type = t;
     this->m_Channels->SetItemNumber(c);
-    this->m_CalMatrix = CalMatrix::Identity(r, c);
+    this->m_CalMatrix.setIdentity(r, c);
   };
 };
 

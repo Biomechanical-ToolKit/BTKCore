@@ -106,11 +106,6 @@ namespace btk
    */
 
   /**
-   * @fn static Pointer ForcePlatform::New()
-   * Creates a smart pointer associated with a ForcePlatform object.
-   */
-
-  /**
    * @fn ForcePlatform::~ForcePlatform()
    * Empty destructor.
    */

@@ -57,8 +57,7 @@ namespace btk
     typedef AnalogCollection::Iterator Iterator;
     typedef AnalogCollection::ConstIterator ConstIterator;
 
-    static Pointer New() {return Pointer(new ForcePlatform());};
-    ~ForcePlatform() {};
+    virtual ~ForcePlatform() {};
     
     Iterator Begin() {return this->m_Channels->Begin();};
     ConstIterator Begin() const {return this->m_Channels->Begin();};

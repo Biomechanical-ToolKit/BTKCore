@@ -3,12 +3,6 @@ import unittest
 import numpy
 
 class ForcePlatformTypesTest(unittest.TestCase):
-    def test_ForcePlatform(self):
-        pf = btk.btkForcePlatform()
-        self.assertEqual(pf.GetType(), 0)
-        self.assertEqual(numpy.all(pf.GetOrigin() == numpy.zeros((3,1))), True)
-        self.assertEqual(pf.GetChannelNumber(), 0)
-
     def test_ForcePlatformType1(self):
         pf = btk.btkForcePlatformType1()
         self.assertEqual(pf.GetType(), 1)
