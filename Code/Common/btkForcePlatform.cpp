@@ -309,10 +309,9 @@ namespace btk
   { 
     this->m_Origin << 0.0, 0.0, 0.0;
     // By default the force platform is square with a side length of 500mm.
-    this->m_Corners << 1.0, 1.0, 0.0,
-                      -1.0, 1.0, 0.0,
-                      -1.0,-1.0, 0.0,
-                       1.0,-1.0, 0.0;
+    this->m_Corners << 1.0, -1.0, -1.0,  1.0,
+                       1.0,  1.0, -1.0, -1.0,
+                       0.0,  0.0,  0.0,  0.0;
     this->m_Corners *= 250;
     this->m_Channels = AnalogCollection::New();
     this->m_Type = 0;
