@@ -111,17 +111,35 @@ btkPointData::btkPointData(int frameNumber)
 // ------------------------------------------------------------------------- //
 BTK_SWIG_DEFINE_CLONE(ForcePlatform);
 
-BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType1, ForcePlatform);
+btkForcePlatform btkForcePlatformType1()
+{
+  return btkForcePlatform_shared(btk::ForcePlatformType1::New());
+};
 
-BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType2, ForcePlatform);
+btkForcePlatform btkForcePlatformType2()
+{
+  return btkForcePlatform_shared(btk::ForcePlatformType2::New());
+};
 
-BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType3, ForcePlatform);
+btkForcePlatform btkForcePlatformType3()
+{
+  return btkForcePlatform_shared(btk::ForcePlatformType3::New());
+};
 
-BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType4, ForcePlatform);
+btkForcePlatform btkForcePlatformType4()
+{
+  return btkForcePlatform_shared(btk::ForcePlatformType4::New());
+};
 
-BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType5, ForcePlatform);
+btkForcePlatform btkForcePlatformType5()
+{
+  return btkForcePlatform_shared(btk::ForcePlatformType5::New());
+};
 
-BTK_SWIG_DEFINE_DEFAULT_INHERIT_CTOR(ForcePlatformType6, ForcePlatform);
+btkForcePlatform btkForcePlatformType6()
+{
+  return btkForcePlatform_shared(btk::ForcePlatformType6::New());
+};
 
 // ------------------------------------------------------------------------- //
 //                                    Wrench                                 //

@@ -203,24 +203,6 @@ protected:
   BTK_SWIG_DECLARE_IMPL_DEFAULT_CTOR(ForcePlatform);
 };
 
-BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType1) : public btkForcePlatform_impl
-{};
-
-BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType2) : public btkForcePlatform_impl
-{};
-
-BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType3) : public btkForcePlatform_impl
-{};
-
-BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType4) : public btkForcePlatform_impl
-{};
-
-BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType5) : public btkForcePlatform_impl
-{};
-
-BTK_SWIG_DECLARE_IMPL_CLASS(ForcePlatformType6) : public btkForcePlatform_impl
-{};
-
 // ------------------------------------------------------------------------- //
 //                                    Wrench                                 //
 // ------------------------------------------------------------------------- //

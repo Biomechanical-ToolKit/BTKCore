@@ -42,44 +42,9 @@ private:
   BTK_SWIG_DECLARE_DEFAULT_CTOR(ForcePlatform);
 };
 
-BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType1, ForcePlatform)
-{
-public:
-  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType1, ForcePlatform);
-  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType1);
-};
-
-BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType2, ForcePlatform)
-{
-public:
-  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType2, ForcePlatform);
-  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType2);
-};
-
-BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType3, ForcePlatform)
-{
-public:
-  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType3, ForcePlatform);
-  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType3);
-};
-
-BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType4, ForcePlatform)
-{
-public:
-  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType4, ForcePlatform);
-  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType4);
-};
-
-BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType5, ForcePlatform)
-{
-public:
-  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType5, ForcePlatform);
-  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType5);
-};
-
-BTK_SWIG_DECLARE_CLASS_INHERIT(ForcePlatformType6, ForcePlatform)
-{
-public:
-  BTK_SWIG_DECLARE_DEFAULT_INHERIT_CTOR(ForcePlatformType6, ForcePlatform);
-  BTK_SWIG_DECLARE_POINTER_OPERATOR(ForcePlatformType6);
-};
+btkForcePlatform btkForcePlatformType1();
+btkForcePlatform btkForcePlatformType2();
+btkForcePlatform btkForcePlatformType3();
+btkForcePlatform btkForcePlatformType4();
+btkForcePlatform btkForcePlatformType5();
+btkForcePlatform btkForcePlatformType6();
