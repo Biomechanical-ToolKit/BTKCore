@@ -118,6 +118,8 @@ class IMUsExtractorTest(unittest.TestCase):
     channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6; channels[6] = -1; channels[7] = -1; channels[8] = -1
     channels[9] = 7; channels[10] = 8; channels[11] = 9; channels[12] = 10; channels[13] = 11; channels[14] = 12; channels[15] = 13; channels[16] = 14; channels[17] = 15
     btk.btkMetaDataCreateChild(imu, 'CHANNEL', channels, 9)
+    extra = btk.btkIntArray(2); extra[0] = 0; extra[1] = 3;
+    btk.btkMetaDataCreateChild(imu, 'EXTRA', extra)
     imuse = btk.btkIMUsExtractor()
     imuse.SetInput(acq)
     output = imuse.GetOutput()
@@ -164,6 +166,8 @@ class IMUsExtractorTest(unittest.TestCase):
     channels[0] = 1; channels[1] = 2; channels[2] = 3; channels[3] = 4; channels[4] = 5; channels[5] = 6; channels[6] = -1; channels[7] = -1; channels[8] = -1
     channels[9] = 7; channels[10] = 8; channels[11] = 9; channels[12] = 10; channels[13] = 11; channels[14] = 12; channels[15] = 13; channels[16] = 14; channels[17] = 15
     btk.btkMetaDataCreateChild(imu, 'CHANNEL', channels, 9)
+    extra = btk.btkIntArray(2); extra[0] = 0; extra[1] = 3;
+    btk.btkMetaDataCreateChild(imu, 'EXTRA', extra)
     imuse = btk.btkIMUsExtractor()
     imuse.SetInput(0, acq1)
     imuse.SetInput(1, acq2)
