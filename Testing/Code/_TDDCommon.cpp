@@ -2,6 +2,7 @@
 
 #include "AcquisitionTest.h"
 #include "ForcePlatformTypesTest.h"
+#include "IMUTypesTest.h"
 #include "PointTest.h"
 #include "PointCollectionTest.h"
 #include "MetaDataInfoTest.h"

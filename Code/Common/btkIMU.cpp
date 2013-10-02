@@ -65,11 +65,10 @@ namespace btk
    * @typedef IMU::ConstPointer
    * Smart pointer associated with a const IMU object.
    */
-    
+
   /**
-   * @fn static Pointer IMU::New(const std::string& label = "IMU", const std::string& desc = "", bool init = true);
-   * Creates a smart pointer associated with a IMU object.
-   * @warning If you want to use the default created channels (init = true), you need to use the method SetFrameNumber as no memory is allocated for the data. In case you do not initialize the channels (init = false), you need to set yourself the channels (see SetChannel and SetChannels) and their number of frames. The later will set the internal integer used for the number of frames as well as resize the number of frames of each channel if necessry.
+   * @fn IMU::~IMU()
+   * Empty destructor.
    */
   
   /**
@@ -254,7 +253,7 @@ namespace btk
   */
 
  /**
-  * Set the calibration matrix
+  * Sets the calibration matrix. Assigning a calibration matrix won't change sensors' values. This is only an informative member to know what is the orientation between the sensors. However the filter btk::IMUsExtractor can adapt sensors' values to have aligned measurements.
   */  
  void IMU::SetCalMatrix(const CalMatrix& cal)
  {
@@ -317,7 +316,7 @@ namespace btk
    * Constructor
    */
   IMU::IMU(const std::string& label, const std::string& desc, bool init)
-  : DataObjectLabeled(label, desc), m_Channels()
+  : DataObjectLabeled(label, desc), m_Channels(), m_CalMatrix()
   {
     this->m_Type = -1;
     this->m_FrameNumber = 0;
@@ -337,7 +336,7 @@ namespace btk
    * Constructor of copy
    */
   IMU::IMU(const IMU& toCopy)
-  : DataObjectLabeled(toCopy), m_Channels(), m_CalMatrix()
+  : DataObjectLabeled(toCopy), m_Channels(), m_CalMatrix(toCopy.m_CalMatrix)
   {
     this->m_Type = toCopy.m_Type;
     this->m_FrameNumber = toCopy.m_FrameNumber;

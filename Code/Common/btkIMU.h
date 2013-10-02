@@ -54,6 +54,8 @@ namespace btk
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> CalMatrix;
     typedef Eigen::Matrix<double,3,3> Rotation;
 
+    virtual ~IMU() {};
+
     BTK_COMMON_EXPORT void SetChannels(Analog::Pointer accX, Analog::Pointer accY, Analog::Pointer accZ, 
                                        Analog::Pointer gyroX, Analog::Pointer gyroY, Analog::Pointer gyroZ);
     BTK_COMMON_EXPORT AnalogCollection::Pointer GetChannels();

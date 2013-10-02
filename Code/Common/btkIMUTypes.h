@@ -44,12 +44,7 @@ namespace btk
   class IMUType : public IMU
   {
   public:
-    typedef SharedPtr<IMUType> Pointer;
-    typedef SharedPtr<const IMUType> ConstPointer;
-
-    static Pointer New(const std::string& label = "IMU", const std::string& desc = "", bool init = true) {return Pointer(new IMUType(label, desc, init));};
-
-    ~IMUType() {};
+    static IMU::Pointer New(const std::string& label = "IMU", const std::string& desc = "", bool init = true) {return Pointer(new IMUType(label, desc, init));};
 
   protected:
     IMUType(const std::string& label, const std::string& desc, bool init);
@@ -67,7 +62,7 @@ namespace btk
    */
   typedef IMUType<1> IMUType1;
   /**
-   * Represents IMU Type-2 (Type 1 + calibration matrix to align accelerometers and gyroscopes together)
+   * Represents IMU Type-2 (Type 1 + calibration matrix used to align accelerometers and gyroscopes on the same inertial reference frame)
    * @ingroup BTKCommon
    */
   typedef IMUType<2> IMUType2;
@@ -76,13 +71,17 @@ namespace btk
 
   /**
    * @class IMUType btkIMUTypes.h
-   * @brief Represents a concrete IMU
+   * @brief Convenient class to represents a concrete IMU
    *
    * @tparam t IMU type
+   *
+   * This class helps to create a configured IMU::Pointer object with required number of channels, calibration matrix, etc. The list of supported IMUs is presented below.
    *
    * Some IMU types are already provided:
    * - btk::IMUType1: IMU Type-1 (6D: 3 accelerometers and 3 gyroscopes)
    * - btk::IMUType2: IMU Type-2 (Type 1 + calibration matrix to align accelerometers and gyroscopes together)
+   *
+   * @warning The use of the New() static method will return a IMU::Pointer object.
    *
    * @ingroup BTKCommon
    */
