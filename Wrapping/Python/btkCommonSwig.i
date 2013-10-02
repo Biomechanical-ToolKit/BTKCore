@@ -180,6 +180,26 @@ protected:
 
 %include "Common/btkCommonSwig_ForcePlatform.h"
 
+%extend btkForcePlatform
+{ 
+  %pythoncode
+  { 
+    def SetOrigin(self, *args):
+      if (len(args) == 1):
+        self._set_origin_1(*args)
+      else:
+        self._set_origin_2(*args)
+        
+    def SetCorner(self, *args):
+      if (len(args) == 2):
+        self._set_corner_1(*args)
+      elif (len(args) == 3):
+        self._set_corner_2(*args)
+      else:
+        self._set_corner_3(*args) 
+  }
+}
+
 BTK_SWIG_DECLARE_IMPL_CLASS_DATA(ForcePlatform)
 {
 public:
@@ -190,9 +210,14 @@ public:
   btkAnalog GetChannel(int );
   void SetChannel(int , btkAnalog );
   btkAnalogCollection GetChannels() const;
+  %rename(_set_origin_1) SetOrigin(const btk::ForcePlatform::Origin& );
+  %rename(_set_origin_2) SetOrigin(double , double , double );
   BTK_SWIG_DECLARE_IMPL_GETSET(Origin, btk::ForcePlatform::Origin& );
   void SetOrigin(double , double , double );
   const btk::ForcePlatform::Corner GetCorner(int ) const;
+  %rename(_set_corner_1) SetCorner(int , const btk::ForcePlatform::Corner& );
+  %rename(_set_corner_2) SetCorner(int , int , double );
+  %rename(_set_corner_3) SetCorner(int , double , double , double );
   void SetCorner(int , int , double );
   void SetCorner(int , double , double , double );
   void SetCorner(int , const btk::ForcePlatform::Corner& );

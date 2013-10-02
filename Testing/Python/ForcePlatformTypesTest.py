@@ -8,11 +8,24 @@ class ForcePlatformTypesTest(unittest.TestCase):
         self.assertEqual(pf.GetType(), 1)
         self.assertEqual(numpy.all(pf.GetOrigin() == numpy.zeros((3,1))), True)
         self.assertEqual(pf.GetChannelNumber(), 6)
+        pf.SetOrigin(numpy.array([[1.],[1.],[1.]]));
+        self.assertEqual(numpy.all(pf.GetOrigin() == numpy.ones((3,1))), True)
+        pf.SetOrigin(0.,0.,0.);
+        self.assertEqual(numpy.all(pf.GetOrigin() == numpy.zeros((3,1))), True)
 
     def test_ForcePlatformType2(self):
         pf = btk.btkForcePlatformType2()
         self.assertEqual(pf.GetType(), 2)
         self.assertEqual(pf.GetChannelNumber(), 6)
+        pf.SetCorner(2,2,2.);
+        self.assertEqual(pf.GetCorner(2)[2], 2.)
+        pf.SetCorner(1,numpy.array([[1.],[1.],[1.]]));
+        self.assertEqual(numpy.all(pf.GetCorner(1) == numpy.ones((3,1))), True)
+        pf.SetCorner(3,5.,6.,7.);
+        c4 = numpy.array([[5.],[6.],[7.]]);
+        self.assertEqual(numpy.all(pf.GetCorner(3) == c4), True)
+        corners = numpy.array([[250.,1.,-250.,5.],[250.,1.,-250.,6.],[0.,1.,2.,7.]]);
+        self.assertEqual(numpy.all(pf.GetCorners() == corners), True)
 
     def test_ForcePlatformType3(self):
         pf = btk.btkForcePlatformType3()
