@@ -407,7 +407,7 @@ used for 3 accelerometers and 3 gyroscopes as some convenient methods are propos
 
 The storage of the channel is done using an ID and not an array index. You can then use the same ID for some kind of sensor even if other are missing (i.e. IMU with accelerometers disabled or configured with 1 acc, and 2 gyros., etc.).
 
-Note: This class is still experimental and could be modified in the next release."
+Note: This class is still experimental and could be modified in a new release."
 
 BTK_SWIG_AUTODOC_IMPL(IMU, SetChannels, "SetChannels(self, btkAnalog, btkAnalog, btkAnalog, btkAnalog, btkAnalog, btkAnalog)");
 BTK_SWIG_AUTODOC_IMPL(IMU, GetChannels, "GetChannels(self) -> btkAnalogCollection");
@@ -420,6 +420,8 @@ BTK_SWIG_AUTODOC_IMPL(IMU, GetAccelerometerZ, "GetAccelerometerZ(self) -> btkAna
 BTK_SWIG_AUTODOC_IMPL(IMU, GetGyroscopeX, "GetGyroscopeX(self) -> btkAnalog");
 BTK_SWIG_AUTODOC_IMPL(IMU, GetGyroscopeY, "GetGyroscopeY(self) -> btkAnalog");
 BTK_SWIG_AUTODOC_IMPL(IMU, GetGyroscopeZ, "GetGyroscopeZ(self) -> btkAnalog");
+BTK_SWIG_AUTODOC_IMPL(IMU, GetCalMatrix, "GetCalMatrix(self) -> array (NumPy)");
+BTK_SWIG_AUTODOC_IMPL(IMU, SetCalMatrix, "SetCalMatrix(self, array)");
 
 BTK_SWIG_DOCSTRING_IMPL(IMU, SetChannels, "Sets the 6 first channels of the IMUs with the analog channels @a accX, @a accY, @a accZ, @a gyroX, @a gyroY, @a gyroZ.");
 BTK_SWIG_DOCSTRING_IMPL(IMU, GetChannels, "Returns the analog channels of the IMU in a collection. The analog channels are pushed in the collection by using their ID.");
@@ -436,7 +438,14 @@ BTK_SWIG_DOCSTRING_IMPL(IMU, GetGyroscopeX, "Convenient method to return the ana
 BTK_SWIG_DOCSTRING_IMPL(IMU, GetGyroscopeY, "Convenient method to return the analog channel with the ID 4 (which should correspond to a gyroscope measuring data on the Y axis of the IMU).");
 BTK_SWIG_DOCSTRING_IMPL(IMU, GetGyroscopeZ, "Convenient method to return the analog channel with the ID 5 (which should correspond to a gyroscope measuring data on the Z axis of the IMU).");
 BTK_SWIG_DOCSTRING_IMPL(IMU, Rotate, "Convenient method to rotate the analog channels with the IDs 0-5. This method handles the case where some of these analog channels are missing.");
-BTK_SWIG_DOCSTRING(IMU, Clone, "Deep copy of the object");
+BTK_SWIG_DOCSTRING_IMPL(IMU, GetChannelNumber, "Returns the number of analog channels associated to this IMU.");
+BTK_SWIG_DOCSTRING_IMPL(IMU, GetType, "Returns the type of the IMU.");
+
+%feature("docstring") btkIMUType1 "
+IMU 6D (3 accelerometers and 3 gyroscopes)."
+
+%feature("docstring") btkIMUType2 "
+IMU 6D (same as Type 1) with a calibration matrix used to align sensors (accelerometers and gyroscopes) on the same inertial reference frame."
 
 // ------------------------------------------------------------------------- //
 //                              EventCollection                              //

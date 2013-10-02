@@ -48,6 +48,7 @@
 #include <btkForcePlatformTypes.h>
 #include <btkWrench.h>
 #include <btkIMU.h>
+#include <btkIMUTypes.h>
 #include <btkEventCollection.h>
 #include <btkAnalogCollection.h>
 #include <btkPointCollection.h>

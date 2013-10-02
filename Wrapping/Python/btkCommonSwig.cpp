@@ -163,10 +163,15 @@ btkWrench::btkWrench(const std::string& label, int frameNumber)
 // ------------------------------------------------------------------------- //
 BTK_SWIG_DEFINE_CLONE(IMU);
 
-btkIMU::btkIMU(const std::string& label, const std::string& desc)
-: btkIMU_shared(btk::IMU::New(label, desc))
-{};
+btkIMU btkIMUType1(const std::string& label, const std::string& desc, bool init)
+{
+  return btkIMU_shared(btk::IMUType1::New(label, desc, init));
+};
 
+btkIMU btkIMUType2(const std::string& label, const std::string& desc, bool init)
+{
+  return btkIMU_shared(btk::IMUType2::New(label, desc, init));
+};
 
 // ------------------------------------------------------------------------- //
 //                                Collection                                 //

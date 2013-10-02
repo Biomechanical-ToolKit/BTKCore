@@ -250,9 +250,10 @@ protected:
 //                                    IMU                                    //
 // ------------------------------------------------------------------------- //
 
-%include "Common/btkCommonSwig_IMU.h"
-
 %eigen_typemaps(btk::IMU::Rotation)
+%eigen_typemaps(btk::IMU::CalMatrix)
+
+%include "Common/btkCommonSwig_IMU.h"
 
 BTK_SWIG_DECLARE_IMPL_CLASS_DATA(IMU)
 {
@@ -264,10 +265,13 @@ public:
   void SetChannel(int , btkAnalog );
   btkAnalog GetChannel(int );
   btkAnalog GetChannel(const std::string& );
+  int GetChannelNumber() const;
+  int GetType() const;
   int GetFrameNumber() const;
   void SetFrameNumber(int fn);
   double GetFrequency() const;
   void SetFrequency(double f);
+  BTK_SWIG_DECLARE_IMPL_GETSET(CalMatrix, btk::IMU::CalMatrix& );
   btkAnalog GetAccelerometerX();
   btkAnalog GetAccelerometerY();
   btkAnalog GetAccelerometerZ();

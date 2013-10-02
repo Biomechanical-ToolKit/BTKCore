@@ -36,7 +36,11 @@
 BTK_SWIG_DECLARE_CLASS(IMU)
 {
 public:
-  btkIMU(const std::string& label = "IMU", const std::string& desc = "");
   BTK_SWIG_DECLARE_CLONE(IMU);
   BTK_SWIG_DECLARE_POINTER_OPERATOR(IMU);
+private:
+  BTK_SWIG_DECLARE_DEFAULT_CTOR(IMU);
 };
+
+btkIMU btkIMUType1(const std::string& label = "IMU", const std::string& desc = "", bool init = true);
+btkIMU btkIMUType2(const std::string& label = "IMU", const std::string& desc = "", bool init = true);
