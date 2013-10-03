@@ -1,6 +1,7 @@
 #include "_TDDConfigure.h"
 
 #include "AcquisitionTest.h"
+#include "AnalogTest.h"
 #include "ForcePlatformTypesTest.h"
 #include "IMUTypesTest.h"
 #include "PointTest.h"

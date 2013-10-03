@@ -55,6 +55,15 @@ CXXTEST_SUITE(PointTest)
     TS_ASSERT(t1 < t2);
   };
   
+  CXXTEST_TEST(DataClone)
+  {
+    btk::Point::Pointer point = btk::Point::New("HEEL_R", 5);
+    point->SetValues(Eigen::Matrix<double,Eigen::Dynamic,3>::Random(5,3));
+    btk::Point::Pointer cloned = point->Clone();
+    for (int i = 0 ; i < 15 ; ++i)
+      TS_ASSERT_DELTA(cloned->GetValues().coeff(i),point->GetValues().coeff(i),1e-15);
+  };
+  
   CXXTEST_TEST(EigenDataFromMap)
   {
     double data[12] = {1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0};
@@ -107,6 +116,7 @@ CXXTEST_TEST_REGISTRATION(PointTest, Constructor)
 CXXTEST_TEST_REGISTRATION(PointTest, FrameNumber)
 CXXTEST_TEST_REGISTRATION(PointTest, DataWithParent)
 CXXTEST_TEST_REGISTRATION(PointTest, DataWithoutParent)
+CXXTEST_TEST_REGISTRATION(PointTest, DataClone)  
 CXXTEST_TEST_REGISTRATION(PointTest, EigenDataFromMap)
 CXXTEST_TEST_REGISTRATION(PointTest, EigenDataMapCopied)
 CXXTEST_TEST_REGISTRATION(PointTest, EigenDataRowMajorFromMap)
