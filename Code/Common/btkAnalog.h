@@ -134,7 +134,7 @@ namespace btk
       this->m_Values = v;
     }
     else
-      this->m_Values = this->m_Values.block(0,0,frameNumber,Values::ColsAtCompileTime);
+      this->m_Values.conservativeResize(frameNumber);
   };
 };
 
