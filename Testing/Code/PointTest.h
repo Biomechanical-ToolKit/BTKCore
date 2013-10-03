@@ -103,12 +103,12 @@ CXXTEST_SUITE(PointTest)
 };
 
 CXXTEST_SUITE_REGISTRATION(PointTest)
-//CXXTEST_TEST_REGISTRATION(PointTest, Constructor)
-//CXXTEST_TEST_REGISTRATION(PointTest, FrameNumber)
+CXXTEST_TEST_REGISTRATION(PointTest, Constructor)
+CXXTEST_TEST_REGISTRATION(PointTest, FrameNumber)
 CXXTEST_TEST_REGISTRATION(PointTest, DataWithParent)
 CXXTEST_TEST_REGISTRATION(PointTest, DataWithoutParent)
-//CXXTEST_TEST_REGISTRATION(PointTest, EigenDataFromMap)
-//CXXTEST_TEST_REGISTRATION(PointTest, EigenDataMapCopied)
-//CXXTEST_TEST_REGISTRATION(PointTest, EigenDataRowMajorFromMap)
-//CXXTEST_TEST_REGISTRATION(PointTest, EigenDataRowMajorFromMapSwap)
+CXXTEST_TEST_REGISTRATION(PointTest, EigenDataFromMap)
+CXXTEST_TEST_REGISTRATION(PointTest, EigenDataMapCopied)
+CXXTEST_TEST_REGISTRATION(PointTest, EigenDataRowMajorFromMap)
+CXXTEST_TEST_REGISTRATION(PointTest, EigenDataRowMajorFromMapSwap)
 #endif
