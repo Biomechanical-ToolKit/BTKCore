@@ -28,24 +28,6 @@ CXXTEST_SUITE(XLSOrthoTrakFileIOTest)
     btk::XLSOrthoTrakFileIO::Pointer pt = btk::XLSOrthoTrakFileIO::New();
     TS_ASSERT_EQUALS(pt->CanReadFile(XLSOrthoTrakFilePathIN + "Gait.xls"), true);
   };
-  
-  CXXTEST_TEST(CanWriteFileEmpty)
-  {
-    btk::XLSOrthoTrakFileIO::Pointer pt = btk::XLSOrthoTrakFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanWriteFile(""), false);
-  };
-  
-  CXXTEST_TEST(CanWriteFileFail)
-  {
-    btk::XLSOrthoTrakFileIO::Pointer pt = btk::XLSOrthoTrakFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanWriteFile("test.jpeg"), false);
-  };
-  
-  CXXTEST_TEST(CanWriteFileOk)
-  {
-    btk::XLSOrthoTrakFileIO::Pointer pt = btk::XLSOrthoTrakFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanWriteFile("test.xls"), true);
-  };
 };
 
 CXXTEST_SUITE_REGISTRATION(XLSOrthoTrakFileIOTest)
@@ -53,8 +35,4 @@ CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileIOTest, CanReadFileEmpty)
 CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileIOTest, CanReadFileEmptyFile)
 CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileIOTest, CanReadFileFail)
 CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileIOTest, CanReadFileOk)
-// NO WRITE TESTS: ACQUISITION FILE IO SET AS READ ONLY
-// CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileIOTest, CanWriteFileEmpty)
-// CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileIOTest, CanWriteFileFail)
-// CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileIOTest, CanWriteFileOk)
 #endif

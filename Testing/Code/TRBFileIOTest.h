@@ -28,25 +28,6 @@ CXXTEST_SUITE(TRBFileIOTest)
     btk::TRBFileIO::Pointer pt = btk::TRBFileIO::New();
     TS_ASSERT_EQUALS(pt->CanReadFile(TRBFilePathIN + "gait.trb"), true);
   };
-  
-  CXXTEST_TEST(CanWriteFileEmpty)
-  {
-    btk::TRBFileIO::Pointer pt = btk::TRBFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanWriteFile(""), false);
-  };
-  
-  CXXTEST_TEST(CanWriteFileFail)
-  {
-    btk::TRBFileIO::Pointer pt = btk::TRBFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanWriteFile("test.jpeg"), false);
-  };
-  
-  CXXTEST_TEST(CanWriteFileOk)
-  {
-    btk::TRBFileIO::Pointer pt = btk::TRBFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanWriteFile("test.trb"), true);
-  };
-
 };
 
 CXXTEST_SUITE_REGISTRATION(TRBFileIOTest)
@@ -54,8 +35,4 @@ CXXTEST_TEST_REGISTRATION(TRBFileIOTest, CanReadFileEmpty)
 CXXTEST_TEST_REGISTRATION(TRBFileIOTest, CanReadFileEmptyFile)
 CXXTEST_TEST_REGISTRATION(TRBFileIOTest, CanReadFileFail)
 CXXTEST_TEST_REGISTRATION(TRBFileIOTest, CanReadFileOk)
-// NO WRITE TESTS: ACQUISITION FILE IO SET AS READ ONLY
-// CXXTEST_TEST_REGISTRATION(TRBFileIOTest, CanWriteFileEmpty)
-// CXXTEST_TEST_REGISTRATION(TRBFileIOTest, CanWriteFileFail)
-// CXXTEST_TEST_REGISTRATION(TRBFileIOTest, CanWriteFileOk)
 #endif

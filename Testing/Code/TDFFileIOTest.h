@@ -34,24 +34,6 @@ CXXTEST_SUITE(TDFFileIOTest)
     btk::TDFFileIO::Pointer pt = btk::TDFFileIO::New();
     TS_ASSERT_EQUALS(pt->CanReadFile(TDFFilePathIN + "gait9.tdf"), true);
   };
-  
-  CXXTEST_TEST(CanWriteFileEmpty)
-  {
-    btk::TDFFileIO::Pointer pt = btk::TDFFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanWriteFile(""), false);
-  };
-  
-  CXXTEST_TEST(CanWriteFileFail)
-  {
-    btk::TDFFileIO::Pointer pt = btk::TDFFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanWriteFile("test.jpeg"), false);
-  };
-  
-  CXXTEST_TEST(CanWriteFileOk)
-  {
-    btk::TDFFileIO::Pointer pt = btk::TDFFileIO::New();
-    TS_ASSERT_EQUALS(pt->CanWriteFile("test.tdf"), true);
-  };
 };
 
 CXXTEST_SUITE_REGISTRATION(TDFFileIOTest)
@@ -60,7 +42,4 @@ CXXTEST_TEST_REGISTRATION(TDFFileIOTest, CanReadFileEmpty)
 CXXTEST_TEST_REGISTRATION(TDFFileIOTest, CanReadFileEmptyFile)
 CXXTEST_TEST_REGISTRATION(TDFFileIOTest, CanReadFileFail)
 CXXTEST_TEST_REGISTRATION(TDFFileIOTest, CanReadFileOk)
-// CXXTEST_TEST_REGISTRATION(TDFFileIOTest, CanWriteFileEmpty)
-// CXXTEST_TEST_REGISTRATION(TDFFileIOTest, CanWriteFileFail)
-// CXXTEST_TEST_REGISTRATION(TDFFileIOTest, CanWriteFileOk)
 #endif
