@@ -1,6 +1,6 @@
 % M-script file to launch unit tests for BTK Matlab binding
 % Note: This script should be used only in the CMake build folder
-function TDD
+function out = TDD
     clc
     % Path for the implemented unit tests
     addpath('@CMAKE_CURRENT_SOURCE_DIR@');
@@ -13,12 +13,13 @@ function TDD
     addpath('@BTK_SOURCE_DIR@/Utilities/matlab_xunit/xunit');
     
     % Run the unit tests
+    out = logical(1);
     fprintf('\n===========================================================\n');
-    runtests testBTKCommon
+    out = out & runtests('testBTKCommon');
     fprintf('\n===========================================================\n');
-    runtests testBTKIO
+    out = out & runtests('testBTKIO');
     fprintf('\n===========================================================\n');
-    runtests testBTKBasicFilters
+    out = out & runtests('testBTKBasicFilters');
     
     % Extra tests for the function btkC3DserverEmulation
     % if the original C3DServer is intalled
@@ -35,6 +36,6 @@ function TDD
         if (c3dserverDetected)
             % - Run the unit tests
             fprintf('\n===========================================================\n');
-            runtests testC3DserverEmulation;
+            out = out & runtests('testC3DserverEmulation');
         end
     end
