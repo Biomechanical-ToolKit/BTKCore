@@ -1,3 +1,5 @@
+ # -*- coding: utf-8 -*- 
+
 import btk
 import unittest
 import _TDDConfigure
@@ -527,3 +529,17 @@ class C3DFileReaderTest(unittest.TestCase):
         self.assertTrue(itAnalysis != acq.GetMetaData().End())
         if (itAnalysis != acq.GetMetaData().End()):
             self.assertTrue(itAnalysis.value().FindChild('VALUES') != itAnalysis.value().End())
+    
+    def test_UTF8(self):
+        reader = btk.btkAcquisitionFileReader()
+        reader.SetFilename(_TDDConfigure.C3DFilePathIN + 'others/Я могу есть стекло/оно мне не вредит.c3d')
+        reader.Update()
+        
+        acq = reader.GetOutput()
+        self.assertEqual(acq.GetPointFrequency(), 250.0)
+        self.assertEqual(acq.GetPointNumber(), 27)
+        self.assertEqual(acq.GetAnalogFrequency(), 1000.0)
+        self.assertEqual(acq.GetAnalogNumber(), 6)
+        self.assertEqual(acq.GetPoint(0).GetLabel(), 'AbcdeFghijk:RASI')
+        self.assertEqual(acq.GetPoint(26).GetLabel(), 'AbcdeFghijk:LFIN')
+    

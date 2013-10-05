@@ -633,6 +633,24 @@ CXXTEST_SUITE(C3DFileReaderTest)
     TS_ASSERT_DELTA(acq->GetPoint(29)->GetValues().coeff(10,1), 731.903015, 1e-5);
     TS_ASSERT_DELTA(acq->GetPoint(40)->GetValues().coeff(110,2), 0.0, 1e-5);
   };
+  
+  CXXTEST_TEST(UTF8)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/Я могу есть стекло/оно мне не вредит.c3d");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetEventNumber(), 0);
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), 27);
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 6);
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), 91);
+    TS_ASSERT_EQUALS(acq->GetLastFrame(), 327);
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 250.0);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 1000.0);
+    TS_ASSERT_EQUALS(acq->GetPoint(0)->GetLabel(), "AbcdeFghijk:RASI");
+    TS_ASSERT_EQUALS(acq->GetPoint(26)->GetLabel(), "AbcdeFghijk:LFIN");
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileReaderTest)
@@ -670,4 +688,5 @@ CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Sample28_type1)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, ParameterOverflow)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, Mocap36)
 CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, BadParameterOffset)
+CXXTEST_TEST_REGISTRATION(C3DFileReaderTest, UTF8)  
 #endif

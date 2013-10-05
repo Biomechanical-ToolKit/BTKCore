@@ -1420,6 +1420,31 @@ CXXTEST_SUITE(C3DFileWriterTest)
     for (size_t i = 0 ; i < scale1.size() ; ++i)
       TS_ASSERT_DELTA(scale1[i]*genscale1, scale2[i]*genscale2, 1e-11);
   }
+
+  CXXTEST_TEST(UTF8)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "sample19/sample19.c3d");
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    reader->Update();
+    writer->SetInput(reader->GetOutput());
+    writer->SetFilename(C3DFilePathOUT + "Я могу есть стекло, оно мне не вредит.c3d");
+    writer->Update();
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "Я могу есть стекло, оно мне не вредит.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), acq2->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileWriterTest)
@@ -1457,4 +1482,5 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertCLB2C3D)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, rewrite_analog_gain)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, test_genscale_unmodified)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, test_genscale_modified)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, UTF8)   
 #endif

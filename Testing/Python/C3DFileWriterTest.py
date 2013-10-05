@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*- 
+
 import btk
 import unittest
-import _TDDConfigure
+import _TDDConfigure 
 
 class C3DFileWriterTest(unittest.TestCase):
   def test_NoFileNoInput(self):
@@ -1065,6 +1067,29 @@ class C3DFileWriterTest(unittest.TestCase):
     self.assertEqual(output.GetAnalogFrameNumber(),200000)
     self.assertEqual(output.GetPointNumber(),3)
     self.assertEqual(output.GetAnalogNumber(),1)
-    
-    self.assertEqual(output.GetMetaData().GetChild('POINT').GetChild('FRAMES').GetInfo().ToInt(0), -1) # WARNING 65535 replaced by -1 due to the missing of possible cast with Python!
+    # WARNING 65535 replaced by -1 due to the missing of possible cast with Python!
+    self.assertEqual(output.GetMetaData().GetChild('POINT').GetChild('FRAMES').GetInfo().ToInt(0), -1) 
     self.assertEqual(output.GetLastFrame(), 100000)
+    
+  def test_UTF8(self):
+      reader = btk.btkAcquisitionFileReader()
+      reader.SetFilename(_TDDConfigure.C3DFilePathIN + 'sample19/sample19.c3d')
+      writer = btk.btkAcquisitionFileWriter()
+      reader.Update()
+      writer.SetInput(reader.GetOutput())
+      writer.SetFilename(_TDDConfigure.C3DFilePathOUT + 'Я могу есть стекло, оно мне не вредит - python.c3d')
+      writer.Update()
+      reader2 = btk.btkAcquisitionFileReader()
+      reader2.SetFilename(_TDDConfigure.C3DFilePathOUT + 'Я могу есть стекло, оно мне не вредит - python.c3d')
+      reader2.Update()
+      acq = reader.GetOutput()
+      acq2 = reader.GetOutput()
+
+      self.assertEqual(acq.GetFirstFrame(), acq2.GetFirstFrame())
+      self.assertEqual(acq.GetPointFrequency(), acq2.GetPointFrequency())
+      self.assertEqual(acq.GetPointNumber(), acq2.GetPointNumber())
+      self.assertEqual(acq.GetPointFrameNumber(), acq2.GetPointFrameNumber())
+      self.assertEqual(acq.GetAnalogFrequency(), acq2.GetAnalogFrequency())
+      self.assertEqual(acq.GetAnalogNumber(), acq2.GetAnalogNumber())
+      self.assertEqual(acq.GetAnalogFrameNumber(), acq2.GetAnalogFrameNumber())
+      self.assertEqual(acq.GetPointUnit(), acq2.GetPointUnit())
