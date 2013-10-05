@@ -2,7 +2,11 @@ function test_suite = testBTKCommon
 initTestSuite;
 end
 
-function testNewAcquisition
+function d = setup
+d = TDDConfigure();
+end
+
+function testNewAcquisition(d)
 h = btkNewAcquisition(10,100,2,10);
 assertEqual(btkGetPointNumber(h), 10);
 assertEqual(btkGetPointFrameNumber(h), 100);
@@ -16,7 +20,7 @@ assertEqual(btkGetAnalogFrequency(h), 0);
 btkDeleteAcquisition(h);
 end
 
-function testGetPointsValues
+function testGetPointsValues(d)
 np = 2;
 h = btkNewAcquisition(np,10);
 res = btkGetPointsValues(h);
@@ -27,7 +31,7 @@ assertEqual(res,res_);
 btkDeleteAcquisition(h);
 end
 
-function testSetPointsValues
+function testSetPointsValues(d)
 np = 2;
 h = btkNewAcquisition(np,10);
 res_ = rand(10,np*3);
@@ -39,7 +43,7 @@ assertEqual(res,res_);
 btkDeleteAcquisition(h);
 end
 
-function testGetPointsResiduals
+function testGetPointsResiduals(d)
 np = 2;
 h = btkNewAcquisition(np,10);
 res = btkGetPointsResiduals(h);
@@ -50,7 +54,7 @@ assertEqual(res,res_);
 btkDeleteAcquisition(h);
 end
 
-function testSetPointsResiduals
+function testSetPointsResiduals(d)
 np = 2;
 h = btkNewAcquisition(np,10);
 res_ = rand(10,np);
@@ -62,7 +66,7 @@ assertEqual(res,res_);
 btkDeleteAcquisition(h);
 end
 
-function testCropAcquisition_first50
+function testCropAcquisition_first50(d)
 h = btkNewAcquisition(10,100,2,10);
 pv_ = rand(100,10*3);
 rv_ = rand(100,10);
@@ -83,7 +87,7 @@ assertEqual(btkGetAnalogsValues(h), av_(1:500,:));
 btkDeleteAcquisition(h);
 end
 
-function testCropAcquisition_last51
+function testCropAcquisition_last51(d)
 h = btkNewAcquisition(10,100,2,10);
 pv_ = rand(100,10*3);
 rv_ = rand(100,10);
@@ -104,8 +108,8 @@ assertEqual(btkGetAnalogsValues(h), av_(491:end,:));
 btkDeleteAcquisition(h);
 end
 
-function testGetAnalysis
-h = btkReadAcquisition('../Data/Input/C3DSamples/others/Analysis.c3d');
+function testGetAnalysis(d)
+h = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Analysis.c3d'));
 analysis = btkGetAnalysis(h);
 labels = fieldnames(analysis);
 assertEqual(length(labels), 34);
@@ -118,11 +122,11 @@ assertElementsAlmostEqual(analysis.(labels{34}), 8.37584, 'absolute', 1e-5)
 btkDeleteAcquisition(h);
 end
 
-function testClearAnalysis
-h = btkReadAcquisition('../Data/Input/C3DSamples/others/Analysis.c3d');
+function testClearAnalysis(d)
+h = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Analysis.c3d'));
 btkClearAnalysis(h);
 analysis = btkGetAnalysis(h);
-md = btkGetMetadata(h, 'ANALYSIS');
+md = btkGetMetaData(h, 'ANALYSIS');
 assertEqual(isstruct(analysis), true);
 assertEqual(isempty(fieldnames(analysis)), true);
 assertEqual(isstruct(md.children), true);
@@ -136,8 +140,8 @@ assertEqual(md.children.DESCRIPTIONS.info.values, cell(0,1));
 btkDeleteAcquisition(h);
 end
 
-function testRemoveAnalysisParameters_Index
-h = btkReadAcquisition('../Data/Input/C3DSamples/others/Analysis.c3d');
+function testRemoveAnalysisParameters_Index(d)
+h = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Analysis.c3d'));
 btkRemoveAnalysisParameter(h,1);
 btkRemoveAnalysisParameter(h,33);
 analysis = btkGetAnalysis(h);
@@ -150,8 +154,8 @@ assertElementsAlmostEqual(analysis.(labels{32}), 68.0304, 'absolute', 1e-4)
 btkDeleteAcquisition(h);
 end
 
-function testRemoveAnalysisParameters_Label
-h = btkReadAcquisition('../Data/Input/C3DSamples/others/Analysis.c3d');
+function testRemoveAnalysisParameters_Label(d)
+h = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Analysis.c3d'));
 btkRemoveAnalysisParameter(h,'Right','Vitesse (m/s)');
 btkRemoveAnalysisParameter(h,'Left','GPS');
 analysis = btkGetAnalysis(h);

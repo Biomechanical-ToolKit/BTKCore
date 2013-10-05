@@ -1,5 +1,10 @@
 function benchmarkC3DserverEmulation
-d.filename = '../Data/Input/C3DSamples/sample01/Eb015pi.c3d';
+try
+  dataPath = TDDConfigure();
+catch
+  error('Error when trying to execute the function ''TDDConfigure''. You certainly did not add the path for this function. You will find the function in the subfolder Testing/Matlab of the project build directory.')
+end
+d.filename = strcat(dataPath.in,'/C3DSamples/sample01/Eb015pi.c3d');
 num = 10;
 fprintf('\n-----------------------------------------------------\n');
 fprintf('      C3Dserver Emulation Benchmark - v0.6\n');

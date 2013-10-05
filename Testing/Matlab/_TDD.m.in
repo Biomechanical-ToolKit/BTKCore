@@ -1,10 +1,16 @@
-% Simple M-script file to launch unit tests for BTK Matlab binding
+% M-script file to launch unit tests for BTK Matlab binding
+% Note: This script should be used only in the CMake build folder
 function TDD
     clc
-    
-    % The toolbox btk is supposed to be already in the Matlab paths.
-    % Let's add the path for Matlab xUnit
-    addpath('../../Utilities/matlab_xunit/xunit');
+    % Path for the implemented unit tests
+    addpath('@CMAKE_CURRENT_SOURCE_DIR@');
+    % Path for the function TDDConfigure()
+    addpath('@CMAKE_CURRENT_BINARY_DIR@');
+    % Path for the functions stored in the Documentation/Wrapping/Matlab.
+    addpath('@BTK_SOURCE_DIR@/Documentation/Wrapping/Matlab/btk');
+    addpath('@BTK_BINARY_DIR@/Documentation/Wrapping/Matlab/btk');
+    % Path for Matlab xUnit
+    addpath('@BTK_SOURCE_DIR@/Utilities/matlab_xunit/xunit');
     
     % Run the unit tests
     fprintf('\n===========================================================\n');

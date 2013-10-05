@@ -3,9 +3,10 @@ initTestSuite;
 end
 
 function d = setup
-d.filename = '../Data/Input/C3DSamples/sample01/Eb015pi.c3d';
-d.filename2 = '../Data/Input/C3DSamples/sample01/Eb015vr.c3d';
-d.filename16bits = '../Data/Input/C3DSamples/sample19/sample19.c3d';
+dataPath = TDDConfigure();
+d.filename = strcat(dataPath.in,'/C3DSamples/sample01/Eb015pi.c3d');
+d.filename2 = strcat(dataPath.in,'/C3DSamples/sample01/Eb015vr.c3d');
+d.filename16bits = strcat(dataPath.in,'/C3DSamples/sample19/sample19.c3d');
 end
 
 function testOpenMode1(d)

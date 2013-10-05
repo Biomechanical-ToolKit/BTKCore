@@ -2,7 +2,11 @@ function test_suite = testBTKBasicFilters
 initTestSuite;
 end
 
-function testGetMarkersResiduals
+function d = setup
+d = TDDConfigure();
+end
+
+function testGetMarkersResiduals(d)
 h = btkNewAcquisition(2,10);
 res = btkGetMarkersResiduals(h);
 assertEqual(size(res,1), 10);
@@ -12,7 +16,7 @@ assertEqual(res,res_);
 btkDeleteAcquisition(h);
 end
 
-function testSetMarkersResiduals
+function testSetMarkersResiduals(d)
 h = btkNewAcquisition(2,10);
 res_ = rand(10,2);
 btkSetMarkersResiduals(h, res_);
@@ -23,7 +27,7 @@ assertEqual(res,res_);
 btkDeleteAcquisition(h);
 end
 
-function testAppendForcePlatformType2
+function testAppendForcePlatformType2(d)
 h = btkNewAcquisition(0,10);
 btkSetFrequency(h,1000);
 force = rand(10,3);
@@ -59,7 +63,7 @@ assertEqual(fpi(1).cal_matrix, eye(6));
 btkDeleteAcquisition(h);
 end
 
-function testAppendForcePlatformType2_interpolate
+function testAppendForcePlatformType2_interpolate(d)
 h = btkNewAcquisition(0,10,0,10);
 btkSetFrequency(h,100);
 force = rand(10,3);
@@ -97,7 +101,7 @@ assertEqual(fpi(1).cal_matrix, eye(6));
 btkDeleteAcquisition(h);
 end
 
-function testAppendForcePlatformType2_global
+function testAppendForcePlatformType2_global(d)
 h = btkNewAcquisition(0,10);
 btkSetFrequency(h,1000);
 btkSetPointsUnit(h,'Marker','Nm');
@@ -135,15 +139,15 @@ assertEqual(fpi(1).cal_matrix, eye(6));
 btkDeleteAcquisition(h);
 end
 
-function testAppendForcePlatformType2_exportC3D
+function testAppendForcePlatformType2_exportC3D(d)
 warning('OFF','btk:ReadAcquisition');
-h = btkReadAcquisition('../Data/Input/C3DSamples/sample09/PluginC3D.c3d');
+h = btkReadAcquisition(strcat(d.in,'/C3DSamples/sample09/PluginC3D.c3d'));
 warning('ON','btk:ReadAcquisition');
 frw = btkGetForcePlatformWrenches(h,0);
 corners = [-200,-200,0;200,-200,0;200,-400,0;-200,-400,0];
 btkAppendForcePlatformType2(h, frw(1).F, frw(1).M, corners, [0,0,0], 1)
-btkWriteAcquisition(h, '../Data/Output/C3DSamples/sample09_PluginC3D.c3d');
-h2 = btkReadAcquisition('../Data/Output/C3DSamples/sample09_PluginC3D.c3d');
+btkWriteAcquisition(h, strcat(d.out,'/C3DSamples/sample09_PluginC3D.c3d'));
+h2 = btkReadAcquisition(strcat(d.out,'/C3DSamples/sample09_PluginC3D.c3d'));
 fp1 = btkGetForcePlatforms(h);
 fp2 = btkGetForcePlatforms(h2);
 assertEqual(length(fp1), 3);
