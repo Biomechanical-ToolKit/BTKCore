@@ -16,13 +16,22 @@ import _TDDBasicFilters
 if __name__ == '__main__':
     if TDD_SILENT_CERR:
         MuteCerr.On()
-    unittest.TextTestRunner().run(_TDDCommon.suite())
-    unittest.TextTestRunner().run(_TDDIO.suite())
-    unittest.TextTestRunner().run(_TDDBasicFilters.suite())
+    out = True
+    result = unittest.TextTestRunner().run(_TDDCommon.suite())
+    out &= result.wasSuccessful()
+    result = unittest.TextTestRunner().run(_TDDIO.suite())
+    out &= result.wasSuccessful()
+    result = unittest.TextTestRunner().run(_TDDBasicFilters.suite())
+    out &= result.wasSuccessful()
     if TDD_SILENT_CERR:
         MuteCerr.Off()
     
-directory = os.listdir('${BTK_SOURCE_DIR}/Testing/Python')
-for filename in directory:
-    if filename[-3:] == 'pyc':
-        os.remove('${BTK_SOURCE_DIR}/Testing/Python/' + filename)
+    directory = os.listdir('${BTK_SOURCE_DIR}/Testing/Python')
+    for filename in directory:
+        if filename[-3:] == 'pyc':
+            os.remove('${BTK_SOURCE_DIR}/Testing/Python/' + filename)
+            
+    if out:
+        sys.exit(0)
+    else:
+        sys.exit(1)
