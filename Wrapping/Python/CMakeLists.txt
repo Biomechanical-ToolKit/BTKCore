@@ -3,6 +3,15 @@ FIND_PACKAGE(SWIG 2.0 REQUIRED)
 FIND_PACKAGE(PythonLibs REQUIRED)
 FIND_PACKAGE(NumPy REQUIRED)
 
+IF (UNIX AND NOT APPLE AND HAVE_64_BIT AND NOT BUILD_SHARED_LIBS)
+  # Force to build library (Common, IO, ...) as shared objects for Linux 64-bit.
+  # See issue 9: http://code.google.com/p/b-tk/issues/detail?id=9
+  MESSAGE(STATUS "\n-------------------------------------------------------------------------")
+  MESSAGE(STATUS "WARNING: Due to the impossibility to mix static and dynamic library under\nLinux 64-bit, BTK is set to build shared libraries.")
+  MESSAGE(STATUS "-------------------------------------------------------------------------")
+  SET(BUILD_SHARED_LIBS TRUE CACHE BOOL "This option is fixed because you cannot mix static and dynamic library under Linux 64-bit." FORCE)
+ENDIF (UNIX AND NOT APPLE AND HAVE_64_BIT AND NOT BUILD_SHARED_LIBS)
+
 INCLUDE(${SWIG_USE_FILE})
 
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
