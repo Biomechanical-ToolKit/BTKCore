@@ -99,7 +99,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     else
     {
       std::string warnText = "Ground reaction wrench #" + btk::ToString(i) + " is empty. Send an email to BTK developers to inform them.";
-      mexWarnMsgTxt(warnText.c_str());
+      mexWarnMsgIdAndTxt("btk:GetGroundReactionWrenches", warnText.c_str());
     }
     ++itWrench;
   }

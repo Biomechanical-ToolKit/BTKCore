@@ -87,7 +87,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     else
     {
       std::string warnText = "Force platform #" + btk::ToString(i) + " is empty. Send an email to BTK developers to inform them.";
-      mexWarnMsgTxt(warnText.c_str());
+      mexWarnMsgIdAndTxt("btk:GetForcePlatforms", warnText.c_str());
     }
     ++itPlatform;
   }
