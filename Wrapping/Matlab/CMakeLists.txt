@@ -36,13 +36,14 @@ IF (BTK_WRAP_MATLAB_REDISTRIBUTABLE_MEX_FILES)
 ENDIF(BTK_WRAP_MATLAB_REDISTRIBUTABLE_MEX_FILES)
 
 IF(MATLAB_MEXFILE_EXT STREQUAL mexa64)
-  # Force to build library (Common, IO, ...) as shared objects for linux 64-bit.
+  # Force to build library (Common, IO, ...) as shared objects for Linux 64-bit.
   # See issue 9: http://code.google.com/p/b-tk/issues/detail?id=9
+  MESSAGE(STATUS "\n-------------------------------------------------------------------------")
+  MESSAGE(STATUS "WARNING: Due to the impossibility to mix static and dynamic library under\nLinux 64-bit, BTK is set to build shared libraries.")
   MESSAGE(STATUS "-------------------------------------------------------------------------")
-  MESSAGE(STATUS "WARNING: Due to the impossibility to mix static and dynamic library under\nlinux 64-bit, BTK is set to build shared libraries.")
-  SET(BUILD_SHARED_LIBS TRUE CACHE BOOL "This option is fixed because you cannot mix static and dynamic library under linux 64-bit." FORCE)
+  SET(BUILD_SHARED_LIBS TRUE CACHE BOOL "This option is fixed because you cannot mix static and dynamic library under Linux 64-bit." FORCE)
   # Message about the incompatibility with the library 'libstdc++' embedded into Matlab
-  MESSAGE(STATUS "-------------------------------------------------------------------------")
+  MESSAGE(STATUS "\n-------------------------------------------------------------------------")
   MESSAGE(STATUS "WARNING: Because Matlab embeds its own version of the library 'libstdc++'\nand then create incompatibility with MEX files, this library will be\nmoved during the installation step into {MATLAB_ROOT}/sys/os/glnxa64/_fix_btk_linux_64\ninstead of {MATLAB_ROOT}/sys/os/glnxa64")
   MESSAGE(STATUS "-------------------------------------------------------------------------")
 ENDIF(MATLAB_MEXFILE_EXT STREQUAL mexa64)
