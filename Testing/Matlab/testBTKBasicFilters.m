@@ -71,7 +71,7 @@ moment = rand(10,3);
 corners = [-200,200,0;200,200,0;-200,-200,0;200,-200,0];
 warning('off','btk:AppendForcePlatformType2');
 btkAppendForcePlatformType2(h, force, moment, corners,[],1)
-warning('off','btk:AppendForcePlatformType2');
+warning('on','btk:AppendForcePlatformType2');
 assertEqual(btkGetFirstFrame(h), 1);
 assertEqual(btkGetLastFrame(h), 10);
 assertEqual(btkGetPointNumber(h), 0);
