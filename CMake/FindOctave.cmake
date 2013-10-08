@@ -3,12 +3,13 @@
 #   a macro to help the build of MEX-functions.
 #
 # This module defines: 
-#  OCTAVE_INCLUDE_DIR:         include path for mex.h, mexproto.h
-#  OCTAVE_OCTINTERP_LIBRARY:   path to the library octinterp
-#  OCTAVE_OCTAVE_LIBRARY:      path to the library octave
-#  OCTAVE_CRUFT_LIBRARY:       path to the library cruft
-#  OCTAVE_LIBRARIES:           required libraries: octinterp, octave, cruft
-#  OCTAVE_CREATE_MEX:          macro to build a MEX-file
+#  OCTAVE_EXECUTABLE:          Path to the Matlab executable
+#  OCTAVE_INCLUDE_DIR:         Include path for mex.h, mexproto.h
+#  OCTAVE_OCTINTERP_LIBRARY:   Path to the library octinterp
+#  OCTAVE_OCTAVE_LIBRARY:      Path to the library octave
+#  OCTAVE_CRUFT_LIBRARY:       Oath to the library cruft
+#  OCTAVE_LIBRARIES:           Required libraries: octinterp, octave, cruft
+#  OCTAVE_CREATE_MEX:          Macro to build a MEX-file
 #
 # The macro OCTAVE_CREATE_MEX requires in this order:
 #  - function's name which will be called in Octave;
@@ -19,10 +20,11 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
-IF(OCTAVE_ROOT AND OCTAVE_INCLUDE_DIR AND OCTAVE_LIBRARIES)
+IF(OCTAVE_ROOT AND OCTAVE_EXECUTABLE AND OCTAVE_INCLUDE_DIR AND OCTAVE_LIBRARIES)
   STRING(COMPARE NOTEQUAL "${OCTAVE_ROOT}" "${OCTAVE_ROOT_LAST}" OCTAVE_CHANGED)
   IF(OCTAVE_CHANGED)
     SET(OCTAVE_USE_MINGW32 OCTAVE_USE_MINGW32-NOTFOUND CACHE INTERNAL "")
+    SET(OCTAVE_EXECUTABLE OCTAVE_EXECUTABLE-NOTFOUND CACHE INTERNAL "")
     SET(OCTAVE_OCTINTERP_LIBRARY OCTAVE_OCTINTERP_LIBRARY-NOTFOUND CACHE INTERNAL "")
     SET(OCTAVE_OCTAVE_LIBRARY OCTAVE_OCTAVE_LIBRARY-NOTFOUND CACHE INTERNAL "")
     SET(OCTAVE_CRUFT_LIBRARY OCTAVE_CRUFT_LIBRARY-NOTFOUND CACHE INTERNAL "")
@@ -31,7 +33,7 @@ IF(OCTAVE_ROOT AND OCTAVE_INCLUDE_DIR AND OCTAVE_LIBRARIES)
     # in cache already
     SET(Octave_FIND_QUIETLY TRUE)
   ENDIF(OCTAVE_CHANGED)
-ENDIF(OCTAVE_ROOT AND OCTAVE_INCLUDE_DIR AND OCTAVE_LIBRARIES)
+ENDIF(OCTAVE_ROOT AND OCTAVE_EXECUTABLE AND OCTAVE_INCLUDE_DIR AND OCTAVE_LIBRARIES)
 
 SET(OCTAVE_MEXFILE_EXT mex)
 
@@ -89,28 +91,39 @@ ELSE(WIN32)
     SET(LIBOCTAVE "liboctave.dylib")
     SET(LIBCRUFT "libcruft.dylib")
   ELSE(APPLE)
-    FILE(GLOB OCTAVE_LOCAL_PATHS "/usr/local/lib/octave-*")
-    FILE(GLOB OCTAVE_USR_PATHS "/usr/lib/octave-*")
+    FILE(GLOB OCTAVE_LIB_LOCAL_PATHS "/usr/local/lib/octave-*")
+    FILE(GLOB OCTAVE_LIB_USR_PATHS "/usr/lib/octave-*")
+    FILE(GLOB OCTAVE_INCLUDE_USR_PATHS "/usr/include/octave-*")
 
-    SET (OCTAVE_INCLUDE_PATHS 
+    SET(OCTAVE_INCLUDE_PATHS 
       "/usr/local/include"
       "/usr/local/include/octave"
       "/usr/include"
-      "/usr/include/octave")
-    SET (OCTAVE_LIBRARIES_PATHS
+      "/usr/include/octave"
+      ${OCTAVE_INCLUDE_USR_PATHS})
+    SET(OCTAVE_LIBRARIES_PATHS
+      "/usr/lib/x86_64-linux-gnu"
       "/usr/local/lib"
       "/usr/local/lib/octave"
-      ${OCTAVE_LOCAL_PATHS}
+      ${OCTAVE_LIB_LOCAL_PATHS}
       "/usr/lib"
       "/usr/lib/octave"
-      ${OCTAVE_USR_PATHS})
+      ${OCTAVE_LIB_USR_PATHS})  
+    SET(OCTAVE_ROOT
+      "/usr/bin"
+      "/usr/local/bin")
       
-    SET (LIBOCTINTERP "octinterp")
-    SET (LIBOCTAVE "octave")
-    SET (LIBCRUFT "cruft")
+    SET(LIBOCTINTERP "octinterp")
+    SET(LIBOCTAVE "octave")
+    SET(LIBCRUFT "cruft")
   ENDIF(APPLE)
 ENDIF(WIN32)
-  
+
+FIND_PROGRAM(OCTAVE_EXECUTABLE
+    "octave"
+    PATHS ${OCTAVE_ROOT}
+    PATH_SUFFIXES "bin" NO_DEFAULT_PATH
+    )
 FIND_LIBRARY(OCTAVE_OCTINTERP_LIBRARY
     ${LIBOCTINTERP}
     ${OCTAVE_LIBRARIES_PATHS} NO_DEFAULT_PATH
@@ -167,12 +180,13 @@ INCLUDE(FindPackageHandleStandardArgs)
 
 # The variable OCTAVE_ROOT is only relevant for WIN32
 IF(WIN32)
-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Octave DEFAULT_MSG OCTAVE_ROOT OCTAVE_INCLUDE_DIR OCTAVE_OCTINTERP_LIBRARY OCTAVE_OCTAVE_LIBRARY OCTAVE_CRUFT_LIBRARY)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Octave DEFAULT_MSG OCTAVE_ROOT OCTAVE_EXECUTABLE OCTAVE_INCLUDE_DIR OCTAVE_OCTINTERP_LIBRARY OCTAVE_OCTAVE_LIBRARY OCTAVE_CRUFT_LIBRARY)
 ELSE(WIN32)
-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Octave DEFAULT_MSG OCTAVE_INCLUDE_DIR OCTAVE_OCTINTERP_LIBRARY OCTAVE_OCTAVE_LIBRARY OCTAVE_CRUFT_LIBRARY)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Octave DEFAULT_MSG OCTAVE_EXECUTABLE OCTAVE_INCLUDE_DIR OCTAVE_OCTINTERP_LIBRARY OCTAVE_OCTAVE_LIBRARY OCTAVE_CRUFT_LIBRARY)
 ENDIF(WIN32)
 
 MARK_AS_ADVANCED(
+  OCTAVE_EXECUTABLE
   OCTAVE_OCTINTERP_LIBRARY
   OCTAVE_OCTAVE_LIBRARY
   OCTAVE_CRUFT_LIBRARY
