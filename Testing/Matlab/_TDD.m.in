@@ -2,16 +2,19 @@
 % Note: This script should be used only in the CMake build folder
 function out = TDD
     clc
-    % Path for the implemented unit tests
-    addpath('@CMAKE_CURRENT_SOURCE_DIR@');
+    isOctave = exist('OCTAVE_VERSION','builtin');
+    % Path for the implemented unit tests (also for Octave)
+    addpath('@BTK_SOURCE_DIR@/Testing/Matlab');
     % Path for the function TDDConfigure()
     addpath('@CMAKE_CURRENT_BINARY_DIR@');
-    % Path for the functions stored in the Documentation/Wrapping/Matlab.
+    % Path for the functions stored in Documentation/Wrapping/Matlab (also for Octave)
     addpath('@BTK_SOURCE_DIR@/Documentation/Wrapping/Matlab/btk');
-    addpath('@BTK_BINARY_DIR@/Documentation/Wrapping/Matlab/btk');
-    % Path for Matlab xUnit
-    addpath('@BTK_SOURCE_DIR@/Utilities/matlab_xunit/xunit');
-    
+    % Path for xUnit
+    if (~isOctave)
+        addpath('@BTK_SOURCE_DIR@/Utilities/matlab_xunit/xunit');
+    else
+        addpath(genpath('@BTK_SOURCE_DIR@/Utilities/octave_xunit/xunit'));
+    end
     % Run the unit tests
     out = logical(1);
     fprintf('\n===========================================================\n');
@@ -21,21 +24,23 @@ function out = TDD
     fprintf('\n===========================================================\n');
     out = out & runtests('testBTKBasicFilters');
     
-    % Extra tests for the function btkC3DserverEmulation
-    % if the original C3DServer is intalled
-    % - Check for the OS
-    if strcmp(computer, 'PCWIN')
-        c3dserverDetected = true;
-        % - Test if C3DServer is installed.
-        try 
-          actxserver('C3Dserver.C3D');
-        catch
+    % Extra tests for the function btkC3DserverEmulation (MATLAB ONLY)
+    if (~isOctave)
+        % if the original C3DServer is intalled
+        % - Check for the OS
+        if strcmp(computer, 'PCWIN')
+            c3dserverDetected = true;
+            % - Test if C3DServer is installed.
+            try
+              actxserver('C3Dserver.C3D');
+            catch
+                c3dserverDetected = false;
+            end
             c3dserverDetected = false;
-        end
-        c3dserverDetected = false;
-        if (c3dserverDetected)
-            % - Run the unit tests
-            fprintf('\n===========================================================\n');
-            out = out & runtests('testC3DserverEmulation');
+            if (c3dserverDetected)
+                % - Run the unit tests
+                fprintf('\n===========================================================\n');
+                out = out & runtests('testC3DserverEmulation');
+            end
         end
     end
