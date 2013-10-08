@@ -24,20 +24,20 @@ if nargin < 3
 end
 
 if ~ (issparse(A) == issparse(B))
-    message = xunit.utils.comparisonMessage(custom_message, ...
+    message = comparisonMessage(custom_message, ...
         'One input is sparse and the other is not.', A, B);
-    throwAsCaller(MException('assertEqual:sparsityNotEqual', '%s', message));
+    error('assertEqual:sparsityNotEqual', '%s', message);
 end
 
 if ~strcmp(class(A), class(B))
-    message = xunit.utils.comparisonMessage(custom_message, ...
+    message = comparisonMessage(custom_message, ...
         'The inputs differ in class.', A, B);
-    throwAsCaller(MException('assertEqual:classNotEqual', '%s', message));
+    error('assertEqual:classNotEqual', '%s', message);
 end
 
 if ~isequalwithequalnans(A, B)
-    message = xunit.utils.comparisonMessage(custom_message, ...
+    message = comparisonMessage(custom_message, ...
         'Inputs are not equal.', A, B);
-    throwAsCaller(MException('assertEqual:nonEqual', '%s', message));
+    error('assertEqual:nonEqual', '%s', message);
 end
 

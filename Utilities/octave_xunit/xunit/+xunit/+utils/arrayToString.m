@@ -28,11 +28,15 @@ tf = whos_output.bytes > byte_threshold;
 function s = dispAsArray(A)
 %   Convert A to a string using disp.  Remove leading and trailing blank lines.
 
-s = evalc('disp(A)');
-if isempty(s)
+if isstruct(A)
     % disp displays nothing for some kinds of empty arrays.
     s = dispAsStructField(A);
 else
+    if isempty(A)
+        s = '[]';
+    else
+        s = num2str(A);
+    end
     s = postprocessDisp(s);
 end
 
@@ -40,8 +44,7 @@ end
 function s = dispAsStructField(A)
 %   Convert A to a string using structure field display.
 
-b.A = A;
-s = evalc('disp(b)');
+s = 'WARNING! Function dispAsStructField not yet implemented!';
 s = postprocessStructDisp(s);
 
 %===============================================================================
@@ -49,7 +52,7 @@ function out = postprocessDisp(in)
 %   Remove leading and trailing blank lines from input string.  Don't include a
 %   newline at the end.
 
-lines = xunit.utils.stringToCellArray(in);
+lines = stringToCellArray(in);
 
 % Remove leading blank lines.
 lines = removeLeadingBlankLines(lines);
@@ -69,7 +72,7 @@ function out = postprocessStructDisp(in)
 %   Return the portion of the display string to the right of the colon in the
 %   output of the first structure field.  Input is a string.
 
-lines = xunit.utils.stringToCellArray(in);
+lines = stringToCellArray(in);
 
 % Remove leading blank lines
 lines = removeLeadingBlankLines(lines);

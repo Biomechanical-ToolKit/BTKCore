@@ -57,7 +57,7 @@ else
     compare_type = 'elementwise';
 end
 
-params = xunit.utils.parseFloatAssertInputs(varargin{:});
+params = parseFloatAssertInputs(varargin{:});
 
 A = params.A(:);
 B = params.B(:);

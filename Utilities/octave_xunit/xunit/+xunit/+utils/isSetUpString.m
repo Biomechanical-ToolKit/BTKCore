@@ -9,4 +9,4 @@ function tf = isSetUpString(str)
 %   Copyright 2008-2009 The MathWorks, Inc.
 
 setup_exp = '^[sS]et[uU]p';
-tf = xunit.utils.containsRegexp(str, setup_exp);
+tf = containsRegexp(str, setup_exp);

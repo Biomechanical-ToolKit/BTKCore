@@ -11,5 +11,5 @@ function tf = isTestString(str)
 test_at_beginning = '^[tT]est';
 test_at_end = '[tT]est$';
 
-tf = xunit.utils.containsRegexp(str, test_at_beginning) | ...
-    xunit.utils.containsRegexp(str, test_at_end);
+tf = containsRegexp(str, test_at_beginning) | ...
+    containsRegexp(str, test_at_end);

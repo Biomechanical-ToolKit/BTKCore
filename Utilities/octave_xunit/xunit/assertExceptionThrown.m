@@ -31,15 +31,20 @@ try
     f();
     noException = true;
     
-catch exception
+catch
+    exception = lasterror;
     if ~strcmp(exception.identifier, expectedId)
+        exception_identifier = exception.identifier;
+        if isempty(exception_identifier)
+          exception_identifier = '(None)';
+        end
         message = sprintf('Expected exception %s but got exception %s.', ...
-            expectedId, exception.identifier);
+            expectedId, exception_identifier);
         if nargin >= 3
             message = sprintf('%s\n%s', custom_message, message);
         end
-        throwAsCaller(MException('assertExceptionThrown:wrongException', ...
-            '%s', message));
+        error('assertExceptionThrown:wrongException', ...
+            '%s', message);
     end
 end
 
@@ -49,5 +54,5 @@ if noException
     if nargin >= 3
         message = sprintf('%s\n%s', custom_message, message);
     end
-    throwAsCaller(MException('assertExceptionThrown:noException', '%s', message));
+    error('assertExceptionThrown:noException', '%s', message);
 end

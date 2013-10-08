@@ -77,18 +77,24 @@ function out = runtests(varargin)
 
 %   Steven L. Eddins
 %   Copyright 2009-2010 The MathWorks, Inc.
+%
+%   Arnaud Barré
+%   Copyright 2013, xUnit for Octave
 
 verbose = false;
 logfile = '';
 if nargin < 1
+    error('xunit:NotYetImplemented','This part of the code has not yet been translated to Octave.');
     suite = TestSuite.fromPwd();
 else
     [name_list, verbose, logfile] = getInputNames(varargin{:});
     if numel(name_list) == 0
+        error('xunit:NotYetImplemented','This part of the code has not yet been translated to Octave.');
         suite = TestSuite.fromPwd();
     elseif numel(name_list) == 1
-        suite = TestSuite.fromName(name_list{1});
+        suite = TestSuiteFromName(name_list{1});
     else
+        error('xunit:NotYetImplemented','This part of the code has not yet been translated to Octave.');
         suite = TestSuite();
         for k = 1:numel(name_list)
             suite.add(TestSuite.fromName(name_list{k}));
@@ -96,7 +102,7 @@ else
     end
 end
 
-if isempty(suite.TestComponents)
+if suite.emptyTestCase()
     error('xunit:runtests:noTestCasesFound', 'No test cases found.');
 end
 
@@ -105,8 +111,7 @@ if isempty(logfile)
 else
     logfile_handle = fopen(logfile, 'w');
     if logfile_handle < 0
-        error('xunit:runtests:FileOpenFailed', ...
-            'Could not open "%s" for writing.', logfile);
+        error('xunit:runtests:FileOpenFailed', 'Could not open "%s" for writing.', logfile);
     else
         cleanup = onCleanup(@() fclose(logfile_handle));
     end
@@ -119,6 +124,7 @@ end
 fprintf(logfile_handle, '%s\n\n', datestr(now));
 
 if verbose
+    error('xunit:NotYetImplemented','This part of the code has not yet been translated to Octave.');
     monitor = VerboseTestRunDisplay(logfile_handle);
 else
     monitor = TestRunDisplay(logfile_handle);

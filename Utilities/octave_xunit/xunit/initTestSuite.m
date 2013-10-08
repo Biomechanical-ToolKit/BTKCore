@@ -14,13 +14,16 @@
 
 %   Steven L. Eddins
 %   Copyright 2008-2009 The MathWorks, Inc.
+%
+%   Arnaud Barré
+%   Copyright 2013, xUnit for Octave
 
-[ST,I] = dbstack('-completenames');
+[ST,I] = dbstack();
 caller_name = ST(I + 1).name;
 caller_file = ST(I + 1).file;
-subFcns = which('-subfun', caller_file);
+subFcns = subFun(caller_file);
 
-setup_fcn_name = subFcns(xunit.utils.isSetUpString(subFcns));
+setup_fcn_name = subFcns(isSetUpString(subFcns));
 if numel(setup_fcn_name) > 1
     error('findSubfunctionTests:tooManySetupFcns', ...
         'Found more than one setup subfunction.')
@@ -30,7 +33,7 @@ else
     setup_fcn = str2func(setup_fcn_name{1});
 end
 
-teardown_fcn_name = subFcns(xunit.utils.isTearDownString(subFcns));
+teardown_fcn_name = subFcns(isTearDownString(subFcns));
 if numel(teardown_fcn_name) > 1
     error('findSubfunctionTests:tooManyTeardownFcns', ...
         'Found more than one teardown subfunction.')
@@ -40,10 +43,10 @@ else
     teardown_fcn = str2func(teardown_fcn_name{1});
 end
 
-test_fcns = cellfun(@str2func, subFcns(xunit.utils.isTestString(subFcns)), ...
+test_fcns = cellfun(@str2func, subFcns(isTestString(subFcns)), ...
     'UniformOutput', false);
 
-suite = TestSuite;
+suite = TestSuite();
 suite.Name = caller_name;
 suite.Location = which(caller_file);
 for k = 1:numel(test_fcns)

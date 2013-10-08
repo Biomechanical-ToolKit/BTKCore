@@ -22,10 +22,10 @@ if nargin < 2
 end
 
 if ~isscalar(condition) || ~islogical(condition)
-   throwAsCaller(MException('assertFalse:invalidCondition', ...
-      'CONDITION must be a scalar logical value.'));
+   error('assertFalse:invalidCondition', ...
+      'CONDITION must be a scalar logical value.');
 end
 
 if condition
-   throwAsCaller(MException('assertFalse:trueCondition', '%s', message));
+   error('assertFalse:trueCondition', '%s', message);
 end
