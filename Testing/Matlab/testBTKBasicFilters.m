@@ -140,9 +140,9 @@ btkDeleteAcquisition(h);
 end
 
 function testAppendForcePlatformType2_exportC3D(d)
-warning('OFF','btk:ReadAcquisition');
-h = btkReadAcquisition(strcat(d.in,'/C3DSamples/sample09/PluginC3D.c3d'));
-warning('ON','btk:ReadAcquisition');
+warning('off','btk:ReadAcquisition');
+h = btkReadAcquisition(strcat(d.in,'/C3DSamples/sample09/PlugInC3D.c3d'));
+warning('on','btk:ReadAcquisition');
 frw = btkGetForcePlatformWrenches(h,0);
 corners = [-200,-200,0;200,-200,0;200,-400,0;-200,-400,0];
 btkAppendForcePlatformType2(h, frw(1).F, frw(1).M, corners, [0,0,0], 1)
