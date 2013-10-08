@@ -108,7 +108,7 @@ if (localFrame == 0)
     % and expressed them in its frame.
     R = zeros(3);
     R(:,1) = corners(1,:) - corners(2,:); R(:,1) = R(:,1) / norm(R(:,1));
-    R(:,3) = cross(R(:,1), corners(1,:) - corners(4,:)); R(:,3) = R(:,3) / norm(R(:,3)); 
+    R(:,3) = cross(R(:,1)', corners(1,:) - corners(4,:)); R(:,3) = R(:,3) / norm(R(:,3)); 
     R(:,2) = cross(R(:,3), R(:,1));
     forces = forces * R;
     moments = moments * R;
