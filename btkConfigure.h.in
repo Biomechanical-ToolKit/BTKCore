@@ -54,7 +54,6 @@
 #cmakedefine HAVE_SYS_MMAP
 
 // Looking for std::shared_ptr in memory.h
-#cmakedefine BTK_USE_GCC_EXPERIMENTAL
 #cmakedefine HAVE_SYS_TR1_MEMORY_H
 #cmakedefine HAVE_SYS_MEMORY_H
 #cmakedefine HAVE_BOOST_TR1_MEMORY_HPP

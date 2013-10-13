@@ -48,11 +48,10 @@ namespace btk // For documentation purpose
  * @ingroup BTKCommon
  */ 
 };
-// TODO: Need to add the experimental case with  GCC 4.3 (-std=c++0x) 
-//       Use BTK_USE_GCC_EXPERIMENTAL for this
+
 /* Native header */
 #if defined(__GNUC__) && (__GNUC__ > 3)
-  #if defined(HAVE_SYS_TR1_MEMORY_H) && !defined(BTK_USE_GCC_EXPERIMENTAL)
+  #if defined(HAVE_SYS_TR1_MEMORY_H)
      #include <tr1/memory>
     namespace btk { 
       #define SharedPtr std::tr1::shared_ptr
@@ -82,7 +81,6 @@ namespace btk // For documentation purpose
   };
   using boost::static_pointer_cast;
 #else
-// #elif defined(HAVE_BOOST_TR1_MEMORY_HPP)
   // From boost 1.34
   #include <boost/tr1/memory.hpp>
   namespace btk { 
