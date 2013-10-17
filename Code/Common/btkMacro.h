@@ -41,7 +41,8 @@
 #ifndef __btkMacro_h
 #define __btkMacro_h
 
-#include <iostream>
+#include "btkLogger.h"
+
 #include <cstring>
 
 #if defined(_WIN32)
@@ -66,14 +67,14 @@
  * <source> (<line>): <message>
  */
 #define btkErrorMacro(m) \
-  std::cerr << btkStripPathMacro(__FILE__) << "(" << btkStringifyMacro(__LINE__) << "): " << m << std::endl;
+  btk::Logger::Warning(btkStripPathMacro(__FILE__), __LINE__, m);
 
 /**
  * This macro is used to print error message with the following format:
- * <source> (<line>): '<file>' <message>
+ * <source> (<line>): <file> - <message>
  */
 #define btkIOErrorMacro(f, m) \
-  std::cerr << btkStripPathMacro(__FILE__) << "(" << btkStringifyMacro(__LINE__) << "): '" << btkStripPathMacro(f.c_str()) << "' - " << m << std::endl;
+  btk::Logger::Warning(btkStripPathMacro(__FILE__), __LINE__, std::string(btkStripPathMacro(f.c_str())) + " - " + m);
 
 /**
  * This macro returns the number of digits in the given integer
