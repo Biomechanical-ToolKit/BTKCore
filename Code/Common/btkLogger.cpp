@@ -45,9 +45,9 @@ namespace btk
   Logger::VerboseMode Logger::s_VerboseMode = Logger::Detailed;
 #endif
   std::string Logger::s_Prefix = "BTK";
-  Logger::Stream Logger::s_DebugStream = Logger::Stream::Stream(&(std::cout), "DEBUG");
-  Logger::Stream Logger::s_WarningStream = Logger::Stream::Stream(&(std::cerr), "WARNING");
-  Logger::Stream Logger::s_ErrorStream = Logger::Stream::Stream(&(std::cerr), "ERROR");
+  Logger::Stream Logger::s_DebugStream = Logger::Stream(&(std::cout), "DEBUG");
+  Logger::Stream Logger::s_WarningStream = Logger::Stream(&(std::cerr), "WARNING");
+  Logger::Stream Logger::s_ErrorStream = Logger::Stream(&(std::cerr), "ERROR");
   
   void Logger::SetLevelStream(Stream* level, std::ostream* p)
   {
