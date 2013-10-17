@@ -4,6 +4,7 @@ SET(BTKCommon_SRCS
   btkDataObject.cpp
   btkEvent.cpp
   btkForcePlatform.cpp
+  btkLogger.cpp
   btkPoint.cpp
   btkMetaData.cpp  
   btkMetaDataInfo.cpp
