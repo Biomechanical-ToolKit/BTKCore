@@ -98,11 +98,7 @@ namespace btk
   {
     if (c == 10) // New line
     {
-#ifdef HAVE_OCTAVE
-      mexPrintf("%.*s\n", this->m_Message.length(), this->m_Message.c_str());
-#else
       mexWarnMsgIdAndTxt(this->m_Id.c_str(), this->m_Message.c_str());
-#endif
       this->m_Message.clear();
     }
     else
