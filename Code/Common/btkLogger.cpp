@@ -45,49 +45,45 @@ namespace btk
   Logger::VerboseMode Logger::s_VerboseMode = Logger::Detailed;
 #endif
   std::string Logger::s_Prefix = "BTK";
-  Logger::Stream Logger::s_DebugStream = Logger::Stream(&(std::cout), "DEBUG");
-  Logger::Stream Logger::s_WarningStream = Logger::Stream(&(std::cerr), "WARNING");
-  Logger::Stream Logger::s_ErrorStream = Logger::Stream(&(std::cerr), "ERROR");
+  std::string Logger::s_DebugAffix = "DEBUG";
+  std::string Logger::s_WarningAffix = "WARNING";
+  std::string Logger::s_ErrorAffix = "ERROR";
+  Logger::Stream::Pointer Logger::sp_DebugStream = Logger::Stream::New(&(std::cout));
+  Logger::Stream::Pointer Logger::sp_WarningStream = Logger::Stream::New(&(std::cerr));
+  Logger::Stream::Pointer Logger::sp_ErrorStream = Logger::Stream::New(&(std::cerr));
   
-  void Logger::SetLevelStream(Stream* level, std::ostream* p)
-  {
-    level->pointer = p;
-    level->owned = false;
-  };
-  
-  void Logger::PrintMessage(Stream* level, const std::string& filename, int line, const std::string& msg)
+  void Logger::PrintMessage(Stream* level, const std::string& affix, const std::string& filename, int line, const std::string& msg)
   {
     if (Logger::s_VerboseMode == Logger::Quiet)
       return;
     if (Logger::s_VerboseMode > Logger::MessageOnly)
     {
-      *(level->pointer) << (Logger::s_Prefix.empty() ? "" : "[" + Logger::s_Prefix + " ")
-                     << (level->affix.empty() ? "" : level->affix)
-                     << (Logger::s_Prefix.empty() && level->affix.empty() ? "" : "] ");
+      level->GetOutput() << (Logger::s_Prefix.empty() ? "" : "[" + Logger::s_Prefix + " ")
+                     << (affix.empty() ? "" : affix)
+                     << (Logger::s_Prefix.empty() && affix.empty() ? "" : "] ");
     }
     if ((Logger::s_VerboseMode == Logger::Detailed) && (!filename.empty()))
     {
-      *(level->pointer) << filename;
+      level->GetOutput() << filename;
       if (line > 0)
-        *(level->pointer) << " (" << line << ")";
-      *(level->pointer) << ": ";
+        level->GetOutput() << " (" << line << ")";
+      level->GetOutput() << ": ";
     }
-    *(level->pointer) << msg << std::endl;
+    level->GetOutput() << msg << std::endl;
   };
   
   // ----------------------------------------------------------------------- //
   
-  Logger::Stream::Stream(std::ostream* p, const std::string& str)
-  : affix(str)
+  Logger::Stream::Stream(std::ostream* output)
   {
-    this->pointer = p;
-    this->owned = false;
+    this->mp_Output = output;
+    this->m_Owned = false;
   };
   
   Logger::Stream::~Stream()
   {
-    if (this->owned)
-      delete this->pointer;
+    if (this->m_Owned)
+      delete this->mp_Output;
   };
   
 };

@@ -36,6 +36,8 @@
 #ifndef __btkLogger_h
 #define __btkLogger_h
 
+#include "btkSharedPtr.h"
+
 #include <fstream>
 #include <string>
 
@@ -46,13 +48,31 @@ namespace btk
   public:
     typedef enum {Quiet = 0, MessageOnly = 1, Normal = 2, Detailed = 3} VerboseMode;
     
-    static void Debug(const std::string& msg) {Logger::PrintMessage(&Logger::s_DebugStream, msg);};
-    static void Warning(const std::string& msg) {Logger::PrintMessage(&Logger::s_WarningStream, msg);};
-    static void Error(const std::string& msg) {Logger::PrintMessage(&Logger::s_ErrorStream, msg);};
+    class Stream
+    {
+    public:
+      typedef SharedPtr<Stream> Pointer;
+      static Pointer New(std::ostream* output) {return Pointer(new Stream(output));};
+      ~Stream();
+      std::ostream& GetOutput() const {return *(this->mp_Output);};
+            
+    private:
+      Stream(std::ostream* output);
+      
+      Stream(const Stream&); // Not implemented.
+      Stream& operator= (const Stream&); // Notimplemented.
+      
+      std::ostream* mp_Output;
+      bool m_Owned;
+    };
     
-    static void Debug(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(&Logger::s_DebugStream, filename, line, msg);};
-    static void Warning(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(&Logger::s_WarningStream, filename, line, msg);};
-    static void Error(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(&Logger::s_ErrorStream, filename, line, msg);};
+    static void Debug(const std::string& msg) {Logger::PrintMessage(Logger::sp_DebugStream.get(), Logger::s_DebugAffix, msg);};
+    static void Warning(const std::string& msg) {Logger::PrintMessage(Logger::sp_WarningStream.get(), Logger::s_WarningAffix, msg);};
+    static void Error(const std::string& msg) {Logger::PrintMessage(Logger::sp_ErrorStream.get(), Logger::s_ErrorAffix, msg);};
+    
+    static void Debug(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(Logger::sp_DebugStream.get(), Logger::s_DebugAffix, filename, line, msg);};
+    static void Warning(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(Logger::sp_WarningStream.get(), Logger::s_WarningAffix, filename, line, msg);};
+    static void Error(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(Logger::sp_ErrorStream.get(), Logger::s_ErrorAffix, filename, line, msg);};
     
     static VerboseMode GetVerboseMode() {return Logger::s_VerboseMode;};
     static void SetVerboseMode(VerboseMode mode) {Logger::s_VerboseMode = mode;};
@@ -60,41 +80,35 @@ namespace btk
     static const std::string& GetPrefix() {return Logger::s_Prefix;};
     static void SetPrefix(const std::string& str) {Logger::s_Prefix = str;};
     
-    static std::ostream& GetDebugStream() {return *(Logger::s_DebugStream.pointer);};
-    static std::ostream& GetWarningStream() {return *(Logger::s_WarningStream.pointer);};
-    static std::ostream& GetErrorStream() {return *(Logger::s_ErrorStream.pointer);};
-    static void SetDebugStream(std::ostream* p) {Logger::SetLevelStream(&Logger::s_DebugStream, p);};
-    static void SetWarningStream(std::ostream* p) {Logger::SetLevelStream(&Logger::s_WarningStream, p);};
-    static void SetErrorStream(std::ostream* p) {Logger::SetLevelStream(&Logger::s_ErrorStream, p);};
+    static Logger::Stream::Pointer GetDebugStream() {return Logger::sp_DebugStream;};
+    static Logger::Stream::Pointer GetWarningStream() {return Logger::sp_WarningStream;};
+    static Logger::Stream::Pointer GetErrorStream() {return Logger::sp_ErrorStream;};
+    static void SetDebugStream(std::ostream* output) {Logger::SetDebugStream(Logger::Stream::New(output));};
+    static void SetWarningStream(std::ostream* output) {Logger::SetWarningStream(Logger::Stream::New(output));};
+    static void SetErrorStream(std::ostream* output) {Logger::SetErrorStream(Logger::Stream::New(output));};
+    static void SetDebugStream(Logger::Stream::Pointer stream) {Logger::sp_DebugStream = stream;};
+    static void SetWarningStream(Logger::Stream::Pointer stream) {Logger::sp_WarningStream = stream;};
+    static void SetErrorStream(Logger::Stream::Pointer stream) {Logger::sp_ErrorStream = stream;};
     
-    static const std::string& GetDebugAffix() {return Logger::s_DebugStream.affix;};
-    static const std::string& GetWarningAffix() {return Logger::s_DebugStream.affix;};
-    static const std::string& GetErrorAffix() {return Logger::s_DebugStream.affix;};
-    static void SetDebugAffix(const std::string& str) {Logger::s_DebugStream.affix = str;};
-    static void SetWarningAffix(const std::string& str) {Logger::s_DebugStream.affix = str;};
-    static void SetErrorAffix(const std::string& str) {Logger::s_DebugStream.affix = str;};
+    static const std::string& GetDebugAffix() {return Logger::s_DebugAffix;};
+    static const std::string& GetWarningAffix() {return Logger::s_WarningAffix;};
+    static const std::string& GetErrorAffix() {return Logger::s_ErrorAffix;};
+    static void SetDebugAffix(const std::string& str) {Logger::s_DebugAffix = str;};
+    static void SetWarningAffix(const std::string& str) {Logger::s_WarningAffix = str;};
+    static void SetErrorAffix(const std::string& str) {Logger::s_ErrorAffix = str;};
     
   private:
-    struct Stream
-    {
-      Stream(std::ostream* p, const std::string& str);
-      ~Stream();
-      // Stream(const Stream&); // Implicit.
-      // Stream& operator= (const Stream&); // Implicit.
-      std::ostream* pointer;
-      bool owned;
-      std::string affix;
-    };
-    
-    static void SetLevelStream(Stream* level, std::ostream* p);
-    static void PrintMessage(Stream* level, const std::string& msg) {Logger::PrintMessage(level, "", 0, msg);};
-    static void PrintMessage(Stream* level, const std::string& filename, int line, const std::string& msg);
+    static void PrintMessage(Stream* level, const std::string& affix, const std::string& msg) {Logger::PrintMessage(level, affix, "", 0, msg);};
+    static void PrintMessage(Stream* level, const std::string& affix, const std::string& filename, int line, const std::string& msg);
     
     static VerboseMode s_VerboseMode;
     static std::string s_Prefix;
-    static Stream s_DebugStream;
-    static Stream s_WarningStream;
-    static Stream s_ErrorStream; 
+    static std::string s_DebugAffix;
+    static std::string s_WarningAffix;
+    static std::string s_ErrorAffix;
+    static Stream::Pointer sp_DebugStream;
+    static Stream::Pointer sp_WarningStream;
+    static Stream::Pointer sp_ErrorStream; 
   };
 };
 
