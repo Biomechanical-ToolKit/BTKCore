@@ -87,7 +87,7 @@ namespace btk
    */
   std::streamsize MEXStreambufToWarnMsgTxt::xsputn(const char* s, std::streamsize n) 
   {
-    this->m_Message += std::string(s);
+    this->m_Message += std::string(s,n);
     return n;
   };
 
