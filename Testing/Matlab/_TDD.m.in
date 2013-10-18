@@ -13,6 +13,7 @@ function out = TDD
     if (~isOctave)
         addpath('@BTK_SOURCE_DIR@/Utilities/matlab_xunit/xunit');
     else
+        more off;
         addpath(genpath('@BTK_SOURCE_DIR@/Utilities/octave_xunit/xunit'));
     end
     % Run the unit tests
@@ -43,4 +44,6 @@ function out = TDD
                 out = out & runtests('testC3DserverEmulation');
             end
         end
+    else
+        more on;
     end
