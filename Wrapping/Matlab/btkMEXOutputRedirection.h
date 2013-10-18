@@ -38,6 +38,7 @@
 
 #include "btkMEXStreambufToPrintf.h"
 #include "btkMEXStreambufToWarnMsgTxt.h"
+#include "btkLogger.h"
 
 #include "btkMex.h"
 
@@ -57,13 +58,14 @@ namespace btk
   class MEXOutputRedirection
   {
   public:
-    MEXOutputRedirection(std::ostream* output);
-    MEXOutputRedirection(std::ostream* output, const std::string& id);
+    MEXOutputRedirection();
+    MEXOutputRedirection(const std::string& id);
     virtual ~MEXOutputRedirection();
-  private:
-    std::ostream* mp_Stream;
-    T* mp_NewBuffer;
-    std::streambuf* mp_OldBuffer;
+  protected:
+    T* mp_Buffer;
+    std::ostream* mp_Output;
+    Logger::VerboseMode m_OldVerboseMode;
+    Logger::Stream::Pointer mp_OldStream;
   };
   
   /**
@@ -90,8 +92,19 @@ namespace btk
   class MEXCoutToPrintf : public MEXOutputRedirection<MEXStreambufToPrintf>
   {
   public:
-    MEXCoutToPrintf() : MEXOutputRedirection<MEXStreambufToPrintf>(&std::cout)
-    {};
+    MEXCoutToPrintf() : MEXOutputRedirection<MEXStreambufToPrintf>()
+    {
+      this->m_OldVerboseMode = Logger::GetVerboseMode();
+      this->mp_OldStream = Logger::GetDebugStream();
+      Logger::SetVerboseMode(Logger::MessageOnly);
+      Logger::SetDebugStream(this->mp_Output);
+      
+    };
+    ~MEXCoutToPrintf()
+    {
+      Logger::SetVerboseMode(this->m_OldVerboseMode);
+      Logger::SetDebugStream(this->mp_OldStream);
+    };
   };
   
   /**
@@ -118,31 +131,43 @@ namespace btk
   class MEXCerrToWarnMsgTxt : public MEXOutputRedirection<MEXStreambufToWarnMsgTxt>
   {
   public:
-    MEXCerrToWarnMsgTxt(const std::string& id) : MEXOutputRedirection<MEXStreambufToWarnMsgTxt>(&std::cerr, id)
-    {};
+    MEXCerrToWarnMsgTxt(const std::string& id) : MEXOutputRedirection<MEXStreambufToWarnMsgTxt>(id)
+    {
+      this->m_OldVerboseMode = Logger::GetVerboseMode();
+      this->mp_OldStream = Logger::GetWarningStream();
+      Logger::SetVerboseMode(Logger::MessageOnly);
+      Logger::SetWarningStream(this->mp_Output);
+    };
+    ~MEXCerrToWarnMsgTxt()
+    {
+      Logger::SetVerboseMode(this->m_OldVerboseMode);
+      Logger::SetWarningStream(this->mp_OldStream);
+    };
   };
   
   /**
    * Constructor setting the new buffer by using the default constructor of the template class @a T
    */
   template <class T>
-  MEXOutputRedirection<T>::MEXOutputRedirection(std::ostream* output)
+  MEXOutputRedirection<T>::MEXOutputRedirection()
+  : mp_OldStream()
   {
-    this->mp_Stream = output;
-    this->mp_NewBuffer = new T();
-    this->mp_OldBuffer = this->mp_Stream->rdbuf(this->mp_NewBuffer);
-  }
+    this->mp_Buffer = new T();
+    this->mp_Output = new std::ostream(this->mp_Buffer);
+    this->m_OldVerboseMode = Logger::Quiet;
+  };
   
   /**
    * Constructor setting the new buffer by using a constructor of the template class @a T requiring an id.
    */
   template <class T>
-  MEXOutputRedirection<T>::MEXOutputRedirection(std::ostream* output, const std::string& id)
+  MEXOutputRedirection<T>::MEXOutputRedirection(const std::string& id)
+  : mp_OldStream()
   {
-    this->mp_Stream = output;
-    this->mp_NewBuffer = new T(id);
-    this->mp_OldBuffer = this->mp_Stream->rdbuf(this->mp_NewBuffer);
-  }
+    this->mp_Buffer = new T(id);
+    this->mp_Output = new std::ostream(this->mp_Buffer);
+    this->m_OldVerboseMode = Logger::Quiet;
+  };
   
   /**
    * Destructor
@@ -151,8 +176,8 @@ namespace btk
   template <class T>
   MEXOutputRedirection<T>::~MEXOutputRedirection()
   {
-    this->mp_Stream->rdbuf(this->mp_OldBuffer);
-    delete this->mp_NewBuffer;
+    delete this->mp_Buffer;
+    delete this->mp_Output;
   };
   
   /**
