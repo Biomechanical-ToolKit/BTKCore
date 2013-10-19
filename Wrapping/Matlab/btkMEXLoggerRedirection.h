@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkMEXOutputRedirection_h
-#define __btkMEXOutputRedirection_h
+#ifndef __btkMEXLoggerRedirection_h
+#define __btkMEXLoggerRedirection_h
 
 #include "btkMEXStreambufToPrintf.h"
 #include "btkMEXStreambufToWarnMsgTxt.h"
@@ -45,22 +45,22 @@
 namespace btk
 {
   /**
-   * @class MEXOutputRedirection btkMEXOutputRedirection.h
-   * @brief Template class to redirect an output stream.
+   * @class MEXLoggerRedirection btkMEXLoggerRedirection.h
+   * @brief Template class to redirect a btk::Logger stream.
    *
    * This is a generic class which gives the possibility to redirect any
-   * output stream to another stream by setting a new stream buffer.
+   * btk::Logger stream to another stream.
    *
    * @ingroup BTKWrappingMatlab
-   * @sa MEXCoutToPrintf, MEXCerrToWarnMsgTxt
+   * @sa MEXDebugLogToPrintf, MEXWarnLogToWarnMsgTxt
    */
   template <class T>
-  class MEXOutputRedirection
+  class MEXLoggerRedirection
   {
   public:
-    MEXOutputRedirection();
-    MEXOutputRedirection(const std::string& id);
-    virtual ~MEXOutputRedirection();
+    MEXLoggerRedirection();
+    MEXLoggerRedirection(const std::string& id);
+    virtual ~MEXLoggerRedirection();
   protected:
     T* mp_Buffer;
     std::ostream* mp_Output;
@@ -69,18 +69,18 @@ namespace btk
   };
   
   /**
-   * @class MEXCoutToPrintf btkMEXOutputRedirection.h
-   * @brief Class to redirect to standard C++ output (std::cout) to the MEX function mexPrintf.
+   * @class MEXDebugLogToPrintf btkMEXLoggerRedirection.h
+   * @brief Class to redirect to debug logs to the MEX function mexPrintf.
    *
-   * The use of this class gives you the possibility in one line to redirect std::cout during the execution
-   * of the MEX function. Automaticaly at the end of the function, the redirection is reseted.
+   * The use of this class gives you the possibility in one line to redirect the logs sent to the debug logger (btk::Logger::Debug()) during the execution
+   * of the MEX function. Automaticaly at the end of the function (or the scope of the variable set), the redirection is reseted.
    * @code
    * void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    * {
-   *   // std::cout redirection to the mexPrintf function.
-   *   btk::MEXCoutToPrintf coutRedir = btk::MEXCoutToPrintf(); // It is important to construct an object otherise the redirection is not done.
+   *   // Redirection of the debug logs to the mexPrintf function.
+   *   btk::MEXDebugLogToPrintf debugRedir = btk::MEXDebugLogToPrintf(); // It is important to construct an object otherwise the redirection is not done.
    *   ... // Do what you want
-   *   std::cout << "Simple example to show you that this line will be printed in the Matlab console."
+   *   btk::Logger::Debug("Simple example to show you that this line will be printed in the Matlab console.");
    *   return;
    *   // The redirection is automaticaly reseted at the end of the function
    * }
@@ -89,10 +89,10 @@ namespace btk
    * @sa MEXStreambufToPrintf
    * @ingroup BTKWrappingMatlab
    */
-  class MEXCoutToPrintf : public MEXOutputRedirection<MEXStreambufToPrintf>
+  class MEXDebugLogToPrintf : public MEXLoggerRedirection<MEXStreambufToPrintf>
   {
   public:
-    MEXCoutToPrintf() : MEXOutputRedirection<MEXStreambufToPrintf>()
+    MEXDebugLogToPrintf() : MEXLoggerRedirection<MEXStreambufToPrintf>()
     {
       this->m_OldVerboseMode = Logger::GetVerboseMode();
       this->mp_OldStream = Logger::GetDebugStream();
@@ -100,7 +100,7 @@ namespace btk
       Logger::SetDebugStream(this->mp_Output);
       
     };
-    ~MEXCoutToPrintf()
+    ~MEXDebugLogToPrintf()
     {
       Logger::SetVerboseMode(this->m_OldVerboseMode);
       Logger::SetDebugStream(this->mp_OldStream);
@@ -108,48 +108,50 @@ namespace btk
   };
   
   /**
-   * @class MEXCerrToWarnMsgTxt btkMEXOutputRedirection.h
-   * @brief Class to redirect to standard C++ error (std::cerr) to the MEX function mexWarnMsgIdAndTxt.
+   * @class MEXWarnLogToWarnMsgTxt btkMEXLoggerRedirection.h
+   * @brief Class to redirect the warning logs to the MEX function mexWarnMsgIdAndTxt.
    *
    * As the new stream buffer is wrapped around the MEX function mexWarnMsgIdAndTxt, it is important
    * to give to the constructor a specific ID which will can be used to enable or disable this warning in Matlab.
    * @code
    * void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    * {
-   *   // std::cerr redirection to the mexWarnMsgTxt function.
-   *   btk::MEXCerrToWarnMsgTxt cerrRedir = btk::MEXCerrToWarnMsgTxt("myProgram:MyID"); // It is important to construct an object otherise the redirection is not done.
+   *   // Redirection of the warning logs to the mexWarnMsgTxt function.
+   *   btk::MEXWarnLogToWarnMsgTxt warnRedir = btk::MEXWarnLogToWarnMsgTxt("myProgram:MyID"); // It is important to construct an object otherwise the redirection is not done.
    *   ... // Do what you want
-   *   std::cerr << "Simple example to show you that this line will be printed in the Matlab console as a warning."
+   *   btk::Logger::Warning("Simple example to show you that this line will be printed in the Matlab console as a warning.");
    *   return;
    *   // The redirection is automaticaly reseted at the end of the function
    * }
    * @endcode
    *
-   * @sa MEXStreambufToPrintf
+   * @sa MEXStreambufToWarnMsgTxt
    * @ingroup BTKWrappingMatlab
    */
-  class MEXCerrToWarnMsgTxt : public MEXOutputRedirection<MEXStreambufToWarnMsgTxt>
+  class MEXWarnLogToWarnMsgTxt : public MEXLoggerRedirection<MEXStreambufToWarnMsgTxt>
   {
   public:
-    MEXCerrToWarnMsgTxt(const std::string& id) : MEXOutputRedirection<MEXStreambufToWarnMsgTxt>(id)
+    MEXWarnLogToWarnMsgTxt(const std::string& id) : MEXLoggerRedirection<MEXStreambufToWarnMsgTxt>(id)
     {
       this->m_OldVerboseMode = Logger::GetVerboseMode();
       this->mp_OldStream = Logger::GetWarningStream();
       Logger::SetVerboseMode(Logger::MessageOnly);
       Logger::SetWarningStream(this->mp_Output);
     };
-    ~MEXCerrToWarnMsgTxt()
+    ~MEXWarnLogToWarnMsgTxt()
     {
       Logger::SetVerboseMode(this->m_OldVerboseMode);
       Logger::SetWarningStream(this->mp_OldStream);
     };
   };
   
+  // ----------------------------------------------------------------------- //
+  
   /**
    * Constructor setting the new buffer by using the default constructor of the template class @a T
    */
   template <class T>
-  MEXOutputRedirection<T>::MEXOutputRedirection()
+  MEXLoggerRedirection<T>::MEXLoggerRedirection()
   : mp_OldStream()
   {
     this->mp_Buffer = new T();
@@ -161,7 +163,7 @@ namespace btk
    * Constructor setting the new buffer by using a constructor of the template class @a T requiring an id.
    */
   template <class T>
-  MEXOutputRedirection<T>::MEXOutputRedirection(const std::string& id)
+  MEXLoggerRedirection<T>::MEXLoggerRedirection(const std::string& id)
   : mp_OldStream()
   {
     this->mp_Buffer = new T(id);
@@ -174,19 +176,19 @@ namespace btk
    * Reset the redirection.
    */
   template <class T>
-  MEXOutputRedirection<T>::~MEXOutputRedirection()
+  MEXLoggerRedirection<T>::~MEXLoggerRedirection()
   {
     delete this->mp_Buffer;
     delete this->mp_Output;
   };
   
   /**
-   * @fn template <class T> MEXCoutToPrintf::MEXCoutToPrintf()
+   * @fn template <class T> MEXDebugLogToPrintf::MEXDebugLogToPrintf()
    * Constructor
    */
    
   /**
-   * @fn template <class T> MEXCerrToWarnMsgTxt::MEXCerrToWarnMsgTxt(const std::string& id)
+   * @fn template <class T> MEXWarnLogToWarnMsgTxt::MEXWarnLogToWarnMsgTxt(const std::string& id)
    * Constructor
    */
 };

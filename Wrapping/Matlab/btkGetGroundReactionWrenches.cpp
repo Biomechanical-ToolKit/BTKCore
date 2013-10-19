@@ -37,7 +37,7 @@
 
 #include "btkMEXObjectHandle.h"
 #include "btkMXMeasure.h"
-#include "btkMEXOutputRedirection.h"
+#include "btkMEXLoggerRedirection.h"
 
 #include <btkAcquisition.h>
 #include <btkForcePlatformsExtractor.h>
@@ -55,8 +55,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     if (!mxIsNumeric(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
       mexErrMsgTxt("Second input argument must be a real value.");
 
-  // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXCerrToWarnMsgTxt cerrRedir = btk::MEXCerrToWarnMsgTxt("btk:GetGroundReactionWrenches");
+  // Redirection of the btk::Logger::Warning stream.
+  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:GetGroundReactionWrenches");
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);

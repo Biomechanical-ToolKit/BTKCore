@@ -37,7 +37,7 @@
 
 #include "btkMEXObjectHandle.h"
 #include "btkMXMeasure.h"
-#include "btkMEXOutputRedirection.h"
+#include "btkMEXLoggerRedirection.h"
 
 #include <btkAcquisition.h>
 #include <btkForcePlatformsExtractor.h>
@@ -52,8 +52,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if ((nrhs > 1)  && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
     mexErrMsgTxt("The flag to express wrenches in global or local frame must be set determine first frame must be set by one integer.");
     
-  // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXCerrToWarnMsgTxt cerrRedir = btk::MEXCerrToWarnMsgTxt("btk:GetForcePlatformWrenches");
+  // Redirection of the btk::Logger::Warning stream.
+  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:GetForcePlatformWrenches");
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);

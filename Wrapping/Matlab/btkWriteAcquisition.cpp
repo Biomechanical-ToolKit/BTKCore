@@ -34,7 +34,7 @@
  */
 
 #include "btkMEXObjectHandle.h"
-#include "btkMEXOutputRedirection.h"
+#include "btkMEXLoggerRedirection.h"
 
 #include <btkAcquisitionFileWriter.h>
 #include <btkAcquisitionFileIOFactory.h>
@@ -133,10 +133,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       mexErrMsgTxt(errMsg.c_str());
   }
   
-  // std::cout redirection to the mexPrintf function.
-  btk::MEXCoutToPrintf coutRedir = btk::MEXCoutToPrintf();
-  // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXCerrToWarnMsgTxt cerrRedir = btk::MEXCerrToWarnMsgTxt("btk:WriteAcquisition");
+  // Redirection of the btk::Logger::Debug stream.
+  btk::MEXDebugLogToPrintf debugRedir = btk::MEXDebugLogToPrintf();
+  // Redirection of the btk::Logger::Warning stream.
+  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:WriteAcquisition");
 
   // The IO detection is done here to be able to set options.
   btk::AcquisitionFileIO::Pointer io = btk::AcquisitionFileIOFactory::CreateAcquisitionIO(filename, btk::AcquisitionFileIOFactory::WriteMode);

@@ -34,7 +34,7 @@
  */
 
 #include "btkMEXObjectHandle.h"
-#include "btkMEXOutputRedirection.h"
+#include "btkMEXLoggerRedirection.h"
 
 #include <btkMergeAcquisitionFilter.h>
 #include <btkAcquisition.h>
@@ -51,8 +51,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   for (int i = 0 ; i < nrhs ; ++i)
     merger->SetInput(i, btk_MOH_get_object<btk::Acquisition>(prhs[i]));
 
-  // std::cerr redirection to the mexWarnMsgTxt function.
-  btk::MEXCerrToWarnMsgTxt cerrRedir = btk::MEXCerrToWarnMsgTxt("btk:MergeAcquisitions");
+  // Redirection of the btk::Logger::Warning stream.
+  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:MergeAcquisitions");
   
   merger->Update();
   
