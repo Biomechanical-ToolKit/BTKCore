@@ -34,7 +34,7 @@
  */
 
 #include "btkMEXObjectHandle.h"
-#include "btkMEXLoggerRedirection.h"
+#include "btkMEXWarnLogToWarnMsgTxt.h"
 
 #include <btkAcquisitionFileReader.h>
 
@@ -48,8 +48,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (!mxIsChar(prhs[0]) || mxIsEmpty(prhs[0]))
    mexErrMsgTxt("The filename must be a string and can't be empty.");
 
-  // Redirection of the btk::Logger::Debug stream.
-  btk::MEXDebugLogToPrintf debugRedir = btk::MEXDebugLogToPrintf();
   // Redirection of the btk::Logger::Warning stream.
   btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:ReadAcquisition");
 

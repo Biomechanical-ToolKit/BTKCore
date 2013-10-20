@@ -37,7 +37,7 @@
 
 #include "btkMEXObjectHandle.h"
 #include "btkMXMeasure.h"
-#include "btkMEXLoggerRedirection.h"
+#include "btkMEXWarnLogToWarnMsgTxt.h"
 
 #include <btkAcquisition.h>
 #include <btkForcePlatformsExtractor.h>

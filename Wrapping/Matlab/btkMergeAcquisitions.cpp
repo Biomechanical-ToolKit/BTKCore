@@ -34,7 +34,7 @@
  */
 
 #include "btkMEXObjectHandle.h"
-#include "btkMEXLoggerRedirection.h"
+#include "btkMEXWarnLogToWarnMsgTxt.h"
 
 #include <btkMergeAcquisitionFilter.h>
 #include <btkAcquisition.h>

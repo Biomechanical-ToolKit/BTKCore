@@ -34,7 +34,7 @@
  */
 
 #include "btkMEXObjectHandle.h"
-#include "btkMEXLoggerRedirection.h"
+#include "btkMEXWarnLogToWarnMsgTxt.h"
 
 #include <btkAcquisitionFileWriter.h>
 #include <btkAcquisitionFileIOFactory.h>
@@ -133,8 +133,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       mexErrMsgTxt(errMsg.c_str());
   }
   
-  // Redirection of the btk::Logger::Debug stream.
-  btk::MEXDebugLogToPrintf debugRedir = btk::MEXDebugLogToPrintf();
   // Redirection of the btk::Logger::Warning stream.
   btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:WriteAcquisition");
 

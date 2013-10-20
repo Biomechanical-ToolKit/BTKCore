@@ -36,8 +36,6 @@
 #ifndef __btkMEXLoggerRedirection_h
 #define __btkMEXLoggerRedirection_h
 
-#include "btkMEXStreambufToPrintf.h"
-#include "btkMEXStreambufToWarnMsgTxt.h"
 #include "btkLogger.h"
 
 #include "btkMex.h"
@@ -67,85 +65,6 @@ namespace btk
     Logger::VerboseMode m_OldVerboseMode;
     Logger::Stream::Pointer mp_OldStream;
   };
-  
-  /**
-   * @class MEXDebugLogToPrintf btkMEXLoggerRedirection.h
-   * @brief Class to redirect to debug logs to the MEX function mexPrintf.
-   *
-   * The use of this class gives you the possibility in one line to redirect the logs sent to the debug logger (btk::Logger::Debug()) during the execution
-   * of the MEX function. Automaticaly at the end of the function (or the scope of the variable set), the redirection is reseted.
-   * @code
-   * void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-   * {
-   *   // Redirection of the debug logs to the mexPrintf function.
-   *   btk::MEXDebugLogToPrintf debugRedir = btk::MEXDebugLogToPrintf(); // It is important to construct an object otherwise the redirection is not done.
-   *   ... // Do what you want
-   *   btk::Logger::Debug("Simple example to show you that this line will be printed in the Matlab console.");
-   *   return;
-   *   // The redirection is automaticaly reseted at the end of the function
-   * }
-   * @endcode
-   *
-   * @sa MEXStreambufToPrintf
-   * @ingroup BTKWrappingMatlab
-   */
-  class MEXDebugLogToPrintf : public MEXLoggerRedirection<MEXStreambufToPrintf>
-  {
-  public:
-    MEXDebugLogToPrintf() : MEXLoggerRedirection<MEXStreambufToPrintf>()
-    {
-      this->m_OldVerboseMode = Logger::GetVerboseMode();
-      this->mp_OldStream = Logger::GetDebugStream();
-      Logger::SetVerboseMode(Logger::MessageOnly);
-      Logger::SetDebugStream(this->mp_Output);
-      
-    };
-    ~MEXDebugLogToPrintf()
-    {
-      Logger::SetVerboseMode(this->m_OldVerboseMode);
-      Logger::SetDebugStream(this->mp_OldStream);
-    };
-  };
-  
-  /**
-   * @class MEXWarnLogToWarnMsgTxt btkMEXLoggerRedirection.h
-   * @brief Class to redirect the warning logs to the MEX function mexWarnMsgIdAndTxt.
-   *
-   * As the new stream buffer is wrapped around the MEX function mexWarnMsgIdAndTxt, it is important
-   * to give to the constructor a specific ID which will can be used to enable or disable this warning in Matlab.
-   * @code
-   * void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-   * {
-   *   // Redirection of the warning logs to the mexWarnMsgTxt function.
-   *   btk::MEXWarnLogToWarnMsgTxt warnRedir = btk::MEXWarnLogToWarnMsgTxt("myProgram:MyID"); // It is important to construct an object otherwise the redirection is not done.
-   *   ... // Do what you want
-   *   btk::Logger::Warning("Simple example to show you that this line will be printed in the Matlab console as a warning.");
-   *   return;
-   *   // The redirection is automaticaly reseted at the end of the function
-   * }
-   * @endcode
-   *
-   * @sa MEXStreambufToWarnMsgTxt
-   * @ingroup BTKWrappingMatlab
-   */
-  class MEXWarnLogToWarnMsgTxt : public MEXLoggerRedirection<MEXStreambufToWarnMsgTxt>
-  {
-  public:
-    MEXWarnLogToWarnMsgTxt(const std::string& id) : MEXLoggerRedirection<MEXStreambufToWarnMsgTxt>(id)
-    {
-      this->m_OldVerboseMode = Logger::GetVerboseMode();
-      this->mp_OldStream = Logger::GetWarningStream();
-      Logger::SetVerboseMode(Logger::MessageOnly);
-      Logger::SetWarningStream(this->mp_Output);
-    };
-    ~MEXWarnLogToWarnMsgTxt()
-    {
-      Logger::SetVerboseMode(this->m_OldVerboseMode);
-      Logger::SetWarningStream(this->mp_OldStream);
-    };
-  };
-  
-  // ----------------------------------------------------------------------- //
   
   /**
    * Constructor setting the new buffer by using the default constructor of the template class @a T
@@ -181,15 +100,5 @@ namespace btk
     delete this->mp_Buffer;
     delete this->mp_Output;
   };
-  
-  /**
-   * @fn template <class T> MEXDebugLogToPrintf::MEXDebugLogToPrintf()
-   * Constructor
-   */
-   
-  /**
-   * @fn template <class T> MEXWarnLogToWarnMsgTxt::MEXWarnLogToWarnMsgTxt(const std::string& id)
-   * Constructor
-   */
 };
 #endif // __btkMEXStreambufToPrintf_h
