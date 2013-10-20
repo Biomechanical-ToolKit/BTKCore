@@ -48,7 +48,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("Too many output arguments.");
 
   // Redirection of the btk::Logger::Warning stream.
-  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:GetForcePlatforms");
+  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk::MEXWarnLogToWarnMsgTxt("btk:GetForcePlatforms");
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);

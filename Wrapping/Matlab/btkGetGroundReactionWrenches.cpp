@@ -56,7 +56,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       mexErrMsgTxt("Second input argument must be a real value.");
 
   // Redirection of the btk::Logger::Warning stream.
-  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:GetGroundReactionWrenches");
+  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk::MEXWarnLogToWarnMsgTxt("btk:GetGroundReactionWrenches");
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);

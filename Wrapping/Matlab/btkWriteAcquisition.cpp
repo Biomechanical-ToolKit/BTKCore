@@ -134,7 +134,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   
   // Redirection of the btk::Logger::Warning stream.
-  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:WriteAcquisition");
+  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk::MEXWarnLogToWarnMsgTxt("btk:WriteAcquisition");
 
   // The IO detection is done here to be able to set options.
   btk::AcquisitionFileIO::Pointer io = btk::AcquisitionFileIOFactory::CreateAcquisitionIO(filename, btk::AcquisitionFileIOFactory::WriteMode);

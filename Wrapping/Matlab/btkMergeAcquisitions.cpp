@@ -52,7 +52,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     merger->SetInput(i, btk_MOH_get_object<btk::Acquisition>(prhs[i]));
 
   // Redirection of the btk::Logger::Warning stream.
-  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:MergeAcquisitions");
+  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk::MEXWarnLogToWarnMsgTxt("btk:MergeAcquisitions");
   
   merger->Update();
   

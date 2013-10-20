@@ -49,7 +49,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
    mexErrMsgTxt("The filename must be a string and can't be empty.");
 
   // Redirection of the btk::Logger::Warning stream.
-  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk:: MEXWarnLogToWarnMsgTxt("btk:ReadAcquisition");
+  btk::MEXWarnLogToWarnMsgTxt warnRedir = btk::MEXWarnLogToWarnMsgTxt("btk:ReadAcquisition");
 
   size_t strlen_ = (mxGetM(prhs[0]) * mxGetN(prhs[0]) * sizeof(mxChar)) + 1;
   char* filename = (char*)mxMalloc(strlen_);
