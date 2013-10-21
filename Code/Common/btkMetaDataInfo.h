@@ -37,7 +37,6 @@
 #define __btkMetaDataInfo_h
 
 #include "btkSharedPtr.h"
-#include "btkMacro.h"
 
 #include <string>
 #include <vector>

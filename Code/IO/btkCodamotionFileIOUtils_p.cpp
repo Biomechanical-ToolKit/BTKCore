@@ -34,6 +34,7 @@
  */
 
 #include "btkCodamotionFileIOUtils_p.h"
+#include "btkLogger.h"
 
 namespace btk
 {

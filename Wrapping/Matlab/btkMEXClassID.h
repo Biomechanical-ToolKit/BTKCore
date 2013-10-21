@@ -36,7 +36,7 @@
 #ifndef __btkMEXClassID_h
 #define __btkMEXClassID_h
 
-#include <btkMacro.h>
+#include <btkLogger.h>
 
 namespace btk
 {

@@ -36,6 +36,7 @@
 #include "btkC3DFileIO.h"
 #include "btkMetaDataUtils.h"
 #include "btkConvert.h"
+#include "btkLogger.h"
 
 #include <algorithm>
 #include <cctype>

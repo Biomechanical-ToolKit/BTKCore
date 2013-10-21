@@ -36,8 +36,6 @@
 #ifndef mokkaConfigure_h
 #define mokkaConfigure_h
 
-#include "btkMacro.h"
-
 #include <QtCore>
 
 #define MOKKA_VERSION_MAJOR @MOKKA_VERSION_MAJOR@

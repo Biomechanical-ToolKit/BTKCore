@@ -35,6 +35,7 @@
 
 #include "btkDataObject.h"
 #include "btkProcessObject.h"
+#include "btkLogger.h"
 
 namespace btk
 {

@@ -37,6 +37,7 @@
 #include "btkMotionAnalysisFileIOUtils_p.h"
 #include "btkConvert.h"
 #include "btkMetaDataUtils.h"
+#include "btkLogger.h"
 
 #include <Eigen/Geometry>
 

@@ -38,7 +38,7 @@
 
 #include "btkDataObject.h"
 #include "btkException.h"
-#include "btkMacro.h"
+#include "btkLogger.h"
 
 #include <list>
 

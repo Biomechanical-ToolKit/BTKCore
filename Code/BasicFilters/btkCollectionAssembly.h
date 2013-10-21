@@ -38,7 +38,6 @@
 
 #include "btkProcessObject.h"
 #include "btkCollection.h"
-#include "btkMacro.h"
 
 namespace btk
 {

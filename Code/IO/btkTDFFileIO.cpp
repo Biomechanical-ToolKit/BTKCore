@@ -37,6 +37,7 @@
 #include "btkBinaryFileStream.h"
 #include "btkConvert.h"
 #include "btkMetaDataUtils.h"
+#include "btkLogger.h"
 
 #include <algorithm>
 #include <cctype>

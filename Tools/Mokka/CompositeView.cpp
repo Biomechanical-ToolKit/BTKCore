@@ -41,7 +41,6 @@
 #include "LoggerWidget.h"
 #include "Acquisition.h"
 
-#include <btkMacro.h>
 #include <btkVTKInteractorStyleTrackballFixedUpCamera.h>
 
 #include <vtkCamera.h>

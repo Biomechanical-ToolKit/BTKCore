@@ -37,7 +37,7 @@
 #define __btkMeasure_h
 
 #include "btkDataObject.h"
-#include "btkMacro.h"
+#include "btkLogger.h"
 
 #include <Eigen/Core>
 #include <string>

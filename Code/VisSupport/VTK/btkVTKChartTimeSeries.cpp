@@ -34,7 +34,7 @@
  */
 
 #include "btkVTKChartTimeSeries.h"
-#include "btkMacro.h"
+#include "btkLogger.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkChartLegend.h>

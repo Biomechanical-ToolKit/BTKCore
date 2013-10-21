@@ -37,7 +37,7 @@
 
 #include "btkVTKOpenGLContextDevice2D.h"
 #include "btkVTKOpenGL2ContextDevice2D.h"
-#include "btkMacro.h"
+#include "btkLogger.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkContext2D.h>

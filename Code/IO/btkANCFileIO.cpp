@@ -37,6 +37,7 @@
 #include "btkMetaDataUtils.h"
 #include "btkMotionAnalysisFileIOUtils_p.h"
 #include "btkConvert.h"
+#include "btkLogger.h"
 
 #include <fstream>
 #include <algorithm>

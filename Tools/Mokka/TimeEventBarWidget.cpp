@@ -35,8 +35,6 @@
 
 #include "TimeEventBarWidget.h"
 
-#include <btkMacro.h>
-
 #include <QtGui>
 #include <QLinearGradient>
 #include <QFontMetrics>

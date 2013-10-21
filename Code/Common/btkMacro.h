@@ -41,8 +41,6 @@
 #ifndef __btkMacro_h
 #define __btkMacro_h
 
-#include "btkLogger.h"
-
 #include <cstring>
 
 #if defined(_WIN32)
@@ -61,20 +59,6 @@
  * Usefull when the compiler gives you a warning to say that the variable is not used.
  */
 #define btkNotUsed(x) (void)x;
-
-/**
- * This macro is used to print error message with the following format:
- * <source> (<line>): <message>
- */
-#define btkErrorMacro(m) \
-  btk::Logger::Warning(btkStripPathMacro(__FILE__), __LINE__, m);
-
-/**
- * This macro is used to print error message with the following format:
- * <source> (<line>): <file> - <message>
- */
-#define btkIOErrorMacro(f, m) \
-  btk::Logger::Warning(btkStripPathMacro(__FILE__), __LINE__, std::string(btkStripPathMacro(f.c_str())) + " - " + m);
 
 /**
  * This macro returns the number of digits in the given integer

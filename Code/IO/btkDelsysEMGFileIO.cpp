@@ -36,6 +36,7 @@
 #include "btkDelsysEMGFileIO.h"
 #include "btkBinaryFileStream.h"
 #include "btkMetaDataUtils.h"
+#include "btkLogger.h"
 
 namespace btk
 {

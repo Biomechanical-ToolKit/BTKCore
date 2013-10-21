@@ -36,7 +36,6 @@
 #ifndef __btkProcessObject_h
 #define __btkProcessObject_h
 
-#include "btkMacro.h"
 #include "btkObject.h"
 #include "btkDataObject.h"
 

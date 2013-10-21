@@ -36,7 +36,7 @@
 #ifndef __btkEigenIIRFilterDesign_h
 #define __btkEigenIIRFilterDesign_h
 
-#include "btkMacro.h"
+#include "btkLogger.h"
 #include "Utilities/maths/comb.h"
 
 #include <Eigen/Core>

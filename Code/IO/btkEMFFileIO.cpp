@@ -36,6 +36,7 @@
 #include "btkEMFFileIO.h"
 #include "btkConvert.h"
 #include "btkMetaDataUtils.h"
+#include "btkLogger.h"
 
 #include <fstream>
 #include <algorithm>

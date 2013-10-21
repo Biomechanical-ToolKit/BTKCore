@@ -37,9 +37,30 @@
 #define __btkLogger_h
 
 #include "btkSharedPtr.h"
+#include "btkMacro.h"
 
 #include <fstream>
 #include <string>
+
+/**
+ * Internal macro used to print log on the given stream @c s.
+ */
+#define _btkLogMacro(s, p, l, m) \
+  btk::Logger::s(btkStripPathMacro(p), l, m);
+
+/**
+ * Send an warning message to the logger with information on its source code location (filename, line number).
+ */
+#define btkErrorMacro(m) \
+  _btkLogMacro(Warning, __FILE__, __LINE__, m);
+
+/**
+ * Send an warning message (including the processed filename) to the logger with information on its source code location (filename, line number).
+ */
+#define btkIOErrorMacro(f, m) \
+  btkErrorMacro(std::string(btkStripPathMacro(f.c_str())) + " - " + m);
+
+// ------------------------------------------------------------------------- //
 
 namespace btk
 {

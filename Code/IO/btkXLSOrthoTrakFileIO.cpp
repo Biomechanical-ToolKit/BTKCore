@@ -36,6 +36,7 @@
 #include "btkXLSOrthoTrakFileIO.h"
 #include "btkMetaDataUtils.h"
 #include "btkConvert.h"
+#include "btkLogger.h"
 
 #include <fstream>
 #include <algorithm>

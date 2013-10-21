@@ -35,6 +35,7 @@
 
 #include "btkRICFileIO.h"
 #include "btkEliteFileIOUtils_p.h"
+#include "btkLogger.h"
 
 #include <algorithm>
 #include <cctype>

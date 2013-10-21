@@ -34,7 +34,7 @@
  */
 
 #include "btkBinaryFileStream_mmfstream.h"
-#include "btkMacro.h"
+#include "btkMacro.h" // btkNotUsed
 
 #if defined(HAVE_SYS_MMAP)
   #if defined(HAVE_64_BIT)

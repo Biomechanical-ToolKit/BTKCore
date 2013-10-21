@@ -57,7 +57,7 @@
 #endif
 
 #include <Eigen/Eigen> // Fix for some conflicts between Scilab and Eigen
-#include <btkMacro.h>
+#include "btkMacro.h" // btkNotUsed
 #include <btkSharedPtr.h> // Fix for some conflicts between Scilab and C++ type (bool)
 #include <mex.h>
 

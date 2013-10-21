@@ -37,6 +37,7 @@
 #define __btkMetaDataInfo_p_h
 
 #include "btkConvert.h"
+#include "btkLogger.h"
 
 #include <vector>
 #include <limits.h>

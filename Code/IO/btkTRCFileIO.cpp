@@ -35,6 +35,7 @@
 
 #include "btkTRCFileIO.h"
 #include "btkConvert.h"
+#include "btkLogger.h"
 
 #include <fstream>
 #include <algorithm>

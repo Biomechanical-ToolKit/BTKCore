@@ -36,7 +36,7 @@
 #ifndef __btkEigenFilter_h
 #define __btkEigenFilter_h
 
-#include "btkMacro.h"
+#include "btkLogger.h"
 
 #include <Eigen/Core>
 

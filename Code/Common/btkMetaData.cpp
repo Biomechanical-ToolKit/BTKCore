@@ -36,8 +36,7 @@
 #include "btkMetaData.h"
 #include "btkException.h"
 #include "btkConvert.h"
-
-#include <iostream>
+#include "btkLogger.h"
 
 namespace btk
 {
