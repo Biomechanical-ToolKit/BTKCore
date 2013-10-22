@@ -110,7 +110,7 @@ namespace btk
    * Same as Normal but add also file information from where the log where written (if these informations are given).
    */
    
-#ifdef _NDEBUG
+#ifdef NDEBUG
   Logger::VerboseMode Logger::s_VerboseMode = Logger::Normal;
 #else
   Logger::VerboseMode Logger::s_VerboseMode = Logger::Detailed;
