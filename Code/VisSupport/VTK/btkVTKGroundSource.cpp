@@ -183,7 +183,7 @@ namespace btk
       switch (this->m_AutomaticDefaultOrientation)
       {
       default:
-        btkErrorMacro("Unknown default orientation. Set to plane XY");
+        btkWarningMacro("Unknown default orientation. Set to plane XY");
       case PlaneXY:
         n[0] = 0.0; n[1] = 0.0; n[2] = 1.0;
         break;

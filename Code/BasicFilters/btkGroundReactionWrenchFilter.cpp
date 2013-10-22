@@ -118,7 +118,7 @@ namespace btk
     if (fabs(this->m_ThresholdValue - v) <= std::numeric_limits<double>::epsilon())
       return;
     if (v < 0.0)
-      btkErrorMacro("Negative threshold has no effect on the algorithm because it compares the threshold value with the absolute value of Fz.");
+      btkWarningMacro("Negative threshold has no effect on the algorithm because it compares the threshold value with the absolute value of Fz.");
     this->m_ThresholdValue = v;
     this->Modified();
   };
@@ -145,7 +145,7 @@ namespace btk
     origin << 0, 0, fp->GetOrigin().z();
     if (origin.z()  > 0)
     {
-      btkErrorMacro("Vertical offset between the origin of the force platform #" + ToString(index + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
+      btkWarningMacro("Vertical offset between the origin of the force platform #" + ToString(index + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
       origin.z() *= -1;
     }
     */
@@ -160,7 +160,7 @@ namespace btk
     ForcePlatform::Origin origin = fp->GetOrigin();
     if (origin.z() > 0)
     {
-      btkErrorMacro("Origin for the force platform #" + ToString(index) + " seems to be located from the center of the working surface instead of the inverse. Data are inverted to locate the center of the working surface from the platform's origin.");
+      btkWarningMacro("Origin for the force platform #" + ToString(index) + " seems to be located from the center of the working surface instead of the inverse. Data are inverted to locate the center of the working surface from the platform's origin.");
       origin *= -1;
     }
     this->FinishGRWComputation(wrh, origin);
@@ -176,7 +176,7 @@ namespace btk
     origin << 0, 0, fp->GetOrigin().z();
     if (origin.z()  > 0)
     {
-      btkErrorMacro("Vertical offset between the origin of the force platform #" + ToString(index) + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
+      btkWarningMacro("Vertical offset between the origin of the force platform #" + ToString(index) + " and the center of the working surface seems to be misconfigured (positive value). The opposite of this offset is used.");
       origin.z() *= -1;
     }
     this->FinishGRWComputation(wrh, origin);

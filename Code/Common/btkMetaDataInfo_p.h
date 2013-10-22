@@ -88,7 +88,7 @@ namespace btk
   {
     if (idx >= static_cast<int>(source.size()))
     {
-      btkErrorMacro("Index out of range. Default value returned.");
+      btkWarningMacro("Index out of range. Default value returned.");
       return T();
     }
     return Devoidify_p<T>(source[idx]);
@@ -115,7 +115,7 @@ namespace btk
   {
     if (idx >= static_cast<int>(source.size()))
     {
-      btkErrorMacro("Index out of range. Default value returned.");
+      btkWarningMacro("Index out of range. Default value returned.");
       return T();
     }
     return static_cast<T>(Devoidify_p<S>(source[idx]));
@@ -149,7 +149,7 @@ namespace btk
   {
     if (idx >= static_cast<int>(source.size()))
     {
-      btkErrorMacro("Index out of range. Default value returned.");
+      btkWarningMacro("Index out of range. Default value returned.");
       return T();
     }
     return NumerifyFromString_p<T>(Devoidify_p<std::string>(source[idx]));
@@ -176,7 +176,7 @@ namespace btk
   {
     if (idx >= static_cast<int>(source.size()))
     {
-      btkErrorMacro("Index out of range. Default value returned.");
+      btkWarningMacro("Index out of range. Default value returned.");
       return "";
     }
     return ToString(Devoidify_p<T>(source[idx]));

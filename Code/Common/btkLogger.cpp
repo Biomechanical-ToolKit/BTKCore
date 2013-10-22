@@ -44,8 +44,14 @@ namespace btk
    * @brief Log mechanism to display debug message, warnings and errors
    *
    * The logger class is implemented with the possibility to print debug message, warnings and errors on different Logger::Stream. By default the debug messages are printed on the standard output (std::cout), while the warnings and errors are printed on the standard error (std::cerr).
-   * To use the log mechanism, you only need to include the header @a btkLogger.h and use one of the static methods Logger::Debug(), Logger::Warning(), or Logger::Error(), depending of the type of message you want to print.
-   * 
+   * To use the log mechanism, you only need to include the header @a btkLogger.h and use one of the static methods Logger::Debug(), Logger::Warning(), or Logger::Error(), depending of the type of message you want to print. 
+   * To simplify the writing of logs with the automatic detection of the filename and line number, three macros are proposed:
+   *  - @c btkDebugMacro(msg): alias for the code <tt>btk::Logger::Debug(__FILE__, __LINE__, msg)</tt>;
+   *  - @c btkWarningMacro(msg): alias for the code <tt>btk::Logger::Warning(__FILE__, __LINE__, msg)</tt>;
+   *  - @c btkErrorMacro(msg): alias for the code <tt>btk::Logger::Error(__FILE__, __LINE__, msg)</tt>;
+   *
+   * The debug logs are only available when the code is compiled in debug mode (when the symbol NDEBUG is not defined).
+   *
    * The diplayed log can be split in 4 parts:
    *  - Prefix: Name of the application/library (by default: BTK)
    *  - Log affix: String for the type of log (by default: DEBUG, WARNING, ERROR)
@@ -79,35 +85,30 @@ namespace btk
    * };
    * @endcode
    *
-   * To simplify the writing of logs with the automatic detection of the filename and line number, three macros are proposed:
-   *  - @c btkDebugMacro(msg): alias for the code <tt>btk::Logger::Debug(__FILE__, __LINE__, msg)</tt>;
-   *  - @c btkWarningMacro(msg): alias for the code <tt>btk::Logger::Warning(__FILE__, __LINE__, msg)</tt>;
-   *  - @c btkErrorMacro(msg): alias for the code <tt>btk::Logger::Error(__FILE__, __LINE__, msg)</tt>;
-   *
    * @ingroup BTKCommon
    */
   
- /**
-  * @typedef Logger::VerboseModel
-  * Analog' values along the time with 1 component (1 column).
-  */
- 
- /**
-  * @enum Logger::Quiet
-  * Do not display any message
-  */
- /**
-  * @enum Logger::MessageOnly
-  * Display only the message
-  */
- /**
-  * @enum Logger::Normal
-  * Display the message as well as the prefix and log affix.
-  */
- /**
-  * @enum Logger::Detailed
-  * Same as Normal but add also file information from where the log where written (if these informations are given).
-  */
+  /**
+   * @typedef Logger::VerboseModel
+   * Analog' values along the time with 1 component (1 column).
+   */
+  
+  /**
+   * @enum Logger::Quiet
+   * Do not display any message
+   */
+  /**
+   * @enum Logger::MessageOnly
+   * Display only the message
+   */
+  /**
+   * @enum Logger::Normal
+   * Display the message as well as the prefix and log affix.
+   */
+  /**
+   * @enum Logger::Detailed
+   * Same as Normal but add also file information from where the log where written (if these informations are given).
+   */
    
 #ifdef _NDEBUG
   Logger::VerboseMode Logger::s_VerboseMode = Logger::Normal;

@@ -120,7 +120,7 @@ void btkMXCreateAnalysisStructure(btk::Acquisition::Pointer acq, int nlhs, mxArr
         parameterValues = (*itValues)->GetInfo()->ToDouble();
         if (parameterValues.size() < numberOfParameters)
         {
-          btkErrorMacro("Some parameters has no values. Data may be corrupted.");
+          btkWarningMacro("Some parameters has no values. Data may be corrupted.");
           parameterValues.resize(numberOfParameters, 0.0);
         }
       }

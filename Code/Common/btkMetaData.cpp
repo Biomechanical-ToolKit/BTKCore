@@ -346,7 +346,7 @@ namespace btk
     Iterator it = this->Begin();
     if (idx > static_cast<int>(this->m_Tree.size()))
     {
-      btkErrorMacro("Out of range, the entry is appended");
+      btkWarningMacro("Out of range, the entry is appended");
       it = this->End();
     }
     else

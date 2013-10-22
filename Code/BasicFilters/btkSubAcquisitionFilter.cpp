@@ -220,19 +220,19 @@ namespace btk
     
     if (lb > ub)
     {
-      btkErrorMacro("The boundaries are inverted and has been reverted.");
+      btkWarningMacro("The boundaries are inverted and has been reverted.");
       int temp = ub;
       ub = lb;
       lb = temp;
     }
     if ((ub-lb+1) > input->GetPointFrameNumber())
     {
-      btkErrorMacro("The number of frames to extract is greater than the total number of frames. The upper boundary is adapted.");
+      btkWarningMacro("The number of frames to extract is greater than the total number of frames. The upper boundary is adapted.");
       ub = input->GetPointFrameNumber()-1;
     }
     if (lb < 0)
     {
-      btkErrorMacro("The lower boundary is negative and reset to 0.");
+      btkWarningMacro("The lower boundary is negative and reset to 0.");
       lb = 0;
     }
     int bounds[2] = {lb, ub};
@@ -282,7 +282,7 @@ namespace btk
         }
         else
         {
-          btkErrorMacro("There is no point with the ID #" + ToString(*it));
+          btkWarningMacro("There is no point with the ID #" + ToString(*it));
         }
       }
     }
@@ -327,7 +327,7 @@ namespace btk
         }
         else
         {
-          btkErrorMacro("There is no analog channel with the ID #" + ToString(*it));
+          btkWarningMacro("There is no analog channel with the ID #" + ToString(*it));
         }
       }
     }

@@ -305,19 +305,19 @@ namespace btk
       int pos1 = this->FindVertex(f[i].GetIds()[0]);
       if (pos1 == -1)
       {
-        btkErrorMacro("The face #" + ToString(i+1) + " uses a first point which is not listed (unknown ID). The face is removed.");
+        btkWarningMacro("The face #" + ToString(i+1) + " uses a first point which is not listed (unknown ID). The face is removed.");
         continue;
       }
       int pos2 = this->FindVertex(f[i].GetIds()[1]);
       if (pos2 == -1)
       {
-        btkErrorMacro("The face #" + ToString(i+1) + " uses a second point which is not listed (unknown ID). The face is removed.");
+        btkWarningMacro("The face #" + ToString(i+1) + " uses a second point which is not listed (unknown ID). The face is removed.");
         continue;
       }
       int pos3 = this->FindVertex(f[i].GetIds()[2]);
       if (pos3 == -1)
       {
-        btkErrorMacro("The face #" + ToString(i+1) + " uses a third point which is not listed (unknown ID). The face is removed.");
+        btkWarningMacro("The face #" + ToString(i+1) + " uses a third point which is not listed (unknown ID). The face is removed.");
         continue;
       }
       Face face;
@@ -371,13 +371,13 @@ namespace btk
       int pos1 = this->FindVertex(l[i].GetIds()[0]);
       if (pos1 == -1)
       {
-        btkErrorMacro("The link #" + ToString(i+1) + " uses a first point which is not listed (unknown ID). The link is removed.");
+        btkWarningMacro("The link #" + ToString(i+1) + " uses a first point which is not listed (unknown ID). The link is removed.");
         continue;
       }
       int pos2 = this->FindVertex(l[i].GetIds()[1]);
       if (pos2 == -1)
       {
-        btkErrorMacro("The link #" + ToString(i+1) + " uses a second point which is not listed (unknown ID). The link is removed.");
+        btkWarningMacro("The link #" + ToString(i+1) + " uses a second point which is not listed (unknown ID). The link is removed.");
         continue;
       }
       Edge edge;

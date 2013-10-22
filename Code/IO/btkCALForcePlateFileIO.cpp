@@ -375,7 +375,7 @@ namespace btk
   {
     if (input.get() == 0)
     {
-      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
+      btkErrorMacro("Impossible to write a null input into a file.");
       return;
     }
     std::ofstream ofs(filename.c_str());
@@ -577,7 +577,7 @@ namespace btk
     }
     else
     {
-      btkErrorMacro("Missing coefficients to build the calibration matrix #" + ToString(idx+1) + ". Its content might be corrupted.");
+      btkWarningMacro("Missing coefficients to build the calibration matrix #" + ToString(idx+1) + ". Its content might be corrupted.");
     }
   }
 };

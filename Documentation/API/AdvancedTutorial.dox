@@ -356,7 +356,7 @@ void DummyFileIO::Write(const std::string& filename, Acquisition::Pointer input)
 {
   if (!input)
   {
-    btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
+    btkErrorMacro("Impossible to write a null input into a file.");
     return;
   }
   IEEELittleEndianBinaryFileStream bifs;

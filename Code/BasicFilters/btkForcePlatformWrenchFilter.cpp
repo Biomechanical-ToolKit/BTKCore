@@ -145,7 +145,7 @@ namespace btk
         ++inc;
         if ((*it)->GetChannelNumber() == 0)
         {
-          btkErrorMacro("Unexpected number of analog channels (0) for force platform #" + ToString(inc));
+          btkWarningMacro("Unexpected number of analog channels (0) for force platform #" + ToString(inc));
           continue;
         }
         int frameNumber = (*it)->GetChannel(0)->GetFrameNumber();

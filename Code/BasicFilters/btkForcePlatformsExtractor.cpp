@@ -157,12 +157,12 @@ namespace btk
         (*itType)->GetInfo()->ToInt(types);
         if (types.size() < numberOfForcePlatforms)
         {
-          btkErrorMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE don't indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:TYPE");
+          btkWarningMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE do not indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:TYPE");
           numberOfForcePlatforms = types.size();
         }
         else if (types.size() > numberOfForcePlatforms)
         {
-          btkErrorMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE don't indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:USED");
+          btkWarningMacro("FORCE_PLATFORM:USED and FORCE_PLATFORM:TYPE do not indicate the same number of force platforms. The lower is kept: FORCE_PLATFORM:USED");
         }
       }
 
@@ -171,12 +171,12 @@ namespace btk
       MetaData::Iterator itChannels = (*itForcePlatformGr)->FindChild("CHANNEL");
       if (itChannels == (*itForcePlatformGr)->End())
       {
-        btkErrorMacro("No FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
+        btkWarningMacro("No FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
         numberOfForcePlatforms = 0;
       }
       else if (!(*itChannels)->HasInfo() || (*itChannels)->GetInfo()->GetDimensions().size() != 2)
       {
-        btkErrorMacro("Wrong format for the FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
+        btkWarningMacro("Wrong format for the FORCE_PLATFORM::CHANNEL entry. Impossible to extract analog channels associated with the force platform(s). Force platforms' data are empty.");
         numberOfForcePlatforms = 0;
       }
       else
@@ -189,7 +189,7 @@ namespace btk
       MetaData::Iterator itOrigin = (*itForcePlatformGr)->FindChild("ORIGIN");
       if (itOrigin == (*itForcePlatformGr)->End())
       {
-        btkErrorMacro("No FORCE_PLATFORM::ORIGIN entry. Default values are used.");
+        btkWarningMacro("No FORCE_PLATFORM::ORIGIN entry. Default values are used.");
       }
       else
         pOrigin = (*itOrigin);
@@ -198,7 +198,7 @@ namespace btk
       MetaData::Iterator itCorners = (*itForcePlatformGr)->FindChild("CORNERS");
       if (itCorners == (*itForcePlatformGr)->End())
       {
-        btkErrorMacro("No FORCE_PLATFORM::CORNERS entry. Default values are used.");
+        btkWarningMacro("No FORCE_PLATFORM::CORNERS entry. Default values are used.");
       }
       else
         pCorners = (*itCorners);
@@ -211,7 +211,7 @@ namespace btk
         {
           if (types[i] > 3)
           {
-            btkErrorMacro("No FORCE_PLATFORM::CAL_MATRIX entry. Force platform which requires a calibration matrix to convert volts in newtons won't be scaled.");
+            btkWarningMacro("No FORCE_PLATFORM::CAL_MATRIX entry. Force platform which requires a calibration matrix to convert volts in newtons will not be scaled.");
             break;
           }
         }
@@ -327,7 +327,7 @@ namespace btk
         // Fill empty force platform channel if necessary
         if (!noError)
         {
-          btkErrorMacro("Error(s) occurred during channel extraction for force platform #" + ToString(i + 1) + ". Replacement by vector of zeros.")
+          btkWarningMacro("Error(s) occurred during channel extraction for force platform #" + ToString(i + 1) + ". Replacement by vector of zeros.")
           int inc = 0;
           for (ForcePlatform::Iterator it = (*itFP)->Begin() ; it != (*itFP)->End() ; ++it )
           {
@@ -380,7 +380,7 @@ namespace btk
       }
     }
     else if (fp->GetType() > 3)
-      btkErrorMacro("No calibration matrix for force platform #" + ToString(idx) + ". Its data won't be scaled.");
+      btkWarningMacro("No calibration matrix for force platform #" + ToString(idx) + ". Its data won't be scaled.");
   };
 
   /**

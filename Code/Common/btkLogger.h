@@ -49,16 +49,30 @@
   btk::Logger::s(btkStripPathMacro(p), l, m);
 
 /**
- * Send an warning message to the logger with information on its source code location (filename, line number).
+ * Send a debug message to the logger with information on its source code location (filename, line number).
  */
-#define btkErrorMacro(m) \
-  _btkLogMacro(Warning, __FILE__, __LINE__, m);
+#define btkDebugMacro(m) \
+  _btkLogMacro(Debug, __FILE__, __LINE__, m);
 
 /**
- * Send an warning message (including the processed filename) to the logger with information on its source code location (filename, line number).
+ * Send a warning message to the logger with information on its source code location (filename, line number).
  */
-#define btkIOErrorMacro(f, m) \
-  btkErrorMacro(std::string(btkStripPathMacro(f.c_str())) + " - " + m);
+#define btkWarningMacro(m) \
+  _btkLogMacro(Warning, __FILE__, __LINE__, m);
+  
+/**
+ * Send an error message to the logger with information on its source code location (filename, line number).
+ */
+#define btkErrorMacro(m) \
+  _btkLogMacro(Error, __FILE__, __LINE__, m);
+
+/**
+ * Send a warning message (including the processed filename) to the logger with information on its source code location (filename, line number).
+ */
+#define btkIOWarningMacro(f, m) \
+  btkWarningMacro(std::string(btkStripPathMacro(f.c_str())) + " - " + m);
+
+// ------------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------------- //
 

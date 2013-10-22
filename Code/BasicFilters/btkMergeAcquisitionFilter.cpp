@@ -183,32 +183,32 @@ namespace btk
       // Check the point's frequency
       if ((in->GetPointFrequency() != 0) && (output->GetPointFrequency() != 0) && !in->IsEmptyPoint() && !output->IsEmptyPoint() && (in->GetPointFrequency() != output->GetPointFrequency()))
       {
-        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Point's frame rates are not equal.");
+        btkWarningMacro("Input #" + ToString(idx) + " is not merged: Point's frame rates are not equal.");
         return;
       }
       // Check the analog's frequency
       if ((in->GetAnalogFrequency() != 0) && (output->GetAnalogFrequency() != 0) && !in->IsEmptyAnalog() && !output->IsEmptyAnalog() && (in->GetAnalogFrequency() != output->GetAnalogFrequency()))
       {
-        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Analog's frame rates are not equal.");
+        btkWarningMacro("Input #" + ToString(idx) + " is not merged: Analog's frame rates are not equal.");
         return;
       }
       // Check the analog resolution
       if ((in->GetAnalogResolution() != 0) && (output->GetAnalogResolution() != 0) && !in->IsEmptyAnalog() && !output->IsEmptyAnalog() && (in->GetAnalogResolution() != output->GetAnalogResolution()))
       {
-        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Analog resolutions are not equal.");
+        btkWarningMacro("Input #" + ToString(idx) + " is not merged: Analog resolutions are not equal.");
         return;
       }
       // Check the number of analog samples per point frame
       if (!in->IsEmptyPoint() && !in->IsEmptyAnalog() && !output->IsEmptyAnalog() && (in->GetAnalogFrameNumber() != 0) && (output->GetAnalogFrameNumber() != 0) && (in->GetNumberAnalogSamplePerFrame() != output->GetNumberAnalogSamplePerFrame()))
       {
-        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
+        btkWarningMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
         return;
       }
       /*
       if ((in->GetAnalogFrameNumber() != 0) && (output->GetAnalogFrameNumber() != 0) && (in->GetAnalogFrameNumber() != output->GetAnalogFrameNumber()))
       {
-        btkErrorMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
-        return;
+        btkWarningMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
+        continue;
       }
       */
       
@@ -246,7 +246,7 @@ namespace btk
             || (output->GetPointUnit(Point::Power).compare(input->GetPointUnit(Point::Power)) != 0)
             || (output->GetPointUnit(Point::Scalar).compare(input->GetPointUnit(Point::Scalar)) != 0))
         {
-          btkErrorMacro("Input #" + ToString(idx) + " is not merged: Units don't correspond.");
+          btkWarningMacro("Input #" + ToString(idx) + " is not merged: Units do not correspond.");
           return;
         }
         // Global orientation
@@ -264,7 +264,7 @@ namespace btk
             if ((xScreenIn->ToString(0).compare(xScreenOut->ToString(0)) != 0)
                 || (yScreenIn->ToString(0).compare(yScreenOut->ToString(0)) != 0))
             {
-              btkErrorMacro("Input #" + ToString(idx) + " is not merged: Global orientations don't correspond.");
+              btkWarningMacro("Input #" + ToString(idx) + " is not merged: Global orientation does not correspond.");
               return;
             }
           }
@@ -277,7 +277,7 @@ namespace btk
           if ((output->GetPointFrequency() == 0) || (input->GetPointFrequency() == 0))
           {
             r = input->GetAnalogFrameNumber() /  output->GetPointFrameNumber();
-            btkErrorMacro("At least one frequency is not set in the output or the input #" + ToString(idx) + " and may corrupt the final output.");
+            btkWarningMacro("At least one frequency is not set in the output or the input #" + ToString(idx) + " and may corrupt the final output.");
           }
           else
             r = static_cast<int>(input->GetPointFrequency() / output->GetPointFrequency());
@@ -296,7 +296,7 @@ namespace btk
           if ((output->GetPointFrequency() == 0) || (input->GetPointFrequency() == 0))
           {
             r = output->GetAnalogFrameNumber() /  input->GetPointFrameNumber();
-            btkErrorMacro("At least one frequency is not set in the output or the input #" + ToString(idx) + " and may corrupt the final output.");
+            btkWarningMacro("At least one frequency is not set in the output or the input #" + ToString(idx) + " and may corrupt the final output.");
           }
           else
             r = static_cast<int>(output->GetPointFrequency() / input->GetPointFrequency());
@@ -728,7 +728,7 @@ namespace btk
           MetaDataInfo::Pointer channel = (*itChan)->ExtractChildInfo("CHANNEL", MetaDataInfo::Integer, 2);
           if (!channel)
           {
-            btkErrorMacro("Metadata '" + (*itChan)->GetLabel() + "' is corrupted. No child labeled 'CHANNEL'. Impossible to detect partial force platform configuration.");
+            btkWarningMacro("Metadata '" + (*itChan)->GetLabel() + "' is corrupted. No child labeled 'CHANNEL'. Impossible to detect partial force platform configuration.");
             itChan = fpChanList.erase(itChan);
             continue;
           }
@@ -756,7 +756,7 @@ namespace btk
       usedOut = this->GetMaxInfoForcePlatform(*fpIt, &chanOut, &calRowOut);
       if (!this->CheckForcePlatform(*fpIt) || (usedOut == -1))
       {
-        btkErrorMacro("Existing metadata for defining force platforms configuration are corrupted. Only valid metadata will be kept in the merged acquisition.");
+        btkWarningMacro("Existing metadata for defining force platforms configuration are corrupted. Only valid metadata will be kept in the merged acquisition.");
         fpIt = out->RemoveChild(fpIt);
       }
     }
@@ -1039,7 +1039,7 @@ namespace btk
     {
       if (!this->CheckEventContext(*itOut))
       {
-        btkErrorMacro("Existing metadata for defining events context are corrupted. Only valid metadata will be kept in the merged acquisition.");
+        btkWarningMacro("Existing metadata for defining events context are corrupted. Only valid metadata will be kept in the merged acquisition.");
         itOut = out->RemoveChild(itOut);
       }
     }

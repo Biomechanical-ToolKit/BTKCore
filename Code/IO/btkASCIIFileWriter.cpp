@@ -249,7 +249,7 @@ namespace btk
     
     if (input->GetPointFrequency() == 0.0)
     {
-      btkErrorMacro("The frequency is not set! The column for the time will contain only zero value.");
+      btkWarningMacro("The frequency is not set! The column for the time will contain only zero value.");
     }
     
     try

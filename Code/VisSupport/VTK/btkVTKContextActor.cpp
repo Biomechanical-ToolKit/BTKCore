@@ -219,7 +219,7 @@ namespace btk
     else
     {
       // Failed
-      btkErrorMacro("Error: failed to initialize the render device.")
+      btkErrorMacro("Initialization of the render device failed.")
     }
   };
   

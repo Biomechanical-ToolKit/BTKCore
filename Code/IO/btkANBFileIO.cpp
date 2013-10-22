@@ -294,7 +294,7 @@ namespace btk
   {
     if (input.get() == 0)
     {
-      btkIOErrorMacro(filename, "Empty input. Impossible to write an empty file.");
+      btkErrorMacro("Impossible to write a null input into a file.");
       return;
     }
     IEEELittleEndianBinaryFileStream bofs;
@@ -331,7 +331,7 @@ namespace btk
       float rate = static_cast<float>(input->GetAnalogFrequency());
       if (rate == 0.0f)
       {
-        btkErrorMacro("Acquisition frequency cannot be null and is set to 50 Hz.");
+        btkWarningMacro("Acquisition frequency cannot be null and is set to 50 Hz.");
         rate = 50.0f; // Hz
         
       }
@@ -389,7 +389,7 @@ namespace btk
         if ((*it)->GetGain() == Analog::Unknown)
         {
           channelRange[i] = ANxFileIODetectAnalogRange_p((*it)->GetScale(), input->GetAnalogResolution());
-          btkErrorMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(channelRange[i]) / 1000.0)  + " volts in the file.");
+          btkWarningMacro("Unknown gain for channel #" + ToString(i+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(channelRange[i]) / 1000.0)  + " volts in the file.");
         }
         else
           channelRange[i] = (*it)->GetGain();

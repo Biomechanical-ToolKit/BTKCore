@@ -279,7 +279,7 @@ namespace btk
     Iterator it = this->Begin();
     if (idx > static_cast<int>(this->m_Items.size()))
     {
-      btkErrorMacro("Out of range, the entry is appended");
+      btkWarningMacro("Out of range, the entry is appended");
       it = this->End();
     }
     else
@@ -326,7 +326,7 @@ namespace btk
   {
     if (loc == this->End())
     {
-      btkErrorMacro("Out of range");
+      btkWarningMacro("Out of range");
       return loc;
     }
     Iterator it = this->m_Items.erase(loc);
@@ -342,7 +342,7 @@ namespace btk
   {
     if (idx >= static_cast<int>(this->m_Items.size()))
     {
-      btkErrorMacro("Out of range");
+      btkWarningMacro("Out of range");
       return;
     }
     Iterator it = this->Begin();

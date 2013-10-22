@@ -75,7 +75,7 @@ namespace btk
     }
     if (mixedPointNumFrames)
     {
-      btkIOErrorMacro(filename, "The number of frames is not the same for every markers. Extra frames will be added to some markers.")
+      btkIOWarningMacro(filename, "The number of frames is not the same for every markers. Extra frames will be added to some markers.")
     }
     // For analog channels, this is the same. The number of frames must be a multiple of the
     // number of video frames (i.e. the analogs' frequency must be a multiple of the markers' frequency)
@@ -121,7 +121,7 @@ namespace btk
     }
     if (mixedAnalogSampleFrequencies)
     {
-      btkIOErrorMacro(filename, "Some analog channels have a sample frequency which is not multiple of the markers' sample frequency. Their data will be interpolated in consequence.")
+      btkIOWarningMacro(filename, "Some analog channels have a sample frequency which is not multiple of the markers' sample frequency. Their data will be interpolated in consequence.")
     }
     // Finaly, it is needed to do some check between markers and analogs data
     if (pointFrequency == 0.0)
@@ -223,7 +223,7 @@ namespace btk
       // Unknown
       else
       {
-        btkIOErrorMacro(filename, "Unknown force platform! Please contact the developers of BTK to update this reader.");
+        btkIOWarningMacro(filename, "Unknown force platform! Please contact the developers of BTK to update this reader.");
         continue;
       }
     }

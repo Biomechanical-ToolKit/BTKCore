@@ -279,7 +279,7 @@ namespace btk
       return;
     if (num < 0)
     {
-      btkErrorMacro("Attempt to set the number of inputs to " + ToString(num));
+      btkWarningMacro("Attempt to set the number of inputs to the negative value" + ToString(num) + ". The number of inputs is set to 0.");
       num = 0;
     }
     this->m_Inputs.resize(num);
@@ -356,7 +356,7 @@ namespace btk
       return;
     if (num < 0)
     {
-      btkErrorMacro("Attempt to set the number of outputs to " + ToString(num));
+      btkWarningMacro("Attempt to set the number of outputs to the negative value" + ToString(num) + ". The number of outputs is set to 0.");
       num = 0;
     }
     this->m_Outputs.resize(num);

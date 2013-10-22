@@ -213,7 +213,7 @@ namespace btk
     int frameNumber = (*it)->GetFrameNumber();
     if (this->m_Index > frameNumber)
     {
-      btkErrorMacro("The specified index is out of range. The index extracted corresponds to the index modulo the frame number.");
+      btkWarningMacro("The specified index is out of range. The index extracted corresponds to the index modulo the frame number.");
       index = this->m_Index % frameNumber;
     }
     int inc = 0;

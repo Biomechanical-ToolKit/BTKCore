@@ -274,19 +274,19 @@ namespace btk
       switch (ibfs->ReadI8())
       {
         case IEEE_LittleEndian :
-          btkIOErrorMacro(filename, "Wrong processor type. Trying to continue by using the INTEL processor.");
+          btkIOWarningMacro(filename, "Wrong processor type. Trying to continue by using the INTEL processor.");
         case IEEE_LittleEndian + 83 : // IEEE LE (Intel)
           this->SetByteOrder(IEEE_LittleEndian);
           ibfs = new IEEELittleEndianBinaryFileStream();
           break;
         case VAX_LittleEndian :
-          btkIOErrorMacro(filename, "Wrong processor type. Trying to continue by using the DEC processor.");
+          btkIOWarningMacro(filename, "Wrong processor type. Trying to continue by using the DEC processor.");
         case VAX_LittleEndian + 83 : // VAX LE (DEC)
           this->SetByteOrder(VAX_LittleEndian);
           ibfs = new VAXLittleEndianBinaryFileStream();
           break;
         case IEEE_BigEndian :
-          btkIOErrorMacro(filename, "Wrong processor type. Trying to continue by using the MIPS processor.");
+          btkIOWarningMacro(filename, "Wrong processor type. Trying to continue by using the MIPS processor.");
         case IEEE_BigEndian + 83 : // IEEE BE (MIPS)
           this->SetByteOrder(IEEE_BigEndian);
           ibfs = new IEEEBigEndianBinaryFileStream();
@@ -327,9 +327,9 @@ namespace btk
         uint16_t labelRangeFirstBlock = ibfs->ReadU16(); // (word 149)
         if (labelRangeSection == 12345)
         {
-          btkIOErrorMacro(filename, "This C3D file has a 'Label and Range Section' but BTK doesn't support it again.");
+          btkIOWarningMacro(filename, "This C3D file has a 'Label and Range Section' but BTK doesn't support it. Please contact the support team.");
           if (labelRangeFirstBlock < 2)
-            btkIOErrorMacro(filename, "The 'Label and Range Section' address is incorrect.");
+            btkIOWarningMacro(filename, "The 'Label and Range Section' address is incorrect.");
         }
         uint16_t labelEventFormat = ibfs->ReadU16(); // (word 150)
         EventCollection::Pointer events = output->GetEvents();
@@ -425,7 +425,7 @@ namespace btk
           bool unlocked = (nbCharLabel > 0 ? true : false);
           if ((sizeData > offset) && (!lastEntry))
           {
-            btkIOErrorMacro(filename, "The size of the data for the parameter '" + label + "' exceeds the space available before the next entry. Trying to continue...");
+            btkIOWarningMacro(filename, "The size of the data for the parameter '" + label + "' exceeds the space available before the next entry. Trying to continue...");
             switch (type)
             {
               // Note: no need to give the number of elements to the vector as the metadata will resize the data automatically.
@@ -480,7 +480,7 @@ namespace btk
               offset -= nbCharDesc;
             }
             else
-              btkIOErrorMacro(filename, "Where is the byte to set the number of characters in the description of the parameter '" + label + "'? Trying to continue...");
+              btkIOWarningMacro(filename, "Where is the byte to set the number of characters in the description of the parameter '" + label + "'? Trying to continue...");
           }
           parameters.push_back(entry);
         }
@@ -488,7 +488,7 @@ namespace btk
           offset = 0;
         if (offset < 0)
         {
-          btkIOErrorMacro(filename, "Error during the pointing of another parameter|group. Trying to continue...");
+          btkIOWarningMacro(filename, "Error during the pointing of another parameter|group. Trying to continue...");
           ibfs->SeekRead(offset, BinaryFileStream::Current);
           offset = 0;
         }
@@ -497,13 +497,13 @@ namespace btk
         {
           if ((totalBytesRead + offset) > static_cast<unsigned int>(((dataFirstBlock - 2) * 512)))
           {
-            btkIOErrorMacro(filename, "The next parameter is pointing in the Data section. Parameters' extraction is stopped.");
+            btkIOWarningMacro(filename, "The next parameter is pointing in the Data section. Parameters' extraction is stopped.");
             totalBytesRead = blockNumber * 512; // Force the number of totalBytesRead to not trigger the "Bad data first block" exception.
             break;
           }
           else if (!alreadyDisplayParameterOverflowMessage)
           {
-            btkIOErrorMacro(filename, "The next parameter is pointing outside the parameter section but not yet in the Data section. Trying to continue...");
+            btkIOWarningMacro(filename, "The next parameter is pointing outside the parameter section but not yet in the Data section. Trying to continue...");
             alreadyDisplayParameterOverflowMessage = true;
           }
         }
@@ -539,11 +539,11 @@ namespace btk
         }
       }
       if (parameters.size() != 0)
-        btkIOErrorMacro(filename, "Some parameters are orphans. No group has the same id. These parameters are lost");
+        btkIOWarningMacro(filename, "Some parameters are orphans. No group has the same id. These parameters are lost");
       int totalBlocksRead = static_cast<int>(ceil((double)totalBytesRead / 512.0));
       if (totalBlocksRead != blockNumber)
       {
-        btkIOErrorMacro(filename, "The number of blocks to be read in the parameter section is different than the number of blocks read. The value kept is the number of blocks read.");
+        btkIOWarningMacro(filename, "The number of blocks to be read in the parameter section is different than the number of blocks read. The value kept is the number of blocks read.");
         blockNumber = totalBlocksRead;
       }
     // Events in Parameter section
@@ -553,7 +553,7 @@ namespace btk
       {
         itEvent = root->FindChild("EVENTS");
         if (itEvent != root->End())
-          btkIOErrorMacro(filename, "EVENTS group found instead of EVENT. The EVENTS group is used to extract events.");
+          btkIOWarningMacro(filename, "EVENTS group found instead of EVENT. The EVENTS group is used to extract events.");
       }
       if (itEvent != root->End())
       {
@@ -570,7 +570,7 @@ namespace btk
           MetaDataCollapseChildrenValues<std::string>(eventsLabel, *itEvent, "LABELS", eventsNumber, "uname*");
           MetaDataCollapseChildrenValues(eventsTime, *itEvent, "TIMES");
           if (static_cast<int>(eventsTime.size()) < 2 * eventsNumber)
-            btkIOErrorMacro(filename, "The EVENT:TIME doesn't contain the appropriate number of values. The extracted times could be corrupted.")
+            btkIOWarningMacro(filename, "The EVENT:TIME doesn't contain the appropriate number of values. The extracted times could be corrupted.")
           eventsTime.resize(2 * eventsNumber, 0.0);
           MetaDataCollapseChildrenValues(eventsContext, *itEvent, "CONTEXTS");
           eventsContext.resize(eventsNumber,"");
@@ -629,7 +629,7 @@ namespace btk
               output->SetAnalogResolution(Acquisition::Bit16);
               break;
             default:
-              btkIOErrorMacro(filename, "Unknown analog resolution. Set by default to 12.");
+              btkIOWarningMacro(filename, "Unknown analog resolution. Set by default to 12.");
               output->SetAnalogResolution(Acquisition::Bit12);
               break;
           }
@@ -650,7 +650,7 @@ namespace btk
           int start = hsb << 16 | lsb;
           if (start != output->GetFirstFrame())
           {
-            if ((output->GetFirstFrame() != 65535) && (hasHeader)) {btkIOErrorMacro(filename, "The first frame index wrote in the header is different than in the parameter TRIAL:ACTUAL_START_FIELD. The value in the parameter is kept.");}
+            if ((output->GetFirstFrame() != 65535) && (hasHeader)) {btkIOWarningMacro(filename, "The first frame index wrote in the header is different than in the parameter TRIAL:ACTUAL_START_FIELD. The value in the parameter is kept.");}
             output->SetFirstFrame(start);
           }
         }
@@ -663,7 +663,7 @@ namespace btk
           int end = hsb << 16 | lsb;
           if (end != lastFrame)
           {
-            if ((lastFrame != 65535) && hasHeader) {btkIOErrorMacro(filename, "The last frame index wrote in the header is different than in the parameter TRIAL:ACTUAL_END_FIELD. The number of frames is modified by keeping the value in the parameter.");}
+            if ((lastFrame != 65535) && hasHeader) {btkIOWarningMacro(filename, "The last frame index wrote in the header is different than in the parameter TRIAL:ACTUAL_END_FIELD. The number of frames is modified by keeping the value in the parameter.");}
             lastFrame = end;
           }
         }
@@ -706,7 +706,7 @@ namespace btk
             analogUsed = (*itAnalogUsed)->GetInfo()->ToInt(0);
             if (analogNumber != static_cast<uint16_t>(analogUsed))
             {
-              btkIOErrorMacro(filename, "The number of analog channels wrote in the header section and in the parameter section are not the same. The value kept is from the header section.");
+              btkIOWarningMacro(filename, "The number of analog channels wrote in the header section and in the parameter section are not the same. The value kept is from the header section.");
               //analogNumber = static_cast<uint16_t>(analogUsed);
             }
           }
@@ -738,7 +738,7 @@ namespace btk
             }
             else
               output->SetAnalogResolution(static_cast<Acquisition::AnalogResolution>(bits));
-            btkIOErrorMacro(filename, "Analog format and/or their resolution are inconsistent with analog offsets. They were updated.");
+            btkIOWarningMacro(filename, "Analog format and/or their resolution are inconsistent with analog offsets. They were updated.");
           }
           // - ANALOG:FORMAT
           MetaData::ConstIterator itAnalogFormat = (*itAnalog)->FindChild("FORMAT");
@@ -766,7 +766,7 @@ namespace btk
             this->m_AnalogUniversalScale = (*itAnalogGenScale)->GetInfo()->ToDouble(0);
             if (this->m_AnalogUniversalScale == 0.0)
             {
-              btkIOErrorMacro(filename, "Analog universal scaling factor error. Value zero (0) replaced by one (1).");
+              btkIOWarningMacro(filename, "Analog universal scaling factor error. Value zero (0) replaced by one (1).");
               this->m_AnalogUniversalScale = 1.0;
             }
           }
@@ -782,7 +782,7 @@ namespace btk
             pointUsed = (*itPointUsed)->GetInfo()->ToInt(0);
             if (pointNumber != static_cast<uint16_t>(pointUsed))
             {
-              btkIOErrorMacro(filename, "The number of points wrote in the header section and in the parameter section are not the same. The value kept is from the header section.");
+              btkIOWarningMacro(filename, "The number of points wrote in the header section and in the parameter section are not the same. The value kept is from the header section.");
               //pointNumber = static_cast<uint16_t>(pointUsed);
             }
           }
@@ -793,7 +793,7 @@ namespace btk
             float pointScale = (*itPointScale)->GetInfo()->ToFloat(0);
             if (fabs(pointScale - pointScaleFactor) > std::numeric_limits<float>::epsilon())
             {
-              btkIOErrorMacro(filename, "The point scaling factor written in the header and in the parameter POINT:SCALE are not the same. The first value is kept.");
+              btkIOWarningMacro(filename, "The point scaling factor written in the header and in the parameter POINT:SCALE are not the same. The first value is kept.");
               //pointScaleFactor = pointScale;
             }
           }
@@ -850,7 +850,7 @@ namespace btk
           // Let's try to continue even if the file is corrupted
           if (ibfs->EndFile())
           {  
-            btkIOErrorMacro(filename, "Some points and/or analog data cannot be extracted and are set as invalid.");
+            btkIOWarningMacro(filename, "Some points and/or analog data cannot be extracted and are set as invalid.");
           }
           else
             throw;
@@ -997,7 +997,7 @@ namespace btk
               (*it)->SetGain(Analog::PlusMinus1);
               break;
             default:
-              btkIOErrorMacro(filename, "Unknown gain. If the value corresponding to this unknown gain is a real value, please contact a developer to add it in the list.");
+              btkIOWarningMacro(filename, "Unknown gain. If the value corresponding to this unknown gain is a real value, please contact a developer to add it in the list.");
               (*it)->SetGain(Analog::Unknown);
               break;
             }
@@ -1064,7 +1064,7 @@ namespace btk
   {
     if (!input)
     {
-      btkErrorMacro("Null acquisition.");
+      btkErrorMacro("Impossible to write a null input into a file.");
       return;
     }
 
@@ -1410,7 +1410,7 @@ namespace btk
     // Frequency
     if (input->GetPointFrequency() == 0.0)
     {
-      btkErrorMacro("Acquisition frequency cannot be null and is set to 50 Hz.");
+      btkWarningMacro("Acquisition frequency cannot be null and is set to 50 Hz.");
       input->SetPointFrequency(50.0);
     }
     // Point
@@ -1532,7 +1532,7 @@ namespace btk
       MetaData::ConstIterator itAnalog = input->GetMetaData()->FindChild("ANALOG");
       if (itAnalog == input->GetMetaData()->End())
       {
-        btkErrorMacro("No ANALOG group. Impossible to update analog scaling factors.");
+        btkWarningMacro("No ANALOG group. Impossible to update analog scaling factors.");
       }
       else
       {
@@ -1554,7 +1554,7 @@ namespace btk
           bits = (*itAnalogResolution)->GetInfo()->ToInt(0);
           if ((bits != 8) && (bits != 10) && (bits != 12) && (bits != 14) && (bits != 16))
           {
-            btkErrorMacro("Unknown analog resolution. Default resolution (12 bits) added for this acquisition.");
+            btkWarningMacro("Unknown analog resolution. Default resolution (12 bits) added for this acquisition.");
             input->SetAnalogResolution(Acquisition::Bit12);
           }
           else
@@ -1566,7 +1566,7 @@ namespace btk
         {
           if ((*itAnalogOffset)->GetInfo()->GetValues().size() < analogNumber)
           {
-            btkErrorMacro("No enough analog offsets. Impossible to update analog offsets.");
+            btkWarningMacro("No enough analog offsets. Impossible to update analog offsets.");
           }
           else
           {
@@ -1587,7 +1587,7 @@ namespace btk
         }
         else
         {
-          btkErrorMacro("No ANALOG:OFFSET parameter. Impossible to update analog offsets.");
+          btkWarningMacro("No ANALOG:OFFSET parameter. Impossible to update analog offsets.");
         }
         // - ANALOG:SCALE
         MetaData::ConstIterator itAnalogScale = (*itAnalog)->FindChild("SCALE");
@@ -1595,14 +1595,14 @@ namespace btk
         {
           if ((*itAnalogScale)->GetInfo()->GetValues().size() < analogNumber)
           {
-            btkErrorMacro("No enough analog scaling factors. Impossible to update analog offsets.");
+            btkWarningMacro("No enough analog scaling factors. Impossible to update analog offsets.");
           }
           else
             (*itAnalogScale)->GetInfo()->ToDouble(this->m_AnalogChannelScale);
         }
         else
         {
-          btkErrorMacro("No ANALOG:SCALE parameter. Impossible to update analog scaling factors.");
+          btkWarningMacro("No ANALOG:SCALE parameter. Impossible to update analog scaling factors.");
         }
         // - ANALOG:GEN_SCALE
         MetaData::ConstIterator itAnalogGenScale = (*itAnalog)->FindChild("GEN_SCALE");
@@ -1610,7 +1610,7 @@ namespace btk
           this->m_AnalogUniversalScale = (*itAnalogGenScale)->GetInfo()->ToDouble(0);
         else
         {
-          btkErrorMacro("No ANALOG:GEN_SCALE parameter. Impossible to update analog scaling factors.");
+          btkWarningMacro("No ANALOG:GEN_SCALE parameter. Impossible to update analog scaling factors.");
         }
       }
     }
@@ -1620,7 +1620,7 @@ namespace btk
       MetaData::ConstIterator itPoint = input->GetMetaData()->FindChild("POINT");
       if (itPoint == input->GetMetaData()->End())
       {
-        btkErrorMacro("No POINT group. Impossible to update point scaling factor.");
+        btkWarningMacro("No POINT group. Impossible to update point scaling factor.");
       }
       else
       {
@@ -1637,7 +1637,7 @@ namespace btk
         }
         else
         {
-          btkErrorMacro("No POINT:SCALE parameter. Impossible to update point scaling factor.");
+          btkWarningMacro("No POINT:SCALE parameter. Impossible to update point scaling factor.");
         }
       }
     }

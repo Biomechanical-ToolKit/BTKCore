@@ -246,7 +246,7 @@ namespace btk
         ifs >> strVal;
         if (ifs.eof() || strVal.empty())
         {
-          btkIOErrorMacro(filename, "File corrupted. There is not enough values to fill data. Others values will be set to 0.");
+          btkIOWarningMacro(filename, "File corrupted. There is not enough values to fill data. Others values will be set to 0.");
           break;
         }
         FromString(strVal, values[i]);

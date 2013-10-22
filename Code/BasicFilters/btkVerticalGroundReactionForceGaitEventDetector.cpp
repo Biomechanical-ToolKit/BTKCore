@@ -222,7 +222,7 @@ namespace btk
     int num = input->GetItemNumber();
     if (static_cast<int>(mapping.size()) < num)
     {
-      btkErrorMacro("The mapping between the force plates and the events' context is not complete. The missing are automatically set to the 'General' context.");
+      btkWarningMacro("The mapping between the force plates and the events' context is not complete. The missing are automatically set to the 'General' context.");
       mapping.resize(num, "General");
     }
     int inc = 0;
@@ -238,12 +238,12 @@ namespace btk
       {
         if ((this->mp_ROI[0] < 0) && (!warningNegativeLowerBoundDisplayed))
         {
-          btkErrorMacro("The lower bound for the frames of interest was set to a negative value and is then reset to 0.");
+          btkWarningMacro("The lower bound for the frames of interest was set to a negative value and is then reset to 0.");
           warningNegativeLowerBoundDisplayed = true;
         }
         else if ((this->mp_ROI[0] >= frameNumber) && (!warningExceededLowerBoundDisplayed))
         {
-          btkErrorMacro("The lower bound for the frames of interest was set to a value exceeding the number of rows and is reset to 0.");
+          btkWarningMacro("The lower bound for the frames of interest was set to a value exceeding the number of rows and is reset to 0.");
           warningExceededLowerBoundDisplayed = true;
         }
         else
@@ -253,12 +253,12 @@ namespace btk
       {
         if ((this->mp_ROI[1] < 0) && (!warningNegativeUpperBoundDisplayed))
         {
-          btkErrorMacro("The upper bound for the frames of interest was set to a negative value and is then reset to the greater index available.");
+          btkWarningMacro("The upper bound for the frames of interest was set to a negative value and is then reset to the greater index available.");
           warningNegativeUpperBoundDisplayed = true;
         }
         else if ((this->mp_ROI[1] >= frameNumber) && (!warningExceededUpperBoundDisplayed))
         {
-          btkErrorMacro("The upper bound for the frames of interest was set to a value exceeding the number of rows and is reset to the greater index available.");
+          btkWarningMacro("The upper bound for the frames of interest was set to a value exceeding the number of rows and is reset to the greater index available.");
           warningExceededUpperBoundDisplayed = true;
         }
         else

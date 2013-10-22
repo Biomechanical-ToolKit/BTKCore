@@ -119,7 +119,7 @@ namespace btk
         output->SetAnalogResolution(Acquisition::Bit16);
         break;
       default:
-        btkErrorMacro("Unknown bit depth resolution. Default value used: 12 bits.");
+        btkWarningMacro("Unknown bit depth resolution. Default value used: 12 bits.");
         output->SetAnalogResolution(Acquisition::Bit12);
         break;
     }
@@ -161,7 +161,7 @@ namespace btk
             (*it)->SetGain(Analog::PlusMinus0Dot05);
             break;
           default:
-            btkErrorMacro("Unknown range: '" + channelLabel[inc] + "'. Default value used: +/- 10 V");
+            btkWarningMacro("Unknown range: '" + channelLabel[inc] + "'. Default value used: +/- 10 V");
             (*it)->SetGain(Analog::PlusMinus10);
             break;
         }
@@ -365,7 +365,7 @@ namespace btk
         break;
       case Analog::Unknown:
         range = ANxFileIODetectAnalogRange_p(scale, bitDepth);
-        btkErrorMacro("Unknown gain for channel #" + ToString(idx+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(range) / 1000)  + " volts in the file. Could corrupt the data in the written file!");
+        btkWarningMacro("Unknown gain for channel #" + ToString(idx+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(range) / 1000)  + " volts in the file. Could corrupt the data in the written file!");
         break;
     }
     return range;

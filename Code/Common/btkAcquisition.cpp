@@ -451,7 +451,7 @@ namespace btk
     {
       if (point->GetFrameNumber() != this->m_PointFrameNumber)
       {
-        btkErrorMacro("Point's frame number is different than acquisition's frame number. Point's frame number is resized.");
+        btkWarningMacro("Point's frame number is different than acquisition's frame number. Point's frame number is resized.");
         point->SetFrameNumber(this->m_PointFrameNumber);
       }
       this->Modified();
@@ -561,7 +561,7 @@ namespace btk
     {
       if (p->GetFrameNumber() != this->m_PointFrameNumber)
       {
-        btkErrorMacro("Point's frame number is different than acquisition's frame number. Point's frame number is resized.");
+        btkWarningMacro("Point's frame number is different than acquisition's frame number. Point's frame number is resized.");
         p->SetFrameNumber(this->m_PointFrameNumber);
       }
       this->Modified();
@@ -575,7 +575,7 @@ namespace btk
   {
     PointIterator it = this->FindPoint(label);
     if (it == this->EndPoint())
-      btkErrorMacro("No point with label: '" + label + "'.");
+      btkWarningMacro("No point with label: '" + label + "'.");
     this->RemovePoint(it);
   };
 
@@ -598,7 +598,7 @@ namespace btk
   {
     if (loc == this->EndPoint())
     {
-      btkErrorMacro("Out of range.");
+      btkWarningMacro("Out of range.");
       return loc;
     } 
     Point::Pointer pnt = *loc;
@@ -717,7 +717,7 @@ namespace btk
     {
       if (analog->GetFrameNumber() != this->m_PointFrameNumber * m_AnalogSampleNumberPerPointFrame)
       {
-        btkErrorMacro("Analog's frame number is different than acquisition's frame number. Analog's frame number is resized.");
+        btkWarningMacro("Analog's frame number is different than acquisition's frame number. Analog's frame number is resized.");
         analog->SetFrameNumber(this->m_PointFrameNumber * m_AnalogSampleNumberPerPointFrame);
       }
       this->Modified();
@@ -794,7 +794,7 @@ namespace btk
     {
       if (ac->GetFrameNumber() != this->m_PointFrameNumber * m_AnalogSampleNumberPerPointFrame)
       {
-        btkErrorMacro("Analog's frame number is different than acquisition's frame number. Analog's frame number is resized.");
+        btkWarningMacro("Analog's frame number is different than acquisition's frame number. Analog's frame number is resized.");
         ac->SetFrameNumber(this->m_PointFrameNumber * m_AnalogSampleNumberPerPointFrame);
       }
       this->Modified();
@@ -808,7 +808,7 @@ namespace btk
   {
     AnalogIterator it = this->FindAnalog(label);
     if (it == this->EndAnalog())
-      btkErrorMacro("No analog channel with label: '" + label + "'.");
+      btkWarningMacro("No analog channel with label: '" + label + "'.");
     this->RemoveAnalog(it);
   };
   
@@ -831,7 +831,7 @@ namespace btk
   {
     if (loc == this->EndAnalog())
     {
-      btkErrorMacro("Out of range.");
+      btkWarningMacro("Out of range.");
       return loc;
     } 
     Analog::Pointer anl = *loc;
@@ -872,7 +872,7 @@ namespace btk
   {
     if (analogSampleNumberPerPointFrame <= 0)
     {
-      btkErrorMacro("Impossible to set the analog sample number to 0. The numbers of analog samples per point frame is now equals to 1.");
+      btkWarningMacro("Impossible to set the analog sample number to 0. The numbers of analog samples per point frame is now equals to 1.");
       analogSampleNumberPerPointFrame = 1;
     }
     this->m_AnalogSampleNumberPerPointFrame = analogSampleNumberPerPointFrame;
@@ -939,7 +939,7 @@ namespace btk
   {
     if (frameNumber <= 0)
     {
-      btkErrorMacro("Impossible to set the frame number to 0 or lower. The number of frames is now equals to 1.");
+      btkWarningMacro("Impossible to set the frame number to 0 or lower. The number of frames is now equals to 1.");
       frameNumber = 1;
     }
     else if (frameNumber == this->m_PointFrameNumber)
@@ -998,7 +998,7 @@ namespace btk
       this->m_FirstFrame = this->m_FirstFrame - frameNumber + this->m_PointFrameNumber;
       if (this->m_FirstFrame <= 0)
       {
-        btkErrorMacro("The index of the first frame can't be set to 0 or lower. It is forced to 1.");
+        btkWarningMacro("The index of the first frame can't be set to 0 or lower. It is forced to 1.");
         this->m_FirstFrame = 1;
       }
     }

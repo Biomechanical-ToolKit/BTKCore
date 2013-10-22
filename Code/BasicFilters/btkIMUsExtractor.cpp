@@ -156,12 +156,12 @@ namespace btk
             (*itType)->GetInfo()->ToInt(types);
             if (types.size() < numUnits)
             {
-              btkErrorMacro("IMU:USED and IMU:TYPE do not indicate the same number of units. The lower is kept: IMU:TYPE");
+              btkWarningMacro("IMU:USED and IMU:TYPE do not indicate the same number of units. The lower is kept: IMU:TYPE");
               numUnits = types.size();
             }
             else if (types.size() > numUnits)
             {
-              btkErrorMacro("IMU:USED and IMU:TYPE do not indicate the same number of units. The lower is kept: IMU:USED");
+              btkWarningMacro("IMU:USED and IMU:TYPE do not indicate the same number of units. The lower is kept: IMU:USED");
             }
           }
 

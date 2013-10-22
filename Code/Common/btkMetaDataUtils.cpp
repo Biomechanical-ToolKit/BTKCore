@@ -66,7 +66,7 @@ namespace btk
     }
     else
     {
-      btkErrorMacro("No parent.");
+      btkWarningMacro("No parent.");
       return entry;
     }
   };

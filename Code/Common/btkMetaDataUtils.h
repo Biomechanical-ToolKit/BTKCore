@@ -310,7 +310,7 @@ namespace btk
         parent->AppendChild(MetaData::New(label, val, "", true));
     }
     else
-      btkErrorMacro("No parent.");
+      btkWarningMacro("No parent.");
   };
 
   /**
@@ -330,7 +330,7 @@ namespace btk
       MetaDataCreateChild_p(parent, label, val, 1);
     }
     else
-      btkErrorMacro("No parent.");
+      btkWarningMacro("No parent.");
   };
   
   /**
@@ -351,7 +351,7 @@ namespace btk
       MetaDataCreateChild_p(parent, label, val, numCol, 1);
     }
     else
-      btkErrorMacro("No parent.");
+      btkWarningMacro("No parent.");
   };
 };
 
