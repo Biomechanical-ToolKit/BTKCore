@@ -101,12 +101,17 @@ namespace btk
       bool m_Owned;
     };
     
+#ifdef NDEBUG
+    static void Debug(const std::string& msg) {btkNotUsed(msg);};
+    static void Debug(const std::string& filename, int line, const std::string& msg) {btkNotUsed(filename);btkNotUsed(line);btkNotUsed(msg);};
+#else
     static void Debug(const std::string& msg) {Logger::PrintMessage(Logger::sp_DebugStream.get(), Logger::s_DebugAffix, msg);};
-    static void Warning(const std::string& msg) {Logger::PrintMessage(Logger::sp_WarningStream.get(), Logger::s_WarningAffix, msg);};
-    static void Error(const std::string& msg) {Logger::PrintMessage(Logger::sp_ErrorStream.get(), Logger::s_ErrorAffix, msg);};
-    
     static void Debug(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(Logger::sp_DebugStream.get(), Logger::s_DebugAffix, filename, line, msg);};
+#endif
+    static void Warning(const std::string& msg) {Logger::PrintMessage(Logger::sp_WarningStream.get(), Logger::s_WarningAffix, msg);};
     static void Warning(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(Logger::sp_WarningStream.get(), Logger::s_WarningAffix, filename, line, msg);};
+    
+    static void Error(const std::string& msg) {Logger::PrintMessage(Logger::sp_ErrorStream.get(), Logger::s_ErrorAffix, msg);};
     static void Error(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(Logger::sp_ErrorStream.get(), Logger::s_ErrorAffix, filename, line, msg);};
     
     static VerboseMode GetVerboseMode() {return Logger::s_VerboseMode;};
