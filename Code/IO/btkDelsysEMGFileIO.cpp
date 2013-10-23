@@ -144,7 +144,7 @@ namespace btk
             output->SetAnalogResolution(Acquisition::Bit16);
             break;
           default:
-            btkIOWarningMacro(filename, "Unknown analog resolution. Set by default to 12.");
+            btkWarningMacro(filename, "Unknown analog resolution. Set by default to 12.");
             bits = 12;
             output->SetAnalogResolution(Acquisition::Bit12);
             break;
@@ -254,7 +254,7 @@ namespace btk
             (*it)->SetGain(static_cast<Analog::Gain>(gain));
             break;
           default:
-            btkIOWarningMacro(filename, "Unknown gain. Contact the developer to add it in the list. Replaced by a gain of +/- 10 volts.");
+            btkWarningMacro(filename, "Unknown gain. Contact the developer to add it in the list. Replaced by a gain of +/- 10 volts.");
             (*it)->SetGain(Analog::PlusMinus10);
             break;
           }

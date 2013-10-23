@@ -219,7 +219,7 @@ namespace btk
         case 5: // -0.625V -- 0.625V
           (*it)->SetScale(1.25/res);
           (*it)->SetOffset(offset);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 6: // -0.5V -- 0.5V
           (*it)->SetScale(1.0/res);
@@ -229,7 +229,7 @@ namespace btk
         case 7: // -0.3125V -- 0.3125V
           (*it)->SetScale(0.625/res);
           (*it)->SetOffset(offset);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 8: // -0.25V -- 0.25V
           (*it)->SetScale(0.5/res);
@@ -239,7 +239,7 @@ namespace btk
         case 9: // -0.125V -- 0.125V
           (*it)->SetScale(0.25/res);
           (*it)->SetOffset(offset);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 10: // -0.1V -- 0.1V
           (*it)->SetScale(0.2/res);
@@ -254,89 +254,89 @@ namespace btk
         case 12: // -0.025V -- 0.025V
           (*it)->SetScale(0.05/res);
           (*it)->SetOffset(offset);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 13: // -0.0125V -- 0.0125V
           (*it)->SetScale(0.05/res);
           (*it)->SetOffset(offset);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 50: // 0V -- 10V
           (*it)->SetScale(10.0/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 51: // 0V -- 5V
           (*it)->SetScale(5.0/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 52: // 0V -- 4.095V
           (*it)->SetScale(4.095/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 53: // 0V -- 2.5V
           (*it)->SetScale(2.5/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 54: // 0V -- 1.25V
           (*it)->SetScale(1.25/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 55: // 0V -- 1V
           (*it)->SetScale(1.0/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 56: // 0V -- 0.5V
           (*it)->SetScale(0.5/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 57: // 0V -- 0.25V
           (*it)->SetScale(0.25/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 58: // 0V -- 0.1V
           (*it)->SetScale(0.1/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 59: // 0V -- 0.05V
           (*it)->SetScale(0.05/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 60: // 0V -- 0.025V
           (*it)->SetScale(0.025/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 61: // 0V -- 0.0125V
           (*it)->SetScale(0.0125/res);
           (*it)->SetOffset(0);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 100: // 0V -- 20mA
           (*it)->SetScale(20.0/res);
           (*it)->SetOffset(0);
           (*it)->SetUnit("mA");
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 101: // 4mA -- 20mA
           (*it)->SetScale(16.0/res);
           (*it)->SetOffset(-1*static_cast<int>(res)/16*4);
           (*it)->SetUnit("mA");
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 150: // 1V -- 5V
           (*it)->SetScale(4.0/res);
           (*it)->SetOffset(-1*static_cast<int>(res)/4*1);
-          btkIOWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
+          btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         default:
           throw CLBFileIOException("Unknown range code. Please contact the developers for more informations.");

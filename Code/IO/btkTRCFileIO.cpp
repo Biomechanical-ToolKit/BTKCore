@@ -166,7 +166,7 @@ namespace btk
         output->SetPointUnit(num);
       else
       {
-        btkIOWarningMacro(filename, "No 'Units' keyword. Default unit is millimeter (mm)");
+        btkWarningMacro(filename, "No 'Units' keyword. Default unit is millimeter (mm)");
         output->SetPointUnit("mm");
       }
       if (numberOfPoints != 0)
@@ -189,7 +189,7 @@ namespace btk
         int numberOfLabels = static_cast<int>(labels.size());
         if (numberOfPoints != numberOfLabels)
         {
-          btkIOWarningMacro(filename, "Mismatch between the number of points and the number of labels extracted. Final number of points corresponds to the number of labels extracted.");
+          btkWarningMacro(filename, "Mismatch between the number of points and the number of labels extracted. Final number of points corresponds to the number of labels extracted.");
           numberOfPoints = numberOfLabels;
         }
         std::getline(ifs, line); // Coordinate's label (X1, Y1, Z1, ...)
@@ -292,7 +292,7 @@ namespace btk
         continue;
       else if (pt->GetFrameNumber() != input->GetPointFrameNumber())
       {
-        btkIOWarningMacro(filename, "Marker '" + pt->GetLabel() + "' was cloned and its number of frames is resized to the general number of frames.");
+        btkWarningMacro(filename, "Marker '" + pt->GetLabel() + "' was cloned and its number of frames is resized to the general number of frames.");
         pt = (*it)->Clone();
         pt->SetFrameNumber(input->GetPointFrameNumber());
       }
@@ -302,7 +302,7 @@ namespace btk
     if (input->GetPointFrequency() != 0)
        freq = input->GetPointFrequency();
     else
-      btkIOWarningMacro(filename, "Points' frequency is not set. Default frequency is set to 100Hz");
+      btkWarningMacro(filename, "Points' frequency is not set. Default frequency is set to 100Hz");
     double stepTime = 1.0 / freq;
     ofs << static_cast<std::string>("PathFileType\t4\t(X/Y/Z)\t") << btkStripPathMacro(filename.c_str());
     ofs << static_cast<std::string>("\t\nDataRate\tCameraRate\tNumFrames\tNumMarkers\tUnits\tOrigDataRate\tOrigDataStartFrame\tOrigNumFrames\t\n");

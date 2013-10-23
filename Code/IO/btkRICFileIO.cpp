@@ -123,7 +123,7 @@ namespace btk
         ReadEliteLabel_p(output, &bifs);
       else
       {
-        btkIOWarningMacro(filename, "There is no section containing the labels of the markers.");
+        btkWarningMacro(filename, "There is no section containing the labels of the markers.");
       }
     }
     catch (BinaryFileStreamFailure& )

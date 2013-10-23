@@ -239,12 +239,12 @@ namespace btk
       // Test if the number of samples for the force platforms correspond to the number of sample in the acquisition.
       if (numPFFrames  != output->GetAnalogFrameNumber())
       {
-        btkIOWarningMacro(filename, "The number of frames for the force platforms will be adapted as it doesn't correspond to the number of analog samples set in the acquisition.");
+        btkWarningMacro(filename, "The number of frames for the force platforms will be adapted as it doesn't correspond to the number of analog samples set in the acquisition.");
       }
       // Test if the number of samples for the force platforms correspond to the number of sample in the acquisition.
       if (numEMGFrames  != output->GetAnalogFrameNumber())
       {
-        btkIOWarningMacro(filename, "The number of frames for the EMGs will be adapted as it doesn't correspond to the number of analog samples set in the acquisition.");
+        btkWarningMacro(filename, "The number of frames for the EMGs will be adapted as it doesn't correspond to the number of analog samples set in the acquisition.");
       }
       const int32_t numAnalogFrames = numFrames * analogSampleNumberPerPointFrame;
       
@@ -639,7 +639,7 @@ namespace btk
         int32_t numPFsBis = bifs.ReadI32();
         if (numPFsBis != numPFs)
         {
-          btkIOWarningMacro(filename, "The number of force platforms in the configuration is not the same than in the data block.");
+          btkWarningMacro(filename, "The number of force platforms in the configuration is not the same than in the data block.");
         }
         
         bifs.SeekRead(4, BinaryFileStream::Current);
@@ -712,7 +712,7 @@ namespace btk
       }
       else if (FPBlockFound)
       {
-        btkIOWarningMacro(filename, "The block for the configuration of the force platform(s) is missing while the data are present. These data will be only available as analog channels.");
+        btkWarningMacro(filename, "The block for the configuration of the force platform(s) is missing while the data are present. These data will be only available as analog channels.");
       }
       // ------------------------------------------------------------------- //
       //                                EMG

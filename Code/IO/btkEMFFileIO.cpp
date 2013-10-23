@@ -174,7 +174,7 @@ namespace btk
         pos = values[7].find(' ', pos+1);
       }
       if (numLabels != numMarkers)
-        btkIOWarningMacro(filename, "Number of nodes is not the same than the number of markers. The number of markers is kept.")
+        btkWarningMacro(filename, "Number of nodes is not the same than the number of markers. The number of markers is kept.")
       output->Init(numMarkers,numFrames);
       output->SetFirstFrame(1 + static_cast<int>(startTimeOffset * frameRate / 1000.0));
       output->SetPointFrequency(frameRate);

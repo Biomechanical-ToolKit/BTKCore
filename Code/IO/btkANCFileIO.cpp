@@ -181,7 +181,7 @@ namespace btk
         size_t numberOfLabels = labels.size();
         if (numberOfChannels != numberOfLabels)
         {
-          btkIOWarningMacro(filename, "Mismatch between the number of analog channels and the number of labels extracted. Final number of analog channels corresponds to the number of labels extracted.");
+          btkWarningMacro(filename, "Mismatch between the number of analog channels and the number of labels extracted. Final number of analog channels corresponds to the number of labels extracted.");
           numberOfChannels = numberOfLabels;
         }
         // Analog channels' rate
@@ -283,7 +283,7 @@ namespace btk
     if (input->GetAnalogFrequency() != 0)
        freq = input->GetAnalogFrequency();
     else
-      btkIOWarningMacro(filename, "Analog channels' frequency is not set. Default frequency is set to 100Hz");
+      btkWarningMacro(filename, "Analog channels' frequency is not set. Default frequency is set to 100Hz");
     double stepTime = 1.0 / freq;
     std::string onlyFilename = btkStripPathMacro(filename.c_str());
     // BoardType
@@ -319,7 +319,7 @@ namespace btk
     double time = 0.0;
     if (this->m_Generation != 2)
     {
-      btkIOWarningMacro(filename, "Only the second generation is now supported. The exportation in the first generation of ANC file was removed due to the lack of data and to stay compatible with the interoperability of file formats.");
+      btkWarningMacro(filename, "Only the second generation is now supported. The exportation in the first generation of ANC file was removed due to the lack of data and to stay compatible with the interoperability of file formats.");
     }
     int i = 0;
     for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
@@ -333,7 +333,7 @@ namespace btk
     }
     if (scaleWarning && (input->GetAnalogResolution() == Acquisition::Bit16))
     {
-      btkIOWarningMacro(filename, "The scale factors used in the ANC file do not correspond to these of the acquisition. Some of the data might be scaled. In case of force platform data, you have to create a calibration file (CAL) to restore exactly the data.");
+      btkWarningMacro(filename, "The scale factors used in the ANC file do not correspond to these of the acquisition. Some of the data might be scaled. In case of force platform data, you have to create a calibration file (CAL) to restore exactly the data.");
     }
     for (int frame = 0 ; frame < input->GetAnalogFrameNumber() ; ++frame)
     {

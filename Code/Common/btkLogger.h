@@ -45,32 +45,51 @@
 /**
  * Internal macro used to print log on the given stream @c s.
  */
-#define _btkLogMacro(s, p, l, m) \
-  btk::Logger::s(btkStripPathMacro(p), l, m);
+#define _btkLogMacro(s, p, l, ...) \
+  /* Keep the scope of _argc, _argv only inside the "loop" */ \
+  do \
+  { \
+    std::string _argv[] = { __VA_ARGS__ }; \
+    int _argc = (sizeof _argv) / (sizeof _argv[0]); \
+    if (_argc == 1) \
+      btk::Logger::s(btkStripPathMacro(p), l, _argv[0]); \
+    else \
+      btk::Logger::s(btkStripPathMacro(p), l, std::string(btkStripPathMacro(_argv[0].c_str())) + " - " + _argv[1]); \
+  } \
+  while (0)
 
 /**
  * Send a debug message to the logger with information on its source code location (filename, line number).
+ * This macro can be used with one or two strings. 
+ * If only one is passed, this is considered as the log message. 
+ * If two strings are passed, then the first one is considered as the path of a file and the second one is considered as the log message.
+ * In this second case, the macro strip the path of the given file to keep only the filename and concat it to the message by using a dash separator between them (i.e. filename - message).
+ * The second case is usefull for log messages sent from IO reader/writer to know which processed file has somme issues during batch.
  */
-#define btkDebugMacro(m) \
-  _btkLogMacro(Debug, __FILE__, __LINE__, m);
+#define btkDebugMacro(...) \
+  _btkLogMacro(Debug, __FILE__, __LINE__, __VA_ARGS__);
 
 /**
  * Send a warning message to the logger with information on its source code location (filename, line number).
+ * This macro can be used with one or two strings. 
+ * If only one is passed, this is considered as the log message. 
+ * If two strings are passed, then the first one is considered as the path of a file and the second one is considered as the log message.
+ * In this second case, the macro strip the path of the given file to keep only the filename and concat it to the message by using a dash separator between them (i.e. filename - message).
+ * The second case is usefull for log messages sent from IO reader/writer to know which processed file has somme issues during batch.
  */
-#define btkWarningMacro(m) \
-  _btkLogMacro(Warning, __FILE__, __LINE__, m);
+#define btkWarningMacro(...) \
+  _btkLogMacro(Warning, __FILE__, __LINE__, __VA_ARGS__);
   
 /**
  * Send an error message to the logger with information on its source code location (filename, line number).
+ * This macro can be used with one or two strings. 
+ * If only one is passed, this is considered as the log message. 
+ * If two strings are passed, then the first one is considered as the path of a file and the second one is considered as the log message.
+ * In this second case, the macro strip the path of the given file to keep only the filename and concat it to the message by using a dash separator between them (i.e. filename - message).
+ * The second case is usefull for log messages sent from IO reader/writer to know which processed file has somme issues during batch.
  */
-#define btkErrorMacro(m) \
-  _btkLogMacro(Error, __FILE__, __LINE__, m);
-
-/**
- * Send a warning message (including the processed filename) to the logger with information on its source code location (filename, line number).
- */
-#define btkIOWarningMacro(f, m) \
-  btkWarningMacro(std::string(btkStripPathMacro(f.c_str())) + " - " + m);
+#define btkErrorMacro(...) \
+  _btkLogMacro(Error, __FILE__, __LINE__, __VA_ARGS__);
 
 // ------------------------------------------------------------------------- //
 
