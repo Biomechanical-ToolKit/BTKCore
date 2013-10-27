@@ -474,6 +474,7 @@ namespace btk
                   const double sf[12] = {scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force], scales[Force]};
                   corrupted = !this->ConvertCalMatrix(values, i*valuesStep, total, columnsStep, 12, 12, sf);
                   }
+                  break;
                 case 11:
                   btkErrorMacro("Force Platform type 11 is not yet supported. Please, report this to the developers");
                   break;
