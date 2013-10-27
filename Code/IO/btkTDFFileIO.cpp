@@ -452,7 +452,7 @@ namespace btk
         // Two force platforms - by analog channels
         else if ((be->format == 5) || (be->format == 7))
         {
-          btkErrorMacro("The use of two wrenches by force platform is partially supported. Please contact the developers to improve this part.");
+          btkWarningMacro(filename, "The use of two wrenches by force platform is partially supported. Please contact the developers to improve this part.");
           FPDoubleFormat = true;
           for (int p = 0 ; p < numPFs ; ++p)
           {

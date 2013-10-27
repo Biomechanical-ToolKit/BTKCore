@@ -212,7 +212,7 @@ namespace btk
     Acquisition::Pointer input = this->GetInput();
     if (!input)
     {
-      btkErrorMacro("No acquisition or NULL acquisition.");
+      btkErrorMacro("Impossible to write a null input into a file.");
       return;
     }
       

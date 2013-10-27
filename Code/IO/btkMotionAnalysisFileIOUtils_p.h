@@ -56,7 +56,7 @@ namespace btk
   void ANxFileIOCheckHeader_p(double preciseRate, size_t channelNumber, 
                             const std::vector<uint16_t>& channelRate, 
                             const std::vector<uint16_t>& channelRange);
-  void ANxFileIOStoreHeader_p(Acquisition::Pointer output,
+  void ANxFileIOStoreHeader_p(Acquisition::Pointer output, const std::string& filename,
                             double preciseRate, size_t frameNumber, size_t channelNumber,
                             const std::vector<std::string>& channelLabel,
                             const std::vector<uint16_t>& channelRate,

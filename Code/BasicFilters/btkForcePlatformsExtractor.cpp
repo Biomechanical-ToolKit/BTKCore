@@ -327,7 +327,7 @@ namespace btk
         // Fill empty force platform channel if necessary
         if (!noError)
         {
-          btkWarningMacro("Error(s) occurred during channel extraction for force platform #" + ToString(i + 1) + ". Replacement by vector of zeros.")
+          btkWarningMacro("Error(s) occurred during channels extraction for force platform #" + ToString(i + 1) + ". Replacement by vector of zeros.")
           int inc = 0;
           for (ForcePlatform::Iterator it = (*itFP)->Begin() ; it != (*itFP)->End() ; ++it )
           {

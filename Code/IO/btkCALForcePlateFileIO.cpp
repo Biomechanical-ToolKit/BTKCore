@@ -494,7 +494,7 @@ namespace btk
             int idxChannel = j + maxChannelPerPlatform * i;
             if ((idxChannel >= static_cast<int>(fpChannel->GetValues().size())) || (idxChannel >= input->GetAnalogNumber()))
             {
-              btkErrorMacro("Index for the analog channel used by the force platform #" + ToString(i+1) + " is out of range.");
+              btkErrorMacro("Analog channel # " + ToString(idxChannel + 1) + "required by the force platform #" + ToString(i+1) + " out of range.");
             }
             else
             {

@@ -210,7 +210,7 @@ namespace btk
         uint32_t frameNumber = (dataSize - 3) * 2 / channelNumber;
         
         ANxFileIOCheckHeader_p(preciseRate, channelNumber, channelRate, channelRange);
-        ANxFileIOStoreHeader_p(output, preciseRate, frameNumber, channelNumber, channelLabel, channelRate, channelRange, boardType, bitDepth);
+        ANxFileIOStoreHeader_p(output, filename, preciseRate, frameNumber, channelNumber, channelLabel, channelRate, channelRange, boardType, bitDepth);
         output->SetFirstFrame(static_cast<int>(firstTime * preciseRate) + 1);
           
         // Convert hexIndex to metadata ANALOG:INDEX

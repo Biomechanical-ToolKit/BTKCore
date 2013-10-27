@@ -184,13 +184,13 @@ namespace btk
     Acquisition::Pointer acquisition = this->GetInputAcquisition();
     if (!acquisition)
     {
-      btkErrorMacro("No acquisition or NULL acquisition.");
+      btkErrorMacro("Impossible to write a null input into a file (acquisition).");
       return;
     }
     TriangleMesh::Pointer mesh = this->GetInputMesh();
     if (!mesh)
     {
-      btkErrorMacro("No mesh set or NULL mesh.");
+      btkErrorMacro("Impossible to write a null input into a file (mesh).");
       return;
     }
       

@@ -207,7 +207,7 @@ namespace btk
           channelLabel[inc++] = *it;
 
         ANxFileIOCheckHeader_p(preciseRate, numberOfChannels, channelRate, channelRange);
-        ANxFileIOStoreHeader_p(output, preciseRate, numberOfFrames, numberOfChannels, channelLabel, channelRate, channelRange, boardType, bitDepth, this->m_Generation);
+        ANxFileIOStoreHeader_p(output, filename, preciseRate, numberOfFrames, numberOfChannels, channelLabel, channelRate, channelRange, boardType, bitDepth, this->m_Generation);
         
         // Extract values
         std::string buf;

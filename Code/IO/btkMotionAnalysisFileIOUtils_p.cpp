@@ -84,7 +84,7 @@ namespace btk
   /**
    * Store the header's informations for the (ANB|ANC)FileIO reader into a btk::Acquisition.
    */
-  void ANxFileIOStoreHeader_p(Acquisition::Pointer output,
+  void ANxFileIOStoreHeader_p(Acquisition::Pointer output, const std::string& filename,
                               double preciseRate, size_t frameNumber, size_t channelNumber, 
                               const std::vector<std::string>& channelLabel, 
                               const std::vector<uint16_t>& channelRate, 
@@ -119,7 +119,7 @@ namespace btk
         output->SetAnalogResolution(Acquisition::Bit16);
         break;
       default:
-        btkWarningMacro("Unknown bit depth resolution. Default value used: 12 bits.");
+        btkWarningMacro(filename, "Unknown bit depth resolution. Default value used: 12 bits.");
         output->SetAnalogResolution(Acquisition::Bit12);
         break;
     }
@@ -161,7 +161,7 @@ namespace btk
             (*it)->SetGain(Analog::PlusMinus0Dot05);
             break;
           default:
-            btkWarningMacro("Unknown range: '" + channelLabel[inc] + "'. Default value used: +/- 10 V");
+            btkWarningMacro(filename, "Unknown range: '" + channelLabel[inc] + "'. Default value used: +/- 10 V");
             (*it)->SetGain(Analog::PlusMinus10);
             break;
         }
