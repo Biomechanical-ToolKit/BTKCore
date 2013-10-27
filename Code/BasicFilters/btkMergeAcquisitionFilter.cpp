@@ -177,9 +177,12 @@ namespace btk
     for (int idx = 0 ; idx < this->GetInputNumber() ; ++idx)
     {
       Acquisition::Pointer in = this->GetInput(idx);
+      // Check null input
       if (!in)
-        return;
-      
+      {
+        btkWarningMacro("Input #" + ToString(idx) + " is not merged: Impossible to merge a null input.");
+        continue;
+      }
       // Check the point's frequency
       if ((in->GetPointFrequency() != 0) && (output->GetPointFrequency() != 0) && !in->IsEmptyPoint() && !output->IsEmptyPoint() && (in->GetPointFrequency() != output->GetPointFrequency()))
       {
