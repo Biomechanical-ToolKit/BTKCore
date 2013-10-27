@@ -233,7 +233,7 @@ namespace btk
   typename T::Pointer Collection<T>::GetItem(int idx)
   {
     if (idx >= this->GetItemNumber())
-      throw(OutOfRangeException("Collection<T>::GetItem"));
+      throw(OutOfRangeException("Collection<T>::GetItem(int)"));
     Iterator it = this->Begin();
     std::advance(it, idx);
     return *it;
@@ -246,7 +246,7 @@ namespace btk
   typename T::ConstPointer Collection<T>::GetItem(int idx) const
   {
     if (idx >= this->GetItemNumber())
-      throw(OutOfRangeException("Collection<T>::GetItem"));
+      throw(OutOfRangeException("Collection<T>::GetItem(int) const"));
     ConstIterator it = this->Begin();
     std::advance(it, idx);
     return *it;
