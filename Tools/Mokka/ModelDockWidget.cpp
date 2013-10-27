@@ -916,7 +916,7 @@ void ModelDockWidget::loadConfiguration(const QString& filename)
                     QStringList rgb = att.value("RGB").toString().split(' ');
                     if (rgb.size() < 3)
                     {
-                      btkErrorMacro("The RGB attribute for the marker element doesn't contain 3 values and is replaced by the default color.");
+                      LOG_WARNING("The RGB attribute for the marker element doesn't contain 3 values and is replaced by the default color.");
                       colors << this->mp_Acquisition->defaultMarkerColor();
                     }
                     else
@@ -1046,7 +1046,7 @@ void ModelDockWidget::appendSegments(QXmlStreamReader& xmlReader, QList<Segment>
       QColor segColor;
       if (rgb.size() < 3)
       {
-        btkErrorMacro("The RGB attribute for the segment element doesn't contain 3 values and is replaced by the default color.");
+        LOG_WARNING("The RGB attribute for the segment element doesn't contain 3 values and is replaced by the default color.");
         segColor = this->mp_Model->defaultSegmentColor();
       }
       else
