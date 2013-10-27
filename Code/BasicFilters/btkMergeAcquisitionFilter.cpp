@@ -187,25 +187,25 @@ namespace btk
       if ((in->GetPointFrequency() != 0) && (output->GetPointFrequency() != 0) && !in->IsEmptyPoint() && !output->IsEmptyPoint() && (in->GetPointFrequency() != output->GetPointFrequency()))
       {
         btkWarningMacro("Input #" + ToString(idx) + " is not merged: Point's frame rates are not equal.");
-        return;
+        continue;
       }
       // Check the analog's frequency
       if ((in->GetAnalogFrequency() != 0) && (output->GetAnalogFrequency() != 0) && !in->IsEmptyAnalog() && !output->IsEmptyAnalog() && (in->GetAnalogFrequency() != output->GetAnalogFrequency()))
       {
         btkWarningMacro("Input #" + ToString(idx) + " is not merged: Analog's frame rates are not equal.");
-        return;
+        continue;
       }
       // Check the analog resolution
       if ((in->GetAnalogResolution() != 0) && (output->GetAnalogResolution() != 0) && !in->IsEmptyAnalog() && !output->IsEmptyAnalog() && (in->GetAnalogResolution() != output->GetAnalogResolution()))
       {
         btkWarningMacro("Input #" + ToString(idx) + " is not merged: Analog resolutions are not equal.");
-        return;
+        continue;
       }
       // Check the number of analog samples per point frame
       if (!in->IsEmptyPoint() && !in->IsEmptyAnalog() && !output->IsEmptyAnalog() && (in->GetAnalogFrameNumber() != 0) && (output->GetAnalogFrameNumber() != 0) && (in->GetNumberAnalogSamplePerFrame() != output->GetNumberAnalogSamplePerFrame()))
       {
         btkWarningMacro("Input #" + ToString(idx) + " is not merged: Number of analog samples per point frame are not equal.");
-        return;
+        continue;
       }
       /*
       if ((in->GetAnalogFrameNumber() != 0) && (output->GetAnalogFrameNumber() != 0) && (in->GetAnalogFrameNumber() != output->GetAnalogFrameNumber()))
@@ -250,7 +250,7 @@ namespace btk
             || (output->GetPointUnit(Point::Scalar).compare(input->GetPointUnit(Point::Scalar)) != 0))
         {
           btkWarningMacro("Input #" + ToString(idx) + " is not merged: Units do not correspond.");
-          return;
+          continue;
         }
         // Global orientation
         MetaData::ConstIterator pointItIn, pointItOut;
@@ -268,7 +268,7 @@ namespace btk
                 || (yScreenIn->ToString(0).compare(yScreenOut->ToString(0)) != 0))
             {
               btkWarningMacro("Input #" + ToString(idx) + " is not merged: Global orientation does not correspond.");
-              return;
+              continue;
             }
           }
         }
