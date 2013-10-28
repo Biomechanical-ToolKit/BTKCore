@@ -72,6 +72,15 @@ namespace btk
   * @class AcquisitionFileIORegister 
   * @brief Interface to add dynamicaly an acquisition file I/O in the factory.
   * @tparam T Classname of the acquisition file I/O.
+  *
+  * To add dynamicaly a file format in the factory (to read or write an acquisition), you need to use the command 
+  * btk::AcquisitionFileIOFactory::AddFileIO() coupled with the template method btk::AcquisitionFileIORegister::New() where the template is the name of the class which will read/write the acquistion (e.g. TestFileIO).
+  * @code {.cpp}
+  * // Only one line is required to add a new acquisition file IO.  
+  * btk::AcquisitionFileIOFactory::AddFileIO(btk::AcquisitionFileIORegister<TestFileIO>::New());
+  * @endcode
+  *
+  * @ingroup BTKIO
   */
 
  /**

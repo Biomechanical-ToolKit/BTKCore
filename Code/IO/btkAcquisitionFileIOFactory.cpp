@@ -49,6 +49,8 @@ namespace btk
    * If you want to add a new file format to this factory, you can use the method AcquisitionFileIOFactory::AddFileIO.
    * Or you if you work directly into the source-code of BTK, you can register direclty the new file format using the file btkAcquisitionFileIOFactory_registration.cpp
    *
+   * @sa AcquisitionFileIORegister
+   * 
    * @ingroup BTKIO
    */
   
