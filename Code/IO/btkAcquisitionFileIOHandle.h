@@ -52,7 +52,7 @@ namespace btk
     };
     
     typedef SharedPtr<AcquisitionFileIOHandle> Pointer;
-    // ~AcquisitionFileIOHandle(); // Implicit
+    virtual ~AcquisitionFileIOHandle() {};
     AcquisitionFileIO::Pointer GetFileIO() const {return this->mp_Functor->GetFileIO();};
     const AcquisitionFileIOHandle::Functor::Pointer GetFunctor() const {return this->mp_Functor;};
     virtual bool HasReadOperation() const = 0;
