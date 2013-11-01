@@ -97,13 +97,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btk::AcquisitionFileIO::ByteOrder byteOrderOption = btk::AcquisitionFileIO::OrderNotApplicable;
   btk::AcquisitionFileIO::StorageFormat storageFormatOption = btk::AcquisitionFileIO::StorageNotApplicable;
-  std::string errMsg;
   
   char* option = 0;
   const char* options[] = {"BYTEORDER", "STORAGEFORMAT"};
   int numberOfOptions =  sizeof(options) / sizeof(char*);
   for (int i = 2 ; i < nrhs ; i += 2)
   {
+    std::string errMsg;
     strlen_ = (mxGetM(prhs[i]) * mxGetN(prhs[i]) * sizeof(mxChar)) + 1;
     option = (char*)mxMalloc(strlen_);
     mxGetString(prhs[i], option, strlen_);
@@ -159,16 +159,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   catch(std::exception& e)
   {
-    std::remove(filename);
-    errMsg = e.what();   
+    std::remove(writer->GetFilename().c_str());
+    // Octave seems to not call the destructor of the SharedPtr when an exception is thrown (possible memory leak).
+    writer.reset();
+    io.reset();
+    mexErrMsgTxt(e.what());
   }
   catch(...)
   {
-    std::remove(filename);
-    errMsg = "An unexpected error occurred.";
+    std::remove(writer->GetFilename().c_str());
+    writer.reset();
+    io.reset();
+    mexErrMsgTxt("An unexpected error occurred.");
   }
-
-  if (!errMsg.empty())
-    mexErrMsgTxt(errMsg.c_str());
 };
 

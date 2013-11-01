@@ -66,10 +66,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   catch(std::exception& e)
   {
+    // Octave seems to not call the destructor of the SharedPtr when an exception is thrown (possible memory leak).
+    reader.reset();
     mexErrMsgTxt(e.what());
   }
   catch(...)
   {
+    reader.reset();
     mexErrMsgTxt("An unexpected error occurred.");
   }
   
