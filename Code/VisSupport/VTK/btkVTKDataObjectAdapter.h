@@ -46,7 +46,7 @@ namespace btk
   {
   public:
     BTK_VTK_EXPORT static VTKDataObjectAdapter* New();
-    vtkExportedTypeRevisionMacro(VTKDataObjectAdapter, vtkDataObject, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKDataObjectAdapter, vtkDataObject);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
     BTK_VTK_EXPORT virtual unsigned long int GetMTime();

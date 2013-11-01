@@ -42,6 +42,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkCellArray.h>
+#include <vtkVersion.h>
 
 #include <btkConvert.h>
 
@@ -116,7 +117,6 @@ namespace btk
    * Creates a VTKGRFsFramesSource object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKGRFsFramesSource);
-  vtkCxxRevisionMacro(VTKGRFsFramesSource, "$Revision: 0.1 $");
   
   /**
    * Prints only the Superclass information.

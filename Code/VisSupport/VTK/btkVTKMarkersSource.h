@@ -46,7 +46,7 @@ namespace btk
   {
   public:
     BTK_VTK_EXPORT static VTKMarkersSource* New();
-    vtkExportedTypeRevisionMacro(VTKMarkersSource, vtkGlyph3D, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKMarkersSource, vtkGlyph3D);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
 
     BTK_VTK_EXPORT virtual int IsPointVisible(vtkDataSet* points, vtkIdType id);

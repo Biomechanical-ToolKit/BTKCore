@@ -40,6 +40,7 @@
 #include <vtkInformationVector.h>
 #include <vtkObjectFactory.h>
 #include <vtkPlaneSource.h>
+#include <vtkVersion.h>
 
 namespace btk
 {
@@ -75,7 +76,6 @@ namespace btk
    * Creates a VTKGroundSource object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKGroundSource);
-  vtkCxxRevisionMacro(VTKGroundSource, "$Revision: 0.1 $");
   
   /**
    * Prints only Superclass informations.

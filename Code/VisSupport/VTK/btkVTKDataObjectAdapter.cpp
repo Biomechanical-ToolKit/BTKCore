@@ -54,7 +54,6 @@ namespace btk
    * Creates a VTKDataObjectAdapter object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKDataObjectAdapter);
-  vtkCxxRevisionMacro(VTKDataObjectAdapter, "$Revision: 0.1 $");
 
   /**
    * Prints only the Superclass information.

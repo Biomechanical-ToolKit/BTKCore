@@ -50,7 +50,7 @@ namespace btk
   {
     public:
       BTK_VTK_EXPORT static VTKFrustumFromTwoPoints* New();
-      vtkExportedTypeRevisionMacro(VTKFrustumFromTwoPoints, vtkObject, BTK_VTK_EXPORT);
+      vtkTypeMacro(VTKFrustumFromTwoPoints, vtkObject);
       BTK_VTK_EXPORT vtkPlanes* Generate(double x0, double y0, double x1, double y1, vtkRenderer* renderer);
       
     protected:
@@ -70,7 +70,7 @@ namespace btk
   {
    public:
      BTK_VTK_EXPORT static VTKFrustumGenerator_p* New();
-     vtkExportedTypeRevisionMacro(VTKFrustumGenerator_p, vtkAreaPicker, BTK_VTK_EXPORT);
+     vtkTypeMacro(VTKFrustumGenerator_p, vtkAreaPicker);
      using vtkAreaPicker::DefineFrustum;
 
    protected:

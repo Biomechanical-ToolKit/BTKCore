@@ -54,7 +54,6 @@
   free(msg);
 
 vtkStandardNewMacro(LoggerVTKOutput);
-vtkCxxRevisionMacro(LoggerVTKOutput, "$Revision: 0.1 $");
 
 void LoggerVTKOutput::PrintSelf(ostream& os, vtkIndent indent)
 {

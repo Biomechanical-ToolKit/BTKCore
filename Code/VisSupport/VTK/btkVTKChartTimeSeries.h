@@ -46,6 +46,7 @@
 #include <vtkContextClip.h>
 #include <vtkContextTransform.h>
 #include <vtkChartLegend.h>
+#include <vtkVersion.h>
 
 class vtkChartLegend;
 class vtkColorSeries;

@@ -44,6 +44,7 @@
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkPointData.h>
 #include <vtkCellArray.h>
+#include <vtkVersion.h>
 
 namespace btk
 {
@@ -131,7 +132,6 @@ namespace btk
    * Creates a VTKMarkersFramesSource object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKMarkersFramesSource);
-  vtkCxxRevisionMacro(VTKMarkersFramesSource, "$Revision: 0.1 $");
   
   /**
    * Prints Superclass informations.

@@ -46,6 +46,8 @@
 #include <vtkColor.h>
 #include <vtkTextProperty.h>
 #include <vtkFreeTypeTools.h>
+#include <vtkVersion.h>
+
 #include <algorithm>
 #include <list>
 #include <utility>

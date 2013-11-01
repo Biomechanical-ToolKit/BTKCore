@@ -47,7 +47,7 @@ SET(BTK_LIBRARIES ${BTK_LIBRARIES} "BTKVTK" CACHE INTERNAL "BTK modules compiled
 
 TARGET_LINK_LIBRARIES(BTKVTK
                       BTKCommon
-                      vtkCommon vtkFiltering vtkGraphics vtkRendering vtkHybrid vtkCharts vtkftgl
+                      ${VTK_LIBRARIES}
                       ${QT_LIBRARIES})
 
 IF(BTK_LIBRARY_PROPERTIES)

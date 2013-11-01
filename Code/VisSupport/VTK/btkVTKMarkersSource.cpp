@@ -55,7 +55,6 @@ namespace btk
    * Creates a VTKMarkersSource object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKMarkersSource);
-  vtkCxxRevisionMacro(VTKMarkersSource, "$Revision: 0.2 $");
   
   /**
    * Print Superclass informations.

@@ -46,7 +46,7 @@ namespace btk
   {
   public:
     BTK_VTK_EXPORT static VTKGRFsFramesSource* New();
-    vtkExportedTypeRevisionMacro(VTKGRFsFramesSource, vtkPolyDataAlgorithm, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKGRFsFramesSource, vtkPolyDataAlgorithm);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
 
     BTK_VTK_EXPORT void SetInput(WrenchCollection::Pointer input);

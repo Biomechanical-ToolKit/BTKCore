@@ -43,6 +43,7 @@
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
+#include <vtkVersion.h>
 
 namespace btk
 {
@@ -109,7 +110,6 @@ namespace btk
    * Creates a VTKSegmentsFramesSource object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKSegmentsFramesSource);
-  vtkCxxRevisionMacro(VTKSegmentsFramesSource, "$Revision: 0.1 $");
   
   /**
    * Prints Superclass informations.

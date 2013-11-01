@@ -37,6 +37,7 @@
 #define __btkVTKQtStringToImage_h
 
 #include <vtkQtStringToImage.h>
+#include <vtkVersion.h>
 
 namespace btk
 {

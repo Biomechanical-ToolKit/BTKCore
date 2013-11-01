@@ -42,7 +42,7 @@ class LoggerVTKOutput : public vtkOutputWindow
 {
 public:
   static LoggerVTKOutput* New();
-  vtkTypeRevisionMacro(LoggerVTKOutput, vtkOutputWindow);
+  vtkTypeMacro(LoggerVTKOutput, vtkOutputWindow);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void DisplayText(const char* msg);

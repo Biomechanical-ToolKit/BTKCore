@@ -51,7 +51,7 @@ namespace btk
   {
   public:
     BTK_VTK_EXPORT static VTKInteractorStyleTrackballFixedUpCamera* New();
-    vtkExportedTypeRevisionMacro(VTKInteractorStyleTrackballFixedUpCamera, vtkInteractorStyleTrackballCamera, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKInteractorStyleTrackballFixedUpCamera, vtkInteractorStyleTrackballCamera);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
     BTK_VTK_EXPORT void GetGlobalUp(double n[3]) const {n[0] = this->mp_GlobalUp[0]; n[1] = this->mp_GlobalUp[1]; n[2] = this->mp_GlobalUp[2];};

@@ -108,7 +108,6 @@ namespace btk
    * Constructs a VTKAxis object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKAxis);
-  vtkCxxRevisionMacro(VTKAxis, "$Revision: 0.1 $");
   
   /**
    * Destructor.

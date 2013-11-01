@@ -55,7 +55,7 @@ namespace btk
   {
   public:
     BTK_VTK_EXPORT static VTKAxesWidget* New();
-    vtkExportedTypeRevisionMacro(VTKAxesWidget, vtkObject, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKAxesWidget, vtkObject);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
     
     BTK_VTK_EXPORT void SetAxesActor(vtkAxesActor* actor);

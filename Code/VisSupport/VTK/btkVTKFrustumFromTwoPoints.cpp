@@ -52,7 +52,6 @@ namespace btk
    * Creates a VTKMarkersSource object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKFrustumFromTwoPoints);
-  vtkCxxRevisionMacro(VTKFrustumFromTwoPoints, "$Revision: 0.1 $");
   
   /**
    * Generate a frustrum based on two points picked on the screen
@@ -91,5 +90,4 @@ namespace btk
   
   // Internals 
   vtkStandardNewMacro(VTKFrustumGenerator_p);
-  vtkCxxRevisionMacro(VTKFrustumGenerator_p, "$Revision: 0.1 $");
 };

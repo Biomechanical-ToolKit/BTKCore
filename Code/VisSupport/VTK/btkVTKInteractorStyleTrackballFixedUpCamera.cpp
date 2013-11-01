@@ -69,7 +69,6 @@ namespace btk
    * Creates a VTKInteractorStyleTrackballFixedUpCamera object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKInteractorStyleTrackballFixedUpCamera);
-  vtkCxxRevisionMacro(VTKInteractorStyleTrackballFixedUpCamera, "$Revision: 0.1 $");
   
   /**
    * Prints Superclass informations.

@@ -37,6 +37,7 @@
 #define __btkVTKOpenGL2ContextDevice2D_h
 
 #include <vtkOpenGL2ContextDevice2D.h>
+#include <vtkVersion.h>
 
 namespace btk
 {

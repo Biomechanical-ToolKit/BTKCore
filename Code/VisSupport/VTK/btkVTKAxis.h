@@ -39,6 +39,7 @@
 #include "btkConfigure.h"
 
 #include <vtkAxis.h>
+#include <vtkVersion.h>
 
 namespace btk
 {
@@ -48,7 +49,7 @@ namespace btk
     enum {INSIDE = 0, OUTSIDE};
     
     BTK_VTK_EXPORT static VTKAxis* New();
-    vtkExportedTypeRevisionMacro(VTKAxis, vtkAxis, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKAxis, vtkAxis);
     
     BTK_VTK_EXPORT virtual ~VTKAxis();
     

@@ -52,6 +52,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkVectorText.h>
 #include <vtkBoundingBox.h>
+#include <vtkVersion.h>
 
 namespace btk
 {
@@ -67,7 +68,6 @@ namespace btk
    * Creates a VTKForcePlatformsSource object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKForcePlatformsSource);
-  vtkCxxRevisionMacro(VTKForcePlatformsSource, "$Revision: 0.1 $");
   
   /**
    * Prints only Superclass informations.

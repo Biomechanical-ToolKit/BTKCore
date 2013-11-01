@@ -51,7 +51,7 @@ namespace btk
   {
   public:
     BTK_VTK_EXPORT static VTKMarkersFramesSource* New();
-    vtkExportedTypeRevisionMacro(VTKMarkersFramesSource, vtkPolyDataAlgorithm, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKMarkersFramesSource, vtkPolyDataAlgorithm);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
 
     void SetInput(PointCollection::Pointer input) {this->SetInput(0,input);};

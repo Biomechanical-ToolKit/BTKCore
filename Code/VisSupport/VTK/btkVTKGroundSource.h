@@ -48,7 +48,7 @@ namespace btk
     typedef enum {Automatic, PlaneXY, PlaneYZ, PlaneZX} Orientation;
     
     BTK_VTK_EXPORT static VTKGroundSource* New();
-    vtkExportedTypeRevisionMacro(VTKGroundSource, vtkPolyDataAlgorithm, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKGroundSource, vtkPolyDataAlgorithm);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
 
     BTK_VTK_EXPORT void SetInput(Acquisition::Pointer input);

@@ -56,7 +56,7 @@ namespace btk
     typedef TriangleMesh::VertexFace Face;
     
     BTK_VTK_EXPORT static VTKSegmentsFramesSource* New();
-    vtkExportedTypeRevisionMacro(VTKSegmentsFramesSource, vtkPolyDataAlgorithm, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKSegmentsFramesSource, vtkPolyDataAlgorithm);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
 
     BTK_VTK_EXPORT void SetInput(PointCollection::Pointer input);

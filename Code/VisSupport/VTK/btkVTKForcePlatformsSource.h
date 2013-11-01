@@ -46,7 +46,7 @@ namespace btk
   {
   public:
     BTK_VTK_EXPORT static VTKForcePlatformsSource* New();
-    vtkExportedTypeRevisionMacro(VTKForcePlatformsSource, vtkPolyDataAlgorithm, BTK_VTK_EXPORT);
+    vtkTypeMacro(VTKForcePlatformsSource, vtkPolyDataAlgorithm);
     BTK_VTK_EXPORT void PrintSelf(ostream& os, vtkIndent indent);
 
     BTK_VTK_EXPORT void SetInput(ForcePlatformCollection::Pointer input);

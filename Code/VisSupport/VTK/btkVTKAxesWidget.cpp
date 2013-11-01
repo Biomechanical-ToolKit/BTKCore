@@ -66,7 +66,6 @@ namespace btk
    * Constructs a VTKAxesWidget object and return it as a pointer.
    */
   vtkStandardNewMacro(VTKAxesWidget);
-  vtkCxxRevisionMacro(VTKAxesWidget, "$Revision: 0.1 $");
   
   /**
    * Prints object informations.
