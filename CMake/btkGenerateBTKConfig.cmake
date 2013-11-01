@@ -2,13 +2,6 @@
 # one for installation.  The file tells external projects how to use
 # BTK.
 
-# System Eigen2
-IF(BTK_USE_SYSTEM_EIGEN3)
-  SET(BTK_EIGEN3_INCLUDE_DIR ${EIGEN3_INCLUDE_DIR})
-ELSE(BTK_USE_SYSTEM_EIGEN3)
-  SET(BTK_EIGEN3_INCLUDE_DIR)
-ENDIF(BTK_USE_SYSTEM_EIGEN3)
-
 #---------------------------------------------------------------------------
 # Settings specific to the build tree.
 

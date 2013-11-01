@@ -59,16 +59,6 @@ SET(CXX_TEST_PATH ${EXECUTABLE_OUTPUT_PATH})
 SET(BTK_CMAKE_MODULE_PATH "${BTK_SOURCE_DIR}/CMake")
 SET(CMAKE_MODULE_PATH "${BTK_CMAKE_MODULE_PATH}")
 
-# BTK_USE_SYSTEM_EIGEN3 is provided so that you can use an installed or 
-# external version of eigen3. If its on, you must specify the variables 
-OPTION(BTK_USE_SYSTEM_EIGEN3 "Use an existing installation of Eigen3." OFF)
-IF(BTK_USE_SYSTEM_EIGEN3)
-  FIND_PACKAGE(Eigen3 REQUIRED)
-ELSE(BTK_USE_SYSTEM_EIGEN3)
-  SET(BTK_EIGEN3_LIBRARIES btkeigen3)
-  SET(EIGEN3_INCLUDE_DIR ${BTK_SOURCE_DIR}/Utilities/eigen3)
-ENDIF(BTK_USE_SYSTEM_EIGEN3)
-
 # Determine Visulization support
 OPTION(BTK_USE_VISSUPPORT "Build BTK with visualization support." OFF)
 IF(NOT BTK_USE_VISSUPPORT)
