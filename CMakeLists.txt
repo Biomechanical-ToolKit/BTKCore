@@ -77,7 +77,7 @@ ENDIF(NOT BTK_USE_VISSUPPORT)
 CMAKE_DEPENDENT_OPTION(BTK_USE_VTK "Build VTK support." OFF "BTK_USE_VISSUPPORT" OFF)
 IF(BTK_USE_VTK)
   # Priorize VTK 6
-  FIND_PACKAGE(VTK 6.0 COMPONENTS vtkCommonCore vtkChartsCore vtkRenderingAnnotation vtkInteractionStyle NO_MODULE)
+  FIND_PACKAGE(VTK 6.0 COMPONENTS vtkCommonCore vtkChartsCore vtkRenderingAnnotation vtkInteractionStyle NO_MODULE QUIET)
   IF(NOT VTK_FOUND)
     # Otherwise, let's try VTK 5.X
     FIND_PACKAGE(VTK REQUIRED)
