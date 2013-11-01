@@ -109,6 +109,9 @@
 #endif
 
 // Addons for Eigen
+#ifdef EIGEN_CORE_H
+  #error The header btkConfigure.h must be included before the inclusion of any Eigen headers to integrate the implemented Eigen plugins
+#endif
 // Need to be defined before the inclusion of the Eigen headers
 #define EIGEN_DENSEBASE_PLUGIN <btkEigen/Plugin/DenseBaseAddons.h>
 #define EIGEN_VECTOROP_PLUGIN <btkEigen/Plugin/VectorOpAddons.h>
