@@ -35,8 +35,9 @@
 
 #include <btkAcquisitionFileReader.h>
 #include <btkAcquisitionFileWriter.h>
-#include <btkMacro.h>
+#include <btkMacro.h> // btkStripPathMacro
 
+#include <iostream> // std::cerr
 #include <cstdio> // Include std::remove for Linux
 
 int main(int argc, char *argv[])
