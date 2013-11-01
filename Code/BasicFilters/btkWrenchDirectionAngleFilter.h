@@ -45,8 +45,8 @@ namespace btk
   class WrenchDirectionAngleFilter : public ProcessObject
   {
   public:
-    typedef SharedPtr<WrenchDirectionAngleFilter> Pointer;
-    typedef SharedPtr<const WrenchDirectionAngleFilter> ConstPointer;
+    typedef btkSharedPtr<WrenchDirectionAngleFilter> Pointer;
+    typedef btkSharedPtr<const WrenchDirectionAngleFilter> ConstPointer;
 
     static Pointer New() {return Pointer(new WrenchDirectionAngleFilter());};
     

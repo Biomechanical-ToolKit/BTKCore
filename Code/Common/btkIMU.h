@@ -48,8 +48,8 @@ namespace btk
   class IMU : public DataObjectLabeled
   {
   public:
-    typedef SharedPtr<IMU> Pointer;
-    typedef SharedPtr<const IMU> ConstPointer;
+    typedef btkSharedPtr<IMU> Pointer;
+    typedef btkSharedPtr<const IMU> ConstPointer;
     
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> CalMatrix;
     typedef Eigen::Matrix<double,3,3> Rotation;

@@ -51,8 +51,8 @@ namespace btk
     typedef Eigen::Matrix<double, 3, 1> Origin;
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> CalMatrix;
 
-    typedef SharedPtr<ForcePlatform> Pointer;
-    typedef SharedPtr<const ForcePlatform> ConstPointer;
+    typedef btkSharedPtr<ForcePlatform> Pointer;
+    typedef btkSharedPtr<const ForcePlatform> ConstPointer;
 
     typedef AnalogCollection::Iterator Iterator;
     typedef AnalogCollection::ConstIterator ConstIterator;

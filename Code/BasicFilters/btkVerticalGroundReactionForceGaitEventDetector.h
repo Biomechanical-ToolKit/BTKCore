@@ -48,8 +48,8 @@ namespace btk
   class VerticalGroundReactionForceGaitEventDetector : public ProcessObject
   {
   public:
-    typedef SharedPtr<VerticalGroundReactionForceGaitEventDetector> Pointer;
-    typedef SharedPtr<const VerticalGroundReactionForceGaitEventDetector> ConstPointer;
+    typedef btkSharedPtr<VerticalGroundReactionForceGaitEventDetector> Pointer;
+    typedef btkSharedPtr<const VerticalGroundReactionForceGaitEventDetector> ConstPointer;
 
     static Pointer New() {return Pointer(new VerticalGroundReactionForceGaitEventDetector());};
     

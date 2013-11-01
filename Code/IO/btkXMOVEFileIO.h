@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<XMOVEFileIO> Pointer;
-    typedef SharedPtr<const XMOVEFileIO> ConstPointer;
+    typedef btkSharedPtr<XMOVEFileIO> Pointer;
+    typedef btkSharedPtr<const XMOVEFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new XMOVEFileIO());};
     

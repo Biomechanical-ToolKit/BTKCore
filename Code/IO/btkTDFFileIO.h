@@ -61,8 +61,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<TDFFileIO> Pointer;
-    typedef SharedPtr<const TDFFileIO> ConstPointer;
+    typedef btkSharedPtr<TDFFileIO> Pointer;
+    typedef btkSharedPtr<const TDFFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new TDFFileIO());};
     

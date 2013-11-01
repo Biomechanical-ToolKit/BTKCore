@@ -48,8 +48,8 @@ namespace btk
   class ForcePlatformWrenchFilter : public ProcessObject
   {
   public:
-    typedef SharedPtr<ForcePlatformWrenchFilter> Pointer;
-    typedef SharedPtr<const ForcePlatformWrenchFilter> ConstPointer;
+    typedef btkSharedPtr<ForcePlatformWrenchFilter> Pointer;
+    typedef btkSharedPtr<const ForcePlatformWrenchFilter> ConstPointer;
 
     static Pointer New() {return Pointer(new ForcePlatformWrenchFilter());};
     

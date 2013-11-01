@@ -43,7 +43,7 @@ namespace btk
   class VTKCurrentFrameFunctor
   {
   public:
-    typedef SharedPtr<VTKCurrentFrameFunctor> Pointer;
+    typedef btkSharedPtr<VTKCurrentFrameFunctor> Pointer;
     virtual ~VTKCurrentFrameFunctor() {};
     virtual int operator()() = 0;
     virtual VTKCurrentFrameFunctor::Pointer ResetedSuperClone() = 0;
@@ -57,7 +57,7 @@ namespace btk
   class VTKRegionOfInterestFunctor
   {
   public:
-    typedef SharedPtr<VTKRegionOfInterestFunctor> Pointer;
+    typedef btkSharedPtr<VTKRegionOfInterestFunctor> Pointer;
     virtual ~VTKRegionOfInterestFunctor() {};
     virtual void operator()(int& left, int& right) = 0;
     virtual VTKRegionOfInterestFunctor::Pointer ResetedSuperClone() = 0;
@@ -71,7 +71,7 @@ namespace btk
   class VTKEventsFrameMapperFunctor
   {
   public:
-    typedef SharedPtr<VTKEventsFrameMapperFunctor> Pointer;
+    typedef btkSharedPtr<VTKEventsFrameMapperFunctor> Pointer;
     virtual ~VTKEventsFrameMapperFunctor() {};
     virtual float operator()(int index, int side, int shift) = 0;
   protected:
@@ -84,7 +84,7 @@ namespace btk
   class VTKEventsFunctor
   {
   public:
-    typedef SharedPtr<VTKEventsFunctor> Pointer;
+    typedef btkSharedPtr<VTKEventsFunctor> Pointer;
     virtual ~VTKEventsFunctor() {};
     virtual bool operator()(int index, int& typeId, float& x, double rgb[3]) = 0;
     virtual VTKEventsFunctor::Pointer ResetedSuperClone() = 0;

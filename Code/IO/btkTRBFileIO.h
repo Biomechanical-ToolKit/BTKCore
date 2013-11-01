@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<TRBFileIO> Pointer;
-    typedef SharedPtr<const TRBFileIO> ConstPointer;
+    typedef btkSharedPtr<TRBFileIO> Pointer;
+    typedef btkSharedPtr<const TRBFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new TRBFileIO());};
     

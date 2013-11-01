@@ -46,8 +46,8 @@ namespace btk
   class ForcePlatformsExtractor : public ProcessObject
   {
   public:
-    typedef SharedPtr<ForcePlatformsExtractor> Pointer;
-    typedef SharedPtr<const ForcePlatformsExtractor> ConstPointer;
+    typedef btkSharedPtr<ForcePlatformsExtractor> Pointer;
+    typedef btkSharedPtr<const ForcePlatformsExtractor> ConstPointer;
 
     static Pointer New() {return Pointer(new ForcePlatformsExtractor());};
     

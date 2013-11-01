@@ -44,8 +44,8 @@ namespace btk
   class Wrench : public DataObject
   {
   public:    
-    typedef SharedPtr<Wrench> Pointer;
-    typedef SharedPtr<const Wrench> ConstPointer;
+    typedef btkSharedPtr<Wrench> Pointer;
+    typedef btkSharedPtr<const Wrench> ConstPointer;
     
     static Pointer New(const std::string& label = "") {return Pointer(new Wrench(label));};
     static Pointer New(int frameNumber) {return Pointer(new Wrench("", frameNumber));};

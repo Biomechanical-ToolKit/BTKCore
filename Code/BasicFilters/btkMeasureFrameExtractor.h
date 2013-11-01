@@ -49,8 +49,8 @@ namespace btk
   class MeasureFrameExtractor : public ProcessObject
   {
   public:
-    typedef SharedPtr<MeasureFrameExtractor> Pointer;
-    typedef SharedPtr<const MeasureFrameExtractor> ConstPointer;
+    typedef btkSharedPtr<MeasureFrameExtractor> Pointer;
+    typedef btkSharedPtr<const MeasureFrameExtractor> ConstPointer;
     
     typedef typename Collection<T>::Pointer CollectionPointer;
     typedef typename Collection<T>::ConstPointer CollectionConstPointer;    

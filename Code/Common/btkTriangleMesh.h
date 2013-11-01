@@ -47,8 +47,8 @@ namespace btk
   class TriangleMesh : public DataObject
   {
   public:    
-    typedef SharedPtr<TriangleMesh> Pointer;
-    typedef SharedPtr<const TriangleMesh> ConstPointer;
+    typedef btkSharedPtr<TriangleMesh> Pointer;
+    typedef btkSharedPtr<const TriangleMesh> ConstPointer;
     
     class VertexLink
     {

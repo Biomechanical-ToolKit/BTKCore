@@ -47,8 +47,8 @@ namespace btk
   class DownsampleFilter : public ProcessObject
   {
   public:
-    typedef SharedPtr<DownsampleFilter> Pointer;
-    typedef SharedPtr<const DownsampleFilter> ConstPointer;
+    typedef btkSharedPtr<DownsampleFilter> Pointer;
+    typedef btkSharedPtr<const DownsampleFilter> ConstPointer;
        
     typedef typename T::Pointer ItemPointer;
     typedef typename T::ConstPointer ItemConstPointer;    
@@ -207,7 +207,7 @@ namespace btk
    * Generic method to downsample data. Does nothing.
    */
   template <class T>
-  inline void DownsampleData(int ratio, SharedPtr<T> input, SharedPtr<T> output)
+  inline void DownsampleData(int ratio, btkSharedPtr<T> input, btkSharedPtr<T> output)
   {
     btkErrorMacro("Generic method. Please specialize it.");
   };

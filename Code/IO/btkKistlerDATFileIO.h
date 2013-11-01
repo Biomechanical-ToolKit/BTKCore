@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<KistlerDATFileIO> Pointer;
-    typedef SharedPtr<const KistlerDATFileIO> ConstPointer;
+    typedef btkSharedPtr<KistlerDATFileIO> Pointer;
+    typedef btkSharedPtr<const KistlerDATFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new KistlerDATFileIO());};
     

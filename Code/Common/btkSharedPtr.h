@@ -38,54 +38,41 @@
 
 #include "btkConfigure.h"
 
-namespace btk // For documentation purpose
-{
 /**
- * @define SharedPtr btkSharedPtr.h
+ * @define btkSharedPtr btkSharedPtr.h
  * Macro which uses the right shared_ptr class in BTK.
  * To downcast a shared pointer you need to use the function static_pointer_cast.
  *
  * @ingroup BTKCommon
  */ 
-};
 
 /* Native header */
 #if defined(__GNUC__) && (__GNUC__ > 3)
   #if defined(HAVE_SYS_TR1_MEMORY_H)
-     #include <tr1/memory>
-    namespace btk { 
-      #define SharedPtr std::tr1::shared_ptr
-    };
+    #include <tr1/memory>
+    #define btkSharedPtr std::tr1::shared_ptr
     using std::tr1::static_pointer_cast;
   /* Experimental with GCC 4.3 */
   #elif defined(HAVE_SYS_MEMORY_H)
     #include <memory>
-    namespace btk { 
-      #define SharedPtr std::shared_ptr
-    };
+    #define btkSharedPtr std::shared_ptr
     using std::static_pointer_cast;
   #endif
 #elif defined(_MSC_VER) && (_MSC_VER >= 1500)
   /* included with MSVC 2008 SP1 */
   #if defined(HAVE_SYS_MEMORY_H)
     #include <memory>
-    namespace btk { 
-      #define SharedPtr std::tr1::shared_ptr
-    };
+    #define btkSharedPtr std::tr1::shared_ptr
     using std::tr1::static_pointer_cast;
   #endif
 #elif defined(HAVE_BOOST_MEMORY_HPP)
   #include <boost/memory.hpp>
-  namespace btk { 
-    #define SharedPtr boost::shared_ptr
-  };
+  #define btkSharedPtr boost::shared_ptr
   using boost::static_pointer_cast;
 #else
   // From boost 1.34
   #include <boost/tr1/memory.hpp>
-  namespace btk { 
-    #define SharedPtr std::tr1::shared_ptr
-  };
+  #define btkSharedPtr std::tr1::shared_ptr
   using std::tr1::static_pointer_cast;
 #endif
 

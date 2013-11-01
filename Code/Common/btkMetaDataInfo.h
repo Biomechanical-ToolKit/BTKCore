@@ -53,8 +53,8 @@ namespace btk
   {
   public:
     typedef enum {Char=-1, Byte=1, Integer=2, Real=4} Format;
-    typedef SharedPtr<MetaDataInfo> Pointer;
-    typedef SharedPtr<const MetaDataInfo> ConstPointer;
+    typedef btkSharedPtr<MetaDataInfo> Pointer;
+    typedef btkSharedPtr<const MetaDataInfo> ConstPointer;
 
     static Pointer New(int8_t val) {return Pointer(new MetaDataInfo(std::vector<uint8_t>(0), std::vector<int8_t>(1, val)));};
     static Pointer New(int16_t val) {return Pointer(new MetaDataInfo(std::vector<uint8_t>(0), std::vector<int16_t>(1, val)));};

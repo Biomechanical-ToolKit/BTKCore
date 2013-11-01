@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<RAxFileIO> Pointer;
-    typedef SharedPtr<const RAxFileIO> ConstPointer;
+    typedef btkSharedPtr<RAxFileIO> Pointer;
+    typedef btkSharedPtr<const RAxFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new RAxFileIO());};
     

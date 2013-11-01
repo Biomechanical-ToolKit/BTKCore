@@ -44,8 +44,8 @@ namespace btk
   class AnalogOffsetRemover : public ProcessObject
   {
   public:
-    typedef SharedPtr<AnalogOffsetRemover> Pointer;
-    typedef SharedPtr<const AnalogOffsetRemover> ConstPointer;
+    typedef btkSharedPtr<AnalogOffsetRemover> Pointer;
+    typedef btkSharedPtr<const AnalogOffsetRemover> ConstPointer;
     
     static Pointer New() {return Pointer(new AnalogOffsetRemover());};
     

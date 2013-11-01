@@ -46,8 +46,8 @@ namespace btk
   class GroundReactionWrenchFilter : public ForcePlatformWrenchFilter
   {
   public:
-    typedef SharedPtr<GroundReactionWrenchFilter> Pointer;
-    typedef SharedPtr<const GroundReactionWrenchFilter> ConstPointer;
+    typedef btkSharedPtr<GroundReactionWrenchFilter> Pointer;
+    typedef btkSharedPtr<const GroundReactionWrenchFilter> ConstPointer;
 
     static Pointer New() {return Pointer(new GroundReactionWrenchFilter());};
     

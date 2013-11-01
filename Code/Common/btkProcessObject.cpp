@@ -53,7 +53,7 @@ namespace btk
    * class Source : public btk::DataObject
    * {
    * public:
-   *   typedef SharedPtr<Source> Pointer;
+   *   typedef btkSharedPtr<Source> Pointer;
    *   static Pointer New() {return Pointer(new Source());}; 
    *   int GetValue() {return this->m_Val;};
    *   void SetValue(int val)
@@ -69,7 +69,7 @@ namespace btk
    * class Filter : public btk::ProcessObject
    * {
    * public:
-   *   typedef SharedPtr<Filter> Pointer;
+   *   typedef btkSharedPtr<Filter> Pointer;
    *   static Pointer New() {return Pointer(new Filter());}; 
    *   void SetInc(int inc)
    *   {

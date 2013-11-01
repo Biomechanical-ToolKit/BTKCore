@@ -51,8 +51,8 @@ namespace btk
   public:
     typedef enum {Bit8 = 8, Bit10 = 10, Bit12 = 12, Bit14 = 14, Bit16 = 16}  AnalogResolution;
 
-    typedef SharedPtr<Acquisition> Pointer;
-    typedef SharedPtr<const Acquisition> ConstPointer;
+    typedef btkSharedPtr<Acquisition> Pointer;
+    typedef btkSharedPtr<const Acquisition> ConstPointer;
     
     typedef EventCollection::Iterator EventIterator;
     typedef EventCollection::ConstIterator EventConstIterator;

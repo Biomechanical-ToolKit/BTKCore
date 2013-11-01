@@ -48,8 +48,8 @@ namespace btk
   public:
     enum {KeepAllFrames = 0, KeepFromHighestFirstFrame};
     
-    typedef SharedPtr<MergeAcquisitionFilter> Pointer;
-    typedef SharedPtr<const MergeAcquisitionFilter> ConstPointer;
+    typedef btkSharedPtr<MergeAcquisitionFilter> Pointer;
+    typedef btkSharedPtr<const MergeAcquisitionFilter> ConstPointer;
 
     static Pointer New() {return Pointer(new MergeAcquisitionFilter());};
     

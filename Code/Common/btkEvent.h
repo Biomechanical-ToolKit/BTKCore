@@ -50,8 +50,8 @@ namespace btk
                   Automatic = 0x04,
                   FromForcePlatform = 0x08} DetectionFlag;
     
-    typedef SharedPtr<Event> Pointer;
-    typedef SharedPtr<const Event> ConstPointer;
+    typedef btkSharedPtr<Event> Pointer;
+    typedef btkSharedPtr<const Event> ConstPointer;
     
     static Pointer New() {return Pointer(new Event("", -1.0, -1, "", Unknown, "", "", 0));};
     static Pointer New(const std::string& label, double t, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, t, -1, context, detectionFlags, subject, desc, id));};

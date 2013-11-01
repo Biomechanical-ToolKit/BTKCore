@@ -56,8 +56,8 @@ namespace btk
   class AcquisitionFileReader : public ProcessObject
   {
   public:
-    typedef SharedPtr<AcquisitionFileReader> Pointer;
-    typedef SharedPtr<const AcquisitionFileReader> ConstPointer;
+    typedef btkSharedPtr<AcquisitionFileReader> Pointer;
+    typedef btkSharedPtr<const AcquisitionFileReader> ConstPointer;
     
     virtual ~AcquisitionFileReader() {};
     

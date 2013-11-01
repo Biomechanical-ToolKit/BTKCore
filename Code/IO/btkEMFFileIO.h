@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;;
     
   public:
-    typedef SharedPtr<EMFFileIO> Pointer;
-    typedef SharedPtr<const EMFFileIO> ConstPointer;
+    typedef btkSharedPtr<EMFFileIO> Pointer;
+    typedef btkSharedPtr<const EMFFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new EMFFileIO());};
     

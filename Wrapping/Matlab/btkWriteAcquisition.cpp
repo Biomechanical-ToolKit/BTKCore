@@ -160,7 +160,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   catch(std::exception& e)
   {
     std::remove(writer->GetFilename().c_str());
-    // Octave seems to not call the destructor of the SharedPtr when an exception is thrown (possible memory leak).
+    // Octave seems to not call the destructor of the btkSharedPtr when an exception is thrown (possible memory leak).
     writer.reset();
     io.reset();
     mexErrMsgTxt(e.what());

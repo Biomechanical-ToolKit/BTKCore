@@ -53,7 +53,7 @@ namespace btk
   public:
     static MEXObjectHandle* FromMEXHandle(const mxArray* ma);
 
-    MEXObjectHandle(SharedPtr<T> ptr)
+    MEXObjectHandle(btkSharedPtr<T> ptr)
     : m_Object(ptr)
     {
       // mexPrintf("MEXObjectHandle::MEXObjectHandle\n");
@@ -69,12 +69,12 @@ namespace btk
     };
 
     mxArray* ToMEXHandle(); 
-    SharedPtr<T> GetObject() const {return this->m_Object;};  
+    btkSharedPtr<T> GetObject() const {return this->m_Object;};  
 
   private:
     MEXObjectHandle* mp_Signature;
     int m_ClassID;
-    SharedPtr<T> m_Object;
+    btkSharedPtr<T> m_Object;
 
     friend class MEXHandleCollector<T>;
   };
@@ -128,7 +128,7 @@ namespace btk
    *
    * This class (code and documentation) is largely inspired by the 
    * %ObjectHandle class of Tim Bailey (2004). The btk::MEXObjectHandle 
-   * class is designed to handle btk::SharedPtr object.
+   * class is designed to handle object embedded in a btkSharedPtr smart pointer.
    *
    * @ingroup BTKWrappingMatlab
    */
@@ -142,8 +142,7 @@ namespace btk
 	  mxArray* handle  = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
 
 	  *static_cast<MEXObjectHandle<T>**>(mxGetData(handle)) = this;
-	  return handle;
-  }
+	  return habtkSharedPtr
 
   /**
    * @fn SharedPtr<T> MEXObjectHandle::GetObject() const
@@ -151,7 +150,7 @@ namespace btk
    */
 
   /**
-   * @fn MEXObjectHandle::MEXObjectHandle(SharedPtr<T> ptr)
+   * @fn MEXObjebtkSharedPtr:MEXObjectHandle(SharedPtr<T> ptr)
    * Constructor. Handle takes a copy of the object @a ptr as it is a shared pointer.
    */
 
@@ -221,7 +220,7 @@ namespace btk
  * @ingroup BTKWrappingMatlab
  */
 template <typename T>
-mxArray* btk_MOH_create_handle(SharedPtr<T> ptr)
+mxArrbtkSharedPtrOH_create_handle(SharedPtr<T> ptr)
 {
   btk::MEXObjectHandle<T>* handle = new btk::MEXObjectHandle<T>(ptr);
   return handle->ToMEXHandle();
@@ -233,8 +232,7 @@ mxArray* btk_MOH_create_handle(SharedPtr<T> ptr)
  * class directly for most common operations.
  *
  * @ingroup BTKWrappingMatlab
- */
-template <typename T>
+btkSharedPtrate <typename T>
 SharedPtr<T> btk_MOH_get_object(const mxArray *mxh)
 {
   btk::MEXObjectHandle<T>* handle = btk::MEXObjectHandle<T>::FromMEXHandle(mxh);

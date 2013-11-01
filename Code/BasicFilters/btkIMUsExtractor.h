@@ -45,8 +45,8 @@ namespace btk
   class IMUsExtractor : public ProcessObject
   {
   public:
-    typedef SharedPtr<IMUsExtractor> Pointer;
-    typedef SharedPtr<const IMUsExtractor> ConstPointer;
+    typedef btkSharedPtr<IMUsExtractor> Pointer;
+    typedef btkSharedPtr<const IMUsExtractor> ConstPointer;
 
     static Pointer New() {return Pointer(new IMUsExtractor());};
     

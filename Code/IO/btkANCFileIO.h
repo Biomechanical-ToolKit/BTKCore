@@ -56,8 +56,8 @@ namespace btk
     BTK_FILE_IO_SUPPORTED_EXTENSIONS("ANC");
     
   public:
-    typedef SharedPtr<ANCFileIO> Pointer;
-    typedef SharedPtr<const ANCFileIO> ConstPointer;
+    typedef btkSharedPtr<ANCFileIO> Pointer;
+    typedef btkSharedPtr<const ANCFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new ANCFileIO());};
     

@@ -48,8 +48,8 @@ namespace btk
   class DataObject : public Object
   {
   public:
-    typedef SharedPtr<DataObject> Pointer;
-    typedef SharedPtr<const DataObject> ConstPointer;
+    typedef btkSharedPtr<DataObject> Pointer;
+    typedef btkSharedPtr<const DataObject> ConstPointer;
     
     bool HasParent() const {return this->mp_Parent != 0;};
     DataObject* GetParent() const {return this->mp_Parent;};
@@ -89,8 +89,8 @@ namespace btk
   class DataObjectLabeled : public DataObject
   {
   public:
-    typedef SharedPtr<DataObjectLabeled> Pointer;
-    typedef SharedPtr<const DataObjectLabeled> ConstPointer;
+    typedef btkSharedPtr<DataObjectLabeled> Pointer;
+    typedef btkSharedPtr<const DataObjectLabeled> ConstPointer;
     
     const std::string& GetLabel() const {return this->m_Label;};
     BTK_COMMON_EXPORT virtual void SetLabel(const std::string& label);

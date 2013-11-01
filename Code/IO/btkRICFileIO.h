@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<RICFileIO> Pointer;
-    typedef SharedPtr<const RICFileIO> ConstPointer;
+    typedef btkSharedPtr<RICFileIO> Pointer;
+    typedef btkSharedPtr<const RICFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new RICFileIO());};
     

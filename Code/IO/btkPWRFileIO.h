@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<PWRFileIO> Pointer;
-    typedef SharedPtr<const PWRFileIO> ConstPointer;
+    typedef btkSharedPtr<PWRFileIO> Pointer;
+    typedef btkSharedPtr<const PWRFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new PWRFileIO());};
     

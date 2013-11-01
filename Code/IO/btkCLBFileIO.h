@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<CLBFileIO> Pointer;
-    typedef SharedPtr<const CLBFileIO> ConstPointer;
+    typedef btkSharedPtr<CLBFileIO> Pointer;
+    typedef btkSharedPtr<const CLBFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new CLBFileIO());};
     

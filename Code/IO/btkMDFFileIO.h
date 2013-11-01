@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<MDFFileIO> Pointer;
-    typedef SharedPtr<const MDFFileIO> ConstPointer;
+    typedef btkSharedPtr<MDFFileIO> Pointer;
+    typedef btkSharedPtr<const MDFFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new MDFFileIO());};
     

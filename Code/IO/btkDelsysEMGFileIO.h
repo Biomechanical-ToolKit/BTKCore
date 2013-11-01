@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<DelsysEMGFileIO> Pointer;
-    typedef SharedPtr<const DelsysEMGFileIO> ConstPointer;
+    typedef btkSharedPtr<DelsysEMGFileIO> Pointer;
+    typedef btkSharedPtr<const DelsysEMGFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new DelsysEMGFileIO());};
     

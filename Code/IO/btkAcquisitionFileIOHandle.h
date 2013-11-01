@@ -46,12 +46,12 @@ namespace btk
     class Functor
     {
     public:
-      typedef SharedPtr<AcquisitionFileIOHandle::Functor> Pointer;
+      typedef btkSharedPtr<AcquisitionFileIOHandle::Functor> Pointer;
       virtual ~Functor() {};
       virtual AcquisitionFileIO::Pointer GetFileIO() const = 0;
     };
     
-    typedef SharedPtr<AcquisitionFileIOHandle> Pointer;
+    typedef btkSharedPtr<AcquisitionFileIOHandle> Pointer;
     virtual ~AcquisitionFileIOHandle() {};
     AcquisitionFileIO::Pointer GetFileIO() const {return this->mp_Functor->GetFileIO();};
     const AcquisitionFileIOHandle::Functor::Pointer GetFunctor() const {return this->mp_Functor;};

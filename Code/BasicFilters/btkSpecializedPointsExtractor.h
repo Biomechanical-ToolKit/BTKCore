@@ -45,8 +45,8 @@ namespace btk
   class SpecializedPointsExtractor : public ProcessObject
   {
   public:
-    typedef SharedPtr<SpecializedPointsExtractor> Pointer;
-    typedef SharedPtr<const SpecializedPointsExtractor> ConstPointer;
+    typedef btkSharedPtr<SpecializedPointsExtractor> Pointer;
+    typedef btkSharedPtr<const SpecializedPointsExtractor> ConstPointer;
 
     static Pointer New() {return Pointer(new SpecializedPointsExtractor());};
     

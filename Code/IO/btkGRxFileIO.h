@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<GRxFileIO> Pointer;
-    typedef SharedPtr<const GRxFileIO> ConstPointer;
+    typedef btkSharedPtr<GRxFileIO> Pointer;
+    typedef btkSharedPtr<const GRxFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new GRxFileIO());};
     

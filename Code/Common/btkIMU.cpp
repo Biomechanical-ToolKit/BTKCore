@@ -277,7 +277,7 @@ namespace btk
     // Because the size of the data can be huge, it is preferred
     // to priorize the memory instead of the speed.
     Analog::Pointer accX, accY, accZ, gyroX, gyroY, gyroZ;
-    typedef SharedPtr<IMU::Data> DataPtr;
+    typedef btkSharedPtr<IMU::Data> DataPtr;
     DataPtr aX = (accX = this->GetChannelMap(0)) ? DataPtr(new IMU::ChannelData(accX)) : DataPtr(new IMU::EmptyData);
     DataPtr aY = (accY = this->GetChannelMap(1)) ? DataPtr(new IMU::ChannelData(accY)) : DataPtr(new IMU::EmptyData);
     DataPtr aZ = (accZ = this->GetChannelMap(2)) ? DataPtr(new IMU::ChannelData(accZ)) : DataPtr(new IMU::EmptyData);

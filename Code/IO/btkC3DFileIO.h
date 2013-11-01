@@ -60,8 +60,8 @@ namespace btk
     typedef enum {Signed, Unsigned}  AnalogIntegerFormat;
     typedef enum {None = 1, ScalesFromDataUpdate = 2, ScalesFromMetaDataUpdate = 4, MetaDataFromDataUpdate = 8, CompatibleVicon = 16} WritingFlag;
 
-    typedef SharedPtr<C3DFileIO> Pointer;
-    typedef SharedPtr<const C3DFileIO> ConstPointer;
+    typedef btkSharedPtr<C3DFileIO> Pointer;
+    typedef btkSharedPtr<const C3DFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new C3DFileIO());};
         

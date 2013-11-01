@@ -57,8 +57,8 @@ namespace btk
     public:
       typedef typename MeasureTraits<Point>::Residuals Residuals; ///< Vector of double representing the residuals associated with each frames (if applicable).
       
-      typedef SharedPtr<Data> Pointer;
-      typedef SharedPtr<const Data> ConstPointer;
+      typedef btkSharedPtr<Data> Pointer;
+      typedef btkSharedPtr<const Data> ConstPointer;
       
       static Pointer Null() {return Pointer();};
       static Pointer New(int frameNumber) {return Pointer(new Data(frameNumber));};
@@ -87,8 +87,8 @@ namespace btk
     
     typedef enum {Marker = 0, Angle, Force, Moment, Power, Scalar, Reaction} Type;
     
-    typedef SharedPtr<Point> Pointer;
-    typedef SharedPtr<const Point> ConstPointer;
+    typedef btkSharedPtr<Point> Pointer;
+    typedef btkSharedPtr<const Point> ConstPointer;
     
     static Pointer New(const std::string& label = "", Type t = Marker, const std::string& desc = "") {return Pointer(new Point(label, t, desc));};
     static Pointer New(int frameNumber) {return Pointer(new Point("", frameNumber, Marker, ""));};

@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<XLSOrthoTrakFileIO> Pointer;
-    typedef SharedPtr<const XLSOrthoTrakFileIO> ConstPointer;
+    typedef btkSharedPtr<XLSOrthoTrakFileIO> Pointer;
+    typedef btkSharedPtr<const XLSOrthoTrakFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new XLSOrthoTrakFileIO());};
     

@@ -44,7 +44,7 @@ namespace btk
   class AcquisitionFileIORegister : public AcquisitionFileIOHandle
   {
   public:
-    typedef SharedPtr<AcquisitionFileIORegister> Pointer;
+    typedef btkSharedPtr<AcquisitionFileIORegister> Pointer;
     static Pointer New() {return Pointer(new AcquisitionFileIORegister());};
     
     virtual bool HasReadOperation() const {return T::HasReadOperation();};

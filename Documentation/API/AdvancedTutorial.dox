@@ -215,8 +215,8 @@ class DummyFileIO : public AcquisitionFileIO
   BTK_FILE_IO_SUPPORTED_EXTENSIONS("DMY");
 
 public:
-  typedef SharedPtr<DummyFileIO> Pointer;
-  typedef SharedPtr<const DummyFileIO> ConstPointer;
+  typedef btkSharedPtr<DummyFileIO> Pointer;
+  typedef btkSharedPtr<const DummyFileIO> ConstPointer;
   
   static Pointer New() {return Pointer(new DummyFileIO());};
   

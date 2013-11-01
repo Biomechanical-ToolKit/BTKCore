@@ -60,8 +60,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<AMTIForcePlatformFileIO> Pointer;
-    typedef SharedPtr<const AMTIForcePlatformFileIO> ConstPointer;
+    typedef btkSharedPtr<AMTIForcePlatformFileIO> Pointer;
+    typedef btkSharedPtr<const AMTIForcePlatformFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new AMTIForcePlatformFileIO());};
     

@@ -50,8 +50,8 @@ namespace btk
     static bool HasReadOperation() {return true;};
     static bool HasWriteOperation() {return true;};
     
-    typedef SharedPtr<AcquisitionFileIO> Pointer;
-    typedef SharedPtr<const AcquisitionFileIO> ConstPointer;
+    typedef btkSharedPtr<AcquisitionFileIO> Pointer;
+    typedef btkSharedPtr<const AcquisitionFileIO> ConstPointer;
     
     typedef enum {TypeNotApplicable, ASCII, Binary} FileType;
     typedef enum {OrderNotApplicable = 0, IEEE_LittleEndian, VAX_LittleEndian, IEEE_BigEndian} ByteOrder;

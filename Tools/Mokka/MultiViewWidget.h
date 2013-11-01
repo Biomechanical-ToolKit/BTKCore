@@ -62,7 +62,7 @@ class ChartExportDialog;
 class EventsFrameMapperFunctor : public btk::VTKEventsFrameMapperFunctor
 {
 public:
-  typedef SharedPtr<EventsFrameMapperFunctor> Pointer;
+  typedef btkSharedPtr<EventsFrameMapperFunctor> Pointer;
   static EventsFrameMapperFunctor::Pointer New(vtkFloatArray* (*abscissa)[4], vtkFloatArray* (*boundaries)[3]) {return Pointer(new EventsFrameMapperFunctor(abscissa, boundaries));};
   virtual ~EventsFrameMapperFunctor() {};
   virtual float operator()(int index, int side, int shift);

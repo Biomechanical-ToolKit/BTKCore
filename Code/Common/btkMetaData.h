@@ -46,8 +46,8 @@ namespace btk
   class MetaData : public DataObjectLabeled
   {
   public:
-    typedef SharedPtr<MetaData> Pointer;
-    typedef SharedPtr<const MetaData> ConstPointer;
+    typedef btkSharedPtr<MetaData> Pointer;
+    typedef btkSharedPtr<const MetaData> ConstPointer;
     
     typedef std::list<MetaData::Pointer>::iterator Iterator;
     typedef std::list<MetaData::Pointer>::const_iterator ConstIterator;

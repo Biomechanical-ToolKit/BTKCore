@@ -43,7 +43,7 @@ class TimeEventControlerWidget;
 class CurrentFrameFunctor : public btk::VTKCurrentFrameFunctor
 {
 public:
-  typedef SharedPtr<CurrentFrameFunctor> Pointer;
+  typedef btkSharedPtr<CurrentFrameFunctor> Pointer;
   static CurrentFrameFunctor::Pointer New(TimeEventControlerWidget* w) {return Pointer(new CurrentFrameFunctor(w));};
   
   virtual ~CurrentFrameFunctor() {};
@@ -63,7 +63,7 @@ private:
 class RegionOfInterestFunctor : public btk::VTKRegionOfInterestFunctor
 {
 public:
-  typedef SharedPtr<RegionOfInterestFunctor> Pointer;
+  typedef btkSharedPtr<RegionOfInterestFunctor> Pointer;
   static RegionOfInterestFunctor::Pointer New(TimeEventControlerWidget* w) {return Pointer(new RegionOfInterestFunctor(w));};
   
   virtual ~RegionOfInterestFunctor() {};
@@ -83,7 +83,7 @@ private:
 class EventsFunctor : public btk::VTKEventsFunctor
 {
 public:
-  typedef SharedPtr<EventsFunctor> Pointer;
+  typedef btkSharedPtr<EventsFunctor> Pointer;
   static EventsFunctor::Pointer New(TimeEventControlerWidget* w) {return Pointer(new EventsFunctor(w));};
   
   virtual ~EventsFunctor() {};

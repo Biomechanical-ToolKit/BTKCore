@@ -46,8 +46,8 @@ namespace btk
   class ProcessObject : public Object
   {
   public:
-    typedef SharedPtr<ProcessObject> Pointer;
-    typedef SharedPtr<const ProcessObject> ConstPointer;
+    typedef btkSharedPtr<ProcessObject> Pointer;
+    typedef btkSharedPtr<const ProcessObject> ConstPointer;
     
     int GetInputNumber() const {return static_cast<int>(this->m_Inputs.size());};
     BTK_COMMON_EXPORT int GetValidInputNumber() const;

@@ -46,8 +46,8 @@ namespace btk
   public:
     typedef enum {Length = 0, Angle = 1, Force = 2, Moment = 3, Power = 4} Unit;
     
-    typedef SharedPtr<AcquisitionUnitConverter> Pointer;
-    typedef SharedPtr<const AcquisitionUnitConverter> ConstPointer;
+    typedef btkSharedPtr<AcquisitionUnitConverter> Pointer;
+    typedef btkSharedPtr<const AcquisitionUnitConverter> ConstPointer;
 
     static Pointer New() {return Pointer(new AcquisitionUnitConverter());};
     

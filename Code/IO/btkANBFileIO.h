@@ -56,8 +56,8 @@ namespace btk
     BTK_FILE_IO_SUPPORTED_EXTENSIONS("ANB");
     
   public:
-    typedef SharedPtr<ANBFileIO> Pointer;
-    typedef SharedPtr<const ANBFileIO> ConstPointer;
+    typedef btkSharedPtr<ANBFileIO> Pointer;
+    typedef btkSharedPtr<const ANBFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new ANBFileIO());};
     

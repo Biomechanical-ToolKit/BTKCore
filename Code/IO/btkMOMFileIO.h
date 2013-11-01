@@ -57,8 +57,8 @@ namespace btk
     BTK_FILE_IO_ONLY_READ_OPERATION;
     
   public:
-    typedef SharedPtr<MOMFileIO> Pointer;
-    typedef SharedPtr<const MOMFileIO> ConstPointer;
+    typedef btkSharedPtr<MOMFileIO> Pointer;
+    typedef btkSharedPtr<const MOMFileIO> ConstPointer;
     
     static Pointer New() {return Pointer(new MOMFileIO());};
     

@@ -54,8 +54,8 @@ namespace btk
    class Data : public MeasureData<Analog>
     {
     public:
-      typedef SharedPtr<Data> Pointer;
-      typedef SharedPtr<const Data> ConstPointer;
+      typedef btkSharedPtr<Data> Pointer;
+      typedef btkSharedPtr<const Data> ConstPointer;
       
       static Pointer Null() {return Pointer();};
       static Pointer New(int frameNumber) {return Pointer(new Data(frameNumber));};
@@ -81,8 +81,8 @@ namespace btk
                   PlusMinus1Dot25 = 1250, PlusMinus1 = 1000, PlusMinus0Dot5 = 500, 
                   PlusMinus0Dot25 = 250, PlusMinus0Dot1 = 100, PlusMinus0Dot05 = 50} Gain;
 
-    typedef SharedPtr<Analog> Pointer;
-    typedef SharedPtr<const Analog> ConstPointer;
+    typedef btkSharedPtr<Analog> Pointer;
+    typedef btkSharedPtr<const Analog> ConstPointer;
     
     static Pointer New(const std::string& label = "", const std::string& desc = "") {return Pointer(new Analog(label, desc));};
     static Pointer New(int frameNumber) {return Pointer(new Analog("", frameNumber));};

@@ -68,8 +68,8 @@ namespace btk
       std::string Axis3;
     };
     
-    typedef SharedPtr<SeparateKnownVirtualMarkersFilter> Pointer;
-    typedef SharedPtr<const SeparateKnownVirtualMarkersFilter> ConstPointer;
+    typedef btkSharedPtr<SeparateKnownVirtualMarkersFilter> Pointer;
+    typedef btkSharedPtr<const SeparateKnownVirtualMarkersFilter> ConstPointer;
 
     static Pointer New() {return Pointer(new SeparateKnownVirtualMarkersFilter());};
     

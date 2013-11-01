@@ -44,8 +44,8 @@ namespace btk
   class SubAcquisitionFilter : public ProcessObject
   {
   public:
-    typedef SharedPtr<SubAcquisitionFilter> Pointer;
-    typedef SharedPtr<const SubAcquisitionFilter> ConstPointer;
+    typedef btkSharedPtr<SubAcquisitionFilter> Pointer;
+    typedef btkSharedPtr<const SubAcquisitionFilter> ConstPointer;
     
     typedef enum {All = 0, PointsOnly, AnalogsOnly, EventsOnly} ExtractionOption; 
 

@@ -7,7 +7,7 @@
 class Source : public btk::DataObject
 {
 public:
-  typedef SharedPtr<Source> Pointer;
+  typedef btkSharedPtr<Source> Pointer;
   static Pointer New() {return Pointer(new Source());}; 
   int GetValue() {return this->m_Val;};
   void SetValue(int val)
@@ -23,8 +23,8 @@ private:
 class Filter : public btk::ProcessObject
 {
 public:
-  typedef SharedPtr<Filter> Pointer;
-  typedef SharedPtr<const Filter> ConstPointer;
+  typedef btkSharedPtr<Filter> Pointer;
+  typedef btkSharedPtr<const Filter> ConstPointer;
   static Pointer New() {return Pointer(new Filter());}; 
   void SetInc(int inc)
   {

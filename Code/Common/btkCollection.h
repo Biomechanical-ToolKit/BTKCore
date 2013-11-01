@@ -48,8 +48,8 @@ namespace btk
   class Collection : public DataObject
   {
   public:
-    typedef typename SharedPtr<Collection> Pointer;
-    typedef typename SharedPtr<const Collection> ConstPointer;
+    typedef typename btkSharedPtr<Collection> Pointer;
+    typedef typename btkSharedPtr<const Collection> ConstPointer;
     
     typedef typename T::Pointer ItemPointer;
     typedef typename T::ConstPointer ItemConstPointer;    
@@ -404,7 +404,7 @@ namespace btk
    * Deep copy.
    */
   template <class T>
-  typename SharedPtr< Collection<T> > Collection<T>::Clone() const
+  typename btkSharedPtr< Collection<T> > Collection<T>::Clone() const
   {
     Pointer p = Pointer(new Collection());
     for (ConstIterator it = this->Begin() ; it != this->End() ; ++it)

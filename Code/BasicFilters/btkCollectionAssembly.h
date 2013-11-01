@@ -45,8 +45,8 @@ namespace btk
   class CollectionAssembly : public ProcessObject
   {
   public:
-    typedef SharedPtr<CollectionAssembly> Pointer;
-    typedef SharedPtr<const CollectionAssembly> ConstPointer;
+    typedef btkSharedPtr<CollectionAssembly> Pointer;
+    typedef btkSharedPtr<const CollectionAssembly> ConstPointer;
     
     typedef typename Collection<T>::Pointer CollectionPointer;
     typedef typename Collection<T>::ConstPointer CollectionConstPointer;    

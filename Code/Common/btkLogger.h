@@ -105,7 +105,7 @@ namespace btk
     class Stream
     {
     public:
-      typedef SharedPtr<Stream> Pointer;
+      typedef btkSharedPtr<Stream> Pointer;
       static Pointer New(std::ostream* output) {return Pointer(new Stream(output));};
       ~Stream();
       std::ostream& GetOutput() const {return *(this->mp_Output);};

@@ -56,8 +56,8 @@ namespace btk
   class MultiSTLFileWriter : public ProcessObject
   {
   public:
-    typedef SharedPtr<MultiSTLFileWriter> Pointer;
-    typedef SharedPtr<const MultiSTLFileWriter> ConstPointer;
+    typedef btkSharedPtr<MultiSTLFileWriter> Pointer;
+    typedef btkSharedPtr<const MultiSTLFileWriter> ConstPointer;
     
     virtual ~MultiSTLFileWriter() {};
     

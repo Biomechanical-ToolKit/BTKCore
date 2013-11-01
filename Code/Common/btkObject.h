@@ -43,8 +43,8 @@ namespace btk
   class Object
   {
   public:
-    typedef SharedPtr<Object> Pointer;
-    typedef SharedPtr<const Object> ConstPointer;
+    typedef btkSharedPtr<Object> Pointer;
+    typedef btkSharedPtr<const Object> ConstPointer;
     
     unsigned long int GetTimestamp() const {return this->m_Timestamp;};
     BTK_COMMON_EXPORT virtual void Modified();

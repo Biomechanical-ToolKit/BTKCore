@@ -56,8 +56,8 @@ namespace btk
   class AcquisitionFileWriter : public ProcessObject
   {
   public:
-    typedef SharedPtr<AcquisitionFileWriter> Pointer;
-    typedef SharedPtr<const AcquisitionFileWriter> ConstPointer;
+    typedef btkSharedPtr<AcquisitionFileWriter> Pointer;
+    typedef btkSharedPtr<const AcquisitionFileWriter> ConstPointer;
     
     virtual ~AcquisitionFileWriter() {};
     

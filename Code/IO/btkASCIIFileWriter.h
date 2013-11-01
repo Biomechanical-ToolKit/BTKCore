@@ -57,8 +57,8 @@ namespace btk
   class ASCIIFileWriter : public ProcessObject
   {
   public:
-    typedef SharedPtr<ASCIIFileWriter> Pointer;
-    typedef SharedPtr<const ASCIIFileWriter> ConstPointer;
+    typedef btkSharedPtr<ASCIIFileWriter> Pointer;
+    typedef btkSharedPtr<const ASCIIFileWriter> ConstPointer;
     
     virtual ~ASCIIFileWriter() {};
     
