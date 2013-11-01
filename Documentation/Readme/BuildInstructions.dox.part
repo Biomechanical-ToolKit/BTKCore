@@ -87,7 +87,7 @@ Enable/Disable generation of BTK bindings in the Python language. In order to bu
 
 @subsubsection config_scilab BTK_WRAP_SCILAB
 <div class="important">
-@b Warning: Scilab wrapping is not updated since BTK 0.1.6 and its easy installer was removed due to a major <a href="http://bugzilla.scilab.org/show_bug.cgi?id=6886">bug</a> in their mexlib library.
+@b Warning: Scilab wrapping is discarded since BTK 0.1.6 and its easy installer was removed due to a major <a href="http://bugzilla.scilab.org/show_bug.cgi?id=6886">bug</a> in their mexlib library.
 </div>
 Enable/Disable generation of BTK bindings in the Scilab language. In order to build the Scilab-based BTK interpreter, the target computer needs to have Scilab 5.1 or above installed. To turn on Scilab wrapping, set BTK_WRAP_SCILAB to ON during the configuration process.
 
