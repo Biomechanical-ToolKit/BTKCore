@@ -36,3 +36,12 @@ assertEqual(btkGetAnalogFrequency(h1), btkGetAnalogFrequency(h2));
 btkDeleteAcquisition(h1);
 btkDeleteAcquisition(h2);
 end
+
+function testCloseAcquisition(d)
+h = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Я могу есть стекло/оно мне не вредит.c3d'));
+btkCloseAcquisition(h);
+try
+  fn = btkGetPointFrameNumber(h)
+end
+assertEqual(isempty(strfind(lasterr, 'Parameter does not represent a MEXObjectHandle object.')), false);
+end

@@ -36,6 +36,6 @@
  * <tt>btkWriteAcquisition(acq, 'filename.c3d', 'ByteOrder', 'VAX_LittleEndian'); </tt>\n
  * <tt>btkWriteAcquisition(acq, 'filename.c3d', 'StorageFormat', 'Integer', 'ByteOrder', 'IEEE_LittleEndian');</tt>
  * 
- * @sa btkReadAcquisition
+ * @sa btkCloseAcquisition, btkReadAcquisition
  * @ingroup BTKMatlabIO
  */

@@ -16,6 +16,6 @@
  *   btkDeleteAcquisition(acq);
  * end @endverbatim
  *
- * @sa btkCloneAcquisition, btkNewAcquisition
+ * @sa btkCloneAcquisition, btkCloseAcquisition, btkNewAcquisition
  * @ingroup BTKMatlabAcquisitionModifier
  */

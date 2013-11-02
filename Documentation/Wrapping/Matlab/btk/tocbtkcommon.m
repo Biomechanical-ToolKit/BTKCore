@@ -24,7 +24,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkCloneAcquisition">btkCloneAcquisition</a>               - Clone an acquisition
 %   <a href="matlab:help btkClearAnalysis">btkClearAnalysis</a>                  - Clear the metadata ANALYSIS
 %   <a href="matlab:help btkCropAcquisition">btkCropAcquisition</a>                - Crop the acquistion and adapt the events' frame/time.
-%   <a href="matlab:help btkDeleteAcquisition">btkDeleteAcquisition</a>              - Delete an acquisition and free the used memory
+%   <a href="matlab:help btkDeleteAcquisition">btkDeleteAcquisition</a>              - Delete acquisition handle and release used memory
 %   <a href="matlab:help btkNewAcquisition">btkNewAcquisition</a>                 - Create an empty acquisition
 %   <a href="matlab:help btkRemoveAnalysisParameter">btkRemoveAnalysisParameter</a>        - Erase a paremeter from the analysis
 %   <a href="matlab:help btkRemoveMetaData">btkRemoveMetaData</a>                 - Remove a metadata from the acquisition

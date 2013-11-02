@@ -3,8 +3,9 @@ function tocbtkio
 % ----------------
 %
 % Acquisition
-%   <a href="matlab:help btkReadAcquisition">btkReadAcquisition</a>                - Load acquisition's file (ANC, C3D and TRC files format supported)
-%   <a href="matlab:help btkWriteAcquisition">btkWriteAcquisition</a>               - Save acquisition data (ANC, C3D and TRC files format supported)
+%   <a href="matlab:help btkReadAcquisition">btkReadAcquisition</a>                - Load acquisition's file
+%   <a href="matlab:help btkCloseAcquisition">btkCloseAcquisition</a>               - Release memory associated with the handle
+%   <a href="matlab:help btkWriteAcquisition">btkWriteAcquisition</a>               - Save acquisition data
 %
 % <a href="matlab:help btk">Biomechanical Toolkit TOC</a>
 
@@ -12,4 +13,3 @@ function tocbtkio
 %   Copyright 2009-2013 Biomechanical ToolKit
 
 % [EOF]
-
