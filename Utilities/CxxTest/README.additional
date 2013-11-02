@@ -1,0 +1,5 @@
+The additional folder is not embedded is the standard package of CxxTest.
+The content of this folder adds additional functions to CxxTest.
+Check in each subfolder for more information.
+
+Note: The license of each additional part may be different than the original license used by CxxTest.

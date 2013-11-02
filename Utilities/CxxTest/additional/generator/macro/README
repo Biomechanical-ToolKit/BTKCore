@@ -1,0 +1,14 @@
+2013-08-17, Arnaud Barré
+===============================================================================
+
+Compared to the standard way proposed by CxxTest (i.e. Python and Perl generators), this generator based on macros doesn't need extra software to generate the code which will be compiled (i.e., the main() function, and extra static classes). On the other hand, this need to add lines to register the suites and the tests you want to execute. These steps are simplified with the use of macros which significantly reduce the extra lines to add. 
+
+To use this generator you need only to include one file (cxxtestgen.h) and create another file which will contain the command to run the tests.
+
+The file 'cxxtest/TestGenerator.h' includes the headers used by CxxTest and the macros required by this generator. This file has only to be included in the compiled file (see test/example2 for more information).
+
+The main() function with the printer to use must be also implemented. The examples in the subfolder 'tests' show how to do it.
+
+Note: Some compiler limits the number of symbols by compiled file (e.g. NMake 64-bit). If this happens, you need to split your tests in different CPP files (see test/example2 for more information).
+
+Note: This generator was tested with CxxTest 3.10.1. It might be used with a greater version of CxxTest.
