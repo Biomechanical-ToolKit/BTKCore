@@ -15,7 +15,7 @@ LINK_DIRECTORIES(${BTK_LIBRARY_PATH})
 
 # The CxxTest library included with BTK is modified.
 # This version uses C/C++ Macros instead of Python/Perl test generator.
-INCLUDE_DIRECTORIES(${BTK_SOURCE_DIR}/Utilities/CxxTest)
+INCLUDE(${BTK_SOURCE_DIR}/Utilities/CxxTest/CxxTest.cmake)
 
 ADD_EXECUTABLE(TDD ${TDD_SRCS})
 
