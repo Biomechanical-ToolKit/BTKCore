@@ -142,15 +142,16 @@ namespace btk
 	  mxArray* handle  = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL);
 
 	  *static_cast<MEXObjectHandle<T>**>(mxGetData(handle)) = this;
-	  return habtkSharedPtr
-
+	  return handle;
+  };
+  
   /**
    * @fn SharedPtr<T> MEXObjectHandle::GetObject() const
    * Returns the object handled.
    */
 
   /**
-   * @fn MEXObjebtkSharedPtr:MEXObjectHandle(SharedPtr<T> ptr)
+   * @fn MEXObjectHandle::MEXObjectHandle(SharedPtr<T> ptr)
    * Constructor. Handle takes a copy of the object @a ptr as it is a shared pointer.
    */
 
@@ -220,7 +221,7 @@ namespace btk
  * @ingroup BTKWrappingMatlab
  */
 template <typename T>
-mxArrbtkSharedPtrOH_create_handle(SharedPtr<T> ptr)
+mxArray* btk_MOH_create_handle(btkSharedPtr<T> ptr)
 {
   btk::MEXObjectHandle<T>* handle = new btk::MEXObjectHandle<T>(ptr);
   return handle->ToMEXHandle();
@@ -232,8 +233,10 @@ mxArrbtkSharedPtrOH_create_handle(SharedPtr<T> ptr)
  * class directly for most common operations.
  *
  * @ingroup BTKWrappingMatlab
-btkSharedPtrate <typename T>
-SharedPtr<T> btk_MOH_get_object(const mxArray *mxh)
+ */
+
+template <typename T>
+btkSharedPtr<T> btk_MOH_get_object(const mxArray *mxh)
 {
   btk::MEXObjectHandle<T>* handle = btk::MEXObjectHandle<T>::FromMEXHandle(mxh);
   return handle->GetObject();
