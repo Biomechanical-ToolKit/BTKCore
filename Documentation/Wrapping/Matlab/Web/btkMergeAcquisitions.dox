@@ -8,7 +8,13 @@
  * @retval h New handle pointing to a C++ btk::Acquisition object containing the data of the inputs.
  *
  * @par Detailed description:
- * First of all, the difference between the merging or the concatenating depends of the acquisitions' informations.
+ * The release of the memory associated with the handle @h can be done automatically
+ * by Matlab when you use the command <tt>clear all</tt>, or you can use the function
+ * btkDeleteAcquisition. The use of the function btkDeleteAcquisition is greatly
+ * advised when you are doing batch processing as Matlab does not manage the C++
+ * memory and an "Out of memory" error could be thrown.
+ * \n\n
+ * The difference between the merging or the concatenating depends of the acquisitions' informations.
  * \n\n
  * If the acquisitions are exactly the same (same label for points and analog channels) and the first 
  * frame of the n+1th acquistion corresponds to the last frame of the nth acquistion, then the 

@@ -8,6 +8,16 @@
  * @retval storageFormat String containing the storage format used in the file (see note #2).
  *
  * @par Detailed description:
+ * 
+ * This function returns an handle @c h of a biomechanical 
+ * acquisition stored in file @c filename. This handle is returned 
+ * as a double and can be only used with the btk* function. The release of the memory
+ * associated with the handle @h can be done automatically by Matlab when you use the
+ * command <tt>clear all</tt>, or you can use the function btkDeleteAcquisition. The
+ * use of the function btkDeleteAcquisition is greatly advised when you are doing
+ * batch processing as Matlab does not manage the C++ memory and an "Out of memory"
+ * error could be thrown.
+ *
  * For more informations about the file formats read by BTK, check the @ref FileFormatSupported page.\n\n
  * <b>Note #1:</b> The possible values for the byte order are:
  *   - OrderNotApplicable: in the case the file is an ASCII file ;
@@ -15,7 +25,7 @@
  *   - VAX_LittleEndian: Native format for the DEC processor ;
  *   - IEEE_BigEndian: Native format for the MIPS/PPC processor.
  *   .
- * <b>Note #2:</b> THe possible values for the storage format are:
+ * <b>Note #2:</b> The possible values for the storage format are:
  *   - StorageNotApplicable: in the case the file is an ASCII file.
  *   - Float: Values are stored on 4 bytes as a real.
  *   - Integer: Values are stored on 2 bytes as integer and are scaled.

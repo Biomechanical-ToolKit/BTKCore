@@ -23,6 +23,11 @@ function h = btkNewAcquisition(pn, fn, an, r) %#ok
 %  R corresponds to the analog samples number by point frame.
 %
 %  This handle is returned as a double and can be only used with the btk* functions.
+%  The release of the memory associated with the handle H can be done automatically
+%  by Matlab when you use the command 'clear all', or you can use the function
+%  BTKDELETEACQUISITION.  The use of the function BTKDELETEACQUISITION is greatly
+%  advised when you are doing batch processing as Matlab does not manage the C++
+%  memory and an "Out of memory" error could be thrown.
 
 %  Author: A. Barré
 %  Copyright 2009-2013 Biomechanical ToolKit (BTK).
