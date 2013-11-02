@@ -183,20 +183,33 @@ protected:
 %extend btkForcePlatform
 { 
   %pythoncode
-  { 
-    def SetOrigin(self, *args):
+  {
+  def SetOrigin(self, *args):
+      """
+      SetOrigin(self, array)
+      SetOrigin(self, double, double, double)
+    
+      Sets the origin.
+      """
       if (len(args) == 1):
-        self._set_origin_1(*args)
+          self._set_origin_1(*args)
       else:
-        self._set_origin_2(*args)
-        
-    def SetCorner(self, *args):
+          self._set_origin_2(*args)
+    
+  def SetCorner(self, *args):
+      """
+      SetCorner(self, int, int, double)
+      SetCorner(self, int, double, double, double)
+      SetCorner(self, int, array)
+      
+      Sets the corner for the given index.
+      """
       if (len(args) == 2):
-        self._set_corner_1(*args)
+          self._set_corner_1(*args)
       elif (len(args) == 3):
-        self._set_corner_2(*args)
+          self._set_corner_2(*args)
       else:
-        self._set_corner_3(*args) 
+          self._set_corner_3(*args) 
   }
 }
 

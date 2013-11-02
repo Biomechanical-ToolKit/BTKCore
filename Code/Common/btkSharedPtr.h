@@ -39,7 +39,7 @@
 #include "btkConfigure.h"
 
 /**
- * @define btkSharedPtr btkSharedPtr.h
+ * @def btkSharedPtr
  * Macro which uses the right shared_ptr class in BTK.
  * To downcast a shared pointer you need to use the function static_pointer_cast.
  *

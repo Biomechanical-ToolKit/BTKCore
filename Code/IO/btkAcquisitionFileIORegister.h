@@ -93,12 +93,6 @@ namespace btk
   * Returns a AcquisitionFileIOHandle::Pointer object and not a AcquisitionFileIORegister::Pointer object!.
   * This method is a convenient method  
   */
-  
- /**
-  * @fn AcquisitionFileIO::Pointer AcquisitionFileIORegister::GetFileIO() const
-  * Creates an acquisition File IO based on the given classname.
-  */
-
 };
 
 #endif

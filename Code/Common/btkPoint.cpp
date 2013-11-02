@@ -238,6 +238,11 @@ namespace btk
   // ----------------------------------------------------------------------- //
   
   /**
+   * @struct MeasureTraits<Point> btkPoint.h
+   * Specialized template for the information related to the data stored in a btk::Point object.
+   */
+  
+  /**
    * @typedef MeasureTraits<Point>::Residuals
    * Vector of double representing the residuals associated with each frames (if applicable).
    */
@@ -254,7 +259,7 @@ namespace btk
    
   /**
    * @fn static Pointer MeasureTraits<Point>::Data::Null()
-   * Convenient method tp create an empy smart pointer.
+   * Convenient method to create an empy smart pointer.
    * This method is only for the sake of the traits and should not be used in other context.
    */
   

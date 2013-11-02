@@ -87,23 +87,8 @@ namespace btk
    */
 
   /**
-   * @typedef IMUType<t>::Pointer
-   * Smart pointer associated with a IMUType object.
-   */
-  
-  /**
-   * @typedef IMUType<t>::ConstPointer
-   * Smart pointer associated with a const IMUType object.
-   */
-
-  /**
    * @fn Pointer IMUType<t>::New()
    * Creates a smart pointer associated with a IMUType object.
-   */
-
-  /**
-   * @fn IMUType<t>::~IMUType()
-   * Empty destructor.
    */
 
   /**

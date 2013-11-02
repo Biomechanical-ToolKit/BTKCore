@@ -118,23 +118,8 @@ namespace btk
    */
 
   /**
-   * @typedef ForcePlatformType<t,r,c>::Pointer
-   * Smart pointer associated with a ForcePlatformType object.
-   */
-  
-  /**
-   * @typedef ForcePlatformType<t,r,c>::ConstPointer
-   * Smart pointer associated with a const ForcePlatformType object.
-   */
-
-  /**
    * @fn Pointer ForcePlatformType<t,r,c>::New()
    * Creates a smart pointer associated with a ForcePlatformType object.
-   */
-
-  /**
-   * @fn ForcePlatformType<t,r,c>::~ForcePlatformType()
-   * Empty destructor.
    */
 
   /**

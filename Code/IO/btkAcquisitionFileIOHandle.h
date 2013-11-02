@@ -101,6 +101,18 @@ namespace btk
    * @fn AcquisitionFileIOHandle::AcquisitionFileIOHandle(AcquisitionFileIOHandle::Functor::Pointer f)
    * Constructor
    */
+  
+  /**
+   * @fn AcquisitionFileIOHandle::~AcquisitionFileIOHandle()
+   * Destructor
+   */
+  
+  /**
+   * @fn AcquisitionFileIO::Pointer AcquisitionFileIOHandle::GetFileIO() const
+   * Creates an acquisition File IO based on the given classname.
+   */
+
+  // ----------------------------------------------------------------------- //
 
   /**
    * @class AcquisitionFileIOHandle::Functor 

@@ -51,10 +51,10 @@ namespace btk
    *
    * @ingroup BTKCommon
    */
- /**
-  * @var IMU::m_Type
-  * Type of the IMU. Used to determine necessary data for a particular IMU sensor.
-  */
+  /**
+   * @var IMU::m_Type
+   * Type of the IMU. Used to determine necessary data for a particular IMU sensor.
+   */
   
   /**
    * @typedef IMU::Pointer
@@ -174,6 +174,16 @@ namespace btk
   };
   
   /**
+   * @fn int IMU::GetChannelNumber() const
+   * Returns the number of channels used by the IMU.
+   */
+  
+  /**
+   * @fn int IMU::GetType() const
+   * Returns the type of the IMU.
+   */
+
+  /**
    * @fn int IMU::GetFrameNumber() const
    * Returns the number of frames set in this IMU.
    */
@@ -240,28 +250,33 @@ namespace btk
    * Convenient method to return the analog channel with the ID 5 (which should correspond to a gyroscope measuring data on the Z axis of the IMU).
    */
 
- /**
-  * @fn CalMatrix& IMU::GetCalMatrix()
-  * Returns calibration marix.
-  *
-  * @warning If you modify the object's content with this function, don't forget to call the Modified() method.
-  */
+  /**
+   * @typedef IMU::CalMatrix
+   * Type which represents a possible calibration matrix used with the IMU to aligne sensors axes together (gyrosocope axes and accelerometer axes).
+   */
+  
+  /**
+   * @fn CalMatrix& IMU::GetCalMatrix()
+   * Returns calibration marix.
+   *
+   * @warning If you modify the object's content with this function, don't forget to call the Modified() method.
+   */
+  
+  /**
+   * @fn const CalMatrix& IMU::GetCalMatrix() const
+   * Returns the calibration matrix.
+   */
  
- /**
-  * @fn const CalMatrix& IMU::GetCalMatrix() const
-  * Returns the calibration matrix.
-  */
-
- /**
-  * Sets the calibration matrix. Assigning a calibration matrix won't change sensors' values. This is only an informative member to know what is the orientation between the sensors. However the filter btk::IMUsExtractor can adapt sensors' values to have aligned measurements.
-  */  
- void IMU::SetCalMatrix(const CalMatrix& cal)
- {
-   if ((this->m_CalMatrix.data() != 0) && (this->m_CalMatrix.isApprox(cal)))
-     return;
-   this->m_CalMatrix = cal;
-   this->Modified();
- };
+  /**
+   * Sets the calibration matrix. Assigning a calibration matrix won't change sensors' values. This is only an informative member to know what is the orientation between the sensors. However the filter btk::IMUsExtractor can adapt sensors' values to have aligned measurements.
+   */  
+  void IMU::SetCalMatrix(const CalMatrix& cal)
+  {
+    if ((this->m_CalMatrix.data() != 0) && (this->m_CalMatrix.isApprox(cal)))
+      return;
+    this->m_CalMatrix = cal;
+    this->Modified();
+  };
   
   /**
    * @typedef IMU::Rotation

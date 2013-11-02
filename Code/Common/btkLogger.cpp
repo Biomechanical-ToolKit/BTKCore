@@ -89,24 +89,23 @@ namespace btk
    */
   
   /**
-   * @typedef Logger::VerboseModel
-   * Analog' values along the time with 1 component (1 column).
+   * @enum Logger::VerboseMode
+   * Proposed mode for the display of the log message.
    */
-  
   /**
-   * @enum Logger::Quiet
+   * @var Logger::VerboseMode Logger::Quiet
    * Do not display any message
    */
   /**
-   * @enum Logger::MessageOnly
+   * @var Logger::VerboseMode Logger::MessageOnly
    * Display only the message
    */
   /**
-   * @enum Logger::Normal
+   * @var Logger::VerboseMode Logger::Normal
    * Display the message as well as the prefix and log affix.
    */
   /**
-   * @enum Logger::Detailed
+   * @var Logger::VerboseMode Logger::Detailed
    * Same as Normal but add also file information from where the log where written (if these informations are given).
    */
    

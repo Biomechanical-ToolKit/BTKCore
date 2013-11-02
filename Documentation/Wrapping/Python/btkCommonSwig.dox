@@ -109,42 +109,6 @@ namespace btk
  */
  
 /**
- * @class btkForcePlatformType1
- * @brief Force platform Type-1 (6 channels: FX, FY, FZ, PX, PY, MZ).
- * @ingroup BTKCommon
- */
-
-/**
- * @class btkForcePlatformType2
- * @brief Force platform Type-2 (6 channels: FX, FY, FZ, MX, MY, MZ).
- * @ingroup BTKCommon
- */
-
-/**
- * @class btkForcePlatformType3
- * @brief Force platform Type-3 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23).
- * @ingroup BTKCommon
- */
- 
-/**
- * @class btkForcePlatformType4
- * @brief Force platform Type-4 (Same as Type-2 + calibration matrix 6 by 6).
- * @ingroup BTKCommon
- */
- 
-/**
- * @class btkForcePlatformType5
- * @brief Force platform Type-5 (8 channels: FZ1, FZ2, FZ3, FZ4, FX12, FX34, FY14, FY23 + calibration matrix 6 (columns) by 8 (rows)).
- * @ingroup BTKCommon
- */
- 
-/**
- * @class btkForcePlatformType6
- * @brief Force platform Type-6 (12 channels: FX[1,2,3,4], FY[1,2,3,4], FZ[1,2,3,4] + calibration matrix 12 by 12).
- * @ingroup BTKCommon
- */
- 
-/**
  * @class btkWrench
  * @brief Represents a wrench as position, force and moment varying during the time.
  * @ingroup BTKCommon

@@ -262,6 +262,11 @@ namespace btk
   // ----------------------------------------------------------------------- //
   
   /**
+   * @struct MeasureTraits<Analog> btkAnalog.h
+   * Specialized template for the information related to the data stored in a btk::Analog object.
+   */
+ 
+  /**
    * @typedef MeasureTraits<Analog>::Data::Pointer
    * Smart pointer associated with a MeasureTraits<Analog>::Data object.
    */
@@ -273,7 +278,7 @@ namespace btk
    
   /**
    * @fn static Pointer MeasureTraits<Analog>::Data::Null()
-   * Convenient method tp create an empy smart pointer.
+   * Convenient method to create an empy smart pointer.
    * This method is only for the sake of the traits and should not be used in other context.
    */
   
