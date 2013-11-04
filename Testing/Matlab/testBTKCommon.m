@@ -20,6 +20,84 @@ assertEqual(btkGetAnalogFrequency(h), 0);
 btkDeleteAcquisition(h);
 end
 
+function testNewAcquisition_bis(d)
+h = btkNewAcquisition(10, 5);
+assertEqual(btkGetPointNumber(h), 10);
+assertEqual(btkGetPointFrameNumber(h), 5);
+assertEqual(btkGetAnalogNumber(h), 0);
+assertEqual(btkGetAnalogFrameNumber(h), 5);
+assertEqual(btkGetFirstFrame(h), 1);
+assertEqual(btkGetLastFrame(h), 5);
+assertEqual(btkGetAnalogSampleNumberPerFrame(h), 1);
+btkDeleteAcquisition(h);
+end
+
+
+function testNewAcquisition_ter(d)
+h = btkNewAcquisition(10,5,1);
+assertEqual(btkGetPointNumber(h), 10);
+assertEqual(btkGetPointFrameNumber(h), 5);
+assertEqual(btkGetAnalogNumber(h), 1);
+assertEqual(btkGetAnalogFrameNumber(h), 5);
+assertEqual(btkGetFirstFrame(h), 1);
+assertEqual(btkGetLastFrame(h), 5);
+assertEqual(btkGetAnalogSampleNumberPerFrame(h), 1);
+btkDeleteAcquisition(h);
+end
+
+function testNewAcquisition_empty(d)
+h = btkNewAcquisition();
+assertEqual(btkGetPointNumber(h), 0);
+assertEqual(btkGetPointFrameNumber(h), 0);
+assertEqual(btkGetAnalogNumber(h), 0);
+assertEqual(btkGetAnalogFrameNumber(h), 0);
+assertEqual(btkGetFirstFrame(h), 1);
+assertEqual(btkGetLastFrame(h), 0);
+assertEqual(btkGetAnalogSampleNumberPerFrame(h), 1);
+assertEqual(btkGetPointFrequency(h), 0);
+assertEqual(btkGetAnalogFrequency(h), 0);
+btkDeleteAcquisition(h);
+end
+
+function testNewAcquisition_onlyPoint(d)
+h = btkNewAcquisition(10);
+assertEqual(btkGetPointNumber(h), 10);
+assertEqual(btkGetPointFrameNumber(h), 0);
+assertEqual(btkGetAnalogNumber(h), 0);
+assertEqual(btkGetAnalogFrameNumber(h), 0);
+assertEqual(btkGetFirstFrame(h), 1);
+assertEqual(btkGetLastFrame(h), 0);
+assertEqual(btkGetAnalogSampleNumberPerFrame(h), 1);
+assertEqual(btkGetPointFrequency(h), 0);
+assertEqual(btkGetAnalogFrequency(h), 0);
+btkDeleteAcquisition(h);
+end
+
+function testResize(d)
+h = btkNewAcquisition();
+btkSetFrameNumber(h, 100);
+btkSetPointNumber(h, 9);
+assertEqual(btkGetPointNumber(h), 9);
+assertEqual(btkGetPointFrameNumber(h), 100);
+assertEqual(btkGetAnalogNumber(h), 0);
+assertEqual(btkGetAnalogFrameNumber(h), 100);
+assertEqual(btkGetFirstFrame(h), 1);
+assertEqual(btkGetLastFrame(h), 100);
+assertEqual(btkGetAnalogSampleNumberPerFrame(h), 1);
+pv = btkGetPointsValues(h);
+assertEqual(size(pv,1), 100);
+assertEqual(size(pv,2), 27);
+assertEqual(all(pv(:) == 0), true);
+btkDeleteAcquisition(h);
+end
+
+function testGetPointsValues_empty(d)
+h = btkNewAcquisition();
+pv = btkGetPointsValues(h);
+assertEqual(isempty(pv), true);
+btkDeleteAcquisition(h);
+end
+
 function testGetPointsValues(d)
 np = 2;
 h = btkNewAcquisition(np,10);

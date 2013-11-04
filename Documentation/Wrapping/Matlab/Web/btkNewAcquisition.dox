@@ -1,30 +1,42 @@
 /**
  * @class btkNewAcquisition
  * @brief Create a new and initialized acquisition.
- * @syntax{h = btkNewAcquisition(pn\, fn)\n h = btkNewAcquisition(pn\, fn\, an)\n h = btkNewAcquisition(pn\, fn\, an\, r)}
+ * @syntax{h = %btkNewAcquisition()\n h = %btkNewAcquisition(pn)\n h = %btkNewAcquisition(pn\, fn)\n h = %btkNewAcquisition(pn\, fn\, an)\n h = %btkNewAcquisition(pn\, fn\, an\, r)}
  * @param np Number of points.
  * @param fn Number of frames.
  * @param an Number of analog channels.
- * @param r Numbre of analog samples per video frame. 
+ * @param r Number of analog samples per video frame.
  * @retval h Handle pointing to the newly created C++ btk::Acquisition object.
  *
  * @par Detailed description:
- * <tt>btkNewAcquisition(pn, fn)</tt> returns an initialized acquisition with @c pn points and @c fn frames. 
+ * <tt>%btkNewAcquisition()</tt> returns an uninitialized and empty acquisition. The
+ * use of the function btkSetFrameNumber, btkSetPointNumber, btkSetAnalogNumber is
+ * then required to set properly the information of the acquistion. It is impossible
+ * to set directly data if the acquisition is uninitialized.
+ * The members of the acquisition are initialized to:
+ * <ul>
+ *  <li>First frame equals to 1: use btkSetFirstFrame to modify it.</li>
+ *  <li>Points' frequency equals to 0: btkSetFrequency to modify it.</li>
+ *  <li>Points' units set to "mm", "deg", "N", "Nmm", "W", "" for markers, angles, forces, moments, powers and scalars respectively: use btkSetPointsUnit to modify them.</li>
+ *  <li>Analogs' frequency equals to 0. Updated when the points' frequency is.</li>
+ *  <li>Analog channel resolution sets to 12 bits: use btkSetAnalogResolution to modify it.</li>
+ *  <li>Number of analog samples per video frame set to 1.</li>
+ * </ul>
+ * <tt>%btkNewAcquisition(pn)</tt> returns an uninitialized acquisition with @c pn
+ * points and 0 frame. The use of the function btkSetFrameNumber is then required to
+ * set properly the number of frames. It is impossible to set directly data if the
+ * acquisition is uninitialized.
  * There is no analog channels. The points created are labeled with the string "uname*" and their index (e.g. uname_1, uname_2, ...).
  * They are also tagged with the type "Marker". To change the type
  * of theses points, use btkSetPointType or btkSetPoint. 
- * The members of the acquisition are initialized to:
- *  - First frame equals to 1: use btkSetFirstFrame to modify it.
- *  - Points' frequency equals to 0: btkSetFrequency to modify it.
- *  - Points' units set to "mm", "deg", "N", "Nmm", "W", "" for markers, angles, forces, moments, powers and scalars respectively: use btkSetPointsUnit to modify them.
- *  - Analogs' frequency equals to 0. Updated when the points' frequency is. 
- *  - Analog channel resolution sets to 12 bits: use btkSetAnalogResolution to modify it.\n
- *  - Number of analog samples per video frame set to 1.
- *  .
- * <tt>btkNewAcquisition(pn, fn, an)</tt> initializes the acquisition with @c an analog channels. Their gain is unknwow, their offset is set to 0 and the scale factor to 1. As with the points, their label is composed of the string "uname*" and their index.\n
- * <tt>btkNewAcquisition(pn, fn, an, r)</tt> initializes the acquisition with @c r analog samples per video frame.
- *
- * The release of the memory associated with the handle @h can be done automatically
+ * \n\n
+ * <tt>%btkNewAcquisition(pn, fn)</tt> returns an initialized acquisition with @c pn points and @c fn frames. 
+ * \n\n
+ * <tt>%btkNewAcquisition(pn, fn, an)</tt> initializes the acquisition with @c an analog channels. Their gain is unknown, their offset is set to 0 and the scale factor to 1. As with the points, their label is composed of the string "uname*" and their index.
+ * \n\n
+ * <tt>%btkNewAcquisition(pn, fn, an, r)</tt> initializes the acquisition with @c r analog samples per video frame.
+ * \n\n
+ * The release of the memory associated with the handle @c h can be done automatically
  * by Matlab when you use the command <tt>clear all</tt>, or you can use the function
  * btkDeleteAcquisition. The use of the function btkDeleteAcquisition is greatly
  * advised when you are doing batch processing as Matlab does not manage the C++

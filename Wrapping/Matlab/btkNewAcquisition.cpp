@@ -39,34 +39,28 @@
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-  if(nrhs < 2)
-    mexErrMsgTxt("Two input arguments required.");
+  if(nrhs > 4)
+    mexErrMsgTxt("Too many input arguments.");
   if (nlhs > 1)
     mexErrMsgTxt("Too many output arguments.");
 
-  if (!mxIsNumeric(prhs[0]) || !mxIsNumeric(prhs[1])
-    || mxIsEmpty(prhs[0]) || mxIsEmpty(prhs[1])
-    || mxIsComplex(prhs[0]) || mxIsComplex(prhs[1]) 
-    || (mxGetNumberOfElements(prhs[0]) != 1) || (mxGetNumberOfElements(prhs[1]) != 1))
-    mexErrMsgTxt("All input arguments must be scalar integers.");
-  if(nrhs >= 3)
-    if (!mxIsNumeric(prhs[2]))
+  int pn = 0, fn = 0, an = 0, r = 1;
+  
+  for (int i = 0 ; i < nrhs ; ++i)
+  {
+    if (!mxIsNumeric(prhs[i]) || mxIsEmpty(prhs[i]) || mxIsComplex(prhs[i])
+        || (mxGetNumberOfElements(prhs[i]) != 1))
       mexErrMsgTxt("All input arguments must be scalar integers.");
-  if(nrhs >= 4)
-    if (!mxIsNumeric(prhs[3]))
-      mexErrMsgTxt("All input arguments must be scalar integers.");
-  int pn, fn, an, r;
-  pn = static_cast<int>(mxGetScalar(prhs[0]));
-  fn = static_cast<int>(mxGetScalar(prhs[1]));
-  an = 0;
-  r = 1;
+  }
+  if (nrhs >= 1)
+    pn = static_cast<int>(mxGetScalar(prhs[0]));
+  if (nrhs >= 2)
+    fn = static_cast<int>(mxGetScalar(prhs[1]));
   if(nrhs >= 3)
     an = static_cast<int>(mxGetScalar(prhs[2]));
   if(nrhs >= 4)
     r = static_cast<int>(mxGetScalar(prhs[3]));
   
-  if (fn == 0)
-    mexErrMsgTxt("Impossible to set the number of frames to 0.");
   if (r == 0)
     mexErrMsgTxt("Impossible to set the analog sample number by point frame to 0.");
 
