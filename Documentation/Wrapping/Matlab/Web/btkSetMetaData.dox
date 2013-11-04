@@ -1,0 +1,28 @@
+/**
+ * @class btkSetMetaData
+ * @brief Set an existing metada into the given acquisition and (optionally) return an updated list of the metadata.
+ * @syntax{md = %btkSetMetaData(h\, label\, sublabel\, ...\, info)}
+ * @param h Handle pointing to a C++ btk::Acquisition object.
+ * @param label String representing a metadata's label in the metadata's root.
+ * @param sublabel String representing a metadata's label contained in the metadata with the label @c label.
+ * @param ... Others strings to point on the desired metadata with any level of depth
+ * @param info Structure with the field @c format and @c values (see note #1).
+ *   - @c info.format: contains a string (Char, Byte, Integer or Real) corresponding to format of the information.
+ *   - @c info.values: contains an array of numerical values or a cell of strings.
+ *     - The array is used for information with the format Byte, Integer or Real.
+ *     - The cell of strings is only use for information with the format Char.
+ * @retval md Structure with the same format than the function btkGetMetaData.
+ *
+ * @par Detailed description:
+ * In case you are not sure the metadata to set does exist you can use instead
+ * the method btkAppendMetaData. This last method is able to set new information if
+ * the metadata exists or will create a new one.
+ * <tt>%btkSetMetaData(h, label, sublabel, ..., info)</tt> sets a metadata with additional 
+ *  informations INFO corresponding to the metadata's values.\n\n
+ * <b>Remark:</b> The number of sub-level is infinite. However, the main common use of the metadata is to 
+ * use @c label as a group and @c sublabel as a parameter. So the metadata has only 2 levels. This use was 
+ * introduced in the C3D format.\n\n
+ * <b>Note #1:</b> The structure @c info should be build by using the function btkMetaDataInfo.
+ * @sa btkAppendMetaData, btkClearMetaData, btkFindMetaData, btkGetMetaData, btkRemoveMetaData
+ * @ingroup BTKMatlabAcquisitionModifier
+ */

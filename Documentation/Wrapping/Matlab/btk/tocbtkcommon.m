@@ -32,6 +32,7 @@ function tocbtkcommon
 %   <a href="matlab:help btkSetFrameNumber">btkSetFrameNumber</a>                 - Point and analog frame number modifier
 %   <a href="matlab:help btkSetFrequency">btkSetFrequency</a>                   - Set the main frequency
 %   <a href="matlab:help btkSetMaxInterpolationGap">btkSetMaxInterpolationGap</a>         - Acquisition's interpolation gap modifier
+%   <a href="matlab:help btkSetMetaData">btkSetMetaData</a>                    - Metadata modifier
 %   <a href="matlab:help btkSetMetaDataDescription">btkSetMetaDataDescription</a>         - Metadata's description modifier
 %   <a href="matlab:help btkSetMetaDataDimensions">btkSetMetaDataDimensions</a>          - Metadata's dimensions modifier
 %   <a href="matlab:help btkSetMetaDataFormat">btkSetMetaDataFormat</a>              - Metadata's format modifier

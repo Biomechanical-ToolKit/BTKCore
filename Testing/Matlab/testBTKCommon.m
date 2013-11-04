@@ -245,3 +245,21 @@ assertEqual(labels{32}, 'Left_GDI')
 assertElementsAlmostEqual(analysis.(labels{32}), 68.0304, 'absolute', 1e-4)
 btkDeleteAcquisition(h);
 end
+
+function testSetMetaData(d)
+h = btkNewAcquisition();
+btkAppendMetaData(h, 'POINT', 'USED', btkMetaDataInfo('Integer', 0));
+md = btkSetMetaData(h, 'POINT', 'USED', btkMetaDataInfo('Integer', 1));
+assertEqual(md.children.POINT.children.USED.info.values, 1);
+btkDeleteAcquisition(h);
+end
+
+function testSetMetaData_error(d)
+h = btkNewAcquisition();
+btkAppendMetaData(h, 'POINT', 'USED', btkMetaDataInfo('Integer', 0));
+try
+  md = btkSetMetaData(h, 'POINT', 'LABELS', btkMetaDataInfo('Char', {'foo', 'bar'}));
+end
+assertEqual(isempty(strfind(lasterr, 'The metadata POINT:LABELS was not found.')), false);
+btkDeleteAcquisition(h);
+end
