@@ -3,6 +3,7 @@
 # Common: accessor
 @MEX_CREATE_MACRO@(btkGetAnalog @MEX_PATH_PREFIX@btkGetAnalog.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkGetAnalogFrameNumber @MEX_PATH_PREFIX@btkGetAnalogFrameNumber.cpp BTKCommon)
+@MEX_CREATE_MACRO@(btkGetAnalogSampleNumberPerFrame @MEX_PATH_PREFIX@btkGetAnalogSampleNumberPerFrame.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkGetAnalogFrequency @MEX_PATH_PREFIX@btkGetAnalogFrequency.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkGetAnalogNumber @MEX_PATH_PREFIX@btkGetAnalogNumber.cpp BTKCommon)
 @MEX_CREATE_MACRO@(btkGetAnalogResolution @MEX_PATH_PREFIX@btkGetAnalogResolution.cpp BTKCommon)

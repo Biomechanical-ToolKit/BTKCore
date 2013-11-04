@@ -1,4 +1,4 @@
-function ratio = btkGetAnalogSampleNumberPerFrame(h)
+function ratio = btkGetAnalogSampleNumberPerFrame(h) %#ok
 %BTKGETANALOGSAMPLENUMBERPERFRAME Return the number of analog samples per video frame.
 %
 %  RATIO = BTKGETANALOGSAMPLENUMBERPERFRAME(H) divides the number of analog frames by 
@@ -9,4 +9,10 @@ function ratio = btkGetAnalogSampleNumberPerFrame(h)
 %  Author: A. Barré
 %  Copyright 2009-2013 Biomechanical ToolKit (BTK).
 
-ratio = btkGetAnalogFrameNumber(h) / btkGetPointFrameNumber(h);
+% The following comment, MATLAB compiler pragma, is necessary to avoid 
+% compiling this M-file instead of linking against the MEX-file.  Don't remove.
+%# mex
+
+error(generatemsgid('NotSupported'),'MEX file for BTKGETANALOGSAMPLENUMBERPERFRAME not found');
+
+% [EOF] btkAppendMetaData.m
