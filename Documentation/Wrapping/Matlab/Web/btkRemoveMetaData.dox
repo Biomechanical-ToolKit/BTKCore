@@ -1,7 +1,7 @@
 /**
  * @class btkRemoveMetaData
  * @brief Remove a metada and return an updated list of the metada in the acquisition.
- * @syntax{md = btkRemoveMetaData(h\, idx)\n md = btkRemoveMetaData(h\, idx\, subidx)\n md = %btkRemoveMetaData(h\, idx\, subidx\, ...)\n md = btkRemoveMetaData(h\, label)\n md = btkRemoveMetaData(h\, label\, sublabel)\n md = %btkRemoveMetaData(h\, label\, sublabel\, ...)}
+ * @syntax{md = %btkRemoveMetaData(h\, idx)\n md = %btkRemoveMetaData(h\, idx\, subidx)\n md = %btkRemoveMetaData(h\, idx\, subidx\, ...)\n md = %btkRemoveMetaData(h\, label)\n md = %btkRemoveMetaData(h\, label\, sublabel)\n md = %btkRemoveMetaData(h\, label\, sublabel\, ...)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param idx Integer specifying the index of a metadata.
  * @param subidx Integer specifying the index of a metadata.
@@ -15,11 +15,11 @@
  * the metadata FORCE_PLATFORM has for effect to not be able to extract force platform
  * data as it contains their geometrical informations.
  * \n\n
- * <tt>btkRemoveMetaData(h\, idx)</tt> removes the metadata at the given index @c idx contained in the metadata's root.
- * <tt>btkRemoveMetaData(h\, idx, subidx)</tt> removes the metadata contained at the index @c subidx which is contained in the metadata with the index @c idx.
+ * <tt>%btkRemoveMetaData(h\, idx)</tt> removes the metadata at the given index @c idx contained in the metadata's root.
+ * <tt>%btkRemoveMetaData(h\, idx, subidx)</tt> removes the metadata contained at the index @c subidx which is contained in the metadata with the index @c idx.
  * <tt>%btkRemoveMetaData(h\, idx, subidx, ...)</tt> removes any metadata specified by the given indices.
- * <tt>btkRemoveMetaData(h\, label)</tt> removes the metadata with the label @c label contained in the metadata's root.
- * <tt>btkRemoveMetaData(h\, label, sublabel)</tt> removes the metadata with the label @c sublabel contained in the metadata with the label @c label.
+ * <tt>%btkRemoveMetaData(h\, label)</tt> removes the metadata with the label @c label contained in the metadata's root.
+ * <tt>%btkRemoveMetaData(h\, label, sublabel)</tt> removes the metadata with the label @c sublabel contained in the metadata with the label @c label.
  * <tt>%btkRemoveMetaData(h\, label, sublabel, ...)</tt> removes any metadata specified by the given labels.
  * \n\n
  * You can mix label and index to remove a metadata entry.

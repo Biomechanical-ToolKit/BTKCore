@@ -1,7 +1,7 @@
 /**
  * @class btkSetAnalogGain
  * @brief Modify analog's gain and return updated analogs.
- * @syntax{[analogs\, analogsInfo] = btkSetAnalogGain(h\, idx\, newgain)\n [analogs\, analogsInfo] = btkSetAnalogGain(h\, label\, newgain)}
+ * @syntax{[analogs\, analogsInfo] = %btkSetAnalogGain(h\, idx\, newgain)\n [analogs\, analogsInfo] = %btkSetAnalogGain(h\, label\, newgain)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param idx Integer containing the index of the analog channel to modify.
  * @param label String containing the label of the analog channel to modify.
@@ -10,8 +10,8 @@
  * @retval analogsInfo Updated informations related to the analog channels. Its format is the same than using the function btkGetAnalogs.
  *
  * @par Detailed description:
- * <tt>btkSetAnalogGain(h, idx, newgain)</tt> modifies the gain of the analog channel specified by the index @c idx.
- * <tt>btkSetAnalogGain(h, label, newgain)</tt> modifies the gain of the analog channel specified by the label @c label.
+ * <tt>%btkSetAnalogGain(h, idx, newgain)</tt> modifies the gain of the analog channel specified by the index @c idx.
+ * <tt>%btkSetAnalogGain(h, label, newgain)</tt> modifies the gain of the analog channel specified by the label @c label.
  * \n\n
  * The available values for the new gain are:
  * - 0 : unknown gain

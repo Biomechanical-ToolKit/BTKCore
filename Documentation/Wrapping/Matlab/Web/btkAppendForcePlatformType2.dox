@@ -1,7 +1,7 @@
 /**
  * @class btkAppendForcePlatformType2
  * @brief Append a virtual force platform of type 2 (Fx,Fy,Fz,Mx,My,Mz).
- * @syntax{btkAppendForcePlatformType2(h\, forces\, moments\, corners)\n btkAppendForcePlatformType2(h\, forces\, moments\, corners\, origin)\n btkAppendForcePlatformType2(h\, forces\, moments\, corners\, origin\, localframe)}
+ * @syntax{%btkAppendForcePlatformType2(h\, forces\, moments\, corners)\n %btkAppendForcePlatformType2(h\, forces\, moments\, corners\, origin)\n %btkAppendForcePlatformType2(h\, forces\, moments\, corners\, origin\, localframe)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param forces Matrix (n,3) where 'n' is the number of analog frames in the acquisition. If the given data corresponds to the number of point frames, these data will be then interpolated to fit the number of analog frames.
  * @param moments Matrix (n,3) where 'n' is the number of analog frames in the acquisition. If the given data corresponds to the number of point frames, these data will be then interpolated to fit the number of analog frames.

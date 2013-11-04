@@ -1,7 +1,7 @@
 /**
  * @class btkGetAngles
  * @brief Extract angles from a given biomechanical acquisition
- * @syntax{[angles\, anglesInfo] = btkGetAngles(h)}
+ * @syntax{[angles\, anglesInfo] = %btkGetAngles(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval angles  Structure with the angles' values. Each field corresponds to an angle's label (see note #1).
  * @retval anglesInfo Structure with the informations related to the angles.

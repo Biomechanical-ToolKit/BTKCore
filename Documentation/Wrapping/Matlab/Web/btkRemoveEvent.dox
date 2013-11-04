@@ -1,7 +1,7 @@
 /**
  * @class btkRemoveEvent
  * @brief Delete events corresponding to the given criterias.
- * @syntax{[events\, eventsInfo] = btkRemoveEvent(h\, index)\n [events\, eventsInfo] = %btkRemoveEvent(h\, option\, value\, ...)}
+ * @syntax{[events\, eventsInfo] = %btkRemoveEvent(h\, index)\n [events\, eventsInfo] = %btkRemoveEvent(h\, option\, value\, ...)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param index Position of the event starting from 1.
  * @param option String to filter the events to remove (check the detailed description for more information).
@@ -11,9 +11,9 @@
  * @retval eventsInfo A structure with the same format than in the function btkGetEvents
  *
  * @par Detailed description:
- * <tt>btkRemoveEvent(h)</tt> corresponds to the function btkClearEvents.
- * <tt>btkRemoveEvent(h, index)</tt> removes the events at the index @c index.
- * <tt>btkRemoveEvent(h, option, value, ...)</tt> removes only event(s) described by the given options.
+ * <tt>%btkRemoveEvent(h)</tt> corresponds to the function btkClearEvents.
+ * <tt>%btkRemoveEvent(h, index)</tt> removes the events at the index @c index.
+ * <tt>%btkRemoveEvent(h, option, value, ...)</tt> removes only event(s) described by the given options.
  * There are four options which can combined to refine the request.
  * - 'Time' followed by a single real value delete all events with this time +/- 0.00005 seconds
  * - 'Label' followed by a string delete all events which have this label

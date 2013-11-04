@@ -15,16 +15,16 @@
  *
  * @par Detailed description:
  * <tt>%btkAppendMetaData(h, label)</tt> appends a metadata with the label @c label to the root.
- *  This metadata has no child, nor information.\n
+ *  This metadata has no child, nor information.\n\n
  * <tt>%btkAppendMetaData(h, label, sublabel, ...)</tt> appends a metadata with the label @c sublabel in
  *  another metadata with the label @c label. The metadata @c 'label' will be automatically generated
- *  if it doesn't exist. The metadata @c 'sublabel' has no child, nor information.\n
+ *  if it doesn't exist. The metadata @c 'sublabel' has no child, nor information.\n\n
  * <tt>%btkAppendMetaData(h, label, sublabel, ..., info)</tt> appends a metadata with additional 
  *  informations INFO corresponding to the metadata's values.\n\n
  * <b>Remark:</b> The number of sub-level is infinite. However, the main common use of the metadata is to 
  * use @c label as a group and @c sublabel as a parameter. So the metadata has only 2 levels. This use was 
  * introduced in the C3D format.\n\n
  * <b>Note #1:</b> The structure @c info should be build by using the function btkMetaDataInfo.
- * @sa btkClearMetaData, btkGetMetaData, btkRemoveMetaData
+ * @sa btkClearMetaData, btkFindMetaData, btkGetMetaData, btkRemoveMetaData, btkSetMetaData
  * @ingroup BTKMatlabAcquisitionModifier
  */

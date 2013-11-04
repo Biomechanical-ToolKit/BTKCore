@@ -1,7 +1,7 @@
 /**
  * @class btkSetAnglesValues
  * @brief Sets angles' components from a matrix.
- * @syntax{btkSetAnglesValues(h\, v)}
+ * @syntax{%btkSetAnglesValues(h\, v)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param v Matrix of reals where the number of rows corresponds to the number of frames in the acquisition. The number of columns corresponds to the number of extracted angles multiplied by 3 (their components X,Y,Z).
  * @sa btkSetForcesValues, btkSetMarkersValues, btkSetMomentsValues, btkSetPowersValues, btkSetScalarsValues

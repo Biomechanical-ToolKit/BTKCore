@@ -1,7 +1,7 @@
 /**
  * @class btkSetPointNumber
  * @brief Sets the number of points.
- * @syntax{btkSetPointNumber(h\, pn)}
+ * @syntax{%btkSetPointNumber(h\, pn)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param pn Integer with the new number of points.
  * @sa btkSetAnalogNumber, btkSetAnalogResolution, btkSetAnalogSampleNumberPerFrame, btkSetFirstFrame, btkSetFrameNumber, btkSetFrequency, btkSetMaxInterpolationGap

@@ -1,7 +1,7 @@
 /**
  * @class btkGetPoints
  * @brief Extract points from the given acquisition.
- * @syntax{[points\, pointsInfo] = btkGetPoints(h)}
+ * @syntax{[points\, pointsInfo] = %btkGetPoints(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval points Structure with the point' values. Each fieldname corresponds to an point's label (see note #1).
  * @retval pointsInfo Structure with the informations related to the moments.

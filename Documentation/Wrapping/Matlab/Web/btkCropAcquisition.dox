@@ -1,15 +1,15 @@
 /**
  * @class btkCropAcquisition
  * @brief Crop the acquistion and adapt the events' frame/time.
- * @syntax{btkCropAcquisition(h\, startAt)\n btkCropAcquisition(h\, startAt\, numFrames)}
+ * @syntax{%btkCropAcquisition(h\, startAt)\n btkCropAcquisition(h\, startAt\, numFrames)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param startAt Integer containing the frame where the cut will start.
  * @param startAt Number of frames to keep.
  * @param numFrames Handle pointing to a C++ btk::Acquisition object.
  *
  * @par Detailed description:
- * <tt>btkCropAcquisition(h, startAt)</tt>  keeps all the frames from the frame @c startAt.
- * <tt>btkCropAcquisition(h, startAt, numFrames)</tt> keeps exactly @c numFrames frames starting from the frame @c startAt.
+ * <tt>%btkCropAcquisition(h, startAt)</tt>  keeps all the frames from the frame @c startAt.
+ * <tt>%btkCropAcquisition(h, startAt, numFrames)</tt> keeps exactly @c numFrames frames starting from the frame @c startAt.
  *
  * @sa btkSetFrameNumber
  * @ingroup BTKMatlabPointModifier

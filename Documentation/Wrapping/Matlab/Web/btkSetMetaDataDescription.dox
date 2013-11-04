@@ -1,7 +1,7 @@
 /**
  * @class btkSetMetaDataDescription
  * @brief Set a metadata's description.
- * @syntax{md = btkSetMetaDataDescription(h\, idx\, newdesc)\n md = btkSetMetaDataDescription(h\, idx\, subidx\, newdesc)\n md = %btkSetMetaDataDescription(h\, idx\, subidx\, ...\, newdesc)\n md = btkSetMetaDataDescription(h\, label\, newdesc)\n md = btkSetMetaDataDescription(h\, label\, sublabel\, newdesc)\n md = %btkSetMetaDataDescription(h\, label\, sublabel\, ...\, newdesc)}
+ * @syntax{md = %btkSetMetaDataDescription(h\, idx\, newdesc)\n md = %btkSetMetaDataDescription(h\, idx\, subidx\, newdesc)\n md = %btkSetMetaDataDescription(h\, idx\, subidx\, ...\, newdesc)\n md = %btkSetMetaDataDescription(h\, label\, newdesc)\n md = btkSetMetaDataDescription(h\, label\, sublabel\, newdesc)\n md = %btkSetMetaDataDescription(h\, label\, sublabel\, ...\, newdesc)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param idx Integer specifying the index of a metadata.
  * @param subidx Integer specifying the index of a metadata.
@@ -12,11 +12,11 @@
  * @retval md Structure with the same format than the function btkGetMetaData.
  *
  * @par Detailed description:
- * <tt>btkSetMetaDataDescription(h, idx, newdesc)</tt> sets the description of the metadata with the index @c idx contained in the root.\n
- * <tt>btkSetMetaDataDescription(h, idx, subidx, newdesc)</tt> sets the description of the metadata with the index @c subidx contained in the metadata with the index @c idx.\n
+ * <tt>%btkSetMetaDataDescription(h, idx, newdesc)</tt> sets the description of the metadata with the index @c idx contained in the root.\n
+ * <tt>%btkSetMetaDataDescription(h, idx, subidx, newdesc)</tt> sets the description of the metadata with the index @c subidx contained in the metadata with the index @c idx.\n
  * <tt>%btkSetMetaDataDescription(h, idx, subidx, ..., newdesc)</tt> sets the description of any metadata specified by the gives indices.\n
- * <tt>btkSetMetaDataDescription(h, label, newdesc)</tt> sets the description of the metadata with the label @c label contained in the root\n.
- * <tt>btkSetMetaDataDescription(h, label, sublabel, newdesc)</tt>  sets the description of the metadata with the label @c sublabel contained in the metadata with the label @c label.\n
+ * <tt>%btkSetMetaDataDescription(h, label, newdesc)</tt> sets the description of the metadata with the label @c label contained in the root\n.
+ * <tt>%btkSetMetaDataDescription(h, label, sublabel, newdesc)</tt>  sets the description of the metadata with the label @c sublabel contained in the metadata with the label @c label.\n
  * <tt>%btkSetMetaDataDescription(h, label, sublabel, ..., newdesc)</tt> sets the description of any metadata specified by the given labels.\n
  * \n
  * You can mix label and index to set the description of a metadata entry.

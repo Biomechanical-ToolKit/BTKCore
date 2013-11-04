@@ -1,7 +1,7 @@
 /**
  * @class btkSetPointsUnit
  * @brief Modify points' unit.
- * @syntax{btkSetPointsUnit(h\, type\, unit)}
+ * @syntax{%btkSetPointsUnit(h\, type\, unit)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param type String with the type to modify (see the detailed description for the available types).
  * @param unit String with the new unit.

@@ -1,7 +1,7 @@
 /**
  * @class btkGetForcePlatformWrenches
  * @brief Extract force platform wrenches expressed in the global frame from a given acquisition.
- * @syntax{fpw = btkGetForcePlatformWrenches(h\, inglobalframe)}
+ * @syntax{fpw = %btkGetForcePlatformWrenches(h\, inglobalframe)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param inglobalframe Optional parameter to express wrenches in global or local frame. Set inglobalframe to 0 to express in local frame.
  * @retval fpw Paged structure with the following fields:

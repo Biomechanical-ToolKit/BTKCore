@@ -1,7 +1,7 @@
 /**
  * @class btkSetEventLabel
  * @brief Modify the label of the selected event.
- * @syntax{[events\, eventsInfo] = btkSetEventLabel(h\, label\, newlabel)}
+ * @syntax{[events\, eventsInfo] = %btkSetEventLabel(h\, label\, newlabel)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param index Integer with the index of the event to modify.
  * @param newlabel String with the new label.

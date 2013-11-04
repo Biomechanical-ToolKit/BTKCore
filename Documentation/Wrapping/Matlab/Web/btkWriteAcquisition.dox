@@ -9,11 +9,11 @@
  * @param ... Other couple of option/value.
  *
  * @par Detailed description:
- * <tt>btkWriteAcquisition(h, filename)</tt> exports acquisition's data represented 
+ * <tt>%btkWriteAcquisition(h, filename)</tt> exports acquisition's data represented 
  * as the handle @c g into the file @c filename.  The choice of the file format is
  * based on the file extension in @c filename (for example, '.trc' or '.c3d')
  * \n\n
- * <tt>btkWriteAcquisition(h, filename, option, value, ...)</tt> gives somes extra-options for some file format.
+ * <tt>%btkWriteAcquisition(h, filename, option, value, ...)</tt> gives somes extra-options for some file format.
  * For the moment, only the C3D format has options. you can specify the byte order and the storage format.
  * \n\n
  * The @c ByteOrder option can receive 3 values:
@@ -32,9 +32,9 @@
  * a C3D file will create a template C3D file. Only the metadata will be saved.
  * 
  * @par Examples
- * <tt>btkWriteAcquisition(acq, 'filename.c3d', 'StorageFormat', 'Float');</tt>\n
- * <tt>btkWriteAcquisition(acq, 'filename.c3d', 'ByteOrder', 'VAX_LittleEndian'); </tt>\n
- * <tt>btkWriteAcquisition(acq, 'filename.c3d', 'StorageFormat', 'Integer', 'ByteOrder', 'IEEE_LittleEndian');</tt>
+ * <tt>%btkWriteAcquisition(acq, 'filename.c3d', 'StorageFormat', 'Float');</tt>\n
+ * <tt>%btkWriteAcquisition(acq, 'filename.c3d', 'ByteOrder', 'VAX_LittleEndian'); </tt>\n
+ * <tt>%btkWriteAcquisition(acq, 'filename.c3d', 'StorageFormat', 'Integer', 'ByteOrder', 'IEEE_LittleEndian');</tt>
  * 
  * @sa btkCloseAcquisition, btkReadAcquisition
  * @ingroup BTKMatlabIO

@@ -1,7 +1,7 @@
 /**
  * @class btkSetPointsResiduals
  * @brief Sets points' residuals from a matrix
- * @syntax{btkSetPointsResiduals(h\, r)}
+ * @syntax{%btkSetPointsResiduals(h\, r)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param r Matrix of reals where the number of rows corresponds to the number of frames in the acquisition. The number of columns corresponds to the number of extracted points.
  * @sa btkGetPointsResiduals, btkGetPointsValues, btkGetPoints, btkSetPointsResiduals

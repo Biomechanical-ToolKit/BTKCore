@@ -67,6 +67,12 @@ namespace btk
  * @var btkAnalog::PlusMinus0Dot05
  * Gain for the range +/- 0.05 volts.
  */
+
+/** 
+ * @class btkAnalogData
+ * @brief Class storing the measures for one analog channel.
+ * @ingroup BTKCommon
+ */
  
 /** 
  * @class btkPoint
@@ -100,6 +106,12 @@ namespace btk
 /**
  * @var btkPoint::Reaction
  * Special type to indicate the point corresponds to one part of a wrench (not really used);
+ */
+ 
+/** 
+ * @class btkPointData
+ * @brief Class storing the measures for a point (3D values and residuals along the time). 
+ * @ingroup BTKCommon
  */
  
 /**

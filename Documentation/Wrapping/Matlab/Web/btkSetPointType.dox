@@ -1,7 +1,7 @@
 /**
  * @class btkSetPointType
  * @brief Modify point's type and return updated points.
- * @syntax{[points\, pointsInfo] = btkSetPointType(h\, index\, newtype)\n [points\, pointsInfo] = btkSetPointType(h\, label\, newtype)}
+ * @syntax{[points\, pointsInfo] = %btkSetPointType(h\, index\, newtype)\n [points\, pointsInfo] = %btkSetPointType(h\, label\, newtype)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param index Integer containing the index of the point to modify.
  * @param label String containing the label of the point to modify.
@@ -10,8 +10,8 @@
  * @retval pointsInfo Updated informations related to the points. Its format is the same than using the function btkGetPoints.
  *
  * @par Detailed description:
- * <tt>btkSetPointType(h, idx, newtype)</tt> modifies the type of the point specified by the index @c idx.
- * <tt>btkSetPointType(h, label, newtype)</tt> modifies the type of the point specified by the label @c label.
+ * <tt>%btkSetPointType(h, idx, newtype)</tt> modifies the type of the point specified by the index @c idx.
+ * <tt>%btkSetPointType(h, label, newtype)</tt> modifies the type of the point specified by the label @c label.
  * \n\n
  * The type must be a string corresponding to one of the following type:
  * - marker ;

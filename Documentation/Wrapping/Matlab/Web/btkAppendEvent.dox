@@ -1,7 +1,7 @@
 /**
  * @class btkAppendEvent
  * @brief Append a new event into the given acquisition and (optionally) return an updated list of events
- * @syntax{[events\, eventsInfo] = btkAppendEvent(h\, label\, time\, context)\n [events\, eventsInfo] = btkAppendEvent(h\, label\, time\, context\, subject)\n [events\, eventsInfo] = btkAppendEvent(h\, label\, time\, context\, subject\, description)\n [events\, eventsInfo] = btkAppendEvent(h\, label\, time\, context\, subject\, description\, id)}
+ * @syntax{[events\, eventsInfo] = %btkAppendEvent(h\, label\, time\, context)\n [events\, eventsInfo] = %btkAppendEvent(h\, label\, time\, context\, subject)\n [events\, eventsInfo] = %btkAppendEvent(h\, label\, time\, context\, subject\, description)\n [events\, eventsInfo] = %btkAppendEvent(h\, label\, time\, context\, subject\, description\, id)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param label String with the event's label
  * @param time Single real number in second
@@ -13,13 +13,13 @@
  * @retval eventsInfo A structure with the same format than in the function btkGetEvents
  *
  * @par Detailed description: 
- * <tt>btkAppendEvent(h, label, time, context)</tt> will set automaticaly the content of the @c subject, 
+ * <tt>%btkAppendEvent(h, label, time, context)</tt> will set automaticaly the content of the @c subject, 
  * @c description and @c id members for the inserted event. If the metadata SUBJECTS:NAMES exists, then, its first
  * value is used to set event's subject. The description and the id members are set with informations found 
  * in the first event with the same label.\n
- * <tt>btkAppendEvent(h, label, time, context, subject)</tt> will set the description and the id members 
+ * <tt>%btkAppendEvent(h, label, time, context, subject)</tt> will set the description and the id members 
  * with informations found in the first event with the same label.\n
- * <tt>btkAppendEvent(h, label, time, context, subject, description)</tt> will set the id member
+ * <tt>%btkAppendEvent(h, label, time, context, subject, description)</tt> will set the id member
  * with informations found in the first event with the same label.\n\n
  * <b>Note #1:</b> Even if there is no rule for the context, these 3 contexts are oftenly used: General, Left, Right.\n
  * <b>Note #2:</b> Even if there is no rule for the id value, these 3 next values are used in Vicon Workstation and Nexus to distinguish events' type:

@@ -1,7 +1,7 @@
 /**
  * @class btkSetEventId
  * @brief Modify the id of all events which have the required label.
- * @syntax{[events\, eventsInfo] = btkSetEventId(h\, label\, newdid)}
+ * @syntax{[events\, eventsInfo] = %btkSetEventId(h\, label\, newdid)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param label String with the label of the event to modify.
  * @param newid Integer containing the new ID (see the detailed description for the list of known ID).

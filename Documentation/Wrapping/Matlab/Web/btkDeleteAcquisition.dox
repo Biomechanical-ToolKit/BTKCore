@@ -1,7 +1,7 @@
 /**
  * @class btkDeleteAcquisition
  * @brief Delete the acquisiton associated with the given handle.
- * @syntax{btkDeleteAcquisition(h)}
+ * @syntax{%btkDeleteAcquisition(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  *
  * @par Detailed description:

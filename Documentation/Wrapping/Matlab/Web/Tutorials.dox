@@ -224,14 +224,14 @@
  @endcode
  
  @section TutorialBatchProcessing Batch processing
- Even if BTK is well adapted to open hundred of acquisition files and process them, there is a limitation in the mechanism used to manage memory between the C++ objects and Matlab. If you open too many acquisitions without releasing the memory, Matlab can send you an "Out of Memory" error and may crash... (see @ref q3 "FAQ"). One way to correct this problem is to use the function btkDeleteAcquisition which will delete the C++ object and then freed the associated memory. You can see this function as a "Close" function.
+ Even if BTK is well adapted to open hundred of acquisition files and process them, there is a limitation in the mechanism used to manage memory between the C++ objects and Matlab. If you open too many acquisitions without releasing the memory, Matlab can send you an "Out of Memory" error and may crash... (see @ref q3 "FAQ"). One way to correct this problem is to use the function btkDeleteAcquisition (or btkCloseAcquisiton) which will release the memory associated to the C++ object.
  
  @code
  % acquisitionsFilename: Large list of filenames
  for 1:length(acquisitionsFilename)
    acq = btkReadAcquistion(acquisitionsFilename{i});
    % ... All of your code processing the acquisition data
-   btkDeleteAcquisition(acq);
+   btkCloseAcquisition(acq); % Release the memory of the C++ object associated with the handle 'acq'
  end
  @endcode
  

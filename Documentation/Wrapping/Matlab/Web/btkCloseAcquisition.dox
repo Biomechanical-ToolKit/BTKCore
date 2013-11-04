@@ -1,7 +1,7 @@
 /**
  * @class btkCloseAcquisition
  * @brief Release the memory associated with a C++ btk::Acquisition object
- * @syntax{btkCloseAcquisition(h)}
+ * @syntax{%btkCloseAcquisition(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  *
  * @par Detailed description:

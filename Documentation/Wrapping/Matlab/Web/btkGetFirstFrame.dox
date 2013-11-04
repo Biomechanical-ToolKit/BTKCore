@@ -1,7 +1,7 @@
 /**
  * @class btkGetFirstFrame
  * @brief Return acquisition's first frame index.
- * @syntax{ff = btkGetFirstFrame(h)}
+ * @syntax{ff = %btkGetFirstFrame(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval ff Single integer with index of the first frame.
  * @sa btkGetLastFrame

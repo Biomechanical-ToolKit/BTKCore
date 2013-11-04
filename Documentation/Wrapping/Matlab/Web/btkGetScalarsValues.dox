@@ -1,7 +1,7 @@
 /**
  * @class btkGetScalarsValues
  * @brief Extract scalars' values from the given acquisition and store them in a matrix
- * @syntax{v = btkGetScalarsValues(h)}
+ * @syntax{v = %btkGetScalarsValues(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval v Matrix of reals where the number of rows of this matrix corresponds to the number of frames in the acquisition. The number of columns of corresponds to the number of extracted scalars multiplied by 3 (their components X,Y,Z).
  * @sa btkGetScalars

@@ -1,7 +1,7 @@
 /**
  * @class btkGetAnalogFrameNumber
  * @brief Return the number of frames for the analog channels
- * @syntax{afn = btkGetAnalogFrameNumber(h)}
+ * @syntax{afn = %btkGetAnalogFrameNumber(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval afn Number of frames for the analog channel
  * @sa btkGetAnalogFrequency, btkGetAnalogNumber

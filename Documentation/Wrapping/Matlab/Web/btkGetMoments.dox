@@ -1,7 +1,7 @@
 /**
  * @class btkGetMoments
  * @brief Extract moments from a given biomechanical acquisition
- * @syntax{[moments\, momentsInfo] = btkGetMoments(h)}
+ * @syntax{[moments\, momentsInfo] = %btkGetMoments(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval moments Structure with the moments' values. Each fieldname corresponds to an moment's label (see note #1).
  * @retval momentsInfo Structure with the informations related to the moments.

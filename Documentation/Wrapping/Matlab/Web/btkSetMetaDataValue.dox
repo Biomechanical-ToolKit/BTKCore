@@ -1,7 +1,7 @@
 /**
  * @class btkSetMetaDataValue
  * @brief Set one metadata's value.
- * @syntax{md = btkSetMetaDataValue(h\, idx\, index\, newvalue)\n md = btkSetMetaDataValue(h\, idx\, subidx\, index\, newvalue)\n md = %btkSetMetaDataValue(h\, idx\, subidx\, ...\, index\, newvalue)\n md = btkSetMetaDataValue(h\, label\, index\, newvalue)\n md = btkSetMetaDataValue(h\, label\, sublabel\, index\, newvalue)\n md = %btkSetMetaDataValue(h\, label\, sublabel\, ...\, index\, newvalue)}
+ * @syntax{md = %btkSetMetaDataValue(h\, idx\, index\, newvalue)\n md = %btkSetMetaDataValue(h\, idx\, subidx\, index\, newvalue)\n md = %btkSetMetaDataValue(h\, idx\, subidx\, ...\, index\, newvalue)\n md = %btkSetMetaDataValue(h\, label\, index\, newvalue)\n md = %btkSetMetaDataValue(h\, label\, sublabel\, index\, newvalue)\n md = %btkSetMetaDataValue(h\, label\, sublabel\, ...\, index\, newvalue)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param idx Integer specifying the index of a metadata.
  * @param subidx Integer specifying the index of a metadata.
@@ -13,11 +13,11 @@
  * @retval md Structure with the same format than the function btkGetMetaData.
  *
  * @par Detailed description:
- * <tt>btkSetMetaDataValue(h, idx, index, newvalue)</tt> sets the value at the index @c index for the metadata with the index @c idx contained in the root.\n
- * <tt>btkSetMetaDataValue(h, idx, subidx, index, newvalue)</tt> sets the value at the index @c index for the metadata with the index @c subidx contained in the metadata with the index @c idx.\n
+ * <tt>%btkSetMetaDataValue(h, idx, index, newvalue)</tt> sets the value at the index @c index for the metadata with the index @c idx contained in the root.\n
+ * <tt>%btkSetMetaDataValue(h, idx, subidx, index, newvalue)</tt> sets the value at the index @c index for the metadata with the index @c subidx contained in the metadata with the index @c idx.\n
  * <tt>%btkSetMetaDataValue(h, idx, subidx, ..., index, newvalue)</tt> sets the value at the index @c index for any metadata specified by the gives indices.\n
- * <tt>btkSetMetaDataValue(h, label, index, newvalue)</tt> sets the value at the index @c index for the metadata with the label @c label contained in the root.\n
- * <tt>btkSetMetaDataValue(h, label, sublabel, index, newvalue)</tt>  sets the value at the index @c index for the metadata with the label @c sublabel contained in the metadata with the label @c label.\n
+ * <tt>%btkSetMetaDataValue(h, label, index, newvalue)</tt> sets the value at the index @c index for the metadata with the label @c label contained in the root.\n
+ * <tt>%btkSetMetaDataValue(h, label, sublabel, index, newvalue)</tt>  sets the value at the index @c index for the metadata with the label @c sublabel contained in the metadata with the label @c label.\n
  * <tt>%btkSetMetaDataValue(h, label, sublabel, ..., index, newvalue)</tt> sets the value at the index @c index for any metadata specified by the given labels.
  * \n\n
  * Based on the format of the metadata, the value set is automaticaly converted to fit the format. This design gives you the possibiliy to pass a Matlab native number format (double) or a char or a cell containing a char and then its content is converted.

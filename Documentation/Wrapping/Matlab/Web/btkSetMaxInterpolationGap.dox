@@ -1,7 +1,7 @@
 /**
  * @class btkSetMaxInterpolationGap
  * @brief Set acquisition's maximum interpolation gap.
- * @syntax{btkSetMaxInterpolationGap(h\, gap)}
+ * @syntax{%btkSetMaxInterpolationGap(h\, gap)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param gap Integer with the adviced maximum number of video frames to interpolate.
  * @sa btkSetAnalogNumber, btkSetAnalogResolution, btkSetAnalogSampleNumberPerFrame, btkSetFirstFrame, btkSetFrameNumber, btkSetFrequency, btkSetPointNumber

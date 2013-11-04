@@ -1,7 +1,7 @@
 /**
  * @class btkGetPointNumber
  * @brief Return the number of points stored in the given acquisition.
- * @syntax{pn = btkGetPointNumber(h)}
+ * @syntax{pn = %btkGetPointNumber(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval pn Number of points
  * @sa btkGetAnalogNumber

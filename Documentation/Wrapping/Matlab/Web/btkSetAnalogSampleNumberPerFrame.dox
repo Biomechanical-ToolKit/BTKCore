@@ -1,7 +1,7 @@
 /**
  * @class btkSetAnalogSampleNumberPerFrame
  * @brief Set the number of analog sample per 3D frame.
- * @syntax{btkSetAnalogSampleNumberPerFrame(h\, ratio)}
+ * @syntax{%btkSetAnalogSampleNumberPerFrame(h\, ratio)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param ratio Integer with the new number of analog samples per 3D frame.
  *

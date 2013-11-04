@@ -1,7 +1,7 @@
 /**
  * @class btkAppendPoint
  * @brief Append a new point into the given acquisition and (optionally) return an updated list of points.
- * @syntax{[points\, pointsInfo] = btkAppendPoint(h\, type\, label\, values)\n [points\, pointsInfo] = btkAppendPoint(h\, type\, label\, values\, residuals)\n [points\, pointsInfo] = btkAppendPoint(h\, type\, label\, values\, residuals\,  desc)}
+ * @syntax{[points\, pointsInfo] = %btkAppendPoint(h\, type\, label\, values)\n [points\, pointsInfo] = %btkAppendPoint(h\, type\, label\, values\, residuals)\n [points\, pointsInfo] = %btkAppendPoint(h\, type\, label\, values\, residuals\,  desc)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param type String with the point's type (see note #1).
  * @param label String containing the label of the inserted point.

@@ -1,7 +1,7 @@
 /**
  * @class btkRemoveAnalog
  * @brief Delete the analog channel with the given index or label.
- * @syntax{[analogs analogsInfo] = btkRemoveAnalog(h\, index)\n [analogs analogsInfo] = btkRemoveAnalog(h\, label)}
+ * @syntax{[analogs analogsInfo] = %btkRemoveAnalog(h\, index)\n [analogs analogsInfo] = %btkRemoveAnalog(h\, label)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param index Index of the analog channel to remove.
  * @param label String with the original label of the analog channel

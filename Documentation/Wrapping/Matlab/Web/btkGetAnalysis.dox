@@ -1,7 +1,7 @@
 /**
  * @class btkGetAnalysis
  * @brief Extract data contained in the metadata ANALYSIS and its children from the given acquisition
- * @syntax{[analysis\, analysisInfo] = btkGetAnalysis(h)}
+ * @syntax{[analysis\, analysisInfo] = %btkGetAnalysis(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval analysis Structure where each field corresponds to a metadata's label (children of ANALYSIS).
  * @retval analysisInfo Structure with additional informations:

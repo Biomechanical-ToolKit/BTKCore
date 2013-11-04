@@ -1,7 +1,7 @@
 /**
  * @class btkGetForcePlatforms
  * @brief Extract force platforms' informations from the given biomechanical acquisition.
- * @syntax{[forceplates\, forceplatesInfo] = btkGetForcePlatforms(h)}
+ * @syntax{[forceplates\, forceplatesInfo] = %btkGetForcePlatforms(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval forceplates Paged structure with the following fields:
  *   - <tt>forceplates(i).channels:</tt> Structure with fields's name corresponding to the analog channel used.

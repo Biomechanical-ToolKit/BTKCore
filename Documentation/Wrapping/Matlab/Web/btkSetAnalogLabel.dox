@@ -1,7 +1,7 @@
 /**
  * @class btkSetAnalogLabel
  * @brief Modify analog's label and return updated analogs.
- * @syntax{[analogs\, analogsInfo] = btkSetAnalogLabel(h\, idx\, newlabel)\n [analogs\, analogsInfo] = btkSetAnalogLabel(h\, label\, newlabel)}
+ * @syntax{[analogs\, analogsInfo] = %btkSetAnalogLabel(h\, idx\, newlabel)\n [analogs\, analogsInfo] = %btkSetAnalogLabel(h\, label\, newlabel)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param idx Integer containing the index of the analog channel to modify.
  * @param label String containing the label of the analog channel to modify.
@@ -10,8 +10,8 @@
  * @retval analogsInfo Updated informations related to the analog channels. Its format is the same than using the function btkGetAnalogs.
  *
  * @par Detailed description:
- * <tt>btkSetAnalogLabel(h, idx, newlabel)</tt> modifies the label of the analog channel specified by the index @c idx.
- * <tt>btkSetAnalogLabel(h, label, newlabel)</tt> modifies the label of the analog channel specified by the label @c label.
+ * <tt>%btkSetAnalogLabel(h, idx, newlabel)</tt> modifies the label of the analog channel specified by the index @c idx.
+ * <tt>%btkSetAnalogLabel(h, label, newlabel)</tt> modifies the label of the analog channel specified by the label @c label.
  * 
  * @sa btkGetAnalog, btkSetAnalogDescription, btkSetAnalogGain, btkSetAnalogOffset, btkSetAnalogScale, btkSetAnalogUnit, btkSetAnalogValues
  * @ingroup BTKMatlabAnalogModifier

@@ -1,7 +1,7 @@
 /**
  * @class btkSetMetaDataLabel
  * @brief Set a metadata's label.
- * @syntax{md = btkSetMetaDataLabel(h\, idx\, newlabel)\n md = btkSetMetaDataLabel(h\, idx\, subidx\, newlabel)\n md = %btkSetMetaDataLabel(h\, idx\, subidx\, ...\, newlabel)\n md = btkSetMetaDataLabel(h\, label\, newlabel)\n md = btkSetMetaDataLabel(h\, label\, sublabel\, newlabel)\n md = %btkSetMetaDataLabel(h\, label\, sublabel\, ...\, newlabel)}
+ * @syntax{md = %btkSetMetaDataLabel(h\, idx\, newlabel)\n md = %btkSetMetaDataLabel(h\, idx\, subidx\, newlabel)\n md = %btkSetMetaDataLabel(h\, idx\, subidx\, ...\, newlabel)\n md = %btkSetMetaDataLabel(h\, label\, newlabel)\n md = %btkSetMetaDataLabel(h\, label\, sublabel\, newlabel)\n md = %btkSetMetaDataLabel(h\, label\, sublabel\, ...\, newlabel)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param idx Integer specifying the index of a metadata.
  * @param subidx Integer specifying the index of a metadata.
@@ -16,11 +16,11 @@
  * renaming the metadata FORCE_PLATFORM has for effect to not be able to extract
  * force platform data as it contains their geometrical informations.
  * \n\n
- * <tt>btkSetMetaDataLabel(h, idx, newlabel)</tt> sets the label of the metadata with the index @c idx contained in the root.
- * <tt>btkSetMetaDataLabel(h, idx, subidx, newlabel)</tt> sets the label of the metadata with the index @c subidx contained in the metadata with the index @c idx.
+ * <tt>%btkSetMetaDataLabel(h, idx, newlabel)</tt> sets the label of the metadata with the index @c idx contained in the root.
+ * <tt>%btkSetMetaDataLabel(h, idx, subidx, newlabel)</tt> sets the label of the metadata with the index @c subidx contained in the metadata with the index @c idx.
  * <tt>%btkSetMetaDataLabel(h, idx, subidx, ..., newlabel)</tt> sets the label of any metadata specified by the gives indices.
- * <tt>btkSetMetaDataLabel(h, label, newlabel)</tt> sets the label of the metadata with the label @c label contained in the root.
- * <tt>btkSetMetaDataLabel(h, label, sublabel, newlabel)</tt>  sets the label of the metadata with the label @c sublabel contained in the metadata with the label @c label.
+ * <tt>%btkSetMetaDataLabel(h, label, newlabel)</tt> sets the label of the metadata with the label @c label contained in the root.
+ * <tt>%btkSetMetaDataLabel(h, label, sublabel, newlabel)</tt>  sets the label of the metadata with the label @c sublabel contained in the metadata with the label @c label.
  * <tt>%btkSetMetaDataLabel(h, label, sublabel, ..., newlabel)</tt> sets the label of any metadata specified by the given labels.
  * \n\n
  * You can mix label and index to set the label of a metadata entry.

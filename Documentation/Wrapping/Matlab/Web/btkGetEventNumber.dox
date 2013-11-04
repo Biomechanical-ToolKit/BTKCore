@@ -1,7 +1,7 @@
 /**
  * @class btkGetEventNumber
  * @brief Return the number of events.
- * @syntax{num = btkGetEventNumber(h)}
+ * @syntax{num = %btkGetEventNumber(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval num Integer with the number of events.
  * @sa btkGetEvents, btkGetEventsValues

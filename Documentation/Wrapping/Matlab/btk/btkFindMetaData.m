@@ -14,7 +14,7 @@ function md = btkFindMetaData(h,label,varargin)
 %
 %  By default, BTK, use two stages of metadata representing group and parameters.
 
-%  Author: A. BarrÃ©
+%  Author: A. Barré
 %  Copyright 2009-2013 Biomechanical ToolKit (BTK).
 
 if (nargin < 2)

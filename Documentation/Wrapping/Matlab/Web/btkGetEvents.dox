@@ -1,7 +1,7 @@
 /**
  * @class btkGetEvents
  * @brief Extract events from a biomechanical acquisition.
- * @syntax{[events\, eventsInfo] = btkGetEvents(h)}
+ * @syntax{[events\, eventsInfo] = %btkGetEvents(h)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval events Structure where each filed corresponds to an event's label
  * @retval eventsInfo Structure with additional informations

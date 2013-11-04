@@ -1,7 +1,7 @@
 /**
  * @class btkSetMetaDataUnlock
  * @brief et the unlock state of a metadata
- * @syntax{md = btkSetMetaDataUnlock(h\, idx\, isunlocked)\n md = btkSetMetaDataUnlock(h\, idx\, subidx\, isunlocked)\n md = %btkSetMetaDataUnlock(h\, idx\, subidx\, ...\, isunlocked)\n md = btkSetMetaDataUnlock(h\, label\, isunlocked)\n md = btkSetMetaDataUnlock(h\, label\, sublabel\, isunlocked)\n md = %btkSetMetaDataUnlock(h\, label\, sublabel\, ...\, isunlocked)}
+ * @syntax{md = %btkSetMetaDataUnlock(h\, idx\, isunlocked)\n md = %btkSetMetaDataUnlock(h\, idx\, subidx\, isunlocked)\n md = %btkSetMetaDataUnlock(h\, idx\, subidx\, ...\, isunlocked)\n md = %btkSetMetaDataUnlock(h\, label\, isunlocked)\n md = %btkSetMetaDataUnlock(h\, label\, sublabel\, isunlocked)\n md = %btkSetMetaDataUnlock(h\, label\, sublabel\, ...\, isunlocked)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param idx Integer specifying the index of a metadata.
  * @param subidx Integer specifying the index of a metadata.
@@ -12,11 +12,11 @@
  * @retval md Structure with the same format than the function btkGetMetaData.
  *
  * @par Detailed description:
- * <tt>btkSetMetaDataUnlock(h, idx, isunlocked)</tt> sets the unlock state of the metadata with the index @c idx contained in the root.
- * <tt>btkSetMetaDataUnlock(h, idx, subidx, isunlocked)</tt> sets the unlock state of the metadata with the index @c subidx contained in the metadata with the index @c idx.
+ * <tt>%btkSetMetaDataUnlock(h, idx, isunlocked)</tt> sets the unlock state of the metadata with the index @c idx contained in the root.
+ * <tt>%btkSetMetaDataUnlock(h, idx, subidx, isunlocked)</tt> sets the unlock state of the metadata with the index @c subidx contained in the metadata with the index @c idx.
  * <tt>%btkSetMetaDataUnlock(h, idx, subidx, ..., isunlocked)</tt> sets the unlock state of any metadata specified by the gives indices.
- * <tt>btkSetMetaDataUnlock(h, label, isunlocked)</tt> sets the unlock state of the metadata with the label @c label contained in the root.
- * <tt>btkSetMetaDataUnlock(h, label, sublabel, isunlocked)</tt>  sets the unlock state of the metadata with the label @c sublabel contained in the metadata with the label @c label.
+ * <tt>%btkSetMetaDataUnlock(h, label, isunlocked)</tt> sets the unlock state of the metadata with the label @c label contained in the root.
+ * <tt>%btkSetMetaDataUnlock(h, label, sublabel, isunlocked)</tt>  sets the unlock state of the metadata with the label @c sublabel contained in the metadata with the label @c label.
  * <tt>%btkSetMetaDataUnlock(h, label, sublabel, ..., isunlocked)</tt> sets the unlock state of any metadata specified by the given labels.
  * \n\n
  * You can mix label and index to set the unlock state of a metadata entry.

@@ -1,7 +1,7 @@
 /**
  * @class btkAppendAnalysisParameter
  * @brief Convenient function to insert or set data into the metadata ANALYSIS formated as required by Vicon.
- * @syntax{[analysis\, analysisInfo] = btkAppendAnalysisParameter(h\, name\, context\, unit\, value)\n [analysis\, analysisInfo] = btkAppendAnalysisParameter(h\, name\, context\, unit\, value\, subject) \n [analysis\, analysisInfo] = btkAppendAnalysisParameter(h\, name\, context\, unit\, value\, subject\, description)}
+ * @syntax{[analysis\, analysisInfo] = %btkAppendAnalysisParameter(h\, name\, context\, unit\, value)\n [analysis\, analysisInfo] = %btkAppendAnalysisParameter(h\, name\, context\, unit\, value\, subject) \n [analysis\, analysisInfo] = %btkAppendAnalysisParameter(h\, name\, context\, unit\, value\, subject\, description)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param name String with the name of the inserted parameter.
  * @param context String with the context of the inserted parameter (e.g. Left, Right).

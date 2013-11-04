@@ -1,7 +1,7 @@
 /**
  * @class btkGetGroundReactionWrenches
  * @brief Extract ground reaction wrenches (GRW) expressed in the global frame from a given acquisition.
- * @syntax{grw = btkGetGroundReactionWrenches(h\, threshold)}
+ * @syntax{grw = %btkGetGroundReactionWrenches(h\, threshold)}
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param threshold Set all positions to (0,0,0) when the Fz value is lower or equal than the threshold
  * @retval fpw Paged structure with the following fields:
