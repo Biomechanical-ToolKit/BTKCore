@@ -937,12 +937,7 @@ namespace btk
    */
   void Acquisition::ResizeFrameNumber(int frameNumber)
   {
-    if (frameNumber <= 0)
-    {
-      btkWarningMacro("Impossible to set the frame number to 0 or lower. The number of frames is now equals to 1.");
-      frameNumber = 1;
-    }
-    else if (frameNumber == this->m_PointFrameNumber)
+    if (frameNumber == this->m_PointFrameNumber)
       return;
     this->SetPointFrameNumber(frameNumber);
     this->SetAnalogFrameNumber(this->m_AnalogSampleNumberPerPointFrame);
