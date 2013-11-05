@@ -1,0 +1,11 @@
+language: objective-c
+
+script:
+  brew update
+  brew install cmake
+  mkdir build-static-release
+  cd build-static-release
+  ROOT=`pwd`
+  git clone https://code.google.com/p/b-tk.data/ Testing/Data
+  cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
+  make && make test
