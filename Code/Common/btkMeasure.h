@@ -279,7 +279,7 @@ namespace btk
   {};
   
   template <class Derived>
-  void MeasureData<Derived>::SetValues(const MeasureData::Values& v)
+  void MeasureData<Derived>::SetValues(const typename MeasureData::Values& v)
   {
     this->m_Values = v;
     this->Modified();

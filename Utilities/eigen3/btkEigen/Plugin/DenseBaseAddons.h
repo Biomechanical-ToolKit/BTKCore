@@ -154,7 +154,7 @@ percentile(const DenseBase<OtherDerived>& other) const
  * Overload method to compute the percentile for only one given percentage
  */
 EIGEN_STRONG_INLINE typename internal::traits<Derived>::Scalar
-percentile(DenseBase<Derived>::RealScalar p) const
+percentile(typename DenseBase<Derived>::RealScalar p) const
 {
   typedef DenseBase<Derived>::Scalar Scalar;
   return this->percentile(Eigen::Array<Scalar,1,1>::Constant(p)).coeff(0);
@@ -164,8 +164,8 @@ percentile(DenseBase<Derived>::RealScalar p) const
  * Overload method to compute the percentile for only two given percentages
  * @return A row/colum vector depending of the size of the current data.
  */
-EIGEN_STRONG_INLINE typename DenseBase<Derived>::template precentile_return_type< Array<DenseBase<Derived>::Scalar, (DenseBase<Derived>::RowsAtCompileTime == 1 ? 1 : 2), (DenseBase<Derived>::ColsAtCompileTime == 1 ? 1 : 2)> >::type
-percentile(DenseBase<Derived>::RealScalar p1, DenseBase<Derived>::RealScalar p2) const
+EIGEN_STRONG_INLINE typename DenseBase<Derived>::template precentile_return_type< Array<typename DenseBase<Derived>::Scalar, (DenseBase<Derived>::RowsAtCompileTime == 1 ? 1 : 2), (DenseBase<Derived>::ColsAtCompileTime == 1 ? 1 : 2)> >::type
+percentile(typename DenseBase<Derived>::RealScalar p1, typename DenseBase<Derived>::RealScalar p2) const
 {
   typedef DenseBase<Derived>::Scalar Scalar;
   return this->percentile(Eigen::Array< Scalar,(DenseBase<Derived>::RowsAtCompileTime == 1 ? 1 : 2),(DenseBase<Derived>::ColsAtCompileTime == 1 ? 1 : 2)>(p1,p2));
@@ -175,8 +175,8 @@ percentile(DenseBase<Derived>::RealScalar p1, DenseBase<Derived>::RealScalar p2)
  * Overload method to compute the percentile for only three given percentages
  * @return A row/colum vector depending of the size of the current data.
  */
-EIGEN_STRONG_INLINE typename DenseBase<Derived>::template precentile_return_type< Array<DenseBase<Derived>::Scalar, (DenseBase<Derived>::RowsAtCompileTime == 1 ? 1 : 3), (DenseBase<Derived>::ColsAtCompileTime == 1 ? 1 : 3)> >::type
-percentile(DenseBase<Derived>::RealScalar p1, DenseBase<Derived>::RealScalar p2, DenseBase<Derived>::RealScalar p3) const
+EIGEN_STRONG_INLINE typename DenseBase<Derived>::template precentile_return_type< Array<typename DenseBase<Derived>::Scalar, (DenseBase<Derived>::RowsAtCompileTime == 1 ? 1 : 3), (DenseBase<Derived>::ColsAtCompileTime == 1 ? 1 : 3)> >::type
+percentile(typename DenseBase<Derived>::RealScalar p1, typename DenseBase<Derived>::RealScalar p2, typename DenseBase<Derived>::RealScalar p3) const
 {
   typedef DenseBase<Derived>::Scalar Scalar;
   return this->percentile(Eigen::Array< Scalar,(DenseBase<Derived>::RowsAtCompileTime == 1 ? 1 : 3), (DenseBase<Derived>::ColsAtCompileTime == 1 ? 1 : 3)>(p1,p2,p3));
@@ -203,7 +203,7 @@ median() const
  *  unbiased estimate of the standard deviation per se"
  */
 EIGEN_STRONG_INLINE typename internal::traits<Derived>::Scalar
-std(DenseBase<Derived>::RealScalar ddof = DenseBase<Derived>::RealScalar(1)) const
+std(typename DenseBase<Derived>::RealScalar ddof = DenseBase<Derived>::RealScalar(1)) const
 {
   EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived)
   Index num = std::max(this->rows(), this->cols());

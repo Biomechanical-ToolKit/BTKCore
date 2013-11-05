@@ -55,7 +55,7 @@ namespace btk
     class Data : public MeasureData<Point>
     {
     public:
-      typedef typename MeasureTraits<Point>::Residuals Residuals; ///< Vector of double representing the residuals associated with each frames (if applicable).
+      typedef MeasureTraits<Point>::Residuals Residuals; ///< Vector of double representing the residuals associated with each frames (if applicable).
       
       typedef btkSharedPtr<Data> Pointer;
       typedef btkSharedPtr<const Data> ConstPointer;
