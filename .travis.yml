@@ -9,4 +9,5 @@ script:
 - git clone https://code.google.com/p/b-tk.data/ Testing/Data
 - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBTK_WRAP_PYTHON:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
 - make
-- ctest -VV
+- bin/TDD
+- python bin/TDD.py
