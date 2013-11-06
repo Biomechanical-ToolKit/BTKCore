@@ -18,7 +18,7 @@ Continuous integration
 To test the implemented features as well as to verify the modification in the code, hundreds of cases representing standard usages of the project are tested at each revision of the project.
 The following list shows the status of the tests for different operating systems as well for the different supported languages (C++, Matlab/Octave, and Python):
 
- * MacOS X (C++, Python): [![Build Status](https://travis-ci.org/Biomechanical-ToolKit/BTKCore.png?branch=master)](https://travis-ci.org/Biomechanical-ToolKit/BTKCore)
- * Linux (C++, Python, Octave): [![Build Status](https://drone.io/Biomechanical-ToolKit/b-tk.core/status.png)](https://drone.io/Biomechanical-ToolKit/b-tk.core/latest)
+ * [![Build Status](https://travis-ci.org/Biomechanical-ToolKit/BTKCore.png?branch=master)](https://travis-ci.org/Biomechanical-ToolKit/BTKCore) MacOS X (C++, Python)
+ * [![Build Status](https://drone.io/Biomechanical-ToolKit/b-tk.core/status.png)](https://drone.io/Biomechanical-ToolKit/b-tk.core/latest) Linux (C++, Python, Octave)
 
- **Note**: The continuous integration is realized on the `master` branch which corresponds to the *development* version of the code.
+**Note**: The continuous integration is realized on the `master` branch which corresponds to the *development* version of the code.
