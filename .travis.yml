@@ -24,7 +24,5 @@ script:
   
 env:
   matrix:
-    - WITH_SHARED_LIBS=0 C_COMPILER=/usr/bin/gcc CXX_COMPILER=/usr/bin/g++
-    - WITH_SHARED_LIBS=1 C_COMPILER=/usr/bin/gcc CXX_COMPILER=/usr/bin/g++
-    - WITH_SHARED_LIBS=0 C_COMPILER=/usr/bin/clang CXX_COMPILER=/usr/bin/clang
-    - WITH_SHARED_LIBS=1 C_COMPILER=/usr/bin/clang CXX_COMPILER=/usr/bin/clang
+    - WITH_SHARED_LIBS=0
+    - WITH_SHARED_LIBS=1
