@@ -46,9 +46,9 @@ namespace btkEigen
    * Cumulative sum of elements.
    */
   template<typename Derived, typename OtherDerived>
-  EIGEN_STRONG_INLINE void cumsum(MatrixBase<OtherDerived> const & out, const MatrixBase<Derived>& in)
+  EIGEN_STRONG_INLINE void cumsum(DenseBase<OtherDerived> const & out, const DenseBase<Derived>& in)
   {
-    MatrixBase<OtherDerived>& out_ = const_cast< MatrixBase<OtherDerived>& >(out);
+    DenseBase<OtherDerived>& out_ = const_cast< DenseBase<OtherDerived>& >(out);
     out_ = in;
     for (int i = 0 ; i < out_.cols() ; ++i)
     {
@@ -63,10 +63,10 @@ namespace btkEigen
    * Overload method to return result by value.
    */
   template<typename Derived>
-  EIGEN_STRONG_INLINE Matrix<typename MatrixBase<Derived>::Scalar, MatrixBase<Derived>::RowsAtCompileTime, MatrixBase<Derived>::ColsAtCompileTime>
-  cumsum(const MatrixBase<Derived>& y)
+  EIGEN_STRONG_INLINE Matrix<typename DenseBase<Derived>::Scalar, DenseBase<Derived>::RowsAtCompileTime, DenseBase<Derived>::ColsAtCompileTime>
+  cumsum(const DenseBase<Derived>& y)
   {
-    Matrix<typename MatrixBase<Derived>::Scalar, MatrixBase<Derived>::RowsAtCompileTime, MatrixBase<Derived>::ColsAtCompileTime> z;
+    Matrix<typename DenseBase<Derived>::Scalar, DenseBase<Derived>::RowsAtCompileTime, DenseBase<Derived>::ColsAtCompileTime> z;
     cumsum(z,y);
     return z;
   };
@@ -75,9 +75,9 @@ namespace btkEigen
    * Cumulative trapezoidal numerical integration with unit spacing.
    */
   template<typename Derived, typename OtherDerived>
-  EIGEN_STRONG_INLINE void cumtrapz(MatrixBase<OtherDerived> const & out, const MatrixBase<Derived>& in)
+  EIGEN_STRONG_INLINE void cumtrapz(DenseBase<OtherDerived> const & out, const DenseBase<Derived>& in)
   {
-    MatrixBase<OtherDerived>& out_ = const_cast< MatrixBase<OtherDerived>& >(out);
+    DenseBase<OtherDerived>& out_ = const_cast< DenseBase<OtherDerived>& >(out);
     out_.derived().setZero(in.rows(), in.cols());
     cumsum(out_.middleRows(1,out_.rows()-1), (in.topRows(in.rows()-1) + in.bottomRows(in.rows()-1)) * 0.5);
   };
@@ -86,10 +86,10 @@ namespace btkEigen
    * Overload method to return result by value.
    */
   template<typename Derived>
-  EIGEN_STRONG_INLINE Matrix<typename MatrixBase<Derived>::Scalar, MatrixBase<Derived>::RowsAtCompileTime, MatrixBase<Derived>::ColsAtCompileTime>
-  cumtrapz(const MatrixBase<Derived>& y)
+  EIGEN_STRONG_INLINE Matrix<typename DenseBase<Derived>::Scalar, DenseBase<Derived>::RowsAtCompileTime, DenseBase<Derived>::ColsAtCompileTime>
+  cumtrapz(const DenseBase<Derived>& y)
   {
-    Matrix<typename MatrixBase<Derived>::Scalar, MatrixBase<Derived>::RowsAtCompileTime, MatrixBase<Derived>::ColsAtCompileTime> z;
+    Matrix<typename DenseBase<Derived>::Scalar, DenseBase<Derived>::RowsAtCompileTime, DenseBase<Derived>::ColsAtCompileTime> z;
     cumtrapz(z,y);
     return z;
   };

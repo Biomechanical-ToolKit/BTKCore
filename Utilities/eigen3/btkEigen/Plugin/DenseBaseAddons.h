@@ -64,7 +64,7 @@ template<typename OtherDerived> struct precentile_return_type {
  * @warning This method use a temporary to internally sort the data.
  */
 template<typename OtherDerived>
-inline typename DenseBase<Derived>::template precentile_return_type<OtherDerived>::type
+typename precentile_return_type<OtherDerived>::type
 percentile(const DenseBase<OtherDerived>& other) const
 {
   typedef typename DenseBase<Derived>::Scalar Scalar;
@@ -209,7 +209,7 @@ std(typename DenseBase<Derived>::RealScalar ddof = DenseBase<Derived>::RealScala
   Index num = std::max(this->rows(), this->cols());
   if (num == 1)
     return DenseBase<Derived>::Scalar(0);
-  return sqrt((this->derived().array() - this->mean()).cwiseAbs2().sum() / (static_cast<double>(num) - ddof));
+  return std::sqrt((this->derived().array() - this->mean()).cwiseAbs2().sum() / (static_cast<double>(num) - ddof));
 };
 
 #endif // __btkEigenDenseBaseAddons_h
