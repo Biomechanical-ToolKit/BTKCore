@@ -1,13 +1,32 @@
 language: objective-c
 
+# To prepare the system to install prerequisites or dependencies
+before_install:
+  - brew update
+  
+# To install any prerequisites or dependencies necessary to run your build
+install:  
+  - brew install cmake swig
+  
+# To prepare your build for testing
+before_script:
+  - git clone https://code.google.com/p/b-tk.data/ Testing/Data
+      
 script:
-- brew update
-- brew install cmake swig
-- mkdir build-static-release
-- cd build-static-release
-- ROOT=`pwd`
-- git clone https://code.google.com/p/b-tk.data/ Testing/Data
-- cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBTK_WRAP_PYTHON:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
-- make
-- bin/TDD
-- python bin/TDD.py
+  - ROOT=`pwd`
+  - rm -rf build
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBTK_WRAP_PYTHON:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
+  - make
+  - bin/TDD
+  - python bin/TDD.py
+
+compiler:
+  - clang
+  - gcc
+  
+env:
+  matrix:
+    - WITH_SHARED_LIBS=0
+    - WITH_SHARED_LIBS=1
