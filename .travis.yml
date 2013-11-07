@@ -17,16 +17,14 @@ script:
   - rm -rf build
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBTK_WRAP_PYTHON:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
+  - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBTK_WRAP_PYTHON:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -DCMAKE_C_COMPILER=$C_COMPILER -D CMAKE_CXX_COMPILER=$CXX_COMPILER -G "Unix Makefiles" ..
   - make
   - bin/TDD
   - python bin/TDD.py
-
-compiler:
-  - clang
-  - gcc
   
 env:
   matrix:
-    - WITH_SHARED_LIBS=0
-    - WITH_SHARED_LIBS=1
+    - WITH_SHARED_LIBS=0 C_COMPILER=/usr/bin/gcc CXX_COMPILER=/usr/bin/g++
+    - WITH_SHARED_LIBS=1 C_COMPILER=/usr/bin/gcc CXX_COMPILER=/usr/bin/g++
+    - WITH_SHARED_LIBS=0 C_COMPILER=/usr/bin/clang CXX_COMPILER=/usr/bin/clang
+    - WITH_SHARED_LIBS=1 C_COMPILER=/usr/bin/clang CXX_COMPILER=/usr/bin/clang
