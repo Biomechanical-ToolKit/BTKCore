@@ -14,14 +14,17 @@ btkDeleteAcquisition(h);
 end
 
 function testReadC3DSampleUTF8(d)
-[h, bo, sf] = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Я могу есть стекло/оно мне не вредит.c3d'));
-assertEqual(bo, 'IEEE_LittleEndian');
-assertEqual(sf, 'Float');
-btkDeleteAcquisition(h);
+% The Windows charset seems not compatible with hardcoded UTF-8 strings. The test is discarded under Windows.
+if (isunix)
+    [h, bo, sf] = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Я могу есть стекло/оно мне не вредит.c3d'));
+    assertEqual(bo, 'IEEE_LittleEndian');
+    assertEqual(sf, 'Float');
+    btkDeleteAcquisition(h);
+end
 end
 
 function testWriteC3DSampleUTF8(d)
-h1 = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Я могу есть стекло/оно мне не вредит.c3d'));
+h1 = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/shd01.c3d'));
 btkWriteAcquisition(h1, strcat(d.out,'/C3DSamples/Я могу есть стекло, оно мне не вредит - Matlab.c3d'));
 h2 = btkReadAcquisition(strcat(d.out,'/C3DSamples/Я могу есть стекло, оно мне не вредит - Matlab.c3d'));
 assertEqual(btkGetPointNumber(h1), btkGetPointNumber(h2));
@@ -38,7 +41,7 @@ btkDeleteAcquisition(h2);
 end
 
 function testCloseAcquisition(d)
-h = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Я могу есть стекло/оно мне не вредит.c3d'));
+h = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/shd01.c3d'));
 btkCloseAcquisition(h);
 try
   fn = btkGetPointFrameNumber(h)
