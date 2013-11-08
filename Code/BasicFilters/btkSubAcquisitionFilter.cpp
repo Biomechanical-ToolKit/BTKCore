@@ -35,6 +35,7 @@
 
 #include "btkSubAcquisitionFilter.h"
 #include "btkConvert.h"
+#include "btkLogger.h"
 
 namespace btk
 {
