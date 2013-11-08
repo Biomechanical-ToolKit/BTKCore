@@ -37,6 +37,19 @@
 
 #include <iostream>
 
+#ifdef NDEBUG
+  static btk::Logger::VerboseMode _btk_logger_verbose_mode = btk::Logger::Normal;
+#else
+  static btk::Logger::VerboseMode _btk_logger_verbose_mode = btk::Logger::Detailed;
+#endif
+static std::string _btk_logger_prefix = "BTK";
+static std::string _btk_logger_debug_affix = "DEBUG";
+static std::string _btk_logger_warning_affix = "WARNING";
+static std::string _btk_logger_error_affix = "ERROR";
+static btk::Logger::Stream::Pointer _btk_logger_debug_stream = btk::Logger::Stream::New(&(std::cout));
+static btk::Logger::Stream::Pointer _btk_logger_warning_stream = btk::Logger::Stream::New(&(std::cerr));
+static btk::Logger::Stream::Pointer _btk_logger_error_stream = btk::Logger::Stream::New(&(std::cerr));
+
 namespace btk
 {
   /**
@@ -108,159 +121,240 @@ namespace btk
    * @var Logger::VerboseMode Logger::Detailed
    * Same as Normal but add also file information from where the log where written (if these informations are given).
    */
-   
-#ifdef NDEBUG
-  Logger::VerboseMode Logger::s_VerboseMode = Logger::Normal;
-#else
-  Logger::VerboseMode Logger::s_VerboseMode = Logger::Detailed;
-#endif
-  std::string Logger::s_Prefix = "BTK";
-  std::string Logger::s_DebugAffix = "DEBUG";
-  std::string Logger::s_WarningAffix = "WARNING";
-  std::string Logger::s_ErrorAffix = "ERROR";
-  Logger::Stream::Pointer Logger::sp_DebugStream = Logger::Stream::New(&(std::cout));
-  Logger::Stream::Pointer Logger::sp_WarningStream = Logger::Stream::New(&(std::cerr));
-  Logger::Stream::Pointer Logger::sp_ErrorStream = Logger::Stream::New(&(std::cerr));
   
   /**
-   * @fn static void Logger::Debug(const std::string& msg)
    * Write the message @c msg to the debug stream
    * @note Setting the verbose mode to Normal or Detailed will have the same effect using this method as the file informations (filename, line number) are not given
    */
-  
+  void Logger::Debug(const std::string& msg)
+  {
+#ifdef NDEBUG
+    btkNotUsed(msg);
+#else
+    Logger::PrintMessage(_btk_logger_debug_stream.get(), _btk_logger_debug_affix, msg);
+#endif
+  };
+     
   /**
-   * @fn static void Logger::Warning(const std::string& msg)
    * Write the message @c msg to the warning stream.
    * @note Setting the verbose mode to Normal or Detailed will have the same effect using this method as the file informations (filename, line number) are not given.
    */
-  
+  void Logger::Warning(const std::string& msg)
+  {
+    Logger::PrintMessage(_btk_logger_warning_stream.get(), _btk_logger_warning_affix, msg);
+  };
+    
   /**
-   * @fn static void Logger::Error(const std::string& msg)
    * Write the message @c msg to the error stream.
    * @note Setting the verbose mode to Normal or Detailed will have the same effect using this method as the file informations (filename, line number) are not given.
    */
+  void Logger::Error(const std::string& msg)
+  {
+    Logger::PrintMessage(_btk_logger_error_stream.get(), _btk_logger_error_affix, msg);
+  }
   
   /**
-   * @fn static void Logger::Debug(const std::string& filename, int line, const std::string& msg)
    * Write the message @c msg to the debug stream.
    */
+  void Logger::Debug(const std::string& filename, int line, const std::string& msg)
+  {
+#ifdef NDEBUG
+    btkNotUsed(filename); btkNotUsed(line); btkNotUsed(msg);
+#else
+    Logger::PrintMessage(_btk_logger_debug_stream.get(), _btk_logger_debug_affix, filename, line, msg);
+#endif
+  };
   
   /**
-   * @fn static void Logger::Warning(const std::string& filename, int line, const std::string& msg)
    * Write the message @c msg to the warning stream.
    */
+  void Logger::Warning(const std::string& filename, int line, const std::string& msg)
+  {
+    Logger::PrintMessage(_btk_logger_warning_stream.get(), _btk_logger_warning_affix, filename, line, msg);
+  };
   
   /**
-   * @fn static void Logger::Error(const std::string& filename, int line, const std::string& msg)
    * Write the message @c msg to the error stream.
    */
+  void Logger::Error(const std::string& filename, int line, const std::string& msg)
+  {
+    Logger::PrintMessage(_btk_logger_error_stream.get(), _btk_logger_error_affix, filename, line, msg);
+  };
   
   /**
-   * @fn static VerboseMode Logger::GetVerboseMode()
    * Returns the current verbose mode.
    */
-  
+  Logger::VerboseMode Logger::GetVerboseMode()
+  {
+    return _btk_logger_verbose_mode;
+  };
+    
   /**
-   * @fn static void Logger::SetVerboseMode(VerboseMode mode)
    * Sets the verbose mode.
    */  
-  
+  void Logger::SetVerboseMode(Logger::VerboseMode mode)
+  {
+    _btk_logger_verbose_mode = mode;
+  };
+      
   /**
-   * @fn static const std::string& Logger::GetPrefix()
    * Returns the prefix used by the logger. The prefix should contain a string for the library or application which use the logger.
    */
-  
+  const std::string& Logger::GetPrefix()
+  {
+    return _btk_logger_prefix;
+  };
+    
   /**
-   * @fn static void Logger::SetPrefix(const std::string& str)
    * Sets the prefix used by the logger. 
    */
-  
+  void Logger::SetPrefix(const std::string& str)
+  {
+    _btk_logger_prefix = str;
+  };
+    
   /**
-   * @fn static Logger::Stream::Pointer Logger::GetDebugStream()
    * Returns the stream used for the debug logs.
    */
-  
+  Logger::Stream::Pointer Logger::GetDebugStream()
+  {
+    return _btk_logger_debug_stream;
+  };
+    
   /**
-   * @fn static Logger::Stream::Pointer Logger::GetWarningStream()
    * Returns the stream used for the warning logs.
    */
-  
+  Logger::Stream::Pointer Logger::GetWarningStream()
+  {
+    return _btk_logger_warning_stream;
+  };
+    
   /**
-   * @fn static Logger::Stream::Pointer Logger::GetErrorStream()
    * Returns the stream used for the error logs.
    */
-  
+  Logger::Stream::Pointer Logger::GetErrorStream()
+  {
+    return _btk_logger_error_stream;
+  };
+    
   /**
-   * @fn static void Logger::SetDebugStream(std::ostream* output)
    * Convenient method to create a Logger::Stream object from an output stream use for the debug messages.
    */
-  
+  void Logger::SetDebugStream(std::ostream* output)
+  {
+    Logger::SetDebugStream(Logger::Stream::New(output));
+  };
+    
   /**
-   * @fn static void Logger::SetWarningStream(std::ostream* output)
    * Convenient method to create a Logger::Stream object from an output stream use for the warning messages.
    */
-  
+  void Logger::SetWarningStream(std::ostream* output)
+  {
+    Logger::SetWarningStream(Logger::Stream::New(output));
+  };
+    
   /**
-   * @fn static void Logger::SetErrorStream(std::ostream* output)
    * Convenient method to create a Logger::Stream object from an output stream use for the error messages.
    */
-  
+  void Logger::SetErrorStream(std::ostream* output)
+  {
+    Logger::SetErrorStream(Logger::Stream::New(output));
+  };
+    
   /**
-   * @fn static void Logger::SetDebugStream(Logger::Stream::Pointer stream)
    * Sets the stream used for the debug logs.
    */
-  
+  void Logger::SetDebugStream(Logger::Stream::Pointer stream)
+  {
+    _btk_logger_debug_stream = stream;
+  };
+    
   /**
-   * @fn static void Logger::SetWarningStream(Logger::Stream::Pointer stream)
    * Sets the stream used for the warning logs.
    */
-  
+  void Logger::SetWarningStream(Logger::Stream::Pointer stream)
+  {
+    _btk_logger_warning_stream = stream;
+  };
+    
   /**
-   * @fn static void Logger::SetErrorStream(Logger::Stream::Pointer stream)
    * Sets the stream used for the error logs.
    */
-  
+  void Logger::SetErrorStream(Logger::Stream::Pointer stream)
+  {
+    _btk_logger_error_stream = stream;
+  };
+    
   /**
-   * @fn static const std::string& Logger::GetDebugAffix()
    * Gets the string used to indicate that the log is a debug message.
    */
-  
+  const std::string& Logger::GetDebugAffix()
+  {
+    return _btk_logger_debug_affix;
+  };
+    
   /**
-   * @fn static const std::string& Logger::GetWarningAffix()
    * Gets the string used to indicate that the log is a warning.
    */
-  
+  const std::string& Logger::GetWarningAffix()
+  {
+    return _btk_logger_warning_affix;
+  };
+    
   /**
-   * @fn static const std::string& Logger::GetErrorAffix()
    * Gets the string used to indicate that the log is an error.
    */
-  
+  const std::string& Logger::GetErrorAffix()
+  {
+    return _btk_logger_error_affix;
+  };
+    
   /**
-   * @fn static void Logger::SetDebugAffix(const std::string& str)
    * Sets the string used to indicate that the log is a debug message.
    */
-  
+  void Logger::SetDebugAffix(const std::string& str)
+  {
+    _btk_logger_debug_affix = str;
+  };
+    
   /**
-   * @fn static void Logger::SetWarningAffix(const std::string& str)
    * Sets the string used to indicate that the log is a warning.
    */
-  
+  void Logger::SetWarningAffix(const std::string& str)
+  {
+    _btk_logger_warning_affix = str;
+  };
+    
   /**
-   * @fn static void Logger::SetErrorAffix(const std::string& str)
    * Sets the string used to indicate that the log is an error.
    */
+  void Logger::SetErrorAffix(const std::string& str)
+  {
+    _btk_logger_error_affix = str;
+  };
   
+  /**
+   * Overload method to print message without information on the file and the line number where the log was written.
+   */
+  void Logger::PrintMessage(Stream* level, const std::string& affix, const std::string& msg)
+  {
+    Logger::PrintMessage(level, affix, "", 0, msg);
+  };
+  
+ /**
+  * Print message on the given stream with the selected verbose mode and other parameters.
+  */
   void Logger::PrintMessage(Stream* level, const std::string& affix, const std::string& filename, int line, const std::string& msg)
   {
-    if (Logger::s_VerboseMode == Logger::Quiet)
+    if (_btk_logger_verbose_mode == Logger::Quiet)
       return;
-    if (Logger::s_VerboseMode > Logger::MessageOnly)
+    if (_btk_logger_verbose_mode > Logger::MessageOnly)
     {
-      level->GetOutput() << (Logger::s_Prefix.empty() ? "" : "[" + Logger::s_Prefix + " ")
+      level->GetOutput() << (_btk_logger_prefix.empty() ? "" : "[" + _btk_logger_prefix + " ")
                      << (affix.empty() ? "" : affix)
-                     << (Logger::s_Prefix.empty() && affix.empty() ? "" : "] ");
+                     << (_btk_logger_prefix.empty() && affix.empty() ? "" : "] ");
     }
-    if ((Logger::s_VerboseMode == Logger::Detailed) && (!filename.empty()))
+    if ((_btk_logger_verbose_mode == Logger::Detailed) && (!filename.empty()))
     {
       level->GetOutput() << filename;
       if (line > 0)

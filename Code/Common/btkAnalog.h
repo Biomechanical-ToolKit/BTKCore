@@ -108,7 +108,7 @@ namespace btk
     BTK_COMMON_EXPORT Analog(const std::string& label, int frameNumber, Gain g = Unknown);
     
   private:
-    Analog(const Analog& toCopy);
+    BTK_COMMON_EXPORT Analog(const Analog& toCopy);
     Analog& operator=(const Analog& ); // Not implemented.
     
     std::string m_Unit;

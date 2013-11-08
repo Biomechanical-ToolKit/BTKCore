@@ -107,11 +107,11 @@ namespace btk
     public:
       typedef btkSharedPtr<Stream> Pointer;
       static Pointer New(std::ostream* output) {return Pointer(new Stream(output));};
-      ~Stream();
+      BTK_COMMON_EXPORT ~Stream();
       std::ostream& GetOutput() const {return *(this->mp_Output);};
             
     private:
-      Stream(std::ostream* output);
+      BTK_COMMON_EXPORT Stream(std::ostream* output);
       
       Stream(const Stream&); // Not implemented.
       Stream& operator= (const Stream&); // Notimplemented.
@@ -120,54 +120,41 @@ namespace btk
       bool m_Owned;
     };
     
-#ifdef NDEBUG
-    static void Debug(const std::string& msg) {btkNotUsed(msg);};
-    static void Debug(const std::string& filename, int line, const std::string& msg) {btkNotUsed(filename);btkNotUsed(line);btkNotUsed(msg);};
-#else
-    static void Debug(const std::string& msg) {Logger::PrintMessage(Logger::sp_DebugStream.get(), Logger::s_DebugAffix, msg);};
-    static void Debug(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(Logger::sp_DebugStream.get(), Logger::s_DebugAffix, filename, line, msg);};
-#endif
-    static void Warning(const std::string& msg) {Logger::PrintMessage(Logger::sp_WarningStream.get(), Logger::s_WarningAffix, msg);};
-    static void Warning(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(Logger::sp_WarningStream.get(), Logger::s_WarningAffix, filename, line, msg);};
+    BTK_COMMON_EXPORT static void Debug(const std::string& msg);
+    BTK_COMMON_EXPORT static void Debug(const std::string& filename, int line, const std::string& msg);
+
+    BTK_COMMON_EXPORT static void Warning(const std::string& msg);
+    BTK_COMMON_EXPORT static void Warning(const std::string& filename, int line, const std::string& msg);
     
-    static void Error(const std::string& msg) {Logger::PrintMessage(Logger::sp_ErrorStream.get(), Logger::s_ErrorAffix, msg);};
-    static void Error(const std::string& filename, int line, const std::string& msg) {Logger::PrintMessage(Logger::sp_ErrorStream.get(), Logger::s_ErrorAffix, filename, line, msg);};
+    BTK_COMMON_EXPORT static void Error(const std::string& msg);
+    BTK_COMMON_EXPORT static void Error(const std::string& filename, int line, const std::string& msg);
     
-    static VerboseMode GetVerboseMode() {return Logger::s_VerboseMode;};
-    static void SetVerboseMode(VerboseMode mode) {Logger::s_VerboseMode = mode;};
+    BTK_COMMON_EXPORT static VerboseMode GetVerboseMode();
+    BTK_COMMON_EXPORT static void SetVerboseMode(VerboseMode mode);
     
-    static const std::string& GetPrefix() {return Logger::s_Prefix;};
-    static void SetPrefix(const std::string& str) {Logger::s_Prefix = str;};
+    BTK_COMMON_EXPORT static const std::string& GetPrefix();
+    BTK_COMMON_EXPORT static void SetPrefix(const std::string& str);
     
-    static Logger::Stream::Pointer GetDebugStream() {return Logger::sp_DebugStream;};
-    static Logger::Stream::Pointer GetWarningStream() {return Logger::sp_WarningStream;};
-    static Logger::Stream::Pointer GetErrorStream() {return Logger::sp_ErrorStream;};
-    static void SetDebugStream(std::ostream* output) {Logger::SetDebugStream(Logger::Stream::New(output));};
-    static void SetWarningStream(std::ostream* output) {Logger::SetWarningStream(Logger::Stream::New(output));};
-    static void SetErrorStream(std::ostream* output) {Logger::SetErrorStream(Logger::Stream::New(output));};
-    static void SetDebugStream(Logger::Stream::Pointer stream) {Logger::sp_DebugStream = stream;};
-    static void SetWarningStream(Logger::Stream::Pointer stream) {Logger::sp_WarningStream = stream;};
-    static void SetErrorStream(Logger::Stream::Pointer stream) {Logger::sp_ErrorStream = stream;};
+    BTK_COMMON_EXPORT static Logger::Stream::Pointer GetDebugStream();
+    BTK_COMMON_EXPORT static Logger::Stream::Pointer GetWarningStream();
+    BTK_COMMON_EXPORT static Logger::Stream::Pointer GetErrorStream();
+    BTK_COMMON_EXPORT static void SetDebugStream(std::ostream* output);
+    BTK_COMMON_EXPORT static void SetWarningStream(std::ostream* output);
+    BTK_COMMON_EXPORT static void SetErrorStream(std::ostream* output);
+    BTK_COMMON_EXPORT static void SetDebugStream(Logger::Stream::Pointer stream);
+    BTK_COMMON_EXPORT static void SetWarningStream(Logger::Stream::Pointer stream);
+    BTK_COMMON_EXPORT static void SetErrorStream(Logger::Stream::Pointer stream);
     
-    static const std::string& GetDebugAffix() {return Logger::s_DebugAffix;};
-    static const std::string& GetWarningAffix() {return Logger::s_WarningAffix;};
-    static const std::string& GetErrorAffix() {return Logger::s_ErrorAffix;};
-    static void SetDebugAffix(const std::string& str) {Logger::s_DebugAffix = str;};
-    static void SetWarningAffix(const std::string& str) {Logger::s_WarningAffix = str;};
-    static void SetErrorAffix(const std::string& str) {Logger::s_ErrorAffix = str;};
+    BTK_COMMON_EXPORT static const std::string& GetDebugAffix();
+    BTK_COMMON_EXPORT static const std::string& GetWarningAffix();
+    BTK_COMMON_EXPORT static const std::string& GetErrorAffix();
+    BTK_COMMON_EXPORT static void SetDebugAffix(const std::string& str);
+    BTK_COMMON_EXPORT static void SetWarningAffix(const std::string& str);
+    BTK_COMMON_EXPORT static void SetErrorAffix(const std::string& str);
     
   private:
-    static void PrintMessage(Stream* level, const std::string& affix, const std::string& msg) {Logger::PrintMessage(level, affix, "", 0, msg);};
+    static void PrintMessage(Stream* level, const std::string& affix, const std::string& msg);
     static void PrintMessage(Stream* level, const std::string& affix, const std::string& filename, int line, const std::string& msg);
-    
-    static VerboseMode s_VerboseMode;
-    static std::string s_Prefix;
-    static std::string s_DebugAffix;
-    static std::string s_WarningAffix;
-    static std::string s_ErrorAffix;
-    static Stream::Pointer sp_DebugStream;
-    static Stream::Pointer sp_WarningStream;
-    static Stream::Pointer sp_ErrorStream; 
   };
 };
 
