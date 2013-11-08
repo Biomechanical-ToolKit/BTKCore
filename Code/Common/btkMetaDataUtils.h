@@ -325,7 +325,7 @@ namespace btk
   template <typename T>
   void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val)
   {
-    if (parent != 0)
+    if (parent.get() != 0)
     {
       MetaDataCreateChild_p(parent, label, val, 1);
     }

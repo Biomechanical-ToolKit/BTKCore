@@ -37,6 +37,7 @@
 #define __btkException_h
 
 #include <stdexcept>
+#include <string>
 
 namespace btk
 {

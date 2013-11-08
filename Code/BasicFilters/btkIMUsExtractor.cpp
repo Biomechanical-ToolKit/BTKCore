@@ -290,7 +290,7 @@ namespace btk
     for (int i = 0 ; i < numberOfChannelsToExtract ; ++i)
     {
       Analog::Pointer channel = imu->GetChannel(i);
-      if (channel != 0)
+      if (channel.get() != 0)
       {
         channel->SetValues(data.col(numChannelsExtracted));
         ++numChannelsExtracted;

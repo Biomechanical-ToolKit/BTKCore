@@ -192,7 +192,7 @@
       void incr() {this->operator++();}; \
       void decr() {this->operator--();}; \
       btk##elt value() {return this->operator*();}; \
-      bool operator==(const btk##classname##Iterator& rhs) {return this->std::list<btk##elt##_shared>::iterator::operator==(rhs);}; \
+      bool operator==(const btk##classname##Iterator& rhs) {return static_cast<const std::list<btk##elt##_shared>::iterator&>(*this) == static_cast<const std::list<btk##elt##_shared>::iterator&>(rhs);}; \
       bool operator!=(const btk##classname##Iterator& rhs) {return !(*this == rhs);}; \
     };
 #else
