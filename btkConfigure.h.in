@@ -75,33 +75,41 @@
 
 // For dll symbols in Windows
 #cmakedefine BTK_BUILD_SHARED_LIBS
-#if (defined(_MSC_VER) && defined(BTK_BUILD_SHARED_LIBS)) 
-  // BTKCommon
-  #if defined(BTKCommon_EXPORTS)
-    #define BTK_COMMON_EXPORT __declspec( dllexport )
+#if (defined(BTK_BUILD_SHARED_LIBS))
+  #if (defined(_MSC_VER)) 
+    // BTKCommon
+    #if defined(BTKCommon_EXPORTS)
+      #define BTK_COMMON_EXPORT __declspec(dllexport)
+    #else
+      #define BTK_COMMON_EXPORT __declspec(dllimport)
+    #endif
+    // BTKIO
+    #if defined(BTKIO_EXPORTS)
+      #define BTK_IO_EXPORT __declspec(dllexport)
+    #else
+      #define BTK_IO_EXPORT __declspec(dllimport)
+    #endif
+    // BTKBasicFilters
+    #if defined(BTKBasicFilters_EXPORTS)
+      #define BTK_BASICFILTERS_EXPORT __declspec(dllexport)
+    #else
+      #define BTK_BASICFILTERS_EXPORT __declspec(dllimport)
+    #endif
+    // BTKVisSupport
+    #if defined(BTKVTK_EXPORTS)
+      #define BTK_VTK_EXPORT __declspec(dllexport)
+    #else
+      #define BTK_VTK_EXPORT __declspec(dllimport)
+    #endif
+  #elif (defined(__GNUC__) && (__GNUC__ >= 4))
+    #define BTK_COMMON_EXPORT __attribute__((visibility("default")))
+    #define BTK_IO_EXPORT __attribute__((visibility("default")))
+    #define BTK_BASICFILTERS_EXPORT __attribute__((visibility("default")))
+    #define BTK_VTK_EXPORT __attribute__((visibility("default")))
   #else
-    #define BTK_COMMON_EXPORT __declspec( dllimport )
-  #endif
-  // BTKIO
-  #if defined(BTKIO_EXPORTS)
-    #define BTK_IO_EXPORT __declspec( dllexport )
-  #else
-    #define BTK_IO_EXPORT __declspec( dllimport )
-  #endif
-  // BTKBasicFilters
-  #if defined(BTKBasicFilters_EXPORTS)
-    #define BTK_BASICFILTERS_EXPORT __declspec( dllexport )
-  #else
-    #define BTK_BASICFILTERS_EXPORT __declspec( dllimport )
-  #endif
-  // BTKVisSupport
-  #if defined(BTKVTK_EXPORTS)
-    #define BTK_VTK_EXPORT __declspec( dllexport )
-  #else
-    #define BTK_VTK_EXPORT __declspec( dllimport )
+    #error Unsupported compiler to build modules as dynamic libraries
   #endif
 #else
-  // Un*x doesn't need this
   #define BTK_COMMON_EXPORT
   #define BTK_IO_EXPORT
   #define BTK_BASICFILTERS_EXPORT
