@@ -59,9 +59,9 @@ namespace btk
     inline mmfilebuf();
     ~mmfilebuf() {this->close();};
     
-    mmfilebuf* open(const char* s, std::ios_base::openmode mode);
+    BTK_IO_EXPORT mmfilebuf* open(const char* s, std::ios_base::openmode mode);
     bool is_open() const {return !(this->m_File == BTK_MMFILEBUF_NO_FILE);};
-    mmfilebuf* close();
+    BTK_IO_EXPORT mmfilebuf* close();
     
     bool is_eob() const {return (this->m_Position == this->m_BufferSize + 1);}; // End of buffer
     bool writemode() const {return this->m_Writing;};
@@ -71,17 +71,17 @@ namespace btk
     
     std::streampos pubseekoff(std::streamoff off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) {return this->seekoff(off, way, which);};
     std::streampos pubseekpos(std::streampos pos, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) {return this->seekpos(pos, which);};
-    std::streamsize sgetn(char* s, std::streamsize n);
-    std::streamsize sputn(const char* s, std::streamsize n);
+    BTK_IO_EXPORT std::streamsize sgetn(char* s, std::streamsize n);
+    BTK_IO_EXPORT std::streamsize sputn(const char* s, std::streamsize n);
     
   protected:
-    std::streampos seekoff(std::streamoff off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
-    std::streampos seekpos(std::streampos pos, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out );
+    BTK_IO_EXPORT std::streampos seekoff(std::streamoff off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
+    BTK_IO_EXPORT std::streampos seekpos(std::streampos pos, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out );
     
-    mmfilebuf* mapfile();
-    mmfilebuf* resizemap();
+    BTK_IO_EXPORT mmfilebuf* mapfile();
+    BTK_IO_EXPORT mmfilebuf* resizemap();
     
-    static int granularity();
+    BTK_IO_EXPORT static int granularity();
     
   private:
     char* mp_Buffer;
