@@ -263,3 +263,14 @@ end
 assertEqual(isempty(strfind(lasterr, 'The metadata POINT:LABELS was not found.')), false);
 btkDeleteAcquisition(h);
 end
+
+function testAppendMetaData_issue66(d)
+h1 = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Analysis.c3d'));
+h2 = btkNewAcquisition();
+md = btkGetMetaData(h1,'POINT','USED');
+btkAppendMetaData(h2, 'POINT', 'USED', md.info);
+md = btkGetMetaData(h2,'POINT','USED');
+assertEqual(md.info.format, 'Integer');
+assertEqual(isempty(md.info.dims), true);
+assertEqual(md.info.values, 24);
+end

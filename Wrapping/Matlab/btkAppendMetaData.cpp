@@ -132,8 +132,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         mexErrMsgTxt("The given number of dimensions exceeds the maximum number (7) available for each metadata.");
       dims.resize(numDims, 1);
     }
-    else
-      mexErrMsgTxt("The structure doesn't contain the field 'numdims'.");
     
     level -= 1;
   }
