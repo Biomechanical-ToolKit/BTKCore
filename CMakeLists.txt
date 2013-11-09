@@ -280,16 +280,6 @@ SET(BTK_LIBRARIES "" CACHE INTERNAL "BTK modules compiled" FORCE)
 # Code
 ADD_SUBDIRECTORY(Code)
 
-# TDD (Test-driven development) code
-OPTION(BUILD_TESTING "Build BTK unit and regression tests." OFF)
-IF(BUILD_TESTING)
-  ENABLE_TESTING()
-  ADD_SUBDIRECTORY(Testing)
-ENDIF(BUILD_TESTING)
-
-# Utilities (boost/eigen3/...)
-ADD_SUBDIRECTORY(Utilities)
-
 # Wrapping
 ADD_SUBDIRECTORY(Wrapping)
 # PYTHON wrapping
@@ -368,6 +358,13 @@ IF(NOT BTK_WRAP_OCTAVE OR NOT BTK_WRAP_OCTAVE_REDISTRIBUTABLE_FILES)
   ENDIF(CMAKE_BUILD_SRD)
 ENDIF(NOT BTK_WRAP_OCTAVE OR NOT BTK_WRAP_OCTAVE_REDISTRIBUTABLE_FILES)
 
+# TDD (Test-driven development) code
+OPTION(BUILD_TESTING "Build BTK unit and regression tests." OFF)
+IF(BUILD_TESTING)
+  ENABLE_TESTING()
+  ADD_SUBDIRECTORY(Testing)
+ENDIF(BUILD_TESTING)
+
 # Documentation
 OPTION(BUILD_DOCUMENTATION "Build BTK Documentation." OFF)
 IF(BUILD_DOCUMENTATION)
@@ -385,6 +382,9 @@ OPTION(BUILD_EXAMPLES "Build BTK Examples." OFF)
 IF(BUILD_EXAMPLES)
   ADD_SUBDIRECTORY(Examples)
 ENDIF(BUILD_EXAMPLES)
+
+# Utilities (boost/eigen3/...)
+ADD_SUBDIRECTORY(Utilities)
 
 # ------------------------------------------------------------------------
 # INSTALLATION INSTRUCTIONS
