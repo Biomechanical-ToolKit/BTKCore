@@ -652,8 +652,8 @@ CXXTEST_SUITE(C3DFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 1000.0);
     TS_ASSERT_EQUALS(acq->GetPoint(0)->GetLabel(), "AbcdeFghijk:RASI");
     TS_ASSERT_EQUALS(acq->GetPoint(26)->GetLabel(), "AbcdeFghijk:LFIN");
-  };
 #endif
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileReaderTest)
