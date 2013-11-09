@@ -19,8 +19,7 @@ script:
   - cd build
   - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBTK_WRAP_PYTHON:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
   - make
-  - bin/TDD
-  - python bin/TDD.py
+  - ctest -VV
 
 compiler:
   - clang
