@@ -110,7 +110,11 @@ mxArray* btkMXCreateMetaDataStructure(btk::MetaData::Pointer md)
     // Format
     mxSetFieldByNumber(info, 0, 0, mxCreateString(md->GetInfo()->GetFormatAsString().c_str()));
     // Dimensions
-    mxArray* dimensions = mxCreateDoubleMatrix(1, md->GetInfo()->GetDimensions().size(), mxREAL);
+    mxArray* dimensions = 0;
+    if (md->GetInfo()->GetDimensions().empty())
+      dimensions = mxCreateDoubleMatrix(0, 0, mxREAL);
+    else
+      dimensions = mxCreateDoubleMatrix(1, md->GetInfo()->GetDimensions().size(), mxREAL);
     data = static_cast<double*>(mxGetData(dimensions));
     for (size_t i = 0 ; i < md->GetInfo()->GetDimensions().size() ; ++i)
       data[i] = md->GetInfo()->GetDimensions()[i];
