@@ -94,6 +94,19 @@ namespace btk
       MEXHandleCollector::Singleton().m_Objects.push_back(obj);
     };
     
+    static void RemoveHandle(MEXObjectHandle<T>* obj)
+    {
+      MEXHandleCollector& c = MEXHandleCollector::Singleton();
+      for(typename std::list<btk::MEXObjectHandle<T>*>::iterator it = c.m_Objects.begin() ; it != c.m_Objects.end() ; ++it)
+      {
+        if (*it == obj)
+        {
+          c.m_Objects.erase(it);
+          break;
+        }
+      }
+    };
+    
     static void ManualClear()
     {
       MEXHandleCollector& singleton = MEXHandleCollector::Singleton();
@@ -236,7 +249,7 @@ mxArray* btk_MOH_create_handle(btkSharedPtr<T> ptr)
  */
 
 template <typename T>
-btkSharedPtr<T> btk_MOH_get_object(const mxArray *mxh)
+btkSharedPtr<T> btk_MOH_get_object(const mxArray* mxh)
 {
   btk::MEXObjectHandle<T>* handle = btk::MEXObjectHandle<T>::FromMEXHandle(mxh);
   return handle->GetObject();
@@ -252,9 +265,10 @@ btkSharedPtr<T> btk_MOH_get_object(const mxArray *mxh)
  * @ingroup BTKWrappingMatlab
  */
 template <typename T>
-void btk_MOH_destroy_handle(const mxArray *mxh)
+void btk_MOH_destroy_handle(const mxArray* mxh)
 {
   btk::MEXObjectHandle<T>* handle = btk::MEXObjectHandle<T>::FromMEXHandle(mxh);
+  btk::MEXHandleCollector<T>::RemoveHandle(handle);
   delete handle;
 };
 
