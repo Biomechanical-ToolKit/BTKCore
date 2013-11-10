@@ -13,6 +13,11 @@
  * If the events represent actions realized by more than one subject, each event starts by the name of 
  * the corresponding subject. The time(s) of each event are reordered. Events are also reordered based 
  * on their first time.
+ * \n\n
+ * Events' time are computed using the following formula:
+ * <tt>t = (event_frame - first_frame) / sample_frequency</tt>\n
+ * Hence, an event set to the first frame of the acquisition, will have a (relative)
+ * time computed to 0.0 second.
  *
  * @sa btkGetEventsValues
  * @ingroup BTKMatlabEventAccessor

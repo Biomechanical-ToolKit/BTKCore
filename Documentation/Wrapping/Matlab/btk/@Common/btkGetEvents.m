@@ -10,6 +10,11 @@ function [events eventsInfo] = btkGetEvents(h) %#ok
 %  Biomechanical acquisition handle H is represented as a double
 %  and can be only used with the btk* functions.
 %
+%  Events' time are computed using the following formula:
+%   t = (event_frame - first_frame) / sample_frequency
+%  Hence, if an event is set at the first frame of the acquisition, the (relative)
+%  time is then set to 0.0 second.
+%
 %  [EVENTS EVENTSINFO] = BTKGETEVENTS(H) returns events' informations  
 %  in EVENTSINFO.  The structure EVENTSINFO has the followig fields:
 %    - EVENTSINFO.SUBJECTS

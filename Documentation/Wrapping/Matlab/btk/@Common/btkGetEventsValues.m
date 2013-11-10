@@ -1,6 +1,11 @@
 function [times, labels, descriptions, ids] = btkGetEventsValuesValues(h) %#ok
 %BTKGETEVENTSVALUES Extract events' values from a biomechanical acquisition
 % 
+%  Events' time are computed using the following formula:
+%   t = (event_frame - first_frame) / sample_frequency
+%  Hence, if an event is set at the first frame of the acquisition, the (relative)
+%  time is then set to 0.0 second.
+%
 %  TIMES = BTKGETEVENTSVALUES(H) returns a matrix (n,1) of real values containing the 
 %  time of each event. These times are not sorted.
 %
