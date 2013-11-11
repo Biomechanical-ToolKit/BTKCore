@@ -135,11 +135,11 @@ CXXTEST_SUITE(AcquisitionTest)
     test->SetFirstFrame(10, true);
     TS_ASSERT_EQUALS(test->GetFirstFrame(), 10);
     TS_ASSERT_EQUALS(test->GetEvent(0)->GetFrame(), 111);
-    TS_ASSERT_DELTA(test->GetEvent(0)->GetTime(), 1.11, 1e-11);
+    TS_ASSERT_DELTA(test->GetEvent(0)->GetTime(), 1.10, 1e-11);
     TS_ASSERT_EQUALS(test->GetEvent(1)->GetFrame(), 228);
-    TS_ASSERT_DELTA(test->GetEvent(1)->GetTime(), 2.28, 1e-11);
+    TS_ASSERT_DELTA(test->GetEvent(1)->GetTime(), 2.27, 1e-11);
     TS_ASSERT_EQUALS(test->GetEvent(2)->GetFrame(), 314);
-    TS_ASSERT_DELTA(test->GetEvent(2)->GetTime(), 3.14, 1e-11);
+    TS_ASSERT_DELTA(test->GetEvent(2)->GetTime(), 3.13, 1e-11);
   }
   
   CXXTEST_TEST(ResizeParent)

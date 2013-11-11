@@ -1078,7 +1078,7 @@ namespace btk
       for (EventIterator it = this->BeginEvent() ; it != this->EndEvent() ; ++it)
       {
         (*it)->SetFrame((*it)->GetFrame()+shift);
-        (*it)->SetTime((*it)->GetFrame()*t);
+        (*it)->SetTime(static_cast<double>((*it)->GetFrame()-1)*t);
       }
     }
   };
