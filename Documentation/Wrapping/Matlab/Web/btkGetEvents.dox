@@ -9,7 +9,7 @@
  *   - @c eventsInfo.units: Structure with one field named ALLEVENTS for the unit used by the events.
  *
  * @par Detailed description:
- * The value of each field in the output @c eventcorresponds to the time(s) where this event occurred.  
+ * The value of each field in the output @c event corresponds to the time(s) where this event occurred.  
  * If the events represent actions realized by more than one subject, each event starts by the name of 
  * the corresponding subject. The time(s) of each event are reordered. Events are also reordered based 
  * on their first time.

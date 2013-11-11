@@ -2,6 +2,9 @@ function btkCropAcquisition(h, startAt, numFrames)
 %BTKCROPACQUISITION Crop the acquisition and adapt the events' frame/time.
 % 
 %  BTKCROPACQUISITION(H, STARTAT) keeps all the frames from the frame STARTAT.
+%  The function shifts also the events' frame/time by adding the difference 
+%  between the new first frame and the old one. For this adaptation, the sample
+%  frequency must be non-null.
 %  The acquisition is represented by the handle H, obtained by the use of a 
 %  btk* function.
 %
