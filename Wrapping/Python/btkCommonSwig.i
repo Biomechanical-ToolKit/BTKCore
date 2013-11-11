@@ -539,7 +539,7 @@ public:
   void Reset();
   double GetDuration() const;
   int GetFirstFrame() const;
-  void SetFirstFrame(int );
+  void SetFirstFrame(int , bool adaptEvents = false);
   int GetLastFrame() const;
   const std::string GetPointUnit() const;
   void SetPointUnit(const std::string& units = "mm");

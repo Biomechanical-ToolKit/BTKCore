@@ -103,3 +103,16 @@ class AcquisitionTest(unittest.TestCase):
         self.assertEqual(test.GetPointNumber(), 1)
         test.RemovePoint("uname*1")
         self.assertEqual(test.GetPointNumber(), 0)
+        
+    def test_SetFirstFrame(self):
+        test = btk.btkAcquisition()
+        test.SetPointFrequency(100)
+        test.GetEvents().InsertItem(btk.btkEvent('FOO', 140))
+        test.SetFirstFrame(100)
+        self.assertEqual(test.GetFirstFrame(), 100)
+        self.assertEqual(test.GetEvent(0).GetFrame(), 140)
+        self.assertEqual(test.GetEvent(0).GetTime(), -1.0)
+        test.SetFirstFrame(200, True)
+        self.assertEqual(test.GetFirstFrame(), 200)
+        self.assertEqual(test.GetEvent(0).GetFrame(), 240)
+        self.assertEqual(test.GetEvent(0).GetTime(), 2.39)

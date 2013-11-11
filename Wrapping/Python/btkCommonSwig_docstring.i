@@ -825,14 +825,15 @@ BTK_SWIG_AUTODOC_IMPL(Acquisition, SetAnalogs, "SetAnalogs(self, btkAnalogCollec
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetEvent, "SetEvent(self, int, btkEvent)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetEventNumber, "SetEventNumber(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetEvents, "SetEvents(self, btkEventCollection)");
-BTK_SWIG_AUTODOC_IMPL(Acquisition, SetFirstFrame, "SetFirstFrame(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetFirstFrame(int), "SetFirstFrame(self, int)");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, SetFirstFrame(int, bool ), "SetFirstFrame(self, int, adaptEvents)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetMaxInterpolationGap, "SetMaxInterpolationGap(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetMetaData, "SetMetaData(self, btkMetaData)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPoint, "SetPoint(self, int, btkPoint)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPointFrequency, "SetPointFrequency(self, double)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPointNumber, "SetPointNumber(self, int)");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPoints, "SetPoints(self, btkPointCollection)");
-BTK_SWIG_AUTODOC_IMPL(Acquisition, GetPointUnit(Point::Type), "GetPointUnit(self, btk.btkPoint.Type) -> std::string const");
+BTK_SWIG_AUTODOC_IMPL(Acquisition, GetPointUnit(Point::Type), "GetPointUnit(self, btk.btkPoint.Type) -> string");
 BTK_SWIG_AUTODOC_IMPL(Acquisition, SetPointUnit(Point::Type , std::string), "SetPointUnit(self, btk.btkPoint.Type, string)");
 
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, BeginMetaData, "Returns an iterator to the beginning of the list of metadata.");
@@ -887,7 +888,7 @@ BTK_SWIG_DOCSTRING_IMPL(Acquisition, ResizeFrameNumberFromEnd, "Resize the numbe
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, Reset, "Resets the acquisition as an empty acquisition.\nTo re-populate this acquisition, you need to re-use the Init() method to set the point and analog number and their frame number.");
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetDuration, "Returns the duration of the acquisition. The duration is computed as the multiplication of the points' frequency with the points frame number.");
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetFirstFrame, "Return the first frame index of the acquisition.");
-BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetFirstFrame, "Sets the first frame index.");
+BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetFirstFrame, "Sets the first frame index. If the third argument is given and set to true, then events' frame/time will be shifted by the difference between the new first frame and the old one.");
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetLastFrame, "Returns the last frame index of the acquisition base on the first frame index and the frame number.");
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, GetPointUnit, "Returns the unit for points which have the given type.");
 BTK_SWIG_DOCSTRING_IMPL(Acquisition, SetPointUnit, "Sets the point's unit for the given point's type. The type btk.btkPoint.Reaction cannot have any unit. You cannot set it.");
