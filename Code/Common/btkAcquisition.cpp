@@ -1071,14 +1071,21 @@ namespace btk
     this->m_FirstFrame = num;
     this->Modified();
     
-    
-    if (adaptEvents && (shift != 0) && (this->m_PointFrequency != 0.0))
+    if (adaptEvents && (shift != 0))
     {
-      double t = 1.0 / this->m_PointFrequency;
-      for (EventIterator it = this->BeginEvent() ; it != this->EndEvent() ; ++it)
+      if (fabs(this->m_PointFrequency) < std::numeric_limits<double>::epsilon())
       {
-        (*it)->SetFrame((*it)->GetFrame()+shift);
-        (*it)->SetTime(static_cast<double>((*it)->GetFrame()-1)*t);
+        btkErrorMacro("Events' informations are not adated as the sample frequency is not set.");
+        return;
+      }
+      else
+      {
+        double dt = 1.0 / this->m_PointFrequency;
+        for (EventIterator it = this->BeginEvent() ; it != this->EndEvent() ; ++it)
+        {
+          (*it)->SetFrame((*it)->GetFrame()+shift);
+          (*it)->SetTime(static_cast<double>((*it)->GetFrame()-1)*dt);
+        }
       }
     }
   };
