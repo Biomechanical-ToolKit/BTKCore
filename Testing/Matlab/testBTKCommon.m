@@ -275,6 +275,48 @@ assertEqual(isempty(md.info.dims), true);
 assertEqual(md.info.values, 24);
 end
 
+function testSetFirstFrame_WithoutEventAdaptation(d)
+h = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Analysis.c3d'));
+evts = btkGetEventsValues(h);
+assertEqual(btkGetFirstFrame(h),1);
+assertEqual(evts(1),0.0);
+assertEqual(evts(2),1.0);
+assertElementsAlmostEqual(evts(3),0.583733,'absolute',1e-5);
+assertEqual(evts(4),0.0);
+assertEqual(evts(5),1.0);
+assertElementsAlmostEqual(evts(6),0.722626,'absolute',1e-5);
+btkSetFirstFrame(h,100);
+evts = btkGetEventsValues(h);
+assertEqual(btkGetFirstFrame(h),100,0);
+assertEqual(evts(1),0.0);
+assertEqual(evts(2),1.0);
+assertElementsAlmostEqual(evts(3),0.583733,'absolute',1e-5);
+assertEqual(evts(4),0.0);
+assertEqual(evts(5),1.0);
+assertElementsAlmostEqual(evts(6),0.722626,'absolute',1e-5);
+end
+
+function testSetFirstFrame_WithEventAdaptation(d)
+h = btkReadAcquisition(strcat(d.in,'/C3DSamples/others/Analysis.c3d'));
+evts = btkGetEventsValues(h);
+assertEqual(btkGetFirstFrame(h),1);
+assertEqual(evts(1),0.0);
+assertEqual(evts(2),1.0);
+assertElementsAlmostEqual(evts(3),0.583733,'absolute',1e-5);
+assertEqual(evts(4),0.0);
+assertEqual(evts(5),1.0);
+assertElementsAlmostEqual(evts(6),0.722626,'absolute',1e-5);
+btkSetFirstFrame(h,100,1);
+evts = btkGetEventsValues(h);
+assertEqual(btkGetFirstFrame(h),100);
+assertEqual(evts(1),0.99);
+assertEqual(evts(2),1.99);
+assertElementsAlmostEqual(evts(3),0.58+0.99,'absolute',1e-5);
+assertEqual(evts(4),0.99);
+assertEqual(evts(5),1.99);
+assertElementsAlmostEqual(evts(6),0.72+0.99,'absolute',1e-5);
+end
+
 function testSetAnalogValues_double(d)
 h = btkNewAcquisition(0,100,1);
 values = rand(100,1);
