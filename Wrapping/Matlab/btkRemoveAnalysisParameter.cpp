@@ -43,12 +43,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 2)
     mexErrMsgTxt("Too many output arguments.");
 
-  if (!mxIsChar(prhs[1]) && mxIsEmpty(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
-    mexErrMsgTxt("Parameter's context must be a non-empty string or an integer.");
+  if (!mxIsChar(prhs[1]) && mxIsEmpty(prhs[1]) && ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
+    mexErrMsgTxt("Parameter's context must be a non-empty string or a double value representing an integer.");
 
   if (mxIsChar(prhs[1]) && (nrhs < 3))
      mexErrMsgTxt("No enough inputs to remove parameter from its context and name.");
-  if (mxIsChar(prhs[1]) && (!mxIsChar(prhs[2]) && mxIsEmpty(prhs[2]) && (!mxIsNumeric(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))))
+  if (mxIsChar(prhs[1]) && (!mxIsChar(prhs[2]) && mxIsEmpty(prhs[2]) && ((mxGetClassID(prhs[2]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))))
     mexErrMsgTxt("Parameter's context must be a non-empty string.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);

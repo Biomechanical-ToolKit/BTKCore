@@ -49,8 +49,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 1)
     mexErrMsgTxt("Too many output arguments.");
 
-  if ((nrhs > 1)  && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
-    mexErrMsgTxt("The flag to express wrenches in global or local frame must be set determine first frame must be set by one integer.");
+  if ((nrhs > 1)  && ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
+    mexErrMsgTxt("The flag to express wrenches in global or local frame must be set by a single double value.");
     
   // Redirection of the btk::Logger::Warning stream.
   btk::MEXWarnLogToWarnMsgTxt warnRedir = btk::MEXWarnLogToWarnMsgTxt("btk:GetForcePlatformWrenches");

@@ -44,15 +44,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 
-  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
-    mexErrMsgTxt("The first frame must be set by one integer.");
+  if ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
+    mexErrMsgTxt("The first frame must be set by one double value representing an integer.");
     
   int adaptEventsOption = 0;
   if (nrhs >= 3)
   {
-    if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
-      mexErrMsgTxt("The option to adapt events' frame/time must be set by one integer.");
-    adaptEventsOption = static_cast<int>(mxGetScalar(prhs[1]));
+    if ((mxGetClassID(prhs[2]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
+      mexErrMsgTxt("The option to adapt events' frame/time must be set by one double value representing an integer.");
+    adaptEventsOption = static_cast<int>(mxGetScalar(prhs[2]));
   }
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]); 

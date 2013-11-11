@@ -47,12 +47,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   for (int i = 1 ; i < nrhs-1 ; ++i)
   {
-    if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && (!mxIsNumeric(prhs[i]) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
-      mexErrMsgTxt("Metadata's label or index must be set by a non-empty string or an integer respectively.");
+    if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && ((mxGetClassID(prhs[i]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
+      mexErrMsgTxt("Metadata's label or index must be set by a non-empty string or an integer (double value) respectively.");
   }
   
-  if (!mxIsNumeric(prhs[nrhs-1]) || mxIsComplex(prhs[nrhs-1]) || (mxGetNumberOfElements(prhs[nrhs-1]) > 7))
-    mexErrMsgTxt("Metadata's dimensions must be set by a vector of integer with a maximum of 7 elements.");
+  if ((mxGetClassID(prhs[nrhs-1]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[nrhs-1]) || (mxGetNumberOfElements(prhs[nrhs-1]) > 7))
+    mexErrMsgTxt("Metadata's dimensions must be set by a vector of integers (double value) with a maximum of 7 elements.");
   
   std::vector<uint8_t> dims;
   double* temp = mxGetPr(prhs[nrhs-1]);

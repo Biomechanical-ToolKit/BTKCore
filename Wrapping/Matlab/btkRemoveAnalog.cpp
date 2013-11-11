@@ -43,8 +43,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 2)
     mexErrMsgTxt("Too many output arguments.");
 
-  if (mxIsEmpty(prhs[1]) || (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))))
-    mexErrMsgTxt("Analog's index must be a non-empty string or an integer.");
+  if (mxIsEmpty(prhs[1]) || (!mxIsChar(prhs[1]) && ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))))
+    mexErrMsgTxt("Analog's index must be a non-empty string or a double value representing an integer.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
 

@@ -44,8 +44,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 
-  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
-    mexErrMsgTxt("The max interpolation gap must be set by one integer.");
+  if ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
+    mexErrMsgTxt("The max interpolation gap must be set by one double representing an integer.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]); 
   acq->SetMaxInterpolationGap(static_cast<int>(mxGetScalar(prhs[1])));

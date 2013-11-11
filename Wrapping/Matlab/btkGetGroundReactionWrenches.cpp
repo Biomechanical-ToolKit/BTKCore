@@ -52,8 +52,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("Too many output arguments.");
 
   if (nrhs == 2)
-    if (!mxIsNumeric(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
-      mexErrMsgTxt("Second input argument must be a real value.");
+    if ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || (mxGetNumberOfElements(prhs[1]) != 1))
+      mexErrMsgTxt("Second input argument must be a real (double) value.");
 
   // Redirection of the btk::Logger::Warning stream.
   btk::MEXWarnLogToWarnMsgTxt warnRedir = btk::MEXWarnLogToWarnMsgTxt("btk:GetGroundReactionWrenches");

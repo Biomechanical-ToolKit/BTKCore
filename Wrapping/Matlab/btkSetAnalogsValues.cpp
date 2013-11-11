@@ -44,8 +44,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 
-  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]))
-    mexErrMsgTxt("The second input must be a matrix of real values corresponding to analog channels values."); 
+  if ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]))
+    mexErrMsgTxt("The second input must be a matrix of real (double) values corresponding to the new analog channels values to assign.");
 
   // First output
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);

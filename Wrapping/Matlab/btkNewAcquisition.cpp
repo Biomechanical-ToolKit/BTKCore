@@ -48,9 +48,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   
   for (int i = 0 ; i < nrhs ; ++i)
   {
-    if (!mxIsNumeric(prhs[i]) || mxIsEmpty(prhs[i]) || mxIsComplex(prhs[i])
+    if ((mxGetClassID(prhs[i]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[i]) || mxIsComplex(prhs[i])
         || (mxGetNumberOfElements(prhs[i]) != 1))
-      mexErrMsgTxt("All input arguments must be scalar integers.");
+      mexErrMsgTxt("All input arguments must be set to double values representing integers.");
   }
   if (nrhs >= 1)
     pn = static_cast<int>(mxGetScalar(prhs[0]));

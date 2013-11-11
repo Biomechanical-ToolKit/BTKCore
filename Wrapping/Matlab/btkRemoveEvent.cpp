@@ -95,8 +95,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs < 1)
     mexErrMsgTxt("One input required.");
-  if ((nrhs == 2) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetN(prhs[1]) != 1))) 
-    mexErrMsgTxt("The index must be set by a single integer value.");
+  if ((nrhs == 2) && ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetN(prhs[1]) != 1))) 
+    mexErrMsgTxt("The index must be set by a single double value representing an integer.");
   else if ((nrhs > 2) && ((nrhs % 2) != 1))
     mexErrMsgTxt("Incorrect number of inputs.");
   if (nlhs > 2)
@@ -137,8 +137,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
           switch(j)
           {
           case 0:
-            if (!mxIsNumeric(prhs[i+1]) || mxIsEmpty(prhs[i+1]) || mxIsComplex(prhs[i+1]) || (mxGetN(prhs[i+1]) != 1))
-              mexErrMsgTxt("Time option must be followed by a single numerical value.");
+            if ((mxGetClassID(prhs[i+1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[i+1]) || mxIsComplex(prhs[i+1]) || (mxGetN(prhs[i+1]) != 1))
+              mexErrMsgTxt("Time option must be followed by a single numerical (double) value.");
             keepEventsWithTime(mxGetScalar(prhs[i+1]), events);
             break;
           case 1:

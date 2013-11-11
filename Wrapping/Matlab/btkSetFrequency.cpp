@@ -44,8 +44,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
    
-  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
-    mexErrMsgTxt("The frequency must be set by a numerical value.");
+  if ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
+    mexErrMsgTxt("The frequency must be set by a numerical (double) value.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   double freq = mxGetScalar(prhs[1]);

@@ -50,8 +50,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::Point::Pointer point = btkMXGetPoint(acq, nrhs, prhs);
   int numberOfFrames = point->GetFrameNumber();
   
-  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetM(prhs[2]) != numberOfFrames) || (mxGetN(prhs[2]) != 1))
-    mexErrMsgTxt("The third input must be a vector of real values corresponding to the data of one point."); 
+  if ((mxGetClassID(prhs[2]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetM(prhs[2]) != numberOfFrames) || (mxGetN(prhs[2]) != 1))
+    mexErrMsgTxt("The third input must be a vector of real (double) values corresponding to the data of one point."); 
 
   // double* values = mxGetPr(prhs[2]);
   // for (int i = 0 ; i < numberOfFrames ; ++i)

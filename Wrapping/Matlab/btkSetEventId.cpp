@@ -48,8 +48,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (!mxIsChar(prhs[1]) ||  mxIsEmpty(prhs[1]))
     mexErrMsgTxt("The event's label must be a non-empty string.");
    
-  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
-    mexErrMsgTxt("The id must be set by a single integer value.");
+  if ((mxGetClassID(prhs[2]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
+    mexErrMsgTxt("The id must be set by a single double value representing an integer.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::EventCollection::Pointer events = acq->GetEvents();

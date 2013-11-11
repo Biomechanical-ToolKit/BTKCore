@@ -47,12 +47,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   for (int i = 1 ; i < nrhs-1 ; ++i)
   {
-    if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && (!mxIsNumeric(prhs[i]) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
-      mexErrMsgTxt("Metadata's label or index must be set by a non-empty string or an integer respectively.");
+    if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && ((mxGetClassID(prhs[i]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
+      mexErrMsgTxt("Metadata's label or index must be set by a non-empty string or an integer (double value) respectively.");
   }
   
-  if (!mxIsNumeric(prhs[nrhs-1]) || mxIsEmpty(prhs[nrhs-1]) || mxIsComplex(prhs[nrhs-1]) || (mxGetNumberOfElements(prhs[nrhs-1]) != 1))
-    mexErrMsgTxt("Metadata's unlock state must be set by a single integer.");
+  if ((mxGetClassID(prhs[nrhs-1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[nrhs-1]) || mxIsComplex(prhs[nrhs-1]) || (mxGetNumberOfElements(prhs[nrhs-1]) != 1))
+    mexErrMsgTxt("Metadata's unlock state must be set by a double value representing an integer.");
   
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::MetaData::Iterator it;

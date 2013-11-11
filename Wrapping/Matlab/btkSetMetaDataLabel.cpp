@@ -47,8 +47,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   for (int i = 1 ; i < nrhs-1 ; ++i)
   {
-    if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && (!mxIsNumeric(prhs[i]) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
-      mexErrMsgTxt("Metadata's label or index must be set by a non-empty string or an integer respectively.");
+    if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && ((mxGetClassID(prhs[i]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
+      mexErrMsgTxt("Metadata's label or index must be set by a non-empty string or an integer (double value) respectively.");
   }
   
   if (!mxIsChar(prhs[nrhs-1]) || mxIsEmpty(prhs[nrhs-1]))

@@ -47,13 +47,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   int vn = 0, rn = 0;
 
-  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetN(prhs[2]) != 3))
-    mexErrMsgTxt("Point's values must have a second dimension equals to 3.");
+  if ((mxGetClassID(prhs[2]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetN(prhs[2]) != 3))
+    mexErrMsgTxt("Point's values must be set with an array of doubles with a second dimension equals to 3.");
   vn = static_cast<int>(mxGetM(prhs[2]));
   if (nrhs >= 4)
   {
-    if (!mxIsNumeric(prhs[3]) || mxIsEmpty(prhs[3]) || mxIsComplex(prhs[3]) || (mxGetN(prhs[3]) != 1))
-      mexErrMsgTxt("Point's residual must have a second dimension equals to 1.");
+    if ((mxGetClassID(prhs[3]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[3]) || mxIsComplex(prhs[3]) || (mxGetN(prhs[3]) != 1))
+      mexErrMsgTxt("Point's residual must be set with an array of doubles with a second dimension equals to 1.");
     rn = static_cast<int>(mxGetM(prhs[3]));
   }
   if ((rn != vn) && (rn != 0))

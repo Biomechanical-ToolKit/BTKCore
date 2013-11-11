@@ -44,10 +44,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btkMXCheckNoOuput(nlhs, plhs); // Only when there is no output for the function.
 
-  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
-    mexErrMsgTxt("Number of frames must be set by a scalar integer value.");
-  if ((nrhs >= 3) && (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1)))
-    mexErrMsgTxt("The number of analog samples per point frame must be set by a scalar integer value.");
+  if ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
+    mexErrMsgTxt("Number of frames must be set by a double value representing an integer.");
+  if ((nrhs >= 3) && ((mxGetClassID(prhs[2]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1)))
+    mexErrMsgTxt("The number of analog samples per point frame must be set by a double value representing an integer.");
     
   int n = static_cast<int>(mxGetScalar(prhs[1]));
   if (n <= 0)

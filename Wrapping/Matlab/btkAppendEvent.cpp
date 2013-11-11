@@ -67,8 +67,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     it = acq->FindEvent(evt->GetLabel());
   }
   // Time
-  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
-    mexErrMsgTxt("The time must be set by a numerical value.");
+  if ((mxGetClassID(prhs[2]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetNumberOfElements(prhs[2]) != 1))
+    mexErrMsgTxt("The time must be set by a numerical (double) value.");
   else
   {
     double t = mxGetScalar(prhs[2]);
@@ -139,8 +139,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   // ID (optional)
   if (nrhs >= 7)
   {
-    if (!mxIsNumeric(prhs[6]) || mxIsEmpty(prhs[6]) || mxIsComplex(prhs[6]) || (mxGetNumberOfElements(prhs[6]) != 1))
-      mexErrMsgTxt("The ID must be set by a single integer value.");
+    if ((mxGetClassID(prhs[6]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[6]) || mxIsComplex(prhs[6]) || (mxGetNumberOfElements(prhs[6]) != 1))
+      mexErrMsgTxt("The ID must be set by a single double representing an integer value.");
     else
       evt->SetId(static_cast<int>(mxGetScalar(prhs[6])));
   }

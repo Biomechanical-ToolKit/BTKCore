@@ -45,8 +45,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 1)
     mexErrMsgTxt("Too many output arguments.");
   
-  if (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
-    mexErrMsgTxt("The index of the event must be set by a single integer value.");
+  if ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1))
+    mexErrMsgTxt("The index of the event must be set by a single double value representing an integer.");
   
   if (!mxIsChar(prhs[2]))
     mexErrMsgTxt("Subject's name must be a empty string.");    

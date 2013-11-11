@@ -274,3 +274,19 @@ assertEqual(md.info.format, 'Integer');
 assertEqual(isempty(md.info.dims), true);
 assertEqual(md.info.values, 24);
 end
+
+function testSetAnalogValues_double(d)
+h = btkNewAcquisition(0,100,1);
+values = rand(100,1);
+btkSetAnalogsValues(h,values);
+assertElementsAlmostEqual(btkGetAnalogsValues(h), values, 'absolute', 1e-15);
+end
+
+function testSetAnalogValues_single(d)
+h = btkNewAcquisition(0,100,1);
+values = single(rand(100,1));
+try
+  btkSetAnalogsValues(h,values);
+end
+assertEqual(isempty(strfind(lasterr, 'The second input must be a matrix of real (double) values corresponding to the new analog channels values to assign.')), false);
+end

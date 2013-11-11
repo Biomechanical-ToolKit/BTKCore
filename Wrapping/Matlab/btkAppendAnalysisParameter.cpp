@@ -52,8 +52,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     mexErrMsgTxt("Parameter's context must be a non-empty string.");
   if (!mxIsChar(prhs[3]) || mxIsEmpty(prhs[3]))
     mexErrMsgTxt("Parameter's unit must be a non-empty string.");
-  if ((!mxIsNumeric(prhs[4]) || mxIsEmpty(prhs[4])) || (mxGetNumberOfElements(prhs[4]) > 1))
-    mexErrMsgTxt("Parameter's value must be single numerical value.");
+  if (((mxGetClassID(prhs[4]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[4])) || (mxGetNumberOfElements(prhs[4]) > 1))
+    mexErrMsgTxt("Parameter's value must be single numerical (double) value.");
 
   char* name = 0;
   char* context = 0;

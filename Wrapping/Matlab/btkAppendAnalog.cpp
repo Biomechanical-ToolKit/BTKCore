@@ -50,8 +50,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   if (!mxIsChar(prhs[1]) || mxIsEmpty(prhs[1]))
     mexErrMsgTxt("Analog's label must be a non-empty string.");
-  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetN(prhs[2]) != 1))
-    mexErrMsgTxt("Analog's values must have a second dimension equals to 1.");
+  if ((mxGetClassID(prhs[2]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]) || (mxGetN(prhs[2]) != 1))
+    mexErrMsgTxt("Analog's values must correspond to numerical (double) values with a second dimension equals to 1.");
   vn = static_cast<int>(mxGetM(prhs[2]));
   if (nrhs >= 4)
   { 

@@ -47,14 +47,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   for (int i = 1 ; i < nrhs-2 ; ++i)
   {
-    if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && (!mxIsNumeric(prhs[i]) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
+    if (mxIsEmpty(prhs[i]) || (!mxIsChar(prhs[i]) && ((mxGetClassID(prhs[i]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[i]) || (mxGetNumberOfElements(prhs[i]) != 1))))
       mexErrMsgTxt("Metadata's label or index must be set by a non-empty string or an integer respectively.");
   }
-  if (!mxIsNumeric(prhs[nrhs-2]) || mxIsComplex(prhs[nrhs-2]) || (mxGetNumberOfElements(prhs[nrhs-2]) != 1))
+  if ((mxGetClassID(prhs[nrhs-2]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[nrhs-2]) || (mxGetNumberOfElements(prhs[nrhs-2]) != 1))
     mexErrMsgTxt("The index for the metadata's value must be set by a single integer");
   if ((mxIsCell(prhs[nrhs-1]) && (mxGetNumberOfElements(prhs[nrhs-1]) != 1)) 
        || (mxIsChar(prhs[nrhs-1]) && (mxGetM(prhs[nrhs-1]) != 1))
-       || (mxIsNumeric(prhs[nrhs-1]) && (mxIsComplex(prhs[nrhs-1]) || (mxGetNumberOfElements(prhs[nrhs-1]) != 1))))
+       || ((mxGetClassID(prhs[nrhs-1]) != mxDOUBLE_CLASS) && (mxIsComplex(prhs[nrhs-1]) || (mxGetNumberOfElements(prhs[nrhs-1]) != 1))))
     mexErrMsgTxt("Unsupported metadata's value or the number of elements is greater than 1.");
   
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);

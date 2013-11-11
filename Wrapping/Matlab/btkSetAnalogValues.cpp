@@ -46,8 +46,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (nlhs > 2)
     mexErrMsgTxt("Too many output arguments.");
 
-  if (!mxIsNumeric(prhs[2]) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]))
-    mexErrMsgTxt("The third input must be a vector of real values corresponding to the data of one analog channel."); 
+  if ((mxGetClassID(prhs[2]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[2]) || mxIsComplex(prhs[2]))
+    mexErrMsgTxt("The third input must be a vector of real (double) values corresponding to the data of one analog channel."); 
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);

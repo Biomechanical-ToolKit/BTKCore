@@ -41,8 +41,8 @@
 
 btk::Point::Pointer btkMXGetPoint(btk::Acquisition::Pointer acq, int nrhs, const mxArray* prhs[])
 {
-  if (!mxIsChar(prhs[1]) && (!mxIsNumeric(prhs[1]) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
-    mexErrMsgTxt("Point's index must be a non-empty string or an integer.");
+  if (!mxIsChar(prhs[1]) && ((mxGetClassID(prhs[1]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[1]) || mxIsComplex(prhs[1]) || (mxGetNumberOfElements(prhs[1]) != 1)))
+    mexErrMsgTxt("Point's index must be a non-empty string or a double value representing an integer.");
   
   btk::Point::Pointer point;
   if (mxIsChar(prhs[1]))

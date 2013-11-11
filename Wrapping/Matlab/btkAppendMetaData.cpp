@@ -94,8 +94,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // Check for the field 'Values'
     if ((mxValues = mxGetField(prhs[nrhs-1], 0, "values")) != NULL)
     {
-      if (!mxIsCell(mxValues) && (!mxIsNumeric(mxValues) || mxIsComplex(mxValues)))
-        mexErrMsgTxt("The field 'format' must be set by cell of strings or an array of numerical values.");
+      if (!mxIsCell(mxValues) && ((mxGetClassID(mxValues) != mxDOUBLE_CLASS) || mxIsComplex(mxValues)))
+        mexErrMsgTxt("The field 'format' must be set by cell of strings or an array of numerical (double) values.");
       numberOfValues = mxGetNumberOfElements(mxValues);
       if ((f != btk::MetaDataInfo::Char) && (numberOfValues > 65535))
         mexErrMsgTxt("Number of values exceeds the maximum number (65535) available for each metadata.");
@@ -123,8 +123,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // Check for the field 'numdims'
     if ((temp = mxGetField(prhs[nrhs-1], 0, "numdims")) != NULL)
     {
-      if (!mxIsNumeric(temp) || mxIsEmpty(temp) || mxIsComplex(temp) || (mxGetNumberOfElements(temp) != 1))
-        mexErrMsgTxt("The field 'numdims' must be set by a single integer value.");
+      if ((mxGetClassID(temp) != mxDOUBLE_CLASS) || mxIsEmpty(temp) || mxIsComplex(temp) || (mxGetNumberOfElements(temp) != 1))
+        mexErrMsgTxt("The field 'numdims' must be set by a single double representing an integer value.");
       size_t numDims = static_cast<size_t>(mxGetScalar(temp));
       if (numDims < dims.size())
         mexErrMsgTxt("The given number of dimensions is lower than the number of dimensions for the given values.");
