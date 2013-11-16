@@ -362,6 +362,8 @@ namespace btk
     this->m_Outputs.resize(num);
     for (int inc = 0 ; inc < num ; ++inc)
     {
+      if (this->m_Outputs[inc].get() != 0)
+        continue;
       this->m_Outputs[inc] = this->MakeOutput(inc);
       this->m_Outputs[inc]->mp_Source = this;
     }
