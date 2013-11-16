@@ -352,13 +352,15 @@ namespace btk
    */
   void ProcessObject::SetOutputNumber(int num)
   {
-    if (num == static_cast<int>(this->m_Outputs.size()))
+    if (num == this->GetOutputNumber())
       return;
     if (num < 0)
     {
       btkWarningMacro("Attempt to set the number of outputs to the negative value" + ToString(num) + ". The number of outputs is set to 0.");
       num = 0;
     }
+    for (int inc = num ; inc < this->GetOutputNumber() ; ++inc)
+      this->m_Outputs[inc]->mp_Source = 0;
     this->m_Outputs.resize(num);
     for (int inc = 0 ; inc < num ; ++inc)
     {
