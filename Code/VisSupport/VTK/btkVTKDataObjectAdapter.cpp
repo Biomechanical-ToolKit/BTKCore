@@ -69,7 +69,7 @@ namespace btk
    */
   unsigned long int VTKDataObjectAdapter::GetMTime()
   {
-    if (this->mp_Data.get() != 0)
+    if (this->mp_Data != DataObject::Null)
     {
       if (this->m_LastKnownTimestamp != this->mp_Data->GetTimestamp())
       {

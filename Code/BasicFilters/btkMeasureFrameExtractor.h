@@ -202,7 +202,7 @@ namespace btk
   {
     ItemPointer output = this->GetOutput();
     CollectionPointer input = this->GetInput();
-    if (input.get() == 0 || input->IsEmpty())
+    if (!input || input->IsEmpty())
     {
       btkErrorMacro("Invalid input. The output does not contains any values");
       return;

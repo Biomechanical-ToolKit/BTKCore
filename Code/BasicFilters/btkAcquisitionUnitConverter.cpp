@@ -226,7 +226,7 @@ namespace btk
     output->Reset();
     
     Acquisition::Pointer input = this->GetInput();
-    if (input.get() == 0)
+    if (!input)
       return;
     
     output->SetPointUnit(Point::Marker, this->m_Units[Point::Marker]);

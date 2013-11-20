@@ -201,7 +201,7 @@ namespace btk
       return;
     this->mp_MetaData->SetParent(static_cast<DataObject*>(0));
     this->mp_MetaData = metaData;
-    if (this->mp_MetaData.get() != 0)
+    if (this->mp_MetaData != MetaData::Null)
       this->mp_MetaData->SetParent(this);
     this->Modified();
   };

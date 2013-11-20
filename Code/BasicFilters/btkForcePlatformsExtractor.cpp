@@ -346,7 +346,7 @@ namespace btk
   void ForcePlatformsExtractor::ExtractForcePlatformDataCommon(ForcePlatform::Pointer fp, size_t idx, int coefficientsAlreadyExtracted, MetaData::Pointer pOrigin, MetaData::Pointer pCorners, MetaData::Pointer pCalMatrix)
   {
     MetaDataInfo::Pointer pValue;
-    if (pOrigin.get() != 0)
+    if (pOrigin != MetaData::Null)
     {
       pValue = pOrigin->GetInfo();
       if (pValue->GetValues().size() >= 3 * (idx + 1))
@@ -356,7 +356,7 @@ namespace btk
                       pValue->ToDouble(3 * static_cast<int>(idx) + 2));
       }
     }
-    if (pCorners.get() != 0)
+    if (pCorners != MetaData::Null)
     {
       pValue = pCorners->GetInfo();
       if (pValue->GetValues().size() >= 12 * (idx + 1))
@@ -366,7 +366,7 @@ namespace btk
             fp->SetCorner(j, i, pValue->ToDouble(j + i * 3 + static_cast<int>(idx) * 12));
       }
     }
-    if (pCalMatrix.get() != 0)
+    if (pCalMatrix != MetaData::Null)
     {
       pValue = pCalMatrix->GetInfo();
       ForcePlatform::CalMatrix cal = fp->GetCalMatrix();

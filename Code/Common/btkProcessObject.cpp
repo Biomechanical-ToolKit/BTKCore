@@ -142,7 +142,7 @@ namespace btk
     int count = 0;
     for (std::vector<DataObject::Pointer>::const_iterator it = this->m_Inputs.begin() ; it != this->m_Inputs.end() ; ++it)
     {
-      if (it->get() != 0)
+      if (*it != DataObject::Null)
         count++;
     }
     return count;
@@ -165,7 +165,7 @@ namespace btk
     
     for (size_t inc = 0 ; inc < this->m_Inputs.size() ; ++inc)
     {
-      if (this->m_Inputs[inc].get() != 0)
+      if (this->m_Inputs[inc] != DataObject::Null)
       {
         this->m_Inputs[inc]->Update();
         if (this->m_Inputs[inc]->m_Timestamp >= this->m_Timestamp)
@@ -179,7 +179,7 @@ namespace btk
       this->Object::Modified();
       for (size_t inc = 0 ; inc < this->m_Outputs.size() ; ++inc)
       {
-        if ((this->m_Outputs[inc].get() != 0) && (this->m_Outputs[inc]->GetTimestamp() > ts))
+        if ((this->m_Outputs[inc] != DataObject::Null) && (this->m_Outputs[inc]->GetTimestamp() > ts))
           this->m_Outputs[inc]->m_Timestamp = this->m_Timestamp;
       }
       this->m_Modified = false;
@@ -339,7 +339,7 @@ namespace btk
       oldOutput = this->m_Outputs[idx];
       oldOutput->mp_Source = 0;
     }
-    if (output.get() == 0)
+    if (!output)
       output = this->MakeOutput(idx);
     output->mp_Source = this;
     this->m_Outputs[idx] = output;

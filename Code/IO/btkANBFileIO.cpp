@@ -292,7 +292,7 @@ namespace btk
    */
   void ANBFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
-    if (input.get() == 0)
+    if (!input)
     {
       btkErrorMacro("Impossible to write a null input into a file.");
       return;
@@ -357,7 +357,7 @@ namespace btk
       if (itAnalog != output->EndMetaData())
       {
         MetaDataInfo::Pointer analogIndex = (*itAnalog)->ExtractChildInfo("INDEX", MetaDataInfo::Integer, 1);
-        if (analogIndex.get() != 0)
+        if (analogIndex != MetaDataInfo::Null)
           channelIndex = analogIndex->ToInt16();
         if (channelIndex.size() != input->GetAnalogNumber())
           btkErrorMaro("Size of the metadata ANALOG:INDEX doesn't correspond to the number of analog channels. Regeneration of the index of the analog channels.");

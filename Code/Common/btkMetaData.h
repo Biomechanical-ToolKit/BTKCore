@@ -122,7 +122,7 @@ namespace btk
     MetaDataInfo::Pointer GetInfo() {return this->m_Info;};
     MetaDataInfo::ConstPointer GetInfo() const {return this->m_Info;};
     void SetInfo(MetaDataInfo::Pointer val) {this->m_Info = val;};
-    bool HasInfo() const {return (this->m_Info.get() != 0);};
+    bool HasInfo() const {return (this->m_Info != MetaDataInfo::Null);};
     BTK_COMMON_EXPORT MetaDataInfo::Pointer ExtractChildInfo(const std::string& l, MetaDataInfo::Format f, int numDims, bool noPossibleEmptyValue = true);
     bool HasMetaDataAsParent() const {return this->m_MetaDataParentAssigned;};
     void SetParent(DataObject* parent = 0) {this->m_MetaDataParentAssigned = false; this->DataObject::SetParent(parent);};

@@ -137,7 +137,7 @@ namespace btk
   {
     WrenchCollection::Pointer output = this->GetOutput();
     ForcePlatformCollection::Pointer input = this->GetInput();
-    if (input.get() != 0)
+    if (input != ForcePlatformCollection::Null)
     {
       int inc = 0;
       for (ForcePlatformCollection::ConstIterator it = input->Begin() ; it != input->End() ; ++it)

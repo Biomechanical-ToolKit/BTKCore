@@ -270,7 +270,7 @@ namespace btk
    */
   void ANCFileIO::Write(const std::string& filename, Acquisition::Pointer input)
   {
-    if (input.get() == 0)
+    if (!input)
     {
       btkErrorMacro("Impossible to write a null input into a file.");
       return;

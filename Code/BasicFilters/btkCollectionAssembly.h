@@ -160,7 +160,7 @@ namespace btk
     for (int idx = 0 ; idx < this->GetInputNumber() ; ++idx)
     {
       CollectionPointer input = this->GetInput(idx);
-      if (input.get() == 0 || input->IsEmpty())
+      if (!input || input->IsEmpty())
         continue;
       for (typename Collection<T>::ConstIterator it = input->Begin() ; it != input->End() ; ++it)
         output->InsertItem(*it);

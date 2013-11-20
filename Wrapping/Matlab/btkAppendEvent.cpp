@@ -107,7 +107,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       btk::MetaData::ConstIterator names = (*subjects)->FindChild("NAMES");
       if (names != (*subjects)->End())
       {
-        if ((*names)->GetInfo().get() != 0)
+        if ((*names)->GetInfo() != btk::MetaDataInfo::Null)
         {
           if ((*names)->GetInfo()->GetDimensionsProduct(1) != 0)
           {

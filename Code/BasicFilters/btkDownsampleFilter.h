@@ -257,7 +257,7 @@ namespace btk
     WrenchCollection::Iterator itOut = output->Begin();
     while (itIn != input->End())
     {
-      if (!itOut->get())
+      if (*itOut == Wrench::Null)
         *itOut = Wrench::New((*itIn)->GetPosition()->GetLabel());
       DownsampleData<Wrench>(ratio, *itIn, *itOut);
       ++itIn;

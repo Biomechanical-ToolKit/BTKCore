@@ -245,7 +245,7 @@ namespace btk
     target.clear();
     int collapsedNumber = 0, inc = 2;
     std::string label = baselabel;
-    if (parent.get() != 0)
+    if (parent != MetaData::Null)
     {
       while (1)
       {
@@ -294,7 +294,7 @@ namespace btk
   template <typename T>
   void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const T& val)
   {
-    if (parent.get() != 0)
+    if (parent != MetaData::Null)
     {
       MetaData::Iterator it = parent->FindChild(label);
       if (it != parent->End())
@@ -325,7 +325,7 @@ namespace btk
   template <typename T>
   void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val)
   {
-    if (parent.get() != 0)
+    if (parent != MetaData::Null)
     {
       MetaDataCreateChild_p(parent, label, val, 1);
     }
@@ -346,7 +346,7 @@ namespace btk
   template <typename T>
   void MetaDataCreateChild(MetaData::Pointer parent, const std::string& label, const std::vector<T>& val, int numCol)
   {
-    if (parent.get() != 0)
+    if (parent != MetaData::Null)
     {
       MetaDataCreateChild_p(parent, label, val, numCol, 1);
     }

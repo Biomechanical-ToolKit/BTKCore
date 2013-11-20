@@ -238,7 +238,7 @@ namespace btk
     int idx = 0;
     for (ConstIterator it = this->Begin() ; it != this->End() ; ++it)
     {
-      if (it->get() == elt.get())
+      if (*it == elt)
         return idx;
       ++idx;
     }
@@ -278,7 +278,7 @@ namespace btk
   template <class T>
   bool Collection<T>::InsertItem(Iterator loc, ItemPointer elt)
   {
-    if (elt.get() == 0)
+    if (!elt)
     {
       btkErrorMacro("Impossible to insert an empty entry");
       return false;
@@ -320,7 +320,7 @@ namespace btk
   template <class T>
   bool Collection<T>::SetItem(int idx, ItemPointer elt)
   {
-    if (elt.get() == 0)
+    if (!elt)
     {
       btkErrorMacro("Impossible to set an empty entry");
       return false;

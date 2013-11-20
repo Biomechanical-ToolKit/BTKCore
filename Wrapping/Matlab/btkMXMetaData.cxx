@@ -77,7 +77,7 @@ void btkMXCreateMetaDataStructure(int nlhs, mxArray *plhs[], int nrhs, const mxA
       md = *it;
   }
   
-  if (!md.get())
+  if (!md)
   {
     std::string err = "Unknown metadata's label: ";
     for (int i = 1 ; i < nrhs ; ++i)

@@ -173,7 +173,7 @@ namespace btk
    */
   Point::Residuals& Point::GetResiduals()
   {
-    assert(this->mp_Data.get() != 0);
+    assert(this->mp_Data != Point::Data::Null);
     return this->mp_Data->GetResiduals();
   }
  
@@ -183,7 +183,7 @@ namespace btk
    */
   const Point::Residuals& Point::GetResiduals() const
   {
-    assert(this->mp_Data.get() != 0);
+    assert(this->mp_Data != Point::Data::Null);
     return this->mp_Data->GetResiduals();
   };
 

@@ -203,9 +203,9 @@ namespace btk
         }
         (*it)->SetType(Point::Angle);
       }
-      if (RFPA.get())
+      if (RFPA != Point::Null)
         output->AppendPoint(RFPA);
-      if (LFPA.get())
+      if (LFPA != Point::Null)
         output->AppendPoint(LFPA);
       
     }

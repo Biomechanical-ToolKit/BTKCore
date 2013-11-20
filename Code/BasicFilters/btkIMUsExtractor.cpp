@@ -139,7 +139,7 @@ namespace btk
     for (int i = 0 ; i < this->GetInputNumber() ; ++i)
     {
       Acquisition::Pointer input = this->GetInput(i);
-      if (input.get() != 0)
+      if (input != Acquisition::Null)
       {
         MetaData::Iterator itIMU = input->GetMetaData()->FindChild("IMU");
         if (itIMU != input->GetMetaData()->End())
@@ -290,7 +290,7 @@ namespace btk
     for (int i = 0 ; i < numberOfChannelsToExtract ; ++i)
     {
       Analog::Pointer channel = imu->GetChannel(i);
-      if (channel.get() != 0)
+      if (channel != Analog::Null)
       {
         channel->SetValues(data.col(numChannelsExtracted));
         ++numChannelsExtracted;

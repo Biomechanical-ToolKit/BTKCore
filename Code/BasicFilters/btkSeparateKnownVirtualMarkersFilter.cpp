@@ -368,7 +368,7 @@ namespace btk
     output[4]->Clear();
     
     PointCollection::Pointer input = this->GetInput();
-    if (input.get() != 0)
+    if (input != PointCollection::Null)
     {
       PointCollection::Pointer virtuals = PointCollection::New();
       // Separate points which are not markers

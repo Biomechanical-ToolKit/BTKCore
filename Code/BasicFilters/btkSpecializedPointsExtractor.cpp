@@ -129,7 +129,7 @@ namespace btk
     PointCollection::Pointer output = this->GetOutput();
     output->Clear();
     Acquisition::Pointer input = this->GetInput();
-    if (input.get() != 0)
+    if (input != Acquisition::Null)
     {
       PointCollection::Pointer allPoints = input->GetPoints();
       for(PointCollection::Iterator itPoint = allPoints->Begin() ; itPoint != allPoints->End() ; ++itPoint)

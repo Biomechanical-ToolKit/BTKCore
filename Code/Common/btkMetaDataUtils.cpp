@@ -48,7 +48,7 @@ namespace btk
   MetaData::Pointer MetaDataCreateChild(MetaData::Pointer parent, const std::string& label)
   {
     MetaData::Pointer entry = MetaData::New(label);
-    if (parent.get() != 0)
+    if (parent != MetaData::Null)
     {
       MetaData::Iterator it = parent->FindChild(label);
       if (it != parent->End())

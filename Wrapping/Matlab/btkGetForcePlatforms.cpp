@@ -67,7 +67,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   for (int i = 0 ; i < numberOfForcePlates ; ++i)
   {
     btk::ForcePlatform::Pointer fp = *itPlatform;
-    if (fp.get() != 0)
+    if (fp != btk::ForcePlatform::Null)
     {
       // channels field
       mxSetFieldByNumber(plhs[0], i, 0, btkMXCreateMeasuresStructure<btk::Analog>(fp->GetChannels(), &(channelFieldnames[i])));
@@ -114,7 +114,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     for (int i = 0 ; i < numberOfForcePlates ; ++i)
     {
       btk::ForcePlatform::Pointer fp = *itPlatform;
-      if (fp.get() != 0)
+      if (fp != btk::ForcePlatform::Null)
       {
         // frequency field
         mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);

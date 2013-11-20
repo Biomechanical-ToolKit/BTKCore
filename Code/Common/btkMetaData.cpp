@@ -338,7 +338,7 @@ namespace btk
    */
   bool MetaData::InsertChild(Iterator loc, MetaData::Pointer entry)
   {
-    if (entry.get() == 0)
+    if (!entry)
     {
       btkErrorMacro("Impossible to insert an empty entry");
       return false;
@@ -375,7 +375,7 @@ namespace btk
    */
   void MetaData::SetChild(int idx, MetaData::Pointer entry)
   {
-    if (entry.get() == 0)
+    if (!entry)
     {
       btkErrorMacro("Impossible to set an empty entry");
       return;
@@ -546,7 +546,7 @@ namespace btk
   {
     Pointer pt(new MetaData(this->GetLabel(), this->GetDescription(), this->GetUnlockState()));
     MetaDataInfo::ConstPointer temp = this->GetInfo();
-    if (temp.get() != 0)
+    if (temp != MetaDataInfo::Null)
       pt->SetInfo(temp->Clone());
     for (ConstIterator it = this->Begin() ; it != this->End() ; ++it)
       pt->AppendChild((*it)->Clone());

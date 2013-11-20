@@ -166,14 +166,14 @@ namespace btk
    template <class Derived>
    typename Measure<Derived>::Values& Measure<Derived>::GetValues()
    {
-     assert(this->mp_Data.get() != 0);
+     assert(this->mp_Data != Data::Null);
      return this->mp_Data->GetValues();
    }
  
    template <class Derived>
    const typename Measure<Derived>::Values& Measure<Derived>::GetValues() const
    {
-     assert(this->mp_Data.get() != 0);
+     assert(this->mp_Data != Measure<Derived>::Data::Null);
      return this->mp_Data->GetValues();
    };
   
