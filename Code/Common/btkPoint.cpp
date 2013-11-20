@@ -43,10 +43,10 @@ namespace btk
    *
    * The coordinates of the point are generally measured by an acquisition system. For each frame, the
    * 3D value has a residual. It can provide informations on the quality of these 3D data 
-   * (residual associated with the reconstruction of the marker). 
+   * (residual associated with the reconstruction of the marker). These values are stored in a Point::Data object.
    * 
-   *  This class is also used to represent angles, forces, moments, powers and scalars. 
-   *  To know/set the type of the point, you can use the methods GetType() and SetType(). 
+   * This class is also used to represent angles, forces, moments, powers and scalars. 
+   * To know/set the type of the point, you can use the methods GetType() and SetType(). 
    * 
    * Note: In some case the values at specific frames are invalid (mainly due to marker's occlusion).
    * To detect if the frame is invalid, you can check the residual which will be 
@@ -107,12 +107,29 @@ namespace btk
    */
    
   /**
+   * @typedef Point::NullPointer
+   * Special null pointer associated with a Point object.
+   * This type should be used only internally to test the nullity of a smart pointer.
+   * See the static method Null() instead.
+   */
+  
+  /**
+   * @fn static NullPointer Point::Null()
+   * Static function to return a null pointer.
+   * @note This static method should be used only to test if a shared ponter is null or not. 
+   * It is advised to call the method without parenthesis as special (in)equality 
+   * operator are implemented to use a function pointer. See the description of the class NullPtr 
+   * for an example.
+   */
+  
+  /**
    * @fn static Pointer Point::New(const std::string& label = "", Type t = Marker, const std::string& desc = "")
    * @brief Creates a smart pointer associated with a Point object.
    *
    * The Point created has no values.
-   * @warning The call of this function must be followed by the use of the method Point::SetFrameNumber
-   * as it creates a null matrix for the values.
+   *
+   * The call of this function must be followed by the use of the method Point::SetFrameNumber
+   * as no btk::Point::Data object is allocated.
    */ 
 
   /**
@@ -120,7 +137,9 @@ namespace btk
    * @brief Creates a smart pointer associated with a Point object.
    *
    * The point created has an empty label and a number of frames  equals to @a framenumber.
-   * @warning The number of frames must be greater than 0.
+   *
+   * The number of frames must be equal or greater than 0.
+   * In case the number of frame is set to 0, no btk::Point::Data object is allocated. You will need to use the method Measure::SetFrameNumber if you want to assign point data later.
    */
 
   /**
@@ -128,7 +147,9 @@ namespace btk
    * @brief Creates a smart pointer associated with a Point object.
    *
    * The point created has a label and a number of frames equals to @a label and @a framenumber respectively.
-   * @warning The number of frames must be greater than 0.
+   *
+   * The number of frames must be equal or greater than 0.
+   * In case the number of frame is set to 0, no btk::Point::Data object is allocated. You will need to use the method Measure::SetFrameNumber if you want to assign point data later.
    */
 
   /**
@@ -198,11 +219,8 @@ namespace btk
    * Returns a deep copy of this object.
    */
 
-
   /**
    * Constructor.
-   * @warning The use of this constructor must be followed by the use of the method Measure::SetFrameNumber
-   * as it creates a null matrix for the values.
    */
   Point::Point(const std::string& label, Type t, const std::string& desc)
   : Measure<Point>(label, desc)
@@ -212,7 +230,6 @@ namespace btk
   
   /**
    * Constructor.
-   * @warning The number of frames must be greater than 0.
    */
   Point::Point(const std::string& label, int frameNumber, Type t, const std::string& desc)
   : Measure<Point>(label, frameNumber, desc)
@@ -258,9 +275,19 @@ namespace btk
    */
    
   /**
-   * @fn static Pointer MeasureTraits<Point>::Data::Null()
-   * Convenient method to create an empy smart pointer.
-   * This method is only for the sake of the traits and should not be used in other context.
+   * @typedef MeasureTraits<Point>::Data::NullPointer
+   * Special null pointer associated with a Point::Data object.
+   * This type should be used only internally to test the nullity of a smart pointer.
+   * See the static method Null() instead.
+   */
+  
+  /**
+   * @fn static NullPointer MeasureTraits<Point>::Data::Null()
+   * Static function to return a null pointer.
+   * @note This static method should be used only to test if a shared ponter is null or not. 
+   * It is advised to call the method without parenthesis as special (in)equality 
+   * operator are implemented to use a function pointer. See the description of the class NullPtr 
+   * for an example.
    */
   
   /**

@@ -48,6 +48,7 @@ namespace btk
   public:
     typedef btkSharedPtr<MetaData> Pointer;
     typedef btkSharedPtr<const MetaData> ConstPointer;
+    typedef btkNullPtr<MetaData> NullPointer;
     
     typedef std::list<MetaData::Pointer>::iterator Iterator;
     typedef std::list<MetaData::Pointer>::const_iterator ConstIterator;
@@ -111,6 +112,8 @@ namespace btk
                        const std::string& desc = "",
                        bool isUnlocked = true)
     {return Pointer(new MetaData(label, dim, val, desc, isUnlocked));};
+    
+    static NullPointer Null() {return NullPointer();}; 
     
     // ~MetaData(); // Implicit.
     void SetLabel(const std::string& label);

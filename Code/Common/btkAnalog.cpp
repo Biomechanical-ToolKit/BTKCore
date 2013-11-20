@@ -42,12 +42,14 @@ namespace btk
    * @brief Analog channel data along the time.
    *
    * An analog channel is defined as:
-   *  - a matrix of double;
+   *  - a set of data samples;
    *  - a unit;
    *  - a scale;
    *  - an offset;
    *  - a gain.
    *
+   * The data samples are is stored in a Analog::Data object.
+   * 
    * The use of the unit, scale, offset and gain are useful for other classes/methods. For example, when you save an acquisition in a file, analog's data are generally unscaled and written as integer, then the scale and offset are important.
    *
    * @ingroup BTKCommon
@@ -114,12 +116,29 @@ namespace btk
    */
 
   /**
+   * @typedef Analog::NullPointer
+   * Special null pointer associated with a Analog object.
+   * This type should be used only internally to test the nullity of a smart pointer.
+   * See the static method Null() instead.
+   */
+  
+  /**
+   * @fn static NullPointer Analog::Null()
+   * Static function to return a null pointer.
+   * @note This static method should be used only to test if a shared ponter is null or not. 
+   * It is advised to call the method without parenthesis as special (in)equality 
+   * operator are implemented to use a function pointer. See the description of the class NullPtr 
+   * for an example.
+   */
+
+  /**
    * @fn static Pointer Analog::New(const std::string& label, const std::string& desc = "")
    * @brief Creates a smart pointer associated with a Analog object.
    *
    * The measure created has no values.
-   * @warning The call of this function must be followed by the use of the method Measure::SetFrameNumber
-   * as it creates a null matrix for the values.
+   *
+   * The call of this function must be followed by the use of the method Measure::SetFrameNumber
+   * as no btk::Analog::Data object is allocated.
    */
 
   /**
@@ -127,7 +146,9 @@ namespace btk
    * @brief Creates a smart pointer associated with a Analog object.
    *
    * The analog channel created has an empty label and a number of frames  equals to @a framenumber.
-   * @warning The number of frames must be greater than 0.
+   *
+   * The number of frames must be equal or greater than 0.
+   * In case the number of frame is set to 0, no btk::Analog::Data object is allocated. You will need to use the method Measure::SetFrameNumber if you want to assign analog data later.
    */
 
   /**
@@ -135,7 +156,9 @@ namespace btk
    * @brief Creates a smart pointer associated with a Analog object.
    *
    * The analog channel created has a label and a number of frames  equals to @a label and @a framenumber respectively.
-   * @warning The number of frames must be greater than 0.
+   *
+   * The number of frames must be equal or greater than 0.
+   * In case the number of frame is set to 0, no btk::Analog::Data object is allocated. You will need to use the method Measure::SetFrameNumber if you want to assign analog data later.
    */
 
   /**
@@ -219,8 +242,6 @@ namespace btk
 
   /**
    * Constructor.
-   * @warning The use of this constructor must be followed by the use of the method Measure::SetFrameNumber
-   * as it creates a null matrix for the values.
    */
   Analog::Analog(const std::string& label, const std::string& desc)
   : Measure<Analog>(label, desc), m_Unit("V")
@@ -231,8 +252,7 @@ namespace btk
   };
   
   /**
-   * Constructor.
-   * @warning The number of frames must be greater than 0.
+   * Constructor. 
    */
   Analog::Analog(const std::string& label, int frameNumber, Gain g)
   : Measure<Analog>(label, frameNumber), m_Unit("V")
@@ -256,7 +276,7 @@ namespace btk
   /**
    * @fn void Analog::SetDataSlice(int idx, double val)
    * Convenient method to set easily the value @a val for the given frame index @a idx.
-   * @warning This function is not safe. There is no cheching to determine if there is data or if the frame is out of range or not. It has the advantage to be faster.
+   * @warning This function is not safe. There is no checking to determine if there is data or if the frame is out of range or not. It has the advantage to be faster.
    */
   
   // ----------------------------------------------------------------------- //
@@ -277,9 +297,19 @@ namespace btk
    */
    
   /**
-   * @fn static Pointer MeasureTraits<Analog>::Data::Null()
-   * Convenient method to create an empy smart pointer.
-   * This method is only for the sake of the traits and should not be used in other context.
+   * @typedef MeasureTraits<Analog>::Data::NullPointer
+   * Special null pointer associated with a Analog::Data object.
+   * This type should be used only internally to test the nullity of a smart pointer.
+   * See the static method Null() instead.
+   */
+  
+  /**
+   * @fn static NullPointer MeasureTraits<Analog>::Data::Null()
+   * Static function to return a null pointer.
+   * @note This static method should be used only to test if a shared ponter is null or not. 
+   * It is advised to call the method without parenthesis as special (in)equality 
+   * operator are implemented to use a function pointer. See the description of the class NullPtr 
+   * for an example.
    */
   
   /**

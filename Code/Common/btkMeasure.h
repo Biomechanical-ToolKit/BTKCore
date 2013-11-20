@@ -205,7 +205,7 @@ namespace btk
     if (frameNumber == this->GetFrameNumber())
       return;
     else if (frameNumber == 0) // Remove the data
-      this->SetData(Measure<Derived>::Data::Null());
+      this->SetData(typename Measure<Derived>::Data::Pointer());
     else if (!this->mp_Data)
       this->SetData(Measure<Derived>::Data::New(frameNumber));
     else 

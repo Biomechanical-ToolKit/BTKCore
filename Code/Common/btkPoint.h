@@ -59,9 +59,11 @@ namespace btk
       
       typedef btkSharedPtr<Data> Pointer;
       typedef btkSharedPtr<const Data> ConstPointer;
+      typedef btkNullPtr<Data> NullPointer;
       
-      static Pointer Null() {return Pointer();};
       static Pointer New(int frameNumber) {return Pointer(new Data(frameNumber));};
+      
+      static NullPointer Null() {return NullPointer();}; 
       
       void Resize(int frameNumber);
       
@@ -89,10 +91,13 @@ namespace btk
     
     typedef btkSharedPtr<Point> Pointer;
     typedef btkSharedPtr<const Point> ConstPointer;
+    typedef btkNullPtr<Point> NullPointer;
     
     static Pointer New(const std::string& label = "", Type t = Marker, const std::string& desc = "") {return Pointer(new Point(label, t, desc));};
     static Pointer New(int frameNumber) {return Pointer(new Point("", frameNumber, Marker, ""));};
     static Pointer New(const std::string& label, int frameNumber, Type t = Marker, const std::string& desc = "") {return Pointer(new Point(label, frameNumber, t, desc));};
+    
+    static NullPointer Null() {return NullPointer();}; 
     
     virtual ~Point() {};
     

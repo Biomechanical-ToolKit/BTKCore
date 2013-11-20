@@ -53,9 +53,12 @@ namespace btk
 
     typedef btkSharedPtr<ForcePlatform> Pointer;
     typedef btkSharedPtr<const ForcePlatform> ConstPointer;
+    typedef btkNullPtr<ForcePlatform> NullPointer;
 
     typedef AnalogCollection::Iterator Iterator;
     typedef AnalogCollection::ConstIterator ConstIterator;
+
+    static NullPointer Null() {return NullPointer();}; 
 
     virtual ~ForcePlatform() {};
     

@@ -50,9 +50,12 @@ namespace btk
   public:
     typedef btkSharedPtr<IMU> Pointer;
     typedef btkSharedPtr<const IMU> ConstPointer;
+    typedef btkNullPtr<IMU> NullPointer;
     
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> CalMatrix;
     typedef Eigen::Matrix<double,3,3> Rotation;
+
+    static NullPointer Null() {return NullPointer();}; 
 
     virtual ~IMU() {};
 

@@ -87,6 +87,22 @@ namespace btk
    */
   
   /**
+   * @typedef MetaDataInfo::NullPointer
+   * Special null pointer associated with a MetaDataInfo object.
+   * This type should be used only internally to test the nullity of a smart pointer.
+   * See the static method Null() instead.
+   */
+  
+  /**
+   * @fn static NullPointer MetaDataInfo::Null()
+   * Static function to return a special null pointer type.
+   * @note This static method should be used only to test if a shared ponter is null or not. 
+   * It is advised to call the method without parenthesis as special (in)equality 
+   * operator are implemented to use a function pointer. See the description of the class NullPtr 
+   * for an example.
+   */
+  
+  /**
    * @fn MetaDataInfo::Pointer MetaDataInfo::New(int8_t val)
 
    * Creates a smart pointer from the MetaDataInfo(int8_t) constructor.

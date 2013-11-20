@@ -37,6 +37,7 @@
 #define __btkDataObject_h
 
 #include "btkObject.h"
+#include "btkNullPtr.h"
 
 #include <list>
 #include <string>
@@ -50,6 +51,9 @@ namespace btk
   public:
     typedef btkSharedPtr<DataObject> Pointer;
     typedef btkSharedPtr<const DataObject> ConstPointer;
+    typedef btkNullPtr<DataObject> NullPointer;
+    
+    static NullPointer Null() {return NullPointer();}; 
     
     bool HasParent() const {return this->mp_Parent != 0;};
     DataObject* GetParent() const {return this->mp_Parent;};

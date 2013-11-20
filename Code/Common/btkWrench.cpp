@@ -61,6 +61,22 @@ namespace btk
    */
    
   /**
+   * @typedef Wrench::NullPointer
+   * Special null pointer associated with a Wrench object.
+   * This type should be used only internally to test the nullity of a smart pointer.
+   * See the static method Null() instead.
+   */
+  
+  /**
+   * @fn static NullPointer Wrench::Null()
+   * Static function to return a null pointer.
+   * @note This static method should be used only to test if a shared ponter is null or not. 
+   * It is advised to call the method without parenthesis as special (in)equality 
+   * operator are implemented to use a function pointer. See the description of the class NullPtr 
+   * for an example.
+   */
+  
+  /**
    * @fn static Pointer Wrench::New(const std::string& label = "")
    * @brief Creates a smart pointer associated with a Wrench object.
    *

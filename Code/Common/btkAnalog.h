@@ -56,9 +56,11 @@ namespace btk
     public:
       typedef btkSharedPtr<Data> Pointer;
       typedef btkSharedPtr<const Data> ConstPointer;
+      typedef btkNullPtr<Data> NullPointer;
       
-      static Pointer Null() {return Pointer();};
       static Pointer New(int frameNumber) {return Pointer(new Data(frameNumber));};
+      
+      static NullPointer Null() {return NullPointer();}; 
       
       void Resize(int frameNumber);
       
@@ -83,10 +85,13 @@ namespace btk
 
     typedef btkSharedPtr<Analog> Pointer;
     typedef btkSharedPtr<const Analog> ConstPointer;
+    typedef btkNullPtr<Analog> NullPointer;
     
     static Pointer New(const std::string& label = "", const std::string& desc = "") {return Pointer(new Analog(label, desc));};
     static Pointer New(int frameNumber) {return Pointer(new Analog("", frameNumber));};
     static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Analog(label, frameNumber));};
+
+    static NullPointer Null() {return NullPointer();}; 
     
     virtual ~Analog() {};
     

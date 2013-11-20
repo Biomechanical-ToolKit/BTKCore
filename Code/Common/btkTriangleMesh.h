@@ -49,6 +49,7 @@ namespace btk
   public:    
     typedef btkSharedPtr<TriangleMesh> Pointer;
     typedef btkSharedPtr<const TriangleMesh> ConstPointer;
+    typedef btkNullPtr<TriangleMesh> NullPointer;
     
     class VertexLink
     {
@@ -124,6 +125,8 @@ namespace btk
     
     static Pointer New(const std::vector<int>& m, const std::vector<VertexLink>& l) {return Pointer(new TriangleMesh(m,l));};
     static Pointer New(const std::vector<int>& m, const std::vector<VertexLink>& l, const std::vector<VertexFace>& f) {return Pointer(new TriangleMesh(m,l,f));};
+    
+    static NullPointer Null() {return NullPointer();}; 
     
     // ~TriangleMesh(); // Implicit.
     

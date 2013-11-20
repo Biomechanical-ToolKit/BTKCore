@@ -46,10 +46,13 @@ namespace btk
   public:    
     typedef btkSharedPtr<Wrench> Pointer;
     typedef btkSharedPtr<const Wrench> ConstPointer;
+    typedef btkNullPtr<Wrench> NullPointer;
     
     static Pointer New(const std::string& label = "") {return Pointer(new Wrench(label));};
     static Pointer New(int frameNumber) {return Pointer(new Wrench("", frameNumber));};
     static Pointer New(const std::string& label, int frameNumber) {return Pointer(new Wrench(label, frameNumber));};
+    
+    static NullPointer Null() {return NullPointer();}; 
     
     // ~Wrench(); // Implicit.
     Point::Pointer GetPosition() const {return this->m_Position;};

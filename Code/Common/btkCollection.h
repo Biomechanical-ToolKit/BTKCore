@@ -50,6 +50,7 @@ namespace btk
   public:
     typedef typename btkSharedPtr<Collection> Pointer;
     typedef typename btkSharedPtr<const Collection> ConstPointer;
+    typedef typename btkNullPtr<Collection> NullPointer;
     
     typedef typename T::Pointer ItemPointer;
     typedef typename T::ConstPointer ItemConstPointer;    
@@ -58,6 +59,8 @@ namespace btk
     typedef typename std::list<ItemPointer>::const_iterator ConstIterator;
     
     static Pointer New() {return Pointer(new Collection());};
+    
+    static NullPointer Null() {return NullPointer();}; 
     
     virtual ~Collection() {};
     
@@ -116,6 +119,22 @@ namespace btk
   /**
    * @typedef Collection<T>::ConstPointer
    * Smart pointer associated with a const Collection object.
+   */
+  
+  /**
+   * @typedef Collection<T>::NullPointer
+   * Special null pointer associated with a Collection object.
+   * This type should be used only internally to test the nullity of a smart pointer.
+   * See the static method Null() instead.
+   */
+  
+  /**
+   * @fn static NullPointer Collection<T>::Null()
+   * Static function to return a null pointer.
+   * @note This static method should be used only to test if a shared ponter is null or not. 
+   * It is advised to call the method without parenthesis as special (in)equality 
+   * operator are implemented to use a function pointer. See the description of the class NullPtr 
+   * for an example.
    */
   
   /**

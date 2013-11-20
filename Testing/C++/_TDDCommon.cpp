@@ -4,6 +4,7 @@
 #include "AnalogTest.h"
 #include "ForcePlatformTypesTest.h"
 #include "IMUTypesTest.h"
+#include "NullPtrTest.h"
 #include "PointTest.h"
 #include "PointCollectionTest.h"
 #include "MetaDataInfoTest.h"

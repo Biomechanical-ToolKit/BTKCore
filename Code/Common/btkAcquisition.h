@@ -53,6 +53,7 @@ namespace btk
 
     typedef btkSharedPtr<Acquisition> Pointer;
     typedef btkSharedPtr<const Acquisition> ConstPointer;
+    typedef btkNullPtr<Acquisition> NullPointer;
     
     typedef EventCollection::Iterator EventIterator;
     typedef EventCollection::ConstIterator EventConstIterator;
@@ -64,6 +65,8 @@ namespace btk
     typedef std::list<MetaData::Pointer>::const_iterator MetaDataConstIterator;
     
     static Pointer New() {return Pointer(new Acquisition());};
+    
+    static NullPointer Null() {return NullPointer();}; 
     
     // ~Acquisition(); // Implicit.
     

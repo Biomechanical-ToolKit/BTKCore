@@ -52,11 +52,15 @@ namespace btk
     
     typedef btkSharedPtr<Event> Pointer;
     typedef btkSharedPtr<const Event> ConstPointer;
+    typedef btkNullPtr<Event> NullPointer;
     
     static Pointer New() {return Pointer(new Event("", -1.0, -1, "", Unknown, "", "", 0));};
     static Pointer New(const std::string& label, double t, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, t, -1, context, detectionFlags, subject, desc, id));};
     static Pointer New(const std::string& label, int f, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, -1.0, f, context, detectionFlags, subject, desc, id));};
     static Pointer New(const std::string& label, double t, int f, const std::string& context = "", int detectionFlags = Unknown, const std::string& subject = "", const std::string& desc = "", int id = 0) {return Pointer(new Event(label, t, f, context, detectionFlags, subject, desc, id));};
+    
+    static NullPointer Null() {return NullPointer();}; 
+    
     // ~Event(); // Implicit.
     const std::string& GetContext() const {return this->m_Context;};
     BTK_COMMON_EXPORT void SetContext(const std::string& context);

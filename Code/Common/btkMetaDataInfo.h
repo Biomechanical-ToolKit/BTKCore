@@ -37,6 +37,7 @@
 #define __btkMetaDataInfo_h
 
 #include "btkSharedPtr.h"
+#include "btkNullPtr.h"
 
 #include <string>
 #include <vector>
@@ -55,6 +56,8 @@ namespace btk
     typedef enum {Char=-1, Byte=1, Integer=2, Real=4} Format;
     typedef btkSharedPtr<MetaDataInfo> Pointer;
     typedef btkSharedPtr<const MetaDataInfo> ConstPointer;
+    
+    typedef btkNullPtr<MetaDataInfo> NullPointer;
 
     static Pointer New(int8_t val) {return Pointer(new MetaDataInfo(std::vector<uint8_t>(0), std::vector<int8_t>(1, val)));};
     static Pointer New(int16_t val) {return Pointer(new MetaDataInfo(std::vector<uint8_t>(0), std::vector<int16_t>(1, val)));};
@@ -68,6 +71,8 @@ namespace btk
     static Pointer New(const std::vector<uint8_t>& dim, const std::vector<int16_t>& val) {return Pointer(new MetaDataInfo(dim, val));};
     static Pointer New(const std::vector<uint8_t>& dim, const std::vector<float>& val) {return Pointer(new MetaDataInfo(dim, val));};
     static Pointer New(const std::vector<uint8_t>& dim, const std::vector<std::string>& val) {return Pointer(new MetaDataInfo(dim, val));};
+    
+    static NullPointer Null() {return NullPointer();}; 
 
     BTK_COMMON_EXPORT ~MetaDataInfo();
     
