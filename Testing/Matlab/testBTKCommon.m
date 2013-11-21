@@ -273,6 +273,8 @@ md = btkGetMetaData(h2,'POINT','USED');
 assertEqual(md.info.format, 'Integer');
 assertEqual(isempty(md.info.dims), true);
 assertEqual(md.info.values, 24);
+btkDeleteAcquisition(h1);
+btkDeleteAcquisition(h2);
 end
 
 function testSetFirstFrame_WithoutEventAdaptation(d)
@@ -294,6 +296,7 @@ assertElementsAlmostEqual(evts(3),0.583733,'absolute',1e-5);
 assertEqual(evts(4),0.0);
 assertEqual(evts(5),1.0);
 assertElementsAlmostEqual(evts(6),0.722626,'absolute',1e-5);
+btkDeleteAcquisition(h);
 end
 
 function testSetFirstFrame_WithEventAdaptation(d)
@@ -315,6 +318,7 @@ assertElementsAlmostEqual(evts(3),0.58+0.99,'absolute',1e-5);
 assertEqual(evts(4),0.99);
 assertEqual(evts(5),1.99);
 assertElementsAlmostEqual(evts(6),0.72+0.99,'absolute',1e-5);
+btkDeleteAcquisition(h);
 end
 
 function testSetAnalogValues_double(d)
@@ -322,6 +326,7 @@ h = btkNewAcquisition(0,100,1);
 values = rand(100,1);
 btkSetAnalogsValues(h,values);
 assertElementsAlmostEqual(btkGetAnalogsValues(h), values, 'absolute', 1e-15);
+btkDeleteAcquisition(h);
 end
 
 function testSetAnalogValues_single(d)
@@ -331,4 +336,5 @@ try
   btkSetAnalogsValues(h,values);
 end
 assertEqual(isempty(strfind(lasterr, 'The second input must be a matrix of real (double) values corresponding to the new analog channels values to assign.')), false);
+btkDeleteAcquisition(h);
 end
