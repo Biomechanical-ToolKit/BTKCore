@@ -1,13 +1,13 @@
 /**
  @page GettingStarted Getting started
- 
+
  <div class="btkmenu">\ref index "Overview"
  | \ref BuildInstructions "Building instructions"
  | \b Getting \b started
  | \ref MoreTutorials "More Tutorials"
  | \ref License
  </div>
- 
+
  The following list gives you the steps to use BTK in a Python environment.
 
   - @ref TutorialIntroPython
@@ -20,35 +20,35 @@
 
   @section TutorialIntroPython Why a python implementation?
 
-  Python is a high-level language, free to use, running on diﬀerent environments 
-  (Windows, Linux, MacOS X). It favours the object-oriented programming, which 
-  do not prevent to implement functional programming. The syntax is clear, doing 
-  python easy to learn and faster to develop. 
-  The popularity of Python increases in the scientific community. Indeed, lot of 
-  libraries can respond to any scientifical expectations (signal processing (Scipy) , 
-  3D modelisation (pyVtk) , optimization (pyOpt), etc). Moreover, advanced interactive- 
-  development environment, like spyder (see figure below), appears allowing to 
+  Python is a high-level language, free to use, running on diﬀerent environments
+  (Windows, Linux, MacOS X). It favours the object-oriented programming, which
+  do not prevent to implement functional programming. The syntax is clear, doing
+  python easy to learn and faster to develop.
+  The popularity of Python increases in the scientific community. Indeed, lot of
+  libraries can respond to any scientifical expectations (signal processing (Scipy) ,
+  3D modelisation (pyVtk) , optimization (pyOpt), etc). Moreover, advanced interactive-
+  development environment, like spyder (see figure below), appears allowing to
   easily switch from Matlab.
 
   @image html scipy-spyder.jpg "Screenshot of the software Spyder: Scientific PYthon Development EnviRonment"
 
-  For further informations about Python versus matlab comparison, you can read this <a href="http://sites.google.com/site/pythonforscientists/python-vs-matlab">article</a>.  
+  For further informations about Python versus matlab comparison, you can read this <a href="http://sites.google.com/site/pythonforscientists/python-vs-matlab">article</a>.
 
   @section TutorialGettingStarted Getting started
 
   @subsection TutorialPythonAddPackage Add the package btk in Python
 
-  If you put the two files (btk.py and btk.pyd (Windows), btk.so (Linux/MacOS X)) in the working directory, you 
+  If you put the two files (btk.py and btk.pyd (Windows), btk.so (Linux/MacOS X)) in the working directory, you
   only have to add the following code: <tt>import btk</tt> in you script header.\n
   Otherwise, if the package is located in another folder then you need to add the path in the known path by Python.
   @code{.py}
-    import sys 
-    sys.path.append("path of btk python package") 
-    import btk 
+    import sys
+    sys.path.append("path of btk python package")
+    import btk
   @endcode
-  Note: if you use Spyder, you can add interactively this path by using the menu <tt>Tools > PYTHONPATH manager</tt>. 
+  Note: if you use Spyder, you can add interactively this path by using the menu <tt>Tools > PYTHONPATH manager</tt>.
 
-  The command <tt>import btk</tt> creates the namespace @c btk which have to be specified as a prefix if 
+  The command <tt>import btk</tt> creates the namespace @c btk which have to be specified as a prefix if
   you create a new BTK object. As an example, a new reader acquisition object will be built with:
   @code{.py}
     reader = btk.btkAcquisitionFileReader()
@@ -56,245 +56,245 @@
 
   @section TutorialAcquisitionExplained Enjoy with a c3d acquisition file
 
-  The primary advantage of BTK is to oﬀer lots of methods for handling a motion 
-  capture file, especially the C3D extension. This binary file embeds four containers: 
+  The primary advantage of BTK is to oﬀer lots of methods for handling a motion
+  capture file, especially the C3D extension. This binary file embeds four containers:
   - 3D POINT represents all vectors, like marker coordinates or any biomechanical paremeters (euler/cardan angles, joint forces and moments, etc);
   - ANALOG (1D signal) inherents to sensors plugged into the analog to digital converter (muscular sensors, accelerometers, etc);
   - EVENT represents a specific frame of the movement;
   - METADATA is a generic container containing all relevant informations about the subject, the system configuration, etc.
 
-  @subsection TutorialPythonReadAcquisition Read an aquisition 
-  Reading an acquisition is simple. 
+  @subsection TutorialPythonReadAcquisition Read an aquisition
+  Reading an acquisition is simple.
   @code{.py}
-    reader = btk.btkAcquisitionFileReader() # build a btk reader object 
-    reader.SetFilename("dynamic.c3d") # set a filename to the reader 
-    reader.Update() 
-    acq = reader.getOutput() # acq is the btk aquisition object 
+    reader = btk.btkAcquisitionFileReader() # build a btk reader object
+    reader.SetFilename("dynamic.c3d") # set a filename to the reader
+    reader.Update()
+    acq = reader.GetOutput() # acq is the btk aquisition object
   @endcode
-  The output is the BTK-aquisition objet @c acq on which you can use diﬀerent accessors for exploring and setting data. 
+  The output is the BTK-aquisition objet @c acq on which you can use diﬀerent accessors for exploring and setting data.
 
-  @subsection TutorialPythonExploreAcquisition Explore an acquisition 
+  @subsection TutorialPythonExploreAcquisition Explore an acquisition
 
-  @subsubsection TutorialPythonPoint Point object 
-  First of all, BTK prevents to extract point frame number and point-aquisition frequency from the metadata. Special accessors are proposed: 
+  @subsubsection TutorialPythonPoint Point object
+  First of all, BTK prevents to extract point frame number and point-aquisition frequency from the metadata. Special accessors are proposed:
   @code{.py}
-    acq.btkGetPointFrequency() # give the point frequency 
-    acq.btkGetPointFrameNumber() # give the number of frames 
+    acq.GetPointFrequency() # give the point frequency
+    acq.GetPointFrameNumber() # give the number of frames
   @endcode
-  Now, let’s imagine that your acquisition only contains the points named into the acquisition: 
+  Now, let’s imagine that your acquisition only contains the points named into the acquisition:
   - @a LASI: the cartesian coordinates of a marker placed on the Left Antero-Superior Iliac spine ;
   - @a LKneeAngles : the knee joint coordinate angles.
-  
-  You can extract them from the aquisition object @c acq with these methods: 
+
+  You can extract them from the aquisition object @c acq with these methods:
   @code{.py}
-    point1 = acq.GetPoint("LASI") 
-    point2 = acq.GetPoint("LKneeAngles") 
-    #if you rather prefer handle index instead of point name, you can use 
-    point1 = acq.GetPoint(0) 
-    point2 = acq.GetPoint(1) 
+    point1 = acq.GetPoint("LASI")
+    point2 = acq.GetPoint("LKneeAngles")
+    #if you rather prefer handle index instead of point name, you can use
+    point1 = acq.GetPoint(0)
+    point2 = acq.GetPoint(1)
   @endcode
   Then @a point1 is the BTK-object characterizing the LASI marker. To access to its 3d-values:
   @code{.py}
-    values = point1.GetValues() # return a Numpy array of nrows, and 3 columns 
-    # for slicing the previous Numpy Array, you can use 
-    point1.GetValues()[0,0] # return the value of the first row, first column. 
-    point1.GetValues()[:,0] # extract the first column 
-    point1.GetValue(0,0) # another method for extracting the first row, first col 
+    values = point1.GetValues() # return a Numpy array of nrows, and 3 columns
+    # for slicing the previous Numpy Array, you can use
+    point1.GetValues()[0,0] # return the value of the first row, first column.
+    point1.GetValues()[:,0] # extract the first column
+    point1.GetValue(0,0) # another method for extracting the first row, first col
   @endcode
-  Except that the index begins at 0, accessing to element of a numpy array is 
-  similar to the matlab syntax. For help about Numpy slicing and equivalent 
-  matlab functions, you can read the following user guide <a href="http://www.scipy.org/NumPy_for_Matlab_Users">Numpy for Matlab 
+  Except that the index begins at 0, accessing to element of a numpy array is
+  similar to the matlab syntax. For help about Numpy slicing and equivalent
+  matlab functions, you can read the following user guide <a href="http://www.scipy.org/NumPy_for_Matlab_Users">Numpy for Matlab
   Users</a>.
 
   @subsubsection TutorialPythonAnalog Analog object
-  Extracting analog object is similar to point extraction. Generally, analog measures are acquired at high-speed frequency. This parameter can be accessed with the method @c btkAcquisiton::GetAnalogFrequency() as the number 
-  of frame with the accessors @c btkAcquisition::GetAnalogFrameNumber(). 
-  Imagine that the c3d contains the muscular activities labeled: Emg1, Emg2, 
+  Extracting analog object is similar to point extraction. Generally, analog measures are acquired at high-speed frequency. This parameter can be accessed with the method @c btkAcquisiton::GetAnalogFrequency() as the number
+  of frame with the accessors @c btkAcquisition::GetAnalogFrameNumber().
+  Imagine that the c3d contains the muscular activities labeled: Emg1, Emg2,
   Emg3,... The following code will explain how to extract their values:
   @code{.py}
-  analog1 = acq.GetAnalog("Emg1") # attribute a btk-analog object to the measurement 
-  values = analog1.GetValues() # return a 1D Numpy array 
+  analog1 = acq.GetAnalog("Emg1") # attribute a btk-analog object to the measurement
+  values = analog1.GetValues() # return a 1D Numpy array
   @endcode
 
-  @subsubsection TutorialPythonEvent Event 
-  An event extracts from the aquisition with the method @c btkAcquisition::GetEvent(). This 
-  creates the BTK-object event of which main features are: 
-  - Label: the name of the event 
-  - Context: indicates if the event is general or attributed to the left (right) body side 
+  @subsubsection TutorialPythonEvent Event
+  An event extracts from the aquisition with the method @c btkAcquisition::GetEvent(). This
+  creates the BTK-object event of which main features are:
+  - Label: the name of the event
+  - Context: indicates if the event is general or attributed to the left (right) body side
   - Frame: the the frame where the event occurs
 
-  Accessing to these informations is easy with the method @c btkEvent::GetLabel, @c btkEvent::GetContext, @c btkEvent::GetFrame. 
+  Accessing to these informations is easy with the method @c btkEvent::GetLabel, @c btkEvent::GetContext, @c btkEvent::GetFrame.
   As an example:
   @code{.py}
-    event = acq.GetEvent(0) # extract the first event of the aquisition 
-    event.GetLabel() # return a string representing the Label 
-    event.GetContext() # return a string representing the Context  
-    event.GetFrame() # return the frame as an integer 
+    event = acq.GetEvent(0) # extract the first event of the aquisition
+    event.GetLabel() # return a string representing the Label
+    event.GetContext() # return a string representing the Context
+    event.GetFrame() # return the frame as an integer
   @endcode
 
   @subsubsection TutorialPythonMetadata Metadata
-  To access the metadata, you have to use the method @c btkAcquisition::GetMetaData() on the 
-  BTK-acquisition object @c acq. A metadata represents a tree structure as in the figure below. 
+  To access the metadata, you have to use the method @c btkAcquisition::GetMetaData() on the
+  BTK-acquisition object @c acq. A metadata represents a tree structure as in the figure below.
 
   @image html mokka-metadata.png "Dialog window from the software Mokka showing the metadata of an acquisition.
 
   To extract the content of the metada @c POINT:MOVIE_DELAY, you can do it as following
   @code{.py}
-  metadata = acq.GetMetaData() 
-  delay = metadata.FindChild("POINT").value().FindChild("MOVIE_DELAY").value().GetInfo().toDouble() 
-  # return a Tuple of double. 
+  metadata = acq.GetMetaData()
+  delay = metadata.FindChild("POINT").value().FindChild("MOVIE_DELAY").value().GetInfo().toDouble()
+  # return a Tuple of double.
   @endcode
 
-  @subsection TutorialPythonModyAcquisition Modify an acquisition 
-  Writing data into an acquisition is as easy as reading data. The package proposed dedicated methods to do it directly on an aquisition object. 
+  @subsection TutorialPythonModyAcquisition Modify an acquisition
+  Writing data into an acquisition is as easy as reading data. The package proposed dedicated methods to do it directly on an aquisition object.
 
-  @subsubsection TutorialPythonModifyPoint Modify and append a point 
-  The following code firsly explains how to modify one point value. Secondly, a new point will be appended into the acquisition. 
-  In this case, developpers can use diﬀerent signatures to build a new @c btkpoint object. 
+  @subsubsection TutorialPythonModifyPoint Modify and append a point
+  The following code firsly explains how to modify one point value. Secondly, a new point will be appended into the acquisition.
+  In this case, developpers can use diﬀerent signatures to build a new @c btkpoint object.
   In this example two signatures are illustrated. Others are detailed in the Doxygen help (see documentation of the class btkPoint).
   @code{.py}
-     point1 = acq.GetPoint("LASI") 
-     # 1) Modifying an element (first raw and first column) 
-     point1.SetValue(0,0,1000.0) # the new coordinate is to 1000 
-     # 2) Appending a new point 
-     newValue = numpy.ones(acq.GetPointFrameNumber(),3) # identity numpy array with 3 colum and PointFrameNumber rows. 
-     # minimal signature = indicate the number of point frame 
-     newpoint = btk.btkPoint(acq.GetPointFrameNumber()) # create an empty new point object 
-     newpoint.SetLabel(’newPoint’) # set newPoint as label 
-     newpoint.SetValues(newValue) # set the value 
-     acq.AppendPoint(newpoint) # append the new point into the acquisition object 
-     # other possible siganture 
-     # => the new point is automatically built with the label "newPointShort" 
-     newpoint_short = btk.btkPoint(’newPointShort’, acq.GetPointFrameNumber()) 
+     point1 = acq.GetPoint("LASI")
+     # 1) Modifying an element (first raw and first column)
+     point1.SetValue(0,0,1000.0) # the new coordinate is to 1000
+     # 2) Appending a new point
+     newValue = numpy.ones(acq.GetPointFrameNumber(),3) # identity numpy array with 3 colum and PointFrameNumber rows.
+     # minimal signature = indicate the number of point frame
+     newpoint = btk.btkPoint(acq.GetPointFrameNumber()) # create an empty new point object
+     newpoint.SetLabel(’newPoint’) # set newPoint as label
+     newpoint.SetValues(newValue) # set the value
+     acq.AppendPoint(newpoint) # append the new point into the acquisition object
+     # other possible siganture
+     # => the new point is automatically built with the label "newPointShort"
+     newpoint_short = btk.btkPoint(’newPointShort’, acq.GetPointFrameNumber())
      newpoint_short.SetValues(value)
   @endcode
 
-  @subsubsection TutorialPythonModifyAnalog Modify and append and analog channel 
+  @subsubsection TutorialPythonModifyAnalog Modify and append and analog channel
   The syntax is equivalent to the above point section.
   @code{.py}
-     # 1) modifying an element 
-     analog1 = acq.GetAnalog("Emg1") # extract the analog channel Emg1 
-     analog1.SetValue(0,1000.0) # modifiy the first value 
-     # 2) appending a new analog signal 
-     newValueAnalog = np.ones( (acq.GetAnalogFrameNumber(),1)) # identity numpy array with 1 column and AnalogFrameNumber rows. 
-     newAnalog=btk.btkAnalog(acq.GetAnalogFrameNumber()) # create an empty new analog channel 
-     newAnalog.SetValues(newValueAnalog) # set its values 
-     newAnalog.SetLabel("NewAnalog") # set its label 
+     # 1) modifying an element
+     analog1 = acq.GetAnalog("Emg1") # extract the analog channel Emg1
+     analog1.SetValue(0,1000.0) # modifiy the first value
+     # 2) appending a new analog signal
+     newValueAnalog = np.ones( (acq.GetAnalogFrameNumber(),1)) # identity numpy array with 1 column and AnalogFrameNumber rows.
+     newAnalog=btk.btkAnalog(acq.GetAnalogFrameNumber()) # create an empty new analog channel
+     newAnalog.SetValues(newValueAnalog) # set its values
+     newAnalog.SetLabel("NewAnalog") # set its label
      acq.AppendAnalog(newAnalog) # append the new analog object to the aquisition
   @endcode
 
-  @subsubsection TutorialPythonModifyEvent Modify and append an event 
+  @subsubsection TutorialPythonModifyEvent Modify and append an event
   If you want to change features of the first event, you can use
   @code{.py}
-  event=acq.GetEvent(0) # extract the first event of the aquisition 
-  event.SetLabel("Foot off") # replace the label 
-  event.SetContext("general") 
+  event=acq.GetEvent(0) # extract the first event of the aquisition
+  event.SetLabel("Foot off") # replace the label
+  event.SetContext("general")
   event.SetFrame(25)
   @endcode
   Appending a new event to the aquisition is possible with following script:
   @code{.py}
-  newEvent=btk.btkEvent() # build an empty event object 
-  newEvent.SetLabel("Foot Off") # set the label 
-  newEvent.SetContext("Left") # 
-  newEvent.SetFrame(390) 
-  acq.AppendEvent(newEvent) # append the new event to the aquisition object 
+  newEvent=btk.btkEvent() # build an empty event object
+  newEvent.SetLabel("Foot Off") # set the label
+  newEvent.SetContext("Left") #
+  newEvent.SetFrame(390)
+  acq.AppendEvent(newEvent) # append the new event to the aquisition object
   @endcode
 
-  @subsubsection TutorialPythonModifyMetadata Modify metadata 
+  @subsubsection TutorialPythonModifyMetadata Modify metadata
   To modify the value of the metadata MOVIE_DELAY:
   @code{.py}
-   metadata = acq.GetMetaData() 
-   # access a sp´ecific element 
+   metadata = acq.GetMetaData()
+   # access a sp´ecific element
    MOVIE_DELAY = metadata.FindChild(’POINT’).value().FindChild(’MOVIE_DELAY’).value().GetInfo()
    MOVIE_DELAY.SetValue(0,2) #setting the first element with the value 2
   @endcode
 
-  @subsection TutorialPythonRecord Recording a c3d with the modification 
-  All modifications are definitely recorded into a C3D file ONLY IF the following 
-  lines end your script. This code consists in building a @c btkAcquisitionFileWriter 
+  @subsection TutorialPythonRecord Recording a c3d with the modification
+  All modifications are definitely recorded into a C3D file ONLY IF the following
+  lines end your script. This code consists in building a @c btkAcquisitionFileWriter
   object and linking it to the modified acquisition. The method @c btkAcquisitionFileWriter::SetFilename allows you
-  either to overwrite the existing file or to create a new one. 
+  either to overwrite the existing file or to create a new one.
   @code{.py}
-    writer = btk.btkAcquisitionFileWriter() 
-    writer.SetInput(acq) 
-    writer.SetFilename(’newFile.c3d’) 
-    writer.Update() 
+    writer = btk.btkAcquisitionFileWriter()
+    writer.SetInput(acq)
+    writer.SetFilename(’newFile.c3d’)
+    writer.Update()
   @endcode
 
   @section TutorialProcessingData Process data
 
-  With Python language, one interest of BTK is to take advantage of scipy modules 
+  With Python language, one interest of BTK is to take advantage of scipy modules
   to implement biomechanical processes.
 
   @subsection TutorialPythonFilterData Filter data
 
-  An unavoidable process is to filter the data. 
-  To this end, the module @c scipy.signal presents a large panel of filtering methods, with a syntax close to Matlab. For 
+  An unavoidable process is to filter the data.
+  To this end, the module @c scipy.signal presents a large panel of filtering methods, with a syntax close to Matlab. For
   example, this code show how to filter an analog data with a Butterworth filter.
 
   @code{.py}
-  # modules to import 
-  import os 
-  import sys 
-  import btk 
-  from matplotlib import pyplot as plt 
-  import numpy as np 
-  import scipy.signal 
-  # Raw data represent the analog measures labelled Emg1 into the c3d 
-  analog1 = acq.GetAnalog("Emg1") 
-  RawValue = analogs1.GetValues() 
-  # Application of a 4-order low-pass Butterworth filter with a frequency set at 9 Hz 
-  # use of the module Scipy/signal 
-  order = 4 
-  Fc = 9 
-  b, a = scipy.signal.butter(order, fc/(0.5*acq.GetAnalogFrequency())) 
-  FilteringData = scipy.signal.filtfilt(b, a,RawValue[:,0]) 
-  # plotting data (use of the library matplotlib, prefixed here by plt) 
-  plt.figure() #create figure 
-  plt.plot(RawValue) # plot raw data 
-  plt.plot(FilteringData) # plot filtering data 
+  # modules to import
+  import os
+  import sys
+  import btk
+  from matplotlib import pyplot as plt
+  import numpy as np
+  import scipy.signal
+  # Raw data represent the analog measures labelled Emg1 into the c3d
+  analog1 = acq.GetAnalog("Emg1")
+  RawValue = analogs1.GetValues()
+  # Application of a 4-order low-pass Butterworth filter with a frequency set at 9 Hz
+  # use of the module Scipy/signal
+  order = 4
+  Fc = 9
+  b, a = scipy.signal.butter(order, fc/(0.5*acq.GetAnalogFrequency()))
+  FilteringData = scipy.signal.filtfilt(b, a,RawValue[:,0])
+  # plotting data (use of the library matplotlib, prefixed here by plt)
+  plt.figure() #create figure
+  plt.plot(RawValue) # plot raw data
+  plt.plot(FilteringData) # plot filtering data
   plt.show()
   @endcode
 
   @subsection TutorialPythonComputeFrame Compute reference frame from markers
 
-  The second biomechanical process takes as example show how to find the nearest rotation matrix from the movement of the pelvis cluster, according Challis, 1995 
-  (<em>A procedure for determining rigid body transformation parameters</em>, Journal of Biomechanics, 28(6), pp. 733-737). The code manipulates method associated with a numpy array object 
+  The second biomechanical process takes as example show how to find the nearest rotation matrix from the movement of the pelvis cluster, according Challis, 1995
+  (<em>A procedure for determining rigid body transformation parameters</em>, Journal of Biomechanics, 28(6), pp. 733-737). The code manipulates method associated with a numpy array object
   and used the linear algebra module of Scipy.
 
   @code{.py}
-  # modules to import 
-  import os 
-  import btk 
-  import numpy as np 
-  import scipy.linalg 
-  # Creation of an numpy array for the referencial frame and the chosen frame 
-  # each row is the X,Y, Z coordinates of the one pelvis marker at the reference frame 
-  data_FrameRef = np.array([acq.GetPoint(’LASI’).GetValues()[0,:], 
-                            acq.GetPoint(’RASI’).GetValues()[0,:], 
-                            acq.GetPoint(’LPSI’).GetValues()[0,:], 
-                            acq.GetPoint(’RPSI’).GetValues()[0,:]]) 
-  Frame = 40 
-  data_FrameChosen = np.array([acq.GetPoint(’LASI’).GetValues()[Frame,:], 
-                               acq.GetPoint(’RASI’).GetValues()[Frame,:], 
-                               acq.GetPoint(’LPSI’).GetValues()[Frame,:], 
-                               acq.GetPoint(’RPSI’).GetValues()[Frame,:]]) 
-  # Difference with mean values 
-  A = data_FrameRef-np.mean(data_FrameRef,axis=0) 
-  B = data_FrameChosen-np.mean(data_FrameChosen,axis=0) 
-  # transposition of the data 
-  A = A.transpose() 
-  B = B.transpose() 
-  # matrix multiplication 
-  # (Note : with a numpy array, it’s the dot method, not the multiplication operator) 
-  C = np.dot(B,A.transpose()) 
-  # singular decomposition, called the svd method of the scipy/linalg module 
-  P,T,Q = scipy.linalg.svd(C) 
-  # computation of the nearest rotation matrix R 
-  mat = np.array([[ 1., 0., 0.], 
-                  [ 0., 1., 0.], 
-                  [ 0., 0., scipy.linalg.det(np.dot(P,Q.transpose()))]]) 
+  # modules to import
+  import os
+  import btk
+  import numpy as np
+  import scipy.linalg
+  # Creation of an numpy array for the referencial frame and the chosen frame
+  # each row is the X,Y, Z coordinates of the one pelvis marker at the reference frame
+  data_FrameRef = np.array([acq.GetPoint(’LASI’).GetValues()[0,:],
+                            acq.GetPoint(’RASI’).GetValues()[0,:],
+                            acq.GetPoint(’LPSI’).GetValues()[0,:],
+                            acq.GetPoint(’RPSI’).GetValues()[0,:]])
+  Frame = 40
+  data_FrameChosen = np.array([acq.GetPoint(’LASI’).GetValues()[Frame,:],
+                               acq.GetPoint(’RASI’).GetValues()[Frame,:],
+                               acq.GetPoint(’LPSI’).GetValues()[Frame,:],
+                               acq.GetPoint(’RPSI’).GetValues()[Frame,:]])
+  # Difference with mean values
+  A = data_FrameRef-np.mean(data_FrameRef,axis=0)
+  B = data_FrameChosen-np.mean(data_FrameChosen,axis=0)
+  # transposition of the data
+  A = A.transpose()
+  B = B.transpose()
+  # matrix multiplication
+  # (Note : with a numpy array, it’s the dot method, not the multiplication operator)
+  C = np.dot(B,A.transpose())
+  # singular decomposition, called the svd method of the scipy/linalg module
+  P,T,Q = scipy.linalg.svd(C)
+  # computation of the nearest rotation matrix R
+  mat = np.array([[ 1., 0., 0.],
+                  [ 0., 1., 0.],
+                  [ 0., 0., scipy.linalg.det(np.dot(P,Q.transpose()))]])
   R = np.dot(P,np.dot(mat,Q.transpose()))
   @endcode
- 
+
  */
