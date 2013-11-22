@@ -24,12 +24,14 @@ This page is separated in the following sections and give you all the details to
       - @ref config_matlab_redistributable
     - @ref config_octave
     - @ref config_python
-    - @ref config_scilab
     - @ref config_doc
     - @ref config_examples
     - @ref config_shared
     - @ref config_test
     - @ref config_tools
+  - @ref internal_config_sec 
+    - @ref internal_config_doc_readme 
+    - @ref internal_utility_easy_install 
 - @ref install_sec
 
 ${BUILD_INSTRUCTIONS_DOX_PART}

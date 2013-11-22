@@ -10,19 +10,20 @@
   - @ref config_sec 
     - @ref config_extra_warnings
     - @ref config_test_path
-    - @ref config_sys_eigen3
     - @ref config_vissupport
       - @ref config_vtk
     - @ref config_matlab
       - @ref config_matlab_redistributable
     - @ref config_octave
     - @ref config_python
-    - @ref config_scilab
     - @ref config_doc
     - @ref config_examples
     - @ref config_shared
     - @ref config_test
     - @ref config_tools
+  - @ref internal_config_sec 
+    - @ref internal_config_doc_readme 
+    - @ref internal_utility_easy_install 
 - @ref install_sec
 - @ref pb_sec
 - @ref data_sec
