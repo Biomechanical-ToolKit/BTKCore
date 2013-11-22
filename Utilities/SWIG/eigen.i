@@ -177,7 +177,7 @@
       return;
     }
    
-    typename Derived::Scalar* data = static_cast<typename Derived::Scalar*>(PyArray_DATA(out));
+    typename Derived::Scalar* data = static_cast<typename Derived::Scalar*>(PyArray_DATA(temp));
 
     for (int i = 0; i != in->rows(); ++i) {
       for (int j = 0; j != in->cols(); ++j) {
@@ -191,13 +191,13 @@
   {
     npy_intp dims[2] = {in->rows(), in->cols()};
     *out = PyArray_SimpleNew(2, dims, NumPyType<typename Derived::Scalar>());
-    typename Derived::Scalar* data = static_cast<typename Derived::Scalar*>(PyArray_DATA(*out));
+    typename Derived::Scalar* data = static_cast<typename Derived::Scalar*>(PyArray_DATA((PyArrayObject*)*out));
     for (int i = 0; i != dims[0]; ++i)
       for (int j = 0; j != dims[1]; ++j)
         data[i*dims[1]+j] = in->coeff(i,j);
   };
 
-  template<> int NumPyType<double>() {return PyArray_DOUBLE;};
+  template<> int NumPyType<double>() {return NPY_DOUBLE;};
 %}
 
 // ----------------------------------------------------------------------------
