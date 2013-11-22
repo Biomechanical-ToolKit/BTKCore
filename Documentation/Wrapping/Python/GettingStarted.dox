@@ -69,7 +69,7 @@
     reader = btk.btkAcquisitionFileReader() # build a btk reader object 
     reader.SetFilename("dynamic.c3d") # set a filename to the reader 
     reader.Update() 
-    acq = reader.getOutput() # acq is the btk aquisition object 
+    acq = reader.GetOutput() # acq is the btk aquisition object 
   @endcode
   The output is the BTK-aquisition objet @c acq on which you can use diﬀerent accessors for exploring and setting data. 
 
@@ -78,8 +78,8 @@
   @subsubsection TutorialPythonPoint Point object 
   First of all, BTK prevents to extract point frame number and point-aquisition frequency from the metadata. Special accessors are proposed: 
   @code{.py}
-    acq.btkGetPointFrequency() # give the point frequency 
-    acq.btkGetPointFrameNumber() # give the number of frames 
+    acq.GetPointFrequency() # give the point frequency 
+    acq.GetPointFrameNumber() # give the number of frames 
   @endcode
   Now, let’s imagine that your acquisition only contains the points named into the acquisition: 
   - @a LASI: the cartesian coordinates of a marker placed on the Left Antero-Superior Iliac spine ;
