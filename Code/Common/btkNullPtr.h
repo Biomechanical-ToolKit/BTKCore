@@ -94,242 +94,400 @@ namespace btk
   private:
     NullPtr& operator=(const NullPtr& ); // Not implemented.
   };
-}
-
-/**
- * Equality operator to test if a (const) shared pointer is null or not.
- * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
- *
- * @b Example
- * @code
- * // Variable an is a btk::Analog::(Const)Pointer object.
- * // A btk::NullPtr object is instanciated in the following condition.
- * if (an == btk::Analog::Null())
- * {
- *   // Do whatever
- * }
- * @endcode
- *
- * @ingroup BTKCommon
- */
-template<typename T>
-inline bool operator==(btkSharedPtr<T> lhs, const btkNullPtr<T>& rhs)
-{
-  btkNotUsed(rhs);
-  return (lhs.get() == 0);
+  
+  // ----------------------------------------------------------------------- //
+  
+  /**
+   * Equality operator to test if a (const) shared pointer is null or not.
+   * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // A btk::NullPtr object is instanciated in the following condition.
+   * if (an == btk::Analog::Null())
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator==(btkSharedPtr<T> const & lhs, btkNullPtr<T> const & rhs)
+  {
+    btkNotUsed(rhs);
+    return (lhs.get() == 0);
+  };
+  
+  /**
+   * Equality operator to test if a (const) shared pointer is null or not.
+   * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // A btk::NullPtr object is instanciated in the following condition.
+   * if (an == btk::Analog::Null())
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator==(btkSharedPtr<const T> const & lhs, btkNullPtr<T> const & rhs)
+  {
+    btkNotUsed(rhs);
+    return (lhs.get() == 0);
+  };
+  
+  /**
+   * Equality operator to test if a (const) shared pointer is null or not.
+   * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // A btk::NullPtr object is instanciated in the following condition.
+   * if (btk::Analog::Null() == an)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator==(btkNullPtr<T> const & lhs, btkSharedPtr<T> const & rhs)
+  {
+    btkNotUsed(lhs);
+    return (rhs.get() == 0);
+  };
+  
+  /**
+   * Equality operator to test if a (const) shared pointer is null or not.
+   * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // A btk::NullPtr object is instanciated in the following condition.
+   * if (btk::Analog::Null() == an)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator==(btkNullPtr<T> const & lhs, btkSharedPtr<const T> rhs)
+  {
+    btkNotUsed(lhs);
+    return (rhs.get() == 0);
+  };
+  
+  /**
+   * Inequality operator to test if a (const) shared pointer is null or not.
+   * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // A btk::NullPtr object is instanciated in the following condition.
+   * if (an != btk::Analog::Null())
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator!=(btkSharedPtr<T> const & lhs, btkNullPtr<T> const & rhs)
+  {
+    return !(lhs == rhs);
+  };
+  
+  /**
+   * Inequality operator to test if a (const) shared pointer is null or not.
+   * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // A btk::NullPtr object is instanciated in the following condition.
+   * if (an != btk::Analog::Null())
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator!=(btkSharedPtr<const T> const & lhs, btkNullPtr<T> const & rhs)
+  {
+    return !(lhs == rhs);
+  };
+  
+  /**
+   * Inequality operator to test if a (const) shared pointer is null or not.
+   * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // A btk::NullPtr object is instanciated in the following condition.
+   * if (btk::Analog::Null() != an)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator!=(btkNullPtr<T> const & lhs, btkSharedPtr<T> const & rhs)
+  {
+    return !(lhs == rhs);
+  };
+  
+  /**
+   * Inequality operator to test if a (const) shared pointer is null or not.
+   * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // A btk::NullPtr object is instanciated in the following condition.
+   * if (btk::Analog::Null() != an)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator!=(btkNullPtr<T> const & lhs, btkSharedPtr<const T> rhs)
+  {
+    return !(lhs == rhs);
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
+  /**
+   * Equality operator to test if a (const) shared pointer is null or not.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // No btk::NullPtr object is instanciated in the following condition.
+   * if (an == btk::Analog::Null)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator==(btkSharedPtr<T> const & lhs, btkNullPtr<T> (*rhs)())
+  {
+    btkNotUsed(rhs);
+    return (lhs.get() == 0);
+  };
+  
+  /**
+   * Equality operator to test if a (const) shared pointer is null or not.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // No btk::NullPtr object is instanciated in the following condition.
+   * if (an == btk::Analog::Null)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator==(btkSharedPtr<const T> const & lhs, btkNullPtr<T> (*rhs)())
+  {
+    btkNotUsed(rhs);
+    return (lhs.get() == 0);
+  };
+  
+  /**
+   * Equality operator to test if a (const) shared pointer is null or not.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // No btk::NullPtr object is instanciated in the following condition.
+   * if (btk::Analog::Null == an)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator==(btkNullPtr<T> (*lhs)(), btkSharedPtr<T> const & rhs)
+  {
+    btkNotUsed(lhs);
+    return (rhs.get() == 0);
+  };
+  
+  /**
+   * Overload operator to fix a possible compilation error depending of the compiler used.
+   */
+  template<typename T>
+  inline bool operator==(typename T::NullPointer (*lhs)(), btkSharedPtr<T> const & rhs)
+  {
+    btkNotUsed(lhs);
+    return (rhs.get() == 0);
+  };
+  
+  /**
+   * Equality operator to test if a (const) shared pointer is null or not.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // No btk::NullPtr object is instanciated in the following condition.
+   * if (btk::Analog::Null == an)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator==(btkNullPtr<T> (*lhs)(), btkSharedPtr<const T> rhs)
+  {
+    btkNotUsed(lhs);
+    return (rhs.get() == 0);
+  };
+  
+  /**
+   * Overload operator to fix a possible compilation error depending of the compiler used.
+   */
+  template<typename T>
+  inline bool operator==(typename T::NullPointer (*lhs)(), btkSharedPtr<const T> rhs)
+  {
+    btkNotUsed(lhs);
+    return (rhs.get() == 0);
+  };
+  
+  /**
+   * Inequality operator to test if a (const) shared pointer is null or not.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // No btk::NullPtr object is instanciated in the following condition.
+   * if (an != btk::Analog::Null)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator!=(btkSharedPtr<T> const & lhs, btkNullPtr<T> (*rhs)())
+  {
+    return !(lhs == rhs);
+  };
+  
+  /**
+   * Inequality operator to test if a (const) shared pointer is null or not.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // No btk::NullPtr object is instanciated in the following condition.
+   * if (an != btk::Analog::Null)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator!=(btkSharedPtr<const T> const & lhs, btkNullPtr<T> (*rhs)())
+  {
+    return !(lhs == rhs);
+  };
+  
+  /**
+   * Inequality operator to test if a (const) shared pointer is null or not.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // No btk::NullPtr object is instanciated in the following condition.
+   * if (btk::Analog::Null != an)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator!=(btkNullPtr<T> (*lhs)(), btkSharedPtr<T> const & rhs)
+  {
+    return !(lhs == rhs);
+  };
+  
+  /**
+   * Overload operator to fix a possible compilation error depending of the compiler used.
+   */
+  template<typename T>
+  inline bool operator!=(typename T::NullPointer (*lhs)(), btkSharedPtr<T> const & rhs)
+  {
+    return !(lhs == rhs);
+  };
+  
+  /**
+   * Inequality operator to test if a (const) shared pointer is null or not.
+   *
+   * @b Example
+   * @code
+   * // Variable an is a btk::Analog::(Const)Pointer object.
+   * // No btk::NullPtr object is instanciated in the following condition.
+   * if (btk::Analog::Null != an)
+   * {
+   *   // Do whatever
+   * }
+   * @endcode
+   *
+   * @ingroup BTKCommon
+   */
+  template<typename T>
+  inline bool operator!=(btkNullPtr<T> (*lhs)(), btkSharedPtr<const T> const & rhs)
+  {
+    return !(lhs == rhs);
+  };
+  
+  /**
+   * Overload operator to fix a possible compilation error depending of the compiler used.
+   */
+  template<typename T>
+  inline bool operator!=(typename T::NullPointer (*lhs)(), btkSharedPtr<const T> const & rhs)
+  {
+    return !(lhs == rhs);
+  };
 };
-
-template<typename T>
-inline bool operator==(btkSharedPtr<const T> lhs, const btkNullPtr<T>& rhs)
-{
-  btkNotUsed(rhs);
-  return (lhs.get() == 0);
-};
-
-/**
- * Equality operator to test if a (const) shared pointer is null or not.
- * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
- *
- * @b Example
- * @code
- * // Variable an is a btk::Analog::(Const)Pointer object.
- * // A btk::NullPtr object is instanciated in the following condition.
- * if (btk::Analog::Null() == an)
- * {
- *   // Do whatever
- * }
- * @endcode
- *
- * @ingroup BTKCommon
- */
-template<typename T>
-inline bool operator==(const btkNullPtr<T>& lhs, btkSharedPtr<T> rhs)
-{
-  btkNotUsed(lhs);
-  return (rhs.get() == 0);
-};
-
-template<typename T>
-inline bool operator==(const btkNullPtr<T>& lhs, btkSharedPtr<const T> rhs)
-{
-  btkNotUsed(lhs);
-  return (rhs.get() == 0);
-};
-
-/**
- * Inequality operator to test if a (const) shared pointer is null or not.
- * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
- *
- * @b Example
- * @code
- * // Variable an is a btk::Analog::(Const)Pointer object.
- * // A btk::NullPtr object is instanciated in the following condition.
- * if (an != btk::Analog::Null())
- * {
- *   // Do whatever
- * }
- * @endcode
- *
- * @ingroup BTKCommon
- */
-template<typename T>
-inline bool operator!=(btkSharedPtr<T> lhs, const btkNullPtr<T>& rhs)
-{
-  btkNotUsed(rhs);
-  return (lhs.get() != 0);
-};
-
-template<typename T>
-inline bool operator!=(btkSharedPtr<const T> lhs, const btkNullPtr<T>& rhs)
-{
-  btkNotUsed(rhs);
-  return (lhs.get() != 0);
-};
-
-/**
- * Inequality operator to test if a (const) shared pointer is null or not.
- * @note It is not advised to use this implementation of the operator. In pratice it will requires the instantiante a NullPtr object which will be then copied by reference.
- *
- * @b Example
- * @code
- * // Variable an is a btk::Analog::(Const)Pointer object.
- * // A btk::NullPtr object is instanciated in the following condition.
- * if (btk::Analog::Null() != an)
- * {
- *   // Do whatever
- * }
- * @endcode
- *
- * @ingroup BTKCommon
- */
-template<typename T>
-inline bool operator!=(const btkNullPtr<T>& lhs, btkSharedPtr<T> rhs)
-{
-  btkNotUsed(lhs);
-  return (rhs.get() != 0);
-};
-
-template<typename T>
-inline bool operator!=(const btkNullPtr<T>& lhs, btkSharedPtr<const T> rhs)
-{
-  btkNotUsed(lhs);
-  return (rhs.get() != 0);
-};
-
-/**
- * Equality operator to test if a (const) shared pointer is null or not.
- *
- * @b Example
- * @code
- * // Variable an is a btk::Analog::(Const)Pointer object.
- * // No btk::NullPtr object is instanciated in the following condition.
- * if (an == btk::Analog::Null)
- * {
- *   // Do whatever
- * }
- * @endcode
- *
- * @ingroup BTKCommon
- */
-template<typename T>
-inline bool operator==(btkSharedPtr<T> lhs, btkNullPtr<T> (*rhs)())
-{
-  btkNotUsed(rhs);
-  return (lhs.get() == 0);
-};
-
-template<typename T>
-inline bool operator==(btkSharedPtr<const T> lhs, btkNullPtr<T> (*rhs)())
-{
-  btkNotUsed(rhs);
-  return (lhs.get() == 0);
-}
-
-/**
- * Equality operator to test if a (const) shared pointer is null or not.
- *
- * @b Example
- * @code
- * // Variable an is a btk::Analog::(Const)Pointer object.
- * // No btk::NullPtr object is instanciated in the following condition.
- * if (btk::Analog::Null == an)
- * {
- *   // Do whatever
- * }
- * @endcode
- *
- * @ingroup BTKCommon
- */
-template<typename T>
-inline bool operator==(btkNullPtr<T> (*lhs)(), btkSharedPtr<T> rhs)
-{
-  btkNotUsed(lhs);
-  return (rhs.get() == 0);
-}
-
-template<typename T>
-inline bool operator==(btkNullPtr<T> (*lhs)(), btkSharedPtr<const T> rhs)
-{
-  btkNotUsed(lhs);
-  return (rhs.get() == 0);
-}
-
-/**
- * Inequality operator to test if a (const) shared pointer is null or not.
- *
- * @b Example
- * @code
- * // Variable an is a btk::Analog::(Const)Pointer object.
- * // No btk::NullPtr object is instanciated in the following condition.
- * if (an != btk::Analog::Null)
- * {
- *   // Do whatever
- * }
- * @endcode
- *
- * @ingroup BTKCommon
- */
-template<typename T>
-inline bool operator!=(btkSharedPtr<T> lhs, btkNullPtr<T> (*rhs)())
-{
-  btkNotUsed(rhs);
-  return (lhs.get() != 0);
-};
-
-template<typename T>
-inline bool operator!=(btkSharedPtr<const T> lhs, btkNullPtr<T> (*rhs)())
-{
-  btkNotUsed(rhs);
-  return (lhs.get() != 0);
-}
-
-/**
- * Inequality operator to test if a (const) shared pointer is null or not.
- *
- * @b Example
- * @code
- * // Variable an is a btk::Analog::(Const)Pointer object.
- * // No btk::NullPtr object is instanciated in the following condition.
- * if (btk::Analog::Null != an)
- * {
- *   // Do whatever
- * }
- * @endcode
- *
- * @ingroup BTKCommon
- */
-template<typename T>
-inline bool operator!=(btkNullPtr<T> (*lhs)(), btkSharedPtr<T> rhs)
-{
-  btkNotUsed(lhs);
-  return (rhs.get() != 0);
-}
-
-template<typename T>
-inline bool operator!=(btkNullPtr<T> (*lhs)(), btkSharedPtr<const T> rhs)
-{
-  btkNotUsed(lhs);
-  return (rhs.get() != 0);
-}
 
 #endif // __btkNullPtr_h
