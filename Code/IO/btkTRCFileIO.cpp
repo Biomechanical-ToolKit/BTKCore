@@ -211,29 +211,49 @@ namespace btk
           std::getline(ifs, line);
           line[0] = ' '; // was '\t'
           line[line.length() - 1] = '\t'; // was '\n'
-          std::istringstream iss2(line, std::istringstream::in);
-          for (PointCollection::Iterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
+          this->ExtractValuesForFrame(line, output, i);
+        }
+      }
+      // In case there is only unlabel markers in the TRC file (see issue #70 - https://code.google.com/p/b-tk/issues/detail?id=70)
+      else if (numberOfFrames != 0)
+      {
+        btkWarningMacro(filename, "Number of point is null but the number of frames. Trying to find values for unlabeled markers...")
+        output->Init(0, numberOfFrames); 
+        std::getline(ifs, line); // Frame#, Time and normaly markers' labels
+        std::getline(ifs, line); // Coordinate's label (X1, Y1, Z1, ...)
+        ifs.exceptions(std::ios_base::goodbit); // Remove exceptions
+        for(int i = 0 ; i < numberOfFrames ; ++i)
+        {
+          if (ifs.eof())
+            throw(TRCFileIOException("Unexpected end of file."));
+          
+          std::string buf;
+          ifs >> buf; // Frame#
+          ifs >> buf; // Time
+          std::getline(ifs, line);
+          line[0] = ' '; // was '\t'
+          line[line.length() - 1] = '\t'; // was '\n'
+          if (line.size() == 2) // correspond to " \t"
+            continue;
+          // Count the number of tab
+          int numTabs = 0;
+          for (int j = 0 ; j < line.length() ; ++j)
           {
-            std::string x="", y="", z="";
-            std::getline(iss2, x, '\t');
-            std::getline(iss2, y, '\t');
-            std::getline(iss2, z, '\t');
-            
-            if (x.empty() || y.empty() || z.empty()) // occlusion
+            if (line[j] == '\t')
+              ++numTabs;
+          }
+          int numMarkers = numTabs / 3;
+          if (output->GetPointNumber() < numMarkers)
+          {
+            for (int k = output->GetPointNumber() ; k < numMarkers ; ++k)
             {
-              (*it)->GetValues().coeffRef(i, 0) = 0.0;
-              (*it)->GetValues().coeffRef(i, 1) = 0.0;
-              (*it)->GetValues().coeffRef(i, 2) = 0.0;
-              (*it)->GetResiduals().coeffRef(i) = -1.0;
-            }
-            else
-            {
-              FromString(x, (*it)->GetValues().coeffRef(i, 0));
-              FromString(y, (*it)->GetValues().coeffRef(i, 1));
-              FromString(z, (*it)->GetValues().coeffRef(i, 2));
-              (*it)->GetResiduals().coeffRef(i) = 0.0;
+              Point::Pointer marker = Point::New("Unlabel#" + ToString(k+1), numberOfFrames);
+              marker->GetResiduals().setConstant(-1.0); // In case the markers was not detected for the first frames.
+              output->AppendPoint(marker);
             }
           }
+          if (numMarkers > 0)
+            this->ExtractValuesForFrame(line, output, i);
         }
       }
     }
@@ -356,4 +376,31 @@ namespace btk
   TRCFileIO::TRCFileIO()
   : AcquisitionFileIO(AcquisitionFileIO::ASCII)
   {};
+  
+  void TRCFileIO::ExtractValuesForFrame(std::string& line, Acquisition::Pointer output, int frameIdx)
+  {
+    std::istringstream iss(line, std::istringstream::in);
+    for (PointCollection::Iterator it = output->BeginPoint() ; it != output->EndPoint() ; ++it)
+    {
+      std::string x="", y="", z="";
+      std::getline(iss, x, '\t');
+      std::getline(iss, y, '\t');
+      std::getline(iss, z, '\t');
+      
+      if (x.empty() || y.empty() || z.empty()) // occlusion
+      {
+        (*it)->GetValues().coeffRef(frameIdx, 0) = 0.0;
+        (*it)->GetValues().coeffRef(frameIdx, 1) = 0.0;
+        (*it)->GetValues().coeffRef(frameIdx, 2) = 0.0;
+        (*it)->GetResiduals().coeffRef(frameIdx) = -1.0;
+      }
+      else
+      {
+        FromString(x, (*it)->GetValues().coeffRef(frameIdx, 0));
+        FromString(y, (*it)->GetValues().coeffRef(frameIdx, 1));
+        FromString(z, (*it)->GetValues().coeffRef(frameIdx, 2));
+        (*it)->GetResiduals().coeffRef(frameIdx) = 0.0;
+      }
+    }
+  };
 };

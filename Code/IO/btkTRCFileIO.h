@@ -72,6 +72,8 @@ namespace btk
     BTK_IO_EXPORT TRCFileIO();
     
   private:
+    inline void ExtractValuesForFrame(std::string& line, Acquisition::Pointer output, int frameIndex);
+    
     TRCFileIO(const TRCFileIO& ); // Not implemented.
     TRCFileIO& operator=(const TRCFileIO& ); // Not implemented. 
    };
