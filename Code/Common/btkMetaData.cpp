@@ -566,7 +566,7 @@ namespace btk
       return false;
     if (rLHS.HasInfo() && rRHS.HasInfo())
     {
-      if (*(rLHS.m_Info) != *(rRHS.m_Info))
+      if (*(rLHS.mp_Info) != *(rRHS.mp_Info))
         return false;
     }
     else if (rLHS.HasInfo() != rRHS.HasInfo())
@@ -596,7 +596,7 @@ namespace btk
   MetaData::MetaData(const std::string& label,
                      const std::string& desc, bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::Pointer()),
+  mp_Info(MetaDataInfo::Pointer()),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -609,7 +609,7 @@ namespace btk
   MetaData::MetaData(const std::string& label, int8_t val,
                      const std::string& desc, bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(val)),
+  mp_Info(MetaDataInfo::New(val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -622,7 +622,7 @@ namespace btk
   MetaData::MetaData(const std::string& label, int16_t val, 
                      const std::string& desc, bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(val)),
+  mp_Info(MetaDataInfo::New(val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -635,7 +635,7 @@ namespace btk
   MetaData::MetaData(const std::string& label, float val, 
                      const std::string& desc, bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(val)),
+  mp_Info(MetaDataInfo::New(val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -648,7 +648,7 @@ namespace btk
   MetaData::MetaData(const std::string& label, const std::string& val, 
                      const std::string& desc, bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(val)),
+  mp_Info(MetaDataInfo::New(val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -662,7 +662,7 @@ namespace btk
                      const std::vector<int8_t>& val, const std::string& desc,
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(val)),
+  mp_Info(MetaDataInfo::New(val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -676,7 +676,7 @@ namespace btk
                      const std::vector<int16_t>& val, const std::string& desc,
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(val)),
+  mp_Info(MetaDataInfo::New(val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -690,7 +690,7 @@ namespace btk
                      const std::vector<float>& val, const std::string& desc,
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(val)),
+  mp_Info(MetaDataInfo::New(val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -704,7 +704,7 @@ namespace btk
                      const std::vector<std::string>& val, const std::string& desc,
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(val)),
+  mp_Info(MetaDataInfo::New(val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -718,7 +718,7 @@ namespace btk
                      const std::vector<int8_t>& val, const std::string& desc,
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(dim, val)),
+  mp_Info(MetaDataInfo::New(dim, val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -732,7 +732,7 @@ namespace btk
                      const std::vector<int16_t>& val, const std::string& desc,
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(dim, val)),
+  mp_Info(MetaDataInfo::New(dim, val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -746,7 +746,7 @@ namespace btk
                      const std::vector<float>& val, const std::string& desc,
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(dim, val)),
+  mp_Info(MetaDataInfo::New(dim, val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;
@@ -760,7 +760,7 @@ namespace btk
                      const std::vector<std::string>& val, const std::string& desc,
                      bool isUnlocked)
   : DataObjectLabeled(label, desc),
-  m_Info(MetaDataInfo::New(dim, val)),
+  mp_Info(MetaDataInfo::New(dim, val)),
   m_Tree(std::list<MetaData::Pointer>(0))
   {
     this->m_Unlocked = isUnlocked;

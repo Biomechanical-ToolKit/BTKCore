@@ -119,10 +119,10 @@ namespace btk
     void SetLabel(const std::string& label);
     bool GetUnlockState(void) const {return this->m_Unlocked;};
     void SetUnlockState(bool isUnlocked) {this->m_Unlocked = isUnlocked;};
-    MetaDataInfo::Pointer GetInfo() {return this->m_Info;};
-    MetaDataInfo::ConstPointer GetInfo() const {return this->m_Info;};
-    void SetInfo(MetaDataInfo::Pointer val) {this->m_Info = val;};
-    bool HasInfo() const {return (this->m_Info != MetaDataInfo::Null);};
+    MetaDataInfo::Pointer GetInfo() {return this->mp_Info;};
+    MetaDataInfo::ConstPointer GetInfo() const {return this->mp_Info;};
+    void SetInfo(MetaDataInfo::Pointer val) {this->mp_Info = val;};
+    bool HasInfo() const {return (this->mp_Info != MetaDataInfo::Null);};
     BTK_COMMON_EXPORT MetaDataInfo::Pointer ExtractChildInfo(const std::string& l, MetaDataInfo::Format f, int numDims, bool noPossibleEmptyValue = true);
     bool HasMetaDataAsParent() const {return this->m_MetaDataParentAssigned;};
     void SetParent(DataObject* parent = 0) {this->m_MetaDataParentAssigned = false; this->DataObject::SetParent(parent);};
@@ -215,7 +215,7 @@ namespace btk
     
   private:
     bool m_Unlocked;
-    MetaDataInfo::Pointer m_Info;
+    MetaDataInfo::Pointer mp_Info;
     bool m_MetaDataParentAssigned;
     std::list<MetaData::Pointer> m_Tree;
     
