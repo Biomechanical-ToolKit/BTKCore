@@ -456,7 +456,8 @@ namespace btk
   template<typename T>
   inline bool operator!=(typename T::NullPointer (*lhs)(), btkSharedPtr<T> const & rhs)
   {
-    return !(lhs == rhs);
+    btkNotUsed(lhs);
+    return (rhs.get() != 0);
   };
   
   /**
@@ -486,7 +487,8 @@ namespace btk
   template<typename T>
   inline bool operator!=(typename T::NullPointer (*lhs)(), btkSharedPtr<const T> const & rhs)
   {
-    return !(lhs == rhs);
+    btkNotUsed(lhs);
+    return (rhs.get() != 0);
   };
 };
 
