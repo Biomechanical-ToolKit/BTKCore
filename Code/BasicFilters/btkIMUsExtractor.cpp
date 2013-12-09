@@ -278,6 +278,7 @@ namespace btk
         Analog::Pointer channelToCopy = channels->GetItem(index - 1);
         channel->SetLabel(channelToCopy->GetLabel());
         channel->SetDescription(channelToCopy->GetDescription());
+        channel->SetUnit(channelToCopy->GetUnit());
         imu->SetChannel(i, channel);
         data.col(numChannelsExtracted) = channelToCopy->GetValues();
         ++numChannelsExtracted;
