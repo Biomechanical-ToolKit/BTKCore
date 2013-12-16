@@ -34,7 +34,6 @@
  */
 
 #include "btkMergeAcquisitionFilter.h"
-#include "btkAcquisitionUnitConverter.h"
 #include "btkMetaDataUtils.h"
 
 #include "btkConvert.h"
