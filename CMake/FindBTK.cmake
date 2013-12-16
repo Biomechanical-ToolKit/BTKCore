@@ -49,8 +49,8 @@ IF(NOT BTK_DIR)
     /usr/lib/share
     
     # Look in standard Windows install locations.
-    C:\\Program Files\\BTK-debug\\share\\btk-0.1\\CMake
-    C:\\Program Files (x86)\\BTK
+    "C:\\Program Files\\BTK-debug\\share\\btk-0.1\\CMake"
+    "C:\\Program Files (x86)\\BTK"
 
     # Read from the CMakeSetup registry entries.  It is likely that
     # BTK will have been recently built.
