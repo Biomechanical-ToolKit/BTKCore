@@ -298,7 +298,7 @@ namespace btk
   */
   
  /**
-  * @fn bool AcquisitionFileIO::HasInternalsUpdateOption(int option)
+  * @fn bool AcquisitionFileIO::HasInternalsUpdateOption(int option) const
   * Returns true if the given @a option is used or false if not.
   */
     

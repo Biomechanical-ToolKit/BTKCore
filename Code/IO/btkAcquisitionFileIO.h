@@ -72,7 +72,7 @@ namespace btk
     
     int GetInternalsUpdateOptions() const {return this->m_InternalsUpdate;};
     void SetInternalsUpdateOptions(int options) {this->m_InternalsUpdate = options;};
-    bool HasInternalsUpdateOption(int option) {return ((this->m_InternalsUpdate & option) == option);};
+    bool HasInternalsUpdateOption(int option) const {return ((this->m_InternalsUpdate & option) == option);};
 
     virtual bool CanReadFile(const std::string& filename) = 0;
     virtual bool CanWriteFile(const std::string& filename) = 0;
