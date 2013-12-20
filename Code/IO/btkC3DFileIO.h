@@ -58,7 +58,7 @@ namespace btk
     
   public:
     typedef enum {Signed, Unsigned}  AnalogIntegerFormat;
-    typedef enum {None = 1, ScalesFromDataUpdate = 2, ScalesFromMetaDataUpdate = 4, MetaDataFromDataUpdate = 8, CompatibleVicon = 16} WritingFlag;
+    enum {CompatibleVicon = AcquisitionFileIO::FileFormatOption};
 
     typedef btkSharedPtr<C3DFileIO> Pointer;
     typedef btkSharedPtr<const C3DFileIO> ConstPointer;
@@ -79,9 +79,6 @@ namespace btk
     void SetAnalogZeroOffset(const std::vector<int>& s) {this->m_AnalogZeroOffset = s;};
     double GetAnalogUniversalScale() const {return this->m_AnalogUniversalScale;};
     void SetAnalogUniversalScale(double s) {this->m_AnalogUniversalScale = s;};
-    int GetWritingFlags() const {return this->m_WritingFlags;};
-    void SetWritingFlags(int flags) {this->m_WritingFlags = flags;};
-    BTK_IO_EXPORT bool HasWritingFlag(WritingFlag flag);
     
     BTK_IO_EXPORT virtual bool CanReadFile(const std::string& filename);
     BTK_IO_EXPORT virtual bool CanWriteFile(const std::string& filename);
@@ -221,7 +218,6 @@ namespace btk
     std::vector<int> m_AnalogZeroOffset;
     double m_AnalogUniversalScale;
     AnalogIntegerFormat m_AnalogIntegerFormat;
-    int m_WritingFlags;
   };
 };
 

@@ -30,8 +30,8 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     btk::C3DFileIO::Pointer io = btk::C3DFileIO::New();
     writer->SetAcquisitionIO(io);
-    TS_ASSERT(io->HasWritingFlag(btk::C3DFileIO::ScalesFromDataUpdate));
-    TS_ASSERT(io->HasWritingFlag(btk::C3DFileIO::MetaDataFromDataUpdate));    
+    TS_ASSERT(io->HasInternalsUpdateOption(btk::C3DFileIO::DataBasedUpdate));
+    TS_ASSERT(io->HasInternalsUpdateOption(btk::C3DFileIO::CompatibleVicon));
     TS_ASSERT_THROWS_EQUALS(writer->Update(), const btk::AcquisitionFileWriterException &e, e.what(), std::string("Filename must be specified."));
   };
 
@@ -103,7 +103,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    io->SetWritingFlags(btk::C3DFileIO::None);
+    io->SetInternalsUpdateOptions(btk::C3DFileIO::NoUpdate);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015pr.c3d");
@@ -152,7 +152,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    io->SetWritingFlags(btk::C3DFileIO::None);
+    io->SetInternalsUpdateOptions(btk::C3DFileIO::NoUpdate);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015si.c3d");
@@ -201,7 +201,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    io->SetWritingFlags(btk::C3DFileIO::None);
+    io->SetInternalsUpdateOptions(btk::C3DFileIO::NoUpdate);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015sr.c3d");
@@ -250,7 +250,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    io->SetWritingFlags(btk::C3DFileIO::None);
+    io->SetInternalsUpdateOptions(btk::C3DFileIO::NoUpdate);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015vi.c3d");
@@ -299,7 +299,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
     btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
     reader->Update();
     btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
-    io->SetWritingFlags(btk::C3DFileIO::None);
+    io->SetInternalsUpdateOptions(btk::C3DFileIO::NoUpdate);
     writer->SetAcquisitionIO(io);
     writer->SetInput(reader->GetOutput());
     writer->SetFilename(C3DFilePathOUT + "sample01_Eb015vr.c3d");
@@ -1445,6 +1445,349 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), acq2->GetAnalogFrameNumber());
     TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
   };
+  
+  CXXTEST_TEST(InternalsUpdateDefault)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/PiGMotion-FlatFoot-Full.c3d");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    reader.reset();
+    // To test the CompatibleVicon option
+    for (btk::Acquisition::PointConstIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
+      (*it)->SetDescription("");
+    for (btk::Acquisition::AnalogConstIterator it = acq->BeginAnalog() ; it != acq->EndAnalog() ; ++it)
+      (*it)->SetDescription("");
+    btk::MetaData::Pointer metadata = acq->GetMetaData()->GetChild("ANALYSIS");
+    int num = metadata->GetChild("USED")->GetInfo()->ToInt(0);
+    std::vector<std::string> blank(num);
+    std::vector<uint8_t> dims = std::vector<uint8_t>(2,(int8_t)0); dims[1] = num;
+    metadata->GetChild("DESCRIPTIONS")->GetInfo()->SetValues(dims, blank);
+    metadata->GetChild("SUBJECTS")->GetInfo()->SetValues(dims, blank);
+    // To test the DataBasedUpdate option
+    int inc = 1;
+    for (btk::Acquisition::PointIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
+      (*it)->SetLabel("MyPoint#" + btk::ToString(inc++));
+    inc = 1;
+    for (btk::Acquisition::AnalogIterator it = acq->BeginAnalog() ; it != acq->EndAnalog() ; ++it)
+      (*it)->SetLabel("MyAnalog#" + btk::ToString(inc++));
+    
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(acq);
+    writer->SetFilename(C3DFilePathOUT + "InternalsUpdateDefault.c3d");
+    writer->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "InternalsUpdateDefault.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), acq2->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+    
+    inc = 1;
+    for (btk::Acquisition::PointIterator it = acq2->BeginPoint() ; it != acq2->EndPoint() ; ++it)
+      TS_ASSERT_EQUALS((*it)->GetLabel(), "MyPoint#" + btk::ToString(inc++));
+    inc = 1;
+    for (btk::Acquisition::AnalogIterator it = acq2->BeginAnalog() ; it != acq2->EndAnalog() ; ++it)
+      TS_ASSERT_EQUALS((*it)->GetLabel(), "MyAnalog#" + btk::ToString(inc++));
+    
+    metadata = acq2->GetMetaData()->GetChild("POINT");
+    dims = metadata->GetChild("DESCRIPTIONS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("DESCRIPTIONS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 4);
+    for (int i = 0 ; i < acq2->GetPointNumber() ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "    ");
+    
+    metadata = acq2->GetMetaData()->GetChild("ANALOG");
+    dims = metadata->GetChild("DESCRIPTIONS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("DESCRIPTIONS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 4);
+    for (int i = 0 ; i < acq2->GetAnalogNumber() ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "    ");
+    
+    metadata = acq2->GetMetaData()->GetChild("ANALYSIS");
+    dims = metadata->GetChild("DESCRIPTIONS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("DESCRIPTIONS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 4);
+    for (int i = 0 ; i < num ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "    ");
+    dims = metadata->GetChild("SUBJECTS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("SUBJECTS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 4);
+    for (int i = 0 ; i < num ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "    ");
+  };
+  
+  CXXTEST_TEST(InternalsUpdateDataBased)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/PiGMotion-FlatFoot-Full.c3d");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    reader.reset();
+    // To test the *non use* of the CompatibleVicon option
+    for (btk::Acquisition::PointConstIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
+      (*it)->SetDescription("");
+    for (btk::Acquisition::AnalogConstIterator it = acq->BeginAnalog() ; it != acq->EndAnalog() ; ++it)
+      (*it)->SetDescription("");
+    btk::MetaData::Pointer metadata = acq->GetMetaData()->GetChild("ANALYSIS");
+    int num = metadata->GetChild("USED")->GetInfo()->ToInt(0);
+    std::vector<std::string> blank(num);
+    std::vector<uint8_t> dims = std::vector<uint8_t>(2,(int8_t)0); dims[1] = num;
+    metadata->GetChild("DESCRIPTIONS")->GetInfo()->SetValues(dims, blank);
+    metadata->GetChild("SUBJECTS")->GetInfo()->SetValues(dims, blank);
+    // To test the DataBasedUpdate option
+    int inc = 1;
+    for (btk::Acquisition::PointIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
+      (*it)->SetLabel("MyPoint#" + btk::ToString(inc++));
+    inc = 1;
+    for (btk::Acquisition::AnalogIterator it = acq->BeginAnalog() ; it != acq->EndAnalog() ; ++it)
+      (*it)->SetLabel("MyAnalog#" + btk::ToString(inc++));
+    
+    btk::C3DFileIO::Pointer io = btk::C3DFileIO::New();
+    io->SetInternalsUpdateOptions(btk::C3DFileIO::DataBasedUpdate);
+    
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(acq);
+    writer->SetAcquisitionIO(io);
+    writer->SetFilename(C3DFilePathOUT + "InternalsUpdateDataBased.c3d");
+    writer->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "InternalsUpdateDataBased.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), acq2->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+    
+    inc = 1;
+    for (btk::Acquisition::PointIterator it = acq2->BeginPoint() ; it != acq2->EndPoint() ; ++it)
+      TS_ASSERT_EQUALS((*it)->GetLabel(), "MyPoint#" + btk::ToString(inc++));
+    inc = 1;
+    for (btk::Acquisition::AnalogIterator it = acq2->BeginAnalog() ; it != acq2->EndAnalog() ; ++it)
+      TS_ASSERT_EQUALS((*it)->GetLabel(), "MyAnalog#" + btk::ToString(inc++));
+    
+    metadata = acq2->GetMetaData()->GetChild("POINT");
+    dims = metadata->GetChild("DESCRIPTIONS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("DESCRIPTIONS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 0);
+    for (int i = 0 ; i < acq2->GetPointNumber() ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "");
+    
+    metadata = acq2->GetMetaData()->GetChild("ANALOG");
+    dims = metadata->GetChild("DESCRIPTIONS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("DESCRIPTIONS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 0);
+    for (int i = 0 ; i < acq2->GetAnalogNumber() ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "");
+    
+    metadata = acq2->GetMetaData()->GetChild("ANALYSIS");
+    dims = metadata->GetChild("DESCRIPTIONS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("DESCRIPTIONS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 0);
+    for (int i = 0 ; i < num ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "");
+    dims = metadata->GetChild("SUBJECTS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("SUBJECTS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 0);
+    for (int i = 0 ; i < num ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "");
+  };
+  
+  CXXTEST_TEST(InternalsUpdateViconCompatibleOnly)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/PiGMotion-FlatFoot-Full.c3d");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    reader.reset();
+    // To test the use of the CompatibleVicon option
+    for (btk::Acquisition::PointConstIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
+      (*it)->SetDescription("");
+    for (btk::Acquisition::AnalogConstIterator it = acq->BeginAnalog() ; it != acq->EndAnalog() ; ++it)
+      (*it)->SetDescription("");
+    btk::MetaData::Pointer metadata = acq->GetMetaData()->GetChild("ANALYSIS");
+    int num = metadata->GetChild("USED")->GetInfo()->ToInt(0);
+    std::vector<std::string> blank(num);
+    std::vector<uint8_t> dims = std::vector<uint8_t>(2,(int8_t)0); dims[1] = num;
+    metadata->GetChild("DESCRIPTIONS")->GetInfo()->SetValues(dims, blank);
+    metadata->GetChild("SUBJECTS")->GetInfo()->SetValues(dims, blank);
+    // To test the *non use* of the DataBasedUpdate option
+    int inc = 1;
+    for (btk::Acquisition::PointIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
+    {  
+      (*it)->SetLabel("MyPoint#" + btk::ToString(inc++));
+      (*it)->SetDescription("test");
+    }
+    inc = 1;
+    for (btk::Acquisition::AnalogIterator it = acq->BeginAnalog() ; it != acq->EndAnalog() ; ++it)
+    {
+      (*it)->SetLabel("MyAnalog#" + btk::ToString(inc++));
+      (*it)->SetDescription("test");
+    }
+    
+    btk::C3DFileIO::Pointer io = btk::C3DFileIO::New();
+    io->SetInternalsUpdateOptions(btk::C3DFileIO::CompatibleVicon);
+    
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(acq);
+    writer->SetAcquisitionIO(io);
+    writer->SetFilename(C3DFilePathOUT + "InternalsUpdateViconCompatibleOnly.c3d");
+    writer->Update();
+    
+    reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/PiGMotion-FlatFoot-Full.c3d");
+    reader->Update();
+    acq = reader->GetOutput();
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "InternalsUpdateViconCompatibleOnly.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), acq2->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+    
+    inc = 0;
+    for (btk::Acquisition::PointIterator it = acq2->BeginPoint() ; it != acq2->EndPoint() ; ++it)
+    {
+      TS_ASSERT_EQUALS((*it)->GetLabel(), acq->GetPoint(inc)->GetLabel());
+      TS_ASSERT_EQUALS((*it)->GetDescription(), acq->GetPoint(inc)->GetDescription());
+      ++inc;
+    }
+    inc = 0;
+    for (btk::Acquisition::AnalogIterator it = acq2->BeginAnalog() ; it != acq2->EndAnalog() ; ++it)
+    {
+      TS_ASSERT_EQUALS((*it)->GetLabel(), acq->GetAnalog(inc)->GetLabel());
+      TS_ASSERT_EQUALS((*it)->GetDescription(), acq->GetAnalog(inc)->GetDescription());
+      ++inc;
+    }
+
+    metadata = acq2->GetMetaData()->GetChild("ANALYSIS");
+    dims = metadata->GetChild("DESCRIPTIONS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("DESCRIPTIONS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 4);
+    for (int i = 0 ; i < num ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "    ");
+    dims = metadata->GetChild("SUBJECTS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("SUBJECTS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 4);
+    for (int i = 0 ; i < num ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "    ");
+  };
+  
+  CXXTEST_TEST(InternalsUpdateUpdateMetaDataBased)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/PiGMotion-FlatFoot-Full.c3d");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    reader.reset();
+    // To test the *non use* of the CompatibleVicon option
+    for (btk::Acquisition::PointConstIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
+      (*it)->SetDescription("");
+    for (btk::Acquisition::AnalogConstIterator it = acq->BeginAnalog() ; it != acq->EndAnalog() ; ++it)
+      (*it)->SetDescription("");
+    btk::MetaData::Pointer metadata = acq->GetMetaData()->GetChild("ANALYSIS");
+    int num = metadata->GetChild("USED")->GetInfo()->ToInt(0);
+    std::vector<std::string> blank(num);
+    std::vector<uint8_t> dims = std::vector<uint8_t>(2,(int8_t)0); dims[1] = num;
+    metadata->GetChild("DESCRIPTIONS")->GetInfo()->SetValues(dims, blank);
+    metadata->GetChild("SUBJECTS")->GetInfo()->SetValues(dims, blank);
+    // To test the *non use* of the DataBasedUpdate option
+    int inc = 1;
+    for (btk::Acquisition::PointIterator it = acq->BeginPoint() ; it != acq->EndPoint() ; ++it)
+    {  
+      (*it)->SetLabel("MyPoint#" + btk::ToString(inc++));
+      (*it)->SetDescription("test");
+    }
+    inc = 1;
+    for (btk::Acquisition::AnalogIterator it = acq->BeginAnalog() ; it != acq->EndAnalog() ; ++it)
+    {
+      (*it)->SetLabel("MyAnalog#" + btk::ToString(inc++));
+      (*it)->SetDescription("test");
+      (*it)->SetScale(1.0);
+      (*it)->SetOffset(0);
+    }
+    acq->GetMetaData()->GetChild("POINT")->GetChild("RATE")->GetInfo()->SetValues(400.0f);
+      
+    btk::C3DFileIO::Pointer io = btk::C3DFileIO::New();
+    io->SetInternalsUpdateOptions(btk::C3DFileIO::MetaDataBasedUpdate);
+    
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(acq);
+    writer->SetAcquisitionIO(io);
+    writer->SetFilename(C3DFilePathOUT + "InternalsUpdateUpdateMetaDataBased.c3d");
+    writer->Update();
+    
+    reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "others/PiGMotion-FlatFoot-Full.c3d");
+    reader->Update();
+    acq = reader->GetOutput();
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "InternalsUpdateUpdateMetaDataBased.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), acq2->GetFirstFrame());
+    TS_ASSERT_EQUALS(400.0, acq2->GetPointFrequency());
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), acq2->GetPointNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq2->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(4000.0, acq2->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), acq2->GetAnalogNumber());
+    TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(), acq2->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), acq2->GetPointUnit());
+    
+    inc = 0;
+    for (btk::Acquisition::PointIterator it = acq2->BeginPoint() ; it != acq2->EndPoint() ; ++it)
+    {
+      TS_ASSERT_EQUALS((*it)->GetLabel(), acq->GetPoint(inc)->GetLabel());
+      TS_ASSERT_EQUALS((*it)->GetDescription(), acq->GetPoint(inc)->GetDescription());
+      ++inc;
+    }
+    inc = 0;
+    for (btk::Acquisition::AnalogIterator it = acq2->BeginAnalog() ; it != acq2->EndAnalog() ; ++it)
+    {
+      TS_ASSERT_EQUALS((*it)->GetLabel(), acq->GetAnalog(inc)->GetLabel());
+      TS_ASSERT_EQUALS((*it)->GetDescription(), acq->GetAnalog(inc)->GetDescription());
+      TS_ASSERT_EQUALS((*it)->GetScale(), acq->GetAnalog(inc)->GetScale());
+      TS_ASSERT_EQUALS((*it)->GetOffset(), acq->GetAnalog(inc)->GetOffset());
+      ++inc;
+    }
+
+    metadata = acq2->GetMetaData()->GetChild("ANALYSIS");
+    dims = metadata->GetChild("DESCRIPTIONS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("DESCRIPTIONS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 0);
+    for (int i = 0 ; i < num ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "");
+    dims = metadata->GetChild("SUBJECTS")->GetInfo()->GetDimensions();
+    blank = metadata->GetChild("SUBJECTS")->GetInfo()->ToString();
+    TS_ASSERT_EQUALS(dims[0], 0);
+    for (int i = 0 ; i < num ; ++i)
+      TS_ASSERT_EQUALS(blank[i], "");
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileWriterTest)
@@ -1482,5 +1825,9 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, convertCLB2C3D)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, rewrite_analog_gain)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, test_genscale_unmodified)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, test_genscale_modified)
-CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, UTF8)   
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, UTF8)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateDefault)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateDataBased)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateViconCompatibleOnly)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateUpdateMetaDataBased)
 #endif

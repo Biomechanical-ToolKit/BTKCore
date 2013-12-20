@@ -71,13 +71,11 @@ namespace btk
    * Compared to the C3DServer API, all the data in BTK extracted from a C3D file are already scaled and available in the children of the output Acquisition.
    * You don't need to access to the groups/parameters for that. However, if you have some custom parameters, then you can access them from the metadata stored in the output Acquisition using the method Acquisition::GetMetadata().
    *
-   * Moreover, there are several options to create a C3D file from an acquisition:
-   *  - None ;
-   *  - ScalesFromDataUpdate ;
-   *  - ScalesFromMetaDataUpdate ;
-   *  - MetaDataFromDataUpdate ;
+   * Moreover, there are specific options to create a C3D file from an acquisition:
+   *  - DataBasedUpdate;
+   *  - MetaDataBasedUpdate;
    *  - CompatibleVicon.
-   * By default, the writer is set with the options ScalesFromDataUpdate, MetaDataFromDataUpdate and CompatibleVicon.
+   * By default, the writer is set with the options C3DFileIO::DataBasedUpdate and C3DFileIO::CompatibleVicon.
    * These options give you the possibility to create a C3D file from any kind of acquisition (created from raw or extracted from another file format).
    *
    * To write a C3D file with a given processor architecture (called byte order in BTK), you have to use the method C3DFileIO::SetByteOrder().
@@ -99,30 +97,9 @@ namespace btk
    * @var C3DFileIO::AnalogIntegerFormat C3DFileIO::Unsigned
    * Analog's data are stored as unsigned integer values.
    */
-
   /**
-   * @enum C3DFileIO::WritingFlag
-   * Enums used to specify options during the acquisition's exportation into a C3D files.
-   */
-  /**
-   * @var C3DFileIO::WritingFlag C3DFileIO::None
-   * Should be used only to erase activated flags.
-   */
-  /**
-   * @var C3DFileIO::WritingFlag C3DFileIO::ScalesFromDataUpdate
-   * Updates the scaling factor (point and analog) from the acquisition's data.
-   */
-  /**
-   * @var C3DFileIO::WritingFlag C3DFileIO::ScalesFromMetaDataUpdate
-   * Updates the scaling factor (point and analog) from the acquisition's metadata.
-   */
-  /**
-   * @var C3DFileIO::WritingFlag C3DFileIO::MetaDataFromDataUpdate
-   * Updates (or synchronize) the acquisition's metadata from the data (by default). If necessary, the groups/parameters are generated to match the data in the given acquisition.
-   */
-  /**
-   * @var C3DFileIO::WritingFlag C3DFileIO::CompatibleVicon
-   * Checks and updates (if necessary) acquisitions parameter which can crash Vicon's 
+   * @var C3DFileIO::CompatibleVicon
+   * Option to checks and updates (if necessary) acquisition parameters which can crash Vicon's 
    * product (Polygon, Workstation, Nexus).
    */
   
@@ -201,27 +178,6 @@ namespace btk
    * @fn void C3DFileIO::SetAnalogUniversalScale(double s)
    * Sets Returns the universal scale factor used to scale analog channels.
    */
-
-  /**
-   * @fn int C3DFileIO::GetWritingFlags() const
-   * Returns the flags to use during the acquisition's exportation into a C3D files.
-   */
-
-  /**
-   * @fn void C3DFileIO::SetWritingFlags(int flags)
-   * Sets the flags to use during the acquisition's exportation into a C3D files.
-   */
-
-  /**
-   * Detects if the flag @a flag is activated.
-   */
-  bool C3DFileIO::HasWritingFlag(WritingFlag flag)
-  {
-    if ((this->m_WritingFlags & flag) == flag)
-      return true;
-    return false;
-  };
-
 
   /**
    * Checks if the first byte of the file corresponds to C3D header.
@@ -1113,14 +1069,28 @@ namespace btk
       }
       int frameNumber = input->GetPointFrameNumber();
       
-      if (this->HasWritingFlag(CompatibleVicon))
+      // Init analog channels config in case the internals update options 'DataBasedUpdate' and 'MetaDataBasedUpdate' are not used.
+      this->m_AnalogChannelScale.resize(input->GetAnalogNumber(), 1.0);
+      this->m_AnalogZeroOffset.resize(input->GetAnalogNumber(), 0);
+      bool internalsUpdated = false;
+      
+      if (this->HasInternalsUpdateOption(CompatibleVicon))
         this->KeepAcquisitionCompatibleVicon(in);
-      if (this->HasWritingFlag(ScalesFromDataUpdate))
+      if (this->HasInternalsUpdateOption(DataBasedUpdate))
+      {
         this->UpdateScalingFactorsFromData(input);
-      if (this->HasWritingFlag(ScalesFromMetaDataUpdate))
-        this->UpdateScalingFactorsFromMetaData(in);
-      if (this->HasWritingFlag(MetaDataFromDataUpdate))
         this->UpdateMetaDataFromData(in, frameNumber, input->GetNumberAnalogSamplePerFrame());
+        internalsUpdated = true;
+      }
+      if (this->HasInternalsUpdateOption(MetaDataBasedUpdate))
+      {
+        this->UpdateScalingFactorsFromMetaData(in);
+        internalsUpdated = true;
+      }
+      if (!internalsUpdated)
+      {
+        btkWarningMacro("The internals (i.e. points' scale and analog channels ADC parameters) were not generated as no option was given to do it. Default values are used.");
+      }
       
       // Acquisition
       bool templateFile = true;
@@ -1316,11 +1286,11 @@ namespace btk
    */
   C3DFileIO::C3DFileIO()
 #if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
-  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_BigEndian, AcquisitionFileIO::Float),
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_BigEndian, AcquisitionFileIO::Float, AcquisitionFileIO::DataBasedUpdate | C3DFileIO::CompatibleVicon),
 #elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
-  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::VAX_LittleEndian, AcquisitionFileIO::Float),
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::VAX_LittleEndian, AcquisitionFileIO::Float, AcquisitionFileIO::DataBasedUpdate | C3DFileIO::CompatibleVicon),
 #else
-  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Float),
+  : AcquisitionFileIO(AcquisitionFileIO::Binary, AcquisitionFileIO::IEEE_LittleEndian, AcquisitionFileIO::Float, AcquisitionFileIO::DataBasedUpdate | C3DFileIO::CompatibleVicon),
 #endif  
     m_AnalogChannelScale(),
     m_AnalogZeroOffset()
@@ -1328,7 +1298,6 @@ namespace btk
     this->m_PointScale = 0.1;
     this->m_AnalogUniversalScale = 1.0;
     this->m_AnalogIntegerFormat = Signed;
-    this->m_WritingFlags = ScalesFromDataUpdate | MetaDataFromDataUpdate | CompatibleVicon;
   };
 
   /*
@@ -1638,6 +1607,13 @@ namespace btk
         else
         {
           btkWarningMacro("No POINT:SCALE parameter. Impossible to update point scaling factor.");
+        }
+        // POINT:RATE
+        MetaData::ConstIterator itPointRate = (*itPoint)->FindChild("RATE");
+        if (itPointRate != (*itPoint)->End())
+        {
+          double pointRate = (*itPointRate)->GetInfo()->ToDouble(0);
+          input->SetPointFrequency(pointRate);
         }
       }
     }
