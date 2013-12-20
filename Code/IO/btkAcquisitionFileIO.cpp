@@ -74,6 +74,12 @@ namespace btk
    * After the implementation of the new IO, you can decide to add it to the factory (using the method AcquisitionFileIOFactory::AddFileIO). This will give the possibility to 
    * select the new IO automatically based on the return value of the method CanReadFile() or CanWriteFile().
    *
+   * For inheriting classes which implement the Write() method, it is possible to select the way the internal configuration (if any) is updated based on the acquisiton input.
+   * By default, the internal member m_InternalsUpdate is set to AcquisitionFileIO::UpdateNotApplicable. Two other choices are proposed to update the internal: based on data (points, analog channels, events) (AcquisitionFileIO::DataBasedUpdate) or based on metadata (AcquisitionFileIO::MetaDataBasedUpdate).
+   * These options are only informative and it is up to each file format to use this information of not.
+   * It is also possible to extend the options used to update each file format internals by using the enum value AcquisitionFileIO::FileFormatOption.
+   * For example, the C3D file format has an option (C3DFileIO::CompatibleVicon = AcquisitionFileIO::FileFormatOption) to keep generated file compatible with the software Polygon (Vicon, version 3.5) which crash if some parameters' description is empty.
+   *
    * @note The methods to set the file type, the byte order or the storage format are in 
    * general not used as lots of file format doesn't have options for these properties.
    * Only the C3D file format is known to have some options each time.
@@ -92,6 +98,10 @@ namespace btk
    * @var AcquisitionFileIO::m_StorageFormat
    * Storage format.
    */
+ /**
+  * @var AcquisitionFileIO::m_InternalsUpdate
+  * Configuration used to update file format internals when an acquisition is writed.
+  */
   
   /**
    * @typedef AcquisitionFileIO::Pointer
@@ -158,6 +168,34 @@ namespace btk
    * Acquisition's data are stored as integer values.
    */
   
+  /**
+   * @enum AcquisitionFileIO::InternalsUpdateOption
+   * Enums used to specify the update of the internal configuration of a file format (if any)
+   */
+  /**
+   * @var AcquisitionFileIO::InternalsUpdateOption AcquisitionFileIO::UpdateNotApplicable
+   * No update is done and existing internals are used.
+   */ 
+  /**
+   * @var AcquisitionFileIO::InternalsUpdateOption AcquisitionFileIO::NoUpdate
+   * Same as AcquisitionFileIO::UpdateNotApplicable.
+   */ 
+  /**
+   * @var AcquisitionFileIO::InternalsUpdateOption AcquisitionFileIO::DataBasedUpdate
+   * Internals are updated using acquisition data (points, analog channels, events).
+   */
+  /**
+   * @var AcquisitionFileIO::InternalsUpdateOption AcquisitionFileIO::MetaDataBasedUpdate
+   * Internals are updated using acquisition metadata.
+   */
+  /**
+   * @var AcquisitionFileIO::InternalsUpdateOption AcquisitionFileIO::FileFormatOption
+   * Extension for specific file format extension. It is important to distinguish each new option by multiplying by 2-based integer (i.e. 2, 4, 8, 16, etc.).
+   * @code
+   * enum {MyFirstOption = AcquisitionFileIO::FileFormatOption, MySecondOption = 2*AcquisitionFileIO::FileFormatOption};
+   * @endcode
+   */
+    
   /** 
    * @fn static bool AcquisitionFileIO::HasReadOperation()
    * Returns the property of this acquisition file IO to read data from a file and extract data.
@@ -249,11 +287,26 @@ namespace btk
    * Sets the format used to store points and analog channels.
    */
 
-  /**
-   * @fn virtual bool AcquisitionFileIO::CanReadFile(const std::string& filename) = 0
-   * Checks if @a filename can be read by this AcquisitionFileIO. This methods 
-   * should try to read the file header instead to check the file's suffix.
-   */
+ /**
+  * @fn int AcquisitionFileIO::GetInternalsUpdateOptions() const
+  * Returns the option(s) used to update internals.
+  */
+  
+ /**
+  * @fn void AcquisitionFileIO::SetInternalsUpdateOptions(int options)
+  * Sets the option(s) used to update internals.
+  */
+  
+ /**
+  * @fn bool AcquisitionFileIO::HasInternalsUpdateOption(int option)
+  * Returns true if the given @a option is used or false if not.
+  */
+    
+ /**
+  * @fn virtual bool AcquisitionFileIO::CanReadFile(const std::string& filename) = 0
+  * Checks if @a filename can be read by this AcquisitionFileIO. This methods 
+  * should try to read the file header instead to check the file's suffix.
+  */
   
   /**
    * @fn virtual bool AcquisitionFileIO::CanWriteFile(const std::string& filename) = 0
@@ -275,11 +328,12 @@ namespace btk
   /**
    * Constructor.
    */
-  AcquisitionFileIO::AcquisitionFileIO(FileType f, ByteOrder b, StorageFormat s)
+  AcquisitionFileIO::AcquisitionFileIO(FileType f, ByteOrder b, StorageFormat s, int internalsUpdate)
   {
     this->m_FileType = f;
     this->m_ByteOrder = b;
     this->m_StorageFormat = s;
+    this->m_InternalsUpdate = internalsUpdate;
   };
   
   /**

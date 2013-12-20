@@ -56,16 +56,23 @@ namespace btk
     typedef enum {TypeNotApplicable, ASCII, Binary} FileType;
     typedef enum {OrderNotApplicable = 0, IEEE_LittleEndian, VAX_LittleEndian, IEEE_BigEndian} ByteOrder;
     typedef enum {StorageNotApplicable = 0, Float = -1, Integer = 1} StorageFormat;
+    typedef enum {UpdateNotApplicable = 0, NoUpdate = UpdateNotApplicable, DataBasedUpdate = 1, MetaDataBasedUpdate = 2, FileFormatOption = 512} InternalsUpdateOption;
     
     virtual const Extensions& GetSupportedExtensions() const = 0;
 
     FileType GetFileType() const {return this->m_FileType;};
+    
     ByteOrder GetByteOrder() const {return this->m_ByteOrder;};
     BTK_IO_EXPORT std::string GetByteOrderAsString() const;
     void SetByteOrder(ByteOrder b) {this->m_ByteOrder = b;};
+    
     StorageFormat GetStorageFormat() const {return this->m_StorageFormat;};
     BTK_IO_EXPORT std::string GetStorageFormatAsString() const;
     void SetStorageFormat(StorageFormat s) {this->m_StorageFormat = s;};
+    
+    int GetInternalsUpdateOptions() const {return this->m_InternalsUpdate;};
+    void SetInternalsUpdateOptions(int options) {this->m_InternalsUpdate = options;};
+    bool HasInternalsUpdateOption(int option) {return ((this->m_InternalsUpdate & option) == option);};
 
     virtual bool CanReadFile(const std::string& filename) = 0;
     virtual bool CanWriteFile(const std::string& filename) = 0;
@@ -101,7 +108,7 @@ namespace btk
     };
     
   protected:
-    BTK_IO_EXPORT AcquisitionFileIO(FileType f = TypeNotApplicable, ByteOrder b = OrderNotApplicable, StorageFormat s = StorageNotApplicable);
+    BTK_IO_EXPORT AcquisitionFileIO(FileType f = TypeNotApplicable, ByteOrder b = OrderNotApplicable, StorageFormat s = StorageNotApplicable, int internalsUpdate = UpdateNotApplicable);
     virtual ~AcquisitionFileIO() {};
     
     void SetFileType(FileType f) {this->m_FileType = f;};
@@ -109,6 +116,7 @@ namespace btk
     FileType m_FileType;
     ByteOrder m_ByteOrder;
     StorageFormat m_StorageFormat;
+    int m_InternalsUpdate;
     
   private:
     enum {ReadOp = 1, WriteOp = 1};
