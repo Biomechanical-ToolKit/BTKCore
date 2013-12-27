@@ -45,7 +45,27 @@ namespace btk
    * @var btkAcquisitionFileIO::Integer
    * Acquisition's data are stored as integer values.
    */
-   
+  /**
+   * @var btkAcquisitionFileIO::UpdateNotApplicable
+   * No update is done and existing internals are used.
+   */ 
+  /**
+   * @var btkAcquisitionFileIO::NoUpdate
+   * Same as AcquisitionFileIO::UpdateNotApplicable.
+   */ 
+  /**
+   * @var btkAcquisitionFileIO::DataBasedUpdate
+   * Internals are updated using acquisition data (points, analog channels, events).
+   */
+  /**
+   * @var btkAcquisitionFileIO::MetaDataBasedUpdate
+   * Internals are updated using acquisition metadata.
+   */
+  /**
+   * @var btkAcquisitionFileIO::FileFormatOption
+   * Extension for specific file format extension. It is important to distinguish each new option by adding 2-based integer (i.e. 1, 2, 4, 8, 16, etc.).
+   */
+  
   /**
    * @class btkAcquisitionFileReader
    * @brief Reader for files which contain acquisition data (C3D, TRC, ...).
@@ -90,25 +110,9 @@ namespace btk
    * Analog's data are stored as unsigned integer values.
    */
   /**
-   * @var btkC3DFileIO::None_
-   * Should be used only to erase activated flags.
-   */
-  /**
-   * @var btkC3DFileIO::ScalesFromDataUpdate
-   * Updates the scaling factor (point and analog) from the acquisition's data.
-   */
-  /**
-   * @var btkC3DFileIO::ScalesFromMetaDataUpdate
-   * Updates the scaling factor (point and analog) from the acquisition's metadata.
-   */
-  /**
-   * @var btkC3DFileIO::MetaDataFromDataUpdate
-   * Updates (or synchronize) the acquisition's metadata from the data (by default).
-   */
-  /**
    * @var btkC3DFileIO::CompatibleVicon
-   * Checks and updates (if necessary) acquisitions parameter which can crash Vicon's 
-   * product (Polygon, Workstation, Nexus).
+   * Checks and updates (if necessary) acquisitions parameter which can crash 
+   * Vicon's product (Polygon, Workstation, Nexus).
    */
    
   /**

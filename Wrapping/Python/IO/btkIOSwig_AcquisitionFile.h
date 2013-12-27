@@ -36,9 +36,11 @@
 BTK_SWIG_DECLARE_CLASS(AcquisitionFileIO)
 {
 public:
-  enum {TypeNotApplicable, ASCII, Binary};
-  enum {OrderNotApplicable = 0, IEEE_LittleEndian, VAX_LittleEndian, IEEE_BigEndian};
-  enum {StorageNotApplicable = 0, Float = -1, Integer = 1};
+  enum {TypeNotApplicable = btk::AcquisitionFileIO::TypeNotApplicable, ASCII = btk::AcquisitionFileIO::ASCII, Binary = btk::AcquisitionFileIO::Binary};
+  enum {OrderNotApplicable = btk::AcquisitionFileIO::OrderNotApplicable, IEEE_LittleEndian = btk::AcquisitionFileIO::IEEE_LittleEndian, VAX_LittleEndian = btk::AcquisitionFileIO::VAX_LittleEndian, IEEE_BigEndian = btk::AcquisitionFileIO::IEEE_BigEndian};
+  enum {StorageNotApplicable = btk::AcquisitionFileIO::StorageNotApplicable, Float = btk::AcquisitionFileIO::Float, Integer = btk::AcquisitionFileIO::Integer};
+  enum {UpdateNotApplicable = btk::AcquisitionFileIO::UpdateNotApplicable, NoUpdate = btk::AcquisitionFileIO::NoUpdate, DataBasedUpdate = btk::AcquisitionFileIO::DataBasedUpdate, MetaDataBasedUpdate = btk::AcquisitionFileIO::MetaDataBasedUpdate, FileFormatOption = btk::AcquisitionFileIO::FileFormatOption};
+
   btkAcquisitionFileIO(const btkAcquisitionFileIO_shared& toCopy) : btkAcquisitionFileIO_shared(toCopy) {};
   BTK_SWIG_DECLARE_POINTER_OPERATOR(AcquisitionFileIO);
 private:
@@ -63,7 +65,7 @@ BTK_SWIG_DECLARE_CLASS_INHERIT(C3DFileIO, AcquisitionFileIO)
 {
 public:
   enum {Signed, Unsigned};
-  enum {None_ = 1, ScalesFromDataUpdate = 2, ScalesFromMetaDataUpdate = 4, MetaDataFromDataUpdate = 8, CompatibleVicon = 16}; // None replaced by None_ because it is a keyword under python
+  enum {CompatibleVicon = btk::C3DFileIO::CompatibleVicon};
   BTK_SWIG_DECLARE_DEFAULT_IO_CTOR(C3DFileIO);
   BTK_SWIG_DECLARE_POINTER_OPERATOR(C3DFileIO);
 };

@@ -51,6 +51,9 @@ BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, CanReadFile, "Checks if the given fil
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, CanWriteFile, "Checks if the given filename can be write by this AcquisitionFileIO. \nThis method should try to determine if the file's suffix corresponds to one of the supported file's suffixes by this btkAcquisitionFileIO.");
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, Read, "Read the file designated by the given filename and fill the given btkAcquisition");
 BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, Write, "Write the file designated by the given filename with the content of the given btkAcquisition.");
+BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, GetInternalsUpdateOptions, "Returns the option(s) used to update internals.");
+BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, SetInternalsUpdateOptions, "Sets the option(s) used to update internals.");
+BTK_SWIG_DOCSTRING_IMPL(AcquisitionFileIO, HasInternalsUpdateOption, "Returns true if the given @a option is used or false if not.");
 
 // ------------------------------------------------------------------------- //
 //                           AcquisitionFileReader                           //
@@ -112,10 +115,8 @@ some custom parameters, then you can access them from the metadata stored in the
 btkAcquisition::GetMetadata().
 
 Moreover, there are several options to create a C3D file from an acquisition:
- - None ;
- - ScalesFromDataUpdate ;
- - ScalesFromMetaDataUpdate ;
- - MetaDataFromDataUpdate ;
+ - DataBasedUpdate;
+ - MetaDataBasedUpdate;
  - CompatibleVicon.
  
 By default, the writer is set with the options ScalesFromDataUpdate, MetaDataFromDataUpdate and CompatibleVicon.
@@ -135,9 +136,6 @@ BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, GetAnalogZeroOffset, "Returns the vector of o
 BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, SetAnalogZeroOffset, "Sets the vector of offsets used for the analog channels' scaling.");
 BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, GetAnalogUniversalScale, "Returns the universal scale factor used to scale analog channels (parameter ANALOG:GEN_SCALE).");
 BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, SetAnalogUniversalScale, "Sets Returns the universal scale factor used to scale analog channels.");
-BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, GetWritingFlags, "Returns the flags to use during the acquisition's exportation into a C3D files.");
-BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, SetWritingFlags, "Sets the flags to use during the acquisition's exportation into a C3D files.");
-BTK_SWIG_DOCSTRING_IMPL(C3DFileIO, HasWritingFlag, "Detects if the given flag is activated.");
 
 // ------------------------------------------------------------------------- //
 //                                  ANBFileIO                                //

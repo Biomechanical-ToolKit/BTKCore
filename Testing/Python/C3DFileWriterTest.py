@@ -24,8 +24,8 @@ class C3DFileWriterTest(unittest.TestCase):
     writer = btk.btkAcquisitionFileWriter()
     io = btk.btkC3DFileIO()
     writer.SetAcquisitionIO(io)
-    self.assertTrue(io.HasWritingFlag(btk.btkC3DFileIO.ScalesFromDataUpdate))
-    self.assertTrue(io.HasWritingFlag(btk.btkC3DFileIO.MetaDataFromDataUpdate))    
+    self.assertTrue(io.HasInternalsUpdateOption(btk.btkC3DFileIO.DataBasedUpdate))
+    self.assertTrue(io.HasInternalsUpdateOption(btk.btkC3DFileIO.CompatibleVicon))
     self.assertRaises(RuntimeError, writer.Update)
     # self.assertRaisesRegexp(RuntimeError, 'Filename must be specified', writer.Update) # Python 2.7+
 
@@ -88,7 +88,7 @@ class C3DFileWriterTest(unittest.TestCase):
     writer = btk.btkAcquisitionFileWriter()
     reader.Update()
     io = btk.btkC3DFileIO(reader.GetAcquisitionIO())
-    io.SetWritingFlags(btk.btkC3DFileIO.None_)
+    io.SetInternalsUpdateOptions(btk.btkC3DFileIO.NoUpdate)
     writer.SetAcquisitionIO(io)
     writer.SetInput(reader.GetOutput())
     writer.SetFilename(_TDDConfigure.C3DFilePathOUT + 'sample01_Eb015pr.c3d')
@@ -130,7 +130,7 @@ class C3DFileWriterTest(unittest.TestCase):
     writer = btk.btkAcquisitionFileWriter()
     reader.Update()
     io = btk.btkC3DFileIO(reader.GetAcquisitionIO())
-    io.SetWritingFlags(btk.btkC3DFileIO.None_)
+    io.SetInternalsUpdateOptions(btk.btkC3DFileIO.NoUpdate)
     writer.SetAcquisitionIO(io)
     writer.SetInput(reader.GetOutput())
     writer.SetFilename(_TDDConfigure.C3DFilePathOUT + 'sample01_Eb015si.c3d')
@@ -172,7 +172,7 @@ class C3DFileWriterTest(unittest.TestCase):
     writer = btk.btkAcquisitionFileWriter()
     reader.Update()
     io = btk.btkC3DFileIO(reader.GetAcquisitionIO())
-    io.SetWritingFlags(btk.btkC3DFileIO.None_)
+    io.SetInternalsUpdateOptions(btk.btkC3DFileIO.NoUpdate)
     writer.SetAcquisitionIO(io)
     writer.SetInput(reader.GetOutput())
     writer.SetFilename(_TDDConfigure.C3DFilePathOUT + 'sample01_Eb015sr.c3d')
@@ -214,7 +214,7 @@ class C3DFileWriterTest(unittest.TestCase):
     writer = btk.btkAcquisitionFileWriter()
     reader.Update()
     io = btk.btkC3DFileIO(reader.GetAcquisitionIO())
-    io.SetWritingFlags(btk.btkC3DFileIO.None_)
+    io.SetInternalsUpdateOptions(btk.btkC3DFileIO.NoUpdate)
     writer.SetAcquisitionIO(io)
     writer.SetInput(reader.GetOutput())
     writer.SetFilename(_TDDConfigure.C3DFilePathOUT + 'sample01_Eb015vi.c3d')
@@ -256,7 +256,7 @@ class C3DFileWriterTest(unittest.TestCase):
     writer = btk.btkAcquisitionFileWriter()
     reader.Update()
     io = btk.btkC3DFileIO(reader.GetAcquisitionIO())
-    io.SetWritingFlags(btk.btkC3DFileIO.None_)
+    io.SetInternalsUpdateOptions(btk.btkC3DFileIO.NoUpdate)
     writer.SetAcquisitionIO(io)
     writer.SetInput(reader.GetOutput())
     writer.SetFilename(_TDDConfigure.C3DFilePathOUT + 'sample01_Eb015vr.c3d')
@@ -1072,24 +1072,111 @@ class C3DFileWriterTest(unittest.TestCase):
     self.assertEqual(output.GetLastFrame(), 100000)
     
   def test_UTF8(self):
-      reader = btk.btkAcquisitionFileReader()
-      reader.SetFilename(_TDDConfigure.C3DFilePathIN + 'sample19/sample19.c3d')
-      writer = btk.btkAcquisitionFileWriter()
-      reader.Update()
-      writer.SetInput(reader.GetOutput())
-      writer.SetFilename(_TDDConfigure.C3DFilePathOUT + 'Я могу есть стекло, оно мне не вредит - python.c3d')
-      writer.Update()
-      reader2 = btk.btkAcquisitionFileReader()
-      reader2.SetFilename(_TDDConfigure.C3DFilePathOUT + 'Я могу есть стекло, оно мне не вредит - python.c3d')
-      reader2.Update()
-      acq = reader.GetOutput()
-      acq2 = reader.GetOutput()
+    reader = btk.btkAcquisitionFileReader()
+    reader.SetFilename(_TDDConfigure.C3DFilePathIN + 'sample19/sample19.c3d')
+    writer = btk.btkAcquisitionFileWriter()
+    reader.Update()
+    writer.SetInput(reader.GetOutput())
+    writer.SetFilename(_TDDConfigure.C3DFilePathOUT + 'Я могу есть стекло, оно мне не вредит - python.c3d')
+    writer.Update()
+    reader2 = btk.btkAcquisitionFileReader()
+    reader2.SetFilename(_TDDConfigure.C3DFilePathOUT + 'Я могу есть стекло, оно мне не вредит - python.c3d')
+    reader2.Update()
+    acq = reader.GetOutput()
+    acq2 = reader.GetOutput()
 
-      self.assertEqual(acq.GetFirstFrame(), acq2.GetFirstFrame())
-      self.assertEqual(acq.GetPointFrequency(), acq2.GetPointFrequency())
-      self.assertEqual(acq.GetPointNumber(), acq2.GetPointNumber())
-      self.assertEqual(acq.GetPointFrameNumber(), acq2.GetPointFrameNumber())
-      self.assertEqual(acq.GetAnalogFrequency(), acq2.GetAnalogFrequency())
-      self.assertEqual(acq.GetAnalogNumber(), acq2.GetAnalogNumber())
-      self.assertEqual(acq.GetAnalogFrameNumber(), acq2.GetAnalogFrameNumber())
-      self.assertEqual(acq.GetPointUnit(), acq2.GetPointUnit())
+    self.assertEqual(acq.GetFirstFrame(), acq2.GetFirstFrame())
+    self.assertEqual(acq.GetPointFrequency(), acq2.GetPointFrequency())
+    self.assertEqual(acq.GetPointNumber(), acq2.GetPointNumber())
+    self.assertEqual(acq.GetPointFrameNumber(), acq2.GetPointFrameNumber())
+    self.assertEqual(acq.GetAnalogFrequency(), acq2.GetAnalogFrequency())
+    self.assertEqual(acq.GetAnalogNumber(), acq2.GetAnalogNumber())
+    self.assertEqual(acq.GetAnalogFrameNumber(), acq2.GetAnalogFrameNumber())
+    self.assertEqual(acq.GetPointUnit(), acq2.GetPointUnit())
+      
+  def test_InternalsUpdateUpdateMetaDataBased(self):
+    reader = btk.btkAcquisitionFileReader()
+    reader.SetFilename(_TDDConfigure.C3DFilePathIN + 'others/PiGMotion-FlatFoot-Full.c3d')
+    reader.Update()
+    acq = reader.GetOutput()
+    reader._reset()
+    # To test the *non use* of the CompatibleVicon option
+    for it in btk.Iterate(acq.GetPoints()):
+        it.SetDescription('')
+    for it in btk.Iterate(acq.GetAnalogs()):
+        it.SetDescription('')
+    metadata = acq.GetMetaData().GetChild('ANALYSIS')
+    num = metadata.GetChild('USED').GetInfo().ToInt(0)
+    blank = btk.btkStringArray(num)
+    dims = btk.btkIntArray(2,0)
+    dims[1] = num
+    metadata.GetChild('DESCRIPTIONS').GetInfo().SetValues(dims, blank)
+    metadata.GetChild('SUBJECTS').GetInfo().SetValues(dims, blank)
+    # To test the *non use* of the DataBasedUpdate option
+    inc = 1
+    for it in btk.Iterate(acq.GetPoints()):
+        it.SetLabel('MyPoint#' + str(inc))
+        it.SetDescription('test')
+        inc += 1 
+    inc = 1
+    for it in btk.Iterate(acq.GetAnalogs()):
+        it.SetLabel('MyAnalog#' + str(inc))
+        it.SetDescription('test')
+        it.SetScale(1.0)
+        it.SetOffset(0)
+        inc += 1
+    acq.GetMetaData().GetChild('POINT').GetChild('RATE').GetInfo().SetValues(400.0)
+      
+    io = btk.btkC3DFileIO()
+    io.SetInternalsUpdateOptions(btk.btkC3DFileIO.MetaDataBasedUpdate)
+    
+    writer = btk.btkAcquisitionFileWriter()
+    writer.SetInput(acq)
+    writer.SetAcquisitionIO(io)
+    writer.SetFilename(_TDDConfigure.C3DFilePathOUT + 'InternalsUpdateUpdateMetaDataBased.c3d')
+    writer.Update()
+    
+    reader = btk.btkAcquisitionFileReader()
+    reader.SetFilename(_TDDConfigure.C3DFilePathIN + 'others/PiGMotion-FlatFoot-Full.c3d')
+    reader.Update()
+    acq = reader.GetOutput()
+    
+    reader2 = btk.btkAcquisitionFileReader()
+    reader2.SetFilename(_TDDConfigure.C3DFilePathOUT + 'InternalsUpdateUpdateMetaDataBased.c3d')
+    reader2.Update()
+    acq2 = reader2.GetOutput()
+
+    self.assertEqual(acq.GetFirstFrame(), acq2.GetFirstFrame())
+    self.assertEqual(400.0, acq2.GetPointFrequency())
+    self.assertEqual(acq.GetPointNumber(), acq2.GetPointNumber())
+    self.assertEqual(acq.GetPointFrameNumber(), acq2.GetPointFrameNumber())
+    self.assertEqual(4000.0, acq2.GetAnalogFrequency())
+    self.assertEqual(acq.GetAnalogNumber(), acq2.GetAnalogNumber())
+    self.assertEqual(acq.GetAnalogFrameNumber(), acq2.GetAnalogFrameNumber())
+    self.assertEqual(acq.GetPointUnit(), acq2.GetPointUnit())
+    
+    inc = 0
+    for it in btk.Iterate(acq.GetPoints()):
+        self.assertEqual(it.GetLabel(), acq.GetPoint(inc).GetLabel())
+        self.assertEqual(it.GetDescription(), acq.GetPoint(inc).GetDescription())
+        inc += 1
+    inc = 0
+    for it in btk.Iterate(acq.GetAnalogs()):
+        self.assertEqual(it.GetLabel(), acq.GetAnalog(inc).GetLabel())
+        self.assertEqual(it.GetDescription(), acq.GetAnalog(inc).GetDescription())
+        self.assertEqual(it.GetScale(), acq.GetAnalog(inc).GetScale())
+        self.assertEqual(it.GetOffset(), acq.GetAnalog(inc).GetOffset())
+        inc += 1
+
+    metadata = acq2.GetMetaData().GetChild('ANALYSIS')
+    dims = metadata.GetChild('DESCRIPTIONS').GetInfo().GetDimensions()
+    blank = metadata.GetChild('DESCRIPTIONS').GetInfo().ToString()
+    self.assertEqual(dims[0], 0)
+    for i in xrange(0,num):
+          self.assertEqual(blank[i], '')
+    dims = metadata.GetChild('SUBJECTS').GetInfo().GetDimensions()
+    blank = metadata.GetChild('SUBJECTS').GetInfo().ToString()
+    self.assertEqual(dims[0], 0)
+    for i in xrange(0,num):
+          self.assertEqual(blank[i], '')
+    

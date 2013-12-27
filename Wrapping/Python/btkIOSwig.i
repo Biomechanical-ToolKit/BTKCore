@@ -55,9 +55,10 @@
 BTK_SWIG_DECLARE_IMPL_CLASS(AcquisitionFileIO)
 {
 public:
-  typedef enum {TypeNotApplicable, ASCII, Binary} FileType;
-  typedef enum {OrderNotApplicable = 0, IEEE_LittleEndian, VAX_LittleEndian, IEEE_BigEndian} ByteOrder;
-  typedef enum {StorageNotApplicable = 0, Float = -1, Integer = 1} StorageFormat;
+  typedef enum {TypeNotApplicable = AcquisitionFileIO::TypeNotApplicable, ASCII = AcquisitionFileIO::ASCII, Binary = AcquisitionFileIO::Binary} FileType;
+  typedef enum {OrderNotApplicable = AcquisitionFileIO::OrderNotApplicable, IEEE_LittleEndian = AcquisitionFileIO::IEEE_LittleEndian, VAX_LittleEndian = AcquisitionFileIO::VAX_LittleEndian, IEEE_BigEndian = AcquisitionFileIO::IEEE_BigEndian} ByteOrder;
+  typedef enum {StorageNotApplicable = AcquisitionFileIO::StorageNotApplicable, Float = AcquisitionFileIO::Float, Integer = AcquisitionFileIO::Integer} StorageFormat;
+  typedef enum {UpdateNotApplicable = AcquisitionFileIO::UpdateNotApplicable, NoUpdate = AcquisitionFileIO::NoUpdate, DataBasedUpdate = AcquisitionFileIO::DataBasedUpdate, MetaDataBasedUpdate = AcquisitionFileIO::MetaDataBasedUpdate, FileFormatOption = AcquisitionFileIO::FileFormatOption} InternalsUpdateOption;
 
   FileType GetFileType() const;
   ByteOrder GetByteOrder() const;
@@ -66,6 +67,10 @@ public:
   StorageFormat GetStorageFormat() const;
   std::string GetStorageFormatAsString() const;
   void SetStorageFormat(StorageFormat s);
+  
+  int GetInternalsUpdateOptions() const;
+  void SetInternalsUpdateOptions(int options);
+  bool HasInternalsUpdateOption(int option) const;
 
   virtual bool CanReadFile(const std::string& filename) = 0;
   virtual bool CanWriteFile(const std::string& filename) = 0;
@@ -82,6 +87,7 @@ protected:
 %extend btkAcquisitionFileReader
 {
   btkAcquisitionFileIO GetAcquisitionIO() {return btkAcquisitionFileIO((*$self)->btkAcquisitionFileReader_impl::GetAcquisitionIO());};
+  void _reset() {$self->reset();};
 };
 
 BTK_SWIG_DECLARE_IMPL_CLASS_PROCESS(AcquisitionFileReader)
@@ -126,7 +132,7 @@ BTK_SWIG_DECLARE_IMPL_CLASS(C3DFileIO) : public btkAcquisitionFileIO_impl
 {
 public:
   typedef enum {Signed, Unsigned} AnalogIntegerFormat;
-  typedef enum {None_ = 1, ScalesFromDataUpdate = 2, ScalesFromMetaDataUpdate = 4, MetaDataFromDataUpdate = 8, CompatibleVicon = 16} WritingFlag; // None replaced by None_ because it is a keyword under python
+  enum {CompatibleVicon = btk::C3DFileIO::CompatibleVicon};
   double GetPointScale() const;
   void SetPointScale(double s);
   AnalogIntegerFormat GetAnalogIntegerFormat();
@@ -137,9 +143,6 @@ public:
   void SetAnalogZeroOffset(const std::vector<int>& s);
   double GetAnalogUniversalScale() const;
   void SetAnalogUniversalScale(double s);
-  int GetWritingFlags() const;
-  void SetWritingFlags(int flags);
-  bool HasWritingFlag(WritingFlag flag);
 };
 
 // ------------------------------------------------------------------------- //
