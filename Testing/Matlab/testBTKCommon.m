@@ -173,6 +173,7 @@ av_ = rand(1000,2);
 btkSetPointsValues(h, pv_);
 btkSetPointsResiduals(h, rv_);
 btkSetAnalogsValues(h, av_);
+btkSetFrequency(h,100);
 btkCropAcquisition(h,50);
 assertEqual(btkGetFirstFrame(h), 50);
 assertEqual(btkGetLastFrame(h), 100);
