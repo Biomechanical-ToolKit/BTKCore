@@ -42,7 +42,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs != 2)
     mexErrMsgTxt("Two inputs required.");
-  if (nlhs > 2)
+  if (nlhs > 3)
     mexErrMsgTxt("Too many output arguments.");
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
@@ -56,5 +56,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   {
     plhs[1] = mxCreateDoubleMatrix(acq->GetPointFrameNumber(), 1, mxREAL);
     memcpy(mxGetPr(plhs[1]), point->GetResiduals().data(), mxGetNumberOfElements(plhs[1]) * sizeof(double));
+  }
+  if (nlhs > 2)
+  {
+    const char* info[] = {"label", "description", "frequency", "units"};
+    int numberOfFields =  sizeof(info) / sizeof(char*);
+    std::string unit = "";
+    if (point->GetType() <= 5) // 0-5: known units.
+      unit = acq->GetPointUnit(point->GetType());
+    plhs[2] = mxCreateStructMatrix(1, 1, numberOfFields, info);
+    mxSetFieldByNumber(plhs[2], 0, 0, mxCreateString(point->GetLabel().c_str()));
+    mxSetFieldByNumber(plhs[2], 0, 1, mxCreateString(point->GetDescription().c_str()));
+    mxSetFieldByNumber(plhs[2], 0, 2, mxCreateDoubleScalar(acq->GetPointFrequency()));
+    mxSetFieldByNumber(plhs[2], 0, 3, mxCreateString(unit.c_str()));
   }
 };
