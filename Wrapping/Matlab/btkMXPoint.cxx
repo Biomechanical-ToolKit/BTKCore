@@ -89,7 +89,7 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
   }
   else
   {
-    const char* info[] = {"firstFrame", "frequency", "units", "residuals"};
+    const char* info[] = {"firstFrame", "frequency", "units", "label", "description", "residuals"};
     int numberOfFields =  sizeof(info) / sizeof(char*);
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     // First frame
@@ -98,9 +98,11 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
     // Frequency
     mxArray* frequency = mxCreateDoubleMatrix(1, 1, mxREAL);
     *mxGetPr(frequency) = acq->GetPointFrequency();
-    // Units & residuals
+    // Others
     int inc = 0;
     mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
+    mxArray* labelsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
+    mxArray* descsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
     mxArray* residualsStruct = mxCreateStructMatrix(1, 1, numberOfPoints, (const char**)fieldnames);
     for(btk::PointCollection::ConstIterator itPt = points->Begin() ; itPt != points->End() ; ++itPt)
     {
@@ -110,6 +112,10 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
       if ((*itPt)->GetType() <= 5) // 0-5: known units.
         unit = acq->GetPointUnit((*itPt)->GetType());
       mxSetFieldByNumber(unitsStruct, 0, inc, mxCreateString(unit.c_str()));
+      // Label
+      mxSetFieldByNumber(labelsStruct, 0, inc, mxCreateString((*itPt)->GetLabel().c_str()));
+      // Description
+      mxSetFieldByNumber(descsStruct, 0, inc, mxCreateString((*itPt)->GetDescription().c_str()));
       // Residuals
       mxArray* residuals = mxCreateDoubleMatrix(num, 1, mxREAL);
       memcpy(mxGetPr(residuals), (*itPt)->GetResiduals().data(), mxGetNumberOfElements(residuals) * sizeof(double));
@@ -123,6 +129,8 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
     mxSetFieldByNumber(plhs[1], 0, 0, firstFrame);
     mxSetFieldByNumber(plhs[1], 0, 1, frequency);
     mxSetFieldByNumber(plhs[1], 0, 2, unitsStruct);
+    mxSetFieldByNumber(plhs[1], 0, 3, labelsStruct);
+    mxSetFieldByNumber(plhs[1], 0, 4, descsStruct);
     mxSetFieldByNumber(plhs[1], 0, 3, residualsStruct);
   }
 }; 
