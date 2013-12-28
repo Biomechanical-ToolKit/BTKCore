@@ -1,0 +1,12 @@
+/**
+ * @class btkSetMetaDataValues
+ * @brief Set values of an existing metadata.
+ * @syntax{md = %btkSetMetaDataValues(h\, label\, sublabel\, ...\, info)}
+ *
+ * @par Detailed description:
+ * This function is only an alias for the function btkSetMetaData
+ * 
+ * @sa btkAppendMetaDataValues, btkSetMetaData
+ *
+ * @ingroup BTKMatlabAcquisitionModifier
+ */

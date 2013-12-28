@@ -1,5 +1,5 @@
 function md = btkSetMetaDataValues(h, varargin) %#ok
-%BTKSETMETADATAVALUES  Set values of an existing metada.
+%BTKSETMETADATAVALUES  Set values of an existing metadata.
 %
 %  BTKSETMETADATAVALUES is only an alias for the function <a href="matlab:help btkSetMetaData">btkSetMetaData</a>.
 %
