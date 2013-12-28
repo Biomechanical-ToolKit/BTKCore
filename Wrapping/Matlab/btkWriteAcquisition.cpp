@@ -80,6 +80,24 @@ const std::string extractStorageFormatOption(const mxArray* opt, btk::Acquisitio
   return errMsg;
 };
 
+const std::string extractInternalsUpdateOption(const mxArray* opt, int* internalsUpdateOption)
+{
+  std::string errMsg;
+  size_t strlen_ = (mxGetM(opt) * mxGetN(opt) * sizeof(mxChar)) + 1;
+  char* option = (char*)mxMalloc(strlen_);
+  mxGetString(opt, option, strlen_);
+  std::string uppercase = std::string(option);
+  std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(), toupper);
+  if (uppercase.compare("DATABASEDUPDATE") == 0)
+    *internalsUpdateOption = btk::AcquisitionFileIO::DataBasedUpdate;
+  else if (uppercase.compare("METADATABASEDUPDATE") == 0)
+    *internalsUpdateOption = btk::AcquisitionFileIO::MetaDataBasedUpdate;
+  else
+    errMsg = "Unknown internals update option: '" + std::string(option) + "'.";
+  mxFree(option);
+  return errMsg;
+};
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
   if(nrhs < 2)
@@ -97,9 +115,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btk::AcquisitionFileIO::ByteOrder byteOrderOption = btk::AcquisitionFileIO::OrderNotApplicable;
   btk::AcquisitionFileIO::StorageFormat storageFormatOption = btk::AcquisitionFileIO::StorageNotApplicable;
-  
+  int internalsUpdateOption = -1;
+    
   char* option = 0;
-  const char* options[] = {"BYTEORDER", "STORAGEFORMAT"};
+  const char* options[] = {"BYTEORDER", "STORAGEFORMAT", "INTERNALSUPDATE"};
   int numberOfOptions =  sizeof(options) / sizeof(char*);
   for (int i = 2 ; i < nrhs ; i += 2)
   {
@@ -122,6 +141,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         case 1:
           errMsg = extractStorageFormatOption(prhs[i+1], &storageFormatOption);
           break;
+        case 2:
+          errMsg = extractInternalsUpdateOption(prhs[i+1], &internalsUpdateOption);
+          break;
         }
         break;
       }
@@ -141,9 +163,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   if (io.get() != 0)
   {
     if (byteOrderOption != btk::AcquisitionFileIO::OrderNotApplicable)
-      io->SetByteOrder(byteOrderOption);      
+      io->SetByteOrder(byteOrderOption);
     if (storageFormatOption != btk::AcquisitionFileIO::StorageNotApplicable)
-      io->SetStorageFormat(storageFormatOption);      
+      io->SetStorageFormat(storageFormatOption);
+    if (internalsUpdateOption != -1)
+      io->SetInternalsUpdateOptions(internalsUpdateOption);
   }
 
   btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();

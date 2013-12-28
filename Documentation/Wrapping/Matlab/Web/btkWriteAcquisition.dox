@@ -13,8 +13,7 @@
  * as the handle @c g into the file @c filename.  The choice of the file format is
  * based on the file extension in @c filename (for example, '.trc' or '.c3d')
  * \n\n
- * <tt>%btkWriteAcquisition(h, filename, option, value, ...)</tt> gives somes extra-options for some file format.
- * For the moment, only the C3D format has options. you can specify the byte order and the storage format.
+ * <tt>%btkWriteAcquisition(h, filename, option, value, ...)</tt> gives somes extra-options for some file format. 
  * \n\n
  * The @c ByteOrder option can receive 3 values:
  * - @c IEEE_LittleEndian: write integer and float in x86 format (PC).
@@ -23,6 +22,13 @@
  * The @c StorageFormat option can receive 2 values:
  * - @c Integer: Acquisition data are scaled and stored as 16 bits integer.
  * - @c Float: Acquisition data are stored as floating values.
+ * The REGENERATEINTERNALS is an advanced option which can receive 2 values.
+ * - @c DataBased: Internal file format configuration (if any) is regenerated based on
+ *   the acquisition data (i.e. points and analog channels plus events). This
+ *   option is the default one.
+ * - @c MetadataBased: Internal file format configuration (if any) is regenerated 
+ *   based on the metadata. WARNING: Use this value carefully as it could be easy to
+ *   corrupt file format internals with it.
  * .
  * \n
  * Without any option, a C3D File is written using the machine byte order

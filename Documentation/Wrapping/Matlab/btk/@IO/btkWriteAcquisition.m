@@ -19,6 +19,13 @@ function h = btkWriteAcquisition(filename) %#ok
 %  The STORAGEFORMAT option can receive 2 values:
 %   - Integer: Acquisition data are scaled and stored as 16 bits integer.
 %   - Float: Acquisition data are stored as floating values.
+%  The REGENERATEINTERNALS is an advanced option which can receive 2 values.
+%   - DataBased: Internal file format configuration (if any) is regenerated based on
+%     the acquisition data (i.e. points and analog channels plus events). This
+%     option is the default one.
+%   - MetadataBased: Internal file format configuration (if any) is regenerated based
+%     on the metadata. WARNING: Use this value carefully as it could be easy to
+%     corrupt file format internals with it.
 %
 %  Without any option, a C3D File is written using the machine byte order
 %  and the float as storage format. Using these options on ASCII formats 
