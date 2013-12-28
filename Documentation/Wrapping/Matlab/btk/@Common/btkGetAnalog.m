@@ -7,14 +7,18 @@ function [values info] = btkGetAnalog(h) %#ok
 %
 %  [VALUES INFO] = BTKGETANALOG(H, INDEX) returns the informations associated with the 
 %  the selected analog channel. The structure INFO has the followig fields:
+%    - INFO.LABEL
+%    - INFO.DESCRIPTION
 %    - INFO.GAIN
 %    - INFO.OFFSET
 %    - INFO.SCALE
 %    - INFO.FREQUENCY
 %    - INFO.UNITS
-%  INFO.GAIN, INFO.OFFSET and INFO.SCALE contains the required parameters
-%  to convert the digital measure into its analog variant. INFO.FREQUENCY contains the 
-%  analogs' frequency.  INFO.UNITS contains the unit of the analog channel.
+%  INFO.LABEL and INFO.DESCRIPTION contains the (true) label and description of the
+%  extracted analog channel.  INFO.GAIN, INFO.OFFSET and INFO.SCALE contains the
+%  required parameters to convert the digital measure into its analog variant.
+%  INFO.FREQUENCY contains the analogs' frequency.  INFO.UNITS contains the unit of
+%  the analog channel.
 %
 %  You can get the analog channel's data by using its LABEL instead of its index.
 %  VALUES = BTKGETANALOG(H, LABEL)

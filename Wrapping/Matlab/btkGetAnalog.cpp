@@ -49,17 +49,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);
   plhs[0] = mxCreateDoubleMatrix(acq->GetAnalogFrameNumber(), 1, mxREAL);
   memcpy(mxGetPr(plhs[0]), analog->GetValues().data(), mxGetNumberOfElements(plhs[0]) * sizeof(double));
-  // Residuals
   if (nlhs > 1)
   {
-    const char* info[] = {"gain", "offset", "scale", "frequency", "units"};
+    const char* info[] = {"label", "description", "gain", "offset", "scale", "frequency", "units"};
     int numberOfFields =  sizeof(info) / sizeof(char*);
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
-    mxSetFieldByNumber(plhs[1], 0, 0, mxCreateDoubleScalar(analog->GetGain()));
-    mxSetFieldByNumber(plhs[1], 0, 1, mxCreateDoubleScalar(analog->GetOffset()));
-    mxSetFieldByNumber(plhs[1], 0, 2, mxCreateDoubleScalar(analog->GetScale()));
-    mxSetFieldByNumber(plhs[1], 0, 3, mxCreateDoubleScalar(acq->GetAnalogFrequency()));
-    mxSetFieldByNumber(plhs[1], 0, 4, mxCreateString(analog->GetUnit().c_str()));
+    mxSetFieldByNumber(plhs[1], 0, 0, mxCreateString(analog->GetLabel().c_str()));
+    mxSetFieldByNumber(plhs[1], 0, 1, mxCreateString(analog->GetDescription().c_str()));
+    mxSetFieldByNumber(plhs[1], 0, 2, mxCreateDoubleScalar(analog->GetGain()));
+    mxSetFieldByNumber(plhs[1], 0, 3, mxCreateDoubleScalar(analog->GetOffset()));
+    mxSetFieldByNumber(plhs[1], 0, 4, mxCreateDoubleScalar(analog->GetScale()));
+    mxSetFieldByNumber(plhs[1], 0, 5, mxCreateDoubleScalar(acq->GetAnalogFrequency()));
+    mxSetFieldByNumber(plhs[1], 0, 6, mxCreateString(analog->GetUnit().c_str()));
   }
 };
 

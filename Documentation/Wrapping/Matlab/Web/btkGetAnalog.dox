@@ -5,11 +5,14 @@
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @param idx Integer containing the index of the analog channel to extract.
  * @param label String containing the label of the analog channel to extract.
+ * @retval values Matrix of reals (n,1) containing the analog data.
  * @retval info Structure with the informations related to the analog channels.
- *   - @c info.gain: Gain (integer) for the extracted channel.
- *   - @c info.offset: Numerical offset (integer) for the extracted channel.
- *   - @c info.scale: Scaling factor (float) for the extracted channel.
- *   - @c info.frequency: Analog's frequency
+ *   - @c info.label: True label of the extracted channel ;
+ *   - @c info.description: Description of the extracted channel ;
+ *   - @c info.gain: Gain (integer) for the extracted channel ;
+ *   - @c info.offset: Numerical offset (integer) for the extracted channel ;
+ *   - @c info.scale: Scaling factor (float) for the extracted channel ;
+ *   - @c info.frequency: Analog's frequency ;
  *   - @c info.units: Unit (string) for the extracted channel.
  * 
  * @sa btkSetAnalogDescription, btkSetAnalogLabel, btkSetAnalogOffset, btkSetAnalogScale, btkSetAnalogValues
