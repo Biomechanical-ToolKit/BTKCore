@@ -7,8 +7,10 @@
  
  For example, if one marker has the label @e uname*1 in the acquisition represented by the handle @c acq. Then using the code <tt>markers = btkGetMarkers(acq)</tt> will return the structure @c markers where one of its field will have the name @e uname_1. The characters '*' will be converted by '_'.
  
-  Other examples:
+ Other examples:
    - '1FE' renamed in C_1FE ;
    - 'Fémur' renamed in 'Femur' ;
    - If 3 markers has the label 'RTOE', then in Matlab you will find 'RTOE', 'RTOE_1', 'RTOE_2'.
+   
+ You can access to the original (true) label of the points and the analog channels by using the content of the field @c label proposed in the last output of the function btkGetPoints, btkGetPoint, btkGetAnalogs, and btkGetAnalog.
  */
