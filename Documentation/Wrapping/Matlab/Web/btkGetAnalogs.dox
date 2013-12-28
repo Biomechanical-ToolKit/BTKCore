@@ -5,6 +5,8 @@
  * @param h Handle pointing to a C++ btk::Acquisition object.
  * @retval analogs Structure with the analogs' values. Each field corresponds to an analog channel's label (see note #1).
  * @retval analogsInfo Structure with the informations related to the analog channels.
+ *   - @c analogsInfo.label: Structure with the (true) label of each analog channels.
+ *   - @c analogsInfo.description: Structure with the description of each analog channels.
  *   - @c analogsInfo.gain: Structure with the gain (integer) of each analog channels.
  *   - @c analogsInfo.offset: Structure with the numerical offset (integer) of each analog channels.
  *   - @c analogsInfo.scale: Structure with the scaling factor (float) of each analog channels.

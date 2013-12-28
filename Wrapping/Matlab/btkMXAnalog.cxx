@@ -88,7 +88,7 @@ void btkMXCreateAnalogsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArra
   }
   else
   {
-    const char* info[] = {"gain", "offset", "scale", "frequency", "units"};
+    const char* info[] = {"label", "description", "gain", "offset", "scale", "frequency", "units"};
     int numberOfFields =  sizeof(info) / sizeof(char*);
     plhs[1] = mxCreateStructMatrix(1, 1, numberOfFields, info);
     // frequency field
@@ -96,31 +96,30 @@ void btkMXCreateAnalogsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArra
     *mxGetPr(frequency) = acq->GetAnalogFrequency();
     // gain, offset, scale and units field
     btk::AnalogCollection::ConstIterator itAnalog = analogs->Begin();
+    mxArray* labelStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
+    mxArray* descStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
     mxArray* gainStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
     mxArray* offsetStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
     mxArray* scaleStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
     mxArray* unitsStruct = mxCreateStructMatrix(1, 1, numberOfAnalogs, (const char**)fieldnames);
-    for (int i = 0 ; i < numberOfAnalogs ;++i)
+    for (int i = 0 ; i < numberOfAnalogs ; ++i)
     {
-      mxArray* gain = mxCreateDoubleMatrix(1, 1, mxREAL);
-      mxArray* offset = mxCreateDoubleMatrix(1, 1, mxREAL);
-      mxArray* scale = mxCreateDoubleMatrix(1, 1, mxREAL);
-      *mxGetPr(gain) = static_cast<double>((*itAnalog)->GetGain());
-      *mxGetPr(offset) = static_cast<double>((*itAnalog)->GetOffset());
-      *mxGetPr(scale) = (*itAnalog)->GetScale();
-      mxSetFieldByNumber(gainStruct, 0, i, gain);
-      mxSetFieldByNumber(offsetStruct, 0, i, offset);
-      mxSetFieldByNumber(scaleStruct, 0, i, scale);
+      mxSetFieldByNumber(labelStruct, 0, i, mxCreateString((*itAnalog)->GetLabel().c_str()));
+      mxSetFieldByNumber(descStruct, 0, i, mxCreateString((*itAnalog)->GetDescription().c_str()));
+      mxSetFieldByNumber(gainStruct, 0, i, mxCreateDoubleScalar((*itAnalog)->GetGain()));
+      mxSetFieldByNumber(offsetStruct, 0, i, mxCreateDoubleScalar((*itAnalog)->GetOffset()));
+      mxSetFieldByNumber(scaleStruct, 0, i, mxCreateDoubleScalar((*itAnalog)->GetScale()));
       mxSetFieldByNumber(unitsStruct, 0, i, mxCreateString((*itAnalog)->GetUnit().c_str()));
-      
       ++itAnalog;
       delete[] fieldnames[i];
     }
     delete[] fieldnames;
-    mxSetFieldByNumber(plhs[1], 0, 0, gainStruct);
-    mxSetFieldByNumber(plhs[1], 0, 1, offsetStruct);
-    mxSetFieldByNumber(plhs[1], 0, 2, scaleStruct);
-    mxSetFieldByNumber(plhs[1], 0, 3, frequency);
-    mxSetFieldByNumber(plhs[1], 0, 4, unitsStruct);
+    mxSetFieldByNumber(plhs[1], 0, 0, labelStruct);
+    mxSetFieldByNumber(plhs[1], 0, 1, descStruct);
+    mxSetFieldByNumber(plhs[1], 0, 2, gainStruct);
+    mxSetFieldByNumber(plhs[1], 0, 3, offsetStruct);
+    mxSetFieldByNumber(plhs[1], 0, 4, scaleStruct);
+    mxSetFieldByNumber(plhs[1], 0, 5, frequency);
+    mxSetFieldByNumber(plhs[1], 0, 6, unitsStruct);
   }
 };
