@@ -292,16 +292,39 @@ try
         btkDeleteAcquisition(btkC3DserverHandles(idx).handle);
     end
     btkC3DserverHandles(idx).handle = btkNewAcquisition(numMarkers, numFrames, numAnalog, avRatio);
-    btkSetPointFrequency(btkC3DserverHandles(idx).handle, frequencyRate);
     btkC3DserverHandles(idx).file = file;
     btkC3DserverHandles(idx).fileType = fileType;
     btkC3DserverHandles(idx).dataType = dataType;
-    btkC3DserverHandles(idx).scalingFactor = scalingFactor; % Not used in BTK as it is computed automatically.
+    btkC3DserverHandles(idx).scalingFactor = scalingFactor;
     btkC3DserverHandles(idx).modified = 1;
-    res = 1; % File created
+    h = btkC3DserverHandles(idx).handle;
+    % Add default groups/parameters
+    btkC3DserverAddMetaData_p(h, 'ANALOG', 'Analog Parameters');
+    btkC3DserverAddMetaData_p(h, 'ANALOG', 'GEN_SCALE', btkMetaDataInfo('Real', 1), 'General Scale Factor');
+    btkC3DserverAddMetaData_p(h, 'ANALOG', 'RATE', btkMetaDataInfo('Real', avRatio * frequencyRate), 'Analog Base Sampling Rate');
+    btkC3DserverAddMetaData_p(h, 'ANALOG', 'USED', btkMetaDataInfo('Integer', numAnalog), 'Number of analog channels used');
+    btkC3DserverAddMetaData_p(h, 'ANALOG', 'SCALE', btkMetaDataInfo('Real', ones(numAnalog,1)), 'Analog scale factors');
+    btkC3DserverAddMetaData_p(h, 'ANALOG', 'OFFSET', btkMetaDataInfo('Integer', 2048 * ones(numAnalog,1)), 'Analog Offsets');
+    btkC3DserverAddMetaData_p(h, 'ANALOG', 'UNITS', btkMetaDataInfo('Char', repmat({''},numAnalog,1)), 'Analog units');
+    btkC3DserverAddMetaData_p(h, 'ANALOG', 'LABELS', btkMetaDataInfo('Char', cellstr(num2str([1:numAnalog]','CH%03i'))), 'Analog labels');
+    btkC3DserverAddMetaData_p(h, 'ANALOG', 'DESCRIPTIONS', btkMetaDataInfo('Char', cellstr(num2str([1:numAnalog]','Channel %03i'))), 'Analog descriptions');
+    btkC3DserverAddMetaData_p(h, 'POINT', 'Point Parameters');
+    btkC3DserverAddMetaData_p(h, 'POINT', 'USED', btkMetaDataInfo('Integer', numMarkers), 'Number of Markers');
+    btkC3DserverAddMetaData_p(h, 'POINT', 'FRAMES', btkMetaDataInfo('Integer', numFrames), 'Number of Video Frames');
+    btkC3DserverAddMetaData_p(h, 'POINT', 'DATA_START', btkMetaDataInfo('Integer', 10), 'Start Record for Data');
+    btkC3DserverAddMetaData_p(h, 'POINT', 'SCALE', btkMetaDataInfo('Real', scalingFactor), 'Scale factor for video data');
+    btkC3DserverAddMetaData_p(h, 'POINT', 'RATE', btkMetaDataInfo('Real', frequencyRate), 'Video sampling rate');
+    btkC3DserverAddMetaData_p(h, 'POINT', 'LABELS', btkMetaDataInfo('Char', cellstr(num2str([1:numMarkers]','MK%03i'))), 'Marker labels');
+    btkC3DserverAddMetaData_p(h, 'POINT', 'DESCRIPTIONS', btkMetaDataInfo('Char', cellstr(num2str([1:numMarkers]','Marker %03i'))), 'Point descriptions');
+    btkC3DserverAddMetaData_p(h, 'FORCE_PLATFORM', 'Force Platform Parameters');
+    btkC3DserverAddMetaData_p(h, 'FORCE_PLATFORM', 'USED', btkMetaDataInfo('Integer', 0), 'Number of Force Plates');
+    % Others
+    btkSetFrequency(h, frequencyRate);
+    % File created
+    res = 1;
 catch
     err = lasterror();
-    error('btk:C3Dserver',['An error occured during the reading of the file: ''', err.message , ''''])
+    error('btk:C3Dserver',['An error occured during the creation of the file: ''', err.message , ''''])
 end
 
 
@@ -2181,3 +2204,12 @@ end
 sF = (startFrame - btkGetFirstFrame(h)) * btkGetAnalogSampleNumberPerFrame(h) + 1;
 eF = (endFrame - btkGetFirstFrame(h) + 1) * btkGetAnalogSampleNumberPerFrame(h);
 frames = sF:eF;
+
+% Last input is the description
+function btkC3DserverAddMetaData_p(h, varargin)
+btkAppendMetaData(h, varargin{1:end-1});
+if (isstruct(varargin{end-1}))
+    btkSetMetaDataDescription(h, varargin{1:end-2}, varargin{end});
+else
+    btkSetMetaDataDescription(h, varargin{1:end-1}, varargin{end});
+end

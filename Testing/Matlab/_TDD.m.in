@@ -9,12 +9,14 @@ function out = TDD
     addpath('@CMAKE_CURRENT_BINARY_DIR@');
     % Path for the functions stored in Documentation/Wrapping/Matlab (also for Octave)
     addpath('@BTK_SOURCE_DIR@/Documentation/Wrapping/Matlab/btk');
-    % Path for xUnit
+    % Path for xUnit and generated function configured by CMake
     if (~isOctave)
         addpath('@BTK_SOURCE_DIR@/Utilities/matlab_xunit/xunit');
+        addpath('@BTK_BINARY_DIR@/Documentation/Wrapping/Matlab/btk');
     else
         more off;
         addpath(genpath('@BTK_SOURCE_DIR@/Utilities/octave_xunit/xunit'));
+        addpath('@BTK_BINARY_DIR@/Documentation/Wrapping/Octave/btk');
     end
     % Run the unit tests
     out = logical(1);
@@ -24,6 +26,8 @@ function out = TDD
     out = out & runtests('testBTKIO');
     fprintf('\n===========================================================\n');
     out = out & runtests('testBTKBasicFilters');
+    fprintf('\n===========================================================\n');
+    out = out & runtests('testC3DserverEmulation');
     
     % Extra tests for the function btkC3DserverEmulation (MATLAB ONLY)
     if (~isOctave)
@@ -41,7 +45,7 @@ function out = TDD
             if (c3dserverDetected)
                 % - Run the unit tests
                 fprintf('\n===========================================================\n');
-                out = out & runtests('testC3DserverEmulation');
+                out = out & runtests('testC3DserverEmulationVersus');
             end
         end
     else
