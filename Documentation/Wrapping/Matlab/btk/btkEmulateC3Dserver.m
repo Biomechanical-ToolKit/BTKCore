@@ -326,7 +326,7 @@ end
 byteorder = {'IEEE_LittleEndian', 'VAX_LittleEndian', 'IEEE_BigEndian'};
 storageformat = {'Integer', 'Float'};
 try
-    btkWriteAcquisition(h, filename, 'ByteOrder', byteorder{fileType}, 'StorageFormat', storageformat{btkC3DserverHandles(idx).dataType});
+    btkWriteAcquisition(h, filename, 'ByteOrder', byteorder{fileType}, 'StorageFormat', storageformat{btkC3DserverHandles(idx).dataType}, 'InternalsUpdate', 'MetaDataBasedUpdate');
     res = 1; % File wrote
 catch
     err = lasterror();
