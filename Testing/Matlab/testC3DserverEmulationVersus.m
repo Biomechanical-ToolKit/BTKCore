@@ -1,4 +1,4 @@
-function test_suite = testC3DserverEmulation
+function test_suite = testC3DserverEmulationVersus
 initTestSuite;
 end
 
