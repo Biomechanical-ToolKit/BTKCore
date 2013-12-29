@@ -52,9 +52,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   }
   if ((mxGetClassID(prhs[nrhs-2]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[nrhs-2]) || (mxGetNumberOfElements(prhs[nrhs-2]) != 1))
     mexErrMsgTxt("The index for the metadata's value must be set by a single integer");
-  if ((mxIsCell(prhs[nrhs-1]) && (mxGetNumberOfElements(prhs[nrhs-1]) != 1)) 
-       || (mxIsChar(prhs[nrhs-1]) && (mxGetM(prhs[nrhs-1]) != 1))
-       || ((mxGetClassID(prhs[nrhs-1]) != mxDOUBLE_CLASS) && (mxIsComplex(prhs[nrhs-1]) || (mxGetNumberOfElements(prhs[nrhs-1]) != 1))))
+  bool invalidData = false;
+  if (mxIsCell(prhs[nrhs-1]))
+  {
+    if (mxGetNumberOfElements(prhs[nrhs-1]) != 1)
+      invalidData = true;
+  }
+  else if (mxIsChar(prhs[nrhs-1]))
+  {
+    if (mxGetM(prhs[nrhs-1]) != 1)
+      invalidData = true;
+  }
+  else if ((mxGetClassID(prhs[nrhs-1]) != mxDOUBLE_CLASS) || mxIsComplex(prhs[nrhs-1]) || (mxGetNumberOfElements(prhs[nrhs-1]) != 1)) 
+    invalidData = true;
+  if (invalidData)
     mexErrMsgTxt("Unsupported metadata's value or the number of elements is greater than 1.");
   
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
@@ -73,7 +84,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
   {
     data = mxGetCell(prhs[nrhs-1], 0);
     if (!data || !mxIsChar(data))
-      mexErrMsgTxt("Error in the value's format: only a string are accepted in cell.");
+      mexErrMsgTxt("Error in the value's format: only a string is accepted in cell.");
   }
   else
     data = prhs[nrhs-1];
