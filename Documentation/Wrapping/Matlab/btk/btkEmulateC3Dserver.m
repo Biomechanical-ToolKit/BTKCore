@@ -1428,10 +1428,7 @@ else % Scaled with the given offset and scale
         data_ = single(data_);
     end
 end
-data = cell(length(frames_),1);
-for i=1:length(frames_)
-    data{i} = data_(i);
-end
+data = num2cell(data_);
 
 
 function res = btkC3DserverSetAnalogData(id, channel, frame, subFrame, data)
@@ -1713,10 +1710,7 @@ if ((btkC3DserverHandles(idx).dataType == 1) && (scaled == char(0)))
 else
     data_ = single(data_);
 end
-data = cell(length(frames),1);
-for i=1:length(frames)
-    data{i} = data_(i);
-end
+data = num2cell(data_);
 
 
 function data = btkC3DserverGetPointResidualEx(id, channel, startFrame, endFrame)
@@ -1734,11 +1728,7 @@ start_ = startFrame - btkGetFirstFrame(h) + 1;
 end_ = endFrame - btkGetFirstFrame(h) + 1;
 frames = start_:end_;
 [values, data_] = btkGetPoint(h, channel+1);
-data_ = data_(frames);
-data = cell(length(frames),1);
-for i=1:length(frames)
-    data{i} = data_(i);
-end
+data = num2cell(data_(frames));
 
 
 function data = btkC3DserverGetPointResidual(id, channel, frame)
