@@ -1925,25 +1925,21 @@ num = btkGetPointFrameNumber(h) + frames;
 btkSetFrameNumber(h, num);
 % Modifying points
 pidx = insertAt:insertAt+frames-1;
-[points, pointsInfo] = btkGetPoints(h);
-% - values
-pv = struct2array(points);
 newDataIdx = insertAt+frames:num;
 oldDataIdx = insertAt:num-frames;
-% keyboard
+% - values
+pv = btkGetPointsValues(h);
 pv(newDataIdx,:) = pv(oldDataIdx,:);
 pv(pidx,:) = zeros(length(pidx), 3 * btkGetPointNumber(h));
+btkSetPointsValues(h,pv);
 % - residuals
-rv = struct2array(pointsInfo.residuals);
+rv = btkGetPointsResiduals(h);
 rv(newDataIdx,:) = rv(oldDataIdx,:);
 rv(pidx,:) = zeros(length(pidx), btkGetPointNumber(h));
-% - storing modifications
-for i = 1:size(pv,2) / 3
-    btkSetPoint(h, i, pv(:,(i-1)*3+1:i*3), rv(:,i));
-end
+btkSetPointsResiduals(h,rv);
 % Modifying analog channels
 aidx = (insertAt-1)*snpf+1:(insertAt+frames-1)*snpf;
-av = struct2array(btkGetAnalogs(h));
+av = btkGetAnalogsValues(h);
 av(aidx(end)+1:end,:) = av(aidx(1):end-frames*snpf,:);
 av(aidx,:) = zeros(length(aidx), btkGetAnalogNumber(h));
 btkSetAnalogsValues(h, av);
@@ -1968,10 +1964,9 @@ end
 % Data to keep
 % - Point
 pidx = setdiff(ff:lf, startAt:startAt+frames-1)-ff+1;
-[points, pointsInfo] = btkGetPoints(h);
-pv = struct2array(points);
+pv = btkGetPointsValues(h);
 pv = pv(pidx,:);
-rv = struct2array(pointsInfo.residuals);
+rv = btkGetPointsResiduals(h);
 rv = rv(pidx,:);
 % - Analog
 aidx = setdiff(ff:lf*snpf, ((startAt-1)*snpf)+ff:(startAt+frames-1)*snpf)-ff+1;
@@ -1981,9 +1976,8 @@ av = av(aidx,:);
 num = btkGetPointFrameNumber(h) - frames;
 btkSetFrameNumber(h, num);
 % Storing modifications
-for i = 1:size(pv,2) / 3
-    btkSetPoint(h, i, pv(:,(i-1)*3+1:i*3), rv(:,i));
-end
+btkSetPointsValues(h,pv);
+btkSetPointsResiduals(h,rv);
 btkSetAnalogsValues(h, av);
 % Update the parameter POINT:FRAMES
 btkAppendMetaData(h, 'POINT', 'FRAMES', btkMetaDataInfo('Integer', num));
