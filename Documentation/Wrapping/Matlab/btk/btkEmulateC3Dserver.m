@@ -1997,7 +1997,7 @@ btkC3DserverSetModified_p(idx,1);
 % Create a new handle and return its ID.
 function id = btkC3DserverRequestNewHandle_p()
 global btkC3DserverHandles;
-id = size(btkC3DserverHandles,1);
+id = size(btkC3DserverHandles,2);
 idx = id + 1;
 btkC3DserverHandles(idx).id = id;
 btkC3DserverHandles(idx).handle = NaN;

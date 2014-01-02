@@ -6,6 +6,19 @@ function d = setup
 d = TDDConfigure();
 end
 
+function testDoubleConstructor(d)
+btksrv_ = btkEmulateC3Dserver();
+btksrv_.Open(strcat(d.in,'/C3DSamples/sample01/Eb015pi.c3d'),3);
+btksrv = btkEmulateC3Dserver();
+btksrv.Open(strcat(d.in,'/C3DSamples/sample09/PlugInC3D.c3d'),3);
+assertEqual(btksrv_.GetVideoFrame(0),1)
+assertEqual(btksrv_.GetVideoFrame(1),450)
+assertEqual(btksrv.GetVideoFrame(0),1)
+assertEqual(btksrv.GetVideoFrame(1),281)
+btksrv_.Close();
+btksrv.Close();
+end
+
 function testSetParameterValue_issue74(d)
 btksrv = btkEmulateC3Dserver();
 % Generate file
