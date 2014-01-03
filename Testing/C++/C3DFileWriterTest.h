@@ -1788,6 +1788,35 @@ CXXTEST_SUITE(C3DFileWriterTest)
     for (int i = 0 ; i < num ; ++i)
       TS_ASSERT_EQUALS(blank[i], "");
   };
+  
+  CXXTEST_TEST(InternalsUpdateUpdateMetaDataBased_EventsHeader)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "sample01/Eb015pi.c3d");
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    
+    btk::C3DFileIO::Pointer io = static_pointer_cast<btk::C3DFileIO>(reader->GetAcquisitionIO());
+    io->SetInternalsUpdateOptions(btk::C3DFileIO::MetaDataBasedUpdate);
+    writer->SetAcquisitionIO(io);
+    writer->SetInput(reader->GetOutput());
+    writer->SetFilename(C3DFilePathOUT + "sample01_Eb015pi_metadata.c3d");
+    writer->Update();
+
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathOUT + "sample01_Eb015pi_metadata.c3d");
+    reader2->Update();
+    btk::Acquisition::Pointer acq2 = reader2->GetOutput();
+    
+    TS_ASSERT_EQUALS(acq->GetEventNumber(), acq2->GetEventNumber());
+    for (int i = 0 ; i < 3 ; ++i)
+    {
+      TS_ASSERT_EQUALS(acq->GetEvent(i)->GetLabel(), acq2->GetEvent(i)->GetLabel());
+      TS_ASSERT_DELTA(acq->GetEvent(i)->GetTime(), acq2->GetEvent(i)->GetTime(), 1e-5);
+    }
+    TS_ASSERT(acq->GetMetaData()->FindChild("EVENT") == acq->EndMetaData());
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileWriterTest)
@@ -1830,4 +1859,5 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateDefault)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateDataBased)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateViconCompatibleOnly)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateUpdateMetaDataBased)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateUpdateMetaDataBased_EventsHeader)
 #endif

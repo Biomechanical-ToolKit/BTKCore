@@ -312,6 +312,8 @@ namespace btk
           while(it != events->End())
           {
             (*it)->SetLabel(btkTrimString(ibfs->ReadString(numCharLabelEvent)));
+            // Trick to know events stored in the header of the C3D file format. 
+            (*it)->SetDetectionFlags(0x10000);
             ++it;
           }
           
@@ -1126,18 +1128,53 @@ namespace btk
         writtenBytes += obfs->Write(static_cast<uint16_t>(0));
         // The event label format. 
         writtenBytes += obfs->Write(static_cast<uint16_t>(12345));
+        // Event stored in header
+        EventCollection::Pointer events = EventCollection::New();
+        int numEvents = 0;
+        const int maxNumEvents = 18;
+        if (this->HasInternalsUpdateOption(MetaDataBasedUpdate))
+        {
+          // Special case when the internals are generated from the metadata
+          // All the events with the special detection flag 0x10000 will be stored
+          // in the header. 
+          // WARNING: A maximum number of 18 events can be stored in the header and
+          //          the label is resized to 4 characters.
+          for (EventCollection::Iterator itEvt = input->BeginEvent() ; itEvt != input->EndEvent() ; ++itEvt)
+          {
+            int headerStorageFlag = 0x10000;
+            if (((*itEvt)->GetDetectionFlags() & headerStorageFlag) == headerStorageFlag)
+              events->InsertItem(*itEvt);
+          }
+          numEvents = events->GetItemNumber();
+          if (numEvents > maxNumEvents)
+          {
+            btkWarningMacro("List of events in the header truncated as the maximum number is limited to 18.");
+            numEvents = maxNumEvents;
+            events->SetItemNumber(numEvents);
+          }
+        }
         // Number of defined time events
-        writtenBytes += obfs->Write(static_cast<int8_t>(0));
+        writtenBytes += obfs->Write(static_cast<int16_t>(numEvents));
         // Word 152 : Reserved for future use
         writtenBytes += obfs->Fill(2);
         // Event time
-        writtenBytes += obfs->Fill(4 * 18);
-        // Event display flags
-        writtenBytes += obfs->Fill(1 * 18);
+        for (EventCollection::ConstIterator itEvt = events->Begin() ; itEvt != events->End() ; ++itEvt)
+          writtenBytes += obfs->Write(static_cast<float>((*itEvt)->GetTime()));
+        writtenBytes += obfs->Fill(4*(maxNumEvents-numEvents));
+        // Event display flags (not supported in BTK. Alwas set to 1)
+        for (EventCollection::ConstIterator itEvt = events->Begin() ; itEvt != events->End() ; ++itEvt)
+          writtenBytes += obfs->Write(static_cast<int8_t>(1));
+        writtenBytes += obfs->Fill(maxNumEvents-numEvents);
         // Word 198 : Reserved for future use
         writtenBytes += obfs->Fill(2);
         // Event labels
-        writtenBytes += obfs->Fill(4 * 1 * 18);
+        for (EventCollection::ConstIterator itEvt = events->Begin() ; itEvt != events->End() ; ++itEvt)
+        {  
+          std::string label = (*itEvt)->GetLabel();
+          label.resize(4,' ');
+          writtenBytes += obfs->Write(label);
+        }
+        writtenBytes += obfs->Fill(4*(maxNumEvents-numEvents));
         // Fill the end of the header section with 0x00
         obfs->Fill(512 - writtenBytes);
       }
