@@ -224,9 +224,9 @@ try
         btkDeleteAcquisition(btkC3DserverHandles(idx).handle);
     end
     % Handle
-    warning('OFF', 'btk:ReadAcquisition');
+    warning('off', 'btk:ReadAcquisition');
     [btkC3DserverHandles(idx).handle, bo, sf] = btkReadAcquisition(filename);
-    warning('ON', 'btk:ReadAcquisition');
+    warning('on', 'btk:ReadAcquisition');
     pointScale = btkGetMetaData(btkC3DserverHandles(idx).handle,'POINT','SCALE');
     btkC3DserverHandles(idx).scalingFactor = pointScale.info.values(1);
     % File type
