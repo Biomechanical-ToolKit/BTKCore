@@ -245,6 +245,18 @@ try
     btkC3DserverHandles(idx).modified = 0; % Reset
     btkC3DserverHandles(idx).parameterIndexMapping = {};
     btkC3DserverHandles(idx).copiedParameter = 0;
+    % Extra: The events in the EVENT group are not included by C3Dserver but BTK does
+    %        The emulation tries to hide them instead of removing them in the case
+    %        the user mix C3Dserver and native BTK code.
+    eventUsed = btkFindMetaData(btkC3DserverHandles(idx).handle,'EVENT','USED');
+    if (~isstruct(eventUsed))
+        eventUsed = btkFindMetaData(btkC3DserverHandles(idx).handle,'EVENTS','USED');
+    end
+    if (isstruct(eventUsed))
+        num = eventUsed.info.values(1);
+        first = btkGetEventNumber(btkC3DserverHandles(idx).handle) - num + 1;
+        btkC3DserverHandles(idx).hiddenParameterEvents = [first,num];
+    end
 catch
     err = lasterror();
     error('btk:C3Dserver',['Internal error: ' , err.message]);
@@ -426,32 +438,34 @@ type = btkC3DserverHandles(idx).dataType;
 
 
 function num = btkC3DserverGetNumberEvents(id)
-h = btkC3DserverExtractHandle_p(id);
-num = btkGetEventNumber(h);
+[h,idx] = btkC3DserverExtractHandle_p(id);
+num = btkC3DserverGetEventNumber_p(h,idx);
 
 
 function time = btkC3DserverGetEventTime(id, index)
-h = btkC3DserverExtractHandle_p(id);
-if ((index < 0) || (index >= btkGetEventNumber(h)))
+[h,idx] = btkC3DserverExtractHandle_p(id);
+if ((index < 0) || (index >= btkC3DserverGetEventNumber_p(h,idx)))
     error('btk:C3Dserver', 'Invalid index has been used.');
 end
 times = btkGetEventsValues(h);
-time = times(index+1);
+index_ = btkC3DserverGetEventIndex_p(index,idx);
+time = times(index_);
 
 
 function label = btkC3DserverGetEventLabel(id, index)
-h = btkC3DserverExtractHandle_p(id);
-if ((index < 0) || (index >= btkGetEventNumber(h)))
+[h,idx] = btkC3DserverExtractHandle_p(id);
+if ((index < 0) || (index >= btkC3DserverGetEventNumber_p(h,idx)))
     error('btk:C3Dserver', 'Invalid index has been used.');
 end
 [times, labels] = btkGetEventsValues(h);
-label = labels{index+1};
+index_ = btkC3DserverGetEventIndex_p(index,idx);
+label = labels{index_};
 
 
 % The status returned is always set to 1 as the the metadata EVENTS doesn't take it into account.
 function status = btkC3DserverGetEventStatus(id, index)
-h = btkC3DserverExtractHandle_p(id);
-if ((index < 0) || (index >= btkGetEventNumber(h)))
+[h,idx] = btkC3DserverExtractHandle_p(id);
+if ((index < 0) || (index >= btkC3DserverGetEventNumber_p(h,idx)))
     error('btk:C3Dserver', 'Invalid index has been used.');
 end
 %[times, labels, descriptions, statuses] = btkGetEventsValues(h);
@@ -464,10 +478,10 @@ function res = btkC3DserverAddEvent(id, label, status, time)
 [h, idx] = btkC3DserverExtractHandle_p(id);
 try
     if (status == char(0))
-        warning('btk:C3Dserver:AddEvent','The library BTK didn''t save event''s status and are set as always displayed.');
+        warning('btk:C3Dserver:AddEvent','The library BTK didn''t save event''s status and are always set as displayed.');
     end
-    btkAppendEvent(h, label, time, '.');
-    res = btkGetEventNumber(h) - 1; % Added
+    btkAppendEvent(h, label, time, '', '', '', -65536); % -65536: Special ID which will set the event detection flag to the value 0x10000. The ID will be then set to the default value (i.e. 0).
+    res = btkC3DserverGetEventNumber_p(h,idx) - 1; % Added
     btkC3DserverSetModified_p(idx,1);
 catch
     err = lasterror();
@@ -477,27 +491,29 @@ end
 
 function res = btkC3DserverSetEventLabel(id, index, label)
 [h, idx] = btkC3DserverExtractHandle_p(id);
-if ((index < 0) || (index >= btkGetEventNumber(h)))
+if ((index < 0) || (index >= btkC3DserverGetEventNumber_p(h,idx)))
     error('btk:C3Dserver', 'Invalid index has been used.');
 end
-btkSetEventLabel(h, index+1, label);
+index_ = btkC3DserverGetEventIndex_p(index,idx);
+btkSetEventLabel(h, index_, label);
 res = 1;
 btkC3DserverSetModified_p(idx,1);
 
 
 function res = btkC3DserverSetEventTime(id, index, time)
 [h, idx] = btkC3DserverExtractHandle_p(id);
-if((index < 0) || (index >= btkGetEventNumber(h)))
+if((index < 0) || (index >= btkC3DserverGetEventNumber_p(h,idx)))
     error('btk:C3Dserver', 'Invalid index has been used.');
 end
-btkSetEventTime(h, index+1, time);
+index_ = btkC3DserverGetEventIndex_p(index,idx);
+btkSetEventTime(h, index_, time);
 res = 1; % Modified
 btkC3DserverSetModified_p(idx,1);
 
 
 function res = btkC3DserverSetEventStatus(id, index, status)
 [h, idx] = btkC3DserverExtractHandle_p(id);
-if ((index < 0) || (index >= btkGetEventNumber(h)))
+if ((index < 0) || (index >= btkC3DserverGetEventNumber_p(h,idx)))
     error('btk:C3Dserver', 'Invalid index has been used.');
 end
 %btkSetEventStatus(h, index+1, status);
@@ -512,10 +528,11 @@ end
 
 function res = btkC3DserverDeleteEvent(id, index)
 [h, idx] = btkC3DserverExtractHandle_p(id);
-if ((index < 0) || (index >= btkGetEventNumber(h)))
+if ((index < 0) || (index >= btkC3DserverGetEventNumber_p(h,idx)))
     error('btk:C3Dserver', 'Invalid index has been used.');
 end
-btkRemoveEvent(h, index+1);
+index_ = btkC3DserverGetEventIndex_p(index,idx);
+btkRemoveEvent(h, index_);
 res = 1; % Removed
 btkC3DserverSetModified_p(idx,1);
 
@@ -1993,6 +2010,7 @@ btkC3DserverHandles(idx).modified = 0;
 btkC3DserverHandles(idx).strictChecking = 1;
 btkC3DserverHandles(idx).parameterIndexMapping = {};
 btkC3DserverHandles(idx).copiedParameter = 0;
+btkC3DserverHandles(idx).hiddenParameterEvents = [0,0];
 
 % Check if the given ID is valid and then return the index of the associated index.
 function idx = btkC3DserverCheckHandleID_p(id)
@@ -2196,4 +2214,15 @@ if (isstruct(varargin{end-1}))
     btkSetMetaDataDescription(h, varargin{1:end-2}, varargin{end});
 else
     btkSetMetaDataDescription(h, varargin{1:end-1}, varargin{end});
+end
+
+function num = btkC3DserverGetEventNumber_p(h,idx)
+global btkC3DserverHandles;
+num = btkGetEventNumber(h) - btkC3DserverHandles(idx).hiddenParameterEvents(2);
+
+function index_ = btkC3DserverGetEventIndex_p(index,idx)
+global btkC3DserverHandles;
+index_ = index + 1;
+if (index_ >= btkC3DserverHandles(idx).hiddenParameterEvents(1))
+    index_ = index_ + btkC3DserverHandles(idx).hiddenParameterEvents(2);
 end

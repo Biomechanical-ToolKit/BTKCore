@@ -44,6 +44,79 @@ assertEqual(info.label, 'Knee_Right');
 btkCloseAcquisition(h)
 end
 
+function testReadWriteEvent_issue74(d)
+times = [2.72, 5.4, 7.32];
+labels = {'RIC', 'RHS', 'RTO'};
+btksrv = btkEmulateC3Dserver();
+btksrv.Open(strcat(d.in,'/C3DSamples/sample01/Eb015pi.c3d'),3);
+assertEqual(btksrv.GetNumberEvents(), 3);
+for i = 1:btksrv.GetNumberEvents()
+    assertElementsAlmostEqual(btksrv.GetEventTime(i-1), times(i), 'absolute', 1e-5);
+    assertEqual(btksrv.GetEventLabel(i-1), labels{i});
+end
+name = strcat(d.out,'/C3DSamples/btkC3DserverEmulation_ReadWriteEvent_issue74.c3d');
+btksrv.SaveFile(name, -1);
+btksrv.Close();
+btksrv.Open(name, 3);
+assertEqual(btksrv.GetNumberEvents(), 3);
+for i = 1:btksrv.GetNumberEvents()
+    assertElementsAlmostEqual(btksrv.GetEventTime(i-1), times(i), 'absolute', 1e-5);
+    assertEqual(btksrv.GetEventLabel(i-1), labels{i});
+end
+times = [2.15, 6.12, 6.1];
+labels = {'FOO1', 'BAR1', 'TOTO'};
+for i = 1:btksrv.GetNumberEvents()
+    btksrv.SetEventTime(i-1,times(i));
+    btksrv.SetEventLabel(i-1,labels{i});
+end
+for i = 1:btksrv.GetNumberEvents()
+    assertElementsAlmostEqual(btksrv.GetEventTime(i-1), times(i), 'absolute', 1e-5);
+    assertEqual(btksrv.GetEventLabel(i-1), labels{i});
+end
+btksrv.Close();
+end
+
+function testReadWriteEventBis_issue74(d)
+btksrv = btkEmulateC3Dserver();
+btksrv.Open(strcat(d.in,'/C3DSamples/sample09/PlugInC3D.c3d'),3);
+assertEqual(btksrv.GetNumberEvents(), 0);
+name = strcat(d.out,'/C3DSamples/btkC3DserverEmulation_ReadWriteEventBis_issue74.c3d');
+btksrv.SaveFile(name, -1);
+btksrv.Close();
+btksrv.Open(name, 3);
+assertEqual(btksrv.GetNumberEvents(), 0);
+num = 2;
+times = [0.15, 3.12];
+labels = {'FOO', 'BAR'};
+for i = 1:num
+    btksrv.AddEvent(labels{i}, char(1), times(i));
+end
+assertEqual(btksrv.GetNumberEvents(), num);
+for i = 1:btksrv.GetNumberEvents()
+    assertElementsAlmostEqual(btksrv.GetEventTime(i-1), times(i), 'absolute', 1e-5);
+    assertEqual(btksrv.GetEventLabel(i-1), labels{i});
+end
+times = [2.15, 6.12];
+labels = {'FOO1', 'BAR1'};
+for i = 1:btksrv.GetNumberEvents()
+    btksrv.SetEventTime(i-1,times(i));
+    btksrv.SetEventLabel(i-1,labels{i});
+end
+for i = 1:btksrv.GetNumberEvents()
+    assertElementsAlmostEqual(btksrv.GetEventTime(i-1), times(i), 'absolute', 1e-5);
+    assertEqual(btksrv.GetEventLabel(i-1), labels{i});
+end
+btksrv.SaveFile(name, -1);
+btksrv.Close();
+btksrv.Open(name, 3);
+assertEqual(btksrv.GetNumberEvents(), num);
+for i = 1:btksrv.GetNumberEvents()
+    assertElementsAlmostEqual(btksrv.GetEventTime(i-1), times(i), 'absolute', 1e-5);
+    assertEqual(btksrv.GetEventLabel(i-1), labels{i});
+end
+btksrv.Close();
+end
+
 function testGetAnalogDataEx(d)
 btksrv = btkEmulateC3Dserver();
 btksrv.Open(strcat(d.in,'/C3DSamples/sample01/Eb015pi.c3d'),3);

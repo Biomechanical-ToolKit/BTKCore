@@ -137,12 +137,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
       evt->SetDescription((*it)->GetDescription());
   }
   // ID (optional)
+  // If the function was called from btkEmulateC3Dserver, the ID was set to a fake
+  // value (-65536) used later to store correctly some events in the C3D header section
   if (nrhs >= 7)
   {
     if ((mxGetClassID(prhs[6]) != mxDOUBLE_CLASS) || mxIsEmpty(prhs[6]) || mxIsComplex(prhs[6]) || (mxGetNumberOfElements(prhs[6]) != 1))
       mexErrMsgTxt("The ID must be set by a single double representing an integer value.");
     else
-      evt->SetId(static_cast<int>(mxGetScalar(prhs[6])));
+    {
+      int id = static_cast<int>(mxGetScalar(prhs[6]));
+      if (id == -65536)
+      {
+        evt->SetDetectionFlags(0x10000);
+        id = 0;
+      }
+      evt->SetId(id);
+    }
   }
   else // Use the ID of the first event with the same label.
   {
