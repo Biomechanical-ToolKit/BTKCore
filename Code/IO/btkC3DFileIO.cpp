@@ -498,6 +498,7 @@ namespace btk
     // Events in Parameter section
       MetaData::ConstIterator itEvent = root->FindChild("EVENT");
       // Took a chance to find the events in EVENTS group instead of EVENT
+      // The BKINtechnologies Dexterit-E software use similar metadata than what proposed Vicon (See sample22 on C3D.org)
       if (itEvent == root->End())
       {
         itEvent = root->FindChild("EVENTS");
@@ -519,7 +520,7 @@ namespace btk
           MetaDataCollapseChildrenValues<std::string>(eventsLabel, *itEvent, "LABELS", eventsNumber, "uname*");
           MetaDataCollapseChildrenValues(eventsTime, *itEvent, "TIMES");
           if (static_cast<int>(eventsTime.size()) < 2 * eventsNumber)
-            btkWarningMacro(filename, "The EVENT:TIME doesn't contain the appropriate number of values. The extracted times could be corrupted.")
+            btkWarningMacro(filename, "The EVENT:TIMES doesn't contain the appropriate number of values. The extracted times could be corrupted.")
           eventsTime.resize(2 * eventsNumber, 0.0);
           MetaDataCollapseChildrenValues(eventsContext, *itEvent, "CONTEXTS");
           eventsContext.resize(eventsNumber,"");
