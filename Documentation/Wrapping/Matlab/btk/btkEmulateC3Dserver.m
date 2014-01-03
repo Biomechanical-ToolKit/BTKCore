@@ -12,15 +12,10 @@ function itf = btkEmulateC3Dserver()
 %      but 'itf.Close()'). Use parenthesis keep your code compatible with
 %      C3Dserver.
 %    - A C3D file is always opened in mode 3.
-%    - The events in BTK use the new format proposed in the C3D 
-%      documentation (using the group EVENT and EVENT_CONTEXT) which  
-%      removes the limits of 18 events (and also the possibility to write 
-%      event's label with more than 4 characters). All the events stored in 
-%      the C3D header are automatically converted. However, at this moment, 
-%      the event's status is not kept (can be added if necessary). Then, 
-%      using the following code with BTK: 'itf.SetEventStatus(0,'0')' sends
-%      a warning and do nothing. To remove the warning, you have to add
-%      this command: 'warning('OFF','btk:C3Dserver:SetEventStatus')'
+%    - The event's status is not kept in BTK. Using the following code:
+%      'itf.SetEventStatus(0,'0')' sends a warning and do nothing. To remove
+%      the warning, you have to add this command:
+%      'warning('OFF','btk:C3Dserver:SetEventStatus')'
 %    - The group and parameter number are generated from the index instead
 %      of using the ID stored in the C3D file. Like that, the user doesn't 
 %      need to manage this number. So, if you set the group or parameter 
@@ -31,13 +26,14 @@ function itf = btkEmulateC3Dserver()
 %      SetGroupNumber, SetParameterNumber. But also on the function AddGroup
 %      when you set manually the number.
 %    - The function 'CompressParameterBlocks' is alway activated in BTK as the 
-%      group/parameter are regenerated when you write the C3D. Trying to
-%      deactivate the compression (by using CompressParameterBlocks(0))
-%      will send a warning. To remove the warning, you have to add
-%      the command: 'warning('OFF','btk:C3Dserver:CompressParameterBlocks')'.
+%      the number of blocks needed for the groups/parameters is automatically 
+%      adapted when you write the C3D. Trying to deactivate the compression 
+%      (by using CompressParameterBlocks(0)) will send a warning. To remove the
+%      warning, you have to add the command:
+%      'warning('OFF','btk:C3Dserver:CompressParameterBlocks')'.
 %    - If some groups and parameters has the same name in the C3D file (which
 %      is the case with the group PROCESSING and its parameter for C3D files
-%      generated with Vicon Nexus 1.4), then BTK remove the duplication 
+%      generated with Vicon Nexus 1.4), then BTK removes the duplication 
 %      (which is not the case of C3Dserver).
 %    - When you delete a group, it is not possible to keep the associated 
 %      parameters (They are stored in the group). If you try to do it, then
@@ -79,7 +75,7 @@ function itf = btkEmulateC3Dserver()
 %      from the functions GetPointMask and GetPointMaskEx are fake masks and
 %      always set to '0000000'. To remove the warning, you have to add
 %      the command: 'warning('OFF','btk:C3Dserver:FakeMask')'.
-%
+
 %  Author: A. Barré
 %  Copyright 2009-2013 Biomechanical ToolKit (BTK).
 
@@ -90,6 +86,15 @@ function itf = btkEmulateC3Dserver()
 %    - Check for the btkGetMomentData (remove offset, in the global frame)
 
 %  HISTORY:
+%    - 13/12/28: btkEmulateC3Dserver 1.0 beta 4 released with BTK 0.3
+%        - Default groups/parameters are now generated within the command NewFile.
+%        - The writing of a C3D file relies now on the informations stored in the
+%          existing groups/parameters as C3Dserver does (instead of the default 
+%          behavior of BTK which regenerate groups/parameters from acquisition data).
+%        - Events are correctly saved in the C3D header section.
+%        - Emulation of some commands improved to speedup them.
+%        - Generation of the internal ID fixed when btkEmulateC3Dserver is called
+%          more than once in the same function.
 %    - 12/08/30: btkEmulateC3Dserver 1.0 beta 3 released with BTK 0.2
 %        - Code updated to remove all the BTK functions related to the camera mask
 %          as this information was removed from BTK 0.2.
@@ -102,7 +107,7 @@ id = btkC3DserverRequestNewHandle_p();
 itf.GetRegistrationMode = 2; % Register mode (full speed)
 itf.GetRegUserName = 'Free Emulation Copy';
 itf.GetRegUserOrganization = 'Biomechanical ToolKit (BTK)';
-itf.GetVersion = sprintf('C3D Server Emulator 1.0 (beta 3) - BTK version %s, compatible C3Dserver 1.144.0', btkGetVersion());
+itf.GetVersion = sprintf('C3D Server Emulator 1.0 (beta 4) - BTK version %s, compatible C3Dserver 1.144.0', btkGetVersion());
 itf.GetHandle = @()btkC3DserverGetHandle(id);
 itf.Open = @(filename,mode)btkC3DserverOpen(id,filename,mode);
 itf.Close = @()btkC3DserverClose(id);
