@@ -306,22 +306,15 @@ namespace btk
           ibfs->SeekRead(maxEvents, BinaryFileStream::Current);
           ibfs->SeekRead(2, BinaryFileStream::Current); // (word 198)
           it = events->Begin();
+          int numCharLabelEvent = 2;
           if (labelEventFormat == 12345)
+            numCharLabelEvent = 4;
+          while(it != events->End())
           {
-            while(it != events->End())
-            {
-              (*it)->SetLabel(btkTrimString(ibfs->ReadString(4)));
-              ++it;
-            }
+            (*it)->SetLabel(btkTrimString(ibfs->ReadString(numCharLabelEvent)));
+            ++it;
           }
-          else
-          {
-            while(it != events->End())
-            {
-              (*it)->SetLabel(btkTrimString(ibfs->ReadString(2)));
-              ++it;
-            }
-          }
+          
         }
     // Parameter
         ibfs->SeekRead((512 * (parameterFirstBlock - 1)), BinaryFileStream::Begin);
