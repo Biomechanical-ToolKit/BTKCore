@@ -22,7 +22,7 @@
  * The @c StorageFormat option can receive 2 values:
  * - @c Integer: Acquisition data are scaled and stored as 16 bits integer.
  * - @c Float: Acquisition data are stored as floating values.
- * The REGENERATEINTERNALS is an advanced option which can receive 2 values.
+ * The @c RegenerateInternals option is an advanced option which can receive 2 values.
  * - @c DataBased: Internal file format configuration (if any) is regenerated based on
  *   the acquisition data (i.e. points and analog channels plus events). This
  *   option is the default one.
