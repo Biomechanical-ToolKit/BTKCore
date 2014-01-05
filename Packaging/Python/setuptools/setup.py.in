@@ -1,0 +1,65 @@
+# coding=utf-8
+
+from setuptools import setup, find_packages
+from distutils.sysconfig import get_python_version
+from pkg_resources import get_build_platform
+import platform, sys, os, shutil
+
+version = '@BTK_VERSION_STRING@'
+name = 'python-btk'
+
+operating_system_classifier = ''
+if platform.system() == 'Windows':
+    operating_system_classifier = 'Operating System :: Microsoft :: Windows :: Windows ' + platform.release()
+elif platform.system() == 'Darwin':
+    operating_system_classifier = 'Operating System :: MacOS :: MacOS X'
+elif platform.system() == 'Linux':
+    operating_system_classifier = 'Operating System :: POSIX :: Linux'
+
+setup(name=name,
+      version=version,
+      description='Python binding for the C++ library Biomechanical ToolKit (BTK)',
+      long_description='''\
+@BTK_PYTHON_PACKAGE_LONG_DESCRIPTION@''',
+      classifiers=[
+          'Programming Language :: C++',
+          'Topic :: Scientific/Engineering :: Medical Science Apps.',
+          'Programming Language :: Python :: ' + get_python_version(),
+          operating_system_classifier,
+          'License :: OSI Approved :: BSD License',
+          'Development Status :: 5 - Production/Stable'
+      ], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      keywords='motion capture gait analysis C3D btk',
+      author='Arnaud Barré',
+      author_email='arnaud.barre@gmail.com',
+      url='https://code.google.com/p/b-tk/',
+      license='New BSD License',
+      packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
+      package_data={name: [@BTK_PYTHON_PACKAGE_DATA@]},
+      include_package_data=True,
+      zip_safe=False,
+      install_requires=['numpy'],
+      entry_points='''
+      # -*- Entry points: -*-
+      ''',
+      )
+
+# Custom command to rename generated file and copy it in the @BTK_BINARY_DIR@/dist folder
+if len(sys.argv) > 1:
+    for i in xrange(1,len(sys.argv)):
+        bdist_original_filename = ''
+        bdist_final_filename = ''
+        if (sys.argv[i] == 'bdist_egg'):
+            bdist_original_filename = name.replace('-','_') + '-' + version + '-py' + get_python_version() + '.egg'
+            bdist_final_filename = name + '_' + version + '-py' + get_python_version() + '_' + get_build_platform() + '.egg'
+        if (sys.argv[i] == 'bdist_rpm'):
+            bdist_original_filename = name + '-' + version + '-1.' + platform.machine() + '.rpm'
+            bdist_final_filename = name + '_' + version + '-1_' + platform.machine() + '.rpm'
+        if (sys.argv[i] == 'bdist_wininst'):
+            bdist_original_filename = name + '-' + version + '.' + get_build_platform() + '.exe'
+            bdist_final_filename = name + '_' + version + '_' + get_build_platform() + '.exe'
+        if (len(bdist_original_filename) != 0):
+            dest = '@BTK_BINARY_DIR@/dist/'
+            if not os.path.exists(dest):
+                os.makedirs(dest)
+            shutil.copy('@BTK_PYTHON_PACKAGE_BINARY_DIR@/dist/' + bdist_original_filename, '@BTK_BINARY_DIR@/dist/' + bdist_final_filename)

@@ -1,0 +1,13 @@
+HARDCODED_PYTHON_LIB_PATH="/usr/local/lib/python@PYTHON_VERSION_MAJOR@.@PYTHON_VERSION_MINOR@"
+HARDCODED_PYTHON_SITE_PATH="$HARDCODED_PYTHON_LIB_PATH/dist-packages"
+HARDCODED_PYTHON_BTK_PATH="$HARDCODED_PYTHON_SITE_PATH/btk"
+if [ -d "$HARDCODED_PYTHON_BTK_PATH" ]; then
+  find "$HARDCODED_PYTHON_BTK_PATH" -maxdepth 0 -empty -exec rmdir {} \;
+fi
+if [ -d "$HARDCODED_PYTHON_SITE_PATH" ]; then
+  find "$HARDCODED_PYTHON_SITE_PATH" -maxdepth 0 -empty -exec rmdir {} \;
+fi
+if [ -d "$HARDCODED_PYTHON_LIB_PATH" ]; then
+  find "$HARDCODED_PYTHON_LIB_PATH" -maxdepth 0 -empty -exec rmdir {} \;
+fi
+ldconfig
