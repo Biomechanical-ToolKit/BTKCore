@@ -41,7 +41,6 @@ function out = TDD
             catch
                 c3dserverDetected = false;
             end
-            c3dserverDetected = false;
             if (c3dserverDetected)
                 % - Run the unit tests
                 fprintf('\n===========================================================\n');
