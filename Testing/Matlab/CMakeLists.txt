@@ -1,4 +1,4 @@
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/_TDD.m.in ${BTK_EXECUTABLE_PATH}/TDD.m)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/_TDDConfigure.m.in ${CMAKE_CURRENT_BINARY_DIR}/TDDConfigure.m)
 
-ADD_TEST(NAME "TDD_Matlab" WORKING_DIRECTORY ${BTK_EXECUTABLE_PATH} COMMAND ${MATLAB_EXECUTABLE} "-nojvm -nosplash -r \"out = TDD; if (out) exit(0); else exit(1); end\"")
+ADD_TEST(NAME "TDD_Matlab" WORKING_DIRECTORY ${BTK_EXECUTABLE_PATH} COMMAND ${MATLAB_EXECUTABLE} -nojvm -nosplash -nodesktop -wait -r "out = TDD; if (out) exit(0); else exit(1); end")
