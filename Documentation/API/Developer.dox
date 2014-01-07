@@ -16,7 +16,7 @@
 - @ref ProgrammingStyle
  - @ref CodingStyle
  - @ref DoxygenDocumentation
-- @ref SVNBTK
+- @ref GITBTK
  - @ref SourceCheckout
  - @ref SubmittingPatch
 - @ref BugReports
@@ -29,9 +29,12 @@ The code compiles without any warning nor error under the tested configurations:
  - MacOS X 10.3 / GCC 3.3 (PPC 32 bits)
  - MacOS X 10.5 / GCC 4.0 (Intel 32/64 bits)
  - MacOS X 10.6 / GCC 4.2 (Intel 64 bits)
+ - MacOS X 10.8 / Clang 3.2 (Intel 64 bits)
+ - MacOS X 10.9 / Clang 5 (Intel 64 bits)
  - Ubuntu 9.04 "Jaunty" / GCC 4.3 (Intel 32 bits)
  - Ubuntu 10.04 "Lucid Lynx" / GCC 4.4  (Intel 64bits)
  - Ubuntu 10.10 "Maverick Meerkat" / GCC 4.5 (Intel 64 bits)
+ - Ubuntu 12.04 / GCC 4.5 (Intel 32/64 bits)
  - Windows XP SP3 / MSVC 2008 (Intel 32 bits)
  - Windows XP SP3 / MSVC 2010 (Intel 32 bits)
  - Windows Vista SP1 / MSVC 2010 (Intel 32 bits)
@@ -187,25 +190,24 @@ Shimba T.@n
 <em>An estimation of center of gravity from force platform data</em>.@n
 Journal of Biomechanics, <b>1984</b>, 17(1), 53–60.
 
-@section SVNBTK Using SVN for BTK development
+@section GITBTK Using Git for BTK development
 
-The library BTK uses <a href="http://subversion.apache.org/">Subversion</a> (SVN) to manage files and directories, and the changes made to them, over time. You can use the following free clients to checkout the code.
-  - <a href="http://tortoisesvn.tigris.org/">TortoiseSVN</a> (Windows only)
-  - <a href="http://kdesvn.alwins-world.de/">KDESvn</a> (Linux only)
-  - <a href="http://www.syntevo.com/smartsvn/index.html">SmartSVN</a> (Win/Mac/Linux)
+Since BTK 0.3, the library uses <a href="http://git-scm.com">Git</a> to manage files and directories, and the changes made to them, over time. You can use the following free clients to checkout the code.
+  - <a href="http://www.sourcetreeapp.com">SourceTree</a> (Windows and MacOS X)
+  - <a href="http://qt-project.org">Qt Creator</a> (Win/Mac/Linux)
+  - <a href="http://www.syntevo.com/smartgithg/">SmartGit/Hg</a> (Win/Mac/Linux)
   - <a href="http://developer.apple.com">XCode</a> (MacOS X only)
 
-For an exhaustive list of the Subversion clients, you can check this <a href="http://en.wikipedia.org/wiki/Comparison_of_Subversion_clients">page</a> on Wikipedia.
+For an exhaustive list of the Git clients, you can check this <a href="http://git-scm.com/downloads">page</a> on the Git official website.
 
-The code is hosted by google and can be browsed <a
-href="http://code.google.com/p/b-tk/source/browse/#svn/BTK/trunk">here</a>.
-It lists the trunk (the default branch) and its folder.
+The code is hosted on GoogleCode and can be browsed <a
+href="https://code.google.com/p/b-tk/source/browse/?repo=core">here</a>.
 If you prefer, you can also access to the list of <a
-href="http://code.google.com/p/b-tk/source/list">changes</a>.
+href="https://code.google.com/p/b-tk/source/list?repo=core">changes</a>.
 
 @subsection SourceCheckout Source checkout
 
-The URL to use in the SVN client to download the latest source code for the trunk is the following: http://b-tk.googlecode.com/svn/BTK/trunk.
+The URL to use in the Git client to download the latest source code is the following: https://code.google.com/p/b-tk.core/.
 This URL gives you a read-only access to the source code. Only the members can commit into the source code.
 
 @subsection SubmittingPatch Submitting Patch
@@ -222,10 +224,6 @@ conflicts in the code and finally gives errors during the compilation
 or worster, crash the final application.
  - Create a patch from the top of the sources (the root) or at least
 indicate from which folder you create the patch.
-
-@b Note: For TortoiseSVN user, check this <a
-href="http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-patch.html">help</a>
-to create patch.
 
 @section BugReports Bug reports
 For bug reports and feature requests, please use the <a

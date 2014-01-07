@@ -34,7 +34,7 @@ Moreover, by using these kits you have the possibility to link only the library 
 
 Finally, the following graph gives you a simplified view (mind map) of the internal structure of the code.
 
-@image html btk_code_structure.png "Mind mapping for the folder 'Code'"
+@image html btk_code_structure.png "Mind mapping for the folder 'Code' in BTK 0.1.7"
 
 @section PipelineMecanism Pipeline's mechanism
 
