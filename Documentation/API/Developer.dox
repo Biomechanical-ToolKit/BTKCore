@@ -165,7 +165,6 @@ Every function / class / method or member (public and protected) must have a blo
  - BTKCommon 
  - BTKIO
  - BTKBasicFilters
- - BTKVTK
  
 A class must have also a brief description to be included in the <tt>Class Index</tt> page. 
 

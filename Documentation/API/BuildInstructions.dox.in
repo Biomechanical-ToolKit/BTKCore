@@ -18,8 +18,6 @@ This page is separated in the following sections and give you all the details to
   - @ref build_sec
   - @ref config_sec 
     - @ref config_extra_warnings
-    - @ref config_vissupport
-      - @ref config_vtk
     - @ref config_matlab
       - @ref config_matlab_redistributable
     - @ref config_octave
@@ -28,7 +26,6 @@ This page is separated in the following sections and give you all the details to
     - @ref config_examples
     - @ref config_shared
     - @ref config_test
-    - @ref config_tools
   - @ref internal_config_sec 
     - @ref internal_config_doc_readme 
     - @ref internal_utility_easy_install 

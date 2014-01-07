@@ -1,21 +1,0 @@
-/**
-@page MokkaCmdLine Command line options
-
-The options can be summarized as the following (generated from the @c --help option):
-@verbatim
-USAGE:  Mokka [-p] [-c <file>] [-h] [-v] file  
-
-DESCRIPTION:  Motion Kinematic & Kinetic Analyzer - x.y.z
-
-OPTIONS:
-  -p, --play    Start to play the acquisition
-  -c <file>, --visual-config=<file>    Set the default visual configuration
-  -h, --help    Display this message
-  -v, --version    Display version information
-@endverbatim
-
-Using these options it comes easy to load an acquisition, a visual configuration and launch the playback from an external program. For example:
-@verbatim
-Mokka.exe -c PiG.mvc -p myFile.c3d
-@endverbatim
- */

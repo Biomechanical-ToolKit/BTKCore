@@ -95,17 +95,10 @@
     #else
       #define BTK_BASICFILTERS_EXPORT __declspec(dllimport)
     #endif
-    // BTKVisSupport
-    #if defined(BTKVTK_EXPORTS)
-      #define BTK_VTK_EXPORT __declspec(dllexport)
-    #else
-      #define BTK_VTK_EXPORT __declspec(dllimport)
-    #endif
   #elif (defined(__GNUC__) && (__GNUC__ >= 4))
     #define BTK_COMMON_EXPORT __attribute__((visibility("default")))
     #define BTK_IO_EXPORT __attribute__((visibility("default")))
     #define BTK_BASICFILTERS_EXPORT __attribute__((visibility("default")))
-    #define BTK_VTK_EXPORT __attribute__((visibility("default")))
   #else
     #error Unsupported compiler to build modules as dynamic libraries
   #endif
@@ -113,7 +106,6 @@
   #define BTK_COMMON_EXPORT
   #define BTK_IO_EXPORT
   #define BTK_BASICFILTERS_EXPORT
-  #define BTK_VTK_EXPORT
 #endif
 
 // Addons for Eigen

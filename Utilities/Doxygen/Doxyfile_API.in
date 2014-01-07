@@ -810,8 +810,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = "${BTK_VISSUPPORT_NO_DOCUMENTATION}" \
-                         "${BTK_VTKSUPPORT_NO_DOCUMENTATION}"
+EXCLUDE                = 
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -1999,13 +1998,9 @@ PREDEFINED             = BTK_COMMON_EXPORT \
                          BTK_IO_EXPORT \
                          BTK_BASICFILTERS_EXPORT \
                          BTK_VISSUPPORT_EXPORT \
-                         BTK_VTK_EXPORT \
                          BTK_IO_ACQUISITON_FILE_FACTORY_INIT \
                          btkChooseNativeBinaryFileStream=BinaryFileStream \
-                         HAVE_SYS_MMAP=1 \
-                         FIX_DOXYGEN_VTK_MISSING_MACRO_DEFINITIONS=1 \
-                         VTK_MAJOR_VERSION=5 \
-                         VTK_MINOR_VERSION=10
+                         HAVE_SYS_MMAP=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

@@ -55,12 +55,6 @@ Add compiler flags in debug mode to be more verbose when the compiler find some 
 @subsubsection config_test_path BTK_TESTING_DATA_PATH
 Path containing the input data for the unit tests. Download <tt>BTKData-x.y.z.zip</tt> (where <tt>x.y.z</tt> corresponds to your version of BTK), unzip it (for example in the folder Testing), and set this variable to the installation path. You can also use the folder BTKData hosted on the svn server using <tt>svn checkout http://b-tk.googlecode.com/svn/BTKData</tt>. The script must find the folder "Input" otherwise most of the unit tests will fail.
 
-@subsubsection config_vissupport BTK_USE_VISSUPPORT
-To display BTK data in 2D/3D enviromments. This option activates sub-options to choose the environment(s) to used.
-
-@paragraph config_vtk BTK_USE_VTK
-Builds library BTKVTK to display BTK data in the <a href="http://www.vtk.org">VTK</a> environment. VTK 5.8 or above required. This option is only shown when @ref config_vissupport is activated.
-
 @subsubsection config_matlab BTK_WRAP_MATLAB
 Enable/Disable generation of BTK bindings in the Matlab language. In order to build the Matlab-based BTK interpreter, the target computer needs to have Matlab 7.0.4 or above installed. To turn on Matlab wrapping, set BTK_WRAP_MATLAB to ON during the configuration process.
 
@@ -97,9 +91,6 @@ This option generates the API documentation and can be found in "Documentation/A
 @paragraph config_doc_api_unselected BUILD_DOCUMENTATION_API_UNSELECTED_MODULES
 This option forces to build the full API documentation.
 
-@paragraph config_doc_mokka BUILD_DOCUMENTATION_MOKKA
-This option build the documentation of the tool Mokka and can be found in "Documentation/Mokka" from the the build directory. This documentation is in a HTML format. The main file is the file index.html. Each time you build Mokka, the documentation will be copied.
-
 @subsubsection config_examples BUILD_EXAMPLES
 Active the building of examples in the folder Examples.
 
@@ -115,10 +106,6 @@ On UNIX-style platforms, the dynamic loader will use an environment variable suc
 @subsubsection config_test BUILD_TESTING
 Each BTK class has unit tests and/or regression tests to verify their functionnalities. All the tests are in the directory Testing/Code. All the required input data should be inserted in the Testing/Data/Input directory and the generated ouput data should be inserted in the Testing/Data/Output. These tests use a modified version of CxxTest embedded in the directory Utilities. This version suppress the Perl/Python dependencies and replace them by C macros. As with the regular CxxTest library, the tests are declared and implemented in a header file. A test class requires to be defined by macro CXXTEST_SUITE. All the class' methods used for tests purpose must be defined by CXXTEST_TEST. Finally, the class must be registred by using CXXTEST_SUITE_REGISTRATION and tests by CXXTEST_TEST_REGISTRATION. The header containing the suite of tests has to be included in the CXX file calling the runner.
 
-@subsubsection config_tools BUILD_TOOLS
-Active the building of tools embedded in BTK. These tools are:
- - Mokka: Visualizer/editor of acquisition data. Requires <a href="http://www.vtk.org">VTK</a> 5.8 or above and <a href="http://www.qtsoftware.com">Qt</a> 4.5 or above. The option @ref config_vtk must be activated.
- 
 @htmlonly <hr> @endhtmlonly
  
 @subsection internal_config_sec Internal Configuration Options in CMake 

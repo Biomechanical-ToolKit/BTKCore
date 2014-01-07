@@ -26,8 +26,7 @@ The internal structure of the code in BTK can be presented in 4 groups:
 Each group names a kit and creates a specific library. Then, for the moment, BTK is composed of four libraries:
 - BTKCommon ;
 - BTKIO ;
-- BTKBasicFilters ;
-- BTKVTK (subfolder of VisSupport using the VTK library).
+- BTKBasicFilters.
 
 The use of this structure can give a better reading of the developer to know where to find the code of the desired class or where to add its new class.
 

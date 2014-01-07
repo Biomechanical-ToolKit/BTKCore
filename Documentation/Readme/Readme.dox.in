@@ -10,8 +10,6 @@
   - @ref config_sec 
     - @ref config_extra_warnings
     - @ref config_test_path
-    - @ref config_vissupport
-      - @ref config_vtk
     - @ref config_matlab
       - @ref config_matlab_redistributable
     - @ref config_octave
@@ -20,7 +18,6 @@
     - @ref config_examples
     - @ref config_shared
     - @ref config_test
-    - @ref config_tools
   - @ref internal_config_sec 
     - @ref internal_config_doc_readme 
     - @ref internal_utility_easy_install 
@@ -53,11 +50,8 @@ The BTK source code repository is organized into six major sections.
   - @b Common: Core classes commonly used by other kits
   - @b IO: Classes for reading and writing data
   - @b BasicFilers: Simple filters to adapt data 
-  - @b VisSupport: Visualization support in 2D/3D environment
-    - @b VTK: Visualization in VTK environment
 - The @b Examples directory contains ressources to use BTK.
 - The @b Testing directory contains lots of testing examples. These are undocumented tests but can be helpful in some cases.
-- The @b Tools directory contains applications created with BTK sources.
 - The @b Utilities directory contains ressources or libraries required to build BTK.
 - The @b Wrapping directory contains code related to BTK and various programing language to bridge BTK with them.
 

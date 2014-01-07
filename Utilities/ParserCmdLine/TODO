@@ -1,8 +1,0 @@
-This file is the TODO list for the "Parser for the Command Line" library.
-
- + Enhance the parser
-   - Need to refactor / include the new options and their comportment
-   - Add the long option with an optional value in the next option (--option value)
- + Implement the double hypen option class (DoubleHyphenOpt.h) and a add method in CmdLine class
- + Implement the multiple flag option class (MultiFlagOpt.h)
- + Implement the PrintHelp and PrintBrief method in the CmdLine class
