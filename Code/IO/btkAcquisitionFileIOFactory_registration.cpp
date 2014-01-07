@@ -72,7 +72,6 @@
 #include "btkKistlerDATFileIO.h"
 // Others
 #include "btkEMFFileIO.h"
-#include "btkAMTIForcePlatformFileIO.h"
 #include "btkCLBFileIO.h"
 
 namespace btk
@@ -117,7 +116,6 @@ namespace btk
     BTK_REGISTER_ACQUISITION_FILE_IO(KistlerDATFileIO)
 
     BTK_REGISTER_ACQUISITION_FILE_IO(EMFFileIO)
-    BTK_REGISTER_ACQUISITION_FILE_IO(AMTIForcePlatformFileIO)
     BTK_REGISTER_ACQUISITION_FILE_IO(CLBFileIO)
   };
 };

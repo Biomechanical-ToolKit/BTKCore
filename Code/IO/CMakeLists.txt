@@ -14,7 +14,6 @@ SET(BTKIO_SRCS
   btkBinaryFileStream.cpp
   btkMultiSTLFileWriter.cpp
   # File formats
-  btkAMTIForcePlatformFileIO.cpp
   btkANBFileIO.cpp
   btkANCFileIO.cpp
   btkANGFileIO.cpp
