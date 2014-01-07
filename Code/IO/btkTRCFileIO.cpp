@@ -237,7 +237,7 @@ namespace btk
             continue;
           // Count the number of tab
           int numTabs = 0;
-          for (int j = 0 ; j < line.length() ; ++j)
+          for (size_t j = 0 ; j < line.length() ; ++j)
           {
             if (line[j] == '\t')
               ++numTabs;
