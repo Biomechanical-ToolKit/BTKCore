@@ -36,11 +36,11 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing (joint) angles</td>
   </tr>
   <tr>
-    <td style="border: 1px solid #aaa; padding: 5px;"> ASC<sup>2</sup> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> BSF<sup>2</sup> </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::AMTIForcePlatformFileIO @htmlonly</p> </td>
-    <td style="border: 1px solid #aaa; padding: 5px;"> <i>AMTI</i> ASCII file format containing FxFyFzMxMyMz data. No need of the COP file.</td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::BSFFileIO @htmlonly</p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>AMTI</i> binary file format containing force platform data.</td>
   </tr>
   <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> C3D </td>
@@ -180,7 +180,7 @@
   <strong>Remarks</strong>
   <ol>
     <li>ANG files are loaded as 3D joints&#x27; angles instead of joints&#x27; angles separated in each plane (sagittal, frontal, transverse). Moreover, the foot progression angle is separated of the ankle angles for each foot. </li>
-    <li>AMTI ASC files require additional informations on the geometry of the force platform. More information in the description of the class @endhtmlonly btk::AMTIForcePlatformFileIO @htmlonly.</li>
+    <li>BSF files with two force platforms and more are partially supported as the location of one platform relatively to the other is missing.</li>
     <li>GR<tt>*</tt> files are loaded as force platforms of type I (i.e. ground reaction forces, COP, and ground reaction moments: <tt>F(X|Y|Z), P(X|Y), MZ</tt>). </li>
     <li>MOM files contain moments expressed in Nm and stored by plane but values are automatically converted in Nmm and expressed by joints to be coherent with data in BTK. </li>
   </ol>
