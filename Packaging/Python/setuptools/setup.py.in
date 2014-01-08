@@ -6,7 +6,7 @@ from pkg_resources import get_build_platform
 import platform, sys, os, shutil
 
 version = '@BTK_VERSION_STRING@'
-name = 'python-btk'
+name = 'btk'
 
 operating_system_classifier = ''
 if platform.system() == 'Windows':
@@ -15,6 +15,22 @@ elif platform.system() == 'Darwin':
     operating_system_classifier = 'Operating System :: MacOS :: MacOS X'
 elif platform.system() == 'Linux':
     operating_system_classifier = 'Operating System :: POSIX :: Linux'
+    
+bdist_original_filename = ''
+bdist_final_filename = ''
+if len(sys.argv) > 1:
+    for i in xrange(1,len(sys.argv)):
+        if (sys.argv[i] == 'bdist_egg'):
+            bdist_original_filename = name + '-' + version + '-py' + get_python_version() + '.egg'
+            bdist_final_filename = name + '-' + version + '-py' + get_python_version() + '_' + get_build_platform() + '.egg'
+        if (sys.argv[i] == 'bdist_rpm'):
+            name = 'python-btk'
+            bdist_original_filename = name + '-' + version + '-1.' + platform.machine() + '.rpm'
+            bdist_final_filename = name + '-' + version + '-1_' + platform.machine() + '.rpm'
+        if (sys.argv[i] == 'bdist_wininst'):
+            name = 'python-btk'
+            bdist_original_filename = name + '-' + version + '.' + get_build_platform() + '.exe'
+            bdist_final_filename = name + '-' + version + '_' + get_build_platform() + '.exe'
 
 setup(name=name,
       version=version,
@@ -45,21 +61,8 @@ setup(name=name,
       )
 
 # Custom command to rename generated file and copy it in the @BTK_BINARY_DIR@/dist folder
-if len(sys.argv) > 1:
-    for i in xrange(1,len(sys.argv)):
-        bdist_original_filename = ''
-        bdist_final_filename = ''
-        if (sys.argv[i] == 'bdist_egg'):
-            bdist_original_filename = name.replace('-','_') + '-' + version + '-py' + get_python_version() + '.egg'
-            bdist_final_filename = name + '_' + version + '-py' + get_python_version() + '_' + get_build_platform() + '.egg'
-        if (sys.argv[i] == 'bdist_rpm'):
-            bdist_original_filename = name + '-' + version + '-1.' + platform.machine() + '.rpm'
-            bdist_final_filename = name + '_' + version + '-1_' + platform.machine() + '.rpm'
-        if (sys.argv[i] == 'bdist_wininst'):
-            bdist_original_filename = name + '-' + version + '.' + get_build_platform() + '.exe'
-            bdist_final_filename = name + '_' + version + '_' + get_build_platform() + '.exe'
-        if (len(bdist_original_filename) != 0):
-            dest = '@BTK_BINARY_DIR@/dist/'
-            if not os.path.exists(dest):
-                os.makedirs(dest)
-            shutil.copy('@BTK_PYTHON_PACKAGE_BINARY_DIR@/dist/' + bdist_original_filename, '@BTK_BINARY_DIR@/dist/' + bdist_final_filename)
+if (len(bdist_original_filename) != 0):
+    dest = '@BTK_BINARY_DIR@/dist/'
+    if not os.path.exists(dest):
+        os.makedirs(dest)
+    shutil.copy('@BTK_PYTHON_PACKAGE_BINARY_DIR@/dist/' + bdist_original_filename, '@BTK_BINARY_DIR@/dist/' + bdist_final_filename)
