@@ -1,6 +1,8 @@
 FIND_PACKAGE(PythonInterp REQUIRED QUIET)
 
+MESSAGE(STATUS "---------------------------")
 MESSAGE(STATUS "Packaging Python Binding...")
+MESSAGE(STATUS "---------------------------")
 
 SET(BTK_PYTHON_PACKAGE_SOURCE_DIR "${BTK_SOURCE_DIR}/Packaging/Python/setuptools")
 SET(BTK_PYTHON_PACKAGE_BINARY_DIR "${BTK_BINARY_DIR}/Packaging/Python")
