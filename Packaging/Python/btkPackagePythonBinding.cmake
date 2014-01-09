@@ -75,7 +75,7 @@ ELSEIF(UNIX)
   IF(ARCH_64_BIT)
     SET(RPM_ARCH "x86_64")
   ELSE(ARCH_64_BIT)
-    SET(RPM_ARCH "i386")
+    SET(RPM_ARCH "i686")
   ENDIF(ARCH_64_BIT)
   # The next line force the installation to /usr/local/lib/pythonx.y/dist-packages
   # but the script linux-post-install.sh will move the installed files to an existing python
