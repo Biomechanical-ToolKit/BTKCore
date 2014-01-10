@@ -149,12 +149,21 @@ namespace btk
       // Main header (SMnHeaderTag)
       if (bifs.ReadI32() != 100)
         throw BSFFileIOException("Invalid BSF file.");
+#if 1
+      bifs.SeekRead(4, BinaryFileStream::Current);
+#else
       int32_t headerSize = bifs.ReadI32();
+#endif
       int32_t numberOfActivePlatforms = bifs.ReadI32();
       int32_t numberOfActiveInstruments = bifs.ReadI32();
       std::string subjectName = btkTrimString(bifs.ReadString(100));
       std::string testDate = btkTrimString(bifs.ReadString(12));
       std::string subjectDateOfBirth = btkTrimString(bifs.ReadString(12));
+#if 1
+      bifs.SeekRead(24, BinaryFileStream::Current);
+      double totaleTimeTrial = bifs.ReadDouble(); // seconds
+      bifs.SeekRead(36, BinaryFileStream::Current);
+#else
       double weight = bifs.ReadDouble();
       double height = bifs.ReadDouble();
       std::string sex = btkTrimString(bifs.ReadString(1));
@@ -169,6 +178,7 @@ namespace btk
       int32_t preTriggerValue = bifs.ReadI32();
       int32_t postTriggerValue = bifs.ReadI32();
       double triggerValue = bifs.ReadDouble();
+#endif
       bifs.SeekRead(4, BinaryFileStream::Current); // FIXME: There is 4 extra bytes in the file used to test this reader! What are they?
       int32_t rate = bifs.ReadI32();
       std::string protocol = btkTrimString(bifs.ReadString(150));

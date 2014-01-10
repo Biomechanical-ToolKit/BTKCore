@@ -209,6 +209,9 @@ namespace btk
   template <class T>
   inline void DownsampleData(int ratio, btkSharedPtr<T> input, btkSharedPtr<T> output)
   {
+    btkNotUsed(ratio);
+    btkNotUsed(input);
+    btkNotUsed(output);
     btkErrorMacro("Generic method. Please specialize it.");
   };
 

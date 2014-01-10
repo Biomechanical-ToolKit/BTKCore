@@ -50,6 +50,8 @@ namespace btk
       std::vector<T>& values,
       MetaDataInfo::ConstPointer info)
   {
+    btkNotUsed(values);
+    btkNotUsed(info);
     btkErrorMacro("Error during metadata's value collapsing. Generic method used.");
   };
 
