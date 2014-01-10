@@ -1,17 +1,21 @@
 # Based on the file vtkCompilerExtras.cmake
-IF(CMAKE_COMPILER_IS_GNUCXX)
+IF(CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
   INCLUDE(CheckCXXCompilerFlag)
 
-  # Addtional warnings for GCC
+  # Compatible flags between GCC and Clang
   # -Wshadow has been removed due to eigen
-  SET(CMAKE_CXX_FLAGS_WARN "-Wnon-virtual-dtor -Wno-long-long -ansi -Wcast-align -Wchar-subscripts -Wall -Wextra -Wpointer-arith -Wformat-security -Woverloaded-virtual -Wunused-parameter -fno-check-new -fno-common")
+  SET(CMAKE_CXX_FLAGS_WARN "-Wnon-virtual-dtor -Wno-long-long -Wcast-align -Wchar-subscripts -Wall -Wextra -Wpointer-arith -Wformat-security -Woverloaded-virtual -Wunused-parameter -fno-common")
+  # Addtional warnings for GCC
+  IF(CMAKE_COMPILER_IS_GNUCXX)
+    SET(CMAKE_CXX_FLAGS_WARN ${CMAKE_CXX_FLAGS_WARN} "-fno-check-new -ansi")
+  ENDIF(CMAKE_COMPILER_IS_GNUCXX)  
 
   # This flag is useful as not returning from a non-void function is an error
   # with MSVC, but it is not supported on all GCC compiler versions
-  CHECK_CXX_COMPILER_FLAG(-Werror=return-type HAVE_GCC_ERROR_RETURN_TYPE)
-  IF(HAVE_GCC_ERROR_RETURN_TYPE)
+  CHECK_CXX_COMPILER_FLAG(-Werror=return-type HAVE_COMPILER_ERROR_RETURN_TYPE)
+  IF(HAVE_COMPILER_ERROR_RETURN_TYPE)
     SET(CMAKE_CXX_FLAGS_ERROR "-Werror=return-type")
-  ENDIF(HAVE_GCC_ERROR_RETURN_TYPE)
+  ENDIF(HAVE_COMPILER_ERROR_RETURN_TYPE)
 
   # Set up the debug CXX_FLAGS for extra warnings
   OPTION(BTK_EXTRA_COMPILER_WARNINGS "Add compiler flags to do stricter checking when building debug." OFF)
@@ -37,4 +41,4 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
       SET(CMAKE_OLD_CXX_FLAGS_DEBUG 0 CACHE STRING "" FORCE)
     ENDIF(CMAKE_OLD_CXX_FLAGS_DEBUG)
   ENDIF(BTK_EXTRA_COMPILER_WARNINGS)
-ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+ENDIF(CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
