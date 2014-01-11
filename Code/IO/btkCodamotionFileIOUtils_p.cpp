@@ -56,7 +56,7 @@ namespace btk
     // frequency. The number of frames can be different too. In this second case, the maximum
     // number of frames is taken and the extra frame for some markers will be set as invalid
     // NOTE: From the code of Open3DMotion, it seems that unit for markers is the millimeter.
-    int numPointFrames = (o3dm_markers.size() == 0) ? 0 : o3dm_markers[0]->NumFrames();
+    size_t numPointFrames = (o3dm_markers.size() == 0) ? 0 : o3dm_markers[0]->NumFrames();
     double pointFrequency = (o3dm_markers.size() == 0) ? 0.0 : o3dm_markers[0]->Rate;
     int firstFrame = (o3dm_markers.size() == 0) ? 1 : (static_cast<int>(o3dm_markers[0]->Start * o3dm_markers[0]->Rate) + 1);
     double pointStart = (o3dm_markers.size() == 0) ? 0.0 : o3dm_markers[0]->Start;
@@ -131,7 +131,7 @@ namespace btk
     if ((pointFrequency == 0.0) && (commonAnalogFrequency == 0.0))
       throw(CodamotionFileIOException("The case where there is not frame for marker and analog is not handled by BTK."));
     int numAnalogSamplesPerFrame = static_cast<int>(commonAnalogFrequency / pointFrequency);
-    int numAnalogFrames = numPointFrames * numAnalogSamplesPerFrame;
+    size_t numAnalogFrames = numPointFrames * numAnalogSamplesPerFrame;
     
     // Store the markers data in the BTK Acquisition object
     PointCollection::Pointer points = output->GetPoints();
@@ -141,10 +141,10 @@ namespace btk
       // Get sequence & iterator (may throw exception if missing fields)
       const Open3DMotion::TimeSequence* ts = o3dm_markers[i];
       Open3DMotion::TSOccVector3ConstIter iter_ts(*ts);
-      for (int j = 0 ; j < o3dm_markers[i]->NumFrames() ; ++j, iter_ts.Next())
-        pt->SetDataSlice(j, iter_ts.Value()[0], iter_ts.Value()[1], iter_ts.Value()[2], iter_ts.Occluded() ? -1.0 : 0.0);
-      for (int j = o3dm_markers[i]->NumFrames() ; j < numPointFrames ; ++j)
-        pt->SetDataSlice(j, 0.0, 0.0, 0.0, -1.0); // Invalid
+      for (size_t j = 0 ; j < o3dm_markers[i]->NumFrames() ; ++j, iter_ts.Next())
+        pt->SetDataSlice((int)j, iter_ts.Value()[0], iter_ts.Value()[1], iter_ts.Value()[2], iter_ts.Occluded() ? -1.0 : 0.0);
+      for (size_t j = o3dm_markers[i]->NumFrames() ; j < numPointFrames ; ++j)
+        pt->SetDataSlice((int)j, 0.0, 0.0, 0.0, -1.0); // Invalid
       points->InsertItem(pt);
     }
 
@@ -152,8 +152,8 @@ namespace btk
     AnalogCollection::Pointer analogs = output->GetAnalogs();
     for (size_t i = 0 ; i < o3dm_analogs.size() ; ++i)
     {
-      int numFrames = numAnalogFrames < o3dm_analogs[i]->NumFrames() ? numAnalogFrames : o3dm_analogs[i]->NumFrames();
-      btk::Analog::Pointer an = btk::Analog::New(o3dm_analogs[i]->Channel, numAnalogFrames);
+      size_t numFrames = numAnalogFrames < o3dm_analogs[i]->NumFrames() ? numAnalogFrames : o3dm_analogs[i]->NumFrames();
+      btk::Analog::Pointer an = btk::Analog::New(o3dm_analogs[i]->Channel, static_cast<int>(numAnalogFrames));
       double offset = o3dm_analogs[i]->Offset.Value();
       double scale = o3dm_analogs[i]->Scale.Value();
       an->SetOffset(static_cast<int>(offset));
@@ -165,20 +165,20 @@ namespace btk
       /// Extract data (without or with the need of interpolation)
       if (analogs_subsample[i] == 1)
       {
-         for (int j = 0 ; j < numFrames ; ++j, iter_ts.Next())
-           an->SetDataSlice(j, (iter_ts.Value() - offset) * scale);
+         for (size_t j = 0 ; j < numFrames ; ++j, iter_ts.Next())
+           an->SetDataSlice((int)j, (iter_ts.Value() - offset) * scale);
       }
       else if (numFrames > 0)
       {
         double val0 = (iter_ts.Value() - offset) * scale; an->SetDataSlice(0, val0); iter_ts.Next();
-        for (int j = 1 ; j < numFrames ; ++j, iter_ts.Next())
+        for (size_t j = 1 ; j < numFrames ; ++j, iter_ts.Next())
         {
           double val1 = (iter_ts.Value() - offset) * scale;
-          an->SetDataSlice(j * analogs_subsample[i], val1);
+          an->SetDataSlice(static_cast<int>(j * analogs_subsample[i]), val1);
           // Linear interpolation
           for (int k = 1 ; k < analogs_subsample[i] ; ++k)
           {
-            int frame = (j-1) * analogs_subsample[i] + k;
+            int frame = static_cast<int>(j-1) * analogs_subsample[i] + k;
             double lambda = static_cast<double>(frame % analogs_subsample[i]) / static_cast<double>(analogs_subsample[i]);
             an->SetDataSlice(frame, (1.0-lambda) * val0 + lambda * val1);
           }
