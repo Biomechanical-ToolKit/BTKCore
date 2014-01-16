@@ -88,7 +88,7 @@ CXXTEST_SUITE(EigenIIRFilterDesignTest)
     TS_ASSERT_DELTA(a(8),  0.50855151093463624    , 5e-13); // Not so accurate?
     TS_ASSERT_DELTA(a(9),  -2.5520129858487823e-14, 1e-13);
     TS_ASSERT_DELTA(a(10), -0.14482945329972546   , 5e-13);
-    TS_ASSERT_DELTA(a(11), 3.1717384177005001e-15 , 1e-14); // Note: With Eigen3 the result is negative: -3.53945e-15
+    TS_ASSERT_DELTA(a(11), 3.1717384177005001e-15 , 5e-14); // Note: With Eigen3 the result is negative: -3.53945e-15
     TS_ASSERT_DELTA(a(12), 0.026252219253782492   , 1e-14);
     TS_ASSERT_DELTA(a(13), -1.8499567508325164e-16, 1e-15);
     TS_ASSERT_DELTA(a(14), -0.00202968024924362   , 1e-15);

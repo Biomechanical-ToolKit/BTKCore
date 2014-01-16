@@ -38,6 +38,7 @@ SET(CMAKE_MODULE_PATH "${BTK_CMAKE_MODULE_PATH}")
 
 # Load some macros.
 INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkMacCompilerFlags.cmake)
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkLinuxCompilerFlags.cmake)
 INCLUDE(CMakeDependentOption)
 INCLUDE(CheckIncludeFile)
 INCLUDE(CheckIncludeFileCXX)
