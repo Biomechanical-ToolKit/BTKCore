@@ -30,7 +30,7 @@ function btkTransformTDFToViconC3DFile(TDF_INPUT, C3D_OUTPUT)
 %                 exists really before trying to remove them.
 
 %  Author: A. Barré
-%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
 if (nargin < 2)
     C3D_OUTPUT = [TDF_INPUT,'.c3d'];

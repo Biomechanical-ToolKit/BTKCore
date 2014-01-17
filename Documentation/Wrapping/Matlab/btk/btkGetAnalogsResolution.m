@@ -6,7 +6,7 @@ function ar = btkGetAnalogsResolution(h)
 %  This handle is obtained by the use of a btk* function.
 
 %  Author: A. Barré
-%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
 warning('This function is deprecated and will be removed in a next release. Use btkGetAnalogResolution instead.');
 return btkGetAnalogResolution(h);

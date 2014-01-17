@@ -3,7 +3,7 @@
 # This module defines: 
 #  NUMPY_INCLUDE_DIR: include path for arrayobject.h
 
-# Copyright (c) 2009-2013 Arnaud Barré <arnaud.barre@gmail.com>
+# Copyright (c) 2009-2014 Arnaud Barré <arnaud.barre@gmail.com>
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 

@@ -1,6 +1,6 @@
 /* 
  * The Biomechanical ToolKit
- * Copyright (c) 2009-2013, Arnaud Bdataé
+ * Copyright (c) 2009-2014, Arnaud Bdataé
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without

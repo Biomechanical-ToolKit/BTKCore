@@ -77,7 +77,7 @@ function itf = btkEmulateC3Dserver()
 %      the command: 'warning('OFF','btk:C3Dserver:FakeMask')'.
 
 %  Author: A. Barré
-%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
 %  TODO:
 %    - How to set parameter's values with the type 'Char'?

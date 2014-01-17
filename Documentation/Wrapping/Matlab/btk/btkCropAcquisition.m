@@ -12,7 +12,7 @@ function btkCropAcquisition(h, startAt, numFrames)
 %  from the frame STARTAT.
 
 %  Author: A. Barré
-%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
 ff = btkGetFirstFrame(h);
 lf = btkGetLastFrame(h);

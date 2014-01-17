@@ -7,7 +7,7 @@ function btkCloseAcquisition(h) %#ok
 %  btk* function.
 
 %  Author: A. Barré
-%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
 btkDeleteAcquisition(h)
 

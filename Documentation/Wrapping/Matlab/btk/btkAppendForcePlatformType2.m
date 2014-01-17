@@ -50,7 +50,7 @@ function btkAppendForcePlatformType2(h, forces, moments, corners, origin, localF
  
 
 %  Author: A. Barré
-%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
 if (nargin < 4)
     error('Missing input arguments');

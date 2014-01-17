@@ -13,7 +13,7 @@ function hc = btkCloneAcquisition(ho) %#ok
 %  memory and an "Out of memory" error could be thrown.
 
 %  Author: A. Barré
-%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
 % The following comment, MATLAB compiler pragma, is necessary to avoid 
 % compiling this M-file instead of linking against the MEX-file.  Don't remove.

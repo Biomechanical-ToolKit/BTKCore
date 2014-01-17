@@ -7,7 +7,7 @@ function md = btkSetMetaDataValues(h, varargin) %#ok
 %  by the use of a btk* function.
 
 %  Author: A. Barré
-%  Copyright 2009-2013 Biomechanical ToolKit (BTK).
+%  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
 md = btkSetMetaData(h, varargin{:});
 
