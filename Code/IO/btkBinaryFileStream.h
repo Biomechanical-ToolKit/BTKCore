@@ -169,6 +169,14 @@ namespace btk
     BTK_IO_EXPORT void ReadU32(size_t nb, uint32_t* values);
     void ReadU32(std::vector<uint32_t>& values) {if (values.empty()) return; this->ReadU32(values.size(), &(values[0]));};
     std::vector<uint32_t> ReadU32(size_t nb) {std::vector<uint32_t> values(nb); this->ReadU32(values); return values;};
+    virtual int64_t ReadI64() = 0;
+    BTK_IO_EXPORT void ReadI64(size_t nb, int64_t* values);
+    void ReadI64(std::vector<int64_t>& values) {if (values.empty()) return; this->ReadI64(values.size(), &(values[0]));};
+    std::vector<int64_t> ReadI64(size_t nb) {std::vector<int64_t> values(nb); this->ReadI64(values); return values;};
+    virtual uint64_t ReadU64() = 0;
+    BTK_IO_EXPORT void ReadU64(size_t nb, uint64_t* values);
+    void ReadU64(std::vector<uint64_t>& values) {if (values.empty()) return; this->ReadU64(values.size(), &(values[0]));};
+    std::vector<uint64_t> ReadU64(size_t nb) {std::vector<uint64_t> values(nb); this->ReadU64(values); return values;};
     virtual float ReadFloat() = 0;
     BTK_IO_EXPORT void ReadFloat(size_t nb, float* values);
     void ReadFloat(std::vector<float>& values) {if (values.empty()) return; this->ReadFloat(values.size(), &(values[0]));};
@@ -233,6 +241,10 @@ namespace btk
     using BinaryFileStream::ReadI32;
     BTK_IO_EXPORT virtual uint32_t ReadU32();
     using BinaryFileStream::ReadU32;
+    BTK_IO_EXPORT virtual int64_t ReadI64(); 
+    using BinaryFileStream::ReadI64;
+    BTK_IO_EXPORT virtual uint64_t ReadU64();
+    using BinaryFileStream::ReadU64;
     BTK_IO_EXPORT virtual float ReadFloat();
     using BinaryFileStream::ReadFloat;
     BTK_IO_EXPORT virtual double ReadDouble();
@@ -263,6 +275,10 @@ namespace btk
     using BinaryFileStream::ReadI32;
     BTK_IO_EXPORT virtual uint32_t ReadU32();
     using BinaryFileStream::ReadU32;
+    BTK_IO_EXPORT virtual int64_t ReadI64(); 
+    using BinaryFileStream::ReadI64;
+    BTK_IO_EXPORT virtual uint64_t ReadU64();
+    using BinaryFileStream::ReadU64;
     BTK_IO_EXPORT virtual float ReadFloat();
     using BinaryFileStream::ReadFloat;
     BTK_IO_EXPORT virtual double ReadDouble();
@@ -293,6 +309,10 @@ namespace btk
     using BinaryFileStream::ReadI32;
     BTK_IO_EXPORT virtual uint32_t ReadU32();
     using BinaryFileStream::ReadU32;
+    BTK_IO_EXPORT virtual int64_t ReadI64(); 
+    using BinaryFileStream::ReadI64;
+    BTK_IO_EXPORT virtual uint64_t ReadU64();
+    using BinaryFileStream::ReadU64;
     BTK_IO_EXPORT virtual float ReadFloat();
     using BinaryFileStream::ReadFloat;
     BTK_IO_EXPORT virtual double ReadDouble();

@@ -489,6 +489,72 @@ namespace btk
   };
   
   /** 
+   * @fn int64_t BinaryFileStream::ReadI64() = 0
+   * Extracts one signed 64-bit integer.
+   */
+  
+  /** 
+   * @fn std::vector<int64_t> BinaryFileStream::ReadI64(size_t nb)
+   * Extracts @a nb signed 64-bit integers and return them as a vector.
+   */
+  
+  /**
+   * @fn void BinaryFileStream::ReadI64(std::vector<int64_t>& values)
+   * Extracts exactly the number of elements set in the vector @a values
+   *
+   * @note In case you want to assign only a part of the vector, you can use the method using an array.
+   * For example;
+   * @code
+   * std::vector<int64_t> val(45,0);
+   * bfs.ReadI64(10, &(val[0])); // assign value #0-9
+   * // ...
+   * bfs.ReadI64(5, &(val[40])); // assign value #41-45
+   * @endcode
+   */
+  
+  /**
+   * Extracts @a nb signed 64-bit integers and set them in the array @a values.
+   */
+  void BinaryFileStream::ReadI64(size_t nb, int64_t* values)
+  {
+    for (size_t i = 0 ; i < nb ; ++i)
+      values[i] = this->ReadI64();
+  };
+  
+  /** 
+   * @fn uint64_t BinaryFileStream::ReadU64() = 0
+   * Extracts one unsigned 64-bit integer.
+   */
+  
+  /** 
+   * @fn std::vector<uint64_t> BinaryFileStream::ReadU64(size_t nb)
+   * Extracts @a nb unsigned 64-bit integers and return them as a vector.
+   */
+  
+  /**
+   * @fn void BinaryFileStream::ReadU64(std::vector<uint64_t>& values)
+   * Extracts exactly the number of elements set in the vector @a values
+   *
+   * @note In case you want to assign only a part of the vector, you can use the method using an array.
+   * For example;
+   * @code
+   * std::vector<uint64_t> val(45,0);
+   * bfs.ReadU64(10, &(val[0])); // assign value #0-9
+   * // ...
+   * bfs.ReadU64(5, &(val[40])); // assign value #41-45
+   * @endcode
+   */
+  
+  /**
+   * Extracts @a nb unsigned 64-bit integers and set them in the array @a values.
+   */
+  void BinaryFileStream::ReadU64(size_t nb, uint64_t* values)
+  {
+    for (size_t i = 0 ; i < nb ; ++i)
+      values[i] = this->ReadU64();
+  };
+  
+  /** 
    * @fn float BinaryFileStream::ReadFloat() = 0
    * Extracts one float.
    */
@@ -880,6 +946,42 @@ namespace btk
   };
   
   /** 
+   * Extracts one signed 64-bit integer.
+   */
+  int64_t VAXLittleEndianBinaryFileStream::ReadI64()
+  {
+    char byteptr[8] = {0};
+    this->mp_Stream->read(byteptr, 8);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[8] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2], byteptr[5], byteptr[4], byteptr[7], byteptr[6]};
+    return *reinterpret_cast<int64_t const*>(foo);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    return *reinterpret_cast<int64_t const*>(byteptr);
+#else
+    char foo[8] = {byteptr[6], byteptr[7], byteptr[4], byteptr[5], byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    return *reinterpret_cast<int64_t const*>(foo);
+#endif
+  };
+
+  /** 
+   * Extracts one unsigned 64-bit integer.
+   */
+  uint64_t VAXLittleEndianBinaryFileStream::ReadU64()
+  {
+    char byteptr[8] = {0};
+    this->mp_Stream->read(byteptr, 8);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[8] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2], byteptr[5], byteptr[4], byteptr[7], byteptr[6]};
+    return *reinterpret_cast<uint64_t const*>(foo);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    return *reinterpret_cast<uint64_t const*>(byteptr);
+#else
+    char foo[8] = {byteptr[6], byteptr[7], byteptr[4], byteptr[5], byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    return *reinterpret_cast<uint64_t const*>(foo);
+#endif
+  };
+  
+  /** 
    * Extracts one float.
    */
   float VAXLittleEndianBinaryFileStream::ReadFloat()
@@ -1092,6 +1194,42 @@ namespace btk
   };
   
   /** 
+   * Extracts one signed 64-bit integer.
+   */
+  int64_t IEEEBigEndianBinaryFileStream::ReadI64()
+  {
+    char byteptr[8] = {0};
+    this->mp_Stream->read(byteptr, 8);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    return *reinterpret_cast<int64_t const*>(byteptr);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    char foo[8] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2], byteptr[5], byteptr[4], byteptr[7], byteptr[6]};
+    return *reinterpret_cast<int64_t const*>(foo);
+#else
+    char foo[8] = {byteptr[7], byteptr[6], byteptr[5], byteptr[4], byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<int64_t const*>(foo);
+#endif
+  };
+  
+  /** 
+   * Extracts one unsigned 64-bit integer.
+   */
+  uint64_t IEEEBigEndianBinaryFileStream::ReadU64()
+  {
+    char byteptr[8] = {0};
+    this->mp_Stream->read(byteptr, 8);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    return *reinterpret_cast<uint64_t const*>(byteptr);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */
+    char foo[8] = {byteptr[1], byteptr[0], byteptr[3], byteptr[2], byteptr[5], byteptr[4], byteptr[7], byteptr[6]};
+    return *reinterpret_cast<uint64_t const*>(foo);
+#else
+    char foo[8] = {byteptr[7], byteptr[6], byteptr[5], byteptr[4], byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<uint64_t const*>(foo);
+#endif
+  };
+  
+  /** 
    * Extracts one float.
    */
   float IEEEBigEndianBinaryFileStream::ReadFloat()
@@ -1285,7 +1423,6 @@ namespace btk
 #endif
   };
 
-
   /** 
    * Extracts one unsigned 32-bit integer.
    */
@@ -1303,7 +1440,42 @@ namespace btk
     return *reinterpret_cast<uint32_t const*>(byteptr);
 #endif
   };
+  
+  /** 
+   * Extracts one signed 64-bit integer.
+   */
+  int64_t IEEELittleEndianBinaryFileStream::ReadI64()
+  {
+    char byteptr[8] = {0};
+    this->mp_Stream->read(byteptr, 8);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[8] = {byteptr[7], byteptr[6], byteptr[5], byteptr[6], byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<int64_t const*>(foo);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */ 
+    char foo[8] = {byteptr[6], byteptr[7], byteptr[4], byteptr[5], byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    return *reinterpret_cast<int64_t const*>(foo);
+#else
+    return *reinterpret_cast<int64_t const*>(byteptr);
+#endif
+  };
 
+  /** 
+   * Extracts one unsigned 64-bit integer.
+   */
+  uint64_t IEEELittleEndianBinaryFileStream::ReadU64()
+  {
+    char byteptr[8] = {0};
+    this->mp_Stream->read(byteptr, 8);
+#if PROCESSOR_TYPE == 3 /* IEEE_BigEndian */
+    char foo[8] = {byteptr[7], byteptr[6], byteptr[5], byteptr[6], byteptr[3], byteptr[2], byteptr[1], byteptr[0]};
+    return *reinterpret_cast<uint64_t const*>(foo);
+#elif PROCESSOR_TYPE == 2 /* VAX_LittleEndian */ 
+    char foo[8] = {byteptr[6], byteptr[7], byteptr[4], byteptr[5], byteptr[2], byteptr[3], byteptr[0], byteptr[1]};
+    return *reinterpret_cast<uint64_t const*>(foo);
+#else
+    return *reinterpret_cast<uint64_t const*>(byteptr);
+#endif
+  };
 
   /** 
    * Extracts one float.
