@@ -322,6 +322,8 @@ namespace btk
       gain = Analog::PlusMinus1;
     else if (gain <= Analog::PlusMinus1Dot25)
       gain = Analog::PlusMinus1Dot25;
+    else if (gain <= Analog::PlusMinus1Dot65)
+      gain = Analog::PlusMinus1Dot65;
     else if (gain <= Analog::PlusMinus2Dot5)
       gain = Analog::PlusMinus2Dot5;
     else if (gain <= Analog::PlusMinus5)

@@ -80,7 +80,7 @@ namespace btk
     
     typedef enum {Unknown = 0, 
                   PlusMinus10 = 10000, PlusMinus5 = 5000, PlusMinus2Dot5 = 2500, 
-                  PlusMinus1Dot25 = 1250, PlusMinus1 = 1000, PlusMinus0Dot5 = 500, 
+                  PlusMinus1Dot65 = 1650, PlusMinus1Dot25 = 1250, PlusMinus1 = 1000, PlusMinus0Dot5 = 500, 
                   PlusMinus0Dot25 = 250, PlusMinus0Dot1 = 100, PlusMinus0Dot05 = 50} Gain;
 
     typedef btkSharedPtr<Analog> Pointer;

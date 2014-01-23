@@ -81,6 +81,10 @@ namespace btk
    * +/- 2.5 volts.
    */
   /**
+   * @var Analog::Gain Analog::PlusMinus1Dot65
+   * +/- 1.65 volts.
+   */
+  /**
    * @var Analog::Gain Analog::PlusMinus1Dot25
    * +/- 1.25 volts.
    */

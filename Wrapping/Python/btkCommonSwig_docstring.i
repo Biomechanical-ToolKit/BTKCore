@@ -119,6 +119,7 @@ The gain has a limited range of possible values and are listed in the following 
  - btk.btkAnalog.PlusMinus10: gain for the range +/- 10 volts;
  - btk.btkAnalog.PlusMinus5: gain for the range +/- 5 volts;
  - btk.btkAnalog.PlusMinus2Dot5: gain for the range +/- 2.5 volts;
+ - btk.btkAnalog.PlusMinus1Dot65: gain for the range +/- 1.65 volts;
  - btk.btkAnalog.PlusMinus1Dot25: gain for the range +/- 1.25 volts;
  - btk.btkAnalog.PlusMinus1: gain for the range +/- 1 volts;.
 

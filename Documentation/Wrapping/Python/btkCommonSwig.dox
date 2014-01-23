@@ -44,6 +44,10 @@ namespace btk
  * Gain for the range +/- 2.5 volts.
  */
 /**
+ * @var btkAnalog::PlusMinus1Dot65
+ * Gain for the range +/- 1.65 volts.
+ */
+/**
  * @var btkAnalog::PlusMinus1Dot25
  * Gain for the range +/- 1.25 volts.
  */
