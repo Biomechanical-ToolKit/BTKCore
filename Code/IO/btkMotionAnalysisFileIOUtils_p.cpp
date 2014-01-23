@@ -338,36 +338,13 @@ namespace btk
     uint16_t range;
     switch(gain) // range is in mV
     {
-      case Analog::PlusMinus10:
-        range = 10000;
-        break;
-      case Analog::PlusMinus5:
-        range = 5000;
-        break;
-      case Analog::PlusMinus2Dot5:
-        range = 2500;
-        break;
-      case Analog::PlusMinus1Dot25:
-        range = 1250;
-        break;
-      case Analog::PlusMinus1:
-        range = 1000;
-        break;
-      case Analog::PlusMinus0Dot5:
-        range = 500;
-        break;
-      case Analog::PlusMinus0Dot25:
-        range = 250;
-        break;
-      case Analog::PlusMinus0Dot1:
-        range = 100;
-        break;
-      case Analog::PlusMinus0Dot05:
-        range = 50;
-        break;
       case Analog::Unknown:
         range = ANxFileIODetectAnalogRange_p(scale, bitDepth);
         btkWarningMacro("Unknown gain for channel #" + ToString(idx+1) + ". Automatically replaced by +/- " + ToString(static_cast<double>(range) / 1000)  + " volts in the file. Could corrupt the data in the written file!");
+        break;
+      default:
+        // The given gain corresponds to the range. See the values for the Analog::Gain enumation
+        range = static_cast<uint16_t>(gain);
         break;
     }
     return range;

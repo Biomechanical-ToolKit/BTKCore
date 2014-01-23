@@ -1736,9 +1736,6 @@ namespace btk
       units[inc] = (*itAnalog)->GetUnit();
       switch((*itAnalog)->GetGain())
       {
-      case Analog::Unknown:
-        gain[inc] = 0;
-        break;
       case Analog::PlusMinus10:
         gain[inc] = 1;
         break;
@@ -1754,17 +1751,8 @@ namespace btk
       case Analog::PlusMinus1:
         gain[inc] = 5;
         break;
-      case Analog::PlusMinus0Dot5:
-        gain[inc] = 6;
-        break;
-      case Analog::PlusMinus0Dot25:
-        gain[inc] = 7;
-        break;
-      case Analog::PlusMinus0Dot1:
-        gain[inc] = 8;
-        break;
-      case Analog::PlusMinus0Dot05:
-        gain[inc] = 9;
+      default:
+        gain[inc] = 0;
         break;
       }
       analogChannelScale[inc] = static_cast<float>(this->m_AnalogChannelScale[inc]);
