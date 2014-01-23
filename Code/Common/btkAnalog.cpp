@@ -203,6 +203,34 @@ namespace btk
   };
 
   /**
+   * Try to set gain from the given value @a g.
+   * The input must represent one of the value associated with the enum Analog::Gain.
+   * These value can be interpreted as the half ot voltage range expressed in mV.
+   */
+  void Analog::SetGainFromValue(int g)
+  {
+    switch(g)
+    {
+    case Analog::PlusMinus10:
+    case Analog::PlusMinus5:
+    case Analog::PlusMinus2Dot5:
+    case Analog::PlusMinus1Dot65:
+    case Analog::PlusMinus1Dot25:
+    case Analog::PlusMinus1:
+    case Analog::PlusMinus0Dot5:  
+    case Analog::PlusMinus0Dot25:
+    case Analog::PlusMinus0Dot1:
+    case Analog::PlusMinus0Dot05:
+      this->SetGain(static_cast<Analog::Gain>(g));
+      break;
+    default:
+      btkWarningMacro("Unknown gain. Replaced by a gain of +/- 10 volts.");
+      this->SetGain(Analog::PlusMinus10);
+      break;
+    }
+  };
+  
+  /**
    * @fn int Analog::GetOffset() const
    * Returns the analog offset value in bit which represents the 0 value.
    */
