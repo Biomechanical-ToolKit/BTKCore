@@ -34,7 +34,10 @@ CXXTEST_SUITE(DelsysEMGFileReaderTest)
     TS_ASSERT_EQUALS(acq->GetAnalogFrameNumber(),60000);
     TS_ASSERT_EQUALS(acq->GetAnalogFrequency(),2000);
     for (int i = 0 ; i < 8; ++i)
+    {
       TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel(), "EMG Ch" + btk::ToString(i+1));
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetGain(), btk::Analog::PlusMinus1);
+    }
     TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues().coeff(0), 1.6327e-5, 1e-9);
     TS_ASSERT_DELTA(acq->GetAnalog(2)->GetValues().coeff(29999), 3.4180e-5, 1e-9);
     TS_ASSERT_DELTA(acq->GetAnalog(5)->GetValues().coeff(12000), 3.4180e-5, 1e-9)

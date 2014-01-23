@@ -239,25 +239,7 @@ namespace btk
           (*it)->SetUnit(bifs.ReadString(bifs.ReadU32()));
           (*it)->SetLabel(bifs.ReadString(bifs.ReadU32()));
           gains[inc] = bifs.ReadDouble(); // System gain
-          int gain = static_cast<int>(gains[inc]);
-          switch(gain)
-          {
-          case Analog::PlusMinus10:
-          case Analog::PlusMinus5:
-          case Analog::PlusMinus2Dot5:
-          case Analog::PlusMinus1Dot25:
-          case Analog::PlusMinus1:
-          case Analog::PlusMinus0Dot5:  
-          case Analog::PlusMinus0Dot25:
-          case Analog::PlusMinus0Dot1:
-          case Analog::PlusMinus0Dot05:
-            (*it)->SetGain(static_cast<Analog::Gain>(gain));
-            break;
-          default:
-            btkWarningMacro(filename, "Unknown gain. Contact the developer to add it in the list. Replaced by a gain of +/- 10 volts.");
-            (*it)->SetGain(Analog::PlusMinus10);
-            break;
-          }
+          (*it)->SetGainFromValue(static_cast<int>(gains[inc]));
           bifs.SeekRead(8, BinaryFileStream::Current); // AD gain
           resolutions[inc] = bifs.ReadDouble();
           offsets[inc] = bifs.ReadDouble();
