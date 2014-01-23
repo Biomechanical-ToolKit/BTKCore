@@ -57,5 +57,7 @@
 #define BSFFilePathOUT std::string(TDD_FilePathOUT) + "BSFSamples/"
 #define KistlerDATFilePathIN std::string(TDD_FilePathIN) + "KistlerDATSamples/"
 #define KistlerDATFilePathOUT std::string(TDD_FilePathOUT) + "KistlerDATSamples/"
+#define HPFFilePathIN std::string(TDD_FilePathIN) + "HPFSamples/"
+#define HPFFilePathOUT std::string(TDD_FilePathOUT) + "HPFSamples/"
 
 #endif // _TDDConfigure_h

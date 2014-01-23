@@ -29,6 +29,8 @@
 #include "EMxFileReaderTest.h"
 #include "GRxFileIOTest.h"
 #include "GRxFileReaderTest.h"
+#include "HPFFileIOTest.h"
+#include "HPFFileReaderTest.h"
 #include "KistlerDATFileIOTest.h"
 #include "KistlerDATFileReaderTest.h"
 #include "MDFFileIOTest.h"

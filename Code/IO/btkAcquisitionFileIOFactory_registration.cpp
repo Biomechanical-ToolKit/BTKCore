@@ -58,6 +58,7 @@
 #include "btkTDFFileIO.h"
 // Delsys IO
 #include "btkDelsysEMGFileIO.h"
+#include "btkHPFFileIO.h"
 // Elite IOs
 #include "btkANGFileIO.h"
 #include "btkEMxFileIO.h"
@@ -102,6 +103,7 @@ namespace btk
     BTK_REGISTER_ACQUISITION_FILE_IO(TDFFileIO)
 
     BTK_REGISTER_ACQUISITION_FILE_IO(DelsysEMGFileIO) // MUST BE BEFORE EMxFileIO
+    BTK_REGISTER_ACQUISITION_FILE_IO(HPFFileIO)
 
     BTK_REGISTER_ACQUISITION_FILE_IO(ANGFileIO)
     BTK_REGISTER_ACQUISITION_FILE_IO(EMxFileIO)
