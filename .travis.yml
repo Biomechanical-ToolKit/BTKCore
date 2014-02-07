@@ -6,7 +6,7 @@ before_install:
   
 # To install any prerequisites or dependencies necessary to run your build
 install:  
-  - brew install cmake swig
+  - brew install swig
   
 # To prepare your build for testing
 before_script:
