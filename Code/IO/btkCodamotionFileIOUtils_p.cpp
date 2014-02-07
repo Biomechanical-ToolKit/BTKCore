@@ -60,7 +60,7 @@ namespace btk
     double pointFrequency = (o3dm_markers.size() == 0) ? 0.0 : o3dm_markers[0]->Rate;
     int firstFrame = (o3dm_markers.size() == 0) ? 1 : (static_cast<int>(o3dm_markers[0]->Start * o3dm_markers[0]->Rate) + 1);
     double pointStart = (o3dm_markers.size() == 0) ? 0.0 : o3dm_markers[0]->Start;
-    bool mixedPointNumFrames = false;
+    bool mixedNumFrames = false;
     for (size_t i = 0 ; i < o3dm_markers.size() ; ++i)
     {
       if (fabs(o3dm_markers[i]->Rate - pointFrequency) > 1e-6)
@@ -70,12 +70,29 @@ namespace btk
       if (numPointFrames != o3dm_markers[i]->NumFrames())
       {
         numPointFrames = numPointFrames > o3dm_markers[i]->NumFrames() ? numPointFrames : o3dm_markers[i]->NumFrames();
-        mixedPointNumFrames = true;
+        mixedNumFrames = true;
       }
     }
-    if (mixedPointNumFrames)
+    if (mixedNumFrames)
     {
       btkWarningMacro(filename, "The number of frames is not the same for every markers. Extra frames will be added to some markers.")
+    }
+    // In case there is no marker the number of frames is set to 0. We need to check the number of frames of the analog channels.
+    if (numPointFrames == 0)
+    {
+      numPointFrames = (o3dm_analogs.size() == 0) ? 0 : o3dm_analogs[0]->NumFrames();
+      for (size_t i = 0 ; i < o3dm_analogs.size() ; ++i)
+      {
+        if (numPointFrames != o3dm_analogs[i]->NumFrames())
+        {
+          numPointFrames = numPointFrames > o3dm_analogs[i]->NumFrames() ? numPointFrames : o3dm_analogs[i]->NumFrames();
+          mixedNumFrames = true;
+        }
+      }
+      if (mixedNumFrames)
+      {
+        btkWarningMacro(filename, "The number of frames is not the same for every analog channels. Extra frames will be added to some analog channels.")
+      }
     }
     // For analog channels, this is the same. The number of frames must be a multiple of the
     // number of video frames (i.e. the analogs' frequency must be a multiple of the markers' frequency)
@@ -270,7 +287,8 @@ namespace btk
             channelData[inc*numChannelPerPlatform + i] = static_cast<int16_t>(analogindex_zerobased + 1);
             Analog::Pointer ch = output->GetAnalog(analogindex_zerobased);
             // Open3DMotion stores platform' forces and not their reactions.
-            ch->GetValues() *= -1.0;
+            if (numAnalogFrames != 0)
+              ch->GetValues() *= -1.0;
             // By default Open3DMotion set force's label to Force1, Force2, etc.
             // They are rewritten to be compatible with other file formats available in BTK.
             switch (i)

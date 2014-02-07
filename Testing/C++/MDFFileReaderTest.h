@@ -64,6 +64,22 @@ CXXTEST_SUITE(MDFFileReaderTest)
       for (int j = 0 ; j < acqC3D->GetAnalogFrameNumber() ; j+=10)
         TS_ASSERT_DELTA(acqMDF->GetAnalog(i)->GetValues()(j), acqC3D->GetAnalog(i)->GetValues()(j), 1e-5);
   };
+  
+  CXXTEST_TEST(ADBHL)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(MDFFilePathIN + "ADBHL.mdf");
+    reader->Update();
+  
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+  
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), 1);
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), 0);
+    TS_ASSERT(acq->GetPointFrameNumber() != 0);
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), acq->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 1000.0);
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 32);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(MDFFileReaderTest)
@@ -72,4 +88,5 @@ CXXTEST_TEST_REGISTRATION(MDFFileReaderTest, MisspelledFile)
 CXXTEST_TEST_REGISTRATION(MDFFileReaderTest, Gait_bilateral_1997_Kistlerx1)
 CXXTEST_TEST_REGISTRATION(MDFFileReaderTest, Gait_bilateral_1997_Kistlerx1_MDF_vs_C3D_float)
 CXXTEST_TEST_REGISTRATION(MDFFileReaderTest, Gait_bilateral_1997_Kistlerx1_MDF_vs_C3D_integer)
+CXXTEST_TEST_REGISTRATION(MDFFileReaderTest, ADBHL)
 #endif
