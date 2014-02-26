@@ -1759,6 +1759,116 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     
     TS_ASSERT_EQUALS(pfe->GetOutput()->GetItemNumber(), 2);
   };
+  
+  CXXTEST_TEST(Merge_Run4)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathIN + "merge/Run4_1.c3d");
+    
+    btk::AcquisitionFileReader::Pointer reader2 = btk::AcquisitionFileReader::New();
+    reader2->SetFilename(C3DFilePathIN + "merge/Run4_2.c3d");
+    
+    btk::AcquisitionFileReader::Pointer reader3 = btk::AcquisitionFileReader::New();
+    reader3->SetFilename(C3DFilePathIN + "merge/Run4_3.c3d");
+    
+    btk::MergeAcquisitionFilter::Pointer merger = btk::MergeAcquisitionFilter::New();
+    merger->SetInput(0, reader->GetOutput());
+    merger->SetInput(1, reader2->GetOutput());
+    merger->SetInput(2, reader3->GetOutput());
+    
+    btk::Acquisition::Pointer output = merger->GetOutput();
+    output->Update();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), 200);
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), 2000);
+    TS_ASSERT_EQUALS(output->GetPointNumber(), 17);
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), 13);
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), 54539);
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), 545390);
+    TS_ASSERT_EQUALS(output->GetEventNumber(), 0);
+    
+    for (int j = 0 ; j < output->GetPointNumber() ; ++j)
+    {
+      btk::Point::Pointer op = output->GetPoint(j);
+      btk::Point::Pointer ip = reader->GetOutput()->GetPoint(op->GetLabel());
+      for (int i = 0 ; i < 12000 ; i+=100)
+      {
+        TS_ASSERT_DELTA(op->GetValues()(i,0), ip->GetValues()(i,0), 1e-5);
+        TS_ASSERT_DELTA(op->GetValues()(i,1), ip->GetValues()(i,1), 1e-5);
+        TS_ASSERT_DELTA(op->GetValues()(i,2), ip->GetValues()(i,2), 1e-5);
+      }
+      ip = reader2->GetOutput()->GetPoint(op->GetLabel());
+      for (int i = 12000 ; i < 24000 ; i+=100)
+      {
+        TS_ASSERT_DELTA(op->GetValues()(i,0), ip->GetValues()(i-12000,0), 1e-5);
+        TS_ASSERT_DELTA(op->GetValues()(i,1), ip->GetValues()(i-12000,1), 1e-5);
+        TS_ASSERT_DELTA(op->GetValues()(i,2), ip->GetValues()(i-12000,2), 1e-5);
+      }
+      ip = reader3->GetOutput()->GetPoint(op->GetLabel());
+      for (int i = 24000 ; i < 54539 ; i+=100)
+      {
+        TS_ASSERT_DELTA(op->GetValues()(i,0), ip->GetValues()(i-24000,0), 1e-5);
+        TS_ASSERT_DELTA(op->GetValues()(i,1), ip->GetValues()(i-24000,1), 1e-5);
+        TS_ASSERT_DELTA(op->GetValues()(i,2), ip->GetValues()(i-24000,2), 1e-5);
+      }
+    }
+    
+    for (int j = 0 ; j < output->GetAnalogNumber() ; ++j)
+    {
+      btk::Analog::Pointer oa = output->GetAnalog(j);
+      btk::Analog::Pointer ia = reader->GetOutput()->GetAnalog(oa->GetLabel());
+      for (int i = 0 ; i < 120000 ; i+=100)
+      {
+        TS_ASSERT_DELTA(oa->GetValues()(i), ia->GetValues()(i), 1e-5);
+      }
+      ia = reader2->GetOutput()->GetAnalog(oa->GetLabel());
+      for (int i = 120000 ; i < 240000 ; i+=100)
+      {
+        TS_ASSERT_DELTA(oa->GetValues()(i), ia->GetValues()(i-120000), 1e-5);
+      }
+      ia = reader3->GetOutput()->GetAnalog(oa->GetLabel());
+      for (int i = 240000 ; i < 545390 ; i+=100)
+      {
+        TS_ASSERT_DELTA(oa->GetValues()(i), ia->GetValues()(i-240000), 1e-5);
+      }
+    }
+    
+    btk::AcquisitionFileWriter::Pointer c3dWriter = btk::AcquisitionFileWriter::New();
+    c3dWriter->SetFilename(C3DFilePathOUT + "Run4_merged.c3d");
+    c3dWriter->SetInput(merger->GetOutput());
+    c3dWriter->Update();
+    // Exported C3D reader
+    btk::AcquisitionFileReader::Pointer c3dReader2 = btk::AcquisitionFileReader::New();
+    c3dReader2->SetFilename(C3DFilePathOUT + "Run4_merged.c3d");
+    btk::Acquisition::Pointer acq = c3dReader2->GetOutput();
+    acq->Update();
+    
+    TS_ASSERT_EQUALS(output->GetPointFrequency(), acq->GetPointFrequency());
+    TS_ASSERT_EQUALS(output->GetAnalogFrequency(), acq->GetAnalogFrequency());
+    TS_ASSERT_EQUALS(output->GetPointNumber(), acq->GetPointNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogNumber(), acq->GetAnalogNumber());
+    TS_ASSERT_EQUALS(output->GetPointFrameNumber(), acq->GetPointFrameNumber());
+    TS_ASSERT_EQUALS(output->GetAnalogFrameNumber(), acq->GetAnalogFrameNumber());
+    TS_ASSERT_EQUALS(output->GetEventNumber(), acq->GetEventNumber());
+    
+    for (int i = 0 ; i < output->GetPointFrameNumber() ; i+=100)  
+    {
+      for (int j = 0 ; j < output->GetPointNumber() ; ++j)
+      {
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,0), acq->GetPoint(j)->GetValues().coeff(i,0), 1e-5);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,1), acq->GetPoint(j)->GetValues().coeff(i,1), 1e-5);
+        TS_ASSERT_DELTA(output->GetPoint(j)->GetValues().coeff(i,2), acq->GetPoint(j)->GetValues().coeff(i,2), 1e-5);
+      }   
+    }
+    
+    for (int i = 0 ; i < output->GetAnalogFrameNumber() ; i+=100)  
+    {
+      for (int j = 0 ; j < output->GetAnalogNumber() ; ++j)
+      {
+        TS_ASSERT_DELTA(output->GetAnalog(j)->GetValues().coeff(i), acq->GetAnalog(j)->GetValues().coeff(i), 1e-5);
+      }   
+    }
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(MergeAcquisitionFilterTest)
@@ -1793,4 +1903,5 @@ CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_TRC
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_CAL_ANC_TRC)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, C3D_Reconstructed_From_ANC_CAL_TRC)
 CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, SH01_C3D_ANC_FP)
+CXXTEST_TEST_REGISTRATION(MergeAcquisitionFilterTest, Merge_Run4)
 #endif

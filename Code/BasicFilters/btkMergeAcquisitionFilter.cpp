@@ -367,6 +367,7 @@ namespace btk
         bool mergeData = false;
         // First frame
         int diffFF = output->GetFirstFrame() - input->GetFirstFrame();
+        int oldInputNumFrames = input->GetPointFrameNumber();
         if ((diffFF < 0) && (input->GetPointFrameNumber() != 0))
         {
           if (abs(diffFF) == output->GetLastFrame())
@@ -421,7 +422,7 @@ namespace btk
           }
         }
         if (mergeData)
-          this->MergeData(output, input, diffFF);
+          this->MergeData(output, input, diffFF, oldInputNumFrames);
         else
           this->ConcatData(output, input);
         
@@ -513,25 +514,25 @@ namespace btk
     }
   };
   
-  void MergeAcquisitionFilter::MergeData(Acquisition::Pointer output, Acquisition::Pointer input, int frameNumber) const
+  void MergeAcquisitionFilter::MergeData(Acquisition::Pointer output, Acquisition::Pointer input, int diffFF, int oldInputNumFrames) const
   {
     int startFrame = 0;
-    if (frameNumber < 0)
-      startFrame = abs(frameNumber);
+    if (diffFF < 0)
+      startFrame = abs(diffFF);
     else
       startFrame = output->GetFirstFrame() - 1;
-      
+    
     for (Acquisition::PointIterator it = input->BeginPoint() ; it != input->EndPoint() ; ++it)
     {
       Point::Pointer p = *(output->FindPoint((*it)->GetLabel()));
-      p->GetValues().block(startFrame, 0, abs(frameNumber), 3) = (*it)->GetValues().block(startFrame, 0, abs(frameNumber), 3);
-      p->GetResiduals().block(startFrame, 0, abs(frameNumber), 1) = (*it)->GetResiduals().block(startFrame, 0, abs(frameNumber), 1);
+      p->GetValues().block(startFrame, 0, oldInputNumFrames, 3) = (*it)->GetValues().block(startFrame, 0, oldInputNumFrames, 3);
+      p->GetResiduals().block(startFrame, 0, oldInputNumFrames, 1) = (*it)->GetResiduals().block(startFrame, 0, oldInputNumFrames, 1);
     }
     // Analog
     for (Acquisition::AnalogIterator it = input->BeginAnalog() ; it != input->EndAnalog() ; ++it)
     {
       Analog::Pointer ac = *(output->FindAnalog((*it)->GetLabel()));
-      ac->GetValues().block(startFrame * input->GetNumberAnalogSamplePerFrame(), 0, abs(frameNumber), 1) = (*it)->GetValues().block(startFrame, 0, abs(frameNumber), 1);
+      ac->GetValues().block(startFrame * input->GetNumberAnalogSamplePerFrame(), 0, oldInputNumFrames * input->GetNumberAnalogSamplePerFrame(), 1) = (*it)->GetValues().block(startFrame * input->GetNumberAnalogSamplePerFrame(), 0, oldInputNumFrames * input->GetNumberAnalogSamplePerFrame(), 1);
     }
   };
   
