@@ -7,7 +7,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
   SET(CMAKE_CXX_FLAGS_WARN "-Wnon-virtual-dtor -Wno-long-long -Wcast-align -Wchar-subscripts -Wall -Wextra -Wpointer-arith -Wformat-security -Woverloaded-virtual -Wunused-parameter -fno-common")
   # Addtional warnings for GCC
   IF(CMAKE_COMPILER_IS_GNUCXX)
-    SET(CMAKE_CXX_FLAGS_WARN ${CMAKE_CXX_FLAGS_WARN} "-fno-check-new -ansi")
+    SET(CMAKE_CXX_FLAGS_WARN "${CMAKE_CXX_FLAGS_WARN} -fno-check-new -ansi")
   ENDIF(CMAKE_COMPILER_IS_GNUCXX)  
 
   # This flag is useful as not returning from a non-void function is an error
