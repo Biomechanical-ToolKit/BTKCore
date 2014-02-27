@@ -170,9 +170,9 @@ CXXTEST_SUITE(EigenIIRFilterDesignTest)
     double k = 1.0;
     btkEigen::zpk2tf(&b, &a, z, p, k);
     TS_ASSERT_EQUALS(b.rows(), b_r.rows());
-    TS_ASSERT(b.isApprox(b_r, 1e-15));
+    TS_ASSERT_EIGEN_DELTA(b, b_r, 1e-15);
     TS_ASSERT_EQUALS(a.rows(), a_r.rows());
-    TS_ASSERT(a.isApprox(a_r, 1e-15));
+    TS_ASSERT_EIGEN_DELTA(a, a_r, 1e-15);
   };
   
   CXXTEST_TEST(Internal_zpk2tf_bis)

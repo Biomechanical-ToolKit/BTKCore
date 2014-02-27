@@ -60,4 +60,7 @@
 #define HPFFilePathIN std::string(TDD_FilePathIN) + "HPFSamples/"
 #define HPFFilePathOUT std::string(TDD_FilePathOUT) + "HPFSamples/"
 
+#define TS_ASSERT_EIGEN_DELTA(lhs,rhs,prec) \
+  TS_ASSERT((lhs - rhs).cwiseAbs().maxCoeff() <= prec)
+
 #endif // _TDDConfigure_h

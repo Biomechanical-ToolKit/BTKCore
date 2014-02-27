@@ -214,13 +214,13 @@ CXXTEST_SUITE(MergeAcquisitionFilterTest)
     {
       TS_ASSERT_EQUALS(output->GetPoint(i)->GetLabel(), input->GetPoint(i)->GetLabel());
       TS_ASSERT_EQUALS(output->GetPoint(i + input->GetPointNumber())->GetLabel(), input->GetPoint(i)->GetLabel() + "_2");
-      TS_ASSERT(output->GetPoint(i)->GetValues().isApprox(output->GetPoint(i + input->GetPointNumber())->GetValues()));
+      TS_ASSERT_EIGEN_DELTA(output->GetPoint(i)->GetValues(), output->GetPoint(i + input->GetPointNumber())->GetValues(), 1e-5);
     }
     for (int i = 0 ; i < input->GetAnalogNumber() ; ++i)
     {  
       TS_ASSERT_EQUALS(output->GetAnalog(i)->GetLabel(), input->GetAnalog(i)->GetLabel());
       TS_ASSERT_EQUALS(output->GetAnalog(i + input->GetAnalogNumber())->GetLabel(), input->GetAnalog(i)->GetLabel() + "_2");
-      TS_ASSERT(output->GetAnalog(i)->GetValues().isApprox(output->GetAnalog(i + input->GetAnalogNumber())->GetValues()));
+      TS_ASSERT_EIGEN_DELTA(output->GetAnalog(i)->GetValues(), output->GetAnalog(i + input->GetAnalogNumber())->GetValues(), 1e-5);
     }
     for (int i = 0 ; i < input->GetEventNumber() ; ++i)
       TS_ASSERT(*(output->GetEvent(i)) == *(input->GetEvent(i)));

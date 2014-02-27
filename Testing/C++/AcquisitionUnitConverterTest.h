@@ -205,16 +205,16 @@ CXXTEST_SUITE(AcquisitionUnitConverterTest)
     btk::Wrench::Pointer grw2 = grwf2->GetOutput()->GetItem(0);
    
     // NaN in the computation of the moment! 
-    TS_ASSERT(pfe2->GetOutput()->GetItem(0)->GetChannel(0)->GetValues().isApprox(pfe1->GetOutput()->GetItem(0)->GetChannel(0)->GetValues()));
-    TS_ASSERT(pfe2->GetOutput()->GetItem(0)->GetChannel(1)->GetValues().isApprox(pfe1->GetOutput()->GetItem(0)->GetChannel(1)->GetValues()));
-    TS_ASSERT(pfe2->GetOutput()->GetItem(0)->GetChannel(2)->GetValues().isApprox(pfe1->GetOutput()->GetItem(0)->GetChannel(2)->GetValues()));
+    TS_ASSERT_EIGEN_DELTA(pfe2->GetOutput()->GetItem(0)->GetChannel(0)->GetValues(), pfe1->GetOutput()->GetItem(0)->GetChannel(0)->GetValues(), 1e-15);
+    TS_ASSERT_EIGEN_DELTA(pfe2->GetOutput()->GetItem(0)->GetChannel(1)->GetValues(), pfe1->GetOutput()->GetItem(0)->GetChannel(1)->GetValues(), 1e-15);
+    TS_ASSERT_EIGEN_DELTA(pfe2->GetOutput()->GetItem(0)->GetChannel(2)->GetValues(), pfe1->GetOutput()->GetItem(0)->GetChannel(2)->GetValues(), 1e-15);
     // Frame #21: NaN?
     TS_ASSERT((pfe2->GetOutput()->GetItem(0)->GetChannel(3)->GetValues()-(pfe1->GetOutput()->GetItem(0)->GetChannel(3)->GetValues() * 0.001)).block(0,0,20,1).rowwise().norm().sum() < 1e-5);
     TS_ASSERT((pfe2->GetOutput()->GetItem(0)->GetChannel(4)->GetValues()-(pfe1->GetOutput()->GetItem(0)->GetChannel(4)->GetValues() * 0.001)).block(0,0,20,1).rowwise().norm().sum() < 1e-5);
     TS_ASSERT((pfe2->GetOutput()->GetItem(0)->GetChannel(5)->GetValues()-(pfe1->GetOutput()->GetItem(0)->GetChannel(5)->GetValues() * 0.001)).block(0,0,20,1).rowwise().norm().sum() < 1e-5);
     TS_ASSERT((grw2->GetPosition()->GetValues() - (grw1->GetPosition()->GetValues() * 0.001)).block(0,0,20,3).rowwise().norm().sum() < 1e-5);
     TS_ASSERT((grw2->GetMoment()->GetValues() - (grw1->GetMoment()->GetValues() * 0.001)).block(0,0,20,3).rowwise().norm().sum() < 1e-5);
-    TS_ASSERT(grw2->GetForce()->GetValues().isApprox(grw1->GetForce()->GetValues(),1e-11));
+    TS_ASSERT_EIGEN_DELTA(grw2->GetForce()->GetValues(), grw1->GetForce()->GetValues(), 1e-9);
   };
   
   CXXTEST_TEST(ConversionFromFileCalMatrix_Type4a)
@@ -242,9 +242,9 @@ CXXTEST_SUITE(AcquisitionUnitConverterTest)
     grwf2->Update();
     
     // FP1
-    TS_ASSERT(pfe2->GetOutput()->GetItem(0)->GetChannel(0)->GetValues().isApprox(pfe1->GetOutput()->GetItem(0)->GetChannel(0)->GetValues()));
-    TS_ASSERT(pfe2->GetOutput()->GetItem(0)->GetChannel(1)->GetValues().isApprox(pfe1->GetOutput()->GetItem(0)->GetChannel(1)->GetValues()));
-    TS_ASSERT(pfe2->GetOutput()->GetItem(0)->GetChannel(2)->GetValues().isApprox(pfe1->GetOutput()->GetItem(0)->GetChannel(2)->GetValues()));
+    TS_ASSERT_EIGEN_DELTA(pfe2->GetOutput()->GetItem(0)->GetChannel(0)->GetValues(), pfe1->GetOutput()->GetItem(0)->GetChannel(0)->GetValues(), 1e-15);
+    TS_ASSERT_EIGEN_DELTA(pfe2->GetOutput()->GetItem(0)->GetChannel(1)->GetValues(), pfe1->GetOutput()->GetItem(0)->GetChannel(1)->GetValues(), 1e-15);
+    TS_ASSERT_EIGEN_DELTA(pfe2->GetOutput()->GetItem(0)->GetChannel(2)->GetValues(), pfe1->GetOutput()->GetItem(0)->GetChannel(2)->GetValues(), 1e-15);
     TS_ASSERT((pfe2->GetOutput()->GetItem(0)->GetChannel(3)->GetValues()-(pfe1->GetOutput()->GetItem(0)->GetChannel(3)->GetValues() * 0.001)).rowwise().norm().sum() < 1e-3);
     TS_ASSERT((pfe2->GetOutput()->GetItem(0)->GetChannel(4)->GetValues()-(pfe1->GetOutput()->GetItem(0)->GetChannel(4)->GetValues() * 0.001)).rowwise().norm().sum() < 1e-3);
     TS_ASSERT((pfe2->GetOutput()->GetItem(0)->GetChannel(5)->GetValues()-(pfe1->GetOutput()->GetItem(0)->GetChannel(5)->GetValues() * 0.001)).rowwise().norm().sum() < 1e-3);
@@ -252,12 +252,12 @@ CXXTEST_SUITE(AcquisitionUnitConverterTest)
     btk::Wrench::Pointer grw2 = grwf2->GetOutput()->GetItem(0);
     TS_ASSERT((grw2->GetPosition()->GetValues() - (grw1->GetPosition()->GetValues() * 0.001)).rowwise().norm().sum() < 1e-3);
     TS_ASSERT((grw2->GetMoment()->GetValues() - (grw1->GetMoment()->GetValues() * 0.001)).rowwise().norm().sum() < 1e-3);
-    TS_ASSERT(grw2->GetForce()->GetValues().isApprox(grw1->GetForce()->GetValues()));
+    TS_ASSERT_EIGEN_DELTA(grw2->GetForce()->GetValues(), grw1->GetForce()->GetValues(), 1e-9);
     
     // FP2
-    TS_ASSERT(pfe2->GetOutput()->GetItem(1)->GetChannel(0)->GetValues().isApprox(pfe1->GetOutput()->GetItem(1)->GetChannel(0)->GetValues()));
-    TS_ASSERT(pfe2->GetOutput()->GetItem(1)->GetChannel(1)->GetValues().isApprox(pfe1->GetOutput()->GetItem(1)->GetChannel(1)->GetValues()));
-    TS_ASSERT(pfe2->GetOutput()->GetItem(1)->GetChannel(2)->GetValues().isApprox(pfe1->GetOutput()->GetItem(1)->GetChannel(2)->GetValues()));
+    TS_ASSERT_EIGEN_DELTA(pfe2->GetOutput()->GetItem(1)->GetChannel(0)->GetValues(), pfe1->GetOutput()->GetItem(1)->GetChannel(0)->GetValues(), 1e-15);
+    TS_ASSERT_EIGEN_DELTA(pfe2->GetOutput()->GetItem(1)->GetChannel(1)->GetValues(), pfe1->GetOutput()->GetItem(1)->GetChannel(1)->GetValues(), 1e-15);
+    TS_ASSERT_EIGEN_DELTA(pfe2->GetOutput()->GetItem(1)->GetChannel(2)->GetValues(), pfe1->GetOutput()->GetItem(1)->GetChannel(2)->GetValues(), 1e-15);
     TS_ASSERT((pfe2->GetOutput()->GetItem(1)->GetChannel(3)->GetValues()-(pfe1->GetOutput()->GetItem(1)->GetChannel(3)->GetValues() * 0.001)).rowwise().norm().sum() < 1e-3);
     TS_ASSERT((pfe2->GetOutput()->GetItem(1)->GetChannel(4)->GetValues()-(pfe1->GetOutput()->GetItem(1)->GetChannel(4)->GetValues() * 0.001)).rowwise().norm().sum() < 1e-3);
     TS_ASSERT((pfe2->GetOutput()->GetItem(1)->GetChannel(5)->GetValues()-(pfe1->GetOutput()->GetItem(1)->GetChannel(5)->GetValues() * 0.001)).rowwise().norm().sum() < 1e-3);
@@ -265,7 +265,7 @@ CXXTEST_SUITE(AcquisitionUnitConverterTest)
     grw2 = grwf2->GetOutput()->GetItem(1);
     TS_ASSERT((grw2->GetPosition()->GetValues() - (grw1->GetPosition()->GetValues() * 0.001)).rowwise().norm().sum() < 1e-3);
     TS_ASSERT((grw2->GetMoment()->GetValues() - (grw1->GetMoment()->GetValues() * 0.001)).rowwise().norm().sum() < 1e-3);
-    TS_ASSERT(grw2->GetForce()->GetValues().isApprox(grw1->GetForce()->GetValues()));
+    TS_ASSERT_EIGEN_DELTA(grw2->GetForce()->GetValues(), grw1->GetForce()->GetValues(), 1e-9);
   };
 };
 
