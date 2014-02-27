@@ -225,7 +225,10 @@ namespace btk
   {
     if ((row > 3) || (col > 4))
       throw OutOfRangeException("ForcePlatform::SetCorner");
+    if (std::fabs(this->m_Corners.coeff(row, col) - v) <= Eigen::NumTraits<Corner::Scalar>::dummy_precision())
+      return;
     this->m_Corners.coeffRef(row, col) = v;
+    this->Modified();
   };
 
 
