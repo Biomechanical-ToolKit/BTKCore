@@ -129,7 +129,51 @@ CXXTEST_SUITE(XLSOrthoTrakFileReaderTest)
     TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(1, 0), -0.558, 1e-4);
     // Last value
     TS_ASSERT_DELTA(acq->GetPoint(50)->GetValues().coeff(acq->GetPointFrameNumber()-1, 0), 25.751, 1e-4);
+  };
+  
+  CXXTEST_TEST(EmptySpatialParameters)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(XLSOrthoTrakFilePathIN + "EmptySpatialParameters.xls");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), 1357);
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), 15);
+
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChildNumber(), 15);
+    TS_ASSERT_DELTA(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("Avg_Step_Width")->GetInfo()->ToDouble(0), 36.53 * 10, 1e-4);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("R_Velocity")->GetInfo()->GetValues().empty(), true);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("R_Stride_Len")->GetInfo()->GetValues().empty(), true);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("R_Cadence")->GetInfo()->GetValues().empty(), true);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("L_Velocity")->GetInfo()->GetValues().empty(), true);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("L_Stride_Len")->GetInfo()->GetValues().empty(), true);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("L_Cadence")->GetInfo()->GetValues().empty(), true);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("R_Support_Time")->GetInfo()->ToDouble(0), 0.0);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("L_Support_Time")->GetInfo()->ToDouble(0), 0.0);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("R_Non_Support")->GetInfo()->ToDouble(0), 0.0);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("L_Non_Support")->GetInfo()->ToDouble(0), 0.0);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("R_Step_Len")->GetInfo()->GetValues().empty(), true);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("L_Step_Len")->GetInfo()->GetValues().empty(), true);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("R_Dbl_Support")->GetInfo()->ToDouble(0), 0.0);
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("SPATIOTEMP")->GetChild("L_Dbl_Support")->GetInfo()->ToDouble(0), 0.0);
     
+    TS_ASSERT_EQUALS(acq->GetEventNumber(), 0);
+    
+    // First frame
+    TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(0,0), 62.767, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(0,1), -15.171, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(0,2), 9.519, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(14)->GetValues().coeff(0,0), 13.240, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(14)->GetValues().coeff(0,1), -3.836, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(14)->GetValues().coeff(0,2), 0.000, 1e-4);
+    // Last frame
+    TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(acq->GetPointFrameNumber()-1, 0), 63.938, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(acq->GetPointFrameNumber()-1, 1), -13.137, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(0)->GetValues().coeff(acq->GetPointFrameNumber()-1, 2), 15.398, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(14)->GetValues().coeff(acq->GetPointFrameNumber()-1, 0), 20.452, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(14)->GetValues().coeff(acq->GetPointFrameNumber()-1, 1), -1.318, 1e-4);
+    TS_ASSERT_DELTA(acq->GetPoint(14)->GetValues().coeff(acq->GetPointFrameNumber()-1, 2), 0.0, 1e-4);
   };
 };
 
@@ -137,4 +181,5 @@ CXXTEST_SUITE_REGISTRATION(XLSOrthoTrakFileReaderTest)
 CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileReaderTest, NoFile)
 CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileReaderTest, MisspelledFile)
 CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileReaderTest, Gait)
+CXXTEST_TEST_REGISTRATION(XLSOrthoTrakFileReaderTest, EmptySpatialParameters)
 #endif

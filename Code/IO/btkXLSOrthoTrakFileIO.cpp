@@ -241,16 +241,19 @@ namespace btk
       double* values = new double[valueNumber];
       std::string strVal;
       int i = 0;
-      for (i = 0 ; i < valueNumber ; ++i)
+      for (i = 0 ; i < frameNumber ; ++i)
       {
-        ifs >> strVal;
-        if (ifs.eof() || strVal.empty())
+        std::getline(ifs, line);
+        if (ifs.eof())
         {
           btkWarningMacro(filename, "File corrupted. There is not enough values to fill data. Others values will be set to 0.");
           break;
         }
-        FromString(strVal, values[i]);
+        iss.str(line); iss.clear();
+        for (int j = 0 ; j < colNumber ; ++j)
+          iss >> values[i*colNumber+j];
       }
+      i *= colNumber;
       for (int j = i ; j < valueNumber ; ++j)
         values[j] = 0.0;
         
@@ -443,12 +446,8 @@ namespace btk
     std::string buf;
     *iss >> buf; // label
     double frame;
-    do
-    {
-      *iss >> frame;
+    while(!iss->eof() && (*iss >> frame))
       output->AppendEvent(Event::New(label, static_cast<int>(frame) + output->GetFirstFrame(), context, Event::Unknown, "", "", id));
-    }
-    while(!iss->eof());
   };
   
   void XLSOrthoTrakFileIO::ExtractEventDetectionFlag(Acquisition::Pointer output, std::istringstream* iss, const std::string& label, const std::string& context)
@@ -458,9 +457,8 @@ namespace btk
     *iss >> buf; // label
     *iss >> buf; // FP
     double frame;
-    do
+    while(!iss->eof() && (*iss >> frame))
     { 
-      *iss >> frame;
       for (Acquisition::EventIterator it = output->BeginEvent() ; it != output->EndEvent() ; ++it)
       {
         if (((*it)->GetLabel().compare(label) == 0) 
@@ -472,7 +470,6 @@ namespace btk
         }
       }
     }
-    while(!iss->eof());
   };
   
   void XLSOrthoTrakFileIO::AppendSpatiotemparalParameter(MetaData::Pointer st, std::istringstream* iss, double scale)
@@ -483,12 +480,8 @@ namespace btk
     std::vector<float> values;
     *iss >> name;
     float s = static_cast<float>(scale);
-    do
-    {
-      *iss >> val;
+    while (!iss->eof() && (*iss >> val))
       values.push_back(val * s);
-    }
-    while (!iss->eof());
     MetaDataCreateChild(st, name, values);
   };
   
