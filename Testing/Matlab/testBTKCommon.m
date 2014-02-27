@@ -339,3 +339,16 @@ end
 assertEqual(isempty(strfind(lasterr, 'The second input must be a matrix of real (double) values corresponding to the new analog channels values to assign.')), false);
 btkDeleteAcquisition(h);
 end
+
+function testGetPointsInfoResiduals(d)
+h = btkNewAcquisition(1,100);
+values = rand(100,3);
+residuals = rand(100,1);
+btkSetPointLabel(h, 1, 'Toto');
+btkSetPointValues(h, 1, values);
+btkSetPointResiduals(h, 1, residuals);
+[points, pointsInfo] = btkGetPoints(h);
+assertElementsAlmostEqual(points.Toto, values, 'absolute', 1e-15);
+assertElementsAlmostEqual(pointsInfo.residuals.Toto, residuals, 'absolute', 1e-15);
+btkDeleteAcquisition(h);
+end

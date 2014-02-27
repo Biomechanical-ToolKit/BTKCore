@@ -131,6 +131,6 @@ void btkMXCreatePointsStructure(btk::Acquisition::Pointer acq, int nlhs, mxArray
     mxSetFieldByNumber(plhs[1], 0, 2, unitsStruct);
     mxSetFieldByNumber(plhs[1], 0, 3, labelsStruct);
     mxSetFieldByNumber(plhs[1], 0, 4, descsStruct);
-    mxSetFieldByNumber(plhs[1], 0, 3, residualsStruct);
+    mxSetFieldByNumber(plhs[1], 0, 5, residualsStruct);
   }
 }; 
