@@ -187,13 +187,13 @@ namespace btk
    */
   void ForcePlatform::SetOrigin(double x, double y, double z)
   {
-    if ((this->m_Origin.x() == x)
-        && (this->m_Origin.y() == y)
-        && (this->m_Origin.z() == z))
+    if ((std::fabs(this->m_Origin.coeff(0) - x) <= Eigen::NumTraits<Corner::Scalar>::dummy_precision())
+        && (std::fabs(this->m_Origin.coeff(1) - y) <= Eigen::NumTraits<Corner::Scalar>::dummy_precision())
+        && (std::fabs(this->m_Origin.coeff(2) - z) <= Eigen::NumTraits<Corner::Scalar>::dummy_precision()))
       return;
-    this->m_Origin.x() = x;
-    this->m_Origin.y() = y;
-    this->m_Origin.z() = z;
+    this->m_Origin.coeffRef(0) = x;
+    this->m_Origin.coeffRef(1) = y;
+    this->m_Origin.coeffRef(2) = z;
     this->Modified();
   };
   
@@ -202,7 +202,7 @@ namespace btk
    */
   void ForcePlatform::SetOrigin(const Origin& o)
   {
-    if (this->m_Origin.isApprox(o))
+    if ((this->m_Origin - o).cwiseAbs().maxCoeff() <= Eigen::NumTraits<Origin::Scalar>::dummy_precision())
       return;
     this->m_Origin = o;
     this->Modified();
@@ -236,10 +236,9 @@ namespace btk
   {
     if (idx >= 4)
       throw OutOfRangeException("ForcePlatform::SetCorner");
-    Corner c = this->m_Corners.col(idx);
-    if ((c.x() == x)
-        && (c.y() == y)
-        && (c.z() == z))
+    if ((std::fabs(this->m_Corners.coeff(0, idx) - x) <= Eigen::NumTraits<Corner::Scalar>::dummy_precision())
+        && (std::fabs(this->m_Corners.coeff(1, idx) - y) <= Eigen::NumTraits<Corner::Scalar>::dummy_precision())
+        && (std::fabs(this->m_Corners.coeff(2, idx) - z) <= Eigen::NumTraits<Corner::Scalar>::dummy_precision()))
       return;
     this->m_Corners.coeffRef(0, idx) = x;
     this->m_Corners.coeffRef(1, idx) = y;
@@ -252,12 +251,7 @@ namespace btk
    */
   void ForcePlatform::SetCorner(int idx, const Corner& c)
   {
-    if (idx >= 4)
-      throw OutOfRangeException("ForcePlatform::SetCorner"); 
-    if (this->m_Corners.col(idx).isApprox(c))
-      return;
-    this->m_Corners.col(idx) = c;
-    this->Modified();
+    this->SetCorner(idx,c.x(),c.y(),c.z());
   };
 
   /**
@@ -277,7 +271,7 @@ namespace btk
    */
   void ForcePlatform::SetCorners(const Corners& c)
   {
-    if (this->m_Corners.isApprox(c))
+    if ((this->m_Corners - c).cwiseAbs().maxCoeff() <= Eigen::NumTraits<Corners::Scalar>::dummy_precision())
       return;
     this->m_Corners = c;
     this->Modified();
@@ -300,7 +294,7 @@ namespace btk
    */  
   void ForcePlatform::SetCalMatrix(const CalMatrix& cal)
   {
-    if (this->m_CalMatrix.isApprox(cal))
+    if ((this->m_CalMatrix - cal).cwiseAbs().maxCoeff() <= Eigen::NumTraits<CalMatrix::Scalar>::dummy_precision())
       return;
     this->m_CalMatrix = cal;
     this->Modified();

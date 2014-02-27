@@ -288,7 +288,7 @@ namespace btk
    */  
   void IMU::SetCalMatrix(const CalMatrix& cal)
   {
-    if ((this->m_CalMatrix.data() != 0) && (this->m_CalMatrix.isApprox(cal)))
+    if ((this->m_CalMatrix.data() != 0) && ((this->m_CalMatrix - cal).cwiseAbs().maxCoeff() <= Eigen::NumTraits<CalMatrix::Scalar>::dummy_precision()))
       return;
     this->m_CalMatrix = cal;
     this->Modified();
