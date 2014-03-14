@@ -3,7 +3,7 @@
 #   a macro to help the build of MEX-functions.
 #
 # This module detects a Matlab's version between Matlab 7.0 (R14)
-# and Matlab 8.2 (r2013b).
+# and Matlab 8.3 (r2014a).
 #
 # This module defines: 
 #  MATLAB_ROOT:               Matlab installation path
@@ -34,6 +34,7 @@ ENDIF(MATLAB_ROOT AND MATLAB_EXECUTABLE AND MATLAB_INCLUDE_DIR AND MATLAB_LIBRAR
 IF(WIN32)
   # Default paths
   SET(MATLAB_PATHS 
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\8.3;MATLABROOT]"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\8.2;MATLABROOT]"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\8.1;MATLABROOT]"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MathWorks\\MATLAB\\8.0;MATLABROOT]"
@@ -57,6 +58,7 @@ IF(WIN32)
   # Paths for Matlab 32-bit under Windows 64-bit
   IF(NOT MATLAB_ROOT)
     SET(MATLAB_PATHS 
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\8.3;MATLABROOT]"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\8.2;MATLABROOT]"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\8.1;MATLABROOT]"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MathWorks\\MATLAB\\8.0;MATLABROOT]"
