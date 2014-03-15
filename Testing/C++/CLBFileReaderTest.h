@@ -41,7 +41,7 @@ CXXTEST_SUITE(CLBFileReaderTest)
     {
       TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel().compare("Channel " + btk::ToString(i)), 0);
       TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetScale(), 20.0/65536.0);
-      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetOffset(), 32768);
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetOffset(), 32768.0);
     }
     
     TS_ASSERT_EQUALS(static_cast<int>(acq->GetAnalog(0)->GetValues()(0) / acq->GetAnalog(0)->GetScale()) + acq->GetAnalog(0)->GetOffset(), 32749);

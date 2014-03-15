@@ -41,6 +41,7 @@
 #include <algorithm>
 #include <cctype>
 #include <iostream>
+#include <cmath>
 
 namespace btk
 {
@@ -664,7 +665,7 @@ namespace btk
           }
         }
         this->m_AnalogChannelScale = std::vector<double>(analogNumber, 1.0);
-        this->m_AnalogZeroOffset = std::vector<int>(analogNumber, 0);
+        this->m_AnalogZeroOffset = std::vector<double>(analogNumber, 0.0);
         this->m_AnalogUniversalScale = 1.0;
 
         if ((analogNumber != 0) && (itAnalog != root->End()))
@@ -704,11 +705,11 @@ namespace btk
           // - ANALOG:OFFSET
           if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
           {
-            for (unsigned inc = 0 ; inc < this->m_AnalogZeroOffset.size() ; ++inc)
-              this->m_AnalogZeroOffset[inc] = static_cast<uint16_t>(analogZeroOffset_t[inc]);
+            for (size_t inc = 0 ; inc < this->m_AnalogZeroOffset.size() ; ++inc)
+              this->m_AnalogZeroOffset[inc] = static_cast<double>(static_cast<uint16_t>(analogZeroOffset_t[inc]));
           }
           else // signed
-            MetaDataCollapseChildrenValues<int>(this->m_AnalogZeroOffset, *itAnalog, "OFFSET", analogNumber, 0);
+            MetaDataCollapseChildrenValues<double>(this->m_AnalogZeroOffset, *itAnalog, "OFFSET", analogNumber, 0.0);
           // - ANALOG:SCALE
           MetaDataCollapseChildrenValues<double>(this->m_AnalogChannelScale, *itAnalog, "SCALE", analogNumber, 1.0);
           // - ANALOG:GEN_SCALE
@@ -786,7 +787,7 @@ namespace btk
             Acquisition::AnalogIterator itA = output->BeginAnalog();
             while (itA != output->EndAnalog())
             {
-              (*itA)->GetValues().data()[analogFrame] = (fdf->ReadAnalog() - static_cast<double>(this->m_AnalogZeroOffset[incChannel])) * this->m_AnalogChannelScale[incChannel] * this->m_AnalogUniversalScale;
+              (*itA)->GetValues().data()[analogFrame] = (fdf->ReadAnalog() - this->m_AnalogZeroOffset[incChannel]) * this->m_AnalogChannelScale[incChannel] * this->m_AnalogUniversalScale;
               ++itA; ++incChannel;
               if ((itA == output->EndAnalog()) && (inc < static_cast<unsigned>(numberSamplesPerAnalogChannel - 1)))
               {
@@ -1483,7 +1484,7 @@ namespace btk
     int analogNumber = input->GetAnalogNumber();
     size_t inc = 0;
     this->m_AnalogChannelScale.resize(analogNumber, 1.0);
-    this->m_AnalogZeroOffset.resize(analogNumber, 0);
+    this->m_AnalogZeroOffset.resize(analogNumber, 0.0);
     double minAnalogscale = 1.0;
     for (Acquisition::AnalogConstIterator itAnalog = input->BeginAnalog() ; itAnalog != input->EndAnalog() ; ++itAnalog)
     {
@@ -1566,24 +1567,33 @@ namespace btk
         {
           if ((*itAnalogOffset)->GetInfo()->GetValues().size() < analogNumber)
           {
-            btkWarningMacro("No enough analog offsets. Impossible to update analog offsets.");
+            btkWarningMacro("No enough analog offsets. Missing offset will be set to 0.");
+          }
+          if (((*itAnalogOffset)->GetInfo()->GetFormat() == MetaDataInfo::Real) || this->m_AnalogIntegerFormat == Signed)
+          {
+            (*itAnalogOffset)->GetInfo()->ToDouble(this->m_AnalogZeroOffset);
           }
           else
-          {
-            if (this->m_AnalogIntegerFormat == Unsigned) // unsigned
+          { 
+            // Check if the casting into unsigned 16-bit integer will not remove any possible fractional part. If it is the case, print a warning message
+            std::vector<float> azo;
+            (*itAnalogOffset)->GetInfo()->ToFloat(azo);
+            size_t mini = ((azo.size() > this->m_AnalogZeroOffset.size()) ? this->m_AnalogZeroOffset.size() : azo.size());
+            for (size_t inc = 0 ; inc < mini ; ++inc)
             {
-              std::vector<uint16_t> analogZeroOffset_t;
-              (*itAnalogOffset)->GetInfo()->ToUInt16(analogZeroOffset_t);
-              size_t mini = ((analogZeroOffset_t.size() > this->m_AnalogZeroOffset.size()) ? this->m_AnalogZeroOffset.size() : analogZeroOffset_t.size());
-              for (size_t inc = 0 ; inc < mini ; ++inc)
-                this->m_AnalogZeroOffset[inc] = analogZeroOffset_t[inc];
+              double intpart = 0.0;
+              if (std::modf(azo[inc], &intpart) > 1e-5)
+              {
+                btkWarningMacro("At least one real offset will have its fractionnal part removed as you select to store them as UNSIGNED offset.");
+                break;
+              }
             }
-            else // signed
-            {
-              (*itAnalogOffset)->GetInfo()->ToInt(this->m_AnalogZeroOffset);
-              this->m_AnalogZeroOffset.resize(analogNumber, 0);
-            }
+            std::vector<uint16_t> analogZeroOffset_t;
+            (*itAnalogOffset)->GetInfo()->ToUInt16(analogZeroOffset_t);
+            for (size_t inc = 0 ; inc < mini ; ++inc)
+              this->m_AnalogZeroOffset[inc] = static_cast<double>(analogZeroOffset_t[inc]);
           }
+          this->m_AnalogZeroOffset.resize(analogNumber, 0.0);
         }
         else
         {
@@ -1726,8 +1736,19 @@ namespace btk
     descs.resize(analogNumber);
     std::vector<std::string> units = std::vector<std::string>(analogNumber);
     std::vector<int16_t> gain = std::vector<int16_t>(analogNumber, 0);
-    std::vector<int16_t> analogZeroOffset = std::vector<int16_t>(analogNumber, 0);
+    std::vector<float> analogZeroOffset_Float = std::vector<float>(analogNumber, 0.0);
+    std::vector<int16_t> analogZeroOffset_Int = std::vector<int16_t>(analogNumber, 0);
     std::vector<float> analogChannelScale = std::vector<float>(analogNumber, 1.0);
+    bool analogZeroOffsetHasTrueReal = false;
+    for (size_t ijk = 0 ; ijk < this->m_AnalogZeroOffset.size() ; ++ijk)
+    {
+      double intpart = 0.0;
+      if (fabs(std::modf(this->m_AnalogZeroOffset[ijk], &intpart)) > 1e-5)
+      {
+        analogZeroOffsetHasTrueReal = true;
+        break;
+      }
+    }
     inc = 0;
     for (Acquisition::AnalogConstIterator itAnalog = input->BeginAnalog() ; itAnalog != input->EndAnalog() ; ++itAnalog)
     {
@@ -1756,7 +1777,8 @@ namespace btk
         break;
       }
       analogChannelScale[inc] = static_cast<float>(this->m_AnalogChannelScale[inc]);
-      analogZeroOffset[inc] = this->m_AnalogZeroOffset[inc];
+      analogZeroOffset_Float[inc] = this->m_AnalogZeroOffset[inc];
+      analogZeroOffset_Int[inc] = static_cast<int16_t>(this->m_AnalogZeroOffset[inc]);
       ++inc;
     }
     MetaDataCreateChild(analog, "LABELS", labels);
@@ -1764,7 +1786,10 @@ namespace btk
     MetaDataCreateChild(analog, "UNITS", units);
     MetaDataCreateChild(analog, "GAIN", gain);
     MetaDataCreateChild(analog, "SCALE", analogChannelScale);
-    MetaDataCreateChild(analog, "OFFSET", analogZeroOffset);
+    if (analogZeroOffsetHasTrueReal)
+      MetaDataCreateChild(analog, "OFFSET", analogZeroOffset_Float);
+    else
+      MetaDataCreateChild(analog, "OFFSET", analogZeroOffset_Int);
     // ANALOG:GEN_SCALE
     MetaDataCreateChild(analog, "GEN_SCALE", static_cast<float>(this->m_AnalogUniversalScale)); 
     // ANALOG:RATE

@@ -38,7 +38,7 @@ CXXTEST_SUITE(KistlerDATFileReaderTest)
     {
       TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetLabel().compare(labels[i]), 0);
       TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetScale(), 1.0);
-      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetOffset(), 0);
+      TS_ASSERT_EQUALS(acq->GetAnalog(i)->GetOffset(), 0.0);
     }
     
     btk::Analog::Values Fx = acq->GetAnalog(0)->GetValues() + acq->GetAnalog(1)->GetValues();

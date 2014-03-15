@@ -164,7 +164,7 @@ namespace btk
           for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
           {
             (*it)->SetScale(scale);
-            (*it)->SetOffset(5); // 5V
+            (*it)->SetOffset(5.0); // 5V
             (*it)->SetGain(Analog::PlusMinus10);
           }
         }
@@ -180,7 +180,7 @@ namespace btk
           for (Acquisition::AnalogIterator it = output->BeginAnalog() ; it != output->EndAnalog() ; ++it)
           {
             (*it)->SetScale(scale);
-            (*it)->SetOffset(5); // 5V
+            (*it)->SetOffset(5.0); // 5V
             (*it)->SetGain(Analog::PlusMinus10); // NOTE: Only assumed from the offset value.
           }
         }
@@ -251,7 +251,7 @@ namespace btk
             bifs.SeekRead(12, BinaryFileStream::Current);
           }
           (*it)->SetScale(resolutions[inc] / gains[inc]);
-          (*it)->SetOffset(static_cast<int>(offsets[inc] / gains[inc]));
+          (*it)->SetOffset(offsets[inc] / gains[inc]);
           ++inc;
         }
         // Data

@@ -74,9 +74,9 @@ namespace btk
     std::vector<double>& GetAnalogChannelScale() {return this->m_AnalogChannelScale;};
     const std::vector<double>& GetAnalogChannelScale() const {return this->m_AnalogChannelScale;};
     void SetAnalogChannelScale(const std::vector<double>& s) {this->m_AnalogChannelScale = s;};
-    std::vector<int>& GetAnalogZeroOffset() {return this->m_AnalogZeroOffset;};
-    const std::vector<int>& GetAnalogZeroOffset() const {return this->m_AnalogZeroOffset;};
-    void SetAnalogZeroOffset(const std::vector<int>& s) {this->m_AnalogZeroOffset = s;};
+    std::vector<double>& GetAnalogZeroOffset() {return this->m_AnalogZeroOffset;};
+    const std::vector<double>& GetAnalogZeroOffset() const {return this->m_AnalogZeroOffset;};
+    void SetAnalogZeroOffset(const std::vector<double>& s) {this->m_AnalogZeroOffset = s;};
     double GetAnalogUniversalScale() const {return this->m_AnalogUniversalScale;};
     void SetAnalogUniversalScale(double s) {this->m_AnalogUniversalScale = s;};
     
@@ -215,7 +215,7 @@ namespace btk
 
     double m_PointScale;
     std::vector<double> m_AnalogChannelScale;
-    std::vector<int> m_AnalogZeroOffset;
+    std::vector<double> m_AnalogZeroOffset;
     double m_AnalogUniversalScale;
     AnalogIntegerFormat m_AnalogIntegerFormat;
   };

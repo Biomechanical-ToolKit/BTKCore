@@ -94,6 +94,8 @@ CXXTEST_SUITE(C3DFileWriterTest)
     TS_ASSERT_EQUALS((int)acq->GetMetaData()->GetChild("EVENT")->GetChild("TIMES")->GetInfo()->GetDimensions().size(), 2);
     TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("EVENT")->GetChild("TIMES")->GetInfo()->GetDimensions()[0], 2);
     TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("EVENT")->GetChild("TIMES")->GetInfo()->GetDimensions()[1], 3);
+
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("ANALOG")->GetChild("OFFSET")->GetInfo()->GetFormat(), btk::MetaDataInfo::Integer);
   };
 
   CXXTEST_TEST(sample01_Eb015pr_rewrited)
@@ -1275,21 +1277,21 @@ CXXTEST_SUITE(C3DFileWriterTest)
     analog0->SetLabel("Test#1");
     analog0->SetDescription("It seems");
     analog0->SetGain(btk::Analog::PlusMinus10);
-    analog0->SetOffset(123);
+    analog0->SetOffset(123.0);
     analog0->SetScale(1.2345);
     analog0->SetUnit("N");
     btk::Analog::Pointer analog1 = acq->GetAnalog(1);
     analog1->SetLabel("Test#2");
     analog1->SetDescription("that BTK doesn't");
     analog1->SetGain(btk::Analog::PlusMinus5);
-    analog1->SetOffset(456);
+    analog1->SetOffset(456.0);
     analog1->SetScale(5.2341);
     analog1->SetUnit("Nmm");
     btk::Analog::Pointer analog2 = acq->GetAnalog(2);
     analog2->SetLabel("Test#3");
     analog2->SetDescription("write all properties");
     analog2->SetGain(btk::Analog::PlusMinus2Dot5);
-    analog2->SetOffset(789);
+    analog2->SetOffset(789.0);
     analog2->SetScale(10.025);
     analog2->SetUnit("Foo");
     
@@ -1727,7 +1729,7 @@ CXXTEST_SUITE(C3DFileWriterTest)
       (*it)->SetLabel("MyAnalog#" + btk::ToString(inc++));
       (*it)->SetDescription("test");
       (*it)->SetScale(1.0);
-      (*it)->SetOffset(0);
+      (*it)->SetOffset(0.0);
     }
     acq->GetMetaData()->GetChild("POINT")->GetChild("RATE")->GetInfo()->SetValues(400.0f);
       
@@ -1817,6 +1819,51 @@ CXXTEST_SUITE(C3DFileWriterTest)
     }
     TS_ASSERT(acq->GetMetaData()->FindChild("EVENT") == acq->EndMetaData());
   };
+  
+  CXXTEST_TEST(AnalogOffsetStoredAsReal_12Bits)
+  {
+    btk::Acquisition::Pointer acq = btk::Acquisition::New();
+    acq->Init(0,10,1);
+    acq->SetPointFrequency(50.0);
+    acq->GetAnalog(0)->SetOffset(-1.1);
+    
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(acq);
+    writer->SetFilename(C3DFilePathOUT + "AnalogOffsetStoredAsReal_12.c3d");
+    writer->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathOUT + "AnalogOffsetStoredAsReal_12.c3d");
+    reader->Update();
+    acq = reader->GetOutput();
+    
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("ANALOG")->GetChild("OFFSET")->GetInfo()->GetFormat(), btk::MetaDataInfo::Real);
+    
+    TS_ASSERT(acq->GetAnalog(0)->GetValues().cwiseAbs().maxCoeff() <= 1e-5);
+  };
+  
+  CXXTEST_TEST(AnalogOffsetStoredAsReal_16Bits)
+  {
+    btk::Acquisition::Pointer acq = btk::Acquisition::New();
+    acq->Init(0,10,1);
+    acq->SetAnalogResolution(btk::Acquisition::Bit16);
+    acq->SetPointFrequency(50.0);
+    acq->GetAnalog(0)->SetOffset(-1.1);
+    
+    btk::AcquisitionFileWriter::Pointer writer = btk::AcquisitionFileWriter::New();
+    writer->SetInput(acq);
+    writer->SetFilename(C3DFilePathOUT + "AnalogOffsetStoredAsReal_16.c3d");
+    writer->Update();
+    
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(C3DFilePathOUT + "AnalogOffsetStoredAsReal_16.c3d");
+    reader->Update();
+    acq = reader->GetOutput();
+    
+    TS_ASSERT_EQUALS(acq->GetMetaData()->GetChild("ANALOG")->GetChild("OFFSET")->GetInfo()->GetFormat(), btk::MetaDataInfo::Real);
+    
+    TS_ASSERT(acq->GetAnalog(0)->GetValues().cwiseAbs().maxCoeff() <= 1e-5);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(C3DFileWriterTest)
@@ -1860,4 +1907,6 @@ CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateDataBased)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateViconCompatibleOnly)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateUpdateMetaDataBased)
 CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, InternalsUpdateUpdateMetaDataBased_EventsHeader)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, AnalogOffsetStoredAsReal_12Bits)
+CXXTEST_TEST_REGISTRATION(C3DFileWriterTest, AnalogOffsetStoredAsReal_16Bits)
 #endif

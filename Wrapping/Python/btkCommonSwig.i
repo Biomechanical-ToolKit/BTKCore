@@ -102,7 +102,7 @@ public:
   BTK_SWIG_DECLARE_IMPL_GETSET(FrameNumber, int);
   BTK_SWIG_DECLARE_IMPL_GETSET(Unit, std::string&);
   BTK_SWIG_DECLARE_IMPL_GETSET(Gain, Gain);
-  BTK_SWIG_DECLARE_IMPL_GETSET(Offset, int);
+  BTK_SWIG_DECLARE_IMPL_GETSET(Offset, double);
   BTK_SWIG_DECLARE_IMPL_GETSET(Scale, double);
   btkAnalogData GetData() const;
   void SetData(btkAnalogData , bool parenting = true);

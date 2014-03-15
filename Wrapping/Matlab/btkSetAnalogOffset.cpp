@@ -54,7 +54,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
   btk::Acquisition::Pointer acq = btk_MOH_get_object<btk::Acquisition>(prhs[0]);
   btk::Analog::Pointer analog = btkMXGetAnalog(acq, nrhs, prhs);
-  analog->SetOffset(static_cast<int>(mxGetScalar(prhs[2])));
+  analog->SetOffset(mxGetScalar(prhs[2]));
 
   // Return updated analog channels
   btkMXCreateAnalogsStructure(acq, nlhs, plhs);

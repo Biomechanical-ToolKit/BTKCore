@@ -173,7 +173,7 @@ namespace btk
       btk::Analog::Pointer an = btk::Analog::New(o3dm_analogs[i]->Channel, static_cast<int>(numAnalogFrames));
       double offset = o3dm_analogs[i]->Offset.Value();
       double scale = o3dm_analogs[i]->Scale.Value();
-      an->SetOffset(static_cast<int>(offset));
+      an->SetOffset(offset);
       an->SetScale(scale);
       an->SetUnit(o3dm_analogs[i]->Units.Value());
       // Get sequence & iterator (may throw exception if missing fields)

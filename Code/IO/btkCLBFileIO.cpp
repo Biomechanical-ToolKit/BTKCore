@@ -153,18 +153,18 @@ namespace btk
       output->Init(0,frameNumber,channelNumber);
       output->SetPointFrequency(1.0e6/static_cast<double>(samplingClock));
       double res = 0.0;
-      int offset = 0;
+      double offset = 0.0;
       switch(DACResolution)
       {
       case 12:
         output->SetAnalogResolution(Acquisition::Bit12);
         res = 4096.0;
-        offset = 2048;
+        offset = 2048.0;
         break;
       case 16:
         output->SetAnalogResolution(Acquisition::Bit16);
         res = 65536.0;
-        offset = 32768;
+        offset = 32768.0;
         break;
       default:
         throw CLBFileIOException("Invalid resolution used for the digital-to-analog conversion");
@@ -263,67 +263,67 @@ namespace btk
           break;
         case 50: // 0V -- 10V
           (*it)->SetScale(10.0/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 51: // 0V -- 5V
           (*it)->SetScale(5.0/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 52: // 0V -- 4.095V
           (*it)->SetScale(4.095/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 53: // 0V -- 2.5V
           (*it)->SetScale(2.5/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 54: // 0V -- 1.25V
           (*it)->SetScale(1.25/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 55: // 0V -- 1V
           (*it)->SetScale(1.0/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 56: // 0V -- 0.5V
           (*it)->SetScale(0.5/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 57: // 0V -- 0.25V
           (*it)->SetScale(0.25/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 58: // 0V -- 0.1V
           (*it)->SetScale(0.1/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 59: // 0V -- 0.05V
           (*it)->SetScale(0.05/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 60: // 0V -- 0.025V
           (*it)->SetScale(0.025/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 61: // 0V -- 0.0125V
           (*it)->SetScale(0.0125/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;
         case 100: // 0V -- 20mA
           (*it)->SetScale(20.0/res);
-          (*it)->SetOffset(0);
+          (*it)->SetOffset(0.0);
           (*it)->SetUnit("mA");
           btkWarningMacro(filename, (*it)->GetLabel() + ": Unsupported gain and set to unknown.");
           break;

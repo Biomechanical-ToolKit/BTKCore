@@ -66,7 +66,7 @@ for i = 1:numAnalogs
     btkSetAnalogLabel(h1,i,['MyAnalog#',num2str(i)]);
     btkSetAnalogDescription(h1,i,'test');
     btkSetAnalogScale(h1,i,1.0);
-    btkSetAnalogOffset(h1,i,0);
+    btkSetAnalogOffset(h1,i,0.0);
 end
 btkSetMetaDataValues(h1,'POINT','RATE',btkMetaDataInfo('Real',400));
 btkWriteAcquisition(h1,strcat(d.out,'/C3DSamples/InternalsUpdateUpdateMetaDataBased_Matlab.c3d'),'InternalsUpdate','MetaDataBasedUpdate');

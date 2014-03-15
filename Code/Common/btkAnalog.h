@@ -100,8 +100,8 @@ namespace btk
     Gain GetGain() const {return this->m_Gain;};
     BTK_COMMON_EXPORT void SetGain(Gain g);
     BTK_COMMON_EXPORT void SetGainFromValue(int g);
-    int GetOffset() const {return this->m_Offset;};
-    BTK_COMMON_EXPORT void SetOffset(int o);
+    double GetOffset() const {return this->m_Offset;};
+    BTK_COMMON_EXPORT void SetOffset(double o);
     double GetScale() const {return this->m_Scale;};
     BTK_COMMON_EXPORT void SetScale(double s);
 
@@ -119,7 +119,7 @@ namespace btk
     
     std::string m_Unit;
     Gain m_Gain;
-    int m_Offset;
+    double m_Offset;
     double m_Scale;
   };
   
