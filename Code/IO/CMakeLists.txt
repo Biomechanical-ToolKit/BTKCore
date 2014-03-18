@@ -28,10 +28,10 @@ SET(BTKIO_SRCS
   btkHPFFileIO.cpp
   btkKistlerDATFileIO.cpp
   btkPWRFileIO.cpp
-  btkRAxFileIO.cpp
-  btkRICFileIO.cpp
   btkMDFFileIO.cpp
   btkMOMFileIO.cpp
+  btkRAxFileIO.cpp
+  btkRICFileIO.cpp
   btkTDFFileIO.cpp
   btkTRBFileIO.cpp
   btkTRCFileIO.cpp

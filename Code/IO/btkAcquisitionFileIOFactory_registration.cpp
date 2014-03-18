@@ -44,22 +44,17 @@
 
 // C3D File IO
 #include "btkC3DFileIO.h"
-// Motion Analysis Corp IOs
-#include "btkANBFileIO.h"
-#include "btkANCFileIO.h"
-#include "btkCALForcePlateFileIO.h"
-#include "btkTRBFileIO.h"
-#include "btkTRCFileIO.h"
-#include "btkXLSOrthoTrakFileIO.h"
+// AMTI
+#include "btkBSFFileIO.h"
 // Codamotion
 #include "btkMDFFileIO.h"
 #include "btkXMOVEFileIO.h"
-// BTS IO
+// BTS
 #include "btkTDFFileIO.h"
-// Delsys IO
+// Delsys
 #include "btkDelsysEMGFileIO.h"
 #include "btkHPFFileIO.h"
-// Elite IOs
+// Elite
 #include "btkANGFileIO.h"
 #include "btkEMxFileIO.h"
 #include "btkGRxFileIO.h"
@@ -67,10 +62,15 @@
 #include "btkPWRFileIO.h"
 #include "btkRAxFileIO.h"
 #include "btkRICFileIO.h"
-// AMTI
-#include "btkBSFFileIO.h"
 // Kistler
 #include "btkKistlerDATFileIO.h"
+// Motion Analysis Corp IOs
+#include "btkANBFileIO.h"
+#include "btkANCFileIO.h"
+#include "btkCALForcePlateFileIO.h"
+#include "btkTRBFileIO.h"
+#include "btkTRCFileIO.h"
+#include "btkXLSOrthoTrakFileIO.h"
 // Others
 #include "btkEMFFileIO.h"
 #include "btkCLBFileIO.h"
@@ -99,7 +99,7 @@ namespace btk
 
     BTK_REGISTER_ACQUISITION_FILE_IO(MDFFileIO)
     BTK_REGISTER_ACQUISITION_FILE_IO(XMOVEFileIO)
-
+    
     BTK_REGISTER_ACQUISITION_FILE_IO(TDFFileIO)
 
     BTK_REGISTER_ACQUISITION_FILE_IO(DelsysEMGFileIO) // MUST BE BEFORE EMxFileIO
