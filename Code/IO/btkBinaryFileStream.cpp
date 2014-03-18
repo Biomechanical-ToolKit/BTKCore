@@ -1386,7 +1386,7 @@ namespace btk
     char foo[2] = {byteptr[1], byteptr[0]};
     return *reinterpret_cast<int16_t const*>(foo);
 #else
-    return *reinterpret_cast<uint16_t const*>(byteptr);
+    return *reinterpret_cast<int16_t const*>(byteptr);
 #endif
   };
   
