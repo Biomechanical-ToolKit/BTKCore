@@ -134,15 +134,15 @@ public:
   typedef enum {Signed, Unsigned} AnalogIntegerFormat;
   enum {CompatibleVicon = btk::C3DFileIO::CompatibleVicon};
   double GetPointScale() const;
-  void SetPointScale(double s);
+  void SetPointScale(double );
   AnalogIntegerFormat GetAnalogIntegerFormat();
-  void SetAnalogIntegerFormat(AnalogIntegerFormat f);
+  void SetAnalogIntegerFormat(AnalogIntegerFormat );
   std::vector<double>& GetAnalogChannelScale();
-  void SetAnalogChannelScale(const std::vector<double>& s);
-  std::vector<int>& GetAnalogZeroOffset();
-  void SetAnalogZeroOffset(const std::vector<int>& s);
+  void SetAnalogChannelScale(const std::vector<double>& );
+  std::vector<double>& GetAnalogZeroOffset();
+  void SetAnalogZeroOffset(const std::vector<double>& );
   double GetAnalogUniversalScale() const;
-  void SetAnalogUniversalScale(double s);
+  void SetAnalogUniversalScale(double );
 };
 
 // ------------------------------------------------------------------------- //
