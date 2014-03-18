@@ -84,13 +84,13 @@
   #include <stdint.h>
 #endif
 
-// btkChooseNativeBinaryFileStream macro
+// _btk_choose_native_binary_file_stream macro
 #if PROCESSOR_TYPE == 1
-  #define btkChooseNativeBinaryFileStream IEEELittleEndianBinaryFileStream
+  #define _btk_choose_native_binary_file_stream IEEELittleEndianBinaryFileStream
 #elif PROCESSOR_TYPE == 2
-  #define btkChooseNativeBinaryFileStream VAXLittleEndianBinaryFileStream
+  #define _btk_choose_native_binary_file_stream VAXLittleEndianBinaryFileStream
 #elif PROCESSOR_TYPE == 3
-  #define btkChooseNativeBinaryFileStream IEEEBigEndianBinaryFileStream
+  #define _btk_choose_native_binary_file_stream IEEEBigEndianBinaryFileStream
 #else
   #error Unknown processor type
 #endif
@@ -306,12 +306,12 @@ namespace btk
     IEEEBigEndianBinaryFileStream(const IEEEBigEndianBinaryFileStream& ); // Not implemented.
     IEEEBigEndianBinaryFileStream& operator=(const IEEEBigEndianBinaryFileStream& ); // Not implemented.
   };
-  
-  class NativeBinaryFileStream : public btkChooseNativeBinaryFileStream
+    
+  class NativeBinaryFileStream : public _btk_choose_native_binary_file_stream
   {
   public:
-    NativeBinaryFileStream() : btkChooseNativeBinaryFileStream() {};
-    NativeBinaryFileStream(const std::string& filename, OpenMode mode) : btkChooseNativeBinaryFileStream(filename, mode) {};
+    NativeBinaryFileStream() : _btk_choose_native_binary_file_stream() {};
+    NativeBinaryFileStream(const std::string& filename, OpenMode mode) : _btk_choose_native_binary_file_stream(filename, mode) {};
     // ~NativeBinaryFileStream(); // Implicit.
   private:
     NativeBinaryFileStream(const NativeBinaryFileStream& ); // Not implemented.
