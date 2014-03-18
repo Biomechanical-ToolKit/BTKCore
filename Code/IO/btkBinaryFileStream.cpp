@@ -252,35 +252,6 @@ namespace btk
   };
   
   /** 
-   * @fn std::vector<char> BinaryFileStream::ReadChar(size_t nb)
-   * Extracts @a nb characters and return them as a vector.
-   */
-  
-  
-  /**
-   * @fn void BinaryFileStream::ReadChar(std::vector<char>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<char> val(45,0);
-   * bfs.ReadChar(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadChar(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb chars and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadChar(size_t nb, char* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadU8();
-  };
-  
-  /** 
    * Extracts one signed 8-bit integer.
    */
   int8_t BinaryFileStream::ReadI8()
@@ -288,34 +259,6 @@ namespace btk
     char byteptr[1] = {0};
     this->mp_Stream->read(byteptr, 1);
     return *byteptr;
-  };
-  
-  /** 
-   * @fn std::vector<int8_t> BinaryFileStream::ReadI8(size_t nb)
-   * Extracts @a nb signed 8-bit integers and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadI8(std::vector<int8_t>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<int8_t> val(45,0);
-   * bfs.ReadI8(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadI8(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb signed 8-bit integers and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadI8(size_t nb, int8_t* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadI8();
   };
   
   /** 
@@ -329,65 +272,9 @@ namespace btk
   };
   
   /** 
-   * @fn std::vector<uint8_t> BinaryFileStream::ReadU8(size_t nb)
-   * Extracts @a nb unsigned 8-bit integers and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadU8(std::vector<uint8_t>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<uint8_t> val(45,0);
-   * bfs.ReadU8(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadU8(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb unsigned 8-bit integers and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadU8(size_t nb, uint8_t* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadU8();
-  };
-  
-  /** 
    * @fn int16_t BinaryFileStream::ReadI16() = 0
    * Extracts one signed 16-bit integer.
    */
-  
-  /** 
-   * @fn std::vector<int16_t> BinaryFileStream::ReadI16(size_t nb)
-   * Extracts @a nb signed 16-bit integers and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadI16(std::vector<int16_t>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<int16_t> val(45,0);
-   * bfs.ReadI16(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadI16(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb signed 16-bit integers and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadI16(size_t nb, int16_t* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadI16();
-  };
   
   /** 
    * @fn uint16_t BinaryFileStream::ReadU16() = 0
@@ -395,65 +282,9 @@ namespace btk
    */
   
   /** 
-   * @fn std::vector<uint16_t> BinaryFileStream::ReadU16(size_t nb)
-   * Extracts @a nb unsigned 16-bit integers and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadU16(std::vector<uint16_t>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<uint16_t> val(45,0);
-   * bfs.ReadU16(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadU16(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb unsigned 16-bit integers and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadU16(size_t nb, uint16_t* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadU16();
-  };
-  
-  /** 
    * @fn int32_t BinaryFileStream::ReadI32() = 0
    * Extracts one signed 32-bit integer.
    */
-  
-  /** 
-   * @fn std::vector<int32_t> BinaryFileStream::ReadI32(size_t nb)
-   * Extracts @a nb signed 32-bit integers and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadI32(std::vector<int32_t>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<int32_t> val(45,0);
-   * bfs.ReadI32(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadI32(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb signed 32-bit integers and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadI32(size_t nb, int32_t* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadI32();
-  };
   
   /** 
    * @fn uint32_t BinaryFileStream::ReadU32() = 0
@@ -461,65 +292,9 @@ namespace btk
    */
   
   /** 
-   * @fn std::vector<uint32_t> BinaryFileStream::ReadU32(size_t nb)
-   * Extracts @a nb unsigned 32-bit integers and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadU32(std::vector<uint32_t>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<uint32_t> val(45,0);
-   * bfs.ReadU32(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadU32(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb unsigned 32-bit integers and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadU32(size_t nb, uint32_t* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadU32();
-  };
-  
-  /** 
    * @fn int64_t BinaryFileStream::ReadI64() = 0
    * Extracts one signed 64-bit integer.
    */
-  
-  /** 
-   * @fn std::vector<int64_t> BinaryFileStream::ReadI64(size_t nb)
-   * Extracts @a nb signed 64-bit integers and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadI64(std::vector<int64_t>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<int64_t> val(45,0);
-   * bfs.ReadI64(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadI64(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb signed 64-bit integers and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadI64(size_t nb, int64_t* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadI64();
-  };
   
   /** 
    * @fn uint64_t BinaryFileStream::ReadU64() = 0
@@ -527,98 +302,14 @@ namespace btk
    */
   
   /** 
-   * @fn std::vector<uint64_t> BinaryFileStream::ReadU64(size_t nb)
-   * Extracts @a nb unsigned 64-bit integers and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadU64(std::vector<uint64_t>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<uint64_t> val(45,0);
-   * bfs.ReadU64(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadU64(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb unsigned 64-bit integers and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadU64(size_t nb, uint64_t* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadU64();
-  };
-  
-  /** 
    * @fn float BinaryFileStream::ReadFloat() = 0
    * Extracts one float.
    */
   
   /** 
-   * @fn std::vector<float> BinaryFileStream::ReadFloat(size_t nb)
-   * Extracts @a nb floats and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadFloat(std::vector<float>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<float> val(45,0);
-   * bfs.ReadFloat(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadFloat(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb floats and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadFloat(size_t nb, float* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadFloat();
-  };
-  
-  /** 
    * @fn float BinaryFileStream::ReadDouble() = 0
    * Extracts one double.
    */
-  
-  /** 
-   * @fn std::vector<double> BinaryFileStream::ReadDouble(size_t nb)
-   * Extracts @a nb doubles and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadDouble(std::vector<double>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<double> val(45,0);
-   * bfs.ReadDouble(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadDouble(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb doubles and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadDouble(size_t nb, double* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadDouble();
-  };
   
   /** 
    * Extracts one string with @a nbChar characters.
@@ -638,34 +329,6 @@ namespace btk
       sFs = std::string();
     }
     return sFs;
-  };
-  
-  /** 
-   * @fn std::vector<std::string> BinaryFileStream::ReadString(size_t nb, size_t nbChar)
-   * Extracts @a nb strings with @a nb Charcharacters and return them as a vector.
-   */
-  
-  /**
-   * @fn void BinaryFileStream::ReadString(size_t nbChar, std::vector<std::string>& values)
-   * Extracts exactly the number of elements set in the vector @a values
-   *
-   * @note In case you want to assign only a part of the vector, you can use the method using an array.
-   * For example;
-   * @code
-   * std::vector<uint8_t> val(45,0);
-   * bfs.ReadU8(10, &(val[0])); // assign value #0-9
-   * // ...
-   * bfs.ReadU8(5, &(val[40])); // assign value #41-45
-   * @endcode
-   */
-  
-  /**
-   * Extracts @a nb unsigned 8-bit integers and set them in the array @a values.
-   */
-  void BinaryFileStream::ReadString(size_t nb, size_t nbChar, std::string* values)
-  {
-    for (size_t i = 0 ; i < nb ; ++i)
-      values[i] = this->ReadString(nbChar);
   };
   
   /** 
@@ -693,7 +356,7 @@ namespace btk
    * Moves the set pointer by @a nb bytes in the seeking direction @a dir.
    */
   
-  /**
+  /*
    * Writes the character @a c in the stream an return its size.
    */
   /*
@@ -703,161 +366,60 @@ namespace btk
     return 1;
   };
   */
-  /*
-   * Writes the vector of characters @a rVectorChar in the stream an return its size.
-   */
-  /*
-  size_t BinaryFileStream::Write(const std::vector<char>& rVectorChar)
-  {
-    size_t inc = 0;
-    while (inc < rVectorChar.size())
-      this->Write(rVectorChar[inc++]);
-    return rVectorChar.size() * 1;
-  };
-  */
+  
   /** 
-   * Writes the signed 8-bit integer @a i8 in the stream an return its size.
+   * Writes the signed 8-bit integer @a value in the stream an return its size.
    */
-  size_t BinaryFileStream::Write(int8_t i8)
+  size_t BinaryFileStream::Write(int8_t value)
   {
-    char c = static_cast<char>(i8);
+    char c = static_cast<char>(value);
     this->mp_Stream->write(&c, 1);
     return 1;
   };
   
   /** 
-   * Writes the vector of signed 8-bit integers @a rVectorI8 in the stream an return its size.
+   * Writes the unsigned 8-bit integer @a value in the stream an return its size.
    */
-  size_t BinaryFileStream::Write(const std::vector<int8_t>& rVectorI8)
+  size_t BinaryFileStream::Write(uint8_t value)
   {
-    size_t inc = 0;
-    while (inc < rVectorI8.size())
-      this->Write(rVectorI8[inc++]);
-    return rVectorI8.size() * 1;
-  };
-  
-  /** 
-   * Writes the unsigned 8-bit integer @a u8 in the stream an return its size.
-   */
-  size_t BinaryFileStream::Write(uint8_t u8)
-  {
-    char c = static_cast<char>(u8);
+    char c = static_cast<char>(value);
     this->mp_Stream->write(&c, 1);
     return 1;
   };
   
   /** 
-   * Writes the vector of unsigned 8-bit integers @a rVectorU8 in the stream an return its size.
-   */
-  size_t BinaryFileStream::Write(const std::vector<uint8_t>& rVectorU8)
-  {
-    size_t inc = 0;
-    while (inc < rVectorU8.size())
-      this->Write(rVectorU8[inc++]);
-    return rVectorU8.size() * 1;
-  };
-
-  /** 
-   * @fn size_t BinaryFileStream::Write(int16_t i16) = 0
+   * @fn size_t BinaryFileStream::Write(int16_t value) = 0
    * Extracts one signed 16-bit integer.
    */
   
   /** 
-   * Writes the vector of signed 16-bit integers @a rVectorI16 in the stream an return its size.
-   */
-  size_t BinaryFileStream::Write(const std::vector<int16_t>& rVectorI16)
-  {
-    size_t inc = 0;
-    while (inc < rVectorI16.size())
-      this->Write(rVectorI16[inc++]);
-    return rVectorI16.size() * 2;
-  };
-
-  /** 
-   * @fn size_t BinaryFileStream::Write(uint16_t u16) = 0
+   * @fn size_t BinaryFileStream::Write(uint16_t value) = 0
    * Extracts one unsigned 16-bit integer.
    */
 
   /** 
-   * Writes the vector of unsigned 16-bit integers @a rVectorU16 in the stream an return its size.
-   */
-  size_t BinaryFileStream::Write(const std::vector<uint16_t>& rVectorU16)
-  {
-    size_t inc = 0;
-    while (inc < rVectorU16.size())
-      this->Write(rVectorU16[inc++]);
-    return rVectorU16.size() * 2;
-  };
-  
-  /** 
-   * @fn size_t BinaryFileStream::Write(int32_t i32) = 0;
+   * @fn size_t BinaryFileStream::Write(int32_t value) = 0;
    * Write one 32-bit signed integer 
    */
   
-  /**
-   * Writes the vector of signed 32-bit integers @a rVectorI32 in the stream an return its size.
-   */
-  size_t BinaryFileStream::Write(const std::vector<int32_t>& rVectorI32)
-  {
-    size_t inc = 0;
-    while (inc < rVectorI32.size())
-      this->Write(rVectorI32[inc++]);
-    return rVectorI32.size() * 2;
-  };
-  
   /** 
-   * @fn size_t BinaryFileStream::Write(uint32_t u32) = 0;
+   * @fn size_t BinaryFileStream::Write(uint32_t value) = 0;
    * Write one 32-bit unsigned integer 
    */
   
-  /**
-   * Writes the vector of unsigned 32-bit integers @a rVectorU32 in the stream an return its size.
-   */
-  size_t BinaryFileStream::Write(const std::vector<uint32_t>& rVectorU32)
-  {
-    size_t inc = 0;
-    while (inc < rVectorU32.size())
-      this->Write(rVectorU32[inc++]);
-    return rVectorU32.size() * 2;
-  };
-
   /** 
-   * @fn size_t BinaryFileStream::Write(float f) = 0
+   * @fn size_t BinaryFileStream::Write(float value) = 0
    * Write one float.
    */
   
   /** 
-   * Writes the vector of floats @a rVectorFloat in the stream an return its size.
-   */
-  size_t BinaryFileStream::Write(const std::vector<float>& rVectorFloat)
-  {
-    size_t inc = 0;
-    while (inc < rVectorFloat.size())
-      this->Write(rVectorFloat[inc++]);
-    return rVectorFloat.size() * 4;
-  };
-  
-  /** 
    * Writes the string @a rString in the stream an return its size.
    */
-  size_t BinaryFileStream::Write(const std::string& rString)
+  size_t BinaryFileStream::Write(const std::string& value)
   {
-    this->mp_Stream->write(rString.c_str(), rString.length());
-    return rString.length();
+    this->mp_Stream->write(value.c_str(), value.length());
+    return value.length();
   };
-  
-  /** 
-   * Writes the vector of strings @a rVectorString in the stream an return its size.
-   */
-  size_t BinaryFileStream::Write(const std::vector<std::string>& rVectorString)
-  {
-    size_t inc = 0;
-    size_t writedBytes = 0;
-    while (inc < rVectorString.size())
-      writedBytes += this->Write(rVectorString[inc++]);
-    return writedBytes;
-  };
-  
   
   /** 
    * @class VAXLittleEndianBinaryFileStream btkBinaryFileStream.h

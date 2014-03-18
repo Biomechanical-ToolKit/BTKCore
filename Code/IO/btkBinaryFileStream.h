@@ -62,6 +62,7 @@
 #else
   #error Development platform not supported
 #endif
+#include "btkBinaryStream.h"
 
 // Check if we can use the memory mapped file stream system
 #if defined HAVE_SYS_MMAP || defined _MSC_VER
@@ -98,7 +99,7 @@ namespace btk
 {
   typedef RawFileStream::failure BinaryFileStreamFailure;
   
-  class BinaryFileStream
+  class BinaryFileStream : public BinaryStream<BinaryFileStream>
   {
   public:
     typedef std::ios_base::iostate IOState;
@@ -142,79 +143,56 @@ namespace btk
     BTK_IO_EXPORT void SwapStream(BinaryFileStream* toSwap);
     
     BTK_IO_EXPORT char ReadChar();
-    BTK_IO_EXPORT void ReadChar(size_t nb, char* values);
-    void ReadChar(std::vector<char>& values) {if (values.empty()) return; this->ReadChar(values.size(), &(values[0]));};
-    std::vector<char> ReadChar(size_t nb) {std::vector<char> values(nb); this->ReadChar(values); return values;};
+    using BinaryStream::ReadChar;
+    
     BTK_IO_EXPORT int8_t ReadI8();
-    BTK_IO_EXPORT void ReadI8(size_t nb, int8_t* values);
-    void ReadI8(std::vector<int8_t>& values) {if (values.empty()) return; this->ReadI8(values.size(), &(values[0]));};
-    std::vector<int8_t> ReadI8(size_t nb) {std::vector<int8_t> values(nb); this->ReadI8(values); return values;};
+    using BinaryStream::ReadI8;
+    
     BTK_IO_EXPORT uint8_t ReadU8();
-    BTK_IO_EXPORT void ReadU8(size_t nb, uint8_t* values);
-    void ReadU8(std::vector<uint8_t>& values) {if (values.empty()) return; this->ReadU8(values.size(), &(values[0]));};
-    std::vector<uint8_t> ReadU8(size_t nb) {std::vector<uint8_t> values(nb); this->ReadU8(values); return values;};
+    using BinaryStream::ReadU8;
+    
     virtual int16_t ReadI16() = 0;
-    BTK_IO_EXPORT void ReadI16(size_t nb, int16_t* values);
-    void ReadI16(std::vector<int16_t>& values) {if (values.empty()) return; this->ReadI16(values.size(), &(values[0]));};
-    std::vector<int16_t> ReadI16(size_t nb) {std::vector<int16_t> values(nb); this->ReadI16(values); return values;};
+    using BinaryStream::ReadI16;
+    
     virtual uint16_t ReadU16() = 0;
-    BTK_IO_EXPORT void ReadU16(size_t nb, uint16_t* values);
-    void ReadU16(std::vector<uint16_t>& values) {if (values.empty()) return; this->ReadU16(values.size(), &(values[0]));};
-    std::vector<uint16_t> ReadU16(size_t nb) {std::vector<uint16_t> values(nb); this->ReadU16(values); return values;};
+    using BinaryStream::ReadU16;
+    
     virtual int32_t ReadI32() = 0;
-    BTK_IO_EXPORT void ReadI32(size_t nb, int32_t* values);
-    void ReadI32(std::vector<int32_t>& values) {if (values.empty()) return; this->ReadI32(values.size(), &(values[0]));};
-    std::vector<int32_t> ReadI32(size_t nb) {std::vector<int32_t> values(nb); this->ReadI32(values); return values;};
+    using BinaryStream::ReadI32;
+    
     virtual uint32_t ReadU32() = 0;
-    BTK_IO_EXPORT void ReadU32(size_t nb, uint32_t* values);
-    void ReadU32(std::vector<uint32_t>& values) {if (values.empty()) return; this->ReadU32(values.size(), &(values[0]));};
-    std::vector<uint32_t> ReadU32(size_t nb) {std::vector<uint32_t> values(nb); this->ReadU32(values); return values;};
+    using BinaryStream::ReadU32;
+    
     virtual int64_t ReadI64() = 0;
-    BTK_IO_EXPORT void ReadI64(size_t nb, int64_t* values);
-    void ReadI64(std::vector<int64_t>& values) {if (values.empty()) return; this->ReadI64(values.size(), &(values[0]));};
-    std::vector<int64_t> ReadI64(size_t nb) {std::vector<int64_t> values(nb); this->ReadI64(values); return values;};
+    using BinaryStream::ReadI64;
+    
     virtual uint64_t ReadU64() = 0;
-    BTK_IO_EXPORT void ReadU64(size_t nb, uint64_t* values);
-    void ReadU64(std::vector<uint64_t>& values) {if (values.empty()) return; this->ReadU64(values.size(), &(values[0]));};
-    std::vector<uint64_t> ReadU64(size_t nb) {std::vector<uint64_t> values(nb); this->ReadU64(values); return values;};
+    using BinaryStream::ReadU64;
+    
     virtual float ReadFloat() = 0;
-    BTK_IO_EXPORT void ReadFloat(size_t nb, float* values);
-    void ReadFloat(std::vector<float>& values) {if (values.empty()) return; this->ReadFloat(values.size(), &(values[0]));};
-    std::vector<float> ReadFloat(size_t nb) {std::vector<float> values(nb); this->ReadFloat(values); return values;};
+    using BinaryStream::ReadFloat;
+    
     virtual double ReadDouble() = 0;
-    BTK_IO_EXPORT void ReadDouble(size_t nb, double* values);
-    void ReadDouble(std::vector<double>& values) {if (values.empty()) return; this->ReadDouble(values.size(), &(values[0]));};
-    std::vector<double> ReadDouble(size_t nb) {std::vector<double> values(nb); this->ReadDouble(values); return values;};
+    using BinaryStream::ReadDouble;
+    
     BTK_IO_EXPORT std::string ReadString(size_t nbChar);
-    BTK_IO_EXPORT void ReadString(size_t nb, size_t nbChar, std::string* values);
-    void ReadString(size_t nbChar, std::vector<std::string>& values) {if (values.empty()) return; this->ReadString(values.size(), nbChar, &(values[0]));};
-    std::vector<std::string> ReadString(size_t nb, size_t nbChar) {std::vector<std::string> values(nb); this->ReadString(nbChar, values); return values;};
+    using BinaryStream::ReadString;
     
     void SeekRead(StreamOffset offset, SeekDir dir) {this->mp_Stream->seekg(offset, dir);};
     StreamPosition TellRead() const {return this->mp_Stream->tellg();};
     
     BTK_IO_EXPORT size_t Fill(size_t nb);
     void SeekWrite(StreamOffset offset, SeekDir dir) {this->mp_Stream->seekp(offset, dir);};
-    // Note: MSVC doesn't like the following commented methods.
-    //       char and int8_t are the same for it...
-    //virtual size_t Write(char c);
-    //virtual size_t Write(const std::vector<char>& rVectorChar);
-    BTK_IO_EXPORT size_t Write(int8_t i8);
-    BTK_IO_EXPORT size_t Write(const std::vector<int8_t>& rVectorI8);
-    BTK_IO_EXPORT size_t Write(uint8_t u8);
-    BTK_IO_EXPORT size_t Write(const std::vector<uint8_t>& rVectorU8);
-    virtual size_t Write(int16_t i16) = 0;
-    BTK_IO_EXPORT size_t Write(const std::vector<int16_t>& rVectorI16);
-    virtual size_t Write(uint16_t u16) = 0;
-    BTK_IO_EXPORT size_t Write(const std::vector<uint16_t>& rVectorU16);
-    virtual size_t Write(int32_t i32) = 0;
-    BTK_IO_EXPORT size_t Write(const std::vector<int32_t>& rVectorI32);
-    virtual size_t Write(uint32_t u32) = 0;
-    BTK_IO_EXPORT size_t Write(const std::vector<uint32_t>& rVectorU32);
-    virtual size_t Write(float f) = 0;
-    BTK_IO_EXPORT size_t Write(const std::vector<float>& rVectorFloat);
-    BTK_IO_EXPORT size_t Write(const std::string& rString);
-    BTK_IO_EXPORT size_t Write(const std::vector<std::string>& rVectorString);
+    
+    BTK_IO_EXPORT size_t Write(int8_t value);
+    BTK_IO_EXPORT size_t Write(uint8_t value);
+    virtual size_t Write(int16_t value) = 0;
+    virtual size_t Write(uint16_t value) = 0;
+    virtual size_t Write(int32_t value) = 0;
+    virtual size_t Write(uint32_t value) = 0;
+    virtual size_t Write(float value) = 0;
+    BTK_IO_EXPORT size_t Write(const std::string& value);
+    using BinaryStream::Write;
   
   protected:
     BinaryFileStream() {this->mp_Stream = new RawFileStream();};
