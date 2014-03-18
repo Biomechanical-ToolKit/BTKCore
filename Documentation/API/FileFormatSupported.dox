@@ -92,6 +92,13 @@
     <td style="border: 1px solid #aaa; padding: 5px;"> <i>BTS Bioengineering (Elite)</i> binary file format containing force platform data. Supports only platforms of type I</td>
   </tr>
   <tr>
+    <td style="border: 1px solid #aaa; padding: 5px;"> HPF </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;">  </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center">@endhtmlonly btk::HPFFileIO @htmlonly</p> </td>
+    <td style="border: 1px solid #aaa; padding: 5px;"> <i>Delsys Inc.</i> binary file format containing analog data (EMG, accelerometer)</td>
+  </tr>
+  <tr>
     <td style="border: 1px solid #aaa; padding: 5px;"> MDF </td>
     <td style="border: 1px solid #aaa; padding: 5px;"> <p align="center"><strong>x</strong></p> </td>
     <td style="border: 1px solid #aaa; padding: 5px;">  </td>
