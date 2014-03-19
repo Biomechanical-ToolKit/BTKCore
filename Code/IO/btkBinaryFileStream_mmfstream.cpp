@@ -327,7 +327,7 @@ namespace btk
    */
   std::streamsize mmfilebuf::sputn(const char* s, std::streamsize n)
   {
-    while ((this->m_Position + n) >= this->m_BufferSize) 
+    while ((this->m_Position + n) > this->m_BufferSize) 
     {
       if (!this->resizemap())
         return 0;
