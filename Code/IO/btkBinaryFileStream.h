@@ -79,24 +79,12 @@ namespace btk
   class BinaryFileStream : public BinaryStream<BinaryFileStream>
   {
   public:
-    typedef std::ios_base::iostate IOState;
     static const IOState EndFileBit = std::ios_base::eofbit;
-    static const IOState FailBit = std::ios_base::failbit;
-    static const IOState BadBit = std::ios_base::badbit;
-    static const IOState GoodBit = std::ios_base::goodbit;
     
     typedef std::ios_base::openmode OpenMode;
     static const OpenMode In = std::ios_base::in;
     static const OpenMode Out = std::ios_base::out;
     static const OpenMode Truncate = std::ios_base::trunc;
-    
-    typedef std::ios_base::seekdir SeekDir;
-    static const SeekDir Begin = std::ios_base::beg;
-    static const SeekDir Current = std::ios_base::cur;
-    static const SeekDir End = std::ios_base::end;
-    
-    typedef std::streampos StreamPosition;
-    typedef std::streamoff StreamOffset;
     
     virtual ~BinaryFileStream()
     {

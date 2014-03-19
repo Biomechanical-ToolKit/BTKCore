@@ -94,40 +94,12 @@ namespace btk
    * Exception for the BinaryFileStream class and inherited classes.
    */
   /**
-   * @typedef BinaryFileStream::IOState
-   * Bitmask type to represent stream error state flags.
-   */
-  /**
    * @typedef BinaryFileStream::OpenMode
    * Flags describing the requested I/O mode for the file. 
    */
   /**
-   * @typedef BinaryFileStream::SeekDir
-   * Flags representing the seeking direction of a stream seeking operation.
-   */
-  /**
-   * @typedef BinaryFileStream::StreamPosition
-   * Type to represent positions in a stream.
-   */
-  /**
-   * @typedef BinaryFileStream::StreamOffset
-   * Type to represent position offsets in a stream.
-   */
-  /**
    * @var BinaryFileStream::EndFileBit
    * End-of-File reached while performing an extracting operation on an input stream.
-   */
-  /**
-   * @var BinaryFileStream::FailBit
-   * The last input operation failed because of an error related to the internal logic of the operation itself.
-   */
-  /**
-   * @var BinaryFileStream::BadBit
-   * Error due to the failure of an input/output operation on the stream buffer.
-   */
-  /**
-   * @var BinaryFileStream::GoodBit
-   * No error. Represents the absence of all the above (the value zero).
    */
   /**
    * @var BinaryFileStream::In
@@ -140,18 +112,6 @@ namespace btk
   /**
    * @var BinaryFileStream::Truncate
    * Any content is erased.The file is assumed to be zero-length.
-   */
-  /**
-   * @var BinaryFileStream::Begin
-   * Beginning of the stream buffer.
-   */
-  /**
-   * @var BinaryFileStream::Current
-   * Current position in the stream buffer.
-   */
-  /**
-   * @var BinaryFileStream::End
-   * End of the stream buffer.
    */
   /**
    * @var BinaryFileStream::mp_Stream

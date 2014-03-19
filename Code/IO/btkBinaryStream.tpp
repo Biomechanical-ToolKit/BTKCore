@@ -37,6 +37,75 @@
 
 namespace btk
 {
+  
+  /** 
+   * @class BinaryStream btkBinaryStream.h
+   * @brief Template class to read and write binary data.
+   * @tparam Derived Children class.
+   *
+   * This class uses the Curiously Recurring Template Pattern (CRTP) to propose the basis to read/write data on any device.
+   * The @a Derived class must have the following method (pure virtual or not):
+   *  - int16_t ReadI16();
+   *  - uint16_t ReadIU6();
+   *  - int32_t ReadI32();
+   *  - uint32_t ReadU32();
+   *  - int64_t ReadI64();
+   *  - uint64_t ReadU64();
+   *  - float ReadFloat();
+   *  - double ReadDouble();
+   *  - size_t Write(int16_t );
+   *  - size_t Write(uint16_t );
+   *  - size_t Write(int32_t );
+   *  - size_t Write(uint32_t );
+   *  - size_t Write(int64_t );
+   *  - size_t Write(uint64_t );
+   *  - size_t Write(float );
+   *  - size_t Write(double );
+   *
+   * @sa BinaryFileStream, BinaryChunkBufferStream
+   */
+  
+  /**
+   * @typedef BinaryStream::IOState
+   * Bitmask type to represent stream error state flags.
+   */
+  /**
+   * @typedef BinaryStream::SeekDir
+   * Flags representing the seeking direction of a stream seeking operation.
+   */
+  /**
+   * @typedef BinaryStream::StreamPosition
+   * Type to represent positions in a stream.
+   */
+  /**
+   * @typedef BinaryStream::StreamOffset
+   * Type to represent position offsets in a stream.
+   */
+  /**
+   * @var BinaryStream::FailBit
+   * The last input operation failed because of an error related to the internal logic of the operation itself.
+   */
+  /**
+   * @var BinaryStream::BadBit
+   * Error due to the failure of an input/output operation on the stream buffer.
+   */
+  /**
+   * @var BinaryStream::GoodBit
+   * No error. Represents the absence of all the above (the value zero).
+   */
+  /**
+   * @var BinaryStream::Begin
+   * Beginning of the stream buffer.
+   */
+  /**
+   * @var BinaryStream::Current
+   * Current position in the stream buffer.
+   */
+  /**
+   * @var BinaryStream::End
+   * End of the stream buffer.
+   */
+   
   /** 
    * Extracts @a nb characters and return them as a vector.
    */

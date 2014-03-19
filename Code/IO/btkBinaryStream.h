@@ -52,6 +52,19 @@ namespace btk
   class BinaryStream
   {
   public:
+    typedef std::ios_base::iostate IOState;
+    static const IOState FailBit = std::ios_base::failbit;
+    static const IOState BadBit = std::ios_base::badbit;
+    static const IOState GoodBit = std::ios_base::goodbit;
+    
+    typedef std::ios_base::seekdir SeekDir;
+    static const SeekDir Begin = std::ios_base::beg;
+    static const SeekDir Current = std::ios_base::cur;
+    static const SeekDir End = std::ios_base::end;
+    
+    typedef std::streampos StreamPosition;
+    typedef std::streamoff StreamOffset;
+    
     ~BinaryStream() {};
     
     // Read methods
