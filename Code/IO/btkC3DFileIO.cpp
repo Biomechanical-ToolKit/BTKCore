@@ -249,7 +249,7 @@ namespace btk
           ibfs = new IEEEBigEndianBinaryFileStream();
           break;
         default :
-          throw(C3DFileIOException("Invalid processor type"));
+          throw(C3DFileIOException("Invalid processor type - Impossible to use the right stream to read data."));
           break;
       };
       ibfs->SwapStream(oldBFS);
@@ -1038,7 +1038,7 @@ namespace btk
           obfs = new IEEEBigEndianBinaryFileStream();
           break;
         default :
-          throw(C3DFileIOException("Invalid processor type"));
+          throw(C3DFileIOException("Invalid processor type - Impossible to use the right stream to write data."));
           break;
       }
       // File access
