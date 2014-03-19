@@ -235,12 +235,7 @@ namespace btk
     
     return this;
   };
-  
-  /**
-   * @fn bool mmfilebuf::is_eob() const
-   * Check if the position of the pointer on the data is at the end of the buffer.
-   */
-  
+
   /**
    * @fn bool mmfilebuf::writemode() const
    * Check if this file buffer is in write mode or not.
@@ -515,8 +510,6 @@ namespace btk
   {
     if (this->m_Filebuf.sgetn(s,n) != n)
       this->setstate(std::ios_base::eofbit | std::ios_base::failbit);
-    else if (this->m_Filebuf.is_eob())
-      this->setstate(std::ios_base::eofbit);
     return *this;
   };
   

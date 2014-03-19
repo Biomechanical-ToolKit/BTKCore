@@ -62,8 +62,7 @@ namespace btk
     BTK_IO_EXPORT mmfilebuf* open(const char* s, std::ios_base::openmode mode);
     bool is_open() const {return !(this->m_File == BTK_MMFILEBUF_NO_FILE);};
     BTK_IO_EXPORT mmfilebuf* close();
-    
-    bool is_eob() const {return (this->m_Position == this->m_BufferSize + 1);}; // End of buffer
+
     bool writemode() const {return this->m_Writing;};
     
     std::streamsize size() const {return this->m_BufferSize;};
