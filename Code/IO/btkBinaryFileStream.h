@@ -38,31 +38,8 @@
 
 #include "btkConfigure.h"
 
-// Check if the processor is supported
-#if defined _MSC_VER
-  #if defined _M_IX86 || defined _M_X64
-    #define PROCESSOR_TYPE 1 /* IEEE_LittleEndian */
-  #elif defined _M_ALPHA
-    #define PROCESSOR_TYPE 2 /* VAX_LittleEndian */
-  #elif defined _M_MRX000 || defined _M_PPC 
-    #define PROCESSOR_TYPE 3 /* IEEE_BigEndian */
-  #else
-    #error Processor not supported
-  #endif
-#elif defined __GNUC__
-  #if defined __i386__ || defined __x86_64__
-    #define PROCESSOR_TYPE 1 /* IEEE_LittleEndian */
-  #elif defined __vax__
-    #define PROCESSOR_TYPE 2 /* VAX_LittleEndian */
-  #elif defined __mips__ || defined __ppc__
-    #define PROCESSOR_TYPE 3 /* IEEE_BigEndian */
-  #else
-    #error Processor not supported
-  #endif
-#else
-  #error Development platform not supported
-#endif
 #include "btkBinaryStream.h"
+#include "btkBinaryByteOrderFormat.h"
 
 // Check if we can use the memory mapped file stream system
 #if defined HAVE_SYS_MMAP || defined _MSC_VER
@@ -205,12 +182,13 @@ namespace btk
     BinaryFileStream& operator=(const BinaryFileStream& ); // Not implemented.
   };
 
-  class VAXLittleEndianBinaryFileStream : public BinaryFileStream
-  {  
+  template <class Format>
+  class ByteOrderBinaryFileStream : public BinaryFileStream
+  {
   public:
-    VAXLittleEndianBinaryFileStream() : BinaryFileStream() {};
-    VAXLittleEndianBinaryFileStream(const std::string& filename, OpenMode mode) : BinaryFileStream(filename, mode) {};
-    // ~VAXLittleEndianBinaryFileStream(); // Implicit.  
+    ByteOrderBinaryFileStream() : BinaryFileStream() {};
+    ByteOrderBinaryFileStream(const std::string& filename, OpenMode mode) : BinaryFileStream(filename, mode) {};
+    // ~ByteOrderBinaryFileStream(); // Implicit.  
     BTK_IO_EXPORT virtual int16_t ReadI16();
     using BinaryFileStream::ReadI16;
     BTK_IO_EXPORT virtual uint16_t ReadU16();
@@ -227,86 +205,51 @@ namespace btk
     using BinaryFileStream::ReadFloat;
     BTK_IO_EXPORT virtual double ReadDouble();
     using BinaryFileStream::ReadDouble;
-    BTK_IO_EXPORT virtual size_t Write(int16_t i16);
-    BTK_IO_EXPORT virtual size_t Write(uint16_t u16);
-    BTK_IO_EXPORT virtual size_t Write(int32_t i32);
-    BTK_IO_EXPORT virtual size_t Write(uint32_t u32);
-    BTK_IO_EXPORT virtual size_t Write(float f);
+    BTK_IO_EXPORT virtual size_t Write(int16_t value);
+    BTK_IO_EXPORT virtual size_t Write(uint16_t value);
+    BTK_IO_EXPORT virtual size_t Write(int32_t value);
+    BTK_IO_EXPORT virtual size_t Write(uint32_t value);
+    BTK_IO_EXPORT virtual size_t Write(float value);
     using BinaryFileStream::Write;
   
+  private:
+    ByteOrderBinaryFileStream(const ByteOrderBinaryFileStream& ); // Not implemented.
+    ByteOrderBinaryFileStream& operator=(const ByteOrderBinaryFileStream& ); // Not implemented.
+  };
+
+  class VAXLittleEndianBinaryFileStream : public ByteOrderBinaryFileStream<VAXLittleEndianFormat>
+  {
+  public:
+    VAXLittleEndianBinaryFileStream() : ByteOrderBinaryFileStream<VAXLittleEndianFormat>() {};
+    VAXLittleEndianBinaryFileStream(const std::string& filename, OpenMode mode) : ByteOrderBinaryFileStream<VAXLittleEndianFormat>(filename, mode) {};
+    // ~ByteOrderBinaryFileStream(); // Implicit.  
   private:
     VAXLittleEndianBinaryFileStream(const VAXLittleEndianBinaryFileStream& ); // Not implemented.
     VAXLittleEndianBinaryFileStream& operator=(const VAXLittleEndianBinaryFileStream& ); // Not implemented.
   };
-
-  class IEEELittleEndianBinaryFileStream : public BinaryFileStream
-  {  
-  public:
-    IEEELittleEndianBinaryFileStream() : BinaryFileStream() {};
-    IEEELittleEndianBinaryFileStream(const std::string& filename, OpenMode mode) : BinaryFileStream(filename, mode) {};
-    // ~IEEELittleEndianBinaryFileStream(); // Implicit.  
-    BTK_IO_EXPORT virtual int16_t ReadI16(); 
-    using BinaryFileStream::ReadI16;
-    BTK_IO_EXPORT virtual uint16_t ReadU16();
-    using BinaryFileStream::ReadU16;
-    BTK_IO_EXPORT virtual int32_t ReadI32(); 
-    using BinaryFileStream::ReadI32;
-    BTK_IO_EXPORT virtual uint32_t ReadU32();
-    using BinaryFileStream::ReadU32;
-    BTK_IO_EXPORT virtual int64_t ReadI64(); 
-    using BinaryFileStream::ReadI64;
-    BTK_IO_EXPORT virtual uint64_t ReadU64();
-    using BinaryFileStream::ReadU64;
-    BTK_IO_EXPORT virtual float ReadFloat();
-    using BinaryFileStream::ReadFloat;
-    BTK_IO_EXPORT virtual double ReadDouble();
-    using BinaryFileStream::ReadDouble;
-    BTK_IO_EXPORT virtual size_t Write(int16_t i16);
-    BTK_IO_EXPORT virtual size_t Write(uint16_t u16);
-    BTK_IO_EXPORT virtual size_t Write(int32_t i32);
-    BTK_IO_EXPORT virtual size_t Write(uint32_t u32);
-    BTK_IO_EXPORT virtual size_t Write(float f);
-    using BinaryFileStream::Write;
   
+  class IEEELittleEndianBinaryFileStream : public ByteOrderBinaryFileStream<IEEELittleEndianFormat>
+  {
+  public:
+    IEEELittleEndianBinaryFileStream() : ByteOrderBinaryFileStream<IEEELittleEndianFormat>() {};
+    IEEELittleEndianBinaryFileStream(const std::string& filename, OpenMode mode) : ByteOrderBinaryFileStream<IEEELittleEndianFormat>(filename, mode) {};
+    // ~ByteOrderBinaryFileStream(); // Implicit.  
   private:
     IEEELittleEndianBinaryFileStream(const IEEELittleEndianBinaryFileStream& ); // Not implemented.
     IEEELittleEndianBinaryFileStream& operator=(const IEEELittleEndianBinaryFileStream& ); // Not implemented.
   };
   
-  class IEEEBigEndianBinaryFileStream : public BinaryFileStream
-  {  
+  class IEEEBigEndianBinaryFileStream : public ByteOrderBinaryFileStream<IEEEBigEndianFormat>
+  {
   public:
-    IEEEBigEndianBinaryFileStream() : BinaryFileStream() {};
-    IEEEBigEndianBinaryFileStream(const std::string& filename, OpenMode mode) : BinaryFileStream(filename, mode) {};
-    // ~IEEEBigEndianBinaryFileStream(); // Implicit.  
-    BTK_IO_EXPORT virtual int16_t ReadI16();
-    using BinaryFileStream::ReadI16;
-    BTK_IO_EXPORT virtual uint16_t ReadU16();
-    using BinaryFileStream::ReadU16;
-    BTK_IO_EXPORT virtual int32_t ReadI32(); 
-    using BinaryFileStream::ReadI32;
-    BTK_IO_EXPORT virtual uint32_t ReadU32();
-    using BinaryFileStream::ReadU32;
-    BTK_IO_EXPORT virtual int64_t ReadI64(); 
-    using BinaryFileStream::ReadI64;
-    BTK_IO_EXPORT virtual uint64_t ReadU64();
-    using BinaryFileStream::ReadU64;
-    BTK_IO_EXPORT virtual float ReadFloat();
-    using BinaryFileStream::ReadFloat;
-    BTK_IO_EXPORT virtual double ReadDouble();
-    using BinaryFileStream::ReadDouble;
-    BTK_IO_EXPORT virtual size_t Write(int16_t i16);
-    BTK_IO_EXPORT virtual size_t Write(uint16_t u16);
-    BTK_IO_EXPORT virtual size_t Write(int32_t i32);
-    BTK_IO_EXPORT virtual size_t Write(uint32_t u32);
-    BTK_IO_EXPORT virtual size_t Write(float f);
-    using BinaryFileStream::Write;
-  
+    IEEEBigEndianBinaryFileStream() : ByteOrderBinaryFileStream<IEEEBigEndianFormat>() {};
+    IEEEBigEndianBinaryFileStream(const std::string& filename, OpenMode mode) : ByteOrderBinaryFileStream<IEEEBigEndianFormat>(filename, mode) {};
+    // ~ByteOrderBinaryFileStream(); // Implicit.  
   private:
     IEEEBigEndianBinaryFileStream(const IEEEBigEndianBinaryFileStream& ); // Not implemented.
     IEEEBigEndianBinaryFileStream& operator=(const IEEEBigEndianBinaryFileStream& ); // Not implemented.
   };
-    
+      
   class NativeBinaryFileStream : public _btk_choose_native_binary_file_stream
   {
   public:
@@ -318,5 +261,7 @@ namespace btk
     NativeBinaryFileStream& operator=(const NativeBinaryFileStream& ); // Not implemented.
   };
 };
+
+#include "btkBinaryFileStream.tpp"
 
 #endif // __btkBinaryFileStream_h

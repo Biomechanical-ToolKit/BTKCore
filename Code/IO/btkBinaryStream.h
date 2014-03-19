@@ -52,6 +52,7 @@ namespace btk
   class BinaryStream
   {
   public:
+    ~BinaryStream() {};
     
     // Read methods
     // ------------
