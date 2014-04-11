@@ -40,6 +40,7 @@
 #include <algorithm>
 #include <cctype>
 #include <vector>
+#include <map>
 
 namespace btk
 {
@@ -228,16 +229,17 @@ namespace btk
       // Construct a vector of indices to facilitate the coordinates' extraction
       // And set the markers' label
       // All the residuals are set to -1 by default
-      std::vector<int> markerIndex = std::vector<int>(numMarkers, -1);
+      std::map<int,Point::Pointer> markerIndexMap;
       Point::Residuals res = Point::Residuals::Constant(numFrames,1,-1.0);
       for (int i = 0 ; i < static_cast<int>(indices.size()) ; ++i)
       {
         Point::Pointer pt = output->GetPoint(i);
         pt->SetLabel(labels[i]);
         pt->SetResiduals(res);
-        markerIndex[indices[i]] = i;
+        markerIndexMap.insert(std::make_pair(indices[i],pt));
       }
       //  Extract coordinates
+      bool extraMarkerFound = false;
       while (1)
       {
         bifs.SeekRead(6, BinaryFileStream::Current); // 0x0000 00000 06000
@@ -250,7 +252,20 @@ namespace btk
         {
           while (1)
           {
-            Point::Pointer point = output->GetPoint(markerIndex[bifs.ReadU16()-1]);
+            Point::Pointer point;
+            int idx = bifs.ReadU16()-1;
+            std::map<int,Point::Pointer>::iterator itM = markerIndexMap.find(idx);
+            if (itM == markerIndexMap.end())
+            {
+              extraMarkerFound = true;
+              point = Point::New("uname*" + ToString(idx+1), numFrames);
+              output->AppendPoint(point);
+              markerIndexMap.insert(std::make_pair(idx,point));
+            }
+            else
+            {  
+              point = itM->second;
+            }
             bifs.SeekRead(2, BinaryFileStream::Current); // 0x0000
             point->GetValues().coeffRef(index,0) = bifs.ReadFloat(); // X
             point->GetValues().coeffRef(index,1) = bifs.ReadFloat(); // Y
@@ -265,6 +280,9 @@ namespace btk
         if (dataSizeBis <= 0)
           break;
       }
+      if (extraMarkerFound)
+        btkWarningMacro(filename, "At least one extra marker was found in the data but was not specified in the label table.");
+              
     }
     catch (BinaryFileStreamFailure& )
     {
