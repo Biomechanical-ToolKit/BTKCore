@@ -41,8 +41,12 @@ av = av(aidx,:);
 % Resizing
 btkSetFrameNumber(h, numFrames);
 % Storing modifications
-btkSetPointsValues(h, pv);
-btkSetPointsResiduals(h, rv);
-btkSetAnalogsValues(h, av);
+if ~isempty(pv)
+    btkSetPointsValues(h, pv);
+    btkSetPointsResiduals(h, rv);
+end
+if ~isempty(av)
+    btkSetAnalogsValues(h, av);
+end
 % Set the first frame.
 btkSetFirstFrame(h, startAt, 1); % 1: Modify also the events' frame/time
