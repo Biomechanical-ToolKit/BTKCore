@@ -14,6 +14,14 @@ function btkCropAcquisition(h, startAt, numFrames)
 %  Author: A. Barré
 %  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
+
+if ~isinteger(startAt) && mod(startAt,1)
+    startAt = round(startAt);
+end
+if ~isinteger(numFrames) && mod(numFrames,1)
+    startAt = round(startAt);
+end
+
 ff = btkGetFirstFrame(h);
 lf = btkGetLastFrame(h);
 if (nargin == 2)
