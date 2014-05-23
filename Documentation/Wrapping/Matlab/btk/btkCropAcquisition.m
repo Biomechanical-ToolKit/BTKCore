@@ -19,7 +19,7 @@ if ~isinteger(startAt) && mod(startAt,1)
     startAt = round(startAt);
 end
 if ~isinteger(numFrames) && mod(numFrames,1)
-    startAt = round(startAt);
+    numFrames = round(numFrames);
 end
 
 ff = btkGetFirstFrame(h);
