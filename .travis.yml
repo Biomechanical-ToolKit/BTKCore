@@ -6,7 +6,7 @@ before_install:
   
 # To install any prerequisites or dependencies necessary to run your build
 install:  
-  - brew install swig
+  - brew install swig cmake
   
 # To prepare your build for testing
 before_script:
@@ -23,7 +23,6 @@ script:
 
 compiler:
   - clang
-  - gcc
   
 env:
   matrix:
