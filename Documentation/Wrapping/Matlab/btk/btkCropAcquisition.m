@@ -15,13 +15,9 @@ function btkCropAcquisition(h, startAt, numFrames)
 %  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
 
-if ~isinteger(startAt) && mod(startAt,1)
-    startAt = round(startAt);
+if (mod(startAt,1) || mod(numFrames,1))
+    error('btk:CropAcquisition','Frame numbers must be real positive integers');
 end
-if ~isinteger(numFrames) && mod(numFrames,1)
-    numFrames = round(numFrames);
-end
-
 ff = btkGetFirstFrame(h);
 lf = btkGetLastFrame(h);
 if (nargin == 2)
