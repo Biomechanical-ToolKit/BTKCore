@@ -14,6 +14,10 @@ function btkCropAcquisition(h, startAt, numFrames)
 %  Author: A. Barré
 %  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
+
+if (mod(startAt,1) || mod(numFrames,1))
+    error('btk:CropAcquisition','Frame numbers must be real positive integers');
+end
 ff = btkGetFirstFrame(h);
 lf = btkGetLastFrame(h);
 if (nargin == 2)
