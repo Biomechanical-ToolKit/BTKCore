@@ -14,16 +14,14 @@ function btkCropAcquisition(h, startAt, numFrames)
 %  Author: A. Barré
 %  Copyright 2009-2014 Biomechanical ToolKit (BTK).
 
-
-if (mod(startAt,1) || mod(numFrames,1))
-    error('btk:CropAcquisition','Frame numbers must be real positive integers');
-end
 ff = btkGetFirstFrame(h);
 lf = btkGetLastFrame(h);
 if (nargin == 2)
     numFrames = lf - ff + 1 - startAt + 1;
 end
-if ((startAt < ff) || startAt > lf)
+if (mod(startAt,1) || mod(numFrames,1))
+    error('btk:CropAcquisition','Frame numbers must be real positive integers');
+elseif ((startAt < ff) || startAt > lf)
     error('btk:CropAcquisiton','Invalid index.');
 elseif (numFrames > lf - startAt + 1)
     error('btk:CropAcquisiton','Incorrect number of frames specified.')
