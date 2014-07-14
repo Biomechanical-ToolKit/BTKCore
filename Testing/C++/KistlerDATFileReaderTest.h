@@ -64,6 +64,32 @@ CXXTEST_SUITE(KistlerDATFileReaderTest)
     reader->SetFilename(KistlerDATFilePathIN + "Truncated.dat");
     TS_ASSERT_THROWS_EQUALS(reader->Update(), const btk::Exception &e, e.what(), std::string("Unexpected end of file."));
   };
+  
+  CXXTEST_TEST(DLL1)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(KistlerDATFilePathIN + "DLL1.dat");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+
+    TS_ASSERT_EQUALS(acq->GetFirstFrame(), 1);
+    TS_ASSERT_EQUALS(acq->GetPointFrequency(), 100);
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), 0);
+    TS_ASSERT_EQUALS(acq->GetPointFrameNumber(), 500);
+    TS_ASSERT_EQUALS(acq->GetAnalogFrequency(), 100);
+    TS_ASSERT_EQUALS(acq->GetAnalogNumber(), 8);
+    TS_ASSERT_EQUALS(acq->GetPointUnit(), "mm");
+    
+    TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(0), -0.203036, 1e-5);
+    TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(1), -0.203036, 1e-5);
+    TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(2), -0.203036, 1e-5);
+    TS_ASSERT_DELTA(acq->GetAnalog(0)->GetValues()(3), -0.357869, 1e-5);
+    
+    TS_ASSERT_DELTA(acq->GetAnalog(7)->GetValues()(496), -68.238548, 1e-5);
+    TS_ASSERT_DELTA(acq->GetAnalog(7)->GetValues()(497), -68.238548, 1e-5);
+    TS_ASSERT_DELTA(acq->GetAnalog(7)->GetValues()(498), -68.582993, 1e-5);
+    TS_ASSERT_DELTA(acq->GetAnalog(7)->GetValues()(499), -68.582993, 1e-5);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(KistlerDATFileReaderTest)
@@ -71,4 +97,5 @@ CXXTEST_TEST_REGISTRATION(KistlerDATFileReaderTest, NoFile)
 CXXTEST_TEST_REGISTRATION(KistlerDATFileReaderTest, MisspelledFile)
 CXXTEST_TEST_REGISTRATION(KistlerDATFileReaderTest, BioWare17)
 CXXTEST_TEST_REGISTRATION(KistlerDATFileReaderTest, Truncated)
+CXXTEST_TEST_REGISTRATION(KistlerDATFileReaderTest, DLL1)
 #endif

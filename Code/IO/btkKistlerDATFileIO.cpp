@@ -115,42 +115,52 @@ namespace btk
       
       // General header?
       // ---------------
-      // FIXME: What is the meaning of the next 66 bytes?
-      bifs.SeekRead(66, BinaryFileStream::Current);
-      // 0x70: (int32) Number of channels
+      // FIXME: What is the meaning of the next 12 bytes?
+      bifs.SeekRead(12, BinaryFileStream::Current);
+      // FIXME: What are the next (numel+4)*4 bytes, seems to be a table.
+      int32_t tableDims[2];
+      bifs.ReadI32(2,tableDims);
+      int32_t numel = tableDims[0] * tableDims[1] * 4;
+      bifs.SeekRead(4, BinaryFileStream::Current); // Space?
+      bifs.SeekRead(numel, BinaryFileStream::Current); // Table data?
+      bifs.SeekRead(4, BinaryFileStream::Current); // Space again?
+      // FIXME: What is the meaning of the next 22 bytes?
+      bifs.SeekRead(22, BinaryFileStream::Current);
+      // The next offsets given in the comments start at 16+(numel+4)*4+22.
+      // 0x00: (int32) Number of channels
       int numberOfChannels = bifs.ReadI32();
-      // 0x74: (int32) Number of frames
+      // 0x04: (int32) Number of frames
       int numberOfFrames = bifs.ReadI32();
-      // 0x78: ??
+      // 0x08: ??
       bifs.SeekRead(4, BinaryFileStream::Current);
-      // 0x82: (int32) ADC resolution? Number of ADC channels on the board?
+      // 0x12: (int32) ADC resolution? Number of ADC channels on the board?
       int digitalResolution = bifs.ReadI32();
-      // 0x86: (double) Sample frequency
+      // 0x16: (double) Sample frequency
       double sampleFrequency = bifs.ReadDouble();
-      // 0x94: ??
+      // 0x24: ??
       bifs.SeekRead(4, BinaryFileStream::Current);
-      // 0x98: ??
+      // 0x28: ??
       bifs.SeekRead(4, BinaryFileStream::Current);
-      // 0x102: Normalized force (N) - SKIPPED
+      // 0x32: Normalized force (N) - SKIPPED
       bifs.SeekRead(4, BinaryFileStream::Current);
-      // 0x106: Normalized length (mm) - SKIPPED
+      // 0x36: Normalized length (mm) - SKIPPED
       bifs.SeekRead(4, BinaryFileStream::Current);
-      // 0x110: ??
+      // 0x40: ??
       bifs.SeekRead(4, BinaryFileStream::Current);
-      // 0x114: ??
+      // 0x44: ??
       bifs.SeekRead(4, BinaryFileStream::Current);
-      // 0x118: ??
+      // 0x48: ??
       bifs.SeekRead(4, BinaryFileStream::Current);
-      // 0x122: ?? (Could be an index) 
+      // 0x52: ?? (Could be an index) 
       bifs.SeekRead(2, BinaryFileStream::Current);
-      // 0x124: (int16_t) Number of characters (n) in the next string
-      // 0x126: (string) What is this string? - SKIPPED
+      // 0x54: (int16_t) Number of characters (n) in the next string
+      // 0x56: (string) What is this string? - SKIPPED
       bifs.SeekRead(bifs.ReadU16(), BinaryFileStream::Current);
       
       // Force plate header?
       // -------------------
       // For simplification the adress in the description is reset to 0, but this is right after
-      // the general header, so add 126+n to find the good position in a file.
+      // the general header, so add 94+(numel+4)*4+n to find the good position in a file.
       // 0x00: ??
       bifs.SeekRead(4, BinaryFileStream::Current);
       // 0x04: ??
