@@ -111,6 +111,38 @@ CXXTEST_SUITE(TRBFileReaderTest)
       }
     }
   }
+  
+  CXXTEST_TEST(Barefoot)
+  {
+    btk::AcquisitionFileReader::Pointer reader = btk::AcquisitionFileReader::New();
+    reader->SetFilename(TRBFilePathIN + "barefoot_walking1.trb");
+    reader->Update();
+    btk::Acquisition::Pointer acq = reader->GetOutput();
+    
+    TS_ASSERT_EQUALS(acq->GetPointNumber(), 41);
+    TS_ASSERT_EQUALS(acq->GetPoint(0)->GetLabel(), "L.Shoulder");
+    TS_ASSERT_EQUALS(acq->GetPoint(1)->GetLabel(), "L.Scapula");
+    TS_ASSERT_EQUALS(acq->GetPoint(2)->GetLabel(), "R.Shoulder");
+    TS_ASSERT_EQUALS(acq->GetPoint(3)->GetLabel(), "L.ASIS");
+    TS_ASSERT_EQUALS(acq->GetPoint(4)->GetLabel(), "V.Sacral");
+    TS_ASSERT_EQUALS(acq->GetPoint(5)->GetLabel(), "R.ASIS");
+    TS_ASSERT_EQUALS(acq->GetPoint(6)->GetLabel(), "R.Thigh");
+    TS_ASSERT_EQUALS(acq->GetPoint(7)->GetLabel(), "R.Knee");
+    TS_ASSERT_EQUALS(acq->GetPoint(8)->GetLabel(), "R.Shank");
+    TS_ASSERT_EQUALS(acq->GetPoint(9)->GetLabel(), "R.Ankle");
+    TS_ASSERT_EQUALS(acq->GetPoint(10)->GetLabel(), "R.Heel");
+    TS_ASSERT_EQUALS(acq->GetPoint(11)->GetLabel(), "R.Toe");
+    TS_ASSERT_EQUALS(acq->GetPoint(12)->GetLabel(), "L.Thigh");
+    TS_ASSERT_EQUALS(acq->GetPoint(13)->GetLabel(), "L.Knee");
+    TS_ASSERT_EQUALS(acq->GetPoint(14)->GetLabel(), "L.Shank");
+    TS_ASSERT_EQUALS(acq->GetPoint(15)->GetLabel(), "L.Ankle");
+    TS_ASSERT_EQUALS(acq->GetPoint(16)->GetLabel(), "L.Heel");
+    TS_ASSERT_EQUALS(acq->GetPoint(17)->GetLabel(), "L.Toe");
+    TS_ASSERT_EQUALS(acq->GetPoint(18)->GetLabel(), "uname*37");
+    TS_ASSERT_EQUALS(acq->GetPoint(19)->GetLabel(), "uname*38");
+    
+    TS_ASSERT_DELTA(acq->GetPoint(18)->GetValues()(56,0), 2911.218750, 1e-5);
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(TRBFileReaderTest)
@@ -119,4 +151,5 @@ CXXTEST_TEST_REGISTRATION(TRBFileReaderTest, MisspelledFile)
 CXXTEST_TEST_REGISTRATION(TRBFileReaderTest, FalseFile)
 CXXTEST_TEST_REGISTRATION(TRBFileReaderTest, Gait)
 CXXTEST_TEST_REGISTRATION(TRBFileReaderTest, Anto_TRB_vs_TRC)
+CXXTEST_TEST_REGISTRATION(TRBFileReaderTest, Barefoot)
 #endif

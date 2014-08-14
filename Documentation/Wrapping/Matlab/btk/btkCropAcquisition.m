@@ -19,7 +19,9 @@ lf = btkGetLastFrame(h);
 if (nargin == 2)
     numFrames = lf - ff + 1 - startAt + 1;
 end
-if ((startAt < ff) || startAt > lf)
+if (mod(startAt,1) || mod(numFrames,1))
+    error('btk:CropAcquisition','Frame numbers must be real positive integers');
+elseif ((startAt < ff) || startAt > lf)
     error('btk:CropAcquisiton','Invalid index.');
 elseif (numFrames > lf - startAt + 1)
     error('btk:CropAcquisiton','Incorrect number of frames specified.')
@@ -41,8 +43,12 @@ av = av(aidx,:);
 % Resizing
 btkSetFrameNumber(h, numFrames);
 % Storing modifications
-btkSetPointsValues(h, pv);
-btkSetPointsResiduals(h, rv);
-btkSetAnalogsValues(h, av);
+if ~isempty(pv)
+    btkSetPointsValues(h, pv);
+    btkSetPointsResiduals(h, rv);
+end
+if ~isempty(av)
+    btkSetAnalogsValues(h, av);
+end
 % Set the first frame.
 btkSetFirstFrame(h, startAt, 1); % 1: Modify also the events' frame/time
