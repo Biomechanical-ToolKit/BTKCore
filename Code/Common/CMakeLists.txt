@@ -1,20 +1,20 @@
 SET(BTKCommon_SRCS
-  btkAcquisition.cpp
-  btkAnalog.cpp
-  btkDataObject.cpp
-  btkEvent.cpp
-  btkForcePlatform.cpp
-  btkLogger.cpp
-  btkPoint.cpp
-  btkMetaData.cpp  
-  btkMetaDataInfo.cpp
-  btkMetaDataUtils.cpp 
-  btkIMU.cpp
-  btkObject.cpp
-  btkProcessObject.cpp
-  btkTriangleMesh.cpp
-  btkWrench.cpp
-  btkCriticalSection_p.cpp
+  # btkAcquisition.cpp
+  # btkAnalog.cpp
+  # btkDataObject.cpp
+  # btkEvent.cpp
+  # btkForcePlatform.cpp
+  # btkLogger.cpp
+  # btkPoint.cpp
+  # btkMetaData.cpp
+  # btkMetaDataInfo.cpp
+  # btkMetaDataUtils.cpp
+  # btkIMU.cpp
+  # btkObject.cpp
+  # btkProcessObject.cpp
+  # btkTriangleMesh.cpp
+  # btkWrench.cpp
+  # btkCriticalSection_p.cpp
 )
 
 ADD_LIBRARY(BTKCommon ${BTK_LIBS_BUILD_TYPE} ${BTKCommon_SRCS})
