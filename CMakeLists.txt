@@ -344,7 +344,9 @@ IF(BUILD_EXAMPLES)
   ADD_SUBDIRECTORY(Examples)
 ENDIF(BUILD_EXAMPLES)
 
-# Utilities (boost/eigen3/...)
+# Extra library required (e.g. eigen3, CxxTest, Open3DMotion)
+ADD_SUBDIRECTORY(ThirdParties)
+# Utilities used by the project (e.g. Doxygen configuration, defined SWIG fragments)
 ADD_SUBDIRECTORY(Utilities)
 
 # ------------------------------------------------------------------------

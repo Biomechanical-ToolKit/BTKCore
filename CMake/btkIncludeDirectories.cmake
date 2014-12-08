@@ -23,7 +23,7 @@ SET(BTK_INCLUDE_RELATIVE_DIRS ${BTK_INCLUDE_RELATIVE_DIRS}
 
 # Because embedded Eigen3 library is required in lots of header of BTK.
 SET(BTK_INCLUDE_DIRS_BUILD_TREE ${BTK_INCLUDE_DIRS_BUILD_TREE}
-  ${BTK_SOURCE_DIR}/Utilities/eigen3)
+  ${BTK_SOURCE_DIR}/ThirdParties/eigen3)
 SET(BTK_INCLUDE_RELATIVE_DIRS ${BTK_INCLUDE_RELATIVE_DIRS}
-  Utilities/eigen3)
+  ThirdParties/eigen3)
 
