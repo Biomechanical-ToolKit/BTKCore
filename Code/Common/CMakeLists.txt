@@ -1,19 +1,23 @@
 SET(BTKCommon_SRCS
   # btkAcquisition.cpp
   # btkAnalog.cpp
+  # btkAny.cpp
   # btkDataObject.cpp
   # btkEvent.cpp
   # btkForcePlatform.cpp
+  # btkIMU.cpp
   # btkLogger.cpp
-  # btkPoint.cpp
   # btkMetaData.cpp
   # btkMetaDataInfo.cpp
   # btkMetaDataUtils.cpp
-  # btkIMU.cpp
-  # btkObject.cpp
+  # btkNodeObject.cpp
+  btkObject.cpp
+  # btkPoint.cpp
   # btkProcessObject.cpp
+  # btkTimeSequence.cpp
   # btkTriangleMesh.cpp
   # btkWrench.cpp
+  # Private
   # btkCriticalSection_p.cpp
 )
 
