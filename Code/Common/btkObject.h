@@ -57,7 +57,7 @@ namespace btk
     Object& operator=(Object&& ) = delete;
     virtual ~Object();
     
-    unsigned long getTimestamp() const noexcept;
+    unsigned long timestamp() const noexcept;
     
     virtual void modified();
     

@@ -73,7 +73,7 @@ namespace btk
   /**
    * Returns the timestamp of the object.
    */
-  unsigned long Object::getTimestamp() const noexcept
+  unsigned long Object::timestamp() const noexcept
   {
     auto optr = this->downcastOpaque();
     return optr->Timestamp;
