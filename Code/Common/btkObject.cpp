@@ -80,7 +80,7 @@ namespace btk
   };
   
   /**
-   * Sets the object as modified (its timestamp is updated.
+   * Sets the object as modified (its timestamp is updated).
    * It is important to use this method each time a member of the object is modified.
    */
   void Object::modified()
