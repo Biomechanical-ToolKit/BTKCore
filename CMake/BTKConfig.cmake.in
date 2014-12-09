@@ -1,56 +1,19 @@
-#---------------------------------------------------------------------------
+# - Config file for the BTK package
+# It defines the following variables
+#  BTK_INCLUDE_DIRS - include directories for BTK
+#  BTK_LIBRARIES    - libraries to link against
+
+"@PACKAGE_INIT@"
+
+SET_AND_CHECK(BTK_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
+
+# # Compute paths
+# get_filename_component(BTK_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+# set(BTK_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
 #
-# BTKConfig.cmake - BTK CMake configuration file for external projects.
-#
-# This file is configured by BTK and used by the UseBTK.cmake module
-# to load BTK's settings for an external project.
-@BTK_CONFIG_CODE@
+# # Our library dependencies (contains definitions for IMPORTED targets)
+# if(NOT TARGET foo AND NOT BTK_BINARY_DIR)
+#   include("${BTK_CMAKE_DIR}/BTKTargets.cmake")
+# endif()
 
-# The BTK include file directories.
-SET(BTK_INCLUDE_DIRS "@BTK_INCLUDE_DIRS_CONFIG@")
-
-# The BTK library directories.
-SET(BTK_LIBRARY_DIRS "@BTK_LIBRARY_DIRS_CONFIG@")
-
-# The C and C++ flags added by BTK to the cmake-configured flags.
-SET(BTK_REQUIRED_C_FLAGS "@BTK_REQUIRED_C_FLAGS@")
-SET(BTK_REQUIRED_CXX_FLAGS "@BTK_REQUIRED_CXX_FLAGS@")
-SET(BTK_REQUIRED_LINK_FLAGS "@BTK_REQUIRED_LINK_FLAGS@")
-
-# The BTK version number
-SET(BTK_VERSION_MAJOR "@BTK_VERSION_MAJOR@")
-SET(BTK_VERSION_MINOR "@BTK_VERSION_MINOR@")
-SET(BTK_VERSION_PATCH "@BTK_VERSION_PATCH@")
-
-# The location of the UseBTK.cmake file.
-SET(BTK_USE_FILE "@BTK_USE_FILE@")
-
-# The build settings file.
-SET(BTK_BUILD_SETTINGS_FILE "@BTK_BUILD_SETTINGS_FILE@")
-
-# The library dependencies file.
-SET(BTK_LIBRARY_DEPENDS_FILE "@BTK_LIBRARY_DEPENDS_FILE@")
-
-# Whether BTK was built with shared libraries.
-SET(BTK_BUILD_SHARED "@BUILD_SHARED_LIBS@")
-
-# Whether BTK was built with the Matlab wrapping support.
-SET(BTK_WRAP_MATLAB "@BTK_WRAP_MATLAB@")
-
-# Whether BTK was built with the Octave wrapping support.
-SET(BTK_WRAP_OCTAVE "@BTK_WRAP_OCTAVE@")
-
-# Whether BTK was built with the Python wrapping support.
-SET(BTK_WRAP_PYTHON "@BTK_WRAP_PYTHON@")
-
-# Whether BTK was built with the Scilab wrapping support.
-SET(BTK_WRAP_SCILAB "@BTK_WRAP_SCILAB@")
-
-# A list of all libraries for BTK.
-# Those listed here should automatically pull in their dependencies.
-SET(BTK_LIBRARIES @BTK_LIBRARIES@)
-
-# The BTK library dependencies.
-IF(NOT BTK_NO_LIBRARY_DEPENDS AND EXISTS "${BTK_LIBRARY_DEPENDS_FILE}")
-  INCLUDE("${BTK_LIBRARY_DEPENDS_FILE}")
-ENDIF(NOT BTK_NO_LIBRARY_DEPENDS AND EXISTS "${BTK_LIBRARY_DEPENDS_FILE}")
+include("${CMAKE_CURRENT_LIST_DIR}/BTKTargets.cmake")
