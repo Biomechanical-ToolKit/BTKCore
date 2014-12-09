@@ -33,44 +33,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkCriticalSection_p_h
-#define __btkCriticalSection_p_h
+#ifndef __btkObject_p_h
+#define __btkObject_p_h
 
-#include "btkConfigure.h"
-
-// Note: The declaration of this class is largely inspired by the class vtkCriticalSection
-
-#if defined(HAVE_SPROC)
-  #include <abi_mutex.h> // Needed for sproc implementation of mutex
-  typedef abilock_t _;
-#elif defined(HAVE_PTHREADS) || defined(HAVE_HP_PTHREADS)
-  #include <pthread.h> // Needed for pthreads implementation of mutex
-  typedef pthread_mutex_t btk_critical_section_t;
-#elif defined(HAVE_WIN32_THREADS)
-  #ifndef WIN32_LEAN_AND_MEAN
-    #define WIN32_LEAN_AND_MEAN
-  #endif
-  #include <windows.h>
-  typedef CRITICAL_SECTION btk_critical_section_t;
-#else
-  typedef int btk_critical_section_t;
-#endif
+/*
+ * WARNING: This file and its content is not included in the public API and 
+ * can change drastically from one release to another.
+ */
 
 namespace btk
-{
-  class critical_section_p
+{ 
+  class ObjectPrivate
   {
   public:
-    BTK_COMMON_EXPORT critical_section_p();
-    BTK_COMMON_EXPORT critical_section_p(int isLocked);
-    BTK_COMMON_EXPORT ~critical_section_p();
-    BTK_COMMON_EXPORT void Init();
-    BTK_COMMON_EXPORT void Lock();
-    BTK_COMMON_EXPORT void Unlock();
-
-  protected:
-    btk_critical_section_t m_CS;
+    ObjectPrivate();
+    ObjectPrivate(const ObjectPrivate& other) = delete;
+    virtual ~ObjectPrivate();
+    // virtual ObjectPrivate* clone() const;
+    
+    ObjectPrivate(ObjectPrivate&& ) = delete; // Not implemented.
+    ObjectPrivate& operator=(const ObjectPrivate& ) = delete; // Not implemented.
+    ObjectPrivate& operator=(const ObjectPrivate&& ) = delete; // Not implemented.
+    
+    unsigned long Timestamp;
   };
 };
 
-#endif // __btkCriticalSection_p_h
+#endif // __btkObject_p_h

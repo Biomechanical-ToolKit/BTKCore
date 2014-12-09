@@ -17,8 +17,6 @@ SET(BTKCommon_SRCS
   # btkTimeSequence.cpp
   # btkTriangleMesh.cpp
   # btkWrench.cpp
-  # Private
-  # btkCriticalSection_p.cpp
 )
 
 ADD_LIBRARY(Common ${BTK_LIBS_BUILD_TYPE} ${BTKCommon_SRCS})

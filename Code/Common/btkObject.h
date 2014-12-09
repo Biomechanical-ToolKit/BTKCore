@@ -36,34 +36,36 @@
 #ifndef __btkObject_h
 #define __btkObject_h
 
-#include "btkSharedPtr.h"
+#include "btkConfigure.h"
+#include "btkCommonExport.h"
+#include "btkOpaque.h"
+
+#include <memory> // std::unique_ptr
 
 namespace btk
 {
-  class Object
+  class ObjectPrivate;
+  
+  class BTK_COMMON_EXPORT Object
   {
-  public:
-    typedef btkSharedPtr<Object> Pointer;
-    typedef btkSharedPtr<const Object> ConstPointer;
+    BTK_DECLARE_PIMPL(Object)
     
-    unsigned long int GetTimestamp() const {return this->m_Timestamp;};
-    BTK_COMMON_EXPORT virtual void Modified();
+  public:
+    Object(const Object& ) = delete;
+    Object(Object&& ) = delete;
+    Object& operator=(const Object& ) = delete;
+    Object& operator=(Object&& ) = delete;
+    virtual ~Object();
+    
+    unsigned long getTimestamp() const noexcept;
+    
+    virtual void modified();
     
   protected:
-    Object()
-    {
-      this->m_Timestamp = 0;
-    };
-    Object(const Object& toCopy)
-    {
-      this->m_Timestamp = toCopy.m_Timestamp;
-    }
-    virtual ~Object() {};
-    
-    unsigned long int m_Timestamp;
-    
-  private:
-    Object& operator=(const Object& ); // Not implemented.
+    Object();
+    Object(ObjectPrivate& impl);
+   
+    std::unique_ptr<ObjectPrivate> mp_Opaque;
   };
 };
 

@@ -34,15 +34,26 @@
  */
 
 #include "btkObject.h"
-#include "btkCriticalSection_p.h"
+#include "btkObject_p.h"
 
-// OSAtomic.h optimizations only used in 10.5 and later
-#if defined(__APPLE__)
-  #include <AvailabilityMacros.h>
-  #if MAC_OS_X_VERSION_MAX_ALLOWED >= 1050
-    #include <libkern/OSAtomic.h>
-  #endif
-#endif
+#include <atomic>
+
+// -------------------------------------------------------------------------- //
+//                                 PRIVATE API                                //
+// -------------------------------------------------------------------------- //
+
+namespace btk
+{
+  ObjectPrivate::ObjectPrivate()
+  : Timestamp(0)
+  {};
+  
+  ObjectPrivate::~ObjectPrivate() = default; // Cannot be inlined
+}
+
+// -------------------------------------------------------------------------- //
+//                                 PUBLIC API                                 //
+// -------------------------------------------------------------------------- //
 
 namespace btk
 {
@@ -52,82 +63,42 @@ namespace btk
    *
    * @ingroup BTKCommon
    */
-  /**
-   * @var Object::m_Timestamp
-   * Time in microseconds to indicate the last modification of the object.
-   */
   
   /**
-   * @typedef Object::Pointer
-   * Smart pointer associated with a Object object.
+   * Destructor
+   * @note The opaque pointer representing the private implementation is automatically deleted as it is contained in a std::unique_ptr object.
    */
+  Object::~Object() = default;
   
   /**
-   * @typedef Object::ConstPointer
-   * Smart pointer associated with a const Object object.
-   */
-  
-  /**
-   * @fn long Object::GetTimestamp() const
    * Returns the timestamp of the object.
    */
-  
-  /**
-   * Sets the object as modified (its timestamp is updated and the flag 'modified' 
-   * is set to true). It is important to use this method each time a component 
-   * of the process is modified.
-   */
-  void Object::Modified()
+  unsigned long Object::getTimestamp() const noexcept
   {
-#if defined(WIN32) || defined(_WIN32)
-    // Windows optimization
-  #if defined(HAVE_64_BIT) 
-    static LONGLONG _atomic_time = 0;
-    this->m_Timestamp = (unsigned long)InterlockedIncrement64(&_atomic_time);
-  #else
-    static LONG _atomic_time = 0;
-    this->m_Timestamp = (unsigned long)InterlockedIncrement(&_atomic_time);
-  #endif
-#elif defined(__APPLE__) && (MAC_OS_X_VERSION_MIN_REQUIRED >= 1050)
-    // Mac optimization
-  #if defined(HAVE_64_BIT) 
-    // NOTE: Comment from VTK library
-    // "m_Timestamp" is "unsigned long", a type that changes sizes
-    // depending on architecture.  The atomic increment is safe, since it
-    // operates on a variable of the exact type needed.  The cast does not
-    // change the size, but does change signedness, which is not ideal.
-    static volatile int64_t _atomic_time = 0;
-    this->m_Timestamp = (unsigned long)OSAtomicIncrement64Barrier(&_atomic_time);
-  #else
-    static volatile int32_t _atomic_time = 0;
-    this->m_Timestamp = (unsigned long)OSAtomicIncrement32Barrier(&_atomic_time);
-  #endif
-#elif defined(HAVE_ATOMIC_BUILTINS)
-    // GCC and CLANG intrinsics
-    static volatile unsigned long _atomic_time = 0;
-    this->m_Timestamp = __sync_add_and_fetch(&_atomic_time, 1);
-#else
-    // General case
-    static unsigned long _atomic_time = 0;
-    static btk_critical_section_p _critical_section;
-    _critical_section.Lock();
-    this->m_Timestamp = ++_atomic_time;
-    _critical_section.Unlock();
-#endif
+    auto optr = this->downcastOpaque();
+    return optr->Timestamp;
   };
   
   /**
-   * @fn Object::Object()
-   * Constructor.
+   * Sets the object as modified (its timestamp is updated.
+   * It is important to use this method each time a member of the object is modified.
    */
-
-  /**
-   * @fn Object::Object(const Object& toCopy)
-   * Copy constructor.
-   */
+  void Object::modified()
+  {
+    auto optr = this->downcastOpaque();
+    static std::atomic<unsigned long> _btk_atomic_time{0};
+    optr->Timestamp = ++_btk_atomic_time;
+  };
   
   /**
-   * @fn Object::~Object()
-   * Destructor.
+   * Constructor.
+   * Initialize the timestamp to 0
    */
+  Object::Object()
+  : mp_Opaque(new ObjectPrivate)
+  {};
+  
+  Object::Object(ObjectPrivate& impl)
+  : mp_Opaque(&impl)
+  {};
 };
