@@ -1,6 +1,6 @@
 #include "_TDDConfigure.h"
 
-// #include "Common/AnyTest.h"
+#include "Common/AnyTest.h"
 // #include "AcquisitionTest.h"
 // #include "AnalogTest.h"
 // #include "ForcePlatformTypesTest.h"

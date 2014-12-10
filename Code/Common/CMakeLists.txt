@@ -1,7 +1,7 @@
 SET(BTKCommon_SRCS
   # btkAcquisition.cpp
   # btkAnalog.cpp
-  # btkAny.cpp
+  btkAny.cpp
   # btkDataObject.cpp
   # btkEvent.cpp
   # btkForcePlatform.cpp
