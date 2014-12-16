@@ -59,7 +59,7 @@ namespace btk
     
     ~Any();
     
-    bool isNull() const noexcept;
+    bool isValid() const noexcept;
     void swap(Any& other) noexcept;
     
     template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type>

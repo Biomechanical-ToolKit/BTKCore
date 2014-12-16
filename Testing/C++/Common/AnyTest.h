@@ -61,9 +61,9 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(i.cast<std::string>(),"-1");
 
     btk::Any n;
-    TS_ASSERT_EQUALS(n.isNull(),true);
+    TS_ASSERT_EQUALS(n.isValid(),false);
     n = 12.5f;
-    TS_ASSERT_EQUALS(n.isNull(),false);
+    TS_ASSERT_EQUALS(n.isValid(),true);
     TS_ASSERT(n == b);
     TS_ASSERT(b == n);
     TS_ASSERT(n.cast<int>() == a);

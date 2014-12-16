@@ -195,7 +195,7 @@ namespace btk
   
   /**
    * Default constructor.
-   * This kind of Any object is defined as null (method Any::isNull() returns true).
+   * This kind of Any object is defined as null (method Any::isValid() returns true).
    */
   Any::Any() noexcept
   : mp_Storage(nullptr)
@@ -211,7 +211,7 @@ namespace btk
 
   /**
    * Move constructor
-   * The content of @c other is moved to this object. The content of @c other is then defined as null (method Any::isNull() returns true).
+   * The content of @c other is moved to this object. The content of @c other is then defined as null (method Any::isValid() returns true).
    */
   Any::Any(Any&& other) noexcept
   : mp_Storage(std::move(other.mp_Storage))
@@ -254,9 +254,9 @@ namespace btk
   /**
    * Return true if the object as no content, otherwise true.
    */
-  bool Any::isNull() const noexcept
+  bool Any::isValid() const noexcept
   {
-    return (this->mp_Storage == nullptr);
+    return (this->mp_Storage != nullptr);
   };
   
   /** 
@@ -294,7 +294,7 @@ namespace btk
 
   /**
    * Move assignement operator.
-   * In case the assigned object is not this one, the previous content is deleted and replaced by the content of the @c other object. The @c other object is then defined as null (method Any::isNull() returns true).
+   * In case the assigned object is not this one, the previous content is deleted and replaced by the content of the @c other object. The @c other object is then defined as null (method Any::isValid() returns true).
    */
   Any& Any::operator=(Any&& other) noexcept
   {
