@@ -22,7 +22,7 @@ struct ObjectCustomPimplPrivate;
 
 class ObjectCustomPimpl : public btk::Object
 {
-  BTK_DECLARE_PIMPL(ObjectCustomPimpl)
+  BTK_DECLARE_PIMPL_ACCESSOR(ObjectCustomPimpl)
     
 public:
   const std::string& getName() const;
@@ -48,13 +48,13 @@ ObjectCustomPimpl::ObjectCustomPimpl(const std::string& name)
 
 const std::string& ObjectCustomPimpl::getName() const
 {
-  auto optr = this->downcastOpaque();
+  auto optr = this->pimpl();
   return optr->Name;
 };
 
 void ObjectCustomPimpl::setName(const std::string& val)
 {
-  auto optr = this->downcastOpaque();
+  auto optr = this->pimpl();
   if (optr->Name != val)
   {
     optr->Name = val;
@@ -64,13 +64,13 @@ void ObjectCustomPimpl::setName(const std::string& val)
 
 int ObjectCustomPimpl::getVersion() const
 {
-  auto optr = this->downcastOpaque();
+  auto optr = this->pimpl();
   return optr->Version;
 };
 
 void ObjectCustomPimpl::setVersion(int val)
 {
-  auto optr = this->downcastOpaque();
+  auto optr = this->pimpl();
   if (optr->Version != val)
   {
     optr->Version = val;

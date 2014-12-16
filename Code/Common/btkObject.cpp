@@ -75,7 +75,7 @@ namespace btk
    */
   unsigned long Object::timestamp() const noexcept
   {
-    auto optr = this->downcastOpaque();
+    auto optr = this->pimpl();
     return optr->Timestamp;
   };
   
@@ -83,9 +83,9 @@ namespace btk
    * Sets the object as modified (its timestamp is updated).
    * It is important to use this method each time a member of the object is modified.
    */
-  void Object::modified()
+  void Object::modified() noexcept
   {
-    auto optr = this->downcastOpaque();
+    auto optr = this->pimpl();
     static std::atomic<unsigned long> _btk_atomic_time{0};
     optr->Timestamp = ++_btk_atomic_time;
   };
@@ -95,10 +95,10 @@ namespace btk
    * Initialize the timestamp to 0
    */
   Object::Object()
-  : mp_Opaque(new ObjectPrivate)
+  : mp_Pimpl(new ObjectPrivate)
   {};
   
   Object::Object(ObjectPrivate& impl)
-  : mp_Opaque(&impl)
+  : mp_Pimpl(&impl)
   {};
 };

@@ -35,36 +35,15 @@
 
 #ifndef __btkOpaque_h
 #define __btkOpaque_h
-
-// #include <functional> // std::bind
   
-#define BTK_DECLARE_PIMPL(classname) \
-  friend class classname##Private; \
-  inline classname##Private* downcastOpaque() {return reinterpret_cast<classname##Private*>(this->mp_Opaque.get());}; \
-  inline const classname##Private* downcastOpaque() const {return reinterpret_cast<const classname##Private*>(this->mp_Opaque.get());}; \
-//   template <typename Member, typename T> \
-//   inline classname##Private* downcastOpaque(Member&& m, const T& t) \
-//   { \
-//     auto optr = this->downcastOpaque(); \
-//     if (t == std::bind(m,optr)()) \
-//       return nullptr; \
-//     optr = this->detach(); \
-//     this->modified(); \
-//     return optr; \
-//   }; \
-//   classname##Private* detach();
-//
-// #define BTK_DEFINE_PIMPL(classname) \
-//   classname##Private* classname::detach() \
-//   { \
-//     auto optr = this->downcastOpaque(); \
-//     if (!this->mp_Opaque.unique()) \
-//     { \
-//       auto ptr = reinterpret_cast<classname##Private*>(this->mp_Opaque->clone()); \
-//       this->mp_Opaque.reset(ptr); \
-//       optr = ptr; \
-//     } \
-//     return optr; \
-//   };
+// Pimpl: Private implementation
+#define BTK_DECLARE_PIMPL_ACCESSOR(classname) \
+  inline classname##Private* pimpl() {return reinterpret_cast<classname##Private*>(this->mp_Pimpl.get());}; \
+  inline const classname##Private* pimpl() const {return reinterpret_cast<const classname##Private*>(this->mp_Pimpl.get());};
+  
+  // Pint: Public interface
+#define BTK_DECLARE_PINT_ACCESSOR(classname) \
+  inline classname* pint() {return reinterpret_cast<classname*>(this->mp_Pint);}; \
+  inline const classname* pint() const {return reinterpret_cast<const classname*>(this->mp_Pint);};
     
 #endif // __btkOpaque_h

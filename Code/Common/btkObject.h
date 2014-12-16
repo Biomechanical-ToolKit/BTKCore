@@ -48,24 +48,25 @@ namespace btk
   
   class BTK_COMMON_EXPORT Object
   {
-    BTK_DECLARE_PIMPL(Object)
+    BTK_DECLARE_PIMPL_ACCESSOR(Object)
     
   public:
+    virtual ~Object();
+    
     Object(const Object& ) = delete;
     Object(Object&& ) = delete;
     Object& operator=(const Object& ) = delete;
     Object& operator=(Object&& ) = delete;
-    virtual ~Object();
     
     unsigned long timestamp() const noexcept;
     
-    virtual void modified();
+    virtual void modified() noexcept;
     
   protected:
     Object();
-    Object(ObjectPrivate& impl);
+    Object(ObjectPrivate& pimpl);
    
-    std::unique_ptr<ObjectPrivate> mp_Opaque;
+    std::unique_ptr<ObjectPrivate> mp_Pimpl;
   };
 };
 
