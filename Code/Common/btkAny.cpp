@@ -316,7 +316,7 @@ namespace btk
   /**
    * Equal operator. Compare the content of two Any objects.
    */
-  bool operator==(const Any& lhs, const Any& rhs)
+  bool operator==(const Any& lhs, const Any& rhs) noexcept
   {
     return lhs.mp_Storage->compare(rhs.mp_Storage);
   };
@@ -324,7 +324,7 @@ namespace btk
  /**
   * Inequal operator. Returns the opposite of equal operator.
   */
-  bool operator!=(const Any& lhs, const Any& rhs)
+  bool operator!=(const Any& lhs, const Any& rhs) noexcept
   {
     return !(lhs == rhs);
   };
