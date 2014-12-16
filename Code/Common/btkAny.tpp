@@ -44,9 +44,9 @@ namespace btk
     Register()
     {
       static_assert(Traits<Type>::ID > TraitsBase::None, "It is not possible to register a type without an Any::Traits::ID. Specialize the struct Any::Traits and assign a unique value to Any::Traits::ID.");
-      for(auto& reg : Converter::Map{Converter::pair<Type,To>()...})
+      for(auto&& reg : Converter::Map{Converter::pair<Type,To>()...})
         Any::converter().Table.emplace(std::forward<Converter::Map::value_type>(reg));
-      for(auto& reg : Converter::Map{Converter::pair<From,Type>()...})
+      for(auto&& reg : Converter::Map{Converter::pair<From,Type>()...})
         Any::converter().Table.emplace(std::forward<Converter::Map::value_type>(reg));
     };
     ~Register() = default;
