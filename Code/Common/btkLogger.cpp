@@ -37,371 +37,211 @@
 
 #include <iostream>
 
-#ifdef NDEBUG
-  static btk::Logger::VerboseMode _btk_logger_verbose_mode = btk::Logger::Normal;
-#else
-  static btk::Logger::VerboseMode _btk_logger_verbose_mode = btk::Logger::Detailed;
-#endif
-static std::string _btk_logger_prefix = "BTK";
-static std::string _btk_logger_debug_affix = "DEBUG";
-static std::string _btk_logger_warning_affix = "WARNING";
-static std::string _btk_logger_error_affix = "ERROR";
-static btk::Logger::Stream::Pointer _btk_logger_debug_stream = btk::Logger::Stream::New(&(std::cout));
-static btk::Logger::Stream::Pointer _btk_logger_warning_stream = btk::Logger::Stream::New(&(std::cerr));
-static btk::Logger::Stream::Pointer _btk_logger_error_stream = btk::Logger::Stream::New(&(std::cerr));
-
 namespace btk
 {
-  /**
-   * @class Logger btkLogger.h
-   * @brief Log mechanism to display debug message, warnings and errors
-   *
-   * The logger class is implemented with the possibility to print debug message, warnings and errors on different Logger::Stream. By default the debug messages are printed on the standard output (std::cout), while the warnings and errors are printed on the standard error (std::cerr).
-   * To use the log mechanism, you only need to include the header @a btkLogger.h and use one of the static methods Logger::Debug(), Logger::Warning(), or Logger::Error(), depending of the type of message you want to print. 
-   * To simplify the writing of logs with the automatic detection of the filename and line number, three macros are proposed:
-   *  - @c btkDebugMacro(msg): alias for the code <tt>btk::Logger::Debug(__FILE__, __LINE__, msg)</tt>;
-   *  - @c btkWarningMacro(msg): alias for the code <tt>btk::Logger::Warning(__FILE__, __LINE__, msg)</tt>;
-   *  - @c btkErrorMacro(msg): alias for the code <tt>btk::Logger::Error(__FILE__, __LINE__, msg)</tt>;
-   *
-   * The debug logs are only available when the code is compiled in debug mode (when the symbol NDEBUG is not defined).
-   *
-   * The diplayed log can be split in 4 parts:
-   *  - Prefix: Name of the application/library (by default: BTK)
-   *  - Log affix: String for the type of log (by default: DEBUG, WARNING, ERROR)
-   *  - File detail: Optional information which can be given to the methods (filename, line)
-   *  - Message: string with the message to the log.
-   *
-   * There are four verbose modes for the display of the logs which can be selected with the method SetVerboseMode().
-   * By default, when the library is compiled in debug mode, the verbose mode is set to Logger::Detailed. In release mode, this is set to Logger::Normal mode. You have also the mode Logger::Quiet where nothing is displayed. The fourh mode is Logger::MessageOnly and show only the given message to the method whitout prefix nor affix.
-   * Depending of the selected verbose mode, each log can be printed as the following:
-   *  - Quiet: (nothing)
-   *  - MessageOnly: <tt>message</tt>
-   *  - Normal: <tt>[prefix log_affix] message</tt>
-   *  - Detailed: <tt>[prefix log_affix] filename (line): message</tt> (filename and line must be given to the method)
-   *
-   * If the prefix and affix are empty, the empty square brackets will not be printed.
-   *
-   * The prefix and affix strings can be set with the method SetPrefix(), SetDebugAffix(), SetWarningAffix(), SetErrorAffix().
-   *
-   * It is possible to select other output streams than std::cout and std::cerr using the method SetDebugStream(), SetWarningStream(), and SetErrorStream().
-   *
-   * An example to use this logger is:
-   * @code{.cpp}
-   * #include <btkLogger.h>
-   *
-   * int main(int argc, char *argv[])
-   * {
-   *   btk::Logger::Debug("My message");
-   *   btk::Logger::Debug("test.cpp", 42, "Other message with specific filename and line number");
-   *   btk::Logger::Debug(__FILE__, __LINE__, "Another message with automatic detection of the filename and line number");
-   *   return 0;
-   * };
-   * @endcode
-   *
-   * @ingroup BTKCommon
-   */
-  
-  /**
-   * @enum Logger::VerboseMode
-   * Proposed mode for the display of the log message.
-   */
-  /**
-   * @var Logger::VerboseMode Logger::Quiet
-   * Do not display any message
-   */
-  /**
-   * @var Logger::VerboseMode Logger::MessageOnly
-   * Display only the message
-   */
-  /**
-   * @var Logger::VerboseMode Logger::Normal
-   * Display the message as well as the prefix and log affix.
-   */
-  /**
-   * @var Logger::VerboseMode Logger::Detailed
-   * Same as Normal but add also file information from where the log where written (if these informations are given).
-   */
-  
-  /**
-   * Write the message @c msg to the debug stream
-   * @note Setting the verbose mode to Normal or Detailed will have the same effect using this method as the file informations (filename, line number) are not given
-   */
-  void Logger::Debug(const std::string& msg)
+  struct Logger::Private
   {
-#ifdef NDEBUG
-    btkNotUsed(msg);
-#else
-    Logger::PrintMessage(_btk_logger_debug_stream.get(), _btk_logger_debug_affix, msg);
-#endif
-  };
-     
-  /**
-   * Write the message @c msg to the warning stream.
-   * @note Setting the verbose mode to Normal or Detailed will have the same effect using this method as the file informations (filename, line number) are not given.
-   */
-  void Logger::Warning(const std::string& msg)
-  {
-    Logger::PrintMessage(_btk_logger_warning_stream.get(), _btk_logger_warning_affix, msg);
-  };
+    Private() noexcept : Output(nullptr), Quiet(false) {};
+    ~Private() noexcept = default;
     
-  /**
-   * Write the message @c msg to the error stream.
-   * @note Setting the verbose mode to Normal or Detailed will have the same effect using this method as the file informations (filename, line number) are not given.
-   */
-  void Logger::Error(const std::string& msg)
-  {
-    Logger::PrintMessage(_btk_logger_error_stream.get(), _btk_logger_error_affix, msg);
-  }
-  
-  /**
-   * Write the message @c msg to the debug stream.
-   */
-  void Logger::Debug(const std::string& filename, int line, const std::string& msg)
-  {
-#ifdef NDEBUG
-    btkNotUsed(filename); btkNotUsed(line); btkNotUsed(msg);
-#else
-    Logger::PrintMessage(_btk_logger_debug_stream.get(), _btk_logger_debug_affix, filename, line, msg);
-#endif
-  };
-  
-  /**
-   * Write the message @c msg to the warning stream.
-   */
-  void Logger::Warning(const std::string& filename, int line, const std::string& msg)
-  {
-    Logger::PrintMessage(_btk_logger_warning_stream.get(), _btk_logger_warning_affix, filename, line, msg);
-  };
-  
-  /**
-   * Write the message @c msg to the error stream.
-   */
-  void Logger::Error(const std::string& filename, int line, const std::string& msg)
-  {
-    Logger::PrintMessage(_btk_logger_error_stream.get(), _btk_logger_error_affix, filename, line, msg);
-  };
-  
-  /**
-   * Returns the current verbose mode.
-   */
-  Logger::VerboseMode Logger::GetVerboseMode()
-  {
-    return _btk_logger_verbose_mode;
-  };
+    Private(const Private& ) = delete;
+    Private(Private&& ) noexcept = delete;
+    Private& operator=(const Private& ) = delete;
+    Private& operator=(Private&& ) noexcept = delete;
     
-  /**
-   * Sets the verbose mode.
-   */  
-  void Logger::SetVerboseMode(Logger::VerboseMode mode)
-  {
-    _btk_logger_verbose_mode = mode;
-  };
-      
-  /**
-   * Returns the prefix used by the logger. The prefix should contain a string for the library or application which use the logger.
-   */
-  const std::string& Logger::GetPrefix()
-  {
-    return _btk_logger_prefix;
-  };
-    
-  /**
-   * Sets the prefix used by the logger. 
-   */
-  void Logger::SetPrefix(const std::string& str)
-  {
-    _btk_logger_prefix = str;
-  };
-    
-  /**
-   * Returns the stream used for the debug logs.
-   */
-  Logger::Stream::Pointer Logger::GetDebugStream()
-  {
-    return _btk_logger_debug_stream;
-  };
-    
-  /**
-   * Returns the stream used for the warning logs.
-   */
-  Logger::Stream::Pointer Logger::GetWarningStream()
-  {
-    return _btk_logger_warning_stream;
-  };
-    
-  /**
-   * Returns the stream used for the error logs.
-   */
-  Logger::Stream::Pointer Logger::GetErrorStream()
-  {
-    return _btk_logger_error_stream;
-  };
-    
-  /**
-   * Convenient method to create a Logger::Stream object from an output stream use for the debug messages.
-   */
-  void Logger::SetDebugStream(std::ostream* output)
-  {
-    Logger::SetDebugStream(Logger::Stream::New(output));
-  };
-    
-  /**
-   * Convenient method to create a Logger::Stream object from an output stream use for the warning messages.
-   */
-  void Logger::SetWarningStream(std::ostream* output)
-  {
-    Logger::SetWarningStream(Logger::Stream::New(output));
-  };
-    
-  /**
-   * Convenient method to create a Logger::Stream object from an output stream use for the error messages.
-   */
-  void Logger::SetErrorStream(std::ostream* output)
-  {
-    Logger::SetErrorStream(Logger::Stream::New(output));
-  };
-    
-  /**
-   * Sets the stream used for the debug logs.
-   */
-  void Logger::SetDebugStream(Logger::Stream::Pointer stream)
-  {
-    _btk_logger_debug_stream = stream;
-  };
-    
-  /**
-   * Sets the stream used for the warning logs.
-   */
-  void Logger::SetWarningStream(Logger::Stream::Pointer stream)
-  {
-    _btk_logger_warning_stream = stream;
-  };
-    
-  /**
-   * Sets the stream used for the error logs.
-   */
-  void Logger::SetErrorStream(Logger::Stream::Pointer stream)
-  {
-    _btk_logger_error_stream = stream;
-  };
-    
-  /**
-   * Gets the string used to indicate that the log is a debug message.
-   */
-  const std::string& Logger::GetDebugAffix()
-  {
-    return _btk_logger_debug_affix;
-  };
-    
-  /**
-   * Gets the string used to indicate that the log is a warning.
-   */
-  const std::string& Logger::GetWarningAffix()
-  {
-    return _btk_logger_warning_affix;
-  };
-    
-  /**
-   * Gets the string used to indicate that the log is an error.
-   */
-  const std::string& Logger::GetErrorAffix()
-  {
-    return _btk_logger_error_affix;
-  };
-    
-  /**
-   * Sets the string used to indicate that the log is a debug message.
-   */
-  void Logger::SetDebugAffix(const std::string& str)
-  {
-    _btk_logger_debug_affix = str;
-  };
-    
-  /**
-   * Sets the string used to indicate that the log is a warning.
-   */
-  void Logger::SetWarningAffix(const std::string& str)
-  {
-    _btk_logger_warning_affix = str;
-  };
-    
-  /**
-   * Sets the string used to indicate that the log is an error.
-   */
-  void Logger::SetErrorAffix(const std::string& str)
-  {
-    _btk_logger_error_affix = str;
-  };
-  
-  /**
-   * Overload method to print message without information on the file and the line number where the log was written.
-   */
-  void Logger::PrintMessage(Stream* level, const std::string& affix, const std::string& msg)
-  {
-    Logger::PrintMessage(level, affix, "", 0, msg);
-  };
-  
- /**
-  * Print message on the given stream with the selected verbose mode and other parameters.
-  */
-  void Logger::PrintMessage(Stream* level, const std::string& affix, const std::string& filename, int line, const std::string& msg)
-  {
-    if (_btk_logger_verbose_mode == Logger::Quiet)
-      return;
-    if (_btk_logger_verbose_mode > Logger::MessageOnly)
-    {
-      level->GetOutput() << (_btk_logger_prefix.empty() ? "" : "[" + _btk_logger_prefix + " ")
-                     << (affix.empty() ? "" : affix)
-                     << (_btk_logger_prefix.empty() && affix.empty() ? "" : "] ");
-    }
-    if ((_btk_logger_verbose_mode == Logger::Detailed) && (!filename.empty()))
-    {
-      level->GetOutput() << filename;
-      if (line > 0)
-        level->GetOutput() << " (" << line << ")";
-      level->GetOutput() << ": ";
-    }
-    level->GetOutput() << msg << std::endl;
+    Device* Output;
+    bool Quiet;
   };
   
   // ----------------------------------------------------------------------- //
   
   /**
-   * @class Logger::Stream btkLogger.h
-   * @brief Helper class to store information regarding the output streams used by the class Logger.
+   * @struct Logger::Device btkLogger.h
+   * @brief Interface class used to write message sent by the logger.
+   *
+   * To be effective, the Logger class needs a device. This device is used to
+   * write log messages.
+   *
+   * A default implementation used to print messages on the standard std::cout 
+   * and std::cerr streams is proposed and correspond to the following lines.
+   *
+   * @code
+   * struct Console : Logger::Device
+   * {
+   *   virtual void writeMessage(Logger::Category category, const char* msg) noexcept override
+   *   {
+   *     if (category == Logger::Info)
+   *       std::cout << "INFO: " << msg << std::endl;
+   *     else if (category == Logger::Warning)
+   *       std::cout << "WARNING: " << msg << std::endl;
+   *     else if (category == Logger::Error)
+   *       std::cout << "ERROR: " << msg << std::endl;
+   *   }
+   * };
+   * @encode
+   *
+   * Only one device can be used at a time. To create your custom device you only need
+   * to inherit from the class Logger::Device and override the method Logger::Device::writeMessage().
+   * To use this custom device with the logger, you have to use the method Device::setDevice().
    */
   
   /**
-   * @typedef Logger::Stream::Pointer
-   * Smart pointer associated with a Logger::Stream  object.
+   * Default (empty) constructor
    */
+  Logger::Device::Device() noexcept = default;
   
   /**
-   * @fn static Pointer Logger::Stream::New(std::ostream* output)
-   * @brief Creates a smart pointer associated with a Logger::Stream object.
+   * Default (empty) destructor
    */
-   
+  Logger::Device::~Device() noexcept = default;
+  
   /**
-   * @fn std::ostream& Logger::Stream::GetOutput() const
-   * Returns the output stream as a reference.
+   * @fn virtual void Logger::Device::writeMessage(Category category, const char* msg) noexcept = 0;
+   * The logger seng message to this method. The @a category input specifies if the message is for
+   * an information, a warning, or an error. The @a msg input is directly the string given to the method
+   * Logger::info(), Logger::warning(), or Logger::error().
    */
   
-  /*
-   * Constructor.
-   */
-  Logger::Stream::Stream(std::ostream* output)
+  // ----------------------------------------------------------------------- //
+
+  struct Console : Logger::Device
   {
-    this->mp_Output = output;
-    this->m_Owned = false;
+    virtual void writeMessage(Logger::Category category, const char* msg) noexcept override
+    {
+      if (category == Logger::Info)
+        std::cout << "INFO: " << msg << std::endl;
+      else if (category == Logger::Warning)
+        std::cout << "WARNING: " << msg << std::endl;
+      else if (category == Logger::Error)
+        std::cout << "ERROR: " << msg << std::endl;
+    }
   };
   
-  /** 
-   * Destructor.
+  // ----------------------------------------------------------------------- //
+  
+  /**
+   * @class Logger btkLogger.h
+   * @brief Class to centralize log messages and write them to a device
+   *
+   * Three categories are available and could be used as proposed below:
+   * - Logger::Info: For users' information or debugging
+   * - Logger::Warning: For incorrect inputs in algorithms but still adatable.
+   * - Logger::Error: For undesired behaviour which can break algorithms' logic.
+   *
+   * Each logging category has a dedicated static method:
+   * - Logger::info()
+   * - Logger::warning()
+   * - Logger::error()
+   *
+   * These methods send the given message to a Logger::Device set. This device 
+   * has the role to write the message (in a console,  a file, etc.). By default,
+   * the message are sent into the standard cout/cerr streams. 
+   * To set a device, you have to use the method Logger::setDevice()
+   *
+   * To disable the logger, you can use the method logger::mute().
+   *
+   * @ingroup BTKCommon
    */
-  Logger::Stream::~Stream()
+ 
+  /**
+   * @enum Logger::Category
+   * Enums used to specify message's type.
+   */
+  /**
+   * @var Logger::Category Logger::Info
+   * Enum value used for information messages.
+   */
+  /**
+   * @var Logger::Category Logger::Warning
+   * Enum value used for warning messages.
+   */
+  /**
+   * @var Logger::Category Logger::Error
+   * Enum value used for error messages.
+   */
+  
+  /**
+   * Write Logger::Info messages.
+   */
+  void Logger::info(const char* msg) noexcept
   {
-    if (this->m_Owned)
-      delete this->mp_Output;
+    Logger::instance().sendMessage(Info, msg);
   };
   
+  /**
+   * Write Logger::Warning messages.
+   */
+  void Logger::warning(const char* msg) noexcept
+  {
+    Logger::instance().sendMessage(Warning, msg);
+  };
+  
+  /**
+   * Write Logger::Error messages.
+   */
+  void Logger::error(const char* msg) noexcept
+  {
+    Logger::instance().sendMessage(Error, msg);
+  };
+  
+  /**
+   * Active/unactive the logger. If the logger is set to mute,
+   * all the messages are eaten and destroyed.
+   */
+  void Logger::mute(bool active) noexcept
+  {
+    Logger::instance().mp_Pimpl->Quiet = active;
+  };
+  
+  /**
+   * Set the device which will write the log messages. If a previous device was set,
+   * it will be deleted. The logger takes the ownership of the device.
+   */
+  void Logger::setDevice(Device* output) noexcept
+  {
+    delete Logger::instance().mp_Pimpl->Output;
+    Logger::instance().mp_Pimpl->Output = output;
+  };
+  
+  /**
+   * Destructor
+   * Delete the set device
+   */
+  Logger::~Logger() noexcept
+  {
+    delete this->mp_Pimpl->Output;
+    delete this->mp_Pimpl;
+  };
+  
+  /**
+   * Singleton
+   */
+  Logger& Logger::instance()
+  {
+    static Logger singleton;
+    return singleton;
+  };
+  
+  /**
+   * Constructor
+   */
+  Logger::Logger()
+  : mp_Pimpl(new Logger::Private)
+  {};
+  
+  /**
+   * Send a message to the set device. If no device is set, a default one is created
+   * and set info messages to the std::cout stream and warning and error messages to 
+   * the std::cerr stream. You can set a device using the method Logger::setDevice().
+   * If the logger is set to mute (Logger::mute() method), no message is sent.
+   */
+  void Logger::sendMessage(Category category, const char* msg) noexcept
+  {
+    if (this->mp_Pimpl->Quiet)
+      return;
+    if (this->mp_Pimpl->Output == nullptr)
+      this->mp_Pimpl->Output = new Console;
+    this->mp_Pimpl->Output->writeMessage(category,msg);
+      
+  };
 };

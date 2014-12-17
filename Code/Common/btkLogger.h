@@ -36,125 +36,53 @@
 #ifndef __btkLogger_h
 #define __btkLogger_h
 
-#include "btkSharedPtr.h"
-#include "btkMacro.h"
+#include "btkCommonExport.h"
 
-#include <fstream>
 #include <string>
-
-/**
- * Internal macro used to print log on the given stream @c s.
- */
-#define _btkLogMacro(s, p, l, ...) \
-  /* Keep the scope of _argc, _argv only inside the "loop" */ \
-  do \
-  { \
-    std::string _argv[] = { __VA_ARGS__ }; \
-    int _argc = (sizeof _argv) / (sizeof _argv[0]); \
-    if (_argc == 1) \
-      btk::Logger::s(btkStripPathMacro(p), l, _argv[0]); \
-    else \
-      btk::Logger::s(btkStripPathMacro(p), l, std::string(btkStripPathMacro(_argv[0].c_str())) + " - " + _argv[1]); \
-  } \
-  while (0)
-
-/**
- * Send a debug message to the logger with information on its source code location (filename, line number).
- * This macro can be used with one or two strings. 
- * If only one is passed, this is considered as the log message. 
- * If two strings are passed, then the first one is considered as the path of a file and the second one is considered as the log message.
- * In this second case, the macro strip the path of the given file to keep only the filename and concat it to the message by using a dash separator between them (i.e. filename - message).
- * The second case is usefull for log messages sent from IO reader/writer to know which processed file has somme issues during batch.
- */
-#define btkDebugMacro(...) \
-  _btkLogMacro(Debug, __FILE__, __LINE__, __VA_ARGS__);
-
-/**
- * Send a warning message to the logger with information on its source code location (filename, line number).
- * This macro can be used with one or two strings. 
- * If only one is passed, this is considered as the log message. 
- * If two strings are passed, then the first one is considered as the path of a file and the second one is considered as the log message.
- * In this second case, the macro strip the path of the given file to keep only the filename and concat it to the message by using a dash separator between them (i.e. filename - message).
- * The second case is usefull for log messages sent from IO reader/writer to know which processed file has somme issues during batch.
- */
-#define btkWarningMacro(...) \
-  _btkLogMacro(Warning, __FILE__, __LINE__, __VA_ARGS__);
-  
-/**
- * Send an error message to the logger with information on its source code location (filename, line number).
- * This macro can be used with one or two strings. 
- * If only one is passed, this is considered as the log message. 
- * If two strings are passed, then the first one is considered as the path of a file and the second one is considered as the log message.
- * In this second case, the macro strip the path of the given file to keep only the filename and concat it to the message by using a dash separator between them (i.e. filename - message).
- * The second case is usefull for log messages sent from IO reader/writer to know which processed file has somme issues during batch.
- */
-#define btkErrorMacro(...) \
-  _btkLogMacro(Error, __FILE__, __LINE__, __VA_ARGS__);
-
-// ------------------------------------------------------------------------- //
-
-// ------------------------------------------------------------------------- //
 
 namespace btk
 {
-  class Logger
+  class BTK_COMMON_EXPORT Logger
   {
   public:
-    typedef enum {Quiet = 0, MessageOnly = 1, Normal = 2, Detailed = 3} VerboseMode;
+    typedef enum {Info, Warning, Error} Category;
     
-    class Stream
+    struct Device
     {
-    public:
-      typedef btkSharedPtr<Stream> Pointer;
-      static Pointer New(std::ostream* output) {return Pointer(new Stream(output));};
-      BTK_COMMON_EXPORT ~Stream();
-      std::ostream& GetOutput() const {return *(this->mp_Output);};
-            
-    private:
-      BTK_COMMON_EXPORT Stream(std::ostream* output);
+      Device() noexcept;
+      virtual ~Device() noexcept;
       
-      Stream(const Stream&); // Not implemented.
-      Stream& operator= (const Stream&); // Notimplemented.
+      virtual void writeMessage(Category category, const char* msg) noexcept = 0;
       
-      std::ostream* mp_Output;
-      bool m_Owned;
+      Device(const Device& ) = delete;
+      Device(Device&& ) noexcept = delete;
+      Device& operator=(const Device& ) = delete;
+      Device& operator=(Device&& ) noexcept = delete;
     };
     
-    BTK_COMMON_EXPORT static void Debug(const std::string& msg);
-    BTK_COMMON_EXPORT static void Debug(const std::string& filename, int line, const std::string& msg);
-
-    BTK_COMMON_EXPORT static void Warning(const std::string& msg);
-    BTK_COMMON_EXPORT static void Warning(const std::string& filename, int line, const std::string& msg);
+    static void info(const char* msg) noexcept;
+    static void warning(const char* msg) noexcept;
+    static void error(const char* msg) noexcept;
     
-    BTK_COMMON_EXPORT static void Error(const std::string& msg);
-    BTK_COMMON_EXPORT static void Error(const std::string& filename, int line, const std::string& msg);
+    static void mute(bool active) noexcept;
     
-    BTK_COMMON_EXPORT static VerboseMode GetVerboseMode();
-    BTK_COMMON_EXPORT static void SetVerboseMode(VerboseMode mode);
+    static void setDevice(Device* output) noexcept;
     
-    BTK_COMMON_EXPORT static const std::string& GetPrefix();
-    BTK_COMMON_EXPORT static void SetPrefix(const std::string& str);
+    ~Logger() noexcept;
     
-    BTK_COMMON_EXPORT static Logger::Stream::Pointer GetDebugStream();
-    BTK_COMMON_EXPORT static Logger::Stream::Pointer GetWarningStream();
-    BTK_COMMON_EXPORT static Logger::Stream::Pointer GetErrorStream();
-    BTK_COMMON_EXPORT static void SetDebugStream(std::ostream* output);
-    BTK_COMMON_EXPORT static void SetWarningStream(std::ostream* output);
-    BTK_COMMON_EXPORT static void SetErrorStream(std::ostream* output);
-    BTK_COMMON_EXPORT static void SetDebugStream(Logger::Stream::Pointer stream);
-    BTK_COMMON_EXPORT static void SetWarningStream(Logger::Stream::Pointer stream);
-    BTK_COMMON_EXPORT static void SetErrorStream(Logger::Stream::Pointer stream);
-    
-    BTK_COMMON_EXPORT static const std::string& GetDebugAffix();
-    BTK_COMMON_EXPORT static const std::string& GetWarningAffix();
-    BTK_COMMON_EXPORT static const std::string& GetErrorAffix();
-    BTK_COMMON_EXPORT static void SetDebugAffix(const std::string& str);
-    BTK_COMMON_EXPORT static void SetWarningAffix(const std::string& str);
-    BTK_COMMON_EXPORT static void SetErrorAffix(const std::string& str);
+    Logger(const Logger& ) = delete;
+    Logger(Logger&& ) noexcept = delete;
+    Logger& operator=(const Logger& ) = delete;
+    Logger& operator=(Logger&& ) noexcept = delete;
     
   private:
-    static void PrintMessage(Stream* level, const std::string& affix, const std::string& msg);
-    static void PrintMessage(Stream* level, const std::string& affix, const std::string& filename, int line, const std::string& msg);
+    static Logger& instance();
+    
+    Logger();
+    void sendMessage(Category category, const char* msg) noexcept;
+    
+    struct Private;
+    Private* mp_Pimpl;
   };
 };
 
