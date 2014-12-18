@@ -7,6 +7,7 @@
 // #include "IMUTypesTest.h"
 // #include "Common/CowodPtrTest.h"
 #include "Common/ObjectTest.h"
+#include "Common/LoggerTest.h"
 // #include "PointTest.h"
 // #include "PointCollectionTest.h"
 // #include "MetaDataInfoTest.h"
