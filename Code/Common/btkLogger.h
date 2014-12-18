@@ -38,7 +38,7 @@
 
 #include "btkCommonExport.h"
 
-#include <string>
+#include <utility> // std::forward
 
 namespace btk
 {
@@ -60,9 +60,9 @@ namespace btk
       Device& operator=(Device&& ) noexcept = delete;
     };
     
-    static void info(const char* msg) noexcept;
-    static void warning(const char* msg) noexcept;
-    static void error(const char* msg) noexcept;
+    template<typename... Args> static inline void info(const char* msg, Args&&... args) noexcept;
+    template<typename... Args> static inline void warning(const char* msg, Args&&... args) noexcept;
+    template<typename... Args> static inline void error(const char* msg, Args&&... args) noexcept;
     
     static void mute(bool active) noexcept;
     
@@ -78,11 +78,61 @@ namespace btk
   private:
     static Logger& instance();
     
+    template<typename... Args> struct Message;
+    
     Logger();
-    void sendMessage(Category category, const char* msg) noexcept;
+    bool isMute() const;
+    const char* prepareMessage(const char* msg, ...) const;
+    void sendMessage(Category category, const char* msg);
     
     struct Private;
     Private* mp_Pimpl;
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
+  template<typename... Args>
+  struct Logger::Message
+  {
+    static inline void send(Category category, const char* msg, Args&&... args)
+    {
+      if (Logger::instance().isMute())
+        return;
+      const char* str = Logger::instance().prepareMessage(msg, std::forward<Args>(args)...);
+      Logger::instance().sendMessage(category, str);
+      delete[] str;
+    };
+  };
+  
+  template<>
+  struct Logger::Message<>
+  {
+    static inline void send(Category category, const char* msg)
+    {
+      if (Logger::instance().isMute())
+        return;
+      Logger::instance().sendMessage(category, msg);
+    };
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
+  template<typename... Args>
+  void Logger::info(const char* msg, Args&&... args) noexcept
+  {
+    Logger::Message<Args...>::send(Info,msg,std::forward<Args>(args)...);
+  };
+  
+  template<typename... Args>
+  void Logger::warning(const char* msg, Args&&... args) noexcept
+  {
+    Logger::Message<Args...>::send(Warning,msg,std::forward<Args>(args)...);
+  };
+  
+  template<typename... Args>
+  void Logger::error(const char* msg, Args&&... args) noexcept
+  {
+    Logger::Message<Args...>::send(Error,msg,std::forward<Args>(args)...);
   };
 };
 

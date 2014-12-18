@@ -36,6 +36,7 @@
 #include "btkLogger.h"
 
 #include <iostream>
+#include <cstdio> // vsnprintf
 
 namespace btk
 {
@@ -161,28 +162,19 @@ namespace btk
    */
   
   /**
+   * @fn template<typename... Args> void Logger::info(const char* msg, Args&&... args) noexcept
    * Write Logger::Info messages.
    */
-  void Logger::info(const char* msg) noexcept
-  {
-    Logger::instance().sendMessage(Info, msg);
-  };
   
   /**
+   * @fn template<typename... Args> void Logger::warning(const char* msg, Args&&... args) noexcept
    * Write Logger::Warning messages.
    */
-  void Logger::warning(const char* msg) noexcept
-  {
-    Logger::instance().sendMessage(Warning, msg);
-  };
   
   /**
+   * @fn template<typename... Args> void Logger::error(const char* msg, Args&&... args) noexcept   
    * Write Logger::Error messages.
    */
-  void Logger::error(const char* msg) noexcept
-  {
-    Logger::instance().sendMessage(Error, msg);
-  };
   
   /**
    * Active/unactive the logger. If the logger is set to mute,
@@ -230,18 +222,52 @@ namespace btk
   {};
   
   /**
-   * Send a message to the set device. If no device is set, a default one is created
-   * and set info messages to the std::cout stream and warning and error messages to 
-   * the std::cerr stream. You can set a device using the method Logger::setDevice().
-   * If the logger is set to mute (Logger::mute() method), no message is sent.
+   * Return true if the logger was set to mute previously.
    */
-  void Logger::sendMessage(Category category, const char* msg) noexcept
+  bool Logger::isMute() const
   {
-    if (this->mp_Pimpl->Quiet)
-      return;
-    if (this->mp_Pimpl->Output == nullptr)
-      this->mp_Pimpl->Output = new Console;
-    this->mp_Pimpl->Output->writeMessage(category,msg);
-      
+    return Logger::instance().mp_Pimpl->Quiet;
+  };
+  
+  /**
+   * Create a string based on the given string @a msg and the variadic arguments.
+   * The returned string must be deleted aftewards using the delete[] operator.
+   */
+  const char* Logger::prepareMessage(const char* msg, ...) const
+  {
+    size_t n = strlen(msg)*2;
+    char* str = new char[n];
+    while (1)
+    {
+      va_list args;
+      va_start(args, msg);
+      int len = vsnprintf(str, n, msg, args);
+      va_end(args);
+      // If something is wrong (negative length), the string is reset and sent like this
+      if (len < 0)
+      {
+        str[0] = '\0';
+        len = 0;
+      }
+      // If the string is complete (or an encoding error occurs)
+      if (len < n)
+        break;
+      n += len - n + 1; // Should be done only one time. +1: null character
+      delete[] str;
+      str = new char[n];
+    }
+    return str;
+  };
+
+  /**
+   * Send a message to the set device. If no device is set, a default one is created
+   * and send info messages to the std::cout stream and warning and error messages to 
+   * the std::cerr stream. You can set a device using the method Logger::setDevice().
+   */
+  void Logger::sendMessage(Category category, const char* msg)
+  {
+  if (this->mp_Pimpl->Output == nullptr)
+    this->mp_Pimpl->Output = new Console;
+  this->mp_Pimpl->Output->writeMessage(category,msg);
   };
 };
