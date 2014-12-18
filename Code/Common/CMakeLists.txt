@@ -6,7 +6,7 @@ SET(BTKCommon_SRCS
   # btkEvent.cpp
   # btkForcePlatform.cpp
   # btkIMU.cpp
-  # btkLogger.cpp
+  btkLogger.cpp
   # btkMetaData.cpp
   # btkMetaDataInfo.cpp
   # btkMetaDataUtils.cpp
