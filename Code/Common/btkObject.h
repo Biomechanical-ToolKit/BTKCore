@@ -51,12 +51,12 @@ namespace btk
     BTK_DECLARE_PIMPL_ACCESSOR(Object)
     
   public:
-    virtual ~Object();
+    virtual ~Object() noexcept;
     
     Object(const Object& ) = delete;
-    Object(Object&& ) = delete;
+    Object(Object&& ) noexcept = delete;
     Object& operator=(const Object& ) = delete;
-    Object& operator=(Object&& ) = delete;
+    Object& operator=(Object&& ) noexcept = delete;
     
     unsigned long timestamp() const noexcept;
     
@@ -64,7 +64,7 @@ namespace btk
     
   protected:
     Object();
-    Object(ObjectPrivate& pimpl);
+    Object(ObjectPrivate& pimpl) noexcept;
    
     std::unique_ptr<ObjectPrivate> mp_Pimpl;
   };

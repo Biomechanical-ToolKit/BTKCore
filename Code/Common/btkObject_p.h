@@ -47,13 +47,13 @@ namespace btk
   {
   public:
     ObjectPrivate();
-    ObjectPrivate(const ObjectPrivate& other) = delete;
     virtual ~ObjectPrivate();
     // virtual ObjectPrivate* clone() const;
     
-    ObjectPrivate(ObjectPrivate&& ) = delete; // Not implemented.
-    ObjectPrivate& operator=(const ObjectPrivate& ) = delete; // Not implemented.
-    ObjectPrivate& operator=(const ObjectPrivate&& ) = delete; // Not implemented.
+    ObjectPrivate(const ObjectPrivate& ) = delete;
+    ObjectPrivate(ObjectPrivate&& ) noexcept = delete;
+    ObjectPrivate& operator=(const ObjectPrivate& ) = delete;
+    ObjectPrivate& operator=(const ObjectPrivate&& ) noexcept = delete;
     
     unsigned long Timestamp;
   };

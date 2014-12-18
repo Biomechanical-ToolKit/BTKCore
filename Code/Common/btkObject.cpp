@@ -68,7 +68,7 @@ namespace btk
    * Destructor
    * @note The opaque pointer representing the private implementation is automatically deleted as it is contained in a std::unique_ptr object.
    */
-  Object::~Object() = default;
+  Object::~Object() noexcept = default;
   
   /**
    * Returns the timestamp of the object.
@@ -98,7 +98,7 @@ namespace btk
   : mp_Pimpl(new ObjectPrivate)
   {};
   
-  Object::Object(ObjectPrivate& impl)
+  Object::Object(ObjectPrivate& impl) noexcept
   : mp_Pimpl(&impl)
   {};
 };
