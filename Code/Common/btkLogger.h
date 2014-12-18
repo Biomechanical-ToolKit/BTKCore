@@ -96,10 +96,11 @@ namespace btk
   {
     static inline void send(Category category, const char* msg, Args&&... args)
     {
-      if (Logger::instance().isMute())
+      Logger& logger = Logger::instance();
+      if (logger.isMute())
         return;
-      const char* str = Logger::instance().prepareMessage(msg, std::forward<Args>(args)...);
-      Logger::instance().sendMessage(category, str);
+      const char* str = logger.prepareMessage(msg, std::forward<Args>(args)...);
+      logger.sendMessage(category, str);
       delete[] str;
     };
   };
@@ -109,9 +110,10 @@ namespace btk
   {
     static inline void send(Category category, const char* msg)
     {
-      if (Logger::instance().isMute())
+      Logger& logger = Logger::instance();
+      if (logger.isMute())
         return;
-      Logger::instance().sendMessage(category, msg);
+      logger.sendMessage(category, msg);
     };
   };
   
