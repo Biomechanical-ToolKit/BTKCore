@@ -111,9 +111,9 @@ namespace btk
       if (category == Logger::Info)
         std::cout << "INFO: " << msg << std::endl;
       else if (category == Logger::Warning)
-        std::cout << "WARNING: " << msg << std::endl;
+        std::cerr << "WARNING: " << msg << std::endl;
       else if (category == Logger::Error)
-        std::cout << "ERROR: " << msg << std::endl;
+        std::cerr << "ERROR: " << msg << std::endl;
     }
   };
   
