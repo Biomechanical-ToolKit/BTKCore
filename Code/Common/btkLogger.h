@@ -81,8 +81,7 @@ namespace btk
     template<typename... Args> struct Message;
     
     Logger();
-    bool isMute() const;
-    const char* prepareMessage(const char* msg, ...) const;
+    void sendPreparedMessage(Category category, const char* msg, ...);
     void sendMessage(Category category, const char* msg);
     
     struct Private;
@@ -96,12 +95,7 @@ namespace btk
   {
     static inline void send(Category category, const char* msg, Args&&... args)
     {
-      Logger& logger = Logger::instance();
-      if (logger.isMute())
-        return;
-      const char* str = logger.prepareMessage(msg, std::forward<Args>(args)...);
-      logger.sendMessage(category, str);
-      delete[] str;
+      Logger::instance().sendPreparedMessage(category, msg, std::forward<Args>(args)...);
     };
   };
   
@@ -110,10 +104,7 @@ namespace btk
   {
     static inline void send(Category category, const char* msg)
     {
-      Logger& logger = Logger::instance();
-      if (logger.isMute())
-        return;
-      logger.sendMessage(category, msg);
+      Logger::instance().sendMessage(category, msg);
     };
   };
   

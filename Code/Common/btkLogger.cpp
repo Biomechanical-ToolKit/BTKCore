@@ -222,19 +222,19 @@ namespace btk
   {};
   
   /**
-   * Return true if the logger was set to mute previously.
+   * Send a message to the set device. If no device is set, a default one is created
+   * and send info messages to the std::cout stream and warning and error messages to 
+   * the std::cerr stream. You can set a device using the method Logger::setDevice().
+   *
+   * Compared to the method Logger::sendMessage(), this method creates also a string 
+   * based on the given variadic arguments.
    */
-  bool Logger::isMute() const
+  void Logger::sendPreparedMessage(Category category, const char* msg, ...)
   {
-    return Logger::instance().mp_Pimpl->Quiet;
-  };
-  
-  /**
-   * Create a string based on the given string @a msg and the variadic arguments.
-   * The returned string must be deleted aftewards using the delete[] operator.
-   */
-  const char* Logger::prepareMessage(const char* msg, ...) const
-  {
+    if (this->mp_Pimpl->Quiet)
+      return;
+    if (this->mp_Pimpl->Output == nullptr)
+      this->mp_Pimpl->Output = new Console;
     size_t n = strlen(msg)*2;
     char* str = new char[n];
     while (1)
@@ -256,7 +256,8 @@ namespace btk
       delete[] str;
       str = new char[n];
     }
-    return str;
+    this->mp_Pimpl->Output->writeMessage(category,str);
+    delete[] str;
   };
 
   /**
@@ -266,8 +267,10 @@ namespace btk
    */
   void Logger::sendMessage(Category category, const char* msg)
   {
-  if (this->mp_Pimpl->Output == nullptr)
-    this->mp_Pimpl->Output = new Console;
-  this->mp_Pimpl->Output->writeMessage(category,msg);
+    if (this->mp_Pimpl->Quiet)
+      return;
+    if (this->mp_Pimpl->Output == nullptr)
+      this->mp_Pimpl->Output = new Console;
+    this->mp_Pimpl->Output->writeMessage(category,msg);
   };
 };
