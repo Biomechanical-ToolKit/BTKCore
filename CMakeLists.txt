@@ -24,10 +24,12 @@ SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  SET(CMAKE_CXX_FLAGS "-stdlib=libc++")
+  SET(CMAKE_CXX_FLAGS "-stdlib=libc++ -fno-rtti")
   # CMake complains it does not know how to set the compile flag to enable C++11 
   SET(CMAKE_CXX11_STANDARD_COMPILE_OPTION "-std=c++11")
   SET(CMAKE_CXX11_EXTENSION_COMPILE_OPTION "-std=gnu++11")
+ELSE()
+  SET(CMAKE_CXX_FLAGS "-fno-rtti")
 ENDIF()
 
 # ------------------------------------------------------------------------
