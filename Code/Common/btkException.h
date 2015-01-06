@@ -50,25 +50,25 @@ namespace btk
     /**
      * Constructor
      */
-    explicit Exception(const std::string& msg)
-    : mWhat(msg)
+    explicit Exception(const std::string& msg) noexcept
+    : m_What(msg)
     {};
     
     /**
      * Destructor
      */
-    virtual ~Exception() throw() {};
+    virtual ~Exception() {};
     
     /**
      * Gets the exception's message
      */
-    virtual const char* what() const throw()
+    virtual const char* what() const noexcept
     {
-      return mWhat.c_str();
+      return this->m_What.c_str();
     };
     
   private:
-    std::string mWhat;
+    std::string m_What;
   };
 
 
@@ -78,20 +78,27 @@ namespace btk
   class LogicError : public Exception
   {
   public:
-    
     /**
      * Constructor
      */
     explicit LogicError(const std::string& msg)
     : Exception(msg)
     {};
-    
-    /**
-     * Destructor
-     */
-    virtual ~LogicError() throw() {}
   };
 
+  /**
+   * @brief Logic error exception
+   */
+  class InvalidArgument : public LogicError
+  {
+  public:
+    /**
+     * Constructor
+     */
+    explicit InvalidArgument(const std::string& msg)
+    : LogicError(msg)
+    {};
+  };
 
   /**
    * @brief Out of range exception
@@ -99,38 +106,26 @@ namespace btk
   class OutOfRangeException : public Exception
   {
   public:
-    
     /**
      * Constructor
      */
     explicit OutOfRangeException(const std::string& msg)
     : Exception(msg)
     {};
-    
-    /**
-     * Destructor
-     */
-    virtual ~OutOfRangeException() throw() {}
   };
   
   /**
-   * @brief Logic error exception
+   * @brief Domain error exception
    */
   class DomainError : public Exception
   {
   public:
-    
     /**
      * Constructor
      */
     explicit DomainError(const std::string& msg)
     : Exception(msg)
     {};
-    
-    /**
-     * Destructor
-     */
-    virtual ~DomainError() throw() {}
   };
   
   /**
@@ -145,11 +140,6 @@ namespace btk
     explicit RuntimeError(const std::string& msg)
     : Exception(msg)
     {};
-    
-    /**
-     * Destructor
-     */
-    virtual ~RuntimeError() throw() {}
   };
 };
 
