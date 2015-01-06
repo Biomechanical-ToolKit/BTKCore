@@ -41,7 +41,7 @@
   inline classname##Private* pimpl() {return reinterpret_cast<classname##Private*>(this->mp_Pimpl.get());}; \
   inline const classname##Private* pimpl() const {return reinterpret_cast<const classname##Private*>(this->mp_Pimpl.get());};
   
-  // Pint: Public interface
+// Pint: Public interface
 #define BTK_DECLARE_PINT_ACCESSOR(classname) \
   inline classname* pint() {return reinterpret_cast<classname*>(this->mp_Pint);}; \
   inline const classname* pint() const {return reinterpret_cast<const classname*>(this->mp_Pint);};
