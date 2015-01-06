@@ -10,7 +10,7 @@ SET(BTKCommon_SRCS
   # btkMetaData.cpp
   # btkMetaDataInfo.cpp
   # btkMetaDataUtils.cpp
-  # btkNodeObject.cpp
+  btkNode.cpp
   btkObject.cpp
   # btkPoint.cpp
   # btkProcessObject.cpp
