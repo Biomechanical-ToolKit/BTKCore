@@ -100,7 +100,7 @@ namespace btk
   template<>
   struct Any::Converter::Helper<std::string,bool> : Any::Converter::HelperBase<std::string,bool>
   {
-    static inline bool convert(const std::string& val) {return (val.empty() || (val.compare("0") == 0) || (val.compare("false") == 0));};
+    static inline bool convert(const std::string& val) {return !(val.empty() || (val.compare("0") == 0) || (val.compare("false") == 0));};
   };
   
   // A boolean converted to a string is set to "true" when it is true or "false" when false.
@@ -117,49 +117,49 @@ namespace btk
   template<>
   struct Any::Converter::Helper<std::string,int8_t> : Any::Converter::HelperBase<std::string,int8_t>
   {
-    static inline int8_t convert(const std::string& val) {return static_cast<int8_t>(stol(val));};
+    static inline int8_t convert(const std::string& val) {int8_t ret = 0; try {ret = static_cast<int8_t>(stol(val));} catch(...) {} return ret;};
   };
 
   template<>
   struct Any::Converter::Helper<std::string,uint8_t> : Any::Converter::HelperBase<std::string,uint8_t>
   {
-    static inline uint8_t convert(const std::string& val) {return static_cast<uint8_t>(stoul(val));};
+    static inline uint8_t convert(const std::string& val) {uint8_t ret = 0; try {ret = static_cast<uint8_t>(stoul(val));} catch(...) {} return ret;};
   };
 
   template<>
   struct Any::Converter::Helper<std::string,int16_t> : Any::Converter::HelperBase<std::string,int16_t>
   {
-    static inline int16_t convert(const std::string& val) {return static_cast<int16_t>(stol(val));};
+    static inline int16_t convert(const std::string& val) {int16_t ret = 0; try {ret = static_cast<int16_t>(stol(val));} catch(...) {} return ret;};
   };
 
   template<>
   struct Any::Converter::Helper<std::string,uint16_t> : Any::Converter::HelperBase<std::string,uint16_t>
   {
-    static inline uint16_t convert(const std::string& val) {return static_cast<uint16_t>(stoul(val));};
+    static inline uint16_t convert(const std::string& val) {uint16_t ret = 0; try {ret = static_cast<uint16_t>(stoul(val));} catch(...) {} return ret;};
   };
 
   template<>
   struct Any::Converter::Helper<std::string,int32_t> : Any::Converter::HelperBase<std::string,int32_t>
   {
-    static inline int32_t convert(const std::string& val) {return static_cast<int32_t>(stol(val));};
+    static inline int32_t convert(const std::string& val) {int32_t ret = 0; try {ret = static_cast<int32_t>(stol(val));} catch(...) {} return ret;};
   };
 
   template<>
   struct Any::Converter::Helper<std::string,uint32_t> : Any::Converter::HelperBase<std::string,uint32_t>
   {
-    static inline uint32_t convert(const std::string& val) {return static_cast<uint32_t>(stoul(val));};
+    static inline uint32_t convert(const std::string& val) {uint32_t ret = 0; try {ret = static_cast<uint32_t>(stoul(val));} catch(...) {} return ret;};
   };
 
   template<>
   struct Any::Converter::Helper<std::string,int64_t> : Any::Converter::HelperBase<std::string,int64_t>
   {
-    static inline int64_t convert(const std::string& val) {return static_cast<int64_t>(stoll(val));};
+    static inline int64_t convert(const std::string& val) {int64_t ret = 0; try {ret = static_cast<int64_t>(stoll(val));} catch(...) {} return ret;};
   };
 
   template<>
   struct Any::Converter::Helper<std::string,uint64_t> : Any::Converter::HelperBase<std::string,uint64_t>
   {
-    static inline uint64_t convert(const std::string& val) {return static_cast<uint64_t>(stoull(val));};
+    static inline uint64_t convert(const std::string& val) {uint64_t ret = 0; try {ret = static_cast<uint64_t>(stoull(val));} catch(...) {} return ret;};
   };
 
   // ----------------------------------------------------------------------- //
@@ -169,13 +169,13 @@ namespace btk
   template<>
   struct Any::Converter::Helper<std::string,float> : Any::Converter::HelperBase<std::string,float>
   {
-    static inline float convert(const std::string& val) {return stof(val);};
+    static inline float convert(const std::string& val) {float ret = 0; try {ret = stof(val);} catch(...) {} return ret;};
   };
 
   template<>
   struct Any::Converter::Helper<std::string,double> : Any::Converter::HelperBase<std::string,double>
   {
-    static inline double convert(const std::string& val) {return stod(val);};
+    static inline double convert(const std::string& val) {double ret = 0; try {ret = stod(val);} catch(...) {} return ret;};
   };
 };
 

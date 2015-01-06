@@ -29,10 +29,15 @@ CXXTEST_SUITE(AnyTest)
     btk::Any d = true;
     TS_ASSERT_EQUALS(d.cast<std::string>(),"true");
     TS_ASSERT_EQUALS(d.cast<int>(),1);
+    d = false;
+    TS_ASSERT_EQUALS(d.cast<std::string>(),"false");
+    TS_ASSERT_EQUALS(d.cast<int>(),0);
+    TS_ASSERT_EQUALS(d.cast<bool>(),false);
 
     btk::Any e = std::string("1.45");
     TS_ASSERT_EQUALS(e.cast<float>(),1.45f);
     TS_ASSERT_EQUALS(e.cast<int>(),1);
+    TS_ASSERT_EQUALS(static_cast<int>(e),1);
 
     btk::Any f = 45;
     TS_ASSERT_EQUALS(45,f);
@@ -47,7 +52,7 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(g,Date({1999,12,19}));
     g = std::string("2009-05-02");
     TS_ASSERT_EQUALS(g.cast<Date>(),Date({2009,05,02}));
-    TS_ASSERT_EQUALS(g.cast<bool>(),false);
+    TS_ASSERT_EQUALS(g.cast<bool>(),true);
 
     btk::Any::Unregister<Date>();
     TS_ASSERT_EQUALS(g.cast<Date>(),Date({0,0,0}));
@@ -67,6 +72,15 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT(n == b);
     TS_ASSERT(b == n);
     TS_ASSERT(n.cast<int>() == a);
+    TS_ASSERT(static_cast<int>(n) == a);
+    
+    btk::Any m(std::string("foo"));
+    TS_ASSERT_EQUALS(m.cast<std::string>(),"foo");
+    TS_ASSERT_EQUALS(m.cast<int>(),0);
+    TS_ASSERT_EQUALS(static_cast<int>(m),0);
+    TS_ASSERT_EQUALS(static_cast<float>(m),0.0f);
+    TS_ASSERT_EQUALS(static_cast<double>(m),0.0);
+    TS_ASSERT_EQUALS(static_cast<bool>(m),true);
   };
 };
 
