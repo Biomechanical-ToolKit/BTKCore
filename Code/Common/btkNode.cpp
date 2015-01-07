@@ -191,15 +191,12 @@ namespace btk
   /*
    * Sets the description of the node. By default the description is empty.
    * You can also modify this information using the property 'description'.
-   * In case the value is different, the state of the node is set to modified.
+   * @note The state of the node is not modified if the description is different.
    */
   void Node::setDescription(const std::string& value) noexcept
   {
     auto optr = this->pimpl();
-    if (value == optr->Description)
-      return;
     optr->Description = value;
-    this->modified();
   };
   
   /**
