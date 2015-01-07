@@ -169,13 +169,13 @@ namespace btk
   template<>
   struct Any::Converter::Helper<std::string,float> : Any::Converter::HelperBase<std::string,float>
   {
-    static inline float convert(const std::string& val) {float ret = 0; try {ret = stof(val);} catch(...) {} return ret;};
+    static inline float convert(const std::string& val) {float ret = 0.0f; try {ret = stof(val);} catch(...) {} return ret;};
   };
 
   template<>
   struct Any::Converter::Helper<std::string,double> : Any::Converter::HelperBase<std::string,double>
   {
-    static inline double convert(const std::string& val) {double ret = 0; try {ret = stod(val);} catch(...) {} return ret;};
+    static inline double convert(const std::string& val) {double ret = 0.0; try {ret = stod(val);} catch(...) {} return ret;};
   };
 };
 
