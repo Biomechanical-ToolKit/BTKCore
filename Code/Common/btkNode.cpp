@@ -169,12 +169,12 @@ namespace btk
   * You can also modify this information using the property 'name'.
   * In case the value is different, the state of the node is set to modified.
   */
-  void Node::setName(const std::string& name) noexcept
+  void Node::setName(const std::string& value) noexcept
   {
     auto optr = this->pimpl();
-    if (name == optr->Name)
+    if (value == optr->Name)
       return;
-    optr->Name = name;
+    optr->Name = value;
     this->modified();
   };
   
