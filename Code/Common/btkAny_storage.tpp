@@ -105,6 +105,16 @@ namespace btk
   {
     return Traits<T>::ID;
   };
+  
+  // ----------------------------------------------------------------------- //
+  //                       Storage Partial specializations
+  // ----------------------------------------------------------------------- //
+  
+  template <std::size_t N>
+  struct Any::Storage<char[N]> : public Any::Storage<std::string>
+  {
+    Storage(const char(&value)[N]) : Storage<std::string>(std::string(value,N-1)) {};
+  };
 };
 
 #endif // __btkAny_storage_tpp

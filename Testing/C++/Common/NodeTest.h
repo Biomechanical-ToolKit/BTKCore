@@ -50,6 +50,9 @@ CXXTEST_SUITE(NodeTest)
     node.setProperty("bar",std::string("hello"));
     TS_ASSERT_DIFFERS(node.timestamp(),ts);
     ts = node.timestamp();
+    node.setProperty("bar","hello");
+    TS_ASSERT_EQUALS(node.timestamp(),ts);
+    ts = node.timestamp();
     TS_ASSERT_EQUALS(node.property("bar").cast<std::string>(),"hello");
     node.setProperty("bar",btk::Any());
     TS_ASSERT_DIFFERS(node.timestamp(),ts);
