@@ -158,11 +158,11 @@ CXXTEST_SUITE(NodeTest)
     TS_ASSERT_EQUALS(foo->findChild<const TestNode*>("sun"),nullptr);
 
     TS_ASSERT_EQUALS(root.findChild("sun"),sun);
-    TS_ASSERT_EQUALS(root.findChild("sun",false),nullptr);
+    TS_ASSERT_EQUALS(root.findChild("sun",{},false),nullptr);
     TS_ASSERT_EQUALS(root.findChild<TestNode*>("sun"),nullptr);
     TS_ASSERT_EQUALS(root.findChild<TestNode*>("col"),col);
     TS_ASSERT_EQUALS(root.findChild("col"),col);
-    TS_ASSERT_EQUALS(root.findChild("col",false),nullptr);
+    TS_ASSERT_EQUALS(root.findChild("col",{},false),nullptr);
     
     std::list<btk::Node*> moonsA = root.findChildren("moon");
     TS_ASSERT_EQUALS(moonsA.size(), 3);
@@ -173,7 +173,7 @@ CXXTEST_SUITE(NodeTest)
     std::list<btk::Node*> planetsA = root.findChildren(std::regex("planet.*"));
     TS_ASSERT_EQUALS(planetsA.size(), 3);
     
-    std::list<TestNode*> planetsB = sun->findChildren<TestNode*>(std::regex("planet.*"),false);
+    std::list<TestNode*> planetsB = sun->findChildren<TestNode*>(std::regex("planet.*"),{},false);
     TS_ASSERT_EQUALS(planetsB.size(), 3);
     
     std::list<btk::Node*> all = root.findChildren();

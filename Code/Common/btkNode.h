@@ -82,9 +82,9 @@ namespace btk
     bool hasParents() const noexcept;
     void appendParent(Node* node) noexcept;
     
-    template <typename T = Node*> T findChild(const std::string& name = std::string(), bool recursiveSearch = true) const noexcept;
-    template <typename T = Node*> std::list<T> findChildren(const std::string& name = std::string(), bool recursiveSearch = true) const noexcept;
-    template <typename T = Node*> std::list<T> findChildren(const std::regex& regexp, bool recursiveSearch = true) const noexcept;
+    template <typename T = Node*> T findChild(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept;
+    template <typename T = Node*> std::list<T> findChildren(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept;
+    template <typename T = Node*, typename U, typename = typename std::enable_if<std::is_same<std::regex, U>::value>::type> std::list<T> findChildren(const U& regexp, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept;
     
   protected:
     void attachParent(Node* node) noexcept;
@@ -96,41 +96,43 @@ namespace btk
     Node(NodePrivate& pimpl, Node* parent) noexcept;
     
   private:
-    Node* findNode(nodeid_t id, const std::string& name, bool recursiveSearch) const noexcept;
-    void findNodes(std::list<void*>* list, nodeid_t id, const std::string& name, bool recursiveSearch) const noexcept;
-    void findNodes(std::list<void*>* list, nodeid_t id, const std::regex& regexp, bool recursiveSearch) const noexcept;
+    Node* findNode(nodeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept;
+    void findNodes(std::list<void*>* list, nodeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept;
+    void findNodes(std::list<void*>* list, nodeid_t id, const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept;
     
     template <typename U> friend U node_cast(Node* node) noexcept;
     bool castable(nodeid_t id);
   };
 
   template <typename T>
-  T Node::findChild(const std::string& name, bool recursiveSearch) const noexcept
+  T Node::findChild(const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
   {
     static_assert(std::is_pointer<T>::value, "The casted type must be a (const) pointer type.");
     static_assert(std::is_base_of<Node,typename std::remove_pointer<T>::type>::value, "The casted type must derive from btk::Node.");
-    return static_cast<T>(this->findNode(nodeid<typename std::remove_cv<typename std::remove_pointer<T>::type>::type>(),name,recursiveSearch));
+    return static_cast<T>(this->findNode(nodeid<typename std::remove_cv<typename std::remove_pointer<T>::type>::type>(),name,std::move(properties),recursiveSearch));
   };
 
   template <typename T>
-  std::list<T> Node::findChildren(const std::string& name, bool recursiveSearch) const noexcept
+  std::list<T> Node::findChildren(const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
   {
     static_assert(std::is_pointer<T>::value, "The casted type must be a (const) pointer type.");
     static_assert(std::is_base_of<Node,typename std::remove_pointer<T>::type>::value, "The casted type must derive from btk::Node.");
     std::list<T> children;
-    this->findNodes(reinterpret_cast<std::list<void*>*>(&children),nodeid<typename std::remove_cv<typename std::remove_pointer<T>::type>::type>(),name,recursiveSearch);
+    this->findNodes(reinterpret_cast<std::list<void*>*>(&children),nodeid<typename std::remove_cv<typename std::remove_pointer<T>::type>::type>(),name,std::move(properties),recursiveSearch);
     return children;
   };
   
-  template <typename T>
-  std::list<T> Node::findChildren(const std::regex& regexp, bool recursiveSearch) const noexcept
+  template <typename T, typename U, typename>
+  std::list<T> Node::findChildren(const U& regexp, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
   {
     static_assert(std::is_pointer<T>::value, "The casted type must be a (const) pointer type.");
     static_assert(std::is_base_of<Node,typename std::remove_pointer<T>::type>::value, "The casted type must derive from btk::Node.");
     std::list<T> children;
-    this->findNodes(reinterpret_cast<std::list<void*>*>(&children), nodeid<typename std::remove_cv<typename std::remove_pointer<T>::type>::type>(),regexp,recursiveSearch);
+    this->findNodes(reinterpret_cast<std::list<void*>*>(&children), nodeid<typename std::remove_cv<typename std::remove_pointer<T>::type>::type>(),regexp,std::move(properties),recursiveSearch);
     return children;
   };
+  
+  // ----------------------------------------------------------------------- //
   
   template <typename U>
   U node_cast(Node* node) noexcept

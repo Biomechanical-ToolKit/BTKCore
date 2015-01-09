@@ -389,8 +389,8 @@ namespace btk
   };
   
   /**
-   * @fn template <typename T = Node*> T findChild(const std::string& name = std::string(), bool recursiveSearch = true) const noexcept
-   * Returns the child with the given @a name and which can be casted to the type T. The search can be done recursively (by default) or only in direct children. The latter is available by setting the second argument @a recursiveSearch to false.
+   * @fn template <typename T = Node*> T findChild(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept
+   * Returns the child with the given @a name and which can be casted to the type T. You can refine the search by adding @a properties to match. The search can be done recursively (by default) or only in direct children. The latter is available by setting @a recursiveSearch to false.
    * There are three ways to use this methods.
    *
    * You can explicitely define the type @a T and the @a name.
@@ -409,35 +409,60 @@ namespace btk
    * btk::Node* bar = root.findChild("bar"); // A node with the name "bar"
    * @endcode
    *
-   * In any case you can set the second argument to false for a search in the direct children only.
+   * In addition, you can add properties to refine the research. Sometimes this could be usefull to distinguish events with the same name but different properties.
+   * As presented in the following examples, it is adviced to give matching properties in an initializer list using curly brackets due to the use of the move semantics in the method. Inside, each matching property is given as a pair {key, value} given also by an initializer list. So, for a single matching property, two pairs of curly brackets are used but this is correct.
    * @code
-   * btk::Event* rhs2 = root.findChild<btk::Event*>("RHS2",false);
-   * btk::ForcePlatform* fp = root.findChild<btk::ForcePlatform*>(std::string(),false); // std::string() and "" are the same.
-   * btk::Node* foo = root.findChild(std::string(),false);
-   * btk::Node* bar = root.findChild("bar",false);
+   * btk::Node events("Events");
+   * btk::Event evtA("Foo",0.0,"Right","JDoe",&events);
+   * btk::Event evtB("Bar",0.0,"Left","JDoe",&events);
+   * btk::Event evtC("Toto",1.1,"Left","JDoe",&events);
+   * btk::Event evtD("Toto",1.5,"Right","Babar",&events);
+   * events.findChild<btk::Event*>("Toto",{{"time",1.5}}); // pointer to evtD object
+   * events.findChild<btk::Event*>({},{{"time",0.0},{"context","Left"}}); // pointer to evtB object
+   * @endcode
+   *
+   * In any case you can set the third argument to false for a search in the direct children only. If no properties are added, the second arguement to give is an empty pair or curly brackets (i.e. {}).
+   * @code
+   * btk::Event* rhs2 = root.findChild<btk::Event*>("RHS2",{},false);
+   * btk::ForcePlatform* fp = root.findChild<btk::ForcePlatform*>({},{},false); // {} and std::string() and "" are the same for the name.
+   * btk::Node* foo = root.findChild({},{},false);
+   * btk::Node* bar = root.findChild("bar",{},false);
    * @endcode
    */
   
   /**
-   * @fn template <typename T = Node*> std::list<T> findChildren(const std::string& name = std::string(), bool recursiveSearch = true) const noexcept
-   * Returns the children with the given @a name and which can be casted to the type T. The search can be done recursively (by default) or only in direct children. The latter is available by setting the second argument @a recursiveSearch to false.
+   * @fn template <typename T = Node*> std::list<T> findChildren(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept
+   * Returns the children with the given @a name and which can be casted to the type T. You can refine the search by adding @a properties to match. The search can be done recursively (by default) or only in direct children. The latter is available by setting @a recursiveSearch to false.
    * As with the method findChild(), you can explicitely or implicitely give the type and/or the name of the children. For example:
    * @code
    * std::list<btk::Event*> events = root.findChildren<btk::Event*>(); // Find all events
    * std::list<btk::Event*> footstrikes = root.findChildren<btk::Event*>("Foot Strike"); // Find all foot strike events
    * std::list<btk::Node*> nodes = root.findChildren("Foot Strike"); // Find all node with the name "Foot Strike"
    * @endcode
+   *
+   * It is adviced to give matching properties by using an initializer list due to the use of the move semantics in the method.
+   * @code
+   * btk::Node events("Events");
+   * btk::Event evtA("Foo",0.0,"Right","JDoe",&events);
+   * btk::Event evtB("Bar",0.0,"Left","JDoe",&events);
+   * btk::Event evtC("Toto",1.1,"Left","JDoe",&events);
+   * btk::Event evtD("Toto",1.5,"Right","Babar",&events);
+   * events.findChildren<btk::Event*>({},{{"time",0.0}}); // evtA and evtB
+   * events.findChildren<btk::Event*>({},{{"context","Right"}}); // evtA and evtD
+   * events.findChildren<btk::Event*>({},{{"context","Left"}}); // evtB and evtC
+   * events.findChildren<btk::Event*>({},{{"subject","JDoe"}}); // evtA, evtB, and evtC
+   * @encode
    */
   
   /**
-   * @fn template <typename T = Node*> std::list<T> findChildren(const std::regex& regexp, bool recursiveSearch = true) const noexcept
-   * Conveniant method to find children using a regular expression.
+   * @fn template <typename T = Node*> std::list<T> findChildren(const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept
+   * Convenient method to find children using a regular expression.
    */
   
   /**
    * Implementation of the findChild method.
    */
-  Node* Node::findNode(nodeid_t id, const std::string& name, bool recursiveSearch) const noexcept
+  Node* Node::findNode(nodeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
   {
     // Search in the direct children
     auto optr = this->pimpl();
@@ -445,14 +470,26 @@ namespace btk
     {
       Node* node = *it;
       if (node->pimpl()->castable(id) && (name.empty() || (node->name() == name)))
-        return node;
+      {
+        bool found = true;
+        for (auto it = properties.cbegin() ; it != properties.cend() ; ++it)
+        {
+          if (node->property(it->first) != it->second)
+          {
+            found = false;
+            break;
+          }
+        }
+        if (found)
+          return node;
+      }
     }
     // In case no corresponding child was found and the recursive search is actived, let's go deeper
     if (recursiveSearch)
     {
       for (auto it = optr->Children.cbegin() ; it != optr->Children.cend() ; ++it)
       {
-        Node* node = (*it)->findNode(id,name,recursiveSearch);
+        Node* node = (*it)->findNode(id,name,std::move(properties),recursiveSearch);
         if (node != nullptr)
           return node;
       }
@@ -463,42 +500,67 @@ namespace btk
   /**
    * Implementation of the findChildren method.
    */
-  void Node::findNodes(std::list<void*>* list, nodeid_t id, const std::string& name, bool recursiveSearch) const noexcept
+  void Node::findNodes(std::list<void*>* list, nodeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
   {
     // Search in the direct children
     auto optr = this->pimpl();
-    for (auto it = optr->Children.cbegin() ; it != optr->Children.cend() ; ++it)
+    for (auto itN = optr->Children.cbegin() ; itN != optr->Children.cend() ; ++itN)
     {
-      Node* node = *it;
+      Node* node = *itN;
       if (node->pimpl()->castable(id) && (name.empty() || (node->name() == name)))
-        list->emplace_back(node);
+      {
+        bool found = true;
+        for (auto itP = properties.cbegin() ; itP != properties.cend() ; ++itP)
+        {
+          if (node->property(itP->first) != itP->second)
+          {
+            found = false;
+            break;
+          }
+        }
+        if (found)
+          list->emplace_back(node);
+      }
+        
     }
     // In case the recursive search is actived, let's go deeper
     if (recursiveSearch)
     {
       for (auto it = optr->Children.cbegin() ; it != optr->Children.cend() ; ++it)
-        (*it)->findNodes(list,id,name,recursiveSearch);
+        (*it)->findNodes(list,id,name,std::move(properties),recursiveSearch);
     }
   };
   
   /**
    * Implementation of the findChildren method.
    */
-  void Node::findNodes(std::list<void*>* list, nodeid_t id, const std::regex& regexp, bool recursiveSearch) const noexcept
+  void Node::findNodes(std::list<void*>* list, nodeid_t id, const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
   {
     // Search in the direct children
     auto optr = this->pimpl();
-    for (auto it = optr->Children.cbegin() ; it != optr->Children.cend() ; ++it)
+    for (auto itN = optr->Children.cbegin() ; itN != optr->Children.cend() ; ++itN)
     {
-      Node* node = *it;
+      Node* node = *itN;
       if (node->pimpl()->castable(id) && std::regex_match(node->name(),regexp))
-        list->emplace_back(node);
+      {
+        bool found = true;
+        for (auto itP = properties.cbegin() ; itP != properties.cend() ; ++itP)
+        {
+          if (node->property(itP->first) != itP->second)
+          {
+            found = false;
+            break;
+          }
+        }
+        if (found)
+          list->emplace_back(node);
+      }
     }
     // In case the recursive search is actived, let's go deeper
     if (recursiveSearch)
     {
       for (auto it = optr->Children.cbegin() ; it != optr->Children.cend() ; ++it)
-        (*it)->findNodes(list,id,regexp,recursiveSearch);
+        (*it)->findNodes(list,id,regexp,std::move(properties),recursiveSearch);
     }
   };
   
