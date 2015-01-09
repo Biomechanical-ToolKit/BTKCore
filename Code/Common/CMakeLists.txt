@@ -3,7 +3,7 @@ SET(BTKCommon_SRCS
   # btkAnalog.cpp
   btkAny.cpp
   # btkDataObject.cpp
-  # btkEvent.cpp
+  btkEvent.cpp
   # btkForcePlatform.cpp
   # btkIMU.cpp
   btkLogger.cpp

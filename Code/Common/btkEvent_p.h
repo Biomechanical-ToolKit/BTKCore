@@ -33,37 +33,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkEvent_h
-#define __btkEvent_h
+#ifndef __btkEvent_p_h
+#define __btkEvent_p_h
 
-#include "btkNode.h"
+/*
+ * WARNING: This file and its content is not included in the public API and 
+ * can change drastically from one release to another.
+ */
+
+#include "btkNode_p.h"
+#include "btkProperty.h"
 
 namespace btk
 {
-  class EventPrivate;
-  
-  class BTK_COMMON_EXPORT Event : public Node
+  class Event;
+
+  class EventPrivate : public NodePrivate
   {
-    BTK_DECLARE_PIMPL_ACCESSOR(Event)
-    
+    BTK_DECLARE_PINT_ACCESSOR(Event)
+  
+    BTK_DECLARE_NODEID(Event, Node)
+    BTK_DECLARE_STATIC_PROPERTIES(Event, Node,
+      Property<Event,double>("time",&Event::time,&Event::setTime),
+      Property<Event,const std::string&>("context",&Event::context,&Event::setContext),
+      Property<Event,const std::string&>("subject",&Event::subject,&Event::setSubject)
+    )
+  
   public:
-    Event(const std::string& name, double time = 0.0, const std::string& context = {}, const std::string& subject = {}, Node* parent = nullptr);
-    ~Event() = default;
-    
-    Event(const Node& ) = delete;
-    Event(Node&& ) noexcept = delete;
-    Event& operator=(const Event& ) = delete;
-    Event& operator=(Event&& ) noexcept = delete;
-    
-    double time() const noexcept;
-    void setTime(double value) noexcept;
-    
-    const std::string& context() const noexcept;
-    void setContext(const std::string& value) noexcept;
-    
-    const std::string& subject() const noexcept;
-    void setSubject(const std::string& value) noexcept;
+    EventPrivate(Event* pint, const std::string& name, double time, const std::string& context, const std::string& subject);
+    double Time;
+    std::string Context;
+    std::string Subject;
   };
+
 };
 
 #endif // __btkEvent_h
