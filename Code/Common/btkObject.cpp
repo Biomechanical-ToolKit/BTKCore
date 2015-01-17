@@ -45,7 +45,7 @@
 namespace btk
 {
   ObjectPrivate::ObjectPrivate()
-  : Timestamp(0)
+  : Timestamp(0ul)
   {};
   
   ObjectPrivate::~ObjectPrivate() = default; // Cannot be inlined
