@@ -86,6 +86,8 @@ namespace btk
     template <typename T = Node*> std::list<T> findChildren(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept;
     template <typename T = Node*, typename U, typename = typename std::enable_if<std::is_same<std::regex, U>::value>::type> std::list<T> findChildren(const U& regexp, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept;
     
+    virtual void modified() noexcept;
+    
   protected:
     void attachParent(Node* node) noexcept;
     void detachParent(Node* node) noexcept;

@@ -5,6 +5,28 @@
 
 CXXTEST_SUITE(NodeTest)
 {
+  CXXTEST_TEST(Modified)
+  {
+    btk::Node root("root");
+    root.modified(); // To grab the last modified timestamp;
+    unsigned long ts = root.timestamp();
+    
+    btk::Node branchA("branchA",&root);
+    btk::Node leafA1("leafA1",&branchA);
+    btk::Node leafA2("leafA2",&branchA);
+    btk::Node branchB("branchB",&root);
+    btk::Node leafB1("leafB1",&branchB);
+    btk::Node leafB2("leafB2",&branchB);
+    
+    TS_ASSERT_EQUALS(root.timestamp(),ts+10ul);
+    TS_ASSERT_EQUALS(branchA.timestamp(),ts+4ul);
+    TS_ASSERT_EQUALS(leafA1.timestamp(),0ul);
+    TS_ASSERT_EQUALS(leafA2.timestamp(),0ul);
+    TS_ASSERT_EQUALS(branchB.timestamp(),ts+9ul);
+    TS_ASSERT_EQUALS(leafB1.timestamp(),0ul);
+    TS_ASSERT_EQUALS(leafB2.timestamp(),0ul);
+  }
+  
   CXXTEST_TEST(StaticProperty)
   {
     btk::Node node("foo");
@@ -182,6 +204,7 @@ CXXTEST_SUITE(NodeTest)
 };
 
 CXXTEST_SUITE_REGISTRATION(NodeTest)
+CXXTEST_TEST_REGISTRATION(NodeTest, Modified)
 CXXTEST_TEST_REGISTRATION(NodeTest, StaticProperty)
 CXXTEST_TEST_REGISTRATION(NodeTest, DynamicProperty)
 CXXTEST_TEST_REGISTRATION(NodeTest, InheritingClassWithStaticProperty)

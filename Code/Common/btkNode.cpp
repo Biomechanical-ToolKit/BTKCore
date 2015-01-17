@@ -326,6 +326,14 @@ namespace btk
     node->appendChild(this);
   };  
   
+  void Node::modified() noexcept
+  {
+    auto optr = this->pimpl();
+    this->Object::modified();
+    for (auto& parent : optr->Parents)
+      parent->modified();
+  };
+  
   /**
    * Checks if @a node is already a parent and add it if it is not the case.
    * In case @a node is already a parent a warning message is send to the message logger.
