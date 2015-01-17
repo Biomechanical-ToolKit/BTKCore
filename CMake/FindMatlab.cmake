@@ -22,7 +22,7 @@
 #  - C/C++ source files;
 #  - third libraries required.
 
-# Copyright (c) 2009-2014 Arnaud Barré <arnaud.barre@gmail.com>
+# Copyright (c) 2009-2015 Arnaud Barré <arnaud.barre@gmail.com>
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
