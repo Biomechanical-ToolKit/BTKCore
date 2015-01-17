@@ -74,6 +74,34 @@ namespace btk
    *  - subject
    *  - description
    *
+   * A time can be positive, null, or negative. The null time indicates the start of the recording, while a negative and postive time corresponds to an event before and after the beginning of the recording, respectively.
+   *
+   * There is no standard for the definition of a context. However, it is common to use the following context for task analysis:
+   * - Right: Any event associated with the right side of the (human) body
+   * - Left: Any event associated with the left side of the (human) body
+   * - General: Any other event which cannot be assigned to the left or the right side of the body
+   * The role of the context may be important or not depending of your later data processing/analysis.
+   * For example, inside a clinical gait analysis you can have several "Foot Strike" and "Foot Off" events assigned to the "Right" and "Left" sides.
+   * You could want to retrieve the events by name or by context or both. Thus, choosing a common orthography could help you as well as other researchers.
+   * The previous example could be implemented like in the following code. The important thing to remind is the case used for any string assigned (name, context, subject, ...)
+   *
+   * @code
+   * // Several events are defined in the node "Events".
+   * // A algorithm could have generated the following events
+   * btk::Node* events = new btk::Node("Events");
+   * new btk::Event("Foot Strike",1.3,"Right","JDoe",&events);
+   * new btk::Event("Foot Off",2.4,"Right","JDoe",&events);
+   * new btk::Event("Foot Strike",1.8,"Left","JDoe",&events);
+   * new btk::Event("Foot Off",3.0,"Left","JDoe",&events);
+   * // Later in the code, you could retrive only:
+   * // Events with the context "Right"
+   * std::list<btk::Event*> rightEvents = events.findChild<btk::Event*>({},{{"context","Right"}});
+   * // Events with the name "Foot Strike"
+   * std::list<btk::Event*> footStrikeEvents = events.findChild<btk::Event*>("Foot Strike");
+   * @endcode
+   *
+   * The subject's identification is used to distinguish events between subject which are in the same trial (if any).
+   *
    * @ingroup BTKCommon
    */
   
@@ -85,14 +113,21 @@ namespace btk
   {};
   
   /**
-   * Returns associated
+   * Returns the time associated with this event.
+   * The time can be positive, null, or negative.
+   * The null time indicates the start of the recording, while a negative and postive time corresponds to an event before and after the beginning of the recording, respectively.
    */
   double Event::time() const noexcept
   {
     auto optr = this->pimpl();
     return optr->Time;
   };
-  
+
+  /**
+   * Sets the time associated with an event.
+   * The time can be positive, null, or negative.
+   * The null time indicates the start of the recording, while a negative and postive time corresponds to an event before and after the beginning of the recording, respectively.
+   */
   void Event::setTime(double value) noexcept
   {
     auto optr = this->pimpl();
@@ -102,12 +137,26 @@ namespace btk
     this->modified();
   };
   
+  /**
+   * Returns the context associated with this event.
+   * There is no standard for the definition of a context. However, it is common to use the following context for task analysis:
+   * - Right: Any event associated with the right side of the (human) body
+   * - Left: Any event associated with the left side of the (human) body
+   * - General: Any other event which cannot be assigned to the left or the right side of the body
+   */
   const std::string& Event::context() const noexcept
   {
     auto optr = this->pimpl();
     return optr->Context;
   };
   
+  /**
+   * Sets the context associated with this event.
+   * There is no standard for the definition of a context. However, it is common to use the following context for task analysis:
+   * - Right: Any event associated with the right side of the (human) body
+   * - Left: Any event associated with the left side of the (human) body
+   * - General: Any other event which cannot be assigned to the left or the right side of the body
+   */
   void Event::setContext(const std::string& value) noexcept
   {
     auto optr = this->pimpl();
@@ -117,12 +166,18 @@ namespace btk
     this->modified();
   };
   
+  /**
+   * Return the subject's identification.
+   */
   const std::string& Event::subject() const noexcept
   {
     auto optr = this->pimpl();
     return optr->Subject;
   };
   
+ /**
+  * Sets the subject's identification.
+  */
   void Event::setSubject(const std::string& value) noexcept
   {
     auto optr = this->pimpl();
