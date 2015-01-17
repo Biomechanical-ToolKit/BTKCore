@@ -14,7 +14,7 @@ SET(BTKCommon_SRCS
   btkObject.cpp
   # btkPoint.cpp
   # btkProcessObject.cpp
-  # btkTimeSequence.cpp
+  btkTimeSequence.cpp
   # btkTriangleMesh.cpp
   # btkWrench.cpp
 )
