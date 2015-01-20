@@ -48,7 +48,6 @@ namespace btk
   public:
     ObjectPrivate();
     virtual ~ObjectPrivate();
-    // virtual ObjectPrivate* clone() const;
     
     ObjectPrivate(const ObjectPrivate& ) = delete;
     ObjectPrivate(ObjectPrivate&& ) noexcept = delete;
