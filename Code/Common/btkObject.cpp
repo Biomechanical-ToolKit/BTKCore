@@ -268,7 +268,7 @@ namespace btk
   : mp_Pimpl(new ObjectPrivate)
   {};
   
-  Object::Object(ObjectPrivate& impl) noexcept
-  : mp_Pimpl(&impl)
+  Object::Object(ObjectPrivate& pimpl) noexcept
+  : mp_Pimpl(&pimpl)
   {};
 };
