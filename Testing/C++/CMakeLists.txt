@@ -10,7 +10,7 @@ SET(TDD_SRCS
   # _TDDBasicFilters.cpp
   _TDDCommon.cpp
   # _TDDExtras.cpp
-  # _TDDIO.cpp
+  _TDDIO.cpp
   )
 
 # The CxxTest library included with BTK is modified.
@@ -19,7 +19,7 @@ INCLUDE(${BTK_SOURCE_DIR}/Utilities/CxxTest/CxxTest.cmake)
 
 ADD_EXECUTABLE(TDD ${TDD_SRCS})
 
-TARGET_LINK_LIBRARIES(TDD Common)
+TARGET_LINK_LIBRARIES(TDD Common IO)
 
 ADD_TEST(TDD_C++ ${BTK_EXECUTABLE_PATH}/TDD)
 
