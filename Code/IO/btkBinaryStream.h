@@ -40,7 +40,9 @@
 #include "btkEndianFormat.h"
 #include "btkOpaque.h"
 
+#include <cstdint>
 #include <string>
+#include <memory> // std::unique_ptr
 
 namespace btk
 {
