@@ -48,7 +48,7 @@ namespace btk
     
   public:
     Event(const std::string& name, double time = 0.0, const std::string& context = {}, const std::string& subject = {}, Node* parent = nullptr);
-    ~Event() = default;
+    ~Event() noexcept;
     
     Event(const Node& ) = delete;
     Event(Node&& ) noexcept = delete;

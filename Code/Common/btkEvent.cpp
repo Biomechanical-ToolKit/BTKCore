@@ -47,6 +47,8 @@ namespace btk
   EventPrivate::EventPrivate(Event* pint, const std::string& name, double time, const std::string& context, const std::string& subject)
   : NodePrivate(pint,name), Time(time), Context(context), Subject(subject)
   {};
+  
+  EventPrivate::~EventPrivate() noexcept = default;
 };
 
 // -------------------------------------------------------------------------- //
@@ -111,6 +113,11 @@ namespace btk
   Event::Event(const std::string& name, double time, const std::string& context, const std::string& subject, Node* parent)
   : Node(*new EventPrivate(this,name,time,context,subject),parent)
   {};
+  
+  /**
+   * Destructor (default)
+   */
+  Event::~Event() noexcept = default;
   
   /**
    * Returns the time associated with this event.

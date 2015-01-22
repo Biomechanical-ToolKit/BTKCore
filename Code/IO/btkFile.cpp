@@ -61,7 +61,7 @@ namespace btk
   : IODevicePrivate(), Buffer(new MemoryMappedBuffer)
   {};
   
-  FilePrivate::~FilePrivate()
+  FilePrivate::~FilePrivate() noexcept
   {
     if (this->Buffer->isOpen() && !this->Buffer->close())
       Logger::error("An error occurred when closing the file device. The data inside the file might be corrupted.");
@@ -436,7 +436,7 @@ namespace btk
   /**
    * Destructor (default).
    */
-  File::~File() = default;
+  File::~File() noexcept = default;
   
   /**
    * Open the given @a fileName with the specified @a mode.

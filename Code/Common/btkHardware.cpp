@@ -46,6 +46,8 @@ namespace btk
   HardwarePrivate::HardwarePrivate(Hardware* pint, const std::string& name)
   : NodePrivate(pint,name), MeasurandsTimestamp(0ul)
   {};
+  
+  HardwarePrivate::~HardwarePrivate() noexcept = default;
 };
 
 // -------------------------------------------------------------------------- //
@@ -69,6 +71,11 @@ namespace btk
   Hardware::Hardware(const std::string& name, Node* parent)
   : Node(*new HardwarePrivate(this,name),parent)
   {};
+  
+  /**
+   * Destructor (default)
+   */
+  Hardware::~Hardware() noexcept = default;
   
   /**
    * Convenient method to extract time sequences associated with the signals recorded by the hardware

@@ -47,7 +47,7 @@ namespace btk
   {
   public:
     ObjectPrivate();
-    virtual ~ObjectPrivate();
+    virtual ~ObjectPrivate() noexcept;
     
     ObjectPrivate(const ObjectPrivate& ) = delete;
     ObjectPrivate(ObjectPrivate&& ) noexcept = delete;

@@ -49,7 +49,7 @@ namespace btk
   : Device(device), Converter(converter)
   {};
   
-  BinaryStreamPrivate::~BinaryStreamPrivate() = default; // Cannot be inlined
+  BinaryStreamPrivate::~BinaryStreamPrivate() noexcept = default;
 }
 
 // -------------------------------------------------------------------------- //
@@ -85,7 +85,7 @@ namespace btk
   /**
    * Destructor. Delete the converter associated with the stream
    */
-  BinaryStream::~BinaryStream()
+  BinaryStream::~BinaryStream() noexcept
   {
     delete this->mp_Pimpl->Converter;
   };

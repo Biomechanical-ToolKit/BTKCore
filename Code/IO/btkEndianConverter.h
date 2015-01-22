@@ -86,7 +86,7 @@ namespace btk
   class BTK_IO_EXPORT EndianConverter
   {
   public:
-    virtual ~EndianConverter() = default;
+    virtual ~EndianConverter() noexcept = default;
     
     EndianConverter(const EndianConverter& ) = delete;
     EndianConverter(EndianConverter&& ) noexcept = delete;

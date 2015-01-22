@@ -50,7 +50,7 @@ namespace btk
   {
   public:
     BinaryStreamPrivate(IODevice* device, EndianConverter* converter);
-    virtual ~BinaryStreamPrivate();
+    virtual ~BinaryStreamPrivate() noexcept;
     
     BinaryStreamPrivate(const BinaryStreamPrivate& ) = delete;
     BinaryStreamPrivate(BinaryStreamPrivate&& ) noexcept = delete;

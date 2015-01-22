@@ -71,7 +71,7 @@ namespace btk
   {
   public:
     FilePrivate();
-    virtual ~FilePrivate();
+    ~FilePrivate() noexcept;
     
     FilePrivate(const FilePrivate& ) = delete;
     FilePrivate(FilePrivate&& ) noexcept = delete;
@@ -85,7 +85,7 @@ namespace btk
   {
   public:
     MemoryMappedBuffer() noexcept;
-    ~MemoryMappedBuffer() {this->close();};
+    ~MemoryMappedBuffer() noexcept {this->close();};
     
     MemoryMappedBuffer* open(const char* s, File::OpenMode mode) noexcept;
     bool isOpen() const noexcept {return !(this->m_File == _BTK_MMFILEBUF_NO_FILE);};

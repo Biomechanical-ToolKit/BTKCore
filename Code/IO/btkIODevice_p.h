@@ -49,7 +49,7 @@ namespace btk
   {
   public:
     IODevicePrivate();
-    virtual ~IODevicePrivate();
+    virtual ~IODevicePrivate() noexcept;
     
     IODevicePrivate(const IODevicePrivate& ) = delete;
     IODevicePrivate(IODevicePrivate&& ) noexcept = delete;

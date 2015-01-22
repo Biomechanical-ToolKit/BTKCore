@@ -58,7 +58,7 @@ namespace btk
     
   public:
     Node(const std::string& name, Node* parent = nullptr);
-    virtual ~Node();
+    virtual ~Node() noexcept;
     
     Node(const Node& ) = delete;
     Node(Node&& ) noexcept = delete;

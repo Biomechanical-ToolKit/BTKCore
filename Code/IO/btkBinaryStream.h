@@ -56,7 +56,7 @@ namespace btk
   public:
     BinaryStream(IODevice* device = 0);
     BinaryStream(IODevice* device, EndianFormat format);
-    ~BinaryStream();
+    ~BinaryStream() noexcept;
     
     BinaryStream(const BinaryStream& ) = delete;
     BinaryStream(BinaryStream&& ) noexcept = delete;

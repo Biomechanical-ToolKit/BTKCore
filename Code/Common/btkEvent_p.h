@@ -61,6 +61,7 @@ namespace btk
   
   public:
     EventPrivate(Event* pint, const std::string& name, double time, const std::string& context, const std::string& subject);
+    ~EventPrivate() noexcept;
     double Time;
     std::string Context;
     std::string Subject;

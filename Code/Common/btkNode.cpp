@@ -55,8 +55,7 @@ namespace btk
   : ObjectPrivate(), mp_Pint(pint), Name(name), Description(), Properties(), Parents(), Children()
   {};
   
-  NodePrivate::~NodePrivate() noexcept
-  {};
+  NodePrivate::~NodePrivate() noexcept = default;
   
   bool NodePrivate::castable(nodeid_t id) const noexcept
   {
@@ -141,7 +140,7 @@ namespace btk
    * Detach this object of these children. In case a child has no more parent, it is deleted.
    * Detach also this object of these parents
    */
-  Node::~Node()
+  Node::~Node() noexcept
   {
     auto optr = this->pimpl();
     for (std::list<Node*>::iterator it = optr->Children.begin() ; it != optr->Children.end() ; ++it)

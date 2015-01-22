@@ -55,6 +55,7 @@ namespace btk
   
   public:
     HardwarePrivate(Hardware* pint, const std::string& name);
+    ~HardwarePrivate() noexcept;
     
     unsigned long MeasurandsTimestamp;
   };

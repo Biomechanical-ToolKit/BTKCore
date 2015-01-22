@@ -46,7 +46,7 @@ namespace btk
   : State(IODevice::GoodBit), Exception(IODevice::GoodBit)
   {};
   
-  IODevicePrivate::~IODevicePrivate() = default; // Cannot be inlined
+  IODevicePrivate::~IODevicePrivate() noexcept = default; // Cannot be inlined
 }
 
 // -------------------------------------------------------------------------- //
@@ -72,8 +72,7 @@ namespace btk
    * Destructor. 
    * This methods does nothing. It is the responsability of the inherited class to decide if their destructor does something specific regarding the state of the device (like closing it).
    */
-  IODevice::~IODevice() noexcept
-  {};
+  IODevice::~IODevice() noexcept = default;
   
   /**
    * Returns true if the device's state is set to GoodBit.

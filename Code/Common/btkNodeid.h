@@ -51,7 +51,7 @@ namespace btk
   {
   public:
     nodeid_t() = delete;
-    ~nodeid_t() = default;
+    ~nodeid_t() noexcept = default;
     nodeid_t(const nodeid_t& ) = default;
     nodeid_t(nodeid_t&& ) noexcept = default;
     nodeid_t& operator=(const nodeid_t& ) = default;

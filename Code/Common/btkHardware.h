@@ -49,7 +49,7 @@ namespace btk
     
   public:
     Hardware(const std::string& name, Node* parent = nullptr);
-    ~Hardware() = default;
+    ~Hardware() noexcept;
     
     Hardware(const Hardware& ) = delete;
     Hardware(Hardware&& ) noexcept = delete;

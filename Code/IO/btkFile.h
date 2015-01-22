@@ -51,7 +51,7 @@ namespace btk
   public:
     File();
     File(const std::string& fileName, OpenMode mode);
-    ~File();
+    ~File() noexcept;
     
     File(const File& ) = delete;
     File(File&& ) noexcept = delete;

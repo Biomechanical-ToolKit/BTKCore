@@ -49,7 +49,7 @@ namespace btk
   public:
     TimeSequence(unsigned component, unsigned samples, const std::string& name, double rate, const std::string& unit, double startTime = 0.0, Node* parent = nullptr);
     TimeSequence(const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, double startTime = 0.0, Node* parent = nullptr);
-    ~TimeSequence() = default;
+    ~TimeSequence() noexcept;
     
     TimeSequence(const TimeSequence& ) = delete;
     TimeSequence(TimeSequence&& ) noexcept = delete;
