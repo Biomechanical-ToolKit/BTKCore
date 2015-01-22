@@ -164,7 +164,7 @@ namespace btk
    */
   EndianFormat VAXLittleEndianConverter::format() const noexcept
   {
-    return VAXLittleEndian;
+    return EndianFormat::VAXLittleEndian;
   };
 
   /** 
@@ -416,7 +416,7 @@ namespace btk
    */
   EndianFormat IEEEBigEndianConverter::format() const noexcept
   {
-    return IEEEBigEndian;
+    return EndianFormat::IEEEBigEndian;
   };
   
   /** 
@@ -668,7 +668,7 @@ namespace btk
    */
   EndianFormat IEEELittleEndianConverter::format() const noexcept
   {
-    return IEEELittleEndian;
+    return EndianFormat::IEEELittleEndian;
   };
   
   /** 

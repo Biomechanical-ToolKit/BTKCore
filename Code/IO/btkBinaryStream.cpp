@@ -137,13 +137,13 @@ namespace btk
     }
     switch (format)
     {
-    case VAXLittleEndian:
+    case EndianFormat::VAXLittleEndian:
       optr->Converter = new VAXLittleEndianConverter;
       break;
-    case IEEELittleEndian:
+    case EndianFormat::IEEELittleEndian:
       optr->Converter = new IEEELittleEndianConverter;
       break;
-    case IEEEBigEndian:
+    case EndianFormat::IEEEBigEndian:
       optr->Converter = new IEEEBigEndianConverter;
       break;
     default: // Should be impossible

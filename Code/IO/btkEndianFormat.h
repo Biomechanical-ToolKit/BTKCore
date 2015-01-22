@@ -38,7 +38,7 @@
 
 namespace btk
 {
-  typedef enum {VAXLittleEndian, IEEELittleEndian, IEEEBigEndian} EndianFormat;
+  enum class EndianFormat {VAXLittleEndian, IEEELittleEndian, IEEEBigEndian};
 
   /**
    * @enum EndianFormat
