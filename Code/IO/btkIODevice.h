@@ -90,7 +90,7 @@ namespace btk
     
     // State
     bool isGood() const noexcept;
-    bool isEnd() const noexcept;
+    bool atEnd() const noexcept;
     bool hasFailure() const noexcept;
     bool hasError() const noexcept;
     State state() const noexcept;

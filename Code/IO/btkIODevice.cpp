@@ -86,7 +86,7 @@ namespace btk
   /**
    * Returns true if the device's state contain the flag EndBit.
    */
-  bool IODevice::isEnd() const noexcept
+  bool IODevice::atEnd() const noexcept
   {
     auto optr = this->pimpl();
     return (this->state() & EndBit) != 0;
