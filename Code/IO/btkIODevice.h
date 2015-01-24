@@ -40,8 +40,8 @@
 #include "btkOpaque.h"
 #include "btkException.h"
 
-#include <memory> // unique_ptr
-#include <ios>
+#include <memory> // std::unique_ptr
+#include <ios> // std::streamsize, std::streamoff, std::streampos
 
 namespace btk
 {
@@ -52,27 +52,13 @@ namespace btk
     BTK_DECLARE_PIMPL_ACCESSOR(IODevice)
     
   public:
-    typedef std::ios_base::iostate State;
-    static const State EndBit = std::ios_base::eofbit;
-    static const State FailBit = std::ios_base::failbit;
-    static const State ErrorBit = std::ios_base::badbit;
-    static const State GoodBit = std::ios_base::goodbit;
-
-    typedef std::ios_base::seekdir SeekDir;
-    static const SeekDir Begin = std::ios_base::beg;
-    static const SeekDir Current = std::ios_base::cur;
-    static const SeekDir End = std::ios_base::end;
+    enum class Mode : int {In = 0x01, Out = 0x02, Append = 0x04, Truncate = 0x08, End = 0x10};
+    enum class Origin : int {Begin, Current, End};
+    enum class State : int {End = 0x01, Fail = 0x02, Error = 0x04, Good = 0x00};
     
-    typedef std::ios_base::openmode OpenMode;
-    static const OpenMode In = std::ios_base::in;
-    static const OpenMode Out = std::ios_base::out;
-    static const OpenMode Append = std::ios_base::app;
-    static const OpenMode Truncate = std::ios_base::trunc;
-    static const OpenMode AtEnd = std::ios_base::ate;
-    
-    typedef std::streamsize Size;
-    typedef std::streamoff Offset;
-    typedef std::streampos Position;
+    using Offset = std::streamoff;
+    using Position = std::streampos;
+    using Size = std::streamsize;
     
     class Failure : public Exception
     {
@@ -95,7 +81,7 @@ namespace btk
     bool hasError() const noexcept;
     State state() const noexcept;
     void setState(State state);
-    void clear(State state = GoodBit);
+    void clear(State state = State::Good);
     State exceptions() noexcept;
     void setExceptions(State mask);
     
@@ -107,19 +93,48 @@ namespace btk
     virtual void write(const char* s, Size n) = 0;
     
     // Random access IO device only
-    virtual void seek(Offset offset, SeekDir dir) = 0;
+    virtual void seek(Offset offset, Origin whence) = 0;
     virtual Position tell() const noexcept = 0;
     
     // Sequential IO only
     virtual bool isSequential() const noexcept = 0;
     
   protected:
-    virtual bool verifyOpenMode(OpenMode mode);
+    virtual bool verifyMode(Mode mode);
     
     IODevice() noexcept;
     IODevice(IODevicePrivate& pimpl) noexcept;
    
     std::unique_ptr<IODevicePrivate> mp_Pimpl;
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
+  inline constexpr IODevice::State operator& (IODevice::State lhs, IODevice::State rhs)
+  {
+    return static_cast<IODevice::State>(static_cast<int>(lhs) & static_cast<int>(rhs));
+  };
+  
+  inline constexpr IODevice::State operator| (IODevice::State lhs, IODevice::State rhs)
+  {
+    return static_cast<IODevice::State>(static_cast<int>(lhs) | static_cast<int>(rhs));
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
+  inline constexpr IODevice::Mode operator& (IODevice::Mode lhs, IODevice::Mode rhs)
+  {
+    return static_cast<IODevice::Mode>(static_cast<int>(lhs) & static_cast<int>(rhs));
+  };
+
+  inline constexpr IODevice::Mode operator| (IODevice::Mode lhs, IODevice::Mode rhs)
+  {
+    return static_cast<IODevice::Mode>(static_cast<int>(lhs) | static_cast<int>(rhs));
+  };
+  
+  inline constexpr IODevice::Mode operator~ (IODevice::Mode x)
+  {
+    return IODevice::Mode(~static_cast<int>(x));
   };
 };
 

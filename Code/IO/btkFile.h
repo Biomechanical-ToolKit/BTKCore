@@ -57,15 +57,15 @@ namespace btk
     File& operator=(const File& ) = delete;
     File& operator=(File&& ) noexcept = delete;
     
-    void open(const std::string& fileName, OpenMode mode);
-    virtual bool isOpen() const noexcept;
-    virtual void close();
-    virtual void read(char* s, Size n);
-    virtual void write(const char* s, Size n);
-    virtual void seek(Offset offset, SeekDir dir);
-    virtual Position tell() const noexcept;
-    virtual bool isSequential() const noexcept;
+    void open(const std::string& fileName, Mode mode);
+    virtual bool isOpen() const noexcept override;
+    virtual void close() override;
     virtual Size peek(char* s, Size n) const override;
+    virtual void read(char* s, Size n) override;
+    virtual void write(const char* s, Size n) override;
+    virtual void seek(Offset offset, Origin whence) override;
+    virtual Position tell() const noexcept override;
+    virtual bool isSequential() const noexcept override;
     
     const char* data() const noexcept;
     Size size() const noexcept;

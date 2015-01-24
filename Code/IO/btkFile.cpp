@@ -37,7 +37,7 @@
 #include "btkFile_p.h"
 #include "btkConfigure.h"
 #include "btkLogger.h"
-  
+
 #if defined(HAVE_SYS_MMAP)
   #if defined(HAVE_64_BIT)
     #ifndef _LARGEFILE_SOURCE
@@ -93,27 +93,26 @@ namespace btk
   /**
    * Open the file with the given filename @a s and the options @a mode.
    */
-  MemoryMappedBuffer* MemoryMappedBuffer::open(const char* s, File::OpenMode mode) noexcept
+  MemoryMappedBuffer* MemoryMappedBuffer::open(const char* s, Mode mode) noexcept
   {
-    assert(mode & ~std::ios_base::binary); // Impossible as binary is not proposed!
     if (this->isOpen())
       return 0;
-    File::OpenMode m = mode & (~File::AtEnd);
-    this->m_Writing = (m & File::Out) != 0;
+    Mode m = mode & ~Mode::End;
+    this->m_Writing = (m & Mode::Out) == Mode::Out;
     // Open the file and map it into the memory
     // The flags' extraction is inspired by the file fstream.cxx from the Comeau Computing library
 #if defined(HAVE_SYS_MMAP) // POSIX
     // Select the flags for the function open
     int flags = 0;
-    if ((m == File::Out) || (m == File::Out + File::Truncate))
+    if ((m == Mode::Out) || (m == (Mode::Out | Mode::Truncate)))
       flags = O_RDWR | O_CREAT | O_TRUNC;
-    else if (m == File::Out + File::Append)
+    else if (m == (Mode::Out | Mode::Append))
       flags = O_WRONLY | O_CREAT | O_APPEND;
-    else if (m == File::In)
+    else if (m == Mode::In)
       flags = O_RDONLY;
-    else if (m == File::In + File::Out)
+    else if (m == (Mode::In | Mode::Out))
       flags = O_RDWR;
-    else if (m == File::In + File::Out + File::Truncate)
+    else if (m == (Mode::In | Mode::Out | Mode::Truncate))
       flags = O_RDWR | O_CREAT | O_TRUNC;
     else // Other flags are not supported in the C++ standard
       return 0;
@@ -141,25 +140,25 @@ namespace btk
     dwFlagsandAttributes = FILE_ATTRIBUTE_TEMPORARY;
     switch(m)
     {
-    case File::Out:
+    case Mode::Out:
       dwCreationDisposition = OPEN_ALWAYS;
       break;
-    case File::Out + File::Truncate:
+    case (Mode::Out | Mode::Truncate):
       dwCreationDisposition = CREATE_ALWAYS;
       break;
-    case File::Out + File::Append:
+    case (Mode::Out | Mode::Append):
       dwCreationDisposition = OPEN_ALWAYS;
       break;
-    case File::In:
+    case Mode::In:
       dwDesiredAccess = GENERIC_READ;
       dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE; // Is it a good idea to give the possibility to other processes to write in the file that we are reading?
       dwCreationDisposition = OPEN_EXISTING;
       dwFlagsandAttributes = FILE_ATTRIBUTE_READONLY;
       break;
-    case File::In + File::Out:
+    case Mode::In | Mode::Out:
       dwCreationDisposition = OPEN_ALWAYS;
       break;
-    case File::In + File::Out + File::Truncate:
+    case Mode::In | Mode::Out | Mode::Truncate:
       dwCreationDisposition = TRUNCATE_EXISTING;
       break;
     default: // Other flags are not supported in the C++ standard
@@ -185,14 +184,14 @@ namespace btk
         return this->close();
     }
 #endif
+    this->m_Offset = 0;
+    
     // Map the file
     if (!this->map())
       return this->close();
-      
-    this->m_Offset = 0;
     
-    // If necessary go to the end of the file (AtEnd option)
-    if ((mode & File::AtEnd) && (this->seek(0,File::End) == File::Position(File::Offset(-1))))
+    // If necessary go to the end of the file (End option)
+    if (((mode & Mode::End) == Mode::End) && (this->seek(0,Origin::End) == Position(Offset(-1))))
     {
       this->close();
       return 0;
@@ -271,21 +270,21 @@ namespace btk
    * Sets internal position pointer to relative position.
    * @return The new position value of the modified position pointer. Errors are expected to be signaled by an invalid position value, like -1.
    */
-  File::Position MemoryMappedBuffer::seek(File::Offset off, File::SeekDir way) noexcept
+  MemoryMappedBuffer::Position MemoryMappedBuffer::seek(Offset off, Origin whence) noexcept
   {
-    switch(way)
+    switch(whence)
     {
-    case File::Begin:
+    case Origin::Begin:
       if (off < 0)
         return -1;
       this->m_Offset = off;
       break;
-    case File::Current:
+    case Origin::Current:
       if (this->m_Offset + off < 0)
         return -1;
       this->m_Offset += off;
       break;
-    case File::End:
+    case Origin::End:
       if (this->m_DataSize + off < 0)
         return -1;
       this->m_Offset = this->m_DataSize + off;
@@ -300,7 +299,7 @@ namespace btk
   * Returns a sequence of characters
   * @return The number of characters gotten.
   */
-  File::Size MemoryMappedBuffer::peek(char* s, File::Size n) const noexcept
+  MemoryMappedBuffer::Size MemoryMappedBuffer::peek(char* s, Size n) const noexcept
   {
     n = (((this->m_Offset + n) == 0) || ((this->m_Offset + n) > this->m_DataSize)) ? ((this->m_DataSize - this->m_Offset) > 0 ? this->m_DataSize - this->m_Offset : 0) : n;
     for (Offset i = 0 ; i < n ; ++i)
@@ -309,10 +308,10 @@ namespace btk
   };
   
   /**
-   * Get sequence of characters
-   * @return The number of characters gotten, returned as a value of type streamsize.
+   * Get a sequence of characters and modify the internal offset based on the number of characters read.
+   * @return The number of characters gotten.
    */
-  File::Size MemoryMappedBuffer::read(char* s, File::Size n) noexcept
+  MemoryMappedBuffer::Size MemoryMappedBuffer::read(char* s, Size n) noexcept
   {
     n = this->peek(s,n);
     this->m_Offset += n;
@@ -321,9 +320,9 @@ namespace btk
   
   /**
    * Write a sequence of characters
-   * @return The number of characters written, returned as a value of type streamsize.
+   * @return The number of characters written.
    */
-  File::Size MemoryMappedBuffer::write(const char* s, File::Size n) noexcept
+  MemoryMappedBuffer::Size MemoryMappedBuffer::write(const char* s, Size n) noexcept
   {
     while ((this->m_Offset + n) > this->m_DataSize) 
     {
@@ -331,7 +330,7 @@ namespace btk
         return 0;
     }
     
-    for (File::Offset i = 0 ; i < n ; ++i)
+    for (Offset i = 0 ; i < n ; ++i)
       this->mp_Data[this->m_Offset + i] = s[i];
     this->m_Offset += n;
     
@@ -422,7 +421,7 @@ namespace btk
    *
    * Internally this class uses automatically a buffer mapped into computer's memory (see https://en.wikipedia.org/wiki/Memory-mapped_file).
    *
-   * @warning Currently the OpenMode Append has no effect on this device.
+   * @warning Currently the Mode Append has no effect on this device.
    *
    * @ingroup BTKIO
    */
@@ -443,13 +442,13 @@ namespace btk
    * Open the given @a fileName with the specified @a mode.
    * @note To open a file, the device has to be first closed if a previous file was already opened.
    */
-  void File::open(const std::string& fileName, OpenMode mode)
+  void File::open(const std::string& fileName, Mode mode)
   {
-    if (this->verifyOpenMode(mode))
+    if (this->verifyMode(mode))
     {
       auto optr = this->pimpl();
       if (!optr->Buffer->open(fileName.c_str(), mode))
-        this->setState(FailBit);
+        this->setState(State::Fail);
       else
         this->clear();
     }
@@ -465,13 +464,13 @@ namespace btk
   };
   
   /**
-   * The use of this method without any file associated will set the FailBit to true.
+   * The use of this method without any file associated will set the State::Fail to true.
    */
   void File::close()
   {
     auto optr = this->pimpl();
     if (!optr->Buffer->close())
-      this->setState(FailBit);
+      this->setState(State::Fail);
   };
   
   /**
@@ -486,38 +485,38 @@ namespace btk
   
   /**
    * Gets from the device a sequence of characters of size @a n and store it in @a s. 
-   * The FailBit state flag is set if any issue happens during the reading operation. 
-   * In case the number or characters read does not correspond to the number of characters to read @a n, the EndBit state flag is also set.
+   * The State::Fail state flag is set if any issue happens during the reading operation. 
+   * In case the number or characters read does not correspond to the number of characters to read @a n, the State::End state flag is also set.
    */
   void File::read(char* s, Size n)
   {
     auto optr = this->pimpl();
     if (optr->Buffer->read(s,n) != n)
-      this->setState(FailBit | EndBit);
+      this->setState(State::Fail | State::End);
   };
   
   /**
    * Puts the sequence of characters @a s of size @a n to the device.
-   * The ErrorBit state flag is set if any issue happens during the wrting operation.
-   * In case you attempt to write on the device while it is open in read-only mode, the FailBit state flag will be set. 
+   * The State::Error state flag is set if any issue happens during the wrting operation.
+   * In case you attempt to write on the device while it is open in read-only mode, the State::Fail state flag will be set. 
    */
   void File::write(const char* s, Size n)
   {
     auto optr = this->pimpl();
     if (!optr->Buffer->hasWriteMode()) // Read-only?
-      this->setState(FailBit);
+      this->setState(State::Fail);
     else if (optr->Buffer->write(s,n) != n)
-      this->setState(ErrorBit);
+      this->setState(State::Error);
   };
   
   /**
    * Moves the internal pointer of the given @a offset in the given direction @a dir.
    */
-  void File::seek(Offset offset, SeekDir dir)
+  void File::seek(Offset offset, Origin whence)
   {
     auto optr = this->pimpl();
-    if (!this->hasFailure() && (optr->Buffer->seek(offset, dir) == Position(Offset(-1))))
-      this->setState(FailBit);
+    if (!this->hasFailure() && (optr->Buffer->seek(offset, whence) == Position(Offset(-1))))
+      this->setState(State::Fail);
   };
   
   /**
@@ -526,7 +525,7 @@ namespace btk
   File::Position File::tell() const noexcept
   {
     auto optr = this->pimpl();
-    return !this->hasFailure() ? optr->Buffer->seek(0, Current) : Position(Offset(-1));
+    return !this->hasFailure() ? optr->Buffer->seek(0, Origin::Current) : Position(Offset(-1));
   };
   
   /**

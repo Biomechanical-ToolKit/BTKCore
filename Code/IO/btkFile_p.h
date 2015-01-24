@@ -84,23 +84,30 @@ namespace btk
   class MemoryMappedBuffer
   {
   public:
+    using State = IODevice::State;
+    using Origin = IODevice::Origin;
+    using Mode = IODevice::Mode;
+    using Size = IODevice::Size;
+    using Offset = IODevice::Offset;
+    using Position = IODevice::Position;
+    
     MemoryMappedBuffer() noexcept;
     ~MemoryMappedBuffer() noexcept {this->close();};
     
-    MemoryMappedBuffer* open(const char* s, File::OpenMode mode) noexcept;
+    MemoryMappedBuffer* open(const char* s, Mode mode) noexcept;
     bool isOpen() const noexcept {return !(this->m_File == _BTK_MMFILEBUF_NO_FILE);};
     MemoryMappedBuffer* close() noexcept;
 
     bool hasWriteMode() const noexcept {return this->m_Writing;};
     
-    File::Size dataSize() const noexcept {return this->m_DataSize;};
+    Size dataSize() const noexcept {return this->m_DataSize;};
     const char* data() const noexcept {return this->mp_Data;};
     
-    File::Size peek(char* s, File::Size n) const noexcept;
-    File::Size read(char* s, File::Size n) noexcept;
-    File::Size write(const char* s, File::Size n) noexcept;
+    Size peek(char* s, Size n) const noexcept;
+    Size read(char* s, Size n) noexcept;
+    Size write(const char* s, Size n) noexcept;
     
-    File::Position seek(File::Offset off, File::SeekDir way) noexcept;
+    Position seek(Offset off, Origin way) noexcept;
     
     MemoryMappedBuffer* map() noexcept;
     MemoryMappedBuffer* resizeMap() noexcept;
@@ -109,15 +116,15 @@ namespace btk
     
   private:
     char* mp_Data;
-    File::Size m_DataSize;
-    File::Size m_LogicalSize;
+    Size m_DataSize;
+    Size m_LogicalSize;
 #if defined(HAVE_SYS_MMAP)
     int m_File;
 #else
     HANDLE m_File;
     HANDLE m_Map;
 #endif
-    File::Offset m_Offset;
+    Offset m_Offset;
     bool m_Writing;
   };
 };

@@ -11,22 +11,22 @@ CXXTEST_SUITE(FileTest)
     btk::File file;
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
-    TS_ASSERT_EQUALS(file.exceptions(), btk::File::GoodBit);
+    TS_ASSERT_EQUALS(file.exceptions(), btk::File::State::Good);
   };
   
   CXXTEST_TEST(SetExceptions)
   {
     btk::File file;
-    file.setExceptions(btk::File::EndBit | btk::File::FailBit | btk::File::ErrorBit);
+    file.setExceptions(btk::File::State::End | btk::File::State::Fail | btk::File::State::Error);
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
-    TS_ASSERT_EQUALS(file.exceptions(), btk::File::EndBit | btk::File::FailBit | btk::File::ErrorBit);
+    TS_ASSERT_EQUALS(file.exceptions(), btk::File::State::End | btk::File::State::Fail | btk::File::State::Error);
   };
   
   CXXTEST_TEST(CloseNoFile)
@@ -35,7 +35,7 @@ CXXTEST_SUITE(FileTest)
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
   };
@@ -43,11 +43,11 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(CloseNoFileException)
   {
     btk::File file;
-    file.setExceptions(btk::File::EndBit | btk::File::FailBit | btk::File::ErrorBit);
+    file.setExceptions(btk::File::State::End | btk::File::State::Fail | btk::File::State::Error);
     TS_ASSERT_THROWS(file.close(), btk::File::Failure);
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
   };
@@ -58,13 +58,13 @@ CXXTEST_SUITE(FileTest)
     file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };
@@ -75,7 +75,7 @@ CXXTEST_SUITE(FileTest)
     file.open("Wrong.test", btk::File::Mode::In);
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
   };
@@ -88,13 +88,13 @@ CXXTEST_SUITE(FileTest)
     file.open(filename, btk::File::Mode::Out);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };
@@ -105,13 +105,13 @@ CXXTEST_SUITE(FileTest)
     file.open(C3DFilePathOUT + "mmfstream.c3d", btk::File::Mode::Out);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };
@@ -119,16 +119,16 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(OpenReadMode)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };
@@ -138,16 +138,16 @@ CXXTEST_SUITE(FileTest)
     std::string filename = C3DFilePathOUT + "mmfstream.c3d";
     std::remove(filename.c_str());
     btk::File file;
-    file.open(filename, btk::File::Out);
+    file.open(filename, btk::File::Mode::Out);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };
@@ -155,16 +155,16 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(OpenWriteModeFromExistingFile)
   {
     btk::File file;
-    file.open(C3DFilePathOUT + "mmfstream.c3d", btk::File::Out);
+    file.open(C3DFilePathOUT + "mmfstream.c3d", btk::File::Mode::Out);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };
@@ -172,20 +172,20 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(Read)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
     char buf[2] = {0};
     file.read(buf,2);
     TS_ASSERT_EQUALS(buf[0], 0x02);
     TS_ASSERT_EQUALS(buf[1], 0x50);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };
@@ -197,7 +197,7 @@ CXXTEST_SUITE(FileTest)
     file.read(buf,3);
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), true);
+    TS_ASSERT_EQUALS(file.atEnd(), true);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
   };
@@ -205,21 +205,21 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekBegin)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
-    file.seek(0, btk::File::Begin);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.seek(0, btk::File::Origin::Begin);
     char buf[2] = {0};
     file.read(buf,2);
     TS_ASSERT_EQUALS(buf[0], 0x02);
     TS_ASSERT_EQUALS(buf[1], 0x50);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };
@@ -228,22 +228,22 @@ CXXTEST_SUITE(FileTest)
   {
     btk::File file;
     char buf[1] = {0};
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
-    file.seek(0, btk::File::End);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.seek(0, btk::File::Origin::End);
     TS_ASSERT(file.tell() == btk::File::Position(406528));
     file.read(buf,1);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), true);
+    TS_ASSERT_EQUALS(file.atEnd(), true);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
     file.clear();
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
-    file.seek(-2, btk::File::End);
+    file.seek(-2, btk::File::Origin::End);
     file.read(buf,1);
     TS_ASSERT_EQUALS(buf[0], 0x15);
     file.read(buf,1);
@@ -251,7 +251,7 @@ CXXTEST_SUITE(FileTest)
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };
@@ -259,11 +259,11 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekBeginInvalid)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
-    file.seek(-1, btk::File::Begin);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.seek(-1, btk::File::Origin::Begin);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
     file.clear();
@@ -273,7 +273,7 @@ CXXTEST_SUITE(FileTest)
     TS_ASSERT_EQUALS(buf[1], 0x50);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
@@ -282,11 +282,11 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekEndInvalid)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
-    file.seek(1, btk::File::End);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.seek(1, btk::File::Origin::End);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.clear();
@@ -294,13 +294,13 @@ CXXTEST_SUITE(FileTest)
     file.read(buf,2);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), true);
+    TS_ASSERT_EQUALS(file.atEnd(), true);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), true);
+    TS_ASSERT_EQUALS(file.atEnd(), true);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
   };
@@ -308,11 +308,11 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekEndInvalidBis)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
-    file.seek(-(406528 + 1), btk::File::End);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.seek(-(406528 + 1), btk::File::Origin::End);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
     file.clear();
@@ -322,7 +322,7 @@ CXXTEST_SUITE(FileTest)
     TS_ASSERT_EQUALS(buf[1], 0x50);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
@@ -331,11 +331,11 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekCurrentInvalidForward)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
-    file.seek(406528 + 1, btk::File::Current);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.seek(406528 + 1, btk::File::Origin::Current);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.clear();
@@ -343,13 +343,13 @@ CXXTEST_SUITE(FileTest)
     file.read(buf,2);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), true);
+    TS_ASSERT_EQUALS(file.atEnd(), true);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), true);
+    TS_ASSERT_EQUALS(file.atEnd(), true);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
   };
@@ -357,11 +357,11 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekCurrentInvalidBackward)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
-    file.seek(-1, btk::File::Current);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.seek(-1, btk::File::Origin::Current);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
     file.clear();
@@ -371,7 +371,7 @@ CXXTEST_SUITE(FileTest)
     TS_ASSERT_EQUALS(buf[1], 0x50);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
@@ -380,12 +380,12 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekCurrentInvalidBackwardBis)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
-    file.seek(0, btk::File::End);
-    file.seek(-(406528 + 1), btk::File::Current);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.seek(0, btk::File::Origin::End);
+    file.seek(-(406528 + 1), btk::File::Origin::Current);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
     file.clear();
@@ -393,7 +393,7 @@ CXXTEST_SUITE(FileTest)
     file.read(buf,2);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
-    TS_ASSERT_EQUALS(file.isEnd(), true);
+    TS_ASSERT_EQUALS(file.atEnd(), true);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), true);
     file.close();
@@ -402,9 +402,9 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(ReadEOFException)
   {
     btk::File file;
-    file.setExceptions(btk::File::EndBit | btk::File::FailBit | btk::File::ErrorBit);
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
-    file.seek(406526, btk::File::Begin);
+    file.setExceptions(btk::File::State::End | btk::File::State::Fail | btk::File::State::Error);
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.seek(406526, btk::File::Origin::Begin);
     char buf[2] = {0};
     file.read(buf,2);
     TS_ASSERT_EQUALS(buf[0], 0x15);
@@ -417,7 +417,7 @@ CXXTEST_SUITE(FileTest)
     std::string filename = C3DFilePathOUT + "mmfstream.c3d";
     std::remove(filename.c_str());
     btk::File file;
-    file.open(filename, btk::File::Out);
+    file.open(filename, btk::File::Mode::Out);
     char buf[1] = {0x16};
     file.write(buf,1);
     file.close();
@@ -428,28 +428,28 @@ CXXTEST_SUITE(FileTest)
     std::string filename = C3DFilePathOUT + "mmfstream.c3d";
     std::remove(filename.c_str());
     btk::File file;
-    file.open(filename, btk::File::Out);
+    file.open(filename, btk::File::Mode::Out);
 #ifdef _MSC_VER // The granularity is not the same
-    file.seek(65536, btk::File::Begin);
+    file.seek(65536, btk::File::Origin::Begin);
 #else
-    file.seek(4096, btk::File::Begin);
+    file.seek(4096, btk::File::Origin::Begin);
 #endif
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     char buf[1] = {0x16};
     file.write(buf,1);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };
@@ -459,24 +459,24 @@ CXXTEST_SUITE(FileTest)
     std::string filename = C3DFilePathOUT + "mmfstream.c3d";
     std::remove(filename.c_str());
     btk::File file;
-    file.open(filename, btk::File::Out);
-    file.seek(400000, btk::File::Begin);
+    file.open(filename, btk::File::Mode::Out);
+    file.seek(400000, btk::File::Origin::Begin);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     char buf[1] = {0x16};
     file.write(buf,1);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
     file.close();
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), true);
-    TS_ASSERT_EQUALS(file.isEnd(), false);
+    TS_ASSERT_EQUALS(file.atEnd(), false);
     TS_ASSERT_EQUALS(file.hasError(), false);
     TS_ASSERT_EQUALS(file.hasFailure(), false);
   };

@@ -43,7 +43,7 @@
 namespace btk
 {
   IODevicePrivate::IODevicePrivate()
-  : State(IODevice::GoodBit), Exception(IODevice::GoodBit)
+  : State(IODevice::State::Good), Exception(IODevice::State::Good)
   {};
   
   IODevicePrivate::~IODevicePrivate() noexcept = default; // Cannot be inlined
@@ -65,7 +65,7 @@ namespace btk
    * This interface proposes also an exception mechanism in case the device fails to do some internal operation, or if there are error during I/O operations.
    * You can use the method setExceptions() to set the states which can trigger an exception. The exception thrown by this class corresponds to a IODevice::Failure exception.
    *
-   * To implement a new device, several methods must me implemented. To facilitate this implementation some protected methods are proposed like verifyOpenMode().
+   * To implement a new device, several methods must me implemented. To facilitate this implementation some protected methods are proposed like verifyMode().
    */
   
   /**
@@ -75,39 +75,39 @@ namespace btk
   IODevice::~IODevice() noexcept = default;
   
   /**
-   * Returns true if the device's state is set to GoodBit.
+   * Returns true if the device's state is set to State::Good.
    */
   bool IODevice::isGood() const noexcept
   {
     auto optr = this->pimpl();
-    return optr->State == GoodBit;
+    return optr->State == State::Good;
   };
   
   /**
-   * Returns true if the device's state contain the flag EndBit.
+   * Returns true if the device's state contain the flag State::End.
    */
   bool IODevice::atEnd() const noexcept
   {
     auto optr = this->pimpl();
-    return (this->state() & EndBit) != 0;
+    return (this->state() & State::End) == State::End;
   };
  
   /**
-   * Returns true if the device's state contain the flag FailBit and/or ErrorBit.
+   * Returns true if the device's state contain the flag State::Fail and/or State::Error.
    */
   bool IODevice::hasFailure() const noexcept
   {
     auto optr = this->pimpl();
-    return (optr->State & (FailBit | ErrorBit)) != 0;
+    return (optr->State & (State::Fail | State::Error)) != State::Good;
   };
  
   /**
-   * Returns true if the device's state contain the flag FailBit
+   * Returns true if the device's state contain the flag State::Fail
    */
   bool IODevice::hasError() const noexcept
   {
     auto optr = this->pimpl();
-    return (optr->State & ErrorBit) != 0;
+    return (optr->State & State::Error) == State::Error;
   };
  
   /**
@@ -132,13 +132,13 @@ namespace btk
   /**
    * Sets the state of the device.
    * If the given state @a flags meets some part of the exception's mask, then a Failure exception is thrown.
-   * @note Setting the state to GoodBit will reset the possible current failure/errors.
+   * @note Setting the state to State::Good will reset the possible current failure/errors.
    */
   void IODevice::clear(IODevice::State state)
   {
     auto optr = this->pimpl();
     optr->State = state;
-    if ((this->exceptions() & this->state()) != 0)
+    if ((this->exceptions() & this->state()) != State::Good)
       throw Failure("IODevice::clear");
   };
    
@@ -153,7 +153,7 @@ namespace btk
  
   /**
    * Sets the mask which will be used to throw an exceptions.
-   * Setting the mask to GoodBit will cancel the use of exception with the device. 
+   * Setting the mask to State::Good will cancel the use of exception with the device. 
    */
   void IODevice::setExceptions(IODevice::State mask)
   {
@@ -170,29 +170,29 @@ namespace btk
   /**
    * @fn virtual void IODevice::close() = 0
    * Close the device.
-   * @note The inherited class should set the FailBit state flag if any failure happens during the closing of the device.
+   * @note The inherited class should set the State::Fail state flag if any failure happens during the closing of the device.
    */
   
   /**
    * @fn virtual void IODevice::read(char* s, Size n) = 0
-   * Gets from the device a sequence of characters of size @a n and store it in @a s. The ErrorBit state flag is set if any issue happens during the reading operation. 
+   * Gets from the device a sequence of characters of size @a n and store it in @a s. The State::Error state flag is set if any issue happens during the reading operation. 
    */
     
   /**
    * @fn virtual void IODevice::write(const char* s, Size n) = 0
-   * Puts the sequence of characters @a s of size @a n to the device. The ErrorBit state flag is set if any issue happens during the writing operation. 
+   * Puts the sequence of characters @a s of size @a n to the device. The State::Error state flag is set if any issue happens during the writing operation. 
    */
     
   /**
    * @fn virtual void IODevice::seek(Offset offset, SeekDir dir) = 0
    * Moves the pointer associated with a random access device of the given @a offset in the given direction @a dir.
-   * @note The use of this method with a sequential device would set the flag FailBit to true.
+   * @note The use of this method with a sequential device would set the flag State::Fail to true.
    */
   
   /**
    * @fn virtual Position IODevice::tell() const = 0
    * Returns the position of the pointer associated with a random access device. 
-   * @note The use of this method with a sequential device would set the flag FailBit to true.
+   * @note The use of this method with a sequential device would set the flag State::Fail to true.
    */
   
   /**
@@ -203,28 +203,28 @@ namespace btk
   /**
    * Verify the coherency of the given open mode.
    * This method should be used by every inherited class in their Open() method before trying to open the implemented device.
-   * Internally, this will set the flag FailBit to true if one of the verification is not valid.
+   * Internally, this will set the flag State::Fail to true if one of the verification is not valid.
    * The following checks are realized by this method:
    *  - The device is not already opened.
    *  - The modes Append and Truncate cannot be set at the same time.
    *  - The mode Truncate is set but not the mode Out.
    */
-  bool IODevice::verifyOpenMode(OpenMode mode)
+  bool IODevice::verifyMode(Mode mode)
   {
     bool valid = true;
     if (this->isOpen()
-      || (((mode & Append) == Append) && ((mode & Truncate) == Truncate))
-      || (((mode & Truncate) == Truncate) && ((mode & Out) != Out)))
+      || (((mode & Mode::Append) == Mode::Append) && ((mode & Mode::Truncate) == Mode::Truncate))
+      || (((mode & Mode::Truncate) == Mode::Truncate) && ((mode & Mode::Out) != Mode::Out)))
     {
       valid = false;
-      this->setState(FailBit);
+      this->setState(State::Fail);
     }
     return valid;
   };
   
   /**
    * Constructor.
-   * Set the device's state to GoodBit without exception enabled.
+   * Set the device's state to State::Good without exception enabled.
    */
   IODevice::IODevice() noexcept
   : mp_Pimpl(new IODevicePrivate)

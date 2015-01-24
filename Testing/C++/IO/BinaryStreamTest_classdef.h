@@ -21,23 +21,28 @@ class DummyBuffer : public btk::IODevice
 public:
   DummyBuffer(char* d) : btk::IODevice(*new DummyBufferPrivate(d))
   {};
-  virtual bool isOpen() const noexcept {return true;};
-  virtual void close() {};
-  virtual void read(char* s, Size n)
+  virtual bool isOpen() const noexcept  override {return true;};
+  virtual void close()  override {};
+  virtual Size peek(char* s, Size n) const override
   {
     auto optr = this->pimpl();
     memcpy(s,optr->Data + optr->Pos, n);
-    optr->Pos += n;
+    return n;
   };
-  virtual void write(const char* s, Size n)
+  virtual void read(char* s, Size n) override
+  {
+    auto optr = this->pimpl();
+    optr->Pos += this->peek(s,n);
+  };
+  virtual void write(const char* s, Size n) override
   {
     auto optr = this->pimpl();
     memcpy(optr->Data + optr->Pos, s, n);
     optr->Pos += n;
   };
-  virtual void seek(Offset , SeekDir ) {}; // Not implemented
-  virtual Position tell() const noexcept {return Position(Offset(-1));}; // Not implemented
-  virtual bool isSequential() const noexcept {return true;};
+  virtual void seek(Offset , Origin ) override {}; // Not implemented
+  virtual Position tell() const noexcept  override {return Position(Offset(-1));}; // Not implemented
+  virtual bool isSequential() const noexcept  override {return true;};
   
   void setPos(Offset pos)
   {
