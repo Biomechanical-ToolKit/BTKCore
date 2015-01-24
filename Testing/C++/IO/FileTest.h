@@ -54,7 +54,8 @@ CXXTEST_SUITE(FileTest)
   
   CXXTEST_TEST(SecondConstructorRead)
   {
-    btk::File file(C3DFilePathIN + "others/Gait.c3d", btk::File::In);
+    btk::File file;
+    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
     TS_ASSERT_EQUALS(file.isEnd(), false);
@@ -70,7 +71,8 @@ CXXTEST_SUITE(FileTest)
   
   CXXTEST_TEST(SecondConstructorWrongFilenameRead)
   {
-    btk::File file("Wrong.test", btk::File::In);
+    btk::File file;
+    file.open("Wrong.test", btk::File::Mode::In);
     TS_ASSERT_EQUALS(file.isOpen(), false);
     TS_ASSERT_EQUALS(file.isGood(), false);
     TS_ASSERT_EQUALS(file.isEnd(), false);
@@ -82,7 +84,8 @@ CXXTEST_SUITE(FileTest)
   {
     std::string filename = C3DFilePathOUT + "mmfstream.c3d";
     std::remove(filename.c_str());
-    btk::File file(filename, btk::File::Out);
+    btk::File file;
+    file.open(filename, btk::File::Mode::Out);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
     TS_ASSERT_EQUALS(file.isEnd(), false);
@@ -98,7 +101,8 @@ CXXTEST_SUITE(FileTest)
   
   CXXTEST_TEST(SecondConstructorWriteExistedFile)
   {
-    btk::File file(C3DFilePathOUT + "mmfstream.c3d", btk::File::Out);
+    btk::File file;
+    file.open(C3DFilePathOUT + "mmfstream.c3d", btk::File::Mode::Out);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
     TS_ASSERT_EQUALS(file.isEnd(), false);

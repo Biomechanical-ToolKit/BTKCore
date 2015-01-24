@@ -50,7 +50,6 @@ namespace btk
     
   public:
     File();
-    File(const std::string& fileName, OpenMode mode);
     ~File() noexcept;
     
     File(const File& ) = delete;

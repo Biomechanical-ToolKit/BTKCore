@@ -425,15 +425,6 @@ namespace btk
   {};
   
   /**
-   * Convenient constructor which calls internally the method Open().
-   */
-  File::File(const std::string& fileName, OpenMode mode)
-  : File()
-  {
-    this->open(fileName, mode);
-  };
-  
-  /**
    * Destructor (default).
    */
   File::~File() noexcept = default;
