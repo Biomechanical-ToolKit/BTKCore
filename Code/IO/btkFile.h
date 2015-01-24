@@ -65,6 +65,7 @@ namespace btk
     virtual void seek(Offset offset, SeekDir dir);
     virtual Position tell() const noexcept;
     virtual bool isSequential() const noexcept;
+    virtual Size peek(char* s, Size n) const override;
     
     const char* data() const noexcept;
     Size size() const noexcept;

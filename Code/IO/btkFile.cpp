@@ -296,15 +296,25 @@ namespace btk
     return this->m_Offset;
   };
   
+ /**
+  * Returns a sequence of characters
+  * @return The number of characters gotten.
+  */
+  File::Size MemoryMappedBuffer::peek(char* s, File::Size n) const noexcept
+  {
+    n = (((this->m_Offset + n) == 0) || ((this->m_Offset + n) > this->m_DataSize)) ? ((this->m_DataSize - this->m_Offset) > 0 ? this->m_DataSize - this->m_Offset : 0) : n;
+    for (Offset i = 0 ; i < n ; ++i)
+      s[i] = this->mp_Data[this->m_Offset + i];
+    return n;
+  };
+  
   /**
    * Get sequence of characters
    * @return The number of characters gotten, returned as a value of type streamsize.
    */
   File::Size MemoryMappedBuffer::read(char* s, File::Size n) noexcept
   {
-    n = (((this->m_Offset + n) == 0) || ((this->m_Offset + n) > this->m_DataSize)) ? ((this->m_DataSize - this->m_Offset) > 0 ? this->m_DataSize - this->m_Offset : 0) : n;
-    for (File::Offset i = 0 ; i < n ; ++i)
-      s[i] = this->mp_Data[this->m_Offset + i];
+    n = this->peek(s,n);
     this->m_Offset += n;
     return n;
   };
@@ -462,6 +472,16 @@ namespace btk
     auto optr = this->pimpl();
     if (!optr->Buffer->close())
       this->setState(FailBit);
+  };
+  
+  /**
+   * Similar to the read() method but does not modify the position of the read indicator.
+   * Returns the number of characters read. No exception or error flag is triggered when an error occurs.
+   */
+  File::Size File::peek(char* s, Size n) const
+  {
+    auto optr = this->pimpl();
+    return optr->Buffer->peek(s,n);
   };
   
   /**

@@ -96,6 +96,7 @@ namespace btk
     File::Size dataSize() const noexcept {return this->m_DataSize;};
     const char* data() const noexcept {return this->mp_Data;};
     
+    File::Size peek(char* s, File::Size n) const noexcept;
     File::Size read(char* s, File::Size n) noexcept;
     File::Size write(const char* s, File::Size n) noexcept;
     

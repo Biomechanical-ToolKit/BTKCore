@@ -102,6 +102,7 @@ namespace btk
     // General
     virtual bool isOpen() const noexcept = 0;
     virtual void close() = 0;
+    virtual Size peek(char* s, Size n) const = 0;
     virtual void read(char* s, Size n) = 0;
     virtual void write(const char* s, Size n) = 0;
     
