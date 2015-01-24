@@ -36,6 +36,7 @@
 #include "btkBinaryStream.h"
 #include "btkBinaryStream_p.h"
 #include "btkEndianConverter.h"
+#include "btkEndianFormat.h"
 #include "btkException.h"
 #include "btkLogger.h"
 

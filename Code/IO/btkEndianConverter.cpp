@@ -34,6 +34,7 @@
  */
 
 #include "btkEndianConverter.h"
+#include "btkEndianFormat.h"
 #include "btkIODevice.h"
 
 namespace btk

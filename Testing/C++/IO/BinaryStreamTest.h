@@ -2,6 +2,7 @@
 #define BinaryStream_h
 
 #include <btkBinaryStream.h>
+#include <btkEndianFormat.h>
 
 #include "BinaryStreamTest_classdef.h"
 

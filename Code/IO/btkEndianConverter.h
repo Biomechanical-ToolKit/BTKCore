@@ -62,7 +62,6 @@
 #endif
 
 #include "btkIOExport.h"
-#include "btkEndianFormat.h"
 
 #include <cstdint>
 #include <string>
@@ -82,6 +81,7 @@
 namespace btk
 {
   class IODevice;
+  enum class EndianFormat;
   
   class BTK_IO_EXPORT EndianConverter
   {

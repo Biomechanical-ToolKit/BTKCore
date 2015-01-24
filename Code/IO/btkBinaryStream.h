@@ -37,7 +37,6 @@
 #define __btkBinaryStream_h
 
 #include "btkIOExport.h"
-#include "btkEndianFormat.h"
 #include "btkOpaque.h"
 
 #include <cstdint>
@@ -46,10 +45,11 @@
 
 namespace btk
 {
-  class BinaryStreamPrivate;
-  
   class IODevice;
   class EndianConverter;
+  enum class EndianFormat;
+  
+  class BinaryStreamPrivate;
   
   class BTK_IO_EXPORT BinaryStream
   {
