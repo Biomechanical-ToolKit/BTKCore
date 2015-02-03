@@ -55,7 +55,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SecondConstructorRead)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
     TS_ASSERT_EQUALS(file.atEnd(), false);
@@ -82,8 +82,8 @@ CXXTEST_SUITE(FileTest)
   
   CXXTEST_TEST(SecondConstructorWriteNewFile)
   {
-    std::string filename = C3DFilePathOUT + "mmfstream.c3d";
-    std::remove(filename.c_str());
+    const char* filename = _BTK_TDD_C3D_OUT_"mmfstream.c3d";
+    std::remove(filename);
     btk::File file;
     file.open(filename, btk::File::Mode::Out);
     TS_ASSERT_EQUALS(file.isOpen(), true);
@@ -102,7 +102,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SecondConstructorWriteExistedFile)
   {
     btk::File file;
-    file.open(C3DFilePathOUT + "mmfstream.c3d", btk::File::Mode::Out);
+    file.open(_BTK_TDD_C3D_OUT_"mmfstream.c3d", btk::File::Mode::Out);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
     TS_ASSERT_EQUALS(file.atEnd(), false);
@@ -119,7 +119,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(OpenReadMode)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
     TS_ASSERT_EQUALS(file.atEnd(), false);
@@ -135,8 +135,8 @@ CXXTEST_SUITE(FileTest)
   
   CXXTEST_TEST(OpenWriteMode)
   {
-    std::string filename = C3DFilePathOUT + "mmfstream.c3d";
-    std::remove(filename.c_str());
+    const char* filename = _BTK_TDD_C3D_OUT_"mmfstream.c3d";
+    std::remove(filename);
     btk::File file;
     file.open(filename, btk::File::Mode::Out);
     TS_ASSERT_EQUALS(file.isOpen(), true);
@@ -155,7 +155,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(OpenWriteModeFromExistingFile)
   {
     btk::File file;
-    file.open(C3DFilePathOUT + "mmfstream.c3d", btk::File::Mode::Out);
+    file.open(_BTK_TDD_C3D_OUT_"mmfstream.c3d", btk::File::Mode::Out);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
     TS_ASSERT_EQUALS(file.atEnd(), false);
@@ -172,7 +172,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(Read)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     char buf[2] = {0};
     file.read(buf,2);
     TS_ASSERT_EQUALS(buf[0], 0x02);
@@ -205,7 +205,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekBegin)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     file.seek(0, btk::File::Origin::Begin);
     char buf[2] = {0};
     file.read(buf,2);
@@ -228,7 +228,7 @@ CXXTEST_SUITE(FileTest)
   {
     btk::File file;
     char buf[1] = {0};
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     file.seek(0, btk::File::Origin::End);
     TS_ASSERT(file.tell() == btk::File::Position(406528));
     file.read(buf,1);
@@ -259,7 +259,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekBeginInvalid)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     file.seek(-1, btk::File::Origin::Begin);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
@@ -282,7 +282,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekEndInvalid)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     file.seek(1, btk::File::Origin::End);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
@@ -308,7 +308,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekEndInvalidBis)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     file.seek(-(406528 + 1), btk::File::Origin::End);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
@@ -331,7 +331,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekCurrentInvalidForward)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     file.seek(406528 + 1, btk::File::Origin::Current);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), true);
@@ -357,7 +357,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekCurrentInvalidBackward)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     file.seek(-1, btk::File::Origin::Current);
     TS_ASSERT_EQUALS(file.isOpen(), true);
     TS_ASSERT_EQUALS(file.isGood(), false);
@@ -380,7 +380,7 @@ CXXTEST_SUITE(FileTest)
   CXXTEST_TEST(SeekCurrentInvalidBackwardBis)
   {
     btk::File file;
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     file.seek(0, btk::File::Origin::End);
     file.seek(-(406528 + 1), btk::File::Origin::Current);
     TS_ASSERT_EQUALS(file.isOpen(), true);
@@ -403,7 +403,7 @@ CXXTEST_SUITE(FileTest)
   {
     btk::File file;
     file.setExceptions(btk::File::State::End | btk::File::State::Fail | btk::File::State::Error);
-    file.open(C3DFilePathIN + "others/Gait.c3d", btk::File::Mode::In);
+    file.open(_BTK_TDD_C3D_IN_"others/Gait.c3d", btk::File::Mode::In);
     file.seek(406526, btk::File::Origin::Begin);
     char buf[2] = {0};
     file.read(buf,2);
@@ -414,8 +414,8 @@ CXXTEST_SUITE(FileTest)
   
   CXXTEST_TEST(Write)
   {
-    std::string filename = C3DFilePathOUT + "mmfstream.c3d";
-    std::remove(filename.c_str());
+    const char* filename = _BTK_TDD_C3D_OUT_"mmfstream.c3d";
+    std::remove(filename);
     btk::File file;
     file.open(filename, btk::File::Mode::Out);
     char buf[1] = {0x16};
@@ -425,8 +425,8 @@ CXXTEST_SUITE(FileTest)
   
   CXXTEST_TEST(SeekWrite)
   {
-    std::string filename = C3DFilePathOUT + "mmfstream.c3d";
-    std::remove(filename.c_str());
+    const char* filename = _BTK_TDD_C3D_OUT_"mmfstream.c3d";
+    std::remove(filename);
     btk::File file;
     file.open(filename, btk::File::Mode::Out);
 #ifdef _MSC_VER // The granularity is not the same
@@ -456,8 +456,8 @@ CXXTEST_SUITE(FileTest)
   
   CXXTEST_TEST(SuperSeekWrite)
   {
-    std::string filename = C3DFilePathOUT + "mmfstream.c3d";
-    std::remove(filename.c_str());
+    const char* filename = _BTK_TDD_C3D_OUT_"mmfstream.c3d";
+    std::remove(filename);
     btk::File file;
     file.open(filename, btk::File::Mode::Out);
     file.seek(400000, btk::File::Origin::Begin);
