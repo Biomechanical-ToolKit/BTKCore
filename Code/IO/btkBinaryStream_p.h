@@ -41,10 +41,14 @@
  * can change drastically from one release to another.
  */
 
+#include <cstdint>
+#include <string>
+
 namespace btk
 {
   class IODevice;
   class EndianConverter;
+  enum class EndianFormat;
   
   class BinaryStreamPrivate
   {
@@ -59,6 +63,139 @@ namespace btk
     
     IODevice* Device;
     EndianConverter* Converter;
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
+  class EndianConverter
+  {
+  public:
+    virtual ~EndianConverter() noexcept = default;
+    
+    EndianConverter(const EndianConverter& ) = delete;
+    EndianConverter(EndianConverter&& ) noexcept = delete;
+    EndianConverter& operator=(const EndianConverter& ) = delete;
+    EndianConverter& operator=(EndianConverter&& ) noexcept = delete;
+    
+    virtual EndianFormat format() const noexcept = 0;
+    
+    char readChar(IODevice* src) const;
+    int8_t readI8(IODevice* src) const;
+    uint8_t readU8(IODevice* src) const;
+    virtual int16_t readI16(IODevice* src) const = 0;
+    virtual uint16_t readU16(IODevice* src) const = 0;
+    virtual int32_t readI32(IODevice* src) const = 0;
+    virtual uint32_t readU32(IODevice* src) const = 0;
+    virtual int64_t readI64(IODevice* src) const = 0;
+    virtual uint64_t readU64(IODevice* src) const = 0;
+    virtual float readFloat(IODevice* src) const = 0;
+    virtual double readDouble(IODevice* src) const = 0;
+    std::string readString(size_t len, IODevice* src) const;
+    
+    void writeChar(char val, IODevice* dest) const;
+    void writeI8(int8_t val, IODevice* dest) const;
+    void writeU8(uint8_t val, IODevice* dest) const;
+    virtual void writeI16(int16_t val, IODevice* dest) const = 0;
+    virtual void writeU16(uint16_t val, IODevice* dest) const = 0;
+    virtual void writeI32(int32_t val, IODevice* dest) const = 0;
+    virtual void writeU32(uint32_t val, IODevice* dest) const = 0;
+    virtual void writeFloat(float val, IODevice* dest) const = 0;
+    void writeString(const std::string& val, IODevice* dest) const;
+    /* TODO
+    virtual void writeI64(int64_t val, IODevice* dest) const = 0;
+    virtual void writeU64(uint64_t val, IODevice* dest) const = 0;
+    virtual void writeDouble(double val, IODevice* dest) const = 0;
+     */
+    
+  protected:
+    EndianConverter();
+  };
+  
+  class VAXLittleEndianConverter : public EndianConverter
+  {
+  public:
+    VAXLittleEndianConverter();
+    ~VAXLittleEndianConverter() = default;
+    
+    VAXLittleEndianConverter(const VAXLittleEndianConverter& ) = delete;
+    VAXLittleEndianConverter(VAXLittleEndianConverter&& ) noexcept = delete;
+    VAXLittleEndianConverter& operator=(const VAXLittleEndianConverter& ) = delete;
+    VAXLittleEndianConverter& operator=(VAXLittleEndianConverter&& ) noexcept = delete;
+    
+    virtual EndianFormat format() const noexcept final;
+    
+    virtual int16_t readI16(IODevice* src) const final;
+    virtual uint16_t readU16(IODevice* src) const final;
+    virtual int32_t readI32(IODevice* src) const final;
+    virtual uint32_t readU32(IODevice* src) const final;
+    virtual int64_t readI64(IODevice* src) const final;
+    virtual uint64_t readU64(IODevice* src) const final;
+    virtual float readFloat(IODevice* src) const final;
+    virtual double readDouble(IODevice* src) const final;
+  
+    virtual void writeI16(int16_t val, IODevice* dest) const final;
+    virtual void writeU16(uint16_t val, IODevice* dest) const final;
+    virtual void writeI32(int32_t val, IODevice* dest) const final;
+    virtual void writeU32(uint32_t val, IODevice* dest) const final;
+    virtual void writeFloat(float val, IODevice* dest) const final;
+  };
+
+  class IEEELittleEndianConverter : public EndianConverter
+  {
+  public:
+    IEEELittleEndianConverter();
+    ~IEEELittleEndianConverter() = default;
+    
+    IEEELittleEndianConverter(const IEEELittleEndianConverter& ) = delete;
+    IEEELittleEndianConverter(IEEELittleEndianConverter&& ) noexcept = delete;
+    IEEELittleEndianConverter& operator=(const IEEELittleEndianConverter& ) = delete;
+    IEEELittleEndianConverter& operator=(IEEELittleEndianConverter&& ) noexcept = delete;
+    
+    virtual EndianFormat format() const noexcept final;
+    
+    virtual int16_t readI16(IODevice* src) const final;
+    virtual uint16_t readU16(IODevice* src) const final;
+    virtual int32_t readI32(IODevice* src) const final;
+    virtual uint32_t readU32(IODevice* src) const final;
+    virtual int64_t readI64(IODevice* src) const final;
+    virtual uint64_t readU64(IODevice* src) const final;
+    virtual float readFloat(IODevice* src) const final;
+    virtual double readDouble(IODevice* src) const final;
+  
+    virtual void writeI16(int16_t val, IODevice* dest) const final;
+    virtual void writeU16(uint16_t val, IODevice* dest) const final;
+    virtual void writeI32(int32_t val, IODevice* dest) const final;
+    virtual void writeU32(uint32_t val, IODevice* dest) const final;
+    virtual void writeFloat(float val, IODevice* dest) const final;
+  };
+
+  class IEEEBigEndianConverter : public EndianConverter
+  {
+  public:
+    IEEEBigEndianConverter();
+    ~IEEEBigEndianConverter() = default;
+    
+    IEEEBigEndianConverter(const IEEEBigEndianConverter& ) = delete;
+    IEEEBigEndianConverter(IEEEBigEndianConverter&& ) noexcept = delete;
+    IEEEBigEndianConverter& operator=(const IEEEBigEndianConverter& ) = delete;
+    IEEEBigEndianConverter& operator=(IEEEBigEndianConverter&& ) noexcept = delete;
+    
+    virtual EndianFormat format() const noexcept final;
+    
+    virtual int16_t readI16(IODevice* src) const final;
+    virtual uint16_t readU16(IODevice* src) const final;
+    virtual int32_t readI32(IODevice* src) const final;
+    virtual uint32_t readU32(IODevice* src) const final;
+    virtual int64_t readI64(IODevice* src) const final;
+    virtual uint64_t readU64(IODevice* src) const final;
+    virtual float readFloat(IODevice* src) const final;
+    virtual double readDouble(IODevice* src) const final;
+  
+    virtual void writeI16(int16_t val, IODevice* dest) const final;
+    virtual void writeU16(uint16_t val, IODevice* dest) const final;
+    virtual void writeI32(int32_t val, IODevice* dest) const final;
+    virtual void writeU32(uint32_t val, IODevice* dest) const final;
+    virtual void writeFloat(float val, IODevice* dest) const final;
   };
 };
 
