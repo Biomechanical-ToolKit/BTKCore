@@ -36,25 +36,50 @@
 #ifndef __btkEndianFormat_h
 #define __btkEndianFormat_h
 
+#include "btkConfigure.h"
+
 namespace btk
 {
-  enum class EndianFormat : int {VAXLittleEndian, IEEELittleEndian, IEEEBigEndian};
+  enum class EndianFormat : int {
+    NotApplicable,
+    VAXLittleEndian,
+    IEEELittleEndian,
+    IEEEBigEndian,
+#if BTK_ARCH_COMPILED == BTK_ARCH_IEEE_LE
+    Native = IEEELittleEndian
+#elif BTK_ARCH_COMPILED == BTK_ARCH_VAX_LE
+    Native = VAXLittleEndian
+#elif BTK_ARCH_COMPILED == BTK_ARCH_IEEE_BE
+    Native = IEEEBigEndian
+#else
+    #error The Native value cannot be unknown at compile time. Processor not supported
+    // Native = NotApplicable
+#endif
+  };
 
   /**
    * @enum EndianFormat
    * Enums used to specify the endian format for the converter integrated in a BinaryStream.
    */
   /**
+   * @var EndianFormat NotApplicable
+   * Enum value used to mention that no endian format is applicable. This value would be used only to informa and not to set.
+   */
+  /**
    * @var EndianFormat VAXLittleEndian
-   * Enum value which set the converter to read data as the VAX (DEC) architecture with little endian byte interpretation.
+   * Enum value representing the VAX architecture with little endian byte interpretation (DEC processor).
    */
   /**
    * @var EndianFormat IEEELittleEndian
-   * Enum value which set the converter to read data as the IEEE (Intel) architecture with little endian byte interpretation.
+   * Enum value representing the IEEE architecture with little endian byte interpretation (Intel processor).
    */
   /**
    * @var EndianFormat IEEEBigEndian
-   * Enum value which set the converter to read data as the IEEE (Intel) architecture with big endian byte interpretation.
+   * Enum value representing the IEEE architecture with big endian byte interpretation (MIPS processor).
+   */
+  /**
+   * @var EndianFormat Native
+   * Convenient enum value which let the compiler chooses the default architecture (i.e. IEEELittleEndian, VAXLittleEndian, IEEEBigEndian)..
    */
 };
 
