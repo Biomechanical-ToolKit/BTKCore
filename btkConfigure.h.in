@@ -47,6 +47,35 @@
 // Looking for mmap
 #cmakedefine HAVE_SYS_MMAP
 
+// Check if the processor is supported
+#define BTK_ARCH_VAX_LE 2  /* VAX LittleEndian */
+#define BTK_ARCH_IEEE_LE 1 /* IEEE LittleEndian */
+#define BTK_ARCH_IEEE_BE 3 /* IEEE BigEndian */
+
+#if defined _MSC_VER
+  #if defined _M_IX86 || defined _M_X64
+    #define BTK_ARCH_COMPILED BTK_ARCH_IEEE_LE
+  #elif defined _M_ALPHA
+    #define BTK_ARCH_COMPILED BTK_ARCH_VAX_LE
+  #elif defined _M_MRX000 || defined _M_PPC 
+    #define BTK_ARCH_COMPILED BTK_ARCH_IEEE_BE 
+  #else
+    #error Processor not supported
+  #endif
+#elif defined __GNUC__
+  #if defined __i386__ || defined __x86_64__
+    #define BTK_ARCH_COMPILED BTK_ARCH_IEEE_LE
+  #elif defined __vax__
+    #define BTK_ARCH_COMPILED BTK_ARCH_VAX_LE
+  #elif defined __mips__ || defined __ppc__
+    #define BTK_ARCH_COMPILED BTK_ARCH_IEEE_BE
+  #else
+    #error Processor not supported
+  #endif
+#else
+  #error Development platform not supported
+#endif
+
 // Special case for Matlab R2010b & MSVC2010
 #if defined(_MSC_VER)
   #if (_MSC_VER >= 1600)
