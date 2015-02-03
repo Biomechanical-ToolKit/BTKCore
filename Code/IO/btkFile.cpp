@@ -439,15 +439,16 @@ namespace btk
   File::~File() noexcept = default;
   
   /**
-   * Open the given @a fileName with the specified @a mode.
+   * Open the given @a filename with the specified @a mode.
    * @note To open a file, the device has to be first closed if a previous file was already opened.
    */
-  void File::open(const std::string& fileName, Mode mode)
+  void File::open(const char* filename, Mode mode)
   {
     if (this->verifyMode(mode))
     {
       auto optr = this->pimpl();
-      if (!optr->Buffer->open(fileName.c_str(), mode))
+      this->setName(filename);
+      if (!optr->Buffer->open(filename, mode))
         this->setState(State::Fail);
       else
         this->clear();
@@ -545,13 +546,12 @@ namespace btk
     return optr->Buffer->data();
   };
   
- /**
-  * Return the size of the data mapped in the memory
-  */
- File::Size File::size() const noexcept
- {
-   auto optr = this->pimpl();
-   return optr->Buffer->dataSize();
- };
-  
+  /**
+   * Return the size of the data mapped in the memory
+   */
+  File::Size File::size() const noexcept
+  {
+    auto optr = this->pimpl();
+    return optr->Buffer->dataSize();
+  };
 };

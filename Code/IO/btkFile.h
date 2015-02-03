@@ -38,8 +38,6 @@
 
 #include "btkIODevice.h"
 
-#include <string>
-
 namespace btk
 {
   class FilePrivate;
@@ -57,7 +55,7 @@ namespace btk
     File& operator=(const File& ) = delete;
     File& operator=(File&& ) noexcept = delete;
     
-    void open(const std::string& fileName, Mode mode);
+    void open(const char* filename, Mode mode);
     virtual bool isOpen() const noexcept override;
     virtual void close() override;
     virtual Size peek(char* s, Size n) const override;
