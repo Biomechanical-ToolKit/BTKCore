@@ -24,6 +24,8 @@ CXXTEST_SUITE(LoggerTest)
     btk::Logger::info("tiny %s. %0.2f","at the beginning but huge after the variadic expansion",1.54f);
     btk::Logger::warning("tiny %s. %0.2f","at the beginning but huge after the variadic expansion",1.54f);
     btk::Logger::error("tiny %s. %0.2f","at the beginning but huge after the variadic expansion",1.54f);
+    
+    btk::Logger::setDevice(nullptr); // Reset the device
   };
 };
 
