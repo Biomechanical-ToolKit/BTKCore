@@ -56,6 +56,7 @@ namespace btk
     IODevicePrivate& operator=(const IODevicePrivate& ) = delete;
     IODevicePrivate& operator=(const IODevicePrivate&& ) noexcept = delete;
     
+    char* Name;
     IODevice::State State;
     IODevice::State Exception;
   };

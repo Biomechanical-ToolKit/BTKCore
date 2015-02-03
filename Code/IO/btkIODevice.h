@@ -86,6 +86,7 @@ namespace btk
     void setExceptions(State mask);
     
     // General
+    const char* name() const noexcept;
     virtual bool isOpen() const noexcept = 0;
     virtual void close() = 0;
     virtual Size peek(char* s, Size n) const = 0;
@@ -100,7 +101,8 @@ namespace btk
     virtual bool isSequential() const noexcept = 0;
     
   protected:
-    virtual bool verifyMode(Mode mode);
+    void setName(const char* name = nullptr);
+    bool verifyMode(Mode mode);
     
     IODevice() noexcept;
     IODevice(IODevicePrivate& pimpl) noexcept;

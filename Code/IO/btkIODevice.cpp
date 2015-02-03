@@ -36,6 +36,8 @@
 #include "btkIODevice.h"
 #include "btkIODevice_p.h"
 
+#include <cstring>
+
 // -------------------------------------------------------------------------- //
 //                                 PRIVATE API                                //
 // -------------------------------------------------------------------------- //
@@ -43,10 +45,13 @@
 namespace btk
 {
   IODevicePrivate::IODevicePrivate()
-  : State(IODevice::State::Good), Exception(IODevice::State::Good)
+  : Name(nullptr), State(IODevice::State::Good), Exception(IODevice::State::Good)
   {};
   
-  IODevicePrivate::~IODevicePrivate() noexcept = default; // Cannot be inlined
+  IODevicePrivate::~IODevicePrivate() noexcept
+  {
+    delete this->Name;
+  };
 }
 
 // -------------------------------------------------------------------------- //
@@ -163,6 +168,17 @@ namespace btk
   };
   
   /**
+   * @fn virtual const char* IODevice::name() const noexcept;
+   * Returns the name associated with this device. 
+   * The name of a device can be anything. For example for a file, it could be the full path of the filename read/write. For a serial port, it could be its identifiant. For a databse, it could the adress of the server.
+   */
+  const char* IODevice::name() const noexcept
+  {
+    auto optr = this->pimpl();
+    return optr->Name;
+  };
+  
+  /**
    * @fn virtual bool IODevice::isOpen() = 0
    * Returns true if the device is opened otherwise returns false.
    */
@@ -199,6 +215,24 @@ namespace btk
    * @fn virtual bool IODevice::isSequential() const = 0
    * Returns true if the device is sequential otherwise false.
    */
+  
+  /**
+    * Sets the name of the device.
+    * Internally, this method copy the given array of characters.
+    */
+  void IODevice::setName(const char* name)
+  {
+    auto optr = this->pimpl();
+    delete optr->Name;
+    optr->Name = nullptr;
+    if (name != nullptr)
+    {
+      size_t len = strlen(name);
+      optr->Name = new char[len+1];
+      strncpy(optr->Name,name,len);
+      optr->Name[len] = '\0';
+    }
+  };
   
   /**
    * Verify the coherency of the given open mode.
