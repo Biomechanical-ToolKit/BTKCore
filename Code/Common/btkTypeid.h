@@ -33,53 +33,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkNode_p_h
-#define __btkNode_p_h
-
-/*
- * WARNING: This file and its content is not included in the public API and 
- * can change drastically from one release to another.
- */
-
-#include "btkObject_p.h"
-#include "btkTypeid.h"
-#include "btkNodeid.h" // Macro BTK_DECLARE_NODEID used by inheriting classes.
-
-#include <string>
-#include <unordered_map>
-#include <list>
+#ifndef __btkTypeid_h
+#define __btkTypeid_h
 
 namespace btk
 {
-  class Node;
-  
-  class NodePrivate : public ObjectPrivate
+  class typeid_t
   {
-    BTK_DECLARE_PINT_ACCESSOR(Node)
-
   public:
-    NodePrivate() = delete;
-    NodePrivate(Node* pint, const std::string& name);
-    ~NodePrivate() noexcept;
-    NodePrivate(const NodePrivate& ) = delete;
-    NodePrivate(NodePrivate&& ) noexcept = delete;
-    NodePrivate& operator=(const NodePrivate& ) = delete;
-    NodePrivate& operator=(const NodePrivate&& ) noexcept = delete;
+    typeid_t() = delete;
+    ~typeid_t() noexcept = default;
+    typeid_t(const typeid_t& ) = default;
+    typeid_t(typeid_t&& ) noexcept = default;
+    typeid_t& operator=(const typeid_t& ) = default;
+    typeid_t& operator=(typeid_t&& ) noexcept = default;
     
-    virtual bool castable(typeid_t id) const noexcept;
+    explicit operator size_t() const noexcept {return reinterpret_cast<size_t>(this->id);};
     
-    virtual bool staticProperty(const char* key, btk::Any* value) const noexcept;
-    virtual bool setStaticProperty(const char* key, const btk::Any* value) noexcept;
+    friend constexpr bool operator==(typeid_t lhs, typeid_t rhs) noexcept {return (lhs.id == rhs.id);};
+    friend constexpr bool operator!=(typeid_t lhs, typeid_t rhs) noexcept {return (lhs.id != rhs.id);};
     
-    std::string Name;
-    std::string Description;
-    std::unordered_map<std::string,Any> Properties;
-    std::list<Node*> Parents;
-    std::list<Node*> Children;
+  private:
+    template<typename T> friend constexpr typeid_t static_typeid() noexcept;
     
-  protected:
-    Node* mp_Pint;
+    using sig = typeid_t();
+    sig* id;
+    
+    constexpr typeid_t(sig* id) : id{id} {};
   };
-};
 
-#endif // __btkObject_p_h
+  template<typename T>
+  constexpr inline typeid_t static_typeid() noexcept
+  {
+    return &static_typeid<T>;
+  };
+  
+  /**
+   * @class typeid_t btkTypeid.h
+   * @brief Unique identifier for each type without using runtime type identifier
+   *
+   * Internally, and compared to the RTTI mechanism, this class use the so-called one-definition rule (ODR).
+   * @par Reference
+   * [...] If an identifier declared with external linkage is used in an expression [...], somewhere in the entire program there shall be exactly one external definition for the identifier; [...]
+   *
+   * Largely inspired by http://codereview.stackexchange.com/questions/48594/unique-type-id-no-rtti
+   */
+  
+  /**
+   * @fn template<typename T> constexpr typeid_t static_typeid() noexcept
+   * Returns the identifier associated with the given template type
+   */
+}
+
+#endif // __btkTypeid_h

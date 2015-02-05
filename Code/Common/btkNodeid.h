@@ -36,59 +36,15 @@
 #ifndef __btkNodeid_h
 #define __btkNodeid_h
 
+#include "btkTypeid.h"
+
 #define BTK_DECLARE_NODEID(derivedclass,baseclass) \
   static_assert(!std::is_same<baseclass,derivedclass>::value,"The base class cannot be the same than the current class."); \
-  virtual bool castable(btk::nodeid_t id) const noexcept override \
+  virtual bool castable(btk::typeid_t id) const noexcept override \
   { \
     if (this->baseclass##Private::castable(id)) \
       return true; \
-    return (btk::nodeid<derivedclass>() == id); \
+    return (btk::static_typeid<derivedclass>() == id); \
   };
-
-namespace btk
-{
-  class nodeid_t
-  {
-  public:
-    nodeid_t() = delete;
-    ~nodeid_t() noexcept = default;
-    nodeid_t(const nodeid_t& ) = default;
-    nodeid_t(nodeid_t&& ) noexcept = default;
-    nodeid_t& operator=(const nodeid_t& ) = default;
-    nodeid_t& operator=(nodeid_t&& ) noexcept = default;
-    
-    friend constexpr bool operator==(nodeid_t lhs, nodeid_t rhs) noexcept {return (lhs.id == rhs.id);};
-    friend constexpr bool operator!=(nodeid_t lhs, nodeid_t rhs) noexcept {return (lhs.id != rhs.id);};
-    
-  private:
-    template<typename T> friend constexpr nodeid_t nodeid() noexcept;
-    
-    using sig = nodeid_t();
-    sig* id;
-    
-    constexpr nodeid_t(sig* id) : id{id} {}
-  };
-
-  template<typename T>
-  constexpr nodeid_t nodeid() noexcept
-  {
-    return &nodeid<T>;
-  };
-  
-  /**
-   * @class nodeid_t btkNodeid.h
-   * @brief Unique identifier for each inherting Node class
-   *
-   * This class is used only to determine if node's children can be cast to a specfic derived class (see Node:findChild(), Node::findChildren().
-   * However the code is universal and could be used with any type. Indeed, the identifier is unique for any type (i.e. nodeid<int>() != nodeid<float>() != nodeid<Node>() != nodeid<Node*>() != nodeid<const Node>(), etc.)
-   *
-   * Largely inspired by http://codereview.stackexchange.com/questions/48594/unique-type-id-no-rtti
-   */
-  
-  /**
-   * @fn template<typename T> constexpr nodeid_t nodeid() noexcept
-   * Returns the identifier associated with the given template type
-   */
-}
 
 #endif // __btkNodeid_h

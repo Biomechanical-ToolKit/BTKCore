@@ -57,9 +57,9 @@ namespace btk
   
   NodePrivate::~NodePrivate() noexcept = default;
   
-  bool NodePrivate::castable(nodeid_t id) const noexcept
+  bool NodePrivate::castable(typeid_t id) const noexcept
   {
-    return (nodeid<Node>() == id);
+    return (static_typeid<Node>() == id);
   };
   
   bool NodePrivate::staticProperty(const char* key, btk::Any* value) const noexcept
@@ -469,7 +469,7 @@ namespace btk
   /**
    * Implementation of the findChild method.
    */
-  Node* Node::findNode(nodeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
+  Node* Node::findNode(typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
   {
     // Search in the direct children
     auto optr = this->pimpl();
@@ -507,7 +507,7 @@ namespace btk
   /**
    * Implementation of the findChildren method.
    */
-  void Node::findNodes(std::list<void*>* list, nodeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
+  void Node::findNodes(std::list<void*>* list, typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
   {
     // Search in the direct children
     auto optr = this->pimpl();
@@ -541,7 +541,7 @@ namespace btk
   /**
    * Implementation of the findChildren method.
    */
-  void Node::findNodes(std::list<void*>* list, nodeid_t id, const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
+  void Node::findNodes(std::list<void*>* list, typeid_t id, const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
   {
     // Search in the direct children
     auto optr = this->pimpl();
@@ -572,9 +572,9 @@ namespace btk
   };
   
   /**
-   * Returns true if the current object is castable to another with the given @a nodeid_t value, false otherwise.
+   * Returns true if the current object is castable to another with the given @a typeid_t value, false otherwise.
    */
-  bool Node::castable(nodeid_t id)
+  bool Node::castable(typeid_t id)
   {
     return this->pimpl()->castable(id);
   };
