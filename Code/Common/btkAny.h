@@ -89,12 +89,11 @@ namespace btk
     
     typedef void(*Convertoid)(void*,void*);
     static Converter& converter() noexcept;
-    static Convertoid extractConvertoid(short sid, short rid) noexcept;
+    static Convertoid extractConvertoid(size_t sid, size_t rid) noexcept;
     StorageBase* mp_Storage;
   };
 };
 
-#include "btkAny_traits.tpp"
 #include "btkAny_storage.tpp"
 #include "btkAny_converter.tpp"
 #include "btkAny.tpp"

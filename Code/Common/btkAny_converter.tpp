@@ -37,6 +37,7 @@
 #define __btkAny_converter_tpp
 
 #include "btkAny.h"
+#include "btkTypeid.h"
 
 #include <unordered_map>
 
@@ -45,7 +46,7 @@ namespace btk
   struct Any::Converter
   {
     // Typedef
-    typedef std::unordered_map<int,Convertoid> Map;
+    typedef std::unordered_map<size_t,Convertoid> Map;
     
     // Forward declaration
     template <typename S, typename R> struct HelperBase;
@@ -66,23 +67,24 @@ namespace btk
     Converter& operator= (Converter&& ) = delete;
     
     // Note: Clang (Apple LLVM version 4.2) does not like to define a static constexpr (template) method outside of the classe declaration, the next method are directly defined.
-    static inline constexpr int hash(unsigned short sid, unsigned short rid) noexcept
-    {
-      return ((sid << 16) | rid);
-    };
-    template <typename S,typename R>
-    static inline constexpr int key() noexcept
-    {
-      static_assert((Traits<S>::ID != TraitsBase::None) || (Traits<R>::ID != TraitsBase::None), "Impossible to create a key for a type which is not registered in the Any class.");
-      return hash(Traits<S>::ID,Traits<R>::ID);
-    };
     template <typename S,typename R>
     static inline constexpr Convertoid mapped() noexcept
     {
       return &HelperBase<S,R>::convert;
     };
+    static inline constexpr size_t hash(size_t sid, size_t rid) noexcept
+    {
+      return ((sid << (4*sizeof(size_t))) | ((rid << (4*sizeof(size_t))) >> (4*sizeof(size_t))));
+    };
+    
     template <typename S,typename R>
-    static inline constexpr std::pair<int,Convertoid> pair() noexcept
+    static inline size_t key() noexcept
+    {
+      return hash(static_cast<size_t>(static_typeid<S>()),static_cast<size_t>(static_typeid<R>()));
+    };
+    
+    template <typename S,typename R>
+    static inline std::pair<size_t,Convertoid> pair() noexcept
     {
       return {key<S,R>(),mapped<S,R>()};
     };

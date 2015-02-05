@@ -41,19 +41,18 @@ namespace btk
   
   Any::Converter::Converter()
   : Table{std::forward<Map>(merge(
-      Register<bool,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<int8_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<uint8_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<int8_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<int16_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<uint16_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<int32_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<uint32_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<int64_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<uint64_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<float,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<double,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
-      Register<std::string,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{}
+      Register<bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
+      Register<int8_t,bool,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
+      Register<uint8_t,bool,int8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
+      Register<int16_t,bool,int8_t,uint8_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
+      Register<uint16_t,bool,int8_t,uint8_t,int16_t,int32_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
+      Register<int32_t,bool,int8_t,uint8_t,int16_t,uint16_t,uint32_t,int64_t,uint64_t,float,double,std::string>{},
+      Register<uint32_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,int64_t,uint64_t,float,double,std::string>{},
+      Register<int64_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,uint64_t,float,double,std::string>{},
+      Register<uint64_t,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,float,double,std::string>{},
+      Register<float,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,double,std::string>{},
+      Register<double,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,std::string>{},
+      Register<std::string,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double>{}
     ).Table)}
   {};
   
@@ -364,7 +363,7 @@ namespace btk
    * Extract the convertion function pointer (convertoid) based on the ID used from the type source (@c sid) and the returned type (@c rid)
    * In case no function pointer was found, the returned valud is set to nullptr.
    */
-  Any::Convertoid Any::extractConvertoid(short sid, short rid) noexcept
+  Any::Convertoid Any::extractConvertoid(size_t sid, size_t rid) noexcept
   {
     auto it = Any::converter().Table.find(Any::Converter::hash(sid,rid));
     return (it != Any::converter().Table.end()) ? it->second : nullptr;

@@ -43,7 +43,6 @@ namespace btk
   {
     Register()
     {
-      static_assert(Traits<Type>::ID > TraitsBase::None, "It is not possible to register a type without an Any::Traits::ID. Specialize the struct Any::Traits and assign a unique value to Any::Traits::ID.");
       for(auto&& reg : Converter::Map{Converter::pair<Type,To>()...})
         Any::converter().Table.emplace(std::forward<Converter::Map::value_type>(reg));
       for(auto&& reg : Converter::Map{Converter::pair<From,Type>()...})
@@ -61,14 +60,16 @@ namespace btk
   {
     Unregister()
     {
-      static_assert(Traits<Type>::ID > TraitsBase::User, "It is not possible to unregister a builtin type. In case this is a user type, verify the Any::Traits::ID value and be sure it is over Any::TraitsBase::User.");
       Converter::Map& table = Any::converter().Table;
       auto it = table.begin();
       while (it != table.end())
       {
         // 1. Remove the conversion between the given user type and the other registered types
         // 2. Remove the conversion between the other registered types and the given user type
-        if ((((it->first & 0xFFFF0000) >> 16) == Traits<Type>::ID) || ((it->first & 0x0000FFFF) == Traits<Type>::ID))
+        constexpr size_t shift = 4*sizeof(size_t);
+        const size_t sid = static_cast<size_t>(static_typeid<Type>()) << shift;
+        const size_t rid = (static_cast<size_t>(static_typeid<Type>()) << shift) >> shift;
+        if (((it->first & sid) == sid) || ((it->first & rid) ==rid))
           it = table.erase(it);
         else
           ++it;
@@ -93,9 +94,16 @@ namespace btk
     U value = U();
     if (this->mp_Storage != nullptr)
     {
-      auto convert = Any::extractConvertoid(this->mp_Storage->id(),Traits<U>::ID);
-      if (convert != nullptr)
-        convert(this->mp_Storage->Data,&value);
+      if (this->mp_Storage->id() == static_cast<size_t>(static_typeid<U>()))
+      {
+        value = *static_cast<U*>(this->mp_Storage->Data);
+      }
+      else
+      {  
+        auto convert = Any::extractConvertoid(this->mp_Storage->id(),static_cast<size_t>(static_typeid<U>()));
+        if (convert != nullptr)
+          convert(this->mp_Storage->Data,&value);
+      }
     }
     return value;
   }
