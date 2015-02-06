@@ -75,12 +75,13 @@ namespace btk
    * in the C++11 revision of the C++ standard (constexpr, variadic templates, 
    * initializer lists, static assertions, rvalue, move, etc.).
    *
-   * The internal behaviour of the class is mostly composed of two elements:
+   * The internal behaviour of the class is mostly composed of three elements:
    *  - A type-erasure storage containing the data
-   *  - A static table (std::unordered_map) containing all the known conversions between registered types.
+   *  - A cast() method implemented differently depending the type requested (using the SFINAE technique)
+   *  - A static table (std::unordered_map) containing all the custom conversions between registered types.
    *
-   * By default, the table gives the possibility to convert boolean, integers (int*_t),
-   * reals (float, double) and string (std::string) between them. For example.
+   * By default, all the arithmetic types (bool, integers, floating points) and 
+   * the std::string type are convertible between them
    *
    * @code
    * btk::Any a(5); // store an integer with the value 5
@@ -96,11 +97,10 @@ namespace btk
    * @endcode
    *
    * It is possible to register new types verified at compile time.
-   * For this, the type must answer to two requirements:
+   * For this, the type must answer two requirements:
    * - Have a valid default constructor
    * - Have an non-member equal operator
    *
-   * One template specialization is at least required to define the type ID associated.
    * For example, if you want to register the class @c Date defined as:
    *
    * @code
@@ -111,38 +111,24 @@ namespace btk
    * };
    * @endcode
    *
-   * The private class Any::Traits must be specialized to define the type ID.
-   * Note: The use of the enum value Any::TraitsBase::User is important as it is used 
-   * to distinguish builtin and user types. This value is used in case you want to 
-   * unregister a type. Only user's type can be unregistered. The ID values available 
-   * for user type are ranged between 1024 and 65535.
-   *
-   * @code
-   * template<> struct btk::Any::Traits<Date> : btk::Any::TraitsBase
-   * {
-   *   enum {ID = Any::TraitsBase::User + 1}; // 1025
-   * };
-   * @endcode
-   *
-   * It is then possible to register a type using the btk::Any::Register command.
+   * It is then possible to register it using the btk::Any::Register command.
    *
    * @code
    * // Must be in a function. For example the main(). The scope of the registration
    * // is valid until the end of the program.
-   * btk::Any::Register<Date, btk::converter<Date>, btk::converter<>>();
-   * //                  ^^^^
+   * btk::Any::Register<Date, btk::converter<>, btk::converter<>>();
+   * //                 ^^^^
    * //      Registered type
-   * //                                 ^^^^^^^^^^^^^^^^
-   * //        A Date stored in a btk::Any object can be
-   * //      converted to these types (In this example, a
-   * //  stored Date is convertible only to a Date object)
-   * //                                                             ^^^^^^^^^^^^
-   * //                           A Date object can be created from another type
-   * //                                         (none available in this example)
+   * //                       ^^^^^^^^^^^^^^^^
+   * // A Date stored in a btk::Any object can be
+   * //                  converted to these types
+   * //          (none available in this example)
+   * //                                         ^^^^^^^^^^^^^^^^
+   * //           A Date object can be created from another type
+   * //                         (none available in this example)
    * @endcode
    *
-   *
-   * In case other conversions are intended. the internal converter must be 
+   * When conversions are intended. the internal converter must be 
    * specialized in consequence. For example, if a @c Date can be converted to a
    * @c std::string or created from a @c std::string, two specializations are required.
    *
@@ -172,11 +158,12 @@ namespace btk
    * btk::Any::Unregister must be called.
    * @code
    * // The next line unregisters all the conversions related to a Date object. 
-   * // You can still store a Date object in btk::Any, but all conversions will be 
-   * // not valid.
+   * // You can still store a Date object in btk::Any, but only a conversion to
+   * // it its own type will be valid
    * btk::Any::Unregister<Date>();
    * btk::Any a(Date{2009,05,02});
-   * btk::Date empty = a; // No conversion is known, the returned Date is empty.
+   * btk::Date b = a; // 2009,05,02
+   * std::string c = a; // empty string
    * @endcode
    *
    * @ingroup BTKCommon
@@ -209,18 +196,8 @@ namespace btk
   /**
    * @fn template <typename U> Any::Any(const U& value);
    * Constructor which store the given @a value.
-   * Internally, the type @c U is tested to verify if an ID is associated with.
-   * If it is not the case an error is triggered (static assertion) at compile time.
    *
-   * By default, all the following types are registered:
-   *  - bool
-   *  - int8_t / uint8_t
-   *  - int16_t / uint16_t (short / unsigned short)
-   *  - int32_t / uint32_t (integer / unsigned integer for 32-bit system)  
-   *  - int64_t / uint64_t (integer / unsigned integer for 64-bit system)  
-   *  - float
-   *  - double
-   *  - std::string
+   * You can store any kind of type. But the conversion between types is only avaible if the stored type correspoinds to an arithmetic type, or a std::string, or if you register some custom conversion .
    */
 
   /**
@@ -256,8 +233,6 @@ namespace btk
    * btk::Any a("5");
    * std::string str = a.cast<std::string>();
    * @endcode
-   *
-   * @note The casted type must be registered otherwise a compiler error will be thrown (unvalid static assertion).
    *
    * @see Any::operator U()
    */
@@ -299,7 +274,6 @@ namespace btk
   /**
    * @fn template<typename U> Any& Any::operator=(const U& other);
    * Convenient assignment operator. This reduces the number of steps (and memory allocation) to assign a new value (compared to the use a constructor plus a copy constructor).
-   * The same rules applies than for the constructor (i.e. the assigned type must be registered).
    */
   
   /**
