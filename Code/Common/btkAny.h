@@ -80,11 +80,10 @@ namespace btk
     friend bool operator==(const Any& lhs, const Any& rhs) noexcept;
     friend bool operator!=(const Any& lhs, const Any& rhs) noexcept;
     
-    // Note: The definition of the next friend (in)equal operators are in the declaration of the class because the default template parameters for a friend function can be specified only one time (see C++11 standard, paragraph 14.1.9)
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> friend inline bool operator==(const Any& lhs, const U& rhs) noexcept {return (lhs.cast<U>() == rhs);};
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> friend inline bool operator==(const U& lhs, const Any& rhs) noexcept {return (rhs == lhs);};
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> friend inline bool operator!=(const Any& lhs, const U& rhs) noexcept {return !(lhs == rhs);};
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> friend inline bool operator!=(const U& lhs, const Any& rhs) noexcept {return !(lhs == rhs);};
+    template <typename U> friend inline bool operator==(const Any& lhs, const U& rhs) noexcept {return (lhs.cast<U>() == rhs);};
+    template <typename U> friend inline bool operator==(const U& lhs, const Any& rhs) noexcept {return (rhs == lhs);};
+    template <typename U> friend inline bool operator!=(const Any& lhs, const U& rhs) noexcept {return !(lhs == rhs);};
+    template <typename U> friend inline bool operator!=(const U& lhs, const Any& rhs) noexcept {return !(lhs == rhs);};
     
   private:
     // Forward declaration

@@ -293,22 +293,22 @@ namespace btk
   };
   
   /**
-   * @fn template <typename U, typename> friend inline bool operator==(const Any& lhs, const U& rhs)
+   * @fn template <typename U> friend inline bool operator==(const Any& lhs, const U& rhs)
    * Convenient equal operator to compare an Any object (@c lhs) with another object of type @c U (@c rhs).
    */  
     
   /**
-   * template <typename U, typename> friend inline bool operator==(const U& lhs, const Any& rhs)
+   * template <typename U> friend inline bool operator==(const U& lhs, const Any& rhs)
    * Convenient equal operator to compare an object of type @c U (@c lhs) with an Any object (@c rhs). Internally this operator does (rhs == lhs).
    */
   
   /**
-   * template <typename U, typename> friend inline bool operator!=(const Any& lhs, const U& rhs)
+   * template <typename U> friend inline bool operator!=(const Any& lhs, const U& rhs)
    * Convenient inequal operator to compare an Any object (@c lhs) with another object of type @c U (@c rhs). Internally this operator take the opposite of the equal operator.
    */
   
   /**
-   * template <typename U, typename> friend inline bool operator!=(const U& lhs, const Any& rhs)
+   * template <typename U> friend inline bool operator!=(const U& lhs, const Any& rhs)
    * Convenient inequal operator to compare an object of type @c U (@c lhs) with an Any object (@c rhs). Internally this operator take the opposite of the equal operator.
    */
 
