@@ -37,6 +37,7 @@
 #define __btkAny_h
 
 #include "btkCommonExport.h"
+#include "btkTypeid.h"
 
 #include <type_traits>
 
@@ -90,7 +91,7 @@ namespace btk
     
     typedef void(*Convertoid)(void*,void*);
     static Converter& converter() noexcept;
-    static Convertoid extractConvertoid(size_t sid, size_t rid) noexcept;
+    static Convertoid extractConvertoid(typeid_t sid, typeid_t rid) noexcept;
     StorageBase* mp_Storage;
   };
 };

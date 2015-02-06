@@ -36,8 +36,6 @@
 #ifndef __btkAny_storage_tpp
 #define __btkAny_storage_tpp
 
-#include "btkTypeid.h"
-
 #include <string>
 
 namespace btk
@@ -47,7 +45,7 @@ namespace btk
     StorageBase(void* data);
     StorageBase(const StorageBase& ) = delete;
     virtual ~StorageBase() noexcept;
-    virtual size_t id() const noexcept = 0;
+    virtual typeid_t id() const noexcept = 0;
     virtual bool is_arithmetic() const noexcept = 0;
     virtual StorageBase* clone() const = 0;
     virtual bool compare(StorageBase* other) const noexcept = 0;
@@ -62,7 +60,7 @@ namespace btk
     
     Storage(const T& value);
     ~Storage() noexcept;
-    virtual size_t id() const noexcept final;
+    virtual typeid_t id() const noexcept final;
     virtual bool is_arithmetic() const noexcept final;
     virtual StorageBase* clone() const final;
     virtual bool compare(StorageBase* other) const noexcept final;
@@ -107,9 +105,9 @@ namespace btk
   };
   
   template <typename T> 
-  inline size_t Any::Storage<T>::id() const noexcept
+  inline typeid_t Any::Storage<T>::id() const noexcept
   {
-    return static_cast<size_t>(static_typeid<T>());
+    return static_typeid<T>();
   };
   
   template <typename T> 

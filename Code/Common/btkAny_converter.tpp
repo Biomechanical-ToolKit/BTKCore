@@ -37,7 +37,6 @@
 #define __btkAny_converter_tpp
 
 #include "btkAny.h"
-#include "btkTypeid.h"
 
 #include <unordered_map>
 

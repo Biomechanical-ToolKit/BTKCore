@@ -36,6 +36,8 @@
 #ifndef __btkTypeid_h
 #define __btkTypeid_h
 
+#include <cstddef>
+
 namespace btk
 {
   class typeid_t

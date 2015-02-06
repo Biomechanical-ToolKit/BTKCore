@@ -363,9 +363,9 @@ namespace btk
    * Extract the convertion function pointer (convertoid) based on the ID used from the type source (@c sid) and the returned type (@c rid)
    * In case no function pointer was found, the returned valud is set to nullptr.
    */
-  Any::Convertoid Any::extractConvertoid(size_t sid, size_t rid) noexcept
+  Any::Convertoid Any::extractConvertoid(typeid_t sid, typeid_t rid) noexcept
   {
-    auto it = Any::converter().Table.find(Any::Converter::hash(sid,rid));
+    auto it = Any::converter().Table.find(Any::Converter::hash(static_cast<size_t>(sid),static_cast<size_t>(rid)));
     return (it != Any::converter().Table.end()) ? it->second : nullptr;
   };
   
