@@ -64,8 +64,11 @@ namespace btk
     bool isValid() const noexcept;
     void swap(Any& other) noexcept;
     
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type, typename = typename std::enable_if<!std::is_arithmetic<typename std::decay<U>::type>::value>::type, typename = typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value>::type> U cast() const noexcept;
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type, typename = typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value>::type> U cast() const noexcept;
+    template <typename U, typename = typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value>::type,
+                          typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type, 
+                          typename = typename std::enable_if<!std::is_arithmetic<typename std::decay<U>::type>::value>::type> U cast() const noexcept;
+    template <typename U, typename = typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value>::type,
+                          typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast() const noexcept;
     template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value && !std::is_arithmetic<typename std::decay<U>::type>::value && !std::is_same<std::string, typename std::decay<U>::type>::value>::type> U cast() const noexcept;
     
     template<class U> operator U() const noexcept;
