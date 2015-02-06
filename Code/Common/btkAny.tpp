@@ -86,9 +86,9 @@ namespace btk
     Unregister& operator=(Unregister&& ) = delete;
   };
   
-  template <typename U>
-  Any::Any(const U& value)
-  : mp_Storage(new Storage<U>(value))
+  template <typename U, typename>
+  Any::Any(U&& value)
+  : mp_Storage(new Storage<typename std::remove_cv<typename std::remove_reference<U>::type>::type>(std::forward<U>(value)))
   {};
   
  /**
@@ -295,12 +295,12 @@ namespace btk
   {
     return this->cast<U>();
   };
-    
-  template <typename U>
-  inline Any& Any::operator=(const U& other)
+
+  template <typename U, typename>
+  inline Any& Any::operator=(U&& other)
   {
     delete this->mp_Storage;
-    this->mp_Storage = new Storage<U>(other);
+    this->mp_Storage = new Storage<typename std::remove_cv<typename std::remove_reference<U>::type>::type>(std::forward<U>(other));
     return *this;
   };
   

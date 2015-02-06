@@ -57,7 +57,7 @@ namespace btk
     Any() noexcept;
     Any(const Any& other);
     Any(Any&& other) noexcept;
-    template <typename U> Any(const U& value);
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(U&& value);
     
     ~Any();
     
@@ -75,7 +75,7 @@ namespace btk
     
     Any& operator=(const Any& other);
     Any& operator=(Any&& other) noexcept;
-    template<typename U> Any& operator=(const U& other);
+    template<typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any& operator=(U&& other);
     
     friend bool operator==(const Any& lhs, const Any& rhs) noexcept;
     friend bool operator!=(const Any& lhs, const Any& rhs) noexcept;
@@ -88,7 +88,7 @@ namespace btk
   private:
     // Forward declaration
     struct TraitsBase;
-    struct StorageBase;    
+    struct StorageBase;
     struct Converter;
     template <typename T> struct Traits;
     template <typename T> struct Storage;

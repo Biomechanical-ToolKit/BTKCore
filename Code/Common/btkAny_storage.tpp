@@ -58,7 +58,7 @@ namespace btk
   {
     static_assert(std::is_copy_constructible<T>::value, "Impossible to use the btk::Any class with a type which does not have a copy constructor.");
     
-    Storage(const T& value);
+    template <typename U> Storage(U&& value);
     ~Storage() noexcept;
     virtual typeid_t id() const noexcept final;
     virtual bool is_arithmetic() const noexcept final;
@@ -78,8 +78,9 @@ namespace btk
   // ----------------------------------------------------------------------- //
   
   template <typename T> 
-  inline Any::Storage<T>::Storage(const T& value)
-  : Any::StorageBase(new T(value))
+  template <typename U> 
+  inline Any::Storage<T>::Storage(U&& value)
+  : Any::StorageBase(new T(std::forward<U>(value)))
   {};
   
   template <typename T> 
