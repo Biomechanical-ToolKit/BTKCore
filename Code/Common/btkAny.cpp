@@ -42,17 +42,7 @@ namespace btk
   Any::Converter::Converter()
   : Table{std::forward<Map>(merge(
       Register<bool,std::string>{},
-      Register<int8_t,std::string>{},
-      Register<uint8_t,std::string>{},
-      Register<int16_t,std::string>{},
-      Register<uint16_t,std::string>{},
-      Register<int32_t,std::string>{},
-      Register<uint32_t,std::string>{},
-      Register<int64_t,std::string>{},
-      Register<uint64_t,std::string>{},
-      Register<float,std::string>{},
-      Register<double,std::string>{},
-      Register<std::string,bool,int8_t,uint8_t,int16_t,uint16_t,int32_t,uint32_t,int64_t,uint64_t,float,double>{}
+      Register<std::string,bool>{}
     ).Table)}
   {};
   
