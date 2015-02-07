@@ -40,7 +40,6 @@
 #include "btkTypeid.h"
 
 #include <type_traits>
-#include <string>
 
 namespace btk
 {
@@ -64,12 +63,7 @@ namespace btk
     bool isValid() const noexcept;
     void swap(Any& other) noexcept;
     
-    template <typename U, typename = typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value>::type,
-                          typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type, 
-                          typename = typename std::enable_if<!std::is_arithmetic<typename std::decay<U>::type>::value>::type> U cast() const noexcept;
-    template <typename U, typename = typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value>::type,
-                          typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast() const noexcept;
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value && !std::is_arithmetic<typename std::decay<U>::type>::value && !std::is_same<std::string, typename std::decay<U>::type>::value>::type> U cast() const noexcept;
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast() const noexcept;
     
     template<class U> operator U() const noexcept;
     
@@ -87,10 +81,10 @@ namespace btk
     
   private:
     // Forward declaration
-    struct TraitsBase;
     struct StorageBase;
-    struct Converter;
     template <typename T> struct Storage;
+    struct Converter;
+    struct Cast;
     
     template <typename U> void convert(U* value)const  noexcept;
     
@@ -103,6 +97,7 @@ namespace btk
 
 #include "btkAny_storage.tpp"
 #include "btkAny_converter.tpp"
+#include "btkAny_cast.tpp"
 #include "btkAny.tpp"
 
 #endif // __btkAny_h
