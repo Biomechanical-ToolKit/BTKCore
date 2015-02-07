@@ -90,7 +90,6 @@ namespace btk
     struct TraitsBase;
     struct StorageBase;
     struct Converter;
-    template <typename T> struct Traits;
     template <typename T> struct Storage;
     
     template <typename U> void convert(U* value)const  noexcept;
