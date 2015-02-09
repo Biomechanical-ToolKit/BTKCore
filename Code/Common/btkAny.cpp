@@ -40,10 +40,7 @@ namespace btk
   // Known conversion table defined at compile time.
   
   Any::Converter::Converter()
-  : Table{std::forward<Map>(merge(
-      Register<bool,std::string>{},
-      Register<std::string,bool>{}
-    ).Table)}
+  : Table{}
   {};
   
   // ----------------------------------------------------------------------- //

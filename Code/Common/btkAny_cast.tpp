@@ -46,12 +46,18 @@ namespace btk
 {
   struct Any::Cast
   {
+    Cast() = delete;
+    ~Cast() noexcept = delete;
+    Cast(const Cast& ) = delete;
+    Cast(Cast&& ) noexcept = delete;
+    Cast& operator=(const Cast& ) = delete;
+    Cast& operator=(Cast&& ) noexcept = delete;
+    
     // Default
     template <typename U>
-    static typename std::enable_if<
-          !std::is_same<Any, typename std::decay<U>::type>::value
-        && !std::is_arithmetic<typename std::decay<U>::type>::value
-        && !std::is_same<std::string, typename std::decay<U>::type>::value  
+    static inline typename std::enable_if<
+          !std::is_arithmetic<typename std::decay<U>::type>::value
+       && !std::is_same<std::string, typename std::decay<U>::type>::value  
       , bool>::type single(U* value, StorageBase* storage) noexcept
     {
       return false;
@@ -62,7 +68,7 @@ namespace btk
     static typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value, bool>::type single(U* value, StorageBase* storage) noexcept
     {
       const typeid_t id = storage->id();
-      if (std::is_arithmetic<U>::value && storage->is_arithmetic())
+      if (storage->is_arithmetic())
       {
         // bool
         if (id == static_typeid<bool>())
@@ -123,34 +129,10 @@ namespace btk
           throw(LogicError("Unexpected error during arithmetic to arithmetic conversion!"));
         return true;
       }
-      else if (std::is_arithmetic<U>::value && (static_typeid<U>() != static_typeid<bool>()) && (id == static_typeid<std::string>()))
+      else if (id == static_typeid<std::string>())
       {
-        if (std::is_integral<U>::value)
-        {
-          if (std::is_signed<U>::value)
-          {
-            if (sizeof(U) > sizeof(long))
-              *value = strtoll(static_cast<std::string*>(storage->Data)->c_str(),nullptr,0);
-            else
-              *value = strtol(static_cast<std::string*>(storage->Data)->c_str(),nullptr,0);
-          }
-          else
-          {
-            if (sizeof(U) > sizeof(long))
-              *value = strtoull(static_cast<std::string*>(storage->Data)->c_str(),nullptr,0);
-            else
-              *value = strtol(static_cast<std::string*>(storage->Data)->c_str(),nullptr,0);
-          }
-        }
-        else
-        {
-          if (static_typeid<U>() == static_typeid<float>())
-            *value = strtof(static_cast<std::string*>(storage->Data)->c_str(),nullptr);
-          else if (static_typeid<U>() != static_typeid<double>())
-            *value = strtod(static_cast<std::string*>(storage->Data)->c_str(),nullptr);
-          else // long double
-            *value = strtold(static_cast<std::string*>(storage->Data)->c_str(),nullptr);
-        }
+        const char* str = static_cast<std::string*>(storage->Data)->c_str();
+        single_from_string(value,str);
         return true;
       }
       return false;
@@ -162,13 +144,15 @@ namespace btk
     {
       const typeid_t id = storage->id();
       if (storage->is_arithmetic()
-               && (id != static_typeid<bool>())
                && (id != static_typeid<char16_t>())
                && (id != static_typeid<char32_t>())
                && (id != static_typeid<wchar_t>()))
       {
+        // bool
+        if (id == static_typeid<bool>())
+          *value = std::string(*static_cast<bool*>(storage->Data) ? "true" : "false");
         // char (convert as it is an int8_t)
-        if (id == static_typeid<char>())
+        else if (id == static_typeid<char>())
           *value = std::to_string((short int)*static_cast<char*>(storage->Data));
         // signed char (convert as it is a signed int8_t)
         else if (id == static_typeid<signed char>())
@@ -215,6 +199,58 @@ namespace btk
         return true;
       }
       return false;
+    };
+  
+    // --------------------------------------------------------------------- //
+    
+  private:
+    
+    template <typename U>
+    static inline typename std::enable_if<std::is_same<bool, typename std::decay<U>::type>::value>::type single_from_string(U* value, const char* str) noexcept
+    {
+      *value = (!((strlen(str) == 0) || (strcmp(str,"0") == 0) || (strcmp(str,"false") == 0)));
+    };
+  
+    template <typename U>
+    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_signed<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) > sizeof(long))>::type single_from_string(U* value, const char* str) noexcept
+    {
+      *value = strtoll(str,nullptr,0);
+    };
+  
+    template <typename U>
+    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_signed<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) <= sizeof(long))>::type single_from_string(U* value, const char* str) noexcept
+    {
+      *value = strtol(str,nullptr,0);
+    };
+  
+    template <typename U>
+    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_unsigned<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) > sizeof(long))>::type single_from_string(U* value, const char* str) noexcept
+    {
+      *value = strtoull(str,nullptr,0);
+    };
+  
+    template <typename U>
+    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_unsigned<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) <= sizeof(long))>::type single_from_string(U* value, const char* str) noexcept
+    {
+      *value = strtol(str,nullptr,0);
+    };
+  
+    template <typename U>
+    static inline typename std::enable_if<std::is_same<float, typename std::decay<U>::type>::value>::type single_from_string(U* value, const char* str) noexcept
+    {
+      *value = strtof(str,nullptr);
+    };
+  
+    template <typename U>
+    static inline typename std::enable_if<std::is_same<double, typename std::decay<U>::type>::value>::type single_from_string(U* value, const char* str) noexcept
+    {
+      *value = strtod(str,nullptr);
+    };
+  
+    template <typename U>
+    static inline typename std::enable_if<std::is_same<long double, typename std::decay<U>::type>::value>::type single_from_string(U* value, const char* str) noexcept
+    {
+      *value = strtold(str,nullptr);
     };
   };
 };

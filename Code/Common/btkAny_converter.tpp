@@ -58,8 +58,6 @@ namespace btk
     // Method
     Converter();
     ~Converter() = default;
-    template <typename T> static T& merge(T&& registered);
-    template <typename T, typename... Ts> static T& merge(T&& registered, Ts&&... others);
     Converter(const Converter& ) = delete;
     Converter(Converter&& ) = delete;
     Converter& operator= (const Converter& ) = delete;
@@ -101,20 +99,6 @@ namespace btk
     Register(Register&& ) = default;
     Register& operator= (const Register& ) = delete;
     Register& operator= (Register&& ) = delete;
-  };
-  
-  template <typename T>
-  inline T& Any::Converter::merge(T&& registered)
-  {
-    return registered;
-  };
-  
-  template <typename T, typename... Ts>
-  inline T& Any::Converter::merge(T&& registered, Ts&&... others)
-  {
-    for(auto& reg : merge(others...).Table)
-      registered.Table.emplace(std::forward<Map::value_type>(reg));
-    return registered;
   };
 };
 

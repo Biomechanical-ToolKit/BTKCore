@@ -38,58 +38,24 @@
 
 namespace btk
 {
+  
+  /**
+   * Base for all the conversions furnished by the user (using the Any::Register structure)
+   */
   template <typename S, typename R>
   struct Any::Converter::HelperBase
   {
     static inline void convert(void* source, void* result) {*static_cast<R*>(result) = Helper<S,R>::convert(*static_cast<S*>(source));};
   };
   
+  /**
+   * Generic converter which does nothing except returning a default value of the type @a R.
+   * All custom conversions must specializase this structure.
+   */
   template <typename S, typename R>
   struct Any::Converter::Helper : Any::Converter::HelperBase<S,R>
   {
-    static inline R convert(const S& val) {return static_cast<R>(val);}
-  };
-  
-  // ----------------------------------------------------------------------- //
-  //                           Partial specializations
-  // ----------------------------------------------------------------------- //
-
-  // Converting the same type returns directly the value
-  template<typename U>
-  struct Any::Converter::Helper<U,U> : Any::Converter::HelperBase<U,U>
-  {
-    static inline U convert(const U& val) {return val;}
-  };
-
-  // Converting a string to something else.
-  // NOTE: This conversion must fully specialized. This partial traits is here only to generate a compiler error due to the use of a static_assert call.
-  template<typename U>
-  struct Any::Converter::Helper<std::string,U> : Any::Converter::HelperBase<std::string,U>
-  {
-    static_assert(std::is_same<U,std::string>::value,"Every conversion from a string must be fully specialized.");
-    static inline U convert(const std::string& ) {return U();};
-  };
-
-  // ----------------------------------------------------------------------- //
-  //                           Full specializations
-  // ----------------------------------------------------------------------- //
-
-  // ----------------------------------------------------------------------- //
-  //                                 boolean
-  // ----------------------------------------------------------------------- //
-
-  // A boolean can be set also to false when the value is equal to "", "0", or "false".
-  template<>
-  struct Any::Converter::Helper<std::string,bool> : Any::Converter::HelperBase<std::string,bool>
-  {
-    static inline bool convert(const std::string& val) {return !(val.empty() || (val.compare("0") == 0) || (val.compare("false") == 0));};
-  };
-  
-  // A boolean converted to a string is set to "true" when it is true or "false" when false.
-  template<>
-  struct Any::Converter::Helper<bool,std::string> : Any::Converter::HelperBase<bool,std::string>
-  {
-    static inline std::string convert(const bool& val) {return std::string(val ? "true" : "false");};
+    static inline R convert(const S& val) {return R();}
   };
 };
 
