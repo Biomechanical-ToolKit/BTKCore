@@ -11,9 +11,10 @@ struct Date
   friend bool operator==(const Date& lhs,const Date& rhs) {return ((lhs.Year == rhs.Year) && (lhs.Month == rhs.Month) && (lhs.Day == rhs.Day));};
 };
 
-template<> struct btk::Any::Traits<Date> : btk::Any::TraitsBase
+struct Foo
 {
-  enum {ID = Any::TraitsBase::User + 1};
+  int Bar1, Bar2;
+  friend bool operator==(const Foo& lhs,const Foo& rhs) {return ((lhs.Bar1 == rhs.Bar1) && (lhs.Bar2 == rhs.Bar2));};
 };
 
 template<>
