@@ -37,9 +37,12 @@
 #define __btkAny_h
 
 #include "btkCommonExport.h"
+#include "btkTypeTraits.h"
 #include "btkTypeid.h"
 
 #include <type_traits>
+#include <vector>
+#include <initializer_list>
 
 namespace btk
 {
@@ -56,9 +59,14 @@ namespace btk
     Any() noexcept;
     Any(const Any& other);
     Any(Any&& other) noexcept;
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(U&& value);
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value && !is_stl_vector<typename std::decay<U>::type>::value>::type> Any(U&& value);
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(const std::vector<U>& values, const std::vector<size_t>& dimensions = {});
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(std::initializer_list<U> values, std::initializer_list<size_t> dimensions = {});
     
     ~Any();
+    
+    std::vector<size_t> dimensions() const noexcept;
+    size_t size() const noexcept;
     
     bool isValid() const noexcept;
     void swap(Any& other) noexcept;
@@ -69,7 +77,6 @@ namespace btk
     
     Any& operator=(const Any& other);
     Any& operator=(Any&& other) noexcept;
-    template<typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any& operator=(U&& other);
     
     friend bool operator==(const Any& lhs, const Any& rhs) noexcept;
     friend bool operator!=(const Any& lhs, const Any& rhs) noexcept;
@@ -82,7 +89,8 @@ namespace btk
   private:
     // Forward declaration
     struct StorageBase;
-    template <typename T> struct Storage;
+    template <typename T> struct StorageSingle;
+    template <typename T> struct StorageArray;
     struct Converter;
     struct Cast;
     

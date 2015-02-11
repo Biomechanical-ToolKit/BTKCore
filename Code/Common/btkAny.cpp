@@ -206,12 +206,14 @@ namespace btk
     delete this->mp_Storage;
   };
   
-  /**
-   * Swap the content of two Any object.
-   */
-  void Any::swap(Any& other) noexcept
+  std::vector<size_t> Any::dimensions() const noexcept
   {
-    std::swap(this->mp_Storage, other.mp_Storage);
+    return this->mp_Storage->dimensions();
+  };
+
+  size_t Any::size() const noexcept
+  {
+    return this->mp_Storage->size();
   };
   
   /**
@@ -220,6 +222,14 @@ namespace btk
   bool Any::isValid() const noexcept
   {
     return (this->mp_Storage != nullptr);
+  };
+ 
+  /**
+   * Swap the content of two Any object.
+   */
+  void Any::swap(Any& other) noexcept
+  {
+    std::swap(this->mp_Storage, other.mp_Storage);
   };
   
   /** 
@@ -267,12 +277,7 @@ namespace btk
     }
     return *this;
   };
-  
-  /**
-   * @fn template<typename U> Any& Any::operator=(const U& other);
-   * Convenient assignment operator. This reduces the number of steps (and memory allocation) to assign a new value (compared to the use a constructor plus a copy constructor).
-   */
-  
+
   /**
    * Equal operator. Compare the content of two Any objects.
    */
