@@ -45,7 +45,7 @@ namespace btk
   struct Any::Converter
   {
     // Typedef
-    typedef std::unordered_map<size_t,details::convert_t> Map;
+    using Map = std::unordered_map<size_t,details::convert_t>;
     
     // Forward declaration
     template <typename S, typename R> struct HelperBase;
