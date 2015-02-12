@@ -45,7 +45,7 @@ namespace btk
   struct Any::Converter
   {
     // Typedef
-    typedef std::unordered_map<size_t,Convertoid> Map;
+    typedef std::unordered_map<size_t,details::convert_t> Map;
     
     // Forward declaration
     template <typename S, typename R> struct HelperBase;
@@ -65,7 +65,7 @@ namespace btk
     
     // Note: Clang (Apple LLVM version 4.2) does not like to define a static constexpr (template) method outside of the classe declaration, the next method are directly defined.
     template <typename S,typename R>
-    static inline constexpr Convertoid mapped() noexcept
+    static inline constexpr details::convert_t mapped() noexcept
     {
       return &HelperBase<S,R>::convert;
     };
@@ -81,7 +81,7 @@ namespace btk
     };
     
     template <typename S,typename R>
-    static inline std::pair<size_t,Convertoid> pair() noexcept
+    static inline std::pair<size_t,details::convert_t> pair() noexcept
     {
       return {key<S,R>(),mapped<S,R>()};
     };

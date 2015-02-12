@@ -46,9 +46,9 @@ namespace btk
     Register()
     {
       for(auto&& reg : Converter::Map{Converter::pair<Type,To>()...})
-        Any::converter().Table.emplace(std::forward<Converter::Map::value_type>(reg));
+        Any::details::converter().Table.emplace(std::forward<Converter::Map::value_type>(reg));
       for(auto&& reg : Converter::Map{Converter::pair<From,Type>()...})
-        Any::converter().Table.emplace(std::forward<Converter::Map::value_type>(reg));
+        Any::details::converter().Table.emplace(std::forward<Converter::Map::value_type>(reg));
     };
     ~Register() = default;
     Register(const Register& ) = delete;
@@ -62,7 +62,7 @@ namespace btk
   {
     Unregister()
     {
-      Converter::Map& table = Any::converter().Table;
+      Converter::Map& table = Any::details::converter().Table;
       auto it = table.begin();
       while (it != table.end())
       {
@@ -104,7 +104,7 @@ namespace btk
       if (this->mp_Storage->id() == static_typeid<U>())
         value = *static_cast<U*>(this->mp_Storage->Data);
       else if (!details::cast(&value, this->mp_Storage))
-        this->convert(&value);
+        details::convert(&value, this->mp_Storage);
     }
     return value;
   };
@@ -113,14 +113,6 @@ namespace btk
   inline Any::operator U() const noexcept
   {
     return this->cast<U>();
-  };
-  
-  template <typename U>
-  inline void Any::convert(U* value) const noexcept
-  {
-    auto convert = Any::extractConvertoid(this->mp_Storage->id(),static_typeid<U>());
-    if (convert != nullptr)
-      convert(this->mp_Storage->Data,value);
   };
 };
 

@@ -314,31 +314,33 @@ namespace btk
    * Convenient inequal operator to compare an object of type @c U (@c lhs) with an Any object (@c rhs). Internally this operator take the opposite of the equal operator.
    */
 
+  // ----------------------------------------------------------------------- //
+
   /**
    * Returns the conversion table used for all the Any object.
    *
    * @note The returned object is a singleton as proposed by Scott Meyers in C++11.
    */
-  Any::Converter& Any::converter() noexcept
+  Any::Converter& Any::details::converter() noexcept
   {
     static Converter helper;
     return helper;
   };
   
   /**
-   * Extract the convertion function pointer (convertoid) based on the ID used from the type source (@c sid) and the returned type (@c rid)
-   * In case no function pointer was found, the returned valud is set to nullptr.
+   * Extract the convertion function pointer based on the ID used from the type source (@c sid) and the returned type (@c rid)
+   * In case no function pointer was found, the returned value is set to nullptr.
    */
-  Any::Convertoid Any::extractConvertoid(typeid_t sid, typeid_t rid) noexcept
+  Any::details::convert_t Any::details::extractConvertFunction(typeid_t sid, typeid_t rid) noexcept
   {
-    auto it = Any::converter().Table.find(Any::Converter::hash(static_cast<size_t>(sid),static_cast<size_t>(rid)));
-    return (it != Any::converter().Table.end()) ? it->second : nullptr;
+    auto it = Any::details::converter().Table.find(Any::Converter::hash(static_cast<size_t>(sid),static_cast<size_t>(rid)));
+    return (it != Any::details::converter().Table.end()) ? it->second : nullptr;
   };
   
   // ----------------------------------------------------------------------- //
   
   /**
-   * @struct converter btkAny.h
+   * @struct Any::Converter btkAny.h
    * @brief Utilitary to define conversion from/to a Any object.
    * The role of this class is to facilitate the registration a type using Any::Register. 
    */

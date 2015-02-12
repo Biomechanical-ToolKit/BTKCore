@@ -45,6 +45,31 @@
 
 namespace btk
 {
+  struct Any::StorageBase
+  { 
+    StorageBase(void* data);
+    StorageBase(const StorageBase& ) = delete;
+    virtual ~StorageBase() noexcept;
+    virtual typeid_t id() const noexcept = 0;
+    virtual bool is_arithmetic() const noexcept = 0;
+    virtual std::vector<size_t> dimensions() const noexcept = 0;
+    virtual size_t size() const noexcept = 0;
+    virtual StorageBase* clone() const = 0;
+    virtual bool compare(StorageBase* other) const noexcept = 0;
+    
+    void* Data;
+  };
+  
+  // WARNING : This class does store only the pointer. It does not freed the associated memory. This is the responsability of the inherited class if some meory was allocated for the given @a data pointer.
+  inline Any::StorageBase::StorageBase(void* data)
+  : Data(data)
+  {};
+  
+  inline Any::StorageBase::~StorageBase() noexcept
+  {};
+  
+  // ----------------------------------------------------------------------- //
+  
   struct Any::details
   {
     details() = delete;
@@ -55,8 +80,60 @@ namespace btk
     details& operator=(details&& ) noexcept = delete;
     
     // --------------------------------------------------------------------- //
+    //                                UTILS
+    // --------------------------------------------------------------------- //
     
-     // The dimensions is not used in the default case
+    static Converter& converter() noexcept;
+    
+    using convert_t = void(*)(void*,void*);
+    static convert_t extractConvertFunction(typeid_t sid, typeid_t rid) noexcept;
+    
+    template <typename U>
+    static inline void convert(U* value, Any::StorageBase* storage) noexcept
+    {
+      convert_t doConversion = extractConvertFunction(storage->id(),static_typeid<U>());
+      if (doConversion != nullptr)
+        doConversion(storage->Data,value);
+    };
+    
+    // --------------------------------------------------------------------- //
+    //                       DATA STORAGE DECLARATION
+    // --------------------------------------------------------------------- //
+
+    template <typename T>
+    struct StorageSingle : public Any::StorageBase
+    {
+      static_assert(std::is_copy_constructible<T>::value, "Impossible to use the btk::Any class with a type which does not have a copy constructor.");
+    
+      template <typename U> StorageSingle(U&& value);
+      ~StorageSingle() noexcept;
+      virtual typeid_t id() const noexcept final;
+      virtual bool is_arithmetic() const noexcept final;
+      virtual std::vector<size_t> dimensions() const noexcept final;
+      virtual size_t size() const noexcept final;
+      virtual StorageBase* clone() const final;
+      virtual bool compare(StorageBase* other) const noexcept final;
+    };
+  
+    template <typename T>
+    struct StorageArray : public Any::StorageBase
+    {
+      static_assert(std::is_copy_constructible<T>::value, "Impossible to use the btk::Any class with a type which does not have a copy constructor.");
+    
+      template <typename U> StorageArray(U* values, size_t numValues, const size_t* dimensions, size_t numDims);
+      ~StorageArray() noexcept;
+      virtual typeid_t id() const noexcept final;
+      virtual bool is_arithmetic() const noexcept final;
+      virtual std::vector<size_t> dimensions() const noexcept final;
+      virtual size_t size() const noexcept final;
+      virtual StorageBase* clone() const final;
+      virtual bool compare(StorageBase* other) const noexcept final;
+      size_t NumValues;
+      const size_t* Dimensions;
+      size_t NumDims;
+    };
+    
+    // The dimensions is not used in the default case
     template <typename U, typename D>
     static inline typename std::enable_if<
          !is_stl_initializer_list<typename std::decay<U>::type>::value
@@ -137,6 +214,8 @@ namespace btk
       return storage;
     };
     
+    // --------------------------------------------------------------------- //
+    //                              DATA CAST
     // --------------------------------------------------------------------- //
     
     // Default cast
@@ -349,6 +428,139 @@ namespace btk
     {
       *value = strtold(str,nullptr);
     };
+  };
+  
+  // --------------------------------------------------------------------- //
+  //                         DATA STORAGE DEFINITION
+  // --------------------------------------------------------------------- //
+
+  template <typename T> 
+  template <typename U> 
+  inline Any::details::StorageSingle<T>::StorageSingle(U&& value)
+  : Any::StorageBase(new T(std::forward<U>(value)))
+  {};
+  
+  template <typename T> 
+  inline Any::details::StorageSingle<T>::~StorageSingle() noexcept
+  {
+    delete static_cast<T*>(this->Data);
+  };
+
+  template <typename T>
+  inline std::vector<size_t> Any::details::StorageSingle<T>::dimensions() const noexcept
+  {
+    return std::vector<size_t>{};
+  };
+
+  template <typename T>
+  inline size_t Any::details::StorageSingle<T>::size() const noexcept
+  {
+    return 1ul;
+  };
+  
+  template <typename T> 
+  inline Any::StorageBase* Any::details::StorageSingle<T>::clone() const
+  {
+    return new Any::details::StorageSingle<T>(*static_cast<T*>(this->Data));
+  };
+  
+  template <typename T> 
+  inline bool Any::details::StorageSingle<T>::compare(StorageBase* other) const noexcept
+  {
+    if ((this->Data == nullptr) || (other->Data == nullptr))
+      return false;
+    if (this->id() != other->id())
+      return false;
+    return (*static_cast<T*>(this->Data) == *static_cast<T*>(other->Data));
+  };
+  
+  template <typename T> 
+  inline typeid_t Any::details::StorageSingle<T>::id() const noexcept
+  {
+    return static_typeid<T>();
+  };
+  
+  template <typename T> 
+  bool Any::details::StorageSingle<T>::is_arithmetic() const noexcept
+  {
+    return std::is_arithmetic<T>::value;
+  };
+  
+  // ----------------------------------------------------------------------- //
+
+  // NOTE: The class take the ownership of the data. It will delete the array pointer. This constructor must be used only with allocated array (and not vector data or initializer_list content)
+  template <typename T>
+  template <typename U>
+  inline Any::details::StorageArray<T>::StorageArray(U* values, size_t numValues, const size_t* dimensions, size_t numDims)
+  : Any::StorageBase(values), NumValues(numValues), Dimensions(dimensions),  NumDims(numDims)
+  {};
+  
+  template <typename T> 
+  inline Any::details::StorageArray<T>::~StorageArray() noexcept
+  {
+    delete[] static_cast<T*>(this->Data);
+    delete[] this->Dimensions;
+  };
+
+  template <typename T>
+  inline std::vector<size_t> Any::details::StorageArray<T>::dimensions() const noexcept
+  {
+    auto dims = std::vector<size_t>(this->NumDims,0ul);
+    for (size_t i = 0 ; i < this->NumDims ; ++i)
+      dims[i] = this->Dimensions[i];
+    return dims;
+  };
+
+  template <typename T>
+  inline size_t Any::details::StorageArray<T>::size() const noexcept
+  {
+    return this->NumValues;
+  };
+  
+  template <typename T> 
+  inline Any::StorageBase* Any::details::StorageArray<T>::clone() const
+  {
+    T* data = new T[this->NumValues];
+    size_t* dims = new size_t[this->NumDims];
+    memcpy(data, static_cast<T*>(this->Data), this->NumValues*sizeof(T));
+    memcpy(dims, this->Dimensions, this->NumDims*sizeof(size_t));
+    return new Any::details::StorageArray<T>(data,this->NumValues,dims,this->NumDims);
+  };
+  
+  template <typename T> 
+  inline bool Any::details::StorageArray<T>::compare(StorageBase* other) const noexcept
+  {
+    if ((this->Data == nullptr) || (other->Data == nullptr))
+      return false;
+    if (this->id() != other->id())
+      return false;
+    if (this->size() != other->size())
+      return false;
+    if (this->dimensions() != other->dimensions())
+      return false;
+    return (*static_cast<T*>(this->Data) == *static_cast<T*>(other->Data));
+  };
+  
+  template <typename T> 
+  inline typeid_t Any::details::StorageArray<T>::id() const noexcept
+  {
+    return static_typeid<T>();
+  };
+  
+  template <typename T> 
+  bool Any::details::StorageArray<T>::is_arithmetic() const noexcept
+  {
+    return std::is_arithmetic<T>::value;
+  };
+  
+  // ----------------------------------------------------------------------- //
+  //                     DATA STORAGE PARTIAL SPECIALIZATIONS
+  // ----------------------------------------------------------------------- //
+  
+  template <size_t N>
+  struct Any::details::StorageSingle<char[N]> : public Any::details::StorageSingle<std::string>
+  {
+    StorageSingle(const char(&value)[N]) : StorageSingle<std::string>(std::string(value,N-1)) {};
   };
 };
 

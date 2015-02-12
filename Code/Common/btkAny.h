@@ -85,25 +85,18 @@ namespace btk
     template <typename U> friend inline bool operator!=(const U& lhs, const Any& rhs) noexcept {return !(lhs == rhs);};
     
   private:
+    
     // Forward declaration
     struct StorageBase;
-    template <typename T> struct StorageSingle;
-    template <typename T> struct StorageArray;
     struct Converter;
     struct details;
     
-    template <typename U> void convert(U* value)const  noexcept;
-    
-    typedef void(*Convertoid)(void*,void*);
-    static Converter& converter() noexcept;
-    static Convertoid extractConvertoid(typeid_t sid, typeid_t rid) noexcept;
     StorageBase* mp_Storage;
   };
 };
 
-#include "btkAny_storage.tpp"
+#include "btkAny_details.tpp"
 #include "btkAny_converter.tpp"
-#include "btkAny_cast.tpp"
 #include "btkAny.tpp"
 
 #endif // __btkAny_h
