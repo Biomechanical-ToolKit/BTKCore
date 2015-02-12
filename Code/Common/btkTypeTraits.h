@@ -37,6 +37,7 @@
 #define __btkTypeTraits_h
 
 #include <vector>
+#include <initializer_list>
 
 namespace btk
 {
@@ -46,8 +47,22 @@ namespace btk
     static constexpr bool value = false;
   };
   
-  template <typename T,typename Alloc>
+  template <typename T, typename Alloc>
   struct is_stl_vector<std::vector<T,Alloc> >
+  {
+    static constexpr bool value = true;
+  };
+  
+  // ---------------------------------------------------------------------- //
+  
+  template <typename T>
+  struct is_stl_initializer_list
+  {
+    static constexpr bool value = false;
+  };
+  
+  template <typename T>
+  struct is_stl_initializer_list<std::initializer_list<T> >
   {
     static constexpr bool value = true;
   };
