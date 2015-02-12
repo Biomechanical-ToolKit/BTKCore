@@ -50,7 +50,6 @@ namespace btk
     // Forward declaration
     template <typename S, typename R> struct HelperBase;
     template <typename S, typename R> struct Helper;
-    template <typename S,typename... Rs> struct Register;
     
     // Member
     Map Table;
