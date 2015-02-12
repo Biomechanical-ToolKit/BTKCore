@@ -95,8 +95,6 @@ namespace btk
   };
 };
 
-#include "btkAny_details.tpp"
-#include "btkAny_converter.tpp"
 #include "btkAny.tpp"
 
 #endif // __btkAny_h
