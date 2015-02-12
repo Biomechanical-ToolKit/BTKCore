@@ -87,20 +87,6 @@ namespace btk
     };
   };
   
-  template <typename S,typename... Rs>
-  struct Any::Converter::Register
-  {
-    Map Table;
-    inline constexpr Register() noexcept
-    : Table{pair<S,Rs>()...}
-    {};
-    ~Register() = default;
-    Register(const Register& ) = delete;
-    Register(Register&& ) = default;
-    Register& operator= (const Register& ) = delete;
-    Register& operator= (Register&& ) = delete;
-  };
-  
   // ----------------------------------------------------------------------- //
   
   /**
