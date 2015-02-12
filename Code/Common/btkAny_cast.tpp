@@ -37,6 +37,7 @@
 #define __btkAny_cast_tpp
 
 #include "btkException.h"
+#include "btkTypeTraits.h"
 
 #include <string>
 
@@ -57,73 +58,74 @@ namespace btk
     template <typename U>
     static inline typename std::enable_if<
           !std::is_arithmetic<typename std::decay<U>::type>::value
-       && !std::is_same<std::string, typename std::decay<U>::type>::value  
-      , bool>::type single(U* value, StorageBase* storage) noexcept
+       && !std::is_same<std::string, typename std::decay<U>::type>::value
+       && !is_stl_vector<typename std::decay<U>::type>::value
+      , bool>::type single(U* , StorageBase* , size_t = 0) noexcept
     {
       return false;
     };
     
     // Arithmetic conversion
     template <typename U>
-    static typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value, bool>::type single(U* value, StorageBase* storage) noexcept
+    static typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value, bool>::type single(U* value, StorageBase* storage, size_t idx = 0) noexcept
     {
       const typeid_t id = storage->id();
       if (storage->is_arithmetic())
       {
         // bool
         if (id == static_typeid<bool>())
-          *value = static_cast<U>(*static_cast<bool*>(storage->Data));
+          *value = static_cast<U>(static_cast<bool*>(storage->Data)[idx]);
         // char
         else if (id == static_typeid<char>())
-          *value = static_cast<U>(*static_cast<char*>(storage->Data));
+          *value = static_cast<U>(static_cast<char*>(storage->Data)[idx]);
         // char16_t
         else if (id == static_typeid<char16_t>())
-          *value = static_cast<U>(*static_cast<char16_t*>(storage->Data));
+          *value = static_cast<U>(static_cast<char16_t*>(storage->Data)[idx]);
         // char32_t
         else if (id == static_typeid<char32_t>())
-          *value = static_cast<U>(*static_cast<char32_t*>(storage->Data));
+          *value = static_cast<U>(static_cast<char32_t*>(storage->Data)[idx]);
         // wchar_t
         else if (id == static_typeid<wchar_t>())
-          *value = static_cast<U>(*static_cast<wchar_t*>(storage->Data));
+          *value = static_cast<U>(static_cast<wchar_t*>(storage->Data)[idx]);
         // signed char
         else if (id == static_typeid<signed char>())
-          *value = static_cast<U>(*static_cast<signed char*>(storage->Data));
+          *value = static_cast<U>(static_cast<signed char*>(storage->Data)[idx]);
         // short int
         else if (id == static_typeid<short int>())
-          *value = static_cast<U>(*static_cast<short int*>(storage->Data));
+          *value = static_cast<U>(static_cast<short int*>(storage->Data)[idx]);
         // int
         else if (id == static_typeid<int>())
-          *value = static_cast<U>(*static_cast<int*>(storage->Data));
+          *value = static_cast<U>(static_cast<int*>(storage->Data)[idx]);
         // long int
         else if (id == static_typeid<long int>())
-          *value = static_cast<U>(*static_cast<long int*>(storage->Data));
+          *value = static_cast<U>(static_cast<long int*>(storage->Data)[idx]);
         // long long int
         else if (id == static_typeid<long long int>())
-          *value = static_cast<U>(*static_cast<long long int*>(storage->Data));
+          *value = static_cast<U>(static_cast<long long int*>(storage->Data)[idx]);
         // unsigned char
         else if (id == static_typeid<unsigned char>())
-          *value = static_cast<U>(*static_cast<unsigned char*>(storage->Data));
+          *value = static_cast<U>(static_cast<unsigned char*>(storage->Data)[idx]);
         // unsigned short int
         else if (id == static_typeid<unsigned short int>())
-          *value = static_cast<U>(*static_cast<unsigned short int*>(storage->Data));
+          *value = static_cast<U>(static_cast<unsigned short int*>(storage->Data)[idx]);
         // unsigned int
         else if (id == static_typeid<unsigned int>())
-          *value = static_cast<U>(*static_cast<unsigned int*>(storage->Data));
+          *value = static_cast<U>(static_cast<unsigned int*>(storage->Data)[idx]);
         // unsigned long int
         else if (id == static_typeid<unsigned long int>())
-          *value = static_cast<U>(*static_cast<unsigned long int*>(storage->Data));
+          *value = static_cast<U>(static_cast<unsigned long int*>(storage->Data)[idx]);
         // unsigned long long int
         else if (id == static_typeid<unsigned long long int>())
-          *value = static_cast<U>(*static_cast<unsigned long long int*>(storage->Data));
+          *value = static_cast<U>(static_cast<unsigned long long int*>(storage->Data)[idx]);
         // float
         else if (id == static_typeid<float>())
-          *value = static_cast<U>(*static_cast<float*>(storage->Data));
+          *value = static_cast<U>(static_cast<float*>(storage->Data)[idx]);
         // double
         else if (id == static_typeid<double>())
-          *value = static_cast<U>(*static_cast<double*>(storage->Data));
+          *value = static_cast<U>(static_cast<double*>(storage->Data)[idx]);
         // long double
         else if (id == static_typeid<long double>())
-          *value = static_cast<U>(*static_cast<long double*>(storage->Data));
+          *value = static_cast<U>(static_cast<long double*>(storage->Data)[idx]);
         // ERROR - Should not be possible! All the standard arithmetic type in C++11 are listed above
         else
           throw(LogicError("Unexpected error during arithmetic to arithmetic conversion!"));
@@ -131,7 +133,7 @@ namespace btk
       }
       else if (id == static_typeid<std::string>())
       {
-        const char* str = static_cast<std::string*>(storage->Data)->c_str();
+        const char* str = static_cast<std::string*>(storage->Data)[idx].c_str();
         single_from_string(value,str);
         return true;
       }
@@ -140,7 +142,7 @@ namespace btk
     
     // String conversion
     template <typename U>
-    static typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value, bool>::type single(U* value, StorageBase* storage) noexcept
+    static typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value, bool>::type single(U* value, StorageBase* storage, size_t idx = 0) noexcept
     {
       const typeid_t id = storage->id();
       if (storage->is_arithmetic()
@@ -150,55 +152,65 @@ namespace btk
       {
         // bool
         if (id == static_typeid<bool>())
-          *value = std::string(*static_cast<bool*>(storage->Data) ? "true" : "false");
+          *value = std::string(static_cast<bool*>(storage->Data)[idx] ? "true" : "false");
         // char (convert as it is an int8_t)
         else if (id == static_typeid<char>())
-          *value = std::to_string((short int)*static_cast<char*>(storage->Data));
+          *value = std::to_string((short int)static_cast<char*>(storage->Data)[idx]);
         // signed char (convert as it is a signed int8_t)
         else if (id == static_typeid<signed char>())
-          *value = std::to_string((signed short int)*static_cast<signed char*>(storage->Data));
+          *value = std::to_string((signed short int)static_cast<signed char*>(storage->Data)[idx]);
         // short int
         else if (id == static_typeid<short int>())
-          *value = std::to_string(*static_cast<short int*>(storage->Data));
+          *value = std::to_string(static_cast<short int*>(storage->Data)[idx]);
         // int
         else if (id == static_typeid<int>())
-          *value = std::to_string(*static_cast<int*>(storage->Data));
+          *value = std::to_string(static_cast<int*>(storage->Data)[idx]);
         // long int
         else if (id == static_typeid<long int>())
-          *value = std::to_string(*static_cast<long int*>(storage->Data));
+          *value = std::to_string(static_cast<long int*>(storage->Data)[idx]);
         // long long int
         else if (id == static_typeid<long long int>())
-          *value = std::to_string(*static_cast<long long int*>(storage->Data));
+          *value = std::to_string(static_cast<long long int*>(storage->Data)[idx]);
         // unsigned char (convert as it is a unsigned int8_t)
         else if (id == static_typeid<unsigned char>())
-          *value = std::to_string((unsigned short int)*static_cast<unsigned char*>(storage->Data));
+          *value = std::to_string((unsigned short int)static_cast<unsigned char*>(storage->Data)[idx]);
         // unsigned short int
         else if (id == static_typeid<unsigned short int>())
-          *value = std::to_string(*static_cast<unsigned short int*>(storage->Data));
+          *value = std::to_string(static_cast<unsigned short int*>(storage->Data)[idx]);
         // unsigned int
         else if (id == static_typeid<unsigned int>())
-          *value = std::to_string(*static_cast<unsigned int*>(storage->Data));
+          *value = std::to_string(static_cast<unsigned int*>(storage->Data)[idx]);
         // unsigned long int
         else if (id == static_typeid<unsigned long int>())
-          *value = std::to_string(*static_cast<unsigned long int*>(storage->Data));
+          *value = std::to_string(static_cast<unsigned long int*>(storage->Data)[idx]);
         // unsigned long long int
         else if (id == static_typeid<unsigned long long int>())
-          *value = std::to_string(*static_cast<unsigned long long int*>(storage->Data));
+          *value = std::to_string(static_cast<unsigned long long int*>(storage->Data)[idx]);
         // float
         else if (id == static_typeid<float>())
-          *value = std::to_string(*static_cast<float*>(storage->Data));
+          *value = std::to_string(static_cast<float*>(storage->Data)[idx]);
         // double
         else if (id == static_typeid<double>())
-          *value = std::to_string(*static_cast<double*>(storage->Data));
+          *value = std::to_string(static_cast<double*>(storage->Data)[idx]);
         // long double
         else if (id == static_typeid<long double>())
-          *value = std::to_string(*static_cast<long double*>(storage->Data));
+          *value = std::to_string(static_cast<long double*>(storage->Data)[idx]);
         // ERROR - Should not be possible! All the standard arithmetic type in C++11 are listed above
         else
           throw(LogicError("Unexpected error during arithmetic to string conversion!"));
         return true;
       }
       return false;
+    };
+    
+    // Vector conversion
+    template <typename U>
+    static typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type single(U* value, StorageBase* storage) noexcept
+    {
+      value->resize(storage->size());
+      for (size_t i = 0 ; i < value->size() ; ++i)
+        Cast::single(&value->operator[](i),storage,i);
+      return true;
     };
   
     // --------------------------------------------------------------------- //
