@@ -208,12 +208,15 @@ namespace btk
   template <typename T> 
   inline bool Any::StorageArray<T>::compare(StorageBase* other) const noexcept
   {
-    // if ((this->Data == nullptr) || (other->Data == nullptr))
-    //   return false;
-    // if (this->id() != other->id())
-    //   return false;
-    // return (*static_cast<T*>(this->Data) == *static_cast<T*>(other->Data));
-    return false;
+    if ((this->Data == nullptr) || (other->Data == nullptr))
+      return false;
+    if (this->id() != other->id())
+      return false;
+    if (this->size() != other->size())
+      return false;
+    if (this->dimensions() != other->dimensions())
+      return false;
+    return (*static_cast<T*>(this->Data) == *static_cast<T*>(other->Data));
   };
   
   template <typename T> 
