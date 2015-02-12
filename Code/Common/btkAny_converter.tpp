@@ -100,8 +100,27 @@ namespace btk
     Register& operator= (const Register& ) = delete;
     Register& operator= (Register&& ) = delete;
   };
+  
+  // ----------------------------------------------------------------------- //
+  
+  /**
+   * Base for all the conversions furnished by the user (using the Any::Register structure)
+   */
+  template <typename S, typename R>
+  struct Any::Converter::HelperBase
+  {
+    static inline void convert(void* source, void* result) {*static_cast<R*>(result) = Helper<S,R>::convert(*static_cast<S*>(source));};
+  };
+  
+  /**
+   * Generic converter which does nothing except returning a default value of the type @a R.
+   * All custom conversions must specializase this structure.
+   */
+  template <typename S, typename R>
+  struct Any::Converter::Helper : Any::Converter::HelperBase<S,R>
+  {
+    static inline R convert(const S& val) {return R();}
+  };
 };
-
-#include "btkAny_converter_helper.tpp"
 
 #endif // __btkAny_converter_tpp
