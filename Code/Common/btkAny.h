@@ -59,10 +59,8 @@ namespace btk
     Any() noexcept;
     Any(const Any& other);
     Any(Any&& other) noexcept;
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value && !is_stl_vector<typename std::decay<U>::type>::value>::type> Any(U&& value);
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(const std::vector<U>& values, const std::vector<size_t>& dimensions = {});
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(std::initializer_list<U> values, std::initializer_list<size_t> dimensions = {});
-    
+    template <typename U, typename D = void*, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(U&& value, D&& dimensions = {});
+    template <typename U, typename D = size_t, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(std::initializer_list<U> values, std::initializer_list<D> dimensions = {});
     ~Any();
     
     std::vector<size_t> dimensions() const noexcept;

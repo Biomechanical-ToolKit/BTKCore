@@ -54,12 +54,97 @@ namespace btk
     details& operator=(const details& ) = delete;
     details& operator=(details&& ) noexcept = delete;
     
-    // Default
+    // --------------------------------------------------------------------- //
+    
+     // The dimensions is not used in the default case
+    template <typename U, typename D>
+    static inline typename std::enable_if<
+         !is_stl_initializer_list<typename std::decay<U>::type>::value
+      && !is_stl_vector<typename std::decay<U>::type>::value
+      , Any::StorageBase*>::type
+    store(U&& value, D&& )
+    {
+      return new StorageSingle<typename std::remove_cv<typename std::remove_reference<U>::type>::type>(std::forward<U>(value));
+    };
+    
+    // From vectors
+    template <typename U, typename D>
+    static inline typename std::enable_if<
+         is_stl_vector<typename std::decay<U>::type>::value
+      && is_stl_vector<typename std::decay<D>::type>::value
+      , Any::StorageBase*>::type
+    store(U&& values, D&& dimensions)
+    {
+      static_assert(std::is_integral<typename std::decay<typename D::value_type>::type>::value, "The given dimensions must be a vector with a value_type set to an integral (e.g. int or size_t).");
+      return store(values.data(),values.size(),dimensions.data(),dimensions.size());
+    };
+    
+    template <typename U, typename D>
+    static inline typename std::enable_if<
+         is_stl_vector<typename std::decay<U>::type>::value
+      && std::is_same<D,void*>::value
+      , Any::StorageBase*>::type
+    store(U&& values, D&& dimensions)
+    {
+      size_t dims[1] = {values.size()};
+      return store(values.data(),values.size(),dims,1ul);
+    };
+    
+    // From initializer lists
+    template <typename U, typename D>
+    static inline typename std::enable_if<
+         is_stl_initializer_list<typename std::decay<U>::type>::value
+      && is_stl_initializer_list<typename std::decay<D>::type>::value
+      , Any::StorageBase*>::type
+    store(U&& values, D&& dimensions)
+    {
+      static_assert(std::is_integral<typename std::decay<typename D::value_type>::type>::value, "The given dimensions must be a initializer_list with a value_type set to an integral (e.g. int or size_t).");
+      return store(values.begin(),values.size(),dimensions.begin(),dimensions.size());
+    };
+    
+    // From pointers
+    template <typename U, typename D>
+    static inline Any::StorageBase* store(U* values, size_t numValues, D* dimensions, size_t numDims)
+    {
+      using _U = typename std::remove_cv<typename std::remove_reference<U>::type>::type;
+      // NOTE: The arrays are not deleted as they are onwed by the StorageArray class.
+      _U* data = nullptr;
+      size_t* dims = nullptr;
+      if (numDims != 0)
+      {
+        size_t size = 1;
+        dims = new size_t[numDims];
+        for (size_t i = 0 ; i < numDims ; ++i)
+        {
+          dims[i] = static_cast<size_t>(dimensions[i]);
+          size *= dims[i];
+        }
+        data = new _U[size];
+        memcpy(data, values, std::min(size,numValues)*sizeof(_U));
+        for (size_t i = numValues ; i < size ; ++i)
+          data[i] = _U();
+        numValues = size;
+      }
+      else
+      {
+        data = new _U[numValues];
+        memcpy(data, values, numValues*sizeof(_U));
+        numDims = 1;
+        dims = new size_t[1];
+        dims[0] = numValues;
+      }
+      Any::StorageBase* storage = new StorageArray<_U>(data, numValues, dims, numDims);
+      return storage;
+    };
+    
+    // --------------------------------------------------------------------- //
+    
+    // Default cast
     template <typename U>
     static inline typename std::enable_if<
-          !std::is_arithmetic<typename std::decay<U>::type>::value
-       && !std::is_same<std::string, typename std::decay<U>::type>::value
-       && !is_stl_vector<typename std::decay<U>::type>::value
+         !std::is_arithmetic<typename std::decay<U>::type>::value
+      && !std::is_same<std::string, typename std::decay<U>::type>::value
+      && !is_stl_vector<typename std::decay<U>::type>::value
       , bool>::type cast(U* , StorageBase* , size_t = 0) noexcept
     {
       return false;

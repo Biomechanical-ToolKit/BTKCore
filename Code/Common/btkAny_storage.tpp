@@ -76,9 +76,7 @@ namespace btk
   {
     static_assert(std::is_copy_constructible<T>::value, "Impossible to use the btk::Any class with a type which does not have a copy constructor.");
     
-    template <typename U> StorageArray(std::initializer_list<U> values, std::initializer_list<size_t> dimensions);
-    template <typename U> StorageArray(const std::vector<U>& values, const std::vector<size_t>& dimensions);
-    template <typename U> StorageArray(const U* values, size_t numValues, const size_t* dimensions, size_t numDims);
+    template <typename U> StorageArray(U* values, size_t numValues, const size_t* dimensions, size_t numDims);
     ~StorageArray() noexcept;
     virtual typeid_t id() const noexcept final;
     virtual bool is_arithmetic() const noexcept final;
@@ -87,7 +85,7 @@ namespace btk
     virtual StorageBase* clone() const final;
     virtual bool compare(StorageBase* other) const noexcept final;
     size_t NumValues;
-    size_t* Dimensions;
+    const size_t* Dimensions;
     size_t NumDims;
   };
   
@@ -155,27 +153,13 @@ namespace btk
   };
   
   // ----------------------------------------------------------------------- //
-  
-  template <typename T>
-  template <typename U>
-  inline Any::StorageArray<T>::StorageArray(std::initializer_list<U> values, std::initializer_list<size_t> dimensions)
-  : Any::StorageArray<T>(values.begin(),values.size(),dimensions.begin(),dimensions.size())
-  {};
-  
-  template <typename T>
-  template <typename U>
-  inline Any::StorageArray<T>::StorageArray(const std::vector<U>& values, const std::vector<size_t>& dimensions)
-  : Any::StorageArray<T>(values.data(),values.size(),dimensions.data(),dimensions.size())
-  {};
 
+  // NOTE: The class take the ownership of the data. It will delete the array pointer. This constructor must be used only with allocated array (and not vector data or initializer_list content)
   template <typename T>
   template <typename U>
-  inline Any::StorageArray<T>::StorageArray(const U* values, size_t numValues, const size_t* dimensions, size_t numDims)
-  : Any::StorageBase(new T[numValues]), NumValues(numValues), Dimensions(new size_t[numDims]),  NumDims(numDims)
-  {
-    memcpy(static_cast<T*>(this->Data), values, numValues*sizeof(T));
-    memcpy(this->Dimensions, dimensions, numDims*sizeof(size_t));
-  };
+  inline Any::StorageArray<T>::StorageArray(U* values, size_t numValues, const size_t* dimensions, size_t numDims)
+  : Any::StorageBase(values), NumValues(numValues), Dimensions(dimensions),  NumDims(numDims)
+  {};
   
   template <typename T> 
   inline Any::StorageArray<T>::~StorageArray() noexcept
@@ -202,7 +186,11 @@ namespace btk
   template <typename T> 
   inline Any::StorageBase* Any::StorageArray<T>::clone() const
   {
-    return new Any::StorageArray<T>(static_cast<T*>(this->Data),this->NumValues,this->Dimensions,this->NumDims);
+    T* data = new T[this->NumValues];
+    size_t* dims = new size_t[this->NumDims];
+    memcpy(data, static_cast<T*>(this->Data), this->NumValues*sizeof(T));
+    memcpy(dims, this->Dimensions, this->NumDims*sizeof(size_t));
+    return new Any::StorageArray<T>(data,this->NumValues,dims,this->NumDims);
   };
   
   template <typename T> 

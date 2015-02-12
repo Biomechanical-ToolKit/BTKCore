@@ -84,19 +84,14 @@ namespace btk
     Unregister& operator=(Unregister&& ) = delete;
   };
   
-  template <typename U, typename>
-  inline Any::Any(U&& value)
-  : mp_Storage(new StorageSingle<typename std::remove_cv<typename std::remove_reference<U>::type>::type>(std::forward<U>(value)))
+  template <typename U, typename D, typename >
+  inline Any::Any(U&& value, D&& dimensions)
+  : mp_Storage(details::store<U>(std::forward<U>(value), std::forward<D>(dimensions)))
   {};
-
-  template <typename U, typename>
-  inline Any::Any(const std::vector<U>& values, const std::vector<size_t>& dimensions)
-  : mp_Storage(new StorageArray<typename std::remove_cv<typename std::remove_reference<U>::type>::type>(values, dimensions.empty() ? std::vector<size_t>{values.size()} : dimensions))
-  {};
-
-  template <typename U, typename>
-  inline Any::Any(std::initializer_list<U> values, std::initializer_list<size_t> dimensions)
-  : mp_Storage(new StorageArray<typename std::remove_cv<typename std::remove_reference<U>::type>::type>(values, dimensions.size() == 0 ? std::initializer_list<size_t>{values.size()} : dimensions))
+  
+  template <typename U, typename D, typename >
+  inline Any::Any(std::initializer_list<U> values, std::initializer_list<D> dimensions)
+  : mp_Storage(details::store<std::initializer_list<U>,std::initializer_list<D>>(std::move(values), std::move(dimensions)))
   {};
 
   template <typename U, typename >
