@@ -45,14 +45,14 @@
 
 namespace btk
 {
-  struct Any::Cast
+  struct Any::details
   {
-    Cast() = delete;
-    ~Cast() noexcept = delete;
-    Cast(const Cast& ) = delete;
-    Cast(Cast&& ) noexcept = delete;
-    Cast& operator=(const Cast& ) = delete;
-    Cast& operator=(Cast&& ) noexcept = delete;
+    details() = delete;
+    ~details() noexcept = delete;
+    details(const details& ) = delete;
+    details(details&& ) noexcept = delete;
+    details& operator=(const details& ) = delete;
+    details& operator=(details&& ) noexcept = delete;
     
     // Default
     template <typename U>
@@ -60,14 +60,14 @@ namespace btk
           !std::is_arithmetic<typename std::decay<U>::type>::value
        && !std::is_same<std::string, typename std::decay<U>::type>::value
        && !is_stl_vector<typename std::decay<U>::type>::value
-      , bool>::type single(U* , StorageBase* , size_t = 0) noexcept
+      , bool>::type cast(U* , StorageBase* , size_t = 0) noexcept
     {
       return false;
     };
     
     // Arithmetic conversion
     template <typename U>
-    static typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value, bool>::type single(U* value, StorageBase* storage, size_t idx = 0) noexcept
+    static typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
     {
       const typeid_t id = storage->id();
       if (storage->is_arithmetic())
@@ -134,7 +134,7 @@ namespace btk
       else if (id == static_typeid<std::string>())
       {
         const char* str = static_cast<std::string*>(storage->Data)[idx].c_str();
-        single_from_string(value,str);
+        cast_from_string(value,str);
         return true;
       }
       return false;
@@ -142,7 +142,7 @@ namespace btk
     
     // String conversion
     template <typename U>
-    static typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value, bool>::type single(U* value, StorageBase* storage, size_t idx = 0) noexcept
+    static typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
     {
       const typeid_t id = storage->id();
       if (storage->is_arithmetic()
@@ -205,11 +205,11 @@ namespace btk
     
     // Vector conversion
     template <typename U>
-    static typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type single(U* value, StorageBase* storage) noexcept
+    static typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage) noexcept
     {
       value->resize(storage->size());
       for (size_t i = 0 ; i < value->size() ; ++i)
-        Cast::single(&value->operator[](i),storage,i);
+        cast(&value->operator[](i),storage,i);
       return true;
     };
   
@@ -218,49 +218,49 @@ namespace btk
   private:
     
     template <typename U>
-    static inline typename std::enable_if<std::is_same<bool, typename std::decay<U>::type>::value>::type single_from_string(U* value, const char* str) noexcept
+    static inline typename std::enable_if<std::is_same<bool, typename std::decay<U>::type>::value>::type cast_from_string(U* value, const char* str) noexcept
     {
       *value = (!((strlen(str) == 0) || (strcmp(str,"0") == 0) || (strcmp(str,"false") == 0)));
     };
   
     template <typename U>
-    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_signed<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) > sizeof(long))>::type single_from_string(U* value, const char* str) noexcept
+    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_signed<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) > sizeof(long))>::type cast_from_string(U* value, const char* str) noexcept
     {
       *value = strtoll(str,nullptr,0);
     };
   
     template <typename U>
-    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_signed<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) <= sizeof(long))>::type single_from_string(U* value, const char* str) noexcept
+    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_signed<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) <= sizeof(long))>::type cast_from_string(U* value, const char* str) noexcept
     {
       *value = strtol(str,nullptr,0);
     };
   
     template <typename U>
-    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_unsigned<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) > sizeof(long))>::type single_from_string(U* value, const char* str) noexcept
+    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_unsigned<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) > sizeof(long))>::type cast_from_string(U* value, const char* str) noexcept
     {
       *value = strtoull(str,nullptr,0);
     };
   
     template <typename U>
-    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_unsigned<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) <= sizeof(long))>::type single_from_string(U* value, const char* str) noexcept
+    static inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_unsigned<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) <= sizeof(long))>::type cast_from_string(U* value, const char* str) noexcept
     {
       *value = strtol(str,nullptr,0);
     };
   
     template <typename U>
-    static inline typename std::enable_if<std::is_same<float, typename std::decay<U>::type>::value>::type single_from_string(U* value, const char* str) noexcept
+    static inline typename std::enable_if<std::is_same<float, typename std::decay<U>::type>::value>::type cast_from_string(U* value, const char* str) noexcept
     {
       *value = strtof(str,nullptr);
     };
   
     template <typename U>
-    static inline typename std::enable_if<std::is_same<double, typename std::decay<U>::type>::value>::type single_from_string(U* value, const char* str) noexcept
+    static inline typename std::enable_if<std::is_same<double, typename std::decay<U>::type>::value>::type cast_from_string(U* value, const char* str) noexcept
     {
       *value = strtod(str,nullptr);
     };
   
     template <typename U>
-    static inline typename std::enable_if<std::is_same<long double, typename std::decay<U>::type>::value>::type single_from_string(U* value, const char* str) noexcept
+    static inline typename std::enable_if<std::is_same<long double, typename std::decay<U>::type>::value>::type cast_from_string(U* value, const char* str) noexcept
     {
       *value = strtold(str,nullptr);
     };

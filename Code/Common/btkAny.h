@@ -92,7 +92,7 @@ namespace btk
     template <typename T> struct StorageSingle;
     template <typename T> struct StorageArray;
     struct Converter;
-    struct Cast;
+    struct details;
     
     template <typename U> void convert(U* value)const  noexcept;
     

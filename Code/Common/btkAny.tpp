@@ -108,7 +108,7 @@ namespace btk
     {
       if (this->mp_Storage->id() == static_typeid<U>())
         value = *static_cast<U*>(this->mp_Storage->Data);
-      else if (!Cast::single(&value, this->mp_Storage))
+      else if (!details::cast(&value, this->mp_Storage))
         this->convert(&value);
     }
     return value;
