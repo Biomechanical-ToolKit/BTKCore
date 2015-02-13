@@ -111,7 +111,8 @@ namespace btk
     struct StorageSingle : public Any::StorageBase
     {
       static_assert(std::is_copy_constructible<T>::value, "Impossible to use the btk::Any class with a type which does not have a copy constructor.");
-    
+      static_assert(!std::is_pointer<T>::value, "Impossible to store a pointer type.");
+      
       template <typename U> StorageSingle(U* value);
       ~StorageSingle() noexcept;
       virtual typeid_t id() const noexcept final;
@@ -126,6 +127,7 @@ namespace btk
     struct StorageArray : public Any::StorageBase
     {
       static_assert(std::is_copy_constructible<T>::value, "Impossible to use the btk::Any class with a type which does not have a copy constructor.");
+      static_assert(!std::is_pointer<T>::value, "Impossible to store a pointer type.");
     
       template <typename U> StorageArray(U* values, size_t numValues, const size_t* dimensions, size_t numDims);
       ~StorageArray() noexcept;
