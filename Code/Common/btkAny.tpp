@@ -562,7 +562,7 @@ namespace btk
   {
     T* data = new T[this->NumValues];
     size_t* dims = new size_t[this->NumDims];
-    memcpy(data, static_cast<T*>(this->Data), this->NumValues*sizeof(T));
+    std::copy(static_cast<T*>(this->Data),static_cast<T*>(this->Data)+this->NumValues,data);
     memcpy(dims, this->Dimensions, this->NumDims*sizeof(size_t));
     return new Any::details::StorageArray<T>(data,this->NumValues,dims,this->NumDims);
   };
