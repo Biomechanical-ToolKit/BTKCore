@@ -140,7 +140,45 @@ namespace btk
       size_t NumDims;
     };
     
-    // The dimensions is not used in the default case
+    template <typename T>
+    struct adapt
+    {
+      using type = T;
+      template <typename U>
+      static inline T* single(U&& value)
+      {
+        return new T(value);
+      };
+      // static inline U* array(U* values, size_t num)
+      // {
+      //   U* data = new U[size];
+      //   std::copy(values,values+num,data);
+      //   return data;
+      // };
+      adapt() = delete;
+      ~adapt() noexcept = delete;
+      adapt(const adapt& ) = delete;
+      adapt(adapt&& ) noexcept = delete;
+      adapt& operator=(const adapt& ) = delete;
+      adapt& operator=(adapt&& ) noexcept = delete;
+    };
+    
+    template <size_t N>
+    struct adapt<char[N]> : adapt<std::string>
+    {
+      static inline std::string* single(const char(&value)[N])
+      {
+        return new std::string(value,N-1);
+      };
+      // static inline U* array(U* values, size_t num)
+      // {
+      //   U* data = new U[size];
+      //   std::copy(values,values+num,data);
+      //   return data;
+      // };
+    };
+        
+    // The dimensions is not used in the single case
     template <typename U, typename D>
     static inline typename std::enable_if<
          !is_stl_initializer_list<typename std::decay<U>::type>::value
@@ -148,7 +186,8 @@ namespace btk
       , Any::StorageBase*>::type
     store(U&& value, D&& )
     {
-      return new StorageSingle<typename std::remove_cv<typename std::remove_reference<U>::type>::type>(std::forward<U>(value));
+      using adapter = adapt<typename std::remove_cv<typename std::remove_reference<U>::type>::type>;
+      return new StorageSingle<typename adapter::type>(adapter::single(std::forward<U>(value)));
     };
     
     // From vectors
@@ -437,8 +476,8 @@ namespace btk
   
   template <typename T> 
   template <typename U> 
-  inline Any::details::StorageSingle<T>::StorageSingle(U&& value)
-  : Any::StorageBase(new T(std::forward<U>(value)))
+  inline Any::details::StorageSingle<T>::StorageSingle(U* value)
+  : Any::StorageBase(value)
   {};
 
   template <typename T> 
@@ -462,7 +501,7 @@ namespace btk
   template <typename T> 
   inline Any::StorageBase* Any::details::StorageSingle<T>::clone() const
   {
-    return new Any::details::StorageSingle<T>(*static_cast<T*>(this->Data));
+    return new Any::details::StorageSingle<T>(new T(*static_cast<T*>(this->Data)));
   };
 
   template <typename T> 
@@ -552,13 +591,6 @@ namespace btk
   bool Any::details::StorageArray<T>::is_arithmetic() const noexcept
   {
     return std::is_arithmetic<T>::value;
-  };
-
-  // Convert array of characters to std::string object
-  template <size_t N>
-  struct Any::details::StorageSingle<char[N]> : public Any::details::StorageSingle<std::string>
-  {
-    StorageSingle(const char(&value)[N]) : StorageSingle<std::string>(std::string(value,N-1)) {};
   };
 
   // ******************************* CONVERTER ****************************** //
