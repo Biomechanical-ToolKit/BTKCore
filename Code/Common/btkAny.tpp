@@ -41,6 +41,8 @@
 
 #include <string>
 #include <unordered_map>
+#include <algorithm> // std::copy
+
 #include <cstdlib> // strtol, strtoll, strtoul, strtoull, strtof, strtod, ...
 
 // -------------------------------------------------------------------------- //
@@ -151,12 +153,13 @@ namespace btk
       {
         return new T(value);
       };
-      // static inline U* array(U* values, size_t num)
-      // {
-      //   U* data = new U[size];
-      //   std::copy(values,values+num,data);
-      //   return data;
-      // };
+      template <typename U>
+      static inline T* array(size_t newarraylen, U* values, size_t num)
+      {
+        T* data = new T[newarraylen];
+        std::copy(values,values+num,data);
+        return data;
+      };
       adapt() = delete;
       ~adapt() noexcept = delete;
       adapt(const adapt& ) = delete;
@@ -172,13 +175,9 @@ namespace btk
       {
         return new std::string(value,N-1);
       };
-      // static inline U* array(U* values, size_t num)
-      // {
-      //   U* data = new U[size];
-      //   std::copy(values,values+num,data);
-      //   return data;
-      // };
     };
+    
+    // NOTE: An explicit specialization of adapt<const char*> is available outside of the class declaration
         
     // The dimensions is not used in the single case
     template <typename U, typename D>
@@ -209,7 +208,7 @@ namespace btk
          is_stl_vector<typename std::decay<U>::type>::value
       && std::is_same<D,void*>::value
       , Any::StorageBase*>::type
-    store(U&& values, D&& dimensions)
+    store(U&& values, D&& )
     {
       size_t dims[1] = {values.size()};
       return store(values.data(),values.size(),dims,1ul);
@@ -231,9 +230,9 @@ namespace btk
     template <typename U, typename D>
     static inline Any::StorageBase* store(U* values, size_t numValues, D* dimensions, size_t numDims)
     {
-      using _U = typename std::remove_cv<typename std::remove_reference<U>::type>::type;
+      using adapter = adapt<typename std::remove_cv<typename std::remove_reference<U>::type>::type>;
       // NOTE: The arrays are not deleted as they are onwed by the StorageArray class.
-      _U* data = nullptr;
+      typename adapter::type* data = nullptr;
       size_t* dims = nullptr;
       if (numDims != 0)
       {
@@ -244,21 +243,19 @@ namespace btk
           dims[i] = static_cast<size_t>(dimensions[i]);
           size *= dims[i];
         }
-        data = new _U[size];
-        memcpy(data, values, std::min(size,numValues)*sizeof(_U));
+        data = adapter::array(size,values,std::min(size,numValues));
         for (size_t i = numValues ; i < size ; ++i)
-          data[i] = _U();
+          data[i] = typename adapter::type();
         numValues = size;
       }
       else
       {
-        data = new _U[numValues];
-        memcpy(data, values, numValues*sizeof(_U));
+        data = adapter::array(numValues,values,numValues);
         numDims = 1;
         dims = new size_t[1];
         dims[0] = numValues;
       }
-      Any::StorageBase* storage = new StorageArray<_U>(data, numValues, dims, numDims);
+      Any::StorageBase* storage = new StorageArray<typename adapter::type>(data, numValues, dims, numDims);
       return storage;
     };
     
@@ -269,6 +266,7 @@ namespace btk
     static inline typename std::enable_if<
          !std::is_arithmetic<typename std::decay<U>::type>::value
       && !std::is_same<std::string, typename std::decay<U>::type>::value
+      && !std::is_same<const char*, typename std::decay<U>::type>::value
       && !is_stl_vector<typename std::decay<U>::type>::value
       , bool>::type cast(U* , StorageBase* , size_t = 0) noexcept
     {
@@ -413,6 +411,18 @@ namespace btk
       return false;
     };
     
+    // const char* conversion
+    template <typename U>
+    static typename std::enable_if<std::is_same<const char*, typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
+    {
+      if (storage->id() == static_typeid<std::string>())
+      {
+        *value = static_cast<std::string*>(storage->Data)[idx].c_str();
+        return true;
+      }
+      return false;
+    }
+    
     // Vector conversion
     template <typename U>
     static typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage) noexcept
@@ -476,6 +486,22 @@ namespace btk
   
   // --------------------------------------------------------------------- //
   
+  template <>
+  struct Any::details::adapt<const char*> : Any::details::adapt<std::string>
+  {
+    static inline std::string* single(const char* value)
+    {
+      return new std::string(value);
+    };
+    static inline std::string* array(size_t newarraylen, const char* const* values, size_t num)
+    {
+      std::string* data = new std::string[newarraylen];
+      for (size_t i = 0 ; i < num ; ++i)
+        data[i].assign(values[i]);
+      return data;
+    };
+  };
+
   template <typename T> 
   template <typename U> 
   inline Any::details::StorageSingle<T>::StorageSingle(U* value)
