@@ -199,7 +199,7 @@ namespace btk
       , Any::StorageBase*>::type
     store(U&& values, D&& dimensions)
     {
-      static_assert(std::is_integral<typename std::decay<typename D::value_type>::type>::value, "The given dimensions must be a vector with a value_type set to an integral (e.g. int or size_t).");
+      static_assert(std::is_integral<typename std::decay<D>::type::value_type>::value, "The given dimensions must be a vector with a value_type set to an integral type (e.g. int or size_t).");
       return store(values.data(),values.size(),dimensions.data(),dimensions.size());
     };
     
@@ -222,7 +222,7 @@ namespace btk
       , Any::StorageBase*>::type
     store(U&& values, D&& dimensions)
     {
-      static_assert(std::is_integral<typename std::decay<typename D::value_type>::type>::value, "The given dimensions must be a initializer_list with a value_type set to an integral (e.g. int or size_t).");
+      static_assert(std::is_integral<typename std::decay<D>::type::value_type>::value, "The given dimensions must be a initializer_list with a value_type set to an integral type (e.g. int or size_t).");
       return store(values.begin(),values.size(),dimensions.begin(),dimensions.size());
     };
     
