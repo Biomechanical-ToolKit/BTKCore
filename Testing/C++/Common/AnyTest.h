@@ -186,6 +186,21 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(strcmp(toto[0],"Coco"),0);
     TS_ASSERT_EQUALS(strcmp(toto[1],"Vroum"),0);
     TS_ASSERT_EQUALS(strcmp(toto[2],"Another"),0);
+    // Use a vector of dimensions already set
+    std::vector<uint8_t> dims = {1,3};
+    a = btk::Any(foo,dims);
+    TS_ASSERT_EQUALS(a.dimensions().empty(),false);
+    TS_ASSERT_EQUALS(a.dimensions().size(),2ul);
+    if (!a.dimensions().empty())
+    {
+      TS_ASSERT_EQUALS(a.dimensions()[0],1ul);
+      TS_ASSERT_EQUALS(a.dimensions()[1],3ul);
+    }
+    TS_ASSERT_EQUALS(a.size(),3ul);
+    TS_ASSERT_EQUALS(a.cast<int>(),1);
+    bar = a.cast<std::vector<int>>();
+    foo = {1,2,3};
+    TS_ASSERT_EQUALS(foo,bar);
   };
 };
 
