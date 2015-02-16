@@ -70,6 +70,7 @@ namespace btk
     void swap(Any& other) noexcept;
     
     template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast() const noexcept;
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast(size_t idx) const noexcept;
     
     template<class U> operator U() const noexcept;
     

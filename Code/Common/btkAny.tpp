@@ -62,6 +62,7 @@ namespace btk
     virtual size_t size() const noexcept = 0;
     virtual StorageBase* clone() const = 0;
     virtual bool compare(StorageBase* other) const noexcept = 0;
+    virtual void* element(size_t idx) const noexcept = 0;
     
     void* Data;
   };
@@ -93,12 +94,35 @@ namespace btk
     using convert_t = void(*)(void*,void*);
     static convert_t extractConvertFunction(typeid_t sid, typeid_t rid) noexcept;
     
+    // Single conversion
     template <typename U>
-    static inline void convert(U* value, Any::StorageBase* storage) noexcept
+    static inline typename std::enable_if<!is_stl_vector<typename std::decay<U>::type>::value>::type  convert(U* value, Any::StorageBase* storage) noexcept
     {
       convert_t doConversion = extractConvertFunction(storage->id(),static_typeid<U>());
       if (doConversion != nullptr)
         doConversion(storage->Data,value);
+    };
+    
+    // Vector conversion
+    template <typename U>
+    static inline typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value>::type convert(U* value, Any::StorageBase* storage) noexcept
+    {
+      convert_t doConversion = extractConvertFunction(storage->id(),static_typeid<typename std::decay<U>::type::value_type>());
+      if (doConversion != nullptr)
+      {
+        value->resize(storage->size());
+        for (size_t i = 0 ; i < value->size() ; ++i)
+          doConversion(storage->element(i),&value->operator[](i));
+      }
+    };
+    
+    // Element conversion
+    template <typename U>
+    static inline void convert(U* value, Any::StorageBase* storage, size_t idx) noexcept
+    {
+      convert_t doConversion = extractConvertFunction(storage->id(),static_typeid<U>());
+      if (doConversion != nullptr)
+        doConversion(storage->element(idx),value);
     };
     
     // Should be used only on size_t values coming from typeid_t variables
@@ -123,6 +147,7 @@ namespace btk
       virtual size_t size() const noexcept final;
       virtual StorageBase* clone() const final;
       virtual bool compare(StorageBase* other) const noexcept final;
+      virtual void* element(size_t idx) const noexcept final;
     };
   
     template <typename T>
@@ -139,6 +164,7 @@ namespace btk
       virtual size_t size() const noexcept final;
       virtual StorageBase* clone() const final;
       virtual bool compare(StorageBase* other) const noexcept final;
+      virtual void* element(size_t idx) const noexcept final;
       size_t NumValues;
       const size_t* Dimensions;
       size_t NumDims;
@@ -427,10 +453,11 @@ namespace btk
     template <typename U>
     static typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage) noexcept
     {
+      bool res = true;
       value->resize(storage->size());
       for (size_t i = 0 ; i < value->size() ; ++i)
-        cast(&value->operator[](i),storage,i);
-      return true;
+        res &= cast(&value->operator[](i),storage,i);
+      return res;
     };
   
     // --------------------------------------------------------------------- //
@@ -553,6 +580,12 @@ namespace btk
   {
     return std::is_arithmetic<T>::value;
   };
+  
+  template <typename T> 
+  void* Any::details::StorageSingle<T>::element(size_t ) const noexcept
+  {
+    return this->Data;
+  };
 
   // --------------------------------------------------------------------- //
 
@@ -619,6 +652,12 @@ namespace btk
   bool Any::details::StorageArray<T>::is_arithmetic() const noexcept
   {
     return std::is_arithmetic<T>::value;
+  };
+  
+  template <typename T> 
+  void* Any::details::StorageArray<T>::element(size_t idx) const noexcept
+  {
+    return static_cast<void*>(&static_cast<T*>(this->Data)[idx]);
   };
 
   // ******************************* CONVERTER ****************************** //
@@ -743,6 +782,22 @@ namespace btk
         value = *static_cast<U*>(this->mp_Storage->Data);
       else if (!details::cast(&value, this->mp_Storage))
         details::convert(&value, this->mp_Storage);
+    }
+    return value;
+  };
+  
+  template <typename U, typename >
+  inline U Any::cast(size_t idx) const noexcept
+  {
+    static_assert(std::is_default_constructible<U>::value,"It is not possible to cast an Any object to a type which does not a default constructor.");
+    static_assert(!is_stl_vector<typename std::decay<U>::type>::value,"The cast(idx) method does not accept std::vector as casted type.");
+    U value = U();
+    if ((this->mp_Storage != nullptr) && (idx < this->mp_Storage->size()))
+    {
+      if (this->mp_Storage->id() == static_typeid<U>())
+        value = static_cast<U*>(this->mp_Storage->Data)[idx];
+      else if (!details::cast(&value, this->mp_Storage, idx))
+        details::convert(&value, this->mp_Storage, idx);
     }
     return value;
   };
