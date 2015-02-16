@@ -242,6 +242,8 @@ CXXTEST_SUITE(AnyTest)
       TS_ASSERT_EQUALS(a.dimensions()[0],4ul);
     TS_ASSERT_EQUALS(a.size(),4ul);
     TS_ASSERT_EQUALS(a.cast<int>(),1);
+    for (size_t i = 0 ; i < foo.size() ; ++i)
+      TS_ASSERT_EQUALS(a.cast<int>(i),foo[i]);
     std::vector<int> bar = a.cast<std::vector<int>>();
     TS_ASSERT_EQUALS(foo,bar);
   };
@@ -273,6 +275,37 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(strcmp(toto[1],"Vroum"),0);
     TS_ASSERT_EQUALS(strcmp(toto[2],"Another"),0);
   };
+  
+  CXXTEST_TEST(Array_CustomType)
+  {
+    btk::Any a = {Date{2009,05,01},Date{2005,12,12},Date{1945,07,23}};
+    TS_ASSERT_EQUALS(a.cast<Date>(),Date({2009,05,01}));
+    TS_ASSERT_EQUALS(a.cast<Date>(0),Date({2009,05,01}));
+    TS_ASSERT_EQUALS(a.cast<Date>(1),Date({2005,12,12}));
+    TS_ASSERT_EQUALS(a.cast<Date>(2),Date({1945,07,23}));
+    TS_ASSERT_EQUALS(a.cast<std::vector<std::string>>(),std::vector<std::string>({"","",""}));  
+    btk::Any::Register<Date, btk::Any::Conversion<std::string>, btk::Any::Conversion<std::string>>();
+    TS_ASSERT_EQUALS(a.cast<std::vector<std::string>>(),std::vector<std::string>({"2009-05-01","2005-12-12","1945-07-23"}));  
+    TS_ASSERT_EQUALS(a.cast<std::vector<int>>(),std::vector<int>({0,0,0}));  
+    btk::Any::Unregister<Date>();
+    TS_ASSERT_EQUALS(a.cast<std::vector<std::string>>(),std::vector<std::string>({"","",""}));
+  }
+    
+  CXXTEST_TEST(Array_FromSingle)
+  {
+    btk::Any a = 1.2f;
+    TS_ASSERT_EQUALS(a.cast<std::vector<float>>(),std::vector<float>({1.2f}));
+  }
+  
+  CXXTEST_TEST(Array_FromSingle_CustomType)
+  {
+    btk::Any a = "2009-05-02";
+    btk::Any::Register<Date, btk::Any::Conversion<std::string>, btk::Any::Conversion<std::string>>();
+    TS_ASSERT_EQUALS(a.cast<std::vector<Date>>(),std::vector<Date>({Date({2009,05,02})}));
+    a = Date{2014,03,01}; // The conversion to a string is correctly "2014-3-1".
+    TS_ASSERT_EQUALS(a.cast<std::vector<std::string>>(),std::vector<std::string>({"2014-3-1"}));
+    btk::Any::Unregister<Date>();
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(AnyTest)
@@ -284,7 +317,7 @@ CXXTEST_TEST_REGISTRATION(AnyTest, Single_Int8ToString)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_BoolAndString)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_String)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_IntImplicitConversion)
-CXXTEST_TEST_REGISTRATION(AnyTest, Single_CustomTypeRegistered)  
+CXXTEST_TEST_REGISTRATION(AnyTest, Single_CustomTypeRegistered)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_CustomTypeNotRegistered)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_IntHexadecimal)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Int8)
@@ -297,5 +330,7 @@ CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Initializer2)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Initializer3)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Comparison)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_String)
+CXXTEST_TEST_REGISTRATION(AnyTest, Array_FromSingle)
+CXXTEST_TEST_REGISTRATION(AnyTest, Array_FromSingle_CustomType)
 
 #endif // AnyTest_h
