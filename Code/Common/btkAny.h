@@ -69,6 +69,8 @@ namespace btk
     bool isValid() const noexcept;
     void swap(Any& other) noexcept;
     
+    template <typename U> bool isEqual(U&& value) const noexcept;
+    
     template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast() const noexcept;
     template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast(size_t idx) const noexcept;
     
@@ -79,11 +81,11 @@ namespace btk
     
     friend bool operator==(const Any& lhs, const Any& rhs) noexcept;
     friend bool operator!=(const Any& lhs, const Any& rhs) noexcept;
-    
-    template <typename U> friend inline bool operator==(const Any& lhs, const U& rhs) noexcept {return (lhs.cast<U>() == rhs);};
-    template <typename U> friend inline bool operator==(const U& lhs, const Any& rhs) noexcept {return (rhs == lhs);};
-    template <typename U> friend inline bool operator!=(const Any& lhs, const U& rhs) noexcept {return !(lhs == rhs);};
-    template <typename U> friend inline bool operator!=(const U& lhs, const Any& rhs) noexcept {return !(lhs == rhs);};
+        
+    template <typename U> friend inline bool operator==(const Any& lhs, const U& rhs) noexcept {return lhs.isEqual(rhs);};
+    template <typename U> friend inline bool operator==(const U& lhs, const Any& rhs) noexcept {return rhs.isEqual(lhs);};
+    template <typename U> friend inline bool operator!=(const Any& lhs, const U& rhs) noexcept {return !lhs.isEqual(rhs);};
+    template <typename U> friend inline bool operator!=(const U& lhs, const Any& rhs) noexcept {return !rhs.isEqual(lhs);};
     
   private:
     

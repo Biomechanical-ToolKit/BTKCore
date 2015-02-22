@@ -811,6 +811,12 @@ namespace btk
   inline Any::Any(std::initializer_list<U> values, std::initializer_list<D> dimensions)
   : mp_Storage(details::store<std::initializer_list<U>,std::initializer_list<D>>(std::move(values), std::move(dimensions)))
   {};
+  
+  template <typename U>
+  inline bool Any::isEqual(U&& value) const noexcept
+  {
+    return btk::Any::details::compare_value(this,std::forward<U>(value));
+  };
 
   template <typename U, typename >
   inline U Any::cast() const noexcept
