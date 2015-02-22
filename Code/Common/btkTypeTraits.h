@@ -36,11 +36,26 @@
 #ifndef __btkTypeTraits_h
 #define __btkTypeTraits_h
 
+#include <array>
 #include <vector>
 #include <initializer_list>
 
 namespace btk
 {
+  template <typename T>
+  struct is_stl_array
+  {
+    static constexpr bool value = false;
+  };
+  
+  template <typename T, size_t N>
+  struct is_stl_array<std::array<T,N> >
+  {
+    static constexpr bool value = true;
+  };
+  
+  // ---------------------------------------------------------------------- //
+  
   template <typename T>
   struct is_stl_vector
   {
