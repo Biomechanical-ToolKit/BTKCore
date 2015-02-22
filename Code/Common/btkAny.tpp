@@ -92,13 +92,13 @@ namespace btk
     static Converter& converter() noexcept;
     
     using convert_t = void(*)(void*,void*);
-    static convert_t extractConvertFunction(typeid_t sid, typeid_t rid) noexcept;
+    static convert_t extract_converter(typeid_t sid, typeid_t rid) noexcept;
     
     // Single conversion
     template <typename U>
     static inline typename std::enable_if<!is_stl_vector<typename std::decay<U>::type>::value && !is_stl_array<typename std::decay<U>::type>::value>::type  convert(U* value, Any::StorageBase* storage) noexcept
     {
-      convert_t doConversion = extractConvertFunction(storage->id(),static_typeid<U>());
+      convert_t doConversion = extract_converter(storage->id(),static_typeid<U>());
       if (doConversion != nullptr)
         doConversion(storage->Data,value);
     };
@@ -107,7 +107,7 @@ namespace btk
     template <typename U>
     static inline typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value>::type convert(U* value, Any::StorageBase* storage) noexcept
     {
-      convert_t doConversion = extractConvertFunction(storage->id(),static_typeid<typename std::decay<U>::type::value_type>());
+      convert_t doConversion = extract_converter(storage->id(),static_typeid<typename std::decay<U>::type::value_type>());
       if (doConversion != nullptr)
       {
         value->resize(storage->size());
@@ -132,7 +132,7 @@ namespace btk
     template <typename U>
     static inline void convert(U* value, Any::StorageBase* storage, size_t idx) noexcept
     {
-      convert_t doConversion = extractConvertFunction(storage->id(),static_typeid<U>());
+      convert_t doConversion = extract_converter(storage->id(),static_typeid<U>());
       if (doConversion != nullptr)
         doConversion(storage->element(idx),value);
     };
