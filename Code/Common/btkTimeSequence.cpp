@@ -36,17 +36,15 @@
 #include "btkTimeSequence.h"
 #include "btkTimeSequence_p.h"
 
-#include <numeric>
-
 // -------------------------------------------------------------------------- //
 //                                 PRIVATE API                                //
 // -------------------------------------------------------------------------- //
 
 namespace btk
 {
-  TimeSequencePrivate::TimeSequencePrivate(TimeSequence* pint, const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, double startTime)
+  TimeSequencePrivate::TimeSequencePrivate(TimeSequence* pint, const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range)
   : NodePrivate(pint,name),
-    Dimensions(dimensions), Samples(samples), SampleRate(rate), Unit(unit), StartTime(startTime), Data(nullptr)
+    Dimensions(dimensions), Samples(samples), SampleRate(rate), Type(type), Unit(unit), StartTime(startTime), Scale(scale), Offset(offset), Range(range), Data(nullptr)
   {
     // Allocate data memory;
     if (samples != 0)
@@ -71,12 +69,14 @@ namespace btk
 
 namespace btk
 {
-  TimeSequence::TimeSequence(unsigned component, unsigned samples, const std::string& name, double rate, const std::string& unit, double startTime, Node* parent)
-  : TimeSequence(std::vector<unsigned>({component}),samples,name,rate,unit,startTime,parent)
+  constexpr std::array<double,2> TimeSequence::InfinityRange;
+  
+  TimeSequence::TimeSequence(unsigned component, unsigned samples, const std::string& name, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range, Node* parent)
+  : TimeSequence(std::vector<unsigned>({component}),samples,name,rate,unit,type,startTime,scale,offset,range,parent)
   {};
   
-  TimeSequence::TimeSequence(const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, double startTime, Node* parent)
-  : Node(*new TimeSequencePrivate(this,dimensions,samples,name,rate,unit,startTime),parent)
+  TimeSequence::TimeSequence(const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range, Node* parent)
+  : Node(*new TimeSequencePrivate(this,dimensions,samples,name,rate,unit,type,startTime,scale,offset,range),parent)
   {};
   
   /*
@@ -131,6 +131,21 @@ namespace btk
     return static_cast<double>(optr->Samples) / optr->SampleRate;
   };
   
+  int TimeSequence::type() const noexcept
+  {
+    auto optr = this->pimpl();
+    return optr->Type;
+  };
+  
+  void TimeSequence::setType(int value) noexcept
+  {
+    auto optr = this->pimpl();
+    if (optr->Type == value)
+      return;
+    optr->Type = value;
+    this->modified();
+  };
+  
   const std::string& TimeSequence::unit() const noexcept
   {
     auto optr = this->pimpl();
@@ -158,6 +173,52 @@ namespace btk
     if (std::fabs(value - optr->StartTime) < std::numeric_limits<double>::epsilon())
       return;
     optr->StartTime = value;
+    this->modified();
+  };
+  
+  double TimeSequence::scale() const noexcept
+  {
+    auto optr = this->pimpl();
+    return optr->Scale;
+  };
+  
+  void TimeSequence::setScale(double value) noexcept
+  {
+    auto optr = this->pimpl();
+    if (std::fabs(value - optr->Scale) < std::numeric_limits<double>::epsilon())
+      return;
+    optr->Scale = value;
+    this->modified();
+  };
+  
+  double TimeSequence::offset() const noexcept
+  {
+    auto optr = this->pimpl();
+    return optr->Offset;
+  };
+  
+  void TimeSequence::setOffset(double value) noexcept
+  {
+    auto optr = this->pimpl();
+    if (std::fabs(value - optr->Offset) < std::numeric_limits<double>::epsilon())
+      return;
+    optr->Offset = value;
+    this->modified();
+  };
+  
+  const std::array<double,2>& TimeSequence::range() const noexcept
+  {
+    auto optr = this->pimpl();
+    return optr->Range;
+  };
+  
+  void TimeSequence::setRange(const std::array<double,2>& value) noexcept
+  {
+    auto optr = this->pimpl();
+    if ((std::fabs(value[0] - optr->Range[0]) < std::numeric_limits<double>::epsilon())
+     && (std::fabs(value[1] - optr->Range[1]) < std::numeric_limits<double>::epsilon()))
+      return;
+    optr->Range = value;
     this->modified();
   };
   

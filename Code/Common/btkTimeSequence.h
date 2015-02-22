@@ -38,6 +38,10 @@
 
 #include "btkNode.h"
 
+#include <vector>
+#include <array>
+#include <numeric>
+
 namespace btk
 {
   class TimeSequencePrivate;
@@ -47,8 +51,11 @@ namespace btk
     BTK_DECLARE_PIMPL_ACCESSOR(TimeSequence)
   
   public:
-    TimeSequence(unsigned component, unsigned samples, const std::string& name, double rate, const std::string& unit, double startTime = 0.0, Node* parent = nullptr);
-    TimeSequence(const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, double startTime = 0.0, Node* parent = nullptr);
+    enum : unsigned {Unknown = 0, Marker, Angle, Force, Moment, Power, Scalar, Analog};
+    static constexpr std::array<double,2> InfinityRange{-std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity()};
+    
+    TimeSequence(unsigned component, unsigned samples, const std::string& name, double rate, const std::string& unit, int type = Unknown, double startTime = 0.0, double scale = 1.0, double offset = 0.0, const std::array<double,2>& range = InfinityRange, Node* parent = nullptr);
+    TimeSequence(const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, int type = Unknown, double startTime = 0.0, double scale = 1.0, double offset = 0.0, const std::array<double,2>& range = InfinityRange, Node* parent = nullptr);
     ~TimeSequence() noexcept;
     
     TimeSequence(const TimeSequence& ) = delete;
@@ -66,11 +73,23 @@ namespace btk
     
     double duration() const noexcept;
     
+    int type() const noexcept;
+    void setType(int value) noexcept;
+    
     const std::string& unit() const noexcept;
     void setUnit(const std::string& value) noexcept;
     
     double startTime() const noexcept;
     void setStartTime(double value) noexcept;
+    
+    double scale() const noexcept;
+    void setScale(double value) noexcept;
+    
+    double offset() const noexcept;
+    void setOffset(double value) noexcept;
+    
+    const std::array<double,2>& range() const noexcept;
+    void setRange(const std::array<double,2>& value) noexcept;
     
     const double* data() const noexcept;
     double* data() noexcept;

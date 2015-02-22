@@ -44,6 +44,10 @@
 #include "btkNode_p.h"
 #include "btkProperty.h"
 
+#include <vector>
+#include <array>
+#include <string>
+
 namespace btk
 {
   class TimeSequence;
@@ -54,24 +58,30 @@ namespace btk
     
     BTK_DECLARE_NODEID(TimeSequence, Node)
     BTK_DECLARE_STATIC_PROPERTIES(TimeSequence, Node,
+      Property<TimeSequence,int>("type",&TimeSequence::type,&TimeSequence::setType),
       Property<TimeSequence,unsigned>("samples",&TimeSequence::samples),
       Property<TimeSequence,double>("sampleRate",&TimeSequence::sampleRate,&TimeSequence::setSampleRate),
       Property<TimeSequence,double>("startTime",&TimeSequence::startTime,&TimeSequence::setStartTime),
       Property<TimeSequence,const std::string&>("unit",&TimeSequence::unit,&TimeSequence::setUnit),
+      Property<TimeSequence,double>("scale",&TimeSequence::scale,&TimeSequence::setScale),
+      Property<TimeSequence,double>("offset",&TimeSequence::offset,&TimeSequence::setOffset),
+      Property<TimeSequence,const std::array<double,2>&>("range",&TimeSequence::range,&TimeSequence::setRange),
       Property<TimeSequence,double>("duration",&TimeSequence::duration)
-        // Scale ?
-        // Offset ?
     )
     
   public:
-    TimeSequencePrivate(TimeSequence* pint, const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, double startTime);
+    TimeSequencePrivate(TimeSequence* pint, const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range);
     ~TimeSequencePrivate();
     
+    int Type;
     std::vector<unsigned> Dimensions;
     unsigned Samples;
     double SampleRate;
     std::string Unit;
     double StartTime;
+    double Scale;
+    double Offset;
+    std::array<double,2> Range;
     double* Data;
   };
 };
