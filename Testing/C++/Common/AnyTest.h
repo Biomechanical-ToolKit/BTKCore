@@ -29,10 +29,19 @@ CXXTEST_SUITE(AnyTest)
   {
     btk::Any a = 12;
     btk::Any b = 12.5f;
+    btk::Any c = "Single_Comparison";
     TS_ASSERT(a == a);
+    TS_ASSERT(a == 12);
     TS_ASSERT(b == b);
+    TS_ASSERT(b == 12.5f);
+    TS_ASSERT(c == c);
+    TS_ASSERT(c == "Single_Comparison");
     TS_ASSERT(a != b);
+    TS_ASSERT(a != c);
     TS_ASSERT(b != a);
+    TS_ASSERT(b != c);
+    TS_ASSERT(c != a);
+    TS_ASSERT(c != b);
   };
   
   CXXTEST_TEST(Single_Comparison2)
@@ -306,6 +315,21 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(a.cast<std::vector<std::string>>(),std::vector<std::string>({"2014-3-1"}));
     btk::Any::Unregister<Date>();
   }
+  
+  CXXTEST_TEST(Array_Int_Array)
+  {
+    std::array<int,4> bar, foo{{1, 2, 3, 4}};
+    // Vector constructor
+    btk::Any a = foo;
+    TS_ASSERT_EQUALS(a.dimensions().empty(),false);
+    TS_ASSERT_EQUALS(a.dimensions().size(),1ul);
+    if (!a.dimensions().empty())
+      TS_ASSERT_EQUALS(a.dimensions()[0],4ul);
+    TS_ASSERT_EQUALS(a.size(),4ul);
+    TS_ASSERT_EQUALS(a.cast<int>(),1);
+    bar = a.cast<std::array<int,4>>();
+    TS_ASSERT_EQUALS(foo,bar);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(AnyTest)
@@ -332,5 +356,6 @@ CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Comparison)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_String)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_FromSingle)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_FromSingle_CustomType)
+CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Array)
 
 #endif // AnyTest_h
