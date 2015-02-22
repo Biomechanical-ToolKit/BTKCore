@@ -96,14 +96,14 @@ namespace btk
     
     // Single conversion
     template <typename U>
-    static inline typename std::enable_if<!is_stl_vector<typename std::decay<U>::type>::value>::type  convert(U* value, Any::StorageBase* storage) noexcept
+    static inline typename std::enable_if<!is_stl_vector<typename std::decay<U>::type>::value && !is_stl_array<typename std::decay<U>::type>::value>::type  convert(U* value, Any::StorageBase* storage) noexcept
     {
       convert_t doConversion = extractConvertFunction(storage->id(),static_typeid<U>());
       if (doConversion != nullptr)
         doConversion(storage->Data,value);
     };
     
-    // Vector conversion
+    // (std) Vector conversion
     template <typename U>
     static inline typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value>::type convert(U* value, Any::StorageBase* storage) noexcept
     {
@@ -111,6 +111,18 @@ namespace btk
       if (doConversion != nullptr)
       {
         value->resize(storage->size());
+        for (size_t i = 0 ; i < value->size() ; ++i)
+          doConversion(storage->element(i),&value->operator[](i));
+      }
+    };
+    
+    // (std) Array conversion
+    template <typename U>
+    static inline typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value>::type convert(U* value, Any::StorageBase* storage) noexcept
+    {
+      convert_t doConversion = extract_converter(storage->id(),static_typeid<typename std::decay<U>::type::value_type>());
+      if (doConversion != nullptr)
+      {
         for (size_t i = 0 ; i < value->size() ; ++i)
           doConversion(storage->element(i),&value->operator[](i));
       }
@@ -124,6 +136,20 @@ namespace btk
       if (doConversion != nullptr)
         doConversion(storage->element(idx),value);
     };
+    
+    // Compare a Any object with a value which has another type
+    template <typename U>
+    static inline typename std::enable_if<!std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type compare_value(const Any* lhs, U&& rhs) noexcept
+    {
+      return (lhs->cast<typename std::decay<U>::type>() == rhs);
+    };
+
+    // Compare a Any object with a const char* value
+    template <typename U>
+    static inline typename std::enable_if<std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type compare_value(const Any* lhs, U&& rhs) noexcept
+    {
+      return (strcmp(lhs->cast<const char*>(), rhs) == 0);
+    }    
     
     // Should be used only on size_t values coming from typeid_t variables
     static inline constexpr size_t hash(size_t sid, size_t rid) noexcept
@@ -210,6 +236,7 @@ namespace btk
     static inline typename std::enable_if<
          !is_stl_initializer_list<typename std::decay<U>::type>::value
       && !is_stl_vector<typename std::decay<U>::type>::value
+      && !is_stl_array<typename std::decay<U>::type>::value
       , Any::StorageBase*>::type
     store(U&& value, D&& )
     {
@@ -220,8 +247,8 @@ namespace btk
     // From vectors
     template <typename U, typename D>
     static inline typename std::enable_if<
-         is_stl_vector<typename std::decay<U>::type>::value
-      && is_stl_vector<typename std::decay<D>::type>::value
+         (is_stl_vector<typename std::decay<U>::type>::value || is_stl_array<typename std::decay<U>::type>::value)
+      && (is_stl_vector<typename std::decay<D>::type>::value || is_stl_array<typename std::decay<D>::type>::value)
       , Any::StorageBase*>::type
     store(U&& values, D&& dimensions)
     {
@@ -231,7 +258,7 @@ namespace btk
     
     template <typename U, typename D>
     static inline typename std::enable_if<
-         is_stl_vector<typename std::decay<U>::type>::value
+         (is_stl_vector<typename std::decay<U>::type>::value || is_stl_array<typename std::decay<U>::type>::value)
       && std::is_same<D,void*>::value
       , Any::StorageBase*>::type
     store(U&& values, D&& )
@@ -294,6 +321,7 @@ namespace btk
       && !std::is_same<std::string, typename std::decay<U>::type>::value
       && !std::is_same<const char*, typename std::decay<U>::type>::value
       && !is_stl_vector<typename std::decay<U>::type>::value
+      && !is_stl_array<typename std::decay<U>::type>::value
       , bool>::type cast(U* , StorageBase* , size_t = 0) noexcept
     {
       return false;
@@ -449,7 +477,7 @@ namespace btk
       return false;
     }
     
-    // Vector conversion
+    // (std) Vector conversion
     template <typename U>
     static typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage) noexcept
     {
@@ -457,6 +485,19 @@ namespace btk
       value->resize(storage->size());
       for (size_t i = 0 ; i < value->size() ; ++i)
         res &= cast(&value->operator[](i),storage,i);
+      return res;
+    };
+    
+    // (std) Array conversion
+    template <typename U>
+    static typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage) noexcept
+    {
+      bool res = true;
+      const size_t size = std::min(value->size(),storage->size());
+      for (size_t i = 0 ; i < size ; ++i)
+        res &= cast(&value->operator[](i),storage,i);
+      for (size_t i = size ; i < value->size() ; ++i)
+        value->operator[](i) = typename std::decay<U>::type::value_type();
       return res;
     };
   
