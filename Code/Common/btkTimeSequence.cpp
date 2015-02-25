@@ -36,6 +36,8 @@
 #include "btkTimeSequence.h"
 #include "btkTimeSequence_p.h"
 
+#include <cassert>
+
 // -------------------------------------------------------------------------- //
 //                                 PRIVATE API                                //
 // -------------------------------------------------------------------------- //
@@ -44,17 +46,22 @@ namespace btk
 {
   TimeSequencePrivate::TimeSequencePrivate(TimeSequence* pint, const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range)
   : NodePrivate(pint,name),
-    Dimensions(dimensions), Samples(samples), SampleRate(rate), Type(type), Unit(unit), StartTime(startTime), Scale(scale), Offset(offset), Range(range), Data(nullptr)
+    Dimensions(dimensions), AccumulatedDimensions(), Samples(samples), SampleRate(rate), Type(type), Unit(unit), StartTime(startTime), Scale(scale), Offset(offset), Range(range), Data(nullptr)
   {
+    assert(!dimensions.empty());
     // Allocate data memory;
     if (samples != 0)
     {
       size_t num = 1;
       for(const unsigned& cpt: dimensions)
         num *= cpt;
-      if (num != 0)
-        this->Data = new double[samples * num];
+      assert(num != 0);
+      this->Data = new double[samples * num];
     }
+    // Compute accumulated dimensions (used for the method data(sample, indices))
+    this->AccumulatedDimensions.resize(dimensions.size()-1,dimensions[0]);
+    for (size_t i = this->AccumulatedDimensions.size() ; i > 0  ; --i)
+      this->AccumulatedDimensions[i-1] = this->AccumulatedDimensions[i] * this->Dimensions[this->AccumulatedDimensions.size()-i];
   };
   
   TimeSequencePrivate::~TimeSequencePrivate()
@@ -232,5 +239,16 @@ namespace btk
   {
     auto optr = this->pimpl();
     return optr->Data;
+  };
+  
+  double& TimeSequence::data(unsigned sample, std::vector<unsigned>&& indices) noexcept
+  {
+    auto optr = this->pimpl();
+    assert(sample < optr->Samples);
+    assert(indices.size() == optr->Dimensions.size());
+    size_t col = indices.back();
+    for (size_t i = 0 ; i < optr->AccumulatedDimensions.size() ; ++i)
+      col += optr->AccumulatedDimensions[i] * indices[i];
+    return optr->Data[col*optr->Samples+sample];
   };
 };

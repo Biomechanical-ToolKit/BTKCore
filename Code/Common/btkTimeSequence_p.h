@@ -74,7 +74,7 @@ namespace btk
     ~TimeSequencePrivate();
     
     int Type;
-    std::vector<unsigned> Dimensions;
+    std::vector<unsigned> Dimensions, AccumulatedDimensions;
     unsigned Samples;
     double SampleRate;
     std::string Unit;

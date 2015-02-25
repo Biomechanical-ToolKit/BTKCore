@@ -93,6 +93,24 @@ namespace btk
     
     const double* data() const noexcept;
     double* data() noexcept;
+    
+    template <typename... Is> double data(unsigned sample, Is... indices) const noexcept;
+    template <typename... Is> double& data(unsigned sample, Is... indices) noexcept;
+    
+  private:
+    double& data(unsigned sample, std::vector<unsigned>&& indices) noexcept;
+  };
+  
+  template <typename... Is>
+  inline double TimeSequence::data(unsigned sample, Is... indices) const noexcept
+  {
+    return this->data(sample,{static_cast<unsigned>(indices)...});
+  };
+  
+  template <typename... Is>
+  inline double& TimeSequence::data(unsigned sample, Is... indices) noexcept
+  {
+    return this->data(sample,{static_cast<unsigned>(indices)...});
   };
 };
 
