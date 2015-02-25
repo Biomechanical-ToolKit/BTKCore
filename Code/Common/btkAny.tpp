@@ -323,8 +323,14 @@ namespace btk
       && !std::is_same<const char*, typename std::decay<U>::type>::value
       && !is_stl_vector<typename std::decay<U>::type>::value
       && !is_stl_array<typename std::decay<U>::type>::value
-      , bool>::type cast(U* , StorageBase* , size_t = 0) noexcept
+      , bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
     {
+      using value_t = typename std::decay<U>::type;
+      if (storage->id() == static_typeid<value_t>())
+      {
+        *value = static_cast<value_t*>(storage->Data)[idx];
+        return true;
+      }
       return false;
     };
     
@@ -408,7 +414,12 @@ namespace btk
     static typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
     {
       const typeid_t id = storage->id();
-      if (storage->is_arithmetic()
+      if (id == static_typeid<std::string>())
+      {
+        *value = static_cast<std::string*>(storage->Data)[idx];
+        return true;
+      }
+      else if (storage->is_arithmetic()
                && (id != static_typeid<char16_t>())
                && (id != static_typeid<char32_t>())
                && (id != static_typeid<wchar_t>()))
@@ -485,16 +496,8 @@ namespace btk
       using value_t = typename std::decay<U>::type::value_type;
       bool res = true;
       value->resize(storage->size());
-      if (storage->id() == static_typeid<value_t>())
-      {
-        for (size_t i = 0 ; i < value->size() ; ++i)
-          value->operator[](i) = static_cast<value_t*>(storage->Data)[i];
-      }
-      else
-      {  
-        for (size_t i = 0 ; i < value->size() ; ++i)
-          res &= cast(&value->operator[](i),storage,i);
-      }
+      for (size_t i = 0 ; i < value->size() ; ++i)
+        res &= cast(&value->operator[](i),storage,i);
       return res;
     };
     
@@ -505,16 +508,8 @@ namespace btk
       using value_t = typename std::decay<U>::type::value_type;
       bool res = true;
       const size_t size = std::min(value->size(),storage->size());
-      if (storage->id() == static_typeid<value_t>())
-      {
-        for (size_t i = 0 ; i < size ; ++i)
-          value->operator[](i) = static_cast<value_t*>(storage->Data)[i];
-      }
-      else
-      {  
-        for (size_t i = 0 ; i < size ; ++i)
-          res &= cast(&value->operator[](i),storage,i);
-      }
+      for (size_t i = 0 ; i < size ; ++i)
+        res &= cast(&value->operator[](i),storage,i);
       for (size_t i = size ; i < value->size() ; ++i)
         value->operator[](i) = typename std::decay<U>::type::value_type();
       return res;
