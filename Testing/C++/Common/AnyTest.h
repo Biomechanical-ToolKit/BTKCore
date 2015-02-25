@@ -279,10 +279,21 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(a.cast<std::string>(),"Coco");
     TS_ASSERT_EQUALS(strcmp(a.cast<const char*>(),"Coco"),0);
     auto toto = a.cast<std::vector<const char*>>();
-    TS_ASSERT_EQUALS(toto.size(),3);
+    TS_ASSERT_EQUALS(toto.size(),3ul);
     TS_ASSERT_EQUALS(strcmp(toto[0],"Coco"),0);
     TS_ASSERT_EQUALS(strcmp(toto[1],"Vroum"),0);
     TS_ASSERT_EQUALS(strcmp(toto[2],"Another"),0);
+    a = btk::Any(std::vector<std::string>({"Coco","Vroum","Another"}),std::vector<size_t>({4}));
+    auto bar = a.cast<std::vector<std::string>>();
+    TS_ASSERT_EQUALS(bar.size(),4ul);
+    TS_ASSERT_EQUALS(bar[0],std::string("Coco"));
+    TS_ASSERT_EQUALS(bar[1],std::string("Vroum"));
+    TS_ASSERT_EQUALS(bar[2],std::string("Another"));
+    TS_ASSERT_EQUALS(bar[3],std::string(""));
+    TS_ASSERT_EQUALS(a.cast<std::string>(0),std::string("Coco"));
+    TS_ASSERT_EQUALS(a.cast<std::string>(1),std::string("Vroum"));
+    TS_ASSERT_EQUALS(a.cast<std::string>(2),std::string("Another"));
+    TS_ASSERT_EQUALS(a.cast<std::string>(3),std::string(""));
   };
   
   CXXTEST_TEST(Array_CustomType)

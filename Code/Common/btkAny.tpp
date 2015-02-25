@@ -481,10 +481,19 @@ namespace btk
     template <typename U>
     static typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage) noexcept
     {
+      using value_t = typename std::decay<U>::type::value_type;
       bool res = true;
       value->resize(storage->size());
-      for (size_t i = 0 ; i < value->size() ; ++i)
-        res &= cast(&value->operator[](i),storage,i);
+      if (storage->id() == static_typeid<value_t>())
+      {
+        for (size_t i = 0 ; i < value->size() ; ++i)
+          value->operator[](i) = static_cast<value_t*>(storage->Data)[i];
+      }
+      else
+      {  
+        for (size_t i = 0 ; i < value->size() ; ++i)
+          res &= cast(&value->operator[](i),storage,i);
+      }
       return res;
     };
     
@@ -492,10 +501,19 @@ namespace btk
     template <typename U>
     static typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage) noexcept
     {
+      using value_t = typename std::decay<U>::type::value_type;
       bool res = true;
       const size_t size = std::min(value->size(),storage->size());
-      for (size_t i = 0 ; i < size ; ++i)
-        res &= cast(&value->operator[](i),storage,i);
+      if (storage->id() == static_typeid<value_t>())
+      {
+        for (size_t i = 0 ; i < size ; ++i)
+          value->operator[](i) = static_cast<value_t*>(storage->Data)[i];
+      }
+      else
+      {  
+        for (size_t i = 0 ; i < size ; ++i)
+          res &= cast(&value->operator[](i),storage,i);
+      }
       for (size_t i = size ; i < value->size() ; ++i)
         value->operator[](i) = typename std::decay<U>::type::value_type();
       return res;
