@@ -148,7 +148,8 @@ namespace btk
     template <typename U>
     static inline typename std::enable_if<std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type compare_value(const Any* lhs, U&& rhs) noexcept
     {
-      return (strcmp(lhs->cast<const char*>(), rhs) == 0);
+      const char* str = lhs->cast<const char*>();
+      return ((str != nullptr) && (rhs != nullptr) && (strcmp(str, rhs) == 0));
     }    
     
     // Should be used only on size_t values coming from typeid_t variables

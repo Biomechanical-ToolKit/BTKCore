@@ -30,18 +30,45 @@ CXXTEST_SUITE(AnyTest)
     btk::Any a = 12;
     btk::Any b = 12.5f;
     btk::Any c = "Single_Comparison";
+    btk::Any d; // invalid
+    
     TS_ASSERT(a == a);
     TS_ASSERT(a == 12);
+    TS_ASSERT(12 == a);
+    TS_ASSERT(a != 0);
+    TS_ASSERT(0 != a);
+    
     TS_ASSERT(b == b);
     TS_ASSERT(b == 12.5f);
+    TS_ASSERT(12.5f == b);
+    TS_ASSERT(b != 0.0f);
+    TS_ASSERT(0.0f != b);
+    
     TS_ASSERT(c == c);
     TS_ASSERT(c == "Single_Comparison");
+    TS_ASSERT("Single_Comparison" == c);
+    TS_ASSERT(c != "");
+    TS_ASSERT("" != c);
+    
+    TS_ASSERT(d != d);
+    TS_ASSERT(d != "invalid");
+    TS_ASSERT("invalid" != d);
+    
     TS_ASSERT(a != b);
     TS_ASSERT(a != c);
+    TS_ASSERT(a != d);
+    
     TS_ASSERT(b != a);
     TS_ASSERT(b != c);
+    TS_ASSERT(b != d);
+    
     TS_ASSERT(c != a);
     TS_ASSERT(c != b);
+    TS_ASSERT(c != d);
+    
+    TS_ASSERT(d != a);
+    TS_ASSERT(d != b);
+    TS_ASSERT(d != c);
   };
   
   CXXTEST_TEST(Single_Comparison2)

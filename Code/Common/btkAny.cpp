@@ -283,7 +283,7 @@ namespace btk
    */
   bool operator==(const Any& lhs, const Any& rhs) noexcept
   {
-    return lhs.mp_Storage->compare(rhs.mp_Storage);
+    return ((lhs.mp_Storage != nullptr) && (rhs.mp_Storage != nullptr) && lhs.mp_Storage->compare(rhs.mp_Storage));
   };
   
  /**
