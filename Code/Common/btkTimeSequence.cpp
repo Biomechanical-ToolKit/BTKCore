@@ -245,9 +245,9 @@ namespace btk
   {
     auto optr = this->pimpl();
     assert(sample < optr->Samples);
-    assert(indices.size() == optr->Dimensions.size());
-    size_t col = indices.back();
-    for (size_t i = 0 ; i < optr->AccumulatedDimensions.size() ; ++i)
+    assert(indices.size() <= optr->Dimensions.size());
+    size_t col = indices.empty() ? 0 : indices.back();
+    for (size_t i = 0 ; i < std::min(indices.size(),optr->AccumulatedDimensions.size()) ; ++i)
       col += optr->AccumulatedDimensions[i] * indices[i];
     return optr->Data[col*optr->Samples+sample];
   };
