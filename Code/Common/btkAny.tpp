@@ -96,7 +96,7 @@ namespace btk
     
     // Single conversion
     template <typename U>
-    static inline typename std::enable_if<!is_stl_vector<typename std::decay<U>::type>::value && !is_stl_array<typename std::decay<U>::type>::value>::type  convert(U* value, Any::StorageBase* storage) noexcept
+    static inline typename std::enable_if<!is_stl_vector<typename std::decay<U>::type>::value && !is_stl_array<typename std::decay<U>::type>::value>::type convert(U* value, Any::StorageBase* storage) noexcept
     {
       convert_t doConversion = extract_converter(storage->id(),static_typeid<U>());
       if (doConversion != nullptr)
