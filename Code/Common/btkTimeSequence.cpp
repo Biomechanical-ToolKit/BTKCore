@@ -44,7 +44,7 @@
 
 namespace btk
 {
-  TimeSequencePrivate::TimeSequencePrivate(TimeSequence* pint, const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range)
+  TimeSequencePrivate::TimeSequencePrivate(TimeSequence* pint, const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range)
   : NodePrivate(pint,name),
     Dimensions(dimensions), AccumulatedDimensions(), Samples(samples), SampleRate(rate), Type(type), Unit(unit), StartTime(startTime), Scale(scale), Offset(offset), Range(range), Data(nullptr)
   {
@@ -78,12 +78,12 @@ namespace btk
 {
   constexpr std::array<double,2> TimeSequence::InfinityRange;
   
-  TimeSequence::TimeSequence(unsigned component, unsigned samples, const std::string& name, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range, Node* parent)
-  : TimeSequence(std::vector<unsigned>({component}),samples,name,rate,unit,type,startTime,scale,offset,range,parent)
+  TimeSequence::TimeSequence(const std::string& name, unsigned component, unsigned samples, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range, Node* parent)
+  : TimeSequence(name,std::vector<unsigned>({component}),samples,rate,unit,type,startTime,scale,offset,range,parent)
   {};
   
-  TimeSequence::TimeSequence(const std::vector<unsigned>& dimensions, unsigned samples, const std::string& name, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range, Node* parent)
-  : Node(*new TimeSequencePrivate(this,dimensions,samples,name,rate,unit,type,startTime,scale,offset,range),parent)
+  TimeSequence::TimeSequence(const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range, Node* parent)
+  : Node(*new TimeSequencePrivate(this,name,dimensions,samples,rate,unit,type,startTime,scale,offset,range),parent)
   {};
   
   /*
@@ -235,11 +235,19 @@ namespace btk
     return optr->Data;
   };
   
+  /**
+   * Have to call modified() manually
+   */
   double* TimeSequence::data() noexcept
   {
     auto optr = this->pimpl();
     return optr->Data;
   };
+  
+ /**
+  * @fn template <typename... Is> double& TimeSequence::data(unsigned sample, Is... indices) noexcept
+  * Have to call modified() manually
+  */
   
   double& TimeSequence::data(unsigned sample, std::vector<unsigned>&& indices) noexcept
   {

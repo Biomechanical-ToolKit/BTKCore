@@ -8,10 +8,10 @@ CXXTEST_SUITE(TimeSequenceTest)
 {
   CXXTEST_TEST(Accessor)
   {
-    btk::TimeSequence foo(4,0,"1D4C_Signal(markers)",100.0,"mm",btk::TimeSequence::Marker);
-    btk::TimeSequence toto(4,10,"1D4C_Signal(markers)",100.0,"mm",btk::TimeSequence::Marker,0.125);
-    btk::TimeSequence bar(1,100,"1D1C_Signal(analog)",1000.0,"V",btk::TimeSequence::Analog);
-    btk::TimeSequence bar2({32,32},2,"2D64x64C_Signal(pressure)",200.0,"Pa");
+    btk::TimeSequence foo("1D4C_Signal(markers)",4,0,100.0,"mm",btk::TimeSequence::Marker);
+    btk::TimeSequence toto("1D4C_Signal(markers)",4,10,100.0,"mm",btk::TimeSequence::Marker,0.125);
+    btk::TimeSequence bar("1D1C_Signal(analog)",1,100,1000.0,"V",btk::TimeSequence::Analog);
+    btk::TimeSequence bar2("2D64x64C_Signal(pressure)",{32,32},2,200.0,"Pa");
     
     TS_ASSERT_EQUALS(foo.data(),nullptr);
     TS_ASSERT_EQUALS(foo.name(),"1D4C_Signal(markers)");
