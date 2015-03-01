@@ -336,9 +336,12 @@ namespace btk
   /**
    * Checks if @a node is already a parent and add it if it is not the case.
    * In case @a node is already a parent a warning message is send to the message logger.
+  * This method returns also false if the given @a node is null.
    */
   void Node::attachParent(Node* node) noexcept
   {
+    if (node == nullptr)
+      return;
     auto optr = this->pimpl();
     for (std::list<Node*>::const_iterator it = optr->Parents.begin() ; it != optr->Parents.end() ; ++it)
     {
@@ -363,9 +366,12 @@ namespace btk
   /**
    * Checks if @a node is already a child and add it if it is not the case.
    * In case @a node is already a child, this method returns false, true otherwise.
+   * This method returns also false if the given @a node is null.
    */
   bool Node::attachChild(Node* node) noexcept
   {
+    if (node == nullptr)
+      return false;
     auto optr = this->pimpl();
     for (std::list<Node*>::const_iterator it = optr->Children.begin() ; it != optr->Children.end() ; ++it)
     {
