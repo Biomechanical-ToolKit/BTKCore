@@ -201,6 +201,17 @@ CXXTEST_SUITE(NodeTest)
     std::list<btk::Node*> all = root.findChildren();
     TS_ASSERT_EQUALS(all.size(), 10);
   }
+  
+  CXXTEST_TEST(NullParentAndChild)
+  {
+    TestNode root("root");
+    TS_ASSERT_EQUALS(root.hasChildren(),false);
+    TS_ASSERT_EQUALS(root.hasParents(),false);
+    root.appendChild(nullptr);
+    TS_ASSERT_EQUALS(root.hasChildren(),false);
+    root.appendParent(nullptr);
+    TS_ASSERT_EQUALS(root.hasParents(),false);
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(NodeTest)
@@ -210,5 +221,6 @@ CXXTEST_TEST_REGISTRATION(NodeTest, DynamicProperty)
 CXXTEST_TEST_REGISTRATION(NodeTest, InheritingClassWithStaticProperty)
 CXXTEST_TEST_REGISTRATION(NodeTest, ChildrenStack)
 CXXTEST_TEST_REGISTRATION(NodeTest, ChildrenHeap)
+CXXTEST_TEST_REGISTRATION(NodeTest, NullParentAndChild)
   
 #endif // ObjectTest_h
