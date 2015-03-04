@@ -71,7 +71,83 @@ namespace btk
   {
     return StaticProperties::visit(this->pint(),key,value);
   };
-}
+  
+  /**
+   * Checks if @a node is already a parent and add it if it is not the case.
+   * In case @a node is already a parent a warning message is send to the message logger.
+   * This method returns also false if the given @a node is null.
+   */
+  bool NodePrivate::attachParent(Node* node) noexcept
+  {
+    if (node == nullptr)
+      return false;
+    for (auto it = this->Parents.cbegin() ; it != this->Parents.cend() ; ++it)
+    {
+      if (*it == node)
+      {
+        Logger::warning("The parent '%s' was already attached to the node '%s'", node->name().c_str(), this->Name.c_str());
+        return false;
+      }
+    }
+    this->Parents.push_back(node);
+    return true;
+  };
+  
+  /**
+   * Removes the given @a node if it is a parent of the current object.
+   * In case @a node is not a parent or is null, this method returns false.
+   */
+  bool NodePrivate::detachParent(Node* node) noexcept
+  {
+    if (node == nullptr)
+      return false;
+    for (auto it = this->Parents.begin() ; it != this->Parents.end() ; ++it)
+    {
+      if (*it == node)
+      {
+        this->Parents.erase(it);
+        return true;
+      }
+    }
+    return false;
+  };
+  
+  /**
+   * Checks if @a node is already a child and add it if it is not the case.
+   * In case @a node is already a child, this method returns false, true otherwise.
+   * This method returns also false if the given @a node is null.
+   */
+  bool NodePrivate::attachChild(Node* node) noexcept
+  {
+    if (node == nullptr)
+      return false;
+    for (auto it = this->Children.cbegin() ; it != this->Children.cend() ; ++it)
+    {
+      if (*it == node)
+        return false;
+    }
+    this->Children.push_back(node);
+    return true;
+  };
+  
+  /**
+   * Removes the given @a node if it is a child of the current object.
+   */
+  bool NodePrivate::detachChild(Node* node) noexcept
+  {
+    if (node == nullptr)
+      return false;
+    for (auto it = this->Children.begin() ; it != this->Children.end() ; ++it)
+    {
+      if (*it == node)
+      {
+        this->Children.erase(it);
+        return true;
+      }
+    }
+    return false;
+  };
+};
 
 // -------------------------------------------------------------------------- //
 //                                 PUBLIC API                                 //
@@ -143,14 +219,14 @@ namespace btk
   Node::~Node() noexcept
   {
     auto optr = this->pimpl();
-    for (std::list<Node*>::iterator it = optr->Children.begin() ; it != optr->Children.end() ; ++it)
+    for (auto it = optr->Children.begin() ; it != optr->Children.end() ; ++it)
     {
-      (*it)->detachParent(this);
+      (*it)->pimpl()->detachParent(this);
       if (!(*it)->hasParents())
         delete *it;
     }
-    for (std::list<Node*>::iterator it = optr->Parents.begin() ; it != optr->Parents.end() ; ++it)
-      (*it)->detachChild(this);
+    for (auto it = optr->Parents.begin() ; it != optr->Parents.end() ; ++it)
+      (*it)->pimpl()->detachChild(this);
   };
 
   /*
@@ -291,12 +367,25 @@ namespace btk
    */
   void Node::appendChild(Node* node) noexcept
   {
-    if (this->attachChild(node))
+    if (this->pimpl()->attachChild(node))
     {
-      node->attachParent(this);
+      node->pimpl()->attachParent(this);
       this->modified();
     }
-  };  
+  };
+  
+  /**
+   * Remove the given @a node from the list of the children.
+   * @note It is the responsability to the developer to delete the given node if this one has no more parent.
+   */
+  void Node::removeChild(Node* node) noexcept
+  {
+    if (this->pimpl()->detachChild(node))
+    {
+      node->pimpl()->detachParent(this);
+      this->modified();
+    }
+  };
   
   /**
    * Returns the list of parents attached with this node.
@@ -322,9 +411,29 @@ namespace btk
    */
   void Node::appendParent(Node* node) noexcept
   {
-    node->appendChild(this);
-  };  
+    if (this->pimpl()->attachParent(node))
+    {
+      node->pimpl()->attachChild(this);
+      node->modified();
+    }
+  };
   
+  /**
+   * Remove the given @a node from the list of the parent.
+   * @note It is the responsability to the developer to delete this node if this one has no more parent.
+   */
+  void Node::removeParent(Node* node) noexcept
+  {
+    if (this->pimpl()->detachParent(node))
+    {
+      node->pimpl()->detachChild(this);
+      node->modified();
+    }
+  };
+  
+  /**
+   * Overload method which modify this object as well as all these parents.
+   */
   void Node::modified() noexcept
   {
     auto optr = this->pimpl();
@@ -334,71 +443,12 @@ namespace btk
   };
   
   /**
-   * Checks if @a node is already a parent and add it if it is not the case.
-   * In case @a node is already a parent a warning message is send to the message logger.
-  * This method returns also false if the given @a node is null.
-   */
-  void Node::attachParent(Node* node) noexcept
-  {
-    if (node == nullptr)
-      return;
-    auto optr = this->pimpl();
-    for (std::list<Node*>::const_iterator it = optr->Parents.begin() ; it != optr->Parents.end() ; ++it)
-    {
-      if (*it == node)
-      {
-        Logger::warning("The parent '%s' was already attached to the node '%s'", node->name().c_str(), optr->Name.c_str());
-        return;
-      }
-    }
-    optr->Parents.push_back(node);
-  };
-  
-  /**
-   * Removes the given @a node if it is a parent of the current object.
-   */
-  void Node::detachParent(Node* node) noexcept
-  {
-    auto optr = this->pimpl();
-    optr->Parents.remove(node);
-  };
-  
-  /**
-   * Checks if @a node is already a child and add it if it is not the case.
-   * In case @a node is already a child, this method returns false, true otherwise.
-   * This method returns also false if the given @a node is null.
-   */
-  bool Node::attachChild(Node* node) noexcept
-  {
-    if (node == nullptr)
-      return false;
-    auto optr = this->pimpl();
-    for (std::list<Node*>::const_iterator it = optr->Children.begin() ; it != optr->Children.end() ; ++it)
-    {
-      if (*it == node)
-        return false;
-    }
-    optr->Children.push_back(node);
-    return true;
-  };
-  
-  /**
-   * Removes the given @a node if it is a child of the current object.
-   */
-  void Node::detachChild(Node* node) noexcept
-  {
-    auto optr = this->pimpl();
-    optr->Children.remove(node);
-  };
-
-  /**
    * Constructor to be used by inherited object which want to add informations (static properties, members, etc) to the private implementation.
    */
   Node::Node(NodePrivate& pimpl, Node* parent) noexcept
   : Object(pimpl)
   {
-    if (parent != nullptr)
-      parent->appendChild(this);
+    this->appendParent(parent);
   };
   
   /**

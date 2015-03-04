@@ -77,10 +77,12 @@ namespace btk
     const std::list<Node*>& children() const noexcept;
     bool hasChildren() const noexcept;
     void appendChild(Node* node) noexcept;
+    void removeChild(Node* node) noexcept;
     
     const std::list<Node*>& parents() const noexcept;
     bool hasParents() const noexcept;
     void appendParent(Node* node) noexcept;
+    void removeParent(Node* node) noexcept;
     
     template <typename T = Node*> T findChild(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept;
     template <typename T = Node*> std::list<T> findChildren(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept;
@@ -88,13 +90,8 @@ namespace btk
     
     virtual void modified() noexcept;
     
+    
   protected:
-    void attachParent(Node* node) noexcept;
-    void detachParent(Node* node) noexcept;
-    
-    bool attachChild(Node* node) noexcept;
-    void detachChild(Node* node) noexcept;
-    
     Node(NodePrivate& pimpl, Node* parent) noexcept;
     
   private:

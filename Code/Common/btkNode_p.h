@@ -71,6 +71,12 @@ namespace btk
     virtual bool staticProperty(const char* key, btk::Any* value) const noexcept;
     virtual bool setStaticProperty(const char* key, const btk::Any* value) noexcept;
     
+    bool attachParent(Node* node) noexcept;
+    bool detachParent(Node* node) noexcept;
+    
+    bool attachChild(Node* node) noexcept;
+    bool detachChild(Node* node) noexcept;
+    
     std::string Name;
     std::string Description;
     std::unordered_map<std::string,Any> Properties;
