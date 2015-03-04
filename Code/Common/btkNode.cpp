@@ -514,7 +514,7 @@ namespace btk
    * events.findChildren<btk::Event*>({},{{"context","Right"}}); // evtA and evtD
    * events.findChildren<btk::Event*>({},{{"context","Left"}}); // evtB and evtC
    * events.findChildren<btk::Event*>({},{{"subject","JDoe"}}); // evtA, evtB, and evtC
-   * @encode
+   * @endcode
    */
   
   /**

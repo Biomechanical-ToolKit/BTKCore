@@ -79,7 +79,7 @@ namespace btk
    *       std::cout << "ERROR: " << msg << std::endl;
    *   }
    * };
-   * @encode
+   * @endcode
    *
    * Only one device can be used at a time. To create your custom device you only need
    * to inherit from the class Logger::Device and override the method Logger::Device::writeMessage().

@@ -198,7 +198,7 @@ namespace btk
    *   TestNodePrivate(TestNode* pint, const std::string& name) :  btk::NodePrivate(pint,name), Version(1) {};
    *   int Version;
    * };
-   * @encode
+   * @endcode
    *
    * In this example, The class TestNode will have a new property name "version" which is associated with the accessor TestNode::version and the mutator TestNode::setVersion. Internally, these methods rely on the member TestNodePrivate::Version.
    * If the member is read-only the pointer to the mutation must be set to nullptr. For example:
