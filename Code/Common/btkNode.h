@@ -94,6 +94,8 @@ namespace btk
   protected:
     Node(NodePrivate& pimpl, Node* parent) noexcept;
     
+    void replaceChild(Node* current, Node* substitute);
+    
   private:
     Node* findNode(typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept;
     void findNodes(std::list<void*>* list, typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept;
