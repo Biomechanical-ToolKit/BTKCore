@@ -176,6 +176,14 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(static_cast<bool>(m),true);
   };
   
+  CXXTEST_TEST(Single_Enum)
+  {
+    enum {Foo= 1, Bar = 2, Toto = 4};
+    btk::Any m(Toto);
+    TS_ASSERT_EQUALS(m.cast<std::string>(),"4");
+    TS_ASSERT_EQUALS(m.cast<int>(),4);
+  };
+  
   CXXTEST_TEST(Array_Int_Vector)
   {
     std::vector<int> bar, foo{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}};
@@ -368,9 +376,25 @@ CXXTEST_SUITE(AnyTest)
     bar = a.cast<std::array<int,4>>();
     TS_ASSERT_EQUALS(foo,bar);
   };
+  
+  CXXTEST_TEST(Array_Enum)
+  {
+    enum class myEnum {Foo= 1, Bar = 2, Toto = 4};
+    btk::Any m(std::vector<myEnum>{myEnum::Foo,myEnum::Toto});
+    TS_ASSERT_EQUALS(m.cast<int>(0),1);
+    TS_ASSERT_EQUALS(m.cast<int>(1),4);
+    TS_ASSERT_EQUALS(m.cast<std::string>(0),"1");
+    TS_ASSERT_EQUALS(m.cast<std::string>(1),"4");
+    TS_ASSERT_EQUALS(m.cast<myEnum>(0),myEnum::Foo);
+    TS_ASSERT_EQUALS(m.cast<myEnum>(1),myEnum::Toto);
+    TS_ASSERT_EQUALS(m.cast<std::vector<int>>(),std::vector<int>({1,4}));
+    TS_ASSERT_EQUALS(m.cast<std::vector<std::string>>(),std::vector<std::string>({"1","4"}));
+    TS_ASSERT_EQUALS(m.cast<std::vector<myEnum>>(),std::vector<myEnum>({myEnum::Foo,myEnum::Toto}));
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(AnyTest)
+  
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Int)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Float)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Comparison)
@@ -384,6 +408,8 @@ CXXTEST_TEST_REGISTRATION(AnyTest, Single_CustomTypeNotRegistered)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_IntHexadecimal)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Int8)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_FromString)
+CXXTEST_TEST_REGISTRATION(AnyTest, Single_Enum)
+    
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Vector)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Vector2)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Vector3)
@@ -395,5 +421,6 @@ CXXTEST_TEST_REGISTRATION(AnyTest, Array_String)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_FromSingle)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_FromSingle_CustomType)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Array)
+CXXTEST_TEST_REGISTRATION(AnyTest, Array_Enum)
 
 #endif // AnyTest_h

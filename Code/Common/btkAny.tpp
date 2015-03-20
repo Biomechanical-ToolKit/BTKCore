@@ -197,8 +197,11 @@ namespace btk
       size_t NumDims;
     };
     
+    template <typename T, typename = void>
+    struct adapt {};
+    
     template <typename T>
-    struct adapt
+    struct adapt<T, typename std::enable_if<!std::is_enum<T>::value && !std::is_same<typename std::remove_extent<T>::type,char>::value>::type>
     {
       using type = T;
       template <typename U>
@@ -221,13 +224,45 @@ namespace btk
       adapt& operator=(adapt&& ) noexcept = delete;
     };
     
-    template <size_t N>
-    struct adapt<char[N]> : adapt<std::string>
+    template <typename T, size_t N>
+    struct adapt<T[N], typename std::enable_if<std::is_same<T,char>::value>::type>
     {
+      using type = std::string;
       static inline std::string* single(const char(&value)[N])
       {
         return new std::string(value,N-1);
       };
+      adapt() = delete;
+      ~adapt() noexcept = delete;
+      adapt(const adapt& ) = delete;
+      adapt(adapt&& ) noexcept = delete;
+      adapt& operator=(const adapt& ) = delete;
+      adapt& operator=(adapt&& ) noexcept = delete;
+    };
+    
+    template <typename T>
+    struct adapt<T, typename std::enable_if<std::is_enum<T>::value>::type>
+    {
+      using type = typename std::underlying_type<T>::type;
+      template <typename U>
+      static inline type* single(U&& value)
+      {
+        return new type(value);
+      };
+      template <typename U>
+      static inline type* array(size_t newarraylen, U* values, size_t num)
+      {
+        type* data = new type[newarraylen];
+        for (size_t i = 0 ; i < newarraylen ; ++i)
+          data[i] = static_cast<type>(values[i]);
+        return data;
+      };
+      adapt() = delete;
+      ~adapt() noexcept = delete;
+      adapt(const adapt& ) = delete;
+      adapt(adapt&& ) noexcept = delete;
+      adapt& operator=(const adapt& ) = delete;
+      adapt& operator=(adapt&& ) noexcept = delete;
     };
     
     // NOTE: An explicit specialization of adapt<const char*> is available outside of the class declaration
@@ -321,6 +356,7 @@ namespace btk
          !std::is_arithmetic<typename std::decay<U>::type>::value
       && !std::is_same<std::string, typename std::decay<U>::type>::value
       && !std::is_same<const char*, typename std::decay<U>::type>::value
+      && !std::is_enum<typename std::decay<U>::type>::value
       && !is_stl_vector<typename std::decay<U>::type>::value
       && !is_stl_array<typename std::decay<U>::type>::value
       , bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
@@ -484,6 +520,21 @@ namespace btk
       if (storage->id() == static_typeid<std::string>())
       {
         *value = static_cast<std::string*>(storage->Data)[idx].c_str();
+        return true;
+      }
+      return false;
+    }
+    
+    // enum conversion
+    template <typename U>
+    static typename std::enable_if<std::is_enum<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
+    {
+      using underlying_t = typename std::underlying_type<typename std::decay<U>::type>::type;
+      if (storage->is_arithmetic())
+      {
+        underlying_t v = underlying_t();
+        cast(&v,storage,idx);
+        *value = static_cast<U>(v);
         return true;
       }
       return false;
