@@ -463,6 +463,20 @@ namespace btk
     this->appendParent(parent);
   };
   
+  void Node::replaceChild(Node* current, Node* substitute)
+  {
+    if (current == substitute)
+      return;
+    if (current != nullptr)
+    {
+      this->removeChild(current);
+      if (!current->hasParents())
+        delete current;
+    }
+    this->appendChild(substitute);
+    // removeChild() and appendChild() internally call modified(). No need to call it explicitely
+  };
+  
   /**
    * @fn template <typename T = Node*> T findChild(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept
    * Returns the child with the given @a name and which can be casted to the type T. You can refine the search by adding @a properties to match. The search can be done recursively (by default) or only in direct children. The latter is available by setting @a recursiveSearch to false.
