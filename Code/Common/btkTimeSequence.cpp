@@ -37,6 +37,7 @@
 #include "btkTimeSequence_p.h"
 
 #include <cassert>
+#include <algorithm> // std::copy_n
 
 // -------------------------------------------------------------------------- //
 //                                 PRIVATE API                                //
@@ -242,6 +243,18 @@ namespace btk
   {
     auto optr = this->pimpl();
     return optr->Data;
+  };
+  
+  void TimeSequence::resize(unsigned samples)
+  {
+    auto optr = this->pimpl();
+    if (optr->Samples == samples)
+      return;
+    double* oldData = optr->Data;
+    optr->Data = new double[samples];
+    std::copy_n(oldData, std::min(optr->Samples,samples), optr->Data);
+    optr->Samples = samples;
+    this->modified();
   };
   
  /**
