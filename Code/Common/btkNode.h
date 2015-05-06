@@ -101,8 +101,8 @@ namespace btk
     void findNodes(std::list<void*>* list, typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept;
     void findNodes(std::list<void*>* list, typeid_t id, const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept;
     
-    bool castable(typeid_t id);
     template <typename U, typename N> friend U node_cast(N* node) noexcept;
+    bool castable(typeid_t id) const noexcept;
   };
 
   template <typename T>

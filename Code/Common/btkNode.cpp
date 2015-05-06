@@ -630,7 +630,7 @@ namespace btk
   /**
    * Returns true if the current object is castable to another with the given @a typeid_t value, false otherwise.
    */
-  bool Node::castable(typeid_t id)
+  bool Node::castable(typeid_t id) const noexcept
   {
     return this->pimpl()->castable(id);
   };
