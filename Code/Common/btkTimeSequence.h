@@ -54,8 +54,10 @@ namespace btk
     enum : int {Unknown = 0, Marker, Angle, Force, Moment, Power, Scalar, Analog, Pose};
     static constexpr std::array<double,2> InfinityRange{-std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity()};
     
-    TimeSequence(const std::string& name, unsigned component, unsigned samples, double rate, const std::string& unit, int type = Unknown, double startTime = 0.0, double scale = 1.0, double offset = 0.0, const std::array<double,2>& range = InfinityRange, Node* parent = nullptr);
-    TimeSequence(const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, const std::string& unit, int type = Unknown, double startTime = 0.0, double scale = 1.0, double offset = 0.0, const std::array<double,2>& range = InfinityRange, Node* parent = nullptr);
+    TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range, Node* parent = nullptr);
+    TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, Node* parent = nullptr);
+    TimeSequence(const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range, Node* parent = nullptr);
+    TimeSequence(const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, double start, int type, const std::string& unit, Node* parent = nullptr);
     ~TimeSequence() noexcept;
     
     TimeSequence(const TimeSequence& ) = delete;

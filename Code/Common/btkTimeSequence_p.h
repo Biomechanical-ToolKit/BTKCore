@@ -70,15 +70,15 @@ namespace btk
     )
     
   public:
-    TimeSequencePrivate(TimeSequence* pint, const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range);
+    TimeSequencePrivate(TimeSequence* pint, const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range);
     ~TimeSequencePrivate();
     
-    int Type;
     std::vector<unsigned> Dimensions, AccumulatedDimensions;
     unsigned Samples;
     double SampleRate;
-    std::string Unit;
     double StartTime;
+    int Type;
+    std::string Unit;
     double Scale;
     double Offset;
     std::array<double,2> Range;

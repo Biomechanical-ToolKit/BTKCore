@@ -45,9 +45,9 @@
 
 namespace btk
 {
-  TimeSequencePrivate::TimeSequencePrivate(TimeSequence* pint, const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range)
+  TimeSequencePrivate::TimeSequencePrivate(TimeSequence* pint, const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range)
   : NodePrivate(pint,name),
-    Dimensions(dimensions), AccumulatedDimensions(), Samples(samples), SampleRate(rate), Type(type), Unit(unit), StartTime(startTime), Scale(scale), Offset(offset), Range(range), Data(nullptr)
+    Dimensions(dimensions), AccumulatedDimensions(), Samples(samples), SampleRate(rate), StartTime(start), Type(type), Unit(unit), Scale(scale), Offset(offset), Range(range), Data(nullptr)
   {
     assert(!dimensions.empty());
     // Allocate data memory;
@@ -79,12 +79,20 @@ namespace btk
 {
   constexpr std::array<double,2> TimeSequence::InfinityRange;
   
-  TimeSequence::TimeSequence(const std::string& name, unsigned component, unsigned samples, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range, Node* parent)
-  : TimeSequence(name,std::vector<unsigned>({component}),samples,rate,unit,type,startTime,scale,offset,range,parent)
+  TimeSequence::TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range, Node* parent)
+  : TimeSequence(name,std::vector<unsigned>({components}),samples,rate,start,type,unit,scale,offset,range,parent)
   {};
   
-  TimeSequence::TimeSequence(const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, const std::string& unit, int type, double startTime, double scale, double offset, const std::array<double,2>& range, Node* parent)
-  : Node(*new TimeSequencePrivate(this,name,dimensions,samples,rate,unit,type,startTime,scale,offset,range),parent)
+  TimeSequence::TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, Node* parent)
+  : TimeSequence(name,components,samples,rate,start,type,unit,1.0,0.0,InfinityRange,parent)
+  {};
+  
+  TimeSequence::TimeSequence(const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range, Node* parent)
+  : Node(*new TimeSequencePrivate(this,name,dimensions,samples,rate,start,type,unit,scale,offset,range),parent)
+  {};
+  
+  TimeSequence::TimeSequence(const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, double start, int type, const std::string& unit, Node* parent)
+  : TimeSequence(name,dimensions,samples,rate,start,type,unit,1.0,0.0,InfinityRange,parent)
   {};
   
   /*
