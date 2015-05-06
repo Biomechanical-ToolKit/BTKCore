@@ -54,7 +54,7 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT(d != "invalid");
     TS_ASSERT("invalid" != d);
     
-    TS_ASSERT(a != b);
+    TS_ASSERT(a == b); // b is casted to int
     TS_ASSERT(a != c);
     TS_ASSERT(a != d);
     
@@ -83,6 +83,8 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT(b == n);
     TS_ASSERT(n.cast<int>() == a);
     TS_ASSERT(static_cast<int>(n) == a);
+    TS_ASSERT(n != a);
+    TS_ASSERT(a == n);
   };
   
   CXXTEST_TEST(Single_Int8ToString)
@@ -296,12 +298,13 @@ CXXTEST_SUITE(AnyTest)
   {
     btk::Any a = {1,2,3,4};
     std::vector<int> bar = {1,2,3,4};
-    // (un)Equality
     TS_ASSERT_EQUALS(a,bar);
     btk::Any b = btk::Any({1,2,3,4},{2,2});
-    TS_ASSERT_DIFFERS(a,b);
+    TS_ASSERT_EQUALS(a,b);
     b = {1,2,3,4};
     TS_ASSERT_EQUALS(a,b);
+    b = {1,2,3};
+    TS_ASSERT_DIFFERS(a,b);
   };
   
   CXXTEST_TEST(Array_String)

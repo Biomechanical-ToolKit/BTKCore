@@ -64,6 +64,10 @@ namespace btk
     virtual bool compare(StorageBase* other) const noexcept = 0;
     virtual void* element(size_t idx) const noexcept = 0;
     
+    // Both methods below are defined after the declaration of the Converter private API
+    template <typename U> void cast(U* value) const noexcept;
+    template <typename U> void cast(U* value, size_t index) const noexcept;
+    
     void* Data;
   };
   
@@ -74,7 +78,6 @@ namespace btk
   
   inline Any::StorageBase::~StorageBase() noexcept
   {};
-
 
   // ******************************** DETAILS ****************************** //
 
@@ -96,7 +99,7 @@ namespace btk
     
     // Single conversion
     template <typename U>
-    static inline typename std::enable_if<!is_stl_vector<typename std::decay<U>::type>::value && !is_stl_array<typename std::decay<U>::type>::value>::type convert(U* value, Any::StorageBase* storage) noexcept
+    static inline typename std::enable_if<!is_stl_vector<typename std::decay<U>::type>::value && !is_stl_array<typename std::decay<U>::type>::value>::type convert(U* value, const Any::StorageBase* storage) noexcept
     {
       convert_t doConversion = extract_converter(storage->id(),static_typeid<U>());
       if (doConversion != nullptr)
@@ -105,7 +108,7 @@ namespace btk
     
     // (std) Vector conversion
     template <typename U>
-    static inline typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value>::type convert(U* value, Any::StorageBase* storage) noexcept
+    static inline typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value>::type convert(U* value, const Any::StorageBase* storage) noexcept
     {
       convert_t doConversion = extract_converter(storage->id(),static_typeid<typename std::decay<U>::type::value_type>());
       if (doConversion != nullptr)
@@ -118,7 +121,7 @@ namespace btk
     
     // (std) Array conversion
     template <typename U>
-    static inline typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value>::type convert(U* value, Any::StorageBase* storage) noexcept
+    static inline typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value>::type convert(U* value, const Any::StorageBase* storage) noexcept
     {
       convert_t doConversion = extract_converter(storage->id(),static_typeid<typename std::decay<U>::type::value_type>());
       if (doConversion != nullptr)
@@ -130,7 +133,7 @@ namespace btk
     
     // Element conversion
     template <typename U>
-    static inline void convert(U* value, Any::StorageBase* storage, size_t idx) noexcept
+    static inline void convert(U* value, const Any::StorageBase* storage, size_t idx) noexcept
     {
       convert_t doConversion = extract_converter(storage->id(),static_typeid<U>());
       if (doConversion != nullptr)
@@ -139,14 +142,14 @@ namespace btk
     
     // Compare a Any object with a value which has another type
     template <typename U>
-    static inline typename std::enable_if<!std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type compare_value(const Any* lhs, U&& rhs) noexcept
+    static inline typename std::enable_if<!std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type is_equal(const Any* lhs, U&& rhs) noexcept
     {
       return (lhs->cast<typename std::decay<U>::type>() == rhs);
     };
 
     // Compare a Any object with a const char* value
     template <typename U>
-    static inline typename std::enable_if<std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type compare_value(const Any* lhs, U&& rhs) noexcept
+    static inline typename std::enable_if<std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type is_equal(const Any* lhs, U&& rhs) noexcept
     {
       const char* str = lhs->cast<const char*>();
       return ((str != nullptr) && (rhs != nullptr) && (strcmp(str, rhs) == 0));
@@ -359,7 +362,7 @@ namespace btk
       && !std::is_enum<typename std::decay<U>::type>::value
       && !is_stl_vector<typename std::decay<U>::type>::value
       && !is_stl_array<typename std::decay<U>::type>::value
-      , bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
+      , bool>::type cast(U* value, const StorageBase* storage, size_t idx = 0) noexcept
     {
       using value_t = typename std::decay<U>::type;
       if (storage->id() == static_typeid<value_t>())
@@ -372,7 +375,7 @@ namespace btk
     
     // Arithmetic conversion
     template <typename U>
-    static typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
+    static typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value, bool>::type cast(U* value, const StorageBase* storage, size_t idx = 0) noexcept
     {
       const typeid_t id = storage->id();
       if (storage->is_arithmetic())
@@ -447,7 +450,7 @@ namespace btk
     
     // String conversion
     template <typename U>
-    static typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
+    static typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value, bool>::type cast(U* value, const StorageBase* storage, size_t idx = 0) noexcept
     {
       const typeid_t id = storage->id();
       if (id == static_typeid<std::string>())
@@ -515,7 +518,7 @@ namespace btk
     
     // const char* conversion
     template <typename U>
-    static typename std::enable_if<std::is_same<const char*, typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
+    static typename std::enable_if<std::is_same<const char*, typename std::decay<U>::type>::value, bool>::type cast(U* value, const StorageBase* storage, size_t idx = 0) noexcept
     {
       if (storage->id() == static_typeid<std::string>())
       {
@@ -527,7 +530,7 @@ namespace btk
     
     // enum conversion
     template <typename U>
-    static typename std::enable_if<std::is_enum<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage, size_t idx = 0) noexcept
+    static typename std::enable_if<std::is_enum<typename std::decay<U>::type>::value, bool>::type cast(U* value, const StorageBase* storage, size_t idx = 0) noexcept
     {
       using underlying_t = typename std::underlying_type<typename std::decay<U>::type>::type;
       if (storage->is_arithmetic())
@@ -542,7 +545,7 @@ namespace btk
     
     // (std) Vector conversion
     template <typename U>
-    static typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage) noexcept
+    static typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type cast(U* value, const StorageBase* storage) noexcept
     {
       using value_t = typename std::decay<U>::type::value_type;
       bool res = true;
@@ -554,7 +557,7 @@ namespace btk
     
     // (std) Array conversion
     template <typename U>
-    static typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value, bool>::type cast(U* value, StorageBase* storage) noexcept
+    static typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value, bool>::type cast(U* value, const StorageBase* storage) noexcept
     {
       using value_t = typename std::decay<U>::type::value_type;
       bool res = true;
@@ -670,9 +673,10 @@ namespace btk
   {
     if ((this->Data == nullptr) || (other->Data == nullptr))
       return false;
-    if (this->id() != other->id())
-      return false;
-    return (*static_cast<T*>(this->Data) == *static_cast<T*>(other->Data));
+    T value = T();
+    other->cast<T>(&value);
+    return *static_cast<T*>(this->Data) == value;
+    
   };
 
   template <typename T> 
@@ -739,13 +743,11 @@ namespace btk
   {
     if ((this->Data == nullptr) || (other->Data == nullptr))
       return false;
-    if (this->id() != other->id())
-      return false;
     if (this->size() != other->size())
       return false;
-    if (this->dimensions() != other->dimensions())
-      return false;
-    return (*static_cast<T*>(this->Data) == *static_cast<T*>(other->Data));
+    T value = T();
+    other->cast<T>(&value);
+    return *static_cast<T*>(this->Data) == value;
   };
 
   template <typename T> 
@@ -764,6 +766,26 @@ namespace btk
   void* Any::details::StorageArray<T>::element(size_t idx) const noexcept
   {
     return static_cast<void*>(&static_cast<T*>(this->Data)[idx]);
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
+  template <typename U>
+  inline void Any::StorageBase::cast(U* value) const noexcept
+  {
+    if (this->id() == static_typeid<U>())
+      *value = *static_cast<U*>(this->Data);
+    else if (!details::cast(value, this))
+      details::convert(value, this);
+  };
+  
+  template <typename U>
+  inline void Any::StorageBase::cast(U* value, size_t idx) const noexcept
+  {
+    if (this->id() == static_typeid<U>())
+      *value = static_cast<U*>(this->Data)[idx];
+    else if (!details::cast(value, this, idx))
+      details::convert(value, this, idx);
   };
 
   // ******************************* CONVERTER ****************************** //
@@ -880,7 +902,7 @@ namespace btk
   template <typename U>
   inline bool Any::isEqual(U&& value) const noexcept
   {
-    return btk::Any::details::compare_value(this,std::forward<U>(value));
+    return btk::Any::details::is_equal(this,std::forward<U>(value));
   };
 
   template <typename U, typename >
@@ -889,12 +911,7 @@ namespace btk
     static_assert(std::is_default_constructible<U>::value,"It is not possible to cast an Any object to a type which does not a default constructor.");
     U value = U();
     if (this->mp_Storage != nullptr)
-    {
-      if (this->mp_Storage->id() == static_typeid<U>())
-        value = *static_cast<U*>(this->mp_Storage->Data);
-      else if (!details::cast(&value, this->mp_Storage))
-        details::convert(&value, this->mp_Storage);
-    }
+      this->mp_Storage->cast<U>(&value);
     return value;
   };
   
@@ -905,12 +922,7 @@ namespace btk
     static_assert(!is_stl_vector<typename std::decay<U>::type>::value,"The cast(idx) method does not accept std::vector as casted type.");
     U value = U();
     if ((this->mp_Storage != nullptr) && (idx < this->mp_Storage->size()))
-    {
-      if (this->mp_Storage->id() == static_typeid<U>())
-        value = static_cast<U*>(this->mp_Storage->Data)[idx];
-      else if (!details::cast(&value, this->mp_Storage, idx))
-        details::convert(&value, this->mp_Storage, idx);
-    }
+      this->mp_Storage->cast<U>(&value,idx);
     return value;
   };
   
