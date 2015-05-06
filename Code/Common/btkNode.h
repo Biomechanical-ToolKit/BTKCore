@@ -48,7 +48,7 @@ namespace btk
 {
   class Node;
   
-  template <typename U> U node_cast(Node* node) noexcept;
+  template <typename U, typename N> U node_cast(N* node) noexcept;
   
   class NodePrivate;
   
@@ -101,8 +101,8 @@ namespace btk
     void findNodes(std::list<void*>* list, typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept;
     void findNodes(std::list<void*>* list, typeid_t id, const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept;
     
-    template <typename U> friend U node_cast(Node* node) noexcept;
     bool castable(typeid_t id);
+    template <typename U, typename N> friend U node_cast(N* node) noexcept;
   };
 
   template <typename T>
@@ -135,17 +135,16 @@ namespace btk
   
   // ----------------------------------------------------------------------- //
   
-  template <typename U>
-  U node_cast(Node* node) noexcept
+  template <typename U, typename N>
+  inline U node_cast(N* node) noexcept
   {
     static_assert(std::is_pointer<U>::value, "The casted type must be a (const) pointer type.");
     static_assert(std::is_base_of<Node,typename std::remove_pointer<U>::type>::value, "The casted type must derive from btk::Node.");
+    static_assert(std::is_base_of<Node,typename std::decay<N>::type>::value, "The type of the given object must derive from btk::Node.");
     if (node->castable(static_typeid<typename std::remove_pointer<U>::type>()))
       return static_cast<U>(node);
     return nullptr;
   };
 };
-
-using btk::node_cast;
 
 #endif // __btkNode_h
