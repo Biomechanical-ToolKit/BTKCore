@@ -39,7 +39,7 @@
 #include "btkIODevice.h"
 
 /*
- * WARNING: This file and its content is not included in the public API and 
+ * WARNING: This file and its content are not included in the public API and 
  * can change drastically from one release to another.
  */
 
