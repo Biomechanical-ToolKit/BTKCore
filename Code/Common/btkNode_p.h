@@ -58,6 +58,8 @@ namespace btk
     BTK_DECLARE_PINT_ACCESSOR(Node)
 
   public:
+    static bool retrievePath(std::list<const Node*>& path, const Node* current, const Node* stop);
+    
     NodePrivate() = delete;
     NodePrivate(Node* pint, const std::string& name);
     ~NodePrivate() noexcept;

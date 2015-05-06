@@ -212,6 +212,45 @@ CXXTEST_SUITE(NodeTest)
     root.appendParent(nullptr);
     TS_ASSERT_EQUALS(root.hasParents(),false);
   }
+  CXXTEST_TEST(RetrievePath)
+  {
+    btk::Node root("root");
+    TestNode branch1("branch1",&root);
+    btk::Node leaf1("leaf1",&branch1);
+    TestNode branch2("branch2",&root);
+    btk::Node branch2_1("branch2_1",&branch2);
+    TestNode leaf2_1_1("leaf2_1_1",&branch2_1);
+    
+    std::list<const btk::Node*> ref;
+    
+    auto path1 = root.retrievePath(&branch1);
+    TS_ASSERT_EQUALS(path1.size(), 2);
+    ref = {&root,&branch1};
+    TS_ASSERT(path1 == ref);
+    
+    auto path2 = root.retrievePath(&leaf1);
+    TS_ASSERT_EQUALS(path2.size(), 3);
+    ref = {&root,&branch1,&leaf1};
+    TS_ASSERT(path2 == ref);
+    
+    auto path3 = branch1.retrievePath(&leaf1);
+    TS_ASSERT_EQUALS(path3.size(), 2);
+    ref = {&branch1,&leaf1};
+    TS_ASSERT(path3 == ref);
+    
+    auto path4 = root.retrievePath(&leaf2_1_1);
+    TS_ASSERT_EQUALS(path4.size(), 4);
+    ref = {&root,&branch2,&branch2_1,&leaf2_1_1};
+    TS_ASSERT(path4 == ref);
+    
+    auto path5 = branch2.retrievePath(&leaf2_1_1);
+    TS_ASSERT_EQUALS(path5.size(), 3);
+    ref = {&branch2,&branch2_1,&leaf2_1_1};
+    TS_ASSERT(path5 == ref);
+    
+    auto path6 = leaf1.retrievePath(&leaf2_1_1);
+    TS_ASSERT_EQUALS(path6.size(), 0);
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(NodeTest)
@@ -222,5 +261,6 @@ CXXTEST_TEST_REGISTRATION(NodeTest, InheritingClassWithStaticProperty)
 CXXTEST_TEST_REGISTRATION(NodeTest, ChildrenStack)
 CXXTEST_TEST_REGISTRATION(NodeTest, ChildrenHeap)
 CXXTEST_TEST_REGISTRATION(NodeTest, NullParentAndChild)
+CXXTEST_TEST_REGISTRATION(NodeTest, RetrievePath)
   
 #endif // ObjectTest_h

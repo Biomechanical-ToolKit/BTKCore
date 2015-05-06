@@ -57,6 +57,34 @@ namespace btk
   
   NodePrivate::~NodePrivate() noexcept = default;
   
+  bool NodePrivate::retrievePath(std::list<const Node*>& path, const Node* current, const Node* stop)
+  {
+    bool found;
+    const auto& children = current->children();
+    // Direct child search
+    for (auto it = children.cbegin() ; it != children.cend() ; ++it)
+    {
+      if (*it == stop)
+      {
+        path.push_back(current);
+        path.push_back(*it);
+        return true;
+      };
+    }
+    // Deep child search
+    for (auto it = children.cbegin() ; it != children.cend() ; ++it)
+    {
+      std::list<const Node*> temp;
+      if (NodePrivate::retrievePath(temp,*it,stop))
+      {
+        path.push_back(current);
+        path.splice(path.end(),temp);
+        return true;
+      }
+    }
+    return false;
+  };
+  
   bool NodePrivate::castable(typeid_t id) const noexcept
   {
     return (static_typeid<Node>() == id);
@@ -547,6 +575,19 @@ namespace btk
    * @fn template <typename T = Node*> std::list<T> findChildren(const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept
    * Convenient method to find children using a regular expression.
    */
+  
+  /**
+   * Retrieves the first path existing between the current node and the given @a node.
+   * If no path exists between both, then an empty list is returned, 
+   * The first node in the retrieved path is the current one, while the last is the node to search.
+   */
+  std::list<const Node*> Node::retrievePath(const Node* node) const noexcept
+  {
+    auto optr = this->pimpl();
+    std::list<const Node*> path;
+    optr->retrievePath(path,this,node);
+    return path;
+  };
   
   /**
    * Implementation of the findChild method.
