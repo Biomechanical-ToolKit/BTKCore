@@ -218,15 +218,7 @@ namespace btk
    */
   Node::~Node() noexcept
   {
-    auto optr = this->pimpl();
-    for (auto it = optr->Children.begin() ; it != optr->Children.end() ; ++it)
-    {
-      (*it)->pimpl()->detachParent(this);
-      if (!(*it)->hasParents())
-        delete *it;
-    }
-    for (auto it = optr->Parents.begin() ; it != optr->Parents.end() ; ++it)
-      (*it)->pimpl()->detachChild(this);
+    this->clear();
   };
 
   /*
@@ -443,6 +435,26 @@ namespace btk
   };
   
   /**
+   * Removes all parents, children and properties
+   * If a child has no more parent, this one is deleted.
+   */
+  void Node::clear() noexcept
+  {
+    auto optr = this->pimpl();
+    if (optr->Parents.empty() && optr->Children.empty() && optr->Properties.empty())
+      return;
+    optr->Properties.clear();
+    for (auto it = optr->Children.begin() ; it != optr->Children.end() ; ++it)
+    {
+      (*it)->pimpl()->detachParent(this);
+      if (!(*it)->hasParents())
+        delete *it;
+    }
+    for (auto it = optr->Parents.begin() ; it != optr->Parents.end() ; ++it)
+      (*it)->pimpl()->detachChild(this);
+    this->modified();
+  };
+  
    * Constructor to be used by inherited object which want to add informations (static properties, members, etc) to the private implementation.
    */
   Node::Node(NodePrivate& pimpl, Node* parent) noexcept

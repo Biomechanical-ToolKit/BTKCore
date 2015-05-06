@@ -90,6 +90,7 @@ namespace btk
     
     virtual void modified() noexcept;
     
+    void clear() noexcept;
     
   protected:
     Node(NodePrivate& pimpl, Node* parent) noexcept;
