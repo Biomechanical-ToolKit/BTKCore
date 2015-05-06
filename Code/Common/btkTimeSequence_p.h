@@ -66,7 +66,7 @@ namespace btk
       Property<TimeSequence,double>("scale",&TimeSequence::scale,&TimeSequence::setScale),
       Property<TimeSequence,double>("offset",&TimeSequence::offset,&TimeSequence::setOffset),
       Property<TimeSequence,const std::array<double,2>&>("range",&TimeSequence::range,&TimeSequence::setRange),
-      Property<TimeSequence,double>("duration",&TimeSequence::duration)
+      Property<TimeSequence,unsigned>("components",&TimeSequence::components)
     )
     
   public:
