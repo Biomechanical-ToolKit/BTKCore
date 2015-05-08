@@ -121,9 +121,7 @@ SET(BTK_INCLUDE_DIRS_BUILD_TREE
   "${BTK_SOURCE_DIR}/Code/Common"
   "${BTK_SOURCE_DIR}/Code/IO"
   "${BTK_SOURCE_DIR}/Code/BasicFilters"
-  "${BTK_SOURCE_DIR}/ThirdParties/eigen3"
-  "${BTK_BINARY_DIR}"
-  "${BTK_BINARY_DIR}/Code/Common")
+  "${BTK_SOURCE_DIR}/ThirdParties/eigen3")
 
 # Code
 ADD_SUBDIRECTORY(Code)
