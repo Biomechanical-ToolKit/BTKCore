@@ -76,13 +76,6 @@
   #error Development platform not supported
 #endif
 
-// Special case for Matlab R2010b & MSVC2010
-#if defined(_MSC_VER)
-  #if (_MSC_VER >= 1600)
-    #cmakedefine FIX_MATLAB_CHAR16_T_TYPE
-  #endif
-#endif
-
 // Addons for Eigen
 #ifdef EIGEN_CORE_H
   #error The header btkConfigure.h must be included before the inclusion of any Eigen headers to integrate the implemented Eigen plugins
