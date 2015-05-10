@@ -122,7 +122,8 @@ SET(BTK_INCLUDE_DIRS_BUILD_TREE
   "${BTK_SOURCE_DIR}/Code/IO"
   "${BTK_SOURCE_DIR}/Code/Model"
   "${BTK_SOURCE_DIR}/Code/Trial"
-  "${BTK_SOURCE_DIR}/ThirdParties/eigen3")
+  "${BTK_SOURCE_DIR}/ThirdParties/eigen3"
+  "${BTK_SOURCE_DIR}/Utilities")
 
 # Code
 ADD_SUBDIRECTORY(Code)
