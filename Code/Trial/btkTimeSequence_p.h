@@ -73,6 +73,8 @@ namespace btk
     TimeSequencePrivate(TimeSequence* pint, const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range);
     ~TimeSequencePrivate();
     
+    virtual Node* makePint() const override;
+    
     std::vector<unsigned> Dimensions, AccumulatedDimensions;
     unsigned Samples;
     double SampleRate;

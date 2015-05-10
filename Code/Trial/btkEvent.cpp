@@ -49,6 +49,11 @@ namespace btk
   {};
   
   EventPrivate::~EventPrivate() noexcept = default;
+  
+  Node* EventPrivate::makePint() const
+  {
+    return new Event(this->Name, this->Time, this->Context, this->Subject);
+  };
 };
 
 // -------------------------------------------------------------------------- //

@@ -68,7 +68,16 @@ namespace btk
   TimeSequencePrivate::~TimeSequencePrivate()
   {
     delete[] this->Data;
-  }
+  };
+    
+  Node* TimeSequencePrivate::makePint() const
+  {
+    auto node = new TimeSequence(this->Name, this->Dimensions, this->Samples, this->SampleRate, this->StartTime, this->Type, this->Unit, this->Scale, this->Offset, this->Range);
+    auto node_pimpl = node->pimpl();
+    if ((this->Data != nullptr) && (node_pimpl->Data != nullptr))
+      std::copy_n(this->Data, node->elements(), node_pimpl->Data);
+    return node;
+  };
 };
 
 // -------------------------------------------------------------------------- //
@@ -78,7 +87,7 @@ namespace btk
 namespace btk
 {
   constexpr std::array<double,2> TimeSequence::InfinityRange;
-  
+
   TimeSequence::TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range, Node* parent)
   : TimeSequence(name,std::vector<unsigned>({components}),samples,rate,start,type,unit,scale,offset,range,parent)
   {};

@@ -36,6 +36,7 @@
 #ifndef __btkTimeSequence_h
 #define __btkTimeSequence_h
 
+#include "btkTrialExport.h"
 #include "btkNode.h"
 
 #include <vector>
@@ -46,13 +47,13 @@ namespace btk
 {
   class TimeSequencePrivate;
   
-  class BTK_COMMON_EXPORT TimeSequence : public Node
+  class BTK_TRIAL_EXPORT TimeSequence : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(TimeSequence)
   
   public:
     enum : int {Unknown = 0, Marker, Angle, Force, Moment, Power, Scalar, Analog, Pose};
-    static constexpr std::array<double,2> InfinityRange{-std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity()};
+    static constexpr std::array<double,2> InfinityRange{{-std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity()}};
     
     TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range, Node* parent = nullptr);
     TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, Node* parent = nullptr);
@@ -99,6 +100,8 @@ namespace btk
     template <typename... Is> double data(unsigned sample, Is... indices) const noexcept;
     template <typename... Is> double& data(unsigned sample, Is... indices) noexcept;
     
+    void resize(unsigned samples);
+  
   private:
     double& data(unsigned sample, std::vector<unsigned>&& indices) noexcept;
   };

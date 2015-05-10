@@ -33,40 +33,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkEvent_p_h
-#define __btkEvent_p_h
+#ifndef __btkTrial_h
+#define __btkTrial_h
 
-/*
- * WARNING: This file and its content are not included in the public API and 
- * can change drastically from one release to another.
- */
-
-#include "btkNode_p.h"
-#include "btkProperty.h"
+#include "btkTrialExport.h"
+#include "btkNode.h"
 
 namespace btk
 {
+  class TimeSequence;
   class Event;
-
-  class EventPrivate : public NodePrivate
+  
+  class TrialPrivate;
+  
+  class BTK_TRIAL_EXPORT Trial : public Node
   {
-    BTK_DECLARE_PINT_ACCESSOR(Event)
-  
-    BTK_DECLARE_NODEID(Event, Node)
-    BTK_DECLARE_STATIC_PROPERTIES(Event, Node,
-      Property<Event,double>("time",&Event::time,&Event::setTime),
-      Property<Event,const std::string&>("context",&Event::context,&Event::setContext),
-      Property<Event,const std::string&>("subject",&Event::subject,&Event::setSubject)
-    )
-  
+    BTK_DECLARE_PIMPL_ACCESSOR(Trial)
+    
   public:
-    EventPrivate(Event* pint, const std::string& name, double time, const std::string& context, const std::string& subject);
-    ~EventPrivate() noexcept;
-    double Time;
-    std::string Context;
-    std::string Subject;
+    Trial(const std::string& name, Node* parent = nullptr);
+    ~Trial() noexcept;
+    
+    Trial(const Node& ) = delete;
+    Trial(Node&& ) noexcept = delete;
+    Trial& operator=(const Trial& ) = delete;
+    Trial& operator=(Trial&& ) noexcept = delete;
+    
+    Node* timeSequences();
+    TimeSequence* timeSequence(unsigned idx);
+      
+    Node* events();
+    Event* event(unsigned idx);
   };
-
 };
 
-#endif // __btkEvent_h
+#endif // __btkTrial_h

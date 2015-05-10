@@ -33,37 +33,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkEvent_h
-#define __btkEvent_h
+#ifndef __btkTrial_p_h
+#define __btkTrial_p_h
 
-#include "btkNode.h"
+/*
+ * WARNING: This file and its content are not included in the public API and 
+ * can change drastically from one release to another.
+ */
+
+#include "btkNode_p.h"
 
 namespace btk
 {
-  class EventPrivate;
+  class Trial;
   
-  class BTK_COMMON_EXPORT Event : public Node
+  class TrialPrivate : public NodePrivate
   {
-    BTK_DECLARE_PIMPL_ACCESSOR(Event)
+    BTK_DECLARE_PINT_ACCESSOR(Trial)
+    
+    BTK_DECLARE_NODEID(Trial, Node)
     
   public:
-    Event(const std::string& name, double time = 0.0, const std::string& context = {}, const std::string& subject = {}, Node* parent = nullptr);
-    ~Event() noexcept;
+    TrialPrivate(Trial* pint, const std::string& name);
+    ~TrialPrivate() noexcept;
     
-    Event(const Node& ) = delete;
-    Event(Node&& ) noexcept = delete;
-    Event& operator=(const Event& ) = delete;
-    Event& operator=(Event&& ) noexcept = delete;
-    
-    double time() const noexcept;
-    void setTime(double value) noexcept;
-    
-    const std::string& context() const noexcept;
-    void setContext(const std::string& value) noexcept;
-    
-    const std::string& subject() const noexcept;
-    void setSubject(const std::string& value) noexcept;
+    virtual Node* makePint() const override;
   };
 };
 
-#endif // __btkEvent_h
+#endif // __btkObject_p_h
