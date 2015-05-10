@@ -1,6 +1,0 @@
-changelog of the btk module
-
-btk (0.1)
-    * Initial version 
- -- Arnaud Barré <arnaud.barre@gmail.com>  Tue, 17 Nov 2009 19:12:02 +0100
-

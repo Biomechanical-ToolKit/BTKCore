@@ -1,9 +1,0 @@
-/**
- * @class btkSetMarkersValues
- * @brief Sets markers' coordinates from a matrix
- * @syntax{%btkSetMarkersValues(h\, v)}
- * @param h Handle pointing to a C++ btk::Acquisition object.
- * @param v Matrix of reals where the number of rows corresponds to the number of frames in the acquisition. The number of columns corresponds to the number of extracted markers multiplied by 3 (their coordinates X,Y,Z).
- * @sa btkSetAnglesValues, btkSetForcesValues, btkSetMomentsValues, btkSetPowersValues, btkSetScalarsValues
- * @ingroup BTKMatlabPointModifier
- */

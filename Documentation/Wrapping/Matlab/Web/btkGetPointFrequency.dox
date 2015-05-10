@@ -1,9 +1,0 @@
-/**
- * @class btkGetPointFrequency
- * @brief Return the point's frequency for the given acquisition.
- * @syntax{pf = %btkGetPointFrequency(h)}
- * @param h Handle pointing to a C++ btk::Acquisition object.
- * @retval pf Point's frequency
- * @sa btkGetAnalogFrequency
- * @ingroup BTKMatlabAcquisitionAccessor
- */

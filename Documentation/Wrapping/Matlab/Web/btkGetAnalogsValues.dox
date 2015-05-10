@@ -1,9 +1,0 @@
-/**
- * @class btkGetAnalogsValues
- * @brief Extract analog channels' values and store them in a matrix
- * @syntax{av = %btkGetAnalogsValues(h)}
- * @param h Handle pointing to a C++ btk::Acquisition object.
- * @retval av Matrix or reals where the number of rows corresponds to the number of analog's frame and the number of columns of this matrix corresponds to the number of analog channels.
- * @sa btkGetAnalogs
- * @ingroup BTKMatlabAnalogAccessor
- */

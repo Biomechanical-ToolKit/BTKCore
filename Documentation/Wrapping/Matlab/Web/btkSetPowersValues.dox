@@ -1,9 +1,0 @@
-/**
- * @class btkSetPowersValues
- * @brief Sets powers' components from a matrix
- * @syntax{%btkSetPowersValues(h\, v)}
- * @param h Handle pointing to a C++ btk::Acquisition object.
- * @param v Matrix of reals where the number of rows corresponds to the number of frames in the acquisition. The number of columns corresponds to the number of extracted powers multiplied by 3 (their components X,Y,Z).
- * @sa btkSetAnglesValues, btkSetForcesValues, btkSetMarkersValues, btkSetMomentsValues, btkSetScalarsValues
- * @ingroup BTKMatlabPointModifier
- */

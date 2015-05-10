@@ -1,8 +1,0 @@
-/**
- * @class btkClearEvents
- * @brief Remove all analog channels in the given acquisition.
- * @syntax{%btkClearEvents(h)}
- * @param h Handle pointing to a C++ btk::Acquisition object.
- * @sa btkAppendEvent, btkGetEvents, btkRemoveEvent
- * @ingroup BTKMatlabEventModifier
- */
