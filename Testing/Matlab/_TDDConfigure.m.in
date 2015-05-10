@@ -1,3 +1,0 @@
-function dataPath = TDDConfigure()
-dataPath.in = '${BTK_TESTING_DATA_PATH}/Input/';
-dataPath.out = '${BTK_BINARY_DIR}/Testing/Data/Output/';
