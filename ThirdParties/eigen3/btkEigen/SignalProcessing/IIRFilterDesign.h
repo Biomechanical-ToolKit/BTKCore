@@ -37,7 +37,7 @@
 #define __btkEigenIIRFilterDesign_h
 
 #include "btkLogger.h"
-#include "Utilities/maths/comb.h"
+#include "maths/comb.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry> // M_PI
@@ -342,7 +342,7 @@ namespace btkEigen
     // This function is only for low pass or high pass filter
     if ((btype == 2) || (btype == 3))
     {
-      btkErrorMacro("This function is not adapted for bandpass/bandstop filter as Wn must contain 2 values.");
+      btk::Logger::error("This function is not adapted for bandpass/bandstop filter as Wn must contain 2 values.");
       return false;
     }
     double Wn_[2] = {Wn, -1.0};
@@ -354,7 +354,7 @@ namespace btkEigen
     // This function is only for band pass or band stop filter
     if (((btype == 0) || (btype == 1)) && (Wn[1] != -1.0))
     {
-      btkErrorMacro("This function is not adapted for lowpass/highpass filter as Wn must contain only 1 value.");
+      btk::Logger::error("This function is not adapted for lowpass/highpass filter as Wn must contain only 1 value.");
       return false;
     }
 
@@ -377,7 +377,7 @@ namespace btkEigen
       wo = sqrt(warped[0] * warped[1]);
       break;
     default:
-      btkErrorMacro("Invalid type of filter");
+      btk::Logger::error("Invalid type of filter");
       return false;
     }
   
@@ -394,21 +394,21 @@ namespace btkEigen
     case Elliptic:
       if ((rp == NULL) || (rs == NULL))
       {
-        btkErrorMacro("Both rp and rs must be provided to design an elliptic filter.");
+        btk::Logger::error("Both rp and rs must be provided to design an elliptic filter.");
         return false;
       }
       break;
     case ChebyshevI:
       if (rp == NULL)
       {
-        btkErrorMacro("Passband ripple (rp) must be provided to design a Chebyshev I filter.");
+        btk::Logger::error("Passband ripple (rp) must be provided to design a Chebyshev I filter.");
         return false;
       }
       break;
     case ChebyshevII:
       if (rs == NULL)
       {
-        btkErrorMacro("Stopband attenuation (rs) must be provided to design an Chebyshev II filter.");
+        btk::Logger::error("Stopband attenuation (rs) must be provided to design an Chebyshev II filter.");
         return false;
       }
       break;
@@ -420,12 +420,12 @@ namespace btkEigen
     case ChebyshevI:
     case ChebyshevII:
     case Bessel:
-      btkErrorMacro("The chosen filter is not yet implemented. Please contact the developers for more informations.");
+      btk::Logger::error("The chosen filter is not yet implemented. Please contact the developers for more informations.");
       return false;
       break;
   
     default:
-      btkErrorMacro("Invalid basic IIR filter.");
+      btk::Logger::error("Invalid basic IIR filter.");
       return false;
     }
   

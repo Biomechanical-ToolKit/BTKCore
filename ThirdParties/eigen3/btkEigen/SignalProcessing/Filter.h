@@ -82,7 +82,7 @@ namespace btkEigen
     Scalar norm = aa.coeff(0);
     if (norm == 0.0)
     {
-      btkErrorMacro("Impossible to filter the signal, the first element of the denominator is equal to 0.");
+      btk::Logger::error("Impossible to filter the signal, the first element of the denominator is equal to 0.");
       return Y;
     }
     else if (std::abs(norm - 1.0) > NumTraits<Scalar>::epsilon())
