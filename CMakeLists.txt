@@ -118,9 +118,10 @@ SET(BTK_LIBRARY_PROPERTIES
 # Could be use by internal targets like TDD
 SET(BTK_INCLUDE_DIRS_BUILD_TREE
   "${BTK_SOURCE_DIR}/Code"
-  "${BTK_SOURCE_DIR}/Code/Common"
+  "${BTK_SOURCE_DIR}/Code/Base"
   "${BTK_SOURCE_DIR}/Code/IO"
-  "${BTK_SOURCE_DIR}/Code/BasicFilters"
+  "${BTK_SOURCE_DIR}/Code/Model"
+  "${BTK_SOURCE_DIR}/Code/Trial"
   "${BTK_SOURCE_DIR}/ThirdParties/eigen3")
 
 # Code
