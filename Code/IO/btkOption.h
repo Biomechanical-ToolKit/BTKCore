@@ -98,8 +98,8 @@
       { \
         static inline void extract_name(std::vector<const char*>* ) {}; \
         static inline std::vector<const char*> extract_choices(const char* ) {return std::vector<const char*>();}; \
-        static inline void get_value(const T* tuple, const char* , void* ) {}; \
-        static inline void set_value(T* tuple, const char* , const void* ) {}; \
+        static inline void get_value(const T* , const char* , void* ) {}; \
+        static inline void set_value(T* , const char* , const void* ) {}; \
       }; \
     }; \
     virtual std::vector<const char*> availableOptions() const noexcept override \
@@ -198,7 +198,7 @@ namespace btk
       inline void setValue(const V& value) noexcept
       {
         constexpr size_t num = sizeof...(vs);
-        constexpr std::array<V,num> choices{vs...};
+        constexpr std::array<V,num> choices{{vs...}};
         for (size_t i = 0 ; i < num ; ++i)
         {
           if (choices[i] == value)
