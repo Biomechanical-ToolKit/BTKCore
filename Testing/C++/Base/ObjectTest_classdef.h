@@ -18,7 +18,7 @@ public:
 
 // Test object using custom private implementation of the d-pointer used in the btk::Object class
 
-struct ObjectCustomPimplPrivate;
+class ObjectCustomPimplPrivate;
 
 class ObjectCustomPimpl : public btk::Object
 {
@@ -34,8 +34,9 @@ public:
   ObjectCustomPimpl(const std::string& name);
 };
 
-struct ObjectCustomPimplPrivate : public btk::ObjectPrivate
+class ObjectCustomPimplPrivate : public btk::ObjectPrivate
 {
+public:
   ObjectCustomPimplPrivate(const std::string& name)
   : ObjectPrivate(), Name(name), Version(1) {};
   std::string Name;

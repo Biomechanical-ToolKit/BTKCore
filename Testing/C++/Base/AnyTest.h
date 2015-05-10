@@ -103,10 +103,10 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(d.cast<int>(),0);
     TS_ASSERT_EQUALS(d.cast<bool>(),false);
     d = "true";
-    TS_ASSERT_EQUALS(d.cast<unsigned int>(),0);
+    TS_ASSERT_EQUALS(d.cast<unsigned int>(),0u);
     TS_ASSERT_EQUALS(d.cast<bool>(),true);
     d = "false";
-    TS_ASSERT_EQUALS(d.cast<unsigned int>(),0);
+    TS_ASSERT_EQUALS(d.cast<unsigned int>(),0u);
     TS_ASSERT_EQUALS(d.cast<bool>(),false);
   };
   
