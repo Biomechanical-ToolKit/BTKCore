@@ -1,16 +1,12 @@
-INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkGetC3DSamples.cmake)
-
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/_TDDConfigure.h.in ${CMAKE_CURRENT_BINARY_DIR}/_TDDConfigure.h)
-INCLUDE_DIRECTORIES(
-  ${BTK_INCLUDE_DIRS_BUILD_TREE}
-  ${BTK_BINARY_DIR}/Testing/C++)
 
 SET(TDD_SRCS
   _TDD.cpp
-  # _TDDBasicFilters.cpp
-  _TDDCommon.cpp
-  # _TDDExtras.cpp
+  _TDDBase.cpp
+  _TDDExtras.cpp
   _TDDIO.cpp
+  _TDDModel.cpp
+  _TDDTrial.cpp
   )
 
 # The CxxTest library included with BTK is modified.
@@ -19,7 +15,11 @@ INCLUDE(${BTK_SOURCE_DIR}/Utilities/CxxTest/CxxTest.cmake)
 
 ADD_EXECUTABLE(TDD ${TDD_SRCS})
 
-TARGET_LINK_LIBRARIES(TDD Common IO)
+TARGET_LINK_LIBRARIES(TDD Base Trial IO Model)
+
+TARGET_INCLUDE_DIRECTORIES(TDD PRIVATE
+  ${BTK_INCLUDE_DIRS_BUILD_TREE}
+)
 
 ADD_TEST(TDD_C++ ${BTK_EXECUTABLE_PATH}/TDD)
 
