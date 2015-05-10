@@ -36,13 +36,13 @@
 #ifndef __btkLogger_h
 #define __btkLogger_h
 
-#include "btkCommonExport.h"
+#include "btkBaseExport.h"
 
 #include <utility> // std::forward
 
 namespace btk
 {
-  class BTK_COMMON_EXPORT Logger
+  class BTK_BASE_EXPORT Logger
   {
   public:
     typedef enum {Info, Warning, Error} Category;

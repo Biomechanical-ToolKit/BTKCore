@@ -36,7 +36,7 @@
 #ifndef __btkAny_h
 #define __btkAny_h
 
-#include "btkCommonExport.h"
+#include "btkBaseExport.h"
 #include "btkTypeTraits.h"
 #include "btkTypeid.h"
 
@@ -46,7 +46,7 @@
 
 namespace btk
 {
-  class BTK_COMMON_EXPORT Any
+  class BTK_BASE_EXPORT Any
   {
   public:
     

@@ -33,17 +33,41 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkOpaque_h
-#define __btkOpaque_h
+#ifndef __btkObject_h
+#define __btkObject_h
+
+#include "btkConfigure.h"
+#include "btkBaseExport.h"
+#include "btkOpaque.h"
+
+#include <memory> // std::unique_ptr
+
+namespace btk
+{
+  class ObjectPrivate;
   
-// Pimpl: Private implementation
-#define BTK_DECLARE_PIMPL_ACCESSOR(classname) \
-  inline classname##Private* pimpl() {return reinterpret_cast<classname##Private*>(this->mp_Pimpl.get());}; \
-  inline const classname##Private* pimpl() const {return reinterpret_cast<const classname##Private*>(this->mp_Pimpl.get());};
-  
-// Pint: Public interface
-#define BTK_DECLARE_PINT_ACCESSOR(classname) \
-  inline classname* pint() {return reinterpret_cast<classname*>(this->mp_Pint);}; \
-  inline const classname* pint() const {return reinterpret_cast<const classname*>(this->mp_Pint);};
+  class BTK_BASE_EXPORT Object
+  {
+    BTK_DECLARE_PIMPL_ACCESSOR(Object)
     
-#endif // __btkOpaque_h
+  public:
+    virtual ~Object() noexcept;
+    
+    Object(const Object& ) = delete;
+    Object(Object&& ) noexcept = delete;
+    Object& operator=(const Object& ) = delete;
+    Object& operator=(Object&& ) noexcept = delete;
+    
+    unsigned long timestamp() const noexcept;
+    
+    virtual void modified() noexcept;
+    
+  protected:
+    Object();
+    Object(ObjectPrivate& pimpl) noexcept;
+   
+    std::unique_ptr<ObjectPrivate> mp_Pimpl;
+  };
+};
+
+#endif // __btkObject_h

@@ -37,6 +37,7 @@
 #include "btkNode_p.h"
 #include "btkProperty.h"
 #include "btkLogger.h"
+#include "btkMacros.h" // BTK_UNUSED
 
 // -------------------------------------------------------------------------- //
 //                                 PRIVATE API                                //
@@ -52,14 +53,15 @@ namespace btk
   // ------------------------------------------------------------------------ //
   
   NodePrivate::NodePrivate(Node* pint, const std::string& name)
-  : ObjectPrivate(), mp_Pint(pint), Name(name), Description(), Properties(), Parents(), Children()
+  : ObjectPrivate(),
+    Name(name), Description(), Properties(), Parents(), Children(),
+    mp_Pint(pint)
   {};
   
   NodePrivate::~NodePrivate() noexcept = default;
   
   bool NodePrivate::retrievePath(std::list<const Node*>& path, const Node* current, const Node* stop)
   {
-    bool found;
     const auto& children = current->children();
     // Direct child search
     for (auto it = children.cbegin() ; it != children.cend() ; ++it)
@@ -174,6 +176,17 @@ namespace btk
       }
     }
     return false;
+  };
+  
+  Node* NodePrivate::makePint() const
+  {
+    return new Node(this->Name);
+  };
+  
+  
+  void NodePrivate::finalizePint(Node* pint) const
+  {
+    BTK_UNUSED(pint)
   };
 };
 
@@ -483,6 +496,34 @@ namespace btk
     this->modified();
   };
   
+  /**
+   * 
+   */
+  Node* Node::clone(Node* parent) const
+  {
+    auto optr = this->pimpl();
+    auto node = optr->makePint();
+    auto node_pimpl = node->pimpl();
+    node_pimpl->Description = optr->Description;
+    node_pimpl->Properties = optr->Properties;
+    for (auto it = optr->Children.cbegin() ; it != optr->Children.cend() ; ++it)
+      (*it)->clone(node);
+    node->appendParent(parent);
+    return node;
+  };
+  
+  // /**
+  //  *
+  //  */
+  // void Node::copy(Node* other)
+  // {
+  //   if (other == nullptr)
+  //     return;
+  //   auto optr = this->pimpl();
+  //   optr->copy(other);
+  // };
+  
+  /**
    * Constructor to be used by inherited object which want to add informations (static properties, members, etc) to the private implementation.
    */
   Node::Node(NodePrivate& pimpl, Node* parent) noexcept

@@ -256,7 +256,7 @@ namespace btk
       static inline type* array(size_t newarraylen, U* values, size_t num)
       {
         type* data = new type[newarraylen];
-        for (size_t i = 0 ; i < newarraylen ; ++i)
+        for (size_t i = 0 ; i < num ; ++i)
           data[i] = static_cast<type>(values[i]);
         return data;
       };
@@ -835,7 +835,7 @@ namespace btk
   template <typename S, typename R>
   struct Any::Converter::Helper : Any::Converter::HelperBase<S,R>
   {
-    static inline R convert(const S& val) {return R();}
+    static inline R convert(const S& /* val */) {return R();}
   };
 };
 

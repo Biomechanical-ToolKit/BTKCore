@@ -33,56 +33,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * btkUtils.h defines standard system-wide macros, constants, and other
- * parameters.
- */
-
-#ifndef __btkUtils_h
-#define __btkUtils_h
-
-#include <cstring> // strrchr
-#include <string>
-
-namespace btk
-{
-  namespace utils
-  {
-    /**
-     * This function keeps only the string part after the last file separator.
-     */
-    inline const char* strip_path(const char* str)
-    {
-    #if defined(_WIN32)
-      const char* substr = strrchr(str, '\\');
-    #else
-      const char* substr = strrchr(str, '/');
-    #endif
-      return (substr == nullptr) ? str : substr+1;
-    };
-
-    /**
-     * This function removes the character @a c at the beginning and the end of the given string
-     * By default the character removed is the white space.
-     * @warning The input is directly modified and returned.
-     */
-    inline void trim_string(std::string* str, const char c = ' ')
-    {
-      *str = str->erase(str->find_last_not_of(c) + 1);
-      *str = str->erase(0, str->find_first_not_of(c));
-    };
-
-    /**
-     * This function removes the character @a c at the beginning and the end of the given string
-     * By default the character removed is the white space.
-     */
-    inline std::string trim_string(const std::string& str, const char c = ' ')
-    {
-      std::string str_ = str;
-      trim_string(&str_, c);
-      return str_;
-    };
-  };
-};
-
-#endif // __btkUtils_h
+#ifndef __btkOpaque_h
+#define __btkOpaque_h
+  
+// Pimpl: Private implementation
+#define BTK_DECLARE_PIMPL_ACCESSOR(classname) \
+  friend class classname##Private; \
+  inline classname##Private* pimpl() {return reinterpret_cast<classname##Private*>(this->mp_Pimpl.get());}; \
+  inline const classname##Private* pimpl() const {return reinterpret_cast<const classname##Private*>(this->mp_Pimpl.get());};
+  
+// Pint: Public interface
+#define BTK_DECLARE_PINT_ACCESSOR(classname) \
+  inline classname* pint() {return reinterpret_cast<classname*>(this->mp_Pint);}; \
+  inline const classname* pint() const {return reinterpret_cast<const classname*>(this->mp_Pint);};
+    
+#endif // __btkOpaque_h

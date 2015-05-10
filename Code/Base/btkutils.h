@@ -33,61 +33,56 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkNode_p_h
-#define __btkNode_p_h
-
-/*
- * WARNING: This file and its content are not included in the public API and 
- * can change drastically from one release to another.
+/**
+ * btkutils.h defines standard system-wide macros, constants, and other
+ * parameters.
  */
 
-#include "btkObject_p.h"
-#include "btkTypeid.h"
-#include "btkNodeid.h" // Macro BTK_DECLARE_NODEID used by inheriting classes.
+#ifndef __btkutils_h
+#define __btkutils_h
 
+#include <cstring> // strrchr
 #include <string>
-#include <unordered_map>
-#include <list>
 
 namespace btk
 {
-  class Node;
-  
-  class NodePrivate : public ObjectPrivate
+  namespace utils
   {
-    BTK_DECLARE_PINT_ACCESSOR(Node)
+    /**
+     * This function keeps only the string part after the last file separator.
+     */
+    inline const char* strip_path(const char* str)
+    {
+    #if defined(_WIN32)
+      const char* substr = strrchr(str, '\\');
+    #else
+      const char* substr = strrchr(str, '/');
+    #endif
+      return (substr == nullptr) ? str : substr+1;
+    };
 
-  public:
-    static bool retrievePath(std::list<const Node*>& path, const Node* current, const Node* stop);
-    
-    NodePrivate() = delete;
-    NodePrivate(Node* pint, const std::string& name);
-    ~NodePrivate() noexcept;
-    NodePrivate(const NodePrivate& ) = delete;
-    NodePrivate(NodePrivate&& ) noexcept = delete;
-    NodePrivate& operator=(const NodePrivate& ) = delete;
-    NodePrivate& operator=(const NodePrivate&& ) noexcept = delete;
-    
-    virtual bool castable(typeid_t id) const noexcept;
-    
-    virtual bool staticProperty(const char* key, btk::Any* value) const noexcept;
-    virtual bool setStaticProperty(const char* key, const btk::Any* value) noexcept;
-    
-    bool attachParent(Node* node) noexcept;
-    bool detachParent(Node* node) noexcept;
-    
-    bool attachChild(Node* node) noexcept;
-    bool detachChild(Node* node) noexcept;
-    
-    std::string Name;
-    std::string Description;
-    std::unordered_map<std::string,Any> Properties;
-    std::list<Node*> Parents;
-    std::list<Node*> Children;
-    
-  protected:
-    Node* mp_Pint;
+    /**
+     * This function removes the character @a c at the beginning and the end of the given string
+     * By default the character removed is the white space.
+     * @warning The input is directly modified and returned.
+     */
+    inline void trim_string(std::string* str, const char c = ' ')
+    {
+      *str = str->erase(str->find_last_not_of(c) + 1);
+      *str = str->erase(0, str->find_first_not_of(c));
+    };
+
+    /**
+     * This function removes the character @a c at the beginning and the end of the given string
+     * By default the character removed is the white space.
+     */
+    inline std::string trim_string(const std::string& str, const char c = ' ')
+    {
+      std::string str_ = str;
+      trim_string(&str_, c);
+      return str_;
+    };
   };
 };
 
-#endif // __btkObject_p_h
+#endif // __btkutils_h

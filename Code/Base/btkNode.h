@@ -52,7 +52,7 @@ namespace btk
   
   class NodePrivate;
   
-  class BTK_COMMON_EXPORT Node : public Object
+  class BTK_BASE_EXPORT Node : public Object
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Node)
     
@@ -93,6 +93,8 @@ namespace btk
     virtual void modified() noexcept;
     
     void clear() noexcept;
+    Node* clone(Node* parent = nullptr) const;
+    // void copy(Node* other);
     
   protected:
     Node(NodePrivate& pimpl, Node* parent) noexcept;
@@ -138,16 +140,30 @@ namespace btk
   
   // ----------------------------------------------------------------------- //
   
-  template <typename U, typename N>
-  inline U node_cast(N* node) noexcept
+  template <typename T, typename N>
+  inline T node_cast(N* node) noexcept
   {
-    static_assert(std::is_pointer<U>::value, "The casted type must be a (const) pointer type.");
-    static_assert(std::is_base_of<Node,typename std::remove_pointer<U>::type>::value, "The casted type must derive from btk::Node.");
+    static_assert(std::is_pointer<T>::value, "The casted type must be a (const) pointer type.");
+    static_assert(std::is_base_of<Node,typename std::remove_pointer<T>::type>::value, "The casted type must derive from btk::Node.");
     static_assert(std::is_base_of<Node,typename std::decay<N>::type>::value, "The type of the given object must derive from btk::Node.");
-    if (node->castable(static_typeid<typename std::remove_pointer<U>::type>()))
-      return static_cast<U>(node);
+    if (node->castable(static_typeid<typename std::remove_pointer<T>::type>()))
+      return static_cast<T>(node);
     return nullptr;
   };
+  
+  // ----------------------------------------------------------------------- //
+  
+  template <typename T, typename... Args> 
+  inline std::vector<T> make_nodes(size_t num, Args&&... args) noexcept
+  {
+    using N = typename std::remove_pointer<T>::type;
+    static_assert(std::is_pointer<T>::value, "The generated type must be a (const) pointer type.");
+    static_assert(std::is_base_of<Node, N>::value, "The generated type must derive from btk::Node.");
+    std::vector<T> nodes(num,nullptr);
+    for (size_t i = 0 ; i < num ; ++i)
+      nodes[i] = new N("uname*"+std::to_string(i+1), args...);
+    return nodes;
+  }
 };
 
 #endif // __btkNode_h

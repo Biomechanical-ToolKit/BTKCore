@@ -33,41 +33,64 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkObject_h
-#define __btkObject_h
+#ifndef __btkNode_p_h
+#define __btkNode_p_h
 
-#include "btkConfigure.h"
-#include "btkCommonExport.h"
-#include "btkOpaque.h"
+/*
+ * WARNING: This file and its content are not included in the public API and 
+ * can change drastically from one release to another.
+ */
 
-#include <memory> // std::unique_ptr
+#include "btkObject_p.h"
+#include "btkTypeid.h"
+#include "btkNodeid.h" // Macro BTK_DECLARE_NODEID used by inheriting classes.
+
+#include <string>
+#include <unordered_map>
+#include <list>
 
 namespace btk
 {
-  class ObjectPrivate;
+  class Node;
   
-  class BTK_COMMON_EXPORT Object
+  class NodePrivate : public ObjectPrivate
   {
-    BTK_DECLARE_PIMPL_ACCESSOR(Object)
-    
+    BTK_DECLARE_PINT_ACCESSOR(Node)
+
   public:
-    virtual ~Object() noexcept;
+    static bool retrievePath(std::list<const Node*>& path, const Node* current, const Node* stop);
     
-    Object(const Object& ) = delete;
-    Object(Object&& ) noexcept = delete;
-    Object& operator=(const Object& ) = delete;
-    Object& operator=(Object&& ) noexcept = delete;
+    NodePrivate() = delete;
+    NodePrivate(Node* pint, const std::string& name);
+    ~NodePrivate() noexcept;
+    NodePrivate(const NodePrivate& ) = delete;
+    NodePrivate(NodePrivate&& ) noexcept = delete;
+    NodePrivate& operator=(const NodePrivate& ) = delete;
+    NodePrivate& operator=(const NodePrivate&& ) noexcept = delete;
     
-    unsigned long timestamp() const noexcept;
+    virtual bool castable(typeid_t id) const noexcept;
     
-    virtual void modified() noexcept;
+    virtual bool staticProperty(const char* key, btk::Any* value) const noexcept;
+    virtual bool setStaticProperty(const char* key, const btk::Any* value) noexcept;
+    
+    bool attachParent(Node* node) noexcept;
+    bool detachParent(Node* node) noexcept;
+    
+    bool attachChild(Node* node) noexcept;
+    bool detachChild(Node* node) noexcept;
+    
+    virtual Node* makePint() const;
+    virtual void finalizePint(Node* pint) const;
+    
+    std::string Name;
+    std::string Description;
+    std::unordered_map<std::string,Any> Properties;
+    std::list<Node*> Parents;
+    std::list<Node*> Children;
     
   protected:
-    Object();
-    Object(ObjectPrivate& pimpl) noexcept;
-   
-    std::unique_ptr<ObjectPrivate> mp_Pimpl;
+    Node* mp_Pint;
   };
 };
 
-#endif // __btkObject_h
+#endif // __btkObject_p_h

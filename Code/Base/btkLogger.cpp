@@ -235,7 +235,7 @@ namespace btk
       return;
     if (this->mp_Pimpl->Output == nullptr)
       this->mp_Pimpl->Output = new Console;
-    size_t n = strlen(msg)*2;
+    int n = strlen(msg)*2;
     char* str = new char[n];
     while (1)
     {
