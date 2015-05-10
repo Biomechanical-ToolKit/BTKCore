@@ -1,8 +1,0 @@
-/** 
- * @defgroup BTKWrappingScilab Scilab
- * @brief Wraps BTK in Scilab by using the MEX API. For more information on BTK in Scilab, go the help in Scilab, go down in the menu list and select "Biomechanical Toolkit".
- *
- * As BTK uses the MEX API implemented in Scilab, there is no specific information related to the wrapping of BTK into Scilab. The code used to compile the Scilab's toolbox is based on the Matlab MEX functions. You will find more information in the @ref BTKWrappingMatlab module.
- *
- * @ingroup BTKWrapping
- */
