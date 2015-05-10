@@ -1,66 +1,18 @@
-# Open3DMotion settings for Codamotion file formats (MDF, XMOVE)
-# SET(USE_O3DM_NO_FILE_FORMAT_REGISTRATION 1)
-# SET(USE_O3DM_MDF_FILE_FORMAT 1)
-# SET(USE_O3DM_XMOVE_FILE_FORMAT 1)
-# INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkOpen3DMotionSources.cmake)
-
 SET(BTKIO_SRCS
   btkIODevice.cpp
-  btkEndianConverter.cpp
   btkBinaryStream.cpp
   btkFile.cpp
-  # btkAcquisitionFileIO.cpp
-  # btkAcquisitionFileIOFactory.cpp
-  # btkAcquisitionFileIOFactory_registration.cpp
-  # btkAcquisitionFileReader.cpp
-  # btkAcquisitionFileWriter.cpp
-  # btkASCIIFileWriter.cpp
-  # btkBinaryFileStream.cpp
-  # btkMultiSTLFileWriter.cpp
-  # # File formats
-  # btkANBFileIO.cpp
-  # btkANCFileIO.cpp
-  # btkANGFileIO.cpp
-  # btkBSFFileIO.cpp
-  # btkC3DFileIO.cpp
-  # btkCALForcePlateFileIO.cpp
-  # btkCLBFileIO.cpp
-  # btkDelsysEMGFileIO.cpp
-  # btkEMFFileIO.cpp
-  # btkEMxFileIO.cpp
-  # btkGRxFileIO.cpp
-  # btkHPFFileIO.cpp
-  # btkKistlerDATFileIO.cpp
-  # btkPWRFileIO.cpp
-  # btkMDFFileIO.cpp
-  # btkMOMFileIO.cpp
-  # btkRAxFileIO.cpp
-  # btkRICFileIO.cpp
-  # btkTDFFileIO.cpp
-  # btkTRBFileIO.cpp
-  # btkTRCFileIO.cpp
-  # btkXLSOrthoTrakFileIO.cpp
-  # btkXMOVEFileIO.cpp
-  # # Utils & Others
-  # btkCodamotionFileIOUtils_p.cpp
-  # btkEliteFileIOUtils_p.cpp
-  # btkMotionAnalysisFileIOUtils.cpp
-  # btkMotionAnalysisFileIOUtils_p.cpp
-  # # Needed by Open3DMotion for the Codamotion file formats
-  # ${BTK_O3DM_SRCS}
-  # "${BTK_SOURCE_DIR}/Utilities/pugixml/src/pugixml.cpp"
-  # "${BTK_SOURCE_DIR}/Utilities/libb64/src/cdecode.c"
-  # "${BTK_SOURCE_DIR}/Utilities/libb64/src/cencode.c"
+  btkIOHandler.cpp
+  # Trial formats
+  TrialFormats/btkTrialIOHandler.cpp
+  TrialFormats/btkC3DHandler.cpp
 )
 
-# INCLUDE_DIRECTORIES(${BTK_O3DM_INCLUDE_DIR})
-# INCLUDE_DIRECTORIES("${BTK_SOURCE_DIR}/Utilities/pugixml/src")
-# INCLUDE_DIRECTORIES("${BTK_SOURCE_DIR}/Utilities/libb64/include")
-
 ADD_LIBRARY(IO ${BTK_LIBS_BUILD_TYPE} ${BTKIO_SRCS})
-TARGET_LINK_LIBRARIES(IO Common)
-TARGET_INCLUDE_DIRECTORIES(Common PUBLIC
+TARGET_LINK_LIBRARIES(IO Trial)
+TARGET_INCLUDE_DIRECTORIES(IO PUBLIC
   $<BUILD_INTERFACE:${BTK_BINARY_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/TrialFormats>
   $<BUILD_INTERFACE:${BTK_SOURCE_DIR}/ThirdParties/eigen3>
   $<INSTALL_INTERFACE:include/btk>
   $<INSTALL_INTERFACE:include/btk/3rdparty/eigen3>
