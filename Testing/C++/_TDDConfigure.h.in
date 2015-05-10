@@ -60,5 +60,8 @@
 
 #define TS_ASSERT_EIGEN_DELTA(lhs,rhs,prec) \
   TS_ASSERT((lhs - rhs).cwiseAbs().maxCoeff() <= prec)
+    
+#define TSM_ASSERT_EIGEN_DELTA(msg,lhs,rhs,prec) \
+  TSM_ASSERT(msg + " (" + std::to_string((lhs - rhs).cwiseAbs().maxCoeff()) + " > " + std::to_string(prec) + ")", (lhs - rhs).cwiseAbs().maxCoeff() <= prec)
 
 #endif // _TDDConfigure_h
