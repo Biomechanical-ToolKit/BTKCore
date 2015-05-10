@@ -94,7 +94,7 @@ namespace btk
   bool IODevice::atEnd() const noexcept
   {
     auto optr = this->pimpl();
-    return (this->state() & State::End) == State::End;
+    return (optr->State & State::End) == State::End;
   };
  
   /**
