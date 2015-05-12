@@ -18,7 +18,7 @@ script:
   - rm -rf build
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
+  - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBUILD_TESTING:BOOL=1 -DBTK_EXTRA_COMPILER_WARNINGS:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
   - make
   - ctest -VV
 
