@@ -43,6 +43,7 @@
 #include <unordered_map>
 #include <algorithm> // std::copy
 #include <cstdlib> // strtol, strtoll, strtoul, strtoull, strtof, strtod, ...
+#include <cstring> // strlen, strcmp
 #include <type_traits>
 
 // -------------------------------------------------------------------------- //
