@@ -80,7 +80,7 @@ namespace btk
     LeftStaticRotationOffset(0.0)
   {};
     
-  PluginGaitPrivate::~PluginGaitPrivate() = default;
+  PluginGaitPrivate::~PluginGaitPrivate() noexcept = default;
   
   Node* PluginGaitPrivate::makePint() const
   {

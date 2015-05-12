@@ -108,7 +108,7 @@ namespace btk
    * @fn TimeSequence::~TimeSequence()
    * Destructor (default)
    */
-  TimeSequence::~TimeSequence() = default;
+  TimeSequence::~TimeSequence() noexcept = default;
   
   double TimeSequence::sampleRate() const noexcept
   {

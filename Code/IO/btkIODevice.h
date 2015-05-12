@@ -64,7 +64,7 @@ namespace btk
     {
     public:
      explicit Failure(const std::string& msg) noexcept : Exception(msg) {};
-     virtual ~Failure() = default;
+     virtual ~Failure() noexcept = default;
     };
     
     IODevice(const IODevice& ) = delete;

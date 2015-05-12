@@ -65,7 +65,7 @@ namespace btk
   : Node(*new SegmentPrivate(this,name,part,side), parent)
   {};
   
-  Segment::~Segment() = default;
+  Segment::~Segment() noexcept = default;
   
   int Segment::part() const noexcept
   {

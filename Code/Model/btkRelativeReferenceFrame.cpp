@@ -89,7 +89,7 @@ namespace btk
     std::copy_n(position, 3, optr->Data+9);
   };
   
-  RelativeReferenceFrame::~RelativeReferenceFrame() = default;
+  RelativeReferenceFrame::~RelativeReferenceFrame() noexcept = default;
   
   const double* RelativeReferenceFrame::u() const noexcept
   {

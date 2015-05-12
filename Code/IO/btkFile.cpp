@@ -436,7 +436,7 @@ namespace btk
   /**
    * Destructor (default).
    */
-  File::~File() = default;
+  File::~File() noexcept = default;
   
   /**
    * Open the given @a filename with the specified @a mode.

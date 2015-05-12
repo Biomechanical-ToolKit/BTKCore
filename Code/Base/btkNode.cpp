@@ -58,7 +58,7 @@ namespace btk
     mp_Pint(pint)
   {};
   
-  NodePrivate::~NodePrivate() = default;
+  NodePrivate::~NodePrivate() noexcept = default;
   
   bool NodePrivate::retrievePath(std::list<const Node*>& path, const Node* current, const Node* stop)
   {

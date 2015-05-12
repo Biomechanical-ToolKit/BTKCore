@@ -71,7 +71,7 @@ namespace btk
     }
   };
   
-  Model::~Model() = default;
+  Model::~Model() noexcept = default;
   
   Node* Model::segments()
   {

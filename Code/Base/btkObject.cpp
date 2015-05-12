@@ -48,7 +48,7 @@ namespace btk
   : Timestamp(0ul)
   {};
   
-  ObjectPrivate::~ObjectPrivate() = default; // Cannot be inlined
+  ObjectPrivate::~ObjectPrivate() noexcept = default; // Cannot be inlined
 }
 
 // -------------------------------------------------------------------------- //
@@ -238,7 +238,7 @@ namespace btk
    * Destructor
    * @note The opaque pointer representing the private implementation is automatically deleted as it is contained in a std::unique_ptr object.
    */
-  Object::~Object() = default;
+  Object::~Object() noexcept = default;
   
   /**
    * Returns the timestamp of the object.

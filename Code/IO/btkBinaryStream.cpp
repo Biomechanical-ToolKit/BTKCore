@@ -51,7 +51,7 @@ namespace btk
   : Device(device), Converter(converter)
   {};
   
-  BinaryStreamPrivate::~BinaryStreamPrivate() = default;
+  BinaryStreamPrivate::~BinaryStreamPrivate() noexcept = default;
   
   // ----------------------------------------------------------------------- //
   

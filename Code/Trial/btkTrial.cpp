@@ -48,7 +48,7 @@ namespace btk
   : NodePrivate(pint,name)
   {};
   
-  TrialPrivate::~TrialPrivate() = default;
+  TrialPrivate::~TrialPrivate() noexcept = default;
   
   Node* TrialPrivate::makePint() const
   {
@@ -66,7 +66,7 @@ namespace btk
   : Node(*new TrialPrivate(this,name),parent)
   {};
   
-  Trial::~Trial() = default;
+  Trial::~Trial() noexcept = default;
   
   Node* Trial::timeSequences()
   {

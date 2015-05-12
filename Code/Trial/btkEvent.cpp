@@ -48,7 +48,7 @@ namespace btk
   : NodePrivate(pint,name), Time(time), Context(context), Subject(subject)
   {};
   
-  EventPrivate::~EventPrivate() = default;
+  EventPrivate::~EventPrivate() noexcept = default;
   
   Node* EventPrivate::makePint() const
   {
@@ -122,7 +122,7 @@ namespace btk
   /**
    * Destructor (default)
    */
-  Event::~Event() = default;
+  Event::~Event() noexcept = default;
   
   /**
    * Returns the time associated with this event.

@@ -44,11 +44,11 @@ namespace btk
   {
   public:
     typeid_t() = delete;
-    ~typeid_t() = default;
+    ~typeid_t() noexcept = default;
     typeid_t(const typeid_t& ) = default;
-    typeid_t(typeid_t&& ) = default;
+    typeid_t(typeid_t&& ) noexcept = default;
     typeid_t& operator=(const typeid_t& ) = default;
-    typeid_t& operator=(typeid_t&& ) = default;
+    typeid_t& operator=(typeid_t&& ) noexcept = default;
     
     explicit operator size_t() const noexcept {return reinterpret_cast<size_t>(this->id);};
     

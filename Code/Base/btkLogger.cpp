@@ -43,7 +43,7 @@ namespace btk
   struct Logger::Private
   {
     Private() noexcept : Output(nullptr), Quiet(false) {};
-    ~Private() = default;
+    ~Private() noexcept = default;
     
     Private(const Private& ) = delete;
     Private(Private&& ) noexcept = delete;
@@ -89,12 +89,12 @@ namespace btk
   /**
    * Default (empty) constructor
    */
-  Logger::Device::Device() = default;
+  Logger::Device::Device() noexcept = default;
   
   /**
    * Default (empty) destructor
    */
-  Logger::Device::~Device() = default;
+  Logger::Device::~Device() noexcept = default;
   
   /**
    * @fn virtual void Logger::Device::writeMessage(Category category, const char* msg) noexcept = 0;

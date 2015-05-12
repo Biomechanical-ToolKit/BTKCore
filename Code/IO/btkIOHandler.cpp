@@ -51,7 +51,7 @@ namespace btk
   : Device(nullptr), ErrorCode(IOHandler::Error::None), ErrorMessage()
   {};
   
-  IOHandlerPrivate::~IOHandlerPrivate() = default; // Cannot be inlined
+  IOHandlerPrivate::~IOHandlerPrivate() noexcept = default; // Cannot be inlined
 }
 
 // -------------------------------------------------------------------------- //
@@ -79,7 +79,7 @@ namespace btk
   /**
    * Destructor (default)
    */
-  IOHandler::~IOHandler() = default;
+  IOHandler::~IOHandler() noexcept = default;
   
   /**
    *

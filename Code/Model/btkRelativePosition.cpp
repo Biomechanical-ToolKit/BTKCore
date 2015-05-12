@@ -71,7 +71,7 @@ namespace btk
   : Node(*new RelativePositionPrivate(this,name,coordinates), parent)
   {};
   
-  RelativePosition::~RelativePosition() = default;
+  RelativePosition::~RelativePosition() noexcept = default;
   
   const double* RelativePosition::data() const noexcept
   {
