@@ -42,8 +42,8 @@
 #include <string>
 #include <unordered_map>
 #include <algorithm> // std::copy
-
 #include <cstdlib> // strtol, strtoll, strtoul, strtoull, strtof, strtod, ...
+#include <type_traits>
 
 // -------------------------------------------------------------------------- //
 //                                 PRIVATE API                                //
