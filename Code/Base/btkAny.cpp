@@ -333,8 +333,8 @@ namespace btk
    */
   Any::details::convert_t Any::details::extract_converter(typeid_t sid, typeid_t rid) noexcept
   {
-    auto it = converter().Table.find(hash(static_cast<size_t>(sid),static_cast<size_t>(rid)));
-    return (it != converter().Table.end()) ? it->second : nullptr;
+    const auto it = converter().Table.find(hash(static_cast<size_t>(sid),static_cast<size_t>(rid)));
+    return (it != converter().Table.cend()) ? it->second : nullptr;
   };
   
   // ----------------------------------------------------------------------- //
