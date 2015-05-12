@@ -37,6 +37,8 @@
 
 #include <iostream>
 #include <cstdio> // vsnprintf
+#include <cstring> // strlen
+#include <cstdarg> // va_start, va_end
 
 namespace btk
 {
