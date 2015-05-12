@@ -82,7 +82,7 @@ namespace btk
     this->appendChild(distal);
   };
   
-  Joint::~Joint() noexcept = default;
+  Joint::~Joint() = default;
   
   Segment* Joint::proximalSegment() const noexcept
   {

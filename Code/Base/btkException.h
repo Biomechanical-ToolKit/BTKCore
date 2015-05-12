@@ -57,7 +57,7 @@ namespace btk
     /**
      * Destructor
      */
-    virtual ~Exception() noexcept = default;
+    virtual ~Exception() = default;
     
     /**
      * Gets the exception's message

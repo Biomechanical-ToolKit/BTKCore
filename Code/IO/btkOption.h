@@ -186,7 +186,7 @@ namespace btk
       : Value(std::forward<V>(v))
       {};
       
-      ~Details() noexcept = default;
+      ~Details() = default;
       Details(Details&& ) = default;
       
       Details() = delete;

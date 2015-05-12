@@ -67,7 +67,7 @@ namespace btk
     AnalogResolution(12), AnalogChannelScale(), AnalogZeroOffset(), AnalogUniversalScale(1.0), AnalogSignedIntegerFormat(true)
   {};
   
-  C3DHandlerPrivate::~C3DHandlerPrivate() noexcept = default;
+  C3DHandlerPrivate::~C3DHandlerPrivate() = default;
   
   template <typename T>
   void C3DHandlerPrivate::mergeProperties(std::vector<T>* target, Trial* trial, const std::string& base, int finalSize, T&& defaultValue)
@@ -274,7 +274,7 @@ namespace btk
   : TrialIOHandler(*new C3DHandlerPrivate)
   {};
   
-  C3DHandler::~C3DHandler() noexcept = default;
+  C3DHandler::~C3DHandler() = default;
   
   C3DHandler::Capability C3DHandler::capability() const noexcept
   {

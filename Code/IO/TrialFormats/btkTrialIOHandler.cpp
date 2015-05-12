@@ -45,7 +45,7 @@ namespace btk
   /**
    * Destructor (default)
    */
-  TrialIOHandler::~TrialIOHandler() noexcept = default;
+  TrialIOHandler::~TrialIOHandler() = default;
   
   /**
    * Constructor for inheriting class with extended private implementation

@@ -70,7 +70,7 @@ namespace btk
   class EndianConverter
   {
   public:
-    virtual ~EndianConverter() noexcept = default;
+    virtual ~EndianConverter() = default;
     
     EndianConverter(const EndianConverter& ) = delete;
     EndianConverter(EndianConverter&& ) noexcept = delete;

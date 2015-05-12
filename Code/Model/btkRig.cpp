@@ -64,5 +64,5 @@ namespace btk
   : Node(pimpl, parent)
   {};
   
-  Rig::~Rig() noexcept = default;
+  Rig::~Rig() = default;
 };
