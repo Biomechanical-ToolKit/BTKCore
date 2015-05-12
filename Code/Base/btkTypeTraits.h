@@ -39,7 +39,8 @@
 #include <array>
 #include <vector>
 #include <initializer_list>
-
+#include <cstddef> // size_t
+  
 namespace btk
 {
   template <typename T>
