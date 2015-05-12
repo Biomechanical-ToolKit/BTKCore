@@ -3,6 +3,11 @@ language: objective-c
 # To prepare the system to install prerequisites or dependencies
 before_install:
   - brew update
+  - brew unlink cmake
+  
+# To install any prerequisites or dependencies necessary to run your build
+install:  
+  - brew install cmake
   
 # To prepare your build for testing
 before_script:
