@@ -4,20 +4,16 @@ language: objective-c
 before_install:
   - brew update
   
-# To install any prerequisites or dependencies necessary to run your build
-install:  
-  - brew install swig cmake
-  
 # To prepare your build for testing
 before_script:
-  - git clone https://code.google.com/p/b-tk.data/ Testing/Data
+  - git clone https://github.com/Biomechanical-ToolKit/BTKData.git Testing/Data
       
 script:
   - ROOT=`pwd`
   - rm -rf build
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBTK_WRAP_PYTHON:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
+  - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
   - make
   - ctest -VV
 
