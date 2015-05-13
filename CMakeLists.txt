@@ -32,6 +32,7 @@ ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows" AND MSVC)
   # CMake 3.1 complains it does not know how to set the compile flag to enable C++11 with MSVC
   SET(CMAKE_CXX11_STANDARD_COMPILE_OPTION "")
   SET(CMAKE_CXX11_EXTENSION_COMPILE_OPTION "")
+  SET(CMAKE_CXX_FLAGS "/GR-") # Disable RTTI
 ELSE()
   SET(CMAKE_CXX_FLAGS "-fno-rtti")
 ENDIF()
