@@ -49,7 +49,7 @@
     { \
       static inline auto make_options() -> decltype(std::make_tuple(__VA_ARGS__)) \
       { \
-        return { __VA_ARGS__ }; \
+        return std::make_tuple(__VA_ARGS__); \
       } \
     public: \
       using _Tuple = decltype(_Options::make_options()); \
