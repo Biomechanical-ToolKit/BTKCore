@@ -341,7 +341,7 @@ namespace btk
    * The @a value can be an Any object or a type supported by it (e.g. int, double, std::string,).
    * In case the property does not exist, or its value is different, or it is removed, the state of the node is set to modified.
    */
-  void Node::setProperty(const std::string& key, const Any& value) noexcept
+  void Node::setProperty(const std::string& key, const Any& value)
   {
     auto optr = this->pimpl();
     bool caught = optr->setStaticProperty(key.c_str(),&value);
