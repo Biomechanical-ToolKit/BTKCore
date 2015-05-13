@@ -174,7 +174,7 @@ configuration:
 # scripts to run before build
 before_build:
   - ps: |
-        if ($env:Build -eq "mingw") {
+        if ($env:OS -eq "MinGW") {
           # Remove path to Git bin directory from PATH because it breaks MinGW config.
           $env:PATH = $env:PATH -replace "C:\\Program Files \(x86\)\\Git\\bin",""
           $generator = "-G MinGW Makefiles"
@@ -183,8 +183,8 @@ before_build:
         }
   - mkdir build
   - cd build
-  - git clone https://github.com/Biomechanical-ToolKit/BTKData.git Testing/Data
-  - cmake "-DCMAKE_BUILD_TYPE:CHAR=$env:Config" -DBUILD_SHARED_LIBS:BOOL=1 -DBUILD_TESTING:BOOL=1 "-DBTK_TESTING_DATA_PATH:CHAR=%APPVEYOR_BUILD_FOLDER%/Testing/Data" "$generator" ..
+  - git clone --quiet https://github.com/Biomechanical-ToolKit/BTKData.git Testing/Data
+  - cmake "-DCMAKE_BUILD_TYPE:CHAR=$env:CONFIGURATION" -DBUILD_SHARED_LIBS:BOOL=1 -DBUILD_TESTING:BOOL=1 "-DBTK_TESTING_DATA_PATH:CHAR=$env:APPVEYOR_BUILD_FOLDER/Testing/Data" "$generator" ..
 
 # scripts to run after build
 after_build:
@@ -192,7 +192,7 @@ after_build:
 # to run your custom scripts instead of automatic MSBuild
 build_script:
   - ps: |
-        if ($env:Build -eq "mingw") {
+        if ($env:OS -eq "MinGW") {
           make
         } else {
           nmake
