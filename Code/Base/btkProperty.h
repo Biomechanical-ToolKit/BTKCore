@@ -61,7 +61,7 @@
   { \
     static inline auto make_properties() -> decltype(std::make_tuple(__VA_ARGS__)) \
     { \
-      return { __VA_ARGS__ }; \
+      return std::make_tuple(__VA_ARGS__); \
     }; \
   };
 
