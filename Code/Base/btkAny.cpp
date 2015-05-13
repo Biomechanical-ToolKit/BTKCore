@@ -37,14 +37,6 @@
 
 namespace btk
 {
-  // Known conversion table defined at compile time.
-  
-  Any::Converter::Converter()
-  : Table{}
-  {};
-  
-  // ----------------------------------------------------------------------- //
-  
   /**
    * @class Any btkAny.h
    * @brief Generic type to store and convert C++'s normal strict and static type.
@@ -194,7 +186,7 @@ namespace btk
    * @fn template <typename U> Any::Any(const U& value);
    * Constructor which store the given @a value.
    *
-   * You can store any kind of type. But the conversion between types is only avaible if the stored type correspoinds to an arithmetic type, or a std::string, or if you register some custom conversion .
+   * You can store any kind of type. But the conversion between types is only available if the stored type correspoinds to an arithmetic type, or a std::string, or if you register some custom conversion.
    */
 
   /**
@@ -316,33 +308,36 @@ namespace btk
 
   // ----------------------------------------------------------------------- //
 
-  /**
-   * Returns the conversion table used for all the Any object.
-   *
-   * @note The returned object is a singleton as proposed by Scott Meyers in C++11.
-   */
-  Any::Converter& Any::details::converter() noexcept
+  namespace __details
   {
-    static Converter helper;
-    return helper;
-  };
+    /**
+     * Returns the conversion table used for all the Any object.
+     *
+     * @note The returned object is a singleton as proposed by Scott Meyers in C++11.
+     */
+    _Any_converter_map& _any_converter_map() noexcept
+    {
+      static _Any_converter_map table;
+      return table;
+    };
   
-  /**
-   * Extract the convertion function pointer based on the ID used from the type source (@c sid) and the returned type (@c rid)
-   * In case no function pointer was found, the returned value is set to nullptr.
-   */
-  Any::details::convert_t Any::details::extract_converter(typeid_t sid, typeid_t rid) noexcept
-  {
-    const auto it = converter().Table.find(hash(static_cast<size_t>(sid),static_cast<size_t>(rid)));
-    return (it != converter().Table.cend()) ? it->second : nullptr;
+    /**
+     * Extract the convertion function pointer based on the ID used from the type source (@c sid) and the returned type (@c rid)
+     * In case no function pointer was found, the returned value is set to nullptr.
+     */
+    _Any_convert_t _any_extract_converter(typeid_t sid, typeid_t rid) noexcept
+    {
+      auto it = _any_converter_map().find(_any_hash(static_cast<size_t>(sid),static_cast<size_t>(rid)));
+      return (it != _any_converter_map().end()) ? it->second : nullptr;
+    };
   };
   
   // ----------------------------------------------------------------------- //
   
   /**
-   * @struct Any::Converter btkAny.h
+   * @struct Any::Conversion btkAny.h
    * @brief Utilitary to define conversion from/to a Any object.
-   * The role of this class is to facilitate the registration a type using Any::Register. 
+   * The role of this class is to facilitate the registration of a type using Any::Register. 
    */
   
   /**

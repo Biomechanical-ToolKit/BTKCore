@@ -18,13 +18,13 @@ struct Foo
 };
 
 template<>
-struct btk::Any::Converter::Helper<std::string,Date> : btk::Any::Converter::HelperBase<std::string,Date>
+struct btk::Any::Helper<std::string,Date>
 {
   static inline Date convert(const std::string& ) {return Date{2009,05,02};};
 };
 
 template<>
-struct btk::Any::Converter::Helper<Date,std::string> : btk::Any::Converter::HelperBase<Date,std::string>
+struct btk::Any::Helper<Date,std::string>
 {
   static inline std::string convert(const Date& val) {return std::to_string(val.Year) + "-" + std::to_string(val.Month) + "-" + std::to_string(val.Day);};
 };

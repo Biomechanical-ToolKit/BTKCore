@@ -51,6 +51,8 @@ namespace btk
   public:
     
     // Forward declaration
+    struct Storage;
+    template <typename S, typename R> struct Helper;
     template <typename... T> struct Conversion;
     template <typename Type, typename From, typename To> struct Register;
     template <typename Type, typename... From, typename... To> struct Register<Type, Conversion<From...>, Conversion<To...>>;
@@ -87,14 +89,8 @@ namespace btk
     template <typename U> friend inline bool operator!=(const Any& lhs, const U& rhs) noexcept {return !lhs.isEqual(rhs);};
     template <typename U> friend inline bool operator!=(const U& lhs, const Any& rhs) noexcept {return !rhs.isEqual(lhs);};
     
-  private:
-    
-    // Forward declaration
-    struct StorageBase;
-    struct Converter;
-    struct details;
-    
-    StorageBase* mp_Storage;
+  private:    
+    Storage* mp_Storage;
   };
 };
 
