@@ -84,10 +84,10 @@ namespace btk
     friend bool operator==(const Any& lhs, const Any& rhs) noexcept;
     friend bool operator!=(const Any& lhs, const Any& rhs) noexcept;
         
-    template <typename U> friend inline bool operator==(const Any& lhs, const U& rhs) noexcept {return lhs.isEqual(rhs);};
-    template <typename U> friend inline bool operator==(const U& lhs, const Any& rhs) noexcept {return rhs.isEqual(lhs);};
-    template <typename U> friend inline bool operator!=(const Any& lhs, const U& rhs) noexcept {return !lhs.isEqual(rhs);};
-    template <typename U> friend inline bool operator!=(const U& lhs, const Any& rhs) noexcept {return !rhs.isEqual(lhs);};
+    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator==(const A& lhs, const U& rhs) noexcept {return lhs.isEqual(rhs);};
+    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator==(const U& lhs, const A& rhs) noexcept {return rhs.isEqual(lhs);};
+    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator!=(const A& lhs, const U& rhs) noexcept {return !lhs.isEqual(rhs);};
+    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator!=(const U& lhs, const A& rhs) noexcept {return !rhs.isEqual(lhs);};
     
   private:    
     Storage* mp_Storage;
