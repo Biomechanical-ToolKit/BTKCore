@@ -71,11 +71,11 @@ namespace btk
   struct Property
   {
     const char* Label;
-    std::size_t Size;
+    size_t Size;
     U (T::*Accessor)() const;
     void (T::*Mutator)(U);
 
-    template <std::size_t N, typename A = std::nullptr_t, typename M = std::nullptr_t>
+    template <size_t N, typename A = std::nullptr_t, typename M = std::nullptr_t>
     constexpr Property(const char(&l)[N], A&& a = nullptr, M&& m = nullptr) : Label(l), Size(N-1), Accessor(a), Mutator(m)
     {
       static_assert(!std::is_same<std::nullptr_t, A>::value, "An accessor is required. It is not possible to pass a null pointer.");
