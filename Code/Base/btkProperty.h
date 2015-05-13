@@ -57,7 +57,7 @@
   private:
 
 #define _BTK_STATIC_PROPERTIES(...) \
-  struct StaticProperties : btk::Properties<StaticProperties> \
+  struct StaticProperties : btk::__details::_Properties<StaticProperties> \
   { \
     static inline auto make_properties() -> decltype(std::make_tuple(__VA_ARGS__)) \
     { \
@@ -107,45 +107,48 @@ namespace btk
     };
   };
   
-  template <typename Derived>
-  struct Properties
-  {
-    template <typename Object, typename Value>
-    static inline bool visit(Object* obj, const char* key, Value* val)
+  namespace __details
+  {   
+    template <typename Derived>
+    struct _Properties
     {
-      const auto properties = Derived::make_properties();
-      return details<decltype(properties),0>::execute(properties,obj,key,val);
-    };
-  
-  private:
-    template <typename Prop, typename Object, typename Value>
-    static inline bool accept(Prop&& property, Object* obj, const char* key, Value* val)
-    {
-      return property.accept(obj,key,val);
-    };
-  
-    template<typename Tuple, size_t Pos, size_t Size = std::tuple_size<Tuple>::value-1>
-    struct details
-    {
-      template <typename Props, typename Object, typename Value>
-      static inline bool execute(Props&& properties, Object* obj, const char* key, Value* val)
+      template <typename Object, typename Value>
+      static inline bool visit(Object* obj, const char* key, Value* val)
       {
-        auto property = std::get<Pos>(properties);
-        if (Derived::accept(std::forward<decltype(property)>(property),obj,key,val))
-          return true;
-        else
-          return details<Tuple,Pos+1,Size>::execute(std::forward<Props>(properties),obj,key,val);
+        const auto properties = Derived::make_properties();
+        return _Retriever<decltype(properties),0>::search(properties,obj,key,val);
       };
-    };
   
-    template<typename Tuple, size_t Size>
-    struct details<Tuple, Size, Size>
-    {
-      template <typename Props, typename Object, typename Value>
-      static inline bool execute(Props&& properties, Object* obj, const char* key, Value* val)
+    private:
+      template <typename Prop, typename Object, typename Value>
+      static inline bool accept(Prop&& property, Object* obj, const char* key, Value* val)
       {
-        auto property = std::get<Size>(properties);
-        return Derived::accept(std::forward<decltype(property)>(property),obj,key,val);
+        return property.accept(obj,key,val);
+      };
+    
+      template<typename Tuple, size_t Pos, size_t Size = std::tuple_size<Tuple>::value-1>
+      struct _Retriever
+      {
+        template <typename Props, typename Object, typename Value>
+        static inline bool search(Props&& properties, Object* obj, const char* key, Value* val)
+        {
+          auto property = std::get<Pos>(properties);
+          if (Derived::accept(std::forward<decltype(property)>(property),obj,key,val))
+            return true;
+          else
+            return _Retriever<Tuple,Pos+1,Size>::search(std::forward<Props>(properties),obj,key,val);
+        };
+      };
+
+      template<typename Tuple, size_t Size>
+      struct _Retriever<Tuple, Size, Size>
+      {
+        template <typename Props, typename Object, typename Value>
+        static inline bool search(Props&& properties, Object* obj, const char* key, Value* val)
+        {
+          auto property = std::get<Size>(properties);
+          return Derived::accept(std::forward<decltype(property)>(property),obj,key,val);
+        };
       };
     };
   };
