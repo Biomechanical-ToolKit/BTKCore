@@ -279,14 +279,20 @@ namespace btk
   * Have to call modified() manually
   */
   
-  double& TimeSequence::data(unsigned sample, std::vector<unsigned>&& indices) noexcept
+  double& TimeSequence::data(unsigned sample, std::initializer_list<unsigned>&& indices) const noexcept
   {
     auto optr = this->pimpl();
     assert(sample < optr->Samples);
     assert(indices.size() <= optr->Dimensions.size());
-    size_t col = indices.empty() ? 0 : indices.back();
-    for (size_t i = 0 ; i < std::min(indices.size(),optr->AccumulatedDimensions.size()) ; ++i)
-      col += optr->AccumulatedDimensions[i] * indices[i];
+    auto it = indices.begin();
+    std::advance(it,indices.size()-1);
+    size_t col = (indices.size() == 0) ? 0 : *it;
+    it = indices.begin();
+    for (size_t i = 0, len = std::min(indices.size(),optr->AccumulatedDimensions.size()) ; i < len ; ++i)
+    {
+      col += optr->AccumulatedDimensions[i] * *it;
+      ++it;
+    }
     return optr->Data[col*optr->Samples+sample];
   };
 };

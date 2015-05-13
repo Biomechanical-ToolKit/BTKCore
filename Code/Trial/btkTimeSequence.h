@@ -42,6 +42,7 @@
 #include <vector>
 #include <array>
 #include <numeric>
+#include <initializer_list>
 
 namespace btk
 {
@@ -103,19 +104,19 @@ namespace btk
     void resize(unsigned samples);
   
   private:
-    double& data(unsigned sample, std::vector<unsigned>&& indices) noexcept;
+    double& data(unsigned sample, std::initializer_list<unsigned>&& indices) const noexcept;
   };
   
   template <typename... Is>
   inline double TimeSequence::data(unsigned sample, Is... indices) const noexcept
   {
-    return this->data(sample,{static_cast<unsigned>(indices)...});
+    return this->data(sample, {static_cast<unsigned>(indices)...});
   };
   
   template <typename... Is>
   inline double& TimeSequence::data(unsigned sample, Is... indices) noexcept
   {
-    return this->data(sample,{static_cast<unsigned>(indices)...});
+    return this->data(sample, {static_cast<unsigned>(indices)...});
   };
 };
 
