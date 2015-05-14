@@ -39,7 +39,7 @@
 #include "btkOpaque.h"
 #include "btkEndianFormat.h"
 #include "btkException.h"
-#include "btkOption.h"
+#include "btkIOHandlerOption.h"
 #include "btkLogger.h"
 
 #include <list>
@@ -72,9 +72,9 @@ namespace btk
     enum class Encoding : int {Text = 0x01, Binary, Mix = Text|Binary};
     enum class DataStorage : int {NotApplicable, Integer, Float};
 
-    using EncodingFormat = Option<_btk_IOHandler_Encoding,Encoding>;
-    using ByteOrderFormat = Option<_btk_IOHandler_ByteOrder,ByteOrder>;
-    using DataStorageFormat = Option<_btk_IOHandler_DataStorage,DataStorage>;
+    using EncodingFormat = IOHandlerOption<_btk_IOHandler_Encoding,Encoding>;
+    using ByteOrderFormat = IOHandlerOption<_btk_IOHandler_ByteOrder,ByteOrder>;
+    using DataStorageFormat = IOHandlerOption<_btk_IOHandler_DataStorage,DataStorage>;
     
     virtual ~IOHandler() noexcept;
     

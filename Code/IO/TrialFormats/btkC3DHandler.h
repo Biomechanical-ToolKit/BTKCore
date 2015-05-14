@@ -51,7 +51,7 @@ namespace btk
   public:
     enum class AnalogStorage : int {Signed, Unsigned};
     
-    using AnalogStorageFormat = Option<_btk_C3DHandler_AnalogStorage,AnalogStorage>;
+    using AnalogStorageFormat = IOHandlerOption<_btk_C3DHandler_AnalogStorage,AnalogStorage>;
     
     C3DHandler();
     ~C3DHandler() noexcept;

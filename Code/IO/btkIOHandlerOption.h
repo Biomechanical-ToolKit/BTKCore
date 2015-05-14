@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkOption_h
-#define __btkOption_h
+#ifndef __btkIOHandlerOption_h
+#define __btkIOHandlerOption_h
 
 #include "btkLogger.h"
 
@@ -104,19 +104,19 @@ namespace btk
   };
   
   template <const char* S, typename V>
-  class Option
+  class IOHandlerOption
   {
   public:
     using Format = V;
     
     static inline constexpr const char* name() noexcept {return S;};
     
-    Option() = delete;
-    ~Option() noexcept = delete;
-    Option(const Option& ) = delete;
-    Option(Option&& ) noexcept = delete;
-    Option& operator=(const Option& ) = delete;
-    Option& operator=(Option&& ) noexcept = delete;
+    IOHandlerOption() = delete;
+    ~IOHandlerOption() noexcept = delete;
+    IOHandlerOption(const IOHandlerOption& ) = delete;
+    IOHandlerOption(IOHandlerOption&& ) noexcept = delete;
+    IOHandlerOption& operator=(const IOHandlerOption& ) = delete;
+    IOHandlerOption& operator=(IOHandlerOption&& ) noexcept = delete;
     
     template <V... vs>
     class Details
