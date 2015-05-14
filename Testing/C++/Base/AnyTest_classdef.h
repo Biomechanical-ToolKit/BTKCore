@@ -17,16 +17,20 @@ struct Foo
   friend bool operator==(const Foo& lhs,const Foo& rhs) {return ((lhs.Bar1 == rhs.Bar1) && (lhs.Bar2 == rhs.Bar2));};
 };
 
-template<>
-struct btk::Any::Helper<std::string,Date>
+// THE SPECIALIZATION MUST BE WRAPPED IN THE NAMESPACE. THE LATER CANNOT BE PASSED DIRECTLY IN THE FUNCTION DEFINITION
+namespace btk
 {
-  static inline Date convert(const std::string& ) {return Date{2009,05,02};};
-};
+  template<>
+  struct Any::Helper<std::string,Date>
+  {
+    static inline Date convert(const std::string& ) {return Date{2009,05,02};};
+  };
 
-template<>
-struct btk::Any::Helper<Date,std::string>
-{
-  static inline std::string convert(const Date& val) {return std::to_string(val.Year) + "-" + std::to_string(val.Month) + "-" + std::to_string(val.Day);};
+  template<>
+  struct btk::Any::Helper<Date,std::string>
+  {
+    static inline std::string convert(const Date& val) {return std::to_string(val.Year) + "-" + std::to_string(val.Month) + "-" + std::to_string(val.Day);};
+  };
 };
 
 #endif
