@@ -42,90 +42,35 @@
 #include <tuple>
 #include <array>
 
-// Note: This is a large macro but all the code is inlined.
 #define BTK_DECLARE_IOHANDLER_OPTIONS(...) \
   public: \
-    class _Options \
-    { \
-      static inline auto make_options() -> decltype(std::make_tuple(__VA_ARGS__)) \
-      { \
-        return std::make_tuple(__VA_ARGS__); \
-      } \
-    public: \
-      using _Tuple = decltype(_Options::make_options()); \
-      _Tuple Tuple; \
-      _Options() : Tuple(_Options::make_options()) {}; \
-      ~_Options() = default; \
-      _Options(const _Options& ) = delete; \
-      _Options(_Options&& ) noexcept = delete; \
-      _Options& operator=(const _Options& ) = delete; \
-      _Options& operator=(const _Options&& ) noexcept = delete; \
-      template<class T, size_t I, size_t N> \
-      struct iterate \
-      { \
-        static inline void extract_name(std::vector<const char*>* output) \
-        { \
-          output->operator[](I) = std::tuple_element<I,T>::type::name(); \
-          iterate<T,I+1,N>::extract_name(output); \
-        }; \
-        static inline std::vector<const char*> extract_choices(const char* option) \
-        { \
-          using _Elt = typename std::tuple_element<I,T>::type; \
-          if (strcmp(_Elt::name(),option) == 0) \
-            return _Elt::choices(); \
-          else \
-            return iterate<T,I+1,N>::extract_choices(option); \
-        }; \
-        static inline void get_value(const T* tuple, const char* option, void* value) \
-        { \
-          using _Elt = typename std::tuple_element<I,T>::type; \
-          if (strcmp(_Elt::name(),option) == 0) \
-            *static_cast<typename _Elt::Format*>(value) = std::get<I>(*tuple).value(); \
-          else \
-            iterate<T,I+1,N>::get_value(tuple, option, value); \
-        }; \
-        static inline void set_value(T* tuple, const char* option, const void* value) \
-        { \
-          using _Elt = typename std::tuple_element<I,T>::type; \
-          if (strcmp(_Elt::name(),option) == 0) \
-            std::get<I>(*tuple).setValue(*static_cast<const typename _Elt::Format*>(value)); \
-          else \
-            iterate<T,I+1,N>::set_value(tuple, option, value); \
-        }; \
-      }; \
-      template<class T, size_t N> \
-      struct iterate<T,N,N> \
-      { \
-        static inline void extract_name(std::vector<const char*>* ) {}; \
-        static inline std::vector<const char*> extract_choices(const char* ) {return std::vector<const char*>();}; \
-        static inline void get_value(const T* , const char* , void* ) {}; \
-        static inline void set_value(T* , const char* , const void* ) {}; \
-      }; \
-    }; \
     virtual std::vector<const char*> availableOptions() const noexcept override \
     { \
       using _TupleSize = std::tuple_size<_Options::_Tuple>; \
       std::vector<const char*> options(_TupleSize::value); \
-      _Options::iterate<_Options::_Tuple,0,_TupleSize::value>::extract_name(&options); \
+      __details::_IOHandler_options_iterate<_Options::_Tuple,0,_TupleSize::value>::extract_name(&options); \
       return options; \
     }; \
     virtual std::vector<const char*> availableOptionChoices(const char* option) const noexcept override \
     { \
       using _TupleSize = std::tuple_size<_Options::_Tuple>; \
-      return _Options::iterate<_Options::_Tuple,0,_TupleSize::value>::extract_choices(option); \
+      return __details::_IOHandler_options_iterate<_Options::_Tuple,0,_TupleSize::value>::extract_choices(option); \
     }; \
     virtual void option(const char* option, void* value) const noexcept override \
     { \
       using _TupleSize = std::tuple_size<_Options::_Tuple>; \
-      _Options::iterate<_Options::_Tuple,0,_TupleSize::value>::get_value(&(this->Options.Tuple),option,value); \
+      __details::_IOHandler_options_iterate<_Options::_Tuple,0,_TupleSize::value>::get_value(&(this->m_Options.Tuple),option,value); \
     }; \
     virtual void setOption(const char* option, const void* value) noexcept override \
     { \
       using _TupleSize = std::tuple_size<_Options::_Tuple>; \
-      _Options::iterate<_Options::_Tuple,0,_TupleSize::value>::set_value(&(this->Options.Tuple),option,value); \
+      __details::_IOHandler_options_iterate<_Options::_Tuple,0,_TupleSize::value>::set_value(&(this->m_Options.Tuple),option,value); \
     }; \
-    _Options Options; \
-  private:
+  private: \
+    struct _Options : __details::_IOHandler_options<decltype(std::make_tuple(__VA_ARGS__))> \
+    { \
+      _Options() : __details::_IOHandler_options<decltype(std::make_tuple(__VA_ARGS__))>(std::make_tuple(__VA_ARGS__)) {}; \
+    } m_Options;
 
 namespace btk
 {
@@ -212,6 +157,68 @@ namespace btk
       
     private:
       V Value;
+    };
+  };
+  
+  namespace __details
+  {
+    template<typename T>
+    struct _IOHandler_options
+    {
+      using _Tuple = T;
+      _Tuple Tuple;
+      _IOHandler_options(T&& t) : Tuple(std::forward<T>(t)) {};
+      ~_IOHandler_options() = default;
+      _IOHandler_options(const _IOHandler_options& ) = delete;
+      _IOHandler_options(_IOHandler_options&& ) noexcept = delete;
+      _IOHandler_options& operator=(const _IOHandler_options& ) = delete;
+      _IOHandler_options& operator=(const _IOHandler_options&& ) noexcept = delete;
+    };
+    
+    template<class T, size_t I, size_t N>
+    struct _IOHandler_options_iterate
+    {
+      static inline void extract_name(std::vector<const char*>* output)
+      {
+        output->operator[](I) = std::tuple_element<I,T>::type::name();
+        _IOHandler_options_iterate<T,I+1,N>::extract_name(output);
+      };
+      
+      static inline std::vector<const char*> extract_choices(const char* option)
+      {
+        using _Elt = typename std::tuple_element<I,T>::type;
+        if (strcmp(_Elt::name(),option) == 0)
+          return _Elt::choices();
+        else
+          return _IOHandler_options_iterate<T,I+1,N>::extract_choices(option);
+      };
+      
+      static inline void get_value(const T* tuple, const char* option, void* value)
+      {
+        using _Elt = typename std::tuple_element<I,T>::type;
+        if (strcmp(_Elt::name(),option) == 0)
+          *static_cast<typename _Elt::Format*>(value) = std::get<I>(*tuple).value();
+        else
+          _IOHandler_options_iterate<T,I+1,N>::get_value(tuple, option, value);
+      };
+      
+      static inline void set_value(T* tuple, const char* option, const void* value)
+      {
+        using _Elt = typename std::tuple_element<I,T>::type;
+        if (strcmp(_Elt::name(),option) == 0)
+          std::get<I>(*tuple).setValue(*static_cast<const typename _Elt::Format*>(value));
+        else
+          _IOHandler_options_iterate<T,I+1,N>::set_value(tuple, option, value);
+      };
+    };
+    
+    template<class T, size_t N>
+    struct _IOHandler_options_iterate<T,N,N>
+    {
+      static inline void extract_name(std::vector<const char*>* ) {};
+      static inline std::vector<const char*> extract_choices(const char* ) {return std::vector<const char*>();};
+      static inline void get_value(const T* , const char* , void* ) {};
+      static inline void set_value(T* , const char* , const void* ) {};
     };
   };
   
