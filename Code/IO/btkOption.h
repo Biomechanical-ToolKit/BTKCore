@@ -82,7 +82,7 @@
           if (strcmp(_Elt::name(),option) == 0) \
             *static_cast<typename _Elt::Format*>(value) = std::get<I>(*tuple).value(); \
           else \
-            return iterate<T,I+1,N>::get_value(tuple, option, value); \
+            iterate<T,I+1,N>::get_value(tuple, option, value); \
         }; \
         static inline void set_value(T* tuple, const char* option, const void* value) \
         { \
@@ -90,7 +90,7 @@
           if (strcmp(_Elt::name(),option) == 0) \
             std::get<I>(*tuple).setValue(*static_cast<const typename _Elt::Format*>(value)); \
           else \
-            return iterate<T,I+1,N>::set_value(tuple, option, value); \
+            iterate<T,I+1,N>::set_value(tuple, option, value); \
         }; \
       }; \
       template<class T, size_t N> \
@@ -117,12 +117,12 @@
     virtual void option(const char* option, void* value) const noexcept override \
     { \
       using _TupleSize = std::tuple_size<_Options::_Tuple>; \
-      return _Options::iterate<_Options::_Tuple,0,_TupleSize::value>::get_value(&(this->Options.Tuple),option,value); \
+      _Options::iterate<_Options::_Tuple,0,_TupleSize::value>::get_value(&(this->Options.Tuple),option,value); \
     }; \
     virtual void setOption(const char* option, const void* value) noexcept override \
     { \
       using _TupleSize = std::tuple_size<_Options::_Tuple>; \
-      return _Options::iterate<_Options::_Tuple,0,_TupleSize::value>::set_value(&(this->Options.Tuple),option,value); \
+      _Options::iterate<_Options::_Tuple,0,_TupleSize::value>::set_value(&(this->Options.Tuple),option,value); \
     }; \
     _Options Options; \
   private:
