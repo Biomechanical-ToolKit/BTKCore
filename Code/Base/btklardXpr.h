@@ -440,8 +440,8 @@ namespace lard
     template <typename U, typename V, typename W, typename O> Motion(const Base<U>& u, const Base<V>& v, const Base<W>& w, const Base<O>& o);
     template <typename U> Motion(const Base<U>& other);
     
-    auto orientations() const noexcept -> decltype(this->m_Values.topLeftCorner(this->m_Values.rows(),Array<9>::Values::ColsAtCompileTime)) {return this->m_Values.topLeftCorner(this->rows(),Orientations::ColsAtCompileTime);};
-    auto positions() const noexcept -> decltype(this->m_Values.topRightCorner(this->m_Values.rows(),Array<9>::Values::ColsAtCompileTime)) {return this->m_Values.topRightCorner(this->rows(),Positions::ColsAtCompileTime);};
+    const Eigen::Block<const Array<12>::Values> orientations() const noexcept {return this->m_Values.topLeftCorner(this->rows(),Orientations::ColsAtCompileTime);};
+    const Eigen::Block<const Array<12>::Values> positions() const noexcept {return this->m_Values.topRightCorner(this->rows(),Positions::ColsAtCompileTime);};
   };
   
 
