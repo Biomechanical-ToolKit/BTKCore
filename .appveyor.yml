@@ -114,7 +114,7 @@ os:
 # # scripts that run after cloning repository
 install:
   - ps: |
-        if ($env:os -eq "Windows Server 2012 R2") {
+        if ($env:os -ne "MinGW") {
           $env:Path += ";C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC"
           if ($env:platform -eq "x86") {
             vcvarsall x86
