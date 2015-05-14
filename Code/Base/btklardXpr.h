@@ -91,11 +91,8 @@ namespace lard
     using Values = typename Traits<Derived>::Values;
     using Residuals = typename Traits<Derived>::Residuals;
     using Index = typename Traits<Derived>::Index;
-    enum : int
-    {
-      ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime,
-      Processing = Traits<Derived>::Processing
-    };
+    static constexpr int ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime;
+    static constexpr int Processing = Traits<Derived>::Processing;
   };
   
   template <int Cols>
@@ -104,11 +101,8 @@ namespace lard
     using Values = Eigen::Array<double,Eigen::Dynamic,Cols>;
     using Residuals = Eigen::Array<double,Eigen::Dynamic,1>;
     using Index = typename Values::Index;
-    enum : int
-    {
-      ColsAtCompileTime = Cols,
-      Processing = None
-    };
+    static constexpr int ColsAtCompileTime = Cols;
+    static constexpr int Processing = None;
   };
   
   template <>
@@ -122,11 +116,8 @@ namespace lard
     using Residuals = Eigen::Map<typename Traits<Derived>::Residuals>;
     using Index = typename Values::Index;
     using Scalar = typename Values::Scalar;
-    enum : int
-    {
-      ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime,
-      Processing = None
-    };
+    static constexpr int ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime;
+    static constexpr int Processing = None;
   };
   
   template <typename Derived>
@@ -136,11 +127,8 @@ namespace lard
     using Residuals = Eigen::Map<const typename Traits<Derived>::Residuals>;
     using Index = typename Values::Index;
     using Scalar = const typename Values::Scalar;
-    enum : int
-    {
-      ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime,
-      Processing = None
-    };
+    static constexpr int ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime;
+    static constexpr int Processing = None;
   };
   
   template <typename Xpr, int Cols>
@@ -149,11 +137,8 @@ namespace lard
     using Values = typename Traits<Array<Cols>>::Values;
     using Residuals = typename Traits<Array<Cols>>::Residuals;
     using Index = typename Values::Index;
-    enum : int
-    {
-      ColsAtCompileTime = Cols,
-      Processing = Traits<typename std::remove_const<Xpr>::type>::Processing
-    };
+    static constexpr int ColsAtCompileTime = Cols;
+    static constexpr int Processing = Traits<typename std::remove_const<Xpr>::type>::Processing;
   };
  
   template <typename Derived, typename Xpr>
@@ -162,11 +147,8 @@ namespace lard
     using Values = typename Traits<Xpr>::Values;
     using Residuals = typename Traits<Xpr>::Residuals;
     using Index = typename Values::Index;
-    enum : int
-    {
-      ColsAtCompileTime = Traits<Xpr>::ColsAtCompileTime,
-      Processing = Traits<Derived>::Processing
-    };
+    static constexpr int ColsAtCompileTime = Traits<Xpr>::ColsAtCompileTime;
+    static constexpr int Processing = Traits<Derived>::Processing;
   };
   
   template <typename Derived, typename XprOne, typename XprTwo>
@@ -175,11 +157,8 @@ namespace lard
     using Values = typename Traits<XprOne>::Values;
     using Residuals = typename Traits<XprOne>::Residuals;
     using Index = typename Values::Index;
-    enum : int
-    {
-      ColsAtCompileTime = Traits<XprTwo>::ColsAtCompileTime, // XprTwo to have the good number of columns after some operation like TransformOp
-      Processing = Traits<Derived>::Processing
-    };
+    static constexpr int  ColsAtCompileTime = Traits<XprTwo>::ColsAtCompileTime; // XprTwo to have the good number of columns after some operation like TransformOp
+    static constexpr int Processing = Traits<Derived>::Processing;
   };
   
   // NOTE : Traits specialization for each operation is declared before this one
@@ -202,11 +181,8 @@ namespace lard
   public:
     using DerivedType = typename std::remove_const<Derived>::type;
     using Index = typename Traits<DerivedType>::Index;
-    enum : int
-    {
-      ColsAtCompileTime = Traits<DerivedType>::ColsAtCompileTime,
-      Processing = Traits<DerivedType>::Processing
-    };
+    static constexpr int ColsAtCompileTime = Traits<DerivedType>::ColsAtCompileTime;
+    static constexpr int Processing = Traits<DerivedType>::Processing;
     
     operator Derived& () noexcept {return static_cast<Derived&>(*this);};
     operator const Derived& () const noexcept {return static_cast<const Derived&>(*this);};
@@ -686,10 +662,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<NormOp<Xpr>>
   {
-    enum : int
-    {
-      Processing = ValuesOnly,
-    };
+    static constexpr int Processing = ValuesOnly;
   };
   
   template <typename Xpr>
@@ -698,11 +671,8 @@ namespace lard
     using Values = typename Traits<Xpr>::Values;
     using Residuals = typename Traits<Xpr>::Residuals;
     using Index = typename Values::Index;
-    enum : int
-    {
-      ColsAtCompileTime = 1,
-      Processing = Traits<NormOp<Xpr>>::Processing
-    };
+    static constexpr int ColsAtCompileTime = 1;
+    static constexpr int Processing = Traits<NormOp<Xpr>>::Processing;
   };
 
   template <typename Xpr>
@@ -739,10 +709,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<MeanOp<Xpr>>
   {
-    enum : int
-    {
-      Processing = Full,
-    };
+    static constexpr int Processing = Full;
   };
 
   template <typename Xpr>
@@ -780,10 +747,7 @@ namespace lard
   template <typename XprOne, typename XprTwo>
   struct Traits<DifferenceOp<XprOne,XprTwo>>
   {
-    enum : int
-    {
-      Processing = Full,
-    };
+    static constexpr int Processing = Full;
   };
 
   template <typename XprOne, typename XprTwo>
@@ -818,10 +782,7 @@ namespace lard
   template <typename XprOne, typename XprTwo>
   struct Traits<SumOp<XprOne,XprTwo>>
   {
-    enum : int
-    {
-      Processing = Full,
-    };
+    static constexpr int Processing = Full;
   };
 
   template <typename XprOne, typename XprTwo>
@@ -856,10 +817,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<ScaleOp<Xpr>>
   {
-    enum : int
-    {
-      Processing = ValuesOnly,
-    };
+    static constexpr int Processing = ValuesOnly;
   };
 
   template <typename Xpr>
@@ -892,10 +850,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<NormalizedOp<Xpr>>
   {
-    enum : int
-    {
-      Processing = ValuesOnly,
-    };
+    static constexpr int Processing = ValuesOnly;
   };
   
   template <typename Xpr>
@@ -935,10 +890,7 @@ namespace lard
   template <typename XprOne, typename XprTwo>
   struct Traits<CrossOp<XprOne,XprTwo>>
   {
-    enum : int
-    {
-      Processing = Full,
-    };
+    static constexpr int Processing = Full;
   };
   
   template <typename XprOne, typename XprTwo>
@@ -983,10 +935,7 @@ namespace lard
   template <typename XprOne, typename XprTwo>
   struct Traits<TransformOp<XprOne,XprTwo>>
   {
-    enum : int
-    {
-      Processing = Full,
-    };
+    static constexpr int Processing = Full;
   };
   
   template <typename XprOne, typename XprTwo>
@@ -1026,10 +975,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<ReplicateOp<Xpr>>
   {
-    enum : int
-    {
-      Processing = None,
-    };
+    static constexpr int Processing = None;
   };
   
   template <typename Xpr>
@@ -1068,10 +1014,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<InverseOp<Xpr>>
   {
-    enum : int
-    {
-      Processing = ValuesOnly,
-    };
+    static constexpr int Processing = ValuesOnly;
   };
   
   template <typename Xpr>
@@ -1111,10 +1054,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<EulerAnglesOp<Xpr>>
   {
-    enum : int
-    {
-      Processing = ValuesOnly,
-    };
+    static constexpr int Processing = ValuesOnly;
   };
   
   template <typename Xpr>
@@ -1123,11 +1063,8 @@ namespace lard
     using Values = typename Traits<Xpr>::Values;
     using Residuals = typename Traits<Xpr>::Residuals;
     using Index = typename Values::Index;
-    enum : int
-    {
-      ColsAtCompileTime = 3,
-      Processing = Traits<EulerAnglesOp<Xpr>>::Processing
-    };
+    static constexpr int ColsAtCompileTime = 3;
+    static constexpr int Processing = Traits<EulerAnglesOp<Xpr>>::Processing;
   }; 
   
   template <typename Xpr>

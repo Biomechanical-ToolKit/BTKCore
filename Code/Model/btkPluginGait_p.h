@@ -186,11 +186,8 @@ namespace btk
       using Values = typename Array<3>::Values;
       using Residuals = typename Array<3>::Residuals;
       using Index = typename Values::Index;
-      enum : int
-      {
-        ColsAtCompileTime = 3,
-        Processing = Full
-      };
+      static constexpr int ColsAtCompileTime = 3;
+      static constexpr int Processing = Full;
     };
   };
   
