@@ -444,7 +444,6 @@ namespace lard
     const Eigen::Block<const Array<12>::Values> positions() const noexcept {return this->m_Values.topRightCorner(this->rows(),Positions::ColsAtCompileTime);};
   };
   
-
   /**
    * Default constructor
    */
