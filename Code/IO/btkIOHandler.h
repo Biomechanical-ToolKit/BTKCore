@@ -41,6 +41,7 @@
 #include "btkException.h"
 #include "btkIOHandlerOption.h"
 #include "btkLogger.h"
+#include "btkMacros.h" // _BTK_CONSTEXPR
 
 #include <list>
 #include <string>
@@ -48,9 +49,9 @@
 #include <vector>
 #include <type_traits> // std::is_same
 
-static constexpr const char _btk_IOHandler_Encoding[] = "Encoding";
-static constexpr const char _btk_IOHandler_ByteOrder[] = "ByteOrder";
-static constexpr const char _btk_IOHandler_DataStorage[] = "DataStorage";
+static _BTK_CONSTEXPR const char _btk_IOHandler_Encoding[] = "Encoding";
+static _BTK_CONSTEXPR const char _btk_IOHandler_ByteOrder[] = "ByteOrder";
+static _BTK_CONSTEXPR const char _btk_IOHandler_DataStorage[] = "DataStorage";
 
 namespace btk
 {
@@ -131,7 +132,7 @@ namespace btk
   
   // ----------------------------------------------------------------------- //
   
-  inline constexpr IOHandler::Capability operator& (IOHandler::Capability lhs, IOHandler::Capability rhs)
+  inline _BTK_CONSTEXPR IOHandler::Capability operator& (IOHandler::Capability lhs, IOHandler::Capability rhs)
   {
     return static_cast<IOHandler::Capability>(static_cast<int>(lhs) & static_cast<int>(rhs));
   };
@@ -141,61 +142,61 @@ namespace btk
   template <>
   struct stringify_option_value<IOHandler::Encoding,IOHandler::Encoding::Binary>
   {
-    static constexpr const char* c_str = "Binary";
+    static _BTK_CONSTEXPR const char* c_str = "Binary";
   };
 
   template <>
   struct stringify_option_value<IOHandler::Encoding,IOHandler::Encoding::Text>
   {
-    static constexpr const char* c_str = "Text";
+    static _BTK_CONSTEXPR const char* c_str = "Text";
   };
   
   template <>
   struct stringify_option_value<IOHandler::Encoding,IOHandler::Encoding::Mix>
   {
-    static constexpr const char* c_str = "Mix";
+    static _BTK_CONSTEXPR const char* c_str = "Mix";
   };
   
   template <>
   struct stringify_option_value<IOHandler::ByteOrder,IOHandler::ByteOrder::VAXLittleEndian>
   {
-    static constexpr const char* c_str = "VAXLittleEndian";
+    static _BTK_CONSTEXPR const char* c_str = "VAXLittleEndian";
   };
 
   template <>
   struct stringify_option_value<IOHandler::ByteOrder,IOHandler::ByteOrder::IEEELittleEndian>
   {
-    static constexpr const char* c_str = "IEEELittleEndian";
+    static _BTK_CONSTEXPR const char* c_str = "IEEELittleEndian";
   };
   
   template <>
   struct stringify_option_value<IOHandler::ByteOrder,IOHandler::ByteOrder::IEEEBigEndian>
   {
-    static constexpr const char* c_str = "IEEEBigEndian";
+    static _BTK_CONSTEXPR const char* c_str = "IEEEBigEndian";
   };
   
   template <>
   struct stringify_option_value<IOHandler::ByteOrder,IOHandler::ByteOrder::NotApplicable>
   {
-    static constexpr const char* c_str = "NotApplicable";
+    static _BTK_CONSTEXPR const char* c_str = "NotApplicable";
   };
   
   template <>
   struct stringify_option_value<IOHandler::DataStorage,IOHandler::DataStorage::NotApplicable>
   {
-    static constexpr const char* c_str = "NotApplicable";
+    static _BTK_CONSTEXPR const char* c_str = "NotApplicable";
   };
   
   template <>
   struct stringify_option_value<IOHandler::DataStorage,IOHandler::DataStorage::Integer>
   {
-    static constexpr const char* c_str = "Integer";
+    static _BTK_CONSTEXPR const char* c_str = "Integer";
   };
   
   template <>
   struct stringify_option_value<IOHandler::DataStorage,IOHandler::DataStorage::Float>
   {
-    static constexpr const char* c_str = "Float";
+    static _BTK_CONSTEXPR const char* c_str = "Float";
   };
   
   // ----------------------------------------------------------------------- //

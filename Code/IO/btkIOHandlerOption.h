@@ -37,6 +37,7 @@
 #define __btkIOHandlerOption_h
 
 #include "btkLogger.h"
+#include "btkMacros.h" // _BTK_CONSTEXPR
 
 #include <vector>
 #include <tuple>
@@ -110,7 +111,7 @@ namespace btk
   public:
     using Format = V;
     
-    static inline constexpr const char* name() noexcept {return S;};
+    static inline _BTK_CONSTEXPR const char* name() noexcept {return S;};
     
     IOHandlerOption() = delete;
     ~IOHandlerOption() noexcept = delete;
@@ -125,7 +126,7 @@ namespace btk
     public:
       using Format = V;
 
-      static inline constexpr const char* name() noexcept {return S;};
+      static inline _BTK_CONSTEXPR const char* name() noexcept {return S;};
       static inline std::vector<const char*> choices() noexcept {return {stringify_option_value<V,vs>::c_str...};};
     
       Details(V&& v)
@@ -135,8 +136,8 @@ namespace btk
       inline const V& value() const noexcept {return this->Value;};
       inline void setValue(const V& value) noexcept
       {
-        constexpr size_t num = sizeof...(vs);
-        constexpr std::array<V,num> choices{{vs...}};
+        _BTK_CONSTEXPR size_t num = sizeof...(vs);
+        _BTK_CONSTEXPR std::array<V,num> choices{{vs...}};
         for (size_t i = 0 ; i < num ; ++i)
         {
           if (choices[i] == value)

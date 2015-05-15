@@ -37,6 +37,7 @@
 #define __btklardXpr_h
 
 #include "btkConfigure.h" // Must be included before any Eigen header
+#include "btkMacros.h" // _BTK_CONSTEXPR
 
 #include <Eigen/Core>
 
@@ -91,8 +92,8 @@ namespace lard
     using Values = typename Traits<Derived>::Values;
     using Residuals = typename Traits<Derived>::Residuals;
     using Index = typename Traits<Derived>::Index;
-    static constexpr int ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime;
-    static constexpr int Processing = Traits<Derived>::Processing;
+    static _BTK_CONSTEXPR int ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime;
+    static _BTK_CONSTEXPR int Processing = Traits<Derived>::Processing;
   };
   
   template <int Cols>
@@ -101,8 +102,8 @@ namespace lard
     using Values = Eigen::Array<double,Eigen::Dynamic,Cols>;
     using Residuals = Eigen::Array<double,Eigen::Dynamic,1>;
     using Index = typename Values::Index;
-    static constexpr int ColsAtCompileTime = Cols;
-    static constexpr int Processing = None;
+    static _BTK_CONSTEXPR int ColsAtCompileTime = Cols;
+    static _BTK_CONSTEXPR int Processing = None;
   };
   
   template <>
@@ -116,8 +117,8 @@ namespace lard
     using Residuals = Eigen::Map<typename Traits<Derived>::Residuals>;
     using Index = typename Values::Index;
     using Scalar = typename Values::Scalar;
-    static constexpr int ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime;
-    static constexpr int Processing = None;
+    static _BTK_CONSTEXPR int ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime;
+    static _BTK_CONSTEXPR int Processing = None;
   };
   
   template <typename Derived>
@@ -127,8 +128,8 @@ namespace lard
     using Residuals = Eigen::Map<const typename Traits<Derived>::Residuals>;
     using Index = typename Values::Index;
     using Scalar = const typename Values::Scalar;
-    static constexpr int ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime;
-    static constexpr int Processing = None;
+    static _BTK_CONSTEXPR int ColsAtCompileTime = Traits<Derived>::ColsAtCompileTime;
+    static _BTK_CONSTEXPR int Processing = None;
   };
   
   template <typename Xpr, int Cols>
@@ -137,8 +138,8 @@ namespace lard
     using Values = typename Traits<Array<Cols>>::Values;
     using Residuals = typename Traits<Array<Cols>>::Residuals;
     using Index = typename Values::Index;
-    static constexpr int ColsAtCompileTime = Cols;
-    static constexpr int Processing = Traits<typename std::remove_const<Xpr>::type>::Processing;
+    static _BTK_CONSTEXPR int ColsAtCompileTime = Cols;
+    static _BTK_CONSTEXPR int Processing = Traits<typename std::remove_const<Xpr>::type>::Processing;
   };
  
   template <typename Derived, typename Xpr>
@@ -147,8 +148,8 @@ namespace lard
     using Values = typename Traits<Xpr>::Values;
     using Residuals = typename Traits<Xpr>::Residuals;
     using Index = typename Values::Index;
-    static constexpr int ColsAtCompileTime = Traits<Xpr>::ColsAtCompileTime;
-    static constexpr int Processing = Traits<Derived>::Processing;
+    static _BTK_CONSTEXPR int ColsAtCompileTime = Traits<Xpr>::ColsAtCompileTime;
+    static _BTK_CONSTEXPR int Processing = Traits<Derived>::Processing;
   };
   
   template <typename Derived, typename XprOne, typename XprTwo>
@@ -157,8 +158,8 @@ namespace lard
     using Values = typename Traits<XprOne>::Values;
     using Residuals = typename Traits<XprOne>::Residuals;
     using Index = typename Values::Index;
-    static constexpr int  ColsAtCompileTime = Traits<XprTwo>::ColsAtCompileTime; // XprTwo to have the good number of columns after some operation like TransformOp
-    static constexpr int Processing = Traits<Derived>::Processing;
+    static _BTK_CONSTEXPR int  ColsAtCompileTime = Traits<XprTwo>::ColsAtCompileTime; // XprTwo to have the good number of columns after some operation like TransformOp
+    static _BTK_CONSTEXPR int Processing = Traits<Derived>::Processing;
   };
   
   // NOTE : Traits specialization for each operation is declared before this one
@@ -181,8 +182,8 @@ namespace lard
   public:
     using DerivedType = typename std::remove_const<Derived>::type;
     using Index = typename Traits<DerivedType>::Index;
-    static constexpr int ColsAtCompileTime = Traits<DerivedType>::ColsAtCompileTime;
-    static constexpr int Processing = Traits<DerivedType>::Processing;
+    static _BTK_CONSTEXPR int ColsAtCompileTime = Traits<DerivedType>::ColsAtCompileTime;
+    static _BTK_CONSTEXPR int Processing = Traits<DerivedType>::Processing;
     
     operator Derived& () noexcept {return static_cast<Derived&>(*this);};
     operator const Derived& () const noexcept {return static_cast<const Derived&>(*this);};
@@ -661,7 +662,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<NormOp<Xpr>>
   {
-    static constexpr int Processing = ValuesOnly;
+    static _BTK_CONSTEXPR int Processing = ValuesOnly;
   };
   
   template <typename Xpr>
@@ -670,8 +671,8 @@ namespace lard
     using Values = typename Traits<Xpr>::Values;
     using Residuals = typename Traits<Xpr>::Residuals;
     using Index = typename Values::Index;
-    static constexpr int ColsAtCompileTime = 1;
-    static constexpr int Processing = Traits<NormOp<Xpr>>::Processing;
+    static _BTK_CONSTEXPR int ColsAtCompileTime = 1;
+    static _BTK_CONSTEXPR int Processing = Traits<NormOp<Xpr>>::Processing;
   };
 
   template <typename Xpr>
@@ -708,7 +709,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<MeanOp<Xpr>>
   {
-    static constexpr int Processing = Full;
+    static _BTK_CONSTEXPR int Processing = Full;
   };
 
   template <typename Xpr>
@@ -746,7 +747,7 @@ namespace lard
   template <typename XprOne, typename XprTwo>
   struct Traits<DifferenceOp<XprOne,XprTwo>>
   {
-    static constexpr int Processing = Full;
+    static _BTK_CONSTEXPR int Processing = Full;
   };
 
   template <typename XprOne, typename XprTwo>
@@ -781,7 +782,7 @@ namespace lard
   template <typename XprOne, typename XprTwo>
   struct Traits<SumOp<XprOne,XprTwo>>
   {
-    static constexpr int Processing = Full;
+    static _BTK_CONSTEXPR int Processing = Full;
   };
 
   template <typename XprOne, typename XprTwo>
@@ -816,7 +817,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<ScaleOp<Xpr>>
   {
-    static constexpr int Processing = ValuesOnly;
+    static _BTK_CONSTEXPR int Processing = ValuesOnly;
   };
 
   template <typename Xpr>
@@ -849,7 +850,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<NormalizedOp<Xpr>>
   {
-    static constexpr int Processing = ValuesOnly;
+    static _BTK_CONSTEXPR int Processing = ValuesOnly;
   };
   
   template <typename Xpr>
@@ -889,7 +890,7 @@ namespace lard
   template <typename XprOne, typename XprTwo>
   struct Traits<CrossOp<XprOne,XprTwo>>
   {
-    static constexpr int Processing = Full;
+    static _BTK_CONSTEXPR int Processing = Full;
   };
   
   template <typename XprOne, typename XprTwo>
@@ -934,7 +935,7 @@ namespace lard
   template <typename XprOne, typename XprTwo>
   struct Traits<TransformOp<XprOne,XprTwo>>
   {
-    static constexpr int Processing = Full;
+    static _BTK_CONSTEXPR int Processing = Full;
   };
   
   template <typename XprOne, typename XprTwo>
@@ -974,7 +975,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<ReplicateOp<Xpr>>
   {
-    static constexpr int Processing = None;
+    static _BTK_CONSTEXPR int Processing = None;
   };
   
   template <typename Xpr>
@@ -1013,7 +1014,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<InverseOp<Xpr>>
   {
-    static constexpr int Processing = ValuesOnly;
+    static _BTK_CONSTEXPR int Processing = ValuesOnly;
   };
   
   template <typename Xpr>
@@ -1053,7 +1054,7 @@ namespace lard
   template <typename Xpr>
   struct Traits<EulerAnglesOp<Xpr>>
   {
-    static constexpr int Processing = ValuesOnly;
+    static _BTK_CONSTEXPR int Processing = ValuesOnly;
   };
   
   template <typename Xpr>
@@ -1062,8 +1063,8 @@ namespace lard
     using Values = typename Traits<Xpr>::Values;
     using Residuals = typename Traits<Xpr>::Residuals;
     using Index = typename Values::Index;
-    static constexpr int ColsAtCompileTime = 3;
-    static constexpr int Processing = Traits<EulerAnglesOp<Xpr>>::Processing;
+    static _BTK_CONSTEXPR int ColsAtCompileTime = 3;
+    static _BTK_CONSTEXPR int Processing = Traits<EulerAnglesOp<Xpr>>::Processing;
   }; 
   
   template <typename Xpr>

@@ -111,13 +111,13 @@ namespace btk
   template <>
   struct stringify_option_value<C3DHandler::AnalogStorage,C3DHandler::AnalogStorage::Signed>
   {
-    static constexpr const char* c_str = "Signed";
+    static _BTK_CONSTEXPR const char* c_str = "Signed";
   };
   
   template <>
   struct stringify_option_value<C3DHandler::AnalogStorage,C3DHandler::AnalogStorage::Unsigned>
   {
-    static constexpr const char* c_str = "Unsigned";
+    static _BTK_CONSTEXPR const char* c_str = "Unsigned";
   };
   
   // ------------------------------------------------------------------------ //

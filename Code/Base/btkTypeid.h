@@ -36,6 +36,8 @@
 #ifndef __btkTypeid_h
 #define __btkTypeid_h
 
+#include "btkMacros.h" // _BTK_CONSTEXPR
+
 #include <cstddef>
 
 namespace btk
@@ -52,20 +54,20 @@ namespace btk
     
     explicit operator size_t() const noexcept {return reinterpret_cast<size_t>(this->id);};
     
-    friend constexpr bool operator==(typeid_t lhs, typeid_t rhs) noexcept {return (lhs.id == rhs.id);};
-    friend constexpr bool operator!=(typeid_t lhs, typeid_t rhs) noexcept {return (lhs.id != rhs.id);};
+    friend _BTK_CONSTEXPR bool operator==(typeid_t lhs, typeid_t rhs) noexcept {return (lhs.id == rhs.id);};
+    friend _BTK_CONSTEXPR bool operator!=(typeid_t lhs, typeid_t rhs) noexcept {return (lhs.id != rhs.id);};
     
   private:
-    template<typename T> friend constexpr typeid_t static_typeid() noexcept;
+    template<typename T> friend _BTK_CONSTEXPR typeid_t static_typeid() noexcept;
     
     using sig = typeid_t();
     sig* id;
     
-    constexpr typeid_t(sig* id) : id{id} {};
+    _BTK_CONSTEXPR typeid_t(sig* id) : id{id} {};
   };
 
   template<typename T>
-  constexpr inline typeid_t static_typeid() noexcept
+  inline _BTK_CONSTEXPR typeid_t static_typeid() noexcept
   {
     return &static_typeid<T>;
   };

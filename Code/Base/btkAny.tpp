@@ -38,6 +38,7 @@
 
 #include "btkException.h"
 #include "btkTypeTraits.h"
+#include "btkMacros.h" // _BTK_CONSTEXPR
 
 #include <string>
 #include <unordered_map>
@@ -170,7 +171,7 @@ namespace btk
     }    
     
     // Should be used only on size_t values coming from typeid_t variables
-    inline constexpr size_t _any_hash(size_t sid, size_t rid) noexcept
+    inline _BTK_CONSTEXPR size_t _any_hash(size_t sid, size_t rid) noexcept
     {
       return ((sid << (4*sizeof(size_t))) | ((rid << (4*sizeof(size_t))) >> (4*sizeof(size_t))));
     };
@@ -843,7 +844,7 @@ namespace btk
       {
         // 1. Remove the conversion between the given user type and the other registered types
         // 2. Remove the conversion between the other registered types and the given user type
-        constexpr size_t shift = 4*sizeof(size_t);
+        _BTK_CONSTEXPR size_t shift = 4*sizeof(size_t);
         const size_t sid = static_cast<size_t>(static_typeid<Type>()) << shift;
         const size_t rid = (static_cast<size_t>(static_typeid<Type>()) << shift) >> shift;
         if (((it->first & sid) == sid) || ((it->first & rid) ==rid))

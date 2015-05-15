@@ -39,6 +39,7 @@
 #include "btkIOExport.h"
 #include "btkOpaque.h"
 #include "btkException.h"
+#include "btkMacros.h" // _BTK_CONSTEXPR
 
 #include <memory> // std::unique_ptr
 #include <ios> // std::streamsize, std::streamoff, std::streampos
@@ -112,29 +113,29 @@ namespace btk
   
   // ----------------------------------------------------------------------- //
   
-  inline constexpr IODevice::State operator& (IODevice::State lhs, IODevice::State rhs)
+  inline _BTK_CONSTEXPR IODevice::State operator& (IODevice::State lhs, IODevice::State rhs)
   {
     return static_cast<IODevice::State>(static_cast<int>(lhs) & static_cast<int>(rhs));
   };
   
-  inline constexpr IODevice::State operator| (IODevice::State lhs, IODevice::State rhs)
+  inline _BTK_CONSTEXPR IODevice::State operator| (IODevice::State lhs, IODevice::State rhs)
   {
     return static_cast<IODevice::State>(static_cast<int>(lhs) | static_cast<int>(rhs));
   };
   
   // ----------------------------------------------------------------------- //
   
-  inline constexpr IODevice::Mode operator& (IODevice::Mode lhs, IODevice::Mode rhs)
+  inline _BTK_CONSTEXPR IODevice::Mode operator& (IODevice::Mode lhs, IODevice::Mode rhs)
   {
     return static_cast<IODevice::Mode>(static_cast<int>(lhs) & static_cast<int>(rhs));
   };
 
-  inline constexpr IODevice::Mode operator| (IODevice::Mode lhs, IODevice::Mode rhs)
+  inline _BTK_CONSTEXPR IODevice::Mode operator| (IODevice::Mode lhs, IODevice::Mode rhs)
   {
     return static_cast<IODevice::Mode>(static_cast<int>(lhs) | static_cast<int>(rhs));
   };
   
-  inline constexpr IODevice::Mode operator~ (IODevice::Mode x)
+  inline _BTK_CONSTEXPR IODevice::Mode operator~ (IODevice::Mode x)
   {
     return IODevice::Mode(~static_cast<int>(x));
   };

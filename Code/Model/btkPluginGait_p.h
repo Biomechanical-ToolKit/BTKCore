@@ -44,6 +44,7 @@
 #include "btkRig_p.h"
 #include "btkProperty.h"
 #include "btklardXpr.h"
+#include "btkMacros.h" // _BTK_CONSTEXPR
 
 #include <unordered_map>
 
@@ -186,8 +187,8 @@ namespace btk
       using Values = typename Array<3>::Values;
       using Residuals = typename Array<3>::Residuals;
       using Index = typename Values::Index;
-      static constexpr int ColsAtCompileTime = 3;
-      static constexpr int Processing = Full;
+      static _BTK_CONSTEXPR int ColsAtCompileTime = 3;
+      static _BTK_CONSTEXPR int Processing = Full;
     };
   };
   

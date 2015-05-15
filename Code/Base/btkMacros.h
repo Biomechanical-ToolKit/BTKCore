@@ -47,4 +47,15 @@
  */
 #define _BTK_UNUSED(x) (void)x;
 
+/**
+ * MSVC 2013 does not support the C++11 keyword 'constexpr' but it will supported in MSVC 2015.
+ *
+ * [1] http://blogs.msdn.com/b/vcblog/archive/2015/04/29/c-11-14-17-features-in-vs-2015-rc.aspx
+ */
+#if defined(_MSVC_VER) && (_MSVC_VER < 1900)
+  #define _BTK_CONSTEXPR const
+#else
+  #define _BTK_CONSTEXPR constexpr
+#endif
+
 #endif // __btkMacros_h

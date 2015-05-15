@@ -86,7 +86,7 @@ namespace btk
 
 namespace btk
 {
-  constexpr std::array<double,2> TimeSequence::InfinityRange;
+  _BTK_CONSTEXPR std::array<double,2> TimeSequence::InfinityRange;
 
   TimeSequence::TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range, Node* parent)
   : TimeSequence(name,std::vector<unsigned>({components}),samples,rate,start,type,unit,scale,offset,range,parent)

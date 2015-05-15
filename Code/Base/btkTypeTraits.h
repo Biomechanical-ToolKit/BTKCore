@@ -36,23 +36,25 @@
 #ifndef __btkTypeTraits_h
 #define __btkTypeTraits_h
 
+#include "btkMacros.h" // _BTK_CONSTEXPR
+
 #include <array>
 #include <vector>
 #include <initializer_list>
 #include <cstddef> // size_t
-  
+
 namespace btk
 {
   template <typename T>
   struct is_stl_array
   {
-    static constexpr bool value = false;
+    static _BTK_CONSTEXPR bool value = false;
   };
   
   template <typename T, size_t N>
   struct is_stl_array<std::array<T,N> >
   {
-    static constexpr bool value = true;
+    static _BTK_CONSTEXPR bool value = true;
   };
   
   // ---------------------------------------------------------------------- //
@@ -60,13 +62,13 @@ namespace btk
   template <typename T>
   struct is_stl_vector
   {
-    static constexpr bool value = false;
+    static _BTK_CONSTEXPR bool value = false;
   };
   
   template <typename T, typename Alloc>
   struct is_stl_vector<std::vector<T,Alloc> >
   {
-    static constexpr bool value = true;
+    static _BTK_CONSTEXPR bool value = true;
   };
   
   // ---------------------------------------------------------------------- //
@@ -74,13 +76,13 @@ namespace btk
   template <typename T>
   struct is_stl_initializer_list
   {
-    static constexpr bool value = false;
+    static _BTK_CONSTEXPR bool value = false;
   };
   
   template <typename T>
   struct is_stl_initializer_list<std::initializer_list<T> >
   {
-    static constexpr bool value = true;
+    static _BTK_CONSTEXPR bool value = true;
   };
 };
 
