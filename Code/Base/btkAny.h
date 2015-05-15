@@ -37,8 +37,6 @@
 #define __btkAny_h
 
 #include "btkBaseExport.h"
-#include "btkTypeTraits.h"
-#include "btkTypeid.h"
 
 #include <type_traits>
 #include <vector>

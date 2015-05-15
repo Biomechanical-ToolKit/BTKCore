@@ -37,6 +37,7 @@
 #define __btkAny_tpp
 
 #include "btkException.h"
+#include "btkTypeid.h"
 #include "btkTypeTraits.h"
 #include "btkMacros.h" // _BTK_CONSTEXPR
 
