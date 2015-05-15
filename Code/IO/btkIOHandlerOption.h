@@ -46,7 +46,6 @@
   public: \
     virtual std::vector<const char*> availableOptions() const noexcept override \
     { \
-      using _Tuple = decltype(std::make_tuple(__VA_ARGS__)); \
       using _TupleSize = std::tuple_size<_Tuple>; \
       std::vector<const char*> options(_TupleSize::value); \
       __details::_IOHandler_options_iterate<_Tuple,0,_TupleSize::value>::extract_name(&options); \
@@ -54,26 +53,24 @@
     }; \
     virtual std::vector<const char*> availableOptionChoices(const char* option) const noexcept override \
     { \
-      using _Tuple = decltype(std::make_tuple(__VA_ARGS__)); \
       using _TupleSize = std::tuple_size<_Tuple>; \
       return __details::_IOHandler_options_iterate<_Tuple,0,_TupleSize::value>::extract_choices(option); \
     }; \
     virtual void option(const char* option, void* value) const noexcept override \
     { \
-      using _Tuple = decltype(std::make_tuple(__VA_ARGS__)); \
       using _TupleSize = std::tuple_size<_Tuple>; \
       __details::_IOHandler_options_iterate<_Tuple,0,_TupleSize::value>::get_value(&(this->m_Options),option,value); \
     }; \
     virtual void setOption(const char* option, const void* value) noexcept override \
     { \
-      using _Tuple = decltype(std::make_tuple(__VA_ARGS__)); \
       using _TupleSize = std::tuple_size<_Tuple>; \
       __details::_IOHandler_options_iterate<_Tuple,0,_TupleSize::value>::set_value(&(this->m_Options),option,value); \
     }; \
   private: \
-    struct _Options : decltype(std::make_tuple(__VA_ARGS__)) \
+    using _Tuple = decltype(std::make_tuple(__VA_ARGS__)); \
+    struct _Options : _Tuple \
     { \
-      _Options() : decltype(std::make_tuple(__VA_ARGS__))(std::make_tuple(__VA_ARGS__)) {}; \
+      _Options() : _Tuple(__VA_ARGS__) {}; \
     } m_Options;
 
 namespace btk
