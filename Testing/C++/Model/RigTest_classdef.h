@@ -33,8 +33,8 @@ bool TestRig::setup(btk::Model* model) const noexcept
 
 bool TestRig::calibrate(btk::Model* model, Node* trials) noexcept
 {
-  BTK_UNUSED(model)
-  BTK_UNUSED(trials)
+  _BTK_UNUSED(model)
+  _BTK_UNUSED(trials)
   // auto segA = model->segments()->findChild<btk::Segment*>("SegA");
   // auto segB = model->segments()->findChild<btk::Segment*>("SegB");
   // btk::Trial* trial = trials->findChild<btk::Trial*>();
@@ -55,8 +55,8 @@ bool TestRig::calibrate(btk::Model* model, Node* trials) noexcept
 
 bool TestRig::generate(btk::Model* model, Node* trials) const noexcept
 {
-  BTK_UNUSED(model)
-  BTK_UNUSED(trials)
+  _BTK_UNUSED(model)
+  _BTK_UNUSED(trials)
   // auto trial = trials->findChild<btk::Trial*>();
   // auto TT = btk::lard::to_mapped_trajectory(trial,"TT");
   // auto LM = btk::lard::to_mapped_trajectory(trial,"LM");
@@ -76,7 +76,7 @@ bool TestRig::generate(btk::Model* model, Node* trials) const noexcept
 
 void TestRig::finalize(btk::Node* trials) const noexcept
 {
-  BTK_UNUSED(trials)
+  _BTK_UNUSED(trials)
 };
 
 #endif // RigTest_classdef_h

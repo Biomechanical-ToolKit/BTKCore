@@ -887,7 +887,7 @@ namespace btk
   
   void C3DHandler::writeDevice(const Node* input)
   {
-    BTK_UNUSED(input);
+    _BTK_UNUSED(input);
   };
   
   std::vector<const char*> C3DHandler::supportedTrialFormats() const noexcept

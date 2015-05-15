@@ -37,7 +37,7 @@
 #include "btkNode_p.h"
 #include "btkProperty.h"
 #include "btkLogger.h"
-#include "btkMacros.h" // BTK_UNUSED
+#include "btkMacros.h" // _BTK_UNUSED
 
 // -------------------------------------------------------------------------- //
 //                                 PRIVATE API                                //
@@ -186,7 +186,7 @@ namespace btk
   
   void NodePrivate::finalizePint(Node* pint) const
   {
-    BTK_UNUSED(pint)
+    _BTK_UNUSED(pint)
   };
 };
 

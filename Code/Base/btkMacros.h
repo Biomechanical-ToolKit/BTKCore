@@ -45,6 +45,6 @@
  * Macro to use when an input is not used in the function.
  * Usefull when the compiler gives you a warning to say that the variable is not used.
  */
-#define BTK_UNUSED(x) (void)x;
+#define _BTK_UNUSED(x) (void)x;
 
 #endif // __btkMacros_h

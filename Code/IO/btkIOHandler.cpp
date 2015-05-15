@@ -273,7 +273,7 @@ namespace btk
    */
   void IOHandler::readDevice(Node* output)
   {
-    BTK_UNUSED(output);
+    _BTK_UNUSED(output);
     this->setError(Error::Unexpected, "You called the default IOHandler::readDevice method. The instanced I/O handler has certainly not the capability to read data.");
   };
   
@@ -282,7 +282,7 @@ namespace btk
    */
   void IOHandler::writeDevice(const Node* input)
   {
-    BTK_UNUSED(input);
+    _BTK_UNUSED(input);
     this->setError(Error::Unexpected, "You called the default IOHandler::writeDevice method. The instanced I/O handler has certainly not the capability to write data.");
   };
   

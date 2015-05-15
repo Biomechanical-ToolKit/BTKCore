@@ -81,7 +81,7 @@ namespace btk
     template <typename T>
     static inline typename std::enable_if<!std::is_same<T,std::string>::value,T>::type generateDefaultValue(T&& blank, int idx)
     {
-      BTK_UNUSED(idx);
+      _BTK_UNUSED(idx);
       return blank;
     };
   
