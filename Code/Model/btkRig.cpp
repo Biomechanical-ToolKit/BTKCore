@@ -60,9 +60,9 @@ namespace btk
   : Node(*new RigPrivate(this,name,region,side), parent)
   {};
   
-  Rig::Rig(RigPrivate& pimpl, Node* parent) noexcept
+  Rig::Rig(RigPrivate& pimpl, Node* parent) _BTK_NOEXCEPT
   : Node(pimpl, parent)
   {};
   
-  Rig::~Rig() noexcept = default;
+  Rig::~Rig() _BTK_NOEXCEPT = default;
 };

@@ -61,7 +61,7 @@ namespace btk
   : IODevicePrivate(), Buffer(new MemoryMappedBuffer)
   {};
   
-  FilePrivate::~FilePrivate() noexcept
+  FilePrivate::~FilePrivate() _BTK_NOEXCEPT
   {
     if (this->Buffer->isOpen() && !this->Buffer->close())
       Logger::error("An error occurred when closing the file device. The data inside the file might be corrupted.");
@@ -73,7 +73,7 @@ namespace btk
   /**
    * Destructor
    */
-  MemoryMappedBuffer::MemoryMappedBuffer() noexcept
+  MemoryMappedBuffer::MemoryMappedBuffer() _BTK_NOEXCEPT
   {
     this->mp_Data = 0;
     this->m_DataSize = -1;
@@ -93,7 +93,7 @@ namespace btk
   /**
    * Open the file with the given filename @a s and the options @a mode.
    */
-  MemoryMappedBuffer* MemoryMappedBuffer::open(const char* s, Mode mode) noexcept
+  MemoryMappedBuffer* MemoryMappedBuffer::open(const char* s, Mode mode) _BTK_NOEXCEPT
   {
     if (this->isOpen())
       return 0;
@@ -201,7 +201,7 @@ namespace btk
   };
   
   /**
-   * @fn bool MemoryMappedBuffer::isOpen() const noexcept
+   * @fn bool MemoryMappedBuffer::isOpen() const _BTK_NOEXCEPT
    * Return true if the file is opened.
    */
    
@@ -209,7 +209,7 @@ namespace btk
    * Close the file.
    * @return Return 0 is an error happened during the closing.
    */ 
-  MemoryMappedBuffer* MemoryMappedBuffer::close() noexcept
+  MemoryMappedBuffer* MemoryMappedBuffer::close() _BTK_NOEXCEPT
   {
     if (!this->isOpen())
       return 0;
@@ -252,17 +252,17 @@ namespace btk
   };
 
   /**
-   * @fn bool MemoryMappedBuffer::hasWriteMode() const  noexcept
+   * @fn bool MemoryMappedBuffer::hasWriteMode() const  _BTK_NOEXCEPT
    * Check if this file buffer is in write mode or not.
    */
 
   /**
-   * @fn size_t MemoryMappedBuffer::dataSize() const  noexcept
+   * @fn size_t MemoryMappedBuffer::dataSize() const  _BTK_NOEXCEPT
    * Returns the size of the buffer.
    */
   
   /**
-   * @fn const char* MemoryMappedBuffer::data() const  noexcept
+   * @fn const char* MemoryMappedBuffer::data() const  _BTK_NOEXCEPT
    * Returns directly the content of the buffer.
    */
   
@@ -270,7 +270,7 @@ namespace btk
    * Sets internal position pointer to relative position.
    * @return The new position value of the modified position pointer. Errors are expected to be signaled by an invalid position value, like -1.
    */
-  MemoryMappedBuffer::Position MemoryMappedBuffer::seek(Offset off, Origin whence) noexcept
+  MemoryMappedBuffer::Position MemoryMappedBuffer::seek(Offset off, Origin whence) _BTK_NOEXCEPT
   {
     switch(whence)
     {
@@ -299,7 +299,7 @@ namespace btk
   * Returns a sequence of characters
   * @return The number of characters gotten.
   */
-  MemoryMappedBuffer::Size MemoryMappedBuffer::peek(char* s, Size n) const noexcept
+  MemoryMappedBuffer::Size MemoryMappedBuffer::peek(char* s, Size n) const _BTK_NOEXCEPT
   {
     n = (((this->m_Offset + n) == 0) || ((this->m_Offset + n) > this->m_DataSize)) ? ((this->m_DataSize - this->m_Offset) > 0 ? this->m_DataSize - this->m_Offset : 0) : n;
     for (Offset i = 0 ; i < n ; ++i)
@@ -311,7 +311,7 @@ namespace btk
    * Get a sequence of characters and modify the internal offset based on the number of characters read.
    * @return The number of characters gotten.
    */
-  MemoryMappedBuffer::Size MemoryMappedBuffer::read(char* s, Size n) noexcept
+  MemoryMappedBuffer::Size MemoryMappedBuffer::read(char* s, Size n) _BTK_NOEXCEPT
   {
     n = this->peek(s,n);
     this->m_Offset += n;
@@ -322,7 +322,7 @@ namespace btk
    * Write a sequence of characters
    * @return The number of characters written.
    */
-  MemoryMappedBuffer::Size MemoryMappedBuffer::write(const char* s, Size n) noexcept
+  MemoryMappedBuffer::Size MemoryMappedBuffer::write(const char* s, Size n) _BTK_NOEXCEPT
   {
     while ((this->m_Offset + n) > this->m_DataSize) 
     {
@@ -343,7 +343,7 @@ namespace btk
    * Try to map the file into the memory.
    * @return Returns 0 if an error occured.
    */
-  MemoryMappedBuffer* MemoryMappedBuffer::map() noexcept
+  MemoryMappedBuffer* MemoryMappedBuffer::map() _BTK_NOEXCEPT
   {
 #if defined(HAVE_SYS_MMAP)
     bool err = ((this->mp_Data = (char*)::mmap(0, 
@@ -370,7 +370,7 @@ namespace btk
    * Try to resize the map to be able to extract more data from the file.
    * @return Returns 0 if an error occured.
    */
-  MemoryMappedBuffer* MemoryMappedBuffer::resizeMap() noexcept
+  MemoryMappedBuffer* MemoryMappedBuffer::resizeMap() _BTK_NOEXCEPT
   {
     if (!this->isOpen() || !this->m_Writing)
       return 0;
@@ -397,7 +397,7 @@ namespace btk
   /**
    * Return the size of block of memory.
    */
-  int MemoryMappedBuffer::granularity() noexcept
+  int MemoryMappedBuffer::granularity() _BTK_NOEXCEPT
   {
 #if defined(_MSC_VER)
     SYSTEM_INFO info;
@@ -436,7 +436,7 @@ namespace btk
   /**
    * Destructor (default).
    */
-  File::~File() noexcept = default;
+  File::~File() _BTK_NOEXCEPT = default;
   
   /**
    * Open the given @a filename with the specified @a mode.
@@ -458,7 +458,7 @@ namespace btk
   /**
    * Returns true if a file was successfuly opened, otherwise false.
    */
-  bool File::isOpen() const noexcept
+  bool File::isOpen() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Buffer->isOpen();
@@ -523,7 +523,7 @@ namespace btk
   /**
    * Returns the position of the internal pointer.
    */
-  File::Position File::tell() const noexcept
+  File::Position File::tell() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return !this->hasFailure() ? optr->Buffer->seek(0, Origin::Current) : Position(Offset(-1));
@@ -532,7 +532,7 @@ namespace btk
   /**
    * Returns false as the File class represents a random access device.
    */
-  bool File::isSequential() const noexcept
+  bool File::isSequential() const _BTK_NOEXCEPT
   {
     return false;
   };
@@ -540,7 +540,7 @@ namespace btk
   /**
    * Return the data mapped in the memory
    */
-  const char* File::data() const noexcept
+  const char* File::data() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Buffer->data();
@@ -549,7 +549,7 @@ namespace btk
   /**
    * Return the size of the data mapped in the memory
    */
-  File::Size File::size() const noexcept
+  File::Size File::size() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Buffer->dataSize();

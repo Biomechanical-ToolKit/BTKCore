@@ -51,7 +51,7 @@ namespace btk
   : Device(device), Converter(converter)
   {};
   
-  BinaryStreamPrivate::~BinaryStreamPrivate() noexcept = default;
+  BinaryStreamPrivate::~BinaryStreamPrivate() _BTK_NOEXCEPT = default;
   
   // ----------------------------------------------------------------------- //
   
@@ -179,7 +179,7 @@ namespace btk
   /**
    * Return the enumeration value EndianConverter::VAXLittleEndian
    */
-  EndianFormat VAXLittleEndianConverter::format() const noexcept
+  EndianFormat VAXLittleEndianConverter::format() const _BTK_NOEXCEPT
   {
     return EndianFormat::VAXLittleEndian;
   };
@@ -431,7 +431,7 @@ namespace btk
   /**
    * Return the enumeration value EndianConverter::IEEEBigEndian
    */
-  EndianFormat IEEEBigEndianConverter::format() const noexcept
+  EndianFormat IEEEBigEndianConverter::format() const _BTK_NOEXCEPT
   {
     return EndianFormat::IEEEBigEndian;
   };
@@ -683,7 +683,7 @@ namespace btk
   /**
    * Return the enumeration value EndianConverter::IEEELittleEndian
    */
-  EndianFormat IEEELittleEndianConverter::format() const noexcept
+  EndianFormat IEEELittleEndianConverter::format() const _BTK_NOEXCEPT
   {
     return EndianFormat::IEEELittleEndian;
   };
@@ -946,7 +946,7 @@ namespace btk
   /**
    * Destructor. Delete the converter associated with the stream
    */
-  BinaryStream::~BinaryStream() noexcept
+  BinaryStream::~BinaryStream() _BTK_NOEXCEPT
   {
     delete this->mp_Pimpl->Converter;
   };
@@ -954,7 +954,7 @@ namespace btk
   /**
    * Returns the device associated to this stream. 
    */
-  IODevice* BinaryStream::device() const noexcept
+  IODevice* BinaryStream::device() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Device;
@@ -964,7 +964,7 @@ namespace btk
    * Sets the device associated to this stream.
    * Trying to assign a null device will print an error message and returns.
    */
-  void BinaryStream::setDevice(IODevice* device) noexcept
+  void BinaryStream::setDevice(IODevice* device) _BTK_NOEXCEPT
   {
     if (device == 0)
     {
@@ -978,7 +978,7 @@ namespace btk
   /**
    * Return the format of current endian converter used by the stream.
    */
-  EndianFormat BinaryStream::endianFormat() const noexcept
+  EndianFormat BinaryStream::endianFormat() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Converter->format();

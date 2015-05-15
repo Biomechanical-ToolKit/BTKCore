@@ -71,15 +71,15 @@ namespace btk
   : Node(*new RelativePositionPrivate(this,name,coordinates), parent)
   {};
   
-  RelativePosition::~RelativePosition() noexcept = default;
+  RelativePosition::~RelativePosition() _BTK_NOEXCEPT = default;
   
-  const double* RelativePosition::data() const noexcept
+  const double* RelativePosition::data() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data;
   };
   
-  double* RelativePosition::data() noexcept
+  double* RelativePosition::data() _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data;

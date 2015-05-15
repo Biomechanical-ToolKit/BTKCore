@@ -37,11 +37,12 @@
 #define __btkNodeid_h
 
 #include "btkTypeid.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #define BTK_DECLARE_NODEID(derivedclass,baseclass) \
   protected: \
   static_assert(!std::is_same<baseclass,derivedclass>::value,"The base class cannot be the same than the current class."); \
-  virtual bool castable(btk::typeid_t id) const noexcept override \
+  virtual bool castable(btk::typeid_t id) const _BTK_NOEXCEPT override \
   { \
     if (this->baseclass##Private::castable(id)) \
       return true; \

@@ -43,6 +43,7 @@
 
 #include "btkNode_p.h"
 #include "btkProperty.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 namespace btk
 {
@@ -61,7 +62,7 @@ namespace btk
   
   public:
     EventPrivate(Event* pint, const std::string& name, double time, const std::string& context, const std::string& subject);
-    ~EventPrivate() noexcept;
+    ~EventPrivate() _BTK_NOEXCEPT;
     
     virtual Node* makePint() const override;
     

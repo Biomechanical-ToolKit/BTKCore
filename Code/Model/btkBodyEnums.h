@@ -33,8 +33,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __btkBodyEnum_h
-#define __btkBodyEnum_h
+#ifndef __btkBodyEnums_h
+#define __btkBodyEnums_h
+
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 namespace btk
 {
@@ -49,11 +51,11 @@ namespace btk
     };
     
     BodySide() = delete;
-    ~BodySide() noexcept = delete;
+    ~BodySide() _BTK_NOEXCEPT = delete;
     BodySide(const BodySide& ) = delete;
-    BodySide(BodySide&& ) noexcept = delete;
+    BodySide(BodySide&& ) _BTK_NOEXCEPT = delete;
     BodySide& operator=(const BodySide& ) = delete;
-    BodySide& operator=(BodySide&& ) noexcept = delete;
+    BodySide& operator=(BodySide&& ) _BTK_NOEXCEPT = delete;
   };
   
   struct BodyRegion
@@ -65,11 +67,11 @@ namespace btk
     };
     
     BodyRegion() = delete;
-    ~BodyRegion() noexcept = delete;
+    ~BodyRegion() _BTK_NOEXCEPT = delete;
     BodyRegion(const BodyRegion& ) = delete;
-    BodyRegion(BodyRegion&& ) noexcept = delete;
+    BodyRegion(BodyRegion&& ) _BTK_NOEXCEPT = delete;
     BodyRegion& operator=(const BodyRegion& ) = delete;
-    BodyRegion& operator=(BodyRegion&& ) noexcept = delete;
+    BodyRegion& operator=(BodyRegion&& ) _BTK_NOEXCEPT = delete;
   };
   
   struct BodyPart
@@ -89,12 +91,12 @@ namespace btk
     };
     
     BodyPart() = delete;
-    ~BodyPart() noexcept = delete;
+    ~BodyPart() _BTK_NOEXCEPT = delete;
     BodyPart(const BodyPart& ) = delete;
-    BodyPart(BodyPart&& ) noexcept = delete;
+    BodyPart(BodyPart&& ) _BTK_NOEXCEPT = delete;
     BodyPart& operator=(const BodyPart& ) = delete;
-    BodyPart& operator=(BodyPart&& ) noexcept = delete;
+    BodyPart& operator=(BodyPart&& ) _BTK_NOEXCEPT = delete;
   };
 };
 
-#endif // __btkBodyEnum_h
+#endif // __btkBodyEnums_h

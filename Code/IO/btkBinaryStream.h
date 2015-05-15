@@ -38,6 +38,7 @@
 
 #include "btkIOExport.h"
 #include "btkOpaque.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <cstdint>
 #include <string>
@@ -58,17 +59,17 @@ namespace btk
   public:
     BinaryStream(IODevice* device = 0);
     BinaryStream(IODevice* device, EndianFormat format);
-    ~BinaryStream() noexcept;
+    ~BinaryStream() _BTK_NOEXCEPT;
     
     BinaryStream(const BinaryStream& ) = delete;
-    BinaryStream(BinaryStream&& ) noexcept = delete;
+    BinaryStream(BinaryStream&& ) _BTK_NOEXCEPT = delete;
     BinaryStream& operator=(const BinaryStream& ) = delete;
-    BinaryStream& operator=(BinaryStream&& ) noexcept = delete;
+    BinaryStream& operator=(BinaryStream&& ) _BTK_NOEXCEPT = delete;
     
-    IODevice* device() const noexcept;
-    void setDevice(IODevice* device) noexcept;
+    IODevice* device() const _BTK_NOEXCEPT;
+    void setDevice(IODevice* device) _BTK_NOEXCEPT;
     
-    EndianFormat endianFormat() const noexcept;
+    EndianFormat endianFormat() const _BTK_NOEXCEPT;
     void setEndianFormat(EndianFormat format);
     
     char readChar();

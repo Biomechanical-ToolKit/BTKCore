@@ -80,7 +80,7 @@ namespace btk
     LeftStaticRotationOffset(0.0)
   {};
     
-  PluginGaitPrivate::~PluginGaitPrivate() noexcept = default;
+  PluginGaitPrivate::~PluginGaitPrivate() _BTK_NOEXCEPT = default;
   
   Node* PluginGaitPrivate::makePint() const
   {
@@ -114,7 +114,7 @@ namespace btk
     return node;
   };
   
-  bool PluginGaitPrivate::calibrateLowerLimb(int side, const lard::Trajectory* HJC, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks) noexcept
+  bool PluginGaitPrivate::calibrateLowerLimb(int side, const lard::Trajectory* HJC, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks) _BTK_NOEXCEPT
   {
     std::string prefix;
     double s = 0.0, ankleWidth = 0.0, kneeWidth = 0.0;
@@ -214,7 +214,7 @@ namespace btk
     return true;
   };
   
-  bool PluginGaitPrivate::generateUpperLimb(Model* model, Trial* trial, int side, const lard::Vector* u_torso, const lard::Vector* o_torso, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks, double sampleRate, double startTime) const noexcept
+  bool PluginGaitPrivate::generateUpperLimb(Model* model, Trial* trial, int side, const lard::Vector* u_torso, const lard::Vector* o_torso, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks, double sampleRate, double startTime) const _BTK_NOEXCEPT
   {
     std::string prefix;
     double s = 0.0, shoulderOffset = 0.0, elbowWidth = 0.0, wristWidth = 0.0, handThickness = 0.0;
@@ -307,7 +307,7 @@ namespace btk
     return true;
   };
   
-  bool PluginGaitPrivate::generateLowerLimb(Trial* trial, int side, const lard::Trajectory* HJC, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks, double sampleRate, double startTime) const noexcept
+  bool PluginGaitPrivate::generateLowerLimb(Trial* trial, int side, const lard::Trajectory* HJC, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks, double sampleRate, double startTime) const _BTK_NOEXCEPT
   {
     std::string prefix;
     double s = 0.0, ankleWidth = 0.0, kneeWidth = 0.0,
@@ -407,7 +407,7 @@ namespace btk
   : Rig(*new PluginGaitPrivate(this, "PiG", region, side), parent)
   {};
 
-  bool PluginGait::setup(btk::Model* model) const noexcept
+  bool PluginGait::setup(btk::Model* model) const _BTK_NOEXCEPT
   {
     if (model == nullptr)
     {
@@ -488,7 +488,7 @@ namespace btk
     return true;
   };
 
-  bool PluginGait::calibrate(btk::Model* model, Node* trials) noexcept
+  bool PluginGait::calibrate(btk::Model* model, Node* trials) _BTK_NOEXCEPT
   {
     if (model == nullptr)
     {
@@ -658,7 +658,7 @@ namespace btk
     return true;
   };
 
-  bool PluginGait::generate(btk::Model* model, Node* trials) const noexcept
+  bool PluginGait::generate(btk::Model* model, Node* trials) const _BTK_NOEXCEPT
   {
     if (model == nullptr)
     {
@@ -830,19 +830,19 @@ namespace btk
     return true;
   };
 
-  void PluginGait::finalize(btk::Node* /*trials*/) const noexcept
+  void PluginGait::finalize(btk::Node* /*trials*/) const _BTK_NOEXCEPT
   {
   };
   
   // ----------------------------------------------------------------------- //
   
-  double PluginGait::markerDiameter() const noexcept
+  double PluginGait::markerDiameter() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->MarkerDiameter;
   };
   
-  void PluginGait::setMarkerDiameter(double value) noexcept
+  void PluginGait::setMarkerDiameter(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->MarkerDiameter) < std::numeric_limits<double>::epsilon())
@@ -851,13 +851,13 @@ namespace btk
     this->modified();
   };
 
-  double PluginGait::headOffset() const noexcept
+  double PluginGait::headOffset() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->HeadOffset;
   };
   
-  void PluginGait::setHeadOffset(double value) noexcept
+  void PluginGait::setHeadOffset(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->HeadOffset) < std::numeric_limits<double>::epsilon())
@@ -866,13 +866,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::rightShoulderOffset() const noexcept
+  double PluginGait::rightShoulderOffset() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightShoulderOffset;
   };
   
-  void PluginGait::setRightShoulderOffset(double value) noexcept
+  void PluginGait::setRightShoulderOffset(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->RightShoulderOffset) < std::numeric_limits<double>::epsilon())
@@ -881,13 +881,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::leftShoulderOffset() const noexcept
+  double PluginGait::leftShoulderOffset() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftShoulderOffset;
   };
   
-  void PluginGait::setLeftShoulderOffset(double value) noexcept
+  void PluginGait::setLeftShoulderOffset(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->LeftShoulderOffset) < std::numeric_limits<double>::epsilon())
@@ -896,13 +896,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::rightElbowWidth() const noexcept
+  double PluginGait::rightElbowWidth() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightElbowWidth;
   };
   
-  void PluginGait::setRightElbowWidth(double value) noexcept
+  void PluginGait::setRightElbowWidth(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->RightElbowWidth) < std::numeric_limits<double>::epsilon())
@@ -911,13 +911,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::leftElbowWidth() const noexcept
+  double PluginGait::leftElbowWidth() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftElbowWidth;
   };
   
-  void PluginGait::setLeftElbowWidth(double value) noexcept
+  void PluginGait::setLeftElbowWidth(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->LeftElbowWidth) < std::numeric_limits<double>::epsilon())
@@ -926,13 +926,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::rightWristWidth() const noexcept
+  double PluginGait::rightWristWidth() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightWristWidth;
   };
   
-  void PluginGait::setRightWristWidth(double value) noexcept
+  void PluginGait::setRightWristWidth(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->RightWristWidth) < std::numeric_limits<double>::epsilon())
@@ -941,13 +941,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::leftWristWidth() const noexcept
+  double PluginGait::leftWristWidth() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftWristWidth;
   };
   
-  void PluginGait::setLeftWristWidth(double value) noexcept
+  void PluginGait::setLeftWristWidth(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->LeftWristWidth) < std::numeric_limits<double>::epsilon())
@@ -956,13 +956,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::rightHandThickness() const noexcept
+  double PluginGait::rightHandThickness() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightHandThickness;
   };
   
-  void PluginGait::setRightHandThickness(double value) noexcept
+  void PluginGait::setRightHandThickness(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->RightHandThickness) < std::numeric_limits<double>::epsilon())
@@ -971,13 +971,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::leftHandThickness() const noexcept
+  double PluginGait::leftHandThickness() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftHandThickness;
   };
   
-  void PluginGait::setLeftHandThickness(double value) noexcept
+  void PluginGait::setLeftHandThickness(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->LeftHandThickness) < std::numeric_limits<double>::epsilon())
@@ -986,13 +986,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::interAsisDistance() const noexcept
+  double PluginGait::interAsisDistance() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->InterAsisDistance;
   };
   
-  void PluginGait::setInterAsisDistance(double value) noexcept
+  void PluginGait::setInterAsisDistance(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->InterAsisDistance) < std::numeric_limits<double>::epsilon())
@@ -1001,13 +1001,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::rightLegLength() const noexcept
+  double PluginGait::rightLegLength() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightLegLength;
   };
   
-  void PluginGait::setRightLegLength(double value) noexcept
+  void PluginGait::setRightLegLength(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->RightLegLength) < std::numeric_limits<double>::epsilon())
@@ -1016,13 +1016,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::leftLegLength() const noexcept
+  double PluginGait::leftLegLength() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftLegLength;
   };
   
-  void PluginGait::setLeftLegLength(double value) noexcept
+  void PluginGait::setLeftLegLength(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->LeftLegLength) < std::numeric_limits<double>::epsilon())
@@ -1031,13 +1031,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::rightAsisTrochanterAPDistance() const noexcept
+  double PluginGait::rightAsisTrochanterAPDistance() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightAsisTrochanterAPDistance;
   };
   
-  void PluginGait::setRightAsisTrochanterAPDistance(double value) noexcept
+  void PluginGait::setRightAsisTrochanterAPDistance(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->RightAsisTrochanterAPDistance) < std::numeric_limits<double>::epsilon())
@@ -1046,13 +1046,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::leftAsisTrochanterAPDistance() const noexcept
+  double PluginGait::leftAsisTrochanterAPDistance() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftAsisTrochanterAPDistance;
   };
   
-  void PluginGait::setLeftAsisTrochanterAPDistance(double value) noexcept
+  void PluginGait::setLeftAsisTrochanterAPDistance(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->LeftAsisTrochanterAPDistance) < std::numeric_limits<double>::epsilon())
@@ -1061,13 +1061,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::rightKneeWidth() const noexcept
+  double PluginGait::rightKneeWidth() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightKneeWidth;
   };
   
-  void PluginGait::setRightKneeWidth(double value) noexcept
+  void PluginGait::setRightKneeWidth(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->RightKneeWidth) < std::numeric_limits<double>::epsilon())
@@ -1076,13 +1076,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::leftKneeWidth() const noexcept
+  double PluginGait::leftKneeWidth() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftKneeWidth;
   };
   
-  void PluginGait::setLeftKneeWidth(double value) noexcept
+  void PluginGait::setLeftKneeWidth(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->LeftKneeWidth) < std::numeric_limits<double>::epsilon())
@@ -1091,13 +1091,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::rightAnkleWidth() const noexcept
+  double PluginGait::rightAnkleWidth() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightAnkleWidth;
   };
   
-  void PluginGait::setRightAnkleWidth(double value) noexcept
+  void PluginGait::setRightAnkleWidth(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->RightAnkleWidth) < std::numeric_limits<double>::epsilon())
@@ -1106,13 +1106,13 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::leftAnkleWidth() const noexcept
+  double PluginGait::leftAnkleWidth() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftAnkleWidth;
   };
   
-  void PluginGait::setLeftAnkleWidth(double value) noexcept
+  void PluginGait::setLeftAnkleWidth(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (fabs(value - optr->LeftAnkleWidth) < std::numeric_limits<double>::epsilon())
@@ -1121,13 +1121,13 @@ namespace btk
     this->modified();
   };
   
-  bool PluginGait::rightFootFlat() const noexcept
+  bool PluginGait::rightFootFlat() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightFootFlat;
   };
   
-  void PluginGait::setRightFootFlat(bool value) noexcept
+  void PluginGait::setRightFootFlat(bool value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (value == optr->RightFootFlat)
@@ -1136,13 +1136,13 @@ namespace btk
     this->modified();
   };
   
-  bool PluginGait::leftFootFlat() const noexcept
+  bool PluginGait::leftFootFlat() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftFootFlat;
   };
   
-  void PluginGait::setLeftFootFlat(bool value) noexcept
+  void PluginGait::setLeftFootFlat(bool value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (value == optr->LeftFootFlat)
@@ -1151,25 +1151,25 @@ namespace btk
     this->modified();
   };
   
-  double PluginGait::rightStaticPlantarFlexionOffset() const noexcept
+  double PluginGait::rightStaticPlantarFlexionOffset() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightStaticPlantarFlexionOffset;
   };
   
-  double PluginGait::rightStaticRotationOffset() const noexcept
+  double PluginGait::rightStaticRotationOffset() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->RightStaticRotationOffset;
   };
   
-  double PluginGait::leftStaticPlantarFlexionOffset() const noexcept
+  double PluginGait::leftStaticPlantarFlexionOffset() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftStaticPlantarFlexionOffset;
   };
   
-  double PluginGait::leftStaticRotationOffset() const noexcept
+  double PluginGait::leftStaticRotationOffset() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->LeftStaticRotationOffset;

@@ -38,6 +38,7 @@
 
 #include "btkTrialExport.h"
 #include "btkNode.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 namespace btk
 {
@@ -49,21 +50,21 @@ namespace btk
     
   public:
     Event(const std::string& name, double time = 0.0, const std::string& context = {}, const std::string& subject = {}, Node* parent = nullptr);
-    ~Event() noexcept;
+    ~Event() _BTK_NOEXCEPT;
     
     Event(const Node& ) = delete;
-    Event(Node&& ) noexcept = delete;
+    Event(Node&& ) _BTK_NOEXCEPT = delete;
     Event& operator=(const Event& ) = delete;
-    Event& operator=(Event&& ) noexcept = delete;
+    Event& operator=(Event&& ) _BTK_NOEXCEPT = delete;
     
-    double time() const noexcept;
-    void setTime(double value) noexcept;
+    double time() const _BTK_NOEXCEPT;
+    void setTime(double value) _BTK_NOEXCEPT;
     
-    const std::string& context() const noexcept;
-    void setContext(const std::string& value) noexcept;
+    const std::string& context() const _BTK_NOEXCEPT;
+    void setContext(const std::string& value) _BTK_NOEXCEPT;
     
-    const std::string& subject() const noexcept;
-    void setSubject(const std::string& value) noexcept;
+    const std::string& subject() const _BTK_NOEXCEPT;
+    void setSubject(const std::string& value) _BTK_NOEXCEPT;
   };
 };
 

@@ -38,7 +38,7 @@
 
 #include "btkAny.h"
 #include "btkLogger.h"
-#include "btkMacros.h" // _BTK_CONSTEXPR
+#include "btkMacros.h" // _BTK_CONSTEXPR, _BTK_NOEXCEPT
 
 #include <type_traits>
 
@@ -47,11 +47,11 @@
   private: \
   _BTK_STATIC_PROPERTIES(__VA_ARGS__); \
   public: \
-  virtual bool staticProperty(const char* key, btk::Any* value) const noexcept override \
+  virtual bool staticProperty(const char* key, btk::Any* value) const _BTK_NOEXCEPT override \
   { \
     return (this->baseclass##Private::staticProperty(key,value) ? true : derivedclass##Private::StaticProperties::visit(this->pint(),key,value)); \
   }; \
-  virtual bool setStaticProperty(const char* key, const btk::Any* value) noexcept override \
+  virtual bool setStaticProperty(const char* key, const btk::Any* value) _BTK_NOEXCEPT override \
   { \
     return (this->baseclass##Private::setStaticProperty(key,value) ? true : derivedclass##Private::StaticProperties::visit(this->pint(),key,value)); \
   }; \

@@ -42,6 +42,7 @@
  */
 
 #include "btkIOHandler.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <string>
 
@@ -53,18 +54,18 @@ namespace btk
   {
   public:
     IOHandlerPrivate();
-    virtual ~IOHandlerPrivate() noexcept;
+    virtual ~IOHandlerPrivate() _BTK_NOEXCEPT;
 
     IOHandlerPrivate(const IOHandlerPrivate& ) = delete;
-    IOHandlerPrivate(IOHandlerPrivate&& ) noexcept = delete;
+    IOHandlerPrivate(IOHandlerPrivate&& ) _BTK_NOEXCEPT = delete;
     IOHandlerPrivate& operator=(const IOHandlerPrivate& ) = delete;
-    IOHandlerPrivate& operator=(const IOHandlerPrivate&& ) noexcept = delete;
+    IOHandlerPrivate& operator=(const IOHandlerPrivate&& ) _BTK_NOEXCEPT = delete;
     
-    virtual std::vector<const char*> availableOptions() const noexcept = 0;
-    virtual std::vector<const char*> availableOptionChoices(const char* option) const noexcept = 0;
+    virtual std::vector<const char*> availableOptions() const _BTK_NOEXCEPT = 0;
+    virtual std::vector<const char*> availableOptionChoices(const char* option) const _BTK_NOEXCEPT = 0;
     
-    virtual void option(const char* name, void* value) const noexcept = 0;
-    virtual void setOption(const char* name, const void* value) noexcept = 0;
+    virtual void option(const char* name, void* value) const _BTK_NOEXCEPT = 0;
+    virtual void setOption(const char* name, const void* value) _BTK_NOEXCEPT = 0;
     
     IODevice* Device;
     IOHandler::Error ErrorCode;

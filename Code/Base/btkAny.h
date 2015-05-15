@@ -37,6 +37,7 @@
 #define __btkAny_h
 
 #include "btkBaseExport.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <type_traits>
 #include <vector>
@@ -56,36 +57,36 @@ namespace btk
     template <typename Type, typename... From, typename... To> struct Register<Type, Conversion<From...>, Conversion<To...>>;
     template <typename Type> struct Unregister;
     
-    Any() noexcept;
+    Any() _BTK_NOEXCEPT;
     Any(const Any& other);
-    Any(Any&& other) noexcept;
+    Any(Any&& other) _BTK_NOEXCEPT;
     template <typename U, typename D = void*, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(U&& value, D&& dimensions = {});
     template <typename U, typename D = size_t, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(std::initializer_list<U> values, std::initializer_list<D> dimensions = {});
     ~Any();
     
-    std::vector<size_t> dimensions() const noexcept;
-    size_t size() const noexcept;
+    std::vector<size_t> dimensions() const _BTK_NOEXCEPT;
+    size_t size() const _BTK_NOEXCEPT;
     
-    bool isValid() const noexcept;
-    void swap(Any& other) noexcept;
+    bool isValid() const _BTK_NOEXCEPT;
+    void swap(Any& other) _BTK_NOEXCEPT;
     
-    template <typename U> bool isEqual(U&& value) const noexcept;
+    template <typename U> bool isEqual(U&& value) const _BTK_NOEXCEPT;
     
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast() const noexcept;
-    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast(size_t idx) const noexcept;
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast() const _BTK_NOEXCEPT;
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast(size_t idx) const _BTK_NOEXCEPT;
     
-    template<class U> operator U() const noexcept;
+    template<class U> operator U() const _BTK_NOEXCEPT;
     
     Any& operator=(const Any& other);
-    Any& operator=(Any&& other) noexcept;
+    Any& operator=(Any&& other) _BTK_NOEXCEPT;
     
-    friend bool operator==(const Any& lhs, const Any& rhs) noexcept;
-    friend bool operator!=(const Any& lhs, const Any& rhs) noexcept;
+    friend bool operator==(const Any& lhs, const Any& rhs) _BTK_NOEXCEPT;
+    friend bool operator!=(const Any& lhs, const Any& rhs) _BTK_NOEXCEPT;
         
-    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator==(const A& lhs, const U& rhs) noexcept {return lhs.isEqual(rhs);};
-    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator==(const U& lhs, const A& rhs) noexcept {return rhs.isEqual(lhs);};
-    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator!=(const A& lhs, const U& rhs) noexcept {return !lhs.isEqual(rhs);};
-    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator!=(const U& lhs, const A& rhs) noexcept {return !rhs.isEqual(lhs);};
+    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator==(const A& lhs, const U& rhs) _BTK_NOEXCEPT {return lhs.isEqual(rhs);};
+    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator==(const U& lhs, const A& rhs) _BTK_NOEXCEPT {return rhs.isEqual(lhs);};
+    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator!=(const A& lhs, const U& rhs) _BTK_NOEXCEPT {return !lhs.isEqual(rhs);};
+    template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator!=(const U& lhs, const A& rhs) _BTK_NOEXCEPT {return !rhs.isEqual(lhs);};
     
   private:    
     Storage* mp_Storage;

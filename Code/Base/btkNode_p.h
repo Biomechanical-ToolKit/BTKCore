@@ -44,6 +44,7 @@
 #include "btkObject_p.h"
 #include "btkTypeid.h"
 #include "btkNodeid.h" // Macro BTK_DECLARE_NODEID used by inheriting classes.
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <string>
 #include <unordered_map>
@@ -62,22 +63,22 @@ namespace btk
     
     NodePrivate() = delete;
     NodePrivate(Node* pint, const std::string& name);
-    ~NodePrivate() noexcept;
+    ~NodePrivate() _BTK_NOEXCEPT;
     NodePrivate(const NodePrivate& ) = delete;
-    NodePrivate(NodePrivate&& ) noexcept = delete;
+    NodePrivate(NodePrivate&& ) _BTK_NOEXCEPT = delete;
     NodePrivate& operator=(const NodePrivate& ) = delete;
-    NodePrivate& operator=(const NodePrivate&& ) noexcept = delete;
+    NodePrivate& operator=(const NodePrivate&& ) _BTK_NOEXCEPT = delete;
     
-    virtual bool castable(typeid_t id) const noexcept;
+    virtual bool castable(typeid_t id) const _BTK_NOEXCEPT;
     
-    virtual bool staticProperty(const char* key, btk::Any* value) const noexcept;
-    virtual bool setStaticProperty(const char* key, const btk::Any* value) noexcept;
+    virtual bool staticProperty(const char* key, btk::Any* value) const _BTK_NOEXCEPT;
+    virtual bool setStaticProperty(const char* key, const btk::Any* value) _BTK_NOEXCEPT;
     
-    bool attachParent(Node* node) noexcept;
-    bool detachParent(Node* node) noexcept;
+    bool attachParent(Node* node) _BTK_NOEXCEPT;
+    bool detachParent(Node* node) _BTK_NOEXCEPT;
     
-    bool attachChild(Node* node) noexcept;
-    bool detachChild(Node* node) noexcept;
+    bool attachChild(Node* node) _BTK_NOEXCEPT;
+    bool detachChild(Node* node) _BTK_NOEXCEPT;
     
     virtual Node* makePint() const;
     virtual void finalizePint(Node* pint) const;

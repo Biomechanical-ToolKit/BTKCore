@@ -38,6 +38,7 @@
 
 #include "btkModelExport.h"
 #include "btkNode.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <string>
 
@@ -54,32 +55,32 @@ namespace btk
     BTK_DECLARE_PIMPL_ACCESSOR(Rig)
     
   public:
-    // static const std::vector<std::string>& requiredBonyLandmarks() const noexcept;
-    // static const RotationSequence predefinedJointRotationSequence(const std::string& /* jointLabel */) const noexcept;
+    // static const std::vector<std::string>& requiredBonyLandmarks() const _BTK_NOEXCEPT;
+    // static const RotationSequence predefinedJointRotationSequence(const std::string& /* jointLabel */) const _BTK_NOEXCEPT;
     
-    ~Rig() noexcept;
+    ~Rig() _BTK_NOEXCEPT;
     
     Rig(const Rig& ) = delete;
-    Rig(Rig&& ) noexcept = delete;
+    Rig(Rig&& ) _BTK_NOEXCEPT = delete;
     Rig& operator=(const Rig& ) = delete;
-    Rig& operator=(Rig&& ) noexcept = delete;
+    Rig& operator=(Rig&& ) _BTK_NOEXCEPT = delete;
     
-    // LandmarksTranslator* predefinedBonyLandmarksTranslator() const noexcept;
+    // LandmarksTranslator* predefinedBonyLandmarksTranslator() const _BTK_NOEXCEPT;
     
-    virtual bool setup(Model* model) const noexcept = 0;
-    virtual bool calibrate(Model* model, Node* trials) noexcept = 0;
-    virtual bool generate(Model* model, Node* trials) const noexcept = 0;
-    virtual void finalize(Node* trials) const noexcept = 0;
+    virtual bool setup(Model* model) const _BTK_NOEXCEPT = 0;
+    virtual bool calibrate(Model* model, Node* trials) _BTK_NOEXCEPT = 0;
+    virtual bool generate(Model* model, Node* trials) const _BTK_NOEXCEPT = 0;
+    virtual void finalize(Node* trials) const _BTK_NOEXCEPT = 0;
     
     virtual LandmarksTranslator* defaultLandmarksTranslator() = 0;
     
   protected:
     Rig(const std::string& name, int region, int side, Node* parent);
-    Rig(RigPrivate& pimpl, Node* parent) noexcept;
+    Rig(RigPrivate& pimpl, Node* parent) _BTK_NOEXCEPT;
         
-    // virtual std::vector<std::string> requiredLandmarks() const noexcept = 0;
+    // virtual std::vector<std::string> requiredLandmarks() const _BTK_NOEXCEPT = 0;
     
-    // std::vector<std::string> mapLandmarks(const Trial* trial) const noexcept;
+    // std::vector<std::string> mapLandmarks(const Trial* trial) const _BTK_NOEXCEPT;
   };
 };
 

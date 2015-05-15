@@ -41,6 +41,8 @@
  * can change drastically from one release to another.
  */
 
+#include "btkMacros.h" // _BTK_NOEXCEPT
+
 #include <cstdint>
 #include <string>
 
@@ -54,12 +56,12 @@ namespace btk
   {
   public:
     BinaryStreamPrivate(IODevice* device, EndianConverter* converter);
-    virtual ~BinaryStreamPrivate() noexcept;
+    virtual ~BinaryStreamPrivate() _BTK_NOEXCEPT;
     
     BinaryStreamPrivate(const BinaryStreamPrivate& ) = delete;
-    BinaryStreamPrivate(BinaryStreamPrivate&& ) noexcept = delete;
+    BinaryStreamPrivate(BinaryStreamPrivate&& ) _BTK_NOEXCEPT = delete;
     BinaryStreamPrivate& operator=(const BinaryStreamPrivate& ) = delete;
-    BinaryStreamPrivate& operator=(const BinaryStreamPrivate&& ) noexcept = delete;
+    BinaryStreamPrivate& operator=(const BinaryStreamPrivate&& ) _BTK_NOEXCEPT = delete;
     
     IODevice* Device;
     EndianConverter* Converter;
@@ -70,14 +72,14 @@ namespace btk
   class EndianConverter
   {
   public:
-    virtual ~EndianConverter() noexcept = default;
+    virtual ~EndianConverter() _BTK_NOEXCEPT = default;
     
     EndianConverter(const EndianConverter& ) = delete;
-    EndianConverter(EndianConverter&& ) noexcept = delete;
+    EndianConverter(EndianConverter&& ) _BTK_NOEXCEPT = delete;
     EndianConverter& operator=(const EndianConverter& ) = delete;
-    EndianConverter& operator=(EndianConverter&& ) noexcept = delete;
+    EndianConverter& operator=(EndianConverter&& ) _BTK_NOEXCEPT = delete;
     
-    virtual EndianFormat format() const noexcept = 0;
+    virtual EndianFormat format() const _BTK_NOEXCEPT = 0;
     
     char readChar(IODevice* src) const;
     int8_t readI8(IODevice* src) const;
@@ -118,11 +120,11 @@ namespace btk
     ~VAXLittleEndianConverter() = default;
     
     VAXLittleEndianConverter(const VAXLittleEndianConverter& ) = delete;
-    VAXLittleEndianConverter(VAXLittleEndianConverter&& ) noexcept = delete;
+    VAXLittleEndianConverter(VAXLittleEndianConverter&& ) _BTK_NOEXCEPT = delete;
     VAXLittleEndianConverter& operator=(const VAXLittleEndianConverter& ) = delete;
-    VAXLittleEndianConverter& operator=(VAXLittleEndianConverter&& ) noexcept = delete;
+    VAXLittleEndianConverter& operator=(VAXLittleEndianConverter&& ) _BTK_NOEXCEPT = delete;
     
-    virtual EndianFormat format() const noexcept final;
+    virtual EndianFormat format() const _BTK_NOEXCEPT final;
     
     virtual int16_t readI16(IODevice* src) const final;
     virtual uint16_t readU16(IODevice* src) const final;
@@ -147,11 +149,11 @@ namespace btk
     ~IEEELittleEndianConverter() = default;
     
     IEEELittleEndianConverter(const IEEELittleEndianConverter& ) = delete;
-    IEEELittleEndianConverter(IEEELittleEndianConverter&& ) noexcept = delete;
+    IEEELittleEndianConverter(IEEELittleEndianConverter&& ) _BTK_NOEXCEPT = delete;
     IEEELittleEndianConverter& operator=(const IEEELittleEndianConverter& ) = delete;
-    IEEELittleEndianConverter& operator=(IEEELittleEndianConverter&& ) noexcept = delete;
+    IEEELittleEndianConverter& operator=(IEEELittleEndianConverter&& ) _BTK_NOEXCEPT = delete;
     
-    virtual EndianFormat format() const noexcept final;
+    virtual EndianFormat format() const _BTK_NOEXCEPT final;
     
     virtual int16_t readI16(IODevice* src) const final;
     virtual uint16_t readU16(IODevice* src) const final;
@@ -176,11 +178,11 @@ namespace btk
     ~IEEEBigEndianConverter() = default;
     
     IEEEBigEndianConverter(const IEEEBigEndianConverter& ) = delete;
-    IEEEBigEndianConverter(IEEEBigEndianConverter&& ) noexcept = delete;
+    IEEEBigEndianConverter(IEEEBigEndianConverter&& ) _BTK_NOEXCEPT = delete;
     IEEEBigEndianConverter& operator=(const IEEEBigEndianConverter& ) = delete;
-    IEEEBigEndianConverter& operator=(IEEEBigEndianConverter&& ) noexcept = delete;
+    IEEEBigEndianConverter& operator=(IEEEBigEndianConverter&& ) _BTK_NOEXCEPT = delete;
     
-    virtual EndianFormat format() const noexcept final;
+    virtual EndianFormat format() const _BTK_NOEXCEPT final;
     
     virtual int16_t readI16(IODevice* src) const final;
     virtual uint16_t readU16(IODevice* src) const final;

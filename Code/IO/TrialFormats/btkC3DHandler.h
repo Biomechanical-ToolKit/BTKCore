@@ -37,7 +37,7 @@
 #define __btkC3DHandler_h
 
 #include "btkTrialIOHandler.h"
-#include "btkMacros.h" // _BTK_CONSTEXPR
+#include "btkMacros.h" // _BTK_CONSTEXPR, _BTK_NOEXCEPT
 
 static _BTK_CONSTEXPR const char _btk_C3DHandler_AnalogStorage[] = "AnalogStorage";
 
@@ -55,19 +55,19 @@ namespace btk
     using AnalogStorageFormat = IOHandlerOption<_btk_C3DHandler_AnalogStorage,AnalogStorage>;
     
     C3DHandler();
-    ~C3DHandler() noexcept;
+    ~C3DHandler() _BTK_NOEXCEPT;
     
     C3DHandler(const C3DHandler& ) = delete;
-    C3DHandler(C3DHandler&& ) noexcept = delete;
+    C3DHandler(C3DHandler&& ) _BTK_NOEXCEPT = delete;
     C3DHandler& operator=(const C3DHandler& ) = delete;
-    C3DHandler& operator=(const C3DHandler&& ) noexcept = delete;
+    C3DHandler& operator=(const C3DHandler&& ) _BTK_NOEXCEPT = delete;
     
-    virtual Capability capability() const noexcept final;
+    virtual Capability capability() const _BTK_NOEXCEPT final;
     
-    virtual std::vector<const char*> supportedTrialFormats() const noexcept final;
+    virtual std::vector<const char*> supportedTrialFormats() const _BTK_NOEXCEPT final;
     
   protected:
-    virtual Signature validateSignature() const noexcept final;
+    virtual Signature validateSignature() const _BTK_NOEXCEPT final;
     virtual void readDevice(Node* output) final;
     virtual void writeDevice(const Node* input) final;
   };

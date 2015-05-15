@@ -37,6 +37,7 @@
 #define __btkIODevice_p_h
 
 #include "btkIODevice.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 /*
  * WARNING: This file and its content are not included in the public API and 
@@ -49,12 +50,12 @@ namespace btk
   {
   public:
     IODevicePrivate();
-    virtual ~IODevicePrivate() noexcept;
+    virtual ~IODevicePrivate() _BTK_NOEXCEPT;
     
     IODevicePrivate(const IODevicePrivate& ) = delete;
-    IODevicePrivate(IODevicePrivate&& ) noexcept = delete;
+    IODevicePrivate(IODevicePrivate&& ) _BTK_NOEXCEPT = delete;
     IODevicePrivate& operator=(const IODevicePrivate& ) = delete;
-    IODevicePrivate& operator=(const IODevicePrivate&& ) noexcept = delete;
+    IODevicePrivate& operator=(const IODevicePrivate&& ) _BTK_NOEXCEPT = delete;
     
     char* Name;
     IODevice::State State;

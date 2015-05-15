@@ -89,63 +89,63 @@ namespace btk
     std::copy_n(position, 3, optr->Data+9);
   };
   
-  RelativeReferenceFrame::~RelativeReferenceFrame() noexcept = default;
+  RelativeReferenceFrame::~RelativeReferenceFrame() _BTK_NOEXCEPT = default;
   
-  const double* RelativeReferenceFrame::u() const noexcept
+  const double* RelativeReferenceFrame::u() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data;
   };
   
-  double* RelativeReferenceFrame::u() noexcept
+  double* RelativeReferenceFrame::u() _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data;
   };
   
-  const double* RelativeReferenceFrame::v() const noexcept
+  const double* RelativeReferenceFrame::v() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data+3;
   };
   
-  double* RelativeReferenceFrame::v() noexcept
+  double* RelativeReferenceFrame::v() _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data+3;
   };
   
-  const double* RelativeReferenceFrame::w() const noexcept
+  const double* RelativeReferenceFrame::w() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data+6;
   };
   
-  double* RelativeReferenceFrame::w() noexcept
+  double* RelativeReferenceFrame::w() _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data+6;
   };
   
-  const double* RelativeReferenceFrame::o() const noexcept
+  const double* RelativeReferenceFrame::o() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data+9;
   };
   
-  double* RelativeReferenceFrame::o() noexcept
+  double* RelativeReferenceFrame::o() _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data+9;
   };
   
-  const double* RelativeReferenceFrame::data() const noexcept
+  const double* RelativeReferenceFrame::data() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data;
   };
   
-  double* RelativeReferenceFrame::data() noexcept
+  double* RelativeReferenceFrame::data() _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Data;

@@ -65,15 +65,15 @@ namespace btk
   : Node(*new SegmentPrivate(this,name,part,side), parent)
   {};
   
-  Segment::~Segment() noexcept = default;
+  Segment::~Segment() _BTK_NOEXCEPT = default;
   
-  int Segment::part() const noexcept
+  int Segment::part() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Part;
   };
   
-  void Segment::setPart(int value) noexcept
+  void Segment::setPart(int value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (optr->Part == value)
@@ -82,13 +82,13 @@ namespace btk
     this->modified();
   };
   
-  int Segment::side() const noexcept
+  int Segment::side() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Side;
   };
   
-  void Segment::setSide(int value) noexcept
+  void Segment::setSide(int value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (optr->Side == value)

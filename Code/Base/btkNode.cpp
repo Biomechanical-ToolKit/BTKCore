@@ -58,7 +58,7 @@ namespace btk
     mp_Pint(pint)
   {};
   
-  NodePrivate::~NodePrivate() noexcept = default;
+  NodePrivate::~NodePrivate() _BTK_NOEXCEPT = default;
   
   bool NodePrivate::retrievePath(std::list<const Node*>& path, const Node* current, const Node* stop)
   {
@@ -87,17 +87,17 @@ namespace btk
     return false;
   };
   
-  bool NodePrivate::castable(typeid_t id) const noexcept
+  bool NodePrivate::castable(typeid_t id) const _BTK_NOEXCEPT
   {
     return (static_typeid<Node>() == id);
   };
   
-  bool NodePrivate::staticProperty(const char* key, btk::Any* value) const noexcept
+  bool NodePrivate::staticProperty(const char* key, btk::Any* value) const _BTK_NOEXCEPT
   {
     return StaticProperties::visit(this->pint(),key,value);
   };
   
-  bool NodePrivate::setStaticProperty(const char* key, const btk::Any* value) noexcept
+  bool NodePrivate::setStaticProperty(const char* key, const btk::Any* value) _BTK_NOEXCEPT
   {
     return StaticProperties::visit(this->pint(),key,value);
   };
@@ -107,7 +107,7 @@ namespace btk
    * In case @a node is already a parent a warning message is send to the message logger.
    * This method returns also false if the given @a node is null.
    */
-  bool NodePrivate::attachParent(Node* node) noexcept
+  bool NodePrivate::attachParent(Node* node) _BTK_NOEXCEPT
   {
     if (node == nullptr)
       return false;
@@ -127,7 +127,7 @@ namespace btk
    * Removes the given @a node if it is a parent of the current object.
    * In case @a node is not a parent or is null, this method returns false.
    */
-  bool NodePrivate::detachParent(Node* node) noexcept
+  bool NodePrivate::detachParent(Node* node) _BTK_NOEXCEPT
   {
     if (node == nullptr)
       return false;
@@ -147,7 +147,7 @@ namespace btk
    * In case @a node is already a child, this method returns false, true otherwise.
    * This method returns also false if the given @a node is null.
    */
-  bool NodePrivate::attachChild(Node* node) noexcept
+  bool NodePrivate::attachChild(Node* node) _BTK_NOEXCEPT
   {
     if (node == nullptr)
       return false;
@@ -163,7 +163,7 @@ namespace btk
   /**
    * Removes the given @a node if it is a child of the current object.
    */
-  bool NodePrivate::detachChild(Node* node) noexcept
+  bool NodePrivate::detachChild(Node* node) _BTK_NOEXCEPT
   {
     if (node == nullptr)
       return false;
@@ -257,7 +257,7 @@ namespace btk
    * Detach this object of these children. In case a child has no more parent, it is deleted.
    * Detach also this object of these parents
    */
-  Node::~Node() noexcept
+  Node::~Node() _BTK_NOEXCEPT
   {
     this->clear();
   };
@@ -266,7 +266,7 @@ namespace btk
    * Returns the name of the node.
    * You can also access to this information using the property 'name'.
    */
-  const std::string& Node::name() const noexcept
+  const std::string& Node::name() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Name;
@@ -277,7 +277,7 @@ namespace btk
   * You can also modify this information using the property 'name'.
   * In case the value is different, the state of the node is set to modified.
   */
-  void Node::setName(const std::string& value) noexcept
+  void Node::setName(const std::string& value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (value == optr->Name)
@@ -290,7 +290,7 @@ namespace btk
    * Returns the description of the node. By default the description is empty.
    * You can also access to this information using the property 'description'.
    */
-  const std::string& Node::description() const noexcept
+  const std::string& Node::description() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Description;
@@ -301,7 +301,7 @@ namespace btk
    * You can also modify this information using the property 'description'.
    * @note The state of the node is not modified if the description is different.
    */
-  void Node::setDescription(const std::string& value) noexcept
+  void Node::setDescription(const std::string& value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     optr->Description = value;
@@ -322,7 +322,7 @@ namespace btk
    * int count2 = node.property("count");
    * @endcode
    */ 
-  Any Node::property(const std::string& key) const noexcept
+  Any Node::property(const std::string& key) const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     Any value;
@@ -379,7 +379,7 @@ namespace btk
   /**
    * Returns the list of children attached with this node.
    */ 
-  const std::list<Node*>& Node::children() const noexcept
+  const std::list<Node*>& Node::children() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Children;
@@ -388,7 +388,7 @@ namespace btk
   /**
    * Returns true if the node has at least one child, false otherwise
    */
-  bool Node::hasChildren() const noexcept
+  bool Node::hasChildren() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return !optr->Children.empty();
@@ -398,7 +398,7 @@ namespace btk
    * Append a node if this one is not already a child.
    * In case the child is appended, this node is attached as parent and its state is set to modified.
    */
-  void Node::appendChild(Node* node) noexcept
+  void Node::appendChild(Node* node) _BTK_NOEXCEPT
   {
     if (this->pimpl()->attachChild(node))
     {
@@ -411,7 +411,7 @@ namespace btk
    * Remove the given @a node from the list of the children.
    * @note It is the responsability to the developer to delete the given node if this one has no more parent.
    */
-  void Node::removeChild(Node* node) noexcept
+  void Node::removeChild(Node* node) _BTK_NOEXCEPT
   {
     if (this->pimpl()->detachChild(node))
     {
@@ -423,7 +423,7 @@ namespace btk
   /**
    * Returns the list of parents attached with this node.
    */ 
-  const std::list<Node*>& Node::parents() const noexcept
+  const std::list<Node*>& Node::parents() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Parents;
@@ -432,7 +432,7 @@ namespace btk
   /**
    * Returns true if the node has at least one parent, false otherwise.
    */
-  bool Node::hasParents() const noexcept
+  bool Node::hasParents() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return !optr->Parents.empty();
@@ -442,7 +442,7 @@ namespace btk
    * Appends a node if this one is not already a parent.
    * In case this node is appended, @a node is attached as parent and its state is set to modified.
    */
-  void Node::appendParent(Node* node) noexcept
+  void Node::appendParent(Node* node) _BTK_NOEXCEPT
   {
     if (this->pimpl()->attachParent(node))
     {
@@ -455,7 +455,7 @@ namespace btk
    * Remove the given @a node from the list of the parent.
    * @note It is the responsability to the developer to delete this node if this one has no more parent.
    */
-  void Node::removeParent(Node* node) noexcept
+  void Node::removeParent(Node* node) _BTK_NOEXCEPT
   {
     if (this->pimpl()->detachParent(node))
     {
@@ -467,7 +467,7 @@ namespace btk
   /**
    * Overload method which modify this object as well as all these parents.
    */
-  void Node::modified() noexcept
+  void Node::modified() _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     this->Object::modified();
@@ -479,7 +479,7 @@ namespace btk
    * Removes all parents, children and properties
    * If a child has no more parent, this one is deleted.
    */
-  void Node::clear() noexcept
+  void Node::clear() _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (optr->Parents.empty() && optr->Children.empty() && optr->Properties.empty())
@@ -526,7 +526,7 @@ namespace btk
   /**
    * Constructor to be used by inherited object which want to add informations (static properties, members, etc) to the private implementation.
    */
-  Node::Node(NodePrivate& pimpl, Node* parent) noexcept
+  Node::Node(NodePrivate& pimpl, Node* parent) _BTK_NOEXCEPT
   : Object(pimpl)
   {
     this->appendParent(parent);
@@ -547,7 +547,7 @@ namespace btk
   };
   
   /**
-   * @fn template <typename T = Node*> T findChild(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept
+   * @fn template <typename T = Node*> T findChild(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const _BTK_NOEXCEPT
    * Returns the child with the given @a name and which can be casted to the type T. You can refine the search by adding @a properties to match. The search can be done recursively (by default) or only in direct children. The latter is available by setting @a recursiveSearch to false.
    * There are three ways to use this methods.
    *
@@ -589,7 +589,7 @@ namespace btk
    */
   
   /**
-   * @fn template <typename T = Node*> std::list<T> findChildren(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept
+   * @fn template <typename T = Node*> std::list<T> findChildren(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const _BTK_NOEXCEPT
    * Returns the children with the given @a name and which can be casted to the type T. You can refine the search by adding @a properties to match. The search can be done recursively (by default) or only in direct children. The latter is available by setting @a recursiveSearch to false.
    * As with the method findChild(), you can explicitely or implicitely give the type and/or the name of the children. For example:
    * @code
@@ -613,7 +613,7 @@ namespace btk
    */
   
   /**
-   * @fn template <typename T = Node*> std::list<T> findChildren(const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const noexcept
+   * @fn template <typename T = Node*> std::list<T> findChildren(const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const _BTK_NOEXCEPT
    * Convenient method to find children using a regular expression.
    */
   
@@ -622,7 +622,7 @@ namespace btk
    * If no path exists between both, then an empty list is returned, 
    * The first node in the retrieved path is the current one, while the last is the node to search.
    */
-  std::list<const Node*> Node::retrievePath(const Node* node) const noexcept
+  std::list<const Node*> Node::retrievePath(const Node* node) const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     std::list<const Node*> path;
@@ -633,7 +633,7 @@ namespace btk
   /**
    * Implementation of the findChild method.
    */
-  Node* Node::findNode(typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
+  Node* Node::findNode(typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const _BTK_NOEXCEPT
   {
     // Search in the direct children
     auto optr = this->pimpl();
@@ -671,7 +671,7 @@ namespace btk
   /**
    * Implementation of the findChildren method.
    */
-  void Node::findNodes(std::list<void*>* list, typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
+  void Node::findNodes(std::list<void*>* list, typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const _BTK_NOEXCEPT
   {
     // Search in the direct children
     auto optr = this->pimpl();
@@ -705,7 +705,7 @@ namespace btk
   /**
    * Implementation of the findChildren method.
    */
-  void Node::findNodes(std::list<void*>* list, typeid_t id, const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const noexcept
+  void Node::findNodes(std::list<void*>* list, typeid_t id, const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const _BTK_NOEXCEPT
   {
     // Search in the direct children
     auto optr = this->pimpl();
@@ -738,13 +738,13 @@ namespace btk
   /**
    * Returns true if the current object is castable to another with the given @a typeid_t value, false otherwise.
    */
-  bool Node::castable(typeid_t id) const noexcept
+  bool Node::castable(typeid_t id) const _BTK_NOEXCEPT
   {
     return this->pimpl()->castable(id);
   };
   
   /**
-   * @fn template <typename U> U node_cast(Node* node) noexcept
+   * @fn template <typename U> U node_cast(Node* node) _BTK_NOEXCEPT
    * Conveniant function to cast a pointer to a Node object to another type U. If it is not possible, this method returns nullptr.
    *
    * @code

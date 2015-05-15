@@ -3,6 +3,7 @@
 
 #include <btkIODevice.h>
 #include <btkIODevice_p.h>
+#include <btkMacros.h> // _BTK_NOEXCEPT
 #include <cstring> // memcpy
 
 class DummyBufferPrivate : public btk::IODevicePrivate
@@ -21,7 +22,7 @@ class DummyBuffer : public btk::IODevice
 public:
   DummyBuffer(char* d) : btk::IODevice(*new DummyBufferPrivate(d))
   {};
-  virtual bool isOpen() const noexcept  override {return true;};
+  virtual bool isOpen() const _BTK_NOEXCEPT  override {return true;};
   virtual void close()  override {};
   virtual Size peek(char* s, Size n) const override
   {
@@ -41,8 +42,8 @@ public:
     optr->Pos += n;
   };
   virtual void seek(Offset , Origin ) override {}; // Not implemented
-  virtual Position tell() const noexcept  override {return Position(Offset(-1));}; // Not implemented
-  virtual bool isSequential() const noexcept  override {return true;};
+  virtual Position tell() const _BTK_NOEXCEPT  override {return Position(Offset(-1));}; // Not implemented
+  virtual bool isSequential() const _BTK_NOEXCEPT  override {return true;};
   
   void setPos(Offset pos)
   {

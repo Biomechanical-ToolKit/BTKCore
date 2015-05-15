@@ -38,7 +38,7 @@
 
 #include "btkTrialExport.h"
 #include "btkNode.h"
-#include "btkMacros.h" // _BTK_CONSTEXPR
+#include "btkMacros.h" // _BTK_CONSTEXPR, _BTK_NOEXCEPT
 
 #include <vector>
 #include <array>
@@ -61,61 +61,61 @@ namespace btk
     TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, Node* parent = nullptr);
     TimeSequence(const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range, Node* parent = nullptr);
     TimeSequence(const std::string& name, const std::vector<unsigned>& dimensions, unsigned samples, double rate, double start, int type, const std::string& unit, Node* parent = nullptr);
-    ~TimeSequence() noexcept;
+    ~TimeSequence() _BTK_NOEXCEPT;
     
     TimeSequence(const TimeSequence& ) = delete;
-    TimeSequence(TimeSequence&& ) noexcept = delete;
+    TimeSequence(TimeSequence&& ) _BTK_NOEXCEPT = delete;
     TimeSequence& operator=(const TimeSequence& ) = delete;
-    TimeSequence& operator=(TimeSequence&& ) noexcept = delete;
+    TimeSequence& operator=(TimeSequence&& ) _BTK_NOEXCEPT = delete;
     
-    double sampleRate() const noexcept;
-    void setSampleRate(double value) noexcept;
+    double sampleRate() const _BTK_NOEXCEPT;
+    void setSampleRate(double value) _BTK_NOEXCEPT;
     
-    const std::vector<unsigned>& dimensions() const noexcept;
-    unsigned samples() const noexcept;
-    unsigned components() const noexcept;
-    size_t elements() const noexcept;
+    const std::vector<unsigned>& dimensions() const _BTK_NOEXCEPT;
+    unsigned samples() const _BTK_NOEXCEPT;
+    unsigned components() const _BTK_NOEXCEPT;
+    size_t elements() const _BTK_NOEXCEPT;
     
-    double duration() const noexcept;
+    double duration() const _BTK_NOEXCEPT;
     
-    int type() const noexcept;
-    void setType(int value) noexcept;
+    int type() const _BTK_NOEXCEPT;
+    void setType(int value) _BTK_NOEXCEPT;
     
-    const std::string& unit() const noexcept;
-    void setUnit(const std::string& value) noexcept;
+    const std::string& unit() const _BTK_NOEXCEPT;
+    void setUnit(const std::string& value) _BTK_NOEXCEPT;
     
-    double startTime() const noexcept;
-    void setStartTime(double value) noexcept;
+    double startTime() const _BTK_NOEXCEPT;
+    void setStartTime(double value) _BTK_NOEXCEPT;
     
-    double scale() const noexcept;
-    void setScale(double value) noexcept;
+    double scale() const _BTK_NOEXCEPT;
+    void setScale(double value) _BTK_NOEXCEPT;
     
-    double offset() const noexcept;
-    void setOffset(double value) noexcept;
+    double offset() const _BTK_NOEXCEPT;
+    void setOffset(double value) _BTK_NOEXCEPT;
     
-    const std::array<double,2>& range() const noexcept;
-    void setRange(const std::array<double,2>& value) noexcept;
+    const std::array<double,2>& range() const _BTK_NOEXCEPT;
+    void setRange(const std::array<double,2>& value) _BTK_NOEXCEPT;
     
-    const double* data() const noexcept;
-    double* data() noexcept;
+    const double* data() const _BTK_NOEXCEPT;
+    double* data() _BTK_NOEXCEPT;
     
-    template <typename... Is> double data(unsigned sample, Is... indices) const noexcept;
-    template <typename... Is> double& data(unsigned sample, Is... indices) noexcept;
+    template <typename... Is> double data(unsigned sample, Is... indices) const _BTK_NOEXCEPT;
+    template <typename... Is> double& data(unsigned sample, Is... indices) _BTK_NOEXCEPT;
     
     void resize(unsigned samples);
   
   private:
-    double& data(unsigned sample, std::initializer_list<unsigned>&& indices) const noexcept;
+    double& data(unsigned sample, std::initializer_list<unsigned>&& indices) const _BTK_NOEXCEPT;
   };
   
   template <typename... Is>
-  inline double TimeSequence::data(unsigned sample, Is... indices) const noexcept
+  inline double TimeSequence::data(unsigned sample, Is... indices) const _BTK_NOEXCEPT
   {
     return this->data(sample, {static_cast<unsigned>(indices)...});
   };
   
   template <typename... Is>
-  inline double& TimeSequence::data(unsigned sample, Is... indices) noexcept
+  inline double& TimeSequence::data(unsigned sample, Is... indices) _BTK_NOEXCEPT
   {
     return this->data(sample, {static_cast<unsigned>(indices)...});
   };

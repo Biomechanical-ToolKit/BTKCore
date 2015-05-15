@@ -64,9 +64,9 @@ namespace btk
   : Node(*new LandmarksTranslatorPrivate(this,name,conversionTable), parent)
   {};
   
-  LandmarksTranslator::~LandmarksTranslator() noexcept = default;
+  LandmarksTranslator::~LandmarksTranslator() _BTK_NOEXCEPT = default;
   
-  std::string LandmarksTranslator::convert(const std::string& name) const noexcept
+  std::string LandmarksTranslator::convert(const std::string& name) const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     auto it = optr->ConverstionTable.find(name);
@@ -75,7 +75,7 @@ namespace btk
     return name;
   };
   
-  std::string LandmarksTranslator::convertIfExists(const std::string& name) const noexcept
+  std::string LandmarksTranslator::convertIfExists(const std::string& name) const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     auto it = optr->ConverstionTable.find(name);

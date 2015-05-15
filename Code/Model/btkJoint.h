@@ -38,6 +38,7 @@
 
 #include "btkModelExport.h"
 #include "btkNode.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 namespace btk
 {
@@ -51,21 +52,21 @@ namespace btk
     
   public:
     Joint(const std::string& name, Segment* proximal, Segment* distal, Node* parent = nullptr);
-    ~Joint() noexcept;
+    ~Joint() _BTK_NOEXCEPT;
     
     Joint(const Joint& ) = delete;
-    Joint(Joint&& ) noexcept = delete;
+    Joint(Joint&& ) _BTK_NOEXCEPT = delete;
     Joint& operator=(const Joint& ) = delete;
-    Joint& operator=(Joint&& ) noexcept = delete;
+    Joint& operator=(Joint&& ) _BTK_NOEXCEPT = delete;
     
-    Segment* proximalSegment() const noexcept;
-    void setProximalSegment(Segment* value) noexcept;
+    Segment* proximalSegment() const _BTK_NOEXCEPT;
+    void setProximalSegment(Segment* value) _BTK_NOEXCEPT;
     
-    Segment* distalSegment() const noexcept;
-    void setDistalSegment(Segment* value) noexcept;
+    Segment* distalSegment() const _BTK_NOEXCEPT;
+    void setDistalSegment(Segment* value) _BTK_NOEXCEPT;
     
   private:
-    Joint(JointPrivate& pimpl, Node* parent) noexcept;
+    Joint(JointPrivate& pimpl, Node* parent) _BTK_NOEXCEPT;
   };
 };
 

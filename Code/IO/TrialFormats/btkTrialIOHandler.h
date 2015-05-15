@@ -37,24 +37,25 @@
 #define __btkTrialIOHandler_h
 
 #include "btkIOHandler.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 namespace btk
 {
   class TrialIOHandler : public IOHandler
   {
   public:
-    ~TrialIOHandler() noexcept;
+    ~TrialIOHandler() _BTK_NOEXCEPT;
     
     TrialIOHandler() = delete;
     TrialIOHandler(const TrialIOHandler& ) = delete;
-    TrialIOHandler(TrialIOHandler&& ) noexcept = delete;
+    TrialIOHandler(TrialIOHandler&& ) _BTK_NOEXCEPT = delete;
     TrialIOHandler& operator=(const TrialIOHandler& ) = delete;
-    TrialIOHandler& operator=(const TrialIOHandler&& ) noexcept = delete;
+    TrialIOHandler& operator=(const TrialIOHandler&& ) _BTK_NOEXCEPT = delete;
     
-    virtual std::vector<const char*> supportedTrialFormats() const noexcept = 0;
+    virtual std::vector<const char*> supportedTrialFormats() const _BTK_NOEXCEPT = 0;
  
   protected:
-    TrialIOHandler(IOHandlerPrivate& pimpl) noexcept;
+    TrialIOHandler(IOHandlerPrivate& pimpl) _BTK_NOEXCEPT;
   };
 };
   

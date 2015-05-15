@@ -48,7 +48,7 @@ namespace btk
   : Name(nullptr), State(IODevice::State::Good), Exception(IODevice::State::Good)
   {};
   
-  IODevicePrivate::~IODevicePrivate() noexcept
+  IODevicePrivate::~IODevicePrivate() _BTK_NOEXCEPT
   {
     delete this->Name;
   };
@@ -77,12 +77,12 @@ namespace btk
    * Destructor. 
    * This methods does nothing. It is the responsability of the inherited class to decide if their destructor does something specific regarding the state of the device (like closing it).
    */
-  IODevice::~IODevice() noexcept = default;
+  IODevice::~IODevice() _BTK_NOEXCEPT = default;
   
   /**
    * Returns true if the device's state is set to State::Good.
    */
-  bool IODevice::isGood() const noexcept
+  bool IODevice::isGood() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->State == State::Good;
@@ -91,7 +91,7 @@ namespace btk
   /**
    * Returns true if the device's state contain the flag State::End.
    */
-  bool IODevice::atEnd() const noexcept
+  bool IODevice::atEnd() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return (optr->State & State::End) == State::End;
@@ -100,7 +100,7 @@ namespace btk
   /**
    * Returns true if the device's state contain the flag State::Fail and/or State::Error.
    */
-  bool IODevice::hasFailure() const noexcept
+  bool IODevice::hasFailure() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return (optr->State & (State::Fail | State::Error)) != State::Good;
@@ -109,7 +109,7 @@ namespace btk
   /**
    * Returns true if the device's state contain the flag State::Fail
    */
-  bool IODevice::hasError() const noexcept
+  bool IODevice::hasError() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return (optr->State & State::Error) == State::Error;
@@ -118,7 +118,7 @@ namespace btk
   /**
    * Returns true current state of the device.
    */
-  IODevice::State IODevice::state() const noexcept
+  IODevice::State IODevice::state() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->State;
@@ -150,7 +150,7 @@ namespace btk
   /**
    * Returns the mask used to possibly throws an exception.
    */
-  IODevice::State IODevice::exceptions() noexcept
+  IODevice::State IODevice::exceptions() _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Exception;
@@ -168,11 +168,11 @@ namespace btk
   };
   
   /**
-   * @fn virtual const char* IODevice::name() const noexcept;
+   * @fn virtual const char* IODevice::name() const _BTK_NOEXCEPT;
    * Returns the name associated with this device. 
    * The name of a device can be anything. For example for a file, it could be the full path of the filename read/write. For a serial port, it could be its identifiant. For a databse, it could the adress of the server.
    */
-  const char* IODevice::name() const noexcept
+  const char* IODevice::name() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Name;
@@ -260,11 +260,11 @@ namespace btk
    * Constructor.
    * Set the device's state to State::Good without exception enabled.
    */
-  IODevice::IODevice() noexcept
+  IODevice::IODevice() _BTK_NOEXCEPT
   : mp_Pimpl(new IODevicePrivate)
   {};
   
-  IODevice::IODevice(IODevicePrivate& pimpl) noexcept
+  IODevice::IODevice(IODevicePrivate& pimpl) _BTK_NOEXCEPT
   : mp_Pimpl(&pimpl)
   {};
   

@@ -39,7 +39,7 @@
 #include "btkIOExport.h"
 #include "btkOpaque.h"
 #include "btkException.h"
-#include "btkMacros.h" // _BTK_CONSTEXPR
+#include "btkMacros.h" // _BTK_CONSTEXPR, _BTK_NOEXCEPT
 
 #include <memory> // std::unique_ptr
 #include <ios> // std::streamsize, std::streamoff, std::streampos
@@ -64,31 +64,31 @@ namespace btk
     class Failure : public Exception
     {
     public:
-     explicit Failure(const std::string& msg) noexcept : Exception(msg) {};
-     virtual ~Failure() noexcept = default;
+     explicit Failure(const std::string& msg) _BTK_NOEXCEPT : Exception(msg) {};
+     virtual ~Failure() _BTK_NOEXCEPT = default;
     };
     
     IODevice(const IODevice& ) = delete;
-    IODevice(IODevice&& ) noexcept = delete;
+    IODevice(IODevice&& ) _BTK_NOEXCEPT = delete;
     IODevice& operator=(const IODevice& ) = delete;
-    IODevice& operator=(IODevice&& ) noexcept = delete;
+    IODevice& operator=(IODevice&& ) _BTK_NOEXCEPT = delete;
 
-    virtual ~IODevice() noexcept;
+    virtual ~IODevice() _BTK_NOEXCEPT;
     
     // State
-    bool isGood() const noexcept;
-    bool atEnd() const noexcept;
-    bool hasFailure() const noexcept;
-    bool hasError() const noexcept;
-    State state() const noexcept;
+    bool isGood() const _BTK_NOEXCEPT;
+    bool atEnd() const _BTK_NOEXCEPT;
+    bool hasFailure() const _BTK_NOEXCEPT;
+    bool hasError() const _BTK_NOEXCEPT;
+    State state() const _BTK_NOEXCEPT;
     void setState(State state);
     void clear(State state = State::Good);
-    State exceptions() noexcept;
+    State exceptions() _BTK_NOEXCEPT;
     void setExceptions(State mask);
     
     // General
-    const char* name() const noexcept;
-    virtual bool isOpen() const noexcept = 0;
+    const char* name() const _BTK_NOEXCEPT;
+    virtual bool isOpen() const _BTK_NOEXCEPT = 0;
     virtual void close() = 0;
     virtual Size peek(char* s, Size n) const = 0;
     virtual void read(char* s, Size n) = 0;
@@ -96,17 +96,17 @@ namespace btk
     
     // Random access IO device only
     virtual void seek(Offset offset, Origin whence) = 0;
-    virtual Position tell() const noexcept = 0;
+    virtual Position tell() const _BTK_NOEXCEPT = 0;
     
     // Sequential IO only
-    virtual bool isSequential() const noexcept = 0;
+    virtual bool isSequential() const _BTK_NOEXCEPT = 0;
     
   protected:
     void setName(const char* name = nullptr);
     bool verifyMode(Mode mode);
     
-    IODevice() noexcept;
-    IODevice(IODevicePrivate& pimpl) noexcept;
+    IODevice() _BTK_NOEXCEPT;
+    IODevice(IODevicePrivate& pimpl) _BTK_NOEXCEPT;
    
     std::unique_ptr<IODevicePrivate> mp_Pimpl;
   };

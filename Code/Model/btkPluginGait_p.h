@@ -89,12 +89,12 @@ namespace btk
     
   public:
     PluginGaitPrivate(PluginGait* pint, const std::string& name, int region, int side);
-    ~PluginGaitPrivate() noexcept;
+    ~PluginGaitPrivate() _BTK_NOEXCEPT;
     
-    void computeHipJointCenter(double* HJC, double S, double C, double xdis) const noexcept;
-    bool calibrateLowerLimb(int side, const lard::Trajectory* HJC, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks) noexcept;
-    bool generateUpperLimb(Model* model, Trial* trial, int side, const lard::Vector* u_torso, const lard::Vector* o_torso, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks, double sampleRate, double startTime) const noexcept;
-    bool generateLowerLimb(Trial* trial, int side, const lard::Trajectory* HJC, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks, double sampleRate, double startTime) const noexcept;
+    void computeHipJointCenter(double* HJC, double S, double C, double xdis) const _BTK_NOEXCEPT;
+    bool calibrateLowerLimb(int side, const lard::Trajectory* HJC, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks) _BTK_NOEXCEPT;
+    bool generateUpperLimb(Model* model, Trial* trial, int side, const lard::Vector* u_torso, const lard::Vector* o_torso, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks, double sampleRate, double startTime) const _BTK_NOEXCEPT;
+    bool generateLowerLimb(Trial* trial, int side, const lard::Trajectory* HJC, std::unordered_map<std::string,lard::MappedTrajectory>* landmarks, double sampleRate, double startTime) const _BTK_NOEXCEPT;
     
     virtual Node* makePint() const override;
     
@@ -128,7 +128,7 @@ namespace btk
     double LeftStaticRotationOffset;
   };
   
-  inline void PluginGaitPrivate::computeHipJointCenter(double* HJC, double S, double C, double xdis) const noexcept
+  inline void PluginGaitPrivate::computeHipJointCenter(double* HJC, double S, double C, double xdis) const _BTK_NOEXCEPT
   {
     //const double theta = 0.49567350756639; // 28.4 * M_PI / 180.0;
     //const double beta = 0.314159265358979; // 18.0 * M_PI / 180.0;
@@ -216,11 +216,11 @@ namespace btk
       assert(this->mr_Xpr3.rows() > 0);
     };
     
-    const ChordOp& derived() const noexcept {return *this;};
+    const ChordOp& derived() const _BTK_NOEXCEPT {return *this;};
     
-    Index rows() const noexcept {return this->mr_Xpr1.rows();};
+    Index rows() const _BTK_NOEXCEPT {return this->mr_Xpr1.rows();};
     
-    const Eigen::internal::ChordOpValues values() const noexcept
+    const Eigen::internal::ChordOpValues values() const _BTK_NOEXCEPT
     {
       const auto& I = this->mr_Xpr1;
       const auto& J = this->mr_Xpr2;
@@ -243,7 +243,7 @@ namespace btk
       return Eigen::internal::ChordOpValues(local.transform(t).values());
     };
   
-    auto residuals() const noexcept -> decltype(ChordOp::generateResiduals((this->mr_Xpr1.derived().residuals() >= 0.0) && (this->mr_Xpr2.derived().residuals() >= 0.0) && (this->mr_Xpr3.derived().residuals() >= 0.0)))
+    auto residuals() const _BTK_NOEXCEPT -> decltype(ChordOp::generateResiduals((this->mr_Xpr1.derived().residuals() >= 0.0) && (this->mr_Xpr2.derived().residuals() >= 0.0) && (this->mr_Xpr3.derived().residuals() >= 0.0)))
     {
       return ChordOp::generateResiduals((this->mr_Xpr1.derived().residuals() >= 0.0) && (this->mr_Xpr2.derived().residuals() >= 0.0) && (this->mr_Xpr3.derived().residuals() >= 0.0));
     };

@@ -38,6 +38,7 @@
 
 #include "btkModelExport.h"
 #include "btkNode.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 namespace btk
 {
@@ -51,30 +52,30 @@ namespace btk
     RelativeReferenceFrame(const std::string& name, Node* parent = nullptr);
     RelativeReferenceFrame(const std::string& name, const double data[12], Node* parent = nullptr);
     RelativeReferenceFrame(const std::string& name, const double orientation[9], const double position[3], Node* parent = nullptr);
-    ~RelativeReferenceFrame() noexcept;
+    ~RelativeReferenceFrame() _BTK_NOEXCEPT;
     
     RelativeReferenceFrame(const RelativeReferenceFrame& ) = delete;
-    RelativeReferenceFrame(RelativeReferenceFrame&& ) noexcept = delete;
+    RelativeReferenceFrame(RelativeReferenceFrame&& ) _BTK_NOEXCEPT = delete;
     RelativeReferenceFrame& operator=(const RelativeReferenceFrame& ) = delete;
-    RelativeReferenceFrame& operator=(RelativeReferenceFrame&& ) noexcept = delete;
+    RelativeReferenceFrame& operator=(RelativeReferenceFrame&& ) _BTK_NOEXCEPT = delete;
     
-    const double* u() const noexcept;
-    double* u() noexcept;
+    const double* u() const _BTK_NOEXCEPT;
+    double* u() _BTK_NOEXCEPT;
     
-    const double* v() const noexcept;
-    double* v() noexcept;
+    const double* v() const _BTK_NOEXCEPT;
+    double* v() _BTK_NOEXCEPT;
     
-    const double* w() const noexcept;
-    double* w() noexcept;
+    const double* w() const _BTK_NOEXCEPT;
+    double* w() _BTK_NOEXCEPT;
     
-    const double* o() const noexcept;
-    double* o() noexcept;    
+    const double* o() const _BTK_NOEXCEPT;
+    double* o() _BTK_NOEXCEPT;    
     
-    const double* data() const noexcept;
-    double* data() noexcept;
+    const double* data() const _BTK_NOEXCEPT;
+    double* data() _BTK_NOEXCEPT;
     
   private:
-    RelativeReferenceFrame(RelativeReferenceFramePrivate& pimpl, Node* parent) noexcept;
+    RelativeReferenceFrame(RelativeReferenceFramePrivate& pimpl, Node* parent) _BTK_NOEXCEPT;
   };
 };
 

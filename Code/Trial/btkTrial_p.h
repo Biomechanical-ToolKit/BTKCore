@@ -42,6 +42,7 @@
  */
 
 #include "btkNode_p.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 namespace btk
 {
@@ -55,7 +56,7 @@ namespace btk
     
   public:
     TrialPrivate(Trial* pint, const std::string& name);
-    ~TrialPrivate() noexcept;
+    ~TrialPrivate() _BTK_NOEXCEPT;
     
     virtual Node* makePint() const override;
   };

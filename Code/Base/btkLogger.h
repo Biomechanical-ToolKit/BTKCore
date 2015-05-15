@@ -37,6 +37,7 @@
 #define __btkLogger_h
 
 #include "btkBaseExport.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <utility> // std::forward
 
@@ -49,31 +50,31 @@ namespace btk
     
     struct Device
     {
-      Device() noexcept;
-      virtual ~Device() noexcept;
+      Device() _BTK_NOEXCEPT;
+      virtual ~Device() _BTK_NOEXCEPT;
       
-      virtual void writeMessage(Category category, const char* msg) noexcept = 0;
+      virtual void writeMessage(Category category, const char* msg) _BTK_NOEXCEPT = 0;
       
       Device(const Device& ) = delete;
-      Device(Device&& ) noexcept = delete;
+      Device(Device&& ) _BTK_NOEXCEPT = delete;
       Device& operator=(const Device& ) = delete;
-      Device& operator=(Device&& ) noexcept = delete;
+      Device& operator=(Device&& ) _BTK_NOEXCEPT = delete;
     };
     
-    template<typename... Args> static inline void info(const char* msg, Args&&... args) noexcept;
-    template<typename... Args> static inline void warning(const char* msg, Args&&... args) noexcept;
-    template<typename... Args> static inline void error(const char* msg, Args&&... args) noexcept;
+    template<typename... Args> static inline void info(const char* msg, Args&&... args) _BTK_NOEXCEPT;
+    template<typename... Args> static inline void warning(const char* msg, Args&&... args) _BTK_NOEXCEPT;
+    template<typename... Args> static inline void error(const char* msg, Args&&... args) _BTK_NOEXCEPT;
     
-    static void mute(bool active) noexcept;
+    static void mute(bool active) _BTK_NOEXCEPT;
     
-    static void setDevice(Device* output) noexcept;
+    static void setDevice(Device* output) _BTK_NOEXCEPT;
     
-    ~Logger() noexcept;
+    ~Logger() _BTK_NOEXCEPT;
     
     Logger(const Logger& ) = delete;
-    Logger(Logger&& ) noexcept = delete;
+    Logger(Logger&& ) _BTK_NOEXCEPT = delete;
     Logger& operator=(const Logger& ) = delete;
-    Logger& operator=(Logger&& ) noexcept = delete;
+    Logger& operator=(Logger&& ) _BTK_NOEXCEPT = delete;
     
   private:
     static Logger& instance();
@@ -111,19 +112,19 @@ namespace btk
   // ----------------------------------------------------------------------- //
   
   template<typename... Args>
-  void Logger::info(const char* msg, Args&&... args) noexcept
+  void Logger::info(const char* msg, Args&&... args) _BTK_NOEXCEPT
   {
     Logger::Message<Args...>::send(Info,msg,std::forward<Args>(args)...);
   };
   
   template<typename... Args>
-  void Logger::warning(const char* msg, Args&&... args) noexcept
+  void Logger::warning(const char* msg, Args&&... args) _BTK_NOEXCEPT
   {
     Logger::Message<Args...>::send(Warning,msg,std::forward<Args>(args)...);
   };
   
   template<typename... Args>
-  void Logger::error(const char* msg, Args&&... args) noexcept
+  void Logger::error(const char* msg, Args&&... args) _BTK_NOEXCEPT
   {
     Logger::Message<Args...>::send(Error,msg,std::forward<Args>(args)...);
   };

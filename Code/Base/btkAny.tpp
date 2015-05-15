@@ -39,7 +39,6 @@
 #include "btkException.h"
 #include "btkTypeid.h"
 #include "btkTypeTraits.h"
-#include "btkMacros.h" // _BTK_CONSTEXPR
 
 #include <string>
 #include <unordered_map>
@@ -58,18 +57,18 @@ namespace btk
   { 
     Storage(void* data);
     Storage(const Storage& ) = delete;
-    virtual ~Storage() noexcept;
-    virtual typeid_t id() const noexcept = 0;
-    virtual bool is_arithmetic() const noexcept = 0;
-    virtual std::vector<size_t> dimensions() const noexcept = 0;
-    virtual size_t size() const noexcept = 0;
+    virtual ~Storage() _BTK_NOEXCEPT;
+    virtual typeid_t id() const _BTK_NOEXCEPT = 0;
+    virtual bool is_arithmetic() const _BTK_NOEXCEPT = 0;
+    virtual std::vector<size_t> dimensions() const _BTK_NOEXCEPT = 0;
+    virtual size_t size() const _BTK_NOEXCEPT = 0;
     virtual Storage* clone() const = 0;
-    virtual bool compare(Storage* other) const noexcept = 0;
-    virtual void* element(size_t idx) const noexcept = 0;
+    virtual bool compare(Storage* other) const _BTK_NOEXCEPT = 0;
+    virtual void* element(size_t idx) const _BTK_NOEXCEPT = 0;
     
     // Both methods below are defined after the declaration of the Converter private API
-    template <typename U> void cast(U* value) const noexcept;
-    template <typename U> void cast(U* value, size_t index) const noexcept;
+    template <typename U> void cast(U* value) const _BTK_NOEXCEPT;
+    template <typename U> void cast(U* value, size_t index) const _BTK_NOEXCEPT;
     
     void* Data;
   };
@@ -79,7 +78,7 @@ namespace btk
   : Data(data)
   {};
   
-  inline Any::Storage::~Storage() noexcept
+  inline Any::Storage::~Storage() _BTK_NOEXCEPT
   {};
   
   // ----------------------------------------------------------------------- //
@@ -103,9 +102,9 @@ namespace btk
     using _Any_convert_t = void(*)(void*,void*);
     using _Any_converter_map = std::unordered_map<size_t,_Any_convert_t>;
     
-    _Any_converter_map& _any_converter_map() noexcept;
+    _Any_converter_map& _any_converter_map() _BTK_NOEXCEPT;
     
-    _Any_convert_t _any_extract_converter(typeid_t sid, typeid_t rid) noexcept;
+    _Any_convert_t _any_extract_converter(typeid_t sid, typeid_t rid) _BTK_NOEXCEPT;
     
     template <typename S, typename R>
     void _any_helper_convert(void* source, void* result)
@@ -115,7 +114,7 @@ namespace btk
     
     // Single conversion
     template <typename U>
-    inline typename std::enable_if<!is_stl_vector<typename std::decay<U>::type>::value && !is_stl_array<typename std::decay<U>::type>::value>::type _any_convert(U* value, const Any::Storage* storage) noexcept
+    inline typename std::enable_if<!is_stl_vector<typename std::decay<U>::type>::value && !is_stl_array<typename std::decay<U>::type>::value>::type _any_convert(U* value, const Any::Storage* storage) _BTK_NOEXCEPT
     {
       _Any_convert_t doConversion = _any_extract_converter(storage->id(),static_typeid<U>());
       if (doConversion != nullptr)
@@ -124,7 +123,7 @@ namespace btk
     
     // (std) Vector conversion
     template <typename U>
-    inline typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value>::type _any_convert(U* value, const Any::Storage* storage) noexcept
+    inline typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value>::type _any_convert(U* value, const Any::Storage* storage) _BTK_NOEXCEPT
     {
       _Any_convert_t doConversion = _any_extract_converter(storage->id(),static_typeid<typename std::decay<U>::type::value_type>());
       if (doConversion != nullptr)
@@ -137,7 +136,7 @@ namespace btk
     
     // (std) Array conversion
     template <typename U>
-    inline typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value>::type _any_convert(U* value, const Any::Storage* storage) noexcept
+    inline typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value>::type _any_convert(U* value, const Any::Storage* storage) _BTK_NOEXCEPT
     {
       _Any_convert_t doConversion = _any_extract_converter(storage->id(),static_typeid<typename std::decay<U>::type::value_type>());
       if (doConversion != nullptr)
@@ -149,7 +148,7 @@ namespace btk
     
     // Element conversion
     template <typename U>
-    inline void _any_convert(U* value, const Any::Storage* storage, size_t idx) noexcept
+    inline void _any_convert(U* value, const Any::Storage* storage, size_t idx) _BTK_NOEXCEPT
     {
       _Any_convert_t doConversion = _any_extract_converter(storage->id(),static_typeid<U>());
       if (doConversion != nullptr)
@@ -158,27 +157,27 @@ namespace btk
     
     // Compare a Any object with a value which has another type
     template <typename U>
-    inline typename std::enable_if<!std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type _any_is_equal(const Any* lhs, U&& rhs) noexcept
+    inline typename std::enable_if<!std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type _any_is_equal(const Any* lhs, U&& rhs) _BTK_NOEXCEPT
     {
       return (lhs->cast<typename std::decay<U>::type>() == rhs);
     };
 
     // Compare a Any object with a const char* value
     template <typename U>
-    inline typename std::enable_if<std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type _any_is_equal(const Any* lhs, U&& rhs) noexcept
+    inline typename std::enable_if<std::is_same<typename std::decay<U>::type, const char*>::value, bool>::type _any_is_equal(const Any* lhs, U&& rhs) _BTK_NOEXCEPT
     {
       const char* str = lhs->cast<const char*>();
       return ((str != nullptr) && (rhs != nullptr) && (strcmp(str, rhs) == 0));
     }    
     
     // Should be used only on size_t values coming from typeid_t variables
-    inline _BTK_CONSTEXPR size_t _any_hash(size_t sid, size_t rid) noexcept
+    inline _BTK_CONSTEXPR size_t _any_hash(size_t sid, size_t rid) _BTK_NOEXCEPT
     {
       return ((sid << (4*sizeof(size_t))) | ((rid << (4*sizeof(size_t))) >> (4*sizeof(size_t))));
     };
     
     template <typename S,typename R>
-    inline std::pair<size_t,_Any_convert_t> _any_pair() noexcept
+    inline std::pair<size_t,_Any_convert_t> _any_pair() _BTK_NOEXCEPT
     {
       return {_any_hash(static_cast<size_t>(static_typeid<S>()),static_cast<size_t>(static_typeid<R>())),&_any_helper_convert<S,R>};
     };
@@ -192,14 +191,14 @@ namespace btk
       static_assert(!std::is_pointer<T>::value, "Impossible to store a pointer type.");
       
       template <typename U> _Any_storage_single(U* value);
-      ~_Any_storage_single() noexcept;
-      virtual typeid_t id() const noexcept final;
-      virtual bool is_arithmetic() const noexcept final;
-      virtual std::vector<size_t> dimensions() const noexcept final;
-      virtual size_t size() const noexcept final;
+      ~_Any_storage_single() _BTK_NOEXCEPT;
+      virtual typeid_t id() const _BTK_NOEXCEPT final;
+      virtual bool is_arithmetic() const _BTK_NOEXCEPT final;
+      virtual std::vector<size_t> dimensions() const _BTK_NOEXCEPT final;
+      virtual size_t size() const _BTK_NOEXCEPT final;
       virtual Storage* clone() const final;
-      virtual bool compare(Storage* other) const noexcept final;
-      virtual void* element(size_t idx) const noexcept final;
+      virtual bool compare(Storage* other) const _BTK_NOEXCEPT final;
+      virtual void* element(size_t idx) const _BTK_NOEXCEPT final;
     };
   
     template <typename T>
@@ -209,14 +208,14 @@ namespace btk
       static_assert(!std::is_pointer<T>::value, "Impossible to store a pointer type.");
     
       template <typename U> _Any_storage_array(U* values, size_t numValues, const size_t* dimensions, size_t numDims);
-      ~_Any_storage_array() noexcept;
-      virtual typeid_t id() const noexcept final;
-      virtual bool is_arithmetic() const noexcept final;
-      virtual std::vector<size_t> dimensions() const noexcept final;
-      virtual size_t size() const noexcept final;
+      ~_Any_storage_array() _BTK_NOEXCEPT;
+      virtual typeid_t id() const _BTK_NOEXCEPT final;
+      virtual bool is_arithmetic() const _BTK_NOEXCEPT final;
+      virtual std::vector<size_t> dimensions() const _BTK_NOEXCEPT final;
+      virtual size_t size() const _BTK_NOEXCEPT final;
       virtual Storage* clone() const final;
-      virtual bool compare(Storage* other) const noexcept final;
-      virtual void* element(size_t idx) const noexcept final;
+      virtual bool compare(Storage* other) const _BTK_NOEXCEPT final;
+      virtual void* element(size_t idx) const _BTK_NOEXCEPT final;
       size_t NumValues;
       const size_t* Dimensions;
       size_t NumDims;
@@ -242,11 +241,11 @@ namespace btk
         return data;
       };
       _Any_adapt() = delete;
-      ~_Any_adapt() noexcept = delete;
+      ~_Any_adapt() _BTK_NOEXCEPT = delete;
       _Any_adapt(const _Any_adapt& ) = delete;
-      _Any_adapt(_Any_adapt&& ) noexcept = delete;
+      _Any_adapt(_Any_adapt&& ) _BTK_NOEXCEPT = delete;
       _Any_adapt& operator=(const _Any_adapt& ) = delete;
-      _Any_adapt& operator=(_Any_adapt&& ) noexcept = delete;
+      _Any_adapt& operator=(_Any_adapt&& ) _BTK_NOEXCEPT = delete;
     };
     
     template <typename T, size_t N>
@@ -258,11 +257,11 @@ namespace btk
         return new std::string(value,N-1);
       };
       _Any_adapt() = delete;
-      ~_Any_adapt() noexcept = delete;
+      ~_Any_adapt() _BTK_NOEXCEPT = delete;
       _Any_adapt(const _Any_adapt& ) = delete;
-      _Any_adapt(_Any_adapt&& ) noexcept = delete;
+      _Any_adapt(_Any_adapt&& ) _BTK_NOEXCEPT = delete;
       _Any_adapt& operator=(const _Any_adapt& ) = delete;
-      _Any_adapt& operator=(_Any_adapt&& ) noexcept = delete;
+      _Any_adapt& operator=(_Any_adapt&& ) _BTK_NOEXCEPT = delete;
     };
     
     template <typename T>
@@ -283,11 +282,11 @@ namespace btk
         return data;
       };
       _Any_adapt() = delete;
-      ~_Any_adapt() noexcept = delete;
+      ~_Any_adapt() _BTK_NOEXCEPT = delete;
       _Any_adapt(const _Any_adapt& ) = delete;
-      _Any_adapt(_Any_adapt&& ) noexcept = delete;
+      _Any_adapt(_Any_adapt&& ) _BTK_NOEXCEPT = delete;
       _Any_adapt& operator=(const _Any_adapt& ) = delete;
-      _Any_adapt& operator=(_Any_adapt&& ) noexcept = delete;
+      _Any_adapt& operator=(_Any_adapt&& ) _BTK_NOEXCEPT = delete;
     };
     
     template <>
@@ -397,19 +396,19 @@ namespace btk
     {};
 
     template <typename T> 
-    inline _Any_storage_single<T>::~_Any_storage_single() noexcept
+    inline _Any_storage_single<T>::~_Any_storage_single() _BTK_NOEXCEPT
     {
       delete static_cast<T*>(this->Data);
     };
 
     template <typename T>
-    inline std::vector<size_t> _Any_storage_single<T>::dimensions() const noexcept
+    inline std::vector<size_t> _Any_storage_single<T>::dimensions() const _BTK_NOEXCEPT
     {
       return std::vector<size_t>{};
     };
 
     template <typename T>
-    inline size_t _Any_storage_single<T>::size() const noexcept
+    inline size_t _Any_storage_single<T>::size() const _BTK_NOEXCEPT
     {
       return 1ul;
     };
@@ -421,7 +420,7 @@ namespace btk
     };
 
     template <typename T> 
-    inline bool _Any_storage_single<T>::compare(Storage* other) const noexcept
+    inline bool _Any_storage_single<T>::compare(Storage* other) const _BTK_NOEXCEPT
     {
       if ((this->Data == nullptr) || (other->Data == nullptr))
         return false;
@@ -431,19 +430,19 @@ namespace btk
     };
 
     template <typename T> 
-    inline typeid_t _Any_storage_single<T>::id() const noexcept
+    inline typeid_t _Any_storage_single<T>::id() const _BTK_NOEXCEPT
     {
       return static_typeid<T>();
     };
 
     template <typename T> 
-    bool _Any_storage_single<T>::is_arithmetic() const noexcept
+    bool _Any_storage_single<T>::is_arithmetic() const _BTK_NOEXCEPT
     {
       return std::is_arithmetic<T>::value;
     };
   
     template <typename T> 
-    void* _Any_storage_single<T>::element(size_t ) const noexcept
+    void* _Any_storage_single<T>::element(size_t ) const _BTK_NOEXCEPT
     {
       return this->Data;
     };
@@ -458,14 +457,14 @@ namespace btk
     {};
 
     template <typename T> 
-    inline _Any_storage_array<T>::~_Any_storage_array() noexcept
+    inline _Any_storage_array<T>::~_Any_storage_array() _BTK_NOEXCEPT
     {
       delete[] static_cast<T*>(this->Data);
       delete[] this->Dimensions;
     };
 
     template <typename T>
-    inline std::vector<size_t> _Any_storage_array<T>::dimensions() const noexcept
+    inline std::vector<size_t> _Any_storage_array<T>::dimensions() const _BTK_NOEXCEPT
     {
       auto dims = std::vector<size_t>(this->NumDims,0ul);
       for (size_t i = 0 ; i < this->NumDims ; ++i)
@@ -474,7 +473,7 @@ namespace btk
     };
 
     template <typename T>
-    inline size_t _Any_storage_array<T>::size() const noexcept
+    inline size_t _Any_storage_array<T>::size() const _BTK_NOEXCEPT
     {
       return this->NumValues;
     };
@@ -490,7 +489,7 @@ namespace btk
     };
 
     template <typename T> 
-    inline bool _Any_storage_array<T>::compare(Storage* other) const noexcept
+    inline bool _Any_storage_array<T>::compare(Storage* other) const _BTK_NOEXCEPT
     {
       if ((this->Data == nullptr) || (other->Data == nullptr))
         return false;
@@ -502,19 +501,19 @@ namespace btk
     };
 
     template <typename T> 
-    inline typeid_t _Any_storage_array<T>::id() const noexcept
+    inline typeid_t _Any_storage_array<T>::id() const _BTK_NOEXCEPT
     {
       return static_typeid<T>();
     };
 
     template <typename T> 
-    bool _Any_storage_array<T>::is_arithmetic() const noexcept
+    bool _Any_storage_array<T>::is_arithmetic() const _BTK_NOEXCEPT
     {
       return std::is_arithmetic<T>::value;
     };
   
     template <typename T> 
-    void* _Any_storage_array<T>::element(size_t idx) const noexcept
+    void* _Any_storage_array<T>::element(size_t idx) const _BTK_NOEXCEPT
     {
       return static_cast<void*>(&static_cast<T*>(this->Data)[idx]);
     };
@@ -522,49 +521,49 @@ namespace btk
     // ---------------------------- DATA CAST ------------------------------ //
     
     template <typename U>
-    inline typename std::enable_if<std::is_same<bool, typename std::decay<U>::type>::value>::type _any_cast_from_string(U* value, const char* str) noexcept
+    inline typename std::enable_if<std::is_same<bool, typename std::decay<U>::type>::value>::type _any_cast_from_string(U* value, const char* str) _BTK_NOEXCEPT
     {
       *value = (!((strlen(str) == 0) || (strcmp(str,"0") == 0) || (strcmp(str,"false") == 0)));
     };
   
     template <typename U>
-    inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_signed<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) > sizeof(long))>::type _any_cast_from_string(U* value, const char* str) noexcept
+    inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_signed<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) > sizeof(long))>::type _any_cast_from_string(U* value, const char* str) _BTK_NOEXCEPT
     {
       *value = strtoll(str,nullptr,0);
     };
   
     template <typename U>
-    inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_signed<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) <= sizeof(long))>::type _any_cast_from_string(U* value, const char* str) noexcept
+    inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_signed<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) <= sizeof(long))>::type _any_cast_from_string(U* value, const char* str) _BTK_NOEXCEPT
     {
       *value = strtol(str,nullptr,0);
     };
   
     template <typename U>
-    inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_unsigned<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) > sizeof(long))>::type _any_cast_from_string(U* value, const char* str) noexcept
+    inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_unsigned<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) > sizeof(long))>::type _any_cast_from_string(U* value, const char* str) _BTK_NOEXCEPT
     {
       *value = strtoull(str,nullptr,0);
     };
   
     template <typename U>
-    inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_unsigned<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) <= sizeof(long))>::type _any_cast_from_string(U* value, const char* str) noexcept
+    inline typename std::enable_if<std::is_integral<typename std::decay<U>::type>::value && !std::is_same<bool, typename std::decay<U>::type>::value && std::is_unsigned<typename std::decay<U>::type>::value && (sizeof(typename std::decay<U>::type) <= sizeof(long))>::type _any_cast_from_string(U* value, const char* str) _BTK_NOEXCEPT
     {
       *value = strtol(str,nullptr,0);
     };
   
     template <typename U>
-    inline typename std::enable_if<std::is_same<float, typename std::decay<U>::type>::value>::type _any_cast_from_string(U* value, const char* str) noexcept
+    inline typename std::enable_if<std::is_same<float, typename std::decay<U>::type>::value>::type _any_cast_from_string(U* value, const char* str) _BTK_NOEXCEPT
     {
       *value = strtof(str,nullptr);
     };
   
     template <typename U>
-    inline typename std::enable_if<std::is_same<double, typename std::decay<U>::type>::value>::type _any_cast_from_string(U* value, const char* str) noexcept
+    inline typename std::enable_if<std::is_same<double, typename std::decay<U>::type>::value>::type _any_cast_from_string(U* value, const char* str) _BTK_NOEXCEPT
     {
       *value = strtod(str,nullptr);
     };
   
     template <typename U>
-    inline typename std::enable_if<std::is_same<long double, typename std::decay<U>::type>::value>::type _any_cast_from_string(U* value, const char* str) noexcept
+    inline typename std::enable_if<std::is_same<long double, typename std::decay<U>::type>::value>::type _any_cast_from_string(U* value, const char* str) _BTK_NOEXCEPT
     {
       *value = strtold(str,nullptr);
     };
@@ -580,7 +579,7 @@ namespace btk
       && !std::is_enum<typename std::decay<U>::type>::value
       && !is_stl_vector<typename std::decay<U>::type>::value
       && !is_stl_array<typename std::decay<U>::type>::value
-      , bool>::type _any_cast(U* value, const Any::Storage* storage, size_t idx = 0) noexcept
+      , bool>::type _any_cast(U* value, const Any::Storage* storage, size_t idx = 0) _BTK_NOEXCEPT
     {
       using value_t = typename std::decay<U>::type;
       if (storage->id() == static_typeid<value_t>())
@@ -593,7 +592,7 @@ namespace btk
     
     // Arithmetic conversion
     template <typename U>
-    typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage, size_t idx = 0) noexcept
+    typename std::enable_if<std::is_arithmetic<typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage, size_t idx = 0) _BTK_NOEXCEPT
     {
       const typeid_t id = storage->id();
       if (storage->is_arithmetic())
@@ -668,7 +667,7 @@ namespace btk
     
     // String conversion
     template <typename U>
-    typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage, size_t idx = 0) noexcept
+    typename std::enable_if<std::is_same<std::string, typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage, size_t idx = 0) _BTK_NOEXCEPT
     {
       const typeid_t id = storage->id();
       if (id == static_typeid<std::string>())
@@ -736,7 +735,7 @@ namespace btk
     
     // const char* conversion
     template <typename U>
-    typename std::enable_if<std::is_same<const char*, typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage, size_t idx = 0) noexcept
+    typename std::enable_if<std::is_same<const char*, typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage, size_t idx = 0) _BTK_NOEXCEPT
     {
       if (storage->id() == static_typeid<std::string>())
       {
@@ -748,7 +747,7 @@ namespace btk
     
     // enum conversion
     template <typename U>
-    typename std::enable_if<std::is_enum<typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage, size_t idx = 0) noexcept
+    typename std::enable_if<std::is_enum<typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage, size_t idx = 0) _BTK_NOEXCEPT
     {
       using underlying_t = typename std::underlying_type<typename std::decay<U>::type>::type;
       if (storage->is_arithmetic())
@@ -763,7 +762,7 @@ namespace btk
     
     // (std) Vector conversion
     template <typename U>
-    typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage) noexcept
+    typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage) _BTK_NOEXCEPT
     {
       using value_t = typename std::decay<U>::type::value_type;
       bool res = true;
@@ -775,7 +774,7 @@ namespace btk
     
     // (std) Array conversion
     template <typename U>
-    typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage) noexcept
+    typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage) _BTK_NOEXCEPT
     {
       using value_t = typename std::decay<U>::type::value_type;
       bool res = true;
@@ -792,7 +791,7 @@ namespace btk
   // --------------------------------------------------------------------- //
 
   template <typename U>
-  inline void Any::Storage::cast(U* value) const noexcept
+  inline void Any::Storage::cast(U* value) const _BTK_NOEXCEPT
   {
     if (this->id() == static_typeid<U>())
       *value = *static_cast<U*>(this->Data);
@@ -801,7 +800,7 @@ namespace btk
   };
 
   template <typename U>
-  inline void Any::Storage::cast(U* value, size_t idx) const noexcept
+  inline void Any::Storage::cast(U* value, size_t idx) const _BTK_NOEXCEPT
   {
     if (this->id() == static_typeid<U>())
       *value = static_cast<U*>(this->Data)[idx];
@@ -872,13 +871,13 @@ namespace btk
   {};
   
   template <typename U>
-  inline bool Any::isEqual(U&& value) const noexcept
+  inline bool Any::isEqual(U&& value) const _BTK_NOEXCEPT
   {
     return __details::_any_is_equal(this,std::forward<U>(value));
   };
 
   template <typename U, typename >
-  inline U Any::cast() const noexcept
+  inline U Any::cast() const _BTK_NOEXCEPT
   {
     static_assert(std::is_default_constructible<U>::value,"It is not possible to cast an Any object to a type which does not a default constructor.");
     U value = U();
@@ -888,7 +887,7 @@ namespace btk
   };
   
   template <typename U, typename >
-  inline U Any::cast(size_t idx) const noexcept
+  inline U Any::cast(size_t idx) const _BTK_NOEXCEPT
   {
     static_assert(std::is_default_constructible<U>::value,"It is not possible to cast an Any object to a type which does not a default constructor.");
     static_assert(!is_stl_vector<typename std::decay<U>::type>::value,"The _any_cast(idx) method does not accept std::vector as casted type.");
@@ -899,7 +898,7 @@ namespace btk
   };
   
   template <class U>
-  inline Any::operator U() const noexcept
+  inline Any::operator U() const _BTK_NOEXCEPT
   {
     return this->cast<U>();
   };

@@ -66,7 +66,7 @@ namespace lard
    * If all the landmarks have the same start time, and if the output @a start is given, its value will be assigned to the found common start time (-1.0 otherwise).
    * If all the landmarks have the same sample rate and start time, and if the output @a ok is given, its value will be assigned to true (false otherwise).
    */
-  static inline std::unordered_map<std::string,lard::MappedTrajectory> extract_landmark_trajectories(Model* model, Trial* trial, double* rate = nullptr, double* start = nullptr, bool* ok = nullptr) noexcept
+  static inline std::unordered_map<std::string,lard::MappedTrajectory> extract_landmark_trajectories(Model* model, Trial* trial, double* rate = nullptr, double* start = nullptr, bool* ok = nullptr) _BTK_NOEXCEPT
   {
     std::unordered_map<std::string, lard::MappedTrajectory> trajectories;
     

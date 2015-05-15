@@ -39,6 +39,7 @@
 #include "btkConfigure.h"
 #include "btkBaseExport.h"
 #include "btkOpaque.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <memory> // std::unique_ptr
 
@@ -51,20 +52,20 @@ namespace btk
     BTK_DECLARE_PIMPL_ACCESSOR(Object)
     
   public:
-    virtual ~Object() noexcept;
+    virtual ~Object() _BTK_NOEXCEPT;
     
     Object(const Object& ) = delete;
-    Object(Object&& ) noexcept = delete;
+    Object(Object&& ) _BTK_NOEXCEPT = delete;
     Object& operator=(const Object& ) = delete;
-    Object& operator=(Object&& ) noexcept = delete;
+    Object& operator=(Object&& ) _BTK_NOEXCEPT = delete;
     
-    unsigned long timestamp() const noexcept;
+    unsigned long timestamp() const _BTK_NOEXCEPT;
     
-    virtual void modified() noexcept;
+    virtual void modified() _BTK_NOEXCEPT;
     
   protected:
     Object();
-    Object(ObjectPrivate& pimpl) noexcept;
+    Object(ObjectPrivate& pimpl) _BTK_NOEXCEPT;
    
     std::unique_ptr<ObjectPrivate> mp_Pimpl;
   };

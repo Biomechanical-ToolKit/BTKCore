@@ -48,7 +48,7 @@ namespace btk
   : Timestamp(0ul)
   {};
   
-  ObjectPrivate::~ObjectPrivate() noexcept = default; // Cannot be inlined
+  ObjectPrivate::~ObjectPrivate() _BTK_NOEXCEPT = default; // Cannot be inlined
 }
 
 // -------------------------------------------------------------------------- //
@@ -84,8 +84,8 @@ namespace btk
    *   
    * public:
    *   MyObject();
-   *   int version() const noexcept;
-   *   void setVersion() const noexcept:
+   *   int version() const _BTK_NOEXCEPT;
+   *   void setVersion() const _BTK_NOEXCEPT:
    *
    *   void print() const;
    *  
@@ -185,11 +185,11 @@ namespace btk
    *   
    * public:
    *   MyObject();
-   *   int version() const noexcept;
-   *   void setVersion() const noexcept:
+   *   int version() const _BTK_NOEXCEPT;
+   *   void setVersion() const _BTK_NOEXCEPT:
    *
    * protected:
-   *   MyObject(MyObjectPrivate& pimpl) noexcept; // Only needed if this class could be inherited
+   *   MyObject(MyObjectPrivate& pimpl) _BTK_NOEXCEPT; // Only needed if this class could be inherited
    * };
    * @endcode
   
@@ -226,7 +226,7 @@ namespace btk
    *   }
    * };
    *
-   * MyObject::MyObject(MyObjectPrivate& pimpl) noexcept
+   * MyObject::MyObject(MyObjectPrivate& pimpl) _BTK_NOEXCEPT
    * : Object(pimpl)
    * {};
    * @endcode
@@ -238,12 +238,12 @@ namespace btk
    * Destructor
    * @note The opaque pointer representing the private implementation is automatically deleted as it is contained in a std::unique_ptr object.
    */
-  Object::~Object() noexcept = default;
+  Object::~Object() _BTK_NOEXCEPT = default;
   
   /**
    * Returns the timestamp of the object.
    */
-  unsigned long Object::timestamp() const noexcept
+  unsigned long Object::timestamp() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Timestamp;
@@ -253,7 +253,7 @@ namespace btk
    * Sets the object as modified (its timestamp is updated).
    * It is important to use this method each time a member of the object is modified.
    */
-  void Object::modified() noexcept
+  void Object::modified() _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     static std::atomic<unsigned long> _btk_atomic_time{0};
@@ -268,7 +268,7 @@ namespace btk
   : mp_Pimpl(new ObjectPrivate)
   {};
   
-  Object::Object(ObjectPrivate& pimpl) noexcept
+  Object::Object(ObjectPrivate& pimpl) _BTK_NOEXCEPT
   : mp_Pimpl(&pimpl)
   {};
 };

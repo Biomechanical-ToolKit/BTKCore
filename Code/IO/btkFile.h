@@ -37,6 +37,7 @@
 #define __btkFile_h
 
 #include "btkIODevice.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 namespace btk
 {
@@ -48,25 +49,25 @@ namespace btk
     
   public:
     File();
-    ~File() noexcept;
+    ~File() _BTK_NOEXCEPT;
     
     File(const File& ) = delete;
-    File(File&& ) noexcept = delete;
+    File(File&& ) _BTK_NOEXCEPT = delete;
     File& operator=(const File& ) = delete;
-    File& operator=(File&& ) noexcept = delete;
+    File& operator=(File&& ) _BTK_NOEXCEPT = delete;
     
     void open(const char* filename, Mode mode);
-    virtual bool isOpen() const noexcept override;
+    virtual bool isOpen() const _BTK_NOEXCEPT override;
     virtual void close() override;
     virtual Size peek(char* s, Size n) const override;
     virtual void read(char* s, Size n) override;
     virtual void write(const char* s, Size n) override;
     virtual void seek(Offset offset, Origin whence) override;
-    virtual Position tell() const noexcept override;
-    virtual bool isSequential() const noexcept override;
+    virtual Position tell() const _BTK_NOEXCEPT override;
+    virtual bool isSequential() const _BTK_NOEXCEPT override;
     
-    const char* data() const noexcept;
-    Size size() const noexcept;
+    const char* data() const _BTK_NOEXCEPT;
+    Size size() const _BTK_NOEXCEPT;
   };
 };
 

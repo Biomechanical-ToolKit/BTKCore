@@ -51,7 +51,7 @@ namespace btk
   : Device(nullptr), ErrorCode(IOHandler::Error::None), ErrorMessage()
   {};
   
-  IOHandlerPrivate::~IOHandlerPrivate() noexcept = default; // Cannot be inlined
+  IOHandlerPrivate::~IOHandlerPrivate() _BTK_NOEXCEPT = default; // Cannot be inlined
 }
 
 // -------------------------------------------------------------------------- //
@@ -79,12 +79,12 @@ namespace btk
   /**
    * Destructor (default)
    */
-  IOHandler::~IOHandler() noexcept = default;
+  IOHandler::~IOHandler() _BTK_NOEXCEPT = default;
   
   /**
    *
    */
-  IOHandler::Capability IOHandler::capability() const noexcept
+  IOHandler::Capability IOHandler::capability() const _BTK_NOEXCEPT
   {
     return Capability::None;
   };
@@ -206,7 +206,7 @@ namespace btk
   /**
    *
    */
-  IODevice* IOHandler::device() const noexcept
+  IODevice* IOHandler::device() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Device;
@@ -215,7 +215,7 @@ namespace btk
   /**
    *
    */
-  void IOHandler::setDevice(IODevice* device) noexcept
+  void IOHandler::setDevice(IODevice* device) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     optr->Device = device;
@@ -224,7 +224,7 @@ namespace btk
   /**
    *
    */
-  std::vector<const char*> IOHandler::availableOptions() const noexcept
+  std::vector<const char*> IOHandler::availableOptions() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->availableOptions();
@@ -233,7 +233,7 @@ namespace btk
   /**
    *
    */
-  std::vector<const char*> IOHandler::availableOptionChoices(const char* option) const noexcept
+  std::vector<const char*> IOHandler::availableOptionChoices(const char* option) const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->availableOptionChoices(option);
@@ -242,7 +242,7 @@ namespace btk
   /**
    *
    */
-  IOHandler::Error IOHandler::errorCode() const noexcept
+  IOHandler::Error IOHandler::errorCode() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->ErrorCode;
@@ -251,7 +251,7 @@ namespace btk
   /**
    *
    */
-  const std::string& IOHandler::errorMessage() const noexcept
+  const std::string& IOHandler::errorMessage() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->ErrorMessage;
@@ -260,7 +260,7 @@ namespace btk
   /**
    *
    */
-  IOHandler::Signature IOHandler::detectSignature() const noexcept
+  IOHandler::Signature IOHandler::detectSignature() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (optr->Device == nullptr)
@@ -289,14 +289,14 @@ namespace btk
   /**
    * Constructor for inheriting class with extended private implementation
    */
-  IOHandler::IOHandler(IOHandlerPrivate& pimpl) noexcept
+  IOHandler::IOHandler(IOHandlerPrivate& pimpl) _BTK_NOEXCEPT
   : mp_Pimpl(&pimpl)
   {};
   
   /**
    *
    */
-  void IOHandler::option(const char* name, void* value) const noexcept
+  void IOHandler::option(const char* name, void* value) const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     optr->option(name,value);
@@ -305,7 +305,7 @@ namespace btk
   /**
    *
    */
-  void IOHandler::setOption(const char* name, const void* value) noexcept
+  void IOHandler::setOption(const char* name, const void* value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     optr->setOption(name,value);
@@ -314,7 +314,7 @@ namespace btk
   /**
    * Set a code and a detailed message for an error which happened during the reading or writing of a device.
    */
-  void IOHandler::setError(Error code, const std::string& msg) noexcept
+  void IOHandler::setError(Error code, const std::string& msg) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     optr->ErrorCode = code;

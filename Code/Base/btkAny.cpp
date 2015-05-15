@@ -162,7 +162,7 @@ namespace btk
    * Default constructor.
    * This kind of Any object is defined as null (method Any::isValid() returns true).
    */
-  Any::Any() noexcept
+  Any::Any() _BTK_NOEXCEPT
   : mp_Storage(nullptr)
   {};
 
@@ -178,7 +178,7 @@ namespace btk
    * Move constructor
    * The content of @c other is moved to this object. The content of @c other is then defined as null (method Any::isValid() returns true).
    */
-  Any::Any(Any&& other) noexcept
+  Any::Any(Any&& other) _BTK_NOEXCEPT
   : mp_Storage(std::move(other.mp_Storage))
   {};
 
@@ -198,12 +198,12 @@ namespace btk
     delete this->mp_Storage;
   };
   
-  std::vector<size_t> Any::dimensions() const noexcept
+  std::vector<size_t> Any::dimensions() const _BTK_NOEXCEPT
   {
     return this->mp_Storage->dimensions();
   };
 
-  size_t Any::size() const noexcept
+  size_t Any::size() const _BTK_NOEXCEPT
   {
     return this->mp_Storage->size();
   };
@@ -211,7 +211,7 @@ namespace btk
   /**
    * Return true if the object as no content, otherwise true.
    */
-  bool Any::isValid() const noexcept
+  bool Any::isValid() const _BTK_NOEXCEPT
   {
     return (this->mp_Storage != nullptr);
   };
@@ -219,13 +219,13 @@ namespace btk
   /**
    * Swap the content of two Any object.
    */
-  void Any::swap(Any& other) noexcept
+  void Any::swap(Any& other) _BTK_NOEXCEPT
   {
     std::swap(this->mp_Storage, other.mp_Storage);
   };
   
   /** 
-   * @fn template <typename U, typename> U Any::cast() const noexcept
+   * @fn template <typename U, typename> U Any::cast() const _BTK_NOEXCEPT
    * Method to explicitely convert the content of this object to the given type.
    *
    * @code
@@ -237,7 +237,7 @@ namespace btk
    */
   
   /**
-   * @fn template<class U> Any::operator U() const noexcept
+   * @fn template<class U> Any::operator U() const _BTK_NOEXCEPT
    * Type conversion operator. Internally this operator uses the Any::cast() method.
    */
 
@@ -259,7 +259,7 @@ namespace btk
    * Move assignement operator.
    * In case the assigned object is not this one, the previous content is deleted and replaced by the content of the @c other object. The @c other object is then defined as null (method Any::isValid() returns true).
    */
-  Any& Any::operator=(Any&& other) noexcept
+  Any& Any::operator=(Any&& other) _BTK_NOEXCEPT
   {
     if (this != &other)
     {
@@ -273,7 +273,7 @@ namespace btk
   /**
    * Equal operator. Compare the content of two Any objects.
    */
-  bool operator==(const Any& lhs, const Any& rhs) noexcept
+  bool operator==(const Any& lhs, const Any& rhs) _BTK_NOEXCEPT
   {
     return ((lhs.mp_Storage != nullptr) && (rhs.mp_Storage != nullptr) && lhs.mp_Storage->compare(rhs.mp_Storage));
   };
@@ -281,7 +281,7 @@ namespace btk
  /**
   * Inequal operator. Returns the opposite of equal operator.
   */
-  bool operator!=(const Any& lhs, const Any& rhs) noexcept
+  bool operator!=(const Any& lhs, const Any& rhs) _BTK_NOEXCEPT
   {
     return !(lhs == rhs);
   };
@@ -315,7 +315,7 @@ namespace btk
      *
      * @note The returned object is a singleton as proposed by Scott Meyers in C++11.
      */
-    _Any_converter_map& _any_converter_map() noexcept
+    _Any_converter_map& _any_converter_map() _BTK_NOEXCEPT
     {
       static _Any_converter_map table;
       return table;
@@ -325,7 +325,7 @@ namespace btk
      * Extract the convertion function pointer based on the ID used from the type source (@c sid) and the returned type (@c rid)
      * In case no function pointer was found, the returned value is set to nullptr.
      */
-    _Any_convert_t _any_extract_converter(typeid_t sid, typeid_t rid) noexcept
+    _Any_convert_t _any_extract_converter(typeid_t sid, typeid_t rid) _BTK_NOEXCEPT
     {
       auto it = _any_converter_map().find(_any_hash(static_cast<size_t>(sid),static_cast<size_t>(rid)));
       return (it != _any_converter_map().end()) ? it->second : nullptr;

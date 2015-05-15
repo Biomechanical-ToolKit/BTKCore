@@ -44,13 +44,13 @@ namespace btk
 {
   struct Logger::Private
   {
-    Private() noexcept : Output(nullptr), Quiet(false) {};
-    ~Private() noexcept = default;
+    Private() _BTK_NOEXCEPT : Output(nullptr), Quiet(false) {};
+    ~Private() _BTK_NOEXCEPT = default;
     
     Private(const Private& ) = delete;
-    Private(Private&& ) noexcept = delete;
+    Private(Private&& ) _BTK_NOEXCEPT = delete;
     Private& operator=(const Private& ) = delete;
-    Private& operator=(Private&& ) noexcept = delete;
+    Private& operator=(Private&& ) _BTK_NOEXCEPT = delete;
     
     Device* Output;
     bool Quiet;
@@ -71,7 +71,7 @@ namespace btk
    * @code
    * struct Console : Logger::Device
    * {
-   *   virtual void writeMessage(Logger::Category category, const char* msg) noexcept override
+   *   virtual void writeMessage(Logger::Category category, const char* msg) _BTK_NOEXCEPT override
    *   {
    *     if (category == Logger::Info)
    *       std::cout << "INFO: " << msg << std::endl;
@@ -91,15 +91,15 @@ namespace btk
   /**
    * Default (empty) constructor
    */
-  Logger::Device::Device() noexcept = default;
+  Logger::Device::Device() _BTK_NOEXCEPT = default;
   
   /**
    * Default (empty) destructor
    */
-  Logger::Device::~Device() noexcept = default;
+  Logger::Device::~Device() _BTK_NOEXCEPT = default;
   
   /**
-   * @fn virtual void Logger::Device::writeMessage(Category category, const char* msg) noexcept = 0;
+   * @fn virtual void Logger::Device::writeMessage(Category category, const char* msg) _BTK_NOEXCEPT = 0;
    * The logger seng message to this method. The @a category input specifies if the message is for
    * an information, a warning, or an error. The @a msg input is directly the string given to the method
    * Logger::info(), Logger::warning(), or Logger::error().
@@ -109,7 +109,7 @@ namespace btk
 
   struct Console : Logger::Device
   {
-    virtual void writeMessage(Logger::Category category, const char* msg) noexcept override
+    virtual void writeMessage(Logger::Category category, const char* msg) _BTK_NOEXCEPT override
     {
       if (category == Logger::Info)
         std::cout << "INFO: " << msg << std::endl;
@@ -164,17 +164,17 @@ namespace btk
    */
   
   /**
-   * @fn template<typename... Args> void Logger::info(const char* msg, Args&&... args) noexcept
+   * @fn template<typename... Args> void Logger::info(const char* msg, Args&&... args) _BTK_NOEXCEPT
    * Write Logger::Info messages.
    */
   
   /**
-   * @fn template<typename... Args> void Logger::warning(const char* msg, Args&&... args) noexcept
+   * @fn template<typename... Args> void Logger::warning(const char* msg, Args&&... args) _BTK_NOEXCEPT
    * Write Logger::Warning messages.
    */
   
   /**
-   * @fn template<typename... Args> void Logger::error(const char* msg, Args&&... args) noexcept   
+   * @fn template<typename... Args> void Logger::error(const char* msg, Args&&... args) _BTK_NOEXCEPT   
    * Write Logger::Error messages.
    */
   
@@ -182,7 +182,7 @@ namespace btk
    * Active/unactive the logger. If the logger is set to mute,
    * all the messages are eaten and destroyed.
    */
-  void Logger::mute(bool active) noexcept
+  void Logger::mute(bool active) _BTK_NOEXCEPT
   {
     Logger::instance().mp_Pimpl->Quiet = active;
   };
@@ -191,7 +191,7 @@ namespace btk
    * Set the device which will write the log messages. If a previous device was set,
    * it will be deleted. The logger takes the ownership of the device.
    */
-  void Logger::setDevice(Device* output) noexcept
+  void Logger::setDevice(Device* output) _BTK_NOEXCEPT
   {
     delete Logger::instance().mp_Pimpl->Output;
     Logger::instance().mp_Pimpl->Output = output;
@@ -201,7 +201,7 @@ namespace btk
    * Destructor
    * Delete the set device
    */
-  Logger::~Logger() noexcept
+  Logger::~Logger() _BTK_NOEXCEPT
   {
     delete this->mp_Pimpl->Output;
     delete this->mp_Pimpl;

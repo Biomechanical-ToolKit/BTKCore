@@ -41,18 +41,20 @@
  * can change drastically from one release to another.
  */
 
+#include "btkMacros.h" // _BTK_NOEXCEPT
+
 namespace btk
 { 
   class ObjectPrivate
   {
   public:
     ObjectPrivate();
-    virtual ~ObjectPrivate() noexcept;
+    virtual ~ObjectPrivate() _BTK_NOEXCEPT;
     
     ObjectPrivate(const ObjectPrivate& ) = delete;
-    ObjectPrivate(ObjectPrivate&& ) noexcept = delete;
+    ObjectPrivate(ObjectPrivate&& ) _BTK_NOEXCEPT = delete;
     ObjectPrivate& operator=(const ObjectPrivate& ) = delete;
-    ObjectPrivate& operator=(const ObjectPrivate&& ) noexcept = delete;
+    ObjectPrivate& operator=(const ObjectPrivate&& ) _BTK_NOEXCEPT = delete;
     
     unsigned long Timestamp;
   };

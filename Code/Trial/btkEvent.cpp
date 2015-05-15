@@ -48,7 +48,7 @@ namespace btk
   : NodePrivate(pint,name), Time(time), Context(context), Subject(subject)
   {};
   
-  EventPrivate::~EventPrivate() noexcept = default;
+  EventPrivate::~EventPrivate() _BTK_NOEXCEPT = default;
   
   Node* EventPrivate::makePint() const
   {
@@ -122,14 +122,14 @@ namespace btk
   /**
    * Destructor (default)
    */
-  Event::~Event() noexcept = default;
+  Event::~Event() _BTK_NOEXCEPT = default;
   
   /**
    * Returns the time associated with this event.
    * The time can be positive, null, or negative.
    * The null time indicates the start of the recording, while a negative and postive time corresponds to an event before and after the beginning of the recording, respectively.
    */
-  double Event::time() const noexcept
+  double Event::time() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Time;
@@ -140,7 +140,7 @@ namespace btk
    * The time can be positive, null, or negative.
    * The null time indicates the start of the recording, while a negative and postive time corresponds to an event before and after the beginning of the recording, respectively.
    */
-  void Event::setTime(double value) noexcept
+  void Event::setTime(double value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (std::fabs(value - optr->Time) < std::numeric_limits<double>::epsilon())
@@ -156,7 +156,7 @@ namespace btk
    * - Left: Any event associated with the left side of the (human) body
    * - General: Any other event which cannot be assigned to the left or the right side of the body
    */
-  const std::string& Event::context() const noexcept
+  const std::string& Event::context() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Context;
@@ -169,7 +169,7 @@ namespace btk
    * - Left: Any event associated with the left side of the (human) body
    * - General: Any other event which cannot be assigned to the left or the right side of the body
    */
-  void Event::setContext(const std::string& value) noexcept
+  void Event::setContext(const std::string& value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (value == optr->Context)
@@ -181,7 +181,7 @@ namespace btk
   /**
    * Return the subject's identification.
    */
-  const std::string& Event::subject() const noexcept
+  const std::string& Event::subject() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     return optr->Subject;
@@ -190,7 +190,7 @@ namespace btk
  /**
   * Sets the subject's identification.
   */
-  void Event::setSubject(const std::string& value) noexcept
+  void Event::setSubject(const std::string& value) _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     if (value == optr->Subject)

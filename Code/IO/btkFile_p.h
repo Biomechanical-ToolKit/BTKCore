@@ -43,6 +43,7 @@
 
 #include "btkIODevice_p.h"
 #include "btkConfigure.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #if !defined(HAVE_SYS_MMAP) && !defined(_MSC_VER)
   #error Missing header to build the File class (memory mapping not found).
@@ -71,12 +72,12 @@ namespace btk
   {
   public:
     FilePrivate();
-    ~FilePrivate() noexcept;
+    ~FilePrivate() _BTK_NOEXCEPT;
     
     FilePrivate(const FilePrivate& ) = delete;
-    FilePrivate(FilePrivate&& ) noexcept = delete;
+    FilePrivate(FilePrivate&& ) _BTK_NOEXCEPT = delete;
     FilePrivate& operator=(const FilePrivate& ) = delete;
-    FilePrivate& operator=(const FilePrivate&& ) noexcept = delete;
+    FilePrivate& operator=(const FilePrivate&& ) _BTK_NOEXCEPT = delete;
     
     MemoryMappedBuffer* Buffer;
   };
@@ -91,28 +92,28 @@ namespace btk
     using Offset = IODevice::Offset;
     using Position = IODevice::Position;
     
-    MemoryMappedBuffer() noexcept;
-    ~MemoryMappedBuffer() noexcept {this->close();};
+    MemoryMappedBuffer() _BTK_NOEXCEPT;
+    ~MemoryMappedBuffer() _BTK_NOEXCEPT {this->close();};
     
-    MemoryMappedBuffer* open(const char* s, Mode mode) noexcept;
-    bool isOpen() const noexcept {return !(this->m_File == _BTK_MMFILEBUF_NO_FILE);};
-    MemoryMappedBuffer* close() noexcept;
+    MemoryMappedBuffer* open(const char* s, Mode mode) _BTK_NOEXCEPT;
+    bool isOpen() const _BTK_NOEXCEPT {return !(this->m_File == _BTK_MMFILEBUF_NO_FILE);};
+    MemoryMappedBuffer* close() _BTK_NOEXCEPT;
 
-    bool hasWriteMode() const noexcept {return this->m_Writing;};
+    bool hasWriteMode() const _BTK_NOEXCEPT {return this->m_Writing;};
     
-    Size dataSize() const noexcept {return this->m_DataSize;};
-    const char* data() const noexcept {return this->mp_Data;};
+    Size dataSize() const _BTK_NOEXCEPT {return this->m_DataSize;};
+    const char* data() const _BTK_NOEXCEPT {return this->mp_Data;};
     
-    Size peek(char* s, Size n) const noexcept;
-    Size read(char* s, Size n) noexcept;
-    Size write(const char* s, Size n) noexcept;
+    Size peek(char* s, Size n) const _BTK_NOEXCEPT;
+    Size read(char* s, Size n) _BTK_NOEXCEPT;
+    Size write(const char* s, Size n) _BTK_NOEXCEPT;
     
-    Position seek(Offset off, Origin way) noexcept;
+    Position seek(Offset off, Origin way) _BTK_NOEXCEPT;
     
-    MemoryMappedBuffer* map() noexcept;
-    MemoryMappedBuffer* resizeMap() noexcept;
+    MemoryMappedBuffer* map() _BTK_NOEXCEPT;
+    MemoryMappedBuffer* resizeMap() _BTK_NOEXCEPT;
     
-    static int granularity() noexcept;
+    static int granularity() _BTK_NOEXCEPT;
     
   private:
     char* mp_Data;

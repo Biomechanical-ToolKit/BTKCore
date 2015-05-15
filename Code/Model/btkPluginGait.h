@@ -38,6 +38,7 @@
 
 #include "btkModelExport.h"
 #include "btkRig.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 namespace btk
 {
@@ -52,57 +53,57 @@ namespace btk
   public:
     PluginGait(int region, int side, Node* parent = nullptr);
   
-    virtual bool setup(btk::Model* model) const noexcept;
-    virtual bool calibrate(btk::Model* model, btk::Node* trials) noexcept;
-    virtual bool generate(btk::Model* model, btk::Node* trials) const noexcept;
-    virtual void finalize(btk::Node* trials) const noexcept;
+    virtual bool setup(btk::Model* model) const _BTK_NOEXCEPT;
+    virtual bool calibrate(btk::Model* model, btk::Node* trials) _BTK_NOEXCEPT;
+    virtual bool generate(btk::Model* model, btk::Node* trials) const _BTK_NOEXCEPT;
+    virtual void finalize(btk::Node* trials) const _BTK_NOEXCEPT;
     
-    double markerDiameter() const noexcept;
-    void setMarkerDiameter(double value) noexcept;
-    double headOffset() const noexcept;
-    void setHeadOffset(double value) noexcept;
-    double rightShoulderOffset() const noexcept;
-    void setRightShoulderOffset(double value) noexcept;
-    double leftShoulderOffset() const noexcept;
-    void setLeftShoulderOffset(double value) noexcept;
-    double rightElbowWidth() const noexcept;
-    void setRightElbowWidth(double value) noexcept;
-    double leftElbowWidth() const noexcept;
-    void setLeftElbowWidth(double value) noexcept;
-    double rightWristWidth() const noexcept;
-    void setRightWristWidth(double value) noexcept;
-    double leftWristWidth() const noexcept;
-    void setLeftWristWidth(double value) noexcept;
-    double rightHandThickness() const noexcept;
-    void setRightHandThickness(double value) noexcept;
-    double leftHandThickness() const noexcept;
-    void setLeftHandThickness(double value) noexcept;
-    double interAsisDistance() const noexcept;
-    void setInterAsisDistance(double value) noexcept;
-    double rightLegLength() const noexcept;
-    void setRightLegLength(double value) noexcept;
-    double leftLegLength() const noexcept;
-    void setLeftLegLength(double value) noexcept;
-    double rightAsisTrochanterAPDistance() const noexcept;
-    void setRightAsisTrochanterAPDistance(double value) noexcept;
-    double leftAsisTrochanterAPDistance() const noexcept;
-    void setLeftAsisTrochanterAPDistance(double value) noexcept;
-    double rightKneeWidth() const noexcept;
-    void setRightKneeWidth(double value) noexcept;
-    double leftKneeWidth() const noexcept;
-    void setLeftKneeWidth(double value) noexcept;
-    double rightAnkleWidth() const noexcept;
-    void setRightAnkleWidth(double value) noexcept;
-    double leftAnkleWidth() const noexcept;
-    void setLeftAnkleWidth(double value) noexcept;
-    bool rightFootFlat() const noexcept;
-    void setRightFootFlat(bool value) noexcept;
-    bool leftFootFlat() const noexcept;
-    void setLeftFootFlat(bool value) noexcept;
-    double rightStaticPlantarFlexionOffset() const noexcept;
-    double rightStaticRotationOffset() const noexcept;
-    double leftStaticPlantarFlexionOffset() const noexcept;
-    double leftStaticRotationOffset() const noexcept;
+    double markerDiameter() const _BTK_NOEXCEPT;
+    void setMarkerDiameter(double value) _BTK_NOEXCEPT;
+    double headOffset() const _BTK_NOEXCEPT;
+    void setHeadOffset(double value) _BTK_NOEXCEPT;
+    double rightShoulderOffset() const _BTK_NOEXCEPT;
+    void setRightShoulderOffset(double value) _BTK_NOEXCEPT;
+    double leftShoulderOffset() const _BTK_NOEXCEPT;
+    void setLeftShoulderOffset(double value) _BTK_NOEXCEPT;
+    double rightElbowWidth() const _BTK_NOEXCEPT;
+    void setRightElbowWidth(double value) _BTK_NOEXCEPT;
+    double leftElbowWidth() const _BTK_NOEXCEPT;
+    void setLeftElbowWidth(double value) _BTK_NOEXCEPT;
+    double rightWristWidth() const _BTK_NOEXCEPT;
+    void setRightWristWidth(double value) _BTK_NOEXCEPT;
+    double leftWristWidth() const _BTK_NOEXCEPT;
+    void setLeftWristWidth(double value) _BTK_NOEXCEPT;
+    double rightHandThickness() const _BTK_NOEXCEPT;
+    void setRightHandThickness(double value) _BTK_NOEXCEPT;
+    double leftHandThickness() const _BTK_NOEXCEPT;
+    void setLeftHandThickness(double value) _BTK_NOEXCEPT;
+    double interAsisDistance() const _BTK_NOEXCEPT;
+    void setInterAsisDistance(double value) _BTK_NOEXCEPT;
+    double rightLegLength() const _BTK_NOEXCEPT;
+    void setRightLegLength(double value) _BTK_NOEXCEPT;
+    double leftLegLength() const _BTK_NOEXCEPT;
+    void setLeftLegLength(double value) _BTK_NOEXCEPT;
+    double rightAsisTrochanterAPDistance() const _BTK_NOEXCEPT;
+    void setRightAsisTrochanterAPDistance(double value) _BTK_NOEXCEPT;
+    double leftAsisTrochanterAPDistance() const _BTK_NOEXCEPT;
+    void setLeftAsisTrochanterAPDistance(double value) _BTK_NOEXCEPT;
+    double rightKneeWidth() const _BTK_NOEXCEPT;
+    void setRightKneeWidth(double value) _BTK_NOEXCEPT;
+    double leftKneeWidth() const _BTK_NOEXCEPT;
+    void setLeftKneeWidth(double value) _BTK_NOEXCEPT;
+    double rightAnkleWidth() const _BTK_NOEXCEPT;
+    void setRightAnkleWidth(double value) _BTK_NOEXCEPT;
+    double leftAnkleWidth() const _BTK_NOEXCEPT;
+    void setLeftAnkleWidth(double value) _BTK_NOEXCEPT;
+    bool rightFootFlat() const _BTK_NOEXCEPT;
+    void setRightFootFlat(bool value) _BTK_NOEXCEPT;
+    bool leftFootFlat() const _BTK_NOEXCEPT;
+    void setLeftFootFlat(bool value) _BTK_NOEXCEPT;
+    double rightStaticPlantarFlexionOffset() const _BTK_NOEXCEPT;
+    double rightStaticRotationOffset() const _BTK_NOEXCEPT;
+    double leftStaticPlantarFlexionOffset() const _BTK_NOEXCEPT;
+    double leftStaticRotationOffset() const _BTK_NOEXCEPT;
     
     virtual LandmarksTranslator* defaultLandmarksTranslator();
   };

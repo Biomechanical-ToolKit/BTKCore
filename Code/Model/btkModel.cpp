@@ -71,7 +71,7 @@ namespace btk
     }
   };
   
-  Model::~Model() noexcept = default;
+  Model::~Model() _BTK_NOEXCEPT = default;
   
   Node* Model::segments()
   {
@@ -89,7 +89,7 @@ namespace btk
     return pt;
   };
   
-  Rig* Model::rig() const noexcept
+  Rig* Model::rig() const _BTK_NOEXCEPT
   {
     return this->findChild<Rig*>({},{},false);
   };

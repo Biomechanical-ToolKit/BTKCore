@@ -41,7 +41,7 @@
 #include "btkException.h"
 #include "btkIOHandlerOption.h"
 #include "btkLogger.h"
-#include "btkMacros.h" // _BTK_CONSTEXPR
+#include "btkMacros.h" // _BTK_CONSTEXPR, _BTK_NOEXCEPT
 
 #include <list>
 #include <string>
@@ -77,33 +77,33 @@ namespace btk
     using ByteOrderFormat = IOHandlerOption<_btk_IOHandler_ByteOrder,ByteOrder>;
     using DataStorageFormat = IOHandlerOption<_btk_IOHandler_DataStorage,DataStorage>;
     
-    virtual ~IOHandler() noexcept;
+    virtual ~IOHandler() _BTK_NOEXCEPT;
     
     IOHandler() = delete;
     IOHandler(const IOHandler& ) = delete;
-    IOHandler(IOHandler&& ) noexcept = delete;
+    IOHandler(IOHandler&& ) _BTK_NOEXCEPT = delete;
     IOHandler& operator=(const IOHandler& ) = delete;
-    IOHandler& operator=(const IOHandler&& ) noexcept = delete;
+    IOHandler& operator=(const IOHandler&& ) _BTK_NOEXCEPT = delete;
     
-    virtual Capability capability() const noexcept;
+    virtual Capability capability() const _BTK_NOEXCEPT;
 
-    Signature detectSignature() const noexcept;
+    Signature detectSignature() const _BTK_NOEXCEPT;
     bool read(Node* output);
     bool write(const Node* input);
  
-    IODevice* device() const noexcept;
-    void setDevice(IODevice* device) noexcept;
+    IODevice* device() const _BTK_NOEXCEPT;
+    void setDevice(IODevice* device) _BTK_NOEXCEPT;
     
-    std::vector<const char*> availableOptions() const noexcept;
-    std::vector<const char*> availableOptionChoices(const char* option) const noexcept;
+    std::vector<const char*> availableOptions() const _BTK_NOEXCEPT;
+    std::vector<const char*> availableOptionChoices(const char* option) const _BTK_NOEXCEPT;
     
-    template <typename O> typename O::Format option() const noexcept;
-    template <typename O, typename V> void setOption(const V& value) noexcept;
-    // const char* option(const const char* name) const noexcept;
-    // void setOption(const char* name, const char* value) noexcept;
+    template <typename O> typename O::Format option() const _BTK_NOEXCEPT;
+    template <typename O, typename V> void setOption(const V& value) _BTK_NOEXCEPT;
+    // const char* option(const const char* name) const _BTK_NOEXCEPT;
+    // void setOption(const char* name, const char* value) _BTK_NOEXCEPT;
     
-    Error errorCode() const noexcept;
-    const std::string& errorMessage() const noexcept;
+    Error errorCode() const _BTK_NOEXCEPT;
+    const std::string& errorMessage() const _BTK_NOEXCEPT;
   
   protected:
     template <typename V, V v> struct stringify_option_value;
@@ -116,14 +116,14 @@ namespace btk
       {};
     };
     
-    IOHandler(IOHandlerPrivate& pimpl) noexcept;
+    IOHandler(IOHandlerPrivate& pimpl) _BTK_NOEXCEPT;
     
-    void option(const char* name, void* value) const noexcept;
-    void setOption(const char* name, const void* value) noexcept;
+    void option(const char* name, void* value) const _BTK_NOEXCEPT;
+    void setOption(const char* name, const void* value) _BTK_NOEXCEPT;
     
-    void setError(Error code = Error::None, const std::string& msg = "") noexcept;
+    void setError(Error code = Error::None, const std::string& msg = "") _BTK_NOEXCEPT;
     
-    virtual Signature validateSignature() const noexcept = 0;
+    virtual Signature validateSignature() const _BTK_NOEXCEPT = 0;
     virtual void readDevice(Node* output);
     virtual void writeDevice(const Node* input);
     
@@ -202,7 +202,7 @@ namespace btk
   // ----------------------------------------------------------------------- //
   
   template <typename O>
-  typename O::Format IOHandler::option() const noexcept
+  typename O::Format IOHandler::option() const _BTK_NOEXCEPT
   {
     typename O::Format value;
     this->option(O::name(),static_cast<void*>(&value));
@@ -210,7 +210,7 @@ namespace btk
   };
   
   template <typename O, typename V>
-  inline void IOHandler::setOption(const V& value) noexcept
+  inline void IOHandler::setOption(const V& value) _BTK_NOEXCEPT
   {
     static_assert(std::is_same<typename O::Format,V>::value, "The type of the given value does not correspond to the type of the option's value.");
     this->setOption(O::name(),static_cast<const void*>(&value));

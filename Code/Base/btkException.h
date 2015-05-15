@@ -36,6 +36,8 @@
 #ifndef __btkException_h
 #define __btkException_h
 
+#include "btkMacros.h" // _BTK_NOEXCEPT
+
 #include <stdexcept>
 #include <string>
 
@@ -50,19 +52,19 @@ namespace btk
     /**
      * Constructor
      */
-    explicit Exception(const std::string& msg) noexcept
+    explicit Exception(const std::string& msg) _BTK_NOEXCEPT
     : m_What(msg)
     {};
     
     /**
      * Destructor
      */
-    virtual ~Exception() noexcept = default;
+    virtual ~Exception() _BTK_NOEXCEPT = default;
     
     /**
      * Gets the exception's message
      */
-    virtual const char* what() const noexcept
+    virtual const char* what() const _BTK_NOEXCEPT
     {
       return this->m_What.c_str();
     };

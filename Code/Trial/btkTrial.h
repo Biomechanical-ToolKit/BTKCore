@@ -38,6 +38,7 @@
 
 #include "btkTrialExport.h"
 #include "btkNode.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 namespace btk
 {
@@ -52,12 +53,12 @@ namespace btk
     
   public:
     Trial(const std::string& name, Node* parent = nullptr);
-    ~Trial() noexcept;
+    ~Trial() _BTK_NOEXCEPT;
     
     Trial(const Node& ) = delete;
-    Trial(Node&& ) noexcept = delete;
+    Trial(Node&& ) _BTK_NOEXCEPT = delete;
     Trial& operator=(const Trial& ) = delete;
-    Trial& operator=(Trial&& ) noexcept = delete;
+    Trial& operator=(Trial&& ) _BTK_NOEXCEPT = delete;
     
     Node* timeSequences();
     TimeSequence* timeSequence(unsigned idx);

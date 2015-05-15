@@ -36,7 +36,7 @@
 #ifndef __btkTypeid_h
 #define __btkTypeid_h
 
-#include "btkMacros.h" // _BTK_CONSTEXPR
+#include "btkMacros.h" // _BTK_CONSTEXPR, _BTK_NOEXCEPT
 
 #include <cstddef>
 
@@ -46,19 +46,19 @@ namespace btk
   {
   public:
     typeid_t() = delete;
-    ~typeid_t() noexcept = default;
+    ~typeid_t() _BTK_NOEXCEPT = default;
     typeid_t(const typeid_t& ) = default;
-    typeid_t(typeid_t&& ) noexcept = default;
+    typeid_t(typeid_t&& ) _BTK_NOEXCEPT = default;
     typeid_t& operator=(const typeid_t& ) = default;
-    typeid_t& operator=(typeid_t&& ) noexcept = default;
+    typeid_t& operator=(typeid_t&& ) _BTK_NOEXCEPT = default;
     
-    explicit operator size_t() const noexcept {return reinterpret_cast<size_t>(this->id);};
+    explicit operator size_t() const _BTK_NOEXCEPT {return reinterpret_cast<size_t>(this->id);};
     
-    friend _BTK_CONSTEXPR bool operator==(typeid_t lhs, typeid_t rhs) noexcept {return (lhs.id == rhs.id);};
-    friend _BTK_CONSTEXPR bool operator!=(typeid_t lhs, typeid_t rhs) noexcept {return (lhs.id != rhs.id);};
+    friend _BTK_CONSTEXPR bool operator==(typeid_t lhs, typeid_t rhs) _BTK_NOEXCEPT {return (lhs.id == rhs.id);};
+    friend _BTK_CONSTEXPR bool operator!=(typeid_t lhs, typeid_t rhs) _BTK_NOEXCEPT {return (lhs.id != rhs.id);};
     
   private:
-    template<typename T> friend _BTK_CONSTEXPR typeid_t static_typeid() noexcept;
+    template<typename T> friend _BTK_CONSTEXPR typeid_t static_typeid() _BTK_NOEXCEPT;
     
     using sig = typeid_t();
     sig* id;
@@ -67,7 +67,7 @@ namespace btk
   };
 
   template<typename T>
-  inline _BTK_CONSTEXPR typeid_t static_typeid() noexcept
+  inline _BTK_CONSTEXPR typeid_t static_typeid() _BTK_NOEXCEPT
   {
     return &static_typeid<T>;
   };
@@ -84,7 +84,7 @@ namespace btk
    */
   
   /**
-   * @fn template<typename T> constexpr typeid_t static_typeid() noexcept
+   * @fn template<typename T> constexpr typeid_t static_typeid() _BTK_NOEXCEPT
    * Returns the identifier associated with the given template type
    */
 }

@@ -58,4 +58,15 @@
   #define _BTK_CONSTEXPR constexpr
 #endif
 
+/**
+ * MSVC 2013 does not support the C++11 keyword 'noexcept' but it will supported in MSVC 2015.
+ *
+ * [1] http://blogs.msdn.com/b/vcblog/archive/2015/04/29/c-11-14-17-features-in-vs-2015-rc.aspx
+ */
+#if defined(_MSVC_VER) && (_MSVC_VER < 1900)
+  #define _BTK_NOEXCEPT
+#else
+  #define _BTK_NOEXCEPT noexcept
+#endif
+
 #endif // __btkMacros_h

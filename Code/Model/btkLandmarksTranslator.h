@@ -38,6 +38,7 @@
 
 #include "btkModelExport.h"
 #include "btkNode.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <vector>
 #include <string>
@@ -52,19 +53,19 @@ namespace btk
     
   public:
     LandmarksTranslator(const std::string& name, const std::unordered_map<std::string,std::string>& converstionTable, Node* parent = nullptr);
-    ~LandmarksTranslator() noexcept;
+    ~LandmarksTranslator() _BTK_NOEXCEPT;
     
     LandmarksTranslator(const LandmarksTranslator& ) = delete;
-    LandmarksTranslator(LandmarksTranslator&& ) noexcept = delete;
+    LandmarksTranslator(LandmarksTranslator&& ) _BTK_NOEXCEPT = delete;
     LandmarksTranslator& operator=(const LandmarksTranslator& ) = delete;
-    LandmarksTranslator& operator=(LandmarksTranslator&& ) noexcept = delete;
+    LandmarksTranslator& operator=(LandmarksTranslator&& ) _BTK_NOEXCEPT = delete;
     
-    std::string convert(const std::string& name) const noexcept;
-    std::string convertIfExists(const std::string& name) const noexcept;
+    std::string convert(const std::string& name) const _BTK_NOEXCEPT;
+    std::string convertIfExists(const std::string& name) const _BTK_NOEXCEPT;
     
     
   private:
-    LandmarksTranslator(LandmarksTranslatorPrivate& pimpl, Node* parent) noexcept;
+    LandmarksTranslator(LandmarksTranslatorPrivate& pimpl, Node* parent) _BTK_NOEXCEPT;
   };
 };
 

@@ -37,7 +37,7 @@
 #define __btkIOHandlerOption_h
 
 #include "btkLogger.h"
-#include "btkMacros.h" // _BTK_CONSTEXPR
+#include "btkMacros.h" // _BTK_CONSTEXPR, _BTK_NOEXCEPT
 
 #include <vector>
 #include <tuple>
@@ -45,24 +45,24 @@
 
 #define BTK_DECLARE_IOHANDLER_OPTIONS(...) \
   public: \
-    virtual std::vector<const char*> availableOptions() const noexcept override \
+    virtual std::vector<const char*> availableOptions() const _BTK_NOEXCEPT override \
     { \
       using _TupleSize = std::tuple_size<_Tuple>; \
       std::vector<const char*> options(_TupleSize::value); \
       __details::_IOHandler_options_iterate<_Tuple,0,_TupleSize::value>::extract_name(&options); \
       return options; \
     }; \
-    virtual std::vector<const char*> availableOptionChoices(const char* option) const noexcept override \
+    virtual std::vector<const char*> availableOptionChoices(const char* option) const _BTK_NOEXCEPT override \
     { \
       using _TupleSize = std::tuple_size<_Tuple>; \
       return __details::_IOHandler_options_iterate<_Tuple,0,_TupleSize::value>::extract_choices(option); \
     }; \
-    virtual void option(const char* option, void* value) const noexcept override \
+    virtual void option(const char* option, void* value) const _BTK_NOEXCEPT override \
     { \
       using _TupleSize = std::tuple_size<_Tuple>; \
       __details::_IOHandler_options_iterate<_Tuple,0,_TupleSize::value>::get_value(&(this->m_Options),option,value); \
     }; \
-    virtual void setOption(const char* option, const void* value) noexcept override \
+    virtual void setOption(const char* option, const void* value) _BTK_NOEXCEPT override \
     { \
       using _TupleSize = std::tuple_size<_Tuple>; \
       __details::_IOHandler_options_iterate<_Tuple,0,_TupleSize::value>::set_value(&(this->m_Options),option,value); \
@@ -92,11 +92,11 @@ namespace btk
         return D<vs...>(std::forward<V>(value));
       };
       multiple_choices() = delete;
-      ~multiple_choices() noexcept = delete;
+      ~multiple_choices() _BTK_NOEXCEPT = delete;
       multiple_choices(const multiple_choices& ) = delete;
-      multiple_choices(multiple_choices&& ) noexcept = delete;
+      multiple_choices(multiple_choices&& ) _BTK_NOEXCEPT = delete;
       multiple_choices& operator=(const multiple_choices& ) = delete;
-      multiple_choices& operator=(multiple_choices&& ) noexcept = delete;
+      multiple_choices& operator=(multiple_choices&& ) _BTK_NOEXCEPT = delete;
     };
     template <V v>
     static inline D<v> single_choice()
@@ -111,14 +111,14 @@ namespace btk
   public:
     using Format = V;
     
-    static inline _BTK_CONSTEXPR const char* name() noexcept {return S;};
+    static inline _BTK_CONSTEXPR const char* name() _BTK_NOEXCEPT {return S;};
     
     IOHandlerOption() = delete;
-    ~IOHandlerOption() noexcept = delete;
+    ~IOHandlerOption() _BTK_NOEXCEPT = delete;
     IOHandlerOption(const IOHandlerOption& ) = delete;
-    IOHandlerOption(IOHandlerOption&& ) noexcept = delete;
+    IOHandlerOption(IOHandlerOption&& ) _BTK_NOEXCEPT = delete;
     IOHandlerOption& operator=(const IOHandlerOption& ) = delete;
-    IOHandlerOption& operator=(IOHandlerOption&& ) noexcept = delete;
+    IOHandlerOption& operator=(IOHandlerOption&& ) _BTK_NOEXCEPT = delete;
     
     template <V... vs>
     class Details
@@ -126,15 +126,15 @@ namespace btk
     public:
       using Format = V;
 
-      static inline _BTK_CONSTEXPR const char* name() noexcept {return S;};
-      static inline std::vector<const char*> choices() noexcept {return {stringify_option_value<V,vs>::c_str...};};
+      static inline _BTK_CONSTEXPR const char* name() _BTK_NOEXCEPT {return S;};
+      static inline std::vector<const char*> choices() _BTK_NOEXCEPT {return {stringify_option_value<V,vs>::c_str...};};
     
       Details(V&& v)
       : Value(std::forward<V>(v))
       {};
       
-      inline const V& value() const noexcept {return this->Value;};
-      inline void setValue(const V& value) noexcept
+      inline const V& value() const _BTK_NOEXCEPT {return this->Value;};
+      inline void setValue(const V& value) _BTK_NOEXCEPT
       {
         _BTK_CONSTEXPR size_t num = sizeof...(vs);
         _BTK_CONSTEXPR std::array<V,num> choices{{vs...}};

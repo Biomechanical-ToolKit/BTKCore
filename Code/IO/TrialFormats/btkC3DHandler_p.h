@@ -43,7 +43,7 @@
 
 #include "btkIOHandler_p.h"
 #include "btkC3DHandler.h"
-#include "btkMacros.h"
+#include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <type_traits>
 #include <vector>
@@ -63,12 +63,12 @@ namespace btk
     
   public:
     C3DHandlerPrivate();
-    ~C3DHandlerPrivate() noexcept;
+    ~C3DHandlerPrivate() _BTK_NOEXCEPT;
 
     C3DHandlerPrivate(const C3DHandlerPrivate& ) = delete;
-    C3DHandlerPrivate(C3DHandlerPrivate&& ) noexcept = delete;
+    C3DHandlerPrivate(C3DHandlerPrivate&& ) _BTK_NOEXCEPT = delete;
     C3DHandlerPrivate& operator=(const C3DHandlerPrivate& ) = delete;
-    C3DHandlerPrivate& operator=(const C3DHandlerPrivate&& ) noexcept = delete;
+    C3DHandlerPrivate& operator=(const C3DHandlerPrivate&& ) _BTK_NOEXCEPT = delete;
     
     double PointScale;
     int PointMaximumInterpolationGap;
@@ -111,9 +111,9 @@ namespace btk
     virtual void writeAnalog(double v) = 0;
     
     C3DDataStream(const C3DDataStream& ) = delete;
-    C3DDataStream(C3DDataStream&& ) noexcept = delete;
+    C3DDataStream(C3DDataStream&& ) _BTK_NOEXCEPT = delete;
     C3DDataStream& operator=(const C3DDataStream& ) = delete;
-    C3DDataStream& operator=(const C3DDataStream&& ) noexcept = delete;
+    C3DDataStream& operator=(const C3DDataStream&& ) _BTK_NOEXCEPT = delete;
     
   protected:
     BinaryStream* Raw;

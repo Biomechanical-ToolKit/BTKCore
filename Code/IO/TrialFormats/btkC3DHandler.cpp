@@ -67,7 +67,7 @@ namespace btk
     AnalogResolution(12), AnalogChannelScale(), AnalogZeroOffset(), AnalogUniversalScale(1.0), AnalogSignedIntegerFormat(true)
   {};
   
-  C3DHandlerPrivate::~C3DHandlerPrivate() noexcept = default;
+  C3DHandlerPrivate::~C3DHandlerPrivate() _BTK_NOEXCEPT = default;
   
   template <typename T>
   void C3DHandlerPrivate::mergeProperties(std::vector<T>* target, Trial* trial, const std::string& base, int finalSize, T&& defaultValue)
@@ -274,9 +274,9 @@ namespace btk
   : TrialIOHandler(*new C3DHandlerPrivate)
   {};
   
-  C3DHandler::~C3DHandler() noexcept = default;
+  C3DHandler::~C3DHandler() _BTK_NOEXCEPT = default;
   
-  C3DHandler::Capability C3DHandler::capability() const noexcept
+  C3DHandler::Capability C3DHandler::capability() const _BTK_NOEXCEPT
   {
     return Capability::ReadWrite;
   };
@@ -890,12 +890,12 @@ namespace btk
     _BTK_UNUSED(input);
   };
   
-  std::vector<const char*> C3DHandler::supportedTrialFormats() const noexcept
+  std::vector<const char*> C3DHandler::supportedTrialFormats() const _BTK_NOEXCEPT
   {
     return {"C3D"};
   };
   
-  C3DHandler::Signature C3DHandler::validateSignature() const noexcept
+  C3DHandler::Signature C3DHandler::validateSignature() const _BTK_NOEXCEPT
   {
     auto optr = this->pimpl();
     char signature[2] = {0};
