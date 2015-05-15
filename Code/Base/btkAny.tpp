@@ -764,7 +764,6 @@ namespace btk
     template <typename U>
     typename std::enable_if<is_stl_vector<typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage) _BTK_NOEXCEPT
     {
-      using value_t = typename std::decay<U>::type::value_type;
       bool res = true;
       value->resize(storage->size());
       for (size_t i = 0 ; i < value->size() ; ++i)
@@ -776,7 +775,6 @@ namespace btk
     template <typename U>
     typename std::enable_if<is_stl_array<typename std::decay<U>::type>::value, bool>::type _any_cast(U* value, const Any::Storage* storage) _BTK_NOEXCEPT
     {
-      using value_t = typename std::decay<U>::type::value_type;
       bool res = true;
       const size_t size = std::min(value->size(),storage->size());
       for (size_t i = 0 ; i < size ; ++i)
