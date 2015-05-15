@@ -9,7 +9,7 @@ before_build:
   - mkdir build
   - cd build
   - git clone --quiet https://github.com/Biomechanical-ToolKit/BTKData.git Testing/Data
-  - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=C:\projects\btkcore\Testing\Data -G NMake Makefiles ..
+  - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=C:\projects\btkcore\Testing\Data -G "NMake Makefiles" ..
 build_script:
   - nmake
 test_script:
