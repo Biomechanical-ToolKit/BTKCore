@@ -135,14 +135,6 @@ namespace btk
       : Value(std::forward<V>(v))
       {};
       
-      ~Details() noexcept = default;
-      Details(Details&& ) = default;
-      
-      Details() = delete;
-      Details(const Details& ) = delete;
-      Details& operator=(const Details& ) = delete;
-      Details& operator=(Details&& ) noexcept = delete;
-      
       inline const V& value() const noexcept {return this->Value;};
       inline void setValue(const V& value) noexcept
       {
