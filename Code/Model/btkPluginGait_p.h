@@ -190,6 +190,12 @@ namespace btk
       static _BTK_CONSTEXPR int ColsAtCompileTime = 3;
       static _BTK_CONSTEXPR int Processing = Full;
     };
+    
+    template <typename XprOne, typename XprTwo, typename XprThree>
+    struct Nested<ChordOp<XprOne, XprTwo, XprThree>>
+    {
+      using type = const ChordOp<XprOne, XprTwo, XprThree>; // Plain object
+    };
   };
   
   template <typename XprOne, typename XprTwo, typename XprThree>
@@ -200,31 +206,31 @@ namespace btk
     
     using Index = typename lard::Traits<ChordOp<XprOne,XprTwo,XprThree>>::Index;
     
-    const XprOne& mr_Xpr1;
-    const XprTwo& mr_Xpr2;
-    const XprThree& mr_Xpr3;
+    const typename lard::Nested<XprOne>::type m_Xpr1;
+    const typename lard::Nested<XprTwo>::type m_Xpr2;
+    const typename lard::Nested<XprThree>::type m_Xpr3;
     double Offset;
     
   public:
     ChordOp(double offset, const lard::Base<XprOne>& x1, const lard::Base<XprTwo>& x2, const lard::Base<XprThree>& x3)
-    : mr_Xpr1(x1), mr_Xpr2(x2), mr_Xpr3(x3), Offset(offset)
+    : m_Xpr1(x1), m_Xpr2(x2), m_Xpr3(x3), Offset(offset)
     {
-      assert(this->mr_Xpr1.rows() == this->mr_Xpr2.rows());
-      assert(this->mr_Xpr2.rows() == this->mr_Xpr3.rows());
-      assert(this->mr_Xpr1.rows() > 0);
-      assert(this->mr_Xpr2.rows() > 0);
-      assert(this->mr_Xpr3.rows() > 0);
+      assert(this->m_Xpr1.rows() == this->m_Xpr2.rows());
+      assert(this->m_Xpr2.rows() == this->m_Xpr3.rows());
+      assert(this->m_Xpr1.rows() > 0);
+      assert(this->m_Xpr2.rows() > 0);
+      assert(this->m_Xpr3.rows() > 0);
     };
     
     const ChordOp& derived() const _BTK_NOEXCEPT {return *this;};
     
-    Index rows() const _BTK_NOEXCEPT {return this->mr_Xpr1.rows();};
+    Index rows() const _BTK_NOEXCEPT {return this->m_Xpr1.rows();};
     
     const Eigen::internal::ChordOpValues values() const _BTK_NOEXCEPT
     {
-      const auto& I = this->mr_Xpr1;
-      const auto& J = this->mr_Xpr2;
-      const auto& K = this->mr_Xpr3;
+      const auto& I = this->m_Xpr1;
+      const auto& J = this->m_Xpr2;
+      const auto& K = this->m_Xpr3;
       // Construct the frame associated with I, J, K
       const lard::Vector v = (J - I).normalized();
       const lard::Vector u = v.cross(K - I).normalized();
@@ -243,9 +249,9 @@ namespace btk
       return Eigen::internal::ChordOpValues(local.transform(t).values());
     };
   
-    auto residuals() const _BTK_NOEXCEPT -> decltype(ChordOp::generateResiduals((this->mr_Xpr1.derived().residuals() >= 0.0) && (this->mr_Xpr2.derived().residuals() >= 0.0) && (this->mr_Xpr3.derived().residuals() >= 0.0)))
+    auto residuals() const _BTK_NOEXCEPT -> decltype(ChordOp::generateResiduals((this->m_Xpr1.derived().residuals() >= 0.0) && (this->m_Xpr2.derived().residuals() >= 0.0) && (this->m_Xpr3.derived().residuals() >= 0.0)))
     {
-      return ChordOp::generateResiduals((this->mr_Xpr1.derived().residuals() >= 0.0) && (this->mr_Xpr2.derived().residuals() >= 0.0) && (this->mr_Xpr3.derived().residuals() >= 0.0));
+      return ChordOp::generateResiduals((this->m_Xpr1.derived().residuals() >= 0.0) && (this->m_Xpr2.derived().residuals() >= 0.0) && (this->m_Xpr3.derived().residuals() >= 0.0));
     };
   };
   
