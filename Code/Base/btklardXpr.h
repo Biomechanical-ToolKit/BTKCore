@@ -351,27 +351,14 @@ namespace lard
   inline Array<Cols>::Array(const Base<U>& other)
   : Array()
   {
-    // static_assert(Cols == Traits<U>::ColsAtCompileTime, "The number of columns is not the same.");
     Array::assign(*this, other);
-    // const U& o = other;
-    // this->m_Residuals.lazyAssign(Array::generateResiduals(o.derived().residuals() >= 0.0));
-    // this->m_Values.lazyAssign((this->m_Residuals.template replicate<1,Cols>() >= 0.0).select(o.derived().values(),0.0));
   };
-  // : Data<Array<Cols>>(static_cast<const U&>(other).derived().values(), static_cast<const U&>(other).derived().residuals())
-  // {
-  //   static_assert(Cols == Traits<U>::ColsAtCompileTime, "The number of columns is not the same.");
-  // };
   
   template <int Cols>
   template <typename U>
   inline Array<Cols>& Array<Cols>::operator= (const Base<U>& other)
   {
-    // static_assert(Cols == Traits<U>::ColsAtCompileTime, "The number of columns is not the same.");
     Array::assign(*this, other);
-    // const U& o = other;
-    // // Array::assignValues(this->m_Values,o.derived().values());
-    // this->m_Residuals.lazyAssign(Array::generateResiduals(o.derived().residuals() >= 0.0));
-    // this->m_Values.lazyAssign((this->m_Residuals.template replicate<1,Cols>() >= 0.0).select(o.derived().values(),0.0));
     return *this;
   };
 
@@ -408,10 +395,6 @@ namespace lard
   template <typename U>
   inline Map<Derived>& Map<Derived>::operator= (const Base<U>& other)
   {
-    // static_assert(Traits<Derived>::ColsAtCompileTime == Traits<U>::ColsAtCompileTime, "The number of columns is not the same.");
-    // const U& o = other;
-    // Map::assignValues(this->m_Values,o.derived().values());
-    // this->m_Residuals.lazyAssign(o.derived().residuals());
     Map::assign(*this, other);
     return *this;
   };
