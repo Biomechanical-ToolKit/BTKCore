@@ -612,6 +612,8 @@ namespace lard
     Index cols() const _BTK_NOEXCEPT {return Traits<UnaryOp<Derived,Xpr>>::ColsAtCompileTime;};
     
     const Derived& derived() const _BTK_NOEXCEPT {return static_cast<const Derived&>(*this);};
+    
+    UnaryOp& operator=(const UnaryOp& ) = delete;
   };
   
   // ----------------------------------------------------------------------- //
@@ -638,6 +640,8 @@ namespace lard
     Index cols() const _BTK_NOEXCEPT {return Traits<BinaryOp<Derived,XprOne,XprTwo>>::ColsAtCompileTime;};
     
     const Derived& derived() const _BTK_NOEXCEPT {return static_cast<const Derived&>(*this);};
+    
+    BinaryOp& operator=(const BinaryOp& ) = delete;
   };
   
   // ----------------------------------------------------------------------- //
