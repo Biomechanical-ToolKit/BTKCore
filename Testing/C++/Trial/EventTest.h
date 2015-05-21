@@ -84,9 +84,12 @@ CXXTEST_SUITE(EventTest)
     it++;
     TS_ASSERT_EQUALS(*it,&evtC);
     
+#if !defined(__GNUC__) || (defined(__GNUC__) && defined(__clang__)) || (__GNUC__ >= 4 && __GNUC_MINOR__ >= 9)
+    // The C++11 regex feature was implemented in GCC 4.9
     TS_ASSERT_EQUALS(events.findChildren<btk::Event*>(std::regex("Foo|Bar")).size(),2u);
     TS_ASSERT_EQUALS(events.findChildren<btk::Event*>(std::regex("Foo|Bar|Toto")).size(),4u);
     TS_ASSERT_EQUALS(events.findChildren<btk::Event*>(std::regex("Foo|Bar|Toto"),{{"context","Right"}}).size(),2u);
+#endif
   };
 };
 
