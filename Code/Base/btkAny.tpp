@@ -241,7 +241,7 @@ namespace btk
         return data;
       };
       _Any_adapt() = delete;
-      ~_Any_adapt() _BTK_NOEXCEPT = delete;
+      ~_Any_adapt() _BTK_NOEXCEPT = default;
       _Any_adapt(const _Any_adapt& ) = delete;
       _Any_adapt(_Any_adapt&& ) _BTK_NOEXCEPT = delete;
       _Any_adapt& operator=(const _Any_adapt& ) = delete;
