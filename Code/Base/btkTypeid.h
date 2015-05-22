@@ -48,9 +48,9 @@ namespace btk
     typeid_t() = delete;
     ~typeid_t() _BTK_NOEXCEPT = default;
     typeid_t(const typeid_t& ) = default;
-    typeid_t(typeid_t&& ) _BTK_NOEXCEPT = default;
+    typeid_t(typeid_t&& other) _BTK_NOEXCEPT;
     typeid_t& operator=(const typeid_t& ) = default;
-    typeid_t& operator=(typeid_t&& ) _BTK_NOEXCEPT = default;
+    typeid_t& operator=(typeid_t&& other) _BTK_NOEXCEPT;
     
     explicit operator size_t() const _BTK_NOEXCEPT {return reinterpret_cast<size_t>(this->id);};
     
@@ -64,6 +64,20 @@ namespace btk
     sig* id;
     
     _BTK_CONSTEXPR typeid_t(sig* id) : id{id} {};
+  };
+  
+  inline typeid_t::typeid_t(typeid_t&& other) _BTK_NOEXCEPT
+  : id(std::move(other.id))
+  {};
+  
+  inline typeid_t& typeid_t::operator=(typeid_t&& other) _BTK_NOEXCEPT
+  {
+    if (this != &other)
+    {
+      this->id = other.id;
+      other.id = nullptr;
+    }
+    return *this;
   };
 
   template<typename T>
