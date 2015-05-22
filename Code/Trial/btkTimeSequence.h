@@ -55,7 +55,11 @@ namespace btk
   
   public:
     enum : int {Unknown = 0, Marker, Angle, Force, Moment, Power, Scalar, Analog, Pose};
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+    static _BTK_CONSTEXPR std::array<double,2> InfinityRange;
+#else
     static _BTK_CONSTEXPR std::array<double,2> InfinityRange{{-std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity()}};
+#endif
     
     TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range, Node* parent = nullptr);
     TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, Node* parent = nullptr);

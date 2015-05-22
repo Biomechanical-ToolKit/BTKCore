@@ -86,10 +86,15 @@ namespace btk
 
 namespace btk
 {
+  
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+  _BTK_CONSTEXPR std::array<double,2> TimeSequence::InfinityRange{{-std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity()}};
+#else  
   _BTK_CONSTEXPR std::array<double,2> TimeSequence::InfinityRange;
-
+#endif
+  
   TimeSequence::TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, double scale, double offset, const std::array<double,2>& range, Node* parent)
-  : TimeSequence(name,std::vector<unsigned>({components}),samples,rate,start,type,unit,scale,offset,range,parent)
+  : TimeSequence(name,std::vector<unsigned>(std::initializer_list<unsigned>{components}),samples,rate,start,type,unit,scale,offset,range,parent)
   {};
   
   TimeSequence::TimeSequence(const std::string& name, unsigned components, unsigned samples, double rate, double start, int type, const std::string& unit, Node* parent)
