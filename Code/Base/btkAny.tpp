@@ -805,7 +805,6 @@ namespace btk
     else if (!__details::_any_cast(value, this, idx))
       __details::_any_convert(value, this, idx);
   };
-  
 };
 
 // -------------------------------------------------------------------------- //
@@ -868,10 +867,17 @@ namespace btk
   : mp_Storage(__details::_any_store<std::initializer_list<U>,std::initializer_list<D>>(std::move(values), std::move(dimensions)))
   {};
   
-  template <typename U>
+  template <typename U, typename>
   inline bool Any::isEqual(U&& value) const _BTK_NOEXCEPT
   {
     return __details::_any_is_equal(this,std::forward<U>(value));
+  };
+  
+  template <typename U, typename>
+  inline void Any::assign(U&& value) _BTK_NOEXCEPT
+  {
+    delete this->mp_Storage;
+    this->mp_Storage = __details::_any_store<U,void*>(std::forward<U>(value), {});
   };
 
   template <typename U, typename >

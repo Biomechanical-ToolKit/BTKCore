@@ -71,8 +71,8 @@ namespace btk
     bool isValid() const _BTK_NOEXCEPT;
     void swap(Any& other) _BTK_NOEXCEPT;
     
-    template <typename U> bool isEqual(U&& value) const _BTK_NOEXCEPT;
-    
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> bool isEqual(U&& value) const _BTK_NOEXCEPT;
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> void assign(U&& value) _BTK_NOEXCEPT;
     template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast() const _BTK_NOEXCEPT;
     template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> U cast(size_t idx) const _BTK_NOEXCEPT;
     

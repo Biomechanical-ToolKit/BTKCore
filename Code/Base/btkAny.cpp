@@ -224,6 +224,16 @@ namespace btk
     std::swap(this->mp_Storage, other.mp_Storage);
   };
   
+  /**
+   * template <typename U, typename> inline bool Any::isEqual(U&& value) const _BTK_NOEXCEPT
+   * Convenient method to compare the content of an Any object with the given value.
+   */
+  
+  /**
+   * template <typename U, typename> inline bool Any::assign(U&& value) const _BTK_NOEXCEPT
+   * Convenient method to assign a value to an Any object.
+   */
+  
   /** 
    * @fn template <typename U, typename> U Any::cast() const _BTK_NOEXCEPT
    * Method to explicitely convert the content of this object to the given type.
