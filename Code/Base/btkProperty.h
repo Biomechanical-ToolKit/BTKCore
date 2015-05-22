@@ -68,44 +68,31 @@
 
 namespace btk
 { 
-  template <typename T, typename U>
+  template <typename T, typename U, U (T::*A)() const, void (T::*M)(U) = nullptr>
   struct Property
   {
+    using ValueType = typename std::decay<U>::type;
+    
     const char* Label;
     size_t Size;
-    U (T::*Accessor)() const;
-    void (T::*Mutator)(U);
 
-    template <size_t N, typename A = std::nullptr_t, typename M = std::nullptr_t>
-    _BTK_CONSTEXPR Property(const char(&l)[N], A&& a = nullptr, M&& m = nullptr) : Label(l), Size(N-1), Accessor(a), Mutator(m)
+    template <size_t N>
+    _BTK_CONSTEXPR Property(const char(&l)[N])
+    : Label(l), Size(N-1)
+    {};
+    
+    U get(const T* obj) const _BTK_NOEXCEPT
     {
-      static_assert(!std::is_same<std::nullptr_t, A>::value, "An accessor is required. It is not possible to pass a null pointer.");
-    };
-
-    template <typename Object>
-    inline bool accept(Object* obj, const char* label, const Any* value) const
+      return (obj->*A)();
+    }
+    
+    void set(T* obj, U value) const _BTK_NOEXCEPT
     {
-      if (strcmp(label,this->Label) == 0)
-      {
-        if (this->Mutator != nullptr)
-          (obj->*(this->Mutator))(value->cast<typename std::decay<U>::type>());
-        else
-          Logger::error("No mutator method defined for the static property '%s'.",label);
-        return true;
-      }
-      return false;
-    };
-  
-    template <typename Object>
-    inline bool accept(const Object* obj, const char* label, Any* value) const
-    {
-      if (strcmp(label,this->Label) == 0)
-      {
-        *value = (obj->*(this->Accessor))();  
-        return true;
-      }
-      return false;
-    };
+      if (M == nullptr)
+        Logger::error("No mutator method defined for the static property '%s'.",this->Label);
+      else
+        (obj->*M)(value);
+    }
   };
   
   namespace __details
@@ -117,39 +104,46 @@ namespace btk
       static inline bool visit(Object* obj, const char* key, Value* val)
       {
         const auto properties = Derived::make_properties();
-        return _Retriever<decltype(properties),0>::search(properties,obj,key,val);
+        return search<0,std::tuple_size<decltype(properties)>::value-1>(properties,obj,key,val);
       };
   
     private:
+      
       template <typename Prop, typename Object, typename Value>
-      static inline bool accept(Prop&& property, Object* obj, const char* key, Value* val)
+      static inline bool accept(Prop&& prop, Object* obj, const char* key, Value* val)
       {
-        return property.accept(obj,key,val);
-      };
-    
-      template<typename Tuple, size_t Pos, size_t Size = std::tuple_size<Tuple>::value-1>
-      struct _Retriever
-      {
-        template <typename Props, typename Object, typename Value>
-        static inline bool search(Props&& properties, Object* obj, const char* key, Value* val)
+        if (strncmp(key,prop.Label,prop.Size) == 0)
         {
-          auto property = std::get<Pos>(properties);
-          if (Derived::accept(std::forward<decltype(property)>(property),obj,key,val))
-            return true;
-          else
-            return _Retriever<Tuple,Pos+1,Size>::search(std::forward<Props>(properties),obj,key,val);
-        };
-      };
-
-      template<typename Tuple, size_t Size>
-      struct _Retriever<Tuple, Size, Size>
+          *val = prop.get(obj);
+          return true;
+        }
+        return false;
+      }
+      
+      template <typename Prop, typename Object, typename Value>
+      static inline bool accept(Prop&& prop, Object* obj, const char* key, const Value* val)
       {
-        template <typename Props, typename Object, typename Value>
-        static inline bool search(Props&& properties, Object* obj, const char* key, Value* val)
+        if (strncmp(key,prop.Label,prop.Size) == 0)
         {
-          auto property = std::get<Size>(properties);
-          return Derived::accept(std::forward<decltype(property)>(property),obj,key,val);
-        };
+          using value_t = typename std::remove_const<typename std::remove_reference<Prop>::type>::type::ValueType;
+          prop.set(obj,val->template cast<value_t>());
+          return true;
+        }
+        return false;
+      }
+      
+      template <size_t Index, size_t Size, typename Props, typename Object, typename Value>
+      static inline typename std::enable_if<Index != Size, bool>::type search(Props&& properties, Object* obj, const char* key, Value* val)
+      {
+        if (accept(std::get<Index>(properties),obj,key,val))
+          return true;
+        return search<Index+1,Size>(std::forward<Props>(properties),obj,key,val);
+      };
+      
+      template <size_t Index, size_t Size, typename Props, typename Object, typename Value>
+      static inline typename std::enable_if<Index == Size, bool>::type search(Props&& properties, Object* obj, const char* key, Value* val)
+      {
+        return accept(std::get<Size>(properties),obj,key,val);
       };
     };
   };
@@ -195,7 +189,7 @@ namespace btk
    *   BTK_DECLARE_PINT_ACCESSOR(TestNode) // To have access to the public interface (pint) from the private implementation
    *   
    *   BTK_DECLARE_STATIC_PROPERTIES(TestNodePrivate, btk::NodePrivate,
-   *     btk::Property<TestNode,int>("version",&TestNode::version,&TestNode::setVersion)
+   *     btk::Property<TestNode,int,&TestNode::version,&TestNode::setVersion>("version")
    *   )
    *   
    * public:
@@ -208,7 +202,7 @@ namespace btk
    * If the member is read-only the pointer to the mutation must be set to nullptr. For example:
    *
    * @code
-   * btk::Property<TestNode,int>("version",&TestNode::version,nullptr)
+   * btk::Property<TestNode,int,&TestNode::version>("version") // by default the mutator is set to nullptr
    * @endcode
    */
   

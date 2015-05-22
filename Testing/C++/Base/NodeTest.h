@@ -51,7 +51,6 @@ CXXTEST_SUITE(NodeTest)
     TS_ASSERT_EQUALS(node.timestamp(),ts);
     TS_ASSERT_EQUALS(node.description(),"I am an empty description, isn't it?");
     TS_ASSERT_EQUALS(node.property("description").cast<std::string>(),"I am an empty description, isn't it?");
-    ts = node.timestamp();
     node.setProperty("description",std::string("Or was I..."));
     TS_ASSERT_EQUALS(node.timestamp(),ts);
     TS_ASSERT_EQUALS(node.description(),"Or was I...");

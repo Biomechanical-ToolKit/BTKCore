@@ -58,15 +58,15 @@ namespace btk
     
     BTK_DECLARE_NODEID(TimeSequence, Node)
     BTK_DECLARE_STATIC_PROPERTIES(TimeSequence, Node,
-      Property<TimeSequence,int>("type",&TimeSequence::type,&TimeSequence::setType),
-      Property<TimeSequence,unsigned>("samples",&TimeSequence::samples),
-      Property<TimeSequence,double>("sampleRate",&TimeSequence::sampleRate,&TimeSequence::setSampleRate),
-      Property<TimeSequence,double>("startTime",&TimeSequence::startTime,&TimeSequence::setStartTime),
-      Property<TimeSequence,const std::string&>("unit",&TimeSequence::unit,&TimeSequence::setUnit),
-      Property<TimeSequence,double>("scale",&TimeSequence::scale,&TimeSequence::setScale),
-      Property<TimeSequence,double>("offset",&TimeSequence::offset,&TimeSequence::setOffset),
-      Property<TimeSequence,const std::array<double,2>&>("range",&TimeSequence::range,&TimeSequence::setRange),
-      Property<TimeSequence,unsigned>("components",&TimeSequence::components)
+      Property<TimeSequence,int,&TimeSequence::type,&TimeSequence::setType>{"type"},
+      Property<TimeSequence,unsigned,&TimeSequence::samples>{"samples"},
+      Property<TimeSequence,double,&TimeSequence::sampleRate,&TimeSequence::setSampleRate>{"sampleRate"},
+      Property<TimeSequence,double,&TimeSequence::startTime,&TimeSequence::setStartTime>{"startTime"},
+      Property<TimeSequence,const std::string&,&TimeSequence::unit,&TimeSequence::setUnit>{"unit"},
+      Property<TimeSequence,double,&TimeSequence::scale,&TimeSequence::setScale>{"scale"},
+      Property<TimeSequence,double,&TimeSequence::offset,&TimeSequence::setOffset>{"offset"},
+      Property<TimeSequence,const std::array<double,2>&,&TimeSequence::range,&TimeSequence::setRange>{"range"},
+      Property<TimeSequence,unsigned,&TimeSequence::components>{"components"}
     )
     
   public:

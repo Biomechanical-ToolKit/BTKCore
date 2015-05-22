@@ -55,9 +55,9 @@ namespace btk
   
     BTK_DECLARE_NODEID(Event, Node)
     BTK_DECLARE_STATIC_PROPERTIES(Event, Node,
-      Property<Event,double>("time",&Event::time,&Event::setTime),
-      Property<Event,const std::string&>("context",&Event::context,&Event::setContext),
-      Property<Event,const std::string&>("subject",&Event::subject,&Event::setSubject)
+      Property<Event,double,&Event::time,&Event::setTime>{"time"},
+      Property<Event,const std::string&,&Event::context,&Event::setContext>{"context"},
+      Property<Event,const std::string&,&Event::subject,&Event::setSubject>{"subject"}
     )
   
   public:

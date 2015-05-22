@@ -46,8 +46,8 @@
 namespace btk
 {
   _BTK_STATIC_PROPERTIES(
-    Property<Node,const std::string&>{"name", &Node::name, &Node::setName},
-    Property<Node,const std::string&>{"description", &Node::description, &Node::setDescription}
+    Property<Node, const std::string&, &Node::name, &Node::setName>{"name"},
+    Property<Node, const std::string&, &Node::description, &Node::setDescription>{"description"}
   );
 
   // ------------------------------------------------------------------------ //
