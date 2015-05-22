@@ -237,7 +237,7 @@ namespace btk
       static inline T* array(size_t newarraylen, U* values, size_t num)
       {
         T* data = new T[newarraylen];
-        std::copy(values,values+num,data);
+        std::copy_n(values,num,data);
         return data;
       };
       _Any_adapt() = delete;
@@ -483,7 +483,7 @@ namespace btk
     {
       T* data = new T[this->NumValues];
       size_t* dims = new size_t[this->NumDims];
-      std::copy(static_cast<T*>(this->Data),static_cast<T*>(this->Data)+this->NumValues,data);
+      std::copy_n(static_cast<T*>(this->Data),this->NumValues,data);
       memcpy(dims, this->Dimensions, this->NumDims*sizeof(size_t));
       return new _Any_storage_array<T>(data,this->NumValues,dims,this->NumDims);
     };
