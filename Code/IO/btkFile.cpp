@@ -138,32 +138,25 @@ namespace btk
     dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
     dwShareMode = FILE_SHARE_READ;
     dwFlagsandAttributes = FILE_ATTRIBUTE_TEMPORARY;
-    switch(m)
-    {
-    case Mode::Out:
+    if (m == Mode::Out)
       dwCreationDisposition = OPEN_ALWAYS;
-      break;
-    case (Mode::Out | Mode::Truncate):
+    else if (m == (Mode::Out | Mode::Truncate))
       dwCreationDisposition = CREATE_ALWAYS;
-      break;
-    case (Mode::Out | Mode::Append):
+    else if (m == (Mode::Out | Mode::Append))
       dwCreationDisposition = OPEN_ALWAYS;
-      break;
-    case Mode::In:
+    else if (m == Mode::In)
+    {
       dwDesiredAccess = GENERIC_READ;
       dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE; // Is it a good idea to give the possibility to other processes to write in the file that we are reading?
       dwCreationDisposition = OPEN_EXISTING;
       dwFlagsandAttributes = FILE_ATTRIBUTE_READONLY;
-      break;
-    case Mode::In | Mode::Out:
-      dwCreationDisposition = OPEN_ALWAYS;
-      break;
-    case Mode::In | Mode::Out | Mode::Truncate:
-      dwCreationDisposition = TRUNCATE_EXISTING;
-      break;
-    default: // Other flags are not supported in the C++ standard
-      return 0;
     }
+    else if (m == (Mode::In | Mode::Out))
+      dwCreationDisposition = OPEN_ALWAYS;
+    else if (m == (Mode::In | Mode::Out | Mode::Truncate))
+      dwCreationDisposition = TRUNCATE_EXISTING;
+    else // Other flags are not supported in the C++ standard
+      return 0;
     // Open the file
     if ((this->m_File = ::CreateFile(s, dwDesiredAccess, dwShareMode, NULL, 
                                      dwCreationDisposition, dwFlagsandAttributes, NULL))
