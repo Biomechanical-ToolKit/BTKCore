@@ -114,7 +114,7 @@ namespace btk
       {
         if (strncmp(key,prop.Label,prop.Size) == 0)
         {
-          *val = prop.get(obj);
+          val->assign(prop.get(obj));
           return true;
         }
         return false;
