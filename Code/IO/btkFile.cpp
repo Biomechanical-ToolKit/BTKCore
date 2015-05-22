@@ -210,7 +210,7 @@ namespace btk
 #if defined(HAVE_SYS_MMAP)
     bool err = !(::munmap(this->mp_Data, this->m_DataSize) == 0);
 #else
-    BOOL err = (::UnmapViewOfFile(this->mp_Data) == 0) || (::closeHandle(this->m_Map) == 0);
+    BOOL err = (::UnmapViewOfFile(this->mp_Data) == 0) || (::CloseHandle(this->m_Map) == 0);
     this->m_Map = NULL;
 #endif
     
@@ -231,7 +231,7 @@ namespace btk
 #if defined(HAVE_SYS_MMAP)
     err |= ::close(this->m_File);
 #else
-    err |= (::closeHandle(this->m_File) == 0);
+    err |= (::CloseHandle(this->m_File) == 0);
 #endif
     this->m_File = _BTK_MMFILEBUF_NO_FILE;
     
@@ -369,7 +369,7 @@ namespace btk
       return 0;
     size_t newBufferSize = this->m_DataSize + this->granularity();
 #if defined(_MSC_VER)
-    if ((::UnmapViewOfFile(this->mp_Data) == 0) || (::closeHandle(this->m_Map) == 0))
+    if ((::UnmapViewOfFile(this->mp_Data) == 0) || (::CloseHandle(this->m_Map) == 0))
       return 0;
     this->m_Map = NULL;
     LONG lDistHigh = (uint64_t)newBufferSize >> 32; // 32 = (sizeof(LONG) * 8)
