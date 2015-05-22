@@ -83,7 +83,11 @@ namespace btk
   template<typename T>
   inline _BTK_CONSTEXPR typeid_t static_typeid() _BTK_NOEXCEPT
   {
+#if defined(_MSC_VER)
+    return reinterpret_cast<typeid_t::sig*>(&static_typeid<T>);
+#else
     return &static_typeid<T>;
+#endif
   };
   
   /**
