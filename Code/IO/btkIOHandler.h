@@ -94,7 +94,7 @@ namespace btk
     std::vector<const char*> availableOptions() const _BTK_NOEXCEPT;
     std::vector<const char*> availableOptionChoices(const char* option) const _BTK_NOEXCEPT;
     
-    template <typename O> typename O::Format option() const _BTK_NOEXCEPT;
+    template <typename O> typename O::ValueType option() const _BTK_NOEXCEPT;
     template <typename O, typename V> void setOption(const V& value) _BTK_NOEXCEPT;
     // const char* option(const const char* name) const _BTK_NOEXCEPT;
     // void setOption(const char* name, const char* value) _BTK_NOEXCEPT;
@@ -129,6 +129,23 @@ namespace btk
   
   // ----------------------------------------------------------------------- //
   
+  template <typename O>
+  typename O::ValueType IOHandler::option() const _BTK_NOEXCEPT
+  {
+    typename O::ValueType value;
+    this->option(O::name(),static_cast<void*>(&value));
+    return value;
+  };
+  
+  template <typename O, typename V>
+  inline void IOHandler::setOption(const V& value) _BTK_NOEXCEPT
+  {
+    static_assert(std::is_same<typename O::ValueType,V>::value, "The type of the given value does not correspond to the type of the option's value.");
+    this->setOption(O::name(),static_cast<const void*>(&value));
+  };
+  
+  // ----------------------------------------------------------------------- //
+  
   inline _BTK_CONSTEXPR IOHandler::Capability operator& (IOHandler::Capability lhs, IOHandler::Capability rhs)
   {
     return static_cast<IOHandler::Capability>(static_cast<int>(lhs) & static_cast<int>(rhs));
@@ -151,23 +168,6 @@ namespace btk
   BTK_STRINGIFY_OPTION_VALUE(IOHandler::DataStorageFormat, IOHandler::DataStorage::NotApplicable, "NotApplicable");
   BTK_STRINGIFY_OPTION_VALUE(IOHandler::DataStorageFormat, IOHandler::DataStorage::Integer, "Integer");
   BTK_STRINGIFY_OPTION_VALUE(IOHandler::DataStorageFormat, IOHandler::DataStorage::Float, "Float");
-  
-  // ----------------------------------------------------------------------- //
-  
-  template <typename O>
-  typename O::Format IOHandler::option() const _BTK_NOEXCEPT
-  {
-    typename O::Format value;
-    this->option(O::name(),static_cast<void*>(&value));
-    return value;
-  };
-  
-  template <typename O, typename V>
-  inline void IOHandler::setOption(const V& value) _BTK_NOEXCEPT
-  {
-    static_assert(std::is_same<typename O::Format,V>::value, "The type of the given value does not correspond to the type of the option's value.");
-    this->setOption(O::name(),static_cast<const void*>(&value));
-  };
 };
   
 #endif // __btkIOHandler_h

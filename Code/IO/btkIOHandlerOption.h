@@ -76,75 +76,37 @@
     
 #define BTK_STRINGIFY_OPTION_NAME(option,str) \
     template <> \
-    struct stringify_option_name<typename option::Format> \
+    struct stringify_option_name<typename option::ValueType> \
     { \
       static inline _BTK_CONSTEXPR_CONST char* c_str() _BTK_NOEXCEPT {return str;}; \
     };
     
 #define BTK_STRINGIFY_OPTION_VALUE(option,value,str) \
     template <> \
-    struct stringify_option_value<typename option::Format,value> \
+    struct stringify_option_value<typename option::ValueType,value> \
     { \
       static inline _BTK_CONSTEXPR_CONST char* c_str() _BTK_NOEXCEPT {return str;}; \
     };
+    
+// ------------------------------------------------------------------------- //
 
 namespace btk
 {
   template <typename V> struct stringify_option_name;
   template <typename V, V v> struct stringify_option_value;
   
-  template <typename O>
-  struct make_option
+  namespace __details
   {
-    using V = typename O::Format;
-    template <V... vs> using D = typename O::template Details<vs...>;
-    
-    template <V... vs>
-    struct multiple_choices
-    {
-      static inline D<vs...> init(V&& value)
-      {
-        return D<vs...>(std::forward<V>(value));
-      };
-      multiple_choices() = delete;
-      ~multiple_choices() _BTK_NOEXCEPT = delete;
-      multiple_choices(const multiple_choices& ) = delete;
-      multiple_choices(multiple_choices&& ) _BTK_NOEXCEPT = delete;
-      multiple_choices& operator=(const multiple_choices& ) = delete;
-      multiple_choices& operator=(multiple_choices&& ) _BTK_NOEXCEPT = delete;
-    };
-    template <V v>
-    static inline D<v> single_choice()
-    {
-      return D<v>(std::forward<V>(v));
-    };
-  };
-  
-  template <typename V>
-  class IOHandlerOption
-  {
-  public:
-    using Format = V;
-    
-    static inline _BTK_CONSTEXPR_CONST char* name() _BTK_NOEXCEPT {return stringify_option_name<V>::c_str();};
-    
-    IOHandlerOption() = delete;
-    ~IOHandlerOption() _BTK_NOEXCEPT = delete;
-    IOHandlerOption(const IOHandlerOption& ) = delete;
-    IOHandlerOption(IOHandlerOption&& ) _BTK_NOEXCEPT = delete;
-    IOHandlerOption& operator=(const IOHandlerOption& ) = delete;
-    IOHandlerOption& operator=(IOHandlerOption&& ) _BTK_NOEXCEPT = delete;
-    
-    template <V... vs>
-    class Details
+    template <typename V, V... vs>
+    class _IOHandler_option
     {
     public:
-      using Format = V;
-
-      static inline _BTK_CONSTEXPR_CONST char* name() _BTK_NOEXCEPT {return IOHandlerOption<V>::name();};
+      using ValueType = V;
+      
+      static inline _BTK_CONSTEXPR_CONST char* name() _BTK_NOEXCEPT {return stringify_option_name<V>::c_str();};
       static inline std::vector<const char*> choices() _BTK_NOEXCEPT {return {stringify_option_value<V,vs>::c_str()...};};
     
-      Details(V&& v)
+      _IOHandler_option(V&& v)
       : Value(std::forward<V>(v))
       {};
       
@@ -167,10 +129,7 @@ namespace btk
     private:
       V Value;
     };
-  };
-  
-  namespace __details
-  {
+    
     template<class T, size_t I, size_t N>
     struct _IOHandler_options_iterate
     {
@@ -193,7 +152,7 @@ namespace btk
       {
         using _Elt = typename std::tuple_element<I,T>::type;
         if (strcmp(_Elt::name(),option) == 0)
-          *static_cast<typename _Elt::Format*>(value) = std::get<I>(*tuple).value();
+          *static_cast<typename _Elt::ValueType*>(value) = std::get<I>(*tuple).value();
         else
           _IOHandler_options_iterate<T,I+1,N>::get_value(tuple, option, value);
       };
@@ -202,7 +161,7 @@ namespace btk
       {
         using _Elt = typename std::tuple_element<I,T>::type;
         if (strcmp(_Elt::name(),option) == 0)
-          std::get<I>(*tuple).setValue(*static_cast<const typename _Elt::Format*>(value));
+          std::get<I>(*tuple).setValue(*static_cast<const typename _Elt::ValueType*>(value));
         else
           _IOHandler_options_iterate<T,I+1,N>::set_value(tuple, option, value);
       };
@@ -216,6 +175,50 @@ namespace btk
       static inline void get_value(const T* , const char* , void* ) {};
       static inline void set_value(T* , const char* , const void* ) {};
     };
+  };
+    
+  // --------------------------------------------------------------------- //
+  
+  template <typename O>
+  struct make_option
+  {
+    using V = typename O::ValueType;
+  
+    template <V... vs>
+    struct multiple_choices
+    {
+      static inline __details::_IOHandler_option<V,vs...> initial_value(V&& value)
+      {
+        return __details::_IOHandler_option<V,vs...>(std::forward<V>(value));
+      };
+      multiple_choices() = delete;
+      ~multiple_choices() _BTK_NOEXCEPT = delete;
+      multiple_choices(const multiple_choices& ) = delete;
+      multiple_choices(multiple_choices&& ) _BTK_NOEXCEPT = delete;
+      multiple_choices& operator=(const multiple_choices& ) = delete;
+      multiple_choices& operator=(multiple_choices&& ) _BTK_NOEXCEPT = delete;
+    };
+    template <V v>
+    static inline __details::_IOHandler_option<V,v> single_choice()
+    {
+      return __details::_IOHandler_option<V,v>(std::forward<V>(v));
+    };
+  };
+
+  template <typename V>
+  class IOHandlerOption
+  {
+  public:
+    using ValueType = V;
+  
+    static inline _BTK_CONSTEXPR_CONST char* name() _BTK_NOEXCEPT {return stringify_option_name<V>::c_str();};
+  
+    IOHandlerOption() = delete;
+    ~IOHandlerOption() _BTK_NOEXCEPT = delete;
+    IOHandlerOption(const IOHandlerOption& ) = delete;
+    IOHandlerOption(IOHandlerOption&& ) _BTK_NOEXCEPT = delete;
+    IOHandlerOption& operator=(const IOHandlerOption& ) = delete;
+    IOHandlerOption& operator=(IOHandlerOption&& ) _BTK_NOEXCEPT = delete;
   };
   
   /**

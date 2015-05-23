@@ -56,9 +56,9 @@ namespace btk
   {
     BTK_DECLARE_IOHANDLER_OPTIONS(
       make_option<C3DHandler::EncodingFormat>::single_choice<C3DHandler::Encoding::Binary>(),
-      make_option<C3DHandler::ByteOrderFormat>::multiple_choices<C3DHandler::ByteOrder::VAXLittleEndian,C3DHandler::ByteOrder::IEEELittleEndian,C3DHandler::ByteOrder::IEEEBigEndian>::init(C3DHandler::ByteOrder::Native),
-      make_option<C3DHandler::DataStorageFormat>::multiple_choices<C3DHandler::DataStorage::Integer,C3DHandler::DataStorage::Float>::init(C3DHandler::DataStorage::Float),
-      make_option<C3DHandler::AnalogStorageFormat>::multiple_choices<C3DHandler::AnalogStorage::Signed,C3DHandler::AnalogStorage::Unsigned>::init(C3DHandler::AnalogStorage::Signed)
+      make_option<C3DHandler::ByteOrderFormat>::multiple_choices<C3DHandler::ByteOrder::VAXLittleEndian,C3DHandler::ByteOrder::IEEELittleEndian,C3DHandler::ByteOrder::IEEEBigEndian>::initial_value(C3DHandler::ByteOrder::Native),
+      make_option<C3DHandler::DataStorageFormat>::multiple_choices<C3DHandler::DataStorage::Integer,C3DHandler::DataStorage::Float>::initial_value(C3DHandler::DataStorage::Float),
+      make_option<C3DHandler::AnalogStorageFormat>::multiple_choices<C3DHandler::AnalogStorage::Signed,C3DHandler::AnalogStorage::Unsigned>::initial_value(C3DHandler::AnalogStorage::Signed)
     )
     
   public:
