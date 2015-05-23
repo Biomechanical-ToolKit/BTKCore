@@ -111,7 +111,7 @@ namespace btk
   public:
     using Format = V;
     
-    static inline _BTK_CONSTEXPR const char* name() _BTK_NOEXCEPT {return S;};
+    static inline _BTK_CONSTEXPR_CONST char* name() _BTK_NOEXCEPT {return S;};
     
     IOHandlerOption() = delete;
     ~IOHandlerOption() _BTK_NOEXCEPT = delete;
@@ -126,7 +126,7 @@ namespace btk
     public:
       using Format = V;
 
-      static inline _BTK_CONSTEXPR const char* name() _BTK_NOEXCEPT {return S;};
+      static inline _BTK_CONSTEXPR_CONST char* name() _BTK_NOEXCEPT {return S;};
       static inline std::vector<const char*> choices() _BTK_NOEXCEPT {return {stringify_option_value<V,vs>::c_str...};};
     
       Details(V&& v)

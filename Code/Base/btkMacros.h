@@ -54,8 +54,10 @@
  */
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
   #define _BTK_CONSTEXPR const
+  #define _BTK_CONSTEXPR_CONST const 
 #else
   #define _BTK_CONSTEXPR constexpr
+  #define _BTK_CONSTEXPR_CONST constexpr const
 #endif
 
 /**

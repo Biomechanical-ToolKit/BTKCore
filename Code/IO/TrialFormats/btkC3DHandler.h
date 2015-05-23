@@ -39,7 +39,7 @@
 #include "btkTrialIOHandler.h"
 #include "btkMacros.h" // _BTK_CONSTEXPR, _BTK_NOEXCEPT
 
-static _BTK_CONSTEXPR const char _btk_C3DHandler_AnalogStorage[] = "AnalogStorage";
+static _BTK_CONSTEXPR_CONST char _btk_C3DHandler_AnalogStorage[] = "AnalogStorage";
 
 namespace btk
 {
