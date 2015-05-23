@@ -49,10 +49,6 @@
 #include <vector>
 #include <type_traits> // std::is_same
 
-static _BTK_CONSTEXPR_CONST char _btk_IOHandler_Encoding[] = "Encoding";
-static _BTK_CONSTEXPR_CONST char _btk_IOHandler_ByteOrder[] = "ByteOrder";
-static _BTK_CONSTEXPR_CONST char _btk_IOHandler_DataStorage[] = "DataStorage";
-
 namespace btk
 {
   class Node;
@@ -69,13 +65,14 @@ namespace btk
     enum class Capability : int {None = 0x00, Read = 0x01, Write = 0x02, ReadWrite = Read|Write};
     enum class Error : int {None, Device, UnsupportedFormat, InvalidData, Unexpected, Unknown};
     
+    enum class Encoding : int {Text = 0x01, Binary, Mixed = Text|Binary};
+    using EncodingFormat = IOHandlerOption<Encoding>;
+    
     using ByteOrder = EndianFormat;
-    enum class Encoding : int {Text = 0x01, Binary, Mix = Text|Binary};
+    using ByteOrderFormat = IOHandlerOption<ByteOrder>;
+    
     enum class DataStorage : int {NotApplicable, Integer, Float};
-
-    using EncodingFormat = IOHandlerOption<_btk_IOHandler_Encoding,Encoding>;
-    using ByteOrderFormat = IOHandlerOption<_btk_IOHandler_ByteOrder,ByteOrder>;
-    using DataStorageFormat = IOHandlerOption<_btk_IOHandler_DataStorage,DataStorage>;
+    using DataStorageFormat = IOHandlerOption<DataStorage>;
     
     virtual ~IOHandler() _BTK_NOEXCEPT;
     
@@ -139,65 +136,21 @@ namespace btk
   
   // ----------------------------------------------------------------------- //
   
-  template <>
-  struct stringify_option_value<IOHandler::Encoding,IOHandler::Encoding::Binary>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "Binary";
-  };
-
-  template <>
-  struct stringify_option_value<IOHandler::Encoding,IOHandler::Encoding::Text>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "Text";
-  };
+  BTK_STRINGIFY_OPTION_NAME(IOHandler::EncodingFormat, "Encoding");
+  BTK_STRINGIFY_OPTION_VALUE(IOHandler::EncodingFormat, IOHandler::Encoding::Binary, "Binary");
+  BTK_STRINGIFY_OPTION_VALUE(IOHandler::EncodingFormat, IOHandler::Encoding::Text, "Text");
+  BTK_STRINGIFY_OPTION_VALUE(IOHandler::EncodingFormat, IOHandler::Encoding::Mixed, "Mixed");
   
-  template <>
-  struct stringify_option_value<IOHandler::Encoding,IOHandler::Encoding::Mix>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "Mix";
-  };
+  BTK_STRINGIFY_OPTION_NAME(IOHandler::ByteOrderFormat, "ByteOrder");
+  BTK_STRINGIFY_OPTION_VALUE(IOHandler::ByteOrderFormat, IOHandler::ByteOrder::VAXLittleEndian, "VAXLittleEndian");
+  BTK_STRINGIFY_OPTION_VALUE(IOHandler::ByteOrderFormat, IOHandler::ByteOrder::IEEELittleEndian, "IEEELittleEndian");
+  BTK_STRINGIFY_OPTION_VALUE(IOHandler::ByteOrderFormat, IOHandler::ByteOrder::IEEEBigEndian, "IEEEBigEndian");
+  BTK_STRINGIFY_OPTION_VALUE(IOHandler::ByteOrderFormat, IOHandler::ByteOrder::NotApplicable, "NotApplicable");
   
-  template <>
-  struct stringify_option_value<IOHandler::ByteOrder,IOHandler::ByteOrder::VAXLittleEndian>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "VAXLittleEndian";
-  };
-
-  template <>
-  struct stringify_option_value<IOHandler::ByteOrder,IOHandler::ByteOrder::IEEELittleEndian>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "IEEELittleEndian";
-  };
-  
-  template <>
-  struct stringify_option_value<IOHandler::ByteOrder,IOHandler::ByteOrder::IEEEBigEndian>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "IEEEBigEndian";
-  };
-  
-  template <>
-  struct stringify_option_value<IOHandler::ByteOrder,IOHandler::ByteOrder::NotApplicable>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "NotApplicable";
-  };
-  
-  template <>
-  struct stringify_option_value<IOHandler::DataStorage,IOHandler::DataStorage::NotApplicable>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "NotApplicable";
-  };
-  
-  template <>
-  struct stringify_option_value<IOHandler::DataStorage,IOHandler::DataStorage::Integer>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "Integer";
-  };
-  
-  template <>
-  struct stringify_option_value<IOHandler::DataStorage,IOHandler::DataStorage::Float>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "Float";
-  };
+  BTK_STRINGIFY_OPTION_NAME(IOHandler::DataStorageFormat, "DataStorage");
+  BTK_STRINGIFY_OPTION_VALUE(IOHandler::DataStorageFormat, IOHandler::DataStorage::NotApplicable, "NotApplicable");
+  BTK_STRINGIFY_OPTION_VALUE(IOHandler::DataStorageFormat, IOHandler::DataStorage::Integer, "Integer");
+  BTK_STRINGIFY_OPTION_VALUE(IOHandler::DataStorageFormat, IOHandler::DataStorage::Float, "Float");
   
   // ----------------------------------------------------------------------- //
   

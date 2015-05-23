@@ -73,9 +73,24 @@
     { \
       _Options() : _Tuple(__VA_ARGS__) {}; \
     } m_Options;
+    
+#define BTK_STRINGIFY_OPTION_NAME(option,str) \
+    template <> \
+    struct stringify_option_name<typename option::Format> \
+    { \
+      static inline _BTK_CONSTEXPR_CONST char* c_str() _BTK_NOEXCEPT {return str;}; \
+    };
+    
+#define BTK_STRINGIFY_OPTION_VALUE(option,value,str) \
+    template <> \
+    struct stringify_option_value<typename option::Format,value> \
+    { \
+      static inline _BTK_CONSTEXPR_CONST char* c_str() _BTK_NOEXCEPT {return str;}; \
+    };
 
 namespace btk
 {
+  template <typename V> struct stringify_option_name;
   template <typename V, V v> struct stringify_option_value;
   
   template <typename O>
@@ -105,13 +120,13 @@ namespace btk
     };
   };
   
-  template <const char* S, typename V>
+  template <typename V>
   class IOHandlerOption
   {
   public:
     using Format = V;
     
-    static inline _BTK_CONSTEXPR_CONST char* name() _BTK_NOEXCEPT {return S;};
+    static inline _BTK_CONSTEXPR_CONST char* name() _BTK_NOEXCEPT {return stringify_option_name<V>::c_str();};
     
     IOHandlerOption() = delete;
     ~IOHandlerOption() _BTK_NOEXCEPT = delete;
@@ -126,8 +141,8 @@ namespace btk
     public:
       using Format = V;
 
-      static inline _BTK_CONSTEXPR_CONST char* name() _BTK_NOEXCEPT {return S;};
-      static inline std::vector<const char*> choices() _BTK_NOEXCEPT {return {stringify_option_value<V,vs>::c_str...};};
+      static inline _BTK_CONSTEXPR_CONST char* name() _BTK_NOEXCEPT {return IOHandlerOption<V>::name();};
+      static inline std::vector<const char*> choices() _BTK_NOEXCEPT {return {stringify_option_value<V,vs>::c_str()...};};
     
       Details(V&& v)
       : Value(std::forward<V>(v))

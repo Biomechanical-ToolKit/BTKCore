@@ -37,9 +37,8 @@
 #define __btkC3DHandler_h
 
 #include "btkTrialIOHandler.h"
+#include "btkIOHandlerOption.h"
 #include "btkMacros.h" // _BTK_CONSTEXPR, _BTK_NOEXCEPT
-
-static _BTK_CONSTEXPR_CONST char _btk_C3DHandler_AnalogStorage[] = "AnalogStorage";
 
 namespace btk
 {
@@ -51,8 +50,7 @@ namespace btk
     
   public:
     enum class AnalogStorage : int {Signed, Unsigned};
-    
-    using AnalogStorageFormat = IOHandlerOption<_btk_C3DHandler_AnalogStorage,AnalogStorage>;
+    using AnalogStorageFormat = IOHandlerOption<AnalogStorage>;
     
     C3DHandler();
     ~C3DHandler() _BTK_NOEXCEPT;
@@ -71,6 +69,10 @@ namespace btk
     virtual void readDevice(Node* output) final;
     virtual void writeDevice(const Node* input) final;
   };
+  
+  BTK_STRINGIFY_OPTION_NAME(C3DHandler::AnalogStorageFormat, "AnalogStorage");
+  BTK_STRINGIFY_OPTION_VALUE(C3DHandler::AnalogStorageFormat, C3DHandler::AnalogStorage::Signed, "Signed");
+  BTK_STRINGIFY_OPTION_VALUE(C3DHandler::AnalogStorageFormat, C3DHandler::AnalogStorage::Unsigned, "Unsigned");
 };
 
 #endif // __btkC3DHandler_h

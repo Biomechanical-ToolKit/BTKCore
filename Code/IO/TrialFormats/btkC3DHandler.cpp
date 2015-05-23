@@ -108,20 +108,6 @@ namespace btk
 
   // ------------------------------------------------------------------------ //
   
-  template <>
-  struct stringify_option_value<C3DHandler::AnalogStorage,C3DHandler::AnalogStorage::Signed>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "Signed";
-  };
-  
-  template <>
-  struct stringify_option_value<C3DHandler::AnalogStorage,C3DHandler::AnalogStorage::Unsigned>
-  {
-    static _BTK_CONSTEXPR_CONST char* c_str = "Unsigned";
-  };
-  
-  // ------------------------------------------------------------------------ //
-  
   C3DDataStream::C3DDataStream(BinaryStream* raw)
   : Raw(raw)
   {};
