@@ -863,9 +863,9 @@ namespace btk
   : mp_Storage(__details::_any_store<U>(std::forward<U>(value), std::forward<D>(dimensions)))
   {};
   
-  template <typename U, typename D, typename >
-  inline Any::Any(std::initializer_list<U> values, std::initializer_list<D> dimensions)
-  : mp_Storage(__details::_any_store<std::initializer_list<U>,std::initializer_list<D>>(std::move(values), std::move(dimensions)))
+  template <typename U, typename >
+  inline Any::Any(std::initializer_list<U> values, std::initializer_list<size_t> dimensions)
+  : mp_Storage(__details::_any_store<std::initializer_list<U>,std::initializer_list<size_t>>(std::move(values), std::move(dimensions)))
   {};
   
   template <typename U, typename>

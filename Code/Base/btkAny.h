@@ -62,7 +62,7 @@ namespace btk
     Any(const Any& other);
     Any(Any&& other) _BTK_NOEXCEPT;
     template <typename U, typename D = void*, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(U&& value, D&& dimensions = D{});
-    template <typename U, typename D = size_t, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(std::initializer_list<U> values, std::initializer_list<D> dimensions = {});
+    template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> Any(std::initializer_list<U> values, std::initializer_list<size_t> dimensions = {});
     ~Any();
     
     std::vector<size_t> dimensions() const _BTK_NOEXCEPT;

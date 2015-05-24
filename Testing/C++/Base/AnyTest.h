@@ -244,7 +244,7 @@ CXXTEST_SUITE(AnyTest)
   {
     // Initializer constructor
     // - Dimensions and values matching
-    std::vector<int> foo = {1,2,3,4}; // std::vecotr<int>{{1,2,3,4}};
+    std::vector<int> foo = {1,2,3,4};
     btk::Any a = btk::Any({1,2,3,4},{2,2});
     TS_ASSERT_EQUALS(a.dimensions().empty(),false);
     TS_ASSERT_EQUALS(a.dimensions().size(),2ul);
@@ -321,7 +321,7 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(strcmp(toto[0],"Coco"),0);
     TS_ASSERT_EQUALS(strcmp(toto[1],"Vroum"),0);
     TS_ASSERT_EQUALS(strcmp(toto[2],"Another"),0);
-    a = btk::Any(std::vector<std::string>({"Coco","Vroum","Another"}),std::vector<size_t>({4}));
+    a = btk::Any(std::vector<std::string>({"Coco","Vroum","Another"}),std::vector<size_t>(1,4));
     auto bar = a.cast<std::vector<std::string>>();
     TS_ASSERT_EQUALS(bar.size(),4ul);
     TS_ASSERT_EQUALS(bar[0],std::string("Coco"));
