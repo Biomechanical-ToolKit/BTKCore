@@ -180,7 +180,9 @@ namespace btk
    */
   Any::Any(Any&& other) _BTK_NOEXCEPT
   : mp_Storage(std::move(other.mp_Storage))
-  {};
+  {
+    other.mp_Storage = nullptr;
+  };
 
   /**
    * @fn template <typename U> Any::Any(const U& value);
