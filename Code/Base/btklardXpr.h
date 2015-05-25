@@ -41,6 +41,11 @@
 
 #include <Eigen/Core>
 
+#include <utility> // std::declval
+
+#define _BTK_LARD_DECLVAL_NESTED(xpr) \
+  std::declval<const typename Nested<xpr>::type>()
+
 namespace btk
 {
 namespace lard
@@ -555,22 +560,22 @@ namespace lard
     
     const BlockOp& derived() const _BTK_NOEXCEPT {return *this;};
     
-    auto values() _BTK_NOEXCEPT -> decltype(this->mr_Xpr.derived().values().block(0,this->m_Index,this->mr_Xpr.derived().values().rows(),Cols))
+    auto values() _BTK_NOEXCEPT -> Eigen::Block<typename std::decay<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).derived().values())>::type>
     {
       return this->mr_Xpr.derived().values().block(0,this->m_Index,this->mr_Xpr.derived().values().rows(),Cols);
     };
     
-    auto values() const _BTK_NOEXCEPT -> decltype(this->mr_Xpr.derived().values().block(0,this->m_Index,this->mr_Xpr.derived().values().rows(),Cols))
+    auto values() const _BTK_NOEXCEPT -> Eigen::Block<typename std::decay<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).derived().values())>::type>
     {
       return this->mr_Xpr.derived().values().block(0,this->m_Index,this->mr_Xpr.derived().values().rows(),Cols);
     };
 
-    auto residuals() _BTK_NOEXCEPT -> decltype(this->mr_Xpr.derived().residuals().block(0,0,this->mr_Xpr.derived().values().rows(),1))
+    auto residuals() _BTK_NOEXCEPT -> Eigen::Block<typename std::decay<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).derived().residuals())>::type>
     {
       return this->mr_Xpr.derived().residuals().block(0,0,this->mr_Xpr.derived().residuals().rows(),1);
     };
     
-    auto residuals() const _BTK_NOEXCEPT -> decltype(this->mr_Xpr.derived().residuals().block(0,0,this->mr_Xpr.derived().residuals().rows(),1))
+    auto residuals() const _BTK_NOEXCEPT -> Eigen::Block<typename std::decay<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).derived().residuals())>::type>
     {
       return this->mr_Xpr.derived().residuals().block(0,0,this->mr_Xpr.derived().residuals().rows(),1);
     };
@@ -704,12 +709,12 @@ namespace lard
     
     Index rows() const _BTK_NOEXCEPT {return this->m_Xpr.rows();};
 
-    auto values() const _BTK_NOEXCEPT -> decltype(this->m_Xpr.values().square().rowwise().sum().sqrt())
+    auto values() const _BTK_NOEXCEPT -> decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).values().square().rowwise().sum().sqrt())
     {
       return this->m_Xpr.values().square().rowwise().sum().sqrt();
     };
 
-    auto residuals() const _BTK_NOEXCEPT -> decltype(this->m_Xpr.derived().residuals())
+    auto residuals() const _BTK_NOEXCEPT -> decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).residuals())
     {
       return this->m_Xpr.residuals();
     };
@@ -741,13 +746,13 @@ namespace lard
       
     Index rows() const _BTK_NOEXCEPT {return this->m_Xpr.rows();};
 
-    auto values() const _BTK_NOEXCEPT -> decltype((this->m_Xpr.residuals() >= 0.0).template replicate<1,Xpr::ColsAtCompileTime>().select(this->m_Xpr.values(), 0.0).colwise().sum() / ((this->m_Xpr.residuals() >= 0.0).any() ? (this->m_Xpr.residuals() >= 0.0).count() : 1.0))
+    auto values() const _BTK_NOEXCEPT -> decltype((_BTK_LARD_DECLVAL_NESTED(Xpr).residuals() >= 0.0).template replicate<1,Xpr::ColsAtCompileTime>().select(_BTK_LARD_DECLVAL_NESTED(Xpr).values(), 0.0).colwise().sum() / ((_BTK_LARD_DECLVAL_NESTED(Xpr).residuals() >= 0.0).any() ? (_BTK_LARD_DECLVAL_NESTED(Xpr).residuals() >= 0.0).count() : 1.0))
     {
       const auto& cond = (this->m_Xpr.residuals() >= 0.0);
       return cond.template replicate<1,Xpr::ColsAtCompileTime>().select(this->m_Xpr.values(), 0.0).colwise().sum() / (cond.any() ? cond.count() : 1.0);
     };
 
-    auto residuals() const _BTK_NOEXCEPT -> decltype(MeanOp::generateResiduals((this->m_Xpr.residuals() >= 0.0).colwise().sum()))
+    auto residuals() const _BTK_NOEXCEPT -> decltype(MeanOp::generateResiduals((_BTK_LARD_DECLVAL_NESTED(Xpr).residuals() >= 0.0).colwise().sum()))
     {
       return MeanOp::generateResiduals((this->m_Xpr.residuals() >= 0.0).colwise().sum());
     };
@@ -783,12 +788,12 @@ namespace lard
     
     Index rows() const _BTK_NOEXCEPT {return this->m_Xpr1.rows();};
 
-    auto values() const _BTK_NOEXCEPT -> decltype(this->m_Xpr1.values() - this->m_Xpr2.values())
+    auto values() const _BTK_NOEXCEPT -> decltype(_BTK_LARD_DECLVAL_NESTED(XprOne).values() - _BTK_LARD_DECLVAL_NESTED(XprTwo).values())
     {
       return this->m_Xpr1.values() - this->m_Xpr2.values();
     };
   
-    auto residuals() const _BTK_NOEXCEPT -> decltype(DifferenceOp::generateResiduals((this->m_Xpr1.residuals() >= 0.0) && (this->m_Xpr2.residuals() >= 0.0)))
+    auto residuals() const _BTK_NOEXCEPT -> decltype(DifferenceOp::generateResiduals((_BTK_LARD_DECLVAL_NESTED(XprOne).residuals() >= 0.0) && (_BTK_LARD_DECLVAL_NESTED(XprTwo).residuals() >= 0.0)))
     {
       return DifferenceOp::generateResiduals((this->m_Xpr1.residuals() >= 0.0) && (this->m_Xpr2.residuals() >= 0.0));
     };
@@ -818,12 +823,12 @@ namespace lard
     
     Index rows() const _BTK_NOEXCEPT {return this->m_Xpr1.rows();};
 
-    auto values() const _BTK_NOEXCEPT -> decltype(this->m_Xpr1.values() + this->m_Xpr2.values())
+    auto values() const _BTK_NOEXCEPT -> decltype(_BTK_LARD_DECLVAL_NESTED(XprOne).values() + _BTK_LARD_DECLVAL_NESTED(XprTwo).values())
     {
       return this->m_Xpr1.values() + this->m_Xpr2.values();
     };
   
-    auto residuals() const _BTK_NOEXCEPT -> decltype(SumOp::generateResiduals((this->m_Xpr1.residuals() >= 0.0) && (this->m_Xpr2.residuals() >= 0.0)))
+    auto residuals() const _BTK_NOEXCEPT -> decltype(SumOp::generateResiduals((_BTK_LARD_DECLVAL_NESTED(XprOne).residuals() >= 0.0) && (_BTK_LARD_DECLVAL_NESTED(XprTwo).residuals() >= 0.0)))
     {
       return SumOp::generateResiduals((this->m_Xpr1.residuals() >= 0.0) && (this->m_Xpr2.residuals() >= 0.0));
     };
@@ -851,12 +856,12 @@ namespace lard
       
     Index rows() const _BTK_NOEXCEPT {return this->m_Xpr.rows();};
 
-    auto values() const _BTK_NOEXCEPT -> decltype(this->m_Scale * this->m_Xpr.values())
+    auto values() const _BTK_NOEXCEPT -> decltype(std::declval<double>() * _BTK_LARD_DECLVAL_NESTED(Xpr).values())
     {
       return this->m_Scale * this->m_Xpr.values();
     };
 
-    auto residuals() const _BTK_NOEXCEPT -> decltype(this->m_Xpr.residuals())
+    auto residuals() const _BTK_NOEXCEPT -> decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).residuals())
     {
       return this->m_Xpr.residuals();
     };
@@ -882,14 +887,14 @@ namespace lard
     
     Index rows() const _BTK_NOEXCEPT {return this->m_Xpr.rows();};
 
-    auto values() const _BTK_NOEXCEPT -> decltype(this->m_Xpr.values().cwiseQuotient((this->m_Xpr.values().square().rowwise().sum() >= std::numeric_limits<double>::epsilon()).select(this->m_Xpr.values().square().rowwise().sum().sqrt(),1.0).replicate(1,3)))
+    auto values() const _BTK_NOEXCEPT -> decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).values().cwiseQuotient((_BTK_LARD_DECLVAL_NESTED(Xpr).values().square().rowwise().sum() >= std::numeric_limits<double>::epsilon()).select(_BTK_LARD_DECLVAL_NESTED(Xpr).values().square().rowwise().sum().sqrt(),1.0).replicate(1,3)))
     {
       const auto temp = this->m_Xpr.values().square().rowwise().sum();
       const auto norm = (temp >= std::numeric_limits<double>::epsilon()).select(temp.sqrt(),1.0).replicate(1,this->m_Xpr.cols());
       return this->m_Xpr.values().cwiseQuotient(norm);
     };
 
-    auto residuals() const _BTK_NOEXCEPT -> decltype(this->m_Xpr.residuals())
+    auto residuals() const _BTK_NOEXCEPT -> decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).residuals())
     {
       return this->m_Xpr.residuals();
     };
@@ -926,14 +931,14 @@ namespace lard
     
     Index rows() const _BTK_NOEXCEPT {return this->m_Xpr1.rows();};
 
-    auto values() const _BTK_NOEXCEPT -> Eigen::internal::CrossOpValues<decltype(this->m_Xpr1.values()),decltype(this->m_Xpr2.values())>
+    auto values() const _BTK_NOEXCEPT -> Eigen::internal::CrossOpValues<decltype(_BTK_LARD_DECLVAL_NESTED(XprOne).values()),decltype(_BTK_LARD_DECLVAL_NESTED(XprTwo).values())>
     {
       using V1 = decltype(this->m_Xpr1.values());
       using V2 = decltype(this->m_Xpr2.values());
       return Eigen::internal::CrossOpValues<V1,V2>(this->m_Xpr1.values(), this->m_Xpr2.values());
     };
   
-    auto residuals() const _BTK_NOEXCEPT -> decltype(CrossOp::generateResiduals((this->m_Xpr1.residuals() >= 0.0) && (this->m_Xpr2.residuals() >= 0.0)))
+    auto residuals() const _BTK_NOEXCEPT -> decltype(CrossOp::generateResiduals((_BTK_LARD_DECLVAL_NESTED(XprOne).residuals() >= 0.0) && (_BTK_LARD_DECLVAL_NESTED(XprTwo).residuals() >= 0.0)))
     {
       return CrossOp::generateResiduals((this->m_Xpr1.residuals() >= 0.0) && (this->m_Xpr2.residuals() >= 0.0));
     };
@@ -966,14 +971,14 @@ namespace lard
     
     Index rows() const _BTK_NOEXCEPT {return this->m_Xpr1.rows();};
 
-    auto values() const _BTK_NOEXCEPT -> Eigen::internal::TransformOpValues<decltype(this->m_Xpr1.values()),decltype(this->m_Xpr2.values())>
+    auto values() const _BTK_NOEXCEPT -> Eigen::internal::TransformOpValues<decltype(_BTK_LARD_DECLVAL_NESTED(XprOne).values()),decltype(_BTK_LARD_DECLVAL_NESTED(XprTwo).values())>
     {
       using V1 = decltype(this->m_Xpr1.values());
       using V2 = decltype(this->m_Xpr2.values()); 
       return Eigen::internal::TransformOpValues<V1,V2>(this->m_Xpr1.values(), this->m_Xpr2.values());
     };
 
-    auto residuals() const _BTK_NOEXCEPT -> decltype(TransformOp::generateResiduals((this->m_Xpr1.residuals() >= 0.0) && (this->m_Xpr2.residuals() >= 0.0)))
+    auto residuals() const _BTK_NOEXCEPT -> decltype(TransformOp::generateResiduals((_BTK_LARD_DECLVAL_NESTED(XprOne).residuals() >= 0.0) && (_BTK_LARD_DECLVAL_NESTED(XprTwo).residuals() >= 0.0)))
     {
       return TransformOp::generateResiduals((this->m_Xpr1.residuals() >= 0.0) && (this->m_Xpr2.residuals() >= 0.0));
     };
@@ -1015,12 +1020,12 @@ namespace lard
       return this->m_Xpr.rows() * this->m_Rows;
     };
 
-    auto values() const _BTK_NOEXCEPT -> decltype(this->m_Xpr.values().replicate(this->m_Rows,1))
+    auto values() const _BTK_NOEXCEPT -> Eigen::Replicate<typename std::decay<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).values())>::type, Eigen::Dynamic, Eigen::Dynamic>
     {
       return this->m_Xpr.values().replicate(this->m_Rows,1);
     };
 
-    auto residuals() const _BTK_NOEXCEPT -> decltype(this->m_Xpr.residuals().replicate(this->m_Rows,1))
+    auto residuals() const _BTK_NOEXCEPT -> Eigen::Replicate<typename std::decay<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).residuals())>::type, Eigen::Dynamic, Eigen::Dynamic>
     {
       return this->m_Xpr.residuals().replicate(this->m_Rows,1);
     };
@@ -1054,13 +1059,13 @@ namespace lard
     
     Index rows() const _BTK_NOEXCEPT {return this->m_Xpr.rows();};
 
-    auto values() const _BTK_NOEXCEPT -> decltype(Eigen::internal::InverseOpValues<decltype(this->m_Xpr.values())>(this->m_Xpr.values()))
+    auto values() const _BTK_NOEXCEPT -> decltype(Eigen::internal::InverseOpValues<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).values())>(_BTK_LARD_DECLVAL_NESTED(Xpr).values()))
     {
       using V = decltype(this->m_Xpr.values());
       return Eigen::internal::InverseOpValues<V>(this->m_Xpr.values());
     };
 
-    auto residuals() const _BTK_NOEXCEPT -> decltype(this->m_Xpr.residuals())
+    auto residuals() const _BTK_NOEXCEPT -> decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).residuals())
     {
       return this->m_Xpr.residuals();
     };
@@ -1109,13 +1114,13 @@ namespace lard
       
     Index rows() const _BTK_NOEXCEPT {return this->m_Xpr.rows();};
       
-    auto values() const _BTK_NOEXCEPT -> decltype(Eigen::internal::EulerAnglesOpValues<decltype(this->m_Xpr.values())>(this->m_Xpr.values(), this->m_Axis0, this->m_Axis1, this->m_Axis2))
+    auto values() const _BTK_NOEXCEPT -> Eigen::internal::EulerAnglesOpValues<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).values())>
     {
       using V = decltype(this->m_Xpr.values());
       return Eigen::internal::EulerAnglesOpValues<V>(this->m_Xpr.values(), this->m_Axis0, this->m_Axis1, this->m_Axis2);
     };
 
-    auto residuals() const _BTK_NOEXCEPT -> decltype(this->m_Xpr.residuals())
+    auto residuals() const _BTK_NOEXCEPT -> decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).residuals())
     {
       return this->m_Xpr.residuals();
     };
