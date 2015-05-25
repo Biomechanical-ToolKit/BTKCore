@@ -76,6 +76,13 @@
   #error Development platform not supported
 #endif
 
+#if defined(_MSC_VER)
+  // Disable warning for too long decorated name
+  // See: https://msdn.microsoft.com/en-us/library/074af4b6.aspx
+  // NOTE: This warning is raised when complex btk::lard expressions are used.
+  #pragma warning(disable : 4503)
+#endif
+
 // Addons for Eigen
 #ifdef EIGEN_CORE_H
   #error The header btkConfigure.h must be included before the inclusion of any Eigen headers to integrate the implemented Eigen plugins
