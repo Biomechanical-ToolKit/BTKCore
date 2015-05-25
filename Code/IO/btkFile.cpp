@@ -39,7 +39,7 @@
 #include "btkLogger.h"
 
 #if defined(HAVE_SYS_MMAP)
-  #if defined(HAVE_64_BIT)
+  #if defined(HAVE_64_BIT_COMPILER)
     #ifndef _LARGEFILE_SOURCE
       #define _LARGEFILE_SOURCE
     #endif
