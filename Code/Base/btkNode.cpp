@@ -37,7 +37,6 @@
 #include "btkNode_p.h"
 #include "btkProperty.h"
 #include "btkLogger.h"
-#include "btkMacros.h" // _BTK_UNUSED
 
 // -------------------------------------------------------------------------- //
 //                                 PRIVATE API                                //

@@ -37,7 +37,6 @@
 #include "btkIOHandler_p.h"
 #include "btkIODevice.h"
 #include "btkNode.h"
-#include "btkMacros.h"
 
 #include <iostream>
 
