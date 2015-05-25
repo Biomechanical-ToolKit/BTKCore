@@ -245,6 +245,7 @@ namespace btk
       va_start(args, msg);
       int len = vsnprintf(str, n, msg, args);
       va_end(args);
+#if !defined(_MSC_VER)
       // If something is wrong (negative length), the string is reset and sent like this
       if (len < 0)
       {
@@ -257,6 +258,17 @@ namespace btk
       n += len - n + 1; // Should be done only one time. +1: null character
       delete[] str;
       str = new char[n];
+#else
+      // if the length is negative, then the buffer was truncated and need to be larger.
+      if (len < 0)
+      {
+        n *= 2;
+        delete[] str;
+        str = new char[n];
+      }
+      else
+        break;
+#endif
     }
     this->mp_Pimpl->Output->writeMessage(category,str);
     delete[] str;
