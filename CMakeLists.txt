@@ -34,9 +34,9 @@ ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows" AND MSVC)
   SET(CMAKE_CXX11_EXTENSION_COMPILE_OPTION "")
   # CXX Flag details
   #  - GR-: disable RTTI
-  #  - EHa: enable exception handling for C++ object
+  #  - EHsc: enable exception handling for C++ object
   #  - D_SCL_SECURE_NO_WARNINGS: disable function call with unsafe parameters warning
-  SET(CMAKE_CXX_FLAGS "/GR- /EHa  -D_SCL_SECURE_NO_WARNINGS")
+  SET(CMAKE_CXX_FLAGS "/GR- /EHsc -D_SCL_SECURE_NO_WARNINGS")
 ELSE()
   SET(CMAKE_CXX_FLAGS "-fno-rtti")
 ENDIF()
