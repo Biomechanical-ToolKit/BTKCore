@@ -3,7 +3,7 @@
 
 struct Verifier : btk::Logger::Device
 {
-  Verifier() : btk::Logger::Device(), ref() {this->ref = {0};};
+  Verifier() : btk::Logger::Device(), ref(nullptr) {};
   ~Verifier() = default;
   
   virtual void writeMessage(btk::Logger::Category , const char* msg) _BTK_NOEXCEPT
