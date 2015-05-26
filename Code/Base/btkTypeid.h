@@ -68,7 +68,9 @@ namespace btk
   
   inline typeid_t::typeid_t(typeid_t&& other) _BTK_NOEXCEPT
   : id(std::move(other.id))
-  {};
+  {
+    other.id = nullptr;
+  };
   
   inline typeid_t& typeid_t::operator=(typeid_t&& other) _BTK_NOEXCEPT
   {
