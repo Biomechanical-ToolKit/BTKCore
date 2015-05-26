@@ -211,11 +211,20 @@ namespace btk
   };
   
   /**
-   * Return true if the object as no content, otherwise true.
+   * Return true if the object has a content, otherwise false.
    */
   bool Any::isValid() const _BTK_NOEXCEPT
   {
     return (this->mp_Storage != nullptr);
+  };
+  
+  /**
+   * Return true if the object as a non-empty content, otherwise false.
+   * In case the object is not valid, this method returns false too.
+   */
+  bool Any::isEmpty() const _BTK_NOEXCEPT
+  {
+    return (!this->isValid() || this->mp_Storage->size() <= 0) ? true : false;
   };
  
   /**

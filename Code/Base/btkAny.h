@@ -69,6 +69,7 @@ namespace btk
     size_t size() const _BTK_NOEXCEPT;
     
     bool isValid() const _BTK_NOEXCEPT;
+    bool isEmpty() const _BTK_NOEXCEPT;
     void swap(Any& other) _BTK_NOEXCEPT;
     
     template <typename U, typename = typename std::enable_if<!std::is_same<Any, typename std::decay<U>::type>::value>::type> bool isEqual(U&& value) const _BTK_NOEXCEPT;

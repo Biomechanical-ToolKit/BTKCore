@@ -334,6 +334,22 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(a.cast<std::string>(3),std::string(""));
   };
   
+  CXXTEST_TEST(Array_String_Empty)
+  {
+    std::vector<std::string> p;
+    std::vector<size_t> dims{0};
+    btk::Any a{p,dims};
+    TS_ASSERT_EQUALS(a.isValid(),true);
+    TS_ASSERT_EQUALS(a.isEmpty(),true);
+    p = {{"foo"}};
+    a = p;
+    TS_ASSERT_EQUALS(a.isValid(),true);
+    TS_ASSERT_EQUALS(a.isEmpty(),false);
+    a = std::vector<std::string>{};
+    TS_ASSERT_EQUALS(a.isValid(),true);
+    TS_ASSERT_EQUALS(a.isEmpty(),true);
+  }
+  
   CXXTEST_TEST(Array_CustomType)
   {
     btk::Any a = {Date{2009,05,01},Date{2005,12,12},Date{1945,07,23}};
@@ -421,6 +437,7 @@ CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Initializer2)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Initializer3)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Comparison)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_String)
+CXXTEST_TEST_REGISTRATION(AnyTest, Array_String_Empty)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_FromSingle)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_FromSingle_CustomType)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Array)
