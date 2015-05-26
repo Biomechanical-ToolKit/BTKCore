@@ -560,22 +560,22 @@ namespace lard
     
     const BlockOp& derived() const _BTK_NOEXCEPT {return *this;};
     
-    auto values() _BTK_NOEXCEPT -> Eigen::Block<typename std::decay<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).derived().values())>::type>
+    auto values() _BTK_NOEXCEPT -> Eigen::Block<typename std::remove_reference<decltype(std::declval<Xpr>().derived().values())>::type>
     {
       return this->mr_Xpr.derived().values().block(0,this->m_Index,this->mr_Xpr.derived().values().rows(),Cols);
     };
     
-    auto values() const _BTK_NOEXCEPT -> Eigen::Block<typename std::decay<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).derived().values())>::type>
+    auto values() const _BTK_NOEXCEPT -> Eigen::Block<typename std::remove_reference<decltype(std::declval<Xpr>().derived().values())>::type>
     {
       return this->mr_Xpr.derived().values().block(0,this->m_Index,this->mr_Xpr.derived().values().rows(),Cols);
     };
 
-    auto residuals() _BTK_NOEXCEPT -> Eigen::Block<typename std::decay<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).derived().residuals())>::type>
+    auto residuals() _BTK_NOEXCEPT -> Eigen::Block<typename std::remove_reference<decltype(std::declval<Xpr>().derived().residuals())>::type>
     {
       return this->mr_Xpr.derived().residuals().block(0,0,this->mr_Xpr.derived().residuals().rows(),1);
     };
     
-    auto residuals() const _BTK_NOEXCEPT -> Eigen::Block<typename std::decay<decltype(_BTK_LARD_DECLVAL_NESTED(Xpr).derived().residuals())>::type>
+    auto residuals() const _BTK_NOEXCEPT -> Eigen::Block<typename std::remove_reference<decltype(std::declval<Xpr>().derived().residuals())>::type>
     {
       return this->mr_Xpr.derived().residuals().block(0,0,this->mr_Xpr.derived().residuals().rows(),1);
     };
