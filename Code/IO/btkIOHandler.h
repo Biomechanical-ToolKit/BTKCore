@@ -36,6 +36,7 @@
 #ifndef __btkIOHandler_h
 #define __btkIOHandler_h
 
+#include "btkIOExport.h"
 #include "btkOpaque.h"
 #include "btkEndianFormat.h"
 #include "btkException.h"
@@ -56,7 +57,7 @@ namespace btk
   
   class IOHandlerPrivate;
   
-  class IOHandler
+  class BTK_IO_EXPORT IOHandler
   {
     BTK_DECLARE_PIMPL_ACCESSOR(IOHandler)
     

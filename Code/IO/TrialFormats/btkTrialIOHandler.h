@@ -41,7 +41,7 @@
 
 namespace btk
 {
-  class TrialIOHandler : public IOHandler
+  class BTK_IO_EXPORT TrialIOHandler : public IOHandler
   {
   public:
     ~TrialIOHandler() _BTK_NOEXCEPT;

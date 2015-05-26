@@ -82,8 +82,8 @@ namespace btk
     Any& operator=(const Any& other);
     Any& operator=(Any&& other) _BTK_NOEXCEPT;
     
-    friend bool operator==(const Any& lhs, const Any& rhs) _BTK_NOEXCEPT;
-    friend bool operator!=(const Any& lhs, const Any& rhs) _BTK_NOEXCEPT;
+    BTK_BASE_EXPORT friend bool operator==(const Any& lhs, const Any& rhs) _BTK_NOEXCEPT;
+    BTK_BASE_EXPORT friend bool operator!=(const Any& lhs, const Any& rhs) _BTK_NOEXCEPT;
         
     template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator==(const A& lhs, const U& rhs) _BTK_NOEXCEPT {return lhs.isEqual(rhs);};
     template <typename U, typename A, typename = typename std::enable_if<std::is_same<Any, typename std::decay<A>::type>::value>::type> friend inline bool operator==(const U& lhs, const A& rhs) _BTK_NOEXCEPT {return rhs.isEqual(lhs);};

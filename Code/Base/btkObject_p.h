@@ -45,7 +45,7 @@
 
 namespace btk
 { 
-  class ObjectPrivate
+  class BTK_BASE_EXPORT ObjectPrivate
   {
   public:
     ObjectPrivate();

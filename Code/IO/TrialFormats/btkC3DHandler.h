@@ -44,7 +44,7 @@ namespace btk
 {
   class C3DHandlerPrivate;
   
-  class C3DHandler : public TrialIOHandler
+  class BTK_IO_EXPORT C3DHandler : public TrialIOHandler
   {
     BTK_DECLARE_PIMPL_ACCESSOR(C3DHandler)
     

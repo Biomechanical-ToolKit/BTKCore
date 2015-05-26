@@ -46,7 +46,7 @@
 
 namespace btk
 { 
-  class IODevicePrivate
+  class BTK_IO_EXPORT IODevicePrivate
   {
   public:
     IODevicePrivate();

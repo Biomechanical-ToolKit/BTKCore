@@ -103,9 +103,9 @@ namespace btk
     using _Any_convert_t = void(*)(void*,void*);
     using _Any_converter_map = std::unordered_map<size_t,_Any_convert_t>;
     
-    _Any_converter_map& _any_converter_map() _BTK_NOEXCEPT;
+    BTK_BASE_EXPORT _Any_converter_map& _any_converter_map() _BTK_NOEXCEPT;
     
-    _Any_convert_t _any_extract_converter(typeid_t sid, typeid_t rid) _BTK_NOEXCEPT;
+    BTK_BASE_EXPORT _Any_convert_t _any_extract_converter(typeid_t sid, typeid_t rid) _BTK_NOEXCEPT;
     
     template <typename S, typename R>
     void _any_helper_convert(void* source, void* result)

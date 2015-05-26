@@ -48,7 +48,7 @@ namespace btk
   public:
     typedef enum {Info, Warning, Error} Category;
     
-    struct Device
+    struct BTK_BASE_EXPORT Device
     {
       Device() _BTK_NOEXCEPT;
       virtual ~Device() _BTK_NOEXCEPT;

@@ -54,7 +54,7 @@ namespace btk
 {
   class Node;
   
-  class NodePrivate : public ObjectPrivate
+  class BTK_BASE_EXPORT NodePrivate : public ObjectPrivate
   {
     BTK_DECLARE_PINT_ACCESSOR(Node)
 
