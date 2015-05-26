@@ -249,9 +249,9 @@ namespace btk
       return Eigen::internal::ChordOpValues(local.transform(t).values());
     };
   
-    auto residuals() const _BTK_NOEXCEPT -> decltype(ChordOp::generateResiduals((this->m_Xpr1.derived().residuals() >= 0.0) && (this->m_Xpr2.derived().residuals() >= 0.0) && (this->m_Xpr3.derived().residuals() >= 0.0)))
+    auto residuals() const _BTK_NOEXCEPT -> decltype(ChordOp::generateResiduals((_BTK_LARD_DECLVAL_NESTED(XprOne).residuals() >= 0.0) && (_BTK_LARD_DECLVAL_NESTED(XprTwo).residuals() >= 0.0) && (_BTK_LARD_DECLVAL_NESTED(XprThree).residuals() >= 0.0)))
     {
-      return ChordOp::generateResiduals((this->m_Xpr1.derived().residuals() >= 0.0) && (this->m_Xpr2.derived().residuals() >= 0.0) && (this->m_Xpr3.derived().residuals() >= 0.0));
+      return ChordOp::generateResiduals((this->m_Xpr1.residuals() >= 0.0) && (this->m_Xpr2.residuals() >= 0.0) && (this->m_Xpr3.residuals() >= 0.0));
     };
   };
   
