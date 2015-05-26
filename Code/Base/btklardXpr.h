@@ -44,7 +44,7 @@
 #include <utility> // std::declval
 
 #define _BTK_LARD_DECLVAL_NESTED(xpr) \
-  std::declval<const typename Nested<xpr>::type>()
+  std::declval<const typename btk::lard::Nested<xpr>::type>()
 
 namespace btk
 {
