@@ -238,7 +238,8 @@ namespace btk
       static inline T* array(size_t newarraylen, U* values, size_t num)
       {
         T* data = new T[newarraylen];
-        std::copy_n(values,num,data);
+        if (values != nullptr)
+          std::copy_n(values,num,data);
         return data;
       };
       _Any_adapt() = delete;
