@@ -431,7 +431,6 @@ namespace btk
             std::vector<std::string> p(dataSizeExceeded ? 0 : rows);
             stream.readString(prod, p.size(), p.data());
             value = Any(p, dims);
-            std::vector<std::string> temp = value.cast<std::vector<std::string>>();
             break;
             }
           case 1: // Byte
