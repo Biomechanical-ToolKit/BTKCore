@@ -61,7 +61,7 @@ namespace btk
     }
     // Compute accumulated dimensions (used for the method data(sample, indices))
     this->AccumulatedDimensions.resize(dimensions.size()-1,dimensions[0]);
-    for (size_t i = this->AccumulatedDimensions.size() ; i > 0  ; --i)
+    for (int i = static_cast<int>(this->AccumulatedDimensions.size()-1) ; i > 0  ; --i)
       this->AccumulatedDimensions[i-1] = this->AccumulatedDimensions[i] * this->Dimensions[this->AccumulatedDimensions.size()-i];
   };
   
