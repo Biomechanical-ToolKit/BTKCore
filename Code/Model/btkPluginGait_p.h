@@ -156,12 +156,12 @@ namespace internal
   template <>
   struct traits<ChordOpValues>
   {
-    using ReturnType = typename Eigen::Array<double,Eigen::Dynamic,3>;
+    using ReturnType = Eigen::Array<double,Eigen::Dynamic,3>;
   };
   
   struct ChordOpValues : public Eigen::ReturnByValue<ChordOpValues>
   {
-    using StorageType = typename traits<ChordOpValues>::ReturnType;
+    using StorageType = traits<ChordOpValues>::ReturnType;
     using Index = StorageType::Index;
     StorageType m_V;
   public:
