@@ -44,7 +44,7 @@ namespace btk
 {
   class RelativePositionPrivate;
   
-  class BTK_MODEL_EXPORT RelativePosition : public Node
+  class BTK_NODE(BTK_MODEL_EXPORT, RelativePosition) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(RelativePosition)
     

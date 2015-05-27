@@ -47,7 +47,7 @@ namespace btk
 {
   class LandmarksTranslatorPrivate;
   
-  class BTK_MODEL_EXPORT LandmarksTranslator : public Node
+  class BTK_NODE(BTK_MODEL_EXPORT, LandmarksTranslator) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(LandmarksTranslator)
     

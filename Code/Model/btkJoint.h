@@ -46,7 +46,7 @@ namespace btk
   
   class JointPrivate;
   
-  class BTK_MODEL_EXPORT Joint : public Node
+  class BTK_NODE(BTK_MODEL_EXPORT, Joint) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Joint)
     

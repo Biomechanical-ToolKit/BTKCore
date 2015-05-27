@@ -50,7 +50,7 @@ namespace btk
   
   class RigPrivate;
   
-  class BTK_MODEL_EXPORT Rig : public Node
+  class BTK_NODE(BTK_MODEL_EXPORT, Rig) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Rig)
     

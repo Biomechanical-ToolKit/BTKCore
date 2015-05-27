@@ -46,7 +46,7 @@ namespace btk
   
   class PluginGaitPrivate;
   
-  class BTK_MODEL_EXPORT PluginGait : public Rig
+  class BTK_NODE(BTK_MODEL_EXPORT, PluginGait) : public Rig
   {
     BTK_DECLARE_PIMPL_ACCESSOR(PluginGait)
     

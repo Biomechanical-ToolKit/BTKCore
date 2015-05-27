@@ -44,7 +44,7 @@ namespace btk
 {
   class RelativeReferenceFramePrivate;
   
-  class BTK_MODEL_EXPORT RelativeReferenceFrame : public Node
+  class BTK_NODE(BTK_MODEL_EXPORT, RelativeReferenceFrame) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(RelativeReferenceFrame)
     

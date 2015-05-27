@@ -47,7 +47,7 @@ namespace btk
   
   class ModelPrivate;
   
-  class BTK_MODEL_EXPORT Model : public Node
+  class BTK_NODE(BTK_MODEL_EXPORT, Model) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Model)
     
