@@ -60,9 +60,10 @@
 #define _BTK_STATIC_PROPERTIES(...) \
   struct StaticProperties : btk::__details::_Properties<StaticProperties> \
   { \
-    static inline auto make_properties() -> decltype(std::make_tuple(__VA_ARGS__)) \
+    static inline auto make_properties() -> std::add_lvalue_reference<decltype(std::make_tuple(__VA_ARGS__))>::type \
     { \
-      return std::make_tuple(__VA_ARGS__); \
+      static auto props = std::make_tuple(__VA_ARGS__); \
+      return props; \
     }; \
   };
 
@@ -103,8 +104,8 @@ namespace btk
       template <typename Object, typename Value>
       static inline bool visit(Object* obj, const char* key, Value* val)
       {
-        const auto properties = Derived::make_properties();
-        return search<0,std::tuple_size<decltype(properties)>::value-1>(properties,obj,key,val);
+        const auto& properties = Derived::make_properties();
+        return search<0,std::tuple_size<typename std::decay<decltype(properties)>::type>::value-1>(properties,obj,key,val);
       };
   
     private:
