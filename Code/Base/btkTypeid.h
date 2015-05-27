@@ -87,7 +87,8 @@ namespace btk
   inline _BTK_CONSTEXPR typeid_t static_typeid() _BTK_NOEXCEPT
   {
 #if defined(_MSC_VER)
-    return reinterpret_cast<typeid_t::sig*>(&static_typeid<T>);
+    static auto odr = &static_typeid<T>;
+    return reinterpret_cast<typeid_t::sig>(odr);
 #else
     return &static_typeid<T>;
 #endif

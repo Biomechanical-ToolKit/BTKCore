@@ -5,3 +5,4 @@
 #include "Base/LardXprTest.h"
 #include "Base/NodeTest.h"
 #include "Base/ObjectTest.h"
+#include "Base/TypeidTest.h"
