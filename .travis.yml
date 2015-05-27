@@ -6,7 +6,7 @@ compiler:
 
 os:
   - osx
-  - linux
+#  - linux # (2015-05-27) Currently TRAVIS does not accept new multi-OS request.
 
 # To prepare the system to install prerequisites or dependencies
 before_install:
