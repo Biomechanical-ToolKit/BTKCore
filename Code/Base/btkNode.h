@@ -45,15 +45,18 @@
 #include <string>
 #include <regex>
 
+#define BTK_NODE(exportname,classname) \
+  classname; \
+  BTK_EXPORT_STATIC_TYPEID(classname,exportname) \
+  class exportname classname
+
 namespace btk
 {
-  class Node;
-  
   template <typename T, typename N> T node_cast(N* node) _BTK_NOEXCEPT;
   
   class NodePrivate;
   
-  class BTK_BASE_EXPORT Node : public Object
+  class BTK_NODE(BTK_BASE_EXPORT, Node) : public Object
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Node)
     
@@ -110,6 +113,8 @@ namespace btk
     template <typename U, typename N> friend U node_cast(N* node) _BTK_NOEXCEPT;
     bool castable(typeid_t id) const _BTK_NOEXCEPT;
   };
+  
+  // ----------------------------------------------------------------------- //
 
   template <typename U>
   U Node::findChild(const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const _BTK_NOEXCEPT
