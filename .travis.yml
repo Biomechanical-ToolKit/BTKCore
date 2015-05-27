@@ -1,13 +1,20 @@
-language: objective-c
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+os:
+  - linux
+  - osx
 
 # To prepare the system to install prerequisites or dependencies
 before_install:
-  - brew update
-  - brew unlink cmake
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] then brew update && brew unlink cmake; fi
   
 # To install any prerequisites or dependencies necessary to run your build
 install:  
-  - brew install cmake
+  - if [ "$TRAVIS_OS_NAME" = "osx" ] then brew install cmake; fi
   
 # To prepare your build for testing
 before_script:
@@ -21,9 +28,6 @@ script:
   - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBUILD_TESTING:BOOL=1 -DBTK_EXTRA_COMPILER_WARNINGS:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
   - make
   - ctest -VV
-
-compiler:
-  - clang
   
 env:
   matrix:
