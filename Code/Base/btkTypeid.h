@@ -36,9 +36,10 @@
 #ifndef __btkTypeid_h
 #define __btkTypeid_h
 
+#include "btkBaseExport.h"
 #include "btkMacros.h" // _BTK_CONSTEXPR, _BTK_NOEXCEPT
 
-#include <cstddef>
+#include <cstddef> // size_t
 
 namespace btk
 {
@@ -60,10 +61,10 @@ namespace btk
   private:
     template<typename T> friend _BTK_CONSTEXPR typeid_t static_typeid() _BTK_NOEXCEPT;
     
-    using sig = typeid_t();
-    sig* id;
+    using sig = typeid_t(*)();
+    sig id;
     
-    _BTK_CONSTEXPR typeid_t(sig* id) : id{id} {};
+    _BTK_CONSTEXPR typeid_t(sig id) : id{id} {};
   };
   
   inline typeid_t::typeid_t(typeid_t&& other) _BTK_NOEXCEPT
@@ -82,7 +83,7 @@ namespace btk
     return *this;
   };
 
-  template<typename T>
+  template <typename T>
   inline _BTK_CONSTEXPR typeid_t static_typeid() _BTK_NOEXCEPT
   {
 #if defined(_MSC_VER)
@@ -91,6 +92,42 @@ namespace btk
     return &static_typeid<T>;
 #endif
   };
+  
+  // UNDER MSVC 
+#if !defined(_MSC_VER)
+  #define BTK_EXPORT_STATIC_TYPEID(classname, exportname)
+#else
+  #define BTK_EXPORT_STATIC_TYPEID(classname, exportname) \
+    template<> \
+    exportname inline _BTK_CONSTEXPR btk::typeid_t static_typeid<classname>() _BTK_NOEXCEPT \
+    { \
+      static auto odr = &static_typeid<classname>; \
+      return reinterpret_cast<btk::typeid_t::sig>(odr); \
+    };
+  
+  // Arithmetic types
+  BTK_EXPORT_STATIC_TYPEID(bool, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(char, BTK_BASE_EXPORT)
+  // BTK_EXPORT_STATIC_TYPEID(char16_t, BTK_BASE_EXPORT) // same as unsigned short int
+  // BTK_EXPORT_STATIC_TYPEID(char32_t, BTK_BASE_EXPORT) // same as unsigned int
+  BTK_EXPORT_STATIC_TYPEID(wchar_t, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(signed char, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(short int, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(int, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(long int, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(long long int, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(unsigned char, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(unsigned short int, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(unsigned int, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(unsigned long int, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(unsigned long long int, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(float, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(double, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(long double, BTK_BASE_EXPORT)
+  // String types
+  BTK_EXPORT_STATIC_TYPEID(std::string, BTK_BASE_EXPORT)
+  BTK_EXPORT_STATIC_TYPEID(const char*, BTK_BASE_EXPORT)
+#endif
   
   /**
    * @class typeid_t btkTypeid.h
