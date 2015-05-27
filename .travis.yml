@@ -5,16 +5,16 @@ compiler:
   - clang
 
 os:
-  - linux
   - osx
+  - linux
 
 # To prepare the system to install prerequisites or dependencies
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] then brew update && brew unlink cmake; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update && brew unlink cmake; fi
   
 # To install any prerequisites or dependencies necessary to run your build
 install:  
-  - if [ "$TRAVIS_OS_NAME" = "osx" ] then brew install cmake; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install cmake; fi
   
 # To prepare your build for testing
 before_script:
