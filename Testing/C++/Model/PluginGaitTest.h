@@ -202,8 +202,7 @@ CXXTEST_SUITE(PluginGaitTest)
     TS_ASSERT_DELTA(rig->property("leftStaticPlantarFlexionOffset").cast<double>(), 0.197172, 1e-4);
     TS_ASSERT_DELTA(rig->leftStaticRotationOffset(), 0.0164273, 1e-4);
     TS_ASSERT_DELTA(rig->property("leftStaticRotationOffset").cast<double>(), 0.0164273, 1e-4);
-    
-  }
+  };
   
   CXXTEST_TEST(CalibrateRightFullBody_OneFrame)
   {
@@ -229,8 +228,7 @@ CXXTEST_SUITE(PluginGaitTest)
     TS_ASSERT_DELTA(rig->property("rightStaticPlantarFlexionOffset").cast<double>(), 0.208874, 1e-4);
     TS_ASSERT_DELTA(rig->rightStaticRotationOffset(), -0.0179406, 1e-4);
     TS_ASSERT_DELTA(rig->property("rightStaticRotationOffset").cast<double>(), -0.0179406, 1e-4);
-    
-  }
+  };
   
   CXXTEST_TEST(CalibrateBothFullBody_OneFrame)
   {
@@ -276,7 +274,7 @@ CXXTEST_SUITE(PluginGaitTest)
     btk::Model model("test", rig);
     
     btk::Node root("root");
-    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"others/PiGCalibration-FlatFoot-Full.c3d");
+    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration-FlatFoot-Full.c3d");
     TS_ASSERT_EQUALS(root.children().size(),1u);
     rig->calibrate(&model, &root);
     
@@ -305,7 +303,7 @@ CXXTEST_SUITE(PluginGaitTest)
     btk::Model model("test", rig);
     
     btk::Node root("root");
-    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"others/PiGCalibration-FlatFoot-Full.c3d");
+    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration-FlatFoot-Full.c3d");
     TS_ASSERT_EQUALS(root.children().size(),1u);
     rig->calibrate(&model, &root);
     
@@ -334,7 +332,7 @@ CXXTEST_SUITE(PluginGaitTest)
     btk::Model model("test", rig);
     
     btk::Node root("root");
-    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"others/PiGCalibration-FlatFoot-Full.c3d");
+    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration-FlatFoot-Full.c3d");
     TS_ASSERT_EQUALS(root.children().size(),1u);
     rig->calibrate(&model, &root);
     
@@ -363,7 +361,7 @@ CXXTEST_SUITE(PluginGaitTest)
     btk::Model model("test", rig);
     
     btk::Node root("root");
-    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"others/PiGCalibration-FlatFoot-Hole.c3d");
+    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration-FlatFoot-Hole.c3d");
     TS_ASSERT_EQUALS(root.children().size(),1u);
     rig->calibrate(&model, &root);
     
@@ -377,7 +375,7 @@ CXXTEST_SUITE(PluginGaitTest)
     TS_ASSERT_DELTA(rig->rightStaticRotationOffset(), -0.0183813, 1e-4);
   };
   
-  CXXTEST_TEST(CalibrateBothFullBody_NoOption)
+  CXXTEST_TEST(Calibrate2BothFullBody_NoOption)
   {
     auto rig = new btk::PluginGait(btk::BodyRegion::Lower, btk::BodySide::Both);
     rig->setMarkerDiameter(14.0); // mm
@@ -386,12 +384,12 @@ CXXTEST_SUITE(PluginGaitTest)
     rig->setLeftKneeWidth(105.0); // mm
     rig->setLeftAnkleWidth(75.0); // mm
     rig->setRightLegLength(905.0); // mm
-    rig->setRightKneeWidth(105.5); // mm
+    rig->setRightKneeWidth(105.0); // mm
     rig->setRightAnkleWidth(75.0); // mm
     btk::Model model("test", rig);
     
     btk::Node root("root");
-    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"others/PiGCalibration2-NoOption.c3d");
+    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration2-NoOption.c3d");
     TS_ASSERT_EQUALS(root.children().size(),1u);
     rig->calibrate(&model, &root);
 
@@ -400,10 +398,90 @@ CXXTEST_SUITE(PluginGaitTest)
     TS_ASSERT_DELTA(rig->leftStaticPlantarFlexionOffset(), 0.202148, 1e-4);
     TS_ASSERT_DELTA(rig->leftStaticRotationOffset(), 0.0270116, 1e-4);
     TS_ASSERT_DELTA(rig->rightAsisTrochanterAPDistance(), 68.004, 5e-3);
-    TS_ASSERT_DELTA(rig->rightStaticPlantarFlexionOffset(), 0.233063, 2e-4);
-    TS_ASSERT_DELTA(rig->rightStaticRotationOffset(), 0.00807751, 2e-4);
+    TS_ASSERT_DELTA(rig->rightStaticPlantarFlexionOffset(), 0.233063, 1e-4);
+    TS_ASSERT_DELTA(rig->rightStaticRotationOffset(), 0.00807751, 1e-4);
   };
+  
+  CXXTEST_TEST(Calibrate3BothLowerBody_FF)
+  {
+    auto rig = new btk::PluginGait(btk::BodyRegion::Lower, btk::BodySide::Both);
+    rig->setMarkerDiameter(14.0); // mm
+    rig->setLeftFootFlat(true);
+    rig->setLeftLegLength(920.0); // mm
+    rig->setLeftKneeWidth(102.0); // mm
+    rig->setLeftAnkleWidth(70.0); // mm
+    rig->setRightFootFlat(true);
+    rig->setRightLegLength(920.0); // mm
+    rig->setRightKneeWidth(102.0); // mm
+    rig->setRightAnkleWidth(70.0); // mm
+    btk::Model model("test", rig);
+    
+    btk::Node root("root");
+    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration3_FF.c3d");
+    TS_ASSERT_EQUALS(root.children().size(),1u);
+    rig->calibrate(&model, &root);
 
+    TS_ASSERT_DELTA(rig->interAsisDistance(), 245.244, 5e-3);
+    TS_ASSERT_DELTA(rig->leftAsisTrochanterAPDistance(), 69.936, 5e-3);
+    TS_ASSERT_DELTA(rig->leftStaticPlantarFlexionOffset(), 0.15719, 1e-4);
+    TS_ASSERT_DELTA(rig->leftStaticRotationOffset(), -0.0888886, 1e-4);
+    TS_ASSERT_DELTA(rig->rightAsisTrochanterAPDistance(), 69.936, 5e-3);
+    TS_ASSERT_DELTA(rig->rightStaticPlantarFlexionOffset(), 0.186005, 1e-4);
+    TS_ASSERT_DELTA(rig->rightStaticRotationOffset(), -0.0166437, 1e-4);
+  };
+  
+  CXXTEST_TEST(Calibrate3BothLowerBody_FF_N18)
+  {
+    auto rig = new btk::PluginGait(btk::BodyRegion::Lower, btk::BodySide::Both);
+    rig->setMarkerDiameter(14.0); // mm
+    rig->setLeftFootFlat(true);
+    rig->setLeftLegLength(920.0); // mm
+    rig->setLeftKneeWidth(102.0); // mm
+    rig->setLeftAnkleWidth(70.0); // mm
+    rig->setRightFootFlat(true);
+    rig->setRightLegLength(920.0); // mm
+    rig->setRightKneeWidth(102.0); // mm
+    rig->setRightAnkleWidth(70.0); // mm
+    btk::Model model("test", rig);
+    
+    btk::Node root("root");
+    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration3_FF_N18.c3d");
+    TS_ASSERT_EQUALS(root.children().size(),1u);
+    rig->calibrate(&model, &root);
+
+    TS_ASSERT_DELTA(rig->interAsisDistance(), 245.32, 5e-3);
+    TS_ASSERT_DELTA(rig->leftStaticPlantarFlexionOffset(), 0.157482, 1e-4);
+    TS_ASSERT_DELTA(rig->leftStaticRotationOffset(), -0.0890265, 1e-4);
+    TS_ASSERT_DELTA(rig->rightStaticPlantarFlexionOffset(), 0.18605, 1e-4);
+    TS_ASSERT_DELTA(rig->rightStaticRotationOffset(), -0.0165357, 1e-4);
+  };
+  
+  CXXTEST_TEST(Calibrate3BothLowerBody_noFF)
+  {
+    auto rig = new btk::PluginGait(btk::BodyRegion::Lower, btk::BodySide::Both);
+    rig->setMarkerDiameter(14.0); // mm
+    rig->setLeftLegLength(920.0); // mm
+    rig->setLeftKneeWidth(102.0); // mm
+    rig->setLeftAnkleWidth(70.0); // mm
+    rig->setRightLegLength(920.0); // mm
+    rig->setRightKneeWidth(102.0); // mm
+    rig->setRightAnkleWidth(70.0); // mm
+    btk::Model model("test", rig);
+    
+    btk::Node root("root");
+    pig_generate_trial_from_file(&root, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration3_noFF.c3d");
+    TS_ASSERT_EQUALS(root.children().size(),1u);
+    rig->calibrate(&model, &root);
+
+    // TS_ASSERT_DELTA(rig->interAsisDistance(), 245.236, 5e-3); // Should be 245.244 like Calibrate3BothLowerBody_FF but Nexus computed a length of 245.236...
+    TS_ASSERT_DELTA(rig->leftAsisTrochanterAPDistance(), 69.936, 5e-3);
+    TS_ASSERT_DELTA(rig->leftStaticPlantarFlexionOffset(), 0.146773, 1e-4);
+    TS_ASSERT_DELTA(rig->leftStaticRotationOffset(), -0.0883149, 1e-4);
+    TS_ASSERT_DELTA(rig->rightAsisTrochanterAPDistance(), 69.936, 5e-3);
+    TS_ASSERT_DELTA(rig->rightStaticPlantarFlexionOffset(), 0.128716, 1e-4);
+    TS_ASSERT_DELTA(rig->rightStaticRotationOffset(), -0.00978336, 1e-4);
+  };
+  
   // ----------------------------------------------------------------------- //
   
   CXXTEST_TEST(GenerateBothLowerBody_OneFrame)
@@ -421,10 +499,10 @@ CXXTEST_SUITE(PluginGaitTest)
     btk::Model model("test", rig);
     
     btk::Node rootCalibration("rootCalibration");
-    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"others/PiGCalibration-FlatFoot-One.c3d");
+    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration-FlatFoot-One.c3d");
     TS_ASSERT(rig->calibrate(&model, &rootCalibration));
     btk::Node rootDynamic("rootDynamic");
-    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"others/PiGMotion-FlatFoot-One.c3d");
+    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"PiG/PiG_Motion-FlatFoot-One.c3d");
     TS_ASSERT(rig->generate(&model, &rootDynamic));
     
     auto trial = rootDynamic.findChild<btk::Trial*>();
@@ -435,7 +513,6 @@ CXXTEST_SUITE(PluginGaitTest)
     pig_compare_segment_motion(trial, "L.Shank", {"LTIO","LTIA","LTIL","LTIP"}, {5e-4});
     pig_compare_segment_motion(trial, "R.Foot", {"RFOO","RFOA","RFOL","RFOP"}, {1e4}); // 1e4 : Not the same origin
     pig_compare_segment_motion(trial, "L.Foot", {"LFOO","LFOA","LFOL","LFOP"}, {1e4}); // 1e4 : Not the same origin
-      
   };
   
   CXXTEST_TEST(GenerateBothUpperBody_OneFrame)
@@ -453,10 +530,10 @@ CXXTEST_SUITE(PluginGaitTest)
     btk::Model model("test", rig);
     
     btk::Node rootCalibration("rootCalibration");
-    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"others/PiGCalibration-FlatFoot-One.c3d");
+    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration-FlatFoot-One.c3d");
     TS_ASSERT(rig->calibrate(&model, &rootCalibration));
     btk::Node rootDynamic("rootDynamic");
-    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"others/PiGMotion-FlatFoot-One.c3d");
+    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"PiG/PiG_Motion-FlatFoot-One.c3d");
     TS_ASSERT(rig->generate(&model, &rootDynamic));
     
     auto trial = rootDynamic.findChild<btk::Trial*>();
@@ -487,10 +564,10 @@ CXXTEST_SUITE(PluginGaitTest)
     btk::Model model("test", rig);
     
     btk::Node rootCalibration("rootCalibration");
-    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"others/PiGCalibration-FlatFoot-Hole.c3d");
+    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration-FlatFoot-Hole.c3d");
     TS_ASSERT(rig->calibrate(&model, &rootCalibration));
     btk::Node rootDynamic("rootDynamic");
-    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"others/PiGMotion-FlatFoot-Hole.c3d");
+    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"PiG/PiG_Motion-FlatFoot-Hole.c3d");
     TS_ASSERT(rig->generate(&model, &rootDynamic));
     
     auto trial = rootDynamic.findChild<btk::Trial*>();
@@ -518,10 +595,10 @@ CXXTEST_SUITE(PluginGaitTest)
     btk::Model model("test", rig);
     
     btk::Node rootCalibration("rootCalibration");
-    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"others/PiGCalibration-FlatFoot-Hole.c3d");
+    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration-FlatFoot-Hole.c3d");
     TS_ASSERT(rig->calibrate(&model, &rootCalibration));
     btk::Node rootDynamic("rootDynamic");
-    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"others/PiGMotion-FlatFoot-Hole.c3d");
+    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"PiG/PiG_Motion-FlatFoot-Hole.c3d");
     TS_ASSERT(rig->generate(&model, &rootDynamic));
     
     auto trial = rootDynamic.findChild<btk::Trial*>();
@@ -561,10 +638,10 @@ CXXTEST_SUITE(PluginGaitTest)
     btk::Model model("test", rig);
     
     btk::Node rootCalibration("rootCalibration");
-    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"others/PiGCalibration-FlatFoot-Full.c3d");
+    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration-FlatFoot-Full.c3d");
     TS_ASSERT(rig->calibrate(&model, &rootCalibration));
     btk::Node rootDynamic("rootDynamic");
-    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"others/PiGMotion-FlatFoot-Full.c3d");
+    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"PiG/PiG_Motion-FlatFoot-Full.c3d");
     TS_ASSERT(rig->generate(&model, &rootDynamic));
     
     auto trial = rootDynamic.findChild<btk::Trial*>();
@@ -587,6 +664,97 @@ CXXTEST_SUITE(PluginGaitTest)
     pig_compare_segment_motion(trial, "R.Foot", {"RFOO","RFOA","RFOL","RFOP"}, {1e4}); // 1e4 : Not the same origin
     pig_compare_segment_motion(trial, "L.Foot", {"LFOO","LFOA","LFOL","LFOP"}, {1e4}); // 1e4 : Not the same origin
   };
+  
+  CXXTEST_TEST(Generate3BothLowerBody_FF)
+  {
+    auto rig = new btk::PluginGait(btk::BodyRegion::Lower, btk::BodySide::Both);
+    rig->setMarkerDiameter(14.0); // mm
+    rig->setLeftFootFlat(true);
+    rig->setLeftLegLength(920.0); // mm
+    rig->setLeftKneeWidth(102.0); // mm
+    rig->setLeftAnkleWidth(70.0); // mm
+    rig->setRightFootFlat(true);
+    rig->setRightLegLength(920.0); // mm
+    rig->setRightKneeWidth(102.0); // mm
+    rig->setRightAnkleWidth(70.0); // mm
+    btk::Model model("test", rig);
+    
+    btk::Node rootCalibration("rootCalibration");
+    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration3_FF.c3d");
+    TS_ASSERT(rig->calibrate(&model, &rootCalibration));
+    btk::Node rootDynamic("rootDynamic");
+    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"PiG/PiG_Motion3_FF.c3d");
+    TS_ASSERT(rig->generate(&model, &rootDynamic));
+
+    auto trial = rootDynamic.findChild<btk::Trial*>();
+    pig_compare_segment_motion(trial, "Pelvis", {"PELO","PELA","PELL","PELP"}, {5e-4});
+    pig_compare_segment_motion(trial, "R.Thigh", {"RFEO","RFEA","RFEL","RFEP"}, {5e-4});
+    pig_compare_segment_motion(trial, "L.Thigh", {"LFEO","LFEA","LFEL","LFEP"}, {5e-4});
+    pig_compare_segment_motion(trial, "R.Shank", {"RTIO","RTIA","RTIL","RTIP"}, {5e-4});
+    pig_compare_segment_motion(trial, "L.Shank", {"LTIO","LTIA","LTIL","LTIP"}, {5e-4});
+    pig_compare_segment_motion(trial, "R.Foot", {"RFOO","RFOA","RFOL","RFOP"}, {1e4}); // 1e4 : Not the same origin
+    pig_compare_segment_motion(trial, "L.Foot", {"LFOO","LFOA","LFOL","LFOP"}, {1e4}); // 1e4 : Not the same origin
+  };
+  
+  CXXTEST_TEST(Generate3BothLowerBody_FF_N18)
+  {
+    auto rig = new btk::PluginGait(btk::BodyRegion::Lower, btk::BodySide::Both);
+    rig->setMarkerDiameter(14.0); // mm
+    rig->setLeftFootFlat(true);
+    rig->setLeftLegLength(920.0); // mm
+    rig->setLeftKneeWidth(102.0); // mm
+    rig->setLeftAnkleWidth(70.0); // mm
+    rig->setRightFootFlat(true);
+    rig->setRightLegLength(920.0); // mm
+    rig->setRightKneeWidth(102.0); // mm
+    rig->setRightAnkleWidth(70.0); // mm
+    btk::Model model("test", rig);
+    
+    btk::Node rootCalibration("rootCalibration");
+    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration3_FF_N18.c3d");
+    TS_ASSERT(rig->calibrate(&model, &rootCalibration));
+    btk::Node rootDynamic("rootDynamic");
+    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"PiG/PiG_Motion3_FF_N18.c3d");
+    TS_ASSERT(rig->generate(&model, &rootDynamic));
+
+    auto trial = rootDynamic.findChild<btk::Trial*>();
+    pig_compare_segment_motion(trial, "Pelvis", {"PELO","PELA","PELL","PELP"}, {5e-4});
+    pig_compare_segment_motion(trial, "R.Thigh", {"RFEO","RFEA","RFEL","RFEP"}, {5e-4});
+    pig_compare_segment_motion(trial, "L.Thigh", {"LFEO","LFEA","LFEL","LFEP"}, {5e-4});
+    pig_compare_segment_motion(trial, "R.Shank", {"RTIO","RTIA","RTIL","RTIP"}, {5e-4});
+    pig_compare_segment_motion(trial, "L.Shank", {"LTIO","LTIA","LTIL","LTIP"}, {5e-4});
+    pig_compare_segment_motion(trial, "R.Foot", {"RFOO","RFOA","RFOL","RFOP"}, {1e4}); // 1e4 : Not the same origin
+    pig_compare_segment_motion(trial, "L.Foot", {"LFOO","LFOA","LFOL","LFOP"}, {1e4}); // 1e4 : Not the same origin
+  };
+  
+  CXXTEST_TEST(Generate3BothLowerBody_noFF)
+  {
+    auto rig = new btk::PluginGait(btk::BodyRegion::Lower, btk::BodySide::Both);
+    rig->setMarkerDiameter(14.0); // mm
+    rig->setLeftLegLength(920.0); // mm
+    rig->setLeftKneeWidth(102.0); // mm
+    rig->setLeftAnkleWidth(70.0); // mm
+    rig->setRightLegLength(920.0); // mm
+    rig->setRightKneeWidth(102.0); // mm
+    rig->setRightAnkleWidth(70.0); // mm
+    btk::Model model("test", rig);
+    
+    btk::Node rootCalibration("rootCalibration");
+    pig_generate_trial_from_file(&rootCalibration, _BTK_TDD_C3D_IN_"PiG/PiG_Calibration3_noFF.c3d");
+    TS_ASSERT(rig->calibrate(&model, &rootCalibration));
+    btk::Node rootDynamic("rootDynamic");
+    pig_generate_trial_from_file(&rootDynamic, _BTK_TDD_C3D_IN_"PiG/PiG_Motion3_noFF.c3d");
+    TS_ASSERT(rig->generate(&model, &rootDynamic));
+
+    auto trial = rootDynamic.findChild<btk::Trial*>();
+    pig_compare_segment_motion(trial, "Pelvis", {"PELO","PELA","PELL","PELP"}, {5e-4});
+    pig_compare_segment_motion(trial, "R.Thigh", {"RFEO","RFEA","RFEL","RFEP"}, {5e-4});
+    pig_compare_segment_motion(trial, "L.Thigh", {"LFEO","LFEA","LFEL","LFEP"}, {5e-4});
+    pig_compare_segment_motion(trial, "R.Shank", {"RTIO","RTIA","RTIL","RTIP"}, {5e-4});
+    pig_compare_segment_motion(trial, "L.Shank", {"LTIO","LTIA","LTIL","LTIP"}, {5e-4});
+    pig_compare_segment_motion(trial, "R.Foot", {"RFOO","RFOA","RFOL","RFOP"}, {1e4}); // 1e4 : Not the same origin
+    pig_compare_segment_motion(trial, "L.Foot", {"LFOO","LFOA","LFOL","LFOP"}, {1e4}); // 1e4 : Not the same origin
+  };
 };
 
 CXXTEST_SUITE_REGISTRATION(PluginGaitTest)
@@ -602,10 +770,16 @@ CXXTEST_TEST_REGISTRATION(PluginGaitTest, CalibrateBothUpperBody_FullFrames)
 CXXTEST_TEST_REGISTRATION(PluginGaitTest, CalibrateBothLowerBody_FullFrames)
 CXXTEST_TEST_REGISTRATION(PluginGaitTest, CalibrateBothFullBody_FullFrames)
 CXXTEST_TEST_REGISTRATION(PluginGaitTest, CalibrateBothFullBody_HoleFrames)
-CXXTEST_TEST_REGISTRATION(PluginGaitTest, CalibrateBothFullBody_NoOption)
+CXXTEST_TEST_REGISTRATION(PluginGaitTest, Calibrate2BothFullBody_NoOption)
+CXXTEST_TEST_REGISTRATION(PluginGaitTest, Calibrate3BothLowerBody_FF)
+CXXTEST_TEST_REGISTRATION(PluginGaitTest, Calibrate3BothLowerBody_FF_N18)
+CXXTEST_TEST_REGISTRATION(PluginGaitTest, Calibrate3BothLowerBody_noFF)
 CXXTEST_TEST_REGISTRATION(PluginGaitTest, GenerateBothLowerBody_OneFrame)
 CXXTEST_TEST_REGISTRATION(PluginGaitTest, GenerateBothUpperBody_OneFrame)
 CXXTEST_TEST_REGISTRATION(PluginGaitTest, GenerateBothLowerBody_HoleFrames)
 CXXTEST_TEST_REGISTRATION(PluginGaitTest, GenerateBothUpperBody_HoleFrames)
 CXXTEST_TEST_REGISTRATION(PluginGaitTest, GenerateBothFullBody_FullFrames)
+CXXTEST_TEST_REGISTRATION(PluginGaitTest, Generate3BothLowerBody_FF)
+CXXTEST_TEST_REGISTRATION(PluginGaitTest, Generate3BothLowerBody_FF_N18)
+CXXTEST_TEST_REGISTRATION(PluginGaitTest, Generate3BothLowerBody_noFF)
 #endif // PluginGaitTest_h

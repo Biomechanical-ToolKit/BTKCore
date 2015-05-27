@@ -107,14 +107,14 @@ CXXTEST_SUITE(C3DFileIOTest)
 
   CXXTEST_TEST(DetectSignatureOk)
   {
-    btk::File file; file.open(_BTK_TDD_C3D_IN_"sample01/Eb015pi.c3d", btk::File::Mode::In);
+    btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample01/Eb015pi.c3d", btk::File::Mode::In);
     btk::C3DHandler format; format.setDevice(&file);
     TS_ASSERT_EQUALS(format.detectSignature(), btk::C3DHandler::Signature::Valid);
   };
   
   CXXTEST_TEST(Sample01_Eb015pi)
   {
-    btk::File file; file.open(_BTK_TDD_C3D_IN_"sample01/Eb015pi.c3d", btk::File::Mode::In);
+    btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample01/Eb015pi.c3d", btk::File::Mode::In);
     btk::C3DHandler format; format.setDevice(&file);
     btk::Node root("root");
     
@@ -170,7 +170,7 @@ CXXTEST_SUITE(C3DFileIOTest)
   
   CXXTEST_TEST(Sample01_Eb015si)
   {
-    btk::File file; file.open(_BTK_TDD_C3D_IN_"sample01/Eb015si.c3d", btk::File::Mode::In);
+    btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample01/Eb015si.c3d", btk::File::Mode::In);
     btk::C3DHandler format; format.setDevice(&file);
     btk::Node root("root");
     
@@ -226,7 +226,7 @@ CXXTEST_SUITE(C3DFileIOTest)
   
   CXXTEST_TEST(Sample01_Eb015vi)
   {
-    btk::File file; file.open(_BTK_TDD_C3D_IN_"sample01/Eb015vi.c3d", btk::File::Mode::In);
+    btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample01/Eb015vi.c3d", btk::File::Mode::In);
     btk::C3DHandler format; format.setDevice(&file);
     btk::Node root("root");
     
@@ -282,7 +282,7 @@ CXXTEST_SUITE(C3DFileIOTest)
   
   CXXTEST_TEST(Sample01_Eb015pr)
   {
-    btk::File file; file.open(_BTK_TDD_C3D_IN_"sample01/Eb015pr.c3d", btk::File::Mode::In);
+    btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample01/Eb015pr.c3d", btk::File::Mode::In);
     btk::C3DHandler format; format.setDevice(&file);
     btk::Node root("root");
     
@@ -339,7 +339,7 @@ CXXTEST_SUITE(C3DFileIOTest)
   
   CXXTEST_TEST(Sample01_Eb015sr)
   {
-    btk::File file; file.open(_BTK_TDD_C3D_IN_"sample01/Eb015sr.c3d", btk::File::Mode::In);
+    btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample01/Eb015sr.c3d", btk::File::Mode::In);
     btk::C3DHandler format; format.setDevice(&file);
     btk::Node root("root");
     
@@ -395,7 +395,7 @@ CXXTEST_SUITE(C3DFileIOTest)
   
   CXXTEST_TEST(Sample01_Eb015vr)
   {
-    btk::File file; file.open(_BTK_TDD_C3D_IN_"sample01/Eb015vr.c3d", btk::File::Mode::In);
+    btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample01/Eb015vr.c3d", btk::File::Mode::In);
     btk::C3DHandler format; format.setDevice(&file);
     btk::Node root("root");
     
@@ -451,7 +451,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 
   CXXTEST_TEST(Sample02_DEC_INT)
   {
-    btk::File file; file.open(_BTK_TDD_C3D_IN_"sample02/DEC_INT.C3D", btk::File::Mode::In);
+    btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample02/DEC_INT.C3D", btk::File::Mode::In);
     btk::C3DHandler format; format.setDevice(&file);
     btk::Node root("root");
     TS_ASSERT(format.read(&root));
@@ -476,7 +476,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample02_Dec_real)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample02/Dec_real.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample02/Dec_real.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -500,7 +500,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample02_pc_int)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample02/pc_int.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample02/pc_int.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -524,7 +524,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample02_pc_real)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample02/pc_real.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample02/pc_real.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -548,7 +548,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample02_sgi_int)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample02/sgi_int.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample02/sgi_int.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -572,7 +572,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample02_sgi_real)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample02/sgi_real.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample02/sgi_real.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -596,7 +596,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample05_vicon512)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample05/vicon512.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample05/vicon512.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -611,7 +611,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample06_MACsample)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample06/MACsample.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample06/MACsample.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //   };
 //
@@ -620,26 +620,26 @@ CXXTEST_SUITE(C3DFileIOTest)
 //   {
 //     btk::File file; btk::C3DHandler format; btk::Node root("root");
 //     // TESTAPI
-//     file.open(_BTK_TDD_C3D_IN_"sample08/TESTAPI.c3d", btk::File::Mode::In);
+//     file.open(_BTK_TDD_C3D_IN_"c3d.org/sample08/TESTAPI.c3d", btk::File::Mode::In);
 //     format.setDevice(&file);
 //     format.read(&root);
 //     // TESTBPI
-//     file.open(_BTK_TDD_C3D_IN_"sample08/TESTBPI.c3d", btk::File::Mode::In);
+//     file.open(_BTK_TDD_C3D_IN_"c3d.org/sample08/TESTBPI.c3d", btk::File::Mode::In);
 //     format.setDevice(&file);
 //     format.read(&root);
 //     // TESTCPI
-//     file.open(_BTK_TDD_C3D_IN_"sample08/TESTCPI.c3d", btk::File::Mode::In);
+//     file.open(_BTK_TDD_C3D_IN_"c3d.org/sample08/TESTCPI.c3d", btk::File::Mode::In);
 //     format.setDevice(&file);
 //     format.read(&root);
 //     // TESTDPI
-//     file.open(_BTK_TDD_C3D_IN_"sample08/TESTDPI.c3d", btk::File::Mode::In);
+//     file.open(_BTK_TDD_C3D_IN_"c3d.org/sample08/TESTDPI.c3d", btk::File::Mode::In);
 //     format.setDevice(&file);
 //     format.read(&root);
 //   };
 //
 //   CXXTEST_TEST(Sample09_PlugInC3D)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample09/PlugInC3D.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample09/PlugInC3D.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -697,7 +697,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample13_Dance)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample13/Dance.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample13/Dance.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -712,7 +712,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample13_golfswing)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample13/golfswing.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample13/golfswing.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -727,7 +727,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample15_FP1)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample15/FP1.C3D", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample15/FP1.C3D", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -735,7 +735,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample15_FP2)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample15/FP2.C3D", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample15/FP2.C3D", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -743,7 +743,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample18_bad_parameter_section)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample18/bad_parameter_section.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample18/bad_parameter_section.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(!format.read(&root));
@@ -753,7 +753,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample19_sample19)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample19/sample19.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample19/sample19.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -768,7 +768,7 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample20_phasespace_sample)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample20/phasespace_sample.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample20/phasespace_sample.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -783,13 +783,13 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample21_sample21)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample21/sample21.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample21/sample21.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //   };
 //
 //   CXXTEST_TEST(Sample22_BKINtechnologies)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample22/BKINtechnologies.c3d", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample22/BKINtechnologies.c3d", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //     btk::Node root("root");
 //     TS_ASSERT(format.read(&root));
@@ -805,19 +805,19 @@ CXXTEST_SUITE(C3DFileIOTest)
 //
 //   CXXTEST_TEST(Sample28_dynamic)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample28/dynamic.C3D", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample28/dynamic.C3D", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //   };
 //
 //   CXXTEST_TEST(Sample28_standing)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample28/standing.C3D", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample28/standing.C3D", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //   };
 //
 //   CXXTEST_TEST(Sample28_type1)
 //   {
-//     btk::File file; file.open(_BTK_TDD_C3D_IN_"sample28/type1.C3D", btk::File::Mode::In);
+//     btk::File file; file.open(_BTK_TDD_C3D_IN_"c3d.org/sample28/type1.C3D", btk::File::Mode::In);
 //     btk::C3DHandler format; format.setDevice(&file);
 //   };
 //
