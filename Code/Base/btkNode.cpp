@@ -642,9 +642,9 @@ namespace btk
       if (node->pimpl()->castable(id) && (name.empty() || (node->name() == name)))
       {
         bool found = true;
-        for (auto it = properties.cbegin() ; it != properties.cend() ; ++it)
+        for (auto it2 = properties.cbegin() ; it2 != properties.cend() ; ++it2)
         {
-          if (node->property(it->first) != it->second)
+          if (node->property(it2->first) != it2->second)
           {
             found = false;
             break;
