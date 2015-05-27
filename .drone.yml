@@ -1,0 +1,19 @@
+# NOTE: This configuration file is not used by drone.io but as a backup file.
+mkdir build
+cd build
+# Switch to GCC 4.8 to have the C++11 support
+echo 2 | sudo update-alternatives --config gcc
+# CMake 3.1 or later is needed but drone.io still uses CMake 2.8.7
+wget http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz >> /dev/null 2>&1
+tar -zxvf cmake-3.2.2.tar.gz >> /dev/null 2>&1
+cd cmake-3.2.2
+sudo ./bootstrap >> /dev/null 2>&1
+sudo make >> /dev/null 2>&1
+sudo make install >> /dev/null 2>&1
+cd ..
+# Compile and test the project
+ROOT=`pwd`
+git clone https://github.com/Biomechanical-ToolKit/BTKData.git Testing/Data
+cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -DBTK_EXTRA_COMPILER_WARNINGS:BOOL=1 -G "Unix Makefiles" ..
+make
+ctest -VV
