@@ -70,6 +70,7 @@ CXXTEST_SUITE(EventTest)
 
     TS_ASSERT_EQUALS(events.children().size(),4ul);
 
+    TS_ASSERT_EQUALS(events.findChild("Toto",{{"time",1.5}},false),&evtD);
     TS_ASSERT_EQUALS(events.findChild<btk::Event*>("Toto",{{"time",1.5}},false),&evtD);
     TS_ASSERT_EQUALS(events.findChild<btk::Event*>({},{{"time",0.0},{"context","Left"}},false),&evtB);
 

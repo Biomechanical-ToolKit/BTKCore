@@ -86,6 +86,11 @@ CXXTEST_SUITE(NodeTest)
     TestNode node("foo");
     
     TS_ASSERT_EQUALS(node.name(),"foo");
+    auto n = node.property("name");
+    TS_ASSERT_EQUALS(n.isValid(), true);
+    TS_ASSERT_EQUALS(n.isEmpty(), false);
+    TS_ASSERT(n == "foo");
+    TS_ASSERT_EQUALS(n.cast<std::string>(),"foo");
     TS_ASSERT_EQUALS(node.property("name").cast<std::string>(),"foo");
     node.setName("bar");
     TS_ASSERT_EQUALS(node.name(),"bar");
