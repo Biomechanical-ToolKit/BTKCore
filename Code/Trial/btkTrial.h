@@ -47,7 +47,7 @@ namespace btk
   
   class TrialPrivate;
   
-  class BTK_TRIAL_EXPORT Trial : public Node
+  class BTK_NODE(BTK_TRIAL_EXPORT, Trial) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Trial)
     

@@ -44,7 +44,7 @@ namespace btk
 {
   class EventPrivate;
   
-  class BTK_TRIAL_EXPORT Event : public Node
+  class BTK_NODE(BTK_TRIAL_EXPORT, Event) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Event)
     

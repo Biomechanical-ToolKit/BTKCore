@@ -49,7 +49,7 @@ namespace btk
 {
   class TimeSequencePrivate;
   
-  class BTK_TRIAL_EXPORT TimeSequence : public Node
+  class BTK_NODE(BTK_TRIAL_EXPORT, TimeSequence) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(TimeSequence)
   
