@@ -88,8 +88,8 @@ namespace btk
     void appendParent(Node* node) _BTK_NOEXCEPT;
     void removeParent(Node* node) _BTK_NOEXCEPT;
     
-    template <typename U = Node*> U findChild(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const _BTK_NOEXCEPT;
-    template <typename U = Node*> std::list<U> findChildren(const std::string& name = {}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const _BTK_NOEXCEPT;
+    template <typename U = Node*> U findChild(const std::string& name = std::string{}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const _BTK_NOEXCEPT;
+    template <typename U = Node*> std::list<U> findChildren(const std::string& name = std::string{}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const _BTK_NOEXCEPT;
     template <typename U = Node*, typename V, typename = typename std::enable_if<std::is_same<std::regex, V>::value>::type> std::list<U> findChildren(const V& regexp, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const _BTK_NOEXCEPT;
     
     std::list<const Node*> retrievePath(const Node* node) const _BTK_NOEXCEPT;

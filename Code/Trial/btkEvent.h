@@ -49,7 +49,7 @@ namespace btk
     BTK_DECLARE_PIMPL_ACCESSOR(Event)
     
   public:
-    Event(const std::string& name, double time = 0.0, const std::string& context = {}, const std::string& subject = {}, Node* parent = nullptr);
+    Event(const std::string& name, double time = 0.0, const std::string& context = std::string{}, const std::string& subject = std::string{}, Node* parent = nullptr);
     ~Event() _BTK_NOEXCEPT;
     
     Event(const Node& ) = delete;
