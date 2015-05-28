@@ -15,20 +15,43 @@ install:
 # To prepare your build for testing
 before_script:
   - git clone https://github.com/Biomechanical-ToolKit/BTKData.git Testing/Data
-      
+
+# Compilation of the project and testing
 script:
   - ROOT=`pwd`
   - rm -rf build
   - mkdir build
   - cd build
   - if [ "$SELECTED_COMPILER" = "GCC" ]; then export CC=gcc-4.8 && export CXX=g++-4.8; fi
-  - cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBUILD_TESTING:BOOL=1 -DBTK_EXTRA_COMPILER_WARNINGS:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
-  - make
-  - ctest -VV
+  - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBUILD_TESTING:BOOL=1 -DBTK_EXTRA_COMPILER_WARNINGS:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..; fi
+  - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then make; fi
+  - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then ctest -VV; fi
 
-# Building matrix used
+# Building matrix used by the 'script' section
 env:
+  global:
+    - secure: "REQZy/uM9qJv7D3pGsCs1EuAl9ZSbSjeNcpbiFkigUZY117JlW1CnAhUMQU8whGL7MuGuJjbGCsAfOyKOLZfU8Z6JzZXkGWUMRwiidmfM3F3QjdC33H6dIWI5dw4E6GylraUSCqXtFV3gaioqf0HbuVpGkBH2RqC5GFAt96O1BA="
+  
   matrix:
-    - SELECTED_COMPILER=Clang WITH_SHARED_LIBS=1
-    - SELECTED_COMPILER=GCC   WITH_SHARED_LIBS=1 
-    - SELECTED_COMPILER=GCC   WITH_SHARED_LIBS=0
+    - SELECTED_COMPILER=Clang WITH_SHARED_LIBS=1 WITH_COVERITY_ENABLED=0
+    - SELECTED_COMPILER=GCC   WITH_SHARED_LIBS=1 WITH_COVERITY_ENABLED=0
+    - SELECTED_COMPILER=GCC   WITH_SHARED_LIBS=0 WITH_COVERITY_ENABLED=1
+  
+matrix:
+  # Exclude all the jobs in the 'coverity_scan' branch with the variable 'WITH_COVERITY_ENABLED=0'
+  exclude:
+    - env: COVERITY_SCAN_BRANCH=1 WITH_COVERITY_ENABLED=0
+  # Allow failure for Coverity as this is not a standard compiler (COVERITY_SCAN_BRANCH is defined by the coverity_scan addon)
+  allow_failures:
+    - env: COVERITY_SCAN_BRANCH=1
+
+# Coverity configuration
+addons:
+  coverity_scan:
+    project:
+      name: "Biomechanical-ToolKit/BTKCore"
+      description: "Build submitted via Travis CI"
+    notification_email: arnaud.barre@gmail.com
+    build_command_prepend: "cmake .; make clean"
+    build_command:   "make -j 4"
+    branch_pattern: coverity_scan
