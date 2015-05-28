@@ -1,10 +1,9 @@
 version: 1.0.{build}
 os: Windows Server 2012 R2
 platform: x64
-configuration:
-  - Release
-  - Debug
-matrix:
+configuration: Release
+environment:
+  matrix:
   - CMAKE_GENERATOR: "NMake Makefiles"
     ARCH: "amd64_x86"
   - CMAKE_GENERATOR: "NMake Makefiles"
