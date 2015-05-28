@@ -93,6 +93,9 @@ CHECK_INCLUDE_FILE(sys/mman.h HAVE_SYS_MMAP)
 # Extra compiler flags for the debug mode
 INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkExtraCompilerFlags.cmake)
 
+# Custom target for Coverity integrated with Travis-ci
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/CoverityCustomTarget.cmake)
+
 # BTK build configuration options.
 OPTION(BUILD_SHARED_LIBS "Build BTK with shared libraries." OFF)
 SET(BTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
