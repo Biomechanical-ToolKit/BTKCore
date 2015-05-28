@@ -1,0 +1,5 @@
+IF(WITH_COVERITY_ENABLED)
+  ADD_CUSTOM_TARGET(coverity COMMAND "${CMAKE_COMMAND}" --build .)
+ELSE()
+  ADD_CUSTOM_TARGET(coverity COMMAND echo "Nothing to do.")
+ENDIF()
