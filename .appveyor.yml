@@ -15,7 +15,7 @@ before_build:
   - vcvarsall %ARCH%
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE:CHAR=%CONFIGURATION% -DBUILD_SHARED_LIBS:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=C:\projects\btkcore\Testing\Data -G %CMAKE_GENERATOR% ..
+  - cmake -DCMAKE_BUILD_TYPE:CHAR=%CONFIGURATION% -DBUILD_SHARED_LIBS:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=C:\projects\btkcore\Testing\Data -G "%CMAKE_GENERATOR%" ..
 build_script:
   - echo BUILD INFO - %CMAKE_GENERATOR% / %ARCH% / %CONFIGURATION%
   - nmake
