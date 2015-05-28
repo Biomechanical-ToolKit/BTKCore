@@ -49,6 +49,6 @@ addons:
       name: "Biomechanical-ToolKit/BTKCore"
       description: "Build submitted via Travis CI"
     notification_email: arnaud.barre@gmail.com
-    build_command_prepend: "export CC=gcc-4.8; export CXX=g++-4.8; cmake .; make clean"
-    build_command:   "if [ ${WITH_COVERITY_ENABLED} == 1 ]; then make -j 4; fi"
+    build_command_prepend: "export CC=gcc-4.8; export CXX=g++-4.8; cmake -DWITH_COVERITY_ENABLED:BOOL=$WITH_COVERITY_ENABLED .; make clean"
+    build_command: "make coverity"
     branch_pattern: coverity_scan
