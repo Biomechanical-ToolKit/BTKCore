@@ -5,10 +5,10 @@ configuration:
   - Release
   - Debug
 matrix:
-  - CMAKE_GENERATOR = "NMake Makefiles"
-    ARCH = "amd64_x86"
-  - CMAKE_GENERATOR = "NMake Makefiles"
-    ARCH = "amd64"
+  - CMAKE_GENERATOR: "NMake Makefiles"
+    ARCH: "amd64_x86"
+  - CMAKE_GENERATOR: "NMake Makefiles"
+    ARCH: "amd64"
 install:
   - SET PATH=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC;%PATH%
   - git clone --quiet https://github.com/Biomechanical-ToolKit/BTKData.git Testing/Data
