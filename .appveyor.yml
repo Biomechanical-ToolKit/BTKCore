@@ -2,6 +2,9 @@ version: 1.0.{build}
 os: Windows Server 2012 R2
 platform: x64
 configuration: Release
+branches:
+  except:
+    - coverity_scan
 environment:
   matrix:
   - CMAKE_GENERATOR: "NMake Makefiles"
