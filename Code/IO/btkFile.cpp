@@ -340,9 +340,9 @@ namespace btk
   {
 #if defined(HAVE_SYS_MMAP)
     bool err = ((this->mp_Data = (char*)::mmap(0, 
-                                                 static_cast<size_t>(this->m_DataSize), 
-                                                 this->m_Writing ? (PROT_READ | PROT_WRITE) : PROT_READ, 
-                                                 MAP_SHARED, this->m_File, 0)) == MAP_FAILED);
+                                               static_cast<size_t>(this->m_DataSize), 
+                                               this->m_Writing ? (PROT_READ | PROT_WRITE) : PROT_READ, 
+                                               MAP_SHARED, this->m_File, 0)) == MAP_FAILED);
 #else
     BOOL err = ((this->m_Map = ::CreateFileMapping(this->m_File,
                                                    NULL, 
@@ -351,10 +351,10 @@ namespace btk
                                                    0,
                                                    NULL)) == NULL);
     err |= ((this->mp_Data = (char*)::MapViewOfFile(this->m_Map,
-                                                       this->m_Writing ? FILE_MAP_WRITE : FILE_MAP_READ,
-                                                       0,
-                                                       0,
-                                                       this->m_DataSize)) == NULL);
+                                                    this->m_Writing ? FILE_MAP_WRITE : FILE_MAP_READ,
+                                                    0,
+                                                    0,
+                                                    this->m_DataSize)) == NULL);
 #endif
     return err ? 0 : this;
   };
