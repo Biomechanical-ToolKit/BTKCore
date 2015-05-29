@@ -15,9 +15,7 @@ IF(WITH_COVERALLS_ENABLED)
       -DPROJECT_ROOT="${PROJECT_SOURCE_DIR}"
       -P "${CMAKE_MODULE_PATH}/CoverallsGenerateGcov.cmake"
     # Upload the result
-    COMMAND ${CURL_EXECUTABLE}
-      -S -F json_file=@${COVERALLS_FILE}
-      https://coveralls.io/api/v1/jobs
+    COMMAND curl -S -F json_file=@${COVERALLS_FILE} https://coveralls.io/api/v1/jobs
     COMMENT "Generating and uploading coveralls output...")
 ELSE()
   ADD_CUSTOM_TARGET(coveralls COMMAND echo "Nothing to do.")
