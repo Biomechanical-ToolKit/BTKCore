@@ -95,6 +95,8 @@ INCLUDE(${BTK_CMAKE_MODULE_PATH}/ExtraCXXFlagsDebug.cmake)
 
 # Custom target for Coverity integrated with Travis-ci
 INCLUDE(${BTK_CMAKE_MODULE_PATH}/CoverityCustomTarget.cmake)
+# Custom target for Coveralls integrated with Travis-ci
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/CoverallsCustomTarget.cmake)
 
 # BTK build configuration options.
 OPTION(BUILD_SHARED_LIBS "Build BTK with shared libraries." OFF)
