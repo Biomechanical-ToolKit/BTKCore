@@ -91,7 +91,7 @@ ENDIF()
 CHECK_INCLUDE_FILE(sys/mman.h HAVE_SYS_MMAP)
 
 # Extra compiler flags for the debug mode
-INCLUDE(${BTK_CMAKE_MODULE_PATH}/btkExtraCompilerFlags.cmake)
+INCLUDE(${BTK_CMAKE_MODULE_PATH}/ExtraCXXFlagsDebug.cmake)
 
 # Custom target for Coverity integrated with Travis-ci
 INCLUDE(${BTK_CMAKE_MODULE_PATH}/CoverityCustomTarget.cmake)

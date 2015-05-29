@@ -14,6 +14,6 @@ cd ..
 # Compile and test the project
 ROOT=`pwd`
 git clone https://github.com/Biomechanical-ToolKit/BTKData.git Testing/Data
-cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -DBTK_EXTRA_COMPILER_WARNINGS:BOOL=1 -G "Unix Makefiles" ..
+cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=1 -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..
 make
 ctest -VV

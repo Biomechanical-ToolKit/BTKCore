@@ -23,7 +23,7 @@ script:
   - mkdir build
   - cd build
   - if [ "$SELECTED_COMPILER" = "GCC" ]; then export CC=gcc-4.8 && export CXX=g++-4.8; fi
-  - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBUILD_TESTING:BOOL=1 -DBTK_EXTRA_COMPILER_WARNINGS:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..; fi
+  - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then cmake -DCMAKE_BUILD_TYPE:CHAR=Release -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..; fi
   - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then make; fi
   - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then ctest -VV; fi
 
