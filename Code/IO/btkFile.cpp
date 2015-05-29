@@ -208,7 +208,7 @@ namespace btk
       return 0;
 
 #if defined(HAVE_SYS_MMAP)
-    bool err = !(::munmap(this->mp_Data, this->m_DataSize) == 0);
+    bool err = !(::munmap(this->mp_Data, static_cast<size_t>(this->m_DataSize)) == 0);
 #else
     BOOL err = (::UnmapViewOfFile(this->mp_Data) == 0) || (::CloseHandle(this->m_Map) == 0);
     this->m_Map = NULL;
@@ -340,7 +340,7 @@ namespace btk
   {
 #if defined(HAVE_SYS_MMAP)
     bool err = ((this->mp_Data = (char*)::mmap(0, 
-                                                 this->m_DataSize, 
+                                                 static_cast<size_t>(this->m_DataSize), 
                                                  this->m_Writing ? (PROT_READ | PROT_WRITE) : PROT_READ, 
                                                  MAP_SHARED, this->m_File, 0)) == MAP_FAILED);
 #else
