@@ -127,9 +127,9 @@ namespace btk
     // New file or truncated file?
     if ((this->m_DataSize == 0) && this->m_Writing)
     {
-      this->m_DataSize = MemoryMappedBuffer::granularity();
-      if ((::lseek(this->m_File, this->m_DataSize-1, SEEK_SET) == -1)
-           || (::write(this->m_File, "", 1) == -1))
+      if (((this->m_DataSize = MemoryMappedBuffer::granularity()) <= 0)
+         || (::lseek(this->m_File, this->m_DataSize-1, SEEK_SET) == -1)
+         || (::write(this->m_File, "", 1) == -1))
         return this->close();
     }
 #else // Windows
@@ -208,7 +208,7 @@ namespace btk
       return 0;
 
 #if defined(HAVE_SYS_MMAP)
-    bool err = !(::munmap(this->mp_Data, static_cast<size_t>(this->m_DataSize)) == 0);
+    bool err = !(::munmap(this->mp_Data, this->m_DataSize) == 0);
 #else
     BOOL err = (::UnmapViewOfFile(this->mp_Data) == 0) || (::CloseHandle(this->m_Map) == 0);
     this->m_Map = NULL;
@@ -340,7 +340,7 @@ namespace btk
   {
 #if defined(HAVE_SYS_MMAP)
     bool err = ((this->mp_Data = (char*)::mmap(0, 
-                                               static_cast<size_t>(this->m_DataSize), 
+                                               this->m_DataSize, 
                                                this->m_Writing ? (PROT_READ | PROT_WRITE) : PROT_READ, 
                                                MAP_SHARED, this->m_File, 0)) == MAP_FAILED);
 #else
@@ -367,7 +367,10 @@ namespace btk
   {
     if (!this->isOpen() || !this->m_Writing)
       return 0;
-    size_t newBufferSize = this->m_DataSize + this->granularity();
+    int pageSize = this->granularity();
+    if (pageSize <= 0)
+      return 0;
+    size_t newBufferSize = this->m_DataSize + pageSize;
 #if defined(_MSC_VER)
     if ((::UnmapViewOfFile(this->mp_Data) == 0) || (::CloseHandle(this->m_Map) == 0))
       return 0;
