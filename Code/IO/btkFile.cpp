@@ -204,7 +204,7 @@ namespace btk
    */ 
   MemoryMappedBuffer* MemoryMappedBuffer::close() _BTK_NOEXCEPT
   {
-    if (!this->isOpen())
+    if (!this->isOpen() || (this->m_DataSize < 0))
       return 0;
 
 #if defined(HAVE_SYS_MMAP)
