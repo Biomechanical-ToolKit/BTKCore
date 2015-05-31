@@ -368,7 +368,7 @@ namespace btk
       // From the C3D documentation:
       // "The first two bytes of the parameter record are only meaningful if they also form the first word of the file"
       // [...]
-      // "This is because one common technique for creating C3D files used to be to maintain a parameter “template” as a separate file"
+      // "This is because one common technique for creating C3D files used to be to maintain a parameter 'template' as a separate file"
       optr->Device->seek(2, IODevice::Origin::Current);
       uint8_t blockNumber = stream.readU8();
       optr->Device->seek(1, IODevice::Origin::Current); // Processor type
