@@ -82,7 +82,6 @@ if (NOT PROJECT_ROOT)
 endif()
 
 SET(COVERAGE_SRCS, "")
-SET(_COVERAGE_SRCS_EXT, "h;hh;hpp;hxx;c;cc;cpp;cxx;tpp;txx")
 FOREACH(_EXT h hh hpp hxx c cc cpp cxx tpp txx)
   FILE(GLOB_RECURSE _COVERAGE_SRCS "${COVERAGE_SRCS_PATH}/*.${_EXT}")
   LIST(APPEND COVERAGE_SRCS ${_COVERAGE_SRCS})
