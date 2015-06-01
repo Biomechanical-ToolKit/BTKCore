@@ -58,6 +58,10 @@
 #      retrieved these information directly from Travis-CI. It is then no more
 #      necessary to finish this part (see TODOs of the original author)
 #
+#  - 2015/06/01 - Arnaud Barré
+#    * Code cleanup to remove the parts related to the parsing of source file
+#      All the code using the variable GCOV_FILE_SOURCE is not necessary.
+#
 # =========================================================================== #
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
@@ -264,23 +268,6 @@ foreach (GCOV_FILE ${GCOV_FILES})
 	file(STRINGS ${GCOV_FILE}_tmp GCOV_LINES)
 	list(LENGTH GCOV_LINES LINE_COUNT)
 
-	# Instead of trying to parse the source from the
-	# gcov file, simply read the file contents from the source file.
-	# (Parsing it from the gcov is hard because C-code uses ; in many places
-	#  which also happens to be the same as the CMake list delimeter).
-	file(READ ${GCOV_SRC_PATH} GCOV_FILE_SOURCE)
-
-	string(REPLACE "\\" "\\\\" GCOV_FILE_SOURCE "${GCOV_FILE_SOURCE}")
-	string(REGEX REPLACE "\"" "\\\\\"" GCOV_FILE_SOURCE "${GCOV_FILE_SOURCE}")
-	string(REPLACE "\t" "\\\\t" GCOV_FILE_SOURCE "${GCOV_FILE_SOURCE}")
-	string(REPLACE "\r" "\\\\r" GCOV_FILE_SOURCE "${GCOV_FILE_SOURCE}")
-	string(REPLACE "\n" "\\\\n" GCOV_FILE_SOURCE "${GCOV_FILE_SOURCE}")
-	# According to http://json.org/ these should be escaped as well.
-	# Don't know how to do that in CMake however...
-	#string(REPLACE "\b" "\\\\b" GCOV_FILE_SOURCE "${GCOV_FILE_SOURCE}")
-	#string(REPLACE "\f" "\\\\f" GCOV_FILE_SOURCE "${GCOV_FILE_SOURCE}")
-	#string(REGEX REPLACE "\u([a-fA-F0-9]{4})" "\\\\u\\1" GCOV_FILE_SOURCE "${GCOV_FILE_SOURCE}")
-
 	# We want a json array of coverage data as a single string
 	# start building them from the contents of the .gcov
 	set(GCOV_FILE_COVERAGE "[")
@@ -383,16 +370,9 @@ foreach(NOT_COVERED_SRC ${COVERAGE_SRCS_REMAINING})
 	file(STRINGS ${NOT_COVERED_SRC} SRC_LINES)
 
 	set(GCOV_FILE_COVERAGE "[")
-	set(GCOV_FILE_SOURCE "")
 
 	foreach (SOURCE ${SRC_LINES})
 		set(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}0, ")
-
-		string(REPLACE "\\" "\\\\" SOURCE "${SOURCE}")
-		string(REGEX REPLACE "\"" "\\\\\"" SOURCE "${SOURCE}")
-		string(REPLACE "\t" "\\\\t" SOURCE "${SOURCE}")
-		string(REPLACE "\r" "\\\\r" SOURCE "${SOURCE}")
-		set(GCOV_FILE_SOURCE "${GCOV_FILE_SOURCE}${SOURCE}\\n")
 	endforeach()
 
 	# Remove trailing comma, and complete JSON array with ]
