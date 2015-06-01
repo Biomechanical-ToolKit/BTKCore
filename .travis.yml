@@ -26,6 +26,8 @@ script:
   - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then cmake -DCMAKE_BUILD_TYPE:CHAR=$WITH_BUILD_TYPE -DBUILD_SHARED_LIBS:BOOL=$WITH_SHARED_LIBS -DWITH_COVERALLS_ENABLED:BOOL=$WITH_COVERALLS_ENABLED -DBUILD_TESTING:BOOL=1 -DBTK_TESTING_DATA_PATH:CHAR=$ROOT/Testing/Data -G "Unix Makefiles" ..; fi
   - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then make; fi
   - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then ctest -VV; fi
+  
+after_success:
   - if [ ${COVERITY_SCAN_BRANCH} != 1 ] && [ ${WITH_COVERALLS_ENABLED} == 1 ]; then make coveralls; fi
 
 # Building matrix used by the 'script' section
