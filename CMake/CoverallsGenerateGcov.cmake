@@ -368,6 +368,8 @@ foreach (GCOV_FILE ${GCOV_FILES})
 	string(CONFIGURE ${SRC_FILE_TEMPLATE} FILE_JSON)
 
 	set(JSON_GCOV_FILES "${JSON_GCOV_FILES}${FILE_JSON}, ")
+  
+  message(STATUS " - COVERED: ${GCOV_SRC_REL_PATH}")
 endforeach()
 
 # Loop through all files we couldn't find any coverage for
@@ -401,6 +403,8 @@ foreach(NOT_COVERED_SRC ${COVERAGE_SRCS_REMAINING})
 	# message("Generate JSON for non-gcov file: ${NOT_COVERED_SRC}...")
 	string(CONFIGURE ${SRC_FILE_TEMPLATE} FILE_JSON)
 	set(JSON_GCOV_FILES "${JSON_GCOV_FILES}${FILE_JSON}, ")
+  
+  message(STATUS " - NOT COVERED: ${GCOV_SRC_REL_PATH}")
 endforeach()
 
 # Get rid of trailing comma.
