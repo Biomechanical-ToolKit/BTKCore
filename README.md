@@ -11,8 +11,11 @@ The code in this branch (`wip-new-api`) introduces several new concepts and a co
 ##Documentation##
 
 All the documentation (user guide, developer guide, etc.) is centralized and accessible over [Read the Docs](https://readthedocs.org/projects/btkdocumentation/). The following items lists the different version of the documentation available for the releases of BTKCore
- - BTKCore 1.0 [![Documentation Status](https://readthedocs.org/projects/btkdocumentation/badge/?version=release-1.0)](https://readthedocs.org/projects/btkdocumentation/?badge=latest)
- - BTKCore (development version) [![Documentation Status](https://readthedocs.org/projects/btkdocumentation/badge/?version=latest)](https://readthedocs.org/projects/btkdocumentation/?badge=latest)
+
+ Version     | Documentation link | Note
+ --- | --- | ---
+ Release-1.0 | [![Documentation Status](https://readthedocs.org/projects/btkdocumentation/badge/?version=release-1.0)](https://readthedocs.org/projects/btkdocumentation/?badge=latest) | Not yet released!
+ Development | [![Documentation Status](https://readthedocs.org/projects/btkdocumentation/badge/?version=latest)](https://readthedocs.org/projects/btkdocumentation/?badge=latest)
 
 ##Technologies##
 
@@ -34,21 +37,20 @@ In order to ensure the development and its quality over supported operating syst
 
 This part compiles the code on different operating systems in release mode and verify that all units tests passed. The unit tests are implemented using a modified version of [CxxTest](http://cxxtest.com) embedded into the source of BTKCore.
 
-####MacOS X [![Build Status](https://travis-ci.org/Biomechanical-ToolKit/BTKCore.svg?branch=wip-new-api)](https://travis-ci.org/Biomechanical-ToolKit/BTKCore)####
- - Compiler(s): Clang (XCode 6.1) / GCC (4.8.3)
- - Processor architecture(s): x86_64
- - Libraries build mode(s): Static / Shared
+ - **MacOS X [![Build Status](https://travis-ci.org/Biomechanical-ToolKit/BTKCore.svg?branch=wip-new-api)](https://travis-ci.org/Biomechanical-ToolKit/BTKCore)**
+  - Compiler(s): Clang (XCode 6.1) / GCC (4.8.3)
+  - Processor architecture(s): x86_64
+  - Libraries build mode(s): Static / Shared
 
-####Linux [![Build Status](https://drone.io/github.com/Biomechanical-ToolKit/BTKCore/status.png)](https://drone.io/github.com/Biomechanical-ToolKit/BTKCore/latest)####
- - Compiler(s): GCC (4.8.1)
- - Processor architecture(s): x86_64
- - Libraries build mode(s): Shared
+ - **Linux [![Build Status](https://drone.io/github.com/Biomechanical-ToolKit/BTKCore/status.png)](https://drone.io/github.com/Biomechanical-ToolKit/BTKCore/latest)**
+  - Compiler(s): GCC (4.8.1)
+  - Processor architecture(s): x86_64
+  - Libraries build mode(s): Shared
 
-####Microsoft Windows [![Build status](https://ci.appveyor.com/api/projects/status/lu8x5pri28fcje3c?svg=true)](https://ci.appveyor.com/project/Alzathar/btkcore)
-####
- - Compiler(s): MSVC 2013 Update 4
- - Processor architecture(s): x86 / x86_64
- - Libraries build mode(s): Shared
+ - **Microsoft Windows [![Build status](https://ci.appveyor.com/api/projects/status/lu8x5pri28fcje3c?svg=true)](https://ci.appveyor.com/project/Alzathar/btkcore)**
+  - Compiler(s): MSVC 2013 Update 4
+  - Processor architecture(s): x86 / x86_64
+  - Libraries build mode(s): Shared
 
 ###Static code analysis <a href="https://scan.coverity.com/projects/5271"><img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/5271/badge.svg"/></a>###
 
