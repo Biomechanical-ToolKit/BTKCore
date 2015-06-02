@@ -98,7 +98,7 @@ INCLUDE(${BTK_CMAKE_MODULE_PATH}/CoverityCustomTarget.cmake)
 # Custom target for Coveralls integrated with Travis-ci
 INCLUDE(${BTK_CMAKE_MODULE_PATH}/CoverallsCustomTarget.cmake)
 
-# BTK build configuration options.
+# BTK build configuration option.
 OPTION(BUILD_SHARED_LIBS "Build BTK with shared libraries." OFF)
 SET(BTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 IF(WIN32)
@@ -107,6 +107,12 @@ IF(WIN32)
    ELSE(BUILD_SHARED_LIBS)
      SET(BTK_LIBS_BUILD_TYPE "STATIC")
    ENDIF(BUILD_SHARED_LIBS)
+ENDIF()
+
+# BTK build API documentation option
+OPTION(BUILD_DOCUMENTATION_API "Build API Documentation with Doxygen." OFF)
+IF(BUILD_DOCUMENTATION_API)
+  ADD_SUBDIRECTORY(Utilities/Doxygen)
 ENDIF()
 
 # Configure files with settings for use by the build.
