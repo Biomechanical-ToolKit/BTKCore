@@ -1,400 +1,260 @@
+# NOTE: The original idea came from Joakim Söderberg [1]. This version is a 
+# refactoring of the code with several improvements:
+# - Directory inclusion (i.e. No more need to list the files to coverage).
+# - File/pattern exclusion
+# - Merging of GCDA file results (very important when the files to cover are 
+#   used in different libraries/binaries)
 #
-# The MIT License (MIT)
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-#
-# Copyright (C) 2014 Joakim Söderberg <joakim.soderberg@gmail.com>
+# [1]see https://github.com/JoakimSoderberg/coveralls-cmake)
 #
 # This is intended to be run by a custom target in a CMake project like this.
 # 0. Compile program with coverage support.
 # 1. Clear coverage data. (Recursively delete *.gcda in build dir)
 # 2. Run the unit tests.
-# 3. Run this script specifying which source files the coverage should be performed on.
+# 3. Run this script specifying the source folder and optionnaly some files
+#   or patterns to exclude.
 #
 # This script will then use gcov to generate .gcov files in the directory specified
 # via the COV_PATH var. This should probably be the same as your cmake build dir.
-#
 # It then parses the .gcov files to convert them into the Coveralls JSON format:
 # https://coveralls.io/docs/api
 #
-# Example for running as standalone CMake script from the command line:
-# (Note it is important the -P is at the end...)
-# $ cmake -DCOV_PATH=$(pwd) 
-#         -DCOVERAGE_SRCS="catcierge_rfid.c;catcierge_timer.c" 
-#         -P ../cmake/CoverallsGcovUpload.cmake
+# WARNING: This script is intentionnaly limited to be used with Travis-CI.
 #
-
-
-# ================================ MODIFICATION ============================= #
-#
-#  - 2015/05/29 - Arnaud Barré
-#    * The CMake variable 'COVERAGE_SRCS' was replaced by 'COVERAGE_SRCS_PATH'
-#      It is no more necessary to give all the files to cover. Instead a path
-#      is given and all the files with one of the following extensions '.h',
-#      '.hh', '.hpp', '.hxx', '.c', '.cc', '.cpp', '.cxx', '.tpp', '.txx' will
-#      be retrieved and covered.
-#    * All the logs 'MESSAGE(...)' were commented to not spam Travis-CI
-#    * The finding of Git was muted
-#    * gcov was muted to not spam Travis-CI
-#
-#  - 2015/05/30 - Arnaud Barré
-#    * The Git part (detection, extraction, display) was removed as Coveralls
-#      retrieved these information directly from Travis-CI. It is then no more
-#      necessary to finish this part (see TODOs of the original author)
-#
-#  - 2015/06/01 - Arnaud Barré
-#    * Code cleanup to remove the parts related to the parsing of source file
-#      All the code using the variable GCOV_FILE_SOURCE is not necessary.
-#
-# =========================================================================== #
-
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+# Example for running this script as a custom target in your project:
+# SET(COVERALLS_FILE "${PROJECT_BINARY_DIR}/coveralls.json")
+# ADD_CUSTOM_TARGET(coveralls
+#   # Generate the output
+#   COMMAND ${CMAKE_COMMAND}
+#     -DCOVERAGE_SRCS_PATH="${PROJECT_SOURCE_DIR}/Code"
+#     -DCOVERAGE_SRCS_EXCLUDED=""
+#     -DCOVERALLS_OUTPUT_FILE="${COVERALLS_FILE}"
+#     -DCOV_PATH="${PROJECT_BINARY_DIR}"
+#     -DPROJECT_ROOT="${PROJECT_SOURCE_DIR}"
+#     -P "${CMAKE_MODULE_PATH}/CoverallsGenerateGcov.cmake"
+#   # Upload the result
+#   COMMAND curl -S -F json_file=@${COVERALLS_FILE} https://coveralls.io/api/v1/jobs && echo
+#   COMMENT "Generating and uploading coveralls output...")
 
 #
 # Make sure we have the needed arguments.
 #
-if (NOT COVERALLS_OUTPUT_FILE)
-	message(FATAL_ERROR "Coveralls: No coveralls output file specified. Please set COVERALLS_OUTPUT_FILE")
-endif()
+IF(NOT COVERALLS_OUTPUT_FILE)
+  message(FATAL_ERROR "Coveralls: No coveralls output file specified. Please set COVERALLS_OUTPUT_FILE")
+ENDIF()
 
-if (NOT COV_PATH)
-	message(FATAL_ERROR "Coveralls: Missing coverage directory path where gcov files will be generated. Please set COV_PATH")
-endif()
+IF(NOT COV_PATH)
+  message(FATAL_ERROR "Coveralls: Missing coverage directory path where gcov files will be generated. Please set COV_PATH")
+ENDIF()
 
-if (NOT COVERAGE_SRCS_PATH)
-	message(FATAL_ERROR "Coveralls: Missing the path of source files that we should get the coverage data for COVERAGE_SRCS_PATH")
-endif()
+IF(NOT COVERAGE_SRCS_PATH)
+  message(FATAL_ERROR "Coveralls: Missing the path of source files that we should get the coverage data for COVERAGE_SRCS_PATH")
+ENDIF()
 
 if (NOT PROJECT_ROOT)
-	message(FATAL_ERROR "Coveralls: Missing PROJECT_ROOT.")
+  message(FATAL_ERROR "Coveralls: Missing PROJECT_ROOT.")
 endif()
-
-SET(COVERAGE_SRCS, "")
-FOREACH(_EXT h hh hpp hxx c cc cpp cxx tpp txx)
-  FILE(GLOB_RECURSE _COVERAGE_SRCS "${COVERAGE_SRCS_PATH}/*.${_EXT}")
-  LIST(APPEND COVERAGE_SRCS ${_COVERAGE_SRCS})
-ENDFOREACH()
 
 find_program(GCOV_EXECUTABLE gcov)
 
-if (NOT GCOV_EXECUTABLE)
+IF(NOT GCOV_EXECUTABLE)
     message(FATAL_ERROR "gcov not found! Aborting...")
-endif()
+ENDIF()
 
 ############################# Macros #########################################
 
 #
 # This macro converts from the full path format gcov outputs:
 #
-#    /path/to/project/root/build/#path#to#project#root#subdir#the_file.c.gcov
+#    /path/to/project/root/build/#path#to#gcda###path#to#project#root#subdir#the_file.c.gcov
 #
 # to the original source file path the .gcov is for:
 #
 #   /path/to/project/root/subdir/the_file.c
 #
-macro(get_source_path_from_gcov_filename _SRC_FILENAME _GCOV_FILENAME)
+MACRO(GET_SOURCE_PATH_FROM_GCOV_FILENAME _SRC_FILENAME _GCOV_FILENAME)
 
-	# /path/to/project/root/build/#path#to#project#root#subdir#the_file.c.gcov 
-	# -> 
-	# #path#to#project#root#subdir#the_file.c.gcov   
-	get_filename_component(_GCOV_FILENAME_WEXT ${_GCOV_FILENAME} NAME)
+  # /path/to/project/root/build/#path#to#project#root#subdir#the_file.c.gcov 
+  # -> 
+  # #path#to#project#root#subdir#the_file.c.gcov   
+  GET_FILENAME_COMPONENT(_GCOV_FILENAME_WEXT ${_GCOV_FILENAME} NAME)
 
-	# #path#to#project#root#subdir#the_file.c.gcov -> /path/to/project/root/subdir/the_file.c
-	string(REGEX REPLACE "\\.gcov$" "" SRC_FILENAME_TMP ${_GCOV_FILENAME_WEXT})
-	string(REGEX REPLACE "\#" "/" SRC_FILENAME_TMP ${SRC_FILENAME_TMP})
-	set(${_SRC_FILENAME} "${SRC_FILENAME_TMP}")
-endmacro()
+  # #path#to#project#root#subdir#the_file.c.gcov -> /path/to/project/root/subdir/the_file.c
+  STRING(REGEX REPLACE "\\.gcov$" "" SRC_FILENAME_TMP ${_GCOV_FILENAME_WEXT})
+  STRING(REGEX REPLACE ".*\#\#\#" "/" SRC_FILENAME_TMP ${SRC_FILENAME_TMP})
+  STRING(REGEX REPLACE "\#" "/" SRC_FILENAME_TMP ${SRC_FILENAME_TMP})
+  SET(${_SRC_FILENAME} "${SRC_FILENAME_TMP}")
+ENDMACRO()
 
 ##############################################################################
 
-# Get the coverage data.
-file(GLOB_RECURSE GCDA_FILES "${COV_PATH}/*.gcda")
+SET(JSON_SERVICE_NAME "travis-ci")
+SET(JSON_SERVICE_JOB_ID $ENV{TRAVIS_JOB_ID})
 
+# Reset the output file
+FILE(WRITE "${COVERALLS_OUTPUT_FILE}"
+"{
+  \"service_name\": \"${JSON_SERVICE_NAME}\",
+  \"service_job_id\": \"${JSON_SERVICE_JOB_ID}\",
+  \"source_files\": ["
+)
+
+# Get the files to cover
+FOREACH(_EXT h hh hpp hxx c cc cpp cxx tpp txx)
+  FILE(GLOB_RECURSE _COVERAGE_SRCS RELATIVE "${COVERAGE_SRCS_PATH}" "${COVERAGE_SRCS_PATH}/*.${_EXT}")
+  LIST(APPEND COVERAGE_SRCS ${_COVERAGE_SRCS})
+ENDFOREACH()
+LIST(SORT COVERAGE_SRCS)
+
+# Transform the optional string arguement COVERAGE_SRCS_EXCLUDED into a list
+string(REGEX REPLACE "\\::" ";" COVERAGE_SRCS_EXCLUDED "${COVERAGE_SRCS_EXCLUDED}")
+
+# Get the coverage data.
+FILE(GLOB_RECURSE GCDA_FILES RELATIVE "${COV_PATH}" "${COV_PATH}/*.gcda")
 # Get a list of all the object directories needed by gcov
 # (The directories the .gcda files and .o files are found in)
 # and run gcov on those.
-foreach(GCDA ${GCDA_FILES})
-	get_filename_component(GCDA_DIR ${GCDA} PATH)
-
-	#
-	# The -p below refers to "Preserve path components",
-	# This means that the generated gcov filename of a source file will
-	# keep the original files entire filepath, but / is replaced with #.
-	# Example:
-	#
-	# /path/to/project/root/build/CMakeFiles/the_file.dir/subdir/the_file.c.gcda
-	# ------------------------------------------------------------------------------
-	# File '/path/to/project/root/subdir/the_file.c'
-	# Lines executed:68.34% of 199
-	# /path/to/project/root/subdir/the_file.c:creating '#path#to#project#root#subdir#the_file.c.gcov'
-	#
-	# If -p is not specified then the file is named only "the_file.c.gcov"
-	#
-	execute_process(
-		COMMAND ${GCOV_EXECUTABLE} -p -o ${GCDA_DIR} ${GCDA}
-		WORKING_DIRECTORY ${COV_PATH}
+file(MAKE_DIRECTORY ${COV_PATH}/_temp_gcov)
+FOREACH(GCDA ${GCDA_FILES})
+  GET_FILENAME_COMPONENT(GCDA_DIR ${GCDA} PATH)
+  EXECUTE_PROCESS(
+    COMMAND ${GCOV_EXECUTABLE} -pl -o "${COV_PATH}/${GCDA_DIR}" "${COV_PATH}/${GCDA}"
+    WORKING_DIRECTORY ${COV_PATH}/_temp_gcov
     OUTPUT_QUIET
-	)
-endforeach()
-
-# TODO: Make these be absolute path
-file(GLOB ALL_GCOV_FILES ${COV_PATH}/*.gcov)
-
-# Get only the filenames to use for filtering.
-#set(COVERAGE_SRCS_NAMES "")
-#foreach (COVSRC ${COVERAGE_SRCS})
-#	get_filename_component(COVSRC_NAME ${COVSRC} NAME)
-#	message("${COVSRC} -> ${COVSRC_NAME}")
-#	list(APPEND COVERAGE_SRCS_NAMES "${COVSRC_NAME}")
-#endforeach()
-
-#
-# Filter out all but the gcov files we want.
-#
-# We do this by comparing the list of COVERAGE_SRCS filepaths that the
-# user wants the coverage data for with the paths of the generated .gcov files,
-# so that we only keep the relevant gcov files.
-#
-# Example:
-# COVERAGE_SRCS =
-#				/path/to/project/root/subdir/the_file.c
-#
-# ALL_GCOV_FILES =
-#				/path/to/project/root/build/#path#to#project#root#subdir#the_file.c.gcov
-#				/path/to/project/root/build/#path#to#project#root#subdir#other_file.c.gcov
-# 
-# Result should be:
-# GCOV_FILES = 
-#				/path/to/project/root/build/#path#to#project#root#subdir#the_file.c.gcov
-#
-set(GCOV_FILES "")
-
-set(COVERAGE_SRCS_REMAINING ${COVERAGE_SRCS})
-
-# Generate the excluded file
-
-string(REGEX REPLACE "\\::" ";" COVERAGE_SRCS_EXCLUDED "${COVERAGE_SRCS_EXCLUDED}")
-SET(EXCLUDED_SRCS, "")
-FOREACH(_PATTERN ${COVERAGE_SRCS_EXCLUDED})
-  FILE(GLOB_RECURSE _EXCLUDED_SRCS "${COVERAGE_SRCS_PATH}/${_PATTERN}")
-  LIST(APPEND EXCLUDED_SRCS ${_EXCLUDED_SRCS})
+  )
 ENDFOREACH()
 
-foreach (GCOV_FILE ${ALL_GCOV_FILES})
+# Filter out the .gcov files not in the source path
+FILE(GLOB _GCOV_FILES RELATIVE "${COV_PATH}/_temp_gcov" "${COV_PATH}/_temp_gcov/*.gcov")
+SET(INC 0)
+FOREACH(_GCOV_FILE ${_GCOV_FILES})
+  GET_SOURCE_PATH_FROM_GCOV_FILENAME(_GCOV_SRC_FILE ${_GCOV_FILE})
+  STRING(FIND "${_GCOV_SRC_FILE}" "${COVERAGE_SRCS_PATH}" FOUND)
+  IF(NOT FOUND EQUAL -1)
+    FILE(RELATIVE_PATH _GCOV_SRC_REL_VAR "${COVERAGE_SRCS_PATH}" "${_GCOV_SRC_FILE}")
+    STRING(REGEX REPLACE "/" "_" _GCOV_SRC_REL_VAR ${_GCOV_SRC_REL_VAR})
+    STRING(REGEX REPLACE "\\." "_" _GCOV_SRC_REL_VAR ${_GCOV_SRC_REL_VAR})
+    LIST(APPEND "${_GCOV_SRC_REL_VAR}" ${INC})
+  ENDIF()
+  MATH(EXPR INC "${INC}+1")
+ENDFOREACH()
 
-	#
-	# /path/to/project/root/build/#path#to#project#root#subdir#the_file.c.gcov 
-	# -> 
-	# /path/to/project/root/subdir/the_file.c 
-	get_source_path_from_gcov_filename(GCOV_SRC_PATH ${GCOV_FILE})
+LIST(LENGTH COVERAGE_SRCS COVERAGE_SRCS_LENGTH)
+SET(INC 0)
+FOREACH(_COVERAGE_SRC ${COVERAGE_SRCS})
+  MATH(EXPR INC "${INC}+1")
+  # Check if the file is not excluded from the coverage
+  LIST(FIND COVERAGE_SRCS_EXCLUDED "${_COVERAGE_SRC}" FOUND)
+  IF(NOT FOUND EQUAL -1)
+    MESSAGE(STATUS "EXCLUDED: ${_COVERAGE_SRC}")
+  ELSE()
+    FILE(RELATIVE_PATH GCOV_SRC_REL_PATH "${PROJECT_ROOT}" "${COVERAGE_SRCS_PATH}/${_COVERAGE_SRC}")
+    FILE(MD5 "${COVERAGE_SRCS_PATH}/${_COVERAGE_SRC}" GCOV_CONTENTS_MD5)
+    # Check if the file is covered or not
+    SET(_GCOV_SRC_REL_VAR "${_COVERAGE_SRC}")
+    STRING(REGEX REPLACE "/" "_" _GCOV_SRC_REL_VAR ${_GCOV_SRC_REL_VAR})
+    STRING(REGEX REPLACE "\\." "_" _GCOV_SRC_REL_VAR ${_GCOV_SRC_REL_VAR})
+    IF(DEFINED ${_GCOV_SRC_REL_VAR})
+      MESSAGE(STATUS "COVERED: ${_COVERAGE_SRC}")
+      SET(GCOV_FILE_COVERAGE "[")
+      # The file is covered but might be used by different GCDA files. We need to merge their results together
+      LIST(GET _GCOV_FILES ${${_GCOV_SRC_REL_VAR}} _SRC_GCOV_FILES)
+      # Reset the total number of calls by line
+      SET(INC_LINE 1)
+      FILE(STRINGS "${COVERAGE_SRCS_PATH}/${_COVERAGE_SRC}" SRC_LINES)
+      FOREACH(_SRC_LINE ${SRC_LINES})
+        UNSET(_GCOV_LINE_CALL_${INC_LINE})
+        MATH(EXPR INC_LINE "${INC_LINE}+1")
+      ENDFOREACH()
+      FOREACH(_SRC_GCOV_FILE ${_SRC_GCOV_FILES})
+        FILE(STRINGS "${COV_PATH}/_temp_gcov/${_SRC_GCOV_FILE}" GCOV_LINES)
+        SET(GCOV_LINE_COUNT 1) # Line number for the .gcov.
+        SET(DO_SKIP 0)
+        FOREACH(GCOV_LINE ${GCOV_LINES})
+          # Example of what we're parsing:
+          # Hitcount  |Line | Source
+          # "        8:   26:        IF(!allowed || (strlen(allowed) == 0))"
+          STRING(REGEX REPLACE
+            "^([^:]*):([^:]*):(.*)$"
+            "\\1;\\2;\\3"
+            RES
+            "${GCOV_LINE}")
+          # Check if we should exclude lines using the Lcov syntax.
+          STRING(REGEX MATCH "LCOV_EXCL_START" START_SKIP "${GCOV_LINE}")
+          STRING(REGEX MATCH "LCOV_EXCL_END" END_SKIP "${GCOV_LINE}")
+          STRING(REGEX MATCH "LCOV_EXCL_LINE" LINE_SKIP "${GCOV_LINE}")
 
-	# Is this in the list of source files?
-	# TODO: We want to match against relative path filenames from the source file root...
-	list(FIND COVERAGE_SRCS ${GCOV_SRC_PATH} WAS_FOUND)
-  list(FIND EXCLUDED_SRCS ${GCOV_SRC_PATH} WAS_FOUND_EXCLUDED)
+          SET(RESET_SKIP 0)
+          IF(LINE_SKIP AND NOT DO_SKIP)
+            SET(DO_SKIP 1)
+            SET(RESET_SKIP 1)
+          ENDIF()
+          IF(START_SKIP)
+            SET(DO_SKIP 1)
+          ENDIF()
+          IF(END_SKIP)
+            SET(DO_SKIP 0)
+          ENDIF()
+          
+          LIST(LENGTH RES RES_COUNT)
+          LIST(LENGTH RES RES_COUNT)
+          IF(RES_COUNT GREATER 2)
+            LIST(GET RES 0 HITCOUNT)
+            LIST(GET RES 1 LINE)
+            LIST(GET RES 2 SOURCE)
+            STRING(STRIP ${HITCOUNT} HITCOUNT)
+            STRING(STRIP ${LINE} LINE)
+            # Lines with 0 line numbers are metadata and can be ignored.
+            IF( (NOT ${LINE} EQUAL 0) AND (NOT DO_SKIP) AND (NOT ${HITCOUNT} STREQUAL "-") )
+              # Translate the hitcount.
+              IF (NOT DEFINED _GCOV_LINE_CALL_${LINE})
+                SET(_GCOV_LINE_CALL_${LINE} 0)
+              ENDIF()
+              IF(${HITCOUNT} STREQUAL "#####")
+                MATH(EXPR _GCOV_LINE_CALL_${LINE} "${_GCOV_LINE_CALL_${LINE}}+0")
+              ELSE()
+                MATH(EXPR _GCOV_LINE_CALL_${LINE} "${_GCOV_LINE_CALL_${LINE}}+${HITCOUNT}")
+              ENDIF()
+            ENDIF()
+          ELSE()
+            MESSAGE(WARNING "Failed to properly parse line (RES_COUNT = ${RES_COUNT}) ${GCOV_FILE}:${GCOV_LINE_COUNT}\n-->${GCOV_LINE}")
+          ENDIF()
 
-	if (NOT WAS_FOUND EQUAL -1)
-    if (WAS_FOUND_EXCLUDED EQUAL -1)
-      list(APPEND GCOV_FILES ${GCOV_FILE})
-    endif()
-
-		# We remove it from the list, so we don't bother searching for it again.
-		# Also files left in COVERAGE_SRCS_REMAINING after this loop ends should
-		# have coverage data generated from them (no lines are covered).
-		list(REMOVE_ITEM COVERAGE_SRCS_REMAINING ${GCOV_SRC_PATH})
-	endif()
-endforeach()
-
-SET(_COVERAGE_SRCS_REMAINING ${COVERAGE_SRCS_REMAINING})
-FOREACH(_REMAINING_SRC ${_COVERAGE_SRCS_REMAINING})
-  list(FIND EXCLUDED_SRCS ${_REMAINING_SRC} WAS_FOUND_EXCLUDED)
-  IF(NOT WAS_FOUND_EXCLUDED EQUAL -1)
-    list(REMOVE_ITEM COVERAGE_SRCS_REMAINING ${_REMAINING_SRC})
+          IF(RESET_SKIP)
+            SET(DO_SKIP 0)
+          ENDIF()
+          MATH(EXPR GCOV_LINE_COUNT "${GCOV_LINE_COUNT}+1")
+        ENDFOREACH()
+      ENDFOREACH()
+      # Generate the content of the variable GCOV_FILE_COVERAGE
+      SET(INC_LINE 1)
+      FOREACH(_SRC_LINE ${SRC_LINES})
+        IF (NOT DEFINED _GCOV_LINE_CALL_${INC_LINE})
+          SET(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}null, ")
+        ELSE()
+          SET(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}${_GCOV_LINE_CALL_${INC_LINE}}, ")
+        ENDIF()
+        MATH(EXPR INC_LINE "${INC_LINE}+1")
+      ENDFOREACH()
+    ELSE()
+      MESSAGE(STATUS "NOT COVERED: ${_COVERAGE_SRC}")
+      # The file is not covered and all these lines are set to 0 (no call)
+      FILE(STRINGS "${COVERAGE_SRCS_PATH}/${_COVERAGE_SRC}" SRC_LINES)
+      SET(GCOV_FILE_COVERAGE "[")
+      FOREACH(SOURCE ${SRC_LINES})
+        SET(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}0, ")
+      ENDFOREACH()
+    ENDIF()
+    STRING(REGEX REPLACE ",[ ]*$" "]" GCOV_FILE_COVERAGE ${GCOV_FILE_COVERAGE})
+    FILE(APPEND "${COVERALLS_OUTPUT_FILE}"
+      "{\n      \"name\": \"${GCOV_SRC_REL_PATH}\",\n"
+         "      \"source_digest\": \"${GCOV_CONTENTS_MD5}\",\n"
+         "      \"coverage\": ${GCOV_FILE_COVERAGE}\n"
+      "  }")
+    IF(INC LESS COVERAGE_SRCS_LENGTH)
+      FILE(APPEND "${COVERALLS_OUTPUT_FILE}" ", ")
+    ENDIF()
   ENDIF()
 ENDFOREACH()
 
-# TODO: Enable setting these
-set(JSON_SERVICE_NAME "travis-ci")
-set(JSON_SERVICE_JOB_ID $ENV{TRAVIS_JOB_ID})
-
-set(JSON_TEMPLATE
-"{
-  \"service_name\": \"\@JSON_SERVICE_NAME\@\",
-  \"service_job_id\": \"\@JSON_SERVICE_JOB_ID\@\",
-  \"source_files\": \@JSON_GCOV_FILES\@
-}"
-)
-
-set(SRC_FILE_TEMPLATE
-"{
-      \"name\": \"\@GCOV_SRC_REL_PATH\@\",
-      \"source_digest\": \"\@GCOV_CONTENTS_MD5\@\",
-      \"coverage\": \@GCOV_FILE_COVERAGE\@
-  }"
-)
-
-set(JSON_GCOV_FILES "[")
-
-# Read the GCOV files line by line and get the coverage data.
-foreach (GCOV_FILE ${GCOV_FILES})
-
-	get_source_path_from_gcov_filename(GCOV_SRC_PATH ${GCOV_FILE})
-	file(RELATIVE_PATH GCOV_SRC_REL_PATH "${PROJECT_ROOT}" "${GCOV_SRC_PATH}")
-
-	# The new coveralls API doesn't need the entire source (Yay!)
-	# However, still keeping that part for now. Will cleanup in the future.
-	file(MD5 "${GCOV_SRC_PATH}" GCOV_CONTENTS_MD5)
-
-	# Loads the gcov file as a list of lines.
-	# (We first open the file and replace all occurences of [] with _
-	#  because CMake will fail to parse a line containing unmatched brackets...
-	#  also the \ to escaped \n in macros screws up things.)
-	# https://public.kitware.com/Bug/view.php?id=15369
-	file(READ ${GCOV_FILE} GCOV_CONTENTS)
-	string(REPLACE "[" "_" GCOV_CONTENTS "${GCOV_CONTENTS}")
-	string(REPLACE "]" "_" GCOV_CONTENTS "${GCOV_CONTENTS}")
-	string(REPLACE "\\" "_" GCOV_CONTENTS "${GCOV_CONTENTS}")
-	file(WRITE ${GCOV_FILE}_tmp "${GCOV_CONTENTS}")
-
-	file(STRINGS ${GCOV_FILE}_tmp GCOV_LINES)
-	list(LENGTH GCOV_LINES LINE_COUNT)
-
-	# We want a json array of coverage data as a single string
-	# start building them from the contents of the .gcov
-	set(GCOV_FILE_COVERAGE "[")
-
-	set(GCOV_LINE_COUNT 1) # Line number for the .gcov.
-	set(DO_SKIP 0)
-	foreach (GCOV_LINE ${GCOV_LINES})
-		# Example of what we're parsing:
-		# Hitcount  |Line | Source
-		# "        8:   26:        if (!allowed || (strlen(allowed) == 0))"
-		string(REGEX REPLACE 
-			"^([^:]*):([^:]*):(.*)$" 
-			"\\1;\\2;\\3"
-			RES
-			"${GCOV_LINE}")
-
-		# Check if we should exclude lines using the Lcov syntax.
-		string(REGEX MATCH "LCOV_EXCL_START" START_SKIP "${GCOV_LINE}")
-		string(REGEX MATCH "LCOV_EXCL_END" END_SKIP "${GCOV_LINE}")
-		string(REGEX MATCH "LCOV_EXCL_LINE" LINE_SKIP "${GCOV_LINE}")
-
-		set(RESET_SKIP 0)
-		if (LINE_SKIP AND NOT DO_SKIP)
-			set(DO_SKIP 1)
-			set(RESET_SKIP 1)
-		endif()
-
-		if (START_SKIP)
-			set(DO_SKIP 1)
-		endif()
-
-		if (END_SKIP)
-			set(DO_SKIP 0)
-		endif()
-
-		list(LENGTH RES RES_COUNT)
-
-		if (RES_COUNT GREATER 2)
-			list(GET RES 0 HITCOUNT)
-			list(GET RES 1 LINE)
-			list(GET RES 2 SOURCE)
-
-			string(STRIP ${HITCOUNT} HITCOUNT)
-			string(STRIP ${LINE} LINE)
-
-			# Lines with 0 line numbers are metadata and can be ignored.
-			if (NOT ${LINE} EQUAL 0)
-				
-				if (DO_SKIP)
-					set(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}null, ")
-				else()
-					# Translate the hitcount into valid JSON values.
-					if (${HITCOUNT} STREQUAL "#####")
-						set(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}0, ")
-					elseif (${HITCOUNT} STREQUAL "-")
-						set(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}null, ")
-					else()
-						set(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}${HITCOUNT}, ")
-					endif()
-				endif()
-			endif()
-		else()
-			message(WARNING "Failed to properly parse line (RES_COUNT = ${RES_COUNT}) ${GCOV_FILE}:${GCOV_LINE_COUNT}\n-->${GCOV_LINE}")
-		endif()
-
-		if (RESET_SKIP)
-			set(DO_SKIP 0)
-		endif()
-		math(EXPR GCOV_LINE_COUNT "${GCOV_LINE_COUNT}+1")
-	endforeach()
-
-
-	# Advanced way of removing the trailing comma in the JSON array.
-	# "[1, 2, 3, " -> "[1, 2, 3"
-	string(REGEX REPLACE ",[ ]*$" "" GCOV_FILE_COVERAGE ${GCOV_FILE_COVERAGE})
-
-	# Append the trailing ] to complete the JSON array.
-	set(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}]")
-
-	# Generate the final JSON for this file.
-	string(CONFIGURE ${SRC_FILE_TEMPLATE} FILE_JSON)
-
-	set(JSON_GCOV_FILES "${JSON_GCOV_FILES}${FILE_JSON}, ")
-  
-  message(STATUS " - COVERED: ${GCOV_SRC_REL_PATH}")
-endforeach()
-
-# Loop through all files we couldn't find any coverage for
-# as well, and generate JSON for those as well with 0% coverage.
-foreach(NOT_COVERED_SRC ${COVERAGE_SRCS_REMAINING})
-
-	file(RELATIVE_PATH GCOV_SRC_REL_PATH "${PROJECT_ROOT}" "${NOT_COVERED_SRC}")
-	file(MD5 "${NOT_COVERED_SRC}" GCOV_CONTENTS_MD5)
-
-	# Loads the source file as a list of lines.
-	file(STRINGS ${NOT_COVERED_SRC} SRC_LINES)
-
-	set(GCOV_FILE_COVERAGE "[")
-
-	foreach (SOURCE ${SRC_LINES})
-		set(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}0, ")
-	endforeach()
-
-	# Remove trailing comma, and complete JSON array with ]
-	string(REGEX REPLACE ",[ ]*$" "" GCOV_FILE_COVERAGE ${GCOV_FILE_COVERAGE})
-	set(GCOV_FILE_COVERAGE "${GCOV_FILE_COVERAGE}]")
-
-	# Generate the final JSON for this file.
-	string(CONFIGURE ${SRC_FILE_TEMPLATE} FILE_JSON)
-	set(JSON_GCOV_FILES "${JSON_GCOV_FILES}${FILE_JSON}, ")
-  
-  message(STATUS " - NOT COVERED: ${GCOV_SRC_REL_PATH}")
-endforeach()
-
-# Get rid of trailing comma.
-string(REGEX REPLACE ",[ ]*$" "" JSON_GCOV_FILES ${JSON_GCOV_FILES})
-set(JSON_GCOV_FILES "${JSON_GCOV_FILES}]")
-
-# Generate the final complete JSON!
-string(CONFIGURE ${JSON_TEMPLATE} JSON)
-
-file(WRITE "${COVERALLS_OUTPUT_FILE}" "${JSON}")
-
+FILE(APPEND "${COVERALLS_OUTPUT_FILE}" "]\n}")
