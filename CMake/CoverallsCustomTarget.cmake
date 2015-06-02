@@ -10,6 +10,7 @@ IF(WITH_COVERALLS_ENABLED)
     # Generate the output
     COMMAND ${CMAKE_COMMAND}
       -DCOVERAGE_SRCS_PATH="${PROJECT_SOURCE_DIR}/Code"
+      -DCOVERAGE_SRCS_EXCLUDED="Base/btkMacros.h::Base/btkNodeid.h::Base/btkOpaque.h::Base/btkTypeTraits.h::IO/btkEndianFormat.h::Model/btkBodyEnums.h"
       -DCOVERALLS_OUTPUT_FILE="${COVERALLS_FILE}"
       -DCOV_PATH="${PROJECT_BINARY_DIR}"
       -DPROJECT_ROOT="${PROJECT_SOURCE_DIR}"

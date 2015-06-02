@@ -187,6 +187,15 @@ set(GCOV_FILES "")
 
 set(COVERAGE_SRCS_REMAINING ${COVERAGE_SRCS})
 
+# Generate the excluded file
+
+string(REGEX REPLACE "\\::" ";" COVERAGE_SRCS_EXCLUDED "${COVERAGE_SRCS_EXCLUDED}")
+SET(EXCLUDED_SRCS, "")
+FOREACH(_PATTERN ${COVERAGE_SRCS_EXCLUDED})
+  FILE(GLOB_RECURSE _EXCLUDED_SRCS "${COVERAGE_SRCS_PATH}/${_PATTERN}")
+  LIST(APPEND EXCLUDED_SRCS ${_EXCLUDED_SRCS})
+ENDFOREACH()
+
 foreach (GCOV_FILE ${ALL_GCOV_FILES})
 
 	#
@@ -198,9 +207,12 @@ foreach (GCOV_FILE ${ALL_GCOV_FILES})
 	# Is this in the list of source files?
 	# TODO: We want to match against relative path filenames from the source file root...
 	list(FIND COVERAGE_SRCS ${GCOV_SRC_PATH} WAS_FOUND)
+  list(FIND EXCLUDED_SRCS ${GCOV_SRC_PATH} WAS_FOUND_EXCLUDED)
 
 	if (NOT WAS_FOUND EQUAL -1)
-		list(APPEND GCOV_FILES ${GCOV_FILE})
+    if (WAS_FOUND_EXCLUDED EQUAL -1)
+      list(APPEND GCOV_FILES ${GCOV_FILE})
+    endif()
 
 		# We remove it from the list, so we don't bother searching for it again.
 		# Also files left in COVERAGE_SRCS_REMAINING after this loop ends should
@@ -208,6 +220,14 @@ foreach (GCOV_FILE ${ALL_GCOV_FILES})
 		list(REMOVE_ITEM COVERAGE_SRCS_REMAINING ${GCOV_SRC_PATH})
 	endif()
 endforeach()
+
+SET(_COVERAGE_SRCS_REMAINING ${COVERAGE_SRCS_REMAINING})
+FOREACH(_REMAINING_SRC ${_COVERAGE_SRCS_REMAINING})
+  list(FIND EXCLUDED_SRCS ${_REMAINING_SRC} WAS_FOUND_EXCLUDED)
+  IF(NOT WAS_FOUND_EXCLUDED EQUAL -1)
+    list(REMOVE_ITEM COVERAGE_SRCS_REMAINING ${_REMAINING_SRC})
+  ENDIF()
+ENDFOREACH()
 
 # TODO: Enable setting these
 set(JSON_SERVICE_NAME "travis-ci")
