@@ -183,8 +183,6 @@ def main():
 
 	# Print report
 	err = report (files)
-	if ns.noerror:
-		return
 
 	# Generate badge
 	if ns.badge:
@@ -203,6 +201,8 @@ def main():
 			color = 'red'
 		urllib.urlretrieve("https://img.shields.io/badge/doxygen-"+str(total_per)+"%25-"+color+".svg", "doxy-coverage.svg")
 
+	if ns.noerror:
+		return
 	sys.exit(err)
 
 
