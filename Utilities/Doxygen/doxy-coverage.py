@@ -39,6 +39,7 @@ __copyright__ = "Copyright (C) 2014 Alvaro Lopez Ortega"
 import os
 import sys
 import argparse
+import urllib
 import xml.etree.ElementTree as ET
 
 # Defaults
@@ -168,6 +169,7 @@ def main():
 	# Arguments
 	parser = argparse.ArgumentParser()
 	parser.add_argument ("dir",         action="store",      help="Path to Doxygen's XML doc directory")
+	parser.add_argument ("--badge",     action="store_true", help="Generate a badge from shields.io")
 	parser.add_argument ("--noerror",   action="store_true", help="Do not return error code after execution")
 	parser.add_argument ("--threshold", action="store",      help="Min acceptable coverage percentage (Default: %s)"%(ACCEPTABLE_COVERAGE), default=ACCEPTABLE_COVERAGE, type=int)
 
@@ -183,6 +185,23 @@ def main():
 	err = report (files)
 	if ns.noerror:
 		return
+
+	# Generate badge
+	if ns.badge:
+		total_per = ns.threshold - err
+		if total_per >= 95:
+			color = "brightgreen"
+		elif total_per >= 80:
+			color = "green"
+		elif total_per >= 65:
+			color = "yellowgreen"
+		elif total_per >= 50:
+			color = "yellow"
+		elif total_per >= 35:
+			color = "orange"
+		else:
+			color = 'red'
+		urllib.urlretrieve("https://img.shields.io/badge/doxygen-"+str(total_per)+"%25-"+color+".svg", "doxy-coverage.svg")
 
 	sys.exit(err)
 
