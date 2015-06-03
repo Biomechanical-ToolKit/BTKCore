@@ -9,7 +9,7 @@ IF(BUILD_DOCUMENTATION_API)
     
   ADD_CUSTOM_TARGET(doxygen ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/Documentation/API 
-    COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Utilities/Doxygen/Doxyfile_API >> doxy-coverage.detail.txt 2>&1 
+    COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Utilities/Doxygen/Doxyfile_API > doxy-coverage.detail.txt 2>&1 
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
     COMMENT "Generate Doxygen documentation..."
     )
