@@ -123,7 +123,10 @@ namespace btk
       if (optr->ErrorCode == Error::None) // In case the handler does not use exception but only error code/message.
       {
         for (auto& child: temp.children())
-          output->appendChild(child);
+        {
+          if (child != nullptr)
+            child->appendParent(output);
+        }
       }
     }
     catch (IODevice::Failure& )

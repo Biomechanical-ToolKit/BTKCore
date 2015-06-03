@@ -78,8 +78,10 @@ namespace btk
   Joint::Joint(const std::string& name, Segment* proximal, Segment* distal, Node* parent)
   : Node(*new JointPrivate(this,name,proximal,distal), parent)
   {
-    this->appendChild(proximal);
-    this->appendChild(distal);
+    if (proximal != nullptr)
+      proximal->appendParent(this);
+    if (distal != nullptr)
+      distal->appendParent(this);
   };
   
   Joint::~Joint() _BTK_NOEXCEPT = default;

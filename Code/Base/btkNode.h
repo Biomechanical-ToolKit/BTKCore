@@ -80,8 +80,6 @@ namespace btk
     
     const std::list<Node*>& children() const _BTK_NOEXCEPT;
     bool hasChildren() const _BTK_NOEXCEPT;
-    void appendChild(Node* node) _BTK_NOEXCEPT;
-    void removeChild(Node* node) _BTK_NOEXCEPT;
     
     const std::list<Node*>& parents() const _BTK_NOEXCEPT;
     bool hasParents() const _BTK_NOEXCEPT;

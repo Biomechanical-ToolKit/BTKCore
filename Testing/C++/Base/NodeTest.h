@@ -43,6 +43,13 @@ CXXTEST_SUITE(NodeTest)
     TS_ASSERT_DIFFERS(node.timestamp(),ts);
     TS_ASSERT_EQUALS(node.name(),"foo");
     TS_ASSERT_EQUALS(node.property("name").cast<std::string>(),"foo");
+    ts = node.timestamp();
+    node.setProperty("name","foo");
+    TS_ASSERT_EQUALS(node.timestamp(),ts);
+    node.setName("foo");
+    TS_ASSERT_EQUALS(node.timestamp(),ts);
+    TS_ASSERT_EQUALS(node.name(),"foo");
+    TS_ASSERT_EQUALS(node.property("name").cast<std::string>(),"foo");
     
     ts = node.timestamp();
     TS_ASSERT_EQUALS(node.description(),"");
@@ -206,15 +213,32 @@ CXXTEST_SUITE(NodeTest)
     TS_ASSERT_EQUALS(all.size(), 10u);
   }
   
-  CXXTEST_TEST(NullParentAndChild)
+  CXXTEST_TEST(AppendParent)
   {
     TestNode root("root");
-    TS_ASSERT_EQUALS(root.hasChildren(),false);
+    TestNode leafA("leafA");
+    TS_ASSERT_EQUALS(leafA.hasChildren(),false);
+    TS_ASSERT_EQUALS(leafA.hasParents(),false);
+    leafA.appendParent(nullptr);
+    TS_ASSERT_EQUALS(leafA.hasParents(),false);
+    TS_ASSERT_EQUALS(leafA.hasChildren(),false);
+    leafA.appendParent(&root);
+    TS_ASSERT_EQUALS(leafA.hasParents(),true);
+    TS_ASSERT_EQUALS(leafA.hasChildren(),false);
     TS_ASSERT_EQUALS(root.hasParents(),false);
-    root.appendChild(nullptr);
+    TS_ASSERT_EQUALS(root.hasChildren(),true);
+  }
+  
+  CXXTEST_TEST(RemoveParent)
+  {
+    TestNode root("root");
+    TestNode leafA("leafA",&root);
+    TS_ASSERT_EQUALS(leafA.hasParents(),true);
+    leafA.removeParent(nullptr);
+    TS_ASSERT_EQUALS(leafA.hasParents(),true);
+    leafA.removeParent(&root);
+    TS_ASSERT_EQUALS(leafA.hasParents(),false);
     TS_ASSERT_EQUALS(root.hasChildren(),false);
-    root.appendParent(nullptr);
-    TS_ASSERT_EQUALS(root.hasParents(),false);
   }
   
   CXXTEST_TEST(Clone)
@@ -335,7 +359,8 @@ CXXTEST_TEST_REGISTRATION(NodeTest, DynamicProperty)
 CXXTEST_TEST_REGISTRATION(NodeTest, InheritingClassWithStaticProperty)
 CXXTEST_TEST_REGISTRATION(NodeTest, ChildrenStack)
 CXXTEST_TEST_REGISTRATION(NodeTest, ChildrenHeap)
-CXXTEST_TEST_REGISTRATION(NodeTest, NullParentAndChild)
+CXXTEST_TEST_REGISTRATION(NodeTest, AppendParent)
+CXXTEST_TEST_REGISTRATION(NodeTest, RemoveParent)
 CXXTEST_TEST_REGISTRATION(NodeTest, Clone)
 CXXTEST_TEST_REGISTRATION(NodeTest, CloneWithChildren)
 CXXTEST_TEST_REGISTRATION(NodeTest, CloneWithRoot)

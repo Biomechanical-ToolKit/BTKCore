@@ -203,7 +203,7 @@ namespace btk
    * The general idea is to store data in a dynamic structure without the need to modify the internal storage each time a new category of data is added (e.g. pressure, GPS, etc.).
    * Thus, it would be simpler to integrate new kind of file formats as well as new models.
    *
-   * Children nodes are owned by their parent. Thus only the first parent(s) (e.g. the root' tree) has to be deleted. 
+   * Children nodes are owned by their parents. Thus only the first parent(s) (e.g. the root' tree) has to be deleted. 
    * This one can be stored in a smart pointer (shared, unique pointer) to not manage its deletion.
    * For example:
    *
@@ -217,8 +217,9 @@ namespace btk
    * delete root; // End of the program/function, the root is deleted and leafA at the same time.
    * @endcode
    *
-   * It is not necessary to create nodes on the heap (using the new operator).
-   * If the nodes are created on the stack (using regular constructor), they must follow a specific order: the parent must be created before the children.
+   * It is strongly adviced to create nodes on the heap (using the new operator). This is important for the child management when some of them might be replaced internally (for example using the method replaceChild()), otherwise your program might crash due to an undefined behaviour.
+   * 
+   * In case you want to use Node objects only as a tree data structure without later modification (e.g. child replacement, child deletion), these ones can be created on the stack (using regular constructor), they must follow a specific order: the parent must be created before the children. 
    * For example:
    *
    * @code
@@ -229,7 +230,7 @@ namespace btk
    * // end of the program/function. Nodes leafB, leafA, and root are destroyed in thid order.
    * @endcode
    *
-   * However, in case this order is not respected, a runtime error (or crash) should occur like in the next example:
+   * In case this order is not respected, a runtime error (or crash) should occur like in the next example:
    *
    * @code
    * btk::Node leafA("leafA");
@@ -394,32 +395,6 @@ namespace btk
   };
   
   /**
-   * Append a node if this one is not already a child.
-   * In case the child is appended, this node is attached as parent and its state is set to modified.
-   */
-  void Node::appendChild(Node* node) _BTK_NOEXCEPT
-  {
-    if (this->pimpl()->attachChild(node))
-    {
-      node->pimpl()->attachParent(this);
-      this->modified();
-    }
-  };
-  
-  /**
-   * Remove the given @a node from the list of the children.
-   * @note It is the responsability to the developer to delete the given node if this one has no more parent.
-   */
-  void Node::removeChild(Node* node) _BTK_NOEXCEPT
-  {
-    if (this->pimpl()->detachChild(node))
-    {
-      node->pimpl()->detachParent(this);
-      this->modified();
-    }
-  };
-  
-  /**
    * Returns the list of parents attached with this node.
    */ 
   const std::list<Node*>& Node::parents() const _BTK_NOEXCEPT
@@ -531,18 +506,22 @@ namespace btk
     this->appendParent(parent);
   };
   
+  /*
+   * Replace the child @a current, by a @a substitute.
+   * The node @a current will be deleted if it has no more parent.
+   */
   void Node::replaceChild(Node* current, Node* substitute)
   {
     if (current == substitute)
       return;
     if (current != nullptr)
     {
-      this->removeChild(current);
+      current->removeParent(this);
       if (!current->hasParents())
         delete current;
     }
-    this->appendChild(substitute);
-    // removeChild() and appendChild() internally call modified(). No need to call it explicitely
+    substitute->appendParent(this);
+    // removeParent() and appendParent() internally call modified(). No need to call it explicitely
   };
   
   /**
