@@ -8,7 +8,7 @@ IF(BUILD_DOCUMENTATION_API)
     ${PROJECT_SOURCE_DIR}/Utilities/Doxygen/Doxyfile_API.in
     ${PROJECT_BINARY_DIR}/Utilities/Doxygen/Doxyfile_API)
     
-  ADD_CUSTOM_TARGET(Doxygen_API ALL
+  ADD_CUSTOM_TARGET(doxygen ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/Documentation/API 
     COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Utilities/Doxygen/Doxyfile_API
     MAIN_DEPENDENCY ${PROJECT_BINARY_DIR}/Utilities/Doxygen/Doxyfile_API
