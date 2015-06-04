@@ -174,11 +174,7 @@ FOREACH(_COVERAGE_SRC ${COVERAGE_SRCS})
           # Example of what we're parsing:
           # Hitcount  |Line | Source
           # "        8:   26:        IF(!allowed || (strlen(allowed) == 0))"
-          STRING(REGEX REPLACE
-            "^([^:]*):([^:]*):(.*)$"
-            "\\1;\\2;\\3"
-            RES
-            "${GCOV_LINE}")
+          STRING(REGEX REPLACE "^([^:]*):([^:]*):.*$" "\\1;\\2" RES "${GCOV_LINE}")
           # Check if we should exclude lines using the Lcov syntax.
           STRING(REGEX MATCH "LCOV_EXCL_START" START_SKIP "${GCOV_LINE}")
           STRING(REGEX MATCH "LCOV_EXCL_END" END_SKIP "${GCOV_LINE}")
@@ -197,11 +193,9 @@ FOREACH(_COVERAGE_SRC ${COVERAGE_SRCS})
           ENDIF()
           
           LIST(LENGTH RES RES_COUNT)
-          LIST(LENGTH RES RES_COUNT)
-          IF(RES_COUNT GREATER 2)
+          IF(RES_COUNT EQUAL 2)
             LIST(GET RES 0 HITCOUNT)
             LIST(GET RES 1 LINE)
-            LIST(GET RES 2 SOURCE)
             STRING(STRIP ${HITCOUNT} HITCOUNT)
             STRING(STRIP ${LINE} LINE)
             # Lines with 0 line numbers are metadata and can be ignored.
