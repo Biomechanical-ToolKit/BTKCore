@@ -1,0 +1,23 @@
+SET(DOXYGEN_SKIP_DOT TRUE)
+FIND_PACKAGE(Doxygen REQUIRED)
+FIND_PACKAGE(PythonInterp QUIET)
+
+IF(BUILD_DOCUMENTATION_API)
+  CONFIGURE_FILE(
+    ${PROJECT_SOURCE_DIR}/Utilities/Doxygen/Doxyfile_API.in
+    ${PROJECT_BINARY_DIR}/Utilities/Doxygen/Doxyfile_API)
+    
+  ADD_CUSTOM_TARGET(doxygen ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/Documentation/API 
+    COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/Utilities/Doxygen/Doxyfile_API > doxy-coverage.detail.txt 2>&1 
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+    COMMENT "Generate Doxygen documentation..."
+    )
+
+  IF(PYTHONINTERP_FOUND)
+    ADD_CUSTOM_COMMAND(TARGET doxygen POST_BUILD
+      COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/Utilities/Doxygen/doxy-coverage.py --badge --noerror ${PROJECT_BINARY_DIR}/Documentation/API/xml > doxy-coverage.resume.txt
+      WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+      )
+  ENDIF()
+ENDIF(BUILD_DOCUMENTATION_API)
