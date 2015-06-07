@@ -24,7 +24,7 @@ SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 IF((CMAKE_SYSTEM_NAME STREQUAL "Darwin") AND (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"))
-  SET(CMAKE_CXX_FLAGS "-stdlib=libc++ -fno-rtti")
+  SET(CMAKE_CXX_FLAGS "-stdlib=libc++")
   # CMake 3.1 complains it does not know how to set the compile flag to enable C++11 with (Apple) Clang
   SET(CMAKE_CXX11_STANDARD_COMPILE_OPTION "-std=c++11")
   SET(CMAKE_CXX11_EXTENSION_COMPILE_OPTION "-std=gnu++11")
@@ -33,12 +33,9 @@ ELSEIF((CMAKE_SYSTEM_NAME STREQUAL "Windows") AND MSVC)
   SET(CMAKE_CXX11_STANDARD_COMPILE_OPTION "")
   SET(CMAKE_CXX11_EXTENSION_COMPILE_OPTION "")
   # CXX Flag details
-  #  - GR-: disable RTTI
   #  - EHsc: enable exception handling for C++ object
   #  - D_SCL_SECURE_NO_WARNINGS: disable function call with unsafe parameters warning
-  SET(CMAKE_CXX_FLAGS "/GR- /EHsc -D_SCL_SECURE_NO_WARNINGS")
-ELSE()
-  SET(CMAKE_CXX_FLAGS "-fno-rtti")
+  SET(CMAKE_CXX_FLAGS "/EHsc -D_SCL_SECURE_NO_WARNINGS")
 ENDIF()
 
 # ------------------------------------------------------------------------
