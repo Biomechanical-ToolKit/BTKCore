@@ -3,7 +3,7 @@
 #  BTK_INCLUDE_DIRS - include directories for BTK
 #  BTK_LIBRARIES    - libraries to link against
 
-"@PACKAGE_INIT@"
+@PACKAGE_INIT@
 
 SET_AND_CHECK(BTK_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
 
