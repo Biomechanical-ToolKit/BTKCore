@@ -133,10 +133,6 @@ SET(BTK_LIBRARY_PROPERTIES
   DEBUG_POSTFIX _debug)
 
 # ------------------------------------------------------------------------
-# INSTALLATION VARIABLES
-# ------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------
 # PROJECT'S SUBDIRECTORIES
 # ------------------------------------------------------------------------
 
@@ -170,38 +166,45 @@ ADD_SUBDIRECTORY(ThirdParties)
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
 EXPORT(PACKAGE BTK)
-SET(BTK_CMAKE_CONFIG_PACKAGE_LOCATION lib/cmake/BTK CACHE STRING "CMake scripts installation path")
-SET(BTK_INCLUDE_INSTALL_DIR include/ CACHE STRING "BTK development headers inclusion path")
 
 # Create the BTKConfig.cmake and BTKConfigVersion.cmake files
-SET(CONF_INCLUDE_DIRS "${BTK_INCLUDE_DIRS_BUILD_TREE}")
-CONFIGURE_PACKAGE_CONFIG_FILE(CMake/BTKConfig.cmake.in "${PROJECT_BINARY_DIR}/BTKConfig.cmake"
-  INSTALL_DESTINATION ${BTK_CMAKE_CONFIG_PACKAGE_LOCATION}
-  PATH_VARS BTK_INCLUDE_INSTALL_DIR)
+
+# Build tree
+# ==========
+
+SET(INCLUDE_INSTALL_DIR "${BTK_SOURCE_DIR}")
+
+CONFIGURE_PACKAGE_CONFIG_FILE("CMake/BTKConfig.cmake.in" "${BTK_BINARY_DIR}/BTKConfig.cmake"
+  INSTALL_DESTINATION ${BTK_BINARY_DIR}
+  PATH_VARS INCLUDE_INSTALL_DIR)
+
 WRITE_BASIC_PACKAGE_VERSION_FILE(
-  "${PROJECT_BINARY_DIR}/BTKConfigVersion.cmake"
+  "${BTK_BINARY_DIR}/BTKConfigVersion.cmake"
   VERSION ${BTK_VERSION}
   COMPATIBILITY SameMajorVersion
 )
+
 EXPORT(EXPORT BTKTargets
-  FILE "${PROJECT_BINARY_DIR}/BTKTargets.cmake"
+  FILE "${BTK_BINARY_DIR}/BTKTargets.cmake"
   NAMESPACE BTK::
 )
 
-INSTALL(EXPORT BTKTargets
-  FILE
-    BTKTargets.cmake
-  NAMESPACE
-    BTK::
-  DESTINATION
-    ${BTK_CMAKE_CONFIG_PACKAGE_LOCATION}
+# Install tree
+# ============
+
+SET(INCLUDE_INSTALL_DIR "${BTK_INSTALL_DIR}/include")
+
+CONFIGURE_PACKAGE_CONFIG_FILE("CMake/BTKConfig.cmake.in" "${BTK_BINARY_DIR}/cmake/BTKConfig.cmake"
+  INSTALL_DESTINATION "${BTK_BINARY_DIR}/cmake"
+  PATH_VARS INCLUDE_INSTALL_DIR)
+
+WRITE_BASIC_PACKAGE_VERSION_FILE(
+  "${BTK_BINARY_DIR}/cmake/BTKConfigVersion.cmake"
+  VERSION ${BTK_VERSION}
+  COMPATIBILITY SameMajorVersion
 )
-INSTALL(
-  FILES
-    "${PROJECT_BINARY_DIR}/BTKConfig.cmake"
-    "${PROJECT_BINARY_DIR}/BTKConfigVersion.cmake"
-  DESTINATION
-    ${BTK_CMAKE_CONFIG_PACKAGE_LOCATION}
-  COMPONENT
-    dev
+
+EXPORT(EXPORT BTKTargets
+  FILE "${BTK_BINARY_DIR}/cmake/BTKTargets.cmake"
+  NAMESPACE BTK::
 )
