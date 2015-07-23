@@ -25,6 +25,15 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(b.cast<double>(),12.5);
   };
   
+  CXXTEST_TEST(Single_Char)
+  {
+    btk::Any c = 'a';
+    TS_ASSERT_EQUALS(c.cast<int>(),97);
+    TS_ASSERT_EQUALS(static_cast<float>(c),97.0f);
+    TS_ASSERT_EQUALS(c.cast<char>(),'a');
+    TS_ASSERT_EQUALS(c.cast<std::string>(),"97"); // Because internally a (signed) char is casted into a (signed) short int before to be converted into a string. This was chosen to priorize int8_t to string conversion.
+  };
+  
   CXXTEST_TEST(Single_Comparison)
   {
     btk::Any a = 12;
@@ -410,12 +419,27 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(m.cast<std::vector<std::string>>(),std::vector<std::string>({"1","4"}));
     TS_ASSERT_EQUALS(m.cast<std::vector<myEnum>>(),std::vector<myEnum>({myEnum::Foo,myEnum::Toto}));
   };
+  
+  CXXTEST_TEST(Array_Char)
+  {
+    std::array<char,4> foo{{'a','b','c','d'}};
+    btk::Any a = foo;
+    TS_ASSERT_EQUALS(a.cast<char>(0),'a');
+    TS_ASSERT_EQUALS(a.cast<char>(1),'b');
+    TS_ASSERT_EQUALS(a.cast<char>(2),'c');
+    TS_ASSERT_EQUALS(a.cast<char>(3),'d');
+    TS_ASSERT_EQUALS(a.cast<std::vector<char>>(),std::vector<char>({'a','b','c','d'}));
+    TS_ASSERT_EQUALS(a.cast<std::vector<int>>(),std::vector<int>({97,98,99,100}));
+    TS_ASSERT_EQUALS(a.cast<std::vector<std::string>>(),std::vector<std::string>({"97","98","99","100"}));
+    
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(AnyTest)
   
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Int)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Float)
+CXXTEST_TEST_REGISTRATION(AnyTest, Single_Char)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Comparison)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Comparison2)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Int8ToString)
@@ -442,5 +466,6 @@ CXXTEST_TEST_REGISTRATION(AnyTest, Array_FromSingle)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_FromSingle_CustomType)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Array)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Enum)
+CXXTEST_TEST_REGISTRATION(AnyTest, Array_Char)
 
 #endif // AnyTest_h

@@ -226,7 +226,7 @@ namespace btk
     struct _Any_adapt {};
     
     template <typename T>
-    struct _Any_adapt<T, typename std::enable_if<!std::is_enum<T>::value && !std::is_same<typename std::remove_extent<T>::type,char>::value>::type>
+    struct _Any_adapt<T, typename std::enable_if<!std::is_enum<T>::value && (!std::is_same<typename std::remove_extent<T>::type,char>::value || std::is_same<T,char>::value)>::type>
     {
       using type = T;
       template <typename U>
