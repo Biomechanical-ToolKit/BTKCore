@@ -179,7 +179,7 @@ namespace btk
   };
   
   /**
-   * @fn virtual bool IODevice::isOpen() = 0
+   * @fn virtual bool IODevice::isOpen() const _BTK_NOEXCEPT = 0
    * Returns true if the device is opened otherwise returns false.
    */
   
@@ -206,10 +206,22 @@ namespace btk
    */
   
   /**
-   * @fn virtual Position IODevice::tell() const = 0
+   * @fn virtual Position IODevice::tell() const _BTK_NOEXCEPT = 0
    * Returns the position of the pointer associated with a random access device. 
    * @note The use of this method with a sequential device would set the flag State::Fail to true.
    */
+  
+  /**
+   * virtual const char* data() const _BTK_NOEXCEPT = 0;
+   * Returns a pointer to the first byte stored in the device (or null if it is not possible to access to the data).
+   * @note The use of this method with a sequential device would set the flag State::Fail to true. At least the output would be null.
+   */
+  
+ /**
+  * virtual Size size() const _BTK_NOEXCEPT = 0;
+  * Returns the size of the stored data (or -1 in case it is not known)
+  * @note The use of this method with a sequential device would set the flag State::Fail to true. At least the output would be equal to -1.
+  */
   
   /**
    * @fn virtual bool IODevice::isSequential() const = 0

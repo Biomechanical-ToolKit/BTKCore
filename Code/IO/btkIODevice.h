@@ -97,6 +97,8 @@ namespace btk
     // Random access IO device only
     virtual void seek(Offset offset, Origin whence) = 0;
     virtual Position tell() const _BTK_NOEXCEPT = 0;
+    virtual const char* data() const _BTK_NOEXCEPT = 0;
+    virtual Size size() const _BTK_NOEXCEPT = 0;
     
     // Sequential IO only
     virtual bool isSequential() const _BTK_NOEXCEPT = 0;
