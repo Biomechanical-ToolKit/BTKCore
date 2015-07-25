@@ -295,7 +295,7 @@ namespace btk
       break;
     // MIPS processor (SGI/MIPS) processor type
     case 3:
-      Logger::warning("C%s - 3D - Wrong processor type. Trying to continue by using the MIPS processor", optr->Device->name());
+      Logger::warning("%s - C3D - Wrong processor type. Trying to continue by using the MIPS processor", optr->Device->name());
     case 86:
       this->setOption<ByteOrderFormat>(EndianFormat::IEEEBigEndian);
       stream.setEndianFormat(EndianFormat::IEEEBigEndian);
@@ -330,7 +330,7 @@ namespace btk
       numberSamplesPerAnalogChannel = stream.readU16(); // (word 10)
       pointSampleRate = stream.readFloat(); // (word 11-12)
       if (pointSampleRate <= 0.0)
-        throw(FormatError("C3D - Incorrect sample rate. This value cannot be negative or null."));
+        throw(FormatError("C3D - Incorrect sample rate. This value cannot be negative or null"));
       optr->Device->seek(270, IODevice::Origin::Current); // word 13-147 => 135 words => 270 bytes 
   // Event in Header section
       const int maxEvents = 18;
@@ -339,9 +339,9 @@ namespace btk
       uint16_t labelRangeFirstBlock = stream.readU16(); // (word 149)
       if (labelRangeSection == headerKeyValue)
       {
-        Logger::warning("%s - C3D - A 'Label and Range Section' was detected but BTK doesn't support it. Please contact the support and report this.", optr->Device->name());
+        Logger::warning("%s - C3D - A 'Label and Range Section' was detected but BTK doesn't support it", optr->Device->name());
         if (labelRangeFirstBlock < 2)
-          Logger::warning("%s - C3D - The 'Label and Range Section' address is incorrect.", optr->Device->name());
+          Logger::warning("%s - C3D - The 'Label and Range Section' address is incorrect", optr->Device->name());
       }
       uint16_t labelEventFormat = stream.readU16(); // (word 150)
       uint16_t eventNumber = stream.readU16();
@@ -483,7 +483,7 @@ namespace btk
         {
           if ((totalBytesRead + offset) > static_cast<unsigned int>(((dataFirstBlock - 2) * 512)))
           {
-            Logger::warning("%s - C3D - The next parameter is pointing in the Data section. Parameters' extraction is stopped.", optr->Device->name());
+            Logger::warning("%s - C3D - The next parameter is pointing in the Data section. Parameters' extraction is stopped", optr->Device->name());
             totalBytesRead = blockNumber * 512; // Force the number of totalBytesRead to not trigger the "Bad data first block" exception.
             break;
           }
@@ -525,7 +525,7 @@ namespace btk
       int totalBlocksRead = static_cast<int>(ceil((double)totalBytesRead / 512.0));
       if (totalBlocksRead != blockNumber)
       {
-        Logger::warning("%s - C3D - The number of blocks to read in the parameter section is different than the number of blocks read. The value kept is the number of blocks read.", optr->Device->name());
+        Logger::warning("%s - C3D - The number of blocks to read in the parameter section is different than the number of blocks read. The value kept is the number of blocks read", optr->Device->name());
         blockNumber = totalBlocksRead;
       }
     // Events in Parameter section
@@ -538,7 +538,7 @@ namespace btk
         std::string eventPrefix = "EVENTS:";
         eventUsed =  trial->property(eventPrefix+"USED");
         if (eventUsed.isValid())
-          Logger::warning("%s - C3D - EVENTS group found instead of EVENT. The EVENTS group is used to extract events.", optr->Device->name());
+          Logger::warning("%s - C3D - EVENTS group found instead of EVENT. The EVENTS group is used to extract events", optr->Device->name());
       }
       if (eventUsed.isValid())
       {
@@ -552,7 +552,7 @@ namespace btk
         C3DHandlerPrivate::mergeProperties<std::string>(&eventsLabel, trial, eventPrefix+"LABELS", eventsNumber, "uname*");
         C3DHandlerPrivate::mergeProperties(&eventsTime, trial, eventPrefix+"TIMES");
         if (eventsTime.size() < static_cast<size_t>(2 * eventsNumber))
-          Logger::warning("%s - C3D - The EVENT:TIMES doesn't contain the appropriate number of values. The extracted times could be corrupted.", optr->Device->name());
+          Logger::warning("%s - C3D - The EVENT:TIMES doesn't contain the appropriate number of values. The extracted times could be corrupted", optr->Device->name());
         eventsTime.resize(2 * eventsNumber, 0.0);
         C3DHandlerPrivate::mergeProperties(&eventsContext, trial, eventPrefix+"CONTEXTS", eventsNumber);
         C3DHandlerPrivate::mergeProperties(&eventsSubject, trial, eventPrefix+"SUBJECTS", eventsNumber);
@@ -584,7 +584,7 @@ namespace btk
         if (start != firstSampleIndex)
         {
           if ((firstSampleIndex != 65535) && hasHeader)
-            Logger::warning("%s - C3D - The first sample index wrote in the header is different than in the parameter TRIAL:ACTUAL_START_FIELD. The value in the parameter is kept.", optr->Device->name());
+            Logger::warning("%s - C3D - The first sample index wrote in the header is different than in the parameter TRIAL:ACTUAL_START_FIELD. The value in the parameter is kept", optr->Device->name());
           firstSampleIndex = start;
         }
       }
@@ -599,7 +599,7 @@ namespace btk
         if (end != lastSampleIndex)
         {
           if ((lastSampleIndex != 65535) && hasHeader)
-            Logger::warning("%s - C3D - The last sample index wrote in the header is different than in the parameter TRIAL:ACTUAL_END_FIELD. The number of samples is modified by keeping the value in the parameter.", optr->Device->name());
+            Logger::warning("%s - C3D - The last sample index wrote in the header is different than in the parameter TRIAL:ACTUAL_END_FIELD. The number of samples is modified by keeping the value in the parameter", optr->Device->name());
           lastSampleIndex = end;
         }
       }
@@ -629,7 +629,7 @@ namespace btk
         {
           // ANALOG:USED
           if (analogNumber != analogUsed)
-            Logger::warning("%s - C3D - The number of analog channels wrote in the header section and in the parameter section are not the same. The value kept is from the header section.", optr->Device->name());
+            Logger::warning("%s - C3D - The number of analog channels wrote in the header section and in the parameter section are not the same. The value kept is from the header section", optr->Device->name());
           optr->AnalogChannelScale.resize(analogNumber, 1.0);
           optr->AnalogZeroOffset.resize(analogNumber, 0.0);
           optr->AnalogUniversalScale = 1.0;
@@ -657,7 +657,7 @@ namespace btk
               }
               else
                 optr->AnalogResolution = 12;
-              Logger::warning("%s - C3D - Analog format and/or their resolution are inconsistent with analog offsets. They were updated.", optr->Device->name());
+              Logger::warning("%s - C3D - Analog format and/or their resolution are inconsistent with analog offsets. They were updated", optr->Device->name());
             }
             // - ANALOG:FORMAT
             if (trial->property("ANALOG:FORMAT").cast<std::string>().compare("UNSIGNED") == 0)
@@ -678,7 +678,7 @@ namespace btk
             optr->AnalogUniversalScale = trial->property("ANALOG:GEN_SCALE");
             if (optr->AnalogUniversalScale == 0.0)
             {
-              Logger::warning("%s - C3D - Analog universal scaling factor error. Value zero (0) replaced by one (1).", optr->Device->name());
+              Logger::warning("%s - C3D - Analog universal scaling factor error. Value zero (0) replaced by one (1)", optr->Device->name());
               optr->AnalogUniversalScale = 1.0;
             }
           }
@@ -686,10 +686,10 @@ namespace btk
         // POINT
         // POINT:USED
         if (trial->property("POINT:USED") != pointNumber)
-          Logger::warning("%s - C3D - The number of points wrote in the header section and in the parameter section are not the same. The value kept is from the header section.", optr->Device->name());
+          Logger::warning("%s - C3D - The number of points wrote in the header section and in the parameter section are not the same. The value kept is from the header section", optr->Device->name());
         // POINT:SCALE
         if (fabs(trial->property("POINT:SCALE").cast<double>() - optr->PointScale) > std::numeric_limits<float>::epsilon())
-          Logger::warning("%s - C3D - The point scaling factor written in the header and in the parameter POINT:SCALE are not the same. The first value is kept.", optr->Device->name());
+          Logger::warning("%s - C3D - The point scaling factor written in the header and in the parameter POINT:SCALE are not the same. The first value is kept", optr->Device->name());
         std::unique_ptr<C3DDataStream> dataStream; 
         if (optr->PointScale > 0) // integer
         {
@@ -737,7 +737,7 @@ namespace btk
         {
           // Let's try to continue even if the file is corrupted
           if (optr->Device->atEnd())
-            Logger::warning("%s - C3D - Some points and/or analog data cannot be extracted and are set as invalid.", optr->Device->name());
+            Logger::warning("%s - C3D - Some points and/or analog data cannot be extracted and are set as invalid", optr->Device->name());
           else
             throw;
         }
@@ -849,7 +849,7 @@ namespace btk
                 if (gains[inc] == 5) // +/- 1V
                   an->setRange(std::array<double,2>{{-1.,1.}});
                 else
-                  Logger::warning("%s - C3D - The extracted gain is not supported by the standard. However, BTK gives you the possibility to use ANALOG:RANGE to set custom gain.", optr->Device->name());
+                  Logger::warning("%s - C3D - The extracted gain is not supported by the standard. However, BTK gives you the possibility to use ANALOG:RANGE to set custom gain", optr->Device->name());
               }
               else
               {
