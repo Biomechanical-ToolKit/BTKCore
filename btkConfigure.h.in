@@ -47,6 +47,9 @@
 // Looking for mmap
 #cmakedefine HAVE_SYS_MMAP
 
+// Looking for the OS endianness
+#cmakedefine HAVE_BIGENDIAN
+
 // Check if the processor is supported
 #define BTK_ARCH_VAX_LE 2  /* VAX LittleEndian */
 #define BTK_ARCH_IEEE_LE 1 /* IEEE LittleEndian */

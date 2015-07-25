@@ -70,6 +70,7 @@ SET(BTK_EXECUTABLE_PATH "${EXECUTABLE_OUTPUT_PATH}")
 INCLUDE(CheckIncludeFile)
 INCLUDE(GenerateExportHeader)
 INCLUDE(CMakePackageConfigHelpers)
+INCLUDE(TestBigEndian)
 
 # By default BTK is compiled in Release mode
 IF(NOT CMAKE_BUILD_TYPE)
@@ -83,6 +84,9 @@ ENDIF()
 IF((CMAKE_SIZEOF_VOID_P EQUAL 8) OR CMAKE_CL_64)
   SET(HAVE_64_BIT_COMPILER 1)
 ENDIF()
+
+# Detect the OS endianness
+TEST_BIG_ENDIAN(HAVE_BIGENDIAN)
 
 # Try to find mmap
 CHECK_INCLUDE_FILE(sys/mman.h HAVE_SYS_MMAP)
@@ -143,6 +147,10 @@ SET(BTK_INCLUDE_DIRS_BUILD_TREE
   "${BTK_SOURCE_DIR}/ThirdParties/eigen3"
   "${BTK_SOURCE_DIR}/Utilities")
 
+# Extra libraries required (e.g. eigen3, CxxTest, Open3DMotion)
+# This subdirectory is added first to compile required external shared libraries
+ADD_SUBDIRECTORY(ThirdParties)
+
 # Code
 ADD_SUBDIRECTORY(Code)
 
@@ -152,9 +160,6 @@ IF(BUILD_TESTING)
   ENABLE_TESTING()
   ADD_SUBDIRECTORY(Testing)
 ENDIF(BUILD_TESTING)
-
-# Extra library required (e.g. eigen3, CxxTest, Open3DMotion)
-ADD_SUBDIRECTORY(ThirdParties)
 
 # ------------------------------------------------------------------------
 # INSTALLATION INSTRUCTIONS

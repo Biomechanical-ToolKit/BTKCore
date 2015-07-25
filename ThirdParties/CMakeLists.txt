@@ -1,1 +1,2 @@
 ADD_SUBDIRECTORY(eigen3)
+ADD_SUBDIRECTORY(ffmpeg_lzo)
