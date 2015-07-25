@@ -62,8 +62,6 @@
   #define _BTK_MMFILEBUF_NO_FILE -1
 #endif
 
-#include "btkIODevice_p.h"
-
 namespace btk
 {
   class MemoryMappedBuffer;
@@ -108,7 +106,7 @@ namespace btk
     Size read(char* s, Size n) _BTK_NOEXCEPT;
     Size write(const char* s, Size n) _BTK_NOEXCEPT;
     
-    Position seek(Offset off, Origin way) _BTK_NOEXCEPT;
+    Position seek(Offset off, Origin whence) _BTK_NOEXCEPT;
     
     MemoryMappedBuffer* map() _BTK_NOEXCEPT;
     MemoryMappedBuffer* resizeMap() _BTK_NOEXCEPT;

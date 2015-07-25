@@ -71,7 +71,7 @@ namespace btk
   // ----------------------------------------------------------------------- //
   
   /**
-   * Destructor
+   * Constructor
    */
   MemoryMappedBuffer::MemoryMappedBuffer() _BTK_NOEXCEPT
   {
@@ -403,7 +403,7 @@ namespace btk
     return static_cast<int>(::sysconf(_SC_PAGESIZE));
 #endif
   };
-}
+};
 
 // -------------------------------------------------------------------------- //
 //                                 PUBLIC API                                 //

@@ -65,9 +65,8 @@ namespace btk
     virtual void seek(Offset offset, Origin whence) override;
     virtual Position tell() const _BTK_NOEXCEPT override;
     virtual bool isSequential() const _BTK_NOEXCEPT override;
-    
-    const char* data() const _BTK_NOEXCEPT;
-    Size size() const _BTK_NOEXCEPT;
+    virtual const char* data() const _BTK_NOEXCEPT override;
+    virtual Size size() const _BTK_NOEXCEPT override;
   };
 };
 

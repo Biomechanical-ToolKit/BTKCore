@@ -12,7 +12,7 @@ public:
   DummyBufferPrivate(char* d) : btk::IODevicePrivate(), Data(d), Pos(0) {};
   
   char* Data;
-   btk::IODevice::Offset Pos;
+  btk::IODevice::Offset Pos;
 };
 
 class DummyBuffer : public btk::IODevice
@@ -44,6 +44,8 @@ public:
   virtual void seek(Offset , Origin ) override {}; // Not implemented
   virtual Position tell() const _BTK_NOEXCEPT  override {return Position(Offset(-1));}; // Not implemented
   virtual bool isSequential() const _BTK_NOEXCEPT  override {return true;};
+  virtual const char* data() const _BTK_NOEXCEPT override {return nullptr;};
+  virtual Size size() const _BTK_NOEXCEPT override {return 0;};
   
   void setPos(Offset pos)
   {
