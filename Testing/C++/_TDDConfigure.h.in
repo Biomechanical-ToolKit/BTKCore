@@ -57,6 +57,8 @@
 #define KistlerDATFilePathOUT _BTK_TDD_PATH_OUT_"KistlerDATSamples/"
 #define HPFFilePathIN _BTK_TDD_PATH_IN_"HPFSamples/"
 #define HPFFilePathOUT _BTK_TDD_PATH_OUT_"HPFSamples/"
+#define _BTK_TDD_QTM_IN_ _BTK_TDD_PATH_IN_"QTMSamples/"
+#define _BTK_TDD_QTM_OUT_ _BTK_TDD_PATH_OUT_"QTMSamples/"
 
 #define TS_ASSERT_EIGEN_DELTA(lhs,rhs,prec) \
   TS_ASSERT((lhs - rhs).cwiseAbs().maxCoeff() <= prec)
