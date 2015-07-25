@@ -1,6 +1,7 @@
 SET(BTKIO_SRCS
   btkIODevice.cpp
   btkBinaryStream.cpp
+  btkBuffer.cpp
   btkFile.cpp
   btkIOHandler.cpp
   # Trial formats
