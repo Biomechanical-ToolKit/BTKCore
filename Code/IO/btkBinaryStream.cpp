@@ -108,15 +108,15 @@ namespace btk
    */
   std::string EndianConverter::readString(size_t len, IODevice* src) const
   {
-    std::string sFs;
+    std::string str;
     if (len != 0)
     {
       char* byteptr = new char[len];
       src->read(byteptr, len);
-      sFs = std::string(byteptr, len);
+      str.assign(byteptr, len);
       delete[] byteptr;
     }
-    return sFs;
+    return str;
   };
   
   
