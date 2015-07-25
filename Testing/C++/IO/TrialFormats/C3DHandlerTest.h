@@ -2,6 +2,7 @@
 #define C3DFileIOTest_h
 
 #include <btkC3DHandler.h>
+#include <btkFile.h>
 #include <btkNode.h>
 #include <btkTimeSequence.h>
 #include <btkEvent.h>
