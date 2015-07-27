@@ -449,11 +449,6 @@ namespace btk
       }
       stream->device()->seek(offset-len, Buffer::Origin::Current);
       item->Properties.emplace_back(prop);
-      
-#if 0
-      if (prop->DictEntry->Name.compare("Time Base ID")  == 0)
-        std::cout << item->DictEntry->Name << " - Time Base ID: " << prop->Value.cast<std::string>() << std::endl;
-#endif
     }
     // Extra values?
     int32_t numExtraValues = stream->readI32();
