@@ -237,6 +237,7 @@ namespace btk
         entry->name.resize(dirNameNumChar, ' ');
         for (int j = 0 ; j < dirNameNumChar ; ++j)
           entry->name[j] = dirNameWStr[2*j];
+        trim_string(&(entry->name),0x00);
         entry->type = stream->readI8();
         // The next byte is the color of the entry stored a red/black tree. But we do not use this information here.
         stream->device()->seek(1, IODevice::Origin::Current);
@@ -423,6 +424,7 @@ namespace btk
         std::string str(len/2 - 1, '\0');
         for (size_t j = 0 ; j < str.length() ; ++j)
           str[j] = temp[2*j];
+        trim_string(&str,0x00);
         prop->Value = str;
         len += 4; // +4: dynamic size
         }
@@ -522,6 +524,7 @@ namespace btk
     {
       // Name: ASCII string
       std::string name = stream->readString(stream->readI32());
+      trim_string(&name,0x00);
       // Name: UTF-16 string (not used)
       stream->device()->seek(stream->readI32(), Buffer::Origin::Current);
       // Type?
@@ -536,8 +539,10 @@ namespace btk
     {
       // Name: ASCII string
       std::string name = stream->readString(stream->readI32());
+      trim_string(&name,0x00);
       // Description? (ASCII string)
       std::string description = stream->readString(stream->readI32());
+      trim_string(&description,0x00);
       // Name: UTF-16 string (not used)
       stream->device()->seek(stream->readI32(), Buffer::Origin::Current);
       // Flags? (20 bytes)
@@ -635,7 +640,6 @@ namespace btk
    *
    * @ingroup BTKIO
    */
-
 
   /**
    * Default constructor
@@ -739,6 +743,7 @@ namespace btk
                 label.resize(numCharLabel);
                 for (int32_t k = 0 ; k < numCharLabel ; ++k)
                   label[k] = temp[2*k];
+                trim_string(&(label),0x00);
               }
               else // Null character
                 label = "uname*" + std::to_string(j+1);
@@ -809,6 +814,7 @@ namespace btk
               std::string label(blockSize-1, 0x00);
               for (size_t k = 0 ; k < label.size() ; ++k)
                 label[k] = temp[2*k];
+              trim_string(&label,0x00);
             }
             // #5: Corners coordinates
             else if (blockIndex == 5)
@@ -895,6 +901,7 @@ namespace btk
             double t = stream.readDouble();
             // Label
             std::string n = stream.readString(4);
+            trim_string(&n,0x00);
             // Next 100 bytes could be to store a descrption?
             buffer.seek(100, IODevice::Origin::Current);
             
