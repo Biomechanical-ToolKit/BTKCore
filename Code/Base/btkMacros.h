@@ -71,4 +71,14 @@
   #define _BTK_NOEXCEPT noexcept
 #endif
 
+/**
+ * Internal macro to stringify the given input.
+ */
+#define __BTK_STRINGIFY(x) #x
+
+/**
+ * Macro to stringify the given input.
+ */
+#define _BTK_STRINGIFY(x) __BTK_STRINGIFY(x)
+
 #endif // __btkMacros_h
