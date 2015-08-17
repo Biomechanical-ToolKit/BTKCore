@@ -33,6 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "btklzo.h"
 #include "lzo.h"
 
 #include <stdexcept>
