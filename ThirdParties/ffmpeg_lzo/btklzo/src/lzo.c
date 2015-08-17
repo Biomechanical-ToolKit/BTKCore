@@ -27,10 +27,14 @@
 #include "intreadwrite.h"
 #include "lzo.h"
 
+// Next lines were commented as the project BTK does want to pad the input/output buffers
+// This would slowdown the decoding, but for a greater safety.
+#if 0
 /// Define if we may write up to 12 bytes beyond the output buffer.
 #define OUTBUF_PADDED 1
 /// Define if we may read up to 8 bytes beyond the input buffer.
 #define INBUF_PADDED 1
+#endif
 
 typedef struct LZOContext {
     const uint8_t *in, *in_end;

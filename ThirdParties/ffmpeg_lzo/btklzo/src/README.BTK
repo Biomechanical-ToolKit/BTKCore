@@ -9,6 +9,7 @@ Some files or functions were adapted to reduce the dependencies:
   - File common.h modified to keep only the macro FFMAX
   - File config.h replaced by the main btkConfigure.h as only the symbol HAVE_BIGENDIAN was needed
   - File intreadwrite modified to keep only required macros
+  - Files lzo.h/lzo.c modified to remove the need to pad the buffers
   - File lzo.c modified to remove the test part
     - The keyword 'register' was removed as it is deprecated in the C++11 standard (lines 87, 88, 120)
   - Files mem.h/mem.c modified to keep only required macros
