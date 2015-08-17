@@ -125,7 +125,7 @@ namespace btk
         for (auto& child: temp.children())
         {
           if (child != nullptr)
-            child->appendParent(output);
+            child->addParent(output);
         }
       }
     }

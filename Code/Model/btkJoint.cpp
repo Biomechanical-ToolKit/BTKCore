@@ -79,9 +79,9 @@ namespace btk
   : Node(*new JointPrivate(this,name,proximal,distal), parent)
   {
     if (proximal != nullptr)
-      proximal->appendParent(this);
+      proximal->addParent(this);
     if (distal != nullptr)
-      distal->appendParent(this);
+      distal->addParent(this);
   };
   
   Joint::~Joint() _BTK_NOEXCEPT = default;

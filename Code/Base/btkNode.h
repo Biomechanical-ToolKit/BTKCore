@@ -83,7 +83,7 @@ namespace btk
     
     const std::list<Node*>& parents() const _BTK_NOEXCEPT;
     bool hasParents() const _BTK_NOEXCEPT;
-    void appendParent(Node* node) _BTK_NOEXCEPT;
+    void addParent(Node* node) _BTK_NOEXCEPT;
     void removeParent(Node* node) _BTK_NOEXCEPT;
     
     template <typename U = Node*> U findChild(const std::string& name = std::string{}, std::list<std::pair<std::string,Any>>&& properties = {}, bool recursiveSearch = true) const _BTK_NOEXCEPT;

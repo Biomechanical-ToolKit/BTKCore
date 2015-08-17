@@ -219,10 +219,10 @@ CXXTEST_SUITE(NodeTest)
     TestNode leafA("leafA");
     TS_ASSERT_EQUALS(leafA.hasChildren(),false);
     TS_ASSERT_EQUALS(leafA.hasParents(),false);
-    leafA.appendParent(nullptr);
+    leafA.addParent(nullptr);
     TS_ASSERT_EQUALS(leafA.hasParents(),false);
     TS_ASSERT_EQUALS(leafA.hasChildren(),false);
-    leafA.appendParent(&root);
+    leafA.addParent(&root);
     TS_ASSERT_EQUALS(leafA.hasParents(),true);
     TS_ASSERT_EQUALS(leafA.hasChildren(),false);
     TS_ASSERT_EQUALS(root.hasParents(),false);

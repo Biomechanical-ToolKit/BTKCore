@@ -236,7 +236,7 @@ namespace btk
    * btk::Node leafA("leafA");
    * btk::Node root("root");
    * btk::Node leafB("leafB",&root); // Owned by the root
-   * leafA.appendParent(&root); // Owned by the root
+   * leafA.addParent(&root); // Owned by the root
    * // ...
    * // End of the program/function, leafB is destroyed, then root which destroys also its children. What about leafA?
    * @endcode
@@ -414,9 +414,9 @@ namespace btk
   
   /**
    * Appends a node if this one is not already a parent.
-   * In case this node is appended, @a node is attached as parent and its state is set to modified.
+   * In case this node is added, @a node is attached as parent and its state is set to modified.
    */
-  void Node::appendParent(Node* node) _BTK_NOEXCEPT
+  void Node::addParent(Node* node) _BTK_NOEXCEPT
   {
     if (this->pimpl()->attachParent(node))
     {
@@ -482,7 +482,7 @@ namespace btk
     node_pimpl->Properties = optr->Properties;
     for (auto it = optr->Children.cbegin() ; it != optr->Children.cend() ; ++it)
       (*it)->clone(node);
-    node->appendParent(parent);
+    node->addParent(parent);
     return node;
   };
   
@@ -503,7 +503,7 @@ namespace btk
   Node::Node(NodePrivate& pimpl, Node* parent) _BTK_NOEXCEPT
   : Object(pimpl)
   {
-    this->appendParent(parent);
+    this->addParent(parent);
   };
   
   /*
@@ -520,8 +520,8 @@ namespace btk
       if (!current->hasParents())
         delete current;
     }
-    substitute->appendParent(this);
-    // removeParent() and appendParent() internally call modified(). No need to call it explicitely
+    substitute->addParent(this);
+    // removeParent() and addParent() internally call modified(). No need to call it explicitely
   };
   
   /**

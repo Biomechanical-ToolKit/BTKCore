@@ -66,7 +66,7 @@ namespace btk
   {
     if (rig != nullptr)
     {
-      rig->appendParent(this);
+      rig->addParent(this);
       rig->setup(this);
     }
   };
