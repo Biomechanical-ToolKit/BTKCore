@@ -10,6 +10,7 @@ class TestNodePrivate;
 class TestNode : public btk::Node
 {
   BTK_DECLARE_PIMPL_ACCESSOR(TestNode)
+  BTK_DECLARE_NODEID(TestNode, btk::Node)
   
 public:
   TestNode();
@@ -25,7 +26,6 @@ class TestNodePrivate : public btk::NodePrivate
 {
   BTK_DECLARE_PINT_ACCESSOR(TestNode)
   
-  BTK_DECLARE_NODEID(TestNode, btk::Node)
   BTK_DECLARE_STATIC_PROPERTIES(TestNode, btk::Node,
     btk::Property<TestNode,int,&TestNode::version,&TestNode::setVersion>{"version"}
   )

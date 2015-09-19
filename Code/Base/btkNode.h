@@ -40,6 +40,7 @@
 #include "btkAny.h"
 #include "btkTypeid.h"
 #include "btkMacros.h" // _BTK_NOEXCEPT
+#include "btkNodeid.h" // Macro BTK_DECLARE_NODEID used by inheriting classes.
 
 #include <list>
 #include <string>
@@ -98,6 +99,8 @@ namespace btk
     Node* clone(Node* parent = nullptr) const;
     // void copy(Node* other);
     
+    virtual bool isCastable(typeid_t id) const _BTK_NOEXCEPT;
+    
   protected:
     Node(NodePrivate& pimpl, Node* parent) _BTK_NOEXCEPT;
     
@@ -107,9 +110,6 @@ namespace btk
     Node* findNode(typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const _BTK_NOEXCEPT;
     void findNodes(std::list<void*>* list, typeid_t id, const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const _BTK_NOEXCEPT;
     void findNodes(std::list<void*>* list, typeid_t id, const std::regex& regexp, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const _BTK_NOEXCEPT;
-    
-    template <typename U, typename N> friend U node_cast(N* node) _BTK_NOEXCEPT;
-    bool castable(typeid_t id) const _BTK_NOEXCEPT;
   };
   
   // ----------------------------------------------------------------------- //
@@ -150,7 +150,7 @@ namespace btk
     static_assert(std::is_pointer<T>::value, "The casted type must be a (const) pointer type.");
     static_assert(std::is_base_of<Node,typename std::remove_pointer<T>::type>::value, "The casted type must derive from btk::Node.");
     static_assert(std::is_base_of<Node,typename std::decay<N>::type>::value, "The type of the given object must derive from btk::Node.");
-    if (node->castable(static_typeid<typename std::remove_pointer<T>::type>()))
+    if (node->isCastable(static_typeid<typename std::remove_pointer<T>::type>()))
       return static_cast<T>(node);
     return nullptr;
   };

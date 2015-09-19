@@ -50,6 +50,7 @@ namespace btk
   class BTK_NODE(BTK_TRIAL_EXPORT, Trial) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Trial)
+    BTK_DECLARE_NODEID(Trial, Node)
     
   public:
     Trial(const std::string& name, Node* parent = nullptr);

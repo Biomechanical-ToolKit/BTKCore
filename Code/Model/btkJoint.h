@@ -49,7 +49,8 @@ namespace btk
   class BTK_NODE(BTK_MODEL_EXPORT, Joint) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Joint)
-    
+    BTK_DECLARE_NODEID(Joint, Node)
+        
   public:
     Joint(const std::string& name, Segment* proximal, Segment* distal, Node* parent = nullptr);
     ~Joint() _BTK_NOEXCEPT;

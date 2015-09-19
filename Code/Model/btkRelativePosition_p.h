@@ -50,8 +50,6 @@ namespace btk
   class RelativePositionPrivate : public NodePrivate
   {
     BTK_DECLARE_PINT_ACCESSOR(RelativePosition)
-    
-    BTK_DECLARE_NODEID(RelativePosition, Node)
       
   public:
     RelativePositionPrivate(RelativePosition* pint, const std::string& name, const double* data);

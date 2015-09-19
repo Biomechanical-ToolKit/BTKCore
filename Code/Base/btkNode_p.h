@@ -43,7 +43,6 @@
 
 #include "btkObject_p.h"
 #include "btkTypeid.h"
-#include "btkNodeid.h" // Macro BTK_DECLARE_NODEID used by inheriting classes.
 #include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <string>
@@ -68,8 +67,6 @@ namespace btk
     NodePrivate(NodePrivate&& ) _BTK_NOEXCEPT = delete;
     NodePrivate& operator=(const NodePrivate& ) = delete;
     NodePrivate& operator=(const NodePrivate&& ) _BTK_NOEXCEPT = delete;
-    
-    virtual bool castable(typeid_t id) const _BTK_NOEXCEPT;
     
     virtual bool staticProperty(const char* key, btk::Any* value) const _BTK_NOEXCEPT;
     virtual bool setStaticProperty(const char* key, const btk::Any* value) _BTK_NOEXCEPT;

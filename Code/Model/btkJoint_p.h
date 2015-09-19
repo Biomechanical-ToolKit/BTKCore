@@ -51,8 +51,6 @@ namespace btk
   class JointPrivate : public NodePrivate
   {
     BTK_DECLARE_PINT_ACCESSOR(Joint)
-    
-    BTK_DECLARE_NODEID(Joint, Node)
       
   public:
     JointPrivate(Joint* pint, const std::string& name, Segment* proximal, Segment* distal);

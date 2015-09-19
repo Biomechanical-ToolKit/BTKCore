@@ -50,7 +50,8 @@ namespace btk
   class BTK_NODE(BTK_MODEL_EXPORT, LandmarksTranslator) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(LandmarksTranslator)
-    
+    BTK_DECLARE_NODEID(LandmarksTranslator, Node)
+        
   public:
     LandmarksTranslator(const std::string& name, const std::unordered_map<std::string,std::string>& converstionTable, Node* parent = nullptr);
     ~LandmarksTranslator() _BTK_NOEXCEPT;

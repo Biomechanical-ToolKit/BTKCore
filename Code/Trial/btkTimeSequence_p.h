@@ -56,7 +56,6 @@ namespace btk
   {
     BTK_DECLARE_PINT_ACCESSOR(TimeSequence)
     
-    BTK_DECLARE_NODEID(TimeSequence, Node)
     BTK_DECLARE_STATIC_PROPERTIES(TimeSequence, Node,
       Property<TimeSequence,int,&TimeSequence::type,&TimeSequence::setType>{"type"},
       Property<TimeSequence,unsigned,&TimeSequence::samples>{"samples"},

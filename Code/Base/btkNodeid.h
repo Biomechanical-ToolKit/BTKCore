@@ -40,11 +40,11 @@
 #include "btkMacros.h" // _BTK_NOEXCEPT
 
 #define BTK_DECLARE_NODEID(derivedclass,baseclass) \
-  protected: \
+  public: \
   static_assert(!std::is_same<baseclass,derivedclass>::value,"The base class cannot be the same than the current class."); \
-  virtual bool castable(btk::typeid_t id) const _BTK_NOEXCEPT override \
+  virtual bool isCastable(btk::typeid_t id) const _BTK_NOEXCEPT override \
   { \
-    if (this->baseclass##Private::castable(id)) \
+    if (this->baseclass::isCastable(id)) \
       return true; \
     return (btk::static_typeid<derivedclass>() == id); \
   }; \

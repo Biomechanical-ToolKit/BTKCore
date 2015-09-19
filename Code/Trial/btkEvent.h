@@ -47,6 +47,7 @@ namespace btk
   class BTK_NODE(BTK_TRIAL_EXPORT, Event) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Event)
+    BTK_DECLARE_NODEID(Event, Node)
     
   public:
     Event(const std::string& name, double time = 0.0, const std::string& context = std::string{}, const std::string& subject = std::string{}, Node* parent = nullptr);

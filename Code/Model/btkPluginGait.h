@@ -49,6 +49,7 @@ namespace btk
   class BTK_NODE(BTK_MODEL_EXPORT, PluginGait) : public Rig
   {
     BTK_DECLARE_PIMPL_ACCESSOR(PluginGait)
+    BTK_DECLARE_NODEID(PluginGait, Rig)
     
   public:
     PluginGait(int region, int side, Node* parent = nullptr);

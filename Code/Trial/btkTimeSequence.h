@@ -52,7 +52,8 @@ namespace btk
   class BTK_NODE(BTK_TRIAL_EXPORT, TimeSequence) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(TimeSequence)
-  
+    BTK_DECLARE_NODEID(TimeSequence, Node)
+    
   public:
     enum : int {Unknown = 0, Marker, Angle, Force, Moment, Power, Scalar, Analog, Pose};
 #if defined(_MSC_VER) && (_MSC_VER < 1900)

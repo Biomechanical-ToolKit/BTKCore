@@ -50,8 +50,6 @@ namespace btk
   class LandmarksTranslatorPrivate : public NodePrivate
   {
     BTK_DECLARE_PINT_ACCESSOR(LandmarksTranslator)
-    
-    BTK_DECLARE_NODEID(LandmarksTranslator, Node)
       
   public:
     LandmarksTranslatorPrivate(LandmarksTranslator* pint, const std::string& name, const std::unordered_map<std::string,std::string>& converstionTable);

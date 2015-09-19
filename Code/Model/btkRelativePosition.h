@@ -47,6 +47,7 @@ namespace btk
   class BTK_NODE(BTK_MODEL_EXPORT, RelativePosition) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(RelativePosition)
+    BTK_DECLARE_NODEID(RelativePosition, Node)
     
   public:
     RelativePosition(const std::string& name, const double coordinates[3], Node* parent = nullptr);

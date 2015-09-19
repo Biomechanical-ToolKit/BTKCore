@@ -51,8 +51,6 @@ namespace btk
   class ModelPrivate : public NodePrivate
   {
     BTK_DECLARE_PINT_ACCESSOR(Model)
-    
-    BTK_DECLARE_NODEID(Model, Node)
       
   public:
     ModelPrivate(Model* pint, const std::string& name);

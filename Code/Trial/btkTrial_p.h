@@ -52,8 +52,6 @@ namespace btk
   {
     BTK_DECLARE_PINT_ACCESSOR(Trial)
     
-    BTK_DECLARE_NODEID(Trial, Node)
-    
   public:
     TrialPrivate(Trial* pint, const std::string& name);
     ~TrialPrivate() _BTK_NOEXCEPT;

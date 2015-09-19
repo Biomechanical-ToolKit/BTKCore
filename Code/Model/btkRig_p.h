@@ -50,8 +50,6 @@ namespace btk
   class RigPrivate : public NodePrivate
   {
     BTK_DECLARE_PINT_ACCESSOR(Rig)
-    
-    BTK_DECLARE_NODEID(Rig, Node)
       
   public:
     RigPrivate(Rig* pint, const std::string& name, int region, int side);

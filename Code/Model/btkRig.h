@@ -53,6 +53,7 @@ namespace btk
   class BTK_NODE(BTK_MODEL_EXPORT, Rig) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Rig)
+    BTK_DECLARE_NODEID(Rig, Node)
     
   public:
     // static const std::vector<std::string>& requiredBonyLandmarks() const _BTK_NOEXCEPT;

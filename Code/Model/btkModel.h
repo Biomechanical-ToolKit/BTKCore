@@ -50,6 +50,7 @@ namespace btk
   class BTK_NODE(BTK_MODEL_EXPORT, Model) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Model)
+    BTK_DECLARE_NODEID(Model, Node)
     
   public:
     Model(const std::string& name, Rig* rig = nullptr, Node* parent = nullptr);

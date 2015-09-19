@@ -47,6 +47,7 @@ namespace btk
   class BTK_NODE(BTK_MODEL_EXPORT, Segment) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(Segment)
+    BTK_DECLARE_NODEID(Segment, Node)
     
   public:
     Segment(const std::string& name, int part = 0, int side = 0, Node* parent = nullptr);

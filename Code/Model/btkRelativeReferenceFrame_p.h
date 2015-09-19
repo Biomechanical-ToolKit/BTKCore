@@ -50,8 +50,6 @@ namespace btk
   class RelativeReferenceFramePrivate : public NodePrivate
   {
     BTK_DECLARE_PINT_ACCESSOR(RelativeReferenceFrame)
-    
-    BTK_DECLARE_NODEID(RelativeReferenceFrame, Node)
       
   public:
     RelativeReferenceFramePrivate(RelativeReferenceFrame* pint, const std::string& name);

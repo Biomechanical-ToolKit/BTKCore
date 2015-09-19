@@ -86,11 +86,6 @@ namespace btk
     return false;
   };
   
-  bool NodePrivate::castable(typeid_t id) const _BTK_NOEXCEPT
-  {
-    return (static_typeid<Node>() == id);
-  };
-  
   bool NodePrivate::staticProperty(const char* key, btk::Any* value) const _BTK_NOEXCEPT
   {
     return StaticProperties::visit(this->pint(),key,value);
@@ -618,7 +613,7 @@ namespace btk
     for (auto it = optr->Children.cbegin() ; it != optr->Children.cend() ; ++it)
     {
       Node* node = *it;
-      if (node->pimpl()->castable(id) && (name.empty() || (node->name() == name)))
+      if (node->isCastable(id) && (name.empty() || (node->name() == name)))
       {
         bool found = true;
         for (auto it2 = properties.cbegin() ; it2 != properties.cend() ; ++it2)
@@ -656,7 +651,7 @@ namespace btk
     for (auto itN = optr->Children.cbegin() ; itN != optr->Children.cend() ; ++itN)
     {
       Node* node = *itN;
-      if (node->pimpl()->castable(id) && (name.empty() || (node->name() == name)))
+      if (node->isCastable(id) && (name.empty() || (node->name() == name)))
       {
         bool found = true;
         for (auto itP = properties.cbegin() ; itP != properties.cend() ; ++itP)
@@ -690,7 +685,7 @@ namespace btk
     for (auto itN = optr->Children.cbegin() ; itN != optr->Children.cend() ; ++itN)
     {
       Node* node = *itN;
-      if (node->pimpl()->castable(id) && std::regex_match(node->name(),regexp))
+      if (node->isCastable(id) && std::regex_match(node->name(),regexp))
       {
         bool found = true;
         for (auto itP = properties.cbegin() ; itP != properties.cend() ; ++itP)
@@ -714,11 +709,11 @@ namespace btk
   };
   
   /**
-   * Returns true if the current object is castable to another with the given @a typeid_t value, false otherwise.
+   * Returns true if the current object is isCastable to another with the given @a typeid_t value, false otherwise.
    */
-  bool Node::castable(typeid_t id) const _BTK_NOEXCEPT
+  bool Node::isCastable(typeid_t id) const _BTK_NOEXCEPT
   {
-    return this->pimpl()->castable(id);
+    return (static_typeid<Node>() == id);
   };
   
   /**

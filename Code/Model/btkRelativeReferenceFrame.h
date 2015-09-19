@@ -47,6 +47,7 @@ namespace btk
   class BTK_NODE(BTK_MODEL_EXPORT, RelativeReferenceFrame) : public Node
   {
     BTK_DECLARE_PIMPL_ACCESSOR(RelativeReferenceFrame)
+    BTK_DECLARE_NODEID(RelativeReferenceFrame, Node)
     
   public:
     RelativeReferenceFrame(const std::string& name, Node* parent = nullptr);
