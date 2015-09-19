@@ -195,6 +195,20 @@ CXXTEST_SUITE(AnyTest)
     TS_ASSERT_EQUALS(m.cast<int>(),4);
   };
   
+  CXXTEST_TEST(Single_IntToArray)
+  {
+    btk::Any a = 12;
+    std::vector<int> ref{12};
+    TS_ASSERT_EQUALS(a.cast<std::vector<int>>(),ref);
+  };
+  
+  CXXTEST_TEST(Single_CustomToArray)
+  {
+    btk::Any g = Foo{1,1};
+    std::vector<Foo> ref{{1,1}};
+    TS_ASSERT_EQUALS(g.cast<std::vector<Foo>>(),ref);
+  };
+  
   CXXTEST_TEST(Array_Int_Vector)
   {
     std::vector<int> bar, foo{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}};
@@ -452,7 +466,9 @@ CXXTEST_TEST_REGISTRATION(AnyTest, Single_IntHexadecimal)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Int8)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_FromString)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Enum)
-    
+CXXTEST_TEST_REGISTRATION(AnyTest, Single_IntToArray)
+CXXTEST_TEST_REGISTRATION(AnyTest, Single_CustomToArray)
+
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Vector)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Vector2)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Vector3)
