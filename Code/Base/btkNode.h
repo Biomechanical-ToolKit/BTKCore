@@ -173,14 +173,14 @@ namespace btk
   // ----------------------------------------------------------------------- //
   
   template <typename T, typename... Args> 
-  inline std::vector<T> make_nodes(size_t num, Args&&... args) _BTK_NOEXCEPT
+  inline std::vector<T> make_nodes(size_t num, Args&&... args)
   {
     using N = typename std::remove_pointer<T>::type;
     static_assert(std::is_pointer<T>::value, "The generated type must be a (const) pointer type.");
     static_assert(std::is_base_of<Node, N>::value, "The generated type must derive from btk::Node.");
     std::vector<T> nodes(num,nullptr);
     for (size_t i = 0 ; i < num ; ++i)
-      nodes[i] = new N("uname*"+std::to_string(i+1), args...);
+      nodes[i] = new N("uname*"+std::to_string(i+1), std::forward<Args>(args)...);
     return nodes;
   }
 };
