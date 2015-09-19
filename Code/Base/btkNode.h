@@ -79,6 +79,7 @@ namespace btk
     Any property(const std::string& key) const _BTK_NOEXCEPT;
     void setProperty(const std::string& key, const Any& value);
     
+    template <typename U = Node*> U child(unsigned index) const _BTK_NOEXCEPT;
     const std::list<Node*>& children() const _BTK_NOEXCEPT;
     bool hasChildren() const _BTK_NOEXCEPT;
     
@@ -113,6 +114,20 @@ namespace btk
   };
   
   // ----------------------------------------------------------------------- //
+  
+  template <typename U>
+  U Node::child(unsigned index) const _BTK_NOEXCEPT
+  {
+    static_assert(std::is_pointer<U>::value, "The casted type must be a (const) pointer type.");
+    static_assert(std::is_base_of<Node,typename std::remove_pointer<U>::type>::value, "The casted type must derive from btk::Node.");
+    if (index < this->children().size())
+    {
+      auto it = this->children().begin();
+      std::advance(it,index);
+      return node_cast<U>(*it);
+    }
+    return nullptr;
+  };
 
   template <typename U>
   U Node::findChild(const std::string& name, std::list<std::pair<std::string,Any>>&& properties, bool recursiveSearch) const _BTK_NOEXCEPT

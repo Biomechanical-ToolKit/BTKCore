@@ -211,7 +211,30 @@ CXXTEST_SUITE(NodeTest)
     
     std::list<btk::Node*> all = root.findChildren();
     TS_ASSERT_EQUALS(all.size(), 10u);
-  }
+  };
+  
+  CXXTEST_TEST(ChildMethod)
+  {
+    TestNode root("root");
+    TS_ASSERT_EQUALS(root.count(),1);
+    TestNode leafA("leafA",&root);
+    TS_ASSERT_EQUALS(root.count(),2);
+    TestNode leafB("leafB",&root);
+    TS_ASSERT_EQUALS(root.count(),3);
+    TestNode leafC("leafC",&root);
+    TS_ASSERT_EQUALS(root.count(),4);
+    btk::Node leafD("leafD",&root);
+    TS_ASSERT_EQUALS(root.child(0),&leafA);
+    TS_ASSERT_EQUALS(root.child<TestNode*>(0),&leafA);
+    TS_ASSERT_EQUALS(root.child(1),&leafB);
+    TS_ASSERT_EQUALS(root.child<TestNode*>(1),&leafB);
+    TS_ASSERT_EQUALS(root.child(2),&leafC);
+    TS_ASSERT_EQUALS(root.child<TestNode*>(2),&leafC);
+    TS_ASSERT_EQUALS(root.child(3),&leafD);
+    TS_ASSERT_EQUALS(root.child<btk::Node*>(3),&leafD);
+    TS_ASSERT_EQUALS(root.child<TestNode*>(3),nullptr);
+    TS_ASSERT_EQUALS(root.child(4),nullptr);
+  };
   
   CXXTEST_TEST(AppendParent)
   {
@@ -359,6 +382,7 @@ CXXTEST_TEST_REGISTRATION(NodeTest, DynamicProperty)
 CXXTEST_TEST_REGISTRATION(NodeTest, InheritingClassWithStaticProperty)
 CXXTEST_TEST_REGISTRATION(NodeTest, ChildrenStack)
 CXXTEST_TEST_REGISTRATION(NodeTest, ChildrenHeap)
+CXXTEST_TEST_REGISTRATION(NodeTest, ChildMethod)  
 CXXTEST_TEST_REGISTRATION(NodeTest, AppendParent)
 CXXTEST_TEST_REGISTRATION(NodeTest, RemoveParent)
 CXXTEST_TEST_REGISTRATION(NodeTest, Clone)
