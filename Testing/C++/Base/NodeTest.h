@@ -25,7 +25,7 @@ CXXTEST_SUITE(NodeTest)
     TS_ASSERT_EQUALS(branchB.timestamp(),ts+9ul);
     TS_ASSERT_EQUALS(leafB1.timestamp(),0ul);
     TS_ASSERT_EQUALS(leafB2.timestamp(),0ul);
-  }
+  };
   
   CXXTEST_TEST(StaticProperty)
   {
@@ -250,7 +250,7 @@ CXXTEST_SUITE(NodeTest)
     TS_ASSERT_EQUALS(leafA.hasChildren(),false);
     TS_ASSERT_EQUALS(root.hasParents(),false);
     TS_ASSERT_EQUALS(root.hasChildren(),true);
-  }
+  };
   
   CXXTEST_TEST(RemoveParent)
   {
@@ -262,7 +262,7 @@ CXXTEST_SUITE(NodeTest)
     leafA.removeParent(&root);
     TS_ASSERT_EQUALS(leafA.hasParents(),false);
     TS_ASSERT_EQUALS(root.hasChildren(),false);
-  }
+  };
   
   CXXTEST_TEST(Clone)
   {
@@ -287,7 +287,7 @@ CXXTEST_SUITE(NodeTest)
     TS_ASSERT_EQUALS(test->name(), "foo");
     TS_ASSERT_EQUALS(test->version(), 2);
     delete root_;
-  }
+  };
   
   CXXTEST_TEST(CloneWithChildren)
   {
@@ -312,7 +312,7 @@ CXXTEST_SUITE(NodeTest)
     TS_ASSERT_DIFFERS(testLeaf,nullptr);
     TS_ASSERT_EQUALS(testLeaf->name(), "leaf");
     delete root_;
-  }
+  };
   
   CXXTEST_TEST(CloneWithRoot)
   {
@@ -332,7 +332,7 @@ CXXTEST_SUITE(NodeTest)
     TS_ASSERT_EQUALS(root.version(), 1);
     TS_ASSERT_EQUALS(test->name(), "child");
     TS_ASSERT_EQUALS(test->version(), 2);
-  }
+  };
   
   CXXTEST_TEST(RetrievePath)
   {
