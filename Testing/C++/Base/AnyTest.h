@@ -3,6 +3,8 @@
 
 #include "AnyTest_classdef.h"
 
+#include <btkTypeid.h>
+
 #include <limits>
 #include <vector>
 
@@ -207,6 +209,13 @@ CXXTEST_SUITE(AnyTest)
     btk::Any g = Foo{1,1};
     std::vector<Foo> ref{{1,1}};
     TS_ASSERT_EQUALS(g.cast<std::vector<Foo>>(),ref);
+  };
+  
+  CXXTEST_TEST(Single_Typeid)
+  {
+    btk::Any b = btk::static_typeid<int>();
+    TS_ASSERT_EQUALS(b.cast<btk::typeid_t>(),btk::static_typeid<int>());
+    TS_ASSERT_DIFFERS(b.cast<btk::typeid_t>(),btk::static_typeid<float>());
   };
   
   CXXTEST_TEST(Array_Int_Vector)
@@ -468,6 +477,7 @@ CXXTEST_TEST_REGISTRATION(AnyTest, Single_FromString)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_Enum)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_IntToArray)
 CXXTEST_TEST_REGISTRATION(AnyTest, Single_CustomToArray)
+CXXTEST_TEST_REGISTRATION(AnyTest, Single_Typeid)
 
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Vector)
 CXXTEST_TEST_REGISTRATION(AnyTest, Array_Int_Vector2)

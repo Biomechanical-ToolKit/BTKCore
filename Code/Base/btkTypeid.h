@@ -46,7 +46,7 @@ namespace btk
   class typeid_t
   {
   public:
-    typeid_t() = delete;
+    typeid_t();
     ~typeid_t() _BTK_NOEXCEPT = default;
     typeid_t(const typeid_t& ) = default;
     typeid_t(typeid_t&& other) _BTK_NOEXCEPT;
@@ -66,6 +66,10 @@ namespace btk
     
     _BTK_CONSTEXPR typeid_t(sig id) : id{id} {};
   };
+  
+  inline typeid_t::typeid_t()
+  : id(nullptr)
+  {};
   
   inline typeid_t::typeid_t(typeid_t&& other) _BTK_NOEXCEPT
   : id(std::move(other.id))
