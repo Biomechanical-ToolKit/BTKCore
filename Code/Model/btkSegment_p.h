@@ -53,7 +53,7 @@ namespace btk
   {
     BTK_DECLARE_PINT_ACCESSOR(Segment)
     
-    BTK_DECLARE_STATIC_PROPERTIES(Segment, Node,
+    BTK_DECLARE_STATIC_PROPERTIES_DERIVED(Segment, Node,
       Property<Segment,int,&Segment::part,&Segment::setPart>{"part"},
       Property<Segment,int,&Segment::side,&Segment::setSide>{"side"}
     )

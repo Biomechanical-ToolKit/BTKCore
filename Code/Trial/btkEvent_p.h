@@ -53,7 +53,7 @@ namespace btk
   {
     BTK_DECLARE_PINT_ACCESSOR(Event)
   
-    BTK_DECLARE_STATIC_PROPERTIES(Event, Node,
+    BTK_DECLARE_STATIC_PROPERTIES_DERIVED(Event, Node,
       Property<Event,double,&Event::time,&Event::setTime>{"time"},
       Property<Event,const std::string&,&Event::context,&Event::setContext>{"context"},
       Property<Event,const std::string&,&Event::subject,&Event::setSubject>{"subject"}

@@ -42,7 +42,21 @@
 
 #include <type_traits>
 
-#define BTK_DECLARE_STATIC_PROPERTIES(derivedclass,baseclass, ...) \
+#define BTK_DECLARE_STATIC_PROPERTIES_BASE(class, ...) \
+  private: \
+  _BTK_STATIC_PROPERTIES(__VA_ARGS__); \
+  public: \
+  virtual bool staticProperty(const char* key, btk::Any* value) const _BTK_NOEXCEPT \
+  { \
+    return class##Private::StaticProperties::visit(this->pint(),key,value); \
+  }; \
+  virtual bool setStaticProperty(const char* key, const btk::Any* value) _BTK_NOEXCEPT \
+  { \
+    return class##Private::StaticProperties::visit(this->pint(),key,value); \
+  }; \
+  private:
+
+#define BTK_DECLARE_STATIC_PROPERTIES_DERIVED(derivedclass,baseclass, ...) \
   static_assert(!std::is_same<baseclass,derivedclass>::value,"The base class cannot be the same than the current class."); \
   private: \
   _BTK_STATIC_PROPERTIES(__VA_ARGS__); \
@@ -167,8 +181,9 @@ namespace btk
    *
    * @note the type @a U must be exactly the same than the type returned/required by the accessor/mutator with all the qualifiers. For example, if the accessor is const std::string& name() const, and the mutator is void setName(const std::string& name), then @a U as to be set to const std::string& (i.e. const reference to a std::string).
    *
-   * A static property is defined only by is constructor. All the other methods are used only internaly.
-   * Moreover, this constructor has to be used in the macro BTK_DECLARE_STATIC_PROPERTIES which itself must be included in the declaration of the private implementation of a class inheriting of btk::Node.
+   * A static property is defined only by its constructor. All the other methods are used only internaly.
+   * Moreover, this constructor has to be used in the macro BTK_DECLARE_STATIC_PROPERTIES_BASE or BTK_DECLARE_STATIC_PROPERTIES_DERIVED which itself must be included in the declaration of the private implementation part.
+   * The difference between the macros BTK_DECLARE_STATIC_PROPERTIES_BASE and BTK_DECLARE_STATIC_PROPERTIES_DERIVED is about the inheriting of a class or not. Code using BTK as a third party library should not have access ot the private implementation (*Private classes). So a base private implementation must be firstly done. The first macro must be used in this case.
    * For example:
    * 
    * @code
@@ -179,32 +194,62 @@ namespace btk
    *   BTK_DECLARE_PIMPL_ACCESSOR(TestNode) // For the private implementation (pimpl)
    *   
    * public:
-   *   TestNode(const std::string& name);
+   *   TestNode(const std::string& name, Node* parent = nullptr);
    *   
    *   int version() const;
    *   void setVersion(int value);
+   *
+   * protected:
+   *   TestNode(TestNodePrivate& pimpl, const std::string& name, Node* parent);
+   *
+   * private:
+   *   std::unique_ptr<TestNodePrivate> mp_Pimpl; // This is the way to store the private implementation
    * };
    * 
-   * class TestNodePrivate : public btk::NodePrivate
+   * class TestNodePrivate
    * {
    *   BTK_DECLARE_PINT_ACCESSOR(TestNode) // To have access to the public interface (pint) from the private implementation
    *   
-   *   BTK_DECLARE_STATIC_PROPERTIES(TestNodePrivate, btk::NodePrivate,
+   *   // Declare property(ies) for a base class
+   *   BTK_DECLARE_STATIC_PROPERTIES_BASE(TestNode
    *     btk::Property<TestNode,int,&TestNode::version,&TestNode::setVersion>("version")
    *   )
    *   
    * public:
-   *   TestNodePrivate(TestNode* pint, const std::string& name) :  btk::NodePrivate(pint,name), Version(1) {};
+   *   TestNodePrivate(TestNode* pint, int version) : Version(version), mp_Pint(pint) {};
    *   int Version;
+   *
+   * protected:
+   *   TestNode* mp_Pint; // Storage of the public interface.
    * };
+   *
+   * class TestNode2Private;
+   * 
+   * class TestNode2 : public TestNode
+   * {
+   *   BTK_DECLARE_PIMPL_ACCESSOR(TestNode2) // For the private implementation (pimpl)
+   *   
+   * public:
+   *   TestNode2(const std::string& name, int version, Node* parent = nullptr);
+   * };
+   * 
+   * class TestNode2Private
+   * {
+   *   BTK_DECLARE_PINT_ACCESSOR(TestNode2) // To have access to the public interface (pint) from the private implementation
+   *   
+   *   // Declare property(ies) for a derived class
+   *   BTK_DECLARE_STATIC_PROPERTIES_DERIVED(TestNode2, TestNode
+   *     btk::Property<TestNode,int,&TestNode::version>("version2")
+   *   )
+   *   
+   * public:
+   *   TestNode2Private(TestNode* pint, int version) : TestNodePrivate(pint, version) {};
+   * };
+   *
    * @endcode
    *
    * In this example, The class TestNode will have a new property name "version" which is associated with the accessor TestNode::version and the mutator TestNode::setVersion. Internally, these methods rely on the member TestNodePrivate::Version.
-   * If the member is read-only the pointer to the mutation must be set to nullptr. For example:
-   *
-   * @code
-   * btk::Property<TestNode,int,&TestNode::version>("version") // by default the mutator is set to nullptr
-   * @endcode
+   * If the member is read-only the pointer to the mutation must be set to nullptr (e.g. in the definition of the propoerty version2 for the class TestNode2).
    */
   
   /**

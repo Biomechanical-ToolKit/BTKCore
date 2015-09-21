@@ -58,7 +58,7 @@ namespace btk
   {
     BTK_DECLARE_PINT_ACCESSOR(PluginGait)
     
-    BTK_DECLARE_STATIC_PROPERTIES(PluginGait, Rig,
+    BTK_DECLARE_STATIC_PROPERTIES_DERIVED(PluginGait, Rig,
       Property<PluginGait,double,&PluginGait::markerDiameter,&PluginGait::setMarkerDiameter>{"markerDiameter"},
       Property<PluginGait,double,&PluginGait::headOffset,&PluginGait::setHeadOffset>{"headOffset"},
       Property<PluginGait,double,&PluginGait::rightShoulderOffset,&PluginGait::setRightShoulderOffset>{"rightShoulderOffset"},

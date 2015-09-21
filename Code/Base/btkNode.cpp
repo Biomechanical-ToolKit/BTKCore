@@ -35,7 +35,6 @@
 
 #include "btkNode.h"
 #include "btkNode_p.h"
-#include "btkProperty.h"
 #include "btkLogger.h"
 
 // -------------------------------------------------------------------------- //
@@ -44,13 +43,6 @@
 
 namespace btk
 {
-  _BTK_STATIC_PROPERTIES(
-    Property<Node, const std::string&, &Node::name, &Node::setName>{"name"},
-    Property<Node, const std::string&, &Node::description, &Node::setDescription>{"description"}
-  );
-
-  // ------------------------------------------------------------------------ //
-  
   NodePrivate::NodePrivate(Node* pint, const std::string& name)
   : ObjectPrivate(),
     Name(name), Description(), Properties(), Parents(), Children(),
@@ -84,16 +76,6 @@ namespace btk
       }
     }
     return false;
-  };
-  
-  bool NodePrivate::staticProperty(const char* key, btk::Any* value) const _BTK_NOEXCEPT
-  {
-    return StaticProperties::visit(this->pint(),key,value);
-  };
-  
-  bool NodePrivate::setStaticProperty(const char* key, const btk::Any* value) _BTK_NOEXCEPT
-  {
-    return StaticProperties::visit(this->pint(),key,value);
   };
   
   /**

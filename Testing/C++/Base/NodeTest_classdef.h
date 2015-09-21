@@ -26,7 +26,7 @@ class TestNodePrivate : public btk::NodePrivate
 {
   BTK_DECLARE_PINT_ACCESSOR(TestNode)
   
-  BTK_DECLARE_STATIC_PROPERTIES(TestNode, btk::Node,
+  BTK_DECLARE_STATIC_PROPERTIES_DERIVED(TestNode, btk::Node,
     btk::Property<TestNode,int,&TestNode::version,&TestNode::setVersion>{"version"}
   )
   

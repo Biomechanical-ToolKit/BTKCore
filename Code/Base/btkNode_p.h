@@ -43,6 +43,7 @@
 
 #include "btkObject_p.h"
 #include "btkTypeid.h"
+#include "btkProperty.h"
 #include "btkMacros.h" // _BTK_NOEXCEPT
 
 #include <string>
@@ -56,6 +57,10 @@ namespace btk
   class BTK_BASE_EXPORT NodePrivate : public ObjectPrivate
   {
     BTK_DECLARE_PINT_ACCESSOR(Node)
+    BTK_DECLARE_STATIC_PROPERTIES_BASE(Node,
+      Property<Node, const std::string&, &Node::name, &Node::setName>{"name"},
+      Property<Node, const std::string&, &Node::description, &Node::setDescription>{"description"}
+    )
 
   public:
     static bool retrievePath(std::list<const Node*>& path, const Node* current, const Node* stop);
@@ -67,9 +72,6 @@ namespace btk
     NodePrivate(NodePrivate&& ) _BTK_NOEXCEPT = delete;
     NodePrivate& operator=(const NodePrivate& ) = delete;
     NodePrivate& operator=(const NodePrivate&& ) _BTK_NOEXCEPT = delete;
-    
-    virtual bool staticProperty(const char* key, btk::Any* value) const _BTK_NOEXCEPT;
-    virtual bool setStaticProperty(const char* key, const btk::Any* value) _BTK_NOEXCEPT;
     
     bool attachParent(Node* node) _BTK_NOEXCEPT;
     bool detachParent(Node* node) _BTK_NOEXCEPT;
