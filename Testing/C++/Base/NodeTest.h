@@ -373,6 +373,20 @@ CXXTEST_SUITE(NodeTest)
     auto path6 = leaf1.retrievePath(&leaf2_1_1);
     TS_ASSERT_EQUALS(path6.size(), 0u);
   };
+  
+  CXXTEST_TEST(IsCastable)
+  {
+    btk::Node temp1("temp1");
+    TestNode temp2("temp1");
+    btk::Node* temp3 = new TestNode("temp3");
+    TS_ASSERT_EQUALS(temp1.isCastable(btk::static_typeid<btk::Node>()), true);
+    TS_ASSERT_EQUALS(temp1.isCastable(btk::static_typeid<TestNode>()), false);
+    TS_ASSERT_EQUALS(temp2.isCastable(btk::static_typeid<btk::Node>()), true);
+    TS_ASSERT_EQUALS(temp2.isCastable(btk::static_typeid<TestNode>()), true);
+    TS_ASSERT_EQUALS(temp3->isCastable(btk::static_typeid<btk::Node>()), true);
+    TS_ASSERT_EQUALS(temp3->isCastable(btk::static_typeid<TestNode>()), true);
+    delete temp3;
+  }
 };
 
 CXXTEST_SUITE_REGISTRATION(NodeTest)
@@ -389,5 +403,6 @@ CXXTEST_TEST_REGISTRATION(NodeTest, Clone)
 CXXTEST_TEST_REGISTRATION(NodeTest, CloneWithChildren)
 CXXTEST_TEST_REGISTRATION(NodeTest, CloneWithRoot)
 CXXTEST_TEST_REGISTRATION(NodeTest, RetrievePath)
+CXXTEST_TEST_REGISTRATION(NodeTest, IsCastable)
   
 #endif // ObjectTest_h
