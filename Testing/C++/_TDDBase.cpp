@@ -1,9 +1,12 @@
 #include "_TDDConfigure.h"
 
+#include "Base/AlgorithmTest.h"
 #include "Base/AnyTest.h"
 #include "Base/ExceptionTest.h"
+#include "Base/InformationTest.h"
 #include "Base/LoggerTest.h"
 #include "Base/LardXprTest.h"
 #include "Base/NodeTest.h"
 #include "Base/ObjectTest.h"
+#include "Base/PortTest.h"
 #include "Base/TypeidTest.h"
