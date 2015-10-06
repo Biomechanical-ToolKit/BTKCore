@@ -76,8 +76,8 @@ namespace btk
     const std::string& description() const _BTK_NOEXCEPT;
     void setDescription(const std::string& value) _BTK_NOEXCEPT;
     
-    Any property(const std::string& key) const _BTK_NOEXCEPT;
-    void setProperty(const std::string& key, const Any& value);
+    virtual Any property(const std::string& key) const _BTK_NOEXCEPT;
+    virtual void setProperty(const std::string& key, const Any& value);
     
     template <typename U = Node*> U child(unsigned index) const _BTK_NOEXCEPT;
     const std::list<Node*>& children() const _BTK_NOEXCEPT;
