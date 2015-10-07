@@ -74,9 +74,9 @@ namespace btk
     Algorithm& operator=(const Algorithm& ) = delete;
     Algorithm& operator=(Algorithm&& ) _BTK_NOEXCEPT = delete;
     
-    template <typename U> typename U::ValueType information(typename U::ValueType&& defaultValue = typename U::ValueType()) const _BTK_NOEXCEPT;
+    template <typename U> typename U::ValueType information(const typename U::ValueType& defaultValue = typename U::ValueType()) const _BTK_NOEXCEPT;
     btk::Any information(const char* key, const btk::Any& defaultValue = btk::Any()) const _BTK_NOEXCEPT;
-    template <typename U> void setInformation(typename U::ValueType&& value);
+    template <typename U> void setInformation(const typename U::ValueType& value);
     void setInformation(const char* key, const btk::Any& value);
     
     unsigned inputsNumber() const _BTK_NOEXCEPT;
@@ -124,15 +124,15 @@ namespace btk
   };
   
   template <typename U>
-  typename U::ValueType Algorithm::information(typename U::ValueType&& defaultValue) const _BTK_NOEXCEPT
+  typename U::ValueType Algorithm::information(const typename U::ValueType& defaultValue) const _BTK_NOEXCEPT
   {
-    return this->information(U::key(),std::forward<typename U::ValueType>(defaultValue)).template cast<typename U::ValueType>();
+    return this->information(U::key(),defaultValue).template cast<typename U::ValueType>();
   };
 
   template <typename U>
-  void Algorithm::setInformation(typename U::ValueType&& value)
+  void Algorithm::setInformation(const typename U::ValueType& value)
   {
-    this->setInformation(U::key(),std::forward<typename U::ValueType>(value));
+    this->setInformation(U::key(),value);
   };
 };
 

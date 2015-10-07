@@ -67,9 +67,9 @@ namespace btk
     Port(unsigned index, Algorithm* parent);
     ~Port() _BTK_NOEXCEPT;
     
-    template <typename U> typename U::ValueType information(typename U::ValueType&& defaultValue = typename U::ValueType()) const _BTK_NOEXCEPT;
+    template <typename U> typename U::ValueType information(const typename U::ValueType& defaultValue = typename U::ValueType()) const _BTK_NOEXCEPT;
     btk::Any information(const char* key, const btk::Any& defaultValue = btk::Any()) const _BTK_NOEXCEPT;
-    template <typename U> void setInformation(typename U::ValueType&& value);
+    template <typename U> void setInformation(const typename U::ValueType& value);
     void setInformation(const char* key, const btk::Any& value);
     
     unsigned index() const _BTK_NOEXCEPT;
@@ -93,15 +93,15 @@ namespace btk
   };
   
   template <typename U>
-  typename U::ValueType Port::information(typename U::ValueType&& defaultValue) const _BTK_NOEXCEPT
+  typename U::ValueType Port::information(const typename U::ValueType& defaultValue) const _BTK_NOEXCEPT
   {
-    return this->information(U::key(),std::forward<typename U::ValueType>(defaultValue)).template cast<typename U::ValueType>();
+    return this->information(U::key(),defaultValue).template cast<typename U::ValueType>();
   };
 
   template <typename U>
-  void Port::setInformation(typename U::ValueType&& value)
+  void Port::setInformation(const typename U::ValueType& value)
   {
-    this->setInformation(U::key(),std::forward<typename U::ValueType>(value));
+    this->setInformation(U::key(),value);
   };
   
   template <typename U>
