@@ -1,8 +1,13 @@
 SET(BTKBase_SRCS
+  btkAlgorithm.cpp
   btkAny.cpp
+  btkDataFactory.cpp
+  btkExecutive.cpp
+  btkInformation.cpp
   btkLogger.cpp
   btkNode.cpp
   btkObject.cpp
+  btkPort.cpp
 )
 
 ADD_LIBRARY(Base ${BTK_LIBS_BUILD_TYPE} ${BTKBase_SRCS})
