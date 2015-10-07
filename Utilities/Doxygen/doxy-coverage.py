@@ -199,7 +199,7 @@ def main():
 			color = "orange"
 		else:
 			color = 'red'
-		urllib.urlretrieve("https://img.shields.io/badge/doxygen-"+str(total_per)+"%25-"+color+".svg", "doxy-coverage.svg")
+		urllib.urlretrieve("http://img.shields.io/badge/doxygen-"+str(total_per)+"%25-"+color+".svg", "doxy-coverage.svg")
 
 	if ns.noerror:
 		return
