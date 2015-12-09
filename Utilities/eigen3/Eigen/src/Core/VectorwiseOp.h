@@ -50,7 +50,7 @@ struct traits<PartialReduxExpr<MatrixType, MemberOp, Direction> >
     MaxColsAtCompileTime = Direction==Horizontal ? 1 : MatrixType::MaxColsAtCompileTime,
     Flags0 = (unsigned int)_MatrixTypeNested::Flags & HereditaryBits,
     Flags = (Flags0 & ~RowMajorBit) | (RowsAtCompileTime == 1 ? RowMajorBit : 0),
-    TraversalSize = Direction==Vertical ? RowsAtCompileTime : ColsAtCompileTime
+    TraversalSize = Direction==Vertical ? MatrixType::RowsAtCompileTime :  MatrixType::ColsAtCompileTime
   };
   #if EIGEN_GNUC_AT_LEAST(3,4)
   typedef typename MemberOp::template Cost<InputScalar,int(TraversalSize)> CostOpType;
@@ -58,7 +58,8 @@ struct traits<PartialReduxExpr<MatrixType, MemberOp, Direction> >
   typedef typename MemberOp::template Cost<InputScalar,TraversalSize> CostOpType;
   #endif
   enum {
-    CoeffReadCost = TraversalSize * traits<_MatrixTypeNested>::CoeffReadCost + int(CostOpType::value)
+    CoeffReadCost = TraversalSize==Dynamic ? Dynamic
+                  : TraversalSize * traits<_MatrixTypeNested>::CoeffReadCost + int(CostOpType::value)
   };
 };
 }
@@ -581,11 +582,6 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
             HNormalizedReturnType;
 
     const HNormalizedReturnType hnormalized() const;
-    
-    // allow to extend VectorOp outside Eigen
-    #ifdef EIGEN_VECTOROP_PLUGIN
-    #include EIGEN_VECTOROP_PLUGIN
-    #endif
 
   protected:
     ExpressionTypeNested m_matrix;
