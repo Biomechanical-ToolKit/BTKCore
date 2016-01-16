@@ -56,7 +56,7 @@
 
 // MSVC doesn't have the header stdint.h
 #ifdef _MSC_VER
-  #include "Utilities/stdint.h"
+  #include "Utilities/msvc_stdint.h"
 #else
   #include <stdint.h>
 #endif

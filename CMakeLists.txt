@@ -21,6 +21,8 @@ SET(BTK_LIBRARY_VERSION_STRING "${BTK_VERSION_MAJOR}.${BTK_VERSION_MINOR}")
 # Using the configuration "Always full RPATH"
 # from http://www.cmake.org/Wiki/CMake_RPATH_handling
 #             --------------------------
+# To silence warning for policy CMP0042.
+SET(CMAKE_MACOSX_RPATH ON)
 # use, i.e. don't skip the full RPATH for the build tree
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 # when building, don't use the install RPATH already
