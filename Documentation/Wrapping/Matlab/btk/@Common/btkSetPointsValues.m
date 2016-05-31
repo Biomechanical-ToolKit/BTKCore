@@ -1,4 +1,4 @@
-function btkSetPointsValues(h. v) %#ok
+function btkSetPointsValues(h v) %#ok
 %BTKSETPOINTSVALUES Sets points' components from a matrix
 % 
 %  BTKSETPOINTSVALUES(H, V) uses the matrix V to sets points' components.

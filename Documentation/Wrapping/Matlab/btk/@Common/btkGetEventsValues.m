@@ -1,4 +1,4 @@
-function [times, labels, descriptions, ids] = btkGetEventsValuesValues(h) %#ok
+function [times, labels, descriptions, ids] = btkGetEventsValues(h) %#ok
 %BTKGETEVENTSVALUES Extract events' values from a biomechanical acquisition
 % 
 %  Events' time are computed using the following formula:
