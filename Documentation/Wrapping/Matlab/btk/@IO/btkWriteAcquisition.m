@@ -1,4 +1,4 @@
-function h = btkWriteAcquisition(filename) %#ok
+function h = btkWriteAcquisition(h, filename) %#ok
 %BTKWRITEACQUISITION Write acquisition's data into file (C3D, TRC, ...)
 % 
 %  BTKWRITEACQUISITION(H, FILENAME, ...) exports acquisition's data represented 
