@@ -38,6 +38,8 @@
 #include "btkMetaDataUtils.h"
 #include "btkWrench.h"
 
+#include "btkBinaryStream.tpp"
+
 #include <fstream>
 #include <algorithm>
 #include <cctype>

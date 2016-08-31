@@ -38,6 +38,8 @@
 #include "btkConvert.h"
 #include "btkLogger.h"
 
+#include "btkBinaryStream.tpp"
+
 #include <algorithm>
 #include <cctype>
 #include <iostream>
