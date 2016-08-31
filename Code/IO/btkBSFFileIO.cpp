@@ -36,7 +36,7 @@
 #include "btkBSFFileIO.h"
 #include "btkBinaryFileStream.h"
 #include "btkMetaDataUtils.h"
-
+#include "btkBinaryStream.tpp"
 // Number found in the documentation.
 const int _btk_bsf_maximum_channel_number = 32;
 
