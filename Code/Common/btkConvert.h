@@ -45,7 +45,7 @@
 #include <limits>
 
 #ifdef _MSC_VER
-  #include "Utilities/stdint.h"
+  #include "Utilities/msvc_stdint.h"
 #else
   #include <stdint.h>
 #endif
