@@ -1,12 +1,12 @@
-/* 
+/*
  * The Biomechanical ToolKit
  * Copyright (c) 2009-2014, Arnaud Barré
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *     * Redistributions of source code must retain the above
  *       copyright notice, this list of conditions and the following
  *       disclaimer.
@@ -18,7 +18,7 @@
  *       of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written
  *       permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -32,7 +32,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 %{
   #define SWIG_FILE_WITH_INIT
   #include <Eigen/Core>
@@ -47,8 +47,8 @@
 
 %fragment("Eigen_Fragments", "header",  fragment="NumPy_Fragments")
 %{
-  template <typename T> int NumPyType() {return -1;};
-  
+  template <typename T> int NumPyType() {return -1;}
+
   template <class Derived>
   void ConvertFromNumpyToEigenMatrix(Eigen::MatrixBase<Derived>* out, PyObject* in)
   {
@@ -115,7 +115,7 @@
     for (int i = 0; i != rows; ++i)
       for (int j = 0; j != cols; ++j)
         out->coeffRef(i,j) = data[i*cols+j];
-  };  
+  }
 
   // Copies values from Eigen type into an existing NumPy type
   template <class Derived>
@@ -176,7 +176,7 @@
       PyErr_SetString(PyExc_ValueError, "Impossible to convert the input into a Python array object.");
       return;
     }
-   
+
     typename Derived::Scalar* data = static_cast<typename Derived::Scalar*>(PyArray_DATA(temp));
 
     for (int i = 0; i != in->rows(); ++i) {
@@ -184,8 +184,8 @@
         data[i*in->cols()+j] = in->coeff(i,j);
       }
     }
-  };
-  
+  }
+
   template <class Derived>
   void ConvertFromEigenToNumPyMatrix(PyObject** out, Eigen::MatrixBase<Derived>* in)
   {
@@ -195,9 +195,11 @@
     for (int i = 0; i != dims[0]; ++i)
       for (int j = 0; j != dims[1]; ++j)
         data[i*dims[1]+j] = in->coeff(i,j);
-  };
+  }
 
-  template<> int NumPyType<double>() {return NPY_DOUBLE;};
+  template<> int NumPyType<int>() {return NPY_INT32;}
+  template<> int NumPyType<float>() {return NPY_FLOAT;}
+  template<> int NumPyType<double>() {return NPY_DOUBLE;}
 %}
 
 // ----------------------------------------------------------------------------
