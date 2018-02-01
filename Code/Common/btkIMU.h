@@ -67,7 +67,7 @@ namespace btk
     BTK_COMMON_EXPORT Analog::ConstPointer GetChannel(int id) const;
     BTK_COMMON_EXPORT Analog::Pointer GetChannel(const std::string& label);
     BTK_COMMON_EXPORT Analog::ConstPointer GetChannel(const std::string& label) const;
-    BTK_COMMON_EXPORT int GetChannelNumber() const {return this->m_Channels.size();};
+    BTK_COMMON_EXPORT int GetChannelNumber() const {return (int)this->m_Channels.size();};
     
     int GetType() const {return this->m_Type;};
     
