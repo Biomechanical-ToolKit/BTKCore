@@ -58,12 +58,18 @@
     #define btkSharedPtr std::shared_ptr
     using std::static_pointer_cast;
   #endif
-#elif defined(_MSC_VER) && (_MSC_VER >= 1500)
-  /* included with MSVC 2008 SP1 */
-  #if defined(HAVE_SYS_MEMORY_H)
+#elif defined(_MSC_VER)
+  #if (_MSC_VER >= 1910)
     #include <memory>
-    #define btkSharedPtr std::tr1::shared_ptr
-    using std::tr1::static_pointer_cast;
+    #define btkSharedPtr std::shared_ptr
+    using std::static_pointer_cast;
+  #elif (_MSC_VER >= 1500)
+    /* included with MSVC 2008 SP1 */
+    #if defined(HAVE_SYS_MEMORY_H)
+      #include <memory>
+      #define btkSharedPtr std::tr1::shared_ptr
+      using std::tr1::static_pointer_cast;
+    #endif
   #endif
 #elif defined(HAVE_BOOST_MEMORY_HPP)
   #include <boost/memory.hpp>
