@@ -46,6 +46,13 @@ namespace btk
   class GroundReactionWrenchFilter : public ForcePlatformWrenchFilter
   {
   public:
+
+      enum class Location : unsigned {
+          Origin = 0u, /// the origin of the forceplate
+          COP = 1u,    /// the center of pressure
+          PWA = 2u     /// the point of wrench application (Shimba 1984)
+      };
+
     typedef btkSharedPtr<GroundReactionWrenchFilter> Pointer;
     typedef btkSharedPtr<const GroundReactionWrenchFilter> ConstPointer;
 
@@ -57,7 +64,8 @@ namespace btk
     BTK_BASICFILTERS_EXPORT void SetThresholdState(bool activated = false);
     double GetThresholdValue() const {return this->m_ThresholdValue;};
     BTK_BASICFILTERS_EXPORT void SetThresholdValue(double v);
-    
+
+    void setLocation(Location loc) { m_location = loc }
   protected:
     BTK_BASICFILTERS_EXPORT GroundReactionWrenchFilter();
     
@@ -73,6 +81,7 @@ namespace btk
 
     bool m_ThresholdActivated;
     double m_ThresholdValue;
+    Location m_location{ Location::Origin };
   };
 
   inline void GroundReactionWrenchFilter::FinishGRWComputation(Wrench::Pointer grw, const ForcePlatform::Origin& o) const
@@ -94,28 +103,44 @@ namespace btk
     Mx += Fy * o.z() - o.y() * Fz;
     My += Fz * o.x() - o.z() * Fx;
     Mz += Fx * o.y() - o.x() * Fy;
+
+    Pz.setZero();
+    // Origin of the force plate ix 0, 0,0
+    if (m_location == Location::Origin) {
+        Px.setZero();
+        Py.setZero();
+    }
+    else if (m_location == Location::COP) {
+        Px = -My / Fz;
+        Py = Mx / Fz;
+        Mx.setZero();
+        My.setZero();
+        Mz += -Px*Fy + Py*Fx;
+    }
     // PWA
     // For explanations of the PWA calculation, see Shimba T. (1984), 
     // "An estimation of center of gravity from force platform data", 
     // Journal of Biomechanics 17(1), 53–60.
-    Px = (Fy * Mz - Fz * My) / sNF - (Fx.square() * My - Fx * (Fy * Mx)) / (sNF * Fz);
-    Py = (Fz * Mx - Fx * Mz) / sNF - (Fx * (Fy * My) - Fy.square() * Mx) / (sNF * Fz);
-    Pz.setZero();
-    // Suppress false PWA
-    for (int i = 0 ; i < Fz.rows() ; ++i)
-    {
-      if ((sNF.coeff(i) == 0.0) || (this->m_ThresholdActivated && (fabs(Fz.coeff(i)) <= this->m_ThresholdValue)))
-      {
-        Px.coeffRef(i) = 0.0;
-        Py.coeffRef(i) = 0.0;
-        // Pz.coeffRef(i) = 0.0; // Already set to 0
-        grw->GetPosition()->GetResiduals().coeffRef(i) = -1.0;
-      }
+    else if (m_location == Location::PWA) {
+        Px = (Fy * Mz - Fz * My) / sNF - (Fx.square() * My - Fx * (Fy * Mx)) / (sNF * Fz);
+        Py = (Fz * Mx - Fx * Mz) / sNF - (Fx * (Fy * My) - Fy.square() * Mx) / (sNF * Fz);
+
+        // Suppress false PWA
+        for (int i = 0; i < Fz.rows(); ++i)
+        {
+            if ((sNF.coeff(i) == 0.0) || (this->m_ThresholdActivated && (fabs(Fz.coeff(i)) <= this->m_ThresholdValue)))
+            {
+                Px.coeffRef(i) = 0.0;
+                Py.coeffRef(i) = 0.0;
+                // Pz.coeffRef(i) = 0.0; // Already set to 0
+                grw->GetPosition()->GetResiduals().coeffRef(i) = -1.0;
+            }
+        }
+        // M_pwa = M_s + F_s x PWA
+        Mx += Fy * Pz - Py * Fz;
+        My += Fz * Px - Pz * Fx;
+        Mz += Fx * Py - Px * Fy;
     }
-    // M_pwa = M_s + F_s x PWA
-    Mx += Fy * Pz - Py * Fz;
-    My += Fz * Px - Pz * Fx;
-    Mz += Fx * Py - Px * Fy;
 
     grw->GetForce()->GetValues().col(0) = Fx;
     grw->GetForce()->GetValues().col(1) = Fy;
