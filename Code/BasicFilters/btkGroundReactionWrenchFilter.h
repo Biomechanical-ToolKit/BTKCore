@@ -65,7 +65,7 @@ namespace btk
     double GetThresholdValue() const {return this->m_ThresholdValue;};
     BTK_BASICFILTERS_EXPORT void SetThresholdValue(double v);
 
-    void setLocation(Location loc) { m_location = loc }
+    void setLocation(Location loc) { m_location = loc; }
   protected:
     BTK_BASICFILTERS_EXPORT GroundReactionWrenchFilter();
     
