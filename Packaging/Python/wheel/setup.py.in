@@ -1,0 +1,50 @@
+# coding=utf-8
+from setuptools import setup, Extension
+import glob
+import os.path
+
+version = '@BTK_VERSION_STRING@'
+
+WRAPPER_SOURCES = '@BTK_PYTHON_WRAPPING_SOURCE_DIR@'
+WRAPPER_OBJECTS = '@BTK_PYTHON_WHEEL_BINARY_DIR@'
+
+
+def get_wrapper_sources():
+    sources = [
+       'btkBasicFiltersSwig.cpp',
+       'btkCommonSwig.cpp',
+       'btkIOSwig.cpp'
+    ]
+    return [os.path.join(WRAPPER_SOURCES, s) for s in sources]
+
+
+_btk = Extension('_btk',
+                include_dirs=[
+                    '.',
+                    '..',
+                    '@CMAKE_CURRENT_SOURCE_DIR@',
+                    '@BTK_BINARY_DIR@',
+                    '@BTK_SOURCE_DIR@/Wrapping/Python/',
+                    '@BTK_SOURCE_DIR@/Code/BasicFilters',
+                    '@BTK_SOURCE_DIR@/Code/Common',
+                    '@BTK_SOURCE_DIR@/Code/IO',
+                    '@BTK_SOURCE_DIR@/Utilities/boost',
+                    '@BTK_SOURCE_DIR@/Utilities/eigen3',
+                    '@BTK_SOURCE_DIR@/Utilities/SWIG',
+                    '@NUMPY_INCLUDE_DIR@'
+                ],
+                sources=get_wrapper_sources() + ['btkSwigPYTHON_wrap.cxx'],
+                extra_objects=['libBTKBasicFilters.a', 'libBTKCommon.a', 'libBTKIO.a'])
+
+
+setup(name='btk',
+      version=version,
+      description='BTK Python bindings',
+      long_description='''@BTK_PYTHON_PACKAGE_LONG_DESCRIPTION@''',
+      author='Arnaud Barré',
+      author_email='arnaud.barre@gmail.com',
+      url='https://code.google.com/p/b-tk/',
+      license='New BSD License',
+      packages=['btk'],
+      setup_requires=['wheel'],
+      ext_modules=[_btk])
