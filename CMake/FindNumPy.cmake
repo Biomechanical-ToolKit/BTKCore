@@ -16,10 +16,10 @@ FIND_PACKAGE(PythonInterp REQUIRED)
 
 # Look for the include path
 # WARNING: The variable PYTHON_EXECUTABLE is defined by the script FindPythonInterp.cmake
-EXECUTE_PROCESS(COMMAND "${PYTHON_EXECUTABLE}" -c "import numpy; print numpy.get_include(); print numpy.version.version"
+EXECUTE_PROCESS(COMMAND "${PYTHON_EXECUTABLE}" -c "from __future__ import print_function; import numpy; print(numpy.get_include()); print(numpy.version.version)"
                  OUTPUT_VARIABLE NUMPY_OUTPUT
                  ERROR_VARIABLE NUMPY_ERROR)
-                 
+
 IF(NOT NUMPY_ERROR)
   STRING(REPLACE "\n" ";" NUMPY_OUTPUT ${NUMPY_OUTPUT})
   LIST(GET NUMPY_OUTPUT 0 NUMPY_INCLUDE_DIR)
