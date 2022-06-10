@@ -79,7 +79,7 @@ namespace Open3DMotion
 	void ForcePlateMDF::ParseMDF(
 			std::map<size_t, std::vector< std::vector<UInt8> >, std::less<size_t> >& data,
 			std::map<size_t, size_t, std::less<size_t> >& /*elementsize*/,
-			size_t iplate) throw(MotionFileException)
+			size_t iplate)
   {
 		// MDF plate ID - init to zero (invalid)
 		UInt8 id(0);
@@ -308,7 +308,7 @@ namespace Open3DMotion
 		return 0.1*floor(10.0*k + 0.5);
 	}
 
-	UInt8 ForcePlateMDF::MDFPlateID() const throw(MotionFileException)
+	UInt8 ForcePlateMDF::MDFPlateID() const
   {
 		UInt8 id(0);
     const std::string& model = Model.Value();
@@ -353,7 +353,7 @@ namespace Open3DMotion
 		return id;
   }
 
-  const char* ForcePlateMDF::IDtoType(UInt8 id) throw(MotionFileException)
+  const char* ForcePlateMDF::IDtoType(UInt8 id)
   {
     switch((int)id)
     {
@@ -378,7 +378,7 @@ namespace Open3DMotion
     }
   }
 
-  const char* ForcePlateMDF::IDtoModel(UInt8 id) throw(MotionFileException)
+  const char* ForcePlateMDF::IDtoModel(UInt8 id)
   {
     switch((int)id)
     {

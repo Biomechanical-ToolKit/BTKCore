@@ -49,7 +49,7 @@ namespace Open3DMotion
 		void ParseMDF(
 			std::map<size_t, std::vector< std::vector<UInt8> >, std::less<size_t> >& data,
 			std::map<size_t, size_t, std::less<size_t> >& elementsize,
-			size_t iplate) throw(MotionFileException);
+			size_t iplate);
 
 		float MDFDefaultSaveRes(size_t ichannel) const;
 
@@ -76,7 +76,7 @@ namespace Open3DMotion
 
 		size_t RuntimeChannelToMDFChannel(size_t runchannel) const;
 
-		UInt8 MDFPlateID() const throw(MotionFileException);
+		UInt8 MDFPlateID() const;
 
 		void MDFSensorConstants(Int16* w) const;
 
@@ -125,9 +125,9 @@ namespace Open3DMotion
 
 		static double RoundSensorConst(double k);
 
-		static const char* IDtoModel(UInt8 id) throw(MotionFileException);
+		static const char* IDtoModel(UInt8 id);
 
-		static const char* IDtoType(UInt8 id) throw(MotionFileException);
+		static const char* IDtoType(UInt8 id);
 	};
 }
 

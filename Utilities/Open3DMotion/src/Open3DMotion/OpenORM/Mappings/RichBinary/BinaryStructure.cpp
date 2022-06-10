@@ -28,7 +28,7 @@ namespace Open3DMotion
 		}
 	}
 
-	void BinaryStructure::GetFieldOffset(BinaryFieldSpec const*& spec, size_t& offset, const char* fieldname) const throw(NoSuchFieldException)
+	void BinaryStructure::GetFieldOffset(BinaryFieldSpec const*& spec, size_t& offset, const char* fieldname) const
 	{
 		size_t n = Layout.NumElements();
 		offset = 0;

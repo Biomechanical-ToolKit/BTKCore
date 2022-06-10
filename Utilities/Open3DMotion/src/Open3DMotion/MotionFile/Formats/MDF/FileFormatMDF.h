@@ -67,13 +67,13 @@ namespace Open3DMotion
   public:
 
 		// check id and number type
-    virtual bool Probe(const MotionFileHandler& context, TreeValue*& readoptions, std::istream& is) const throw(MotionFileException);
+    virtual bool Probe(const MotionFileHandler& context, TreeValue*& readoptions, std::istream& is) const;
 
     // Read MDF
-    virtual TreeValue* Read(const MotionFileHandler& context, std::istream& is, const BinMemFactory& memfactory, const TreeValue* readoptions) const throw(MotionFileException) ;
+    virtual TreeValue* Read(const MotionFileHandler& context, std::istream& is, const BinMemFactory& memfactory, const TreeValue* readoptions) const;
 
     // Write MDF
-    virtual void Write(const MotionFileHandler& context, const TreeValue* contents, std::ostream& os, const TreeValue* writeoptions) const throw(MotionFileException);
+    virtual void Write(const MotionFileHandler& context, const TreeValue* contents, std::ostream& os, const TreeValue* writeoptions) const;
 		
 	};
 }

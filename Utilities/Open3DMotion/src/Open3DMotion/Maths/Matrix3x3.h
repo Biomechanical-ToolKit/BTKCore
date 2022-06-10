@@ -81,7 +81,7 @@ namespace Open3DMotion
     }
 
     // retrieve element in row i, column j
-    double& operator() (int i, int j) throw(MathsException)
+    double& operator() (int i, int j)
     {
       CODAMOTION_MATHS_VERIFY(i >= 0);
       CODAMOTION_MATHS_VERIFY(j >= 0);
@@ -91,7 +91,7 @@ namespace Open3DMotion
     }
 
     // retrieve element in row i, column j (const)
-    const double& operator() (int i, int j) const throw(MathsException)
+    const double& operator() (int i, int j) const
     {
       CODAMOTION_MATHS_VERIFY(i >= 0);
       CODAMOTION_MATHS_VERIFY(j >= 0);

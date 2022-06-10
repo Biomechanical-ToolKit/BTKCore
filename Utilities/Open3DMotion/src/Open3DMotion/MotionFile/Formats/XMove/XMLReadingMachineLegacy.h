@@ -20,7 +20,7 @@ namespace Open3DMotion
 		XMLReadingMachineLegacy(const BinMemFactory& _memfactory);
 
 	public:
-		virtual TreeValue* ReadValue(const pugi::xml_node& element) throw(XMLReadException);
+		virtual TreeValue* ReadValue(const pugi::xml_node& element);
 
 	public:
 
