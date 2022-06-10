@@ -37,16 +37,16 @@ namespace Open3DMotion
 		{ return programversion; }
 
 		/** Read from file */
-		TreeValue* Read(const char* filename, const MotionFileFormatList& formatlist = MotionFileFormatListAll(), const BinMemFactory& memfactory = BinMemFactoryDefault()) throw(MotionFileException);
+		TreeValue* Read(const char* filename, const MotionFileFormatList& formatlist = MotionFileFormatListAll(), const BinMemFactory& memfactory = BinMemFactoryDefault());
 
 		/** Read from STL stream */
-		TreeValue* Read(std::istream& is, const MotionFileFormatList& formatlist = MotionFileFormatListAll(), const BinMemFactory& memfactory = BinMemFactoryDefault()) throw(MotionFileException);
+		TreeValue* Read(std::istream& is, const MotionFileFormatList& formatlist = MotionFileFormatListAll(), const BinMemFactory& memfactory = BinMemFactoryDefault());
 
 		/** Write to file */
-		void Write(const char* filename, const TreeValue* contents, const TreeValue* writeoptions, const MotionFileFormatList& formatlist = MotionFileFormatListAll()) throw(MotionFileException);
+		void Write(const char* filename, const TreeValue* contents, const TreeValue* writeoptions, const MotionFileFormatList& formatlist = MotionFileFormatListAll());
 
 		/** Write to STL stream */
-		void Write(std::ostream& os, const char* filename, const TreeValue* contents, const TreeValue* writeoptions, const MotionFileFormatList& formatlist = MotionFileFormatListAll()) throw(MotionFileException);
+		void Write(std::ostream& os, const char* filename, const TreeValue* contents, const TreeValue* writeoptions, const MotionFileFormatList& formatlist = MotionFileFormatListAll());
 
 	private:
 		std::string programname;

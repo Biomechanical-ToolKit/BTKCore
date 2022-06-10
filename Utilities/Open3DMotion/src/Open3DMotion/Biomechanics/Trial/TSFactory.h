@@ -51,7 +51,7 @@ namespace Open3DMotion
 	class TSScalarConstIter : public BinConstIter1<double>
 	{
 	public:
-		TSScalarConstIter(const TimeSequence& ts) throw(NoSuchFieldException)  :
+		TSScalarConstIter(const TimeSequence& ts) :
 				BinConstIter1<double>(ts, TSFactoryValue::fieldname_value, 1)
 		{
 		}
@@ -64,7 +64,7 @@ namespace Open3DMotion
 	class TSScalarIter : public BinIter1<double>
 	{
 	public:
-		TSScalarIter(TimeSequence& ts) throw(NoSuchFieldException)  :
+		TSScalarIter(TimeSequence& ts) :
 				BinIter1<double>(ts, TSFactoryValue::fieldname_value, 1)
 		{
 		}
@@ -77,7 +77,7 @@ namespace Open3DMotion
 	class TSVector3ConstIter : public BinConstIter1<double>
 	{
 	public:
-			TSVector3ConstIter(const TimeSequence& ts) throw(NoSuchFieldException) :
+			TSVector3ConstIter(const TimeSequence& ts) :
 				BinConstIter1<double>(ts, TSFactoryValue::fieldname_value, 3)
 		{
 		}
@@ -90,7 +90,7 @@ namespace Open3DMotion
 	class TSVector3Iter : public BinIter1<double>
 	{
 	public:
-		TSVector3Iter(TimeSequence& ts) throw(NoSuchFieldException)  :
+		TSVector3Iter(TimeSequence& ts) :
 				BinIter1<double>(ts, TSFactoryValue::fieldname_value, 3)
 		{
 		}
@@ -103,7 +103,7 @@ namespace Open3DMotion
 	class TSOccVector3ConstIter : public BinConstIter2<double, UInt8>
 	{
 	public:
-			TSOccVector3ConstIter(const TimeSequence& ts) throw(NoSuchFieldException) :
+			TSOccVector3ConstIter(const TimeSequence& ts) :
 				BinConstIter2<double, UInt8>(ts, TSFactoryValue::fieldname_value, 3, TSFactoryOccValue::fieldname_occluded, 1)
 		{
 		}
@@ -119,7 +119,7 @@ namespace Open3DMotion
 	class TSOccVector3Iter : public BinIter2<double, UInt8>
 	{
 	public:
-		TSOccVector3Iter(TimeSequence& ts) throw(NoSuchFieldException)  :
+		TSOccVector3Iter(TimeSequence& ts) :
 			BinIter2<double, UInt8>(ts, TSFactoryValue::fieldname_value, 3, TSFactoryOccValue::fieldname_occluded, 1)
 		{
 		}
@@ -135,7 +135,7 @@ namespace Open3DMotion
 	class TSOccConstIter : public BinConstIter1<UInt8>
 	{
 	public:
-		TSOccConstIter(const TimeSequence& ts) throw(NoSuchFieldException)  :
+		TSOccConstIter(const TimeSequence& ts) :
 				BinConstIter1<UInt8>(ts, TSFactoryOccValue::fieldname_occluded, 1)
 		{
 		}
@@ -148,7 +148,7 @@ namespace Open3DMotion
 	class TSOccIter : public BinIter1<UInt8>
 	{
 	public:
-		TSOccIter(TimeSequence& ts) throw(NoSuchFieldException)  :
+		TSOccIter(TimeSequence& ts) :
 				BinIter1<UInt8>(ts, TSFactoryOccValue::fieldname_occluded, 1)
 		{
 		}
@@ -161,7 +161,7 @@ namespace Open3DMotion
 	class TSOccMatrix3x3ConstIter : public Open3DMotion::BinConstIter2<double, Open3DMotion::UInt8>
 	{
 	public:
-			TSOccMatrix3x3ConstIter(const Open3DMotion::TimeSequence& ts) throw(Open3DMotion::NoSuchFieldException) :
+			TSOccMatrix3x3ConstIter(const Open3DMotion::TimeSequence& ts) :
 				BinConstIter2<double, Open3DMotion::UInt8>(ts, Open3DMotion::TSFactoryValue::fieldname_value, 9, Open3DMotion::TSFactoryOccValue::fieldname_occluded, 1)
 		{
 		}
@@ -177,7 +177,7 @@ namespace Open3DMotion
 	class TSOccMatrix3x3Iter : public Open3DMotion::BinIter2<double, Open3DMotion::UInt8>
 	{
 	public:
-			TSOccMatrix3x3Iter(Open3DMotion::TimeSequence& ts) throw(Open3DMotion::NoSuchFieldException) :
+			TSOccMatrix3x3Iter(Open3DMotion::TimeSequence& ts) :
 				BinIter2<double, Open3DMotion::UInt8>(ts, Open3DMotion::TSFactoryValue::fieldname_value, 9, Open3DMotion::TSFactoryOccValue::fieldname_occluded, 1)
 		{
 		}

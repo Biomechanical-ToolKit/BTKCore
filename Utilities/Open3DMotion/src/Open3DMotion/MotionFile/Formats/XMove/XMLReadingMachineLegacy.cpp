@@ -22,7 +22,7 @@ namespace Open3DMotion
 	{
 	}
 
-	TreeValue* XMLReadingMachineLegacy::ReadValue(const pugi::xml_node& xml_element) throw(XMLReadException)
+	TreeValue* XMLReadingMachineLegacy::ReadValue(const pugi::xml_node& xml_element)
 	{
 		// element to remap
 		pugi::xml_node remapped_element = xml_element;

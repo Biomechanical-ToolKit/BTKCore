@@ -34,7 +34,7 @@ namespace Open3DMotion
 	TreeValue* MotionFileHandler::Read(
 		const char* filename, 
 		const MotionFileFormatList& formatlist /*=MotionFileFormatListAll()*/, 
-		const BinMemFactory& memfactory /*=BinMemFactoryDefault()*/ ) throw(MotionFileException)
+		const BinMemFactory& memfactory /*=BinMemFactoryDefault()*/ )
 	{
 #ifdef _MSC_VER
 		// creating a C-style file object may work better with UTF-8
@@ -59,7 +59,7 @@ namespace Open3DMotion
 	TreeValue* MotionFileHandler::Read(
 		std::istream& is, 
 		const MotionFileFormatList& formatlist /*=MotionFileFormatListAll()*/, 
-		const BinMemFactory& memfactory /*=BinMemFactoryDefault()*/ ) throw(MotionFileException)
+		const BinMemFactory& memfactory /*=BinMemFactoryDefault()*/ )
 	{
 		// establish the format
 		TreeValue* readoptions(NULL);
@@ -105,7 +105,7 @@ namespace Open3DMotion
 		return trialobject;
 	}
 
-	void MotionFileHandler::Write(const char* filename, const TreeValue* contents, const TreeValue* writeoptions, const MotionFileFormatList& formatlist /*=MotionFileFormatListAll()*/) throw(MotionFileException)
+	void MotionFileHandler::Write(const char* filename, const TreeValue* contents, const TreeValue* writeoptions, const MotionFileFormatList& formatlist /*=MotionFileFormatListAll()*/)
 	{
 #ifdef _MSC_VER
 		// creating a C-style file object may work better with UTF-8
@@ -123,7 +123,7 @@ namespace Open3DMotion
 		os.close();
 	}
 
-	void MotionFileHandler::Write(std::ostream& os, const char* filename, const TreeValue* contents, const TreeValue* writeoptions, const MotionFileFormatList& formatlist /*=MotionFileFormatListAll()*/) throw(MotionFileException)
+	void MotionFileHandler::Write(std::ostream& os, const char* filename, const TreeValue* contents, const TreeValue* writeoptions, const MotionFileFormatList& formatlist /*=MotionFileFormatListAll()*/)
 	{
 		// ensure write options non-NULL
 		TreeCompound emptyoptions;

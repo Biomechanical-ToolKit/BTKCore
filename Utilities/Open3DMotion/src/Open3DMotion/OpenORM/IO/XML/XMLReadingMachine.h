@@ -34,7 +34,7 @@ namespace Open3DMotion
 	   */
 		virtual TreeValue* Read(const ReadWriteXML* xml_reader, const pugi::xml_node& element);
 
-		virtual TreeValue* ReadValue(const pugi::xml_node& element) throw(XMLReadException);
+		virtual TreeValue* ReadValue(const pugi::xml_node& element);
 
 		virtual void ReadTextNode(std::string& node_text, const pugi::xml_node& element);
 

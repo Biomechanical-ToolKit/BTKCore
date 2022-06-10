@@ -29,7 +29,7 @@ namespace Open3DMotion
 		const MapArrayCompound<BinaryFieldSpec>& GetLayout() const
 		{ return Layout; }
 
-		void GetFieldOffset(BinaryFieldSpec const*& spec, size_t& offset, const char* fieldname) const throw(NoSuchFieldException);
+		void GetFieldOffset(BinaryFieldSpec const*& spec, size_t& offset, const char* fieldname) const;
 
 		static const char LayoutElementName[];
 

@@ -31,7 +31,7 @@ namespace Open3DMotion
 	{
 	}
 
-	bool FileFormatXMove::Probe(const MotionFileHandler& /*context*/, TreeValue*& readoptions, std::istream& is) const throw(MotionFileException)
+	bool FileFormatXMove::Probe(const MotionFileHandler& /*context*/, TreeValue*& readoptions, std::istream& is) const
 	{
 		// check for format
 		if (!ProbeTextString(is, "<xmove", 1024))
@@ -49,7 +49,7 @@ namespace Open3DMotion
 		return true;
 	}
 
-  TreeValue* FileFormatXMove::Read(const MotionFileHandler& /*context*/, std::istream& is, const BinMemFactory& memfactory, const TreeValue* readoptions) const throw(MotionFileException) 
+  TreeValue* FileFormatXMove::Read(const MotionFileHandler& /*context*/, std::istream& is, const BinMemFactory& memfactory, const TreeValue* readoptions) const
 	{
 		// options
 		FileFormatOptionsXMove xmove_options;
@@ -108,7 +108,7 @@ namespace Open3DMotion
 
 	}
 
-	void FileFormatXMove::Write(const MotionFileHandler& context, const TreeValue* contents, std::ostream& os, const TreeValue* writeoptions) const throw(MotionFileException)
+	void FileFormatXMove::Write(const MotionFileHandler& context, const TreeValue* contents, std::ostream& os, const TreeValue* writeoptions) const
 	{
 		// options
 		FileFormatOptionsXMove xmove_options;

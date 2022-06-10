@@ -31,7 +31,7 @@ namespace Open3DMotion
     virtual ~BinIterBase() {};
 
 	protected:
-		template<typename DataType> static const DataType* GetFieldPointer(const RichBinary& bin, const char* fieldname, size_t dimension) throw(NoSuchFieldException)
+		template<typename DataType> static const DataType* GetFieldPointer(const RichBinary& bin, const char* fieldname, size_t dimension)
 		{
 			// get spec and relative offset - will throw exception if not found
 			const BinaryFieldSpec* spec(NULL);
@@ -160,7 +160,7 @@ namespace Open3DMotion
 	template<typename TypeA> class BinConstIter1 : public BinIterBase
 	{
 	public:
-		BinConstIter1(const RichBinary& bin, const char* fieldA, size_t dimA) throw(NoSuchFieldException) :
+		BinConstIter1(const RichBinary& bin, const char* fieldA, size_t dimA) :
 			BinIterBase(bin),
 			a( GetFieldPointer<TypeA> (bin, fieldA, dimA) )
 		{
@@ -191,7 +191,7 @@ namespace Open3DMotion
 	template<typename TypeA> class BinIter1 : public BinConstIter1<TypeA>
 	{
 	public:
-		BinIter1(RichBinary& bin, const char* fieldA, size_t dimA)  throw(NoSuchFieldException) :
+		BinIter1(RichBinary& bin, const char* fieldA, size_t dimA) :
 			BinConstIter1<TypeA>(bin, fieldA, dimA)
 		{
 		}
@@ -205,7 +205,7 @@ namespace Open3DMotion
 	template<typename TypeA, typename TypeB> class BinConstIter2 : public BinConstIter1<TypeA>
 	{
 	public:
-		BinConstIter2(const RichBinary& bin, const char* fieldA, size_t dimA, const char* fieldB, size_t dimB) throw(NoSuchFieldException) :
+		BinConstIter2(const RichBinary& bin, const char* fieldA, size_t dimA, const char* fieldB, size_t dimB) :
 				BinConstIter1<TypeA> (bin, fieldA, dimA),
         b( BinIterBase::GetFieldPointer<TypeB>(bin, fieldB, dimB) )
 		{
@@ -238,7 +238,7 @@ namespace Open3DMotion
 	template<typename TypeA, typename TypeB> class BinIter2 : public BinConstIter2<TypeA, TypeB>
 	{
 	public:
-		BinIter2(const RichBinary& bin, const char* fieldA, size_t dimA, const char* fieldB, size_t dimB) throw(NoSuchFieldException) :
+		BinIter2(const RichBinary& bin, const char* fieldA, size_t dimA, const char* fieldB, size_t dimB) :
 				 BinConstIter2<TypeA, TypeB>(bin, fieldA, dimA, fieldB, dimB)
 		{
 		}
@@ -254,7 +254,7 @@ namespace Open3DMotion
 	template<typename TypeA, typename TypeB, typename TypeC> class BinConstIter3 : public BinConstIter2<TypeA, TypeB>
 	{
 	public:
-		BinConstIter3(const RichBinary& bin, const char* fieldA, size_t dimA, const char* fieldB, size_t dimB, const char* fieldC, size_t dimC) throw(NoSuchFieldException) :
+		BinConstIter3(const RichBinary& bin, const char* fieldA, size_t dimA, const char* fieldB, size_t dimB, const char* fieldC, size_t dimC) :
 				BinConstIter2<TypeA, TypeB> (bin, fieldA, dimA, fieldB, dimB),
         c( BinIterBase::GetFieldPointer<TypeC>(bin, fieldC, dimC) )
 		{
@@ -287,7 +287,7 @@ namespace Open3DMotion
 	template<typename TypeA, typename TypeB, typename TypeC> class BinIter3 : public BinConstIter3<TypeA, TypeB, TypeC>
 	{
 	public:
-		BinIter3(const RichBinary& bin, const char* fieldA, size_t dimA, const char* fieldB, size_t dimB, const char* fieldC, size_t dimC) throw(NoSuchFieldException) :
+		BinIter3(const RichBinary& bin, const char* fieldA, size_t dimA, const char* fieldB, size_t dimB, const char* fieldC, size_t dimC) :
 				 BinConstIter3<TypeA, TypeB, TypeC>(bin, fieldA, dimA, fieldB, dimB, fieldC, dimC)
 		{
 		}
